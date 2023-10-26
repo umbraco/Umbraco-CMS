@@ -150,6 +150,12 @@
     <key alias="confirmActionConfirm">Confirmer</key>
     <key alias="morePublishingOptions">Options de publication supplémentaires</key>
   </area>
+  <area alias="auditTrailsMedia">
+    <key alias="delete">Media supprimé</key>
+    <key alias="move">Media déplacé</key>
+    <key alias="copy">Media copié</key>
+    <key alias="save">Media sauvegardé</key>
+  </area>
   <area alias="auditTrails">
     <key alias="atViewingFor">Aperçu pour</key>
     <key alias="delete">Contenu supprimé</key>

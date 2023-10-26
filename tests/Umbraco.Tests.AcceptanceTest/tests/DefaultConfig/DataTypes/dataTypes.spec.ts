@@ -104,7 +104,7 @@ test.describe('DataTypes', () => {
     // Add char and assert helptext appears - no publish to save time & has been asserted above & below
     await page.locator('input[name="textbox"]').type('9');
     await expect(page.locator('localize[key="textbox_characters_left"]', {hasText: "characters left"}).first()).toBeVisible();
-    await expect(await umbracoUi.getErrorNotification()).not.toBeVisible();
+    await expect(await umbracoUi.getErrorNotification()).not.toBeVisible({timeout: 20000});
 
     // Add char and assert errortext appears and can't save
     await page.locator('input[name="textbox"]').type('10'); // 1 char over max
@@ -154,14 +154,14 @@ test.describe('DataTypes', () => {
     await page.locator('.umb-tree-root').click({button: "right"});
     await page.locator('[data-element="action-create"]').click();
     await page.locator('[data-element="action-create-' + pickerDocTypeAlias + '"] > .umb-action-link').click();
-    
+
     // Fill out content
     await umbracoUi.setEditorHeaderName('UrlPickerContent');
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.saveAndPublish));
     await umbracoUi.isSuccessNotificationVisible();
     await page.locator('span:has-text("×")').click();
     await page.locator('.umb-node-preview-add').click();
-    
+
     await page.locator('[data-element="editor-container"]').locator('[data-element="tree-item-UrlPickerContent"]').click();
     await expect(page.locator('[alias="urlLinkPicker"]').locator('input[id="urlLinkPicker"]')).toHaveValue('/');
     await page.locator('.umb-editor-footer-content__right-side').locator('[label-key="' + ConstantHelper.buttons.submit + '"]').click();
@@ -172,7 +172,7 @@ test.describe('DataTypes', () => {
     await umbracoUi.isSuccessNotificationVisible();
 
     // Assert
-    await expect(await umbracoUi.getErrorNotification()).not.toBeVisible();
+    await expect(await umbracoUi.getErrorNotification()).not.toBeVisible({timeout: 20000});
 
     // Testing if the edits match the expected results
     const expected = '<a href="/">UrlPickerContent</a>';

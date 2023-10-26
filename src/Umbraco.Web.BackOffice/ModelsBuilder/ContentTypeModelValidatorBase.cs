@@ -68,10 +68,10 @@ public abstract class ContentTypeModelValidatorBase<TModel, TProperty> : EditorV
 
     private ValidationResult? ValidateProperty(PropertyTypeBasic property, int groupIndex, int propertyIndex)
     {
-        // don't let them match any properties or methods in IPublishedContent
+        // don't let them match any properties or methods in IPublishedContent (including those defined in any base interfaces like IPublishedElement)
         // TODO: There are probably more!
-        var reservedProperties = typeof(IPublishedContent).GetProperties().Select(x => x.Name).ToArray();
-        var reservedMethods = typeof(IPublishedContent).GetMethods().Select(x => x.Name).ToArray();
+        var reservedProperties = typeof(IPublishedContent).GetPublicProperties().Select(x => x.Name).ToArray();
+        var reservedMethods = typeof(IPublishedContent).GetPublicMethods().Select(x => x.Name).ToArray();
 
         var alias = property.Alias;
 

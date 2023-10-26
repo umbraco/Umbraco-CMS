@@ -3,6 +3,7 @@ using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Umbraco.Cms.Api.Delivery.Configuration;
 using Umbraco.Cms.Api.Delivery.Controllers;
+using Umbraco.Cms.Api.Delivery.Controllers.Media;
 
 namespace Umbraco.Cms.Api.Delivery.Filters;
 

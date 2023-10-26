@@ -48,9 +48,43 @@ public class CurrentUserController : UmbracoAuthorizedJsonController
     private readonly IShortStringHelper _shortStringHelper;
     private readonly IUmbracoMapper _umbracoMapper;
     private readonly IUserDataService _userDataService;
+    private readonly IFileStreamSecurityValidator? _fileStreamSecurityValidator; // make non nullable in v14
     private readonly IUserService _userService;
 
     [ActivatorUtilitiesConstructor]
+    public CurrentUserController(
+        MediaFileManager mediaFileManager,
+        IOptionsSnapshot<ContentSettings> contentSettings,
+        IHostingEnvironment hostingEnvironment,
+        IImageUrlGenerator imageUrlGenerator,
+        IBackOfficeSecurityAccessor backofficeSecurityAccessor,
+        IUserService userService,
+        IUmbracoMapper umbracoMapper,
+        IBackOfficeUserManager backOfficeUserManager,
+        ILocalizedTextService localizedTextService,
+        AppCaches appCaches,
+        IShortStringHelper shortStringHelper,
+        IPasswordChanger<BackOfficeIdentityUser> passwordChanger,
+        IUserDataService userDataService,
+        IFileStreamSecurityValidator fileStreamSecurityValidator)
+    {
+        _mediaFileManager = mediaFileManager;
+        _contentSettings = contentSettings.Value;
+        _hostingEnvironment = hostingEnvironment;
+        _imageUrlGenerator = imageUrlGenerator;
+        _backofficeSecurityAccessor = backofficeSecurityAccessor;
+        _userService = userService;
+        _umbracoMapper = umbracoMapper;
+        _backOfficeUserManager = backOfficeUserManager;
+        _localizedTextService = localizedTextService;
+        _appCaches = appCaches;
+        _shortStringHelper = shortStringHelper;
+        _passwordChanger = passwordChanger;
+        _userDataService = userDataService;
+        _fileStreamSecurityValidator = fileStreamSecurityValidator;
+    }
+
+    [Obsolete("Use constructor overload that has fileStreamSecurityValidator, scheduled for removal in v14")]
     public CurrentUserController(
         MediaFileManager mediaFileManager,
         IOptionsSnapshot<ContentSettings> contentSettings,
@@ -192,10 +226,12 @@ public class CurrentUserController : UmbracoAuthorizedJsonController
     /// </summary>
     /// <param name="newPassword"></param>
     /// <returns></returns>
+    /// <seealso cref="AuthenticationController.PostSetInvitedUserPassword"/>
     /// <remarks>
     ///     This only works when the user is logged in (partially)
     /// </remarks>
     [AllowAnonymous]
+    [Obsolete("This is no longer used and will be removed in future versions. Use the AuthenticationController.PostSetInvitedUserPassword instead.")]
     public async Task<ActionResult<UserDetail?>> PostSetInvitedUserPassword([FromBody] string newPassword)
     {
         var userId = _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().ResultOr(0).ToString();
@@ -251,6 +287,7 @@ public class CurrentUserController : UmbracoAuthorizedJsonController
             _contentSettings,
             _hostingEnvironment,
             _imageUrlGenerator,
+            _fileStreamSecurityValidator,
             _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? 0);
     }
 

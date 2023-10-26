@@ -28,7 +28,7 @@ public static class XmlExtensions
     /// <remarks>
     ///     <para>
     ///         If
-    ///         <param name="variables" />
+    ///         <paramref name="variables" />
     ///         is <c>null</c>, or is empty, or contains only one single
     ///         value which itself is <c>null</c>, then variables are ignored.
     ///     </para>
@@ -51,7 +51,7 @@ public static class XmlExtensions
     /// <remarks>
     ///     <para>
     ///         If
-    ///         <param name="variables" />
+    ///         <paramref name="variables" />
     ///         is <c>null</c>, or is empty, or contains only one single
     ///         value which itself is <c>null</c>, then variables are ignored.
     ///     </para>
@@ -74,7 +74,7 @@ public static class XmlExtensions
     /// <remarks>
     ///     <para>
     ///         If
-    ///         <param name="variables" />
+    ///         <paramref name="variables" />
     ///         is <c>null</c>, or is empty, or contains only one single
     ///         value which itself is <c>null</c>, then variables are ignored.
     ///     </para>
@@ -102,7 +102,7 @@ public static class XmlExtensions
     /// <remarks>
     ///     <para>
     ///         If
-    ///         <param name="variables" />
+    ///         <paramref name="variables" />
     ///         is <c>null</c>, or is empty, or contains only one single
     ///         value which itself is <c>null</c>, then variables are ignored.
     ///     </para>
@@ -130,7 +130,7 @@ public static class XmlExtensions
     /// <remarks>
     ///     <para>
     ///         If
-    ///         <param name="variables" />
+    ///         <paramref name="variables" />
     ///         is <c>null</c>, or is empty, or contains only one single
     ///         value which itself is <c>null</c>, then variables are ignored.
     ///     </para>
@@ -153,7 +153,7 @@ public static class XmlExtensions
     /// <remarks>
     ///     <para>
     ///         If
-    ///         <param name="variables" />
+    ///         <paramref name="variables" />
     ///         is <c>null</c>, or is empty, or contains only one single
     ///         value which itself is <c>null</c>, then variables are ignored.
     ///     </para>
@@ -176,7 +176,7 @@ public static class XmlExtensions
     /// <remarks>
     ///     <para>
     ///         If
-    ///         <param name="variables" />
+    ///         <paramref name="variables" />
     ///         is <c>null</c>, or is empty, or contains only one single
     ///         value which itself is <c>null</c>, then variables are ignored.
     ///     </para>
@@ -203,7 +203,7 @@ public static class XmlExtensions
     /// <remarks>
     ///     <para>
     ///         If
-    ///         <param name="variables" />
+    ///         <paramref name="variables" />
     ///         is <c>null</c>, or is empty, or contains only one single
     ///         value which itself is <c>null</c>, then variables are ignored.
     ///     </para>

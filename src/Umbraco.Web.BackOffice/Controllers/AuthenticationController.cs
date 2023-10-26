@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -306,14 +307,15 @@ public class AuthenticationController : UmbracoApiControllerBase
     ///     When a user is invited they are not approved but we need to resolve the partially logged on (non approved)
     ///     user.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>It returns a 403 error if the logged-in user has already been created.</returns>
     /// <remarks>
     ///     We cannot user GetCurrentUser since that requires they are approved, this is the same as GetCurrentUser but doesn't
     ///     require them to be approved
     /// </remarks>
     [Authorize(Policy = AuthorizationPolicies.BackOfficeAccessWithoutApproval)]
-    [SetAngularAntiForgeryTokens]
     [Authorize(Policy = AuthorizationPolicies.DenyLocalLoginIfConfigured)]
+    [SetAngularAntiForgeryTokens]
+    [AllowAnonymous] // Needed for users that are invited when they use the link from the mail they may have logged in on a different session, so we don't want to redirect them.
     public ActionResult<UserDetail?> GetCurrentInvitedUser()
     {
         IUser? user = _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
@@ -333,6 +335,76 @@ public class AuthenticationController : UmbracoApiControllerBase
         }
 
         return result;
+    }
+
+    /// <summary>
+    ///     When a user is invited and they click on the invitation link, they will be partially logged in
+    ///     where they can set their username/password.
+    /// </summary>
+    /// <param name="invitePasswordModel">The model for the new password.</param>
+    /// <returns>The user model for the invited user.</returns>
+    /// <remarks>
+    ///     This only works when the user is logged in (partially).
+    /// </remarks>
+    [Authorize(Policy = AuthorizationPolicies.BackOfficeAccessWithoutApproval)]
+    [Authorize(Policy = AuthorizationPolicies.DenyLocalLoginIfConfigured)]
+    [SetAngularAntiForgeryTokens]
+    [AllowAnonymous] // Needed for users that are invited when they use the link from the mail they may have logged in on a different session, so we don't want to redirect them.
+    public async Task<ActionResult<UserDetail?>> PostSetInvitedUserPassword(InvitePasswordModel invitePasswordModel)
+    {
+        IUser? currentUser = _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
+
+        if (currentUser is null)
+        {
+            return BadRequest("Could not find user");
+        }
+
+        if (currentUser.IsApproved)
+        {
+            // if they are approved, than they are no longer invited and we can return an error
+            return Forbid();
+        }
+
+        BackOfficeIdentityUser? user = await _userManager.FindByIdAsync(currentUser!.Id.ToString());
+
+        if (user is null)
+        {
+            return BadRequest("Could not find identity user");
+        }
+
+        IdentityResult result = await _userManager.AddPasswordAsync(user, invitePasswordModel.NewPassword);
+
+        if (result.Succeeded is false)
+        {
+            // it wasn't successful, so add the change error to the model state, we've name the property alias _umb_password on the form
+            // so that is why it is being used here.
+            ModelState.AddModelError("value", result.Errors.ToErrorMessage());
+
+            return ValidationProblem(ModelState);
+        }
+
+        if (_backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser is not null)
+        {
+            // They've successfully set their password, we can now update their user account to be approved
+            _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.IsApproved = true;
+
+            // They've successfully set their password, and will now get fully logged into the back office, so the lastlogindate is set so the backoffice shows they have logged in
+            _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.LastLoginDate = DateTime.UtcNow;
+
+            _userService.Save(_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser);
+        }
+
+
+        // now we can return their full object since they are now really logged into the back office
+        UserDetail? userDisplay =
+            _umbracoMapper.Map<UserDetail>(_backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser);
+
+        if (userDisplay is not null)
+        {
+            userDisplay.SecondsUntilTimeout = HttpContext.User.GetRemainingAuthSeconds();
+        }
+
+        return userDisplay;
     }
 
     /// <summary>
@@ -357,11 +429,6 @@ public class AuthenticationController : UmbracoApiControllerBase
         if (result.RequiresTwoFactor)
         {
             var twofactorView = _backOfficeTwoFactorOptions.GetTwoFactorView(loginModel.Username);
-            if (twofactorView.IsNullOrWhiteSpace())
-            {
-                return new ValidationErrorResult(
-                    $"The registered {typeof(IBackOfficeTwoFactorOptions)} of type {_backOfficeTwoFactorOptions.GetType()} did not return a view for two factor auth ");
-            }
 
             IUser? attemptedUser = _userService.GetByUsername(loginModel.Username);
 
@@ -428,6 +495,8 @@ public class AuthenticationController : UmbracoApiControllerBase
                 _userManager.NotifyForgotPasswordRequested(User, user.Id.ToString());
             }
         }
+
+        await Task.Delay(RandomNumberGenerator.GetInt32(400, 2500));
 
         return Ok();
     }
@@ -650,7 +719,6 @@ public class AuthenticationController : UmbracoApiControllerBase
     ///     Return the <see cref="UserDetail" /> for the given <see cref="IUser" />
     /// </summary>
     /// <param name="user"></param>
-    /// <param name="principal"></param>
     /// <returns></returns>
     private UserDetail? GetUserDetail(IUser? user)
     {

@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Integration.TestServerTest;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Website.Controllers;
@@ -48,6 +49,7 @@ public class SurfaceControllerTests : UmbracoTestServerTestBase
     }
 
     [Test]
+    [LongRunning]
     public async Task Plugin_Controller_Routes_By_Area()
     {
         // Create URL manually, because PrepareSurfaceController URl will prepare whatever the controller is routed as

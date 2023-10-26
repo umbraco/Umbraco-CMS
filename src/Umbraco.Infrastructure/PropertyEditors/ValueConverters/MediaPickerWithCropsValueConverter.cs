@@ -151,13 +151,13 @@ public class MediaPickerWithCropsValueConverter : PropertyValueConverterBase, ID
 
     public PropertyCacheLevel GetDeliveryApiPropertyCacheLevel(IPublishedPropertyType propertyType) => PropertyCacheLevel.Elements;
 
-    public Type GetDeliveryApiPropertyValueType(IPublishedPropertyType propertyType) => typeof(IEnumerable<ApiMediaWithCrops>);
+    public Type GetDeliveryApiPropertyValueType(IPublishedPropertyType propertyType) => typeof(IEnumerable<IApiMediaWithCrops>);
 
     public object? ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview, bool expanding)
     {
         var isMultiple = IsMultipleDataType(propertyType.DataType);
 
-        ApiMediaWithCrops ToApiMedia(MediaWithCrops media) => _apiMediaWithCropsBuilder.Build(media);
+        IApiMediaWithCrops ToApiMedia(MediaWithCrops media) => _apiMediaWithCropsBuilder.Build(media);
 
         // NOTE: eventually we might implement this explicitly instead of piggybacking on the default object conversion. however, this only happens once per cache rebuild,
         // and the performance gain from an explicit implementation is negligible, so... at least for the time being this will do just fine.
@@ -171,7 +171,7 @@ public class MediaPickerWithCropsValueConverter : PropertyValueConverterBase, ID
             return new [] { ToApiMedia(mediaWithCrops) };
         }
 
-        return Array.Empty<ApiMediaWithCrops>();
+        return Array.Empty<IApiMediaWithCrops>();
     }
 
     private bool IsMultipleDataType(PublishedDataType dataType) =>
