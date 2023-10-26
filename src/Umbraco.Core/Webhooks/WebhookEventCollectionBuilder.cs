@@ -17,6 +17,7 @@ public class WebhookEventCollectionBuilder : OrderedCollectionBuilderBase<Webhoo
 
         // register the types
         RegisterTypes(services);
+        base.RegisterWith(services);
     }
 
     public WebhookEventCollectionBuilder AddCoreWebhooks()
