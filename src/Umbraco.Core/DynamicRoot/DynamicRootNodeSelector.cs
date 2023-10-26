@@ -7,7 +7,7 @@ public class DynamicRootNodeSelector
     public required string OriginAlias { get; set; }
     public Guid? OriginKey { get; set; }
 
-    public required DynamicRootSelectorContext Context { get; set; }
+    public required DynamicRootContext Context { get; set; }
 
     public IEnumerable<DynamicRootQueryStep> QuerySteps { get; set; } = Array.Empty<DynamicRootQueryStep>();
 }

@@ -602,7 +602,7 @@ public class EntityController : UmbracoAuthorizedJsonController
 
         var startNodeSelector = new DynamicRootNodeSelector()
         {
-            Context = new DynamicRootSelectorContext()
+            Context = new DynamicRootContext()
             {
                 CurrentKey = currentKey,
                 ParentKey = parentKey.Value

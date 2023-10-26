@@ -6,12 +6,12 @@ namespace Umbraco.Cms.Core.DynamicRoot;
 
 public class DynamicRootService : IDynamicRootService
 {
-    private readonly StartNodeOriginFinderCollection _originFinderCollection;
+    private readonly DynamicRootOriginCollection _originCollection;
     private readonly DynamicRootQueryStepCollection _dynamicRootQueryStepCollection;
 
-    public DynamicRootService(StartNodeOriginFinderCollection originFinderCollection, DynamicRootQueryStepCollection dynamicRootQueryStepCollection)
+    public DynamicRootService(DynamicRootOriginCollection originCollection, DynamicRootQueryStepCollection dynamicRootQueryStepCollection)
     {
-        _originFinderCollection = originFinderCollection;
+        _originCollection = originCollection;
         _dynamicRootQueryStepCollection = dynamicRootQueryStepCollection;
     }
 
@@ -53,7 +53,7 @@ public class DynamicRootService : IDynamicRootService
 
     internal Guid? FindOriginKey(DynamicRootNodeSelector dynamicRootNodeSelector)
     {
-        foreach (IDynamicRootOrigin startNodeOriginFinder in _originFinderCollection)
+        foreach (IDynamicRootOrigin startNodeOriginFinder in _originCollection)
         {
             Guid? originKey = startNodeOriginFinder.FindOriginKey(dynamicRootNodeSelector);
 

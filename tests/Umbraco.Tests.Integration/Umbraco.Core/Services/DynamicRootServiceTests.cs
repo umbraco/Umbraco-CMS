@@ -176,7 +176,7 @@ public class DynamicRootServiceTests : UmbracoIntegrationTest
         {
             OriginAlias = DynamicRootOrigin.Current.ToString(),
             OriginKey = null,
-            Context = new DynamicRootSelectorContext()
+            Context = new DynamicRootContext()
             {
                 CurrentKey = ContentAct2022RanD.Key,
                 ParentKey = ContentActs2022.Key
@@ -210,7 +210,7 @@ public class DynamicRootServiceTests : UmbracoIntegrationTest
         {
             OriginAlias = DynamicRootOrigin.Root.ToString(),
             OriginKey = null,
-            Context = new DynamicRootSelectorContext()
+            Context = new DynamicRootContext()
             {
                 CurrentKey = ContentAct2022RanD.Key,
                 ParentKey = ContentActs2022.Key
@@ -245,7 +245,7 @@ public class DynamicRootServiceTests : UmbracoIntegrationTest
         {
             OriginAlias = DynamicRootOrigin.Current.ToString(),
             OriginKey = null,
-            Context = new DynamicRootSelectorContext()
+            Context = new DynamicRootContext()
             {
                 CurrentKey = ContentAct2022RanD.Key,
                 ParentKey = ContentActs2022.Key
@@ -292,7 +292,7 @@ public class DynamicRootServiceTests : UmbracoIntegrationTest
         {
             OriginAlias = DynamicRootOrigin.Root.ToString(),
             OriginKey = null,
-            Context = new DynamicRootSelectorContext()
+            Context = new DynamicRootContext()
             {
                 CurrentKey = contentNewAct.Key,
                 ParentKey = contentNewActs.Key
@@ -340,7 +340,7 @@ public class DynamicRootServiceTests : UmbracoIntegrationTest
         {
             OriginAlias = DynamicRootOrigin.Root.ToString(),
             OriginKey = null,
-            Context = new DynamicRootSelectorContext()
+            Context = new DynamicRootContext()
             {
                 CurrentKey = contentNewAct.Key,
                 ParentKey = contentNewActs.Key
@@ -374,7 +374,7 @@ public class DynamicRootServiceTests : UmbracoIntegrationTest
         {
             OriginAlias = DynamicRootOrigin.Current.ToString(),
             OriginKey = null,
-            Context = new DynamicRootSelectorContext()
+            Context = new DynamicRootContext()
             {
                 CurrentKey = ContentAct2022RanD.Key,
                 ParentKey = ContentActs2022.Key
@@ -413,7 +413,7 @@ public class DynamicRootServiceTests : UmbracoIntegrationTest
         {
             OriginAlias = DynamicRootOrigin.Current.ToString(),
             OriginKey = null,
-            Context = new DynamicRootSelectorContext()
+            Context = new DynamicRootContext()
             {
                 CurrentKey = ContentYear2022.Key,
                 ParentKey = ContentYears.Key
@@ -448,7 +448,7 @@ public class DynamicRootServiceTests : UmbracoIntegrationTest
         {
             OriginAlias = DynamicRootOrigin.Parent.ToString(),
             OriginKey = null,
-            Context = new DynamicRootSelectorContext()
+            Context = new DynamicRootContext()
             {
                 CurrentKey = ContentYear2022.Key,
                 ParentKey = ContentYears.Key
@@ -476,7 +476,7 @@ public class DynamicRootServiceTests : UmbracoIntegrationTest
         {
             OriginAlias = DynamicRootOrigin.Parent.ToString(),
             OriginKey = null,
-            Context = new DynamicRootSelectorContext()
+            Context = new DynamicRootContext()
             {
                 CurrentKey = ContentYear2022.Key,
                 ParentKey = ContentYears.Key
@@ -498,7 +498,7 @@ public class DynamicRootServiceTests : UmbracoIntegrationTest
         {
             OriginAlias = DynamicRootOrigin.Current.ToString(),
             OriginKey = null,
-            Context = new DynamicRootSelectorContext()
+            Context = new DynamicRootContext()
             {
                 CurrentKey = ContentYear2022.Key,
                 ParentKey = ContentYears.Key
@@ -520,7 +520,7 @@ public class DynamicRootServiceTests : UmbracoIntegrationTest
         {
             OriginAlias = DynamicRootOrigin.Current.ToString(),
             OriginKey = null,
-            Context = new DynamicRootSelectorContext()
+            Context = new DynamicRootContext()
             {
                 CurrentKey = Guid.NewGuid(),
                 ParentKey = ContentYears.Key
@@ -542,7 +542,7 @@ public class DynamicRootServiceTests : UmbracoIntegrationTest
         {
             OriginAlias = DynamicRootOrigin.Root.ToString(),
             OriginKey = null,
-            Context = new DynamicRootSelectorContext()
+            Context = new DynamicRootContext()
             {
                 CurrentKey = ContentAct2022RanD.Key,
                 ParentKey = ContentActs2022.Key
@@ -565,7 +565,7 @@ public class DynamicRootServiceTests : UmbracoIntegrationTest
         {
             OriginAlias = DynamicRootOrigin.Site.ToString(),
             OriginKey =origin.Key,
-            Context = new DynamicRootSelectorContext()
+            Context = new DynamicRootContext()
             {
                 CurrentKey = origin.Key,
                 ParentKey = ContentYears.Key
@@ -590,7 +590,7 @@ public class DynamicRootServiceTests : UmbracoIntegrationTest
         {
             OriginAlias = DynamicRootOrigin.Site.ToString(),
             OriginKey = origin.Key,
-            Context = new DynamicRootSelectorContext()
+            Context = new DynamicRootContext()
             {
                 CurrentKey = origin.Key,
                 ParentKey = ContentActs2022.Key
@@ -614,7 +614,7 @@ public class DynamicRootServiceTests : UmbracoIntegrationTest
         {
             OriginAlias = DynamicRootOrigin.Site.ToString(),
             OriginKey = ContentActs2022.Key,
-            Context = new DynamicRootSelectorContext()
+            Context = new DynamicRootContext()
             {
                 CurrentKey = ContentAct2022RanD.Key,
                 ParentKey = ContentActs2022.Key
@@ -642,7 +642,7 @@ public class DynamicRootServiceTests : UmbracoIntegrationTest
         {
             OriginAlias = origin.ToString(),
             OriginKey = randomKey,
-            Context = new DynamicRootSelectorContext() { CurrentKey = randomKey, ParentKey = Guid.NewGuid() }
+            Context = new DynamicRootContext() { CurrentKey = randomKey, ParentKey = Guid.NewGuid() }
         };
 
         // Act
@@ -666,7 +666,7 @@ public class DynamicRootServiceTests : UmbracoIntegrationTest
         {
             OriginAlias = origin.ToString(),
             OriginKey = trashedKey,
-            Context = new DynamicRootSelectorContext() { CurrentKey = trashedKey, ParentKey = trashedKey }
+            Context = new DynamicRootContext() { CurrentKey = trashedKey, ParentKey = trashedKey }
         };
 
         // Act
@@ -690,7 +690,7 @@ public class DynamicRootServiceTests : UmbracoIntegrationTest
         {
             OriginAlias = origin.ToString(),
             OriginKey = contentTypeKey,
-            Context = new DynamicRootSelectorContext() { CurrentKey = contentTypeKey, ParentKey = contentTypeKey }
+            Context = new DynamicRootContext() { CurrentKey = contentTypeKey, ParentKey = contentTypeKey }
         };
         // Act
         var result = DynamicRootService.FindOriginKey(selector);
