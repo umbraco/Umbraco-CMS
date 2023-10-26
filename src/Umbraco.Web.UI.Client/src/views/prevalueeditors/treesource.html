@@ -91,12 +91,6 @@
         </div>
       <div ng-if="showDynamicStartNode || model.value.dynamicRoot">
 
-        <!--
-        <textarea type="text"
-          ng-model="model.value.queryFilter"
-          class="umb-property-editor umb-textarea"
-          placeholder="Enter query"></textarea>
-        -->
         <h5><localize key="dynamicRoot_configurationTitle">Dynamic Root Query</localize></h5>
 
         <!-- origin -->
@@ -125,9 +119,16 @@
               <umb-icon class="umb-node-preview__icon" icon="{{getIconForQueryStepAlias(queryStep.alias)}}"></umb-icon>
               <div class="umb-node-preview__content">
                 <div class="umb-node-preview__name">
-                  <localize key="dynamicRoot_queryStep{{queryStep.alias}}Title"></localize>
+                  <localize ng-if="queryStep.alias === 'NearestAncestorOrSelf' ||
+                  queryStep.alias === 'FurthestAncestorOrSelf' ||
+                  queryStep.alias === 'NearestDescendantOrSelf' ||
+                  queryStep.alias === 'FurthestDescendantOrSelf'" key="dynamicRoot_queryStep{{queryStep.alias}}Title"></localize>
+                  <span ng-if="queryStep.alias !== 'NearestAncestorOrSelf' &&
+                  queryStep.alias !== 'FurthestAncestorOrSelf' &&
+                  queryStep.alias !== 'NearestDescendantOrSelf' &&
+                  queryStep.alias !== 'FurthestDescendantOrSelf'">{{queryStep.alias}}</span>
                 </div>
-                <div class="umb-node-preview__description" ng-if="queryStep.anyOfDocTypeKeys">
+                <div class="umb-node-preview__description" ng-if="queryStep.anyOfDocTypeKeys && queryStep.anyOfDocTypeKeys.length > 0">
                   <!-- todo: Maybe get the name to display here. -->
                   <localize key="dynamicRoot_queryStepTypes">of type: </localize>
 

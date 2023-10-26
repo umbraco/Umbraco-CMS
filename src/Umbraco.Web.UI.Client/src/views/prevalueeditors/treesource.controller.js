@@ -151,6 +151,7 @@ angular.module('umbraco')
         case "FurthestDescendantOrSelf":
           return "icon-chevron-down";
       }
+      return "icon-lab";
     }
 
     $scope.sortableOptionsForQuerySteps = {

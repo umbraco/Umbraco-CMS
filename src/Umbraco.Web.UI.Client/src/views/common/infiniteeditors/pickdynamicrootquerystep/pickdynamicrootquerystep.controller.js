@@ -50,6 +50,25 @@
           }
         }
 
+        vm.chooseCustom = function() {
+          var customStepPicker = {
+            view: "views/common/infiniteeditors/pickdynamicrootcustomstep/pickdynamicrootcustomstep.html",
+            size: "small",
+            value: "",
+            submit: function(model) {
+              $scope.model.value = {
+                alias: model.value
+              }
+              editorService.close();
+              vm.submit($scope.model);
+            },
+            close: function() {
+              editorService.close();
+            }
+          };
+          editorService.open(customStepPicker);
+        }
+
         vm.submit = submit;
         function submit(model) {
           if ($scope.model.submit) {

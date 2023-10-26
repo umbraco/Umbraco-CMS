@@ -1244,6 +1244,8 @@ Mange hilsner fra Umbraco robotten
     <key alias="queryStepNearestDescendantOrSelfDesc">Forespørg nærmeste barn eller selv der passer på en af de givne typer</key>
     <key alias="queryStepFurthestDescendantOrSelfTitle">Fjerneste barn eller selv</key>
     <key alias="queryStepFurthestDescendantOrSelfDesc">Forespørg fjerneste barn eller selv der passer på en af de givne typer</key>
+    <key alias="queryStepCustomTitle">Brugerdefineret</key>
+    <key alias="queryStepCustomDesc">Forespørg med et skræddersyet forespørgsels skridt</key>
     <key alias="addQueryStep">Tilføj skridt</key>
     <key alias="queryStepTypes">der passer med typerne: </key>
     <key alias="noValidStartNodeTitle">Intet passende indhold</key>

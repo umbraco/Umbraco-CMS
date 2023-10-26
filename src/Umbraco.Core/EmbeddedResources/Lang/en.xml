@@ -1460,6 +1460,8 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="queryStepNearestDescendantOrSelfDesc">Query the nearest descendant or self that fits with one of the configured types</key>
     <key alias="queryStepFurthestDescendantOrSelfTitle">Furthest Descendant Or Self</key>
     <key alias="queryStepFurthestDescendantOrSelfDesc">Query the Furthest descendant or self that fits with one of the configured types</key>
+    <key alias="queryStepCustomTitle">Custom</key>
+    <key alias="queryStepCustomDesc">Query the using a custom Query Step</key>
     <key alias="addQueryStep">Add query step</key>
     <key alias="queryStepTypes">That matches types: </key>
     <key alias="noValidStartNodeTitle">No matching content</key>
