@@ -42,19 +42,28 @@ public class DynamicRootRepository: IDynamicRootRepository
         return Database.SingleOrDefault<Guid?>(query);
     }
 
-    private Sql<ISqlContext> GetAncestorOrSelfBaseQuery(IEnumerable<Guid> origins, DynamicRootQueryStep filter) =>
-            Database.SqlContext.Sql()
-                .Select<NodeDto>("n", n => n.UniqueId)
-                .From<NodeDto>("norigin")
-                .Append(            // TODO hack because npoco do not support this
-                    $"INNER JOIN {Database.SqlContext.SqlSyntax.GetQuotedTableName(NodeDto.TableName)} n ON {Database.SqlContext.SqlSyntax.Substring}(norigin.path, 1, {Database.SqlContext.SqlSyntax.Length}(n.path)) = n.path")
-                .InnerJoin<ContentDto>("c")
-                .On<ContentDto, NodeDto>((c, n) => c.NodeId == n.NodeId, "c", "n")
-                .InnerJoin<ContentTypeDto>("ct").On<ContentDto, ContentTypeDto>((c, ct) => c.ContentTypeId == ct.NodeId, "c", "ct")
-                .InnerJoin<NodeDto>("ctn")
-                .On<ContentTypeDto, NodeDto>((ct, ctn) => ct.NodeId == ctn.NodeId, "ct", "ctn")
-                .Where<NodeDto>(ctn => filter.AnyOfDocTypeKeys.Contains(ctn.UniqueId), "ctn")
-                .Where<NodeDto>(norigin => origins.Contains(norigin.UniqueId), "norigin");
+    private Sql<ISqlContext> GetAncestorOrSelfBaseQuery(IEnumerable<Guid> origins, DynamicRootQueryStep filter)
+    {
+        var query = Database.SqlContext.Sql()
+            .Select<NodeDto>("n", n => n.UniqueId)
+            .From<NodeDto>("norigin")
+            .Append( // hack because npoco do not support this
+                $"INNER JOIN {Database.SqlContext.SqlSyntax.GetQuotedTableName(NodeDto.TableName)} n ON {Database.SqlContext.SqlSyntax.Substring}(norigin.path, 1, {Database.SqlContext.SqlSyntax.Length}(n.path)) = n.path")
+            .InnerJoin<ContentDto>("c")
+            .On<ContentDto, NodeDto>((c, n) => c.NodeId == n.NodeId, "c", "n")
+            .InnerJoin<ContentTypeDto>("ct")
+            .On<ContentDto, ContentTypeDto>((c, ct) => c.ContentTypeId == ct.NodeId, "c", "ct")
+            .InnerJoin<NodeDto>("ctn")
+            .On<ContentTypeDto, NodeDto>((ct, ctn) => ct.NodeId == ctn.NodeId, "ct", "ctn")
+            .Where<NodeDto>(norigin => origins.Contains(norigin.UniqueId), "norigin");
+
+        if (filter.AnyOfDocTypeKeys.Any())
+        {
+            query = query.Where<NodeDto>(ctn => filter.AnyOfDocTypeKeys.Contains(ctn.UniqueId), "ctn");
+        }
+
+        return query;
+    }
 
 
     public IEnumerable<Guid> NearestDescendantOrSelf(IEnumerable<Guid> origins, DynamicRootQueryStep filter)
@@ -92,11 +101,12 @@ public class DynamicRootRepository: IDynamicRootRepository
 
 internal static class HelperExtensions
 {
-    internal static Sql<ISqlContext> DescendantOrSelfBaseQuery(this Sql<ISqlContext> sql, IEnumerable<Guid> origins, DynamicRootQueryStep filter) =>
+    internal static Sql<ISqlContext> DescendantOrSelfBaseQuery(this Sql<ISqlContext> sql, IEnumerable<Guid> origins, DynamicRootQueryStep filter)
+    {
         //sql. Database.SqlContext.Sql().Select<NodeDto>("n", n => n.UniqueId)
-        sql
+        var query =  sql
             .From<NodeDto>("norigin")
-            .Append( // TODO hack because npoco do not support this
+            .Append( // hack because npoco do not support this
                 $"INNER JOIN {sql.SqlContext.SqlSyntax.GetQuotedTableName(NodeDto.TableName)} n ON {sql.SqlContext.SqlSyntax.Substring}(N.path, 1, {sql.SqlContext.SqlSyntax.Length}(norigin.path)) = norigin.path")
             .InnerJoin<ContentDto>("c")
             .On<ContentDto, NodeDto>((c, n) => c.NodeId == n.NodeId, "c", "n")
@@ -104,6 +114,17 @@ internal static class HelperExtensions
             .On<ContentDto, ContentTypeDto>((c, ct) => c.ContentTypeId == ct.NodeId, "c", "ct")
             .InnerJoin<NodeDto>("ctn")
             .On<ContentTypeDto, NodeDto>((ct, ctn) => ct.NodeId == ctn.NodeId, "ct", "ctn")
-            .Where<NodeDto>(ctn => filter.AnyOfDocTypeKeys.Contains(ctn.UniqueId), "ctn")
             .Where<NodeDto>(norigin => origins.Contains(norigin.UniqueId), "norigin");
+
+        if (filter.AnyOfDocTypeKeys.Any())
+        {
+            query = query.Where<NodeDto>(ctn => filter.AnyOfDocTypeKeys.Contains(ctn.UniqueId), "ctn");
+        }
+
+        return query;
+
+    }
+
+
+
 }
