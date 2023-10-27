@@ -22,6 +22,7 @@ internal class WebhookLogDto
     public string StatusCode { get; set; } = string.Empty;
 
     [Column(Name = "date")]
+    [Index(IndexTypes.NonClustered, Name = "IX_" + Constants.DatabaseSchema.Tables.WebhookLog + "_date")]
     [NullSetting(NullSetting = NullSettings.NotNull)]
     public DateTime Date { get; set; }
 
