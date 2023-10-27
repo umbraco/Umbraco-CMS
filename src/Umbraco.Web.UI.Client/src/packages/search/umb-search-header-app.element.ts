@@ -22,7 +22,7 @@ export class UmbSearchHeaderAppElement extends UmbLitElement {
 	render() {
 		return html`
 			<uui-button @click=${this.#onSearchClick} look="primary" label="search" compact>
-				<uui-icon name="umb:search"></uui-icon>
+				<uui-icon name="icon-search"></uui-icon>
 			</uui-button>
 		`;
 	}

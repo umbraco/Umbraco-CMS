@@ -86,7 +86,7 @@ export class UmbExtensionRootWorkspaceElement extends UmbLitElement {
 											color="danger"
 											look="primary"
 											@click=${() => this.#removeExtension(extension)}>
-											<uui-icon name="umb:trash"></uui-icon>
+											<uui-icon name="icon-trash"></uui-icon>
 										</uui-button>
 									</uui-table-cell>
 								</uui-table-row>

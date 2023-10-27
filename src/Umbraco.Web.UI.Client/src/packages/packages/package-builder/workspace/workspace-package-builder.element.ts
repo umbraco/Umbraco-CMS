@@ -106,7 +106,7 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 	#renderHeader() {
 		return html`<div class="header" slot="header">
 			<uui-button compact @click="${this.#navigateBack}" label="Back to created package overview">
-				<uui-icon name="umb:arrow-left"></uui-icon>
+				<uui-icon name="icon-arrow-left"></uui-icon>
 			</uui-button>
 			<uui-input
 				required

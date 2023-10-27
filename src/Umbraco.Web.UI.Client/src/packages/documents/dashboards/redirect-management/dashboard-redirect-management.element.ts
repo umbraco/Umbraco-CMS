@@ -237,14 +237,14 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 				<uui-table-cell> ${data.culture || '*'} </uui-table-cell>
 				<uui-table-cell>
 					<a href="${data.originalUrl || '#'}" target="_blank"> ${data.originalUrl}</a>
-					<uui-icon name="umb:out"></uui-icon>
+					<uui-icon name="icon-out"></uui-icon>
 				</uui-table-cell>
 				<uui-table-cell>
-					<uui-icon name="umb:arrow-right"></uui-icon>
+					<uui-icon name="icon-arrow-right"></uui-icon>
 				</uui-table-cell>
 				<uui-table-cell>
 					<a href="${data.destinationUrl || '#'}" target="_blank"> ${data.destinationUrl}</a>
-					<uui-icon name="umb:out"></uui-icon>
+					<uui-icon name="icon-out"></uui-icon>
 				</uui-table-cell>
 				<uui-table-cell>
 					<uui-action-bar style="justify-self: left;">

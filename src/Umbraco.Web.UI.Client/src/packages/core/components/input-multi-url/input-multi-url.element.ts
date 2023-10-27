@@ -205,7 +205,7 @@ export class UmbInputMultiUrlElement extends FormControlMixin(UmbLitElement) {
 			.name="${link.name || ''}"
 			.detail="${(link.url || '') + (link.queryString || '')}"
 			@open="${() => this._temporary_onClick_editItem(index)}">
-			<uui-icon slot="icon" name="${link.icon || 'umb:link'}"></uui-icon>
+			<uui-icon slot="icon" name="${link.icon || 'icon-link'}"></uui-icon>
 			<uui-action-bar slot="actions">
 				<uui-button .href=${this._modalRoute?.({ index })} label="Edit link">Edit</uui-button>
 				<uui-button @click="${() => this._removeItem(index)}" label="Remove link">Remove</uui-button>

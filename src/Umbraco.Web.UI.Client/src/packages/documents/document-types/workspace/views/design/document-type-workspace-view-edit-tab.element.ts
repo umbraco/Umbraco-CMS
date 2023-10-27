@@ -161,7 +161,7 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 								? html`
 										<div slot="header">
 											<div>
-												${this._sortModeActive ? html`<uui-icon name="umb:navigation"></uui-icon>` : ''}
+												${this._sortModeActive ? html`<uui-icon name="icon-navigation"></uui-icon>` : ''}
 
 												<uui-input
 													label="Group name"
@@ -179,7 +179,7 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 										</div>
 								  `
 								: html`<div slot="header">
-										<div><uui-icon name="umb:merge"></uui-icon><b>${group.name ?? ''}</b> (Inherited)</div>
+										<div><uui-icon name="icon-merge"></uui-icon><b>${group.name ?? ''}</b> (Inherited)</div>
 										${!this._sortModeActive
 											? html`<uui-input
 													readonly

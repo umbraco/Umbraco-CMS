@@ -201,7 +201,7 @@ export class UmbTagsInputElement extends FormControlMixin(UmbLitElement) {
 						@keydown="${this.#onKeydown}"
 						@input="${this.#onInput}"
 						@blur="${this.#onBlur}" />
-					<uui-icon id="icon-add" name="umb:add"></uui-icon>
+					<uui-icon id="icon-add" name="icon-add"></uui-icon>
 					${this.#renderTagOptions()}
 				</uui-tag>
 				<span>
@@ -214,7 +214,7 @@ export class UmbTagsInputElement extends FormControlMixin(UmbLitElement) {
 			return html`
 				<uui-tag class="tag">
 					<span>${tag}</span>
-					<uui-icon name="umb:wrong" @click="${() => this.#delete(tag)}"></uui-icon>
+					<uui-icon name="icon-wrong" @click="${() => this.#delete(tag)}"></uui-icon>
 				</uui-tag>
 			`;
 		})}`;

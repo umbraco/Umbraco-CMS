@@ -87,7 +87,7 @@ export class UmbPropertyEditorUITinyMceToolbarConfigurationElement
 					this._toolbarConfig.push({
 						alias: t.alias,
 						label: t.label,
-						icon: t.icon ?? 'umb:autofill',
+						icon: t.icon ?? 'icon-autofill',
 						selected: this.value.includes(t.alias),
 					});
 				});

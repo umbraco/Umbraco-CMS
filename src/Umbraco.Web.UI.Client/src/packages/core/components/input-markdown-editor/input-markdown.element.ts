@@ -441,7 +441,7 @@ export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 					label="Quote"
 					title="Quote"
 					@click=${() => this.#editor?.monacoEditor?.getAction('q')?.run()}>
-					<uui-icon name="umb:quote"></uui-icon>
+					<uui-icon name="icon-quote"></uui-icon>
 				</uui-button>
 				<uui-button
 					compact
@@ -449,7 +449,7 @@ export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 					label="Ordered List"
 					title="Ordered List"
 					@click=${() => this.#editor?.monacoEditor?.getAction('ol')?.run()}>
-					<uui-icon name="umb:ordered-list"></uui-icon>
+					<uui-icon name="icon-ordered-list"></uui-icon>
 				</uui-button>
 				<uui-button
 					compact
@@ -457,7 +457,7 @@ export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 					label="Unordered List"
 					title="Unordered List"
 					@click=${() => this.#editor?.monacoEditor?.getAction('ul')?.run()}>
-					<uui-icon name="umb:bulleted-list"></uui-icon>
+					<uui-icon name="icon-bulleted-list"></uui-icon>
 				</uui-button>
 			</div>
 			<div>
@@ -467,7 +467,7 @@ export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 					label="Fenced Code"
 					title="Fenced Code"
 					@click=${() => this.#editor?.monacoEditor?.getAction('fenced-code')?.run()}>
-					<uui-icon name="umb:code"></uui-icon>
+					<uui-icon name="icon-code"></uui-icon>
 				</uui-button>
 				<uui-button
 					compact
@@ -475,7 +475,7 @@ export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 					label="Line"
 					title="Line"
 					@click=${() => this.#editor?.monacoEditor?.getAction('line')?.run()}>
-					<uui-icon name="umb:width"></uui-icon>
+					<uui-icon name="icon-width"></uui-icon>
 				</uui-button>
 				<uui-button
 					compact
@@ -483,7 +483,7 @@ export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 					label="Link"
 					title="Link"
 					@click=${() => this.#editor?.monacoEditor?.getAction('link')?.run()}>
-					<uui-icon name="umb:link"></uui-icon>
+					<uui-icon name="icon-link"></uui-icon>
 				</uui-button>
 				<uui-button
 					compact
@@ -491,7 +491,7 @@ export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 					label="Image"
 					title="Image"
 					@click=${() => this.#editor?.monacoEditor?.getAction('image')?.run()}>
-					<uui-icon name="umb:picture"></uui-icon>
+					<uui-icon name="icon-picture"></uui-icon>
 				</uui-button>
 			</div>
 			<div>

@@ -64,7 +64,7 @@ export class UmbLogViewerPollingButtonElement extends UmbLitElement {
 		return html` <uui-button-group>
 			<uui-button label="Start pooling" @click=${this.#togglePolling}
 				>${this._poolingConfig.enabled
-					? html`<uui-icon name="umb:axis-rotation" id="polling-enabled-icon"></uui-icon>Polling
+					? html`<uui-icon name="icon-axis-rotation" id="polling-enabled-icon"></uui-icon>Polling
 							${this._poolingConfig.interval / 1000} seconds`
 					: 'Polling'}</uui-button
 			>

@@ -47,7 +47,7 @@ export default class UmbStylesheetRichTextEditorRuleElement extends UmbLitElemen
 
 	render() {
 		return html`
-			<div class="rule-name"><uui-icon name="umb:navigation"></uui-icon>${this.rule?.name}</div>
+			<div class="rule-name"><uui-icon name="icon-navigation"></uui-icon>${this.rule?.name}</div>
 			<div class="rule-actions">
 				<uui-button label="Edit" look="secondary" @click=${this.openModal}>Edit</uui-button
 				><uui-button label="Remove" look="secondary" color="danger" @click=${this.removeRule}>Remove</uui-button>
