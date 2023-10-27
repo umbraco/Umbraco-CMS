@@ -33,7 +33,8 @@ const collectDictionaryIcons = async () => {
 		const path = lucideSvgDirectory + "/" + iconDef.file;
 
 		const rawData = readFileSync(path);
-		const svg = rawData.toString();
+		// For Lucide icons specially we adjust the stroke width to 1.75 as that looks better for our usage in backoffice:
+		const svg = rawData.toString().replace('stroke-width="2"', 'stroke-width="1.75"');
 		const iconFileName = iconDef.name;
 
 		const icon = {
