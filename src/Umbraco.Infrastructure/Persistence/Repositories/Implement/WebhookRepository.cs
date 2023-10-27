@@ -31,8 +31,6 @@ public class WebhookRepository : IWebhookRepository
 
     public async Task<Webhook> CreateAsync(Webhook webhook)
     {
-        webhook.AddingEntity();
-
         WebhookDto webhookDto = WebhookFactory.BuildDto(webhook);
 
         var result = await _scopeAccessor.AmbientScope?.Database.InsertAsync(webhookDto)!;
@@ -43,8 +41,6 @@ public class WebhookRepository : IWebhookRepository
         await _scopeAccessor.AmbientScope?.Database.InsertBulkAsync(WebhookFactory.BuildEvent2WebhookDto(webhook))!;
         await _scopeAccessor.AmbientScope?.Database.InsertBulkAsync(WebhookFactory.BuildEntityKey2WebhookDto(webhook))!;
         await _scopeAccessor.AmbientScope?.Database.InsertBulkAsync(WebhookFactory.BuildHeaders2WebhookDtos(webhook))!;
-
-        webhook.ResetDirtyProperties();
 
         return webhook;
     }
@@ -86,22 +82,16 @@ public class WebhookRepository : IWebhookRepository
             .Where<WebhookDto>(x => x.Key == webhook.Key);
 
         await _scopeAccessor.AmbientScope?.Database.ExecuteAsync(sql)!;
-
-        webhook.DeleteDate = DateTime.Now;
     }
 
     public async Task UpdateAsync(Webhook webhook)
     {
-        webhook.UpdatingEntity();
-
         WebhookDto dto = WebhookFactory.BuildDto(webhook);
         await _scopeAccessor.AmbientScope?.Database.UpdateAsync(dto)!;
 
         // Delete and re-insert the many to one references (event & entity keys)
         DeleteManyToOneReferences(dto.Id);
         InsertManyToOneReferences(webhook);
-
-        webhook.ResetDirtyProperties();
     }
 
     private void DeleteManyToOneReferences(int webhookId)
@@ -140,9 +130,6 @@ public class WebhookRepository : IWebhookRepository
         List<Event2WebhookDto>? event2WebhookDtos = await _scopeAccessor.AmbientScope?.Database.FetchAsync<Event2WebhookDto>("WHERE webhookId = @webhookId", new { webhookId = dto.Id })!;
         List<Headers2WebhookDto>? headersWebhookDtos = await _scopeAccessor.AmbientScope?.Database.FetchAsync<Headers2WebhookDto>("WHERE webhookId = @webhookId", new { webhookId = dto.Id })!;
         Webhook entity = WebhookFactory.BuildEntity(dto, webhookEntityKeyDtos, event2WebhookDtos, headersWebhookDtos);
-
-        // reset dirty initial properties (U4-1946)
-        entity.ResetDirtyProperties(false);
 
         return entity;
     }

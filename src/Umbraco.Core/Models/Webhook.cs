@@ -3,68 +3,28 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Models;
 
-public class Webhook : EntityBase
+public class Webhook
 {
-    private string _url;
-    private string[] _events;
-    private Guid[] _entityKeys;
-    private bool _enabled;
-    private Dictionary<string, string> _headers;
-
-    // Custom comparer for enumerable guids
-    private static readonly DelegateEqualityComparer<IEnumerable<Guid>> _guidEnumerableComparer =
-        new(
-            (enum1, enum2) => enum1.UnsortedSequenceEqual(enum2),
-            enum1 => enum1.GetHashCode());
-
-    // Custom comparer for enumerable webhook events
-    private static readonly DelegateEqualityComparer<IEnumerable<string>> _webhookEventEnumerableComparer =
-        new(
-            (enum1, enum2) => enum1.UnsortedSequenceEqual(enum2),
-            enum1 => enum1.GetHashCode());
-
-    // Custom comparer for enumerable webhook events
-    private static readonly DelegateEqualityComparer<Dictionary<string, string>> _dictionaryEnumerableComparer =
-        new(
-            (enum1, enum2) => enum1.UnsortedSequenceEqual(enum2),
-            enum1 => enum1.GetHashCode());
-
     public Webhook(string url, bool? enabled = null, Guid[]? entityKeys = null, string[]? events = null, Dictionary<string, string>? headers = null)
     {
-        _url = url;
-        _headers = headers ?? new Dictionary<string, string>();
-        _events = events ?? Array.Empty<string>();
-        _entityKeys = entityKeys ?? Array.Empty<Guid>();
-        _enabled = enabled ?? false;
+        Url = url;
+        Headers = headers ?? new Dictionary<string, string>();
+        Events = events ?? Array.Empty<string>();
+        EntityKeys = entityKeys ?? Array.Empty<Guid>();
+        Enabled = enabled ?? false;
     }
 
-    public string Url
-    {
-        get => _url;
-        set => SetPropertyValueAndDetectChanges(value, ref _url!, nameof(Url));
-    }
+    public int Id { get; set; }
 
-    public string[] Events
-    {
-        get => _events;
-        set => SetPropertyValueAndDetectChanges(value, ref _events!, nameof(Events), _webhookEventEnumerableComparer);
-    }
+    public Guid Key { get; set; }
 
-    public Guid[] EntityKeys
-    {
-        get => _entityKeys;
-        set => SetPropertyValueAndDetectChanges(value, ref _entityKeys!, nameof(EntityKeys), _guidEnumerableComparer);
-    }
+    public string Url { get; set; }
 
-    public bool Enabled
-    {
-        get => _enabled;
-        set => SetPropertyValueAndDetectChanges(value, ref _enabled, nameof(Enabled));
-    }
+    public string[] Events { get; set; }
 
-    public Dictionary<string, string> Headers
-    {
-        get => _headers;
-        set => SetPropertyValueAndDetectChanges(value, ref _headers!, nameof(Headers), _dictionaryEnumerableComparer);
-    }
+    public Guid[] EntityKeys {get; set; }
+
+    public bool Enabled { get; set; }
+
+    public Dictionary<string, string> Headers { get; set; }
 }

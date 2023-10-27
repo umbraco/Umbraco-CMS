@@ -12,23 +12,13 @@ internal static class WebhookFactory
             dto.Enabled,
             entityKey2WebhookDtos?.Select(x => x.EntityKey).ToArray(),
             event2WebhookDtos?.Select(x => x.Event).ToArray(),
-            headersWebhookDtos?.ToDictionary(x => x.Key, x => x.Value));
-
-        try
+            headersWebhookDtos?.ToDictionary(x => x.Key, x => x.Value))
         {
-            entity.DisableChangeTracking();
+            Id = dto.Id,
+            Key = dto.Key,
+        };
 
-            entity.Id = dto.Id;
-            entity.Key = dto.Key;
-
-            // reset dirty initial properties (U4-1946)
-            entity.ResetDirtyProperties(false);
-            return entity;
-        }
-        finally
-        {
-            entity.EnableChangeTracking();
-        }
+        return entity;
     }
 
     public static WebhookDto BuildDto(Webhook webhook)
@@ -37,12 +27,9 @@ internal static class WebhookFactory
         {
             Url = webhook.Url,
             Key = webhook.Key,
-            Enabled = webhook.Enabled
+            Enabled = webhook.Enabled,
+            Id = webhook.Id,
         };
-        if (webhook.HasIdentity)
-        {
-            dto.Id = webhook.Id;
-        }
 
         return dto;
     }
