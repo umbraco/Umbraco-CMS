@@ -13,6 +13,7 @@ public class WebhookLogFactory : IWebhookLogFactory
             EventName = eventName,
             Key = Guid.NewGuid(),
             Url = webhook.Url,
+            WebhookKey = webhook.Key,
         };
 
         if (responseModel.HttpResponseMessage is not null)

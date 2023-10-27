@@ -4,6 +4,8 @@ public class WebhookLog
 {
     public int Id { get; set; }
 
+    public Guid WebhookKey { get; set; }
+
     public Guid Key { get; set; }
 
     public string Url { get; set; } = string.Empty;

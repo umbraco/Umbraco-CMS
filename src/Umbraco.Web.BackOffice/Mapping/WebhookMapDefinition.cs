@@ -53,5 +53,6 @@ public class WebhookMapDefinition : IMapDefinition
         target.Url = source.Url;
         target.RequestHeaders = source.RequestHeaders;
         target.ResponseHeaders = source.ResponseHeaders;
+        target.WebhookKey = source.WebhookKey;
     }
 }

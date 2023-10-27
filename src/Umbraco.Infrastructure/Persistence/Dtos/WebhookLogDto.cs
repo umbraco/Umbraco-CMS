@@ -13,6 +13,9 @@ internal class WebhookLogDto
     [PrimaryKeyColumn(AutoIncrement = true)]
     public int Id { get; set; }
 
+    [Column("webhookId")]
+    public Guid WebhookKey { get; set; }
+
     [Column(Name = "key")]
     [NullSetting(NullSetting = NullSettings.NotNull)]
     public Guid Key { get; set; }

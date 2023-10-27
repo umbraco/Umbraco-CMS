@@ -8,6 +8,9 @@ public class WebhookLogViewModel
     [DataMember(Name = "key")]
     public Guid Key { get; set; }
 
+    [DataMember(Name = "webhookKey")]
+    public Guid WebhookKey { get; set; }
+
     [DataMember(Name = "statusCode")]
     public string StatusCode { get; set; } = string.Empty;
 

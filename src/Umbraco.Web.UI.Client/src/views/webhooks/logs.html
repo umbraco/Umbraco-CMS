@@ -3,6 +3,7 @@
     <thead>
     <tr>
       <th></th>
+      <th>Webhook key</th>
       <th>Date</th>
       <th>Url</th>
       <th>Event</th>
@@ -16,6 +17,9 @@
                        checked="log.retryCount < 5"
                        size="xs">
         </umb-checkmark>
+      </td>
+      <td>
+        {{ log.webhookKey}}
       </td>
       <td>
         {{ log.date}}
