@@ -40,7 +40,7 @@
           data.forEach(function (event) {
             let eventObject = { name: event.eventName, selected: false}
             vm.events.push(eventObject);
-            if($scope.model.selectedEvents.includes(eventObject.name)){
+            if($scope.model.selectedEvents && $scope.model.selectedEvents.includes(eventObject.name)){
               selectedEvents.push(eventObject);
             }
           });
