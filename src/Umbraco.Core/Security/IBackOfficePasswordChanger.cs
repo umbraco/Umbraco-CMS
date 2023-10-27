@@ -5,5 +5,5 @@ namespace Umbraco.Cms.Core.Security;
 
 public interface IBackOfficePasswordChanger
 {
-    Task<Attempt<PasswordChangedModel?>> ChangeBackOfficePassword(ChangeBackOfficeUserPasswordModel model);
+    Task<Attempt<PasswordChangedModel?>> ChangeBackOfficePassword(ChangeBackOfficeUserPasswordModel model, IUser? performingUser);
 }

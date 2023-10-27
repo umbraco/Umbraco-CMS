@@ -17,6 +17,7 @@ using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Tests.Common;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
+using Umbraco.Cms.Tests.UnitTests.TestHelpers;
 using Umbraco.Cms.Web.Common.Security;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security;
@@ -33,7 +34,7 @@ public class MemberManagerTests
 
     public MemberManager CreateSut()
     {
-        var scopeProvider = new Mock<IScopeProvider>().Object;
+        var scopeProvider = TestHelper.ScopeProvider;
         _mockMemberService = new Mock<IMemberService>();
 
         var mapDefinitions = new List<IMapDefinition>

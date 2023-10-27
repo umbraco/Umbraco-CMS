@@ -28,9 +28,6 @@ internal sealed class OpenAPIContractTest : UmbracoTestServerTestBase
             mvcBuilder.AddApplicationPart(typeof(InstallControllerBase).Assembly);
         });
 
-        new ManagementApiComposer().Compose(builder);
-        new UmbracoEFCoreComposer().Compose(builder);
-
         // Currently we cannot do this in tests, as EF Core is not initialized
         builder.Services.PostConfigure<UmbracoPipelineOptions>(options =>
         {

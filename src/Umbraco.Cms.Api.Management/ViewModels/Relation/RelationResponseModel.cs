@@ -9,7 +9,7 @@ public class RelationResponseModel
     ///     Gets or sets the Parent Id of the Relation (Source).
     /// </summary>
     [ReadOnly(true)]
-    public int ParentId { get; set; }
+    public Guid ParentId { get; set; }
 
     /// <summary>
     ///     Gets or sets the Parent Name of the relation (Source).
@@ -21,7 +21,7 @@ public class RelationResponseModel
     ///     Gets or sets the Child Id of the Relation (Destination).
     /// </summary>
     [ReadOnly(true)]
-    public int ChildId { get; set; }
+    public Guid ChildId { get; set; }
 
     /// <summary>
     ///     Gets or sets the Child Name of the relation (Destination).

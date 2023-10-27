@@ -32,7 +32,7 @@ public class ScriptService : FileServiceBase<IScriptRepository, IScript>, IScrip
     }
 
     /// <inheritdoc />
-    public async Task<ScriptOperationStatus> DeleteAsync(string path, Guid performingUserKey)
+    public async Task<ScriptOperationStatus> DeleteAsync(string path, Guid userKey)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
@@ -55,14 +55,14 @@ public class ScriptService : FileServiceBase<IScriptRepository, IScript>, IScrip
         scope.Notifications.Publish(
             new ScriptDeletedNotification(script, eventMessages).WithStateFrom(deletingNotification));
 
-        await AuditAsync(AuditType.Delete, performingUserKey);
+        await AuditAsync(AuditType.Delete, userKey);
 
         scope.Complete();
         return ScriptOperationStatus.Success;
     }
 
     /// <inheritdoc />
-    public async Task<Attempt<IScript?, ScriptOperationStatus>> CreateAsync(ScriptCreateModel createModel, Guid performingUserKey)
+    public async Task<Attempt<IScript?, ScriptOperationStatus>> CreateAsync(ScriptCreateModel createModel, Guid userKey)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
@@ -92,7 +92,7 @@ public class ScriptService : FileServiceBase<IScriptRepository, IScript>, IScrip
         Repository.Save(script);
 
         scope.Notifications.Publish(new ScriptSavedNotification(script, eventMessages).WithStateFrom(savingNotification));
-        await AuditAsync(AuditType.Save, performingUserKey);
+        await AuditAsync(AuditType.Save, userKey);
 
         scope.Complete();
         return Attempt.SucceedWithStatus<IScript?, ScriptOperationStatus>(ScriptOperationStatus.Success, script);
@@ -125,7 +125,7 @@ public class ScriptService : FileServiceBase<IScriptRepository, IScript>, IScrip
     }
 
     /// <inheritdoc />
-    public async Task<Attempt<IScript?, ScriptOperationStatus>> UpdateAsync(ScriptUpdateModel updateModel, Guid performingUserKey)
+    public async Task<Attempt<IScript?, ScriptOperationStatus>> UpdateAsync(ScriptUpdateModel updateModel, Guid userKey)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         IScript? script = Repository.Get(updateModel.ExistingPath);
@@ -159,7 +159,7 @@ public class ScriptService : FileServiceBase<IScriptRepository, IScript>, IScrip
         Repository.Save(script);
         scope.Notifications.Publish(new ScriptSavedNotification(script, eventMessages).WithStateFrom(savingNotification));
 
-        await AuditAsync(AuditType.Save, performingUserKey);
+        await AuditAsync(AuditType.Save, userKey);
 
         scope.Complete();
         return Attempt.SucceedWithStatus<IScript?, ScriptOperationStatus>(ScriptOperationStatus.Success, script);
@@ -180,9 +180,9 @@ public class ScriptService : FileServiceBase<IScriptRepository, IScript>, IScrip
         return ScriptOperationStatus.Success;
     }
 
-    private async Task AuditAsync(AuditType type, Guid performingUserKey)
+    private async Task AuditAsync(AuditType type, Guid userKey)
     {
-        int userId = await _userIdKeyResolver.GetAsync(performingUserKey);
+        int userId = await _userIdKeyResolver.GetAsync(userKey);
         _auditRepository.Save(new AuditItem(-1, type, userId, "Script"));
     }
 }

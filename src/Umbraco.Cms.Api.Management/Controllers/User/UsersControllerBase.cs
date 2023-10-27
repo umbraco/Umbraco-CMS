@@ -64,6 +64,10 @@ public abstract class UserControllerBase : ManagementApiControllerBase
                 .WithTitle("Cannot disable")
                 .WithDetail("A user cannot disable itself.")
                 .Build()),
+            UserOperationStatus.CannotDeleteSelf => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Cannot delete")
+                .WithDetail("A user cannot delete itself.")
+                .Build()),
             UserOperationStatus.OldPasswordRequired => BadRequest(new ProblemDetailsBuilder()
                 .WithTitle("Old password required")
                 .WithDetail("The old password is required to change the password of the specified user.")
@@ -104,7 +108,7 @@ public abstract class UserControllerBase : ManagementApiControllerBase
                 .WithTitle("Invalid ISO code")
                 .WithDetail("The specified ISO code is invalid.")
                 .Build()),
-            UserOperationStatus.InvalidVerificationToken => BadRequest(new ProblemDetailsBuilder()
+            UserOperationStatus.InvalidInviteToken => BadRequest(new ProblemDetailsBuilder()
                 .WithTitle("Invalid verification token")
                 .WithDetail("The specified verification token is invalid.")
                 .Build()),

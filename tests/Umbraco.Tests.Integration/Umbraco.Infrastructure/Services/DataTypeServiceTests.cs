@@ -174,7 +174,7 @@ public class DataTypeServiceTests : UmbracoIntegrationTest
     [Test]
     public async Task Can_Create_DataType_In_Container()
     {
-        var container = (await DataTypeContainerService.CreateAsync(new EntityContainer(Constants.ObjectTypes.DataType) { Name = "Root Container" }, null, Constants.Security.SuperUserKey)).Result;
+        var container = (await DataTypeContainerService.CreateAsync(null, "Root Container", null, Constants.Security.SuperUserKey)).Result;
 
         var result = await DataTypeService.CreateAsync(
             new DataType(new LabelPropertyEditor(DataValueEditorFactory, IOHelper), ConfigurationEditorJsonSerializer)
@@ -205,7 +205,7 @@ public class DataTypeServiceTests : UmbracoIntegrationTest
             },
             Constants.Security.SuperUserKey)).Result;
 
-        var container = (await DataTypeContainerService.CreateAsync(new EntityContainer(Constants.ObjectTypes.DataType) { Name = "Root Container" }, null, Constants.Security.SuperUserKey)).Result;
+        var container = (await DataTypeContainerService.CreateAsync(null, "Root Container", null, Constants.Security.SuperUserKey)).Result;
 
         dataType = await DataTypeService.GetAsync(dataType.Key);
         Assert.IsNotNull(dataType);
@@ -223,7 +223,7 @@ public class DataTypeServiceTests : UmbracoIntegrationTest
     [Test]
     public async Task Can_Move_DataType_To_Root()
     {
-        var container = (await DataTypeContainerService.CreateAsync(new EntityContainer(Constants.ObjectTypes.DataType) { Name = "Root Container" }, null, Constants.Security.SuperUserKey)).Result;
+        var container = (await DataTypeContainerService.CreateAsync(null, "Root Container", null, Constants.Security.SuperUserKey)).Result;
         var dataType = (await DataTypeService.CreateAsync(
             new DataType(new LabelPropertyEditor(DataValueEditorFactory, IOHelper), ConfigurationEditorJsonSerializer)
             {
@@ -272,7 +272,7 @@ public class DataTypeServiceTests : UmbracoIntegrationTest
     [Test]
     public async Task Can_Copy_DataType_To_Container()
     {
-        var container = (await DataTypeContainerService.CreateAsync(new EntityContainer(Constants.ObjectTypes.DataType) { Name = "Root Container" }, null, Constants.Security.SuperUserKey)).Result;
+        var container = (await DataTypeContainerService.CreateAsync(null, "Root Container", null, Constants.Security.SuperUserKey)).Result;
         var dataType = (await DataTypeService.CreateAsync(
             new DataType(new LabelPropertyEditor(DataValueEditorFactory, IOHelper), ConfigurationEditorJsonSerializer)
             {
@@ -296,8 +296,8 @@ public class DataTypeServiceTests : UmbracoIntegrationTest
     [Test]
     public async Task Can_Copy_DataType_Between_Containers()
     {
-        var container1 = (await DataTypeContainerService.CreateAsync(new EntityContainer(Constants.ObjectTypes.DataType) { Name = "Root Container 1" }, null, Constants.Security.SuperUserKey)).Result;
-        var container2 = (await DataTypeContainerService.CreateAsync(new EntityContainer(Constants.ObjectTypes.DataType) { Name = "Root Container 2" }, null, Constants.Security.SuperUserKey)).Result;
+        var container1 = (await DataTypeContainerService.CreateAsync(null, "Root Container 1", null, Constants.Security.SuperUserKey)).Result;
+        var container2 = (await DataTypeContainerService.CreateAsync(null, "Root Container 2", null, Constants.Security.SuperUserKey)).Result;
         var dataType = (await DataTypeService.CreateAsync(
             new DataType(new LabelPropertyEditor(DataValueEditorFactory, IOHelper), ConfigurationEditorJsonSerializer)
             {
@@ -326,7 +326,7 @@ public class DataTypeServiceTests : UmbracoIntegrationTest
     [Test]
     public async Task Can_Copy_DataType_From_Container_To_Root()
     {
-        var container1 = (await DataTypeContainerService.CreateAsync(new EntityContainer(Constants.ObjectTypes.DataType) { Name = "Root Container 1" }, null, Constants.Security.SuperUserKey)).Result;
+        var container1 = (await DataTypeContainerService.CreateAsync(null, "Root Container 1", null, Constants.Security.SuperUserKey)).Result;
         var dataType = (await DataTypeService.CreateAsync(
             new DataType(new LabelPropertyEditor(DataValueEditorFactory, IOHelper), ConfigurationEditorJsonSerializer)
             {

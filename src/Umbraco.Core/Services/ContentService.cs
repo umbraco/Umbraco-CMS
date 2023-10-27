@@ -207,7 +207,7 @@ public class ContentService : RepositoryService, IContentService
 
     /// <summary>
     ///     Used to bulk update the permissions set for a content item. This will replace all permissions
-    ///     assigned to an entity with a list of user id & permission pairs.
+    ///     assigned to an entity with a list of user id &amp; permission pairs.
     /// </summary>
     /// <param name="permissionSet"></param>
     public void SetPermissions(EntityPermissionSet permissionSet)
@@ -372,7 +372,7 @@ public class ContentService : RepositoryService, IContentService
     public IContent CreateAndSave(string name, int parentId, string contentTypeAlias, int userId = Constants.Security.SuperUserId)
     {
         // TODO: what about culture?
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             // locking the content tree secures content types too
             scope.WriteLock(Constants.Locks.ContentTree);
@@ -395,6 +395,8 @@ public class ContentService : RepositoryService, IContentService
 
             Save(content, userId);
 
+            scope.Complete();
+
             return content;
         }
     }
@@ -416,7 +418,7 @@ public class ContentService : RepositoryService, IContentService
             throw new ArgumentNullException(nameof(parent));
         }
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             // locking the content tree secures content types too
             scope.WriteLock(Constants.Locks.ContentTree);
@@ -431,6 +433,7 @@ public class ContentService : RepositoryService, IContentService
 
             Save(content, userId);
 
+            scope.Complete();
             return content;
         }
     }
@@ -508,10 +511,11 @@ public class ContentService : RepositoryService, IContentService
     /// <inheritdoc />
     public void PersistContentSchedule(IContent content, ContentScheduleCollection contentSchedule)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             scope.WriteLock(Constants.Locks.ContentTree);
             _documentRepository.PersistContentSchedule(content, contentSchedule);
+            scope.Complete();
         }
     }
 
@@ -1097,7 +1101,8 @@ public class ContentService : RepositoryService, IContentService
             scope.Notifications.Publish(
                 new ContentTreeChangeNotification(contentsA, TreeChangeTypes.RefreshNode, eventMessages));
 
-            Audit(AuditType.Save, userId == -1 ? 0 : userId, Constants.System.Root, "Saved multiple content");
+            string contentIds = string.Join(", ", contentsA.Select(x => x.Id));
+            Audit(AuditType.Save, userId, Constants.System.Root, $"Saved multiple content items (#{contentIds.Length})");
 
             scope.Complete();
         }
@@ -2105,7 +2110,7 @@ public class ContentService : RepositoryService, IContentService
             }
 
             // deal with the branch root - if it fails, abort
-            PublishResult? result = SaveAndPublishBranchItem(scope, document, shouldPublish, publishCultures, true, publishedDocuments, eventMessages, userId, allLangs);
+            PublishResult? result = SaveAndPublishBranchItem(scope, document, shouldPublish, publishCultures, true, publishedDocuments, eventMessages, userId, allLangs, out IDictionary<string, object?> notificationState);
             if (result != null)
             {
                 results.Add(result);
@@ -2140,7 +2145,7 @@ public class ContentService : RepositoryService, IContentService
                     }
 
                     // no need to check path here, parent has to be published here
-                    result = SaveAndPublishBranchItem(scope, d, shouldPublish, publishCultures, false, publishedDocuments, eventMessages, userId, allLangs);
+                    result = SaveAndPublishBranchItem(scope, d, shouldPublish, publishCultures, false, publishedDocuments, eventMessages, userId, allLangs, out _);
                     if (result != null)
                     {
                         results.Add(result);
@@ -2164,7 +2169,7 @@ public class ContentService : RepositoryService, IContentService
             // (SaveAndPublishBranchOne does *not* do it)
             scope.Notifications.Publish(
                 new ContentTreeChangeNotification(document, TreeChangeTypes.RefreshBranch, eventMessages));
-            scope.Notifications.Publish(new ContentPublishedNotification(publishedDocuments, eventMessages, true));
+            scope.Notifications.Publish(new ContentPublishedNotification(publishedDocuments, eventMessages).WithState(notificationState));
 
             scope.Complete();
         }
@@ -2185,8 +2190,10 @@ public class ContentService : RepositoryService, IContentService
         ICollection<IContent> publishedDocuments,
         EventMessages evtMsgs,
         int userId,
-        IReadOnlyCollection<ILanguage> allLangs)
+        IReadOnlyCollection<ILanguage> allLangs,
+        out IDictionary<string, object?> notificationState)
     {
+        notificationState = new Dictionary<string, object?>();
         HashSet<string>? culturesToPublish = shouldPublish(document);
 
         // null = do not include
@@ -2218,6 +2225,7 @@ public class ContentService : RepositoryService, IContentService
         if (result.Success)
         {
             publishedDocuments.Add(document);
+            notificationState = savingNotification.State;
         }
 
         return result;
@@ -2824,7 +2832,7 @@ public class ContentService : RepositoryService, IContentService
             }
             else
             {
-                Audit(AuditType.SendToPublish, content.WriterId, content.Id);
+                Audit(AuditType.SendToPublish, userId, content.Id);
             }
 
             return saveResult.Success;
@@ -2961,7 +2969,7 @@ public class ContentService : RepositoryService, IContentService
 
     public ContentDataIntegrityReport CheckDataIntegrity(ContentDataIntegrityReportOptions options)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             scope.WriteLock(Constants.Locks.ContentTree);
 
@@ -2973,6 +2981,8 @@ public class ContentService : RepositoryService, IContentService
                 var root = new Content("root", -1, new ContentType(_shortStringHelper, -1)) { Id = -1, Key = Guid.Empty };
                 scope.Notifications.Publish(new ContentTreeChangeNotification(root, TreeChangeTypes.RefreshAll, EventMessagesFactory.Get()));
             }
+
+            scope.Complete();
 
             return report;
         }
@@ -3566,7 +3576,7 @@ public class ContentService : RepositoryService, IContentService
 
             _documentBlueprintRepository.Save(content);
 
-            Audit(AuditType.Save, Constants.Security.SuperUserId, content.Id, $"Saved content template: {content.Name}");
+            Audit(AuditType.Save, userId, content.Id, $"Saved content template: {content.Name}");
 
             scope.Notifications.Publish(new ContentSavedBlueprintNotification(content, evtMsgs));
 

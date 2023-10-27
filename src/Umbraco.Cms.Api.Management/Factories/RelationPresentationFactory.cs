@@ -9,17 +9,26 @@ namespace Umbraco.Cms.Api.Management.Factories;
 public class RelationPresentationFactory : IRelationPresentationFactory
 {
     private readonly IRelationService _relationService;
-    private readonly IUmbracoMapper _umbracoMapper;
+    private readonly IEntityService _entityService;
 
-    public RelationPresentationFactory(IRelationService relationService, IUmbracoMapper umbracoMapper)
+    public RelationPresentationFactory(IRelationService relationService, IEntityService entityService)
     {
         _relationService = relationService;
-        _umbracoMapper = umbracoMapper;
+        _entityService = entityService;
     }
 
     public RelationResponseModel Create(IRelation relation)
     {
-        RelationResponseModel relationResponseModel = _umbracoMapper.Map<RelationResponseModel>(relation)!;
+        var child = _entityService.Get(relation.ChildId)!;
+        var parent = _entityService.Get(relation.ParentId)!;
+
+        RelationResponseModel relationResponseModel = new RelationResponseModel()
+        {
+            ChildId = child.Key,
+            Comment = relation.Comment,
+            CreateDate = relation.CreateDate,
+            ParentId = parent.Key,
+        };
         Tuple<IUmbracoEntity, IUmbracoEntity>? entities = _relationService.GetEntitiesFromRelation(relation);
 
         if (entities is not null)

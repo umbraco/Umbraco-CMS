@@ -10,7 +10,9 @@ namespace Umbraco.Cms.Api.Management.Controllers.DataType.Folder;
 [ApiVersion("1.0")]
 public class ByKeyDataTypeFolderController : DataTypeFolderControllerBase
 {
-    public ByKeyDataTypeFolderController(IBackOfficeSecurityAccessor backOfficeSecurityAccessor, IDataTypeContainerService dataTypeContainerService)
+    public ByKeyDataTypeFolderController(
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+        IDataTypeContainerService dataTypeContainerService)
         : base(backOfficeSecurityAccessor, dataTypeContainerService)
     {
     }

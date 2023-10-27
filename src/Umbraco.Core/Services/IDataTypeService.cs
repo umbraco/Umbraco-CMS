@@ -101,6 +101,13 @@ public interface IDataTypeService : IService
     Task<IDataType?> GetAsync(Guid id);
 
     /// <summary>
+    /// Gets multiple <see cref="IDataType"/> objects by their unique keys.
+    /// </summary>
+    /// <param name="keys">The keys to get datatypes by.</param>
+    /// <returns>An attempt with the requested data types.</returns>
+    Task<IEnumerable<IDataType>> GetAllAsync(params Guid[] keys);
+
+    /// <summary>
     ///     Gets all <see cref="IDataType" /> objects or those with the ids passed in
     /// </summary>
     /// <param name="ids">Optional array of Ids</param>

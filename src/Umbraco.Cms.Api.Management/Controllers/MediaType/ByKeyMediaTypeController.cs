@@ -5,6 +5,7 @@ using Umbraco.Cms.Api.Management.ViewModels.MediaType;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.MediaType;
 
@@ -26,11 +27,10 @@ public class ByKeyMediaTypeController : MediaTypeControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ByKey(Guid id)
     {
-        // FIXME: create and use an async get method here.
-        IMediaType? mediaType = _mediaTypeService.Get(id);
+        IMediaType? mediaType = await _mediaTypeService.GetAsync(id);
         if (mediaType == null)
         {
-            return MediaTypeNotFound();
+            return OperationStatusResult(ContentTypeOperationStatus.NotFound);
         }
 
         MediaTypeResponseModel model = _umbracoMapper.Map<MediaTypeResponseModel>(mediaType)!;

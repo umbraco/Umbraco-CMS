@@ -12,7 +12,8 @@ public class DocumentTypeMapDefinition : ContentTypeMapDefinition<IContentType, 
     public void DefineMaps(IUmbracoMapper mapper)
         => mapper.Define<IContentType, DocumentTypeResponseModel>((_, _) => new DocumentTypeResponseModel(), Map);
 
-    // Umbraco.Code.MapAll
+    // TODO: ParentId
+    // Umbraco.Code.MapAll -ParentId
     private void Map(IContentType source, DocumentTypeResponseModel target, MapperContext context)
     {
         target.Id = source.Key;

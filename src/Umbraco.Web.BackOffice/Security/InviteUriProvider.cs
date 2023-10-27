@@ -40,7 +40,7 @@ public class InviteUriProvider : IInviteUriProvider
             return Attempt.FailWithStatus(tokenAttempt.Status, new Uri(string.Empty));
         }
 
-        string inviteToken = $"{invitee.Id}{WebUtility.UrlEncode("|")}{tokenAttempt.Result.ToUrlBase64()}";
+        string inviteToken = $"{invitee.Key}{WebUtility.UrlEncode("|")}{tokenAttempt.Result.ToUrlBase64()}";
 
         // FIXME: This will need to change.
         string? action = _linkGenerator.GetPathByAction(

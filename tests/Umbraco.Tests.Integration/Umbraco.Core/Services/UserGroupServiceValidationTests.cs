@@ -25,7 +25,7 @@ public class UserGroupServiceValidationTests : UmbracoIntegrationTest
             Name = null
         };
 
-        var result = await UserGroupService.CreateAsync(userGroup, Constants.Security.SuperUserId);
+        var result = await UserGroupService.CreateAsync(userGroup, Constants.Security.SuperUserKey);
 
         Assert.IsFalse(result.Success);
         Assert.AreEqual(UserGroupOperationStatus.MissingName, result.Status);
@@ -39,7 +39,7 @@ public class UserGroupServiceValidationTests : UmbracoIntegrationTest
             Name = "Sed porttitor lectus nibh. Vivamus magna justo, lacinia eget consectetur sed, convallis at tellus. Vivamus suscipit tortor eget felis porttitor volutpat. Quisque velit nisi, pretium ut lacinia in, elementum id enim."
         };
 
-        var result = await UserGroupService.CreateAsync(userGroup, Constants.Security.SuperUserId);
+        var result = await UserGroupService.CreateAsync(userGroup, Constants.Security.SuperUserKey);
 
         Assert.IsFalse(result.Success);
         Assert.AreEqual(UserGroupOperationStatus.NameTooLong, result.Status);
@@ -54,7 +54,7 @@ public class UserGroupServiceValidationTests : UmbracoIntegrationTest
             Alias = "Sed porttitor lectus nibh. Vivamus magna justo, lacinia eget consectetur sed, convallis at tellus. Vivamus suscipit tortor eget felis porttitor volutpat. Quisque velit nisi, pretium ut lacinia in, elementum id enim. Vivamus suscipit tortor eget felis porttitor volutpat. Quisque velit nisi, pretium ut lacinia in, elementum id enim."
         };
 
-        var result = await UserGroupService.CreateAsync(userGroup, Constants.Security.SuperUserId);
+        var result = await UserGroupService.CreateAsync(userGroup, Constants.Security.SuperUserKey);
 
         Assert.IsFalse(result.Success);
         Assert.AreEqual(UserGroupOperationStatus.AliasTooLong, result.Status);
@@ -69,7 +69,7 @@ public class UserGroupServiceValidationTests : UmbracoIntegrationTest
             Alias = "someAlias"
         };
 
-        var result = await UserGroupService.UpdateAsync(userGroup, Constants.Security.SuperUserId);
+        var result = await UserGroupService.UpdateAsync(userGroup, Constants.Security.SuperUserKey);
 
         Assert.IsFalse(result.Success);
         Assert.AreEqual(UserGroupOperationStatus.NotFound, result.Status);
@@ -84,11 +84,11 @@ public class UserGroupServiceValidationTests : UmbracoIntegrationTest
             Alias = "someAlias"
         };
 
-        var result = await UserGroupService.CreateAsync(userGroup, Constants.Security.SuperUserId);
+        var result = await UserGroupService.CreateAsync(userGroup, Constants.Security.SuperUserKey);
 
         Assert.IsTrue(result.Success);
 
-        result = await UserGroupService.CreateAsync(userGroup, Constants.Security.SuperUserId);
+        result = await UserGroupService.CreateAsync(userGroup, Constants.Security.SuperUserKey);
 
         Assert.IsFalse(result.Success);
         Assert.AreEqual(UserGroupOperationStatus.AlreadyExists, result.Status);
@@ -104,7 +104,7 @@ public class UserGroupServiceValidationTests : UmbracoIntegrationTest
             Name = "I already exist",
             Alias = alias
         };
-        var setupResult = await UserGroupService.CreateAsync(existingUserGroup, Constants.Security.SuperUserId);
+        var setupResult = await UserGroupService.CreateAsync(existingUserGroup, Constants.Security.SuperUserKey);
         Assert.IsTrue(setupResult.Success);
 
         var newUserGroup = new UserGroup(ShortStringHelper)
@@ -112,7 +112,7 @@ public class UserGroupServiceValidationTests : UmbracoIntegrationTest
             Name = "I have a duplicate alias",
             Alias = alias,
         };
-        var result = await UserGroupService.CreateAsync(newUserGroup, Constants.Security.SuperUserId);
+        var result = await UserGroupService.CreateAsync(newUserGroup, Constants.Security.SuperUserKey);
 
         Assert.IsFalse(result.Success);
         Assert.AreEqual(UserGroupOperationStatus.DuplicateAlias, result.Status);
@@ -128,7 +128,7 @@ public class UserGroupServiceValidationTests : UmbracoIntegrationTest
             Name = "I already exist",
             Alias = alias
         };
-        var setupResult = await UserGroupService.CreateAsync(existingUserGroup, Constants.Security.SuperUserId);
+        var setupResult = await UserGroupService.CreateAsync(existingUserGroup, Constants.Security.SuperUserKey);
         Assert.IsTrue(setupResult.Success);
 
         IUserGroup userGroupToUpdate = new UserGroup(ShortStringHelper)
@@ -136,7 +136,7 @@ public class UserGroupServiceValidationTests : UmbracoIntegrationTest
             Name = "I don't have a duplicate alias",
             Alias = "somAlias",
         };
-        var creationResult = await UserGroupService.CreateAsync(userGroupToUpdate, Constants.Security.SuperUserId);
+        var creationResult = await UserGroupService.CreateAsync(userGroupToUpdate, Constants.Security.SuperUserKey);
         Assert.IsTrue(creationResult.Success);
 
 
@@ -144,7 +144,7 @@ public class UserGroupServiceValidationTests : UmbracoIntegrationTest
         userGroupToUpdate.Name = "Now I have a duplicate alias";
         userGroupToUpdate.Alias = alias;
 
-        var updateResult = await UserGroupService.UpdateAsync(userGroupToUpdate, Constants.Security.SuperUserId);
+        var updateResult = await UserGroupService.UpdateAsync(userGroupToUpdate, Constants.Security.SuperUserKey);
         Assert.IsFalse(updateResult.Success);
         Assert.AreEqual(UserGroupOperationStatus.DuplicateAlias, updateResult.Status);
     }
@@ -157,13 +157,13 @@ public class UserGroupServiceValidationTests : UmbracoIntegrationTest
             Name = "Some Name",
             Alias = "someAlias"
         };
-        var setupResult = await UserGroupService.CreateAsync(userGroup, Constants.Security.SuperUserId);
+        var setupResult = await UserGroupService.CreateAsync(userGroup, Constants.Security.SuperUserKey);
         Assert.IsTrue(setupResult.Success);
 
 
         var updateName = "New Name";
         userGroup.Name = updateName;
-        var updateResult = await UserGroupService.UpdateAsync(userGroup, Constants.Security.SuperUserId);
+        var updateResult = await UserGroupService.UpdateAsync(userGroup, Constants.Security.SuperUserKey);
         Assert.IsTrue(updateResult.Success);
         var updatedGroup = updateResult.Result;
         Assert.AreEqual(updateName, updatedGroup.Name);

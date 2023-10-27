@@ -20,15 +20,16 @@ public class BackOfficePasswordChanger : IBackOfficePasswordChanger
     }
 
     public async Task<Attempt<PasswordChangedModel?>> ChangeBackOfficePassword(
-        ChangeBackOfficeUserPasswordModel model)
+        ChangeBackOfficeUserPasswordModel model, IUser? performingUser)
     {
         var mappedModel = new ChangingPasswordModel
         {
             Id = model.User.Id,
             OldPassword = model.OldPassword,
-            NewPassword = model.NewPassword
+            NewPassword = model.NewPassword,
+            ResetPasswordToken = model.ResetPasswordToken,
         };
 
-        return await _passwordChanger.ChangePasswordWithIdentityAsync(mappedModel, _userManager);
+        return await _passwordChanger.ChangePasswordWithIdentityAsync(mappedModel, _userManager, performingUser);
     }
 }

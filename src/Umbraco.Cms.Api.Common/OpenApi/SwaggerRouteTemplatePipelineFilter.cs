@@ -5,6 +5,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using Swashbuckle.AspNetCore.SwaggerUI;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Web.Common.ApplicationBuilder;
@@ -32,20 +33,8 @@ public class SwaggerRouteTemplatePipelineFilter : UmbracoPipelineFilter
             {
                 swaggerOptions.RouteTemplate = SwaggerRouteTemplate(applicationBuilder);
             });
-        applicationBuilder.UseSwaggerUI(
-            swaggerUiOptions =>
-            {
-                swaggerUiOptions.RoutePrefix = SwaggerUiRoutePrefix(applicationBuilder);
 
-                foreach ((var name, OpenApiInfo? apiInfo) in swaggerGenOptions.Value.SwaggerGeneratorOptions.SwaggerDocs
-                             .OrderBy(x => x.Value.Title))
-                {
-                    swaggerUiOptions.SwaggerEndpoint($"{name}/swagger.json", $"{apiInfo.Title}");
-                }
-
-                swaggerUiOptions.OAuthClientId(Constants.OauthClientIds.Swagger);
-                swaggerUiOptions.OAuthUsePkce();
-            });
+        applicationBuilder.UseSwaggerUI(swaggerUiOptions => SwaggerUiConfiguration(swaggerUiOptions, swaggerGenOptions.Value, applicationBuilder));
     }
 
     protected virtual bool SwaggerIsEnabled(IApplicationBuilder applicationBuilder)
@@ -59,6 +48,23 @@ public class SwaggerRouteTemplatePipelineFilter : UmbracoPipelineFilter
 
     protected virtual string SwaggerUiRoutePrefix(IApplicationBuilder applicationBuilder)
         => $"{GetUmbracoPath(applicationBuilder).TrimStart(Constants.CharArrays.ForwardSlash)}/swagger";
+
+    protected virtual void SwaggerUiConfiguration(
+        SwaggerUIOptions swaggerUiOptions,
+        SwaggerGenOptions swaggerGenOptions,
+        IApplicationBuilder applicationBuilder)
+    {
+        swaggerUiOptions.RoutePrefix = SwaggerUiRoutePrefix(applicationBuilder);
+
+        foreach ((var name, OpenApiInfo? apiInfo) in swaggerGenOptions.SwaggerGeneratorOptions.SwaggerDocs
+                     .OrderBy(x => x.Value.Title))
+        {
+            swaggerUiOptions.SwaggerEndpoint($"{name}/swagger.json", $"{apiInfo.Title}");
+        }
+
+        swaggerUiOptions.OAuthClientId(Constants.OAuthClientIds.Swagger);
+        swaggerUiOptions.OAuthUsePkce();
+    }
 
     private string GetUmbracoPath(IApplicationBuilder applicationBuilder)
     {

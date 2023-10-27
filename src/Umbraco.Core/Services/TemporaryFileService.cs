@@ -2,6 +2,7 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models.TemporaryFile;
 using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
 
@@ -10,15 +11,18 @@ namespace Umbraco.Cms.Core.Services;
 internal sealed class TemporaryFileService : ITemporaryFileService
 {
     private readonly ITemporaryFileRepository _temporaryFileRepository;
+    private readonly IFileStreamSecurityValidator _fileStreamSecurityValidator;
     private RuntimeSettings _runtimeSettings;
     private ContentSettings _contentSettings;
 
     public TemporaryFileService(
         ITemporaryFileRepository temporaryFileRepository,
         IOptionsMonitor<RuntimeSettings> runtimeOptionsMonitor,
-        IOptionsMonitor<ContentSettings> contentOptionsMonitor)
+        IOptionsMonitor<ContentSettings> contentOptionsMonitor,
+        IFileStreamSecurityValidator fileStreamSecurityValidator)
     {
         _temporaryFileRepository = temporaryFileRepository;
+        _fileStreamSecurityValidator = fileStreamSecurityValidator;
 
         _runtimeSettings = runtimeOptionsMonitor.CurrentValue;
         _contentSettings = contentOptionsMonitor.CurrentValue;
@@ -40,6 +44,15 @@ internal sealed class TemporaryFileService : ITemporaryFileService
         {
             return Attempt.FailWithStatus<TemporaryFileModel?, TemporaryFileOperationStatus>(TemporaryFileOperationStatus.KeyAlreadyUsed, null);
         }
+
+
+        await using Stream dataStream = createModel.OpenReadStream();
+        dataStream.Seek(0, SeekOrigin.Begin);
+        if (_fileStreamSecurityValidator.IsConsideredSafe(dataStream) is false)
+        {
+            return Attempt.FailWithStatus<TemporaryFileModel?, TemporaryFileOperationStatus>(TemporaryFileOperationStatus.UploadBlocked, null);
+        }
+
 
         temporaryFileModel = new TemporaryFileModel
         {

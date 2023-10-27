@@ -11,6 +11,7 @@ using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
@@ -74,6 +75,7 @@ public class ContentTypeServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
+    [LongRunning]
     public void Deleting_Content_Type_With_Hierarchy_Of_Content_Items_Moves_Orphaned_Content_To_Recycle_Bin()
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
@@ -125,6 +127,7 @@ public class ContentTypeServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
+    [LongRunning]
     public void Deleting_Content_Types_With_Hierarchy_Of_Content_Items_Doesnt_Raise_Trashed_Event_For_Deleted_Items_1()
     {
         ContentNotificationHandler.MovedContentToRecycleBin = MovedContentToRecycleBin;
@@ -175,6 +178,7 @@ public class ContentTypeServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
+    [LongRunning]
     public void Deleting_Content_Types_With_Hierarchy_Of_Content_Items_Doesnt_Raise_Trashed_Event_For_Deleted_Items_2()
     {
         ContentNotificationHandler.MovedContentToRecycleBin = MovedContentToRecycleBin;
@@ -262,7 +266,7 @@ public class ContentTypeServiceTests : UmbracoIntegrationTest
         // Arrange
         var contentTypeService = ContentTypeService;
         var hierarchy = CreateContentTypeHierarchy();
-        contentTypeService.Save(hierarchy, 0); // ensure they are saved!
+        contentTypeService.Save(hierarchy, -1); // ensure they are saved!
         var master = hierarchy.First();
 
         // Act
@@ -278,7 +282,7 @@ public class ContentTypeServiceTests : UmbracoIntegrationTest
         // Arrange
         var contentTypeService = ContentTypeService;
         var hierarchy = CreateContentTypeHierarchy();
-        contentTypeService.Save(hierarchy, 0); // ensure they are saved!
+        contentTypeService.Save(hierarchy, -1); // ensure they are saved!
         var master = hierarchy.First();
 
         // Act
@@ -296,7 +300,7 @@ public class ContentTypeServiceTests : UmbracoIntegrationTest
         var hierarchy = CreateContentTypeHierarchy();
 
         // Act
-        contentTypeService.Save(hierarchy, 0);
+        contentTypeService.Save(hierarchy, -1);
 
         Assert.That(hierarchy.Any(), Is.True);
         Assert.That(hierarchy.Any(x => x.HasIdentity == false), Is.False);

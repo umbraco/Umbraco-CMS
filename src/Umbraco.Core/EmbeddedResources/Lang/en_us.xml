@@ -57,6 +57,7 @@
     <key alias="unlock">Unlock</key>
     <key alias="createblueprint">Create Content Template</key>
     <key alias="resendInvite">Resend Invitation</key>
+    <key alias="toggleHideUnavailable">Hide unavailable options</key>
   </area>
   <area alias="actionCategories">
     <key alias="content">Content</key>
@@ -158,6 +159,12 @@
     <key alias="confirmActionConfirm">Confirm</key>
     <key alias="morePublishingOptions">More publishing options</key>
     <key alias="submitChanges">Submit</key>
+  </area>
+  <area alias="auditTrailsMedia">
+    <key alias="delete">Media deleted</key>
+    <key alias="move">Media moved</key>
+    <key alias="copy">Media copied</key>
+    <key alias="save">Media saved</key>
   </area>
   <area alias="auditTrails">
     <key alias="atViewingFor">Viewing for</key>
@@ -352,6 +359,7 @@
     <key alias="renameFolderFailed">Failed to rename the folder with id %0%</key>
     <key alias="dragAndDropYourFilesIntoTheArea">Drag and drop your file(s) into the area</key>
     <key alias="uploadNotAllowed">Upload is not allowed in this location.</key>
+    <key alias="fileSecurityValidationFailure">One or more file security validations have failed</key>
   </area>
   <area alias="member">
     <key alias="createNewMember">Create a new member</key>
@@ -1193,6 +1201,8 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
 </body>
 </html>
 	]]>    </key>
+    <key alias="mfaSecurityCodeSubject">Umbraco: Security Code</key>
+    <key alias="mfaSecurityCodeMessage">Your security code is: %0%</key>
     <key alias="2faTitle">One last step</key>
     <key alias="2faText">You have enabled 2-factor authentication and must verify your identity.</key>
     <key alias="2faMultipleText">Please choose a 2-factor provider</key>
@@ -1867,14 +1877,14 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
       type.
     </key>
     <key alias="chooseChildNode">Choose child node</key>
-    <key alias="compositionsDescription">Inherit tabs and properties from an existing Document Type. New tabs will be
-      added to the current Document Type or merged if a tab with an identical name exists.
+    <key alias="compositionsDescription">Inherit tabs and properties from an existing Content Type. New tabs will be
+      added to the current Content Type or merged if a tab with an identical name exists.
     </key>
     <key alias="compositionInUse">This Content Type is used in a composition, and therefore cannot be composed itself.
     </key>
     <key alias="noAvailableCompositions">There are no Content Types available to use as a composition.</key>
     <key alias="compositionRemoveWarning">Removing a composition will delete all the associated property data. Once you
-      save the Document Type there's no way back.
+      save the Content Type there's no way back.
     </key>
     <key alias="availableEditors">Create new</key>
     <key alias="reuse">Use existing</key>
@@ -2622,6 +2632,8 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="addImageCaption">Add image caption</key>
     <key alias="searchContentTree">Search content tree</key>
     <key alias="maxAmount">Maximum amount</key>
+    <key alias="expandChildItems">Expand child items for</key>
+    <key alias="openContextNode">Open context node for</key>
   </area>
   <area alias="references">
     <key alias="tabName">References</key>

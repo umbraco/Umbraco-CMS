@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 using System.Security.Claims;
 using System.Security.Principal;
 using Microsoft.AspNetCore.Http;
@@ -317,6 +318,19 @@ public class BackOfficeUserManager : UmbracoUserManager<BackOfficeIdentityUser, 
         return new IdentityCreationResult { Succeded = true, InitialPassword = password };
     }
 
+    public async Task<Attempt<string, UserOperationStatus>> GeneratePasswordResetTokenAsync(IUser user)
+    {
+        BackOfficeIdentityUser? identityUser = await FindByIdAsync(user.Id.ToString());
+
+        if (identityUser is null)
+        {
+            return Attempt.FailWithStatus(UserOperationStatus.UserNotFound, string.Empty);
+        }
+
+        var token = await GeneratePasswordResetTokenAsync(identityUser);
+
+        return Attempt.SucceedWithStatus(UserOperationStatus.Success, token);
+    }
     public async Task<Attempt<string, UserOperationStatus>> GenerateEmailConfirmationTokenAsync(IUser user)
     {
         BackOfficeIdentityUser? identityUser = await FindByIdAsync(user.Id.ToString());
@@ -344,9 +358,21 @@ public class BackOfficeUserManager : UmbracoUserManager<BackOfficeIdentityUser, 
 
     public async Task<bool> IsEmailConfirmationTokenValidAsync(IUser user, string token)
     {
-        BackOfficeIdentityUser? identityUser = await FindByIdAsync(user.Id.ToString());
+        BackOfficeIdentityUser? identityUser = await FindByIdAsync(user.Id.ToString(CultureInfo.InvariantCulture));
 
         if (identityUser != null && await VerifyUserTokenAsync(identityUser, Options.Tokens.EmailConfirmationTokenProvider, ConfirmEmailTokenPurpose, token).ConfigureAwait(false))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    public async Task<bool> IsResetPasswordTokenValidAsync(IUser user, string token)
+    {
+        BackOfficeIdentityUser? identityUser = await FindByIdAsync(user.Id.ToString(CultureInfo.InvariantCulture));
+
+        if (identityUser != null && await VerifyUserTokenAsync(identityUser, Options.Tokens.PasswordResetTokenProvider, ResetPasswordTokenPurpose, token).ConfigureAwait(false))
         {
             return true;
         }

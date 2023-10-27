@@ -246,15 +246,16 @@ AND umbracoNode.nodeObjectType = @objectType",
             }
         }
 
-        if (entity.AllowedContentTypes is not null)
+        (TEntity Entity, int SortOrder)[] allowedContentTypes = GetAllowedContentTypes(entity);
+        if (allowedContentTypes.Any())
         {
             // Insert collection of allowed content types
-            foreach (ContentTypeSort allowedContentType in entity.AllowedContentTypes)
+            foreach ((TEntity Entity, int SortOrder) allowedContentType in allowedContentTypes)
             {
                 Database.Insert(new ContentTypeAllowedContentTypeDto
                 {
                     Id = entity.Id,
-                    AllowedId = allowedContentType.Id.Value,
+                    AllowedId = allowedContentType.Entity.Id,
                     SortOrder = allowedContentType.SortOrder,
                 });
             }
@@ -401,14 +402,16 @@ AND umbracoNode.id <> @id",
 
         // delete the allowed content type entries before re-inserting the collection of allowed content types
         Database.Delete<ContentTypeAllowedContentTypeDto>("WHERE Id = @Id", new { entity.Id });
-        if (entity.AllowedContentTypes is not null)
+
+        (TEntity Entity, int SortOrder)[] allowedContentTypes = GetAllowedContentTypes(entity);
+        if (allowedContentTypes.Any())
         {
-            foreach (ContentTypeSort allowedContentType in entity.AllowedContentTypes)
+            foreach ((TEntity Entity, int SortOrder) allowedContentType in allowedContentTypes)
             {
                 Database.Insert(new ContentTypeAllowedContentTypeDto
                 {
                     Id = entity.Id,
-                    AllowedId = allowedContentType.Id.Value,
+                    AllowedId = allowedContentType.Entity.Id,
                     SortOrder = allowedContentType.SortOrder,
                 });
             }
@@ -1535,6 +1538,26 @@ WHERE {Constants.DatabaseSchema.Tables.Content}.nodeId IN (@ids) AND cmsContentT
             " WHERE contenttypeNodeId = @id",
         };
         return list;
+    }
+
+    private (TEntity Entity, int SortOrder)[] GetAllowedContentTypes(IContentTypeBase contentTypeBase)
+    {
+        if (contentTypeBase.AllowedContentTypes?.Any() is not true)
+        {
+            return Array.Empty<(TEntity, int)>();
+        }
+
+        Guid[] allowedContentTypeKeys = contentTypeBase
+            .AllowedContentTypes
+            .OrderBy(c => c.SortOrder)
+            .Select(c => c.Key)
+            .ToArray();
+
+        // NOTE: we're efficiently discarding the input sort order here in favor of a "0 to n" sorting (which is the correct sort order).
+        //       i.e. if the input sort orders are [5, 3, 17] they will be come [1, 0, 2] (in effect though they will also be sorted by
+        //       the 0 based sort order, so they will be returned as [0, 1, 2]).
+        return PerformGetAll(allowedContentTypeKeys)?.Select(c => (c, allowedContentTypeKeys.IndexOf(c.Key))).ToArray()
+            ?? Array.Empty<(TEntity, int)>();
     }
 
     private class NameCompareDto

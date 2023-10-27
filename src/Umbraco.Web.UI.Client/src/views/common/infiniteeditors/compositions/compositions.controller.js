@@ -8,6 +8,7 @@
 
         vm.showConfirmSubmit = false;
         vm.loadingAlias = null;
+        vm.hideUnavailable = false;
 
         vm.isSelected = isSelected;
         vm.openContentType = openContentType;

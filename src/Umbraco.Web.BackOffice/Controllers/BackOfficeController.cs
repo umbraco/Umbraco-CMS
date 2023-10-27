@@ -316,7 +316,9 @@ public class BackOfficeController : UmbracoController
     [AllowAnonymous]
     public ActionResult ExternalLogin(string provider, string? redirectUrl = null)
     {
-        if (redirectUrl == null || Uri.TryCreate(redirectUrl, UriKind.Absolute, out _))
+        // Only relative urls are accepted as redirect url
+        // We can't simply use Uri.TryCreate with kind Absolute, as in Linux any relative url would be seen as an absolute file uri
+        if (redirectUrl == null || !Uri.TryCreate(redirectUrl, UriKind.RelativeOrAbsolute, out Uri? redirectUri) || redirectUri.IsAbsoluteUri)
         {
             redirectUrl = Url.Action(nameof(Default), this.GetControllerName());
         }
@@ -571,6 +573,11 @@ public class BackOfficeController : UmbracoController
 
         if (errors.Count > 0)
         {
+            // the external user might actually be signed in at this point, but certain errors (i.e. missing claims)
+            // prevents us from applying said user to a back-office session. make sure the sign-in manager does not
+            // report the user as being signed in for subsequent requests.
+            await _signInManager.SignOutAsync();
+
             ViewData.SetExternalSignInProviderErrors(
                 new BackOfficeExternalLoginProviderErrors(
                     loginInfo.LoginProvider,

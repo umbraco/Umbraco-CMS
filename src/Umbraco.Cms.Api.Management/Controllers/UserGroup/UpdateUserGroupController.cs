@@ -5,6 +5,7 @@ using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.UserGroup;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
@@ -15,13 +16,16 @@ public class UpdateUserGroupController : UserGroupControllerBase
 {
     private readonly IUserGroupService _userGroupService;
     private readonly IUserGroupPresentationFactory _userGroupPresentationFactory;
+    private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
     public UpdateUserGroupController(
         IUserGroupService userGroupService,
-        IUserGroupPresentationFactory userGroupPresentationFactory)
+        IUserGroupPresentationFactory userGroupPresentationFactory,
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
     {
         _userGroupService = userGroupService;
         _userGroupPresentationFactory = userGroupPresentationFactory;
+        _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
     [HttpPut("{id:guid}")]
@@ -44,7 +48,7 @@ public class UpdateUserGroupController : UserGroupControllerBase
         }
 
         IUserGroup userGroup = userGroupUpdateAttempt.Result;
-        Attempt<IUserGroup, UserGroupOperationStatus> result = await _userGroupService.UpdateAsync(userGroup, -1);
+        Attempt<IUserGroup, UserGroupOperationStatus> result = await _userGroupService.UpdateAsync(userGroup, CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Success
             ? Ok()

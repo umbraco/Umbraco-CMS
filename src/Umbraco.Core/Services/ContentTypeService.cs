@@ -1,4 +1,6 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
@@ -24,9 +26,43 @@ public class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository,
         IAuditRepository auditRepository,
         IDocumentTypeContainerRepository entityContainerRepository,
         IEntityRepository entityRepository,
-        IEventAggregator eventAggregator)
-        : base(provider, loggerFactory, eventMessagesFactory, repository, auditRepository, entityContainerRepository, entityRepository, eventAggregator) =>
+        IEventAggregator eventAggregator,
+        IUserIdKeyResolver userIdKeyResolver)
+        : base(
+            provider,
+            loggerFactory,
+            eventMessagesFactory,
+            repository,
+            auditRepository,
+            entityContainerRepository,
+            entityRepository,
+            eventAggregator,
+            userIdKeyResolver) =>
         ContentService = contentService;
+
+    [Obsolete("Use the ctor specifying all dependencies instead")]
+    public ContentTypeService(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IContentService contentService,
+        IContentTypeRepository repository,
+        IAuditRepository auditRepository,
+        IDocumentTypeContainerRepository entityContainerRepository,
+        IEntityRepository entityRepository,
+        IEventAggregator eventAggregator)
+        : this(
+            provider,
+            loggerFactory,
+            eventMessagesFactory,
+            contentService,
+            repository,
+            auditRepository,
+            entityContainerRepository,
+            entityRepository,
+            eventAggregator,
+            StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>())
+    { }
 
     // beware! order is important to avoid deadlocks
     protected override int[] ReadLockIds { get; } = { Constants.Locks.ContentTypes };
@@ -114,13 +150,25 @@ public class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository,
             return Task.FromResult(Attempt.FailWithStatus<PagedModel<IContentType>?, ContentTypeOperationStatus>(ContentTypeOperationStatus.NotFound, null));
         }
 
-        IContentType[] allowedChildren = GetAll(parent.AllowedContentTypes.Select(x => x.Key)).ToArray();
-
-        var result = new PagedModel<IContentType>
+        PagedModel<IContentType> result;
+        if (parent.AllowedContentTypes.Any() is false)
         {
-            Items = allowedChildren.Take(take).Skip(skip),
-            Total = allowedChildren.Length,
-        };
+            // no content types allowed under parent
+            result = new PagedModel<IContentType>
+            {
+                Items = Array.Empty<IContentType>(),
+                Total = 0,
+            };
+        }
+        else
+        {
+            IContentType[] allowedChildren = GetAll(parent.AllowedContentTypes.Select(x => x.Key)).ToArray();
+            result = new PagedModel<IContentType>
+            {
+                Items = allowedChildren.Take(take).Skip(skip),
+                Total = allowedChildren.Length,
+            };
+        }
 
         return Task.FromResult(Attempt.SucceedWithStatus<PagedModel<IContentType>?, ContentTypeOperationStatus>(ContentTypeOperationStatus.Success, result));
     }

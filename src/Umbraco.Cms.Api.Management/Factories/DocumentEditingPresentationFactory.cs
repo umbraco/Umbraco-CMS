@@ -8,6 +8,7 @@ internal sealed class DocumentEditingPresentationFactory : ContentEditingPresent
     public ContentCreateModel MapCreateModel(CreateDocumentRequestModel requestModel)
     {
         ContentCreateModel model = MapContentEditingModel<ContentCreateModel>(requestModel);
+        model.Key = requestModel.Id;
         model.ContentTypeKey = requestModel.ContentTypeId;
         model.TemplateKey = requestModel.TemplateId;
         model.ParentKey = requestModel.ParentId;

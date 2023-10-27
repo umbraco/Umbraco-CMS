@@ -168,7 +168,12 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
             .From<CreatedPackageSchemaDto>()
             .Where<CreatedPackageSchemaDto>(x => x.PackageId == key);
 
-        List<CreatedPackageSchemaDto> schemaDtos = Database.Fetch<CreatedPackageSchemaDto>(query);
+        if (_scopeAccessor.AmbientScope is null)
+        {
+            return null;
+        }
+
+        List<CreatedPackageSchemaDto> schemaDtos = _scopeAccessor.AmbientScope.Database.Fetch<CreatedPackageSchemaDto>(query);
 
         if (schemaDtos.IsCollectionEmpty())
         {
@@ -215,7 +220,13 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
                     .SelectCount()
                     .From<CreatedPackageSchemaDto>()
                     .Where<CreatedPackageSchemaDto>(x => x.Name == definition.Name);
-            var exists = Database.ExecuteScalar<int>(query);
+
+            if (_scopeAccessor.AmbientScope is null)
+            {
+                return false;
+            }
+
+            var exists = _scopeAccessor.AmbientScope.Database.ExecuteScalar<int>(query);
 
             if (exists > 0)
             {

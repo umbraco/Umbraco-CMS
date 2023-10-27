@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Factories;
-using Umbraco.Cms.Api.Management.Mapping.Relation;
 using Umbraco.Cms.Api.Management.Mapping.TrackedReferences;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
@@ -16,8 +15,7 @@ internal static class TrackedReferencesBuilderExtensions
 
         builder.WithCollectionBuilder<MapDefinitionCollectionBuilder>()
             .Add<TrackedReferenceViewModelsMapDefinition>()
-            .Add<RelationModelMapDefinition>()
-            .Add<RelationViewModelsMapDefinition>();
+            .Add<RelationModelMapDefinition>();
 
         return builder;
     }

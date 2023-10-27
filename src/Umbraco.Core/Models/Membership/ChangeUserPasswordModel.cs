@@ -6,5 +6,7 @@ public class ChangeUserPasswordModel
 
     public string? OldPassword { get; set; }
 
+    public string? ResetPasswordToken { get; set; }
+
     public Guid UserKey { get; set; }
 }

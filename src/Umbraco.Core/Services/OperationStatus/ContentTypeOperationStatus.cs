@@ -6,6 +6,13 @@ public enum ContentTypeOperationStatus
     DuplicateAlias,
     InvalidAlias,
     InvalidPropertyTypeAlias,
-    InvalidDataType,
-    NotFound
+    DuplicatePropertyTypeAlias,
+    DataTypeNotFound,
+    InvalidInheritance,
+    InvalidComposition,
+    InvalidParent,
+    InvalidContainerName,
+    MissingContainer,
+    DuplicateContainer,
+    NotFound,
 }

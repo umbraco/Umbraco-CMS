@@ -10,6 +10,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.Models.TemporaryFile;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
@@ -24,6 +25,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core vs web?
 {
     private readonly IDataTypeService _dataTypeService;
+    private readonly IFileStreamSecurityValidator _fileStreamSecurityValidator;
     private readonly ILogger<ImageCropperPropertyValueEditor> _logger;
     private readonly MediaFileManager _mediaFileManager;
     private readonly IJsonSerializer _jsonSerializer;
@@ -42,7 +44,8 @@ internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core v
         IIOHelper ioHelper,
         IDataTypeService dataTypeService,
         ITemporaryFileService temporaryFileService,
-        IScopeProvider scopeProvider)
+        IScopeProvider scopeProvider,
+        IFileStreamSecurityValidator fileStreamSecurityValidator)
         : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -52,6 +55,7 @@ internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core v
         _dataTypeService = dataTypeService;
         _temporaryFileService = temporaryFileService;
         _scopeProvider = scopeProvider;
+        _fileStreamSecurityValidator = fileStreamSecurityValidator;
         contentSettings.OnChange(x => _contentSettings = x);
 
         Validators.Add(new TemporaryFileUploadValidator(() => _contentSettings, TryParseTemporaryFileKey, TryGetTemporaryFile));
@@ -263,6 +267,11 @@ internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core v
 
         using (Stream filestream = file.OpenReadStream())
         {
+            if (_fileStreamSecurityValidator.IsConsideredSafe(filestream) == false)
+            {
+                return null;
+            }
+
             // TODO: Here it would make sense to do the auto-fill properties stuff but the API doesn't allow us to do that right
             // since we'd need to be able to return values for other properties from these methods
             _mediaFileManager.FileSystem.AddFile(filepath, filestream, true); // must overwrite!
