@@ -7,19 +7,50 @@ const getDirName = path.dirname;
 const glob = globModule.default;
 
 const moduleDirectory = 'src/shared/icon-registry';
-const iconsSVGDirectory = `${moduleDirectory}/svgs`;
 const iconsOutputDirectory = `${moduleDirectory}/icons`;
+const umbracoSvgDirectory = `${moduleDirectory}/svgs`;
+const iconMapJson = `${moduleDirectory}/icon-dictionary.json`;
+
+const lucideSvgDirectory = 'node_modules/lucide-static/icons';
 
 const run = async () => {
-	const icons = await collectIcons();
-	outputIcons(icons);
+	var icons = await collectDictionaryIcons();
+	icons = await collectDiskIcons(icons);
+	writeIconsToDisk(icons);
 	generateJSON(icons);
 };
 
-const collectIcons = async () => {
-	const iconPaths = await glob(`${iconsSVGDirectory}/icon-*.svg`);
+const collectDictionaryIcons = async () => {
+
+	const rawData = readFileSync(iconMapJson);
+	const fileRaw = rawData.toString();
+	const fileJSON = JSON.parse(fileRaw);
 
 	let icons = [];
+
+	// Lucide:
+	fileJSON.lucide.forEach((iconDef) => {
+		const path = lucideSvgDirectory + "/" + iconDef.file;
+
+		const rawData = readFileSync(path);
+		const svg = rawData.toString();
+		const iconFileName = iconDef.name;
+
+		const icon = {
+			name: iconDef.name,
+			fileName: iconFileName,
+			svg,
+			output: `${iconsOutputDirectory}/${iconFileName}.js`,
+		};
+
+		icons.push(icon);
+	});
+
+	return icons;
+};
+
+const collectDiskIcons = async (icons) => {
+	const iconPaths = await glob(`${umbracoSvgDirectory}/icon-*.svg`);
 
 	iconPaths.forEach((path) => {
 		const rawData = readFileSync(path);
@@ -35,24 +66,26 @@ const collectIcons = async () => {
 
 		const SVGFileName = match[1];
 		const iconFileName = SVGFileName.replace('.svg', '');
-		const iconName = iconFileName.replace('icon-', '').replace('.svg', '');
+		const iconName = iconFileName;
 
-		const icon = {
-			src: path,
-			SVGFileName,
-			iconFileName,
-			name: iconName,
-			svg,
-			output: `${iconsOutputDirectory}/${iconFileName}.js`,
-		};
+		// Only append not already defined icons:
+		if(!icons.find(x => x.name === iconName)) {
 
-		icons.push(icon);
+			const icon = {
+				name: iconName,
+				fileName: iconFileName,
+				svg,
+				output: `${iconsOutputDirectory}/${iconFileName}.js`,
+			};
+
+			icons.push(icon);
+		}
 	});
 
 	return icons;
 };
 
-const outputIcons = (icons) => {
+const writeIconsToDisk = (icons) => {
 	icons.forEach((icon) => {
 		const content = 'export default `' + icon.svg + '`;';
 
@@ -72,10 +105,9 @@ const generateJSON = (icons) => {
 	const JSONPath = `${iconsOutputDirectory}/icons.json`;
 
 	const iconDescriptors = icons.map((icon) => {
-		console.log(icon);
 		return {
-			name: `umb:${icon.name}`,
-			path: `./icons/${icon.iconFileName}.js`,
+			name: icon.name,
+			path: `./icons/${icon.fileName}.js`,
 		};
 	});
 
