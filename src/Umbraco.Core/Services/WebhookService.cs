@@ -28,8 +28,6 @@ public class WebhookService : IWebHookService
     {
         using ICoreScope scope = _provider.CreateCoreScope();
 
-        // TODO: Validation if we need it
-
         Webhook? currentWebhook = await _webhookRepository.GetAsync(updateModel.Key);
 
         if (currentWebhook is null)

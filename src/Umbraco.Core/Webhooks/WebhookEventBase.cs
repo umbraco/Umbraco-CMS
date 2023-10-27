@@ -11,7 +11,6 @@ public abstract class WebhookEventBase<TNotification, TEntity> : IWebhookEvent, 
     where TNotification : INotification
     where TEntity : IContentBase
 {
-
     private readonly IWebhookFiringService _webhookFiringService;
     private readonly IWebHookService _webHookService;
     private readonly IWebhookLogService _webhookLogService;
@@ -37,7 +36,7 @@ public abstract class WebhookEventBase<TNotification, TEntity> : IWebhookEvent, 
 
     public string EventName { get; set; }
 
-    public async Task HandleAsync(TNotification notification, CancellationToken cancellationToken)
+    public virtual async Task HandleAsync(TNotification notification, CancellationToken cancellationToken)
     {
         if (_webhookSettings.Enabled is false)
         {
@@ -48,14 +47,14 @@ public abstract class WebhookEventBase<TNotification, TEntity> : IWebhookEvent, 
 
         foreach (Webhook webhook in webhooks)
         {
+            if (!webhook.Enabled)
+            {
+                continue;
+            }
+
             foreach (TEntity entity in GetEntitiesFromNotification(notification))
             {
                 if (webhook.EntityKeys.Any() && !webhook.EntityKeys.Contains(entity.ContentType.Key))
-                {
-                    continue;
-                }
-
-                if (!webhook.Enabled)
                 {
                     continue;
                 }
@@ -70,4 +69,3 @@ public abstract class WebhookEventBase<TNotification, TEntity> : IWebhookEvent, 
 
     protected abstract IEnumerable<TEntity> GetEntitiesFromNotification(TNotification notification);
 }
-

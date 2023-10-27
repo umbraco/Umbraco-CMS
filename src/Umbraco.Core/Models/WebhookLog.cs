@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Webhooks;
+﻿namespace Umbraco.Cms.Core.Models;
 
 public class WebhookLog
 {

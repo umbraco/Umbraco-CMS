@@ -2,6 +2,7 @@
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Notifications;
+using Umbraco.Cms.Core.Webhooks.Events;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Webhooks;

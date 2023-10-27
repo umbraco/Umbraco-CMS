@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Cms.Core.Webhooks;
+namespace Umbraco.Cms.Core.Webhooks.Events;
 
 public class MediaDeleteWebhookEvent : WebhookEventBase<MediaDeletedNotification, IMedia>
 {
