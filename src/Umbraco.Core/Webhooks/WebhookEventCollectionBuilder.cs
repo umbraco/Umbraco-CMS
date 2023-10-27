@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Composing;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Notifications;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Webhooks;
 
@@ -40,13 +40,14 @@ public class WebhookEventCollectionBuilder : OrderedCollectionBuilderBase<Webhoo
             EnsureType(type, "register");
         }
 
-        // register them - ensuring that each item is registered with the same lifetime as the collection.
-        // NOTE: Previously each one was not registered with the same lifetime which would mean that if there
-        // was a dependency on an individual item, it would resolve a brand new transient instance which isn't what
-        // we would expect to happen. The same item should be resolved from the container as the collection.
         foreach (Type type in types)
         {
-            Type notificationType = GetNotificationType(type); // Implement a method to extract the TNotification type from the INotificationHandler
+            Type? notificationType = GetNotificationType(type);
+
+            if (notificationType is null)
+            {
+                continue;
+            }
 
             var descriptor = new ServiceDescriptor(
                 typeof(INotificationAsyncHandler<>).MakeGenericType(notificationType),
@@ -60,11 +61,11 @@ public class WebhookEventCollectionBuilder : OrderedCollectionBuilderBase<Webhoo
         }
     }
 
-    private Type GetNotificationType(Type handlerType)
+    private Type? GetNotificationType(Type handlerType)
     {
-        if (handlerType.BaseType != null && handlerType.BaseType.IsGenericType && handlerType.BaseType.GetGenericTypeDefinition() == typeof(WebhookEventBase<,>))
+        if (handlerType.IsOfGenericType(typeof(INotificationAsyncHandler<>)))
         {
-            Type[] genericArguments = handlerType.BaseType.GetGenericArguments();
+            Type[] genericArguments = handlerType.BaseType!.GetGenericArguments();
 
             Type? notificationType = genericArguments.FirstOrDefault(arg => typeof(INotification).IsAssignableFrom(arg));
 
@@ -74,6 +75,6 @@ public class WebhookEventCollectionBuilder : OrderedCollectionBuilderBase<Webhoo
             }
         }
 
-        throw new InvalidOperationException($"Invalid handlerType: {handlerType}");
+        return null;
     }
 }
