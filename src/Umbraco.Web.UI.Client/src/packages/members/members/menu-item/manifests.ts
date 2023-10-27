@@ -8,7 +8,7 @@ const menuItem: ManifestTypes = {
 	weight: 400,
 	meta: {
 		label: 'Members',
-		icon: 'umb:folder',
+		icon: 'icon-folder',
 		entityType: 'member',
 		treeAlias: 'Umb.Tree.Members',
 		menus: ['Umb.Menu.Members'],

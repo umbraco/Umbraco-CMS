@@ -9,7 +9,7 @@ export const manifest: ManifestPropertyEditorUi = {
 	meta: {
 		label: 'Tags Storage Type',
 		propertyEditorSchemaAlias: '',
-		icon: 'umb:autofill',
+		icon: 'icon-autofill',
 		group: 'common',
 	},
 };

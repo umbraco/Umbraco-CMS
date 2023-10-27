@@ -7,7 +7,7 @@ const menuItem: ManifestMenuItem = {
 	weight: 0,
 	meta: {
 		label: 'Extensions',
-		icon: 'umb:wand',
+		icon: 'icon-wand',
 		entityType: 'extension-root',
 		menus: ['Umb.Menu.Settings'],
 	},

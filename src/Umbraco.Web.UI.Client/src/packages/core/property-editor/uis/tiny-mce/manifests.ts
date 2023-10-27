@@ -9,7 +9,7 @@ const manifest: ManifestPropertyEditorUi = {
 	meta: {
 		label: 'Rich Text Editor',
 		propertyEditorSchemaAlias: 'Umbraco.TinyMCE',
-		icon: 'umb:browser-window',
+		icon: 'icon-browser-window',
 		group: 'richText',
 		settings: {
 			properties: [

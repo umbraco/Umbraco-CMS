@@ -24,7 +24,7 @@ const partialViewActions: Array<ManifestEntityAction> = [
 		name: 'Delete PartialView Entity Action',
 		api: UmbDeleteEntityAction,
 		meta: {
-			icon: 'umb:trash',
+			icon: 'icon-trash',
 			label: 'Delete',
 			repositoryAlias: PARTIAL_VIEW_REPOSITORY_ALIAS,
 			entityTypes: [PARTIAL_VIEW_ENTITY_TYPE],
@@ -41,7 +41,7 @@ const partialViewFolderActions: Array<ManifestEntityAction> = [
 		name: 'Create PartialView Entity Under Directory Action',
 		api: UmbCreateEmptyPartialViewAction,
 		meta: {
-			icon: 'umb:article',
+			icon: 'icon-article',
 			label: 'New empty partial view',
 			repositoryAlias: PARTIAL_VIEW_REPOSITORY_ALIAS,
 			entityTypes: [PARTIAL_VIEW_FOLDER_ENTITY_TYPE, PARTIAL_VIEW_ROOT_ENTITY_TYPE],
@@ -53,7 +53,7 @@ const partialViewFolderActions: Array<ManifestEntityAction> = [
 		name: 'Create PartialView Entity From Snippet Under Directory Action',
 		api: UmbCreateFromSnippetPartialViewAction,
 		meta: {
-			icon: 'umb:article',
+			icon: 'icon-article',
 			label: 'New partial view from snippet...',
 			repositoryAlias: PARTIAL_VIEW_REPOSITORY_ALIAS,
 			entityTypes: [PARTIAL_VIEW_FOLDER_ENTITY_TYPE, PARTIAL_VIEW_ROOT_ENTITY_TYPE],
@@ -65,7 +65,7 @@ const partialViewFolderActions: Array<ManifestEntityAction> = [
 		name: 'Remove empty folder',
 		api: UmbDeleteFolderEntityAction,
 		meta: {
-			icon: 'umb:trash',
+			icon: 'icon-trash',
 			label: 'Remove folder',
 			repositoryAlias: PARTIAL_VIEW_REPOSITORY_ALIAS,
 			entityTypes: [PARTIAL_VIEW_FOLDER_EMPTY_ENTITY_TYPE],
@@ -77,7 +77,7 @@ const partialViewFolderActions: Array<ManifestEntityAction> = [
 		name: 'Create empty folder',
 		api: UmbCreateFolderEntityAction,
 		meta: {
-			icon: 'umb:add',
+			icon: 'icon-add',
 			label: 'Create folder',
 			repositoryAlias: PARTIAL_VIEW_REPOSITORY_ALIAS,
 			entityTypes: [

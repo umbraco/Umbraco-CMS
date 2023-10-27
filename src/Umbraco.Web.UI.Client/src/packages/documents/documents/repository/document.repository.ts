@@ -72,7 +72,7 @@ export class UmbDocumentRepository
 			id: null,
 			type: 'document-root',
 			name: 'Documents',
-			icon: 'umb:folder',
+			icon: 'icon-folder',
 			hasChildren: true,
 		};
 

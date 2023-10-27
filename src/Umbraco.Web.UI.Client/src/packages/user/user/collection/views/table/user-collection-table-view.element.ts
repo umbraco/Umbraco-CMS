@@ -100,7 +100,7 @@ export class UmbUserCollectionTableViewElement extends UmbLitElement {
 		this._tableItems = this._users.map((user) => {
 			return {
 				id: user.id ?? '',
-				icon: 'umb:user',
+				icon: 'icon-user',
 				data: [
 					{
 						columnAlias: 'userName',

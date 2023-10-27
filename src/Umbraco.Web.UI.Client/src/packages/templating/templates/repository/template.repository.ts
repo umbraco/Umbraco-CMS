@@ -81,7 +81,7 @@ export class UmbTemplateRepository
 			id: null,
 			type: 'template-root',
 			name: 'Templates',
-			icon: 'umb:folder',
+			icon: 'icon-folder',
 			hasChildren: true,
 		};
 

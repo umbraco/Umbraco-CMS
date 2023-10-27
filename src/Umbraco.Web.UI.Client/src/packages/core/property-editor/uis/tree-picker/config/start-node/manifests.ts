@@ -7,7 +7,7 @@ export const manifest: ManifestPropertyEditorUi = {
 	loader: () => import('./property-editor-ui-tree-picker-start-node.element.js'),
 	meta: {
 		label: 'Tree Picker Start Node',
-		icon: 'umb:page-add',
+		icon: 'icon-page-add',
 		group: 'pickers',
 		propertyEditorSchemaAlias: '',
 	},
