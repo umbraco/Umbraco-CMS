@@ -30,21 +30,28 @@ const collectDictionaryIcons = async () => {
 
 	// Lucide:
 	fileJSON.lucide.forEach((iconDef) => {
-		const path = lucideSvgDirectory + "/" + iconDef.file;
+		// enables leaving things uncommented via underscore
+		if(iconDef.file && iconDef.name) {
+			const path = lucideSvgDirectory + "/" + iconDef.file;
 
-		const rawData = readFileSync(path);
-		// For Lucide icons specially we adjust the stroke width to 1.75 as that looks better for our usage in backoffice:
-		const svg = rawData.toString().replace('stroke-width="2"', 'stroke-width="1.75"');
-		const iconFileName = iconDef.name;
+			try {
+				const rawData = readFileSync(path);
+				// For Lucide icons specially we adjust the stroke width to 1.75 as that looks better for our usage in backoffice:
+				const svg = rawData.toString().replace('stroke-width="2"', 'stroke-width="1.75"');
+				const iconFileName = iconDef.name;
 
-		const icon = {
-			name: iconDef.name,
-			fileName: iconFileName,
-			svg,
-			output: `${iconsOutputDirectory}/${iconFileName}.js`,
-		};
+				const icon = {
+					name: iconDef.name,
+					fileName: iconFileName,
+					svg,
+					output: `${iconsOutputDirectory}/${iconFileName}.js`,
+				};
 
-		icons.push(icon);
+				icons.push(icon);
+			} catch(e) {
+				console.log(`Could not load file: '${path}'`);
+			}
+		}
 	});
 
 	return icons;
@@ -90,7 +97,7 @@ const writeIconsToDisk = (icons) => {
 	icons.forEach((icon) => {
 		const content = 'export default `' + icon.svg + '`;';
 
-		writeFileWithDir(`${icon.output}`, content, (err) => {
+		writeFileWithDir(icon.output, content, (err) => {
 			if (err) {
 				// eslint-disable-next-line no-undef
 				console.log(err);

@@ -1,8 +1,2467 @@
 {
 	"lucide": [
 		{
+			"name": "icon-activity",
+			"file": "activity.svg"
+		},
+		{
+			"name": "icon-add",
+			"file": "plus.svg"
+		},
+		{
+			"name": "icon-addressbook",
+			"file": "book-user.svg"
+		},
+		{
+			"name": "icon-alarm-clock",
+			"file": "alarm-clock.svg"
+		},
+		{
+			"name": "icon-alert-alt",
+			"file": "alert-triangle.svg"
+		},
+		{
+			"name": "icon-alert",
+			"file": "alert-triangle.svg"
+		},
+		{
+			"name": "icon-alt",
+			"file": "option.svg"
+		},
+		{
+			"name": "icon-anchor",
+			"file": "anchor.svg"
+		},
+		{
+			"name": "icon-app",
+			"file": "app-window.svg"
+		},
+		{
+			"name": "icon-application-error",
+			"file": "application-error.svg"
+		},
+		{
+			"name": "icon-application-window-alt",
+			"file": "app-window.svg"
+		},
+		{
+			"name": "icon-application-window",
+			"file": "app-window.svg"
+		},
+		{
+			"name": "icon-arrivals",
+			"file": "plane-landing.svg"
+		},
+		{
+			"name": "icon-arrow-down",
+			"file": "arrow-down.svg"
+		},
+		{
+			"name": "icon-arrow-left",
+			"file": "arrow-left.svg"
+		},
+		{
+			"name": "icon-arrow-right",
+			"file": "arrow-right.svg"
+		},
+		{
+			"name": "icon-arrow-up",
+			"file": "arrow-up.svg"
+		},
+		{
+			"_name": "icon-art-easel",
+			"_file": "wallpaper.svg"
+		},
+		{
+			"_name": "icon-article",
+			"_file": "article.svg"
+		},
+		{
+			"name": "icon-attachment",
+			"file": "paperclip.svg"
+		},
+		{
+			"_name": "icon-auction-hammer",
+			"___file": "auction-hammer.svg"
+		},
+		{
+			"name": "icon-autofill",
+			"file": "text-cursor-input.svg"
+		},
+		{
+			"name": "icon-award",
+			"file": "award.svg"
+		},
+		{
+			"name": "icon-axis-rotation-2",
+			"file": "refresh-ccw.svg"
+		},
+		{
+			"name": "icon-axis-rotation-3",
+			"file": "refresh-ccw.svg"
+		},
+		{
+			"name": "icon-axis-rotation",
+			"file": "refresh-ccw.svg"
+		},
+		{
+			"_name": "icon-baby-stroller",
+			"___file": "baby.svg"
+		},
+		{
+			"name": "icon-backspace",
+			"file": "delete.svg"
+		},
+		{
+			"name": "icon-badge-add",
+			"file": "plus-circle.svg"
+		},
+		{
+			"_name": "icon-badge-count",
+			"___file": "badge-count.svg"
+		},
+		{
+			"name": "icon-badge-remove",
+			"file": "minus-circle.svg"
+		},
+		{
+			"name": "icon-badge-restricted",
+			"file": "ban.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-ball",
+			"file": "dribble.svg"
+		},
+		{
+			"_name": "icon-band-aid",
+			"____file": ""
+		},
+		{
+			"name": "icon-bar-chart",
+			"file": "bar-chart-2.svg"
+		},
+		{
+			"name": "icon-barcode",
+			"file": "scan-barcode.svg"
+		},
+		{
+			"name": "icon-bars",
+			"file": "bar-chart.svg"
+		},
+		{
+			"name": "icon-battery-full",
+			"file": "battery-full.svg"
+		},
+		{
+			"name": "icon-battery-low",
+			"file": "battery-low.svg"
+		},
+		{
+			"name": "icon-beer-glass",
+			"file": "beer.svg"
+		},
+		{
+			"name": "icon-bell-off",
+			"file": "bell-off.svg"
+		},
+		{
+			"name": "icon-bell",
+			"file": "bell.svg"
+		},
+		{
+			"_name": "icon-bill-dollar",
+			"____file": "circle-dollar-sign.svg"
+		},
+		{
+			"_name": "icon-bill-euro",
+			"____file": "bill-euro.svg"
+		},
+		{
+			"_name": "icon-bill-pound",
+			"____file": "bill-pound.svg"
+		},
+		{
+			"_name": "icon-bill-yen",
+			"____file": "bill-yen.svg"
+		},
+		{
+			"_name": "icon-bill",
+			"____file": "bill.svg"
+		},
+		{
+			"_name": "icon-billboard",
+			"____file": "billboard.svg"
+		},
+		{
+			"_name": "icon-bills-dollar",
+			"____file": "bills-dollar.svg"
+		},
+		{
+			"_name": "icon-bills-euro",
+			"____file": "bills-euro.svg"
+		},
+		{
+			"_name": "icon-bills-pound",
+			"____file": "bills-pound.svg"
+		},
+		{
+			"_name": "icon-bills-yen",
+			"____file": "bills-yen.svg"
+		},
+		{
+			"_name": "icon-bills",
+			"____file": "bills.svg"
+		},
+		{
+			"name": "icon-binarycode",
+			"file": "binary.svg"
+		},
+		{
+			"_name": "icon-binoculars",
+			"___file": "binoculars.svg"
+		},
+		{
+			"name": "icon-bird",
+			"file": "bird.svg"
+		},
+		{
+			"name": "icon-birthday-cake",
+			"file": "cake.svg"
+		},
+		{
+			"name": "icon-block",
+			"file": "ban.svg"
+		},
+		{
+			"_name": "icon-blueprint",
+			"____file": "blueprint.svg"
+		},
+		{
+			"name": "icon-bluetooth",
+			"file": "bluetooth.svg"
+		},
+		{
+			"name": "icon-boat-shipping",
+			"file": "ship.svg"
+		},
+		{
+			"_name": "icon-bomb",
+			"____file": "bomb.svg"
+		},
+		{
+			"name": "icon-bones",
+			"file": "bone.svg"
+		},
+		{
+			"name": "icon-book-alt-2",
+			"file": "book-open-text.svg"
+		},
+		{
+			"name": "icon-book-alt",
+			"file": "book-open.svg"
+		},
+		{
+			"name": "icon-book",
+			"file": "book-text.svg"
+		},
+		{
+			"name": "icon-bookmark",
+			"file": "bookmark.svg"
+		},
+		{
+			"name": "icon-books",
+			"file": "library.svg"
+		},
+		{
+			"name": "icon-box-alt",
+			"file": "archive.svg"
+		},
+		{
+			"name": "icon-box-open",
+			"file": "package-open.svg"
+		},
+		{
+			"name": "icon-box",
+			"file": "package.svg"
+		},
+		{
+			"name": "icon-brackets",
+			"file": "braces.svg"
+		},
+		{
+			"name": "icon-brick",
+			"file": "toy-brick.svg"
+		},
+		{
+			"name": "icon-briefcase",
+			"file": "briefcase.svg"
+		},
+		{
+			"name": "icon-browser-window",
+			"file": "app-window.svg"
+		},
+		{
+			"name": "icon-brush-alt-2",
+			"file": "paintbrush-2.svg"
+		},
+		{
+			"name": "icon-brush-alt",
+			"file": "paintbrush.svg"
+		},
+		{
+			"name": "icon-brush",
+			"file": "brush.svg"
+		},
+		{
+			"name": "icon-bug",
+			"file": "bug.svg"
+		},
+		{
+			"name": "icon-bulleted-list",
+			"file": "list.svg"
+		},
+		{
+			"name": "icon-burn",
+			"file": "radiation.svg"
+		},
+		{
+			"name": "icon-bus",
+			"file": "bus.svg"
+		},
+		{
+			"name": "icon-calculator",
+			"file": "calculator.svg"
+		},
+		{
+			"name": "icon-calendar-alt",
+			"file": "calendar-days.svg"
+		},
+		{
+			"name": "icon-calendar",
+			"file": "calendar-check.svg"
+		},
+		{
+			"name": "icon-camcorder",
+			"file": "video.svg"
+		},
+		{
+			"name": "icon-camera-roll",
+			"file": "videotape.svg"
+		},
+		{
+			"name": "icon-candy",
+			"file": "candy.svg"
+		},
+		{
+			"name": "icon-caps-lock",
+			"file": "arrow-big-up-dash.svg"
+		},
+		{
+			"name": "icon-car",
+			"file": "car.svg"
+		},
+		{
+			"_name": "icon-cash-register",
+			"____file": "cash-register.svg"
+		},
+		{
+			"name": "icon-categories",
+			"file": "archive.svg"
+		},
+		{
+			"_name": "icon-certificate",
+			"___file": "certificate.svg",
+			"missing": "TODO:"
+		},
+		{
+			"name": "icon-chart-curve",
+			"file": "area-chart.svg"
+		},
+		{
+			"name": "icon-chart",
+			"file": "line-chart.svg"
+		},
+		{
+			"name": "icon-chat-active",
+			"file": "message-circle.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-chat",
+			"file": "message-circle.svg"
+		},
+		{
+			"name": "icon-check",
+			"file": "check.svg"
+		},
+		{
+			"_name": "icon-checkbox-dotted-active",
+			"____file": "checkbox-dotted-active.svg"
+		},
+		{
+			"name": "icon-checkbox-dotted",
+			"file": "box-select.svg"
+		},
+		{
+			"name": "icon-checkbox-empty",
+			"file": "box-select.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-checkbox",
+			"file": "check-square.svg"
+		},
+		{
+			"_name": "icon-chess",
+			"____file": "chess.svg"
+		},
+		{
+			"name": "icon-chip-alt",
+			"file": "cpu.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-chip",
+			"file": "cpu.svg"
+		},
+		{
+			"name": "icon-cinema",
+			"file": "theater.svg"
+		},
+		{
+			"name": "icon-circle-dotted-active",
+			"file": "check-circle.svg"
+		},
+		{
+			"name": "icon-circle-dotted",
+			"file": "circle-dashed.svg"
+		},
+		{
+			"name": "icon-circuits",
+			"file": "circuit-board.svg"
+		},
+		{
+			"_name": "icon-circus",
+			"____file": "circus.svg"
+		},
+		{
+			"name": "icon-client",
+			"file": "user.svg",
+			"legacy": true
+		},
+		{
+			"_name": "icon-clothes-hanger",
+			"____file": "clothes-hanger.svg"
+		},
+		{
+			"name": "icon-cloud-drive",
+			"file": "hard-drive.svg"
+		},
+		{
+			"name": "icon-cloud-upload",
+			"file": "upload-cloud.svg"
+		},
+		{
+			"name": "icon-cloud",
+			"file": "cloud.svg"
+		},
+		{
+			"name": "icon-cloudy",
+			"file": "cloudy.svg"
+		},
+		{
+			"name": "icon-clubs",
+			"file": "club.svg"
+		},
+		{
+			"name": "icon-cocktail",
+			"file": "martini.svg"
+		},
+		{
+			"name": "icon-code",
+			"file": "code.svg"
+		},
+		{
+			"name": "icon-coffee",
+			"file": "coffee.svg"
+		},
+		{
+			"name": "icon-coin-dollar",
+			"file": "dollar.svg"
+		},
+		{
+			"name": "icon-coin-euro",
+			"file": "euro.svg"
+		},
+		{
+			"name": "icon-coin-pound",
+			"file": "pound.svg"
+		},
+		{
+			"name": "icon-coin-yen",
+			"file": "japanese-yen.svg"
+		},
+		{
+			"_name": "icon-coin",
+			"____file": "coin.svg"
+		},
+		{
+			"name": "icon-coins-alt",
+			"file": "coins.svg",
+			"legacy": true
+		},
+		{
+			"_name": "icon-coins-dollar-alt",
+			"____file": "coins-dollar-alt.svg"
+		},
+		{
+			"_name": "icon-coins-dollar",
+			"____file": "coins-dollar.svg"
+		},
+		{
+			"_name": "icon-coins-euro-alt",
+			"____file": "coins-euro-alt.svg"
+		},
+		{
+			"_name": "icon-coins-euro",
+			"____file": "coins-euro.svg"
+		},
+		{
+			"_name": "icon-coins-pound-alt",
+			"____file": "coins-pound-alt.svg"
+		},
+		{
+			"_name": "icon-coins-pound",
+			"____file": "coins-pound.svg"
+		},
+		{
+			"_name": "icon-coins-yen-alt",
+			"____file": "coins-yen-alt.svg"
+		},
+		{
+			"_name": "icon-coins-yen",
+			"____file": "coins-yen.svg"
+		},
+		{
+			"name": "icon-coins",
+			"file": "coins.svg"
+		},
+		{
+			"name": "icon-color-bucket",
+			"file": "paint-bucket.svg"
+		},
+		{
+			"name": "icon-colorpicker",
+			"file": "pipette.svg"
+		},
+		{
+			"name": "icon-columns",
+			"file": "tally-3.svg"
+		},
+		{
+			"_name": "icon-comb",
+			"____file": "comb.svg"
+		},
+		{
+			"name": "icon-combination-lock-open",
+			"file": "unlock-keyhole.svg"
+		},
+		{
+			"name": "icon-combination-lock",
+			"file": "lock-keyhole.svg"
+		},
+		{
+			"name": "icon-command",
+			"file": "terminal.svg"
+		},
+		{
+			"name": "icon-company",
+			"file": "building-2.svg"
+		},
+		{
+			"name": "icon-compress",
+			"file": "file-archive.svg"
+		},
+		{
+			"name": "icon-connection",
+			"file": "zap.svg"
+		},
+		{
+			"name": "icon-console",
+			"file": "terminal-square.svg"
+		},
+		{
+			"name": "icon-contrast",
+			"file": "contrast.svg"
+		},
+		{
+			"name": "icon-conversation-alt",
+			"file": "messages-square.svg"
+		},
+		{
+			"name": "icon-conversation",
+			"file": "refresh-ccw.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-coverflow",
+			"file": "gallery-horizontal.svg"
+		},
+		{
+			"name": "icon-credit-card-alt",
+			"file": "credit-card.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-credit-card",
+			"file": "credit-card.svg"
+		},
+		{
+			"name": "icon-crop",
+			"file": "crop.svg"
+		},
+		{
+			"name": "icon-crosshair",
+			"file": "crosshair.svg"
+		},
+		{
+			"name": "icon-crown-alt",
+			"file": "crown.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-crown",
+			"file": "crown.svg"
+		},
+		{
+			"name": "icon-cupcake",
+			"file": "dessert.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-curve",
+			"file": "tangent.svg"
+		},
+		{
+			"name": "icon-cut",
+			"file": "scissors.svg"
+		},
+		{
+			"name": "icon-dashboard",
+			"file": "gauge.svg"
+		},
+		{
+			"name": "icon-defrag",
+			"file": "scatter-chart.svg"
+		},
+		{
+			"name": "icon-delete-key",
+			"file": "delete.svg"
+		},
+		{
+			"name": "icon-delete",
+			"file": "x.svg"
+		},
+		{
+			"name": "icon-departure",
+			"file": "plane-takeoff.svg"
+		},
+		{
+			"_name": "icon-desk",
+			"____file": "desk.svg"
+		},
+		{
+			"name": "icon-desktop",
+			"file": "monitor.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-diagnostics",
+			"file": "stethoscope.svg"
+		},
+		{
+			"name": "icon-diagonal-arrow-alt",
+			"file": "move-diagonal.svg"
+		},
+		{
+			"name": "icon-diagonal-arrow",
+			"file": "move-diagonal-2.svg"
+		},
+		{
+			"name": "icon-diamond",
+			"file": "gem.svg"
+		},
+		{
+			"name": "icon-diamonds",
+			"file": "diamond.svg"
+		},
+		{
+			"name": "icon-dice",
+			"file": "dices.svg"
+		},
+		{
+			"name": "icon-diploma-alt",
+			"file": "scroll-text.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-diploma",
+			"file": "scroll-text.svg"
+		},
+		{
+			"name": "icon-directions-alt",
+			"file": "split.svg"
+		},
+		{
+			"name": "icon-directions",
+			"file": "signpost-big.svg"
+		},
+		{
+			"name": "icon-disc",
+			"file": "disc-3.svg"
+		},
+		{
+			"name": "icon-disk-image",
+			"file": "hard-drive.svg"
+		},
+		{
+			"name": "icon-display",
+			"file": "monitor.svg"
+		},
+		{
+			"name": "icon-dna",
+			"file": "dna.svg"
+		},
+		{
+			"name": "icon-dock-connector",
+			"file": "cable.svg"
+		},
+		{
+			"name": "icon-document-dashed-line",
+			"file": "file.svg",
+			"missing": "TODO:"
+		},
+		{
+			"name": "icon-document",
+			"file": "file.svg"
+		},
+		{
+			"name": "icon-documents",
+			"file": "files.svg"
+		},
+		{
+			"_name": "icon-dollar-bag",
+			"____file": "dollar-bag.svg"
+		},
+		{
+			"name": "icon-donate",
+			"file": "helping-hand.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-door-open-alt",
+			"file": "door-open.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-door-open",
+			"file": "door-open.svg"
+		},
+		{
+			"name": "icon-download-alt",
+			"file": "download.svg"
+		},
+		{
+			"name": "icon-download",
+			"file": "monitor-down.svg"
+		},
+		{
+			"name": "icon-drop",
+			"file": "droplet.svg"
+		},
+		{
+			"name": "icon-eco",
+			"file": "leaf.svg"
+		},
+		{
+			"name": "icon-economy",
+			"file": "coins.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-edit",
+			"file": "pencil.svg"
+		},
+		{
+			"_name": "icon-eject",
+			"____file": "eject.svg"
+		},
+		{
+			"name": "icon-employee",
+			"file": "user.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-energy-saving-bulb",
+			"file": "lightbulb.svg"
+		},
+		{
+			"name": "icon-enter",
+			"file": "corner-down-left.svg"
+		},
+		{
+			"name": "icon-equalizer",
+			"file": "sliders-horizontal.svg"
+		},
+		{
+			"name": "icon-escape",
+			"file": "arrow-up-left-from-circle.svg"
+		},
+		{
+			"name": "icon-ethernet",
+			"file": "network.svg"
+		},
+		{
+			"_name": "icon-euro-bag",
+			"____file": "euro-bag.svg"
+		},
+		{
 			"name": "icon-eye",
 			"file": "eye.svg"
+		},
+		{
+			"name": "icon-exit-fullscreen",
+			"file": "exit-fullscreen.svg"
+		},
+		{
+			"name": "icon-facebook-like",
+			"file": "thumbs-up.svg"
+		},
+		{
+			"name": "icon-factory",
+			"file": "factory.svg"
+		},
+		{
+			"name": "icon-favorite",
+			"file": "heart.svg"
+		},
+		{
+			"_name": "icon-female-symbol",
+			"____file": "female-symbol.svg"
+		},
+		{
+			"name": "icon-file-cabinet",
+			"file": "library-square.svg"
+		},
+		{
+			"name": "icon-files",
+			"file": "file-stack.svg"
+		},
+		{
+			"name": "icon-filter-arrows",
+			"file": "filter-arrows.svg"
+		},
+		{
+			"name": "icon-filter",
+			"file": "filter.svg"
+		},
+		{
+			"name": "icon-fingerprint",
+			"file": "fingerprint.svg"
+		},
+		{
+			"name": "icon-fire",
+			"file": "flame-kindling.svg"
+		},
+		{
+			"_name": "icon-firewall",
+			"____file": "firewall.svg"
+		},
+		{
+			"name": "icon-firewire",
+			"file": "usb.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-flag-alt",
+			"file": "flag.svg"
+		},
+		{
+			"name": "icon-flag",
+			"file": "flag-triangle-right.svg"
+		},
+		{
+			"name": "icon-flash",
+			"file": "zap.svg"
+		},
+		{
+			"name": "icon-flashlight",
+			"file": "flashlight.svg"
+		},
+		{
+			"name": "icon-flowerpot",
+			"file": "flower-2.svg"
+		},
+		{
+			"_name": "icon-folder-open",
+			"____file": "folder-open.svg"
+		},
+		{
+			"_name": "icon-folder-outline",
+			"____file": "folder-outline.svg"
+		},
+		{
+			"name": "icon-folder",
+			"file": "folder.svg"
+		},
+		{
+			"name": "icon-folders",
+			"file": "folders.svg"
+		},
+		{
+			"name": "icon-font",
+			"file": "type.svg"
+		},
+		{
+			"name": "icon-food",
+			"file": "utensils-crossed.svg"
+		},
+		{
+			"name": "icon-footprints",
+			"file": "footprints.svg"
+		},
+		{
+			"name": "icon-forking",
+			"file": "git-pull-request.svg"
+		},
+		{
+			"name": "icon-frame-alt",
+			"file": "frame.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-frame",
+			"file": "frame.svg"
+		},
+		{
+			"name": "icon-fullscreen-alt",
+			"file": "maximize-2.svg"
+		},
+		{
+			"name": "icon-fullscreen",
+			"file": "maximize.svg"
+		},
+		{
+			"name": "icon-game",
+			"file": "gamepad-2.svg"
+		},
+		{
+			"name": "icon-geometry",
+			"file": "ruler.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-gift",
+			"file": "gift.svg"
+		},
+		{
+			"name": "icon-glasses",
+			"file": "glasses.svg"
+		},
+		{
+			"name": "icon-globe-alt",
+			"file": "globe.svg"
+		},
+		{
+			"name": "icon-globe-asia",
+			"file": "globe.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-globe-europe-africa",
+			"file": "globe.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-globe-inverted-america",
+			"file": "globe.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-globe-inverted-asia",
+			"file": "globe.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-globe-inverted-europe-africa",
+			"file": "globe.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-globe",
+			"file": "globe.svg"
+		},
+		{
+			"name": "icon-gps",
+			"file": "satellite.svg"
+		},
+		{
+			"name": "icon-graduate",
+			"file": "graduation-cap.svg"
+		},
+		{
+			"name": "icon-grid",
+			"file": "grid-3x3.svg"
+		},
+		{
+			"name": "icon-hammer",
+			"file": "hammer.svg"
+		},
+		{
+			"name": "icon-hand-active-alt",
+			"file": "grab.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-hand-active",
+			"file": "grab.svg"
+		},
+		{
+			"name": "icon-hand-pointer-alt",
+			"file": "pointer.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-hand-pointer",
+			"file": "pointer.svg"
+		},
+		{
+			"_name": "icon-handprint",
+			"____file": "handprint.svg"
+		},
+		{
+			"name": "icon-handshake",
+			"file": "heart-handshake.svg"
+		},
+		{
+			"name": "icon-handtool-alt",
+			"file": "hand.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-handtool",
+			"file": "hand.svg"
+		},
+		{
+			"name": "icon-hard-drive-alt",
+			"file": "hard-drive.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-hard-drive",
+			"file": "hard-drive.svg",
+			"legacy": true
+		},
+		{
+			"_name": "icon-hat",
+			"____file": "hat.svg"
+		},
+		{
+			"_name": "icon-hd",
+			"____file": "hd.svg"
+		},
+		{
+			"name": "icon-headphones",
+			"file": "headphones.svg"
+		},
+		{
+			"name": "icon-headset",
+			"file": "headphones.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-hearts",
+			"file": "heart.svg"
+		},
+		{
+			"name": "icon-height",
+			"file": "move-vertical.svg"
+		},
+		{
+			"name": "icon-help-alt",
+			"file": "help-circle.svg"
+		},
+		{
+			"name": "icon-help",
+			"file": "life-buoy.svg"
+		},
+		{
+			"name": "icon-home",
+			"file": "home.svg"
+		},
+		{
+			"name": "icon-hourglass",
+			"file": "hourglass.svg"
+		},
+		{
+			"name": "icon-imac",
+			"file": "monitor.svg",
+			"legacy": true
+		},
+		{
+			"_name": "icon-inactive-line",
+			"____file": "inactive-line.svg"
+		},
+		{
+			"name": "icon-inbox-full",
+			"file": "inbox.svg",
+			"legacy": true
+		},
+		{
+			"name": "icon-inbox",
+			"file": "inbox.svg"
+		},
+		{
+			"name": "icon-indent",
+			"file": "indent.svg"
+		},
+
+
+
+
+		
+		{
+			"name": "icon-infinity",
+			"file": "infinity.svg"
+		},
+		{
+			"name": "icon-info",
+			"file": "info.svg"
+		},
+		{
+			"name": "icon-invoice",
+			"file": "invoice.svg"
+		},
+		{
+			"name": "icon-ipad",
+			"file": "ipad.svg"
+		},
+		{
+			"name": "icon-iphone",
+			"file": "iphone.svg"
+		},
+		{
+			"name": "icon-item-arrangement",
+			"file": "item-arrangement.svg"
+		},
+		{
+			"name": "icon-junk",
+			"file": "junk.svg"
+		},
+		{
+			"name": "icon-key",
+			"file": "key.svg"
+		},
+		{
+			"name": "icon-keyboard",
+			"file": "keyboard.svg"
+		},
+		{
+			"name": "icon-keychain",
+			"file": "keychain.svg"
+		},
+		{
+			"name": "icon-keyhole",
+			"file": "keyhole.svg"
+		},
+		{
+			"name": "icon-lab",
+			"file": "lab.svg"
+		},
+		{
+			"name": "icon-laptop",
+			"file": "laptop.svg"
+		},
+		{
+			"name": "icon-layers-alt",
+			"file": "layers-alt.svg"
+		},
+		{
+			"name": "icon-layers",
+			"file": "layers.svg"
+		},
+		{
+			"name": "icon-layout",
+			"file": "layout.svg"
+		},
+		{
+			"name": "icon-left-double-arrow",
+			"file": "left-double-arrow.svg"
+		},
+		{
+			"name": "icon-legal",
+			"file": "legal.svg"
+		},
+		{
+			"name": "icon-lense",
+			"file": "lense.svg"
+		},
+		{
+			"name": "icon-library",
+			"file": "library.svg"
+		},
+		{
+			"name": "icon-light-down",
+			"file": "light-down.svg"
+		},
+		{
+			"name": "icon-light-up",
+			"file": "light-up.svg"
+		},
+		{
+			"name": "icon-lightbulb-active",
+			"file": "lightbulb-active.svg"
+		},
+		{
+			"name": "icon-lightbulb",
+			"file": "lightbulb.svg"
+		},
+		{
+			"name": "icon-lightning",
+			"file": "lightning.svg"
+		},
+		{
+			"name": "icon-link",
+			"file": "link.svg"
+		},
+		{
+			"name": "icon-linux-tux",
+			"file": "linux-tux.svg"
+		},
+		{
+			"name": "icon-list",
+			"file": "list.svg"
+		},
+		{
+			"name": "icon-load",
+			"file": "load.svg"
+		},
+		{
+			"name": "icon-loading",
+			"file": "loading.svg"
+		},
+		{
+			"name": "icon-locate",
+			"file": "locate.svg"
+		},
+		{
+			"name": "icon-location-near-me",
+			"file": "location-near-me.svg"
+		},
+		{
+			"name": "icon-location-nearby",
+			"file": "location-nearby.svg"
+		},
+		{
+			"name": "icon-lock",
+			"file": "lock.svg"
+		},
+		{
+			"name": "icon-log-out",
+			"file": "log-out.svg"
+		},
+		{
+			"name": "icon-logout",
+			"file": "logout.svg"
+		},
+		{
+			"name": "icon-loupe",
+			"file": "loupe.svg"
+		},
+		{
+			"name": "icon-magnet",
+			"file": "magnet.svg"
+		},
+		{
+			"name": "icon-mailbox",
+			"file": "mailbox.svg"
+		},
+		{
+			"name": "icon-male-and-female",
+			"file": "male-and-female.svg"
+		},
+		{
+			"name": "icon-male-symbol",
+			"file": "male-symbol.svg"
+		},
+		{
+			"name": "icon-map-alt",
+			"file": "map-alt.svg"
+		},
+		{
+			"name": "icon-map-location",
+			"file": "map-location.svg"
+		},
+		{
+			"name": "icon-map-marker",
+			"file": "map-marker.svg"
+		},
+		{
+			"name": "icon-map",
+			"file": "map.svg"
+		},
+		{
+			"name": "icon-medal",
+			"file": "medal.svg"
+		},
+		{
+			"name": "icon-medical-emergency",
+			"file": "medical-emergency.svg"
+		},
+		{
+			"name": "icon-medicine",
+			"file": "medicine.svg"
+		},
+		{
+			"name": "icon-meeting",
+			"file": "meeting.svg"
+		},
+		{
+			"name": "icon-megaphone",
+			"file": "megaphone.svg"
+		},
+		{
+			"name": "icon-merge",
+			"file": "merge.svg"
+		},
+		{
+			"name": "icon-message-open",
+			"file": "message-open.svg"
+		},
+		{
+			"name": "icon-message-unopened",
+			"file": "message-unopened.svg"
+		},
+		{
+			"name": "icon-message",
+			"file": "message.svg"
+		},
+		{
+			"name": "icon-microscope",
+			"file": "microscope.svg"
+		},
+		{
+			"name": "icon-mindmap",
+			"file": "mindmap.svg"
+		},
+		{
+			"name": "icon-mobile",
+			"file": "mobile.svg"
+		},
+		{
+			"name": "icon-molecular-network",
+			"file": "molecular-network.svg"
+		},
+		{
+			"name": "icon-molecular",
+			"file": "molecular.svg"
+		},
+		{
+			"name": "icon-mountain",
+			"file": "mountain.svg"
+		},
+		{
+			"name": "icon-mouse-cursor",
+			"file": "mouse-cursor.svg"
+		},
+		{
+			"name": "icon-mouse",
+			"file": "mouse.svg"
+		},
+		{
+			"name": "icon-movie-alt",
+			"file": "movie-alt.svg"
+		},
+		{
+			"name": "icon-movie",
+			"file": "movie.svg"
+		},
+		{
+			"name": "icon-multiple-credit-cards",
+			"file": "multiple-credit-cards.svg"
+		},
+		{
+			"name": "icon-multiple-windows",
+			"file": "multiple-windows.svg"
+		},
+		{
+			"name": "icon-music",
+			"file": "music.svg"
+		},
+		{
+			"name": "icon-name-badge",
+			"file": "name-badge.svg"
+		},
+		{
+			"name": "icon-navigation-bottom",
+			"file": "navigation-bottom.svg"
+		},
+		{
+			"name": "icon-navigation-down",
+			"file": "navigation-down.svg"
+		},
+		{
+			"name": "icon-navigation-first",
+			"file": "navigation-first.svg"
+		},
+		{
+			"name": "icon-navigation-horizontal",
+			"file": "navigation-horizontal.svg"
+		},
+		{
+			"name": "icon-navigation-last",
+			"file": "navigation-last.svg"
+		},
+		{
+			"name": "icon-navigation-left",
+			"file": "navigation-left.svg"
+		},
+		{
+			"name": "icon-navigation-right",
+			"file": "navigation-right.svg"
+		},
+		{
+			"name": "icon-navigation-road",
+			"file": "navigation-road.svg"
+		},
+		{
+			"name": "icon-navigation-top",
+			"file": "navigation-top.svg"
+		},
+		{
+			"name": "icon-navigation-up",
+			"file": "navigation-up.svg"
+		},
+		{
+			"name": "icon-navigation-vertical",
+			"file": "navigation-vertical.svg"
+		},
+		{
+			"name": "icon-navigation",
+			"file": "navigation.svg"
+		},
+		{
+			"name": "icon-navigational-arrow",
+			"file": "navigational-arrow.svg"
+		},
+		{
+			"name": "icon-network-alt",
+			"file": "network-alt.svg"
+		},
+		{
+			"name": "icon-newspaper-alt",
+			"file": "newspaper-alt.svg"
+		},
+		{
+			"name": "icon-newspaper",
+			"file": "newspaper.svg"
+		},
+		{
+			"name": "icon-next-media",
+			"file": "next-media.svg"
+		},
+		{
+			"name": "icon-next",
+			"file": "next.svg"
+		},
+		{
+			"name": "icon-nodes",
+			"file": "nodes.svg"
+		},
+		{
+			"name": "icon-notepad-alt",
+			"file": "notepad-alt.svg"
+		},
+		{
+			"name": "icon-notepad",
+			"file": "notepad.svg"
+		},
+		{
+			"name": "icon-old-key",
+			"file": "old-key.svg"
+		},
+		{
+			"name": "icon-old-phone",
+			"file": "old-phone.svg"
+		},
+		{
+			"name": "icon-operator",
+			"file": "operator.svg"
+		},
+		{
+			"name": "icon-ordered-list",
+			"file": "ordered-list.svg"
+		},
+		{
+			"name": "icon-os-x",
+			"file": "os-x.svg"
+		},
+		{
+			"name": "icon-out",
+			"file": "out.svg"
+		},
+		{
+			"name": "icon-outbox",
+			"file": "outbox.svg"
+		},
+		{
+			"name": "icon-outdent",
+			"file": "outdent.svg"
+		},
+		{
+			"name": "icon-page-add",
+			"file": "page-add.svg"
+		},
+		{
+			"name": "icon-page-down",
+			"file": "page-down.svg"
+		},
+		{
+			"name": "icon-page-remove",
+			"file": "page-remove.svg"
+		},
+		{
+			"name": "icon-page-restricted",
+			"file": "page-restricted.svg"
+		},
+		{
+			"name": "icon-page-up",
+			"file": "page-up.svg"
+		},
+		{
+			"name": "icon-paint-roller",
+			"file": "paint-roller.svg"
+		},
+		{
+			"name": "icon-palette",
+			"file": "palette.svg"
+		},
+		{
+			"name": "icon-panel-show",
+			"file": "panel-show.svg"
+		},
+		{
+			"name": "icon-pannel-close",
+			"file": "pannel-close.svg"
+		},
+		{
+			"name": "icon-pants",
+			"file": "pants.svg"
+		},
+		{
+			"name": "icon-paper-bag",
+			"file": "paper-bag.svg"
+		},
+		{
+			"name": "icon-paper-plane-alt",
+			"file": "paper-plane-alt.svg"
+		},
+		{
+			"name": "icon-paper-plane",
+			"file": "paper-plane.svg"
+		},
+		{
+			"name": "icon-parachute-drop",
+			"file": "parachute-drop.svg"
+		},
+		{
+			"name": "icon-parental-control",
+			"file": "parental-control.svg"
+		},
+		{
+			"name": "icon-partly-cloudy",
+			"file": "partly-cloudy.svg"
+		},
+		{
+			"name": "icon-paste-in",
+			"file": "paste-in.svg"
+		},
+		{
+			"name": "icon-path",
+			"file": "path.svg"
+		},
+		{
+			"name": "icon-pause",
+			"file": "pause.svg"
+		},
+		{
+			"name": "icon-pc",
+			"file": "pc.svg"
+		},
+		{
+			"name": "icon-people-alt-2",
+			"file": "people-alt-2.svg"
+		},
+		{
+			"name": "icon-people-alt",
+			"file": "people-alt.svg"
+		},
+		{
+			"name": "icon-people-female",
+			"file": "people-female.svg"
+		},
+		{
+			"name": "icon-people",
+			"file": "people.svg"
+		},
+		{
+			"name": "icon-phone-ring",
+			"file": "phone-ring.svg"
+		},
+		{
+			"name": "icon-phone",
+			"file": "phone.svg"
+		},
+		{
+			"name": "icon-photo-album",
+			"file": "photo-album.svg"
+		},
+		{
+			"name": "icon-picture",
+			"file": "picture.svg"
+		},
+		{
+			"name": "icon-pictures-alt-2",
+			"file": "pictures-alt-2.svg"
+		},
+		{
+			"name": "icon-pictures-alt",
+			"file": "pictures-alt.svg"
+		},
+		{
+			"name": "icon-pictures",
+			"file": "pictures.svg"
+		},
+		{
+			"name": "icon-pie-chart",
+			"file": "pie-chart.svg"
+		},
+		{
+			"name": "icon-piggy-bank",
+			"file": "piggy-bank.svg"
+		},
+		{
+			"name": "icon-pin-location",
+			"file": "pin-location.svg"
+		},
+		{
+			"name": "icon-piracy",
+			"file": "piracy.svg"
+		},
+		{
+			"name": "icon-plane",
+			"file": "plane.svg"
+		},
+		{
+			"name": "icon-planet",
+			"file": "planet.svg"
+		},
+		{
+			"name": "icon-play",
+			"file": "play.svg"
+		},
+		{
+			"name": "icon-playing-cards",
+			"file": "playing-cards.svg"
+		},
+		{
+			"name": "icon-playlist",
+			"file": "playlist.svg"
+		},
+		{
+			"name": "icon-plugin",
+			"file": "plugin.svg"
+		},
+		{
+			"name": "icon-podcast",
+			"file": "podcast.svg"
+		},
+		{
+			"name": "icon-poker-chip",
+			"file": "poker-chip.svg"
+		},
+		{
+			"name": "icon-poll",
+			"file": "poll.svg"
+		},
+		{
+			"name": "icon-post-it",
+			"file": "post-it.svg"
+		},
+		{
+			"name": "icon-pound-bag",
+			"file": "pound-bag.svg"
+		},
+		{
+			"name": "icon-power-outlet",
+			"file": "power-outlet.svg"
+		},
+		{
+			"name": "icon-power",
+			"file": "power.svg"
+		},
+		{
+			"name": "icon-presentation",
+			"file": "presentation.svg"
+		},
+		{
+			"name": "icon-previous-media",
+			"file": "previous-media.svg"
+		},
+		{
+			"name": "icon-previous",
+			"file": "previous.svg"
+		},
+		{
+			"name": "icon-price-dollar",
+			"file": "price-dollar.svg"
+		},
+		{
+			"name": "icon-price-euro",
+			"file": "price-euro.svg"
+		},
+		{
+			"name": "icon-price-pound",
+			"file": "price-pound.svg"
+		},
+		{
+			"name": "icon-price-yen",
+			"file": "price-yen.svg"
+		},
+		{
+			"name": "icon-print",
+			"file": "print.svg"
+		},
+		{
+			"name": "icon-printer-alt",
+			"file": "printer-alt.svg"
+		},
+		{
+			"name": "icon-projector",
+			"file": "projector.svg"
+		},
+		{
+			"name": "icon-pulse",
+			"file": "pulse.svg"
+		},
+		{
+			"name": "icon-pushpin",
+			"file": "pushpin.svg"
+		},
+		{
+			"name": "icon-qr-code",
+			"file": "qr-code.svg"
+		},
+		{
+			"name": "icon-quote",
+			"file": "quote.svg"
+		},
+		{
+			"name": "icon-radio-alt",
+			"file": "radio-alt.svg"
+		},
+		{
+			"name": "icon-radio-receiver",
+			"file": "radio-receiver.svg"
+		},
+		{
+			"name": "icon-radio",
+			"file": "radio.svg"
+		},
+		{
+			"name": "icon-rain",
+			"file": "rain.svg"
+		},
+		{
+			"name": "icon-rate",
+			"file": "rate.svg"
+		},
+		{
+			"name": "icon-re-post",
+			"file": "re-post.svg"
+		},
+		{
+			"name": "icon-readonly",
+			"file": "readonly.svg"
+		},
+		{
+			"name": "icon-receipt-alt",
+			"file": "receipt-alt.svg"
+		},
+		{
+			"name": "icon-receipt-dollar",
+			"file": "receipt-dollar.svg"
+		},
+		{
+			"name": "icon-receipt-euro",
+			"file": "receipt-euro.svg"
+		},
+		{
+			"name": "icon-receipt-pound",
+			"file": "receipt-pound.svg"
+		},
+		{
+			"name": "icon-receipt-yen",
+			"file": "receipt-yen.svg"
+		},
+		{
+			"name": "icon-reception",
+			"file": "reception.svg"
+		},
+		{
+			"name": "icon-record",
+			"file": "record.svg"
+		},
+		{
+			"name": "icon-redo",
+			"file": "redo.svg"
+		},
+		{
+			"name": "icon-refresh",
+			"file": "refresh.svg"
+		},
+		{
+			"name": "icon-remote",
+			"file": "remote.svg"
+		},
+		{
+			"name": "icon-remove",
+			"file": "remove.svg"
+		},
+		{
+			"name": "icon-repeat-one",
+			"file": "repeat-one.svg"
+		},
+		{
+			"name": "icon-repeat",
+			"file": "repeat.svg"
+		},
+		{
+			"name": "icon-reply-arrow",
+			"file": "reply-arrow.svg"
+		},
+		{
+			"name": "icon-resize",
+			"file": "resize.svg"
+		},
+		{
+			"name": "icon-return-to-top",
+			"file": "return-to-top.svg"
+		},
+		{
+			"name": "icon-right-double-arrow",
+			"file": "right-double-arrow.svg"
+		},
+		{
+			"name": "icon-road",
+			"file": "road.svg"
+		},
+		{
+			"name": "icon-roadsign",
+			"file": "roadsign.svg"
+		},
+		{
+			"name": "icon-rocket",
+			"file": "rocket.svg"
+		},
+		{
+			"name": "icon-rss",
+			"file": "rss.svg"
+		},
+		{
+			"name": "icon-ruler-alt",
+			"file": "ruler-alt.svg"
+		},
+		{
+			"name": "icon-ruler",
+			"file": "ruler.svg"
+		},
+		{
+			"name": "icon-safe",
+			"file": "safe.svg"
+		},
+		{
+			"name": "icon-safedial",
+			"file": "safedial.svg"
+		},
+		{
+			"name": "icon-sandbox-toys",
+			"file": "sandbox-toys.svg"
+		},
+		{
+			"name": "icon-satellite-dish",
+			"file": "satellite-dish.svg"
+		},
+		{
+			"name": "icon-save",
+			"file": "save.svg"
+		},
+		{
+			"name": "icon-scan",
+			"file": "scan.svg"
+		},
+		{
+			"name": "icon-school",
+			"file": "school.svg"
+		},
+		{
+			"name": "icon-screensharing",
+			"file": "screensharing.svg"
+		},
+		{
+			"name": "icon-script-alt",
+			"file": "script-alt.svg"
+		},
+		{
+			"name": "icon-script",
+			"file": "script.svg"
+		},
+		{
+			"name": "icon-scull",
+			"file": "scull.svg"
+		},
+		{
+			"name": "icon-search",
+			"file": "search.svg"
+		},
+		{
+			"name": "icon-security-camera",
+			"file": "security-camera.svg"
+		},
+		{
+			"name": "icon-sensor",
+			"file": "sensor.svg"
+		},
+		{
+			"name": "icon-server-alt",
+			"file": "server-alt.svg"
+		},
+		{
+			"name": "icon-server",
+			"file": "server.svg"
+		},
+		{
+			"name": "icon-settings-alt-2",
+			"file": "settings-alt-2.svg"
+		},
+		{
+			"name": "icon-settings-alt",
+			"file": "settings-alt.svg"
+		},
+		{
+			"name": "icon-settings",
+			"file": "settings.svg"
+		},
+		{
+			"name": "icon-share-alt-2",
+			"file": "share-alt-2.svg"
+		},
+		{
+			"name": "icon-share-alt",
+			"file": "share-alt.svg"
+		},
+		{
+			"name": "icon-share",
+			"file": "share.svg"
+		},
+		{
+			"name": "icon-sharing-iphone",
+			"file": "sharing-iphone.svg"
+		},
+		{
+			"name": "icon-shield",
+			"file": "shield.svg"
+		},
+		{
+			"name": "icon-shift",
+			"file": "shift.svg"
+		},
+		{
+			"name": "icon-shipping-box",
+			"file": "shipping-box.svg"
+		},
+		{
+			"name": "icon-shipping",
+			"file": "shipping.svg"
+		},
+		{
+			"name": "icon-shoe",
+			"file": "shoe.svg"
+		},
+		{
+			"name": "icon-shopping-basket-alt-2",
+			"file": "shopping-basket-alt-2.svg"
+		},
+		{
+			"name": "icon-shopping-basket-alt",
+			"file": "shopping-basket-alt.svg"
+		},
+		{
+			"name": "icon-shopping-basket",
+			"file": "shopping-basket.svg"
+		},
+		{
+			"name": "icon-shorts",
+			"file": "shorts.svg"
+		},
+		{
+			"name": "icon-shuffle",
+			"file": "shuffle.svg"
+		},
+		{
+			"name": "icon-sience",
+			"file": "sience.svg"
+		},
+		{
+			"name": "icon-simcard",
+			"file": "simcard.svg"
+		},
+		{
+			"name": "icon-single-note",
+			"file": "single-note.svg"
+		},
+		{
+			"name": "icon-sitemap",
+			"file": "sitemap.svg"
+		},
+		{
+			"name": "icon-sleep",
+			"file": "sleep.svg"
+		},
+		{
+			"name": "icon-slideshow",
+			"file": "slideshow.svg"
+		},
+		{
+			"name": "icon-smiley-inverted",
+			"file": "smiley-inverted.svg"
+		},
+		{
+			"name": "icon-smiley",
+			"file": "smiley.svg"
+		},
+		{
+			"name": "icon-snow",
+			"file": "snow.svg"
+		},
+		{
+			"name": "icon-sound-low",
+			"file": "sound-low.svg"
+		},
+		{
+			"name": "icon-sound-medium",
+			"file": "sound-medium.svg"
+		},
+		{
+			"name": "icon-sound-off",
+			"file": "sound-off.svg"
+		},
+		{
+			"name": "icon-sound-waves",
+			"file": "sound-waves.svg"
+		},
+		{
+			"name": "icon-sound",
+			"file": "sound.svg"
+		},
+		{
+			"name": "icon-spades",
+			"file": "spades.svg"
+		},
+		{
+			"name": "icon-speaker",
+			"file": "speaker.svg"
+		},
+		{
+			"name": "icon-speed-gauge",
+			"file": "speed-gauge.svg"
+		},
+		{
+			"name": "icon-split-alt",
+			"file": "split-alt.svg"
+		},
+		{
+			"name": "icon-split",
+			"file": "split.svg"
+		},
+		{
+			"name": "icon-sprout",
+			"file": "sprout.svg"
+		},
+		{
+			"name": "icon-squiggly-line",
+			"file": "squiggly-line.svg"
+		},
+		{
+			"name": "icon-ssd",
+			"file": "ssd.svg"
+		},
+		{
+			"name": "icon-stacked-disks",
+			"file": "stacked-disks.svg"
+		},
+		{
+			"name": "icon-stamp",
+			"file": "stamp.svg"
+		},
+		{
+			"name": "icon-stop-alt",
+			"file": "stop-alt.svg"
+		},
+		{
+			"name": "icon-stop-hand",
+			"file": "stop-hand.svg"
+		},
+		{
+			"name": "icon-stop",
+			"file": "stop.svg"
+		},
+		{
+			"name": "icon-store",
+			"file": "store.svg"
+		},
+		{
+			"name": "icon-stream",
+			"file": "stream.svg"
+		},
+		{
+			"name": "icon-sunny",
+			"file": "sunny.svg"
+		},
+		{
+			"name": "icon-sweatshirt",
+			"file": "sweatshirt.svg"
+		},
+		{
+			"name": "icon-sync",
+			"file": "sync.svg"
+		},
+		{
+			"name": "icon-t-shirt",
+			"file": "t-shirt.svg"
+		},
+		{
+			"name": "icon-tab-key",
+			"file": "tab-key.svg"
+		},
+		{
+			"name": "icon-tab",
+			"file": "tab.svg"
+		},
+		{
+			"name": "icon-tactics",
+			"file": "tactics.svg"
+		},
+		{
+			"name": "icon-tag",
+			"file": "tag.svg"
+		},
+		{
+			"name": "icon-tags",
+			"file": "tags.svg"
+		},
+		{
+			"name": "icon-takeaway-cup",
+			"file": "takeaway-cup.svg"
+		},
+		{
+			"name": "icon-target",
+			"file": "target.svg"
+		},
+		{
+			"name": "icon-temperatrure-alt",
+			"file": "temperatrure-alt.svg"
+		},
+		{
+			"name": "icon-temperature",
+			"file": "temperature.svg"
+		},
+		{
+			"name": "icon-terminal",
+			"file": "terminal.svg"
+		},
+		{
+			"name": "icon-theater",
+			"file": "theater.svg"
+		},
+		{
+			"name": "icon-theif",
+			"file": "theif.svg"
+		},
+		{
+			"name": "icon-thought-bubble",
+			"file": "thought-bubble.svg"
+		},
+		{
+			"name": "icon-thumb-down",
+			"file": "thumb-down.svg"
+		},
+		{
+			"name": "icon-thumb-up",
+			"file": "thumb-up.svg"
+		},
+		{
+			"name": "icon-thumbnail-list",
+			"file": "thumbnail-list.svg"
+		},
+		{
+			"name": "icon-thumbnails-small",
+			"file": "thumbnails-small.svg"
+		},
+		{
+			"name": "icon-thumbnails",
+			"file": "thumbnails.svg"
+		},
+		{
+			"name": "icon-ticket",
+			"file": "ticket.svg"
+		},
+		{
+			"name": "icon-time",
+			"file": "time.svg"
+		},
+		{
+			"name": "icon-timer",
+			"file": "timer.svg"
+		},
+		{
+			"name": "icon-tools",
+			"file": "tools.svg"
+		},
+		{
+			"name": "icon-top",
+			"file": "top.svg"
+		},
+		{
+			"name": "icon-traffic-alt",
+			"file": "traffic-alt.svg"
+		},
+		{
+			"name": "icon-trafic",
+			"file": "trafic.svg"
+		},
+		{
+			"name": "icon-train",
+			"file": "train.svg"
+		},
+		{
+			"name": "icon-trash-alt-2",
+			"file": "trash-alt-2.svg"
+		},
+		{
+			"name": "icon-trash-alt",
+			"file": "trash-alt.svg"
+		},
+		{
+			"name": "icon-trash",
+			"file": "trash.svg"
+		},
+		{
+			"name": "icon-tree",
+			"file": "tree.svg"
+		},
+		{
+			"name": "icon-trophy",
+			"file": "trophy.svg"
+		},
+		{
+			"name": "icon-truck",
+			"file": "truck.svg"
+		},
+		{
+			"name": "icon-tv-old",
+			"file": "tv-old.svg"
+		},
+		{
+			"name": "icon-tv",
+			"file": "tv.svg"
+		},
+		{
+			"name": "icon-umb-content",
+			"file": "umb-content.svg"
+		},
+		{
+			"name": "icon-umb-contour",
+			"file": "umb-contour.svg"
+		},
+		{
+			"name": "icon-umb-deploy",
+			"file": "umb-deploy.svg"
+		},
+		{
+			"name": "icon-umb-developer",
+			"file": "umb-developer.svg"
+		},
+		{
+			"name": "icon-umb-media",
+			"file": "umb-media.svg"
+		},
+		{
+			"name": "icon-umb-members",
+			"file": "umb-members.svg"
+		},
+		{
+			"name": "icon-umb-settings",
+			"file": "umb-settings.svg"
+		},
+		{
+			"name": "icon-umb-users",
+			"file": "umb-users.svg"
+		},
+		{
+			"name": "icon-umbraco",
+			"file": "umbraco.svg"
+		},
+		{
+			"name": "icon-umbrella",
+			"file": "umbrella.svg"
+		},
+		{
+			"name": "icon-undo",
+			"file": "undo.svg"
+		},
+		{
+			"name": "icon-universal",
+			"file": "universal.svg"
+		},
+		{
+			"name": "icon-unlocked",
+			"file": "unlocked.svg"
+		},
+		{
+			"name": "icon-untitled",
+			"file": "untitled.svg"
+		},
+		{
+			"name": "icon-usb-connector",
+			"file": "usb-connector.svg"
+		},
+		{
+			"name": "icon-usb",
+			"file": "usb.svg"
+		},
+		{
+			"name": "icon-user-female",
+			"file": "user-female.svg"
+		},
+		{
+			"name": "icon-user-females-alt",
+			"file": "user-females-alt.svg"
+		},
+		{
+			"name": "icon-user-females",
+			"file": "user-females.svg"
+		},
+		{
+			"name": "icon-user-glasses",
+			"file": "user-glasses.svg"
+		},
+		{
+			"name": "icon-user",
+			"file": "user.svg"
+		},
+		{
+			"name": "icon-users-alt",
+			"file": "users-alt.svg"
+		},
+		{
+			"name": "icon-users",
+			"file": "users.svg"
+		},
+		{
+			"name": "icon-utilities",
+			"file": "utilities.svg"
+		},
+		{
+			"name": "icon-vcard",
+			"file": "vcard.svg"
+		},
+		{
+			"name": "icon-video",
+			"file": "video.svg"
+		},
+		{
+			"name": "icon-voice",
+			"file": "voice.svg"
+		},
+		{
+			"name": "icon-wall-plug",
+			"file": "wall-plug.svg"
+		},
+		{
+			"name": "icon-wallet",
+			"file": "wallet.svg"
+		},
+		{
+			"name": "icon-wand",
+			"file": "wand.svg"
+		},
+		{
+			"name": "icon-war",
+			"file": "war.svg"
+		},
+		{
+			"name": "icon-weight",
+			"file": "weight.svg"
+		},
+		{
+			"name": "icon-width",
+			"file": "width.svg"
+		},
+		{
+			"name": "icon-wifi",
+			"file": "wifi.svg"
+		},
+		{
+			"name": "icon-window-popin",
+			"file": "window-popin.svg"
+		},
+		{
+			"name": "icon-window-sizes",
+			"file": "window-sizes.svg"
+		},
+		{
+			"name": "icon-windows",
+			"file": "windows.svg"
+		},
+		{
+			"name": "icon-wine-glass",
+			"file": "wine-glass.svg"
+		},
+		{
+			"name": "icon-wrench",
+			"file": "wrench.svg"
+		},
+		{
+			"name": "icon-wrong",
+			"file": "wrong.svg"
+		},
+		{
+			"name": "icon-yen-bag",
+			"file": "yen-bag.svg"
+		},
+		{
+			"name": "icon-zip",
+			"file": "zip.svg"
+		},
+		{
+			"name": "icon-zom-out",
+			"file": "zom-out.svg"
+		},
+		{
+			"name": "icon-zoom-in",
+			"file": "zoom-in.svg"
 		}
 	]
 }

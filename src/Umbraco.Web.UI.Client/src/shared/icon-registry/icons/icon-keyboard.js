@@ -1,1 +1,22 @@
-export default `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor"><path d="M37.521 104.271v303.855h436.853V104.271H37.521zm411.802 278.804H62.573V129.322h386.75v253.753zm-252.44-206.691h-41.205v41.178h41.205v-41.178zm65.144 0H220.84v41.178h41.188v-41.178zm65.172 0H285.99v41.178h41.209v-41.178zm-7.719 108.825h40.073v-41.188H319.48v41.188zM129.212 175.568H88.027v41.183h41.185v-41.183zm37.37 68.453H88.868v41.188h77.714v-41.188zm24.324 0v41.188h41.175v-41.188h-41.175zm65.543 0v41.188h41.208v-41.188h-41.208zM88.775 352.862h41.187v-41.201H88.775v41.201zm65.875 0h201.547v-41.201H154.65v41.201zm226.782-67.213h41.188V176.287h-69.042v41.179h27.854v68.183zm-.558 67.213h41.208v-41.201h-41.208v41.201z"/></svg>`;
+export default `<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="1.75"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <rect width="20" height="16" x="2" y="4" rx="2" ry="2" />
+  <path d="M6 8h.001" />
+  <path d="M10 8h.001" />
+  <path d="M14 8h.001" />
+  <path d="M18 8h.001" />
+  <path d="M8 12h.001" />
+  <path d="M12 12h.001" />
+  <path d="M16 12h.001" />
+  <path d="M7 16h10" />
+</svg>
+`;
