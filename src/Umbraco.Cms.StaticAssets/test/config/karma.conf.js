@@ -1,4 +1,6 @@
 const jsdom = require("jsdom");
+const gulpConfig = require('../../gulp/config');
+
 module.exports = function (config) {
 
   config.set({
@@ -34,12 +36,12 @@ module.exports = function (config) {
       'test/config/app.unit.js',
 
       //application files
-      '../Umbraco.Cms.StaticAssets/wwwroot/umbraco/js/*.controllers.min.js',
-      '../Umbraco.Cms.StaticAssets/wwwroot/umbraco/js/*.directives.min.js',
-      '../Umbraco.Cms.StaticAssets/wwwroot/umbraco/js/*.filters.min.js',
-      '../Umbraco.Cms.StaticAssets/wwwroot/umbraco/js/*.services.min.js',
-      '../Umbraco.Cms.StaticAssets/wwwroot/umbraco/js/*.interceptors.min.js',
-      '../Umbraco.Cms.StaticAssets/wwwroot/umbraco/js/*.resources.min.js',
+      gulpConfig.roots[0] + '/umbraco/js/*.controllers.min.js',
+      gulpConfig.roots[0] + '/umbraco/js/*.directives.min.js',
+      gulpConfig.roots[0] + '/umbraco/js/*.filters.min.js',
+      gulpConfig.roots[0] + '/umbraco/js/*.services.min.js',
+      gulpConfig.roots[0] + '/umbraco/js/*.interceptors.min.js',
+      gulpConfig.roots[0] + '/umbraco/js/*.resources.min.js',
 
       //mocked data and routing
       'src/common/mocks/umbraco.servervariables.js',
