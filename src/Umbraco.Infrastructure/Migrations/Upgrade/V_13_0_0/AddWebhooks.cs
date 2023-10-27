@@ -20,26 +20,26 @@ public class AddWebhooks : MigrationBase
 
         Create.Table<WebhookDto>().Do();
 
-        if (tables.InvariantContains(Constants.DatabaseSchema.Tables.Event2Webhook))
+        if (tables.InvariantContains(Constants.DatabaseSchema.Tables.Webhook2Events))
         {
             return;
         }
 
-        Create.Table<Event2WebhookDto>().Do();
+        Create.Table<Webhook2EventsDto>().Do();
 
-        if (tables.InvariantContains(Constants.DatabaseSchema.Tables.EntityKey2Webhook))
+        if (tables.InvariantContains(Constants.DatabaseSchema.Tables.Webhook2ContentTypeKeys))
         {
             return;
         }
 
-        Create.Table<EntityKey2WebhookDto>().Do();
+        Create.Table<Webhook2ContentTypeKeysDto>().Do();
 
-        if (tables.InvariantContains(Constants.DatabaseSchema.Tables.Headers2Webhook))
+        if (tables.InvariantContains(Constants.DatabaseSchema.Tables.Webhook2Headers))
         {
             return;
         }
 
-        Create.Table<Headers2WebhookDto>().Do();
+        Create.Table<Webhook2HeadersDto>().Do();
 
         if (tables.InvariantContains(Constants.DatabaseSchema.Tables.WebhookLog))
         {

@@ -84,9 +84,9 @@ public class DatabaseSchemaCreator
         typeof(CreatedPackageSchemaDto),
         typeof(UserGroup2LanguageDto),
         typeof(WebhookDto),
-        typeof(EntityKey2WebhookDto),
-        typeof(Event2WebhookDto),
-        typeof(Headers2WebhookDto),
+        typeof(Webhook2ContentTypeKeysDto),
+        typeof(Webhook2EventsDto),
+        typeof(Webhook2HeadersDto),
         typeof(WebhookLogDto),
     };
 

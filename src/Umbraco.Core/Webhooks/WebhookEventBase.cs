@@ -54,7 +54,7 @@ public abstract class WebhookEventBase<TNotification, TEntity> : IWebhookEvent, 
 
             foreach (TEntity entity in GetEntitiesFromNotification(notification))
             {
-                if (webhook.EntityKeys.Any() && !webhook.EntityKeys.Contains(entity.ContentType.Key))
+                if (webhook.ContentTypeKeys.Any() && !webhook.ContentTypeKeys.Contains(entity.ContentType.Key))
                 {
                     continue;
                 }

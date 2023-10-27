@@ -18,7 +18,7 @@ public class WebhookMapDefinition : IMapDefinition
     // Umbraco.Code.MapAll -CreateDate -DeleteDate -Id -Key -UpdateDate
     private void Map(WebhookViewModel source, Webhook target, MapperContext context)
     {
-        target.EntityKeys = source.EntityKeys;
+        target.ContentTypeKeys = source.ContentTypeKeys;
         target.Events = source.Events;
         target.Url = source.Url;
         target.Enabled = source.Enabled;
@@ -29,7 +29,7 @@ public class WebhookMapDefinition : IMapDefinition
     // Umbraco.Code.MapAll
     private void Map(Webhook source, WebhookViewModel target, MapperContext context)
     {
-        target.EntityKeys = source.EntityKeys;
+        target.ContentTypeKeys = source.ContentTypeKeys;
         target.Events = source.Events;
         target.Url = source.Url;
         target.Enabled = source.Enabled;

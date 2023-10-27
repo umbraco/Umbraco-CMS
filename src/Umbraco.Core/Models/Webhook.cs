@@ -10,7 +10,7 @@ public class Webhook
         Url = url;
         Headers = headers ?? new Dictionary<string, string>();
         Events = events ?? Array.Empty<string>();
-        EntityKeys = entityKeys ?? Array.Empty<Guid>();
+        ContentTypeKeys = entityKeys ?? Array.Empty<Guid>();
         Enabled = enabled ?? false;
     }
 
@@ -22,7 +22,7 @@ public class Webhook
 
     public string[] Events { get; set; }
 
-    public Guid[] EntityKeys {get; set; }
+    public Guid[] ContentTypeKeys {get; set; }
 
     public bool Enabled { get; set; }
 

@@ -30,7 +30,7 @@ public class WebhookServiceTests : UmbracoIntegrationTest
             Assert.AreEqual(1, webhook.Events.Length);
             Assert.IsTrue(webhook.Events.Contains(webhookEvent));
             Assert.AreEqual(url, webhook.Url);
-            Assert.IsTrue(webhook.EntityKeys.Contains(key));
+            Assert.IsTrue(webhook.ContentTypeKeys.Contains(key));
         });
     }
 
@@ -75,7 +75,7 @@ public class WebhookServiceTests : UmbracoIntegrationTest
         var webhook = await WebhookService.GetAsync(createdWebhook.Key);
 
         Assert.IsNotNull(webhook);
-        Assert.IsEmpty(webhook.EntityKeys);
+        Assert.IsEmpty(webhook.ContentTypeKeys);
     }
 
     [Test]

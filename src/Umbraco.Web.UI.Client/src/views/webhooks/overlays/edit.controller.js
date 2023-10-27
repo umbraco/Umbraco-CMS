@@ -38,7 +38,7 @@
         multiPicker: true,
         submit(model) {
           getEntities(model.selection, isContent);
-          $scope.model.webhook.entityKeys = model.selection.map((item) => item.key);
+          $scope.model.webhook.contentTypeKeys = model.selection.map((item) => item.key);
           editorService.close();
         },
         close() {
@@ -79,8 +79,8 @@
     }
 
     function clearContentType(contentTypeKey) {
-      if (Array.isArray($scope.model.webhook.entityKeys)) {
-        $scope.model.webhook.entityKeys = $scope.model.webhook.entityKeys.filter(x => x !== contentTypeKey);
+      if (Array.isArray($scope.model.webhook.contentTypeKeys)) {
+        $scope.model.webhook.contentTypeKeys = $scope.model.webhook.contentTypeKeys.filter(x => x !== contentTypeKey);
       }
       if (Array.isArray($scope.model.contentTypes)) {
         $scope.model.contentTypes = $scope.model.contentTypes.filter(x => x.key !== contentTypeKey);

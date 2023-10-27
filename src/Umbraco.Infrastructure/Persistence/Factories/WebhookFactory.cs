@@ -5,12 +5,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories;
 
 internal static class WebhookFactory
 {
-    public static Webhook BuildEntity(WebhookDto dto, IEnumerable<EntityKey2WebhookDto>? entityKey2WebhookDtos = null, IEnumerable<Event2WebhookDto>? event2WebhookDtos = null, IEnumerable<Headers2WebhookDto>? headersWebhookDtos = null)
+    public static Webhook BuildEntity(WebhookDto dto, IEnumerable<Webhook2ContentTypeKeysDto>? entityKey2WebhookDtos = null, IEnumerable<Webhook2EventsDto>? event2WebhookDtos = null, IEnumerable<Webhook2HeadersDto>? headersWebhookDtos = null)
     {
         var entity = new Webhook(
             dto.Url,
             dto.Enabled,
-            entityKey2WebhookDtos?.Select(x => x.EntityKey).ToArray(),
+            entityKey2WebhookDtos?.Select(x => x.ContentTypeKey).ToArray(),
             event2WebhookDtos?.Select(x => x.Event).ToArray(),
             headersWebhookDtos?.ToDictionary(x => x.Key, x => x.Value))
         {
@@ -34,22 +34,22 @@ internal static class WebhookFactory
         return dto;
     }
 
-    public static IEnumerable<EntityKey2WebhookDto> BuildEntityKey2WebhookDto(Webhook webhook) =>
-        webhook.EntityKeys.Select(x => new EntityKey2WebhookDto
+    public static IEnumerable<Webhook2ContentTypeKeysDto> BuildEntityKey2WebhookDto(Webhook webhook) =>
+        webhook.ContentTypeKeys.Select(x => new Webhook2ContentTypeKeysDto
         {
-            EntityKey = x,
+            ContentTypeKey = x,
             WebhookId = webhook.Id,
         });
 
-    public static IEnumerable<Event2WebhookDto> BuildEvent2WebhookDto(Webhook webhook) =>
-        webhook.Events.Select(x => new Event2WebhookDto
+    public static IEnumerable<Webhook2EventsDto> BuildEvent2WebhookDto(Webhook webhook) =>
+        webhook.Events.Select(x => new Webhook2EventsDto
         {
             Event = x,
             WebhookId = webhook.Id,
         });
 
-    public static IEnumerable<Headers2WebhookDto> BuildHeaders2WebhookDtos(Webhook webhook) =>
-        webhook.Headers.Select(x => new Headers2WebhookDto
+    public static IEnumerable<Webhook2HeadersDto> BuildHeaders2WebhookDtos(Webhook webhook) =>
+        webhook.Headers.Select(x => new Webhook2HeadersDto
         {
             Key = x.Key,
             Value = x.Value,

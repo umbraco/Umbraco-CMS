@@ -38,7 +38,7 @@
       const resource = isContent ? contentTypeResource : mediaTypeResource;
       let entities = [];
 
-      webhook.entityKeys.forEach((key) => {
+      webhook.contentTypeKeys.forEach((key) => {
         resource.getById(key)
           .then((data) => {
             entities.push(data);
@@ -56,7 +56,7 @@
         delete vm.webHooksContentTypes[webhook.key];
       }
 
-      webhook.entityKeys.forEach((key) => {
+      webhook.contentTypeKeys.forEach((key) => {
         resource.getById(key)
           .then((data) => {
             if (!vm.webHooksContentTypes[webhook.key]) {

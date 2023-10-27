@@ -5,8 +5,8 @@ using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
-[TableName(Constants.DatabaseSchema.Tables.Headers2Webhook)]
-public class Headers2WebhookDto
+[TableName(Constants.DatabaseSchema.Tables.Webhook2Headers)]
+public class Webhook2HeadersDto
 {
     [Column("webhookId")]
     [PrimaryKeyColumn(AutoIncrement = false, Name = "PK_heaeders2WebhookDto", OnColumns = "webhookId, key")]

@@ -15,8 +15,8 @@ public class WebhookViewModel
     [DataMember(Name = "events")]
     public string[] Events { get; set; } = Array.Empty<string>();
 
-    [DataMember(Name = "entityKeys")]
-    public Guid[] EntityKeys { get; set; } = Array.Empty<Guid>();
+    [DataMember(Name = "contentTypeKeys")]
+    public Guid[] ContentTypeKeys { get; set; } = Array.Empty<Guid>();
 
     [DataMember(Name = "enabled")]
     public bool Enabled { get; set; }

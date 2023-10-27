@@ -26,15 +26,15 @@ internal class WebhookDto
     public bool Enabled { get; set; }
 
     [ResultColumn]
-    [Reference(ReferenceType.Many, ReferenceMemberName = nameof(Event2WebhookDto.WebhookId))]
-    public List<Event2WebhookDto> Event2WebhookDtos { get; set; } = new();
+    [Reference(ReferenceType.Many, ReferenceMemberName = nameof(Webhook2EventsDto.WebhookId))]
+    public List<Webhook2EventsDto> Webhook2Events { get; set; } = new();
 
     [ResultColumn]
-    [Reference(ReferenceType.Many, ReferenceMemberName = nameof(EntityKey2WebhookDto.WebhookId))]
-    public List<EntityKey2WebhookDto> EntityKey2WebhookDtos { get; set; } = new();
+    [Reference(ReferenceType.Many, ReferenceMemberName = nameof(Webhook2ContentTypeKeysDto.WebhookId))]
+    public List<Webhook2ContentTypeKeysDto> Webhook2ContentTypeKeys { get; set; } = new();
 
     [ResultColumn]
-    [Reference(ReferenceType.Many, ReferenceMemberName = nameof(Headers2WebhookDto.WebhookId))]
-    public List<EntityKey2WebhookDto> Headers2WebhookDtos { get; set; } = new();
+    [Reference(ReferenceType.Many, ReferenceMemberName = nameof(Webhook2HeadersDto.WebhookId))]
+    public List<Webhook2ContentTypeKeysDto> Webhook2Headers { get; set; } = new();
 }
 
