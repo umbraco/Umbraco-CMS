@@ -7,14 +7,14 @@ using Umbraco.Cms.Web.Common.Models;
 
 namespace Umbraco.Cms.Web.BackOffice.Controllers;
 
-public class WebHookController : UmbracoAuthorizedJsonController
+public class WebhookController : UmbracoAuthorizedJsonController
 {
     private readonly IWebHookService _webHookService;
     private readonly IUmbracoMapper _umbracoMapper;
     private readonly WebhookEventCollection _webhookEventCollection;
     private readonly IWebhookLogService _webhookLogService;
 
-    public WebHookController(IWebHookService webHookService, IUmbracoMapper umbracoMapper, WebhookEventCollection webhookEventCollection, IWebhookLogService webhookLogService)
+    public WebhookController(IWebHookService webHookService, IUmbracoMapper umbracoMapper, WebhookEventCollection webhookEventCollection, IWebhookLogService webhookLogService)
     {
         _webHookService = webHookService;
         _umbracoMapper = umbracoMapper;

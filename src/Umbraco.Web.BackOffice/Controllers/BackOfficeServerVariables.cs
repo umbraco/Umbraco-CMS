@@ -586,7 +586,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                                 controller => controller.UploadMedia(null!))
                         },
                         {
-                            "webhooksApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<WebHookController>(
+                            "webhooksApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<WebhookController>(
                                 controller => controller.GetAll(0, 0))
                         },
                     }
