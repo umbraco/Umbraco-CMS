@@ -1,7 +1,8 @@
-﻿using Umbraco.Cms.Core.Models;
+﻿using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Webhooks;
 
 namespace Umbraco.Cms.Infrastructure.Services.Implement;
 
@@ -9,12 +10,13 @@ public class WebhookFiringService : IWebhookFiringService
 {
     private readonly IJsonSerializer _jsonSerializer;
     private readonly IRetryService _retryService;
-    private readonly int _maxRetries = 5;
+    private readonly WebhookSettings _webhookSettings;
 
-    public WebhookFiringService(IJsonSerializer jsonSerializer, IRetryService retryService)
+    public WebhookFiringService(IJsonSerializer jsonSerializer, IRetryService retryService, IOptions<WebhookSettings> webhookSettings)
     {
         _jsonSerializer = jsonSerializer;
         _retryService = retryService;
+        _webhookSettings = webhookSettings.Value;
     }
 
     public async Task<WebhookResponseModel> Fire(Webhook webhook, string eventName, object? requestObject) =>
@@ -34,5 +36,5 @@ public class WebhookFiringService : IWebhookFiringService
 
                 return await httpClient.PostAsync(webhook.Url, byteContent);
             },
-            _maxRetries);
+            _webhookSettings.MaximumRetries);
 }
