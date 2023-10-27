@@ -68,7 +68,7 @@ preserve.belle
 /build/docs.zip
 /build/ui-docs.zip
 /build/csharp-docs.zip
-/src/Umbraco.Cms.StaticAssets/wwwroot/umbraco/
+/src/Umbraco.Cms.StaticAssets/gulpfile.outputPath.js
 
 # Environment specific data
 /src/Umbraco.Web.UI.Client/[Bb]uild/

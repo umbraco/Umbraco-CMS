@@ -4,10 +4,12 @@
     <Description>Contains the static assets needed to run Umbraco CMS.</Description>
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
     <StaticWebAssetBasePath>/</StaticWebAssetBasePath>
+    <EnableDefaultContentItems>false</EnableDefaultContentItems>
   </PropertyGroup>
 
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <SupportedPlatform Include="browser" />
   </ItemGroup>
 
   <ItemGroup>
@@ -15,33 +17,45 @@
     <ProjectReference Include="..\Umbraco.Web.Website\Umbraco.Web.Website.csproj" />
   </ItemGroup>
 
-  <PropertyGroup>
-    <BellePath>$(ProjectDir)wwwroot\umbraco</BellePath>
-  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="umbraco\**" />
+  </ItemGroup>
 
-  <Target Name="BuildBellePreconditions" BeforeTargets="Build">
-    <Message Text="Skip BuildBelle target because UmbracoBuild is '$(UmbracoBuild)' (this is not Visual Studio)" Importance="high" Condition="'$(UmbracoBuild)' != ''" />
-    <Message Text="Skip BuildBelle target because '$(BellePath)' already exists" Importance="high" Condition="Exists('$(BellePath)')" />
-    <Message Text="Call BuildBelle target because UmbracoBuild is empty (this is Visual Studio) and '$(BellePath)' doesn't exist" Importance="high" Condition="'$(UmbracoBuild)' == '' and !Exists('$(BellePath)')" />
-    <CallTarget Targets="BuildBelle" Condition="'$(UmbracoBuild)' == '' and !Exists('$(BellePath)')" />
-  </Target>
-  
-  <Target Name="BuildBelle">
-    <Exec WorkingDirectory="$(ProjectDir)..\Umbraco.Web.UI.Client\" Command="npm ci --no-fund --no-audit --prefer-offline" />
-    <Exec WorkingDirectory="$(ProjectDir)..\Umbraco.Web.UI.Client\" Command="npm run build:skip-tests" />
+  <!-- Build client assets using NPM -->
+  <ItemGroup>
+    <ClientAssetsInputs Include="assets\**;gulp\**;lib\**;src\**;test\**" Exclude="$(DefaultItemExcludes)" />
+  </ItemGroup>
+
+  <Target Name="ClientAssetsRestore" BeforeTargets="DispatchToInnerBuilds" Inputs="package.json;package-lock.json" Outputs="node_modules\.package-lock.json">
+    <Message Text="Restoring NPM packages" Importance="high" />
+    <Exec Command="npm ci --no-fund --no-audit --prefer-offline" />
   </Target>
 
-  <Target Name="CleanBellePreconditions" AfterTargets="Clean" Condition="'$(UmbracoBuild)' == ''">
-    <Message Text="Skip CleanBelle target because '$(BellePath)' doesn't exist" Importance="high" Condition="!Exists('$(BellePath)')" />
-    <Message Text="Skip CleanBelle target because preserve.belle marker file exists" Importance="high" Condition="Exists('$(BellePath)') and Exists('$(SolutionDir)preserve.belle')" />
-    <Message Text="Call CleanBelle target because '$(BellePath)' exists and preserve.belle marker file doesn't exist" Importance="high" Condition="Exists('$(BellePath)') and !Exists('$(SolutionDir)preserve.belle')" />
-    <CallTarget Targets="CleanBelle" Condition="Exists('$(BellePath)') and !Exists('$(SolutionDir)preserve.belle')" />
-  </Target>
-  
-  <Target Name="CleanBelle">
+  <Target Name="ClientAssetsBuild" DependsOnTargets="ClientAssetsRestore" BeforeTargets="AssignTargetPaths" Inputs="@(ClientAssetsInputs)" Outputs="$(IntermediateOutputPath)clientassetsbuild.complete.txt">
+    <Message Text="Executing NPM build script" Importance="High" />
+    <PropertyGroup>
+      <_ClientAssetsOutputFullPath>$([System.IO.Path]::GetFullPath('$(IntermediateOutputPath)clientassets'))</_ClientAssetsOutputFullPath>
+      <_ClientAssetsOutputFile>$(IntermediateOutputPath)clientassets.build.txt</_ClientAssetsOutputFile>
+    </PropertyGroup>
+    <MakeDir Directories="$(_ClientAssetsOutputFullPath)" />
+    <Exec Command="npm run build:skip-tests -- --no-color --output-path=&quot;$(_ClientAssetsOutputFullPath)&quot;" />
     <ItemGroup>
-      <BelleLib Include="$(BellePath)" />
+      <_ClientAssetsBuildOutput Include="$(IntermediateOutputPath)clientassets\**"></_ClientAssetsBuildOutput>
     </ItemGroup>
-    <RemoveDir Directories="@(BelleLib)" />
+    <WriteLinesToFile File="$(_ClientAssetsOutputFile)" Lines="@(_ClientAssetsBuildOutput)" Overwrite="true" />
+  </Target>
+
+  <Target Name="ClientAssetsBuildOutputPath" AfterTargets="ClientAssetsBuild">
+    <WriteLinesToFile File="gulpfile.outputPath.js" Lines="exports.outputPath = '$(IntermediateOutputPath.Replace('\', '/'))clientassets';" Overwrite="true" />
+  </Target>
+
+  <Target Name="DefineClientAssets" AfterTargets="ClientAssetsBuild" DependsOnTargets="ResolveStaticWebAssetsConfiguration">
+    <ItemGroup>
+      <FileWrites Include="@(_ClientAssetsBuildOutput)" />
+      <FileWrites Include="$(_ClientAssetsOutputFile)" />
+    </ItemGroup>
+    <DefineStaticWebAssets CandidateAssets="@(_ClientAssetsBuildOutput)" SourceId="$(PackageId)" SourceType="Computed" ContentRoot="$(_ClientAssetsOutputFullPath)" BasePath="$(StaticWebAssetBasePath)">
+      <Output TaskParameter="Assets" ItemName="StaticWebAsset" />
+    </DefineStaticWebAssets>
   </Target>
 </Project>
