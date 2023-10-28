@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <Content Include="umbraco\**" />
+    <Content Include="wwwroot\**" />
   </ItemGroup>
 
   <!-- Build client assets using NPM -->
