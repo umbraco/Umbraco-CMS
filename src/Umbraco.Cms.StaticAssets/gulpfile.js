@@ -25,6 +25,19 @@ const { watchTask } = require('./gulp/tasks/watchTask');
 // set default current compile mode:
 config.compile.current = config.compile.build;
 
+// Set output path
+function getOutputPath() {
+  var argv = require('minimist')(process.argv.slice(2));
+
+  var outputPath = argv['output-path'];
+  if (!outputPath) {
+    outputPath = require('./gulpfile.outputPath.js').outputPath;
+  }
+
+  return outputPath;
+}
+config.roots = [getOutputPath()];
+
 const coreBuild = parallel(dependencies, js, less, css, views);
 
 // ***********************************************************

@@ -60,7 +60,7 @@ stages:
   ###############################################
   - stage: Build
     variables:
-      npm_config_cache: $(Pipeline.Workspace)/.npm_client
+      npm_config_cache: $(Pipeline.Workspace)/.npm_src
     jobs:
       - job: A
         displayName: Build Umbraco CMS
@@ -72,22 +72,13 @@ stages:
             inputs:
               versionSpec: $(nodeVersion)
           - task: Cache@2
-            displayName: Cache node_modules
+            displayName: Cache NPM packages
             inputs:
-              key: '"npm_client" | "$(Agent.OS)" | $(Build.SourcesDirectory)/src/Umbraco.Web.UI.Client/package-lock.json'
+              key: 'npm_src | "$(Agent.OS)" | src/**/package-lock.json, !**/node_modules/**'
               restoreKeys: |
-                "npm_client" | "$(Agent.OS)"
-                "npm_client"
+                npm_src | "$(Agent.OS)"
+                npm_src
               path: $(npm_config_cache)
-          - script: npm ci --no-fund --no-audit --prefer-offline
-            workingDirectory:  src/Umbraco.Web.UI.Client
-            displayName: Run npm ci
-          - task: gulp@0
-            displayName: Run gulp build
-            inputs:
-              gulpFile: src/Umbraco.Web.UI.Client/gulpfile.js
-              targets: coreBuild
-              workingDirectory: src/Umbraco.Web.UI.Client
           - task: UseDotNet@2
             displayName: Use .NET $(dotnetVersion)
             inputs:
@@ -370,7 +361,7 @@ stages:
 
   - stage: E2E
     variables:
-      npm_config_cache: $(Pipeline.Workspace)/.npm_e2e
+      npm_config_cache: $(Pipeline.Workspace)/.npm_tests
     displayName: E2E Tests
     dependsOn: Build
     jobs:
@@ -418,12 +409,12 @@ stages:
             inputs:
               versionSpec: $(nodeVersion)
           - task: Cache@2
-            displayName: Cache node_modules
+            displayName: Cache NPM packages
             inputs:
-              key: '"npm_e2e" | "$(Agent.OS)" | $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/package-lock.json'
+              key: 'npm_tests | "$(Agent.OS)" | tests/**/package-lock.json, !**/node_modules/**'
               restoreKeys: |
-                "npm_e2e" | "$(Agent.OS)"
-                "npm_e2e"
+                npm_tests | "$(Agent.OS)"
+                npm_tests
               path: $(npm_config_cache)
           - pwsh: |
               New-Item -Path "." -Name ".env" -ItemType "file" -Value "UMBRACO_USER_LOGIN=$(Umbraco__CMS__Unattended__UnattendedUserEmail)

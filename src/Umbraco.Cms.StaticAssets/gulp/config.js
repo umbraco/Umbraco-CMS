@@ -91,13 +91,13 @@ module.exports = {
             assets: "./src/assets/**"
         }
     },
-    roots: ["../Umbraco.Cms.StaticAssets/wwwroot/"],
+    roots: ["./wwwroot"],
     targets: {
-        js: "umbraco/js/",
-        lib: "umbraco/lib/",
-        views: "umbraco/views/",
-        less: "umbraco/assets/css/",
-        css: "umbraco/assets/css/",
-        assets: "umbraco/assets/"
+        js: "/umbraco/js/",
+        lib: "/umbraco/lib/",
+        views: "/umbraco/views/",
+        less: "/umbraco/assets/css/",
+        css: "/umbraco/assets/css/",
+        assets: "/umbraco/assets/"
     }
 };
