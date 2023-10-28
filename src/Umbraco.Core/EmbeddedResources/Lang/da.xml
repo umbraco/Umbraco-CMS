@@ -329,7 +329,7 @@
     <key alias="clickToUpload">Klik for at uploade</key>
     <key alias="orClickHereToUpload">eller klik her for at vælge filer</key>
     <key alias="disallowedFileType">Kan ikke uploade denne fil; den har ikke en godkendt filtype</key>
-    <key alias="maxFileSize">Maksimum filstørrelse er</key>
+    <key alias="maxFileSize">Maksimal filstørrelse er</key>
     <key alias="mediaRoot">Medie rod</key>
     <key alias="moveToSameFolderFailed">Overordnet og destinationsmappe kan ikke være den samme</key>
     <key alias="createFolderFailed">Oprettelse af mappen under node med id %0% fejlede</key>
@@ -364,9 +364,9 @@
     <key alias="enterFolderName">Angiv et navn for mappen</key>
     <key alias="updateData">Vælg en type og skriv en titel</key>
     <key alias="noDocumentTypes" version="7.0">
-      <![CDATA[Der kunne ikke findes nogen tilladte dokumenttyper. Du skal tillade disse i indstillinger under <strong>"dokumenttyper"</strong>.]]></key>
+      <![CDATA[Der kunne ikke findes nogen tilladte dokumenttyper. Du skal tillade disse i <strong>Indstillinger</strong> under <strong>"Dokumenttyper"</strong>.]]></key>
     <key alias="noDocumentTypesAtRoot">
-      <![CDATA[Der er ingen dokumenttyper tilgængelige til at oprette indhold her. Du skal oprette disse under <strong>Dokumenttyper</strong> i <strong>Indstillinger</strong> sektionen.]]></key>
+      <![CDATA[Der er ingen dokumenttyper tilgængelige til at oprette indhold her. Du skal oprette disse under <strong>Dokumenttyper</strong> i <strong>Indstillinger</strong>-sektionen.]]></key>
     <key alias="noDocumentTypesWithNoSettingsAccess">Den valgte side i træet tillader ikke at sider oprettes under
       den.
     </key>
@@ -408,8 +408,8 @@
     <key alias="newPartialViewFromSnippet">Ny partial view fra snippet</key>
     <key alias="newPartialViewMacroFromSnippet">Ny partial view makro fra snippet</key>
     <key alias="newPartialViewMacroNoMacro">Ny partial view makro (uden makro)</key>
-    <key alias="newStyleSheetFile">Ny stylesheet fil</key>
-    <key alias="newRteStyleSheetFile">Ny Rich Text Editor stylesheet fil</key>
+    <key alias="newStyleSheetFile">Ny stylesheet-fil</key>
+    <key alias="newRteStyleSheetFile">Ny Rich Text Editor stylesheet-fil</key>
   </area>
   <area alias="dashboard">
     <key alias="browser">Til dit website</key>
@@ -2093,9 +2093,9 @@ Mange hilsner fra Umbraco robotten
   </area>
   <area alias="references">
     <key alias="tabName">Referencer</key>
-    <key alias="DataTypeNoReferences">Denne Data Type har ingen referencer.</key>
-    <key alias="labelUsedByMediaTypes">Bruges i Medie Typer</key>
-    <key alias="labelUsedByMemberTypes">Bruges i Medlems Typer</key>
+    <key alias="DataTypeNoReferences">Denne Datatype har ingen referencer.</key>
+    <key alias="labelUsedByMediaTypes">Bruges i Medietyper</key>
+    <key alias="labelUsedByMemberTypes">Bruges i Medlemstyper</key>
     <key alias="usedByProperties">Bruges af</key>
     <key alias="labelUsedByDocuments">Bruges i Dokumenter</key>
     <key alias="labelUsedByMembers">Bruges i Medlemmer</key>
@@ -2318,7 +2318,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="FolderCreation">Mappeoprettelse</key>
     <key alias="FileWritingForPackages">Filskrivning for pakker</key>
     <key alias="FileWriting">Filskrivning</key>
-    <key alias="MediaFolderCreation">Mediemappe oprettelse</key>
+    <key alias="MediaFolderCreation">Mediemappeoprettelse</key>
   </area>
   <area alias="treeSearch">
     <key alias="searchResult">resultat</key>
