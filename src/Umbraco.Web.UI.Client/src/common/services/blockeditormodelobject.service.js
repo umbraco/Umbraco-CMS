@@ -31,7 +31,8 @@
                 for (var p = 0; p < tab.properties.length; p++) {
                     var prop = tab.properties[p];
 
-                    prop.value = dataModel[prop.alias];
+                    if (typeof (dataModel[prop.alias]) !== 'undefined')
+                        prop.value = dataModel[prop.alias];
                 }
             }
 
