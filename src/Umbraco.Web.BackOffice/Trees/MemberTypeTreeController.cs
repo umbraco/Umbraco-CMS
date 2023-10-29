@@ -10,6 +10,7 @@ using Umbraco.Cms.Core.Trees;
 using Umbraco.Cms.Infrastructure.Search;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
+using static Umbraco.Cms.Core.Collections.TopoGraph;
 
 namespace Umbraco.Cms.Web.BackOffice.Trees;
 
@@ -67,6 +68,11 @@ public class MemberTypeTreeController : MemberTypeAndGroupTreeControllerBase, IS
     protected override IEnumerable<TreeNode> GetTreeNodesFromService(string id, FormCollection queryStrings) =>
         _memberTypeService.GetAll()
             .OrderBy(x => x.Name)
-            .Select(dt => CreateTreeNode(dt, Constants.ObjectTypes.MemberType, id, queryStrings,
-                dt?.Icon ?? Constants.Icons.MemberType, false));
+            .Select(dt =>
+            {
+                var tn = CreateTreeNode(dt, Constants.ObjectTypes.MemberType, id, queryStrings,
+                dt?.Icon ?? Constants.Icons.MemberType, false);
+                tn.Key = dt?.Key ?? Guid.Empty;
+                return tn;
+            });
 }

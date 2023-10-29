@@ -92,17 +92,23 @@ public class TemplatesTreeController : TreeController, ISearchableTree
 
         if (found is not null)
         {
-            nodes.AddRange(found.Select(template => CreateTreeNode(
-                template.Id.ToString(CultureInfo.InvariantCulture),
-                // TODO: Fix parent ID stuff for templates
-                "-1",
-                queryStrings,
-                template.Name,
-                template.IsMasterTemplate ? "icon-newspaper" : "icon-newspaper-alt",
-                template.IsMasterTemplate,
-                null,
-                Udi.Create(ObjectTypes.GetUdiType(Constants.ObjectTypes.TemplateType), template.Key)
-            )));
+            nodes.AddRange(found.Select(template =>
+            {
+                var tn = CreateTreeNode(
+                    template.Id.ToString(CultureInfo.InvariantCulture),
+                    // TODO: Fix parent ID stuff for templates
+                    "-1",
+                    queryStrings,
+                    template.Name,
+                    template.IsMasterTemplate ? "icon-newspaper" : "icon-newspaper-alt",
+                    template.IsMasterTemplate,
+                    null,
+                    Udi.Create(ObjectTypes.GetUdiType(Constants.ObjectTypes.TemplateType), template.Key)
+                );
+                tn.Key = template.Key;
+
+                return tn;
+            }));
         }
 
         return nodes;

@@ -120,6 +120,7 @@ public class ContentTypeTreeController : TreeController, ISearchableTree
                     // now we can enrich the result with content type data that's not available in the entity service output
                     node.Alias = contentType?.Alias ?? string.Empty;
                     node.AdditionalData["isElement"] = contentType?.IsElement;
+                    node.Key = contentType?.Key ?? Guid.Empty;
 
                     return node;
                 }));

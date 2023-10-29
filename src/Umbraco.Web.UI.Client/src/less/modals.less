@@ -12,8 +12,11 @@
   box-sizing: border-box;
   padding: 0 20px;
   display: flex;
-  align-items: center;
-  white-space: nowrap
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 10px;
+  white-space: nowrap;
 }
 
 .umb-modalcolumn-header h1,
@@ -21,7 +24,19 @@
   margin: 0;
   white-space: nowrap;
   font-size: @fontSizeMedium;
+  line-height: 1;
   font-weight: 400;
+}
+
+.umb-modalcolumn-header #contextmenu-key {
+  font-size: @fontSizeSmall;
+  line-height: 1;
+  font-weight: 400;
+  color: @gray-5;
+}
+
+.umb-modalcolumn-header p {
+  margin-bottom: 0;
 }
 
 .umb-modalcolumn-body {

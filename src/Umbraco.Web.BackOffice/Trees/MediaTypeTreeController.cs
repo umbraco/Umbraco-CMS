@@ -95,6 +95,7 @@ public class MediaTypeTreeController : TreeController, ISearchableTree
                         mt?.Icon ?? Constants.Icons.MediaType, hasChildren);
 
                     node.Path = dt.Path;
+                    node.Key = mt?.Key ?? Guid.Empty;
                     return node;
                 }));
 

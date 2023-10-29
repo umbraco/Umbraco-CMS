@@ -3,6 +3,7 @@
     <div>
         <div class="umb-modalcolumn-header">
             <h1 id="contextmenu-title">{{menuDialogTitle}}</h1>
+            <p id="contextmenu-key" ng-show="currentNode.key !== '00000000-0000-0000-0000-000000000000'">{{currentNode.key}}</p>
             <p id="contextmenu-description" class="sr-only">
                 <localize key="visuallyHiddenTexts_contextMenuDescription">Select one of the options to edit the node.</localize>
             </p>
