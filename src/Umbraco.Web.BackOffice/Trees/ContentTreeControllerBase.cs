@@ -159,7 +159,21 @@ public abstract class ContentTreeControllerBase : TreeController, ITreeNodeContr
     {
         var entityIsAncestorOfStartNodes =
             ContentPermissions.IsInBranchOfStartNode(e.Path, startNodeIds, startNodePaths, out var hasPathAccess);
-        var ignoreUserStartNodes = IgnoreUserStartNodes(queryStrings);
+
+        bool ignoreUserStartNodes;
+
+        // if the user is accessing a node in the recycle bin ignore the user's start nodes
+        // they will always have access to nodes in the recycle bin
+        if (parentId == Constants.System.RecycleBinContentString)
+        {
+            ignoreUserStartNodes = true;
+        }
+        else
+        {
+            ignoreUserStartNodes = IgnoreUserStartNodes(queryStrings);
+        }
+
+
         if (ignoreUserStartNodes == false && entityIsAncestorOfStartNodes == false)
         {
             return null;

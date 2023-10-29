@@ -58,11 +58,10 @@ public class ContentPermissions
 
         var formattedPath = string.Concat(",", path, ",");
 
-        // only users with root access have access to the recycle bin,
-        // if the above check didn't pass then access is denied
+        // all users have access to the recycle bin
         if (formattedPath.Contains(string.Concat(",", recycleBinId.ToString(CultureInfo.InvariantCulture), ",")))
         {
-            return false;
+            return true;
         }
 
         // check for a start node in the path
