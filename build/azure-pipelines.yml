@@ -149,7 +149,7 @@ stages:
             inputs:
               targetType: inline
               script: |
-                choco install docfx --version=2.59.4 -y
+                dotnet tool install -g docfx --version 2.72.1
                 if ($lastexitcode -ne 0){
                     throw ("Error installing DocFX")
                 }
