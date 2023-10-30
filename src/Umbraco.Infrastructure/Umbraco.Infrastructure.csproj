@@ -25,7 +25,6 @@
     <PackageReference Include="ncrontab" Version="3.3.3" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="NPoco" Version="5.7.1" />
-    <PackageReference Include="OpenIddict.Abstractions" Version="4.2.0" />
     <PackageReference Include="Serilog" Version="3.0.1" />
     <PackageReference Include="OpenIddict.Abstractions" Version="4.9.0" />
     <PackageReference Include="Serilog.Enrichers.Process" Version="2.0.2" />
