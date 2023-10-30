@@ -59,6 +59,7 @@ export class UmbAuthLayoutElement extends LitElement {
 				background-position: 50%;
 				background-repeat: no-repeat;
 				background-size: cover;
+				transform: scaleX(-1);
 			}
 			:host::after {
 				content: '';
@@ -130,7 +131,7 @@ export class UmbAuthLayoutElement extends LitElement {
 				box-sizing: border-box;
 				margin-inline: auto;
 			}
-			@media (min-width: 850px) {
+			@media (min-width: 979px) {
 				:host {
 					background-image: none;
 				}
@@ -153,7 +154,7 @@ export class UmbAuthLayoutElement extends LitElement {
 					padding-inline: 100px;
 				}
 			}
-			@media (min-width: 1300px) {
+			@media (min-width: 1200px) {
 				:host([has-background-image]) #image-column {
 					padding: var(--uui-size-layout-3);
 					padding-right: 0;
