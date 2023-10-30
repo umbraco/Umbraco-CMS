@@ -25,6 +25,8 @@ public class WebhookFiringService : IWebhookFiringService
         _webhookSettings = webhookSettings.Value;
     }
 
+    // TODO: Add queing instead of processing directly in thread
+    // as this just makes save and publish longer
     public async Task FireAsync(Webhook webhook, string eventName, object? payload, CancellationToken cancellationToken, TimeSpan? retryDelay = null)
     {
         for (var retry = 0; retry < _webhookSettings.MaximumRetries; retry++)
