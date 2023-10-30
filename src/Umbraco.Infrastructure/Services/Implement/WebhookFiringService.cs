@@ -19,13 +19,13 @@ public class WebhookFiringService : IWebhookFiringService
         _webhookSettings = webhookSettings.Value;
     }
 
-    public async Task<WebhookResponseModel> Fire(Webhook webhook, string eventName, object? requestObject) =>
+    public async Task<WebhookResponseModel> Fire(Webhook webhook, string eventName, object? payload) =>
         await _retryService.RetryAsync(
             async () =>
             {
                 using var httpClient = new HttpClient();
 
-                var serializedObject = _jsonSerializer.Serialize(requestObject);
+                var serializedObject = _jsonSerializer.Serialize(payload);
                 var buffer = System.Text.Encoding.UTF8.GetBytes(serializedObject);
                 var byteContent = new ByteArrayContent(buffer);
                 httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Umb-Webhook-Event", eventName);
