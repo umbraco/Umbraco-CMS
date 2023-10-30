@@ -46,7 +46,7 @@ export class UmbDashboardTelemetryElement extends UmbLitElement {
 			this,
 			TelemetryResource.postTelemetryLevel({
 				requestBody: { telemetryLevel: this._telemetryFormData },
-			})
+			}),
 		);
 
 		if (error) {
@@ -75,19 +75,11 @@ export class UmbDashboardTelemetryElement extends UmbLitElement {
 	private get _selectedTelemetryDescription() {
 		switch (this._selectedTelemetry.telemetryLevel) {
 			case TelemetryLevelModel.MINIMAL:
-				return 'We will only send an anonymized site ID to let us know that the site exists.';
+				return this.localize.term('analytics_minimalLevelDescription');
 			case TelemetryLevelModel.BASIC:
-				return 'We will send an anonymized site ID, Umbraco version, and packages installed.';
+				return this.localize.term('analytics_basicLevelDescription');
 			case TelemetryLevelModel.DETAILED:
-				return `We will send:<ul>
-				<li>Anonymized site ID, Umbraco version, and packages installed.</li>
-				<li>Number of: Root nodes, Content nodes, Macros, Media, Document Types, Templates, Languages, Domains, User Group, Users, Members, and Property Editors in use.</li>
-				<li>System information: Webserver, server OS, server framework, server OS language, and database provider.</li>
-				<li>Configuration settings: Modelsbuilder mode, if custom Umbraco path exists, ASP environment, and if you are in debug mode.</li>
-				</ul>
-
-				<i>We might change what we send on the Detailed level in the future. If so, it will be listed above.
-				By choosing "Detailed" you agree to current and future anonymized information being collected.</i>`;
+				return this.localize.term('analytics_detailedLevelDescription');
 			default:
 				return 'Could not find description for this setting';
 		}
@@ -100,7 +92,7 @@ export class UmbDashboardTelemetryElement extends UmbLitElement {
 			<uui-slider
 				@input=${this._handleChange}
 				name="telemetryLevel"
-				label="telemetry level"
+				label=${this.localize.term('analytics_consentForAnalytics')}
 				value=${this._selectedTelemetryIndex + 1}
 				min="1"
 				max=${this._telemetryLevels.length}
@@ -113,26 +105,16 @@ export class UmbDashboardTelemetryElement extends UmbLitElement {
 	render() {
 		return html`
 			<uui-box class="uui-text">
-				<h1 class="uui-h2">Consent for telemetry data</h1>
+				<h1 class="uui-h2"><umb-localize key="analytics_consentForAnalytics"></umb-localize></h1>
 				<div style="max-width:75ch">
-					<p>
-						In order to improve Umbraco and add new functionality based on as relevant information as possible, we would
-						like to collect system- and usage information from your installation. Aggregate data will be shared on a
-						regular basis as well as learnings from these metrics. Hopefully, you will help us collect some valuable
-						data.
-						<br /><br />
-						We <strong>WILL NOT</strong> collect any personal data such as content, code, user information, and all data
-						will be fully anonymized.
-					</p>
+					<umb-localize key="analytics_analyticsDescription"></umb-localize>
 					${this._renderSettingSlider()}
 					<uui-button
 						look="primary"
 						color="positive"
-						label="Save telemetry settings"
+						label=${this.localize.term('buttons_save')}
 						@click="${this._handleSubmit}"
-						.state=${this._buttonState}>
-						Save
-					</uui-button>
+						.state=${this._buttonState}></uui-button>
 				</div>
 				${this._errorMessage ? html`<p class="error">${this._errorMessage}</p>` : ''}
 			</uui-box>
