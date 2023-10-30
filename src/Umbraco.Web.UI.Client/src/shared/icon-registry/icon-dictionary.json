@@ -370,9 +370,8 @@
 			"file": "archive.svg"
 		},
 		{
-			"_name": "icon-certificate",
-			"___file": "certificate.svg",
-			"missing": "TODO:"
+			"name": "icon-certificate",
+			"file": "file-badge-2.svg"
 		},
 		{
 			"name": "icon-chart-curve",
@@ -1126,11 +1125,6 @@
 			"name": "icon-indent",
 			"file": "indent.svg"
 		},
-
-
-
-
-		
 		{
 			"name": "icon-infinity",
 			"file": "infinity.svg"
@@ -1141,43 +1135,47 @@
 		},
 		{
 			"name": "icon-invoice",
-			"file": "invoice.svg"
+			"file": "scroll-text.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-ipad",
-			"file": "ipad.svg"
+			"file": "tablet.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-iphone",
-			"file": "iphone.svg"
+			"file": "smartphone.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-item-arrangement",
-			"file": "item-arrangement.svg"
+			"file": "table-properties.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-junk",
-			"file": "junk.svg"
+			"file": "archive-x.svg"
 		},
 		{
 			"name": "icon-key",
-			"file": "key.svg"
+			"file": "key-round.svg"
 		},
 		{
 			"name": "icon-keyboard",
 			"file": "keyboard.svg"
 		},
 		{
-			"name": "icon-keychain",
-			"file": "keychain.svg"
+			"_name": "icon-keychain",
+			"____file": "keychain.svg"
 		},
 		{
-			"name": "icon-keyhole",
-			"file": "keyhole.svg"
+			"_name": "icon-keyhole",
+			"____file": "keyhole.svg"
 		},
 		{
 			"name": "icon-lab",
-			"file": "lab.svg"
+			"file": "flask-conical.svg"
 		},
 		{
 			"name": "icon-laptop",
@@ -1185,11 +1183,12 @@
 		},
 		{
 			"name": "icon-layers-alt",
-			"file": "layers-alt.svg"
+			"file": "layers.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-layers",
-			"file": "layers.svg"
+			"file": "layers-3.svg"
 		},
 		{
 			"name": "icon-layout",
@@ -1197,71 +1196,76 @@
 		},
 		{
 			"name": "icon-left-double-arrow",
-			"file": "left-double-arrow.svg"
+			"file": "chevrons-left.svg"
 		},
 		{
 			"name": "icon-legal",
-			"file": "legal.svg"
+			"file": "scale.svg"
 		},
 		{
 			"name": "icon-lense",
-			"file": "lense.svg"
+			"file": "focus.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-library",
-			"file": "library.svg"
+			"file": "landmark.svg"
 		},
 		{
 			"name": "icon-light-down",
-			"file": "light-down.svg"
+			"file": "sun-moon.svg"
 		},
 		{
 			"name": "icon-light-up",
-			"file": "light-up.svg"
+			"file": "sun.svg"
 		},
 		{
 			"name": "icon-lightbulb-active",
-			"file": "lightbulb-active.svg"
+			"file": "bulb.svg"
 		},
 		{
 			"name": "icon-lightbulb",
-			"file": "lightbulb.svg"
+			"file": "bulb.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-lightning",
-			"file": "lightning.svg"
+			"file": "cloud-lightning.svg"
 		},
 		{
 			"name": "icon-link",
 			"file": "link.svg"
 		},
 		{
-			"name": "icon-linux-tux",
-			"file": "linux-tux.svg"
+			"_name": "icon-linux-tux",
+			"____file": "linux-tux.svg"
 		},
 		{
 			"name": "icon-list",
-			"file": "list.svg"
+			"file": "align-justify.svg"
 		},
 		{
 			"name": "icon-load",
-			"file": "load.svg"
+			"file": "arrow-down-to-line.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-loading",
-			"file": "loading.svg"
+			"file": "watch.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-locate",
-			"file": "locate.svg"
+			"file": "locate"
 		},
 		{
 			"name": "icon-location-near-me",
-			"file": "location-near-me.svg"
+			"file": "map-pinned",
+			"legacy": true
 		},
 		{
 			"name": "icon-location-nearby",
-			"file": "location-nearby.svg"
+			"file": "map-pinned.svg"
 		},
 		{
 			"name": "icon-lock",
@@ -1273,11 +1277,13 @@
 		},
 		{
 			"name": "icon-logout",
-			"file": "logout.svg"
+			"file": "log-out.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-loupe",
-			"file": "loupe.svg"
+			"file": "scan-search.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-magnet",
@@ -1288,24 +1294,25 @@
 			"file": "mailbox.svg"
 		},
 		{
-			"name": "icon-male-and-female",
-			"file": "male-and-female.svg"
+			"_name": "icon-male-and-female",
+			"____file": "users-2.svg"
 		},
 		{
-			"name": "icon-male-symbol",
-			"file": "male-symbol.svg"
+			"_name": "icon-male-symbol",
+			"____file": "male-symbol.svg"
 		},
 		{
 			"name": "icon-map-alt",
-			"file": "map-alt.svg"
+			"file": "navigation.svg"
 		},
 		{
 			"name": "icon-map-location",
-			"file": "map-location.svg"
+			"file": "map-pinned.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-map-marker",
-			"file": "map-marker.svg"
+			"file": "map-pin.svg"
 		},
 		{
 			"name": "icon-map",
@@ -1317,15 +1324,16 @@
 		},
 		{
 			"name": "icon-medical-emergency",
-			"file": "medical-emergency.svg"
+			"file": "heart-pulse.svg"
 		},
 		{
 			"name": "icon-medicine",
-			"file": "medicine.svg"
+			"file": "pill.svg"
 		},
 		{
 			"name": "icon-meeting",
-			"file": "meeting.svg"
+			"file": "presentation.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-megaphone",
@@ -1337,15 +1345,16 @@
 		},
 		{
 			"name": "icon-message-open",
-			"file": "message-open.svg"
+			"file": "mail-open.svg"
 		},
 		{
 			"name": "icon-message-unopened",
-			"file": "message-unopened.svg"
+			"file": "mail.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-message",
-			"file": "message.svg"
+			"file": "mail.svg"
 		},
 		{
 			"name": "icon-microscope",
@@ -1353,27 +1362,28 @@
 		},
 		{
 			"name": "icon-mindmap",
-			"file": "mindmap.svg"
+			"file": "network.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-mobile",
-			"file": "mobile.svg"
+			"file": "smartphone.svg"
 		},
 		{
-			"name": "icon-molecular-network",
-			"file": "molecular-network.svg"
+			"_name": "icon-molecular-network",
+			"____file": "molecular-network.svg"
 		},
 		{
-			"name": "icon-molecular",
-			"file": "molecular.svg"
+			"_name": "icon-molecular",
+			"____file": "molecular.svg"
 		},
 		{
 			"name": "icon-mountain",
-			"file": "mountain.svg"
+			"file": "mountain-snow.svg"
 		},
 		{
 			"name": "icon-mouse-cursor",
-			"file": "mouse-cursor.svg"
+			"file": "mouse-pointer.svg"
 		},
 		{
 			"name": "icon-mouse",
@@ -1381,15 +1391,15 @@
 		},
 		{
 			"name": "icon-movie-alt",
-			"file": "movie-alt.svg"
+			"file": "clapperboard.svg"
 		},
 		{
 			"name": "icon-movie",
-			"file": "movie.svg"
+			"file": "film.svg"
 		},
 		{
 			"name": "icon-multiple-credit-cards",
-			"file": "multiple-credit-cards.svg"
+			"file": "wallet-cards.svg"
 		},
 		{
 			"name": "icon-multiple-windows",
@@ -1401,8 +1411,13 @@
 		},
 		{
 			"name": "icon-name-badge",
-			"file": "name-badge.svg"
+			"file": "contact-2.svg"
 		},
+
+
+
+
+
 		{
 			"name": "icon-navigation-bottom",
 			"file": "navigation-bottom.svg"
