@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Options;
+﻿using System.Net.Http.Headers;
+using System.Text;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Serialization;
@@ -62,15 +64,15 @@ public class WebhookFiringService : IWebhookFiringService
         using var httpClient = new HttpClient();
 
         var serializedObject = _jsonSerializer.Serialize(payload);
-        var buffer = System.Text.Encoding.UTF8.GetBytes(serializedObject);
-        var byteContent = new ByteArrayContent(buffer);
-        httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Umb-Webhook-Event", eventName);
+        var stringContent = new StringContent(serializedObject, Encoding.UTF8, "application/json");
+        stringContent.Headers.TryAddWithoutValidation("Umb-Webhook-Event", eventName);
+
         foreach (KeyValuePair<string, string> header in webhook.Headers)
         {
-            httpClient.DefaultRequestHeaders.TryAddWithoutValidation(header.Key, header.Value);
+            stringContent.Headers.TryAddWithoutValidation(header.Key, header.Value);
         }
 
-        HttpResponseMessage response = await httpClient.PostAsync(webhook.Url, byteContent);
+        HttpResponseMessage response = await httpClient.PostAsync(webhook.Url, stringContent, cancellationToken);
 
         var webhookResponseModel = new WebhookResponseModel
         {
