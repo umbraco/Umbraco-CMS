@@ -1,6 +1,6 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbSelectionManagerBase } from '@umbraco-cms/backoffice/utils';
+import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import { ManifestSection, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import {
 	UmbSectionPickerModalData,
@@ -16,7 +16,7 @@ export class UmbSectionPickerModalElement extends UmbModalBaseElement<
 	@state()
 	private _sections: Array<ManifestSection> = [];
 
-	#selectionManager = new UmbSelectionManagerBase();
+	#selectionManager = new UmbSelectionManager();
 
 	#submit() {
 		this.modalContext?.submit({

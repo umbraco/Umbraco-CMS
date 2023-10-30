@@ -1,6 +1,6 @@
 import { UmbArrayState, UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 
-export class UmbSelectionManagerBase {
+export class UmbSelectionManager {
 	#selection = new UmbArrayState(<Array<string | null>>[]);
 	public readonly selection = this.#selection.asObservable();
 

@@ -2,7 +2,7 @@ import { UmbUserCollectionRepository } from '../../collection/repository/user-co
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state, ifDefined, PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { UmbUserPickerModalData, UmbUserPickerModalValue, UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import { UmbSelectionManagerBase } from '@umbraco-cms/backoffice/utils';
+import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import { UserItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-user-picker-modal')
@@ -10,7 +10,7 @@ export class UmbUserPickerModalElement extends UmbModalBaseElement<UmbUserPicker
 	@state()
 	private _users: Array<UserItemResponseModel> = [];
 
-	#selectionManager = new UmbSelectionManagerBase();
+	#selectionManager = new UmbSelectionManager();
 	#userCollectionRepository = new UmbUserCollectionRepository(this);
 
 	connectedCallback(): void {
