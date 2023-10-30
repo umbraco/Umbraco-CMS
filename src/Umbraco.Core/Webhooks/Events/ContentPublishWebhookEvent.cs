@@ -2,7 +2,6 @@
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PublishedCache;
@@ -19,18 +18,14 @@ public class ContentPublishWebhookEvent : WebhookEventBase<ContentPublishedNotif
     public ContentPublishWebhookEvent(
         IWebhookFiringService webhookFiringService,
         IWebHookService webHookService,
-        IWebhookLogService webhookLogService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
-        IWebhookLogFactory webhookLogFactory,
         IServerRoleAccessor serverRoleAccessor,
         IPublishedSnapshotAccessor publishedSnapshotAccessor,
         IApiContentBuilder apiContentBuilder)
         : base(
             webhookFiringService,
             webHookService,
-            webhookLogService,
             webhookSettings,
-            webhookLogFactory,
             serverRoleAccessor,
             Constants.WebhookEvents.ContentPublish)
     {

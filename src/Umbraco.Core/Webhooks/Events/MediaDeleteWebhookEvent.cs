@@ -12,16 +12,12 @@ public class MediaDeleteWebhookEvent : WebhookEventBase<MediaDeletedNotification
     public MediaDeleteWebhookEvent(
         IWebhookFiringService webhookFiringService,
         IWebHookService webHookService,
-        IWebhookLogService webhookLogService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
-        IWebhookLogFactory webhookLogFactory,
         IServerRoleAccessor serverRoleAccessor)
         : base(
             webhookFiringService,
             webHookService,
-            webhookLogService,
             webhookSettings,
-            webhookLogFactory,
             serverRoleAccessor,
             Constants.WebhookEvents.MediaDelete)
     {

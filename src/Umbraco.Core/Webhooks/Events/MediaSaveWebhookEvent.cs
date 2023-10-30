@@ -18,18 +18,14 @@ public class MediaSaveWebhookEvent : WebhookEventBase<MediaSavedNotification, IM
     public MediaSaveWebhookEvent(
         IWebhookFiringService webhookFiringService,
         IWebHookService webHookService,
-        IWebhookLogService webhookLogService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
-        IWebhookLogFactory webhookLogFactory,
         IServerRoleAccessor serverRoleAccessor,
         IPublishedSnapshotAccessor publishedSnapshotAccessor,
         IApiMediaBuilder apiMediaBuilder)
         : base(
             webhookFiringService,
             webHookService,
-            webhookLogService,
             webhookSettings,
-            webhookLogFactory,
             serverRoleAccessor,
             Constants.WebhookEvents.MediaSave)
     {

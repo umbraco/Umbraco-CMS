@@ -14,24 +14,18 @@ public abstract class WebhookEventBase<TNotification, TEntity> : IWebhookEvent, 
 {
     private readonly IWebhookFiringService _webhookFiringService;
     private readonly IWebHookService _webHookService;
-    private readonly IWebhookLogService _webhookLogService;
-    private readonly IWebhookLogFactory _webhookLogFactory;
     private readonly IServerRoleAccessor _serverRoleAccessor;
     private WebhookSettings _webhookSettings;
 
     protected WebhookEventBase(
         IWebhookFiringService webhookFiringService,
         IWebHookService webHookService,
-        IWebhookLogService webhookLogService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
-        IWebhookLogFactory webhookLogFactory,
         IServerRoleAccessor serverRoleAccessor,
         string eventName)
     {
         _webhookFiringService = webhookFiringService;
         _webHookService = webHookService;
-        _webhookLogService = webhookLogService;
-        _webhookLogFactory = webhookLogFactory;
         _serverRoleAccessor = serverRoleAccessor;
         EventName = eventName;
         _webhookSettings = webhookSettings.CurrentValue;
@@ -68,10 +62,7 @@ public abstract class WebhookEventBase<TNotification, TEntity> : IWebhookEvent, 
                     continue;
                 }
 
-                WebhookResponseModel response = await _webhookFiringService.Fire(webhook, EventName, ConvertEntityToRequestPayload(entity));
-
-                WebhookLog log = await _webhookLogFactory.CreateAsync(EventName, response, webhook, cancellationToken);
-                await _webhookLogService.CreateAsync(log);
+                await _webhookFiringService.FireAsync(webhook, EventName, ConvertEntityToRequestPayload(entity), cancellationToken);
             }
         }
     }

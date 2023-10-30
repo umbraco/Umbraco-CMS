@@ -226,8 +226,6 @@ public static partial class UmbracoBuilderExtensions
         builder.AddPropertyIndexValueFactories();
 
         builder.AddDeliveryApiCoreServices();
-
-        builder.Services.AddTransient<IRetryService, RetryService>();
         builder.Services.AddTransient<IWebhookFiringService, WebhookFiringService>();
 
         return builder;

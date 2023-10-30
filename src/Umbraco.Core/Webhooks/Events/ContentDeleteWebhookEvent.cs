@@ -12,16 +12,12 @@ public class ContentDeleteWebhookEvent : WebhookEventBase<ContentDeletedNotifica
     public ContentDeleteWebhookEvent(
         IWebhookFiringService webhookFiringService,
         IWebHookService webHookService,
-        IWebhookLogService webhookLogService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
-        IWebhookLogFactory webhookLogFactory,
         IServerRoleAccessor serverRoleAccessor)
         : base(
             webhookFiringService,
             webHookService,
-            webhookLogService,
             webhookSettings,
-            webhookLogFactory,
             serverRoleAccessor,
             Constants.WebhookEvents.ContentDelete)
     {
