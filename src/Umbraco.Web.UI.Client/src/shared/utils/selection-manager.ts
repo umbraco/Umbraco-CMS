@@ -1,23 +1,6 @@
-import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbArrayState, UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 
-export interface UmbSelectionManager {
-	selection: Observable<Array<string | null>>;
-	multiple: Observable<boolean>;
-
-	getSelection(): Array<string | null>;
-	setSelection(value: Array<string | null>): void;
-
-	getMultiple(): boolean;
-	setMultiple(value: boolean): void;
-
-	toggleSelect(unique: string | null): void;
-	select(unique: string | null): void;
-	deselect(unique: string | null): void;
-	isSelected(unique: string | null): boolean;
-}
-
-export class UmbSelectionManagerBase implements UmbSelectionManager {
+export class UmbSelectionManagerBase {
 	#selection = new UmbArrayState(<Array<string | null>>[]);
 	public readonly selection = this.#selection.asObservable();
 
