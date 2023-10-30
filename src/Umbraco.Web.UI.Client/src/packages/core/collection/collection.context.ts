@@ -1,19 +1,17 @@
 import { UmbCollectionRepository } from '@umbraco-cms/backoffice/repository';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbBaseController, type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import {
 	UmbArrayState,
 	UmbNumberState,
 	UmbObjectState,
-	UmbObserverController,
 } from '@umbraco-cms/backoffice/observable-api';
 import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 import { ManifestCollectionView, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbCollectionFilterModel } from '@umbraco-cms/backoffice/collection';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
 
-export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectionFilterModel> {
-	protected host: UmbControllerHostElement;
+export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectionFilterModel> extends UmbBaseController {
 	protected entityType: string;
 	protected init;
 
@@ -39,37 +37,34 @@ export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectio
 	collectionRootPathname: string;
 
 	constructor(host: UmbControllerHostElement, entityType: string, repositoryAlias: string) {
+		super(host);
 		this.entityType = entityType;
-		this.host = host;
 
 		const currentUrl = new URL(window.location.href);
 		this.collectionRootPathname = currentUrl.pathname.substring(0, currentUrl.pathname.lastIndexOf('/'));
 
 		this.init = Promise.all([
-			new UmbObserverController(
-				this.host,
+			this.observe(
 				umbExtensionsRegistry.getByTypeAndAlias('repository', repositoryAlias),
 				async (repositoryManifest) => {
 					if (repositoryManifest) {
-						const result = await createExtensionApi(repositoryManifest, [this.host]);
+						const result = await createExtensionApi(repositoryManifest, [this._host]);
 						this.repository = result as UmbCollectionRepository;
 						this.requestCollection();
 					}
 				},
+				'umbCollectionRepository'
 			).asPromise(),
 
-			new UmbObserverController(
-				this.host,
-				umbExtensionsRegistry.extensionsOfType('collectionView').pipe(
-					map((extensions) => {
-						return extensions.filter((extension) => extension.conditions.entityType === this.getEntityType());
-					}),
-				),
-				(views) => {
-					this.#views.next(views);
-					this.#setCurrentView();
-				},
-			).asPromise(),
+			this.observe(umbExtensionsRegistry.extensionsOfType('collectionView').pipe(
+				map((extensions) => {
+					return extensions.filter((extension) => extension.conditions.entityType === this.getEntityType());
+				}),
+			),
+			(views) => {
+				this.#views.next(views);
+				this.#setCurrentView();
+			}, 'umbCollectionViews').asPromise(),
 		]);
 	}
 
