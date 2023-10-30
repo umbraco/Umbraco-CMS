@@ -24,22 +24,22 @@ public class WebhookService : IWebHookService
         return created;
     }
 
-    public async Task UpdateAsync(Webhook updateModel)
+    public async Task UpdateAsync(Webhook webhook)
     {
         using ICoreScope scope = _provider.CreateCoreScope();
 
-        Webhook? currentWebhook = await _webhookRepository.GetAsync(updateModel.Key);
+        Webhook? currentWebhook = await _webhookRepository.GetAsync(webhook.Key);
 
         if (currentWebhook is null)
         {
             throw new ArgumentException("Webhook does not exist");
         }
 
-        currentWebhook.Enabled = updateModel.Enabled;
-        currentWebhook.ContentTypeKeys = updateModel.ContentTypeKeys;
-        currentWebhook.Events = updateModel.Events;
-        currentWebhook.Url = updateModel.Url;
-        currentWebhook.Headers = updateModel.Headers;
+        currentWebhook.Enabled = webhook.Enabled;
+        currentWebhook.ContentTypeKeys = webhook.ContentTypeKeys;
+        currentWebhook.Events = webhook.Events;
+        currentWebhook.Url = webhook.Url;
+        currentWebhook.Headers = webhook.Headers;
 
         await _webhookRepository.UpdateAsync(currentWebhook);
         scope.Complete();

@@ -6,7 +6,7 @@ public interface IWebHookService
 {
     Task<Webhook> CreateAsync(Webhook webhook);
 
-    Task UpdateAsync(Webhook updateModel);
+    Task UpdateAsync(Webhook webhook);
 
     Task DeleteAsync(Guid key);
 
