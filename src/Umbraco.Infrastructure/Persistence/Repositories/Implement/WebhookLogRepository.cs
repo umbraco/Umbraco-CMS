@@ -28,7 +28,8 @@ public class WebhookLogRepository : IWebhookLogRepository
     {
         Sql<ISqlContext>? sql = _scopeAccessor.AmbientScope?.Database.SqlContext.Sql()
             .Select<WebhookLogDto>()
-            .From<WebhookLogDto>();
+            .From<WebhookLogDto>()
+            .OrderByDescending<WebhookLogDto>(x => x.Date);
 
         PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
 
