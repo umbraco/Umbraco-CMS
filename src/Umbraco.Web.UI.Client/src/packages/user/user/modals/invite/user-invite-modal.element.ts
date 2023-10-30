@@ -34,8 +34,11 @@ export class UmbUserInviteModalElement extends UmbModalBaseElement {
 
 		const message = formData.get('message') as string;
 
+		alert('implement');
+
 		// TODO: figure out when to use email or username
 		// TODO: invite request gives 500 error.
+		/*
 		const { data } = await this.#userRepository.invite({
 			name,
 			email,
@@ -47,6 +50,7 @@ export class UmbUserInviteModalElement extends UmbModalBaseElement {
 		if (data) {
 			this._invitedUser = data;
 		}
+		*/
 	}
 
 	private _submitForm() {

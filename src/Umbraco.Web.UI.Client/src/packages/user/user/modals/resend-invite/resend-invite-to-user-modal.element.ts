@@ -22,9 +22,12 @@ export class UmbResendInviteToUserModalElement extends UmbModalBaseElement {
 		const formData = new FormData(form);
 		const message = formData.get('message') as string;
 
+		alert('implement');
+		/*
 		const { error } = await this.#userRepository.resendInvite({
 			message,
 		});
+		*/
 	}
 
 	private _closeModal() {
