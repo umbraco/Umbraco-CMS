@@ -35,13 +35,13 @@ export class UmbCollectionViewBundleElement extends UmbLitElement {
 	#observeCurrentView() {
 		this.observe(this.#collectionContext!.currentView, (view) => {
 			this._currentView = view;
-		});
+		}, 'umbCurrentCollectionViewObserver');
 	}
 
 	#observeViews() {
 		this.observe(this.#collectionContext!.views, (views) => {
 			this._views = views;
-		});
+		}, 'umbCollectionViewsObserver');
 	}
 
 	#toggleDropdown() {

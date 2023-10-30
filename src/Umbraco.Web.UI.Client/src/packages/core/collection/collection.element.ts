@@ -35,7 +35,7 @@ export class UmbCollectionElement extends UmbLitElement {
 		this.observe(this.collectionContext!.views, (views) => {
 			this._createRoutes(views);
 		}),
-			'collectionViews';
+			'umbCollectionViewsObserver';
 	}
 
 	private _createRoutes(views: ManifestCollectionView[] | null) {

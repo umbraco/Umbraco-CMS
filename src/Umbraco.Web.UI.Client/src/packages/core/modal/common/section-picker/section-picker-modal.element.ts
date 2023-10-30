@@ -38,7 +38,7 @@ export class UmbSectionPickerModalElement extends UmbModalBaseElement<
 		this.observe(
 			umbExtensionsRegistry.extensionsOfType('section'),
 			(sections: Array<ManifestSection>) => (this._sections = sections),
-		);
+		), 'umbSectionsObserver';
 	}
 
 	render() {

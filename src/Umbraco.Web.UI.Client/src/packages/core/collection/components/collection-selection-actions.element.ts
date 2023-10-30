@@ -15,7 +15,7 @@ export class UmbCollectionSelectionActionsElement extends UmbLitElement {
 	@state()
 	private _extensionProps = {};
 
-	private _selection: Array<string> = [];
+	private _selection: Array<string | null> = [];
 
 	private _collectionContext?: UmbCollectionContext<any, any>;
 
@@ -46,7 +46,7 @@ export class UmbCollectionSelectionActionsElement extends UmbLitElement {
 			(mediaItems) => {
 				this._nodesLength = mediaItems.length;
 			},
-			'observeItem',
+			'umbItemsLengthObserver',
 		);
 
 		this.observe(
@@ -56,7 +56,7 @@ export class UmbCollectionSelectionActionsElement extends UmbLitElement {
 				this._selection = selection;
 				this._extensionProps = { selection: this._selection };
 			},
-			'observeSelection',
+			'umbSelectionObserver',
 		);
 	}
 

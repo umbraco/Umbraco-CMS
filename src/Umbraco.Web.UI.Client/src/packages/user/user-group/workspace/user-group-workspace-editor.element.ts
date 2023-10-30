@@ -20,7 +20,7 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 	private _userGroup?: UserGroupResponseModel;
 
 	@state()
-	private _userKeys?: Array<string>;
+	private _userIds?: Array<string>;
 
 	#workspaceContext?: typeof UMB_USER_GROUP_WORKSPACE_CONTEXT.TYPE;
 
@@ -29,8 +29,8 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 
 		this.consumeContext(UMB_USER_GROUP_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
-			this.observe(this.#workspaceContext.data, (userGroup) => (this._userGroup = userGroup));
-			this.observe(this.#workspaceContext.userIds, (userKeys) => (this._userKeys = userKeys));
+			this.observe(this.#workspaceContext.data, (userGroup) => (this._userGroup = userGroup), 'umbUserGroupObserver');
+			this.observe(this.#workspaceContext.userIds, (userIds) => (this._userIds = userIds), 'umbUserIdsObserver');
 		});
 	}
 
@@ -148,7 +148,7 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 	#renderRightColumn() {
 		return html`<uui-box>
 				<div slot="headline"><umb-localize key="sections_users"></umb-localize></div>
-				<umb-user-input @change=${this.#onUsersChange} .selectedIds=${this._userKeys ?? []}></umb-user-input>
+				<umb-user-input @change=${this.#onUsersChange} .selectedIds=${this._userIds ?? []}></umb-user-input>
 			</uui-box>
 			<uui-box headline="Actions">
 				<umb-entity-action-list
