@@ -14,9 +14,10 @@
     <tr ng-repeat="log in vm.logs track by log.key" ng-click="vm.openLogOverlay(log)" style="cursor: pointer;">
       <td style="width: 20px;">
         <umb-checkmark ng-if="vm.isChecked(log)"
-                       checked="log.retryCount < 5"
+                       checked="vm.isChecked(log)"
                        size="xs">
         </umb-checkmark>
+
       </td>
       <td>
         {{ log.webhookKey}}

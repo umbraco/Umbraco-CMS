@@ -28,7 +28,7 @@
     }
 
     function isChecked (log) {
-      return log.retryCount < 5;
+      return log.statusCode === "OK";
     }
 
     loadLogs();
