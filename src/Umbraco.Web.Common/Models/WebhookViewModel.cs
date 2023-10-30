@@ -1,5 +1,4 @@
 ﻿using System.Runtime.Serialization;
-using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Web.Common.Models;
 

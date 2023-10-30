@@ -13,39 +13,29 @@ public class AddWebhooks : MigrationBase
     protected override void Migrate()
     {
         IEnumerable<string> tables = SqlSyntax.GetTablesInSchema(Context.Database).ToArray();
-        if (tables.InvariantContains(Constants.DatabaseSchema.Tables.Webhook))
+        if (tables.InvariantContains(Constants.DatabaseSchema.Tables.Webhook) is false)
         {
-            return;
+            Create.Table<WebhookDto>().Do();
         }
 
-        Create.Table<WebhookDto>().Do();
-
-        if (tables.InvariantContains(Constants.DatabaseSchema.Tables.Webhook2Events))
+        if (tables.InvariantContains(Constants.DatabaseSchema.Tables.Webhook2Events) is false)
         {
-            return;
+            Create.Table<Webhook2EventsDto>().Do();
         }
 
-        Create.Table<Webhook2EventsDto>().Do();
-
-        if (tables.InvariantContains(Constants.DatabaseSchema.Tables.Webhook2ContentTypeKeys))
+        if (tables.InvariantContains(Constants.DatabaseSchema.Tables.Webhook2ContentTypeKeys) is false)
         {
-            return;
+            Create.Table<Webhook2ContentTypeKeysDto>().Do();
         }
 
-        Create.Table<Webhook2ContentTypeKeysDto>().Do();
-
-        if (tables.InvariantContains(Constants.DatabaseSchema.Tables.Webhook2Headers))
+        if (tables.InvariantContains(Constants.DatabaseSchema.Tables.Webhook2Headers) is false)
         {
-            return;
+            Create.Table<Webhook2HeadersDto>().Do();
         }
 
-        Create.Table<Webhook2HeadersDto>().Do();
-
-        if (tables.InvariantContains(Constants.DatabaseSchema.Tables.WebhookLog))
+        if (tables.InvariantContains(Constants.DatabaseSchema.Tables.WebhookLog) is false)
         {
-            return;
+            Create.Table<WebhookLogDto>().Do();
         }
-
-        Create.Table<WebhookLogDto>().Do();
     }
 }
