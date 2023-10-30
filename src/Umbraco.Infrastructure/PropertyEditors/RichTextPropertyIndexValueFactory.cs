@@ -6,7 +6,6 @@ using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Examine;
-using Umbraco.Cms.Infrastructure.Extensions;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
@@ -33,9 +32,7 @@ internal class RichTextPropertyIndexValueFactory : NestedPropertyIndexValueFacto
     public IEnumerable<KeyValuePair<string, IEnumerable<object?>>> GetIndexValues(IProperty property, string? culture, string? segment, bool published, IEnumerable<string> availableCultures)
     {
         var val = property.GetValue(culture, segment, published);
-        RichTextEditorValue? richTextEditorValue = val.TryParseRichTextEditorValue(_jsonSerializer, _logger);
-
-        if (richTextEditorValue is null)
+        if (RichTextPropertyEditorHelper.TryParseRichTextEditorValue(val, _jsonSerializer, _logger, out RichTextEditorValue? richTextEditorValue) is false)
         {
             yield break;
         }

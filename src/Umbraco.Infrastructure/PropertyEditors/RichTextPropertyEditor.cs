@@ -1,9 +1,9 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Media;
@@ -15,7 +15,6 @@ using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Templates;
-using Umbraco.Cms.Infrastructure.Extensions;
 using Umbraco.Cms.Infrastructure.Macros;
 using Umbraco.Cms.Infrastructure.Templates;
 using Umbraco.Extensions;
@@ -237,8 +236,7 @@ public class RichTextPropertyEditor : DataEditor
         /// <returns></returns>
         public override IEnumerable<UmbracoEntityReference> GetReferences(object? value)
         {
-            RichTextEditorValue? richTextEditorValue = TryParseEditorValue(value);
-            if (richTextEditorValue is null)
+            if (TryParseEditorValue(value, out RichTextEditorValue? richTextEditorValue) is false)
             {
                 return Array.Empty<UmbracoEntityReference>();
             }
@@ -263,7 +261,11 @@ public class RichTextPropertyEditor : DataEditor
             // references from blocks
             if (richTextEditorValue.Blocks is not null)
             {
-                references.AddRange(GetBlockValueReferences(richTextEditorValue.Blocks));
+                BlockEditorData? blockEditorData = ConvertAndClean(richTextEditorValue.Blocks);
+                if (blockEditorData is not null)
+                {
+                    references.AddRange(GetBlockValueReferences(blockEditorData.BlockValue));
+                }
             }
 
             return references;
@@ -271,10 +273,18 @@ public class RichTextPropertyEditor : DataEditor
 
         public override IEnumerable<ITag> GetTags(object? value, object? dataTypeConfiguration, int? languageId)
         {
-            RichTextEditorValue? richTextEditorValue = TryParseEditorValue(value);
-            return richTextEditorValue?.Blocks is not null
-                ? GetBlockValueTags(richTextEditorValue.Blocks, languageId)
-                : Array.Empty<ITag>();
+            if (TryParseEditorValue(value, out RichTextEditorValue? richTextEditorValue) is false || richTextEditorValue.Blocks is null)
+            {
+                return Array.Empty<ITag>();
+            }
+
+            BlockEditorData? blockEditorData = ConvertAndClean(richTextEditorValue.Blocks);
+            if (blockEditorData is null)
+            {
+                return Array.Empty<ITag>();
+            }
+
+            return GetBlockValueTags(blockEditorData.BlockValue, languageId);
         }
 
         /// <summary>
@@ -286,8 +296,7 @@ public class RichTextPropertyEditor : DataEditor
         public override object? ToEditor(IProperty property, string? culture = null, string? segment = null)
         {
             var value = property.GetValue(culture, segment);
-            RichTextEditorValue? richTextEditorValue = TryParseEditorValue(value);
-            if (richTextEditorValue is null)
+            if (TryParseEditorValue(value, out RichTextEditorValue? richTextEditorValue) is false)
             {
                 return null;
             }
@@ -310,8 +319,7 @@ public class RichTextPropertyEditor : DataEditor
         /// <returns></returns>
         public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
         {
-            RichTextEditorValue? richTextEditorValue = TryParseEditorValue(editorValue.Value);
-            if (richTextEditorValue is null)
+            if (TryParseEditorValue(editorValue.Value, out RichTextEditorValue? richTextEditorValue) is false)
             {
                 return null;
             }
@@ -341,11 +349,11 @@ public class RichTextPropertyEditor : DataEditor
             RichTextEditorValue cleanedUpRichTextEditorValue = CleanAndMapBlocks(richTextEditorValue, MapBlockValueFromEditor);
 
             // return json
-            return _jsonSerializer.Serialize(cleanedUpRichTextEditorValue);
+            return RichTextPropertyEditorHelper.SerializeRichTextEditorValue(cleanedUpRichTextEditorValue, _jsonSerializer);
         }
 
-        private RichTextEditorValue? TryParseEditorValue(object? value)
-            => value.TryParseRichTextEditorValue(_jsonSerializer, _logger);
+        private bool TryParseEditorValue(object? value, [NotNullWhen(true)] out RichTextEditorValue? richTextEditorValue)
+            => RichTextPropertyEditorHelper.TryParseRichTextEditorValue(value, _jsonSerializer, _logger, out richTextEditorValue);
 
         private RichTextEditorValue CleanAndMapBlocks(RichTextEditorValue richTextEditorValue, Action<BlockValue> handleMapping)
         {
@@ -355,23 +363,15 @@ public class RichTextPropertyEditor : DataEditor
                 return MarkupWithEmptyBlocks();
             }
 
-            try
-            {
-                BlockEditorValues blockEditorValues = CreateBlockEditorValues();
-                BlockEditorData? blockEditorData = blockEditorValues.ConvertAndClean(richTextEditorValue.Blocks);
+            BlockEditorData? blockEditorData = ConvertAndClean(richTextEditorValue.Blocks);
 
-                if (blockEditorData is not null)
-                {
-                    handleMapping(blockEditorData.BlockValue);
-                    return new RichTextEditorValue
-                    {
-                        Markup = richTextEditorValue.Markup, Blocks = blockEditorData.BlockValue
-                    };
-                }
-            }
-            catch (JsonSerializationException exception)
+            if (blockEditorData is not null)
             {
-                _logger.LogError(exception, "Could not parse block editor value, see exception for details.");
+                handleMapping(blockEditorData.BlockValue);
+                return new RichTextEditorValue
+                {
+                    Markup = richTextEditorValue.Markup, Blocks = blockEditorData.BlockValue
+                };
             }
 
             // could not deserialize the blocks or handle the mapping, store empty block value
@@ -381,6 +381,12 @@ public class RichTextPropertyEditor : DataEditor
             {
                 Markup = richTextEditorValue.Markup, Blocks = new BlockValue()
             };
+        }
+
+        private BlockEditorData? ConvertAndClean(BlockValue blockValue)
+        {
+            BlockEditorValues blockEditorValues = CreateBlockEditorValues();
+            return blockEditorValues.ConvertAndClean(blockValue);
         }
 
         private BlockEditorValues CreateBlockEditorValues()

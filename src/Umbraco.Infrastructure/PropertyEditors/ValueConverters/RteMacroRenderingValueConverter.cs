@@ -117,8 +117,7 @@ public class RteMacroRenderingValueConverter : SimpleTinyMceValueConverter, IDel
     // to counterweigh the cache level, we're going to do as much of the heavy lifting as we can while converting source to intermediate
     public override object? ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
     {
-        RichTextEditorValue? richTextEditorValue = source.TryParseRichTextEditorValue(_jsonSerializer, _logger);
-        if (richTextEditorValue is null)
+        if (RichTextPropertyEditorHelper.TryParseRichTextEditorValue(source, _jsonSerializer, _logger, out RichTextEditorValue? richTextEditorValue) is false)
         {
             return null;
         }

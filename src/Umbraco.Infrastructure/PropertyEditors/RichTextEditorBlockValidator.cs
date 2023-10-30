@@ -2,7 +2,6 @@
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Infrastructure.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
@@ -27,7 +26,7 @@ internal class RichTextEditorBlockValidator : BlockEditorValidatorBase
 
     protected override IEnumerable<ElementTypeValidationModel> GetElementTypeValidation(object? value)
     {
-        RichTextEditorValue? richTextEditorValue = value.TryParseRichTextEditorValue(_jsonSerializer, _logger);
+        RichTextPropertyEditorHelper.TryParseRichTextEditorValue(value, _jsonSerializer, _logger, out RichTextEditorValue? richTextEditorValue);
         if (richTextEditorValue?.Blocks is null)
         {
             return Array.Empty<ElementTypeValidationModel>();
