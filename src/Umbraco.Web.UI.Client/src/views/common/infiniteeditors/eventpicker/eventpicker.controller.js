@@ -55,13 +55,15 @@
       if (!event.selected) {
         event.selected = true;
         $scope.model.selection.push(event);
-        if(event.name.toLowerCase().includes("content")){
-          vm.events = vm.events.filter(event => event.name.toLowerCase().includes("content"));
+        // Only filter if we have not selected an item yet.
+        if($scope.model.selection.length === 1){
+          if(event.name.toLowerCase().includes("content")){
+            vm.events = vm.events.filter(event => event.name.toLowerCase().includes("content"));
+          }
+          else if (event.name.toLowerCase().includes("media")){
+            vm.events = vm.events.filter(event => event.name.toLowerCase().includes("media"));
+          }
         }
-        else{
-          vm.events = vm.events.filter(event => event.name.toLowerCase().includes("media"));
-        }
-
       } else {
 
         $scope.model.selection.forEach(function (selectedEvent, index) {
