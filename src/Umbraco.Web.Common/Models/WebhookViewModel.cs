@@ -22,5 +22,5 @@ public class WebhookViewModel
     public bool Enabled { get; set; }
 
     [DataMember(Name = "headers")]
-    public Dictionary<string, string> Headers { get; set; } = new();
+    public IDictionary<string, string> Headers { get; set; } = new Dictionary<string, string>();
 }

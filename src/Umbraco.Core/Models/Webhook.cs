@@ -1,11 +1,8 @@
-﻿using Umbraco.Cms.Core.Models.Entities;
-using Umbraco.Extensions;
-
-namespace Umbraco.Cms.Core.Models;
+﻿namespace Umbraco.Cms.Core.Models;
 
 public class Webhook
 {
-    public Webhook(string url, bool? enabled = null, Guid[]? entityKeys = null, string[]? events = null, Dictionary<string, string>? headers = null)
+    public Webhook(string url, bool? enabled = null, Guid[]? entityKeys = null, string[]? events = null, IDictionary<string, string>? headers = null)
     {
         Url = url;
         Headers = headers ?? new Dictionary<string, string>();
@@ -26,5 +23,5 @@ public class Webhook
 
     public bool Enabled { get; set; }
 
-    public Dictionary<string, string> Headers { get; set; }
+    public IDictionary<string, string> Headers { get; set; }
 }
