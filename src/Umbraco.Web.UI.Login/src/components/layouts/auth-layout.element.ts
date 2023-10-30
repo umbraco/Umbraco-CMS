@@ -54,11 +54,17 @@ export class UmbAuthLayoutElement extends LitElement {
 				position: relative;
 				z-index: 0;
 			}
-			:host {
+			:host::before {
 				background-image: var(--background-image);
 				background-position: 50%;
 				background-repeat: no-repeat;
 				background-size: cover;
+				content: '';
+				inset: 0;
+				position: absolute;
+				width: 100%;
+				height: 100%;
+				z-index: -2;
 				transform: scaleX(-1);
 			}
 			:host::after {
@@ -132,7 +138,7 @@ export class UmbAuthLayoutElement extends LitElement {
 				margin-inline: auto;
 			}
 			@media (min-width: 979px) {
-				:host {
+				:host::before {
 					background-image: none;
 				}
 				:host([has-background-image]) #image-column {
