@@ -1,31 +1,38 @@
 import { css, CSSResultGroup, html, LitElement, PropertyValueMap } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
+import { styleMap } from 'lit/directives/style-map.js';
+import { when } from 'lit/directives/when.js';
 
 @customElement('umb-auth-layout')
 export class UmbAuthLayoutElement extends LitElement {
 	@property({ attribute: 'background-image' })
 	backgroundImage?: string; //TODO: Implement
 
-	@property({ attribute: 'logo-image' })
-	logoImage?: string; //TODO: For the current design we need two logos. One for on top of the image and one for smaller screens where the image is gone and the logo is in the top left corner on white background.
+	@property({ attribute: 'logo-light' })
+	logoLight?: string;
+
+	@property({ attribute: 'logo-dark' })
+	logoDark?: string;
 
 	protected updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		super.updated(_changedProperties);
-		if (_changedProperties.has('backgroundImage')) {
-			this.style.setProperty('--background-image', `url(${this.backgroundImage})`);
-		}
 		if (_changedProperties.has('logoImage')) {
-			this.style.setProperty('--logo-image', `url(${this.logoImage})`);
+			this.style.setProperty('--logo-light', `url(${this.logoLight})`);
+			this.style.setProperty('--logo-dark', `url(${this.logoDark})`);
 		}
+	}
+
+	#renderImage() {
+		return html` <div id="image-column">
+			<div id="image" style=${styleMap({ backgroundImage: `url(${this.backgroundImage})` })}></div>
+		</div>`;
 	}
 
 	render() {
 		return html`
 			<div id="layout">
 				<div id="logo"></div>
-				<div id="image-column">
-					<div id="image"></div>
-				</div>
+				${when(this.backgroundImage, () => this.#renderImage())}
 				<div id="auth-column">
 					<div id="auth-box">
 						<slot></slot>
