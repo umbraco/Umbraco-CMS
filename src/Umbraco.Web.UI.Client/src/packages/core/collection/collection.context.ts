@@ -22,8 +22,8 @@ export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectio
 	#total = new UmbNumberState(0);
 	public readonly total = this.#total.asObservable();
 
-	#selection = new UmbArrayState<string>([]);
-	public readonly selection = this.#selection.asObservable();
+	#selectionManager = new UmbSelectionManager();
+	public readonly selection = this.#selectionManager.selection;
 
 	#filter = new UmbObjectState<FilterModelType | object>({});
 	public readonly filter = this.#filter.asObservable();
@@ -33,8 +33,6 @@ export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectio
 
 	#currentView = new UmbObjectState<ManifestCollectionView | undefined>(undefined);
 	public readonly currentView = this.#currentView.asObservable();
-
-	#selectionManager = new UmbSelectionManager();
 
 	repository?: UmbCollectionRepository;
 	collectionRootPathname: string;
