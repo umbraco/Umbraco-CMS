@@ -22,6 +22,7 @@
     <AdditionalFiles Include="umbraco\UmbracoBackOffice\Default.cshtml" />
     <AdditionalFiles Include="umbraco\UmbracoBackOffice\Preview.cshtml" />
     <AdditionalFiles Include="umbraco\UmbracoInstall\Index.cshtml" />
+    <AdditionalFiles Include="umbraco\UmbracoLogin\Index.cshtml" />
     <AdditionalFiles Include="umbraco\UmbracoWebsite\Maintenance.cshtml" />
     <AdditionalFiles Include="umbraco\UmbracoWebsite\NoNodes.cshtml" />
     <AdditionalFiles Include="umbraco\UmbracoWebsite\NotFound.cshtml" />
