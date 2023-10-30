@@ -25,8 +25,6 @@ export class UmbResendInviteToUserModalElement extends UmbModalBaseElement {
 		const { error } = await this.#userRepository.resendInvite({
 			message,
 		});
-
-		debugger;
 	}
 
 	private _closeModal() {
