@@ -7,5 +7,4 @@ export * from './item-repository.interface.js';
 export * from './move-repository.interface.js';
 export * from './copy-repository.interface.js';
 export * from './repository-items.manager.js';
-export * from './repository.interface.js';
 export * from './repository-base.js';
