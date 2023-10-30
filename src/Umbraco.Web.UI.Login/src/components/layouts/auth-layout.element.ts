@@ -5,7 +5,7 @@ import { when } from 'lit/directives/when.js';
 
 @customElement('umb-auth-layout')
 export class UmbAuthLayoutElement extends LitElement {
-	@property({ attribute: 'background-image', reflect: true })
+	@property({ attribute: 'background-image' })
 	backgroundImage?: string;
 
 	@property({ attribute: 'logo-light' })
@@ -24,6 +24,8 @@ export class UmbAuthLayoutElement extends LitElement {
 	}
 
 	#renderImage() {
+		this.toggleAttribute('has-background-image', !!this.backgroundImage);
+
 		return html`<div id="image-column">
 			<div id="image" style=${styleMap({ backgroundImage: `url(${this.backgroundImage})` })}></div>
 		</div>`;

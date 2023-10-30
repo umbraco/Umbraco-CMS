@@ -20,11 +20,14 @@ export default class UmbAuthElement extends LitElement {
 		umbAuthContext.disableLocalLogin = value;
 	}
 
-	@property({ type: String, attribute: 'background-image' })
+	@property({ attribute: 'background-image' })
 	backgroundImage?: string;
 
-	@property({ type: String, attribute: 'logo-image' })
-	logoImage?: string;
+	@property({ attribute: 'logo-light' })
+	logoLight?: string;
+
+	@property({ attribute: 'logo-dark' })
+	logoDark?: string;
 
 	@property({ type: Boolean, attribute: 'username-is-email' })
 	usernameIsEmail = false;
@@ -65,7 +68,10 @@ export default class UmbAuthElement extends LitElement {
 
 	render() {
 		return html`
-			<umb-auth-layout background-image=${ifDefined(this.backgroundImage)} logo-image=${ifDefined(this.logoImage)}>
+			<umb-auth-layout
+				background-image=${ifDefined(this.backgroundImage)}
+				logo-light=${ifDefined(this.logoLight)}
+				logo-dark=${ifDefined(this.logoDark)}>
 				${this._renderFlowAndStatus()}
 			</umb-auth-layout>
 		`;
@@ -78,16 +84,22 @@ export default class UmbAuthElement extends LitElement {
 
 		if (status === 'resetCodeExpired') {
 			return html` <umb-error-layout
-							header="Hi there"
-							message=${until(umbLocalizationContext.localize('login_resetCodeExpired'), 'The link you have clicked on is invalid or has expired')}>
-						</umb-error-layout>`;
+				header="Hi there"
+				message=${until(
+					umbLocalizationContext.localize('login_resetCodeExpired'),
+					'The link you have clicked on is invalid or has expired'
+				)}>
+			</umb-error-layout>`;
 		}
 
 		if (flow === 'invite-user' && status === 'false') {
 			return html` <umb-error-layout
-							header="Hi there"
-							message=${until(umbLocalizationContext.localize('user_userinviteExpiredMessage'), 'Welcome to Umbraco! Unfortunately your invite has expired. Please contact your administrator and ask them to resend it.')}>
-						</umb-error-layout>`;
+				header="Hi there"
+				message=${until(
+					umbLocalizationContext.localize('user_userinviteExpiredMessage'),
+					'Welcome to Umbraco! Unfortunately your invite has expired. Please contact your administrator and ask them to resend it.'
+				)}>
+			</umb-error-layout>`;
 		}
 
 		// validate
@@ -109,11 +121,11 @@ export default class UmbAuthElement extends LitElement {
 
 			default:
 				return html`<umb-login-page
-								?allow-password-reset=${this.allowPasswordReset}
-								?username-is-email=${this.usernameIsEmail}>
-								<slot name="subheadline" slot="subheadline"></slot>
-								<slot name="external" slot="external"></slot>
-							</umb-login-page>`;
+					?allow-password-reset=${this.allowPasswordReset}
+					?username-is-email=${this.usernameIsEmail}>
+					<slot name="subheadline" slot="subheadline"></slot>
+					<slot name="external" slot="external"></slot>
+				</umb-login-page>`;
 		}
 	}
 }
