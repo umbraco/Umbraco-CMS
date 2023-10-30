@@ -53,7 +53,7 @@ export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectio
 						this.requestCollection();
 					}
 				},
-				'umbCollectionRepository'
+				'umbCollectionRepositoryObserver'
 			).asPromise(),
 
 			this.observe(umbExtensionsRegistry.extensionsOfType('collectionView').pipe(
@@ -64,7 +64,7 @@ export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectio
 			(views) => {
 				this.#views.next(views);
 				this.#setCurrentView();
-			}, 'umbCollectionViews').asPromise(),
+			}, 'umbCollectionViewsObserver').asPromise(),
 		]);
 	}
 
