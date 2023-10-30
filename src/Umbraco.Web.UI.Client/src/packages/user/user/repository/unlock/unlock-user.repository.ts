@@ -1,14 +1,14 @@
 import { UmbUserRepositoryBase } from '../user-repository-base.js';
 import { UmbUnlockUserServerDataSource } from './unlock-user.server.data.js';
-import { type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UserStateModel } from '@umbraco-cms/backoffice/backend-api';
 
 export class UmbUnlockUserRepository extends UmbUserRepositoryBase {
 	#source: UmbUnlockUserServerDataSource;
 
-	constructor(host: UmbControllerHostElement) {
+	constructor(host: UmbControllerHost) {
 		super(host);
-		this.#source = new UmbUnlockUserServerDataSource(this.host);
+		this.#source = new UmbUnlockUserServerDataSource(host);
 	}
 
 	async unlock(ids: Array<string>) {

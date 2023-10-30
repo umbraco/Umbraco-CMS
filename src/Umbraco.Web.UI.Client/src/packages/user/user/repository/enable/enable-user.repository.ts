@@ -1,14 +1,14 @@
 import { UmbUserRepositoryBase } from '../user-repository-base.js';
 import { UmbEnableUserServerDataSource } from './enable-user.server.data.js';
-import { type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UserStateModel } from '@umbraco-cms/backoffice/backend-api';
 
 export class UmbEnableUserRepository extends UmbUserRepositoryBase {
 	#enableSource: UmbEnableUserServerDataSource;
 
-	constructor(host: UmbControllerHostElement) {
+	constructor(host: UmbControllerHost) {
 		super(host);
-		this.#enableSource = new UmbEnableUserServerDataSource(this.host);
+		this.#enableSource = new UmbEnableUserServerDataSource(host);
 	}
 
 	async enable(ids: Array<string>) {

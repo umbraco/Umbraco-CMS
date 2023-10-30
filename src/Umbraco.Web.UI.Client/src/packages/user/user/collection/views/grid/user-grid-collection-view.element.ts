@@ -14,7 +14,7 @@ export class UmbUserGridCollectionViewElement extends UmbLitElement {
 	private _users: Array<UmbUserDetail> = [];
 
 	@state()
-	private _selection: Array<string> = [];
+	private _selection: Array<string | null> = [];
 
 	@state()
 	private _loading = false;
@@ -28,8 +28,8 @@ export class UmbUserGridCollectionViewElement extends UmbLitElement {
 
 		this.consumeContext(UMB_COLLECTION_CONTEXT, (instance) => {
 			this.#collectionContext = instance as UmbUserCollectionContext;
-			this.observe(this.#collectionContext.selection, (selection) => (this._selection = selection));
-			this.observe(this.#collectionContext.items, (items) => (this._users = items));
+			this.observe(this.#collectionContext.selection, (selection) => (this._selection = selection), 'umbCollectionSelectionObserver');
+			this.observe(this.#collectionContext.items, (items) => (this._users = items), 'umbCollectionItemsObserver');
 		});
 
 		this.#requestUserGroups();

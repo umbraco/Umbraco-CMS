@@ -1,15 +1,15 @@
 import { UmbUserRepositoryBase } from '../user-repository-base.js';
 import { UmbUserItemServerDataSource } from './user-item.server.data.js';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbItemDataSource, UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 import { UserItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 export class UmbUserItemRepository extends UmbUserRepositoryBase implements UmbItemRepository<UserItemResponseModel> {
 	#itemSource: UmbItemDataSource<UserItemResponseModel>;
 
-	constructor(host: UmbControllerHostElement) {
+	constructor(host: UmbControllerHost) {
 		super(host);
-		this.#itemSource = new UmbUserItemServerDataSource(this.host);
+		this.#itemSource = new UmbUserItemServerDataSource(host);
 	}
 
 	/**

@@ -60,7 +60,7 @@ export class UmbUserTableCollectionViewElement extends UmbLitElement {
 	private _users: Array<UmbUserDetail> = [];
 
 	@state()
-	private _selection: Array<string> = [];
+	private _selection: Array<string | null> = [];
 
 	#collectionContext?: UmbUserCollectionContext;
 

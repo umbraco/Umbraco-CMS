@@ -3,7 +3,7 @@ import { UmbUserServerDataSource } from './sources/user.server.data.js';
 import { UmbUserSetGroupsServerDataSource } from './sources/user-set-group.server.data.js';
 
 import { UmbUserRepositoryBase } from './user-repository-base.js';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
 import {
 	CreateUserRequestModel,
@@ -25,11 +25,11 @@ export class UmbUserRepository extends UmbUserRepositoryBase implements UmbUserD
 	#setUserGroupsSource: UmbUserSetGroupDataSource;
 	#notificationContext?: UmbNotificationContext;
 
-	constructor(host: UmbControllerHostElement) {
+	constructor(host: UmbControllerHost) {
 		super(host);
 
-		this.#detailSource = new UmbUserServerDataSource(this.host);
-		this.#setUserGroupsSource = new UmbUserSetGroupsServerDataSource(this.host);
+		this.#detailSource = new UmbUserServerDataSource(host);
+		this.#setUserGroupsSource = new UmbUserSetGroupsServerDataSource(host);
 	}
 
 	// DETAILS
@@ -96,8 +96,11 @@ export class UmbUserRepository extends UmbUserRepositoryBase implements UmbUserD
 		}
 
 		if (!error) {
+			// TODO: how do we localize here?
+			// The localize method shouldn't be part of the UmbControllerHost interface
+			// this._host.localize?.term('speechBubbles_editUserSaved') ??
 			const notification = {
-				data: { message: this.host.localize?.term('speechBubbles_editUserSaved') ?? 'User saved' },
+				data: { message:  'User saved' },
 			};
 			this.#notificationContext?.peek('positive', notification);
 		}

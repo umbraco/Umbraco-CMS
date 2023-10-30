@@ -1,15 +1,15 @@
 import { UmbUserRepositoryBase } from '../user-repository-base.js';
 import { type UmbInviteUserDataSource } from './types.js';
 import { UmbInviteUserServerDataSource } from './invite-user.server.data.js';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { InviteUserRequestModel } from '@umbraco-cms/backoffice/backend-api';
 
 export class UmbInviteUserRepository extends UmbUserRepositoryBase {
 	#inviteSource: UmbInviteUserDataSource;
 
-	constructor(host: UmbControllerHostElement) {
+	constructor(host: UmbControllerHost) {
 		super(host);
-		this.#inviteSource = new UmbInviteUserServerDataSource(this.host);
+		this.#inviteSource = new UmbInviteUserServerDataSource(host);
 	}
 
 	/**
