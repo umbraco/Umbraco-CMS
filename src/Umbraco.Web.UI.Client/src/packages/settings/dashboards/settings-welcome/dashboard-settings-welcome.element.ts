@@ -1,86 +1,94 @@
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
-import { css, html, LitElement, customElement } from '@umbraco-cms/backoffice/external/lit';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-dashboard-settings-welcome')
-export class UmbDashboardSettingsWelcomeElement extends LitElement {
+export class UmbDashboardSettingsWelcomeElement extends UmbLitElement {
 	render() {
 		return html`
 			<section id="settings-dashboard" class="uui-text">
 				<uui-box>
-					<h1 class="uui-h3">Documentation</h1>
-					<p>Read more about working with the items in Settings in our Documentation.</p>
+					<h1 class="uui-h3"><umb-localize key="settingsDashboard_documentationHeader">Documentation</umb-localize></h1>
+					<p>
+						<umb-localize key="settingsDashboard_documentationDescription">
+							Read more about working with the items in Settings in our Documentation.
+						</umb-localize>
+					</p>
 					<uui-button
 						look="primary"
 						href="https://docs.umbraco.com/umbraco-cms/umbraco-cms"
-						label="Get the help you need"
+						label=${this.localize.term('settingsDashboard_getHelp')}
 						target="_blank"
-						rel="noopener">
-						Get the help you need
-					</uui-button>
+						rel="noopener"></uui-button>
 				</uui-box>
 
 				<uui-box>
-					<h1 class="uui-h3">Community</h1>
-					<p>Ask a question in the community forum or our Discord community</p>
+					<h1 class="uui-h3"><umb-localize key="settingsDashboard_communityHeader">Community</umb-localize></h1>
+					<p>
+						<umb-localize key="settingsDashboard_supportDescription">
+							Ask a question in the community forum or our Discord community
+						</umb-localize>
+					</p>
 					<uui-button
 						look="primary"
 						href="https://our.umbraco.com/forum"
-						label="Go to the forum"
+						label=${this.localize.term('settingsDashboard_goForum')}
 						target="_blank"
-						rel="noopener">
-						Go to the forum
-					</uui-button>
+						rel="noopener"></uui-button>
 					<uui-button
 						look="primary"
 						href="https://discord.umbraco.com"
-						label="Chat with the community"
+						label=${this.localize.term('settingsDashboard_chatWithCommunity')}
 						target="_blank"
-						rel="noopener">
-						Chat with the community
-					</uui-button>
+						rel="noopener"></uui-button>
 				</uui-box>
 
 				<uui-box class="training">
-					<h1 class="uui-h3">Training</h1>
+					<h1 class="uui-h3"><umb-localize key="settingsDashboard_trainingHeader">Training</umb-localize></h1>
 
-					<p>Find out about real-life training and certification opportunities</p>
+					<p>
+						<umb-localize key="settingsDashboard_trainingDescription">
+							Find out about real-life training and certification opportunities
+						</umb-localize>
+					</p>
 					<uui-button
 						look="primary"
 						href="https://umbraco.com/training/"
-						label="Get Certified"
+						label=${this.localize.term('settingsDashboard_getCertified')}
 						target="_blank"
-						rel="noopener">
-						Get Certified
-					</uui-button>
+						rel="noopener"></uui-button>
 				</uui-box>
 
 				<uui-box>
-					<h1 class="uui-h3">Support</h1>
-					<p>Ask a question in the community forum or our Discord community.</p>
+					<h1 class="uui-h3"><umb-localize key="settingsDashboard_supportHeader">Support</umb-localize></h1>
+
+					<p>
+						<umb-localize key="settingsDashboard_supportDescription">
+							Ask a question in the community forum or our Discord community.
+						</umb-localize>
+					</p>
 					<uui-button
 						look="primary"
 						href="https://umbraco.com/support/"
-						label="Get the help you need"
+						label=${this.localize.term('settingsDashboard_getHelp')}
 						target="_blank"
-						rel="noopener">
-						Get the help you need
-					</uui-button>
+						rel="noopener"></uui-button>
 				</uui-box>
 
 				<uui-box>
-					<h1 class="uui-h3">Videos</h1>
+					<h1 class="uui-h3"><umb-localize key="settingsDashboard_videosHeader">Videos</umb-localize></h1>
 					<p>
-						Watch our free tutorial videos on the Umbraco Learning Base YouTube channel, to get upto speed quickly with
-						Umbraco.
+						<umb-localize key="settingsDashboard_videosDescription">
+							Watch our free tutorial videos on the Umbraco Learning Base YouTube channel, to get upto speed quickly
+							with Umbraco.
+						</umb-localize>
 					</p>
 					<uui-button
 						look="primary"
 						href="https://www.youtube.com/c/UmbracoLearningBase"
-						label="Watch the videos"
+						label=${this.localize.term('settingsDashboard_watchVideos')}
 						target="_blank"
-						rel="noopener">
-						Watch the videos
-					</uui-button>
+						rel="noopener"></uui-button>
 				</uui-box>
 			</section>
 		`;
