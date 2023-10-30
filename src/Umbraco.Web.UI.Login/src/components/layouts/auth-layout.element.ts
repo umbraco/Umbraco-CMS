@@ -1,12 +1,12 @@
-import { css, CSSResultGroup, html, LitElement, PropertyValueMap } from 'lit';
+import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 import { when } from 'lit/directives/when.js';
 
 @customElement('umb-auth-layout')
 export class UmbAuthLayoutElement extends LitElement {
-	@property({ attribute: 'background-image' })
-	backgroundImage?: string; //TODO: Implement
+	@property({ attribute: 'background-image', reflect: true })
+	backgroundImage?: string;
 
 	@property({ attribute: 'logo-light' })
 	logoLight?: string;
@@ -14,16 +14,17 @@ export class UmbAuthLayoutElement extends LitElement {
 	@property({ attribute: 'logo-dark' })
 	logoDark?: string;
 
-	protected updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
-		super.updated(_changedProperties);
-		if (_changedProperties.has('logoImage')) {
-			this.style.setProperty('--logo-light', `url(${this.logoLight})`);
-			this.style.setProperty('--logo-dark', `url(${this.logoDark})`);
-		}
+	#renderLogo() {
+		return html`<div
+			style=${styleMap({
+				'--logo-light': `url(${this.logoLight})`,
+				'--logo-dark': `url(${this.logoDark})`,
+			})}
+			id="logo"></div>`;
 	}
 
 	#renderImage() {
-		return html` <div id="image-column">
+		return html`<div id="image-column">
 			<div id="image" style=${styleMap({ backgroundImage: `url(${this.backgroundImage})` })}></div>
 		</div>`;
 	}
@@ -31,8 +32,7 @@ export class UmbAuthLayoutElement extends LitElement {
 	render() {
 		return html`
 			<div id="layout">
-				<div id="logo"></div>
-				${when(this.backgroundImage, () => this.#renderImage())}
+				${this.#renderLogo()} ${when(this.backgroundImage, () => this.#renderImage())}
 				<div id="auth-column">
 					<div id="auth-box">
 						<slot></slot>
@@ -52,8 +52,11 @@ export class UmbAuthLayoutElement extends LitElement {
 			#layout {
 				display: flex;
 				height: 100%;
+			}
+			:host([background-image]) #layout {
 				max-width: 2000px;
 			}
+
 			#image-column {
 				display: none;
 				padding: var(--uui-size-layout-2);
@@ -66,7 +69,7 @@ export class UmbAuthLayoutElement extends LitElement {
 			}
 			#logo {
 				position: fixed;
-				background-image: url('login/umbraco_logo_blue_horizontal.svg'); /* should use a dark logo here */
+				background-image: var(--logo-light);
 				background-repeat: no-repeat;
 				z-index: 1;
 				width: 80px;
@@ -90,7 +93,6 @@ export class UmbAuthLayoutElement extends LitElement {
 				background-position: 50%;
 				background-repeat: no-repeat;
 				background-size: cover;
-				background-image: url('login/loginImage.jpg');
 				width: 100%;
 				height: 100%;
 				transform: scaleX(-1);
@@ -106,39 +108,37 @@ export class UmbAuthLayoutElement extends LitElement {
 				margin-inline: auto;
 			}
 			@media (min-width: 850px) {
-				#image-column {
+				:host([background-image]) #image-column {
 					display: block;
 				}
-				#auth-box {
+				:host([background-image]) #auth-box {
 					width: 300px;
 				}
-				#logo {
-					background-image: url('login/umbraco_logo_white_horizontal.svg');
+				:host([background-image]) #logo {
+					background-image: var(--logo-dark);
 					top: 48px;
 					left: 48px;
 					width: 140px;
 					height: 39px;
 				}
-				#auth-column {
+				:host([background-image]) #auth-column {
 					max-height: calc(50% + 200px);
 					width: max-content;
 					padding-inline: 100px;
 				}
 			}
 			@media (min-width: 1300px) {
-				#image-column {
+				:host([background-image]) #image-column {
 					padding: var(--uui-size-layout-3);
 					padding-right: 0;
 				}
-				#auth-column {
+				:host([background-image]) #auth-column {
 					padding-inline: 200px;
 				}
-				#logo {
+				:host([background-image]) #logo {
 					top: 64px;
 					left: 64px;
 				}
-			}
-			@media (min-width: 1600px) {
 			}
 		`,
 	];
