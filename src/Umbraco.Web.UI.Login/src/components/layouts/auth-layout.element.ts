@@ -92,7 +92,7 @@ export class UmbAuthLayoutElement extends LitElement {
 			}
 			#logo {
 				position: fixed;
-				background-image: var(--logo-light);
+				background-image: var(--logo-dark);
 				background-repeat: no-repeat;
 				z-index: 1;
 				width: 80px;
@@ -141,7 +141,7 @@ export class UmbAuthLayoutElement extends LitElement {
 					width: 300px;
 				}
 				:host([has-background-image]) #logo {
-					background-image: var(--logo-dark);
+					background-image: var(--logo-light);
 					top: 48px;
 					left: 48px;
 					width: 140px;
