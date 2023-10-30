@@ -27,5 +27,7 @@ public class ContentUnpublishWebhookEvent : WebhookEventBase<ContentUnpublishedN
     {
     }
 
-    protected override IEnumerable<IContent> GetEntitiesFromNotification(ContentUnpublishedNotification notification) => throw new NotImplementedException();
+    protected override IEnumerable<IContent> GetEntitiesFromNotification(ContentUnpublishedNotification notification) => notification.UnpublishedEntities;
+
+    protected override object ConvertEntityToRequestPayload(IContent entity) => new DefaultPayloadModel { Id = entity.Key };
 }

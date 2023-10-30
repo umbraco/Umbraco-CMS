@@ -28,4 +28,6 @@ public class MediaDeleteWebhookEvent : WebhookEventBase<MediaDeletedNotification
     }
 
     protected override IEnumerable<IMedia> GetEntitiesFromNotification(MediaDeletedNotification notification) => notification.DeletedEntities;
+
+    protected override object ConvertEntityToRequestPayload(IMedia entity) => new DefaultPayloadModel { Id = entity.Key };
 }

@@ -68,7 +68,7 @@ public abstract class WebhookEventBase<TNotification, TEntity> : IWebhookEvent, 
                     continue;
                 }
 
-                WebhookResponseModel response = await _webhookFiringService.Fire(webhook, EventName, entity);
+                WebhookResponseModel response = await _webhookFiringService.Fire(webhook, EventName, ConvertEntityToRequestPayload(entity));
 
                 WebhookLog log = await _webhookLogFactory.CreateAsync(EventName, response, webhook, cancellationToken);
                 await _webhookLogService.CreateAsync(log);
@@ -77,4 +77,6 @@ public abstract class WebhookEventBase<TNotification, TEntity> : IWebhookEvent, 
     }
 
     protected abstract IEnumerable<TEntity> GetEntitiesFromNotification(TNotification notification);
+
+    protected abstract object? ConvertEntityToRequestPayload(TEntity entity);
 }
