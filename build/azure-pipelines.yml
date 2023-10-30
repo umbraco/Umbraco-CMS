@@ -144,6 +144,11 @@ stages:
         pool:
           vmImage: 'windows-latest'
         steps:
+          - task: UseDotNet@2
+            displayName: Use .NET $(dotnetVersion)
+            inputs:
+              version: $(dotnetVersion)
+              includePreviewVersions: $(dotnetIncludePreviewVersions)
           - task: PowerShell@2
             displayName: Install DocFX
             inputs:
