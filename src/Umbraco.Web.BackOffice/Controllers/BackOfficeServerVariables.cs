@@ -615,6 +615,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         {"allowPasswordReset", _securitySettings.AllowPasswordReset},
                         {"loginBackgroundImage", _contentSettings.LoginBackgroundImage},
                         {"loginLogoImage", _contentSettings.LoginLogoImage },
+                        {"loginLogoImageDark", _contentSettings.LoginLogoImageDark },
                         {"hideBackofficeLogo", _contentSettings.HideBackOfficeLogo },
                         {"disableDeleteWhenReferenced", _contentSettings.DisableDeleteWhenReferenced },
                         {"disableUnpublishWhenReferenced", _contentSettings.DisableUnpublishWhenReferenced },
