@@ -13,7 +13,7 @@
 (function () {
     'use strict';
 
-    function blockEditorModelObjectFactory($interpolate, $q, udiService, contentResource, localizationService, umbRequestHelper, clipboardService, notificationsService, $compile) {
+    function blockEditorModelObjectFactory($interpolate, $q, udiService, contentResource, localizationService, umbRequestHelper, clipboardService, notificationsService, $compile, editorState) {
 
         /**
          * Simple mapping from property model content entry to editing model,
@@ -396,7 +396,11 @@
                 // removing duplicates.
                 scaffoldKeys = scaffoldKeys.filter((value, index, self) => self.indexOf(value) === index);
 
-                tasks.push(contentResource.getScaffoldByKeys(-20, scaffoldKeys).then(scaffolds => {
+                // get current node (for page context)
+                var currentPage = editorState.getCurrent();
+                var currentPageId = currentPage ? (currentPage.id > 0 ? currentPage.id : currentPage.parentId) : null || -20;
+
+                tasks.push(contentResource.getScaffoldByKeys(currentPageId, scaffoldKeys).then(scaffolds => {
                     Object.values(scaffolds).forEach(scaffold => {
                         // self.scaffolds might not exists anymore, this happens if this instance has been destroyed before the load is complete.
                         if (self.scaffolds) {
