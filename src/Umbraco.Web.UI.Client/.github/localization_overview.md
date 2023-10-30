@@ -14,8 +14,12 @@ Before you start:
 - Get an understanding of how we do localization in the new Backoffice. The explanations can be found in the stories under **Localization** by running `npm run storybook`. Alternatively see the raw story file [localization.mdx](https://github.com/umbraco/Umbraco.CMS.Backoffice/blob/main/src/packages/core/localization/stories/localization.mdx) 
 
 
+
 # Overview
-### Sections
+ - [Sections that needs to be localized](#sections)
+ - [Keys that needs to be localized](#keys)
+
+## Sections
 
 - [ ] [Header App](#header-app)
 - [ ] [Content](#content)
@@ -28,6 +32,8 @@ Before you start:
 - [ ] [Property Editors](#property-editor-ui-and-their-input)
 - [ ] [Modals](#modals)
 - [ ] [Misc](#misc)
+
+
 ### Subsections
 
 #### Header App
@@ -50,7 +56,7 @@ Before you start:
 
 #### Settings
 - [ ] Dashboards
-	- [ ] Welcome
+	- [x] Welcome / Settings
 	- [ ] Examine Management
 	- [ ] Models Builder
 	- [ ] Published Status
@@ -158,3 +164,75 @@ Rest of modals can be found:
 	- [ ] Tree Actions
 	- [ ] Recycle Bin
 - [ ] Validator messages
+
+
+## Keys
+
+Do you speak any of the following languages?
+Then we need your help! With Bellissima we added new localization keys, and we still need them available in all our supported languages.
+
+- `bs-BS` - Bosnian (Bosnia and Herzegovina)
+- `cs-CZ` - Czech (Czech Republic)
+- `cy-GB` - Welsh (United Kingdom)
+- `da-DK` - Danish (Denmark)
+- `de-DE` - German (Germany)
+- `en-GB` - English (United Kingdom)
+- `es-ES` - Spanish (Spain)
+- `fr-FR` - French (France)
+- `he-IL` - Hebrew (Israel)
+- `hr-HR` - Croatian (Croatia)
+- `it-IT` - Italian (Italy)
+- `ja-JP` - Japanese (Japan)
+- `ko-KR` - Korean (Korea)
+- `nb-NO` - Norwegian Bokmål (Norway)
+- `nl-NL` - Dutch (Netherlands)
+- `pl-PL` - Polish (Poland)
+- `pt-BR` - Portuguese (Brazil)
+- `ro-RO` - Romanian (Romania)
+- `ru-RU` - Russian (Russia)
+- `sv-SE` - Swedish (Sweden)
+- `tr-TR` - Turkish (Turkey)
+- `ua-UA` - Ukrainian (Ukraine)
+- `zh-CN` - Chinese (China)
+- `zh-TW` - Chinese (Taiwan)
+
+#### settingsDashboard
+- documentationHeader
+- documentationDescription
+- communityHeader
+- trainingHeader
+- trainingDescription
+- supportHeader
+- supportDescription
+- videosHeader
+- videosDescription
+- getHelp
+- getCertified
+- goForum
+- chatWithCommunity
+- watchVideos
+
+- [ ] `bs-BS` - Bosnian (Bosnia and Herzegovina)
+- [ ] `cs-CZ` - Czech (Czech Republic)
+- [ ] `cy-GB` - Welsh (United Kingdom)
+- [x] `da-DK` - Danish (Denmark)
+- [ ] `de-DE` - German (Germany)
+- [ ] `en-GB` - English (United Kingdom)
+- [ ] `es-ES` - Spanish (Spain)
+- [ ] `fr-FR` - French (France)
+- [ ] `he-IL` - Hebrew (Israel)
+- [ ] `hr-HR` - Croatian (Croatia)
+- [ ] `it-IT` - Italian (Italy)
+- [ ] `ja-JP` - Japanese (Japan)
+- [ ] `ko-KR` - Korean (Korea)
+- [ ] `nb-NO` - Norwegian Bokmål (Norway)
+- [ ] `nl-NL` - Dutch (Netherlands)
+- [ ] `pl-PL` - Polish (Poland)
+- [ ] `pt-BR` - Portuguese (Brazil)
+- [ ] `ro-RO` - Romanian (Romania)
+- [ ] `ru-RU` - Russian (Russia)
+- [ ] `sv-SE` - Swedish (Sweden)
+- [ ] `tr-TR` - Turkish (Turkey)
+- [ ] `ua-UA` - Ukrainian (Ukraine)
+- [ ] `zh-CN` - Chinese (China)
+- [ ] `zh-TW` - Chinese (Taiwan)
