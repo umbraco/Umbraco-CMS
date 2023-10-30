@@ -24,7 +24,8 @@ export class UmbAuthLayoutElement extends LitElement {
 	}
 
 	#renderImage() {
-		this.toggleAttribute('has-background-image', !!this.backgroundImage);
+		this.toggleAttribute('has-background-image', this.backgroundImage ? true : false);
+		this.style.setProperty('--background-image', `url(${this.backgroundImage})`);
 
 		return html`<div id="image-column">
 			<div id="image" style=${styleMap({ backgroundImage: `url(${this.backgroundImage})` })}></div>
@@ -50,12 +51,32 @@ export class UmbAuthLayoutElement extends LitElement {
 				display: block;
 				height: 100dvh;
 				background-color: var(--uui-color-surface);
+				position: relative;
+				z-index: 0;
+			}
+			:host {
+				background-image: var(--background-image);
+				background-position: 50%;
+				background-repeat: no-repeat;
+				background-size: cover;
+			}
+			:host::after {
+				content: '';
+				position: absolute;
+				inset: 0;
+				width: calc(100% - 64px);
+				height: calc(100% - 64px);
+				margin: auto;
+				background-color: #fff;
+				opacity: 0.9;
+				border-radius: 40px;
+				z-index: -1;
 			}
 			#layout {
 				display: flex;
 				height: 100%;
 			}
-			:host([background-image]) #layout {
+			:host([has-background-image]) #layout {
 				max-width: 2000px;
 			}
 
@@ -110,34 +131,37 @@ export class UmbAuthLayoutElement extends LitElement {
 				margin-inline: auto;
 			}
 			@media (min-width: 850px) {
-				:host([background-image]) #image-column {
+				:host {
+					background-image: none;
+				}
+				:host([has-background-image]) #image-column {
 					display: block;
 				}
-				:host([background-image]) #auth-box {
+				:host([has-background-image]) #auth-box {
 					width: 300px;
 				}
-				:host([background-image]) #logo {
+				:host([has-background-image]) #logo {
 					background-image: var(--logo-dark);
 					top: 48px;
 					left: 48px;
 					width: 140px;
 					height: 39px;
 				}
-				:host([background-image]) #auth-column {
+				:host([has-background-image]) #auth-column {
 					max-height: calc(50% + 200px);
 					width: max-content;
 					padding-inline: 100px;
 				}
 			}
 			@media (min-width: 1300px) {
-				:host([background-image]) #image-column {
+				:host([has-background-image]) #image-column {
 					padding: var(--uui-size-layout-3);
 					padding-right: 0;
 				}
-				:host([background-image]) #auth-column {
+				:host([has-background-image]) #auth-column {
 					padding-inline: 200px;
 				}
-				:host([background-image]) #logo {
+				:host([has-background-image]) #logo {
 					top: 64px;
 					left: 64px;
 				}
