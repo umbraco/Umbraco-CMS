@@ -45,10 +45,10 @@ export class UmbUserProfileAppProfileElement extends UmbLitElement {
 	}
 	private _changePassword() {
 		if (!this._modalContext) return;
-
-		// TODO: check if current user is admin
+		
 		this._modalContext.open(UMB_CHANGE_PASSWORD_MODAL, {
 			requireOldPassword: false,
+			userId: this._currentUser?.id ?? '',
 		});
 	}
 
