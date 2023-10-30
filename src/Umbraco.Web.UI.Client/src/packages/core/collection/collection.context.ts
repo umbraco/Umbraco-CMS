@@ -10,6 +10,7 @@ import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 import { ManifestCollectionView, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbCollectionFilterModel } from '@umbraco-cms/backoffice/collection';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
+import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 
 export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectionFilterModel> extends UmbBaseController {
 	protected entityType: string;
@@ -33,12 +34,16 @@ export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectio
 	#currentView = new UmbObjectState<ManifestCollectionView | undefined>(undefined);
 	public readonly currentView = this.#currentView.asObservable();
 
+	#selectionManager = new UmbSelectionManager();
+
 	repository?: UmbCollectionRepository;
 	collectionRootPathname: string;
 
 	constructor(host: UmbControllerHostElement, entityType: string, repositoryAlias: string) {
 		super(host);
 		this.entityType = entityType;
+
+		this.#selectionManager.setMultiple(true);
 
 		const currentUrl = new URL(window.location.href);
 		this.collectionRootPathname = currentUrl.pathname.substring(0, currentUrl.pathname.lastIndexOf('/'));
@@ -75,7 +80,7 @@ export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectio
 	 * @memberof UmbCollectionContext
 	 */
 	public isSelected(id: string) {
-		return this.#selection.getValue().includes(id);
+		return this.#selectionManager.isSelected(id);
 	}
 
 	/**
@@ -84,8 +89,7 @@ export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectio
 	 * @memberof UmbCollectionContext
 	 */
 	public setSelection(selection: Array<string>) {
-		if (!selection) return;
-		this.#selection.next(selection);
+		this.#selectionManager.setSelection(selection);
 	}
 
 	/**
@@ -94,7 +98,7 @@ export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectio
 	 * @memberof UmbCollectionContext
 	 */
 	public getSelection() {
-		this.#selection.getValue();
+		this.#selectionManager.getSelection();
 	}
 
 	/**
@@ -102,7 +106,7 @@ export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectio
 	 * @memberof UmbCollectionContext
 	 */
 	public clearSelection() {
-		this.#selection.next([]);
+		this.#selectionManager.clearSelection();
 	}
 
 	/**
@@ -111,7 +115,7 @@ export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectio
 	 * @memberof UmbCollectionContext
 	 */
 	public select(id: string) {
-		this.#selection.appendOne(id);
+		this.#selectionManager.select(id);
 	}
 
 	/**
@@ -120,7 +124,7 @@ export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectio
 	 * @memberof UmbCollectionContext
 	 */
 	public deselect(id: string) {
-		this.#selection.filter((k) => k !== id);
+		this.#selectionManager.deselect(id);
 	}
 
 	/**
