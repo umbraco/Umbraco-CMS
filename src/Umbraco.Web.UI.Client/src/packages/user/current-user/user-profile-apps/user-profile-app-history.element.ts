@@ -27,7 +27,7 @@ export class UmbUserProfileAppHistoryElement extends UmbLitElement {
 		if (this.#currentUserHistoryStore) {
 			this.observe(this.#currentUserHistoryStore.latestHistory, (history) => {
 				this._history = history;
-			});
+			}, 'umbCurrentUserHistoryObserver');
 		}
 	}
 

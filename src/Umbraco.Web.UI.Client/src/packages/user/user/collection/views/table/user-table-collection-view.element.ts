@@ -69,11 +69,11 @@ export class UmbUserTableCollectionViewElement extends UmbLitElement {
 
 		this.consumeContext(UMB_COLLECTION_CONTEXT, (instance) => {
 			this.#collectionContext = instance as UmbUserCollectionContext;
-			this.observe(this.#collectionContext.selection, (selection) => (this._selection = selection));
+			this.observe(this.#collectionContext.selection, (selection) => (this._selection = selection), 'umbCollectionSelectionObserver');
 			this.observe(this.#collectionContext.items, (items) => {
 				this._users = items;
 				this.#observeUserGroups();
-			});
+			}, 'umbCollectionItemsObserver');
 		});
 	}
 
@@ -84,7 +84,7 @@ export class UmbUserTableCollectionViewElement extends UmbLitElement {
 		this.observe(asObservable(), (userGroups) => {
 			this._userGroupItems = userGroups;
 			this.#createTableItems();
-		});
+		}, 'umbUserGroupItemsObserver');
 	}
 
 	#getUserGroupNames(ids: Array<string>) {

@@ -25,7 +25,7 @@ export class UmbUserWorkspaceInfoElement extends UmbLitElement {
 			this.observe(this.#userWorkspaceContext.data, (user) => {
 				this._user = user;
 				this.#setUserInfoItems(user);
-			});
+			}, 'umbUserObserver');
 		});
 	}
 

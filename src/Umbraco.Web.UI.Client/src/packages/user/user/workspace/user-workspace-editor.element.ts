@@ -29,7 +29,7 @@ export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 
 	#observeUser() {
 		if (!this.#workspaceContext) return;
-		this.observe(this.#workspaceContext.data, (user) => (this._user = user));
+		this.observe(this.#workspaceContext.data, (user) => (this._user = user), 'umbUserObserver');
 	}
 
 	// TODO. find a way where we don't have to do this for all workspaces.

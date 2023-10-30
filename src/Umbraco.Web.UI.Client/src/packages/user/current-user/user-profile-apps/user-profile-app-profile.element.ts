@@ -34,7 +34,7 @@ export class UmbUserProfileAppProfileElement extends UmbLitElement {
 
 		this.observe(this._auth.currentUser, (currentUser) => {
 			this._currentUser = currentUser;
-		});
+		}, 'umbCurrentUserObserver');
 	}
 
 	private _edit() {

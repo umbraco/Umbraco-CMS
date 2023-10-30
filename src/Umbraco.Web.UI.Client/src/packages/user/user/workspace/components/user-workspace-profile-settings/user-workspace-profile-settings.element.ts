@@ -32,7 +32,7 @@ export class UmbUserWorkspaceProfileSettingsElement extends UmbLitElement {
 
 		this.consumeContext(UMB_USER_WORKSPACE_CONTEXT, (instance) => {
 			this.#userWorkspaceContext = instance;
-			this.observe(this.#userWorkspaceContext.data, (user) => (this._user = user));
+			this.observe(this.#userWorkspaceContext.data, (user) => (this._user = user), 'umbUserObserver');
 		});
 	}
 
@@ -80,7 +80,7 @@ export class UmbUserWorkspaceProfileSettingsElement extends UmbLitElement {
 					selected: true,
 				});
 			}
-		});
+		}, 'umbUserObserver');
 	}
 
 	render() {

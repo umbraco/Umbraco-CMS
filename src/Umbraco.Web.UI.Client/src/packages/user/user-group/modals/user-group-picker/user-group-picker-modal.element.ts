@@ -30,7 +30,7 @@ export class UmbUserGroupPickerModalElement extends UmbModalBaseElement<any, any
 	async #observeUserGroups() {
 		const { error, asObservable } = await this.#userGroupCollectionRepository.requestCollection();
 		if (error) return;
-		this.observe(asObservable(), (items) => (this._userGroups = items));
+		this.observe(asObservable(), (items) => (this._userGroups = items), 'umbUserGroupsObserver');
 	}
 
 	#onSelected(event: UUIMenuItemEvent, item: UserGroupResponseModel) {

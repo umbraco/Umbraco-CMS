@@ -35,7 +35,7 @@ export class UmbCurrentUserModalElement extends UmbLitElement {
 
 		this.observe(this.#authContext.currentUser, (currentUser) => {
 			this._currentUser = currentUser;
-		});
+		}, 'umbCurrentUserObserver');
 	}
 
 	private _close() {

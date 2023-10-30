@@ -32,7 +32,7 @@ export class UmbUserWorkspaceContext
 			this.#data.update(data);
 		}
 
-		this.observe(asObservable(), (user) => this.onUserStoreChanges(user));
+		this.observe(asObservable(), (user) => this.onUserStoreChanges(user), 'umbUserStoreObserver');
 	}
 
 	/* TODO: some properties are allowed to update without saving. 

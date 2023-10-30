@@ -25,7 +25,7 @@ export class UmbUserActionConditionBase extends UmbBaseController implements Umb
 			this.observe(userContext.data, (data) => {
 				this.userData = data;
 				this.onUserDataChange();
-			});
+			}, 'umbUserDataActionConditionObserver');
 		});
 	}
 
