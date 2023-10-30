@@ -41,4 +41,8 @@ export class UmbSelectionManager {
 	public isSelected(unique: string | null) {
 		return this.getSelection().includes(unique);
 	}
+
+	public clearSelection() {
+		this.#selection.next([]);
+	}
 }
