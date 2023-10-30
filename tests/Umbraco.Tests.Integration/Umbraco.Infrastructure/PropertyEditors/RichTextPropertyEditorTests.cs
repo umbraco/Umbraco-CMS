@@ -59,7 +59,7 @@ public class RichTextPropertyEditorTests : UmbracoIntegrationTest
         var valueEditor = editor.GetValueEditor();
 
         const string markup = "<p>This is some markup</p>";
-        var propertyValue = JsonSerializer.Serialize(new RichTextEditorValue { Markup = markup, Blocks = null });
+        var propertyValue = RichTextPropertyEditorHelper.SerializeRichTextEditorValue(new RichTextEditorValue { Markup = markup, Blocks = null }, JsonSerializer);
 
         var content = ContentBuilder.CreateTextpageContent(contentType, "My Content", -1);
         content.Properties["bodyText"]!.SetValue(propertyValue);
@@ -91,7 +91,7 @@ public class RichTextPropertyEditorTests : UmbracoIntegrationTest
         var valueEditor = (BlockValuePropertyValueEditorBase)editor.GetValueEditor();
 
         var elementId = Guid.NewGuid();
-        var propertyValue = JsonSerializer.Serialize(
+        var propertyValue = RichTextPropertyEditorHelper.SerializeRichTextEditorValue(
             new RichTextEditorValue
             {
                 Markup = @$"<p>This is some markup</p><umb-rte-block data-content-udi=""umb://element/{elementId:N}""><!--Umbraco-Block--></umb-rte-block>",
@@ -112,7 +112,8 @@ public class RichTextPropertyEditorTests : UmbracoIntegrationTest
                                                                   	"settingsData": []
                                                                   }
                                                                   """)
-            });
+            },
+            JsonSerializer);
 
         var content = ContentBuilder.CreateTextpageContent(contentType, "My Content", -1);
         content.Properties["bodyText"]!.SetValue(propertyValue);
@@ -141,7 +142,7 @@ public class RichTextPropertyEditorTests : UmbracoIntegrationTest
         var valueEditor = (BlockValuePropertyValueEditorBase)editor.GetValueEditor();
 
         var elementId = Guid.NewGuid();
-        var propertyValue = JsonSerializer.Serialize(
+        var propertyValue = RichTextPropertyEditorHelper.SerializeRichTextEditorValue(
             new RichTextEditorValue
             {
                 Markup = @$"<p>This is some markup</p><umb-rte-block data-content-udi=""umb://element/{elementId:N}""><!--Umbraco-Block--></umb-rte-block>",
@@ -162,7 +163,8 @@ public class RichTextPropertyEditorTests : UmbracoIntegrationTest
                                                                   	"settingsData": []
                                                                   }
                                                                   """)
-            });
+            },
+            JsonSerializer);
 
         var content = ContentBuilder.CreateTextpageContent(contentType, "My Content", -1);
         content.Properties["bodyText"]!.SetValue(propertyValue);
