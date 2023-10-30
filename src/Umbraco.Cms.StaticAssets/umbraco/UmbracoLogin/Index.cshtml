@@ -18,6 +18,7 @@
 @{
     var backOfficePath = GlobalSettings.Value.GetBackOfficePath(HostingEnvironment);
     var loginLogoImage = ContentSettings.Value.LoginLogoImage;
+    var loginLogoImageDark = ContentSettings.Value.LoginLogoImageDark;
     var loginBackgroundImage = ContentSettings.Value.LoginBackgroundImage;
     var usernameIsEmail = SecuritySettings.Value.UsernameIsEmail;
     var allowUserInvite = EmailSender.CanSendRequiredEmail();
@@ -51,7 +52,8 @@
         <umb-backoffice-icon-registry>
             <umb-auth
                 return-url="@backOfficePath"
-                logo-image="@loginLogoImage"
+                logo-light="@loginLogoImage"
+                logo-dark="@loginLogoImageDark"
                 background-image="@loginBackgroundImage"
                 username-is-email="@usernameIsEmail"
                 allow-user-invite="@allowUserInvite"
