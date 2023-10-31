@@ -21,7 +21,7 @@ import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbMediaHelper } from '@umbraco-cms/backoffice/utils';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
-import { UmbStylesheetRepository } from '@umbraco-cms/backoffice/stylesheet';
+import { UMB_APP } from '@umbraco-cms/backoffice/app';
 
 // TODO => integrate macro picker, update stylesheet fetch when backend CLI exists (ref tinymce.service.js in existing backoffice)
 @customElement('umb-input-tiny-mce')
@@ -45,11 +45,14 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 	@query('#editor', true)
 	private _editorElement?: HTMLElement;
 
+	private serverUrl?: string;
+
 	constructor() {
 		super();
 
-		const repo = new UmbStylesheetRepository(this);
-		repo.requestRootTreeItems().then((x) => console.log(x));
+		this.consumeContext(UMB_APP, (instance) => {
+			this.serverUrl = instance.getServerUrl();
+		});
 
 		// TODO => this breaks tests, removing for now will ignore user language
 		// and fall back to tinymce default language
@@ -106,6 +109,11 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 			...(this.configuration ? this.configuration?.toObject() : {}),
 		};
 
+		// Map the stylesheets with server url
+		const stylesheets = configurationOptions.stylesheets.map(
+			(stylesheetPath: string) => `${this.serverUrl}/css/${stylesheetPath.replace(/\\/g, '/')}`,
+		);
+
 		// no auto resize when a fixed height is set
 		if (!configurationOptions.dimensions?.height) {
 			configurationOptions.plugins ??= [];
@@ -133,14 +141,15 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 		// extend with configuration values
 		this._tinyConfig = {
 			...this._tinyConfig,
-			content_css: configurationOptions.stylesheets.join(','),
+
+			content_css: stylesheets,
+			style_formats: defaultStyleFormats,
 
 			extended_valid_elements: defaultExtendedValidElements,
 			height: configurationOptions.height ?? 500,
 			invalid_elements: configurationOptions.invalidElements,
 			plugins: configurationOptions.plugins.map((x: any) => x.name),
 			toolbar: configurationOptions.toolbar.join(' '),
-			style_formats: defaultStyleFormats,
 			valid_elements: configurationOptions.validElements,
 			width: configurationOptions.width,
 		};
