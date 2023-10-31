@@ -71,8 +71,8 @@ export class UmbAuthLayoutElement extends LitElement {
 				content: '';
 				position: absolute;
 				inset: 0;
-				width: calc(100% - 64px);
-				height: calc(100% - 64px);
+				width: calc(100% - 32px);
+				height: calc(100% - 32px);
 				margin: auto;
 				background-color: #fff;
 				opacity: 0.95;
@@ -136,6 +136,12 @@ export class UmbAuthLayoutElement extends LitElement {
 				width: 100%;
 				box-sizing: border-box;
 				margin-inline: auto;
+			}
+			@media (min-width: 500px) {
+				:host::after {
+					width: calc(100% - 64px);
+					height: calc(100% - 64px);
+				}
 			}
 			@media (min-width: 979px) {
 				:host::before {
