@@ -19,79 +19,77 @@
   <PropertyGroup>
     <BasePath>$(ProjectDir)wwwroot\umbraco</BasePath>
     <BellePath>$(BasePath)\lib</BellePath>
-    <BackofficePath>$(BasePath)\backoffice</BackofficePath>
+    <BellissimaPath>$(BasePath)\backoffice</BellissimaPath>
     <LoginPath>$(BasePath)\login</LoginPath>
   </PropertyGroup>
 
-  <Target Name="BuildBellePreconditions" BeforeTargets="Build">
+  <Target Name="BuildStaticAssetsPreconditions" BeforeTargets="Build">
     <Message Text="Skip BuildBelle target because UmbracoBuild is '$(UmbracoBuild)' (this is not Visual Studio)" Importance="high" Condition="'$(UmbracoBuild)' != ''" />
     <Message Text="Skip BuildBelle target because '$(BellePath)' already exists" Importance="high" Condition="Exists('$(BellePath)')" />
     <Message Text="Call BuildBelle target because UmbracoBuild is empty (this is Visual Studio) and '$(BellePath)' doesn't exist" Importance="high" Condition="'$(UmbracoBuild)' == '' and !Exists('$(BellePath)')" />
     <CallTarget Targets="BuildBelle" Condition="'$(UmbracoBuild)' == '' and !Exists('$(BellePath)')" />
 
-    <Message Text="Skip BuildBackOffice target because UmbracoBuild is '$(UmbracoBuild)' (this is not Visual Studio)" Importance="high" Condition="'$(UmbracoBuild)' != ''" />
-    <Message Text="Skip BuildBackOffice target because '$(BackofficePath)' already exists" Importance="high" Condition="Exists('$(BackofficePath)')" />
-    <Message Text="Call BuildBackOffice target because UmbracoBuild is empty (this is Visual Studio) and '$(BackofficePath)' doesn't exist" Importance="high" Condition="'$(UmbracoBuild)' == '' and !Exists('$(BackofficePath)')" />
-    <CallTarget Targets="BuildBackOffice" Condition="'$(UmbracoBuild)' == '' and !Exists('$(BackofficePath)')" />
+    <Message Text="Skip BuildBellissima target because UmbracoBuild is '$(UmbracoBuild)' (this is not Visual Studio)" Importance="high" Condition="'$(UmbracoBuild)' != ''" />
+    <Message Text="Skip BuildBellissima target because '$(BellissimaPath)' already exists" Importance="high" Condition="Exists('$(BellissimaPath)')" />
+    <Message Text="Call BuildBellissima target because UmbracoBuild is empty (this is Visual Studio) and '$(BellissimaPath)' doesn't exist" Importance="high" Condition="'$(UmbracoBuild)' == '' and !Exists('$(BellissimaPath)')" />
+    <CallTarget Targets="BuildBellissima" Condition="'$(UmbracoBuild)' == '' and !Exists('$(BellissimaPath)')" />
 
     <Message Text="Skip BuildLogin target because UmbracoBuild is '$(UmbracoBuild)' (this is not Visual Studio)" Importance="high" Condition="'$(UmbracoBuild)' != ''" />
-    <Message Text="Skip BuildLogin target because '$(LoginPath)' already exists" Importance="high" Condition="Exists('$(LoginPath)')" />
-    <Message Text="Call BuildLogin target because UmbracoBuild is empty (this is Visual Studio) and '$(LoginPath)' doesn't exist" Importance="high" Condition="'$(UmbracoBuild)' == '' and !Exists('$(LoginPath)')" />
-    <CallTarget Targets="BuildLogin" Condition="'$(UmbracoBuild)' == '' and !Exists('$(LoginPath)')" />
+    <Message Text="Skip BuildLogin target because '$(LoginPath)' already exists" Importance="high" Condition="Exists('$(LoginPath)') and Exists('$(BasePath)/auth')" />
+    <Message Text="Call BuildLogin target because UmbracoBuild is empty (this is Visual Studio) and '$(LoginPath)' doesn't exist" Importance="high" Condition="'$(UmbracoBuild)' == '' and (!Exists('$(LoginPath)') or !Exists('$(BasePath)/auth'))" />
+    <CallTarget Targets="BuildLogin" Condition="'$(UmbracoBuild)' == '' and (!Exists('$(LoginPath)') or !Exists('$(BasePath)/auth'))" />
   </Target>
 
   <Target Name="BuildBelle">
     <Exec WorkingDirectory="$(ProjectDir)..\Umbraco.Web.UI.Client\" Command="npm ci --no-fund --no-audit --prefer-offline" />
     <Exec WorkingDirectory="$(ProjectDir)..\Umbraco.Web.UI.Client\" Command="npm run build:skip-tests" />
-    <Exec WorkingDirectory="$(ProjectDir)..\Umbraco.Web.UI.Login\" Command="npm ci --no-fund --no-audit --prefer-offline" />
-    <Exec WorkingDirectory="$(ProjectDir)..\Umbraco.Web.UI.Login\" Command="npm run build" />
   </Target>
 
-  <Target Name="BuildBackOffice">
+  <Target Name="BuildBellissima">
     <Exec WorkingDirectory="$(ProjectDir)..\Umbraco.Web.UI.New.Client\" Command="npm ci --no-fund --no-audit --prefer-offline" />
     <Exec WorkingDirectory="$(ProjectDir)..\Umbraco.Web.UI.New.Client\" Command="npm run build:for:cms" />
   </Target>
 
-  <Target Name="BuildLogin" DependsOnTargets="BuildBackOffice">
+  <Target Name="BuildLogin" DependsOnTargets="BuildBellissima">
     <Exec WorkingDirectory="$(ProjectDir)..\Umbraco.Web.UI.New.Client\apps\auth" Command="npm run build" />
+    <Exec WorkingDirectory="$(ProjectDir)..\Umbraco.Web.UI.Login\" Command="npm ci --no-fund --no-audit --prefer-offline" />
+    <Exec WorkingDirectory="$(ProjectDir)..\Umbraco.Web.UI.Login\" Command="npm run build" />
   </Target>
 
-  <Target Name="CleanBellePreconditions" AfterTargets="Clean" Condition="'$(UmbracoBuild)' == ''">
+  <Target Name="CleanStaticAssetsPreconditions" AfterTargets="Clean" Condition="'$(UmbracoBuild)' == ''">
     <Message Text="Skip CleanBelle target because '$(BellePath)' doesn't exist" Importance="high" Condition="!Exists('$(BellePath)')" />
     <Message Text="Skip CleanBelle target because preserve.belle marker file exists" Importance="high" Condition="Exists('$(BellePath)') and Exists('$(SolutionDir)preserve.belle')" />
     <Message Text="Call CleanBelle target because '$(BellePath)' exists and preserve.belle marker file doesn't exist" Importance="high" Condition="Exists('$(BellePath)') and !Exists('$(SolutionDir)preserve.belle')" />
     <CallTarget Targets="CleanBelle" Condition="Exists('$(BellePath)') and !Exists('$(SolutionDir)preserve.belle')" />
 
-    <Message Text="Skip CleanBackoffice target because '$(BackofficePath)' doesn't exist" Importance="high" Condition="!Exists('$(BackofficePath)')" />
-    <Message Text="Skip CleanBackoffice target because preserve.belle marker file exists" Importance="high" Condition="Exists('$(BackofficePath)') and Exists('$(SolutionDir)preserve.belle')" />
-    <Message Text="Call CleanBackoffice target because '$(BackofficePath)' exists and preserve.belle marker file doesn't exist" Importance="high" Condition="Exists('$(BackofficePath)') and !Exists('$(SolutionDir)preserve.belle')" />
-    <CallTarget Targets="CleanBackoffice" Condition="Exists('$(BackofficePath)') and !Exists('$(SolutionDir)preserve.belle')" />
+    <Message Text="Skip CleanBellissima target because '$(BellissimaPath)' doesn't exist" Importance="high" Condition="!Exists('$(BellissimaPath)')" />
+    <Message Text="Skip CleanBellissima target because preserve.bellissima marker file exists" Importance="high" Condition="Exists('$(BellissimaPath)') and Exists('$(SolutionDir)preserve.bellissima')" />
+    <Message Text="Call CleanBellissima target because '$(BellissimaPath)' exists and preserve.bellissima marker file doesn't exist" Importance="high" Condition="Exists('$(BellissimaPath)') and !Exists('$(SolutionDir)preserve.bellissima')" />
+    <CallTarget Targets="CleanBellissima" Condition="Exists('$(BellissimaPath)') and !Exists('$(SolutionDir)preserve.bellissima')" />
 
-    <Message Text="Skip CleanLogin target because '$(LoginPath)' doesn't exist" Importance="high" Condition="!Exists('$(LoginPath)')" />
-    <Message Text="Skip CleanLogin target because preserve.belle marker file exists" Importance="high" Condition="Exists('$(LoginPath)') and Exists('$(SolutionDir)preserve.belle')" />
-    <Message Text="Call CleanLogin target because '$(LoginPath)' exists and preserve.belle marker file doesn't exist" Importance="high" Condition="Exists('$(LoginPath)') and !Exists('$(SolutionDir)preserve.belle')" />
-    <CallTarget Targets="CleanLogin" Condition="Exists('$(LoginPath)') and !Exists('$(SolutionDir)preserve.login')" />
-
-
+    <Message Text="Skip CleanLogin target because '$(LoginPath)' doesn't exist" Importance="high" Condition="!Exists('$(LoginPath)') or !Exists('$(BasePath)/auth')" />
+    <Message Text="Skip CleanLogin target because preserve.login marker file exists" Importance="high" Condition="Exists('$(LoginPath)') and Exists('$(BasePath)/auth') and Exists('$(SolutionDir)preserve.login')" />
+    <Message Text="Call CleanLogin target because '$(LoginPath)' exists and preserve.login marker file doesn't exist" Importance="high" Condition="(Exists('$(LoginPath)') or Exists('$(BasePath)/auth')) and !Exists('$(SolutionDir)preserve.login')" />
+    <CallTarget Targets="CleanLogin" Condition="(Exists('$(LoginPath)') or Exists('$(BasePath)/auth')) and !Exists('$(SolutionDir)preserve.login')" />
   </Target>
 
   <Target Name="CleanBelle">
     <ItemGroup>
-      <BelleDirectories Include="$(BasePath)/js;$(BasePath)/lib;$(BasePath)/assets;$(BasePath)/views" />
+      <BelleDirectories Include="$(BasePath)/js;$(BasePath)/lib;$(BasePath)/assets;$(BasePath)/views;" />
     </ItemGroup>
     <RemoveDir Directories="@(BelleDirectories)" />
   </Target>
 
-  <Target Name="CleanBackoffice">
+  <Target Name="CleanBellissima">
     <ItemGroup>
-      <BackofficeDirectories Include="$(BackofficePath);" />
+      <BellissimaDirectories Include="$(BellissimaPath);" />
     </ItemGroup>
-    <RemoveDir Directories="@(BackofficeDirectories)" />
+    <RemoveDir Directories="@(BellissimaDirectories)" />
   </Target>
 
   <Target Name="CleanLogin">
     <ItemGroup>
-      <LoginDirectories Include="$(LoginPath);" />
+      <LoginDirectories Include="$(LoginPath);$(BasePath)/auth;" />
     </ItemGroup>
     <RemoveDir Directories="@(LoginDirectories)" />
   </Target>
