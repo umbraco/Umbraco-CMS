@@ -194,6 +194,8 @@
           //wait for queue to end
           $q.all(promises).then(function (result) {
 
+            console.log("all promises is good")
+
               var standardConfig = result[promises.length - 1];
 
               if (height !== null) {
@@ -255,13 +257,9 @@
               baseLineConfigObj.readonly = vm.readonly ? 1 : baseLineConfigObj.readonly;
 
               // We need to wait for DOM to have rendered before we can find the element by ID.
-              if(tinymce) {
+              $timeout(function () {
                 tinymce.init(baseLineConfigObj);
-              } else {
-                $timeout(function () {
-                    tinymce.init(baseLineConfigObj);
-                }, 150);
-              }
+              }, 50);
 
               //listen for formSubmitting event (the result is callback used to remove the event subscription)
               unsubscribe.push($scope.$on("formSubmitting", function () {
