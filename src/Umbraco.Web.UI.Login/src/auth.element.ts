@@ -1,4 +1,4 @@
-import { html, LitElement } from 'lit';
+import { css, CSSResultGroup, html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { until } from 'lit/directives/until.js';
@@ -23,10 +23,10 @@ const createInput = (id: string, type: InputType, name: string, autocomplete: Au
 };
 
 const createLabel = (forId: string, localizeAlias: string) => {
-	const label = document.createElement('label');
+	const label = document.createElement('uui-label');
 	const umbLocalize = document.createElement('umb-localize') as UmbLocalizeElement;
 	umbLocalize.key = localizeAlias;
-	label.htmlFor = forId;
+	label.for = forId;
 	label.appendChild(umbLocalize);
 
 	return label;
@@ -44,7 +44,7 @@ const createForm = (elements: HTMLElement[]) => {
 	const form = document.createElement('form');
 	const submitButton = document.createElement('input');
 	submitButton.type = 'submit';
-	submitButton.ariaHidden = true;
+	submitButton.ariaHidden = 'true';
 	submitButton.style.display = 'none';
 
 	elements.push(submitButton);
