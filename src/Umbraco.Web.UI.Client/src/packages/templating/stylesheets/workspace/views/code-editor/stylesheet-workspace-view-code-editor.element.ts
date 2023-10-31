@@ -1,9 +1,9 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css';
 import { css, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UMB_STYLESHEET_WORKSPACE_CONTEXT, UmbStylesheetWorkspaceContext } from '../../stylesheet-workspace.context.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
+import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-stylesheet-workspace-view-code-editor')
 export class UmbStylesheetWorkspaceViewCodeEditorElement extends UmbLitElement {

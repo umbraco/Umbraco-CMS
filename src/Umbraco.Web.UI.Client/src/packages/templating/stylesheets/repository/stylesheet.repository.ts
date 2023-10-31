@@ -27,6 +27,7 @@ import {
 	FolderResponseModel,
 	InterpolateRichTextStylesheetRequestModel,
 	InterpolateRichTextStylesheetResponseModel,
+	PagedStylesheetOverviewResponseModel,
 	ProblemDetails,
 	RichTextStylesheetRulesResponseModel,
 	TextFileResponseModelBaseModel,
@@ -141,6 +142,10 @@ export class UmbStylesheetRepository
 		const parentPath = id.substring(0, id.lastIndexOf('/'));
 		this.requestTreeItemsOf(parentPath ? parentPath : null);
 		return promise;
+	}
+
+	async getAll(skip?: number, take?: number): Promise<DataSourceResponse<PagedStylesheetOverviewResponseModel>> {
+		return this.#dataSource.getAll(skip, take);
 	}
 
 	getStylesheetRules(

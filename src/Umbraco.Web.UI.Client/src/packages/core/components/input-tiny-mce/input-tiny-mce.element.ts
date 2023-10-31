@@ -21,6 +21,7 @@ import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbMediaHelper } from '@umbraco-cms/backoffice/utils';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import { UmbStylesheetRepository } from '@umbraco-cms/backoffice/stylesheet';
 
 // TODO => integrate macro picker, update stylesheet fetch when backend CLI exists (ref tinymce.service.js in existing backoffice)
 @customElement('umb-input-tiny-mce')
@@ -46,6 +47,9 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 
 	constructor() {
 		super();
+
+		const repo = new UmbStylesheetRepository(this);
+		repo.requestRootTreeItems().then((x) => console.log(x));
 
 		// TODO => this breaks tests, removing for now will ignore user language
 		// and fall back to tinymce default language
@@ -130,6 +134,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 		this._tinyConfig = {
 			...this._tinyConfig,
 			content_css: configurationOptions.stylesheets.join(','),
+
 			extended_valid_elements: defaultExtendedValidElements,
 			height: configurationOptions.height ?? 500,
 			invalid_elements: configurationOptions.invalidElements,
