@@ -194,8 +194,6 @@
           //wait for queue to end
           $q.all(promises).then(function (result) {
 
-            console.log("all promises is good")
-
               var standardConfig = result[promises.length - 1];
 
               if (height !== null) {
@@ -240,8 +238,8 @@
                         vm.model.value.markup = newVal;
                         $scope.$evalAsync();
                       },
-                      culture: vm.umbProperty.culture,
-                      segment: vm.umbProperty.segment,
+                      culture: vm.umbProperty?.culture ?? null,
+                      segment: vm.umbProperty?.segment ?? null,
                       blockEditorApi: vm.blockEditorApi,
                       parentForm: vm.propertyForm,
                       valFormManager: vm.valFormManager,
