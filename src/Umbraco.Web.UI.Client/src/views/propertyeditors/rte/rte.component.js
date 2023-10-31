@@ -464,6 +464,7 @@
           block.showValidation = block.config.view ? true : false;
 
           block.hideContentInOverlay = block.config.forceHideContentEditorInOverlay === true;
+          block.showContent = !block.hideContentInOverlay && block.content?.variants[0].tabs?.some(tab=>tab.properties.length) === true;
           block.showSettings = block.config.settingsElementTypeKey != null;
 
           // If we have content, otherwise it doesn't make sense to copy.

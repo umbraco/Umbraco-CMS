@@ -68,6 +68,7 @@
 
                     <button type="button" class="btn-reset action --content" localize="title" title="actions_editContent"
                             ng-click="api.editBlock(block, false, index, model.blockForm);"
+                            ng-if="block.showContent === true"
                             ng-class="{ '--error': model.blockForm.$error.valServerMatchContent }">
                         <umb-icon icon="icon-edit" class="icon"></umb-icon>
                         <span class="sr-only">
