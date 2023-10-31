@@ -1,4 +1,4 @@
-﻿<div class="headless-edit-webhook-overlay" ng-controller="Umbraco.Editors.Webhooks.EditController as vm">
+<div class="headless-edit-webhook-overlay" ng-controller="Umbraco.Editors.Webhooks.EditController as vm">
   <umb-editor-view>
     <ng-form name="editWebhookForm" novalidate val-form-manager>
       <umb-editor-header
@@ -40,12 +40,11 @@
                   allow-open="false"
                   on-remove="vm.clearEvent(event)">
                 </umb-node-preview>
-                <a href
+                <button type="button"
                    class="umb-node-preview-add"
-                   ng-click="vm.openEventPicker()"
-                   prevent-default>
+                   ng-click="vm.openEventPicker()">
                   <localize key="general_add">Add</localize>
-                </a>
+                </button>
               </umb-control-group>
 
               <umb-control-group label="Content Type"
@@ -62,13 +61,12 @@
                   allow-open="false"
                   on-remove="vm.clearContentType(contentType.key)">
                 </umb-node-preview>
-                <a href
+                <button type="button"
                    ng-show="model.webhook.events && model.webhook.events.length !== 0"
                    class="umb-node-preview-add"
-                   ng-click="vm.openContentTypePicker()"
-                   prevent-default>
+                   ng-click="vm.openContentTypePicker()">
                   <localize key="general_add">Add</localize>
-                </a>
+                </button>
                 <span class="umb-node-preview-add" ng-show="!model.webhook.events || model.webhook.events.length === 0">Please select an event first.</span>
               </umb-control-group>
 
