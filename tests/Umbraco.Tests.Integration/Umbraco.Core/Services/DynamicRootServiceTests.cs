@@ -674,4 +674,46 @@ public class DynamicRootServiceTests : UmbracoIntegrationTest
         // Assert
         Assert.IsNull(result);
     }
+
+    [Test]
+    public async Task GetDynamicRoots__With_multiple_filters_that_do_not_return_any_results()
+    {
+        // Arrange
+        var startNodeSelector = new DynamicRootNodeQuery()
+        {
+            OriginAlias = DynamicRootOrigin.Current.ToString(),
+            OriginKey = null,
+            Context =
+                new DynamicRootContext() { CurrentKey = ContentAct2022RanD.Key, ParentKey = ContentActs2022.Key },
+            QuerySteps = new[]
+            {
+                new DynamicRootQueryStep()
+                {
+                    Alias = DynamicRootStepAlias.NearestAncestorOrSelf.ToString(),
+                    AnyOfDocTypeKeys = new[] { ContentTypeYear.Key },
+                },
+                new DynamicRootQueryStep()
+                {
+                    Alias = DynamicRootStepAlias.NearestDescendantOrSelf.ToString(),
+                    AnyOfDocTypeKeys = new[] { ContentTypeStages.Key },
+                },
+                new DynamicRootQueryStep()
+                {
+                    Alias = DynamicRootStepAlias.NearestDescendantOrSelf.ToString(),
+                    AnyOfDocTypeKeys = new[] { ContentTypeYears.Key },
+                },
+                new DynamicRootQueryStep()
+                {
+                    Alias = DynamicRootStepAlias.NearestDescendantOrSelf.ToString(),
+                    AnyOfDocTypeKeys = new[] { ContentTypeYears.Key },
+                },
+            },
+        };
+
+        // Act
+        var result = (await DynamicRootService.GetDynamicRootsAsync(startNodeSelector)).ToList();
+
+        // Assert
+        Assert.AreEqual(0, result.Count());
+    }
 }
