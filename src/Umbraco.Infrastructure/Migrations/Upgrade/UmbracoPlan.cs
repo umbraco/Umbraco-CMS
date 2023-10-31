@@ -94,5 +94,8 @@ public class UmbracoPlan : MigrationPlan
 
         // And once more for 12
         To<MigrateTagsFromNVarcharToNText>("{2D4C9FBD-08B3-472D-A76C-6ED467A0CD20}");
+
+        // To 13.0.0
+        To<V_13_0_0.AddWebhooks>("{C76D9C9A-635B-4D2C-A301-05642A523E9D}");
     }
 }

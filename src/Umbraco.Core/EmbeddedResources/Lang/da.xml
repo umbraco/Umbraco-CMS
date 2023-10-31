@@ -1004,6 +1004,12 @@
     <key alias="welcomeIntro">
       <![CDATA[Denne guide vil bringe dig gennem konfigurationsprocessen af <strong>Umbraco %0%</strong> for en frisk installation eller for en opgradering fra version 3.0.<br/><br/>Tryk på <strong>Næste</strong> for at begynde på guiden.]]></key>
   </area>
+  <area alias="webhooks">
+    <key alias="addWebhook">Opret webhook</key>
+    <key alias="addWebhookHeader">Tilføj webhook header</key>
+    <key alias="addDocumentType">Tilføj dokument type</key>
+    <key alias="addMediaType">Tilføj medie Type</key>
+  </area>
   <area alias="language">
     <key alias="cultureCode">Culture Code</key>
     <key alias="displayName">Culture Name</key>
