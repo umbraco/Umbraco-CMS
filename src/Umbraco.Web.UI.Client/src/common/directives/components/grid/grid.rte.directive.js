@@ -26,8 +26,8 @@ angular.module("umbraco.directives")
                 var editorConfig = scope.configuration ? scope.configuration : null;
                 if (!editorConfig || Utilities.isString(editorConfig)) {
                     editorConfig = tinyMceService.defaultPrevalues();
-                    //for the grid by default, we don't want to include the macro toolbar
-                    editorConfig.toolbar = _.without(editorConfig, "umbmacro");
+                    //for the grid by default, we don't want to include the macro or the block-picker toolbar
+                    editorConfig.toolbar = _.without(editorConfig, "umbmacro", "umbblockpicker");
                 }
 
                 //ensure the grid's global config is being passed up to the RTE, these 2 properties need to be in this format
