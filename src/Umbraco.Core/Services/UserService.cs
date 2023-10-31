@@ -797,6 +797,48 @@ internal class UserService : RepositoryService, IUserService
 
         await userStore.SaveAsync(invitedUser);
 
+        Attempt<UserInvitationResult, UserOperationStatus> invitationAttempt = await SendInvitationAsync(performingUser, serviceScope, invitedUser, model.Message);
+
+        scope.Complete();
+
+        return invitationAttempt;
+    }
+
+    public async Task<Attempt<UserInvitationResult, UserOperationStatus>> ResendInvitationAsync(Guid performingUserKey, UserResendInviteModel model)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        using IServiceScope serviceScope = _serviceScopeFactory.CreateScope();
+
+        IUser? performingUser = await GetAsync(performingUserKey);
+        if (performingUser == null)
+        {
+            return Attempt.FailWithStatus(UserOperationStatus.MissingUser, new UserInvitationResult());
+        }
+
+        IBackOfficeUserStore userStore = serviceScope.ServiceProvider.GetRequiredService<IBackOfficeUserStore>();
+        IUser? invitedUser = await userStore.GetAsync(model.InvitedUserKey);
+        if (invitedUser == null)
+        {
+            return Attempt.FailWithStatus(UserOperationStatus.UserNotFound, new UserInvitationResult());
+        }
+
+        if (invitedUser.UserState != UserState.Invited)
+        {
+            return Attempt.FailWithStatus(UserOperationStatus.NotInInviteState, new UserInvitationResult());
+        }
+
+        // re-inviting so update invite date
+        invitedUser.InvitedDate = DateTime.Now;
+        await userStore.SaveAsync(invitedUser);
+
+        Attempt<UserInvitationResult, UserOperationStatus> invitationAttempt = await SendInvitationAsync(performingUser, serviceScope, invitedUser, model.Message);
+        scope.Complete();
+
+        return invitationAttempt;
+    }
+
+    private async Task<Attempt<UserInvitationResult, UserOperationStatus>> SendInvitationAsync(IUser performingUser, IServiceScope serviceScope, IUser invitedUser, string? message)
+    {
         IInviteUriProvider inviteUriProvider = serviceScope.ServiceProvider.GetRequiredService<IInviteUriProvider>();
         Attempt<Uri, UserOperationStatus> inviteUriAttempt = await inviteUriProvider.CreateInviteUriAsync(invitedUser);
         if (inviteUriAttempt.Success is false)
@@ -807,15 +849,13 @@ internal class UserService : RepositoryService, IUserService
         var invitation = new UserInvitationMessage
         {
             InviteUri = inviteUriAttempt.Result,
-            Message = model.Message ?? string.Empty,
+            Message = message ?? string.Empty,
             Recipient = invitedUser,
             Sender = performingUser,
         };
         await _inviteSender.InviteUser(invitation);
 
-        scope.Complete();
-
-        return Attempt.SucceedWithStatus(UserOperationStatus.Success, new UserInvitationResult { InvitedUser =  invitedUser });
+        return Attempt.SucceedWithStatus(UserOperationStatus.Success, new UserInvitationResult { InvitedUser = invitedUser });
     }
 
     private UserOperationStatus ValidateUserCreateModel(UserCreateModel model)
