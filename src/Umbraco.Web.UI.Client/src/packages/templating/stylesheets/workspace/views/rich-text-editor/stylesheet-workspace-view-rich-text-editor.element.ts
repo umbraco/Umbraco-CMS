@@ -6,7 +6,7 @@ import {
 	StylesheetRichTextEditorStyleModalData,
 	UmbStylesheetRichTextEditorStyleModalValue,
 } from './stylesheet-workspace-view-rich-text-editor-style-sidebar.element.js';
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UMB_MODAL_MANAGER_CONTEXT_TOKEN, UmbModalManagerContext, UmbModalToken } from '@umbraco-cms/backoffice/modal';
@@ -111,7 +111,7 @@ export class UmbStylesheetWorkspaceViewRichTextEditorElement extends UmbLitEleme
 	}
 
 	static styles = [
-		UUITextStyles,
+		UmbTextStyles,
 		css`
 			:host {
 				display: block;
