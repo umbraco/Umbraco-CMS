@@ -148,7 +148,7 @@
         });
     }
 
-    function deleteWebhook (webhook) {
+    function deleteWebhook (webhook, event) {
       overlayService.open({
         title: 'Confirm delete webhook',
         content: 'Are you sure you want to delete the webhook?',
@@ -171,6 +171,9 @@
           overlayService.close();
         }
       });
+
+      event.preventDefault();
+      event.stopPropagation();
     }
 
     loadWebhooks()
