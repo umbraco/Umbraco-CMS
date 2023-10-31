@@ -1,6 +1,6 @@
-import type { UUIButtonState } from '@umbraco-ui/uui';
+import type { UUIButtonElement, UUIButtonState } from '@umbraco-ui/uui';
 import { css, CSSResultGroup, html, LitElement, nothing } from 'lit';
-import { customElement, property, queryAssignedElements, state } from 'lit/decorators.js';
+import { customElement, property, query, queryAssignedElements, state } from 'lit/decorators.js';
 import { when } from 'lit/directives/when.js';
 import { until } from 'lit/directives/until.js';
 
@@ -9,11 +9,14 @@ import { umbLocalizationContext } from '../../external/localization/localization
 
 @customElement('umb-login-page')
 export default class UmbLoginPageElement extends LitElement {
+	@query('#umb-login-button')
+	submitButtonElement?: UUIButtonElement;
+
 	@property({ type: Boolean, attribute: 'username-is-email' })
 	usernameIsEmail = false;
 
 	@queryAssignedElements({ flatten: true })
-	protected slottedElements?: HTMLElement[];
+	protected slottedElements?: HTMLInputElement[];
 
 	@property({ type: Boolean, attribute: 'allow-password-reset' })
 	allowPasswordReset = false;
@@ -29,6 +32,9 @@ export default class UmbLoginPageElement extends LitElement {
 		return umbAuthContext.disableLocalLogin;
 	}
 
+	#usernameInputElement?: HTMLInputElement;
+	#passwordInputElement?: HTMLInputElement;
+
 	connectedCallback(): void {
 		super.connectedCallback();
 
@@ -37,16 +43,26 @@ export default class UmbLoginPageElement extends LitElement {
 				(node) => node.tagName && node.tagName.toLowerCase() === 'input'
 			);
 
-			const usernameInput = inputElements?.find((node) => node.name === 'username');
-			const passwordInput = inputElements?.find((node) => node.name === 'password');
+			this.#usernameInputElement = inputElements?.find((node) => node.name === 'username');
+			this.#passwordInputElement = inputElements?.find((node) => node.name === 'password');
 
-			console.log('umb-login-page', usernameInput, passwordInput);
+			this.#usernameInputElement?.addEventListener('keydown', this.#onInputKeydown);
+			this.#passwordInputElement?.addEventListener('keydown', this.#onInputKeydown);
 		});
 	}
 
 	disconnectedCallback(): void {
 		super.disconnectedCallback();
+
+		this.#usernameInputElement?.removeEventListener('keydown', this.#onInputKeydown);
+		this.#passwordInputElement?.removeEventListener('keydown', this.#onInputKeydown);
 	}
+
+	#onInputKeydown = (event: KeyboardEvent) => {
+		if (event.key === 'Enter') {
+			this.submitButtonElement?.click();
+		}
+	};
 
 	#handleSubmit = async (e: SubmitEvent) => {
 		e.preventDefault();
@@ -56,10 +72,14 @@ export default class UmbLoginPageElement extends LitElement {
 
 		if (!form.checkValidity()) return;
 
+		if (!this.#usernameInputElement || !this.#passwordInputElement) return;
+
+		if (!this.#usernameInputElement.checkValidity() || !this.#passwordInputElement.checkValidity()) return;
+
 		const formData = new FormData(form);
 
-		const username = formData.get('email') as string;
-		const password = formData.get('password') as string;
+		const username = this.#usernameInputElement.value;
+		const password = this.#passwordInputElement.value;
 		const persist = formData.has('persist');
 
 		this._loginState = 'waiting';
