@@ -30,8 +30,8 @@
 
   <PropertyGroup>
     <!-- Remove RazorCompileOnBuild and RazorCompileOnPublish when not using ModelsMode InMemoryAuto -->
-    <RazorCompileOnBuild>false</RazorCompileOnBuild>
-    <RazorCompileOnPublish>false</RazorCompileOnPublish>
+    <RazorCompileOnBuild>true</RazorCompileOnBuild>
+    <RazorCompileOnPublish>true</RazorCompileOnPublish>
   </PropertyGroup>
 
   <Target Name="CopyAppsettingsTemplate" BeforeTargets="Build" Condition="!Exists('appsettings.json')">

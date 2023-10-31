@@ -5,6 +5,13 @@ angular.module("umbraco.install").controller("Umbraco.Install.UserController", f
   $scope.installer.current.model.subscribeToNewsLetter = $scope.installer.current.model.subscribeToNewsLetter || false;
   setTelemetryLevelAndDescription($scope.installer.current.model.telemetryIndex ?? 2);
 
+  $scope.togglePassword = function () {
+    var elem = $("form[name='installerForm'] input[name='installer.current.model.password']");
+    elem.attr("type", (elem.attr("type") === "text" ? "password" : "text"));
+    elem.focus();
+    $(".password-text.hide, .password-text.show").toggle();
+  };
+
   if ($scope.installer.current.model.minNonAlphaNumericLength > 0) {
     var exp = "";
     for (var i = 0; i < $scope.installer.current.model.minNonAlphaNumericLength; i++) {

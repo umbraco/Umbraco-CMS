@@ -50,31 +50,36 @@
           <label class="control-label" for="password">Password</label>
           <div class="controls">
             <!-- why isn't this masked: https://www.nngroup.com/articles/stop-password-masking/ -->
-            <input
-              type="text"
-              name="installer.current.model.password"
-              ng-minlength="{{installer.current.model.minCharLength}}"
-              ng-pattern="passwordPattern"
-              autocorrect="off"
-              autocapitalize="off"
-              autocomplete="off"
-              required
-              ng-model="installer.current.model.password"
-              id="password"
-              spellcheck="false"
-            />
-            <small class="inline-help"
-              >At least {{installer.current.model.minCharLength}} characters
-              long</small
-            >
+            <input type="text"
+                   name="installer.current.model.password"
+                   ng-minlength="{{installer.current.model.minCharLength}}"
+                   ng-pattern="passwordPattern"
+                   autocorrect="off"
+                   autocapitalize="off"
+                   autocomplete="off"
+                   required
+                   ng-model="installer.current.model.password"
+                   id="password"
+                   spellcheck="false" />
+            <div class="password-toggle">
+              <button type="button" class="btn-reset" ng-click="togglePassword()">
+                <span class="password-text hide"><localize key="install_hidePassword">Hide password</localize></span>
+                <span class="password-text show"><localize key="install_showPassword">Show password</localize></span>
+              </button>
+            </div>
 
-            <small
-              ng-if="installer.current.model.minNonAlphaNumericLength > 0"
-              class="inline-help"
-            >
+            <small class="inline-help">
+              At least {{installer.current.model.minCharLength}} characters
+              long
+            </small>
+
+            <small ng-if="installer.current.model.minNonAlphaNumericLength > 0"
+                   class="inline-help">
               At least {{installer.current.model.minNonAlphaNumericLength}}
-              symbol{{installer.current.model.minNonAlphaNumericLength > 1 ? 's'
-              : ''}}
+              symbol{{
+installer.current.model.minNonAlphaNumericLength > 1 ? 's'
+              : ''
+              }}
             </small>
           </div>
         </div>
