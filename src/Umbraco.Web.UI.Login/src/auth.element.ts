@@ -199,8 +199,7 @@ export default class UmbAuthElement extends LitElement {
 			return html` <umb-error-layout
 				header="Hi there"
 				message=${until(
-					umbLocalizationContext.localize('login_resetCodeExpired'),
-					'The link you have clicked on is invalid or has expired'
+					umbLocalizationContext.localize('login_resetCodeExpired', undefined, 'The link you have clicked on is invalid or has expired')
 				)}>
 			</umb-error-layout>`;
 		}
@@ -209,8 +208,7 @@ export default class UmbAuthElement extends LitElement {
 			return html` <umb-error-layout
 				header="Hi there"
 				message=${until(
-					umbLocalizationContext.localize('user_userinviteExpiredMessage'),
-					'Welcome to Umbraco! Unfortunately your invite has expired. Please contact your administrator and ask them to resend it.'
+					umbLocalizationContext.localize('user_userinviteExpiredMessage', undefined, 'Welcome to Umbraco! Unfortunately your invite has expired. Please contact your administrator and ask them to resend it.'),
 				)}>
 			</umb-error-layout>`;
 		}
