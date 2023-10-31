@@ -9,9 +9,6 @@ import { umbLocalizationContext } from '../../external/localization/localization
 
 @customElement('umb-login-page')
 export default class UmbLoginPageElement extends LitElement {
-  @query('#umb-login-button')
-  submitButtonElement?: UUIButtonElement;
-
   @property({ type: Boolean, attribute: 'username-is-email' })
   usernameIsEmail = false;
 
