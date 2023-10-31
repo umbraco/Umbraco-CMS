@@ -11,7 +11,7 @@ import { InputType, UUIFormLayoutItemElement, UUILabelElement } from '@umbraco-u
 
 import authStyles from './auth-styles.css?inline';
 
-const createInput = (id: string, type: InputType, name: string, autocomplete: AutoFill, requiredMessage: string, label: string) => {
+const createInput = (id: string, type: InputType, name: string, autocomplete: AutoFill, requiredMessage: string, label: string, inputmode: string) => {
   const input = document.createElement('umb-login-input');
   input.type = type;
   input.name = name;
@@ -21,6 +21,7 @@ const createInput = (id: string, type: InputType, name: string, autocomplete: Au
   input.requiredMessage = requiredMessage;
   input.label = label;
   input.spellcheck = false;
+  input.inputMode = inputmode;
 
   return input;
 };
@@ -154,13 +155,14 @@ export default class UmbAuthElement extends LitElement {
 
     this._usernameInput = createInput(
       'username-input',
-      this.usernameIsEmail ? 'email' : 'text',
+      'text',
       'username',
       'username',
       requiredMessage,
-      labelUsername
+      labelUsername,
+      this.usernameIsEmail ? 'email' : ''
     );
-    this._passwordInput = createInput('password-input', 'password', 'password', 'current-password', requiredMessage, labelPassword);
+    this._passwordInput = createInput('password-input', 'password', 'password', 'current-password', requiredMessage, labelPassword, '');
     this._usernameLabel = createLabel('username-input', this.usernameIsEmail ? 'general_email' : 'user_username');
     this._passwordLabel = createLabel('password-input', 'user_password');
 
