@@ -33,15 +33,15 @@
             "imports": {
                 @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/app", backofficeAssetsPath + "/apps/app/index.js")),
 
-                @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/external/uui", backofficeAssetsPath + "/external/uui/index.js")),
                 @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/external/lit", backofficeAssetsPath + "/external/lit/index.js")),
-                @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/external/openid", backofficeAssetsPath + "/external/openid/index.js")),
-                @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/external/rxjs", backofficeAssetsPath + "/external/rxjs/index.js")),
-                @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/external/router-slot", backofficeAssetsPath + "/external/router-slot/index.js")),
-                @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/external/uuid", backofficeAssetsPath + "/external/uuid/index.js")),
                 @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/external/lodash", backofficeAssetsPath + "/external/lodash/index.js")),
                 @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/external/monaco-editor", backofficeAssetsPath + "/external/monaco-editor/index.js")),
+                @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/external/openid", backofficeAssetsPath + "/external/openid/index.js")),
+                @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/external/router-slot", backofficeAssetsPath + "/external/router-slot/index.js")),
+                @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/external/rxjs", backofficeAssetsPath + "/external/rxjs/index.js")),
                 @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/external/tinymce", backofficeAssetsPath + "/external/tinymce/index.js")),
+                @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/external/uui", backofficeAssetsPath + "/external/uui/index.js")),
+                @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/external/uuid", backofficeAssetsPath + "/external/uuid/index.js")),
                 @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/external/sanitize-html", backofficeAssetsPath + "/external/sanitize-html/index.js")),
                 @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/external/marked", backofficeAssetsPath + "/external/marked/index.js")),
 
@@ -55,7 +55,6 @@
                 @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/observable-api", backofficeAssetsPath + "/libs/observable-api/index.js")),
 
                 @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/auth", backofficeAssetsPath + "/shared/auth/index.js")),
-                @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/context", backofficeAssetsPath + "/shared/context/index.js")),
                 @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/icon", backofficeAssetsPath + "/shared/icon-registry/index.js")),
                 @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/models", backofficeAssetsPath + "/shared/models/index.js")),
                 @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/resources", backofficeAssetsPath + "/shared/resources/index.js")),
@@ -64,7 +63,6 @@
                 @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/utils", backofficeAssetsPath + "/shared/utils/index.js")),
 
                 @Html.Raw(ImportMapValue("@umbraco-cms/internal/lit-element", backofficeAssetsPath + "/shared/lit-element/index.js")),
-                @Html.Raw(ImportMapValue("@umbraco-cms/internal/modal", backofficeAssetsPath + "/shared/modal/index.js")),
 
                 @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/action", backofficeAssetsPath + "/packages/core/action/index.js")),
                 @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/collection", backofficeAssetsPath + "/packages/core/collection/index.js")),
@@ -81,6 +79,8 @@
                 @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/modal", backofficeAssetsPath + "/packages/core/modal/index.js")),
                 @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/notification", backofficeAssetsPath + "/packages/core/notification/index.js")),
                 @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/picker-input", backofficeAssetsPath + "/packages/core/picker-input/index.js")),
+                @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/property-action", backofficeAssetsPath + "/packages/core/property-action/index.js")),
+                @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/property-editor", backofficeAssetsPath + "/packages/core/property-editor/index.js")),
                 @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/section", backofficeAssetsPath + "/packages/core/section/index.js")),
                 @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/sorter", backofficeAssetsPath + "/packages/core/sorter/index.js")),
                 @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/store", backofficeAssetsPath + "/packages/core/store/index.js")),
@@ -88,8 +88,6 @@
                 @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/tree", backofficeAssetsPath + "/packages/core/tree/index.js")),
                 @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/variant", backofficeAssetsPath + "/packages/core/variant/index.js")),
                 @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/workspace", backofficeAssetsPath + "/packages/core/workspace/index.js")),
-                @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/property-editor", backofficeAssetsPath + "/packages/core/property-editor/index.js")),
-                @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/property-action", backofficeAssetsPath + "/packages/core/property-action/index.js")),
                 @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/culture", backofficeAssetsPath + "/packages/core/culture/index.js")),
                 @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/event", backofficeAssetsPath + "/packages/core/event/index.js")),
                 @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/repository", backofficeAssetsPath + "/packages/core/repository/index.js")),
@@ -118,6 +116,7 @@
                 @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/user-group", backofficeAssetsPath + "/packages/user/user-group/index.js")),
                 @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/current-user", backofficeAssetsPath + "/packages/user/current-user/index.js")),
                 @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/user", backofficeAssetsPath + "/packages/user/user/index.js")),
+                @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/user-permission", backofficeAssetsPath + "/packages/user/user-permission/index.js")),
 
                 @Html.Raw(ImportMapValue("@umbraco-cms/backoffice/code-editor", backofficeAssetsPath + "/packages/templating/code-editor/index.js"))
             }
