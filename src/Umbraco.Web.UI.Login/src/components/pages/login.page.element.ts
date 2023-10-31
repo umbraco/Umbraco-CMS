@@ -34,21 +34,48 @@ export default class UmbLoginPageElement extends LitElement {
 
 	#usernameInputElement?: HTMLInputElement;
 	#passwordInputElement?: HTMLInputElement;
+	#usernameValidationErrorElement?: HTMLElement;
+	#passwordValidationErrorElement?: HTMLElement;
 
 	connectedCallback(): void {
 		super.connectedCallback();
 
-		requestAnimationFrame(() => {
-			const inputElements = this.slottedElements?.filter(
-				(node) => node.tagName && node.tagName.toLowerCase() === 'input'
-			);
+		this.#initializeInputs();
+	}
 
-			this.#usernameInputElement = inputElements?.find((node) => node.name === 'username');
-			this.#passwordInputElement = inputElements?.find((node) => node.name === 'password');
+	async #initializeInputs() {
+		await new Promise((resolve) => requestAnimationFrame(resolve));
 
-			this.#usernameInputElement?.addEventListener('keydown', this.#onInputKeydown);
-			this.#passwordInputElement?.addEventListener('keydown', this.#onInputKeydown);
-		});
+		const inputElements = this.slottedElements?.filter(
+			(node) => node.tagName && node.tagName.toLowerCase() === 'input'
+		);
+
+		this.#usernameInputElement = inputElements?.find((node) => node.name === 'username');
+		this.#passwordInputElement = inputElements?.find((node) => node.name === 'password');
+
+		this.#usernameInputElement?.addEventListener('keydown', this.#onInputKeydown);
+		this.#passwordInputElement?.addEventListener('keydown', this.#onInputKeydown);
+
+		this.#usernameValidationErrorElement = document.createElement('span');
+		this.#usernameValidationErrorElement.innerText = await umbLocalizationContext.localize(
+			'general_required',
+			undefined,
+			'Required'
+		);
+		this.#usernameValidationErrorElement.style.color = 'var(--uui-color-danger)';
+		this.#usernameValidationErrorElement.style.display = 'none';
+
+		this.#passwordValidationErrorElement = document.createElement('span');
+		this.#passwordValidationErrorElement.innerText = await umbLocalizationContext.localize(
+			'user_password',
+			undefined,
+			'Password'
+		);
+		this.#passwordValidationErrorElement.style.color = 'var(--uui-color-danger)';
+		this.#passwordValidationErrorElement.style.display = 'none';
+
+		this.#usernameInputElement?.insertAdjacentElement('afterend', this.#usernameValidationErrorElement);
+		this.#passwordInputElement?.insertAdjacentElement('afterend', this.#passwordValidationErrorElement);
 	}
 
 	disconnectedCallback(): void {
@@ -74,7 +101,15 @@ export default class UmbLoginPageElement extends LitElement {
 
 		if (!this.#usernameInputElement || !this.#passwordInputElement) return;
 
-		if (!this.#usernameInputElement.checkValidity() || !this.#passwordInputElement.checkValidity()) return;
+		if (!this.#usernameInputElement.checkValidity()) {
+			this.#usernameValidationErrorElement?.style.setProperty('display', 'block');
+			return;
+		}
+
+		if (!this.#passwordInputElement.checkValidity()) {
+			this.#passwordValidationErrorElement?.style.setProperty('display', 'block');
+			return;
+		}
 
 		const formData = new FormData(form);
 
@@ -260,7 +295,7 @@ export default class UmbLoginPageElement extends LitElement {
 				color: inherit;
 				font-weight: bold;
 			}
-			::slotted(input#username-input) {
+			::slotted(input#username-input + span) {
 				margin-bottom: var(--uui-size-space-3);
 			}
 

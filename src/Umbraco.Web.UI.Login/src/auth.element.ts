@@ -96,7 +96,12 @@ export default class UmbAuthElement extends LitElement {
 
 	public connectedCallback() {
 		super.connectedCallback();
-		this._usernameInput = createInput('username-input', 'text', 'username', 'username');
+		this._usernameInput = createInput(
+			'username-input',
+			'text',
+			'username',
+			this.usernameIsEmail ? 'email' : 'username'
+		);
 		this._passwordInput = createInput('password-input', 'password', 'password', 'current-password');
 		this._usernameLabel = createLabel('username-input', this.usernameIsEmail ? 'general_email' : 'user_username');
 		this._passwordLabel = createLabel('password-input', 'user_password');
