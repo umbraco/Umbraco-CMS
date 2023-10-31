@@ -37,15 +37,7 @@ export default class UmbLoginPageElement extends LitElement {
 
 	#formElement?: HTMLFormElement;
 
-	connectedCallback(): void {
-		super.connectedCallback();
-
-		this.#initializeInputs();
-	}
-
-	async #initializeInputs() {
-		await new Promise((resolve) => requestAnimationFrame(resolve));
-
+	async #onSlotChanged() {
 		this.#formElement = this.slottedElements?.[0];
 
 		if (!this.#formElement) return;
@@ -129,7 +121,7 @@ export default class UmbLoginPageElement extends LitElement {
 			${this.disableLocalLogin
 				? nothing
 				: html`
-						<slot></slot>
+						<slot @slotchange=${this.#onSlotChanged}></slot>
 						<div id="secondary-actions">
 							${when(
 								umbAuthContext.supportsPersistLogin,
