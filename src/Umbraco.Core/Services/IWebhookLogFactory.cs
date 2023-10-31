@@ -5,5 +5,5 @@ namespace Umbraco.Cms.Core.Services;
 
 public interface IWebhookLogFactory
 {
-    Task<WebhookLog> CreateAsync(string eventName, WebhookResponseModel responseModel, Webhook webhook, CancellationToken cancellationToken);
+    Task<WebhookLog> CreateAsync(string eventName, WebhookResponseModel responseModel, Webhook webhook);
 }

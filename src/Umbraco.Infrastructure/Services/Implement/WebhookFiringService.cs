@@ -14,35 +14,28 @@ public class WebhookFiringService : IWebhookFiringService
     private readonly WebhookSettings _webhookSettings;
     private readonly IWebhookLogService _webhookLogService;
     private readonly IWebhookLogFactory _webhookLogFactory;
+    private readonly IWebhookBackgroundTaskQueue _webhookBackgroundTaskQueue;
 
     public WebhookFiringService(
         IJsonSerializer jsonSerializer,
         IOptions<WebhookSettings> webhookSettings,
         IWebhookLogService webhookLogService,
-        IWebhookLogFactory webhookLogFactory)
+        IWebhookLogFactory webhookLogFactory,
+        IWebhookBackgroundTaskQueue webhookBackgroundTaskQueue)
     {
         _jsonSerializer = jsonSerializer;
         _webhookLogService = webhookLogService;
         _webhookLogFactory = webhookLogFactory;
+        _webhookBackgroundTaskQueue = webhookBackgroundTaskQueue;
         _webhookSettings = webhookSettings.Value;
     }
 
     // TODO: Add queing instead of processing directly in thread
     // as this just makes save and publish longer
-    public async Task FireAsync(Webhook webhook, string eventName, object? payload, CancellationToken cancellationToken)
-    {
-        for (var retry = 0; retry < _webhookSettings.MaximumRetries; retry++)
-        {
-            HttpResponseMessage response = await SendRequestAsync(webhook, eventName, payload, retry, cancellationToken);
+    public async Task FireAsync(Webhook webhook, string eventName, object? payload, CancellationToken cancellationToken) =>
+        await _webhookBackgroundTaskQueue.QueueBackgroundWorkItemAsync(async () => await SendRequestAsync(webhook, eventName, payload, 0));
 
-            if (response.IsSuccessStatusCode)
-            {
-                return;
-            }
-        }
-    }
-
-    private async Task<HttpResponseMessage> SendRequestAsync(Webhook webhook, string eventName, object? payload, int retryCount, CancellationToken cancellationToken)
+    private async Task<WebhookResponseModel> SendRequestAsync(Webhook webhook, string eventName, object? payload, int retryCount)
     {
         using var httpClient = new HttpClient();
 
@@ -55,7 +48,7 @@ public class WebhookFiringService : IWebhookFiringService
             stringContent.Headers.TryAddWithoutValidation(header.Key, header.Value);
         }
 
-        HttpResponseMessage response = await httpClient.PostAsync(webhook.Url, stringContent, cancellationToken);
+        HttpResponseMessage response = await httpClient.PostAsync(webhook.Url, stringContent);
 
         var webhookResponseModel = new WebhookResponseModel
         {
@@ -64,10 +57,10 @@ public class WebhookFiringService : IWebhookFiringService
         };
 
 
-        WebhookLog log = await _webhookLogFactory.CreateAsync(eventName, webhookResponseModel, webhook, cancellationToken);
+        WebhookLog log = await _webhookLogFactory.CreateAsync(eventName, webhookResponseModel, webhook);
         await _webhookLogService.CreateAsync(log);
 
-        return response;
+        return webhookResponseModel;
     }
 }
 

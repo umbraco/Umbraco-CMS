@@ -5,7 +5,7 @@ namespace Umbraco.Cms.Core.Services;
 
 public class WebhookLogFactory : IWebhookLogFactory
 {
-    public async Task<WebhookLog> CreateAsync(string eventName, WebhookResponseModel responseModel, Webhook webhook, CancellationToken cancellationToken)
+    public async Task<WebhookLog> CreateAsync(string eventName, WebhookResponseModel responseModel, Webhook webhook)
     {
         var log = new WebhookLog
         {
@@ -18,8 +18,8 @@ public class WebhookLogFactory : IWebhookLogFactory
 
         if (responseModel.HttpResponseMessage is not null)
         {
-            log.RequestBody = await responseModel.HttpResponseMessage!.RequestMessage!.Content!.ReadAsStringAsync(cancellationToken);
-            log.ResponseBody = await responseModel.HttpResponseMessage.Content.ReadAsStringAsync(cancellationToken);
+            log.RequestBody = await responseModel.HttpResponseMessage!.RequestMessage!.Content!.ReadAsStringAsync();
+            log.ResponseBody = await responseModel.HttpResponseMessage.Content.ReadAsStringAsync();
             log.StatusCode = responseModel.HttpResponseMessage.StatusCode.ToString();
             log.RetryCount = responseModel.RetryCount;
             log.ResponseHeaders = responseModel.HttpResponseMessage.Headers.ToString();

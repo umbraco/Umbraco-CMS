@@ -183,12 +183,10 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddHostedService<ContentVersionCleanup>();
         builder.Services.AddHostedService<ScheduledPublishing>();
         builder.Services.AddHostedService<TempFileCleanup>();
+        builder.Services.AddHostedService<WebhookQueuedHostedService>();
         builder.Services.AddHostedService<InstructionProcessTask>();
         builder.Services.AddHostedService<TouchServerTask>();
-        builder.Services.AddHostedService(provider =>
-            new ReportSiteTask(
-                provider.GetRequiredService<ILogger<ReportSiteTask>>(),
-                provider.GetRequiredService<ITelemetryService>()));
+        builder.Services.AddHostedService(provider => new ReportSiteTask(provider.GetRequiredService<ILogger<ReportSiteTask>>(), provider.GetRequiredService<ITelemetryService>()));
         return builder;
     }
 
