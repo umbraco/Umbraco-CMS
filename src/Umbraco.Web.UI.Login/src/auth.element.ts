@@ -48,6 +48,7 @@ const createForm = (elements: HTMLElement[]) => {
   styles.innerHTML = authStyles;
   const form = document.createElement('form');
   form.id = 'umb-login-form';
+  form.name = 'login-form';
 
   elements.push(styles);
   elements.forEach((element) => form.appendChild(element));
