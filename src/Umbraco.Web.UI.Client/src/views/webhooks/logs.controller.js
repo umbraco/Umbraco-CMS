@@ -9,14 +9,14 @@
     vm.openLogOverlay = openLogOverlay;
     vm.isChecked = isChecked;
 
-    function loadLogs (){
+    function loadLogs() {
       return webhooksResource.getLogs()
         .then(data => {
           vm.logs = data.items;
         });
     }
 
-    function openLogOverlay (log) {
+    function openLogOverlay(log) {
       overlayService.open({
         view: "views/webhooks/overlays/details.html",
         title: 'Details',
@@ -29,7 +29,7 @@
       });
     }
 
-    function isChecked (log) {
+    function isChecked(log) {
       return log.statusCode === "OK";
     }
 
