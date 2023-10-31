@@ -144,15 +144,15 @@ export default class UmbLoginPageElement extends LitElement {
 										<umb-localize key="login_forgottenPassword">Forgotten password?</umb-localize>
 									</button>`
 							)}
-							<uui-button
-								type="submit"
-								id="umb-login-button"
-								look="primary"
-								@click=${() => this.#formElement?.querySelector('input[type="submit"]')?.click()}
-								.label=${until(umbLocalizationContext.localize('general_login', undefined, 'Login'))}
-								color="default"
-								.state=${this._loginState}></uui-button>
 						</div>
+						<uui-button
+							type="submit"
+							id="umb-login-button"
+							look="primary"
+							@click=${() => this.#formElement?.querySelector('input[type="submit"]')?.click()}
+							.label=${until(umbLocalizationContext.localize('general_login', undefined, 'Login'))}
+							color="default"
+							.state=${this._loginState}></uui-button>
 
 						${this.#renderErrorMessage()}
 
@@ -246,44 +246,6 @@ export default class UmbLoginPageElement extends LitElement {
 				flex-direction: column;
 			}
 
-			uui-input {
-				display: none;
-			}
-
-			::slotted(input) {
-				font-family: inherit;
-				background: none;
-				background-color: var(--uui-input-background-color, var(--uui-color-surface, #fff));
-				padding: var(--uui-size-1, 3px) var(--uui-size-space-3, 9px);
-				font-size: inherit;
-				color: inherit;
-				border-radius: 0px;
-				box-sizing: border-box;
-				text-align: inherit;
-				width: 100%;
-				height: 38px;
-				border-radius: var(--uui-border-radius);
-				box-sizing: border-box;
-				border: var(--uui-input-border-width, 1px) solid var(--uui-input-border-color, var(--uui-color-border, #d8d7d9));
-				position: relative;
-				outline: transparent;
-			}
-			::slotted(input:focus) {
-				border-color: var(--uui-input-border-color-focus, var(--uui-color-border-emphasis, #a1a1a1));
-			}
-			::slotted(input:hover:not(:focus)) {
-				border-color: var(--uui-input-border-color-hover, var(--uui-color-border-standalone, #c2c2c2));
-			}
-			::slotted(label) {
-				font-family: inherit;
-				font-size: inherit;
-				color: inherit;
-				font-weight: bold;
-			}
-			::slotted(input#username-input + span) {
-				margin-bottom: var(--uui-size-space-3);
-			}
-
 			#greeting {
 				color: var(--uui-color-interactive);
 				text-align: center;
@@ -291,12 +253,6 @@ export default class UmbLoginPageElement extends LitElement {
 				font-size: 1.5rem;
 				margin: 0 0 var(--uui-size-layout-2);
 				line-height: 1.2 !important;
-			}
-
-			form {
-				display: flex;
-				flex-direction: column;
-				gap: var(--uui-size-space-2);
 			}
 
 			uui-form-layout-item {
@@ -311,6 +267,7 @@ export default class UmbLoginPageElement extends LitElement {
 			}
 
 			#umb-login-button {
+				margin-top: var(--uui-size-space-4);
 				width: 100%;
 				--uui-button-padding-top-factor: 1.5;
 				--uui-button-padding-bottom-factor: 1.5;
