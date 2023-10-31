@@ -1413,70 +1413,78 @@
 			"name": "icon-name-badge",
 			"file": "contact-2.svg"
 		},
-
-
-
-
-
 		{
 			"name": "icon-navigation-bottom",
-			"file": "navigation-bottom.svg"
+			"file": "arrow-down-to-line.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-navigation-down",
-			"file": "navigation-down.svg"
+			"file": "chevron-down.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-navigation-first",
-			"file": "navigation-first.svg"
+			"file": "arrow-left-to-line.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-navigation-horizontal",
-			"file": "navigation-horizontal.svg"
+			"file": "move-horizontal.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-navigation-last",
-			"file": "navigation-last.svg"
+			"file": "arrow-right-to-line.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-navigation-left",
-			"file": "navigation-left.svg"
+			"file": "chevron-left.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-navigation-right",
-			"file": "navigation-right.svg"
+			"file": "chevron-right.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-navigation-road",
-			"file": "navigation-road.svg"
+			"file": "move-vertical.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-navigation-top",
-			"file": "navigation-top.svg"
+			"file": "arrow-up-to-line",
+			"legacy": true
 		},
 		{
 			"name": "icon-navigation-up",
-			"file": "navigation-up.svg"
+			"file": "chevron-up.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-navigation-vertical",
-			"file": "navigation-vertical.svg"
+			"file": "move-vertical.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-navigation",
-			"file": "navigation.svg"
+			"file": "move.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-navigational-arrow",
-			"file": "navigational-arrow.svg"
+			"file": "navigation-2.svg"
 		},
 		{
 			"name": "icon-network-alt",
-			"file": "network-alt.svg"
+			"file": "network.svg"
 		},
 		{
 			"name": "icon-newspaper-alt",
-			"file": "newspaper-alt.svg"
+			"file": "newspaper.svg",
+			"legacy":true
 		},
 		{
 			"name": "icon-newspaper",
@@ -1484,51 +1492,53 @@
 		},
 		{
 			"name": "icon-next-media",
-			"file": "next-media.svg"
+			"file": "fast-forward.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-next",
-			"file": "next.svg"
+			"file": "play.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-nodes",
-			"file": "nodes.svg"
+			"file": "waypoints.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-notepad-alt",
-			"file": "notepad-alt.svg"
+			"file": "file-text.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-notepad",
-			"file": "notepad.svg"
+			"file": "file-text.svg"
 		},
 		{
 			"name": "icon-old-key",
-			"file": "old-key.svg"
+			"file": "key.svg"
 		},
 		{
 			"name": "icon-old-phone",
-			"file": "old-phone.svg"
+			"file": "phone.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-operator",
-			"file": "operator.svg"
+			"file": "user-cog.svg"
 		},
 		{
 			"name": "icon-ordered-list",
-			"file": "ordered-list.svg"
-		},
-		{
-			"name": "icon-os-x",
-			"file": "os-x.svg"
+			"file": "list-ordered.svg"
 		},
 		{
 			"name": "icon-out",
-			"file": "out.svg"
+			"file": "external-link.svg"
 		},
 		{
 			"name": "icon-outbox",
-			"file": "outbox.svg"
+			"file": "archive-restore.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-outdent",
@@ -1536,27 +1546,28 @@
 		},
 		{
 			"name": "icon-page-add",
-			"file": "page-add.svg"
+			"file": "file-plus-2.svg"
 		},
 		{
 			"name": "icon-page-down",
-			"file": "page-down.svg"
+			"file": "arrow-down-to-line.svg"
 		},
 		{
 			"name": "icon-page-remove",
-			"file": "page-remove.svg"
+			"file": "file-minus-2.svg"
 		},
 		{
 			"name": "icon-page-restricted",
-			"file": "page-restricted.svg"
+			"file": "file-x-2.svg"
 		},
 		{
 			"name": "icon-page-up",
-			"file": "page-up.svg"
+			"file": "arrow-up-to-line.svg"
 		},
 		{
 			"name": "icon-paint-roller",
-			"file": "paint-roller.svg"
+			"file": "paint-bucket.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-palette",
@@ -1564,47 +1575,33 @@
 		},
 		{
 			"name": "icon-panel-show",
-			"file": "panel-show.svg"
+			"file": "panel-bottom-open.svg"
 		},
 		{
 			"name": "icon-pannel-close",
-			"file": "pannel-close.svg"
-		},
-		{
-			"name": "icon-pants",
-			"file": "pants.svg"
+			"file": "panel-bottom-close.svg"
 		},
 		{
 			"name": "icon-paper-bag",
-			"file": "paper-bag.svg"
+			"file": "shopping-basket.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-paper-plane-alt",
-			"file": "paper-plane-alt.svg"
+			"file": "send-horizontal.svg"
 		},
 		{
 			"name": "icon-paper-plane",
-			"file": "paper-plane.svg"
-		},
-		{
-			"name": "icon-parachute-drop",
-			"file": "parachute-drop.svg"
-		},
-		{
-			"name": "icon-parental-control",
-			"file": "parental-control.svg"
+			"file": "send.svg"
 		},
 		{
 			"name": "icon-partly-cloudy",
-			"file": "partly-cloudy.svg"
+			"file": "cloud-sun.svg"
 		},
 		{
 			"name": "icon-paste-in",
-			"file": "paste-in.svg"
-		},
-		{
-			"name": "icon-path",
-			"file": "path.svg"
+			"file": "clipboard-paste.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-pause",
@@ -1612,27 +1609,31 @@
 		},
 		{
 			"name": "icon-pc",
-			"file": "pc.svg"
+			"file": "monitor.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-people-alt-2",
-			"file": "people-alt-2.svg"
+			"file": "person-standing.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-people-alt",
-			"file": "people-alt.svg"
+			"file": "person-standing.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-people-female",
-			"file": "people-female.svg"
+			"file": "person-standing.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-people",
-			"file": "people.svg"
+			"file": "person-standing.svg"
 		},
 		{
 			"name": "icon-phone-ring",
-			"file": "phone-ring.svg"
+			"file": "phone-call.svg"
 		},
 		{
 			"name": "icon-phone",
@@ -1640,23 +1641,24 @@
 		},
 		{
 			"name": "icon-photo-album",
-			"file": "photo-album.svg"
+			"file": "book-image.svg"
 		},
 		{
 			"name": "icon-picture",
-			"file": "picture.svg"
+			"file": "image.svg"
 		},
 		{
 			"name": "icon-pictures-alt-2",
-			"file": "pictures-alt-2.svg"
+			"file": "gallery-thumbnails.svg"
 		},
 		{
 			"name": "icon-pictures-alt",
-			"file": "pictures-alt.svg"
+			"file": "image.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-pictures",
-			"file": "pictures.svg"
+			"file": "camera.svg"
 		},
 		{
 			"name": "icon-pie-chart",
@@ -1668,11 +1670,7 @@
 		},
 		{
 			"name": "icon-pin-location",
-			"file": "pin-location.svg"
-		},
-		{
-			"name": "icon-piracy",
-			"file": "piracy.svg"
+			"file": "map-pin.svg"
 		},
 		{
 			"name": "icon-plane",
@@ -1680,7 +1678,8 @@
 		},
 		{
 			"name": "icon-planet",
-			"file": "planet.svg"
+			"file": "orbit.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-play",
@@ -1688,39 +1687,34 @@
 		},
 		{
 			"name": "icon-playing-cards",
-			"file": "playing-cards.svg"
+			"file": "gallery-horizontal-end.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-playlist",
-			"file": "playlist.svg"
+			"file": "list-music.svg"
 		},
 		{
 			"name": "icon-plugin",
-			"file": "plugin.svg"
+			"file": "blocks.svg"
 		},
 		{
 			"name": "icon-podcast",
 			"file": "podcast.svg"
 		},
 		{
-			"name": "icon-poker-chip",
-			"file": "poker-chip.svg"
-		},
-		{
 			"name": "icon-poll",
-			"file": "poll.svg"
+			"file": "vote.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-post-it",
-			"file": "post-it.svg"
-		},
-		{
-			"name": "icon-pound-bag",
-			"file": "pound-bag.svg"
+			"file": "sticky-note.svg"
 		},
 		{
 			"name": "icon-power-outlet",
-			"file": "power-outlet.svg"
+			"file": "power-square.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-power",
@@ -1732,35 +1726,40 @@
 		},
 		{
 			"name": "icon-previous-media",
-			"file": "previous-media.svg"
+			"file": "rewind.svg"
 		},
 		{
 			"name": "icon-previous",
-			"file": "previous.svg"
+			"file": "skip-back.svg"
 		},
 		{
 			"name": "icon-price-dollar",
-			"file": "price-dollar.svg"
+			"file": "badge-dollar-sign.svg",
+			"legacy":true
 		},
 		{
 			"name": "icon-price-euro",
-			"file": "price-euro.svg"
+			"file": "badge-euro.svg",
+			"legacy":true
 		},
 		{
 			"name": "icon-price-pound",
-			"file": "price-pound.svg"
+			"file": "badge-pound-sterling.svg",
+			"legacy":true
 		},
 		{
 			"name": "icon-price-yen",
-			"file": "price-yen.svg"
+			"file": "badge-japanese-yen",
+			"legacy":true
 		},
 		{
 			"name": "icon-print",
-			"file": "print.svg"
+			"file": "printer.svg"
 		},
 		{
 			"name": "icon-printer-alt",
-			"file": "printer-alt.svg"
+			"file": "printer.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-projector",
@@ -1768,11 +1767,11 @@
 		},
 		{
 			"name": "icon-pulse",
-			"file": "pulse.svg"
+			"file": "activity.svg"
 		},
 		{
 			"name": "icon-pushpin",
-			"file": "pushpin.svg"
+			"file": "pin.svg"
 		},
 		{
 			"name": "icon-qr-code",
@@ -1784,79 +1783,67 @@
 		},
 		{
 			"name": "icon-radio-alt",
-			"file": "radio-alt.svg"
-		},
-		{
-			"name": "icon-radio-receiver",
-			"file": "radio-receiver.svg"
-		},
-		{
-			"name": "icon-radio",
 			"file": "radio.svg"
 		},
 		{
+			"name": "icon-radio-receiver",
+			"file": "boom-box.svg"
+		},
+		{
+			"name": "icon-radio",
+			"file": "radio-tower.svg"
+		},
+		{
 			"name": "icon-rain",
-			"file": "rain.svg"
+			"file": "cloud-rain.svg"
 		},
 		{
 			"name": "icon-rate",
-			"file": "rate.svg"
+			"file": "star.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-re-post",
-			"file": "re-post.svg"
+			"file": "repeat.svg"
 		},
 		{
 			"name": "icon-readonly",
-			"file": "readonly.svg"
+			"file": "ban.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-receipt-alt",
-			"file": "receipt-alt.svg"
-		},
-		{
-			"name": "icon-receipt-dollar",
-			"file": "receipt-dollar.svg"
-		},
-		{
-			"name": "icon-receipt-euro",
-			"file": "receipt-euro.svg"
-		},
-		{
-			"name": "icon-receipt-pound",
-			"file": "receipt-pound.svg"
-		},
-		{
-			"name": "icon-receipt-yen",
-			"file": "receipt-yen.svg"
+			"file": "receipt.svg"
 		},
 		{
 			"name": "icon-reception",
-			"file": "reception.svg"
+			"file": "concierge-bell.svg"
 		},
 		{
 			"name": "icon-record",
-			"file": "record.svg"
+			"file": "disc-3.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-redo",
-			"file": "redo.svg"
+			"file": "redo-2.svg"
 		},
 		{
 			"name": "icon-refresh",
-			"file": "refresh.svg"
+			"file": "rotate-cw.svg"
 		},
 		{
 			"name": "icon-remote",
-			"file": "remote.svg"
+			"file": "calculator.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-remove",
-			"file": "remove.svg"
+			"file": "trash-2.svg"
 		},
 		{
 			"name": "icon-repeat-one",
-			"file": "repeat-one.svg"
+			"file": "repeat-1.svg"
 		},
 		{
 			"name": "icon-repeat",
@@ -1864,7 +1851,7 @@
 		},
 		{
 			"name": "icon-reply-arrow",
-			"file": "reply-arrow.svg"
+			"file": "reply.svg"
 		},
 		{
 			"name": "icon-resize",
@@ -1872,19 +1859,18 @@
 		},
 		{
 			"name": "icon-return-to-top",
-			"file": "return-to-top.svg"
+			"file": "arrow-up-to-line.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-right-double-arrow",
-			"file": "right-double-arrow.svg"
-		},
-		{
-			"name": "icon-road",
-			"file": "road.svg"
+			"file": "chevrons-right.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-roadsign",
-			"file": "roadsign.svg"
+			"file": "milestone.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-rocket",
@@ -1896,23 +1882,11 @@
 		},
 		{
 			"name": "icon-ruler-alt",
-			"file": "ruler-alt.svg"
+			"file": "pencil-ruler.svg"
 		},
 		{
 			"name": "icon-ruler",
 			"file": "ruler.svg"
-		},
-		{
-			"name": "icon-safe",
-			"file": "safe.svg"
-		},
-		{
-			"name": "icon-safedial",
-			"file": "safedial.svg"
-		},
-		{
-			"name": "icon-sandbox-toys",
-			"file": "sandbox-toys.svg"
 		},
 		{
 			"name": "icon-satellite-dish",
@@ -1924,111 +1898,100 @@
 		},
 		{
 			"name": "icon-scan",
-			"file": "scan.svg"
+			"file": "radar.svg"
 		},
 		{
 			"name": "icon-school",
-			"file": "school.svg"
+			"file": "school-2.svg"
 		},
 		{
 			"name": "icon-screensharing",
-			"file": "screensharing.svg"
+			"file": "screen-share.svg"
 		},
 		{
 			"name": "icon-script-alt",
-			"file": "script-alt.svg"
+			"file": "scroll.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-script",
-			"file": "script.svg"
+			"file": "scroll-text.svg"
 		},
 		{
 			"name": "icon-scull",
-			"file": "scull.svg"
+			"file": "skull.svg"
 		},
 		{
 			"name": "icon-search",
 			"file": "search.svg"
 		},
 		{
-			"name": "icon-security-camera",
-			"file": "security-camera.svg"
-		},
-		{
 			"name": "icon-sensor",
-			"file": "sensor.svg"
+			"file": "scan-eye.svg"
 		},
 		{
 			"name": "icon-server-alt",
-			"file": "server-alt.svg"
+			"file": "database.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-server",
 			"file": "server.svg"
 		},
 		{
-			"name": "icon-settings-alt-2",
-			"file": "settings-alt-2.svg"
-		},
-		{
 			"name": "icon-settings-alt",
-			"file": "settings-alt.svg"
+			"file": "settings.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-settings",
 			"file": "settings.svg"
 		},
 		{
-			"name": "icon-share-alt-2",
-			"file": "share-alt-2.svg"
-		},
-		{
 			"name": "icon-share-alt",
-			"file": "share-alt.svg"
+			"file": "wifi.svg"
 		},
 		{
 			"name": "icon-share",
-			"file": "share.svg"
+			"file": "share-2.svg"
 		},
 		{
 			"name": "icon-sharing-iphone",
-			"file": "sharing-iphone.svg"
+			"file": "share.svg"
 		},
 		{
 			"name": "icon-shield",
-			"file": "shield.svg"
+			"file": "shield-half.svg"
 		},
 		{
 			"name": "icon-shift",
-			"file": "shift.svg"
+			"file": "arrow-big-up.svg"
 		},
 		{
 			"name": "icon-shipping-box",
-			"file": "shipping-box.svg"
+			"file": "container.svg"
 		},
 		{
 			"name": "icon-shipping",
-			"file": "shipping.svg"
+			"file": "baggage-claim.svg"
 		},
 		{
 			"name": "icon-shoe",
-			"file": "shoe.svg"
+			"file": "footprints.svg",
+			"legay": true
 		},
 		{
 			"name": "icon-shopping-basket-alt-2",
-			"file": "shopping-basket-alt-2.svg"
+			"file": "shopping-basket.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-shopping-basket-alt",
-			"file": "shopping-basket-alt.svg"
-		},
-		{
-			"name": "icon-shopping-basket",
 			"file": "shopping-basket.svg"
 		},
 		{
-			"name": "icon-shorts",
-			"file": "shorts.svg"
+			"name": "icon-shopping-basket",
+			"file": "shopping-cart.svg"
 		},
 		{
 			"name": "icon-shuffle",
@@ -2036,63 +1999,63 @@
 		},
 		{
 			"name": "icon-sience",
-			"file": "sience.svg"
-		},
-		{
-			"name": "icon-simcard",
-			"file": "simcard.svg"
+			"file": "atom.svg"
 		},
 		{
 			"name": "icon-single-note",
-			"file": "single-note.svg"
+			"file": "music-2.svg"
 		},
 		{
 			"name": "icon-sitemap",
-			"file": "sitemap.svg"
+			"file": "network.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-sleep",
-			"file": "sleep.svg"
+			"file": "moon-star.svg"
 		},
 		{
 			"name": "icon-slideshow",
-			"file": "slideshow.svg"
+			"file": "presentation.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-smiley-inverted",
-			"file": "smiley-inverted.svg"
+			"file": "smile.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-smiley",
-			"file": "smiley.svg"
+			"file": "smile.svg"
 		},
 		{
 			"name": "icon-snow",
-			"file": "snow.svg"
+			"file": "cloud-snow.svg"
 		},
 		{
 			"name": "icon-sound-low",
-			"file": "sound-low.svg"
+			"file": "volume-1.svg"
 		},
 		{
 			"name": "icon-sound-medium",
-			"file": "sound-medium.svg"
+			"file": "volume-2.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-sound-off",
-			"file": "sound-off.svg"
+			"file": "volume.svg"
 		},
 		{
 			"name": "icon-sound-waves",
-			"file": "sound-waves.svg"
+			"file": "waves.svg"
 		},
 		{
 			"name": "icon-sound",
-			"file": "sound.svg"
+			"file": "volume-2.svg"
 		},
 		{
 			"name": "icon-spades",
-			"file": "spades.svg"
+			"file": "spade.svg"
 		},
 		{
 			"name": "icon-speaker",
@@ -2100,7 +2063,7 @@
 		},
 		{
 			"name": "icon-speed-gauge",
-			"file": "speed-gauge.svg"
+			"file": "gauge-circle.svg"
 		},
 		{
 			"name": "icon-split-alt",
@@ -2116,31 +2079,36 @@
 		},
 		{
 			"name": "icon-squiggly-line",
-			"file": "squiggly-line.svg"
+			"file": "route.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-ssd",
-			"file": "ssd.svg"
+			"file": "hard-drive.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-stacked-disks",
-			"file": "stacked-disks.svg"
+			"file": "server.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-stamp",
-			"file": "stamp.svg"
+			"file": "square-asterisk.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-stop-alt",
-			"file": "stop-alt.svg"
+			"file": "x-octagon.svg"
 		},
 		{
 			"name": "icon-stop-hand",
-			"file": "stop-hand.svg"
+			"file": "hand.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-stop",
-			"file": "stop.svg"
+			"file": "square.svg"
 		},
 		{
 			"name": "icon-store",
@@ -2148,35 +2116,29 @@
 		},
 		{
 			"name": "icon-stream",
-			"file": "stream.svg"
+			"file": "activity-square.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-sunny",
-			"file": "sunny.svg"
+			"file": "sun.svg"
 		},
 		{
 			"name": "icon-sweatshirt",
-			"file": "sweatshirt.svg"
+			"file": "shirt.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-sync",
-			"file": "sync.svg"
+			"file": "refresh-ccw.svg"
 		},
 		{
 			"name": "icon-t-shirt",
-			"file": "t-shirt.svg"
+			"file": "shirt.svg"
 		},
 		{
 			"name": "icon-tab-key",
-			"file": "tab-key.svg"
-		},
-		{
-			"name": "icon-tab",
-			"file": "tab.svg"
-		},
-		{
-			"name": "icon-tactics",
-			"file": "tactics.svg"
+			"file": "arrow-right-to-line.svg"
 		},
 		{
 			"name": "icon-tag",
@@ -2188,7 +2150,8 @@
 		},
 		{
 			"name": "icon-takeaway-cup",
-			"file": "takeaway-cup.svg"
+			"file": "cup-soda.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-target",
@@ -2196,47 +2159,39 @@
 		},
 		{
 			"name": "icon-temperatrure-alt",
-			"file": "temperatrure-alt.svg"
+			"file": "thermometer-snowflake.svg"
 		},
 		{
 			"name": "icon-temperature",
-			"file": "temperature.svg"
+			"file": "thermometer-sun.svg"
 		},
 		{
 			"name": "icon-terminal",
-			"file": "terminal.svg"
+			"file": "terminal-square.svg"
 		},
 		{
 			"name": "icon-theater",
-			"file": "theater.svg"
-		},
-		{
-			"name": "icon-theif",
-			"file": "theif.svg"
-		},
-		{
-			"name": "icon-thought-bubble",
-			"file": "thought-bubble.svg"
+			"file": "drama.svg"
 		},
 		{
 			"name": "icon-thumb-down",
-			"file": "thumb-down.svg"
+			"file": "thumbs-down.svg"
 		},
 		{
 			"name": "icon-thumb-up",
-			"file": "thumb-up.svg"
+			"file": "thumbs-up.svg"
 		},
 		{
 			"name": "icon-thumbnail-list",
-			"file": "thumbnail-list.svg"
+			"file": "layout-list.svg"
 		},
 		{
 			"name": "icon-thumbnails-small",
-			"file": "thumbnails-small.svg"
+			"file": "grip.svg"
 		},
 		{
 			"name": "icon-thumbnails",
-			"file": "thumbnails.svg"
+			"file": "layout-grid.svg"
 		},
 		{
 			"name": "icon-ticket",
@@ -2244,12 +2199,16 @@
 		},
 		{
 			"name": "icon-time",
-			"file": "time.svg"
+			"file": "clock-4.svg"
 		},
 		{
 			"name": "icon-timer",
 			"file": "timer.svg"
 		},
+
+
+
+		
 		{
 			"name": "icon-tools",
 			"file": "tools.svg"
@@ -2344,7 +2303,7 @@
 		},
 		{
 			"name": "icon-undo",
-			"file": "undo.svg"
+			"file": "undo-2.svg"
 		},
 		{
 			"name": "icon-universal",
@@ -2477,6 +2436,18 @@
 		{
 			"name": "icon-zoom-in",
 			"file": "zoom-in.svg"
+		},
+
+
+
+
+		{
+			"name": "icon-star",
+			"file": "star.svg"
+		},
+		{
+			"name": "icon-database",
+			"file": "database.svg"
 		}
 	]
 }
