@@ -29,32 +29,15 @@ public class WebhookFiringService : IWebhookFiringService
 
     // TODO: Add queing instead of processing directly in thread
     // as this just makes save and publish longer
-    public async Task FireAsync(Webhook webhook, string eventName, object? payload, CancellationToken cancellationToken, TimeSpan? retryDelay = null)
+    public async Task FireAsync(Webhook webhook, string eventName, object? payload, CancellationToken cancellationToken)
     {
         for (var retry = 0; retry < _webhookSettings.MaximumRetries; retry++)
         {
-            try
-            {
-                HttpResponseMessage response = await SendRequestAsync(webhook, eventName, payload, retry, cancellationToken);
+            HttpResponseMessage response = await SendRequestAsync(webhook, eventName, payload, retry, cancellationToken);
 
-                if (response.IsSuccessStatusCode)
-                {
-                    return;
-                }
-
-                // Retry after a delay, if specified
-                if (retryDelay is not null)
-                {
-                    await Task.Delay(retryDelay.Value, cancellationToken);
-                }
-            }
-            catch (Exception ex)
+            if (response.IsSuccessStatusCode)
             {
-                // Retry after a delay, if specified
-                if (retryDelay != null)
-                {
-                    await Task.Delay(retryDelay.Value, cancellationToken);
-                }
+                return;
             }
         }
     }
