@@ -115,6 +115,11 @@ export default class UmbLoginPageElement extends LitElement {
 		][new Date().getDay()];
 	}
 
+	#onSubmitClick = () => {
+		const submitButton = this.#formElement?.querySelector('input[type="submit"]') as HTMLInputElement;
+		submitButton?.click();
+	};
+
 	render() {
 		return html`
 			<h1 id="greeting" class="uui-h3">
@@ -148,7 +153,7 @@ export default class UmbLoginPageElement extends LitElement {
 							type="submit"
 							id="umb-login-button"
 							look="primary"
-							@click=${() => this.#formElement?.querySelector('input[type="submit"]')?.click()}
+							@click=${this.#onSubmitClick}
 							.label=${until(umbLocalizationContext.localize('general_login', undefined, 'Login'))}
 							color="default"
 							.state=${this._loginState}></uui-button>
