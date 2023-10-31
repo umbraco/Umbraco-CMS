@@ -1,6 +1,6 @@
-import type { UUIButtonElement, UUIButtonState } from '@umbraco-ui/uui';
+import type { UUIButtonState } from '@umbraco-ui/uui';
 import { css, CSSResultGroup, html, LitElement, nothing } from 'lit';
-import { customElement, property, query, queryAssignedElements, state } from 'lit/decorators.js';
+import { customElement, property, queryAssignedElements, state } from 'lit/decorators.js';
 import { when } from 'lit/directives/when.js';
 import { until } from 'lit/directives/until.js';
 
