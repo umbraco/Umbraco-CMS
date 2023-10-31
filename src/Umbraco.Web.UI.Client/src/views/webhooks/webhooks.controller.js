@@ -22,7 +22,6 @@
 
       let promises = [];
 
-      // Load all languages
       promises.push(loadEvents());
       promises.push(loadWebhooks());
 

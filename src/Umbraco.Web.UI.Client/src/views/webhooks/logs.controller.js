@@ -1,13 +1,25 @@
 (function () {
   "use strict";
 
-  function WebhookLogController(webhooksResource, overlayService) {
+  function WebhookLogController($q, webhooksResource, overlayService) {
 
     const vm = this;
 
     vm.logs = [];
     vm.openLogOverlay = openLogOverlay;
     vm.isChecked = isChecked;
+
+    function init() {
+      vm.loading = true;
+
+      let promises = [];
+
+      promises.push(loadLogs());
+
+      $q.all(promises).then(function () {
+        vm.loading = false;
+      });
+    }
 
     function loadLogs() {
       return webhooksResource.getLogs()
@@ -33,7 +45,7 @@
       return log.statusCode === "OK";
     }
 
-    loadLogs();
+    init();
   }
 
   angular.module("umbraco").controller("Umbraco.Editors.Webhooks.WebhookLogController", WebhookLogController);
