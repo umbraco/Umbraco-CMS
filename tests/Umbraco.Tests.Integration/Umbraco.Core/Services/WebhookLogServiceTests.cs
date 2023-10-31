@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using System.Globalization;
+using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
@@ -37,7 +38,7 @@ public class WebhookLogServiceTests : UmbracoIntegrationTest
             Assert.IsNotEmpty(webhookLogsPaged.Items);
             Assert.AreEqual(1, webhookLogsPaged.Items.Count());
             var webHookLog = webhookLogsPaged.Items.First();
-            Assert.AreEqual(createdWebhookLog.Date, webHookLog.Date);
+            Assert.AreEqual(createdWebhookLog.Date.ToString(CultureInfo.InvariantCulture), webHookLog.Date.ToString(CultureInfo.InvariantCulture));
             Assert.AreEqual(createdWebhookLog.EventName, webHookLog.EventName);
             Assert.AreEqual(createdWebhookLog.RequestBody, webHookLog.RequestBody);
             Assert.AreEqual(createdWebhookLog.ResponseBody, webHookLog.ResponseBody);
