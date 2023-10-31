@@ -32,9 +32,6 @@ export default class UmbLoginPageElement extends LitElement {
     return umbAuthContext.disableLocalLogin;
   }
 
-  @state()
-  nativeInputValue = '';
-
   #formElement?: HTMLFormElement;
 
   async #onSlotChanged() {
