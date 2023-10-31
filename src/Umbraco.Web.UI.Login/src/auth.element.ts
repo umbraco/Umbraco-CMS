@@ -11,26 +11,26 @@ import { InputType, UUIFormLayoutItemElement, UUILabelElement } from '@umbraco-u
 
 import authStyles from './auth-styles.css?inline';
 
-const createInput = (id: string, type: InputType, name: string, autocomplete: AutoFill, requiredMessage: string, label: string, inputmode: string) => {
+const createInput = (opts: {id: string, type: InputType, name: string, autocomplete: AutoFill, requiredMessage: string, label: string, inputmode: string}) => {
   const input = document.createElement('umb-login-input');
-  input.type = type;
-  input.name = name;
-  input.autocomplete = autocomplete;
-  input.id = id;
+  input.type = opts.type;
+  input.name = opts.name;
+  input.autocomplete = opts.autocomplete;
+  input.id = opts.id;
   input.required = true;
-  input.requiredMessage = requiredMessage;
-  input.label = label;
+  input.requiredMessage = opts.requiredMessage;
+  input.label = opts.label;
   input.spellcheck = false;
-  input.inputMode = inputmode;
+  input.inputMode = opts.inputmode;
 
   return input;
 };
 
-const createLabel = (forId: string, localizeAlias: string) => {
+const createLabel = (opts: {forId: string, localizeAlias: string}) => {
   const label = document.createElement('uui-label');
   const umbLocalize = document.createElement('umb-localize') as UmbLocalizeElement;
-  umbLocalize.key = localizeAlias;
-  label.for = forId;
+  umbLocalize.key = opts.localizeAlias;
+  label.for = opts.forId;
   label.appendChild(umbLocalize);
 
   return label;
@@ -153,18 +153,26 @@ export default class UmbAuthElement extends LitElement {
     const labelPassword = await umbLocalizationContext.localize('general_password', undefined, 'Password');
     const requiredMessage = await umbLocalizationContext.localize('general_required', undefined, 'Required');
 
-    this._usernameInput = createInput(
-      'username-input',
-      'text',
-      'username',
-      'username',
+    this._usernameInput = createInput({
+      id: 'username-input',
+      type: 'text',
+      name: 'username',
+      autocomplete: 'username',
       requiredMessage,
-      labelUsername,
-      this.usernameIsEmail ? 'email' : ''
-    );
-    this._passwordInput = createInput('password-input', 'password', 'password', 'current-password', requiredMessage, labelPassword, '');
-    this._usernameLabel = createLabel('username-input', this.usernameIsEmail ? 'general_email' : 'user_username');
-    this._passwordLabel = createLabel('password-input', 'user_password');
+      label: labelUsername,
+      inputmode: this.usernameIsEmail ? 'email' : ''
+    });
+    this._passwordInput = createInput({
+      id: 'password-input',
+      type: 'password',
+      name: 'password',
+      autocomplete: 'current-password',
+      requiredMessage,
+      label: labelPassword,
+      inputmode: ''
+    });
+    this._usernameLabel = createLabel({ forId: 'username-input', localizeAlias: this.usernameIsEmail ? 'general_email' : 'user_username' });
+    this._passwordLabel = createLabel({ forId: 'password-input', localizeAlias: 'user_password' });
 
     this._usernameLayoutItem = createFormLayoutItem(this._usernameLabel, this._usernameInput);
     this._passwordLayoutItem = createFormLayoutItem(this._passwordLabel, this._passwordInput);
