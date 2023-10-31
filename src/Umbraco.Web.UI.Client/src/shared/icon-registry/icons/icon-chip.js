@@ -1,1 +1,23 @@
-export default `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor"><path d="M38.744 361.163h49.97v-32.422h-49.97v32.422zm0-118.64h49.97v-32.442h-49.97v32.442zm0 59.323h49.97v-32.411h-49.97v32.411zm0-118.676h49.97v-32.397h-49.97v32.397zm435.289 145.571h-69.112v-26.896h69.112v-32.411h-69.112v-26.943h69.112v-32.41h-69.112v-26.897h69.098v-60.289h-32.391l-.017 27.863h-36.69v-18.457c0-14.062-11.38-25.459-25.442-25.459H132.14c-14.062 0-25.458 11.396-25.458 25.459v247.34c0 14.062 11.396 25.442 25.458 25.442h247.339c14.062 0 25.442-11.38 25.442-25.442v-18.479h36.69v24.266h32.422v-56.687zm-104.447 40.991H142.034V142.178h227.552v227.554zM344.668 167.13H166.967v177.649h177.701V167.13z"/></svg>`;
+export default `<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="1.75"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <rect x="4" y="4" width="16" height="16" rx="2" />
+  <rect x="9" y="9" width="6" height="6" />
+  <path d="M15 2v2" />
+  <path d="M15 20v2" />
+  <path d="M2 15h2" />
+  <path d="M2 9h2" />
+  <path d="M20 15h2" />
+  <path d="M20 9h2" />
+  <path d="M9 2v2" />
+  <path d="M9 20v2" />
+</svg>
+`;

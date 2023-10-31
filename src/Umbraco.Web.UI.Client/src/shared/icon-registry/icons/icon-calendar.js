@@ -13,5 +13,6 @@ export default `<svg
   <line x1="16" x2="16" y1="2" y2="6" />
   <line x1="8" x2="8" y1="2" y2="6" />
   <line x1="3" x2="21" y1="10" y2="10" />
+  <path d="m9 16 2 2 4-4" />
 </svg>
 `;

@@ -9,8 +9,10 @@ export default `<svg
   stroke-linecap="round"
   stroke-linejoin="round"
 >
-  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-  <polyline points="7 10 12 15 17 10" />
-  <line x1="12" x2="12" y1="15" y2="3" />
+  <path d="M12 13V7" />
+  <path d="m15 10-3 3-3-3" />
+  <rect width="20" height="14" x="2" y="3" rx="2" />
+  <path d="M12 17v4" />
+  <path d="M8 21h8" />
 </svg>
 `;

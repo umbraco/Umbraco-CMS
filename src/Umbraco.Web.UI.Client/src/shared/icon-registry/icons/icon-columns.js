@@ -9,7 +9,8 @@ export default `<svg
   stroke-linecap="round"
   stroke-linejoin="round"
 >
-  <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
-  <line x1="12" x2="12" y1="3" y2="21" />
+  <path d="M4 4v16" />
+  <path d="M9 4v16" />
+  <path d="M14 4v16" />
 </svg>
 `;

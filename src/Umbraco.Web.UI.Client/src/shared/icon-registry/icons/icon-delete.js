@@ -9,8 +9,7 @@ export default `<svg
   stroke-linecap="round"
   stroke-linejoin="round"
 >
-  <path d="M20 5H9l-7 7 7 7h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2Z" />
-  <line x1="18" x2="12" y1="9" y2="15" />
-  <line x1="12" x2="18" y1="9" y2="15" />
+  <path d="M18 6 6 18" />
+  <path d="m6 6 12 12" />
 </svg>
 `;
