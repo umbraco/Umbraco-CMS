@@ -23,9 +23,9 @@
 
     function loadNavigation() {
 
-      const labels = ["treeHeaders_webhooks", "webhooks_logs"];
+      const labelKeys = ["treeHeaders_webhooks", "webhooks_logs"];
 
-      localizationService.localizeMany(labels).then(data => {
+      localizationService.localizeMany(labelKeys).then(data => {
         vm.page.labels.webhooks = data[0];
         vm.page.labels.logs = data[1];
 

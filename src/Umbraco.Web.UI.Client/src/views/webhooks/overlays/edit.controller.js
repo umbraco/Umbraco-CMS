@@ -2,7 +2,9 @@
   "use strict";
 
   function EditController($scope, editorService, contentTypeResource, mediaTypeResource) {
-    var vm = this;
+
+    const vm = this;
+
     vm.clearContentType = clearContentType;
     vm.clearEvent = clearEvent;
     vm.removeHeader = removeHeader;
@@ -104,8 +106,7 @@
       }
     }
 
-    function submit()
-    {
+    function submit() {
       if ($scope.model.submit) {
         $scope.model.submit($scope.model);
       }
