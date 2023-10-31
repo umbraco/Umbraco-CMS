@@ -1,6 +1,6 @@
 import type { UUIButtonState } from '@umbraco-ui/uui';
 import { css, CSSResultGroup, html, LitElement, nothing } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
+import { customElement, property, queryAssignedElements, state } from 'lit/decorators.js';
 import { when } from 'lit/directives/when.js';
 import { until } from 'lit/directives/until.js';
 
@@ -11,6 +11,9 @@ import { umbLocalizationContext } from '../../external/localization/localization
 export default class UmbLoginPageElement extends LitElement {
 	@property({ type: Boolean, attribute: 'username-is-email' })
 	usernameIsEmail = false;
+
+	@queryAssignedElements({ flatten: true })
+	protected slottedElements?: HTMLElement[];
 
 	@property({ type: Boolean, attribute: 'allow-password-reset' })
 	allowPasswordReset = false;
@@ -24,6 +27,25 @@ export default class UmbLoginPageElement extends LitElement {
 	@state()
 	private get disableLocalLogin() {
 		return umbAuthContext.disableLocalLogin;
+	}
+
+	connectedCallback(): void {
+		super.connectedCallback();
+
+		requestAnimationFrame(() => {
+			const inputElements = this.slottedElements?.filter(
+				(node) => node.tagName && node.tagName.toLowerCase() === 'input'
+			);
+
+			const usernameInput = inputElements?.find((node) => node.name === 'username');
+			const passwordInput = inputElements?.find((node) => node.name === 'password');
+
+			console.log('umb-login-page', usernameInput, passwordInput);
+		});
+	}
+
+	disconnectedCallback(): void {
+		super.disconnectedCallback();
 	}
 
 	#handleSubmit = async (e: SubmitEvent) => {
@@ -99,11 +121,12 @@ export default class UmbLoginPageElement extends LitElement {
 				: html`
 						<uui-form>
 							<form id="LoginForm" name="login" @submit="${this.#handleSubmit}">
-								<uui-form-layout-item>
+								<slot></slot>
+								<!-- <uui-form-layout-item>
 									<uui-label id="emailLabel" for="umb-username" slot="label" required>
 										${this.usernameIsEmail
-											? html`<umb-localize key="general_email">Email</umb-localize>`
-											: html`<umb-localize key="user_username">Name</umb-localize>`}
+									? html`<umb-localize key="general_email">Email</umb-localize>`
+									: html`<umb-localize key="user_username">Name</umb-localize>`}
 									</uui-label>
 									<uui-input
 										type=${this.usernameIsEmail ? 'email' : 'text'}
@@ -111,12 +134,10 @@ export default class UmbLoginPageElement extends LitElement {
 										name="email"
 										autocomplete=${this.usernameIsEmail ? 'username' : 'email'}
 										.label=${this.usernameIsEmail
-											? until(umbLocalizationContext.localize('general_email', undefined, 'Email'))
-											: until(umbLocalizationContext.localize('user_username', undefined, 'Username'))}
+									? until(umbLocalizationContext.localize('general_email', undefined, 'Email'))
+									: until(umbLocalizationContext.localize('user_username', undefined, 'Username'))}
 										required
-										required-message=${until(
-											umbLocalizationContext.localize('general_required', undefined, 'Required')
-										)}></uui-input>
+										required-message=${until(umbLocalizationContext.localize('general_required', undefined, 'Required'))}></uui-input>
 								</uui-form-layout-item>
 
 								<uui-form-layout-item>
@@ -130,9 +151,9 @@ export default class UmbLoginPageElement extends LitElement {
 										.label=${until(umbLocalizationContext.localize('user_password', undefined, 'Password'))}
 										required
 										required-message=${until(
-											umbLocalizationContext.localize('general_required', undefined, 'Required')
-										)}></uui-input-password>
-								</uui-form-layout-item>
+									umbLocalizationContext.localize('general_required', undefined, 'Required')
+								)}></uui-input-password>
+								</uui-form-layout-item> -->
 
 								<div id="secondary-actions">
 									${when(
@@ -189,6 +210,40 @@ export default class UmbLoginPageElement extends LitElement {
 				flex-direction: column;
 			}
 
+			::slotted(input) {
+				font-family: inherit;
+				background: none;
+				background-color: var(--uui-input-background-color, var(--uui-color-surface, #fff));
+				padding: var(--uui-size-1, 3px) var(--uui-size-space-3, 9px);
+				font-size: inherit;
+				color: inherit;
+				border-radius: 0px;
+				box-sizing: border-box;
+				text-align: inherit;
+				width: 100%;
+				height: 38px;
+				border-radius: var(--uui-border-radius);
+				box-sizing: border-box;
+				border: var(--uui-input-border-width, 1px) solid var(--uui-input-border-color, var(--uui-color-border, #d8d7d9));
+				position: relative;
+				outline: transparent;
+			}
+			::slotted(input:focus) {
+				border-color: var(--uui-input-border-color-focus, var(--uui-color-border-emphasis, #a1a1a1));
+			}
+			::slotted(input:hover:not(:focus)) {
+				border-color: var(--uui-input-border-color-hover, var(--uui-color-border-standalone, #c2c2c2));
+			}
+			::slotted(label) {
+				font-family: inherit;
+				font-size: inherit;
+				color: inherit;
+				font-weight: bold;
+			}
+			::slotted(input#username-input) {
+				margin-bottom: var(--uui-size-space-3);
+			}
+
 			#greeting {
 				color: var(--uui-color-interactive);
 				text-align: center;
@@ -201,7 +256,7 @@ export default class UmbLoginPageElement extends LitElement {
 			form {
 				display: flex;
 				flex-direction: column;
-				gap: var(--uui-size-space-5);
+				gap: var(--uui-size-space-2);
 			}
 
 			uui-form-layout-item {
