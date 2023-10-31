@@ -52,43 +52,7 @@ export default class UmbLoginPageElement extends LitElement {
 		if (!this.#formElement) return;
 
 		this.#formElement.onsubmit = this.#handleSubmit;
-
-		console.log('Form', this.#formElement, this.slottedElements);
-
-		// this.#usernameValidationErrorElement = document.createElement('span');
-		// this.#usernameValidationErrorElement.innerText = await umbLocalizationContext.localize(
-		// 	'general_required',
-		// 	undefined,
-		// 	'Required'
-		// );
-		// this.#usernameValidationErrorElement.style.color = 'var(--uui-color-danger)';
-		// this.#usernameValidationErrorElement.style.display = 'none';
-
-		// this.#passwordValidationErrorElement = document.createElement('span');
-		// this.#passwordValidationErrorElement.innerText = await umbLocalizationContext.localize(
-		// 	'user_password',
-		// 	undefined,
-		// 	'Password'
-		// );
-		// this.#passwordValidationErrorElement.style.color = 'var(--uui-color-danger)';
-		// this.#passwordValidationErrorElement.style.display = 'none';
-
-		// this.#usernameInputElement?.insertAdjacentElement('afterend', this.#usernameValidationErrorElement);
-		// this.#passwordInputElement?.insertAdjacentElement('afterend', this.#passwordValidationErrorElement);
 	}
-
-	disconnectedCallback(): void {
-		super.disconnectedCallback();
-
-		// this.#usernameInputElement?.removeEventListener('keydown', this.#onInputKeydown);
-		// this.#passwordInputElement?.removeEventListener('keydown', this.#onInputKeydown);
-	}
-
-	#onInputKeydown = (event: KeyboardEvent) => {
-		if (event.key === 'Enter') {
-			this.submitButtonElement?.click();
-		}
-	};
 
 	#handleSubmit = async (e: SubmitEvent) => {
 		e.preventDefault();
@@ -98,27 +62,11 @@ export default class UmbLoginPageElement extends LitElement {
 
 		if (!form.checkValidity()) return;
 
-		// if (!this.#usernameInputElement || !this.#passwordInputElement) return;
-
-		// if (!this.#usernameInputElement.checkValidity()) {
-		// 	this.#usernameValidationErrorElement?.style.setProperty('display', 'block');
-		// 	return;
-		// }
-
-		// if (!this.#passwordInputElement.checkValidity()) {
-		// 	this.#passwordValidationErrorElement?.style.setProperty('display', 'block');
-		// 	return;
-		// }
-
 		const formData = new FormData(form);
 
 		const username = formData.get('username') as string;
 		const password = formData.get('password') as string;
 		const persist = formData.has('persist');
-
-		console.log('Form data', username, password, persist);
-
-		return;
 
 		this._loginState = 'waiting';
 
@@ -170,11 +118,6 @@ export default class UmbLoginPageElement extends LitElement {
 
 	render() {
 		return html`
-			<h2>LOGIN</h2>
-			<slot></slot>
-			<h3>END</h3>
-		`;
-		return html`
 			<h1 id="greeting" class="uui-h3">
 				<umb-localize .key=${this.#greetingLocalizationKey}></umb-localize>
 			</h1>
@@ -183,13 +126,43 @@ export default class UmbLoginPageElement extends LitElement {
 				? nothing
 				: html`
 						<slot></slot>
-						<uui-form>
+						<div id="secondary-actions">
+							${when(
+								umbAuthContext.supportsPersistLogin,
+								() => html`<uui-form-layout-item>
+									<uui-checkbox
+										name="persist"
+										.label=${until(umbLocalizationContext.localize('user_rememberMe', undefined, 'Remember me'))}>
+										<umb-localize key="user_rememberMe">Remember me</umb-localize>
+									</uui-checkbox>
+								</uui-form-layout-item>`
+							)}
+							${when(
+								this.allowPasswordReset,
+								() =>
+									html`<button type="button" id="forgot-password" @click=${this.#handleForgottenPassword}>
+										<umb-localize key="login_forgottenPassword">Forgotten password?</umb-localize>
+									</button>`
+							)}
+							<uui-button
+								type="submit"
+								id="umb-login-button"
+								look="primary"
+								@click=${() => this.#formElement?.querySelector('input[type="submit"]')?.click()}
+								.label=${until(umbLocalizationContext.localize('general_login', undefined, 'Login'))}
+								color="default"
+								.state=${this._loginState}></uui-button>
+						</div>
+
+						${this.#renderErrorMessage()}
+
+						<!-- <uui-form>
 							<form id="LoginForm" name="login" @submit="${this.#handleSubmit}">
 								<uui-form-layout-item>
 									<uui-label id="emailLabel" for="umb-username" slot="label" required>
 										${this.usernameIsEmail
-											? html`<umb-localize key="general_email">Email</umb-localize>`
-											: html`<umb-localize key="user_username">Name</umb-localize>`}
+							? html`<umb-localize key="general_email">Email</umb-localize>`
+							: html`<umb-localize key="user_username">Name</umb-localize>`}
 									</uui-label>
 									<uui-input
 										type=${this.usernameIsEmail ? 'email' : 'text'}
@@ -197,12 +170,10 @@ export default class UmbLoginPageElement extends LitElement {
 										name="email"
 										autocomplete=${this.usernameIsEmail ? 'username' : 'email'}
 										.label=${this.usernameIsEmail
-											? until(umbLocalizationContext.localize('general_email', undefined, 'Email'))
-											: until(umbLocalizationContext.localize('user_username', undefined, 'Username'))}
+							? until(umbLocalizationContext.localize('general_email', undefined, 'Email'))
+							: until(umbLocalizationContext.localize('user_username', undefined, 'Username'))}
 										required
-										required-message=${until(
-											umbLocalizationContext.localize('general_required', undefined, 'Required')
-										)}></uui-input>
+										required-message=${until(umbLocalizationContext.localize('general_required', undefined, 'Required'))}></uui-input>
 								</uui-form-layout-item>
 
 								<uui-form-layout-item>
@@ -216,28 +187,28 @@ export default class UmbLoginPageElement extends LitElement {
 										.label=${until(umbLocalizationContext.localize('user_password', undefined, 'Password'))}
 										required
 										required-message=${until(
-											umbLocalizationContext.localize('general_required', undefined, 'Required')
-										)}></uui-input-password>
+							umbLocalizationContext.localize('general_required', undefined, 'Required')
+						)}></uui-input-password>
 								</uui-form-layout-item>
 
 								<div id="secondary-actions">
 									${when(
-										umbAuthContext.supportsPersistLogin,
-										() => html`<uui-form-layout-item>
-											<uui-checkbox
-												name="persist"
-												.label=${until(umbLocalizationContext.localize('user_rememberMe', undefined, 'Remember me'))}>
-												<umb-localize key="user_rememberMe">Remember me</umb-localize>
-											</uui-checkbox>
-										</uui-form-layout-item>`
-									)}
+							umbAuthContext.supportsPersistLogin,
+							() => html`<uui-form-layout-item>
+								<uui-checkbox
+									name="persist"
+									.label=${until(umbLocalizationContext.localize('user_rememberMe', undefined, 'Remember me'))}>
+									<umb-localize key="user_rememberMe">Remember me</umb-localize>
+								</uui-checkbox>
+							</uui-form-layout-item>`
+						)}
 									${when(
-										this.allowPasswordReset,
-										() =>
-											html`<button type="button" id="forgot-password" @click=${this.#handleForgottenPassword}>
-												<umb-localize key="login_forgottenPassword">Forgotten password?</umb-localize>
-											</button>`
-									)}
+							this.allowPasswordReset,
+							() =>
+								html`<button type="button" id="forgot-password" @click=${this.#handleForgottenPassword}>
+									<umb-localize key="login_forgottenPassword">Forgotten password?</umb-localize>
+								</button>`
+						)}
 								</div>
 
 								${this.#renderErrorMessage()}
@@ -250,7 +221,7 @@ export default class UmbLoginPageElement extends LitElement {
 									color="default"
 									.state=${this._loginState}></uui-button>
 							</form>
-						</uui-form>
+						</uui-form> -->
 				  `}
 			<umb-external-login-providers-layout .showDivider=${!this.disableLocalLogin}>
 				<slot name="external"></slot>

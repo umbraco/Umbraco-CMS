@@ -44,7 +44,8 @@ const createForm = (elements: HTMLElement[]) => {
 	const form = document.createElement('form');
 	const submitButton = document.createElement('input');
 	submitButton.type = 'submit';
-	submitButton.value = 'Login';
+	submitButton.ariaHidden = true;
+	submitButton.style.display = 'none';
 
 	elements.push(submitButton);
 	elements.forEach((element) => form.appendChild(element));
