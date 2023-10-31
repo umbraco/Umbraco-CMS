@@ -313,7 +313,7 @@
               $scope.$on('$destroy', function () {
                   if (vm.tinyMceEditor != null) {
                     if($element) {
-                        $element[0]?.dispatchEvent(new CustomEvent('blur', {composed: true, bubbles: true}));
+                      $element[0]?.dispatchEvent(new CustomEvent('blur', {composed: true, bubbles: true}));
                     }
                     vm.tinyMceEditor.destroy();
                     vm.tinyMceEditor = null;
@@ -543,6 +543,8 @@
           // lets move focus to this new block.
           vm.setBlockFocus(blockObject);
 
+          setDirty();
+
           return true;
       }
 
@@ -639,6 +641,7 @@
                       blockObject.retrieveValuesFrom(blockEditorModel.content, blockEditorModel.settings);
                   }
 
+                  setDirty();
                   blockObject.active = false;
                   editorService.close();
               },
@@ -905,6 +908,7 @@
                   },
                   submit: function () {
                       deleteBlock(block);
+                      setDirty();
                       overlayService.close();
                   }
               };
