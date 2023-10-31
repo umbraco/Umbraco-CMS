@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core;
@@ -52,7 +52,7 @@ public class WebhooksTreeController : TreeController
         {
             // This will load in a custom UI instead of the dashboard for the root node
             root.RoutePath = $"{Constants.Applications.Settings}/{Constants.Trees.Webhooks}/overview";
-            root.Icon = Constants.Icons.Webhooks;
+            root.Icon = Constants.Icons.Webhook;
             root.HasChildren = false;
             root.MenuUrl = null;
         }
