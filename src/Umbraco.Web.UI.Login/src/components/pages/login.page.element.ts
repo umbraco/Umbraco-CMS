@@ -146,7 +146,7 @@ export default class UmbLoginPageElement extends LitElement {
 							id="umb-login-button"
 							look="primary"
 							@click=${this.#onSubmitClick}
-							.label=${until(umbLocalizationContext.localize('general_login', undefined, 'Login'))}
+							.label=${until(umbLocalizationContext.localize('general_login', undefined, 'Login'), 'Login')}
 							color="default"
 							.state=${this._loginState}></uui-button>
 
