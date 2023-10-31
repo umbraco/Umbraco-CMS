@@ -1469,6 +1469,43 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="allowedItemTypes">You can only select items of type(s): %0%</key>
     <key alias="pickedTrashedItem">You have picked a content item currently deleted or in the recycle bin</key>
     <key alias="pickedTrashedItems">You have picked content items currently deleted or in the recycle bin</key>
+    <key alias="specifyPickerRootTitle">Specify root</key>
+    <key alias="defineRootNode">Pick root node</key>
+    <key alias="defineXPathOrigin">Specify root via XPath</key>
+    <key alias="defineDynamicRoot">Specify a Dynamic Root</key>
+    <key alias="configurationStartNodeTitle">Start node</key>
+    <key alias="configurationXPathTitle">XPath Query</key>
+  </area>
+  <area alias="dynamicRoot">
+    <key alias="configurationTitle">Dynamic Root Query</key>
+    <key alias="pickDynamicRootOriginTitle">Pick origin</key>
+    <key alias="pickDynamicRootOriginDesc">Define the origin for your Dynamic Root Query</key>
+    <key alias="originRootTitle">Root</key>
+    <key alias="originRootDesc">Root node of this editing session</key>
+    <key alias="originParentTitle">Parent</key>
+    <key alias="originParentDesc">The parent node of the source in this editing session</key>
+    <key alias="originCurrentTitle">Current</key>
+    <key alias="originCurrentDesc">The content node that is source for this editing session</key>
+    <key alias="originSiteTitle">Site</key>
+    <key alias="originSiteDesc">Find nearest node with a hostname</key>
+    <key alias="originByKeyTitle">Specific Node</key>
+    <key alias="originByKeyDesc">Pick a specific Node as the origin for this query</key>
+    <key alias="pickDynamicRootQueryStepTitle">Append step to query</key>
+    <key alias="pickDynamicRootQueryStepDesc">Define the next step of your Dynamic Root Query</key>
+    <key alias="queryStepNearestAncestorOrSelfTitle">Nearest Ancestor Or Self</key>
+    <key alias="queryStepNearestAncestorOrSelfDesc">Query the nearest ancestor or self that fits with one of the configured types</key>
+    <key alias="queryStepFurthestAncestorOrSelfTitle">Furthest Ancestor Or Self</key>
+    <key alias="queryStepFurthestAncestorOrSelfDesc">Query the Furthest ancestor or self that fits with one of the configured types</key>
+    <key alias="queryStepNearestDescendantOrSelfTitle">Nearest Descendant Or Self</key>
+    <key alias="queryStepNearestDescendantOrSelfDesc">Query the nearest descendant or self that fits with one of the configured types</key>
+    <key alias="queryStepFurthestDescendantOrSelfTitle">Furthest Descendant Or Self</key>
+    <key alias="queryStepFurthestDescendantOrSelfDesc">Query the Furthest descendant or self that fits with one of the configured types</key>
+    <key alias="queryStepCustomTitle">Custom</key>
+    <key alias="queryStepCustomDesc">Query the using a custom Query Step</key>
+    <key alias="addQueryStep">Add query step</key>
+    <key alias="queryStepTypes">That matches types: </key>
+    <key alias="noValidStartNodeTitle">No matching content</key>
+    <key alias="noValidStartNodeDesc">The configuration of this property does not match any content. Create the missing content or contact your adminnistrator to adjust the Dynamic Root settings for this property.</key>
   </area>
   <area alias="mediaPicker">
     <key alias="deletedItem">Deleted item</key>
@@ -1975,6 +2012,13 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="historyCleanupGloballyDisabled"><![CDATA[<strong>NOTE!</strong> The cleanup of historically content versions are disabled globally. These settings will not take effect before it is enabled.]]></key>
     <key alias="changeDataTypeHelpText">Changing a data type with stored values is disabled. To allow this you can change the Umbraco:CMS:DataTypes:CanBeChanged setting in appsettings.json.</key>
   </area>
+  <area alias="webhooks">
+    <key alias="addWebhook">Create webhook</key>
+    <key alias="addWebhookHeader">Add webhook header</key>
+    <key alias="logs">Logs</key>
+    <key alias="addDocumentType">Add Document Type</key>
+    <key alias="addMediaType">Add Media Type</key>
+  </area>
   <area alias="languages">
     <key alias="addLanguage">Add language</key>
     <key alias="culture">ISO code</key>
@@ -2119,6 +2163,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="settingsGroup">Settings</key>
     <key alias="templatingGroup">Templating</key>
     <key alias="thirdPartyGroup">Third Party</key>
+    <key alias="webhooks">Webhooks</key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">New update ready</key>

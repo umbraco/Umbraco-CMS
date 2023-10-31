@@ -366,6 +366,20 @@ function entityResource($q, $http, umbRequestHelper) {
                'Failed to retrieve entity data for query ' + query);
         },
 
+      getDynamicRoot: function (query, currentId, parentId) {
+        return umbRequestHelper.resourcePromise(
+          $http.post(
+            umbRequestHelper.getApiUrl(
+              "entityApiBaseUrl",
+              "getDynamicRoot"),
+            {
+              query: JSON.parse(query),
+              parentId: parentId,
+              currentId: currentId
+            }),
+          'Failed to retrieve entity data for query ' + query);
+      },
+
         /**
          * @ngdoc method
          * @name umbraco.resources.entityResource#getAll
