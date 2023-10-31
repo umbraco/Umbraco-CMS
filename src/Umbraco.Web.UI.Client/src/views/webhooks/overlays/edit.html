@@ -62,12 +62,16 @@
                   on-remove="vm.clearContentType(contentType.key)">
                 </umb-node-preview>
                 <button type="button"
-                   ng-show="model.webhook.events && model.webhook.events.length !== 0"
                    class="umb-node-preview-add"
+                   ng-disabled="!model.webhook.events || model.webhook.events.length === 0"
                    ng-click="vm.openContentTypePicker()">
-                  <localize key="general_add">Add</localize>
+                  <span ng-if="model.webhook.events && model.webhook.events.length !== 0">
+                    <localize key="general_add">Add</localize>
+                  </span>
+                  <span ng-if="!model.webhook.events || model.webhook.events.length === 0">
+                    Please select an event first.
+                  </span>
                 </button>
-                <span class="umb-node-preview-add" ng-show="!model.webhook.events || model.webhook.events.length === 0">Please select an event first.</span>
               </umb-control-group>
 
               <umb-control-group label="Enabled" description="Is the webhook enabled?" alias="webhookEnabled">
