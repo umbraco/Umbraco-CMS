@@ -4,7 +4,7 @@ import type { ManifestWithLoader } from '../types.js';
 export async function loadExtension<T = unknown>(manifest: ManifestWithLoader<T>): Promise<T | null> {
 	try {
 		if (isManifestLoaderType<T>(manifest)) {
-			return manifest.loader();
+			return await manifest.loader();
 		}
 
 		if (isManifestJSType<T>(manifest) && manifest.js) {
