@@ -30,11 +30,14 @@
 
     function openContentTypePicker() {
       const isContent = $scope.model.webhook ? $scope.model.webhook.events[0].toLowerCase().includes("content") : null;
-      editorService.treePicker({
-        section: 'settings',
-        treeAlias: isContent ? 'documentTypes' : 'mediaTypes',
-        entityType: isContent ? 'DocumentType' : 'MediaType',
+
+      const editor = {
         multiPicker: true,
+        filterCssClass: "not-allowed not-published",
+        filter: function (item) {
+          // filter out folders (containers), element types (for content) and already selected items
+          return item.nodeType === "container"; // || item.metaData.isElement || !!_.findWhere(vm.itemTypes, { udi: item.udi });
+        },
         submit(model) {
           getEntities(model.selection, isContent);
           $scope.model.webhook.contentTypeKeys = model.selection.map(item => item.key);
@@ -43,7 +46,21 @@
         close() {
           editorService.close();
         }
-      });
+      };
+
+      const itemType = isContent ? "content" : "media";
+
+      switch (itemType) {
+        case "content":
+          editorService.contentTypePicker(editor);
+          break;
+        case "media":
+          editorService.mediaTypePicker(editor);
+          break;
+        case "member":
+          editorService.memberTypePicker(editor);
+          break;
+      }
     }
 
     function openCreateHeader() {
