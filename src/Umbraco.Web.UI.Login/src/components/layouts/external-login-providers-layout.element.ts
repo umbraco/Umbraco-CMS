@@ -53,24 +53,34 @@ export class UmbExternalLoginProvidersLayoutElement extends LitElement {
 				position: relative;
 				z-index: 0;
 				margin-bottom: 16px;
+				overflow: hidden;
 			}
 
 			#divider span {
-				background-color: var(--uui-color-surface);
+				/* background-color: var(--uui-color-surface); */
 				padding: 0 9px;
 				text-transform: capitalize;
+				overflow: hidden;
+				position: relative;
 			}
 
-			#divider::before {
+			#divider span::before,
+			#divider span::after {
 				content: '';
 				display: block;
-				width: 100%;
+				width: 200px; /* Arbitrary value, just be bigger than 50% of the max width of the container */
 				height: 1px;
-				background-color: var(--uui-color-border);
 				position: absolute;
-				top: calc(50% + 1px);
 				transform: translateY(-50%);
+				top: calc(50% + 1px);
 				z-index: -1;
+				background-color: var(--uui-color-border);
+			}
+			#divider span::before {
+				right: 100%;
+			}
+			#divider span::after {
+				left: 100%;
 			}
 		`,
 	];
