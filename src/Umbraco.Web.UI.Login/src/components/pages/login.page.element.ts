@@ -1,4 +1,4 @@
-import type { UUIButtonElement, UUIButtonState, UUIFormLayoutItemElement, UUIInputElement } from '@umbraco-ui/uui';
+import type { UUIButtonElement, UUIButtonState } from '@umbraco-ui/uui';
 import { css, CSSResultGroup, html, LitElement, nothing } from 'lit';
 import { customElement, property, query, queryAssignedElements, state } from 'lit/decorators.js';
 import { when } from 'lit/directives/when.js';
@@ -6,7 +6,6 @@ import { until } from 'lit/directives/until.js';
 
 import { umbAuthContext } from '../../context/auth.context.js';
 import { umbLocalizationContext } from '../../external/localization/localization-context.js';
-import { UMBLoginInputElement } from '../logIn-input.element.js';
 
 @customElement('umb-login-page')
 export default class UmbLoginPageElement extends LitElement {
@@ -155,73 +154,6 @@ export default class UmbLoginPageElement extends LitElement {
 							.state=${this._loginState}></uui-button>
 
 						${this.#renderErrorMessage()}
-
-						<!-- <uui-form>
-							<form id="LoginForm" name="login" @submit="${this.#handleSubmit}">
-								<uui-form-layout-item>
-									<uui-label id="emailLabel" for="umb-username" slot="label" required>
-										${this.usernameIsEmail
-							? html`<umb-localize key="general_email">Email</umb-localize>`
-							: html`<umb-localize key="user_username">Name</umb-localize>`}
-									</uui-label>
-									<uui-input
-										type=${this.usernameIsEmail ? 'email' : 'text'}
-										id="umb-username"
-										name="email"
-										autocomplete=${this.usernameIsEmail ? 'username' : 'email'}
-										.label=${this.usernameIsEmail
-							? until(umbLocalizationContext.localize('general_email', undefined, 'Email'))
-							: until(umbLocalizationContext.localize('user_username', undefined, 'Username'))}
-										required
-										required-message=${until(umbLocalizationContext.localize('general_required', undefined, 'Required'))}></uui-input>
-								</uui-form-layout-item>
-
-								<uui-form-layout-item>
-									<uui-label id="passwordLabel" for="umb-password" slot="label" required>
-										<umb-localize key="user_password">Password</umb-localize>
-									</uui-label>
-									<uui-input-password
-										id="umb-password"
-										name="password"
-										autocomplete="current-password"
-										.label=${until(umbLocalizationContext.localize('user_password', undefined, 'Password'))}
-										required
-										required-message=${until(
-							umbLocalizationContext.localize('general_required', undefined, 'Required')
-						)}></uui-input-password>
-								</uui-form-layout-item>
-
-								<div id="secondary-actions">
-									${when(
-							umbAuthContext.supportsPersistLogin,
-							() => html`<uui-form-layout-item>
-								<uui-checkbox
-									name="persist"
-									.label=${until(umbLocalizationContext.localize('user_rememberMe', undefined, 'Remember me'))}>
-									<umb-localize key="user_rememberMe">Remember me</umb-localize>
-								</uui-checkbox>
-							</uui-form-layout-item>`
-						)}
-									${when(
-							this.allowPasswordReset,
-							() =>
-								html`<button type="button" id="forgot-password" @click=${this.#handleForgottenPassword}>
-									<umb-localize key="login_forgottenPassword">Forgotten password?</umb-localize>
-								</button>`
-						)}
-								</div>
-
-								${this.#renderErrorMessage()}
-
-								<uui-button
-									type="submit"
-									id="umb-login-button"
-									look="primary"
-									.label=${until(umbLocalizationContext.localize('general_login', undefined, 'Login'))}
-									color="default"
-									.state=${this._loginState}></uui-button>
-							</form>
-						</uui-form> -->
 				  `}
 			<umb-external-login-providers-layout .showDivider=${!this.disableLocalLogin}>
 				<slot name="external"></slot>
@@ -251,19 +183,8 @@ export default class UmbLoginPageElement extends LitElement {
 				text-align: center;
 				font-weight: 400;
 				font-size: 1.5rem;
-				margin: 0 0 var(--uui-size-layout-2);
-				line-height: 1.2 !important;
-			}
-
-			uui-form-layout-item {
-				margin: 0;
-			}
-
-			uui-input,
-			uui-input-password {
-				width: 100%;
-				height: 38px;
-				border-radius: var(--uui-border-radius);
+				margin: 0 0 var(--uui-size-layout-1);
+				line-height: 1.2;
 			}
 
 			#umb-login-button {
@@ -302,10 +223,10 @@ export default class UmbLoginPageElement extends LitElement {
 				justify-content: space-between;
 			}
 
-			@media (min-width: 850px) {
+			@media (min-width: 979px) {
 				:host #greeting {
 					font-size: 2rem;
-					margin: 0 0 var(--uui-size-layout-3);
+					margin: 0 0 var(--uui-size-layout-2);
 				}
 			}
 		`,
