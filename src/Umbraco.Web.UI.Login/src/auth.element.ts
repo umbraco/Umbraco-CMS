@@ -9,6 +9,8 @@ import { UmbLocalizeElement } from './external/localization/localize.element.js'
 import { UMBLoginInputElement } from './components/logIn-input.element.js';
 import { InputType, UUIFormLayoutItemElement, UUILabelElement } from '@umbraco-ui/uui';
 
+import authStyles from './auth-styles.css?inline';
+
 const createInput = (id: string, type: InputType, name: string, autocomplete: AutoFill, requiredMessage: string) => {
 	const input = document.createElement('umb-login-input');
 	input.type = type;
@@ -40,12 +42,16 @@ const createFormLayoutItem = (label: UUILabelElement, input: UMBLoginInputElemen
 };
 
 const createForm = (elements: HTMLElement[]) => {
+	const styles = document.createElement('style');
+	styles.innerHTML = authStyles;
 	const form = document.createElement('form');
+	form.id = 'umb-login-form';
 	const submitButton = document.createElement('input');
 	submitButton.type = 'submit';
 	submitButton.ariaHidden = 'true';
 	submitButton.style.display = 'none';
 
+	elements.push(styles);
 	elements.push(submitButton);
 	elements.forEach((element) => form.appendChild(element));
 
