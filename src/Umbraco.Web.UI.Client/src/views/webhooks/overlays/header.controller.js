@@ -1,10 +1,14 @@
-﻿(function () {
+(function () {
   "use strict";
   function HeaderController($scope) {
-    var vm = this;
-    $scope.headerModel = { key: "", value: "" };
+    const vm = this;
+
     vm.submit = submit;
     vm.close = close;
+
+    vm.headers = ["Accept", "Content-Type", "User-Agent", "Content-Length"];
+
+    $scope.headerModel = { key: "", value: "" };
 
     function submit () {
       if ($scope.headerModel.key && $scope.headerModel.value) {

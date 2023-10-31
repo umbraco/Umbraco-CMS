@@ -1,4 +1,4 @@
-﻿<div ng-controller="Umbraco.Editors.Webhooks.HeaderController as vm">
+<div ng-controller="Umbraco.Editors.Webhooks.HeaderController as vm">
   <umb-editor-view>
     <ng-form name="createWebhookHeader" novalidate val-form-manager>
       <umb-editor-header
@@ -20,8 +20,12 @@
                      no-dirty-check
                      focus-on-filled="true"
                      placeholder="Accept"
+                     list="webhook-headers"
                      umb-auto-focus
-                     required/>
+                     required />
+              <datalist id="webhook-headers">
+                <option ng-repeat="header in vm.headers" ng-value="header"></option>
+              </datalist>
             </umb-control-group>
             <umb-control-group label="Value" description="The value of the header" alias="headerValueGroup" required="true">
               <input type="text"
