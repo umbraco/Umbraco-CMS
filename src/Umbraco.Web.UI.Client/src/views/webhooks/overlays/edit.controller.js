@@ -12,9 +12,7 @@
     vm.close = close;
     vm.submit = submit;
 
-
-    function openEventPicker()
-    {
+    function openEventPicker() {
       editorService.eventPicker({
         title: "Select event",
         selectedEvents: $scope.model.webhook.events,
@@ -28,8 +26,7 @@
       });
     }
 
-    function openContentTypePicker()
-    {
+    function openContentTypePicker() {
       const isContent = $scope.model.webhook ? $scope.model.webhook.events[0].toLowerCase().includes("content") : null;
       editorService.treePicker({
         section: 'settings',
@@ -38,7 +35,7 @@
         multiPicker: true,
         submit(model) {
           getEntities(model.selection, isContent);
-          $scope.model.webhook.contentTypeKeys = model.selection.map((item) => item.key);
+          $scope.model.webhook.contentTypeKeys = model.selection.map(item => item.key);
           editorService.close();
         },
         close() {

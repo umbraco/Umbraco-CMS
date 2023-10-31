@@ -58,9 +58,11 @@
 
               </umb-control-group>
 
-              <umb-control-group label="Content Type"
-                                 description="Only trigger the webhook for a specific content type."
-                                 alias="webhookContentType">
+              <umb-control-group
+                  label="Content Type"
+                  description="Only trigger the webhook for a specific content type."
+                  alias="webhookContentType">
+
                 <umb-node-preview
                   ng-repeat="contentType in model.contentTypes"
                   ng-show="contentType"
@@ -72,6 +74,7 @@
                   allow-open="false"
                   on-remove="vm.clearContentType(contentType.key)">
                 </umb-node-preview>
+
                 <button type="button"
                    class="umb-node-preview-add"
                    ng-disabled="!model.webhook.events || model.webhook.events.length === 0"
@@ -83,6 +86,7 @@
                     Please select an event first.
                   </span>
                 </button>
+
               </umb-control-group>
 
               <umb-control-group label="Enabled" description="Is the webhook enabled?" alias="webhookEnabled">
@@ -91,8 +95,11 @@
                   on-click="model.webhook.enabled = !model.webhook.enabled">
                 </umb-toggle>
               </umb-control-group>
-              <umb-control-group label="Headers" description="Custom headers to include in the webhook request."
-                                 alias="webhookHeaders">
+              <umb-control-group
+                  label="Headers"
+                  description="Custom headers to include in the webhook request."
+                  alias="webhookHeaders">
+
                 <table class="table table-hover" ng-if="!vm.loading">
                   <thead>
                   <tr>
@@ -102,12 +109,8 @@
                   </thead>
                   <tbody>
                   <tr ng-repeat="(key, value) in model.webhook.headers">
-                    <td>
-                      {{ key }}
-                    </td>
-                    <td>
-                      {{ value }}
-                    </td>
+                    <td>{{key}}</td>
+                    <td>{{value}}</td>
                     <td style="text-align: right;">
                       <umb-button
                         type="button"
@@ -126,6 +129,7 @@
                   button-style="outline"
                   label-key="webhooks_addWebhookHeader">
                 </umb-button>
+
               </umb-control-group>
             </div>
           </umb-box-content>

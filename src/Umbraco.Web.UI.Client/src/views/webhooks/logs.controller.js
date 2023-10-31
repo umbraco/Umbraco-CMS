@@ -1,15 +1,17 @@
-﻿(function () {
+(function () {
   "use strict";
 
-  function WebhookLogController($q,$scope, webhooksResource, notificationsService, overlayService) {
-    var vm = this;
+  function WebhookLogController(webhooksResource, overlayService) {
+
+    const vm = this;
+
     vm.logs = [];
     vm.openLogOverlay = openLogOverlay;
     vm.isChecked = isChecked;
 
     function loadLogs (){
       return webhooksResource.getLogs()
-        .then((data) => {
+        .then(data => {
           vm.logs = data.items;
         });
     }
