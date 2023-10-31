@@ -143,6 +143,13 @@ export default class UmbAuthElement extends LitElement {
 		this._passwordInput?.remove();
 	}
 
+  /**
+   * Creates the login form and adds it to the DOM in the default slot.
+   * This is done to avoid having to deal with the shadow DOM, which is not supported in Google Chrome for autocomplete/autofill.
+   *
+   * @see Track this intent-to-ship for Chrome https://groups.google.com/a/chromium.org/g/blink-dev/c/RY9leYMu5hI?pli=1
+   * @private
+   */
 	async #initializeForm() {
 		const requiredMessage = await umbLocalizationContext.localize('general_required', undefined, 'Required');
 
@@ -150,7 +157,7 @@ export default class UmbAuthElement extends LitElement {
 			'username-input',
 			this.usernameIsEmail ? 'email' : 'text',
 			'username',
-			this.usernameIsEmail ? 'email' : 'username',
+			'username',
 			requiredMessage
 		);
 		this._passwordInput = createInput('password-input', 'password', 'password', 'current-password', requiredMessage);
