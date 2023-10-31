@@ -1,10 +1,33 @@
 import { html, LitElement } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { until } from 'lit/directives/until.js';
 
 import { umbAuthContext } from './context/auth.context.js';
 import { umbLocalizationContext } from './external/localization/localization-context.js';
+import { UmbLocalizeElement } from './external/localization/localize.element.js';
+
+const createInput = (id: string, type: string, name: string, autocomplete: AutoFill) => {
+	const input = document.createElement('input');
+	input.type = type;
+	input.name = name;
+	input.autocomplete = autocomplete;
+	input.id = id;
+	input.required = true;
+	//TODO: How should we add validation messages?
+
+	return input;
+};
+
+const createLabel = (forId: string, localizeAlias: string) => {
+	const label = document.createElement('label');
+	const umbLocalize = document.createElement('umb-localize') as UmbLocalizeElement;
+	umbLocalize.key = localizeAlias;
+	label.htmlFor = forId;
+	label.appendChild(umbLocalize);
+
+	return label;
+};
 
 @customElement('umb-auth')
 export default class UmbAuthElement extends LitElement {
@@ -53,6 +76,11 @@ export default class UmbAuthElement extends LitElement {
 	 */
 	protected flow?: 'mfa' | 'reset-password' | 'invite-user';
 
+	_usernameInput?: HTMLInputElement;
+	_passwordInput?: HTMLInputElement;
+	_usernameLabel?: HTMLLabelElement;
+	_passwordLabel?: HTMLLabelElement;
+
 	constructor() {
 		super();
 		this.classList.add('uui-text');
@@ -64,6 +92,27 @@ export default class UmbAuthElement extends LitElement {
 			}
 			this.requestUpdate();
 		});
+	}
+
+	public connectedCallback() {
+		super.connectedCallback();
+		this._usernameInput = createInput('username-input', 'text', 'username', 'username');
+		this._passwordInput = createInput('password-input', 'password', 'password', 'current-password');
+		this._usernameLabel = createLabel('username-input', this.usernameIsEmail ? 'general_email' : 'user_username');
+		this._passwordLabel = createLabel('password-input', 'user_password');
+
+		this.insertAdjacentElement('beforeend', this._usernameLabel);
+		this.insertAdjacentElement('beforeend', this._usernameInput);
+		this.insertAdjacentElement('beforeend', this._passwordLabel);
+		this.insertAdjacentElement('beforeend', this._passwordInput);
+	}
+
+	public disconnectedCallback() {
+		super.disconnectedCallback();
+		this._usernameLabel?.remove();
+		this._usernameInput?.remove();
+		this._passwordLabel?.remove();
+		this._passwordInput?.remove();
 	}
 
 	render() {
@@ -123,6 +172,7 @@ export default class UmbAuthElement extends LitElement {
 				return html`<umb-login-page
 					?allow-password-reset=${this.allowPasswordReset}
 					?username-is-email=${this.usernameIsEmail}>
+					<slot></slot>
 					<slot name="subheadline" slot="subheadline"></slot>
 					<slot name="external" slot="external"></slot>
 				</umb-login-page>`;
