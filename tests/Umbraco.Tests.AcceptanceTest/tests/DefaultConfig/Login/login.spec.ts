@@ -18,8 +18,8 @@ test.describe('Login', () => {
     await expect(error).toBeHidden();
 
     // Action
-    await page.fill('#umb-username input', process.env.UMBRACO_USER_LOGIN);
-    await page.fill('#umb-password input', process.env.UMBRACO_USER_PASSWORD);
+    await page.fill('#username-input input', process.env.UMBRACO_USER_LOGIN);
+    await page.fill('#password-input input', process.env.UMBRACO_USER_PASSWORD);
     await page.locator('#umb-login-button').click();
     await page.waitForURL(process.env.URL + '/umbraco#/content');
 
@@ -32,18 +32,18 @@ test.describe('Login', () => {
     const username = process.env.UMBRACO_USER_LOGIN;
     const password = 'wrong';
 
-    // Precondition
+    // Precondition«
     let error = page.locator('.text-error');
     await expect(error).toBeHidden();
 
     // Action
-    await page.fill('#umb-username input', username);
-    await page.fill('#umb-password input', password);
+    await page.fill('#username-input input', username);
+    await page.fill('#password-input input', password);
     await page.locator('#umb-login-button').click();
 
     // Assert
-    let usernameField = await page.locator('#umb-username');
-    let passwordField = await page.locator('#umb-password');
+    let usernameField = await page.locator('#username-input');
+    let passwordField = await page.locator('#password-input');
     await expect(error).toBeVisible();
     await expect(usernameField).toBeVisible();
     await expect(passwordField).toBeVisible();
@@ -58,13 +58,13 @@ test.describe('Login', () => {
     await expect(error).toBeHidden();
 
     // Action
-    await page.fill('#umb-username input', username);
-    await page.fill('#umb-password input', password);
+    await page.fill('#username-input input', username);
+    await page.fill('#password-input input', password);
     await page.locator('#umb-login-button').click();
 
     // Assert
-    let usernameField = await page.locator('#umb-username');
-    let passwordField = await page.locator('#umb-password');
+    let usernameField = await page.locator('#username-input');
+    let passwordField = await page.locator('#password-input');
     await expect(error).toBeVisible();
     await expect(usernameField).toBeVisible();
     await expect(passwordField).toBeVisible();
