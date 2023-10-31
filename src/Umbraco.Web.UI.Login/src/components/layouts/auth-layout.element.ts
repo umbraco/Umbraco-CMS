@@ -102,10 +102,10 @@ export class UmbAuthLayoutElement extends LitElement {
 				background-image: var(--logo-dark);
 				background-repeat: no-repeat;
 				z-index: 1;
-				width: 80px;
-				height: 22px;
-				top: var(--uui-size-space-4);
-				left: var(--uui-size-space-4);
+				top: 52px;
+				left: 52px;
+				width: 120px;
+				height: 39px;
 			}
 			#auth-column {
 				display: flex;
@@ -149,8 +149,8 @@ export class UmbAuthLayoutElement extends LitElement {
 				}
 				:host([has-background-image]) #logo {
 					background-image: var(--logo-light);
-					top: 48px;
-					left: 48px;
+					top: 52px;
+					left: 52px;
 					width: 140px;
 					height: 39px;
 				}
@@ -169,8 +169,8 @@ export class UmbAuthLayoutElement extends LitElement {
 					padding-inline: 200px;
 				}
 				:host([has-background-image]) #logo {
-					top: 64px;
-					left: 64px;
+					top: 68px;
+					left: 68px;
 				}
 			}
 		`,
