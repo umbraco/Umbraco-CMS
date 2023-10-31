@@ -20,6 +20,7 @@ const createInput = (id: string, type: InputType, name: string, autocomplete: Au
   input.required = true;
   input.requiredMessage = requiredMessage;
   input.label = label;
+  input.spellcheck = false;
 
   return input;
 };
