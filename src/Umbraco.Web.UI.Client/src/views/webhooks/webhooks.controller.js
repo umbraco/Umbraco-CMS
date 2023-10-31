@@ -1,8 +1,9 @@
 (function () {
   "use strict";
 
-  function WebhookController($q,$scope, webhooksResource, notificationsService, editorService, overlayService, contentTypeResource, mediaTypeResource) {
-    var vm = this;
+  function WebhookController($q, $timeout, $routeParams, webhooksResource, navigationService, notificationsService, editorService, overlayService, contentTypeResource, mediaTypeResource) {
+
+    const vm = this;
 
     vm.openWebhookOverlay = openWebhookOverlay;
     vm.deleteWebhook = deleteWebhook;
@@ -16,7 +17,26 @@
     vm.webHooksContentTypes = {};
     vm.webhookEvents = {};
 
-    function loadEvents (){
+    function init() {
+      vm.loading = true;
+
+      let promises = [];
+
+      // Load all languages
+      promises.push(loadEvents());
+      promises.push(loadWebhooks());
+
+      $q.all(promises).then(function () {
+        vm.loading = false;
+      });
+
+      // Activate tree node
+      $timeout(function () {
+        navigationService.syncTree({ tree: $routeParams.tree, path: [-1], activate: true });
+      });
+    }
+
+    function loadEvents() {
       return webhooksResource.getAllEvents()
         .then(data => {
           vm.events = data.map(item => item.eventName);
@@ -24,7 +44,7 @@
     }
 
     function resolveEventNames(webhook) {
-      webhook.events.forEach((event) => {
+      webhook.events.forEach(event => {
         if (!vm.webhookEvents[webhook.key]) {
           vm.webhookEvents[webhook.key] = event;
         } else {
@@ -38,7 +58,7 @@
       const resource = isContent ? contentTypeResource : mediaTypeResource;
       let entities = [];
 
-      webhook.contentTypeKeys.forEach((key) => {
+      webhook.contentTypeKeys.forEach(key => {
         resource.getById(key)
           .then(data => {
             entities.push(data);
@@ -97,7 +117,8 @@
             handleSubmissionError(model, 'Please provide the event for which the webhook should trigger');
             return;
           }
-          if(isCreating){
+
+          if (isCreating) {
             webhooksResource.create(model.webhook)
               .then(() => {
                 loadWebhooks()
@@ -111,7 +132,7 @@
                 handleSubmissionError(model, `Error saving webhook. ${errorMessage ?? ''}`);
               });
           }
-          else{
+          else {
             webhooksResource.update(model.webhook)
               .then(() => {
                 loadWebhooks()
@@ -136,12 +157,12 @@
     function loadWebhooks(){
       webhooksResource
         .getAll()
-        .then((result) => {
+        .then(result => {
           vm.webhooks = result;
           vm.webhookEvents = {};
           vm.webHooksContentTypes = {};
 
-          vm.webhooks.forEach((webhook) => {
+          vm.webhooks.forEach(webhook => {
             resolveTypeNames(webhook);
             resolveEventNames(webhook);
           })
@@ -176,8 +197,7 @@
       event.stopPropagation();
     }
 
-    loadWebhooks()
-    loadEvents()
+    init();
   }
 
   angular.module("umbraco").controller("Umbraco.Editors.Webhooks.WebhookController", WebhookController);
