@@ -11,7 +11,7 @@ import { InputType, UUIFormLayoutItemElement, UUILabelElement } from '@umbraco-u
 
 import authStyles from './auth-styles.css?inline';
 
-const createInput = (id: string, type: InputType, name: string, autocomplete: AutoFill, requiredMessage: string) => {
+const createInput = (id: string, type: InputType, name: string, autocomplete: AutoFill, requiredMessage: string, label: string) => {
 	const input = document.createElement('umb-login-input');
 	input.type = type;
 	input.name = name;
@@ -19,6 +19,7 @@ const createInput = (id: string, type: InputType, name: string, autocomplete: Au
 	input.id = id;
 	input.required = true;
 	input.requiredMessage = requiredMessage;
+  input.label = label;
 
 	return input;
 };
@@ -151,6 +152,11 @@ export default class UmbAuthElement extends LitElement {
    * @private
    */
 	async #initializeForm() {
+    const labelUsername =
+      this.usernameIsEmail
+        ? await umbLocalizationContext.localize('general_username', undefined, 'Username')
+        : await umbLocalizationContext.localize('general_email', undefined, 'Email');
+    const labelPassword = await umbLocalizationContext.localize('general_password', undefined, 'Password');
 		const requiredMessage = await umbLocalizationContext.localize('general_required', undefined, 'Required');
 
 		this._usernameInput = createInput(
@@ -158,9 +164,10 @@ export default class UmbAuthElement extends LitElement {
 			this.usernameIsEmail ? 'email' : 'text',
 			'username',
 			'username',
-			requiredMessage
+			requiredMessage,
+      labelUsername
 		);
-		this._passwordInput = createInput('password-input', 'password', 'password', 'current-password', requiredMessage);
+		this._passwordInput = createInput('password-input', 'password', 'password', 'current-password', requiredMessage, labelPassword);
 		this._usernameLabel = createLabel('username-input', this.usernameIsEmail ? 'general_email' : 'user_username');
 		this._passwordLabel = createLabel('password-input', 'user_password');
 
