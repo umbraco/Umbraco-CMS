@@ -75,7 +75,7 @@ export class UmbAuthLayoutElement extends LitElement {
 				height: calc(100% - 64px);
 				margin: auto;
 				background-color: #fff;
-				opacity: 0.9;
+				opacity: 0.95;
 				border-radius: 40px;
 				z-index: -1;
 			}
