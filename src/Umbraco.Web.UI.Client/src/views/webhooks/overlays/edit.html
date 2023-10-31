@@ -13,8 +13,13 @@
           <umb-box-content>
             <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
             <div ng-hide="vm.loading" style="margin-top: 20px;">
-              <umb-control-group label="Url" description="The url to call when the webhook is triggered."
-                                 alias="webhookUrl" required="true">
+
+              <umb-control-group
+                  label="Url"
+                  description="The url to call when the webhook is triggered."
+                  alias="webhookUrl"
+                  required="true">
+
                 <input type="url"
                        data-element="webhook-url"
                        name="webhookUrl"
@@ -25,10 +30,15 @@
                        placeholder="https://example.com/api/webhook"
                        umb-auto-focus
                        required/>
+
               </umb-control-group>
 
-              <umb-control-group label="Event" description="The events for which the webhook should be triggered."
-                                 alias="webhookEvents" required="true">
+              <umb-control-group
+                  label="Events"
+                  description="The events for which the webhook should be triggered."
+                  alias="webhookEvents"
+                  required="true">
+
                 <umb-node-preview
                   ng-repeat="event in model.webhook.events"
                   ng-show="event"
@@ -45,6 +55,7 @@
                    ng-click="vm.openEventPicker()">
                   <localize key="general_add">Add</localize>
                 </button>
+
               </umb-control-group>
 
               <umb-control-group label="Content Type"
