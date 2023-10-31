@@ -33,15 +33,10 @@
         </umb-checkmark>
       </td>
       <td>
-        <umb-icon icon="icon-globe" class="event-icon"></umb-icon>
         <span>{{ vm.webhookEvents[webhook.key] }}</span>
       </td>
-      <td>
-        {{ webhook.url }}
-      </td>
-      <td>
-        {{ vm.webHooksContentTypes[webhook.key] }}
-      </td>
+      <td>{{ webhook.url }}</td>
+      <td>{{ vm.webHooksContentTypes[webhook.key] }}</td>
       <td style="text-align: right;">
         <umb-button
           type="button"
