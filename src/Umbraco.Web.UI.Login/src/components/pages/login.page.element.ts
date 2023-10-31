@@ -1,4 +1,4 @@
-import type { UUIButtonElement, UUIButtonState } from '@umbraco-ui/uui';
+import type { UUIButtonElement, UUIButtonState, UUIFormLayoutItemElement, UUIInputElement } from '@umbraco-ui/uui';
 import { css, CSSResultGroup, html, LitElement, nothing } from 'lit';
 import { customElement, property, query, queryAssignedElements, state } from 'lit/decorators.js';
 import { when } from 'lit/directives/when.js';
@@ -6,6 +6,7 @@ import { until } from 'lit/directives/until.js';
 
 import { umbAuthContext } from '../../context/auth.context.js';
 import { umbLocalizationContext } from '../../external/localization/localization-context.js';
+import { UMBLoginInputElement } from '../logIn-input.element.js';
 
 @customElement('umb-login-page')
 export default class UmbLoginPageElement extends LitElement {
@@ -16,7 +17,7 @@ export default class UmbLoginPageElement extends LitElement {
 	usernameIsEmail = false;
 
 	@queryAssignedElements({ flatten: true })
-	protected slottedElements?: HTMLInputElement[];
+	protected slottedElements?: HTMLFormElement[];
 
 	@property({ type: Boolean, attribute: 'allow-password-reset' })
 	allowPasswordReset = false;
@@ -32,10 +33,10 @@ export default class UmbLoginPageElement extends LitElement {
 		return umbAuthContext.disableLocalLogin;
 	}
 
-	#usernameInputElement?: HTMLInputElement;
-	#passwordInputElement?: HTMLInputElement;
-	#usernameValidationErrorElement?: HTMLElement;
-	#passwordValidationErrorElement?: HTMLElement;
+	@state()
+	nativeInputValue = '';
+
+	#formElement?: HTMLFormElement;
 
 	connectedCallback(): void {
 		super.connectedCallback();
@@ -46,43 +47,41 @@ export default class UmbLoginPageElement extends LitElement {
 	async #initializeInputs() {
 		await new Promise((resolve) => requestAnimationFrame(resolve));
 
-		const inputElements = this.slottedElements?.filter(
-			(node) => node.tagName && node.tagName.toLowerCase() === 'input'
-		);
+		this.#formElement = this.slottedElements?.[0];
 
-		this.#usernameInputElement = inputElements?.find((node) => node.name === 'username');
-		this.#passwordInputElement = inputElements?.find((node) => node.name === 'password');
+		if (!this.#formElement) return;
 
-		this.#usernameInputElement?.addEventListener('keydown', this.#onInputKeydown);
-		this.#passwordInputElement?.addEventListener('keydown', this.#onInputKeydown);
+		this.#formElement.onsubmit = this.#handleSubmit;
 
-		this.#usernameValidationErrorElement = document.createElement('span');
-		this.#usernameValidationErrorElement.innerText = await umbLocalizationContext.localize(
-			'general_required',
-			undefined,
-			'Required'
-		);
-		this.#usernameValidationErrorElement.style.color = 'var(--uui-color-danger)';
-		this.#usernameValidationErrorElement.style.display = 'none';
+		console.log('Form', this.#formElement, this.slottedElements);
 
-		this.#passwordValidationErrorElement = document.createElement('span');
-		this.#passwordValidationErrorElement.innerText = await umbLocalizationContext.localize(
-			'user_password',
-			undefined,
-			'Password'
-		);
-		this.#passwordValidationErrorElement.style.color = 'var(--uui-color-danger)';
-		this.#passwordValidationErrorElement.style.display = 'none';
+		// this.#usernameValidationErrorElement = document.createElement('span');
+		// this.#usernameValidationErrorElement.innerText = await umbLocalizationContext.localize(
+		// 	'general_required',
+		// 	undefined,
+		// 	'Required'
+		// );
+		// this.#usernameValidationErrorElement.style.color = 'var(--uui-color-danger)';
+		// this.#usernameValidationErrorElement.style.display = 'none';
 
-		this.#usernameInputElement?.insertAdjacentElement('afterend', this.#usernameValidationErrorElement);
-		this.#passwordInputElement?.insertAdjacentElement('afterend', this.#passwordValidationErrorElement);
+		// this.#passwordValidationErrorElement = document.createElement('span');
+		// this.#passwordValidationErrorElement.innerText = await umbLocalizationContext.localize(
+		// 	'user_password',
+		// 	undefined,
+		// 	'Password'
+		// );
+		// this.#passwordValidationErrorElement.style.color = 'var(--uui-color-danger)';
+		// this.#passwordValidationErrorElement.style.display = 'none';
+
+		// this.#usernameInputElement?.insertAdjacentElement('afterend', this.#usernameValidationErrorElement);
+		// this.#passwordInputElement?.insertAdjacentElement('afterend', this.#passwordValidationErrorElement);
 	}
 
 	disconnectedCallback(): void {
 		super.disconnectedCallback();
 
-		this.#usernameInputElement?.removeEventListener('keydown', this.#onInputKeydown);
-		this.#passwordInputElement?.removeEventListener('keydown', this.#onInputKeydown);
+		// this.#usernameInputElement?.removeEventListener('keydown', this.#onInputKeydown);
+		// this.#passwordInputElement?.removeEventListener('keydown', this.#onInputKeydown);
 	}
 
 	#onInputKeydown = (event: KeyboardEvent) => {
@@ -99,23 +98,27 @@ export default class UmbLoginPageElement extends LitElement {
 
 		if (!form.checkValidity()) return;
 
-		if (!this.#usernameInputElement || !this.#passwordInputElement) return;
+		// if (!this.#usernameInputElement || !this.#passwordInputElement) return;
 
-		if (!this.#usernameInputElement.checkValidity()) {
-			this.#usernameValidationErrorElement?.style.setProperty('display', 'block');
-			return;
-		}
+		// if (!this.#usernameInputElement.checkValidity()) {
+		// 	this.#usernameValidationErrorElement?.style.setProperty('display', 'block');
+		// 	return;
+		// }
 
-		if (!this.#passwordInputElement.checkValidity()) {
-			this.#passwordValidationErrorElement?.style.setProperty('display', 'block');
-			return;
-		}
+		// if (!this.#passwordInputElement.checkValidity()) {
+		// 	this.#passwordValidationErrorElement?.style.setProperty('display', 'block');
+		// 	return;
+		// }
 
 		const formData = new FormData(form);
 
-		const username = this.#usernameInputElement.value;
-		const password = this.#passwordInputElement.value;
+		const username = formData.get('username') as string;
+		const password = formData.get('password') as string;
 		const persist = formData.has('persist');
+
+		console.log('Form data', username, password, persist);
+
+		return;
 
 		this._loginState = 'waiting';
 
@@ -167,6 +170,11 @@ export default class UmbLoginPageElement extends LitElement {
 
 	render() {
 		return html`
+			<h2>LOGIN</h2>
+			<slot></slot>
+			<h3>END</h3>
+		`;
+		return html`
 			<h1 id="greeting" class="uui-h3">
 				<umb-localize .key=${this.#greetingLocalizationKey}></umb-localize>
 			</h1>
@@ -174,14 +182,14 @@ export default class UmbLoginPageElement extends LitElement {
 			${this.disableLocalLogin
 				? nothing
 				: html`
+						<slot></slot>
 						<uui-form>
 							<form id="LoginForm" name="login" @submit="${this.#handleSubmit}">
-								<slot></slot>
-								<!-- <uui-form-layout-item>
+								<uui-form-layout-item>
 									<uui-label id="emailLabel" for="umb-username" slot="label" required>
 										${this.usernameIsEmail
-									? html`<umb-localize key="general_email">Email</umb-localize>`
-									: html`<umb-localize key="user_username">Name</umb-localize>`}
+											? html`<umb-localize key="general_email">Email</umb-localize>`
+											: html`<umb-localize key="user_username">Name</umb-localize>`}
 									</uui-label>
 									<uui-input
 										type=${this.usernameIsEmail ? 'email' : 'text'}
@@ -189,10 +197,12 @@ export default class UmbLoginPageElement extends LitElement {
 										name="email"
 										autocomplete=${this.usernameIsEmail ? 'username' : 'email'}
 										.label=${this.usernameIsEmail
-									? until(umbLocalizationContext.localize('general_email', undefined, 'Email'))
-									: until(umbLocalizationContext.localize('user_username', undefined, 'Username'))}
+											? until(umbLocalizationContext.localize('general_email', undefined, 'Email'))
+											: until(umbLocalizationContext.localize('user_username', undefined, 'Username'))}
 										required
-										required-message=${until(umbLocalizationContext.localize('general_required', undefined, 'Required'))}></uui-input>
+										required-message=${until(
+											umbLocalizationContext.localize('general_required', undefined, 'Required')
+										)}></uui-input>
 								</uui-form-layout-item>
 
 								<uui-form-layout-item>
@@ -206,9 +216,9 @@ export default class UmbLoginPageElement extends LitElement {
 										.label=${until(umbLocalizationContext.localize('user_password', undefined, 'Password'))}
 										required
 										required-message=${until(
-									umbLocalizationContext.localize('general_required', undefined, 'Required')
-								)}></uui-input-password>
-								</uui-form-layout-item> -->
+											umbLocalizationContext.localize('general_required', undefined, 'Required')
+										)}></uui-input-password>
+								</uui-form-layout-item>
 
 								<div id="secondary-actions">
 									${when(
@@ -263,6 +273,10 @@ export default class UmbLoginPageElement extends LitElement {
 			:host {
 				display: flex;
 				flex-direction: column;
+			}
+
+			uui-input {
+				display: none;
 			}
 
 			::slotted(input) {

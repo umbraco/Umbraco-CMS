@@ -1,19 +1,22 @@
 import { html, LitElement } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
+import { customElement, property } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { until } from 'lit/directives/until.js';
 
 import { umbAuthContext } from './context/auth.context.js';
 import { umbLocalizationContext } from './external/localization/localization-context.js';
 import { UmbLocalizeElement } from './external/localization/localize.element.js';
+import { UMBLoginInputElement } from './components/logIn-input.element.js';
+import { InputType, UUIFormLayoutItemElement } from '@umbraco-ui/uui';
 
-const createInput = (id: string, type: string, name: string, autocomplete: AutoFill) => {
-	const input = document.createElement('input');
+const createInput = (id: string, type: InputType, name: string, autocomplete: AutoFill) => {
+	const input = document.createElement('umb-login-input');
 	input.type = type;
 	input.name = name;
 	input.autocomplete = autocomplete;
 	input.id = id;
 	input.required = true;
+	input.requiredMessage = 'bubber';
 	//TODO: How should we add validation messages?
 
 	return input;
@@ -27,6 +30,26 @@ const createLabel = (forId: string, localizeAlias: string) => {
 	label.appendChild(umbLocalize);
 
 	return label;
+};
+
+const createFormLayoutItem = (label: HTMLLabelElement, input: UMBLoginInputElement) => {
+	const formLayoutItem = document.createElement('uui-form-layout-item') as UUIFormLayoutItemElement;
+	formLayoutItem.appendChild(label);
+	formLayoutItem.appendChild(input);
+
+	return formLayoutItem;
+};
+
+const createForm = (elements: HTMLElement[]) => {
+	const form = document.createElement('form');
+	const submitButton = document.createElement('input');
+	submitButton.type = 'submit';
+	submitButton.value = 'Login';
+
+	elements.push(submitButton);
+	elements.forEach((element) => form.appendChild(element));
+
+	return form;
 };
 
 @customElement('umb-auth')
@@ -76,8 +99,12 @@ export default class UmbAuthElement extends LitElement {
 	 */
 	protected flow?: 'mfa' | 'reset-password' | 'invite-user';
 
-	_usernameInput?: HTMLInputElement;
-	_passwordInput?: HTMLInputElement;
+	//TODO We could probably just save the form. everything inside should be cleaned up when it's removed
+	_form?: HTMLFormElement;
+	_usernameLayoutItem?: UUIFormLayoutItemElement;
+	_passwordLayoutItem?: UUIFormLayoutItemElement;
+	_usernameInput?: UMBLoginInputElement;
+	_passwordInput?: UMBLoginInputElement;
 	_usernameLabel?: HTMLLabelElement;
 	_passwordLabel?: HTMLLabelElement;
 
@@ -96,9 +123,10 @@ export default class UmbAuthElement extends LitElement {
 
 	public connectedCallback() {
 		super.connectedCallback();
+
 		this._usernameInput = createInput(
 			'username-input',
-			'text',
+			this.usernameIsEmail ? 'email' : 'text',
 			'username',
 			this.usernameIsEmail ? 'email' : 'username'
 		);
@@ -106,14 +134,18 @@ export default class UmbAuthElement extends LitElement {
 		this._usernameLabel = createLabel('username-input', this.usernameIsEmail ? 'general_email' : 'user_username');
 		this._passwordLabel = createLabel('password-input', 'user_password');
 
-		this.insertAdjacentElement('beforeend', this._usernameLabel);
-		this.insertAdjacentElement('beforeend', this._usernameInput);
-		this.insertAdjacentElement('beforeend', this._passwordLabel);
-		this.insertAdjacentElement('beforeend', this._passwordInput);
+		this._usernameLayoutItem = createFormLayoutItem(this._usernameLabel, this._usernameInput);
+		this._passwordLayoutItem = createFormLayoutItem(this._passwordLabel, this._passwordInput);
+
+		this._form = createForm([this._usernameLayoutItem, this._passwordLayoutItem]);
+
+		this.insertAdjacentElement('beforeend', this._form);
 	}
 
 	public disconnectedCallback() {
 		super.disconnectedCallback();
+		this._usernameLayoutItem?.remove();
+		this._passwordLayoutItem?.remove();
 		this._usernameLabel?.remove();
 		this._usernameInput?.remove();
 		this._passwordLabel?.remove();
