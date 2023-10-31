@@ -1,4 +1,4 @@
-﻿(function () {
+(function () {
   "use strict";
 
   function WebhookController($q,$scope, webhooksResource, notificationsService, editorService, overlayService, contentTypeResource, mediaTypeResource) {
@@ -18,7 +18,7 @@
 
     function loadEvents (){
       return webhooksResource.getAllEvents()
-        .then((data) => {
+        .then(data => {
           vm.events = data.map(item => item.eventName);
         });
     }
@@ -40,7 +40,7 @@
 
       webhook.contentTypeKeys.forEach((key) => {
         resource.getById(key)
-          .then((data) => {
+          .then(data => {
             entities.push(data);
           });
       });
@@ -56,9 +56,9 @@
         delete vm.webHooksContentTypes[webhook.key];
       }
 
-      webhook.contentTypeKeys.forEach((key) => {
+      webhook.contentTypeKeys.forEach(key => {
         resource.getById(key)
-          .then((data) => {
+          .then(data => {
             if (!vm.webHooksContentTypes[webhook.key]) {
               vm.webHooksContentTypes[webhook.key] = data.name;
             } else {
