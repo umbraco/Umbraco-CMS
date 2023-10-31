@@ -66,8 +66,10 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddUnique<ILogViewerQueryRepository, LogViewerQueryRepository>();
         builder.Services.AddUnique<INodeCountRepository, NodeCountRepository>();
         builder.Services.AddUnique<IIdKeyMapRepository, IdKeyMapRepository>();
-            builder.Services.AddUnique<IPropertyTypeUsageRepository, PropertyTypeUsageRepository>();
-            builder.Services.AddUnique<IDataTypeUsageRepository, DataTypeUsageRepository>();
+        builder.Services.AddUnique<IPropertyTypeUsageRepository, PropertyTypeUsageRepository>();
+        builder.Services.AddUnique<IDataTypeUsageRepository, DataTypeUsageRepository>();
+        builder.Services.AddUnique<IWebhookRepository, WebhookRepository>();
+        builder.Services.AddUnique<IWebhookLogRepository, WebhookLogRepository>();
 
         return builder;
     }
