@@ -417,8 +417,9 @@
         // TODO: new paths:
           var defaultViewFolderPath = "views/propertyeditors/rte/blocks/blockrteentryeditors/";
 
-          if (block.config.unsupported === true)
-              return defaultViewFolderPath + "unsupportedblock/unsupportedblock.editor.html";
+          if (block.config.unsupported === true) {
+            return defaultViewFolderPath + "unsupportedblock/unsupportedblock.editor.html";
+          }
 
           return defaultViewFolderPath + "labelblock/rtelabelblock.editor.html";
       }

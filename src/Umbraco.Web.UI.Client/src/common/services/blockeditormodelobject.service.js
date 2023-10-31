@@ -527,17 +527,20 @@
                 }
 
                 var dataModel = getDataByUdi(contentUdi, this.value.contentData);
-
-                if (dataModel === null) {
-                    console.error("Couldn't find content data of UDI:", contentUdi, "layoutEntry:", layoutEntry)
-                    return null;
-                }
-
-                var blockConfiguration = this.getBlockConfiguration(dataModel.contentTypeKey);
+                var blockConfiguration = null;
                 var contentScaffold = null;
 
+                if (dataModel === null) {
+                  console.error("Couldn't find content data of UDI:", contentUdi, "layoutEntry:", layoutEntry)
+                  //return null;
+                } else {
+                  blockConfiguration = this.getBlockConfiguration(dataModel.contentTypeKey);
+                }
+
                 if (blockConfiguration === null) {
+                  if(dataModel) {
                     console.warn("The block of " + contentUdi + " is not being initialized because its contentTypeKey('" + dataModel.contentTypeKey + "') is not allowed for this PropertyEditor");
+                  }
                 } else {
                     contentScaffold = this.getScaffoldFromKey(blockConfiguration.contentElementTypeKey);
                     if (contentScaffold === null) {
