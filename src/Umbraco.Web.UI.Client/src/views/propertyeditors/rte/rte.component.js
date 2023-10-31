@@ -708,7 +708,8 @@
           }
 
           if (vm.availableBlockTypes.length === 0) {
-              return;
+            alert("No Blocks configured for this data-type");
+            return;
           }
 
           if(createIndex === undefined) {
