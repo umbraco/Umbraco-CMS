@@ -1,4 +1,4 @@
-import { css, CSSResultGroup, html, LitElement } from 'lit';
+import { html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { until } from 'lit/directives/until.js';
@@ -7,17 +7,16 @@ import { umbAuthContext } from './context/auth.context.js';
 import { umbLocalizationContext } from './external/localization/localization-context.js';
 import { UmbLocalizeElement } from './external/localization/localize.element.js';
 import { UMBLoginInputElement } from './components/logIn-input.element.js';
-import { InputType, UUIFormLayoutItemElement } from '@umbraco-ui/uui';
+import { InputType, UUIFormLayoutItemElement, UUILabelElement } from '@umbraco-ui/uui';
 
-const createInput = (id: string, type: InputType, name: string, autocomplete: AutoFill) => {
+const createInput = (id: string, type: InputType, name: string, autocomplete: AutoFill, requiredMessage: string) => {
 	const input = document.createElement('umb-login-input');
 	input.type = type;
 	input.name = name;
 	input.autocomplete = autocomplete;
 	input.id = id;
 	input.required = true;
-	input.requiredMessage = 'bubber';
-	//TODO: How should we add validation messages?
+	input.requiredMessage = requiredMessage;
 
 	return input;
 };
@@ -32,7 +31,7 @@ const createLabel = (forId: string, localizeAlias: string) => {
 	return label;
 };
 
-const createFormLayoutItem = (label: HTMLLabelElement, input: UMBLoginInputElement) => {
+const createFormLayoutItem = (label: UUILabelElement, input: UMBLoginInputElement) => {
 	const formLayoutItem = document.createElement('uui-form-layout-item') as UUIFormLayoutItemElement;
 	formLayoutItem.appendChild(label);
 	formLayoutItem.appendChild(input);
@@ -106,8 +105,8 @@ export default class UmbAuthElement extends LitElement {
 	_passwordLayoutItem?: UUIFormLayoutItemElement;
 	_usernameInput?: UMBLoginInputElement;
 	_passwordInput?: UMBLoginInputElement;
-	_usernameLabel?: HTMLLabelElement;
-	_passwordLabel?: HTMLLabelElement;
+	_usernameLabel?: UUILabelElement;
+	_passwordLabel?: UUILabelElement;
 
 	constructor() {
 		super();
@@ -122,16 +121,33 @@ export default class UmbAuthElement extends LitElement {
 		});
 	}
 
-	public connectedCallback() {
+	connectedCallback() {
 		super.connectedCallback();
+
+		this.#initializeForm();
+	}
+
+	disconnectedCallback() {
+		super.disconnectedCallback();
+		this._usernameLayoutItem?.remove();
+		this._passwordLayoutItem?.remove();
+		this._usernameLabel?.remove();
+		this._usernameInput?.remove();
+		this._passwordLabel?.remove();
+		this._passwordInput?.remove();
+	}
+
+	async #initializeForm() {
+		const requiredMessage = await umbLocalizationContext.localize('general_required', undefined, 'Required');
 
 		this._usernameInput = createInput(
 			'username-input',
 			this.usernameIsEmail ? 'email' : 'text',
 			'username',
-			this.usernameIsEmail ? 'email' : 'username'
+			this.usernameIsEmail ? 'email' : 'username',
+			requiredMessage
 		);
-		this._passwordInput = createInput('password-input', 'password', 'password', 'current-password');
+		this._passwordInput = createInput('password-input', 'password', 'password', 'current-password', requiredMessage);
 		this._usernameLabel = createLabel('username-input', this.usernameIsEmail ? 'general_email' : 'user_username');
 		this._passwordLabel = createLabel('password-input', 'user_password');
 
@@ -141,16 +157,6 @@ export default class UmbAuthElement extends LitElement {
 		this._form = createForm([this._usernameLayoutItem, this._passwordLayoutItem]);
 
 		this.insertAdjacentElement('beforeend', this._form);
-	}
-
-	public disconnectedCallback() {
-		super.disconnectedCallback();
-		this._usernameLayoutItem?.remove();
-		this._passwordLayoutItem?.remove();
-		this._usernameLabel?.remove();
-		this._usernameInput?.remove();
-		this._passwordLabel?.remove();
-		this._passwordInput?.remove();
 	}
 
 	render() {
