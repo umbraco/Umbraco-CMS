@@ -302,7 +302,7 @@
                       }
                     });
 
-                    vm.model.value.markup = new XMLSerializer().serializeToString(doc);
+                    vm.model.value.markup = doc.body.innerHTML;
 
                   }
               }));
