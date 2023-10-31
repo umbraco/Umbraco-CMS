@@ -12,7 +12,7 @@ const glob = globModule.default;
 const DIST_DIRECTORY = './dist-cms';
 
 /* TODO: temp solution. Not every external library can run in the browser so we need rollup to bundle them and make them Browser friendly.
-For each external library we want to bundle all its files into one js bundle. First we run the 
+For each external library we want to bundle all its files into one js bundle. First we run the
 Typescript compiler to create the external folder with d.ts files in the correct places. Then we delete all the js modules that are created, but
 might not work in the browser. Then we run rollup to bundle the external libraries. */
 console.log('--- Deleting temp external JS modules ---');
@@ -75,9 +75,9 @@ const libraries = allowed.map((module) => {
 			format: 'es',
 		},
 		plugins: [
-			nodeResolve(),
-			webWorkerLoader({ target: 'browser', pattern: /^(.+)\?worker$/ }),
 			commonjs(),
+			nodeResolve({ preferBuiltins: false, browser: true }),
+			webWorkerLoader({ target: 'browser', pattern: /^(.+)\?worker$/ }),
 			css(),
 			esbuild({ minify: true, sourceMap: true }),
 		],
