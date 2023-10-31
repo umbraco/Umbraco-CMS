@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using Umbraco.Cms.Core.Scoping;
 
 namespace Umbraco.Cms.Core.DynamicRoot.QuerySteps;
@@ -15,17 +14,17 @@ public class FarthestDescendantOrSelfDynamicRootQueryStep : IDynamicRootQuerySte
     }
 
     protected virtual string SupportedDirectionAlias { get; set; } = "FarthestDescendantOrSelf";
-    public bool Execute(IEnumerable<Guid> origins, DynamicRootQueryStep filter, [MaybeNullWhen(false)] out IEnumerable<Guid> result)
+
+    public async Task<Attempt<ICollection<Guid>>> ExecuteAsync(ICollection<Guid> origins, DynamicRootQueryStep filter)
     {
-        if (filter.Alias != SupportedDirectionAlias || origins.Any() is false)
+        if (filter.Alias != SupportedDirectionAlias || origins.Count < 1)
         {
-            result = null;
-            return false;
+            return Attempt<ICollection<Guid>>.Fail();
         }
 
         using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
-        result = _nodeFilterRepository.FarthestDescendantOrSelf(origins, filter);
+        var result = await _nodeFilterRepository.FarthestDescendantOrSelfAsync(origins, filter);
 
-        return true;
+        return Attempt<ICollection<Guid>>.Succeed(result);
     }
 }

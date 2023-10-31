@@ -4,11 +4,11 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Core.DynamicRoot.Origin;
 
-public class RootDynamicRootOrigin : IDynamicRootOrigin
+public class RootDynamicRootOriginFinder : IDynamicRootOriginFinder
 {
     private readonly IEntityService _entityService;
 
-    public RootDynamicRootOrigin(IEntityService entityService)
+    public RootDynamicRootOriginFinder(IEntityService entityService)
     {
         _entityService = entityService;
     }
@@ -19,13 +19,15 @@ public class RootDynamicRootOrigin : IDynamicRootOrigin
     });
 
     protected virtual string SupportedOriginType { get; set; } = "Root";
-    public virtual Guid? FindOriginKey(DynamicRootNodeSelector selector)
+
+    public virtual Guid? FindOriginKey(DynamicRootNodeQuery query)
     {
-        if (selector.OriginAlias != SupportedOriginType)
+        if (query.OriginAlias != SupportedOriginType)
         {
             return null;
         }
-        var entity = _entityService.Get(selector.Context.ParentKey);
+
+        var entity = _entityService.Get(query.Context.ParentKey);
 
         if (entity is null || _allowedObjectTypes.Contains(entity.NodeObjectType) is false)
         {
@@ -43,8 +45,7 @@ public class RootDynamicRootOrigin : IDynamicRootOrigin
         IEntitySlim? root = rootId is null ? null : _entityService.Get(rootId.Value);
 
         if (root is null
-            || root.NodeObjectType != Constants.ObjectTypes.Document
-           )
+            || root.NodeObjectType != Constants.ObjectTypes.Document)
         {
             return null;
         }
@@ -52,12 +53,11 @@ public class RootDynamicRootOrigin : IDynamicRootOrigin
         return root.Key;
     }
 
-    private int? GetRootId(string[] path)
+    private static int? GetRootId(string[] path)
     {
         foreach (var contentId in path)
         {
-            if (contentId == Constants.System.RootString
-                || contentId == Constants.System.RecycleBinContentString)
+            if (contentId is Constants.System.RootString or Constants.System.RecycleBinContentString)
             {
                 continue;
             }

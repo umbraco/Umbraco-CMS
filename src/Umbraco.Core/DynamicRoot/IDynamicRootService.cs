@@ -1,6 +1,9 @@
 namespace Umbraco.Cms.Core.DynamicRoot;
 
+/// <summary>
+/// Supports finding content roots for pickers (like MNTP) in a dynamic fashion
+/// </summary>
 public interface IDynamicRootService
 {
-    IEnumerable<Guid> GetDynamicRoots(DynamicRootNodeSelector dynamicRootNodeSelector);
+    Task<IEnumerable<Guid>> GetDynamicRootsAsync(DynamicRootNodeQuery dynamicRootNodeQuery);
 }

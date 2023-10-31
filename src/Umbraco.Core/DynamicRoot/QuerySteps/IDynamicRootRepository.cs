@@ -2,8 +2,11 @@ namespace Umbraco.Cms.Core.DynamicRoot.QuerySteps;
 
 public interface IDynamicRootRepository
 {
-    Guid? NearestAncestorOrSelf(IEnumerable<Guid> origins, DynamicRootQueryStep queryStep);
-    Guid? FarthestAncestorOrSelf(IEnumerable<Guid> origins, DynamicRootQueryStep queryStep);
-    IEnumerable<Guid> NearestDescendantOrSelf(IEnumerable<Guid> origins, DynamicRootQueryStep queryStep);
-    IEnumerable<Guid> FarthestDescendantOrSelf(IEnumerable<Guid> origins, DynamicRootQueryStep queryStep);
+    Task<Guid?> NearestAncestorOrSelfAsync(IEnumerable<Guid> origins, DynamicRootQueryStep queryStep);
+
+    Task<Guid?> FarthestAncestorOrSelfAsync(IEnumerable<Guid> origins, DynamicRootQueryStep queryStep);
+
+    Task<ICollection<Guid>> NearestDescendantOrSelfAsync(ICollection<Guid> origins, DynamicRootQueryStep queryStep);
+
+    Task<ICollection<Guid>> FarthestDescendantOrSelfAsync(ICollection<Guid> origins, DynamicRootQueryStep queryStep);
 }

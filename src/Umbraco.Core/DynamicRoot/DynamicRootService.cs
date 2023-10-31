@@ -6,56 +6,61 @@ namespace Umbraco.Cms.Core.DynamicRoot;
 
 public class DynamicRootService : IDynamicRootService
 {
-    private readonly DynamicRootOriginCollection _originCollection;
-    private readonly DynamicRootQueryStepCollection _dynamicRootQueryStepCollection;
+    private readonly DynamicRootOriginFinderCollection _originFinderCollection;
+    private readonly DynamicRootQueryStepCollection _queryStepCollection;
 
-    public DynamicRootService(DynamicRootOriginCollection originCollection, DynamicRootQueryStepCollection dynamicRootQueryStepCollection)
+    public DynamicRootService(DynamicRootOriginFinderCollection originFinderCollection, DynamicRootQueryStepCollection queryStepCollection)
     {
-        _originCollection = originCollection;
-        _dynamicRootQueryStepCollection = dynamicRootQueryStepCollection;
+        _originFinderCollection = originFinderCollection;
+        _queryStepCollection = queryStepCollection;
     }
 
-    public IEnumerable<Guid> GetDynamicRoots(DynamicRootNodeSelector dynamicRootNodeSelector)
+    public async Task<IEnumerable<Guid>> GetDynamicRootsAsync(DynamicRootNodeQuery dynamicRootNodeQuery)
     {
-        var originKey = FindOriginKey(dynamicRootNodeSelector);
+        var originKey = FindOriginKey(dynamicRootNodeQuery);
 
         if (originKey is null)
         {
             return Array.Empty<Guid>();
         }
 
-        if (dynamicRootNodeSelector.QuerySteps.Any() is false)
+        // no steps means the origin is the root
+        if (dynamicRootNodeQuery.QuerySteps.Any() is false)
         {
             return originKey.Value.Yield();
         }
 
-        IEnumerable<Guid> filtered = originKey.Value.Yield();
-        foreach (DynamicRootQueryStep startNodeSelectorFilter in dynamicRootNodeSelector.QuerySteps)
+        // start with the origin
+        ICollection<Guid> filtered = new []{originKey.Value};
+
+        // resolved each Query Step using the result of the previous step (or origin)
+        foreach (DynamicRootQueryStep startNodeSelectorFilter in dynamicRootNodeQuery.QuerySteps)
         {
-            filtered = ExcuteFilters(filtered, startNodeSelectorFilter);
+            filtered = await ExcuteFiltersAsync(filtered, startNodeSelectorFilter);
         }
 
         return filtered;
     }
 
-    internal IEnumerable<Guid> ExcuteFilters(IEnumerable<Guid> origin, DynamicRootQueryStep dynamicRootQueryStep)
+    internal async Task<ICollection<Guid>> ExcuteFiltersAsync(ICollection<Guid> origin, DynamicRootQueryStep dynamicRootQueryStep)
     {
-        foreach (IDynamicRootQueryStep startNodeSelectorFilter in _dynamicRootQueryStepCollection)
+        foreach (IDynamicRootQueryStep queryStep in _queryStepCollection)
         {
-            if (startNodeSelectorFilter.Execute(origin, dynamicRootQueryStep, out var filtered))
+            var queryStepAttempt = await queryStep.ExecuteAsync(origin, dynamicRootQueryStep);
+            if (queryStepAttempt is { Success: true, Result: not null })
             {
-                return filtered;
+                return queryStepAttempt.Result;
             }
         }
 
         throw new NotSupportedException($"Did not find any filteres that could handle {dynamicRootQueryStep.Alias}");
     }
 
-    internal Guid? FindOriginKey(DynamicRootNodeSelector dynamicRootNodeSelector)
+    internal Guid? FindOriginKey(DynamicRootNodeQuery dynamicRootNodeQuery)
     {
-        foreach (IDynamicRootOrigin startNodeOriginFinder in _originCollection)
+        foreach (IDynamicRootOriginFinder originFinder in _originFinderCollection)
         {
-            Guid? originKey = startNodeOriginFinder.FindOriginKey(dynamicRootNodeSelector);
+            Guid? originKey = originFinder.FindOriginKey(dynamicRootNodeQuery);
 
             if (originKey is not null)
             {

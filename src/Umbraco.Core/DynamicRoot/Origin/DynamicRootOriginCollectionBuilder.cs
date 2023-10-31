@@ -2,7 +2,7 @@ using Umbraco.Cms.Core.Composing;
 
 namespace Umbraco.Cms.Core.DynamicRoot.Origin;
 
-public class DynamicRootOriginCollectionBuilder : OrderedCollectionBuilderBase<DynamicRootOriginCollectionBuilder, DynamicRootOriginCollection, IDynamicRootOrigin>
+public class DynamicRootOriginFinderCollectionBuilder : OrderedCollectionBuilderBase<DynamicRootOriginFinderCollectionBuilder, DynamicRootOriginFinderCollection, IDynamicRootOriginFinder>
 {
-    protected override DynamicRootOriginCollectionBuilder This => this;
+    protected override DynamicRootOriginFinderCollectionBuilder This => this;
 }

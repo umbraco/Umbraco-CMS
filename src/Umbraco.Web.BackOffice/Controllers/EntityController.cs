@@ -585,12 +585,14 @@ public class EntityController : UmbracoAuthorizedJsonController
     public class DynamicRootViewModel
     {
         public DynamicRoot Query { get; set; } = null!;
+
         public int CurrentId { get; set; }
+
         public int ParentId { get; set; }
     }
 
     [HttpPost]
-    public ActionResult<EntityBasic?> GetDynamicRoot([FromBody]DynamicRootViewModel model)
+    public async Task<ActionResult<EntityBasic?>> GetDynamicRootAsync([FromBody]DynamicRootViewModel model)
     {
         var currentKey = model.CurrentId == 0 ? null : _entityService.Get(model.CurrentId)?.Key;
         var parentKey = model.ParentId == 0 ? null : _entityService.Get(model.ParentId)?.Key;
@@ -600,7 +602,7 @@ public class EntityController : UmbracoAuthorizedJsonController
             throw new ArgumentException("Invalid parentId", nameof(model.ParentId));
         }
 
-        var startNodeSelector = new DynamicRootNodeSelector()
+        var startNodeSelector = new DynamicRootNodeQuery()
         {
             Context = new DynamicRootContext()
             {
@@ -615,7 +617,7 @@ public class EntityController : UmbracoAuthorizedJsonController
                 AnyOfDocTypeKeys = x.AnyOfDocTypeKeys
             })
         };
-        var startNodes = _dynamicRootService.GetDynamicRoots(startNodeSelector).ToArray();
+        var startNodes = (await _dynamicRootService.GetDynamicRootsAsync(startNodeSelector)).ToArray();
 
         Guid? first = startNodes.Any() ? startNodes.First() : null;
         if (first.HasValue)
