@@ -48,14 +48,22 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
         public override bool IsConverter(IPublishedPropertyType propertyType)
             => propertyType.EditorAlias.InvariantEquals(Constants.PropertyEditors.Aliases.BlockGrid);
 
+        /// <inheritdoc />
+        public override Type GetPropertyValueType(IPublishedPropertyType propertyType)
+            => typeof(BlockGridModel);
+
+        /// <inheritdoc />
         public override object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
             => ConvertIntermediateToBlockGridModel(propertyType, referenceCacheLevel, inter, preview);
 
+        /// <inheritdoc />
         public PropertyCacheLevel GetDeliveryApiPropertyCacheLevel(IPublishedPropertyType propertyType) => GetPropertyCacheLevel(propertyType);
 
+        /// <inheritdoc />
         public Type GetDeliveryApiPropertyValueType(IPublishedPropertyType propertyType)
             => typeof(ApiBlockGridModel);
 
+        /// <inheritdoc />
         public object? ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview, bool expanding)
         {
             const int defaultColumns = 12;
