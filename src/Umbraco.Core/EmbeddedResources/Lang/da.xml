@@ -2320,6 +2320,8 @@ Mange hilsner fra Umbraco robotten
     <key alias="configureArea">Konfigurer område</key>
     <key alias="deleteArea">Slet område</key>
     <key alias="addColumnSpanOption">Tilføj mulighed for %0% koloner</key>
+    <key alias="insertBlock">Indsæt Blok</key>
+    <key alias="labelInlineMode">Vis på linje med tekst</key>
   </area>
   <area alias="contentTemplatesDashboard">
     <key alias="whatHeadline">Hvad er Indholdsskabeloner?</key>
