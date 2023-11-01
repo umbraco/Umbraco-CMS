@@ -281,7 +281,9 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IPublicAccessService, PublicAccessService>();
             Services.AddUnique<IContentVersionService, ContentVersionService>();
             Services.AddTransient<IUserGroupAuthorizationService, UserGroupAuthorizationService>();
+            Services.AddUnique<IUserGroupPermissionService, UserGroupPermissionService>();
             Services.AddUnique<IUserGroupService, UserGroupService>();
+            Services.AddUnique<IUserPermissionService, UserPermissionService>();
             Services.AddUnique<IUserService, UserService>();
             Services.AddUnique<ITourService, TourService>();
             Services.AddUnique<IWebProfilerService, WebProfilerService>();
@@ -299,12 +301,13 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IPropertyValidationService, PropertyValidationService>();
             Services.AddUnique<IDomainService, DomainService>();
             Services.AddUnique<ITagService, TagService>();
+            Services.AddUnique<IContentPermissionService, ContentPermissionService>();
             Services.AddUnique<IContentService, ContentService>();
             Services.AddUnique<IContentEditingService, ContentEditingService>();
             Services.AddUnique<IContentCreatingService, ContentCreatingService>();
             Services.AddUnique<IContentVersionCleanupPolicy, DefaultContentVersionCleanupPolicy>();
             Services.AddUnique<IMemberService, MemberService>();
-            Services.AddTransient<IMediaPermissionsService, MediaPermissionsService>();
+            Services.AddUnique<IMediaPermissionService, MediaPermissionService>();
             Services.AddUnique<IMediaService, MediaService>();
             Services.AddUnique<IMediaEditingService, MediaEditingService>();
             Services.AddUnique<IContentTypeService, ContentTypeService>();
