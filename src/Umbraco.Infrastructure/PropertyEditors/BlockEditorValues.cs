@@ -36,7 +36,17 @@ internal class BlockEditorValues<TValue, TLayout>
         }
 
         BlockEditorData<TValue, TLayout> blockEditorData = _dataConverter.Deserialize(propertyValueAsString);
+        return Clean(blockEditorData);
+    }
 
+    public BlockEditorData? ConvertAndClean(BlockValue blockValue)
+    {
+        BlockEditorData blockEditorData = _dataConverter.Convert(blockValue);
+        return Clean(blockEditorData);
+    }
+
+    private BlockEditorData? Clean(BlockEditorData blockEditorData)
+    {
         if (blockEditorData.BlockValue.ContentData.Count == 0)
         {
             // if there's no content ensure there's no settings too

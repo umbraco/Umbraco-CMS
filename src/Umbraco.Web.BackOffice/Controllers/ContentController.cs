@@ -771,6 +771,7 @@ public class ContentController : ContentControllerBase
 
         return pagedResult;
     }
+
     /// <summary>
     ///     Creates a blueprint from a content item
     /// </summary>
@@ -1056,7 +1057,7 @@ public class ContentController : ContentControllerBase
                 AddDomainWarnings(publishStatus.Content, successfulCultures, globalNotifications);
                 AddPublishStatusNotifications(new[] { publishStatus }, globalNotifications, notifications, successfulCultures);
             }
-            break;
+                break;
             case ContentSaveAction.PublishWithDescendants:
             case ContentSaveAction.PublishWithDescendantsNew:
             {
@@ -1073,7 +1074,7 @@ public class ContentController : ContentControllerBase
                 AddDomainWarnings(publishStatus, successfulCultures, globalNotifications);
                 AddPublishStatusNotifications(publishStatus, globalNotifications, notifications, successfulCultures);
             }
-            break;
+                break;
             case ContentSaveAction.PublishWithDescendantsForce:
             case ContentSaveAction.PublishWithDescendantsForceNew:
             {
@@ -1089,7 +1090,7 @@ public class ContentController : ContentControllerBase
                 var publishStatus = PublishBranchInternal(contentItem, true, cultureForInvariantErrors, out wasCancelled, out var successfulCultures).ToList();
                 AddPublishStatusNotifications(publishStatus, globalNotifications, notifications, successfulCultures);
             }
-            break;
+                break;
             default:
                 throw new ArgumentOutOfRangeException();
         }
@@ -2743,7 +2744,7 @@ public class ContentController : ContentControllerBase
                         }
                     }
                 }
-                break;
+                    break;
                 case PublishResultType.SuccessPublish:
                 {
                     // TODO: Here we should have messaging for when there are release dates specified like https://github.com/umbraco/Umbraco-CMS/pull/3507
@@ -2771,7 +2772,7 @@ public class ContentController : ContentControllerBase
                         }
                     }
                 }
-                break;
+                    break;
                 case PublishResultType.FailedPublishPathNotPublished:
                 {
                     //TODO: This doesn't take into account variations with the successfulCultures param
@@ -2780,14 +2781,14 @@ public class ContentController : ContentControllerBase
                         _localizedTextService.Localize(null, "publish"),
                         _localizedTextService.Localize("publish", "contentPublishedFailedByParent", new[] { names }).Trim());
                 }
-                break;
+                    break;
                 case PublishResultType.FailedPublishCancelledByEvent:
                 {
                     //TODO: This doesn't take into account variations with the successfulCultures param
                     var names = string.Join(", ", status.Select(x => $"'{x.Content?.Name}'"));
                     AddCancelMessage(display, "publish", "contentPublishedFailedByEvent", new[] { names });
                 }
-                break;
+                    break;
                 case PublishResultType.FailedPublishAwaitingRelease:
                 {
                     //TODO: This doesn't take into account variations with the successfulCultures param
@@ -2796,7 +2797,7 @@ public class ContentController : ContentControllerBase
                         _localizedTextService.Localize(null, "publish"),
                         _localizedTextService.Localize("publish", "contentPublishedFailedAwaitingRelease", new[] { names }).Trim());
                 }
-                break;
+                    break;
                 case PublishResultType.FailedPublishHasExpired:
                 {
                     //TODO: This doesn't take into account variations with the successfulCultures param
@@ -2805,7 +2806,7 @@ public class ContentController : ContentControllerBase
                         _localizedTextService.Localize(null, "publish"),
                         _localizedTextService.Localize("publish", "contentPublishedFailedExpired", new[] { names }).Trim());
                 }
-                break;
+                    break;
                 case PublishResultType.FailedPublishIsTrashed:
                 {
                     //TODO: This doesn't take into account variations with the successfulCultures param
@@ -2814,7 +2815,7 @@ public class ContentController : ContentControllerBase
                         _localizedTextService.Localize(null, "publish"),
                         _localizedTextService.Localize("publish", "contentPublishedFailedIsTrashed", new[] { names }).Trim());
                 }
-                break;
+                    break;
                 case PublishResultType.FailedPublishContentInvalid:
                 {
                     if (successfulCultures == null)
@@ -2838,7 +2839,7 @@ public class ContentController : ContentControllerBase
                         }
                     }
                 }
-                break;
+                    break;
                 case PublishResultType.FailedPublishMandatoryCultureMissing:
                     display.AddWarningNotification(
                         _localizedTextService.Localize(null, "publish"),
