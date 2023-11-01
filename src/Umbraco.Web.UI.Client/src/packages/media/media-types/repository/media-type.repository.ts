@@ -18,7 +18,7 @@ export class UmbMediaTypeRepository implements UmbTreeRepository<EntityTreeItemR
 	#treeStore?: UmbMediaTypeTreeStore;
 
 	#detailSource: UmbMediaTypeDetailServerDataSource;
-	#store?: UmbMediaTypeStore;
+	#detailStore?: UmbMediaTypeStore;
 
 	#notificationContext?: UmbNotificationContext;
 
@@ -31,7 +31,7 @@ export class UmbMediaTypeRepository implements UmbTreeRepository<EntityTreeItemR
 
 		this.#init = Promise.all([
 			new UmbContextConsumerController(this.#host, UMB_MEDIA_TYPE_STORE_CONTEXT_TOKEN, (instance) => {
-				this.#store = instance;
+				this.#detailStore = instance;
 			}),
 
 			new UmbContextConsumerController(this.#host, UMB_MEDIA_TYPE_TREE_STORE_CONTEXT_TOKEN, (instance) => {
@@ -118,18 +118,18 @@ export class UmbMediaTypeRepository implements UmbTreeRepository<EntityTreeItemR
 		return this.#detailSource.createScaffold();
 	}
 
-	async requestDetails(id: string) {
+	async requestById(id: string) {
 		await this.#init;
-
 		// TODO: should we show a notification if the id is missing?
 		// Investigate what is best for Acceptance testing, cause in that perspective a thrown error might be the best choice?
 		if (!id) {
 			throw new Error('Id is missing');
 		}
+		debugger;
 		const { data, error } = await this.#detailSource.get(id);
 
 		if (data) {
-			this.#store?.append(data);
+			this.#detailStore?.append(data);
 		}
 		return { data, error };
 	}
@@ -158,7 +158,7 @@ export class UmbMediaTypeRepository implements UmbTreeRepository<EntityTreeItemR
 		// TODO: we currently don't use the detail store for anything.
 		// Consider to look up the data before fetching from the server
 		// Consider notify a workspace if a media type is updated in the store while someone is editing it.
-		this.#store?.append(mediaType);
+		this.#detailStore?.append(mediaType);
 		this.#treeStore?.updateItem(mediaType.id, { name: mediaType.name });
 		// TODO: would be nice to align the stores on methods/methodNames.
 
