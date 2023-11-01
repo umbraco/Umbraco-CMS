@@ -621,7 +621,7 @@ internal class PublishedSnapshotService : IPublishedSnapshotService
     /// </remarks>
     private void MainDomRegister()
     {
-        var path = GetLocalFilesPath();
+        var path = GetAndEnsureLocalFilesPathExists();
         var localContentDbPath = Path.Combine(path, "NuCache.Content.db");
         var localMediaDbPath = Path.Combine(path, "NuCache.Media.db");
 
@@ -670,7 +670,7 @@ internal class PublishedSnapshotService : IPublishedSnapshotService
         }
     }
 
-    private string GetLocalFilesPath()
+    private string GetAndEnsureLocalFilesPathExists()
     {
         var path = LocalFilePath;
 
