@@ -132,10 +132,10 @@ public static class UmbracoEFCoreServiceCollectionExtensions
     {
         switch (providerName)
         {
-            case Cms.Persistence.EFCore.Constants.ProviderNames.SQLServer:
+            case Constants.ProviderNames.SQLServer:
                 builder.UseSqlServer(connectionString);
                 break;
-            case Cms.Persistence.EFCore.Constants.ProviderNames.SQLLite:
+            case Constants.ProviderNames.SQLLite:
                 builder.UseSqlite(connectionString);
                 break;
             default:
