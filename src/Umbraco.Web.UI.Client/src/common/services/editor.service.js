@@ -391,12 +391,44 @@ When building a custom infinite editor view you can use the same components as a
      * Opens a content type picker in infinite editing, the submit callback returns an array of selected items
      *
      * @param {object} editor rendering options.
+     * @param {string} editor.entityType Entity type to open - default document type.
      * @param {boolean} editor.multiPicker Pick one or multiple items.
      * @param {function} editor.submit Callback function when the submit button is clicked. Returns the editor model object.
      * @param {function} editor.close Callback function when the close button is clicked.
      * @returns {object} editor object
      */
     function contentTypePicker(editor) {
+      
+      if (!editor.entityType) editor.entityType = "documentType";
+      
+      switch (editor.entityType) {
+        case "documentType":
+          documentTypePicker(editor);
+          break;
+        case "mediaType":
+          mediaTypePicker(editor);
+          break;
+        case "memberType":
+          memberTypePicker(editor);
+          break;
+      }
+    }
+
+    /**
+     * @ngdoc method
+     * @name umbraco.services.editorService#documentTypePicker
+     * @methodOf umbraco.services.editorService
+     *
+     * @description
+     * Opens a document type picker in infinite editing, the submit callback returns an array of selected items
+     *
+     * @param {object} editor rendering options.
+     * @param {boolean} editor.multiPicker Pick one or multiple items.
+     * @param {function} editor.submit Callback function when the submit button is clicked. Returns the editor model object.
+     * @param {function} editor.close Callback function when the close button is clicked.
+     * @returns {object} editor object
+     */
+    function documentTypePicker(editor) {
       editor.view = "views/common/infiniteeditors/treepicker/treepicker.html";
       if (!editor.size) editor.size = "small";
       editor.section = "settings";
@@ -1143,10 +1175,12 @@ When building a custom infinite editor view you can use the same components as a
       open: open,
       close: close,
       closeAll: closeAll,
-      mediaEditor: mediaEditor,
       contentEditor: contentEditor,
+      mediaEditor: mediaEditor,
+      memberEditor: memberEditor,
       contentPicker: contentPicker,
       contentTypePicker: contentTypePicker,
+      documentTypePicker: documentTypePicker,
       mediaTypePicker: mediaTypePicker,
       memberTypePicker: memberTypePicker,
       copy: copy,
@@ -1178,7 +1212,6 @@ When building a custom infinite editor view you can use the same components as a
       macroPicker: macroPicker,
       memberGroupPicker: memberGroupPicker,
       memberPicker: memberPicker,
-      memberEditor: memberEditor,
       mediaCropDetails
     };
 
