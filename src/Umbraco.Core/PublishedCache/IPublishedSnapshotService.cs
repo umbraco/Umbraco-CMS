@@ -126,5 +126,7 @@ public interface IPublishedSnapshotService : IDisposable
     /// </summary>
     Task CollectAsync();
 
-    void ResetLocalDb();
+    void ResetLocalDb()
+    {
+    }
 }
