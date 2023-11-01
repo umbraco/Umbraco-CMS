@@ -391,7 +391,7 @@ When building a custom infinite editor view you can use the same components as a
      * Opens a content type picker in infinite editing, the submit callback returns an array of selected items
      *
      * @param {object} editor rendering options.
-     * @param {string} editor.entityType Entity type to open - default document type.
+     * @param {string} editor.entityType Entity type to open - default is document type.
      * @param {boolean} editor.multiPicker Pick one or multiple items.
      * @param {function} editor.submit Callback function when the submit button is clicked. Returns the editor model object.
      * @param {function} editor.close Callback function when the close button is clicked.
