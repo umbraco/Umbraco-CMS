@@ -1,4 +1,3 @@
-import type { MediaTypeDetails } from '../types.js';
 import { UmbMediaTypeTreeStore, UMB_MEDIA_TYPE_TREE_STORE_CONTEXT_TOKEN } from './media-type.tree.store.js';
 import { UmbMediaTypeDetailServerDataSource } from './sources/media-type.detail.server.data.js';
 import { UmbMediaTypeStore, UMB_MEDIA_TYPE_STORE_CONTEXT_TOKEN } from './media-type.detail.store.js';
@@ -7,7 +6,11 @@ import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-ap
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 import { UmbTreeRepository, UmbTreeDataSource } from '@umbraco-cms/backoffice/repository';
-import { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import {
+	CreateMediaTypeRequestModel,
+	EntityTreeItemResponseModel,
+	UpdateMediaTypeRequestModel,
+} from '@umbraco-cms/backoffice/backend-api';
 
 export class UmbMediaTypeRepository implements UmbTreeRepository<EntityTreeItemResponseModel> {
 	#init!: Promise<unknown>;
@@ -125,7 +128,6 @@ export class UmbMediaTypeRepository implements UmbTreeRepository<EntityTreeItemR
 		if (!id) {
 			throw new Error('Id is missing');
 		}
-		debugger;
 		const { data, error } = await this.#detailSource.get(id);
 
 		if (data) {
@@ -139,33 +141,24 @@ export class UmbMediaTypeRepository implements UmbTreeRepository<EntityTreeItemR
 		return this.#detailSource.delete(id);
 	}
 
-	async save(mediaType: MediaTypeDetails) {
+	async save(id: string, updatedMediaType: UpdateMediaTypeRequestModel) {
+		if (!id) throw new Error('Data Type id is missing');
+		if (!updatedMediaType) throw new Error('Media Type is missing');
 		await this.#init;
 
-		// TODO: should we show a notification if the media type is missing?
-		// Investigate what is best for Acceptance testing, cause in that perspective a thrown error might be the best choice?
-		if (!mediaType || !mediaType.id) {
-			throw new Error('Media type is missing');
-		}
-
-		const { error } = await this.#detailSource.update(mediaType);
+		const { error } = await this.#detailSource.update(id, updatedMediaType);
 
 		if (!error) {
-			const notification = { data: { message: `Media type '${mediaType.name}' saved` } };
+			const notification = { data: { message: `Media type '${updatedMediaType.name}' saved` } };
 			this.#notificationContext?.peek('positive', notification);
-		}
 
-		// TODO: we currently don't use the detail store for anything.
-		// Consider to look up the data before fetching from the server
-		// Consider notify a workspace if a media type is updated in the store while someone is editing it.
-		this.#detailStore?.append(mediaType);
-		this.#treeStore?.updateItem(mediaType.id, { name: mediaType.name });
-		// TODO: would be nice to align the stores on methods/methodNames.
+			//TODO: Update stores
+		}
 
 		return { error };
 	}
 
-	async create(mediaType: MediaTypeDetails) {
+	async create(mediaType: CreateMediaTypeRequestModel) {
 		await this.#init;
 
 		if (!mediaType.name) {
