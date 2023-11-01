@@ -6,13 +6,13 @@ using Umbraco.Cms.Core.Services.AuthorizationStatus;
 namespace Umbraco.Cms.Core.Services;
 
 /// <inheritdoc />
-internal sealed class MediaPermissionsService : IMediaPermissionsService
+internal sealed class MediaPermissionService : IMediaPermissionService
 {
     private readonly IMediaService _mediaService;
     private readonly IEntityService _entityService;
     private readonly AppCaches _appCaches;
 
-    public MediaPermissionsService(
+    public MediaPermissionService(
         IMediaService mediaService,
         IEntityService entityService,
         AppCaches appCaches)

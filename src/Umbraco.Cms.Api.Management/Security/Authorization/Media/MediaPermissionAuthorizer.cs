@@ -6,15 +6,15 @@ using Umbraco.Cms.Core.Services.AuthorizationStatus;
 namespace Umbraco.Cms.Api.Management.Security.Authorization.Media;
 
 /// <inheritdoc />
-internal sealed class MediaAuthorizer : IMediaAuthorizer
+internal sealed class MediaPermissionAuthorizer : IMediaPermissionAuthorizer
 {
     private readonly IAuthorizationHelper _authorizationHelper;
-    private readonly IMediaPermissionsService _mediaPermissionsService;
+    private readonly IMediaPermissionService _mediaPermissionService;
 
-    public MediaAuthorizer(IAuthorizationHelper authorizationHelper, IMediaPermissionsService mediaPermissionsService)
+    public MediaPermissionAuthorizer(IAuthorizationHelper authorizationHelper, IMediaPermissionService mediaPermissionService)
     {
         _authorizationHelper = authorizationHelper;
-        _mediaPermissionsService = mediaPermissionsService;
+        _mediaPermissionService = mediaPermissionService;
     }
 
     /// <inheritdoc />
@@ -28,7 +28,7 @@ internal sealed class MediaAuthorizer : IMediaAuthorizer
 
         IUser user = _authorizationHelper.GetCurrentUser(currentUser);
 
-        var result = await _mediaPermissionsService.AuthorizeAccessAsync(user, mediaKeys);
+        var result = await _mediaPermissionService.AuthorizeAccessAsync(user, mediaKeys);
 
         return result == MediaAuthorizationStatus.Success;
     }

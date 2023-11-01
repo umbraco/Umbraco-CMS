@@ -5,7 +5,7 @@ namespace Umbraco.Cms.Api.Management.Security.Authorization.Media;
 /// <summary>
 ///     Authorizes media access.
 /// </summary>
-public interface IMediaAuthorizer
+public interface IMediaPermissionAuthorizer
 {
     /// <summary>
     ///     Authorizes whether the current user has access to the specified media item(s).

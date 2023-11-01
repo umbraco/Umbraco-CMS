@@ -5,7 +5,7 @@ namespace Umbraco.Cms.Api.Management.Security.Authorization.UserGroup;
 /// <summary>
 ///     Authorizes user group access.
 /// </summary>
-public interface IUserGroupAuthorizer
+public interface IUserGroupPermissionAuthorizer
 {
     /// <summary>
     ///     Authorizes whether the current user has access to the specified user group(s).

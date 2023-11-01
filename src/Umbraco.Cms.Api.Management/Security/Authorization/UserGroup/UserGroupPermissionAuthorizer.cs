@@ -6,12 +6,12 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 namespace Umbraco.Cms.Api.Management.Security.Authorization.UserGroup;
 
 /// <inheritdoc />
-internal sealed class UserGroupAuthorizer : IUserGroupAuthorizer
+internal sealed class UserGroupPermissionAuthorizer : IUserGroupPermissionAuthorizer
 {
     private readonly IAuthorizationHelper _authorizationHelper;
     private readonly IUserGroupService _userGroupService;
 
-    public UserGroupAuthorizer(IAuthorizationHelper authorizationHelper, IUserGroupService userGroupService)
+    public UserGroupPermissionAuthorizer(IAuthorizationHelper authorizationHelper, IUserGroupService userGroupService)
     {
         _authorizationHelper = authorizationHelper;
         _userGroupService = userGroupService;
