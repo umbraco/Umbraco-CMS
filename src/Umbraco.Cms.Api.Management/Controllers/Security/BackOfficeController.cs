@@ -15,7 +15,6 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Web.BackOffice.Security;
 using Umbraco.Extensions;
 using Umbraco.Cms.Api.Management.Routing;
-using Umbraco.Cms.Web.Common.Authorization;
 using SignInResult = Microsoft.AspNetCore.Mvc.SignInResult;
 using IdentitySignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
@@ -49,7 +48,6 @@ public class BackOfficeController : SecurityControllerBase
     //[AllowAnonymous] // This is handled implicitly by the NewDenyLocalLoginIfConfigured policy on the <see cref="SecurityControllerBase" />. Keep it here for now and check FIXME in <see cref="DenyLocalLoginHandler" />.
     [HttpPost("login")]
     [MapToApiVersion("1.0")]
-    [Authorize(Policy = "New" + AuthorizationPolicies.DenyLocalLoginIfConfigured)]
     public async Task<IActionResult> Login(LoginRequestModel model)
     {
         var validated = await _backOfficeUserManager.ValidateCredentialsAsync(model.Username, model.Password);
