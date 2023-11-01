@@ -70,6 +70,8 @@ internal class PublishedSnapshotService : IPublishedSnapshotService
     private long _mediaGen;
     private ContentStore _mediaStore = null!;
 
+    private string LocalFilePath => Path.Combine(_hostingEnvironment.LocalTempPath, "NuCache");
+
     public PublishedSnapshotService(
         PublishedSnapshotServiceOptions options,
         ISyncBootStateAccessor syncBootStateAccessor,
@@ -475,6 +477,22 @@ internal class PublishedSnapshotService : IPublishedSnapshotService
         return GetUid(_mediaStore, id);
     }
 
+
+    public void ResetLocalDb()
+    {
+        _logger.LogInformation(
+            "Resetting NuCache local db");
+        var path = LocalFilePath;
+        if (Directory.Exists(path) is false)
+        {
+            return;
+        }
+
+        MainDomRelease();
+        Directory.Delete(path, true);
+        MainDomRegister();
+    }
+
     /// <summary>
     ///     Lazily populates the stores only when they are first requested
     /// </summary>
@@ -654,7 +672,7 @@ internal class PublishedSnapshotService : IPublishedSnapshotService
 
     private string GetLocalFilesPath()
     {
-        var path = Path.Combine(_hostingEnvironment.LocalTempPath, "NuCache");
+        var path = LocalFilePath;
 
         if (!Directory.Exists(path))
         {
