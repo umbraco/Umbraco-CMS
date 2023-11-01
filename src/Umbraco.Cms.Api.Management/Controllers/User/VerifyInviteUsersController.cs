@@ -18,7 +18,7 @@ public class VerifyInviteUserController : UserControllerBase
 
     public VerifyInviteUserController(IUserService userService) => _userService = userService;
 
-    [AllowAnonymous]
+    //[AllowAnonymous] // This is handled implicitly by the NewDenyLocalLoginIfConfigured policy. Keep it here for now and check FIXME in <see cref="DenyLocalLoginHandler" />.
     [HttpPost("invite/verify")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]

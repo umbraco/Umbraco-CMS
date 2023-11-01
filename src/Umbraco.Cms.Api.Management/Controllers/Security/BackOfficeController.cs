@@ -46,7 +46,7 @@ public class BackOfficeController : SecurityControllerBase
 
     // FIXME: this is a temporary solution to get the new backoffice auth rolling.
     //        once the old backoffice auth is no longer necessary, clean this up and merge with 2FA handling etc.
-    [AllowAnonymous]
+    //[AllowAnonymous] // This is handled implicitly by the NewDenyLocalLoginIfConfigured policy on the <see cref="SecurityControllerBase" />. Keep it here for now and check FIXME in <see cref="DenyLocalLoginHandler" />.
     [HttpPost("login")]
     [MapToApiVersion("1.0")]
     [Authorize(Policy = "New" + AuthorizationPolicies.DenyLocalLoginIfConfigured)]
