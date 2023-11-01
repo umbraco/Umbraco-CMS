@@ -4,7 +4,6 @@ import {
 	MediaTypeResponseModel,
 	UpdateMediaTypeRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
-import type { MediaTypeDetails } from '../../types.js';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { UmbDataSource } from '@umbraco-cms/backoffice/repository';
@@ -30,9 +29,9 @@ export class UmbMediaTypeDetailServerDataSource
 	 * @memberof UmbMediaTypeDetailServerDataSource
 	 */
 	async createScaffold() {
-		const data: MediaTypeDetails = {
+		const data: CreateMediaTypeRequestModel = {
 			name: '',
-		} as MediaTypeDetails;
+		} as CreateMediaTypeRequestModel;
 
 		return { data };
 	}
@@ -55,7 +54,7 @@ export class UmbMediaTypeDetailServerDataSource
 
 	/**
 	 * @description - Updates a MediaType on the server
-	 * @param {MediaTypeDetails} MediaType
+	 * @param {UpdateMediaTypeRequestModel} MediaType
 	 * @return {*}
 	 * @memberof UmbMediaTypeDetailServerDataSource
 	 */
@@ -73,7 +72,7 @@ export class UmbMediaTypeDetailServerDataSource
 
 	/**
 	 * @description - Inserts a new MediaType on the server
-	 * @param {MediaTypeDetails} data
+	 * @param {CreateMediaTypeRequestModel} data
 	 * @return {*}
 	 * @memberof UmbMediaTypeDetailServerDataSource
 	 */
