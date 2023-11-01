@@ -14,6 +14,6 @@ export const UMB_ICON_PICKER_MODAL = new UmbModalToken<UmbIconPickerModalData, U
 	'Umb.Modal.IconPicker',
 	{
 		type: 'sidebar',
-		size: 'small',
+		size: 'medium',
 	},
 );

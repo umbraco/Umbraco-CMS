@@ -1,3 +1,5 @@
-import * as sanitizeHtml from 'sanitize-html';
+import DOMPurify from 'dompurify';
+
+const sanitizeHtml = DOMPurify.sanitize;
 
 export { sanitizeHtml };
