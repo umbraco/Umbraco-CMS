@@ -43,7 +43,7 @@ parameters:
     default: ' '
 
 variables:
-  nodeVersion: 18.16.x
+  nodeVersion: 20
   dotnetVersion: 8.x
   dotnetIncludePreviewVersions: true
   solution: umbraco.sln
@@ -72,6 +72,7 @@ stages:
             submodules: true
           - task: NodeTool@0
             displayName: Use Node.js $(nodeVersion)
+            retryCountOnTaskFailure: 3
             inputs:
               versionSpec: $(nodeVersion)
           - task: Cache@2
@@ -84,9 +85,9 @@ stages:
               path: $(npm_config_cache)
           - script: npm ci --no-fund --no-audit --prefer-offline
             workingDirectory:  src/Umbraco.Web.UI.Client
-            displayName: Run npm ci
+            displayName: Run npm ci (Backoffice)
           - task: gulp@0
-            displayName: Run gulp build
+            displayName: Run gulp build (Backoffice)
             inputs:
               gulpFile: src/Umbraco.Web.UI.Client/gulpfile.js
               targets: coreBuild
@@ -442,6 +443,7 @@ stages:
 #              path: $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/misc/nupkg
 #          - task: NodeTool@0
 #            displayName: Use Node.js $(nodeVersion)
+#            retryCountOnTaskFailure: 3
 #            inputs:
 #              versionSpec: $(nodeVersion)
 #          - task: Cache@2

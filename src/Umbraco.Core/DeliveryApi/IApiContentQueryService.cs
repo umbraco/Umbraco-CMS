@@ -22,5 +22,6 @@ public interface IApiContentQueryService
     /// <param name="take">The amount of items to take.</param>
     /// <param name="protectedAccess">Defines the limitations for querying protected content.</param>
     /// <returns>A paged model of item ids that are returned after applying the search queries in an attempt.</returns>
-    Attempt<PagedModel<Guid>, ApiContentQueryOperationStatus> ExecuteQuery(string? fetch, IEnumerable<string> filters, IEnumerable<string> sorts, ProtectedAccess protectedAccess, int skip, int take);
+    Attempt<PagedModel<Guid>, ApiContentQueryOperationStatus> ExecuteQuery(string? fetch, IEnumerable<string> filters, IEnumerable<string> sorts, ProtectedAccess protectedAccess, int skip, int take)
+        => default;
 }
