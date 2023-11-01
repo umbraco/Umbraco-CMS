@@ -509,6 +509,7 @@
             scope.openContentType = (contentTypeId) => {
                 const editor = {
                     id: contentTypeId,
+                    entityType: scope.contentType,
                     submit: () => {
                         const args = { node: scope.model };
                         eventsService.emit("editors.documentType.reload", args);
@@ -519,7 +520,7 @@
                     }
                 };
 
-                editorService.contentTypeEditor(editor, scope.contentType);
+                editorService.contentTypeEditor(editor);
             };
 
             /* ---------- TABS ---------- */
