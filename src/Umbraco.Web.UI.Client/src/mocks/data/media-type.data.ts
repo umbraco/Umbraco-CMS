@@ -61,6 +61,11 @@ class UmbMediaTypeData extends UmbEntityData<MediaTypeResponseModel> {
 		return result;
 	}
 
+	getItems(ids: Array<string>): Array<MediaTypeTreeItemResponseModel> {
+		const items = this.data.filter((item) => ids.includes(item.id ?? ''));
+		return items.map((item) => item);
+	}
+
 	getTreeRoot(): Array<MediaTypeTreeItemResponseModel> {
 		const rootItems = this.treeData.filter((item) => item.parentId === null);
 		const result = rootItems.map((item) => createMediaTypeTreeItem(item));
@@ -72,7 +77,7 @@ class UmbMediaTypeData extends UmbEntityData<MediaTypeResponseModel> {
 		return childItems.map((item) => item);
 	}
 
-	getTreeItem(ids: Array<string>): Array<MediaTypeTreeItemResponseModel> {
+	getTreeItems(ids: Array<string>): Array<MediaTypeTreeItemResponseModel> {
 		const items = this.treeData.filter((item) => ids.includes(item.id ?? ''));
 		return items.map((item) => item);
 	}
@@ -82,11 +87,6 @@ class UmbMediaTypeData extends UmbEntityData<MediaTypeResponseModel> {
 		const allowedTypeKeys = mediaType?.allowedContentTypes?.map((mediaType) => mediaType.id) ?? [];
 		const items = this.treeData.filter((item) => allowedTypeKeys.includes(item.id ?? ''));
 		return items.map((item) => item);
-	}
-
-	/** For internal use */
-	getAll() {
-		return this.data;
 	}
 }
 
