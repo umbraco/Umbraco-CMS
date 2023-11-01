@@ -60,6 +60,7 @@ function DataTypeInfoController($scope, $routeParams, dataTypeResource, $timeout
 
         const editor = {
             id: id,
+            entityType: type,
             submit: function (model) {
                 editorService.close();
                 vm.view.loading = true;
@@ -71,7 +72,7 @@ function DataTypeInfoController($scope, $routeParams, dataTypeResource, $timeout
             }
         };
 
-        editorService.contentTypeEditor(editor, type);
+        editorService.contentTypeEditor(editor);
     }
 
     loadRelations();
