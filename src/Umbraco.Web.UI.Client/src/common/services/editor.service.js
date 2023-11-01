@@ -644,14 +644,18 @@ When building a custom infinite editor view you can use the same components as a
      * Opens the content type editor in infinite editing, the submit callback returns the alias of the saved content type.
      *
      * @param {object} editor rendering options.
+     * @param {string} editor.entityType Entity type to open - default document type.
      * @param {number} editor.id Indicates the ID of the content type to be edited. Alternatively the ID may be set to `-1` in combination with `create` being set to `true` to open the content type editor for creating a new content type.
      * @param {boolean} editor.create Set to `true` to open the content type editor for creating a new content type.
      * @param {function} editor.submit Callback function when the submit button is clicked. Returns the editor model object.
      * @param {function} editor.close Callback function when the close button is clicked.
      * @returns {object} editor object.
      */
-    function contentTypeEditor(editor, type) {
-      switch (type) {
+    function contentTypeEditor(editor) {
+
+      if (!editor.entityType) editor.entityType = "documentType";
+
+      switch (editor.entityType) {
         case "documentType":
           documentTypeEditor(editor);
           break;
