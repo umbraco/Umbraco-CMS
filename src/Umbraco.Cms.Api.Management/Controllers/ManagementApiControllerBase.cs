@@ -12,6 +12,7 @@ using Umbraco.Cms.Web.Common.Authorization;
 namespace Umbraco.Cms.Api.Management.Controllers;
 
 [Authorize(Policy = "New" + AuthorizationPolicies.BackOfficeAccess)]
+[Authorize(Policy = "New" + AuthorizationPolicies.UmbracoFeatureEnabled)]
 [MapToApi(ManagementApiConfiguration.ApiName)]
 [JsonOptionsName(Constants.JsonOptionsNames.BackOffice)]
 public abstract class ManagementApiControllerBase : Controller
