@@ -34,17 +34,17 @@ public static class UmbracoBuilderAuthExtensions
                 // FIXME: swap paths here so member API is first (see comment above)
                 options
                     .SetAuthorizationEndpointUris(
-                        Paths.BackOfficeApi.AuthorizationEndpoint.TrimStart(Constants.CharArrays.ForwardSlash),
-                        Paths.MemberApi.AuthorizationEndpoint.TrimStart(Constants.CharArrays.ForwardSlash))
+                        Paths.MemberApi.AuthorizationEndpoint.TrimStart(Constants.CharArrays.ForwardSlash),
+                        Paths.BackOfficeApi.AuthorizationEndpoint.TrimStart(Constants.CharArrays.ForwardSlash))
                     .SetTokenEndpointUris(
-                        Paths.BackOfficeApi.TokenEndpoint.TrimStart(Constants.CharArrays.ForwardSlash),
-                        Paths.MemberApi.TokenEndpoint.TrimStart(Constants.CharArrays.ForwardSlash))
+                        Paths.MemberApi.TokenEndpoint.TrimStart(Constants.CharArrays.ForwardSlash),
+                        Paths.BackOfficeApi.TokenEndpoint.TrimStart(Constants.CharArrays.ForwardSlash))
                     .SetLogoutEndpointUris(
-                        Paths.BackOfficeApi.LogoutEndpoint.TrimStart(Constants.CharArrays.ForwardSlash),
-                        Paths.MemberApi.LogoutEndpoint.TrimStart(Constants.CharArrays.ForwardSlash))
+                        Paths.MemberApi.LogoutEndpoint.TrimStart(Constants.CharArrays.ForwardSlash),
+                        Paths.BackOfficeApi.LogoutEndpoint.TrimStart(Constants.CharArrays.ForwardSlash))
                     .SetRevocationEndpointUris(
-                        Paths.BackOfficeApi.RevokeEndpoint.TrimStart(Constants.CharArrays.ForwardSlash),
-                        Paths.MemberApi.RevokeEndpoint.TrimStart(Constants.CharArrays.ForwardSlash));
+                        Paths.MemberApi.RevokeEndpoint.TrimStart(Constants.CharArrays.ForwardSlash),
+                        Paths.BackOfficeApi.RevokeEndpoint.TrimStart(Constants.CharArrays.ForwardSlash));
 
                 // Enable authorization code flow with PKCE
                 options

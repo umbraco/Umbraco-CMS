@@ -13,8 +13,8 @@ namespace Umbraco.Cms.Web.Common.Filters;
 ///     Attribute used to check that the request contains a valid Umbraco form request string.
 /// </summary>
 /// <remarks>
-    /// Applying this attribute/filter to a <see cref="SurfaceController"/> or SurfaceController Action will ensure that the Action can only be executed
-    /// when it is routed to from within Umbraco, typically when rendering a form with BeginUmbracoForm. It will mean that the natural MVC route for this Action
+/// Applying this attribute/filter to a <see cref="T:Umbraco.Cms.Web.Website.Controllers.SurfaceContorller"/> or SurfaceController Action will ensure that the Action can only be executed
+/// when it is routed to from within Umbraco, typically when rendering a form with BeginUmbracoForm. It will mean that the natural MVC route for this Action
 ///     will fail with a <see cref="HttpUmbracoFormRouteStringException" />.
 /// </remarks>
 public class ValidateUmbracoFormRouteStringAttribute : TypeFilterAttribute
