@@ -343,7 +343,8 @@
 		},
 		{
 			"name": "icon-camcorder",
-			"file": "video.svg"
+			"file": "video.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-camera-roll",
@@ -1411,7 +1412,8 @@
 		},
 		{
 			"name": "icon-name-badge",
-			"file": "contact-2.svg"
+			"file": "contact.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-navigation-bottom",
@@ -2208,42 +2210,47 @@
 
 
 
-		
+
 		{
 			"name": "icon-tools",
-			"file": "tools.svg"
+			"file": "wrench.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-top",
-			"file": "top.svg"
+			"file": "shirt.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-traffic-alt",
-			"file": "traffic-alt.svg"
+			"file": "arrow-left-right.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-trafic",
-			"file": "trafic.svg"
+			"file": "arrow-left-right.svg"
 		},
 		{
 			"name": "icon-train",
-			"file": "train.svg"
+			"file": "train-front.svg"
 		},
 		{
 			"name": "icon-trash-alt-2",
-			"file": "trash-alt-2.svg"
+			"file": "trash-2.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-trash-alt",
-			"file": "trash-alt.svg"
+			"file": "trash-2.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-trash",
-			"file": "trash.svg"
+			"file": "trash-2.svg"
 		},
 		{
 			"name": "icon-tree",
-			"file": "tree.svg"
+			"file": "tree-deciduous.svg"
 		},
 		{
 			"name": "icon-trophy",
@@ -2255,47 +2262,40 @@
 		},
 		{
 			"name": "icon-tv-old",
-			"file": "tv-old.svg"
-		},
-		{
-			"name": "icon-tv",
 			"file": "tv.svg"
 		},
 		{
+			"name": "icon-tv",
+			"file": "monitor-play.svg"
+		},
+		{
 			"name": "icon-umb-content",
-			"file": "umb-content.svg"
-		},
-		{
-			"name": "icon-umb-contour",
-			"file": "umb-contour.svg"
-		},
-		{
-			"name": "icon-umb-deploy",
-			"file": "umb-deploy.svg"
+			"file": "file.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-umb-developer",
-			"file": "umb-developer.svg"
+			"file": "user-cog.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-umb-media",
-			"file": "umb-media.svg"
-		},
-		{
-			"name": "icon-umb-members",
-			"file": "umb-members.svg"
+			"file": "image.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-umb-settings",
-			"file": "umb-settings.svg"
+			"file": "wrench.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-umb-users",
-			"file": "umb-users.svg"
+			"file": "user.svg",
+			"legacy": true
 		},
 		{
-			"name": "icon-umbraco",
-			"file": "umbraco.svg"
+			"_name": "icon-umbraco",
+			"____file": "umbraco.svg"
 		},
 		{
 			"name": "icon-umbrella",
@@ -2306,20 +2306,18 @@
 			"file": "undo-2.svg"
 		},
 		{
-			"name": "icon-universal",
-			"file": "universal.svg"
-		},
-		{
 			"name": "icon-unlocked",
-			"file": "unlocked.svg"
+			"file": "unlock.svg"
 		},
 		{
 			"name": "icon-untitled",
-			"file": "untitled.svg"
+			"file": "box.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-usb-connector",
-			"file": "usb-connector.svg"
+			"file": "cable.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-usb",
@@ -2327,19 +2325,23 @@
 		},
 		{
 			"name": "icon-user-female",
-			"file": "user-female.svg"
+			"file": "user.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-user-females-alt",
-			"file": "user-females-alt.svg"
+			"file": "users.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-user-females",
-			"file": "user-females.svg"
+			"file": "users.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-user-glasses",
-			"file": "user-glasses.svg"
+			"file": "user.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-user",
@@ -2347,7 +2349,8 @@
 		},
 		{
 			"name": "icon-users-alt",
-			"file": "users-alt.svg"
+			"file": "users.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-users",
@@ -2355,11 +2358,11 @@
 		},
 		{
 			"name": "icon-utilities",
-			"file": "utilities.svg"
+			"file": "pocket-knife.svg"
 		},
 		{
 			"name": "icon-vcard",
-			"file": "vcard.svg"
+			"file": "contact.svg"
 		},
 		{
 			"name": "icon-video",
@@ -2367,11 +2370,11 @@
 		},
 		{
 			"name": "icon-voice",
-			"file": "voice.svg"
+			"file": "mic.svg"
 		},
 		{
 			"name": "icon-wall-plug",
-			"file": "wall-plug.svg"
+			"file": "plug.svg"
 		},
 		{
 			"name": "icon-wallet",
@@ -2379,11 +2382,7 @@
 		},
 		{
 			"name": "icon-wand",
-			"file": "wand.svg"
-		},
-		{
-			"name": "icon-war",
-			"file": "war.svg"
+			"file": "wand-2.svg"
 		},
 		{
 			"name": "icon-weight",
@@ -2391,7 +2390,7 @@
 		},
 		{
 			"name": "icon-width",
-			"file": "width.svg"
+			"file": "move-horizontal.svg"
 		},
 		{
 			"name": "icon-wifi",
@@ -2399,19 +2398,15 @@
 		},
 		{
 			"name": "icon-window-popin",
-			"file": "window-popin.svg"
+			"file": "arrow-down-left-square.svg"
 		},
 		{
 			"name": "icon-window-sizes",
-			"file": "window-sizes.svg"
-		},
-		{
-			"name": "icon-windows",
-			"file": "windows.svg"
+			"file": "scaling.svg"
 		},
 		{
 			"name": "icon-wine-glass",
-			"file": "wine-glass.svg"
+			"file": "wine.svg"
 		},
 		{
 			"name": "icon-wrench",
@@ -2419,19 +2414,16 @@
 		},
 		{
 			"name": "icon-wrong",
-			"file": "wrong.svg"
-		},
-		{
-			"name": "icon-yen-bag",
-			"file": "yen-bag.svg"
+			"file": "x-circle.svg"
 		},
 		{
 			"name": "icon-zip",
-			"file": "zip.svg"
+			"file": "file-archive.svg"
 		},
 		{
 			"name": "icon-zom-out",
-			"file": "zom-out.svg"
+			"file": "zoom-out.svg",
+			"legacy": true
 		},
 		{
 			"name": "icon-zoom-in",
@@ -2441,6 +2433,10 @@
 
 
 
+		{
+			"name": "icon-zoom-out",
+			"file": "zoom-out.svg"
+		},
 		{
 			"name": "icon-star",
 			"file": "star.svg"
