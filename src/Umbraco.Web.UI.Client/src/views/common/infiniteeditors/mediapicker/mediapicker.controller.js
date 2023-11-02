@@ -264,18 +264,24 @@ angular.module("umbraco")
                                 function (f) {
                                     return f.path.indexOf($scope.startNodeId) !== -1;
                                 });
+							folder.path = $scope.path[0].path;
+							performGotoFolder(folder);	
                         });
                 } else {
                     $scope.path = [];
+					performGotoFolder(folder);
                 }
-
+            }
+			
+            function performGotoFolder(folder) {
                 mediaTypeHelper.getAllowedImagetypes(folder.id).then(function (types) { vm.acceptedMediatypes = types; });
+
                 $scope.lockedFolder = (folder.id === -1 && $scope.model.startNodeIsVirtual) || hasFolderAccess(folder) === false;
                 $scope.currentFolder = folder;
 
                 localStorageService.set("umbLastOpenedMediaNodeId", folder.id);
 
-                return getChildren(folder.id);
+                getChildren(folder.id);
             }
 
             function toggleListView() {
