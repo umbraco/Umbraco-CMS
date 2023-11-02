@@ -43,7 +43,7 @@ const workspaceViews: Array<ManifestWorkspaceEditorView> = [
 		meta: {
 			label: 'List View',
 			pathname: 'list-view',
-			icon: 'bug',
+			icon: 'document',
 		},
 		conditions: [
 			{
@@ -61,7 +61,7 @@ const workspaceViews: Array<ManifestWorkspaceEditorView> = [
 		meta: {
 			label: 'Permissions',
 			pathname: 'permissions',
-			icon: 'bug',
+			icon: 'document',
 		},
 		conditions: [
 			{
