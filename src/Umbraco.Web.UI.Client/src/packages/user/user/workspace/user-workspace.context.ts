@@ -5,19 +5,19 @@ import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controlle
 import type { UpdateUserRequestModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextConsumerController, UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { UMB_AUTH } from '@umbraco-cms/backoffice/auth';
+import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 
 export class UmbUserWorkspaceContext
 	extends UmbWorkspaceContext<UmbUserRepository, UmbUserDetail>
 	implements UmbSaveableWorkspaceContextInterface<UmbUserDetail | undefined>
 {
-	#authContext?: typeof UMB_AUTH.TYPE;
+	#authContext?: typeof UMB_AUTH_CONTEXT.TYPE;
 
 	constructor(host: UmbControllerHostElement) {
 		super(host, 'Umb.Workspace.User', new UmbUserRepository(host));
 
-		new UmbContextConsumerController(host, UMB_AUTH, (auth) => {
+		new UmbContextConsumerController(host, UMB_AUTH_CONTEXT, (auth) => {
 			this.#authContext = auth;
 		});
 	}

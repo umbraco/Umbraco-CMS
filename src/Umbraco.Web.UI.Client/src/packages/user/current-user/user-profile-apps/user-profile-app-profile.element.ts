@@ -6,7 +6,7 @@ import {
 	UMB_CHANGE_PASSWORD_MODAL,
 	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
 } from '@umbraco-cms/backoffice/modal';
-import { UMB_AUTH, type UmbLoggedInUser } from '@umbraco-cms/backoffice/auth';
+import { UMB_AUTH_CONTEXT, type UmbLoggedInUser } from '@umbraco-cms/backoffice/auth';
 
 @customElement('umb-user-profile-app-profile')
 export class UmbUserProfileAppProfileElement extends UmbLitElement {
@@ -14,7 +14,7 @@ export class UmbUserProfileAppProfileElement extends UmbLitElement {
 	private _currentUser?: UmbLoggedInUser;
 
 	private _modalContext?: UmbModalManagerContext;
-	private _auth?: typeof UMB_AUTH.TYPE;
+	private _auth?: typeof UMB_AUTH_CONTEXT.TYPE;
 
 	constructor() {
 		super();
@@ -23,7 +23,7 @@ export class UmbUserProfileAppProfileElement extends UmbLitElement {
 			this._modalContext = instance;
 		});
 
-		this.consumeContext(UMB_AUTH, (instance) => {
+		this.consumeContext(UMB_AUTH_CONTEXT, (instance) => {
 			this._auth = instance;
 			this._observeCurrentUser();
 		});

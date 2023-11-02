@@ -2,6 +2,7 @@ import { UmbUserItemRepository } from '../../user/repository/item/user-item.repo
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, CSSResultGroup, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangePasswordModalData, UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
+import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 
 @customElement('umb-change-password-modal')
 export class UmbChangePasswordModalElement extends UmbModalBaseElement<UmbChangePasswordModalData> {
@@ -12,6 +13,7 @@ export class UmbChangePasswordModalElement extends UmbModalBaseElement<UmbChange
 	private _headline: string = 'Change password';
 
 	#userItemRepository = new UmbUserItemRepository(this);
+	#authContext?: typeof UMB_AUTH_CONTEXT.TYPE;
 
 	#onClose() {
 		this.modalContext?.reject();

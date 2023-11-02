@@ -4,7 +4,7 @@ import { availableLanguages } from './input-tiny-mce.languages.js';
 import { uriAttributeSanitizer } from './input-tiny-mce.sanitizer.js';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { renderEditor, type tinymce } from '@umbraco-cms/backoffice/external/tinymce';
-import { UMB_AUTH, UmbLoggedInUser } from '@umbraco-cms/backoffice/auth';
+import { UMB_AUTH_CONTEXT, UmbLoggedInUser } from '@umbraco-cms/backoffice/auth';
 import { TinyMcePluginArguments, UmbTinyMcePluginBase } from '@umbraco-cms/backoffice/components';
 import { ClassConstructor, hasDefaultExport, loadExtension } from '@umbraco-cms/backoffice/extension-api';
 import { ManifestTinyMcePlugin, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -33,7 +33,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 
 	#mediaHelper = new UmbMediaHelper();
 	#currentUser?: UmbLoggedInUser;
-	#auth?: typeof UMB_AUTH.TYPE;
+	#auth?: typeof UMB_AUTH_CONTEXT.TYPE;
 	#plugins: Array<new (args: TinyMcePluginArguments) => UmbTinyMcePluginBase> = [];
 	#editorRef?: tinymce.Editor | null = null;
 
