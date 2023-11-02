@@ -10,7 +10,7 @@ import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 import { ManifestCollectionView, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbCollectionFilterModel } from '@umbraco-cms/backoffice/collection';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
-import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
+import { UmbSelectionManager, UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
 
 export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectionFilterModel> extends UmbBaseController {
 	protected entityType: string;
@@ -21,12 +21,6 @@ export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectio
 
 	#totalItems = new UmbNumberState(0);
 	public readonly totalItems = this.#totalItems.asObservable();
-
-	#totalPages = new UmbNumberState(0);
-	public readonly totalPages = this.#totalPages.asObservable();
-
-	#currentPage = new UmbNumberState(1);
-	public readonly currentPage = this.#currentPage.asObservable();
 
 	#selectionManager = new UmbSelectionManager();
 	public readonly selection = this.#selectionManager.selection;
@@ -42,6 +36,8 @@ export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectio
 
 	repository?: UmbCollectionRepository;
 	collectionRootPathname: string;
+
+	public readonly pagination = new UmbPaginationManager();
 
 	constructor(host: UmbControllerHostElement, entityType: string, repositoryAlias: string) {
 		super(host);
@@ -154,8 +150,9 @@ export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectio
 		const { data } = await this.repository.requestCollection(filter);
 
 		if (data) {
-			this.#totalItems.next(data.total);
 			this.#items.next(data.items);
+			this.#totalItems.next(data.total);
+			this.pagination.setTotalItems(data.total);
 		}
 	}
 
