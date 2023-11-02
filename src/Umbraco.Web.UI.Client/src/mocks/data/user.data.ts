@@ -154,9 +154,23 @@ class UmbUserData extends UmbEntityData<UserResponseModel> {
 		this.createUser(invitedUser);
 	}
 
-	filter (filter: string): PagedUserResponseModel {
-		const { total, items } = this.getAll();
-		return { total, items };
+	filter (config: any): PagedUserResponseModel {
+		const { total, items: allItems } = this.getAll();
+
+    const filter = {
+      skip: config.skip || 0,
+      take: config.take || 10,
+      orderBy: config.orderBy || 'name',
+      orderDirection: config.orderDirection || 'asc',
+      userGroupIds: config.userGroupIds || [],
+      userStates: config.userStates || [],
+      filter: config.filter || '',
+    };
+
+		// TODO: filter item based on values in filter object
+		const filteredItems = allItems.slice(filter.skip, filter.skip + filter.take);
+
+		return { total, items: filteredItems };
 	};
 }
 
