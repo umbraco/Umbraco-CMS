@@ -21,12 +21,13 @@ export class UmbUserMediaStartNodeElement extends UmbLitElement {
 	}
 
 	render() {
-		if (this.ids.length < 1)
+		if (this.ids.length < 1) {
 			return html`
 				<uui-ref-node name="Media Root">
 					<uui-icon slot="icon" name="folder"></uui-icon>
 				</uui-ref-node>
 			`;
+		}
 
 		return repeat(
 			this._displayValue,
