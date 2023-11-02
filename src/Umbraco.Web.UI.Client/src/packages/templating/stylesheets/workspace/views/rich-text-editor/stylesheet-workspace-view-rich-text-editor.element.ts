@@ -1,5 +1,4 @@
-import { css, html } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
+import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { RichTextRuleModelSortable, UmbStylesheetWorkspaceContext } from '../../stylesheet-workspace.context.js';
 import { UMB_MODAL_TEMPLATING_STYLESHEET_RTF_STYLE_SIDEBAR } from '../../manifests.js';
 import {
