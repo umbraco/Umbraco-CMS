@@ -5,15 +5,15 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
-internal class RichTextEditorBlockValidator : BlockEditorValidatorBase
+internal class RichTextEditorBlockValidator: BlockEditorValidatorBase<RichTextBlockValue, RichTextBlockLayoutItem>
 {
-    private readonly BlockEditorValues _blockEditorValues;
+    private readonly BlockEditorValues<RichTextBlockValue, RichTextBlockLayoutItem> _blockEditorValues;
     private readonly IJsonSerializer _jsonSerializer;
     private readonly ILogger _logger;
 
     public RichTextEditorBlockValidator(
         IPropertyValidationService propertyValidationService,
-        BlockEditorValues blockEditorValues,
+        BlockEditorValues<RichTextBlockValue, RichTextBlockLayoutItem> blockEditorValues,
         IContentTypeService contentTypeService,
         IJsonSerializer jsonSerializer,
         ILogger logger)
@@ -32,7 +32,7 @@ internal class RichTextEditorBlockValidator : BlockEditorValidatorBase
             return Array.Empty<ElementTypeValidationModel>();
         }
 
-        BlockEditorData? blockEditorData = _blockEditorValues.ConvertAndClean(richTextEditorValue.Blocks);
+        BlockEditorData<RichTextBlockValue, RichTextBlockLayoutItem>? blockEditorData = _blockEditorValues.ConvertAndClean(richTextEditorValue.Blocks);
         return blockEditorData is not null
             ? GetBlockEditorDataValidation(blockEditorData)
             : Array.Empty<ElementTypeValidationModel>();

@@ -9,7 +9,9 @@ using Umbraco.Cms.Core.Strings;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
-internal abstract class BlockValuePropertyValueEditorBase : DataValueEditor, IDataValueReference, IDataValueTags
+internal abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataValueEditor, IDataValueReference, IDataValueTags
+    where TValue : BlockValue<TLayout>, new()
+    where TLayout : class, IBlockLayoutItem, new()
 {
     private readonly IDataTypeService _dataTypeService;
     private readonly PropertyEditorCollection _propertyEditors;
@@ -34,7 +36,7 @@ internal abstract class BlockValuePropertyValueEditorBase : DataValueEditor, IDa
     /// <inheritdoc />
     public abstract IEnumerable<UmbracoEntityReference> GetReferences(object? value);
 
-    protected IEnumerable<UmbracoEntityReference> GetBlockValueReferences(BlockValue blockValue)
+    protected IEnumerable<UmbracoEntityReference> GetBlockValueReferences(TValue blockValue)
     {
         var result = new List<UmbracoEntityReference>();
 
@@ -65,7 +67,7 @@ internal abstract class BlockValuePropertyValueEditorBase : DataValueEditor, IDa
     /// <inheritdoc />
     public abstract IEnumerable<ITag> GetTags(object? value, object? dataTypeConfiguration, int? languageId);
 
-    protected IEnumerable<ITag> GetBlockValueTags(BlockValue blockValue, int? languageId)
+    protected IEnumerable<ITag> GetBlockValueTags(TValue blockValue, int? languageId)
     {
         var result = new List<ITag>();
         // loop through all content and settings data
@@ -81,7 +83,7 @@ internal abstract class BlockValuePropertyValueEditorBase : DataValueEditor, IDa
                     continue;
                 }
 
-                object? configuration = _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeKey)?.Configuration;
+                object? configuration = _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeKey)?.ConfigurationObject;
 
                 result.AddRange(tagsProvider.GetTags(prop.Value.Value, configuration, languageId));
             }
@@ -90,13 +92,13 @@ internal abstract class BlockValuePropertyValueEditorBase : DataValueEditor, IDa
         return result;
     }
 
-    protected void MapBlockValueFromEditor(BlockValue blockValue)
+    protected void MapBlockValueFromEditor(TValue blockValue)
     {
         MapBlockItemDataFromEditor(blockValue.ContentData);
         MapBlockItemDataFromEditor(blockValue.SettingsData);
     }
 
-    protected void MapBlockValueToEditor(IProperty property, BlockValue blockValue)
+    protected void MapBlockValueToEditor(IProperty property, TValue blockValue)
     {
         MapBlockItemDataToEditor(property, blockValue.ContentData);
         MapBlockItemDataToEditor(property, blockValue.SettingsData);
@@ -141,7 +143,7 @@ internal abstract class BlockValuePropertyValueEditorBase : DataValueEditor, IDa
 
                 if (!valEditors.TryGetValue(dataType.Id, out IDataValueEditor? valEditor))
                 {
-                    var tempConfig = dataType.Configuration;
+                    var tempConfig = dataType.ConfigurationObject;
                     valEditor = propEditor.GetValueEditor(tempConfig);
 
                     valEditors.Add(dataType.Id, valEditor);
@@ -162,7 +164,7 @@ internal abstract class BlockValuePropertyValueEditorBase : DataValueEditor, IDa
             foreach (KeyValuePair<string, BlockItemData.BlockPropertyValue> prop in row.PropertyValues)
             {
                 // Fetch the property types prevalue
-                var propConfiguration = _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeId)?.Configuration;
+                var propConfiguration = _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeId)?.ConfigurationObject;
 
                 // Lookup the property editor
                 IDataEditor? propEditor = _propertyEditors[prop.Value.PropertyType.PropertyEditorAlias];

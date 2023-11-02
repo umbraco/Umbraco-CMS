@@ -12,9 +12,12 @@ using Umbraco.Cms.Core.Strings;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
-internal abstract class BlockEditorPropertyValueEditor : BlockValuePropertyValueEditorBase
+internal abstract class BlockEditorPropertyValueEditor<TValue, TLayout> : BlockValuePropertyValueEditorBase<TValue, TLayout>
+    where TValue : BlockValue<TLayout>, new()
+    where TLayout : class, IBlockLayoutItem, new()
 {
-    private BlockEditorValues? _blockEditorValues;
+    private readonly IJsonSerializer _jsonSerializer;
+    private BlockEditorValues<TValue, TLayout>? _blockEditorValues;
 
     protected BlockEditorPropertyValueEditor(
         DataEditorAttribute attribute,
@@ -26,8 +29,7 @@ internal abstract class BlockEditorPropertyValueEditor : BlockValuePropertyValue
         IJsonSerializer jsonSerializer,
         IIOHelper ioHelper)
         : base(attribute, propertyEditors, dataTypeService, textService, logger, shortStringHelper, jsonSerializer, ioHelper)
-    {
-    }
+        => _jsonSerializer = jsonSerializer;
 
     protected BlockEditorValues<TValue, TLayout> BlockEditorValues
     {
@@ -40,7 +42,6 @@ internal abstract class BlockEditorPropertyValueEditor : BlockValuePropertyValue
     {
         var rawJson = value == null ? string.Empty : value is string str ? str : value.ToString();
 
-        var result = new List<UmbracoEntityReference>();
         BlockEditorData<TValue, TLayout>? blockEditorData = BlockEditorValues.DeserializeAndClean(rawJson);
         if (blockEditorData == null)
         {

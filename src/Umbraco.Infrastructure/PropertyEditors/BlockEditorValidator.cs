@@ -6,7 +6,9 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
-internal class BlockEditorValidator : BlockEditorValidatorBase
+internal class BlockEditorValidator<TValue, TLayout> : BlockEditorValidatorBase<TValue, TLayout>
+    where TValue : BlockValue<TLayout>, new()
+    where TLayout : class, IBlockLayoutItem, new()
 {
     private readonly BlockEditorValues<TValue, TLayout> _blockEditorValues;
 

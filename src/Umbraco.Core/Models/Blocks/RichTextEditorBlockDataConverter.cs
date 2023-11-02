@@ -3,16 +3,13 @@
 /// <summary>
 ///     Data converter for blocks in the richtext property editor
 /// </summary>
-internal sealed class RichTextEditorBlockDataConverter : BlockEditorDataConverter
+public sealed class RichTextEditorBlockDataConverter : BlockEditorDataConverter<RichTextBlockValue, RichTextBlockLayoutItem>
 {
     public RichTextEditorBlockDataConverter()
         : base(Constants.PropertyEditors.Aliases.TinyMce)
     {
     }
 
-    protected override IEnumerable<ContentAndSettingsReference>? GetBlockReferences(JToken jsonLayout)
-    {
-        IEnumerable<RichTextBlockLayoutItem>? blockListLayout = jsonLayout.ToObject<IEnumerable<RichTextBlockLayoutItem>>();
-        return blockListLayout?.Select(x => new ContentAndSettingsReference(x.ContentUdi, x.SettingsUdi)).ToList();
-    }
+    protected override IEnumerable<ContentAndSettingsReference> GetBlockReferences(IEnumerable<RichTextBlockLayoutItem> layout)
+        => layout.Select(x => new ContentAndSettingsReference(x.ContentUdi, x.SettingsUdi)).ToList();
 }

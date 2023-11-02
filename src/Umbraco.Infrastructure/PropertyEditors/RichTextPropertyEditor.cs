@@ -161,7 +161,7 @@ public class RichTextPropertyEditor : DataEditor
     ///     A custom value editor to ensure that macro syntax is parsed when being persisted and formatted correctly for
     ///     display in the editor
     /// </summary>
-    internal class RichTextPropertyValueEditor : BlockValuePropertyValueEditorBase
+    internal class RichTextPropertyValueEditor : BlockValuePropertyValueEditorBase<RichTextBlockValue, RichTextBlockLayoutItem>
     {
         private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
         private readonly IHtmlSanitizer _htmlSanitizer;
@@ -261,7 +261,7 @@ public class RichTextPropertyEditor : DataEditor
             // references from blocks
             if (richTextEditorValue.Blocks is not null)
             {
-                BlockEditorData? blockEditorData = ConvertAndClean(richTextEditorValue.Blocks);
+                BlockEditorData<RichTextBlockValue, RichTextBlockLayoutItem>? blockEditorData = ConvertAndClean(richTextEditorValue.Blocks);
                 if (blockEditorData is not null)
                 {
                     references.AddRange(GetBlockValueReferences(blockEditorData.BlockValue));
@@ -278,7 +278,7 @@ public class RichTextPropertyEditor : DataEditor
                 return Array.Empty<ITag>();
             }
 
-            BlockEditorData? blockEditorData = ConvertAndClean(richTextEditorValue.Blocks);
+            BlockEditorData<RichTextBlockValue, RichTextBlockLayoutItem>? blockEditorData = ConvertAndClean(richTextEditorValue.Blocks);
             if (blockEditorData is null)
             {
                 return Array.Empty<ITag>();
@@ -339,7 +339,7 @@ public class RichTextPropertyEditor : DataEditor
             var parseAndSaveBase64Images = _pastedImages.FindAndPersistEmbeddedImages(
                 richTextEditorValue.Markup, mediaParentId, userKey);
             var parseAndSavedTempImages = _pastedImages
-                .FindAndPersistPastedTempImagesAsync(parseAndSaveBase64Images, mediaParentId, userKey, _imageUrlGenerator)
+                .FindAndPersistPastedTempImagesAsync(parseAndSaveBase64Images, mediaParentId, userKey)
                 .GetAwaiter()
                 .GetResult();
             var editorValueWithMediaUrlsRemoved = _imageSourceParser.RemoveImageSources(parseAndSavedTempImages);
@@ -357,7 +357,7 @@ public class RichTextPropertyEditor : DataEditor
         private bool TryParseEditorValue(object? value, [NotNullWhen(true)] out RichTextEditorValue? richTextEditorValue)
             => RichTextPropertyEditorHelper.TryParseRichTextEditorValue(value, _jsonSerializer, _logger, out richTextEditorValue);
 
-        private RichTextEditorValue CleanAndMapBlocks(RichTextEditorValue richTextEditorValue, Action<BlockValue> handleMapping)
+        private RichTextEditorValue CleanAndMapBlocks(RichTextEditorValue richTextEditorValue, Action<RichTextBlockValue> handleMapping)
         {
             if (richTextEditorValue.Blocks is null)
             {
@@ -365,7 +365,7 @@ public class RichTextPropertyEditor : DataEditor
                 return MarkupWithEmptyBlocks();
             }
 
-            BlockEditorData? blockEditorData = ConvertAndClean(richTextEditorValue.Blocks);
+            BlockEditorData<RichTextBlockValue, RichTextBlockLayoutItem>? blockEditorData = ConvertAndClean(richTextEditorValue.Blocks);
 
             if (blockEditorData is not null)
             {
@@ -381,17 +381,17 @@ public class RichTextPropertyEditor : DataEditor
 
             RichTextEditorValue MarkupWithEmptyBlocks() => new()
             {
-                Markup = richTextEditorValue.Markup, Blocks = new BlockValue()
+                Markup = richTextEditorValue.Markup, Blocks = new RichTextBlockValue()
             };
         }
 
-        private BlockEditorData? ConvertAndClean(BlockValue blockValue)
+        private BlockEditorData<RichTextBlockValue, RichTextBlockLayoutItem>? ConvertAndClean(RichTextBlockValue blockValue)
         {
-            BlockEditorValues blockEditorValues = CreateBlockEditorValues();
+            BlockEditorValues<RichTextBlockValue, RichTextBlockLayoutItem> blockEditorValues = CreateBlockEditorValues();
             return blockEditorValues.ConvertAndClean(blockValue);
         }
 
-        private BlockEditorValues CreateBlockEditorValues()
+        private BlockEditorValues<RichTextBlockValue, RichTextBlockLayoutItem> CreateBlockEditorValues()
             => new(new RichTextEditorBlockDataConverter(), _contentTypeService, _logger);
     }
 }

@@ -4,7 +4,9 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
-internal abstract class BlockEditorValidatorBase : ComplexEditorValidator
+internal abstract class BlockEditorValidatorBase<TValue, TLayout> : ComplexEditorValidator
+    where TValue : BlockValue<TLayout>, new()
+    where TLayout : class, IBlockLayoutItem, new()
 {
     private readonly IContentTypeService _contentTypeService;
 
@@ -12,7 +14,7 @@ internal abstract class BlockEditorValidatorBase : ComplexEditorValidator
         : base(propertyValidationService)
         => _contentTypeService = contentTypeService;
 
-    protected IEnumerable<ElementTypeValidationModel> GetBlockEditorDataValidation(BlockEditorData blockEditorData)
+    protected IEnumerable<ElementTypeValidationModel> GetBlockEditorDataValidation(BlockEditorData<TValue, TLayout> blockEditorData)
     {
         // There is no guarantee that the client will post data for every property defined in the Element Type but we still
         // need to validate that data for each property especially for things like 'required' data to work.

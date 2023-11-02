@@ -10,5 +10,5 @@ public class RichTextEditorValue
     public required string Markup { get; set; }
 
     [DataMember(Name = "blocks")]
-    public required BlockValue? Blocks { get; set; }
+    public required RichTextBlockValue? Blocks { get; set; }
 }

@@ -159,7 +159,7 @@ public class BlockListPropertyValueConverter : PropertyValueConverterBase, IDeli
                 return null;
             }
 
-            var creator = new BlockListPropertyValueCreator(_blockConverter);
+            var creator = new BlockListPropertyValueCreator(_blockConverter, _jsonSerializer);
             return creator.CreateBlockModel(referenceCacheLevel, intermediateBlockModelValue, preview, configuration.Blocks);
         }
     }

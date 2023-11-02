@@ -39,13 +39,13 @@ internal class BlockEditorValues<TValue, TLayout>
         return Clean(blockEditorData);
     }
 
-    public BlockEditorData? ConvertAndClean(BlockValue blockValue)
+    public BlockEditorData<TValue, TLayout>? ConvertAndClean(TValue blockValue)
     {
-        BlockEditorData blockEditorData = _dataConverter.Convert(blockValue);
+        BlockEditorData<TValue, TLayout> blockEditorData = _dataConverter.Convert(blockValue);
         return Clean(blockEditorData);
     }
 
-    private BlockEditorData? Clean(BlockEditorData blockEditorData)
+    private BlockEditorData<TValue, TLayout>? Clean(BlockEditorData<TValue, TLayout> blockEditorData)
     {
         if (blockEditorData.BlockValue.ContentData.Count == 0)
         {

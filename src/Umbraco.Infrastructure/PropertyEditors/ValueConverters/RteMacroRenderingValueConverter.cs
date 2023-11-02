@@ -257,7 +257,7 @@ public class RteMacroRenderingValueConverter : SimpleTinyMceValueConverter, IDel
         return sourceString;
     }
 
-    private RichTextBlockModel? ParseRichTextBlockModel(BlockValue blocks, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, bool preview)
+    private RichTextBlockModel? ParseRichTextBlockModel(RichTextBlockValue blocks, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, bool preview)
     {
         RichTextConfiguration? configuration = propertyType.DataType.ConfigurationAs<RichTextConfiguration>();
         if (configuration?.Blocks?.Any() is not true)

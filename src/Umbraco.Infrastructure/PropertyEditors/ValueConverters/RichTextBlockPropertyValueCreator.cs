@@ -5,14 +5,14 @@ using Umbraco.Cms.Core.Models.Blocks;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
-internal class RichTextBlockPropertyValueCreator : BlockPropertyValueCreatorBase<RichTextBlockModel, RichTextBlockItem, RichTextBlockLayoutItem, RichTextConfiguration.RichTextBlockConfiguration>
+internal class RichTextBlockPropertyValueCreator : BlockPropertyValueCreatorBase<RichTextBlockModel, RichTextBlockItem, RichTextBlockLayoutItem, RichTextConfiguration.RichTextBlockConfiguration, RichTextBlockValue>
 {
     public RichTextBlockPropertyValueCreator(BlockEditorConverter blockEditorConverter)
         : base(blockEditorConverter)
     {
     }
 
-    public RichTextBlockModel CreateBlockModel(PropertyCacheLevel referenceCacheLevel, BlockValue blockValue, bool preview, RichTextConfiguration.RichTextBlockConfiguration[] blockConfigurations)
+    public RichTextBlockModel CreateBlockModel(PropertyCacheLevel referenceCacheLevel, RichTextBlockValue blockValue, bool preview, RichTextConfiguration.RichTextBlockConfiguration[] blockConfigurations)
     {
         RichTextBlockModel CreateEmptyModel() => RichTextBlockModel.Empty;
 
@@ -23,7 +23,7 @@ internal class RichTextBlockPropertyValueCreator : BlockPropertyValueCreatorBase
         return blockModel;
     }
 
-    protected override BlockEditorDataConverter CreateBlockEditorDataConverter() => new RichTextEditorBlockDataConverter();
+    protected override BlockEditorDataConverter<RichTextBlockValue, RichTextBlockLayoutItem> CreateBlockEditorDataConverter() => new RichTextEditorBlockDataConverter();
 
     protected override BlockItemActivator<RichTextBlockItem> CreateBlockItemActivator() => new RichTextBlockItemActivator(BlockEditorConverter);
 
