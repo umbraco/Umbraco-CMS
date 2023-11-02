@@ -4,7 +4,8 @@
     "welcome": "Welcome",
     "or": "Or",
     "validate": "Validate",
-    "back": "Back"
+    "back": "Back",
+    "required": "Required"
 	},
   "login": {
     "forgottenPassword": "Forgot password?",
