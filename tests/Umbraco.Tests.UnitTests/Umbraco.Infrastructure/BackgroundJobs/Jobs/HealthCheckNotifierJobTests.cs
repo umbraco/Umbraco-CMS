@@ -16,15 +16,15 @@ using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
-using Umbraco.Cms.Infrastructure.HostedServices;
+using Umbraco.Cms.Infrastructure.BackgroundJobs;
+using Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Tests.Common;
 
-namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HostedServices;
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.BackgroundJobs.Jobs;
 
 [TestFixture]
-[Obsolete("Replaced by BackgroundJobs.Jobs.HealthCheckNotifierJobTests")]
-public class HealthCheckNotifierTests
+public class HealthCheckNotifierJobTests
 {
     private Mock<IHealthCheckNotificationMethod> _mockNotificationMethod;
 
@@ -36,43 +36,7 @@ public class HealthCheckNotifierTests
     public async Task Does_Not_Execute_When_Not_Enabled()
     {
         var sut = CreateHealthCheckNotifier(false);
-        await sut.PerformExecuteAsync(null);
-        VerifyNotificationsNotSent();
-    }
-
-    [TestCase(RuntimeLevel.Boot)]
-    [TestCase(RuntimeLevel.Install)]
-    [TestCase(RuntimeLevel.Unknown)]
-    [TestCase(RuntimeLevel.Upgrade)]
-    [TestCase(RuntimeLevel.BootFailed)]
-    public async Task Does_Not_Execute_When_Runtime_State_Is_Not_Run(RuntimeLevel runtimeLevel)
-    {
-        var sut = CreateHealthCheckNotifier(runtimeLevel: runtimeLevel);
-        await sut.PerformExecuteAsync(null);
-        VerifyNotificationsNotSent();
-    }
-
-    [Test]
-    public async Task Does_Not_Execute_When_Server_Role_Is_Subscriber()
-    {
-        var sut = CreateHealthCheckNotifier(serverRole: ServerRole.Subscriber);
-        await sut.PerformExecuteAsync(null);
-        VerifyNotificationsNotSent();
-    }
-
-    [Test]
-    public async Task Does_Not_Execute_When_Server_Role_Is_Unknown()
-    {
-        var sut = CreateHealthCheckNotifier(serverRole: ServerRole.Unknown);
-        await sut.PerformExecuteAsync(null);
-        VerifyNotificationsNotSent();
-    }
-
-    [Test]
-    public async Task Does_Not_Execute_When_Not_Main_Dom()
-    {
-        var sut = CreateHealthCheckNotifier(isMainDom: false);
-        await sut.PerformExecuteAsync(null);
+        await sut.RunJobAsync();
         VerifyNotificationsNotSent();
     }
 
@@ -80,7 +44,7 @@ public class HealthCheckNotifierTests
     public async Task Does_Not_Execute_With_No_Enabled_Notification_Methods()
     {
         var sut = CreateHealthCheckNotifier(notificationEnabled: false);
-        await sut.PerformExecuteAsync(null);
+        await sut.RunJobAsync();
         VerifyNotificationsNotSent();
     }
 
@@ -88,7 +52,7 @@ public class HealthCheckNotifierTests
     public async Task Executes_With_Enabled_Notification_Methods()
     {
         var sut = CreateHealthCheckNotifier();
-        await sut.PerformExecuteAsync(null);
+        await sut.RunJobAsync();
         VerifyNotificationsSent();
     }
 
@@ -96,7 +60,7 @@ public class HealthCheckNotifierTests
     public async Task Executes_Only_Enabled_Checks()
     {
         var sut = CreateHealthCheckNotifier();
-        await sut.PerformExecuteAsync(null);
+        await sut.RunJobAsync();
         _mockNotificationMethod.Verify(
             x => x.SendAsync(
                 It.Is<HealthCheckResults>(y =>
@@ -104,11 +68,8 @@ public class HealthCheckNotifierTests
             Times.Once);
     }
 
-    private HealthCheckNotifier CreateHealthCheckNotifier(
+    private HealthCheckNotifierJob CreateHealthCheckNotifier(
         bool enabled = true,
-        RuntimeLevel runtimeLevel = RuntimeLevel.Run,
-        ServerRole serverRole = ServerRole.Single,
-        bool isMainDom = true,
         bool notificationEnabled = true)
     {
         var settings = new HealthChecksSettings
@@ -132,26 +93,15 @@ public class HealthCheckNotifierTests
         var notifications = new HealthCheckNotificationMethodCollection(() =>
             new List<IHealthCheckNotificationMethod> { _mockNotificationMethod.Object });
 
-        var mockRunTimeState = new Mock<IRuntimeState>();
-        mockRunTimeState.SetupGet(x => x.Level).Returns(runtimeLevel);
-
-        var mockServerRegistrar = new Mock<IServerRoleAccessor>();
-        mockServerRegistrar.Setup(x => x.CurrentServerRole).Returns(serverRole);
-
-        var mockMainDom = new Mock<IMainDom>();
-        mockMainDom.SetupGet(x => x.IsMainDom).Returns(isMainDom);
 
         var mockScopeProvider = new Mock<IScopeProvider>();
-        var mockLogger = new Mock<ILogger<HealthCheckNotifier>>();
+        var mockLogger = new Mock<ILogger<HealthCheckNotifierJob>>();
         var mockProfilingLogger = new Mock<IProfilingLogger>();
 
-        return new HealthCheckNotifier(
+        return new HealthCheckNotifierJob(
             new TestOptionsMonitor<HealthChecksSettings>(settings),
             checks,
             notifications,
-            mockRunTimeState.Object,
-            mockServerRegistrar.Object,
-            mockMainDom.Object,
             mockScopeProvider.Object,
             mockLogger.Object,
             mockProfilingLogger.Object,

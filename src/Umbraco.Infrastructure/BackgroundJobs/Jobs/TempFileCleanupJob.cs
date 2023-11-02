@@ -4,8 +4,9 @@
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Runtime;
+using Umbraco.Cms.Core.Sync;
 
-namespace Umbraco.Cms.Infrastructure.HostedServices;
+namespace Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
 
 /// <summary>
 ///     Used to cleanup temporary file locations.
@@ -14,44 +15,36 @@ namespace Umbraco.Cms.Infrastructure.HostedServices;
 ///     Will run on all servers - even though file upload should only be handled on the scheduling publisher, this will
 ///     ensure that in the case it happens on subscribers that they are cleaned up too.
 /// </remarks>
-[Obsolete("Use Umbraco.Cms.Infrastructure.BackgroundJobs.TempFileCleanupJob instead.  This class will be removed in Umbraco 14.")]
-public class TempFileCleanup : RecurringHostedServiceBase
+public class TempFileCleanupJob : IRecurringBackgroundJob
 {
+    public TimeSpan Period { get => TimeSpan.FromMinutes(60); }
+
+    // Runs on all servers
+    public ServerRole[] ServerRoles { get => Enum.GetValues<ServerRole>(); }
+
+    // No-op event as the period never changes on this job
+    public event EventHandler PeriodChanged { add { } remove { } }
+
     private readonly TimeSpan _age = TimeSpan.FromDays(1);
     private readonly IIOHelper _ioHelper;
-    private readonly ILogger<TempFileCleanup> _logger;
-    private readonly IMainDom _mainDom;
-
+    private readonly ILogger<TempFileCleanupJob> _logger;
     private readonly DirectoryInfo[] _tempFolders;
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="TempFileCleanup" /> class.
+    ///     Initializes a new instance of the <see cref="TempFileCleanupJob" /> class.
     /// </summary>
     /// <param name="ioHelper">Helper service for IO operations.</param>
-    /// <param name="mainDom">Representation of the main application domain.</param>
     /// <param name="logger">The typed logger.</param>
-    public TempFileCleanup(IIOHelper ioHelper, IMainDom mainDom, ILogger<TempFileCleanup> logger)
-        : base(logger, TimeSpan.FromMinutes(60), DefaultDelay)
+    public TempFileCleanupJob(IIOHelper ioHelper, ILogger<TempFileCleanupJob> logger)
     {
         _ioHelper = ioHelper;
-        _mainDom = mainDom;
         _logger = logger;
 
         _tempFolders = _ioHelper.GetTempFolders();
     }
 
-    public override Task PerformExecuteAsync(object? state)
+    public Task RunJobAsync()
     {
-        // Ensure we do not run if not main domain
-        if (_mainDom.IsMainDom == false)
-        {
-            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
-            {
-                _logger.LogDebug("Does not run if not MainDom.");
-            }
-            return Task.CompletedTask;
-        }
-
         foreach (DirectoryInfo folder in _tempFolders)
         {
             CleanupFolder(folder);
@@ -66,10 +59,7 @@ public class TempFileCleanup : RecurringHostedServiceBase
         switch (result.Status)
         {
             case CleanFolderResultStatus.FailedAsDoesNotExist:
-                if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
-                {
-                    _logger.LogDebug("The cleanup folder doesn't exist {Folder}", folder.FullName);
-                }
+                _logger.LogDebug("The cleanup folder doesn't exist {Folder}", folder.FullName);
                 break;
             case CleanFolderResultStatus.FailedWithException:
                 foreach (CleanFolderResult.Error error in result.Errors!)
@@ -84,10 +74,7 @@ public class TempFileCleanup : RecurringHostedServiceBase
         folder.Refresh(); // In case it's changed during runtime
         if (!folder.Exists)
         {
-            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
-            {
-                _logger.LogDebug("The cleanup folder doesn't exist {Folder}", folder.FullName);
-            }
+            _logger.LogDebug("The cleanup folder doesn't exist {Folder}", folder.FullName);
             return;
         }
 
@@ -108,4 +95,5 @@ public class TempFileCleanup : RecurringHostedServiceBase
             }
         }
     }
+
 }

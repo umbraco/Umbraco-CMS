@@ -8,47 +8,37 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Runtime;
-using Umbraco.Cms.Infrastructure.HostedServices;
+using Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
 
-namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.BackgroundJobs.Jobs
 {
     [TestFixture]
-    [Obsolete("Replaced by BackgroundJobs.Jobs.TempFileCleanupTests")]
-    public class TempFileCleanupTests
+    public class TempFileCleanupJobTests
     {
         private Mock<IIOHelper> _mockIOHelper;
         private readonly string _testPath = Path.Combine(TestContext.CurrentContext.TestDirectory.Split("bin")[0], "App_Data", "TEMP");
 
-        [Test]
-        public async Task Does_Not_Execute_When_Not_Main_Dom()
-        {
-            TempFileCleanup sut = CreateTempFileCleanup(isMainDom: false);
-            await sut.PerformExecuteAsync(null);
-            VerifyFilesNotCleaned();
-        }
 
         [Test]
         public async Task Executes_And_Cleans_Files()
         {
-            TempFileCleanup sut = CreateTempFileCleanup();
-            await sut.PerformExecuteAsync(null);
+            TempFileCleanupJob sut = CreateTempFileCleanupJob();
+            await sut.RunJobAsync();
             VerifyFilesCleaned();
         }
 
-        private TempFileCleanup CreateTempFileCleanup(bool isMainDom = true)
+        private TempFileCleanupJob CreateTempFileCleanupJob()
         {
-            var mockMainDom = new Mock<IMainDom>();
-            mockMainDom.SetupGet(x => x.IsMainDom).Returns(isMainDom);
-
+            
             _mockIOHelper = new Mock<IIOHelper>();
             _mockIOHelper.Setup(x => x.GetTempFolders())
                 .Returns(new DirectoryInfo[] { new(_testPath) });
             _mockIOHelper.Setup(x => x.CleanFolder(It.IsAny<DirectoryInfo>(), It.IsAny<TimeSpan>()))
                 .Returns(CleanFolderResult.Success());
 
-            var mockLogger = new Mock<ILogger<TempFileCleanup>>();
+            var mockLogger = new Mock<ILogger<TempFileCleanupJob>>();
 
-            return new TempFileCleanup(_mockIOHelper.Object, mockMainDom.Object, mockLogger.Object);
+            return new TempFileCleanupJob(_mockIOHelper.Object,mockLogger.Object);
         }
 
         private void VerifyFilesNotCleaned() => VerifyFilesCleaned(Times.Never());

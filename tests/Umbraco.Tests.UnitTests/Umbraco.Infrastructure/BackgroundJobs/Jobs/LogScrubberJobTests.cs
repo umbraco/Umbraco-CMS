@@ -13,62 +13,30 @@ using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
+using Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
 using Umbraco.Cms.Infrastructure.HostedServices;
 using Umbraco.Cms.Tests.Common;
 
-namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HostedServices;
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.BackgroundJobs.Jobs;
 
 [TestFixture]
-[Obsolete("Replaced by BackgroundJobs.Jobs.LogScrubberJobTests")]
-public class LogScrubberTests
+public class LogScrubberJobTests
 {
     private Mock<IAuditService> _mockAuditService;
 
     private const int MaxLogAgeInMinutes = 60;
 
     [Test]
-    public async Task Does_Not_Execute_When_Server_Role_Is_Subscriber()
-    {
-        var sut = CreateLogScrubber(ServerRole.Subscriber);
-        await sut.PerformExecuteAsync(null);
-        VerifyLogsNotScrubbed();
-    }
-
-    [Test]
-    public async Task Does_Not_Execute_When_Server_Role_Is_Unknown()
-    {
-        var sut = CreateLogScrubber(ServerRole.Unknown);
-        await sut.PerformExecuteAsync(null);
-        VerifyLogsNotScrubbed();
-    }
-
-    [Test]
-    public async Task Does_Not_Execute_When_Not_Main_Dom()
-    {
-        var sut = CreateLogScrubber(isMainDom: false);
-        await sut.PerformExecuteAsync(null);
-        VerifyLogsNotScrubbed();
-    }
-
-    [Test]
     public async Task Executes_And_Scrubs_Logs()
     {
         var sut = CreateLogScrubber();
-        await sut.PerformExecuteAsync(null);
+        await sut.RunJobAsync();
         VerifyLogsScrubbed();
     }
 
-    private LogScrubber CreateLogScrubber(
-        ServerRole serverRole = ServerRole.Single,
-        bool isMainDom = true)
+    private LogScrubberJob CreateLogScrubber()
     {
         var settings = new LoggingSettings { MaxLogAge = TimeSpan.FromMinutes(MaxLogAgeInMinutes) };
-
-        var mockServerRegistrar = new Mock<IServerRoleAccessor>();
-        mockServerRegistrar.Setup(x => x.CurrentServerRole).Returns(serverRole);
-
-        var mockMainDom = new Mock<IMainDom>();
-        mockMainDom.SetupGet(x => x.IsMainDom).Returns(isMainDom);
 
         var mockScope = new Mock<IScope>();
         var mockScopeProvider = new Mock<ICoreScopeProvider>();
@@ -82,14 +50,12 @@ public class LogScrubberTests
                 It.IsAny<bool>(),
                 It.IsAny<bool>()))
             .Returns(mockScope.Object);
-        var mockLogger = new Mock<ILogger<LogScrubber>>();
+        var mockLogger = new Mock<ILogger<LogScrubberJob>>();
         var mockProfilingLogger = new Mock<IProfilingLogger>();
 
         _mockAuditService = new Mock<IAuditService>();
 
-        return new LogScrubber(
-            mockMainDom.Object,
-            mockServerRegistrar.Object,
+        return new LogScrubberJob(
             _mockAuditService.Object,
             new TestOptionsMonitor<LoggingSettings>(settings),
             mockScopeProvider.Object,
