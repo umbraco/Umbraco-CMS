@@ -2068,6 +2068,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="settingsGroup">Settings</key>
     <key alias="templatingGroup">Templating</key>
     <key alias="thirdPartyGroup">Third Party</key>
+    <key alias="webhooks">Webhooks</key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">New update ready</key>
@@ -2883,6 +2884,8 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="configureArea">Configure area</key>
     <key alias="deleteArea">Delete area</key>
     <key alias="addColumnSpanOption">Add spanning %0% columns option</key>
+    <key alias="insertBlock">Insert Block</key>
+    <key alias="labelInlineMode">Display inline with text</key>
   </area>
   <area alias="contentTemplatesDashboard">
     <key alias="whatHeadline">What are Content Templates?</key>

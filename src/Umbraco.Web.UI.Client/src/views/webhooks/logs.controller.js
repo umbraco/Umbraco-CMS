@@ -1,20 +1,34 @@
-﻿(function () {
+(function () {
   "use strict";
 
-  function WebhookLogController($q,$scope, webhooksResource, notificationsService, overlayService) {
-    var vm = this;
+  function WebhookLogController($q, webhooksResource, overlayService) {
+
+    const vm = this;
+
     vm.logs = [];
     vm.openLogOverlay = openLogOverlay;
     vm.isChecked = isChecked;
 
-    function loadLogs (){
+    function init() {
+      vm.loading = true;
+
+      let promises = [];
+
+      promises.push(loadLogs());
+
+      $q.all(promises).then(function () {
+        vm.loading = false;
+      });
+    }
+
+    function loadLogs() {
       return webhooksResource.getLogs()
-        .then((data) => {
+        .then(data => {
           vm.logs = data.items;
         });
     }
 
-    function openLogOverlay (log) {
+    function openLogOverlay(log) {
       overlayService.open({
         view: "views/webhooks/overlays/details.html",
         title: 'Details',
@@ -27,11 +41,11 @@
       });
     }
 
-    function isChecked (log) {
+    function isChecked(log) {
       return log.statusCode === "OK";
     }
 
-    loadLogs();
+    init();
   }
 
   angular.module("umbraco").controller("Umbraco.Editors.Webhooks.WebhookLogController", WebhookLogController);

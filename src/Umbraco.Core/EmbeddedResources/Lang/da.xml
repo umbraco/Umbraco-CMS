@@ -1848,6 +1848,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="settingsGroup">Indstillinger</key>
     <key alias="templatingGroup">Design og layout</key>
     <key alias="thirdPartyGroup">Tredjepart</key>
+    <key alias="webhooks">Webhooks</key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">Ny opdatering er klar</key>
@@ -2320,6 +2321,8 @@ Mange hilsner fra Umbraco robotten
     <key alias="configureArea">Konfigurer område</key>
     <key alias="deleteArea">Slet område</key>
     <key alias="addColumnSpanOption">Tilføj mulighed for %0% koloner</key>
+    <key alias="insertBlock">Indsæt Blok</key>
+    <key alias="labelInlineMode">Vis på linje med tekst</key>
   </area>
   <area alias="contentTemplatesDashboard">
     <key alias="whatHeadline">Hvad er Indholdsskabeloner?</key>

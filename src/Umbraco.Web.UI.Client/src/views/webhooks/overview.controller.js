@@ -1,14 +1,16 @@
-﻿(function () {
+(function () {
   "use strict";
 
-  function OverviewController($q, $location, $routeParams, notificationsService, editorService, overlayService, localizationService) {
-    var vm = this;
+  function OverviewController($location, $routeParams, localizationService) {
+
+    const vm = this;
+
     vm.page = {};
     vm.page.labels = {};
     vm.page.name = "";
     vm.page.navigation = [];
-    let webhookUri = $routeParams.method;
 
+    let webhookUri = $routeParams.method;
 
     onInit();
 
@@ -21,16 +23,16 @@
 
     function loadNavigation() {
 
-      var labels = ["treeHeaders_webhooks", "webhooks_logs"];
+      const labelKeys = ["treeHeaders_webhooks", "webhooks_logs"];
 
-      localizationService.localizeMany(labels).then(function (data) {
+      localizationService.localizeMany(labelKeys).then(data => {
         vm.page.labels.webhooks = data[0];
         vm.page.labels.logs = data[1];
 
         vm.page.navigation = [
           {
             "name": vm.page.labels.webhooks,
-            "icon": "icon-directions-alt",
+            "icon": "icon-webhook",
             "view": "views/webhooks/webhooks.html",
             "active": webhookUri === 'overview',
             "alias": "umbWebhooks",
@@ -53,7 +55,7 @@
     }
 
     function setPageName() {
-      localizationService.localize("treeHeaders_webhooks").then(function (data) {
+      localizationService.localize("treeHeaders_webhooks").then(data => {
         vm.page.name = data;
       })
     }

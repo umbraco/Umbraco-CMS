@@ -1,9 +1,9 @@
-﻿<div class="headless-webhook-log-entry-details-overlay" style="margin-top: 20px;">
+<div class="headless-webhook-log-entry-details-overlay" style="margin-top: 20px;">
   <div class="control-group">
     <div class="flex items-center">
       <div class="flx-g0 flx-s0" style="flex-basis: 40px;">
         <umb-checkmark checked="true" size="m" style="cursor: default"></umb-checkmark>
-        <i class="icon-wrong umb-checkmark umb-checkmark--m" style="cursor: default;" ng-if="model.webhookLogEntry.response.isSuccess === false"></i>
+        <umb-icon icon="icon-wrong" class="umb-checkmark umb-checkmark--m" style="cursor: default;" ng-if="model.webhookLogEntry.response.isSuccess === false"></umb-icon>
       </div>
       <div class="flx-g1 flx-s1 flx-b2" ng-if="model.webhookLogEntry.responseStatus.description || model.webhookLogEntry.response.statusCode">{{model.webhookLogEntry.response.statusDescription}} ({{model.webhookLogEntry.response.statusCode}})</div>
     </div>
@@ -17,7 +17,7 @@
     <div class="controls controls-row">{{model.log.url}}</div>
   </div>
   <div class="control-group">
-    <span class="bold">Status Code</span>
+    <span class="bold">Status code</span>
     <div class="controls controls-row">{{model.log.statusCode}}</div>
   </div>
   <div class="control-group">

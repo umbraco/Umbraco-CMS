@@ -16,4 +16,4 @@ import './components/layouts/new-password-layout.element.js';
 import './components/layouts/confirmation-layout.element.js';
 import './components/layouts/error-layout.element.js';
 
-import './components/logIn-input.element.js';
+import './components/login-input.element.js';
