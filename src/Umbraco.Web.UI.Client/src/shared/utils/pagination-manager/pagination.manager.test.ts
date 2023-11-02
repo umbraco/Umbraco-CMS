@@ -127,9 +127,10 @@ describe('UmbContextConsumer', () => {
       const listener = oneEvent(manager, UmbChangeEvent.TYPE);
       manager.setCurrentPageNumber(200);
       const event = (await listener) as unknown as UmbChangeEvent;
+      const target = event.target as UmbPaginationManager;
       expect(event).to.exist;
       expect(event.type).to.equal(UmbChangeEvent.TYPE);
-      expect(event.target.getCurrentPageNumber()).to.equal(200);
+      expect(target.getCurrentPageNumber()).to.equal(200);
     });
   });
 

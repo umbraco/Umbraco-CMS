@@ -22,10 +22,6 @@ export class UmbUserGroupCollectionServerDataSource implements UmbCollectionData
 		this.#host = host;
 	}
 
-	getCollection() {
-		return tryExecuteAndNotify(this.#host, UserGroupResource.getUserGroup({}));
-	}
-
 	getCollection(filter: UmbUserGroupCollectionFilterModel) {
 		// TODO: Switch this to the filter endpoint when available
 		return tryExecuteAndNotify(this.#host, UserGroupResource.getUserGroup({}));
