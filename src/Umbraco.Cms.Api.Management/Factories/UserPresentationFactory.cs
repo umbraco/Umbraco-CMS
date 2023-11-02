@@ -1,6 +1,5 @@
 ﻿using Umbraco.Cms.Api.Management.ViewModels.User;
 using Umbraco.Cms.Api.Management.ViewModels.User.Current;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Media;
@@ -68,7 +67,7 @@ public class UserPresentationFactory : IUserPresentationFactory
             UserGroupKeys = requestModel.UserGroupIds,
         };
 
-        return createModel;
+        return await Task.FromResult(createModel);
     }
 
     public async Task<UserInviteModel> CreateInviteModelAsync(InviteUserRequestModel requestModel)
@@ -82,7 +81,18 @@ public class UserPresentationFactory : IUserPresentationFactory
             Message = requestModel.Message,
         };
 
-        return inviteModel;
+        return await Task.FromResult(inviteModel);
+    }
+
+    public async Task<UserResendInviteModel> CreateResendInviteModelAsync(ResendInviteUserRequestModel requestModel)
+    {
+        var inviteModel = new UserResendInviteModel
+        {
+            InvitedUserKey = requestModel.UserId,
+            Message = requestModel.Message,
+        };
+
+        return await Task.FromResult(inviteModel);
     }
 
     public async Task<UserUpdateModel> CreateUpdateModelAsync(Guid existingUserKey, UpdateUserRequestModel updateModel)
@@ -100,7 +110,7 @@ public class UserPresentationFactory : IUserPresentationFactory
 
         model.UserGroupKeys = updateModel.UserGroupIds;
 
-        return model;
+        return await Task.FromResult(model);
     }
 
     public async Task<CurrentUserResponseModel> CreateCurrentUserResponseModelAsync(IUser user)

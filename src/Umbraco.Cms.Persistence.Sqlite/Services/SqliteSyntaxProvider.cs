@@ -470,4 +470,7 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
 
         public bool IsUnique { get; set; }
     }
+
+    public override string Length => "length";
+    public override string Substring => "substr";
 }

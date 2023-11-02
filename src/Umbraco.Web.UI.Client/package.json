@@ -14,14 +14,14 @@
     "lint": "eslint src"
   },
   "engines": {
-    "node": ">=18.16",
-    "npm": ">=9.5"
+    "node": ">=20.8",
+    "npm": ">=10.1"
   },
   "dependencies": {
     "@microsoft/signalr": "7.0.12",
-    "@umbraco-ui/uui": "1.4.0",
-    "@umbraco-ui/uui-css": "1.4.0",
-    "ace-builds": "1.30.0",
+    "@umbraco-ui/uui": "1.5.0",
+    "@umbraco-ui/uui-css": "1.5.0",
+    "ace-builds": "1.31.0",
     "angular": "1.8.3",
     "angular-animate": "1.8.3",
     "angular-aria": "1.8.3",
@@ -51,7 +51,7 @@
     "ng-file-upload": "12.2.13",
     "nouislider": "15.7.1",
     "spectrum-colorpicker2": "2.0.10",
-    "tinymce": "6.7.0",
+    "tinymce": "6.7.1",
     "typeahead.js": "0.11.1",
     "underscore": "1.13.6",
     "wicg-inert": "3.1.2"
@@ -61,7 +61,7 @@
     "@babel/preset-env": "7.21.5",
     "autoprefixer": "10.4.16",
     "cssnano": "6.0.1",
-    "eslint": "8.51.0",
+    "eslint": "8.52.0",
     "gulp": "4.0.2",
     "gulp-angular-embed-templates": "2.3.0",
     "gulp-babel": "8.0.0",

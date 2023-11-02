@@ -1,7 +1,10 @@
-﻿using NUnit.Framework;
+﻿using Microsoft.Extensions.Logging;
+using Moq;
+using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Tests.Common.Builders;
 
@@ -51,7 +54,7 @@ public partial class ContentEditingServiceTests
                 Assert.IsTrue(createdContent.HasIdentity);
                 Assert.AreEqual("Test Create", createdContent.Name);
                 Assert.AreEqual("The title value", createdContent.GetValue<string>("title"));
-                Assert.AreEqual("The body text", createdContent.GetValue<string>("bodyText"));
+                AssertBodyTextEquals("The body text", createdContent);
             }
         }
         else
@@ -117,7 +120,7 @@ public partial class ContentEditingServiceTests
             Assert.IsTrue(createdContent.HasIdentity);
             Assert.AreEqual("Test Create Child", createdContent.Name);
             Assert.AreEqual("The child title value", createdContent.GetValue<string>("title"));
-            Assert.AreEqual("The child body text", createdContent.GetValue<string>("bodyText"));
+            AssertBodyTextEquals("The child body text", createdContent);
         }
         else
         {
@@ -492,5 +495,17 @@ public partial class ContentEditingServiceTests
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentEditingOperationStatus.InTrash, result.Status);
         Assert.IsNull(result.Result);
+    }
+
+    private void AssertBodyTextEquals(string expected, IContent content)
+    {
+        var bodyTextValue = content.GetValue<string>("bodyText");
+        Assert.IsTrue(
+            RichTextPropertyEditorHelper.TryParseRichTextEditorValue(
+                bodyTextValue,
+                JsonSerializer,
+                Mock.Of<ILogger>(),
+                out RichTextEditorValue? richTextEditorValue));
+        Assert.AreEqual(expected, richTextEditorValue!.Markup);
     }
 }

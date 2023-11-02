@@ -404,4 +404,6 @@ public interface IUserService : IMembershipUserService
     /// </summary>
     /// <param name="userEmail">The email address of the user.</param>
     Task<Attempt<UserOperationStatus>> SendResetPasswordEmailAsync(string userEmail);
+
+    Task<Attempt<UserInvitationResult, UserOperationStatus>> ResendInvitationAsync(Guid performingUserKey, UserResendInviteModel model);
 }
