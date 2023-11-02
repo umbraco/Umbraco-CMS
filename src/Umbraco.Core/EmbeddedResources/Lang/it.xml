@@ -163,6 +163,12 @@
     <key alias="submitChanges">Invia</key>
     <key alias="submitChangesAndClose">Invia e chiudi</key>
   </area>
+  <area alias="auditTrailsMedia">
+    <key alias="delete">Media eliminato</key>
+    <key alias="move">Media spostato</key>
+    <key alias="copy">Media copiato</key>
+    <key alias="save">Media salvato</key>
+  </area>
   <area alias="auditTrails">
     <key alias="atViewingFor">Visualizzazione per</key>
     <key alias="delete">Contenuto eliminato</key>

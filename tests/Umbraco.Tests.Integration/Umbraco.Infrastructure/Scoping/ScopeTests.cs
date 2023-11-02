@@ -12,6 +12,7 @@ using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Tests.Common;
+using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Extensions;
@@ -40,6 +41,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
         }
 
         [Test]
+        [LongRunning]
         public void GivenUncompletedScopeOnChildThread_WhenTheParentCompletes_TheTransactionIsRolledBack()
         {
             ScopeProvider scopeProvider = ScopeProvider;
@@ -77,6 +79,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
         }
 
         [Test]
+        [LongRunning]
         public void GivenChildThread_WhenParentDisposedBeforeChild_ParentScopeThrows()
         {
             ScopeProvider scopeProvider = ScopeProvider;

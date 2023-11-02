@@ -151,6 +151,12 @@
     <key alias="confirmActionConfirm">Potvrdit</key>
     <key alias="morePublishingOptions">Další možnosti publikování</key>
   </area>
+  <area alias="auditTrailsMedia">
+    <key alias="delete">Média smazán</key>
+    <key alias="move">Média přesunut</key>
+    <key alias="copy">Média zkopírován</key>
+    <key alias="save">Média uložen</key>
+  </area>
   <area alias="auditTrails">
     <key alias="atViewingFor">Zobrazení pro</key>
     <key alias="delete">Obsah smazán</key>
