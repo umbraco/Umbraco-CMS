@@ -7,7 +7,10 @@ import './user-collection-header.element.js';
 
 @customElement('umb-user-collection')
 export class UmbUserCollectionElement extends UmbCollectionElement {
-	public collectionContext = new UmbUserCollectionContext(this);
+	constructor() {
+		super();
+		new UmbUserCollectionContext(this);
+	}
 
 	protected renderToolbar() {
 		return html`<umb-user-collection-header slot="header"></umb-user-collection-header> `;
