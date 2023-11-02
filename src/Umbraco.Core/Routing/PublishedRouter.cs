@@ -274,7 +274,7 @@ public class PublishedRouter : IPublishedRouter
     ///     Finds the site root (if any) matching the http request, and updates the PublishedRequest accordingly.
     /// </summary>
     /// <returns>A value indicating whether a domain was found.</returns>
-    internal bool FindDomain(IPublishedRequestBuilder request)
+    public bool FindDomain(IPublishedRequestBuilder request)
     {
         const string tracePrefix = "FindDomain: ";
 
