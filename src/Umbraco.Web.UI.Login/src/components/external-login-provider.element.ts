@@ -122,7 +122,7 @@ export class UmbExternalLoginProviderElement extends LitElement {
           ${this.displayName
 			  ? html`
 				  <div>
-					  <uui-icon name=${this.icon} aria-hidden="true"></uui-icon>
+					  <uui-icon name=${this.icon}></uui-icon>
 					  <umb-localize key="login_signInWith">Sign in with</umb-localize>
 					  ${this.displayName}
 				  </div>

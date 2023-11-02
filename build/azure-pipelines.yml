@@ -137,49 +137,54 @@ stages:
       umbracoMajorVersion: $[ stageDependencies.Build.A.outputs['build.NBGV_VersionMajor'] ]
     jobs:
       # C# API Reference
-#      - job:
-#        displayName: Build C# API Reference
-#        pool:
-#          vmImage: 'windows-latest'
-#        steps:
-#          - task: PowerShell@2
-#            displayName: Install DocFX
-#            inputs:
-#              targetType: inline
-#              script: |
-#                choco install docfx --version=2.59.4 -y
-#                if ($lastexitcode -ne 0){
-#                    throw ("Error installing DocFX")
-#                }
-#          - task: PowerShell@2
-#            displayName: Generate metadata
-#            inputs:
-#              targetType: inline
-#              script: |
-#                docfx metadata "$(Build.SourcesDirectory)/build/csharp-docs/docfx.json"
-#                if ($lastexitcode -ne 0){
-#                    throw ("Error generating metadata.")
-#                }
-#          - task: PowerShell@2
-#            displayName: Generate documentation
-#            inputs:
-#              targetType: inline
-#              script: |
-#                docfx build "$(Build.SourcesDirectory)/build/csharp-docs/docfx.json"
-#                if ($lastexitcode -ne 0){
-#                      throw ("Error generating documentation.")
-#                }
-#          - task: ArchiveFiles@2
-#            displayName: Archive C# Docs
-#            inputs:
-#              rootFolderOrFile: $(Build.SourcesDirectory)/build/csharp-docs/_site
-#              includeRootFolder: false
-#              archiveFile: $(Build.ArtifactStagingDirectory)/csharp-docs.zip
-#          - task: PublishPipelineArtifact@1
-#            displayName: Publish C# Docs
-#            inputs:
-#              targetPath: $(Build.ArtifactStagingDirectory)/csharp-docs.zip
-#              artifact: csharp-docs
+      - job:
+        displayName: Build C# API Reference
+        pool:
+          vmImage: 'windows-latest'
+        steps:
+          - task: UseDotNet@2
+            displayName: Use .NET $(dotnetVersion)
+            inputs:
+              version: $(dotnetVersion)
+              includePreviewVersions: $(dotnetIncludePreviewVersions)
+          - task: PowerShell@2
+            displayName: Install DocFX
+            inputs:
+              targetType: inline
+              script: |
+                dotnet tool install -g docfx --version 2.72.1
+                if ($lastexitcode -ne 0){
+                    throw ("Error installing DocFX")
+                }
+          - task: PowerShell@2
+            displayName: Generate metadata
+            inputs:
+              targetType: inline
+              script: |
+                docfx metadata "$(Build.SourcesDirectory)/build/csharp-docs/docfx.json"
+                if ($lastexitcode -ne 0){
+                    throw ("Error generating metadata.")
+                }
+          - task: PowerShell@2
+            displayName: Generate documentation
+            inputs:
+              targetType: inline
+              script: |
+                docfx build "$(Build.SourcesDirectory)/build/csharp-docs/docfx.json"
+                if ($lastexitcode -ne 0){
+                      throw ("Error generating documentation.")
+                }
+          - task: ArchiveFiles@2
+            displayName: Archive C# Docs
+            inputs:
+              rootFolderOrFile: $(Build.SourcesDirectory)/build/csharp-docs/_site
+              includeRootFolder: false
+              archiveFile: $(Build.ArtifactStagingDirectory)/csharp-docs.zip
+          - task: PublishPipelineArtifact@1
+            displayName: Publish C# Docs
+            inputs:
+              targetPath: $(Build.ArtifactStagingDirectory)/csharp-docs.zip
+              artifact: csharp-docs
 
       # js API Reference
       - job:

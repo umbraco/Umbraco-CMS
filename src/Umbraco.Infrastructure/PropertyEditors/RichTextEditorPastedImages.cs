@@ -4,6 +4,8 @@
 using HtmlAgilityPack;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Hosting;
@@ -30,7 +32,9 @@ public sealed class RichTextEditorPastedImages
     private readonly ITemporaryFileService _temporaryFileService;
     private readonly IScopeProvider _scopeProvider;
     private readonly IMediaImportService _mediaImportService;
+    private readonly IImageUrlGenerator _imageUrlGenerator;
     private readonly IUserService _userService;
+    private readonly ContentSettings _contentSettings;
 
     [Obsolete("Please use the non-obsolete constructor. Will be removed in V16.")]
     public RichTextEditorPastedImages(
@@ -55,7 +59,9 @@ public sealed class RichTextEditorPastedImages
             publishedUrlProvider,
             StaticServiceProvider.Instance.GetRequiredService<ITemporaryFileService>(),
             StaticServiceProvider.Instance.GetRequiredService<IScopeProvider>(),
-            StaticServiceProvider.Instance.GetRequiredService<IMediaImportService>())
+            StaticServiceProvider.Instance.GetRequiredService<IMediaImportService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IImageUrlGenerator>(),
+            StaticServiceProvider.Instance.GetRequiredService<IOptions<ContentSettings>>())
     {
     }
 
@@ -72,8 +78,10 @@ public sealed class RichTextEditorPastedImages
         IPublishedUrlProvider publishedUrlProvider,
         ITemporaryFileService temporaryFileService,
         IScopeProvider scopeProvider,
-        IMediaImportService mediaImportService)
-        : this(umbracoContextAccessor, publishedUrlProvider, temporaryFileService, scopeProvider, mediaImportService)
+        IMediaImportService mediaImportService,
+        IImageUrlGenerator imageUrlGenerator,
+        IOptions<ContentSettings> contentSettings)
+        : this(umbracoContextAccessor, publishedUrlProvider, temporaryFileService, scopeProvider, mediaImportService, imageUrlGenerator, contentSettings)
     {
     }
 
@@ -82,7 +90,9 @@ public sealed class RichTextEditorPastedImages
         IPublishedUrlProvider publishedUrlProvider,
         ITemporaryFileService temporaryFileService,
         IScopeProvider scopeProvider,
-        IMediaImportService mediaImportService)
+        IMediaImportService mediaImportService,
+        IImageUrlGenerator imageUrlGenerator,
+        IOptions<ContentSettings> contentSettings)
     {
         _umbracoContextAccessor =
             umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
@@ -90,24 +100,44 @@ public sealed class RichTextEditorPastedImages
         _temporaryFileService = temporaryFileService;
         _scopeProvider = scopeProvider;
         _mediaImportService = mediaImportService;
+        _imageUrlGenerator = imageUrlGenerator;
+        _contentSettings = contentSettings.Value;
 
         // this obviously is not correct. however, we only use IUserService in an obsolete method,
         // so this is better than having even more obsolete constructors for V16
         _userService = StaticServiceProvider.Instance.GetRequiredService<IUserService>();
     }
 
+    /// <summary>
+    ///     Used by the RTE (and grid RTE) for converting inline base64 images to Media items.
+    /// </summary>
+    /// <param name="html">HTML from the Rich Text Editor property editor.</param>
+    /// <param name="mediaParentFolder"></param>
+    /// <param name="userId"></param>
+    /// <returns>Formatted HTML.</returns>
+    /// <exception cref="NotSupportedException">Thrown if image extension is not allowed</exception>
+    internal string FindAndPersistEmbeddedImages(string html, Guid mediaParentFolder, Guid userId)
+    {
+        // FIXME: the FindAndPersistEmbeddedImages implementation from #14546 must be ported to V14 and added here
+        return html;
+    }
+
     [Obsolete($"Please use {nameof(FindAndPersistPastedTempImagesAsync)}. Will be removed in V16.")]
     public string FindAndPersistPastedTempImages(string html, Guid mediaParentFolder, int userId, IImageUrlGenerator imageUrlGenerator)
+        => FindAndPersistPastedTempImages(html, mediaParentFolder, userId);
+
+    [Obsolete($"Please use {nameof(FindAndPersistPastedTempImagesAsync)}. Will be removed in V16.")]
+    public string FindAndPersistPastedTempImages(string html, Guid mediaParentFolder, int userId)
     {
         IUser user = _userService.GetUserById(userId)
                      ?? throw new ArgumentException($"Could not find a user with the specified user key ({userId})", nameof(userId));
-        return FindAndPersistPastedTempImagesAsync(html, mediaParentFolder, user.Key, imageUrlGenerator).GetAwaiter().GetResult();
+        return FindAndPersistPastedTempImagesAsync(html, mediaParentFolder, user.Key).GetAwaiter().GetResult();
     }
 
     /// <summary>
     ///     Used by the RTE (and grid RTE) for drag/drop/persisting images.
     /// </summary>
-    public async Task<string> FindAndPersistPastedTempImagesAsync(string html, Guid mediaParentFolder, Guid userKey, IImageUrlGenerator imageUrlGenerator)
+    public async Task<string> FindAndPersistPastedTempImagesAsync(string html, Guid mediaParentFolder, Guid userKey)
     {
         // Find all img's that has data-tmpimg attribute
         // Use HTML Agility Pack - https://html-agility-pack.net
@@ -181,7 +211,7 @@ public sealed class RichTextEditorPastedImages
 
             if (width != int.MinValue && height != int.MinValue)
             {
-                location = imageUrlGenerator.GetImageUrl(new ImageUrlGenerationOptions(location)
+                location = _imageUrlGenerator.GetImageUrl(new ImageUrlGenerationOptions(location)
                 {
                     ImageCropMode = ImageCropMode.Max,
                     Width = width,

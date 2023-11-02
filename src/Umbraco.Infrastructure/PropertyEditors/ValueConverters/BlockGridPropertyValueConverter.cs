@@ -11,14 +11,14 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors.DeliveryApi;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Extensions;
-using static Umbraco.Cms.Core.PropertyEditors.BlockGridConfiguration;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
 {
     [DefaultPropertyValueConverter(typeof(JsonValueConverter))]
-    public class BlockGridPropertyValueConverter : BlockPropertyValueConverterBase<BlockGridModel, BlockGridItem, BlockGridLayoutItem, BlockGridBlockConfiguration, BlockGridValue>, IDeliveryApiPropertyValueConverter
+    public class BlockGridPropertyValueConverter : PropertyValueConverterBase, IDeliveryApiPropertyValueConverter
     {
         private readonly IProfilingLogger _proflog;
+        private readonly BlockEditorConverter _blockConverter;
         private readonly IJsonSerializer _jsonSerializer;
         private readonly IApiElementBuilder _apiElementBuilder;
 
@@ -32,15 +32,14 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
 
         }
 
-        // Niels, Change: I would love if this could be general, so we don't need a specific one for each block property editor....
         public BlockGridPropertyValueConverter(
             IProfilingLogger proflog,
             BlockEditorConverter blockConverter,
             IJsonSerializer jsonSerializer,
             IApiElementBuilder apiElementBuilder)
-            : base(blockConverter)
         {
             _proflog = proflog;
+            _blockConverter = blockConverter;
             _jsonSerializer = jsonSerializer;
             _apiElementBuilder = apiElementBuilder;
         }
@@ -49,14 +48,22 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
         public override bool IsConverter(IPublishedPropertyType propertyType)
             => propertyType.EditorAlias.InvariantEquals(Constants.PropertyEditors.Aliases.BlockGrid);
 
+        /// <inheritdoc />
+        public override Type GetPropertyValueType(IPublishedPropertyType propertyType)
+            => typeof(BlockGridModel);
+
+        /// <inheritdoc />
         public override object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
             => ConvertIntermediateToBlockGridModel(propertyType, referenceCacheLevel, inter, preview);
 
+        /// <inheritdoc />
         public PropertyCacheLevel GetDeliveryApiPropertyCacheLevel(IPublishedPropertyType propertyType) => GetPropertyCacheLevel(propertyType);
 
+        /// <inheritdoc />
         public Type GetDeliveryApiPropertyValueType(IPublishedPropertyType propertyType)
             => typeof(ApiBlockGridModel);
 
+        /// <inheritdoc />
         public object? ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview, bool expanding)
         {
             const int defaultColumns = 12;
@@ -96,6 +103,18 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
         {
             using (!_proflog.IsEnabled(LogLevel.Debug) ? null : _proflog.DebugDuration<BlockGridPropertyValueConverter>($"ConvertPropertyToBlockGrid ({propertyType.DataType.Id})"))
             {
+                // NOTE: this is to retain backwards compatability
+                if (inter is null)
+                {
+                    return BlockGridModel.Empty;
+                }
+
+                // NOTE: The intermediate object is just a JSON string, we don't actually convert from source -> intermediate since source is always just a JSON string
+                if (inter is not string intermediateBlockModelValue)
+                {
+                    return null;
+                }
+
                 // Get configuration
                 BlockGridConfiguration? configuration = propertyType.DataType.ConfigurationAs<BlockGridConfiguration>();
                 if (configuration is null)
@@ -103,58 +122,9 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                     return null;
                 }
 
-                BlockGridModel CreateEmptyModel() => BlockGridModel.Empty;
-
-                BlockGridModel CreateModel(IList<BlockGridItem> items) => new BlockGridModel(items, configuration.GridColumns);
-
-                BlockGridItem? EnrichBlockItem(BlockGridItem blockItem, BlockGridLayoutItem layoutItem, BlockGridBlockConfiguration blockConfig, CreateBlockItemModelFromLayout createBlockItem)
-                {
-                    // enrich block item with additional configs + setup areas
-                    var blockConfigAreaMap = blockConfig.Areas.ToDictionary(area => area.Key);
-
-                    blockItem.RowSpan = layoutItem.RowSpan!.Value;
-                    blockItem.ColumnSpan = layoutItem.ColumnSpan!.Value;
-                    blockItem.AreaGridColumns = blockConfig.AreaGridColumns;
-                    blockItem.GridColumns = configuration.GridColumns;
-                    blockItem.Areas = layoutItem.Areas.Select(area =>
-                    {
-                        if (!blockConfigAreaMap.TryGetValue(area.Key, out BlockGridAreaConfiguration? areaConfig))
-                        {
-                            return null;
-                        }
-
-                        var items = area.Items.Select(item => createBlockItem(item)).WhereNotNull().ToList();
-                        return new BlockGridArea(items, areaConfig.Alias!, areaConfig.RowSpan!.Value, areaConfig.ColumnSpan!.Value);
-                    }).WhereNotNull().ToArray();
-
-                    return blockItem;
-                }
-
-                BlockGridModel blockModel = UnwrapBlockModel(
-                    referenceCacheLevel,
-                    inter,
-                    preview,
-                    configuration.Blocks,
-                    CreateEmptyModel,
-                    CreateModel,
-                    EnrichBlockItem
-                );
-
-                return blockModel;
+                var creator = new BlockGridPropertyValueCreator(_blockConverter, _jsonSerializer);
+                return creator.CreateBlockModel(referenceCacheLevel, intermediateBlockModelValue, preview, configuration.Blocks, configuration.GridColumns);
             }
-        }
-
-        protected override BlockGridEditorDataConverter CreateBlockEditorDataConverter() => new(_jsonSerializer);
-
-        protected override BlockItemActivator<BlockGridItem> CreateBlockItemActivator() => new BlockGridItemActivator(BlockEditorConverter);
-
-        private class BlockGridItemActivator : BlockItemActivator<BlockGridItem>
-        {
-            public BlockGridItemActivator(BlockEditorConverter blockConverter) : base(blockConverter)
-            {
-            }
-
-            protected override Type GenericItemType => typeof(BlockGridItem<,>);
         }
     }
 }

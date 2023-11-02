@@ -12,15 +12,12 @@ using Umbraco.Cms.Core.Strings;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
-internal abstract class BlockEditorPropertyValueEditor<TValue, TLayout> : DataValueEditor, IDataValueReference, IDataValueTags
+internal abstract class BlockEditorPropertyValueEditor<TValue, TLayout> : BlockValuePropertyValueEditorBase<TValue, TLayout>
     where TValue : BlockValue<TLayout>, new()
     where TLayout : class, IBlockLayoutItem, new()
 {
-    private BlockEditorValues<TValue, TLayout>? _blockEditorValues;
-    private readonly IDataTypeService _dataTypeService;
-    private readonly ILogger<BlockEditorPropertyValueEditor<TValue, TLayout>> _logger;
-    private readonly PropertyEditorCollection _propertyEditors;
     private readonly IJsonSerializer _jsonSerializer;
+    private BlockEditorValues<TValue, TLayout>? _blockEditorValues;
 
     protected BlockEditorPropertyValueEditor(
         DataEditorAttribute attribute,
@@ -31,13 +28,8 @@ internal abstract class BlockEditorPropertyValueEditor<TValue, TLayout> : DataVa
         IShortStringHelper shortStringHelper,
         IJsonSerializer jsonSerializer,
         IIOHelper ioHelper)
-        : base(textService, shortStringHelper, jsonSerializer, ioHelper, attribute)
-    {
-        _propertyEditors = propertyEditors;
-        _dataTypeService = dataTypeService;
-        _logger = logger;
-        _jsonSerializer = jsonSerializer;
-    }
+        : base(attribute, propertyEditors, dataTypeService, textService, logger, shortStringHelper, jsonSerializer, ioHelper)
+        => _jsonSerializer = jsonSerializer;
 
     protected BlockEditorValues<TValue, TLayout> BlockEditorValues
     {
@@ -45,43 +37,22 @@ internal abstract class BlockEditorPropertyValueEditor<TValue, TLayout> : DataVa
         set => _blockEditorValues = value;
     }
 
-    public IEnumerable<UmbracoEntityReference> GetReferences(object? value)
+    /// <inheritdoc />
+    public override IEnumerable<UmbracoEntityReference> GetReferences(object? value)
     {
         var rawJson = value == null ? string.Empty : value is string str ? str : value.ToString();
 
-        var result = new List<UmbracoEntityReference>();
         BlockEditorData<TValue, TLayout>? blockEditorData = BlockEditorValues.DeserializeAndClean(rawJson);
         if (blockEditorData == null)
         {
             return Enumerable.Empty<UmbracoEntityReference>();
         }
 
-        // loop through all content and settings data
-        foreach (BlockItemData row in blockEditorData.BlockValue.ContentData.Concat(blockEditorData.BlockValue.SettingsData))
-        {
-            foreach (KeyValuePair<string, BlockItemData.BlockPropertyValue> prop in row.PropertyValues)
-            {
-                IDataEditor? propEditor = _propertyEditors[prop.Value.PropertyType.PropertyEditorAlias];
-
-                IDataValueEditor? valueEditor = propEditor?.GetValueEditor();
-                if (!(valueEditor is IDataValueReference reference))
-                {
-                    continue;
-                }
-
-                var val = prop.Value.Value?.ToString();
-
-                IEnumerable<UmbracoEntityReference> refs = reference.GetReferences(val);
-
-                result.AddRange(refs);
-            }
-        }
-
-        return result;
+        return GetBlockValueReferences(blockEditorData.BlockValue);
     }
 
     /// <inheritdoc />
-    public IEnumerable<ITag> GetTags(object? value, object? dataTypeConfiguration, int? languageId)
+    public override IEnumerable<ITag> GetTags(object? value, object? dataTypeConfiguration, int? languageId)
     {
         var rawJson = value == null ? string.Empty : value is string str ? str : value.ToString();
 
@@ -91,30 +62,8 @@ internal abstract class BlockEditorPropertyValueEditor<TValue, TLayout> : DataVa
             return Enumerable.Empty<ITag>();
         }
 
-        var result = new List<ITag>();
-        // loop through all content and settings data
-        foreach (BlockItemData row in blockEditorData.BlockValue.ContentData.Concat(blockEditorData.BlockValue.SettingsData))
-        {
-            foreach (KeyValuePair<string, BlockItemData.BlockPropertyValue> prop in row.PropertyValues)
-            {
-                IDataEditor? propEditor = _propertyEditors[prop.Value.PropertyType.PropertyEditorAlias];
-
-                IDataValueEditor? valueEditor = propEditor?.GetValueEditor();
-                if (valueEditor is not IDataValueTags tagsProvider)
-                {
-                    continue;
-                }
-
-                object? configurationObject = _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeKey)?.ConfigurationObject;
-
-                result.AddRange(tagsProvider.GetTags(prop.Value.Value, configurationObject, languageId));
-            }
-        }
-
-        return result;
+        return GetBlockValueTags(blockEditorData.BlockValue, languageId);
     }
-
-    #region Convert database // editor
 
     // note: there is NO variant support here
 
@@ -145,8 +94,7 @@ internal abstract class BlockEditorPropertyValueEditor<TValue, TLayout> : DataVa
             return string.Empty;
         }
 
-        MapBlockItemDataToEditor(property, blockEditorData.BlockValue.ContentData);
-        MapBlockItemDataToEditor(property, blockEditorData.BlockValue.SettingsData);
+        MapBlockValueToEditor(property, blockEditorData.BlockValue);
 
         // return json convertable object
         return blockEditorData.BlockValue;
@@ -181,93 +129,9 @@ internal abstract class BlockEditorPropertyValueEditor<TValue, TLayout> : DataVa
             return string.Empty;
         }
 
-        MapBlockItemDataFromEditor(blockEditorData.BlockValue.ContentData);
-        MapBlockItemDataFromEditor(blockEditorData.BlockValue.SettingsData);
+        MapBlockValueFromEditor(blockEditorData.BlockValue);
 
         // return json
         return _jsonSerializer.Serialize(blockEditorData.BlockValue);
     }
-
-    private void MapBlockItemDataToEditor(IProperty property, List<BlockItemData> items)
-    {
-        var valEditors = new Dictionary<int, IDataValueEditor>();
-
-        foreach (BlockItemData row in items)
-        {
-            foreach (KeyValuePair<string, BlockItemData.BlockPropertyValue> prop in row.PropertyValues)
-            {
-                // create a temp property with the value
-                // - force it to be culture invariant as the block editor can't handle culture variant element properties
-                prop.Value.PropertyType.Variations = ContentVariation.Nothing;
-                var tempProp = new Property(prop.Value.PropertyType);
-                tempProp.SetValue(prop.Value.Value);
-
-                IDataEditor? propEditor = _propertyEditors[prop.Value.PropertyType.PropertyEditorAlias];
-                if (propEditor == null)
-                {
-                    // NOTE: This logic was borrowed from Nested Content and I'm unsure why it exists.
-                    // if the property editor doesn't exist I think everything will break anyways?
-                    // update the raw value since this is what will get serialized out
-                    row.RawPropertyValues[prop.Key] = tempProp.GetValue()?.ToString();
-                    continue;
-                }
-
-                IDataType? dataType = _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeId);
-                if (dataType == null)
-                {
-                    // deal with weird situations by ignoring them (no comment)
-                    row.PropertyValues.Remove(prop.Key);
-                    _logger.LogWarning(
-                        "ToEditor removed property value {PropertyKey} in row {RowId} for property type {PropertyTypeAlias}",
-                        prop.Key,
-                        row.Key,
-                        property.PropertyType.Alias);
-                    continue;
-                }
-
-                if (!valEditors.TryGetValue(dataType.Id, out IDataValueEditor? valEditor))
-                {
-                    var tempConfig = dataType.ConfigurationObject;
-                    valEditor = propEditor.GetValueEditor(tempConfig);
-
-                    valEditors.Add(dataType.Id, valEditor);
-                }
-
-                var convValue = valEditor.ToEditor(tempProp);
-
-                // update the raw value since this is what will get serialized out
-                row.RawPropertyValues[prop.Key] = convValue;
-            }
-        }
-    }
-
-    private void MapBlockItemDataFromEditor(List<BlockItemData> items)
-    {
-        foreach (BlockItemData row in items)
-        {
-            foreach (KeyValuePair<string, BlockItemData.BlockPropertyValue> prop in row.PropertyValues)
-            {
-                // Fetch the property types prevalue
-                var propConfiguration = _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeId)?.ConfigurationObject;
-
-                // Lookup the property editor
-                IDataEditor? propEditor = _propertyEditors[prop.Value.PropertyType.PropertyEditorAlias];
-                if (propEditor == null)
-                {
-                    continue;
-                }
-
-                // Create a fake content property data object
-                var contentPropData = new ContentPropertyData(prop.Value.Value, propConfiguration);
-
-                // Get the property editor to do it's conversion
-                var newValue = propEditor.GetValueEditor().FromEditor(contentPropData, prop.Value.Value);
-
-                // update the raw value since this is what will get serialized out
-                row.RawPropertyValues[prop.Key] = newValue;
-            }
-        }
-    }
-
-    #endregion
 }
