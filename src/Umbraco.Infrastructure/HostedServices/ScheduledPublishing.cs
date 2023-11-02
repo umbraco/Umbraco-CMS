@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices;
 /// <remarks>
 ///     Runs only on non-replica servers.
 /// </remarks>
-[Obsolete("Use Umbraco.Cms.Infrastructure.BackgroundJobs.ScheduledPublishingJob instead")]
+[Obsolete("Use Umbraco.Cms.Infrastructure.BackgroundJobs.ScheduledPublishingJob instead.  This class will be removed in Umbraco 14.")]
 public class ScheduledPublishing : RecurringHostedServiceBase
 {
     private readonly IContentService _contentService;
