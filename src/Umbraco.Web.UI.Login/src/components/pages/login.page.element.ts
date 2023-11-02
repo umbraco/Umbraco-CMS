@@ -124,14 +124,16 @@ export default class UmbLoginPageElement extends LitElement {
                   </button>`
             )}
           </div>
-          <uui-button
-            type="submit"
-            id="umb-login-button"
-            look="primary"
-            @click=${this.#onSubmitClick}
-            .label=${until(umbLocalizationContext.localize('general_login', undefined, 'Login'), 'Login')}
-            color="default"
-            .state=${this._loginState}></uui-button>
+          <div id="primary-actions">
+            <uui-button
+              type="submit"
+              id="umb-login-button"
+              look="primary"
+              @click=${this.#onSubmitClick}
+              .label=${until(umbLocalizationContext.localize('general_login', undefined, 'Login'), 'Login')}
+              color="default"
+              .state=${this._loginState}></uui-button>
+          </div>
 
           ${this.#renderErrorMessage()}
         `}
@@ -199,7 +201,14 @@ export default class UmbLoginPageElement extends LitElement {
       #secondary-actions {
         display: flex;
         align-items: center;
-        justify-content: space-between;
+        justify-content: end;
+      }
+
+      #primary-actions {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-top: var(--uui-size-space-6);
       }
     `,
   ];
