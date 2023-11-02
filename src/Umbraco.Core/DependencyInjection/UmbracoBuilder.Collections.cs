@@ -90,7 +90,7 @@ public static partial class UmbracoBuilderExtensions
 
         builder.DynamicRootSteps()
             .Append<NearestAncestorOrSelfDynamicRootQueryStep>()
-            .Append<FarthestAncestorOrSelfDynamicRootQueryStep>()
+            .Append<FurthestAncestorOrSelfDynamicRootQueryStep>()
             .Append<NearestDescendantOrSelfDynamicRootQueryStep>()
             .Append<FurthestDescendantOrSelfDynamicRootQueryStep>();
 
