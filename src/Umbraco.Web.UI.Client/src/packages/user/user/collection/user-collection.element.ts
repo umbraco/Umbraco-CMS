@@ -1,18 +1,13 @@
 import { UmbUserCollectionContext } from './user-collection.context.js';
 import { html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UMB_COLLECTION_CONTEXT, UmbCollectionElement } from '@umbraco-cms/backoffice/collection';
+import { UmbCollectionElement } from '@umbraco-cms/backoffice/collection';
 
 import './user-collection-header.element.js';
 
 @customElement('umb-user-collection')
 export class UmbUserCollectionElement extends UmbCollectionElement {
 	public collectionContext = new UmbUserCollectionContext(this);
-
-	constructor() {
-		super();
-		this.provideContext(UMB_COLLECTION_CONTEXT, this.collectionContext);
-	}
 
 	protected renderToolbar() {
 		return html`<umb-user-collection-header slot="header"></umb-user-collection-header> `;

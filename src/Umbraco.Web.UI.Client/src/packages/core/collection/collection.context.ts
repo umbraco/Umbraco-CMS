@@ -69,6 +69,8 @@ export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectio
 				this.#setCurrentView();
 			}, 'umbCollectionViewsObserver').asPromise(),
 		]);
+
+		this.provideContext(UMB_COLLECTION_CONTEXT, this);
 	}
 
 	/**
