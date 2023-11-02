@@ -1,11 +1,11 @@
 import { UmbUserItemRepository } from '../../user/repository/item/user-item.repository.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, CSSResultGroup, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbChangePasswordModalData, UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
+import { UmbChangePasswordModalData, UmbChangePasswordModalValue, UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 
 @customElement('umb-change-password-modal')
-export class UmbChangePasswordModalElement extends UmbModalBaseElement<UmbChangePasswordModalData> {
+export class UmbChangePasswordModalElement extends UmbModalBaseElement<UmbChangePasswordModalData, UmbChangePasswordModalValue> {
 	@state()
 	private _headline: string = 'Change password';
 
@@ -35,7 +35,7 @@ export class UmbChangePasswordModalElement extends UmbModalBaseElement<UmbChange
 		const newPassword = formData.get('newPassword') as string;
 		const confirmPassword = formData.get('confirmPassword') as string;
 
-		this.modalContext?.submit({ oldPassword, newPassword, confirmPassword });
+		this.modalContext?.submit({ oldPassword, newPassword });
 	}
 
 	constructor() {
