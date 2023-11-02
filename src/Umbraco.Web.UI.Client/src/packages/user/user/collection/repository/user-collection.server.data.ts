@@ -40,7 +40,7 @@ export class UmbUserCollectionServerDataSource implements UmbCollectionDataSourc
 	 * @return {*}
 	 * @memberof UmbUserCollectionServerDataSource
 	 */
-	async filterCollection(filter: UmbUserCollectionFilterModel) {
+	async getCollection(filter: UmbUserCollectionFilterModel) {
 		const response = await tryExecuteAndNotify(this.#host, UserResource.getUserFilter(filter));
 		return extendDataSourcePagedResponseData<UmbUserDetail>(response, {
 			entityType: USER_ENTITY_TYPE,
