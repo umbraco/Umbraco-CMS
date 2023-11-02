@@ -8,6 +8,7 @@ export * from './path-folder-name.function.js';
 export * from './selection-manager.js';
 export * from './udi-service.js';
 export * from './umbraco-path.function.js';
+export * from './pagination.manager.js';
 
 declare global {
 	interface Window {
