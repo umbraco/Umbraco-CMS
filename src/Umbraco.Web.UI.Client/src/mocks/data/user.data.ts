@@ -1,11 +1,12 @@
-import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbEntityData } from './entity.data.js';
 import { umbUserGroupData } from './user-group.data.js';
+import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbLoggedInUser } from '@umbraco-cms/backoffice/auth';
 import {
 	CreateUserRequestModel,
 	CreateUserResponseModel,
 	InviteUserRequestModel,
+	PagedUserResponseModel,
 	UpdateUserGroupsOnUserRequestModel,
 	UserItemResponseModel,
 	UserResponseModel,
@@ -139,6 +140,11 @@ class UmbUserData extends UmbEntityData<UserResponseModel> {
 		});
 	}
 
+	/**
+	 * Invites a user
+	 * @param {InviteUserRequestModel} data
+	 * @memberof UmbUserData
+	 */
 	invite(data: InviteUserRequestModel): void {
 		const invitedUser = {
 			status: UserStateModel.INVITED,
@@ -147,6 +153,11 @@ class UmbUserData extends UmbEntityData<UserResponseModel> {
 
 		this.createUser(invitedUser);
 	}
+
+	filter (filter: string): PagedUserResponseModel {
+		const { total, items } = this.getAll();
+		return { total, items };
+	};
 }
 
 export const data: Array<UserResponseModel & { type: string }> = [
