@@ -62,7 +62,7 @@ Before you start:
 	- [ ] Published Status
 	- [ ] Health Check
 	- [x] Profiling
-	- [ ] Telemetry Data
+	- [x] Telemetry Data
 - [ ] Document Type
 	- [ ] Section: Design
 	- [ ] Section: Structure
