@@ -32,7 +32,7 @@ export default class UmbLoginPageElement extends LitElement {
   #formElement?: HTMLFormElement;
 
   async #onSlotChanged() {
-    this.#formElement = this.slottedElements?.[0];
+    this.#formElement = this.slottedElements?.find((el) => el.id === 'umb-login-form');
 
     if (!this.#formElement) return;
 
