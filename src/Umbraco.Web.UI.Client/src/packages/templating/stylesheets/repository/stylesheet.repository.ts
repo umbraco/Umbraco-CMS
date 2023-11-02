@@ -1,5 +1,4 @@
-import { Observable } from 'rxjs';
-import { StylesheetDetails } from '../index.js';
+import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbStylesheetTreeStore, UMB_STYLESHEET_TREE_STORE_CONTEXT_TOKEN } from './stylesheet.tree.store.js';
 import { UmbStylesheetTreeServerDataSource } from './sources/stylesheet.tree.server.data.js';
 import { UmbStylesheetServerDataSource } from './sources/stylesheet.server.data.js';
@@ -35,6 +34,7 @@ import {
 	UpdateTextFileViewModelBaseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbTreeRootFileSystemModel } from '@umbraco-cms/backoffice/tree';
+import { StylesheetDetails } from "../index";
 
 export class UmbStylesheetRepository
 	implements
