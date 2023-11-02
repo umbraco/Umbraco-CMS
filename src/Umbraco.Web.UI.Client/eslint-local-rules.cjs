@@ -338,4 +338,37 @@ module.exports = {
 			};
 		},
 	},
+
+	/** @type {import('eslint').Rule.RuleModule}*/
+	'ensure-no-external-imports': {
+		meta: {
+			type: 'problem',
+			docs: {
+				description: 'Ensures that the application does not rely on imports from external packages.',
+				category: 'Best Practices',
+				recommended: true,
+			},
+			fixable: 'code',
+			schema: [],
+		},
+		create: (context) => {
+			return {
+				ImportDeclaration: (node) => {
+					const { source } = node;
+					const { value } = source;
+
+					// If import starts with any of the following, then it's allowed
+					if (['@umbraco-cms', '.'].some(v => value.startsWith(v))) {
+						return;
+					}
+
+					context.report({
+						node,
+						message: 'External imports are not allowed.',
+						fix: (fixer) => fixer.replaceText(source, `'@umbraco-cms/backoffice/external${value.startsWith('/') ? '' : '/'}${value}'`),
+					});
+				},
+			};
+		},
+	},
 };
