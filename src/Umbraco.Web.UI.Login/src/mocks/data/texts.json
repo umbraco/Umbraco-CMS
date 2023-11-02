@@ -1,6 +1,9 @@
 {
 	"general": {
 		"login": "Login",
+    "email": "Email",
+    "username": "Username",
+    "password": "Password",
     "welcome": "Welcome",
     "or": "Or",
     "validate": "Validate",

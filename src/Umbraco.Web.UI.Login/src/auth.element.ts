@@ -185,7 +185,7 @@ export default class UmbAuthElement extends LitElement {
     });
     this._usernameLabel = createLabel({
       forId: 'username-input',
-      localizeAlias: this.usernameIsEmail ? 'general_email' : 'user_username'
+      localizeAlias: this.usernameIsEmail ? 'general_email' : 'general_username'
     });
     this._passwordLabel = createLabel({forId: 'password-input', localizeAlias: 'user_password'});
 
