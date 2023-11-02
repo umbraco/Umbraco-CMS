@@ -53,7 +53,7 @@ export default class UmbResetPasswordPageElement extends LitElement {
 							name="email"
 							.label=${until(umbLocalizationContext.localize('user_email', undefined, 'Email'))}
 							required
-							required-message=${until(umbLocalizationContext.localize('general_required', undefined, 'Email'))}></uui-input>
+							required-message=${until(umbLocalizationContext.localize('general_required', undefined, 'Required'))}></uui-input>
 					</uui-form-layout-item>
 
 					${this.#renderErrorMessage()}
