@@ -19,7 +19,6 @@ export class UmbUserCollectionRepository extends UmbUserRepositoryBase implement
 		const { data, error } = await this.#collectionSource.getCollection(filter);
 
 		if (data) {
-			debugger;
 			this.detailStore!.appendItems(data.items);
 		}
 
