@@ -15,6 +15,7 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 	@state()
 	private _iconListFiltered: Array<string> = [];
 
+	// TODO: Make sure we do not store colors, but color-aliases.
 	@state()
 	private _colorList = [
 		'#000000',
@@ -45,13 +46,13 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 	@state()
 	private _currentIcon?: string;
 
-	private _changeIcon(e: { target: HTMLInputElement; type: any; key: unknown }) {
+	#changeIcon(e: { target: HTMLInputElement; type: any; key: unknown }) {
 		if (e.type == 'click' || (e.type == 'keyup' && e.key == 'Enter')) {
 			this._currentIcon = e.target.id;
 		}
 	}
 
-	private _filterIcons(e: { target: HTMLInputElement }) {
+	#filterIcons(e: { target: HTMLInputElement }) {
 		if (e.target.value) {
 			this._iconListFiltered = this._iconList.filter((icon) => icon.includes(e.target.value));
 		} else {
@@ -59,15 +60,15 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 		}
 	}
 
-	private _close() {
+	#close() {
 		this.modalContext?.reject();
 	}
 
-	private _submit() {
+	#submit() {
 		this.modalContext?.submit({ color: this._currentColor, icon: this._currentIcon });
 	}
 
-	private _onColorChange(e: UUIColorSwatchesEvent) {
+	#onColorChange(e: UUIColorSwatchesEvent) {
 		this._currentColor = e.target.value;
 	}
 
@@ -87,7 +88,7 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 					<uui-color-swatches
 						.value="${this._currentColor || ''}"
 						label="Color switcher for icons"
-						@change="${this._onColorChange}">
+						@change="${this.#onColorChange}">
 						${this._colorList.map(
 							(color) => html`
 								<uui-color-swatch label="${color}" title="${color}" value="${color}"></uui-color-swatch>
@@ -97,8 +98,8 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 					<hr />
 					<uui-scroll-container id="icon-selection">${this.renderIconSelection()}</uui-scroll-container>
 				</div>
-				<uui-button slot="actions" label="close" @click="${this._close}">Close</uui-button>
-				<uui-button slot="actions" color="positive" look="primary" @click="${this._submit}" label="Submit">
+				<uui-button slot="actions" label="close" @click="${this.#close}">Close</uui-button>
+				<uui-button slot="actions" color="positive" look="primary" @click="${this.#submit}" label="Submit">
 					Submit
 				</uui-button>
 			</umb-body-layout>
@@ -107,7 +108,7 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 
 	renderSearchbar() {
 		return html` <uui-input
-			@keyup="${this._filterIcons}"
+			@keyup="${this.#filterIcons}"
 			placeholder="Type to filter..."
 			label="Type to filter icons"
 			id="searchbar">
@@ -126,8 +127,8 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 					name="${icon}"
 					label="${icon}"
 					id="${icon}"
-					@click="${this._changeIcon}"
-					@keyup="${this._changeIcon}">
+					@click="${this.#changeIcon}"
+					@keyup="${this.#changeIcon}">
 				</uui-icon>
 			`;
 		})}`;
