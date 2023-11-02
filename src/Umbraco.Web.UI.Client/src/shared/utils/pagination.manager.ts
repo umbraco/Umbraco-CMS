@@ -1,6 +1,7 @@
+import { UmbChangeEvent } from "@umbraco-cms/backoffice/event";
 import { UmbNumberState } from "@umbraco-cms/backoffice/observable-api";
 
-export class UmbPaginationManager {
+export class UmbPaginationManager extends EventTarget {
 
   #pageSize = new UmbNumberState(10);
   public readonly pageSize = this.#pageSize.asObservable();
@@ -13,6 +14,9 @@ export class UmbPaginationManager {
 
 	#currentPage = new UmbNumberState(1);
 	public readonly currentPage = this.#currentPage.asObservable();
+
+  #skip = new UmbNumberState(0);
+  public readonly skip = this.#skip.asObservable();
 
   /**
    * Sets the number of items per page and recalculates the total number of pages
@@ -77,7 +81,18 @@ export class UmbPaginationManager {
    */
   public setCurrentPageNumber(pageNumber: number) {
     this.#currentPage.next(pageNumber);
+    this.#calculateSkip();
+    this.dispatchEvent(new UmbChangeEvent());
 	}
+
+  /**
+   * Gets the number of items to skip
+   * @return {number} 
+   * @memberof UmbPaginationManager
+   */
+  public getSkip() {
+    return this.#skip.getValue();
+  }
 
   /**
    * Calculates the total number of pages
@@ -86,5 +101,10 @@ export class UmbPaginationManager {
   #calculateTotalPages() {
     const totalPages = Math.ceil(this.#totalItems.getValue() / this.#pageSize.getValue());
     this.#totalPages.next(totalPages);
+  }
+  
+  #calculateSkip() {
+    const skip = (this.#currentPage.getValue() - 1) * this.#pageSize.getValue();
+    this.#skip.next(skip);
   }
 }
