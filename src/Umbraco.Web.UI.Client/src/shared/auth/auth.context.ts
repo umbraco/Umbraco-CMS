@@ -69,6 +69,12 @@ export class UmbAuthContext implements IUmbAuth {
 		return this.#authFlow.signOut();
 	}
 
+	/**
+	 * Checks if a user is the current user.
+	 *
+	 * @param userId The user id to check
+	 * @returns True if the user is the current user, otherwise false
+	 */
 	async isUserCurrentUser(userId: string): Promise<boolean> {
 		const currentUser = await firstValueFrom(this.currentUser);
 		return currentUser?.id === userId;
