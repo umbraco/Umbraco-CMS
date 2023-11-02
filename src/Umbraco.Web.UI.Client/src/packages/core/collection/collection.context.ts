@@ -12,6 +12,7 @@ import { ManifestCollectionView, umbExtensionsRegistry } from '@umbraco-cms/back
 import type { UmbCollectionFilterModel } from '@umbraco-cms/backoffice/collection';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbSelectionManager, UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectionFilterModel> extends UmbBaseController {
 	protected entityType: string;
@@ -44,8 +45,8 @@ export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectio
 		super(host);
 		this.entityType = entityType;
 
-		// TODO: get configuration from somewhere
-		this.#configure({ pageSize: 1 });
+		// listen for page changes on the pagination manager
+		this.pagination.addEventListener(UmbChangeEvent.TYPE, this.#onPageChange);
 
 		const currentUrl = new URL(window.location.href);
 		this.collectionRootPathname = currentUrl.pathname.substring(0, currentUrl.pathname.lastIndexOf('/'));
@@ -54,6 +55,9 @@ export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectio
 			this.#observeRepository(repositoryAlias).asPromise(),
 			this.#observeViews().asPromise(),
 		]);
+
+		// TODO: get configuration from somewhere
+		this.#configure({ pageSize: 2 });
 
 		this.provideContext(UMB_COLLECTION_CONTEXT, this);
 	}
@@ -198,6 +202,12 @@ export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectio
 			this.#views.next(views);
 			this.#setCurrentView();
 		}, 'umbCollectionViewsObserver');
+	}
+
+	#onPageChange = (event: UmbChangeEvent) => {
+		const target = event.target as UmbPaginationManager;
+		const skipFilter = { skip: target.getSkip() };
+		this.setFilter(skipFilter);
 	}
 
 	#setCurrentView() {
