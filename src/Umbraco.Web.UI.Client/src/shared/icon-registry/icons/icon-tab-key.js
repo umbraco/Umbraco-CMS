@@ -1,1 +1,16 @@
-export default `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor"><path d="M252.263 230.963H92.58v51.146h159.683v48.007l89.16-73.576-89.16-73.582v48.005zm116.712-83.06V362.72h51.18V147.903h-51.18zM157.459 255.309"/></svg>`;
+export default `<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="1.75"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M17 12H3" />
+  <path d="m11 18 6-6-6-6" />
+  <path d="M21 5v14" />
+</svg>
+`;

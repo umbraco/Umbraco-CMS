@@ -1,1 +1,15 @@
-export default `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor"><path d="M253.006 256.045l213.783-124.477v248.955zm-210.52 0l213.785-124.477v248.955z"/></svg>`;
+export default `<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="1.75"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <polygon points="11 19 2 12 11 5 11 19" />
+  <polygon points="22 19 13 12 22 5 22 19" />
+</svg>
+`;
