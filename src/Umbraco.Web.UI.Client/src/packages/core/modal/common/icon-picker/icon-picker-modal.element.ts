@@ -12,7 +12,7 @@ import { UmbIconPickerModalData, UmbIconPickerModalValue, UmbModalBaseElement } 
 export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPickerModalData, UmbIconPickerModalValue> {
 
 
-	private _iconList = icons.map((icon) => icon);
+	private _iconList = icons.filter((icon) => !icon.legacy);
 
 	@state()
 	private _iconListFiltered: Array<(typeof icons)[0]> = [];

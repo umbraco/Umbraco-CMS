@@ -42,6 +42,7 @@ const collectDictionaryIcons = async () => {
 
 				const icon = {
 					name: iconDef.name,
+					legacy: iconDef.legacy,
 					fileName: iconFileName,
 					svg,
 					output: `${iconsOutputDirectory}/${iconFileName}.js`,
@@ -81,6 +82,7 @@ const collectDiskIcons = async (icons) => {
 
 			const icon = {
 				name: iconName,
+				legacy: true,
 				fileName: iconFileName,
 				svg,
 				output: `${iconsOutputDirectory}/${iconFileName}.js`,
@@ -115,6 +117,7 @@ const generateJSON = (icons) => {
 	const iconDescriptors = icons.map((icon) => {
 		return {
 			name: icon.name,
+			legacy: icon.legacy,
 			path: `./icons/${icon.fileName}.js`,
 		};
 	});
