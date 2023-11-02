@@ -1,7 +1,22 @@
 {
 	"general": {
-		"login": "Login"
+		"login": "Login",
+    "welcome": "Welcome",
+    "or": "Or",
+    "validate": "Validate",
+    "back": "Back"
 	},
+  "login": {
+    "forgottenPassword": "Forgot password?",
+    "signInWith": "Sign in with",
+    "forgottenPasswordInstruction": "Enter your email address and we'll send you a link to reset your password.",
+    "returnToLogin": "Return to login",
+    "2fatitle": "Two-factor authentication",
+    "2faText": "Enter the code from your authenticator app",
+    "2faMultipleText": "Select an authentication method",
+    "2faCodeInput": "Enter your code",
+    "2faCodeInputHelp": "Enter the code from your authenticator app"
+  },
 	"user": {
 		"username": "Username",
 		"email": "Email",
