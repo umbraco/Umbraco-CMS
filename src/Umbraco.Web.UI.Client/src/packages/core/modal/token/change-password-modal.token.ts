@@ -2,7 +2,6 @@ import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbChangePasswordModalData {
 	userId: string;
-	requireOldPassword?: boolean;
 }
 
 export interface UmbChangePasswordModalValue {

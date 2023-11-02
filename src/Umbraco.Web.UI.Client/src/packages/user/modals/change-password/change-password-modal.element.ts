@@ -7,10 +7,10 @@ import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 @customElement('umb-change-password-modal')
 export class UmbChangePasswordModalElement extends UmbModalBaseElement<UmbChangePasswordModalData> {
 	@state()
-	private _userName: string = '';
+	private _headline: string = 'Change password';
 
 	@state()
-	private _headline: string = 'Change password';
+	private _isCurrentUser: boolean = false;
 
 	#userItemRepository = new UmbUserItemRepository(this);
 	#authContext?: typeof UMB_AUTH_CONTEXT.TYPE;
@@ -38,6 +38,29 @@ export class UmbChangePasswordModalElement extends UmbModalBaseElement<UmbChange
 		this.modalContext?.submit({ oldPassword, newPassword, confirmPassword });
 	}
 
+	constructor() {
+		super();
+
+		this.consumeContext(UMB_AUTH_CONTEXT, (instance) => {
+			this.#authContext = instance;
+			this.#setIsCurrentUser();
+		});
+	}
+
+	async #setIsCurrentUser() {
+		if (!this.data?.userId) {
+			this._isCurrentUser = false;
+			return;
+		}
+
+		if (!this.#authContext) {
+			this._isCurrentUser = false;
+			return;
+		}
+
+		this._isCurrentUser = await this.#authContext.isUserCurrentUser(this.data.userId);
+	}
+
 	protected async firstUpdated(): Promise<void> {
 		if (!this.data?.userId) return;
 		const { data } = await this.#userItemRepository.requestItems([this.data.userId]);
@@ -53,7 +76,7 @@ export class UmbChangePasswordModalElement extends UmbModalBaseElement<UmbChange
 			<uui-dialog-layout class="uui-text" headline=${this._headline}>
 				<uui-form>
 					<form id="ChangePasswordForm" @submit="${this.#onSubmit}">
-						${this.data?.requireOldPassword ? this.#renderOldPasswordInput() : nothing}
+						${this._isCurrentUser ? this.#renderOldPasswordInput() : nothing}
 						<uui-form-layout-item>
 							<uui-label id="newPasswordLabel" for="newPassword" slot="label" required>New password</uui-label>
 							<uui-input-password
