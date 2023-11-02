@@ -8,7 +8,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 export class UmbCollectionPaginationElement extends UmbLitElement {
 
   @state()
-  _totalPages = 11;
+  _totalPages = 0;
 
   @state()
   _currentPage = 1;
@@ -19,17 +19,29 @@ export class UmbCollectionPaginationElement extends UmbLitElement {
 		super();
 		this.consumeContext(UMB_COLLECTION_CONTEXT, (instance) => {
 			this._collectionContext = instance;
+			this.#observeCurrentPage();
+			this.#observerTotalPages();
 		});
 	}
 
-  #onChange (event: UUIPaginationEvent) { 
-    console.log(event);
-    console.log(event.target.current);
-    this._collectionContext?.setPage(event.target.current);
+	#observeCurrentPage () {
+		this.observe(this._collectionContext!.pagination.currentPage, (currentPage) => {
+			this._currentPage = currentPage;
+		}, 'umbCurrentPageObserver');
+	}
+
+	#observerTotalPages () {
+		this.observe(this._collectionContext!.pagination.totalPages, (totalPages) => {
+			this._totalPages = totalPages;
+		}, 'umbTotalPagesObserver');
+	}
+
+  #onChange (event: UUIPaginationEvent) {
+    this._collectionContext?.pagination.setCurrentPageNumber(event.target.current);
   }
 
 	render() {
-    if (this._totalPages === 0) {
+    if (this._totalPages <= 1) {
       return nothing;
     }
 
