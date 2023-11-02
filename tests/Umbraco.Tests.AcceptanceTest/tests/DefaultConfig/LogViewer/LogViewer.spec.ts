@@ -3,7 +3,7 @@ import {expect} from "@playwright/test";
 
 test.describe('Log Viewer tests', () => {
 
-  test('can search in log viewer', async ({page, umbracoApi, umbracoUi, request}) => {
+  test('can search', async ({page, umbracoApi, umbracoUi, request}) => {
     // Arrange
     const startTelemetryLevel = await umbracoApi.telemetry.getLevel();
     const telemetryLevel = "Minimal";
