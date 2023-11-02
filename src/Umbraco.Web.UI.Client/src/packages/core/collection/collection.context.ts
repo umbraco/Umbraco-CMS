@@ -19,8 +19,8 @@ export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectio
 	#items = new UmbArrayState<ItemType>([]);
 	public readonly items = this.#items.asObservable();
 
-	#total = new UmbNumberState(0);
-	public readonly total = this.#total.asObservable();
+	#totalItems = new UmbNumberState(0);
+	public readonly totalItems = this.#totalItems.asObservable();
 
 	#totalPages = new UmbNumberState(0);
 	public readonly totalPages = this.#totalPages.asObservable();
@@ -154,7 +154,7 @@ export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectio
 		const { data } = await this.repository.requestCollection(filter);
 
 		if (data) {
-			this.#total.next(data.total);
+			this.#totalItems.next(data.total);
 			this.#items.next(data.items);
 		}
 	}
