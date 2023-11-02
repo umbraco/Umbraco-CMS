@@ -7,11 +7,19 @@ import { umbAuthContext } from './context/auth.context.js';
 import { umbLocalizationContext } from './external/localization/localization-context.js';
 import { UmbLocalizeElement } from './external/localization/localize.element.js';
 import type { UmbLoginInputElement } from './components/login-input.element.js';
-import { InputType, UUIFormLayoutItemElement, UUILabelElement } from '@umbraco-ui/uui';
+import type { InputType, UUIFormLayoutItemElement, UUILabelElement } from '@umbraco-ui/uui';
 
 import authStyles from './auth-styles.css?inline';
 
-const createInput = (opts: {id: string, type: InputType, name: string, autocomplete: AutoFill, requiredMessage: string, label: string, inputmode: string}) => {
+const createInput = (opts: {
+  id: string,
+  type: InputType,
+  name: string,
+  autocomplete: AutoFill,
+  requiredMessage: string,
+  label: string,
+  inputmode: string
+}) => {
   const input = document.createElement('umb-login-input');
   input.type = opts.type;
   input.name = opts.name;
@@ -26,7 +34,7 @@ const createInput = (opts: {id: string, type: InputType, name: string, autocompl
   return input;
 };
 
-const createLabel = (opts: {forId: string, localizeAlias: string}) => {
+const createLabel = (opts: { forId: string, localizeAlias: string }) => {
   const label = document.createElement('uui-label');
   const umbLocalize = document.createElement('umb-localize') as UmbLocalizeElement;
   umbLocalize.key = opts.localizeAlias;
@@ -66,34 +74,35 @@ export default class UmbAuthElement extends LitElement {
    *
    * @attr disable-local-login
    */
-  @property({ type: Boolean, attribute: 'disable-local-login' })
+  @property({type: Boolean, attribute: 'disable-local-login'})
   set disableLocalLogin(value: boolean) {
     umbAuthContext.disableLocalLogin = value;
   }
 
-  @property({ attribute: 'background-image' })
+  @property({attribute: 'background-image'})
   backgroundImage?: string;
 
-	@property({ attribute: 'logo-light' })
-	logoLight?: string;
+  @property({attribute: 'logo-light'})
+  logoLight?: string;
 
-	@property({ attribute: 'logo-dark' })
-	logoDark?: string;
+  @property({attribute: 'logo-dark'})
+  logoDark?: string;
 
-  @property({ type: Boolean, attribute: 'username-is-email' })
+  @property({type: Boolean, attribute: 'username-is-email'})
   usernameIsEmail = false;
 
-  @property({ type: Boolean, attribute: 'allow-password-reset' })
+  @property({type: Boolean, attribute: 'allow-password-reset'})
   allowPasswordReset = false;
 
-  @property({ type: Boolean, attribute: 'allow-user-invite' })
+  @property({type: Boolean, attribute: 'allow-user-invite'})
   allowUserInvite = false;
 
-  @property({ attribute: 'return-url' })
+  @property({attribute: 'return-url'})
   set returnPath(value: string) {
     this.#returnPath = value;
     umbAuthContext.returnPath = this.returnPath;
   }
+
   get returnPath() {
     // Check if there is a ?redir querystring or else return the returnUrl attribute
     return new URLSearchParams(window.location.search).get('returnPath') || this.#returnPath;
@@ -174,8 +183,11 @@ export default class UmbAuthElement extends LitElement {
       label: labelPassword,
       inputmode: ''
     });
-    this._usernameLabel = createLabel({ forId: 'username-input', localizeAlias: this.usernameIsEmail ? 'general_email' : 'user_username' });
-    this._passwordLabel = createLabel({ forId: 'password-input', localizeAlias: 'user_password' });
+    this._usernameLabel = createLabel({
+      forId: 'username-input',
+      localizeAlias: this.usernameIsEmail ? 'general_email' : 'user_username'
+    });
+    this._passwordLabel = createLabel({forId: 'password-input', localizeAlias: 'user_password'});
 
     this._usernameLayoutItem = createFormLayoutItem(this._usernameLabel, this._usernameInput);
     this._passwordLayoutItem = createFormLayoutItem(this._passwordLabel, this._passwordInput);
@@ -187,13 +199,13 @@ export default class UmbAuthElement extends LitElement {
 
   render() {
     return html`
-			<umb-auth-layout
-				background-image=${ifDefined(this.backgroundImage)}
+      <umb-auth-layout
+        background-image=${ifDefined(this.backgroundImage)}
         logo-light=${ifDefined(this.logoLight)}
         logo-dark=${ifDefined(this.logoDark)}>
-				${this._renderFlowAndStatus()}
-			</umb-auth-layout>
-		`;
+        ${this._renderFlowAndStatus()}
+      </umb-auth-layout>
+    `;
   }
 
   private _renderFlowAndStatus() {
@@ -202,21 +214,23 @@ export default class UmbAuthElement extends LitElement {
     const status = searchParams.get('status');
 
     if (status === 'resetCodeExpired') {
-      return html` <umb-error-layout
-				header="Hi there"
-				message=${until(
-        umbLocalizationContext.localize('login_resetCodeExpired', undefined, 'The link you have clicked on is invalid or has expired')
-      )}>
-			</umb-error-layout>`;
+      return html`
+        <umb-error-layout
+          header="Hi there"
+          message=${until(
+            umbLocalizationContext.localize('login_resetCodeExpired', undefined, 'The link you have clicked on is invalid or has expired')
+          )}>
+        </umb-error-layout>`;
     }
 
     if (flow === 'invite-user' && status === 'false') {
-      return html` <umb-error-layout
-				header="Hi there"
-				message=${until(
-        umbLocalizationContext.localize('user_userinviteExpiredMessage', undefined, 'Welcome to Umbraco! Unfortunately your invite has expired. Please contact your administrator and ask them to resend it.'),
-      )}>
-			</umb-error-layout>`;
+      return html`
+        <umb-error-layout
+          header="Hi there"
+          message=${until(
+            umbLocalizationContext.localize('user_userinviteExpiredMessage', undefined, 'Welcome to Umbraco! Unfortunately your invite has expired. Please contact your administrator and ask them to resend it.'),
+          )}>
+        </umb-error-layout>`;
     }
 
     // validate
@@ -228,22 +242,27 @@ export default class UmbAuthElement extends LitElement {
 
     switch (flow) {
       case 'mfa':
-        return html`<umb-mfa-page></umb-mfa-page>`;
+        return html`
+          <umb-mfa-page></umb-mfa-page>`;
       case 'reset':
-        return html`<umb-reset-password-page></umb-reset-password-page>`;
+        return html`
+          <umb-reset-password-page></umb-reset-password-page>`;
       case 'reset-password':
-        return html`<umb-new-password-page></umb-new-password-page>`;
+        return html`
+          <umb-new-password-page></umb-new-password-page>`;
       case 'invite-user':
-        return html`<umb-invite-page></umb-invite-page>`;
+        return html`
+          <umb-invite-page></umb-invite-page>`;
 
       default:
-        return html`<umb-login-page
-					?allow-password-reset=${this.allowPasswordReset}
-					?username-is-email=${this.usernameIsEmail}>
-					<slot></slot>
-					<slot name="subheadline" slot="subheadline"></slot>
-					<slot name="external" slot="external"></slot>
-				</umb-login-page>`;
+        return html`
+          <umb-login-page
+            ?allow-password-reset=${this.allowPasswordReset}
+            ?username-is-email=${this.usernameIsEmail}>
+            <slot></slot>
+            <slot name="subheadline" slot="subheadline"></slot>
+            <slot name="external" slot="external"></slot>
+          </umb-login-page>`;
     }
   }
 }
