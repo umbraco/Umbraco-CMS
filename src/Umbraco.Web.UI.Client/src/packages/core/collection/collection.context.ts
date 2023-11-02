@@ -51,27 +51,8 @@ export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectio
 		this.collectionRootPathname = currentUrl.pathname.substring(0, currentUrl.pathname.lastIndexOf('/'));
 
 		this.init = Promise.all([
-			this.observe(
-				umbExtensionsRegistry.getByTypeAndAlias('repository', repositoryAlias),
-				async (repositoryManifest) => {
-					if (repositoryManifest) {
-						const result = await createExtensionApi(repositoryManifest, [this._host]);
-						this.repository = result as UmbCollectionRepository;
-						this.requestCollection();
-					}
-				},
-				'umbCollectionRepositoryObserver'
-			).asPromise(),
-
-			this.observe(umbExtensionsRegistry.extensionsOfType('collectionView').pipe(
-				map((extensions) => {
-					return extensions.filter((extension) => extension.conditions.entityType === this.getEntityType());
-				}),
-			),
-			(views) => {
-				this.#views.next(views);
-				this.#setCurrentView();
-			}, 'umbCollectionViewsObserver').asPromise(),
+			this.#observeRepository(repositoryAlias).asPromise(),
+			this.#observeViews().asPromise(),
 		]);
 
 		this.provideContext(UMB_COLLECTION_CONTEXT, this);
@@ -191,6 +172,32 @@ export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectio
 		this.#selectionManager.setMultiple(true);
 		this.pagination.setPageSize(configuration.pageSize);
 		this.#filter.next({ ...this.#filter.getValue(), skip: 0, take: configuration.pageSize });
+	}
+
+	#observeRepository(repositoryAlias: string) {
+		return this.observe(
+			umbExtensionsRegistry.getByTypeAndAlias('repository', repositoryAlias),
+			async (repositoryManifest) => {
+				if (repositoryManifest) {
+					const result = await createExtensionApi(repositoryManifest, [this._host]);
+					this.repository = result as UmbCollectionRepository;
+					this.requestCollection();
+				}
+			},
+			'umbCollectionRepositoryObserver'
+		)
+	}
+
+	#observeViews() {
+		return this.observe(umbExtensionsRegistry.extensionsOfType('collectionView').pipe(
+			map((extensions) => {
+				return extensions.filter((extension) => extension.conditions.entityType === this.getEntityType());
+			}),
+		),
+		(views) => {
+			this.#views.next(views);
+			this.#setCurrentView();
+		}, 'umbCollectionViewsObserver');
 	}
 
 	#setCurrentView() {
