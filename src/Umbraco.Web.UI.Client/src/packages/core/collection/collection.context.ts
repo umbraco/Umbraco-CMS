@@ -22,6 +22,12 @@ export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectio
 	#total = new UmbNumberState(0);
 	public readonly total = this.#total.asObservable();
 
+	#totalPages = new UmbNumberState(0);
+	public readonly totalPages = this.#totalPages.asObservable();
+
+	#currentPage = new UmbNumberState(1);
+	public readonly currentPage = this.#currentPage.asObservable();
+
 	#selectionManager = new UmbSelectionManager();
 	public readonly selection = this.#selectionManager.selection;
 
