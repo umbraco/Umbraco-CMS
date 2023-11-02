@@ -95,14 +95,4 @@ public interface IUserGroupService
     /// <param name="userKeys">The user whose groups we want to alter.</param>
     /// <returns>An attempt indicating if the operation was a success as well as a more detailed <see cref="UserGroupOperationStatus"/>.</returns>
     Task UpdateUserGroupsOnUsers(ISet<Guid> userGroupKeys, ISet<Guid> userKeys);
-
-    /// <summary>
-    ///     Authorize that the current user belongs to these groups.
-    /// </summary>
-    /// <param name="performingUser">The user performing the operation.</param>
-    /// <param name="userGroupKeys">The identifiers of the user groups to check for access.</param>
-    /// <returns>A task resolving into a <see cref="UserGroupOperationStatus"/>.</returns>
-    // FIXME: Start using <see cref="UserGroupAuthorizationStatus"/> for all authorization things.
-    // TODO: Consider if this is the right place for this method or if we can introduce it in a new IUserGroupPermissionsService
-    Task<UserGroupOperationStatus> AuthorizeGroupAccessAsync(IUser performingUser, IEnumerable<Guid> userGroupKeys);
 }

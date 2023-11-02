@@ -1,27 +1,33 @@
 ﻿using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Services.AuthorizationStatus;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
+// FIXME: Move methods implementation to <see cref="UserGroupPermissionService"/> & remove class
 internal sealed class UserGroupAuthorizationService : IUserGroupAuthorizationService
 {
     private readonly IContentService _contentService;
     private readonly IMediaService _mediaService;
     private readonly IEntityService _entityService;
     private readonly AppCaches _appCaches;
+    // TODO: Remove this when implementation logic is moved to UserGroupPermissionService
+    private readonly IUserGroupPermissionService _userGroupPermissionService;
 
     public UserGroupAuthorizationService(
         IContentService contentService,
         IMediaService mediaService,
         IEntityService entityService,
+        IUserGroupPermissionService userGroupPermissionService, // this should not be necessary when logic is moved to UserGroupPermissionService
         AppCaches appCaches)
     {
         _contentService = contentService;
         _mediaService = mediaService;
         _entityService = entityService;
+        _userGroupPermissionService = userGroupPermissionService;
         _appCaches = appCaches;
     }
 
@@ -61,10 +67,12 @@ internal sealed class UserGroupAuthorizationService : IUserGroupAuthorizationSer
             return Attempt.Fail(authorizeSectionAccess.Result);
         }
 
-        UserGroupOperationStatus authorizeGroupAccess = AuthorizeGroupAccess(performingUser, new[] { userGroup });
-        if (authorizeGroupAccess != UserGroupOperationStatus.Success)
+        // Temporary solution until we move this implementation to <see cref="UserGroupPermissionService"/>
+        UserGroupAuthorizationStatus authorizeGroupAccess = _userGroupPermissionService.AuthorizeAccessAsync(performingUser, new[] { userGroup.Key }).GetAwaiter().GetResult();
+        if (authorizeGroupAccess != UserGroupAuthorizationStatus.Success)
         {
-            return Attempt.Fail(authorizeGroupAccess);
+            // TODO: return just authorizeGroupAccess when logic is moved to UserGroupPermissionService
+            return Attempt.Fail(UserGroupOperationStatus.UnauthorizedMissingUserGroup);
         }
 
         Attempt<UserGroupOperationStatus> authorizeStartNodeChanges = AuthorizeStartNodeChanges(performingUser, userGroup);
@@ -73,25 +81,7 @@ internal sealed class UserGroupAuthorizationService : IUserGroupAuthorizationSer
             return Attempt.Fail(authorizeStartNodeChanges.Result);
         }
 
-
         return Attempt.Succeed(UserGroupOperationStatus.Success);
-    }
-
-    /// <inheritdoc/>
-    public UserGroupOperationStatus AuthorizeGroupAccess(IUser performingUser, IEnumerable<IUserGroup> userGroups)
-    {
-        if (performingUser.IsAdmin())
-        {
-            return UserGroupOperationStatus.Success;
-        }
-
-        var userGroupsKeys = performingUser.Groups.Select(x => x.Key).ToArray();
-        var requiredUserGroupsKeys = userGroups.Select(x => x.Key).ToArray();
-        var missingAccess = requiredUserGroupsKeys.Except(userGroupsKeys).ToArray();
-
-        return missingAccess.Length == 0
-            ? UserGroupOperationStatus.Success
-            : UserGroupOperationStatus.UnauthorizedMissingUserGroup;
     }
 
     /// <summary>

@@ -330,14 +330,6 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
         return Attempt.SucceedWithStatus(UserGroupOperationStatus.Success, userGroup);
     }
 
-    /// <inheritdoc/>
-    public async Task<UserGroupOperationStatus> AuthorizeGroupAccessAsync(IUser performingUser, IEnumerable<Guid> userGroupKeys)
-    {
-        IEnumerable<IUserGroup> userGroups = await GetAsync(userGroupKeys);
-
-        return _userGroupAuthorizationService.AuthorizeGroupAccess(performingUser, userGroups);
-    }
-
     private async Task<UserGroupOperationStatus> ValidateUserGroupUpdateAsync(IUserGroup userGroup)
     {
         UserGroupOperationStatus commonValidationStatus = ValidateCommon(userGroup);
