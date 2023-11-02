@@ -65,7 +65,6 @@ export class UmbAuthLayoutElement extends LitElement {
 				width: 100%;
 				height: 100%;
 				z-index: -2;
-				transform: scaleX(-1);
 			}
 			:host::after {
 				content: '';
@@ -125,7 +124,6 @@ export class UmbAuthLayoutElement extends LitElement {
 				background-size: cover;
 				width: 100%;
 				height: 100%;
-				transform: scaleX(-1);
 				border-radius: 40px;
 				/* border: 1px solid white; */
 				box-sizing: border-box;
