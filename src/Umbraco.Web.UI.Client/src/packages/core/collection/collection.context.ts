@@ -1,3 +1,4 @@
+import { UmbCollectionConfiguration } from './types.js';
 import { UmbCollectionRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbBaseController, type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
@@ -43,7 +44,8 @@ export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectio
 		super(host);
 		this.entityType = entityType;
 
-		this.#selectionManager.setMultiple(true);
+		// TODO: get configuration from somewhere
+		this.#configure({ pageSize: 1 });
 
 		const currentUrl = new URL(window.location.href);
 		this.collectionRootPathname = currentUrl.pathname.substring(0, currentUrl.pathname.lastIndexOf('/'));
@@ -183,6 +185,12 @@ export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectio
 	 */
 	public getCurrentView() {
 		return this.#currentView.getValue();
+	}
+
+	#configure(configuration: UmbCollectionConfiguration) {
+		this.#selectionManager.setMultiple(true);
+		this.pagination.setPageSize(configuration.pageSize);
+		this.#filter.next({ ...this.#filter.getValue(), skip: 0, take: configuration.pageSize });
 	}
 
 	#setCurrentView() {
