@@ -1,37 +1,25 @@
-﻿using System.Threading.Channels;
+﻿using System.Collections.Concurrent;
 using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Services;
 
 public class WebhookBackgroundTaskQueue : IWebhookBackgroundTaskQueue
 {
-    private readonly Channel<Func<Task<WebhookResponseModel>>> _queue;
-
-    public WebhookBackgroundTaskQueue()
-    {
-        // Capacity should be set based on the expected application load and
-        // number of concurrent threads accessing the queue.
-        // BoundedChannelFullMode.Wait will cause calls to WriteAsync() to return a task,
-        // which completes only when space became available. This leads to backpressure,
-        // in case too many publishers/calls start accumulating.
-        var options = new BoundedChannelOptions(100)
-        {
-            FullMode = BoundedChannelFullMode.Wait,
-        };
-        _queue = Channel.CreateBounded<Func<Task<WebhookResponseModel>>>(options);
-    }
+    private readonly ConcurrentQueue<Func<Task<WebhookResponseModel>>> _queue = new();
+    private readonly SemaphoreSlim _signal = new(0);
 
     public async Task QueueBackgroundWorkItemAsync(Func<Task<WebhookResponseModel>> workItem)
     {
         ArgumentNullException.ThrowIfNull(workItem);
 
-        await _queue.Writer.WriteAsync(workItem);
+        _queue.Enqueue(workItem);
+        _signal.Release();
     }
 
-    public async Task<Func<Task<WebhookResponseModel>>> DequeueAsync()
+    public async Task<Func<Task<WebhookResponseModel>>?> DequeueAsync()
     {
-        Func<Task<WebhookResponseModel>> workItem = await _queue.Reader.ReadAsync();
-
+        await _signal.WaitAsync();
+        _queue.TryDequeue(out Func<Task<WebhookResponseModel>>? workItem);
         return workItem;
     }
 }

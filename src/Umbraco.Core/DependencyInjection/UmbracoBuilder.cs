@@ -331,7 +331,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IWebHookService, WebhookService>();
             Services.AddUnique<IWebhookLogService, WebhookLogService>();
             Services.AddUnique<IWebhookLogFactory, WebhookLogFactory>();
-            Services.AddUnique<IWebhookBackgroundTaskQueue, WebhookBackgroundTaskQueue>();
+            Services.AddSingleton<IWebhookBackgroundTaskQueue, WebhookBackgroundTaskQueue>();
         }
     }
 }

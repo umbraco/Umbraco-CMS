@@ -19,15 +19,19 @@ public class WebhookQueuedHostedService : RecurringHostedServiceBase
 
     private async Task BackgroundProcessing()
     {
-        Func<Task<WebhookResponseModel>> workItem = await _taskQueue.DequeueAsync();
 
-        try
+        while (await _taskQueue.DequeueAsync() is Func<Task<WebhookResponseModel>> workItem)
         {
-            WebhookResponseModel response = await workItem();
+            try
+            {
+                WebhookResponseModel response = await workItem();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred executing {WorkItem}.", nameof(workItem));
+            }
         }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error occurred executing {WorkItem}.", nameof(workItem));
-        }
+
+
     }
 }

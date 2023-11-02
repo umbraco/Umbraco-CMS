@@ -6,5 +6,5 @@ public interface IWebhookBackgroundTaskQueue
 {
     Task QueueBackgroundWorkItemAsync(Func<Task<WebhookResponseModel>> workItem);
 
-    Task<Func<Task<WebhookResponseModel>>> DequeueAsync();
+    Task<Func<Task<WebhookResponseModel>>?> DequeueAsync();
 }
