@@ -1,4 +1,3 @@
-import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { RichTextRuleModelSortable, UmbStylesheetWorkspaceContext } from '../../stylesheet-workspace.context.js';
 import { UMB_MODAL_TEMPLATING_STYLESHEET_RTF_STYLE_SIDEBAR } from '../../manifests.js';
 import {
@@ -11,7 +10,7 @@ import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UMB_MODAL_MANAGER_CONTEXT_TOKEN, UmbModalManagerContext, UmbModalToken } from '@umbraco-cms/backoffice/modal';
 import { RichTextRuleModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbSorterConfig, UmbSorterController } from '@umbraco-cms/backoffice/sorter';
-import { ifDefined, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, ifDefined, repeat } from '@umbraco-cms/backoffice/external/lit';
 
 import './stylesheet-workspace-view-rich-text-editor-rule.element.js';
 
