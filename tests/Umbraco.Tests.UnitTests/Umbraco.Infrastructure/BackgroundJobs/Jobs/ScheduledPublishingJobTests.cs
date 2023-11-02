@@ -14,58 +14,22 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure;
+using Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
 using Umbraco.Cms.Infrastructure.HostedServices;
 
-namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HostedServices;
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.BackgroundJobs.Jobs;
 
 [TestFixture]
-[Obsolete("Replaced by BackgroundJobs.Jobs.ScheduledPublishingJobTests")]
-public class ScheduledPublishingTests
+public class ScheduledPublishingJobTests
 {
     private Mock<IContentService> _mockContentService;
-    private Mock<ILogger<ScheduledPublishing>> _mockLogger;
+    private Mock<ILogger<ScheduledPublishingJob>> _mockLogger;
 
     [Test]
     public async Task Does_Not_Execute_When_Not_Enabled()
     {
-        var sut = CreateScheduledPublishing(false);
-        await sut.PerformExecuteAsync(null);
-        VerifyScheduledPublishingNotPerformed();
-    }
-
-    [TestCase(RuntimeLevel.Boot)]
-    [TestCase(RuntimeLevel.Install)]
-    [TestCase(RuntimeLevel.Unknown)]
-    [TestCase(RuntimeLevel.Upgrade)]
-    [TestCase(RuntimeLevel.BootFailed)]
-    public async Task Does_Not_Execute_When_Runtime_State_Is_Not_Run(RuntimeLevel runtimeLevel)
-    {
-        var sut = CreateScheduledPublishing(runtimeLevel: runtimeLevel);
-        await sut.PerformExecuteAsync(null);
-        VerifyScheduledPublishingNotPerformed();
-    }
-
-    [Test]
-    public async Task Does_Not_Execute_When_Server_Role_Is_Subscriber()
-    {
-        var sut = CreateScheduledPublishing(serverRole: ServerRole.Subscriber);
-        await sut.PerformExecuteAsync(null);
-        VerifyScheduledPublishingNotPerformed();
-    }
-
-    [Test]
-    public async Task Does_Not_Execute_When_Server_Role_Is_Unknown()
-    {
-        var sut = CreateScheduledPublishing(serverRole: ServerRole.Unknown);
-        await sut.PerformExecuteAsync(null);
-        VerifyScheduledPublishingNotPerformed();
-    }
-
-    [Test]
-    public async Task Does_Not_Execute_When_Not_Main_Dom()
-    {
-        var sut = CreateScheduledPublishing(isMainDom: false);
-        await sut.PerformExecuteAsync(null);
+        var sut = CreateScheduledPublishing(enabled: false);
+        await sut.RunJobAsync();
         VerifyScheduledPublishingNotPerformed();
     }
 
@@ -73,15 +37,12 @@ public class ScheduledPublishingTests
     public async Task Executes_And_Performs_Scheduled_Publishing()
     {
         var sut = CreateScheduledPublishing();
-        await sut.PerformExecuteAsync(null);
+        await sut.RunJobAsync();
         VerifyScheduledPublishingPerformed();
     }
 
-    private ScheduledPublishing CreateScheduledPublishing(
-        bool enabled = true,
-        RuntimeLevel runtimeLevel = RuntimeLevel.Run,
-        ServerRole serverRole = ServerRole.Single,
-        bool isMainDom = true)
+    private ScheduledPublishingJob CreateScheduledPublishing(
+        bool enabled = true)
     {
         if (enabled)
         {
@@ -92,22 +53,13 @@ public class ScheduledPublishingTests
             Suspendable.ScheduledPublishing.Suspend();
         }
 
-        var mockRunTimeState = new Mock<IRuntimeState>();
-        mockRunTimeState.SetupGet(x => x.Level).Returns(runtimeLevel);
-
-        var mockServerRegistrar = new Mock<IServerRoleAccessor>();
-        mockServerRegistrar.Setup(x => x.CurrentServerRole).Returns(serverRole);
-
-        var mockMainDom = new Mock<IMainDom>();
-        mockMainDom.SetupGet(x => x.IsMainDom).Returns(isMainDom);
-
         _mockContentService = new Mock<IContentService>();
 
         var mockUmbracoContextFactory = new Mock<IUmbracoContextFactory>();
         mockUmbracoContextFactory.Setup(x => x.EnsureUmbracoContext())
             .Returns(new UmbracoContextReference(null, false, null));
 
-        _mockLogger = new Mock<ILogger<ScheduledPublishing>>();
+        _mockLogger = new Mock<ILogger<ScheduledPublishingJob>>();
 
         var mockServerMessenger = new Mock<IServerMessenger>();
 
@@ -123,10 +75,7 @@ public class ScheduledPublishingTests
                 It.IsAny<bool>()))
             .Returns(Mock.Of<IScope>());
 
-        return new ScheduledPublishing(
-            mockRunTimeState.Object,
-            mockMainDom.Object,
-            mockServerRegistrar.Object,
+        return new ScheduledPublishingJob(
             _mockContentService.Object,
             mockUmbracoContextFactory.Object,
             _mockLogger.Object,

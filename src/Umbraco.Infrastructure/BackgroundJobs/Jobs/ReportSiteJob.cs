@@ -8,49 +8,43 @@ using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Core.Telemetry;
 using Umbraco.Cms.Core.Telemetry.Models;
 
-namespace Umbraco.Cms.Infrastructure.HostedServices;
+namespace Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
 
-[Obsolete("Use Umbraco.Cms.Infrastructure.BackgroundJobs.ReportSiteJob instead.  This class will be removed in Umbraco 14.")]
-public class ReportSiteTask : RecurringHostedServiceBase
+public class ReportSiteJob : IRecurringBackgroundJob
 {
-    private static HttpClient _httpClient = new();
-    private readonly ILogger<ReportSiteTask> _logger;
-    private readonly ITelemetryService _telemetryService;
-    private readonly IRuntimeState _runtimeState;
 
-    public ReportSiteTask(
-        ILogger<ReportSiteTask> logger,
-        ITelemetryService telemetryService,
-        IRuntimeState runtimeState)
-        : base(logger, TimeSpan.FromDays(1), TimeSpan.FromMinutes(5))
+    public TimeSpan Period { get => TimeSpan.FromDays(1); }
+    public TimeSpan Delay { get => TimeSpan.FromMinutes(5); }
+    public ServerRole[] ServerRoles { get => Enum.GetValues<ServerRole>(); }
+
+    // No-op event as the period never changes on this job
+    public event EventHandler PeriodChanged { add { } remove { } }
+
+
+    private static HttpClient _httpClient = new();
+    private readonly ILogger<ReportSiteJob> _logger;
+    private readonly ITelemetryService _telemetryService;
+    
+
+    public ReportSiteJob(
+        ILogger<ReportSiteJob> logger,
+        ITelemetryService telemetryService)
     {
         _logger = logger;
         _telemetryService = telemetryService;
-        _runtimeState = runtimeState;
         _httpClient = new HttpClient();
     }
 
-    [Obsolete("Use the constructor that takes IRuntimeState, scheduled for removal in V12")]
-    public ReportSiteTask(
-        ILogger<ReportSiteTask> logger,
-        ITelemetryService telemetryService)
-        : this(logger, telemetryService, StaticServiceProvider.Instance.GetRequiredService<IRuntimeState>())
+    /// <summary>
+    /// Runs the background task to send the anonymous ID
+    /// to telemetry service
+    /// </summary>
+    public  async Task RunJobAsync()
     {
-    }
-
-        /// <summary>
-        /// Runs the background task to send the anonymous ID
-        /// to telemetry service
-        /// </summary>
-        public override async Task PerformExecuteAsync(object? state){
-        if (_runtimeState.Level is not RuntimeLevel.Run)
-        {
-            // We probably haven't installed yet, so we can't get telemetry.
-            return;
-        }
 
         if (_telemetryService.TryGetTelemetryReportData(out TelemetryReportData? telemetryReportData) is false)
         {
@@ -92,10 +86,7 @@ public class ReportSiteTask : RecurringHostedServiceBase
             // Silently swallow
             // The user does not need the logs being polluted if our service has fallen over or is down etc
             // Hence only logging this at a more verbose level (which users should not be using in production)
-            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
-            {
-                _logger.LogDebug("There was a problem sending a request to the Umbraco telemetry service");
-            }
+            _logger.LogDebug("There was a problem sending a request to the Umbraco telemetry service");
         }
     }
 }

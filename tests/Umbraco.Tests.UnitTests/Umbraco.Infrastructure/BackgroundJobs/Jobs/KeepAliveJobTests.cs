@@ -15,14 +15,14 @@ using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Sync;
+using Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
 using Umbraco.Cms.Infrastructure.HostedServices;
 using Umbraco.Cms.Tests.Common;
 
-namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HostedServices;
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.BackgroundJobs.Jobs;
 
 [TestFixture]
-[Obsolete("Replaced by BackgroundJobs.Jobs.KeepAliveJobTests")]
-public class KeepAliveTests
+public class KeepAliveJobTests
 {
     private Mock<HttpMessageHandler> _mockHttpMessageHandler;
 
@@ -32,46 +32,21 @@ public class KeepAliveTests
     public async Task Does_Not_Execute_When_Not_Enabled()
     {
         var sut = CreateKeepAlive(false);
-        await sut.PerformExecuteAsync(null);
+        await sut.RunJobAsync();
         VerifyKeepAliveRequestNotSent();
     }
 
-    [Test]
-    public async Task Does_Not_Execute_When_Server_Role_Is_Subscriber()
-    {
-        var sut = CreateKeepAlive(serverRole: ServerRole.Subscriber);
-        await sut.PerformExecuteAsync(null);
-        VerifyKeepAliveRequestNotSent();
-    }
-
-    [Test]
-    public async Task Does_Not_Execute_When_Server_Role_Is_Unknown()
-    {
-        var sut = CreateKeepAlive(serverRole: ServerRole.Unknown);
-        await sut.PerformExecuteAsync(null);
-        VerifyKeepAliveRequestNotSent();
-    }
-
-    [Test]
-    public async Task Does_Not_Execute_When_Not_Main_Dom()
-    {
-        var sut = CreateKeepAlive(isMainDom: false);
-        await sut.PerformExecuteAsync(null);
-        VerifyKeepAliveRequestNotSent();
-    }
 
     [Test]
     public async Task Executes_And_Calls_Ping_Url()
     {
         var sut = CreateKeepAlive();
-        await sut.PerformExecuteAsync(null);
+        await sut.RunJobAsync();
         VerifyKeepAliveRequestSent();
     }
 
-    private KeepAlive CreateKeepAlive(
-        bool enabled = true,
-        ServerRole serverRole = ServerRole.Single,
-        bool isMainDom = true)
+    private KeepAliveJob CreateKeepAlive(
+        bool enabled = true)
     {
         var settings = new KeepAliveSettings { DisableKeepAliveTask = !enabled };
 
@@ -80,14 +55,8 @@ public class KeepAliveTests
         mockHostingEnvironment.Setup(x => x.ToAbsolute(It.IsAny<string>()))
             .Returns((string s) => s.TrimStart('~'));
 
-        var mockServerRegistrar = new Mock<IServerRoleAccessor>();
-        mockServerRegistrar.Setup(x => x.CurrentServerRole).Returns(serverRole);
-
-        var mockMainDom = new Mock<IMainDom>();
-        mockMainDom.SetupGet(x => x.IsMainDom).Returns(isMainDom);
-
         var mockScopeProvider = new Mock<IScopeProvider>();
-        var mockLogger = new Mock<ILogger<KeepAlive>>();
+        var mockLogger = new Mock<ILogger<KeepAliveJob>>();
         var mockProfilingLogger = new Mock<IProfilingLogger>();
 
         _mockHttpMessageHandler = new Mock<HttpMessageHandler>();
@@ -104,13 +73,11 @@ public class KeepAliveTests
         var mockHttpClientFactory = new Mock<IHttpClientFactory>(MockBehavior.Strict);
         mockHttpClientFactory.Setup(x => x.CreateClient(It.IsAny<string>())).Returns(httpClient);
 
-        return new KeepAlive(
+        return new KeepAliveJob(
             mockHostingEnvironment.Object,
-            mockMainDom.Object,
             new TestOptionsMonitor<KeepAliveSettings>(settings),
             mockLogger.Object,
             mockProfilingLogger.Object,
-            mockServerRegistrar.Object,
             mockHttpClientFactory.Object);
     }
 

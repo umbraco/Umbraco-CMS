@@ -10,37 +10,26 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
+using Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs.ServerRegistration;
 using Umbraco.Cms.Infrastructure.HostedServices.ServerRegistration;
 using Umbraco.Cms.Tests.Common;
 
-namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HostedServices.ServerRegistration;
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.BackgroundJobs.Jobs.ServerRegistration;
 
 [TestFixture]
-[Obsolete("Replaced by BackgroundJobs.Jobs.ServerRegistration.TouchServerJobTests")]
-public class TouchServerTaskTests
+public class TouchServerJobTests
 {
     private Mock<IServerRegistrationService> _mockServerRegistrationService;
 
     private const string ApplicationUrl = "https://mysite.com/";
     private readonly TimeSpan _staleServerTimeout = TimeSpan.FromMinutes(2);
 
-    [TestCase(RuntimeLevel.Boot)]
-    [TestCase(RuntimeLevel.Install)]
-    [TestCase(RuntimeLevel.Unknown)]
-    [TestCase(RuntimeLevel.Upgrade)]
-    [TestCase(RuntimeLevel.BootFailed)]
-    public async Task Does_Not_Execute_When_Runtime_State_Is_Not_Run(RuntimeLevel runtimeLevel)
-    {
-        var sut = CreateTouchServerTask(runtimeLevel);
-        await sut.PerformExecuteAsync(null);
-        VerifyServerNotTouched();
-    }
 
     [Test]
     public async Task Does_Not_Execute_When_Application_Url_Is_Not_Available()
     {
         var sut = CreateTouchServerTask(applicationUrl: string.Empty);
-        await sut.PerformExecuteAsync(null);
+        await sut.RunJobAsync();
         VerifyServerNotTouched();
     }
 
@@ -48,7 +37,7 @@ public class TouchServerTaskTests
     public async Task Executes_And_Touches_Server()
     {
         var sut = CreateTouchServerTask();
-        await sut.PerformExecuteAsync(null);
+        await sut.RunJobAsync();
         VerifyServerTouched();
     }
 
@@ -56,11 +45,11 @@ public class TouchServerTaskTests
     public async Task Does_Not_Execute_When_Role_Accessor_Is_Not_Elected()
     {
         var sut = CreateTouchServerTask(useElection: false);
-        await sut.PerformExecuteAsync(null);
+        await sut.RunJobAsync();
         VerifyServerNotTouched();
     }
 
-    private TouchServerTask CreateTouchServerTask(
+    private TouchServerJob CreateTouchServerTask(
         RuntimeLevel runtimeLevel = RuntimeLevel.Run,
         string applicationUrl = ApplicationUrl,
         bool useElection = true)
@@ -72,7 +61,7 @@ public class TouchServerTaskTests
         var mockRunTimeState = new Mock<IRuntimeState>();
         mockRunTimeState.SetupGet(x => x.Level).Returns(runtimeLevel);
 
-        var mockLogger = new Mock<ILogger<TouchServerTask>>();
+        var mockLogger = new Mock<ILogger<TouchServerJob>>();
 
         _mockServerRegistrationService = new Mock<IServerRegistrationService>();
 
@@ -85,8 +74,7 @@ public class TouchServerTaskTests
             ? new ElectedServerRoleAccessor(_mockServerRegistrationService.Object)
             : new SingleServerRoleAccessor();
 
-        return new TouchServerTask(
-            mockRunTimeState.Object,
+        return new TouchServerJob(
             _mockServerRegistrationService.Object,
             mockRequestAccessor.Object,
             mockLogger.Object,

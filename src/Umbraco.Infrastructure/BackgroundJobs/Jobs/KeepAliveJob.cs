@@ -12,85 +12,56 @@ using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Infrastructure.HostedServices;
+namespace Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
 
 /// <summary>
 ///     Hosted service implementation for keep alive feature.
 /// </summary>
-[Obsolete("Use Umbraco.Cms.Infrastructure.BackgroundJobs.KeepAliveJob instead.  This class will be removed in Umbraco 14.")]
-public class KeepAlive : RecurringHostedServiceBase
+public class KeepAliveJob : IRecurringBackgroundJob
 {
+    public TimeSpan Period { get => TimeSpan.FromMinutes(5); }
+
+    // No-op event as the period never changes on this job
+    public event EventHandler PeriodChanged { add { } remove { } }
+
     private readonly IHostingEnvironment _hostingEnvironment;
     private readonly IHttpClientFactory _httpClientFactory;
-    private readonly ILogger<KeepAlive> _logger;
-    private readonly IMainDom _mainDom;
+    private readonly ILogger<KeepAliveJob> _logger;
     private readonly IProfilingLogger _profilingLogger;
-    private readonly IServerRoleAccessor _serverRegistrar;
     private KeepAliveSettings _keepAliveSettings;
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="KeepAlive" /> class.
+    ///     Initializes a new instance of the <see cref="KeepAliveJob" /> class.
     /// </summary>
     /// <param name="hostingEnvironment">The current hosting environment</param>
-    /// <param name="mainDom">Representation of the main application domain.</param>
     /// <param name="keepAliveSettings">The configuration for keep alive settings.</param>
     /// <param name="logger">The typed logger.</param>
     /// <param name="profilingLogger">The profiling logger.</param>
-    /// <param name="serverRegistrar">Provider of server registrations to the distributed cache.</param>
     /// <param name="httpClientFactory">Factory for <see cref="HttpClient" /> instances.</param>
-    public KeepAlive(
+    public KeepAliveJob(
         IHostingEnvironment hostingEnvironment,
-        IMainDom mainDom,
         IOptionsMonitor<KeepAliveSettings> keepAliveSettings,
-        ILogger<KeepAlive> logger,
+        ILogger<KeepAliveJob> logger,
         IProfilingLogger profilingLogger,
-        IServerRoleAccessor serverRegistrar,
         IHttpClientFactory httpClientFactory)
-        : base(logger, TimeSpan.FromMinutes(5), DefaultDelay)
     {
         _hostingEnvironment = hostingEnvironment;
-        _mainDom = mainDom;
         _keepAliveSettings = keepAliveSettings.CurrentValue;
         _logger = logger;
         _profilingLogger = profilingLogger;
-        _serverRegistrar = serverRegistrar;
         _httpClientFactory = httpClientFactory;
 
         keepAliveSettings.OnChange(x => _keepAliveSettings = x);
     }
 
-    public override async Task PerformExecuteAsync(object? state)
+    public async Task RunJobAsync()
     {
         if (_keepAliveSettings.DisableKeepAliveTask)
         {
             return;
         }
 
-        // Don't run on replicas nor unknown role servers
-        switch (_serverRegistrar.CurrentServerRole)
-        {
-            case ServerRole.Subscriber:
-                if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
-                {
-                    _logger.LogDebug("Does not run on subscriber servers.");
-                }
-                return;
-            case ServerRole.Unknown:
-                if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
-                {
-                    _logger.LogDebug("Does not run on servers with unknown role.");
-                }
-                return;
-        }
-
-        // Ensure we do not run if not main domain, but do NOT lock it
-        if (_mainDom.IsMainDom == false)
-        {
-            _logger.LogDebug("Does not run if not MainDom.");
-            return;
-        }
-
-        using (!_profilingLogger.IsEnabled(Core.Logging.LogLevel.Debug) ? null : _profilingLogger.DebugDuration<KeepAlive>("Keep alive executing", "Keep alive complete"))
+        using (_profilingLogger.DebugDuration<KeepAliveJob>("Keep alive executing", "Keep alive complete"))
         {
             var umbracoAppUrl = _hostingEnvironment.ApplicationMainUrl?.ToString();
             if (umbracoAppUrl.IsNullOrWhiteSpace())

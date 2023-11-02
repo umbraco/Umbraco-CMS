@@ -15,105 +15,74 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Infrastructure.HostedServices;
+namespace Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
 
 /// <summary>
 ///     Hosted service implementation for recurring health check notifications.
 /// </summary>
-[Obsolete("Use Umbraco.Cms.Infrastructure.BackgroundJobs.HealthCheckNotifierJob instead.  This class will be removed in Umbraco 14.")]
-public class HealthCheckNotifier : RecurringHostedServiceBase
+public class HealthCheckNotifierJob : IRecurringBackgroundJob
 {
+    
+
+    public TimeSpan Period { get; private set; }
+    public TimeSpan Delay { get; private set; }
+
+    private event EventHandler? _periodChanged;
+    public event EventHandler PeriodChanged
+    {
+        add { _periodChanged += value; }
+        remove { _periodChanged -= value; }
+    }
+
     private readonly HealthCheckCollection _healthChecks;
-    private readonly ILogger<HealthCheckNotifier> _logger;
-    private readonly IMainDom _mainDom;
+    private readonly ILogger<HealthCheckNotifierJob> _logger;
     private readonly HealthCheckNotificationMethodCollection _notifications;
     private readonly IProfilingLogger _profilingLogger;
-    private readonly IRuntimeState _runtimeState;
     private readonly ICoreScopeProvider _scopeProvider;
-    private readonly IServerRoleAccessor _serverRegistrar;
     private HealthChecksSettings _healthChecksSettings;
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="HealthCheckNotifier" /> class.
+    ///     Initializes a new instance of the <see cref="HealthCheckNotifierJob" /> class.
     /// </summary>
     /// <param name="healthChecksSettings">The configuration for health check settings.</param>
     /// <param name="healthChecks">The collection of healthchecks.</param>
     /// <param name="notifications">The collection of healthcheck notification methods.</param>
-    /// <param name="runtimeState">Representation of the state of the Umbraco runtime.</param>
-    /// <param name="serverRegistrar">Provider of server registrations to the distributed cache.</param>
-    /// <param name="mainDom">Representation of the main application domain.</param>
     /// <param name="scopeProvider">Provides scopes for database operations.</param>
     /// <param name="logger">The typed logger.</param>
     /// <param name="profilingLogger">The profiling logger.</param>
     /// <param name="cronTabParser">Parser of crontab expressions.</param>
-    public HealthCheckNotifier(
+    public HealthCheckNotifierJob(
         IOptionsMonitor<HealthChecksSettings> healthChecksSettings,
         HealthCheckCollection healthChecks,
         HealthCheckNotificationMethodCollection notifications,
-        IRuntimeState runtimeState,
-        IServerRoleAccessor serverRegistrar,
-        IMainDom mainDom,
         ICoreScopeProvider scopeProvider,
-        ILogger<HealthCheckNotifier> logger,
+        ILogger<HealthCheckNotifierJob> logger,
         IProfilingLogger profilingLogger,
         ICronTabParser cronTabParser)
-        : base(
-            logger,
-            healthChecksSettings.CurrentValue.Notification.Period,
-            GetDelay(healthChecksSettings.CurrentValue.Notification.FirstRunTime, cronTabParser, logger, DefaultDelay))
     {
         _healthChecksSettings = healthChecksSettings.CurrentValue;
         _healthChecks = healthChecks;
         _notifications = notifications;
-        _runtimeState = runtimeState;
-        _serverRegistrar = serverRegistrar;
-        _mainDom = mainDom;
         _scopeProvider = scopeProvider;
         _logger = logger;
         _profilingLogger = profilingLogger;
 
+        Period = healthChecksSettings.CurrentValue.Notification.Period;
+        Delay = DelayCalculator.GetDelay(healthChecksSettings.CurrentValue.Notification.FirstRunTime, cronTabParser, logger, TimeSpan.FromMinutes(3));
+
+
         healthChecksSettings.OnChange(x =>
         {
             _healthChecksSettings = x;
-            ChangePeriod(x.Notification.Period);
+            Period = x.Notification.Period;
+            _periodChanged?.Invoke(this, EventArgs.Empty);
         });
     }
 
-    public override async Task PerformExecuteAsync(object? state)
+    public async Task RunJobAsync()
     {
         if (_healthChecksSettings.Notification.Enabled == false)
         {
-            return;
-        }
-
-        if (_runtimeState.Level != RuntimeLevel.Run)
-        {
-            return;
-        }
-
-        switch (_serverRegistrar.CurrentServerRole)
-        {
-            case ServerRole.Subscriber:
-                if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
-                {
-                    _logger.LogDebug("Does not run on subscriber servers.");
-                }
-                return;
-            case ServerRole.Unknown:
-                if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
-                {
-                    _logger.LogDebug("Does not run on servers with unknown role.");
-                }
-                return;
-        }
-
-        // Ensure we do not run if not main domain, but do NOT lock it
-        if (_mainDom.IsMainDom == false)
-        {
-            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
-            {
-                _logger.LogDebug("Does not run if not MainDom.");
-            }
             return;
         }
 
@@ -121,7 +90,7 @@ public class HealthCheckNotifier : RecurringHostedServiceBase
         // checks can be making service/database calls so we want to ensure the CallContext/Ambient scope
         // isn't used since that can be problematic.
         using (ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true))
-        using (!_profilingLogger.IsEnabled(Core.Logging.LogLevel.Debug) ? null : _profilingLogger.DebugDuration<HealthCheckNotifier>("Health checks executing", "Health checks complete"))
+        using (_profilingLogger.DebugDuration<HealthCheckNotifierJob>("Health checks executing", "Health checks complete"))
         {
             // Don't notify for any checks that are disabled, nor for any disabled just for notifications.
             Guid[] disabledCheckIds = _healthChecksSettings.Notification.DisabledChecks
