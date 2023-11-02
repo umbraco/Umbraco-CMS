@@ -1,7 +1,7 @@
 import icons from '../../../../../shared/icon-registry/icons/icons.json' assert { type: 'json' };
 import type { UUIColorSwatchesEvent } from '@umbraco-cms/backoffice/external/uui';
 
-import { css, html, styleMap, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, styleMap, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 import { UmbIconPickerModalData, UmbIconPickerModalValue, UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
@@ -10,10 +10,12 @@ import { UmbIconPickerModalData, UmbIconPickerModalValue, UmbModalBaseElement } 
 // TODO: to prevent element extension we need to move the Picker logic into a separate class we can reuse across all pickers
 @customElement('umb-icon-picker-modal')
 export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPickerModalData, UmbIconPickerModalValue> {
-	private _iconList = icons.map((icon) => icon.name);
+
+
+	private _iconList = icons.map((icon) => icon);
 
 	@state()
-	private _iconListFiltered: Array<string> = [];
+	private _iconListFiltered: Array<(typeof icons)[0]> = [];
 
 	// TODO: Make sure we do not store colors, but color-aliases.
 	@state()
@@ -54,7 +56,7 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 
 	#filterIcons(e: { target: HTMLInputElement }) {
 		if (e.target.value) {
-			this._iconListFiltered = this._iconList.filter((icon) => icon.includes(e.target.value));
+			this._iconListFiltered = this._iconList.filter((icon) => icon.name.includes(e.target.value));
 		} else {
 			this._iconListFiltered = this._iconList;
 		}
@@ -75,7 +77,7 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 	connectedCallback() {
 		super.connectedCallback();
 		this._currentColor = this.data?.color ?? this._colorList[0];
-		this._currentIcon = this.data?.icon ?? this._iconList[0];
+		this._currentIcon = this.data?.icon ?? this._iconList[0].name;
 		this._iconListFiltered = this._iconList;
 	}
 
@@ -117,21 +119,22 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 	}
 
 	renderIconSelection() {
-		return html`${this._iconListFiltered.map((icon) => {
-			return html`
+		return repeat(this._iconListFiltered,
+			(icon) => icon.name,
+			(icon) => html`
 				<uui-icon
 					tabindex="0"
 					style=${styleMap({ color: this._currentColor })}
-					class="icon ${icon === this._currentIcon ? 'selected' : ''}"
-					title="${icon}"
-					name="${icon}"
-					label="${icon}"
-					id="${icon}"
+					class="icon ${icon.name === this._currentIcon ? 'selected' : ''}"
+					title="${icon.name}"
+					name="${icon.name}"
+					label="${icon.name}"
+					id="${icon.name}"
 					@click="${this.#changeIcon}"
 					@keyup="${this.#changeIcon}">
 				</uui-icon>
-			`;
-		})}`;
+			`
+		);
 	}
 
 	static styles = [
