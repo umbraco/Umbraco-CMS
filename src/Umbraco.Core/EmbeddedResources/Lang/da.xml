@@ -847,7 +847,7 @@
     <key alias="username">Brugernavn</key>
     <key alias="value">Værdi</key>
     <key alias="view">Vis</key>
-    <key alias="welcome">Velkommen...</key>
+    <key alias="welcome">Velkommen</key>
     <key alias="width">Bredde</key>
     <key alias="yes">Ja</key>
     <key alias="folder">Mappe</key>

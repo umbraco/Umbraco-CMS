@@ -714,7 +714,7 @@
     <key alias="username">Uživatelské jméno</key>
     <key alias="value">Hodnota</key>
     <key alias="view">Pohled</key>
-    <key alias="welcome">Vítejte...</key>
+    <key alias="welcome">Vítejte</key>
     <key alias="width">Šířka</key>
     <key alias="yes">Ano</key>
     <key alias="folder">Složka</key>
