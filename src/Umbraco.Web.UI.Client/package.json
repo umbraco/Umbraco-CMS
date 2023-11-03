@@ -122,8 +122,8 @@
 		"prepublishOnly": "node ./devops/publish/cleanse-pkg.js"
 	},
 	"engines": {
-		"node": ">=18.14 <19",
-		"npm": ">=9.5 < 10"
+		"node": ">=20.9 <21",
+		"npm": ">=10.1 < 11"
 	},
 	"dependencies": {
 		"@openid/appauth": "^1.3.1",
