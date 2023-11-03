@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Core.Services;
 public interface IUserGroupPermissionService
 {
     /// <summary>
-    ///     Authorize that the current user has access to the specified user group.
+    ///     Authorize that the current user belongs to the specified user group.
     /// </summary>
     /// <param name="performingUser">The user performing the operation.</param>
     /// <param name="userGroupKey">The identifier of the user group to check for access.</param>
