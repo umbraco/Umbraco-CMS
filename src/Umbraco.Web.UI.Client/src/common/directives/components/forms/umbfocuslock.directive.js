@@ -124,7 +124,8 @@
                 }
                 else if(defaultFocusedElement === null ){
                     // If the first focusable elements are either items from the umb-sub-views-nav menu or the umb-button-ellipsis we most likely want to start the focus on the second item
-                    var avoidStartElm = focusableElements.findIndex(elm => elm.classList.contains('umb-button-ellipsis') || elm.classList.contains('umb-sub-views-nav-item__action') || elm.classList.contains('umb-tab-button'));
+                    // We don't want to focus the second button if it's in a tab otherwise the second tab is highlighted as well as the first tab
+                    var avoidStartElm = focusableElements.findIndex(elm => elm.classList.contains('umb-button-ellipsis') || elm.classList.contains('umb-sub-views-nav-item__action') || (elm.classList.contains('umb-tab-button') && !elm.parent.classList.contains('umb-tab')));
 
                     if(avoidStartElm === 0) {
                         focusableElements[1].focus();

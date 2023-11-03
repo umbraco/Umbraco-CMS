@@ -844,6 +844,7 @@
     <key alias="search">Search</key>
     <key alias="searchNoResult">Sorry, we can not find what you are looking for.</key>
     <key alias="noItemsInList">No items have been added</key>
+    <key alias="selectAll">Select all</key>
     <key alias="server">Server</key>
     <key alias="settings">Settings</key>
     <key alias="shared">Shared</key>
@@ -1479,6 +1480,10 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="rollbackTo">Rollback to</key>
     <key alias="selectVersion">Select version</key>
     <key alias="view">View</key>
+    <key alias="pagination"><![CDATA[Showing version %0% to %1% of %2% versions]]></key>
+    <key alias="versions">Versions</key>
+    <key alias="currentDraftVersion">Current draft version</key>
+    <key alias="currentPublishedVersion">Current published version</key>
   </area>
   <area alias="scripts">
     <key alias="editscript">Edit script file</key>

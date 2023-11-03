@@ -5,7 +5,7 @@ namespace Umbraco.Cms.Persistence.EFCore.Sqlite;
 
 public class SqliteMigrationProviderSetup : IMigrationProviderSetup
 {
-    public string ProviderName => "Microsoft.Data.Sqlite";
+    public string ProviderName => Constants.ProviderNames.SQLLite;
 
     public void Setup(DbContextOptionsBuilder builder, string? connectionString)
     {
