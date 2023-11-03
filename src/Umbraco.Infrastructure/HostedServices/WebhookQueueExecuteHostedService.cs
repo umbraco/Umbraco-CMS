@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
@@ -6,19 +7,16 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Infrastructure.HostedServices;
 
-public class WebhookQueueExecuteHostedService : RecurringHostedServiceBase
+public class WebhookQueueExecuteHostedService : BackgroundService
 {
     private readonly IWebhookBackgroundTaskQueue _taskQueue;
     private readonly WebhookSettings _webhookSettings;
 
     public WebhookQueueExecuteHostedService(ILogger<QueuedHostedService> logger, IWebhookBackgroundTaskQueue taskQueue, IOptions<WebhookSettings> webhookSettings)
-        : base(logger, TimeSpan.FromSeconds(10), TimeSpan.FromMinutes(1))
     {
         _taskQueue = taskQueue;
         _webhookSettings = webhookSettings.Value;
     }
-
-    public override async Task PerformExecuteAsync(object? state) => await BackgroundProcessing();
 
     private async Task BackgroundProcessing()
     {
@@ -57,4 +55,6 @@ public class WebhookQueueExecuteHostedService : RecurringHostedServiceBase
             return TimeSpan.FromMilliseconds(delay);
         }
     }
+
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken) => await BackgroundProcessing();
 }
