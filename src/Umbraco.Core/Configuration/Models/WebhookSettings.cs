@@ -31,4 +31,15 @@ public class WebhookSettings
     /// </remarks>
     [DefaultValue(StaticMaximumRetries)]
     public int MaximumRetries { get; set; } = StaticMaximumRetries;
+
+    /// <summary>
+    ///     Gets or sets a value indicating the increments of the delay between retries..
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         By default, maximum number of retries is 5, and thus this array also have 5 values in it.
+    ///         If  the maximum number of retries is higher than the counter of the delay, the last value in the array is used.
+    ///     </para>
+    /// </remarks>
+    public int[] RetryDelaysInMilliseconds { get; set; } = new int[] { 500, 1000, 5000, 10000, 30000 };
 }

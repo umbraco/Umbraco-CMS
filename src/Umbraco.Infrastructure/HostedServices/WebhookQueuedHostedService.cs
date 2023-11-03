@@ -33,6 +33,7 @@ public class WebhookQueuedHostedService : RecurringHostedServiceBase
 
             response.RetryCount++;
             await _taskQueue.QueueBackgroundWorkItemAsync(() => RetryWorkItem(workItem, response.RetryCount));
+            await Task.Delay(CalculateDelay(response.RetryCount));
         }
     }
 
@@ -41,5 +42,19 @@ public class WebhookQueuedHostedService : RecurringHostedServiceBase
         WebhookResponseModel response = await originalWorkItem();
         response.RetryCount = retryCount;
         return response;
+    }
+
+    private TimeSpan CalculateDelay(int retryCount)
+    {
+        if (retryCount < _webhookSettings.RetryDelaysInMilliseconds.Length)
+        {
+            var delay = _webhookSettings.RetryDelaysInMilliseconds[retryCount];
+            return TimeSpan.FromMilliseconds(delay);
+        }
+        else
+        {
+            var delay = _webhookSettings.RetryDelaysInMilliseconds.Last();
+            return TimeSpan.FromMilliseconds(delay);
+        }
     }
 }
