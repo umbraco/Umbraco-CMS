@@ -358,7 +358,7 @@ module.exports = {
 					const { value } = source;
 
 					// If import starts with any of the following, then it's allowed
-					if (['@umbraco-cms', '.'].some(v => value.startsWith(v))) {
+					if (['@umbraco-cms', '@open-wc/testing', '@storybook', '.'].some(v => value.startsWith(v))) {
 						return;
 					}
 
