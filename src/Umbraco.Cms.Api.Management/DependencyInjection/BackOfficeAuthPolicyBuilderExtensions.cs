@@ -2,11 +2,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 using OpenIddict.Validation.AspNetCore;
 using Umbraco.Cms.Api.Management.Security.Authorization;
-using Umbraco.Cms.Api.Management.Security.Authorization.Admin;
 using Umbraco.Cms.Api.Management.Security.Authorization.Content;
 using Umbraco.Cms.Api.Management.Security.Authorization.DenyLocalLogin;
 using Umbraco.Cms.Api.Management.Security.Authorization.Feature;
 using Umbraco.Cms.Api.Management.Security.Authorization.Media;
+using Umbraco.Cms.Api.Management.Security.Authorization.User;
 using Umbraco.Cms.Api.Management.Security.Authorization.UserGroup;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -23,6 +23,8 @@ internal static class BackOfficeAuthPolicyBuilderExtensions
         // NOTE: Even though we are registering these handlers globally they will only actually execute their logic for
         // any auth defining a matching requirement and scheme.
         builder.Services.AddSingleton<IAuthorizationHandler, ContentPermissionHandler>();
+        builder.Services.AddSingleton<IAuthorizationHandler, ContentRecycleBinPermissionHandler>();
+        builder.Services.AddSingleton<IAuthorizationHandler, ContentRootPermissionHandler>();
         builder.Services.AddSingleton<IAuthorizationHandler, DenyLocalLoginHandler>();
         builder.Services.AddSingleton<IAuthorizationHandler, FeatureAuthorizeHandler>();
         builder.Services.AddSingleton<IAuthorizationHandler, MediaPermissionHandler>();
