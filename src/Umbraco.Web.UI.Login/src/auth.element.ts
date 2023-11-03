@@ -50,6 +50,7 @@ const createForm = (elements: HTMLElement[]) => {
   const form = document.createElement('form');
   form.id = 'umb-login-form';
   form.name = 'login-form';
+  form.noValidate = true;
 
   elements.push(styles);
   elements.forEach((element) => form.appendChild(element));
