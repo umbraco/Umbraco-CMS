@@ -334,7 +334,7 @@
 
             if (block === null) return null;
 
-            block.view = (block.config.view ? block.config.view : getDefaultViewForBlock(block));
+            block.view = block.config.view && inlineEditing === false ? block.config.view : getDefaultViewForBlock(block);
             block.showValidation = block.config.view ? true : false;
 
             block.hideContentInOverlay = block.config.forceHideContentEditorInOverlay === true || inlineEditing === true;

@@ -16,9 +16,7 @@ public class BlockListConfiguration
     [ConfigurationField("validationLimit", "Amount", "numberrange", Description = "Set a required range of blocks")]
     public NumberRange ValidationLimit { get; set; } = new();
 
-    [ConfigurationField("useSingleBlockMode", "Single block mode", "boolean",
-        Description = @"When in Single block mode, the output will be BlockListItem<>, instead of BlockListModel.
-
+    [ConfigurationField("useSingleBlockMode", "Single block mode", "boolean", Description = @"When in Single block mode, the output will be BlockListItem<>, instead of BlockListModel.
 **NOTE:**
 Single block mode requires a maximum of one available block, and an amount set to minimum 1 and maximum 1 blocks.")]
     public bool UseSingleBlockMode { get; set; }
@@ -26,7 +24,7 @@ Single block mode requires a maximum of one available block, and an amount set t
     [ConfigurationField("useLiveEditing", "Live editing mode", "boolean", Description = "Live editing in editor overlays for live updated custom views or labels using custom expression.")]
     public bool UseLiveEditing { get; set; }
 
-    [ConfigurationField("useInlineEditingAsDefault", "Inline editing mode", "boolean", Description = "Use the inline editor as the default block view.")]
+    [ConfigurationField("useInlineEditingAsDefault", "Inline editing mode", "boolean", Description = "Use the inline editor as the default block view. **NOTE:** Custom view is currently not supported in inline editing.")]
     public bool UseInlineEditingAsDefault { get; set; }
 
     [ConfigurationField("maxPropertyWidth", "Property editor width", "textstring", Description = "Optional CSS override, example: 800px or 100%")]
