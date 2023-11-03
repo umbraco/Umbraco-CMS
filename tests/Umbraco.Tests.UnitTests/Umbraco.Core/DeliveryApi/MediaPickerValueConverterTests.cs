@@ -27,8 +27,9 @@ public class MediaPickerValueConverterTests : PropertyValueConverterTests
         var publishedPropertyType = SetupMediaPropertyType(false);
         var valueConverter = CreateMediaPickerValueConverter();
 
-        var inter = new[] {new GuidUdi(Constants.UdiEntityType.MediaType, PublishedMedia.Key)};
+        var source = new GuidUdi(Constants.UdiEntityType.Media, PublishedMedia.Key).ToString();
 
+        var inter = valueConverter.ConvertSourceToIntermediate(Mock.Of<IPublishedElement>(), publishedPropertyType, source, false);
         var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<IApiMedia>;
 
         Assert.NotNull(result);
@@ -37,6 +38,20 @@ public class MediaPickerValueConverterTests : PropertyValueConverterTests
         Assert.AreEqual(PublishedMedia.Key, result.First().Id);
         Assert.AreEqual("the-media-url", result.First().Url);
         Assert.AreEqual("TheMediaType", result.First().MediaType);
+    }
+
+    [TestCase(123)]
+    [TestCase("123")]
+    [TestCase(null)]
+    public void MediaPickerValueConverter_InSingleMode_ConvertsInvalidValueToEmptyArray(object? source)
+    {
+        var publishedPropertyType = SetupMediaPropertyType(true);
+        var valueConverter = CreateMediaPickerValueConverter();
+
+        var inter = valueConverter.ConvertSourceToIntermediate(Mock.Of<IPublishedElement>(), publishedPropertyType, source, false);
+        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<IApiMedia>;
+        Assert.NotNull(result);
+        Assert.IsEmpty(result);
     }
 
     [Test]
@@ -63,8 +78,8 @@ public class MediaPickerValueConverterTests : PropertyValueConverterTests
             .Setup(pcc => pcc.GetById(otherMediaKey))
             .Returns(otherMedia.Object);
 
-        var inter = new[] { new GuidUdi(Constants.UdiEntityType.MediaType, PublishedMedia.Key), new GuidUdi(Constants.UdiEntityType.MediaType, otherMediaKey) };
-
+        var source = $"{new GuidUdi(Constants.UdiEntityType.Media, PublishedMedia.Key)},{new GuidUdi(Constants.UdiEntityType.Media, otherMediaKey)}";
+        var inter = valueConverter.ConvertSourceToIntermediate(Mock.Of<IPublishedElement>(), publishedPropertyType, source, false);
         var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<IApiMedia>;
 
         Assert.NotNull(result);
@@ -79,6 +94,20 @@ public class MediaPickerValueConverterTests : PropertyValueConverterTests
         Assert.AreEqual(otherMediaKey, result.Last().Id);
         Assert.AreEqual("the-other-media-url", result.Last().Url);
         Assert.AreEqual("TheMediaType", result.Last().MediaType);
+    }
+
+    [TestCase(123)]
+    [TestCase("123")]
+    [TestCase(null)]
+    public void MediaPickerValueConverter_InMultiMode_ConvertsInvalidValueToEmptyArray(object? source)
+    {
+        var publishedPropertyType = SetupMediaPropertyType(true);
+        var valueConverter = CreateMediaPickerValueConverter();
+
+        var inter = valueConverter.ConvertSourceToIntermediate(Mock.Of<IPublishedElement>(), publishedPropertyType, source, false);
+        var result = valueConverter.ConvertIntermediateToDeliveryApiObject(Mock.Of<IPublishedElement>(), publishedPropertyType, PropertyCacheLevel.Element, inter, false, false) as IEnumerable<IApiMedia>;
+        Assert.NotNull(result);
+        Assert.IsEmpty(result);
     }
 
     private IPublishedPropertyType SetupMediaPropertyType(bool multiSelect)

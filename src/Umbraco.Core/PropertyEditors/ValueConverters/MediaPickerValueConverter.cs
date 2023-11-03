@@ -1,11 +1,9 @@
-using System.Collections;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors.DeliveryApi;
 using Umbraco.Cms.Core.PublishedCache;
-using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
@@ -61,18 +59,13 @@ public class MediaPickerValueConverter : PropertyValueConverterBase, IDeliveryAp
     public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
         => PropertyCacheLevel.Snapshot;
 
+    // the intermediate value of this editor is the picked IPublishedContent items (or item in single picker mode).
     public override object? ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
     {
-        if (source == null)
-        {
-            return null;
-        }
-
-        Udi[]? nodeIds = source.ToString()?
-            .Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries)
-            .Select(UdiParser.Parse)
-            .ToArray();
-        return nodeIds;
+        Udi[]? udis = ParseMediaUdis(source);
+        return udis is null
+            ? null
+            : ConvertMediaUdisToIntermediateObject(udis, propertyType);
     }
 
     private bool IsMultipleDataType(PublishedDataType dataType)
@@ -86,42 +79,18 @@ public class MediaPickerValueConverter : PropertyValueConverterBase, IDeliveryAp
         IPublishedElement owner,
         IPublishedPropertyType propertyType,
         PropertyCacheLevel cacheLevel,
-        object? source,
-        bool preview)
-    {
-        var isMultiple = IsMultipleDataType(propertyType.DataType);
+        object? inter,
+        bool preview) => inter;
 
-        var udis = (Udi[]?)source;
-        var mediaItems = new List<IPublishedContent>();
+    // for backwards compat let's convert the intermediate value (either a list of content items or a single content item) to an array of media UDIs
+    public override object? ConvertIntermediateToXPath(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
+        => inter is IEnumerable<IPublishedContent> medias
+            ? medias.Select(m => new GuidUdi(Constants.UdiEntityType.Media, m.Key)).ToArray()
+            : inter is IPublishedContent media
+                ? new[] { new GuidUdi(Constants.UdiEntityType.Media, media.Key) }
+                : null;
 
-        if (source == null)
-        {
-            return isMultiple ? mediaItems : null;
-        }
-
-        if (udis?.Any() ?? false)
-        {
-            IPublishedSnapshot publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
-            foreach (Udi udi in udis)
-            {
-                if (udi is not GuidUdi guidUdi)
-                {
-                    continue;
-                }
-
-                IPublishedContent? item = publishedSnapshot?.Media?.GetById(guidUdi.Guid);
-                if (item != null)
-                {
-                    mediaItems.Add(item);
-                }
-            }
-
-            return isMultiple ? mediaItems : FirstOrDefault(mediaItems);
-        }
-
-        return source;
-    }
-
+    // the API cache level must be Snapshot in order to facilitate nested field expansion and limiting
     public PropertyCacheLevel GetDeliveryApiPropertyCacheLevel(IPublishedPropertyType propertyType) => PropertyCacheLevel.Snapshot;
 
     public Type GetDeliveryApiPropertyValueType(IPublishedPropertyType propertyType) => typeof(IEnumerable<IApiMedia>);
@@ -130,15 +99,12 @@ public class MediaPickerValueConverter : PropertyValueConverterBase, IDeliveryAp
     {
         var isMultiple = IsMultipleDataType(propertyType.DataType);
 
-        // NOTE: eventually we might implement this explicitly instead of piggybacking on the default object conversion. however, this only happens once per cache rebuild,
-        // and the performance gain from an explicit implementation is negligible, so... at least for the time being this will do just fine.
-        var converted = ConvertIntermediateToObject(owner, propertyType, referenceCacheLevel, inter, preview);
-        if (isMultiple && converted is IEnumerable<IPublishedContent> items)
+        if (isMultiple && inter is IEnumerable<IPublishedContent> items)
         {
             return items.Select(_apiMediaBuilder.Build).ToArray();
         }
 
-        if (isMultiple == false && converted is IPublishedContent item)
+        if (isMultiple == false && inter is IPublishedContent item)
         {
             return new[] { _apiMediaBuilder.Build(item) };
         }
@@ -146,5 +112,47 @@ public class MediaPickerValueConverter : PropertyValueConverterBase, IDeliveryAp
         return Array.Empty<ApiMedia>();
     }
 
-    private object? FirstOrDefault(IList mediaItems) => mediaItems.Count == 0 ? null : mediaItems[0];
+    private Udi[]? ParseMediaUdis(object? source)
+        => source?.ToString()?
+            .Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries)
+            .Select(item
+                => UdiParser.TryParse(item, out Udi? udi) && udi.EntityType is Constants.UdiEntityType.Media
+                    ? udi
+                    : null)
+            .WhereNotNull()
+            .ToArray();
+
+    private object? ConvertMediaUdisToIntermediateObject(Udi[] udis, IPublishedPropertyType propertyType)
+    {
+        if (udis.Any() is false)
+        {
+            return null;
+        }
+
+        var isMultiple = IsMultipleDataType(propertyType.DataType);
+
+        var mediaItems = new List<IPublishedContent>();
+
+        IPublishedSnapshot publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
+        foreach (Udi udi in udis)
+        {
+            if (udi is not GuidUdi guidUdi)
+            {
+                continue;
+            }
+
+            IPublishedContent? item = publishedSnapshot?.Media?.GetById(guidUdi.Guid);
+            if (item != null)
+            {
+                mediaItems.Add(item);
+            }
+
+            if (isMultiple is false && mediaItems.Any())
+            {
+                break;
+            }
+        }
+
+        return isMultiple ? mediaItems : mediaItems.FirstOrDefault();
+    }
 }

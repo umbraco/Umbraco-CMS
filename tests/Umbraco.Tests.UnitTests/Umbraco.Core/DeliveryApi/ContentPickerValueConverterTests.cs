@@ -29,11 +29,16 @@ public class ContentPickerValueConverterTests : PropertyValueConverterTests
 
         var valueConverter = CreateValueConverter();
         Assert.AreEqual(typeof(IApiContent), valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType.Object));
+        var inter = valueConverter.ConvertSourceToIntermediate(
+            Mock.Of<IPublishedContent>(),
+            publishedPropertyType.Object,
+            new GuidUdi(Constants.UdiEntityType.Document, PublishedContent.Key),
+            false);
         var result = valueConverter.ConvertIntermediateToDeliveryApiObject(
             Mock.Of<IPublishedContent>(),
             publishedPropertyType.Object,
             PropertyCacheLevel.Element,
-            new GuidUdi(Constants.UdiEntityType.Document, PublishedContent.Key),
+            inter,
             false,
             false) as IApiContent;
 
@@ -55,11 +60,16 @@ public class ContentPickerValueConverterTests : PropertyValueConverterTests
         customNameProvider.Setup(n => n.GetName(PublishedContent)).Returns($"Custom name for: {PublishedContent.Name}");
 
         var valueConverter = CreateValueConverter(customNameProvider.Object);
+        var inter = valueConverter.ConvertSourceToIntermediate(
+            Mock.Of<IPublishedContent>(),
+            publishedPropertyType.Object,
+            new GuidUdi(Constants.UdiEntityType.Document, PublishedContent.Key),
+            false);
         var result = valueConverter.ConvertIntermediateToDeliveryApiObject(
             Mock.Of<IPublishedContent>(),
             publishedPropertyType.Object,
             PropertyCacheLevel.Element,
-            new GuidUdi(Constants.UdiEntityType.Document, PublishedContent.Key),
+            inter,
             false,
             false) as IApiContent;
 
@@ -92,11 +102,16 @@ public class ContentPickerValueConverterTests : PropertyValueConverterTests
 
         var valueConverter = CreateValueConverter();
         Assert.AreEqual(typeof(IApiContent), valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType.Object));
+        var inter = valueConverter.ConvertSourceToIntermediate(
+            Mock.Of<IPublishedContent>(),
+            publishedPropertyType.Object,
+            new GuidUdi(Constants.UdiEntityType.Document, key),
+            false);
         var result = valueConverter.ConvertIntermediateToDeliveryApiObject(
             Mock.Of<IPublishedContent>(),
             publishedPropertyType.Object,
             PropertyCacheLevel.Element,
-            new GuidUdi(Constants.UdiEntityType.Document, key),
+            inter,
             false,
             false) as IApiContent;
 

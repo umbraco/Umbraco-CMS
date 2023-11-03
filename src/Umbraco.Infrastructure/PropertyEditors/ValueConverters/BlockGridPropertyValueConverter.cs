@@ -53,8 +53,12 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             => typeof(BlockGridModel);
 
         /// <inheritdoc />
+        public override object? ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
+            => ConvertSourceToBlockGridModel(propertyType, source, preview);
+
+        /// <inheritdoc />
         public override object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
-            => ConvertIntermediateToBlockGridModel(propertyType, referenceCacheLevel, inter, preview);
+            => inter as BlockGridModel;
 
         /// <inheritdoc />
         public PropertyCacheLevel GetDeliveryApiPropertyCacheLevel(IPublishedPropertyType propertyType) => PropertyCacheLevel.Snapshot;
@@ -67,9 +71,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
         public object? ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview, bool expanding)
         {
             const int defaultColumns = 12;
-
-            BlockGridModel? blockGridModel = ConvertIntermediateToBlockGridModel(propertyType, referenceCacheLevel, inter, preview);
-            if (blockGridModel == null)
+            if (inter is not BlockGridModel blockGridModel)
             {
                 return new ApiBlockGridModel(defaultColumns, Array.Empty<ApiBlockGridItem>());
             }
@@ -99,7 +101,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             return model;
         }
 
-        private BlockGridModel? ConvertIntermediateToBlockGridModel(IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
+        private BlockGridModel? ConvertSourceToBlockGridModel(IPublishedPropertyType propertyType, object? inter, bool preview)
         {
             using (!_proflog.IsEnabled(LogLevel.Debug) ? null : _proflog.DebugDuration<BlockGridPropertyValueConverter>($"ConvertPropertyToBlockGrid ({propertyType.DataType.Id})"))
             {
@@ -123,7 +125,8 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                 }
 
                 var creator = new BlockGridPropertyValueCreator(_blockConverter, _jsonSerializer);
-                return creator.CreateBlockModel(referenceCacheLevel, intermediateBlockModelValue, preview, configuration.Blocks, configuration.GridColumns);
+                // the reference cache level is .Element here, as is also the case when rendering at property level.
+                return creator.CreateBlockModel(PropertyCacheLevel.Element, intermediateBlockModelValue, preview, configuration.Blocks, configuration.GridColumns);
             }
         }
     }
