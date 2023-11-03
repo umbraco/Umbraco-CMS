@@ -30,24 +30,10 @@ internal sealed class ContentPermissionService : IContentPermissionService
     /// <inheritdoc/>
     public async Task<ContentAuthorizationStatus> AuthorizeAccessAsync(
         IUser performingUser,
-        IEnumerable<Guid?> contentKeys,
+        IEnumerable<Guid> contentKeys,
         IReadOnlyList<char> permissionsToCheck)
     {
-        var keysWithoutRoot = contentKeys
-            .Where(x => x.HasValue)
-            .Select(x => x!.Value);
-
-        if (keysWithoutRoot.Count() < contentKeys.Count())
-        {
-            var authorizeRootAccess = await AuthorizeRootAccessAsync(performingUser);
-
-            if (authorizeRootAccess != ContentAuthorizationStatus.Success)
-            {
-                return authorizeRootAccess;
-            }
-        }
-
-        var contentItems = _contentService.GetByIds(keysWithoutRoot).ToArray();
+        var contentItems = _contentService.GetByIds(contentKeys).ToArray();
 
         if (contentItems.Length == 0)
         {
