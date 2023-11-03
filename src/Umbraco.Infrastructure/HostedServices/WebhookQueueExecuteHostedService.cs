@@ -6,12 +6,12 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Infrastructure.HostedServices;
 
-public class WebhookQueuedHostedService : RecurringHostedServiceBase
+public class WebhookQueueExecuteHostedService : RecurringHostedServiceBase
 {
     private readonly IWebhookBackgroundTaskQueue _taskQueue;
     private readonly WebhookSettings _webhookSettings;
 
-    public WebhookQueuedHostedService(ILogger<QueuedHostedService> logger, IWebhookBackgroundTaskQueue taskQueue, IOptions<WebhookSettings> webhookSettings)
+    public WebhookQueueExecuteHostedService(ILogger<QueuedHostedService> logger, IWebhookBackgroundTaskQueue taskQueue, IOptions<WebhookSettings> webhookSettings)
         : base(logger, TimeSpan.FromSeconds(10), TimeSpan.FromMinutes(1))
     {
         _taskQueue = taskQueue;
