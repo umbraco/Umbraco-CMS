@@ -1,4 +1,4 @@
-<div class="umb-tour">
+<div class="umb-tour" tabindex="1" role="dialog" aria-labelledby="step-title" aria-describedby="step-content">
 
     <umb-loader class="umb-tour__loader" ng-if="loadingStep"></umb-loader>
 
@@ -12,11 +12,13 @@
             <umb-tour-step ng-if="model.currentStepIndex < model.steps.length" on-close="model.endTour()">
 
                 <umb-tour-step-header
-                    title="model.currentStep.title">
+                    title="model.currentStep.title"
+                    id="step-title">
                 </umb-tour-step-header>
 
                 <umb-tour-step-content
-                    content="model.currentStep.content">
+                    content="model.currentStep.content"
+                    id="step-content">
                 </umb-tour-step-content>
 
                 <umb-tour-step-footer>
