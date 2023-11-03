@@ -1,5 +1,5 @@
 import { expect } from '@open-wc/testing';
-import { customElement } from 'lit/decorators.js';
+import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { ManifestElement, ManifestElementAndApi } from '../types.js';
 import { createExtensionElement } from './create-extension-element.function.js';
 
