@@ -41,5 +41,5 @@ public class WebhookSettings
     ///         If  the maximum number of retries is higher than the counter of the delay, the last value in the array is used.
     ///     </para>
     /// </remarks>
-    public int[] RetryDelaysInMilliseconds { get; set; } = new int[] { 500, 1000, 5000, 10000, 30000 };
+    public int[] RetryDelaysInMilliseconds { get; set; } = { 500, 1000, 2000, 4000, 8000 };
 }
