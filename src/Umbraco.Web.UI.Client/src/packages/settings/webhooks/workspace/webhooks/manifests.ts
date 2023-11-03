@@ -12,7 +12,7 @@ const workspace: ManifestWorkspace = {
 	name: 'Webhooks Root Workspace',
 	loader: () => import('./webhooks-workspace.element.js'),
 	meta: {
-		entityType: 'webhooks-root',
+		entityType: 'webhooks',
 	},
 };
 
