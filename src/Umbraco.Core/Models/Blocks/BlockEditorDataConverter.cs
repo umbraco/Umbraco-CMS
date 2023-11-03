@@ -58,7 +58,7 @@ public abstract class BlockEditorDataConverter<TValue, TLayout>
     /// <returns></returns>
     protected abstract IEnumerable<ContentAndSettingsReference> GetBlockReferences(IEnumerable<TLayout> layout);
 
-    private BlockEditorData<TValue, TLayout> Convert(TValue? value)
+    public BlockEditorData<TValue, TLayout> Convert(TValue? value)
     {
         if (value?.Layout == null)
         {

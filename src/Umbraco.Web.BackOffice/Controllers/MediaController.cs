@@ -437,7 +437,7 @@ public class MediaController : ContentControllerBase
     public ActionResult<MediaItemDisplay?>? PostSave(
         [ModelBinder(typeof(MediaItemBinder))] MediaItemSave contentItem)
     {
-        //If we've reached here it means:
+        //  If we've reached here it means:
         // * Our model has been bound
         // * and validated
         // * any file attachments have been saved to their temporary location for us to use

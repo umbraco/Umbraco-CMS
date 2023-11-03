@@ -1927,14 +1927,7 @@ internal class UserService : RepositoryService, IUserService
     /// <param name="userGroup">UserGroup to save.</param>
     /// <param name="userIds">
     ///     If null than no changes are made to the users who are assigned to this group, however if a value is passed in
-    ///     than all users will be removed from this group and only these users will be added
-    /// </param>
-    /// Default is
-    /// <c>True</c>
-    /// otherwise set to
-    /// <c>False</c>
-    /// to not raise events
-    /// </param>
+    ///     than all users will be removed from this group and only these users will be added.</param>
     [Obsolete("Use IUserGroupService.CreateAsync and IUserGroupService.UpdateAsync instead, scheduled for removal in V15.")]
     public void Save(IUserGroup userGroup, int[]? userIds = null)
     {
