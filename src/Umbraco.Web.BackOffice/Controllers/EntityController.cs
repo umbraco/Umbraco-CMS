@@ -9,8 +9,11 @@ using Examine.Search;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
@@ -19,9 +22,12 @@ using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Models.TemplateQuery;
 using Umbraco.Cms.Core.Persistence;
+using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.DynamicRoot;
+using Umbraco.Cms.Core.DynamicRoot.QuerySteps;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Trees;
 using Umbraco.Cms.Core.Xml;
@@ -62,6 +68,7 @@ public class EntityController : UmbracoAuthorizedJsonController
     private static readonly string[] _postFilterSplitStrings = { "=", "==", "!=", "<>", ">", "<", ">=", "<=" };
 
     private readonly AppCaches _appCaches;
+    private readonly IDynamicRootService _dynamicRootService;
     private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
     private readonly IContentService _contentService;
     private readonly IContentTypeService _contentTypeService;
@@ -82,6 +89,7 @@ public class EntityController : UmbracoAuthorizedJsonController
     private readonly IUmbracoMapper _umbracoMapper;
     private readonly IUserService _userService;
 
+    [ActivatorUtilitiesConstructor]
     public EntityController(
         ITreeService treeService,
         UmbracoTreeSearcher treeSearcher,
@@ -102,7 +110,8 @@ public class EntityController : UmbracoAuthorizedJsonController
         IMacroService macroService,
         IUserService userService,
         ILocalizationService localizationService,
-        AppCaches appCaches)
+        AppCaches appCaches,
+        IDynamicRootService dynamicRootService)
     {
         _treeService = treeService ?? throw new ArgumentNullException(nameof(treeService));
         _treeSearcher = treeSearcher ?? throw new ArgumentNullException(nameof(treeSearcher));
@@ -129,6 +138,54 @@ public class EntityController : UmbracoAuthorizedJsonController
         _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
         _appCaches = appCaches ?? throw new ArgumentNullException(nameof(appCaches));
+        _dynamicRootService = dynamicRootService;
+    }
+
+    [Obsolete("Use non-obsolete ctor. This will be removed in Umbraco 14.")]
+    public EntityController(
+        ITreeService treeService,
+        UmbracoTreeSearcher treeSearcher,
+        SearchableTreeCollection searchableTreeCollection,
+        IPublishedContentQuery publishedContentQuery,
+        IShortStringHelper shortStringHelper,
+        IEntityService entityService,
+        IBackOfficeSecurityAccessor backofficeSecurityAccessor,
+        IPublishedUrlProvider publishedUrlProvider,
+        IContentService contentService,
+        IUmbracoMapper umbracoMapper,
+        IDataTypeService dataTypeService,
+        ISqlContext sqlContext,
+        ILocalizedTextService localizedTextService,
+        IFileService fileService,
+        IContentTypeService contentTypeService,
+        IMediaTypeService mediaTypeService,
+        IMacroService macroService,
+        IUserService userService,
+        ILocalizationService localizationService,
+        AppCaches appCaches): this(
+        treeService,
+        treeSearcher,
+        searchableTreeCollection,
+        publishedContentQuery,
+        shortStringHelper,
+        entityService,
+        backofficeSecurityAccessor,
+        publishedUrlProvider,
+        contentService,
+        umbracoMapper,
+        dataTypeService,
+        sqlContext,
+        localizedTextService,
+        fileService,
+        contentTypeService,
+        mediaTypeService,
+        macroService,
+        userService,
+        localizationService,
+        appCaches,
+        StaticServiceProvider.Instance.GetRequiredService<IDynamicRootService>())
+    {
+
     }
 
 
@@ -524,6 +581,52 @@ public class EntityController : UmbracoAuthorizedJsonController
     /// <returns></returns>
     [Obsolete("This will be removed in Umbraco 13. Use GetByXPath instead")]
     public ActionResult<EntityBasic?>? GetByQuery(string query, int nodeContextId, UmbracoEntityTypes type) => GetByXPath(query, nodeContextId, null, type);
+
+    public class DynamicRootViewModel
+    {
+        public DynamicRoot Query { get; set; } = null!;
+
+        public int CurrentId { get; set; }
+
+        public int ParentId { get; set; }
+    }
+
+    [HttpPost]
+    public async Task<ActionResult<EntityBasic?>> GetDynamicRootAsync([FromBody]DynamicRootViewModel model)
+    {
+        var currentKey = model.CurrentId == 0 ? null : _entityService.Get(model.CurrentId)?.Key;
+        var parentKey = model.ParentId == 0 ? null : _entityService.Get(model.ParentId)?.Key;
+
+        if (parentKey is null)
+        {
+            throw new ArgumentException("Invalid parentId", nameof(model.ParentId));
+        }
+
+        var startNodeSelector = new DynamicRootNodeQuery()
+        {
+            Context = new DynamicRootContext()
+            {
+                CurrentKey = currentKey,
+                ParentKey = parentKey.Value
+            },
+            OriginKey = model.Query.OriginKey,
+            OriginAlias = model.Query.OriginAlias,
+            QuerySteps = model.Query.QuerySteps.Select(x=>new DynamicRootQueryStep()
+            {
+                Alias = x.Alias,
+                AnyOfDocTypeKeys = x.AnyOfDocTypeKeys
+            })
+        };
+        var startNodes = (await _dynamicRootService.GetDynamicRootsAsync(startNodeSelector)).ToArray();
+
+        Guid? first = startNodes.Any() ? startNodes.First() : null;
+        if (first.HasValue)
+        {
+            return GetById(first.Value, UmbracoEntityTypes.Document);
+        }
+
+        return Ok();
+    }
 
     /// <summary>
     ///     Gets an entity by a xpath query
@@ -1630,3 +1733,5 @@ public class EntityController : UmbracoAuthorizedJsonController
 
     #endregion
 }
+
+

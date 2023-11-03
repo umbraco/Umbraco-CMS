@@ -52,6 +52,7 @@ using Umbraco.Cms.Infrastructure.Migrations.PostMigrations;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0.DataTypes;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
+using Umbraco.Cms.Infrastructure.Routing;
 using Umbraco.Cms.Infrastructure.Runtime;
 using Umbraco.Cms.Infrastructure.Runtime.RuntimeModeValidators;
 using Umbraco.Cms.Infrastructure.Scoping;
@@ -216,6 +217,9 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<ICronTabParser, NCronTabParser>();
 
         builder.Services.AddTransient<INodeCountService, NodeCountService>();
+
+        builder.Services.AddSingleton<IRedirectTracker, RedirectTracker>();
+
         builder.AddInstaller();
 
         // Services required to run background jobs (with out the handler)
@@ -236,6 +240,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IBlockValuePropertyIndexValueFactory, BlockValuePropertyIndexValueFactory>();
         builder.Services.AddSingleton<INestedContentPropertyIndexValueFactory, NestedContentPropertyIndexValueFactory>();
         builder.Services.AddSingleton<ITagPropertyIndexValueFactory, TagPropertyIndexValueFactory>();
+        builder.Services.AddSingleton<IRichTextPropertyIndexValueFactory, RichTextPropertyIndexValueFactory>();
 
         return builder;
     }

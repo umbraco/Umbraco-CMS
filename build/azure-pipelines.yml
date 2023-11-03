@@ -144,12 +144,17 @@ stages:
         pool:
           vmImage: 'windows-latest'
         steps:
+          - task: UseDotNet@2
+            displayName: Use .NET $(dotnetVersion)
+            inputs:
+              version: $(dotnetVersion)
+              includePreviewVersions: $(dotnetIncludePreviewVersions)
           - task: PowerShell@2
             displayName: Install DocFX
             inputs:
               targetType: inline
               script: |
-                choco install docfx --version=2.59.4 -y
+                dotnet tool install -g docfx --version 2.72.1
                 if ($lastexitcode -ne 0){
                     throw ("Error installing DocFX")
                 }
