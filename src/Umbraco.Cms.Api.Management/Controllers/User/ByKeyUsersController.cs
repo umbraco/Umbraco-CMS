@@ -1,4 +1,5 @@
 ﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Factories;
@@ -6,19 +7,23 @@ using Umbraco.Cms.Api.Management.ViewModels.User;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.User;
 
 [ApiVersion("1.0")]
 public class ByKeyUserController : UserControllerBase
 {
+    private readonly IAuthorizationService _authorizationService;
     private readonly IUserService _userService;
     private readonly IUserPresentationFactory _userPresentationFactory;
 
     public ByKeyUserController(
+        IAuthorizationService authorizationService,
         IUserService userService,
         IUserPresentationFactory userPresentationFactory)
     {
+        _authorizationService = authorizationService;
         _userService = userService;
         _userPresentationFactory = userPresentationFactory;
     }
@@ -29,6 +34,14 @@ public class ByKeyUserController : UserControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ByKey(Guid id)
     {
+        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeAsync(User, new[] { id },
+            $"New{AuthorizationPolicies.AdminUserEditsRequireAdmin}");
+
+        if (!authorizationResult.Succeeded)
+        {
+            return Forbidden();
+        }
+
         IUser? user = await _userService.GetAsync(id);
 
         if (user is null)
