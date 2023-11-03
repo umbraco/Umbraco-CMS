@@ -96,6 +96,7 @@ export default {
 						'@umbraco-cms/backoffice/data-type': './src/packages/settings/data-types/index.ts',
 						'@umbraco-cms/backoffice/language': './src/packages/settings/languages/index.ts',
 						'@umbraco-cms/backoffice/logviewer': './src/packages/settings/logviewer/index.ts',
+						'@umbraco-cms/backoffice/webhooks': './src/packages/settings/webhooks/index.ts',
 						'@umbraco-cms/backoffice/relation-type': './src/packages/settings/relation-types/index.ts',
 						'@umbraco-cms/backoffice/tags': './src/packages/tags/index.ts',
 						'@umbraco-cms/backoffice/partial-view': './src/packages/templating/partial-views/index.ts',
