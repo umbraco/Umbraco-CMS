@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 
-namespace Umbraco.Cms.Api.Management.Security.Authorization.Admin;
+namespace Umbraco.Cms.Api.Management.Security.Authorization.User;
 
 /// <summary>
 ///     Authorizes that the current user has the correct permission access to perform actions on the user account(s) specified in the request.

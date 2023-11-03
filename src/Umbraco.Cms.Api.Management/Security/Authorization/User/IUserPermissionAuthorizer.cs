@@ -1,6 +1,6 @@
 using System.Security.Principal;
 
-namespace Umbraco.Cms.Api.Management.Security.Authorization.Admin;
+namespace Umbraco.Cms.Api.Management.Security.Authorization.User;
 
 /// <summary>
 ///     Authorizes user access.

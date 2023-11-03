@@ -3,7 +3,7 @@ using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.AuthorizationStatus;
 
-namespace Umbraco.Cms.Api.Management.Security.Authorization.Admin;
+namespace Umbraco.Cms.Api.Management.Security.Authorization.User;
 
 /// <inheritdoc />
 internal sealed class UserPermissionAuthorizer : IUserPermissionAuthorizer
