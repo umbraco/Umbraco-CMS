@@ -2,7 +2,7 @@
 
 public class WebhookResponseModel
 {
-    public HttpResponseMessage? HttpResponseMessage { get; set; }
+    public HttpResponseMessage HttpResponseMessage { get; set; } = null!;
 
     public int RetryCount { get; set; }
 }
