@@ -109,7 +109,7 @@ public class BlockListPropertyValueConverter : PropertyValueConverterBase, IDeli
     }
 
     /// <inheritdoc />
-    public PropertyCacheLevel GetDeliveryApiPropertyCacheLevel(IPublishedPropertyType propertyType) => GetPropertyCacheLevel(propertyType);
+    public PropertyCacheLevel GetDeliveryApiPropertyCacheLevel(IPublishedPropertyType propertyType) => PropertyCacheLevel.Snapshot;
 
     /// <inheritdoc />
     public Type GetDeliveryApiPropertyValueType(IPublishedPropertyType propertyType)

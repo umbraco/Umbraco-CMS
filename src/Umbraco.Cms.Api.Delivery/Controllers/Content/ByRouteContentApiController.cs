@@ -13,6 +13,7 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Api.Delivery.Controllers.Content;
 
 [ApiVersion("1.0")]
+[ApiVersion("2.0")]
 public class ByRouteContentApiController : ContentApiItemControllerBase
 {
     private readonly IRequestRoutingService _requestRoutingService;
@@ -73,6 +74,16 @@ public class ByRouteContentApiController : ContentApiItemControllerBase
         _requestMemberAccessService = requestMemberAccessService;
     }
 
+    [HttpGet("item/{*path}")]
+    [MapToApiVersion("1.0")]
+    [ProducesResponseType(typeof(IApiContentResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [Obsolete("Please use version 2 of this API. Will be removed in V15.")]
+    public async Task<IActionResult> ByRoute(string path = "")
+        => await HandleRequest(path);
+
     /// <summary>
     ///     Gets a content item by route.
     /// </summary>
@@ -83,12 +94,15 @@ public class ByRouteContentApiController : ContentApiItemControllerBase
     /// </remarks>
     /// <returns>The content item or not found result.</returns>
     [HttpGet("item/{*path}")]
-    [MapToApiVersion("1.0")]
+    [MapToApiVersion("2.0")]
     [ProducesResponseType(typeof(IApiContentResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> ByRoute(string path = "")
+    public async Task<IActionResult> ByRouteV20(string path = "")
+        => await HandleRequest(path);
+
+    private async Task<IActionResult> HandleRequest(string path)
     {
         path = DecodePath(path);
 

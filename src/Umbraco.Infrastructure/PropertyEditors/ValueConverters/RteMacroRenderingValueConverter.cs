@@ -142,7 +142,7 @@ public class RteMacroRenderingValueConverter : SimpleTinyMceValueConverter, IDel
         return new HtmlEncodedString(converted ?? string.Empty);
     }
 
-    public PropertyCacheLevel GetDeliveryApiPropertyCacheLevel(IPublishedPropertyType propertyType) => PropertyCacheLevel.Elements;
+    public PropertyCacheLevel GetDeliveryApiPropertyCacheLevel(IPublishedPropertyType propertyType) => PropertyCacheLevel.Snapshot;
 
     public Type GetDeliveryApiPropertyValueType(IPublishedPropertyType propertyType)
         => _deliveryApiSettings.RichTextOutputAsJson

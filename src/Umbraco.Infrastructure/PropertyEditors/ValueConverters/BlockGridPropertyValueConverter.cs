@@ -57,7 +57,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             => ConvertIntermediateToBlockGridModel(propertyType, referenceCacheLevel, inter, preview);
 
         /// <inheritdoc />
-        public PropertyCacheLevel GetDeliveryApiPropertyCacheLevel(IPublishedPropertyType propertyType) => GetPropertyCacheLevel(propertyType);
+        public PropertyCacheLevel GetDeliveryApiPropertyCacheLevel(IPublishedPropertyType propertyType) => PropertyCacheLevel.Snapshot;
 
         /// <inheritdoc />
         public Type GetDeliveryApiPropertyValueType(IPublishedPropertyType propertyType)
