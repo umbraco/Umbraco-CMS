@@ -23,6 +23,7 @@ public class ConfigureUmbracoDeliveryApiSwaggerGenOptions: IConfigureOptions<Swa
         swaggerGenOptions.DocumentFilter<MimeTypeDocumentFilter>(DeliveryApiConfiguration.ApiName);
 
         swaggerGenOptions.OperationFilter<SwaggerContentDocumentationFilter>();
+        swaggerGenOptions.OperationFilter<SwaggerTranslationApiDocumentationFilter>();
         swaggerGenOptions.OperationFilter<SwaggerMediaDocumentationFilter>();
         swaggerGenOptions.ParameterFilter<SwaggerContentDocumentationFilter>();
         swaggerGenOptions.ParameterFilter<SwaggerMediaDocumentationFilter>();
