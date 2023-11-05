@@ -44,7 +44,7 @@ const workspaceViews: Array<ManifestWorkspaceEditorView> = [
 		meta: {
 			label: 'Logs',
 			pathname: 'logs',
-			icon: 'umb:search',
+			icon: 'umb:box-alt',
 		},
 		conditions: [
 			{
