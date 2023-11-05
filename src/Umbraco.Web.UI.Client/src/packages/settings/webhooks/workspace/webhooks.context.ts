@@ -1,4 +1,4 @@
-import { UmbWebhooksRepository } from '../repository/webhooks.repository.js';
+import { UmbWebhookRepository } from '../repository/webhooks.repository.js';
 import { UmbBaseController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UMB_WORKSPACE_CONTEXT, UmbWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
@@ -6,7 +6,7 @@ import { UMB_WORKSPACE_CONTEXT, UmbWorkspaceContextInterface } from '@umbraco-cm
 // TODO: Revisit usage of workspace for this case...
 export class UmbWebhooksWorkspaceContext extends UmbBaseController implements UmbWorkspaceContextInterface {
 	public readonly workspaceAlias: string = 'Umb.Workspace.Webhooks';
-	#repository: UmbWebhooksRepository;
+	#repository: UmbWebhookRepository;
 
 	getEntityType() {
 		return 'webhooks';
@@ -27,7 +27,7 @@ export class UmbWebhooksWorkspaceContext extends UmbBaseController implements Um
 		this.provideContext(UMB_WORKSPACE_CONTEXT, this);
 		// TODO: Revisit usage of workspace for this case... currently no other workspace context provides them self with their own token.
 		this.provideContext(UMB_APP_WEBHOOKS_CONTEXT_TOKEN, this);
-		this.#repository = new UmbWebhooksRepository(host);
+		this.#repository = new UmbWebhookRepository(host);
 	}
 
 	onChangeState = () => {
