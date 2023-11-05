@@ -1,17 +1,24 @@
+//import '../../components/index.js';
+import { UmbWebhooksWorkspaceContext } from '../webhooks.context.js';
 import { PropertyValueMap, css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-webhooks-workspace')
 export class UmbWebhooksWorkspaceElement extends UmbLitElement {
+	#webhooksContext = new UmbWebhooksWorkspaceContext(this);
 
 	firstUpdated(props: PropertyValueMap<unknown>) {
 		super.firstUpdated(props);
 
+		// TODO: This should be moved to the log viewer context:
+		window.addEventListener('changestate', this.#webhooksContext.onChangeState);
+		this.#webhooksContext.onChangeState();
 	}
 
 	disconnectedCallback(): void {
 		super.disconnectedCallback();
+		window.removeEventListener('changestate', this.#webhooksContext.onChangeState);
 	}
 
 	load(): void {
