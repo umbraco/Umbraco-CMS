@@ -40,7 +40,7 @@ export const handlers = [
 	}),
 	//#endregion
 
-	//#region Temaplates
+	//#region Templates
 	rest.get(umbracoPath('/log-viewer/message-template'), (req, res, ctx) => {
 		const skip = req.url.searchParams.get('skip');
 		const skipNumber = skip ? Number.parseInt(skip) : undefined;
@@ -57,6 +57,7 @@ export const handlers = [
 		return res(ctx.delay(), ctx.status(200), ctx.json(response));
 	}),
 	//#endregion
+	
 	//#region Logs
 	rest.get(umbracoPath('/log-viewer/level'), (req, res, ctx) => {
 		return res(ctx.delay(), ctx.status(200), ctx.json(umbLogViewerData.logLevels));
