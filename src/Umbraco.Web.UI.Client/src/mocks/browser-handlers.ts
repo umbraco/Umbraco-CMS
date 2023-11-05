@@ -25,6 +25,7 @@ import { handlers as languageHandlers } from './handlers/language.handlers.js';
 import { handlers as cultureHandlers } from './handlers/culture.handlers.js';
 import { handlers as redirectManagementHandlers } from './handlers/redirect-management.handlers.js';
 import { handlers as logViewerHandlers } from './handlers/log-viewer.handlers.js';
+import { handlers as webhookHandlers } from './handlers/webhook.handlers.js';
 import { handlers as packageHandlers } from './handlers/package.handlers.js';
 import { handlers as rteEmbedHandlers } from './handlers/rte-embed.handlers.js';
 import { handlers as stylesheetHandlers } from './handlers/stylesheet.handlers.js';
@@ -60,6 +61,7 @@ const handlers = [
 	...cultureHandlers,
 	...redirectManagementHandlers,
 	...logViewerHandlers,
+	...webhookHandlers,
 	...packageHandlers,
 	...rteEmbedHandlers,
 	...stylesheetHandlers,
