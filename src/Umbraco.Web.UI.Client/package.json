@@ -60,6 +60,7 @@
 		"./data-type": "./dist-cms/packages/settings/data-types/index.js",
 		"./language": "./dist-cms/packages/settings/languages/index.js",
 		"./logviewer": "./dist-cms/packages/settings/logviewer/index.js",
+		"./webhooks": "./dist-cms/packages/settings/webhooks/index.js",
 		"./relation-type": "./dist-cms/packages/settings/relation-types/index.js",
 		"./tags": "./dist-cms/packages/tags/index.js",
 		"./partial-view": "./dist-cms/packages/templating/partial-views/index.js",

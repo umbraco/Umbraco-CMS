@@ -1741,6 +1741,7 @@ export default {
 		settingsGroup: 'Settings',
 		templatingGroup: 'Templating',
 		thirdPartyGroup: 'Third Party',
+		webhooks: 'Webhooks',
 	},
 	update: {
 		updateAvailable: 'New update ready',
