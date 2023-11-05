@@ -1,4 +1,4 @@
-<div class="umb-tour" tabindex="1" role="dialog" aria-labelledby="step-title" aria-describedby="step-content">
+<div class="umb-tour" tabindex="0" role="dialog" aria-label="tour">
 
     <umb-loader class="umb-tour__loader" ng-if="loadingStep"></umb-loader>
 
@@ -12,13 +12,11 @@
             <umb-tour-step ng-if="model.currentStepIndex < model.steps.length" on-close="model.endTour()">
 
                 <umb-tour-step-header
-                    title="model.currentStep.title"
-                    id="step-title">
+                    title="model.currentStep.title">
                 </umb-tour-step-header>
 
                 <umb-tour-step-content
-                    content="model.currentStep.content"
-                    id="step-content">
+                    content="model.currentStep.content">
                 </umb-tour-step-content>
 
                 <umb-tour-step-footer>
@@ -31,7 +29,7 @@
                                 total-steps="model.steps.length">
                             </umb-tour-step-counter>
                             <div ng-if="model.allowDisable && model.currentStep.type === 'intro'">
-                                <button type="button" class="underline" ng-click="model.disableTour()" prevent-default>Don't show this tour again</button>
+                                <button type="button" class="underline" ng-click="model.disableTour()" tabindex="0" prevent-default>Don't show this tour again</button>
                             </div>
                         </div>
 
@@ -60,7 +58,7 @@
                 </umb-tour-step-content>
 
                 <umb-tour-step-footer>
-                    <umb-button type="button" button-style="action" size="m" action="model.completeTour()" label="Complete"></umb-button>
+                    <umb-button type="button" button-style="action" size="m" action="model.completeTour()" label="Complete" tabindex="0"></umb-button>
                 </umb-tour-step-footer>
 
             </umb-tour-step>
