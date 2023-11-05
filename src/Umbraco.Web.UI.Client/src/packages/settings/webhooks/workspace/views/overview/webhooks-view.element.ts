@@ -1,11 +1,17 @@
+import { UmbWebhooksWorkspaceContext, UMB_APP_WEBHOOKS_CONTEXT_TOKEN } from '../../webhooks.context.js';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-webhooks-overview-view')
 export class UmbWebhooksOverviewViewElement extends UmbLitElement {
 
+	#webhooksContext?: UmbWebhooksWorkspaceContext;
 	constructor() {
 		super();
+
+		this.consumeContext(UMB_APP_WEBHOOKS_CONTEXT_TOKEN, (instance) => {
+			this.#webhooksContext = instance;
+		});
 	}
 
 	render() {
