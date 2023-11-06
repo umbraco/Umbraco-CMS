@@ -17357,7 +17357,7 @@
         },
         "additionalProperties": false
       },
-      "ContentResponseModelBaseDocumentValueModelDocumentVariantResponseModel": {
+      "ContentForDocumentResponseModel": {
         "type": "object",
         "properties": {
           "values": {
@@ -17462,7 +17462,7 @@
         "type": "integer",
         "format": "int32"
       },
-      "ContentTypeResponseModelBaseDocumentTypePropertyTypeResponseModelDocumentTypePropertyTypeContainerResponseModel": {
+      "ContentTypeForDocumentTypeResponseModel": {
         "type": "object",
         "properties": {
           "alias": {
@@ -17537,7 +17537,7 @@
         },
         "additionalProperties": false
       },
-      "ContentTypeResponseModelBaseMediaTypePropertyTypeResponseModelMediaTypePropertyTypeContainerResponseModel": {
+      "ContentTypeForMediaTypeResponseModel": {
         "type": "object",
         "properties": {
           "alias": {
@@ -17667,7 +17667,7 @@
         },
         "additionalProperties": false
       },
-      "CreateContentRequestModelBaseDocumentValueModelDocumentVariantRequestModel": {
+      "CreateContentForDocumentRequestModel": {
         "type": "object",
         "properties": {
           "values": {
@@ -17703,7 +17703,7 @@
         },
         "additionalProperties": false
       },
-      "CreateContentRequestModelBaseMediaValueModelMediaVariantRequestModel": {
+      "CreateContentForMediaRequestModel": {
         "type": "object",
         "properties": {
           "values": {
@@ -17739,7 +17739,7 @@
         },
         "additionalProperties": false
       },
-      "CreateContentTypeRequestModelBaseCreateDocumentTypePropertyTypeRequestModelCreateDocumentTypePropertyTypeContainerRequestModel": {
+      "CreateContentTypeForDocumentTypeRequestModel": {
         "type": "object",
         "properties": {
           "alias": {
@@ -17820,7 +17820,7 @@
         },
         "additionalProperties": false
       },
-      "CreateContentTypeRequestModelBaseCreateMediaTypePropertyTypeRequestModelCreateMediaTypePropertyTypeContainerRequestModel": {
+      "CreateContentTypeForMediaTypeRequestModel": {
         "type": "object",
         "properties": {
           "alias": {
@@ -17942,7 +17942,7 @@
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/CreateContentRequestModelBaseDocumentValueModelDocumentVariantRequestModel"
+            "$ref": "#/components/schemas/CreateContentForDocumentRequestModel"
           }
         ],
         "properties": {
@@ -17980,7 +17980,7 @@
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/CreateContentTypeRequestModelBaseCreateDocumentTypePropertyTypeRequestModelCreateDocumentTypePropertyTypeContainerRequestModel"
+            "$ref": "#/components/schemas/CreateContentTypeForDocumentTypeRequestModel"
           }
         ],
         "properties": {
@@ -18059,7 +18059,7 @@
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/CreateContentRequestModelBaseMediaValueModelMediaVariantRequestModel"
+            "$ref": "#/components/schemas/CreateContentForMediaRequestModel"
           }
         ],
         "properties": {
@@ -18092,7 +18092,7 @@
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/CreateContentTypeRequestModelBaseCreateMediaTypePropertyTypeRequestModelCreateMediaTypePropertyTypeContainerRequestModel"
+            "$ref": "#/components/schemas/CreateContentTypeForMediaTypeRequestModel"
           }
         ],
         "additionalProperties": false
@@ -18697,7 +18697,7 @@
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/ContentResponseModelBaseDocumentValueModelDocumentVariantResponseModel"
+            "$ref": "#/components/schemas/ContentForDocumentResponseModel"
           }
         ],
         "properties": {
@@ -18796,7 +18796,7 @@
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/ContentTypeResponseModelBaseDocumentTypePropertyTypeResponseModelDocumentTypePropertyTypeContainerResponseModel"
+            "$ref": "#/components/schemas/ContentTypeForDocumentTypeResponseModel"
           }
         ],
         "properties": {
@@ -19688,7 +19688,7 @@
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/ContentTypeResponseModelBaseMediaTypePropertyTypeResponseModelMediaTypePropertyTypeContainerResponseModel"
+            "$ref": "#/components/schemas/ContentTypeForMediaTypeResponseModel"
           }
         ],
         "additionalProperties": false
@@ -22148,7 +22148,7 @@
         },
         "additionalProperties": false
       },
-      "UpdateContentRequestModelBaseDocumentValueModelDocumentVariantRequestModel": {
+      "UpdateContentForDocumentRequestModel": {
         "type": "object",
         "properties": {
           "values": {
@@ -22174,7 +22174,7 @@
         },
         "additionalProperties": false
       },
-      "UpdateContentRequestModelBaseMediaValueModelMediaVariantRequestModel": {
+      "UpdateContentForMediaRequestModel": {
         "type": "object",
         "properties": {
           "values": {
@@ -22200,7 +22200,7 @@
         },
         "additionalProperties": false
       },
-      "UpdateContentTypeRequestModelBaseUpdateDocumentTypePropertyTypeRequestModelUpdateDocumentTypePropertyTypeContainerRequestModel": {
+      "UpdateContentTypeForDocumentTypeRequestModel": {
         "type": "object",
         "properties": {
           "alias": {
@@ -22271,7 +22271,7 @@
         },
         "additionalProperties": false
       },
-      "UpdateContentTypeRequestModelBaseUpdateMediaTypePropertyTypeRequestModelUpdateMediaTypePropertyTypeContainerRequestModel": {
+      "UpdateContentTypeForMediaTypeRequestModel": {
         "type": "object",
         "properties": {
           "alias": {
@@ -22376,7 +22376,7 @@
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/UpdateContentRequestModelBaseDocumentValueModelDocumentVariantRequestModel"
+            "$ref": "#/components/schemas/UpdateContentForDocumentRequestModel"
           }
         ],
         "properties": {
@@ -22410,7 +22410,7 @@
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/UpdateContentTypeRequestModelBaseUpdateDocumentTypePropertyTypeRequestModelUpdateDocumentTypePropertyTypeContainerRequestModel"
+            "$ref": "#/components/schemas/UpdateContentTypeForDocumentTypeRequestModel"
           }
         ],
         "properties": {
@@ -22467,7 +22467,7 @@
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/UpdateContentRequestModelBaseMediaValueModelMediaVariantRequestModel"
+            "$ref": "#/components/schemas/UpdateContentForMediaRequestModel"
           }
         ],
         "additionalProperties": false
@@ -22494,7 +22494,7 @@
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/UpdateContentTypeRequestModelBaseUpdateMediaTypePropertyTypeRequestModelUpdateMediaTypePropertyTypeContainerRequestModel"
+            "$ref": "#/components/schemas/UpdateContentTypeForMediaTypeRequestModel"
           }
         ],
         "additionalProperties": false
