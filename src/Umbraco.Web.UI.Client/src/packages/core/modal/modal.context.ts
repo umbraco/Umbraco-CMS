@@ -30,11 +30,15 @@ type OptionalSubmitArgumentIfUndefined<T> = T extends undefined
 			submit: (arg: T) => void;
 	  };
 
+export interface UmbModalRejectReason {
+	type: string;
+}
+
 // TODO: consider splitting this into two separate handlers
 export class UmbModalContextClass<ModalPreset extends object = object, ModalValue = unknown> extends EventTarget {
 	#submitPromise: Promise<ModalValue>;
 	#submitResolver?: (value: ModalValue) => void;
-	#submitRejecter?: () => void;
+	#submitRejecter?: (reason?: UmbModalRejectReason) => void;
 
 	public readonly key: string;
 	public readonly data: ModalPreset;
@@ -90,8 +94,8 @@ export class UmbModalContextClass<ModalPreset extends object = object, ModalValu
 	 * @public
 	 * @memberof UmbModalContext
 	 */
-	public reject() {
-		this.#submitRejecter?.();
+	public reject(reason?: UmbModalRejectReason) {
+		this.#submitRejecter?.(reason);
 	}
 
 	/**

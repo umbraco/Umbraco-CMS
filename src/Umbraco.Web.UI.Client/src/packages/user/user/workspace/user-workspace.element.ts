@@ -1,7 +1,7 @@
 import { UmbUserWorkspaceContext } from './user-workspace.context.js';
 import { UmbUserWorkspaceEditorElement } from './user-workspace-editor.element.js';
 import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 
