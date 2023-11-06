@@ -1,9 +1,8 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
+import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UMB_STYLESHEET_WORKSPACE_CONTEXT, UmbStylesheetWorkspaceContext } from '../../stylesheet-workspace.context.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 @customElement('umb-stylesheet-workspace-view-code-editor')
 export class UmbStylesheetWorkspaceViewCodeEditorElement extends UmbLitElement {
@@ -62,7 +61,7 @@ export class UmbStylesheetWorkspaceViewCodeEditorElement extends UmbLitElement {
 	}
 
 	static styles = [
-		UUITextStyles,
+		UmbTextStyles,
 		css`
 			:host {
 				display: block;
