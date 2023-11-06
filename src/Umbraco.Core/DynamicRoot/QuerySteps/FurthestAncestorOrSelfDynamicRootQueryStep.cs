@@ -30,7 +30,7 @@ public class FurthestAncestorOrSelfDynamicRootQueryStep : IDynamicRootQueryStep
         }
 
         using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
-        var result = (await _nodeFilterRepository.FarthestAncestorOrSelfAsync(origins, filter))?.ToSingleItemCollection() ?? Array.Empty<Guid>();
+        var result = (await _nodeFilterRepository.FurthestAncestorOrSelfAsync(origins, filter))?.ToSingleItemCollection() ?? Array.Empty<Guid>();
 
         return Attempt<ICollection<Guid>>.Succeed(result);
     }
