@@ -53,7 +53,8 @@
     }
 
     function getEntities(webhook) {
-      const isContent = webhook.events[0].toLowerCase().includes("content");
+      console.log(webhook.events[0])
+      const isContent = webhook.events[0].name.toLowerCase().includes("content");
       const resource = isContent ? contentTypeResource : mediaTypeResource;
       let entities = [];
 

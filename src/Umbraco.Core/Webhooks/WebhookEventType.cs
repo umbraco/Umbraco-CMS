@@ -2,6 +2,7 @@
 
 public enum WebhookEventType
 {
+    None,
     Content,
     Media,
     Member,

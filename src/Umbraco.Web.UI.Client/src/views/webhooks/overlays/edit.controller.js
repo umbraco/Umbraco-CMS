@@ -1,7 +1,7 @@
 (function () {
   "use strict";
 
-  function EditController($scope, editorService, contentTypeResource, mediaTypeResource) {
+  function EditController($scope, editorService, contentTypeResource, mediaTypeResource, memberTypeResource) {
 
     const vm = this;
 
@@ -29,7 +29,7 @@
     }
 
     function openContentTypePicker() {
-      const isContent = $scope.model.webhook ? $scope.model.webhook.events[0].toLowerCase().includes("content") : null;
+      const eventType = $scope.model.webhook ? $scope.model.webhook.events[0].eventType.toLowerCase() : null;
 
       const editor = {
         multiPicker: true,
@@ -39,7 +39,7 @@
           return item.nodeType === "container"; // || item.metaData.isElement || !!_.findWhere(vm.itemTypes, { udi: item.udi });
         },
         submit(model) {
-          getEntities(model.selection, isContent);
+          getEntities(model.selection, eventType);
           $scope.model.webhook.contentTypeKeys = model.selection.map(item => item.key);
           editorService.close();
         },
@@ -48,9 +48,7 @@
         }
       };
 
-      const itemType = isContent ? "content" : "media";
-
-      switch (itemType) {
+      switch (eventType) {
         case "content":
           editorService.contentTypePicker(editor);
           break;
@@ -82,8 +80,22 @@
       });
     }
 
-    function getEntities(selection, isContent) {
-      const resource = isContent ? contentTypeResource : mediaTypeResource;
+    function getEntities(selection, eventType) {
+      let resource;
+      switch (eventType) {
+        case "content":
+          resource = contentTypeResource;
+          break;
+        case "media":
+          resource = mediaTypeResource;
+          break;
+        case "member":
+          resource = memberTypeResource;
+          break;
+        default:
+          return;
+      }
+
       $scope.model.contentTypes = [];
 
       selection.forEach(entity => {
@@ -125,6 +137,7 @@
 
     function submit() {
       if ($scope.model.submit) {
+        $scope.model.webhook.events = $scope.model.webhook.events.map((event) => (event.name));
         $scope.model.submit($scope.model);
       }
     }
