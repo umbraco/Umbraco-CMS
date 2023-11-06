@@ -45,16 +45,15 @@
     function resolveEventNames(webhook) {
       webhook.events.forEach(event => {
         if (!vm.webhookEvents[webhook.key]) {
-          vm.webhookEvents[webhook.key] = event;
+          vm.webhookEvents[webhook.key] = event.eventName;
         } else {
-          vm.webhookEvents[webhook.key] += ", " + event;
+          vm.webhookEvents[webhook.key] += ", " + event.eventName;
         }
       });
     }
 
     function getEntities(webhook) {
-      console.log(webhook.events[0])
-      const isContent = webhook.events[0].name.toLowerCase().includes("content");
+      const isContent = webhook.events[0].eventName.toLowerCase().includes("content");
       const resource = isContent ? contentTypeResource : mediaTypeResource;
       let entities = [];
 
@@ -69,7 +68,7 @@
     }
 
     function resolveTypeNames(webhook) {
-      const isContent = webhook.events[0].toLowerCase().includes("content");
+      const isContent = webhook.events[0].eventName.toLowerCase().includes("content");
       const resource = isContent ? contentTypeResource : mediaTypeResource;
 
       if (vm.webHooksContentTypes[webhook.key]){
