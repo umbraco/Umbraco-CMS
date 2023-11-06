@@ -32,7 +32,7 @@ public class DeleteWebhookController : WebhookControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> Delete(Guid id)
     {
-        Attempt<IWebhookEvent?, WebhookOperationStatus> result = await _webhookService.DeleteAsync(id);
+        Attempt<Core.Models.Webhook?, WebhookOperationStatus> result = await _webhookService.DeleteAsync(id); //, CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Success
             ? Ok()

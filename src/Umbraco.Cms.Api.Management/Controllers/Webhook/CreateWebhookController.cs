@@ -34,17 +34,17 @@ public class CreateWebhookController : WebhookControllerBase
 
     [HttpPost]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Create(CreateWebhookRequestModel createWebhookRequestModel)
     {
-        IWebhookEvent created = _umbracoMapper.Map<IWebhookEvent>(createWebhookRequestModel)!;
+        Core.Models.Webhook created = _umbracoMapper.Map<Core.Models.Webhook>(createWebhookRequestModel)!;
 
-        Attempt<IWebhookEvent, WebhookOperationStatus> result = await _webhookService.CreateAsync(created)); //, CurrentUserKey(_backOfficeSecurityAccessor));
+        Attempt<Core.Models.Webhook, WebhookOperationStatus> result = await _webhookService.CreateAsync(created)); //, CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Success
-            ? CreatedAtAction<ByIsoCodeLanguageController>(controller => nameof(controller.ByIsoCode), new { isoCode = result.Result.IsoCode })
+            ? CreatedAtAction<ByKeyWebhookController>(controller => nameof(controller.ByKey), result.Result!.Key)
             : WebhookOperationStatusResult(result.Status);
     }
 }
