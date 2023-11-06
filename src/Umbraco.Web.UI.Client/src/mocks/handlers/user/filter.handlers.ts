@@ -6,17 +6,25 @@ import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 export const handlers = [
   rest.get(umbracoPath(`${slug}/filter`), (req, res, ctx) => {
 
-    const filter = {
-      skip: Number(req.url.searchParams.get('skip')),
-      take: Number(req.url.searchParams.get('take')),
-      orderBy: req.url.searchParams.get('orderBy'),
-      orderDirection: req.url.searchParams.get('orderDirection'),
-      userGroupIds: req.url.searchParams.getAll('userGroupIds'),
-      userStates: req.url.searchParams.getAll('userStates'),
-      filter: req.url.searchParams.get('filter'),
+    const skip = Number(req.url.searchParams.get('skip'));
+    const take = Number(req.url.searchParams.get('take'));
+    const orderBy = req.url.searchParams.get('orderBy');
+    const orderDirection = req.url.searchParams.get('orderDirection');
+    const userGroupIds = req.url.searchParams.getAll('userGroupIds');
+    const userStates = req.url.searchParams.getAll('userStates');
+    const filter = req.url.searchParams.get('filter');
+
+    const options = {
+      skip: skip || undefined,
+      take: take || undefined,
+      orderBy: orderBy || undefined,
+      orderDirection: orderDirection || undefined,
+      userGroupIds: userGroupIds.length > 0 ? userGroupIds : undefined,
+      userStates: userStates.length > 0 ? userStates : undefined,
+      filter: filter || undefined,
     };
 
-    const response = umbUsersData.filter(filter);
+    const response = umbUsersData.filter(options);
     return res(ctx.status(200), ctx.json(response));
   }),
 ];

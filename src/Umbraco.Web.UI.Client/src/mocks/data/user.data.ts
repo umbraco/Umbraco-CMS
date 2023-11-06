@@ -1,5 +1,6 @@
 import { UmbEntityData } from './entity.data.js';
 import { umbUserGroupData } from './user-group.data.js';
+import { arrayFilter, stringFilter, queryFilter } from './utils.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbLoggedInUser } from '@umbraco-cms/backoffice/auth';
 import {
@@ -19,6 +20,10 @@ const createUserItem = (item: UserResponseModel): UserItemResponseModel => {
 		id: item.id,
 	};
 };
+
+const userGroupFilter = (filterOptions: any, item: UserItemResponseModel) => arrayFilter(filterOptions.userGroupIds, item.userGroupIds);
+const userStateFilter = (filterOptions: any, item: UserItemResponseModel) => stringFilter(filterOptions.userStates, item.state);
+const userQueryFilter = (filterOptions: any, item: UserItemResponseModel) => queryFilter(filterOptions.filter, item.name);
 
 // Temp mocked database
 class UmbUserData extends UmbEntityData<UserResponseModel> {
@@ -154,23 +159,25 @@ class UmbUserData extends UmbEntityData<UserResponseModel> {
 		this.createUser(invitedUser);
 	}
 
-	filter (config: any): PagedUserResponseModel {
-		const { total, items: allItems } = this.getAll();
+	filter (options: any): PagedUserResponseModel {
+		const { items: allItems } = this.getAll();
 
-    const filter = {
-      skip: config.skip || 0,
-      take: config.take || 10,
-      orderBy: config.orderBy || 'name',
-      orderDirection: config.orderDirection || 'asc',
-      userGroupIds: config.userGroupIds || [],
-      userStates: config.userStates || [],
-      filter: config.filter || '',
+    const filterOptions = {
+      skip: options.skip || 0,
+      take: options.take || 25,
+      orderBy: options.orderBy || 'name',
+      orderDirection: options.orderDirection || 'asc',
+      userGroupIds: options.userGroupIds,
+      userStates: options.userStates,
+      filter: options.filter,
     };
 
-		// TODO: filter item based on values in filter object
-		const filteredItems = allItems.slice(filter.skip, filter.skip + filter.take);
+		const filteredItems = allItems.filter((item) => userGroupFilter(filterOptions, item) && userStateFilter(filterOptions, item) && userQueryFilter(filterOptions, item));
+		const totalItems = filteredItems.length;
 
-		return { total, items: filteredItems };
+		const paginatedItems = filteredItems.slice(filterOptions.skip, filterOptions.skip + filterOptions.take);
+
+		return { total: totalItems, items: paginatedItems };
 	};
 }
 
