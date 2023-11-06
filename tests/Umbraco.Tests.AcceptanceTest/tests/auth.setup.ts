@@ -1,18 +1,17 @@
-﻿import {test as setup, expect, Page} from '@playwright/test';
+﻿import {test as setup, expect} from '@playwright/test';
 import {STORAGE_STATE} from '../playwright.config'
+import {UiHelpers} from "@umbraco/playwright-testhelpers";
 
-// Update this setup with test ids in the future. Maybe also find better locators in general
 setup('authenticate', async ({page}) => {
-  await page.goto(process.env.URL + '/umbraco');
+  const umbracoUi = new UiHelpers(page);
 
-  await page.getByRole('textbox', { name: 'Email' }).fill(process.env.UMBRACO_USER_LOGIN);
-  await page.getByRole('textbox', { name: 'Password' }).fill(process.env.UMBRACO_USER_PASSWORD);
+  await page.goto(process.env.URL + '/umbraco');
+  await page.getByLabel('Email').fill(process.env.UMBRACO_USER_LOGIN);
+  await page.getByLabel( 'Password', {exact: true}).fill(process.env.UMBRACO_USER_PASSWORD);
   await page.getByRole('button', {name: 'Login'}).click();
 
-  await page.waitForURL(process.env.URL + '/umbraco');
-
   // Assert
-  await expect(page.getByRole('tab', { name: 'Settings' })).toBeVisible();
-
+  await expect(page.getByRole('tab', {name: 'Settings'})).toBeVisible();
+  await umbracoUi.goToSection('Settings');
   await page.context().storageState({path: STORAGE_STATE});
 });
