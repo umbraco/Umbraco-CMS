@@ -3,7 +3,7 @@ using Umbraco.Cms.Api.Management.ViewModels.ContentType;
 
 namespace Umbraco.Cms.Api.Management.ViewModels.MediaType;
 
-[ShortGenericSchemaName<MediaTypePropertyTypeResponseModel,MediaTypePropertyTypeContainerResponseModel>("ContentTypeForMediaTypeResponse")]
+[ShortGenericSchemaName<MediaTypePropertyTypeResponseModel, MediaTypePropertyTypeContainerResponseModel>("ContentTypeForMediaTypeResponseModel")]
 public class MediaTypeResponseModel : ContentTypeResponseModelBase<MediaTypePropertyTypeResponseModel, MediaTypePropertyTypeContainerResponseModel>
 {
 }
