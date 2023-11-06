@@ -2,8 +2,8 @@ import { UmbTemplateRepository } from '../../repository/template.repository.js';
 import type { UmbQueryBuilderFilterElement } from './query-builder-filter.element.js';
 import { UUIComboboxListElement } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state, query, queryAll } from '@umbraco-cms/backoffice/external/lit';
-import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import {
+	UmbModalBaseElement ,
 	UMB_DOCUMENT_PICKER_MODAL,
 	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
 	UmbModalManagerContext,

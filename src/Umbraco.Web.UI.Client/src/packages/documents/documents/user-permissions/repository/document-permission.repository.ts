@@ -1,4 +1,3 @@
-import { t } from 'msw/lib/glossary-de6278a9.js';
 import { UmbDocumentPermissionServerDataSource } from './document-permission.server.data.js';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 

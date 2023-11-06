@@ -46,6 +46,16 @@ export class UmbStylesheetServerDataSource
 		if (!path) throw new Error('Path is missing');
 		return tryExecuteAndNotify(this.#host, StylesheetResource.getStylesheet({ path }));
 	}
+
+	/**
+	 * Fetches all stylesheets from the server
+	 * @return {*}
+	 * @memberof UmbStylesheetServerDataSource
+	 */
+	async getAll(skip: number = 0, take: number = 9999) {
+		return tryExecuteAndNotify(this.#host, StylesheetResource.getStylesheetAll({ skip, take }));
+	}
+
 	/**
 	 * Creates a new Stylesheet
 	 *
@@ -85,7 +95,7 @@ export class UmbStylesheetServerDataSource
 	 * @memberof UmbStylesheetServerDataSource
 	 */
 	getStylesheetRichTextRules(
-		path: string
+		path: string,
 	): Promise<DataSourceResponse<RichTextStylesheetRulesResponseModel | ExtractRichTextStylesheetRulesResponseModel>> {
 		return tryExecuteAndNotify(this.#host, StylesheetResource.getStylesheetRichTextRules({ path }));
 	}
@@ -97,11 +107,11 @@ export class UmbStylesheetServerDataSource
 	 * @memberof UmbStylesheetServerDataSource
 	 */
 	postStylesheetRichTextExtractRules(
-		data: ExtractRichTextStylesheetRulesRequestModel
+		data: ExtractRichTextStylesheetRulesRequestModel,
 	): Promise<DataSourceResponse<ExtractRichTextStylesheetRulesResponseModel>> {
 		return tryExecuteAndNotify(
 			this.#host,
-			StylesheetResource.postStylesheetRichTextExtractRules({ requestBody: data })
+			StylesheetResource.postStylesheetRichTextExtractRules({ requestBody: data }),
 		);
 	}
 	/**
@@ -112,11 +122,11 @@ export class UmbStylesheetServerDataSource
 	 * @memberof UmbStylesheetServerDataSource
 	 */
 	postStylesheetRichTextInterpolateRules(
-		data: InterpolateRichTextStylesheetRequestModel
+		data: InterpolateRichTextStylesheetRequestModel,
 	): Promise<DataSourceResponse<InterpolateRichTextStylesheetResponseModel>> {
 		return tryExecuteAndNotify(
 			this.#host,
-			StylesheetResource.postStylesheetRichTextInterpolateRules({ requestBody: data })
+			StylesheetResource.postStylesheetRichTextInterpolateRules({ requestBody: data }),
 		);
 	}
 }
