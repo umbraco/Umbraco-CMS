@@ -1,9 +1,9 @@
 import type {
-	LoginRequestModel,
-	LoginResponse,
-	MfaProvidersResponse,
-	ResetPasswordResponse,
-	ValidatePasswordResetCodeResponse,
+  LoginRequestModel,
+  LoginResponse,
+  MfaProvidersResponse,
+  ResetPasswordResponse,
+  ValidatePasswordResetCodeResponse,
 } from '../types.js';
 import { umbLocalizationContext } from '../external/localization/localization-context.js';
 
@@ -215,16 +215,17 @@ export class UmbAuthRepository {
 
 		const response = await fetch(request);
 
+    let text = await response.text();
+    text = this.#removeAngularJSResponseData(text);
+
+    const data = JSON.parse(text);
+
 		if (response.ok) {
 			return {
+        data,
 				status: response.status,
 			};
 		}
-
-		let text = await response.text();
-		text = this.#removeAngularJSResponseData(text);
-
-		const data = JSON.parse(text);
 
 		return {
 			status: response.status,
