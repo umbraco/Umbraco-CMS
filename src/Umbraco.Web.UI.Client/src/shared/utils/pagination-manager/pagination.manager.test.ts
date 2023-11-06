@@ -101,8 +101,9 @@ describe('UmbPaginationManager', () => {
 
     it('it fall backs to the last page number if the totalPages is less than the currentPage', () => {
       manager.setPageSize(5);
+      manager.setTotalItems(100);
+      manager.setCurrentPageNumber(10);
       manager.setTotalItems(10);
-      manager.setCurrentPageNumber(5);
       expect(manager.getCurrentPageNumber()).to.equal(2);
     });
   });
