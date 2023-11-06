@@ -41,7 +41,7 @@ export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectio
 
 	public readonly pagination = new UmbPaginationManager();
 
-	constructor(host: UmbControllerHostElement, entityType: string, repositoryAlias: string) {
+	constructor(host: UmbControllerHostElement, entityType: string, repositoryAlias: string, config: UmbCollectionConfiguration = { pageSize: 50 }) {
 		super(host);
 		this.entityType = entityType;
 
@@ -56,8 +56,7 @@ export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectio
 			this.#observeViews().asPromise(),
 		]);
 
-		// TODO: get configuration from somewhere
-		this.#configure({ pageSize: 2 });
+		this.#configure(config);
 
 		this.provideContext(UMB_COLLECTION_CONTEXT, this);
 	}
