@@ -2,7 +2,7 @@
 // contains only functions referenced by the TinyMCE editor
 // TODO: This should not be done in this way, we need to split this into seperate defined helper methods. This is also very specific to TinyMCE, so should be named that way.
 
-import { Editor, EditorEvent } from 'tinymce';
+import { tinymce } from '@umbraco-cms/backoffice/external/tinymce';
 
 export class UmbMediaHelper {
 	/**
@@ -11,7 +11,7 @@ export class UmbMediaHelper {
 	 * @param imageDomElement
 	 * @param imgUrl
 	 */
-	async sizeImageInEditor(editor: Editor, imageDomElement: HTMLElement, imgUrl?: string) {
+	async sizeImageInEditor(editor: tinymce.Editor, imageDomElement: HTMLElement, imgUrl?: string) {
 		const size = editor.dom.getSize(imageDomElement);
 		const maxImageSize = editor.options.get('maxImageSize');
 
@@ -94,7 +94,7 @@ export class UmbMediaHelper {
 	 *
 	 * @param editor
 	 */
-	async uploadBlobImages(editor: Editor) {
+	async uploadBlobImages(editor: tinymce.Editor) {
 		const content = editor.getContent();
 
 		// Upload BLOB images (dragged/pasted ones)
@@ -168,7 +168,7 @@ export class UmbMediaHelper {
 	 * @returns
 	 */
 	async onResize(
-		e: EditorEvent<{
+		e: tinymce.EditorEvent<{
 			target: HTMLElement;
 			width: number;
 			height: number;
