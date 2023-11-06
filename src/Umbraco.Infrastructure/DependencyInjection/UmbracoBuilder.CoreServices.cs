@@ -77,7 +77,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IUmbracoDatabaseFactory, UmbracoDatabaseFactory>();
         builder.Services.AddSingleton(factory => factory.GetRequiredService<IUmbracoDatabaseFactory>().SqlContext);
         builder.NPocoMappers()?.Add<NullableDateMapper>();
-        builder.PackageMigrationPlans()?.Add(() => builder.TypeLoader.GetPackageMigrationPlans());
+        builder.PackageMigrationPlans()?.Add(builder.TypeLoader.GetPackageMigrationPlans());
 
         builder.Services.AddSingleton<IRuntimeState, RuntimeState>();
         builder.Services.AddSingleton<IRuntime, CoreRuntime>();
