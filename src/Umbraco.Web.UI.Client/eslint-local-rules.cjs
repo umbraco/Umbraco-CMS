@@ -345,11 +345,23 @@ module.exports = {
 			type: 'problem',
 			docs: {
 				description: 'Ensures that the application does not rely on imports from external packages.',
-				category: 'Best Practices',
 				recommended: true,
 			},
 			fixable: 'code',
-			schema: [],
+			schema: {
+				type: "array",
+				minItems: 0,
+				maxItems: 1,
+				items: [
+					{
+						type: "object",
+						properties: {
+							exceptions: { type: "array" }
+						},
+						additionalProperties: false
+					}
+				]
+			}
 		},
 		create: (context) => {
 			return {
@@ -357,8 +369,11 @@ module.exports = {
 					const { source } = node;
 					const { value } = source;
 
+					const options = context.options[0] || {};
+					const exceptions = options.exceptions || [];
+
 					// If import starts with any of the following, then it's allowed
-					if (['@umbraco-cms', '@open-wc/testing', '@storybook', 'msw', '.'].some(v => value.startsWith(v))) {
+					if (exceptions.some(v => value.startsWith(v))) {
 						return;
 					}
 

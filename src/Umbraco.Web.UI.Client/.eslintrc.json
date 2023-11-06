@@ -45,7 +45,12 @@
 				"local-rules/umb-class-prefix": "error",
 				"local-rules/prefer-static-styles-last": "warn",
 				"local-rules/ensure-relative-import-use-js-extension": "error",
-				"local-rules/ensure-no-external-imports": "error",
+				"local-rules/ensure-no-external-imports": [
+					"error",
+					{
+						"exceptions": ["@umbraco-cms", "@open-wc/testing", "@storybook", "msw", "."]
+					}
+				],
 				"@typescript-eslint/no-non-null-assertion": "off",
 				"@typescript-eslint/no-explicit-any": "warn",
 				"@typescript-eslint/no-unused-vars": "warn"
