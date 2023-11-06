@@ -22,6 +22,7 @@ internal static class BackOfficeAuthPolicyBuilderExtensions
     {
         // NOTE: Even though we are registering these handlers globally they will only actually execute their logic for
         // any auth defining a matching requirement and scheme.
+        builder.Services.AddSingleton<IAuthorizationHandler, ContentBranchPermissionHandler>();
         builder.Services.AddSingleton<IAuthorizationHandler, ContentPermissionHandler>();
         builder.Services.AddSingleton<IAuthorizationHandler, ContentRecycleBinPermissionHandler>();
         builder.Services.AddSingleton<IAuthorizationHandler, ContentRootPermissionHandler>();
