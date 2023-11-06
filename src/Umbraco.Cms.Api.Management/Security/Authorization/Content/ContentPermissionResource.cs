@@ -1,7 +1,7 @@
 namespace Umbraco.Cms.Api.Management.Security.Authorization.Content;
 
 /// <summary>
-///     The resource used for the <see cref="ContentPermissionRequirement" />.
+///     A resource used for the <see cref="ContentPermissionRequirement" />.
 /// </summary>
 public class ContentPermissionResource
 {

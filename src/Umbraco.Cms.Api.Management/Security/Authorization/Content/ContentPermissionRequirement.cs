@@ -4,7 +4,8 @@ namespace Umbraco.Cms.Api.Management.Security.Authorization.Content;
 
 /// <summary>
 ///     Authorization requirement for the <see cref="ContentPermissionHandler" />,
-///     <see cref="ContentRecycleBinPermissionHandler" /> and <see cref="ContentRootPermissionHandler" />.
+///     <see cref="ContentRecycleBinPermissionHandler" />, <see cref="ContentRootPermissionHandler" />
+///     and <see cref="ContentBranchPermissionHandler" />.
 /// </summary>
 public class ContentPermissionRequirement : IAuthorizationRequirement
 {

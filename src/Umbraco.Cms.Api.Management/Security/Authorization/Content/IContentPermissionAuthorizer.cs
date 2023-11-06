@@ -27,7 +27,7 @@ public interface IContentPermissionAuthorizer
     Task<bool> IsAuthorizedAsync(IPrincipal currentUser, IEnumerable<Guid> contentKeys, IReadOnlyList<char> permissionsToCheck);
 
     /// <summary>
-    ///     Authorizes whether the current user has access to the descendants of the specified content item(s).
+    ///     Authorizes whether the current user has access to the descendants of the specified content item.
     /// </summary>
     /// <param name="currentUser">The current user's principal.</param>
     /// <param name="parentKey">The key of the parent content item.</param>
