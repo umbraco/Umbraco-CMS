@@ -57,6 +57,7 @@ public static class AuthorizationPolicies
     public const string TreeAccessMediaTypes = nameof(TreeAccessMediaTypes);
     public const string TreeAccessMacros = nameof(TreeAccessMacros);
     public const string TreeAccessLanguages = nameof(TreeAccessLanguages);
+    public const string TreeAccessWebhooks = nameof(TreeAccessWebhooks);
     public const string TreeAccessMemberGroups = nameof(TreeAccessMemberGroups);
     public const string TreeAccessDocumentTypes = nameof(TreeAccessDocumentTypes);
     public const string TreeAccessMemberTypes = nameof(TreeAccessMemberTypes);
