@@ -19,10 +19,6 @@
       <Link>UmbracoProject\Program.cs</Link>
       <PackagePath>UmbracoProject</PackagePath>
     </Content>
-    <Content Include="..\src\Umbraco.Web.UI\Startup.cs">
-      <Link>UmbracoProject\Startup.cs</Link>
-      <PackagePath>UmbracoProject</PackagePath>
-    </Content>
     <Content Include="..\src\Umbraco.Web.UI\Views\Partials\blocklist\**">
       <Link>UmbracoProject\Views\Partials\blocklist\%(RecursiveDir)%(Filename)%(Extension)</Link>
       <PackagePath>UmbracoProject\Views\Partials\blocklist</PackagePath>

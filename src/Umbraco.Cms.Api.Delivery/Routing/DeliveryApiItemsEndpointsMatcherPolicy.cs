@@ -2,7 +2,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Routing.Matching;
-using Umbraco.Cms.Api.Delivery.Controllers;
+using Umbraco.Cms.Api.Delivery.Controllers.Content;
+using Umbraco.Cms.Api.Delivery.Controllers.Media;
 
 namespace Umbraco.Cms.Api.Delivery.Routing;
 

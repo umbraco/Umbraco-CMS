@@ -280,6 +280,7 @@
 
                 // Map membership properties
                 _.each(displayModel.membershipProperties, prop => {
+                  if(prop.readonly === false){
                     switch (prop.alias) {
                         case '_umb_login':
                             saveModel.username = prop.value.trim();
@@ -303,6 +304,7 @@
                             saveModel.isTwoFactorEnabled = prop.value;
                             break;
                     }
+                  }
                 });
 
                 // saveModel.password = this.formatChangePasswordModel(propPass.value);

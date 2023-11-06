@@ -5,11 +5,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AngleSharp" Version="1.0.3" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.5.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.2" />
+    <PackageReference Include="AngleSharp" Version="1.0.4" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
-    <PackageReference Include="System.Data.Odbc" Version="7.0.0" />
-    <PackageReference Include="System.Data.OleDb" Version="7.0.0" />
+    <PackageReference Include="System.Data.Odbc" Version="8.0.0-rc.2.*" />
+    <PackageReference Include="System.Data.OleDb" Version="8.0.0-rc.2.*" />
   </ItemGroup>
 
   <ItemGroup>

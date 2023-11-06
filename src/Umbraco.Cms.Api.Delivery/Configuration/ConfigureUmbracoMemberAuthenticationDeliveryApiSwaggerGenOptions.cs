@@ -3,7 +3,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Umbraco.Cms.Api.Common.Security;
-using Umbraco.Cms.Api.Delivery.Controllers;
+using Umbraco.Cms.Api.Delivery.Controllers.Content;
 using Umbraco.Cms.Api.Delivery.Filters;
 
 namespace Umbraco.Cms.Api.Delivery.Configuration;
