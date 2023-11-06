@@ -173,6 +173,44 @@ public class DataValueReferenceFactoryCollectionTests
         Assert.AreEqual(trackedUdi4, result.ElementAt(1).Udi.ToString());
     }
 
+    [Test]
+    public void GetAutomaticRelationTypesAliases_ContainsDefault()
+    {
+        var collection = new DataValueReferenceFactoryCollection(Enumerable.Empty<IDataValueReferenceFactory>);
+        var propertyEditors = new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>));
+        var properties = new PropertyCollection();
+
+        var resultA = collection.GetAutomaticRelationTypesAliases(propertyEditors).ToArray();
+        var resultB = collection.GetAutomaticRelationTypesAliases(properties, propertyEditors).ToArray();
+
+        Assert.AreEqual(resultA.Length, Constants.Conventions.RelationTypes.AutomaticRelationTypes.Length);
+        Assert.AreEqual(resultA.Length, Constants.Conventions.RelationTypes.AutomaticRelationTypes.Length);
+
+        foreach (var alias in Constants.Conventions.RelationTypes.AutomaticRelationTypes)
+        {
+            Assert.Contains(alias, resultA);
+            Assert.Contains(alias, resultB);
+        }
+    }
+
+    [Test]
+    public void GetAutomaticRelationTypesAliases_ContainsCustom()
+    {
+        var collection = new DataValueReferenceFactoryCollection(() => new TestDataValueReferenceFactory().Yield());
+
+        var labelPropertyEditor = new LabelPropertyEditor(DataValueEditorFactory, IOHelper, EditorConfigurationParser);
+        var propertyEditors = new PropertyEditorCollection(new DataEditorCollection(() => labelPropertyEditor.Yield()));
+        var serializer = new ConfigurationEditorJsonSerializer();
+        var property = new Property(new PropertyType(ShortStringHelper, new DataType(labelPropertyEditor, serializer)));
+        var properties = new PropertyCollection { property };
+
+        var resultA = collection.GetAutomaticRelationTypesAliases(propertyEditors).ToArray();
+        var resultB = collection.GetAutomaticRelationTypesAliases(properties, propertyEditors).ToArray();
+
+        Assert.Contains("umbTest", resultA);
+        Assert.Contains("umbTest", resultB);
+    }
+
     private class TestDataValueReferenceFactory : IDataValueReferenceFactory
     {
         public IDataValueReference GetDataValueReference() => new TestMediaDataValueReference();
@@ -196,6 +234,8 @@ public class DataValueReferenceFactoryCollectionTests
                     yield return new UmbracoEntityReference(udi);
                 }
             }
+
+            public IEnumerable<string> GetAutomaticRelationTypesAliases() => new[] { "umbTest" };
         }
     }
 }

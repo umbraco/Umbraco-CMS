@@ -50,7 +50,7 @@ public class DataValueReferenceFactoryCollection : BuilderCollectionBase<IDataVa
                 {
                     // Check if this value reference is for this datatype/editor
                     // Then call it's GetReferences method - to see if the value stored
-                    // in the dataeditor/property has referecnes to media/content items
+                    // in the dataeditor/property has references to media/content items
                     if (item.IsForEditor(editor))
                     {
                         foreach (UmbracoEntityReference r in item.GetDataValueReference().GetReferences(val))
@@ -63,5 +63,75 @@ public class DataValueReferenceFactoryCollection : BuilderCollectionBase<IDataVa
         }
 
         return trackedRelations;
+    }
+
+    /// <summary>
+    /// Gets all relation type aliases that are automatically tracked.
+    /// </summary>
+    /// <param name="propertyEditors">The property editors.</param>
+    /// <returns>
+    /// All relation type aliases that are automatically tracked.
+    /// </returns>
+    public ISet<string> GetAutomaticRelationTypesAliases(PropertyEditorCollection propertyEditors)
+    {
+        // Always add default automatic relation types
+        var automaticRelationTypeAliases = new HashSet<string>(Constants.Conventions.RelationTypes.AutomaticRelationTypes);
+
+        // Add relation types for all property editors
+        foreach (IDataEditor dataEditor in propertyEditors)
+        {
+            automaticRelationTypeAliases.UnionWith(GetAutomaticRelationTypesAliases(dataEditor));
+        }
+
+        return automaticRelationTypeAliases;
+    }
+
+    /// <summary>
+    /// Gets the relation type aliases that are automatically tracked for all properties.
+    /// </summary>
+    /// <param name="properties">The properties.</param>
+    /// <param name="propertyEditors">The property editors.</param>
+    /// <returns>
+    /// The relation type aliases that are automatically tracked for all properties.
+    /// </returns>
+    public ISet<string> GetAutomaticRelationTypesAliases(IPropertyCollection properties, PropertyEditorCollection propertyEditors)
+    {
+        // Always add default automatic relation types
+        var automaticRelationTypeAliases = new HashSet<string>(Constants.Conventions.RelationTypes.AutomaticRelationTypes);
+
+        // Only add relation types that are used in the properties
+        foreach (IProperty property in properties)
+        {
+            if (propertyEditors.TryGet(property.PropertyType.PropertyEditorAlias, out IDataEditor? dataEditor))
+            {
+                automaticRelationTypeAliases.UnionWith(GetAutomaticRelationTypesAliases(dataEditor));
+            }
+        }
+
+        return automaticRelationTypeAliases;
+    }
+
+    private IEnumerable<string> GetAutomaticRelationTypesAliases(IDataEditor dataEditor)
+    {
+        if (dataEditor.GetValueEditor() is IDataValueReference dataValueReference)
+        {
+            // Return custom relation types from value editor implementation
+            foreach (var alias in dataValueReference.GetAutomaticRelationTypesAliases())
+            {
+                yield return alias;
+            }
+        }
+
+        foreach (IDataValueReferenceFactory dataValueReferenceFactory in this)
+        {
+            if (dataValueReferenceFactory.IsForEditor(dataEditor))
+            {
+                // Return custom relation types from factory
+                foreach (var alias in dataValueReferenceFactory.GetDataValueReference().GetAutomaticRelationTypesAliases())
+                {
+                    yield return alias;
+                }
+            }
+        }
     }
 }
