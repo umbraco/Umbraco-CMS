@@ -105,7 +105,7 @@ export const stringFilter = (filterBy: Array<string>, value?: string): boolean =
 	return filterBy.includes(value);
 };
 
-export const queryFilter = (filterBy: string, value: string) => {
+export const queryFilter = (filterBy: string, value?: string) => {
 	if (!filterBy || !value) {
 		return true;
 	}

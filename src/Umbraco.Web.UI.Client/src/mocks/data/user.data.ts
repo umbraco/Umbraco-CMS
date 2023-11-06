@@ -21,9 +21,9 @@ const createUserItem = (item: UserResponseModel): UserItemResponseModel => {
 	};
 };
 
-const userGroupFilter = (filterOptions: any, item: UserItemResponseModel) => arrayFilter(filterOptions.userGroupIds, item.userGroupIds);
-const userStateFilter = (filterOptions: any, item: UserItemResponseModel) => stringFilter(filterOptions.userStates, item.state);
-const userQueryFilter = (filterOptions: any, item: UserItemResponseModel) => queryFilter(filterOptions.filter, item.name);
+const userGroupFilter = (filterOptions: any, item: UserResponseModel) => arrayFilter(filterOptions.userGroupIds, item.userGroupIds);
+const userStateFilter = (filterOptions: any, item: UserResponseModel) => stringFilter(filterOptions.userStates, item.state);
+const userQueryFilter = (filterOptions: any, item: UserResponseModel) => queryFilter(filterOptions.filter, item.name);
 
 // Temp mocked database
 class UmbUserData extends UmbEntityData<UserResponseModel> {
