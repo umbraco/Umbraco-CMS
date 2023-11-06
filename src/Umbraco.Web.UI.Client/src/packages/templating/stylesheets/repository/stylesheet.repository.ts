@@ -1,4 +1,3 @@
-import { Observable } from 'rxjs';
 import { StylesheetDetails } from '../index.js';
 import { UmbStylesheetTreeStore, UMB_STYLESHEET_TREE_STORE_CONTEXT_TOKEN } from './stylesheet.tree.store.js';
 import { UmbStylesheetTreeServerDataSource } from './sources/stylesheet.tree.server.data.js';
@@ -7,6 +6,7 @@ import {
 	StylesheetGetFolderResponse,
 	UmbStylesheetFolderServerDataSource,
 } from './sources/stylesheet.folder.server.data.js';
+import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import {
@@ -27,6 +27,7 @@ import {
 	FolderResponseModel,
 	InterpolateRichTextStylesheetRequestModel,
 	InterpolateRichTextStylesheetResponseModel,
+	PagedStylesheetOverviewResponseModel,
 	ProblemDetails,
 	RichTextStylesheetRulesResponseModel,
 	TextFileResponseModelBaseModel,
@@ -141,6 +142,10 @@ export class UmbStylesheetRepository
 		const parentPath = id.substring(0, id.lastIndexOf('/'));
 		this.requestTreeItemsOf(parentPath ? parentPath : null);
 		return promise;
+	}
+
+	async getAll(skip?: number, take?: number): Promise<DataSourceResponse<PagedStylesheetOverviewResponseModel>> {
+		return this.#dataSource.getAll(skip, take);
 	}
 
 	getStylesheetRules(

@@ -1,3 +1,4 @@
+/* eslint local-rules/enforce-umbraco-external-imports: 0 */
 /**
  * TinyMce is a CommonJS module, but in order to make @web/test-runner happy
  * we need to load it as a module and then manually register it in the browser

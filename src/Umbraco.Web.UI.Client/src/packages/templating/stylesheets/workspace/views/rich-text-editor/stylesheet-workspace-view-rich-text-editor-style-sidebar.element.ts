@@ -1,5 +1,5 @@
 import { RichTextRuleModelSortable } from '../../stylesheet-workspace.context.js';
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, ifDefined, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { RichTextRuleModel } from '@umbraco-cms/backoffice/backend-api';
@@ -128,7 +128,7 @@ export default class UmbStylesheetRichTextEditorStyleModalElement extends UmbMod
 	}
 
 	static styles = [
-		UUITextStyles,
+		UmbTextStyles,
 		css`
 			:host {
 				display: block;

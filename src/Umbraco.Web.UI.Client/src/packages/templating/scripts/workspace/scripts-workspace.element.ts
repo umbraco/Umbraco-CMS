@@ -1,5 +1,5 @@
 import { UmbScriptsWorkspaceContext } from './scripts-workspace.context.js';
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbRoute, IRoutingInfo, PageComponent } from '@umbraco-cms/backoffice/router';
@@ -40,7 +40,7 @@ export class UmbScriptsWorkspaceElement extends UmbLitElement {
 		return html`<umb-router-slot .routes=${this._routes}></umb-router-slot>`;
 	}
 
-	static styles = [UUITextStyles, css``];
+	static styles = [UmbTextStyles, css``];
 }
 
 export default UmbScriptsWorkspaceElement;
