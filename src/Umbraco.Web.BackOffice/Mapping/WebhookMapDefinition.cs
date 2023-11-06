@@ -38,7 +38,11 @@ public class WebhookMapDefinition : IMapDefinition
     }
 
     // Umbraco.Code.MapAll
-    private void Map(IWebhookEvent source, WebhookEventViewModel target, MapperContext context) => target.EventName = source.EventName;
+    private void Map(IWebhookEvent source, WebhookEventViewModel target, MapperContext context)
+    {
+        target.EventName = source.EventName;
+        target.EventType = source.EventType;
+    }
 
     // Umbraco.Code.MapAll
     private void Map(WebhookLog source, WebhookLogViewModel target, MapperContext context)

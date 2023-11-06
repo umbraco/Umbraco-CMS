@@ -14,11 +14,14 @@ public abstract class WebhookEventBase<TNotification> : IWebhookEvent, INotifica
 {
     private readonly IServerRoleAccessor _serverRoleAccessor;
 
-    /// <InheritDoc />
     public string EventName { get; set; }
 
+    public WebhookEventType EventType { get; }
+
     protected IWebhookFiringService WebhookFiringService { get; }
+
     protected IWebHookService WebHookService { get; }
+
     protected WebhookSettings WebhookSettings { get; private set; }
 
     protected WebhookEventBase(
@@ -26,9 +29,11 @@ public abstract class WebhookEventBase<TNotification> : IWebhookEvent, INotifica
         IWebHookService webHookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
         IServerRoleAccessor serverRoleAccessor,
-        string eventName)
+        string eventName,
+        WebhookEventType eventType)
     {
         EventName = eventName;
+        EventType = eventType;
 
         WebhookFiringService = webhookFiringService;
         WebHookService = webHookService;

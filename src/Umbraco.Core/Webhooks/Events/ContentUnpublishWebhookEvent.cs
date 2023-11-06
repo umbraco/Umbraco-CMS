@@ -19,7 +19,8 @@ public class ContentUnpublishWebhookEvent : WebhookEventContentBase<ContentUnpub
             webHookService,
             webhookSettings,
             serverRoleAccessor,
-            Constants.WebhookEvents.ContentUnpublish)
+            Constants.WebhookEvents.ContentUnpublish,
+            WebhookEventType.Content)
     {
     }
 

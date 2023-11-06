@@ -3,4 +3,6 @@
 public interface IWebhookEvent
 {
     string EventName { get; set; }
+
+    WebhookEventType EventType { get; }
 }

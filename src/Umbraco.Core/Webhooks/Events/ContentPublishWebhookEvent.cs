@@ -27,7 +27,8 @@ public class ContentPublishWebhookEvent : WebhookEventContentBase<ContentPublish
             webHookService,
             webhookSettings,
             serverRoleAccessor,
-            Constants.WebhookEvents.ContentPublish)
+            Constants.WebhookEvents.ContentPublish,
+            WebhookEventType.Content)
     {
         _publishedSnapshotAccessor = publishedSnapshotAccessor;
         _apiContentBuilder = apiContentBuilder;

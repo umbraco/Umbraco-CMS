@@ -17,8 +17,9 @@ public abstract class WebhookEventContentBase<TNotification, TEntity> : WebhookE
         IWebHookService webHookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
         IServerRoleAccessor serverRoleAccessor,
-        string eventName)
-        : base(webhookFiringService, webHookService, webhookSettings, serverRoleAccessor, eventName)
+        string eventName,
+        WebhookEventType eventType)
+        : base(webhookFiringService, webHookService, webhookSettings, serverRoleAccessor, eventName, eventType)
     {
     }
 

@@ -27,7 +27,8 @@ public class MediaSaveWebhookEvent : WebhookEventContentBase<MediaSavedNotificat
             webHookService,
             webhookSettings,
             serverRoleAccessor,
-            Constants.WebhookEvents.MediaSave)
+            Constants.WebhookEvents.MediaSave,
+            WebhookEventType.Media)
     {
         _publishedSnapshotAccessor = publishedSnapshotAccessor;
         _apiMediaBuilder = apiMediaBuilder;
