@@ -2381,6 +2381,10 @@
 			"file": "wand-2.svg"
 		},
 		{
+			"name": "icon-webhook",
+			"file": "webhook.svg"
+		},
+		{
 			"name": "icon-weight",
 			"file": "weight.svg"
 		},
