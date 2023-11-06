@@ -18677,6 +18677,9 @@
           "contentTypeId": {
             "type": "string",
             "format": "uuid"
+          },
+          "isTrashed": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -18715,6 +18718,9 @@
             "type": "string",
             "format": "uuid",
             "nullable": true
+          },
+          "isTrashed": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -19633,6 +19639,9 @@
           "icon": {
             "type": "string",
             "nullable": true
+          },
+          "isTrashed": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
