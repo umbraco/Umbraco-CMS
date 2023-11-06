@@ -206,7 +206,7 @@ export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectio
 
 	#onPageChange = (event: UmbChangeEvent) => {
 		const target = event.target as UmbPaginationManager;
-		const skipFilter = { skip: target.getSkip() };
+		const skipFilter = { skip: target.getSkip() } as Partial<FilterModelType>;
 		this.setFilter(skipFilter);
 	}
 
