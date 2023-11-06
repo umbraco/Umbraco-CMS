@@ -98,6 +98,13 @@ describe('UmbContextConsumer', () => {
       manager.setTotalItems(100);
       expect(manager.getTotalPages()).to.equal(20);
     });
+
+    it('it fall backs to the last page number if the totalPages is less than the currentPage', () => {
+      manager.setPageSize(5);
+      manager.setTotalItems(10);
+      manager.setCurrentPageNumber(5);
+      expect(manager.getCurrentPageNumber()).to.equal(2);
+    });
   });
 
   describe('Current Page', () => {

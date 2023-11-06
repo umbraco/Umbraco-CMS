@@ -101,6 +101,12 @@ export class UmbPaginationManager extends EventTarget {
   #calculateTotalPages() {
     const totalPages = Math.ceil(this.#totalItems.getValue() / this.#pageSize.getValue());
     this.#totalPages.next(totalPages);
+
+    /* If we currently are on a page higher than the total pages. We need to reset the current page to the last page.
+    This can happen if we have a filter that returns less items than the current page size. */
+    if (this.getCurrentPageNumber() > totalPages) {
+      this.setCurrentPageNumber(totalPages);
+    }
   }
   
   #calculateSkip() {
