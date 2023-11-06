@@ -340,7 +340,7 @@ module.exports = {
 	},
 
 	/** @type {import('eslint').Rule.RuleModule}*/
-	'ensure-no-external-imports': {
+	'enforce-umbraco-external-imports': {
 		meta: {
 			type: 'problem',
 			docs: {
