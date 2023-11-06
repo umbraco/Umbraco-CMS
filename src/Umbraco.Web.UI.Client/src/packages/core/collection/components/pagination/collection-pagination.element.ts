@@ -53,6 +53,7 @@ export class UmbCollectionPaginationElement extends UmbLitElement {
 		css`
       :host {
         display: block;
+				margin-top: var(--uui-size-layout-1);
       }
     `
 	];
