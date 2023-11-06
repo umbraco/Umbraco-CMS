@@ -19,9 +19,12 @@ public class MediaControllerBase : ContentControllerBase
     protected IActionResult MediaAuthorizationStatusResult(MediaAuthorizationStatus status) =>
         status switch
         {
+            MediaAuthorizationStatus.NotFound => NotFound(new ProblemDetailsBuilder()
+                .WithTitle("The media item could not be found")
+                .Build()),
             MediaAuthorizationStatus.UnauthorizedMissingBinAccess => Unauthorized(new ProblemDetailsBuilder()
-                .WithTitle("Unauthorized bin access")
-                .WithDetail("The performing user does not have access to the media bin item.")
+                .WithTitle("Unauthorized recycle bin access")
+                .WithDetail("The performing user does not have access to the media recycle bin item.")
                 .Build()),
             MediaAuthorizationStatus.UnauthorizedMissingPathAccess => Unauthorized(new ProblemDetailsBuilder()
                 .WithTitle("Unauthorized")

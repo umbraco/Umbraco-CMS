@@ -1,18 +1,15 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Core.Services.AuthorizationStatus;
 using Umbraco.Cms.Core.Services.OperationStatus;
-using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.UserGroup;
 
 [ApiController]
 [VersionedApiBackOfficeRoute("user-group")]
 [ApiExplorerSettings(GroupName = "User Group")]
-[Authorize(Policy = "New" + AuthorizationPolicies.SectionAccessUsers)]
 public class UserGroupControllerBase : ManagementApiControllerBase
 {
     protected IActionResult UserGroupOperationStatusResult(UserGroupOperationStatus status) =>
@@ -49,7 +46,7 @@ public class UserGroupControllerBase : ManagementApiControllerBase
                 .Build()),
             UserGroupOperationStatus.UnauthorizedMissingUserGroup => Unauthorized(new ProblemDetailsBuilder()
                 .WithTitle("User not in user group")
-                .WithDetail("The current user is not in the user group(s)")
+                .WithDetail("The current user is not in the user group")
                 .Build()),
             UserGroupOperationStatus.CancelledByNotification => BadRequest(new ProblemDetailsBuilder()
                 .WithTitle("Cancelled by notification")
@@ -87,7 +84,7 @@ public class UserGroupControllerBase : ManagementApiControllerBase
     protected IActionResult UserGroupAuthorizationStatusResult(UserGroupAuthorizationStatus status) =>
         status switch
         {
-            UserGroupAuthorizationStatus.UnauthorizedMissingUserGroup => Unauthorized(new ProblemDetailsBuilder()
+            UserGroupAuthorizationStatus.UnauthorizedMissingUserGroupAccess => Unauthorized(new ProblemDetailsBuilder()
                 .WithTitle("Unauthorized")
                 .WithDetail("The performing user does not have access to all specified user groups.")
                 .Build()),
@@ -99,5 +96,4 @@ public class UserGroupControllerBase : ManagementApiControllerBase
     protected IActionResult UserGroupNotFound() => NotFound(new ProblemDetailsBuilder()
         .WithTitle("The user group could not be found")
         .Build());
-
 }

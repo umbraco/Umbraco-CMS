@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Services.AuthorizationStatus;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Web.Common.Authorization;
 
@@ -128,5 +129,17 @@ public abstract class UserControllerBase : ManagementApiControllerBase
             _ => StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetailsBuilder()
                     .WithTitle("Unknown user operation status.")
                     .Build()),
+        };
+
+    protected IActionResult UserAuthorizationStatusResult(UserAuthorizationStatus status) =>
+        status switch
+        {
+            UserAuthorizationStatus.UnauthorizedMissingAdminAccess => Unauthorized(new ProblemDetailsBuilder()
+                .WithTitle("Unauthorized admin access")
+                .WithDetail("The performing user does not have admin access to perform the operation.")
+                .Build()),
+            _ => StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetailsBuilder()
+                .WithTitle("Unknown user authorization status.")
+                .Build()),
         };
 }
