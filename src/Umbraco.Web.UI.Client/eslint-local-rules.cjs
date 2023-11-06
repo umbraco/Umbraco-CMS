@@ -344,7 +344,7 @@ module.exports = {
 		meta: {
 			type: 'problem',
 			docs: {
-				description: 'Ensures that the application does not rely on imports from external packages.',
+				description: 'Ensures that the application strictly uses node_modules imports from `@umbraco-cms/backoffice/external`. This is needed to run the application in the browser.',
 				recommended: true,
 			},
 			fixable: 'code',
@@ -379,7 +379,7 @@ module.exports = {
 
 					context.report({
 						node,
-						message: 'External imports are not allowed.',
+						message: 'node_modules imports should be proxied through `@umbraco-cms/backoffice/external`. Please create it if it does not exist.',
 						fix: (fixer) => fixer.replaceText(source, `'@umbraco-cms/backoffice/external${value.startsWith('/') ? '' : '/'}${value}'`),
 					});
 				},
