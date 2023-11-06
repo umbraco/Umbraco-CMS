@@ -242,14 +242,14 @@ public static partial class UmbracoBuilderExtensions
     /// Gets the partial view snippets collection builder.
     /// </summary>
     /// <param name="builder">The builder.</param>
-    public static PartialViewSnippetCollectionBuilder? PartialViewSnippets(this IUmbracoBuilder builder)
+    public static PartialViewSnippetCollectionBuilder PartialViewSnippets(this IUmbracoBuilder builder)
         => builder.WithCollectionBuilder<PartialViewSnippetCollectionBuilder>();
 
     /// <summary>
     /// Gets the partial view macro snippets collection builder.
     /// </summary>
     /// <param name="builder">The builder.</param>
-    public static PartialViewMacroSnippetCollectionBuilder? PartialViewMacroSnippets(this IUmbracoBuilder builder)
+    public static PartialViewMacroSnippetCollectionBuilder PartialViewMacroSnippets(this IUmbracoBuilder builder)
         => builder.WithCollectionBuilder<PartialViewMacroSnippetCollectionBuilder>();
 
     /// <summary>
