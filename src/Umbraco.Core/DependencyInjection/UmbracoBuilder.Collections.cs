@@ -36,9 +36,9 @@ public static partial class UmbracoBuilderExtensions
     /// </summary>
     internal static void AddAllCoreCollectionBuilders(this IUmbracoBuilder builder)
     {
-        builder.CacheRefreshers().Add(() => builder.TypeLoader.GetCacheRefreshers());
-        builder.DataEditors().Add(() => builder.TypeLoader.GetDataEditors());
-        builder.Actions().Add(() => builder .TypeLoader.GetActions());
+        builder.CacheRefreshers().Add(builder.TypeLoader.GetCacheRefreshers);
+        builder.DataEditors().Add(builder.TypeLoader.GetDataEditors);
+        builder.Actions().Add(builder.TypeLoader.GetActions);
 
         // register known content apps
         builder.ContentApps()
