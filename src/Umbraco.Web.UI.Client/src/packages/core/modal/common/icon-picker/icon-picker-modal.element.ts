@@ -1,7 +1,7 @@
 import icons from '../../../../../shared/icon-registry/icons/icons.json' assert { type: 'json' };
 import type { UUIColorSwatchesEvent } from '@umbraco-cms/backoffice/external/uui';
 
-import { css, html, styleMap, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 import { UmbIconPickerModalData, UmbIconPickerModalValue, UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
@@ -17,40 +17,28 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 	@state()
 	private _iconListFiltered: Array<(typeof icons)[0]> = [];
 
-	// TODO: Make sure we do not store colors, but color-aliases.
 	@state()
 	private _colorList = [
-		'#000000',
-		'#373737',
-		'#9e9e9e',
-		'#607d8b',
-		'#2196f3',
-		'#03a9f4',
-		'#3f51b5',
-		'#9c27b0',
-		'#673ab7',
-		'#00bcd4',
-		'#4caf50',
-		'#8bc34a',
-		'#cddc39',
-		'#ffeb3b',
-		'#ffc107',
-		'#ff9800',
-		'#ff5722',
-		'#f44336',
-		'#e91e63',
-		'#795548',
+		{alias:'text', varName:'--uui-color-text'},
+		{alias:'yellow', varName:'--uui-palette-sunglow'},
+		{alias:'pink', varName:'--uui-palette-spanish-pink'},
+		{alias:'dark', varName:'--uui-palette-gunmetal'},
+		{alias:'darkblue', varName:'--uui-palette-space-cadet'},
+		{alias:'blue', varName:'--uui-palette-violet-blue'},
+		{alias:'red', varName:'--uui-palette-maroon-flush'},
+		{alias:'green', varName:'--uui-palette-jungle-green'},
+		{alias:'brown', varName:'--uui-palette-chamoisee'},
 	];
 
 	@state()
-	private _currentColor?: string;
+	_modalValue?:UmbIconPickerModalValue;
 
 	@state()
-	private _currentIcon?: string;
+	_currentColorVarName = '--uui-color-text';
 
 	#changeIcon(e: { target: HTMLInputElement; type: any; key: unknown }) {
 		if (e.type == 'click' || (e.type == 'keyup' && e.key == 'Enter')) {
-			this._currentIcon = e.target.id;
+			this.modalContext?.updateValue({icon: e.target.id});
 		}
 	}
 
@@ -67,18 +55,24 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 	}
 
 	#submit() {
-		this.modalContext?.submit({ color: this._currentColor, icon: this._currentIcon });
+		// TODO: Shouldnt we stop sending the value here, instead let the modal context send of its value. and then its up to any one using it to make sure Modal Context value is up to date.
+		this.modalContext?.submit(this._modalValue);
 	}
 
 	#onColorChange(e: UUIColorSwatchesEvent) {
-		this._currentColor = e.target.value;
+		this.modalContext?.updateValue({icon: e.target.value});
 	}
 
 	connectedCallback() {
 		super.connectedCallback();
-		this._currentColor = this.data?.color ?? this._colorList[0];
-		this._currentIcon = this.data?.icon ?? this._iconList[0].name;
 		this._iconListFiltered = this._iconList;
+
+		if(this.modalContext) {
+			this.observe(this.modalContext?.value, (newValue) => {
+				this._modalValue = newValue;
+				this._currentColorVarName = this._colorList.find(x => x.alias === newValue?.color)?.alias ?? this._colorList[0].varName;
+			}, '_observeModalContextValue');
+		}
 	}
 
 	render() {
@@ -88,12 +82,14 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 					${this.renderSearchbar()}
 					<hr />
 					<uui-color-swatches
-						.value="${this._currentColor || ''}"
+						.value="${this._modalValue?.color ?? ''}"
 						label="Color switcher for icons"
 						@change="${this.#onColorChange}">
-						${this._colorList.map(
+						${
+							// TODO: Missing translation for the color aliases.
+							this._colorList.map(
 							(color) => html`
-								<uui-color-swatch label="${color}" title="${color}" value="${color}"></uui-color-swatch>
+								<uui-color-swatch label="${color.alias}" title="${color.alias}" value=${color.alias} style="--uui-swatch-color: ${color.varName}"></uui-color-swatch>
 							`,
 						)}
 					</uui-color-swatches>
@@ -124,8 +120,8 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 			(icon) => html`
 				<uui-icon
 					tabindex="0"
-					style=${styleMap({ color: this._currentColor })}
-					class="icon ${icon.name === this._currentIcon ? 'selected' : ''}"
+					style="color: var(${this._currentColorVarName})"
+					class="icon ${icon.name === this._modalValue?.icon ? 'selected' : ''}"
 					title="${icon.name}"
 					name="${icon.name}"
 					label="${icon.name}"
