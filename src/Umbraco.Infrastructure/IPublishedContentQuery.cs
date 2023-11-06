@@ -63,10 +63,7 @@ public interface IPublishedContentQuery
     ///     The name of the index to search (defaults to
     ///     <see cref="Constants.UmbracoIndexes.ExternalIndexName" />).
     /// </param>
-    /// <param name="loadedFields">
-    ///     This parameter is no longer used, because the results are loaded from the published snapshot
-    ///     using the single item ID field.
-    /// </param>
+    /// <param name="filterQuery">Additional filter query to be applied.</param>
     /// <returns>
     ///     The search results.
     /// </returns>
@@ -86,7 +83,7 @@ public interface IPublishedContentQuery
         out long totalRecords,
         string culture = "*",
         string indexName = Constants.UmbracoIndexes.ExternalIndexName,
-        ISet<string>? loadedFields = null);
+        Func<IBooleanOperation, IOrdering>? filterQuery = null);
 
     /// <summary>
     ///     Searches content.

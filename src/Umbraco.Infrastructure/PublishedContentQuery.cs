@@ -245,9 +245,14 @@ public class PublishedContentQuery : IPublishedContentQuery
         => Search(term, 0, 0, out _, culture, indexName);
 
     /// <inheritdoc />
-    public IEnumerable<PublishedSearchResult> Search(string term, int skip, int take, out long totalRecords,
-        string culture = "*", string indexName = Constants.UmbracoIndexes.ExternalIndexName,
-        ISet<string>? loadedFields = null)
+    public IEnumerable<PublishedSearchResult> Search(
+        string term,
+        int skip,
+        int take,
+        out long totalRecords,
+        string culture = "*",
+        string indexName = Constants.UmbracoIndexes.ExternalIndexName,
+        Func<IBooleanOperation, IOrdering>? filterQuery = null)
     {
         if (skip < 0)
         {
@@ -274,16 +279,16 @@ public class PublishedContentQuery : IPublishedContentQuery
 
         IQuery? query = umbIndex.Searcher.CreateQuery(IndexTypes.Content);
 
-        IOrdering ordering;
+        IBooleanOperation booleanQuery;
         if (culture == "*")
         {
             // Search everything
-            ordering = query.ManagedQuery(term);
+            booleanQuery = query.ManagedQuery(term);
         }
         else if (string.IsNullOrWhiteSpace(culture))
         {
             // Only search invariant
-            ordering = query
+            booleanQuery = query
                 .Field(UmbracoExamineFieldNames.VariesByCultureFieldName, "n") // Must not vary by culture
                 .And().ManagedQuery(term);
         }
@@ -296,12 +301,15 @@ public class PublishedContentQuery : IPublishedContentQuery
 
             // Filter out unpublished content for the specified culture if the content varies by culture
             // The published__{culture} field is not populated when the content is not published in that culture
-            ordering = query
+            booleanQuery = query
                 .ManagedQuery(term, fields)
                 .Not().Group(q => q
                     .Field(UmbracoExamineFieldNames.VariesByCultureFieldName, "y")
                     .Not().Field($"{UmbracoExamineFieldNames.PublishedFieldName}_{culture.ToLowerInvariant()}", "y"));
         }
+
+        // Apply any additional user supplied filtering
+        IOrdering ordering = filterQuery != null ? filterQuery(booleanQuery) : booleanQuery;
 
         return Search(ordering, skip, take, out totalRecords, culture);
     }
