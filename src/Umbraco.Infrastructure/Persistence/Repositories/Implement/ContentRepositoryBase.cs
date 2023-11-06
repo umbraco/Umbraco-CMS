@@ -1083,9 +1083,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         protected void PersistRelations(TEntity entity)
         {
             // Get all references from our core built in DataEditors/Property Editors
-            // Along with seeing if deverlopers want to collect additional references from the DataValueReferenceFactories collection
-            var trackedRelations = new List<UmbracoEntityReference>();
-            trackedRelations.AddRange(_dataValueReferenceFactories.GetAllReferences(entity.Properties, PropertyEditors));
+            // Along with seeing if developers want to collect additional references from the DataValueReferenceFactories collection
+            var trackedRelations = _dataValueReferenceFactories.GetAllReferences(entity.Properties, PropertyEditors);
 
             // First delete all auto-relations for this entity
             var relationTypeAliases = _dataValueReferenceFactories.GetAutomaticRelationTypesAliases(entity.Properties, PropertyEditors).ToArray();
@@ -1096,23 +1095,20 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 return;
             }
 
-            trackedRelations = trackedRelations.Distinct().ToList();
-            var udiToGuids = trackedRelations.Select(x => x.Udi as GuidUdi)
-                .ToDictionary(x => (Udi)x!, x => x!.Guid);
+            var udiToGuids = trackedRelations.Select(x => x.Udi as GuidUdi).WhereNotNull().ToDictionary(x => (Udi)x, x => x.Guid);
 
             // lookup in the DB all INT ids for the GUIDs and chuck into a dictionary
-            var keyToIds = Database.Fetch<NodeIdKey>(Sql()
+            var keyToIds = Database.FetchByGroups<NodeIdKey, Guid>(udiToGuids.Values, Constants.Sql.MaxParameterCount, guids => Sql()
                 .Select<NodeDto>(x => x.NodeId, x => x.UniqueId)
                 .From<NodeDto>()
-                .WhereIn<NodeDto>(x => x.UniqueId, udiToGuids.Values))
+                .WhereIn<NodeDto>(x => x.UniqueId, guids))
                 .ToDictionary(x => x.UniqueId, x => x.NodeId);
 
-            var allRelationTypes = RelationTypeRepository.GetMany(Array.Empty<int>())?
-                .ToDictionary(x => x.Alias, x => x);
+            var allRelationTypes = RelationTypeRepository.GetMany(Array.Empty<int>()).ToDictionary(x => x.Alias, x => x);
 
             IEnumerable<ReadOnlyRelation> toSave = trackedRelations.Select(rel =>
                 {
-                    if (allRelationTypes is null || !allRelationTypes.TryGetValue(rel.RelationTypeAlias, out IRelationType? relationType))
+                    if (!allRelationTypes.TryGetValue(rel.RelationTypeAlias, out IRelationType? relationType))
                     {
                         throw new InvalidOperationException($"The relation type {rel.RelationTypeAlias} does not exist");
                     }
