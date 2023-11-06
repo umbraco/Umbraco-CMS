@@ -15,7 +15,7 @@ public interface ILocalLinkParser
     ///     Turns {{localLink:1234}} into {{localLink:umb://{type}/{id}}} and adds the corresponding udi to the
     ///     dependencies.
     /// </remarks>
-    string? ToArtifact(string? value, ICollection<Udi> dependencies);
+    string ToArtifact(string value, ICollection<Udi> dependencies);
 
     /// <summary>
     ///     Parses an artifact property value and produces an Umbraco property value.
@@ -23,5 +23,5 @@ public interface ILocalLinkParser
     /// <param name="value">The artifact property value.</param>
     /// <returns>The parsed value.</returns>
     /// <remarks>Turns {{localLink:umb://{type}/{id}}} into {{localLink:1234}}.</remarks>
-    string? FromArtifact(string? value);
+    string FromArtifact(string value);
 }
