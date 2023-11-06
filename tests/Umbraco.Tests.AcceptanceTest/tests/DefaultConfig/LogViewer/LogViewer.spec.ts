@@ -179,6 +179,7 @@ test.describe('Log Viewer tests', () => {
 
     // Assert
     await expect(page.locator('umb-log-viewer-message').locator('[id="message"]').first()).toContainText(firstLogOnSecondPage);
+    // TODO: Remove the comment below when the issue is resolved.
     // At the time this test was created, the UI only highlights page 1. Uncomment the line below when the issue is resolved.
     // await expect(page.getByLabel('Pagination navigation. Current page: 2.', {exact: true})).toBeVisible();
   });
