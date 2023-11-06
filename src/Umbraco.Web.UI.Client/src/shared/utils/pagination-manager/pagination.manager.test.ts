@@ -8,6 +8,8 @@ describe('UmbPaginationManager', () => {
 
 	beforeEach(() => {
 		manager = new UmbPaginationManager();
+    manager.setPageSize(10);
+    manager.setTotalItems(100);
 	});
 
 	describe('Public API', () => {
@@ -62,8 +64,8 @@ describe('UmbPaginationManager', () => {
 
   describe('Page Size', () => {
     it('sets and gets the pageSize value', () => {
-      manager.setPageSize(10);
-      expect(manager.getPageSize()).to.equal(10);
+      manager.setPageSize(5);
+      expect(manager.getPageSize()).to.equal(5);
     });
 
     it('updates the observable', (done) => {
@@ -79,13 +81,11 @@ describe('UmbPaginationManager', () => {
 
   describe('Total Items', () => {
     it('sets and gets the totalItems value', () => {
-      manager.setTotalItems(100);
-      expect(manager.getTotalItems()).to.equal(100);
+      manager.setTotalItems(200);
+      expect(manager.getTotalItems()).to.equal(200);
     });
 
-    it('updates the observable', (done) => {
-      manager.setTotalItems(100);
-      
+    it('updates the observable', (done) => {      
       manager.totalItems.subscribe((value) => {
         expect(value).to.equal(100);
         done();
@@ -94,16 +94,12 @@ describe('UmbPaginationManager', () => {
     });
 
     it('recalculates the total pages', () => {
-      manager.setPageSize(5);
-      manager.setTotalItems(100);
-      expect(manager.getTotalPages()).to.equal(20);
+      expect(manager.getTotalPages()).to.equal(10);
     });
 
     it('it fall backs to the last page number if the totalPages is less than the currentPage', () => {
-      manager.setPageSize(5);
-      manager.setTotalItems(100);
       manager.setCurrentPageNumber(10);
-      manager.setTotalItems(10);
+      manager.setTotalItems(20);
       expect(manager.getCurrentPageNumber()).to.equal(2);
     });
   });
@@ -111,6 +107,18 @@ describe('UmbPaginationManager', () => {
   describe('Current Page', () => {
     it('sets and gets the currentPage value', () => {
       manager.setCurrentPageNumber(2);
+      expect(manager.getCurrentPageNumber()).to.equal(2);
+    });
+
+    it ('cant be set to a value less than 1', () => {
+      manager.setCurrentPageNumber(0);
+      expect(manager.getCurrentPageNumber()).to.equal(1);
+    });
+
+    it ('cant be set to a value greater than the total pages', () => {
+      manager.setPageSize(1);
+      manager.setTotalItems(2);
+      manager.setCurrentPageNumber(10);
       expect(manager.getCurrentPageNumber()).to.equal(2);
     });
 
@@ -125,38 +133,32 @@ describe('UmbPaginationManager', () => {
     });
 
     it('updates the skip value', () => {
-      manager.setPageSize(5);
-      manager.setTotalItems(100);
       manager.setCurrentPageNumber(5);
-      expect(manager.getSkip()).to.equal(20);
+      expect(manager.getSkip()).to.equal(40);
     });
 
     it('dispatches a change event', async () => {
       const listener = oneEvent(manager, UmbChangeEvent.TYPE);
-      manager.setCurrentPageNumber(200);
+      manager.setCurrentPageNumber(2);
       const event = (await listener) as unknown as UmbChangeEvent;
       const target = event.target as UmbPaginationManager;
       expect(event).to.exist;
       expect(event.type).to.equal(UmbChangeEvent.TYPE);
-      expect(target.getCurrentPageNumber()).to.equal(200);
+      expect(target.getCurrentPageNumber()).to.equal(2);
     });
   });
 
   describe('Skip', () => {
     it('gets the skip value', () => {
-      manager.setPageSize(5);
-      manager.setTotalItems(100);
       manager.setCurrentPageNumber(5);
-      expect(manager.getSkip()).to.equal(20);
+      expect(manager.getSkip()).to.equal(40);
     });
 
     it('updates the observable', (done) => {
-      manager.setPageSize(5);
-      manager.setTotalItems(100);
       manager.setCurrentPageNumber(5);
       
       manager.skip.subscribe((value) => {
-        expect(value).to.equal(20);
+        expect(value).to.equal(40);
         done();
       })
       .unsubscribe();

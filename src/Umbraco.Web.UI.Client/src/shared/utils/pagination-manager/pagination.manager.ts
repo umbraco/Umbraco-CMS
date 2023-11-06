@@ -80,6 +80,14 @@ export class UmbPaginationManager extends EventTarget {
    * @memberof UmbPaginationManager
    */
   public setCurrentPageNumber(pageNumber: number) {
+    if (pageNumber < 1) {
+      pageNumber = 1;
+    }
+
+    if (pageNumber > this.#totalPages.getValue()) {
+      pageNumber = this.#totalPages.getValue();
+    }
+
     this.#currentPage.next(pageNumber);
     this.#calculateSkip();
     this.dispatchEvent(new UmbChangeEvent());
