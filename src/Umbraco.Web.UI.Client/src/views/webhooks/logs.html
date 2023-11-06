@@ -1,47 +1,30 @@
-﻿<div ng-controller="Umbraco.Editors.Webhooks.WebhookLogController as vm">
+<div ng-controller="Umbraco.Editors.Webhooks.WebhookLogController as vm">
   <table class="table table-hover" ng-if="!vm.loading">
     <thead>
-    <tr>
-      <th></th>
-      <th>Webhook key</th>
-      <th>Date</th>
-      <th>Url</th>
-      <th>Event</th>
-      <th>RetryCount</th>
-    </tr>
+      <tr>
+        <th></th>
+        <th>Webhook key</th>
+        <th>Date</th>
+        <th>Url</th>
+        <th>Event</th>
+        <th>Retry count</th>
+      </tr>
     </thead>
     <tbody>
-    <tr ng-repeat="log in vm.logs track by log.key" ng-click="vm.openLogOverlay(log)" style="cursor: pointer;">
-      <td style="width: 20px;">
-        <umb-checkmark ng-if="vm.isChecked(log)"
-                       checked="vm.isChecked(log)"
-                       size="xs">
-        </umb-checkmark>
-
-      </td>
-      <td>
-        {{ log.webhookKey}}
-      </td>
-      <td>
-        {{ log.date}}
-      </td>
-      <td>
-        {{ log.url }}
-      </td>
-      <td>
-        {{ log.eventName }}
-      </td>
-      <td>
-        {{ log.retryCount}}
-      </td>
-      <td style="text-align: right;">
-        <umb-button type="button"
-                    action="vm.deleteWebhook(webhook)"
-                    size="xxs"
-                    label="Details">
-        </umb-button>
-      </td>
-    </tr>
+      <tr ng-repeat="log in vm.logs track by log.key" ng-click="vm.openLogOverlay(log)" style="cursor: pointer;">
+        <td style="width: 20px;">
+          <umb-checkmark
+            ng-if="vm.isChecked(log)"
+            checked="vm.isChecked(log)"
+            size="xs">
+          </umb-checkmark>
+        </td>
+        <td>{{ log.webhookKey }}</td>
+        <td>{{ log.date }}</td>
+        <td>{{ log.url }}</td>
+        <td>{{ log.eventName }}</td>
+        <td>{{ log.retryCount }}</td>
+      </tr>
     </tbody>
   </table>
 </div>
