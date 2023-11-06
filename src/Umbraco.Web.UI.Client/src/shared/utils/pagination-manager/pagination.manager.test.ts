@@ -3,7 +3,7 @@ import { UmbPaginationManager } from './pagination.manager.js';
 import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event'
 
-describe('UmbContextConsumer', () => {
+describe('UmbPaginationManager', () => {
 	let manager: UmbPaginationManager;
 
 	beforeEach(() => {
