@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.Webhooks.Events.Dictionary;
 using Umbraco.Cms.Core.Webhooks.Events.Domain;
 using Umbraco.Cms.Core.Webhooks.Events.Language;
 using Umbraco.Cms.Core.Webhooks.Events.Relation;
+using Umbraco.Cms.Core.Webhooks.Events.Script;
 using Umbraco.Cms.Core.Webhooks.Events.Stylesheet;
 using Umbraco.Extensions;
 
@@ -125,6 +126,13 @@ public class WebhookEventCollectionBuilder : OrderedCollectionBuilderBase<Webhoo
 
         Append<RelationTypeDeletedWebhookEvent>();
         Append<RelationTypeSavedWebhookEvent>();
+        return this;
+    }
+
+    public WebhookEventCollectionBuilder AddScriptWebhooks()
+    {
+        Append<ScriptDeletedWebhookEvent>();
+        Append<ScriptSavedWebhookEvent>();
         return this;
     }
 
