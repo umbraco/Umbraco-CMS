@@ -1,6 +1,6 @@
 namespace Umbraco.Cms.Api.Management.ViewModels.Webhook.Item;
 
-public class WebhooktemResponseModel
+public class WebhookItemResponseModel
 {
     public bool Enabled { get; set; } = true;
 
