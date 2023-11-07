@@ -34,9 +34,26 @@ public class IdentityMapDefinition : IMapDefinition
         _textService = textService;
         _entityService = entityService;
         _globalSettings = globalSettings.Value;
+        _securitySettings = securitySettings.Value;
         _appCaches = appCaches;
         _twoFactorLoginService = twoFactorLoginService;
-        _securitySettings = securitySettings.Value;
+    }
+
+    [Obsolete("Use constructor that also takes an IOptions<SecuritySettings>. Scheduled for removal in V14")]
+    public IdentityMapDefinition(
+        ILocalizedTextService textService,
+        IEntityService entityService,
+        IOptions<GlobalSettings> globalSettings,
+        AppCaches appCaches,
+        ITwoFactorLoginService twoFactorLoginService)
+        : this(
+            textService,
+            entityService,
+            globalSettings,
+            StaticServiceProvider.Instance.GetRequiredService<IOptions<SecuritySettings>>(),
+            appCaches,
+            twoFactorLoginService)
+    {
     }
 
     [Obsolete("Use constructor that also takes an ITwoFactorLoginService. Scheduled for removal in V12")]
@@ -44,13 +61,12 @@ public class IdentityMapDefinition : IMapDefinition
         ILocalizedTextService textService,
         IEntityService entityService,
         IOptions<GlobalSettings> globalSettings,
-        IOptions<SecuritySettings> securitySettings,
         AppCaches appCaches)
         : this(
             textService,
             entityService,
             globalSettings,
-            securitySettings,
+            StaticServiceProvider.Instance.GetRequiredService<IOptions<SecuritySettings>>(),
             appCaches,
             StaticServiceProvider.Instance.GetRequiredService<ITwoFactorLoginService>())
     {
