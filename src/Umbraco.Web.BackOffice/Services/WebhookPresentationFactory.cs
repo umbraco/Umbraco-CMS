@@ -1,4 +1,5 @@
-﻿using Umbraco.Cms.Core.Models;
+﻿using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Webhooks;
 using Umbraco.Cms.Web.Common.Models;
 
@@ -29,7 +30,7 @@ internal class WebhookPresentationFactory : IWebhookPresentationFactory
         return new WebhookEventViewModel
         {
             EventName = webhookEvent?.EventName ?? alias,
-            EventType = webhookEvent?.EventType ?? WebhookEventType.None,
+            EventType = webhookEvent?.EventType ?? Constants.WebhookEvents.Types.Other,
             Alias = alias,
         };
     }

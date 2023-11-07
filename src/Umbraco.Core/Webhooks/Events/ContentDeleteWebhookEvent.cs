@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events;
 
+[WebhookEvent(Constants.WebhookEvents.Names.ContentDelete, Constants.WebhookEvents.Types.Content)]
 public class ContentDeleteWebhookEvent : WebhookEventContentBase<ContentDeletedNotification, IContent>
 {
     public ContentDeleteWebhookEvent(
@@ -18,9 +19,7 @@ public class ContentDeleteWebhookEvent : WebhookEventContentBase<ContentDeletedN
             webhookFiringService,
             webHookService,
             webhookSettings,
-            serverRoleAccessor,
-            Constants.WebhookEvents.Names.ContentDelete,
-            WebhookEventType.Content)
+            serverRoleAccessor)
     {
     }
 

@@ -10,6 +10,7 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events;
 
+[WebhookEvent(Constants.WebhookEvents.Names.ContentPublish, Constants.WebhookEvents.Types.Content)]
 public class ContentPublishWebhookEvent : WebhookEventContentBase<ContentPublishedNotification, IContent>
 {
     private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
@@ -26,9 +27,7 @@ public class ContentPublishWebhookEvent : WebhookEventContentBase<ContentPublish
             webhookFiringService,
             webHookService,
             webhookSettings,
-            serverRoleAccessor,
-            Constants.WebhookEvents.Names.ContentPublish,
-            WebhookEventType.Content)
+            serverRoleAccessor)
     {
         _publishedSnapshotAccessor = publishedSnapshotAccessor;
         _apiContentBuilder = apiContentBuilder;

@@ -59,5 +59,28 @@ public static partial class Constants
             /// </summary>
             public const string MediaSave = "Umbraco.MediaSave";
         }
+
+        public static class Types
+        {
+            /// <summary>
+            ///     Webhook event type for content.
+            /// </summary>
+            public const string Content= "Content";
+
+            /// <summary>
+            ///     Webhook event type for content media.
+            /// </summary>
+            public const string Media = "Media";
+
+            /// <summary>
+            ///     Webhook event type for content member.
+            /// </summary>
+            public const string Member = "Member";
+
+            /// <summary>
+            ///     Webhook event type for others, this is the default catory if you have not chosen one.
+            /// </summary>
+            public const string Other = "Other";
+        }
     }
 }

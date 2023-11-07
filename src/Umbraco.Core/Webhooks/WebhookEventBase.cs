@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Webhooks;
 
@@ -18,7 +19,7 @@ public abstract class WebhookEventBase<TNotification> : IWebhookEvent, INotifica
 
     public string EventName { get; set; }
 
-    public WebhookEventType EventType { get; }
+    public string EventType { get; }
 
     protected IWebhookFiringService WebhookFiringService { get; }
 
@@ -32,16 +33,18 @@ public abstract class WebhookEventBase<TNotification> : IWebhookEvent, INotifica
         IWebhookFiringService webhookFiringService,
         IWebHookService webHookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
-        IServerRoleAccessor serverRoleAccessor,
-        string eventName,
-        WebhookEventType eventType)
+        IServerRoleAccessor serverRoleAccessor)
     {
-        EventName = eventName;
-        EventType = eventType;
 
         WebhookFiringService = webhookFiringService;
         WebHookService = webHookService;
         _serverRoleAccessor = serverRoleAccessor;
+
+        // assign properties based on the attribute, if it is found
+        WebhookEventAttribute? attribute = GetType().GetCustomAttribute<WebhookEventAttribute>(false);
+
+        EventType = attribute?.EventType ?? "Others";
+        EventName = attribute?.Name ?? Alias;
 
         WebhookSettings = webhookSettings.CurrentValue;
         webhookSettings.OnChange(x => WebhookSettings = x);

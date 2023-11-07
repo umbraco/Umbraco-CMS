@@ -10,7 +10,7 @@ public class WebhookEventViewModel
     public string EventName { get; set; } = string.Empty;
 
     [DataMember(Name = "eventType")]
-    public WebhookEventType EventType { get; set; }
+    public string EventType { get; set; } = string.Empty;
 
     [DataMember(Name = "alias")]
     public string Alias { get; set; } = string.Empty;
