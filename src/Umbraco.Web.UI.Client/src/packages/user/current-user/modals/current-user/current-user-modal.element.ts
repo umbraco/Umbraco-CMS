@@ -1,5 +1,5 @@
 import { UMB_APP } from '@umbraco-cms/backoffice/app';
-import { UMB_AUTH, type UmbLoggedInUser } from '@umbraco-cms/backoffice/auth';
+import { UMB_AUTH_CONTEXT, type UmbLoggedInUser } from '@umbraco-cms/backoffice/auth';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, CSSResultGroup, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalContext } from '@umbraco-cms/backoffice/modal';
@@ -13,14 +13,14 @@ export class UmbCurrentUserModalElement extends UmbLitElement {
 	@state()
 	private _currentUser?: UmbLoggedInUser;
 
-	#authContext?: typeof UMB_AUTH.TYPE;
+	#authContext?: typeof UMB_AUTH_CONTEXT.TYPE;
 
 	#appContext?: typeof UMB_APP.TYPE;
 
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_AUTH, (instance) => {
+		this.consumeContext(UMB_AUTH_CONTEXT, (instance) => {
 			this.#authContext = instance;
 			this._observeCurrentUser();
 		});
@@ -35,7 +35,7 @@ export class UmbCurrentUserModalElement extends UmbLitElement {
 
 		this.observe(this.#authContext.currentUser, (currentUser) => {
 			this._currentUser = currentUser;
-		});
+		}, 'umbCurrentUserObserver');
 	}
 
 	private _close() {

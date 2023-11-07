@@ -1,4 +1,3 @@
-import { Observable } from 'rxjs';
 import { StylesheetDetails } from '../index.js';
 import { UmbStylesheetTreeStore, UMB_STYLESHEET_TREE_STORE_CONTEXT_TOKEN } from './stylesheet.tree.store.js';
 import { UmbStylesheetTreeServerDataSource } from './sources/stylesheet.tree.server.data.js';
@@ -7,6 +6,7 @@ import {
 	StylesheetGetFolderResponse,
 	UmbStylesheetFolderServerDataSource,
 } from './sources/stylesheet.folder.server.data.js';
+import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import {

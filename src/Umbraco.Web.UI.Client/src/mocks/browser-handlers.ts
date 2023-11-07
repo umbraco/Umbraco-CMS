@@ -6,7 +6,7 @@ import * as manifestsHandlers from './handlers/manifests.handlers.js';
 import { handlers as publishedStatusHandlers } from './handlers/published-status.handlers.js';
 import * as serverHandlers from './handlers/server.handlers.js';
 import { handlers as upgradeHandlers } from './handlers/upgrade.handlers.js';
-import { handlers as userHandlers } from './handlers/user.handlers.js';
+import { handlers as userHandlers } from './handlers/user/index.js';
 import { handlers as telemetryHandlers } from './handlers/telemetry.handlers.js';
 import { handlers as userGroupsHandlers } from './handlers/user-group/index.js';
 import { handlers as examineManagementHandlers } from './handlers/examine-management.handlers.js';

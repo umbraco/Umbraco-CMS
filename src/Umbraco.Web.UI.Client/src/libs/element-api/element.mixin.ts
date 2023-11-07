@@ -33,6 +33,11 @@ export declare class UmbElement extends UmbControllerHostElement {
 		alias: string | UmbContextToken<BaseType, ResultType>,
 		callback: UmbContextCallback<ResultType>
 	): UmbContextConsumerController<BaseType, ResultType>;
+	/**
+	 * Use the UmbLocalizeController to localize your element.
+	 * @see UmbLocalizeController
+	 */
+	localize: UmbLocalizeController;
 }
 
 export const UmbElementMixin = <T extends HTMLElementConstructor>(superClass: T) => {
