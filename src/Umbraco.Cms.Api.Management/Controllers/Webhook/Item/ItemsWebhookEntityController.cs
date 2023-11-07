@@ -22,11 +22,11 @@ public class ItemsWebhookEntityController : WebhookEntityControllerBase
 
     [HttpGet("item")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(IEnumerable<WebhooktemResponseModel>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IEnumerable<WebhookItemResponseModel>), StatusCodes.Status200OK)]
     public async Task<ActionResult> Items([FromQuery(Name = "isoCode")] HashSet<string> isoCodes)
     {
         IEnumerable<ILanguage> languages = await _languageService.GetMultipleAsync(isoCodes);
-        List<WebhooktemResponseModel> entityResponseModels = _mapper.MapEnumerable<ILanguage, WebhooktemResponseModel>(languages);
+        List<WebhookItemResponseModel> entityResponseModels = _mapper.MapEnumerable<ILanguage, WebhooktemResponseModel>(languages);
         return Ok(entityResponseModels);
     }
 }
