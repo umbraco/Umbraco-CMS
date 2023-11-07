@@ -91,7 +91,7 @@ public abstract class WebhookEventBase<TNotification> : IWebhookEvent, INotifica
             return;
         }
 
-        IEnumerable<Webhook> webhooks = await WebHookService.GetByEventNameAsync(EventName);
+        IEnumerable<Webhook> webhooks = await WebHookService.GetByAliasAsync(Alias);
 
         await ProcessWebhooks(notification, webhooks, cancellationToken);
     }

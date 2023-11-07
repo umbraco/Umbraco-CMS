@@ -74,10 +74,10 @@ public class WebhookService : IWebHookService
         return webhooks;
     }
 
-    public async Task<IEnumerable<Webhook>> GetByEventNameAsync(string eventName)
+    public async Task<IEnumerable<Webhook>> GetByAliasAsync(string eventName)
     {
         using ICoreScope scope = _provider.CreateCoreScope();
-        PagedModel<Webhook> webhooks = await _webhookRepository.GetByEventNameAsync(eventName);
+        PagedModel<Webhook> webhooks = await _webhookRepository.GetByAliasAsync(eventName);
         scope.Complete();
 
         return webhooks.Items;

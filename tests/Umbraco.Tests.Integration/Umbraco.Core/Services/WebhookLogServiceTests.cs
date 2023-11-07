@@ -21,7 +21,7 @@ public class WebhookLogServiceTests : UmbracoIntegrationTest
         var createdWebhookLog = await WebhookLogService.CreateAsync(new WebhookLog
         {
             Date = DateTime.UtcNow,
-            EventName = Constants.WebhookEvents.ContentPublish,
+            EventName = Constants.WebhookEvents.Names.ContentPublish,
             RequestBody = "Test Request Body",
             ResponseBody = "Test response body",
             StatusCode = "200",
