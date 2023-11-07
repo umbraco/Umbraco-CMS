@@ -1,8 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Collections.Generic;
-using System.Linq;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
@@ -183,14 +181,19 @@ public class DataValueReferenceFactoryCollectionTests
         var resultA = collection.GetAutomaticRelationTypesAliases(propertyEditors).ToArray();
         var resultB = collection.GetAutomaticRelationTypesAliases(properties, propertyEditors).ToArray();
 
-        Assert.AreEqual(resultA.Length, Constants.Conventions.RelationTypes.AutomaticRelationTypes.Length);
-        Assert.AreEqual(resultA.Length, Constants.Conventions.RelationTypes.AutomaticRelationTypes.Length);
-
-        foreach (var alias in Constants.Conventions.RelationTypes.AutomaticRelationTypes)
+        Assert.Multiple(() =>
         {
-            Assert.Contains(alias, resultA);
-            Assert.Contains(alias, resultB);
-        }
+            foreach (var alias in Constants.Conventions.RelationTypes.AutomaticRelationTypes)
+            {
+                Assert.Contains(alias, resultA, "Result A does not contain one of the default automatic relation types.");
+                Assert.Contains(alias, resultB, "Result B does not contain one of the default automatic relation types.");
+            }
+        });
+
+        // Ensure we don't have more than just the default
+        int expectedCount = Constants.Conventions.RelationTypes.AutomaticRelationTypes.Length;
+        Assert.AreEqual(expectedCount, resultA.Length, "Result A should only contain the default automatic relation types.");
+        Assert.AreEqual(expectedCount, resultB.Length, "Result B should only contain the default automatic relation types.");
     }
 
     [Test]
@@ -202,13 +205,21 @@ public class DataValueReferenceFactoryCollectionTests
         var propertyEditors = new PropertyEditorCollection(new DataEditorCollection(() => labelPropertyEditor.Yield()));
         var serializer = new ConfigurationEditorJsonSerializer();
         var property = new Property(new PropertyType(ShortStringHelper, new DataType(labelPropertyEditor, serializer)));
-        var properties = new PropertyCollection { property };
+        var properties = new PropertyCollection { property, property }; // Duplicate on purpose to test distinct aliases
 
         var resultA = collection.GetAutomaticRelationTypesAliases(propertyEditors).ToArray();
         var resultB = collection.GetAutomaticRelationTypesAliases(properties, propertyEditors).ToArray();
 
-        Assert.Contains("umbTest", resultA);
-        Assert.Contains("umbTest", resultB);
+        Assert.Multiple(() =>
+        {
+            Assert.Contains("umbTest", resultA, "Result A does not contain the custom automatic relation type.");
+            Assert.Contains("umbTest", resultB, "Result B does not contain the custom automatic relation type.");
+        });
+
+        // Ensure we don't have more than just the default and single custom
+        int expectedCount = Constants.Conventions.RelationTypes.AutomaticRelationTypes.Length + 1;
+        Assert.AreEqual(expectedCount, resultA.Length, "Result A should only contain the default and a single custom automatic relation type.");
+        Assert.AreEqual(expectedCount, resultB.Length, "Result B should only contain the default and a single custom automatic relation type.");
     }
 
     private class TestDataValueReferenceFactory : IDataValueReferenceFactory
@@ -235,7 +246,11 @@ public class DataValueReferenceFactoryCollectionTests
                 }
             }
 
-            public IEnumerable<string> GetAutomaticRelationTypesAliases() => new[] { "umbTest" };
+            public IEnumerable<string> GetAutomaticRelationTypesAliases() => new[]
+            {
+                "umbTest",
+                "umbTest", // Duplicate on purpose to test distinct aliases
+            };
         }
     }
 }
