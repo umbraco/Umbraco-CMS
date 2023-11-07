@@ -42,7 +42,7 @@ public class SortDocumentController : DocumentControllerBase
         if (sortingRequestModel.ParentId is null)
         {
             authorizationResult = await _authorizationService.AuthorizeAsync(User, new[] { ActionSort.ActionLetter },
-                $"New{AuthorizationPolicies.ContentPermissionByResource}");
+                $"New{AuthorizationPolicies.ContentPermissionAtRoot}");
         }
         else
         {

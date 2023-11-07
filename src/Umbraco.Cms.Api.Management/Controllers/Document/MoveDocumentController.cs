@@ -43,7 +43,7 @@ public class MoveDocumentController : DocumentControllerBase
         if (moveDocumentRequestModel.TargetId is null)
         {
             authorizationResult = await _authorizationService.AuthorizeAsync(User, new[] { ActionMove.ActionLetter },
-                $"New{AuthorizationPolicies.ContentPermissionByResource}");
+                $"New{AuthorizationPolicies.ContentPermissionAtRoot}");
         }
         else
         {

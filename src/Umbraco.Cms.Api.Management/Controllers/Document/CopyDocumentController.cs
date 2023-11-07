@@ -43,7 +43,7 @@ public class CopyDocumentController : DocumentControllerBase
         if (copyDocumentRequestModel.TargetId is null)
         {
             authorizationResult = await _authorizationService.AuthorizeAsync(User, new[] { ActionCopy.ActionLetter },
-                $"New{AuthorizationPolicies.ContentPermissionByResource}");
+                $"New{AuthorizationPolicies.ContentPermissionAtRoot}");
         }
         else
         {
