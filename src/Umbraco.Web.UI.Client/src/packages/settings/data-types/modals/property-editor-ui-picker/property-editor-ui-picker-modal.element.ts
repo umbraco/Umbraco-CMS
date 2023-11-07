@@ -1,6 +1,5 @@
 import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { groupBy } from '@umbraco-cms/backoffice/external/lodash';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import {
 	UmbPropertyEditorUIPickerModalData,
@@ -51,7 +50,13 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbLitElement {
 				(propertyEditorUi) => !!propertyEditorUi.meta.propertyEditorSchemaAlias,
 			);
 
-			this._groupedPropertyEditorUIs = groupBy(this._propertyEditorUIs, 'meta.group');
+			// TODO: groupBy is not known by TS yet
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-expect-error
+			this._groupedPropertyEditorUIs = Object.groupBy(
+				this._propertyEditorUIs,
+				(propertyEditorUi: ManifestPropertyEditorUi) => propertyEditorUi.meta.group,
+			);
 		});
 	}
 
@@ -75,7 +80,13 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbLitElement {
 					);
 			  });
 
-		this._groupedPropertyEditorUIs = groupBy(result, 'meta.group');
+		// TODO: groupBy is not known by TS yet
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-expect-error
+		this._groupedPropertyEditorUIs = Object.groupBy(
+			result,
+			(propertyEditorUI: ManifestPropertyEditorUi) => propertyEditorUI.meta.group,
+		);
 	}
 
 	private _close() {
