@@ -3,6 +3,8 @@ using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Webhooks.Events;
+using Umbraco.Cms.Core.Webhooks.Events.Core;
+using Umbraco.Cms.Core.Webhooks.Events.Language;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Webhooks;
@@ -19,16 +21,6 @@ public class WebhookEventCollectionBuilder : OrderedCollectionBuilderBase<Webhoo
         // register the types
         RegisterTypes(services);
         base.RegisterWith(services);
-    }
-
-    public WebhookEventCollectionBuilder AddCoreWebhooks()
-    {
-        Append<ContentDeleteWebhookEvent>();
-        Append<ContentPublishWebhookEvent>();
-        Append<ContentUnpublishWebhookEvent>();
-        Append<MediaDeleteWebhookEvent>();
-        Append<MediaSaveWebhookEvent>();
-        return this;
     }
 
     private void RegisterTypes(IServiceCollection services)
@@ -77,5 +69,22 @@ public class WebhookEventCollectionBuilder : OrderedCollectionBuilderBase<Webhoo
         }
 
         return null;
+    }
+
+    public WebhookEventCollectionBuilder AddCoreWebhooks()
+    {
+        Append<ContentDeleteWebhookEvent>();
+        Append<ContentPublishWebhookEvent>();
+        Append<ContentUnpublishWebhookEvent>();
+        Append<MediaDeleteWebhookEvent>();
+        Append<MediaSaveWebhookEvent>();
+        return this;
+    }
+
+    public WebhookEventCollectionBuilder AddLanguageWebhooks()
+    {
+        Append<LanguageDeletedWebhookEvent>();
+        Append<LanguageSavedWebhookEvent>();
+        return this;
     }
 }
