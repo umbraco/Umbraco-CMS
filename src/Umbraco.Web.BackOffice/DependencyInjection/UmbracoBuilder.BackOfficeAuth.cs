@@ -329,6 +329,12 @@ public static partial class UmbracoBuilderExtensions
             policy.Requirements.Add(new TreeRequirement(Constants.Trees.LogViewer));
         });
 
+        options.AddPolicy(AuthorizationPolicies.TreeAccessWebhooks, policy =>
+        {
+            policy.AuthenticationSchemes.Add(backOfficeAuthenticationScheme);
+            policy.Requirements.Add(new TreeRequirement(Constants.Trees.Webhooks));
+        });
+
         options.AddPolicy(AuthorizationPolicies.TreeAccessDataTypes, policy =>
         {
             policy.AuthenticationSchemes.Add(backOfficeAuthenticationScheme);
