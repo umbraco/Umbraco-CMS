@@ -134,4 +134,14 @@ public class WebhookEventCollectionBuilder : OrderedCollectionBuilderBase<Webhoo
         Append<StylesheetSavedWebhookEvent>();
         return this;
     }
+
+    public WebhookEventCollectionBuilder AddTemplateWebhooks()
+    {
+        Append<PartialViewDeletedWebhookEvent>();
+        Append<PartialViewSavedWebhookEvent>();
+
+        Append<TemplateDeletedWebhookEvent>();
+        Append<TemplateSavedWebhookEvent>();
+        return this;
+    }
 }
