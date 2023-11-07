@@ -48,7 +48,7 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 			(actions) => {
 				this._hasActions = actions.length > 0;
 			},
-			'observeEntityAction'
+			'umbEntityActionsObserver'
 		);
 	}
 

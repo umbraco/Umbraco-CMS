@@ -2,14 +2,22 @@ import { UmbStylesheetRepository } from '../repository/stylesheet.repository.js'
 import { StylesheetDetails } from '../index.js';
 import { UmbSaveableWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UmbArrayState, UmbBooleanState, UmbObjectState, createObservablePart } from '@umbraco-cms/backoffice/observable-api';
+import {
+	UmbArrayState,
+	UmbBooleanState,
+	UmbObjectState,
+	createObservablePart,
+} from '@umbraco-cms/backoffice/observable-api';
 import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
 import { RichTextRuleModel, UpdateStylesheetRequestModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 export type RichTextRuleModelSortable = RichTextRuleModel & { sortOrder?: number };
 
-export class UmbStylesheetWorkspaceContext extends UmbWorkspaceContext<UmbStylesheetRepository, StylesheetDetails> implements UmbSaveableWorkspaceContextInterface {
+export class UmbStylesheetWorkspaceContext
+	extends UmbWorkspaceContext<UmbStylesheetRepository, StylesheetDetails>
+	implements UmbSaveableWorkspaceContextInterface
+{
 	#data = new UmbObjectState<StylesheetDetails | undefined>(undefined);
 	#rules = new UmbArrayState<RichTextRuleModelSortable>([], (rule) => rule.name);
 	data = this.#data.asObservable();
@@ -55,7 +63,6 @@ export class UmbStylesheetWorkspaceContext extends UmbWorkspaceContext<UmbStyles
 	updateRule(unique: string, rule: RichTextRuleModelSortable) {
 		this.#rules.updateOne(unique, rule);
 		this.sendRulesGetContent();
-
 	}
 
 	setRules(rules: RichTextRuleModelSortable[]) {
@@ -103,7 +110,6 @@ export class UmbStylesheetWorkspaceContext extends UmbWorkspaceContext<UmbStyles
 	}
 
 	async sendContentGetRules() {
-
 		if (!this.getData()?.content) return;
 
 		const requestBody = {
@@ -135,7 +141,7 @@ export class UmbStylesheetWorkspaceContext extends UmbWorkspaceContext<UmbStyles
 			const createRequestBody = {
 				name: stylesheet.name,
 				content: stylesheet.content,
-				parentPath: stylesheet.path === 'null' ? '' : stylesheet.path + '/',
+				parentPath: stylesheet.path ?? '',
 			};
 
 			this.repository.create(createRequestBody);
@@ -166,7 +172,10 @@ export class UmbStylesheetWorkspaceContext extends UmbWorkspaceContext<UmbStyles
 	}
 }
 
-export const UMB_STYLESHEET_WORKSPACE_CONTEXT = new UmbContextToken<UmbSaveableWorkspaceContextInterface, UmbStylesheetWorkspaceContext>(
+export const UMB_STYLESHEET_WORKSPACE_CONTEXT = new UmbContextToken<
+	UmbSaveableWorkspaceContextInterface,
+	UmbStylesheetWorkspaceContext
+>(
 	'UmbWorkspaceContext',
-	(context): context is UmbStylesheetWorkspaceContext => context.getEntityType?.() === 'stylesheet'
+	(context): context is UmbStylesheetWorkspaceContext => context.getEntityType?.() === 'stylesheet',
 );

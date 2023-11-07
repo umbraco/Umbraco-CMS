@@ -1,10 +1,9 @@
 import { UmbUserGroupInputElement } from '../../../user-group/components/input-user-group/user-group-input.element.js';
-import { UmbUserRepository } from '../../repository/user.repository.js';
+import { UmbInviteUserRepository } from '../../repository/invite/invite-user.repository.js';
 import { css, html, nothing, customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 
-export type UsersViewType = 'list' | 'grid';
 @customElement('umb-user-invite-modal')
 export class UmbUserInviteModalElement extends UmbModalBaseElement {
 	@query('#form')
@@ -13,8 +12,7 @@ export class UmbUserInviteModalElement extends UmbModalBaseElement {
 	@state()
 	private _invitedUser?: any;
 
-	// TODO: get from extension registry
-	#userRepository = new UmbUserRepository(this);
+	#userRepository = new UmbInviteUserRepository(this);
 
 	private async _handleSubmit(e: Event) {
 		e.preventDefault();
@@ -36,8 +34,11 @@ export class UmbUserInviteModalElement extends UmbModalBaseElement {
 
 		const message = formData.get('message') as string;
 
+		alert('implement');
+
 		// TODO: figure out when to use email or username
 		// TODO: invite request gives 500 error.
+		/*
 		const { data } = await this.#userRepository.invite({
 			name,
 			email,
@@ -49,6 +50,7 @@ export class UmbUserInviteModalElement extends UmbModalBaseElement {
 		if (data) {
 			this._invitedUser = data;
 		}
+		*/
 	}
 
 	private _submitForm() {
@@ -67,7 +69,7 @@ export class UmbUserInviteModalElement extends UmbModalBaseElement {
 		if (!this._invitedUser) return;
 
 		this._closeModal();
-		history.pushState(null, '', 'section/users/view/users/user/' + this._invitedUser?.id); //TODO: URL Should be dynamic
+		history.pushState(null, '', 'section/user-management/view/users/user/' + this._invitedUser?.id); //TODO: URL Should be dynamic
 	}
 
 	private _renderForm() {

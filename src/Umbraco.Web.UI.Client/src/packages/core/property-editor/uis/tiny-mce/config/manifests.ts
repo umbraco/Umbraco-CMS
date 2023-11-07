@@ -8,7 +8,7 @@ const configurationManifests: Array<ManifestPropertyEditorUi> = [
 		loader: () => import('./toolbar/property-editor-ui-tiny-mce-toolbar-configuration.element.js'),
 		meta: {
 			label: 'TinyMCE Toolbar Configuration',
-			propertyEditorSchemaAlias: 'Umbraco.TinyMCE.Configuration',
+			propertyEditorSchemaAlias: 'Umbraco.RichText.Configuration',
 			icon: 'umb:autofill',
 			group: 'common',
 		},
@@ -20,7 +20,7 @@ const configurationManifests: Array<ManifestPropertyEditorUi> = [
 		loader: () => import('./stylesheets/property-editor-ui-tiny-mce-stylesheets-configuration.element.js'),
 		meta: {
 			label: 'TinyMCE Stylesheets Configuration',
-			propertyEditorSchemaAlias: 'Umbraco.TinyMCE.Configuration',
+			propertyEditorSchemaAlias: 'Umbraco.RichText.Configuration',
 			icon: 'umb:autofill',
 			group: 'common',
 		},
@@ -32,7 +32,7 @@ const configurationManifests: Array<ManifestPropertyEditorUi> = [
 		loader: () => import('./dimensions/property-editor-ui-tiny-mce-dimensions-configuration.element.js'),
 		meta: {
 			label: 'TinyMCE Dimensions Configuration',
-			propertyEditorSchemaAlias: 'Umbraco.TinyMCE.Configuration',
+			propertyEditorSchemaAlias: 'Umbraco.RichText.Configuration',
 			icon: 'umb:autofill',
 			group: 'common',
 		},
@@ -44,7 +44,7 @@ const configurationManifests: Array<ManifestPropertyEditorUi> = [
 		loader: () => import('./max-image-size/property-editor-ui-tiny-mce-maximagesize-configuration.element.js'),
 		meta: {
 			label: 'TinyMCE Max Image Size Configuration',
-			propertyEditorSchemaAlias: 'Umbraco.TinyMCE.Configuration',
+			propertyEditorSchemaAlias: 'Umbraco.RichText.Configuration',
 			icon: 'umb:autofill',
 			group: 'common',
 		},

@@ -1,3 +1,4 @@
+import { USER_ENTITY_TYPE } from '../types.js';
 import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type {
 	ManifestWorkspace,
@@ -11,7 +12,7 @@ const workspace: ManifestWorkspace = {
 	name: 'User Workspace',
 	loader: () => import('./user-workspace.element.js'),
 	meta: {
-		entityType: 'user',
+		entityType: USER_ENTITY_TYPE,
 	},
 };
 
