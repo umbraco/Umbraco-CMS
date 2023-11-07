@@ -20,13 +20,13 @@ public static partial class Constants
         public const string ContentUnpublish = "ContentUnpublish";
 
         /// <summary>
-        ///     Webhook event name for media delete.
+        ///     Webhook event name for media deleted.
         /// </summary>
-        public const string MediaDelete = "MediaDelete";
+        public const string MediaDeleted = "Media Deleted";
 
         /// <summary>
-        ///     Webhook event name for media save.
+        ///     Webhook event name for media saved.
         /// </summary>
-        public const string MediaSave = "MediaSave";
+        public const string MediaSaved = "Media Saved";
     }
 }

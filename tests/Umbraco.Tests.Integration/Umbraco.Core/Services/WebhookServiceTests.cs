@@ -17,8 +17,8 @@ public class WebhookServiceTests : UmbracoIntegrationTest
     [TestCase("https://example.com", Constants.WebhookEvents.ContentPublish, "00000000-0000-0000-0000-010000000000")]
     [TestCase("https://example.com", Constants.WebhookEvents.ContentDelete, "00000000-0000-0000-0000-000200000000")]
     [TestCase("https://example.com", Constants.WebhookEvents.ContentUnpublish, "00000000-0000-0000-0000-300000000000")]
-    [TestCase("https://example.com", Constants.WebhookEvents.MediaDelete, "00000000-0000-0000-0000-000004000000")]
-    [TestCase("https://example.com", Constants.WebhookEvents.MediaSave, "00000000-0000-0000-0000-000000500000")]
+    [TestCase("https://example.com", Constants.WebhookEvents.MediaDeleted, "00000000-0000-0000-0000-000004000000")]
+    [TestCase("https://example.com", Constants.WebhookEvents.MediaSaved, "00000000-0000-0000-0000-000000500000")]
     public async Task Can_Create_And_Get(string url, string webhookEvent, Guid key)
     {
         var createdWebhook = await WebhookService.CreateAsync(new Webhook(url, true, new[] { key }, new[] { webhookEvent }));
@@ -55,8 +55,8 @@ public class WebhookServiceTests : UmbracoIntegrationTest
     [TestCase("https://example.com", Constants.WebhookEvents.ContentPublish, "00000000-0000-0000-0000-010000000000")]
     [TestCase("https://example.com", Constants.WebhookEvents.ContentDelete, "00000000-0000-0000-0000-000200000000")]
     [TestCase("https://example.com", Constants.WebhookEvents.ContentUnpublish, "00000000-0000-0000-0000-300000000000")]
-    [TestCase("https://example.com", Constants.WebhookEvents.MediaDelete, "00000000-0000-0000-0000-000004000000")]
-    [TestCase("https://example.com", Constants.WebhookEvents.MediaSave, "00000000-0000-0000-0000-000000500000")]
+    [TestCase("https://example.com", Constants.WebhookEvents.MediaDeleted, "00000000-0000-0000-0000-000004000000")]
+    [TestCase("https://example.com", Constants.WebhookEvents.MediaSaved, "00000000-0000-0000-0000-000000500000")]
     public async Task Can_Delete(string url, string webhookEvent, Guid key)
     {
         var createdWebhook = await WebhookService.CreateAsync(new Webhook(url, true, new[] { key }, new[] { webhookEvent }));

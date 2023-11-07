@@ -87,8 +87,8 @@ public class WebhookEventCollectionBuilder : OrderedCollectionBuilderBase<Webhoo
         Append<ContentDeleteWebhookEvent>();
         Append<ContentPublishWebhookEvent>();
         Append<ContentUnpublishWebhookEvent>();
-        Append<MediaDeleteWebhookEvent>();
-        Append<MediaSaveWebhookEvent>();
+        Append<MediaDeletedWebhookEvent>();
+        Append<MediaSavedWebhookEvent>();
         return this;
     }
 
@@ -118,6 +118,22 @@ public class WebhookEventCollectionBuilder : OrderedCollectionBuilderBase<Webhoo
     {
         Append<LanguageDeletedWebhookEvent>();
         Append<LanguageSavedWebhookEvent>();
+        return this;
+    }
+
+    public WebhookEventCollectionBuilder AddMediaWebhooks()
+    {
+        // Even though these two are in the AddCoreWebhooks()
+        // The job of the CollectionBuilder should be removing duplicates
+        // Would allow someone to use .AddCoreWebhooks().AddMediaWebhooks()
+        // Or if they explicitly they could skip over CoreWebHooks and just add this perhaps
+        Append<MediaDeletedWebhookEvent>();
+        Append<MediaSavedWebhookEvent>();
+
+        Append<MediaTypeChangedWebhookEvent>();
+        Append<MediaTypeDeletedWebhookEvent>();
+        Append<MediaTypeMovedWebhookEvent>();
+        Append<MediaTypeSavedWebhookEvent>();
         return this;
     }
 
