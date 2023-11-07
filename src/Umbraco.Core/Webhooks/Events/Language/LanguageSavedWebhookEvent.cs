@@ -14,5 +14,6 @@ public class LanguageSavedWebhookEvent : WebhookEventBase<LanguageSavedNotificat
         IOptionsMonitor<WebhookSettings> webhookSettings,
         IServerRoleAccessor serverRoleAccessor)
         : base(webhookFiringService, webHookService, webhookSettings, serverRoleAccessor, "Language Saved")
-    { }
+    {
+    }
 }

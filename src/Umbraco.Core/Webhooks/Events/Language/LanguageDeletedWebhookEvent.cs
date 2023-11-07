@@ -14,5 +14,6 @@ public class LanguageDeletedWebhookEvent : WebhookEventBase<LanguageDeletedNotif
         IOptionsMonitor<WebhookSettings> webhookSettings,
         IServerRoleAccessor serverRoleAccessor)
         : base(webhookFiringService, webHookService, webhookSettings, serverRoleAccessor, "Language Deleted")
-    { }
+    {
+    }
 }
