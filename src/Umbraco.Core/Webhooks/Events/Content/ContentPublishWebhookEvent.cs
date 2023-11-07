@@ -8,41 +8,41 @@ using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 
-namespace Umbraco.Cms.Core.Webhooks.Events.Core;
+namespace Umbraco.Cms.Core.Webhooks.Events.Content;
 
-public class MediaSaveWebhookEvent : WebhookEventContentBase<MediaSavedNotification, IMedia>
+public class ContentPublishWebhookEvent : WebhookEventContentBase<ContentPublishedNotification, IContent>
 {
     private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
-    private readonly IApiMediaBuilder _apiMediaBuilder;
+    private readonly IApiContentBuilder _apiContentBuilder;
 
-    public MediaSaveWebhookEvent(
+    public ContentPublishWebhookEvent(
         IWebhookFiringService webhookFiringService,
         IWebHookService webHookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
         IServerRoleAccessor serverRoleAccessor,
         IPublishedSnapshotAccessor publishedSnapshotAccessor,
-        IApiMediaBuilder apiMediaBuilder)
+        IApiContentBuilder apiContentBuilder)
         : base(
             webhookFiringService,
             webHookService,
             webhookSettings,
             serverRoleAccessor,
-            Constants.WebhookEvents.MediaSave)
+            Constants.WebhookEvents.ContentPublish)
     {
         _publishedSnapshotAccessor = publishedSnapshotAccessor;
-        _apiMediaBuilder = apiMediaBuilder;
+        _apiContentBuilder = apiContentBuilder;
     }
 
-    protected override IEnumerable<IMedia> GetEntitiesFromNotification(MediaSavedNotification notification) => notification.SavedEntities;
+    protected override IEnumerable<IContent> GetEntitiesFromNotification(ContentPublishedNotification notification) => notification.PublishedEntities;
 
-    protected override object? ConvertEntityToRequestPayload(IMedia entity)
+    protected override object? ConvertEntityToRequestPayload(IContent entity)
     {
         if (_publishedSnapshotAccessor.TryGetPublishedSnapshot(out IPublishedSnapshot? publishedSnapshot) is false || publishedSnapshot!.Content is null)
         {
             return null;
         }
 
-        IPublishedContent? publishedContent = publishedSnapshot.Media?.GetById(entity.Key);
-        return publishedContent is null ? null : _apiMediaBuilder.Build(publishedContent);
+        IPublishedContent? publishedContent = publishedSnapshot.Content.GetById(entity.Key);
+        return publishedContent is null ? null : _apiContentBuilder.Build(publishedContent);
     }
 }
