@@ -4,10 +4,12 @@
 /* eslint-disable */
 
 import type { DocumentValueModel } from './DocumentValueModel';
-import type { DocumentVariantRequestModel } from './DocumentVariantRequestModel';
+import type { DocumentVariantResponseModel } from './DocumentVariantResponseModel';
 
-export type UpdateContentRequestModelBaseDocumentValueModelDocumentVariantRequestModel = {
+export type ContentForDocumentResponseModel = {
     values?: Array<DocumentValueModel>;
-    variants?: Array<DocumentVariantRequestModel>;
+    variants?: Array<DocumentVariantResponseModel>;
+    id?: string;
+    contentTypeId?: string;
 };
 

@@ -6,7 +6,7 @@
 import type { MediaValueModel } from './MediaValueModel';
 import type { MediaVariantRequestModel } from './MediaVariantRequestModel';
 
-export type UpdateContentRequestModelBaseMediaValueModelMediaVariantRequestModel = {
+export type UpdateContentForMediaRequestModel = {
     values?: Array<MediaValueModel>;
     variants?: Array<MediaVariantRequestModel>;
 };

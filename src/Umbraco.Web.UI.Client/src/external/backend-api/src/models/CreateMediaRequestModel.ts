@@ -3,9 +3,9 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { CreateContentRequestModelBaseMediaValueModelMediaVariantRequestModel } from './CreateContentRequestModelBaseMediaValueModelMediaVariantRequestModel';
+import type { CreateContentForMediaRequestModel } from './CreateContentForMediaRequestModel';
 
-export type CreateMediaRequestModel = (CreateContentRequestModelBaseMediaValueModelMediaVariantRequestModel & {
+export type CreateMediaRequestModel = (CreateContentForMediaRequestModel & {
     contentTypeId?: string;
 });
 

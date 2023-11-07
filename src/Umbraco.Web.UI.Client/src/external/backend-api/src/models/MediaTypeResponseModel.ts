@@ -3,7 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { ContentTypeResponseModelBaseMediaTypePropertyTypeResponseModelMediaTypePropertyTypeContainerResponseModel } from './ContentTypeResponseModelBaseMediaTypePropertyTypeResponseModelMediaTypePropertyTypeContainerResponseModel';
+import type { ContentTypeForMediaTypeResponseModel } from './ContentTypeForMediaTypeResponseModel';
 
-export type MediaTypeResponseModel = ContentTypeResponseModelBaseMediaTypePropertyTypeResponseModelMediaTypePropertyTypeContainerResponseModel;
+export type MediaTypeResponseModel = ContentTypeForMediaTypeResponseModel;
 
