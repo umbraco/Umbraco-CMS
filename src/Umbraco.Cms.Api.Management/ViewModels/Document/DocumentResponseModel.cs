@@ -1,7 +1,9 @@
-﻿using Umbraco.Cms.Api.Management.ViewModels.Content;
+﻿using Umbraco.Cms.Api.Common.Attributes;
+using Umbraco.Cms.Api.Management.ViewModels.Content;
 
 namespace Umbraco.Cms.Api.Management.ViewModels.Document;
 
+[ShortGenericSchemaName<DocumentValueModel, DocumentVariantResponseModel>("ContentForDocumentResponseModel")]
 public class DocumentResponseModel : ContentResponseModelBase<DocumentValueModel, DocumentVariantResponseModel>
 {
     public IEnumerable<ContentUrlInfo> Urls { get; set; } = Array.Empty<ContentUrlInfo>();
