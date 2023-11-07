@@ -1,5 +1,5 @@
 import { UmbInstallerContext } from '../installer.context.js';
-import { html, TemplateResult } from '@umbraco-cms/backoffice/external/lit';
+import { html, type TemplateResult } from '@umbraco-cms/backoffice/external/lit';
 
 export const installerContextProvider = (story: () => Node | string | TemplateResult, installerContext = new UmbInstallerContext()) => html`
 	<umb-context-provider
