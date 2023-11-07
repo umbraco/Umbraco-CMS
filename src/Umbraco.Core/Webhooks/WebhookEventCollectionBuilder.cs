@@ -5,6 +5,7 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Webhooks.Events;
 using Umbraco.Cms.Core.Webhooks.Events.Core;
 using Umbraco.Cms.Core.Webhooks.Events.Dictionary;
+using Umbraco.Cms.Core.Webhooks.Events.Domain;
 using Umbraco.Cms.Core.Webhooks.Events.Language;
 using Umbraco.Extensions;
 
@@ -86,6 +87,13 @@ public class WebhookEventCollectionBuilder : OrderedCollectionBuilderBase<Webhoo
     {
         Append<DictionaryItemDeletedWebhookEvent>();
         Append<DictionaryItemSavedWebhookEvent>();
+        return this;
+    }
+
+    public WebhookEventCollectionBuilder AddDomainWebhooks()
+    {
+        Append<DomainDeletedWebhookEvent>();
+        Append<DomainSavedWebhookEvent>();
         return this;
     }
 
