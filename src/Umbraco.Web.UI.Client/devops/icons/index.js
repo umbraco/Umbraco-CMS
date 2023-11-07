@@ -30,7 +30,6 @@ const collectDictionaryIcons = async () => {
 
 	// Lucide:
 	fileJSON.lucide.forEach((iconDef) => {
-		// enables leaving things uncommented via underscore
 		if(iconDef.file && iconDef.name) {
 			const path = lucideSvgDirectory + "/" + iconDef.file;
 
@@ -40,6 +39,31 @@ const collectDictionaryIcons = async () => {
 				let svg = rawData.toString().replace('  width="24"\n', '');
 				svg = svg.replace('  height="24"\n', '');
 				svg = svg.replace('stroke-width="2"', 'stroke-width="1.75"');
+				const iconFileName = iconDef.name;
+
+				const icon = {
+					name: iconDef.name,
+					legacy: iconDef.legacy,
+					fileName: iconFileName,
+					svg,
+					output: `${iconsOutputDirectory}/${iconFileName}.js`,
+				};
+
+				icons.push(icon);
+			} catch(e) {
+				console.log(`Could not load file: '${path}'`);
+			}
+		}
+	});
+
+	// Umbraco:
+	fileJSON.umbraco.forEach((iconDef) => {
+		if(iconDef.file && iconDef.name) {
+			const path = umbracoSvgDirectory + "/" + iconDef.file;
+
+			try {
+				const rawData = readFileSync(path);
+				const svg = rawData.toString()
 				const iconFileName = iconDef.name;
 
 				const icon = {

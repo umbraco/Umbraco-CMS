@@ -2445,5 +2445,11 @@
 			"name": "icon-database",
 			"file": "database.svg"
 		}
+	],
+	"umbraco": [
+		{
+			"name": "icon-umbraco",
+			"file": "icon-umbraco.svg"
+		}
 	]
 }
