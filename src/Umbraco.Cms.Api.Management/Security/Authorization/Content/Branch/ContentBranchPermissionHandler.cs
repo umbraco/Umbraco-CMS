@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 
-namespace Umbraco.Cms.Api.Management.Security.Authorization.Content;
+namespace Umbraco.Cms.Api.Management.Security.Authorization.Content.Branch;
 
 /// <summary>
 ///     Authorizes that the current user has the correct permission access to the descendants of the specified content item.
