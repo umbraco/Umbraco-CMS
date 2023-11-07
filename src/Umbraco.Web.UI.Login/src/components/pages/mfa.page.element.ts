@@ -7,7 +7,8 @@ import { umbLocalizationContext } from '../../external/localization/localization
 import { loadCustomView, renderCustomView } from '../../utils/load-custom-view.function.js';
 
 type MfaCustomViewElement = HTMLElement & {
-	providers: string[];
+	providers?: string[];
+  returnPath?: string;
 };
 
 @customElement('umb-mfa-page')
@@ -107,7 +108,7 @@ export default class UmbMfaPageElement extends LitElement {
 				location.href = returnPath;
 			}
 
-			this.dispatchEvent(new CustomEvent('umb-login-success', { bubbles: true, composed: true }));
+			this.dispatchEvent(new CustomEvent('umb-login-success', { bubbles: true, composed: true, detail: response.data }));
 		} catch (e) {
 			if (e instanceof Error) {
 				this.error = e.message ?? 'Unknown error';
@@ -200,6 +201,7 @@ export default class UmbMfaPageElement extends LitElement {
 			const customView = await loadCustomView<MfaCustomViewElement>(view);
 			if (typeof customView === 'object') {
 				customView.providers = this.providers.map((provider) => provider.value);
+        customView.returnPath = umbAuthContext.returnPath;
 			}
 			return renderCustomView(customView);
 		} catch (e) {
