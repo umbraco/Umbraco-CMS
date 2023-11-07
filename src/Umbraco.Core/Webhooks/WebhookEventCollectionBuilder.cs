@@ -8,18 +8,21 @@ using Umbraco.Cms.Core.Webhooks.Events.DataType;
 using Umbraco.Cms.Core.Webhooks.Events.Dictionary;
 using Umbraco.Cms.Core.Webhooks.Events.Domain;
 using Umbraco.Cms.Core.Webhooks.Events.Language;
+using Umbraco.Cms.Core.Webhooks.Events.Relation;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Webhooks;
 
-public class WebhookEventCollectionBuilder : OrderedCollectionBuilderBase<WebhookEventCollectionBuilder, WebhookEventCollection, IWebhookEvent>
+public class WebhookEventCollectionBuilder : OrderedCollectionBuilderBase<WebhookEventCollectionBuilder,
+    WebhookEventCollection, IWebhookEvent>
 {
     protected override WebhookEventCollectionBuilder This => this;
 
     public override void RegisterWith(IServiceCollection services)
     {
         // register the collection
-        services.Add(new ServiceDescriptor(typeof(WebhookEventCollection), CreateCollection, ServiceLifetime.Singleton));
+        services.Add(new ServiceDescriptor(typeof(WebhookEventCollection), CreateCollection,
+            ServiceLifetime.Singleton));
 
         // register the types
         RegisterTypes(services);
@@ -63,7 +66,8 @@ public class WebhookEventCollectionBuilder : OrderedCollectionBuilderBase<Webhoo
         {
             Type[] genericArguments = handlerType.BaseType!.GetGenericArguments();
 
-            Type? notificationType = genericArguments.FirstOrDefault(arg => typeof(INotification).IsAssignableFrom(arg));
+            Type? notificationType =
+                genericArguments.FirstOrDefault(arg => typeof(INotification).IsAssignableFrom(arg));
 
             if (notificationType is not null)
             {
@@ -110,6 +114,16 @@ public class WebhookEventCollectionBuilder : OrderedCollectionBuilderBase<Webhoo
     {
         Append<LanguageDeletedWebhookEvent>();
         Append<LanguageSavedWebhookEvent>();
+        return this;
+    }
+
+    public WebhookEventCollectionBuilder AddRelationWebhooks()
+    {
+        Append<RelationDeletedWebhookEvent>();
+        Append<RelationSavedWebhookEvent>();
+
+        Append<RelationTypeDeletedWebhookEvent>();
+        Append<RelationTypeSavedWebhookEvent>();
         return this;
     }
 }
