@@ -38,7 +38,7 @@
         .then((data) => {
           let selectedEvents = [];
           data.forEach(function (event) {
-            let eventObject = { name: event.eventName, selected: false, eventType: event.eventType}
+            let eventObject = { eventName: event.eventName, selected: false, eventType: event.eventType}
             vm.events.push(eventObject);
             if($scope.model.selectedEvents && $scope.model.selectedEvents.some(event => event.name === eventObject.name)){
               selectedEvents.push(eventObject);

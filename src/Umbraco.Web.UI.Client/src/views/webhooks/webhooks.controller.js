@@ -1,7 +1,7 @@
 (function () {
   "use strict";
 
-  function WebhookController($q, $timeout, $routeParams, webhooksResource, navigationService, notificationsService, editorService, overlayService, contentTypeResource, mediaTypeResource) {
+  function WebhookController($q, $timeout, $routeParams, webhooksResource, navigationService, notificationsService, editorService, overlayService, contentTypeResource, mediaTypeResource, memberTypeResource) {
 
     const vm = this;
 
@@ -53,8 +53,20 @@
     }
 
     function getEntities(webhook) {
-      const isContent = webhook.events[0].eventName.toLowerCase().includes("content");
-      const resource = isContent ? contentTypeResource : mediaTypeResource;
+      let resource;
+      switch (webhook.events[0].eventType) {
+        case "content":
+          resource = contentTypeResource;
+          break;
+        case "media":
+          resource = mediaTypeResource;
+          break;
+        case "member":
+          resource = memberTypeResource;
+          break;
+        default:
+          return;
+      }
       let entities = [];
 
       webhook.contentTypeKeys.forEach(key => {
@@ -68,8 +80,20 @@
     }
 
     function resolveTypeNames(webhook) {
-      const isContent = webhook.events[0].eventName.toLowerCase().includes("content");
-      const resource = isContent ? contentTypeResource : mediaTypeResource;
+      let resource;
+      switch (webhook.events[0].eventType) {
+        case "content":
+          resource = contentTypeResource;
+          break;
+        case "media":
+          resource = mediaTypeResource;
+          break;
+        case "member":
+          resource = memberTypeResource;
+          break;
+        default:
+          return;
+      }
 
       if (vm.webHooksContentTypes[webhook.key]){
         delete vm.webHooksContentTypes[webhook.key];
