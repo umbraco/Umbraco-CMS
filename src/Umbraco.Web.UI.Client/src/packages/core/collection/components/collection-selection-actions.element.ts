@@ -7,7 +7,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 @customElement('umb-collection-selection-actions')
 export class UmbCollectionSelectionActionsElement extends UmbLitElement {
 	@state()
-	private _nodesLength = 0;
+	private _totalItems = 0;
 
 	@state()
 	private _selectionLength = 0;
@@ -40,13 +40,12 @@ export class UmbCollectionSelectionActionsElement extends UmbLitElement {
 	private _observeCollectionContext() {
 		if (!this._collectionContext) return;
 
-		// TODO: Make sure it only updates on length change.
 		this.observe(
-			this._collectionContext.items,
-			(mediaItems) => {
-				this._nodesLength = mediaItems.length;
+			this._collectionContext.totalItems,
+			(value) => {
+				this._totalItems = value;
 			},
-			'umbItemsLengthObserver',
+			'umbTotalItemsObserver',
 		);
 
 		this.observe(
@@ -61,7 +60,7 @@ export class UmbCollectionSelectionActionsElement extends UmbLitElement {
 	}
 
 	private _renderSelectionCount() {
-		return html`<div>${this._selectionLength} of ${this._nodesLength} selected</div>`;
+		return html`<div>${this._selectionLength} of ${this._totalItems} selected</div>`;
 	}
 
 	#onActionExecuted(event: UmbActionExecutedEvent) {

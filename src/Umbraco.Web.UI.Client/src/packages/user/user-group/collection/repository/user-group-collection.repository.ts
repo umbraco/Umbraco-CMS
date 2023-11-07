@@ -27,7 +27,7 @@ export class UmbUserGroupCollectionRepository implements UmbCollectionRepository
 	async requestCollection(filter: UmbUserGroupCollectionFilterModel = { skip: 0, take: 100 }) {
 		await this.#init;
 
-		const { data, error } = await this.#collectionSource.filterCollection(filter);
+		const { data, error } = await this.#collectionSource.getCollection(filter);
 
 		if (data) {
 			this.#detailStore?.appendItems(data.items);
