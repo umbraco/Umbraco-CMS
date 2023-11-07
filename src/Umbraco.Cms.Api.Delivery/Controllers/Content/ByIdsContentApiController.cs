@@ -64,7 +64,7 @@ public class ByIdsContentApiController : ContentApiItemControllerBase
     /// </summary>
     /// <param name="ids">The unique identifiers of the content items to retrieve.</param>
     /// <returns>The content items.</returns>
-    [HttpGet("item")]
+    [HttpGet("items")]
     [MapToApiVersion("2.0")]
     [ProducesResponseType(typeof(IEnumerable<IApiContentResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]

@@ -30,7 +30,7 @@ public class ByIdsMediaApiController : MediaApiControllerBase
     /// </summary>
     /// <param name="ids">The unique identifiers of the media items to retrieve.</param>
     /// <returns>The media items.</returns>
-    [HttpGet("item")]
+    [HttpGet("items")]
     [MapToApiVersion("2.0")]
     [ProducesResponseType(typeof(IEnumerable<IApiMediaWithCropsResponse>), StatusCodes.Status200OK)]
     public async Task<IActionResult> ItemV20([FromQuery(Name = "id")] HashSet<Guid> ids)
