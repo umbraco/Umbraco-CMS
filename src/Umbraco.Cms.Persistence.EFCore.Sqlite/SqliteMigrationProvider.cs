@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Persistence.EFCore.Migrations;
 using Umbraco.Extensions;
 
@@ -11,7 +12,7 @@ public class SqliteMigrationProvider : IMigrationProvider
     public SqliteMigrationProvider(IDbContextFactory<UmbracoDbContext> dbContextFactory)
         => _dbContextFactory = dbContextFactory;
 
-    public string ProviderName => "Microsoft.Data.Sqlite";
+    public string ProviderName => Constants.ProviderNames.SQLLite;
 
     public async Task MigrateAsync(EFCoreMigration migration)
     {
