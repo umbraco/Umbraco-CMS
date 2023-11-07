@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Authorization;
 
-namespace Umbraco.Cms.Api.Management.Security.Authorization.Content;
+namespace Umbraco.Cms.Api.Management.Security.Authorization.Content.Root;
 
 /// <summary>
 ///     Authorizes that the current user has the correct permission access to the content root item.
 /// </summary>
-public class ContentRootPermissionHandler : MustSatisfyRequirementAuthorizationHandler<ContentPermissionRequirement, IEnumerable<char>>
+public class ContentRootPermissionHandler : MustSatisfyRequirementAuthorizationHandler<ContentRootPermissionRequirement, IEnumerable<char>>
 {
     private readonly IContentPermissionAuthorizer _contentPermissionAuthorizer;
 
@@ -19,7 +19,7 @@ public class ContentRootPermissionHandler : MustSatisfyRequirementAuthorizationH
     /// <inheritdoc />
     protected override async Task<bool> IsAuthorized(
         AuthorizationHandlerContext context,
-        ContentPermissionRequirement requirement,
+        ContentRootPermissionRequirement requirement,
         IEnumerable<char> resource) =>
         await _contentPermissionAuthorizer.IsAuthorizedAtRootLevelAsync(context.User, resource.ToList().AsReadOnly());
 }
