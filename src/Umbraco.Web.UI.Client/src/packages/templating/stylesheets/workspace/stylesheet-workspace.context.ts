@@ -5,8 +5,7 @@ import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api
 import {
 	UmbArrayState,
 	UmbBooleanState,
-	UmbObjectState,
-	createObservablePart,
+	UmbObjectState
 } from '@umbraco-cms/backoffice/observable-api';
 import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
 import { RichTextRuleModel, UpdateStylesheetRequestModel } from '@umbraco-cms/backoffice/backend-api';
@@ -22,9 +21,9 @@ export class UmbStylesheetWorkspaceContext
 	#rules = new UmbArrayState<RichTextRuleModelSortable>([], (rule) => rule.name);
 	data = this.#data.asObservable();
 	rules = this.#rules.asObservable();
-	name = createObservablePart(this.#data, (data) => data?.name);
-	content = createObservablePart(this.#data, (data) => data?.content);
-	path = createObservablePart(this.#data, (data) => data?.path);
+	name = this.#data.asObservablePart((data) => data?.name);
+	content = this.#data.asObservablePart((data) => data?.content);
+	path = this.#data.asObservablePart((data) => data?.path);
 
 	#isCodeEditorReady = new UmbBooleanState(false);
 	isCodeEditorReady = this.#isCodeEditorReady.asObservable();

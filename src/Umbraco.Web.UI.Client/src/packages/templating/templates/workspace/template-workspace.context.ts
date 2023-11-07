@@ -16,11 +16,11 @@ export class UmbTemplateWorkspaceContext extends UmbWorkspaceContext<UmbTemplate
 	data = this.#data.asObservable();
 	#masterTemplate = new UmbObjectState<TemplateItemResponseModel | null>(null);
 	masterTemplate = this.#masterTemplate.asObservable();
-	name = createObservablePart(this.#data, (data) => data?.name);
-	alias = createObservablePart(this.#data, (data) => data?.alias);
-	content = createObservablePart(this.#data, (data) => data?.content);
-	id = createObservablePart(this.#data, (data) => data?.id);
-	masterTemplateID = createObservablePart(this.#data, (data) => data?.masterTemplateId);
+	name = this.#data.asObservablePart((data) => data?.name);
+	alias = this.#data.asObservablePart((data) => data?.alias);
+	content = this.#data.asObservablePart((data) => data?.content);
+	id = this.#data.asObservablePart((data) => data?.id);
+	masterTemplateID = this.#data.asObservablePart((data) => data?.masterTemplateId);
 
 	#isCodeEditorReady = new UmbBooleanState(false);
 	isCodeEditorReady = this.#isCodeEditorReady.asObservable();
