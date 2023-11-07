@@ -5,11 +5,11 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 
-namespace Umbraco.Cms.Core.Webhooks.Events;
+namespace Umbraco.Cms.Core.Webhooks.Events.Core;
 
-public class MediaDeleteWebhookEvent : WebhookEventContentBase<MediaDeletedNotification, IMedia>
+public class ContentUnpublishWebhookEvent : WebhookEventContentBase<ContentUnpublishedNotification, IContent>
 {
-    public MediaDeleteWebhookEvent(
+    public ContentUnpublishWebhookEvent(
         IWebhookFiringService webhookFiringService,
         IWebHookService webHookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
@@ -19,11 +19,11 @@ public class MediaDeleteWebhookEvent : WebhookEventContentBase<MediaDeletedNotif
             webHookService,
             webhookSettings,
             serverRoleAccessor,
-            Constants.WebhookEvents.MediaDelete)
+            Constants.WebhookEvents.ContentUnpublish)
     {
     }
 
-    protected override IEnumerable<IMedia> GetEntitiesFromNotification(MediaDeletedNotification notification) => notification.DeletedEntities;
+    protected override IEnumerable<IContent> GetEntitiesFromNotification(ContentUnpublishedNotification notification) => notification.UnpublishedEntities;
 
-    protected override object ConvertEntityToRequestPayload(IMedia entity) => new DefaultPayloadModel { Id = entity.Key };
+    protected override object ConvertEntityToRequestPayload(IContent entity) => new DefaultPayloadModel { Id = entity.Key };
 }

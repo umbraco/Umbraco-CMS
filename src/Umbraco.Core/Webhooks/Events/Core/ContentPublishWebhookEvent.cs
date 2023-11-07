@@ -8,7 +8,7 @@ using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 
-namespace Umbraco.Cms.Core.Webhooks.Events;
+namespace Umbraco.Cms.Core.Webhooks.Events.Core;
 
 public class ContentPublishWebhookEvent : WebhookEventContentBase<ContentPublishedNotification, IContent>
 {
