@@ -23,10 +23,10 @@ public class ItemsWebhookEntityController : WebhookEntityControllerBase
     [HttpGet("item")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<WebhookItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult> Items([FromQuery(Name = "isoCode")] HashSet<string> isoCodes)
+    public async Task<ActionResult> Items([FromQuery(Name = "ids")] HashSet<Guid> ids)
     {
-        IEnumerable<ILanguage> languages = await _languageService.GetMultipleAsync(isoCodes);
-        List<WebhookItemResponseModel> entityResponseModels = _mapper.MapEnumerable<ILanguage, WebhooktemResponseModel>(languages);
+        IEnumerable<Core.Models.Webhook> webhooks = await _webhookService.GetMultipleAsync(ids);
+        List<WebhookItemResponseModel> entityResponseModels = _mapper.MapEnumerable<Core.Models.Webhook, WebhooktemResponseModel>(webhooks);
         return Ok(entityResponseModels);
     }
 }
