@@ -112,6 +112,12 @@ public class UmbracoXPathPathSyntaxParser
                     "$site",
                     string.Format(rootXpath, closestPublishedAncestorId) + "/ancestor-or-self::*[@level = 1]");
             });
+
+            vars.Add("$current", q =>
+            {
+                var closestPublishedAncestorId = getClosestPublishedAncestor(getPath(parentId.Value));
+                return q.Replace("$current", string.Format(rootXpath, closestPublishedAncestorId));
+            });
         }
         else if (nodeContextId.HasValue)
         {
@@ -134,11 +140,7 @@ public class UmbracoXPathPathSyntaxParser
                     "$site",
                     string.Format(rootXpath, closestPublishedAncestorId) + "/ancestor-or-self::*[@level = 1]");
             });
-        }
 
-        // These parameters must have a node id context
-        if (nodeContextId.HasValue)
-        {
             vars.Add("$current", q =>
             {
                 var closestPublishedAncestorId = getClosestPublishedAncestor(getPath(nodeContextId.Value));
