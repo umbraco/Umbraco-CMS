@@ -1,6 +1,6 @@
-import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbEntityData } from './entity.data.js';
 import { umbUserGroupData } from './user-group.data.js';
+import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbLoggedInUser } from '@umbraco-cms/backoffice/auth';
 import {
 	CreateUserRequestModel,
