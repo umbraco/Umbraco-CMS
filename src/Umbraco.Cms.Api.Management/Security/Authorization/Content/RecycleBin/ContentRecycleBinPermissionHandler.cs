@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Authorization;
 
-namespace Umbraco.Cms.Api.Management.Security.Authorization.Content;
+namespace Umbraco.Cms.Api.Management.Security.Authorization.Content.RecycleBin;
 
 /// <summary>
 ///     Authorizes that the current user has the correct permission access to the content recycle bin item.
 /// </summary>
-public class ContentRecycleBinPermissionHandler : MustSatisfyRequirementAuthorizationHandler<ContentPermissionRequirement, IEnumerable<char>>
+public class ContentRecycleBinPermissionHandler : MustSatisfyRequirementAuthorizationHandler<ContentRecycleBinPermissionRequirement, IEnumerable<char>>
 {
     private readonly IContentPermissionAuthorizer _contentPermissionAuthorizer;
 
@@ -19,7 +19,7 @@ public class ContentRecycleBinPermissionHandler : MustSatisfyRequirementAuthoriz
     /// <inheritdoc />
     protected override async Task<bool> IsAuthorized(
         AuthorizationHandlerContext context,
-        ContentPermissionRequirement requirement,
+        ContentRecycleBinPermissionRequirement requirement,
         IEnumerable<char> resource) =>
         await _contentPermissionAuthorizer.IsAuthorizedAtRecycleBinLevelAsync(context.User, resource.ToList().AsReadOnly());
 }
