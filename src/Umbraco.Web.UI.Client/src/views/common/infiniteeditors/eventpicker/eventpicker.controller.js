@@ -38,10 +38,11 @@
         .then((data) => {
           let selectedEvents = [];
           data.forEach(function (event) {
-            let eventObject = { eventName: event.eventName, selected: false, eventType: event.eventType}
-            vm.events.push(eventObject);
-            if($scope.model.selectedEvents && $scope.model.selectedEvents.some(event => event.name === eventObject.name)){
-              selectedEvents.push(eventObject);
+            event.selected = false;
+            // let eventObject = { eventName: event.eventName, selected: false, eventType: event.eventType, alias: event.alias}
+            vm.events.push(event);
+            if($scope.model.selectedEvents && $scope.model.selectedEvents.some(x => x.alias === event.alias)){
+              selectedEvents.push(event);
             }
           });
 
@@ -63,7 +64,7 @@
       }
       else {
         $scope.model.selection.forEach(function (selectedEvent, index) {
-          if (selectedEvent.name === event.name) {
+          if (selectedEvent.alias === event.alias) {
             event.selected = false;
             $scope.model.selection.splice(index, 1);
           }
@@ -71,6 +72,7 @@
 
         if($scope.model.selection.length === 0){
           vm.events = [];
+          $scope.model.selectedEvents = [];
           getAllEvents();
         }
       }

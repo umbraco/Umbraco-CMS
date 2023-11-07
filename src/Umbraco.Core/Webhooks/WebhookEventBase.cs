@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
@@ -14,6 +14,8 @@ public abstract class WebhookEventBase<TNotification> : IWebhookEvent, INotifica
 {
     private readonly IServerRoleAccessor _serverRoleAccessor;
 
+    public abstract string Alias { get; }
+
     public string EventName { get; set; }
 
     public WebhookEventType EventType { get; }
@@ -23,6 +25,8 @@ public abstract class WebhookEventBase<TNotification> : IWebhookEvent, INotifica
     protected IWebHookService WebHookService { get; }
 
     protected WebhookSettings WebhookSettings { get; private set; }
+
+
 
     protected WebhookEventBase(
         IWebhookFiringService webhookFiringService,

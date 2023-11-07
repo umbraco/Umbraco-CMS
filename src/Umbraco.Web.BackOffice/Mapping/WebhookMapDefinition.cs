@@ -18,7 +18,7 @@ public class WebhookMapDefinition : IMapDefinition
     private void Map(WebhookViewModel source, Webhook target, MapperContext context)
     {
         target.ContentTypeKeys = source.ContentTypeKeys;
-        target.Events = source.Events.Select(x => x.EventName).ToArray();
+        target.Events = source.Events.Select(x => x.Alias).ToArray();
         target.Url = source.Url;
         target.Enabled = source.Enabled;
         target.Key = source.Key ?? Guid.NewGuid();
@@ -30,6 +30,7 @@ public class WebhookMapDefinition : IMapDefinition
     {
         target.EventName = source.EventName;
         target.EventType = source.EventType;
+        target.Alias = source.Alias;
     }
 
     // Umbraco.Code.MapAll

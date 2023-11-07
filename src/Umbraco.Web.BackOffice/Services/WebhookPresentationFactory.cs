@@ -12,24 +12,25 @@ internal class WebhookPresentationFactory : IWebhookPresentationFactory
 
     public WebhookViewModel Create(Webhook webhook)
     {
-        var target = new WebhookViewModel();
-        target.ContentTypeKeys = webhook.ContentTypeKeys;
-        target.Events = webhook.Events.Select(Create).ToArray();
-        target.Url = webhook.Url;
-        target.Enabled = webhook.Enabled;
-        target.Key = webhook.Key;
-        target.Headers = webhook.Headers;
+        var target = new WebhookViewModel
+            {
+                ContentTypeKeys = webhook.ContentTypeKeys, Events = webhook.Events.Select(Create).ToArray(), Url = webhook.Url,
+                Enabled = webhook.Enabled,
+                Key = webhook.Key,
+                Headers = webhook.Headers,
+            };
 
         return target;
     }
 
-    private WebhookEventViewModel Create(string eventName)
+    private WebhookEventViewModel Create(string alias)
     {
-        IWebhookEvent? webhookEvent = _webhookEventCollection.FirstOrDefault(x => x.EventName == eventName);
+        IWebhookEvent? webhookEvent = _webhookEventCollection.FirstOrDefault(x => x.Alias == alias);
         return new WebhookEventViewModel
         {
-            EventName = eventName,
+            EventName = webhookEvent?.EventName ?? alias,
             EventType = webhookEvent?.EventType ?? WebhookEventType.None,
+            Alias = alias,
         };
     }
 }

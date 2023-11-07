@@ -11,4 +11,7 @@ public class WebhookEventViewModel
 
     [DataMember(Name = "eventType")]
     public WebhookEventType EventType { get; set; }
+
+    [DataMember(Name = "alias")]
+    public string Alias { get; set; } = string.Empty;
 }

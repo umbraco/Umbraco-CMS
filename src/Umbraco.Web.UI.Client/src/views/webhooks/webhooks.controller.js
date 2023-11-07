@@ -1,4 +1,4 @@
-(function () {
+﻿(function () {
   "use strict";
 
   function WebhookController($q, $timeout, $routeParams, webhooksResource, navigationService, notificationsService, editorService, overlayService, contentTypeResource, mediaTypeResource, memberTypeResource) {
@@ -38,7 +38,7 @@
     function loadEvents() {
       return webhooksResource.getAllEvents()
         .then(data => {
-          vm.events = data.map(item => item.eventName);
+          vm.events = data;
         });
     }
 
@@ -178,7 +178,7 @@
     }
 
     function loadWebhooks(){
-      webhooksResource
+      return webhooksResource
         .getAll()
         .then(result => {
           vm.webhooks = result;

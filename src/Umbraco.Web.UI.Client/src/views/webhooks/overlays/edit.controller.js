@@ -1,4 +1,4 @@
-(function () {
+﻿(function () {
   "use strict";
 
   function EditController($scope, editorService, contentTypeResource, mediaTypeResource, memberTypeResource) {
@@ -137,7 +137,6 @@
 
     function submit() {
       if ($scope.model.submit) {
-        $scope.model.webhook.events = $scope.model.webhook.events.map((event) => (event.name));
         $scope.model.submit($scope.model);
       }
     }

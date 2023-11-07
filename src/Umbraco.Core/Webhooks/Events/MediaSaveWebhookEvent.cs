@@ -27,12 +27,14 @@ public class MediaSaveWebhookEvent : WebhookEventContentBase<MediaSavedNotificat
             webHookService,
             webhookSettings,
             serverRoleAccessor,
-            Constants.WebhookEvents.MediaSave,
+            Constants.WebhookEvents.Names.MediaSave,
             WebhookEventType.Media)
     {
         _publishedSnapshotAccessor = publishedSnapshotAccessor;
         _apiMediaBuilder = apiMediaBuilder;
     }
+
+    public override string Alias => Constants.WebhookEvents.Aliases.MediaSave;
 
     protected override IEnumerable<IMedia> GetEntitiesFromNotification(MediaSavedNotification notification) => notification.SavedEntities;
 

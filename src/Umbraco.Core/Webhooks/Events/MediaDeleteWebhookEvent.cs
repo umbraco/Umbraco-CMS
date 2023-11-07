@@ -19,10 +19,12 @@ public class MediaDeleteWebhookEvent : WebhookEventContentBase<MediaDeletedNotif
             webHookService,
             webhookSettings,
             serverRoleAccessor,
-            Constants.WebhookEvents.MediaDelete,
+            Constants.WebhookEvents.Names.MediaDelete,
             WebhookEventType.Media)
     {
     }
+
+    public override string Alias => Constants.WebhookEvents.Aliases.MediaDelete;
 
     protected override IEnumerable<IMedia> GetEntitiesFromNotification(MediaDeletedNotification notification) => notification.DeletedEntities;
 

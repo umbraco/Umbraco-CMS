@@ -27,12 +27,14 @@ public class ContentPublishWebhookEvent : WebhookEventContentBase<ContentPublish
             webHookService,
             webhookSettings,
             serverRoleAccessor,
-            Constants.WebhookEvents.ContentPublish,
+            Constants.WebhookEvents.Names.ContentPublish,
             WebhookEventType.Content)
     {
         _publishedSnapshotAccessor = publishedSnapshotAccessor;
         _apiContentBuilder = apiContentBuilder;
     }
+
+    public override string Alias => Constants.WebhookEvents.Aliases.ContentPublish;
 
     protected override IEnumerable<IContent> GetEntitiesFromNotification(ContentPublishedNotification notification) => notification.PublishedEntities;
 
