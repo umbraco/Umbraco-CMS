@@ -5,9 +5,9 @@ name: Build and test
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
   # Allows GitHub to use this workflow to validate the merge queue
   merge_group:
@@ -20,33 +20,32 @@ env:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        node-version: [18.x]
+        node-version: [20]
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    - run: npm ci --no-audit --no-fund --prefer-offline
-    - run: npm run lint
-    - run: npm run build
-    - run: npm run generate:jsonschema:dist
-    - run: sudo npx playwright install-deps
-    - run: npm test
-    - name: Upload Code Coverage reports
-      uses: actions/upload-artifact@v3
-      if: always()
-      with:
-        name: code-coverage
-        path: coverage/
-        retention-days: 30
+      - uses: actions/checkout@v4
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+      - run: npm ci --no-audit --no-fund --prefer-offline
+      - run: npm run lint
+      - run: npm run build
+      - run: npm run generate:jsonschema:dist
+      - run: sudo npx playwright install-deps
+      - run: npm test
+      - name: Upload Code Coverage reports
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: code-coverage
+          path: coverage/
+          retention-days: 30
     # Commented out since it is outdated and is quite spammy
     # - name: Report code coverage
     #   uses: zgosalvez/github-actions-report-lcov@v2

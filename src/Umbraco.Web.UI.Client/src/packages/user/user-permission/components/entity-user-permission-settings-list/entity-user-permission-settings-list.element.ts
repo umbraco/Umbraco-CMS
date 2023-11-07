@@ -43,6 +43,7 @@ export class UmbEntityUserPermissionSettingsListElement extends UmbLitElement {
 			(userPermissionManifests) => {
 				this._manifests = userPermissionManifests.filter((manifest) => manifest.meta.entityType === this.entityType);
 			},
+			'umbUserPermissionManifestsObserver',
 		);
 	}
 

@@ -1,6 +1,6 @@
 import { Meta, StoryObj } from '@storybook/web-components';
-import { html } from 'lit';
 import type UmbTestSorterControllerElement from './test-sorter-controller.element.js';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 import './test-sorter-controller.element.js';
 
 const meta: Meta<UmbTestSorterControllerElement> = {

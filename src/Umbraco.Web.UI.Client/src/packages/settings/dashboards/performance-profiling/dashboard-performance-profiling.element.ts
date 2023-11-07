@@ -52,7 +52,7 @@ export class UmbDashboardPerformanceProfilingElement extends UmbLitElement {
 
 					<uui-toggle
 						id="toggle"
-						label="Activate the profiler by default"
+						label=${this.localize.term('profiling_activateByDefault')}
 						label-position="left"
 						?checked="${this._profilingStatus}"
 						@change="${this._changeProfilingStatus}"></uui-toggle>

@@ -17,7 +17,7 @@ export class UmbUserGroupCollectionHeaderElement extends UmbLitElement {
 	}
 
 	#onCreate() {
-		history.pushState(null, '', 'section/users/view/user-groups/user-group/create/');
+		history.pushState(null, '', 'section/user-management/view/user-groups/user-group/create/');
 	}
 
 	#onSearch(event: UUIInputEvent) {

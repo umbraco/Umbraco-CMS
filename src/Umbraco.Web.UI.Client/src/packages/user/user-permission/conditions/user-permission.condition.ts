@@ -1,4 +1,4 @@
-import { UMB_AUTH } from '@umbraco-cms/backoffice/auth';
+import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 import { UmbBaseController } from '@umbraco-cms/backoffice/controller-api';
 import {
 	ManifestCondition,
@@ -17,11 +17,11 @@ export class UmbUserPermissionCondition extends UmbBaseController implements Umb
 		this.config = args.config;
 		this.#onChange = args.onChange;
 
-		this.consumeContext(UMB_AUTH, (context) => {
+		this.consumeContext(UMB_AUTH_CONTEXT, (context) => {
 			this.observe(context.currentUser, (currentUser) => {
 				this.permitted = currentUser?.permissions?.includes(this.config.match) || false;
 				this.#onChange();
-			});
+			}, 'umbUserPermissionConditionObserver');
 		});
 	}
 }

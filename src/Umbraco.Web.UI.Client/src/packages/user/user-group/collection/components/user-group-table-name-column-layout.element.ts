@@ -10,7 +10,9 @@ export class UmbUserGroupTableNameColumnLayoutElement extends LitElement {
 	value!: any;
 
 	render() {
-		return html` <a style="font-weight: bold;" href="section/users/view/user-groups/user-group/edit/${this.item.id}">
+		return html` <a
+			style="font-weight: bold;"
+			href="section/user-management/view/user-groups/user-group/edit/${this.item.id}">
 			${this.value.name}
 		</a>`;
 	}

@@ -2,7 +2,7 @@ import { sanitizeHtml } from '@umbraco-cms/backoffice/external/sanitize-html';
 import { marked } from '@umbraco-cms/backoffice/external/marked';
 import { monaco } from '@umbraco-cms/backoffice/external/monaco-editor';
 import { UmbCodeEditorController, UmbCodeEditorElement, loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
-import { css, html, customElement, query, property, unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, query, property, unsafeHTML, when } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin, UUIModalSidebarSize, UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -541,13 +541,14 @@ export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 				@keypress=${this.onKeyPress}
 				@input=${this.#onInput}
 				theme="umb-light"></umb-code-editor>
-			${this.renderPreview()}`;
+			${when(this.preview && this.value, () => this.renderPreview(this.value as string))}`;
 	}
 
-	renderPreview() {
-		if (!this.preview) return;
+	renderPreview(markdown: string) {
+		const markdownAsHtml = marked.parse(markdown);
+		const sanitizedHtml = markdownAsHtml ? sanitizeHtml(markdownAsHtml) : '';
 		return html`<uui-scroll-container id="preview">
-			${unsafeHTML(sanitizeHtml(marked.parse(this.value as string)))}
+			${unsafeHTML(sanitizedHtml)}
 		</uui-scroll-container>`;
 	}
 

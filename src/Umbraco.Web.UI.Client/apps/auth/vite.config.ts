@@ -19,7 +19,7 @@ export default defineConfig({
 				},
 			},
 		},
-		outDir: '../../../Umbraco.Cms.StaticAssets/wwwroot/umbraco/login',
+		outDir: '../../../Umbraco.Cms.StaticAssets/wwwroot/umbraco/auth',
 		emptyOutDir: true,
 	},
 	server: {

@@ -1,0 +1,42 @@
+import { UserResource } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+
+/**
+ * A server data source for changing the password of a user
+ * @export
+ * @class UmbChangeUserPasswordServerDataSource
+ */
+export class UmbChangeUserPasswordServerDataSource {
+	#host: UmbControllerHost;
+
+	/**
+	 * Creates an instance of UmbChangeUserPasswordServerDataSource.
+	 * @param {UmbControllerHost} host
+	 * @memberof UmbChangeUserPasswordServerDataSource
+	 */
+	constructor(host: UmbControllerHost) {
+		this.#host = host;
+	}
+
+	/**
+	 * Change the password of a user
+	 * @param {string} id
+	 * @param {string} newPassword
+	 * @return {*}
+	 * @memberof UmbChangeUserPasswordServerDataSource
+	 */
+	async changePassword(id: string, newPassword: string) {
+		if (!id) throw new Error('User Id is missing');
+
+		return tryExecuteAndNotify(
+			this.#host,
+			UserResource.postUserChangePasswordById({
+				id,
+				requestBody: {
+					newPassword,
+				},
+			}),
+		);
+	}
+}
