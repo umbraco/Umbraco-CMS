@@ -181,19 +181,9 @@ public class DataValueReferenceFactoryCollectionTests
         var resultA = collection.GetAutomaticRelationTypesAliases(propertyEditors).ToArray();
         var resultB = collection.GetAutomaticRelationTypesAliases(properties, propertyEditors).ToArray();
 
-        Assert.Multiple(() =>
-        {
-            foreach (var alias in Constants.Conventions.RelationTypes.AutomaticRelationTypes)
-            {
-                Assert.Contains(alias, resultA, "Result A does not contain one of the default automatic relation types.");
-                Assert.Contains(alias, resultB, "Result B does not contain one of the default automatic relation types.");
-            }
-        });
-
-        // Ensure we don't have more than just the default
-        int expectedCount = Constants.Conventions.RelationTypes.AutomaticRelationTypes.Length;
-        Assert.AreEqual(expectedCount, resultA.Length, "Result A should only contain the default automatic relation types.");
-        Assert.AreEqual(expectedCount, resultB.Length, "Result B should only contain the default automatic relation types.");
+        var expected = Constants.Conventions.RelationTypes.AutomaticRelationTypes;
+        CollectionAssert.AreEquivalent(expected, resultA, "Result A does not contain the expected relation type aliases.");
+        CollectionAssert.AreEquivalent(expected, resultB, "Result B does not contain the expected relation type aliases.");
     }
 
     [Test]
@@ -210,16 +200,9 @@ public class DataValueReferenceFactoryCollectionTests
         var resultA = collection.GetAutomaticRelationTypesAliases(propertyEditors).ToArray();
         var resultB = collection.GetAutomaticRelationTypesAliases(properties, propertyEditors).ToArray();
 
-        Assert.Multiple(() =>
-        {
-            Assert.Contains("umbTest", resultA, "Result A does not contain the custom automatic relation type.");
-            Assert.Contains("umbTest", resultB, "Result B does not contain the custom automatic relation type.");
-        });
-
-        // Ensure we don't have more than just the default and single custom
-        int expectedCount = Constants.Conventions.RelationTypes.AutomaticRelationTypes.Length + 1;
-        Assert.AreEqual(expectedCount, resultA.Length, "Result A should only contain the default and a single custom automatic relation type.");
-        Assert.AreEqual(expectedCount, resultB.Length, "Result B should only contain the default and a single custom automatic relation type.");
+        var expected = Constants.Conventions.RelationTypes.AutomaticRelationTypes.Append("umbTest");
+        CollectionAssert.AreEquivalent(expected, resultA, "Result A does not contain the expected relation type aliases.");
+        CollectionAssert.AreEquivalent(expected, resultB, "Result B does not contain the expected relation type aliases.");
     }
 
     private class TestDataValueReferenceFactory : IDataValueReferenceFactory
