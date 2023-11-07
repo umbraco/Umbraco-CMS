@@ -11,9 +11,9 @@ export class UmbBasicState<T> {
 
 	constructor(initialData: T) {
 		this._subject = new BehaviorSubject(initialData);
-		this.asObservable = this._subject.asObservable;
-		this.getValue = this._subject.getValue;
-		this.destroy = this._subject.complete;
+		this.asObservable = this._subject.asObservable.bind(this._subject);
+		this.getValue = this._subject.getValue.bind(this._subject);
+		this.destroy = this._subject.complete.bind(this._subject);
 	}
 
 
