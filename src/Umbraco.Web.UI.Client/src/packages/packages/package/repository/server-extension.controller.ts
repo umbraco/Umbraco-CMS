@@ -1,12 +1,10 @@
 import { UmbPackageRepository } from './package.repository.js';
-import { Subject, takeUntil } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbBaseController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBackofficeExtensionRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
 export class UmbExtensionInitializer extends UmbBaseController {
-	#host: UmbControllerHostElement;
+
 	#extensionRegistry: UmbBackofficeExtensionRegistry;
-	#unobserve = new Subject<void>();
 	#repository: UmbPackageRepository;
 	#localPackages: Array<Promise<any>>;
 
@@ -16,7 +14,7 @@ export class UmbExtensionInitializer extends UmbBaseController {
 		localPackages: Array<Promise<any>>
 	) {
 		super(host, UmbExtensionInitializer.name);
-		this.#host = host;
+
 		this.#extensionRegistry = extensionRegistry;
 		this.#repository = new UmbPackageRepository(host);
 		this.#localPackages = localPackages;
@@ -28,8 +26,7 @@ export class UmbExtensionInitializer extends UmbBaseController {
 	}
 
 	hostDisconnected(): void {
-		this.#unobserve.next();
-		this.#unobserve.complete();
+		this.removeControllerByAlias('_observeExtensions');
 	}
 
 	async #loadLocalPackages() {
@@ -40,13 +37,8 @@ export class UmbExtensionInitializer extends UmbBaseController {
 	}
 
 	async #loadServerPackages() {
-		const extensions$ = await this.#repository.extensions();
+		const extensions = await this.#repository.extensions();
 
-		extensions$
-			.pipe(
-				// If the app breaks then stop the request
-				takeUntil(this.#unobserve)
-			)
-			.subscribe((extensions) => this.#extensionRegistry.registerMany(extensions));
+		this.observe(extensions, (extensions) => this.#extensionRegistry.registerMany(extensions), '_observeExtensions');
 	}
 }

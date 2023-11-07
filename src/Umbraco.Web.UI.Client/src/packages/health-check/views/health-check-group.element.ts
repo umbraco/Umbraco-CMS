@@ -47,16 +47,19 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 
 			this._api = this._healthCheckContext?.apis.get(this.groupName);
 
-			this._api?.getGroupChecks(this.groupName);
+			if(this._api) {
+				this._api.getGroupChecks(this.groupName);
 
-			this._api?.checks.subscribe((group) => {
-				this._checks = group?.checks;
-				this._group = group;
-			});
+				this.observe(this._api.checks, (group) => {
+					this._checks = group?.checks;
+					this._group = group;
+				});
 
-			this._api?.results.subscribe((results) => {
-				this._idResults = results?.checks;
-			});
+				this.observe(this._api.results, (results) => {
+					this._idResults = results?.checks;
+				});
+
+			}
 		});
 	}
 

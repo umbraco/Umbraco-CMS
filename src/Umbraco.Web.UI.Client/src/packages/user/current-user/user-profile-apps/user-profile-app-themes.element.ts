@@ -6,7 +6,7 @@ import { ManifestTheme, umbExtensionsRegistry } from '@umbraco-cms/backoffice/ex
 
 @customElement('umb-user-profile-app-themes')
 export class UmbUserProfileAppThemesElement extends UmbLitElement {
-	#themeService?: UmbThemeContext;
+	#themeContext?: UmbThemeContext;
 
 	@state()
 	private _themeAlias: string | null = null;
@@ -16,24 +16,24 @@ export class UmbUserProfileAppThemesElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_THEME_CONTEXT_TOKEN, (instance) => {
-			this.#themeService = instance;
-			instance.theme.subscribe((themeAlias) => {
+		this.consumeContext(UMB_THEME_CONTEXT_TOKEN, (context) => {
+			this.#themeContext = context;
+			this.observe(context.theme, (themeAlias) => {
 				this._themeAlias = themeAlias;
-			});
+			}, '_observeCurrentTheme');
 
-			umbExtensionsRegistry.extensionsOfType('theme').subscribe((themes) => {
+			this.observe(umbExtensionsRegistry.extensionsOfType('theme'), (themes) => {
 				this._themes = themes;
-			});
+			}, '_observeThemeExtensions');
 		});
 	}
 
 	#handleThemeChange(event: UUISelectEvent) {
-		if (!this.#themeService) return;
+		if (!this.#themeContext) return;
 
 		const theme = event.target.value.toString();
 
-		this.#themeService.setThemeByAlias(theme);
+		this.#themeContext.setThemeByAlias(theme);
 	}
 
 	get #options() {
