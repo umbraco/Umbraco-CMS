@@ -86,7 +86,7 @@ export class UmbAppElement extends UmbLitElement {
 		// just in case the user language is not the default language.
 		// We **need** to do this because the default language (typically en-us) holds all the fallback keys for all the other languages.
 		// This way we can ensure that the document language is always loaded first and subsequently registered as the fallback language.
-		umbLocalizationRegistry.isDefaultLoaded.subscribe((isDefaultLoaded) => {
+		this.observe(umbLocalizationRegistry.isDefaultLoaded, (isDefaultLoaded) => {
 			if (!this.#authContext) {
 				throw new Error('[Fatal] AuthContext requested before it was initialised');
 			}
