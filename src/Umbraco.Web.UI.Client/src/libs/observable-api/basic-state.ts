@@ -3,17 +3,33 @@ import { BehaviorSubject } from '@umbraco-cms/backoffice/external/rxjs';
 /**
  * @export
  * @class UmbBasicState
- * @extends {BehaviorSubject<T>}
- * @description - A RxJS BehaviorSubject this Subject ensures the data is unique, not updating any Observes unless there is an actual change of the value.
+ * @description - State ensures the data is unique, not updating any Observes unless there is an actual change of the value using `===`.
  */
-export class UmbBasicState<T> extends BehaviorSubject<T> {
+export class UmbBasicState<T> {
+
+	protected _subject:BehaviorSubject<T>;
+
 	constructor(initialData: T) {
-		super(initialData);
+		this._subject = new BehaviorSubject(initialData);
+		this.asObservable = this._subject.asObservable;
+		this.getValue = this._subject.getValue;
+		this.complete = this._subject.complete;
 	}
 
+	/**
+	 *
+	 */
+	public asObservable: BehaviorSubject<T>['asObservable'];
+	public get value(): BehaviorSubject<T>['value'] {
+		return this._subject.value;
+	};
+	public getValue: BehaviorSubject<T>['getValue'];
+	public complete: BehaviorSubject<T>['complete'];
+
+
 	next(newData: T): void {
-		if (newData !== this.getValue()) {
-			super.next(newData);
+		if (newData !== this._subject.getValue()) {
+			this._subject.next(newData);
 		}
 	}
 }

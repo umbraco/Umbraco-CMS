@@ -120,6 +120,6 @@ export class UmbEntityWorkspaceManager<
 	};
 
 	public destroy = (): void => {
-		this.state.unsubscribe();
+		this.state.complete();
 	};
 }
