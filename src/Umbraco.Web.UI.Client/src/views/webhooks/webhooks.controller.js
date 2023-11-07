@@ -54,7 +54,7 @@
 
     function getEntities(webhook) {
       let resource;
-      switch (webhook.events[0].eventType) {
+      switch (webhook.events[0].eventType.toLowerCase()) {
         case "content":
           resource = contentTypeResource;
           break;
@@ -81,7 +81,7 @@
 
     function resolveTypeNames(webhook) {
       let resource;
-      switch (webhook.events[0].eventType) {
+      switch (webhook.events[0].eventType.toLowerCase()) {
         case "content":
           resource = contentTypeResource;
           break;

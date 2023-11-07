@@ -48,7 +48,7 @@
         }
       };
 
-      switch (eventType) {
+      switch (eventType.toLowerCase()) {
         case "content":
           editorService.contentTypePicker(editor);
           break;
@@ -82,7 +82,7 @@
 
     function getEntities(selection, eventType) {
       let resource;
-      switch (eventType) {
+      switch (eventType.toCamelCase()) {
         case "content":
           resource = contentTypeResource;
           break;
