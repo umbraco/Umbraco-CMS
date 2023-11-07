@@ -130,6 +130,10 @@ public class WebhookEventCollectionBuilder : OrderedCollectionBuilderBase<Webhoo
         Append<MediaDeletedWebhookEvent>();
         Append<MediaSavedWebhookEvent>();
 
+        Append<MediaEmptiedRecycleBinWebhookEvent>();
+        Append<MediaMovedWebhookEvent>();
+        Append<MediaMovedToRecycleBinWebhookEvent>();
+
         Append<MediaTypeChangedWebhookEvent>();
         Append<MediaTypeDeletedWebhookEvent>();
         Append<MediaTypeMovedWebhookEvent>();
