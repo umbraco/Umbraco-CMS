@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 
@@ -15,6 +15,7 @@ public class WebhookService : IWebHookService
         _webhookRepository = webhookRepository;
     }
 
+    /// <inheritdoc />
     public async Task<Webhook> CreateAsync(Webhook webhook)
     {
         using ICoreScope scope = _provider.CreateCoreScope();
@@ -24,6 +25,7 @@ public class WebhookService : IWebHookService
         return created;
     }
 
+    /// <inheritdoc />
     public async Task UpdateAsync(Webhook webhook)
     {
         using ICoreScope scope = _provider.CreateCoreScope();
@@ -45,6 +47,7 @@ public class WebhookService : IWebHookService
         scope.Complete();
     }
 
+    /// <inheritdoc />
     public async Task DeleteAsync(Guid key)
     {
         using ICoreScope scope = _provider.CreateCoreScope();
@@ -57,6 +60,7 @@ public class WebhookService : IWebHookService
         scope.Complete();
     }
 
+    /// <inheritdoc />
     public async Task<Webhook?> GetAsync(Guid key)
     {
         using ICoreScope scope = _provider.CreateCoreScope();
@@ -65,6 +69,7 @@ public class WebhookService : IWebHookService
         return webhook;
     }
 
+    /// <inheritdoc />
     public async Task<PagedModel<Webhook>> GetAllAsync(int skip, int take)
     {
         using ICoreScope scope = _provider.CreateCoreScope();
@@ -74,6 +79,7 @@ public class WebhookService : IWebHookService
         return webhooks;
     }
 
+    /// <inheritdoc />
     public async Task<IEnumerable<Webhook>> GetByAliasAsync(string eventName)
     {
         using ICoreScope scope = _provider.CreateCoreScope();

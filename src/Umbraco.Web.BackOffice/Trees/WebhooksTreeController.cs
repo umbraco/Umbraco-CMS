@@ -10,7 +10,7 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Web.BackOffice.Trees;
 
-[Authorize(Policy = AuthorizationPolicies.TreeAccessLogs)]
+[Authorize(Policy = AuthorizationPolicies.TreeAccessWebhooks)]
 [Tree(Constants.Applications.Settings, Constants.Trees.Webhooks, SortOrder = 9, TreeGroup = Constants.Trees.Groups.Settings)]
 [PluginController(Constants.Web.Mvc.BackOfficeTreeArea)]
 [CoreTree]
