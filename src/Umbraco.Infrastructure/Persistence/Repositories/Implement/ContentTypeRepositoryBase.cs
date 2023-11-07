@@ -1385,10 +1385,15 @@ AND umbracoNode.id <> @id",
         }
 
         // Now bulk update the umbracoDocument table
-        foreach (IGrouping<bool, KeyValuePair<int, bool>> editValue in editedDocument.GroupBy(x => x.Value))
+        // we need to do this in batches as the WhereIn Npoco method translates to all the nodeIds being passed in as parameters when using the SqlClient provider
+        // this results in to many parameters (>2100) being passed to the client when there are a lot of documents being normalized
+        foreach (IGrouping<bool, KeyValuePair<int, bool>> groupByValue in editedDocument.GroupBy(x => x.Value))
         {
-            Database.Execute(Sql().Update<DocumentDto>(u => u.Set(x => x.Edited, editValue.Key))
-                .WhereIn<DocumentDto>(x => x.NodeId, editValue.Select(x => x.Key)));
+            foreach (IEnumerable<KeyValuePair<int, bool>> batch in groupByValue.InGroupsOf(2000))
+            {
+                Database.Execute(Sql().Update<DocumentDto>(u => u.Set(x => x.Edited, groupByValue.Key))
+                    .WhereIn<DocumentDto>(x => x.NodeId, batch.Select(x => x.Key)));
+            }
         }
     }
 
