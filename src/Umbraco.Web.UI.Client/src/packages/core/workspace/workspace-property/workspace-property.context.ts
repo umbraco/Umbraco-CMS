@@ -144,7 +144,7 @@ export class UmbWorkspacePropertyContext<ValueType = any> extends UmbBaseControl
 	}
 
 	public destroy(): void {
-		this.#data.complete();
+		this.#data.destroy();
 		this._providerController.destroy(); // This would also be handled by the controller host, but if someone wanted to replace/remove this context without the host being destroyed. Then we have clean up out selfs here.
 	}
 }

@@ -167,7 +167,7 @@ export class UmbStylesheetWorkspaceContext
 	}
 
 	public destroy(): void {
-		this.#data.complete();
+		this.#data.destroy();
 	}
 }
 

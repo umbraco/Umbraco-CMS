@@ -163,7 +163,7 @@ ${currentContent}`;
 	}
 
 	public destroy() {
-		this.#data.complete();
+		this.#data.destroy();
 		super.destroy();
 	}
 }

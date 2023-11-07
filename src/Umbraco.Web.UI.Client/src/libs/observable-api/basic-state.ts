@@ -13,7 +13,7 @@ export class UmbBasicState<T> {
 		this._subject = new BehaviorSubject(initialData);
 		this.asObservable = this._subject.asObservable;
 		this.getValue = this._subject.getValue;
-		this.complete = this._subject.complete;
+		this.destroy = this._subject.complete;
 	}
 
 	/**
@@ -24,7 +24,7 @@ export class UmbBasicState<T> {
 		return this._subject.value;
 	};
 	public getValue: BehaviorSubject<T>['getValue'];
-	public complete: BehaviorSubject<T>['complete'];
+	public destroy: BehaviorSubject<T>['complete'];
 
 
 	next(newData: T): void {
