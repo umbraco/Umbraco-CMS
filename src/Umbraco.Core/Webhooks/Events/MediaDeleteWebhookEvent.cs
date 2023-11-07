@@ -7,7 +7,7 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events;
 
-public class MediaDeleteWebhookEvent : WebhookEventBase<MediaDeletedNotification, IMedia>
+public class MediaDeleteWebhookEvent : WebhookEventContentBase<MediaDeletedNotification, IMedia>
 {
     public MediaDeleteWebhookEvent(
         IWebhookFiringService webhookFiringService,

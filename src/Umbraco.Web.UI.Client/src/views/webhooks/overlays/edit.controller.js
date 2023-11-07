@@ -1,8 +1,10 @@
-﻿(function () {
+(function () {
   "use strict";
 
   function EditController($scope, editorService, contentTypeResource, mediaTypeResource) {
-    var vm = this;
+
+    const vm = this;
+
     vm.clearContentType = clearContentType;
     vm.clearEvent = clearEvent;
     vm.removeHeader = removeHeader;
@@ -12,9 +14,7 @@
     vm.close = close;
     vm.submit = submit;
 
-
-    function openEventPicker()
-    {
+    function openEventPicker() {
       editorService.eventPicker({
         title: "Select event",
         selectedEvents: $scope.model.webhook.events,
@@ -28,23 +28,39 @@
       });
     }
 
-    function openContentTypePicker()
-    {
+    function openContentTypePicker() {
       const isContent = $scope.model.webhook ? $scope.model.webhook.events[0].toLowerCase().includes("content") : null;
-      editorService.treePicker({
-        section: 'settings',
-        treeAlias: isContent ? 'documentTypes' : 'mediaTypes',
-        entityType: isContent ? 'DocumentType' : 'MediaType',
+
+      const editor = {
         multiPicker: true,
+        filterCssClass: "not-allowed not-published",
+        filter: function (item) {
+          // filter out folders (containers), element types (for content) and already selected items
+          return item.nodeType === "container"; // || item.metaData.isElement || !!_.findWhere(vm.itemTypes, { udi: item.udi });
+        },
         submit(model) {
           getEntities(model.selection, isContent);
-          $scope.model.webhook.contentTypeKeys = model.selection.map((item) => item.key);
+          $scope.model.webhook.contentTypeKeys = model.selection.map(item => item.key);
           editorService.close();
         },
         close() {
           editorService.close();
         }
-      });
+      };
+
+      const itemType = isContent ? "content" : "media";
+
+      switch (itemType) {
+        case "content":
+          editorService.contentTypePicker(editor);
+          break;
+        case "media":
+          editorService.mediaTypePicker(editor);
+          break;
+        case "member":
+          editorService.memberTypePicker(editor);
+          break;
+      }
     }
 
     function openCreateHeader() {
@@ -70,29 +86,29 @@
       const resource = isContent ? contentTypeResource : mediaTypeResource;
       $scope.model.contentTypes = [];
 
-      selection.forEach((entity) => {
+      selection.forEach(entity => {
         resource.getById(entity.key)
-          .then((data) => {
+          .then(data => {
             $scope.model.contentTypes.push(data);
           });
       });
     }
 
     function clearContentType(contentTypeKey) {
-      if (Array.isArray($scope.model.webhook.contentTypeKeys)) {
+      if (Utilities.isArray($scope.model.webhook.contentTypeKeys)) {
         $scope.model.webhook.contentTypeKeys = $scope.model.webhook.contentTypeKeys.filter(x => x !== contentTypeKey);
       }
-      if (Array.isArray($scope.model.contentTypes)) {
+      if (Utilities.isArray($scope.model.contentTypes)) {
         $scope.model.contentTypes = $scope.model.contentTypes.filter(x => x.key !== contentTypeKey);
       }
     }
 
     function clearEvent(event) {
-      if (Array.isArray($scope.model.webhook.events)) {
+      if (Utilities.isArray($scope.model.webhook.events)) {
         $scope.model.webhook.events = $scope.model.webhook.events.filter(x => x !== event);
       }
 
-      if (Array.isArray($scope.model.contentTypes)) {
+      if (Utilities.isArray($scope.model.contentTypes)) {
         $scope.model.events = $scope.model.events.filter(x => x.key !== event);
       }
     }
@@ -101,16 +117,13 @@
       delete $scope.model.webhook.headers[key];
     }
 
-
-    function close()
-    {
+    function close() {
       if ($scope.model.close) {
         $scope.model.close();
       }
     }
 
-    function submit()
-    {
+    function submit() {
       if ($scope.model.submit) {
         $scope.model.submit($scope.model);
       }

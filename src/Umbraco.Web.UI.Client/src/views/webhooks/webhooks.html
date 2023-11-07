@@ -1,4 +1,4 @@
-﻿<div ng-controller="Umbraco.Editors.Webhooks.WebhookController as vm">
+<div ng-controller="Umbraco.Editors.Webhooks.WebhookController as vm">
 
   <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
 
@@ -17,7 +17,6 @@
   <table class="table table-hover" ng-if="!vm.loading">
     <thead>
     <tr>
-      <!--          <th><localize key="general_language"></localize></th>-->
       <th>Enabled</th>
       <th>Events</th>
       <th>Url</th>
@@ -27,27 +26,24 @@
     <tbody>
     <tr ng-repeat="webhook in vm.webhooks track by webhook.key" ng-click="vm.openWebhookOverlay(webhook)" style="cursor: pointer;">
       <td style="width: 60px;">
-        <umb-checkmark ng-if="webhook.enabled"
-                       checked="webhook.enabled"
-                       size="xs">
+        <umb-checkmark
+          ng-if="webhook.enabled"
+          checked="webhook.enabled"
+          size="xs">
         </umb-checkmark>
       </td>
       <td>
-        <umb-icon icon="icon-globe" class="event-icon"></umb-icon>
         <span>{{ vm.webhookEvents[webhook.key] }}</span>
       </td>
-      <td>
-        {{ webhook.url }}
-      </td>
-      <td>
-        {{ vm.webHooksContentTypes[webhook.key] }}
-      </td>
+      <td>{{ webhook.url }}</td>
+      <td>{{ vm.webHooksContentTypes[webhook.key] }}</td>
       <td style="text-align: right;">
-        <umb-button type="button"
-                    action="vm.deleteWebhook(webhook)"
-                    button-style="danger"
-                    size="xxs"
-                    label-key="general_delete">
+        <umb-button
+          type="button"
+          action="vm.deleteWebhook(webhook, $event)"
+          button-style="danger"
+          size="xxs"
+          label-key="general_delete">
         </umb-button>
       </td>
     </tr>
