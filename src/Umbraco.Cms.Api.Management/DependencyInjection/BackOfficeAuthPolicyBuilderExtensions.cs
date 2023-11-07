@@ -3,6 +3,9 @@ using Microsoft.Extensions.DependencyInjection;
 using OpenIddict.Validation.AspNetCore;
 using Umbraco.Cms.Api.Management.Security.Authorization;
 using Umbraco.Cms.Api.Management.Security.Authorization.Content;
+using Umbraco.Cms.Api.Management.Security.Authorization.Content.Branch;
+using Umbraco.Cms.Api.Management.Security.Authorization.Content.RecycleBin;
+using Umbraco.Cms.Api.Management.Security.Authorization.Content.Root;
 using Umbraco.Cms.Api.Management.Security.Authorization.DenyLocalLogin;
 using Umbraco.Cms.Api.Management.Security.Authorization.Feature;
 using Umbraco.Cms.Api.Management.Security.Authorization.Media;
@@ -106,10 +109,22 @@ internal static class BackOfficeAuthPolicyBuilderExtensions
             policy.Requirements.Add(new UserPermissionRequirement());
         });
 
+        options.AddPolicy($"New{AuthorizationPolicies.ContentPermissionAtRoot}", policy =>
+        {
+            policy.AuthenticationSchemes.Add(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
+            policy.Requirements.Add(new ContentRootPermissionRequirement());
+        });
+
         options.AddPolicy($"New{AuthorizationPolicies.ContentPermissionByResource}", policy =>
         {
             policy.AuthenticationSchemes.Add(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
             policy.Requirements.Add(new ContentPermissionRequirement());
+        });
+
+        options.AddPolicy($"New{AuthorizationPolicies.ContentPermissionEmptyRecycleBin}", policy =>
+        {
+            policy.AuthenticationSchemes.Add(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
+            policy.Requirements.Add(new ContentRecycleBinPermissionRequirement());
         });
 
         options.AddPolicy($"New{AuthorizationPolicies.DenyLocalLoginIfConfigured}", policy =>

@@ -23,6 +23,7 @@ public static class AuthorizationPolicies
     public const string ContentPermissionProtectById = nameof(ContentPermissionProtectById);
     public const string ContentPermissionBrowseById = nameof(ContentPermissionBrowseById);
     public const string ContentPermissionDeleteById = nameof(ContentPermissionDeleteById);
+    public const string ContentPermissionAtRoot = nameof(ContentPermissionAtRoot);
 
     public const string MediaPermissionByResource = nameof(MediaPermissionByResource);
     public const string MediaPermissionPathById = nameof(MediaPermissionPathById);
