@@ -11,9 +11,6 @@ export class UmbBasicState<T> {
 
 	constructor(initialData: T) {
 		this._subject = new BehaviorSubject(initialData);
-		this.asObservable = this._subject.asObservable.bind(this._subject);
-		this.getValue = this._subject.getValue.bind(this._subject);
-		this.destroy = this._subject.complete.bind(this._subject);
 	}
 
 
@@ -26,7 +23,9 @@ export class UmbBasicState<T> {
 	 *
 	 * this.observe(myState, (latestStateValue) => console.log("Value is: ", latestStateValue));
    */
-	public asObservable: BehaviorSubject<T>['asObservable'];
+	public asObservable(): ReturnType<BehaviorSubject<T>['asObservable']> {
+		return this._subject.asObservable();
+	}
 
 	/**
 	 * @property value
@@ -47,13 +46,17 @@ export class UmbBasicState<T> {
 	 * const myState = new UmbArrayState('Hello world');
 	 * console.log("Value is: ", myState.value);
    */
-	public getValue: BehaviorSubject<T>['getValue'];
+	public getValue(): ReturnType<BehaviorSubject<T>['getValue']> {
+		return this._subject.getValue();
+	}
 
 	/**
 	 * @method destroy
 	 * @description - Destroys this state and completes all observations made to it.
    */
-	public destroy: BehaviorSubject<T>['complete'];
+	public destroy(): void {
+		this._subject.complete();
+	}
 
 	/**
 	 * @method next
