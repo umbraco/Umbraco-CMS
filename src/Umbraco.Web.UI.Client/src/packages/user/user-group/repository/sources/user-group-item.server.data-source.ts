@@ -34,7 +34,7 @@ export class UmbUserGroupItemServerDataSource implements UmbItemDataSource<UserG
 			this.#host,
 			UserGroupResource.getUserGroupItem({
 				id: ids,
-			})
+			}),
 		);
 	}
 }

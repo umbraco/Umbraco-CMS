@@ -1,5 +1,5 @@
 import { UmbUserRepositoryBase } from '../user-repository-base.js';
-import { UmbUserItemServerDataSource } from './user-item.server.data.js';
+import { UmbUserItemServerDataSource } from './user-item.server.data-source.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbItemDataSource, UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 import { UserItemResponseModel } from '@umbraco-cms/backoffice/backend-api';

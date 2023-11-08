@@ -1,7 +1,7 @@
 import { UmbTemporaryFileRepository } from '@umbraco-cms/backoffice/temporary-file';
 import { UmbUserDetailDataSource, UmbUserSetGroupDataSource } from '../types.js';
-import { UmbUserServerDataSource } from './sources/user.server.data.js';
-import { UmbUserSetGroupsServerDataSource } from './sources/user-set-group.server.data.js';
+import { UmbUserServerDataSource } from './sources/user.server.data-source.js';
+import { UmbUserSetGroupsServerDataSource } from './sources/user-set-group.server.data-source.js';
 
 import { UmbUserRepositoryBase } from './user-repository-base.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';

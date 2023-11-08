@@ -1,8 +1,8 @@
 import { UmbUserGroupDetailDataSource } from '../types.js';
-import { UmbUserGroupServerDataSource } from './sources/user-group.server.data.js';
+import { UmbUserGroupServerDataSource } from './sources/user-group.server.data-source.js';
 import { UMB_USER_GROUP_ITEM_STORE_CONTEXT_TOKEN, UmbUserGroupItemStore } from './user-group-item.store.js';
 import { UMB_USER_GROUP_STORE_CONTEXT_TOKEN, UmbUserGroupStore } from './user-group.store.js';
-import { UmbUserGroupItemServerDataSource } from './sources/user-group-item.server.data.js';
+import { UmbUserGroupItemServerDataSource } from './sources/user-group-item.server.data-source.js';
 import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import {
 	CreateUserGroupRequestModel,
