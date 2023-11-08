@@ -4,6 +4,7 @@ import { FormControlMixin, UUISelectEvent } from '@umbraco-cms/backoffice/extern
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbInputMediaElement } from '@umbraco-cms/backoffice/media';
 import { StartNode } from '@umbraco-cms/backoffice/components';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 @customElement('umb-input-start-node')
 export class UmbInputStartNodeElement extends FormControlMixin(UmbLitElement) {
@@ -25,7 +26,7 @@ export class UmbInputStartNodeElement extends FormControlMixin(UmbLitElement) {
 
 		// Clear others
 		this.startNodeId = '';
-		this.dispatchEvent(new CustomEvent('change'));
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	#onIdChange(event: CustomEvent) {
