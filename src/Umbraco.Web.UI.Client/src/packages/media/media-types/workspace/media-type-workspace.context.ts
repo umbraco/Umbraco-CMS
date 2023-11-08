@@ -54,7 +54,9 @@ export class UmbMediaTypeWorkspaceContext
 		if (!data) return;
 
 		this.setIsNew(true);
-		this.#data.next(data);
+
+		//TODO: Model mismatch. FIX
+		this.#data.next(data as unknown as MediaTypeResponseModel);
 	}
 
 	async save() {

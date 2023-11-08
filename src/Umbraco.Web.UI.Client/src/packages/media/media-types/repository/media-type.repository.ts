@@ -9,6 +9,7 @@ import { UmbTreeRepository, UmbTreeDataSource } from '@umbraco-cms/backoffice/re
 import {
 	CreateMediaTypeRequestModel,
 	EntityTreeItemResponseModel,
+	MediaTypeResponseModel,
 	UpdateMediaTypeRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
 
@@ -160,20 +161,28 @@ export class UmbMediaTypeRepository implements UmbTreeRepository<EntityTreeItemR
 	}
 
 	async create(mediaType: CreateMediaTypeRequestModel) {
+		if (!mediaType || !mediaType.id) throw new Error('Document Type is missing');
 		await this.#init;
 
-		if (!mediaType.name) {
-			throw new Error('Name is missing');
-		}
-
-		const { data, error } = await this.#detailSource.insert(mediaType);
+		const { error } = await this.#detailSource.insert(mediaType);
 
 		if (!error) {
-			const notification = { data: { message: `Media type '${mediaType.name}' created` } };
-			this.#notificationContext?.peek('positive', notification);
+			//TODO: Model mismatch. FIX
+			this.#detailStore?.append(mediaType as unknown as MediaTypeResponseModel);
+
+			const treeItem = {
+				type: 'media-type',
+				parentId: null,
+				name: mediaType.name,
+				id: mediaType.id,
+				isFolder: false,
+				isContainer: false,
+				hasChildren: false,
+			};
+			this.#treeStore?.appendItems([treeItem]);
 		}
 
-		return { data, error };
+		return { error };
 	}
 
 	async move() {
