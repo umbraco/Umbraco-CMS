@@ -25,8 +25,8 @@ test.describe('Telemetry tests', () => {
     // Assert
     // UI
     await page.reload();
-    await expect(await page.locator('[name="telemetryLevel"] >> input[id=input]')).toHaveValue('1');
+    await expect(page.locator('[name="telemetryLevel"] >> input[id=input]')).toHaveValue('1');
     // API
-    await expect(await umbracoApi.telemetry.checkLevel(expectedLevel)).toBeTruthy();
+    expect(await umbracoApi.telemetry.getLevel() == "Minimal").toBeTruthy();
   });
 });

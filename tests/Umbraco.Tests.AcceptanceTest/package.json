@@ -11,8 +11,6 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.38",
-    "typescript": "^4.8.3",
-    "tslib": "^2.4.0",
     "del": "^6.0.0",
     "ncp": "^2.0.0",
     "prompt": "^1.2.0",
@@ -22,7 +20,7 @@
   },
   "dependencies": {
     "@umbraco/json-models-builders": "^1.0.6",
-    "@umbraco/playwright-testhelpers": "2.0.0-beta.2",
+    "@umbraco/playwright-testhelpers": "2.0.0-beta.4",
     "camelize": "^1.0.0",
     "dotenv": "^16.3.1",
     "faker": "^4.1.0",
