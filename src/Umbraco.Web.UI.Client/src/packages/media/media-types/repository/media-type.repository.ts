@@ -2,7 +2,7 @@ import { UmbMediaTypeTreeStore, UMB_MEDIA_TYPE_TREE_STORE_CONTEXT_TOKEN } from '
 import { UmbMediaTypeDetailServerDataSource } from './sources/media-type.detail.server.data.js';
 import { UmbMediaTypeStore, UMB_MEDIA_TYPE_STORE_CONTEXT_TOKEN } from './media-type.detail.store.js';
 import { UmbMediaTypeTreeServerDataSource } from './sources/media-type.tree.server.data.js';
-import { UmbMediaTypeItemStore } from './media-type-item.store.js';
+import { UMB_MEDIA_TYPE_ITEM_STORE_CONTEXT_TOKEN, UmbMediaTypeItemStore } from './media-type-item.store.js';
 import { UmbMediaTypeItemServerDataSource } from './sources/media-type-item.server.data.js';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
@@ -59,6 +59,10 @@ export class UmbMediaTypeRepository
 
 			new UmbContextConsumerController(this.#host, UMB_MEDIA_TYPE_TREE_STORE_CONTEXT_TOKEN, (instance) => {
 				this.#treeStore = instance;
+			}),
+
+			new UmbContextConsumerController(this.#host, UMB_MEDIA_TYPE_ITEM_STORE_CONTEXT_TOKEN, (instance) => {
+				this.#itemStore = instance;
 			}),
 
 			new UmbContextConsumerController(this.#host, UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
