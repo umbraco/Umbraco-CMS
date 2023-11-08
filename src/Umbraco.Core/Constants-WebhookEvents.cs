@@ -65,7 +65,7 @@ public static partial class Constants
             /// <summary>
             ///     Webhook event type for content.
             /// </summary>
-            public const string Content= "Content";
+            public const string Content = "Content";
 
             /// <summary>
             ///     Webhook event type for content media.
@@ -78,7 +78,7 @@ public static partial class Constants
             public const string Member = "Member";
 
             /// <summary>
-            ///     Webhook event type for others, this is the default catory if you have not chosen one.
+            ///     Webhook event type for others, this is the default category if you have not chosen one.
             /// </summary>
             public const string Other = "Other";
         }
