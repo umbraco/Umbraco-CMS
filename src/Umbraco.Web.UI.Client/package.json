@@ -47,6 +47,7 @@
 		"./workspace": "./dist-cms/packages/core/workspace/index.js",
 		"./events": "./dist-cms/packages/core/umb-events/index.js",
 		"./repository": "./dist-cms/packages/core/repository/index.js",
+		"./temporary-file": "./dist-cms/packages/core/temporary-file/index.js",
 		"./dictionary": "./dist-cms/packages/dictionary/dictionary/index.js",
 		"./document": "./dist-cms/packages/documents/documents/index.js",
 		"./document-blueprint": "./dist-cms/packages/documents/document-blueprints/index.js",
