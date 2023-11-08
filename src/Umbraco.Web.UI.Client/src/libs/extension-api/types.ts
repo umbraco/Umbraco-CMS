@@ -97,6 +97,7 @@ export interface ManifestWithLoader<LoaderReturnType> extends ManifestBase {
 	loader?(): Promise<LoaderReturnType>;
 }
 
+// TODO: Rename this to something more descriptive:
 export interface ExtensionApi {
 	destroy?(): void;
 }

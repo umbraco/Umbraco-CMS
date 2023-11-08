@@ -1,22 +1,21 @@
 import { UmbMemberTreeStore, UMB_MEMBER_TREE_STORE_CONTEXT_TOKEN } from './member.tree.store.js';
 import { UmbMemberTreeServerDataSource } from './sources/member.tree.server.data.js';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
+import { UmbBaseController, type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
+import { ExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 
-export class UmbMemberRepository implements UmbTreeRepository<any> {
-	#host: UmbControllerHostElement;
+export class UmbMemberRepository extends UmbBaseController implements UmbTreeRepository<any>, ExtensionApi {
 	#dataSource: UmbMemberTreeServerDataSource;
 	#treeStore?: UmbMemberTreeStore;
 	#init;
 
 	constructor(host: UmbControllerHostElement) {
-		this.#host = host;
+		super(host);
 		// TODO: figure out how spin up get the correct data source
-		this.#dataSource = new UmbMemberTreeServerDataSource(this.#host);
+		this.#dataSource = new UmbMemberTreeServerDataSource(this);
 
 		this.#init = Promise.all([
-			new UmbContextConsumerController(this.#host, UMB_MEMBER_TREE_STORE_CONTEXT_TOKEN, (instance) => {
+			this.consumeContext(UMB_MEMBER_TREE_STORE_CONTEXT_TOKEN, (instance) => {
 				this.#treeStore = instance;
 			}).asPromise(),
 		]);

@@ -6,7 +6,7 @@ import {
 	CreateFolderRequestModel,
 	FolderModelBaseModel,
 } from '@umbraco-cms/backoffice/backend-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
@@ -16,14 +16,14 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
  * @implements {RepositoryDetailDataSource}
  */
 export class UmbDataTypeFolderServerDataSource implements UmbFolderDataSource {
-	#host: UmbControllerHostElement;
+	#host: UmbControllerHost;
 
 	/**
 	 * Creates an instance of UmbDataTypeFolderServerDataSource.
-	 * @param {UmbControllerHostElement} host
+	 * @param {UmbControllerHost} host
 	 * @memberof UmbDataTypeFolderServerDataSource
 	 */
-	constructor(host: UmbControllerHostElement) {
+	constructor(host: UmbControllerHost) {
 		this.#host = host;
 	}
 

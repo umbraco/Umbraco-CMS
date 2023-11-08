@@ -7,7 +7,7 @@ import {
 	CreateDataTypeRequestModel,
 	UpdateDataTypeRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
@@ -19,14 +19,14 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 export class UmbDataTypeServerDataSource
 	implements UmbDataSource<CreateDataTypeRequestModel, any, UpdateDataTypeRequestModel, DataTypeResponseModel>
 {
-	#host: UmbControllerHostElement;
+	#host: UmbControllerHost;
 
 	/**
 	 * Creates an instance of UmbDataTypeServerDataSource.
-	 * @param {UmbControllerHostElement} host
+	 * @param {UmbControllerHost} host
 	 * @memberof UmbDataTypeServerDataSource
 	 */
-	constructor(host: UmbControllerHostElement) {
+	constructor(host: UmbControllerHost) {
 		this.#host = host;
 	}
 

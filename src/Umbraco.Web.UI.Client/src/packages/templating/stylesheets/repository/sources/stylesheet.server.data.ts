@@ -1,6 +1,6 @@
 import type { StylesheetDetails } from '../../index.js';
 import { DataSourceResponse, UmbDataSource } from '@umbraco-cms/backoffice/repository';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import {
 	CreateStylesheetRequestModel,
 	ExtractRichTextStylesheetRulesRequestModel,
@@ -22,14 +22,14 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 export class UmbStylesheetServerDataSource
 	implements UmbDataSource<CreateStylesheetRequestModel, string, UpdateStylesheetRequestModel, StylesheetDetails>
 {
-	#host: UmbControllerHostElement;
+	#host: UmbControllerHost;
 
 	/**
 	 * Creates an instance of UmbStylesheetServerDataSource.
-	 * @param {UmbControllerHostElement} host
+	 * @param {UmbControllerHost} host
 	 * @memberof UmbStylesheetServerDataSource
 	 */
-	constructor(host: UmbControllerHostElement) {
+	constructor(host: UmbControllerHost) {
 		this.#host = host;
 	}
 	createScaffold(parentId: string | null): Promise<DataSourceResponse<StylesheetDetails>> {

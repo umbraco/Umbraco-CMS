@@ -13,9 +13,8 @@ import type {
 	UmbTreeDataSource,
 	UmbTreeRepository,
 } from '@umbraco-cms/backoffice/repository';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbBaseController, type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
-import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import type {
 	CreateTemplateRequestModel,
 	EntityTreeItemResponseModel,
@@ -25,15 +24,16 @@ import type {
 	TemplateResponseModel,
 	UpdateTemplateRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
+import { ExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 
-export class UmbTemplateRepository
+export class UmbTemplateRepository extends UmbBaseController
 	implements
 		UmbTreeRepository<EntityTreeItemResponseModel>,
 		UmbDetailRepository<CreateTemplateRequestModel, string, UpdateTemplateRequestModel, TemplateResponseModel>,
-		UmbItemRepository<TemplateItemResponseModel>
+		UmbItemRepository<TemplateItemResponseModel>,
+		ExtensionApi
 {
 	#init;
-	#host: UmbControllerHostElement;
 
 	#treeDataSource: UmbTreeDataSource<EntityTreeItemResponseModel>;
 	#detailDataSource: UmbTemplateDetailServerDataSource;
@@ -46,28 +46,28 @@ export class UmbTemplateRepository
 	#notificationContext?: UmbNotificationContext;
 	#queryBuilderSource: UmbTemplateQueryBuilderServerDataSource;
 
-	constructor(host: UmbControllerHostElement) {
-		this.#host = host;
+	constructor(host: UmbControllerHost) {
+		super(host);
 
-		this.#treeDataSource = new UmbTemplateTreeServerDataSource(this.#host);
-		this.#detailDataSource = new UmbTemplateDetailServerDataSource(this.#host);
-		this.#itemSource = new UmbTemplateItemServerDataSource(this.#host);
-		this.#queryBuilderSource = new UmbTemplateQueryBuilderServerDataSource(this.#host);
+		this.#treeDataSource = new UmbTemplateTreeServerDataSource(this);
+		this.#detailDataSource = new UmbTemplateDetailServerDataSource(this);
+		this.#itemSource = new UmbTemplateItemServerDataSource(this);
+		this.#queryBuilderSource = new UmbTemplateQueryBuilderServerDataSource(this);
 
 		this.#init = Promise.all([
-			new UmbContextConsumerController(this.#host, UMB_TEMPLATE_ITEM_STORE_CONTEXT_TOKEN, (instance) => {
+			this.consumeContext(UMB_TEMPLATE_ITEM_STORE_CONTEXT_TOKEN, (instance) => {
 				this.#itemStore = instance;
 			}),
 
-			new UmbContextConsumerController(this.#host, UMB_TEMPLATE_TREE_STORE_CONTEXT_TOKEN, (instance) => {
+			this.consumeContext(UMB_TEMPLATE_TREE_STORE_CONTEXT_TOKEN, (instance) => {
 				this.#treeStore = instance;
 			}),
 
-			new UmbContextConsumerController(this.#host, UMB_TEMPLATE_STORE_CONTEXT_TOKEN, (instance) => {
+			this.consumeContext(UMB_TEMPLATE_STORE_CONTEXT_TOKEN, (instance) => {
 				this.#store = instance;
 			}),
 
-			new UmbContextConsumerController(this.#host, UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
+			this.consumeContext(UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
 				this.#notificationContext = instance;
 			}),
 		]);

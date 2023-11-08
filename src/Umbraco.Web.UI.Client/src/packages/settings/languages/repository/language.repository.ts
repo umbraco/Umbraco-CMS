@@ -2,16 +2,13 @@ import { UmbLanguageServerDataSource } from './sources/language.server.data.js';
 import { UmbLanguageStore, UMB_LANGUAGE_STORE_CONTEXT_TOKEN } from './language.store.js';
 import { UmbLanguageItemServerDataSource } from './sources/language-item.server.data.js';
 import { UMB_LANGUAGE_ITEM_STORE_CONTEXT_TOKEN, UmbLanguageItemStore } from './language-item.store.js';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
+import { UmbBaseController, type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 import { LanguageItemResponseModel, LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 
-export class UmbLanguageRepository implements UmbItemRepository<LanguageItemResponseModel> {
+export class UmbLanguageRepository extends UmbBaseController implements UmbItemRepository<LanguageItemResponseModel> {
 	#init: Promise<unknown>;
-
-	#host: UmbControllerHostElement;
 
 	#dataSource: UmbLanguageServerDataSource;
 	#itemDataSource: UmbLanguageItemServerDataSource;
@@ -21,21 +18,21 @@ export class UmbLanguageRepository implements UmbItemRepository<LanguageItemResp
 	#notificationContext?: UmbNotificationContext;
 
 	constructor(host: UmbControllerHostElement) {
-		this.#host = host;
+		super(host);
 
-		this.#dataSource = new UmbLanguageServerDataSource(this.#host);
-		this.#itemDataSource = new UmbLanguageItemServerDataSource(this.#host);
+		this.#dataSource = new UmbLanguageServerDataSource(this);
+		this.#itemDataSource = new UmbLanguageItemServerDataSource(this);
 
 		this.#init = Promise.all([
-			new UmbContextConsumerController(this.#host, UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
+			this.consumeContext(UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
 				this.#notificationContext = instance;
 			}).asPromise(),
 
-			new UmbContextConsumerController(this.#host, UMB_LANGUAGE_STORE_CONTEXT_TOKEN, (instance) => {
+			this.consumeContext(UMB_LANGUAGE_STORE_CONTEXT_TOKEN, (instance) => {
 				this.#languageStore = instance;
 			}).asPromise(),
 
-			new UmbContextConsumerController(this.#host, UMB_LANGUAGE_ITEM_STORE_CONTEXT_TOKEN, (instance) => {
+			this.consumeContext(UMB_LANGUAGE_ITEM_STORE_CONTEXT_TOKEN, (instance) => {
 				this.#languageItemStore = instance;
 			}).asPromise(),
 		]);

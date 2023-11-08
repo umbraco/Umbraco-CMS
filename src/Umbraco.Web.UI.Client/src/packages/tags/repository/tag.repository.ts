@@ -1,26 +1,22 @@
 import { UmbTagServerDataSource } from './sources/tag.server.data.js';
 import { UmbTagStore, UMB_TAG_STORE_CONTEXT_TOKEN } from './tag.store.js';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
+import { UmbBaseController, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { ExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 
-export class UmbTagRepository {
+export class UmbTagRepository extends UmbBaseController implements ExtensionApi {
 	#init!: Promise<unknown>;
-
-	#host: UmbControllerHostElement;
 
 	#dataSource: UmbTagServerDataSource;
 	#tagStore?: UmbTagStore;
 
-	constructor(host: UmbControllerHostElement) {
-		this.#host = host;
+	constructor(host: UmbControllerHost) {
+		super(host);
 
-		this.#dataSource = new UmbTagServerDataSource(this.#host);
+		this.#dataSource = new UmbTagServerDataSource(this);
 
-		this.#init = Promise.all([
-			new UmbContextConsumerController(this.#host, UMB_TAG_STORE_CONTEXT_TOKEN, (instance) => {
-				this.#tagStore = instance;
-			}).asPromise(),
-		]);
+		this.#init = this.consumeContext(UMB_TAG_STORE_CONTEXT_TOKEN, (instance) => {
+			this.#tagStore = instance;
+		}).asPromise()
 	}
 
 	async requestTags(

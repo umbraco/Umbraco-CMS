@@ -1,12 +1,12 @@
 import { ScriptsTreeDataSource } from './index.js';
 import { ScriptResource, ProblemDetails } from '@umbraco-cms/backoffice/backend-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 export class UmbScriptsTreeServerDataSource implements ScriptsTreeDataSource {
-	#host: UmbControllerHostElement;
+	#host: UmbControllerHost;
 
-	constructor(host: UmbControllerHostElement) {
+	constructor(host: UmbControllerHost) {
 		this.#host = host;
 	}
 
