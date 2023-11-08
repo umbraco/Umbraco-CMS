@@ -4,7 +4,7 @@ import { UmbUserSetGroupsServerDataSource } from './sources/user-set-group.serve
 
 import { UmbUserRepositoryBase } from './user-repository-base.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
+import { UmbDataSourceErrorResponse, UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
 import {
 	CreateUserRequestModel,
 	CreateUserResponseModel,
@@ -13,12 +13,16 @@ import {
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
 
-export type UmbUserDetailRepository = UmbDetailRepository<
-	CreateUserRequestModel,
-	CreateUserResponseModel,
-	UpdateUserRequestModel,
-	UserResponseModel
->;
+export interface UmbUserDetailRepository
+	extends UmbDetailRepository<
+		CreateUserRequestModel,
+		CreateUserResponseModel,
+		UpdateUserRequestModel,
+		UserResponseModel
+	> {
+	uploadAvatar(id: string, file: File): Promise<UmbDataSourceErrorResponse>;
+	deleteAvatar(id: string): Promise<UmbDataSourceErrorResponse>;
+}
 
 export class UmbUserRepository extends UmbUserRepositoryBase implements UmbUserDetailRepository {
 	#detailSource: UmbUserDetailDataSource;
@@ -100,7 +104,7 @@ export class UmbUserRepository extends UmbUserRepositoryBase implements UmbUserD
 			// The localize method shouldn't be part of the UmbControllerHost interface
 			// this._host.localize?.term('speechBubbles_editUserSaved') ??
 			const notification = {
-				data: { message:  'User saved' },
+				data: { message: 'User saved' },
 			};
 			this.#notificationContext?.peek('positive', notification);
 		}
@@ -117,6 +121,46 @@ export class UmbUserRepository extends UmbUserRepositoryBase implements UmbUserD
 			this.detailStore?.removeItem(id);
 
 			const notification = { data: { message: `User deleted` } };
+			this.#notificationContext?.peek('positive', notification);
+		}
+
+		return { error };
+	}
+
+	/**
+	 * Uploads an avatar for the user with the given id
+	 * @param {string} id
+	 * @param {File} file
+	 * @return {*}
+	 * @memberof UmbUserRepository
+	 */
+	async uploadAvatar(id: string, file: File) {
+		if (!id) throw new Error('Id is missing');
+
+		const { error } = await this.#detailSource.uploadAvatar(id, file);
+
+		if (!error) {
+			// TODO: update store + current user
+			const notification = { data: { message: `Avatar uploaded` } };
+			this.#notificationContext?.peek('positive', notification);
+		}
+
+		return { error };
+	}
+
+	/**
+	 * Removes the avatar for the user with the given id
+	 * @param {string} id
+	 * @memberof UmbUserRepository
+	 */
+	async deleteAvatar(id: string) {
+		if (!id) throw new Error('Id is missing');
+
+		const { error } = await this.#detailSource.deleteAvatar(id);
+
+		if (!error) {
+			// TODO: update store + current user
+			const notification = { data: { message: `Avatar deleted` } };
 			this.#notificationContext?.peek('positive', notification);
 		}
 
