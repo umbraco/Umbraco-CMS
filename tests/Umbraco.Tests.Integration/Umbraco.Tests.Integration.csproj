@@ -6,7 +6,7 @@
     <Description>Contains helper classes for integration tests with Umbraco CMS, including all internal integration tests.</Description>
     <RootNamespace>Umbraco.Cms.Tests.Integration</RootNamespace>
     <IsPackable>true</IsPackable>
-    <EnablePackageValidation>true</EnablePackageValidation>
+    <EnablePackageValidation>$(BaseEnablePackageValidation)</EnablePackageValidation>
   </PropertyGroup>
 
   <ItemGroup>
