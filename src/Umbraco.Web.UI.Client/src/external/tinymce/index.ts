@@ -7,26 +7,27 @@
  *
  * TODO: Load the plugins that we want to use in the editor.
  */
-import * as tiny from 'tinymce';
+import tinymce, { type RawEditorOptions } from 'tinymce';
 
 // Declare a global variable to hold the TinyMCE instance
 declare global {
 	interface Window {
-		tinymce: typeof tiny.default;
+		tinymce: typeof tinymce;
 	}
 }
 
 // Load default icons making them available to everyone
 import 'tinymce/icons/default/icons.js';
 
-const defaultConfig: tiny.RawEditorOptions = {
+const defaultConfig: RawEditorOptions = {
 	base_url: '/umbraco/backoffice/tinymce',
 };
 
 /* Initialize TinyMCE */
-export function renderEditor(userConfig?: tiny.RawEditorOptions) {
+export function renderEditor(userConfig?: RawEditorOptions) {
 	const config = { ...defaultConfig, ...userConfig };
-	return window.tinymce.init(config);
+	return tinymce.init(config);
 }
 
-export { tiny as tinymce };
+export { tinymce };
+export type { RawEditorOptions, AstNode, EditorEvent, Editor } from 'tinymce';

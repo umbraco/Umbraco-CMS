@@ -6,7 +6,7 @@ import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import { tinymce } from '@umbraco-cms/backoffice/external/tinymce';
 
-const tinyIconSet = (tinymce as any).IconManager.get('default');
+const tinyIconSet = tinymce.IconManager.get('default');
 
 type ToolbarConfig = {
 	alias: string;
