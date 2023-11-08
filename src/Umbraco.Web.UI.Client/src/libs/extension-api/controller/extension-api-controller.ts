@@ -5,6 +5,18 @@ import { ExtensionApi, ManifestApi, ManifestCondition, ManifestWithDynamicCondit
 import { UmbBaseExtensionController } from './base-extension-controller.js';
 import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
+
+/**
+ * This Controller manages a single Extension and its API instance.
+ * When the extension is permitted to be used, its API will be instantiated and available for the consumer.
+ *
+ * @example
+* ```ts
+* const controller = new UmbExtensionApiController(host, extensionRegistry, alias, [], (permitted, ctrl) => { ctrl.api.helloWorld() }));
+* ```
+ * @export
+ * @class UmbCodeEditor
+ */
 export class UmbExtensionApiController<
 	ManifestType extends (ManifestWithDynamicConditions & ManifestApi) = (ManifestWithDynamicConditions & ManifestApi),
 	ControllerType extends UmbExtensionApiController<ManifestType, any> = any,
@@ -27,10 +39,10 @@ export class UmbExtensionApiController<
 	/**
 	 * The props that are passed to the class.
 	 * @type {Record<string, any>}
-	 * @memberof UmbElementExtensionController
+	 * @memberof UmbExtensionApiController
 	 * @example
 	 * ```ts
-	 * const controller = new UmbElementExtensionController(host, extensionRegistry, alias, onPermissionChanged);
+	 * const controller = new UmbExtensionApiController(host, extensionRegistry, alias, [], onPermissionChanged);
 	 * controller.props = { foo: 'bar' };
 	 * ```
 	 * Is equivalent to:
@@ -97,7 +109,7 @@ export class UmbExtensionApiController<
 	}
 
 	protected async _conditionsAreBad() {
-		// Destroy the element:
+		// Destroy the api:
 		if (this.#api) {
 			if ('destroy' in this.#api) {
 				(this.#api as unknown as { destroy: () => void }).destroy();
