@@ -24,6 +24,7 @@ import {
 	AuthorizationServiceConfiguration,
 	GRANT_TYPE_AUTHORIZATION_CODE,
 	GRANT_TYPE_REFRESH_TOKEN,
+	RevokeTokenRequest,
 	TokenRequest,
 	TokenResponse,
 	LocationLike,
@@ -218,7 +219,7 @@ export class UmbAuthFlow {
 	 *
 	 * @returns true if the user is logged in, false otherwise.
 	 */
-	loggedIn(): boolean {
+	isAuthorized(): boolean {
 		return !!this.#accessTokenResponse && this.#accessTokenResponse.isValid();
 	}
 
@@ -227,9 +228,33 @@ export class UmbAuthFlow {
 	 */
 	async signOut() {
 		// forget all cached token state
-		this.#accessTokenResponse = undefined;
-		this.#refreshToken = undefined;
 		await this.#storageBackend.removeItem(TOKEN_RESPONSE_NAME);
+
+		if (this.#accessTokenResponse) {
+			// TODO: Enable this when the server supports it
+			// const tokenRevokeRequest = new RevokeTokenRequest({
+			// 	token: this.#accessTokenResponse.accessToken,
+			// 	client_id: this.#clientId,
+			// 	token_type_hint: 'access_token',
+			// });
+
+			// await this.#tokenHandler.performRevokeTokenRequest(this.#configuration, tokenRevokeRequest);
+
+			this.#accessTokenResponse = undefined;
+		}
+
+		if (this.#refreshToken) {
+			// TODO: Enable this when the server supports it
+			// const tokenRevokeRequest = new RevokeTokenRequest({
+			// 	token: this.#refreshToken,
+			// 	client_id: this.#clientId,
+			// 	token_type_hint: 'refresh_token',
+			// });
+
+			// await this.#tokenHandler.performRevokeTokenRequest(this.#configuration, tokenRevokeRequest);
+
+			this.#refreshToken = undefined;
+		}
 	}
 
 	/**

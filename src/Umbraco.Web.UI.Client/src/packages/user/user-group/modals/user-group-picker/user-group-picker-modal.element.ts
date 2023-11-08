@@ -1,7 +1,7 @@
 import { UmbUserGroupCollectionRepository } from '../../collection/repository/index.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import { UmbSelectionManagerBase } from '@umbraco-cms/backoffice/utils';
+import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UUIMenuItemEvent } from '@umbraco-cms/backoffice/external/uui';
@@ -12,7 +12,7 @@ export class UmbUserGroupPickerModalElement extends UmbModalBaseElement<any, any
 	@state()
 	private _userGroups: Array<UserGroupResponseModel> = [];
 
-	#selectionManager = new UmbSelectionManagerBase();
+	#selectionManager = new UmbSelectionManager();
 	#userGroupCollectionRepository = new UmbUserGroupCollectionRepository(this);
 
 	connectedCallback(): void {
@@ -30,7 +30,7 @@ export class UmbUserGroupPickerModalElement extends UmbModalBaseElement<any, any
 	async #observeUserGroups() {
 		const { error, asObservable } = await this.#userGroupCollectionRepository.requestCollection();
 		if (error) return;
-		this.observe(asObservable(), (items) => (this._userGroups = items));
+		this.observe(asObservable(), (items) => (this._userGroups = items), 'umbUserGroupsObserver');
 	}
 
 	#onSelected(event: UUIMenuItemEvent, item: UserGroupResponseModel) {

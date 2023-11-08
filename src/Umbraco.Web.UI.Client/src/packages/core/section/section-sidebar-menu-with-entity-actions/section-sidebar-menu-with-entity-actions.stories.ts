@@ -1,7 +1,7 @@
 import { Meta, Story } from '@storybook/web-components';
-import { html } from 'lit';
-
 import type { UmbSectionSidebarMenuWithEntityActionsElement } from './section-sidebar-menu-with-entity-actions.element.js';
+import { html } from '@umbraco-cms/backoffice/external/lit';
+
 import './section-sidebar-menu-with-entity-actions.element.js';
 
 export default {

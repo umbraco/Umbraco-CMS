@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { isApiError, isCancelError, isCancelablePromise } from './apiTypeValidators.function.js';
 import {
 	UmbNotificationContext,
 	UMB_NOTIFICATION_CONTEXT_TOKEN,
 	UmbNotificationOptions,
 } from '@umbraco-cms/backoffice/notification';
-import { ApiError, CancelError, CancelablePromise } from '@umbraco-cms/backoffice/backend-api';
 import { UmbBaseController, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import type { DataSourceResponse } from '@umbraco-cms/backoffice/repository';
@@ -39,7 +39,7 @@ export class UmbResourceController extends UmbBaseController {
 		try {
 			return { data: await promise };
 		} catch (error) {
-			if (error instanceof ApiError || error instanceof CancelError) {
+			if (isApiError(error) || isCancelError(error)) {
 				return { error };
 			}
 
@@ -61,7 +61,7 @@ export class UmbResourceController extends UmbBaseController {
 			 * If the error is not a recognizable system error (i.e. a HttpError), then we will show a notification
 			 * with the error details using the default notification options.
 			 */
-			if (error instanceof CancelError) {
+			if (isCancelError(error)) {
 				// Cancelled - do nothing
 				return {};
 			} else {
@@ -125,7 +125,7 @@ export class UmbResourceController extends UmbBaseController {
 	 * @see https://developer.mozilla.org/en-US/docs/Web/API/AbortController
 	 */
 	cancel() {
-		if (this.#promise instanceof CancelablePromise) {
+		if (isCancelablePromise(this.#promise)) {
 			this.#promise.cancel();
 		}
 	}

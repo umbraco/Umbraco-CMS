@@ -1,11 +1,11 @@
 import { UmbStylesheetWorkspaceContext } from '../../stylesheet-workspace.context.js';
 import { UMB_MODAL_TEMPLATING_STYLESHEET_RTF_STYLE_SIDEBAR_MODAL } from './stylesheet-workspace-view-rich-text-editor.element.js';
-import { UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { RichTextRuleModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UMB_MODAL_MANAGER_CONTEXT_TOKEN, UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 @customElement('umb-stylesheet-rich-text-editor-rule')
 export default class UmbStylesheetRichTextEditorRuleElement extends UmbLitElement {
@@ -56,7 +56,7 @@ export default class UmbStylesheetRichTextEditorRuleElement extends UmbLitElemen
 	}
 
 	static styles = [
-		UUITextStyles,
+		UmbTextStyles,
 		css`
 			:host {
 				display: flex;

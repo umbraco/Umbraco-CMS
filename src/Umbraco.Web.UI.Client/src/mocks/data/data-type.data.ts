@@ -462,7 +462,28 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 		parentId: null,
 		propertyEditorAlias: 'Umbraco.ImageCropper',
 		propertyEditorUiAlias: 'Umb.PropertyEditorUi.ImageCropper',
-		values: [],
+		values: [
+			{
+				alias: 'crops',
+				value: [
+					{
+						alias: 'Square',
+						height: 1000,
+						width: 1000,
+					},
+					{
+						alias: 'Banner',
+						height: 600,
+						width: 1200,
+					},
+					{
+						alias: 'Mobile',
+						height: 1200,
+						width: 800,
+					},
+				],
+			},
+		],
 	},
 	{
 		type: 'data-type',
@@ -514,7 +535,7 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 		name: 'Rich Text Editor',
 		id: 'dt-richTextEditor',
 		parentId: null,
-		propertyEditorAlias: 'Umbraco.TinyMCE',
+		propertyEditorAlias: 'Umbraco.RichText',
 		propertyEditorUiAlias: 'Umb.PropertyEditorUi.TinyMCE',
 		values: [
 			{

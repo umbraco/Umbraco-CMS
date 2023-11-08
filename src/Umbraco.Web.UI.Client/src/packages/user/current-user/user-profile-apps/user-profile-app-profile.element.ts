@@ -1,12 +1,12 @@
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import {
 	UmbModalManagerContext,
 	UMB_CHANGE_PASSWORD_MODAL,
 	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
 } from '@umbraco-cms/backoffice/modal';
-import { UMB_AUTH, type UmbLoggedInUser } from '@umbraco-cms/backoffice/auth';
+import { UMB_AUTH_CONTEXT, type UmbLoggedInUser } from '@umbraco-cms/backoffice/auth';
 
 @customElement('umb-user-profile-app-profile')
 export class UmbUserProfileAppProfileElement extends UmbLitElement {
@@ -14,7 +14,7 @@ export class UmbUserProfileAppProfileElement extends UmbLitElement {
 	private _currentUser?: UmbLoggedInUser;
 
 	private _modalContext?: UmbModalManagerContext;
-	private _auth?: typeof UMB_AUTH.TYPE;
+	private _auth?: typeof UMB_AUTH_CONTEXT.TYPE;
 
 	constructor() {
 		super();
@@ -23,7 +23,7 @@ export class UmbUserProfileAppProfileElement extends UmbLitElement {
 			this._modalContext = instance;
 		});
 
-		this.consumeContext(UMB_AUTH, (instance) => {
+		this.consumeContext(UMB_AUTH_CONTEXT, (instance) => {
 			this._auth = instance;
 			this._observeCurrentUser();
 		});
@@ -34,21 +34,20 @@ export class UmbUserProfileAppProfileElement extends UmbLitElement {
 
 		this.observe(this._auth.currentUser, (currentUser) => {
 			this._currentUser = currentUser;
-		});
+		}, 'umbCurrentUserObserver');
 	}
 
 	private _edit() {
 		if (!this._currentUser) return;
 
-		history.pushState(null, '', 'section/users/view/users/user/' + this._currentUser.id); //TODO Change to a tag with href and make dynamic
+		history.pushState(null, '', 'section/user-management/view/users/user/' + this._currentUser.id); //TODO Change to a tag with href and make dynamic
 		//TODO Implement modal routing for the current-user-modal, so that the modal closes when navigating to the edit profile page
 	}
 	private _changePassword() {
 		if (!this._modalContext) return;
-
-		// TODO: check if current user is admin
+		
 		this._modalContext.open(UMB_CHANGE_PASSWORD_MODAL, {
-			requireOldPassword: false,
+			userId: this._currentUser?.id ?? '',
 		});
 	}
 

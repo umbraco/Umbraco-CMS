@@ -1,7 +1,6 @@
 import { UmbDataTypeRepository } from '../../repository/data-type.repository.js';
 import { css, html, repeat, customElement, property, state, when, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { groupBy } from '@umbraco-cms/backoffice/external/lodash';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import {
 	UMB_DATA_TYPE_PICKER_FLOW_DATA_TYPE_PICKER_MODAL,
@@ -139,12 +138,16 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 	}
 	private _performFiltering() {
 		if (this.#currentFilterQuery) {
-			this._groupedDataTypes = groupBy(
-				this.#dataTypes.filter((dataType) => {
-					return dataType.name?.toLowerCase().includes(this.#currentFilterQuery);
-				}),
-				'meta.group',
+			const filteredDataTypes = this.#dataTypes.filter(
+				(dataType) => dataType.name?.toLowerCase().includes(this.#currentFilterQuery),
 			);
+
+			/* TODO: data type items doesn't have a group property. We will need a reference to the property editor UI to get the group.
+				this is a temp solution to group them as uncategorized. The same result as with the lodash groupBy.
+			*/
+			this._groupedDataTypes = {
+				undefined: filteredDataTypes,
+			};
 		} else {
 			this._groupedDataTypes = undefined;
 		}
@@ -158,7 +161,13 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 					);
 			  });
 
-		this._groupedPropertyEditorUIs = groupBy(filteredUIs, 'meta.group');
+		// TODO: groupBy is not known by TS yet
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-expect-error
+		this._groupedPropertyEditorUIs = Object.groupBy(
+			filteredUIs,
+			(propertyEditorUI: ManifestPropertyEditorUi) => propertyEditorUI.meta.group,
+		);
 	}
 
 	private _close() {

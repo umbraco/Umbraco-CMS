@@ -3188,20 +3188,19 @@ export default {
 		getStarted: 'To get you started',
 	},
 	settingsDashboard: {
-		start: 'Start here',
-		startDescription:
-			'This section contains the building blocks for your Umbraco site. Follow the below\n      links to find out more about working with the items in the Settings section\n    ',
-		more: 'Find out more',
-		bulletPointOne:
-			'\n            Read more about working with the items in Settings <a class="btn-link -underline" href="https://docs.umbraco.com/umbraco-cms/fundamentals/backoffice/sections/" target="_blank" rel="noopener">in the Documentation section</a> of Our Umbraco\n        ',
-		bulletPointTwo:
-			'\n            Ask a question in the <a class="btn-link -underline" href="https://our.umbraco.com/forum" target="_blank" rel="noopener">Community Forum</a>\n        ',
-		bulletPointTutorials:
-			'\n            Watch our free <a class="btn-link -underline" href="https://umbra.co/ulb" target="_blank" rel="noopener">tutorial videos on the Umbraco Learning Base</a>\n        ',
-		bulletPointFour:
-			'\n            Find out about our <a class="btn-link -underline" href="https://umbraco.com/products/" target="_blank" rel="noopener">productivity boosting tools and commercial support</a>\n        ',
-		bulletPointFive:
-			'\n            Find out about real-life <a class="btn-link -underline" href="https://umbraco.com/training/" target="_blank" rel="noopener">training and certification</a> opportunities\n        ',
+		communityHeader: 'Community',
+		trainingHeader: 'Træning',
+		trainingDescription: 'Se mulighederne for real-life træning og certificering',
+		supportHeader: 'Support',
+		supportDescription: 'Stil et spørgsmål i community forummet eller i vores Discord community',
+		videosHeader: 'Videoer',
+		videosDescription:
+			'Se vores gratis tutortial videoer på Umbraco Learning Base YouTube-kanel, for hurtigt at komme i gang med Umbraco.',
+		getHelp: 'Få den hjælp du har brug for',
+		getCertified: 'Bliv certificeret',
+		goForum: 'Gå til forummet',
+		chatWithCommunity: 'Chat med communitiet',
+		watchVideos: 'Se videoerne',
 	},
 	startupDashboard: {
 		fallbackHeadline: 'Welcome to The Friendly CMS',

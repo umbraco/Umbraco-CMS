@@ -1,7 +1,7 @@
 import type { UmbAppErrorElement } from './app-error.element.js';
 import { UMB_APP, UmbAppContext } from './app.context.js';
 import { umbLocalizationRegistry } from '@umbraco-cms/backoffice/localization';
-import { UMB_AUTH, UmbAuthFlow, UmbAuthContext } from '@umbraco-cms/backoffice/auth';
+import { UMB_AUTH_CONTEXT, UmbAuthContext } from '@umbraco-cms/backoffice/auth';
 import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UUIIconRegistryEssential } from '@umbraco-cms/backoffice/external/uui';
 import { UmbIconRegistry } from '@umbraco-cms/backoffice/icon';
@@ -56,7 +56,7 @@ export class UmbAppElement extends UmbLitElement {
 		},
 	];
 
-	#authFlow?: UmbAuthFlow;
+	#authContext?: UmbAuthContext;
 	#umbIconRegistry = new UmbIconRegistry();
 	#uuiIconRegistry = new UUIIconRegistryEssential();
 	#runtimeLevel = RuntimeLevelModel.UNKNOWN;
@@ -81,15 +81,20 @@ export class UmbAppElement extends UmbLitElement {
 		}
 	}
 
-	#listenForLanguageChange(authContext: UmbAuthContext) {
+	#listenForLanguageChange() {
 		// This will wait for the default language to be loaded before attempting to load the current user language
 		// just in case the user language is not the default language.
 		// We **need** to do this because the default language (typically en-us) holds all the fallback keys for all the other languages.
 		// This way we can ensure that the document language is always loaded first and subsequently registered as the fallback language.
 		umbLocalizationRegistry.isDefaultLoaded.subscribe((isDefaultLoaded) => {
+			if (!this.#authContext) {
+				throw new Error('[Fatal] AuthContext requested before it was initialised');
+			}
+
 			if (!isDefaultLoaded) return;
+
 			this.observe(
-				authContext.languageIsoCode,
+				this.#authContext.languageIsoCode,
 				(currentLanguageIsoCode) => {
 					umbLocalizationRegistry.loadLanguage(currentLanguageIsoCode);
 				},
@@ -104,11 +109,9 @@ export class UmbAppElement extends UmbLitElement {
 		OpenAPI.BASE = this.serverUrl;
 		const redirectUrl = `${window.location.origin}${this.backofficePath}`;
 
-		this.#authFlow = new UmbAuthFlow(this.serverUrl, redirectUrl);
+		this.#authContext = new UmbAuthContext(this, this.serverUrl, redirectUrl);
 
-		const authContext = new UmbAuthContext(this, this.#authFlow);
-
-		this.provideContext(UMB_AUTH, authContext);
+		this.provideContext(UMB_AUTH_CONTEXT, this.#authContext);
 
 		this.provideContext(UMB_APP, new UmbAppContext({ backofficePath: this.backofficePath, serverUrl: this.serverUrl }));
 
@@ -120,9 +123,9 @@ export class UmbAppElement extends UmbLitElement {
 			// If the runtime level is "install" we should clear any cached tokens
 			// else we should try and set the auth status
 			if (this.#runtimeLevel === RuntimeLevelModel.INSTALL) {
-				await authContext.signOut();
+				await this.#authContext.signOut();
 			} else {
-				await this.#setAuthStatus(authContext);
+				await this.#setAuthStatus();
 			}
 
 			// Initialise the router
@@ -180,19 +183,27 @@ export class UmbAppElement extends UmbLitElement {
 		this.#runtimeLevel = data?.serverStatus ?? RuntimeLevelModel.UNKNOWN;
 	}
 
-	async #setAuthStatus(authContext: UmbAuthContext) {
+	async #setAuthStatus() {
 		if (this.bypassAuth === false) {
+			if (!this.#authContext) {
+				throw new Error('[Fatal] AuthContext requested before it was initialised');
+			}
+
 			// Get service configuration from authentication server
-			await authContext.setInitialState();
+			await this.#authContext.setInitialState();
 
 			// Instruct all requests to use the auth flow to get and use the access_token for all subsequent requests
-			OpenAPI.TOKEN = () => this.#authFlow!.performWithFreshTokens();
+			OpenAPI.TOKEN = () => this.#authContext!.getLatestToken();
 			OpenAPI.WITH_CREDENTIALS = true;
 		}
 
-		this.#listenForLanguageChange(authContext);
+		this.#listenForLanguageChange();
 
-		authContext.isLoggedIn.next(true);
+		if (this.#authContext?.isAuthorized()) {
+			this.#authContext.isLoggedIn.next(true);
+		} else {
+			this.#authContext?.isLoggedIn.next(false);
+		}
 	}
 
 	#redirect() {
@@ -233,8 +244,8 @@ export class UmbAppElement extends UmbLitElement {
 	}
 
 	#isAuthorized(): boolean {
-		if (!this.#authFlow) return false;
-		return this.bypassAuth ? true : this.#authFlow.loggedIn();
+		if (!this.#authContext) return false;
+		return this.bypassAuth ? true : this.#authContext.isAuthorized();
 	}
 
 	#isAuthorizedGuard(): Guard {
@@ -247,7 +258,7 @@ export class UmbAppElement extends UmbLitElement {
 			window.sessionStorage.setItem('umb:auth:redirect', location.href);
 
 			// Make a request to the auth server to start the auth flow
-			this.#authFlow!.makeAuthorizationRequest();
+			this.#authContext!.login();
 
 			// Return false to prevent the route from being rendered
 			return false;

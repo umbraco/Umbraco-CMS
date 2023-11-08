@@ -5,7 +5,7 @@ import {
 	UmbModalManagerContext,
 	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
 } from '@umbraco-cms/backoffice/modal';
-import { UMB_AUTH, UmbLoggedInUser } from '@umbraco-cms/backoffice/auth';
+import { UMB_AUTH_CONTEXT, UmbLoggedInUser } from '@umbraco-cms/backoffice/auth';
 
 interface MediaPickerTargetData {
 	altText?: string;
@@ -28,7 +28,7 @@ export default class UmbTinyMceMediaPickerPlugin extends UmbTinyMcePluginBase {
 	#mediaHelper: UmbMediaHelper;
 	#currentUser?: UmbLoggedInUser;
 	#modalContext?: UmbModalManagerContext;
-	#auth?: typeof UMB_AUTH.TYPE;
+	#auth?: typeof UMB_AUTH_CONTEXT.TYPE;
 
 	constructor(args: TinyMcePluginArguments) {
 		super(args);
