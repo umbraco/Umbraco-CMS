@@ -1,16 +1,16 @@
 import { getDisplayStateFromUserStatus } from '../../../../utils.js';
 import { UMB_USER_WORKSPACE_CONTEXT } from '../../user-workspace.context.js';
+import { UmbUserDetail } from '../../../types.js';
 import { html, customElement, state, css, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UserResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 type UmbUserWorkspaceInfoItem = { labelKey: string; value: string | number | undefined };
 
 @customElement('umb-user-workspace-info')
 export class UmbUserWorkspaceInfoElement extends UmbLitElement {
 	@state()
-	private _user?: UserResponseModel;
+	private _user?: UmbUserDetail;
 
 	@state()
 	private _userInfo: Array<UmbUserWorkspaceInfoItem> = [];
@@ -22,14 +22,33 @@ export class UmbUserWorkspaceInfoElement extends UmbLitElement {
 
 		this.consumeContext(UMB_USER_WORKSPACE_CONTEXT, (instance) => {
 			this.#userWorkspaceContext = instance;
-			this.observe(this.#userWorkspaceContext.data, (user) => {
-				this._user = user;
-				this.#setUserInfoItems(user);
-			}, 'umbUserObserver');
+			this.observe(
+				this.#userWorkspaceContext.data,
+				(user) => {
+					this._user = user;
+					this.#setUserInfoItems(user);
+				},
+				'umbUserObserver',
+			);
 		});
 	}
 
-	#setUserInfoItems = (user: UserResponseModel | undefined) => {
+	#onAvatarUploadSubmit = (event: SubmitEvent) => {
+		event.preventDefault();
+
+		const form = event.target as HTMLFormElement;
+		if (!form) return;
+
+		if (!form.checkValidity()) return;
+
+		const formData = new FormData(form);
+
+		const avatarFile = formData.get('avatarFile');
+
+		this.#userWorkspaceContext?.uploadAvatar(avatarFile as File);
+	};
+
+	#setUserInfoItems = (user: UmbUserDetail | undefined) => {
 		if (!user) {
 			this._userInfo = [];
 			return;
@@ -69,8 +88,11 @@ export class UmbUserWorkspaceInfoElement extends UmbLitElement {
 		return html`
 			<uui-box id="user-info">
 				<div id="user-avatar-settings" class="user-info-item">
-					<uui-avatar .name=${this._user?.name || ''}></uui-avatar>
-					<uui-button label=${this.localize.term('user_changePhoto')}></uui-button>
+					<form id="AvatarUploadForm" @submit=${this.#onAvatarUploadSubmit}>
+						<uui-avatar .name=${this._user?.name || ''}></uui-avatar>
+						<input id="AvatarFileField" type="file" name="avatarFile" required />
+						<uui-button type="submit" label="${this.localize.term('user_changePhoto')}"></uui-button>
+					</form>
 				</div>
 
 				<div id="user-status-info" class="user-info-item">
