@@ -117,7 +117,6 @@ export class UmbUserInviteModalElement extends UmbModalBaseElement {
 				? html`
 						<uui-button
 							@click=${this._closeModal}
-							style="margin-right: auto"
 							slot="actions"
 							label="Close"
 							look="secondary"></uui-button>
@@ -131,16 +130,17 @@ export class UmbUserInviteModalElement extends UmbModalBaseElement {
 				: html`
 						<uui-button
 							@click=${this._closeModal}
-							style="margin-right: auto"
 							slot="actions"
 							label="Cancel"
-							look="secondary"></uui-button>
+							look="secondary">
+						</uui-button>
 						<uui-button
 							@click="${this._submitForm}"
 							slot="actions"
 							type="submit"
 							label="Send invite"
-							look="primary"></uui-button>
+							look="primary">
+						</uui-button>
 				  `}
 		</uui-dialog-layout>`;
 	}
