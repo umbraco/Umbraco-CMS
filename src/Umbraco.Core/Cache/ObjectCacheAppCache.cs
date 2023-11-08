@@ -1,31 +1,53 @@
-using System.Runtime.Caching;
 using System.Text.RegularExpressions;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Cache;
 
 /// <summary>
-///     Implements <see cref="IAppPolicyCache" /> on top of a <see cref="ObjectCache" />.
+///     Implements <see cref="IAppPolicyCache" /> on top of a <see cref="MemoryCache" />.
 /// </summary>
 public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
 {
+    private readonly IOptions<MemoryCacheOptions> _options;
+    private readonly IHostEnvironment? _hostEnvironment;
+    private readonly ISet<string> _keys = new HashSet<string>();
     private readonly ReaderWriterLockSlim _locker = new(LockRecursionPolicy.SupportsRecursion);
     private bool _disposedValue;
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="ObjectCacheAppCache" />.
+    /// Gets the internal memory cache, for tests only!
     /// </summary>
-    public ObjectCacheAppCache() =>
-
-        // the MemoryCache is created with name "in-memory". That name is
-        // used to retrieve configuration options. It does not identify the memory cache, i.e.
-        // each instance of this class has its own, independent, memory cache.
-        MemoryCache = new MemoryCache("in-memory");
+    /// <value>
+    /// The memory cache.
+    /// </value>
+    internal MemoryCache MemoryCache { get; private set; }
 
     /// <summary>
-    ///     Gets the internal memory cache, for tests only!
+    /// Initializes a new instance of the <see cref="ObjectCacheAppCache" />.
     /// </summary>
-    public ObjectCache MemoryCache { get; private set; }
+    public ObjectCacheAppCache()
+        : this(Options.Create(new MemoryCacheOptions()), NullLoggerFactory.Instance, null)
+    { }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ObjectCacheAppCache" /> class.
+    /// </summary>
+    /// <param name="options">The options.</param>
+    /// <param name="loggerFactory">The logger factory.</param>
+    /// <param name="hostEnvironment">The host environment.</param>
+    public ObjectCacheAppCache(IOptions<MemoryCacheOptions> options, ILoggerFactory loggerFactory, IHostEnvironment? hostEnvironment)
+    {
+        _options = options;
+        _hostEnvironment = hostEnvironment;
+
+        MemoryCache = new MemoryCache(_options, loggerFactory);
+    }
 
     /// <inheritdoc />
     public object? Get(string key)
@@ -34,6 +56,7 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
         try
         {
             _locker.EnterReadLock();
+
             result = MemoryCache.Get(key) as Lazy<object?>; // null if key not found
         }
         finally
@@ -51,41 +74,21 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
     public object? Get(string key, Func<object?> factory) => Get(key, factory, null);
 
     /// <inheritdoc />
-    public IEnumerable<object> SearchByKey(string keyStartsWith)
-    {
-        KeyValuePair<string, object>[] entries;
-        try
-        {
-            _locker.EnterReadLock();
-            entries = MemoryCache
-                .Where(x => x.Key.InvariantStartsWith(keyStartsWith))
-                .ToArray(); // evaluate while locked
-        }
-        finally
-        {
-            if (_locker.IsReadLockHeld)
-            {
-                _locker.ExitReadLock();
-            }
-        }
-
-        return entries
-            .Select(x => SafeLazy.GetSafeLazyValue((Lazy<object?>)x.Value)) // return exceptions as null
-            .Where(x => x != null) // backward compat, don't store null values in the cache
-            .ToList()!;
-    }
+    public IEnumerable<object> SearchByKey(string keyStartsWith) => SearchByPredicate(key => key.InvariantStartsWith(keyStartsWith));
 
     /// <inheritdoc />
-    public IEnumerable<object> SearchByRegex(string regex)
-    {
-        var compiled = new Regex(regex, RegexOptions.Compiled);
+    public IEnumerable<object> SearchByRegex(string regex) => SearchByPredicate(new Regex(regex, RegexOptions.Compiled).IsMatch);
 
-        KeyValuePair<string, object>[] entries;
+    private IEnumerable<object> SearchByPredicate(Func<string, bool> predicate)
+    {
+        object[] entries;
         try
         {
             _locker.EnterReadLock();
-            entries = MemoryCache
-                .Where(x => compiled.IsMatch(x.Key))
+
+            entries = _keys.Where(predicate)
+                .Select(key => MemoryCache.Get(key))
+                .WhereNotNull()
                 .ToArray(); // evaluate while locked
         }
         finally
@@ -97,9 +100,9 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
         }
 
         return entries
-            .Select(x => SafeLazy.GetSafeLazyValue((Lazy<object?>)x.Value)) // return exceptions as null
-            .Where(x => x != null) // backward compat, don't store null values in the cache
-            .ToList()!;
+            .Select(x => SafeLazy.GetSafeLazyValue((Lazy<object?>)x)) // return exceptions as null
+            .WhereNotNull() // backward compat, don't store null values in the cache
+            .ToList();
     }
 
     /// <inheritdoc />
@@ -118,14 +121,15 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
             if (result == null || SafeLazy.GetSafeLazyValue(result, true) == null)
             {
                 result = SafeLazy.GetSafeLazy(factory);
-                CacheItemPolicy policy = GetPolicy(timeout, isSliding, dependentFiles);
+                MemoryCacheEntryOptions options = GetOptions(timeout, isSliding, dependentFiles);
 
                 try
                 {
                     _locker.EnterWriteLock();
 
                     // NOTE: This does an add or update
-                    MemoryCache.Set(key, result, policy);
+                    MemoryCache.Set(key, result, options);
+                    _keys.Add(key);
                 }
                 finally
                 {
@@ -166,10 +170,11 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
             return; // do not store null values (backward compat)
         }
 
-        CacheItemPolicy policy = GetPolicy(timeout, isSliding, dependentFiles);
+        MemoryCacheEntryOptions options = GetOptions(timeout, isSliding, dependentFiles);
 
         // NOTE: This does an add or update
-        MemoryCache.Set(key, result, policy);
+        MemoryCache.Set(key, result, options);
+        _keys.Add(key);
     }
 
     /// <inheritdoc />
@@ -178,8 +183,10 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
         try
         {
             _locker.EnterWriteLock();
-            MemoryCache.DisposeIfDisposable();
-            MemoryCache = new MemoryCache("in-memory");
+
+            MemoryCache.Dispose();
+            MemoryCache = new MemoryCache(_options);
+            _keys.Clear();
         }
         finally
         {
@@ -196,12 +203,9 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
         try
         {
             _locker.EnterWriteLock();
-            if (MemoryCache[key] == null)
-            {
-                return;
-            }
 
             MemoryCache.Remove(key);
+            _keys.Remove(key);
         }
         finally
         {
@@ -221,159 +225,75 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
         }
 
         var isInterface = type.IsInterface;
-        try
-        {
-            _locker.EnterWriteLock();
 
-            // ToArray required to remove
-            foreach (var key in MemoryCache
-                         .Where(x =>
-                         {
-                             // x.Value is Lazy<object> and not null, its value may be null
-                             // remove null values as well, does not hurt
-                             // get non-created as NonCreatedValue & exceptions as null
-                             var value = SafeLazy.GetSafeLazyValue((Lazy<object?>)x.Value, true);
-
-                             // if T is an interface remove anything that implements that interface
-                             // otherwise remove exact types (not inherited types)
-                             return value == null ||
-                                    (isInterface ? type.IsInstanceOfType(value) : value.GetType() == type);
-                         })
-                         .Select(x => x.Key)
-                         .ToArray())
-            {
-                MemoryCache.Remove(key);
-            }
-        }
-        finally
+        ClearByPredicate(key =>
         {
-            if (_locker.IsWriteLockHeld)
+            var entry = MemoryCache.Get(key);
+            if (entry is null)
             {
-                _locker.ExitWriteLock();
+                return false;
             }
-        }
+
+            // x.Value is Lazy<object> and not null, its value may be null
+            // remove null values as well, does not hurt
+            // get non-created as NonCreatedValue & exceptions as null
+            var value = SafeLazy.GetSafeLazyValue((Lazy<object?>)entry, true);
+
+            // if T is an interface remove anything that implements that interface
+            // otherwise remove exact types (not inherited types)
+            return value == null || (isInterface ? type.IsInstanceOfType(value) : value.GetType() == type);
+        });
     }
 
     /// <inheritdoc />
-    public virtual void ClearOfType<T>()
-    {
-        try
-        {
-            _locker.EnterWriteLock();
-            Type typeOfT = typeof(T);
-            var isInterface = typeOfT.IsInterface;
-
-            // ToArray required to remove
-            foreach (var key in MemoryCache
-                         .Where(x =>
-                         {
-                             // x.Value is Lazy<object> and not null, its value may be null
-                             // remove null values as well, does not hurt
-                             // get non-created as NonCreatedValue & exceptions as null
-                             var value = SafeLazy.GetSafeLazyValue((Lazy<object?>)x.Value, true);
-
-                             // if T is an interface remove anything that implements that interface
-                             // otherwise remove exact types (not inherited types)
-                             return value == null || (isInterface ? value is T : value.GetType() == typeOfT);
-                         })
-                         .Select(x => x.Key)
-                         .ToArray())
-            {
-                MemoryCache.Remove(key);
-            }
-        }
-        finally
-        {
-            if (_locker.IsWriteLockHeld)
-            {
-                _locker.ExitWriteLock();
-            }
-        }
-    }
+    public virtual void ClearOfType<T>() => ClearOfType(typeof(T));
 
     /// <inheritdoc />
     public virtual void ClearOfType<T>(Func<string, T, bool> predicate)
     {
-        try
-        {
-            _locker.EnterWriteLock();
-            Type typeOfT = typeof(T);
-            var isInterface = typeOfT.IsInterface;
+        Type type = typeof(T);
+        var isInterface = type.IsInterface;
 
-            // ToArray required to remove
-            foreach (var key in MemoryCache
-                         .Where(x =>
-                         {
-                             // x.Value is Lazy<object> and not null, its value may be null
-                             // remove null values as well, does not hurt
-                             // get non-created as NonCreatedValue & exceptions as null
-                             var value = SafeLazy.GetSafeLazyValue((Lazy<object?>)x.Value, true);
-                             if (value == null)
-                             {
-                                 return true;
-                             }
-
-                             // if T is an interface remove anything that implements that interface
-                             // otherwise remove exact types (not inherited types)
-                             return (isInterface ? value is T : value.GetType() == typeOfT)
-                                    && predicate(x.Key, (T)value);
-                         })
-                         .Select(x => x.Key)
-                         .ToArray())
-            {
-                MemoryCache.Remove(key);
-            }
-        }
-        finally
+        ClearByPredicate(key =>
         {
-            if (_locker.IsWriteLockHeld)
+            var entry = MemoryCache.Get(key);
+            if (entry is null)
             {
-                _locker.ExitWriteLock();
+                return false;
             }
-        }
+
+            // x.Value is Lazy<object> and not null, its value may be null
+            // remove null values as well, does not hurt
+            // get non-created as NonCreatedValue & exceptions as null
+            var value = SafeLazy.GetSafeLazyValue((Lazy<object?>)entry, true);
+            if (value == null)
+            {
+                return true;
+            }
+
+            // if T is an interface remove anything that implements that interface
+            // otherwise remove exact types (not inherited types)
+            return (isInterface ? value is T : value.GetType() == type) && predicate(key, (T)value);
+        });
     }
 
     /// <inheritdoc />
-    public virtual void ClearByKey(string keyStartsWith)
+    public virtual void ClearByKey(string keyStartsWith) => ClearByPredicate(x => x.InvariantStartsWith(keyStartsWith));
+
+    /// <inheritdoc />
+    public virtual void ClearByRegex(string regex) => ClearByPredicate(new Regex(regex, RegexOptions.Compiled).IsMatch);
+
+    private void ClearByPredicate(Func<string, bool> predicate)
     {
         try
         {
             _locker.EnterWriteLock();
 
             // ToArray required to remove
-            foreach (var key in MemoryCache
-                         .Where(x => x.Key.InvariantStartsWith(keyStartsWith))
-                         .Select(x => x.Key)
-                         .ToArray())
+            foreach (var key in _keys.Where(predicate).ToArray())
             {
                 MemoryCache.Remove(key);
-            }
-        }
-        finally
-        {
-            if (_locker.IsWriteLockHeld)
-            {
-                _locker.ExitWriteLock();
-            }
-        }
-    }
-
-    /// <inheritdoc />
-    public virtual void ClearByRegex(string regex)
-    {
-        var compiled = new Regex(regex, RegexOptions.Compiled);
-
-        try
-        {
-            _locker.EnterWriteLock();
-
-            // ToArray required to remove
-            foreach (var key in MemoryCache
-                         .Where(x => compiled.IsMatch(x.Key))
-                         .Select(x => x.Key)
-                         .ToArray())
-            {
-                MemoryCache.Remove(key);
+                _keys.Remove(key);
             }
         }
         finally
@@ -386,7 +306,6 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
     }
 
     public void Dispose() =>
-
         // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
         Dispose(true);
 
@@ -397,27 +316,41 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
             if (disposing)
             {
                 _locker.Dispose();
+                MemoryCache.Dispose();
             }
 
             _disposedValue = true;
         }
     }
 
-    private static CacheItemPolicy GetPolicy(TimeSpan? timeout = null, bool isSliding = false, string[]? dependentFiles = null)
+    private MemoryCacheEntryOptions GetOptions(TimeSpan? timeout = null, bool isSliding = false, string[]? dependentFiles = null)
     {
-        DateTimeOffset absolute = isSliding ? ObjectCache.InfiniteAbsoluteExpiration :
-            timeout == null ? ObjectCache.InfiniteAbsoluteExpiration : DateTime.Now.Add(timeout.Value);
-        TimeSpan sliding = isSliding == false
-            ? ObjectCache.NoSlidingExpiration
-            : timeout ?? ObjectCache.NoSlidingExpiration;
+        var options = new MemoryCacheEntryOptions();
 
-        var policy = new CacheItemPolicy { AbsoluteExpiration = absolute, SlidingExpiration = sliding };
-
-        if (dependentFiles != null && dependentFiles.Any())
+        // Configure time based expiration
+        if (isSliding)
         {
-            policy.ChangeMonitors.Add(new HostFileChangeMonitor(dependentFiles.ToList()));
+            options.SlidingExpiration = timeout;
+        }
+        else
+        {
+            options.AbsoluteExpirationRelativeToNow = timeout;
         }
 
-        return policy;
+        // Configure file based expiration
+        if (dependentFiles?.Length > 0 && _hostEnvironment?.ContentRootFileProvider is IFileProvider fileProvider)
+        {
+            foreach (var dependentFile in dependentFiles)
+            {
+                var relativePath = Path.IsPathFullyQualified(dependentFile)
+                    ? Path.GetRelativePath(_hostEnvironment.ContentRootPath, dependentFile)
+                    : dependentFile;
+
+                options.ExpirationTokens.Add(fileProvider.Watch(relativePath));
+            }
+        }
+
+        // Ensure key is removed from set when evicted from cache
+        return options.RegisterPostEvictionCallback((key, _, _, _) => _keys.Remove((string)key));
     }
 }

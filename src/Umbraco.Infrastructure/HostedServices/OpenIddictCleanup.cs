@@ -1,4 +1,3 @@
-﻿using System.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using OpenIddict.Abstractions;
@@ -41,8 +40,7 @@ public class OpenIddictCleanup : RecurringHostedServiceBase
 
         try
         {
-            IOpenIddictTokenManager tokenManager = scope.ServiceProvider.GetService<IOpenIddictTokenManager>()
-                    ?? throw new ConfigurationErrorsException($"Could not retrieve an {nameof(IOpenIddictTokenManager)} service from the current scope");
+            IOpenIddictTokenManager tokenManager = scope.ServiceProvider.GetRequiredService<IOpenIddictTokenManager>();
             await tokenManager.PruneAsync(threshold);
         }
         catch (Exception exception)
@@ -52,8 +50,7 @@ public class OpenIddictCleanup : RecurringHostedServiceBase
 
         try
         {
-            IOpenIddictAuthorizationManager authorizationManager = scope.ServiceProvider.GetService<IOpenIddictAuthorizationManager>()
-                    ?? throw new ConfigurationErrorsException($"Could not retrieve an {nameof(IOpenIddictAuthorizationManager)} service from the current scope");
+            IOpenIddictAuthorizationManager authorizationManager = scope.ServiceProvider.GetRequiredService<IOpenIddictAuthorizationManager>();
             await authorizationManager.PruneAsync(threshold);
         }
         catch (Exception exception)
