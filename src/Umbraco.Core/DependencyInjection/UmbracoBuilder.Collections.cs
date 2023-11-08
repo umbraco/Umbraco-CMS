@@ -90,9 +90,9 @@ public static partial class UmbracoBuilderExtensions
 
         builder.DynamicRootSteps()
             .Append<NearestAncestorOrSelfDynamicRootQueryStep>()
-            .Append<FarthestAncestorOrSelfDynamicRootQueryStep>()
+            .Append<FurthestAncestorOrSelfDynamicRootQueryStep>()
             .Append<NearestDescendantOrSelfDynamicRootQueryStep>()
-            .Append<FarthestDescendantOrSelfDynamicRootQueryStep>();
+            .Append<FurthestDescendantOrSelfDynamicRootQueryStep>();
 
         builder.Components();
         // register core CMS dashboards and 3rd party types - will be ordered by weight attribute & merged with package.manifest dashboards

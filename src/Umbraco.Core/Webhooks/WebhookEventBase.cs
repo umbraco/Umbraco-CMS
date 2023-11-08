@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Options;
+
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
@@ -8,14 +9,17 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks;
 
-public abstract class WebhookEventBase<TNotification, TEntity> : IWebhookEvent, INotificationAsyncHandler<TNotification>
+public abstract class WebhookEventBase<TNotification> : IWebhookEvent, INotificationAsyncHandler<TNotification>
     where TNotification : INotification
-    where TEntity : IContentBase
 {
-    private readonly IWebhookFiringService _webhookFiringService;
-    private readonly IWebHookService _webHookService;
     private readonly IServerRoleAccessor _serverRoleAccessor;
-    private WebhookSettings _webhookSettings;
+
+    /// <InheritDoc />
+    public string EventName { get; set; }
+
+    protected IWebhookFiringService WebhookFiringService { get; }
+    protected IWebHookService WebHookService { get; }
+    protected WebhookSettings WebhookSettings { get; private set; }
 
     protected WebhookEventBase(
         IWebhookFiringService webhookFiringService,
@@ -24,50 +28,59 @@ public abstract class WebhookEventBase<TNotification, TEntity> : IWebhookEvent, 
         IServerRoleAccessor serverRoleAccessor,
         string eventName)
     {
-        _webhookFiringService = webhookFiringService;
-        _webHookService = webHookService;
-        _serverRoleAccessor = serverRoleAccessor;
         EventName = eventName;
-        _webhookSettings = webhookSettings.CurrentValue;
-        webhookSettings.OnChange(x => _webhookSettings = x);
+
+        WebhookFiringService = webhookFiringService;
+        WebHookService = webHookService;
+        _serverRoleAccessor = serverRoleAccessor;
+
+        WebhookSettings = webhookSettings.CurrentValue;
+        webhookSettings.OnChange(x => WebhookSettings = x);
     }
 
-    public string EventName { get; set; }
-
-    public virtual async Task HandleAsync(TNotification notification, CancellationToken cancellationToken)
+    /// <summary>
+    ///  Process the webhooks for the given notification.
+    /// </summary>
+    public virtual async Task ProcessWebhooks(TNotification notification, IEnumerable<Webhook> webhooks, CancellationToken cancellationToken)
     {
-        if (_serverRoleAccessor.CurrentServerRole is not ServerRole.Single && _serverRoleAccessor.CurrentServerRole is not ServerRole.SchedulingPublisher)
-        {
-            return;
-        }
-
-        if (_webhookSettings.Enabled is false)
-        {
-            return;
-        }
-
-        IEnumerable<Webhook> webhooks = await _webHookService.GetByEventNameAsync(EventName);
-
         foreach (Webhook webhook in webhooks)
         {
-            if (!webhook.Enabled)
+            if (webhook.Enabled is false)
             {
                 continue;
             }
 
-            foreach (TEntity entity in GetEntitiesFromNotification(notification))
-            {
-                if (webhook.ContentTypeKeys.Any() && !webhook.ContentTypeKeys.Contains(entity.ContentType.Key))
-                {
-                    continue;
-                }
-
-                await _webhookFiringService.FireAsync(webhook, EventName, ConvertEntityToRequestPayload(entity), cancellationToken);
-            }
+            await WebhookFiringService.FireAsync(webhook, EventName, notification, cancellationToken);
         }
     }
 
-    protected abstract IEnumerable<TEntity> GetEntitiesFromNotification(TNotification notification);
+    /// <summary>
+    ///  should webhooks fire for this notification.
+    /// </summary>
+    /// <returns>true if webhooks should be fired.</returns>
+    public virtual bool ShouldFireWebhookForNotification(TNotification notificationObject)
+        => true;
 
-    protected abstract object? ConvertEntityToRequestPayload(TEntity entity);
+    public async Task HandleAsync(TNotification notification, CancellationToken cancellationToken)
+    {
+        if (WebhookSettings.Enabled is false)
+        {
+            return;
+        }
+
+        if (_serverRoleAccessor.CurrentServerRole is not ServerRole.Single
+            && _serverRoleAccessor.CurrentServerRole is not ServerRole.SchedulingPublisher)
+        {
+            return;
+        }
+
+        if (ShouldFireWebhookForNotification(notification) is false)
+        {
+            return;
+        }
+
+        IEnumerable<Webhook> webhooks = await WebHookService.GetByEventNameAsync(EventName);
+
+        await ProcessWebhooks(notification, webhooks, cancellationToken);
+    }
 }

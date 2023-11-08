@@ -34,7 +34,7 @@ public class DynamicRootServiceTests : UmbracoIntegrationTest
     {
         NearestAncestorOrSelf,
         NearestDescendantOrSelf,
-        FarthestDescendantOrSelf,
+        FurthestDescendantOrSelf,
     }
 
     protected IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
@@ -240,7 +240,7 @@ public class DynamicRootServiceTests : UmbracoIntegrationTest
 
     [Test]
     [TestCase(DynamicRootStepAlias.NearestDescendantOrSelf)]
-    [TestCase(DynamicRootStepAlias.FarthestDescendantOrSelf)]
+    [TestCase(DynamicRootStepAlias.FurthestDescendantOrSelf)]
     public async Task
         GetDynamicRoots__DescendantOrSelf_must_handle_when_there_is_not_found_any_and_level_becomes_impossible_to_get(
             DynamicRootStepAlias dynamicRootAlias)
@@ -323,7 +323,7 @@ public class DynamicRootServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task GetDynamicRoots__FarthestDescendantOrSelf__has_to_find_only_the_farthest()
+    public async Task GetDynamicRoots__FurthestDescendantOrSelf__has_to_find_only_the_furthest()
     {
         // Arrange
 
@@ -351,7 +351,7 @@ public class DynamicRootServiceTests : UmbracoIntegrationTest
             {
                 new DynamicRootQueryStep()
                 {
-                    Alias = DynamicRootStepAlias.FarthestDescendantOrSelf.ToString(),
+                    Alias = DynamicRootStepAlias.FurthestDescendantOrSelf.ToString(),
                     AnyOfDocTypeKeys = new[] { ContentTypeActs.Key },
                 },
             },

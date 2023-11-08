@@ -10,7 +10,7 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events;
 
-public class ContentPublishWebhookEvent : WebhookEventBase<ContentPublishedNotification, IContent>
+public class ContentPublishWebhookEvent : WebhookEventContentBase<ContentPublishedNotification, IContent>
 {
     private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
     private readonly IApiContentBuilder _apiContentBuilder;
