@@ -89,6 +89,18 @@ export class UmbUserWorkspaceContext
 		}
 	}
 
+	async uploadAvatar(file: File) {
+		const id = this.getEntityId();
+		if (!id) throw new Error('Id is missing');
+		await this.repository.uploadAvatar(id, file);
+	}
+
+	async removeAvatar() {
+		const id = this.getEntityId();
+		if (!id) throw new Error('Id is missing');
+		await this.repository.deleteAvatar(id);
+	}
+
 	destroy(): void {
 		this.#data.complete();
 	}
