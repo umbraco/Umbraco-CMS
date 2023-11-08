@@ -37,36 +37,36 @@ export class UmbInputStartNodeElement extends FormControlMixin(UmbLitElement) {
 		return html`<umb-input-dropdown-list
 				.options=${this.options}
 				@change="${this.#onTypeChange}"></umb-input-dropdown-list>
-			${this.renderType()}`;
+			${this.#renderType()}`;
 	}
 
-	renderType() {
+	#renderType() {
 		switch (this.startNodeType) {
 			case 'content':
-				return this.renderTypeContent();
+				return this.#renderTypeContent();
 			case 'media':
-				return this.renderTypeMedia();
+				return this.#renderTypeMedia();
 			case 'member':
-				return this.renderTypeMember();
+				return this.#renderTypeMember();
 			default:
 				return 'No type found';
 		}
 	}
 
-	renderTypeContent() {
+	#renderTypeContent() {
 		const startNodeId = this.startNodeId ? [this.startNodeId] : [];
 		return html`
 			<umb-input-document @change=${this.#onIdChange} .selectedIds=${startNodeId} max="1"></umb-input-document>
 		`;
 	}
 
-	renderTypeMedia() {
+	#renderTypeMedia() {
 		const startNodeId = this.startNodeId ? [this.startNodeId] : [];
 		//TODO => MediaTypes
 		return html` <umb-input-media @change=${this.#onIdChange} .selectedIds=${startNodeId} max="1"></umb-input-media> `;
 	}
 
-	renderTypeMember() {
+	#renderTypeMember() {
 		const startNodeId = this.startNodeId ? [this.startNodeId] : [];
 		//TODO => Members
 		return html`
