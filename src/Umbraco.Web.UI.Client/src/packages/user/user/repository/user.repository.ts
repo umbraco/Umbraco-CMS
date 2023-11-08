@@ -1,3 +1,4 @@
+import { UmbTemporaryFileRepository } from '@umbraco-cms/backoffice/temporary-file';
 import { UmbUserDetailDataSource, UmbUserSetGroupDataSource } from '../types.js';
 import { UmbUserServerDataSource } from './sources/user.server.data.js';
 import { UmbUserSetGroupsServerDataSource } from './sources/user-set-group.server.data.js';
@@ -12,6 +13,7 @@ import {
 	UserResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
+import { UmbId } from '@umbraco-cms/backoffice/id';
 
 export interface IUmbUserDetailRepository
 	extends UmbDetailRepository<
@@ -28,12 +30,14 @@ export class UmbUserRepository extends UmbUserRepositoryBase implements IUmbUser
 	#detailSource: UmbUserDetailDataSource;
 	#setUserGroupsSource: UmbUserSetGroupDataSource;
 	#notificationContext?: UmbNotificationContext;
+	#temporaryFileRepository: UmbTemporaryFileRepository;
 
 	constructor(host: UmbControllerHost) {
 		super(host);
 
 		this.#detailSource = new UmbUserServerDataSource(host);
 		this.#setUserGroupsSource = new UmbUserSetGroupsServerDataSource(host);
+		this.#temporaryFileRepository = new UmbTemporaryFileRepository(host);
 	}
 
 	/**
@@ -173,7 +177,12 @@ export class UmbUserRepository extends UmbUserRepositoryBase implements IUmbUser
 	async uploadAvatar(id: string, file: File) {
 		if (!id) throw new Error('Id is missing');
 
-		const { error } = await this.#detailSource.uploadAvatar(id, file);
+		// upload temp file
+		const fileId = UmbId.new();
+		await this.#temporaryFileRepository.upload(fileId, file);
+
+		// assign temp file to avatar
+		const { error } = await this.#detailSource.createAvatar(id, fileId);
 
 		if (!error) {
 			// TODO: update store + current user
