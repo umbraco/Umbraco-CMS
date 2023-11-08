@@ -27,7 +27,10 @@ export interface UmbUserCollectionFilterModel {
 }
 
 export interface UmbUserDetailDataSource
-	extends UmbDataSource<CreateUserRequestModel, CreateUserResponseModel, UpdateUserRequestModel, UmbUserDetail> {}
+	extends UmbDataSource<CreateUserRequestModel, CreateUserResponseModel, UpdateUserRequestModel, UmbUserDetail> {
+	uploadAvatar(id: string, file: File): Promise<UmbDataSourceErrorResponse>;
+	deleteAvatar(id: string): Promise<UmbDataSourceErrorResponse>;
+}
 
 export interface UmbUserSetGroupDataSource {
 	setGroups(userIds: string[], userGroupIds: string[]): Promise<UmbDataSourceErrorResponse>;
