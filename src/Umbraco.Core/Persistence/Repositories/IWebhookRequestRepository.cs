@@ -10,4 +10,17 @@ public interface IWebhookRequestRepository
     /// <param name="webhookRequest">The webhook request you want to create.</param>
     /// <returns>The created <see cref="WebhookRequest" /> webhook</returns>
     Task<WebhookRequest> CreateAsync(WebhookRequest webhookRequest);
+
+    /// <summary>
+    ///     Deletes a webhook request
+    /// </summary>
+    /// <param name="webhookRequest">The webhook request to be deleted.</param>
+    /// <returns><placeholder>A <see cref="Task"/> representing the asynchronous operation.</placeholder></returns>
+    Task DeleteAsync(WebhookRequest webhookRequest);
+
+    /// <summary>
+    ///     Gets all of the webhook requests in the current database.
+    /// </summary>
+    /// <returns>An enumerable of <see cref="WebhookRequest" /> objects.</returns>
+    Task<IEnumerable<WebhookRequest>> GetAllAsync();
 }

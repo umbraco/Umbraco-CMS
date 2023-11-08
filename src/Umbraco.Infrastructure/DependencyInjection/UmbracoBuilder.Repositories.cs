@@ -73,6 +73,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddUnique<IDynamicRootRepository, DynamicRootRepository>();
         builder.Services.AddUnique<IWebhookRepository, WebhookRepository>();
         builder.Services.AddUnique<IWebhookLogRepository, WebhookLogRepository>();
+        builder.Services.AddUnique<IWebhookRequestRepository, WebhookRequestRepository>();
 
         return builder;
     }

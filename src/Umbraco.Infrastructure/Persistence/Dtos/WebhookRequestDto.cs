@@ -22,4 +22,7 @@ public class WebhookRequestDto
     [Column(Name = "requestObject")]
     [NullSetting(NullSetting = NullSettings.Null)]
     public object? RequestObject { get; set; }
+
+    [Column("retryCount")]
+    public int RetryCount { get; set; }
 }
