@@ -1,6 +1,6 @@
 import { UmbStylesheetWorkspaceContext } from './stylesheet-workspace.context.js';
 import { UUIInputElement, UUIInputEvent, UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { Subject, debounceTime } from '@umbraco-cms/backoffice/external/rxjs';
@@ -23,14 +23,19 @@ export class UmbStylesheetWorkspaceEditorElement extends UmbLitElement {
 	@state()
 	private _path?: string;
 
+	@state()
+	private _dirName?: string;
+
 	private inputQuery$ = new Subject<string>();
 
 	constructor() {
 		super();
 
 		this.consumeContext(UMB_WORKSPACE_CONTEXT, (instance) => {
-			this.#workspaceContext = instance as unknown as UmbStylesheetWorkspaceContext;
+			this.#workspaceContext = instance as UmbStylesheetWorkspaceContext;
+
 			this.#observeNameAndPath();
+
 			this.inputQuery$.pipe(debounceTime(250)).subscribe((nameInputValue: string) => {
 				this.#workspaceContext?.setName(`${nameInputValue}.css`);
 			});
@@ -39,8 +44,15 @@ export class UmbStylesheetWorkspaceEditorElement extends UmbLitElement {
 
 	#observeNameAndPath() {
 		if (!this.#workspaceContext) return;
-		this.observe(this.#workspaceContext.name, (name) => (this._name = name ?? ''), '_observeName');
-		this.observe(this.#workspaceContext.path, (path) => (this._path = path ?? ''), '_observePath');
+		this.observe(
+			this.#workspaceContext.path,
+			(path) => {
+				this._path = path;
+				this._dirName = this._path?.substring(0, this._path?.lastIndexOf('\\') + 1)?.replace('\\', '/');
+			},
+			'_observeStylesheetPath',
+		);
+		this.observe(this.#workspaceContext.name, (name) => (this._name = name), '_observeStylesheetName');
 	}
 
 	#onNameChange(event: UUIInputEvent) {
@@ -60,7 +72,7 @@ export class UmbStylesheetWorkspaceEditorElement extends UmbLitElement {
 						.value=${this._name}
 						@input="${this.#onNameChange}">
 					</uui-input>
-					<small>/css/${this._path}</small>
+					<small>/css/${this._dirName}${this._name}.css</small>
 				</div>
 
 				<div slot="footer-info">
