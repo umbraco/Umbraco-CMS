@@ -49,8 +49,8 @@ export class UmbMediaTypeWorkspaceContext
 		}
 	}
 
-	async create() {
-		this.#getDataPromise = this.repository.createScaffold();
+	async create(parentId: string | null) {
+		this.#getDataPromise = this.repository.createScaffold(parentId);
 		const { data } = await this.#getDataPromise;
 		if (!data) return;
 
