@@ -47,7 +47,7 @@ export class UmbLanguageWorkspaceEditorElement extends UmbLitElement {
 		return html`<umb-workspace-editor alias="Umb.Workspace.Language">
 			<div id="header" slot="header">
 				<uui-button label="Navigate back" href="section/settings/workspace/language-root" compact>
-					<uui-icon name="umb:arrow-left"></uui-icon>
+					<uui-icon name="icon-arrow-left"></uui-icon>
 				</uui-button>
 				${this._isNew
 					? html`<strong>Add language</strong>`

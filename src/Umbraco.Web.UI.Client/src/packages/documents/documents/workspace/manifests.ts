@@ -69,7 +69,7 @@ const workspaceViewCollections: Array<ManifestWorkspaceViewCollection> = [
 		meta: {
 			label: 'Documents',
 			pathname: 'collection',
-			icon: 'umb:grid',
+			icon: 'icon-grid',
 			entityType: 'document',
 			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
 		}

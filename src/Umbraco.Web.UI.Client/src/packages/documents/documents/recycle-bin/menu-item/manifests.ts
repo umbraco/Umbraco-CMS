@@ -9,7 +9,7 @@ const menuItem: ManifestTypes = {
 	meta: {
 		treeAlias: 'Umb.Tree.DocumentRecycleBin',
 		label: 'Recycle Bin',
-		icon: 'umb:trash',
+		icon: 'icon-trash',
 		menus: ['Umb.Menu.Content'],
 	},
 };

@@ -23,7 +23,7 @@ const entityActions: Array<ManifestTypes> = [
 		weight: 900,
 		api: UmbDeleteEntityAction,
 		meta: {
-			icon: 'umb:trash',
+			icon: 'icon-trash',
 			label: 'Delete',
 			repositoryAlias: USER_REPOSITORY_ALIAS,
 			entityTypes: [UMB_USER_ENTITY_TYPE],
@@ -41,7 +41,7 @@ const entityActions: Array<ManifestTypes> = [
 		weight: 800,
 		api: UmbEnableUserEntityAction,
 		meta: {
-			icon: 'umb:check',
+			icon: 'icon-check',
 			label: 'Enable',
 			repositoryAlias: ENABLE_USER_REPOSITORY_ALIAS,
 			entityTypes: [UMB_USER_ENTITY_TYPE],
@@ -59,7 +59,7 @@ const entityActions: Array<ManifestTypes> = [
 		weight: 700,
 		api: UmbDisableUserEntityAction,
 		meta: {
-			icon: 'umb:block',
+			icon: 'icon-block',
 			label: 'Disable',
 			repositoryAlias: DISABLE_USER_REPOSITORY_ALIAS,
 			entityTypes: [UMB_USER_ENTITY_TYPE],
@@ -77,7 +77,7 @@ const entityActions: Array<ManifestTypes> = [
 		weight: 600,
 		api: UmbChangeUserPasswordEntityAction,
 		meta: {
-			icon: 'umb:key',
+			icon: 'icon-key',
 			label: 'Change Password',
 			repositoryAlias: CHANGE_USER_PASSWORD_REPOSITORY_ALIAS,
 			entityTypes: [UMB_USER_ENTITY_TYPE],
@@ -90,7 +90,7 @@ const entityActions: Array<ManifestTypes> = [
 		weight: 600,
 		api: UmbUnlockUserEntityAction,
 		meta: {
-			icon: 'umb:unlocked',
+			icon: 'icon-unlocked',
 			label: 'Unlock',
 			repositoryAlias: UNLOCK_USER_REPOSITORY_ALIAS,
 			entityTypes: [UMB_USER_ENTITY_TYPE],
@@ -108,7 +108,7 @@ const entityActions: Array<ManifestTypes> = [
 		weight: 500,
 		api: UmbResendInviteToUserEntityAction,
 		meta: {
-			icon: 'umb:message',
+			icon: 'icon-message',
 			label: 'Resend Invite',
 			repositoryAlias: INVITE_USER_REPOSITORY_ALIAS,
 			entityTypes: [UMB_USER_ENTITY_TYPE],

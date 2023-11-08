@@ -17,7 +17,7 @@ export const manifests: Array<ManifestPropertyEditorUi> = [
 		meta: {
 			label: 'Text Box',
 			propertyEditorSchemaAlias: 'Umbraco.TextBox',
-			icon: 'umb:autofill',
+			icon: 'icon-autofill',
 			group: 'common',
 			settings: {
 				properties: [inputTypeConfig],
@@ -38,7 +38,7 @@ export const manifests: Array<ManifestPropertyEditorUi> = [
 		meta: {
 			label: 'Email',
 			propertyEditorSchemaAlias: 'Umbraco.EmailAddress',
-			icon: 'umb:message',
+			icon: 'icon-message',
 			group: 'common',
 			settings: {
 				properties: [inputTypeConfig],

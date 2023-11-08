@@ -143,28 +143,28 @@ export class UmbSearchModalElement extends LitElement {
 		{
 			name: 'Blog',
 			href: '#',
-			icon: 'umb:thumbnail-list',
+			icon: 'icon-thumbnail-list',
 			parent: 'Content',
 			url: '/blog/',
 		},
 		{
 			name: 'Popular blogs',
 			href: '#',
-			icon: 'umb:article',
+			icon: 'icon-article',
 			parent: 'Content',
 			url: '/blog/popular-blogs/',
 		},
 		{
 			name: 'How to write a blog',
 			href: '#',
-			icon: 'umb:article',
+			icon: 'icon-article',
 			parent: 'Content',
 			url: '/blog/how-to-write-a-blog/',
 		},
 		{
 			name: 'Blog hero',
 			href: '#',
-			icon: 'umb:picture',
+			icon: 'icon-picture',
 			parent: 'Media',
 		},
 		{

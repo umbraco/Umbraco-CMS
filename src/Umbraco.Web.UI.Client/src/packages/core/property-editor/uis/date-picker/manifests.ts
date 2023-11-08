@@ -8,7 +8,7 @@ export const manifest: ManifestPropertyEditorUi = {
 	meta: {
 		label: 'Date Picker',
 		propertyEditorSchemaAlias: 'Umbraco.DateTime',
-		icon: 'umb:time',
+		icon: 'icon-time',
 		group: 'pickers',
 		settings: {
 			properties: [

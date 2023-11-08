@@ -89,7 +89,7 @@ export class UmbLogViewerMessagesListElement extends UmbLitElement {
 			  )}`
 			: html`<umb-empty-state size="small"
 					><span id="empty">
-						<uui-icon name="umb:search"></uui-icon>Sorry, we cannot find what you are looking for.
+						<uui-icon name="icon-search"></uui-icon>Sorry, we cannot find what you are looking for.
 					</span></umb-empty-state
 			  >`}`;
 	}

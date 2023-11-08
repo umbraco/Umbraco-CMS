@@ -8,7 +8,7 @@ export const manifest: ManifestPropertyEditorUi = {
 	meta: {
 		label: 'Document Picker',
 		propertyEditorSchemaAlias: 'Umbraco.ContentPicker',
-		icon: 'umb:document',
+		icon: 'icon-document',
 		group: 'common',
 		settings: {
 			properties: [

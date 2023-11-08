@@ -160,7 +160,7 @@ export class UmbDocumentInfoWorkspaceViewElement extends UmbLitElement {
 		return html`<div id="link-section">
 			<a href="http://google.com" target="_blank" class="link-item with-href">
 				<span class="link-language">da-DK</span>
-				<span class="link-content"> <uui-icon name="umb:out"></uui-icon>google.com </span>
+				<span class="link-content"> <uui-icon name="icon-out"></uui-icon>google.com </span>
 			</a>
 			<div class="link-item">
 				<span class="link-language">en-EN</span>
@@ -200,7 +200,7 @@ export class UmbDocumentInfoWorkspaceViewElement extends UmbLitElement {
 		return html` <umb-history-item .name="${history.userName}" .detail="${this.localize.date(history.timestamp!)}">
 			<span class="log-type">${this.#renderTag(history.logType)} ${this.#renderTagDescription(history.logType, history)}</span>
 			<uui-button label=${this.localize.term('actions_rollback')} look="secondary" slot="actions">
-				<uui-icon name="umb:undo"></uui-icon> 
+				<uui-icon name="icon-undo"></uui-icon> 
 				<umb-localize key="actions_rollback"></umb-localize>
 			</uui-button>
 		</umb-history-item>`;

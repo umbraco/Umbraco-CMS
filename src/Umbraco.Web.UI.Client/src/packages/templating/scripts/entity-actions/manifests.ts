@@ -24,7 +24,7 @@ const scriptsViewActions: Array<ManifestEntityAction> = [
 		name: 'Delete Scripts Entity Action',
 		api: UmbDeleteEntityAction,
 		meta: {
-			icon: 'umb:trash',
+			icon: 'icon-trash',
 			label: 'Delete',
 			repositoryAlias: SCRIPTS_REPOSITORY_ALIAS,
 			entityTypes: [SCRIPTS_ENTITY_TYPE],
@@ -39,7 +39,7 @@ const scriptsFolderActions: Array<ManifestEntityAction> = [
 		name: 'Create Scripts Entity Under Directory Action',
 		api: UmbCreateScriptAction,
 		meta: {
-			icon: 'umb:article',
+			icon: 'icon-article',
 			label: 'New empty script',
 			repositoryAlias: SCRIPTS_REPOSITORY_ALIAS,
 			entityTypes: [SCRIPTS_FOLDER_ENTITY_TYPE, SCRIPTS_FOLDER_EMPTY_ENTITY_TYPE, SCRIPTS_ROOT_ENTITY_TYPE],
@@ -51,7 +51,7 @@ const scriptsFolderActions: Array<ManifestEntityAction> = [
 		name: 'Remove empty folder',
 		api: UmbDeleteFolderEntityAction,
 		meta: {
-			icon: 'umb:trash',
+			icon: 'icon-trash',
 			label: 'Remove folder',
 			repositoryAlias: SCRIPTS_REPOSITORY_ALIAS,
 			entityTypes: [SCRIPTS_FOLDER_EMPTY_ENTITY_TYPE],
@@ -63,7 +63,7 @@ const scriptsFolderActions: Array<ManifestEntityAction> = [
 		name: 'Create empty folder',
 		api: UmbCreateFolderEntityAction,
 		meta: {
-			icon: 'umb:add',
+			icon: 'icon-add',
 			label: 'Create folder',
 			repositoryAlias: SCRIPTS_REPOSITORY_ALIAS,
 			entityTypes: [SCRIPTS_FOLDER_EMPTY_ENTITY_TYPE, SCRIPTS_FOLDER_ENTITY_TYPE, SCRIPTS_ROOT_ENTITY_TYPE],

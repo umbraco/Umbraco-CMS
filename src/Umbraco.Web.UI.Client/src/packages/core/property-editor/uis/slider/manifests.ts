@@ -8,7 +8,7 @@ export const manifest: ManifestPropertyEditorUi = {
 	meta: {
 		label: 'Slider',
 		propertyEditorSchemaAlias: 'Umbraco.Slider',
-		icon: 'umb:navigation-horizontal',
+		icon: 'icon-navigation-horizontal',
 		group: 'common',
 		settings: {
 			properties: [

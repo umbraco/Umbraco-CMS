@@ -19,7 +19,7 @@ const entityActions: Array<ManifestEntityAction> = [
 		weight: 900,
 		api: UmbDeleteEntityAction,
 		meta: {
-			icon: 'umb:trash',
+			icon: 'icon-trash',
 			label: 'Delete...',
 			repositoryAlias: DATA_TYPE_REPOSITORY_ALIAS,
 			entityTypes: [DATA_TYPE_ENTITY_TYPE],
@@ -32,7 +32,7 @@ const entityActions: Array<ManifestEntityAction> = [
 		weight: 800,
 		api: UmbDeleteFolderEntityAction,
 		meta: {
-			icon: 'umb:trash',
+			icon: 'icon-trash',
 			label: 'Delete Folder...',
 			repositoryAlias: DATA_TYPE_REPOSITORY_ALIAS,
 			entityTypes: [DATA_TYPE_ENTITY_TYPE, DATA_TYPE_FOLDER_ENTITY_TYPE],
@@ -45,7 +45,7 @@ const entityActions: Array<ManifestEntityAction> = [
 		weight: 700,
 		api: UmbFolderUpdateEntityAction,
 		meta: {
-			icon: 'umb:edit',
+			icon: 'icon-edit',
 			label: 'Rename Folder...',
 			repositoryAlias: DATA_TYPE_REPOSITORY_ALIAS,
 			entityTypes: [DATA_TYPE_ENTITY_TYPE, DATA_TYPE_FOLDER_ENTITY_TYPE],

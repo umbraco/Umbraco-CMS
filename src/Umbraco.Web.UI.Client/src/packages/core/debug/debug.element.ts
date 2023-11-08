@@ -85,7 +85,7 @@ export class UmbDebugElement extends UmbLitElement {
 	private _renderDialog() {
 		return html` <div id="container">
 			<uui-badge color="danger" look="primary" attention @click="${this._openDialog}">
-				<uui-icon name="umb:bug"></uui-icon> Debug
+				<uui-icon name="icon-bug"></uui-icon> Debug
 			</uui-badge>
 		</div>`;
 	}
@@ -93,7 +93,7 @@ export class UmbDebugElement extends UmbLitElement {
 	private _renderPanel() {
 		return html` <div id="container">
 			<uui-button color="danger" look="primary" @click="${this._toggleDebugPane}">
-				<uui-icon name="umb:bug"></uui-icon>
+				<uui-icon name="icon-bug"></uui-icon>
 				Debug
 			</uui-button>
 

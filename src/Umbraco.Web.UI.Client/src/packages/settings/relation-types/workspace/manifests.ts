@@ -25,7 +25,7 @@ const workspaceViews: Array<ManifestWorkspaceEditorView> = [
 		meta: {
 			label: 'RelationType',
 			pathname: 'relation-type',
-			icon: 'umb:info',
+			icon: 'icon-info',
 		},
 		conditions: [
 			{
@@ -43,7 +43,7 @@ const workspaceViews: Array<ManifestWorkspaceEditorView> = [
 		meta: {
 			label: 'Relation',
 			pathname: 'relation',
-			icon: 'umb:trafic',
+			icon: 'icon-trafic',
 		},
 		conditions: [
 			{

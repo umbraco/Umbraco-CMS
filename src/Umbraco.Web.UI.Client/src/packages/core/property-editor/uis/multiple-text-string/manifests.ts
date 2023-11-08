@@ -8,7 +8,7 @@ export const manifest: ManifestPropertyEditorUi = {
 	meta: {
 		label: 'Multiple Text String',
 		propertyEditorSchemaAlias: 'Umbraco.MultipleTextString',
-		icon: 'umb:ordered-list',
+		icon: 'icon-ordered-list',
 		group: '',
 		supportsReadOnly: true,
 	},

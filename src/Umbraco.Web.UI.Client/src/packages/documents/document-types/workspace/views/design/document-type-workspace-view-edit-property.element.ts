@@ -187,7 +187,7 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 		if (!this.property) return;
 		return html`
 			<div class="sortable">
-				<uui-icon name="${this.inherited ? 'umb:merge' : 'umb:navigation'}"></uui-icon>
+				<uui-icon name="${this.inherited ? 'icon-merge' : 'icon-navigation'}"></uui-icon>
 				${this.property.name} <span style="color: var(--uui-color-disabled-contrast)">(${this.property.alias})</span>
 			</div>
 			<uui-input
@@ -257,7 +257,7 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 				<div id="editor">
 					${this.renderPropertyTags()}
 					<uui-tag look="default" class="inherited">
-						<uui-icon name="umb:merge"></uui-icon>
+						<uui-icon name="icon-merge"></uui-icon>
 						<span
 							>${this.localize.term('contentTypeEditor_inheritedFrom')}
 							<a href=${this._editDocumentTypePath + 'edit/' + this.ownerDocumentTypeId}>
@@ -285,7 +285,7 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 					<!-- TODO: should use UUI-LOCK-INPUT, but that does not fire an event when its locked/unlocked -->
 					<!-- TODO: validation for bad characters -->
 					<div @click=${this.#onToggleAliasLock} @keydown=${() => ''} id="alias-lock" slot="prepend">
-						<uui-icon name=${this._aliasLocked ? 'umb:lock' : 'umb:unlocked'}></uui-icon>
+						<uui-icon name=${this._aliasLocked ? 'icon-lock' : 'icon-unlocked'}></uui-icon>
 					</div>
 			  </uui-input>`
 			: '';
@@ -297,7 +297,7 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 					${this.property.dataTypeId ? html`<uui-tag look="default">${this._dataTypeName}</uui-tag>` : nothing}
 					${this.property.variesByCulture
 						? html`<uui-tag look="default">
-								<uui-icon name="umb:shuffle"></uui-icon> ${this.localize.term('contentTypeEditor_cultureVariantLabel')}
+								<uui-icon name="icon-shuffle"></uui-icon> ${this.localize.term('contentTypeEditor_cultureVariantLabel')}
 						  </uui-tag>`
 						: nothing}
 					${this.property.appearance?.labelOnTop == true
