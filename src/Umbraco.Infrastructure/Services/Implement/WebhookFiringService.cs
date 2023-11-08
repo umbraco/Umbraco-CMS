@@ -14,33 +14,24 @@ public class WebhookFiringService : IWebhookFiringService
     private readonly WebhookSettings _webhookSettings;
     private readonly IWebhookLogService _webhookLogService;
     private readonly IWebhookLogFactory _webhookLogFactory;
+    private readonly IWebhookRequestService _webhookRequestService;
 
     public WebhookFiringService(
         IJsonSerializer jsonSerializer,
         IOptions<WebhookSettings> webhookSettings,
         IWebhookLogService webhookLogService,
-        IWebhookLogFactory webhookLogFactory)
+        IWebhookLogFactory webhookLogFactory,
+        IWebhookRequestService webhookRequestService)
     {
         _jsonSerializer = jsonSerializer;
         _webhookLogService = webhookLogService;
         _webhookLogFactory = webhookLogFactory;
+        _webhookRequestService = webhookRequestService;
         _webhookSettings = webhookSettings.Value;
     }
 
-    // TODO: Add queing instead of processing directly in thread
-    // as this just makes save and publish longer
-    public async Task FireAsync(Webhook webhook, string eventName, object? payload, CancellationToken cancellationToken)
-    {
-        for (var retry = 0; retry < _webhookSettings.MaximumRetries; retry++)
-        {
-            HttpResponseMessage response = await SendRequestAsync(webhook, eventName, payload, retry, cancellationToken);
-
-            if (response.IsSuccessStatusCode)
-            {
-                return;
-            }
-        }
-    }
+    public async Task FireAsync(Webhook webhook, string eventName, object? payload, CancellationToken cancellationToken) =>
+        await _webhookRequestService.CreateAsync(webhook.Key, eventName, payload);
 
     private async Task<HttpResponseMessage> SendRequestAsync(Webhook webhook, string eventName, object? payload, int retryCount, CancellationToken cancellationToken)
     {

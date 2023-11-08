@@ -8,7 +8,7 @@ public class WebhookRequest
 
     public string EventName { get; set; } = string.Empty;
 
-    public object? RequestObject { get; set; }
+    public string? RequestObject { get; set; }
 
     public int RetryCount { get; set; }
 }
