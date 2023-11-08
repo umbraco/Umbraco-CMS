@@ -48,7 +48,7 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 	private _tableItems: Array<UmbTableItem> = [];
 
 	@state()
-	private _selection: Array<string> = [];
+	private _selection: Array<string | null> = [];
 
 	private _collectionContext?: UmbCollectionContext<EntityType, any>;
 

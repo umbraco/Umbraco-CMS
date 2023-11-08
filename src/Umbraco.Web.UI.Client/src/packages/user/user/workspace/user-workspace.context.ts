@@ -1,23 +1,23 @@
 import { UmbUserRepository } from '../repository/user.repository.js';
-import { type UmbUserDetail } from '../index.js';
+import { USER_ENTITY_TYPE, type UmbUserDetail } from '../index.js';
 import { UmbSaveableWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import type { UpdateUserRequestModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextConsumerController, UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { UMB_AUTH } from '@umbraco-cms/backoffice/auth';
+import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 
 export class UmbUserWorkspaceContext
 	extends UmbWorkspaceContext<UmbUserRepository, UmbUserDetail>
 	implements UmbSaveableWorkspaceContextInterface<UmbUserDetail | undefined>
 {
-	#authContext?: typeof UMB_AUTH.TYPE;
+	#authContext?: typeof UMB_AUTH_CONTEXT.TYPE;
 
 	constructor(host: UmbControllerHostElement) {
 		super(host, 'Umb.Workspace.User', new UmbUserRepository(host));
 
-		new UmbContextConsumerController(host, UMB_AUTH, (auth) => {
+		new UmbContextConsumerController(host, UMB_AUTH_CONTEXT, (auth) => {
 			this.#authContext = auth;
 		});
 	}
@@ -26,11 +26,23 @@ export class UmbUserWorkspaceContext
 	data = this.#data.asObservable();
 
 	async load(id: string) {
-		const { data } = await this.repository.requestById(id);
+		const { data, asObservable } = await this.repository.requestById(id);
 		if (data) {
 			this.setIsNew(false);
 			this.#data.update(data);
 		}
+
+		this.observe(asObservable(), (user) => this.onUserStoreChanges(user), 'umbUserStoreObserver');
+	}
+
+	/* TODO: some properties are allowed to update without saving. 
+		For a user properties like state will be updated when one of the entity actions are executed.
+		Therefore we have to subscribe to the user store to update the state in the workspace data.
+		There might be a less manual way to do this.
+	*/
+	onUserStoreChanges(user: UmbUserDetail) {
+		if (!user) return;
+		this.#data.update({ state: user.state });
 	}
 
 	getEntityId(): string | undefined {
@@ -38,7 +50,7 @@ export class UmbUserWorkspaceContext
 	}
 
 	getEntityType(): string {
-		return 'user';
+		return USER_ENTITY_TYPE;
 	}
 
 	getData() {
@@ -47,7 +59,7 @@ export class UmbUserWorkspaceContext
 
 	updateProperty<PropertyName extends keyof UmbUserDetail>(
 		propertyName: PropertyName,
-		value: UmbUserDetail[PropertyName]
+		value: UmbUserDetail[PropertyName],
 	) {
 		this.#data.update({ [propertyName]: value });
 	}
@@ -82,7 +94,10 @@ export class UmbUserWorkspaceContext
 	}
 }
 
-export const UMB_USER_WORKSPACE_CONTEXT = new UmbContextToken<UmbSaveableWorkspaceContextInterface, UmbUserWorkspaceContext>(
+export const UMB_USER_WORKSPACE_CONTEXT = new UmbContextToken<
+	UmbSaveableWorkspaceContextInterface,
+	UmbUserWorkspaceContext
+>(
 	'UmbWorkspaceContext',
-	(context): context is UmbUserWorkspaceContext => context.getEntityType?.() === 'user'
+	(context): context is UmbUserWorkspaceContext => context.getEntityType?.() === USER_ENTITY_TYPE,
 );

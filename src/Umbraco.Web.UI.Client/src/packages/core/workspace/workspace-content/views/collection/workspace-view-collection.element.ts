@@ -1,5 +1,5 @@
 import { css, html, customElement, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbCollectionContext, UMB_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { FolderTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
@@ -39,7 +39,7 @@ export class UmbWorkspaceViewCollectionElement extends UmbLitElement {
 	}
 
 	render() {
-		return html`<umb-collection entity-type=${ifDefined(this._workspaceContext?.getEntityType())}></umb-collection>`;
+		return html`<umb-collection></umb-collection>`;
 	}
 
 	static styles = [

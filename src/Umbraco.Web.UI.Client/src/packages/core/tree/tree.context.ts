@@ -5,7 +5,7 @@ import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbBaseController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 import { ProblemDetails, TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbSelectionManagerBase } from '@umbraco-cms/backoffice/utils';
+import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import { UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
 
 // TODO: update interface
@@ -31,7 +31,7 @@ export class UmbTreeContextBase<TreeItemType extends TreeItemPresentationModel>
 	extends UmbBaseController
 	implements UmbTreeContext<TreeItemType>
 {
-	#selectionManager = new UmbSelectionManagerBase();
+	#selectionManager = new UmbSelectionManager();
 
 	#selectable = new UmbBooleanState(false);
 	public readonly selectable = this.#selectable.asObservable();

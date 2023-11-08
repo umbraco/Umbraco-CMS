@@ -39,6 +39,7 @@ export class UmbUserGroupWorkspaceContext
 			this.#data.update(data);
 		}
 
+		/* TODO: implement user selection for a user group
 		const { data: users } = await this.#userRepository.filterCollection({
 			skip: 0,
 			take: 10000000,
@@ -50,6 +51,7 @@ export class UmbUserGroupWorkspaceContext
 		const ids = users.items.map((user) => user.id ?? '');
 
 		this.#userIds.next(ids);
+		*/
 	}
 
 	getEntityId(): string | undefined {

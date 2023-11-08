@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import { UmbScriptsWorkspaceContext } from './scripts-workspace.context.js';
 import type { UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
 import { UUITextStyles, UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
