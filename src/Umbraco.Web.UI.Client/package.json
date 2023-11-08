@@ -164,6 +164,7 @@
 		"@typescript-eslint/parser": "^6.5.0",
 		"@web/dev-server-esbuild": "^0.4.1",
 		"@web/dev-server-import-maps": "^0.1.1",
+		"@web/dev-server-rollup": "^0.6.0",
 		"@web/test-runner": "^0.17.0",
 		"@web/test-runner-playwright": "^0.10.1",
 		"babel-loader": "^9.1.3",

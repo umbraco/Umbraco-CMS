@@ -1,6 +1,6 @@
-import type { tinymce } from '@umbraco-cms/backoffice/external/tinymce';
+import type { RawEditorOptions } from '@umbraco-cms/backoffice/external/tinymce';
 
-export type TinyStyleSheet = tinymce.RawEditorOptions['style_formats'];
+export type TinyStyleSheet = RawEditorOptions['style_formats'];
 
 export const defaultStyleFormats: TinyStyleSheet = [
 	{
@@ -29,7 +29,7 @@ export const defaultStyleFormats: TinyStyleSheet = [
 export const defaultExtendedValidElements =
 	'@[id|class|style],-div[id|dir|class|align|style],ins[datetime|cite],-ul[class|style],-li[class|style],-h1[id|dir|class|align|style],-h2[id|dir|class|align|style],-h3[id|dir|class|align|style],-h4[id|dir|class|align|style],-h5[id|dir|class|align|style],-h6[id|style|dir|class|align],span[id|class|style|lang],figure,figcaption';
 
-export const defaultFallbackConfig: tinymce.RawEditorOptions = {
+export const defaultFallbackConfig: RawEditorOptions = {
 	toolbar: [
 		'styles',
 		'bold',

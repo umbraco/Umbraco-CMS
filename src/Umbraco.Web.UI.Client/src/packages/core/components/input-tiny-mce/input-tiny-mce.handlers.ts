@@ -1,6 +1,6 @@
-import type { tinymce } from '@umbraco-cms/backoffice/external/tinymce';
+import type { RawEditorOptions } from '@umbraco-cms/backoffice/external/tinymce';
 
-export const pastePreProcessHandler: tinymce.RawEditorOptions['paste_preprocess'] = (_editor, args) => {
+export const pastePreProcessHandler: RawEditorOptions['paste_preprocess'] = (_editor, args) => {
 	// Remove spans
 	args.content = args.content.replace(/<\s*span[^>]*>(.*?)<\s*\/\s*span>/g, '$1');
 	// Convert b to strong.
@@ -9,7 +9,7 @@ export const pastePreProcessHandler: tinymce.RawEditorOptions['paste_preprocess'
 	args.content = args.content.replace(/<\s*i([^>]*)>(.*?)<\s*\/\s*i([^>]*)>/g, '<em$1>$2</em$3>');
 };
 
-export const uploadImageHandler: tinymce.RawEditorOptions['images_upload_handler'] = (blobInfo, progress) => {
+export const uploadImageHandler: RawEditorOptions['images_upload_handler'] = (blobInfo, progress) => {
 	return new Promise((resolve, reject) => {
 		const xhr = new XMLHttpRequest();
 		xhr.open('POST', window.Umbraco?.Sys.ServerVariables.umbracoUrls.tinyMceApiBaseUrl + 'UploadImage');
