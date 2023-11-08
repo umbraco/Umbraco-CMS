@@ -1,10 +1,10 @@
 import { UmbMediaTypeRepository } from '../repository/media-type.repository.js';
+import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbSaveableWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { MediaTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { firstValueFrom } from 'rxjs';
 
 type EntityType = MediaTypeResponseModel;
 export class UmbMediaTypeWorkspaceContext
