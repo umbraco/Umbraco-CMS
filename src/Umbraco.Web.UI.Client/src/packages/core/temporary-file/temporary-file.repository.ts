@@ -29,7 +29,7 @@ export class UmbTemporaryFileRepository extends UmbRepositoryBase {
 	 * @memberof UmbTemporaryFileRepository
 	 */
 	upload(id: string, file: File) {
-		return this.#source.create('id', file);
+		return this.#source.create(id, file);
 	}
 
 	/**
