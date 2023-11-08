@@ -7,10 +7,10 @@ import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbExtensionElementController<
 	ManifestType extends ManifestWithDynamicConditions = ManifestWithDynamicConditions,
-	ControllerType extends UmbExtensionElementController<ManifestType> = any
+	ControllerType extends UmbExtensionElementController<ManifestType, any> = any
 > extends UmbBaseExtensionController<ManifestType, ControllerType> {
-	_defaultElement?: string;
-	_component?: HTMLElement;
+	#defaultElement?: string;
+	#component?: HTMLElement;
 
 	/**
 	 * The component that is created for this extension.
@@ -18,7 +18,7 @@ export class UmbExtensionElementController<
 	 * @type {(HTMLElement | undefined)}
 	 */
 	public get component() {
-		return this._component;
+		return this.#component;
 	}
 
 	/**
@@ -53,16 +53,16 @@ export class UmbExtensionElementController<
 		defaultElement?: string
 	) {
 		super(host, extensionRegistry, alias, onPermissionChanged);
-		this._defaultElement = defaultElement;
+		this.#defaultElement = defaultElement;
 		this._init();
 	}
 
 	#assignProperties = () => {
-		if (!this._component || !this.#properties) return;
+		if (!this.#component || !this.#properties) return;
 
 		// TODO: we could optimize this so we only re-set the updated props.
 		Object.keys(this.#properties).forEach((key) => {
-			(this._component as any)[key] = this.#properties![key];
+			(this.#component as any)[key] = this.#properties![key];
 		});
 	};
 
@@ -70,22 +70,22 @@ export class UmbExtensionElementController<
 		const manifest = this.manifest!; // In this case we are sure its not undefined.
 
 		if (isManifestElementableType(manifest)) {
-			const newComponent = await createExtensionElement(manifest, this._defaultElement);
+			const newComponent = await createExtensionElement(manifest, this.#defaultElement);
 			if (!this._positive) {
 				// We are not positive anymore, so we will back out of this creation.
 				return false;
 			}
-			this._component = newComponent;
+			this.#component = newComponent;
 
-		} else if (this._defaultElement) {
-			this._component = document.createElement(this._defaultElement);
+		} else if (this.#defaultElement) {
+			this.#component = document.createElement(this.#defaultElement);
 		} else {
-			this._component = undefined;
+			this.#component = undefined;
 			console.warn('Manifest did not provide any useful data for a web component to be created.')
 		}
-		if (this._component) {
+		if (this.#component) {
 			this.#assignProperties();
-			(this._component as any).manifest = manifest;
+			(this.#component as any).manifest = manifest;
 			return true; // we will confirm we have a component and are still good to go.
 		}
 
@@ -94,11 +94,11 @@ export class UmbExtensionElementController<
 
 	protected async _conditionsAreBad() {
 		// Destroy the element:
-		if (this._component) {
-			if ('destroy' in this._component) {
-				(this._component as unknown as { destroy: () => void }).destroy();
+		if (this.#component) {
+			if ('destroy' in this.#component) {
+				(this.#component as unknown as { destroy: () => void }).destroy();
 			}
-			this._component = undefined;
+			this.#component = undefined;
 		}
 	}
 }

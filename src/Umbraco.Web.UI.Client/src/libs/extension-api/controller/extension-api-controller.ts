@@ -6,12 +6,13 @@ import { UmbBaseExtensionController } from './base-extension-controller.js';
 import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbExtensionApiController<
-	ManifestType extends (ManifestWithDynamicConditions & ManifestApi<ApiType>) = (ManifestWithDynamicConditions & ManifestApi<any>),
-	ControllerType extends UmbExtensionApiController<ManifestType> = any,
-	ApiType extends ExtensionApi = ExtensionApi,
+	ManifestType extends (ManifestWithDynamicConditions & ManifestApi) = (ManifestWithDynamicConditions & ManifestApi),
+	ControllerType extends UmbExtensionApiController<ManifestType, any> = any,
+	ExtensionApiInterface extends ExtensionApi = ManifestType extends ManifestApi ? NonNullable<ManifestType['API_TYPE']> : ExtensionApi
 > extends UmbBaseExtensionController<ManifestType, ControllerType> {
 
-	_api?: ApiType;
+	#api?: ExtensionApiInterface;
+	#constructorArguments?: Array<unknown>;
 
 	/**
 	 * The api that is created for this extension.
@@ -19,33 +20,9 @@ export class UmbExtensionApiController<
 	 * @type {(class | undefined)}
 	 */
 	public get api() {
-		return this._api;
+		return this.#api;
 	}
 
-	/**
-	 * The arguments passed to the class constructor.
-	 * @type {Array<any>}
-	 * @memberof UmbApiExtensionController
-	 * @example
-	 * ```ts
-	 * const controller = new UmbApiExtensionController(host, extensionRegistry, alias, onPermissionChanged);
-	 * controller.props = { foo: 'bar' };
-	 * ```
-	 * Is equivalent to:
-	 * ```ts
-	 * controller.component.foo = 'bar';
-	 * ```
-	 */
-	#constructorArguments?: Array<unknown>;
-	get constructorArguments() {
-		return this.#constructorArguments;
-	}
-	set constructorArguments(newVal) {
-		this.#constructorArguments = newVal;
-		if(this._api) {
-			console.warn('Constructor Arguments was set after api class has been constructed')
-		}
-	}
 
 	/**
 	 * The props that are passed to the class.
@@ -77,9 +54,11 @@ export class UmbExtensionApiController<
 		host: UmbControllerHost,
 		extensionRegistry: UmbExtensionRegistry<ManifestCondition>,
 		alias: string,
+		constructorArguments: Array<unknown> | undefined,
 		onPermissionChanged: (isPermitted: boolean, controller: ControllerType) => void
 	) {
 		super(host, extensionRegistry, alias, onPermissionChanged);
+		this.#constructorArguments = constructorArguments;
 		this._init();
 	}
 
@@ -98,18 +77,18 @@ export class UmbExtensionApiController<
 		const manifest = this.manifest!; // In this case we are sure its not undefined.
 
 		if (isManifestApiType(manifest)) {
-			const newApi = await createExtensionApi<ApiType>(manifest, this.#constructorArguments);
+			const newApi = await createExtensionApi<ExtensionApiInterface>(manifest as unknown as ManifestApi<ExtensionApiInterface>, this.#constructorArguments);
 			if (!this._positive) {
 				// We are not positive anymore, so we will back out of this creation.
 				return false;
 			}
-			this._api = newApi;
+			this.#api = newApi;
 
 		} else {
-			this._api = undefined;
+			this.#api = undefined;
 			console.warn('Manifest did not provide any useful data for a api class to construct.')
 		}
-		if (this._api) {
+		if (this.#api) {
 			//this.#assignProperties();
 			return true; // we will confirm we have a component and are still good to go.
 		}
@@ -119,11 +98,11 @@ export class UmbExtensionApiController<
 
 	protected async _conditionsAreBad() {
 		// Destroy the element:
-		if (this._api) {
-			if ('destroy' in this._api) {
-				(this._api as unknown as { destroy: () => void }).destroy();
+		if (this.#api) {
+			if ('destroy' in this.#api) {
+				(this.#api as unknown as { destroy: () => void }).destroy();
 			}
-			this._api = undefined;
+			this.#api = undefined;
 		}
 	}
 }

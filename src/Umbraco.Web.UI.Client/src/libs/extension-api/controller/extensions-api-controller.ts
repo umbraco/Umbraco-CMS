@@ -42,27 +42,19 @@ export class UmbExtensionsApiController<
 	}
 	*/
 
-	#constructorArgs?: Array<unknown>;
-
-	public get constructorArguments() {
-		return this.#constructorArgs;
-	}
-	public set constructorArguments(args: Array<unknown> | undefined) {
-		this.#constructorArgs = args;
-		this._extensions.forEach((controller) => {
-			controller.constructorArguments = args;
-		});
-	}
+	#constructorArgs: Array<unknown> | undefined;
 
 	constructor(
 		host: UmbControllerHost,
 		extensionRegistry: UmbExtensionRegistry<ManifestTypes>,
 		type: ManifestTypeName | Array<ManifestTypeName>,
+		constructorArguments: Array<unknown> | undefined,
 		filter: undefined | null | ((manifest: ManifestTypeAsApi) => boolean),
 		onChange: (permittedManifests: Array<MyPermittedControllerType>, controller: MyPermittedControllerType) => void
 	) {
 		super(host, extensionRegistry, type, filter, onChange);
 		this.#extensionRegistry = extensionRegistry;
+		this.#constructorArgs = constructorArguments;
 		this._init();
 	}
 
@@ -71,10 +63,9 @@ export class UmbExtensionsApiController<
 			this,
 			this.#extensionRegistry,
 			manifest.alias,
+			this.#constructorArgs,
 			this._extensionChanged
 		) as ControllerType;
-
-		extController.constructorArguments = this.#constructorArgs;
 
 		return extController;
 	}

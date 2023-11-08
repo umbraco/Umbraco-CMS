@@ -4,13 +4,14 @@ import { UmbBaseExtensionController } from './base-extension-controller.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbExtensionManifestController<
-	ManifestType extends ManifestWithDynamicConditions = ManifestWithDynamicConditions
-> extends UmbBaseExtensionController<ManifestType> {
+	ManifestType extends ManifestWithDynamicConditions = ManifestWithDynamicConditions,
+	ControllerType extends UmbBaseExtensionController<ManifestType, any> = any
+> extends UmbBaseExtensionController<ManifestType, ControllerType> {
 	constructor(
 		host: UmbControllerHost,
 		extensionRegistry: UmbExtensionRegistry<ManifestCondition>,
 		alias: string,
-		onPermissionChanged: (isPermitted: boolean, controller: UmbBaseExtensionController<ManifestType>) => void
+		onPermissionChanged: (isPermitted: boolean, controller: ControllerType) => void
 	) {
 		super(host, extensionRegistry, alias, onPermissionChanged);
 		this._init();
