@@ -9,6 +9,8 @@ import type {
 	DocumentResponseModel,
 	TextFileResponseModelBaseModel,
 	FileItemResponseModelBaseModel,
+	MediaTypeResponseModel,
+	MediaTypeTreeItemResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 
 export const createEntityTreeItem = (item: any): EntityTreeItemResponseModel => {
@@ -66,6 +68,13 @@ export const createDocumentTypeTreeItem = (item: DocumentTypeResponseModel): Doc
 	};
 };
 
+export const createMediaTypeTreeItem = (item: MediaTypeResponseModel): MediaTypeTreeItemResponseModel => {
+	return {
+		...createEntityTreeItem(item),
+		type: 'media-type',
+	};
+};
+
 export const createFileSystemTreeItem = (item: any): FileSystemTreeItemPresentationModel => {
 	return {
 		name: item.name,
@@ -87,3 +96,29 @@ export const createFileItemResponseModelBaseModel = (item: any): FileItemRespons
 	name: item.name,
 	icon: item.icon,
 });
+
+export const arrayFilter = (filterBy: Array<string>, value?: Array<string>): boolean => {
+	// if a filter is not set, return all items
+	if (!filterBy) {
+		return true;
+	}
+
+	return filterBy.some((filterValue: string) => value?.includes(filterValue));
+}
+
+export const stringFilter = (filterBy: Array<string>, value?: string): boolean => {
+	// if a filter is not set, return all items
+	if (!filterBy || !value) {
+		return true;
+	}
+	return filterBy.includes(value);
+};
+
+export const queryFilter = (filterBy: string, value?: string) => {
+	if (!filterBy || !value) {
+		return true;
+	}
+
+	const query = filterBy.toLowerCase();
+	return value.toLowerCase().includes(query);
+};

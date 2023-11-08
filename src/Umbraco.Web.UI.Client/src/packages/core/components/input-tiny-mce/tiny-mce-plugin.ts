@@ -1,10 +1,10 @@
 import type { UmbInputTinyMceElement } from '@umbraco-cms/backoffice/components';
-import type { tinymce } from '@umbraco-cms/backoffice/external/tinymce';
+import type { Editor } from '@umbraco-cms/backoffice/external/tinymce';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
 export class UmbTinyMcePluginBase {
 	host: UmbInputTinyMceElement;
-	editor: tinymce.Editor;
+	editor: Editor;
 	configuration?: UmbPropertyEditorConfigCollection;
 
 	constructor(arg: TinyMcePluginArguments) {
@@ -16,5 +16,5 @@ export class UmbTinyMcePluginBase {
 
 export interface TinyMcePluginArguments {
 	host: UmbInputTinyMceElement;
-	editor: tinymce.Editor;
+	editor: Editor;
 }

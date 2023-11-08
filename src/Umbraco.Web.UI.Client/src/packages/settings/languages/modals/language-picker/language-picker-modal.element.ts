@@ -2,7 +2,7 @@ import { UmbLanguageRepository } from '../../repository/language.repository.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbSelectionManagerBase } from '@umbraco-cms/backoffice/utils';
+import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import {
 	UmbLanguagePickerModalValue,
 	UmbLanguagePickerModalData,
@@ -18,7 +18,7 @@ export class UmbLanguagePickerModalElement extends UmbModalBaseElement<
 	private _languages: Array<LanguageResponseModel> = [];
 
 	#languageRepository = new UmbLanguageRepository(this);
-	#selectionManager = new UmbSelectionManagerBase();
+	#selectionManager = new UmbSelectionManager();
 
 	connectedCallback(): void {
 		super.connectedCallback();

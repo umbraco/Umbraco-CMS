@@ -1,4 +1,4 @@
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, CSSResultGroup, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import {
 	UmbModalManagerContext,
@@ -6,14 +6,14 @@ import {
 	UMB_CURRENT_USER_MODAL,
 } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UMB_AUTH, type UmbLoggedInUser } from '@umbraco-cms/backoffice/auth';
+import { UMB_AUTH_CONTEXT, type UmbLoggedInUser } from '@umbraco-cms/backoffice/auth';
 
 @customElement('umb-current-user-header-app')
 export class UmbCurrentUserHeaderAppElement extends UmbLitElement {
 	@state()
 	private _currentUser?: UmbLoggedInUser;
 
-	private _auth?: typeof UMB_AUTH.TYPE;
+	private _auth?: typeof UMB_AUTH_CONTEXT.TYPE;
 	private _modalContext?: UmbModalManagerContext;
 
 	constructor() {
@@ -23,7 +23,7 @@ export class UmbCurrentUserHeaderAppElement extends UmbLitElement {
 			this._modalContext = instance;
 		});
 
-		this.consumeContext(UMB_AUTH, (instance) => {
+		this.consumeContext(UMB_AUTH_CONTEXT, (instance) => {
 			this._auth = instance;
 			this._observeCurrentUser();
 		});
@@ -34,7 +34,7 @@ export class UmbCurrentUserHeaderAppElement extends UmbLitElement {
 
 		this.observe(this._auth.currentUser, (currentUser) => {
 			this._currentUser = currentUser;
-		});
+		}, 'umbCurrentUserObserver');
 	}
 
 	private _handleUserClick() {

@@ -15,7 +15,9 @@ export class UmbUserTableNameColumnLayoutElement extends LitElement {
 	render() {
 		return html` <div style="display: flex; align-items: center;">
 			<uui-avatar name="${this.value.name}" style="margin-right: var(--uui-size-space-3);"></uui-avatar>
-			<a style="font-weight: bold;" href="section/users/view/users/user/${this.item.id}">${this.value.name}</a>
+			<a style="font-weight: bold;" href="section/user-management/view/users/user/${this.item.id}"
+				>${this.value.name}</a
+			>
 		</div>`;
 	}
 }

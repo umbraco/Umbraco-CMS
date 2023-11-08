@@ -33,7 +33,7 @@ export class UmbLogViewerWorkspaceElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<umb-workspace-editor alias="Umb.Workspace.Dictionary" headline="Log Viewer" .enforceNoFooter=${true}>
+			<umb-workspace-editor alias="Umb.Workspace.LogViewer" headline="Log Viewer" .enforceNoFooter=${true}>
 			</umb-workspace-editor>
 		`;
 	}

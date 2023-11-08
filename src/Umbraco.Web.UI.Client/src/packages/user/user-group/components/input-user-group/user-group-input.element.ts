@@ -85,8 +85,8 @@ export class UmbUserGroupInputElement extends FormControlMixin(UmbLitElement) {
 			() => !!this.max && this.#pickerContext.getSelection().length > this.max,
 		);
 
-		this.observe(this.#pickerContext.selection, (selection) => (super.value = selection.join(',')));
-		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems));
+		this.observe(this.#pickerContext.selection, (selection) => (super.value = selection.join(',')), 'umbUserGroupInputSelectionObserver');
+		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems), 'umbUserGroupInputItemsObserver');
 	}
 
 	protected getFormElement() {

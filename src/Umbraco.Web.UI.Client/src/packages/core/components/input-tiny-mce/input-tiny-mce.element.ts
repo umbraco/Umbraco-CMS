@@ -3,8 +3,13 @@ import { pastePreProcessHandler, uploadImageHandler } from './input-tiny-mce.han
 import { availableLanguages } from './input-tiny-mce.languages.js';
 import { uriAttributeSanitizer } from './input-tiny-mce.sanitizer.js';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
-import { renderEditor, type tinymce } from '@umbraco-cms/backoffice/external/tinymce';
-import { UMB_AUTH, UmbLoggedInUser } from '@umbraco-cms/backoffice/auth';
+import {
+	type Editor,
+	type EditorEvent,
+	type RawEditorOptions,
+	renderEditor,
+} from '@umbraco-cms/backoffice/external/tinymce';
+import { UMB_AUTH_CONTEXT, UmbLoggedInUser } from '@umbraco-cms/backoffice/auth';
 import { TinyMcePluginArguments, UmbTinyMcePluginBase } from '@umbraco-cms/backoffice/components';
 import { ClassConstructor, hasDefaultExport, loadExtension } from '@umbraco-cms/backoffice/extension-api';
 import { ManifestTinyMcePlugin, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -31,13 +36,13 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 	configuration?: UmbPropertyEditorConfigCollection;
 
 	@state()
-	private _tinyConfig: tinymce.RawEditorOptions = {};
+	private _tinyConfig: RawEditorOptions = {};
 
 	#mediaHelper = new UmbMediaHelper();
 	#currentUser?: UmbLoggedInUser;
-	#auth?: typeof UMB_AUTH.TYPE;
+	#auth?: typeof UMB_AUTH_CONTEXT.TYPE;
 	#plugins: Array<new (args: TinyMcePluginArguments) => UmbTinyMcePluginBase> = [];
-	#editorRef?: tinymce.Editor | null = null;
+	#editorRef?: Editor | null = null;
 	#stylesheetRepository?: UmbStylesheetRepository;
 	#serverUrl?: string;
 
@@ -256,7 +261,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 		}
 	}
 
-	#editorSetup(editor: tinymce.Editor) {
+	#editorSetup(editor: Editor) {
 		editor.suffix = '.min';
 
 		// register custom option maxImageSize
@@ -306,7 +311,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 		// To update the icon to show you can NOT drop something into the editor
 		if (this._tinyConfig.toolbar && !this.#isMediaPickerEnabled()) {
 			// Wire up the event listener
-			editor.on('dragstart dragend dragover draggesture dragdrop drop drag', (e: tinymce.EditorEvent<InputEvent>) => {
+			editor.on('dragstart dragend dragover draggesture dragdrop drop drag', (e: EditorEvent<InputEvent>) => {
 				e.preventDefault();
 				if (e.dataTransfer) {
 					e.dataTransfer.effectAllowed = 'none';
@@ -317,7 +322,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 		}
 	}
 
-	#onInit(editor: tinymce.Editor) {
+	#onInit(editor: Editor) {
 		//enable browser based spell checking
 		editor.getBody().setAttribute('spellcheck', 'true');
 		uriAttributeSanitizer(editor);

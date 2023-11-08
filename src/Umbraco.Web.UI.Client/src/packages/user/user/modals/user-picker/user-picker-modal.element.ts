@@ -1,8 +1,8 @@
-import { UmbUserRepository } from '../../repository/user.repository.js';
+import { UmbUserCollectionRepository } from '../../collection/repository/user-collection.repository.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state, ifDefined, PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { UmbUserPickerModalData, UmbUserPickerModalValue, UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import { UmbSelectionManagerBase } from '@umbraco-cms/backoffice/utils';
+import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import { UserItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-user-picker-modal')
@@ -10,8 +10,8 @@ export class UmbUserPickerModalElement extends UmbModalBaseElement<UmbUserPicker
 	@state()
 	private _users: Array<UserItemResponseModel> = [];
 
-	#selectionManager = new UmbSelectionManagerBase();
-	#userRepository = new UmbUserRepository(this);
+	#selectionManager = new UmbSelectionManager();
+	#userCollectionRepository = new UmbUserCollectionRepository(this);
 
 	connectedCallback(): void {
 		super.connectedCallback();
@@ -27,8 +27,8 @@ export class UmbUserPickerModalElement extends UmbModalBaseElement<UmbUserPicker
 	}
 
 	async #requestUsers() {
-		if (!this.#userRepository) return;
-		const { data } = await this.#userRepository.requestCollection();
+		if (!this.#userCollectionRepository) return;
+		const { data } = await this.#userCollectionRepository.requestCollection();
 
 		if (data) {
 			this._users = data.items;

@@ -3,11 +3,12 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { ContentResponseModelBaseDocumentValueModelDocumentVariantResponseModel } from './ContentResponseModelBaseDocumentValueModelDocumentVariantResponseModel';
+import type { ContentForDocumentResponseModel } from './ContentForDocumentResponseModel';
 import type { ContentUrlInfoModel } from './ContentUrlInfoModel';
 
-export type DocumentResponseModel = (ContentResponseModelBaseDocumentValueModelDocumentVariantResponseModel & {
+export type DocumentResponseModel = (ContentForDocumentResponseModel & {
     urls?: Array<ContentUrlInfoModel>;
     templateId?: string | null;
+    isTrashed?: boolean;
 });
 

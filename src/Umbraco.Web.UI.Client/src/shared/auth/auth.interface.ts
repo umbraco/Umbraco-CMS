@@ -52,4 +52,9 @@ export interface IUmbAuth {
 	 * Signs the user out by removing any tokens from the browser.
 	 */
 	signOut(): Promise<void>;
+
+	/**
+	 * Check if the given user is the current user.
+	 */
+	isUserCurrentUser(userId: string): Promise<boolean>;
 }

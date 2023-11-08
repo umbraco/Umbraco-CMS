@@ -1,4 +1,4 @@
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, nothing, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
@@ -10,7 +10,7 @@ export class UmbDropdownElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<uui-popover id="container" .open=${this.open}>
+			<uui-popover id="container" .open=${this.open} @close=${() => (this.open = false)}>
 				<slot name="trigger" slot="trigger"></slot>
 				${this.open ? this.#renderDropdown() : nothing}
 			</uui-popover>

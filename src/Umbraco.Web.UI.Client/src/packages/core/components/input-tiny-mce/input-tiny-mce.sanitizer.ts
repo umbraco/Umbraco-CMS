@@ -1,10 +1,10 @@
-import { tinymce } from '@umbraco-cms/backoffice/external/tinymce';
+import type { AstNode, Editor } from '@umbraco-cms/backoffice/external/tinymce';
 
 /** Setup sanitization for preventing injecting arbitrary JavaScript execution in attributes:
  * https://github.com/advisories/GHSA-w7jx-j77m-wp65
  * https://github.com/advisories/GHSA-5vm8-hhgr-jcjp
  */
-export const uriAttributeSanitizer = (editor: tinymce.Editor) => {
+export const uriAttributeSanitizer = (editor: Editor) => {
 	const uriAttributesToSanitize = ['src', 'href', 'data', 'background', 'action', 'formaction', 'poster', 'xlink:href'];
 
 	const parseUri = (function () {
@@ -46,8 +46,8 @@ export const uriAttributeSanitizer = (editor: tinymce.Editor) => {
 
 	if (window.Umbraco?.Sys.ServerVariables.umbracoSettings.sanitizeTinyMce) {
 		uriAttributesToSanitize.forEach((attribute) => {
-			editor.serializer.addAttributeFilter(attribute, (nodes: tinymce.AstNode[]) => {
-				nodes.forEach((node: tinymce.AstNode) => {
+			editor.serializer.addAttributeFilter(attribute, (nodes: AstNode[]) => {
+				nodes.forEach((node: AstNode) => {
 					node.attributes?.forEach((attr) => {
 						if (uriAttributesToSanitize.includes(attr.name.toLowerCase())) {
 							attr.value = parseUri(attr.value, node.name) ?? '';
