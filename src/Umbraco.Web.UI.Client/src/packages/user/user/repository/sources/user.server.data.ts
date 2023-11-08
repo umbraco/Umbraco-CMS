@@ -66,12 +66,6 @@ export class UmbUserServerDataSource implements UmbUserDetailDataSource {
 		return tryExecuteAndNotify(this.#host, UserResource.deleteUserById({ id }));
 	}
 
-	// Invite
-	invite(data: InviteUserRequestModel) {
-		if (!data) throw new Error('Invite data is missing');
-		return tryExecuteAndNotify(this.#host, UserResource.postUserInvite({ requestBody: data }));
-	}
-
 	uploadAvatar(id: string, file: File): Promise<UmbDataSourceErrorResponse> {
 		throw new Error('Method not implemented.');
 	}
