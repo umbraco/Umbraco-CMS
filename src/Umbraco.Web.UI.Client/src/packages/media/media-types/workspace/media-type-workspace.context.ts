@@ -50,7 +50,8 @@ export class UmbMediaTypeWorkspaceContext
 	}
 
 	async create() {
-		const { data } = await this.repository.createScaffold();
+		this.#getDataPromise = this.repository.createScaffold();
+		const { data } = await this.#getDataPromise;
 		if (!data) return;
 
 		this.setIsNew(true);
