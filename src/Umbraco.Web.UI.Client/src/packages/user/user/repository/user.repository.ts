@@ -36,12 +36,23 @@ export class UmbUserRepository extends UmbUserRepositoryBase implements UmbUserD
 		this.#setUserGroupsSource = new UmbUserSetGroupsServerDataSource(host);
 	}
 
-	// DETAILS
+	/**
+	 * Creates a new user scaffold
+	 * @param {(string | null)} parentId
+	 * @return {*}
+	 * @memberof UmbUserRepository
+	 */
 	createScaffold(parentId: string | null) {
 		if (parentId === undefined) throw new Error('Parent id is missing');
 		return this.#detailSource.createScaffold(parentId);
 	}
 
+	/**
+	 * Requests the user with the given id
+	 * @param {string} id
+	 * @return {*}
+	 * @memberof UmbUserRepository
+	 */
 	async requestById(id: string) {
 		if (!id) throw new Error('Id is missing');
 		await this.init;
@@ -68,12 +79,24 @@ export class UmbUserRepository extends UmbUserRepositoryBase implements UmbUserD
 		return { error };
 	}
 
+	/**
+	 * Returns an observable for the user with the given id
+	 * @param {string} id
+	 * @return {Promise<Observable<UserDetailModel>>}
+	 * @memberof UmbUserRepository
+	 */
 	async byId(id: string) {
 		if (!id) throw new Error('Key is missing');
 		await this.init;
 		return this.detailStore!.byId(id);
 	}
 
+	/**
+	 * Creates a new user
+	 * @param {CreateUserRequestModel} userRequestData
+	 * @return { Promise<UmbDataSourceSuccessResponse, UmbDataSourceErrorResponse>}
+	 * @memberof UmbUserRepository
+	 */
 	async create(userRequestData: CreateUserRequestModel) {
 		if (!userRequestData) throw new Error('Data is missing');
 
@@ -89,6 +112,13 @@ export class UmbUserRepository extends UmbUserRepositoryBase implements UmbUserD
 		return { data, error };
 	}
 
+	/**
+	 * Saves the user with the given id
+	 * @param {string} id
+	 * @param {UpdateUserRequestModel} user
+	 * @return {Promise<UmbDataSourceSuccessResponse, UmbDataSourceErrorResponse>}
+	 * @memberof UmbUserRepository
+	 */
 	async save(id: string, user: UpdateUserRequestModel) {
 		if (!id) throw new Error('User id is missing');
 		if (!user) throw new Error('User update data is missing');
@@ -112,6 +142,12 @@ export class UmbUserRepository extends UmbUserRepositoryBase implements UmbUserD
 		return { data, error };
 	}
 
+	/**
+	 * Deletes the user with the given id
+	 * @param {string} id
+	 * @return {Promise<UmbDataSourceErrorResponse>}
+	 * @memberof UmbUserRepository
+	 */
 	async delete(id: string) {
 		if (!id) throw new Error('Id is missing');
 
@@ -131,7 +167,7 @@ export class UmbUserRepository extends UmbUserRepositoryBase implements UmbUserD
 	 * Uploads an avatar for the user with the given id
 	 * @param {string} id
 	 * @param {File} file
-	 * @return {*}
+	 * @return {Promise<UmbDataSourceErrorResponse>}
 	 * @memberof UmbUserRepository
 	 */
 	async uploadAvatar(id: string, file: File) {
@@ -151,6 +187,7 @@ export class UmbUserRepository extends UmbUserRepositoryBase implements UmbUserD
 	/**
 	 * Removes the avatar for the user with the given id
 	 * @param {string} id
+	 * @return {Promise<UmbDataSourceErrorResponse>}
 	 * @memberof UmbUserRepository
 	 */
 	async deleteAvatar(id: string) {
