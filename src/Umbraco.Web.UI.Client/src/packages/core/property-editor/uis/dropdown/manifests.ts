@@ -8,7 +8,7 @@ export const manifest: ManifestPropertyEditorUi = {
 	meta: {
 		label: 'Dropdown',
 		propertyEditorSchemaAlias: 'Umbraco.Dropdown',
-		icon: 'umb:time',
+		icon: 'icon-time',
 		group: 'pickers',
 		settings: {
 			properties: [

@@ -11,7 +11,7 @@ const entityActions: Array<ManifestEntityAction> = [
 		weight: 1000,
 		api: UmbCreateDocumentEntityAction,
 		meta: {
-			icon: 'umb:add',
+			icon: 'icon-add',
 			label: 'Create',
 			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
 			entityTypes: [DOCUMENT_ROOT_ENTITY_TYPE, DOCUMENT_ENTITY_TYPE],

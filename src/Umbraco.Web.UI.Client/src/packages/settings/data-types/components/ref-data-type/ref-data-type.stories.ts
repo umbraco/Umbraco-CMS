@@ -46,7 +46,7 @@ export const WithSlots: Story = {
 			<div slot="actions">
 				<uui-action-bar>
 					<uui-button label="delete" look="primary" color="danger" compact>
-						<uui-icon name="umb:delete"></uui-icon>
+						<uui-icon name="icon-delete"></uui-icon>
 					</uui-button>
 				</uui-action-bar>
 			</div>

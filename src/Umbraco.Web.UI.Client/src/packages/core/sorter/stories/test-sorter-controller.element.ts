@@ -64,7 +64,7 @@ export default class UmbTestSorterControllerElement extends UmbLitElement {
 				${model.map(
 					(entry) =>
 						html`<li class="item" data-sort-entry-id="${entry.id}">
-							<span><uui-icon name="umb:wand"></uui-icon>${entry.value}</span>
+							<span><uui-icon name="icon-wand"></uui-icon>${entry.value}</span>
 						</li>`,
 				)}
 			</ul>

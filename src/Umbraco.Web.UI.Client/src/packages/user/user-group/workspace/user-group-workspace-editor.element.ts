@@ -86,7 +86,7 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 		return html`
 			<div id="header" slot="header">
 				<a href="/section/users/view/user-groups">
-					<uui-icon name="umb:arrow-left"></uui-icon>
+					<uui-icon name="icon-arrow-left"></uui-icon>
 				</a>
 				<uui-input
 					id="name"

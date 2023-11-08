@@ -8,7 +8,7 @@ export const manifest: ManifestPropertyEditorUi = {
 	meta: {
 		label: 'Icon Picker',
 		propertyEditorSchemaAlias: 'Umbraco.IconPicker',
-		icon: 'umb:autofill',
+		icon: 'icon-autofill',
 		group: 'common',
 	},
 };

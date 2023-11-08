@@ -70,7 +70,7 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 														this.#setCountFilter(level);
 													}}>
 													<uui-icon
-														name="umb:record"
+														name="icon-record"
 														style="color: var(--umb-log-viewer-${level.toLowerCase()}-color);"></uui-icon
 													>${level}
 												</button>

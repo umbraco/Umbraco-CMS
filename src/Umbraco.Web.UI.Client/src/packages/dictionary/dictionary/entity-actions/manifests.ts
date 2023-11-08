@@ -17,7 +17,7 @@ const entityActions: Array<ManifestEntityAction> = [
 		weight: 600,
 		api: UmbCreateDictionaryEntityAction,
 		meta: {
-			icon: 'umb:add',
+			icon: 'icon-add',
 			label: 'Create',
 			repositoryAlias,
 			entityTypes: [entityType],
@@ -30,7 +30,7 @@ const entityActions: Array<ManifestEntityAction> = [
 		weight: 500,
 		api: UmbMoveEntityAction,
 		meta: {
-			icon: 'umb:enter',
+			icon: 'icon-enter',
 			label: 'Move',
 			repositoryAlias,
 			entityTypes: [entityType],
@@ -43,7 +43,7 @@ const entityActions: Array<ManifestEntityAction> = [
 		weight: 400,
 		api: UmbExportDictionaryEntityAction,
 		meta: {
-			icon: 'umb:download-alt',
+			icon: 'icon-download-alt',
 			label: 'Export',
 			repositoryAlias,
 			entityTypes: [entityType],
@@ -56,7 +56,7 @@ const entityActions: Array<ManifestEntityAction> = [
 		weight: 300,
 		api: UmbImportDictionaryEntityAction,
 		meta: {
-			icon: 'umb:page-up',
+			icon: 'icon-page-up',
 			label: 'Import',
 			repositoryAlias,
 			entityTypes: [entityType],
@@ -69,7 +69,7 @@ const entityActions: Array<ManifestEntityAction> = [
 		weight: 200,
 		api: UmbReloadDictionaryEntityAction,
 		meta: {
-			icon: 'umb:refresh',
+			icon: 'icon-refresh',
 			label: 'Reload',
 			repositoryAlias,
 			entityTypes: [entityType],
@@ -82,7 +82,7 @@ const entityActions: Array<ManifestEntityAction> = [
 		weight: 100,
 		api: UmbDeleteEntityAction,
 		meta: {
-			icon: 'umb:trash',
+			icon: 'icon-trash',
 			label: 'Delete',
 			repositoryAlias,
 			entityTypes: [entityType],

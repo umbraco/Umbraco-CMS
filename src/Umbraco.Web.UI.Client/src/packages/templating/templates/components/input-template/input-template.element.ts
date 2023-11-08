@@ -161,7 +161,7 @@ export class UmbInputTemplateElement extends FormControlMixin(UmbLitElement) {
 							label="Remove document ${template.name}"
 							@click="${() => this.#removeTemplate(template.id ?? '')}"
 							compact>
-							<uui-icon name="umb:trash"></uui-icon>
+							<uui-icon name="icon-trash"></uui-icon>
 						</uui-button>
 					</umb-template-card>
 				`

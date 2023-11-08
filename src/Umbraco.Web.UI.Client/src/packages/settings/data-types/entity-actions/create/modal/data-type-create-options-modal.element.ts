@@ -53,10 +53,10 @@ export class UmbDataTypeCreateOptionsModalElement extends UmbLitElement {
 						href=${`section/settings/workspace/data-type/create/${this.data?.parentKey || null}`}
 						label="New Data Type..."
 						@click=${this.#onNavigate}>
-						<uui-icon slot="icon" name="umb:autofill"></uui-icon>}
+						<uui-icon slot="icon" name="icon-autofill"></uui-icon>}
 					</uui-menu-item>
 					<uui-menu-item @click=${this.#onClick} label="New Folder...">
-						<uui-icon slot="icon" name="umb:folder"></uui-icon>}
+						<uui-icon slot="icon" name="icon-folder"></uui-icon>}
 					</uui-menu-item>
 				</uui-box>
 				<uui-button slot="actions" id="cancel" label="Cancel" @click="${this.#onCancel}">Cancel</uui-button>

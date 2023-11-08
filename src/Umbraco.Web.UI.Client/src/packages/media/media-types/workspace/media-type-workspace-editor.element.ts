@@ -131,7 +131,7 @@ export class UmbMediaTypeWorkspaceEditorElement extends UmbLitElement {
 						?disabled=${this._aliasLocked}>
 						<!-- TODO: validation for bad characters -->
 						<div @click=${this.#onToggleAliasLock} @keydown=${() => ''} id="alias-lock" slot="prepend">
-							<uui-icon name=${this._aliasLocked ? 'umb:lock' : 'umb:unlocked'}></uui-icon>
+							<uui-icon name=${this._aliasLocked ? 'icon-lock' : 'icon-unlocked'}></uui-icon>
 						</div>
 					</uui-input>
 				</uui-input>

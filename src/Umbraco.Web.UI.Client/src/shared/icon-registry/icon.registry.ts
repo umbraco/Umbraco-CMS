@@ -10,7 +10,7 @@ interface UmbIconDescriptor {
  * @export
  * @class UmbIconRegistry
  * @extends {UUIIconRegistry}
- * @description - Icon Registry. Provides icons from the icon manifest. Icons are loaded on demand. All icons are prefixed with 'umb:'
+ * @description - Icon Registry. Provides icons from the icon manifest. Icons are loaded on demand. All icons are prefixed with 'icon-'
  */
 export class UmbIconRegistry extends UUIIconRegistry {
 	/**

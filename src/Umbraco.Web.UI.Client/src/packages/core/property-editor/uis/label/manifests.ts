@@ -7,7 +7,7 @@ export const manifest: ManifestPropertyEditorUi = {
 	loader: () => import('./property-editor-ui-label.element.js'),
 	meta: {
 		label: 'Label',
-		icon: 'umb:readonly',
+		icon: 'icon-readonly',
 		group: 'pickers',
 		propertyEditorSchemaAlias: 'Umbraco.Label',
 	},

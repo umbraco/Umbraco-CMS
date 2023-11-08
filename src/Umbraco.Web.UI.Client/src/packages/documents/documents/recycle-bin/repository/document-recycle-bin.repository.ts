@@ -36,7 +36,7 @@ export class UmbDocumentRecycleBinRepository implements UmbTreeRepository<Docume
 			id: null,
 			type: 'document-recycle-bin-root',
 			name: 'Recycle Bin',
-			icon: 'umb:trash',
+			icon: 'icon-trash',
 			hasChildren: true,
 		};
 

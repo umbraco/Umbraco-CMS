@@ -27,7 +27,7 @@ const workspaceEditorViews: Array<ManifestWorkspaceEditorView> = [
 		meta: {
 			label: 'Media',
 			pathname: 'media',
-			icon: 'umb:picture',
+			icon: 'icon-picture',
 		},
 		conditions: [
 			{
@@ -65,7 +65,7 @@ const workspaceViewCollections: Array<ManifestWorkspaceViewCollection> = [
 		meta: {
 			label: 'Media',
 			pathname: 'collection',
-			icon: 'umb:grid',
+			icon: 'icon-grid',
 			entityType: 'media',
 			repositoryAlias: MEDIA_REPOSITORY_ALIAS,
 		},

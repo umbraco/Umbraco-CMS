@@ -46,20 +46,20 @@ export const data: Array<UserGroupResponseModel> = [
 	{
 		id: 'c630d49e-4e7b-42ea-b2bc-edc0edacb6b1',
 		name: 'Administrators',
-		icon: 'umb:medal',
+		icon: 'icon-medal',
 		documentStartNodeId: 'all-property-editors-document-id',
 		permissions: [UMB_USER_PERMISSION_DOCUMENT_CREATE, UMB_USER_PERMISSION_DOCUMENT_DELETE],
 	},
 	{
 		id: '9d24dc47-a4bf-427f-8a4a-b900f03b8a12',
 		name: 'User Group 1',
-		icon: 'umb:bell',
+		icon: 'icon-bell',
 		permissions: [UMB_USER_PERMISSION_DOCUMENT_DELETE],
 	},
 	{
 		id: 'f4626511-b0d7-4ab1-aebc-a87871a5dcfa',
 		name: 'User Group 2',
-		icon: 'umb:ball',
+		icon: 'icon-ball',
 		permissions: [UMB_USER_PERMISSION_DOCUMENT_READ],
 	},
 ];

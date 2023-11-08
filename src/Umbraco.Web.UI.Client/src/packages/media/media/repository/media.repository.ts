@@ -70,7 +70,7 @@ export class UmbMediaRepository
 			id: null,
 			type: 'media-root',
 			name: 'Media',
-			icon: 'umb:folder',
+			icon: 'icon-folder',
 			hasChildren: true,
 		};
 

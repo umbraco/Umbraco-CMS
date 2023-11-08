@@ -78,7 +78,7 @@ export class UmbMediaTypeRepository
 			id: null,
 			type: 'media-type-root',
 			name: 'Media Types',
-			icon: 'umb:folder',
+			icon: 'icon-folder',
 			hasChildren: true,
 		};
 

@@ -8,7 +8,7 @@ const tableCollectionView: ManifestCollectionView = {
 	loader: () => import('./table/user-table-collection-view.element.js'),
 	meta: {
 		label: 'Table',
-		icon: 'umb:box',
+		icon: 'icon-box',
 		pathName: 'table',
 	},
 	conditions: {
@@ -24,7 +24,7 @@ const gridCollectionView: ManifestCollectionView = {
 	weight: 200,
 	meta: {
 		label: 'Grid',
-		icon: 'umb:grid',
+		icon: 'icon-grid',
 		pathName: 'grid',
 	},
 	conditions: {
