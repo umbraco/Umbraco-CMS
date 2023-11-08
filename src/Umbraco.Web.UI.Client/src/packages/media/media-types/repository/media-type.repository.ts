@@ -141,18 +141,19 @@ export class UmbMediaTypeRepository implements UmbTreeRepository<EntityTreeItemR
 		return this.#detailSource.delete(id);
 	}
 
-	async save(id: string, updatedMediaType: UpdateMediaTypeRequestModel) {
+	async save(id: string, item: UpdateMediaTypeRequestModel) {
 		if (!id) throw new Error('Data Type id is missing');
-		if (!updatedMediaType) throw new Error('Media Type is missing');
+		if (!item) throw new Error('Media Type is missing');
 		await this.#init;
 
-		const { error } = await this.#detailSource.update(id, updatedMediaType);
+		const { error } = await this.#detailSource.update(id, item);
 
 		if (!error) {
-			const notification = { data: { message: `Media type '${updatedMediaType.name}' saved` } };
-			this.#notificationContext?.peek('positive', notification);
+			this.#detailStore?.append(item);
+			this.#treeStore?.updateItem(id, item);
 
-			//TODO: Update stores
+			const notification = { data: { message: `Media type '${item.name}' saved` } };
+			this.#notificationContext?.peek('positive', notification);
 		}
 
 		return { error };

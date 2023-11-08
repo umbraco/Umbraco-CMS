@@ -1,5 +1,4 @@
 import { UmbMediaTypeRepository } from '../repository/media-type.repository.js';
-import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbSaveableWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
@@ -59,12 +58,16 @@ export class UmbMediaTypeWorkspaceContext
 	}
 
 	async save() {
-		const id = await firstValueFrom(this.id);
+		if (!this.#data.value) return;
+		if (!this.#data.value.id) return;
 
-		if (!this.#data.value || !id) return;
+		if (this.getIsNew()) {
+			await this.repository.create(this.#data.value);
+		} else {
+			await this.repository.save(this.#data.value.id, this.#data.value);
+		}
 
-		await this.repository.save(id, this.#data.value);
-		this.setIsNew(false);
+		this.saveComplete(this.#data.value);
 	}
 
 	public destroy(): void {
