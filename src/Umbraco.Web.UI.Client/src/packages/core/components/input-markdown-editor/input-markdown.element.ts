@@ -1,4 +1,4 @@
-import { sanitizeHtml } from '@umbraco-cms/backoffice/external/sanitize-html';
+import { DOMPurify } from '@umbraco-cms/backoffice/external/dompurify';
 import { marked } from '@umbraco-cms/backoffice/external/marked';
 import { monaco } from '@umbraco-cms/backoffice/external/monaco-editor';
 import { UmbCodeEditorController, UmbCodeEditorElement, loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
@@ -548,7 +548,7 @@ export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 
 	renderPreview(markdown: string) {
 		const markdownAsHtml = marked.parse(markdown);
-		const sanitizedHtml = markdownAsHtml ? sanitizeHtml(markdownAsHtml) : '';
+		const sanitizedHtml = markdownAsHtml ? DOMPurify.sanitize(markdownAsHtml) : '';
 		return html`<uui-scroll-container id="preview"> ${unsafeHTML(sanitizedHtml)} </uui-scroll-container>`;
 	}
 
