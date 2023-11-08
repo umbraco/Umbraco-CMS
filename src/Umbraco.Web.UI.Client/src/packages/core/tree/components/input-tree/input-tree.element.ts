@@ -14,8 +14,10 @@ export class UmbInputTreeElement extends FormControlMixin(UmbLitElement) {
 	private _type: StartNode['type'] = undefined;
 	@property()
 	public set type(newType: StartNode['type']) {
+		const oldType = this._type;
 		if (newType?.toLowerCase() !== this._type) {
 			this._type = newType?.toLowerCase() as StartNode['type'];
+			this.requestUpdate('type', oldType);
 		}
 	}
 	public get type(): StartNode['type'] {
@@ -71,7 +73,7 @@ export class UmbInputTreeElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	render() {
-		switch (this.type) {
+		switch (this._type) {
 			case 'content':
 				return html`<umb-input-document
 					.selectedIds=${this.selectedIds}
