@@ -3,7 +3,8 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
-import { StartNode, UmbInputTreeElement } from '@umbraco-cms/backoffice/components';
+import { StartNode } from '@umbraco-cms/backoffice/content-type';
+import { UmbInputTreeElement } from '@umbraco-cms/backoffice/tree';
 
 /**
  * @element umb-property-editor-ui-tree-picker
@@ -57,16 +58,16 @@ export class UmbPropertyEditorUITreePickerElement extends UmbLitElement implemen
 	}
 
 	render() {
-		return html`${this.value}<umb-input-tree
-				.value=${this.value}
-				.type=${this.type}
-				.startNodeId=${this.startNodeId ?? ''}
-				.min=${this.min}
-				.max=${this.max}
-				.filter=${this.filter ?? ''}
-				?showOpenButton=${this.showOpenButton}
-				?ignoreUserStartNodes=${this.ignoreUserStartNodes}
-				@change=${this.#onChange}></umb-input-tree>`;
+		return html`<umb-input-tree
+			.value=${this.value}
+			.type=${this.type}
+			.startNodeId=${this.startNodeId ?? ''}
+			.min=${this.min}
+			.max=${this.max}
+			.filter=${this.filter ?? ''}
+			?showOpenButton=${this.showOpenButton}
+			?ignoreUserStartNodes=${this.ignoreUserStartNodes}
+			@change=${this.#onChange}></umb-input-tree>`;
 	}
 	static styles = [UmbTextStyles];
 }

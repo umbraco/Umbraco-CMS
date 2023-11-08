@@ -3,12 +3,7 @@ import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbInputDocumentElement } from '@umbraco-cms/backoffice/document';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-
-type NodeType = 'content' | 'member' | 'media';
-export type StartNode = {
-	type?: NodeType;
-	id?: string | null;
-};
+import { StartNode } from '@umbraco-cms/backoffice/content-type';
 
 @customElement('umb-input-tree')
 export class UmbInputTreeElement extends FormControlMixin(UmbLitElement) {
@@ -108,7 +103,7 @@ export class UmbInputTreeElement extends FormControlMixin(UmbLitElement) {
 					@change=${this.#onChange}>
 				</umb-input-member>`;
 			default:
-				return html`Node type could not be found`;
+				return html`Type could not be found`;
 		}
 	}
 

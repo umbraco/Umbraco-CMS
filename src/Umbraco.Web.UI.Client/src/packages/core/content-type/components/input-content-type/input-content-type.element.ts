@@ -3,11 +3,17 @@ import { html, customElement, property, css } from '@umbraco-cms/backoffice/exte
 import { FormControlMixin, UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbInputMediaElement } from '@umbraco-cms/backoffice/media';
-import { StartNode } from '@umbraco-cms/backoffice/components';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
-@customElement('umb-input-start-node')
-export class UmbInputStartNodeElement extends FormControlMixin(UmbLitElement) {
+export type ContentType = 'content' | 'member' | 'media';
+
+export type StartNode = {
+	type?: ContentType;
+	id?: string | null;
+};
+
+@customElement('umb-input-content-type')
+export class UmbInputContentTypeElement extends FormControlMixin(UmbLitElement) {
 	protected getFormElement() {
 		return undefined;
 	}
@@ -86,10 +92,10 @@ export class UmbInputStartNodeElement extends FormControlMixin(UmbLitElement) {
 	];
 }
 
-export default UmbInputStartNodeElement;
+export default UmbInputContentTypeElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-input-start-node': UmbInputStartNodeElement;
+		'umb-input-content-type': UmbInputContentTypeElement;
 	}
 }
