@@ -13,7 +13,7 @@ import {
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
 
-export interface UmbUserDetailRepository
+export interface IUmbUserDetailRepository
 	extends UmbDetailRepository<
 		CreateUserRequestModel,
 		CreateUserResponseModel,
@@ -24,7 +24,7 @@ export interface UmbUserDetailRepository
 	deleteAvatar(id: string): Promise<UmbDataSourceErrorResponse>;
 }
 
-export class UmbUserRepository extends UmbUserRepositoryBase implements UmbUserDetailRepository {
+export class UmbUserRepository extends UmbUserRepositoryBase implements IUmbUserDetailRepository {
 	#detailSource: UmbUserDetailDataSource;
 	#setUserGroupsSource: UmbUserSetGroupDataSource;
 	#notificationContext?: UmbNotificationContext;
