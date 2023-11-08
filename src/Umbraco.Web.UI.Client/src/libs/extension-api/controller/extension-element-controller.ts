@@ -81,7 +81,7 @@ export class UmbExtensionElementController<
 			this._component = document.createElement(this._defaultElement);
 		} else {
 			this._component = undefined;
-			// TODO: Lets make an console.error in this case? we could not initialize any component based on this manifest.
+			console.warn('Manifest did not provide any useful data for a web component to be created.')
 		}
 		if (this._component) {
 			this.#assignProperties();

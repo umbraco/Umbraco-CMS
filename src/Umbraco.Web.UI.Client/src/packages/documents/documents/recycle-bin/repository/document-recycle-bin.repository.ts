@@ -4,26 +4,24 @@ import {
 	UmbDocumentRecycleBinTreeStore,
 } from './document-recycle.bin.tree.store.js';
 import type { UmbTreeDataSource, UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbBaseController, type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { DocumentTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
-export class UmbDocumentRecycleBinRepository implements UmbTreeRepository<DocumentTreeItemResponseModel> {
+export class UmbDocumentRecycleBinRepository extends UmbBaseController implements UmbTreeRepository<DocumentTreeItemResponseModel> {
 	#init!: Promise<unknown>;
-
-	#host: UmbControllerHostElement;
 
 	#treeSource: UmbTreeDataSource;
 	#treeStore?: UmbDocumentRecycleBinTreeStore;
 
-	constructor(host: UmbControllerHostElement) {
-		this.#host = host;
+	constructor(host: UmbControllerHost) {
+		super(host);
 
 		// TODO: figure out how spin up get the correct data source
-		this.#treeSource = new UmbDocumentRecycleBinTreeServerDataSource(this.#host);
+		this.#treeSource = new UmbDocumentRecycleBinTreeServerDataSource(this);
 
 		this.#init = Promise.all([
-			new UmbContextConsumerController(this.#host, UMB_DOCUMENT_RECYCLE_BIN_TREE_STORE_CONTEXT, (instance) => {
+			new UmbContextConsumerController(this._host, UMB_DOCUMENT_RECYCLE_BIN_TREE_STORE_CONTEXT, (instance) => {
 				this.#treeStore = instance;
 			}),
 		]);

@@ -2,8 +2,9 @@ import { UmbCultureServerDataSource } from './sources/culture.server.data.js';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
+import { type ExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 
-export class UmbCultureRepository {
+export class UmbCultureRepository implements ExtensionApi {
 	#init!: Promise<unknown>;
 	#host: UmbControllerHostElement;
 
@@ -25,5 +26,9 @@ export class UmbCultureRepository {
 
 	requestCultures({ skip, take } = { skip: 0, take: 1000 }) {
 		return this.#dataSource.getCollection({ skip, take });
+	}
+
+	destroy() {
+
 	}
 }

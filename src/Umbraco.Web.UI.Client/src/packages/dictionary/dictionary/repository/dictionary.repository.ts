@@ -2,8 +2,7 @@ import { UmbDictionaryStore, UMB_DICTIONARY_STORE_CONTEXT_TOKEN } from './dictio
 import { UmbDictionaryDetailServerDataSource } from './sources/dictionary.detail.server.data.js';
 import { UmbDictionaryTreeStore, UMB_DICTIONARY_TREE_STORE_CONTEXT_TOKEN } from './dictionary.tree.store.js';
 import { UmbDictionaryTreeServerDataSource } from './sources/dictionary.tree.server.data.js';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
+import { UmbBaseController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbTreeDataSource, UmbDetailRepository, UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
 import {
 	CreateDictionaryItemRequestModel,
@@ -13,8 +12,9 @@ import {
 	UpdateDictionaryItemRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
+import type { ExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 
-export class UmbDictionaryRepository
+export class UmbDictionaryRepository extends UmbBaseController
 	implements
 		UmbTreeRepository<EntityTreeItemResponseModel>,
 		UmbDetailRepository<
@@ -22,11 +22,10 @@ export class UmbDictionaryRepository
 			any,
 			UpdateDictionaryItemRequestModel,
 			DictionaryOverviewResponseModel
-		>
+		>,
+		ExtensionApi
 {
 	#init!: Promise<unknown>;
-
-	#host: UmbControllerHostElement;
 
 	#treeSource: UmbTreeDataSource;
 	#treeStore?: UmbDictionaryTreeStore;
@@ -37,22 +36,22 @@ export class UmbDictionaryRepository
 	#notificationContext?: UmbNotificationContext;
 
 	constructor(host: UmbControllerHostElement) {
-		this.#host = host;
+		super(host);
 
 		// TODO: figure out how spin up get the correct data source
-		this.#treeSource = new UmbDictionaryTreeServerDataSource(this.#host);
-		this.#detailSource = new UmbDictionaryDetailServerDataSource(this.#host);
+		this.#treeSource = new UmbDictionaryTreeServerDataSource(this);
+		this.#detailSource = new UmbDictionaryDetailServerDataSource(this);
 
 		this.#init = Promise.all([
-			new UmbContextConsumerController(this.#host, UMB_DICTIONARY_STORE_CONTEXT_TOKEN, (instance) => {
+			this.consumeContext(UMB_DICTIONARY_STORE_CONTEXT_TOKEN, (instance) => {
 				this.#detailStore = instance;
 			}),
 
-			new UmbContextConsumerController(this.#host, UMB_DICTIONARY_TREE_STORE_CONTEXT_TOKEN, (instance) => {
+			this.consumeContext(UMB_DICTIONARY_TREE_STORE_CONTEXT_TOKEN, (instance) => {
 				this.#treeStore = instance;
 			}),
 
-			new UmbContextConsumerController(this.#host, UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
+			this.consumeContext(UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
 				this.#notificationContext = instance;
 			}),
 		]);

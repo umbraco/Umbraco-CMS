@@ -6,7 +6,7 @@ export interface UmbEntityBulkAction<RepositoryType = unknown> extends UmbAction
 	setSelection(selection: Array<string>): void;
 }
 
-export class UmbEntityBulkActionBase<RepositoryType = unknown> extends UmbActionBase<RepositoryType> {
+export abstract class UmbEntityBulkActionBase<RepositoryType = unknown> extends UmbActionBase<RepositoryType> implements UmbEntityBulkAction<RepositoryType> {
 	selection: Array<string>;
 
 	constructor(host: UmbControllerHostElement, repositoryAlias: string, selection: Array<string>) {
@@ -17,4 +17,6 @@ export class UmbEntityBulkActionBase<RepositoryType = unknown> extends UmbAction
 	setSelection(selection: Array<string>) {
 		this.selection = selection;
 	}
+
+	abstract execute(): Promise<void>;
 }

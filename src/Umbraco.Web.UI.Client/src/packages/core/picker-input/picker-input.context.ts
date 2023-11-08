@@ -1,6 +1,6 @@
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbItemRepository, UmbRepositoryItemsManager } from '@umbraco-cms/backoffice/repository';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbBaseController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import {
 	UMB_CONFIRM_MODAL,
 	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
@@ -11,8 +11,7 @@ import {
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { ItemResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 
-export class UmbPickerInputContext<ItemType extends ItemResponseModelBaseModel> {
-	host: UmbControllerHostElement;
+export class UmbPickerInputContext<ItemType extends ItemResponseModelBaseModel>extends UmbBaseController {
 	modalAlias: string | UmbModalToken;
 	repository?: UmbItemRepository<ItemType>;
 	#getUnique: (entry: ItemType) => string | undefined;
@@ -39,7 +38,7 @@ export class UmbPickerInputContext<ItemType extends ItemResponseModelBaseModel> 
 		modalAlias: string | UmbModalToken,
 		getUniqueMethod?: (entry: ItemType) => string | undefined,
 	) {
-		this.host = host;
+		super(host);
 		this.modalAlias = modalAlias;
 		this.#getUnique = getUniqueMethod || ((entry) => entry.id || '');
 
@@ -50,7 +49,7 @@ export class UmbPickerInputContext<ItemType extends ItemResponseModelBaseModel> 
 
 		this.#init = Promise.all([
 			this.#itemManager.init,
-			new UmbContextConsumerController(this.host, UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
+			new UmbContextConsumerController(this._host, UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
 				this.modalManager = instance;
 			}).asPromise(),
 		]);
@@ -77,7 +76,7 @@ export class UmbPickerInputContext<ItemType extends ItemResponseModelBaseModel> 
 
 		modalContext?.onSubmit().then(({ selection }: any) => {
 			this.setSelection(selection);
-			this.host.dispatchEvent(new UmbChangeEvent());
+			this.getHostElement().dispatchEvent(new UmbChangeEvent());
 			// TODO: we only want to request items that are not already in the selectedItems array
 		});
 	}
@@ -101,6 +100,6 @@ export class UmbPickerInputContext<ItemType extends ItemResponseModelBaseModel> 
 	#removeItem(unique: string) {
 		const newSelection = this.getSelection().filter((value) => value !== unique);
 		this.setSelection(newSelection);
-		this.host.dispatchEvent(new UmbChangeEvent());
+		this.getHostElement().dispatchEvent(new UmbChangeEvent());
 	}
 }

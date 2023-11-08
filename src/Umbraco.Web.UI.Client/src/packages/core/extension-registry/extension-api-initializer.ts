@@ -5,6 +5,7 @@ import {
 	ManifestBase,
 	ManifestApi,
 	SpecificManifestTypeOrManifestBase,
+	ExtensionApi,
 } from '@umbraco-cms/backoffice/extension-api';
 import { UmbBaseController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
@@ -22,7 +23,7 @@ import { UmbBaseController, UmbControllerHostElement } from '@umbraco-cms/backof
 export class UmbExtensionApiInitializer<
 	ExtensionType extends string = string,
 	ExtensionManifest extends ManifestBase = SpecificManifestTypeOrManifestBase<ManifestTypes, ExtensionType>,
-	ExtensionApiInterface = ExtensionManifest extends ManifestApi ? ExtensionManifest['API_TYPE'] : unknown
+	ExtensionApiInterface extends ExtensionApi = ExtensionManifest extends ManifestApi ? NonNullable<ExtensionManifest['API_TYPE']> : ExtensionApi
 > extends UmbBaseController {
 	#currentPromise?: Promise<ExtensionApiInterface | undefined>;
 	#currentPromiseResolver?: (value: ExtensionApiInterface | undefined) => void;

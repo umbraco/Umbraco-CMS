@@ -1,24 +1,21 @@
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
+import { UmbBaseController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { type ExtensionApi, createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
-export class UmbActionBase<RepositoryType> {
-	host: UmbControllerHostElement;
+export class UmbActionBase<RepositoryType> extends UmbBaseController implements ExtensionApi {
 	repository?: RepositoryType;
 
 	constructor(host: UmbControllerHostElement, repositoryAlias: string) {
-		this.host = host;
+		super(host);
 
-		// TODO: unsure a method can't be called before everything is initialized
-		new UmbObserverController(
-			this.host,
+		// TODO: Could be replaced with ExtensionApiController?
+		this.observe(
 			umbExtensionsRegistry.getByTypeAndAlias('repository', repositoryAlias),
 			async (repositoryManifest) => {
 				if (!repositoryManifest) return;
 
 				try {
-					const result = await createExtensionApi(repositoryManifest, [this.host]);
+					const result = await createExtensionApi(repositoryManifest, [this._host]);
 					this.repository = result as RepositoryType;
 				} catch (error) {
 					throw new Error('Could not create repository with alias: ' + repositoryAlias + '');
