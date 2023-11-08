@@ -1,10 +1,7 @@
-import { LitElement, css, html } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
-
+import { LitElement, css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import './image-cropper.element.js';
 import './image-cropper-focus-setter.element.js';
 import './image-cropper-preview.element.js';
-import { repeat } from 'lit/directives/repeat.js';
 import type { UmbImageCropperElement } from './image-cropper.element.js';
 import {
 	UmbImageCropperCrop,

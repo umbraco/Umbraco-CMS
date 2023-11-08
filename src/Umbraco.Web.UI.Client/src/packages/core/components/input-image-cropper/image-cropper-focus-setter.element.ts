@@ -1,7 +1,15 @@
-import { LitElement, PropertyValueMap, css, html, nothing } from 'lit';
-import { customElement, property, query } from 'lit/decorators.js';
 import { clamp } from './mathUtils.js';
 import { UmbImageCropperFocalPoint } from './index.js';
+import {
+	LitElement,
+	PropertyValueMap,
+	css,
+	html,
+	nothing,
+	customElement,
+	property,
+	query,
+} from '@umbraco-cms/backoffice/external/lit';
 
 @customElement('umb-image-cropper-focus-setter')
 export class UmbImageCropperFocusSetterElement extends LitElement {

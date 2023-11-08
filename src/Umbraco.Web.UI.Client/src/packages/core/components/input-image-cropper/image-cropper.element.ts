@@ -1,7 +1,15 @@
-import { LitElement, PropertyValueMap, css, html } from 'lit';
-import { customElement, property, query, state } from 'lit/decorators.js';
 import { clamp, calculateExtrapolatedValue, inverseLerp, lerp } from './mathUtils.js';
 import { UmbImageCropperCrop, UmbImageCropperFocalPoint } from './index.js';
+import {
+	customElement,
+	property,
+	query,
+	state,
+	LitElement,
+	PropertyValueMap,
+	css,
+	html,
+} from '@umbraco-cms/backoffice/external/lit';
 
 @customElement('umb-image-cropper')
 export class UmbImageCropperElement extends LitElement {
