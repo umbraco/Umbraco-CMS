@@ -6,7 +6,7 @@ import { UmbCollectionDataSource, UmbCollectionRepository } from '@umbraco-cms/b
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbUserCollectionRepository extends UmbUserRepositoryBase implements UmbCollectionRepository {
-	#collectionSource: UmbCollectionDataSource<UserResponseModel>;
+	#collectionSource: UmbCollectionDataSource<UserResponseModel, UmbUserCollectionFilterModel>;
 
 	constructor(host: UmbControllerHost) {
 		super(host);
@@ -16,7 +16,7 @@ export class UmbUserCollectionRepository extends UmbUserRepositoryBase implement
 	async requestCollection(filter: UmbUserCollectionFilterModel = { skip: 0, take: 100 }) {
 		await this.init;
 
-		const { data, error } = await this.#collectionSource.filterCollection(filter);
+		const { data, error } = await this.#collectionSource.getCollection(filter);
 
 		if (data) {
 			this.detailStore!.appendItems(data.items);

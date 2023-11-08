@@ -1,11 +1,7 @@
-import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
+import { type UmbPagedData } from './data-source/types.js';
+import { type Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbTreeRootEntityModel, UmbTreeRootModel } from '@umbraco-cms/backoffice/tree';
 import { ProblemDetails, EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
-
-export interface UmbPagedData<T> {
-	total: number;
-	items: Array<T>;
-}
 
 export interface UmbTreeRepository<
 	TreeItemType extends EntityTreeItemResponseModel,

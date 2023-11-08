@@ -1,11 +1,6 @@
 import { UmbChangeEvent, UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
-import {
-	ManifestEntityAction,
-	ManifestUserPermission,
-	umbExtensionsRegistry,
-} from '@umbraco-cms/backoffice/extension-registry';
+import { ManifestUserPermission, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { css, html, customElement, property, state, nothing, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import { groupBy } from '@umbraco-cms/backoffice/external/lodash';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { UmbUserPermissionSettingElement } from '@umbraco-cms/backoffice/user';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -68,7 +63,13 @@ export class UmbEntityUserPermissionSettingsListElement extends UmbLitElement {
 	}
 
 	#renderGroupedPermissions(permissionManifests: Array<ManifestUserPermission>) {
-		const groupedPermissions = groupBy(permissionManifests, (manifest) => manifest.meta.group);
+		// TODO: groupBy is not known by TS yet
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-expect-error
+		const groupedPermissions = Object.groupBy(
+			permissionManifests,
+			(manifest: ManifestUserPermission) => manifest.meta.group,
+		) as Record<string, Array<ManifestUserPermission>>;
 		return html`
 			${Object.entries(groupedPermissions).map(
 				([group, manifests]) => html`
