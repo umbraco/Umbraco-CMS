@@ -73,7 +73,7 @@ export class UmbScriptsRepository
 			parentPath: requestBody.parentId,
 			name: requestBody.name,
 		};
-		const promise = this.#folderDataSource.insert(req);
+		const promise = this.#folderDataSource.create(req);
 		await promise;
 		this.requestTreeItemsOf(requestBody.parentId ? requestBody.parentId : null);
 		return promise;
@@ -82,7 +82,7 @@ export class UmbScriptsRepository
 		unique: string,
 	): Promise<{ data?: ScriptsGetFolderResponse | undefined; error?: ProblemDetails | undefined }> {
 		await this.#init;
-		return this.#folderDataSource.get(unique);
+		return this.#folderDataSource.read(unique);
 	}
 	updateFolder(
 		unique: string,
@@ -178,7 +178,7 @@ export class UmbScriptsRepository
 	async requestByKey(path: string) {
 		if (!path) throw new Error('Path is missing');
 		await this.#init;
-		const { data, error } = await this.#detailDataSource.get(path);
+		const { data, error } = await this.#detailDataSource.read(path);
 		return { data, error };
 	}
 
@@ -193,7 +193,7 @@ export class UmbScriptsRepository
 		return this.#detailDataSource.createScaffold(parentId, preset);
 	}
 	async create(data: CreateScriptRequestModel): Promise<DataSourceResponse<any>> {
-		const promise = this.#detailDataSource.insert(data);
+		const promise = this.#detailDataSource.create(data);
 		await promise;
 		this.requestTreeItemsOf(data.parentPath ? data.parentPath : null);
 		return promise;

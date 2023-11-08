@@ -157,7 +157,7 @@ export class UmbDocumentRepository
 			throw new Error('Id is missing');
 		}
 
-		const { data, error } = await this.#detailDataSource.get(id);
+		const { data, error } = await this.#detailDataSource.read(id);
 
 		if (data) {
 			this.#store?.append(data);
@@ -180,7 +180,7 @@ export class UmbDocumentRepository
 			throw new Error('Document is missing');
 		}
 
-		const { error } = await this.#detailDataSource.insert(item);
+		const { error } = await this.#detailDataSource.create(item);
 
 		if (!error) {
 			// TODO: we currently don't use the detail store for anything.

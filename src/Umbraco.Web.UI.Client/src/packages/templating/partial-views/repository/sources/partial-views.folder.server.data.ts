@@ -9,7 +9,7 @@ import { DataSourceResponse, UmbFolderDataSource } from '@umbraco-cms/backoffice
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 //! this is of any type in the backend-api
-export type PartialViewGetFolderResponse = {path: string, parentPath: string, name: string} ;
+export type PartialViewGetFolderResponse = { path: string; parentPath: string; name: string };
 
 export class UmbPartialViewsFolderServerDataSource implements UmbFolderDataSource {
 	#host: UmbControllerHostElement;
@@ -20,10 +20,10 @@ export class UmbPartialViewsFolderServerDataSource implements UmbFolderDataSourc
 	createScaffold(parentId: string | null): Promise<DataSourceResponse<FolderResponseModel>> {
 		throw new Error('Method not implemented.');
 	}
-	get(unique: string): Promise<DataSourceResponse<PartialViewGetFolderResponse>> {
+	read(unique: string): Promise<DataSourceResponse<PartialViewGetFolderResponse>> {
 		return tryExecuteAndNotify(this.#host, PartialViewResource.getPartialViewFolder({ path: unique }));
 	}
-	insert(requestBody: CreateFolderRequestModel): Promise<DataSourceResponse<string>> {
+	create(requestBody: CreateFolderRequestModel): Promise<DataSourceResponse<string>> {
 		return tryExecuteAndNotify(this.#host, PartialViewResource.postPartialViewFolder({ requestBody }));
 	}
 	update(unique: string, data: CreateFolderRequestModel): Promise<DataSourceResponse<FolderModelBaseModel>> {

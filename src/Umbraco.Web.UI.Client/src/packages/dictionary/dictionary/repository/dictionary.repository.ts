@@ -138,7 +138,7 @@ export class UmbDictionaryRepository
 		if (!id) throw new Error('Id is missing');
 		await this.#init;
 
-		const { data, error } = await this.#detailSource.get(id);
+		const { data, error } = await this.#detailSource.read(id);
 
 		if (data) {
 			this.#detailStore?.append(data);
@@ -192,7 +192,7 @@ export class UmbDictionaryRepository
 			throw new Error('Name is missing');
 		}
 
-		const { data, error } = await this.#detailSource.insert(detail);
+		const { data, error } = await this.#detailSource.create(detail);
 
 		if (!error) {
 			const notification = { data: { message: `Dictionary '${detail.name}' created` } };

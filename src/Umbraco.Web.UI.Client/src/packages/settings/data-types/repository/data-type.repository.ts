@@ -173,7 +173,7 @@ export class UmbDataTypeRepository
 		if (!id) throw new Error('Key is missing');
 		await this.#init;
 
-		const { data, error } = await this.#detailSource.get(id);
+		const { data, error } = await this.#detailSource.read(id);
 
 		if (data) {
 			this.#detailStore?.append(data);
@@ -199,7 +199,7 @@ export class UmbDataTypeRepository
 		if (!dataType.id) throw new Error('Data Type id is missing');
 		await this.#init;
 
-		const { error } = await this.#detailSource.insert(dataType);
+		const { error } = await this.#detailSource.create(dataType);
 
 		if (!error) {
 			// TODO: We need to push a new item to the tree store to update the tree. How do we want to create the tree items?
@@ -272,7 +272,7 @@ export class UmbDataTypeRepository
 		if (!folderRequest) throw new Error('folder request is missing');
 		await this.#init;
 
-		const { error } = await this.#folderSource.insert(folderRequest);
+		const { error } = await this.#folderSource.create(folderRequest);
 
 		if (!error) {
 			// TODO: We need to push a new item to the tree store to update the tree. How do we want to create the tree items?
@@ -313,7 +313,7 @@ export class UmbDataTypeRepository
 	async requestFolder(id: string) {
 		if (!id) throw new Error('Key is missing');
 		await this.#init;
-		return await this.#folderSource.get(id);
+		return await this.#folderSource.read(id);
 	}
 
 	// Actions

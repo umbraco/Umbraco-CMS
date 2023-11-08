@@ -51,7 +51,7 @@ export class UmbDictionaryDetailServerDataSource
 	 * @return {*}
 	 * @memberof UmbDictionaryDetailServerDataSource
 	 */
-	get(id: string) {
+	read(id: string) {
 		return tryExecuteAndNotify(this.#host, DictionaryResource.getDictionaryById({ id }));
 	}
 
@@ -85,7 +85,7 @@ export class UmbDictionaryDetailServerDataSource
 	 * @return {*}
 	 * @memberof UmbDictionaryDetailServerDataSource
 	 */
-	async insert(data: CreateDictionaryItemRequestModel) {
+	async create(data: CreateDictionaryItemRequestModel) {
 		return tryExecuteAndNotify(this.#host, DictionaryResource.postDictionary({ requestBody: data }));
 	}
 

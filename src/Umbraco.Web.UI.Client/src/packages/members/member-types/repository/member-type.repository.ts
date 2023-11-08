@@ -197,7 +197,7 @@ export class UmbMemberTypeRepository implements UmbTreeRepository<TreeItemType>,
 			throw new Error('Name is missing');
 		}
 
-		const { data, error } = await this.#detailSource.insert(detail);
+		const { data, error } = await this.#detailSource.create(detail);
 
 		if (!error) {
 			const notification = { data: { message: `Member type '${detail.name}' created` } };

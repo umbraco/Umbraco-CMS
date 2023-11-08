@@ -33,13 +33,13 @@ export class UmbLanguageServerDataSource
 	 * @return {*}
 	 * @memberof UmbLanguageServerDataSource
 	 */
-	async get(isoCode: string) {
+	async read(isoCode: string) {
 		if (!isoCode) throw new Error('Iso Code is missing');
 		return tryExecuteAndNotify(
 			this.#host,
 			LanguageResource.getLanguageByIsoCode({
 				isoCode,
-			})
+			}),
 		);
 	}
 
@@ -66,7 +66,7 @@ export class UmbLanguageServerDataSource
 	 * @return {*}
 	 * @memberof UmbLanguageServerDataSource
 	 */
-	async insert(language: CreateLanguageRequestModel) {
+	async create(language: CreateLanguageRequestModel) {
 		if (!language.isoCode) {
 			throw new Error('Language iso code is missing');
 		}
@@ -87,7 +87,7 @@ export class UmbLanguageServerDataSource
 
 		return tryExecuteAndNotify(
 			this.#host,
-			LanguageResource.putLanguageByIsoCode({ isoCode: language.isoCode, requestBody: language })
+			LanguageResource.putLanguageByIsoCode({ isoCode: language.isoCode, requestBody: language }),
 		);
 	}
 

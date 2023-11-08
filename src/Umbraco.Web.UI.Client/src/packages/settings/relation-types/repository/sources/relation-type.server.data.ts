@@ -35,7 +35,7 @@ export class UmbRelationTypeServerDataSource
 	 * @return {*}
 	 * @memberof UmbRelationTypeServerDataSource
 	 */
-	async get(id: string) {
+	async read(id: string) {
 		if (!id) {
 			throw new Error('Id is missing');
 		}
@@ -44,7 +44,7 @@ export class UmbRelationTypeServerDataSource
 			this.#host,
 			RelationTypeResource.getRelationTypeById({
 				id,
-			})
+			}),
 		);
 	}
 
@@ -66,14 +66,14 @@ export class UmbRelationTypeServerDataSource
 	 * @return {*}
 	 * @memberof UmbRelationTypeServerDataSource
 	 */
-	async insert(relationType: CreateRelationTypeRequestModel) {
+	async create(relationType: CreateRelationTypeRequestModel) {
 		if (!relationType.id) throw new Error('RelationType id is missing');
 
 		return tryExecuteAndNotify(
 			this.#host,
 			RelationTypeResource.postRelationType({
 				requestBody: relationType,
-			})
+			}),
 		);
 	}
 
@@ -91,7 +91,7 @@ export class UmbRelationTypeServerDataSource
 			RelationTypeResource.putRelationTypeById({
 				id,
 				requestBody: relationType,
-			})
+			}),
 		);
 	}
 
@@ -110,7 +110,7 @@ export class UmbRelationTypeServerDataSource
 			this.#host,
 			RelationTypeResource.deleteRelationTypeById({
 				id,
-			})
+			}),
 		);
 	}
 }

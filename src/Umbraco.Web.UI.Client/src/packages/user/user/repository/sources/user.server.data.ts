@@ -42,7 +42,7 @@ export class UmbUserServerDataSource implements UmbUserDetailDataSource {
 	 * @return {*}
 	 * @memberof UmbUserServerDataSource
 	 */
-	async get(id: string) {
+	async read(id: string) {
 		if (!id) throw new Error('Id is missing');
 		const response = await tryExecuteAndNotify(this.#host, UserResource.getUserById({ id }));
 		return extendDataSourceResponseData<UmbUserDetail>(response, {
@@ -56,7 +56,7 @@ export class UmbUserServerDataSource implements UmbUserDetailDataSource {
 	 * @return {*}
 	 * @memberof UmbUserServerDataSource
 	 */
-	insert(data: CreateUserRequestModel) {
+	create(data: CreateUserRequestModel) {
 		return tryExecuteAndNotify(this.#host, UserResource.postUser({ requestBody: data }));
 	}
 

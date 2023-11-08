@@ -34,7 +34,7 @@ export class UmbTemplateDetailServerDataSource
 	 * @return {*}
 	 * @memberof UmbTemplateDetailServerDataSource
 	 */
-	get(id: string) {
+	read(id: string) {
 		if (!id) throw new Error('Id is missing');
 		return tryExecuteAndNotify(this.#host, TemplateResource.getTemplateById({ id }));
 	}
@@ -59,7 +59,7 @@ export class UmbTemplateDetailServerDataSource
 	async createScaffold(masterTemplateId: string | null) {
 		return await tryExecuteAndNotify(
 			this.#host,
-			TemplateResource.getTemplateScaffold({ masterTemplateId: masterTemplateId ?? undefined })
+			TemplateResource.getTemplateScaffold({ masterTemplateId: masterTemplateId ?? undefined }),
 		);
 	}
 
@@ -69,7 +69,7 @@ export class UmbTemplateDetailServerDataSource
 	 * @return {*}
 	 * @memberof UmbTemplateDetailServerDataSource
 	 */
-	async insert(template: CreateTemplateRequestModel) {
+	async create(template: CreateTemplateRequestModel) {
 		if (!template) throw new Error('Template is missing');
 		return await tryExecuteAndNotify(this.#host, TemplateResource.postTemplate({ requestBody: template }));
 	}

@@ -61,7 +61,7 @@ export class UmbUserRepository extends UmbUserRepositoryBase implements IUmbUser
 		if (!id) throw new Error('Id is missing');
 		await this.init;
 
-		const { data, error } = await this.#detailSource.get(id);
+		const { data, error } = await this.#detailSource.read(id);
 
 		if (data) {
 			this.detailStore!.append(data);
@@ -104,7 +104,7 @@ export class UmbUserRepository extends UmbUserRepositoryBase implements IUmbUser
 	async create(userRequestData: CreateUserRequestModel) {
 		if (!userRequestData) throw new Error('Data is missing');
 
-		const { data, error } = await this.#detailSource.insert(userRequestData);
+		const { data, error } = await this.#detailSource.create(userRequestData);
 
 		if (data) {
 			this.detailStore?.append(data);

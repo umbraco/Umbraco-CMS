@@ -42,7 +42,7 @@ export class UmbStylesheetServerDataSource
 	 * @return {*}
 	 * @memberof UmbStylesheetServerDataSource
 	 */
-	async get(path: string) {
+	async read(path: string) {
 		if (!path) throw new Error('Path is missing');
 		return tryExecuteAndNotify(this.#host, StylesheetResource.getStylesheet({ path }));
 	}
@@ -63,7 +63,7 @@ export class UmbStylesheetServerDataSource
 	 * @return {*}  {Promise<DataSourceResponse<any>>}
 	 * @memberof UmbStylesheetServerDataSource
 	 */
-	insert(data: StylesheetDetails): Promise<DataSourceResponse<any>> {
+	create(data: StylesheetDetails): Promise<DataSourceResponse<any>> {
 		return tryExecuteAndNotify(this.#host, StylesheetResource.postStylesheet({ requestBody: data }));
 	}
 	/**

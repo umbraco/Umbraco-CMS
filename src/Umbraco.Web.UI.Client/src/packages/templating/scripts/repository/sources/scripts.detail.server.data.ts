@@ -31,7 +31,7 @@ export class UmbScriptsServerDataSource
 	 * @return {*}
 	 * @memberof UmbScriptsDetailServerDataSource
 	 */
-	get(path: string): Promise<DataSourceResponse<ScriptResponseModel>> {
+	read(path: string): Promise<DataSourceResponse<ScriptResponseModel>> {
 		if (!path) throw new Error('Path is missing');
 		return tryExecuteAndNotify(this.#host, ScriptResource.getScript({ path }));
 	}
@@ -42,7 +42,7 @@ export class UmbScriptsServerDataSource
 	 * @return {*}  {Promise<DataSourceResponse<string>>}
 	 * @memberof UmbScriptsDetailServerDataSource
 	 */
-	insert(requestBody: CreateScriptRequestModel): Promise<DataSourceResponse<string>> {
+	create(requestBody: CreateScriptRequestModel): Promise<DataSourceResponse<string>> {
 		return tryExecuteAndNotify(this.#host, ScriptResource.postScript({ requestBody }));
 	}
 

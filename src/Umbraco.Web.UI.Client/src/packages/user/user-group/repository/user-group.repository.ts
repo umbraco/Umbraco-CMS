@@ -90,7 +90,7 @@ export class UmbUserGroupRepository
 	async requestById(id: string) {
 		if (!id) throw new Error('Id is missing');
 
-		const { data, error } = await this.#detailSource.get(id);
+		const { data, error } = await this.#detailSource.read(id);
 
 		//TODO Put it in the store
 
@@ -104,7 +104,7 @@ export class UmbUserGroupRepository
 	async create(userGroupRequestData: any): Promise<DataSourceResponse<any>> {
 		if (!userGroupRequestData) throw new Error('Data is missing');
 
-		const { data, error } = await this.#detailSource.insert(userGroupRequestData);
+		const { data, error } = await this.#detailSource.create(userGroupRequestData);
 
 		//TODO Update store
 

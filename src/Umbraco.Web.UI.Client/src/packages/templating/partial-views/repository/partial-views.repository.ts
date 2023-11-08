@@ -67,7 +67,7 @@ export class UmbPartialViewsRepository
 
 	//#region FOLDER
 	createFolderScaffold(
-		parentId: string | null
+		parentId: string | null,
 	): Promise<{ data?: FolderResponseModel | undefined; error?: ProblemDetails | undefined }> {
 		const data: FolderResponseModel = {
 			name: '',
@@ -76,27 +76,27 @@ export class UmbPartialViewsRepository
 		return Promise.resolve({ data, error: undefined });
 	}
 	async createFolder(
-		requestBody: CreateFolderRequestModel
+		requestBody: CreateFolderRequestModel,
 	): Promise<{ data?: string | undefined; error?: ProblemDetails | undefined }> {
 		await this.#init;
 		const req = {
 			parentPath: requestBody.parentId,
 			name: requestBody.name,
 		};
-		const promise = this.#folderDataSource.insert(req);
+		const promise = this.#folderDataSource.create(req);
 		await promise;
 		this.requestTreeItemsOf(requestBody.parentId ? requestBody.parentId : null);
 		return promise;
 	}
 	async requestFolder(
-		unique: string
+		unique: string,
 	): Promise<{ data?: PartialViewGetFolderResponse | undefined; error?: ProblemDetails | undefined }> {
 		await this.#init;
-		return this.#folderDataSource.get(unique);
+		return this.#folderDataSource.read(unique);
 	}
 	updateFolder(
 		unique: string,
-		folder: FolderModelBaseModel
+		folder: FolderModelBaseModel,
 	): Promise<{ data?: FolderModelBaseModel | undefined; error?: ProblemDetails | undefined }> {
 		throw new Error('Method not implemented.');
 	}
@@ -188,7 +188,7 @@ export class UmbPartialViewsRepository
 	async requestByKey(path: string) {
 		if (!path) throw new Error('Path is missing');
 		await this.#init;
-		const { data, error } = await this.#detailDataSource.get(path);
+		const { data, error } = await this.#detailDataSource.read(path);
 		return { data, error };
 	}
 
@@ -203,7 +203,7 @@ export class UmbPartialViewsRepository
 		return this.#detailDataSource.createScaffold(parentId, preset);
 	}
 	async create(data: CreatePartialViewRequestModel): Promise<DataSourceResponse<any>> {
-		const promise = this.#detailDataSource.insert(data);
+		const promise = this.#detailDataSource.create(data);
 		await promise;
 		this.requestTreeItemsOf(data.parentPath ? data.parentPath : null);
 		return promise;

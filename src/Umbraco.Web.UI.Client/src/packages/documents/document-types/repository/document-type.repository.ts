@@ -164,7 +164,7 @@ export class UmbDocumentTypeRepository
 		if (!id) throw new Error('Id is missing');
 		await this.#init;
 
-		const { data, error } = await this.#detailDataSource.get(id);
+		const { data, error } = await this.#detailDataSource.read(id);
 
 		if (data) {
 			this.#detailStore?.append(data);
@@ -192,7 +192,7 @@ export class UmbDocumentTypeRepository
 		if (!documentType || !documentType.id) throw new Error('Document Type is missing');
 		await this.#init;
 
-		const { error } = await this.#detailDataSource.insert(documentType);
+		const { error } = await this.#detailDataSource.create(documentType);
 
 		if (!error) {
 			this.#detailStore?.append(documentType);
