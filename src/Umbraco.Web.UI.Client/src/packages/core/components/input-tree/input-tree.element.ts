@@ -2,6 +2,7 @@ import { css, html, customElement, property } from '@umbraco-cms/backoffice/exte
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbInputDocumentElement } from '@umbraco-cms/backoffice/document';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 type NodeType = 'content' | 'member' | 'media';
 export type StartNode = {
@@ -67,7 +68,7 @@ export class UmbInputTreeElement extends FormControlMixin(UmbLitElement) {
 
 	#onChange(event: CustomEvent) {
 		this.value = (event.target as UmbInputDocumentElement).selectedIds.join(',');
-		this.dispatchEvent(new CustomEvent('change', { bubbles: true, composed: true }));
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	constructor() {
