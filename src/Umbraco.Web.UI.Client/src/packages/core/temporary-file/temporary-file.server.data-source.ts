@@ -1,6 +1,7 @@
 import { TemporaryFileResource } from '@umbraco-cms/backoffice/backend-api';
 import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { UmbFileManager } from './file';
 
 /**
  * A data source to upload temporary files to the server
@@ -27,14 +28,13 @@ export class UmbTemporaryFileServerDataSource {
 	 * @return {*}
 	 * @memberof UmbTemporaryFileServerDataSource
 	 */
-	create(id: string, file: File) {
-		debugger;
+	async create(id: string, file: File) {
 		return tryExecuteAndNotify(
 			this.#host,
 			TemporaryFileResource.postTemporaryfile({
-				requestBody: {
-					id,
-					file,
+				formData: {
+					Id: id,
+					File: file,
 				},
 			}),
 		);
