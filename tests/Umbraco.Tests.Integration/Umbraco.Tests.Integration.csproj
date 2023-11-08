@@ -7,7 +7,6 @@
     <RootNamespace>Umbraco.Cms.Tests.Integration</RootNamespace>
     <IsPackable>true</IsPackable>
     <EnablePackageValidation>true</EnablePackageValidation>
-    <GenerateCompatibilitySuppressionFile>true</GenerateCompatibilitySuppressionFile>
   </PropertyGroup>
 
   <ItemGroup>
