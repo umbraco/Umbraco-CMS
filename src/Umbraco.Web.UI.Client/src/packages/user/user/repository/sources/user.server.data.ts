@@ -1,5 +1,9 @@
 import { USER_ENTITY_TYPE, UmbUserDetail, UmbUserDetailDataSource } from '../../types.js';
-import { DataSourceResponse, extendDataSourceResponseData } from '@umbraco-cms/backoffice/repository';
+import {
+	DataSourceResponse,
+	UmbDataSourceErrorResponse,
+	extendDataSourceResponseData,
+} from '@umbraco-cms/backoffice/repository';
 import {
 	CreateUserRequestModel,
 	UpdateUserRequestModel,
@@ -66,5 +70,13 @@ export class UmbUserServerDataSource implements UmbUserDetailDataSource {
 	invite(data: InviteUserRequestModel) {
 		if (!data) throw new Error('Invite data is missing');
 		return tryExecuteAndNotify(this.#host, UserResource.postUserInvite({ requestBody: data }));
+	}
+
+	uploadAvatar(id: string, file: File): Promise<UmbDataSourceErrorResponse> {
+		throw new Error('Method not implemented.');
+	}
+
+	deleteAvatar(id: string): Promise<UmbDataSourceErrorResponse> {
+		throw new Error('Method not implemented.');
 	}
 }
