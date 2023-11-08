@@ -2,18 +2,33 @@ import { UmbMediaTypeTreeStore, UMB_MEDIA_TYPE_TREE_STORE_CONTEXT_TOKEN } from '
 import { UmbMediaTypeDetailServerDataSource } from './sources/media-type.detail.server.data.js';
 import { UmbMediaTypeStore, UMB_MEDIA_TYPE_STORE_CONTEXT_TOKEN } from './media-type.detail.store.js';
 import { UmbMediaTypeTreeServerDataSource } from './sources/media-type.tree.server.data.js';
+import { UmbMediaTypeItemStore } from './media-type-item.store.js';
+import { UmbMediaTypeItemServerDataSource } from './sources/media-type-item.server.data.js';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
-import { UmbTreeRepository, UmbTreeDataSource } from '@umbraco-cms/backoffice/repository';
+import {
+	UmbTreeRepository,
+	UmbTreeDataSource,
+	UmbDataSource,
+	UmbItemRepository,
+	UmbDetailRepository,
+	UmbItemDataSource,
+} from '@umbraco-cms/backoffice/repository';
 import {
 	CreateMediaTypeRequestModel,
-	EntityTreeItemResponseModel,
+	FolderTreeItemResponseModel,
+	MediaTypeItemResponseModel,
 	MediaTypeResponseModel,
 	UpdateMediaTypeRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
 
-export class UmbMediaTypeRepository implements UmbTreeRepository<EntityTreeItemResponseModel> {
+export class UmbMediaTypeRepository
+	implements
+		UmbItemRepository<MediaTypeItemResponseModel>,
+		UmbTreeRepository<FolderTreeItemResponseModel>,
+		UmbDetailRepository<CreateMediaTypeRequestModel, any, UpdateMediaTypeRequestModel, MediaTypeResponseModel>
+{
 	#init!: Promise<unknown>;
 
 	#host: UmbControllerHostElement;
@@ -21,8 +36,11 @@ export class UmbMediaTypeRepository implements UmbTreeRepository<EntityTreeItemR
 	#treeSource: UmbTreeDataSource;
 	#treeStore?: UmbMediaTypeTreeStore;
 
-	#detailSource: UmbMediaTypeDetailServerDataSource;
+	#detailSource: UmbDataSource<CreateMediaTypeRequestModel, any, UpdateMediaTypeRequestModel, MediaTypeResponseModel>;
 	#detailStore?: UmbMediaTypeStore;
+
+	#itemSource: UmbItemDataSource<MediaTypeItemResponseModel>;
+	#itemStore?: UmbMediaTypeItemStore;
 
 	#notificationContext?: UmbNotificationContext;
 
@@ -32,6 +50,7 @@ export class UmbMediaTypeRepository implements UmbTreeRepository<EntityTreeItemR
 		// TODO: figure out how spin up get the correct data source
 		this.#treeSource = new UmbMediaTypeTreeServerDataSource(this.#host);
 		this.#detailSource = new UmbMediaTypeDetailServerDataSource(this.#host);
+		this.#itemSource = new UmbMediaTypeItemServerDataSource(this.#host);
 
 		this.#init = Promise.all([
 			new UmbContextConsumerController(this.#host, UMB_MEDIA_TYPE_STORE_CONTEXT_TOKEN, (instance) => {
@@ -88,6 +107,12 @@ export class UmbMediaTypeRepository implements UmbTreeRepository<EntityTreeItemR
 		return { data, error, asObservable: () => this.#treeStore!.childrenOf(parentId) };
 	}
 
+	async byId(id: string) {
+		if (!id) throw new Error('Key is missing');
+		await this.#init;
+		return this.#detailStore!.byId(id);
+	}
+
 	async requestItemsLegacy(ids: Array<string>) {
 		await this.#init;
 
@@ -117,9 +142,10 @@ export class UmbMediaTypeRepository implements UmbTreeRepository<EntityTreeItemR
 
 	// DETAILS
 
-	async createScaffold() {
+	async createScaffold(parentId: string | null) {
+		if (parentId === undefined) throw new Error('Parent id is missing');
 		await this.#init;
-		return this.#detailSource.createScaffold();
+		return this.#detailSource.createScaffold(parentId);
 	}
 
 	async requestById(id: string) {
@@ -135,6 +161,24 @@ export class UmbMediaTypeRepository implements UmbTreeRepository<EntityTreeItemR
 			this.#detailStore?.append(data);
 		}
 		return { data, error };
+	}
+
+	async requestItems(ids: Array<string>) {
+		if (!ids) throw new Error('Keys are missing');
+		await this.#init;
+
+		const { data, error } = await this.#itemSource.getItems(ids);
+
+		if (data) {
+			this.#itemStore?.appendItems(data);
+		}
+
+		return { data, error, asObservable: () => this.#itemStore!.items(ids) };
+	}
+
+	async items(ids: Array<string>) {
+		await this.#init;
+		return this.#itemStore!.items(ids);
 	}
 
 	async delete(id: string) {

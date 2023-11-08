@@ -19,6 +19,10 @@ export class UmbMediaTypeStore extends UmbStoreBase {
 		);
 	}
 
+	byId(id: MediaTypeResponseModel['id']) {
+		return this._data.asObservablePart((x) => x.find((y) => y.id === id));
+	}
+
 	append(mediaType: MediaTypeResponseModel) {
 		this._data.append([mediaType]);
 	}
