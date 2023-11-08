@@ -5,6 +5,8 @@ import type {
 	ManifestWorkspaceViewCollection,
 } from '@umbraco-cms/backoffice/extension-registry';
 
+import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
+
 const workspace: ManifestWorkspace = {
 	type: 'workspace',
 	alias: 'Umb.Workspace.MediaType',
@@ -72,6 +74,24 @@ const workspaceViews: Array<ManifestWorkspaceEditorView> = [
 	},
 ];
 const workspaceViewCollections: Array<ManifestWorkspaceViewCollection> = [];
-const workspaceActions: Array<ManifestWorkspaceAction> = [];
+const workspaceActions: Array<ManifestWorkspaceAction> = [
+	{
+		type: 'workspaceAction',
+		alias: 'Umb.WorkspaceAction.MediaType.Save',
+		name: 'Save Media Type Workspace Action',
+		api: UmbSaveWorkspaceAction,
+		meta: {
+			label: 'Save',
+			look: 'primary',
+			color: 'positive',
+		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.WorkspaceAlias',
+				match: workspace.alias,
+			},
+		],
+	},
+];
 
 export const manifests = [workspace, ...workspaceViews, ...workspaceViewCollections, ...workspaceActions];
