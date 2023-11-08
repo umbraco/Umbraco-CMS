@@ -3,9 +3,9 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { UpdateContentRequestModelBaseDocumentValueModelDocumentVariantRequestModel } from './UpdateContentRequestModelBaseDocumentValueModelDocumentVariantRequestModel';
+import type { UpdateContentForDocumentRequestModel } from './UpdateContentForDocumentRequestModel';
 
-export type UpdateDocumentRequestModel = (UpdateContentRequestModelBaseDocumentValueModelDocumentVariantRequestModel & {
+export type UpdateDocumentRequestModel = (UpdateContentForDocumentRequestModel & {
     templateId?: string | null;
 });
 

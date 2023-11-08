@@ -8,3 +8,4 @@ export * from './folder-data-source.interface.js';
 export * from './item-data-source.interface.js';
 export * from './move-data-source.interface.js';
 export * from './tree-data-source.interface.js';
+export * from './types.js';

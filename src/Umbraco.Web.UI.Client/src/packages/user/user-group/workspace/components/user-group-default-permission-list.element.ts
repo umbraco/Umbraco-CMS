@@ -25,6 +25,7 @@ export class UmbUserGroupDefaultPermissionListElement extends UmbLitElement {
 			this.observe(
 				this.#userGroupWorkspaceContext.data,
 				(userGroup) => (this._userGroupDefaultPermissions = userGroup?.permissions),
+				'umbUserGroupPermissionsObserver'
 			);
 		});
 	}
@@ -32,7 +33,7 @@ export class UmbUserGroupDefaultPermissionListElement extends UmbLitElement {
 	#observeUserPermissions() {
 		this.observe(umbExtensionsRegistry.extensionsOfType('userPermission'), (userPermissionManifests) => {
 			this._entityTypes = [...new Set(userPermissionManifests.map((manifest) => manifest.meta.entityType))];
-		});
+		}, 'umbUserPermissionsObserver');
 	}
 
 	#onSelectedUserPermission(event: UmbSelectionChangeEvent) {

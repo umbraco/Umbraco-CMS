@@ -1,30 +1,33 @@
-import type { MediaTypeDetails } from '../../packages/media/media-types/types.js';
 import { UmbEntityData } from './entity.data.js';
-import { createFolderTreeItem } from './utils.js';
-import { FolderTreeItemResponseModel, PagedMediaTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { createFolderTreeItem, createMediaTypeTreeItem } from './utils.js';
+import {
+	FolderTreeItemResponseModel,
+	MediaTypeResponseModel,
+	MediaTypeTreeItemResponseModel,
+	PagedMediaTreeItemResponseModel,
+} from '@umbraco-cms/backoffice/backend-api';
 
-export const data: Array<MediaTypeDetails> = [
+export const data: Array<MediaTypeResponseModel> = [
 	{
 		name: 'Media Type 1',
-		type: 'media-type',
-		hasChildren: false,
 		id: 'c5159663-eb82-43ee-bd23-e42dc5e71db6',
-		isContainer: false,
-		parentId: null,
-		isFolder: false,
+		description: 'Media type 1 description',
 		alias: 'mediaType1',
+		icon: 'umb:bug',
 		properties: [],
+		containers: [],
 	},
+];
+
+export const treeData: Array<MediaTypeTreeItemResponseModel> = [
 	{
-		name: 'Media Type 2',
+		name: data[0].name,
+		id: data[0].id,
+		icon: data[0].icon,
 		type: 'media-type',
 		hasChildren: false,
-		id: '22da1b0b-c310-4730-9912-c30b3eb9802e',
 		isContainer: false,
 		parentId: null,
-		isFolder: false,
-		alias: 'mediaType2',
-		properties: [],
 	},
 ];
 
@@ -32,28 +35,58 @@ export const data: Array<MediaTypeDetails> = [
 // TODO: all properties are optional in the server schema. I don't think this is correct.
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-class UmbMediaTypeData extends UmbEntityData<MediaTypeDetails> {
+class UmbMediaTypeData extends UmbEntityData<MediaTypeResponseModel> {
+	private treeData = treeData;
+
 	constructor() {
 		super(data);
 	}
 
-	getTreeRoot(): PagedMediaTreeItemResponseModel {
-		const items = this.data.filter((item) => item.parentId === null);
-		const treeItems = items.map((item) => createFolderTreeItem(item));
-		const total = items.length;
-		return { items: treeItems, total };
+	// TODO: Can we do this smarter so we don't need to make this for each mock data:
+	insert(item: MediaTypeResponseModel) {
+		const result = super.insert(item);
+		this.treeData.push(createMediaTypeTreeItem(result));
+		return result;
 	}
 
-	getTreeItemChildren(id: string): PagedMediaTreeItemResponseModel {
-		const items = this.data.filter((item) => item.parentId === id);
-		const treeItems = items.map((item) => createFolderTreeItem(item));
-		const total = items.length;
-		return { items: treeItems, total };
+	update(id: string, item: MediaTypeResponseModel) {
+		const result = super.save(id, item);
+		this.treeData = this.treeData.map((x) => {
+			if (x.id === result.id) {
+				return createMediaTypeTreeItem(result);
+			} else {
+				return x;
+			}
+		});
+		return result;
 	}
 
-	getTreeItem(ids: Array<string>): Array<FolderTreeItemResponseModel> {
+	getItems(ids: Array<string>): Array<MediaTypeTreeItemResponseModel> {
 		const items = this.data.filter((item) => ids.includes(item.id ?? ''));
-		return items.map((item) => createFolderTreeItem(item));
+		return items.map((item) => item);
+	}
+
+	getTreeRoot(): Array<MediaTypeTreeItemResponseModel> {
+		const rootItems = this.treeData.filter((item) => item.parentId === null);
+		const result = rootItems.map((item) => createMediaTypeTreeItem(item));
+		return result;
+	}
+
+	getTreeItemChildren(id: string): Array<MediaTypeTreeItemResponseModel> {
+		const childItems = this.treeData.filter((item) => item.parentId === id);
+		return childItems.map((item) => item);
+	}
+
+	getTreeItems(ids: Array<string>): Array<MediaTypeTreeItemResponseModel> {
+		const items = this.treeData.filter((item) => ids.includes(item.id ?? ''));
+		return items.map((item) => item);
+	}
+
+	getAllowedTypesOf(id: string): Array<MediaTypeTreeItemResponseModel> {
+		const mediaType = this.getById(id);
+		const allowedTypeKeys = mediaType?.allowedContentTypes?.map((mediaType) => mediaType.id) ?? [];
+		const items = this.treeData.filter((item) => allowedTypeKeys.includes(item.id ?? ''));
+		return items.map((item) => item);
 	}
 }
 

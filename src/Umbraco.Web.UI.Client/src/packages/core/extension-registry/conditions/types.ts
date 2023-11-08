@@ -1,6 +1,6 @@
-import type { UserPermissionConditionConfig } from '@umbraco-cms/backoffice/user-permission';
 import type { SectionAliasConditionConfig } from './section-alias.condition.js';
 import type { SwitchConditionConfig } from './switch.condition.js';
+import type { UserPermissionConditionConfig } from '@umbraco-cms/backoffice/user-permission';
 import type {
 	WorkspaceAliasConditionConfig,
 	WorkspaceEntityTypeConditionConfig,

@@ -1,18 +1,16 @@
-import { UUITextStyles } from '@umbraco-ui/uui-css';
-import { css, html } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
 import { RichTextRuleModelSortable, UmbStylesheetWorkspaceContext } from '../../stylesheet-workspace.context.js';
 import { UMB_MODAL_TEMPLATING_STYLESHEET_RTF_STYLE_SIDEBAR } from '../../manifests.js';
 import {
 	StylesheetRichTextEditorStyleModalData,
 	UmbStylesheetRichTextEditorStyleModalValue,
 } from './stylesheet-workspace-view-rich-text-editor-style-sidebar.element.js';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UMB_MODAL_MANAGER_CONTEXT_TOKEN, UmbModalManagerContext, UmbModalToken } from '@umbraco-cms/backoffice/modal';
 import { RichTextRuleModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbSorterConfig, UmbSorterController } from '@umbraco-cms/backoffice/sorter';
-import { ifDefined, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, ifDefined, repeat } from '@umbraco-cms/backoffice/external/lit';
 
 import './stylesheet-workspace-view-rich-text-editor-rule.element.js';
 
@@ -111,7 +109,7 @@ export class UmbStylesheetWorkspaceViewRichTextEditorElement extends UmbLitEleme
 	}
 
 	static styles = [
-		UUITextStyles,
+		UmbTextStyles,
 		css`
 			:host {
 				display: block;

@@ -4,7 +4,7 @@ import { availableLanguages } from './input-tiny-mce.languages.js';
 import { uriAttributeSanitizer } from './input-tiny-mce.sanitizer.js';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { renderEditor, type tinymce } from '@umbraco-cms/backoffice/external/tinymce';
-import { UMB_AUTH, UmbLoggedInUser } from '@umbraco-cms/backoffice/auth';
+import { UMB_AUTH_CONTEXT, UmbLoggedInUser } from '@umbraco-cms/backoffice/auth';
 import { TinyMcePluginArguments, UmbTinyMcePluginBase } from '@umbraco-cms/backoffice/components';
 import { ClassConstructor, hasDefaultExport, loadExtension } from '@umbraco-cms/backoffice/extension-api';
 import { ManifestTinyMcePlugin, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -21,6 +21,8 @@ import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbMediaHelper } from '@umbraco-cms/backoffice/utils';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import { UMB_APP } from '@umbraco-cms/backoffice/app';
+import { UmbStylesheetRepository } from '@umbraco-cms/backoffice/stylesheet';
 
 // TODO => integrate macro picker, update stylesheet fetch when backend CLI exists (ref tinymce.service.js in existing backoffice)
 @customElement('umb-input-tiny-mce')
@@ -33,9 +35,11 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 
 	#mediaHelper = new UmbMediaHelper();
 	#currentUser?: UmbLoggedInUser;
-	#auth?: typeof UMB_AUTH.TYPE;
+	#auth?: typeof UMB_AUTH_CONTEXT.TYPE;
 	#plugins: Array<new (args: TinyMcePluginArguments) => UmbTinyMcePluginBase> = [];
 	#editorRef?: tinymce.Editor | null = null;
+	#stylesheetRepository?: UmbStylesheetRepository;
+	#serverUrl?: string;
 
 	protected getFormElement() {
 		return this._editorElement?.querySelector('iframe') ?? undefined;
@@ -46,6 +50,12 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 
 	constructor() {
 		super();
+
+		this.consumeContext(UMB_APP, (instance) => {
+			this.#serverUrl = instance.getServerUrl();
+		});
+
+		this.#stylesheetRepository = new UmbStylesheetRepository(this);
 
 		// TODO => this breaks tests, removing for now will ignore user language
 		// and fall back to tinymce default language
@@ -94,6 +104,61 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 		}
 	}
 
+	async getFormatStyles(stylesheetPath: Array<string>) {
+		const rules: any[] = [];
+
+		stylesheetPath.forEach((path) => {
+			//TODO => Legacy path?
+			/**
+			 * if (val.indexOf(Umbraco.Sys.ServerVariables.umbracoSettings.cssPath + "/") === 0) {
+				// current format (full path to stylesheet)
+				stylesheets.push(val);
+			  }
+			  else {
+				// legacy format (stylesheet name only) - must prefix with stylesheet folder and postfix with ".css"
+				stylesheets.push(Umbraco.Sys.ServerVariables.umbracoSettings.cssPath + "/" + val + ".css");
+			  }
+			 */
+			this.#stylesheetRepository?.getStylesheetRules(path).then(({ data }) => {
+				data?.rules?.forEach((rule) => {
+					const r: {
+						title?: string;
+						inline?: string;
+						classes?: string;
+						attributes?: Record<string, string>;
+						block?: string;
+					} = {
+						title: rule.name,
+					};
+
+					if (!rule.selector) return;
+
+					if (rule.selector.startsWith('.')) {
+						r.inline = 'span';
+						r.classes = rule.selector.substring(1);
+					} else if (rule.selector.startsWith('#')) {
+						r.inline = 'span';
+						r.attributes = { id: rule.selector.substring(1) };
+					} else if (rule.selector.includes('.')) {
+						const [block, ...classes] = rule.selector.split('.');
+						r.block = block;
+						r.classes = classes.join(' ').replace(/\./g, ' ');
+					} else if (rule.selector.includes('#')) {
+						const [block, id] = rule.selector.split('#');
+						r.block = block;
+						r.classes = id;
+					} else {
+						r.block = rule.selector;
+					}
+
+					rules.push(r);
+				});
+			});
+		});
+
+		return rules;
+	}
+
 	async #setTinyConfig() {
 		// create an object by merging the configuration onto the fallback config
 		// TODO: Seems like a too tight coupling between DataTypeConfigCollection and TinyMceConfig, I would love it begin more explicit what we take from DataTypeConfigCollection and parse on, but I understand that this gives some flexibility. Is this flexibility on purpose?
@@ -101,6 +166,12 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 			...defaultFallbackConfig,
 			...(this.configuration ? this.configuration?.toObject() : {}),
 		};
+
+		// Map the stylesheets with server url
+		const stylesheets = configurationOptions.stylesheets.map(
+			(stylesheetPath: string) => `${this.#serverUrl}/css/${stylesheetPath.replace(/\\/g, '/')}`,
+		);
+		const styleFormats = await this.getFormatStyles(configurationOptions.stylesheets);
 
 		// no auto resize when a fixed height is set
 		if (!configurationOptions.dimensions?.height) {
@@ -129,13 +200,13 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 		// extend with configuration values
 		this._tinyConfig = {
 			...this._tinyConfig,
-			content_css: configurationOptions.stylesheets.join(','),
+			content_css: stylesheets,
+			style_formats: styleFormats || defaultStyleFormats,
 			extended_valid_elements: defaultExtendedValidElements,
 			height: configurationOptions.height ?? 500,
 			invalid_elements: configurationOptions.invalidElements,
 			plugins: configurationOptions.plugins.map((x: any) => x.name),
 			toolbar: configurationOptions.toolbar.join(' '),
-			style_formats: defaultStyleFormats,
 			valid_elements: configurationOptions.validElements,
 			width: configurationOptions.width,
 		};

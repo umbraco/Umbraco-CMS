@@ -1,7 +1,7 @@
 import type { UmbAppErrorElement } from './app-error.element.js';
 import { UMB_APP, UmbAppContext } from './app.context.js';
 import { umbLocalizationRegistry } from '@umbraco-cms/backoffice/localization';
-import { UMB_AUTH, UmbAuthContext } from '@umbraco-cms/backoffice/auth';
+import { UMB_AUTH_CONTEXT, UmbAuthContext } from '@umbraco-cms/backoffice/auth';
 import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UUIIconRegistryEssential } from '@umbraco-cms/backoffice/external/uui';
 import { UmbIconRegistry } from '@umbraco-cms/backoffice/icon';
@@ -111,7 +111,7 @@ export class UmbAppElement extends UmbLitElement {
 
 		this.#authContext = new UmbAuthContext(this, this.serverUrl, redirectUrl);
 
-		this.provideContext(UMB_AUTH, this.#authContext);
+		this.provideContext(UMB_AUTH_CONTEXT, this.#authContext);
 
 		this.provideContext(UMB_APP, new UmbAppContext({ backofficePath: this.backofficePath, serverUrl: this.serverUrl }));
 

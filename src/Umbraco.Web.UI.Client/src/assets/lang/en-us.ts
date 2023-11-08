@@ -2222,20 +2222,21 @@ export default {
 		getStarted: 'To get you started',
 	},
 	settingsDashboard: {
-		start: 'Start here',
-		startDescription:
-			'This section contains the building blocks for your Umbraco site. Follow the below\n      links to find out more about working with the items in the Settings section\n    ',
-		more: 'Find out more',
-		bulletPointOne:
-			'\n            Read more about working with the items in Settings <a class="btn-link -underline" href="https://docs.umbraco.com/umbraco-cms/fundamentals/backoffice/sections/" target="_blank" rel="noopener">in the Documentation section</a> of Our Umbraco\n        ',
-		bulletPointTwo:
-			'\n            Ask a question in the <a class="btn-link -underline" href="https://our.umbraco.com/forum" target="_blank" rel="noopener">Community Forum</a>\n        ',
-		bulletPointTutorials:
-			'\n            Watch our free <a class="btn-link -underline" href="https://umbra.co/ulb" target="_blank" rel="noopener">tutorial videos on the Umbraco Learning Base</a>\n        ',
-		bulletPointFour:
-			'\n            Find out about our <a class="btn-link -underline" href="https://umbraco.com/products/" target="_blank" rel="noopener">productivity boosting tools and commercial support</a>\n        ',
-		bulletPointFive:
-			'\n            Find out about real-life <a class="btn-link -underline" href="https://umbraco.com/training/" target="_blank" rel="noopener">training and certification</a> opportunities\n        ',
+		documentationHeader: 'Documentation',
+		documentationDescription: 'Read more about working with the items in Settings in our Documentation.',
+		communityHeader: 'Community',
+		trainingHeader: 'Training',
+		trainingDescription: 'Find out about real-life training and certification opportunities',
+		supportHeader: 'Support',
+		supportDescription: 'Ask a question in the community forum or our Discord community.',
+		videosHeader: 'Videos',
+		videosDescription:
+			'Watch our free tutorial videos on the Umbraco Learning Base YouTube channel, to get up to speed quickly with Umbraco.',
+		getHelp: 'Get the help you need',
+		getCertified: 'Get Certified',
+		goForum: 'Go to the forum',
+		chatWithCommunity: 'Chat with the community',
+		watchVideos: 'Watch the videos',
 	},
 	startupDashboard: {
 		fallbackHeadline: 'Welcome to The Friendly CMS',

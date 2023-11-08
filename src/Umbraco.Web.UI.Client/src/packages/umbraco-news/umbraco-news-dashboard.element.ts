@@ -1,18 +1,18 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UMB_AUTH } from '@umbraco-cms/backoffice/auth';
+import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-umbraco-news-dashboard')
 export class UmbUmbracoNewsDashboardElement extends UmbLitElement {
-	#auth?: typeof UMB_AUTH.TYPE;
+	#auth?: typeof UMB_AUTH_CONTEXT.TYPE;
 
 	@state()
 	private name = '';
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_AUTH, (instance) => {
+		this.consumeContext(UMB_AUTH_CONTEXT, (instance) => {
 			this.#auth = instance;
 			this.#observeCurrentUser();
 		});
