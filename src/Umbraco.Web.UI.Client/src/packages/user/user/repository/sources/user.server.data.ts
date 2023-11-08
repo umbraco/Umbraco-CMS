@@ -9,7 +9,6 @@ import {
 	UpdateUserRequestModel,
 	UserPresentationBaseModel,
 	UserResource,
-	InviteUserRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
