@@ -2,7 +2,7 @@ import { UmbLanguageServerDataSource } from './sources/language.server.data.js';
 import { UmbLanguageStore, UMB_LANGUAGE_STORE_CONTEXT_TOKEN } from './language.store.js';
 import { UmbLanguageItemServerDataSource } from './sources/language-item.server.data.js';
 import { UMB_LANGUAGE_ITEM_STORE_CONTEXT_TOKEN, UmbLanguageItemStore } from './language-item.store.js';
-import { UmbBaseController, type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbBaseController, type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 import { LanguageItemResponseModel, LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
@@ -17,7 +17,7 @@ export class UmbLanguageRepository extends UmbBaseController implements UmbItemR
 
 	#notificationContext?: UmbNotificationContext;
 
-	constructor(host: UmbControllerHostElement) {
+	constructor(host: UmbControllerHost) {
 		super(host);
 
 		this.#dataSource = new UmbLanguageServerDataSource(this);
