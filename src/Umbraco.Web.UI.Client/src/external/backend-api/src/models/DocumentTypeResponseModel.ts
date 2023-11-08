@@ -4,9 +4,9 @@
 /* eslint-disable */
 
 import type { ContentTypeCleanupModel } from './ContentTypeCleanupModel';
-import type { ContentTypeResponseModelBaseDocumentTypePropertyTypeResponseModelDocumentTypePropertyTypeContainerResponseModel } from './ContentTypeResponseModelBaseDocumentTypePropertyTypeResponseModelDocumentTypePropertyTypeContainerResponseModel';
+import type { ContentTypeForDocumentTypeResponseModel } from './ContentTypeForDocumentTypeResponseModel';
 
-export type DocumentTypeResponseModel = (ContentTypeResponseModelBaseDocumentTypePropertyTypeResponseModelDocumentTypePropertyTypeContainerResponseModel & {
+export type DocumentTypeResponseModel = (ContentTypeForDocumentTypeResponseModel & {
     allowedTemplateIds?: Array<string>;
     defaultTemplateId?: string | null;
     cleanup?: ContentTypeCleanupModel;
