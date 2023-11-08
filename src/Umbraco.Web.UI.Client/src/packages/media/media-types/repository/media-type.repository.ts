@@ -67,7 +67,6 @@ export class UmbMediaTypeRepository
 		]);
 	}
 
-	// TREE:
 	async requestTreeRoot() {
 		await this.#init;
 
@@ -150,8 +149,6 @@ export class UmbMediaTypeRepository
 
 	async requestById(id: string) {
 		await this.#init;
-		// TODO: should we show a notification if the id is missing?
-		// Investigate what is best for Acceptance testing, cause in that perspective a thrown error might be the best choice?
 		if (!id) {
 			throw new Error('Id is missing');
 		}
