@@ -24,13 +24,12 @@ import {
 	AuthorizationServiceConfiguration,
 	GRANT_TYPE_AUTHORIZATION_CODE,
 	GRANT_TYPE_REFRESH_TOKEN,
-	//RevokeTokenRequest,
+	RevokeTokenRequest,
 	TokenRequest,
 	TokenResponse,
 	LocationLike,
 	StringMap,
 } from '@umbraco-cms/backoffice/external/openid';
-import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 
 const requestor = new FetchRequestor();
 
@@ -83,7 +82,6 @@ class UmbNoHashQueryStringUtils extends BasicQueryStringUtils {
  * 4. After login, get the latest token before each request to the server by calling the `performWithFreshTokens` method
  */
 export class UmbAuthFlow {
-
 	// handlers
 	readonly #notifier: AuthorizationNotifier;
 	readonly #authorizationHandler: RedirectRequestHandler;
@@ -99,9 +97,6 @@ export class UmbAuthFlow {
 	// tokens
 	#refreshToken: string | undefined;
 	#accessTokenResponse: TokenResponse | undefined;
-
-	readonly #authorized = new UmbBooleanState<boolean>(false);
-	readonly authorized = this.#authorized.asObservable();
 
 	constructor(
 		openIdConnectUrl: string,
@@ -147,6 +142,7 @@ export class UmbAuthFlow {
 
 				await this.#makeRefreshTokenRequest(response.code, codeVerifier);
 				await this.performWithFreshTokens();
+				await this.#saveTokenState();
 			}
 		});
 	}
@@ -171,7 +167,6 @@ export class UmbAuthFlow {
 			if (response.isValid()) {
 				this.#accessTokenResponse = response;
 				this.#refreshToken = this.#accessTokenResponse.refreshToken;
-				this.checkAuthorization();
 			}
 		}
 
@@ -219,24 +214,13 @@ export class UmbAuthFlow {
 	}
 
 	/**
-	 * Checks if the user is logged in by validating the timestamp of the stored token.
+	 * This method will check if the user is logged in by validating the timestamp of the stored token.
 	 * If no token is stored, it will return false.
 	 *
 	 * @returns true if the user is logged in, false otherwise.
 	 */
 	isAuthorized(): boolean {
 		return !!this.#accessTokenResponse && this.#accessTokenResponse.isValid();
-	}
-
-	/**
-	 * Checks if the user is logged in by validating the token, this will update authorized state as well.
-	 *
-	 * @returns true if the user is logged in, false otherwise.
-	 */
-	checkAuthorization() {
-		const authorized = this.isAuthorized();
-		this.#authorized.next(authorized);
-		return authorized;
 	}
 
 	/**
@@ -257,7 +241,6 @@ export class UmbAuthFlow {
 			// await this.#tokenHandler.performRevokeTokenRequest(this.#configuration, tokenRevokeRequest);
 
 			this.#accessTokenResponse = undefined;
-			this.checkAuthorization();
 		}
 
 		if (this.#refreshToken) {
@@ -302,8 +285,6 @@ export class UmbAuthFlow {
 
 		const response = await this.#tokenHandler.performTokenRequest(this.#configuration, request);
 		this.#accessTokenResponse = response;
-		await this.#saveTokenState();
-		this.checkAuthorization();
 		return response.accessToken;
 	}
 
@@ -339,6 +320,5 @@ export class UmbAuthFlow {
 		const response = await this.#tokenHandler.performTokenRequest(this.#configuration, request);
 		this.#refreshToken = response.refreshToken;
 		this.#accessTokenResponse = response;
-		this.checkAuthorization();
 	}
 }
