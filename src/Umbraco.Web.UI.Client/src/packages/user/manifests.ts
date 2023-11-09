@@ -17,4 +17,10 @@ export const manifests = [
 	...currentUserManifests,
 	...userPermissionManifests,
 	...modalManifests,
+	{
+		name: 'User Management Entry Point',
+		alias: 'Umb.EntryPoint.UserManagement',
+		type: 'entryPoint',
+		loader: () => import('./entry-point.js'),
+	},
 ];
