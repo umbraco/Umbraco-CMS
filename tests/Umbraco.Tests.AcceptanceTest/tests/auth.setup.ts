@@ -1,5 +1,5 @@
 ﻿import {test as setup, expect} from '@playwright/test';
-import {STORAGE_STATE} from '../playwright.config'
+import {STORAGE_STATE} from '../playwright.config';
 import {UiHelpers} from "@umbraco/playwright-testhelpers";
 
 setup('authenticate', async ({page}) => {
@@ -11,7 +11,7 @@ setup('authenticate', async ({page}) => {
   await page.getByRole('button', {name: 'Login'}).click();
 
   // Assert
-  await expect(page.getByRole('tab', {name: 'Settings'})).toBeVisible();
+  await expect(page.locator('uui-tab-group').locator('[label="Settings"]')).toBeVisible();
   await umbracoUi.goToSection('Settings');
   await page.context().storageState({path: STORAGE_STATE});
 });
