@@ -4,6 +4,7 @@ import { UmbUserDetail } from '../../../types.js';
 import { html, customElement, state, css, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
 
 type UmbUserWorkspaceInfoItem = { labelKey: string; value: string | number | undefined };
 
@@ -11,6 +12,9 @@ type UmbUserWorkspaceInfoItem = { labelKey: string; value: string | number | und
 export class UmbUserWorkspaceInfoElement extends UmbLitElement {
 	@state()
 	private _user?: UmbUserDetail;
+
+	@state()
+	private _userAvatarUrls?: Array<{ url: string; scale: string }>;
 
 	@state()
 	private _userInfo: Array<UmbUserWorkspaceInfoItem> = [];
@@ -24,14 +28,36 @@ export class UmbUserWorkspaceInfoElement extends UmbLitElement {
 			this.#userWorkspaceContext = instance;
 			this.observe(
 				this.#userWorkspaceContext.data,
-				(user) => {
+				async (user) => {
 					this._user = user;
+					this.#setUserAvatarUrls(user);
 					this.#setUserInfoItems(user);
 				},
 				'umbUserObserver',
 			);
 		});
 	}
+
+	async #getServerUrl() {
+		// TODO: remove this when we get absolute urls from the server
+		return this.consumeContext(UMB_APP_CONTEXT, (instance) => {}).asPromise();
+	}
+
+	// TODO: remove this when we get absolute urls from the server
+	#setUserAvatarUrls = async (user: UmbUserDetail | undefined) => {
+		const serverUrl = (await this.#getServerUrl()).getServerUrl();
+
+		this._userAvatarUrls = [
+			{
+				scale: '1x',
+				url: `${serverUrl}${user?.avatarUrls?.[3]}`,
+			},
+			{
+				scale: '2x',
+				url: `${serverUrl}${user?.avatarUrls?.[4]}`,
+			},
+		];
+	};
 
 	#onAvatarUploadSubmit = (event: SubmitEvent) => {
 		event.preventDefault();
@@ -86,15 +112,9 @@ export class UmbUserWorkspaceInfoElement extends UmbLitElement {
 		const displayState = getDisplayStateFromUserStatus(this._user.state);
 
 		return html`
-			<uui-box id="user-info">
-				<div id="user-avatar-settings" class="user-info-item">
-					<form id="AvatarUploadForm" @submit=${this.#onAvatarUploadSubmit}>
-						<uui-avatar .name=${this._user?.name || ''}></uui-avatar>
-						<input id="AvatarFileField" type="file" name="avatarFile" required />
-						<uui-button type="submit" label="${this.localize.term('user_changePhoto')}"></uui-button>
-					</form>
-				</div>
+			${this.#renderAvatar()}
 
+			<uui-box id="user-info">
 				<div id="user-status-info" class="user-info-item">
 					<b><umb-localize key="general_status">Status</umb-localize>:</b>
 					<uui-tag look="${ifDefined(displayState?.look)}" color="${ifDefined(displayState?.color)}">
@@ -107,6 +127,33 @@ export class UmbUserWorkspaceInfoElement extends UmbLitElement {
 					(item) => item.labelKey,
 					(item) => this.#renderInfoItem(item.labelKey, item.value),
 				)}
+			</uui-box>
+		`;
+	}
+
+	getSrcset() {
+		let string = '';
+
+		this._userAvatarUrls?.forEach((url) => {
+			string += `${url.url} ${url.scale},`;
+		});
+		return string;
+	}
+
+	#renderAvatar() {
+		return html`
+			<uui-box>
+				<div id="user-avatar-settings" class="user-info-item">
+					<form id="AvatarUploadForm" @submit=${this.#onAvatarUploadSubmit}>
+						<uui-avatar
+							id="Avatar"
+							.name=${this._user?.name || ''}
+							img-src=${ifDefined(this._userAvatarUrls?.[0].url)}
+							img-srcset=${this.getSrcset()}></uui-avatar>
+						<input id="AvatarFileField" type="file" name="avatarFile" required />
+						<uui-button type="submit" label="${this.localize.term('user_changePhoto')}"></uui-button>
+					</form>
+				</div>
 			</uui-box>
 		`;
 	}
@@ -132,6 +179,10 @@ export class UmbUserWorkspaceInfoElement extends UmbLitElement {
 				width: fit-content;
 			}
 
+			#Avatar {
+				font-size: 75px;
+			}
+
 			#user-info {
 				margin-bottom: var(--uui-size-space-4);
 			}
@@ -142,7 +193,7 @@ export class UmbUserWorkspaceInfoElement extends UmbLitElement {
 				margin-bottom: var(--uui-size-space-3);
 			}
 
-			#user-avatar-settings {
+			#user-avatar-settings form {
 				display: flex;
 				flex-direction: column;
 				gap: var(--uui-size-space-2);
