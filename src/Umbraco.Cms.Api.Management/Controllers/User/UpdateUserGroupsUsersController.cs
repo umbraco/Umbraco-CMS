@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Factories;
+using Umbraco.Cms.Api.Management.Headers;
 using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.User;
 using Umbraco.Cms.Core.Models.Membership;
@@ -26,12 +27,13 @@ public class UpdateGroupsUsersController : UserControllerBase
     [HttpPatch("user-group-ids")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<UserResponseModel>), StatusCodes.Status200OK)]
+    [MultiResourceListPatch]
     public async Task<IActionResult> UpdateUserGroups(PatchResourceListRequestModel requestModel)
     {
         IUser[] updatedUsers = await _userGroupService.UpdateUserGroupsOnUsers(
             requestModel.Resources,
-            requestModel.Post,
-            requestModel.Delete);
+            requestModel.Add,
+            requestModel.Remove);
         return Ok(updatedUsers.Select(user => _userPresentationFactory.CreateResponseModel(user)));
     }
 }

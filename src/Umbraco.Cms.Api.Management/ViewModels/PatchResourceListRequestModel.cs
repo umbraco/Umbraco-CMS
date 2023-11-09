@@ -13,10 +13,10 @@ public class PatchResourceListRequestModel
     /// <summary>
     /// The identifiers of the resources to add to the list.
     /// </summary>
-    public required ISet<Guid> Post { get; set; }
+    public required ISet<Guid> Add { get; set; }
 
     /// <summary>
     /// The identifiers of the resources to remove from the list.
     /// </summary>
-    public required ISet<Guid> Delete { get; set; }
+    public required ISet<Guid> Remove { get; set; }
 }
