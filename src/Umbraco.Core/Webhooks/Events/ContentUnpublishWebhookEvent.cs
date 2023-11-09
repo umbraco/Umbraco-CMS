@@ -7,7 +7,7 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events;
 
-[WebhookEvent(Constants.WebhookEvents.Names.ContentUnpublish, Constants.WebhookEvents.Types.Content)]
+[WebhookEvent("Content was unpublished", Constants.WebhookEvents.Types.Content)]
 public class ContentUnpublishWebhookEvent : WebhookEventContentBase<ContentUnpublishedNotification, IContent>
 {
     public ContentUnpublishWebhookEvent(
