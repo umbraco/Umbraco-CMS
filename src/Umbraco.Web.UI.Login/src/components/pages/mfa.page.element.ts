@@ -126,7 +126,7 @@ export default class UmbMfaPageElement extends LitElement {
 				<form id="LoginForm" @submit=${this.handleSubmit}>
 					<header>
 						<h1>
-							<umb-localize key="login_2fatitle">One last step</umb-localize>
+							<umb-localize key="login_2faTitle">One last step</umb-localize>
 						</h1>
 					</header>
 
