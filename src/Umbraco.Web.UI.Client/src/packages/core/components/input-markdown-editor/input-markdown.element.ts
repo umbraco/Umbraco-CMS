@@ -12,7 +12,7 @@ import {
 	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
 	UmbModalManagerContext,
 } from '@umbraco-cms/backoffice/modal';
-import { UMB_APP } from '@umbraco-cms/backoffice/app';
+import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
 
 /**
  * @element umb-input-markdown
@@ -49,7 +49,7 @@ export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
 			this._modalContext = instance;
 		});
-		this.consumeContext(UMB_APP, (instance) => {
+		this.consumeContext(UMB_APP_CONTEXT, (instance) => {
 			this.serverUrl = instance.getServerUrl();
 		});
 	}
