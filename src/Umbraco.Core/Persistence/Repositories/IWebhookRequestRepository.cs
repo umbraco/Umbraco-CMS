@@ -23,4 +23,11 @@ public interface IWebhookRequestRepository
     /// </summary>
     /// <returns>An enumerable of <see cref="WebhookRequest" /> objects.</returns>
     Task<IEnumerable<WebhookRequest>> GetAllAsync();
+
+    /// <summary>
+    ///     Update a webhook request.
+    /// </summary>
+    /// <param name="webhookRequest">The webhook request you want to update.</param>
+    /// <returns>The updated <see cref="WebhookRequest" /> webhook</returns>
+    Task<WebhookRequest> UpdateAsync(WebhookRequest webhookRequest);
 }

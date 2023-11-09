@@ -34,4 +34,27 @@ public class WebhookRequestService : IWebhookRequestService
 
         return webhookRequest;
     }
+
+    public Task<IEnumerable<WebhookRequest>> GetAllAsync()
+    {
+        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+        Task<IEnumerable<WebhookRequest>> webhookRequests = _webhookRequestRepository.GetAllAsync();
+        scope.Complete();
+        return webhookRequests;
+    }
+
+    public async Task DeleteAsync(WebhookRequest webhookRequest)
+    {
+        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+        await _webhookRequestRepository.DeleteAsync(webhookRequest);
+        scope.Complete();
+    }
+
+    public async Task<WebhookRequest> UpdateAsync(WebhookRequest webhookRequest)
+    {
+        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+        WebhookRequest updated = await _webhookRequestRepository.UpdateAsync(webhookRequest);
+        scope.Complete();
+        return updated;
+    }
 }
