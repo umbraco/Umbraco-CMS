@@ -186,7 +186,7 @@ export class UmbAppElement extends UmbLitElement {
 	async #setAuthStatus() {
 		if (this.bypassAuth === false) {
 			if (!this.#authContext) {
-				throw new Error('[Fatal] AuthContext requested before it was initialised');
+				throw new Error('[Fatal] AuthContext requested before it was initialized');
 			}
 
 			// Get service configuration from authentication server
@@ -199,6 +199,8 @@ export class UmbAppElement extends UmbLitElement {
 
 		// TODO: This feels like an od placement, move this into some method regarding starting the application/not install/...
 		this.#listenForLanguageChange();
+
+		this.#authContext?.checkAuthorization();
 
 	}
 
@@ -239,13 +241,13 @@ export class UmbAppElement extends UmbLitElement {
 		}
 	}
 
-	#isAuthorized(): boolean {
-		return this.#authContext?.isAuthorized() ?? false;
+	#checkAuthorized(): boolean {
+		return this.#authContext?.checkAuthorization() ?? false;
 	}
 
 	#isAuthorizedGuard(): Guard {
 		return () => {
-			if (this.#isAuthorized()) {
+			if (this.#checkAuthorized()) {
 				return true;
 			}
 

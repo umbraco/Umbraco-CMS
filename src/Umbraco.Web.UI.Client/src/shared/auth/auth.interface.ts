@@ -1,7 +1,7 @@
 import type { UmbLoggedInUser } from './types.js';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 
-export interface IUmbAuth {
+export interface UmbAuth {
 	/**
 	 * Initiates the login flow.
 	 */
@@ -15,8 +15,7 @@ export interface IUmbAuth {
 	/**
 	 * Checks if there is a token and it is still valid.
 	 */
-	isAuthorized(): boolean;
-
+	checkAuthorization(): boolean;
 	/**
 	 * Gets the latest token from the Management API.
 	 * If the token is expired, it will be refreshed.
