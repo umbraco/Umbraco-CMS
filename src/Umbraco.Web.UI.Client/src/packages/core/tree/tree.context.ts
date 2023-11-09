@@ -3,7 +3,7 @@ import { UmbPagedData, UmbTreeRepository } from '@umbraco-cms/backoffice/reposit
 import { ManifestTree, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbBaseController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
+import { UmbExtensionApiController } from '@umbraco-cms/backoffice/extension-api';
 import { ProblemDetails, TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import { UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
@@ -153,6 +153,11 @@ export class UmbTreeContextBase<TreeItemType extends TreeItemPresentationModel>
 		const repositoryAlias = treeManifest.meta.repositoryAlias;
 		if (!repositoryAlias) throw new Error('Tree must have a repository alias.');
 
+		new UmbExtensionApiController(this, umbExtensionsRegistry, repositoryAlias, [this._host], (permitted, ctrl) => {
+			this.repository = permitted ? ctrl.api as UmbTreeRepository<TreeItemType> : undefined;
+			this.#checkIfInitialized();
+		});
+		/*
 		this.observe(
 			umbExtensionsRegistry.getByTypeAndAlias('repository', treeManifest.meta.repositoryAlias),
 			async (repositoryManifest) => {
@@ -168,5 +173,6 @@ export class UmbTreeContextBase<TreeItemType extends TreeItemPresentationModel>
 			},
 			'_observeRepository',
 		);
+		*/
 	}
 }

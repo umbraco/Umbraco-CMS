@@ -59,8 +59,8 @@ export class UmbExtensionsApiController<
 		extensionRegistry: UmbExtensionRegistry<ManifestTypes>,
 		type: ManifestTypeName | Array<ManifestTypeName>,
 		constructorArguments: Array<unknown> | undefined,
-		filter: undefined | null | ((manifest: ManifestTypeAsApi) => boolean),
-		onChange: (permittedManifests: Array<MyPermittedControllerType>, controller: MyPermittedControllerType) => void
+		filter?: undefined | null | ((manifest: ManifestTypeAsApi) => boolean),
+		onChange?: (permittedManifests: Array<MyPermittedControllerType>) => void
 	) {
 		super(host, extensionRegistry, type, filter, onChange);
 		this.#extensionRegistry = extensionRegistry;

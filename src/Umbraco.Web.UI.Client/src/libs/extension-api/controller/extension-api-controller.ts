@@ -67,7 +67,7 @@ export class UmbExtensionApiController<
 		extensionRegistry: UmbExtensionRegistry<ManifestCondition>,
 		alias: string,
 		constructorArguments: Array<unknown> | undefined,
-		onPermissionChanged: (isPermitted: boolean, controller: ControllerType) => void
+		onPermissionChanged?: (isPermitted: boolean, controller: ControllerType) => void
 	) {
 		super(host, extensionRegistry, alias, onPermissionChanged);
 		this.#constructorArguments = constructorArguments;

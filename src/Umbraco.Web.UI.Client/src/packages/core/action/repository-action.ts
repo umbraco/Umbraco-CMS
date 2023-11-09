@@ -1,5 +1,5 @@
 import { UmbBaseController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { type ExtensionApi, createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
+import { type ExtensionApi, UmbExtensionApiController } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
 export class UmbActionBase<RepositoryType> extends UmbBaseController implements ExtensionApi {
@@ -8,8 +8,10 @@ export class UmbActionBase<RepositoryType> extends UmbBaseController implements 
 	constructor(host: UmbControllerHostElement, repositoryAlias: string) {
 		super(host);
 
-		// TODO: Could be replaced with ExtensionApiController?
-		this.observe(
+		new UmbExtensionApiController(this, umbExtensionsRegistry, repositoryAlias, [this._host], (permitted, ctrl) => {
+			this.repository = permitted ? ctrl.api as RepositoryType : undefined;
+		});
+		/*this.observe(
 			umbExtensionsRegistry.getByTypeAndAlias('repository', repositoryAlias),
 			async (repositoryManifest) => {
 				if (!repositoryManifest) return;
@@ -21,6 +23,6 @@ export class UmbActionBase<RepositoryType> extends UmbBaseController implements 
 					throw new Error('Could not create repository with alias: ' + repositoryAlias + '');
 				}
 			}
-		);
+		);*/
 	}
 }

@@ -43,7 +43,7 @@ export class UmbExtensionsElementController<
 		extensionRegistry: UmbExtensionRegistry<ManifestTypes>,
 		type: ManifestTypeName | Array<ManifestTypeName>,
 		filter: undefined | null | ((manifest: ManifestType) => boolean),
-		onChange: (permittedManifests: Array<MyPermittedControllerType>, controller: MyPermittedControllerType) => void,
+		onChange: (permittedManifests: Array<MyPermittedControllerType>) => void,
 		defaultElement?: string
 	) {
 		super(host, extensionRegistry, type, filter, onChange);

@@ -19,7 +19,7 @@ export abstract class UmbBaseExtensionController<
 	#overwrites: Array<string> = [];
 	#manifest?: ManifestType;
 	#conditionControllers: Array<UmbExtensionCondition> = [];
-	#onPermissionChanged: (isPermitted: boolean, controller: SubClassType) => void;
+	#onPermissionChanged?: (isPermitted: boolean, controller: SubClassType) => void;
 	protected _positive?: boolean;
 	#isPermitted?: boolean;
 
@@ -52,7 +52,7 @@ export abstract class UmbBaseExtensionController<
 		host: UmbControllerHost,
 		extensionRegistry: UmbExtensionRegistry<ManifestCondition>,
 		alias: string,
-		onPermissionChanged: (isPermitted: boolean, controller: SubClassType) => void
+		onPermissionChanged?: (isPermitted: boolean, controller: SubClassType) => void
 	) {
 		super(host, alias);
 		this.#extensionRegistry = extensionRegistry;
@@ -202,7 +202,7 @@ export abstract class UmbBaseExtensionController<
 				this.#promiseResolvers.forEach((x) => x());
 				this.#promiseResolvers = [];
 			}
-			this.#onPermissionChanged(this.#isPermitted, this as any);
+			this.#onPermissionChanged?.(this.#isPermitted, this as any);
 		}
 	};
 
@@ -219,7 +219,7 @@ export abstract class UmbBaseExtensionController<
 		if (this.#isPermitted === true) {
 			this.#isPermitted = undefined;
 			this._conditionsAreBad();
-			this.#onPermissionChanged(false, this as any);
+			this.#onPermissionChanged?.(false, this as any);
 		}
 		super.destroy();
 		// Destroy the conditions controllers, are begin destroyed cause they are controllers.

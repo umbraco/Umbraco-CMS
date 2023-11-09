@@ -54,7 +54,7 @@ class UmbTestExtensionsController<
 		extensionRegistry: UmbExtensionRegistry<ManifestWithDynamicConditions>,
 		type: myTestManifestTypes,
 		filter: null | ((manifest: ManifestWithDynamicConditions) => boolean),
-		onChange: (permittedManifests: Array<MyPermittedControllerType>, controller: MyPermittedControllerType) => void
+		onChange: (permittedManifests: Array<MyPermittedControllerType>) => void
 	) {
 		super(host, extensionRegistry, type, filter, onChange);
 		this.#host = host;

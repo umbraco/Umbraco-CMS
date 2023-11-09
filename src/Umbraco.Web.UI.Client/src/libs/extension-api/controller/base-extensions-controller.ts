@@ -24,7 +24,7 @@ export abstract class UmbBaseExtensionsController<
 	#extensionRegistry: UmbExtensionRegistry<ManifestType>;
 	#type: ManifestTypeName | Array<ManifestTypeName>;
 	#filter: undefined | null | ((manifest: ManifestType) => boolean);
-	#onChange: (permittedManifests: Array<MyPermittedControllerType>, controller: MyPermittedControllerType) => void;
+	#onChange?: (permittedManifests: Array<MyPermittedControllerType>) => void;
 	protected _extensions: Array<ControllerType> = [];
 	private _permittedExts: Array<MyPermittedControllerType> = [];
 
@@ -33,7 +33,7 @@ export abstract class UmbBaseExtensionsController<
 		extensionRegistry: UmbExtensionRegistry<ManifestType>,
 		type: ManifestTypeName | Array<ManifestTypeName>,
 		filter: undefined | null | ((manifest: ManifestType) => boolean),
-		onChange: (permittedManifests: Array<MyPermittedControllerType>, controller: MyPermittedControllerType) => void
+		onChange?: (permittedManifests: Array<MyPermittedControllerType>) => void
 	) {
 		super(host);
 		this.#extensionRegistry = extensionRegistry;
@@ -121,7 +121,7 @@ export abstract class UmbBaseExtensionsController<
 			// Sorting:
 			exposedPermittedExts.sort((a, b) => b.weight - a.weight);
 
-			this.#onChange(exposedPermittedExts, this as unknown as MyPermittedControllerType);
+			this.#onChange?.(exposedPermittedExts);
 		}
 	};
 
@@ -144,5 +144,6 @@ export abstract class UmbBaseExtensionsController<
 		super.destroy();
 		this._extensions.length = 0;
 		this._permittedExts.length = 0;
+		this.#onChange?.(this._permittedExts);
 	}
 }

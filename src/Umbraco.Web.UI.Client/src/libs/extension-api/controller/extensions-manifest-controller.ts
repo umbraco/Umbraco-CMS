@@ -31,7 +31,7 @@ export class UmbExtensionsManifestController<
 		extensionRegistry: UmbExtensionRegistry<ManifestTypes>,
 		type: ManifestTypeName | Array<ManifestTypeName>,
 		filter: null | ((manifest: ManifestType) => boolean),
-		onChange: (permittedManifests: Array<MyPermittedControllerType>, controller: MyPermittedControllerType) => void
+		onChange: (permittedManifests: Array<MyPermittedControllerType>) => void
 	) {
 		super(host, extensionRegistry, type, filter, onChange);
 		this.#extensionRegistry = extensionRegistry;
