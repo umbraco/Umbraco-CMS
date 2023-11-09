@@ -100,7 +100,7 @@ export class UmbInstalledPackagesSectionViewElement extends UmbLitElement implem
 					(item) => html`<umb-installed-packages-section-view-item
 						.name=${item.name}
 						.version=${item.version}
-						.customIcon="${'umb:sync'}"
+						.customIcon="${'icon-sync'}"
 						.hasPendingMigrations=${item.hasPendingMigrations}></umb-installed-packages-section-view-item>`
 				)}
 			</uui-ref-list>

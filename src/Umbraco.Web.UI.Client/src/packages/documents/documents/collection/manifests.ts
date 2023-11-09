@@ -12,7 +12,7 @@ export const manifests: Array<ManifestCollectionView> = [
 		},
 		meta: {
 			label: 'Table',
-			icon: 'umb:box',
+			icon: 'icon-box',
 			pathName: 'table',
 		},
 	},

@@ -8,7 +8,7 @@ export const manifest: ManifestPropertyEditorUi = {
 	meta: {
 		label: 'Toggle',
 		propertyEditorSchemaAlias: 'Umbraco.TrueFalse',
-		icon: 'umb:checkbox',
+		icon: 'icon-checkbox',
 		group: 'common',
 		settings: {
 			properties: [

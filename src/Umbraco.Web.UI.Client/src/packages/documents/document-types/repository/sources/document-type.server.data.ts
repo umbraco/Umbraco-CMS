@@ -63,7 +63,7 @@ export class UmbDocumentTypeServerDataSource
 			name: '',
 			alias: '',
 			description: '',
-			icon: 'umb:document',
+			icon: 'icon-document',
 			allowedAsRoot: false,
 			variesByCulture: false,
 			variesBySegment: false,

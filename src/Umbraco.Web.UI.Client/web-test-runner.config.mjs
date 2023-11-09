@@ -1,6 +1,10 @@
 import { esbuildPlugin } from '@web/dev-server-esbuild';
 import { playwrightLauncher } from '@web/test-runner-playwright';
 import { importMapsPlugin } from '@web/dev-server-import-maps';
+import rollupCommonjs from '@rollup/plugin-commonjs';
+import { fromRollup } from '@web/dev-server-rollup';
+
+const commonjs = fromRollup(rollupCommonjs);
 
 const mode = process.env.MODE || 'dev';
 if (!['dev', 'prod'].includes(mode)) {
@@ -11,7 +15,7 @@ if (!['dev', 'prod'].includes(mode)) {
 export default {
 	rootDir: '.',
 	files: ['./src/**/*.test.ts'],
-	nodeResolve: { exportConditions: mode === 'dev' ? ['development'] : [] },
+	nodeResolve: { exportConditions: mode === 'dev' ? ['development'] : [], preferBuiltins: false, browser: true },
 	plugins: [
 		esbuildPlugin({ ts: true, tsconfig: './tsconfig.json', target: 'auto', json: true }),
 		importMapsPlugin({
@@ -31,8 +35,8 @@ export default {
 						'@umbraco-cms/backoffice/external/tinymce': './src/external/tinymce/index.ts',
 						'@umbraco-cms/backoffice/external/uui': './src/external/uui/index.ts',
 						'@umbraco-cms/backoffice/external/uuid': './src/external/uuid/index.ts',
-						'@umbraco-cms/backoffice/external/sanitize-html': './src/external/sanitize-html/index.ts',
-						'@umbraco-cms/backoffice/external/marked': 'src/external/marked/index.ts',
+						'@umbraco-cms/backoffice/external/dompurify': './src/external/dompurify/index.ts',
+						'@umbraco-cms/backoffice/external/marked': './src/external/marked/index.ts',
 
 						'@umbraco-cms/backoffice/backend-api': './src/external/backend-api/index.ts',
 						'@umbraco-cms/backoffice/class-api': './src/libs/class-api/index.ts',
@@ -113,6 +117,9 @@ export default {
 					},
 				},
 			},
+		}),
+		commonjs({
+			include: ['node_modules/**', 'src/external/**'],
 		}),
 	],
 	browsers: [playwrightLauncher({ product: 'chromium' }), playwrightLauncher({ product: 'webkit' })],

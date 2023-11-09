@@ -16,7 +16,7 @@ import { handlers as profilingHandlers } from './handlers/performance-profiling.
 import { handlers as documentHandlers } from './handlers/document/index.js';
 import { handlers as mediaHandlers } from './handlers/media.handlers.js';
 import { handlers as dictionaryHandlers } from './handlers/dictionary.handlers.js';
-import { handlers as mediaTypeHandlers } from './handlers/media-type.handlers.js';
+import { handlers as mediaTypeHandlers } from './handlers/media-type/index.js';
 import { handlers as memberGroupHandlers } from './handlers/member-group.handlers.js';
 import { handlers as memberHandlers } from './handlers/member.handlers.js';
 import { handlers as memberTypeHandlers } from './handlers/member-type.handlers.js';

@@ -8,7 +8,7 @@ export const manifest: ManifestPropertyEditorUi = {
 	meta: {
 		label: 'Block Grid Stylesheet Picker',
 		propertyEditorSchemaAlias: '',
-		icon: 'umb:autofill',
+		icon: 'icon-autofill',
 		group: 'blocks',
 	},
 };

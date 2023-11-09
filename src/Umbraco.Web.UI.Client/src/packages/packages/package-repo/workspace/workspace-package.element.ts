@@ -30,7 +30,7 @@ export class UmbWorkspacePackageElement extends LitElement {
 	private _renderHeader() {
 		return html`<div class="header" slot="header">
 			<uui-button compact @click="${this._navigateBack}">
-				<uui-icon name="umb:arrow-left"></uui-icon>
+				<uui-icon name="icon-arrow-left"></uui-icon>
 				${this._package.name ?? 'Package name'}
 			</uui-button>
 		</div>`;

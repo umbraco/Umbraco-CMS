@@ -7,19 +7,85 @@ const getDirName = path.dirname;
 const glob = globModule.default;
 
 const moduleDirectory = 'src/shared/icon-registry';
-const iconsSVGDirectory = `${moduleDirectory}/svgs`;
 const iconsOutputDirectory = `${moduleDirectory}/icons`;
+const umbracoSvgDirectory = `${moduleDirectory}/svgs`;
+const iconMapJson = `${moduleDirectory}/icon-dictionary.json`;
+
+const lucideSvgDirectory = 'node_modules/lucide-static/icons';
 
 const run = async () => {
-	const icons = await collectIcons();
-	outputIcons(icons);
+	var icons = await collectDictionaryIcons();
+	icons = await collectDiskIcons(icons);
+	writeIconsToDisk(icons);
 	generateJSON(icons);
 };
 
-const collectIcons = async () => {
-	const iconPaths = await glob(`${iconsSVGDirectory}/icon-*.svg`);
+const collectDictionaryIcons = async () => {
+
+	const rawData = readFileSync(iconMapJson);
+	const fileRaw = rawData.toString();
+	const fileJSON = JSON.parse(fileRaw);
 
 	let icons = [];
+
+	// Lucide:
+	fileJSON.lucide.forEach((iconDef) => {
+		if(iconDef.file && iconDef.name) {
+			const path = lucideSvgDirectory + "/" + iconDef.file;
+
+			try {
+				const rawData = readFileSync(path);
+				// For Lucide icons specially we adjust the icons a bit for them to work in our case:
+				let svg = rawData.toString().replace('  width="24"\n', '');
+				svg = svg.replace('  height="24"\n', '');
+				svg = svg.replace('stroke-width="2"', 'stroke-width="1.75"');
+				const iconFileName = iconDef.name;
+
+				const icon = {
+					name: iconDef.name,
+					legacy: iconDef.legacy,
+					fileName: iconFileName,
+					svg,
+					output: `${iconsOutputDirectory}/${iconFileName}.js`,
+				};
+
+				icons.push(icon);
+			} catch(e) {
+				console.log(`Could not load file: '${path}'`);
+			}
+		}
+	});
+
+	// Umbraco:
+	fileJSON.umbraco.forEach((iconDef) => {
+		if(iconDef.file && iconDef.name) {
+			const path = umbracoSvgDirectory + "/" + iconDef.file;
+
+			try {
+				const rawData = readFileSync(path);
+				const svg = rawData.toString()
+				const iconFileName = iconDef.name;
+
+				const icon = {
+					name: iconDef.name,
+					legacy: iconDef.legacy,
+					fileName: iconFileName,
+					svg,
+					output: `${iconsOutputDirectory}/${iconFileName}.js`,
+				};
+
+				icons.push(icon);
+			} catch(e) {
+				console.log(`Could not load file: '${path}'`);
+			}
+		}
+	});
+
+	return icons;
+};
+
+const collectDiskIcons = async (icons) => {
+	const iconPaths = await glob(`${umbracoSvgDirectory}/icon-*.svg`);
 
 	iconPaths.forEach((path) => {
 		const rawData = readFileSync(path);
@@ -35,28 +101,31 @@ const collectIcons = async () => {
 
 		const SVGFileName = match[1];
 		const iconFileName = SVGFileName.replace('.svg', '');
-		const iconName = iconFileName.replace('icon-', '').replace('.svg', '');
+		const iconName = iconFileName;
 
-		const icon = {
-			src: path,
-			SVGFileName,
-			iconFileName,
-			name: iconName,
-			svg,
-			output: `${iconsOutputDirectory}/${iconFileName}.js`,
-		};
+		// Only append not already defined icons:
+		if(!icons.find(x => x.name === iconName)) {
 
-		icons.push(icon);
+			const icon = {
+				name: iconName,
+				legacy: true,
+				fileName: iconFileName,
+				svg,
+				output: `${iconsOutputDirectory}/${iconFileName}.js`,
+			};
+
+			icons.push(icon);
+		}
 	});
 
 	return icons;
 };
 
-const outputIcons = (icons) => {
+const writeIconsToDisk = (icons) => {
 	icons.forEach((icon) => {
 		const content = 'export default `' + icon.svg + '`;';
 
-		writeFileWithDir(`${icon.output}`, content, (err) => {
+		writeFileWithDir(icon.output, content, (err) => {
 			if (err) {
 				// eslint-disable-next-line no-undef
 				console.log(err);
@@ -72,10 +141,10 @@ const generateJSON = (icons) => {
 	const JSONPath = `${iconsOutputDirectory}/icons.json`;
 
 	const iconDescriptors = icons.map((icon) => {
-		console.log(icon);
 		return {
-			name: `umb:${icon.name}`,
-			path: `./icons/${icon.iconFileName}.js`,
+			name: icon.name,
+			legacy: icon.legacy,
+			path: `./icons/${icon.fileName}.js`,
 		};
 	});
 

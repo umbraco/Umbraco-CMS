@@ -99,7 +99,7 @@ export class UmbDataTypeRepository
 			id: null,
 			type: DATA_TYPE_ROOT_ENTITY_TYPE,
 			name: 'Data Types',
-			icon: 'umb:folder',
+			icon: 'icon-folder',
 			hasChildren: true,
 		};
 

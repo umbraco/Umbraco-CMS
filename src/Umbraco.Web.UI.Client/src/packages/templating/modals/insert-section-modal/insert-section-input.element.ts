@@ -55,7 +55,7 @@ export class UmbInsertSectionCheckboxElement extends UUIBooleanInputElement {
 	render() {
 		return html`
 			${super.render()}
-			<h3 class="uui-h3" @click=${this.click}>${this.checked ? html`<uui-icon name="umb:check"></uui-icon>` : ''}${this.label}</h3>
+			<h3 class="uui-h3" @click=${this.click}>${this.checked ? html`<uui-icon name="icon-check"></uui-icon>` : ''}${this.label}</h3>
 			<div @click=${this.click}>
 				<slot name="description"><p>here goes some description</p></slot>
 			</div>

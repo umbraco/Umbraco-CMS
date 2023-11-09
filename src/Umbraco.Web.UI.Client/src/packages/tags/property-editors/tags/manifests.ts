@@ -9,7 +9,7 @@ const manifest: ManifestPropertyEditorUi = {
 	meta: {
 		label: 'Tags',
 		propertyEditorSchemaAlias: 'Umbraco.Tags',
-		icon: 'umb:tags',
+		icon: 'icon-tags',
 		group: 'common',
 	},
 };

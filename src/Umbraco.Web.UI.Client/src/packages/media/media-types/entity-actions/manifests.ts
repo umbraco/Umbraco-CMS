@@ -15,7 +15,7 @@ const entityActions: Array<ManifestEntityAction> = [
 		weight: 500,
 		api: UmbCreateMediaTypeEntityAction,
 		meta: {
-			icon: 'umb:add',
+			icon: 'icon-add',
 			label: 'Create',
 			repositoryAlias,
 			entityTypes: [entityType],
@@ -28,7 +28,7 @@ const entityActions: Array<ManifestEntityAction> = [
 		weight: 400,
 		api: UmbMoveEntityAction,
 		meta: {
-			icon: 'umb:enter',
+			icon: 'icon-enter',
 			label: 'Move',
 			repositoryAlias,
 			entityTypes: [entityType],
@@ -41,7 +41,7 @@ const entityActions: Array<ManifestEntityAction> = [
 		weight: 300,
 		api: UmbCopyEntityAction,
 		meta: {
-			icon: 'umb:documents',
+			icon: 'icon-documents',
 			label: 'Copy',
 			repositoryAlias,
 			entityTypes: [entityType],
@@ -54,7 +54,7 @@ const entityActions: Array<ManifestEntityAction> = [
 		weight: 200,
 		api: UmbDeleteEntityAction,
 		meta: {
-			icon: 'umb:trash',
+			icon: 'icon-trash',
 			label: 'Delete',
 			repositoryAlias,
 			entityTypes: [entityType],
@@ -67,7 +67,7 @@ const entityActions: Array<ManifestEntityAction> = [
 		weight: 100,
 		api: UmbReloadMediaTypeEntityAction,
 		meta: {
-			icon: 'umb:refresh',
+			icon: 'icon-refresh',
 			label: 'Reload',
 			repositoryAlias,
 			entityTypes: [entityType],

@@ -33,7 +33,7 @@ export default class UmbPartialViewCreateFromSnippetModalElement extends UmbModa
 						${this._snippets.map(
 							(snippet) =>
 								html`<uui-menu-item label="${snippet.name ?? ''}" @click-label=${() => this._submit(snippet.name ?? '')}
-									><uui-icon name="umb:article" slot="icon"></uui-icon
+									><uui-icon name="icon-article" slot="icon"></uui-icon
 								></uui-menu-item>`,
 						)}
 					</uui-box>

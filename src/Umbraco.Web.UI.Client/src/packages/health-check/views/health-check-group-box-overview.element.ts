@@ -61,25 +61,25 @@ export class UmbHealthCheckGroupBoxOverviewElement extends UmbLitElement {
 	_renderCheckResults(resultObject: any) {
 		return html`${resultObject.success > 0
 			? html`<uui-tag look="secondary" color="positive">
-					<uui-icon name="umb:check"></uui-icon>
+					<uui-icon name="icon-check"></uui-icon>
 					${resultObject.success}
 			  </uui-tag> `
 			: nothing}
 		${resultObject.warning > 0
 			? html`<uui-tag look="secondary" color="warning">
-					<uui-icon name="umb:alert"></uui-icon>
+					<uui-icon name="icon-alert"></uui-icon>
 					${resultObject.warning}
 			  </uui-tag>`
 			: nothing}
 		${resultObject.error > 0
 			? html`<uui-tag look="secondary" color="danger">
-					<uui-icon name="umb:wrong"></uui-icon>
+					<uui-icon name="icon-wrong"></uui-icon>
 					${resultObject.error}
 			  </uui-tag>`
 			: nothing}
 		${resultObject.info > 0
 			? html`<uui-tag look="secondary">
-					<uui-icon name="umb:info"></uui-icon>
+					<uui-icon name="icon-info"></uui-icon>
 					${resultObject.info}
 			  </uui-tag>`
 			: nothing} `;

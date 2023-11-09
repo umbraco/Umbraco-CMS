@@ -110,7 +110,7 @@ export class UmbScriptsRepository
 			path: null,
 			type: SCRIPTS_ROOT_ENTITY_TYPE,
 			name: 'Scripts',
-			icon: 'umb:folder',
+			icon: 'icon-folder',
 			hasChildren: true,
 		};
 		return { data };

@@ -9,7 +9,7 @@ export const manifests: Array<ManifestCollectionView> = [
 		weight: 300,
 		meta: {
 			label: 'Grid',
-			icon: 'umb:grid',
+			icon: 'icon-grid',
 			pathName: 'grid',
 		},
 		conditions: {
@@ -24,7 +24,7 @@ export const manifests: Array<ManifestCollectionView> = [
 		weight: 200,
 		meta: {
 			label: 'Table',
-			icon: 'umb:box',
+			icon: 'icon-box',
 			pathName: 'table',
 		},
 		conditions: {
@@ -40,7 +40,7 @@ export const manifests: Array<ManifestCollectionView> = [
 		weight: 100,
 		meta: {
 			label: 'Test',
-			icon: 'umb:newspaper',
+			icon: 'icon-newspaper',
 			pathName: 'test',
 		},
 		conditions: {

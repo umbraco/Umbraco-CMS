@@ -31,7 +31,7 @@ export class UmbMemberRepository implements UmbTreeRepository<any> {
 			parentId: null,
 			type: 'member-root',
 			name: 'Members',
-			icon: 'umb:folder',
+			icon: 'icon-folder',
 			hasChildren: true,
 		};
 

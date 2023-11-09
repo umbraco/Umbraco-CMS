@@ -130,7 +130,7 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 									target="_blank"
 									href="${result.readMoreLink}">
 									Read more
-									<uui-icon name="umb:out"></uui-icon>
+									<uui-icon name="icon-out"></uui-icon>
 							  </uui-button>`
 							: nothing}
 					</div>`;

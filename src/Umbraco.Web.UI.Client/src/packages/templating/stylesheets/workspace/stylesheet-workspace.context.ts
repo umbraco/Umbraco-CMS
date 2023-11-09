@@ -15,7 +15,7 @@ export type RichTextRuleModelSortable = RichTextRuleModel & { sortOrder?: number
 
 export class UmbStylesheetWorkspaceContext
 	extends UmbWorkspaceContext<UmbStylesheetRepository, StylesheetDetails>
-	implements UmbSaveableWorkspaceContextInterface
+	implements UmbSaveableWorkspaceContextInterface<StylesheetDetails | undefined>
 {
 	#data = new UmbObjectState<StylesheetDetails | undefined>(undefined);
 	#rules = new UmbArrayState<RichTextRuleModelSortable>([], (rule) => rule.name);
@@ -48,7 +48,11 @@ export class UmbStylesheetWorkspaceContext
 	}
 
 	getEntityId() {
-		return this.getData()?.path || '';
+		const path = this.getData()?.path;
+		const name = this.getData()?.name;
+
+		// TODO: %2F is a slash (/). Should we make it an actual slash in the URL? (%2F for now so that the server can find the correct stylesheet via URL)
+		return path && name ? `${path}%2F${name}` : name || '';
 	}
 
 	getData() {
@@ -136,6 +140,7 @@ export class UmbStylesheetWorkspaceContext
 		if (!stylesheet) {
 			return Promise.reject('Something went wrong, there is no data for partial view you want to save...');
 		}
+
 		if (this.getIsNew()) {
 			const createRequestBody = {
 				name: stylesheet.name,
@@ -143,17 +148,23 @@ export class UmbStylesheetWorkspaceContext
 				parentPath: stylesheet.path ?? '',
 			};
 
-			this.repository.create(createRequestBody);
+			const { error } = await this.repository.create(createRequestBody);
+			if (!error) {
+				this.setIsNew(false);
+			}
+
+			return Promise.resolve();
+		} else {
+			if (!stylesheet.path) return Promise.reject('There is no path');
+			const updateRequestBody: UpdateStylesheetRequestModel = {
+				name: stylesheet.name,
+				existingPath: stylesheet.path,
+				content: stylesheet.content,
+			};
+			this.repository.save(stylesheet.path, updateRequestBody);
+
 			return Promise.resolve();
 		}
-		if (!stylesheet.path) return Promise.reject('There is no path');
-		const updateRequestBody: UpdateStylesheetRequestModel = {
-			name: stylesheet.name,
-			existingPath: stylesheet.path,
-			content: stylesheet.content,
-		};
-		this.repository.save(stylesheet.path, updateRequestBody);
-		return Promise.resolve();
 	}
 
 	async create(parentKey: string | null) {
@@ -162,6 +173,7 @@ export class UmbStylesheetWorkspaceContext
 			path: parentKey ?? '',
 			content: '',
 		};
+
 		this.#data.next(newStylesheet);
 		this.setIsNew(true);
 	}

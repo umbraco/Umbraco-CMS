@@ -63,7 +63,7 @@ export class UmbRelationTypeRepository
 			id: null,
 			type: 'relation-type-root',
 			name: 'Relation Types',
-			icon: 'umb:folder',
+			icon: 'icon-folder',
 			hasChildren: true,
 		};
 

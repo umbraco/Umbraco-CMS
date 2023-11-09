@@ -6,7 +6,7 @@
 import type { DocumentValueModel } from './DocumentValueModel';
 import type { DocumentVariantRequestModel } from './DocumentVariantRequestModel';
 
-export type CreateContentRequestModelBaseDocumentValueModelDocumentVariantRequestModel = {
+export type CreateContentForDocumentRequestModel = {
     values?: Array<DocumentValueModel>;
     variants?: Array<DocumentVariantRequestModel>;
     id?: string | null;

@@ -3,7 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { UpdateContentTypeRequestModelBaseUpdateMediaTypePropertyTypeRequestModelUpdateMediaTypePropertyTypeContainerRequestModel } from './UpdateContentTypeRequestModelBaseUpdateMediaTypePropertyTypeRequestModelUpdateMediaTypePropertyTypeContainerRequestModel';
+import type { UpdateContentTypeForMediaTypeRequestModel } from './UpdateContentTypeForMediaTypeRequestModel';
 
-export type UpdateMediaTypeRequestModel = UpdateContentTypeRequestModelBaseUpdateMediaTypePropertyTypeRequestModelUpdateMediaTypePropertyTypeContainerRequestModel;
+export type UpdateMediaTypeRequestModel = UpdateContentTypeForMediaTypeRequestModel;
 

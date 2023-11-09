@@ -75,12 +75,15 @@ export class UmbBackofficeMainElement extends UmbLitElement {
 		this.requestUpdate('_routes', oldValue);
 	}
 
-	private _onRouteChange = (event: UmbRouterSlotChangeEvent) => {
+	private _onRouteChange = async (event: UmbRouterSlotChangeEvent) => {
 		const currentPath = event.target.localActiveViewPath || '';
 		const section = this._sections.find((s) => this._routePrefix + (s.manifest as any).meta.pathname === currentPath);
 		if (!section) return;
-		this._backofficeContext?.setActiveSectionAlias(section.alias);
-		this._provideSectionContext(section.manifest as any);
+		await section.asPromise();
+		if(section.manifest) {
+			this._backofficeContext?.setActiveSectionAlias(section.alias);
+			this._provideSectionContext(section.manifest);
+		}
 	};
 
 	private _provideSectionContext(sectionManifest: ManifestSection) {

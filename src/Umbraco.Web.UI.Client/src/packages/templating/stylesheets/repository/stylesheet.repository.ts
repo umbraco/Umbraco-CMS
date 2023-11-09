@@ -188,7 +188,7 @@ export class UmbStylesheetRepository
 			path: null,
 			type: 'stylesheet-root',
 			name: 'Stylesheets',
-			icon: 'umb:folder',
+			icon: 'icon-folder',
 			hasChildren: true,
 		};
 
