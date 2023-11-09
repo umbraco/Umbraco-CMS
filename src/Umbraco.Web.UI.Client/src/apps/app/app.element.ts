@@ -88,7 +88,7 @@ export class UmbAppElement extends UmbLitElement {
 		// This way we can ensure that the document language is always loaded first and subsequently registered as the fallback language.
 		this.observe(umbLocalizationRegistry.isDefaultLoaded, (isDefaultLoaded) => {
 			if (!this.#authContext) {
-				throw new Error('[Fatal] AuthContext requested before it was initialised');
+				throw new Error('[Fatal] AuthContext requested before it was initialized');
 			}
 
 			if (!isDefaultLoaded) return;
@@ -134,7 +134,7 @@ export class UmbAppElement extends UmbLitElement {
 			// If the auth flow fails, there is most likely something wrong with the connection to the backend server
 			// and we should redirect to the error page
 			let errorMsg =
-				'An error occured while trying to initialise the connection to the Umbraco server (check console for details)';
+				'An error occurred while trying to initialize the connection to the Umbraco server (check console for details)';
 
 			// Get the type of the error and check http status codes
 			if (error instanceof Error) {
@@ -186,7 +186,7 @@ export class UmbAppElement extends UmbLitElement {
 	async #setAuthStatus() {
 		if (this.bypassAuth === false) {
 			if (!this.#authContext) {
-				throw new Error('[Fatal] AuthContext requested before it was initialised');
+				throw new Error('[Fatal] AuthContext requested before it was initialized');
 			}
 
 			// Get service configuration from authentication server
@@ -200,9 +200,9 @@ export class UmbAppElement extends UmbLitElement {
 		this.#listenForLanguageChange();
 
 		if (this.#authContext?.isAuthorized()) {
-			this.#authContext.isLoggedIn.next(true);
+			this.#authContext?.setLoggedIn(true);
 		} else {
-			this.#authContext?.isLoggedIn.next(false);
+			this.#authContext?.setLoggedIn(false);
 		}
 	}
 
