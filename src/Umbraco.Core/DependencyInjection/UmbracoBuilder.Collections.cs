@@ -36,9 +36,9 @@ public static partial class UmbracoBuilderExtensions
     /// </summary>
     internal static void AddAllCoreCollectionBuilders(this IUmbracoBuilder builder)
     {
-        builder.CacheRefreshers().Add(() => builder.TypeLoader.GetCacheRefreshers());
-        builder.DataEditors().Add(() => builder.TypeLoader.GetDataEditors());
-        builder.Actions().Add(() => builder .TypeLoader.GetActions());
+        builder.CacheRefreshers().Add(builder.TypeLoader.GetCacheRefreshers);
+        builder.DataEditors().Add(builder.TypeLoader.GetDataEditors);
+        builder.Actions().Add(builder.TypeLoader.GetActions);
 
         // register known content apps
         builder.ContentApps()
@@ -242,14 +242,14 @@ public static partial class UmbracoBuilderExtensions
     /// Gets the partial view snippets collection builder.
     /// </summary>
     /// <param name="builder">The builder.</param>
-    public static PartialViewSnippetCollectionBuilder? PartialViewSnippets(this IUmbracoBuilder builder)
+    public static PartialViewSnippetCollectionBuilder PartialViewSnippets(this IUmbracoBuilder builder)
         => builder.WithCollectionBuilder<PartialViewSnippetCollectionBuilder>();
 
     /// <summary>
     /// Gets the partial view macro snippets collection builder.
     /// </summary>
     /// <param name="builder">The builder.</param>
-    public static PartialViewMacroSnippetCollectionBuilder? PartialViewMacroSnippets(this IUmbracoBuilder builder)
+    public static PartialViewMacroSnippetCollectionBuilder PartialViewMacroSnippets(this IUmbracoBuilder builder)
         => builder.WithCollectionBuilder<PartialViewMacroSnippetCollectionBuilder>();
 
     /// <summary>

@@ -1115,14 +1115,17 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             {
                 if (!automaticRelationTypeAliases.Contains(reference.RelationTypeAlias))
                 {
-                    Logger.LogWarning("The reference to {Udi} uses a relation type {RelationTypeAlias} that is not an automatic relation type.", reference.Udi, reference.RelationTypeAlias);
+                    // Returning a reference that doesn't use an automatic relation type is an issue that should be fixed in code
+                    Logger.LogError("The reference to {Udi} uses a relation type {RelationTypeAlias} that is not an automatic relation type.", reference.Udi, reference.RelationTypeAlias);
                 }
                 else if (!relationTypeLookup.TryGetValue(reference.RelationTypeAlias, out int relationTypeId))
                 {
+                    // A non-existent relation type could be caused by an environment issue (e.g. it was manually removed)
                     Logger.LogWarning("The reference to {Udi} uses a relation type {RelationTypeAlias} that does not exist.", reference.Udi, reference.RelationTypeAlias);
                 }
                 else if (reference.Udi is not GuidUdi udi || !keysLookup.TryGetValue(udi.Guid, out var id))
                 {
+                    // Relations only support references to items that are stored in the NodeDto table (because of foreign key constraints)
                     Logger.LogInformation("The reference to {Udi} can not be saved as relation, because doesn't have a node ID.", reference.Udi);
                 }
                 else
