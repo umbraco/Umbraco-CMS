@@ -120,6 +120,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddUnique<IConflictingRouteService, ConflictingRouteService>();
         builder.Services.AddSingleton<UnhandledExceptionLoggerMiddleware>();
         builder.Services.AddTransient<BlockGridSampleHelper>();
+        builder.Services.AddUnique<IWebhookPresentationFactory, WebhookPresentationFactory>();
 
         return builder;
     }

@@ -29,9 +29,11 @@ public interface IWebhookRepository
     /// <summary>
     ///     Gets a webhook by key
     /// </summary>
-    /// <param name="eventName">The key of the webhook which will be retrieved.</param>
-    /// <returns>The <see cref="Webhook" /> webhook with the given key.</returns>
-    Task<PagedModel<Webhook>> GetByEventNameAsync(string eventName);
+    /// <param name="alias">The alias of an event, which is referenced by a webhook.</param>
+    /// <returns>
+    ///     A paged model of <see cref="Webhook" />
+    /// </returns>
+    Task<PagedModel<Webhook>> GetByAliasAsync(string alias);
 
     /// <summary>
     ///     Gets a webhook by key

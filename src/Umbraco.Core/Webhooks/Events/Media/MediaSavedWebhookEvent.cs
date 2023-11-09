@@ -8,14 +8,15 @@ using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 
-namespace Umbraco.Cms.Core.Webhooks.Events.Media;
+namespace Umbraco.Cms.Core.Webhooks.Events;
 
-public class MediaSavedWebhookEvent : WebhookEventContentBase<MediaSavedNotification, IMedia>
+[WebhookEvent("Media was saved", Constants.WebhookEvents.Types.Media)]
+public class MediaSaveWebhookEvent : WebhookEventContentBase<MediaSavedNotification, IMedia>
 {
     private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
     private readonly IApiMediaBuilder _apiMediaBuilder;
 
-    public MediaSavedWebhookEvent(
+    public MediaSaveWebhookEvent(
         IWebhookFiringService webhookFiringService,
         IWebHookService webHookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
@@ -26,12 +27,13 @@ public class MediaSavedWebhookEvent : WebhookEventContentBase<MediaSavedNotifica
             webhookFiringService,
             webHookService,
             webhookSettings,
-            serverRoleAccessor,
-            Constants.WebhookEvents.MediaSaved)
+            serverRoleAccessor)
     {
         _publishedSnapshotAccessor = publishedSnapshotAccessor;
         _apiMediaBuilder = apiMediaBuilder;
     }
+
+    public override string Alias => Constants.WebhookEvents.Aliases.MediaSave;
 
     protected override IEnumerable<IMedia> GetEntitiesFromNotification(MediaSavedNotification notification) => notification.SavedEntities;
 
