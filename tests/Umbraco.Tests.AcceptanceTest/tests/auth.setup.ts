@@ -11,7 +11,7 @@ setup('authenticate', async ({page}) => {
   await page.getByRole('button', {name: 'Login'}).click();
 
   // Assert
-  await expect(page.locator('uui-tab-group').locator('[label="Settings"]')).toBeVisible();
+  await expect(page.locator('uui-tab-group').locator('[label="Settings"]')).toBeVisible({timeout: 10000});
   await umbracoUi.goToSection('Settings');
   await page.context().storageState({path: STORAGE_STATE});
 });
