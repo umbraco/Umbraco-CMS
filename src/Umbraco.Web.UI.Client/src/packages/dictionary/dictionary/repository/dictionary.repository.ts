@@ -110,6 +110,19 @@ export class UmbDictionaryRepository
 		return { data, error, asObservable: () => this.#treeStore!.items(ids) };
 	}
 
+	async requestItems(ids: Array<string>) {
+		if (!ids) throw new Error('Dictionary Ids are missing');
+		await this.#init;
+
+		const { data, error } = await this.#treeSource.getItems(ids);
+
+		if (data) {
+			this.#treeStore?.appendItems(data);
+		}
+
+		return { data, error, asObservable: () => this.#treeStore!.items(ids) };
+	}
+
 	async rootTreeItems() {
 		await this.#init;
 		return this.#treeStore!.rootItems;

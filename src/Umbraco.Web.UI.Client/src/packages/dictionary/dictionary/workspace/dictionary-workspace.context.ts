@@ -68,9 +68,8 @@ export class UmbDictionaryWorkspaceContext
 		const { data } = await this.repository.createScaffold(parentId);
 		if (!data) return;
 		this.setIsNew(true);
-		// TODO: This is a hack to get around the fact that the data is not typed correctly.
-		// Create and response models are different. We need to look into this.
-		this.#data.next(data as unknown as DictionaryItemResponseModel);
+
+		this.#data.next(data as DictionaryItemResponseModel);
 	}
 
 	async save() {
