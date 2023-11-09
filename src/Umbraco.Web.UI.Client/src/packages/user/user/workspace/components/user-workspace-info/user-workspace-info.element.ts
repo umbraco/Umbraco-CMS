@@ -170,17 +170,13 @@ export class UmbUserWorkspaceInfoElement extends UmbLitElement {
 	static styles = [
 		UmbTextStyles,
 		css`
-			uui-avatar {
-				font-size: var(--uui-size-16);
-				place-self: center;
-			}
-
 			uui-tag {
 				width: fit-content;
 			}
 
 			#Avatar {
 				font-size: 75px;
+				place-self: center;
 			}
 
 			#user-info {
