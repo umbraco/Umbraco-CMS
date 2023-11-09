@@ -18,16 +18,6 @@ const manifest: ManifestPropertyEditorUi = {
 					label: 'Node type',
 					description: '',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.TreePicker.StartNode',
-					config: [
-						{
-							alias: 'items',
-							value: [
-								{ value: 'content', name: 'Content' },
-								{ value: 'member', name: 'Members' },
-								{ value: 'media', name: 'Media' },
-							],
-						},
-					],
 				},
 				{
 					alias: 'filter',

@@ -1,5 +1,5 @@
 import { UmbInputDocumentElement } from '@umbraco-cms/backoffice/document';
-import { html, customElement, property, css } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, css, state } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin, UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbInputMediaElement } from '@umbraco-cms/backoffice/media';
@@ -10,6 +10,7 @@ export type ContentType = 'content' | 'member' | 'media';
 export type StartNode = {
 	type?: ContentType;
 	id?: string | null;
+	query?: string | null;
 };
 
 @customElement('umb-input-content-type')
@@ -18,37 +19,57 @@ export class UmbInputContentTypeElement extends FormControlMixin(UmbLitElement) 
 		return undefined;
 	}
 
+	private _type: StartNode['type'] = 'content';
 	@property()
-	startNodeType?: StartNode['type'];
+	public set type(value: StartNode['type']) {
+		const oldValue = this._type;
 
-	@property({ attribute: 'start-node-id' })
-	startNodeId?: string;
+		this._options = this._options.map((option) =>
+			option.value === value ? { ...option, selected: true } : { ...option, selected: false },
+		);
+		this._type = value;
+		this.requestUpdate('type', oldValue);
+	}
+	public get type(): StartNode['type'] {
+		return this._type;
+	}
 
-	@property({ type: Array })
-	options: Array<Option> = [];
+	@property({ attribute: 'node-id' })
+	nodeId = '';
+
+	@property({ attribute: 'dynamic-path' })
+	dynamicPath = '';
+
+	@state()
+	_options: Array<Option> = [
+		{ value: 'content', name: 'Content' },
+		{ value: 'member', name: 'Members' },
+		{ value: 'media', name: 'Media' },
+	];
 
 	#onTypeChange(event: UUISelectEvent) {
-		this.startNodeType = event.target.value as StartNode['type'];
+		this.type = event.target.value as StartNode['type'];
 
 		// Clear others
-		this.startNodeId = '';
+		this.nodeId = '';
+		this.dynamicPath = '';
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	#onIdChange(event: CustomEvent) {
-		this.startNodeId = (event.target as UmbInputDocumentElement | UmbInputMediaElement).selectedIds.join('');
+		this.nodeId = (event.target as UmbInputDocumentElement | UmbInputMediaElement).selectedIds.join('');
 		this.dispatchEvent(new CustomEvent('change'));
 	}
 
 	render() {
 		return html`<umb-input-dropdown-list
-				.options=${this.options}
+				.options=${this._options}
 				@change="${this.#onTypeChange}"></umb-input-dropdown-list>
 			${this.#renderType()}`;
 	}
 
 	#renderType() {
-		switch (this.startNodeType) {
+		switch (this.type) {
 			case 'content':
 				return this.#renderTypeContent();
 			case 'media':
@@ -61,24 +82,21 @@ export class UmbInputContentTypeElement extends FormControlMixin(UmbLitElement) 
 	}
 
 	#renderTypeContent() {
-		const startNodeId = this.startNodeId ? [this.startNodeId] : [];
-		return html`
-			<umb-input-document @change=${this.#onIdChange} .selectedIds=${startNodeId} max="1"></umb-input-document>
-		`;
+		const nodeId = this.nodeId ? [this.nodeId] : [];
+		//TODO: Dynamic paths
+		return html` <umb-input-document @change=${this.#onIdChange} .selectedIds=${nodeId} max="1"></umb-input-document> `;
 	}
 
 	#renderTypeMedia() {
-		const startNodeId = this.startNodeId ? [this.startNodeId] : [];
+		const nodeId = this.nodeId ? [this.nodeId] : [];
 		//TODO => MediaTypes
-		return html` <umb-input-media @change=${this.#onIdChange} .selectedIds=${startNodeId} max="1"></umb-input-media> `;
+		return html` <umb-input-media @change=${this.#onIdChange} .selectedIds=${nodeId} max="1"></umb-input-media> `;
 	}
 
 	#renderTypeMember() {
-		const startNodeId = this.startNodeId ? [this.startNodeId] : [];
+		const nodeId = this.nodeId ? [this.nodeId] : [];
 		//TODO => Members
-		return html`
-			<umb-input-member @change=${this.#onIdChange} .selectedIds=${startNodeId} max="1"></umb-input-member>
-		`;
+		return html` <umb-input-member @change=${this.#onIdChange} .selectedIds=${nodeId} max="1"></umb-input-member> `;
 	}
 
 	static styles = [
