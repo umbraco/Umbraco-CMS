@@ -52,9 +52,9 @@
       });
     }
 
-    function getEntities(webhook) {
+    function determineResource(resourceType){
       let resource;
-      switch (webhook.events[0].eventType.toLowerCase()) {
+      switch (resourceType) {
         case "content":
           resource = contentTypeResource;
           break;
@@ -67,6 +67,12 @@
         default:
           return;
       }
+
+      return resource;
+    }
+
+    function getEntities(webhook) {
+      let resource = determineResource(webhook.events[0].eventType.toLowerCase());
       let entities = [];
 
       webhook.contentTypeKeys.forEach(key => {
@@ -80,20 +86,7 @@
     }
 
     function resolveTypeNames(webhook) {
-      let resource;
-      switch (webhook.events[0].eventType.toLowerCase()) {
-        case "content":
-          resource = contentTypeResource;
-          break;
-        case "media":
-          resource = mediaTypeResource;
-          break;
-        case "member":
-          resource = memberTypeResource;
-          break;
-        default:
-          return;
-      }
+      let resource = determineResource(webhook.events[0].eventType.toLowerCase());
 
       if (vm.webHooksContentTypes[webhook.key]){
         delete vm.webHooksContentTypes[webhook.key];
