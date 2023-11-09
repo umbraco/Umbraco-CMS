@@ -113,15 +113,15 @@ const codeSnippets: Record<CodeEditorLanguage, string> = {
 	"Smartypants, double quotes" and 'single quotes'`,
 	typescript: `import { UmbTemplateRepository } from '../repository/template.repository.js';
 	import { UmbWorkspaceContext } from '../../../shared/components/workspace/workspace-context/workspace-context.js';
-	import { createObservablePart, UmbDeepState } from '@umbraco-cms/observable-api';
+	import { UmbObjectState } from '@umbraco-cms/observable-api';
 	import { TemplateModel } from '@umbraco-cms/backend-api';
 	import { UmbControllerHostElement } from '@umbraco-cms/controller';
 
 	export class UmbTemplateWorkspaceContext extends UmbWorkspaceContext<UmbTemplateRepository, TemplateModel> {
-		#data = new UmbDeepState<TemplateModel | undefined>(undefined);
+		#data = new UmbObjectState<TemplateModel | undefined>(undefined);
 		data = this.#data.asObservable();
-		name = createObservablePart(this.#data, (data) => data?.name);
-		content = createObservablePart(this.#data, (data) => data?.content);
+		name = this.#data.asObservablePart((data) => data?.name);
+		content = this.#data.asObservablePart((data) => data?.content);
 
 		constructor(host: UmbControllerHostElement) {
 			super(host, 'Umb.Workspace.Template', new UmbTemplateRepository(host));

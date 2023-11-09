@@ -40,7 +40,7 @@ export class UmbMemberStore extends UmbStoreBase implements UmbEntityDetailStore
 			this._data.appendOne(member);
 		}
 
-		return createObservablePart(this._data, (members) => members.find((member) => member.id === id) as MemberDetails);
+		return this._data.asObservablePart((members) => members.find((member) => member.id === id) as MemberDetails);
 	}
 
 	async save(member: Array<MemberDetails>): Promise<void> {

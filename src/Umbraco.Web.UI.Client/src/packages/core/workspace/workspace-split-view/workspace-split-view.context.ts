@@ -33,7 +33,7 @@ export class UmbWorkspaceSplitViewContext extends UmbBaseController {
 			this._observeVariant();
 		});
 
-		this.observe(this.#index, () => {
+		this.observe(this.index, () => {
 			this._observeVariant();
 		});
 
