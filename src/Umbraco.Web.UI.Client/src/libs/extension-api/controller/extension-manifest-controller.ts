@@ -12,7 +12,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 * const controller = new UmbExtensionManifestController(host, extensionRegistry, alias, (permitted, ctrl) => { console.log("Extension is permitted and this is the manifest: ", ctrl.manifest) }));
 * ```
  * @export
- * @class UmbCodeEditor
+ * @class UmbExtensionManifestController
  */
 export class UmbExtensionManifestController<
 	ManifestType extends ManifestWithDynamicConditions = ManifestWithDynamicConditions,

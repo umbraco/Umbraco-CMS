@@ -15,7 +15,7 @@ import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 * const controller = new UmbExtensionApiController(host, extensionRegistry, alias, [], (permitted, ctrl) => { ctrl.api.helloWorld() }));
 * ```
  * @export
- * @class UmbCodeEditor
+ * @class UmbExtensionApiController
  */
 export class UmbExtensionApiController<
 	ManifestType extends (ManifestWithDynamicConditions & ManifestApi) = (ManifestWithDynamicConditions & ManifestApi),
