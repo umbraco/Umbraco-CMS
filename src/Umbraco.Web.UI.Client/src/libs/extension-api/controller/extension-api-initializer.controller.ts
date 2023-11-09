@@ -1,8 +1,8 @@
 import { createExtensionApi } from '../functions/create-extension-api.function.js';
 import { UmbExtensionRegistry } from '../registry/extension.registry.js';
 import { isManifestApiType } from '../type-guards/is-manifest-apiable-type.function.js';
-import { UmbApi, ManifestApi, ManifestCondition, ManifestWithDynamicConditions } from '../types.js';
-import { UmbBaseExtensionController } from './base-extension-controller.js';
+import { UmbApi, ManifestApi, ManifestCondition } from '../types.js';
+import { UmbBaseExtensionInitializer } from './base-extension-initializer.controller.js';
 import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 
@@ -17,11 +17,11 @@ import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
  * @export
  * @class UmbExtensionApiController
  */
-export class UmbExtensionApiController<
+export class UmbExtensionApiInitializer<
 	ManifestType extends ManifestApi =  ManifestApi,
-	ControllerType extends UmbExtensionApiController<ManifestType, any> = any,
+	ControllerType extends UmbExtensionApiInitializer<ManifestType, any> = any,
 	ExtensionApiInterface extends UmbApi = ManifestType extends ManifestApi ? NonNullable<ManifestType['API_TYPE']> : UmbApi
-> extends UmbBaseExtensionController<ManifestType, ControllerType> {
+> extends UmbBaseExtensionInitializer<ManifestType, ControllerType> {
 
 	#api?: ExtensionApiInterface;
 	#constructorArguments?: Array<unknown>;

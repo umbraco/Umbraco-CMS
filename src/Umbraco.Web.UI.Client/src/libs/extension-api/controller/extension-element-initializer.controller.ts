@@ -2,7 +2,7 @@ import { createExtensionElement } from '../functions/create-extension-element.fu
 import { UmbExtensionRegistry } from '../registry/extension.registry.js';
 import { isManifestElementableType } from '../type-guards/is-manifest-elementable-type.function.js';
 import { ManifestCondition, ManifestWithDynamicConditions } from '../types.js';
-import { UmbBaseExtensionController } from './base-extension-controller.js';
+import { UmbBaseExtensionInitializer } from './base-extension-initializer.controller.js';
 import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
@@ -16,10 +16,10 @@ import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
  * @export
  * @class UmbExtensionElementController
  */
-export class UmbExtensionElementController<
+export class UmbExtensionElementInitializer<
 	ManifestType extends ManifestWithDynamicConditions = ManifestWithDynamicConditions,
-	ControllerType extends UmbExtensionElementController<ManifestType, any> = any
-> extends UmbBaseExtensionController<ManifestType, ControllerType> {
+	ControllerType extends UmbExtensionElementInitializer<ManifestType, any> = any
+> extends UmbBaseExtensionInitializer<ManifestType, ControllerType> {
 	#defaultElement?: string;
 	#component?: HTMLElement;
 

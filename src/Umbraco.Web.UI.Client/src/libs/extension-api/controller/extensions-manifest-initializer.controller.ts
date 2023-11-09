@@ -1,5 +1,5 @@
-import { UmbExtensionManifestController } from './extension-manifest-controller.js';
-import { type PermittedControllerType, UmbBaseExtensionsController } from './base-extensions-controller.js';
+import { UmbExtensionManifestInitializer } from './extension-manifest-initializer.controller.js';
+import { type PermittedControllerType, UmbBaseExtensionsInitializer } from './base-extensions-initializer.controller.js';
 import {
 	ManifestBase,
 	ManifestTypeMap,
@@ -14,9 +14,9 @@ export class UmbExtensionsManifestController<
 	ManifestTypes extends ManifestBase,
 	ManifestTypeName extends keyof ManifestTypeMap<ManifestTypes> | string,
 	ManifestType extends ManifestBase = SpecificManifestTypeOrManifestBase<ManifestTypes, ManifestTypeName>,
-	ControllerType extends UmbExtensionManifestController<ManifestType> = UmbExtensionManifestController<ManifestType>,
+	ControllerType extends UmbExtensionManifestInitializer<ManifestType> = UmbExtensionManifestInitializer<ManifestType>,
 	MyPermittedControllerType extends ControllerType = PermittedControllerType<ControllerType>
-> extends UmbBaseExtensionsController<
+> extends UmbBaseExtensionsInitializer<
 	ManifestTypes,
 	ManifestTypeName,
 	ManifestType,
@@ -39,7 +39,7 @@ export class UmbExtensionsManifestController<
 	}
 
 	protected _createController(manifest: ManifestType) {
-		return new UmbExtensionManifestController<ManifestType>(
+		return new UmbExtensionManifestInitializer<ManifestType>(
 			this,
 			this.#extensionRegistry,
 			manifest.alias,

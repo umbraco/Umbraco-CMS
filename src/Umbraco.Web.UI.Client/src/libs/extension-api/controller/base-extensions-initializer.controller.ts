@@ -3,7 +3,7 @@ import type {
 	ManifestBase,
 	ManifestTypeMap,
 	SpecificManifestTypeOrManifestBase,
-	UmbBaseExtensionController,
+	UmbBaseExtensionInitializer,
 	UmbExtensionRegistry,
 } from '@umbraco-cms/backoffice/extension-api';
 import { UmbBaseController, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -14,11 +14,11 @@ export type PermittedControllerType<ControllerType extends { manifest: any }> = 
 
 /**
  */
-export abstract class UmbBaseExtensionsController<
+export abstract class UmbBaseExtensionsInitializer<
 	ManifestTypes extends ManifestBase,
 	ManifestTypeName extends keyof ManifestTypeMap<ManifestTypes> | string,
 	ManifestType extends ManifestBase = SpecificManifestTypeOrManifestBase<ManifestTypes, ManifestTypeName>,
-	ControllerType extends UmbBaseExtensionController<ManifestType> = UmbBaseExtensionController<ManifestType>,
+	ControllerType extends UmbBaseExtensionInitializer<ManifestType> = UmbBaseExtensionInitializer<ManifestType>,
 	MyPermittedControllerType extends ControllerType = PermittedControllerType<ControllerType>
 > extends UmbBaseController {
 	#extensionRegistry: UmbExtensionRegistry<ManifestType>;

@@ -3,7 +3,7 @@ import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api
 import { UmbArrayState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { ManifestRepository, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { ItemResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbExtensionApiController } from '@umbraco-cms/backoffice/extension-api';
+import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 
 export class UmbRepositoryItemsManager<ItemType extends ItemResponseModelBaseModel> {
 	host: UmbControllerHostElement;
@@ -35,7 +35,7 @@ export class UmbRepositoryItemsManager<ItemType extends ItemResponseModelBaseMod
 		this.host = host;
 		this.#getUnique = getUniqueMethod || ((entry) => entry.id || '');
 
-		this.#init = new UmbExtensionApiController<ManifestRepository<UmbItemRepository<ItemType>>>(host, umbExtensionsRegistry, repositoryAlias, [host], (permitted, repository) => {
+		this.#init = new UmbExtensionApiInitializer<ManifestRepository<UmbItemRepository<ItemType>>>(host, umbExtensionsRegistry, repositoryAlias, [host], (permitted, repository) => {
 			this.repository = permitted ? repository.api : undefined;
 		}).asPromise();
 	}

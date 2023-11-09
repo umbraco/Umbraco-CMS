@@ -1,43 +1,31 @@
 import { expect, fixture } from '@open-wc/testing';
 import { UmbExtensionRegistry } from '../registry/extension.registry.js';
-import { ManifestApi, ManifestWithDynamicConditions } from '../types.js';
-import { UmbExtensionApiController } from './index.js';
-import { UmbBaseController, UmbControllerHost, UmbControllerHostElement, UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
+import { UmbExtensionElementInitializer } from './index.js';
+import { UmbControllerHostElement, UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import { customElement, html } from '@umbraco-cms/backoffice/external/lit';
 import { type ManifestSection, UmbSwitchCondition } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-test-controller-host')
 export class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
 
-
-export class UmbTestApiController extends UmbBaseController {
-
-	public i_am_test_api_controller = true;
-
-	constructor(host:UmbControllerHost) {
-		super(host);
-	}
-
-}
-
-interface TestManifest extends ManifestWithDynamicConditions, ManifestApi<UmbTestApiController> {
-	type: 'test-type'
-}
-
-describe('UmbExtensionApiController', () => {
+describe('UmbExtensionElementController', () => {
 	describe('Manifest without conditions', () => {
 		let hostElement: UmbControllerHostElement;
-		let extensionRegistry: UmbExtensionRegistry<TestManifest>;
-		let manifest: TestManifest;
+		let extensionRegistry: UmbExtensionRegistry<ManifestSection>;
+		let manifest: ManifestSection;
 
 		beforeEach(async () => {
 			hostElement = await fixture(html`<umb-test-controller-host></umb-test-controller-host>`);
 			extensionRegistry = new UmbExtensionRegistry();
 			manifest = {
-				type: 'test-type',
-				name: 'test-type-1',
-				alias: 'Umb.Test.Type-1',
-				api: UmbTestApiController
+				type: 'section',
+				name: 'test-section-1',
+				alias: 'Umb.Test.Section.1',
+				elementName: 'section',
+				meta: {
+					label: 'my section',
+					pathname: 'my-section',
+				},
 			};
 
 			extensionRegistry.register(manifest);
@@ -45,45 +33,50 @@ describe('UmbExtensionApiController', () => {
 
 		it('permits when there is no conditions', (done) => {
 			let called = false;
-			const extensionController = new UmbExtensionApiController<TestManifest>(
+			const extensionController = new UmbExtensionElementInitializer(
 				hostElement,
 				extensionRegistry,
-				'Umb.Test.Type-1',
-				[hostElement],
+				'Umb.Test.Section.1',
 				(permitted) => {
 					if (called === false) {
 						called = true;
 						expect(permitted).to.be.true;
 						if (permitted) {
-							expect(extensionController?.manifest?.alias).to.eq('Umb.Test.Type-1');
-							expect(extensionController.api?.i_am_test_api_controller).to.be.true;
+							expect(extensionController?.manifest?.alias).to.eq('Umb.Test.Section.1');
+							expect(extensionController.component?.nodeName).to.eq('SECTION');
 							done();
 							extensionController.destroy();
 						}
 					}
 				}
 			);
-			/*
-			TODO: Consider if builder pattern would be a more nice way to setup this:
-			const extensionController = new UmbExtensionApiController<TestManifest>(
+		});
+
+		it('utilized the default element when there is none provided by manifest', (done) => {
+			extensionRegistry.unregister(manifest.alias);
+
+			const noElementManifest = { ...manifest, elementName: undefined };
+			extensionRegistry.register(noElementManifest);
+
+			let called = false;
+			const extensionController = new UmbExtensionElementInitializer(
 				hostElement,
 				extensionRegistry,
-				'Umb.Test.Type-1'
-			)
-			.withConstructorArguments([hostElement])
-			.onPermitted((permitted) => {
-				if (called === false) {
-					called = true;
-					expect(permitted).to.be.true;
-					if (permitted) {
-						expect(extensionController?.manifest?.alias).to.eq('Umb.Test.Type-1');
-						expect(extensionController.api?.i_am_test_api_controller).to.be.true;
-						done();
-						extensionController.destroy();
+				'Umb.Test.Section.1',
+				(permitted) => {
+					if (called === false) {
+						called = true;
+						expect(permitted).to.be.true;
+						if (permitted) {
+							expect(extensionController?.manifest?.alias).to.eq('Umb.Test.Section.1');
+							expect(extensionController.component?.nodeName).to.eq('UMB-TEST-FALLBACK-ELEMENT');
+							done();
+							extensionController.destroy();
+						}
 					}
-				}
-			).observe();
-			*/
+				},
+				'umb-test-fallback-element'
+			);
 		});
 	});
 
@@ -97,10 +90,10 @@ describe('UmbExtensionApiController', () => {
 			extensionRegistry = new UmbExtensionRegistry();
 
 			manifest = {
-				type: 'test-type',
-				name: 'test-type-1',
-				alias: 'Umb.Test.Type-1',
-				api: UmbTestApiController,
+				type: 'section',
+				name: 'test-section-1',
+				alias: 'Umb.Test.Section.1',
+				elementName: 'section',
 				conditions: [
 					{
 						alias: 'Umb.Test.Condition.Delay',
@@ -132,22 +125,21 @@ describe('UmbExtensionApiController', () => {
 
 		it('does change permission as conditions change', (done) => {
 			let count = 0;
-			const extensionController = new UmbExtensionApiController<TestManifest>(
+			const extensionController = new UmbExtensionElementInitializer(
 				hostElement,
 				extensionRegistry,
-				'Umb.Test.Type-1',
-				[hostElement],
+				'Umb.Test.Section.1',
 				async () => {
 					count++;
 					// We want the controller callback to first fire when conditions are initialized.
 					expect(extensionController.manifest?.conditions?.length).to.be.equal(2);
-					expect(extensionController?.manifest?.alias).to.eq('Umb.Test.Type-1');
+					expect(extensionController?.manifest?.alias).to.eq('Umb.Test.Section.1');
 					if (count === 1) {
 						expect(extensionController?.permitted).to.be.true;
-						expect(extensionController.api?.i_am_test_api_controller).to.be.true;
+						expect(extensionController.component?.nodeName).to.eq('SECTION');
 					} else if (count === 2) {
 						expect(extensionController?.permitted).to.be.false;
-						expect(extensionController.api).to.be.undefined;
+						expect(extensionController.component).to.be.undefined;
 						done();
 						extensionController.destroy(); // need to destroy the controller.
 					}

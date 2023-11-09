@@ -14,7 +14,7 @@ import { manifests as cultureManifests } from './culture/manifests.js';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 import { UmbModalManagerContext, UMB_MODAL_MANAGER_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
 import { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
-import { UmbExtensionsApiController, type UmbEntryPointOnInit } from '@umbraco-cms/backoffice/extension-api';
+import { UmbExtensionsApiInitializer, type UmbEntryPointOnInit } from '@umbraco-cms/backoffice/extension-api';
 import type { ManifestTypes, UmbBackofficeManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 export * from './localization/index.js';
@@ -57,10 +57,10 @@ const manifests: Array<ManifestTypes | UmbBackofficeManifestKind> = [
 
 export const onInit: UmbEntryPointOnInit = (host, extensionRegistry) => {
 
-	new UmbExtensionsApiController(host, extensionRegistry, 'globalContext', [host]);
-	new UmbExtensionsApiController(host, extensionRegistry, 'store', [host]);
-	new UmbExtensionsApiController(host, extensionRegistry, 'treeStore', [host]);
-	new UmbExtensionsApiController(host, extensionRegistry, 'itemStore', [host]);
+	new UmbExtensionsApiInitializer(host, extensionRegistry, 'globalContext', [host]);
+	new UmbExtensionsApiInitializer(host, extensionRegistry, 'store', [host]);
+	new UmbExtensionsApiInitializer(host, extensionRegistry, 'treeStore', [host]);
+	new UmbExtensionsApiInitializer(host, extensionRegistry, 'itemStore', [host]);
 
 	extensionRegistry.registerMany(manifests);
 

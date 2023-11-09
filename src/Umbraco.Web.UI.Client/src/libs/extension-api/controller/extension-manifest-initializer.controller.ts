@@ -1,6 +1,6 @@
 import type { ManifestCondition, ManifestWithDynamicConditions } from '../types.js';
 import type { UmbExtensionRegistry } from '../registry/extension.registry.js';
-import { UmbBaseExtensionController } from './base-extension-controller.js';
+import { UmbBaseExtensionInitializer } from './base-extension-initializer.controller.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
@@ -14,10 +14,10 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
  * @export
  * @class UmbExtensionManifestController
  */
-export class UmbExtensionManifestController<
+export class UmbExtensionManifestInitializer<
 	ManifestType extends ManifestWithDynamicConditions = ManifestWithDynamicConditions,
-	ControllerType extends UmbBaseExtensionController<ManifestType, any> = any
-> extends UmbBaseExtensionController<ManifestType, ControllerType> {
+	ControllerType extends UmbBaseExtensionInitializer<ManifestType, any> = any
+> extends UmbBaseExtensionInitializer<ManifestType, ControllerType> {
 	constructor(
 		host: UmbControllerHost,
 		extensionRegistry: UmbExtensionRegistry<ManifestCondition>,

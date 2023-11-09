@@ -1,5 +1,5 @@
-import { type PermittedControllerType, UmbBaseExtensionsController } from './base-extensions-controller.js';
-import { UmbExtensionApiController } from './extension-api-controller.js';
+import { type PermittedControllerType, UmbBaseExtensionsInitializer } from './base-extensions-initializer.controller.js';
+import { UmbExtensionApiInitializer } from './extension-api-initializer.controller.js';
 import {
 	type ManifestTypeMap,
 	type SpecificManifestTypeOrManifestBase,
@@ -16,19 +16,19 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
  * @example
 * ```ts
 TODO: Correct this, start using builder pattern:
-* const controller = new UmbExtensionsApiController(host, extensionRegistry, type, ['constructor argument 1', 'constructor argument '], filter?, (permitted, ctrl) => { console.log("Extension is permitted and this is the manifest: ", ctrl.manifest) }));
+* const controller = new UmbExtensionsApiInitializer(host, extensionRegistry, type, ['constructor argument 1', 'constructor argument '], filter?, (permitted, ctrl) => { console.log("Extension is permitted and this is the manifest: ", ctrl.manifest) }));
 * ```
  * @export
- * @class UmbExtensionsApiController
+ * @class UmbExtensionsApiInitializer
  */
-export class UmbExtensionsApiController<
+export class UmbExtensionsApiInitializer<
 	ManifestTypes extends ManifestApi,
 	ManifestTypeName extends keyof ManifestTypeMap<ManifestTypes> | string = string,
 	ManifestType extends ManifestBase = SpecificManifestTypeOrManifestBase<ManifestTypes, ManifestTypeName>,
 	ManifestTypeAsApi extends ManifestApi = ManifestType extends ManifestApi ? ManifestType : never,
-	ControllerType extends UmbExtensionApiController<ManifestTypeAsApi> = UmbExtensionApiController<ManifestTypeAsApi>,
+	ControllerType extends UmbExtensionApiInitializer<ManifestTypeAsApi> = UmbExtensionApiInitializer<ManifestTypeAsApi>,
 	MyPermittedControllerType extends ControllerType = PermittedControllerType<ControllerType>
-> extends UmbBaseExtensionsController<
+> extends UmbBaseExtensionsInitializer<
 	ManifestTypes,
 	ManifestTypeName,
 	ManifestTypeAsApi,
@@ -69,7 +69,7 @@ export class UmbExtensionsApiController<
 	}
 
 	protected _createController(manifest: ManifestTypeAsApi) {
-		const extController = new UmbExtensionApiController<ManifestTypeAsApi>(
+		const extController = new UmbExtensionApiInitializer<ManifestTypeAsApi>(
 			this,
 			this.#extensionRegistry,
 			manifest.alias,

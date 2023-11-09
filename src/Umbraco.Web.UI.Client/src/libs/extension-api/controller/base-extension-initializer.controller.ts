@@ -8,7 +8,7 @@ import {
 } from '@umbraco-cms/backoffice/extension-api';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
-export abstract class UmbBaseExtensionController<
+export abstract class UmbBaseExtensionInitializer<
 	ManifestType extends ManifestWithDynamicConditions = ManifestWithDynamicConditions,
 	SubClassType = never
 > extends UmbBaseController {
@@ -211,7 +211,7 @@ export abstract class UmbBaseExtensionController<
 
 	protected abstract _conditionsAreBad(): Promise<void>;
 
-	public equal(otherClass: UmbBaseExtensionController | undefined): boolean {
+	public equal(otherClass: UmbBaseExtensionInitializer | undefined): boolean {
 		return otherClass?.manifest === this.manifest;
 	}
 
