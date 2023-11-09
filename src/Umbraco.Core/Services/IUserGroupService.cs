@@ -93,5 +93,17 @@ public interface IUserGroupService
     /// <param name="userGroupKeys">The user groups the users should be part of.</param>
     /// <param name="userKeys">The user whose groups we want to alter.</param>
     /// <returns>An attempt indicating if the operation was a success as well as a more detailed <see cref="UserGroupOperationStatus"/>.</returns>
-    Task UpdateUserGroupsOnUsers(ISet<Guid> userGroupKeys, ISet<Guid> userKeys);
+    Task SetUserGroupsOnUsers(ISet<Guid> userGroupKeys, ISet<Guid> userKeys);
+
+    /// <summary>
+    /// Updates users to have the groups specified added or removed.
+    /// </summary>
+    /// <param name="userIds">The user whose groups we want to alter.</param>
+    /// <param name="userGroupIdsToAdd">The user groups the users should be part of.</param>
+    /// <param name="userGroupIdsToRemove">The user groups the users should NOT be part of.</param>
+    /// <returns>The users with in their update state</returns>
+    Task<IUser[]> UpdateUserGroupsOnUsers(
+        IEnumerable<Guid> userIds,
+        IEnumerable<Guid> userGroupIdsToAdd,
+        IEnumerable<Guid> userGroupIdsToRemove);
 }

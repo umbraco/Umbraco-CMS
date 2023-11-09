@@ -1,27 +1,37 @@
 ﻿using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Management.Factories;
+using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.User;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.User;
 
 [ApiVersion("1.0")]
-public class UpdateUserGroupsUserController : UserControllerBase
+public class UpdateGroupsUsersController : UserControllerBase
 {
     private readonly IUserGroupService _userGroupService;
+    private readonly IUserPresentationFactory _userPresentationFactory;
 
-    public UpdateUserGroupsUserController(IUserGroupService userGroupService)
+    public UpdateGroupsUsersController(
+        IUserGroupService userGroupService,
+        IUserPresentationFactory userPresentationFactory)
     {
         _userGroupService = userGroupService;
+        _userPresentationFactory = userPresentationFactory;
     }
 
-    [HttpPost("set-user-groups")]
+    [HttpPatch("user-group-ids")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> UpdateUserGroups(UpdateUserGroupsOnUserRequestModel requestModel)
+    [ProducesResponseType(typeof(IEnumerable<UserResponseModel>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> UpdateUserGroups(PatchResourceListRequestModel requestModel)
     {
-        await _userGroupService.UpdateUserGroupsOnUsers(requestModel.UserGroupIds, requestModel.UserIds);
-        return Ok();
+        IUser[] updatedUsers = await _userGroupService.UpdateUserGroupsOnUsers(
+            requestModel.Resources,
+            requestModel.Post,
+            requestModel.Delete);
+        return Ok(updatedUsers.Select(user => _userPresentationFactory.CreateResponseModel(user)));
     }
 }

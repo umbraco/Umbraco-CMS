@@ -180,7 +180,7 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
         return Attempt.Succeed(UserGroupOperationStatus.Success);
     }
 
-    public async Task UpdateUserGroupsOnUsers(
+    public async Task SetUserGroupsOnUsers(
         ISet<Guid> userGroupKeys,
         ISet<Guid> userKeys)
     {
@@ -200,6 +200,41 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
         }
 
         _userService.Save(users);
+    }
+
+    public async Task<IUser[]> UpdateUserGroupsOnUsers(
+        IEnumerable<Guid> userIds,
+        IEnumerable<Guid> userGroupIdsToAdd,
+        IEnumerable<Guid> userGroupIdsToRemove)
+    {
+        IUser[] users = (await _userService.GetAsync(userIds)).ToArray();
+
+        IReadOnlyUserGroup[] userGroupsToAdd = (await GetAsync(userGroupIdsToAdd))
+            .Select(x => x.ToReadOnlyGroup())
+            .ToArray();
+
+        IReadOnlyUserGroup[] userGroupsToRemove = (await GetAsync(userGroupIdsToRemove))
+            .Select(x => x.ToReadOnlyGroup())
+            .ToArray();
+
+        foreach (IUser user in users)
+        {
+            // add all specified groups that the user is not yet part off
+            foreach (IReadOnlyUserGroup userGroup in userGroupsToAdd.ExceptBy(user.Groups.Select(g => g.Key), group => group.Key))
+            {
+                user.AddGroup(userGroup);
+            }
+
+            // remove all specified groups the user is part of
+            foreach (IReadOnlyUserGroup userGroup in userGroupsToRemove.UnionBy(user.Groups, group => group.Key))
+            {
+                user.AddGroup(userGroup);
+            }
+        }
+
+        _userService.Save(users);
+
+        return users;
     }
 
     private Attempt<UserGroupOperationStatus> ValidateUserGroupDeletion(IUserGroup? userGroup)
