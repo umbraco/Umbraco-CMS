@@ -3,7 +3,7 @@ import { UmbBaseController, UmbControllerHost } from '@umbraco-cms/backoffice/co
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { UserResource } from '@umbraco-cms/backoffice/backend-api';
-import { UmbLoggedInUser } from '@umbraco-cms/backoffice/auth';
+import { UMB_AUTH_CONTEXT, UmbLoggedInUser } from '@umbraco-cms/backoffice/auth';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 
 export class UmbCurrentUserContext extends UmbBaseController {
@@ -12,17 +12,17 @@ export class UmbCurrentUserContext extends UmbBaseController {
 
 	readonly languageIsoCode = this.#currentUser.asObservablePart((user) => user?.languageIsoCode ?? 'en-us');
 
+	#authContext: any;
+
 	constructor(host: UmbControllerHost) {
 		super(host);
-		this.provideContext(UMB_CURRENT_USER_CONTEXT, this);
 
-		/*
-		this.observe(this.isLoggedIn, (isLoggedIn) => {
-			if (isLoggedIn) {
-				this.fetchCurrentUser();
-			}
+		this.consumeContext(UMB_AUTH_CONTEXT, (instance) => {
+			this.#authContext = instance;
+			this.#observeIsLoggedIn();
 		});
-    */
+
+		this.provideContext(UMB_CURRENT_USER_CONTEXT, this);
 	}
 
 	/**
@@ -36,12 +36,18 @@ export class UmbCurrentUserContext extends UmbBaseController {
 		return currentUser?.id === userId;
 	}
 
-	async fetchCurrentUser(): Promise<UmbLoggedInUser | undefined> {
+	#observeIsLoggedIn() {
+		if (!this.#authContext) return;
+		this.observe(this.#authContext.isLoggedIn, (isLoggedIn) => {
+			if (isLoggedIn) {
+				this.#requestCurrentUser();
+			}
+		});
+	}
+
+	async #requestCurrentUser() {
 		const { data } = await tryExecuteAndNotify(this._host, UserResource.getUserCurrent());
-
 		this.#currentUser.next(data);
-
-		return data;
 	}
 }
 
