@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.Scoping;
 
 namespace Umbraco.Cms.Core.Services;
 
-public class WebhookService : IWebHookService
+public class WebhookService : IWebhookService
 {
     private readonly ICoreScopeProvider _provider;
     private readonly IWebhookRepository _webhookRepository;

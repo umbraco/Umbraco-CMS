@@ -332,7 +332,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             // Register filestream security analyzers
             Services.AddUnique<IFileStreamSecurityValidator,FileStreamSecurityValidator>();
             Services.AddUnique<IDynamicRootService,DynamicRoot.DynamicRootService>();
-            Services.AddUnique<IWebHookService, WebhookService>();
+            Services.AddUnique<IWebhookService, WebhookService>();
             Services.AddUnique<IWebhookLogService, WebhookLogService>();
             Services.AddUnique<IWebhookLogFactory, WebhookLogFactory>();
         }

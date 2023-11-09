@@ -2,7 +2,7 @@ using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Services;
 
-public interface IWebHookService
+public interface IWebhookService
 {
     /// <summary>
     ///     Creates a webhook.
