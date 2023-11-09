@@ -56,7 +56,7 @@ export class UmbMemberTypeRepository implements UmbTreeRepository<TreeItemType>,
 			id: null,
 			type: 'member-type-root',
 			name: 'Member Types',
-			icon: 'umb:folder',
+			icon: 'icon-folder',
 			hasChildren: true,
 		};
 

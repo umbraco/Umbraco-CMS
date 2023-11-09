@@ -8,7 +8,7 @@ export const manifest: ManifestPropertyEditorUi = {
 	meta: {
 		label: 'Media Picker',
 		propertyEditorSchemaAlias: 'Umbraco.MediaPicker3',
-		icon: 'umb:picture',
+		icon: 'icon-picture',
 		group: 'pickers',
 	},
 };

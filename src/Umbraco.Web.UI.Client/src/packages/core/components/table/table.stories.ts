@@ -27,7 +27,7 @@ const columns: Array<UmbTableColumn> = [
 const items: Array<UmbTableItem> = [
 	{
 		id: UmbId.new(),
-		icon: 'umb:wand',
+		icon: 'icon-wand',
 		data: [
 			{
 				columnAlias: 'name',
@@ -41,7 +41,7 @@ const items: Array<UmbTableItem> = [
 	},
 	{
 		id: UmbId.new(),
-		icon: 'umb:document',
+		icon: 'icon-document',
 		data: [
 			{
 				columnAlias: 'name',
@@ -55,7 +55,7 @@ const items: Array<UmbTableItem> = [
 	},
 	{
 		id: UmbId.new(),
-		icon: 'umb:user',
+		icon: 'icon-user',
 		data: [
 			{
 				columnAlias: 'name',

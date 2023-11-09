@@ -98,7 +98,7 @@ export class UmbLanguageWorkspaceContext
 	}
 
 	destroy(): void {
-		this.#data.complete();
+		this.#data.destroy();
 	}
 }
 

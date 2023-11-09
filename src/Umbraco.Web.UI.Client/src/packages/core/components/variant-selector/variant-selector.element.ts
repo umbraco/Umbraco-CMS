@@ -204,7 +204,7 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 																${this._isNotPublishedMode(variant.culture!, variant.state!) ? 'add-mode' : ''}"
 																@click=${() => this._switchVariant(variant)}>
 																${this._isNotPublishedMode(variant.culture!, variant.state!)
-																	? html`<uui-icon class="add-icon" name="umb:add"></uui-icon>`
+																	? html`<uui-icon class="add-icon" name="icon-add"></uui-icon>`
 																	: nothing}
 																<div>
 																	${variant.name} <i>(${variant.culture})</i> ${variant.segment}

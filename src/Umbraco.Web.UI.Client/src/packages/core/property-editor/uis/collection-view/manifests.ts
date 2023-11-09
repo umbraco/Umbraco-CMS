@@ -12,7 +12,7 @@ const manifest: ManifestPropertyEditorUi = {
 	meta: {
 		label: 'Collection View',
 		propertyEditorSchemaAlias: 'Umbraco.ListView',
-		icon: 'umb:bulleted-list',
+		icon: 'icon-bulleted-list',
 		group: 'lists',
 		settings: {
 			properties: [

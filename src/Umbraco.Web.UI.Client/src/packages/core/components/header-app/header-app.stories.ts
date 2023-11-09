@@ -19,7 +19,7 @@ export const Overview: Story = {
 			kind: 'button',
 			meta: {
 				label: 'Some Header',
-				icon: 'umb:home',
+				icon: 'icon-home',
 				href: '/some/path',
 			},
 		},

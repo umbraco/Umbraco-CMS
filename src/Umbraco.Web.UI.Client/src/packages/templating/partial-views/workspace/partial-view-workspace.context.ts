@@ -44,9 +44,9 @@ export class UmbPartialViewWorkspaceContext extends UmbWorkspaceContext<
 
 	#data = new UmbDeepState<PartialViewDetails | undefined>(undefined);
 	data = this.#data.asObservable();
-	name = createObservablePart(this.#data, (data) => data?.name);
-	content = createObservablePart(this.#data, (data) => data?.content);
-	path = createObservablePart(this.#data, (data) => data?.path);
+	name = this.#data.asObservablePart((data) => data?.name);
+	content = this.#data.asObservablePart((data) => data?.content);
+	path = this.#data.asObservablePart((data) => data?.path);
 
 	#isCodeEditorReady = new UmbBooleanState(false);
 	isCodeEditorReady = this.#isCodeEditorReady.asObservable();

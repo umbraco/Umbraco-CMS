@@ -13,7 +13,7 @@ export const data: Array<MediaTypeResponseModel> = [
 		id: 'c5159663-eb82-43ee-bd23-e42dc5e71db6',
 		description: 'Media type 1 description',
 		alias: 'mediaType1',
-		icon: 'umb:bug',
+		icon: 'icon-bug',
 		properties: [],
 		containers: [],
 	},

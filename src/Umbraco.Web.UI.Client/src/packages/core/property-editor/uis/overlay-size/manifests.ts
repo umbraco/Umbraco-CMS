@@ -8,7 +8,7 @@ export const manifest: ManifestPropertyEditorUi = {
 	meta: {
 		label: 'Overlay Size',
 		propertyEditorSchemaAlias: '',
-		icon: 'umb:document',
+		icon: 'icon-document',
 		group: '',
 	},
 };

@@ -2,8 +2,6 @@ import { UmbLogViewerRepository } from '../repository/log-viewer.repository.js';
 import {
 	UmbBasicState,
 	UmbArrayState,
-	createObservablePart,
-	UmbDeepState,
 	UmbObjectState,
 	UmbStringState,
 } from '@umbraco-cms/backoffice/observable-api';
@@ -73,41 +71,41 @@ export class UmbLogViewerWorkspaceContext extends UmbBaseController implements U
 	};
 
 	#savedSearches = new UmbObjectState<PagedSavedLogSearchResponseModel | undefined>(undefined);
-	savedSearches = createObservablePart(this.#savedSearches, (data) => data?.items);
+	savedSearches = this.#savedSearches.asObservablePart((data) => data?.items);
 
-	#logCount = new UmbDeepState<LogLevelCountsReponseModel | null>(null);
-	logCount = createObservablePart(this.#logCount, (data) => data);
+	#logCount = new UmbObjectState<LogLevelCountsReponseModel | null>(null);
+	logCount = this.#logCount.asObservable();
 
-	#dateRange = new UmbDeepState<LogViewerDateRange>(this.defaultDateRange);
-	dateRange = createObservablePart(this.#dateRange, (data) => data);
+	#dateRange = new UmbObjectState<LogViewerDateRange>(this.defaultDateRange);
+	dateRange = this.#dateRange.asObservable();
 
-	#loggers = new UmbDeepState<PagedLoggerResponseModel | null>(null);
-	loggers = createObservablePart(this.#loggers, (data) => data?.items);
+	#loggers = new UmbObjectState<PagedLoggerResponseModel | null>(null);
+	loggers = this.#loggers.asObservablePart((data) => data?.items);
 
 	#canShowLogs = new UmbBasicState<boolean | null>(null);
-	canShowLogs = createObservablePart(this.#canShowLogs, (data) => data);
+	canShowLogs = this.#canShowLogs.asObservable();
 
 	#isLoadingLogs = new UmbBasicState<boolean | null>(null);
-	isLoadingLogs = createObservablePart(this.#isLoadingLogs, (data) => data);
+	isLoadingLogs = this.#isLoadingLogs.asObservable();
 
 	#filterExpression = new UmbStringState<string>('');
-	filterExpression = createObservablePart(this.#filterExpression, (data) => data);
+	filterExpression = this.#filterExpression.asObservable();
 
-	#messageTemplates = new UmbDeepState<PagedLogTemplateResponseModel | null>(null);
-	messageTemplates = createObservablePart(this.#messageTemplates, (data) => data);
+	#messageTemplates = new UmbObjectState<PagedLogTemplateResponseModel | null>(null);
+	messageTemplates = this.#messageTemplates.asObservable();
 
 	#logLevelsFilter = new UmbArrayState<LogLevelModel>([]);
-	logLevelsFilter = createObservablePart(this.#logLevelsFilter, (data) => data);
+	logLevelsFilter = this.#logLevelsFilter.asObservable();
 
-	#logs = new UmbDeepState<PagedLogMessageResponseModel | null>(null);
-	logs = createObservablePart(this.#logs, (data) => data?.items);
-	logsTotal = createObservablePart(this.#logs, (data) => data?.total);
+	#logs = new UmbObjectState<PagedLogMessageResponseModel | null>(null);
+	logs = this.#logs.asObservablePart((data) => data?.items);
+	logsTotal = this.#logs.asObservablePart((data) => data?.total);
 
 	#polling = new UmbObjectState<PoolingCOnfig>({ enabled: false, interval: 2000 });
-	polling = createObservablePart(this.#polling, (data) => data);
+	polling = this.#polling.asObservable();
 
 	#sortingDirection = new UmbBasicState<DirectionModel>(DirectionModel.ASCENDING);
-	sortingDirection = createObservablePart(this.#sortingDirection, (data) => data);
+	sortingDirection = this.#sortingDirection.asObservable();
 
 	#intervalID: number | null = null;
 

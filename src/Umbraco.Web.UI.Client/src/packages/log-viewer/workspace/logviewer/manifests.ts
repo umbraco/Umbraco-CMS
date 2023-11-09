@@ -27,7 +27,7 @@ const workspaceViews: Array<ManifestWorkspaceEditorView> = [
 		meta: {
 			label: 'Overview',
 			pathname: 'overview',
-			icon: 'umb:box-alt',
+			icon: 'icon-box-alt',
 		},
 		conditions: [
 			{
@@ -45,7 +45,7 @@ const workspaceViews: Array<ManifestWorkspaceEditorView> = [
 		meta: {
 			label: 'Search',
 			pathname: 'search',
-			icon: 'umb:search',
+			icon: 'icon-search',
 		},
 		conditions: [
 			{

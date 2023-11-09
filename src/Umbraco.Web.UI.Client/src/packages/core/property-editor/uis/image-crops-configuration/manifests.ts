@@ -7,7 +7,7 @@ export const manifest: ManifestPropertyEditorUi = {
 	loader: () => import('./property-editor-ui-image-crops-configuration.element.js'),
 	meta: {
 		label: 'Image Crops Configuration',
-		icon: 'umb:autofill',
+		icon: 'icon-autofill',
 		group: 'common',
 		propertyEditorSchemaAlias: 'Umbraco.ImageCropper.Configuration',
 	},

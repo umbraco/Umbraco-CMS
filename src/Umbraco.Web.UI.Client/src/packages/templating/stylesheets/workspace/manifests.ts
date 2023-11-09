@@ -26,7 +26,7 @@ const workspaceEditorViews: Array<ManifestWorkspaceEditorView> = [
 		meta: {
 			label: 'Code',
 			pathname: 'code',
-			icon: 'umb:brackets',
+			icon: 'icon-brackets',
 		},
 		conditions: [
 			{
@@ -44,7 +44,7 @@ const workspaceEditorViews: Array<ManifestWorkspaceEditorView> = [
 		meta: {
 			label: 'Rich Text Editor',
 			pathname: 'rich-text-editor',
-			icon: 'umb:font',
+			icon: 'icon-font',
 		},
 		conditions: [
 			{

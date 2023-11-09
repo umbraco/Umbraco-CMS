@@ -52,7 +52,7 @@ export class UmbMemberGroupRepository
 			id: null,
 			type: 'member-group-root',
 			name: 'Member Groups',
-			icon: 'umb:folder',
+			icon: 'icon-folder',
 			hasChildren: true,
 		};
 

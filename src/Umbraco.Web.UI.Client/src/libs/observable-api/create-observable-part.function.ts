@@ -15,11 +15,11 @@ import { distinctUntilChanged, map, Observable, shareReplay } from '@umbraco-cms
  */
 
 export function createObservablePart<R, T>(
-	source$: Observable<T>,
+	source: Observable<T>,
 	mappingFunction: MappingFunction<T, R>,
 	memoizationFunction?: MemoizationFunction<R>
 ): Observable<R> {
-	return source$.pipe(
+	return source.pipe(
 		map(mappingFunction),
 		distinctUntilChanged(memoizationFunction || defaultMemoization),
 		shareReplay(1)

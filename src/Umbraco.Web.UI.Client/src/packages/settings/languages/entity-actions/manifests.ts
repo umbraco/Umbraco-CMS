@@ -12,7 +12,7 @@ const entityActions: Array<ManifestEntityAction> = [
 		api: UmbDeleteEntityAction,
 		meta: {
 			repositoryAlias: LANGUAGE_REPOSITORY_ALIAS,
-			icon: 'umb:trash',
+			icon: 'icon-trash',
 			label: 'Delete',
 			entityTypes: [LANGUAGE_ENTITY_TYPE],
 		},
@@ -24,7 +24,7 @@ const entityActions: Array<ManifestEntityAction> = [
 		weight: 900,
 		api: UmbLanguageCreateEntityAction,
 		meta: {
-			icon: 'umb:add',
+			icon: 'icon-add',
 			label: 'Create',
 			repositoryAlias: LANGUAGE_REPOSITORY_ALIAS,
 			entityTypes: [LANGUAGE_ENTITY_TYPE, LANGUAGE_ROOT_ENTITY_TYPE],

@@ -35,7 +35,7 @@ export class UmbUserWorkspaceContext
 		this.observe(asObservable(), (user) => this.onUserStoreChanges(user), 'umbUserStoreObserver');
 	}
 
-	/* TODO: some properties are allowed to update without saving. 
+	/* TODO: some properties are allowed to update without saving.
 		For a user properties like state will be updated when one of the entity actions are executed.
 		Therefore we have to subscribe to the user store to update the state in the workspace data.
 		There might be a less manual way to do this.
@@ -102,7 +102,7 @@ export class UmbUserWorkspaceContext
 	}
 
 	destroy(): void {
-		this.#data.complete();
+		this.#data.destroy();
 	}
 }
 

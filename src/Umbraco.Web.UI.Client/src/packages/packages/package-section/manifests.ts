@@ -23,7 +23,7 @@ const sectionsViews: Array<ManifestSectionView> = [
 		meta: {
 			label: 'Packages',
 			pathname: 'packages',
-			icon: 'umb:cloud',
+			icon: 'icon-cloud',
 		},
 		conditions: [
 			{
@@ -41,7 +41,7 @@ const sectionsViews: Array<ManifestSectionView> = [
 		meta: {
 			label: 'Installed',
 			pathname: 'installed',
-			icon: 'umb:box',
+			icon: 'icon-box',
 		},
 		conditions: [
 			{
@@ -59,7 +59,7 @@ const sectionsViews: Array<ManifestSectionView> = [
 		meta: {
 			label: 'Created',
 			pathname: 'created',
-			icon: 'umb:files',
+			icon: 'icon-files',
 		},
 		conditions: [
 			{

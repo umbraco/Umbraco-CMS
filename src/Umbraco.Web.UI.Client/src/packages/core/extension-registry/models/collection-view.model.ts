@@ -15,8 +15,8 @@ export interface MetaCollectionView {
 	 * An icon to represent the collection view
 	 *
 	 * @examples [
-	 *   "umb:box",
-	 *   "umb:grid"
+	 *   "icon-box",
+	 *   "icon-grid"
 	 * ]
 	 */
 	icon: string;

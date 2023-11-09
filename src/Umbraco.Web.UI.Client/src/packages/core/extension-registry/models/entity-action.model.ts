@@ -15,8 +15,8 @@ export interface MetaEntityAction {
 	 * An icon to represent the action to be performed
 	 *
 	 * @examples [
-	 *   "umb:box",
-	 *   "umb:grid"
+	 *   "icon-box",
+	 *   "icon-grid"
 	 * ]
 	 */
 	icon?: string;

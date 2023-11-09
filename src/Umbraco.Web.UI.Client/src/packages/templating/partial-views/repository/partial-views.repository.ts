@@ -120,7 +120,7 @@ export class UmbPartialViewsRepository
 			path: null,
 			type: PARTIAL_VIEW_ROOT_ENTITY_TYPE,
 			name: 'Partial Views',
-			icon: 'umb:folder',
+			icon: 'icon-folder',
 			hasChildren: true,
 		};
 		return { data };

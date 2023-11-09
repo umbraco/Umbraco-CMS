@@ -66,7 +66,7 @@ export class UmbDictionaryRepository
 			id: null,
 			type: 'dictionary-root',
 			name: 'Dictionary',
-			icon: 'umb:folder',
+			icon: 'icon-folder',
 			hasChildren: true,
 		};
 
