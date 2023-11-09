@@ -10,6 +10,16 @@ import {
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
+ * This Controller manages a set of Extensions and their Manifest.
+ * When one or more extensions is permitted to be used, the callback gives all permitted extensions and their manifest.
+ *
+ * @example
+* ```ts
+TODO: Correct this, start using builder pattern:
+* const controller = new UmbExtensionsApiController(host, extensionRegistry, type, ['constructor argument 1', 'constructor argument '], filter?, (permitted, ctrl) => { console.log("Extension is permitted and this is the manifest: ", ctrl.manifest) }));
+* ```
+ * @export
+ * @class UmbExtensionsApiController
  */
 export class UmbExtensionsApiController<
 	ManifestTypes extends ManifestApi,
