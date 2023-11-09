@@ -1,5 +1,6 @@
 import { IUmbAuth } from './auth.interface.js';
 import { UmbAuthFlow } from './auth-flow.js';
+import { UMB_AUTH_CONTEXT } from './auth.token.js';
 import { UmbBaseController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 
@@ -12,6 +13,7 @@ export class UmbAuthContext extends UmbBaseController implements IUmbAuth {
 	constructor(host: UmbControllerHostElement, serverUrl: string, redirectUrl: string) {
 		super(host);
 		this.#authFlow = new UmbAuthFlow(serverUrl, redirectUrl);
+		this.provideContext(UMB_AUTH_CONTEXT, this);
 	}
 
 	/**

@@ -111,8 +111,6 @@ export class UmbAppElement extends UmbLitElement {
 
 		this.#authContext = new UmbAuthContext(this, this.serverUrl, redirectUrl);
 
-		this.provideContext(UMB_AUTH_CONTEXT, this.#authContext);
-
 		this.provideContext(UMB_APP, new UmbAppContext({ backofficePath: this.backofficePath, serverUrl: this.serverUrl }));
 
 		// Try to initialise the auth flow and get the runtime status
