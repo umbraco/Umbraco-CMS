@@ -6,12 +6,12 @@ import {
 	UMB_CHANGE_PASSWORD_MODAL,
 	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
 } from '@umbraco-cms/backoffice/modal';
-import { UMB_AUTH_CONTEXT, type UmbLoggedInUser } from '@umbraco-cms/backoffice/auth';
+import { UMB_AUTH_CONTEXT, type UmbCurrentUser } from '@umbraco-cms/backoffice/auth';
 
 @customElement('umb-user-profile-app-profile')
 export class UmbUserProfileAppProfileElement extends UmbLitElement {
 	@state()
-	private _currentUser?: UmbLoggedInUser;
+	private _currentUser?: UmbCurrentUser;
 
 	private _modalContext?: UmbModalManagerContext;
 	private _auth?: typeof UMB_AUTH_CONTEXT.TYPE;
@@ -32,9 +32,13 @@ export class UmbUserProfileAppProfileElement extends UmbLitElement {
 	private async _observeCurrentUser() {
 		if (!this._auth) return;
 
-		this.observe(this._auth.currentUser, (currentUser) => {
-			this._currentUser = currentUser;
-		}, 'umbCurrentUserObserver');
+		this.observe(
+			this._auth.currentUser,
+			(currentUser) => {
+				this._currentUser = currentUser;
+			},
+			'umbCurrentUserObserver',
+		);
 	}
 
 	private _edit() {
@@ -45,7 +49,7 @@ export class UmbUserProfileAppProfileElement extends UmbLitElement {
 	}
 	private _changePassword() {
 		if (!this._modalContext) return;
-		
+
 		this._modalContext.open(UMB_CHANGE_PASSWORD_MODAL, {
 			userId: this._currentUser?.id ?? '',
 		});

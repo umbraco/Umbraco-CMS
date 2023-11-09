@@ -1,4 +1,4 @@
-import type { UmbLoggedInUser } from './types.js';
+import type { UmbCurrentUser } from './types.js';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 
 export interface IUmbAuth {

@@ -6,12 +6,12 @@ import {
 	UMB_CURRENT_USER_MODAL,
 } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UMB_AUTH_CONTEXT, type UmbLoggedInUser } from '@umbraco-cms/backoffice/auth';
+import { UMB_AUTH_CONTEXT, type UmbCurrentUser } from '@umbraco-cms/backoffice/auth';
 
 @customElement('umb-current-user-header-app')
 export class UmbCurrentUserHeaderAppElement extends UmbLitElement {
 	@state()
-	private _currentUser?: UmbLoggedInUser;
+	private _currentUser?: UmbCurrentUser;
 
 	private _auth?: typeof UMB_AUTH_CONTEXT.TYPE;
 	private _modalContext?: UmbModalManagerContext;
@@ -32,9 +32,13 @@ export class UmbCurrentUserHeaderAppElement extends UmbLitElement {
 	private async _observeCurrentUser() {
 		if (!this._auth) return;
 
-		this.observe(this._auth.currentUser, (currentUser) => {
-			this._currentUser = currentUser;
-		}, 'umbCurrentUserObserver');
+		this.observe(
+			this._auth.currentUser,
+			(currentUser) => {
+				this._currentUser = currentUser;
+			},
+			'umbCurrentUserObserver',
+		);
 	}
 
 	private _handleUserClick() {

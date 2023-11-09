@@ -3,11 +3,11 @@ import { UmbBaseController, UmbControllerHost } from '@umbraco-cms/backoffice/co
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { UserResource } from '@umbraco-cms/backoffice/backend-api';
-import { UMB_AUTH_CONTEXT, UmbLoggedInUser } from '@umbraco-cms/backoffice/auth';
+import { UMB_AUTH_CONTEXT, UmbCurrentUser } from '@umbraco-cms/backoffice/auth';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 
 export class UmbCurrentUserContext extends UmbBaseController {
-	#currentUser = new UmbObjectState<UmbLoggedInUser | undefined>(undefined);
+	#currentUser = new UmbObjectState<UmbCurrentUser | undefined>(undefined);
 	readonly currentUser = this.#currentUser.asObservable();
 
 	readonly languageIsoCode = this.#currentUser.asObservablePart((user) => user?.languageIsoCode ?? 'en-us');
