@@ -82,7 +82,6 @@ public class ExamineExternalIndexTests : ExamineBaseTest
         builder.AddExamineIndexes();
         builder.AddBackOfficeIdentity();
         builder.Services.AddHostedService<QueuedHostedService>();
-        ExamineUmbracoIndexingHandler.ForceInstantExecution = true;
     }
 
     private IEnumerable<ISearchResult> ExamineExternalIndexSearch(string query, int pageSize = 20, int pageIndex = 0)

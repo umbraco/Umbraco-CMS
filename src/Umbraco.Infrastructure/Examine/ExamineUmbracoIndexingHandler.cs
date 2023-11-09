@@ -28,7 +28,6 @@ internal class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
     private readonly ExamineIndexingMainDomHandler _mainDomHandler;
     private readonly IPublicAccessService _publicAccessService;
 
-    internal static bool ForceInstantExecution { get; set; } = false;
     public ExamineUmbracoIndexingHandler(
         ILogger<ExamineUmbracoIndexingHandler> logger,
         ICoreScopeProvider scopeProvider,
