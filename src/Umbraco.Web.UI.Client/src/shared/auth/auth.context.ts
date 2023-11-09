@@ -12,7 +12,8 @@ export class UmbAuthContext extends UmbBaseController implements IUmbAuth {
 	#currentUser = new UmbObjectState<UmbLoggedInUser | undefined>(undefined);
 	readonly currentUser = this.#currentUser.asObservable();
 
-	readonly isLoggedIn = new UmbBooleanState<boolean>(false);
+	#isLoggedIn = new UmbBooleanState<boolean>(false);
+	readonly isLoggedIn = this.#isLoggedIn.asObservable();
 	readonly languageIsoCode = this.#currentUser.asObservablePart((user) => user?.languageIsoCode ?? 'en-us');
 
 	#authFlow;
@@ -33,6 +34,11 @@ export class UmbAuthContext extends UmbBaseController implements IUmbAuth {
 	 */
 	login(): void {
 		return this.#authFlow.makeAuthorizationRequest();
+	}
+
+	/* TEMPORARY METHOD UNTIL RESPONSIBILITY IS MOVED TO CONTEXT */
+	setLoggedIn(newValue: boolean): void {
+		return this.#isLoggedIn.next(newValue);
 	}
 
 	isAuthorized() {
