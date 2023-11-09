@@ -110,8 +110,7 @@ export class UmbAppElement extends UmbLitElement {
 		const redirectUrl = `${window.location.origin}${this.backofficePath}`;
 
 		this.#authContext = new UmbAuthContext(this, this.serverUrl, redirectUrl);
-
-		this.provideContext(UMB_APP, new UmbAppContext({ backofficePath: this.backofficePath, serverUrl: this.serverUrl }));
+		new UmbAppContext(this, { backofficePath: this.backofficePath, serverUrl: this.serverUrl });
 
 		// Try to initialise the auth flow and get the runtime status
 		try {
