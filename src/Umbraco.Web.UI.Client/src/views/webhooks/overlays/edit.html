@@ -42,9 +42,9 @@
                 <umb-node-preview
                   ng-repeat="event in model.webhook.events"
                   ng-show="event"
-                  icon="icon-navigation"
-                  name="event"
-                  alias="event"
+                  icon="icon-flag"
+                  name="event.eventName"
+                  alias="event.eventAlias"
                   description=""
                   allow-remove="true"
                   allow-open="false"
