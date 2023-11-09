@@ -1,4 +1,4 @@
-import { UmbAuth } from './auth.interface.js';
+import { IUmbAuth } from './auth.interface.js';
 import { UmbAuthFlow } from './auth-flow.js';
 import { UmbLoggedInUser } from './types.js';
 import { UserResource } from '@umbraco-cms/backoffice/backend-api';
@@ -7,7 +7,7 @@ import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observa
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 
-export class UmbAuthContext extends UmbBaseController implements UmbAuth {
+export class UmbAuthContext extends UmbBaseController implements IUmbAuth {
 
 	#currentUser = new UmbObjectState<UmbLoggedInUser | undefined>(undefined);
 	readonly currentUser = this.#currentUser.asObservable();
@@ -47,8 +47,8 @@ export class UmbAuthContext extends UmbBaseController implements UmbAuth {
 		return this.#authFlow?.makeAuthorizationRequest();
 	}
 
-	checkAuthorization() {
-		return this.#authFlow?.checkAuthorization() ?? true;
+	isAuthorized() {
+		return this.#authFlow?.isAuthorized() ?? true;
 	}
 
 	setInitialState(): Promise<void> {
