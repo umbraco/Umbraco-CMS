@@ -63,7 +63,7 @@ export class UmbExtensionElementController<
 		onPermissionChanged: (isPermitted: boolean, controller: ControllerType) => void,
 		defaultElement?: string
 	) {
-		super(host, extensionRegistry, alias, onPermissionChanged);
+		super(host, extensionRegistry, 'extElement_', alias, onPermissionChanged);
 		this.#defaultElement = defaultElement;
 		this._init();
 	}

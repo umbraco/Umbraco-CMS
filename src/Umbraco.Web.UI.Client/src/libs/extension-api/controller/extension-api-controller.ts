@@ -18,7 +18,7 @@ import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
  * @class UmbExtensionApiController
  */
 export class UmbExtensionApiController<
-	ManifestType extends (ManifestWithDynamicConditions & ManifestApi) = (ManifestWithDynamicConditions & ManifestApi),
+	ManifestType extends ManifestApi =  ManifestApi,
 	ControllerType extends UmbExtensionApiController<ManifestType, any> = any,
 	ExtensionApiInterface extends ExtensionApi = ManifestType extends ManifestApi ? NonNullable<ManifestType['API_TYPE']> : ExtensionApi
 > extends UmbBaseExtensionController<ManifestType, ControllerType> {
@@ -69,7 +69,7 @@ export class UmbExtensionApiController<
 		constructorArguments: Array<unknown> | undefined,
 		onPermissionChanged?: (isPermitted: boolean, controller: ControllerType) => void
 	) {
-		super(host, extensionRegistry, alias, onPermissionChanged);
+		super(host, extensionRegistry, 'extApi_', alias, onPermissionChanged);
 		this.#constructorArguments = constructorArguments;
 		this._init();
 	}

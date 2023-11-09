@@ -77,7 +77,6 @@ export class UmbPickerInputContext<ItemType extends ItemResponseModelBaseModel>e
 		modalContext?.onSubmit().then(({ selection }: any) => {
 			this.setSelection(selection);
 			this.getHostElement().dispatchEvent(new UmbChangeEvent());
-			// TODO: we only want to request items that are not already in the selectedItems array
 		});
 	}
 

@@ -27,7 +27,7 @@ class UmbTestExtensionController extends UmbBaseExtensionController {
 		alias: string,
 		onPermissionChanged: (isPermitted: boolean) => void
 	) {
-		super(host, extensionRegistry, alias, onPermissionChanged);
+		super(host, extensionRegistry, 'test_', alias, onPermissionChanged);
 		this._init();
 	}
 

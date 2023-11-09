@@ -51,10 +51,11 @@ export abstract class UmbBaseExtensionController<
 	constructor(
 		host: UmbControllerHost,
 		extensionRegistry: UmbExtensionRegistry<ManifestCondition>,
+		extensionTypeName: string,
 		alias: string,
 		onPermissionChanged?: (isPermitted: boolean, controller: SubClassType) => void
 	) {
-		super(host, alias);
+		super(host, extensionTypeName+alias);
 		this.#extensionRegistry = extensionRegistry;
 		this.#alias = alias;
 		this.#onPermissionChanged = onPermissionChanged;

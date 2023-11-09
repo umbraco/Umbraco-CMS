@@ -1,6 +1,6 @@
 import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbPagedData, UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
-import { ManifestTree, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { type ManifestRepository, type ManifestTree, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbBaseController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbExtensionApiController } from '@umbraco-cms/backoffice/extension-api';
@@ -153,26 +153,9 @@ export class UmbTreeContextBase<TreeItemType extends TreeItemPresentationModel>
 		const repositoryAlias = treeManifest.meta.repositoryAlias;
 		if (!repositoryAlias) throw new Error('Tree must have a repository alias.');
 
-		new UmbExtensionApiController(this, umbExtensionsRegistry, repositoryAlias, [this._host], (permitted, ctrl) => {
-			this.repository = permitted ? ctrl.api as UmbTreeRepository<TreeItemType> : undefined;
+		new UmbExtensionApiController<ManifestRepository<UmbTreeRepository<TreeItemType>>>(this, umbExtensionsRegistry, repositoryAlias, [this._host], (permitted, ctrl) => {
+			this.repository = permitted ? ctrl.api : undefined;
 			this.#checkIfInitialized();
 		});
-		/*
-		this.observe(
-			umbExtensionsRegistry.getByTypeAndAlias('repository', treeManifest.meta.repositoryAlias),
-			async (repositoryManifest) => {
-				if (!repositoryManifest) return;
-
-				try {
-					const result = await createExtensionApi(repositoryManifest, [this._host]);
-					this.repository = result as UmbTreeRepository<TreeItemType>;
-					this.#checkIfInitialized();
-				} catch (error) {
-					throw new Error('Could not create repository with alias: ' + repositoryAlias + '');
-				}
-			},
-			'_observeRepository',
-		);
-		*/
 	}
 }
