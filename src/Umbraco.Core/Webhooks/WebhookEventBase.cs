@@ -62,7 +62,7 @@ public abstract class WebhookEventBase<TNotification> : IWebhookEvent, INotifica
                 continue;
             }
 
-            await WebhookFiringService.FireAsync(webhook, EventName, notification, cancellationToken);
+            await WebhookFiringService.FireAsync(webhook, Alias, notification, cancellationToken);
         }
     }
 

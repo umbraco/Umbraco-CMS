@@ -36,5 +36,5 @@ public interface IWebHookService
     /// <summary>
     ///     Gets webhooks by event name.
     /// </summary>
-    Task<IEnumerable<Webhook>> GetByAliasAsync(string eventName);
+    Task<IEnumerable<Webhook>> GetByAliasAsync(string alias);
 }

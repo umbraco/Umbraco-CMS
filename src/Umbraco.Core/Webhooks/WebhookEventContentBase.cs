@@ -37,7 +37,7 @@ public abstract class WebhookEventContentBase<TNotification, TEntity> : WebhookE
                     continue;
                 }
 
-                await WebhookFiringService.FireAsync(webhook, EventName, ConvertEntityToRequestPayload(entity), cancellationToken);
+                await WebhookFiringService.FireAsync(webhook, Alias, ConvertEntityToRequestPayload(entity), cancellationToken);
             }
         }
     }

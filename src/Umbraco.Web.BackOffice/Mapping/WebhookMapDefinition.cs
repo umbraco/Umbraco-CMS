@@ -37,7 +37,7 @@ public class WebhookMapDefinition : IMapDefinition
     private void Map(WebhookLog source, WebhookLogViewModel target, MapperContext context)
     {
         target.Date = source.Date;
-        target.EventName = source.EventName;
+        target.EventAlias = source.EventAlias;
         target.Key = source.Key;
         target.RequestBody = source.RequestBody ?? string.Empty;
         target.ResponseBody = source.ResponseBody;

@@ -14,7 +14,7 @@ public class WebhookLog
 
     public DateTime Date { get; set; }
 
-    public string EventName { get; set; } = string.Empty;
+    public string EventAlias { get; set; } = string.Empty;
 
     public int RetryCount { get; set; }
 
