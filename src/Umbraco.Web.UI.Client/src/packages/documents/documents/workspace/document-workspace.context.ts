@@ -213,7 +213,7 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	public destroy(): void {
-		this.#currentData.complete();
+		this.#currentData.destroy();
 		this.structure.destroy();
 		super.destroy();
 	}

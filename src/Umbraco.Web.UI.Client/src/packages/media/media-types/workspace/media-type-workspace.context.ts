@@ -74,7 +74,7 @@ export class UmbMediaTypeWorkspaceContext
 	}
 
 	public destroy(): void {
-		this.#data.complete();
+		this.#data.destroy();
 	}
 }
 

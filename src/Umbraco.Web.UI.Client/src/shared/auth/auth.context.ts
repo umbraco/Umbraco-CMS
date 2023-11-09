@@ -2,27 +2,27 @@ import { IUmbAuth } from './auth.interface.js';
 import { UmbAuthFlow } from './auth-flow.js';
 import { UmbLoggedInUser } from './types.js';
 import { UserResource } from '@umbraco-cms/backoffice/backend-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbBaseController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 
-export class UmbAuthContext implements IUmbAuth {
+export class UmbAuthContext extends UmbBaseController implements IUmbAuth {
 
 	#currentUser = new UmbObjectState<UmbLoggedInUser | undefined>(undefined);
 	readonly currentUser = this.#currentUser.asObservable();
-	
-	readonly isLoggedIn = new UmbBooleanState<boolean>(false);
+
+	#isLoggedIn = new UmbBooleanState<boolean>(false);
+	readonly isLoggedIn = this.#isLoggedIn.asObservable();
 	readonly languageIsoCode = this.#currentUser.asObservablePart((user) => user?.languageIsoCode ?? 'en-us');
 
-	#host;
 	#authFlow;
 
 	constructor(host: UmbControllerHostElement, serverUrl: string, redirectUrl: string) {
-		this.#host = host;
+		super(host)
 		this.#authFlow = new UmbAuthFlow(serverUrl, redirectUrl);
 
-		this.isLoggedIn.subscribe((isLoggedIn) => {
+		this.observe(this.isLoggedIn, (isLoggedIn) => {
 			if (isLoggedIn) {
 				this.fetchCurrentUser();
 			}
@@ -36,6 +36,11 @@ export class UmbAuthContext implements IUmbAuth {
 		return this.#authFlow.makeAuthorizationRequest();
 	}
 
+	/* TEMPORARY METHOD UNTIL RESPONSIBILITY IS MOVED TO CONTEXT */
+	setLoggedIn(newValue: boolean): void {
+		return this.#isLoggedIn.next(newValue);
+	}
+
 	isAuthorized() {
 		return this.#authFlow.isAuthorized();
 	}
@@ -45,7 +50,7 @@ export class UmbAuthContext implements IUmbAuth {
 	}
 
 	async fetchCurrentUser(): Promise<UmbLoggedInUser | undefined> {
-		const { data } = await tryExecuteAndNotify(this.#host, UserResource.getUserCurrent());
+		const { data } = await tryExecuteAndNotify(this._host, UserResource.getUserCurrent());
 
 		this.#currentUser.next(data);
 
