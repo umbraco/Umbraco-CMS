@@ -1,6 +1,3 @@
-import type { UmbCurrentUser } from './types.js';
-import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
-
 export interface IUmbAuth {
 	/**
 	 * Initiates the login flow.
