@@ -34,27 +34,7 @@ export interface IUmbAuth {
 	getLatestToken(): Promise<string>;
 
 	/**
-	 * Get the current user model of the current user.
-	 */
-	get currentUser(): Observable<UmbLoggedInUser | undefined>;
-
-	/**
-	 * Get the current user's language ISO code.
-	 */
-	languageIsoCode: Observable<string>;
-
-	/**
-	 * Make a server request for the current user and save the state
-	 */
-	fetchCurrentUser(): Promise<UmbLoggedInUser | undefined>;
-
-	/**
 	 * Signs the user out by removing any tokens from the browser.
 	 */
 	signOut(): Promise<void>;
-
-	/**
-	 * Check if the given user is the current user.
-	 */
-	isUserCurrentUser(userId: string): Promise<boolean>;
 }
