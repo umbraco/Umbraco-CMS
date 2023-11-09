@@ -2,5 +2,5 @@
 
 public interface IWebhookEvent
 {
-    string EventName { get; set; }
+    string EventName { get; }
 }
