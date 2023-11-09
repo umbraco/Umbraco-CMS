@@ -4,7 +4,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UUISelectElement } from '@umbraco-cms/backoffice/external/uui';
 import { UserResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UMB_AUTH_CONTEXT, UmbLoggedInUser } from '@umbraco-cms/backoffice/auth';
+import { UMB_AUTH_CONTEXT, UmbCurrentUser } from '@umbraco-cms/backoffice/auth';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -14,7 +14,7 @@ export class UmbUserWorkspaceProfileSettingsElement extends UmbLitElement {
 	private _user?: UserResponseModel;
 
 	@state()
-	private _currentUser?: UmbLoggedInUser;
+	private _currentUser?: UmbCurrentUser;
 
 	@state()
 	private languages: Array<{ name: string; value: string; selected: boolean }> = [];
@@ -46,41 +46,45 @@ export class UmbUserWorkspaceProfileSettingsElement extends UmbLitElement {
 
 	#observeCurrentUser() {
 		if (!this.#authContext) return;
-		this.observe(this.#authContext.currentUser, async (currentUser) => {
-			this._currentUser = currentUser;
+		this.observe(
+			this.#authContext.currentUser,
+			async (currentUser) => {
+				this._currentUser = currentUser;
 
-			if (!currentUser) {
-				return;
-			}
+				if (!currentUser) {
+					return;
+				}
 
-			// Find all translations and make a unique list of iso codes
-			const translations = await firstValueFrom(umbExtensionsRegistry.extensionsOfType('localization'));
+				// Find all translations and make a unique list of iso codes
+				const translations = await firstValueFrom(umbExtensionsRegistry.extensionsOfType('localization'));
 
-			this.languages = translations
-				.filter((isoCode) => isoCode !== undefined)
-				.map((translation) => ({
-					value: translation.meta.culture.toLowerCase(),
-					name: translation.name,
-					selected: false,
-				}));
+				this.languages = translations
+					.filter((isoCode) => isoCode !== undefined)
+					.map((translation) => ({
+						value: translation.meta.culture.toLowerCase(),
+						name: translation.name,
+						selected: false,
+					}));
 
-			const currentUserLanguageCode = currentUser.languageIsoCode?.toLowerCase();
+				const currentUserLanguageCode = currentUser.languageIsoCode?.toLowerCase();
 
-			// Set the current user's language as selected
-			const currentUserLanguage = this.languages.find((language) => language.value === currentUserLanguageCode);
+				// Set the current user's language as selected
+				const currentUserLanguage = this.languages.find((language) => language.value === currentUserLanguageCode);
 
-			if (currentUserLanguage) {
-				currentUserLanguage.selected = true;
-			} else {
-				// If users language code did not fit any of the options. We will create an option that fits, named unknown.
-				// In this way the user can keep their choice though a given language was not present at this time.
-				this.languages.push({
-					value: currentUserLanguageCode ?? 'en-us',
-					name: currentUserLanguageCode ? `${currentUserLanguageCode} (unknown)` : 'Unknown',
-					selected: true,
-				});
-			}
-		}, 'umbUserObserver');
+				if (currentUserLanguage) {
+					currentUserLanguage.selected = true;
+				} else {
+					// If users language code did not fit any of the options. We will create an option that fits, named unknown.
+					// In this way the user can keep their choice though a given language was not present at this time.
+					this.languages.push({
+						value: currentUserLanguageCode ?? 'en-us',
+						name: currentUserLanguageCode ? `${currentUserLanguageCode} (unknown)` : 'Unknown',
+						selected: true,
+					});
+				}
+			},
+			'umbUserObserver',
+		);
 	}
 
 	render() {
