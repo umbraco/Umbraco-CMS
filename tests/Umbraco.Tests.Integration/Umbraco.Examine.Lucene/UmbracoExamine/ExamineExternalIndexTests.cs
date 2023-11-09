@@ -27,7 +27,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine;
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
 public class ExamineExternalIndexTests : ExamineBaseTest
 {
-    // Path to Examine files (Find a better way)
     private string _examinePath = "../../../umbraco/Data/TEMP/ExamineIndexes/";
 
     [SetUp]
@@ -44,7 +43,7 @@ public class ExamineExternalIndexTests : ExamineBaseTest
     public void TearDown()
     {
         Services.DisposeIfDisposable();
-        // Thread.Sleep(1500);
+        Thread.Sleep(1000);
         TestHelper.DeleteDirectory(_examinePath + "InternalIndex");
         TestHelper.DeleteDirectory(_examinePath + "ExternalIndex");
     }

@@ -29,8 +29,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine;
 public class BackOfficeExamineSearcherTests : ExamineBaseTest
 {
     // TODO: Find a way to remove all the timeouts
-
-    // Path to Examine files (Find a better way)
     private string _examinePath = "../../../umbraco/Data/TEMP/ExamineIndexes/";
 
     [SetUp]
@@ -48,7 +46,7 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
     {
         // Sometimes we do not dispose all services in time and the test fails because the log file is locked. Resulting in all other tests failing aswell
         Services.DisposeIfDisposable();
-        // Thread.Sleep(1500);
+        Thread.Sleep(1000);
         TestHelper.DeleteDirectory(_examinePath + "InternalIndex");
         TestHelper.DeleteDirectory(_examinePath + "ExternalIndex");
     }
