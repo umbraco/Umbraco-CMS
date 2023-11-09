@@ -3,6 +3,17 @@ import type { UmbExtensionRegistry } from '../registry/extension.registry.js';
 import { UmbBaseExtensionController } from './base-extension-controller.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
+/**
+ * This Controller manages a single Extension and its Manifest.
+ * When the extension is permitted to be used, the manifest is available for the consumer.
+ *
+ * @example
+* ```ts
+* const controller = new UmbExtensionManifestController(host, extensionRegistry, alias, (permitted, ctrl) => { console.log("Extension is permitted and this is the manifest: ", ctrl.manifest) }));
+* ```
+ * @export
+ * @class UmbCodeEditor
+ */
 export class UmbExtensionManifestController<
 	ManifestType extends ManifestWithDynamicConditions = ManifestWithDynamicConditions,
 	ControllerType extends UmbBaseExtensionController<ManifestType, any> = any
