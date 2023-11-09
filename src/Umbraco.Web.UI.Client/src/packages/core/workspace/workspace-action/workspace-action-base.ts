@@ -1,9 +1,9 @@
 import { UmbWorkspaceContextInterface, UMB_WORKSPACE_CONTEXT } from '../workspace-context/index.js';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
-import type { ExtensionApi } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
-export interface UmbWorkspaceAction<WorkspaceType = unknown> extends ExtensionApi {
+export interface UmbWorkspaceAction<WorkspaceType = unknown> extends UmbApi {
 	host: UmbControllerHostElement;
 	workspaceContext?: WorkspaceType;
 	execute(): Promise<void>;

@@ -11,13 +11,13 @@ import {
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbDetailRepository, UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
-import { ExtensionApi } from '@umbraco-cms/backoffice/extension-api';
+import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
 export class UmbRelationTypeRepository extends UmbBaseController
 	implements
 		UmbTreeRepository<any>,
 		UmbDetailRepository<CreateRelationTypeRequestModel, any, UpdateRelationTypeRequestModel, RelationTypeResponseModel>,
-		ExtensionApi
+		UmbApi
 {
 	#init!: Promise<unknown>;
 

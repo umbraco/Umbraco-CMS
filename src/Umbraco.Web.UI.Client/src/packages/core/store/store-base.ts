@@ -1,11 +1,11 @@
 import { UmbStore } from './store.interface.js';
 import { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
 import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { type ExtensionApi } from '@umbraco-cms/backoffice/extension-api';
+import { type UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 
 // TODO: Make a Store interface?
-export class UmbStoreBase<StoreItemType = any> implements UmbStore<StoreItemType>, ExtensionApi {
+export class UmbStoreBase<StoreItemType = any> implements UmbStore<StoreItemType>, UmbApi {
 
 	#provider;
 

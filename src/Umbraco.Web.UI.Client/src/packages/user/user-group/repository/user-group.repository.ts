@@ -19,14 +19,14 @@ import {
 } from '@umbraco-cms/backoffice/repository';
 import { UMB_NOTIFICATION_CONTEXT_TOKEN, UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
 import { UmbBaseController, type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { ExtensionApi } from '@umbraco-cms/backoffice/extension-api';
+import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
 // TODO: implement
 export class UmbUserGroupRepository extends UmbBaseController
 	implements
 		UmbDetailRepository<CreateUserGroupRequestModel, any, UpdateUserGroupRequestModel, UserGroupResponseModel>,
 		UmbItemRepository<UserGroupItemResponseModel>,
-		ExtensionApi
+		UmbApi
 {
 	#init;
 

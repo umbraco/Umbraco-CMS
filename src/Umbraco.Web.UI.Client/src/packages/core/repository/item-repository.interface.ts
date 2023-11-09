@@ -1,8 +1,8 @@
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { ItemResponseModelBaseModel, ProblemDetails } from '@umbraco-cms/backoffice/backend-api';
-import { ExtensionApi } from '@umbraco-cms/backoffice/extension-api';
+import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
-export interface UmbItemRepository<ItemType extends ItemResponseModelBaseModel> extends ExtensionApi {
+export interface UmbItemRepository<ItemType extends ItemResponseModelBaseModel> extends UmbApi {
 	requestItems: (uniques: string[]) => Promise<{
 		data?: Array<ItemType> | undefined;
 		error?: ProblemDetails | undefined;

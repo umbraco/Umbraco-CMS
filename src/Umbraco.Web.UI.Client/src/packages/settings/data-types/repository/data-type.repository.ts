@@ -33,7 +33,7 @@ import {
 	UpdateDataTypeRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
-import { ExtensionApi } from '@umbraco-cms/backoffice/extension-api';
+import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 export class UmbDataTypeRepository extends UmbBaseController
 	implements
 		UmbItemRepository<DataTypeItemResponseModel>,
@@ -42,7 +42,7 @@ export class UmbDataTypeRepository extends UmbBaseController
 		UmbFolderRepository,
 		UmbMoveRepository,
 		UmbCopyRepository,
-		ExtensionApi
+		UmbApi
 {
 	#init: Promise<unknown>;
 

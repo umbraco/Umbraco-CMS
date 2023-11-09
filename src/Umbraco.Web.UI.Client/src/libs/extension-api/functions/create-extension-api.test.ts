@@ -1,18 +1,18 @@
 import { expect } from '@open-wc/testing';
-import { ManifestApi, ExtensionApi } from '../types.js';
+import { ManifestApi, UmbApi } from '../types.js';
 import { createExtensionApi } from './create-extension-api.function.js';
 
 
 
 
-class UmbExtensionApiTrueTestClass implements ExtensionApi {
+class UmbExtensionApiTrueTestClass implements UmbApi {
 	isValidClassInstance() {
 		return true;
 	}
 	destroy() {}
 }
 
-class UmbExtensionApiFalseTestClass implements ExtensionApi {
+class UmbExtensionApiFalseTestClass implements UmbApi {
 	isValidClassInstance() {
 		return false;
 	}

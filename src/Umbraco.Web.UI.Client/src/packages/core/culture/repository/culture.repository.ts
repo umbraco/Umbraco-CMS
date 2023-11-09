@@ -1,8 +1,8 @@
 import { UmbCultureServerDataSource } from './sources/culture.server.data.js';
 import { UmbBaseController, type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { type ExtensionApi } from '@umbraco-cms/backoffice/extension-api';
+import { type UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
-export class UmbCultureRepository extends UmbBaseController implements ExtensionApi {
+export class UmbCultureRepository extends UmbBaseController implements UmbApi {
 	
 	#dataSource: UmbCultureServerDataSource;
 

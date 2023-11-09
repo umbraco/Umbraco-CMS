@@ -34,14 +34,14 @@ import {
 	UpdateTextFileViewModelBaseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbTreeRootFileSystemModel } from '@umbraco-cms/backoffice/tree';
-import { ExtensionApi } from '@umbraco-cms/backoffice/extension-api';
+import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
 export class UmbStylesheetRepository extends UmbBaseController
 	implements
 		UmbTreeRepository<FileSystemTreeItemPresentationModel, UmbTreeRootFileSystemModel>,
 		UmbDetailRepository<CreateStylesheetRequestModel, string, UpdateStylesheetRequestModel, StylesheetDetails>,
 		UmbFolderRepository,
-		ExtensionApi
+		UmbApi
 {
 	#dataSource;
 	#treeDataSource;

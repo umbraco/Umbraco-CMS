@@ -12,7 +12,7 @@ import {
 	UpdateDictionaryItemRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
-import type { ExtensionApi } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
 export class UmbDictionaryRepository extends UmbBaseController
 	implements
@@ -23,7 +23,7 @@ export class UmbDictionaryRepository extends UmbBaseController
 			UpdateDictionaryItemRequestModel,
 			DictionaryOverviewResponseModel
 		>,
-		ExtensionApi
+		UmbApi
 {
 	#init!: Promise<unknown>;
 

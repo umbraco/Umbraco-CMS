@@ -1,9 +1,9 @@
 import { UmbTagServerDataSource } from './sources/tag.server.data.js';
 import { UmbTagStore, UMB_TAG_STORE_CONTEXT_TOKEN } from './tag.store.js';
 import { UmbBaseController, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { ExtensionApi } from '@umbraco-cms/backoffice/extension-api';
+import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
-export class UmbTagRepository extends UmbBaseController implements ExtensionApi {
+export class UmbTagRepository extends UmbBaseController implements UmbApi {
 	#init!: Promise<unknown>;
 
 	#dataSource: UmbTagServerDataSource;

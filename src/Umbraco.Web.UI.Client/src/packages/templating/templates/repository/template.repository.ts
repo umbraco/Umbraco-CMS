@@ -24,14 +24,14 @@ import type {
 	TemplateResponseModel,
 	UpdateTemplateRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
-import { ExtensionApi } from '@umbraco-cms/backoffice/extension-api';
+import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
 export class UmbTemplateRepository extends UmbBaseController
 	implements
 		UmbTreeRepository<EntityTreeItemResponseModel>,
 		UmbDetailRepository<CreateTemplateRequestModel, string, UpdateTemplateRequestModel, TemplateResponseModel>,
 		UmbItemRepository<TemplateItemResponseModel>,
-		ExtensionApi
+		UmbApi
 {
 	#init;
 

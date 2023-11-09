@@ -1,7 +1,7 @@
 import { UmbPackageStore, UMB_PACKAGE_STORE_TOKEN } from './package.store.js';
 import { UmbPackageServerDataSource } from './sources/package.server.data.js';
 import { UmbBaseController, type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { ExtensionApi, isManifestJSType, ManifestBase } from '@umbraco-cms/backoffice/extension-api';
+import { UmbApi, isManifestJSType, ManifestBase } from '@umbraco-cms/backoffice/extension-api';
 import { OpenAPI } from '@umbraco-cms/backoffice/backend-api';
 
 // TODO: Figure out if we should base stores like this on something more generic for "collections" rather than trees.
@@ -10,7 +10,7 @@ import { OpenAPI } from '@umbraco-cms/backoffice/backend-api';
  * A repository for Packages which mimicks a tree store.
  * @export
  */
-export class UmbPackageRepository extends UmbBaseController implements ExtensionApi {
+export class UmbPackageRepository extends UmbBaseController implements UmbApi {
 	#init!: Promise<void>;
 	#packageStore?: UmbPackageStore;
 	#packageSource: UmbPackageServerDataSource;

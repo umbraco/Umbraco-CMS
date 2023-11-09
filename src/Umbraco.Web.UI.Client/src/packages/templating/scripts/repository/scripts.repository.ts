@@ -24,14 +24,14 @@ import {
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbBaseController, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
-import { ExtensionApi } from '@umbraco-cms/backoffice/extension-api';
+import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
 export class UmbScriptsRepository extends UmbBaseController
 	implements
 		UmbTreeRepository<FileSystemTreeItemPresentationModel>,
 		UmbDetailRepository<CreateScriptRequestModel, string, UpdateScriptRequestModel, ScriptResponseModel, string>,
 		UmbFolderRepository,
-		ExtensionApi
+		UmbApi
 {
 	#init;
 

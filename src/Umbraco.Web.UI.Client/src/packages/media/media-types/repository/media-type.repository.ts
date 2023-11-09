@@ -21,14 +21,14 @@ import {
 	MediaTypeResponseModel,
 	UpdateMediaTypeRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
-import { ExtensionApi } from '@umbraco-cms/backoffice/extension-api';
+import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
 export class UmbMediaTypeRepository extends UmbBaseController
 	implements
 		UmbItemRepository<MediaTypeItemResponseModel>,
 		UmbTreeRepository<FolderTreeItemResponseModel>,
 		UmbDetailRepository<CreateMediaTypeRequestModel, any, UpdateMediaTypeRequestModel, MediaTypeResponseModel>,
-		ExtensionApi
+		UmbApi
 {
 	#init!: Promise<unknown>;
 

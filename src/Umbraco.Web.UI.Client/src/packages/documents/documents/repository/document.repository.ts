@@ -13,13 +13,13 @@ import {
 	DocumentTreeItemResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
-import { ExtensionApi } from '@umbraco-cms/backoffice/extension-api';
+import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
 export class UmbDocumentRepository extends UmbBaseController
 	implements
 		UmbTreeRepository<DocumentTreeItemResponseModel>,
 		UmbDetailRepository<CreateDocumentRequestModel, any, UpdateDocumentRequestModel, DocumentResponseModel>,
-		ExtensionApi
+		UmbApi
 {
 	#init!: Promise<unknown>;
 

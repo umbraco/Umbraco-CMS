@@ -28,7 +28,7 @@ import {
 	UmbFolderRepository,
 	UmbTreeRepository,
 } from '@umbraco-cms/backoffice/repository';
-import { ExtensionApi } from '@umbraco-cms/backoffice/extension-api';
+import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
 export class UmbPartialViewsRepository extends UmbBaseController
 	implements
@@ -41,7 +41,7 @@ export class UmbPartialViewsRepository extends UmbBaseController
 			string
 		>,
 		UmbFolderRepository,
-		ExtensionApi
+		UmbApi
 {
 	#init;
 

@@ -7,11 +7,11 @@ import { UmbBaseController, type UmbControllerHost } from '@umbraco-cms/backoffi
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 import type { UmbTreeDataSource, UmbDetailRepository, UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
 import { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { ExtensionApi } from '@umbraco-cms/backoffice/extension-api';
+import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
 // TODO => Update type when backend updated
 export class UmbMemberGroupRepository extends UmbBaseController
-	implements UmbTreeRepository<EntityTreeItemResponseModel>, UmbDetailRepository<any, any, any, any>, ExtensionApi
+	implements UmbTreeRepository<EntityTreeItemResponseModel>, UmbDetailRepository<any, any, any, any>, UmbApi
 {
 	#init!: Promise<unknown>;
 

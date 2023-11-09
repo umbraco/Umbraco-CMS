@@ -15,7 +15,7 @@ import {
 	UpdateDocumentTypeRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
-import { ExtensionApi } from '@umbraco-cms/backoffice/extension-api';
+import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
 type ItemType = DocumentTypeResponseModel;
 
@@ -23,7 +23,7 @@ export class UmbDocumentTypeRepository extends UmbBaseController
 	implements
 		UmbTreeRepository<EntityTreeItemResponseModel>,
 		UmbDetailRepository<CreateDocumentTypeRequestModel, any, UpdateDocumentTypeRequestModel, DocumentTypeResponseModel>,
-		ExtensionApi
+		UmbApi
 {
 	#init!: Promise<unknown>;
 

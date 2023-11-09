@@ -3,9 +3,9 @@ import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbBaseController, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { ExtensionApi } from '@umbraco-cms/backoffice/extension-api';
+import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
-export class UmbAppLanguageContext extends UmbBaseController implements ExtensionApi {
+export class UmbAppLanguageContext extends UmbBaseController implements UmbApi {
 	#languageRepository: UmbLanguageRepository;
 
 	#languages: Array<LanguageResponseModel> = [];

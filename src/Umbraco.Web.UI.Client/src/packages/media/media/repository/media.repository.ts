@@ -14,13 +14,13 @@ import {
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
-import { ExtensionApi } from '@umbraco-cms/backoffice/extension-api';
+import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
 export class UmbMediaRepository extends UmbBaseController
 	implements
 		UmbTreeRepository<EntityTreeItemResponseModel>,
 		UmbDetailRepository<CreateMediaRequestModel, any, UpdateMediaRequestModel, MediaDetails>,
-		ExtensionApi
+		UmbApi
 {
 	#init;
 
