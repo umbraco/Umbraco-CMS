@@ -109,7 +109,7 @@ export class UmbAppElement extends UmbLitElement {
 		OpenAPI.BASE = this.serverUrl;
 		const redirectUrl = `${window.location.origin}${this.backofficePath}`;
 
-		this.#authContext = new UmbAuthContext(this, this.serverUrl, redirectUrl);
+		this.#authContext = new UmbAuthContext(this, this.serverUrl, redirectUrl, this.bypassAuth);
 
 		this.provideContext(UMB_AUTH_CONTEXT, this.#authContext);
 
@@ -197,13 +197,9 @@ export class UmbAppElement extends UmbLitElement {
 			OpenAPI.WITH_CREDENTIALS = true;
 		}
 
+		// TODO: This feels like an od placement, move this into some method regarding starting the application/not install/...
 		this.#listenForLanguageChange();
 
-		if (this.#authContext?.isAuthorized()) {
-			this.#authContext.isLoggedIn.next(true);
-		} else {
-			this.#authContext?.isLoggedIn.next(false);
-		}
 	}
 
 	#redirect() {
@@ -244,8 +240,7 @@ export class UmbAppElement extends UmbLitElement {
 	}
 
 	#isAuthorized(): boolean {
-		if (!this.#authContext) return false;
-		return this.bypassAuth ? true : this.#authContext.isAuthorized();
+		return this.#authContext?.isAuthorized() ?? false;
 	}
 
 	#isAuthorizedGuard(): Guard {

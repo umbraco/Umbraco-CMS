@@ -12,14 +12,26 @@ export class UmbAuthContext extends UmbBaseController implements IUmbAuth {
 	#currentUser = new UmbObjectState<UmbLoggedInUser | undefined>(undefined);
 	readonly currentUser = this.#currentUser.asObservable();
 
-	readonly isLoggedIn = new UmbBooleanState<boolean>(false);
+	#isLoggedIn = new UmbBooleanState<boolean>(false);
+	readonly isLoggedIn = this.#isLoggedIn.asObservable();
 	readonly languageIsoCode = this.#currentUser.asObservablePart((user) => user?.languageIsoCode ?? 'en-us');
 
 	#authFlow;
 
-	constructor(host: UmbControllerHostElement, serverUrl: string, redirectUrl: string) {
+	constructor(host: UmbControllerHostElement, serverUrl: string, redirectUrl: string, bypassAuth: boolean) {
 		super(host)
-		this.#authFlow = new UmbAuthFlow(serverUrl, redirectUrl);
+		if(bypassAuth) {
+			this.#isLoggedIn.next(true);
+		} else {
+			this.#authFlow = new UmbAuthFlow(serverUrl, redirectUrl);
+			this.observe(this.#authFlow.authorized, (isAuthorized) => {
+				if (isAuthorized) {
+					this.#isLoggedIn.next(true);
+				} else {
+					this.#isLoggedIn.next(false);
+				}
+			});
+		}
 
 		this.observe(this.isLoggedIn, (isLoggedIn) => {
 			if (isLoggedIn) {
@@ -32,15 +44,15 @@ export class UmbAuthContext extends UmbBaseController implements IUmbAuth {
 	 * Initiates the login flow.
 	 */
 	login(): void {
-		return this.#authFlow.makeAuthorizationRequest();
+		return this.#authFlow?.makeAuthorizationRequest();
 	}
 
 	isAuthorized() {
-		return this.#authFlow.isAuthorized();
+		return this.#authFlow?.isAuthorized() ?? true;
 	}
 
 	setInitialState(): Promise<void> {
-		return this.#authFlow.setInitialState();
+		return this.#authFlow?.setInitialState() ?? Promise.resolve();
 	}
 
 	async fetchCurrentUser(): Promise<UmbLoggedInUser | undefined> {
@@ -60,14 +72,14 @@ export class UmbAuthContext extends UmbBaseController implements IUmbAuth {
 	 * @returns The latest token from the Management API
 	 */
 	getLatestToken(): Promise<string> {
-		return this.#authFlow.performWithFreshTokens();
+		return this.#authFlow?.performWithFreshTokens() ?? Promise.resolve('bypass');
 	}
 
 	/**
 	 * Signs the user out by removing any tokens from the browser.
 	 */
 	signOut(): Promise<void> {
-		return this.#authFlow.signOut();
+		return this.#authFlow?.signOut() ?? Promise.resolve();
 	}
 
 	/**
