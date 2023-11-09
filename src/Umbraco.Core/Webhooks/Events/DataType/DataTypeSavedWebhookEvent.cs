@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events.DataType;
 
+[WebhookEvent("DataType Saved")]
 public class DataTypeSavedWebhookEvent : WebhookEventBase<DataTypeSavedNotification>
 {
     public DataTypeSavedWebhookEvent(
@@ -13,7 +14,9 @@ public class DataTypeSavedWebhookEvent : WebhookEventBase<DataTypeSavedNotificat
         IWebHookService webHookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
         IServerRoleAccessor serverRoleAccessor)
-        : base(webhookFiringService, webHookService, webhookSettings, serverRoleAccessor, "DataType Saved")
+        : base(webhookFiringService, webHookService, webhookSettings, serverRoleAccessor)
     {
     }
+
+    public override string Alias => "dataTypeSaved";
 }

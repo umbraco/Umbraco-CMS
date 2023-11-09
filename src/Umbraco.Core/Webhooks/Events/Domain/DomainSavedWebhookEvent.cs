@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events.Domain;
 
+[WebhookEvent("Domain Saved")]
 public class DomainSavedWebhookEvent : WebhookEventBase<DomainSavedNotification>
 {
     public DomainSavedWebhookEvent(
@@ -13,7 +14,9 @@ public class DomainSavedWebhookEvent : WebhookEventBase<DomainSavedNotification>
         IWebHookService webHookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
         IServerRoleAccessor serverRoleAccessor)
-        : base(webhookFiringService, webHookService, webhookSettings, serverRoleAccessor, "Domain Saved")
+        : base(webhookFiringService, webHookService, webhookSettings, serverRoleAccessor)
     {
     }
+
+    public override string Alias => "domainSaved";
 }

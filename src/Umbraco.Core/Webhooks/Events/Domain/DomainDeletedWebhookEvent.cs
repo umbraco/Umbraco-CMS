@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events.Domain;
 
+[WebhookEvent("Domain Deleted")]
 public class DomainDeletedWebhookEvent : WebhookEventBase<DomainDeletedNotification>
 {
     public DomainDeletedWebhookEvent(
@@ -13,7 +14,9 @@ public class DomainDeletedWebhookEvent : WebhookEventBase<DomainDeletedNotificat
         IWebHookService webHookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
         IServerRoleAccessor serverRoleAccessor)
-        : base(webhookFiringService, webHookService, webhookSettings, serverRoleAccessor, "Domain Deleted")
+        : base(webhookFiringService, webHookService, webhookSettings, serverRoleAccessor)
     {
     }
+
+    public override string Alias => "domainDeleted";
 }

@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events.Dictionary;
 
+[WebhookEvent("Dictionary Item Deleted")]
 public class DictionaryItemDeletedWebhookEvent : WebhookEventBase<DictionaryItemDeletedNotification>
 {
     public DictionaryItemDeletedWebhookEvent(
@@ -13,7 +14,9 @@ public class DictionaryItemDeletedWebhookEvent : WebhookEventBase<DictionaryItem
         IWebHookService webHookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
         IServerRoleAccessor serverRoleAccessor)
-        : base(webhookFiringService, webHookService, webhookSettings, serverRoleAccessor, "Dictionary Item Deleted")
+        : base(webhookFiringService, webHookService, webhookSettings, serverRoleAccessor)
     {
     }
+
+    public override string Alias => "dictionaryItemDeleted";
 }

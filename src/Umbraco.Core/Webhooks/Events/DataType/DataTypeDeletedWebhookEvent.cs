@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events.DataType;
 
+[WebhookEvent("DataType Deleted")]
 public class DataTypeDeletedWebhookEvent : WebhookEventBase<DataTypeSavedNotification>
 {
     public DataTypeDeletedWebhookEvent(
@@ -13,7 +14,9 @@ public class DataTypeDeletedWebhookEvent : WebhookEventBase<DataTypeSavedNotific
         IWebHookService webHookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
         IServerRoleAccessor serverRoleAccessor)
-        : base(webhookFiringService, webHookService, webhookSettings, serverRoleAccessor, "DataType Deleted")
+        : base(webhookFiringService, webHookService, webhookSettings, serverRoleAccessor)
     {
     }
+
+    public override string Alias => "dataTypeDeleted";
 }
