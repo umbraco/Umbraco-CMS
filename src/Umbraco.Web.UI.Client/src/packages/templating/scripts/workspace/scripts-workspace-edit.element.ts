@@ -61,7 +61,7 @@ export class UmbScriptsWorkspaceEditElement extends UmbLitElement {
 
 			this.observe(this.#scriptsWorkspaceContext.path, (path) => {
 				this._path = path;
-				this._dirName = this._path?.substring(0, this._path?.lastIndexOf('\\') + 1)?.replace('\\', '/');
+				this._dirName = this._path?.substring(0, this._path?.lastIndexOf('\\'))?.replace(/\\/g, '/');
 			});
 
 			this.observe(this.#scriptsWorkspaceContext.isNew, (isNew) => {

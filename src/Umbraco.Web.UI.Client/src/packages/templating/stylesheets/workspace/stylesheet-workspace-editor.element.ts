@@ -48,7 +48,7 @@ export class UmbStylesheetWorkspaceEditorElement extends UmbLitElement {
 			this.#workspaceContext.path,
 			(path) => {
 				this._path = path;
-				this._dirName = this._path?.substring(0, this._path?.lastIndexOf('\\') + 1)?.replace('\\', '/');
+				this._dirName = this._path?.substring(0, this._path?.lastIndexOf('\\') + 1)?.replace(/\\/g, '/');
 			},
 			'_observeStylesheetPath',
 		);
