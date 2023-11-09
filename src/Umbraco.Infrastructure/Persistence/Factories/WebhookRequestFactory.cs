@@ -8,7 +8,7 @@ internal static class WebhookRequestFactory
     public static WebhookRequestDto CreateDto(WebhookRequest webhookRequest) =>
         new()
         {
-            EventName = webhookRequest.EventName,
+            Alias = webhookRequest.EventAlias,
             Id = webhookRequest.Id,
             WebhookKey = webhookRequest.WebhookKey,
             RequestObject = webhookRequest.RequestObject,
@@ -18,7 +18,7 @@ internal static class WebhookRequestFactory
     public static WebhookRequest CreateModel(WebhookRequestDto webhookRequestDto) =>
         new()
         {
-            EventName = webhookRequestDto.EventName,
+            EventAlias = webhookRequestDto.Alias,
             Id = webhookRequestDto.Id,
             WebhookKey = webhookRequestDto.WebhookKey,
             RequestObject = webhookRequestDto.RequestObject,

@@ -4,7 +4,7 @@ namespace Umbraco.Cms.Core.Services;
 
 public interface IWebhookRequestService
 {
-    Task<WebhookRequest> CreateAsync(Guid webhookKey, string eventName, object? payload);
+    Task<WebhookRequest> CreateAsync(Guid webhookKey, string eventAlias, object? payload);
 
     Task<IEnumerable<WebhookRequest>> GetAllAsync();
 

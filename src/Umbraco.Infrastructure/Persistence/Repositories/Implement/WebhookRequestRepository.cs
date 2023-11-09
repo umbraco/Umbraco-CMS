@@ -42,4 +42,11 @@ public class WebhookRequestRepository : IWebhookRequestRepository
 
         return webhookDtos.Select(WebhookRequestFactory.CreateModel);
     }
+
+    public async Task<WebhookRequest> UpdateAsync(WebhookRequest webhookRequest)
+    {
+        WebhookRequestDto dto = WebhookRequestFactory.CreateDto(webhookRequest);
+        await _scopeAccessor.AmbientScope?.Database.UpdateAsync(dto)!;
+        return webhookRequest;
+    }
 }

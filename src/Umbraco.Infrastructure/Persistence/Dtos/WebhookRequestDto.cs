@@ -17,7 +17,7 @@ public class WebhookRequestDto
     public Guid WebhookKey { get; set; }
 
     [Column("eventName")]
-    public string EventName { get; set; } = string.Empty;
+    public string Alias { get; set; } = string.Empty;
 
     [Column(Name = "requestObject")]
     [NullSetting(NullSetting = NullSettings.Null)]

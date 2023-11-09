@@ -78,8 +78,8 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IDistributedLockingMechanismFactory, DefaultDistributedLockingMechanismFactory>();
         builder.Services.AddSingleton<IUmbracoDatabaseFactory, UmbracoDatabaseFactory>();
         builder.Services.AddSingleton(factory => factory.GetRequiredService<IUmbracoDatabaseFactory>().SqlContext);
-        builder.NPocoMappers()?.Add<NullableDateMapper>();
-        builder.PackageMigrationPlans()?.Add(() => builder.TypeLoader.GetPackageMigrationPlans());
+        builder.NPocoMappers().Add<NullableDateMapper>();
+        builder.PackageMigrationPlans().Add(builder.TypeLoader.GetPackageMigrationPlans());
 
         builder.Services.AddSingleton<IRuntimeState, RuntimeState>();
         builder.Services.AddSingleton<IRuntime, CoreRuntime>();
@@ -107,7 +107,7 @@ public static partial class UmbracoBuilderExtensions
         // register persistence mappers - required by database factory so needs to be done here
         // means the only place the collection can be modified is in a runtime - afterwards it
         // has been frozen and it is too late
-        builder.Mappers()?.AddCoreMappers();
+        builder.Mappers().AddCoreMappers();
 
         // register the scope provider
         builder.Services.AddSingleton<ScopeProvider>(sp => ActivatorUtilities.CreateInstance<ScopeProvider>(sp, sp.GetRequiredService<IAmbientScopeStack>())); // implements IScopeProvider, IScopeAccessor

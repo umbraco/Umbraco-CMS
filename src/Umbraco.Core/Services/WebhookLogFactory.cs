@@ -5,12 +5,12 @@ namespace Umbraco.Cms.Core.Services;
 
 public class WebhookLogFactory : IWebhookLogFactory
 {
-    public async Task<WebhookLog> CreateAsync(string eventName, WebhookResponseModel responseModel, Webhook webhook, CancellationToken cancellationToken)
+    public async Task<WebhookLog> CreateAsync(string eventAlias, WebhookResponseModel responseModel, Webhook webhook, CancellationToken cancellationToken)
     {
         var log = new WebhookLog
         {
             Date = DateTime.UtcNow,
-            EventName = eventName,
+            EventAlias = eventAlias,
             Key = Guid.NewGuid(),
             Url = webhook.Url,
             WebhookKey = webhook.Key,

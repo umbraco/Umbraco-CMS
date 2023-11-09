@@ -6,7 +6,7 @@ public class WebhookRequest
 
     public Guid WebhookKey { get; set; }
 
-    public string EventName { get; set; } = string.Empty;
+    public string EventAlias { get; set; } = string.Empty;
 
     public string? RequestObject { get; set; }
 

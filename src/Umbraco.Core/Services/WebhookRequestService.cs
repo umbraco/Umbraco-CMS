@@ -18,13 +18,13 @@ public class WebhookRequestService : IWebhookRequestService
         _jsonSerializer = jsonSerializer;
     }
 
-    public async Task<WebhookRequest> CreateAsync(Guid webhookKey, string eventName, object? payload)
+    public async Task<WebhookRequest> CreateAsync(Guid webhookKey, string eventAlias, object? payload)
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         var webhookRequest = new WebhookRequest
         {
             WebhookKey = webhookKey,
-            EventName = eventName,
+            EventAlias = eventAlias,
             RequestObject = _jsonSerializer.Serialize(payload),
             RetryCount = 0,
         };

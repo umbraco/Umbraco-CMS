@@ -21,7 +21,7 @@ public class WebhookLogServiceTests : UmbracoIntegrationTest
         var createdWebhookLog = await WebhookLogService.CreateAsync(new WebhookLog
         {
             Date = DateTime.UtcNow,
-            EventName = Constants.WebhookEvents.ContentPublish,
+            EventAlias = Constants.WebhookEvents.Aliases.ContentPublish,
             RequestBody = "Test Request Body",
             ResponseBody = "Test response body",
             StatusCode = "200",
@@ -39,7 +39,7 @@ public class WebhookLogServiceTests : UmbracoIntegrationTest
             Assert.AreEqual(1, webhookLogsPaged.Items.Count());
             var webHookLog = webhookLogsPaged.Items.First();
             Assert.AreEqual(createdWebhookLog.Date.ToString(CultureInfo.InvariantCulture), webHookLog.Date.ToString(CultureInfo.InvariantCulture));
-            Assert.AreEqual(createdWebhookLog.EventName, webHookLog.EventName);
+            Assert.AreEqual(createdWebhookLog.EventAlias, webHookLog.EventAlias);
             Assert.AreEqual(createdWebhookLog.RequestBody, webHookLog.RequestBody);
             Assert.AreEqual(createdWebhookLog.ResponseBody, webHookLog.ResponseBody);
             Assert.AreEqual(createdWebhookLog.StatusCode, webHookLog.StatusCode);

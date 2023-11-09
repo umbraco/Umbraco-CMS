@@ -7,14 +7,10 @@ public class WebhookFiringService : IWebhookFiringService
 {
     private readonly IWebhookRequestService _webhookRequestService;
 
-    public WebhookFiringService(
-        IWebhookRequestService webhookRequestService)
-    {
-        _webhookRequestService = webhookRequestService;
-    }
+    public WebhookFiringService(IWebhookRequestService webhookRequestService) => _webhookRequestService = webhookRequestService;
 
-    public async Task FireAsync(Webhook webhook, string eventName, object? payload, CancellationToken cancellationToken) =>
-        await _webhookRequestService.CreateAsync(webhook.Key, eventName, payload);
+    public async Task FireAsync(Webhook webhook, string eventAlias, object? payload, CancellationToken cancellationToken) =>
+        await _webhookRequestService.CreateAsync(webhook.Key, eventAlias, payload);
 }
 
 

@@ -69,7 +69,7 @@ public class WebhookFiring : RecurringHostedServiceBase
                 continue;
             }
 
-            HttpResponseMessage response = await SendRequestAsync(webhook, request.EventName, request.RequestObject, request.RetryCount, CancellationToken.None);
+            HttpResponseMessage response = await SendRequestAsync(webhook, request.EventAlias, request.RequestObject, request.RetryCount, CancellationToken.None);
             if (response.IsSuccessStatusCode || request.RetryCount >= _webhookSettings.MaximumRetries)
             {
                 await _webhookRequestService.DeleteAsync(request);
