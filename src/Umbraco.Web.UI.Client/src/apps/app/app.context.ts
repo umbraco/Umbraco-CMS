@@ -19,4 +19,4 @@ export class UmbAppContext {
 	}
 }
 
-export const UMB_APP = new UmbContextToken<UmbAppContext>('UMB_APP');
+export const UMB_APP_CONTEXT = new UmbContextToken<UmbAppContext>('UMB_APP');

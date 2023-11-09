@@ -1,5 +1,5 @@
 import type { UmbAppErrorElement } from './app-error.element.js';
-import { UMB_APP, UmbAppContext } from './app.context.js';
+import { UMB_APP_CONTEXT, UmbAppContext } from './app.context.js';
 import { umbLocalizationRegistry } from '@umbraco-cms/backoffice/localization';
 import { UMB_AUTH_CONTEXT, UmbAuthContext } from '@umbraco-cms/backoffice/auth';
 import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
@@ -113,7 +113,10 @@ export class UmbAppElement extends UmbLitElement {
 
 		this.provideContext(UMB_AUTH_CONTEXT, this.#authContext);
 
-		this.provideContext(UMB_APP, new UmbAppContext({ backofficePath: this.backofficePath, serverUrl: this.serverUrl }));
+		this.provideContext(
+			UMB_APP_CONTEXT,
+			new UmbAppContext({ backofficePath: this.backofficePath, serverUrl: this.serverUrl }),
+		);
 
 		// Try to initialise the auth flow and get the runtime status
 		try {
