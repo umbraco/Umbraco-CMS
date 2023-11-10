@@ -44,9 +44,6 @@
                   vm.showIdentifier = false;
                   vm.webhook.name = vm.labels.addWebhook;
                 }
-                else {
-                  vm.webhook.name = vm.labels.editWebhook;
-                }
             }));
 
             // Load events
@@ -56,6 +53,7 @@
                 promises.push(webhooksResource.getByKey($routeParams.id).then(webhook => {
                     
                     vm.webhook = webhook;
+                    vm.webhook.name = vm.labels.editWebhook;
 
                     makeBreadcrumbs();
                 }));
@@ -65,7 +63,7 @@
                 if ($routeParams.create) {
                     $scope.$emit("$changeTitle", vm.labels.addWebhook);
                 } else {
-                  $scope.$emit("$changeTitle", vm.labels.editWebhook + ": " + vm.webhook.name);
+                  $scope.$emit("$changeTitle", vm.labels.editWebhook + ": " + vm.webhook.key);
                 }
 
                 vm.loading = false;
@@ -155,12 +153,12 @@
           });
         }
 
-      function loadEvents() {
-        return webhooksResource.getAllEvents()
-          .then(data => {
-            vm.events = data;
-          });
-      }
+        function loadEvents() {
+          return webhooksResource.getAllEvents()
+            .then(data => {
+              vm.events = data;
+            });
+        }
 
         function clearContentType(contentTypeKey) {
           if (Utilities.isArray(vm.webhook.contentTypeKeys)) {
@@ -210,19 +208,24 @@
         }
 
         function save() {
-            if (formHelper.submitForm({ scope: $scope })) {
-                saveWebhook();
+
+            if (!formHelper.submitForm({ scope: $scope })) {
+              return;
             }
+
+            saveWebhook();
         }
 
         function saveWebhook() {
-            webhooksResource.save(vm.webhook).then(webhook => {
+            webhooksResource.update(vm.webhook).then(webhook => {
                 formHelper.resetForm({ scope: $scope });
 
                 vm.webhook = webhook;
+                vm.webhook.name = vm.labels.editWebhook;
+
                 vm.saveButtonState = "success";
 
-                $scope.$emit("$changeTitle", vm.labels.editWebhook + ": " + vm.webhook.name);
+                $scope.$emit("$changeTitle", vm.labels.editWebhook + ": " + vm.webhook.key);
 
                 localizationService.localize("speechBubbles_webhookSaved").then(value => {
                     notificationsService.success(value);
