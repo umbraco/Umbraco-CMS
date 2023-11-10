@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
@@ -13,15 +13,15 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers;
 [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
 public class WebhookController : UmbracoAuthorizedJsonController
 {
-    private readonly IWebhookService _webHookService;
+    private readonly IWebhookService _webhookService;
     private readonly IUmbracoMapper _umbracoMapper;
     private readonly WebhookEventCollection _webhookEventCollection;
     private readonly IWebhookLogService _webhookLogService;
     private readonly IWebhookPresentationFactory _webhookPresentationFactory;
 
-    public WebhookController(IWebhookService webHookService, IUmbracoMapper umbracoMapper, WebhookEventCollection webhookEventCollection, IWebhookLogService webhookLogService, IWebhookPresentationFactory webhookPresentationFactory)
+    public WebhookController(IWebhookService webhookService, IUmbracoMapper umbracoMapper, WebhookEventCollection webhookEventCollection, IWebhookLogService webhookLogService, IWebhookPresentationFactory webhookPresentationFactory)
     {
-        _webHookService = webHookService;
+        _webhookService = webhookService;
         _umbracoMapper = umbracoMapper;
         _webhookEventCollection = webhookEventCollection;
         _webhookLogService = webhookLogService;
@@ -31,7 +31,7 @@ public class WebhookController : UmbracoAuthorizedJsonController
     [HttpGet]
     public async Task<IActionResult> GetAll(int skip = 0, int take = int.MaxValue)
     {
-        PagedModel<Webhook> webhooks = await _webHookService.GetAllAsync(skip, take);
+        PagedModel<Webhook> webhooks = await _webhookService.GetAllAsync(skip, take);
 
         IEnumerable<WebhookViewModel> webhookViewModels = webhooks.Items.Select(_webhookPresentationFactory.Create);
 
@@ -43,7 +43,7 @@ public class WebhookController : UmbracoAuthorizedJsonController
     {
         Webhook updateModel = _umbracoMapper.Map<Webhook>(webhookViewModel)!;
 
-        await _webHookService.UpdateAsync(updateModel);
+        await _webhookService.UpdateAsync(updateModel);
 
         return Ok();
     }
@@ -52,7 +52,7 @@ public class WebhookController : UmbracoAuthorizedJsonController
     public async Task<IActionResult> Create(WebhookViewModel webhookViewModel)
     {
         Webhook webhook = _umbracoMapper.Map<Webhook>(webhookViewModel)!;
-        await _webHookService.CreateAsync(webhook);
+        await _webhookService.CreateAsync(webhook);
 
         return Ok();
     }
@@ -60,7 +60,7 @@ public class WebhookController : UmbracoAuthorizedJsonController
     [HttpGet]
     public async Task<IActionResult> GetByKey(Guid key)
     {
-        Webhook? webhook = await _webHookService.GetAsync(key);
+        Webhook? webhook = await _webhookService.GetAsync(key);
 
         return webhook is null ? NotFound() : Ok(webhook);
     }
@@ -68,7 +68,7 @@ public class WebhookController : UmbracoAuthorizedJsonController
     [HttpDelete]
     public async Task<IActionResult> Delete(Guid key)
     {
-        await _webHookService.DeleteAsync(key);
+        await _webhookService.DeleteAsync(key);
 
         return Ok();
     }

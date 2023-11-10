@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Options;
 
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
@@ -23,7 +23,7 @@ public abstract class WebhookEventBase<TNotification> : IWebhookEvent, INotifica
 
     protected IWebhookFiringService WebhookFiringService { get; }
 
-    protected IWebhookService WebHookService { get; }
+    protected IWebhookService WebhookService { get; }
 
     protected WebhookSettings WebhookSettings { get; private set; }
 
@@ -37,7 +37,7 @@ public abstract class WebhookEventBase<TNotification> : IWebhookEvent, INotifica
     {
 
         WebhookFiringService = webhookFiringService;
-        WebHookService = webHookService;
+        WebhookService = webHookService;
         _serverRoleAccessor = serverRoleAccessor;
 
         // assign properties based on the attribute, if it is found
@@ -91,7 +91,7 @@ public abstract class WebhookEventBase<TNotification> : IWebhookEvent, INotifica
             return;
         }
 
-        IEnumerable<Webhook> webhooks = await WebHookService.GetByAliasAsync(Alias);
+        IEnumerable<Webhook> webhooks = await WebhookService.GetByAliasAsync(Alias);
 
         await ProcessWebhooks(notification, webhooks, cancellationToken);
     }
