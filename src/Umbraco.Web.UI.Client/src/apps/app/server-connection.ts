@@ -11,6 +11,8 @@ export class UmbServerConnection {
 
 	constructor(serverUrl: string) {
 		this.#url = serverUrl;
+		/* All requests to the server requires the base URL to be set. 
+		We make sure it happens before we get the server status. */
 		OpenAPI.BASE = this.#url;
 	}
 
