@@ -1,9 +1,9 @@
-import { type PermittedControllerType, UmbBaseExtensionsController } from './base-extensions-controller.js';
+import { type PermittedControllerType, UmbBaseExtensionsInitializer } from './base-extensions-initializer.controller.js';
 import {
 	type ManifestBase,
 	type ManifestTypeMap,
 	type SpecificManifestTypeOrManifestBase,
-	UmbExtensionElementController,
+	UmbExtensionElementInitializer,
 	type UmbExtensionRegistry,
 } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -14,9 +14,9 @@ export class UmbExtensionsElementController<
 	ManifestTypes extends ManifestBase,
 	ManifestTypeName extends keyof ManifestTypeMap<ManifestTypes> | string = string,
 	ManifestType extends ManifestBase = SpecificManifestTypeOrManifestBase<ManifestTypes, ManifestTypeName>,
-	ControllerType extends UmbExtensionElementController<ManifestType> = UmbExtensionElementController<ManifestType>,
+	ControllerType extends UmbExtensionElementInitializer<ManifestType> = UmbExtensionElementInitializer<ManifestType>,
 	MyPermittedControllerType extends ControllerType = PermittedControllerType<ControllerType>
-> extends UmbBaseExtensionsController<
+> extends UmbBaseExtensionsInitializer<
 	ManifestTypes,
 	ManifestTypeName,
 	ManifestType,
@@ -43,7 +43,7 @@ export class UmbExtensionsElementController<
 		extensionRegistry: UmbExtensionRegistry<ManifestTypes>,
 		type: ManifestTypeName | Array<ManifestTypeName>,
 		filter: undefined | null | ((manifest: ManifestType) => boolean),
-		onChange: (permittedManifests: Array<MyPermittedControllerType>, controller: MyPermittedControllerType) => void,
+		onChange: (permittedManifests: Array<MyPermittedControllerType>) => void,
 		defaultElement?: string
 	) {
 		super(host, extensionRegistry, type, filter, onChange);
@@ -53,7 +53,7 @@ export class UmbExtensionsElementController<
 	}
 
 	protected _createController(manifest: ManifestType) {
-		const extController = new UmbExtensionElementController<ManifestType>(
+		const extController = new UmbExtensionElementInitializer<ManifestType>(
 			this,
 			this.#extensionRegistry,
 			manifest.alias,

@@ -1,7 +1,6 @@
 import { type UmbUnlockUserRepository } from '../../repository/index.js';
 import { UmbUserItemRepository } from '../../repository/item/user-item.repository.js';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
-import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import {
 	type UmbModalManagerContext,
@@ -16,9 +15,9 @@ export class UmbUnlockUserEntityAction extends UmbEntityActionBase<UmbUnlockUser
 	constructor(host: UmbControllerHostElement, repositoryAlias: string, unique: string) {
 		super(host, repositoryAlias, unique);
 
-		this.#itemRepository = new UmbUserItemRepository(this.host);
+		this.#itemRepository = new UmbUserItemRepository(this);
 
-		new UmbContextConsumerController(this.host, UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
 			this.#modalManager = instance;
 		});
 	}

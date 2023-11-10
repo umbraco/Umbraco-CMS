@@ -3,8 +3,7 @@ import { UmbRelationTypeServerDataSource } from './sources/relation-type.server.
 import { UmbRelationTypeStore, UMB_RELATION_TYPE_STORE_CONTEXT_TOKEN } from './relation-type.store.js';
 import { UmbRelationTypeTreeServerDataSource } from './sources/relation-type.tree.server.data.js';
 import { UmbRelationTypeTreeDataSource } from './sources/index.js';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
+import { UmbBaseController, type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import {
 	CreateRelationTypeRequestModel,
 	RelationTypeResponseModel,
@@ -12,15 +11,15 @@ import {
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbDetailRepository, UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
+import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
-export class UmbRelationTypeRepository
+export class UmbRelationTypeRepository extends UmbBaseController
 	implements
 		UmbTreeRepository<any>,
-		UmbDetailRepository<CreateRelationTypeRequestModel, any, UpdateRelationTypeRequestModel, RelationTypeResponseModel>
+		UmbDetailRepository<CreateRelationTypeRequestModel, any, UpdateRelationTypeRequestModel, RelationTypeResponseModel>,
+		UmbApi
 {
 	#init!: Promise<unknown>;
-
-	#host: UmbControllerHostElement;
 
 	#treeSource: UmbRelationTypeTreeDataSource;
 	#treeStore?: UmbRelationTypeTreeStore;
@@ -30,25 +29,25 @@ export class UmbRelationTypeRepository
 
 	#notificationContext?: UmbNotificationContext;
 
-	constructor(host: UmbControllerHostElement) {
-		this.#host = host;
+	constructor(host: UmbControllerHost) {
+		super(host);
 
 		// TODO: figure out how spin up get the correct data source
-		this.#treeSource = new UmbRelationTypeTreeServerDataSource(this.#host);
-		this.#detailDataSource = new UmbRelationTypeServerDataSource(this.#host);
+		this.#treeSource = new UmbRelationTypeTreeServerDataSource(this._host);
+		this.#detailDataSource = new UmbRelationTypeServerDataSource(this._host);
 
 		this.#init = Promise.all([
-			new UmbContextConsumerController(this.#host, UMB_RELATION_TYPE_TREE_STORE_CONTEXT_TOKEN, (instance) => {
+			this.consumeContext(UMB_RELATION_TYPE_TREE_STORE_CONTEXT_TOKEN, (instance) => {
 				this.#treeStore = instance;
-			}),
+			}).asPromise(),
 
-			new UmbContextConsumerController(this.#host, UMB_RELATION_TYPE_STORE_CONTEXT_TOKEN, (instance) => {
+			this.consumeContext(UMB_RELATION_TYPE_STORE_CONTEXT_TOKEN, (instance) => {
 				this.#detailStore = instance;
-			}),
+			}).asPromise(),
 
-			new UmbContextConsumerController(this.#host, UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
+			this.consumeContext(UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
 				this.#notificationContext = instance;
-			}),
+			}).asPromise(),
 		]);
 	}
 

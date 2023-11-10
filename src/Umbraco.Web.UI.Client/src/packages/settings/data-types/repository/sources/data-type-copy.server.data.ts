@@ -1,5 +1,5 @@
 import { DataTypeResource } from '@umbraco-cms/backoffice/backend-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { UmbCopyDataSource } from '@umbraco-cms/backoffice/repository';
 
@@ -9,14 +9,14 @@ import { UmbCopyDataSource } from '@umbraco-cms/backoffice/repository';
  * @class UmbDataTypeCopyServerDataSource
  */
 export class UmbDataTypeCopyServerDataSource implements UmbCopyDataSource {
-	#host: UmbControllerHostElement;
+	#host: UmbControllerHost;
 
 	/**
 	 * Creates an instance of UmbDataTypeCopyServerDataSource.
-	 * @param {UmbControllerHostElement} host
+	 * @param {UmbControllerHost} host
 	 * @memberof UmbDataTypeCopyServerDataSource
 	 */
-	constructor(host: UmbControllerHostElement) {
+	constructor(host: UmbControllerHost) {
 		this.#host = host;
 	}
 

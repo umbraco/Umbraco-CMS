@@ -4,7 +4,7 @@ import {
 	FolderResponseModel,
 	PartialViewResource,
 } from '@umbraco-cms/backoffice/backend-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { DataSourceResponse, UmbFolderDataSource } from '@umbraco-cms/backoffice/repository';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -12,9 +12,9 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 export type PartialViewGetFolderResponse = {path: string, parentPath: string, name: string} ;
 
 export class UmbPartialViewsFolderServerDataSource implements UmbFolderDataSource {
-	#host: UmbControllerHostElement;
+	#host: UmbControllerHost;
 
-	constructor(host: UmbControllerHostElement) {
+	constructor(host: UmbControllerHost) {
 		this.#host = host;
 	}
 	createScaffold(parentId: string | null): Promise<DataSourceResponse<FolderResponseModel>> {

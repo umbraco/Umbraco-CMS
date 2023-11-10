@@ -11,7 +11,7 @@ import {
 } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbExtensionElementController, UmbExtensionsElementController } from '@umbraco-cms/backoffice/extension-api';
+import { UmbExtensionElementInitializer, UmbExtensionsElementController } from '@umbraco-cms/backoffice/extension-api';
 
 /**
  * @export
@@ -39,7 +39,7 @@ export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectio
 
 	@state()
 	private _sidebarApps?: Array<
-		UmbExtensionElementController<ManifestSectionSidebarApp | ManifestSectionSidebarAppMenuKind>
+		UmbExtensionElementInitializer<ManifestSectionSidebarApp | ManifestSectionSidebarAppMenuKind>
 	>;
 
 	constructor() {

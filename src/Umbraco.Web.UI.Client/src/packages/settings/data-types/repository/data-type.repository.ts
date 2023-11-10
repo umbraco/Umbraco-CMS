@@ -22,8 +22,7 @@ import type {
 	UmbMoveDataSource,
 	UmbCopyDataSource,
 } from '@umbraco-cms/backoffice/repository';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
+import { UmbBaseController, type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import {
 	CreateDataTypeRequestModel,
 	CreateFolderRequestModel,
@@ -34,18 +33,18 @@ import {
 	UpdateDataTypeRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
-export class UmbDataTypeRepository
+import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
+export class UmbDataTypeRepository extends UmbBaseController
 	implements
 		UmbItemRepository<DataTypeItemResponseModel>,
 		UmbTreeRepository<FolderTreeItemResponseModel>,
 		UmbDetailRepository<CreateDataTypeRequestModel, any, UpdateDataTypeRequestModel, DataTypeResponseModel>,
 		UmbFolderRepository,
 		UmbMoveRepository,
-		UmbCopyRepository
+		UmbCopyRepository,
+		UmbApi
 {
 	#init: Promise<unknown>;
-
-	#host: UmbControllerHostElement;
 
 	#treeSource: UmbTreeDataSource<FolderTreeItemResponseModel>;
 	#detailSource: UmbDataSource<CreateDataTypeRequestModel, any, UpdateDataTypeRequestModel, DataTypeResponseModel>;
@@ -60,32 +59,32 @@ export class UmbDataTypeRepository
 
 	#notificationContext?: UmbNotificationContext;
 
-	constructor(host: UmbControllerHostElement) {
-		this.#host = host;
+	constructor(host: UmbControllerHost) {
+		super(host);
 
 		// TODO: figure out how spin up get the correct data source
-		this.#treeSource = new UmbDataTypeTreeServerDataSource(this.#host);
-		this.#detailSource = new UmbDataTypeServerDataSource(this.#host);
-		this.#folderSource = new UmbDataTypeFolderServerDataSource(this.#host);
-		this.#itemSource = new UmbDataTypeItemServerDataSource(this.#host);
-		this.#moveSource = new UmbDataTypeMoveServerDataSource(this.#host);
-		this.#copySource = new UmbDataTypeCopyServerDataSource(this.#host);
+		this.#treeSource = new UmbDataTypeTreeServerDataSource(this);
+		this.#detailSource = new UmbDataTypeServerDataSource(this);
+		this.#folderSource = new UmbDataTypeFolderServerDataSource(this);
+		this.#itemSource = new UmbDataTypeItemServerDataSource(this);
+		this.#moveSource = new UmbDataTypeMoveServerDataSource(this);
+		this.#copySource = new UmbDataTypeCopyServerDataSource(this);
 
 		// TODO: Make a method that takes the controllers and returns a promise, just to simplify this:
 		this.#init = Promise.all([
-			new UmbContextConsumerController(this.#host, UMB_DATA_TYPE_STORE_CONTEXT_TOKEN, (instance) => {
+			this.consumeContext(UMB_DATA_TYPE_STORE_CONTEXT_TOKEN, (instance) => {
 				this.#detailStore = instance;
 			}).asPromise(),
 
-			new UmbContextConsumerController(this.#host, UMB_DATA_TYPE_TREE_STORE_CONTEXT_TOKEN, (instance) => {
+			this.consumeContext(UMB_DATA_TYPE_TREE_STORE_CONTEXT_TOKEN, (instance) => {
 				this.#treeStore = instance;
 			}).asPromise(),
 
-			new UmbContextConsumerController(this.#host, UMB_DATA_TYPE_ITEM_STORE_CONTEXT_TOKEN, (instance) => {
+			this.consumeContext(UMB_DATA_TYPE_ITEM_STORE_CONTEXT_TOKEN, (instance) => {
 				this.#itemStore = instance;
 			}).asPromise(),
 
-			new UmbContextConsumerController(this.#host, UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
+			this.consumeContext(UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
 				this.#notificationContext = instance;
 			}).asPromise(),
 		]);

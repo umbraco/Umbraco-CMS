@@ -1,10 +1,14 @@
 import { UmbStore } from './store.interface.js';
 import { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
 import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { type UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 
 // TODO: Make a Store interface?
-export class UmbStoreBase<StoreItemType = any> implements UmbStore<StoreItemType> {
+export class UmbStoreBase<StoreItemType = any> implements UmbStore<StoreItemType>, UmbApi {
+
+	#provider;
+
 	protected _host: UmbControllerHost;
 	protected _data: UmbArrayState<StoreItemType>;
 
@@ -15,7 +19,7 @@ export class UmbStoreBase<StoreItemType = any> implements UmbStore<StoreItemType
 		this.storeAlias = storeAlias;
 		this._data = data;
 
-		new UmbContextProviderController(_host, storeAlias, this);
+		this.#provider = new UmbContextProviderController(_host, storeAlias, this);
 	}
 
 	/**
@@ -70,5 +74,9 @@ export class UmbStoreBase<StoreItemType = any> implements UmbStore<StoreItemType
 	 */
 	all() {
 		return this._data.asObservable();
+	}
+
+	destroy() {
+		this.#provider.destroy();
 	}
 }
