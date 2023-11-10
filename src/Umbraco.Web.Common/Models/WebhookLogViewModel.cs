@@ -17,8 +17,8 @@ public class WebhookLogViewModel
     [DataMember(Name = "date")]
     public DateTime Date { get; set; }
 
-    [DataMember(Name = "eventName")]
-    public string EventName { get; set; } = string.Empty;
+    [DataMember(Name = "eventAlias")]
+    public string EventAlias { get; set; } = string.Empty;
 
     [DataMember(Name = "url")]
     public string Url { get; set; } = string.Empty;

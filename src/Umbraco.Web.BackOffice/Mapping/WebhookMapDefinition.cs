@@ -10,7 +10,6 @@ public class WebhookMapDefinition : IMapDefinition
     public void DefineMaps(IUmbracoMapper mapper)
     {
         mapper.Define<WebhookViewModel, Webhook>((_, _) => new Webhook(string.Empty), Map);
-        mapper.Define<Webhook, WebhookViewModel>((_, _) => new WebhookViewModel(), Map);
         mapper.Define<IWebhookEvent, WebhookEventViewModel>((_, _) => new WebhookEventViewModel(), Map);
         mapper.Define<WebhookLog, WebhookLogViewModel>((_, _) => new WebhookLogViewModel(), Map);
     }
@@ -19,7 +18,7 @@ public class WebhookMapDefinition : IMapDefinition
     private void Map(WebhookViewModel source, Webhook target, MapperContext context)
     {
         target.ContentTypeKeys = source.ContentTypeKeys;
-        target.Events = source.Events;
+        target.Events = source.Events.Select(x => x.Alias).ToArray();
         target.Url = source.Url;
         target.Enabled = source.Enabled;
         target.Key = source.Key ?? Guid.NewGuid();
@@ -27,24 +26,18 @@ public class WebhookMapDefinition : IMapDefinition
     }
 
     // Umbraco.Code.MapAll
-    private void Map(Webhook source, WebhookViewModel target, MapperContext context)
+    private void Map(IWebhookEvent source, WebhookEventViewModel target, MapperContext context)
     {
-        target.ContentTypeKeys = source.ContentTypeKeys;
-        target.Events = source.Events;
-        target.Url = source.Url;
-        target.Enabled = source.Enabled;
-        target.Key = source.Key;
-        target.Headers = source.Headers;
+        target.EventName = source.EventName;
+        target.EventType = source.EventType;
+        target.Alias = source.Alias;
     }
-
-    // Umbraco.Code.MapAll
-    private void Map(IWebhookEvent source, WebhookEventViewModel target, MapperContext context) => target.EventName = source.EventName;
 
     // Umbraco.Code.MapAll
     private void Map(WebhookLog source, WebhookLogViewModel target, MapperContext context)
     {
         target.Date = source.Date;
-        target.EventName = source.EventName;
+        target.EventAlias = source.EventAlias;
         target.Key = source.Key;
         target.RequestBody = source.RequestBody ?? string.Empty;
         target.ResponseBody = source.ResponseBody;

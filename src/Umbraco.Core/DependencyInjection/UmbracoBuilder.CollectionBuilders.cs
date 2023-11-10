@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Sections;
+using Umbraco.Cms.Core.Webhooks;
 
 namespace Umbraco.Cms.Core.DependencyInjection;
 
@@ -131,6 +132,18 @@ public static partial class UmbracoBuilderExtensions
     public static IUmbracoBuilder AddMapDefinition<T>(this IUmbracoBuilder builder) where T : IMapDefinition
     {
         builder.WithCollectionBuilder<MapDefinitionCollectionBuilder>().Add<T>();
+        return builder;
+    }
+
+    /// <summary>
+    /// Add an IWebhookEvent to the WebhookEventCollectionBuilder.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="builder"></param>
+    /// <returns></returns>
+    public static IUmbracoBuilder AddWebhookEvent<T>(this IUmbracoBuilder builder) where T : IWebhookEvent
+    {
+        builder.WebhookEvents().Append<T>();
         return builder;
     }
 }

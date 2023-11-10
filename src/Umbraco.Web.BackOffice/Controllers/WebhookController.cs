@@ -4,6 +4,7 @@ using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Webhooks;
+using Umbraco.Cms.Web.BackOffice.Services;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Models;
 
@@ -16,13 +17,15 @@ public class WebhookController : UmbracoAuthorizedJsonController
     private readonly IUmbracoMapper _umbracoMapper;
     private readonly WebhookEventCollection _webhookEventCollection;
     private readonly IWebhookLogService _webhookLogService;
+    private readonly IWebhookPresentationFactory _webhookPresentationFactory;
 
-    public WebhookController(IWebhookService webHookService, IUmbracoMapper umbracoMapper, WebhookEventCollection webhookEventCollection, IWebhookLogService webhookLogService)
+    public WebhookController(IWebhookService webHookService, IUmbracoMapper umbracoMapper, WebhookEventCollection webhookEventCollection, IWebhookLogService webhookLogService, IWebhookPresentationFactory webhookPresentationFactory)
     {
         _webHookService = webHookService;
         _umbracoMapper = umbracoMapper;
         _webhookEventCollection = webhookEventCollection;
         _webhookLogService = webhookLogService;
+        _webhookPresentationFactory = webhookPresentationFactory;
     }
 
     [HttpGet]
@@ -30,7 +33,7 @@ public class WebhookController : UmbracoAuthorizedJsonController
     {
         PagedModel<Webhook> webhooks = await _webHookService.GetAllAsync(skip, take);
 
-        List<WebhookViewModel> webhookViewModels = _umbracoMapper.MapEnumerable<Webhook, WebhookViewModel>(webhooks.Items);
+        IEnumerable<WebhookViewModel> webhookViewModels = webhooks.Items.Select(_webhookPresentationFactory.Create);
 
         return Ok(webhookViewModels);
     }

@@ -16,9 +16,8 @@ public abstract class WebhookEventContentBase<TNotification, TEntity> : WebhookE
         IWebhookFiringService webhookFiringService,
         IWebhookService webHookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
-        IServerRoleAccessor serverRoleAccessor,
-        string eventName)
-        : base(webhookFiringService, webHookService, webhookSettings, serverRoleAccessor, eventName)
+        IServerRoleAccessor serverRoleAccessor)
+        : base(webhookFiringService, webHookService, webhookSettings, serverRoleAccessor)
     {
     }
 
@@ -38,7 +37,7 @@ public abstract class WebhookEventContentBase<TNotification, TEntity> : WebhookE
                     continue;
                 }
 
-                await WebhookFiringService.FireAsync(webhook, EventName, ConvertEntityToRequestPayload(entity), cancellationToken);
+                await WebhookFiringService.FireAsync(webhook, Alias, ConvertEntityToRequestPayload(entity), cancellationToken);
             }
         }
     }
