@@ -18,14 +18,14 @@ public class MediaSavedWebhookEvent : WebhookEventContentBase<MediaSavedNotifica
 
     public MediaSavedWebhookEvent(
         IWebhookFiringService webhookFiringService,
-        IWebHookService webHookService,
+        IWebhookService webhookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
         IServerRoleAccessor serverRoleAccessor,
         IPublishedSnapshotAccessor publishedSnapshotAccessor,
         IApiMediaBuilder apiMediaBuilder)
         : base(
             webhookFiringService,
-            webHookService,
+            webhookService,
             webhookSettings,
             serverRoleAccessor)
     {

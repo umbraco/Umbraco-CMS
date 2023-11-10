@@ -15,7 +15,30 @@ export class UmbAuthContext implements IUmbAuthContext {
 
 	#authRepository = new UmbAuthRepository();
 
-	public returnPath = '';
+	#returnPath = '';
+
+  set returnPath(value: string) {
+    this.#returnPath = value;
+  }
+
+  /**
+   * Gets the return path from the query string.
+   *
+   * It will first look for a `ReturnUrl` parameter, then a `returnPath` parameter, and finally the `returnPath` property.
+   *
+   * @returns The return path from the query string.
+   */
+  get returnPath(): string {
+    const params = new URLSearchParams(window.location.search);
+    let returnUrl = params.get('ReturnUrl') ?? params.get('returnPath') ?? this.#returnPath;
+
+    // Paths from the old Backoffice are encoded twice and need to be decoded,
+    // but we don't want to decode the new paths coming from the Management API.
+    if (returnUrl.indexOf('/security/back-office/authorize') === -1) {
+      returnUrl = decodeURIComponent(returnUrl);
+    }
+    return returnUrl || '';
+  }
 
 	async login(data: LoginRequestModel): Promise<LoginResponse> {
 		return this.#authRepository.login(data);
