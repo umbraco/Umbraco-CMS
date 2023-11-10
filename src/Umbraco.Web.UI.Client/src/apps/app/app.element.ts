@@ -1,7 +1,7 @@
 import type { UmbAppErrorElement } from './app-error.element.js';
 import { UmbAppContext } from './app.context.js';
 import { umbLocalizationRegistry } from '@umbraco-cms/backoffice/localization';
-import { UmbAuthContext } from '@umbraco-cms/backoffice/auth';
+import { UMB_AUTH_CONTEXT, UmbAuthContext } from '@umbraco-cms/backoffice/auth';
 import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UUIIconRegistryEssential } from '@umbraco-cms/backoffice/external/uui';
 import { UmbIconRegistry } from '@umbraco-cms/backoffice/icon';
@@ -11,6 +11,7 @@ import { pathWithoutBasePath } from '@umbraco-cms/backoffice/router';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { OpenAPI, RuntimeLevelModel, ServerResource } from '@umbraco-cms/backoffice/backend-api';
 import { contextData, umbDebugContextEventType } from '@umbraco-cms/backoffice/context-api';
+import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
 
 @customElement('umb-app')
 export class UmbAppElement extends UmbLitElement {
@@ -56,7 +57,8 @@ export class UmbAppElement extends UmbLitElement {
 		},
 	];
 
-	#authContext?: UmbAuthContext;
+	#currentUserContext?: typeof UMB_CURRENT_USER_CONTEXT.TYPE;
+	#authContext?: typeof UMB_AUTH_CONTEXT.TYPE;
 	#umbIconRegistry = new UmbIconRegistry();
 	#uuiIconRegistry = new UUIIconRegistryEssential();
 	#runtimeLevel = RuntimeLevelModel.UNKNOWN;
@@ -87,14 +89,14 @@ export class UmbAppElement extends UmbLitElement {
 		// We **need** to do this because the default language (typically en-us) holds all the fallback keys for all the other languages.
 		// This way we can ensure that the document language is always loaded first and subsequently registered as the fallback language.
 		this.observe(umbLocalizationRegistry.isDefaultLoaded, (isDefaultLoaded) => {
-			if (!this.#authContext) {
-				throw new Error('[Fatal] AuthContext requested before it was initialized');
+			if (!this.#currentUserContext) {
+				throw new Error('[Fatal] CurrentUserContext requested before it was initialized');
 			}
 
 			if (!isDefaultLoaded) return;
 
 			this.observe(
-				this.#authContext.languageIsoCode,
+				this.#currentUserContext.languageIsoCode,
 				(currentLanguageIsoCode) => {
 					umbLocalizationRegistry.loadLanguage(currentLanguageIsoCode);
 				},
@@ -187,7 +189,7 @@ export class UmbAppElement extends UmbLitElement {
 			}
 
 			// Get service configuration from authentication server
-			await this.#authContext.setInitialState();
+			await this.#authContext?.setInitialState();
 
 			// Instruct all requests to use the auth flow to get and use the access_token for all subsequent requests
 			OpenAPI.TOKEN = () => this.#authContext!.getLatestToken();
