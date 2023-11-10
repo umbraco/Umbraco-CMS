@@ -1,5 +1,6 @@
 import type { UmbAppErrorElement } from './app-error.element.js';
 import { UmbAppContext } from './app.context.js';
+import { UmbServerConnection } from './server-connection.js';
 import { UMB_AUTH_CONTEXT, UmbAuthContext } from '@umbraco-cms/backoffice/auth';
 import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UUIIconRegistryEssential } from '@umbraco-cms/backoffice/external/uui';
@@ -58,7 +59,7 @@ export class UmbAppElement extends UmbLitElement {
 	#authContext?: typeof UMB_AUTH_CONTEXT.TYPE;
 	#umbIconRegistry = new UmbIconRegistry();
 	#uuiIconRegistry = new UUIIconRegistryEssential();
-	#serverStatus = RuntimeLevelModel.UNKNOWN;
+	#serverConnection?: UmbServerConnection;
 
 	constructor() {
 		super();
@@ -74,21 +75,20 @@ export class UmbAppElement extends UmbLitElement {
 
 	async #setup() {
 		if (this.serverUrl === undefined) throw new Error('No serverUrl provided');
-
 		OpenAPI.BASE = this.serverUrl;
 		const redirectUrl = `${window.location.origin}${this.backofficePath}`;
+
+		this.#serverConnection = new UmbServerConnection(this.serverUrl);
+		await this.#serverConnection.connect();
 
 		this.#authContext = new UmbAuthContext(this, this.serverUrl, redirectUrl, this.bypassAuth);
 		new UmbAppContext(this, { backofficePath: this.backofficePath, serverUrl: this.serverUrl });
 
 		// Try to initialise the auth flow and get the runtime status
 		try {
-			// Get the current runtime level
-			await this.#setServerStatus();
-
 			// If the runtime level is "install" we should clear any cached tokens
 			// else we should try and set the auth status
-			if (this.#serverStatus === RuntimeLevelModel.INSTALL) {
+			if (this.#serverConnection.getStatus() === RuntimeLevelModel.INSTALL) {
 				await this.#authContext.signOut();
 			} else {
 				await this.#setAuthStatus();
@@ -141,14 +141,6 @@ export class UmbAppElement extends UmbLitElement {
 		});
 	}
 
-	async #setServerStatus() {
-		const { data, error } = await tryExecute(ServerResource.getServerStatus());
-		if (error) {
-			throw error;
-		}
-		this.#serverStatus = data?.serverStatus ?? RuntimeLevelModel.UNKNOWN;
-	}
-
 	async #setAuthStatus() {
 		if (this.bypassAuth) return;
 
@@ -165,7 +157,7 @@ export class UmbAppElement extends UmbLitElement {
 	}
 
 	#redirect() {
-		switch (this.#serverStatus) {
+		switch (this.#serverConnection?.getStatus()) {
 			case RuntimeLevelModel.INSTALL:
 				history.replaceState(null, '', 'install');
 				break;
@@ -197,7 +189,7 @@ export class UmbAppElement extends UmbLitElement {
 
 			default:
 				// Redirect to the error page
-				this.#errorPage(`Unsupported runtime level: ${this.#serverStatus}`);
+				this.#errorPage(`Unsupported runtime level: ${this.#serverConnection?.getStatus()}`);
 		}
 	}
 

@@ -10,7 +10,7 @@ export class UmbAppContext extends UmbBaseController {
 		super(host);
 		this.#serverUrl = config.serverUrl;
 		this.#backofficePath = config.backofficePath;
-		this.provideContext(UMB_APP, this);
+		this.provideContext(UMB_APP_CONTEXT, this);
 	}
 
 	getBackofficePath() {
@@ -22,4 +22,4 @@ export class UmbAppContext extends UmbBaseController {
 	}
 }
 
-export const UMB_APP = new UmbContextToken<UmbAppContext>('UMB_APP');
+export const UMB_APP_CONTEXT = new UmbContextToken<UmbAppContext>('UMB_APP');

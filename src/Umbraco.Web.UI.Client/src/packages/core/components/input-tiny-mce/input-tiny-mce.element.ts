@@ -26,7 +26,7 @@ import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbMediaHelper } from '@umbraco-cms/backoffice/utils';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
-import { UMB_APP } from '@umbraco-cms/backoffice/app';
+import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
 import { UmbStylesheetRepository } from '@umbraco-cms/backoffice/stylesheet';
 
 // TODO => integrate macro picker, update stylesheet fetch when backend CLI exists (ref tinymce.service.js in existing backoffice)
@@ -56,7 +56,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_APP, (instance) => {
+		this.consumeContext(UMB_APP_CONTEXT, (instance) => {
 			this.#serverUrl = instance.getServerUrl();
 		});
 
