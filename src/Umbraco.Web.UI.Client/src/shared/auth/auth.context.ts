@@ -1,10 +1,10 @@
-import { IUmbAuth } from './auth.context.interface.js';
+import { IUmbAuthContext } from './auth.context.interface.js';
 import { UmbAuthFlow } from './auth-flow.js';
 import { UMB_AUTH_CONTEXT } from './auth.context.token.js';
 import { UmbBaseController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 
-export class UmbAuthContext extends UmbBaseController implements IUmbAuth {
+export class UmbAuthContext extends UmbBaseController implements IUmbAuthContext {
 	#isAuthorized = new UmbBooleanState<boolean>(false);
 	readonly isAuthorized = this.#isAuthorized.asObservable();
 
