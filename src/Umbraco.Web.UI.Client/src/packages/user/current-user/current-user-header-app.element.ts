@@ -32,9 +32,13 @@ export class UmbCurrentUserHeaderAppElement extends UmbLitElement {
 	private async _observeCurrentUser() {
 		if (!this._auth) return;
 
-		this.observe(this._auth.currentUser, (currentUser) => {
-			this._currentUser = currentUser;
-		}, 'umbCurrentUserObserver');
+		this.observe(
+			this._auth.currentUser,
+			(currentUser) => {
+				this._currentUser = currentUser;
+			},
+			'umbCurrentUserObserver',
+		);
 	}
 
 	private _handleUserClick() {
@@ -43,8 +47,12 @@ export class UmbCurrentUserHeaderAppElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<uui-button @click=${this._handleUserClick} look="primary" label="${this._currentUser?.name || ''}" compact>
-				<uui-avatar name="${this._currentUser?.name || ''}"></uui-avatar>
+			<uui-button
+				@click=${this._handleUserClick}
+				look="primary"
+				label="${this.localize.term('visuallyHiddenTexts_openCloseBackofficeProfileOptions')}"
+				compact>
+				<uui-avatar name="${this._currentUser?.name || 'Unknown'}"></uui-avatar>
 			</uui-button>
 		`;
 	}
