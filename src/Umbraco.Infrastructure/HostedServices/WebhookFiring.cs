@@ -75,15 +75,7 @@ public class WebhookFiring : RecurringHostedServiceBase
                 continue;
             }
 
-            HttpResponseMessage? response = null;
-            try
-            {
-                response = await SendRequestAsync(webhook, request.EventAlias, request.RequestObject, request.RetryCount, CancellationToken.None);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error while sending webhook request for webhook {WebhookKey}.", request.WebhookKey);
-            }
+            HttpResponseMessage? response = await SendRequestAsync(webhook, request.EventAlias, request.RequestObject, request.RetryCount, CancellationToken.None);
 
             if ((response?.IsSuccessStatusCode ?? false) || request.RetryCount >= _webhookSettings.MaximumRetries)
             {
@@ -99,7 +91,7 @@ public class WebhookFiring : RecurringHostedServiceBase
         scope.Complete();
     }
 
-    private async Task<HttpResponseMessage> SendRequestAsync(Webhook webhook, string eventName, object? payload, int retryCount, CancellationToken cancellationToken)
+    private async Task<HttpResponseMessage?> SendRequestAsync(Webhook webhook, string eventName, object? payload, int retryCount, CancellationToken cancellationToken)
     {
         using var httpClient = new HttpClient();
 
@@ -112,7 +104,15 @@ public class WebhookFiring : RecurringHostedServiceBase
             stringContent.Headers.TryAddWithoutValidation(header.Key, header.Value);
         }
 
-        HttpResponseMessage response = await httpClient.PostAsync(webhook.Url, stringContent, cancellationToken);
+        HttpResponseMessage? response = null;
+        try
+        {
+            response = await httpClient.PostAsync(webhook.Url, stringContent, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error while sending webhook request for webhook {WebhookKey}.", webhook);
+        }
 
         var webhookResponseModel = new WebhookResponseModel
         {
