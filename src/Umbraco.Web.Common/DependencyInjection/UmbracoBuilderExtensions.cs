@@ -191,6 +191,7 @@ public static partial class UmbracoBuilderExtensions
             new ReportSiteTask(
                 provider.GetRequiredService<ILogger<ReportSiteTask>>(),
                 provider.GetRequiredService<ITelemetryService>()));
+        builder.Services.AddHostedService<WebhookFiring>();
         return builder;
     }
 
