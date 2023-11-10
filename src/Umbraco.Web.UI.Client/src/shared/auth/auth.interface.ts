@@ -3,8 +3,6 @@ import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 export interface IUmbAuth {
 	isAuthorized: Observable<boolean>;
 
-	setLoggedIn(loggedIn: boolean): void;
-
 	/**
 	 * Initiates the login flow.
 	 */

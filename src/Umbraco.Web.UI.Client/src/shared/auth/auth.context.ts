@@ -26,11 +26,6 @@ export class UmbAuthContext extends UmbBaseController implements IUmbAuth {
 		return this.#authFlow.makeAuthorizationRequest();
 	}
 
-	/* TEMPORARY METHOD UNTIL RESPONSIBILITY IS MOVED TO CONTEXT */
-	setLoggedIn(newValue: boolean): void {
-		return this.#isAuthorized.next(newValue);
-	}
-
 	getIsAuthorized() {
 		if (this.isBypassed) {
 			this.#isAuthorized.next(true);
