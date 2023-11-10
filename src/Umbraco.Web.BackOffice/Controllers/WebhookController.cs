@@ -45,7 +45,7 @@ public class WebhookController : UmbracoAuthorizedJsonController
 
         await _webhookService.UpdateAsync(webhook);
 
-        return Ok();
+        return Ok(_webhookPresentationFactory.Create(webhook));
     }
 
     [HttpPost]
