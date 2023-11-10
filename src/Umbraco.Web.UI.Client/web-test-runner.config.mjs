@@ -141,7 +141,7 @@ export default {
       <body>
         <script type="module" src="${testFramework}"></script>
 				<script type="module">
-					<!-- Hack to disable Lit dev mode warnings -->
+					/* Hack to disable Lit dev mode warnings */
 					const systemWarn = window.console.warn;
 					window.console.warn = (...args) => {
 						if (args[0].indexOf('Lit is in dev mode.') === 0) {
