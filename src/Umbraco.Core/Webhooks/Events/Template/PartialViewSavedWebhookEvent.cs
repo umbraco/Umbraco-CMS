@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events.Stylesheet;
 
+[WebhookEvent("Partial View Saved")]
 public class PartialViewSavedWebhookEvent : WebhookEventBase<PartialViewSavedNotification>
 {
     public PartialViewSavedWebhookEvent(
@@ -13,7 +14,9 @@ public class PartialViewSavedWebhookEvent : WebhookEventBase<PartialViewSavedNot
         IWebHookService webHookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
         IServerRoleAccessor serverRoleAccessor)
-        : base(webhookFiringService, webHookService, webhookSettings, serverRoleAccessor, "Partial View Saved")
+        : base(webhookFiringService, webHookService, webhookSettings, serverRoleAccessor)
     {
     }
+
+    public override string Alias => "partialViewSaved";
 }

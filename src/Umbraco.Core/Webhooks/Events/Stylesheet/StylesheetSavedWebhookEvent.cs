@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events.Stylesheet;
 
+[WebhookEvent("Stylesheet Saved")]
 public class StylesheetSavedWebhookEvent : WebhookEventBase<StylesheetSavedNotification>
 {
     public StylesheetSavedWebhookEvent(
@@ -13,7 +14,9 @@ public class StylesheetSavedWebhookEvent : WebhookEventBase<StylesheetSavedNotif
         IWebHookService webHookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
         IServerRoleAccessor serverRoleAccessor)
-        : base(webhookFiringService, webHookService, webhookSettings, serverRoleAccessor, "Stylesheet Saved")
+        : base(webhookFiringService, webHookService, webhookSettings, serverRoleAccessor)
     {
     }
+
+    public override string Alias => "stylesheetSaved";
 }

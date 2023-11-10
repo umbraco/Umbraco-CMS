@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events.Stylesheet;
 
+[WebhookEvent("Template Deleted")]
 public class TemplateDeletedWebhookEvent : WebhookEventBase<TemplateDeletedNotification>
 {
     public TemplateDeletedWebhookEvent(
@@ -13,7 +14,9 @@ public class TemplateDeletedWebhookEvent : WebhookEventBase<TemplateDeletedNotif
         IWebHookService webHookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
         IServerRoleAccessor serverRoleAccessor)
-        : base(webhookFiringService, webHookService, webhookSettings, serverRoleAccessor, "Template Deleted")
+        : base(webhookFiringService, webHookService, webhookSettings, serverRoleAccessor)
     {
     }
+
+    public override string Alias => "templateDeleted";
 }

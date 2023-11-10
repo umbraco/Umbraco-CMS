@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events.Relation;
 
+[WebhookEvent("Relation Saved")]
 public class RelationSavedWebhookEvent : WebhookEventBase<RelationSavedNotification>
 {
     public RelationSavedWebhookEvent(
@@ -13,7 +14,9 @@ public class RelationSavedWebhookEvent : WebhookEventBase<RelationSavedNotificat
         IWebHookService webHookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
         IServerRoleAccessor serverRoleAccessor)
-        : base(webhookFiringService, webHookService, webhookSettings, serverRoleAccessor, "Relation Saved")
+        : base(webhookFiringService, webHookService, webhookSettings, serverRoleAccessor)
     {
     }
+
+    public override string Alias => "relationSaved";
 }

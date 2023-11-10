@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events.Stylesheet;
 
+[WebhookEvent("Stylesheet Deleted")]
 public class StylesheetDeletedWebhookEvent : WebhookEventBase<StylesheetDeletedNotification>
 {
     public StylesheetDeletedWebhookEvent(
@@ -13,7 +14,9 @@ public class StylesheetDeletedWebhookEvent : WebhookEventBase<StylesheetDeletedN
         IWebHookService webHookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
         IServerRoleAccessor serverRoleAccessor)
-        : base(webhookFiringService, webHookService, webhookSettings, serverRoleAccessor, "Stylesheet Deleted")
+        : base(webhookFiringService, webHookService, webhookSettings, serverRoleAccessor)
     {
     }
+
+    public override string Alias => "stylesheetDeleted";
 }

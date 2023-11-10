@@ -10,13 +10,13 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events;
 
-[WebhookEvent("Media was saved", Constants.WebhookEvents.Types.Media)]
-public class MediaSaveWebhookEvent : WebhookEventContentBase<MediaSavedNotification, IMedia>
+[WebhookEvent("Media Saved", Constants.WebhookEvents.Types.Media)]
+public class MediaSavedWebhookEvent : WebhookEventContentBase<MediaSavedNotification, IMedia>
 {
     private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
     private readonly IApiMediaBuilder _apiMediaBuilder;
 
-    public MediaSaveWebhookEvent(
+    public MediaSavedWebhookEvent(
         IWebhookFiringService webhookFiringService,
         IWebHookService webHookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,

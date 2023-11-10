@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events.Language;
 
+[WebhookEvent("Language Saved")]
 public class LanguageSavedWebhookEvent : WebhookEventBase<LanguageSavedNotification>
 {
     public LanguageSavedWebhookEvent(
@@ -13,7 +14,9 @@ public class LanguageSavedWebhookEvent : WebhookEventBase<LanguageSavedNotificat
         IWebHookService webHookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
         IServerRoleAccessor serverRoleAccessor)
-        : base(webhookFiringService, webHookService, webhookSettings, serverRoleAccessor, "Language Saved")
+        : base(webhookFiringService, webHookService, webhookSettings, serverRoleAccessor)
     {
     }
+
+    public override string Alias => "languageSaved";
 }

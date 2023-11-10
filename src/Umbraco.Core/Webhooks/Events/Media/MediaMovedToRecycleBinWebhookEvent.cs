@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events.Media;
 
+[WebhookEvent("Media Moved to Recycle Bin", Constants.WebhookEvents.Types.Media)]
 public class MediaMovedToRecycleBinWebhookEvent : WebhookEventContentBase<MediaMovedToRecycleBinNotification, IMedia>
 {
     public MediaMovedToRecycleBinWebhookEvent(
@@ -18,10 +19,11 @@ public class MediaMovedToRecycleBinWebhookEvent : WebhookEventContentBase<MediaM
             webhookFiringService,
             webHookService,
             webhookSettings,
-            serverRoleAccessor,
-            "Media Moved to Recycle Bin")
+            serverRoleAccessor)
     {
     }
+
+    public override string Alias => "mediaMovedToRecycleBin";
 
     protected override IEnumerable<IMedia> GetEntitiesFromNotification(MediaMovedToRecycleBinNotification notification) => notification.MoveInfoCollection.Select(x => x.Entity);
 

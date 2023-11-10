@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events.Media;
 
+[WebhookEvent("Media Type Changed")]
 public class MediaTypeChangedWebhookEvent : WebhookEventBase<MediaTypeChangedNotification>
 {
     public MediaTypeChangedWebhookEvent(
@@ -13,7 +14,9 @@ public class MediaTypeChangedWebhookEvent : WebhookEventBase<MediaTypeChangedNot
         IWebHookService webHookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
         IServerRoleAccessor serverRoleAccessor)
-        : base(webhookFiringService, webHookService, webhookSettings, serverRoleAccessor, "Media Type Changed")
+        : base(webhookFiringService, webHookService, webhookSettings, serverRoleAccessor)
     {
     }
+
+    public override string Alias => "mediaTypeChanged";
 }

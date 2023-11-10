@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events.Media;
 
+[WebhookEvent("Media Moved", Constants.WebhookEvents.Types.Media)]
 public class MediaMovedWebhookEvent : WebhookEventContentBase<MediaMovedNotification, IMedia>
 {
     public MediaMovedWebhookEvent(
@@ -18,10 +19,11 @@ public class MediaMovedWebhookEvent : WebhookEventContentBase<MediaMovedNotifica
             webhookFiringService,
             webHookService,
             webhookSettings,
-            serverRoleAccessor,
-            "Media Moved")
+            serverRoleAccessor)
     {
     }
+
+    public override string Alias => "mediaMoved";
 
     protected override IEnumerable<IMedia> GetEntitiesFromNotification(MediaMovedNotification notification) => notification.MoveInfoCollection.Select(x => x.Entity);
 

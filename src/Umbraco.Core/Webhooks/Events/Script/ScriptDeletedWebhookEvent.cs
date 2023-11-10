@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events.Script;
 
+[WebhookEvent("Script Deleted")]
 public class ScriptDeletedWebhookEvent : WebhookEventBase<ScriptDeletedNotification>
 {
     public ScriptDeletedWebhookEvent(
@@ -13,7 +14,9 @@ public class ScriptDeletedWebhookEvent : WebhookEventBase<ScriptDeletedNotificat
         IWebHookService webHookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
         IServerRoleAccessor serverRoleAccessor)
-        : base(webhookFiringService, webHookService, webhookSettings, serverRoleAccessor, "Script Deleted")
+        : base(webhookFiringService, webHookService, webhookSettings, serverRoleAccessor)
     {
     }
+
+    public override string Alias => "scriptDeleted";
 }

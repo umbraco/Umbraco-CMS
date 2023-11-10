@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events.Relation;
 
+[WebhookEvent("Relation Type Deleted")]
 public class RelationTypeDeletedWebhookEvent : WebhookEventBase<RelationTypeDeletedNotification>
 {
     public RelationTypeDeletedWebhookEvent(
@@ -13,7 +14,10 @@ public class RelationTypeDeletedWebhookEvent : WebhookEventBase<RelationTypeDele
         IWebHookService webHookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
         IServerRoleAccessor serverRoleAccessor)
-        : base(webhookFiringService, webHookService, webhookSettings, serverRoleAccessor, "Relation Item Deleted")
+        : base(webhookFiringService, webHookService, webhookSettings, serverRoleAccessor)
     {
     }
+
+
+    public override string Alias => "relationTypeDeleted";
 }
