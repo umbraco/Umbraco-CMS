@@ -2,7 +2,7 @@ import { expect, fixture } from '@open-wc/testing';
 import { UmbExtensionRegistry } from '../registry/extension.registry.js';
 import { ManifestCondition, ManifestWithDynamicConditions, UmbConditionConfigBase } from '../types.js';
 import { UmbExtensionCondition } from '../condition/extension-condition.interface.js';
-import { PermittedControllerType, UmbBaseExtensionController, UmbBaseExtensionsController } from './index.js';
+import { PermittedControllerType, UmbBaseExtensionInitializer, UmbBaseExtensionsInitializer } from './index.js';
 import {
 	UmbBaseController,
 	UmbControllerHost,
@@ -13,14 +13,14 @@ import { customElement, html } from '@umbraco-cms/backoffice/external/lit';
 @customElement('umb-test-controller-host')
 class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
 
-class UmbTestExtensionController extends UmbBaseExtensionController {
+class UmbTestExtensionController extends UmbBaseExtensionInitializer {
 	constructor(
 		host: UmbControllerHost,
 		extensionRegistry: UmbExtensionRegistry<ManifestWithDynamicConditions>,
 		alias: string,
 		onPermissionChanged: (isPermitted: boolean, controller: UmbTestExtensionController) => void
 	) {
-		super(host, extensionRegistry, alias, onPermissionChanged);
+		super(host, extensionRegistry, 'test_', alias, onPermissionChanged);
 		this._init();
 	}
 
@@ -41,7 +41,7 @@ type myTestManifestTypes = myTestManifestTypesUnion | myTestManifestTypesUnion[]
 
 class UmbTestExtensionsController<
 	MyPermittedControllerType extends UmbTestExtensionController = PermittedControllerType<UmbTestExtensionController>
-> extends UmbBaseExtensionsController<
+> extends UmbBaseExtensionsInitializer<
 	myTestManifests,
 	myTestManifestTypesUnion,
 	ManifestWithDynamicConditions,
@@ -54,7 +54,7 @@ class UmbTestExtensionsController<
 		extensionRegistry: UmbExtensionRegistry<ManifestWithDynamicConditions>,
 		type: myTestManifestTypes,
 		filter: null | ((manifest: ManifestWithDynamicConditions) => boolean),
-		onChange: (permittedManifests: Array<MyPermittedControllerType>, controller: MyPermittedControllerType) => void
+		onChange: (permittedManifests: Array<MyPermittedControllerType>) => void
 	) {
 		super(host, extensionRegistry, type, filter, onChange);
 		this.#host = host;

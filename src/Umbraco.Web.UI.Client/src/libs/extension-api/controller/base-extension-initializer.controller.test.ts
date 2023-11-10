@@ -13,21 +13,21 @@ import {
 } from '../../controller-api/controller-host-element.mixin.js';
 import { UmbBaseController } from '../../controller-api/controller.class.js';
 import { UmbControllerHost } from '../../controller-api/controller-host.interface.js';
-import { UmbBaseExtensionController } from './index.js';
+import { UmbBaseExtensionInitializer } from './index.js';
 import { customElement, html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbSwitchCondition } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-test-controller-host')
 export class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
 
-class UmbTestExtensionController extends UmbBaseExtensionController {
+class UmbTestExtensionController extends UmbBaseExtensionInitializer {
 	constructor(
 		host: UmbControllerHostElement,
 		extensionRegistry: UmbExtensionRegistry<ManifestWithDynamicConditions>,
 		alias: string,
 		onPermissionChanged: (isPermitted: boolean) => void
 	) {
-		super(host, extensionRegistry, alias, onPermissionChanged);
+		super(host, extensionRegistry, 'test_', alias, onPermissionChanged);
 		this._init();
 	}
 

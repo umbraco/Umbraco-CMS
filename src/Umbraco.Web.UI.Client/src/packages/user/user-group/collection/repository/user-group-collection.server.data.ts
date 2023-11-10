@@ -1,6 +1,6 @@
 import type { UmbUserGroupCollectionFilterModel } from '../../types.js';
 import type { UmbCollectionDataSource } from '@umbraco-cms/backoffice/repository';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { UserGroupResponseModel, UserGroupResource } from '@umbraco-cms/backoffice/backend-api';
 
@@ -11,14 +11,14 @@ import { UserGroupResponseModel, UserGroupResource } from '@umbraco-cms/backoffi
  * @implements {RepositoryDetailDataSource}
  */
 export class UmbUserGroupCollectionServerDataSource implements UmbCollectionDataSource<UserGroupResponseModel> {
-	#host: UmbControllerHostElement;
+	#host: UmbControllerHost;
 
 	/**
 	 * Creates an instance of UmbUserGroupCollectionServerDataSource.
-	 * @param {UmbControllerHostElement} host
+	 * @param {UmbControllerHost} host
 	 * @memberof UmbUserGroupCollectionServerDataSource
 	 */
-	constructor(host: UmbControllerHostElement) {
+	constructor(host: UmbControllerHost) {
 		this.#host = host;
 	}
 

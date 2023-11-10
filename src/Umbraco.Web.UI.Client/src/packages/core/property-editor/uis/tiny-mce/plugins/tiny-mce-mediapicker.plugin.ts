@@ -35,7 +35,7 @@ export default class UmbTinyMceMediaPickerPlugin extends UmbTinyMcePluginBase {
 
 		this.#mediaHelper = new UmbMediaHelper();
 
-		this.host.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (modalContext) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (modalContext) => {
 			this.#modalContext = modalContext;
 		});
 
@@ -57,7 +57,7 @@ export default class UmbTinyMceMediaPickerPlugin extends UmbTinyMcePluginBase {
 	async #observeCurrentUser() {
 		if (!this.#currentUserContext) return;
 
-		this.host.observe(this.#currentUserContext.currentUser, (currentUser) => (this.#currentUser = currentUser));
+		this.observe(this.#currentUserContext.currentUser, (currentUser) => (this.#currentUser = currentUser));
 	}
 
 	async #onAction() {

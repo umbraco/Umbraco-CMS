@@ -1,4 +1,4 @@
-import { UmbEntityBulkAction } from './entity-bulk-action.js';
+import { UmbEntityBulkAction, UmbEntityBulkActionBase } from './entity-bulk-action.js';
 import { UmbActionExecutedEvent } from '@umbraco-cms/backoffice/event';
 import { html, ifDefined, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { ManifestEntityBulkAction } from '@umbraco-cms/backoffice/extension-registry';
@@ -41,7 +41,7 @@ export class UmbEntityBulkActionElement extends UmbLitElement {
 		this.#api = await createExtensionApi(this._manifest, [this, this._manifest.meta.repositoryAlias, this._selection]);
 	}
 
-	#api?: UmbEntityBulkAction;
+	#api?: UmbEntityBulkActionBase;
 
 	async #onClick(event: PointerEvent) {
 		if (!this.#api) return;

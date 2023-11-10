@@ -1,6 +1,6 @@
 import { UmbControllerHostElement, UmbControllerHostElementMixin } from './controller-host-element.mixin.js';
 
-export class UmbControllerHostInitializerElement
+export class UmbControllerHostProviderElement
 	extends UmbControllerHostElementMixin(HTMLElement)
 	implements UmbControllerHostElement
 {
@@ -25,10 +25,10 @@ export class UmbControllerHostInitializerElement
 	}
 }
 
-customElements.define('umb-controller-host-initializer', UmbControllerHostInitializerElement);
+customElements.define('umb-controller-host-provider', UmbControllerHostProviderElement);
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-controller-host-initializer': UmbControllerHostInitializerElement;
+		'umb-controller-host-provider': UmbControllerHostProviderElement;
 	}
 }

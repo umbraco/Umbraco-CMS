@@ -8,7 +8,7 @@ import {
 } from '@umbraco-cms/backoffice/extension-api';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
-export abstract class UmbBaseExtensionController<
+export abstract class UmbBaseExtensionInitializer<
 	ManifestType extends ManifestWithDynamicConditions = ManifestWithDynamicConditions,
 	SubClassType = never
 > extends UmbBaseController {
@@ -19,7 +19,7 @@ export abstract class UmbBaseExtensionController<
 	#overwrites: Array<string> = [];
 	#manifest?: ManifestType;
 	#conditionControllers: Array<UmbExtensionCondition> = [];
-	#onPermissionChanged: (isPermitted: boolean, controller: SubClassType) => void;
+	#onPermissionChanged?: (isPermitted: boolean, controller: SubClassType) => void;
 	protected _positive?: boolean;
 	#isPermitted?: boolean;
 
@@ -51,10 +51,11 @@ export abstract class UmbBaseExtensionController<
 	constructor(
 		host: UmbControllerHost,
 		extensionRegistry: UmbExtensionRegistry<ManifestCondition>,
+		extensionTypeName: string,
 		alias: string,
-		onPermissionChanged: (isPermitted: boolean, controller: SubClassType) => void
+		onPermissionChanged?: (isPermitted: boolean, controller: SubClassType) => void
 	) {
-		super(host, alias);
+		super(host, extensionTypeName+alias);
 		this.#extensionRegistry = extensionRegistry;
 		this.#alias = alias;
 		this.#onPermissionChanged = onPermissionChanged;
@@ -202,7 +203,7 @@ export abstract class UmbBaseExtensionController<
 				this.#promiseResolvers.forEach((x) => x());
 				this.#promiseResolvers = [];
 			}
-			this.#onPermissionChanged(this.#isPermitted, this as any);
+			this.#onPermissionChanged?.(this.#isPermitted, this as any);
 		}
 	};
 
@@ -210,7 +211,7 @@ export abstract class UmbBaseExtensionController<
 
 	protected abstract _conditionsAreBad(): Promise<void>;
 
-	public equal(otherClass: UmbBaseExtensionController | undefined): boolean {
+	public equal(otherClass: UmbBaseExtensionInitializer | undefined): boolean {
 		return otherClass?.manifest === this.manifest;
 	}
 
@@ -219,7 +220,7 @@ export abstract class UmbBaseExtensionController<
 		if (this.#isPermitted === true) {
 			this.#isPermitted = undefined;
 			this._conditionsAreBad();
-			this.#onPermissionChanged(false, this as any);
+			this.#onPermissionChanged?.(false, this as any);
 		}
 		super.destroy();
 		// Destroy the conditions controllers, are begin destroyed cause they are controllers.
