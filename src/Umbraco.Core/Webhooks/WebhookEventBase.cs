@@ -31,13 +31,13 @@ public abstract class WebhookEventBase<TNotification> : IWebhookEvent, INotifica
 
     protected WebhookEventBase(
         IWebhookFiringService webhookFiringService,
-        IWebhookService webHookService,
+        IWebhookService webhookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
         IServerRoleAccessor serverRoleAccessor)
     {
 
         WebhookFiringService = webhookFiringService;
-        WebhookService = webHookService;
+        WebhookService = webhookService;
         _serverRoleAccessor = serverRoleAccessor;
 
         // assign properties based on the attribute, if it is found

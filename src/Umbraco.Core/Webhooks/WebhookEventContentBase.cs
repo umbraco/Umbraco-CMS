@@ -14,10 +14,10 @@ public abstract class WebhookEventContentBase<TNotification, TEntity> : WebhookE
 {
     protected WebhookEventContentBase(
         IWebhookFiringService webhookFiringService,
-        IWebhookService webHookService,
+        IWebhookService webhookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
         IServerRoleAccessor serverRoleAccessor)
-        : base(webhookFiringService, webHookService, webhookSettings, serverRoleAccessor)
+        : base(webhookFiringService, webhookService, webhookSettings, serverRoleAccessor)
     {
     }
 
