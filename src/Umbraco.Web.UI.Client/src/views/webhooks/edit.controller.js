@@ -75,8 +75,8 @@
         }
 
         function openEventPicker() {
-          editorService.eventPicker({
-            title: "Select event",
+
+          const dialog = {
             selectedEvents: vm.webhook.events,
             submit(model) {
               vm.webhook.events = model.selection;
@@ -85,6 +85,11 @@
             close() {
               editorService.close();
             }
+          };
+
+          localizationService.localize("defaultdialogs_selectEvent").then(value => {
+            dialog.title = value;
+            editorService.eventPicker(dialog);
           });
         }
 

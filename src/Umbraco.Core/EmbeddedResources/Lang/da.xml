@@ -532,6 +532,7 @@
     <key alias="openInNewWindow">Åben linket i et nyt vindue eller fane</key>
     <key alias="linkToMedia">Link til medie</key>
     <key alias="selectContentStartNode">Vælg startnode for indhold</key>
+    <key alias="selectEvent">Vælg event</key>
     <key alias="selectMedia">Vælg medie</key>
     <key alias="selectMediaType">Vælg medietype</key>
     <key alias="selectIcon">Vælg ikon</key>
