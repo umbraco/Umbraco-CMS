@@ -25,7 +25,7 @@ const workspaceEditorViews: Array<ManifestWorkspaceEditorView> = [
 		meta: {
 			label: 'Design',
 			pathname: 'design',
-			icon: 'umb:document-dashed-line',
+			icon: 'icon-document-dashed-line',
 		},
 		conditions: [
 			{
@@ -43,7 +43,7 @@ const workspaceEditorViews: Array<ManifestWorkspaceEditorView> = [
 		meta: {
 			label: 'Structure',
 			pathname: 'structure',
-			icon: 'umb:mindmap',
+			icon: 'icon-mindmap',
 		},
 		conditions: [
 			{
@@ -61,7 +61,7 @@ const workspaceEditorViews: Array<ManifestWorkspaceEditorView> = [
 		meta: {
 			label: 'Settings',
 			pathname: 'settings',
-			icon: 'umb:settings',
+			icon: 'icon-settings',
 		},
 		conditions: [
 			{
@@ -79,7 +79,7 @@ const workspaceEditorViews: Array<ManifestWorkspaceEditorView> = [
 		meta: {
 			label: 'Templates',
 			pathname: 'templates',
-			icon: 'umb:layout',
+			icon: 'icon-layout',
 		},
 		conditions: [
 			{

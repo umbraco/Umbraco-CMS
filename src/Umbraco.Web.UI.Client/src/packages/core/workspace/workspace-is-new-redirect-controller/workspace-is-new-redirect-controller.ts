@@ -17,7 +17,7 @@ export class UmbWorkspaceIsNewRedirectController extends UmbBaseController {
 	constructor(
 		host: UmbControllerHost,
 		workspaceContext: UmbWorkspaceContext<unknown, UmbEntityBase>,
-		router: UmbRouterSlotElement
+		router: UmbRouterSlotElement,
 	) {
 		super(host);
 
@@ -38,7 +38,7 @@ export class UmbWorkspaceIsNewRedirectController extends UmbBaseController {
 					}
 				}
 			},
-			'_observeIsNew'
+			'_observeIsNew',
 		);
 	}
 }

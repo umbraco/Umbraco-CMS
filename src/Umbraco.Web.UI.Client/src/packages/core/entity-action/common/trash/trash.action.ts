@@ -16,7 +16,7 @@ export class UmbTrashEntityAction<
 	constructor(host: UmbControllerHostElement, repositoryAlias: string, unique: string) {
 		super(host, repositoryAlias, unique);
 
-		new UmbContextConsumerController(this.host, UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
+		new UmbContextConsumerController(this._host, UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
 			this.#modalContext = instance;
 		});
 	}

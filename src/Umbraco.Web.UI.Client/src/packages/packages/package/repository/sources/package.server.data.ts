@@ -1,5 +1,5 @@
 import { PackageResource } from '@umbraco-cms/backoffice/backend-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
@@ -7,7 +7,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
  * @export
  */
 export class UmbPackageServerDataSource {
-	constructor(private readonly host: UmbControllerHostElement) {}
+	constructor(private readonly host: UmbControllerHost) {}
 
 	/**
 	 * Get the root items from the server

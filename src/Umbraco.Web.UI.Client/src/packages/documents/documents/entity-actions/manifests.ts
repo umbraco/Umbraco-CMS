@@ -25,7 +25,7 @@ const entityActions: Array<ManifestTypes> = [
 		weight: 800,
 		api: UmbCreateDocumentBlueprintEntityAction,
 		meta: {
-			icon: 'umb:blueprint',
+			icon: 'icon-blueprint',
 			label: 'Create Document Blueprint (TBD)',
 			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
 			entityTypes: [DOCUMENT_ENTITY_TYPE],
@@ -38,7 +38,7 @@ const entityActions: Array<ManifestTypes> = [
 		weight: 700,
 		api: UmbMoveEntityAction,
 		meta: {
-			icon: 'umb:enter',
+			icon: 'icon-enter',
 			label: 'Move (TBD)',
 			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
 			entityTypes: [DOCUMENT_ENTITY_TYPE],
@@ -51,7 +51,7 @@ const entityActions: Array<ManifestTypes> = [
 		weight: 600,
 		api: UmbCopyEntityAction,
 		meta: {
-			icon: 'umb:documents',
+			icon: 'icon-documents',
 			label: 'Copy (TBD)',
 			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
 			entityTypes: [DOCUMENT_ENTITY_TYPE],
@@ -64,7 +64,7 @@ const entityActions: Array<ManifestTypes> = [
 		weight: 500,
 		api: UmbSortChildrenOfEntityAction,
 		meta: {
-			icon: 'umb:navigation-vertical',
+			icon: 'icon-navigation-vertical',
 			label: 'Sort (TBD)',
 			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
 			entityTypes: [DOCUMENT_ROOT_ENTITY_TYPE, DOCUMENT_ENTITY_TYPE],
@@ -77,7 +77,7 @@ const entityActions: Array<ManifestTypes> = [
 		weight: 400,
 		api: UmbDocumentCultureAndHostnamesEntityAction,
 		meta: {
-			icon: 'umb:home',
+			icon: 'icon-home',
 			label: 'Culture And Hostnames (TBD)',
 			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
 			entityTypes: [DOCUMENT_ENTITY_TYPE],
@@ -89,7 +89,7 @@ const entityActions: Array<ManifestTypes> = [
 		name: 'Document Permissions Entity Action',
 		api: UmbDocumentPublicAccessEntityAction,
 		meta: {
-			icon: 'umb:lock',
+			icon: 'icon-lock',
 			label: 'Public Access (TBD)',
 			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
 			entityTypes: [DOCUMENT_ENTITY_TYPE],
@@ -101,7 +101,7 @@ const entityActions: Array<ManifestTypes> = [
 		name: 'Publish Document Entity Action',
 		api: UmbPublishDocumentEntityAction,
 		meta: {
-			icon: 'umb:globe',
+			icon: 'icon-globe',
 			label: 'Publish (TBD)',
 			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
 			entityTypes: [DOCUMENT_ENTITY_TYPE],
@@ -113,7 +113,7 @@ const entityActions: Array<ManifestTypes> = [
 		name: 'Unpublish Document Entity Action',
 		api: UmbUnpublishDocumentEntityAction,
 		meta: {
-			icon: 'umb:globe',
+			icon: 'icon-globe',
 			label: 'Unpublish (TBD)',
 			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
 			entityTypes: [DOCUMENT_ENTITY_TYPE],
@@ -125,7 +125,7 @@ const entityActions: Array<ManifestTypes> = [
 		name: 'Rollback Document Entity Action',
 		api: UmbRollbackDocumentEntityAction,
 		meta: {
-			icon: 'umb:undo',
+			icon: 'icon-undo',
 			label: 'Rollback (TBD)',
 			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
 			entityTypes: [DOCUMENT_ENTITY_TYPE],

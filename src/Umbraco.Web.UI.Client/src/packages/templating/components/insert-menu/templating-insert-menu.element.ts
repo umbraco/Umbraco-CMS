@@ -113,7 +113,7 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 		return html`
 			<uui-button-group>
 				<uui-button look="secondary" @click=${this.#openChooseTypeModal} label="Choose value to insert">
-					<uui-icon name="umb:add"></uui-icon>Insert</uui-button
+					<uui-icon name="icon-add"></uui-icon>Insert</uui-button
 				>
 				<umb-button-with-dropdown
 					look="secondary"
@@ -186,7 +186,7 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 				--umb-button-with-dropdown-symbol-expand-margin-left: 0;
 			}
 
-			uui-icon[name='umb:add'] {
+			uui-icon[name='icon-add'] {
 				margin-right: var(--uui-size-4);
 			}
 		`,

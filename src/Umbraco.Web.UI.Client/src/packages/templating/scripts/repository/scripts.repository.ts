@@ -22,18 +22,18 @@ import {
 	TextFileResponseModelBaseModel,
 	UpdateScriptRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
-import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbBaseController, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
+import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
-export class UmbScriptsRepository
+export class UmbScriptsRepository extends UmbBaseController
 	implements
 		UmbTreeRepository<FileSystemTreeItemPresentationModel>,
 		UmbDetailRepository<CreateScriptRequestModel, string, UpdateScriptRequestModel, ScriptResponseModel, string>,
-		UmbFolderRepository
+		UmbFolderRepository,
+		UmbApi
 {
 	#init;
-	#host: UmbControllerHostElement;
 
 	#treeDataSource: UmbScriptsTreeServerDataSource;
 	#detailDataSource: UmbScriptsServerDataSource;
@@ -41,18 +41,16 @@ export class UmbScriptsRepository
 
 	#treeStore?: UmbScriptsTreeStore;
 
-	constructor(host: UmbControllerHostElement) {
-		this.#host = host;
+	constructor(host: UmbControllerHost) {
+		super(host);
 
-		this.#treeDataSource = new UmbScriptsTreeServerDataSource(this.#host);
-		this.#detailDataSource = new UmbScriptsServerDataSource(this.#host);
-		this.#folderDataSource = new UmbScriptsFolderServerDataSource(this.#host);
+		this.#treeDataSource = new UmbScriptsTreeServerDataSource(this);
+		this.#detailDataSource = new UmbScriptsServerDataSource(this);
+		this.#folderDataSource = new UmbScriptsFolderServerDataSource(this);
 
-		this.#init = Promise.all([
-			new UmbContextConsumerController(this.#host, UMB_SCRIPTS_TREE_STORE_CONTEXT_TOKEN, (instance) => {
-				this.#treeStore = instance;
-			}),
-		]);
+		this.#init = this.consumeContext(UMB_SCRIPTS_TREE_STORE_CONTEXT_TOKEN, (instance) => {
+			this.#treeStore = instance;
+		}).asPromise();
 	}
 
 	//#region FOLDER
@@ -110,7 +108,7 @@ export class UmbScriptsRepository
 			path: null,
 			type: SCRIPTS_ROOT_ENTITY_TYPE,
 			name: 'Scripts',
-			icon: 'umb:folder',
+			icon: 'icon-folder',
 			hasChildren: true,
 		};
 		return { data };

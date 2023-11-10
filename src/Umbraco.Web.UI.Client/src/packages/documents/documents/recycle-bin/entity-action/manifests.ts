@@ -10,7 +10,7 @@ export const manifests = [
 		weight: 900,
 		api: UmbTrashEntityAction,
 		meta: {
-			icon: 'umb:trash',
+			icon: 'icon-trash',
 			label: 'Trash',
 			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
 			entityTypes: [DOCUMENT_ENTITY_TYPE],

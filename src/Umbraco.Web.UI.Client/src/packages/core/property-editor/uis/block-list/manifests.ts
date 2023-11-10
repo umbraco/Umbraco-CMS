@@ -9,7 +9,7 @@ const manifest: ManifestPropertyEditorUi = {
 	meta: {
 		label: 'Block List',
 		propertyEditorSchemaAlias: 'Umbraco.BlockList',
-		icon: 'umb:thumbnail-list',
+		icon: 'icon-thumbnail-list',
 		group: 'lists',
 		settings: {
 			properties: [

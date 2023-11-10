@@ -24,7 +24,7 @@ const stylesheetActions: Array<ManifestEntityAction> = [
 		name: 'Delete Stylesheet Entity Action',
 		api: UmbDeleteEntityAction,
 		meta: {
-			icon: 'umb:trash',
+			icon: 'icon-trash',
 			label: 'Delete',
 			repositoryAlias: STYLESHEET_REPOSITORY_ALIAS,
 			entityTypes: [STYLESHEET_ENTITY_TYPE],
@@ -41,7 +41,7 @@ const stylesheetFolderActions: Array<ManifestEntityAction> = [
 		name: 'Create Stylesheet Entity Under Directory Action',
 		api: UmbCreateStylesheetAction,
 		meta: {
-			icon: 'umb:script',
+			icon: 'icon-script',
 			label: 'New stylesheet file',
 			repositoryAlias: STYLESHEET_REPOSITORY_ALIAS,
 			entityTypes: [STYLESHEET_FOLDER_ENTITY_TYPE, STYLESHEET_FOLDER_EMPTY_ENTITY_TYPE, STYLESHEET_ROOT_ENTITY_TYPE],
@@ -53,7 +53,7 @@ const stylesheetFolderActions: Array<ManifestEntityAction> = [
 		name: 'Create RTF Stylesheet Entity Under Directory Action',
 		api: UmbCreateRTFStylesheetAction,
 		meta: {
-			icon: 'umb:script',
+			icon: 'icon-script',
 			label: 'New Rich Text Editor style sheet file',
 			repositoryAlias: STYLESHEET_REPOSITORY_ALIAS,
 			entityTypes: [STYLESHEET_FOLDER_ENTITY_TYPE, STYLESHEET_FOLDER_EMPTY_ENTITY_TYPE, STYLESHEET_ROOT_ENTITY_TYPE],
@@ -65,7 +65,7 @@ const stylesheetFolderActions: Array<ManifestEntityAction> = [
 		name: 'Remove empty folder',
 		api: UmbDeleteFolderEntityAction,
 		meta: {
-			icon: 'umb:trash',
+			icon: 'icon-trash',
 			label: 'Remove folder',
 			repositoryAlias: STYLESHEET_REPOSITORY_ALIAS,
 			entityTypes: [STYLESHEET_FOLDER_EMPTY_ENTITY_TYPE],
@@ -77,7 +77,7 @@ const stylesheetFolderActions: Array<ManifestEntityAction> = [
 		name: 'Create empty folder',
 		api: UmbCreateFolderEntityAction,
 		meta: {
-			icon: 'umb:add',
+			icon: 'icon-add',
 			label: 'Create folder',
 			repositoryAlias: STYLESHEET_REPOSITORY_ALIAS,
 			entityTypes: [STYLESHEET_FOLDER_EMPTY_ENTITY_TYPE, STYLESHEET_FOLDER_ENTITY_TYPE, STYLESHEET_ROOT_ENTITY_TYPE],

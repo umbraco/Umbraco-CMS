@@ -101,7 +101,7 @@ export class UmbInputMediaElement extends FormControlMixin(UmbLitElement) {
 		if (this._items && this.max && this._items.length >= this.max) return;
 		return html`
 			<uui-button id="add-button" look="placeholder" @click=${() => this.#pickerContext.openPicker()} label="open">
-				<uui-icon name="umb:add"></uui-icon>
+				<uui-icon name="icon-add"></uui-icon>
 				Add
 			</uui-button>
 		`;
@@ -116,10 +116,10 @@ export class UmbInputMediaElement extends FormControlMixin(UmbLitElement) {
 				<!-- <uui-tag size="s" slot="tag" color="danger">Trashed</uui-tag> -->
 				<uui-action-bar slot="actions">
 					<uui-button label="Copy media">
-						<uui-icon name="umb:documents"></uui-icon>
+						<uui-icon name="icon-documents"></uui-icon>
 					</uui-button>
 					<uui-button @click=${() => this.#pickerContext.requestRemoveItem(item.id!)} label="Remove media ${item.name}">
-						<uui-icon name="umb:trash"></uui-icon>
+						<uui-icon name="icon-trash"></uui-icon>
 					</uui-button>
 				</uui-action-bar>
 			</uui-card-media>

@@ -118,7 +118,7 @@ export class UmbPartialViewWorkspaceEditElement extends UmbLitElement {
 				<div slot="header" id="code-editor-menu-container">
 					<umb-templating-insert-menu @insert=${this.#insertSnippet}></umb-templating-insert-menu>
 					<uui-button look="secondary" id="query-builder-button" label="Query builder" @click=${this.#openQueryBuilder}>
-						<uui-icon name="umb:wand"></uui-icon>Query builder
+						<uui-icon name="icon-wand"></uui-icon>Query builder
 					</uui-button>
 				</div>
 				${this._ready
@@ -164,7 +164,7 @@ export class UmbPartialViewWorkspaceEditElement extends UmbLitElement {
 				width: 100%;
 			}
 
-			#code-editor-menu-container uui-icon:not([name='umb:delete']) {
+			#code-editor-menu-container uui-icon:not([name='icon-delete']) {
 				margin-right: var(--uui-size-space-3);
 			}
 

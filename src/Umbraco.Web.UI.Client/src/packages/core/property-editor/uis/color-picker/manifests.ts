@@ -8,7 +8,7 @@ export const manifest: ManifestPropertyEditorUi = {
 	meta: {
 		label: 'Color Picker',
 		propertyEditorSchemaAlias: 'Umbraco.ColorPicker',
-		icon: 'umb:colorpicker',
+		icon: 'icon-colorpicker',
 		group: 'pickers',
 	},
 };

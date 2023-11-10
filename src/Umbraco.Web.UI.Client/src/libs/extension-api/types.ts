@@ -94,13 +94,18 @@ export interface ManifestWithLoader<LoaderReturnType> extends ManifestBase {
 	/**
 	 * @TJS-ignore
 	 */
-	loader?: () => Promise<LoaderReturnType>;
+	loader?(): Promise<LoaderReturnType>;
+}
+
+// TODO: Rename this to something more descriptive:
+export interface UmbApi {
+	destroy?(): void;
 }
 
 /**
  * The type of extension such as dashboard etc...
  */
-export interface ManifestApi<ApiType = unknown>
+export interface ManifestApi<ApiType extends UmbApi = UmbApi>
 	extends ManifestWithLoader<{ default: ClassConstructor<ApiType> } | { api: ClassConstructor<ApiType> }> {
 	/**
 	 * @TJS-ignore
@@ -132,7 +137,7 @@ export interface ManifestWithLoaderIncludingDefaultExport<T = unknown>
 	js?: string;
 }
 
-export interface ManifestWithLoaderIncludingApiExport<ApiType = unknown>
+export interface ManifestWithLoaderIncludingApiExport<ApiType extends UmbApi = UmbApi>
 	extends ManifestWithLoader<{ api: ApiType } | Omit<object, 'api'>> {
 	/**
 	 * The file location of the javascript file to load
@@ -157,7 +162,7 @@ export interface ManifestWithLoaderIncludingElementExport<ElementType extends HT
 }
 export interface ManifestWithLoaderOptionalApiOrElementExport<
 	ElementType extends HTMLElement = HTMLElement,
-	ApiType = unknown,
+	ApiType extends UmbApi = UmbApi,
 	ClassType = { element: ElementType } | { api: ApiType } | { element: ElementType, api: ApiType } | Omit<Omit<object, 'element'>, 'api'>
 >
 extends ManifestWithLoader<ClassType> {
@@ -201,7 +206,7 @@ export interface ManifestElement<ElementType extends HTMLElement = HTMLElement>
 	meta?: unknown;
 }
 
-export interface ManifestElementAndApi<ElementType extends HTMLElement = HTMLElement, ApiType = unknown>
+export interface ManifestElementAndApi<ElementType extends HTMLElement = HTMLElement, ApiType extends UmbApi = UmbApi>
 	extends ManifestWithLoaderOptionalApiOrElementExport<ElementType, ApiType> {
 	/**
 	 * @TJS-ignore

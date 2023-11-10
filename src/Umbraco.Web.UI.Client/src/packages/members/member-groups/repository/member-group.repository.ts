@@ -3,19 +3,17 @@ import { UmbMemberGroupTreeStore, UMB_MEMBER_GROUP_TREE_STORE_CONTEXT_TOKEN } fr
 import { UmbMemberGroupDetailServerDataSource } from './sources/member-group.detail.server.data.js';
 import { UmbMemberGroupStore, UMB_MEMBER_GROUP_STORE_CONTEXT_TOKEN } from './member-group.store.js';
 import { UmbMemberGroupTreeServerDataSource } from './sources/member-group.tree.server.data.js';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbBaseController, type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
-import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import type { UmbTreeDataSource, UmbDetailRepository, UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
 import { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
 // TODO => Update type when backend updated
-export class UmbMemberGroupRepository
-	implements UmbTreeRepository<EntityTreeItemResponseModel>, UmbDetailRepository<any, any, any, any>
+export class UmbMemberGroupRepository extends UmbBaseController
+	implements UmbTreeRepository<EntityTreeItemResponseModel>, UmbDetailRepository<any, any, any, any>, UmbApi
 {
 	#init!: Promise<unknown>;
-
-	#host: UmbControllerHostElement;
 
 	#treeSource: UmbTreeDataSource;
 	#treeStore?: UmbMemberGroupTreeStore;
@@ -25,21 +23,21 @@ export class UmbMemberGroupRepository
 
 	#notificationContext?: UmbNotificationContext;
 
-	constructor(host: UmbControllerHostElement) {
-		this.#host = host;
+	constructor(host: UmbControllerHost) {
+		super(host)
 		// TODO: figure out how spin up get the correct data source
-		this.#treeSource = new UmbMemberGroupTreeServerDataSource(this.#host);
-		this.#detailSource = new UmbMemberGroupDetailServerDataSource(this.#host);
+		this.#treeSource = new UmbMemberGroupTreeServerDataSource(this);
+		this.#detailSource = new UmbMemberGroupDetailServerDataSource(this);
 
-		new UmbContextConsumerController(this.#host, UMB_MEMBER_GROUP_TREE_STORE_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_MEMBER_GROUP_TREE_STORE_CONTEXT_TOKEN, (instance) => {
 			this.#treeStore = instance;
 		});
 
-		new UmbContextConsumerController(this.#host, UMB_MEMBER_GROUP_STORE_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_MEMBER_GROUP_STORE_CONTEXT_TOKEN, (instance) => {
 			this.#store = instance;
 		});
 
-		new UmbContextConsumerController(this.#host, UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
 			this.#notificationContext = instance;
 		});
 	}
@@ -52,7 +50,7 @@ export class UmbMemberGroupRepository
 			id: null,
 			type: 'member-group-root',
 			name: 'Member Groups',
-			icon: 'umb:folder',
+			icon: 'icon-folder',
 			hasChildren: true,
 		};
 

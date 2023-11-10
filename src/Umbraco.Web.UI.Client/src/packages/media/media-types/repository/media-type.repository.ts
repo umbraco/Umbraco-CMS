@@ -4,8 +4,7 @@ import { UmbMediaTypeStore, UMB_MEDIA_TYPE_STORE_CONTEXT_TOKEN } from './media-t
 import { UmbMediaTypeTreeServerDataSource } from './sources/media-type.tree.server.data.js';
 import { UMB_MEDIA_TYPE_ITEM_STORE_CONTEXT_TOKEN, UmbMediaTypeItemStore } from './media-type-item.store.js';
 import { UmbMediaTypeItemServerDataSource } from './sources/media-type-item.server.data.js';
-import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbBaseController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 import {
 	UmbTreeRepository,
@@ -22,16 +21,16 @@ import {
 	MediaTypeResponseModel,
 	UpdateMediaTypeRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
+import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
-export class UmbMediaTypeRepository
+export class UmbMediaTypeRepository extends UmbBaseController
 	implements
 		UmbItemRepository<MediaTypeItemResponseModel>,
 		UmbTreeRepository<FolderTreeItemResponseModel>,
-		UmbDetailRepository<CreateMediaTypeRequestModel, any, UpdateMediaTypeRequestModel, MediaTypeResponseModel>
+		UmbDetailRepository<CreateMediaTypeRequestModel, any, UpdateMediaTypeRequestModel, MediaTypeResponseModel>,
+		UmbApi
 {
 	#init!: Promise<unknown>;
-
-	#host: UmbControllerHostElement;
 
 	#treeSource: UmbTreeDataSource;
 	#treeStore?: UmbMediaTypeTreeStore;
@@ -45,27 +44,27 @@ export class UmbMediaTypeRepository
 	#notificationContext?: UmbNotificationContext;
 
 	constructor(host: UmbControllerHostElement) {
-		this.#host = host;
+		super(host);
 
 		// TODO: figure out how spin up get the correct data source
-		this.#treeSource = new UmbMediaTypeTreeServerDataSource(this.#host);
-		this.#detailSource = new UmbMediaTypeDetailServerDataSource(this.#host);
-		this.#itemSource = new UmbMediaTypeItemServerDataSource(this.#host);
+		this.#treeSource = new UmbMediaTypeTreeServerDataSource(this);
+		this.#detailSource = new UmbMediaTypeDetailServerDataSource(this);
+		this.#itemSource = new UmbMediaTypeItemServerDataSource(this);
 
 		this.#init = Promise.all([
-			new UmbContextConsumerController(this.#host, UMB_MEDIA_TYPE_STORE_CONTEXT_TOKEN, (instance) => {
+			this.consumeContext(UMB_MEDIA_TYPE_STORE_CONTEXT_TOKEN, (instance) => {
 				this.#detailStore = instance;
 			}),
 
-			new UmbContextConsumerController(this.#host, UMB_MEDIA_TYPE_TREE_STORE_CONTEXT_TOKEN, (instance) => {
+			this.consumeContext(UMB_MEDIA_TYPE_TREE_STORE_CONTEXT_TOKEN, (instance) => {
 				this.#treeStore = instance;
 			}),
 
-			new UmbContextConsumerController(this.#host, UMB_MEDIA_TYPE_ITEM_STORE_CONTEXT_TOKEN, (instance) => {
+			this.consumeContext(UMB_MEDIA_TYPE_ITEM_STORE_CONTEXT_TOKEN, (instance) => {
 				this.#itemStore = instance;
 			}),
 
-			new UmbContextConsumerController(this.#host, UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
+			this.consumeContext(UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
 				this.#notificationContext = instance;
 			}),
 		]);
@@ -78,7 +77,7 @@ export class UmbMediaTypeRepository
 			id: null,
 			type: 'media-type-root',
 			name: 'Media Types',
-			icon: 'umb:folder',
+			icon: 'icon-folder',
 			hasChildren: true,
 		};
 

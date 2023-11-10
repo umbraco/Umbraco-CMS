@@ -3,8 +3,7 @@ import { UmbMemberTypeTreeServerDataSource } from './sources/member-type.tree.se
 import { UmbMemberTypeTreeStore, UMB_MEMBER_TYPE_TREE_STORE_CONTEXT_TOKEN } from './member-type.tree.store.js';
 import { UmbMemberTypeStore, UMB_MEMBER_TYPE_STORE_CONTEXT_TOKEN } from './member-type.store.js';
 import { UmbMemberTypeDetailServerDataSource } from './sources/member-type.detail.server.data.js';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
+import { UmbBaseController, type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbTreeDataSource, UmbDetailRepository, UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 import { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
@@ -13,10 +12,8 @@ import { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api
 type ItemType = any;
 type TreeItemType = EntityTreeItemResponseModel;
 
-export class UmbMemberTypeRepository implements UmbTreeRepository<TreeItemType>, UmbDetailRepository<ItemType> {
+export class UmbMemberTypeRepository extends UmbBaseController implements UmbTreeRepository<TreeItemType>, UmbDetailRepository<ItemType> {
 	#init!: Promise<unknown>;
-
-	#host: UmbControllerHostElement;
 
 	#treeSource: UmbTreeDataSource;
 	#treeStore?: UmbMemberTypeTreeStore;
@@ -26,23 +23,23 @@ export class UmbMemberTypeRepository implements UmbTreeRepository<TreeItemType>,
 
 	#notificationContext?: UmbNotificationContext;
 
-	constructor(host: UmbControllerHostElement) {
-		this.#host = host;
+	constructor(host: UmbControllerHost) {
+		super(host);
 
 		// TODO: figure out how spin up get the correct data source
-		this.#treeSource = new UmbMemberTypeTreeServerDataSource(this.#host);
-		this.#detailSource = new UmbMemberTypeDetailServerDataSource(this.#host);
+		this.#treeSource = new UmbMemberTypeTreeServerDataSource(this);
+		this.#detailSource = new UmbMemberTypeDetailServerDataSource(this);
 
 		this.#init = Promise.all([
-			new UmbContextConsumerController(this.#host, UMB_MEMBER_TYPE_STORE_CONTEXT_TOKEN, (instance) => {
+			this.consumeContext(UMB_MEMBER_TYPE_STORE_CONTEXT_TOKEN, (instance) => {
 				this.#store = instance;
 			}),
 
-			new UmbContextConsumerController(this.#host, UMB_MEMBER_TYPE_TREE_STORE_CONTEXT_TOKEN, (instance) => {
+			this.consumeContext(UMB_MEMBER_TYPE_TREE_STORE_CONTEXT_TOKEN, (instance) => {
 				this.#treeStore = instance;
 			}),
 
-			new UmbContextConsumerController(this.#host, UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
+			this.consumeContext(UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
 				this.#notificationContext = instance;
 			}),
 		]);
@@ -56,7 +53,7 @@ export class UmbMemberTypeRepository implements UmbTreeRepository<TreeItemType>,
 			id: null,
 			type: 'member-type-root',
 			name: 'Member Types',
-			icon: 'umb:folder',
+			icon: 'icon-folder',
 			hasChildren: true,
 		};
 

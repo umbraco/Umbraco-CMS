@@ -8,7 +8,7 @@ export const manifest: ManifestPropertyEditorUi = {
 	meta: {
 		label: 'Member Group Picker',
 		propertyEditorSchemaAlias: 'Umbraco.MemberGroupPicker',
-		icon: 'umb:users-alt',
+		icon: 'icon-users-alt',
 		group: 'people',
 	},
 };

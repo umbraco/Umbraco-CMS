@@ -47,7 +47,7 @@ export class UmbTemplateCardElement extends FormControlMixin(UmbLitElement) {
 	render() {
 		return html`<div id="card">
 			<button id="open-part" aria-label="Open ${this.name}" @click="${this.#openTemplate}">
-				<uui-icon class="logo" name="umb:layout"></uui-icon>
+				<uui-icon class="logo" name="icon-layout"></uui-icon>
 				<strong>${this.name.length ? this.name : 'Untitled template'}</strong>
 			</button>
 			<uui-button id="bottom" label="Default template" ?disabled="${this.default}" @click="${this.#setSelection}">

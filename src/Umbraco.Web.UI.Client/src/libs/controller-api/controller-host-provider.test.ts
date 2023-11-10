@@ -1,5 +1,5 @@
 import { expect, fixture, html } from '@open-wc/testing';
-import { UmbControllerHostInitializerElement } from './controller-host-initializer.element.js';
+import { UmbControllerHostProviderElement } from './controller-host-provider.element.js';
 import { UmbControllerHostElement, UmbControllerHostElementMixin } from './controller-host-element.mixin.js';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbContextConsumerController, UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
@@ -17,17 +17,17 @@ export class UmbTestControllerHostInitializerConsumerElement extends UmbControll
 }
 
 describe('UmbControllerHostTestElement', () => {
-	let element: UmbControllerHostInitializerElement;
+	let element: UmbControllerHostProviderElement;
 	let consumer: UmbTestControllerHostInitializerConsumerElement;
 	const contextValue = 'test-value';
 
 	beforeEach(async () => {
 		element = await fixture(
-			html` <umb-controller-host-initializer
+			html` <umb-controller-host-provider
 				.create=${(host: UmbControllerHostElement) =>
 					new UmbContextProviderController(host, 'my-test-context-alias', contextValue)}>
 				<umb-test-controller-host-initializer-consumer></umb-test-controller-host-initializer-consumer>
-			</umb-controller-host-initializer>`
+			</umb-controller-host-provider>`
 		);
 		consumer = element.getElementsByTagName(
 			'umb-test-controller-host-initializer-consumer'
@@ -35,7 +35,7 @@ describe('UmbControllerHostTestElement', () => {
 	});
 
 	it('element is defined with its own instance', () => {
-		expect(element).to.be.instanceOf(UmbControllerHostInitializerElement);
+		expect(element).to.be.instanceOf(UmbControllerHostProviderElement);
 	});
 
 	it('provides the context', () => {

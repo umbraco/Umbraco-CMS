@@ -256,7 +256,7 @@ export class UmbDataTypeWorkspaceContext
 	}
 
 	public destroy(): void {
-		this.#data.complete();
+		this.#data.destroy();
 	}
 }
 

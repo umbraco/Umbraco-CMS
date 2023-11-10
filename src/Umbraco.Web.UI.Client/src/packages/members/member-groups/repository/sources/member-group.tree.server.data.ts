@@ -1,5 +1,5 @@
 import { MemberGroupResource } from '@umbraco-cms/backoffice/backend-api';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbTreeDataSource } from '@umbraco-cms/backoffice/repository';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -10,14 +10,14 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
  * @implements {UmbTreeDataSource}
  */
 export class UmbMemberGroupTreeServerDataSource implements UmbTreeDataSource {
-	#host: UmbControllerHostElement;
+	#host: UmbControllerHost;
 
 	/**
 	 * Creates an instance of UmbMemberGroupTreeServerDataSource.
-	 * @param {UmbControllerHostElement} host
+	 * @param {UmbControllerHost} host
 	 * @memberof UmbMemberGroupTreeServerDataSource
 	 */
-	constructor(host: UmbControllerHostElement) {
+	constructor(host: UmbControllerHost) {
 		this.#host = host;
 	}
 

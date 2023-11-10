@@ -23,7 +23,7 @@ export default class UmbTinyMceMacroPickerPlugin extends UmbTinyMcePluginBase {
 	constructor(args: TinyMcePluginArguments) {
 		super(args);
 
-		this.host.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (modalContext) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (modalContext) => {
 			this.#modalContext = modalContext;
 		});
 

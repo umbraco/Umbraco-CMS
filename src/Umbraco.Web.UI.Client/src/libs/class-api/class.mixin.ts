@@ -23,7 +23,7 @@ type UmbClassMixinConstructor = new (
 declare class UmbClassMixinDeclaration implements UmbClassMixinInterface {
 	_host: UmbControllerHost;
 	observe<T>(
-		source: Observable<T> | { asObservable: () => Observable<T> },
+		source: Observable<T>,
 		callback: (_value: T) => void,
 		controllerAlias?: UmbControllerAlias
 	): UmbObserverController<T>;

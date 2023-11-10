@@ -61,7 +61,7 @@ export class UmbMemberGroupWorkspaceContext
 	}
 
 	public destroy(): void {
-		this.#data.complete();
+		this.#data.destroy();
 	}
 }
 

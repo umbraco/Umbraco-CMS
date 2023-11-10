@@ -11,7 +11,7 @@ const entityActions: Array<ManifestEntityAction> = [
 		name: 'Create Template Entity Action',
 		api: UmbCreateEntityAction,
 		meta: {
-			icon: 'umb:add',
+			icon: 'icon-add',
 			label: 'Create',
 			repositoryAlias: TEMPLATE_REPOSITORY_ALIAS,
 			entityTypes: [TEMPLATE_ENTITY_TYPE, TEMPLATE_ROOT_ENTITY_TYPE],
@@ -23,7 +23,7 @@ const entityActions: Array<ManifestEntityAction> = [
 		name: 'Delete Template Entity Action',
 		api: UmbDeleteEntityAction,
 		meta: {
-			icon: 'umb:trash',
+			icon: 'icon-trash',
 			label: 'Delete',
 			repositoryAlias: TEMPLATE_REPOSITORY_ALIAS,
 			entityTypes: [TEMPLATE_ENTITY_TYPE],

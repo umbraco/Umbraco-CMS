@@ -11,14 +11,14 @@ export class UmbCollectionToolbarElement extends UmbLitElement {
 	public actions: Array<TooltipMenuItem> = [
 		{
 			label: 'File',
-			icon: 'umb:document',
+			icon: 'icon-document',
 			action: () => {
 				console.log('Create file');
 			},
 		},
 		{
 			label: 'Folder',
-			icon: 'umb:folder',
+			icon: 'icon-folder',
 			action: () => {
 				console.log('create folder');
 			},

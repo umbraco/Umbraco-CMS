@@ -9,7 +9,7 @@ const menuItem: ManifestTypes = {
 	weight: 10,
 	meta: {
 		label: 'Scripts',
-		icon: 'umb:folder',
+		icon: 'icon-folder',
 		entityType: SCRIPTS_ENTITY_TYPE,
 		treeAlias: SCRIPTS_TREE_ALIAS,
 		menus: ['Umb.Menu.Templating'],

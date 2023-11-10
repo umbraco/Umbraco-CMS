@@ -88,7 +88,7 @@ export class UmbDictionaryWorkspaceContext
 	}
 
 	public destroy(): void {
-		this.#data.complete();
+		this.#data.destroy();
 	}
 }
 

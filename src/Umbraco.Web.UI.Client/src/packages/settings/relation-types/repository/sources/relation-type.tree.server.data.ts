@@ -1,6 +1,6 @@
 import type { UmbRelationTypeTreeDataSource } from './index.js';
 import { RelationTypeResource } from '@umbraco-cms/backoffice/backend-api';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -11,7 +11,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
  * @implements {UmbRelationTypeTreeDataSource}
  */
 export class UmbRelationTypeTreeServerDataSource implements UmbRelationTypeTreeDataSource {
-	#host: UmbControllerHostElement;
+	#host: UmbControllerHost;
 
 	// TODO: how do we handle trashed items?
 	async trashItems(ids: Array<string>) {
@@ -47,10 +47,10 @@ export class UmbRelationTypeTreeServerDataSource implements UmbRelationTypeTreeD
 
 	/**
 	 * Creates an instance of UmbRelationTypeTreeServerDataSource.
-	 * @param {UmbControllerHostElement} host
+	 * @param {UmbControllerHost} host
 	 * @memberof UmbRelationTypeTreeServerDataSource
 	 */
-	constructor(host: UmbControllerHostElement) {
+	constructor(host: UmbControllerHost) {
 		this.#host = host;
 	}
 

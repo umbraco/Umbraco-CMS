@@ -8,7 +8,7 @@ export const manifest: ManifestPropertyEditorUi = {
 	meta: {
 		label: 'Order Direction',
 		propertyEditorSchemaAlias: '',
-		icon: 'umb:autofill',
+		icon: 'icon-autofill',
 		group: 'common',
 	},
 };

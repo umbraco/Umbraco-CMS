@@ -171,7 +171,7 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 												label="Find logs with ${property.name}"
 												title="Find logs with ${property.name}"
 												href=${`section/settings/workspace/logviewer/search/?${this._findLogsWithProperty(property)}`}>
-												<uui-icon name="umb:search"></uui-icon>
+												<uui-icon name="icon-search"></uui-icon>
 										  </uui-button>`
 										: ''}
 								</div>
@@ -179,7 +179,7 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 					)}
 				</ul>
 				<umb-button-with-dropdown look="secondary" placement="bottom-start" id="search-button" label="Search">
-					<uui-icon name="umb:search"></uui-icon>Search
+					<uui-icon name="icon-search"></uui-icon>Search
 					<ul id="search-menu" slot="dropdown">
 						${this._searchMenuData.map(
 							(menuItem) => html`

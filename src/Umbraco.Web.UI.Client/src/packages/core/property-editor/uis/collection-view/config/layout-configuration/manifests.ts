@@ -8,7 +8,7 @@ export const manifest: ManifestPropertyEditorUi = {
 	meta: {
 		label: 'Collection View Layout Configuration',
 		propertyEditorSchemaAlias: '',
-		icon: 'umb:autofill',
+		icon: 'icon-autofill',
 		group: 'lists',
 	},
 };

@@ -1,6 +1,6 @@
 import type { TemplateTreeDataSource } from './index.js';
 import { TemplateResource } from '@umbraco-cms/backoffice/backend-api';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
@@ -10,14 +10,14 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
  * @implements {TemplateTreeDataSource}
  */
 export class UmbTemplateTreeServerDataSource implements TemplateTreeDataSource {
-	#host: UmbControllerHostElement;
+	#host: UmbControllerHost;
 
 	/**
 	 * Creates an instance of UmbTemplateTreeServerDataSource.
-	 * @param {UmbControllerHostElement} host
+	 * @param {UmbControllerHost} host
 	 * @memberof UmbTemplateTreeServerDataSource
 	 */
-	constructor(host: UmbControllerHostElement) {
+	constructor(host: UmbControllerHost) {
 		this.#host = host;
 	}
 
