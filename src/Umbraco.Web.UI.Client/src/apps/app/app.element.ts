@@ -11,7 +11,6 @@ import { pathWithoutBasePath } from '@umbraco-cms/backoffice/router';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { OpenAPI, RuntimeLevelModel, ServerResource } from '@umbraco-cms/backoffice/backend-api';
 import { contextData, umbDebugContextEventType } from '@umbraco-cms/backoffice/context-api';
-import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
 
 @customElement('umb-app')
 export class UmbAppElement extends UmbLitElement {
@@ -57,7 +56,6 @@ export class UmbAppElement extends UmbLitElement {
 		},
 	];
 
-	#currentUserContext?: typeof UMB_CURRENT_USER_CONTEXT.TYPE;
 	#authContext?: typeof UMB_AUTH_CONTEXT.TYPE;
 	#umbIconRegistry = new UmbIconRegistry();
 	#uuiIconRegistry = new UUIIconRegistryEssential();
