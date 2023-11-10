@@ -332,7 +332,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IDynamicRootService,DynamicRoot.DynamicRootService>();
 
             // Register Webhook services
-            Services.AddUnique<IWebHookService, WebhookService>();
+            Services.AddUnique<IWebhookService, WebhookService>();
             Services.AddUnique<IWebhookLogService, WebhookLogService>();
             Services.AddUnique<IWebhookLogFactory, WebhookLogFactory>();
             Services.AddUnique<IWebhookRequestService, WebhookRequestService>();
