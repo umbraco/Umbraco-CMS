@@ -1,7 +1,7 @@
-(function () {
+﻿(function () {
   "use strict";
 
-  function WebhookController($q, $timeout, $routeParams, webhooksResource, navigationService, notificationsService, editorService, overlayService, contentTypeResource, mediaTypeResource) {
+  function WebhookController($q, $timeout, $routeParams, webhooksResource, navigationService, notificationsService, editorService, overlayService, contentTypeResource, mediaTypeResource, memberTypeResource) {
 
     const vm = this;
 
@@ -14,7 +14,7 @@
     vm.page = {};
     vm.webhooks = [];
     vm.events = [];
-    vm.webHooksContentTypes = {};
+    vm.webhooksContentTypes = {};
     vm.webhookEvents = {};
 
     function init() {
@@ -38,23 +38,41 @@
     function loadEvents() {
       return webhooksResource.getAllEvents()
         .then(data => {
-          vm.events = data.map(item => item.eventName);
+          vm.events = data;
         });
     }
 
     function resolveEventNames(webhook) {
       webhook.events.forEach(event => {
         if (!vm.webhookEvents[webhook.key]) {
-          vm.webhookEvents[webhook.key] = event;
+          vm.webhookEvents[webhook.key] = event.eventName;
         } else {
-          vm.webhookEvents[webhook.key] += ", " + event;
+          vm.webhookEvents[webhook.key] += ", " + event.eventName;
         }
       });
     }
 
+    function determineResource(resourceType){
+      let resource;
+      switch (resourceType) {
+        case "content":
+          resource = contentTypeResource;
+          break;
+        case "media":
+          resource = mediaTypeResource;
+          break;
+        case "member":
+          resource = memberTypeResource;
+          break;
+        default:
+          return;
+      }
+
+      return resource;
+    }
+
     function getEntities(webhook) {
-      const isContent = webhook.events[0].toLowerCase().includes("content");
-      const resource = isContent ? contentTypeResource : mediaTypeResource;
+      let resource = determineResource(webhook.events[0].eventType.toLowerCase());
       let entities = [];
 
       webhook.contentTypeKeys.forEach(key => {
@@ -68,20 +86,19 @@
     }
 
     function resolveTypeNames(webhook) {
-      const isContent = webhook.events[0].toLowerCase().includes("content");
-      const resource = isContent ? contentTypeResource : mediaTypeResource;
+      let resource = determineResource(webhook.events[0].eventType.toLowerCase());
 
-      if (vm.webHooksContentTypes[webhook.key]){
-        delete vm.webHooksContentTypes[webhook.key];
+      if (vm.webhooksContentTypes[webhook.key]){
+        delete vm.webhooksContentTypes[webhook.key];
       }
 
       webhook.contentTypeKeys.forEach(key => {
         resource.getById(key)
           .then(data => {
-            if (!vm.webHooksContentTypes[webhook.key]) {
-              vm.webHooksContentTypes[webhook.key] = data.name;
+            if (!vm.webhooksContentTypes[webhook.key]) {
+              vm.webhooksContentTypes[webhook.key] = data.name;
             } else {
-              vm.webHooksContentTypes[webhook.key] += ", " + data.name;
+              vm.webhooksContentTypes[webhook.key] += ", " + data.name;
             }
           });
       });
@@ -154,12 +171,12 @@
     }
 
     function loadWebhooks(){
-      webhooksResource
+      return webhooksResource
         .getAll()
         .then(result => {
           vm.webhooks = result;
           vm.webhookEvents = {};
-          vm.webHooksContentTypes = {};
+          vm.webhooksContentTypes = {};
 
           vm.webhooks.forEach(webhook => {
             resolveTypeNames(webhook);
