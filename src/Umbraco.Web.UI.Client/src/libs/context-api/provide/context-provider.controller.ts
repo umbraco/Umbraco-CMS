@@ -20,7 +20,6 @@ export class UmbContextProviderController<
 		// Makes the controllerAlias unique for this instance, this enables multiple Contexts to be provided under the same name. (This only makes sense cause of Context Token Discriminators)
 		// This does mean that if someone provides a context with the same name, but with a different instance, it will not override the previous instance. But its good since it enables extensions to provide contexts at the same scope of other contexts.
 		this.#controllerAlias = contextAlias.toString() + '_' + (instance as any).constructor?.name;
-		console.log("this.#controllerAlias ", this.#controllerAlias)
 
 		// If this API is already provided with this alias? Then we do not want to register this controller:
 		const existingControllers = host.getControllers((x) => x.controllerAlias === this.controllerAlias);
