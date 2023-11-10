@@ -1013,6 +1013,7 @@
     <key alias="addMediaType">Tilføj medie Type</key>
     <key alias="createHeader">Opret header</key>
     <key alias="logs">Logs</key>
+    <key alias="noHeaders">Der er ikke tilføjet nogen webhook headers</key>
   </area>
   <area alias="language">
     <key alias="cultureCode">Culture Code</key>
