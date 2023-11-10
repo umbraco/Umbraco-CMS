@@ -6,6 +6,7 @@ import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { UserResource } from '@umbraco-cms/backoffice/backend-api';
 import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import { umbLocalizationRegistry } from '@umbraco-cms/backoffice/localization';
 
 export class UmbCurrentUserContext extends UmbBaseController {
 	#currentUser = new UmbObjectState<UmbCurrentUser | undefined>(undefined);
@@ -21,6 +22,19 @@ export class UmbCurrentUserContext extends UmbBaseController {
 		this.consumeContext(UMB_AUTH_CONTEXT, (instance) => {
 			this.#authContext = instance;
 			this.#observeIsLoggedIn();
+		});
+
+		// TODO: revisit this. It can probably be simplified
+		this.observe(umbLocalizationRegistry.isDefaultLoaded, (isDefaultLoaded) => {
+			if (!isDefaultLoaded) return;
+
+			this.observe(
+				this.languageIsoCode,
+				(currentLanguageIsoCode) => {
+					umbLocalizationRegistry.loadLanguage(currentLanguageIsoCode);
+				},
+				'umbCurrentUserLanguageIsoCode',
+			);
 		});
 
 		this.provideContext(UMB_CURRENT_USER_CONTEXT, this);

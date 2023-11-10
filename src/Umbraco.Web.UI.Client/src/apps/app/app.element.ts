@@ -83,28 +83,6 @@ export class UmbAppElement extends UmbLitElement {
 		}
 	}
 
-	#listenForLanguageChange() {
-		// This will wait for the default language to be loaded before attempting to load the current user language
-		// just in case the user language is not the default language.
-		// We **need** to do this because the default language (typically en-us) holds all the fallback keys for all the other languages.
-		// This way we can ensure that the document language is always loaded first and subsequently registered as the fallback language.
-		this.observe(umbLocalizationRegistry.isDefaultLoaded, (isDefaultLoaded) => {
-			if (!this.#currentUserContext) {
-				throw new Error('[Fatal] CurrentUserContext requested before it was initialized');
-			}
-
-			if (!isDefaultLoaded) return;
-
-			this.observe(
-				this.#currentUserContext.languageIsoCode,
-				(currentLanguageIsoCode) => {
-					umbLocalizationRegistry.loadLanguage(currentLanguageIsoCode);
-				},
-				'languageIsoCode',
-			);
-		});
-	}
-
 	async #setup() {
 		if (this.serverUrl === undefined) throw new Error('No serverUrl provided');
 
@@ -195,8 +173,6 @@ export class UmbAppElement extends UmbLitElement {
 			OpenAPI.TOKEN = () => this.#authContext!.getLatestToken();
 			OpenAPI.WITH_CREDENTIALS = true;
 		}
-
-		this.#listenForLanguageChange();
 
 		if (this.#authContext?.isAuthorized()) {
 			this.#authContext?.setLoggedIn(true);
