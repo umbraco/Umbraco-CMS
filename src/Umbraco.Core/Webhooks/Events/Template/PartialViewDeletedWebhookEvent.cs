@@ -11,7 +11,7 @@ public class PartialViewDeletedWebhookEvent : WebhookEventBase<PartialViewDelete
 {
     public PartialViewDeletedWebhookEvent(
         IWebhookFiringService webhookFiringService,
-        IWebHookService webHookService,
+        IWebhookService webHookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
         IServerRoleAccessor serverRoleAccessor)
         : base(webhookFiringService, webHookService, webhookSettings, serverRoleAccessor)

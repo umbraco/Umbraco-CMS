@@ -12,7 +12,7 @@ public class MediaMovedToRecycleBinWebhookEvent : WebhookEventContentBase<MediaM
 {
     public MediaMovedToRecycleBinWebhookEvent(
         IWebhookFiringService webhookFiringService,
-        IWebHookService webHookService,
+        IWebhookService webHookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
         IServerRoleAccessor serverRoleAccessor)
         : base(

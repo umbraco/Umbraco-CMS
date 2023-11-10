@@ -11,7 +11,7 @@ public class RelationTypeSavedWebhookEvent : WebhookEventBase<RelationTypeSavedN
 {
     public RelationTypeSavedWebhookEvent(
         IWebhookFiringService webhookFiringService,
-        IWebHookService webHookService,
+        IWebhookService webHookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
         IServerRoleAccessor serverRoleAccessor)
         : base(webhookFiringService, webHookService, webhookSettings, serverRoleAccessor)

@@ -11,7 +11,7 @@ public class LanguageSavedWebhookEvent : WebhookEventBase<LanguageSavedNotificat
 {
     public LanguageSavedWebhookEvent(
         IWebhookFiringService webhookFiringService,
-        IWebHookService webHookService,
+        IWebhookService webHookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
         IServerRoleAccessor serverRoleAccessor)
         : base(webhookFiringService, webHookService, webhookSettings, serverRoleAccessor)
@@ -20,3 +20,4 @@ public class LanguageSavedWebhookEvent : WebhookEventBase<LanguageSavedNotificat
 
     public override string Alias => "languageSaved";
 }
+

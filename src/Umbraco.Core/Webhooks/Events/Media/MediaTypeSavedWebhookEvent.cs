@@ -11,7 +11,7 @@ public class MediaTypeSavedWebhookEvent : WebhookEventBase<MediaTypeSavedNotific
 {
     public MediaTypeSavedWebhookEvent(
         IWebhookFiringService webhookFiringService,
-        IWebHookService webHookService,
+        IWebhookService webHookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
         IServerRoleAccessor serverRoleAccessor)
         : base(webhookFiringService, webHookService, webhookSettings, serverRoleAccessor)

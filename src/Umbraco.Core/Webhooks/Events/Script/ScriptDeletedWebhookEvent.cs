@@ -11,7 +11,7 @@ public class ScriptDeletedWebhookEvent : WebhookEventBase<ScriptDeletedNotificat
 {
     public ScriptDeletedWebhookEvent(
         IWebhookFiringService webhookFiringService,
-        IWebHookService webHookService,
+        IWebhookService webHookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
         IServerRoleAccessor serverRoleAccessor)
         : base(webhookFiringService, webHookService, webhookSettings, serverRoleAccessor)

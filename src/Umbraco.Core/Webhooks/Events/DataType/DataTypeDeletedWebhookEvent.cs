@@ -11,7 +11,7 @@ public class DataTypeDeletedWebhookEvent : WebhookEventBase<DataTypeSavedNotific
 {
     public DataTypeDeletedWebhookEvent(
         IWebhookFiringService webhookFiringService,
-        IWebHookService webHookService,
+        IWebhookService webHookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
         IServerRoleAccessor serverRoleAccessor)
         : base(webhookFiringService, webHookService, webhookSettings, serverRoleAccessor)

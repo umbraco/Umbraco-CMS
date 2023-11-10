@@ -11,7 +11,7 @@ public class DataTypeMovedWebhookEvent : WebhookEventBase<DataTypeMovedNotificat
 {
     public DataTypeMovedWebhookEvent(
         IWebhookFiringService webhookFiringService,
-        IWebHookService webHookService,
+        IWebhookService webHookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
         IServerRoleAccessor serverRoleAccessor)
         : base(webhookFiringService, webHookService, webhookSettings, serverRoleAccessor)

@@ -11,7 +11,7 @@ public class DictionaryItemSavedWebhookEvent : WebhookEventBase<DictionaryItemSa
 {
     public DictionaryItemSavedWebhookEvent(
         IWebhookFiringService webhookFiringService,
-        IWebHookService webHookService,
+        IWebhookService webHookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
         IServerRoleAccessor serverRoleAccessor)
         : base(webhookFiringService, webHookService, webhookSettings, serverRoleAccessor)

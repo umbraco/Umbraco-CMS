@@ -11,7 +11,7 @@ public class RelationTypeDeletedWebhookEvent : WebhookEventBase<RelationTypeDele
 {
     public RelationTypeDeletedWebhookEvent(
         IWebhookFiringService webhookFiringService,
-        IWebHookService webHookService,
+        IWebhookService webHookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
         IServerRoleAccessor serverRoleAccessor)
         : base(webhookFiringService, webHookService, webhookSettings, serverRoleAccessor)

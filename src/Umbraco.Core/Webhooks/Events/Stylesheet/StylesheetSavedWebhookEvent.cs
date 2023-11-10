@@ -11,7 +11,7 @@ public class StylesheetSavedWebhookEvent : WebhookEventBase<StylesheetSavedNotif
 {
     public StylesheetSavedWebhookEvent(
         IWebhookFiringService webhookFiringService,
-        IWebHookService webHookService,
+        IWebhookService webHookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
         IServerRoleAccessor serverRoleAccessor)
         : base(webhookFiringService, webHookService, webhookSettings, serverRoleAccessor)

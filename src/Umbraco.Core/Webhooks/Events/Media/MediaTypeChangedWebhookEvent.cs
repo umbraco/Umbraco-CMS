@@ -11,7 +11,7 @@ public class MediaTypeChangedWebhookEvent : WebhookEventBase<MediaTypeChangedNot
 {
     public MediaTypeChangedWebhookEvent(
         IWebhookFiringService webhookFiringService,
-        IWebHookService webHookService,
+        IWebhookService webHookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
         IServerRoleAccessor serverRoleAccessor)
         : base(webhookFiringService, webHookService, webhookSettings, serverRoleAccessor)

@@ -11,7 +11,7 @@ public class DictionaryItemDeletedWebhookEvent : WebhookEventBase<DictionaryItem
 {
     public DictionaryItemDeletedWebhookEvent(
         IWebhookFiringService webhookFiringService,
-        IWebHookService webHookService,
+        IWebhookService webHookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
         IServerRoleAccessor serverRoleAccessor)
         : base(webhookFiringService, webHookService, webhookSettings, serverRoleAccessor)

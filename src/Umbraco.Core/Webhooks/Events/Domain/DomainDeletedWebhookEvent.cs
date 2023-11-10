@@ -11,7 +11,7 @@ public class DomainDeletedWebhookEvent : WebhookEventBase<DomainDeletedNotificat
 {
     public DomainDeletedWebhookEvent(
         IWebhookFiringService webhookFiringService,
-        IWebHookService webHookService,
+        IWebhookService webHookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
         IServerRoleAccessor serverRoleAccessor)
         : base(webhookFiringService, webHookService, webhookSettings, serverRoleAccessor)

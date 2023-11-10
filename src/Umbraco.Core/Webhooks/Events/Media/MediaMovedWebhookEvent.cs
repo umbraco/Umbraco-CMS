@@ -12,7 +12,7 @@ public class MediaMovedWebhookEvent : WebhookEventContentBase<MediaMovedNotifica
 {
     public MediaMovedWebhookEvent(
         IWebhookFiringService webhookFiringService,
-        IWebHookService webHookService,
+        IWebhookService webHookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
         IServerRoleAccessor serverRoleAccessor)
         : base(

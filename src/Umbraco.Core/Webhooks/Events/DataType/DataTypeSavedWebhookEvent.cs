@@ -11,7 +11,7 @@ public class DataTypeSavedWebhookEvent : WebhookEventBase<DataTypeSavedNotificat
 {
     public DataTypeSavedWebhookEvent(
         IWebhookFiringService webhookFiringService,
-        IWebHookService webHookService,
+        IWebhookService webHookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
         IServerRoleAccessor serverRoleAccessor)
         : base(webhookFiringService, webHookService, webhookSettings, serverRoleAccessor)
