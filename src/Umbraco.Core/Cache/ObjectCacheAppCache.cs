@@ -1,7 +1,5 @@
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.FileProviders;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
@@ -15,7 +13,6 @@ namespace Umbraco.Cms.Core.Cache;
 public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
 {
     private readonly IOptions<MemoryCacheOptions> _options;
-    private readonly IHostEnvironment? _hostEnvironment;
     private readonly ISet<string> _keys = new HashSet<string>();
     private readonly ReaderWriterLockSlim _locker = new(LockRecursionPolicy.SupportsRecursion);
     private bool _disposedValue;
@@ -32,7 +29,7 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
     /// Initializes a new instance of the <see cref="ObjectCacheAppCache" />.
     /// </summary>
     public ObjectCacheAppCache()
-        : this(Options.Create(new MemoryCacheOptions()), NullLoggerFactory.Instance, null)
+        : this(Options.Create(new MemoryCacheOptions()), NullLoggerFactory.Instance)
     { }
 
     /// <summary>
@@ -40,11 +37,9 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
     /// </summary>
     /// <param name="options">The options.</param>
     /// <param name="loggerFactory">The logger factory.</param>
-    /// <param name="hostEnvironment">The host environment.</param>
-    public ObjectCacheAppCache(IOptions<MemoryCacheOptions> options, ILoggerFactory loggerFactory, IHostEnvironment? hostEnvironment)
+    public ObjectCacheAppCache(IOptions<MemoryCacheOptions> options, ILoggerFactory loggerFactory)
     {
         _options = options;
-        _hostEnvironment = hostEnvironment;
 
         MemoryCache = new MemoryCache(_options, loggerFactory);
     }
@@ -106,7 +101,7 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
     }
 
     /// <inheritdoc />
-    public object? Get(string key, Func<object?> factory, TimeSpan? timeout, bool isSliding = false, string[]? dependentFiles = null)
+    public object? Get(string key, Func<object?> factory, TimeSpan? timeout, bool isSliding = false)
     {
         // see notes in HttpRuntimeAppCache
         Lazy<object?>? result;
@@ -121,7 +116,7 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
             if (result == null || SafeLazy.GetSafeLazyValue(result, true) == null)
             {
                 result = SafeLazy.GetSafeLazy(factory);
-                MemoryCacheEntryOptions options = GetOptions(timeout, isSliding, dependentFiles);
+                MemoryCacheEntryOptions options = GetOptions(timeout, isSliding);
 
                 try
                 {
@@ -159,7 +154,7 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
     }
 
     /// <inheritdoc />
-    public void Insert(string key, Func<object?> factory, TimeSpan? timeout = null, bool isSliding = false, string[]? dependentFiles = null)
+    public void Insert(string key, Func<object?> factory, TimeSpan? timeout = null, bool isSliding = false)
     {
         // NOTE - here also we must insert a Lazy<object> but we can evaluate it right now
         // and make sure we don't store a null value.
@@ -170,7 +165,7 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
             return; // do not store null values (backward compat)
         }
 
-        MemoryCacheEntryOptions options = GetOptions(timeout, isSliding, dependentFiles);
+        MemoryCacheEntryOptions options = GetOptions(timeout, isSliding);
 
         // NOTE: This does an add or update
         MemoryCache.Set(key, result, options);
@@ -323,7 +318,7 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
         }
     }
 
-    private MemoryCacheEntryOptions GetOptions(TimeSpan? timeout = null, bool isSliding = false, string[]? dependentFiles = null)
+    private MemoryCacheEntryOptions GetOptions(TimeSpan? timeout, bool isSliding)
     {
         var options = new MemoryCacheEntryOptions();
 
@@ -335,19 +330,6 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
         else
         {
             options.AbsoluteExpirationRelativeToNow = timeout;
-        }
-
-        // Configure file based expiration
-        if (dependentFiles?.Length > 0 && _hostEnvironment?.ContentRootFileProvider is IFileProvider fileProvider)
-        {
-            foreach (var dependentFile in dependentFiles)
-            {
-                var relativePath = Path.IsPathFullyQualified(dependentFile)
-                    ? Path.GetRelativePath(_hostEnvironment.ContentRootPath, dependentFile)
-                    : dependentFile;
-
-                options.ExpirationTokens.Add(fileProvider.Watch(relativePath));
-            }
         }
 
         // Ensure key is removed from set when evicted from cache
