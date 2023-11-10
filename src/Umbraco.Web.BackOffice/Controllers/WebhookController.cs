@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
@@ -62,7 +62,7 @@ public class WebhookController : UmbracoAuthorizedJsonController
     {
         Webhook? webhook = await _webHookService.GetAsync(key);
 
-        return webhook is null ? NotFound() : Ok(webhook);
+        return webhook is null ? NotFound() : Ok(_webhookPresentationFactory.Create(webhook));
     }
 
     [HttpDelete]

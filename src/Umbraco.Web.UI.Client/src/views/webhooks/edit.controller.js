@@ -51,15 +51,8 @@
 
             if (!$routeParams.create) {
                 promises.push(webhooksResource.getByKey($routeParams.id).then(webhook => {
-
-                    const obj = {};
-
-                    // Convert webhook object to camelCase properties.
-                    for (const [key, value] of Object.entries(webhook)) {
-                      obj[key.toCamelCase()] = value;
-                    }
-
-                    vm.webhook = obj;
+                    
+                    vm.webhook = webhook;
 
                     makeBreadcrumbs();
                 }));
