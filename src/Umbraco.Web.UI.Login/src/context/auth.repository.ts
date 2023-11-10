@@ -34,9 +34,6 @@ export class UmbAuthRepository {
         return responseData;
       }
 
-      // Additionally authenticate with the Management API
-      await this.#managementApiLogin(data.username, data.password);
-
       try {
         const text = await response.text();
         if (text) {
@@ -274,25 +271,5 @@ export class UmbAuthRepository {
     }
 
     return text;
-  }
-
-  async #managementApiLogin(username: string, password: string) {
-    try {
-      const authURLManagementApi = 'management/api/v1/security/back-office/login';
-      const requestManagementApi = new Request(authURLManagementApi, {
-        method: 'POST',
-        body: JSON.stringify({
-          username,
-          password,
-        }),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      return await fetch(requestManagementApi);
-    } catch (error) {
-      console.error('Failed to authenticate with the Management API:', error);
-    }
   }
 }
