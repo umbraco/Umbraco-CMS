@@ -50,10 +50,16 @@
             promises.push(loadEvents());
 
             if (!$routeParams.create) {
+                
                 promises.push(webhooksResource.getByKey($routeParams.id).then(webhook => {
-                    
+
                     vm.webhook = webhook;
                     vm.webhook.name = vm.labels.editWebhook;
+
+                    const eventType = vm.webhook ? vm.webhook.events[0].eventType.toLowerCase() : null;
+                    const contentTypes = webhook.contentTypeKeys.map(x => ({ key: x }));
+                    
+                    getEntities(contentTypes, eventType);
 
                     makeBreadcrumbs();
                 }));
@@ -217,7 +223,12 @@
         }
 
         function saveWebhook() {
-            webhooksResource.update(vm.webhook).then(webhook => {
+
+          if (vm.isNew) {
+            webhooksResource.create(vm.webhook)
+              .then(webhook => {
+                //loadWebhooks()
+
                 formHelper.resetForm({ scope: $scope });
 
                 vm.webhook = webhook;
@@ -228,22 +239,67 @@
                 $scope.$emit("$changeTitle", vm.labels.editWebhook + ": " + vm.webhook.key);
 
                 localizationService.localize("speechBubbles_webhookSaved").then(value => {
-                    notificationsService.success(value);
+                  notificationsService.success(value);
                 });
 
                 // Emit event when language is created or updated/saved
                 eventsService.emit("editors.webhooks.webhookSaved", {
-                    webhook: webhook,
-                    isNew: vm.isNew
+                  webhook: webhook,
+                  isNew: vm.isNew
                 });
 
                 vm.isNew = false;
                 vm.showIdentifier = true;
-            }, function (err) {
-                vm.saveButtonState = "error";
-                formHelper.resetForm({ scope: $scope, hasErrors: true });
-                formHelper.handleError(err);
-            });
+
+              }, x => {
+                let errorMessage = undefined;
+                if (x.data.ModelState) {
+                  errorMessage = `Message: ${Object.values(x.data.ModelState).flat().join(' ')}`;
+                }
+                handleSubmissionError(x, `Error saving webhook. ${errorMessage ?? ''}`);
+              });
+          }
+          else {
+            webhooksResource.update(vm.webhook)
+              .then(webhook => {
+                //loadWebhooks()
+                formHelper.resetForm({ scope: $scope });
+
+                vm.webhook = webhook;
+                vm.webhook.name = vm.labels.editWebhook;
+
+                vm.saveButtonState = "success";
+
+                $scope.$emit("$changeTitle", vm.labels.editWebhook + ": " + vm.webhook.key);
+
+                localizationService.localize("speechBubbles_webhookSaved").then(value => {
+                  notificationsService.success(value);
+                });
+
+                // Emit event when language is created or updated/saved
+                eventsService.emit("editors.webhooks.webhookSaved", {
+                  webhook: webhook,
+                  isNew: vm.isNew
+                });
+
+                vm.isNew = false;
+                vm.showIdentifier = true;
+
+              }, x => {
+                let errorMessage = undefined;
+                if (x.data.ModelState) {
+                  errorMessage = `Message: ${Object.values(x.data.ModelState).flat().join(' ')}`;
+                }
+                handleSubmissionError(x, `Error saving webhook. ${errorMessage ?? ''}`);
+              });
+            }
+        }
+
+        function handleSubmissionError(err, errorMessage) {
+          notificationsService.error(errorMessage);
+          vm.saveButtonState = 'error';
+          formHelper.resetForm({ scope: $scope, hasErrors: true });
+          formHelper.handleError(err);
         }
 
         function back() {

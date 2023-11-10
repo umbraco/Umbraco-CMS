@@ -5,8 +5,6 @@
 
     const vm = this;
 
-    vm.openWebhookOverlay = openWebhookOverlay;
-
     vm.addWebhook = addWebhook;
     vm.editWebhook = editWebhook;
     vm.deleteWebhook = deleteWebhook;
@@ -74,20 +72,6 @@
       return resource;
     }
 
-    function getEntities(webhook) {
-      let resource = determineResource(webhook.events[0].eventType.toLowerCase());
-      let entities = [];
-
-      webhook.contentTypeKeys.forEach(key => {
-        resource.getById(key)
-          .then(data => {
-            entities.push(data);
-          });
-      });
-
-      return entities;
-    }
-
     function resolveTypeNames(webhook) {
       let resource = determineResource(webhook.events[0].eventType.toLowerCase());
 
@@ -107,7 +91,7 @@
       });
     }
 
-    function handleSubmissionError (model, errorMessage) {
+    function handleSubmissionError(model, errorMessage) {
       notificationsService.error(errorMessage);
       model.disableSubmitButton = false;
       model.submitButtonState = 'error';
@@ -121,66 +105,6 @@
     function editWebhook(webhook) {
       $location.search('create', null);
       $location.path("/settings/webhooks/edit/" + webhook.key);
-    }
-
-    function openWebhookOverlay (webhook) {
-      let isCreating = !webhook;
-      editorService.open({
-        title: webhook ? 'Edit webhook' : 'Add webhook',
-        position: 'right',
-        size: 'small',
-        submitButtonLabel: webhook ? 'Save' : 'Create',
-        view: "views/webhooks/overlays/edit.html",
-        events: vm.events,
-        contentTypes : webhook ? getEntities(webhook) : null,
-        webhook: webhook ? webhook : {enabled: true},
-        submit: (model) => {
-          model.disableSubmitButton = true;
-          model.submitButtonState = 'busy';
-          if (!model.webhook.url) {
-            //Due to validation url will only be populated if it's valid, hence we can make do with checking url is there
-            handleSubmissionError(model, 'Please provide a valid URL. Did you include https:// ?');
-            return;
-          }
-          if (!model.webhook.events || model.webhook.events.length === 0) {
-            handleSubmissionError(model, 'Please provide the event for which the webhook should trigger');
-            return;
-          }
-
-          if (isCreating) {
-            webhooksResource.create(model.webhook)
-              .then(() => {
-                loadWebhooks()
-                notificationsService.success('Webhook saved.');
-                editorService.close();
-              }, x => {
-                let errorMessage = undefined;
-                if (x.data.ModelState) {
-                  errorMessage = `Message: ${Object.values(x.data.ModelState).flat().join(' ')}`;
-                }
-                handleSubmissionError(model, `Error saving webhook. ${errorMessage ?? ''}`);
-              });
-          }
-          else {
-            webhooksResource.update(model.webhook)
-              .then(() => {
-                loadWebhooks()
-                notificationsService.success('Webhook saved.');
-                editorService.close();
-              }, x => {
-                let errorMessage = undefined;
-                if (x.data.ModelState) {
-                  errorMessage = `Message: ${Object.values(x.data.ModelState).flat().join(' ')}`;
-                }
-                handleSubmissionError(model, `Error saving webhook. ${errorMessage ?? ''}`);
-              });
-          }
-
-        },
-        close: () => {
-          editorService.close();
-        }
-      });
     }
 
     function loadWebhooks(){
