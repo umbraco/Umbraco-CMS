@@ -74,12 +74,11 @@ export class UmbAppElement extends UmbLitElement {
 
 	async #setup() {
 		if (this.serverUrl === undefined) throw new Error('No serverUrl provided');
-		const redirectUrl = `${window.location.origin}${this.backofficePath}`;
 
 		this.#serverConnection = new UmbServerConnection(this.serverUrl);
 		await this.#serverConnection.connect();
 
-		this.#authContext = new UmbAuthContext(this, this.serverUrl, redirectUrl, this.bypassAuth);
+		this.#authContext = new UmbAuthContext(this, this.serverUrl, this.backofficePath, this.bypassAuth);
 		new UmbAppContext(this, { backofficePath: this.backofficePath, serverUrl: this.serverUrl });
 
 		// Try to initialise the auth flow and get the runtime status

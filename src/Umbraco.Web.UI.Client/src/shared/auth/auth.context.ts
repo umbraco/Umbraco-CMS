@@ -8,14 +8,17 @@ export class UmbAuthContext extends UmbBaseController implements IUmbAuth {
 	#isAuthorized = new UmbBooleanState<boolean>(false);
 	readonly isAuthorized = this.#isAuthorized.asObservable();
 
-	isBypassed = false;
+	#isBypassed = false;
+	#backofficePath: string;
 
 	#authFlow;
 
-	constructor(host: UmbControllerHostElement, serverUrl: string, redirectUrl: string, isBypassed: boolean) {
+	constructor(host: UmbControllerHostElement, serverUrl: string, backofficePath: string, isBypassed: boolean) {
 		super(host);
-		this.isBypassed = isBypassed;
-		this.#authFlow = new UmbAuthFlow(serverUrl, redirectUrl);
+		this.#isBypassed = isBypassed;
+		this.#backofficePath = backofficePath;
+
+		this.#authFlow = new UmbAuthFlow(serverUrl, this.#getRedirectUrl());
 		this.provideContext(UMB_AUTH_CONTEXT, this);
 	}
 
@@ -26,8 +29,12 @@ export class UmbAuthContext extends UmbBaseController implements IUmbAuth {
 		return this.#authFlow.makeAuthorizationRequest();
 	}
 
+	/**
+	 * Checks if the user is authorized. If Authorization is bypassed, the user is always authorized.
+	 * @returns {boolean} True if the user is authorized, otherwise false.
+	 */
 	getIsAuthorized() {
-		if (this.isBypassed) {
+		if (this.#isBypassed) {
 			this.#isAuthorized.next(true);
 			return true;
 		} else {
@@ -37,6 +44,10 @@ export class UmbAuthContext extends UmbBaseController implements IUmbAuth {
 		}
 	}
 
+	/**
+	 * Sets the initial state of the auth flow.
+	 * @returns {Promise<void>}
+	 */
 	setInitialState(): Promise<void> {
 		return this.#authFlow.setInitialState();
 	}
@@ -55,8 +66,14 @@ export class UmbAuthContext extends UmbBaseController implements IUmbAuth {
 
 	/**
 	 * Signs the user out by removing any tokens from the browser.
+	 * @return {*}  {Promise<void>}
+	 * @memberof UmbAuthContext
 	 */
 	signOut(): Promise<void> {
 		return this.#authFlow.signOut();
+	}
+
+	#getRedirectUrl() {
+		return `${window.location.origin}${this.#backofficePath}`;
 	}
 }
