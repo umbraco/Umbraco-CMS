@@ -8,6 +8,7 @@
         vm.isNew = false;
         vm.showIdentifier = true;
 
+        vm.contentTypes = [];
         vm.webhook = {};
         vm.breadcrumbs = [];
         vm.labels = {};
@@ -149,12 +150,12 @@
               return;
           }
 
-          vm.contentTypes = [];
-
           selection.forEach(entity => {
             resource.getById(entity.key)
               .then(data => {
-                vm.contentTypes.push(data);
+                if (!vm.contentTypes.some(x => x.key === data.key)) {
+                  vm.contentTypes.push(data);
+                }
               });
           });
         }
@@ -227,7 +228,6 @@
           if (vm.isNew) {
             webhooksResource.create(vm.webhook)
               .then(webhook => {
-                //loadWebhooks()
 
                 formHelper.resetForm({ scope: $scope });
 
@@ -262,7 +262,7 @@
           else {
             webhooksResource.update(vm.webhook)
               .then(webhook => {
-                //loadWebhooks()
+
                 formHelper.resetForm({ scope: $scope });
 
                 vm.webhook = webhook;
