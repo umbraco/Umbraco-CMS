@@ -162,12 +162,6 @@ export class UmbAppElement extends UmbLitElement {
 			OpenAPI.TOKEN = () => this.#authContext!.getLatestToken();
 			OpenAPI.WITH_CREDENTIALS = true;
 		}
-
-		if (this.#authContext?.isAuthorized()) {
-			this.#authContext?.setLoggedIn(true);
-		} else {
-			this.#authContext?.setLoggedIn(false);
-		}
 	}
 
 	#redirect() {

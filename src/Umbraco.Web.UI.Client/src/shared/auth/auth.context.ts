@@ -32,7 +32,14 @@ export class UmbAuthContext extends UmbBaseController implements IUmbAuth {
 	}
 
 	isAuthorized() {
-		return this.isBypassed ? true : this.#authFlow.isAuthorized();
+		if (this.isBypassed) {
+			this.#isLoggedIn.next(true);
+			return true;
+		} else {
+			const isAuthorized = this.#authFlow.isAuthorized();
+			this.#isLoggedIn.next(isAuthorized);
+			return isAuthorized;
+		}
 	}
 
 	setInitialState(): Promise<void> {
