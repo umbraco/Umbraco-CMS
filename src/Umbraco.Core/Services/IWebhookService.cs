@@ -2,13 +2,13 @@ using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Services;
 
-public interface IWebHookService
+public interface IWebhookService
 {
     /// <summary>
     ///     Creates a webhook.
     /// </summary>
     /// <param name="webhook"><see cref="Webhook" /> to create.</param>
-    Task<Webhook> CreateAsync(Webhook webhook);
+    Task<Webhook?> CreateAsync(Webhook webhook);
 
     /// <summary>
     ///     Updates a webhook.

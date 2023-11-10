@@ -18,14 +18,14 @@ public class ContentPublishWebhookEvent : WebhookEventContentBase<ContentPublish
 
     public ContentPublishWebhookEvent(
         IWebhookFiringService webhookFiringService,
-        IWebHookService webHookService,
+        IWebhookService webhookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
         IServerRoleAccessor serverRoleAccessor,
         IPublishedSnapshotAccessor publishedSnapshotAccessor,
         IApiContentBuilder apiContentBuilder)
         : base(
             webhookFiringService,
-            webHookService,
+            webhookService,
             webhookSettings,
             serverRoleAccessor)
     {

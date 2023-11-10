@@ -17,7 +17,7 @@
     vm.page = {};
     vm.webhooks = [];
     vm.events = [];
-    vm.webHooksContentTypes = {};
+    vm.webhooksContentTypes = {};
     vm.webhookEvents = {};
 
     function init() {
@@ -91,17 +91,17 @@
     function resolveTypeNames(webhook) {
       let resource = determineResource(webhook.events[0].eventType.toLowerCase());
 
-      if (vm.webHooksContentTypes[webhook.key]){
-        delete vm.webHooksContentTypes[webhook.key];
+      if (vm.webhooksContentTypes[webhook.key]){
+        delete vm.webhooksContentTypes[webhook.key];
       }
 
       webhook.contentTypeKeys.forEach(key => {
         resource.getById(key)
           .then(data => {
-            if (!vm.webHooksContentTypes[webhook.key]) {
-              vm.webHooksContentTypes[webhook.key] = data.name;
+            if (!vm.webhooksContentTypes[webhook.key]) {
+              vm.webhooksContentTypes[webhook.key] = data.name;
             } else {
-              vm.webHooksContentTypes[webhook.key] += ", " + data.name;
+              vm.webhooksContentTypes[webhook.key] += ", " + data.name;
             }
           });
       });
@@ -189,7 +189,7 @@
         .then(result => {
           vm.webhooks = result;
           vm.webhookEvents = {};
-          vm.webHooksContentTypes = {};
+          vm.webhooksContentTypes = {};
 
           vm.webhooks.forEach(webhook => {
             resolveTypeNames(webhook);
