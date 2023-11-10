@@ -40,9 +40,12 @@
                 vm.labels.editWebhook = values[3];
 
                 if ($routeParams.create) {
-                    vm.isNew = true;
-                    vm.showIdentifier = false;
-                    vm.webhook.name = vm.labels.addWebhook;
+                  vm.isNew = true;
+                  vm.showIdentifier = false;
+                  vm.webhook.name = vm.labels.addWebhook;
+                }
+                else {
+                  vm.webhook.name = vm.labels.editWebhook;
                 }
             }));
 
