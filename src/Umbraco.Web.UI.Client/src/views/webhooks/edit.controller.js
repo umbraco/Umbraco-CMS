@@ -61,8 +61,6 @@
 
                     vm.webhook = obj;
 
-                    resolveEventNames(vm.webhook);
-
                     makeBreadcrumbs();
                 }));
             }
@@ -81,16 +79,6 @@
             $timeout(function () {
                 navigationService.syncTree({ tree: $routeParams.tree, path: [-1], activate: true });
             });
-        }
-
-        function resolveEventNames(webhook) {
-          webhook.events.forEach(event => {
-            if (!vm.webhookEvents[webhook.key]) {
-              vm.webhookEvents[webhook.key] = event.eventName;
-            } else {
-              vm.webhookEvents[webhook.key] += ", " + event.eventName;
-            }
-          });
         }
 
         function openEventPicker() {
