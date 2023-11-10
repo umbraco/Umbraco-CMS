@@ -12,12 +12,12 @@ public class ContentUnpublishWebhookEvent : WebhookEventContentBase<ContentUnpub
 {
     public ContentUnpublishWebhookEvent(
         IWebhookFiringService webhookFiringService,
-        IWebHookService webHookService,
+        IWebhookService webhookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
         IServerRoleAccessor serverRoleAccessor)
         : base(
             webhookFiringService,
-            webHookService,
+            webhookService,
             webhookSettings,
             serverRoleAccessor)
     {
