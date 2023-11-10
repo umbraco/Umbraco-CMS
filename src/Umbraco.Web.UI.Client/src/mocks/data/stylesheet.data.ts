@@ -225,9 +225,10 @@ ${rule.selector} {
 	}
 
 	insertStyleSheet(item: CreateTextFileViewModelBaseModel) {
+		const parentPath = item.parentPath ? `${item.parentPath}/` : '';
 		const newItem: StylesheetDBItem = {
 			...item,
-			path: `${item.parentPath}/${item.name}.css`,
+			path: `${parentPath}${item.name}`,
 			isFolder: false,
 			hasChildren: false,
 			type: 'stylesheet',
@@ -237,7 +238,6 @@ ${rule.selector} {
 		this.insert(newItem);
 		return newItem;
 	}
-
 
 	insert(item: StylesheetDBItem) {
 		const exits = this.data.find((i) => i.path === item.path);
