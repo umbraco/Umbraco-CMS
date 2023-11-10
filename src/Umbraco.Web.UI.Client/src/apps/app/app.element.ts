@@ -150,18 +150,18 @@ export class UmbAppElement extends UmbLitElement {
 	}
 
 	async #setAuthStatus() {
-		if (this.bypassAuth === false) {
-			if (!this.#authContext) {
-				throw new Error('[Fatal] AuthContext requested before it was initialized');
-			}
+		if (this.bypassAuth) return;
 
-			// Get service configuration from authentication server
-			await this.#authContext?.setInitialState();
-
-			// Instruct all requests to use the auth flow to get and use the access_token for all subsequent requests
-			OpenAPI.TOKEN = () => this.#authContext!.getLatestToken();
-			OpenAPI.WITH_CREDENTIALS = true;
+		if (!this.#authContext) {
+			throw new Error('[Fatal] AuthContext requested before it was initialized');
 		}
+
+		// Get service configuration from authentication server
+		await this.#authContext?.setInitialState();
+
+		// Instruct all requests to use the auth flow to get and use the access_token for all subsequent requests
+		OpenAPI.TOKEN = () => this.#authContext!.getLatestToken();
+		OpenAPI.WITH_CREDENTIALS = true;
 	}
 
 	#redirect() {
