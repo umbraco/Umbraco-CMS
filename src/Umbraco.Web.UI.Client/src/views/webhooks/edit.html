@@ -134,7 +134,7 @@
                                       </umb-button>
                                     </td>
                                   </tr>
-                                  <tr ng-if="vm.webhook.headers.length === 0">
+                                  <tr ng-if="!vm.webhook.headers || vm.webhook.headers.length === 0">
                                     <td colspan="3">
                                       <localize key="webhooks_noHeaders">No webhook headers have been added.</localize>
                                     </td>
