@@ -1733,6 +1733,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="preventCleanupDisableError">An error occurred while disabling version cleanup for %0%</key>
     <key alias="copySuccessMessage">Your system information has successfully been copied to the clipboard</key>
     <key alias="cannotCopyInformation">Could not copy your system information to the clipboard</key>
+    <key alias="webhookSaved">Webhook saved</key>
   </area>
   <area alias="stylesheet">
     <key alias="addRule">Add style</key>

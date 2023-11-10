@@ -1468,6 +1468,7 @@ Mange hilsner fra Umbraco robotten
     </key>
     <key alias="copySuccessMessage">Dit systems information er blevet kopieret til udklipsholderen</key>
     <key alias="cannotCopyInformation">Kunne desværre ikke kopiere dit systems information til udklipsholderen</key>
+    <key alias="webhookSaved">Webhook gemt</key>
   </area>
   <area alias="stylesheet">
     <key alias="addRule">Tilføj style</key>
