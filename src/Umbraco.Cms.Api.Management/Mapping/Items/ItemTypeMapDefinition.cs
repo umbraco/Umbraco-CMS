@@ -49,7 +49,7 @@ public class ItemTypeMapDefinition : IMapDefinition
     {
         target.Name = source.Name ?? string.Empty;
         target.Id = source.Key;
-        target.Icon = source.Editor?.Icon;
+        target.EditorUiAlias = source.EditorUiAlias;
     }
 
     // Umbraco.Code.MapAll
