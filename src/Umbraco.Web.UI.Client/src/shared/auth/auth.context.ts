@@ -5,8 +5,8 @@ import { UmbBaseController, UmbControllerHostElement } from '@umbraco-cms/backof
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 
 export class UmbAuthContext extends UmbBaseController implements IUmbAuth {
-	#isLoggedIn = new UmbBooleanState<boolean>(false);
-	readonly isLoggedIn = this.#isLoggedIn.asObservable();
+	#isAuthorized = new UmbBooleanState<boolean>(false);
+	readonly isAuthorized = this.#isAuthorized.asObservable();
 
 	isBypassed = false;
 
@@ -28,16 +28,16 @@ export class UmbAuthContext extends UmbBaseController implements IUmbAuth {
 
 	/* TEMPORARY METHOD UNTIL RESPONSIBILITY IS MOVED TO CONTEXT */
 	setLoggedIn(newValue: boolean): void {
-		return this.#isLoggedIn.next(newValue);
+		return this.#isAuthorized.next(newValue);
 	}
 
-	isAuthorized() {
+	getIsAuthorized() {
 		if (this.isBypassed) {
-			this.#isLoggedIn.next(true);
+			this.#isAuthorized.next(true);
 			return true;
 		} else {
 			const isAuthorized = this.#authFlow.isAuthorized();
-			this.#isLoggedIn.next(isAuthorized);
+			this.#isAuthorized.next(isAuthorized);
 			return isAuthorized;
 		}
 	}

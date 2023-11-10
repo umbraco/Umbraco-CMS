@@ -21,7 +21,7 @@ export class UmbCurrentUserContext extends UmbBaseController {
 
 		this.consumeContext(UMB_AUTH_CONTEXT, (instance) => {
 			this.#authContext = instance;
-			this.#observeIsLoggedIn();
+			this.#observeIsAuthorized();
 		});
 
 		// TODO: revisit this. It can probably be simplified
@@ -59,10 +59,10 @@ export class UmbCurrentUserContext extends UmbBaseController {
 		return currentUser?.id === userId;
 	}
 
-	#observeIsLoggedIn() {
+	#observeIsAuthorized() {
 		if (!this.#authContext) return;
-		this.observe(this.#authContext.isLoggedIn, (isLoggedIn) => {
-			if (isLoggedIn) {
+		this.observe(this.#authContext.isAuthorized, (isAuthorized) => {
+			if (isAuthorized) {
 				this.requestCurrentUser();
 			}
 		});

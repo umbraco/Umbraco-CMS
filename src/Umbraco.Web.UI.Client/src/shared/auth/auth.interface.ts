@@ -1,7 +1,7 @@
 import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 
 export interface IUmbAuth {
-	isLoggedIn: Observable<boolean>;
+	isAuthorized: Observable<boolean>;
 
 	setLoggedIn(loggedIn: boolean): void;
 
@@ -18,7 +18,7 @@ export interface IUmbAuth {
 	/**
 	 * Checks if there is a token and it is still valid.
 	 */
-	isAuthorized(): boolean;
+	getIsAuthorized(): boolean;
 
 	/**
 	 * Gets the latest token from the Management API.

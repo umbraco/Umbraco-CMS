@@ -207,7 +207,7 @@ export class UmbAppElement extends UmbLitElement {
 				throw new Error('[Fatal] AuthContext requested before it was initialized');
 			}
 
-			if (this.#authContext.isAuthorized()) {
+			if (this.#authContext.getIsAuthorized()) {
 				return true;
 			}
 
