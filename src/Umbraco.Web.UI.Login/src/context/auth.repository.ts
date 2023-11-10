@@ -8,7 +8,7 @@ import type {
 import { umbLocalizationContext } from '../external/localization/localization-context.js';
 
 export class UmbAuthRepository {
-	readonly #authURL = 'management/api/v1/security/back-office/login';
+	readonly #authURL = 'backoffice/umbracoapi/authentication/postlogin';
 
 	public async login(data: LoginRequestModel): Promise<LoginResponse> {
 		try {
