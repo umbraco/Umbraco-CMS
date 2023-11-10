@@ -70,15 +70,7 @@ export class UmbAppElement extends UmbLitElement {
 
 	connectedCallback(): void {
 		super.connectedCallback();
-
-		this.#setLanguage();
 		this.#setup();
-	}
-
-	#setLanguage() {
-		if (this.lang) {
-			umbLocalizationRegistry.loadLanguage(this.lang);
-		}
 	}
 
 	async #setup() {
