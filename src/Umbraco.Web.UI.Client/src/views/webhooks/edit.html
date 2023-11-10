@@ -112,35 +112,37 @@
                               description="Custom headers to include in the webhook request."
                               alias="webhookHeaders">
 
-                            <table class="table table-hover" ng-if="!vm.loading">
-                              <thead>
-                                <tr>
-                                  <th>Name</th>
-                                  <th>Value</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                <tr ng-repeat="(key, value) in vm.webhook.headers">
-                                  <td>{{key}}</td>
-                                  <td>{{value}}</td>
-                                  <td style="text-align: right;">
-                                    <umb-button
-                                        type="button"
-                                        button-style="danger"
-                                        label-key="general_delete" ,
-                                        size="xxs"
-                                        action="vm.removeHeader(key)">
-                                    </umb-button>
-                                  </td>
-                                </tr>
-                              </tbody>
-                            </table>
-                            <umb-button
-                                type="button"
-                                action="vm.openCreateHeader()"
-                                button-style="outline"
-                                label-key="webhooks_addWebhookHeader">
-                            </umb-button>
+                            <div class="umb-property-editor--limit-width" ng-if="!vm.loading">
+                              <table class="table table-hover">
+                                <thead>
+                                  <tr>
+                                    <th>Name</th>
+                                    <th>Value</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  <tr ng-repeat="(key, value) in vm.webhook.headers">
+                                    <td>{{key}}</td>
+                                    <td>{{value}}</td>
+                                    <td style="text-align: right;">
+                                      <umb-button
+                                          type="button"
+                                          button-style="danger"
+                                          label-key="general_delete" ,
+                                          size="xxs"
+                                          action="vm.removeHeader(key)">
+                                      </umb-button>
+                                    </td>
+                                  </tr>
+                                </tbody>
+                              </table>
+                              <umb-button
+                                  type="button"
+                                  action="vm.openCreateHeader()"
+                                  button-style="outline"
+                                  label-key="webhooks_addWebhookHeader">
+                              </umb-button>
+                            </div>
 
                           </umb-control-group>
 
