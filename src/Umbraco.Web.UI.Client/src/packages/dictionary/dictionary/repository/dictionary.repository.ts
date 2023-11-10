@@ -14,7 +14,8 @@ import {
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
-export class UmbDictionaryRepository extends UmbBaseController
+export class UmbDictionaryRepository
+	extends UmbBaseController
 	implements
 		UmbTreeRepository<EntityTreeItemResponseModel>,
 		UmbDetailRepository<
@@ -110,6 +111,7 @@ export class UmbDictionaryRepository extends UmbBaseController
 	}
 
 	async requestItems(ids: Array<string>) {
+		// TODO: There is a bug where the item gets removed from the tree before we confirm the delete via the modal. It doesn't delete the item unless we confirm the delete.
 		if (!ids) throw new Error('Dictionary Ids are missing');
 		await this.#init;
 
