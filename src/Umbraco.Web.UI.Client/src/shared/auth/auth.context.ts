@@ -8,10 +8,13 @@ export class UmbAuthContext extends UmbBaseController implements IUmbAuth {
 	#isLoggedIn = new UmbBooleanState<boolean>(false);
 	readonly isLoggedIn = this.#isLoggedIn.asObservable();
 
+	isBypassed = false;
+
 	#authFlow;
 
-	constructor(host: UmbControllerHostElement, serverUrl: string, redirectUrl: string) {
+	constructor(host: UmbControllerHostElement, serverUrl: string, redirectUrl: string, isBypassed: boolean) {
 		super(host);
+		this.isBypassed = isBypassed;
 		this.#authFlow = new UmbAuthFlow(serverUrl, redirectUrl);
 		this.provideContext(UMB_AUTH_CONTEXT, this);
 	}
@@ -29,7 +32,7 @@ export class UmbAuthContext extends UmbBaseController implements IUmbAuth {
 	}
 
 	isAuthorized() {
-		return this.#authFlow.isAuthorized();
+		return this.isBypassed ? true : this.#authFlow.isAuthorized();
 	}
 
 	setInitialState(): Promise<void> {

@@ -78,7 +78,7 @@ export class UmbAppElement extends UmbLitElement {
 		OpenAPI.BASE = this.serverUrl;
 		const redirectUrl = `${window.location.origin}${this.backofficePath}`;
 
-		this.#authContext = new UmbAuthContext(this, this.serverUrl, redirectUrl);
+		this.#authContext = new UmbAuthContext(this, this.serverUrl, redirectUrl, this.bypassAuth);
 		new UmbAppContext(this, { backofficePath: this.backofficePath, serverUrl: this.serverUrl });
 
 		// Try to initialise the auth flow and get the runtime status
@@ -207,14 +207,13 @@ export class UmbAppElement extends UmbLitElement {
 		}
 	}
 
-	#isAuthorized(): boolean {
-		if (!this.#authContext) return false;
-		return this.bypassAuth ? true : this.#authContext.isAuthorized();
-	}
-
 	#isAuthorizedGuard(): Guard {
 		return () => {
-			if (this.#isAuthorized()) {
+			if (!this.#authContext) {
+				throw new Error('[Fatal] AuthContext requested before it was initialized');
+			}
+
+			if (this.#authContext.isAuthorized()) {
 				return true;
 			}
 
@@ -222,7 +221,7 @@ export class UmbAppElement extends UmbLitElement {
 			window.sessionStorage.setItem('umb:auth:redirect', location.href);
 
 			// Make a request to the auth server to start the auth flow
-			this.#authContext!.login();
+			this.#authContext.login();
 
 			// Return false to prevent the route from being rendered
 			return false;
