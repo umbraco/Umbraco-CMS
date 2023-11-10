@@ -1011,6 +1011,8 @@
     <key alias="addWebhookHeader">Tilføj webhook header</key>
     <key alias="addDocumentType">Tilføj dokument type</key>
     <key alias="addMediaType">Tilføj medie Type</key>
+    <key alias="createHeader">Opret header</key>
+    <key alias="logs">Logs</key>
   </area>
   <area alias="language">
     <key alias="cultureCode">Culture Code</key>

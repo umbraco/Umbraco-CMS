@@ -179,8 +179,8 @@
         }
 
         function openCreateHeader() {
-          editorService.open({
-            title: "Create header",
+
+          const dialog = {
             view: "views/webhooks/overlays/header.html",
             size: 'small',
             position: 'right',
@@ -194,6 +194,11 @@
             close() {
               editorService.close();
             }
+          };
+
+          localizationService.localize("webhooks_createHeader").then(value => {
+            dialog.title = value;
+            editorService.open(dialog);
           });
         }
 
