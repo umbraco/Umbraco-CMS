@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core;
@@ -9,11 +10,13 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Core.Webhooks;
 using Umbraco.Cms.Web.BackOffice.Services;
 using Umbraco.Cms.Web.Common.Attributes;
+using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Cms.Web.Common.Models;
 
 namespace Umbraco.Cms.Web.BackOffice.Controllers;
 
 [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
+[Authorize(Policy = AuthorizationPolicies.TreeAccessWebhooks)]
 public class WebhookController : UmbracoAuthorizedJsonController
 {
     private readonly IWebhookService _webhookService;
