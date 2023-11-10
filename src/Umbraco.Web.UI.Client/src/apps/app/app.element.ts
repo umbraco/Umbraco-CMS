@@ -74,7 +74,6 @@ export class UmbAppElement extends UmbLitElement {
 
 	async #setup() {
 		if (this.serverUrl === undefined) throw new Error('No serverUrl provided');
-		OpenAPI.BASE = this.serverUrl;
 		const redirectUrl = `${window.location.origin}${this.backofficePath}`;
 
 		this.#serverConnection = new UmbServerConnection(this.serverUrl);
