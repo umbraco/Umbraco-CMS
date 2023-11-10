@@ -4,7 +4,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UUISelectElement } from '@umbraco-cms/backoffice/external/uui';
 import { UserResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UMB_AUTH_CONTEXT, UmbCurrentUser } from '@umbraco-cms/backoffice/auth';
+import { UMB_CURRENT_USER_CONTEXT, UmbCurrentUser } from '@umbraco-cms/backoffice/current-user';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -19,14 +19,14 @@ export class UmbUserWorkspaceProfileSettingsElement extends UmbLitElement {
 	@state()
 	private languages: Array<{ name: string; value: string; selected: boolean }> = [];
 
-	#authContext?: typeof UMB_AUTH_CONTEXT.TYPE;
+	#currentUserContext?: typeof UMB_CURRENT_USER_CONTEXT.TYPE;
 	#userWorkspaceContext?: typeof UMB_USER_WORKSPACE_CONTEXT.TYPE;
 
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_AUTH_CONTEXT, (instance) => {
-			this.#authContext = instance;
+		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (instance) => {
+			this.#currentUserContext = instance;
 			this.#observeCurrentUser();
 		});
 
@@ -45,9 +45,9 @@ export class UmbUserWorkspaceProfileSettingsElement extends UmbLitElement {
 	}
 
 	#observeCurrentUser() {
-		if (!this.#authContext) return;
+		if (!this.#currentUserContext) return;
 		this.observe(
-			this.#authContext.currentUser,
+			this.#currentUserContext.currentUser,
 			async (currentUser) => {
 				this._currentUser = currentUser;
 
