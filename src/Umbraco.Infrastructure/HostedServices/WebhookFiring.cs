@@ -18,7 +18,7 @@ public class WebhookFiring : RecurringHostedServiceBase
     private readonly IJsonSerializer _jsonSerializer;
     private readonly IWebhookLogFactory _webhookLogFactory;
     private readonly IWebhookLogService _webhookLogService;
-    private readonly IWebHookService _webHookService;
+    private readonly IWebhookService _webHookService;
     private readonly ICoreScopeProvider _coreScopeProvider;
     private WebhookSettings _webhookSettings;
 
@@ -29,7 +29,7 @@ public class WebhookFiring : RecurringHostedServiceBase
         IJsonSerializer jsonSerializer,
         IWebhookLogFactory webhookLogFactory,
         IWebhookLogService webhookLogService,
-        IWebHookService webHookService,
+        IWebhookService webHookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
         ICoreScopeProvider coreScopeProvider)
         : base(logger, TimeSpan.FromSeconds(10), DefaultDelay)
