@@ -1,9 +1,10 @@
+import { UmbCurrentUser } from './types.js';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbBaseController, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { UserResource } from '@umbraco-cms/backoffice/backend-api';
-import { UMB_AUTH_CONTEXT, UmbCurrentUser } from '@umbraco-cms/backoffice/auth';
+import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 
 export class UmbCurrentUserContext extends UmbBaseController {
@@ -12,7 +13,7 @@ export class UmbCurrentUserContext extends UmbBaseController {
 
 	readonly languageIsoCode = this.#currentUser.asObservablePart((user) => user?.languageIsoCode ?? 'en-us');
 
-	#authContext: any;
+	#authContext?: typeof UMB_AUTH_CONTEXT.TYPE;
 
 	constructor(host: UmbControllerHost) {
 		super(host);
@@ -23,6 +24,14 @@ export class UmbCurrentUserContext extends UmbBaseController {
 		});
 
 		this.provideContext(UMB_CURRENT_USER_CONTEXT, this);
+	}
+
+	async requestCurrentUser() {
+		// TODO: use repository
+		const { data, error } = await tryExecuteAndNotify(this._host, UserResource.getUserCurrent());
+		// TODO: add current user store
+		this.#currentUser.next(data);
+		return { data, error };
 	}
 
 	/**
@@ -40,14 +49,9 @@ export class UmbCurrentUserContext extends UmbBaseController {
 		if (!this.#authContext) return;
 		this.observe(this.#authContext.isLoggedIn, (isLoggedIn) => {
 			if (isLoggedIn) {
-				this.#requestCurrentUser();
+				this.requestCurrentUser();
 			}
 		});
-	}
-
-	async #requestCurrentUser() {
-		const { data } = await tryExecuteAndNotify(this._host, UserResource.getUserCurrent());
-		this.#currentUser.next(data);
 	}
 }
 
