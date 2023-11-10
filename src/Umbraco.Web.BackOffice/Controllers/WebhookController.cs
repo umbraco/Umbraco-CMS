@@ -12,12 +12,12 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers;
 [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
 public class WebhookController : UmbracoAuthorizedJsonController
 {
-    private readonly IWebHookService _webHookService;
+    private readonly IWebhookService _webHookService;
     private readonly IUmbracoMapper _umbracoMapper;
     private readonly WebhookEventCollection _webhookEventCollection;
     private readonly IWebhookLogService _webhookLogService;
 
-    public WebhookController(IWebHookService webHookService, IUmbracoMapper umbracoMapper, WebhookEventCollection webhookEventCollection, IWebhookLogService webhookLogService)
+    public WebhookController(IWebhookService webHookService, IUmbracoMapper umbracoMapper, WebhookEventCollection webhookEventCollection, IWebhookLogService webhookLogService)
     {
         _webHookService = webHookService;
         _umbracoMapper = umbracoMapper;

@@ -11,7 +11,7 @@ public class MediaDeleteWebhookEvent : WebhookEventContentBase<MediaDeletedNotif
 {
     public MediaDeleteWebhookEvent(
         IWebhookFiringService webhookFiringService,
-        IWebHookService webHookService,
+        IWebhookService webHookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
         IServerRoleAccessor serverRoleAccessor)
         : base(

@@ -11,7 +11,7 @@ public class ContentDeleteWebhookEvent : WebhookEventContentBase<ContentDeletedN
 {
     public ContentDeleteWebhookEvent(
         IWebhookFiringService webhookFiringService,
-        IWebHookService webHookService,
+        IWebhookService webHookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
         IServerRoleAccessor serverRoleAccessor)
         : base(

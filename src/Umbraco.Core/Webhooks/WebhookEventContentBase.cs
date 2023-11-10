@@ -14,7 +14,7 @@ public abstract class WebhookEventContentBase<TNotification, TEntity> : WebhookE
 {
     protected WebhookEventContentBase(
         IWebhookFiringService webhookFiringService,
-        IWebHookService webHookService,
+        IWebhookService webHookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
         IServerRoleAccessor serverRoleAccessor,
         string eventName)

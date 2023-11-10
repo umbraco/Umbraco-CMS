@@ -1,10 +1,10 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Services;
 
-public interface IWebHookService
+public interface IWebhookService
 {
-    Task<Webhook> CreateAsync(Webhook webhook);
+    Task<Webhook?> CreateAsync(Webhook webhook);
 
     Task UpdateAsync(Webhook webhook);
 

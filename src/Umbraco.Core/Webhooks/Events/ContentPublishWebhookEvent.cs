@@ -17,7 +17,7 @@ public class ContentPublishWebhookEvent : WebhookEventContentBase<ContentPublish
 
     public ContentPublishWebhookEvent(
         IWebhookFiringService webhookFiringService,
-        IWebHookService webHookService,
+        IWebhookService webHookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
         IServerRoleAccessor serverRoleAccessor,
         IPublishedSnapshotAccessor publishedSnapshotAccessor,

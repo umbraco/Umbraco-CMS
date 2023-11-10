@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
 public class WebhookServiceTests : UmbracoIntegrationTest
 {
-    private IWebHookService WebhookService => GetRequiredService<IWebHookService>();
+    private IWebhookService WebhookService => GetRequiredService<IWebhookService>();
 
     [Test]
     [TestCase("https://example.com", Constants.WebhookEvents.ContentPublish, "00000000-0000-0000-0000-010000000000")]

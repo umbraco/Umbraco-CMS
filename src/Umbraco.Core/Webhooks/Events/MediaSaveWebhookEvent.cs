@@ -17,7 +17,7 @@ public class MediaSaveWebhookEvent : WebhookEventContentBase<MediaSavedNotificat
 
     public MediaSaveWebhookEvent(
         IWebhookFiringService webhookFiringService,
-        IWebHookService webHookService,
+        IWebhookService webHookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
         IServerRoleAccessor serverRoleAccessor,
         IPublishedSnapshotAccessor publishedSnapshotAccessor,

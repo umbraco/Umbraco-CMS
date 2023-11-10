@@ -18,12 +18,12 @@ public abstract class WebhookEventBase<TNotification> : IWebhookEvent, INotifica
     public string EventName { get; set; }
 
     protected IWebhookFiringService WebhookFiringService { get; }
-    protected IWebHookService WebHookService { get; }
+    protected IWebhookService WebHookService { get; }
     protected WebhookSettings WebhookSettings { get; private set; }
 
     protected WebhookEventBase(
         IWebhookFiringService webhookFiringService,
-        IWebHookService webHookService,
+        IWebhookService webHookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
         IServerRoleAccessor serverRoleAccessor,
         string eventName)
