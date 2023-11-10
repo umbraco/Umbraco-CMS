@@ -477,9 +477,10 @@
     <key alias="confirmlogout">Er du sikker på at du vil forlade Umbraco?</key>
     <key alias="confirmSure">Er du sikker?</key>
     <key alias="cut">Klip</key>
-    <key alias="editdictionary">Rediger ordbogsnøgle</key>
-    <key alias="editlanguage">Rediger sprog</key>
+    <key alias="editDictionary">Rediger ordbogsnøgle</key>
+    <key alias="editLanguage">Rediger sprog</key>
     <key alias="editSelectedMedia">Rediger det valgte medie</key>
+    <key alias="editWebhook">Edit webhook</key> 
     <key alias="insertAnchor">Indsæt lokalt link</key>
     <key alias="insertCharacter">Indsæt tegn</key>
     <key alias="insertgraphicheadline">Indsæt grafisk overskrift</key>

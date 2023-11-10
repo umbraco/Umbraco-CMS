@@ -501,9 +501,10 @@
     <key alias="confirmlogout">Are you sure?</key>
     <key alias="confirmSure">Are you sure?</key>
     <key alias="cut">Cut</key>
-    <key alias="editdictionary">Edit Dictionary Item</key>
-    <key alias="editlanguage">Edit Language</key>
+    <key alias="editDictionary">Edit dictionary item</key>
+    <key alias="editLanguage">Edit language</key>
     <key alias="editSelectedMedia">Edit selected media</key>
+    <key alias="editWebhook">Edit webhook</key>
     <key alias="insertAnchor">Insert local link</key>
     <key alias="insertCharacter">Insert character</key>
     <key alias="insertgraphicheadline">Insert graphic headline</key>
