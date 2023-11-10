@@ -1,11 +1,14 @@
-﻿(function () {
+(function () {
   "use strict";
 
-  function WebhookController($q, $timeout, $routeParams, webhooksResource, navigationService, notificationsService, editorService, overlayService, contentTypeResource, mediaTypeResource, memberTypeResource) {
+  function WebhookController($q, $timeout, $location, $routeParams, webhooksResource, navigationService, notificationsService, editorService, overlayService, contentTypeResource, mediaTypeResource, memberTypeResource) {
 
     const vm = this;
 
     vm.openWebhookOverlay = openWebhookOverlay;
+
+    vm.addWebhook = addWebhook;
+    vm.editWebhook = editWebhook;
     vm.deleteWebhook = deleteWebhook;
     vm.handleSubmissionError = handleSubmissionError;
     vm.resolveTypeNames = resolveTypeNames;
@@ -110,6 +113,16 @@
       model.submitButtonState = 'error';
     }
 
+    function addWebhook() {
+      $location.search('create', null);
+      $location.path("/settings/webhooks/edit/-1").search("create", "true");
+    }
+
+    function editWebhook(webhook) {
+      $location.search('create', null);
+      $location.path("/settings/webhooks/edit/" + webhook.key);
+    }
+
     function openWebhookOverlay (webhook) {
       let isCreating = !webhook;
       editorService.open({
@@ -185,7 +198,7 @@
         });
     }
 
-    function deleteWebhook (webhook, event) {
+    function deleteWebhook(webhook, event) {
       overlayService.open({
         title: 'Confirm delete webhook',
         content: 'Are you sure you want to delete the webhook?',

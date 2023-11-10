@@ -1,4 +1,4 @@
-<div class="headless-edit-webhook-overlay" ng-controller="Umbraco.Editors.Webhooks.EditController as vm">
+<div class="headless-edit-webhook-overlay" ng-controller="Umbraco.Editors.Webhooks.Old.EditController as vm">
   <umb-editor-view>
     <ng-form name="editWebhookForm" novalidate val-form-manager>
       <umb-editor-header
@@ -95,6 +95,7 @@
                   on-click="model.webhook.enabled = !model.webhook.enabled">
                 </umb-toggle>
               </umb-control-group>
+
               <umb-control-group
                   label="Headers"
                   description="Custom headers to include in the webhook request."

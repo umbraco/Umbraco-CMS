@@ -1,4 +1,4 @@
-﻿(function () {
+(function () {
   "use strict";
 
   function EditController($scope, editorService, contentTypeResource, mediaTypeResource, memberTypeResource) {
@@ -142,5 +142,5 @@
     }
   }
 
-  angular.module("umbraco").controller("Umbraco.Editors.Webhooks.EditController", EditController);
+  angular.module("umbraco").controller("Umbraco.Editors.Webhooks.Old.EditController", EditController);
 })();
