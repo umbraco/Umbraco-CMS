@@ -32,7 +32,7 @@ public class WebhookFiring : RecurringHostedServiceBase
         IWebhookService webHookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
         ICoreScopeProvider coreScopeProvider)
-        : base(logger, TimeSpan.FromSeconds(10), DefaultDelay)
+        : base(logger, webhookSettings.CurrentValue.Period, TimeSpan.FromSeconds(20))
     {
         _logger = logger;
         _runtimeState = runtimeState;
