@@ -4,6 +4,7 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 
@@ -18,6 +19,7 @@ public class WebhookFiring : RecurringHostedServiceBase
     private readonly IWebhookLogFactory _webhookLogFactory;
     private readonly IWebhookLogService _webhookLogService;
     private readonly IWebHookService _webHookService;
+    private readonly ICoreScopeProvider _coreScopeProvider;
     private WebhookSettings _webhookSettings;
 
     public WebhookFiring(
@@ -28,8 +30,9 @@ public class WebhookFiring : RecurringHostedServiceBase
         IWebhookLogFactory webhookLogFactory,
         IWebhookLogService webhookLogService,
         IWebHookService webHookService,
-        IOptionsMonitor<WebhookSettings> webhookSettings)
-        : base(logger, TimeSpan.FromMinutes(1), DefaultDelay)
+        IOptionsMonitor<WebhookSettings> webhookSettings,
+        ICoreScopeProvider coreScopeProvider)
+        : base(logger, TimeSpan.FromSeconds(10), DefaultDelay)
     {
         _logger = logger;
         _runtimeState = runtimeState;
@@ -38,13 +41,14 @@ public class WebhookFiring : RecurringHostedServiceBase
         _webhookLogFactory = webhookLogFactory;
         _webhookLogService = webhookLogService;
         _webHookService = webHookService;
+        _coreScopeProvider = coreScopeProvider;
         _webhookSettings = webhookSettings.CurrentValue;
         webhookSettings.OnChange(x => _webhookSettings = x);
     }
 
     public override async Task PerformExecuteAsync(object? state)
     {
-        // Do NOT run publishing if not properly running
+        // Don't process webhooks if we're not in RuntimeLevel.Run.
         if (_runtimeState.Level != RuntimeLevel.Run)
         {
             if (_logger.IsEnabled(LogLevel.Debug))
@@ -60,6 +64,8 @@ public class WebhookFiring : RecurringHostedServiceBase
 
     private async Task ProcessWebhookRequests()
     {
+        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+        scope.WriteLock(Constants.Locks.WebhookRequest);
         IEnumerable<WebhookRequest> requests = await _webhookRequestService.GetAllAsync();
         foreach (WebhookRequest request in requests)
         {
@@ -69,8 +75,17 @@ public class WebhookFiring : RecurringHostedServiceBase
                 continue;
             }
 
-            HttpResponseMessage response = await SendRequestAsync(webhook, request.EventAlias, request.RequestObject, request.RetryCount, CancellationToken.None);
-            if (response.IsSuccessStatusCode || request.RetryCount >= _webhookSettings.MaximumRetries)
+            HttpResponseMessage? response = null;
+            try
+            {
+                response = await SendRequestAsync(webhook, request.EventAlias, request.RequestObject, request.RetryCount, CancellationToken.None);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while sending webhook request for webhook {WebhookKey}.", request.WebhookKey);
+            }
+
+            if ((response?.IsSuccessStatusCode ?? false) || request.RetryCount >= _webhookSettings.MaximumRetries)
             {
                 await _webhookRequestService.DeleteAsync(request);
             }
@@ -80,6 +95,8 @@ public class WebhookFiring : RecurringHostedServiceBase
                 await _webhookRequestService.UpdateAsync(request);
             }
         }
+
+        scope.Complete();
     }
 
     private async Task<HttpResponseMessage> SendRequestAsync(Webhook webhook, string eventName, object? payload, int retryCount, CancellationToken cancellationToken)
