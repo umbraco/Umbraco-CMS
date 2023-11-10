@@ -9,7 +9,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { Guard, UmbRoute } from '@umbraco-cms/backoffice/router';
 import { pathWithoutBasePath } from '@umbraco-cms/backoffice/router';
 import { OpenAPI, RuntimeLevelModel } from '@umbraco-cms/backoffice/backend-api';
-import { contextData, umbDebugContextEventType } from '@umbraco-cms/backoffice/context-api';
+import { UmbContextDebugController } from '@umbraco-cms/backoffice/debug';
 
 @customElement('umb-app')
 export class UmbAppElement extends UmbLitElement {
@@ -63,6 +63,8 @@ export class UmbAppElement extends UmbLitElement {
 	constructor() {
 		super();
 
+		new UmbContextDebugController(this);
+
 		this.#umbIconRegistry.attach(this);
 		this.#uuiIconRegistry.attach(this);
 	}
@@ -113,29 +115,6 @@ export class UmbAppElement extends UmbLitElement {
 			// Redirect to the error page
 			this.#errorPage(errorMsg, error);
 		}
-
-		// TODO: wrap all debugging logic in a separate class. Maybe this could be part of the context-api? When we create a new root, we could attach the debugger to it?
-		// Listen for the debug event from the <umb-debug> component
-		this.addEventListener(umbDebugContextEventType, (event: any) => {
-			// Once we got to the outter most component <umb-app>
-			// we can send the event containing all the contexts
-			// we have collected whilst coming up through the DOM
-			// and pass it back down to the callback in
-			// the <umb-debug> component that originally fired the event
-			if (event.callback) {
-				event.callback(event.instances);
-			}
-
-			// Massage the data into a simplier format
-			// Why? Can't send contexts data directly - browser seems to not serialize it and says its null
-			// But a simple object works fine for browser extension to consume
-			const data = {
-				contexts: contextData(event.instances),
-			};
-
-			// Emit this new event for the browser extension to listen for
-			this.dispatchEvent(new CustomEvent('umb:debug-contexts:data', { detail: data, bubbles: true }));
-		});
 	}
 
 	async #setAuthStatus() {
