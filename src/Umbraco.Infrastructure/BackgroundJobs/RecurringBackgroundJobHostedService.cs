@@ -62,7 +62,6 @@ public class RecurringBackgroundJobHostedService<TJob> : RecurringHostedServiceB
     public override async Task PerformExecuteAsync(object? state)
     {
         var executingNotification = new Notifications.RecurringBackgroundJobExecutingNotification(_job, new EventMessages());
-        await _eventAggregator.PublishAsync(executingNotification);
 
         try
         {
@@ -90,7 +89,7 @@ public class RecurringBackgroundJobHostedService<TJob> : RecurringHostedServiceB
                 return;
             }
 
-
+            await _eventAggregator.PublishAsync(executingNotification);
             await _job.RunJobAsync();
             await _eventAggregator.PublishAsync(new Notifications.RecurringBackgroundJobExecutedNotification(_job, new EventMessages()).WithStateFrom(executingNotification));
 
