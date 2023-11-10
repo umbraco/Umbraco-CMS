@@ -13,7 +13,7 @@ public class WebhookRequestServiceTests : UmbracoIntegrationTest
 {
     private IWebhookRequestService WebhookRequestService => GetRequiredService<IWebhookRequestService>();
 
-    private IWebHookService WebhookService => GetRequiredService<IWebHookService>();
+    private IWebhookService WebhookService => GetRequiredService<IWebhookService>();
 
     [Test]
     public async Task Can_Create_And_Get()
