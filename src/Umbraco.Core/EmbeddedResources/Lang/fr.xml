@@ -1587,7 +1587,7 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
   </area>
  <area alias="webhooks">
     <key alias="addWebhook">Créer un webhook</key>
-    <key alias="addWebhookHeader">Ajouter un en-tête de webhook</key>
+    <key alias="addWebhookHeader">Ajouter un header au webhook</key>
     <key alias="logs">Logs</key>
     <key alias="addDocumentType">Ajouter un Type de Document</key>
     <key alias="addMediaType">Ajouter un Type de Media</key>
