@@ -40,6 +40,12 @@ internal sealed class NestedContentPropertyIndexValueFactory
     }
 
     protected override IContentType? GetContentTypeOfNestedItem(
+        NestedContentPropertyEditor.NestedContentValues.NestedContentRowValue input, IDictionary<Guid, IContentType> contentTypeDictionary)
+        => _contentTypeService.Get(input.ContentTypeAlias);
+
+    [Obsolete("Use non-obsolete overload, scheduled for removal in v14")]
+
+    protected override IContentType? GetContentTypeOfNestedItem(
         NestedContentPropertyEditor.NestedContentValues.NestedContentRowValue input)
         => _contentTypeService.Get(input.ContentTypeAlias);
 
