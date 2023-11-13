@@ -143,6 +143,10 @@ internal abstract class SwaggerDocumentationFilterBase<TBaseController>
             {
                 { "Include all properties", new OpenApiExample { Value = new OpenApiString("properties[$all]") } },
                 {
+                    "Include only specific property",
+                    new OpenApiExample { Value = new OpenApiString("properties[alias1]") }
+                },
+                {
                     "Include only specific properties",
                     new OpenApiExample { Value = new OpenApiString("properties[alias1,alias2]") }
                 },
