@@ -1,8 +1,21 @@
-import { DATA_TYPE_REPOSITORY_ALIAS } from '../repository/manifests.js';
+import { UmbDataTypeTreeRepository } from './data-type-tree.repository.js';
 import { UmbDataTypeTreeStore } from './data-type.tree.store.js';
-import type { ManifestTree, ManifestTreeItem, ManifestTreeStore } from '@umbraco-cms/backoffice/extension-registry';
+import type {
+	ManifestRepository,
+	ManifestTree,
+	ManifestTreeItem,
+	ManifestTreeStore,
+} from '@umbraco-cms/backoffice/extension-registry';
 
+export const DATA_TYPE_TREE_REPOSITORY_ALIAS = 'Umb.Repository.DataType.Tree';
 export const DATA_TYPE_TREE_STORE_ALIAS = 'Umb.Store.DataType.Tree';
+
+const treeRepository: ManifestRepository = {
+	type: 'repository',
+	alias: DATA_TYPE_TREE_REPOSITORY_ALIAS,
+	name: 'Data Type Tree Repository',
+	api: UmbDataTypeTreeRepository,
+};
 
 const treeStore: ManifestTreeStore = {
 	type: 'treeStore',
@@ -16,7 +29,7 @@ const tree: ManifestTree = {
 	alias: 'Umb.Tree.DataTypes',
 	name: 'Data Types Tree',
 	meta: {
-		repositoryAlias: DATA_TYPE_REPOSITORY_ALIAS,
+		repositoryAlias: DATA_TYPE_TREE_REPOSITORY_ALIAS,
 	},
 };
 
@@ -30,4 +43,4 @@ const treeItem: ManifestTreeItem = {
 	},
 };
 
-export const manifests = [treeStore, tree, treeItem];
+export const manifests = [treeRepository, treeStore, tree, treeItem];

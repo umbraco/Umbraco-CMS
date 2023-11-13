@@ -1,89 +1,22 @@
-import { DATA_TYPE_ROOT_ENTITY_TYPE } from '../entities.js';
-import { UmbDataTypeTreeServerDataSource } from './sources/data-type.tree.server.data.js';
 import { UmbDataTypeServerDataSource } from './sources/data-type.server.data.js';
 import { UmbDataTypeRepositoryBase } from './data-type-repository-base.js';
 import { createTreeItem } from './utils.js';
-import type {
-	UmbTreeRepository,
-	UmbDetailRepository,
-	UmbTreeDataSource,
-	UmbDataSource,
-} from '@umbraco-cms/backoffice/repository';
+import type { UmbDetailRepository, UmbDataSource } from '@umbraco-cms/backoffice/repository';
 import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import {
 	CreateDataTypeRequestModel,
 	DataTypeResponseModel,
-	FolderTreeItemResponseModel,
 	UpdateDataTypeRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
-import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 export class UmbDataTypeRepository
 	extends UmbDataTypeRepositoryBase
-	implements
-		UmbTreeRepository<FolderTreeItemResponseModel>,
-		UmbDetailRepository<CreateDataTypeRequestModel, any, UpdateDataTypeRequestModel, DataTypeResponseModel>,
-		UmbApi
+	implements UmbDetailRepository<CreateDataTypeRequestModel, any, UpdateDataTypeRequestModel, DataTypeResponseModel>
 {
-	#treeSource: UmbTreeDataSource<FolderTreeItemResponseModel>;
 	#detailSource: UmbDataSource<CreateDataTypeRequestModel, any, UpdateDataTypeRequestModel, DataTypeResponseModel>;
 
 	constructor(host: UmbControllerHost) {
 		super(host);
-
-		// TODO: figure out how spin up get the correct data source
-		this.#treeSource = new UmbDataTypeTreeServerDataSource(this);
 		this.#detailSource = new UmbDataTypeServerDataSource(this);
-	}
-
-	// TREE:
-	async requestTreeRoot() {
-		await this._init;
-
-		const data = {
-			id: null,
-			type: DATA_TYPE_ROOT_ENTITY_TYPE,
-			name: 'Data Types',
-			icon: 'icon-folder',
-			hasChildren: true,
-		};
-
-		return { data };
-	}
-
-	async requestRootTreeItems() {
-		await this._init;
-
-		const { data, error } = await this.#treeSource.getRootItems();
-
-		if (data) {
-			this._treeStore!.appendItems(data.items);
-		}
-
-		return { data, error, asObservable: () => this._treeStore!.rootItems };
-	}
-
-	async requestTreeItemsOf(parentId: string | null) {
-		await this._init;
-		if (parentId === undefined) throw new Error('Parent id is missing');
-
-		const { data, error } = await this.#treeSource.getChildrenOf(parentId);
-
-		if (data) {
-			this._treeStore!.appendItems(data.items);
-		}
-
-		return { data, error, asObservable: () => this._treeStore!.childrenOf(parentId) };
-	}
-
-	async rootTreeItems() {
-		await this._init;
-		return this._treeStore!.rootItems;
-	}
-
-	async treeItemsOf(parentId: string | null) {
-		if (parentId === undefined) throw new Error('Parent id is missing');
-		await this._init;
-		return this._treeStore!.childrenOf(parentId);
 	}
 
 	// DETAILS:
