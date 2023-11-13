@@ -138,6 +138,9 @@ public static class UmbracoEFCoreServiceCollectionExtensions
             case Constants.ProviderNames.SQLLite:
                 builder.UseSqlite(connectionString);
                 break;
+            case "Microsoft.Data.SQLite":
+                builder.UseSqlite(connectionString);
+                break;
             default:
                 throw new InvalidDataException($"The provider {providerName} is not supported. Manually add the add the UseXXX statement to the options. I.E UseNpgsql()");
         }
