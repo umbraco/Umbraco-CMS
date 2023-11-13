@@ -1,22 +1,18 @@
 import { DATA_TYPE_ROOT_ENTITY_TYPE } from '../entities.js';
 import { UmbDataTypeTreeServerDataSource } from './sources/data-type.tree.server.data.js';
 import { UmbDataTypeServerDataSource } from './sources/data-type.server.data.js';
-import { UmbDataTypeFolderServerDataSource } from './sources/data-type-folder.server.data.js';
 import { UmbDataTypeRepositoryBase } from './data-type-repository-base.js';
+import { createTreeItem } from './utils.js';
 import type {
 	UmbTreeRepository,
 	UmbDetailRepository,
-	UmbFolderRepository,
 	UmbTreeDataSource,
 	UmbDataSource,
-	UmbFolderDataSource,
 } from '@umbraco-cms/backoffice/repository';
 import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import {
 	CreateDataTypeRequestModel,
-	CreateFolderRequestModel,
 	DataTypeResponseModel,
-	FolderModelBaseModel,
 	FolderTreeItemResponseModel,
 	UpdateDataTypeRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
@@ -26,12 +22,10 @@ export class UmbDataTypeRepository
 	implements
 		UmbTreeRepository<FolderTreeItemResponseModel>,
 		UmbDetailRepository<CreateDataTypeRequestModel, any, UpdateDataTypeRequestModel, DataTypeResponseModel>,
-		UmbFolderRepository,
 		UmbApi
 {
 	#treeSource: UmbTreeDataSource<FolderTreeItemResponseModel>;
 	#detailSource: UmbDataSource<CreateDataTypeRequestModel, any, UpdateDataTypeRequestModel, DataTypeResponseModel>;
-	#folderSource: UmbFolderDataSource;
 
 	constructor(host: UmbControllerHost) {
 		super(host);
@@ -39,7 +33,6 @@ export class UmbDataTypeRepository
 		// TODO: figure out how spin up get the correct data source
 		this.#treeSource = new UmbDataTypeTreeServerDataSource(this);
 		this.#detailSource = new UmbDataTypeServerDataSource(this);
-		this.#folderSource = new UmbDataTypeFolderServerDataSource(this);
 	}
 
 	// TREE:
@@ -191,85 +184,4 @@ export class UmbDataTypeRepository
 
 		return { error };
 	}
-
-	// Folder:
-	async createFolderScaffold(parentId: string | null) {
-		if (parentId === undefined) throw new Error('Parent id is missing');
-		await this._init;
-		return this.#folderSource.createScaffold(parentId);
-	}
-
-	// TODO: temp create type until backend is ready. Remove the id addition when new types are generated.
-	async createFolder(folderRequest: CreateFolderRequestModel & { id?: string | undefined }) {
-		if (!folderRequest) throw new Error('folder request is missing');
-		await this._init;
-
-		const { error } = await this.#folderSource.insert(folderRequest);
-
-		if (!error) {
-			// TODO: We need to push a new item to the tree store to update the tree. How do we want to create the tree items?
-			const folderTreeItem = createFolderTreeItem(folderRequest);
-			this._treeStore!.appendItems([folderTreeItem]);
-		}
-
-		return { error };
-	}
-
-	async deleteFolder(id: string) {
-		if (!id) throw new Error('Key is missing');
-		await this._init;
-
-		const { error } = await this.#folderSource.delete(id);
-
-		if (!error) {
-			this._treeStore!.removeItem(id);
-		}
-
-		return { error };
-	}
-
-	async updateFolder(id: string, folder: FolderModelBaseModel) {
-		if (!id) throw new Error('Key is missing');
-		if (!folder) throw new Error('Folder data is missing');
-		await this._init;
-
-		const { error } = await this.#folderSource.update(id, folder);
-
-		if (!error) {
-			this._treeStore!.updateItem(id, { name: folder.name });
-		}
-
-		return { error };
-	}
-
-	async requestFolder(id: string) {
-		if (!id) throw new Error('Key is missing');
-		await this._init;
-		return await this.#folderSource.get(id);
-	}
 }
-
-export const createTreeItem = (item: CreateDataTypeRequestModel): FolderTreeItemResponseModel => {
-	if (!item) throw new Error('item is null or undefined');
-	if (!item.id) throw new Error('item.id is null or undefined');
-
-	return {
-		type: 'data-type',
-		parentId: item.parentId,
-		name: item.name,
-		id: item.id,
-		isFolder: false,
-		isContainer: false,
-		hasChildren: false,
-	};
-};
-
-export const createFolderTreeItem = (item: CreateFolderRequestModel): FolderTreeItemResponseModel => {
-	if (!item) throw new Error('item is null or undefined');
-	if (!item.id) throw new Error('item.id is null or undefined');
-
-	return {
-		...createTreeItem(item),
-		isFolder: true,
-	};
-};
