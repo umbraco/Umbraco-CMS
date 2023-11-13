@@ -52,4 +52,19 @@ export class UmbStylesheetTreeServerDataSource implements UmbTreeDataSource<File
 			);
 		}
 	}
+
+	/**
+	 * Fetches stylesheet items from the server
+	 * @param {(string | undefined)} path
+	 * @return {*}
+	 * @memberof UmbStylesheetTreeServerDataSource
+	 */
+	async getItems(path: Array<string>) {
+		return tryExecuteAndNotify(
+			this.#host,
+			StylesheetResource.getStylesheetItem({
+				path,
+			}),
+		);
+	}
 }
