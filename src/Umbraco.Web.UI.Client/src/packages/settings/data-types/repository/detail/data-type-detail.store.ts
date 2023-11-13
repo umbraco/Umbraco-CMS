@@ -27,30 +27,12 @@ export class UmbDataTypeDetailStore extends UmbStoreBase<DataTypeResponseModel> 
 	}
 
 	/**
-	 * Append a data-type to the store
-	 * @param {DataTypeModel} dataType
-	 * @memberof UmbDataTypeStore
-	 */
-	append(dataType: DataTypeResponseModel) {
-		this._data.append([dataType]);
-	}
-
-	/**
 	 * Retrieve a data-type from the store
 	 * @param {id} string id.
 	 * @memberof UmbDataTypeStore
 	 */
 	byId(id: DataTypeResponseModel['id']) {
 		return this._data.asObservablePart((x) => x.find((y) => y.id === id));
-	}
-
-	/**
-	 * Removes data-types in the store with the given uniques
-	 * @param {string[]} uniques
-	 * @memberof UmbDataTypeStore
-	 */
-	remove(uniques: Array<DataTypeResponseModel['id']>) {
-		this._data.remove(uniques);
 	}
 
 	withPropertyEditorUiAlias(propertyEditorUiAlias: string) {
