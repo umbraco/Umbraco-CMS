@@ -42,18 +42,22 @@ internal class WebhookLogDto
     public int RetryCount { get; set; }
 
     [Column(Name = "requestHeaders")]
+    [SpecialDbType(SpecialDbTypes.NVARCHARMAX)]
     [NullSetting(NullSetting = NullSettings.NotNull)]
     public string RequestHeaders { get; set; } = string.Empty;
 
     [Column(Name = "requestBody")]
+    [SpecialDbType(SpecialDbTypes.NVARCHARMAX)]
     [NullSetting(NullSetting = NullSettings.NotNull)]
     public string RequestBody { get; set; } = string.Empty;
 
     [Column(Name = "responseHeaders")]
+    [SpecialDbType(SpecialDbTypes.NVARCHARMAX)]
     [NullSetting(NullSetting = NullSettings.NotNull)]
     public string ResponseHeaders { get; set; } = string.Empty;
 
     [Column(Name = "responseBody")]
+    [SpecialDbType(SpecialDbTypes.NVARCHARMAX)]
     [NullSetting(NullSetting = NullSettings.NotNull)]
     public string ResponseBody { get; set; } = string.Empty;
 }
