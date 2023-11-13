@@ -20,5 +20,5 @@ export class UmbStylesheetTreeStore extends UmbFileSystemTreeStore {
 }
 
 export const UMB_STYLESHEET_TREE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbStylesheetTreeStore>(
-	'UmbStylesheetTreeStore'
+	'UmbStylesheetTreeStore',
 );

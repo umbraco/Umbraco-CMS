@@ -1,7 +1,29 @@
-import { STYLESHEET_ENTITY_TYPE, STYLESHEET_REPOSITORY_ALIAS } from '../config.js';
-import type { ManifestTree, ManifestTreeItem } from '@umbraco-cms/backoffice/extension-registry';
+import { STYLESHEET_ENTITY_TYPE, STYLESHEET_TREE_STORE_ALIAS } from '../config.js';
+import { UmbStylesheetTreeRepository } from './stylesheet-tree.repository.js';
+import { UmbStylesheetTreeStore } from './stylesheet.tree.store.js';
+import type {
+	ManifestRepository,
+	ManifestTree,
+	ManifestTreeItem,
+	ManifestTreeStore,
+} from '@umbraco-cms/backoffice/extension-registry';
 
 export const STYLESHEET_TREE_ALIAS = 'Umb.Tree.Stylesheet';
+export const STYLESHEET_TREE_REPOSITORY_ALIAS = 'Umb.Repository.StylesheetTree';
+
+const treeRepository: ManifestRepository = {
+	type: 'repository',
+	alias: STYLESHEET_TREE_REPOSITORY_ALIAS,
+	name: 'Stylesheet Tree Repository',
+	api: UmbStylesheetTreeRepository,
+};
+
+const treeStore: ManifestTreeStore = {
+	type: 'treeStore',
+	alias: STYLESHEET_TREE_STORE_ALIAS,
+	name: 'Stylesheet Tree Store',
+	api: UmbStylesheetTreeStore,
+};
 
 const tree: ManifestTree = {
 	type: 'tree',
@@ -9,7 +31,7 @@ const tree: ManifestTree = {
 	name: 'Stylesheet Tree',
 	weight: 10,
 	meta: {
-		repositoryAlias: STYLESHEET_REPOSITORY_ALIAS,
+		repositoryAlias: STYLESHEET_TREE_REPOSITORY_ALIAS,
 	},
 };
 
@@ -23,4 +45,4 @@ const treeItem: ManifestTreeItem = {
 	},
 };
 
-export const manifests = [tree, treeItem];
+export const manifests = [treeRepository, treeStore, tree, treeItem];

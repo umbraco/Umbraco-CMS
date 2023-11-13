@@ -48,7 +48,7 @@ export class UmbStylesheetTreeServerDataSource implements UmbTreeDataSource<File
 				this.#host,
 				StylesheetResource.getTreeStylesheetChildren({
 					path,
-				})
+				}),
 			);
 		}
 	}
@@ -64,7 +64,7 @@ export class UmbStylesheetTreeServerDataSource implements UmbTreeDataSource<File
 			this.#host,
 			StylesheetResource.getStylesheetItem({
 				path,
-			})
+			}),
 		);
 	}
 }

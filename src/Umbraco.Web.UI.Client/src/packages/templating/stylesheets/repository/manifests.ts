@@ -1,8 +1,6 @@
-import { STYLESHEET_REPOSITORY_ALIAS, STYLESHEET_TREE_STORE_ALIAS } from '../config.js';
+import { STYLESHEET_REPOSITORY_ALIAS } from '../config.js';
 import { UmbStylesheetRepository } from './stylesheet.repository.js';
-import { UmbStylesheetTreeStore } from './stylesheet.tree.store.js';
-import { ManifestRepository, ManifestTreeStore } from '@umbraco-cms/backoffice/extension-registry';
-
+import { ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
 
 const repository: ManifestRepository = {
 	type: 'repository',
@@ -11,12 +9,4 @@ const repository: ManifestRepository = {
 	api: UmbStylesheetRepository,
 };
 
-
-const treeStore: ManifestTreeStore = {
-	type: 'treeStore',
-	alias: STYLESHEET_TREE_STORE_ALIAS,
-	name: 'Stylesheet Tree Store',
-	api: UmbStylesheetTreeStore,
-};
-
-export const manifests = [treeStore, repository];
+export const manifests = [repository];
