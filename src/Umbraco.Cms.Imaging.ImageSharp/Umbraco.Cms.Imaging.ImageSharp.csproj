@@ -7,6 +7,8 @@
   <ItemGroup>
     <PackageReference Include="SixLabors.ImageSharp" Version="3.0.1" />
     <PackageReference Include="SixLabors.ImageSharp.Web" Version="3.0.1" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="2.1.6" />
+    <PackageReference Include="SixLabors.ImageSharp.Web" Version="2.0.2" />
   </ItemGroup>
 
   <ItemGroup>
