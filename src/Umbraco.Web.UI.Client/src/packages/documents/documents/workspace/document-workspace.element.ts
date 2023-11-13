@@ -21,9 +21,10 @@ export class UmbDocumentWorkspaceElement extends UmbLitElement {
 
 	public set manifest(manifest: ManifestWorkspace) {
 
-		console.log("got manifest", manifest)
+		console.log("got manifest", manifest.alias)
+		// TODO: Make context declaration.
 
-		createExtensionApi(this.manifest, [this]).then( (context) => {
+		createExtensionApi(manifest, [this]).then( (context) => {
 			if(context) {
 				this.#gotWorkspaceContext(context);
 			}

@@ -115,7 +115,7 @@ To declare the Published Cache Status Dashboard as a new manifest, we need to ad
 	alias: 'Umb.Dashboard.PublishedStatus',
 	name: 'Published Status Dashboard',
 	elementName: 'umb-dashboard-published-status',
-	loader: () => import('./published-status/dashboard-published-status.element.js'),
+	element: () => import('./published-status/dashboard-published-status.element.js'),
 	weight: 200,
 	meta: {
 		label: 'Published Status',

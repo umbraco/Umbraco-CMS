@@ -16,7 +16,7 @@ const treeItem: ManifestTreeItem = {
 	type: 'treeItem',
 	alias: 'Umb.TreeItem.Document',
 	name: 'Document Tree Item',
-	loader: () => import('./tree-item/document-tree-item.element.js'),
+	js: () => import('./tree-item/document-tree-item.element.js'),
 	meta: {
 		entityTypes: ['document-root', 'document'],
 	},

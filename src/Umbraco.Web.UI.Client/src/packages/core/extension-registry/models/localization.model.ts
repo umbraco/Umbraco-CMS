@@ -1,7 +1,7 @@
-import type { ManifestWithLoaderIncludingDefaultExport } from '@umbraco-cms/backoffice/extension-api';
+import type { ManifestPlainJs } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbLocalizationDictionary } from '@umbraco-cms/backoffice/localization-api';
 
-export interface ManifestLocalization extends ManifestWithLoaderIncludingDefaultExport<UmbLocalizationDictionary> {
+export interface ManifestLocalization extends ManifestPlainJs<UmbLocalizationDictionary> {
 	type: 'localization';
 	meta: MetaLocalization;
 }

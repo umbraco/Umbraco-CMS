@@ -4,7 +4,7 @@ export const manifests = [
 		alias: 'Umb.Dashboard.HealthCheck',
 		name: 'Health Check',
 		elementName: 'umb-dashboard-health-check',
-		loader: () => import('./dashboard-health-check.element.js'),
+		js: () => import('./dashboard-health-check.element.js'),
 		weight: 102,
 		meta: {
 			label: 'Health Check',

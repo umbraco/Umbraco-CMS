@@ -5,7 +5,7 @@ const menuItem: ManifestMenuItem = {
 	alias: 'Umb.MenuItem.Documents',
 	name: 'Documents Menu Item',
 	weight: 200,
-	loader: () => import('./document-menu-item.element.js'),
+	js: () => import('./document-menu-item.element.js'),
 	meta: {
 		label: 'Documents',
 		icon: 'icon-folder',

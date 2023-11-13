@@ -3,6 +3,8 @@ import type { ManifestWithLoader } from '../types.js';
 
 export async function loadExtension<T = unknown>(manifest: ManifestWithLoader<T>): Promise<T | null> {
 	try {
+
+		// TODO: Get rid of this, instead make js support loader.
 		if (isManifestLoaderType<T>(manifest)) {
 			return await manifest.loader();
 		}

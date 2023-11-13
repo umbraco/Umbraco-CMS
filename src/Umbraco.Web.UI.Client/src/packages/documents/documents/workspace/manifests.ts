@@ -1,10 +1,12 @@
 import { UmbDocumentSaveAndPublishWorkspaceAction } from './actions/save-and-publish.action.js';
 import { UmbDocumentSaveAndPreviewWorkspaceAction } from './actions/save-and-preview.action.js';
 import { UmbSaveAndScheduleDocumentWorkspaceAction } from './actions/save-and-schedule.action.js';
+import { UmbDocumentWorkspaceContext } from './document-workspace.context.js'; // JUST FOR TEST
 import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type {
 	ManifestWorkspace,
 	ManifestWorkspaceAction,
+	ManifestWorkspaceContext,
 	ManifestWorkspaceEditorView,
 	ManifestWorkspaceViewCollection,
 } from '@umbraco-cms/backoffice/extension-registry';
@@ -13,10 +15,24 @@ const workspace: ManifestWorkspace = {
 	type: 'workspace',
 	alias: 'Umb.Workspace.Document',
 	name: 'Document Workspace',
-	loader: () => import('./document-workspace.element.js'),
+	js: () => import('./document-workspace.element.js'),
+	api: UmbDocumentWorkspaceContext,
 	meta: {
 		entityType: 'document',
 	},
+};
+
+const workspaceContext: ManifestWorkspaceContext = {
+	type: 'workspaceContext',
+	alias: 'Umb.WorkspaceContext.Document',
+	name: 'Document Workspace Context',
+	js: './bla-test.js',
+	conditions: [
+		{
+			alias: 'Umb.Condition.WorkspaceAlias',
+			match: workspace.alias,
+		},
+	],
 };
 
 const workspaceEditorViews: Array<ManifestWorkspaceEditorView> = [
@@ -24,7 +40,7 @@ const workspaceEditorViews: Array<ManifestWorkspaceEditorView> = [
 		type: 'workspaceEditorView',
 		alias: 'Umb.WorkspaceView.Document.Edit',
 		name: 'Document Workspace Edit View',
-		loader: () => import('./views/edit/document-workspace-view-edit.element.js'),
+		js: () => import('./views/edit/document-workspace-view-edit.element.js'),
 		weight: 200,
 		meta: {
 			label: 'Content',
@@ -42,7 +58,7 @@ const workspaceEditorViews: Array<ManifestWorkspaceEditorView> = [
 		type: 'workspaceEditorView',
 		alias: 'Umb.WorkspaceView.Document.Info',
 		name: 'Document Workspace Info View',
-		loader: () => import('./views/info/document-info-workspace-view.element.js'),
+		js: () => import('./views/info/document-info-workspace-view.element.js'),
 		weight: 100,
 		meta: {
 			label: 'Info',
@@ -152,4 +168,4 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 	*/
 ];
 
-export const manifests = [workspace, ...workspaceEditorViews, ...workspaceViewCollections, ...workspaceActions];
+export const manifests = [workspace, workspaceContext, ...workspaceEditorViews, ...workspaceViewCollections, ...workspaceActions];

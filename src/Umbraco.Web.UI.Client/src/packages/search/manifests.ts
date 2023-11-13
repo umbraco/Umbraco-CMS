@@ -5,7 +5,7 @@ export const manifests: Array<ManifestTypes> = [
 		type: 'headerApp',
 		alias: 'Umb.HeaderApp.Search',
 		name: 'Header App Search',
-		loader: () => import('./umb-search-header-app.element.js'),
+		js: () => import('./umb-search-header-app.element.js'),
 		weight: 900,
 		meta: {
 			label: 'Search',
@@ -17,14 +17,14 @@ export const manifests: Array<ManifestTypes> = [
 		type: 'modal',
 		alias: 'Umb.Modal.Search',
 		name: 'Search Modal',
-		loader: () => import('./search-modal/search-modal.element.js'),
+		js: () => import('./search-modal/search-modal.element.js'),
 	},
 	{
 		type: 'dashboard',
 		alias: 'Umb.Dashboard.ExamineManagement',
 		name: 'Examine Management Dashboard',
 		elementName: 'umb-dashboard-examine-management',
-		loader: () => import('./examine-management-dashboard/dashboard-examine-management.element.js'),
+		js: () => import('./examine-management-dashboard/dashboard-examine-management.element.js'),
 		weight: 400,
 		meta: {
 			label: 'Examine Management',
@@ -41,6 +41,6 @@ export const manifests: Array<ManifestTypes> = [
 		type: 'modal',
 		alias: 'Umb.Modal.ExamineFieldsSettings',
 		name: 'Examine Field Settings Modal',
-		loader: () => import('./examine-management-dashboard/views/modal-views/fields-settings.element.js'),
+		js: () => import('./examine-management-dashboard/views/modal-views/fields-settings.element.js'),
 	},
 ];

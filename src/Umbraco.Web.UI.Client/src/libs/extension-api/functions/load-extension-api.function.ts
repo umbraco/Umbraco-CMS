@@ -1,8 +1,11 @@
+import { UmbApi } from '../models/api.interface.js';
 import { isManifestApiJSType, isManifestJSType, isManifestLoaderType } from '../type-guards/index.js';
-import type { ManifestWithLoader } from '../types.js';
+import type { ManifestApi } from '../types/index.js';
 
-export async function loadExtensionApi<T = unknown>(manifest: ManifestWithLoader<T>): Promise<T | null> {
+export async function loadExtensionApi<T extends UmbApi = UmbApi>(manifest: ManifestApi<T>): Promise<T | null> {
 	try {
+
+		// TODO: Get rid of this, instead make apiJs support loader.
 		if (isManifestLoaderType<T>(manifest)) {
 			return manifest.loader();
 		}
