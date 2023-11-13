@@ -8,6 +8,7 @@ export class UmbCreateRTFStylesheetAction<T extends { copy(): Promise<void> }> e
 
 	async execute() {
 		if (this.unique !== null) {
+			// Note: %2f is a slash (/)
 			this.unique = this.unique.replace(/\//g, '%2f');
 		}
 

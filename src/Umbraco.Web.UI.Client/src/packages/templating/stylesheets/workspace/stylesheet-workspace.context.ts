@@ -47,8 +47,8 @@ export class UmbStylesheetWorkspaceContext
 		const path = this.getData()?.path?.replace(/\//g, '%2f');
 		const name = this.getData()?.name;
 
-		// TODO: %2F is a slash (/). Should we make it an actual slash in the URL? (%2F for now so that the server can find the correct stylesheet via URL)
-		return path && name ? `${path}%2F${name}` : name || '';
+		// Note: %2f is a slash (/)
+		return path && name ? `${path}%2f${name}` : name || '';
 	}
 
 	getData() {

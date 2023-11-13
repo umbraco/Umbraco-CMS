@@ -8,6 +8,7 @@ export class UmbCreateStylesheetAction<T extends { copy(): Promise<void> }> exte
 
 	async execute() {
 		if (this.unique !== null) {
+			// Note: %2f is a slash (/)
 			this.unique = this.unique.replace(/\//g, '%2f');
 		}
 
