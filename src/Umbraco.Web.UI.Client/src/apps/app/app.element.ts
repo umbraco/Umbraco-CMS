@@ -117,6 +117,7 @@ export class UmbAppElement extends UmbLitElement {
 		}
 	}
 
+	// TODO: move set initial auth state into auth context
 	async #setAuthStatus() {
 		if (this.bypassAuth) return;
 
