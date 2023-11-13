@@ -1,6 +1,6 @@
 import { UmbDocumentTypeRepository } from '../repository/document-type.repository.js';
 import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
-import { UmbWorkspaceContext, UmbSaveableWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
+import { UmbEditableWorkspaceContextBase, UmbSaveableWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
 import type {
 	ContentTypeCompositionModel,
 	ContentTypeSortModel,
@@ -12,7 +12,7 @@ import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 
 type EntityType = DocumentTypeResponseModel;
 export class UmbDocumentTypeWorkspaceContext
-	extends UmbWorkspaceContext<UmbDocumentTypeRepository, EntityType>
+	extends UmbEditableWorkspaceContextBase<UmbDocumentTypeRepository, EntityType>
 	implements UmbSaveableWorkspaceContextInterface<EntityType | undefined>
 {
 	// Draft is located in structure manager

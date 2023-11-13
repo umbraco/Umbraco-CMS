@@ -2,12 +2,12 @@ import { UmbPartialViewsRepository } from '../repository/partial-views.repositor
 import { PartialViewDetails } from '../config.js';
 import { createObservablePart, UmbBooleanState, UmbDeepState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UmbSaveableWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
+import { UmbSaveableWorkspaceContextInterface, UmbEditableWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
 import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
 import { UpdatePartialViewRequestModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
-export class UmbPartialViewWorkspaceContext extends UmbWorkspaceContext<
+export class UmbPartialViewWorkspaceContext extends UmbEditableWorkspaceContextBase<
 	UmbPartialViewsRepository,
 	PartialViewDetails
 > implements UmbSaveableWorkspaceContextInterface {
