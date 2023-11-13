@@ -1,5 +1,15 @@
 import { DATA_TYPE_REPOSITORY_ALIAS } from '../repository/manifests.js';
-import type { ManifestTree, ManifestTreeItem } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbDataTypeTreeStore } from './data-type.tree.store.js';
+import type { ManifestTree, ManifestTreeItem, ManifestTreeStore } from '@umbraco-cms/backoffice/extension-registry';
+
+export const DATA_TYPE_TREE_STORE_ALIAS = 'Umb.Store.DataType.Tree';
+
+const treeStore: ManifestTreeStore = {
+	type: 'treeStore',
+	alias: DATA_TYPE_TREE_STORE_ALIAS,
+	name: 'Data Type Tree Store',
+	api: UmbDataTypeTreeStore,
+};
 
 const tree: ManifestTree = {
 	type: 'tree',
@@ -20,4 +30,4 @@ const treeItem: ManifestTreeItem = {
 	},
 };
 
-export const manifests = [tree, treeItem];
+export const manifests = [treeStore, tree, treeItem];
