@@ -35,13 +35,11 @@ using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Snippets;
 using Umbraco.Cms.Core.DynamicRoot;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Core.Telemetry;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Core.Web;
-using Umbraco.Cms.Core.Webhooks;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.DependencyInjection
@@ -332,9 +330,12 @@ namespace Umbraco.Cms.Core.DependencyInjection
             // Register filestream security analyzers
             Services.AddUnique<IFileStreamSecurityValidator,FileStreamSecurityValidator>();
             Services.AddUnique<IDynamicRootService,DynamicRoot.DynamicRootService>();
+
+            // Register Webhook services
             Services.AddUnique<IWebhookService, WebhookService>();
             Services.AddUnique<IWebhookLogService, WebhookLogService>();
             Services.AddUnique<IWebhookLogFactory, WebhookLogFactory>();
+            Services.AddUnique<IWebhookRequestService, WebhookRequestService>();
         }
     }
 }
