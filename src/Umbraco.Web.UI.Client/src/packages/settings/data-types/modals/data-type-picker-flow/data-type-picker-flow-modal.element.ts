@@ -1,4 +1,4 @@
-import { UmbDataTypeDetailRepository } from '../../repository/detail/data-type-detail.repository.js';
+import { UmbDataTypeTreeRepository } from '../../tree/data-type-tree.repository.js';
 import { css, html, repeat, customElement, property, state, when, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
@@ -51,14 +51,14 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 
 	private _createDataTypeModal: UmbModalRouteRegistrationController;
 
-	#repository;
+	#treeRepository;
 	#dataTypes: Array<EntityTreeItemResponseModel> = [];
 	#propertyEditorUIs: Array<ManifestPropertyEditorUi> = [];
 	#currentFilterQuery = '';
 
 	constructor() {
 		super();
-		this.#repository = new UmbDataTypeDetailRepository(this);
+		this.#treeRepository = new UmbDataTypeTreeRepository(this);
 
 		new UmbModalRouteRegistrationController(this, UMB_DATA_TYPE_PICKER_FLOW_DATA_TYPE_PICKER_MODAL)
 			.addAdditionalPath(':uiAlias')
@@ -102,7 +102,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 	async #init() {
 		// TODO: Get ALL items, or traverse the structure aka. multiple recursive calls.
 		this.observe(
-			(await this.#repository.requestRootTreeItems()).asObservable(),
+			(await this.#treeRepository.requestRootTreeItems()).asObservable(),
 			(items) => {
 				this.#dataTypes = items;
 				this._performFiltering();

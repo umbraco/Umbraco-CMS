@@ -1,14 +1,17 @@
 import { UmbDataTypeRepositoryBase } from '../data-type-repository-base.js';
+import { UmbDataTypeDetailRepository } from '../detail/data-type-detail.repository.js';
 import { UmbDataTypeCopyServerDataSource } from './data-type-copy.server.data-source.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbCopyDataSource, UmbCopyRepository } from '@umbraco-cms/backoffice/repository';
 
 export class UmbCopyDataTypeRepository extends UmbDataTypeRepositoryBase implements UmbCopyRepository {
 	#copySource: UmbCopyDataSource;
+	#detailRepository: UmbDataTypeDetailRepository;
 
 	constructor(host: UmbControllerHost) {
 		super(host);
 		this.#copySource = new UmbDataTypeCopyServerDataSource(this);
+		this.#detailRepository = new UmbDataTypeDetailRepository(this);
 	}
 
 	async copy(id: string, targetId: string | null) {
@@ -17,7 +20,7 @@ export class UmbCopyDataTypeRepository extends UmbDataTypeRepositoryBase impleme
 		if (error) return { error };
 
 		if (dataTypeCopyId) {
-			const { data: dataTypeCopy } = await this.requestById(dataTypeCopyId);
+			const { data: dataTypeCopy } = await this.#detailRepository.requestById(dataTypeCopyId);
 			if (!dataTypeCopy) throw new Error('Could not find copied data type');
 
 			// TODO: Be aware about this responsibility.

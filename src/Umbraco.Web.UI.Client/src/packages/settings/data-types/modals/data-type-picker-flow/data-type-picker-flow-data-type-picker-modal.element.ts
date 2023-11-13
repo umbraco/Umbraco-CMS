@@ -1,4 +1,5 @@
 import { UmbDataTypeDetailRepository } from '../../repository/detail/data-type-detail.repository.js';
+import { UmbDataTypeTreeRepository } from '../../tree/data-type-tree.repository.js';
 import { css, html, customElement, property, state, repeat, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import {
@@ -32,26 +33,27 @@ export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbLitEleme
 	private async _observeDataTypesOf(propertyEditorUiAlias: string) {
 		if (!this.data) return;
 
-		const dataTypeRepository = new UmbDataTypeDetailRepository(this);
+		const dataTypeDetailRepository = new UmbDataTypeDetailRepository(this);
+		const dataTypeTreeRepository = new UmbDataTypeTreeRepository(this);
 
 		// TODO: This is a hack to get the data types of a property editor ui alias.
 		// TODO: Make sure filtering works data-type that does not have a property editor ui, but should be using the default property editor UI for those.
 		// TODO: make an end-point just retrieving the data types using a given property editor ui alias.
-		const { data } = await dataTypeRepository.requestRootTreeItems();
+		const { data } = await dataTypeTreeRepository.requestRootTreeItems();
 
 		if (!data) return;
 
 		await Promise.all(
 			data.items.map((item) => {
 				if (item.id) {
-					return dataTypeRepository.requestById(item.id);
+					return dataTypeDetailRepository.requestById(item.id);
 				}
 				return Promise.resolve();
 			}),
 		);
 
 		// TODO: Use the asObservable from above onces end-point has been made.
-		const source = await dataTypeRepository.byPropertyEditorUiAlias(propertyEditorUiAlias);
+		const source = await dataTypeDetailRepository.byPropertyEditorUiAlias(propertyEditorUiAlias);
 		this.observe(source, (dataTypes) => {
 			this._dataTypes = dataTypes;
 		});
