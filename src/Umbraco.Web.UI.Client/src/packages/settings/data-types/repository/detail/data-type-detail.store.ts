@@ -22,7 +22,7 @@ export class UmbDataTypeStore extends UmbStoreBase<DataTypeResponseModel> {
 		super(
 			host,
 			UMB_DATA_TYPE_STORE_CONTEXT_TOKEN.toString(),
-			new UmbArrayState<DataTypeResponseModel>([], (x) => x.id)
+			new UmbArrayState<DataTypeResponseModel>([], (x) => x.id),
 		);
 	}
 
@@ -56,7 +56,7 @@ export class UmbDataTypeStore extends UmbStoreBase<DataTypeResponseModel> {
 	withPropertyEditorUiAlias(propertyEditorUiAlias: string) {
 		// TODO: Use a model for the data-type tree items: ^^Most likely it should be parsed to the UmbEntityTreeStore as a generic type.
 		return this._data.asObservablePart((items) =>
-			items.filter((item) => (item as any).propertyEditorUiAlias === propertyEditorUiAlias)
+			items.filter((item) => (item as any).propertyEditorUiAlias === propertyEditorUiAlias),
 		);
 	}
 }
