@@ -1,1 +1,1 @@
-export { UmbDataTypeDetailRepository as UmbDataTypeRepository } from './detail/data-type-detail.repository.js';
+export { UmbDataTypeDetailRepository } from './detail/data-type-detail.repository.js';
