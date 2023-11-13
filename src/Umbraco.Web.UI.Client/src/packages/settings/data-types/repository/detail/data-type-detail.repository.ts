@@ -1,6 +1,6 @@
-import { UmbDataTypeServerDataSource } from './data-type-detail.server.data-source.js';
 import { UmbDataTypeRepositoryBase } from '../data-type-repository-base.js';
 import { createTreeItem } from '../utils.js';
+import { UmbDataTypeServerDataSource } from './data-type-detail.server.data-source.js';
 import type { UmbDetailRepository, UmbDataSource } from '@umbraco-cms/backoffice/repository';
 import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import {
