@@ -77,6 +77,12 @@ export class UmbAppElement extends UmbLitElement {
 	async #setup() {
 		if (this.serverUrl === undefined) throw new Error('No serverUrl provided');
 
+		/* All requests to the server requires the base URL to be set. 
+		We make sure it happens before we get the server status. 
+		TODO: find the right place to set this
+		*/
+		OpenAPI.BASE = this.serverUrl;
+
 		this.#serverConnection = new UmbServerConnection(this.serverUrl);
 		await this.#serverConnection.connect();
 

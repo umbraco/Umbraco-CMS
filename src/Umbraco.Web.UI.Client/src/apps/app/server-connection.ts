@@ -1,4 +1,4 @@
-import { OpenAPI, RuntimeLevelModel, ServerResource } from '@umbraco-cms/backoffice/backend-api';
+import { RuntimeLevelModel, ServerResource } from '@umbraco-cms/backoffice/backend-api';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
@@ -11,9 +11,6 @@ export class UmbServerConnection {
 
 	constructor(serverUrl: string) {
 		this.#url = serverUrl;
-		/* All requests to the server requires the base URL to be set. 
-		We make sure it happens before we get the server status. */
-		OpenAPI.BASE = this.#url;
 	}
 
 	/**
