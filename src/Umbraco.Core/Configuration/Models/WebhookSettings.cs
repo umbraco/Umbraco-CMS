@@ -7,6 +7,9 @@ public class WebhookSettings
 {
     private const bool StaticEnabled = true;
     private const int StaticMaximumRetries = 5;
+    private const bool StaticEnableLoggingCleanup = true;
+    private const int StaticKeepLogsForDays = 30;
+
 
     /// <summary>
     ///     Gets or sets a value indicating whether webhooks are enabled.
@@ -31,4 +34,26 @@ public class WebhookSettings
     /// </remarks>
     [DefaultValue(StaticMaximumRetries)]
     public int MaximumRetries { get; set; } = StaticMaximumRetries;
+
+    /// <summary>
+    ///     Gets or sets a value indicating whether cleanup of webhook logs are enabled.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         By default, cleanup is enabled.
+    ///     </para>
+    /// </remarks>
+    [DefaultValue(StaticEnableLoggingCleanup)]
+    public bool EnableLoggingCleanup { get; set; } = StaticEnableLoggingCleanup;
+
+    /// <summary>
+    ///     Gets or sets a value indicating number of days to keep logs for.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         By default, logs are kept for 30 days.
+    ///     </para>
+    /// </remarks>
+    [DefaultValue(StaticKeepLogsForDays)]
+    public int KeepLogsForDays { get; set; } = StaticKeepLogsForDays;
 }
