@@ -7,6 +7,21 @@ public static partial class Constants
         public static class Aliases
         {
             /// <summary>
+            ///     Webhook event alias for content emptied recycle bin.
+            /// </summary>
+            public const string ContentEmptiedRecycleBin = "Umbraco.ContentEmptiedRecycleBin";
+
+            /// <summary>
+            ///     Webhook event alias for content rolled back.
+            /// </summary>
+            public const string ContentRolledBack = "Umbraco.ContentRolledBack";
+
+            /// <summary>
+            ///     Webhook event alias for content saved.
+            /// </summary>
+            public const string ContentSaved = "Umbraco.ContentSaved";
+
+            /// <summary>
             ///     Webhook event alias for content publish.
             /// </summary>
             public const string ContentPublish = "Umbraco.ContentPublish";
