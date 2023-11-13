@@ -22,15 +22,6 @@ export class UmbStylesheetTreeServerDataSource implements UmbTreeDataSource<File
 	}
 
 	/**
-	 * Fetches the stylesheet tree root items from the server
-	 * @return {*}
-	 * @memberof UmbStylesheetTreeServerDataSource
-	 */
-	async getRootItems() {
-		return tryExecuteAndNotify(this.#host, StylesheetResource.getTreeStylesheetRoot({}));
-	}
-
-	/**
 	 * Fetches the children of a given stylesheet path from the server
 	 * @param {(string | null)} path
 	 * @return {*}
@@ -39,10 +30,8 @@ export class UmbStylesheetTreeServerDataSource implements UmbTreeDataSource<File
 	async getChildrenOf(path: string | null) {
 		if (path === undefined) throw new Error('Path is missing');
 
-		/* TODO: should we make getRootItems() internal 
-		so it only is a server concern that there are two endpoints? */
 		if (path === null) {
-			return this.getRootItems();
+			return tryExecuteAndNotify(this.#host, StylesheetResource.getTreeStylesheetRoot({}));
 		} else {
 			return tryExecuteAndNotify(
 				this.#host,

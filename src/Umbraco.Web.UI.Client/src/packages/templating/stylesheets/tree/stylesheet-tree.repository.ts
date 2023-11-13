@@ -35,25 +35,8 @@ export class UmbStylesheetTreeRepository
 		return { data };
 	}
 
-	async requestRootTreeItems() {
-		console.log('stylesheet root');
-		await this.#init;
-
-		const { data, error } = await this.#treeDataSource.getRootItems();
-
-		if (data) {
-			this.#treeStore?.appendItems(data.items);
-		}
-
-		return { data, error, asObservable: () => this.#treeStore!.rootItems };
-	}
-
 	async requestTreeItemsOf(path: string | null) {
 		if (path === undefined) throw new Error('Cannot request tree item with missing path');
-		if (path === null || path === '/' || path === '') {
-			return this.requestRootTreeItems();
-		}
-
 		await this.#init;
 
 		const { data, error } = await this.#treeDataSource.getChildrenOf(path);
@@ -63,11 +46,6 @@ export class UmbStylesheetTreeRepository
 		}
 
 		return { data, error, asObservable: () => this.#treeStore!.childrenOf(path) };
-	}
-
-	async rootTreeItems() {
-		await this.#init;
-		return this.#treeStore!.rootItems;
 	}
 
 	async treeItemsOf(parentPath: string | null) {
