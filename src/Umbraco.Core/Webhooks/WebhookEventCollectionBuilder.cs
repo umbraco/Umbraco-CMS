@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.Webhooks.Events.Dictionary;
 using Umbraco.Cms.Core.Webhooks.Events.Domain;
 using Umbraco.Cms.Core.Webhooks.Events.Language;
 using Umbraco.Cms.Core.Webhooks.Events.Media;
+using Umbraco.Cms.Core.Webhooks.Events.MemberType;
 using Umbraco.Cms.Core.Webhooks.Events.Package;
 using Umbraco.Cms.Core.Webhooks.Events.Relation;
 using Umbraco.Cms.Core.Webhooks.Events.Script;
@@ -149,6 +150,15 @@ public class WebhookEventCollectionBuilder : OrderedCollectionBuilderBase<Webhoo
         Append<MediaTypeDeletedWebhookEvent>();
         Append<MediaTypeMovedWebhookEvent>();
         Append<MediaTypeSavedWebhookEvent>();
+        return this;
+    }
+
+    public WebhookEventCollectionBuilder AddMemberTypeWebhooks()
+    {
+        Append<MemberTypeChangedWebhookEvent>();
+        Append<MemberTypeDeletedWebhookEvent>();
+        Append<MemberTypeMovedWebhookEvent>();
+        Append<MemberTypeSavedWebhookEvent>();
         return this;
     }
 
