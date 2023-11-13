@@ -23,6 +23,7 @@ using Umbraco.Cms.Tests.Common;
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HostedServices;
 
 [TestFixture]
+[Obsolete("Replaced by BackgroundJobs.Jobs.HealthCheckNotifierJobTests")]
 public class HealthCheckNotifierTests
 {
     private Mock<IHealthCheckNotificationMethod> _mockNotificationMethod;

@@ -33,9 +33,9 @@ internal class WebhookLogDto
     [NullSetting(NullSetting = NullSettings.NotNull)]
     public string Url { get; set; } = string.Empty;
 
-    [Column(Name = "eventName")]
+    [Column(Name = "eventAlias")]
     [NullSetting(NullSetting = NullSettings.NotNull)]
-    public string EventName { get; set; } = string.Empty;
+    public string EventAlias { get; set; } = string.Empty;
 
     [Column(Name = "retryCount")]
     [NullSetting(NullSetting = NullSettings.NotNull)]

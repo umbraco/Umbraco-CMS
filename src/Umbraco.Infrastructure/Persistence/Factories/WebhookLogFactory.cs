@@ -10,7 +10,7 @@ internal static class WebhookLogFactory
         new()
         {
             Date = log.Date,
-            EventName = log.EventName,
+            EventAlias = log.EventAlias,
             RequestBody = log.RequestBody ?? string.Empty,
             ResponseBody = log.ResponseBody,
             RetryCount = log.RetryCount,
@@ -27,7 +27,7 @@ internal static class WebhookLogFactory
         new()
         {
             Date = dto.Date,
-            EventName = dto.EventName,
+            EventAlias = dto.EventAlias,
             RequestBody = dto.RequestBody,
             ResponseBody = dto.ResponseBody,
             RetryCount = dto.RetryCount,

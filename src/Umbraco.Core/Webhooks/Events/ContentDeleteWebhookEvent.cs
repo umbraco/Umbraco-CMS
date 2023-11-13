@@ -7,21 +7,23 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events;
 
+[WebhookEvent("Content was deleted", Constants.WebhookEvents.Types.Content)]
 public class ContentDeleteWebhookEvent : WebhookEventContentBase<ContentDeletedNotification, IContent>
 {
     public ContentDeleteWebhookEvent(
         IWebhookFiringService webhookFiringService,
-        IWebHookService webHookService,
+        IWebhookService webhookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
         IServerRoleAccessor serverRoleAccessor)
         : base(
             webhookFiringService,
-            webHookService,
+            webhookService,
             webhookSettings,
-            serverRoleAccessor,
-            Constants.WebhookEvents.ContentDelete)
+            serverRoleAccessor)
     {
     }
+
+    public override string Alias => Constants.WebhookEvents.Aliases.ContentUnpublish;
 
     protected override IEnumerable<IContent> GetEntitiesFromNotification(ContentDeletedNotification notification) =>
         notification.DeletedEntities;
