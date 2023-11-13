@@ -53,11 +53,18 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             => typeof(BlockGridModel);
 
         /// <inheritdoc />
+        public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
+            => PropertyCacheLevel.Element;
+
+        /// <inheritdoc />
         public override object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
             => ConvertIntermediateToBlockGridModel(propertyType, referenceCacheLevel, inter, preview);
 
         /// <inheritdoc />
-        public PropertyCacheLevel GetDeliveryApiPropertyCacheLevel(IPublishedPropertyType propertyType) => PropertyCacheLevel.Snapshot;
+        public PropertyCacheLevel GetDeliveryApiPropertyCacheLevel(IPublishedPropertyType propertyType) => GetPropertyCacheLevel(propertyType);
+
+        /// <inheritdoc />
+        public PropertyCacheLevel GetDeliveryApiPropertyCacheLevelForExpansion(IPublishedPropertyType propertyType) => PropertyCacheLevel.Snapshot;
 
         /// <inheritdoc />
         public Type GetDeliveryApiPropertyValueType(IPublishedPropertyType propertyType)
