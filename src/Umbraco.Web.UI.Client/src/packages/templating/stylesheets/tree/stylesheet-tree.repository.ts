@@ -44,7 +44,7 @@ export class UmbStylesheetTreeRepository
 			this.#treeStore?.appendItems(data.items);
 		}
 
-		return { data, error };
+		return { data, error, asObservable: () => this.#treeStore!.rootItems };
 	}
 
 	async requestTreeItemsOf(path: string | null) {
