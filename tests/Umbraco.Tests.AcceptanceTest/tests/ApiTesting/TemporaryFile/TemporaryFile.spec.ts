@@ -1,5 +1,6 @@
 ﻿import {test} from "@umbraco/playwright-testhelpers";
 import {expect} from "@playwright/test";
+import * as crypto from 'crypto';
 
 test.describe('Temporary File tests', () => {
   const temporaryFileId = crypto.randomUUID();

@@ -14,7 +14,7 @@
     "lint": "eslint src"
   },
   "engines": {
-    "node": ">=20.8",
+    "node": ">=20.9",
     "npm": ">=10.1"
   },
   "dependencies": {

@@ -29,11 +29,11 @@ public class WebhookFiringService : IWebhookFiringService
 
     // TODO: Add queing instead of processing directly in thread
     // as this just makes save and publish longer
-    public async Task FireAsync(Webhook webhook, string eventName, object? payload, CancellationToken cancellationToken)
+    public async Task FireAsync(Webhook webhook, string eventAlias, object? payload, CancellationToken cancellationToken)
     {
         for (var retry = 0; retry < _webhookSettings.MaximumRetries; retry++)
         {
-            HttpResponseMessage response = await SendRequestAsync(webhook, eventName, payload, retry, cancellationToken);
+            HttpResponseMessage response = await SendRequestAsync(webhook, eventAlias, payload, retry, cancellationToken);
 
             if (response.IsSuccessStatusCode)
             {
@@ -42,13 +42,13 @@ public class WebhookFiringService : IWebhookFiringService
         }
     }
 
-    private async Task<HttpResponseMessage> SendRequestAsync(Webhook webhook, string eventName, object? payload, int retryCount, CancellationToken cancellationToken)
+    private async Task<HttpResponseMessage> SendRequestAsync(Webhook webhook, string eventAlias, object? payload, int retryCount, CancellationToken cancellationToken)
     {
         using var httpClient = new HttpClient();
 
         var serializedObject = _jsonSerializer.Serialize(payload);
         var stringContent = new StringContent(serializedObject, Encoding.UTF8, "application/json");
-        stringContent.Headers.TryAddWithoutValidation("Umb-Webhook-Event", eventName);
+        stringContent.Headers.TryAddWithoutValidation("Umb-Webhook-Event", eventAlias);
 
         foreach (KeyValuePair<string, string> header in webhook.Headers)
         {
@@ -64,7 +64,7 @@ public class WebhookFiringService : IWebhookFiringService
         };
 
 
-        WebhookLog log = await _webhookLogFactory.CreateAsync(eventName, webhookResponseModel, webhook, cancellationToken);
+        WebhookLog log = await _webhookLogFactory.CreateAsync(eventAlias, webhookResponseModel, webhook, cancellationToken);
         await _webhookLogService.CreateAsync(log);
 
         return response;

@@ -363,6 +363,21 @@ public static class UdiGetterExtensions
     /// </summary>
     /// <param name="entity">The entity.</param>
     /// <returns>The entity identifier of the entity.</returns>
+    public static GuidUdi GetUdi(this Webhook entity)
+    {
+        if (entity == null)
+        {
+            throw new ArgumentNullException("entity");
+        }
+
+        return new GuidUdi(Constants.UdiEntityType.Webhook, entity.Key).EnsureClosed();
+    }
+
+    /// <summary>
+    ///     Gets the entity identifier of the entity.
+    /// </summary>
+    /// <param name="entity">The entity.</param>
+    /// <returns>The entity identifier of the entity.</returns>
     public static StringUdi GetUdi(this ILanguage entity)
     {
         if (entity == null)

@@ -35,7 +35,7 @@ public class DynamicRootRepository: IDynamicRootRepository
         return await Database.SingleOrDefaultAsync<Guid?>(query);
     }
 
-    public async Task<Guid?> FarthestAncestorOrSelfAsync(IEnumerable<Guid> origins, DynamicRootQueryStep filter) {
+    public async Task<Guid?> FurthestAncestorOrSelfAsync(IEnumerable<Guid> origins, DynamicRootQueryStep filter) {
         Sql<ISqlContext> query = Database.SqlContext.SqlSyntax.SelectTop(
             GetAncestorOrSelfBaseQuery(origins, filter)
                 .Append($"ORDER BY n.level ASC"),
@@ -83,7 +83,7 @@ public class DynamicRootRepository: IDynamicRootRepository
         return await Database.FetchAsync<Guid>(query);
     }
 
-    public async Task<ICollection<Guid>> FarthestDescendantOrSelfAsync(ICollection<Guid> origins, DynamicRootQueryStep filter)
+    public async Task<ICollection<Guid>> FurthestDescendantOrSelfAsync(ICollection<Guid> origins, DynamicRootQueryStep filter)
     {
         var level = Database.Single<int>(Database.SqlContext.Sql()
             .Select("COALESCE(MAX(n.level), 0)")

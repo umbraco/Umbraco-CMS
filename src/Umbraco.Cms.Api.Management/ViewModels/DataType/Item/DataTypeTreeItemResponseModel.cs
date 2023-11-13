@@ -4,5 +4,5 @@ namespace Umbraco.Cms.Api.Management.ViewModels.DataType.Item;
 
 public class DataTypeTreeItemResponseModel : FolderTreeItemResponseModel
 {
-    public string? Icon { get; set; }
+    public string? EditorUiAlias { get; set; }
 }
