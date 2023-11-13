@@ -83,8 +83,7 @@ export class UmbAppElement extends UmbLitElement {
 		*/
 		OpenAPI.BASE = this.serverUrl;
 
-		this.#serverConnection = new UmbServerConnection(this.serverUrl);
-		await this.#serverConnection.connect();
+		this.#serverConnection = await new UmbServerConnection(this.serverUrl).connect();
 
 		this.#authContext = new UmbAuthContext(this, this.serverUrl, this.backofficePath, this.bypassAuth);
 		new UmbAppContext(this, { backofficePath: this.backofficePath, serverUrl: this.serverUrl });

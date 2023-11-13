@@ -19,6 +19,7 @@ export class UmbServerConnection {
 	 */
 	async connect() {
 		await this.#setStatus();
+		return this;
 	}
 
 	/**
