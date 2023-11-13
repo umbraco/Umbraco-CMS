@@ -1,6 +1,6 @@
 import { STYLESHEET_ENTITY_TYPE } from '../config.js';
 import { UmbStylesheetTreeRepository } from './stylesheet-tree.repository.js';
-import { UmbStylesheetTreeStore } from './stylesheet.tree.store.js';
+import { UmbStylesheetTreeStore } from './stylesheet-tree.store.js';
 import type {
 	ManifestRepository,
 	ManifestTree,
