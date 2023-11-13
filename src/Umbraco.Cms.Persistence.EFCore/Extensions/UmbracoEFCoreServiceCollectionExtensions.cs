@@ -144,11 +144,11 @@ public static class UmbracoEFCoreServiceCollectionExtensions
     }
 
     /// <summary>
-    /// Sets the database provider to use based on the Umbraco connection string.
+    /// Gets the Umbraco connection string and provider name.
     /// </summary>
-    /// <param name="builder"></param>
     /// <param name="serviceProvider"></param>
-    public static void UseUmbracoDatabaseProvider(this DbContextOptionsBuilder builder, IServiceProvider serviceProvider)
+    /// <returns></returns>
+    public static ConnectionStrings GetUmbracoConnectionString(this IServiceProvider serviceProvider)
     {
         ConnectionStrings connectionStrings = serviceProvider.GetRequiredService<IOptionsMonitor<ConnectionStrings>>().CurrentValue;
 
@@ -162,12 +162,32 @@ public static class UmbracoEFCoreServiceCollectionExtensions
         if (string.IsNullOrEmpty(connectionStrings.ProviderName))
         {
             Log.Warning("No database provider was set. ProviderName is null");
-            return;
         }
 
         if (string.IsNullOrEmpty(connectionStrings.ConnectionString))
         {
             Log.Warning("No database provider was set. Connection string is null");
+        }
+
+        return connectionStrings;
+    }
+
+    /// <summary>
+    /// Sets the database provider to use based on the Umbraco connection string.
+    /// </summary>
+    /// <param name="builder"></param>
+    /// <param name="serviceProvider"></param>
+    public static void UseUmbracoDatabaseProvider(this DbContextOptionsBuilder builder, IServiceProvider serviceProvider)
+    {
+        ConnectionStrings connectionStrings = serviceProvider.GetUmbracoConnectionString();
+
+        if (string.IsNullOrEmpty(connectionStrings.ProviderName))
+        {
+            return;
+        }
+
+        if (string.IsNullOrEmpty(connectionStrings.ConnectionString))
+        {
             return;
         }
 
