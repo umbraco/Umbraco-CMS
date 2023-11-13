@@ -6,7 +6,7 @@ import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
 export interface UmbTreeRepository<
 	TreeItemType extends EntityTreeItemResponseModel,
-	TreeRootType extends UmbTreeRootModel = UmbTreeRootEntityModel
+	TreeRootType extends UmbTreeRootModel = UmbTreeRootEntityModel,
 > extends UmbApi {
 	requestTreeRoot: () => Promise<{
 		data?: TreeRootType;

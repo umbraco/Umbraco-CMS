@@ -61,13 +61,6 @@ export class UmbStylesheetTreeRepository
 		return { data, error, asObservable: () => this.#treeStore!.childrenOf(path) };
 	}
 
-	async requestItems(paths: Array<string>) {
-		if (!paths) throw new Error('Paths are missing');
-		await this.#init;
-		const { data, error } = await this.#treeDataSource.getItems(paths);
-		return { data, error };
-	}
-
 	async rootTreeItems() {
 		await this.#init;
 		return this.#treeStore!.rootItems;
