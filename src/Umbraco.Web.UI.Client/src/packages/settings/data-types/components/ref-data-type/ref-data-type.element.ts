@@ -1,4 +1,4 @@
-import { UmbDataTypeRepository } from '../../repository/data-type.repository.js';
+import { UmbDataTypeDetailRepository } from '../../repository/detail/data-type-detail.repository.js';
 import { UUIRefNodeElement } from '@umbraco-cms/backoffice/external/uui';
 import { html, customElement, property, state, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
@@ -39,7 +39,7 @@ export class UmbRefDataTypeElement extends UmbElementMixin(UUIRefNodeElement) {
 		}
 	}
 
-	repository = new UmbDataTypeRepository(this);
+	repository = new UmbDataTypeDetailRepository(this);
 
 	/**
 	 * Property Editor UI Alias

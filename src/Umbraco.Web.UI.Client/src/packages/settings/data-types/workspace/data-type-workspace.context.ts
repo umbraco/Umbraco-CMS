@@ -1,4 +1,4 @@
-import { UmbDataTypeRepository } from '../repository/data-type.repository.js';
+import { UmbDataTypeDetailRepository } from '../repository/detail/data-type-detail.repository.js';
 import { UmbDataTypeVariantContext } from '../variant-context/data-type-variant-context.js';
 import {
 	UmbInvariantableWorkspaceContextInterface,
@@ -23,7 +23,7 @@ import {
 import { UMB_PROPERTY_EDITOR_SCHEMA_ALIAS_DEFAULT } from '@umbraco-cms/backoffice/property-editor';
 
 export class UmbDataTypeWorkspaceContext
-	extends UmbWorkspaceContext<UmbDataTypeRepository, DataTypeResponseModel>
+	extends UmbWorkspaceContext<UmbDataTypeDetailRepository, DataTypeResponseModel>
 	implements UmbInvariantableWorkspaceContextInterface<DataTypeResponseModel | undefined>
 {
 	// TODO: revisit. temp solution because the create and response models are different.
@@ -62,7 +62,7 @@ export class UmbDataTypeWorkspaceContext
 	propertyEditorUiName = this.#propertyEditorUiName.asObservable();
 
 	constructor(host: UmbControllerHostElement) {
-		super(host, 'Umb.Workspace.DataType', new UmbDataTypeRepository(host));
+		super(host, 'Umb.Workspace.DataType', new UmbDataTypeDetailRepository(host));
 		this.#observePropertyEditorUIAlias();
 	}
 

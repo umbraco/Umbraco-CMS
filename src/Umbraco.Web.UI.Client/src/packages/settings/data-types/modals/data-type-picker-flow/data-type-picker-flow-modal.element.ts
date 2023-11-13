@@ -1,4 +1,4 @@
-import { UmbDataTypeRepository } from '../../repository/data-type.repository.js';
+import { UmbDataTypeDetailRepository } from '../../repository/detail/data-type-detail.repository.js';
 import { css, html, repeat, customElement, property, state, when, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
@@ -58,7 +58,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		this.#repository = new UmbDataTypeRepository(this);
+		this.#repository = new UmbDataTypeDetailRepository(this);
 
 		new UmbModalRouteRegistrationController(this, UMB_DATA_TYPE_PICKER_FLOW_DATA_TYPE_PICKER_MODAL)
 			.addAdditionalPath(':uiAlias')

@@ -1,6 +1,6 @@
-import { UmbDataTypeServerDataSource } from './sources/data-type.server.data.js';
-import { UmbDataTypeRepositoryBase } from './data-type-repository-base.js';
-import { createTreeItem } from './utils.js';
+import { UmbDataTypeServerDataSource } from './data-type.server.data.js';
+import { UmbDataTypeRepositoryBase } from '../data-type-repository-base.js';
+import { createTreeItem } from '../utils.js';
 import type { UmbDetailRepository, UmbDataSource } from '@umbraco-cms/backoffice/repository';
 import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import {
@@ -8,7 +8,7 @@ import {
 	DataTypeResponseModel,
 	UpdateDataTypeRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
-export class UmbDataTypeRepository
+export class UmbDataTypeDetailRepository
 	extends UmbDataTypeRepositoryBase
 	implements UmbDetailRepository<CreateDataTypeRequestModel, any, UpdateDataTypeRequestModel, DataTypeResponseModel>
 {
@@ -19,7 +19,6 @@ export class UmbDataTypeRepository
 		this.#detailSource = new UmbDataTypeServerDataSource(this);
 	}
 
-	// DETAILS:
 	async createScaffold(parentId: string | null) {
 		if (parentId === undefined) throw new Error('Parent id is missing');
 		await this._init;

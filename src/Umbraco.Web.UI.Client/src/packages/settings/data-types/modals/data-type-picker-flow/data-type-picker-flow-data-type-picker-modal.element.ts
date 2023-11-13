@@ -1,4 +1,4 @@
-import { UmbDataTypeRepository } from '../../repository/data-type.repository.js';
+import { UmbDataTypeDetailRepository } from '../../repository/detail/data-type-detail.repository.js';
 import { css, html, customElement, property, state, repeat, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import {
@@ -32,7 +32,7 @@ export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbLitEleme
 	private async _observeDataTypesOf(propertyEditorUiAlias: string) {
 		if (!this.data) return;
 
-		const dataTypeRepository = new UmbDataTypeRepository(this);
+		const dataTypeRepository = new UmbDataTypeDetailRepository(this);
 
 		// TODO: This is a hack to get the data types of a property editor ui alias.
 		// TODO: Make sure filtering works data-type that does not have a property editor ui, but should be using the default property editor UI for those.
