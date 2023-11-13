@@ -44,6 +44,7 @@
                   vm.isNew = true;
                   vm.showIdentifier = false;
                   vm.webhook.name = vm.labels.addWebhook;
+                  vm.webhook.enabled = true;
                 }
             }));
 
