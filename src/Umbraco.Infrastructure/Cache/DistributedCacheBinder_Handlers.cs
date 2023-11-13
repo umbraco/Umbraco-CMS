@@ -67,15 +67,6 @@ public class DistributedCacheBinder :
         _distributedCache.RefreshContentCache(notification.Changes.ToArray());
     }
 
-    // private void ContentService_SavedBlueprint(IContentService sender, SaveEventArgs<IContent> e)
-    // {
-    //    _distributedCache.RefreshUnpublishedPageCache(e.SavedEntities.ToArray());
-    // }
-
-    // private void ContentService_DeletedBlueprint(IContentService sender, DeleteEventArgs<IContent> e)
-    // {
-    //    _distributedCache.RemoveUnpublishedPageCache(e.DeletedEntities.ToArray());
-    // }
     #endregion
 
     #region LocalizationService / Dictionary
