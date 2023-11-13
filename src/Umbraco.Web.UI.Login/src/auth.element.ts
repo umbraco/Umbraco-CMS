@@ -60,8 +60,6 @@ const createForm = (elements: HTMLElement[]) => {
 
 @customElement('umb-auth')
 export default class UmbAuthElement extends LitElement {
-  #returnPath = '';
-
   /**
    * Disables the local login form and only allows external login providers.
    *
@@ -89,12 +87,7 @@ export default class UmbAuthElement extends LitElement {
 
   @property({ type: String, attribute: 'return-url' })
   set returnPath(value: string) {
-    this.#returnPath = value;
-    umbAuthContext.returnPath = this.returnPath;
-  }
-  get returnPath() {
-    // Check if there is a ?redir querystring or else return the returnUrl attribute
-    return new URLSearchParams(window.location.search).get('returnPath') || this.#returnPath;
+    umbAuthContext.returnPath = value;
   }
 
   /**

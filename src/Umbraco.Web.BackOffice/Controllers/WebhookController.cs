@@ -1,3 +1,4 @@
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
@@ -6,11 +7,13 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Webhooks;
 using Umbraco.Cms.Web.BackOffice.Services;
 using Umbraco.Cms.Web.Common.Attributes;
+using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Cms.Web.Common.Models;
 
 namespace Umbraco.Cms.Web.BackOffice.Controllers;
 
 [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
+[Authorize(Policy = AuthorizationPolicies.TreeAccessWebhooks)]
 public class WebhookController : UmbracoAuthorizedJsonController
 {
     private readonly IWebhookService _webhookService;
@@ -41,20 +44,21 @@ public class WebhookController : UmbracoAuthorizedJsonController
     [HttpPut]
     public async Task<IActionResult> Update(WebhookViewModel webhookViewModel)
     {
-        Webhook updateModel = _umbracoMapper.Map<Webhook>(webhookViewModel)!;
+        Webhook webhook = _umbracoMapper.Map<Webhook>(webhookViewModel)!;
 
-        await _webhookService.UpdateAsync(updateModel);
+        await _webhookService.UpdateAsync(webhook);
 
-        return Ok();
+        return Ok(_webhookPresentationFactory.Create(webhook));
     }
 
     [HttpPost]
     public async Task<IActionResult> Create(WebhookViewModel webhookViewModel)
     {
         Webhook webhook = _umbracoMapper.Map<Webhook>(webhookViewModel)!;
+
         await _webhookService.CreateAsync(webhook);
 
-        return Ok();
+        return Ok(_webhookPresentationFactory.Create(webhook));
     }
 
     [HttpGet]
@@ -62,7 +66,7 @@ public class WebhookController : UmbracoAuthorizedJsonController
     {
         Webhook? webhook = await _webhookService.GetAsync(key);
 
-        return webhook is null ? NotFound() : Ok(webhook);
+        return webhook is null ? NotFound() : Ok(_webhookPresentationFactory.Create(webhook));
     }
 
     [HttpDelete]
