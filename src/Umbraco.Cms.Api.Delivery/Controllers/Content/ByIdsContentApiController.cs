@@ -69,7 +69,7 @@ public class ByIdsContentApiController : ContentApiItemControllerBase
     [ProducesResponseType(typeof(IEnumerable<IApiContentResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    public async Task<IActionResult> ItemV20([FromQuery(Name = "id")] HashSet<Guid> ids)
+    public async Task<IActionResult> ItemsV20([FromQuery(Name = "id")] HashSet<Guid> ids)
         => await HandleRequest(ids);
 
     private async Task<IActionResult> HandleRequest(HashSet<Guid> ids)

@@ -33,7 +33,7 @@ public class ByIdsMediaApiController : MediaApiControllerBase
     [HttpGet("items")]
     [MapToApiVersion("2.0")]
     [ProducesResponseType(typeof(IEnumerable<IApiMediaWithCropsResponse>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> ItemV20([FromQuery(Name = "id")] HashSet<Guid> ids)
+    public async Task<IActionResult> ItemsV20([FromQuery(Name = "id")] HashSet<Guid> ids)
         => await HandleRequest(ids);
 
     private async Task<IActionResult> HandleRequest(HashSet<Guid> ids)
