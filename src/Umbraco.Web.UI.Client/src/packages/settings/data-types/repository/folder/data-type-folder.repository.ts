@@ -4,7 +4,7 @@ import { UmbDataTypeFolderServerDataSource } from './data-type-folder.server.dat
 import type { UmbFolderRepository, UmbFolderDataSource } from '@umbraco-cms/backoffice/repository';
 import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { CreateFolderRequestModel, FolderModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
-export class UmbDataTypeRepository extends UmbDataTypeRepositoryBase implements UmbFolderRepository {
+export class UmbDataTypeFolderRepository extends UmbDataTypeRepositoryBase implements UmbFolderRepository {
 	#folderSource: UmbFolderDataSource;
 
 	constructor(host: UmbControllerHost) {

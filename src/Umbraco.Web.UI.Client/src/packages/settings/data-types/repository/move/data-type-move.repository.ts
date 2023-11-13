@@ -3,7 +3,7 @@ import { UmbDataTypeMoveServerDataSource } from './data-type-move.server.data-so
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbMoveDataSource, UmbMoveRepository } from '@umbraco-cms/backoffice/repository';
 
-export class UmbDataTypeMoveRepository extends UmbDataTypeRepositoryBase implements UmbMoveRepository {
+export class UmbMoveDataTypeRepository extends UmbDataTypeRepositoryBase implements UmbMoveRepository {
 	#moveSource: UmbMoveDataSource;
 
 	constructor(host: UmbControllerHost) {

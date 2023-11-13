@@ -3,7 +3,7 @@ import { UmbDataTypeCopyServerDataSource } from './data-type-copy.server.data-so
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbCopyDataSource, UmbCopyRepository } from '@umbraco-cms/backoffice/repository';
 
-export class UmbDataTypeCopyRepository extends UmbDataTypeRepositoryBase implements UmbCopyRepository {
+export class UmbCopyDataTypeRepository extends UmbDataTypeRepositoryBase implements UmbCopyRepository {
 	#copySource: UmbCopyDataSource;
 
 	constructor(host: UmbControllerHost) {
