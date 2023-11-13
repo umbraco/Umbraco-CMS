@@ -15,8 +15,8 @@ export class UmbDataTypeTreeStore extends UmbEntityTreeStore {
 	 * @memberof UmbDataTypeTreeStore
 	 */
 	constructor(host: UmbControllerHostElement) {
-		super(host, UMB_DATA_TYPE_TREE_STORE_CONTEXT_TOKEN.toString());
+		super(host, UMB_DATA_TYPE_TREE_STORE_CONTEXT.toString());
 	}
 }
 
-export const UMB_DATA_TYPE_TREE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbDataTypeTreeStore>('UmbDataTypeTreeStore');
+export const UMB_DATA_TYPE_TREE_STORE_CONTEXT = new UmbContextToken<UmbDataTypeTreeStore>('UmbDataTypeTreeStore');

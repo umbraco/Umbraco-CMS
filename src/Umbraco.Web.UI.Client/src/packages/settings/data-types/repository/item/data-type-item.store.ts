@@ -17,8 +17,8 @@ export class UmbDataTypeItemStore extends UmbEntityItemStore<DataTypeItemRespons
 	 * @memberof UmbDataTypeItemStore
 	 */
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_DATA_TYPE_ITEM_STORE_CONTEXT_TOKEN.toString());
+		super(host, UMB_DATA_TYPE_ITEM_STORE_CONTEXT.toString());
 	}
 }
 
-export const UMB_DATA_TYPE_ITEM_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbDataTypeItemStore>('UmbDataTypeItemStore');
+export const UMB_DATA_TYPE_ITEM_STORE_CONTEXT = new UmbContextToken<UmbDataTypeItemStore>('UmbDataTypeItemStore');
