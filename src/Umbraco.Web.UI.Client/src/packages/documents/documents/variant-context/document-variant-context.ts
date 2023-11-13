@@ -1,4 +1,4 @@
-import { UmbDocumentWorkspaceContext } from "../workspace/index.js";
+import type { UmbDocumentWorkspaceContext } from "../workspace/index.js";
 import { DocumentVariantResponseModel, PropertyTypeModelBaseModel } from "@umbraco-cms/backoffice/backend-api";
 import { UmbBaseController, UmbControllerHost } from "@umbraco-cms/backoffice/controller-api";
 import { map } from "@umbraco-cms/backoffice/external/rxjs";

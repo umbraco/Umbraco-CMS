@@ -1,10 +1,10 @@
 import { UmbWorkspaceContextInterface, UMB_WORKSPACE_CONTEXT } from '../workspace-context/index.js';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
 export interface UmbWorkspaceAction<WorkspaceType = unknown> extends UmbApi {
-	host: UmbControllerHostElement;
+	host: UmbControllerHost;
 	workspaceContext?: WorkspaceType;
 	execute(): Promise<void>;
 }
@@ -12,9 +12,9 @@ export interface UmbWorkspaceAction<WorkspaceType = unknown> extends UmbApi {
 export abstract class UmbWorkspaceActionBase<WorkspaceContextType extends UmbWorkspaceContextInterface>
 	implements UmbWorkspaceAction<WorkspaceContextType>
 {
-	host: UmbControllerHostElement;
+	host: UmbControllerHost;
 	workspaceContext?: WorkspaceContextType;
-	constructor(host: UmbControllerHostElement) {
+	constructor(host: UmbControllerHost) {
 		this.host = host;
 
 		new UmbContextConsumerController(this.host, UMB_WORKSPACE_CONTEXT, (instance) => {

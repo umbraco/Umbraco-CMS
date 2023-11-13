@@ -19,7 +19,7 @@ export class UmbWorkspaceIsNewRedirectController extends UmbBaseController {
 		workspaceContext: UmbEditableWorkspaceContextBase<unknown, UmbEntityBase>,
 		router: UmbRouterSlotElement,
 	) {
-		super(host);
+		super(host, 'isNewRedirectController');
 
 		// Navigate to edit route when language is created:
 		this.observe(
