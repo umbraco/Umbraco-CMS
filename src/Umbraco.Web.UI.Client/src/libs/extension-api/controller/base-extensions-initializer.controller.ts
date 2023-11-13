@@ -35,7 +35,7 @@ export abstract class UmbBaseExtensionsInitializer<
 		filter: undefined | null | ((manifest: ManifestType) => boolean),
 		onChange?: (permittedManifests: Array<MyPermittedControllerType>) => void
 	) {
-		super(host);
+		super(host, 'extensionsInitializer_' + (Array.isArray(type) ? type.join('_') : type));
 		this.#extensionRegistry = extensionRegistry;
 		this.#type = type;
 		this.#filter = filter;
