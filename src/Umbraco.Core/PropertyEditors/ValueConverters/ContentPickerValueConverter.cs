@@ -46,7 +46,6 @@ public class ContentPickerValueConverter : PropertyValueConverterBase, IDelivery
     public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
         => PropertyCacheLevel.Elements;
 
-    // the intermediate value of this editor is the picked IPublishedContent item.
     public override object? ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
     {
         if (source == null)
@@ -59,7 +58,7 @@ public class ContentPickerValueConverter : PropertyValueConverterBase, IDelivery
             Attempt<int> attemptConvertInt = source.TryConvertTo<int>();
             if (attemptConvertInt.Success)
             {
-                return GetContent(propertyType, attemptConvertInt.Result);
+                return attemptConvertInt.Result;
             }
         }
 
@@ -69,36 +68,49 @@ public class ContentPickerValueConverter : PropertyValueConverterBase, IDelivery
             && !strSource.StartsWith("umb")
             && int.TryParse(strSource, NumberStyles.Integer, CultureInfo.InvariantCulture, out var intValue))
         {
-            return GetContent(propertyType, intValue);
+            return intValue;
         }
 
         Attempt<Udi> attemptConvertUdi = source.TryConvertTo<Udi>();
         if (attemptConvertUdi.Success)
         {
-            return GetContent(propertyType, attemptConvertUdi.Result);
+            return attemptConvertUdi.Result;
         }
 
         return null;
     }
 
     public override object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
-        => inter;
+    {
+        IPublishedContent? content = GetContent(propertyType, inter);
+        return content ?? inter;
+    }
 
     [Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
     public override object? ConvertIntermediateToXPath(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
-        => inter is IPublishedContent content
-            ? Udi.Create(Constants.UdiEntityType.Document, content.Key)
-            : null;
+    {
+        if (inter == null)
+        {
+            return null;
+        }
 
-    // the API cache level must be Snapshot in order to facilitate nested field expansion and limiting
+        return inter.ToString();
+    }
+
     public PropertyCacheLevel GetDeliveryApiPropertyCacheLevel(IPublishedPropertyType propertyType) => PropertyCacheLevel.Snapshot;
 
     public Type GetDeliveryApiPropertyValueType(IPublishedPropertyType propertyType) => typeof(IApiContent);
 
     public object? ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview, bool expanding)
-        => inter is IPublishedContent content
-            ? _apiContentBuilder.Build(content)
-            : null;
+    {
+        IPublishedContent? content = GetContent(propertyType, inter);
+        if (content == null)
+        {
+            return null;
+        }
+
+        return _apiContentBuilder.Build(content);
+    }
 
     private IPublishedContent? GetContent(IPublishedPropertyType propertyType, object? inter)
     {

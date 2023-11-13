@@ -89,17 +89,23 @@ public class BlockListPropertyValueConverter : PropertyValueConverterBase, IDeli
 
     /// <inheritdoc />
     public override object? ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
-        => ConvertSourceToBlockListModel(propertyType, source, preview);
+        => source?.ToString();
 
     /// <inheritdoc />
     public override object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
     {
-        if (inter is not BlockListModel blockListModel)
+        // NOTE: The intermediate object is just a JSON string, we don't actually convert from source -> intermediate since source is always just a JSON string
+        using (!_proflog.IsEnabled(Core.Logging.LogLevel.Debug) ? null : _proflog.DebugDuration<BlockListPropertyValueConverter>(
+                   $"ConvertPropertyToBlockList ({propertyType.DataType.Id})"))
         {
-            return null;
-        }
+            BlockListModel? blockListModel = ConvertIntermediateToBlockListModel(owner, propertyType, referenceCacheLevel, inter, preview);
+            if (blockListModel == null)
+            {
+                return null;
+            }
 
-        return IsSingleBlockMode(propertyType.DataType) ? blockListModel.FirstOrDefault() : blockListModel;
+            return IsSingleBlockMode(propertyType.DataType) ? blockListModel.FirstOrDefault() : blockListModel;
+        }
     }
 
     /// <inheritdoc />
@@ -112,29 +118,27 @@ public class BlockListPropertyValueConverter : PropertyValueConverterBase, IDeli
     /// <inheritdoc />
     public object? ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview, bool expanding)
     {
-        if (inter is not BlockListModel blockListModel)
-        {
-            return null;
-        }
+        BlockListModel? model = ConvertIntermediateToBlockListModel(owner, propertyType, referenceCacheLevel, inter, preview);
 
-        return new ApiBlockListModel(blockListModel
-            .Select(item => item.CreateApiBlockItem(_apiElementBuilder))
-            .ToArray());
+        return new ApiBlockListModel(
+            model != null
+                ? model.Select(item => item.CreateApiBlockItem(_apiElementBuilder)).ToArray()
+                : Array.Empty<ApiBlockItem>());
     }
 
-    private BlockListModel? ConvertSourceToBlockListModel(IPublishedPropertyType propertyType, object? source, bool preview)
+    private BlockListModel? ConvertIntermediateToBlockListModel(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
     {
         using (!_proflog.IsEnabled(LogLevel.Debug) ? null : _proflog.DebugDuration<BlockListPropertyValueConverter>(
                    $"ConvertPropertyToBlockList ({propertyType.DataType.Id})"))
         {
             // NOTE: this is to retain backwards compatability
-            if (source is null)
+            if (inter is null)
             {
                 return BlockListModel.Empty;
             }
 
             // NOTE: The intermediate object is just a JSON string, we don't actually convert from source -> intermediate since source is always just a JSON string
-            if (source is not string intermediateBlockModelValue)
+            if (inter is not string intermediateBlockModelValue)
             {
                 return null;
             }
@@ -147,8 +151,7 @@ public class BlockListPropertyValueConverter : PropertyValueConverterBase, IDeli
             }
 
             var creator = new BlockListPropertyValueCreator(_blockConverter);
-            // the reference cache level is .Element here, as is also the case when rendering at property level.
-            return creator.CreateBlockModel(PropertyCacheLevel.Element, intermediateBlockModelValue, preview, configuration.Blocks);
+            return creator.CreateBlockModel(referenceCacheLevel, intermediateBlockModelValue, preview, configuration.Blocks);
         }
     }
 }

@@ -124,14 +124,14 @@ public class BlockListPropertyValueConverterTests : BlockPropertyValueConverterT
 
         string json = null;
         var converted =
-            editor.ConvertSourceToIntermediate(publishedElement, propertyType, json, false) as
+            editor.ConvertIntermediateToObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as
                 BlockListModel;
 
         Assert.IsNotNull(converted);
         Assert.AreEqual(0, converted.Count);
 
         json = string.Empty;
-        converted = editor.ConvertSourceToIntermediate(publishedElement, propertyType, json, false) as BlockListModel;
+        converted = editor.ConvertIntermediateToObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as BlockListModel;
 
         Assert.IsNotNull(converted);
         Assert.AreEqual(0, converted.Count);
@@ -147,7 +147,7 @@ public class BlockListPropertyValueConverterTests : BlockPropertyValueConverterT
 
         var json = "{}";
         var converted =
-            editor.ConvertSourceToIntermediate(publishedElement, propertyType, json, false) as
+            editor.ConvertIntermediateToObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as
                 BlockListModel;
 
         Assert.IsNotNull(converted);
@@ -156,7 +156,7 @@ public class BlockListPropertyValueConverterTests : BlockPropertyValueConverterT
         json = @"{
 layout: {},
 data: []}";
-        converted = editor.ConvertSourceToIntermediate(publishedElement, propertyType, json, false) as BlockListModel;
+        converted = editor.ConvertIntermediateToObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as BlockListModel;
 
         Assert.IsNotNull(converted);
         Assert.AreEqual(0, converted.Count);
@@ -174,7 +174,7 @@ data: []}";
     contentData: []
 }";
 
-        converted = editor.ConvertSourceToIntermediate(publishedElement, propertyType, json, false) as BlockListModel;
+        converted = editor.ConvertIntermediateToObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as BlockListModel;
 
         Assert.IsNotNull(converted);
         Assert.AreEqual(0, converted.Count);
@@ -196,7 +196,7 @@ data: []}";
     ]
 }";
 
-        converted = editor.ConvertSourceToIntermediate(publishedElement, propertyType, json, false) as BlockListModel;
+        converted = editor.ConvertIntermediateToObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as BlockListModel;
 
         Assert.IsNotNull(converted);
         Assert.AreEqual(0, converted.Count);
@@ -219,7 +219,7 @@ data: []}";
     ]
 }";
 
-        converted = editor.ConvertSourceToIntermediate(publishedElement, propertyType, json, false) as BlockListModel;
+        converted = editor.ConvertIntermediateToObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as BlockListModel;
 
         Assert.IsNotNull(converted);
         Assert.AreEqual(0, converted.Count);
@@ -250,7 +250,7 @@ data: []}";
     ]
 }";
         var converted =
-            editor.ConvertSourceToIntermediate(publishedElement, propertyType, json, false) as
+            editor.ConvertIntermediateToObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as
                 BlockListModel;
 
         Assert.IsNotNull(converted);
@@ -315,7 +315,7 @@ data: []}";
 }";
 
         var converted =
-            editor.ConvertSourceToIntermediate(publishedElement, propertyType, json, false) as
+            editor.ConvertIntermediateToObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as
                 BlockListModel;
 
         Assert.IsNotNull(converted);
@@ -401,7 +401,7 @@ data: []}";
 }";
 
         var converted =
-            editor.ConvertSourceToIntermediate(publishedElement, propertyType, json, false) as
+            editor.ConvertIntermediateToObject(publishedElement, propertyType, PropertyCacheLevel.None, json, false) as
                 BlockListModel;
 
         Assert.IsNotNull(converted);

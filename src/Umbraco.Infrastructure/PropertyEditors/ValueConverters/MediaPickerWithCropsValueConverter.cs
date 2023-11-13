@@ -104,11 +104,10 @@ public class MediaPickerWithCropsValueConverter : PropertyValueConverterBase, ID
     public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType) =>
         PropertyCacheLevel.Snapshot;
 
-    // the intermediate value of this editor is the picked MediaWithCrops items (or item in single picker mode).
-    public override object? ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
+    public override object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
     {
         var isMultiple = IsMultipleDataType(propertyType.DataType);
-        if (string.IsNullOrEmpty(source?.ToString()))
+        if (string.IsNullOrEmpty(inter?.ToString()))
         {
             // Short-circuit on empty value
             return isMultiple ? Enumerable.Empty<MediaWithCrops>() : null;
@@ -116,7 +115,7 @@ public class MediaPickerWithCropsValueConverter : PropertyValueConverterBase, ID
 
         var mediaItems = new List<MediaWithCrops>();
         IEnumerable<MediaPicker3PropertyEditor.MediaPicker3PropertyValueEditor.MediaWithCropsDto> dtos =
-            MediaPicker3PropertyEditor.MediaPicker3PropertyValueEditor.Deserialize(_jsonSerializer, source);
+            MediaPicker3PropertyEditor.MediaPicker3PropertyValueEditor.Deserialize(_jsonSerializer, inter);
         MediaPicker3Configuration? configuration = propertyType.DataType.ConfigurationAs<MediaPicker3Configuration>();
         IPublishedSnapshot publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
         foreach (MediaPicker3PropertyEditor.MediaPicker3PropertyValueEditor.MediaWithCropsDto dto in dtos)
@@ -150,10 +149,6 @@ public class MediaPickerWithCropsValueConverter : PropertyValueConverterBase, ID
         return isMultiple ? mediaItems : mediaItems.FirstOrDefault();
     }
 
-    public override object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
-        => inter;
-
-    // the API cache level must be Snapshot in order to facilitate nested field expansion and limiting
     public PropertyCacheLevel GetDeliveryApiPropertyCacheLevel(IPublishedPropertyType propertyType) => PropertyCacheLevel.Snapshot;
 
     public Type GetDeliveryApiPropertyValueType(IPublishedPropertyType propertyType) => typeof(IEnumerable<IApiMediaWithCrops>);
@@ -164,11 +159,14 @@ public class MediaPickerWithCropsValueConverter : PropertyValueConverterBase, ID
 
         IApiMediaWithCrops ToApiMedia(MediaWithCrops media) => _apiMediaWithCropsBuilder.Build(media);
 
-        if (isMultiple && inter is IEnumerable<MediaWithCrops> mediasWithCrops)
+        // NOTE: eventually we might implement this explicitly instead of piggybacking on the default object conversion. however, this only happens once per cache rebuild,
+        // and the performance gain from an explicit implementation is negligible, so... at least for the time being this will do just fine.
+        var converted = ConvertIntermediateToObject(owner, propertyType, referenceCacheLevel, inter, preview);
+        if (isMultiple && converted is IEnumerable<MediaWithCrops> mediasWithCrops)
         {
             return mediasWithCrops.Select(ToApiMedia).ToArray();
         }
-        if (isMultiple == false && inter is MediaWithCrops mediaWithCrops)
+        if (isMultiple == false && converted is MediaWithCrops mediaWithCrops)
         {
             return new [] { ToApiMedia(mediaWithCrops) };
         }

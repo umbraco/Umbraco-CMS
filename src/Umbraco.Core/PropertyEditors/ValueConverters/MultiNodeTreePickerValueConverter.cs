@@ -71,115 +71,116 @@ public class MultiNodeTreePickerValueConverter : PropertyValueConverterBase, IDe
             ? typeof(IPublishedContent)
             : typeof(IEnumerable<IPublishedContent>);
 
-    // the intermediate value of this editor is the picked IPublishedContent items (or item in single picker mode).
     public override object? ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object? source, bool preview)
     {
-        if (source == null || propertyType.EditorAlias.Equals(Constants.PropertyEditors.Aliases.MultiNodeTreePicker) is false)
+        if (source == null)
         {
             return null;
         }
 
-        // NOTE: This guard is likely legacy at this point, but we'll keep it around to be safe (no functional breakage).
-        //       None of the other pickers have this kind of defensive guard in place. We can remove it at a later point.
-        //       For the time being it causes no harm to leave in place.
-        if (_umbracoContextAccessor.TryGetUmbracoContext(out _) is false)
+        if (propertyType.EditorAlias.Equals(Constants.PropertyEditors.Aliases.MultiNodeTreePicker))
         {
-            return source;
+            Udi[]? nodeIds = source.ToString()?
+                .Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries)
+                .Select(UdiParser.Parse)
+                .ToArray();
+            return nodeIds;
         }
 
-        Udi[]? udis = ParseUdis(source);
-
-        return udis is null
-            ? null
-            : ConvertUdisToIntermediateObject(udis, propertyType);
+        return null;
     }
 
-    private Udi[]? ParseUdis(object? source)
+    public override object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel cacheLevel, object? source, bool preview)
     {
-        if (source is null)
+        if (source == null)
         {
             return null;
         }
 
-        return source.ToString()?
-            .Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries)
-            .Select(item => UdiParser.TryParse(item, out Udi? udi) ? udi : null)
-            .WhereNotNull()
-            .ToArray();
-    }
-
-    private object? ConvertUdisToIntermediateObject(Udi[] udis, IPublishedPropertyType propertyType)
-    {
-        if (PropertiesToExclude.InvariantContains(propertyType.Alias))
+        // TODO: Inject an UmbracoHelper and create a GetUmbracoHelper method based on either injected or singleton
+        if (_umbracoContextAccessor.TryGetUmbracoContext(out _))
         {
-            // return the first nodeId as this is one of the excluded properties that expects a single id
-            return udis.FirstOrDefault();
-        }
-
-        var isSingleNodePicker = IsSingleNodePicker(propertyType);
-
-        var multiNodeTreePicker = new List<IPublishedContent>();
-
-        var entityType = GetEntityType(propertyType);
-
-        IPublishedSnapshot publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
-        foreach (Udi udi in udis.Where(u => u.EntityType == entityType))
-        {
-            if (udi is not GuidUdi guidUdi)
+            if (propertyType.EditorAlias.Equals(Constants.PropertyEditors.Aliases.MultiNodeTreePicker))
             {
-                continue;
-            }
+                var udis = (Udi[])source;
+                var isSingleNodePicker = IsSingleNodePicker(propertyType);
 
-            IPublishedContent? multiNodeTreePickerItem = null;
-            switch (udi.EntityType)
-            {
-                case Constants.UdiEntityType.Document:
-                    multiNodeTreePickerItem = publishedSnapshot.Content?.GetById(guidUdi.Guid);
-                    break;
-                case Constants.UdiEntityType.Media:
-                    multiNodeTreePickerItem = publishedSnapshot.Media?.GetById(guidUdi.Guid);
-                    break;
-                case Constants.UdiEntityType.Member:
-                    IMember? member = _memberService.GetByKey(guidUdi.Guid);
-                    multiNodeTreePickerItem = member is not null
-                        ? publishedSnapshot.Members?.Get(member)
-                        : null;
-                    break;
-            }
-
-            if (multiNodeTreePickerItem is not null)
-            {
-                multiNodeTreePicker.Add(multiNodeTreePickerItem);
-                if (isSingleNodePicker)
+                if ((propertyType.Alias != null && PropertiesToExclude.InvariantContains(propertyType.Alias)) == false)
                 {
-                    break;
+                    var multiNodeTreePicker = new List<IPublishedContent>();
+
+                    UmbracoObjectTypes objectType = UmbracoObjectTypes.Unknown;
+                    IPublishedSnapshot publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
+                    foreach (Udi udi in udis)
+                    {
+                        if (udi is not GuidUdi guidUdi)
+                        {
+                            continue;
+                        }
+
+                        IPublishedContent? multiNodeTreePickerItem = null;
+                        switch (udi.EntityType)
+                        {
+                            case Constants.UdiEntityType.Document:
+                                multiNodeTreePickerItem = GetPublishedContent(
+                                    udi,
+                                    ref objectType,
+                                    UmbracoObjectTypes.Document,
+                                    id => publishedSnapshot.Content?.GetById(guidUdi.Guid));
+                                break;
+                            case Constants.UdiEntityType.Media:
+                                multiNodeTreePickerItem = GetPublishedContent(
+                                    udi,
+                                    ref objectType,
+                                    UmbracoObjectTypes.Media,
+                                    id => publishedSnapshot.Media?.GetById(guidUdi.Guid));
+                                break;
+                            case Constants.UdiEntityType.Member:
+                                multiNodeTreePickerItem = GetPublishedContent(
+                                    udi,
+                                    ref objectType,
+                                    UmbracoObjectTypes.Member,
+                                    id =>
+                                    {
+                                        IMember? m = _memberService.GetByKey(guidUdi.Guid);
+                                        if (m == null)
+                                        {
+                                            return null;
+                                        }
+
+                                        IPublishedContent? member = publishedSnapshot?.Members?.Get(m);
+                                        return member;
+                                    });
+                                break;
+                        }
+
+                        if (multiNodeTreePickerItem != null &&
+                            multiNodeTreePickerItem.ContentType.ItemType != PublishedItemType.Element)
+                        {
+                            multiNodeTreePicker.Add(multiNodeTreePickerItem);
+                            if (isSingleNodePicker)
+                            {
+                                break;
+                            }
+                        }
+                    }
+
+                    if (isSingleNodePicker)
+                    {
+                        return multiNodeTreePicker.FirstOrDefault();
+                    }
+
+                    return multiNodeTreePicker;
                 }
+
+                // return the first nodeId as this is one of the excluded properties that expects a single id
+                return udis.FirstOrDefault();
             }
         }
 
-        if (isSingleNodePicker)
-        {
-            return multiNodeTreePicker.FirstOrDefault();
-        }
-
-        return multiNodeTreePicker;
+        return source;
     }
 
-    public override object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel cacheLevel, object? inter, bool preview)
-        => inter;
-
-    // for backwards compat let's convert the intermediate value (either a list of content items or a single content item) to an array of media UDIs
-    public override object? ConvertIntermediateToXPath(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
-    {
-        var entityType = GetEntityType (propertyType);
-        return inter is IEnumerable<IPublishedContent> items
-            ? items.Select(item => new GuidUdi(entityType, item.Key)).ToArray()
-            : inter is IPublishedContent item
-                ? new[] { new GuidUdi(entityType, item.Key) }
-                : null;
-    }
-
-    // the API cache level must be Snapshot in order to facilitate nested field expansion and limiting
     public PropertyCacheLevel GetDeliveryApiPropertyCacheLevel(IPublishedPropertyType propertyType) => PropertyCacheLevel.Snapshot;
 
     public Type GetDeliveryApiPropertyValueType(IPublishedPropertyType propertyType)
@@ -193,37 +194,41 @@ public class MultiNodeTreePickerValueConverter : PropertyValueConverterBase, IDe
 
     public object? ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview, bool expanding)
     {
-        var entityType = GetEntityType(propertyType);
-        if (entityType is Constants.UdiEntityType.Member)
-        {
-            return "(unsupported)";
-        }
-
         IEnumerable<IApiContent> DefaultValue() => Array.Empty<IApiContent>();
 
-        IPublishedContent[]? interItems = inter is IEnumerable<IPublishedContent> interValues
-            ? interValues.ToArray()
-            : inter is IPublishedContent interValue
-                ? new[] { interValue }
-                : null;
-
-        if (interItems is null)
+        if (inter is not IEnumerable<Udi> udis)
         {
             return DefaultValue();
         }
 
+        IPublishedSnapshot publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
+
+        var entityType = GetEntityType(propertyType);
+
+        if (entityType == "content")
+        {
+            // TODO Why do MNTP config saves "content" and not "document"?
+            entityType = Constants.UdiEntityType.Document;
+        }
+
+        GuidUdi[] entityTypeUdis = udis.Where(udi => udi.EntityType == entityType).OfType<GuidUdi>().ToArray();
         return entityType switch
         {
-            Constants.UdiEntityType.Document => interItems
-                .Where(item => item.ItemType is PublishedItemType.Content)
-                .Select(item => _apiContentBuilder.Build(item))
-                .WhereNotNull()
-                .ToArray(),
-            Constants.UdiEntityType.Media => interItems
-                .Where(item => item.ItemType is PublishedItemType.Media)
-                .Select(item => _apiMediaBuilder.Build(item))
-                .WhereNotNull()
-                .ToArray(),
+            Constants.UdiEntityType.Document => entityTypeUdis.Select(udi =>
+            {
+                IPublishedContent? content = publishedSnapshot.Content?.GetById(udi.Guid);
+                return content != null
+                    ? _apiContentBuilder.Build(content)
+                    : null;
+            }).WhereNotNull().ToArray(),
+            Constants.UdiEntityType.Media => entityTypeUdis.Select(udi =>
+            {
+                IPublishedContent? media = publishedSnapshot.Media?.GetById(udi.Guid);
+                return media != null
+                    ? _apiMediaBuilder.Build(media)
+                    : null;
+            }).WhereNotNull().ToArray(),
+            Constants.UdiEntityType.Member => "(unsupported)",
             _ => DefaultValue()
         };
     }
@@ -231,15 +236,37 @@ public class MultiNodeTreePickerValueConverter : PropertyValueConverterBase, IDe
     private static bool IsSingleNodePicker(IPublishedPropertyType propertyType) =>
         propertyType.DataType.ConfigurationAs<MultiNodePickerConfiguration>()?.MaxNumber == 1;
 
-    private static string GetEntityType(IPublishedPropertyType propertyType)
+    private static string GetEntityType(IPublishedPropertyType propertyType) =>
+        propertyType.DataType.ConfigurationAs<MultiNodePickerConfiguration>()?.TreeSource?.ObjectType ?? Constants.UdiEntityType.Document;
+
+    /// <summary>
+    ///     Attempt to get an IPublishedContent instance based on ID and content type
+    /// </summary>
+    /// <param name="nodeId">The content node ID</param>
+    /// <param name="actualType">The type of content being requested</param>
+    /// <param name="expectedType">The type of content expected/supported by <paramref name="contentFetcher" /></param>
+    /// <param name="contentFetcher">A function to fetch content of type <paramref name="expectedType" /></param>
+    /// <returns>
+    ///     The requested content, or null if either it does not exist or <paramref name="actualType" /> does not match
+    ///     <paramref name="expectedType" />
+    /// </returns>
+    private IPublishedContent? GetPublishedContent<T>(T nodeId, ref UmbracoObjectTypes actualType, UmbracoObjectTypes expectedType, Func<T, IPublishedContent?> contentFetcher)
     {
-        var entityType = propertyType.DataType.ConfigurationAs<MultiNodePickerConfiguration>()?.TreeSource?.ObjectType;
-        if (entityType == "content")
+        // is the actual type supported by the content fetcher?
+        if (actualType != UmbracoObjectTypes.Unknown && actualType != expectedType)
         {
-            // TODO Why do MNTP config saves "content" and not "document"?
-            entityType = Constants.UdiEntityType.Document;
+            // no, return null
+            return null;
         }
 
-        return entityType ?? Constants.UdiEntityType.Document;
+        // attempt to get the content
+        IPublishedContent? content = contentFetcher(nodeId);
+        if (content != null)
+        {
+            // if we found the content, assign the expected type to the actual type so we don't have to keep looking for other types of content
+            actualType = expectedType;
+        }
+
+        return content;
     }
 }
