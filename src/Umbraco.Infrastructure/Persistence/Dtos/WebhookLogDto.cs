@@ -13,7 +13,7 @@ internal class WebhookLogDto
     [PrimaryKeyColumn(AutoIncrement = true)]
     public int Id { get; set; }
 
-    [Column("webhookId")]
+    [Column("webhookKey")]
     public Guid WebhookKey { get; set; }
 
     [Column(Name = "key")]
