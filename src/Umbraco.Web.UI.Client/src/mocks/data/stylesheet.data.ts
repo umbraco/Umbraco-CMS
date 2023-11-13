@@ -87,7 +87,7 @@ h1 {
 		path: 'Folder 1/Stylesheet File 3.css',
 		name: 'Stylesheet File 3.css',
 		type: 'stylesheet',
-		hasChildren: true,
+		hasChildren: false,
 		isFolder: false,
 		content: `h1 {
 	color: pink;
