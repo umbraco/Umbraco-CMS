@@ -46,7 +46,7 @@ public static partial class UmbracoBuilderExtensions
             .AddMvcAndRazor(configureMvc)
             .AddWebServer()
             .AddPreviewSupport()
-            .AddHostedServices()
+            .AddRecurringBackgroundJobs()
             .AddNuCache()
             .AddDistributedCache()
             .TryAddModelsBuilderDashboard()
