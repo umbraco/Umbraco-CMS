@@ -44,11 +44,11 @@ export class UmbStylesheetWorkspaceContext
 	}
 
 	getEntityId() {
-		const path = this.getData()?.path?.replace(/\//g, '%2f');
+		const path = this.getData()?.path?.replace(/\//g, '%2F');
 		const name = this.getData()?.name;
 
-		// Note: %2f is a slash (/)
-		return path && name ? `${path}%2f${name}` : name || '';
+		// Note: %2F is a slash (/)
+		return path && name ? `${path}%2F${name}` : name || '';
 	}
 
 	getData() {
