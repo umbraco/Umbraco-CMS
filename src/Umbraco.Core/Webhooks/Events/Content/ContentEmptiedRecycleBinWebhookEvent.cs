@@ -38,14 +38,5 @@ public class ContentEmptiedRecycleBinWebhookEvent : WebhookEventContentBase<Cont
     protected override IEnumerable<IContent> GetEntitiesFromNotification(ContentEmptiedRecycleBinNotification notification) =>
         notification.DeletedEntities;
 
-    protected override object? ConvertEntityToRequestPayload(IContent entity)
-    {
-        if (_publishedSnapshotAccessor.TryGetPublishedSnapshot(out IPublishedSnapshot? publishedSnapshot) is false || publishedSnapshot!.Content is null)
-        {
-            return null;
-        }
-
-        IPublishedContent? publishedContent = publishedSnapshot.Content.GetById(true, entity.Key);
-        return publishedContent is null ? null : _apiContentBuilder.Build(publishedContent);
-    }
+    protected override object? ConvertEntityToRequestPayload(IContent entity) => entity;
 }
