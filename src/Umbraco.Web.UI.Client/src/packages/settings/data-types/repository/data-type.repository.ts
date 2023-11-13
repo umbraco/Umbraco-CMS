@@ -1,21 +1,15 @@
 import { DATA_TYPE_ROOT_ENTITY_TYPE } from '../entities.js';
 import { UmbDataTypeTreeServerDataSource } from './sources/data-type.tree.server.data.js';
-import { UmbDataTypeMoveServerDataSource } from './sources/data-type-move.server.data.js';
 import { UmbDataTypeServerDataSource } from './sources/data-type.server.data.js';
 import { UmbDataTypeFolderServerDataSource } from './sources/data-type-folder.server.data.js';
-import { UmbDataTypeCopyServerDataSource } from './sources/data-type-copy.server.data.js';
 import { UmbDataTypeRepositoryBase } from './data-type-repository-base.js';
 import type {
 	UmbTreeRepository,
 	UmbDetailRepository,
 	UmbFolderRepository,
-	UmbMoveRepository,
-	UmbCopyRepository,
 	UmbTreeDataSource,
 	UmbDataSource,
 	UmbFolderDataSource,
-	UmbMoveDataSource,
-	UmbCopyDataSource,
 } from '@umbraco-cms/backoffice/repository';
 import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import {
@@ -33,15 +27,11 @@ export class UmbDataTypeRepository
 		UmbTreeRepository<FolderTreeItemResponseModel>,
 		UmbDetailRepository<CreateDataTypeRequestModel, any, UpdateDataTypeRequestModel, DataTypeResponseModel>,
 		UmbFolderRepository,
-		UmbMoveRepository,
-		UmbCopyRepository,
 		UmbApi
 {
 	#treeSource: UmbTreeDataSource<FolderTreeItemResponseModel>;
 	#detailSource: UmbDataSource<CreateDataTypeRequestModel, any, UpdateDataTypeRequestModel, DataTypeResponseModel>;
 	#folderSource: UmbFolderDataSource;
-	#moveSource: UmbMoveDataSource;
-	#copySource: UmbCopyDataSource;
 
 	constructor(host: UmbControllerHost) {
 		super(host);
@@ -50,8 +40,6 @@ export class UmbDataTypeRepository
 		this.#treeSource = new UmbDataTypeTreeServerDataSource(this);
 		this.#detailSource = new UmbDataTypeServerDataSource(this);
 		this.#folderSource = new UmbDataTypeFolderServerDataSource(this);
-		this.#moveSource = new UmbDataTypeMoveServerDataSource(this);
-		this.#copySource = new UmbDataTypeCopyServerDataSource(this);
 	}
 
 	// TREE:
@@ -258,49 +246,6 @@ export class UmbDataTypeRepository
 		if (!id) throw new Error('Key is missing');
 		await this._init;
 		return await this.#folderSource.get(id);
-	}
-
-	// Actions
-	async move(id: string, targetId: string | null) {
-		await this._init;
-		const { error } = await this.#moveSource.move(id, targetId);
-
-		if (!error) {
-			// TODO: Be aware about this responsibility.
-			this._treeStore!.updateItem(id, { parentId: targetId });
-			// only update the target if its not the root
-			if (targetId) {
-				this._treeStore!.updateItem(targetId, { hasChildren: true });
-			}
-
-			const notification = { data: { message: `Data type moved` } };
-			this._notificationContext!.peek('positive', notification);
-		}
-
-		return { error };
-	}
-
-	async copy(id: string, targetId: string | null) {
-		await this._init;
-		const { data: dataTypeCopyId, error } = await this.#copySource.copy(id, targetId);
-		if (error) return { error };
-
-		if (dataTypeCopyId) {
-			const { data: dataTypeCopy } = await this.requestById(dataTypeCopyId);
-			if (!dataTypeCopy) throw new Error('Could not find copied data type');
-
-			// TODO: Be aware about this responsibility.
-			this._treeStore!.appendItems([dataTypeCopy]);
-			// only update the target if its not the root
-			if (targetId) {
-				this._treeStore!.updateItem(targetId, { hasChildren: true });
-			}
-
-			const notification = { data: { message: `Data type copied` } };
-			this._notificationContext!.peek('positive', notification);
-		}
-
-		return { data: dataTypeCopyId };
 	}
 }
 
