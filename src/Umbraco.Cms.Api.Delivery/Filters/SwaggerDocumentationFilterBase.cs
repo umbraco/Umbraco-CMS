@@ -137,7 +137,7 @@ internal abstract class SwaggerDocumentationFilterBase<TBaseController>
             Name = "fields",
             In = ParameterLocation.Query,
             Required = false,
-            Description = QueryParameterDescription("Explicitly defines which properties that should be included in the response (by default all properties are included)"),
+            Description = QueryParameterDescription("Explicitly defines which properties should be included in the response (by default all properties are included)"),
             Schema = new OpenApiSchema { Type = "string" },
             Examples = new Dictionary<string, OpenApiExample>
             {
