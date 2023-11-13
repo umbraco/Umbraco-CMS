@@ -1,6 +1,7 @@
 import { contextData, umbDebugContextEventType } from '@umbraco-cms/backoffice/context-api';
 import { UmbBaseController, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
+// Temp controller to get the code away from the app.element.ts
 export class UmbContextDebugController extends UmbBaseController {
 	constructor(host: UmbControllerHost) {
 		super(host);
