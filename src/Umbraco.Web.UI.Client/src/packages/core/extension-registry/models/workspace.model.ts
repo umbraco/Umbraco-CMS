@@ -1,6 +1,6 @@
-import type { ManifestElement } from '@umbraco-cms/backoffice/extension-api';
+import type { ManifestElementAndApi, UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
-export interface ManifestWorkspace extends ManifestElement {
+export interface ManifestWorkspace extends ManifestElementAndApi<HTMLElement, UmbApi> {
 	type: 'workspace';
 	meta: MetaEditor;
 }
