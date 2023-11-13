@@ -7,11 +7,11 @@ export async function loadExtensionApi<T = unknown>(manifest: ManifestWithLoader
 			return manifest.loader();
 		}
 
-		if (isManifestApiJSType<T>(manifest) && manifest.apiJs) {
+		if (isManifestApiJSType<T>(manifest)) {
 			return await import(/* @vite-ignore */ manifest.apiJs);
 		}
 
-		if (isManifestJSType<T>(manifest) && manifest.js) {
+		if (isManifestJSType<T>(manifest)) {
 			return await import(/* @vite-ignore */ manifest.js);
 		}
 	} catch (err: any) {

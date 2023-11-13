@@ -7,7 +7,7 @@ export async function loadExtension<T = unknown>(manifest: ManifestWithLoader<T>
 			return await manifest.loader();
 		}
 
-		if (isManifestJSType<T>(manifest) && manifest.js) {
+		if (isManifestJSType<T>(manifest)) {
 			return await import(/* @vite-ignore */ manifest.js);
 		}
 	} catch (err: any) {
