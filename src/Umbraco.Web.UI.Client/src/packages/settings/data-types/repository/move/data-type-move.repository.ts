@@ -1,5 +1,5 @@
 import { UmbDataTypeRepositoryBase } from '../data-type-repository-base.js';
-import { UmbDataTypeMoveServerDataSource } from './data-type-move.server.data.js';
+import { UmbDataTypeMoveServerDataSource } from './data-type-move.server.data-source.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbMoveDataSource, UmbMoveRepository } from '@umbraco-cms/backoffice/repository';
 

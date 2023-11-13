@@ -1,5 +1,5 @@
 import { UmbDataTypeRepositoryBase } from '../data-type-repository-base.js';
-import { UmbDataTypeCopyServerDataSource } from './data-type-copy.server.data.js';
+import { UmbDataTypeCopyServerDataSource } from './data-type-copy.server.data-source.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbCopyDataSource, UmbCopyRepository } from '@umbraco-cms/backoffice/repository';
 
