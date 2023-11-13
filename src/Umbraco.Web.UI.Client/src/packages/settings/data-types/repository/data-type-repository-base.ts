@@ -1,5 +1,5 @@
 import { UMB_DATA_TYPE_ITEM_STORE_CONTEXT_TOKEN, UmbDataTypeItemStore } from './item/data-type-item.store.js';
-import { UMB_DATA_TYPE_TREE_STORE_CONTEXT_TOKEN, UmbDataTypeTreeStore } from './data-type.tree.store.js';
+import { UMB_DATA_TYPE_TREE_STORE_CONTEXT_TOKEN, UmbDataTypeTreeStore } from '../tree/data-type.tree.store.js';
 import { UMB_DATA_TYPE_STORE_CONTEXT_TOKEN, UmbDataTypeStore } from './data-type.store.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_NOTIFICATION_CONTEXT_TOKEN, UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
