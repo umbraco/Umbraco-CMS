@@ -47,10 +47,10 @@ public class WebhookController : UmbracoAuthorizedJsonController
     [HttpPut]
     public async Task<IActionResult> Update(WebhookViewModel webhookViewModel)
     {
-        Webhook updateModel = _umbracoMapper.Map<Webhook>(webhookViewModel)!;
+        Webhook webhook = _umbracoMapper.Map<Webhook>(webhookViewModel)!;
 
         Attempt<Webhook, WebhookOperationStatus> result = await _webhookService.UpdateAsync(updateModel);
-        return result.Success ? Ok() : WebhookOperationStatusResult(result.Status);
+        return result.Success ? Ok(_webhookPresentationFactory.Create(webhook)) : WebhookOperationStatusResult(result.Status);
     }
 
     [HttpPost]
@@ -58,7 +58,7 @@ public class WebhookController : UmbracoAuthorizedJsonController
     {
         Webhook webhook = _umbracoMapper.Map<Webhook>(webhookViewModel)!;
         Attempt<Webhook, WebhookOperationStatus> result = await _webhookService.CreateAsync(webhook);
-        return result.Success ? Ok() : WebhookOperationStatusResult(result.Status);
+        return result.Success ? Ok(_webhookPresentationFactory.Create(webhook)) : WebhookOperationStatusResult(result.Status);
     }
 
     [HttpGet]
@@ -66,7 +66,7 @@ public class WebhookController : UmbracoAuthorizedJsonController
     {
         Webhook? webhook = await _webhookService.GetAsync(key);
 
-        return webhook is null ? NotFound() : Ok(webhook);
+        return webhook is null ? NotFound() : Ok(_webhookPresentationFactory.Create(webhook));
     }
 
     [HttpDelete]
