@@ -21,7 +21,7 @@ public class WebhookFiring : IRecurringBackgroundJob
     private readonly ICoreScopeProvider _coreScopeProvider;
     private WebhookSettings _webhookSettings;
 
-    public TimeSpan Period { get => _webhookSettings.Period; }
+    public TimeSpan Period => _webhookSettings.Period;
 
     public TimeSpan Delay { get; } = TimeSpan.FromSeconds(20);
 
@@ -51,32 +51,40 @@ public class WebhookFiring : IRecurringBackgroundJob
 
     public async Task RunJobAsync()
     {
-        using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
-        scope.WriteLock(Constants.Locks.WebhookRequest);
-        IEnumerable<WebhookRequest> requests = await _webhookRequestService.GetAllAsync();
-
-        await Parallel.ForEachAsync(requests, async (request, token) =>
+        IEnumerable<WebhookRequest> requests;
+        using (ICoreScope scope = _coreScopeProvider.CreateCoreScope())
         {
-            Webhook? webhook = await _webHookService.GetAsync(request.WebhookKey);
-            if (webhook is null)
-            {
-                return;
-            }
+            scope.ReadLock(Constants.Locks.WebhookRequest);
+            requests = await _webhookRequestService.GetAllAsync();
+            scope.Complete();
+        }
 
-            HttpResponseMessage? response = await SendRequestAsync(webhook, request.EventAlias, request.RequestObject, request.RetryCount, token);
-
-            if ((response?.IsSuccessStatusCode ?? false) || request.RetryCount >= _webhookSettings.MaximumRetries)
+        await Task.WhenAll(requests.Select(request =>
+        {
+            using (ExecutionContext.SuppressFlow())
             {
-                await _webhookRequestService.DeleteAsync(request);
-            }
-            else
-            {
-                request.RetryCount++;
-                await _webhookRequestService.UpdateAsync(request);
-            }
-        });
+                return Task.Run(async () =>
+                {
+                    Webhook? webhook = await _webHookService.GetAsync(request.WebhookKey);
+                    if (webhook is null)
+                    {
+                        return;
+                    }
 
-        scope.Complete();
+                    HttpResponseMessage? response = await SendRequestAsync(webhook, request.EventAlias, request.RequestObject, request.RetryCount, CancellationToken.None);
+
+                    if ((response?.IsSuccessStatusCode ?? false) || request.RetryCount >= _webhookSettings.MaximumRetries)
+                    {
+                        await _webhookRequestService.DeleteAsync(request);
+                    }
+                    else
+                    {
+                        request.RetryCount++;
+                        await _webhookRequestService.UpdateAsync(request);
+                    }
+                });
+            }
+        }));
     }
 
     private async Task<HttpResponseMessage?> SendRequestAsync(Webhook webhook, string eventName, object? payload, int retryCount, CancellationToken cancellationToken)
@@ -107,7 +115,6 @@ public class WebhookFiring : IRecurringBackgroundJob
             HttpResponseMessage = response,
             RetryCount = retryCount,
         };
-
 
         WebhookLog log = await _webhookLogFactory.CreateAsync(eventName, webhookResponseModel, webhook, cancellationToken);
         await _webhookLogService.CreateAsync(log);
