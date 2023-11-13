@@ -1,4 +1,4 @@
-import { UmbDataTypeRepository } from '../../repository/data-type.repository.js';
+import { type UmbCopyDataTypeRepository } from '../../repository/copy/data-type-copy.repository.js';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import {
@@ -8,7 +8,7 @@ import {
 } from '@umbraco-cms/backoffice/modal';
 
 // TODO: investigate what we need to make a generic copy action
-export class UmbCopyDataTypeEntityAction extends UmbEntityActionBase<UmbDataTypeRepository> {
+export class UmbCopyDataTypeEntityAction extends UmbEntityActionBase<UmbCopyDataTypeRepository> {
 	#modalManagerContext?: UmbModalManagerContext;
 
 	constructor(host: UmbControllerHostElement, repositoryAlias: string, unique: string) {
