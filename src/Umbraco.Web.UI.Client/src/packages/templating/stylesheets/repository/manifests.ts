@@ -10,4 +10,4 @@ const repository: ManifestRepository = {
 	api: UmbStylesheetRepository,
 };
 
-export const manifests = [repository, itemManifests];
+export const manifests = [repository, ...itemManifests];
