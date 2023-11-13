@@ -1,6 +1,6 @@
 import { DATA_TYPE_ROOT_ENTITY_TYPE } from '../entities.js';
-import { UmbDataTypeTreeServerDataSource } from './data-type.tree.server.data.js';
 import { UmbDataTypeRepositoryBase } from '../repository/data-type-repository-base.js';
+import { UmbDataTypeTreeServerDataSource } from './data-type.tree.server.data.js';
 import type { UmbTreeRepository, UmbTreeDataSource } from '@umbraco-cms/backoffice/repository';
 import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { FolderTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
