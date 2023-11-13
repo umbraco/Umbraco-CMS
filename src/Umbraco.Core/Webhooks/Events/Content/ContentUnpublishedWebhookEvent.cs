@@ -8,9 +8,9 @@ using Umbraco.Cms.Core.Sync;
 namespace Umbraco.Cms.Core.Webhooks.Events.Content;
 
 [WebhookEvent("Content Unpublished", Constants.WebhookEvents.Types.Content)]
-public class ContentUnpublishWebhookEvent : WebhookEventContentBase<ContentUnpublishedNotification, IContent>
+public class ContentUnpublishedWebhookEvent : WebhookEventContentBase<ContentUnpublishedNotification, IContent>
 {
-    public ContentUnpublishWebhookEvent(
+    public ContentUnpublishedWebhookEvent(
         IWebhookFiringService webhookFiringService,
         IWebhookService webhookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,

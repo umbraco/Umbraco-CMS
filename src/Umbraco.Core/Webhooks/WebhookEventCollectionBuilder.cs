@@ -84,9 +84,9 @@ public class WebhookEventCollectionBuilder : OrderedCollectionBuilderBase<Webhoo
 
     public WebhookEventCollectionBuilder AddCoreWebhooks()
     {
-        Append<ContentDeleteWebhookEvent>();
-        Append<ContentPublishWebhookEvent>();
-        Append<ContentUnpublishWebhookEvent>();
+        Append<ContentDeletedWebhookEvent>();
+        Append<ContentPublishedWebhookEvent>();
+        Append<ContentUnpublishedWebhookEvent>();
         Append<MediaDeletedWebhookEvent>();
         Append<MediaSavedWebhookEvent>();
         return this;
