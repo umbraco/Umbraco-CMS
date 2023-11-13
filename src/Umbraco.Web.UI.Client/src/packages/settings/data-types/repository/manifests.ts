@@ -1,5 +1,5 @@
 import { UmbDataTypeDetailRepository } from './detail/data-type-detail.repository.js';
-import { UmbDataTypeStore } from './data-type.store.js';
+import { UmbDataTypeStore } from './detail/data-type.store.js';
 import { manifests as itemManifests } from './item/manifests.js';
 import { manifests as moveManifests } from './move/manifests.js';
 import { manifests as copyManifests } from './copy/manifests.js';
