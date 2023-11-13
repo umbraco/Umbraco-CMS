@@ -135,7 +135,6 @@ export class UmbDocumentTypeWorkspaceContext
 		this.setIsSorting(false);
 		//this.#draft.next(data);
 		return { data } || undefined;
-		// TODO: Is this wrong? should we return { data }??
 	}
 
 	async load(entityId: string) {
@@ -146,7 +145,6 @@ export class UmbDocumentTypeWorkspaceContext
 		this.setIsSorting(false);
 		//this.#draft.next(data);
 		return { data } || undefined;
-		// TODO: Is this wrong? should we return { data }??
 	}
 
 	/**

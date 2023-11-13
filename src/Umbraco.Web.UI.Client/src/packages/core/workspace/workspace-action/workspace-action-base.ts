@@ -9,17 +9,17 @@ export interface UmbWorkspaceAction<WorkspaceType = unknown> extends UmbApi {
 	execute(): Promise<void>;
 }
 
-export abstract class UmbWorkspaceActionBase<WorkspaceType extends UmbWorkspaceContextInterface>
-	implements UmbWorkspaceAction<WorkspaceType>
+export abstract class UmbWorkspaceActionBase<WorkspaceContextType extends UmbWorkspaceContextInterface>
+	implements UmbWorkspaceAction<WorkspaceContextType>
 {
 	host: UmbControllerHostElement;
-	workspaceContext?: WorkspaceType;
+	workspaceContext?: WorkspaceContextType;
 	constructor(host: UmbControllerHostElement) {
 		this.host = host;
 
 		new UmbContextConsumerController(this.host, UMB_WORKSPACE_CONTEXT, (instance) => {
 			// TODO: Be aware we are casting here. We should consider a better solution for typing the contexts. (But notice we still want to capture the first workspace...)
-			this.workspaceContext = instance as unknown as WorkspaceType;
+			this.workspaceContext = instance as unknown as WorkspaceContextType;
 		});
 	}
 	abstract execute(): Promise<void>;
