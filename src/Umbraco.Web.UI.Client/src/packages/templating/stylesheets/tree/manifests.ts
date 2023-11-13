@@ -1,4 +1,4 @@
-import { STYLESHEET_ENTITY_TYPE, STYLESHEET_TREE_STORE_ALIAS } from '../config.js';
+import { STYLESHEET_ENTITY_TYPE } from '../config.js';
 import { UmbStylesheetTreeRepository } from './stylesheet-tree.repository.js';
 import { UmbStylesheetTreeStore } from './stylesheet.tree.store.js';
 import type {
@@ -10,6 +10,7 @@ import type {
 
 export const STYLESHEET_TREE_ALIAS = 'Umb.Tree.Stylesheet';
 export const STYLESHEET_TREE_REPOSITORY_ALIAS = 'Umb.Repository.StylesheetTree';
+export const STYLESHEET_TREE_STORE_ALIAS = 'Umb.Store.StylesheetTree';
 
 const treeRepository: ManifestRepository = {
 	type: 'repository',

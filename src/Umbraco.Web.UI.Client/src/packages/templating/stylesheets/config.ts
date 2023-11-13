@@ -10,4 +10,3 @@ export const UMB_STYLESHEET_TREE_STORE_CONTEXT_TOKEN_ALIAS = 'Umb.Store.Styleshe
 export const UMB_STYLESHEET_STORE_CONTEXT_TOKEN_ALIAS = 'Umb.Store.Stylesheet';
 
 export const STYLESHEET_STORE_ALIAS = 'Umb.Store.Stylesheet';
-export const STYLESHEET_TREE_STORE_ALIAS = 'Umb.Store.StylesheetTree';
