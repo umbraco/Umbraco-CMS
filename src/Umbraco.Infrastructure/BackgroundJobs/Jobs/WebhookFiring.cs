@@ -7,14 +7,12 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Infrastructure.BackgroundJobs;
 
 namespace Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
 
 public class WebhookFiring : IRecurringBackgroundJob
 {
     private readonly ILogger<WebhookFiring> _logger;
-    private readonly IRuntimeState _runtimeState;
     private readonly IWebhookRequestService _webhookRequestService;
     private readonly IJsonSerializer _jsonSerializer;
     private readonly IWebhookLogFactory _webhookLogFactory;
@@ -32,7 +30,6 @@ public class WebhookFiring : IRecurringBackgroundJob
 
     public WebhookFiring(
         ILogger<WebhookFiring> logger,
-        IRuntimeState runtimeState,
         IWebhookRequestService webhookRequestService,
         IJsonSerializer jsonSerializer,
         IWebhookLogFactory webhookLogFactory,
@@ -42,7 +39,6 @@ public class WebhookFiring : IRecurringBackgroundJob
         ICoreScopeProvider coreScopeProvider)
     {
         _logger = logger;
-        _runtimeState = runtimeState;
         _webhookRequestService = webhookRequestService;
         _jsonSerializer = jsonSerializer;
         _webhookLogFactory = webhookLogFactory;
