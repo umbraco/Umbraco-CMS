@@ -34,7 +34,7 @@ public class ByIdMediaApiController : MediaApiControllerBase
     [MapToApiVersion("2.0")]
     [ProducesResponseType(typeof(IApiMediaWithCropsResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> ById20(Guid id)
+    public async Task<IActionResult> ByIdV20(Guid id)
         => await HandleRequest(id);
 
     private async Task<IActionResult> HandleRequest(Guid id)
