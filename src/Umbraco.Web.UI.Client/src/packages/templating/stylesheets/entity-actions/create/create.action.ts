@@ -7,6 +7,10 @@ export class UmbCreateStylesheetAction<T extends { copy(): Promise<void> }> exte
 	}
 
 	async execute() {
+		if (this.unique !== null) {
+			this.unique = this.unique.replace(/\//g, '%2f');
+		}
+
 		history.pushState(null, '', `section/settings/workspace/stylesheet/create/${this.unique ?? 'null'}/view/code`);
 	}
 }
