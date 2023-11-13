@@ -54,15 +54,16 @@ public class WebhookFiring : IRecurringBackgroundJob
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         scope.WriteLock(Constants.Locks.WebhookRequest);
         IEnumerable<WebhookRequest> requests = await _webhookRequestService.GetAllAsync();
-        foreach (WebhookRequest request in requests)
+
+        await Parallel.ForEachAsync(requests, async (request, token) =>
         {
             Webhook? webhook = await _webHookService.GetAsync(request.WebhookKey);
             if (webhook is null)
             {
-                continue;
+                return;
             }
 
-            HttpResponseMessage? response = await SendRequestAsync(webhook, request.EventAlias, request.RequestObject, request.RetryCount, CancellationToken.None);
+            HttpResponseMessage? response = await SendRequestAsync(webhook, request.EventAlias, request.RequestObject, request.RetryCount, token);
 
             if ((response?.IsSuccessStatusCode ?? false) || request.RetryCount >= _webhookSettings.MaximumRetries)
             {
@@ -73,7 +74,7 @@ public class WebhookFiring : IRecurringBackgroundJob
                 request.RetryCount++;
                 await _webhookRequestService.UpdateAsync(request);
             }
-        }
+        });
 
         scope.Complete();
     }
