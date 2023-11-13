@@ -36,6 +36,7 @@ export class UmbStylesheetTreeRepository
 	}
 
 	async requestRootTreeItems() {
+		console.log('stylesheet root');
 		await this.#init;
 
 		const { data, error } = await this.#treeDataSource.getRootItems();
@@ -49,6 +50,9 @@ export class UmbStylesheetTreeRepository
 
 	async requestTreeItemsOf(path: string | null) {
 		if (path === undefined) throw new Error('Cannot request tree item with missing path');
+		if (path === null || path === '/' || path === '') {
+			return this.requestRootTreeItems();
+		}
 
 		await this.#init;
 
