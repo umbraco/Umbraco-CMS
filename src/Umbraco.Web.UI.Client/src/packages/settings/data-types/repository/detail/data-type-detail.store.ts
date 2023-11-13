@@ -4,7 +4,7 @@ import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
-export const UMB_DATA_TYPE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbDataTypeStore>('UmbDataTypeStore');
+export const UMB_DATA_TYPE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbDataTypeDetailStore>('UmbDataTypeStore');
 
 /**
  * @export
@@ -12,7 +12,7 @@ export const UMB_DATA_TYPE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbDataType
  * @extends {UmbStoreBase}
  * @description - Data Store for Template Details
  */
-export class UmbDataTypeStore extends UmbStoreBase<DataTypeResponseModel> {
+export class UmbDataTypeDetailStore extends UmbStoreBase<DataTypeResponseModel> {
 	/**
 	 * Creates an instance of UmbDataTypeStore.
 	 * @param {UmbControllerHostElement} host
