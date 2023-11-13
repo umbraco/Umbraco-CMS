@@ -1,6 +1,6 @@
 import type { UmbAppErrorElement } from './app-error.element.js';
-import { UMB_APP_CONTEXT, UmbAppContext } from './app.context.js';
-import { umbLocalizationRegistry } from '@umbraco-cms/backoffice/localization';
+import { UmbAppContext } from './app.context.js';
+import { UmbServerConnection } from './server-connection.js';
 import { UMB_AUTH_CONTEXT, UmbAuthContext } from '@umbraco-cms/backoffice/auth';
 import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UUIIconRegistryEssential } from '@umbraco-cms/backoffice/external/uui';
@@ -8,9 +8,8 @@ import { UmbIconRegistry } from '@umbraco-cms/backoffice/icon';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { Guard, UmbRoute } from '@umbraco-cms/backoffice/router';
 import { pathWithoutBasePath } from '@umbraco-cms/backoffice/router';
-import { tryExecute } from '@umbraco-cms/backoffice/resources';
-import { OpenAPI, RuntimeLevelModel, ServerResource } from '@umbraco-cms/backoffice/backend-api';
-import { contextData, umbDebugContextEventType } from '@umbraco-cms/backoffice/context-api';
+import { OpenAPI, RuntimeLevelModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbContextDebugController } from '@umbraco-cms/backoffice/debug';
 
 @customElement('umb-app')
 export class UmbAppElement extends UmbLitElement {
@@ -56,13 +55,15 @@ export class UmbAppElement extends UmbLitElement {
 		},
 	];
 
-	#authContext?: UmbAuthContext;
+	#authContext?: typeof UMB_AUTH_CONTEXT.TYPE;
 	#umbIconRegistry = new UmbIconRegistry();
 	#uuiIconRegistry = new UUIIconRegistryEssential();
-	#runtimeLevel = RuntimeLevelModel.UNKNOWN;
+	#serverConnection?: UmbServerConnection;
 
 	constructor() {
 		super();
+
+		new UmbContextDebugController(this);
 
 		this.#umbIconRegistry.attach(this);
 		this.#uuiIconRegistry.attach(this);
@@ -70,62 +71,28 @@ export class UmbAppElement extends UmbLitElement {
 
 	connectedCallback(): void {
 		super.connectedCallback();
-
-		this.#setLanguage();
 		this.#setup();
-	}
-
-	#setLanguage() {
-		if (this.lang) {
-			umbLocalizationRegistry.loadLanguage(this.lang);
-		}
-	}
-
-	#listenForLanguageChange() {
-		// This will wait for the default language to be loaded before attempting to load the current user language
-		// just in case the user language is not the default language.
-		// We **need** to do this because the default language (typically en-us) holds all the fallback keys for all the other languages.
-		// This way we can ensure that the document language is always loaded first and subsequently registered as the fallback language.
-		this.observe(umbLocalizationRegistry.isDefaultLoaded, (isDefaultLoaded) => {
-			if (!this.#authContext) {
-				throw new Error('[Fatal] AuthContext requested before it was initialized');
-			}
-
-			if (!isDefaultLoaded) return;
-
-			this.observe(
-				this.#authContext.languageIsoCode,
-				(currentLanguageIsoCode) => {
-					umbLocalizationRegistry.loadLanguage(currentLanguageIsoCode);
-				},
-				'languageIsoCode',
-			);
-		});
 	}
 
 	async #setup() {
 		if (this.serverUrl === undefined) throw new Error('No serverUrl provided');
 
+		/* All requests to the server requires the base URL to be set. 
+		We make sure it happens before we get the server status. 
+		TODO: find the right place to set this
+		*/
 		OpenAPI.BASE = this.serverUrl;
-		const redirectUrl = `${window.location.origin}${this.backofficePath}`;
 
-		this.#authContext = new UmbAuthContext(this, this.serverUrl, redirectUrl);
+		this.#serverConnection = await new UmbServerConnection(this.serverUrl).connect();
 
-		this.provideContext(UMB_AUTH_CONTEXT, this.#authContext);
-
-		this.provideContext(
-			UMB_APP_CONTEXT,
-			new UmbAppContext({ backofficePath: this.backofficePath, serverUrl: this.serverUrl }),
-		);
+		this.#authContext = new UmbAuthContext(this, this.serverUrl, this.backofficePath, this.bypassAuth);
+		new UmbAppContext(this, { backofficePath: this.backofficePath, serverUrl: this.serverUrl });
 
 		// Try to initialise the auth flow and get the runtime status
 		try {
-			// Get the current runtime level
-			await this.#setInitStatus();
-
 			// If the runtime level is "install" we should clear any cached tokens
 			// else we should try and set the auth status
-			if (this.#runtimeLevel === RuntimeLevelModel.INSTALL) {
+			if (this.#serverConnection.getStatus() === RuntimeLevelModel.INSTALL) {
 				await this.#authContext.signOut();
 			} else {
 				await this.#setAuthStatus();
@@ -153,64 +120,26 @@ export class UmbAppElement extends UmbLitElement {
 			// Redirect to the error page
 			this.#errorPage(errorMsg, error);
 		}
-
-		// TODO: wrap all debugging logic in a separate class. Maybe this could be part of the context-api? When we create a new root, we could attach the debugger to it?
-		// Listen for the debug event from the <umb-debug> component
-		this.addEventListener(umbDebugContextEventType, (event: any) => {
-			// Once we got to the outter most component <umb-app>
-			// we can send the event containing all the contexts
-			// we have collected whilst coming up through the DOM
-			// and pass it back down to the callback in
-			// the <umb-debug> component that originally fired the event
-			if (event.callback) {
-				event.callback(event.instances);
-			}
-
-			// Massage the data into a simplier format
-			// Why? Can't send contexts data directly - browser seems to not serialize it and says its null
-			// But a simple object works fine for browser extension to consume
-			const data = {
-				contexts: contextData(event.instances),
-			};
-
-			// Emit this new event for the browser extension to listen for
-			this.dispatchEvent(new CustomEvent('umb:debug-contexts:data', { detail: data, bubbles: true }));
-		});
 	}
 
-	async #setInitStatus() {
-		const { data, error } = await tryExecute(ServerResource.getServerStatus());
-		if (error) {
-			throw error;
-		}
-		this.#runtimeLevel = data?.serverStatus ?? RuntimeLevelModel.UNKNOWN;
-	}
-
+	// TODO: move set initial auth state into auth context
 	async #setAuthStatus() {
-		if (this.bypassAuth === false) {
-			if (!this.#authContext) {
-				throw new Error('[Fatal] AuthContext requested before it was initialized');
-			}
+		if (this.bypassAuth) return;
 
-			// Get service configuration from authentication server
-			await this.#authContext.setInitialState();
-
-			// Instruct all requests to use the auth flow to get and use the access_token for all subsequent requests
-			OpenAPI.TOKEN = () => this.#authContext!.getLatestToken();
-			OpenAPI.WITH_CREDENTIALS = true;
+		if (!this.#authContext) {
+			throw new Error('[Fatal] AuthContext requested before it was initialized');
 		}
 
-		this.#listenForLanguageChange();
+		// Get service configuration from authentication server
+		await this.#authContext?.setInitialState();
 
-		if (this.#authContext?.isAuthorized()) {
-			this.#authContext?.setLoggedIn(true);
-		} else {
-			this.#authContext?.setLoggedIn(false);
-		}
+		// Instruct all requests to use the auth flow to get and use the access_token for all subsequent requests
+		OpenAPI.TOKEN = () => this.#authContext!.getLatestToken();
+		OpenAPI.WITH_CREDENTIALS = true;
 	}
 
 	#redirect() {
-		switch (this.#runtimeLevel) {
+		switch (this.#serverConnection?.getStatus()) {
 			case RuntimeLevelModel.INSTALL:
 				history.replaceState(null, '', 'install');
 				break;
@@ -242,18 +171,17 @@ export class UmbAppElement extends UmbLitElement {
 
 			default:
 				// Redirect to the error page
-				this.#errorPage(`Unsupported runtime level: ${this.#runtimeLevel}`);
+				this.#errorPage(`Unsupported runtime level: ${this.#serverConnection?.getStatus()}`);
 		}
-	}
-
-	#isAuthorized(): boolean {
-		if (!this.#authContext) return false;
-		return this.bypassAuth ? true : this.#authContext.isAuthorized();
 	}
 
 	#isAuthorizedGuard(): Guard {
 		return () => {
-			if (this.#isAuthorized()) {
+			if (!this.#authContext) {
+				throw new Error('[Fatal] AuthContext requested before it was initialized');
+			}
+
+			if (this.#authContext.getIsAuthorized()) {
 				return true;
 			}
 
@@ -261,7 +189,8 @@ export class UmbAppElement extends UmbLitElement {
 			window.sessionStorage.setItem('umb:auth:redirect', location.href);
 
 			// Make a request to the auth server to start the auth flow
-			this.#authContext!.login();
+			// TODO: find better name for this method
+			this.#authContext.login();
 
 			// Return false to prevent the route from being rendered
 			return false;

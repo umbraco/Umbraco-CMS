@@ -1,7 +1,6 @@
 import { UmbUserGroupDetailDataSource } from '../types.js';
 import { UmbUserGroupServerDataSource } from './sources/user-group.server.data-source.js';
 import { UMB_USER_GROUP_ITEM_STORE_CONTEXT_TOKEN, UmbUserGroupItemStore } from './user-group-item.store.js';
-import { UMB_USER_GROUP_STORE_CONTEXT_TOKEN, UmbUserGroupStore } from './user-group.store.js';
 import { UmbUserGroupItemServerDataSource } from './sources/user-group-item.server.data-source.js';
 import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import {
@@ -18,46 +17,45 @@ import {
 	UmbDataSourceErrorResponse,
 	DataSourceResponse,
 } from '@umbraco-cms/backoffice/repository';
-import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { UMB_NOTIFICATION_CONTEXT_TOKEN, UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbBaseController, type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
 // TODO: implement
 export class UmbUserGroupRepository
+	extends UmbBaseController
 	implements
 		UmbDetailRepository<CreateUserGroupRequestModel, any, UpdateUserGroupRequestModel, UserGroupResponseModel>,
-		UmbItemRepository<UserGroupItemResponseModel>
+		UmbItemRepository<UserGroupItemResponseModel>,
+		UmbApi
 {
-	#host: UmbControllerHostElement;
 	#init;
 
 	#detailSource: UmbUserGroupDetailDataSource;
-	#detailStore?: UmbUserGroupStore;
+	//#detailStore?: UmbUserGroupStore;
 
 	#itemSource: UmbItemDataSource<UserGroupItemResponseModel>;
 	#itemStore?: UmbUserGroupItemStore;
 
 	#notificationContext?: UmbNotificationContext;
 
-	constructor(host: UmbControllerHostElement) {
-		this.#host = host;
-		this.#detailSource = new UmbUserGroupServerDataSource(this.#host);
-		this.#itemSource = new UmbUserGroupItemServerDataSource(this.#host);
-
-		new UmbContextConsumerController(this.#host, UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
-			this.#notificationContext = instance;
-		});
+	constructor(host: UmbControllerHost) {
+		super(host);
+		this.#detailSource = new UmbUserGroupServerDataSource(this._host);
+		this.#itemSource = new UmbUserGroupItemServerDataSource(this._host);
 
 		this.#init = Promise.all([
-			new UmbContextConsumerController(this.#host, UMB_USER_GROUP_STORE_CONTEXT_TOKEN, (instance) => {
+			/*
+			this.consumeContext(UMB_USER_GROUP_STORE_CONTEXT_TOKEN, (instance) => {
 				this.#detailStore = instance;
 			}).asPromise(),
+			*/
 
-			new UmbContextConsumerController(this.#host, UMB_USER_GROUP_ITEM_STORE_CONTEXT_TOKEN, (instance) => {
+			this.consumeContext(UMB_USER_GROUP_ITEM_STORE_CONTEXT_TOKEN, (instance) => {
 				this.#itemStore = instance;
 			}).asPromise(),
 
-			new UmbContextConsumerController(this.#host, UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
+			this.consumeContext(UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
 				this.#notificationContext = instance;
 			}).asPromise(),
 		]);

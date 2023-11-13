@@ -1,5 +1,5 @@
 import type { MemberGroupDetails } from '../../types.js';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { UmbDataSource } from '@umbraco-cms/backoffice/repository';
 
@@ -11,9 +11,9 @@ import { UmbDataSource } from '@umbraco-cms/backoffice/repository';
  */
 // TODO => Provide type when it is available
 export class UmbMemberGroupDetailServerDataSource implements UmbDataSource<any, any, any, any> {
-	#host: UmbControllerHostElement;
+	#host: UmbControllerHost;
 
-	constructor(host: UmbControllerHostElement) {
+	constructor(host: UmbControllerHost) {
 		this.#host = host;
 	}
 

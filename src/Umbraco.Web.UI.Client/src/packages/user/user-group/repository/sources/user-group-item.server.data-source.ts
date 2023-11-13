@@ -1,5 +1,5 @@
 import type { UmbItemDataSource } from '@umbraco-cms/backoffice/repository';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { UserGroupItemResponseModel, UserGroupResource } from '@umbraco-cms/backoffice/backend-api';
 
@@ -10,14 +10,14 @@ import { UserGroupItemResponseModel, UserGroupResource } from '@umbraco-cms/back
  * @implements {UmbItemDataSource}
  */
 export class UmbUserGroupItemServerDataSource implements UmbItemDataSource<UserGroupItemResponseModel> {
-	#host: UmbControllerHostElement;
+	#host: UmbControllerHost;
 
 	/**
 	 * Creates an instance of UmbUserGroupItemServerDataSource.
-	 * @param {UmbControllerHostElement} host
+	 * @param {UmbControllerHost} host
 	 * @memberof UmbUserGroupItemServerDataSource
 	 */
-	constructor(host: UmbControllerHostElement) {
+	constructor(host: UmbControllerHost) {
 		this.#host = host;
 	}
 

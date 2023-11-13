@@ -7,8 +7,7 @@ import {
 	UmbStylesheetFolderServerDataSource,
 } from './sources/stylesheet.folder.server.data.js';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
+import { UmbBaseController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import {
 	DataSourceResponse,
 	UmbDataSourceErrorResponse,
@@ -35,14 +34,15 @@ import {
 	UpdateTextFileViewModelBaseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbTreeRootFileSystemModel } from '@umbraco-cms/backoffice/tree';
+import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
-export class UmbStylesheetRepository
+export class UmbStylesheetRepository extends UmbBaseController
 	implements
 		UmbTreeRepository<FileSystemTreeItemPresentationModel, UmbTreeRootFileSystemModel>,
 		UmbDetailRepository<CreateStylesheetRequestModel, string, UpdateStylesheetRequestModel, StylesheetDetails>,
-		UmbFolderRepository
+		UmbFolderRepository,
+		UmbApi
 {
-	#host;
 	#dataSource;
 	#treeDataSource;
 	#treeStore?: UmbStylesheetTreeStore;
@@ -50,14 +50,14 @@ export class UmbStylesheetRepository
 	#init;
 
 	constructor(host: UmbControllerHostElement) {
-		this.#host = host;
+		super(host);
 
 		// TODO: figure out how spin up get the correct data source
-		this.#dataSource = new UmbStylesheetServerDataSource(this.#host);
-		this.#treeDataSource = new UmbStylesheetTreeServerDataSource(this.#host);
-		this.#folderDataSource = new UmbStylesheetFolderServerDataSource(this.#host);
+		this.#dataSource = new UmbStylesheetServerDataSource(this);
+		this.#treeDataSource = new UmbStylesheetTreeServerDataSource(this);
+		this.#folderDataSource = new UmbStylesheetFolderServerDataSource(this);
 
-		this.#init = new UmbContextConsumerController(this.#host, UMB_STYLESHEET_TREE_STORE_CONTEXT_TOKEN, (instance) => {
+		this.#init = this.consumeContext(UMB_STYLESHEET_TREE_STORE_CONTEXT_TOKEN, (instance) => {
 			this.#treeStore = instance;
 		}).asPromise();
 	}

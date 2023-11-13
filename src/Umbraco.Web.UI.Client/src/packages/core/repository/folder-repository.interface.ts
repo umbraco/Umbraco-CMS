@@ -5,8 +5,9 @@ import type {
 	ProblemDetails,
 	UpdateFolderResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
-export interface UmbFolderRepository {
+export interface UmbFolderRepository extends UmbApi {
 	createFolderScaffold(parentId: string | null): Promise<{
 		data?: FolderResponseModel;
 		error?: ProblemDetails;

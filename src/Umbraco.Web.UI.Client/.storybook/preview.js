@@ -61,26 +61,26 @@ customElements.define('umb-storybook', UmbStoryBookElement);
 const storybookProvider = (story) => html` <umb-storybook>${story()}</umb-storybook> `;
 
 const dataTypeStoreProvider = (story) => html`
-	<umb-controller-host-initializer .create=${(host) => new UmbDataTypeStore(host)}
-		>${story()}</umb-controller-host-initializer
+	<umb-controller-host-provider .create=${(host) => new UmbDataTypeStore(host)}
+		>${story()}</umb-controller-host-provider
 	>
 `;
 
 const documentTypeStoreProvider = (story) => html`
-	<umb-controller-host-initializer .create=${(host) => new UmbDocumentTypeStore(host)}
-		>${story()}</umb-controller-host-initializer
+	<umb-controller-host-provider .create=${(host) => new UmbDocumentTypeStore(host)}
+		>${story()}</umb-controller-host-provider
 	>
 `;
 
 const documentStoreProvider = (story) => html`
-	<umb-controller-host-initializer .create=${(host) => new UmbDocumentStore(host)}
-		>${story()}</umb-controller-host-initializer
+	<umb-controller-host-provider .create=${(host) => new UmbDocumentStore(host)}
+		>${story()}</umb-controller-host-provider
 	>
 `;
 
 const documentTreeStoreProvider = (story) => html`
-	<umb-controller-host-initializer .create=${(host) => new UmbDocumentTreeStore(host)}
-		>${story()}</umb-controller-host-initializer
+	<umb-controller-host-provider .create=${(host) => new UmbDocumentTreeStore(host)}
+		>${story()}</umb-controller-host-provider
 	>
 `;
 

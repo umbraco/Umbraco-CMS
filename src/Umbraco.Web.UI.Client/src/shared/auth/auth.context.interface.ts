@@ -1,7 +1,8 @@
-import type { UmbLoggedInUser } from './types.js';
-import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
+import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 
-export interface IUmbAuth {
+export interface IUmbAuthContext {
+	isAuthorized: Observable<boolean>;
+
 	/**
 	 * Initiates the login flow.
 	 */
@@ -15,7 +16,7 @@ export interface IUmbAuth {
 	/**
 	 * Checks if there is a token and it is still valid.
 	 */
-	isAuthorized(): boolean;
+	getIsAuthorized(): boolean;
 
 	/**
 	 * Gets the latest token from the Management API.
@@ -34,27 +35,7 @@ export interface IUmbAuth {
 	getLatestToken(): Promise<string>;
 
 	/**
-	 * Get the current user model of the current user.
-	 */
-	get currentUser(): Observable<UmbLoggedInUser | undefined>;
-
-	/**
-	 * Get the current user's language ISO code.
-	 */
-	languageIsoCode: Observable<string>;
-
-	/**
-	 * Make a server request for the current user and save the state
-	 */
-	fetchCurrentUser(): Promise<UmbLoggedInUser | undefined>;
-
-	/**
 	 * Signs the user out by removing any tokens from the browser.
 	 */
 	signOut(): Promise<void>;
-
-	/**
-	 * Check if the given user is the current user.
-	 */
-	isUserCurrentUser(userId: string): Promise<boolean>;
 }

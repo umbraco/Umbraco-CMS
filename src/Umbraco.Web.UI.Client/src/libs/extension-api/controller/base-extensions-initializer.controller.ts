@@ -3,7 +3,7 @@ import type {
 	ManifestBase,
 	ManifestTypeMap,
 	SpecificManifestTypeOrManifestBase,
-	UmbBaseExtensionController,
+	UmbBaseExtensionInitializer,
 	UmbExtensionRegistry,
 } from '@umbraco-cms/backoffice/extension-api';
 import { UmbBaseController, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -14,17 +14,17 @@ export type PermittedControllerType<ControllerType extends { manifest: any }> = 
 
 /**
  */
-export abstract class UmbBaseExtensionsController<
+export abstract class UmbBaseExtensionsInitializer<
 	ManifestTypes extends ManifestBase,
 	ManifestTypeName extends keyof ManifestTypeMap<ManifestTypes> | string,
 	ManifestType extends ManifestBase = SpecificManifestTypeOrManifestBase<ManifestTypes, ManifestTypeName>,
-	ControllerType extends UmbBaseExtensionController<ManifestType> = UmbBaseExtensionController<ManifestType>,
+	ControllerType extends UmbBaseExtensionInitializer<ManifestType> = UmbBaseExtensionInitializer<ManifestType>,
 	MyPermittedControllerType extends ControllerType = PermittedControllerType<ControllerType>
 > extends UmbBaseController {
 	#extensionRegistry: UmbExtensionRegistry<ManifestType>;
 	#type: ManifestTypeName | Array<ManifestTypeName>;
 	#filter: undefined | null | ((manifest: ManifestType) => boolean);
-	#onChange: (permittedManifests: Array<MyPermittedControllerType>, controller: MyPermittedControllerType) => void;
+	#onChange?: (permittedManifests: Array<MyPermittedControllerType>) => void;
 	protected _extensions: Array<ControllerType> = [];
 	private _permittedExts: Array<MyPermittedControllerType> = [];
 
@@ -33,7 +33,7 @@ export abstract class UmbBaseExtensionsController<
 		extensionRegistry: UmbExtensionRegistry<ManifestType>,
 		type: ManifestTypeName | Array<ManifestTypeName>,
 		filter: undefined | null | ((manifest: ManifestType) => boolean),
-		onChange: (permittedManifests: Array<MyPermittedControllerType>, controller: MyPermittedControllerType) => void
+		onChange?: (permittedManifests: Array<MyPermittedControllerType>) => void
 	) {
 		super(host);
 		this.#extensionRegistry = extensionRegistry;
@@ -89,7 +89,7 @@ export abstract class UmbBaseExtensionsController<
 
 	protected abstract _createController(manifest: ManifestType): ControllerType;
 
-	protected _extensionChanged = (isPermitted: boolean, controller: UmbBaseExtensionController<ManifestType>) => {
+	protected _extensionChanged = (isPermitted: boolean, controller: ControllerType) => {
 		let hasChanged = false;
 		const existingIndex = this._permittedExts.indexOf(controller as unknown as MyPermittedControllerType);
 		if (isPermitted) {
@@ -121,7 +121,7 @@ export abstract class UmbBaseExtensionsController<
 			// Sorting:
 			exposedPermittedExts.sort((a, b) => b.weight - a.weight);
 
-			this.#onChange(exposedPermittedExts, this as unknown as MyPermittedControllerType);
+			this.#onChange?.(exposedPermittedExts);
 		}
 	};
 
@@ -144,5 +144,6 @@ export abstract class UmbBaseExtensionsController<
 		super.destroy();
 		this._extensions.length = 0;
 		this._permittedExts.length = 0;
+		this.#onChange?.(this._permittedExts);
 	}
 }

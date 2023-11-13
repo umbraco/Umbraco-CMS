@@ -1,5 +1,5 @@
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import {
 	CreateDictionaryItemRequestModel,
@@ -21,9 +21,9 @@ export class UmbDictionaryDetailServerDataSource
 	implements
 		UmbDataSource<CreateDictionaryItemRequestModel, any, UpdateDictionaryItemRequestModel, DictionaryItemResponseModel>
 {
-	#host: UmbControllerHostElement;
+	#host: UmbControllerHost;
 
-	constructor(host: UmbControllerHostElement) {
+	constructor(host: UmbControllerHost) {
 		this.#host = host;
 	}
 

@@ -1,7 +1,7 @@
 import type { MediaDetails } from '../../index.js';
 import type { UmbDataSource } from '@umbraco-cms/backoffice/repository';
 import { CreateMediaRequestModel, UpdateMediaRequestModel } from '@umbraco-cms/backoffice/backend-api';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
@@ -13,14 +13,14 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 export class UmbMediaDetailServerDataSource
 	implements UmbDataSource<CreateMediaRequestModel, any, UpdateMediaRequestModel, MediaDetails>
 {
-	#host: UmbControllerHostElement;
+	#host: UmbControllerHost;
 
 	/**
 	 * Creates an instance of UmbMediaDetailServerDataSource.
-	 * @param {UmbControllerHostElement} host
+	 * @param {UmbControllerHost} host
 	 * @memberof UmbMediaDetailServerDataSource
 	 */
-	constructor(host: UmbControllerHostElement) {
+	constructor(host: UmbControllerHost) {
 		this.#host = host;
 	}
 

@@ -7,8 +7,7 @@ import {
 	UmbPartialViewsFolderServerDataSource,
 } from './sources/partial-views.folder.server.data.js';
 import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
+import { UmbBaseController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import {
 	CreateFolderRequestModel,
 	CreatePartialViewRequestModel,
@@ -29,8 +28,9 @@ import {
 	UmbFolderRepository,
 	UmbTreeRepository,
 } from '@umbraco-cms/backoffice/repository';
+import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
-export class UmbPartialViewsRepository
+export class UmbPartialViewsRepository extends UmbBaseController
 	implements
 		UmbTreeRepository<FileSystemTreeItemPresentationModel>,
 		UmbDetailRepository<
@@ -40,10 +40,10 @@ export class UmbPartialViewsRepository
 			PartialViewResponseModel,
 			string
 		>,
-		UmbFolderRepository
+		UmbFolderRepository,
+		UmbApi
 {
 	#init;
-	#host: UmbControllerHostElement;
 
 	#treeDataSource: UmbPartialViewsTreeServerDataSource;
 	#detailDataSource: UmbPartialViewDetailServerDataSource;
@@ -52,17 +52,15 @@ export class UmbPartialViewsRepository
 	#treeStore?: UmbPartialViewsTreeStore;
 
 	constructor(host: UmbControllerHostElement) {
-		this.#host = host;
+		super(host);
 
-		this.#treeDataSource = new UmbPartialViewsTreeServerDataSource(this.#host);
-		this.#detailDataSource = new UmbPartialViewDetailServerDataSource(this.#host);
-		this.#folderDataSource = new UmbPartialViewsFolderServerDataSource(this.#host);
+		this.#treeDataSource = new UmbPartialViewsTreeServerDataSource(this);
+		this.#detailDataSource = new UmbPartialViewDetailServerDataSource(this);
+		this.#folderDataSource = new UmbPartialViewsFolderServerDataSource(this);
 
-		this.#init = Promise.all([
-			new UmbContextConsumerController(this.#host, UMB_PARTIAL_VIEW_TREE_STORE_CONTEXT_TOKEN, (instance) => {
-				this.#treeStore = instance;
-			}),
-		]);
+		this.#init = this.consumeContext(UMB_PARTIAL_VIEW_TREE_STORE_CONTEXT_TOKEN, (instance) => {
+			this.#treeStore = instance;
+		}).asPromise();
 	}
 
 	//#region FOLDER

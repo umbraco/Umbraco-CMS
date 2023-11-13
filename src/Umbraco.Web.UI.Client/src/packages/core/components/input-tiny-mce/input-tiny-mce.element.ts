@@ -9,7 +9,7 @@ import {
 	type RawEditorOptions,
 	renderEditor,
 } from '@umbraco-cms/backoffice/external/tinymce';
-import { UMB_AUTH_CONTEXT, UmbLoggedInUser } from '@umbraco-cms/backoffice/auth';
+import { UMB_CURRENT_USER_CONTEXT, UmbCurrentUser } from '@umbraco-cms/backoffice/current-user';
 import { TinyMcePluginArguments, UmbTinyMcePluginBase } from '@umbraco-cms/backoffice/components';
 import { ClassConstructor, hasDefaultExport, loadExtension } from '@umbraco-cms/backoffice/extension-api';
 import { ManifestTinyMcePlugin, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -39,8 +39,8 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 	private _tinyConfig: RawEditorOptions = {};
 
 	#mediaHelper = new UmbMediaHelper();
-	#currentUser?: UmbLoggedInUser;
-	#auth?: typeof UMB_AUTH_CONTEXT.TYPE;
+	#currentUser?: UmbCurrentUser;
+	#currentUserContext?: typeof UMB_CURRENT_USER_CONTEXT.TYPE;
 	#plugins: Array<new (args: TinyMcePluginArguments) => UmbTinyMcePluginBase> = [];
 	#editorRef?: Editor | null = null;
 	#stylesheetRepository?: UmbStylesheetRepository;
@@ -71,9 +71,9 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	async #observeCurrentUser() {
-		if (!this.#auth) return;
+		if (!this.#currentUserContext) return;
 
-		this.observe(this.#auth.currentUser, (currentUser) => (this.#currentUser = currentUser));
+		this.observe(this.#currentUserContext.currentUser, (currentUser) => (this.#currentUser = currentUser));
 	}
 
 	protected async firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): Promise<void> {

@@ -141,6 +141,16 @@ export default {
 			</head>
       <body>
         <script type="module" src="${testFramework}"></script>
+				<script type="module">
+					/* Hack to disable Lit dev mode warnings */
+					const systemWarn = window.console.warn;
+					window.console.warn = (...args) => {
+						if (args[0].indexOf('Lit is in dev mode.') === 0) {
+							return;
+						}
+						systemWarn(...args);
+					};
+				</script>
         <script type="module">
 					import 'element-internals-polyfill';
 					import '@umbraco-ui/uui';

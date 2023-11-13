@@ -1,5 +1,5 @@
 import { LanguageResource, LanguageItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { UmbItemDataSource } from '@umbraco-cms/backoffice/repository';
 
@@ -10,9 +10,9 @@ import { UmbItemDataSource } from '@umbraco-cms/backoffice/repository';
  * @implements {UmbItemDataSource}
  */
 export class UmbLanguageItemServerDataSource implements UmbItemDataSource<LanguageItemResponseModel> {
-	#host: UmbControllerHostElement;
+	#host: UmbControllerHost;
 
-	constructor(host: UmbControllerHostElement) {
+	constructor(host: UmbControllerHost) {
 		this.#host = host;
 	}
 

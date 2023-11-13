@@ -182,6 +182,7 @@ export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectio
 			umbExtensionsRegistry.getByTypeAndAlias('repository', repositoryAlias),
 			async (repositoryManifest) => {
 				if (repositoryManifest) {
+					// TODO: Maybe use the UmbExtensionApiController instead of createExtensionApi, to ensure usage of conditions:
 					const result = await createExtensionApi(repositoryManifest, [this._host]);
 					this.repository = result as UmbCollectionRepository;
 					this.requestCollection();
@@ -216,7 +217,7 @@ export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectio
 		const viewMatch = views.find((view) => view.meta.pathName === lastPathSegment);
 
 		/* TODO: Find a way to figure out which layout it starts with and set _currentLayout to that instead of [0]. eg. '/table'
-			For document, media and members this will come as part of a data type configuration, but in other cases "users" we should find another way. 
+			For document, media and members this will come as part of a data type configuration, but in other cases "users" we should find another way.
 			This should only happen if the current layout is not set in the URL.
 		*/
 		const currentView = viewMatch || views[0];
