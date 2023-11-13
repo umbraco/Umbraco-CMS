@@ -49,7 +49,7 @@ public class WebhookController : UmbracoAuthorizedJsonController
     {
         Webhook webhook = _umbracoMapper.Map<Webhook>(webhookViewModel)!;
 
-        Attempt<Webhook, WebhookOperationStatus> result = await _webhookService.UpdateAsync(updateModel);
+        Attempt<Webhook, WebhookOperationStatus> result = await _webhookService.UpdateAsync(webhook);
         return result.Success ? Ok(_webhookPresentationFactory.Create(webhook)) : WebhookOperationStatusResult(result.Status);
     }
 
