@@ -75,10 +75,4 @@ export class UmbStylesheetTreeRepository
 		await this.#init;
 		return this.#treeStore!.childrenOf(parentPath);
 	}
-
-	async itemsLegacy(paths: Array<string>) {
-		if (!paths) throw new Error('Paths are missing');
-		await this.#init;
-		return this.#treeStore!.items(paths);
-	}
 }
