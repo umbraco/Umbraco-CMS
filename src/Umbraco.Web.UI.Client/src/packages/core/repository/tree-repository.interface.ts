@@ -13,17 +13,26 @@ export interface UmbTreeRepository<
 		error?: ProblemDetails;
 	}>;
 
+	requestTreeItemsOf: (parentUnique: string | null) => Promise<{
+		data?: UmbPagedData<TreeItemType>;
+		error?: ProblemDetails;
+		asObservable?: () => Observable<TreeItemType[]>;
+	}>;
+
+	treeItemsOf: (parentUnique: string | null) => Promise<Observable<TreeItemType[]>>;
+
+	/* TODO: remove this. It is not used client side.
+	Logic to call the root endpoint should be in the data source 
+	because it is a server decision to split them
+	*/
 	requestRootTreeItems: () => Promise<{
 		data?: UmbPagedData<TreeItemType>;
 		error?: ProblemDetails;
 		asObservable?: () => Observable<TreeItemType[]>;
 	}>;
 
-	requestTreeItemsOf: (parentUnique: string | null) => Promise<{
-		data?: UmbPagedData<TreeItemType>;
-		error?: ProblemDetails;
-		asObservable?: () => Observable<TreeItemType[]>;
-	}>;
+	// TODO: remove
+	rootTreeItems: () => Promise<Observable<TreeItemType[]>>;
 
 	// TODO: remove this when all repositories are migrated to the new interface items interface
 	requestItemsLegacy?: (uniques: string[]) => Promise<{
@@ -31,10 +40,6 @@ export interface UmbTreeRepository<
 		error?: ProblemDetails;
 		asObservable?: () => Observable<any[]>;
 	}>;
-
-	rootTreeItems: () => Promise<Observable<TreeItemType[]>>;
-
-	treeItemsOf: (parentUnique: string | null) => Promise<Observable<TreeItemType[]>>;
 
 	// TODO: remove this when all repositories are migrated to the new items interface
 	itemsLegacy?: (uniques: string[]) => Promise<Observable<any[]>>;
