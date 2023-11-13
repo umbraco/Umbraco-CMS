@@ -189,6 +189,7 @@ export class UmbAppElement extends UmbLitElement {
 			window.sessionStorage.setItem('umb:auth:redirect', location.href);
 
 			// Make a request to the auth server to start the auth flow
+			// TODO: find better name for this method
 			this.#authContext.login();
 
 			// Return false to prevent the route from being rendered
