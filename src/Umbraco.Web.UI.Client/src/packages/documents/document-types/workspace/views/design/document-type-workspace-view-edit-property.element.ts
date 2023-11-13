@@ -11,7 +11,6 @@ import {
 } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { generateAlias } from '@umbraco-cms/backoffice/utils';
-import { UmbDataTypeRepository } from '@umbraco-cms/backoffice/data-type';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 /**
