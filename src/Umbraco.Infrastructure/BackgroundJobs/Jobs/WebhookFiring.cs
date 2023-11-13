@@ -7,10 +7,11 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.BackgroundJobs;
 
-namespace Umbraco.Cms.Infrastructure.HostedServices;
+namespace Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
 
-public class WebhookFiring : RecurringHostedServiceBase
+public class WebhookFiring : IRecurringBackgroundJob
 {
     private readonly ILogger<WebhookFiring> _logger;
     private readonly IRuntimeState _runtimeState;
@@ -22,6 +23,13 @@ public class WebhookFiring : RecurringHostedServiceBase
     private readonly ICoreScopeProvider _coreScopeProvider;
     private WebhookSettings _webhookSettings;
 
+    public TimeSpan Period { get => _webhookSettings.Period; }
+
+    public TimeSpan Delay { get; } = TimeSpan.FromSeconds(20);
+
+    // No-op event as the period never changes on this job
+    public event EventHandler PeriodChanged { add { } remove { } }
+
     public WebhookFiring(
         ILogger<WebhookFiring> logger,
         IRuntimeState runtimeState,
@@ -32,7 +40,6 @@ public class WebhookFiring : RecurringHostedServiceBase
         IWebhookService webHookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
         ICoreScopeProvider coreScopeProvider)
-        : base(logger, webhookSettings.CurrentValue.Period, TimeSpan.FromSeconds(20))
     {
         _logger = logger;
         _runtimeState = runtimeState;
@@ -46,23 +53,7 @@ public class WebhookFiring : RecurringHostedServiceBase
         webhookSettings.OnChange(x => _webhookSettings = x);
     }
 
-    public override async Task PerformExecuteAsync(object? state)
-    {
-        // Don't process webhooks if we're not in RuntimeLevel.Run.
-        if (_runtimeState.Level != RuntimeLevel.Run)
-        {
-            if (_logger.IsEnabled(LogLevel.Debug))
-            {
-                _logger.LogDebug("Does not run if run level is not Run.");
-            }
-
-            return;
-        }
-
-        await ProcessWebhookRequests();
-    }
-
-    private async Task ProcessWebhookRequests()
+    public async Task RunJobAsync()
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         scope.WriteLock(Constants.Locks.WebhookRequest);

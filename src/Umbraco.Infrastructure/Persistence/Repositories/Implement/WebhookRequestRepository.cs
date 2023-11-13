@@ -14,10 +14,23 @@ public class WebhookRequestRepository : IWebhookRequestRepository
 
     public WebhookRequestRepository(IScopeAccessor scopeAccessor) => _scopeAccessor = scopeAccessor;
 
+    private IUmbracoDatabase Database
+    {
+        get
+        {
+            if (_scopeAccessor.AmbientScope is null)
+            {
+                throw new NotSupportedException("Need to be executed in a scope");
+            }
+
+            return _scopeAccessor.AmbientScope.Database;
+        }
+    }
+
     public async Task<WebhookRequest> CreateAsync(WebhookRequest webhookRequest)
     {
         WebhookRequestDto dto = WebhookRequestFactory.CreateDto(webhookRequest);
-        var result = await _scopeAccessor.AmbientScope?.Database.InsertAsync(dto)!;
+        var result = await Database.InsertAsync(dto);
         var id = Convert.ToInt32(result);
         webhookRequest.Id = id;
         return webhookRequest;
@@ -25,20 +38,20 @@ public class WebhookRequestRepository : IWebhookRequestRepository
 
     public async Task DeleteAsync(WebhookRequest webhookRequest)
     {
-        Sql<ISqlContext> sql = _scopeAccessor.AmbientScope!.Database.SqlContext.Sql()
+        Sql<ISqlContext> sql = Database.SqlContext.Sql()
             .Delete<WebhookRequestDto>()
             .Where<WebhookRequestDto>(x => x.Id == webhookRequest.Id);
 
-        await _scopeAccessor.AmbientScope?.Database.ExecuteAsync(sql)!;
+        await Database.ExecuteAsync(sql);
     }
 
     public async Task<IEnumerable<WebhookRequest>> GetAllAsync()
     {
-        Sql<ISqlContext>? sql = _scopeAccessor.AmbientScope?.Database.SqlContext.Sql()
+        Sql<ISqlContext>? sql = Database.SqlContext.Sql()
             .Select<WebhookRequestDto>()
             .From<WebhookRequestDto>();
 
-        List<WebhookRequestDto>? webhookDtos = await _scopeAccessor.AmbientScope?.Database.FetchAsync<WebhookRequestDto>(sql)!;
+        List<WebhookRequestDto> webhookDtos = await Database.FetchAsync<WebhookRequestDto>(sql);
 
         return webhookDtos.Select(WebhookRequestFactory.CreateModel);
     }
@@ -46,7 +59,7 @@ public class WebhookRequestRepository : IWebhookRequestRepository
     public async Task<WebhookRequest> UpdateAsync(WebhookRequest webhookRequest)
     {
         WebhookRequestDto dto = WebhookRequestFactory.CreateDto(webhookRequest);
-        await _scopeAccessor.AmbientScope?.Database.UpdateAsync(dto)!;
+        await Database.UpdateAsync(dto);
         return webhookRequest;
     }
 }
