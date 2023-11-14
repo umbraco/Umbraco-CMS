@@ -22,12 +22,10 @@ export default class UmbExportDictionaryEntityAction extends UmbEntityActionBase
 	}
 
 	async execute() {
-		// TODO: what to do if modal service is not available?
 		if (!this.#modalContext) return;
 
 		const modalContext = this.#modalContext?.open(UMB_EXPORT_DICTIONARY_MODAL, { unique: this.unique });
 
-		// TODO: get type from modal result
 		const { includeChildren } = await modalContext.onSubmit();
 		if (includeChildren === undefined) return;
 
