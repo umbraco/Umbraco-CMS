@@ -1,5 +1,5 @@
 import { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context.js';
-import type { UmbDocumentTypeInputElement } from '../../../components/input-document-type/document-type-input.element.js';
+import type { UmbDocumentTypeInputElement } from '../../../components/document-type-input/document-type-input.element.js';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UUIToggleElement } from '@umbraco-cms/backoffice/external/uui';

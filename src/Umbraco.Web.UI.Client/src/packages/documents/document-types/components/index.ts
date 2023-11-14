@@ -1,1 +1,1 @@
-import './input-document-type/document-type-input.element.js';
+import './document-type-input/document-type-input.element.js';
