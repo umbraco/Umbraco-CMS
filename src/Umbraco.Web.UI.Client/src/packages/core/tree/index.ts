@@ -5,6 +5,9 @@ export * from './tree-item-base/index.js';
 export * from './tree-menu-item/index.js';
 export * from './tree.context.js';
 export * from './tree.element.js';
+export * from './types.js';
+
+export { UmbEntityTreeRepositoryBase } from './entity-tree.repository.js';
 
 export interface UmbTreeRootModel {
 	type: string;
