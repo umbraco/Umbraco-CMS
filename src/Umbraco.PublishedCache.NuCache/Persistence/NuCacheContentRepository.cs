@@ -1025,7 +1025,7 @@ WHERE cmsContentNu.nodeId IN (
         {
             // Use a more efficient COUNT query
             Sql<ISqlContext>? sqlCountQuery = SqlContentSourcesCount()
-                .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.ContentItem));
+                .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Document));
 
             Sql<ISqlContext>? sqlCount =
                 SqlContext.Sql("SELECT COUNT(*) FROM (").Append(sqlCountQuery).Append(") npoco_tbl");
