@@ -85,11 +85,14 @@ public class WebhookEventCollectionBuilder : OrderedCollectionBuilderBase<Webhoo
 
     public WebhookEventCollectionBuilder AddContentWebhooks()
     {
+        Append<ContentCopiedWebhookEvent>();
         Append<ContentDeletedWebhookEvent>();
         Append<ContentEmptiedRecycleBinWebhookEvent>();
+        Append<ContentMovedWebhookEvent>();
         Append<ContentPublishedWebhookEvent>();
         Append<ContentRolledBackWebhookEvent>();
         Append<ContentSavedWebhookEvent>();
+        Append<ContentSortedWebhookEvent>();
         Append<ContentUnpublishedWebhookEvent>();
         return this;
     }
