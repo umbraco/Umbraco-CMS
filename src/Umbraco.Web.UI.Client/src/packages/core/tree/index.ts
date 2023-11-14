@@ -9,5 +9,6 @@ export * from './tree.element.js';
 export * from './types.js';
 export * from './tree-repository.interface.js';
 export * from './tree-data-source.interface.js';
+export * from './tree-store.interface.js';
 
 export { UmbEntityTreeRepositoryBase } from './entity-tree.repository.js';
