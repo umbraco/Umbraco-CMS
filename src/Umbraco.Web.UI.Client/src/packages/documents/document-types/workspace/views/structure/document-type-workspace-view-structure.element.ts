@@ -62,7 +62,7 @@ export class UmbDocumentTypeWorkspaceViewStructureElement
 					</div>
 					<div slot="editor">
 						<!-- TODO: maybe we want to somehow display the hierarchy, but not necessary in the same way as old backoffice? -->
-						<umb-input-document-type
+						<umb-document-type-input
 							.selectedIds=${this._allowedContentTypeIDs ?? []}
 							@change="${(e: CustomEvent) => {
 								const sortedContentTypesList = (e.target as UmbDocumentTypeInputElement).selectedIds.map(
@@ -73,7 +73,7 @@ export class UmbDocumentTypeWorkspaceViewStructureElement
 								);
 								this.#workspaceContext?.setAllowedContentTypes(sortedContentTypesList);
 							}}">
-						</umb-input-document-type>
+						</umb-document-type-input>
 					</div>
 				</umb-workspace-property-layout>
 			</uui-box>
