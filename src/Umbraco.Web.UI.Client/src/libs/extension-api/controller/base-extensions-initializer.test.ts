@@ -48,7 +48,7 @@ class UmbTestExtensionsController<
 	UmbTestExtensionController,
 	MyPermittedControllerType
 > {
-	#host: UmbControllerHost;
+	#extensionRegistry: UmbExtensionRegistry<ManifestWithDynamicConditions>;
 	constructor(
 		host: UmbControllerHost,
 		extensionRegistry: UmbExtensionRegistry<ManifestWithDynamicConditions>,
@@ -57,12 +57,13 @@ class UmbTestExtensionsController<
 		onChange: (permittedManifests: Array<MyPermittedControllerType>) => void
 	) {
 		super(host, extensionRegistry, type, filter, onChange);
-		this.#host = host;
+		this.#extensionRegistry = extensionRegistry;
 		this._init();
 	}
 
 	protected _createController(manifest: ManifestWithDynamicConditions) {
-		return new UmbTestExtensionController(this.#host, testExtensionRegistry, manifest.alias, this._extensionChanged);
+		return new UmbTestExtensionController(this, this.#extensionRegistry, manifest.alias, this._extensionChanged);
+		
 	}
 }
 
@@ -109,6 +110,7 @@ describe('UmbBaseExtensionsController', () => {
 
 		it('exposes both manifests', (done) => {
 			let count = 0;
+
 			const extensionController = new UmbTestExtensionsController(
 				hostElement,
 				testExtensionRegistry,

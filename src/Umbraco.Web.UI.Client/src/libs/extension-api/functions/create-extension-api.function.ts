@@ -2,7 +2,7 @@ import { UmbApi } from "../models/api.interface.js";
 import { ManifestApi, ManifestElementAndApi } from "../types/base.types.js";
 import { loadManifestApi } from "./load-manifest-api.function.js";
 
-export async function createExtensionApi<ApiType extends UmbApi = UmbApi>(manifest: ManifestApi<ApiType> | ManifestElementAndApi<any, ApiType>, constructorArguments: unknown[] = []): Promise<ApiType | undefined> {
+export async function createExtensionApi<ApiType extends UmbApi = UmbApi>(manifest: ManifestApi<ApiType> | ManifestElementAndApi<any, ApiType>, constructorArguments: Array<unknown> = []): Promise<ApiType | undefined> {
 
 	if(manifest.api) {
 		const apiConstructor = await loadManifestApi<ApiType>(manifest.api);
