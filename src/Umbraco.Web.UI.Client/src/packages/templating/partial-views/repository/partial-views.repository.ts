@@ -26,11 +26,12 @@ import {
 	UmbDataSourceErrorResponse,
 	UmbDetailRepository,
 	UmbFolderRepository,
-	UmbTreeRepository,
 } from '@umbraco-cms/backoffice/repository';
+import { UmbTreeRepository } from '@umbraco-cms/backoffice/tree';
 import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
-export class UmbPartialViewsRepository extends UmbBaseController
+export class UmbPartialViewsRepository
+	extends UmbBaseController
 	implements
 		UmbTreeRepository<FileSystemTreeItemPresentationModel>,
 		UmbDetailRepository<
@@ -65,7 +66,7 @@ export class UmbPartialViewsRepository extends UmbBaseController
 
 	//#region FOLDER
 	createFolderScaffold(
-		parentId: string | null
+		parentId: string | null,
 	): Promise<{ data?: FolderResponseModel | undefined; error?: ProblemDetails | undefined }> {
 		const data: FolderResponseModel = {
 			name: '',
@@ -74,7 +75,7 @@ export class UmbPartialViewsRepository extends UmbBaseController
 		return Promise.resolve({ data, error: undefined });
 	}
 	async createFolder(
-		requestBody: CreateFolderRequestModel
+		requestBody: CreateFolderRequestModel,
 	): Promise<{ data?: string | undefined; error?: ProblemDetails | undefined }> {
 		await this.#init;
 		const req = {
@@ -87,14 +88,14 @@ export class UmbPartialViewsRepository extends UmbBaseController
 		return promise;
 	}
 	async requestFolder(
-		unique: string
+		unique: string,
 	): Promise<{ data?: PartialViewGetFolderResponse | undefined; error?: ProblemDetails | undefined }> {
 		await this.#init;
 		return this.#folderDataSource.get(unique);
 	}
 	updateFolder(
 		unique: string,
-		folder: FolderModelBaseModel
+		folder: FolderModelBaseModel,
 	): Promise<{ data?: FolderModelBaseModel | undefined; error?: ProblemDetails | undefined }> {
 		throw new Error('Method not implemented.');
 	}

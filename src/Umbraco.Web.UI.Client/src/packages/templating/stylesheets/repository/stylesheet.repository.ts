@@ -13,8 +13,8 @@ import {
 	UmbDataSourceErrorResponse,
 	UmbDetailRepository,
 	UmbFolderRepository,
-	UmbTreeRepository,
 } from '@umbraco-cms/backoffice/repository';
+import { UmbTreeRepository } from '@umbraco-cms/backoffice/tree';
 import {
 	CreateFolderRequestModel,
 	CreateStylesheetRequestModel,

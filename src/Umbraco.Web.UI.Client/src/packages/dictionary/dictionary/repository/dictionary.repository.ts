@@ -3,7 +3,8 @@ import { UmbDictionaryDetailServerDataSource } from './sources/dictionary.detail
 import { UmbDictionaryTreeStore, UMB_DICTIONARY_TREE_STORE_CONTEXT_TOKEN } from './dictionary.tree.store.js';
 import { UmbDictionaryTreeServerDataSource } from './sources/dictionary.tree.server.data.js';
 import { UmbBaseController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UmbTreeDataSource, UmbDetailRepository, UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
+import { UmbTreeDataSource, UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
+import { UmbTreeRepository } from '@umbraco-cms/backoffice/tree';
 import {
 	CreateDictionaryItemRequestModel,
 	DictionaryOverviewResponseModel,
@@ -14,7 +15,8 @@ import {
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
-export class UmbDictionaryRepository extends UmbBaseController
+export class UmbDictionaryRepository
+	extends UmbBaseController
 	implements
 		UmbTreeRepository<EntityTreeItemResponseModel>,
 		UmbDetailRepository<

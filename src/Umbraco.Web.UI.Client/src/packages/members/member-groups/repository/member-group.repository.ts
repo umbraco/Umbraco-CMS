@@ -5,12 +5,14 @@ import { UmbMemberGroupStore, UMB_MEMBER_GROUP_STORE_CONTEXT_TOKEN } from './mem
 import { UmbMemberGroupTreeServerDataSource } from './sources/member-group.tree.server.data.js';
 import { UmbBaseController, type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
-import type { UmbTreeDataSource, UmbDetailRepository, UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
+import type { UmbTreeDataSource, UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
+import { UmbTreeRepository } from '@umbraco-cms/backoffice/tree';
 import { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
 // TODO => Update type when backend updated
-export class UmbMemberGroupRepository extends UmbBaseController
+export class UmbMemberGroupRepository
+	extends UmbBaseController
 	implements UmbTreeRepository<EntityTreeItemResponseModel>, UmbDetailRepository<any, any, any, any>, UmbApi
 {
 	#init!: Promise<unknown>;
@@ -24,7 +26,7 @@ export class UmbMemberGroupRepository extends UmbBaseController
 	#notificationContext?: UmbNotificationContext;
 
 	constructor(host: UmbControllerHost) {
-		super(host)
+		super(host);
 		// TODO: figure out how spin up get the correct data source
 		this.#treeSource = new UmbMemberGroupTreeServerDataSource(this);
 		this.#detailSource = new UmbMemberGroupDetailServerDataSource(this);

@@ -1,6 +1,7 @@
-import { UmbTreeItemModelBase, type UmbTreeItemModel } from './types.js';
+import { type UmbTreeItemModelBase } from './types.js';
 import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
-import { UmbPagedData, UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
+import { UmbPagedData } from '@umbraco-cms/backoffice/repository';
+import { UmbTreeRepository } from '@umbraco-cms/backoffice/tree';
 import {
 	type ManifestRepository,
 	type ManifestTree,

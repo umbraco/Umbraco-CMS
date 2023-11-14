@@ -4,9 +4,9 @@ import { UmbDocumentTypeTreeStore, UMB_DOCUMENT_TYPE_TREE_STORE_CONTEXT_TOKEN } 
 import { UmbDocumentTypeStore, UMB_DOCUMENT_TYPE_STORE_CONTEXT_TOKEN } from './document-type.store.js';
 import { UMB_DOCUMENT_TYPE_ITEM_STORE_CONTEXT_TOKEN, UmbDocumentTypeItemStore } from './document-type-item.store.js';
 import { UmbDocumentTypeItemServerDataSource } from './sources/document-type-item.server.data.js';
-import type { UmbTreeDataSource, UmbTreeRepository, UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
+import type { UmbTreeDataSource, UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
+import { UmbTreeRepository } from '@umbraco-cms/backoffice/tree';
 import { UmbBaseController, type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import {
 	CreateDocumentTypeRequestModel,
 	DocumentTypeResponseModel,
@@ -19,7 +19,8 @@ import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
 type ItemType = DocumentTypeResponseModel;
 
-export class UmbDocumentTypeRepository extends UmbBaseController
+export class UmbDocumentTypeRepository
+	extends UmbBaseController
 	implements
 		UmbTreeRepository<EntityTreeItemResponseModel>,
 		UmbDetailRepository<CreateDocumentTypeRequestModel, any, UpdateDocumentTypeRequestModel, DocumentTypeResponseModel>,

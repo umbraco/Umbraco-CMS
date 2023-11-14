@@ -11,8 +11,8 @@ import type {
 	UmbItemDataSource,
 	UmbItemRepository,
 	UmbTreeDataSource,
-	UmbTreeRepository,
 } from '@umbraco-cms/backoffice/repository';
+import { UmbTreeRepository } from '@umbraco-cms/backoffice/tree';
 import { UmbBaseController, type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 import type {
@@ -26,7 +26,8 @@ import type {
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
-export class UmbTemplateRepository extends UmbBaseController
+export class UmbTemplateRepository
+	extends UmbBaseController
 	implements
 		UmbTreeRepository<EntityTreeItemResponseModel>,
 		UmbDetailRepository<CreateTemplateRequestModel, string, UpdateTemplateRequestModel, TemplateResponseModel>,

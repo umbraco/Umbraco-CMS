@@ -7,5 +7,6 @@ export * from './tree-menu-item/index.js';
 export * from './tree.context.js';
 export * from './tree.element.js';
 export * from './types.js';
+export * from './tree-repository.interface.js';
 
 export { UmbEntityTreeRepositoryBase } from './entity-tree.repository.js';
