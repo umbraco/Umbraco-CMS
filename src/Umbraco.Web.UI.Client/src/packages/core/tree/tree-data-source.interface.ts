@@ -1,5 +1,4 @@
-import type { UmbPagedData } from '../repository/data-source/types.js';
-import type { DataSourceResponse } from '../repository/data-source/data-source-response.interface.js';
+import type { UmbPagedData, DataSourceResponse } from '@umbraco-cms/backoffice/repository';
 import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export interface UmbTreeDataSourceConstructor<TreeItemType = any, TreeRootType = any> {
