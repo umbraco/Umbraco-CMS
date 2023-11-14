@@ -154,7 +154,7 @@ public class ContentSettings
     internal const bool StaticShowDeprecatedPropertyEditors = false;
     internal const string StaticLoginBackgroundImage = "assets/img/login.jpg";
     internal const string StaticLoginLogoImage = "assets/img/application/umbraco_logo_white.svg";
-    internal const string StaticLoginLogoImageDark = "assets/img/application/umbraco_logo_blue.svg";
+    internal const string StaticLoginLogoImageAlternative = "assets/img/application/umbraco_logo_blue.svg";
     internal const bool StaticHideBackOfficeLogo = false;
     internal const bool StaticDisableDeleteWhenReferenced = false;
     internal const bool StaticDisableUnpublishWhenReferenced = false;
@@ -220,18 +220,20 @@ public class ContentSettings
     public string LoginBackgroundImage { get; set; } = StaticLoginBackgroundImage;
 
     /// <summary>
-    ///     Gets or sets a value for the path to the login screen logo image.
+    ///     Gets or sets a value for the path to the login screen logo image
+    ///     shown on top of the background image set in <see cref="LoginBackgroundImage" />.
     /// </summary>
-    /// <remarks>This is the alternative white version of <see cref="LoginLogoImageDark"/>.</remarks>
+    /// <remarks>This is the alternative white version of <see cref="LoginLogoImageAlternative"/>.</remarks>
     [DefaultValue(StaticLoginLogoImage)]
     public string LoginLogoImage { get; set; } = StaticLoginLogoImage;
 
     /// <summary>
-    ///     Gets or sets a value for the path to the dark version of the login screen logo image.
+    ///     Gets or sets a value for the path to the login screen logo image when shown on top
+    ///     of a light background (e.g. in mobile resolutions).
     /// </summary>
-    /// <remarks>This is the alternative dark version of <see cref="LoginLogoImage"/>.</remarks>
-    [DefaultValue(StaticLoginLogoImageDark)]
-    public string LoginLogoImageDark { get; set; } = StaticLoginLogoImageDark;
+    /// <remarks>This is the alternative version to the regular <see cref="LoginLogoImage"/>.</remarks>
+    [DefaultValue(StaticLoginLogoImageAlternative)]
+    public string LoginLogoImageAlternative { get; set; } = StaticLoginLogoImageAlternative;
 
     /// <summary>
     ///     Gets or sets a value indicating whether to hide the backoffice umbraco logo or not.

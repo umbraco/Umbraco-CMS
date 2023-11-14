@@ -8,17 +8,17 @@ export class UmbAuthLayoutElement extends LitElement {
 	@property({ attribute: 'background-image' })
 	backgroundImage?: string;
 
-	@property({ attribute: 'logo-light' })
-	logoLight?: string;
+	@property({ attribute: 'logo-image' })
+	logoImage?: string;
 
-	@property({ attribute: 'logo-dark' })
-	logoDark?: string;
+	@property({ attribute: 'logo-image-alternative' })
+	logoImageAlternative?: string;
 
 	#renderLogo() {
 		return html`<div
 			style=${styleMap({
-				'--logo-light': `url(${this.logoLight})`,
-				'--logo-dark': `url(${this.logoDark})`,
+				'--logo-light': `url(${this.logoImage})`,
+				'--logo-dark': `url(${this.logoImageAlternative})`,
 			})}
 			id="logo"></div>`;
 	}

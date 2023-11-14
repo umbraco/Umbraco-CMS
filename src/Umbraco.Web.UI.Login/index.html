@@ -19,8 +19,8 @@
 	<body class="uui-font uui-text" style="margin: 0; padding: 0; overflow: hidden">
 		<umb-backoffice-icon-registry>
 			<umb-auth
-				logo-light="/logo_light.svg"
-        logo-dark="/logo_dark.svg"
+				logo-image="/logo_light.svg"
+        logo-image-alternative="/logo_dark.svg"
 				background-image="/login.jpg"
 				allow-password-reset
 				allow-user-invite>
@@ -29,17 +29,13 @@
 					display-name="Google"
 					provider-name="Umbraco.Google"
 					icon="icon-google-fill"
-					external-logins-url="https://google.com"
-					button-look="primary"
-					button-color="positive"></umb-external-login-provider>
+					external-logins-url="https://google.com"></umb-external-login-provider>
 				<umb-external-login-provider
 					slot="external"
 					display-name="Azure ID"
 					provider-name="Umbraco.Azure"
 					icon="lock"
-					external-logins-url="https://microsoft.com"
-					button-look="primary"
-					button-color="warning"></umb-external-login-provider>
+					external-logins-url="https://microsoft.com"></umb-external-login-provider>
 				<umb-external-login-provider
 					slot="external"
 					display-name="My provider"

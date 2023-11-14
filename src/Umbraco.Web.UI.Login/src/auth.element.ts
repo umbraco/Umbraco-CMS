@@ -81,11 +81,11 @@ export default class UmbAuthElement extends LitElement {
   @property({attribute: 'background-image'})
   backgroundImage?: string;
 
-  @property({attribute: 'logo-light'})
-  logoLight?: string;
+  @property({attribute: 'logo-image'})
+  logoImage?: string;
 
-  @property({attribute: 'logo-dark'})
-  logoDark?: string;
+  @property({attribute: 'logo-image-alternative'})
+  logoImageAlternative?: string;
 
   @property({type: Boolean, attribute: 'username-is-email'})
   usernameIsEmail = false;
@@ -194,8 +194,8 @@ export default class UmbAuthElement extends LitElement {
     return html`
       <umb-auth-layout
         background-image=${ifDefined(this.backgroundImage)}
-        logo-light=${ifDefined(this.logoLight)}
-        logo-dark=${ifDefined(this.logoDark)}>
+        logo-image=${ifDefined(this.logoImage)}
+        logo-image-alternative=${ifDefined(this.logoImageAlternative)}>
         ${this._renderFlowAndStatus()}
       </umb-auth-layout>
     `;

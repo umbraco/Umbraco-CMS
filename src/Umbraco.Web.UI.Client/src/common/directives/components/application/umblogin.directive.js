@@ -20,7 +20,7 @@
 
         vm.backgroundImage = Umbraco.Sys.ServerVariables.umbracoSettings.loginBackgroundImage;
         vm.logoImage = Umbraco.Sys.ServerVariables.umbracoSettings.loginLogoImage;
-        vm.logoImageDark = Umbraco.Sys.ServerVariables.umbracoSettings.loginLogoImageDark;
+        vm.logoImageAlternative = Umbraco.Sys.ServerVariables.umbracoSettings.loginLogoImageAlternative;
         vm.allowPasswordReset = Umbraco.Sys.ServerVariables.umbracoSettings.canSendRequiredEmail && Umbraco.Sys.ServerVariables.umbracoSettings.allowPasswordReset;
         vm.usernameIsEmail = Umbraco.Sys.ServerVariables.umbracoSettings.usernameIsEmail;
 
