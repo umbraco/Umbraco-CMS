@@ -59,7 +59,7 @@ public class WebhookLogRepository : IWebhookLogRepository
         Sql<ISqlContext> sql = Database.SqlContext.Sql()
             .Select<WebhookLogDto>()
             .From<WebhookLogDto>()
-            .Where<WebhookLogDto>(log => log.Date > date);
+            .Where<WebhookLogDto>(log => log.Date < date);
 
         List<WebhookLogDto>? logs = await Database.FetchAsync<WebhookLogDto>(sql);
 

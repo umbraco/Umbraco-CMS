@@ -5,10 +5,9 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
-using Umbraco.Cms.Infrastructure.BackgroundJobs;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Infrastructure.HostedServices;
+namespace Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
 
 public class WebhookLoggingCleanup : IRecurringBackgroundJob
 {
@@ -34,13 +33,19 @@ public class WebhookLoggingCleanup : IRecurringBackgroundJob
 
     public async Task RunJobAsync()
     {
-        if (!_webhookSettings.Enabled)
+        if (_webhookSettings.EnableLoggingCleanup is false)
         {
             _logger.LogInformation("WebhookLoggingCleanup task will not run as it has been globally disabled via configuration");
             return;
         }
 
-        IEnumerable<WebhookLog> webhookLogs = await _webhookLogRepository.GetOlderThanDate(DateTime.Now - _webhookSettings.Period);
+        IEnumerable<WebhookLog> webhookLogs;
+        using (ICoreScope scope = _coreScopeProvider.CreateCoreScope())
+        {
+            scope.ReadLock(Constants.Locks.WebhookLogs);
+            webhookLogs = await _webhookLogRepository.GetOlderThanDate(DateTime.Now - TimeSpan.FromDays(_webhookSettings.KeepLogsForDays));
+            scope.Complete();
+        }
 
         foreach (IEnumerable<WebhookLog> group in webhookLogs.InGroupsOf(Constants.Sql.MaxParameterCount))
         {
