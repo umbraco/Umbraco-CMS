@@ -1,6 +1,6 @@
 import { expect, fixture } from '@open-wc/testing';
 import { UmbExtensionRegistry } from '../registry/extension.registry.js';
-import { ManifestCondition, ManifestWithDynamicConditions, UmbConditionConfigBase } from '../types.js';
+import { ManifestCondition, ManifestWithDynamicConditions, UmbConditionConfigBase } from '../types/index.js';
 import { UmbExtensionCondition } from '../condition/extension-condition.interface.js';
 import { PermittedControllerType, UmbBaseExtensionInitializer, UmbBaseExtensionsInitializer } from './index.js';
 import {

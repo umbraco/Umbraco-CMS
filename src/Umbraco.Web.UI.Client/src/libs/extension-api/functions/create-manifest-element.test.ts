@@ -1,6 +1,6 @@
 import { expect } from '@open-wc/testing';
-import { ManifestElement, ManifestElementAndApi } from '../types.js';
-import { createExtensionElement } from './create-extension-element.function.js';
+import { ManifestElement, ManifestElementAndApi } from '../types/index.js';
+import { createManifestElement } from './create-manifest-element.function.js';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 
 
@@ -43,11 +43,11 @@ describe('Extension-Api: Create Extension Element', () => {
 
 		const manifest: ManifestElement = {
 			type: 'my-test-type',
-			alias: 'Umb.Test.CreateExtensionElement',
+			alias: 'Umb.Test.CreateManifestElement',
 			name: 'pretty name'
 		};
 
-		const api = await createExtensionElement(manifest);
+		const api = await createManifestElement(manifest);
 		expect(api).to.be.undefined;
 	});
 
@@ -55,11 +55,11 @@ describe('Extension-Api: Create Extension Element', () => {
 
 		const manifest: ManifestElement<UmbExtensionApiTrueTestElement> = {
 			type: 'my-test-type',
-			alias: 'Umb.Test.CreateExtensionElement',
+			alias: 'Umb.Test.CreateManifestElement',
 			name: 'pretty name'
 		};
 
-		const element = await createExtensionElement(manifest, 'umb-extension-api-true-test-element');
+		const element = await createManifestElement(manifest, 'umb-extension-api-true-test-element');
 		expect(element).to.not.be.undefined;
 		if(element) {
 			expect(element.isValidClassInstance()).to.be.true;
@@ -71,12 +71,12 @@ describe('Extension-Api: Create Extension Element', () => {
 
 		const manifest: ManifestElementAndApi<UmbExtensionApiTrueTestElement> = {
 			type: 'my-test-type',
-			alias: 'Umb.Test.CreateExtensionElement',
+			alias: 'Umb.Test.CreateManifestElement',
 			name: 'pretty name',
 			api: class TestApi {}
 		};
 
-		const element = await createExtensionElement(manifest, 'umb-extension-api-true-test-element');
+		const element = await createManifestElement(manifest, 'umb-extension-api-true-test-element');
 		expect(element).to.not.be.undefined;
 		if(element) {
 			expect(element.isValidClassInstance()).to.be.true;
@@ -87,12 +87,12 @@ describe('Extension-Api: Create Extension Element', () => {
 
 		const manifest: ManifestElement<UmbExtensionApiTrueTestElement> = {
 			type: 'my-test-type',
-			alias: 'Umb.Test.CreateExtensionElement',
+			alias: 'Umb.Test.CreateManifestElement',
 			name: 'pretty name',
 			elementName: 'umb-extension-api-true-test-element'
 		};
 
-		const element = await createExtensionElement(manifest);
+		const element = await createManifestElement(manifest);
 		expect(element).to.not.be.undefined;
 		if(element) {
 			expect(element.isValidClassInstance()).to.be.true;
@@ -103,12 +103,12 @@ describe('Extension-Api: Create Extension Element', () => {
 
 		const manifest: ManifestElement<UmbExtensionApiTrueTestElement> = {
 			type: 'my-test-type',
-			alias: 'Umb.Test.CreateExtensionElement',
+			alias: 'Umb.Test.CreateManifestElement',
 			name: 'pretty name',
-			loader: () => Promise.resolve(jsModuleWithDefaultExport)
+			js: () => Promise.resolve(jsModuleWithDefaultExport)
 		};
 
-		const element = await createExtensionElement(manifest);
+		const element = await createManifestElement(manifest);
 		expect(element).to.not.be.undefined;
 		if(element) {
 			expect(element.isValidClassInstance()).to.be.true;
@@ -119,12 +119,12 @@ describe('Extension-Api: Create Extension Element', () => {
 
 		const manifest: ManifestElement<UmbExtensionApiTrueTestElement> = {
 			type: 'my-test-type',
-			alias: 'Umb.Test.CreateExtensionElement',
+			alias: 'Umb.Test.CreateManifestElement',
 			name: 'pretty name',
-			loader: () => Promise.resolve(jsModuleWithElementExport)
+			js: () => Promise.resolve(jsModuleWithElementExport)
 		};
 
-		const element = await createExtensionElement(manifest);
+		const element = await createManifestElement(manifest);
 		expect(element).to.not.be.undefined;
 		if(element) {
 			expect(element.isValidClassInstance()).to.be.true;
@@ -135,12 +135,12 @@ describe('Extension-Api: Create Extension Element', () => {
 
 		const manifest: ManifestElement<UmbExtensionApiTrueTestElement> = {
 			type: 'my-test-type',
-			alias: 'Umb.Test.CreateExtensionElement',
+			alias: 'Umb.Test.CreateManifestElement',
 			name: 'pretty name',
-			loader: () => Promise.resolve(jsModuleWithDefaultAndElementExport)
+			js: () => Promise.resolve(jsModuleWithDefaultAndElementExport)
 		};
 
-		const element = await createExtensionElement(manifest);
+		const element = await createManifestElement(manifest);
 		expect(element).to.not.be.undefined;
 		if(element) {
 			expect(element.isValidClassInstance()).to.be.true;

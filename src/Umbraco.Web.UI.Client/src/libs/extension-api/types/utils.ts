@@ -19,13 +19,21 @@ export type ApiLoaderExports<
 	ApiType extends UmbApi = UmbApi
 > = ({default: ClassConstructor<ApiType>} | {api: ClassConstructor<ApiType>})//| Omit<Omit<object, 'api'>, 'default'>
 
-export type ElementAndJsLoaderExports<
+export type ElementAndApiLoaderExports<
 	ElementType extends HTMLElement = HTMLElement,
 	ApiType extends UmbApi = UmbApi
 > = ({api: ClassConstructor<ApiType>} | {element: ClassConstructor<ElementType>} | {api: ClassConstructor<ApiType>, element: ClassConstructor<ElementType>})// | Omit<Omit<Omit<object, 'element'>, 'api'>, 'default'>
 
 
 // Promise Types:
+
+export type CssLoaderPromise<
+	CssType = unknown
+> = (() => Promise<CssType>)
+
+export type JsLoaderPromise<
+	JsType extends object = object
+> = (() => Promise<JsType>)
 
 export type ElementLoaderPromise<
 	ElementType extends HTMLElement = HTMLElement
@@ -35,37 +43,44 @@ export type ApiLoaderPromise<
 	ApiType extends UmbApi = UmbApi
 > = (() => Promise<ApiLoaderExports<ApiType>>)
 
-export type ElementAndJsLoaderPromise<
+export type ElementAndApiLoaderPromise<
 	ElementType extends HTMLElement = HTMLElement,
 	ApiType extends UmbApi = UmbApi
-> = (() => Promise<ElementAndJsLoaderExports<ElementType, ApiType>>)
+> = (() => Promise<ElementAndApiLoaderExports<ElementType, ApiType>>)
 
 
 // Property Types:
 
-export type JsLoaderProperty<JsType = unknown> = (
+export type CssLoaderProperty<CssType = string> = (
 	string
 	 | 
-	(() => Promise<{default: JsType}>)// | Omit<object, 'default'>
+	CssLoaderPromise<CssType>
+);
+export type JsLoaderProperty<JsType extends object = object> = (
+	string
 	 | 
-	JsType
+	JsLoaderPromise<JsType>
 );
 export type ElementLoaderProperty<ElementType extends HTMLElement = HTMLElement> = (
 	string
 	 | 
-	 ElementLoaderPromise<ElementType>
+	ElementLoaderPromise<ElementType>
 	 | 
 	ClassConstructor<ElementType>
 );
 export type ApiLoaderProperty<ApiType extends UmbApi = UmbApi> = (
 	string
 	 | 
-	 ApiLoaderPromise<ApiType>
+	ApiLoaderPromise<ApiType>
 	 | 
 	ClassConstructor<ApiType>
 );
 export type ElementAndApiLoaderProperty<ElementType extends HTMLElement = HTMLElement, ApiType extends UmbApi = UmbApi> = (
 	string
 	 | 
-	ElementAndJsLoaderPromise<ElementType, ApiType>
+	ElementAndApiLoaderPromise<ElementType, ApiType>
+	 |
+	ElementLoaderPromise<ElementType>
+	 |
+	ApiLoaderPromise<ApiType>
 );

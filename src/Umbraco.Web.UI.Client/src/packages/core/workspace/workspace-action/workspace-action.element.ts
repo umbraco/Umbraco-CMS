@@ -5,7 +5,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { ManifestWorkspaceAction } from '@umbraco-cms/backoffice/extension-registry';
-import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
+import { createManifestApi } from '@umbraco-cms/backoffice/extension-api';
 
 @customElement('umb-workspace-action')
 export class UmbWorkspaceActionElement extends UmbLitElement {
@@ -29,7 +29,7 @@ export class UmbWorkspaceActionElement extends UmbLitElement {
 
 	async #createApi() {
 		if (!this._manifest) return;
-		this.#api = await createExtensionApi(this._manifest, [this]);
+		this.#api = await createManifestApi(this._manifest, [this]);
 	}
 
 	#api?: UmbWorkspaceAction;

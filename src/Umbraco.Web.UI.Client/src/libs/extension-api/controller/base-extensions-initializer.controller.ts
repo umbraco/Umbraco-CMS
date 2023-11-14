@@ -1,8 +1,7 @@
+import { ManifestTypeMap, SpecificManifestTypeOrManifestBase } from '../types/map.types.js';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import type {
 	ManifestBase,
-	ManifestTypeMap,
-	SpecificManifestTypeOrManifestBase,
 	UmbBaseExtensionInitializer,
 	UmbExtensionRegistry,
 } from '@umbraco-cms/backoffice/extension-api';
@@ -21,12 +20,19 @@ export abstract class UmbBaseExtensionsInitializer<
 	ControllerType extends UmbBaseExtensionInitializer<ManifestType> = UmbBaseExtensionInitializer<ManifestType>,
 	MyPermittedControllerType extends ControllerType = PermittedControllerType<ControllerType>
 > extends UmbBaseController {
+	#promiseResolvers: Array<() => void> = [];
 	#extensionRegistry: UmbExtensionRegistry<ManifestType>;
 	#type: ManifestTypeName | Array<ManifestTypeName>;
 	#filter: undefined | null | ((manifest: ManifestType) => boolean);
 	#onChange?: (permittedManifests: Array<MyPermittedControllerType>) => void;
 	protected _extensions: Array<ControllerType> = [];
 	private _permittedExts: Array<MyPermittedControllerType> = [];
+
+	asPromise(): Promise<void> {
+		return new Promise((resolve) => {
+			this._permittedExts.length > 0 ? resolve() : this.#promiseResolvers.push(resolve);
+		});
+	}
 
 	constructor(
 		host: UmbControllerHost,
@@ -121,6 +127,10 @@ export abstract class UmbBaseExtensionsInitializer<
 			// Sorting:
 			exposedPermittedExts.sort((a, b) => b.weight - a.weight);
 
+			if (exposedPermittedExts.length > 0) {
+				this.#promiseResolvers.forEach((x) => x());
+				this.#promiseResolvers = [];
+			}
 			this.#onChange?.(exposedPermittedExts);
 		}
 	};

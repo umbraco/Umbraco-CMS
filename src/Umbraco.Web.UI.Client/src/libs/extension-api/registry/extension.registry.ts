@@ -1,4 +1,5 @@
-import type { ManifestTypeMap, ManifestBase, SpecificManifestTypeOrManifestBase, ManifestKind } from '../types.js';
+import type { ManifestBase, ManifestKind } from '../types/index.js';
+import { ManifestTypeMap, SpecificManifestTypeOrManifestBase } from '../types/map.types.js';
 import { UmbBasicState } from '@umbraco-cms/backoffice/observable-api';
 import {
 	map,

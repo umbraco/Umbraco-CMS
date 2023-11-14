@@ -11,7 +11,7 @@ import {
 } from '@umbraco-cms/backoffice/external/tinymce';
 import { UMB_AUTH_CONTEXT, UmbLoggedInUser } from '@umbraco-cms/backoffice/auth';
 import { TinyMcePluginArguments, UmbTinyMcePluginBase } from '@umbraco-cms/backoffice/components';
-import { ClassConstructor, hasDefaultExport, loadExtension } from '@umbraco-cms/backoffice/extension-api';
+import { ClassConstructor, hasDefaultExport, loadManifestApi } from '@umbraco-cms/backoffice/extension-api';
 import { ManifestTinyMcePlugin, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import {
 	PropertyValueMap,
@@ -99,12 +99,12 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 	 */
 	async #loadPlugins() {
 		const observable = umbExtensionsRegistry?.extensionsOfType('tinyMcePlugin');
-		const plugins = (await firstValueFrom(observable)) as ManifestTinyMcePlugin[];
+		const manifests = (await firstValueFrom(observable)) as ManifestTinyMcePlugin[];
 
-		for (const plugin of plugins) {
-			const module = await loadExtension(plugin);
-			if (hasDefaultExport<ClassConstructor<UmbTinyMcePluginBase>>(module)) {
-				this.#plugins.push(module.default);
+		for (const manifest of manifests) {
+			const plugin = manifest.js ? await loadManifestApi(manifest.js) : manifest.api ? await loadManifestApi(manifest.api) : undefined;
+			if (plugin) {
+				this.#plugins.push(plugin);
 			}
 		}
 	}

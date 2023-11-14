@@ -1,11 +1,10 @@
 import { PackageResource, OpenAPI } from '@umbraco-cms/backoffice/backend-api';
-import { UmbBaseController, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbBaseController, type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBackofficeExtensionRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import { ManifestBase, isManifestJSType } from '@umbraco-cms/backoffice/extension-api';
+import { ManifestBase, isManifestBaseType } from '@umbraco-cms/backoffice/extension-api';
 
 // TODO: consider if this can be replaced by the new extension controllers
-// TODO: move local part out of this, and name something with server.
 export class UmbServerExtensionRegistrator extends UmbBaseController {
 	#extensionRegistry: UmbBackofficeExtensionRegistry;
 	#apiBaseUrl = OpenAPI.BASE;
@@ -13,7 +12,6 @@ export class UmbServerExtensionRegistrator extends UmbBaseController {
 	constructor(host: UmbControllerHost, extensionRegistry: UmbBackofficeExtensionRegistry) {
 		super(host, UmbServerExtensionRegistrator.name);
 		this.#extensionRegistry = extensionRegistry;
-		// TODO: This was before in hostConnected(), but I don't see the reason to wait. lets just do it right away.
 		this.#loadServerPackages();
 	}
 
@@ -36,17 +34,18 @@ export class UmbServerExtensionRegistrator extends UmbBaseController {
 				p.extensions?.forEach((e) => {
 					// Crudely validate that the extension at least follows a basic manifest structure
 					// Idea: Use `Zod` to validate the manifest
-					if (this.isManifestBase(e)) {
+					if (isManifestBaseType(e)) {
 						/**
 						 * Crude check to see if extension is of type "js" since it is safe to assume we do not
 						 * need to load any other types of extensions in the backoffice (we need a js file to load)
 						 */
-						if (isManifestJSType(e)) {
-							// Add API base url if the js path is relative
-							if (!e.js.startsWith('http')) {
-								e.js = `${this.#apiBaseUrl}${e.js}`;
-							}
+						
+						// Add API base url if the js path is relative
+						if ('js' in e && typeof e.js === 'string' && !e.js.startsWith('http')) {
+							e.js = `${this.#apiBaseUrl}${e.js}`;
 						}
+
+						// TODO: Niels: I assume we also need to do this for, element and api?
 
 						extensions.push(e);
 					}
@@ -55,9 +54,5 @@ export class UmbServerExtensionRegistrator extends UmbBaseController {
 
 			this.#extensionRegistry.registerMany(extensions);
 		}
-	}
-
-	private isManifestBase(x: unknown): x is ManifestBase {
-		return typeof x === 'object' && x !== null && 'alias' in x;
 	}
 }

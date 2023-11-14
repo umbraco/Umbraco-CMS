@@ -1,6 +1,6 @@
 import type { UmbApi } from "../models/index.js";
 import type { ManifestBase } from "./manifest-base.interface.js";
-import type { ApiLoaderProperty, ClassConstructor, ElementAndApiLoaderProperty, ElementLoaderProperty } from "./utils.js";
+import type { ApiLoaderProperty, CssLoaderProperty, ElementAndApiLoaderProperty, ElementLoaderProperty, JsLoaderProperty } from "./utils.js";
 
 
 
@@ -26,12 +26,21 @@ export interface ManifestElementWithElementName extends ManifestElement {
 
 
 
-export interface ManifestPlainJs<JsType = unknown> extends ManifestBase {
+export interface ManifestPlainCss<CssType = unknown> extends ManifestBase {
+	/**
+	 * The file location of the stylesheet file to load
+   * @TJS-type string
+	 */
+	css?: CssLoaderProperty<CssType>
+}
+
+
+export interface ManifestPlainJs<JsType extends object = object> extends ManifestBase {
 	/**
 	 * The file location of the javascript file to load
    * @TJS-type string
 	 */
-	js?: string | Promise<{ default: ClassConstructor<JsType> }> | ClassConstructor<JsType>;
+	js?: JsLoaderProperty<JsType>;
 }
 
 /**

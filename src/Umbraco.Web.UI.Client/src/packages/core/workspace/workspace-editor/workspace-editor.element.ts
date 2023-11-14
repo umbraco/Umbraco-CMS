@@ -6,7 +6,7 @@ import {
 	ManifestWorkspaceViewCollection,
 	umbExtensionsRegistry,
 } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbExtensionsManifestController, createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
+import { UmbExtensionsManifestInitializer, createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { componentHasManifestProperty } from '@umbraco-cms/backoffice/utils';
@@ -60,7 +60,7 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		new UmbExtensionsManifestController(
+		new UmbExtensionsManifestInitializer(
 			this,
 			umbExtensionsRegistry,
 			['workspaceEditorView', 'workspaceViewCollection'],

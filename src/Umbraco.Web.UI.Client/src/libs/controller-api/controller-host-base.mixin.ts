@@ -1,4 +1,4 @@
-import { ClassConstructor } from '../extension-api/types.js';
+import { ClassConstructor } from '../extension-api/types/utils.js';
 import { UmbControllerHost } from './controller-host.interface.js';
 import type { UmbController } from './controller.interface.js';
 
@@ -21,7 +21,7 @@ declare class UmbControllerHostBaseDeclaration implements Omit<UmbControllerHost
  * @param {Object} superClass - superclass to be extended.
  * @mixin
  */
-export const UmbControllerHostBaseMixin = <T extends ClassConstructor<any>>(superClass: T) => {
+export const UmbControllerHostBaseMixin = <T extends ClassConstructor>(superClass: T) => {
 	class UmbControllerHostBaseClass extends superClass {
 		#controllers: UmbController[] = [];
 

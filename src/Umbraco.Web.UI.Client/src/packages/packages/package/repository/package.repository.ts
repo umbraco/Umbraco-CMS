@@ -1,13 +1,13 @@
 import { UmbPackageStore, UMB_PACKAGE_STORE_TOKEN } from './package.store.js';
 import { UmbPackageServerDataSource } from './sources/package.server.data.js';
 import { UmbBaseController, type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbApi, isManifestJSType, ManifestBase } from '@umbraco-cms/backoffice/extension-api';
+import { UmbApi, ManifestBase, isManifestBaseType } from '@umbraco-cms/backoffice/extension-api';
 import { OpenAPI } from '@umbraco-cms/backoffice/backend-api';
 
 // TODO: Figure out if we should base stores like this on something more generic for "collections" rather than trees.
 
 /**
- * A repository for Packages which mimicks a tree store.
+ * A repository for Packages which mimics a tree store.
  * @export
  */
 export class UmbPackageRepository extends UmbBaseController implements UmbApi {
@@ -49,16 +49,14 @@ export class UmbPackageRepository extends UmbBaseController implements UmbApi {
 				p.extensions?.forEach((e) => {
 					// Crudely validate that the extension at least follows a basic manifest structure
 					// Idea: Use `Zod` to validate the manifest
-					if (this.isManifestBase(e)) {
+					if (isManifestBaseType(e)) {
 						/**
 						 * Crude check to see if extension is of type "js" since it is safe to assume we do not
 						 * need to load any other types of extensions in the backoffice (we need a js file to load)
 						 */
-						if (isManifestJSType(e)) {
 							// Add API base url if the js path is relative
-							if (!e.js.startsWith('http')) {
-								e.js = `${this.#apiBaseUrl}${e.js}`;
-							}
+						if ('js' in e && typeof e.js === 'string' && !e.js.startsWith('http')) {
+							e.js = `${this.#apiBaseUrl}${e.js}`;
 						}
 
 						extensions.push(e);
@@ -108,8 +106,5 @@ export class UmbPackageRepository extends UmbBaseController implements UmbApi {
 		await this.#init;
 		return this.#packageStore!.migrations;
 	}
-
-	private isManifestBase(x: unknown): x is ManifestBase {
-		return typeof x === 'object' && x !== null && 'alias' in x;
-	}
+	
 }

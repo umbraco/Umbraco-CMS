@@ -1,7 +1,7 @@
-import { createExtensionApi } from '../functions/create-extension-api.function.js';
+import { createManifestApi } from '../functions/create-manifest-api.function.js';
+import { UmbApi } from '../models/api.interface.js';
 import { UmbExtensionRegistry } from '../registry/extension.registry.js';
-import { isManifestApiType } from '../type-guards/is-manifest-apiable-type.function.js';
-import { UmbApi, ManifestApi, ManifestCondition } from '../types.js';
+import { ManifestApi, ManifestCondition } from '../types/index.js';
 import { UmbBaseExtensionInitializer } from './base-extension-initializer.controller.js';
 import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
@@ -88,23 +88,19 @@ export class UmbExtensionApiInitializer<
 	protected async _conditionsAreGood() {
 		const manifest = this.manifest!; // In this case we are sure its not undefined.
 
-		if (isManifestApiType(manifest)) {
-			const newApi = await createExtensionApi<ExtensionApiInterface>(manifest as unknown as ManifestApi<ExtensionApiInterface>, this.#constructorArguments);
-			if (!this._positive) {
-				// We are not positive anymore, so we will back out of this creation.
-				return false;
-			}
-			this.#api = newApi;
-
-		} else {
-			this.#api = undefined;
-			console.warn('Manifest did not provide any useful data for a api class to construct.')
+		const newApi = await createManifestApi<ExtensionApiInterface>(manifest as unknown as ManifestApi<ExtensionApiInterface>, this.#constructorArguments);
+		if (!this._positive) {
+			// We are not positive anymore, so we will back out of this creation.
+			return false;
 		}
+		this.#api = newApi;
+			
 		if (this.#api) {
 			//this.#assignProperties();
 			return true; // we will confirm we have a component and are still good to go.
 		}
 
+		console.warn('Manifest did not provide any useful data for a api class to construct.');
 		return false; // we will reject the state, we have no component, we are not good to be shown.
 	}
 

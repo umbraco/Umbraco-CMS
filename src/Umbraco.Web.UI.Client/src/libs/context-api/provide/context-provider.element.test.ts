@@ -10,7 +10,7 @@ export class UmbTestContextElement extends UmbControllerHostElementMixin(HTMLEle
 	constructor() {
 		super();
 
-		new UmbContextConsumerController<string>(this, 'test-context', (value) => {
+		new UmbContextConsumerController<string, string>(this, 'test-context', (value) => {
 			this.value = value;
 		});
 	}

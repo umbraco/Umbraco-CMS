@@ -1,16 +1,15 @@
+import type { ManifestTypeMap, SpecificManifestTypeOrManifestBase } from '../types/map.types.js';
 import { UmbExtensionManifestInitializer } from './extension-manifest-initializer.controller.js';
 import { type PermittedControllerType, UmbBaseExtensionsInitializer } from './base-extensions-initializer.controller.js';
 import {
-	ManifestBase,
-	ManifestTypeMap,
-	SpecificManifestTypeOrManifestBase,
-	UmbExtensionRegistry,
+	type ManifestBase,
+	type UmbExtensionRegistry,
 } from '@umbraco-cms/backoffice/extension-api';
 import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
  */
-export class UmbExtensionsManifestController<
+export class UmbExtensionsManifestInitializer<
 	ManifestTypes extends ManifestBase,
 	ManifestTypeName extends keyof ManifestTypeMap<ManifestTypes> | string,
 	ManifestType extends ManifestBase = SpecificManifestTypeOrManifestBase<ManifestTypes, ManifestTypeName>,

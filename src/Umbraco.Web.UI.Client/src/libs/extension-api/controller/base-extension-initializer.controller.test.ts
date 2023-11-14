@@ -4,7 +4,7 @@ import type {
 	ManifestKind,
 	ManifestWithDynamicConditions,
 	UmbConditionConfigBase,
-} from '../types.js';
+} from '../types/index.js';
 import { UmbExtensionRegistry } from '../registry/extension.registry.js';
 import type { UmbExtensionCondition } from '../condition/extension-condition.interface.js';
 import {

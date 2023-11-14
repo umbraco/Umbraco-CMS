@@ -11,7 +11,7 @@ import {
 } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbExtensionElementInitializer, UmbExtensionsElementController } from '@umbraco-cms/backoffice/extension-api';
+import { UmbExtensionElementInitializer, UmbExtensionsElementInitializer } from '@umbraco-cms/backoffice/extension-api';
 
 /**
  * @export
@@ -45,7 +45,7 @@ export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectio
 	constructor() {
 		super();
 
-		new UmbExtensionsElementController(this, umbExtensionsRegistry, 'sectionSidebarApp', null, (sidebarApps) => {
+		new UmbExtensionsElementInitializer(this, umbExtensionsRegistry, 'sectionSidebarApp', null, (sidebarApps) => {
 			const oldValue = this._sidebarApps;
 			this._sidebarApps = sidebarApps;
 			this.requestUpdate('_sidebarApps', oldValue);
