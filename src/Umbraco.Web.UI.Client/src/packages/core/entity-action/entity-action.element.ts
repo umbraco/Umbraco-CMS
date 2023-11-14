@@ -3,7 +3,7 @@ import { html, nothing, ifDefined, customElement, property, state } from '@umbra
 import { UUIMenuItemEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { ManifestEntityAction } from '@umbraco-cms/backoffice/extension-registry';
-import { createManifestApi } from '@umbraco-cms/backoffice/extension-api';
+import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 
 @customElement('umb-entity-action')
 export class UmbEntityActionElement extends UmbLitElement {
@@ -40,7 +40,7 @@ export class UmbEntityActionElement extends UmbLitElement {
 		if (!this._manifest) return;
 		if (this._unique === undefined) return;
 
-		this.#api = await createManifestApi(this._manifest, [this, this._manifest.meta.repositoryAlias, this.unique]);
+		this.#api = await createExtensionApi(this._manifest, [this, this._manifest.meta.repositoryAlias, this.unique]);
 
 		// TODO: Fix so when we use a HREF it does not refresh the page?
 		this._href = await this.#api.getHref?.();

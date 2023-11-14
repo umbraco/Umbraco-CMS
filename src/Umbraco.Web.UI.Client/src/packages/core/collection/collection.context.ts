@@ -7,7 +7,7 @@ import {
 	UmbNumberState,
 	UmbObjectState,
 } from '@umbraco-cms/backoffice/observable-api';
-import { UmbExtensionsManifestInitializer, createManifestApi } from '@umbraco-cms/backoffice/extension-api';
+import { UmbExtensionsManifestInitializer, createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 import { ManifestCollectionView, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbCollectionFilterModel } from '@umbraco-cms/backoffice/collection';
 import { UmbSelectionManager, UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
@@ -182,7 +182,7 @@ export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectio
 			async (repositoryManifest) => {
 				if (repositoryManifest) {
 					// TODO: Maybe use the UmbExtensionApiController instead of createExtensionApi, to ensure usage of conditions:
-					const result = await createManifestApi(repositoryManifest, [this._host]);
+					const result = await createExtensionApi(repositoryManifest, [this._host]);
 					this.repository = result as UmbCollectionRepository;
 					this.requestCollection();
 				}

@@ -1,7 +1,7 @@
 import { ManifestElement, ManifestElementAndApi } from "../types/base.types.js";
 import { loadManifestElement } from "./load-manifest-element.function.js";
 
-export async function createManifestElement<ElementType extends HTMLElement>(manifest: ManifestElement<ElementType> | ManifestElementAndApi<ElementType>, fallbackElement?: string): Promise<ElementType | undefined> {
+export async function createExtensionElement<ElementType extends HTMLElement>(manifest: ManifestElement<ElementType> | ManifestElementAndApi<ElementType>, fallbackElement?: string): Promise<ElementType | undefined> {
 
 	if(manifest.element) {
 		const elementConstructor = await loadManifestElement<ElementType>(manifest.element);

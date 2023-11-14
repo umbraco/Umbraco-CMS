@@ -7,7 +7,7 @@ import { BehaviorSubject } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { UUIDialogElement, UUIModalDialogElement, UUIModalSidebarElement } from '@umbraco-cms/backoffice/external/uui';
 import { UmbRouterSlotElement } from '@umbraco-cms/backoffice/router';
-import { createManifestElement } from '@umbraco-cms/backoffice/extension-api';
+import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import { UmbContextProvider } from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-modal')
@@ -104,7 +104,7 @@ export class UmbModalElement extends UmbLitElement {
 
 	async #createInnerElement(manifest: ManifestModal) {
 		// TODO: add inner fallback element if no extension element is found
-		const innerElement = (await createManifestElement(manifest));
+		const innerElement = (await createExtensionElement(manifest));
 
 		if (innerElement) {
 			innerElement.data = this.#modalContext!.data;

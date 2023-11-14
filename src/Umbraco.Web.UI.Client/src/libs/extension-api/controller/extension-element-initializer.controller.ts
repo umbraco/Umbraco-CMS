@@ -1,4 +1,4 @@
-import { createManifestElement } from '../functions/create-manifest-element.function.js';
+import { createExtensionElement } from '../functions/create-extension-element.function.js';
 import { UmbExtensionRegistry } from '../registry/extension.registry.js';
 import { ManifestCondition, ManifestWithDynamicConditions } from '../types/index.js';
 import { UmbBaseExtensionInitializer } from './base-extension-initializer.controller.js';
@@ -79,7 +79,7 @@ export class UmbExtensionElementInitializer<
 	protected async _conditionsAreGood() {
 		const manifest = this.manifest!; // In this case we are sure its not undefined.
 
-		const newComponent = await createManifestElement(manifest, this.#defaultElement);
+		const newComponent = await createExtensionElement(manifest, this.#defaultElement);
 		if (!this._positive) {
 			// We are not positive anymore, so we will back out of this creation.
 			return false;

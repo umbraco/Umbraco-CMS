@@ -1,4 +1,4 @@
-import { createManifestApi } from '../functions/create-manifest-api.function.js';
+import { createExtensionApi } from '../functions/create-extension-api.function.js';
 import { UmbApi } from '../models/api.interface.js';
 import { UmbExtensionRegistry } from '../registry/extension.registry.js';
 import { ManifestApi, ManifestCondition } from '../types/index.js';
@@ -88,7 +88,7 @@ export class UmbExtensionApiInitializer<
 	protected async _conditionsAreGood() {
 		const manifest = this.manifest!; // In this case we are sure its not undefined.
 
-		const newApi = await createManifestApi<ExtensionApiInterface>(manifest as unknown as ManifestApi<ExtensionApiInterface>, this.#constructorArguments);
+		const newApi = await createExtensionApi<ExtensionApiInterface>(manifest as unknown as ManifestApi<ExtensionApiInterface>, this.#constructorArguments);
 		if (!this._positive) {
 			// We are not positive anymore, so we will back out of this creation.
 			return false;

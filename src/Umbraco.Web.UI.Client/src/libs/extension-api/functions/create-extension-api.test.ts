@@ -1,7 +1,7 @@
 import { expect } from '@open-wc/testing';
 import { ManifestApi } from '../types/index.js';
 import { UmbApi } from '../models/api.interface.js';
-import { createManifestApi } from './create-manifest-api.function.js';
+import { createExtensionApi } from './create-extension-api.function.js';
 
 
 
@@ -49,7 +49,7 @@ describe('Extension-Api: Create Extension Api', () => {
 			name: 'pretty name'
 		};
 
-		const api = await createManifestApi(manifest, []);
+		const api = await createExtensionApi(manifest, []);
 		expect(api).to.be.undefined;
 	});
 
@@ -62,7 +62,7 @@ describe('Extension-Api: Create Extension Api', () => {
 			api: UmbExtensionApiTrueTestClass
 		};
 
-		const api = await createManifestApi(manifest, []);
+		const api = await createExtensionApi(manifest, []);
 		expect(api).to.not.be.undefined;
 		if(api) {
 			expect(api.isValidClassInstance()).to.be.true;
@@ -78,7 +78,7 @@ describe('Extension-Api: Create Extension Api', () => {
 			js: () => Promise.resolve(jsModuleWithDefaultExport)
 		};
 
-		const api = await createManifestApi(manifest, []);
+		const api = await createExtensionApi(manifest, []);
 		expect(api).to.not.be.undefined;
 		if(api) {
 			expect(api.isValidClassInstance()).to.be.true;
@@ -94,7 +94,7 @@ describe('Extension-Api: Create Extension Api', () => {
 			js: () => Promise.resolve(jsModuleWithApiExport)
 		};
 
-		const api = await createManifestApi(manifest, []);
+		const api = await createExtensionApi(manifest, []);
 		expect(api).to.not.be.undefined;
 		if(api) {
 			expect(api.isValidClassInstance()).to.be.true;
@@ -110,7 +110,7 @@ describe('Extension-Api: Create Extension Api', () => {
 			js: () => Promise.resolve(jsModuleWithDefaultAndApiExport)
 		};
 
-		const api = await createManifestApi(manifest, []);
+		const api = await createExtensionApi(manifest, []);
 		expect(api).to.not.be.undefined;
 		if(api) {
 			expect(api.isValidClassInstance()).to.be.true;

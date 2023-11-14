@@ -4,7 +4,7 @@ import {
 	type ManifestCondition,
 	type ManifestWithDynamicConditions,
 	type UmbExtensionRegistry,
-	createManifestApi,
+	createExtensionApi,
 } from '@umbraco-cms/backoffice/extension-api';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
@@ -143,7 +143,7 @@ export abstract class UmbBaseExtensionInitializer<
 							// Check if we already have a controller for this config:
 							const existing = this.#conditionControllers.find((controller) => controller.config === conditionConfig);
 							if (!existing) {
-								const conditionController = await createManifestApi(conditionManifest, [
+								const conditionController = await createExtensionApi(conditionManifest, [
 									{
 										host: this,
 										manifest: conditionManifest,

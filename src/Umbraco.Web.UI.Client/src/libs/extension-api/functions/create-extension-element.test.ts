@@ -1,6 +1,6 @@
 import { expect } from '@open-wc/testing';
 import { ManifestElement, ManifestElementAndApi } from '../types/index.js';
-import { createManifestElement } from './create-manifest-element.function.js';
+import { createExtensionElement } from './create-extension-element.function.js';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 
 
@@ -47,7 +47,7 @@ describe('Extension-Api: Create Extension Element', () => {
 			name: 'pretty name'
 		};
 
-		const api = await createManifestElement(manifest);
+		const api = await createExtensionElement(manifest);
 		expect(api).to.be.undefined;
 	});
 
@@ -59,7 +59,7 @@ describe('Extension-Api: Create Extension Element', () => {
 			name: 'pretty name'
 		};
 
-		const element = await createManifestElement(manifest, 'umb-extension-api-true-test-element');
+		const element = await createExtensionElement(manifest, 'umb-extension-api-true-test-element');
 		expect(element).to.not.be.undefined;
 		if(element) {
 			expect(element.isValidClassInstance()).to.be.true;
@@ -76,7 +76,7 @@ describe('Extension-Api: Create Extension Element', () => {
 			api: class TestApi {}
 		};
 
-		const element = await createManifestElement(manifest, 'umb-extension-api-true-test-element');
+		const element = await createExtensionElement(manifest, 'umb-extension-api-true-test-element');
 		expect(element).to.not.be.undefined;
 		if(element) {
 			expect(element.isValidClassInstance()).to.be.true;
@@ -92,7 +92,7 @@ describe('Extension-Api: Create Extension Element', () => {
 			elementName: 'umb-extension-api-true-test-element'
 		};
 
-		const element = await createManifestElement(manifest);
+		const element = await createExtensionElement(manifest);
 		expect(element).to.not.be.undefined;
 		if(element) {
 			expect(element.isValidClassInstance()).to.be.true;
@@ -108,7 +108,7 @@ describe('Extension-Api: Create Extension Element', () => {
 			js: () => Promise.resolve(jsModuleWithDefaultExport)
 		};
 
-		const element = await createManifestElement(manifest);
+		const element = await createExtensionElement(manifest);
 		expect(element).to.not.be.undefined;
 		if(element) {
 			expect(element.isValidClassInstance()).to.be.true;
@@ -124,7 +124,7 @@ describe('Extension-Api: Create Extension Element', () => {
 			js: () => Promise.resolve(jsModuleWithElementExport)
 		};
 
-		const element = await createManifestElement(manifest);
+		const element = await createExtensionElement(manifest);
 		expect(element).to.not.be.undefined;
 		if(element) {
 			expect(element.isValidClassInstance()).to.be.true;
@@ -140,7 +140,7 @@ describe('Extension-Api: Create Extension Element', () => {
 			js: () => Promise.resolve(jsModuleWithDefaultAndElementExport)
 		};
 
-		const element = await createManifestElement(manifest);
+		const element = await createExtensionElement(manifest);
 		expect(element).to.not.be.undefined;
 		if(element) {
 			expect(element.isValidClassInstance()).to.be.true;

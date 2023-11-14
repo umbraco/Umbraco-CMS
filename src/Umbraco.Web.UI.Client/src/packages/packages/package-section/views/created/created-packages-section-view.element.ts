@@ -5,7 +5,7 @@ import {
 	UmbSectionViewExtensionElement,
 	umbExtensionsRegistry,
 } from '@umbraco-cms/backoffice/extension-registry';
-import { createManifestElement } from '@umbraco-cms/backoffice/extension-api';
+import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-created-packages-section-view')
@@ -35,7 +35,7 @@ export class UmbCreatedPackagesSectionViewElement extends UmbLitElement implemen
 		this._workspaces?.map((workspace: ManifestWorkspace) => {
 			routes.push({
 				path: `${workspace.meta.entityType}/:id`,
-				component: () => createManifestElement(workspace),
+				component: () => createExtensionElement(workspace),
 				setup: (component, info) => {
 					if (component) {
 						(component as any).entityId = info.match.params.id;
@@ -44,7 +44,7 @@ export class UmbCreatedPackagesSectionViewElement extends UmbLitElement implemen
 			});
 			routes.push({
 				path: workspace.meta.entityType,
-				component: () => createManifestElement(workspace),
+				component: () => createExtensionElement(workspace),
 			});
 		});
 
