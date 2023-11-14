@@ -55,7 +55,7 @@ export abstract class UmbBaseExtensionInitializer<
 		alias: string,
 		onPermissionChanged?: (isPermitted: boolean, controller: SubClassType) => void
 	) {
-		super(host, extensionTypeName+alias);
+		super(host, extensionTypeName + '_' + alias);
 		this.#extensionRegistry = extensionRegistry;
 		this.#alias = alias;
 		this.#onPermissionChanged = onPermissionChanged;
