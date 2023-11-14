@@ -4,8 +4,8 @@ import { UmbDocumentTreeStore, UMB_DOCUMENT_TREE_STORE_CONTEXT_TOKEN } from './d
 import { UmbDocumentTreeServerDataSource } from './sources/document.tree.server.data.js';
 import { UMB_DOCUMENT_ITEM_STORE_CONTEXT_TOKEN, type UmbDocumentItemStore } from './document-item.store.js';
 import { UmbDocumentItemServerDataSource } from './sources/document-item.server.data.js';
-import type { UmbTreeDataSource, UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
-import { type UmbTreeRepository } from '@umbraco-cms/backoffice/tree';
+import type { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
+import type { UmbTreeRepository, UmbTreeDataSource } from '@umbraco-cms/backoffice/tree';
 import { UmbBaseController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import {
 	DocumentResponseModel,

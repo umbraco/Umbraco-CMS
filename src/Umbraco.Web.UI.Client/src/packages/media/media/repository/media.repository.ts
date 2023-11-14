@@ -5,8 +5,7 @@ import { UmbMediaStore, UMB_MEDIA_STORE_CONTEXT_TOKEN } from './media.store.js';
 import { UmbMediaDetailServerDataSource } from './sources/media.detail.server.data.js';
 import { UmbMediaItemServerDataSource } from './sources/media-item.server.data.js';
 import { UmbMediaItemStore } from './media-item.store.js';
-import { type UmbTreeDataSource } from '@umbraco-cms/backoffice/repository';
-import { type UmbTreeRepository } from '@umbraco-cms/backoffice/tree';
+import type { UmbTreeRepository, UmbTreeDataSource } from '@umbraco-cms/backoffice/tree';
 import { UmbBaseController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import {
 	CreateMediaRequestModel,

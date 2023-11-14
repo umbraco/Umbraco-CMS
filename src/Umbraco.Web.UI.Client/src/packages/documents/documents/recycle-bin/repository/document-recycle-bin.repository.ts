@@ -3,8 +3,7 @@ import {
 	UMB_DOCUMENT_RECYCLE_BIN_TREE_STORE_CONTEXT,
 	UmbDocumentRecycleBinTreeStore,
 } from './document-recycle.bin.tree.store.js';
-import { type UmbTreeDataSource } from '@umbraco-cms/backoffice/repository';
-import { type UmbTreeRepository } from '@umbraco-cms/backoffice/tree';
+import type { UmbTreeRepository, UmbTreeDataSource } from '@umbraco-cms/backoffice/tree';
 import { UmbBaseController, type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { DocumentTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';

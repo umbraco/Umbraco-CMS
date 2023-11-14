@@ -6,13 +6,8 @@ import { UMB_TEMPLATE_ITEM_STORE_CONTEXT_TOKEN, UmbTemplateItemStore } from './t
 import { UmbTemplateItemServerDataSource } from './sources/template.item.server.data.js';
 import { UmbTemplateQueryBuilderServerDataSource } from './sources/template.query-builder.server.data.js';
 import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
-import type {
-	UmbDetailRepository,
-	UmbItemDataSource,
-	UmbItemRepository,
-	UmbTreeDataSource,
-} from '@umbraco-cms/backoffice/repository';
-import { UmbTreeRepository } from '@umbraco-cms/backoffice/tree';
+import type { UmbDetailRepository, UmbItemDataSource, UmbItemRepository } from '@umbraco-cms/backoffice/repository';
+import { UmbTreeRepository, UmbTreeDataSource } from '@umbraco-cms/backoffice/tree';
 import { UmbBaseController, type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 import type {

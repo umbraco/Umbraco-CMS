@@ -1,11 +1,8 @@
 import { UmbTreeStore } from '../store/tree-store.interface.js';
 import { type UmbEntityTreeItemModel } from './types.js';
 import { UmbTreeRepository } from './tree-repository.interface.js';
-import {
-	type UmbTreeDataSource,
-	UmbRepositoryBase,
-	UmbTreeDataSourceConstructor,
-} from '@umbraco-cms/backoffice/repository';
+import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
+import type { UmbTreeDataSource, UmbTreeDataSourceConstructor } from '@umbraco-cms/backoffice/tree';
 import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';

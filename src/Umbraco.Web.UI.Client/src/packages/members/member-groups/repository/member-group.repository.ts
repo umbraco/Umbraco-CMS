@@ -5,8 +5,8 @@ import { UmbMemberGroupStore, UMB_MEMBER_GROUP_STORE_CONTEXT_TOKEN } from './mem
 import { UmbMemberGroupTreeServerDataSource } from './sources/member-group.tree.server.data.js';
 import { UmbBaseController, type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
-import type { UmbTreeDataSource, UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
-import { UmbTreeRepository } from '@umbraco-cms/backoffice/tree';
+import { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
+import type { UmbTreeRepository, UmbTreeDataSource } from '@umbraco-cms/backoffice/tree';
 import { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 

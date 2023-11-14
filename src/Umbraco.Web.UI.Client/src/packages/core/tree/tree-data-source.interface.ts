@@ -1,5 +1,5 @@
-import type { UmbPagedData } from './types.js';
-import type { DataSourceResponse } from './data-source-response.interface.js';
+import type { UmbPagedData } from '../repository/data-source/types.js';
+import type { DataSourceResponse } from '../repository/data-source/data-source-response.interface.js';
 import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbEntityTreeRootModel, UmbTreeItemModel, UmbTreeItemModelBase } from '@umbraco-cms/backoffice/tree';
 
