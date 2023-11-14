@@ -4,7 +4,7 @@ import type { ApiLoaderExports, ApiLoaderProperty, ClassConstructor, ElementAndA
 export async function loadManifestApi<ApiType extends UmbApi>(property: ApiLoaderProperty<ApiType> | ElementAndApiLoaderProperty<any, ApiType>): Promise<ClassConstructor<ApiType> | undefined> {
 	const propType = typeof property
 	if(propType === 'function') {
-		if(typeof property.constructor === 'function') {
+		if((property as ClassConstructor).prototype) {
 			// Class Constructor
 			return property as ClassConstructor<ApiType>;
 		} else {

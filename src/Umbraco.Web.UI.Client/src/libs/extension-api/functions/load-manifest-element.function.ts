@@ -4,7 +4,7 @@ import type { ApiLoaderExports, ClassConstructor, ElementAndApiLoaderProperty, E
 export async function loadManifestElement<ElementType extends HTMLElement>(property: ElementLoaderProperty<ElementType> | ElementAndApiLoaderProperty<ElementType>): Promise<ClassConstructor<ElementType> | undefined> {
 	const propType = typeof property
 	if(propType === 'function') {
-		if(typeof property.constructor === 'function') {
+		if((property as ClassConstructor).prototype) {
 			// Class Constructor
 			return property as ClassConstructor<ElementType>;
 		} else {
