@@ -153,7 +153,7 @@ export class UmbDocumentTypeDetailRepository
 			// Consider to look up the data before fetching from the server.
 			// Consider notify a workspace if a template is deleted from the store while someone is editing it.
 			// TODO: would be nice to align the stores on methods/methodNames.
-			this.#detailStore?.remove([id]);
+			this.#detailStore?.removeItem(id);
 			this.#treeStore?.removeItem(id);
 			this.#itemStore?.removeItem(id);
 		}

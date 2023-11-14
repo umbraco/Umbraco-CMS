@@ -25,30 +25,12 @@ export class UmbDocumentTypeDetailStore extends UmbStoreBase<DocumentTypeRespons
 	}
 
 	/**
-	 * Append a document-type to the store
-	 * @param {DocumentTypeModel} document
-	 * @memberof UmbDocumentTypeStore
-	 */
-	append(document: DocumentTypeResponseModel) {
-		this._data.append([document]);
-	}
-
-	/**
-	 * Append a document-type to the store
-	 * @param {DocumentTypeModel} document
-	 * @memberof UmbDocumentTypeStore
+	 * @param {DocumentTypeResponseModel['id']} id
+	 * @return {*}
+	 * @memberof UmbDocumentTypeDetailStore
 	 */
 	byId(id: DocumentTypeResponseModel['id']) {
 		return this._data.asObservablePart((x) => x.find((y) => y.id === id));
-	}
-
-	/**
-	 * Removes document-types in the store with the given uniques
-	 * @param {string[]} uniques
-	 * @memberof UmbDocumentTypeStore
-	 */
-	remove(uniques: Array<DocumentTypeResponseModel['id']>) {
-		this._data.remove(uniques);
 	}
 }
 
