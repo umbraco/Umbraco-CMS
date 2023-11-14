@@ -5,8 +5,6 @@ import { ManifestPropertyAction, ManifestTypes, umbExtensionsRegistry } from '@u
 import { UmbExtensionElementInitializer, UmbExtensionsElementInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
-import '../property-action/property-action.element.js';
-
 @customElement('umb-property-action-menu')
 export class UmbPropertyActionMenuElement extends UmbLitElement {
 
