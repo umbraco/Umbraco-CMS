@@ -1,8 +1,7 @@
 import { UMB_DOCUMENT_TYPE_TREE_STORE_CONTEXT, UmbDocumentTypeTreeStore } from '../tree/document-type.tree.store.js';
 import { UmbDocumentTypeServerDataSource } from './sources/document-type.server.data.js';
 import { UmbDocumentTypeStore, UMB_DOCUMENT_TYPE_STORE_CONTEXT_TOKEN } from './document-type.store.js';
-import { UMB_DOCUMENT_TYPE_ITEM_STORE_CONTEXT_TOKEN, UmbDocumentTypeItemStore } from './document-type-item.store.js';
-import { UmbDocumentTypeItemServerDataSource } from './sources/document-type-item.server.data.js';
+import { UMB_DOCUMENT_TYPE_ITEM_STORE_CONTEXT, UmbDocumentTypeItemStore } from './item/document-type-item.store.js';
 import { type UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbBaseController, type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import {
@@ -29,7 +28,6 @@ export class UmbDocumentTypeRepository
 	#detailDataSource: UmbDocumentTypeServerDataSource;
 	#detailStore?: UmbDocumentTypeStore;
 
-	#itemSource: UmbDocumentTypeItemServerDataSource;
 	#itemStore?: UmbDocumentTypeItemStore;
 
 	#notificationContext?: UmbNotificationContext;
@@ -39,7 +37,6 @@ export class UmbDocumentTypeRepository
 
 		// TODO: figure out how spin up get the correct data source
 		this.#detailDataSource = new UmbDocumentTypeServerDataSource(this);
-		this.#itemSource = new UmbDocumentTypeItemServerDataSource(this);
 
 		this.#init = Promise.all([
 			this.consumeContext(UMB_DOCUMENT_TYPE_TREE_STORE_CONTEXT, (instance) => {
@@ -50,7 +47,7 @@ export class UmbDocumentTypeRepository
 				this.#detailStore = instance;
 			}),
 
-			this.consumeContext(UMB_DOCUMENT_TYPE_ITEM_STORE_CONTEXT_TOKEN, (instance) => {
+			this.consumeContext(UMB_DOCUMENT_TYPE_ITEM_STORE_CONTEXT, (instance) => {
 				this.#itemStore = instance;
 			}),
 
@@ -58,19 +55,6 @@ export class UmbDocumentTypeRepository
 				this.#notificationContext = instance;
 			}),
 		]);
-	}
-
-	async requestItems(ids: Array<string>) {
-		if (!ids) throw new Error('Document Type Ids are missing');
-		await this.#init;
-
-		const { data, error } = await this.#itemSource.getItems(ids);
-
-		if (data) {
-			this.#itemStore?.appendItems(data);
-		}
-
-		return { data, error, asObservable: () => this.#itemStore!.items(ids) };
 	}
 
 	// DETAILS:
