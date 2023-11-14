@@ -1,7 +1,7 @@
-import { UMB_DOCUMENT_TYPE_TREE_STORE_CONTEXT, UmbDocumentTypeTreeStore } from '../tree/document-type.tree.store.js';
-import { UmbDocumentTypeServerDataSource } from './sources/document-type.server.data.js';
-import { UmbDocumentTypeStore, UMB_DOCUMENT_TYPE_STORE_CONTEXT_TOKEN } from './document-type.store.js';
-import { UMB_DOCUMENT_TYPE_ITEM_STORE_CONTEXT, UmbDocumentTypeItemStore } from './item/document-type-item.store.js';
+import { UMB_DOCUMENT_TYPE_TREE_STORE_CONTEXT, UmbDocumentTypeTreeStore } from '../../tree/document-type.tree.store.js';
+import { UMB_DOCUMENT_TYPE_ITEM_STORE_CONTEXT, UmbDocumentTypeItemStore } from '../item/document-type-item.store.js';
+import { UmbDocumentTypeServerDataSource } from './document-type.server.data.js';
+import { UmbDocumentTypeDetailStore, UMB_DOCUMENT_TYPE_DETAIL_STORE_CONTEXT } from './document-type-detail.store.js';
 import { type UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbBaseController, type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import {
@@ -15,7 +15,7 @@ import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
 type ItemType = DocumentTypeResponseModel;
 
-export class UmbDocumentTypeRepository
+export class UmbDocumentTypeDetailRepository
 	extends UmbBaseController
 	implements
 		UmbDetailRepository<CreateDocumentTypeRequestModel, any, UpdateDocumentTypeRequestModel, DocumentTypeResponseModel>,
@@ -26,7 +26,7 @@ export class UmbDocumentTypeRepository
 	#treeStore?: UmbDocumentTypeTreeStore;
 
 	#detailDataSource: UmbDocumentTypeServerDataSource;
-	#detailStore?: UmbDocumentTypeStore;
+	#detailStore?: UmbDocumentTypeDetailStore;
 
 	#itemStore?: UmbDocumentTypeItemStore;
 
@@ -43,7 +43,7 @@ export class UmbDocumentTypeRepository
 				this.#treeStore = instance;
 			}),
 
-			this.consumeContext(UMB_DOCUMENT_TYPE_STORE_CONTEXT_TOKEN, (instance) => {
+			this.consumeContext(UMB_DOCUMENT_TYPE_DETAIL_STORE_CONTEXT, (instance) => {
 				this.#detailStore = instance;
 			}),
 
