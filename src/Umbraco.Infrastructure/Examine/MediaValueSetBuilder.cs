@@ -20,8 +20,6 @@ public class MediaValueSetBuilder : BaseValueSetBuilder<IMedia>
     private readonly UrlSegmentProviderCollection _urlSegmentProviders;
     private readonly IUserService _userService;
 
-
-
     public MediaValueSetBuilder(
         PropertyEditorCollection propertyEditors,
         UrlSegmentProviderCollection urlSegmentProviders,

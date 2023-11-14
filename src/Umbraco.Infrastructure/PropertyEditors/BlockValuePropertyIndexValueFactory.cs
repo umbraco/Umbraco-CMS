@@ -38,8 +38,7 @@ internal sealed class BlockValuePropertyIndexValueFactory :
         _contentTypeService = contentTypeService;
     }
 
-
-    [Obsolete]
+    [Obsolete("Use non-obsolete overload, scheduled for removal in v14")]
     protected override IContentType? GetContentTypeOfNestedItem(BlockItemData input) =>
         _contentTypeService.Get(input.ContentTypeKey);
 
