@@ -79,6 +79,6 @@ public static partial class Constants
         /// <summary>
         ///     All webhook logs.
         /// </summary>
-        public const int WebhookLogs = -342;
+        public const int WebhookLogs = -343;
     }
 }
