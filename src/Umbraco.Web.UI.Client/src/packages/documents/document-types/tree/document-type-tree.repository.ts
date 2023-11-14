@@ -18,7 +18,7 @@ export class UmbDocumentTypeTreeRepository
 		const data = {
 			id: null,
 			type: DOCUMENT_TYPE_ROOT_ENTITY_TYPE,
-			name: 'BLa Bla',
+			name: 'Document Types',
 			icon: 'icon-folder',
 			hasChildren: true,
 		};

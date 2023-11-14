@@ -1,11 +1,11 @@
-import { UmbDataTypePickerContext } from './data-type-input.context.js';
+import { UmbDocumentTypePickerContext } from './document-type-input.context.js';
 import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { DataTypeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { DocumentTypeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
-@customElement('umb-data-type-input')
-export class UmbDataTypeInputElement extends FormControlMixin(UmbLitElement) {
+@customElement('umb-document-type-input')
+export class UmbDocumentTypeInputElement extends FormControlMixin(UmbLitElement) {
 	/**
 	 * This is a minimum amount of selected items in this input.
 	 * @type {number}
@@ -74,9 +74,9 @@ export class UmbDataTypeInputElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	@state()
-	private _items?: Array<DataTypeItemResponseModel>;
+	private _items?: Array<DocumentTypeItemResponseModel>;
 
-	#pickerContext = new UmbDataTypePickerContext(this);
+	#pickerContext = new UmbDocumentTypePickerContext(this);
 
 	constructor() {
 		super();
@@ -110,18 +110,18 @@ export class UmbDataTypeInputElement extends FormControlMixin(UmbLitElement) {
 		`;
 	}
 
-	private _renderItem(item: DataTypeItemResponseModel) {
+	private _renderItem(item: DocumentTypeItemResponseModel) {
 		if (!item.id) return;
 		return html`
-			<uui-ref-node-data-type name=${item.name}>
+			<uui-ref-node-document-type name=${item.name}>
 				<uui-action-bar slot="actions">
 					<uui-button
 						@click=${() => this.#pickerContext.requestRemoveItem(item.id!)}
-						label="Remove Data Type ${item.name}"
+						label="Remove Document Type ${item.name}"
 						>Remove</uui-button
 					>
 				</uui-action-bar>
-			</uui-ref-node-data-type>
+			</uui-ref-node-document-type>
 		`;
 	}
 
@@ -134,10 +134,10 @@ export class UmbDataTypeInputElement extends FormControlMixin(UmbLitElement) {
 	];
 }
 
-export default UmbDataTypeInputElement;
+export default UmbDocumentTypeInputElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-data-type-input': UmbDataTypeInputElement;
+		'umb-document-type-input': UmbDocumentTypeInputElement;
 	}
 }

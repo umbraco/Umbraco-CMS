@@ -1,7 +1,7 @@
 import { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context.js';
-import type { UmbInputDocumentTypeElement } from '../../../components/input-document-type/input-document-type.element.js';
+import type { UmbDocumentTypeInputElement } from '../../../components/input-document-type/document-type-input.element.js';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UUIToggleElement } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
@@ -65,7 +65,7 @@ export class UmbDocumentTypeWorkspaceViewStructureElement
 						<umb-input-document-type
 							.selectedIds=${this._allowedContentTypeIDs ?? []}
 							@change="${(e: CustomEvent) => {
-								const sortedContentTypesList = (e.target as UmbInputDocumentTypeElement).selectedIds.map(
+								const sortedContentTypesList = (e.target as UmbDocumentTypeInputElement).selectedIds.map(
 									(id, index) => ({
 										id: id,
 										sortOrder: index,
