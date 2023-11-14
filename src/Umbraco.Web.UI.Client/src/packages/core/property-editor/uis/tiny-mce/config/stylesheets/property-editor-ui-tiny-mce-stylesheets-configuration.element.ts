@@ -3,17 +3,19 @@ import { css, customElement, html, property, state } from '@umbraco-cms/backoffi
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbStylesheetRepository } from '@umbraco-cms/backoffice/stylesheet';
 import { StylesheetOverviewResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 
 /**
  * @element umb-property-editor-ui-tiny-mce-stylesheets-configuration
  */
 @customElement('umb-property-editor-ui-tiny-mce-stylesheets-configuration')
-export class UmbPropertyEditorUITinyMceStylesheetsConfigurationElement extends UmbLitElement {
+export class UmbPropertyEditorUITinyMceStylesheetsConfigurationElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	@property({ type: Array })
 	value: string[] = [];
 
-	@property({ type: Array, attribute: false })
-	public config = [];
+	@property({ type: Object, attribute: false })
+	public config?: UmbPropertyEditorConfigCollection;
 
 	@state()
 	stylesheetList: Array<StylesheetOverviewResponseModel & Partial<{ selected: boolean }>> = [];

@@ -35,7 +35,7 @@ export interface ManifestPlainCss<CssType = unknown> extends ManifestBase {
 }
 
 
-export interface ManifestPlainJs<JsType extends object = object> extends ManifestBase {
+export interface ManifestPlainJs<JsType> extends ManifestBase {
 	/**
 	 * The file location of the javascript file to load
    * @TJS-type string

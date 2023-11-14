@@ -32,7 +32,7 @@ export type CssLoaderPromise<
 > = (() => Promise<CssType>)
 
 export type JsLoaderPromise<
-	JsType extends object = object
+	JsType
 > = (() => Promise<JsType>)
 
 export type ElementLoaderPromise<
@@ -56,7 +56,7 @@ export type CssLoaderProperty<CssType = string> = (
 	 | 
 	CssLoaderPromise<CssType>
 );
-export type JsLoaderProperty<JsType extends object = object> = (
+export type JsLoaderProperty<JsType> = (
 	string
 	 | 
 	JsLoaderPromise<JsType>

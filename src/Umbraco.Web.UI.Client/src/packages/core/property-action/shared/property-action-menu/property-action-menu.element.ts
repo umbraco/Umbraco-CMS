@@ -1,27 +1,40 @@
 import { UmbPropertyActionMenuContext } from './property-action-menu.context.js';
-import { css, CSSResultGroup, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { map } from '@umbraco-cms/backoffice/external/rxjs';
+import { css, CSSResultGroup, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
-import { ManifestPropertyAction, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { ManifestPropertyAction, ManifestTypes, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbExtensionElementInitializer, UmbExtensionsElementInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
 import '../property-action/property-action.element.js';
 
 @customElement('umb-property-action-menu')
 export class UmbPropertyActionMenuElement extends UmbLitElement {
+
+	#actionsInitializer?: UmbExtensionsElementInitializer<ManifestTypes, 'propertyAction'>;
+
+
 	@property({ attribute: false })
-	public value?: unknown;
+	public get value(): unknown {
+		return this._value;
+	}
+	public set value(value: unknown) {
+		this._value = value;
+		if(this.#actionsInitializer) {
+			this.#actionsInitializer.properties = { value };
+		}
+	}
+	private _value?: unknown;
 
 	@property()
 	set propertyEditorUiAlias(alias: string) {
-		this._observeActions(alias);
+
+		// TODO: Align property actions with entity actions.
+		this.#actionsInitializer = new UmbExtensionsElementInitializer(this, umbExtensionsRegistry, 'propertyAction', (propertyAction) => propertyAction.meta.propertyEditors.includes(alias), (ctrls) => {
+			this._actions = ctrls;
+		});
 	}
-
-	private _actionsObserver?: UmbObserverController<ManifestPropertyAction[]>;
-
 	@state()
-	private _actions: Array<ManifestPropertyAction> = [];
+	private _actions: Array<UmbExtensionElementInitializer<ManifestPropertyAction, any>> = [];
 
 	@state()
 	private _open = false;
@@ -31,29 +44,14 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.observe(this._propertyActionMenuContext.isOpen, (value) => {
-			this._open = value;
+		this.observe(this._propertyActionMenuContext.isOpen, (isOpen) => {
+			this._open = isOpen;
 		});
 
 		this.addEventListener('close', (e) => {
 			this._propertyActionMenuContext.close();
 			e.stopPropagation();
 		});
-	}
-
-	private _observeActions(alias: string) {
-		this._actionsObserver?.destroy();
-		// TODO: Align property actions with entity actions.
-		this._actionsObserver = this.observe(
-			umbExtensionsRegistry.extensionsOfType('propertyAction').pipe(
-				map((propertyActions) => {
-					return propertyActions.filter((propertyAction) => propertyAction.meta.propertyEditors.includes(alias));
-				})
-			),
-			(manifests) => {
-				this._actions = manifests;
-			}
-		);
 	}
 
 	private _toggleMenu() {
@@ -65,7 +63,6 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 		event.stopPropagation();
 	}
 
-	// TODO: Implement extension-slot on change event. And use the extension slot instead of custom implementation.
 	render() {
 		return this._actions.length > 0
 			? html`
@@ -81,10 +78,8 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 						</uui-button>
 
 						<div slot="popover" id="dropdown">
-							${this._actions.map(
-								(action) => html`
-									<umb-property-action .propertyAction=${action} .value="${this.value}"></umb-property-action>
-								`
+							${repeat(this._actions,
+								(action) => action.component
 							)}
 						</div>
 					</uui-popover>
