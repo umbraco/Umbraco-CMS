@@ -57,6 +57,10 @@ internal class RichTextPropertyIndexValueFactory : NestedPropertyIndexValueFacto
     public IEnumerable<KeyValuePair<string, IEnumerable<object?>>> GetIndexValues(IProperty property, string? culture, string? segment, bool published)
         => GetIndexValues(property, culture, segment, published, Enumerable.Empty<string>());
 
+    protected override IContentType? GetContentTypeOfNestedItem(BlockItemData nestedItem, IDictionary<Guid, IContentType> contentTypeDictionary)
+        => contentTypeDictionary.TryGetValue(nestedItem.ContentTypeKey, out var result) ? result : null;
+
+    [Obsolete("Use non-obsolete overload. Scheduled for removal in Umbraco 14.")]
     protected override IContentType? GetContentTypeOfNestedItem(BlockItemData nestedItem)
         => _contentTypeService.Get(nestedItem.ContentTypeKey);
 

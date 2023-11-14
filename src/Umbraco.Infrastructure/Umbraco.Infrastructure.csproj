@@ -29,7 +29,6 @@
     <PackageReference Include="OpenIddict.Abstractions" Version="4.9.0" />
     <PackageReference Include="MailKit" Version="4.1.0" />
     <PackageReference Include="HtmlAgilityPack" Version="1.11.54" />
-    <PackageReference Include="IPNetwork2" Version="2.6.618" />
     <PackageReference Include="Markdown" Version="2.2.1" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="7.0.0" />
