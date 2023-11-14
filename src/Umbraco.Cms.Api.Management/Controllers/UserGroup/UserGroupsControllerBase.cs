@@ -64,15 +64,15 @@ public class UserGroupControllerBase : ManagementApiControllerBase
                 .Build()),
             UserGroupOperationStatus.UnauthorizedMissingAllowedSectionAccess => Unauthorized(new ProblemDetailsBuilder()
                 .WithTitle("Unauthorized section access")
-                .WithDetail("The performing user does not have access to all sections specified in the user group allowed sections.")
+                .WithDetail("The performing user does not have access to all sections specified as allowed for this user group.")
                 .Build()),
             UserGroupOperationStatus.UnauthorizedMissingContentStartNodeAccess => Unauthorized(new ProblemDetailsBuilder()
                 .WithTitle("Unauthorized content start node access")
-                .WithDetail("The performing user does not have access to the content start node item.")
+                .WithDetail("The performing user does not have access to the specified content start node item.")
                 .Build()),
             UserGroupOperationStatus.UnauthorizedMissingMediaStartNodeAccess => Unauthorized(new ProblemDetailsBuilder()
                 .WithTitle("Unauthorized media start node access")
-                .WithDetail("The performing user does not have access to the media start node item.")
+                .WithDetail("The performing user does not have access to the specified media start node item.")
                 .Build()),
             UserGroupOperationStatus.UnauthorizedMissingUserGroupAccess => Unauthorized(new ProblemDetailsBuilder()
                 .WithTitle("Unauthorized user group access")
