@@ -1,7 +1,8 @@
-import { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
+import { StartNode, UmbInputContentTypeElement } from '@umbraco-cms/backoffice/content-type';
+import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 /**
@@ -9,14 +10,28 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
  */
 @customElement('umb-property-editor-ui-tree-picker-start-node')
 export class UmbPropertyEditorUITreePickerStartNodeElement extends UmbLitElement implements UmbPropertyEditorUiElement {
-	@property()
-	value = '';
+	@property({ type: Object })
+	value?: StartNode;
 
 	@property({ type: Object, attribute: false })
 	public config?: UmbPropertyEditorConfigCollection;
 
+	#onChange(event: CustomEvent) {
+		const target = event.target as UmbInputContentTypeElement;
+
+		this.value = {
+			type: target.type,
+			id: target.nodeId,
+			query: target.dynamicPath,
+		};
+
+		this.dispatchEvent(new CustomEvent('property-value-change'));
+	}
+
 	render() {
-		return html`<div>umb-property-editor-ui-tree-picker-start-node</div>`;
+		return html`<umb-input-content-type
+			@change="${this.#onChange}"
+			.type=${this.value?.type}></umb-input-content-type>`;
 	}
 
 	static styles = [UmbTextStyles];

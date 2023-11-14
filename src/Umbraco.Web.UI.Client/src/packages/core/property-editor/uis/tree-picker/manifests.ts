@@ -15,7 +15,7 @@ const manifest: ManifestPropertyEditorUi = {
 			properties: [
 				{
 					alias: 'startNode',
-					label: 'Start node',
+					label: 'Node type',
 					description: '',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.TreePicker.StartNode',
 				},

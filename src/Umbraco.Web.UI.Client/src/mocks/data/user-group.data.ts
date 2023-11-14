@@ -79,6 +79,13 @@ export const data: Array<UserGroupResponseModel> = [
 		permissions: [UMB_USER_PERMISSION_DOCUMENT_CREATE, UMB_USER_PERMISSION_DOCUMENT_DELETE],
 	},
 	{
+		id: 'c630d49e-4e7b-42ea-b2bc-edc0edacb6b2',
+		name: 'Something',
+		icon: 'umb:medal',
+		documentStartNodeId: 'simple-document-id',
+		permissions: [UMB_USER_PERMISSION_DOCUMENT_CREATE, UMB_USER_PERMISSION_DOCUMENT_DELETE],
+	},
+	{
 		id: '9d24dc47-a4bf-427f-8a4a-b900f03b8a12',
 		name: 'User Group 1',
 		icon: 'icon-bell',
