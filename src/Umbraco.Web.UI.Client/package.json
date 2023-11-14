@@ -10,7 +10,8 @@
     "build:dev": "gulp buildDev",
     "dev": "gulp dev",
     "fastdev": "gulp fastdev",
-    "watch": "gulp watch"
+    "watch": "gulp watch",
+    "lint": "eslint src"
   },
   "engines": {
     "node": ">=20.9",
