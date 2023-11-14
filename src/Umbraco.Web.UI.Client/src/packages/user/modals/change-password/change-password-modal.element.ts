@@ -1,11 +1,18 @@
 import { UmbUserItemRepository } from '../../user/repository/item/user-item.repository.js';
+import { UMB_CURRENT_USER_CONTEXT } from '../../current-user/current-user.context.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, CSSResultGroup, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbChangePasswordModalData, UmbChangePasswordModalValue, UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
+import {
+	UmbChangePasswordModalData,
+	UmbChangePasswordModalValue,
+	UmbModalBaseElement,
+} from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-change-password-modal')
-export class UmbChangePasswordModalElement extends UmbModalBaseElement<UmbChangePasswordModalData, UmbChangePasswordModalValue> {
+export class UmbChangePasswordModalElement extends UmbModalBaseElement<
+	UmbChangePasswordModalData,
+	UmbChangePasswordModalValue
+> {
 	@state()
 	private _headline: string = 'Change password';
 
@@ -13,7 +20,7 @@ export class UmbChangePasswordModalElement extends UmbModalBaseElement<UmbChange
 	private _isCurrentUser: boolean = false;
 
 	#userItemRepository = new UmbUserItemRepository(this);
-	#authContext?: typeof UMB_AUTH_CONTEXT.TYPE;
+	#currentUserContext?: typeof UMB_CURRENT_USER_CONTEXT.TYPE;
 
 	#onClose() {
 		this.modalContext?.reject();
@@ -41,8 +48,8 @@ export class UmbChangePasswordModalElement extends UmbModalBaseElement<UmbChange
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_AUTH_CONTEXT, (instance) => {
-			this.#authContext = instance;
+		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (instance) => {
+			this.#currentUserContext = instance;
 			this.#setIsCurrentUser();
 		});
 	}
@@ -53,12 +60,12 @@ export class UmbChangePasswordModalElement extends UmbModalBaseElement<UmbChange
 			return;
 		}
 
-		if (!this.#authContext) {
+		if (!this.#currentUserContext) {
 			this._isCurrentUser = false;
 			return;
 		}
 
-		this._isCurrentUser = await this.#authContext.isUserCurrentUser(this.data.userId);
+		this._isCurrentUser = await this.#currentUserContext.isUserCurrentUser(this.data.userId);
 	}
 
 	protected async firstUpdated(): Promise<void> {

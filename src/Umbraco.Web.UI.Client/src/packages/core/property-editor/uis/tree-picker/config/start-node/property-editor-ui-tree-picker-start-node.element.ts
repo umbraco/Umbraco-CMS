@@ -1,5 +1,6 @@
+import { StartNode, UmbInputContentTypeElement } from '@umbraco-cms/backoffice/content-type';
 import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 /**
@@ -7,14 +8,25 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
  */
 @customElement('umb-property-editor-ui-tree-picker-start-node')
 export class UmbPropertyEditorUITreePickerStartNodeElement extends UmbLitElement {
-	@property()
-	value = '';
+	@property({ type: Object })
+	value?: StartNode;
 
-	@property({ type: Array, attribute: false })
-	public config = [];
+	#onChange(event: CustomEvent) {
+		const target = event.target as UmbInputContentTypeElement;
+
+		this.value = {
+			type: target.type,
+			id: target.nodeId,
+			query: target.dynamicPath,
+		};
+
+		this.dispatchEvent(new CustomEvent('property-value-change'));
+	}
 
 	render() {
-		return html`<div>umb-property-editor-ui-tree-picker-start-node</div>`;
+		return html`<umb-input-content-type
+			@change="${this.#onChange}"
+			.type=${this.value?.type}></umb-input-content-type>`;
 	}
 
 	static styles = [UmbTextStyles];

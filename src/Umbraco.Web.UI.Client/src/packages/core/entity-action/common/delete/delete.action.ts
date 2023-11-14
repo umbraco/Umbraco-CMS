@@ -24,20 +24,17 @@ export class UmbDeleteEntityAction<
 	async execute() {
 		if (!this.repository || !this.#modalManager) return;
 
-		const { data } = await this.repository.requestItems([this.unique]);
+		// TOOD: add back when entity actions can support multiple repositories
+		//const { data } = await this.repository.requestItems([this.unique]);
 
-		if (data) {
-			const item = data[0];
+		const modalContext = this.#modalManager.open(UMB_CONFIRM_MODAL, {
+			headline: `Delete`,
+			content: 'Are you sure you want to delete this item?',
+			color: 'danger',
+			confirmLabel: 'Delete',
+		});
 
-			const modalContext = this.#modalManager.open(UMB_CONFIRM_MODAL, {
-				headline: `Delete ${item.name}`,
-				content: 'Are you sure you want to delete this item?',
-				color: 'danger',
-				confirmLabel: 'Delete',
-			});
-
-			await modalContext.onSubmit();
-			await this.repository?.delete(this.unique);
-		}
+		await modalContext.onSubmit();
+		await this.repository?.delete(this.unique);
 	}
 }
