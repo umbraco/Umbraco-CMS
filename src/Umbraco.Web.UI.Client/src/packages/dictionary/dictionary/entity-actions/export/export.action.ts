@@ -1,5 +1,5 @@
 import { UmbDictionaryRepository } from '../../repository/dictionary.repository.js';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import {
@@ -31,9 +31,21 @@ export default class UmbExportDictionaryEntityAction extends UmbEntityActionBase
 		const { includeChildren } = await modalContext.onSubmit();
 		if (includeChildren === undefined) return;
 
+		// Export the file
 		const result = await this.repository?.export(this.unique, includeChildren);
 
-		// TODO => get location header to route to new item
-		console.log(result);
+		const blobContent = await result?.data;
+		if (!blobContent) return;
+
+		const blob = new Blob([blobContent], { type: 'text/plain' });
+		const a = document.createElement('a');
+
+		const url = window.URL.createObjectURL(blob);
+		a.href = url;
+		a.download = `${this.unique}.udt`;
+		document.body.appendChild(a);
+		a.click();
+		document.body.removeChild(a);
+		window.URL.revokeObjectURL(url);
 	}
 }
