@@ -1,15 +1,20 @@
+import { UmbTreeItemModelBase, type UmbTreeItemModel } from './types.js';
 import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbPagedData, UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
-import { type ManifestRepository, type ManifestTree, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import {
+	type ManifestRepository,
+	type ManifestTree,
+	umbExtensionsRegistry,
+} from '@umbraco-cms/backoffice/extension-registry';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbBaseController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
-import { ProblemDetails, TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
+import { ProblemDetails } from '@umbraco-cms/backoffice/backend-api';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 import { UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
 
 // TODO: update interface
-export interface UmbTreeContext<TreeItemType extends TreeItemPresentationModel> extends UmbBaseController {
+export interface UmbTreeContext<TreeItemType extends UmbTreeItemModelBase> extends UmbBaseController {
 	readonly selectable: Observable<boolean>;
 	readonly selection: Observable<Array<string | null>>;
 	setSelectable(value: boolean): void;
@@ -27,7 +32,7 @@ export interface UmbTreeContext<TreeItemType extends TreeItemPresentationModel> 
 	}>;
 }
 
-export class UmbTreeContextBase<TreeItemType extends TreeItemPresentationModel>
+export class UmbTreeContextBase<TreeItemType extends UmbTreeItemModelBase>
 	extends UmbBaseController
 	implements UmbTreeContext<TreeItemType>
 {
@@ -153,9 +158,15 @@ export class UmbTreeContextBase<TreeItemType extends TreeItemPresentationModel>
 		const repositoryAlias = treeManifest.meta.repositoryAlias;
 		if (!repositoryAlias) throw new Error('Tree must have a repository alias.');
 
-		new UmbExtensionApiInitializer<ManifestRepository<UmbTreeRepository<TreeItemType>>>(this, umbExtensionsRegistry, repositoryAlias, [this._host], (permitted, ctrl) => {
-			this.repository = permitted ? ctrl.api : undefined;
-			this.#checkIfInitialized();
-		});
+		new UmbExtensionApiInitializer<ManifestRepository<UmbTreeRepository<TreeItemType>>>(
+			this,
+			umbExtensionsRegistry,
+			repositoryAlias,
+			[this._host],
+			(permitted, ctrl) => {
+				this.repository = permitted ? ctrl.api : undefined;
+				this.#checkIfInitialized();
+			},
+		);
 	}
 }

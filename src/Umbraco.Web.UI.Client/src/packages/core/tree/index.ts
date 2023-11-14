@@ -8,18 +8,3 @@ export * from './tree.element.js';
 export * from './types.js';
 
 export { UmbEntityTreeRepositoryBase } from './entity-tree.repository.js';
-
-export interface UmbTreeRootModel {
-	type: string;
-	name: string;
-	hasChildren: boolean;
-	icon?: string;
-}
-
-export interface UmbTreeRootEntityModel extends UmbTreeRootModel {
-	id: string | null;
-}
-
-export interface UmbTreeRootFileSystemModel extends UmbTreeRootModel {
-	path: string | null;
-}
