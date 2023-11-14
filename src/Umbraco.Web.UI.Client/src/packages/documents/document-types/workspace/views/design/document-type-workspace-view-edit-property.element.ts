@@ -1,3 +1,4 @@
+import { UmbDataTypeDetailRepository } from '@umbraco-cms/backoffice/data-type';
 import { UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, property, state, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { PropertyTypeModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
@@ -11,7 +12,6 @@ import {
 } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { generateAlias } from '@umbraco-cms/backoffice/utils';
-import { UmbDataTypeRepository } from '@umbraco-cms/backoffice/data-type';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 /**
@@ -53,7 +53,7 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 	@property({ type: Boolean, reflect: true, attribute: 'sort-mode-active' })
 	public sortModeActive = false;
 
-	#dataTypeRepository = new UmbDataTypeRepository(this);
+	#dataTypeDetailRepository = new UmbDataTypeDetailRepository(this);
 
 	#modalRegistration;
 	private _modalManagerContext?: typeof UMB_MODAL_MANAGER_CONTEXT_TOKEN.TYPE;
@@ -80,7 +80,7 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 
 	async setDataType(dataTypeId: string | undefined) {
 		if (!dataTypeId) return;
-		this.#dataTypeRepository.requestById(dataTypeId).then((x) => (this._dataTypeName = x?.data?.name));
+		this.#dataTypeDetailRepository.requestById(dataTypeId).then((x) => (this._dataTypeName = x?.data?.name));
 	}
 
 	constructor() {
