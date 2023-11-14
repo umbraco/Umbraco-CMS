@@ -1,16 +1,12 @@
 import type { UmbPagedData } from '../repository/data-source/types.js';
 import type { DataSourceResponse } from '../repository/data-source/data-source-response.interface.js';
 import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbEntityTreeRootModel, UmbTreeItemModel, UmbTreeItemModelBase } from '@umbraco-cms/backoffice/tree';
 
-export interface UmbTreeDataSourceConstructor<TreeItemType extends UmbTreeItemModel = UmbTreeItemModel> {
-	new (host: UmbControllerHost): UmbTreeDataSource<TreeItemType>;
+export interface UmbTreeDataSourceConstructor<TreeItemType = any, TreeRootType = any> {
+	new (host: UmbControllerHost): UmbTreeDataSource<TreeItemType, TreeRootType>;
 }
 
-export interface UmbTreeDataSource<
-	TreeItemType extends UmbTreeItemModel = UmbTreeItemModel,
-	TreeRootType extends UmbTreeItemModelBase = UmbEntityTreeRootModel,
-> {
+export interface UmbTreeDataSource<TreeItemType = any, TreeRootType = any> {
 	getTreeRoot?(): Promise<DataSourceResponse<TreeRootType>>;
 	getRootItems(): Promise<DataSourceResponse<UmbPagedData<TreeItemType>>>;
 	getChildrenOf(parentUnique: string | null): Promise<DataSourceResponse<UmbPagedData<TreeItemType>>>;

@@ -2,22 +2,29 @@ import { UmbTreeStore } from '../store/tree-store.interface.js';
 import { type UmbEntityTreeItemModel } from './types.js';
 import { UmbTreeRepository } from './tree-repository.interface.js';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
-import type { UmbTreeDataSource, UmbTreeDataSourceConstructor } from '@umbraco-cms/backoffice/tree';
+import type {
+	UmbEntityTreeRootModel,
+	UmbTreeDataSource,
+	UmbTreeDataSourceConstructor,
+} from '@umbraco-cms/backoffice/tree';
 import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
-export class UmbEntityTreeRepositoryBase<TreeItemType extends UmbEntityTreeItemModel>
+export class UmbEntityTreeRepositoryBase<
+		TreeItemType extends UmbEntityTreeItemModel,
+		TreeRootType extends UmbEntityTreeRootModel,
+	>
 	extends UmbRepositoryBase
-	implements UmbTreeRepository<TreeItemType>, UmbApi
+	implements UmbTreeRepository<TreeItemType, TreeRootType>, UmbApi
 {
 	protected _init: Promise<unknown>;
 	protected _treeStore?: UmbTreeStore;
-	#treeSource: UmbTreeDataSource<TreeItemType>;
+	#treeSource: UmbTreeDataSource;
 
 	constructor(
 		host: UmbControllerHost,
-		treeSource: UmbTreeDataSourceConstructor<TreeItemType>,
+		treeSource: UmbTreeDataSourceConstructor,
 		treeStoreContextAlias: string | UmbContextToken<any, any>,
 	) {
 		super(host);
