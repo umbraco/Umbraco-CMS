@@ -76,7 +76,7 @@ public class UserGroupControllerBase : ManagementApiControllerBase
                 .Build()),
             UserGroupOperationStatus.UnauthorizedMissingUserGroupAccess => Unauthorized(new ProblemDetailsBuilder()
                 .WithTitle("Unauthorized user group access")
-                .WithDetail("The performing user does not have access to all specified user groups.")
+                .WithDetail("The performing user does not have access to the specified user group(s).")
                 .Build()),
             UserGroupOperationStatus.UnauthorizedMissingUserSectionAccess => Unauthorized(new ProblemDetailsBuilder()
                 .WithTitle("Unauthorized access to User section")
