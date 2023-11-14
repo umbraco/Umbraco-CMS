@@ -21,7 +21,7 @@ public class WebhookLogServiceTests : UmbracoIntegrationTest
         var createdWebhookLog = await WebhookLogService.CreateAsync(new WebhookLog
         {
             Date = DateTime.UtcNow,
-            EventName = Constants.WebhookEvents.ContentPublish,
+            EventAlias = Constants.WebhookEvents.Aliases.ContentPublish,
             RequestBody = "Test Request Body",
             ResponseBody = "Test response body",
             StatusCode = "200",
@@ -37,14 +37,14 @@ public class WebhookLogServiceTests : UmbracoIntegrationTest
             Assert.IsNotNull(webhookLogsPaged);
             Assert.IsNotEmpty(webhookLogsPaged.Items);
             Assert.AreEqual(1, webhookLogsPaged.Items.Count());
-            var webHookLog = webhookLogsPaged.Items.First();
-            Assert.AreEqual(createdWebhookLog.Date.ToString(CultureInfo.InvariantCulture), webHookLog.Date.ToString(CultureInfo.InvariantCulture));
-            Assert.AreEqual(createdWebhookLog.EventName, webHookLog.EventName);
-            Assert.AreEqual(createdWebhookLog.RequestBody, webHookLog.RequestBody);
-            Assert.AreEqual(createdWebhookLog.ResponseBody, webHookLog.ResponseBody);
-            Assert.AreEqual(createdWebhookLog.StatusCode, webHookLog.StatusCode);
-            Assert.AreEqual(createdWebhookLog.RetryCount, webHookLog.RetryCount);
-            Assert.AreEqual(createdWebhookLog.Key, webHookLog.Key);
+            var webhookLog = webhookLogsPaged.Items.First();
+            Assert.AreEqual(createdWebhookLog.Date.ToString(CultureInfo.InvariantCulture), webhookLog.Date.ToString(CultureInfo.InvariantCulture));
+            Assert.AreEqual(createdWebhookLog.EventAlias, webhookLog.EventAlias);
+            Assert.AreEqual(createdWebhookLog.RequestBody, webhookLog.RequestBody);
+            Assert.AreEqual(createdWebhookLog.ResponseBody, webhookLog.ResponseBody);
+            Assert.AreEqual(createdWebhookLog.StatusCode, webhookLog.StatusCode);
+            Assert.AreEqual(createdWebhookLog.RetryCount, webhookLog.RetryCount);
+            Assert.AreEqual(createdWebhookLog.Key, webhookLog.Key);
         });
     }
 }

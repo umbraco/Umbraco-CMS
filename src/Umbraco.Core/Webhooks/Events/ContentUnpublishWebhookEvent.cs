@@ -7,21 +7,23 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events;
 
-public class ContentUnpublishWebhookEvent : WebhookEventBase<ContentUnpublishedNotification, IContent>
+[WebhookEvent("Content was unpublished", Constants.WebhookEvents.Types.Content)]
+public class ContentUnpublishWebhookEvent : WebhookEventContentBase<ContentUnpublishedNotification, IContent>
 {
     public ContentUnpublishWebhookEvent(
         IWebhookFiringService webhookFiringService,
-        IWebHookService webHookService,
+        IWebhookService webhookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
         IServerRoleAccessor serverRoleAccessor)
         : base(
             webhookFiringService,
-            webHookService,
+            webhookService,
             webhookSettings,
-            serverRoleAccessor,
-            Constants.WebhookEvents.ContentUnpublish)
+            serverRoleAccessor)
     {
     }
+
+    public override string Alias => Constants.WebhookEvents.Aliases.ContentDelete;
 
     protected override IEnumerable<IContent> GetEntitiesFromNotification(ContentUnpublishedNotification notification) => notification.UnpublishedEntities;
 

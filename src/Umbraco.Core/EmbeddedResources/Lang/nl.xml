@@ -1706,6 +1706,13 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="historyCleanupEnableCleanup">Opschonen aanzetten</key>
     <key alias="historyCleanupGloballyDisabled">Geschiedenis opschonen is globaal uitgeschakeld. Deze instellingen worden pas van kracht nadat ze zijn ingeschakeld.</key>
   </area>
+  <area alias="webhooks">
+    <key alias="addWebhook">Webhook aanmaken</key>
+    <key alias="addWebhookHeader">Webhook header toevoegen</key>
+    <key alias="logs">Logboek</key>
+    <key alias="addDocumentType">Documenttype toevoegen</key>
+    <key alias="addMediaType">Mediatype toevoegen</key>
+  </area>
   <area alias="languages">
     <key alias="addLanguage">Taal toevoegen</key>
     <key alias="mandatoryLanguage">Verplichte taal</key>
@@ -1846,6 +1853,7 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="settingsGroup">Instellingen</key>
     <key alias="templatingGroup">Sjabloon</key>
     <key alias="thirdPartyGroup">Derde partij</key>
+    <key alias="webhooks">Webhooks</key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">Nieuwe update beschikbaar</key>
