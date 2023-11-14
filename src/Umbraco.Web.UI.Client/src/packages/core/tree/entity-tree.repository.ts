@@ -9,7 +9,6 @@ import {
 import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { Observable } from 'rxjs';
 
 export class UmbEntityTreeRepositoryBase<TreeItemType extends UmbEntityTreeItemModel>
 	extends UmbRepositoryBase
