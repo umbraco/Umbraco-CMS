@@ -82,16 +82,16 @@ internal sealed class UserGroupPermissionService : IUserGroupPermissionService
             return UserGroupAuthorizationStatus.UnauthorizedMissingUserSectionAccess;
         }
 
-        var hasAccessToAllGroupSections = HasAccessToAllUserGroupSections(performingUser, userGroup);
-        if (hasAccessToAllGroupSections is false)
-        {
-            return UserGroupAuthorizationStatus.UnauthorizedMissingAllowedSectionAccess;
-        }
-
         UserGroupAuthorizationStatus authorizeGroupAccess = await AuthorizeAccessAsync(performingUser, new[] { userGroup.Key });
         if (authorizeGroupAccess != UserGroupAuthorizationStatus.Success)
         {
             return authorizeGroupAccess;
+        }
+
+        var hasAccessToAllGroupSections = HasAccessToAllUserGroupSections(performingUser, userGroup);
+        if (hasAccessToAllGroupSections is false)
+        {
+            return UserGroupAuthorizationStatus.UnauthorizedMissingAllowedSectionAccess;
         }
 
         // Check that the user is not setting start nodes that they don't have access to.
