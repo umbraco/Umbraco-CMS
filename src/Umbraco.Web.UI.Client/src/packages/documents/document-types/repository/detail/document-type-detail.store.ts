@@ -53,5 +53,5 @@ export class UmbDocumentTypeDetailStore extends UmbStoreBase<DocumentTypeRespons
 }
 
 export const UMB_DOCUMENT_TYPE_DETAIL_STORE_CONTEXT = new UmbContextToken<UmbDocumentTypeDetailStore>(
-	'UmbDocumentTypeStore',
+	'UmbDocumentTypeDetailStore',
 );
