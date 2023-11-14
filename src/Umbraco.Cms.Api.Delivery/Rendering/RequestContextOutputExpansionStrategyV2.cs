@@ -71,6 +71,7 @@ internal sealed class RequestContextOutputExpansionStrategyV2 : IOutputExpansion
         catch (ArgumentException ex)
         {
             _logger.LogError(ex, $"Could not parse the '{ExpandParameterName}' parameter. See exception for details.");
+            throw new ArgumentException($"Could not parse the '{ExpandParameterName}' parameter: {ex.Message}");
         }
 
         try
@@ -80,6 +81,7 @@ internal sealed class RequestContextOutputExpansionStrategyV2 : IOutputExpansion
         catch (ArgumentException ex)
         {
             _logger.LogError(ex, $"Could not parse the '{FieldsParameterName}' parameter. See exception for details.");
+            throw new ArgumentException($"Could not parse the '{FieldsParameterName}' parameter: {ex.Message}");
         }
     }
 
