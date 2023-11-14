@@ -7,6 +7,7 @@ public class WebhookSettings
 {
     private const bool StaticEnabled = true;
     private const int StaticMaximumRetries = 5;
+    internal const string StaticPeriod = "00:00:10";
     private const bool StaticEnableLoggingCleanup = true;
     private const int StaticKeepLogsForDays = 30;
 
@@ -34,6 +35,12 @@ public class WebhookSettings
     /// </remarks>
     [DefaultValue(StaticMaximumRetries)]
     public int MaximumRetries { get; set; } = StaticMaximumRetries;
+
+    /// <summary>
+    ///     Gets or sets a value for the period of the webhook firing.
+    /// </summary>
+    [DefaultValue(StaticPeriod)]
+    public TimeSpan Period { get; set; } = TimeSpan.Parse(StaticPeriod);
 
     /// <summary>
     ///     Gets or sets a value indicating whether cleanup of webhook logs are enabled.
