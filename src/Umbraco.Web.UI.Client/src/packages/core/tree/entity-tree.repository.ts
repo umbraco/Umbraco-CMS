@@ -9,6 +9,7 @@ import {
 import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { Observable } from 'rxjs';
 
 export class UmbEntityTreeRepositoryBase<TreeItemType extends UmbEntityTreeItemModel>
 	extends UmbRepositoryBase
@@ -31,14 +32,24 @@ export class UmbEntityTreeRepositoryBase<TreeItemType extends UmbEntityTreeItemM
 		}).asPromise();
 	}
 
+	/**
+	 * Request the tree root item
+	 * @return {*}
+	 * @memberof UmbEntityTreeRepositoryBase
+	 */
 	async requestTreeRoot() {
-		await this._init;
+		if (!this.#treeSource.getTreeRoot?.()) {
+			return { data: undefined, error: undefined };
+		}
 
-		const { data, error } = await this.#treeSource.getTreeRoot();
-
-		return { data, error };
+		return this.#treeSource.getTreeRoot();
 	}
 
+	/**
+	 * Requests root items of a tree
+	 * @return {*}
+	 * @memberof UmbEntityTreeRepositoryBase
+	 */
 	async requestRootTreeItems() {
 		await this._init;
 
@@ -51,6 +62,12 @@ export class UmbEntityTreeRepositoryBase<TreeItemType extends UmbEntityTreeItemM
 		return { data, error, asObservable: () => this._treeStore!.rootItems };
 	}
 
+	/**
+	 * Requests tree items of a given parent
+	 * @param {(string | null)} parentId
+	 * @return {*}
+	 * @memberof UmbEntityTreeRepositoryBase
+	 */
 	async requestTreeItemsOf(parentId: string | null) {
 		if (parentId === undefined) throw new Error('Parent id is missing');
 		await this._init;
@@ -64,11 +81,22 @@ export class UmbEntityTreeRepositoryBase<TreeItemType extends UmbEntityTreeItemM
 		return { data, error, asObservable: () => this._treeStore!.childrenOf(parentId) };
 	}
 
+	/**
+	 * Returns a promise with an observable of tree root items
+	 * @return {*}
+	 * @memberof UmbEntityTreeRepositoryBase
+	 */
 	async rootTreeItems() {
 		await this._init;
 		return this._treeStore!.rootItems;
 	}
 
+	/**
+	 * Returns a promise with an observable of children items of a given parent
+	 * @param {(string | null)} parentId
+	 * @return {*}
+	 * @memberof UmbEntityTreeRepositoryBase
+	 */
 	async treeItemsOf(parentId: string | null) {
 		if (parentId === undefined) throw new Error('Parent id is missing');
 		await this._init;
