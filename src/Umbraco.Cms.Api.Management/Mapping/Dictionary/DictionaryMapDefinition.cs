@@ -40,7 +40,7 @@ public class DictionaryMapDefinition : IMapDefinition
     // Umbraco.Code.MapAll -Id -CreateDate -UpdateDate -Translations
     private void Map(CreateDictionaryItemRequestModel source, IDictionaryItem target, MapperContext context)
     {
-        if (source.Id != null)
+        if (source.Id is not null)
         {
             target.Key = source.Id.Value;
         }
