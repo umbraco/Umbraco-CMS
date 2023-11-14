@@ -29,7 +29,13 @@ internal class RichTextPropertyIndexValueFactory : NestedPropertyIndexValueFacto
         _logger = logger;
     }
 
-    public IEnumerable<KeyValuePair<string, IEnumerable<object?>>> GetIndexValues(IProperty property, string? culture, string? segment, bool published, IEnumerable<string> availableCultures)
+    public new IEnumerable<KeyValuePair<string, IEnumerable<object?>>> GetIndexValues(
+        IProperty property,
+        string? culture,
+        string? segment,
+        bool published,
+        IEnumerable<string> availableCultures,
+        IDictionary<Guid, IContentType> contentTypeDictionary)
     {
         var val = property.GetValue(culture, segment, published);
         if (RichTextPropertyEditorHelper.TryParseRichTextEditorValue(val, _jsonSerializer, _logger, out RichTextEditorValue? richTextEditorValue) is false)
@@ -38,7 +44,7 @@ internal class RichTextPropertyIndexValueFactory : NestedPropertyIndexValueFacto
         }
 
         // the "blocks values resume" (the combined searchable text values from all blocks) is stored as a string value under the property alias by the base implementation
-        var blocksIndexValues = base.GetIndexValues(property, culture, segment, published, availableCultures).ToDictionary(pair => pair.Key, pair => pair.Value);
+        var blocksIndexValues = base.GetIndexValues(property, culture, segment, published, availableCultures, contentTypeDictionary).ToDictionary(pair => pair.Key, pair => pair.Value);
         var blocksIndexValuesResume = blocksIndexValues.TryGetValue(property.Alias, out IEnumerable<object?>? blocksIndexValuesResumeValue)
                 ? blocksIndexValuesResumeValue.FirstOrDefault() as string
                 : null;
