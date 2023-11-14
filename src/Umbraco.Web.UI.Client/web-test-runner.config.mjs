@@ -97,7 +97,7 @@ export default {
 						'@umbraco-cms/backoffice/member-type': './src/packages/members/member-types/index.ts',
 						'@umbraco-cms/backoffice/package': './src/packages/packages/package/index.ts',
 
-						'@umbraco-cms/backoffice/data-type': './src/packages/settings/data-types/index.ts',
+						'@umbraco-cms/backoffice/data-type': './src/packages/core/data-type/index.ts',
 						'@umbraco-cms/backoffice/language': './src/packages/settings/languages/index.ts',
 						'@umbraco-cms/backoffice/logviewer': './src/packages/settings/logviewer/index.ts',
 						'@umbraco-cms/backoffice/relation-type': './src/packages/settings/relation-types/index.ts',
@@ -141,7 +141,7 @@ export default {
       <body>
         <script type="module" src="${testFramework}"></script>
 				<script type="module">
-					<!-- Hack to disable Lit dev mode warnings -->
+					/* Hack to disable Lit dev mode warnings */
 					const systemWarn = window.console.warn;
 					window.console.warn = (...args) => {
 						if (args[0].indexOf('Lit is in dev mode.') === 0) {

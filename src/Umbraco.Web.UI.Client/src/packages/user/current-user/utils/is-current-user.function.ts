@@ -1,13 +1,13 @@
-import { IUmbAuth, UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
+import { UMB_CURRENT_USER_CONTEXT } from '../current-user.context.js';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export const isCurrentUser = async (host: UmbControllerHost, userId: string) => {
-	let authContext: IUmbAuth | undefined = undefined;
+	let currentUserContext: typeof UMB_CURRENT_USER_CONTEXT.TYPE | undefined;
 
-	await new UmbContextConsumerController(host, UMB_AUTH_CONTEXT, (context) => {
-		authContext = context;
+	await new UmbContextConsumerController(host, UMB_CURRENT_USER_CONTEXT, (context) => {
+		currentUserContext = context;
 	}).asPromise();
 
-	return await authContext!.isUserCurrentUser(userId);
+	return await currentUserContext!.isUserCurrentUser(userId);
 };

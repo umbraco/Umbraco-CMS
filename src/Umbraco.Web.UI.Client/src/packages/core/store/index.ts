@@ -5,3 +5,4 @@ export * from './store-base.js';
 export * from './store.interface.js';
 export * from './store.js';
 export * from './tree-store.interface.js';
+export * from './entity-item.store.js';
