@@ -1,5 +1,5 @@
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { UmbEntityTreeStore } from '@umbraco-cms/backoffice/store';
+import { UmbEntityTreeStore } from '@umbraco-cms/backoffice/tree';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 /**

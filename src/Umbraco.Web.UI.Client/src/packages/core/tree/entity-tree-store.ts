@@ -1,4 +1,4 @@
-import { UmbStoreBase } from './store-base.js';
+import { UmbStoreBase } from '../store/store-base.js';
 import type { UmbTreeStore } from '@umbraco-cms/backoffice/tree';
 import { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
