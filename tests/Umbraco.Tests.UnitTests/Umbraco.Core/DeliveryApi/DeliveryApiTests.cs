@@ -43,6 +43,7 @@ public class DeliveryApiTests
         deliveryApiPropertyValueConverter.Setup(p => p.IsValue(It.IsAny<object?>(), It.IsAny<PropertyValueLevel>())).Returns(true);
         deliveryApiPropertyValueConverter.Setup(p => p.GetPropertyCacheLevel(It.IsAny<IPublishedPropertyType>())).Returns(PropertyCacheLevel.None);
         deliveryApiPropertyValueConverter.Setup(p => p.GetDeliveryApiPropertyCacheLevel(It.IsAny<IPublishedPropertyType>())).Returns(PropertyCacheLevel.None);
+        deliveryApiPropertyValueConverter.Setup(p => p.GetDeliveryApiPropertyCacheLevelForExpansion(It.IsAny<IPublishedPropertyType>())).Returns(PropertyCacheLevel.None);
 
         DeliveryApiPropertyType = SetupPublishedPropertyType(deliveryApiPropertyValueConverter.Object, "deliveryApi", "Delivery.Api.Editor");
 

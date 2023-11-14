@@ -1,3 +1,4 @@
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Routing;
@@ -29,9 +30,25 @@ internal sealed class DeliveryApiItemsEndpointsMatcherPolicy : MatcherPolicy, IE
     public Task ApplyAsync(HttpContext httpContext, CandidateSet candidates)
     {
         var hasIdQueryParameter = httpContext.Request.Query.ContainsKey("id");
+        ApiVersion? requestedApiVersion = httpContext.GetRequestedApiVersion();
         for (var i = 0; i < candidates.Count; i++)
         {
-            ControllerActionDescriptor? controllerActionDescriptor = candidates[i].Endpoint?.Metadata.GetMetadata<ControllerActionDescriptor>();
+            CandidateState candidate = candidates[i];
+            Endpoint? endpoint = candidate.Endpoint;
+
+            // NOTE: nullability for the CandidateState.Endpoint property is not correct - it *can* be null
+            if (endpoint is null)
+            {
+                continue;
+            }
+
+            if (EndpointSupportsApiVersion(endpoint, requestedApiVersion) is false)
+            {
+                candidates.SetValidity(i, false);
+                continue;
+            }
+
+            ControllerActionDescriptor? controllerActionDescriptor = endpoint.Metadata.GetMetadata<ControllerActionDescriptor>();
             if (IsByIdsController(controllerActionDescriptor))
             {
                 candidates.SetValidity(i, hasIdQueryParameter);
@@ -43,6 +60,15 @@ internal sealed class DeliveryApiItemsEndpointsMatcherPolicy : MatcherPolicy, IE
         }
 
         return Task.CompletedTask;
+    }
+
+    private static bool EndpointSupportsApiVersion(Endpoint endpoint, ApiVersion? requestedApiVersion)
+    {
+        ApiVersion[]? supportedApiVersions = endpoint.Metadata.GetMetadata<MapToApiVersionAttribute>()?.Versions.ToArray();
+
+        // if the endpoint is versioned, the requested API version must be among the API versions supported by the endpoint.
+        // if the endpoint is NOT versioned, it cannot be used with a requested API version
+        return supportedApiVersions?.Contains(requestedApiVersion) ?? requestedApiVersion is null;
     }
 
     private static bool IsByIdsController(ControllerActionDescriptor? controllerActionDescriptor)
