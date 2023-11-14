@@ -1,26 +1,27 @@
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
 
-public interface IWebHookService
+public interface IWebhookService
 {
     /// <summary>
     ///     Creates a webhook.
     /// </summary>
     /// <param name="webhook"><see cref="Webhook" /> to create.</param>
-    Task<Webhook> CreateAsync(Webhook webhook);
+    Task<Attempt<Webhook, WebhookOperationStatus>> CreateAsync(Webhook webhook);
 
     /// <summary>
     ///     Updates a webhook.
     /// </summary>
     /// <param name="webhook"><see cref="Webhook" /> to update.</param>
-    Task UpdateAsync(Webhook webhook);
+    Task<Attempt<Webhook, WebhookOperationStatus>> UpdateAsync(Webhook webhook);
 
     /// <summary>
     ///     Deletes a webhook.
     /// </summary>
     /// <param name="key">The unique key of the webhook.</param>
-    Task DeleteAsync(Guid key);
+    Task<Attempt<Webhook?, WebhookOperationStatus>> DeleteAsync(Guid key);
 
     /// <summary>
     ///     Gets a webhook by its key.
@@ -36,5 +37,5 @@ public interface IWebHookService
     /// <summary>
     ///     Gets webhooks by event name.
     /// </summary>
-    Task<IEnumerable<Webhook>> GetByEventNameAsync(string eventName);
+    Task<IEnumerable<Webhook>> GetByAliasAsync(string alias);
 }
