@@ -21,4 +21,4 @@ const store: ManifestStore = {
 	api: UmbDocumentTypeStore,
 };
 
-export const manifests = [repository, store, itemManifests];
+export const manifests = [repository, store, ...itemManifests];
