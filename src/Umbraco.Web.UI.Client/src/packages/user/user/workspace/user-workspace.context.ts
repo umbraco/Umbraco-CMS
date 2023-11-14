@@ -5,20 +5,20 @@ import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controlle
 import type { UpdateUserRequestModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextConsumerController, UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
+import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 
 export class UmbUserWorkspaceContext
 	extends UmbWorkspaceContext<UmbUserRepository, UmbUserDetail>
 	implements UmbSaveableWorkspaceContextInterface<UmbUserDetail | undefined>
 {
-	#authContext?: typeof UMB_AUTH_CONTEXT.TYPE;
+	#currentUserContext?: typeof UMB_CURRENT_USER_CONTEXT.TYPE;
 
 	constructor(host: UmbControllerHostElement) {
 		super(host, 'Umb.Workspace.User', new UmbUserRepository(host));
 
-		new UmbContextConsumerController(host, UMB_AUTH_CONTEXT, (auth) => {
-			this.#authContext = auth;
+		new UmbContextConsumerController(host, UMB_CURRENT_USER_CONTEXT, (instance) => {
+			this.#currentUserContext = instance;
 		});
 	}
 
@@ -35,7 +35,7 @@ export class UmbUserWorkspaceContext
 		this.observe(asObservable(), (user) => this.onUserStoreChanges(user), 'umbUserStoreObserver');
 	}
 
-	/* TODO: some properties are allowed to update without saving. 
+	/* TODO: some properties are allowed to update without saving.
 		For a user properties like state will be updated when one of the entity actions are executed.
 		Therefore we have to subscribe to the user store to update the state in the workspace data.
 		There might be a less manual way to do this.
@@ -82,15 +82,15 @@ export class UmbUserWorkspaceContext
 	}
 
 	async #reloadCurrentUser(savedUserId: string): Promise<void> {
-		if (!this.#authContext) return;
-		const currentUser = await firstValueFrom(this.#authContext.currentUser);
+		if (!this.#currentUserContext) return;
+		const currentUser = await firstValueFrom(this.#currentUserContext.currentUser);
 		if (currentUser?.id === savedUserId) {
-			await this.#authContext.fetchCurrentUser();
+			await this.#currentUserContext.requestCurrentUser();
 		}
 	}
 
 	destroy(): void {
-		this.#data.complete();
+		this.#data.destroy();
 	}
 }
 

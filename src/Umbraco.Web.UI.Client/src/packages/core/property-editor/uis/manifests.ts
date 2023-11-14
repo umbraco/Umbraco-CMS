@@ -72,7 +72,7 @@ export const manifests: Array<ManifestPropertyEditorUi> = [
 		loader: () => import('./number/property-editor-ui-number.element.js'),
 		meta: {
 			label: 'Number',
-			icon: 'umb:autofill',
+			icon: 'icon-autofill',
 			group: 'common',
 			propertyEditorSchemaAlias: 'Umbraco.Integer',
 		},

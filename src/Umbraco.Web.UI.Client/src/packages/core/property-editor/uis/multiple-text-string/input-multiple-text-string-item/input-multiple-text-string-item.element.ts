@@ -92,7 +92,7 @@ export class UmbInputMultipleTextStringItemElement extends FormControlMixin(UmbL
 
 	render() {
 		return html`
-			${this.disabled || this.readonly ? nothing : html`<uui-icon name="umb:navigation"></uui-icon>`}
+			${this.disabled || this.readonly ? nothing : html`<uui-icon name="icon-navigation"></uui-icon>`}
 			<uui-form-validation-message id="validation-message" @invalid=${this.#onInvalid} @valid=${this.#onValid}>
 				<uui-input
 					id="input"
@@ -115,7 +115,7 @@ export class UmbInputMultipleTextStringItemElement extends FormControlMixin(UmbL
 						@click="${this.#onDelete}"
 						?disabled=${this.disabled}
 						compact>
-						<uui-icon name="umb:trash"></uui-icon>
+						<uui-icon name="icon-trash"></uui-icon>
 				  </uui-button>`}
 		`;
 	}

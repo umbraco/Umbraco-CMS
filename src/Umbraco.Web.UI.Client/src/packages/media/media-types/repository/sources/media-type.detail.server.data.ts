@@ -1,7 +1,12 @@
-import type { MediaTypeDetails } from '../../types.js';
-import { MediaTypeDetailDataSource } from './media-type.details.server.data.interface.js';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import {
+	CreateMediaTypeRequestModel,
+	MediaTypeResource,
+	MediaTypeResponseModel,
+	UpdateMediaTypeRequestModel,
+} from '@umbraco-cms/backoffice/backend-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { UmbDataSource } from '@umbraco-cms/backoffice/repository';
 
 /**
  * @description - A data source for the Media Type detail that fetches data from the server
@@ -9,10 +14,12 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
  * @class UmbMediaTypeDetailServerDataSource
  * @implements {MediaTypeDetailDataSource}
  */
-export class UmbMediaTypeDetailServerDataSource implements MediaTypeDetailDataSource {
-	#host: UmbControllerHostElement;
+export class UmbMediaTypeDetailServerDataSource
+	implements UmbDataSource<CreateMediaTypeRequestModel, any, UpdateMediaTypeRequestModel, MediaTypeResponseModel>
+{
+	#host: UmbControllerHost;
 
-	constructor(host: UmbControllerHostElement) {
+	constructor(host: UmbControllerHost) {
 		this.#host = host;
 	}
 
@@ -22,9 +29,9 @@ export class UmbMediaTypeDetailServerDataSource implements MediaTypeDetailDataSo
 	 * @memberof UmbMediaTypeDetailServerDataSource
 	 */
 	async createScaffold() {
-		const data: MediaTypeDetails = {
+		const data: CreateMediaTypeRequestModel = {
 			name: '',
-		} as MediaTypeDetails;
+		} as CreateMediaTypeRequestModel;
 
 		return { data };
 	}
@@ -35,58 +42,50 @@ export class UmbMediaTypeDetailServerDataSource implements MediaTypeDetailDataSo
 	 * @return {*}
 	 * @memberof UmbMediaTypeDetailServerDataSource
 	 */
-	get(id: string) {
-		//return tryExecuteAndNotify(this.#host, MediaTypeResource.getMediaTypeByKey({ id })) as any;
-		// TODO: use backend cli when available.
-		return tryExecuteAndNotify(this.#host, fetch(`/umbraco/management/api/v1/media-type/${id}`)) as any;
+	async get(id: string) {
+		if (!id) throw new Error('Key is missing');
+		return tryExecuteAndNotify(
+			this.#host,
+			MediaTypeResource.getMediaTypeById({
+				id: id,
+			}),
+		);
 	}
 
 	/**
 	 * @description - Updates a MediaType on the server
-	 * @param {MediaTypeDetails} MediaType
+	 * @param {UpdateMediaTypeRequestModel} MediaType
 	 * @return {*}
 	 * @memberof UmbMediaTypeDetailServerDataSource
 	 */
-	async update(mediaType: MediaTypeDetails) {
-		if (!mediaType.id) {
-			throw new Error('MediaType id is missing');
-		}
+	async update(id: string, data: UpdateMediaTypeRequestModel) {
+		if (!id) throw new Error('Key is missing');
 
-		const payload = { id: mediaType.id, requestBody: mediaType };
-		//return tryExecuteAndNotify(this.#host, MediaTypeResource.putMediaTypeByKey(payload));
-
-		// TODO: use backend cli when available.
 		return tryExecuteAndNotify(
 			this.#host,
-			fetch(`/umbraco/management/api/v1/media-type/${mediaType.id}`, {
-				method: 'PUT',
-				body: JSON.stringify(payload),
-				headers: {
-					'Content-Type': 'application/json',
-				},
-			})
-		) as any;
+			MediaTypeResource.putMediaTypeById({
+				id: id,
+				requestBody: data,
+			}),
+		);
 	}
 
 	/**
 	 * @description - Inserts a new MediaType on the server
-	 * @param {MediaTypeDetails} data
+	 * @param {CreateMediaTypeRequestModel} data
 	 * @return {*}
 	 * @memberof UmbMediaTypeDetailServerDataSource
 	 */
-	async insert(data: MediaTypeDetails) {
-		//return tryExecuteAndNotify(this.#host, MediaTypeResource.postMediaType({ requestBody: data }));
-		// TODO: use backend cli when available.
+	async insert(mediaType: CreateMediaTypeRequestModel) {
+		if (!mediaType) throw new Error('Media type is missing');
+		if (!mediaType.id) throw new Error('Media type id is missing');
+
 		return tryExecuteAndNotify(
 			this.#host,
-			fetch(`/umbraco/management/api/v1/media-type/`, {
-				method: 'POST',
-				body: JSON.stringify(data),
-				headers: {
-					'Content-Type': 'application/json',
-				},
-			})
-		) as any;
+			MediaTypeResource.postMediaType({
+				requestBody: mediaType,
+			}),
+		);
 	}
 
 	/**
@@ -96,17 +95,13 @@ export class UmbMediaTypeDetailServerDataSource implements MediaTypeDetailDataSo
 	 * @memberof UmbMediaTypeDetailServerDataSource
 	 */
 	async delete(id: string) {
-		if (!id) {
-			throw new Error('Id is missing');
-		}
+		if (!id) throw new Error('Key is missing');
 
-		//return await tryExecuteAndNotify(this.#host, MediaTypeResource.deleteMediaTypeByKey({ id }));
-		// TODO: use backend cli when available.
 		return tryExecuteAndNotify(
 			this.#host,
-			fetch(`/umbraco/management/api/v1/media-type/${id}`, {
-				method: 'DELETE',
-			})
-		) as any;
+			MediaTypeResource.deleteMediaTypeById({
+				id: id,
+			}),
+		);
 	}
 }

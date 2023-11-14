@@ -8,7 +8,7 @@ export const manifest: ManifestPropertyEditorUi = {
 	meta: {
 		label: 'Text Area',
 		propertyEditorSchemaAlias: 'Umbraco.TextArea',
-		icon: 'umb:edit',
+		icon: 'icon-edit',
 		group: 'common',
 		settings: {
 			properties: [

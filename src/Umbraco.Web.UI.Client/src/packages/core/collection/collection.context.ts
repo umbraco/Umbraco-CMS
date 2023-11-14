@@ -1,3 +1,4 @@
+import { UmbCollectionConfiguration } from './types.js';
 import { UmbCollectionRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbBaseController, type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
@@ -10,7 +11,8 @@ import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 import { ManifestCollectionView, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbCollectionFilterModel } from '@umbraco-cms/backoffice/collection';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
-import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
+import { UmbSelectionManager, UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectionFilterModel> extends UmbBaseController {
 	protected entityType: string;
@@ -19,8 +21,8 @@ export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectio
 	#items = new UmbArrayState<ItemType>([]);
 	public readonly items = this.#items.asObservable();
 
-	#total = new UmbNumberState(0);
-	public readonly total = this.#total.asObservable();
+	#totalItems = new UmbNumberState(0);
+	public readonly totalItems = this.#totalItems.asObservable();
 
 	#selectionManager = new UmbSelectionManager();
 	public readonly selection = this.#selectionManager.selection;
@@ -37,38 +39,24 @@ export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectio
 	repository?: UmbCollectionRepository;
 	collectionRootPathname: string;
 
-	constructor(host: UmbControllerHostElement, entityType: string, repositoryAlias: string) {
+	public readonly pagination = new UmbPaginationManager();
+
+	constructor(host: UmbControllerHostElement, entityType: string, repositoryAlias: string, config: UmbCollectionConfiguration = { pageSize: 50 }) {
 		super(host);
 		this.entityType = entityType;
 
-		this.#selectionManager.setMultiple(true);
+		// listen for page changes on the pagination manager
+		this.pagination.addEventListener(UmbChangeEvent.TYPE, this.#onPageChange);
 
 		const currentUrl = new URL(window.location.href);
 		this.collectionRootPathname = currentUrl.pathname.substring(0, currentUrl.pathname.lastIndexOf('/'));
 
 		this.init = Promise.all([
-			this.observe(
-				umbExtensionsRegistry.getByTypeAndAlias('repository', repositoryAlias),
-				async (repositoryManifest) => {
-					if (repositoryManifest) {
-						const result = await createExtensionApi(repositoryManifest, [this._host]);
-						this.repository = result as UmbCollectionRepository;
-						this.requestCollection();
-					}
-				},
-				'umbCollectionRepositoryObserver'
-			).asPromise(),
-
-			this.observe(umbExtensionsRegistry.extensionsOfType('collectionView').pipe(
-				map((extensions) => {
-					return extensions.filter((extension) => extension.conditions.entityType === this.getEntityType());
-				}),
-			),
-			(views) => {
-				this.#views.next(views);
-				this.#setCurrentView();
-			}, 'umbCollectionViewsObserver').asPromise(),
+			this.#observeRepository(repositoryAlias).asPromise(),
+			this.#observeViews().asPromise(),
 		]);
+
+		this.#configure(config);
 
 		this.provideContext(UMB_COLLECTION_CONTEXT, this);
 	}
@@ -148,8 +136,9 @@ export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectio
 		const { data } = await this.repository.requestCollection(filter);
 
 		if (data) {
-			this.#total.next(data.total);
 			this.#items.next(data.items);
+			this.#totalItems.next(data.total);
+			this.pagination.setTotalItems(data.total);
 		}
 	}
 
@@ -182,6 +171,45 @@ export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectio
 		return this.#currentView.getValue();
 	}
 
+	#configure(configuration: UmbCollectionConfiguration) {
+		this.#selectionManager.setMultiple(true);
+		this.pagination.setPageSize(configuration.pageSize);
+		this.#filter.next({ ...this.#filter.getValue(), skip: 0, take: configuration.pageSize });
+	}
+
+	#observeRepository(repositoryAlias: string) {
+		return this.observe(
+			umbExtensionsRegistry.getByTypeAndAlias('repository', repositoryAlias),
+			async (repositoryManifest) => {
+				if (repositoryManifest) {
+					// TODO: Maybe use the UmbExtensionApiController instead of createExtensionApi, to ensure usage of conditions:
+					const result = await createExtensionApi(repositoryManifest, [this._host]);
+					this.repository = result as UmbCollectionRepository;
+					this.requestCollection();
+				}
+			},
+			'umbCollectionRepositoryObserver'
+		)
+	}
+
+	#observeViews() {
+		return this.observe(umbExtensionsRegistry.extensionsOfType('collectionView').pipe(
+			map((extensions) => {
+				return extensions.filter((extension) => extension.conditions.entityType === this.getEntityType());
+			}),
+		),
+		(views) => {
+			this.#views.next(views);
+			this.#setCurrentView();
+		}, 'umbCollectionViewsObserver');
+	}
+
+	#onPageChange = (event: UmbChangeEvent) => {
+		const target = event.target as UmbPaginationManager;
+		const skipFilter = { skip: target.getSkip() } as Partial<FilterModelType>;
+		this.setFilter(skipFilter);
+	}
+
 	#setCurrentView() {
 		const currentUrl = new URL(window.location.href);
 		const lastPathSegment = currentUrl.pathname.split('/').pop();
@@ -189,7 +217,7 @@ export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectio
 		const viewMatch = views.find((view) => view.meta.pathName === lastPathSegment);
 
 		/* TODO: Find a way to figure out which layout it starts with and set _currentLayout to that instead of [0]. eg. '/table'
-			For document, media and members this will come as part of a data type configuration, but in other cases "users" we should find another way. 
+			For document, media and members this will come as part of a data type configuration, but in other cases "users" we should find another way.
 			This should only happen if the current layout is not set in the URL.
 		*/
 		const currentView = viewMatch || views[0];

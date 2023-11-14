@@ -6,7 +6,7 @@ import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import { tinymce } from '@umbraco-cms/backoffice/external/tinymce';
 
-const tinyIconSet = tinymce.default?.IconManager.get('default');
+const tinyIconSet = tinymce.IconManager.get('default');
 
 type ToolbarConfig = {
 	alias: string;
@@ -87,7 +87,7 @@ export class UmbPropertyEditorUITinyMceToolbarConfigurationElement
 					this._toolbarConfig.push({
 						alias: t.alias,
 						label: t.label,
-						icon: t.icon ?? 'umb:autofill',
+						icon: t.icon ?? 'icon-autofill',
 						selected: this.value.includes(t.alias),
 					});
 				});

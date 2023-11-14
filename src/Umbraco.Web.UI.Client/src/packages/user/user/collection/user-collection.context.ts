@@ -6,7 +6,7 @@ import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api
 
 export class UmbUserCollectionContext extends UmbCollectionContext<UmbUserDetail, UmbUserCollectionFilterModel> {
 	constructor(host: UmbControllerHostElement) {
-		super(host, USER_ENTITY_TYPE, USER_COLLECTION_REPOSITORY_ALIAS);
+		super(host, USER_ENTITY_TYPE, USER_COLLECTION_REPOSITORY_ALIAS, { pageSize: 50 });
 	}
 
 	/**

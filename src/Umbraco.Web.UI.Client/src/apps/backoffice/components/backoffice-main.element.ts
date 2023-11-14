@@ -4,7 +4,7 @@ import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from '@umbraco-cms/backo
 import type { UmbRoute, UmbRouterSlotChangeEvent } from '@umbraco-cms/backoffice/router';
 import type { ManifestSection, UmbSectionElement } from '@umbraco-cms/backoffice/extension-registry';
 import {
-	UmbExtensionManifestController,
+	UmbExtensionManifestInitializer,
 	createExtensionElement,
 } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -15,7 +15,7 @@ export class UmbBackofficeMainElement extends UmbLitElement {
 	private _routes: Array<UmbRoute & { alias: string }> = [];
 
 	@state()
-	private _sections: Array<UmbExtensionManifestController<ManifestSection>> = [];
+	private _sections: Array<UmbExtensionManifestInitializer<ManifestSection>> = [];
 
 	private _routePrefix = 'section/';
 	private _backofficeContext?: UmbBackofficeContext;
@@ -75,12 +75,15 @@ export class UmbBackofficeMainElement extends UmbLitElement {
 		this.requestUpdate('_routes', oldValue);
 	}
 
-	private _onRouteChange = (event: UmbRouterSlotChangeEvent) => {
+	private _onRouteChange = async (event: UmbRouterSlotChangeEvent) => {
 		const currentPath = event.target.localActiveViewPath || '';
 		const section = this._sections.find((s) => this._routePrefix + (s.manifest as any).meta.pathname === currentPath);
 		if (!section) return;
-		this._backofficeContext?.setActiveSectionAlias(section.alias);
-		this._provideSectionContext(section.manifest as any);
+		await section.asPromise();
+		if(section.manifest) {
+			this._backofficeContext?.setActiveSectionAlias(section.alias);
+			this._provideSectionContext(section.manifest);
+		}
 	};
 
 	private _provideSectionContext(sectionManifest: ManifestSection) {

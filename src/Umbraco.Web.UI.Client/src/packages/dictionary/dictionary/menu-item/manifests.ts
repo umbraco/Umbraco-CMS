@@ -8,7 +8,7 @@ const menuItem: ManifestMenuItem = {
 	loader: () => import('./dictionary-menu-item.element.js'),
 	meta: {
 		label: 'Dictionary',
-		icon: 'umb:book-alt',
+		icon: 'icon-book-alt',
 		entityType: 'dictionary-item',
 		menus: ['Umb.Menu.Dictionary'],
 	},

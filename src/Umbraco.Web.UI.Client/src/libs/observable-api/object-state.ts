@@ -21,7 +21,7 @@ export class UmbObjectState<T> extends UmbDeepState<T> {
 	 * myState.update({value: 'myNewValue'});
 	 */
 	update(partialData: Partial<T>) {
-		this.next({ ...this.getValue(), ...partialData });
+		this.next({ ...this._subject.getValue(), ...partialData });
 		return this;
 	}
 }

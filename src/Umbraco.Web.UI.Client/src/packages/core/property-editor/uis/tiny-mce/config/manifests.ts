@@ -9,7 +9,7 @@ const configurationManifests: Array<ManifestPropertyEditorUi> = [
 		meta: {
 			label: 'TinyMCE Toolbar Configuration',
 			propertyEditorSchemaAlias: 'Umbraco.RichText.Configuration',
-			icon: 'umb:autofill',
+			icon: 'icon-autofill',
 			group: 'common',
 		},
 	},
@@ -21,7 +21,7 @@ const configurationManifests: Array<ManifestPropertyEditorUi> = [
 		meta: {
 			label: 'TinyMCE Stylesheets Configuration',
 			propertyEditorSchemaAlias: 'Umbraco.RichText.Configuration',
-			icon: 'umb:autofill',
+			icon: 'icon-autofill',
 			group: 'common',
 		},
 	},
@@ -33,7 +33,7 @@ const configurationManifests: Array<ManifestPropertyEditorUi> = [
 		meta: {
 			label: 'TinyMCE Dimensions Configuration',
 			propertyEditorSchemaAlias: 'Umbraco.RichText.Configuration',
-			icon: 'umb:autofill',
+			icon: 'icon-autofill',
 			group: 'common',
 		},
 	},
@@ -45,7 +45,7 @@ const configurationManifests: Array<ManifestPropertyEditorUi> = [
 		meta: {
 			label: 'TinyMCE Max Image Size Configuration',
 			propertyEditorSchemaAlias: 'Umbraco.RichText.Configuration',
-			icon: 'umb:autofill',
+			icon: 'icon-autofill',
 			group: 'common',
 		},
 	},

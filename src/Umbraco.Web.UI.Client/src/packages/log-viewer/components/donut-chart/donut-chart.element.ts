@@ -270,7 +270,7 @@ export class UmbDonutChartElement extends LitElement {
 				<div
 					id="details-box"
 					style="--pos-y: ${this._posY}px; --pos-x: ${this._posX}px; --umb-donut-detail-color: ${this._detailColor}">
-					<div id="details-title"><uui-icon name="umb:record"></uui-icon>${this._detailName}</div>
+					<div id="details-title"><uui-icon name="icon-record"></uui-icon>${this._detailName}</div>
 					<span>${this._detailAmount} ${this._detailKind}</span>
 				</div>
 			</div>

@@ -1,4 +1,4 @@
-import { sanitizeHtml } from '@umbraco-cms/backoffice/external/sanitize-html';
+import { DOMPurify } from '@umbraco-cms/backoffice/external/dompurify';
 import { marked } from '@umbraco-cms/backoffice/external/marked';
 import { monaco } from '@umbraco-cms/backoffice/external/monaco-editor';
 import { UmbCodeEditorController, UmbCodeEditorElement, loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
@@ -12,6 +12,7 @@ import {
 	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
 	UmbModalManagerContext,
 } from '@umbraco-cms/backoffice/modal';
+import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
 
 /**
  * @element umb-input-markdown
@@ -23,6 +24,7 @@ export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 	protected getFormElement() {
 		return this._codeEditor;
 	}
+
 	// TODO: Make actions be able to handle multiple selection
 
 	@property({ type: Boolean })
@@ -39,11 +41,16 @@ export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 
 	private _modalContext?: UmbModalManagerContext;
 
+	private serverUrl?: string;
+
 	constructor() {
 		super();
 		this.#loadCodeEditor();
 		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
 			this._modalContext = instance;
+		});
+		this.consumeContext(UMB_APP_CONTEXT, (instance) => {
+			this.serverUrl = instance.getServerUrl();
 		});
 	}
 
@@ -67,42 +74,41 @@ export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	async #loadActions() {
-		// TODO: Find a way to have "double" keybindings (ctrl+m+ctrl+c for `code`, rather than simple ctrl+c as its taken by OS to copy things)
-		// Going with the keybindings of a Markdown Shortcut plugin https://marketplace.visualstudio.com/items?itemName=robole.markdown-shortcuts#shortcuts or perhaps there are keybindings that would make more sense.
+		//Note: UI Buttons have the keybindings hardcoded in its title. If you change the keybindings here, please update the render as well.
 		this.#editor?.monacoEditor?.addAction({
 			label: 'Add Heading H1',
 			id: 'h1',
-			keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.Digit1],
+			keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.Digit1],
 			run: () => this._insertAtCurrentLine('# '),
 		});
 		this.#editor?.monacoEditor?.addAction({
 			label: 'Add Heading H2',
 			id: 'h2',
-			keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.Digit2],
+			keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.Digit2],
 			run: () => this._insertAtCurrentLine('## '),
 		});
 		this.#editor?.monacoEditor?.addAction({
 			label: 'Add Heading H3',
 			id: 'h3',
-			keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.Digit3],
+			keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.Digit3],
 			run: () => this._insertAtCurrentLine('### '),
 		});
 		this.#editor?.monacoEditor?.addAction({
 			label: 'Add Heading H4',
 			id: 'h4',
-			keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.Digit4],
+			keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.Digit4],
 			run: () => this._insertAtCurrentLine('#### '),
 		});
 		this.#editor?.monacoEditor?.addAction({
 			label: 'Add Heading H5',
 			id: 'h5',
-			keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.Digit5],
+			keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.Digit5],
 			run: () => this._insertAtCurrentLine('##### '),
 		});
 		this.#editor?.monacoEditor?.addAction({
 			label: 'Add Heading H6',
 			id: 'h6',
-			keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.Digit6],
+			keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.Digit6],
 			run: () => this._insertAtCurrentLine('###### '),
 		});
 		this.#editor?.monacoEditor?.addAction({
@@ -120,52 +126,49 @@ export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 		this.#editor?.monacoEditor?.addAction({
 			label: 'Add Quote',
 			id: 'q',
-			keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyQ],
+			keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.Period],
 			run: () => this._insertQuote(),
 		});
 		this.#editor?.monacoEditor?.addAction({
 			label: 'Add Ordered List',
 			id: 'ol',
-			keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyO],
+			keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.Digit7],
 			run: () => this._insertAtCurrentLine('1. '),
 		});
 		this.#editor?.monacoEditor?.addAction({
 			label: 'Add Unordered List',
 			id: 'ul',
-			keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyU],
+			keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.Digit8],
 			run: () => this._insertAtCurrentLine('- '),
 		});
 		this.#editor?.monacoEditor?.addAction({
 			label: 'Add Code',
 			id: 'code',
-			//keybindings: [KeyMod.CtrlCmd | KeyCode.KeyM | KeyMod.CtrlCmd | KeyCode.KeyC],
+			keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyE],
 			run: () => this._insertBetweenSelection('`', '`', 'Code'),
 		});
 		this.#editor?.monacoEditor?.addAction({
 			label: 'Add Fenced Code',
 			id: 'fenced-code',
-			//keybindings: [KeyMod.CtrlCmd | KeyCode.KeyM | KeyMod.CtrlCmd | KeyCode.KeyF],
 			run: () => this._insertBetweenSelection('```', '```', 'Code'),
 		});
 		this.#editor?.monacoEditor?.addAction({
 			label: 'Add Line',
 			id: 'line',
-			//keybindings: [KeyMod.CtrlCmd | KeyCode.KeyM | KeyMod.CtrlCmd | KeyCode.KeyC],
 			run: () => this._insertLine(),
 		});
 		this.#editor?.monacoEditor?.addAction({
 			label: 'Add Link',
 			id: 'link',
-			//keybindings: [KeyMod.CtrlCmd | KeyCode.KeyM | KeyMod.CtrlCmd | KeyCode.KeyC],
+			keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyK],
 			run: () => this._insertLink(),
-			// TODO: Open in modal
 		});
 		this.#editor?.monacoEditor?.addAction({
 			label: 'Add Image',
 			id: 'image',
-			//keybindings: [KeyMod.CtrlCmd | KeyCode.KeyM | KeyMod.CtrlCmd | KeyCode.KeyC],
+			//keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyJ], // What keybinding would be good for image?
 			run: () => this._insertMedia(),
-			// TODO: Open in modal
+			// TODO: Update when media picker is complete.
 		});
 	}
 
@@ -221,7 +224,7 @@ export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 		const selection = this.#editor?.getSelections()[0];
 		if (!selection) return;
 
-		const alt = this.#editor?.getValueInRange(selection);
+		const alt = this.#editor?.getValueInRange(selection) || 'alt text';
 
 		this._focusEditor(); // Focus before opening modal, otherwise cannot regain focus back after modal
 		const modalContext = this._modalContext?.open(UMB_MEDIA_TREE_PICKER_MODAL, {});
@@ -231,18 +234,18 @@ export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 			.then((data) => {
 				const imgUrl = data.selection[0];
 				this.#editor?.monacoEditor?.executeEdits('', [
-					//TODO: media url
-					{ range: selection, text: `[${alt || 'alt text'}](TODO: id-${imgUrl || this.localize.term('general_url')})` },
+					//TODO: Get the correct media URL
+					{
+						range: selection,
+						text: `![${alt}](${imgUrl ? `${this.serverUrl}'/media/'${imgUrl}` : 'URL'})`,
+					},
 				]);
-
-				if (!alt?.length) {
-					this.#editor?.select({
-						startColumn: selection.startColumn + 1,
-						endColumn: selection.startColumn + 9,
-						endLineNumber: selection.startLineNumber,
-						startLineNumber: selection.startLineNumber,
-					});
-				}
+				this.#editor?.select({
+					startColumn: selection.startColumn + 2,
+					endColumn: selection.startColumn + alt.length + 2, // +2 because of ![
+					endLineNumber: selection.startLineNumber,
+					startLineNumber: selection.startLineNumber,
+				});
 			})
 			.catch(() => undefined)
 			.finally(() => this._focusEditor());
@@ -413,7 +416,7 @@ export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 					compact
 					look="secondary"
 					label="Heading"
-					title="Heading"
+					title="Heading, &lt;Ctrl+Shift+1&gt;"
 					@click=${() => this.#editor?.monacoEditor?.getAction('h1')?.run()}>
 					H
 				</uui-button>
@@ -421,7 +424,7 @@ export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 					compact
 					look="secondary"
 					label="Bold"
-					title="Bold"
+					title="Bold, &lt;Ctrl+B&gt;"
 					@click=${() => this.#editor?.monacoEditor?.getAction('b')?.run()}>
 					B
 				</uui-button>
@@ -429,7 +432,7 @@ export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 					compact
 					look="secondary"
 					label="Italic"
-					title="Italic"
+					title="Italic, &lt;Ctrl+I&gt;"
 					@click=${() => this.#editor?.monacoEditor?.getAction('i')?.run()}>
 					I
 				</uui-button>
@@ -439,35 +442,35 @@ export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 					compact
 					look="secondary"
 					label="Quote"
-					title="Quote"
+					title="Quote, &lt;Ctrl+Shift+.&gt;"
 					@click=${() => this.#editor?.monacoEditor?.getAction('q')?.run()}>
-					<uui-icon name="umb:quote"></uui-icon>
+					<uui-icon name="icon-quote"></uui-icon>
 				</uui-button>
 				<uui-button
 					compact
 					look="secondary"
 					label="Ordered List"
-					title="Ordered List"
+					title="Ordered List, &lt;Ctrl+Shift+7&gt;"
 					@click=${() => this.#editor?.monacoEditor?.getAction('ol')?.run()}>
-					<uui-icon name="umb:ordered-list"></uui-icon>
+					<uui-icon name="icon-ordered-list"></uui-icon>
 				</uui-button>
 				<uui-button
 					compact
 					look="secondary"
 					label="Unordered List"
-					title="Unordered List"
+					title="Unordered List, &lt;Ctrl+Shift+8&gt;"
 					@click=${() => this.#editor?.monacoEditor?.getAction('ul')?.run()}>
-					<uui-icon name="umb:bulleted-list"></uui-icon>
+					<uui-icon name="icon-bulleted-list"></uui-icon>
 				</uui-button>
 			</div>
 			<div>
 				<uui-button
 					compact
 					look="secondary"
-					label="Fenced Code"
-					title="Fenced Code"
-					@click=${() => this.#editor?.monacoEditor?.getAction('fenced-code')?.run()}>
-					<uui-icon name="umb:code"></uui-icon>
+					label="Code"
+					title="Code, &lt;Ctrl+E&gt;"
+					@click=${() => this.#editor?.monacoEditor?.getAction('code')?.run()}>
+					<uui-icon name="icon-code"></uui-icon>
 				</uui-button>
 				<uui-button
 					compact
@@ -475,15 +478,15 @@ export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 					label="Line"
 					title="Line"
 					@click=${() => this.#editor?.monacoEditor?.getAction('line')?.run()}>
-					<uui-icon name="umb:width"></uui-icon>
+					<uui-icon name="icon-width"></uui-icon>
 				</uui-button>
 				<uui-button
 					compact
 					look="secondary"
 					label="Link"
-					title="Link"
+					title="Link, &lt;Ctrl+K&gt;"
 					@click=${() => this.#editor?.monacoEditor?.getAction('link')?.run()}>
-					<uui-icon name="umb:link"></uui-icon>
+					<uui-icon name="icon-link"></uui-icon>
 				</uui-button>
 				<uui-button
 					compact
@@ -491,7 +494,7 @@ export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 					label="Image"
 					title="Image"
 					@click=${() => this.#editor?.monacoEditor?.getAction('image')?.run()}>
-					<uui-icon name="umb:picture"></uui-icon>
+					<uui-icon name="icon-picture"></uui-icon>
 				</uui-button>
 			</div>
 			<div>
@@ -533,7 +536,6 @@ export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	render() {
-		//TODO: Why is the theme dark in Backoffice, but light in Storybook?
 		return html` <div id="actions">${this._renderBasicActions()}</div>
 			<umb-code-editor
 				language="markdown"
@@ -546,10 +548,8 @@ export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 
 	renderPreview(markdown: string) {
 		const markdownAsHtml = marked.parse(markdown);
-		const sanitizedHtml = markdownAsHtml ? sanitizeHtml(markdownAsHtml) : '';
-		return html`<uui-scroll-container id="preview">
-			${unsafeHTML(sanitizedHtml)}
-		</uui-scroll-container>`;
+		const sanitizedHtml = markdownAsHtml ? DOMPurify.sanitize(markdownAsHtml) : '';
+		return html`<uui-scroll-container id="preview"> ${unsafeHTML(sanitizedHtml)} </uui-scroll-container>`;
 	}
 
 	static styles = [
@@ -592,6 +592,19 @@ export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 				border-left: 2px solid var(--uui-color-default-emphasis);
 				margin-inline: 0;
 				padding-inline: var(--uui-size-3);
+			}
+
+			p > code,
+			pre {
+				border: 1px solid var(--uui-color-divider-emphasis);
+				border-radius: var(--uui-border-radius);
+				padding: 0 var(--uui-size-1);
+				background-color: var(--uui-color-background);
+			}
+
+			hr {
+				border: none;
+				border-bottom: 1px solid var(--uui-palette-cocoa-black);
 			}
 		`,
 	];

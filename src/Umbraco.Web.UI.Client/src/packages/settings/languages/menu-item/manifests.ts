@@ -7,7 +7,7 @@ const menuItem: ManifestMenuItem = {
 	weight: 100,
 	meta: {
 		label: 'Languages',
-		icon: 'umb:globe',
+		icon: 'icon-globe',
 		entityType: 'language-root',
 		menus: ['Umb.Menu.Settings'],
 	},

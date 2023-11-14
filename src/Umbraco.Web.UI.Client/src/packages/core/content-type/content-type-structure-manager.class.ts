@@ -452,7 +452,7 @@ export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepositor
 	}
 	public destroy() {
 		this._reset();
-		this.#contentTypes.complete();
-		this.#containers.complete();
+		this.#contentTypes.destroy();
+		this.#containers.destroy();
 	}
 }

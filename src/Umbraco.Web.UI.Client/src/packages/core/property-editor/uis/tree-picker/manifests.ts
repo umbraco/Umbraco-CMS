@@ -8,7 +8,7 @@ const manifest: ManifestPropertyEditorUi = {
 	loader: () => import('./property-editor-ui-tree-picker.element.js'),
 	meta: {
 		label: 'Tree Picker',
-		icon: 'umb:page-add',
+		icon: 'icon-page-add',
 		group: 'pickers',
 		propertyEditorSchemaAlias: 'Umbraco.MultiNodeTreePicker',
 		settings: {

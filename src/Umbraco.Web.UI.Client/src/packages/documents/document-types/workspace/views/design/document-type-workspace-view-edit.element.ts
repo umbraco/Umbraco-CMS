@@ -295,7 +295,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 	renderAddButton() {
 		if (this.sortModeActive) return;
 		return html`<uui-button id="add-tab" @click="${this.#addTab}" label="Add tab" compact>
-			<uui-icon name="umb:add"></uui-icon>
+			<uui-icon name="icon-add"></uui-icon>
 			Add tab
 		</uui-button>`;
 	}
@@ -307,11 +307,11 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 
 		return html`<div class="tab-actions">
 			<uui-button look="outline" label=${this.localize.term('contentTypeEditor_compositions')} compact>
-				<uui-icon name="umb:merge"></uui-icon>
+				<uui-icon name="icon-merge"></uui-icon>
 				${this.localize.term('contentTypeEditor_compositions')}
 			</uui-button>
 			<uui-button look="outline" label=${sortButtonText} compact @click=${this.#changeMode}>
-				<uui-icon name="umb:navigation"></uui-icon>
+				<uui-icon name="icon-navigation"></uui-icon>
 				${sortButtonText}
 			</uui-button>
 		</div>`;
@@ -362,8 +362,8 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 		if (this.sortModeActive) {
 			return html`<div class="no-edit">
 				${tabInherited
-					? html`<uui-icon class="external" name="umb:merge"></uui-icon>${tab.name!}`
-					: html`<uui-icon name="umb:navigation" class="drag-${tab.id}"> </uui-icon>${tab.name!}
+					? html`<uui-icon class="external" name="icon-merge"></uui-icon>${tab.name!}`
+					: html`<uui-icon name="icon-navigation" class="drag-${tab.id}"> </uui-icon>${tab.name!}
 							<uui-input
 								label="sort order"
 								type="number"
@@ -392,7 +392,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 		}
 
 		if (tabInherited) {
-			return html`<div class="no-edit"><uui-icon name="umb:merge"></uui-icon>${tab.name!}</div>`;
+			return html`<div class="no-edit"><uui-icon name="icon-merge"></uui-icon>${tab.name!}</div>`;
 		} else {
 			return html`<div class="no-edit">${tab.name!} ${this.renderDeleteFor(tab)}</div>`;
 		}
@@ -412,7 +412,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement
 			?disabled=${this._buttonDisabled}
 			@click=${() => this.#requestRemoveTab(tab)}
 			compact>
-			<uui-icon name="umb:trash"></uui-icon>
+			<uui-icon name="icon-trash"></uui-icon>
 		</uui-button>`;
 	}
 

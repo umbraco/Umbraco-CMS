@@ -61,6 +61,7 @@ export class UmbCollectionElement extends UmbLitElement {
 			<umb-body-layout header-transparent>
 				${this.renderToolbar()}
 				<umb-router-slot id="router-slot" .routes="${this._routes}"></umb-router-slot>
+				${this.renderPagination()}
 				${this.renderSelectionActions()}
 			</umb-body-layout>
 		`;
@@ -68,6 +69,10 @@ export class UmbCollectionElement extends UmbLitElement {
 
 	protected renderToolbar() {
 		return html`<umb-collection-toolbar slot="header"></umb-collection-toolbar>`;
+	}
+
+	protected renderPagination () {
+		return html`<umb-collection-pagination></umb-collection-pagination>`;
 	}
 
 	protected renderSelectionActions() {

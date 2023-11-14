@@ -11,7 +11,7 @@ const sectionsViews: Array<ManifestSectionView> = [
 		meta: {
 			label: 'User Groups',
 			pathname: 'user-groups',
-			icon: 'umb:users',
+			icon: 'icon-users',
 		},
 		conditions: [
 			{

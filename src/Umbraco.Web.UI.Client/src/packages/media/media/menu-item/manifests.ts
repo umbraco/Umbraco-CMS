@@ -8,7 +8,7 @@ const menuItem: ManifestMenuItem = {
 	loader: () => import('./media-menu-item.element.js'),
 	meta: {
 		label: 'Media',
-		icon: 'umb:folder',
+		icon: 'icon-folder',
 		menus: ['Umb.Menu.Media'],
 	},
 };

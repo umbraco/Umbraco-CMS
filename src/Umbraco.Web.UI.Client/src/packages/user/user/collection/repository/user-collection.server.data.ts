@@ -1,7 +1,7 @@
 import { USER_ENTITY_TYPE, type UmbUserCollectionFilterModel, type UmbUserDetail } from '../../types.js';
 import { UmbCollectionDataSource, extendDataSourcePagedResponseData } from '@umbraco-cms/backoffice/repository';
 import { UserResource } from '@umbraco-cms/backoffice/backend-api';
-import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
@@ -23,24 +23,12 @@ export class UmbUserCollectionServerDataSource implements UmbCollectionDataSourc
 	}
 
 	/**
-	 * Gets the user collection from the server.
-	 * @return {*}
-	 * @memberof UmbUserCollectionServerDataSource
-	 */
-	async getCollection() {
-		const response = await tryExecuteAndNotify(this.#host, UserResource.getUser({}));
-		return extendDataSourcePagedResponseData<UmbUserDetail>(response, {
-			entityType: USER_ENTITY_TYPE,
-		});
-	}
-
-	/**
 	 * Gets the user collection filtered by the given filter.
 	 * @param {UmbUserCollectionFilterModel} filter
 	 * @return {*}
 	 * @memberof UmbUserCollectionServerDataSource
 	 */
-	async filterCollection(filter: UmbUserCollectionFilterModel) {
+	async getCollection(filter: UmbUserCollectionFilterModel) {
 		const response = await tryExecuteAndNotify(this.#host, UserResource.getUserFilter(filter));
 		return extendDataSourcePagedResponseData<UmbUserDetail>(response, {
 			entityType: USER_ENTITY_TYPE,

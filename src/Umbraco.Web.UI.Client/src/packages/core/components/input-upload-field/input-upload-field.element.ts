@@ -124,7 +124,7 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 				})}
 			</div>
 			<uui-button compact @click=${this.#handleRemove} label="Remove files">
-				<uui-icon name="umb:trash"></uui-icon> Remove file(s)
+				<uui-icon name="icon-trash"></uui-icon> Remove file(s)
 			</uui-button>`;
 	}
 

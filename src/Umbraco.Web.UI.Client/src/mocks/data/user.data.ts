@@ -1,11 +1,13 @@
-import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbEntityData } from './entity.data.js';
 import { umbUserGroupData } from './user-group.data.js';
-import { UmbLoggedInUser } from '@umbraco-cms/backoffice/auth';
+import { arrayFilter, stringFilter, queryFilter } from './utils.js';
+import { UmbId } from '@umbraco-cms/backoffice/id';
+import { UmbCurrentUser } from '@umbraco-cms/backoffice/current-user';
 import {
 	CreateUserRequestModel,
 	CreateUserResponseModel,
 	InviteUserRequestModel,
+	PagedUserResponseModel,
 	UpdateUserGroupsOnUserRequestModel,
 	UserItemResponseModel,
 	UserResponseModel,
@@ -18,6 +20,12 @@ const createUserItem = (item: UserResponseModel): UserItemResponseModel => {
 		id: item.id,
 	};
 };
+
+const userGroupFilter = (filterOptions: any, item: UserResponseModel) =>
+	arrayFilter(filterOptions.userGroupIds, item.userGroupIds);
+const userStateFilter = (filterOptions: any, item: UserResponseModel) =>
+	stringFilter(filterOptions.userStates, item.state);
+const userQueryFilter = (filterOptions: any, item: UserResponseModel) => queryFilter(filterOptions.filter, item.name);
 
 // Temp mocked database
 class UmbUserData extends UmbEntityData<UserResponseModel> {
@@ -83,7 +91,7 @@ class UmbUserData extends UmbEntityData<UserResponseModel> {
 	 * @return {*}  {UmbLoggedInUser}
 	 * @memberof UmbUserData
 	 */
-	getCurrentUser(): UmbLoggedInUser {
+	getCurrentUser(): UmbCurrentUser {
 		const firstUser = this.data[0];
 		const permissions = firstUser.userGroupIds?.length ? umbUserGroupData.getPermissions(firstUser.userGroupIds) : [];
 
@@ -139,6 +147,11 @@ class UmbUserData extends UmbEntityData<UserResponseModel> {
 		});
 	}
 
+	/**
+	 * Invites a user
+	 * @param {InviteUserRequestModel} data
+	 * @memberof UmbUserData
+	 */
 	invite(data: InviteUserRequestModel): void {
 		const invitedUser = {
 			status: UserStateModel.INVITED,
@@ -146,6 +159,32 @@ class UmbUserData extends UmbEntityData<UserResponseModel> {
 		};
 
 		this.createUser(invitedUser);
+	}
+
+	filter(options: any): PagedUserResponseModel {
+		const { items: allItems } = this.getAll();
+
+		const filterOptions = {
+			skip: options.skip || 0,
+			take: options.take || 25,
+			orderBy: options.orderBy || 'name',
+			orderDirection: options.orderDirection || 'asc',
+			userGroupIds: options.userGroupIds,
+			userStates: options.userStates,
+			filter: options.filter,
+		};
+
+		const filteredItems = allItems.filter(
+			(item) =>
+				userGroupFilter(filterOptions, item) &&
+				userStateFilter(filterOptions, item) &&
+				userQueryFilter(filterOptions, item),
+		);
+		const totalItems = filteredItems.length;
+
+		const paginatedItems = filteredItems.slice(filterOptions.skip, filterOptions.skip + filterOptions.take);
+
+		return { total: totalItems, items: paginatedItems };
 	}
 }
 

@@ -1,6 +1,6 @@
 import type { UmbTreeDataSource } from '@umbraco-cms/backoffice/repository';
 import { DataTypeResource } from '@umbraco-cms/backoffice/backend-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
@@ -10,14 +10,14 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
  * @implements {DocumentTreeDataSource}
  */
 export class UmbDataTypeTreeServerDataSource implements UmbTreeDataSource {
-	#host: UmbControllerHostElement;
+	#host: UmbControllerHost;
 
 	/**
 	 * Creates an instance of UmbDataTypeTreeServerDataSource.
-	 * @param {UmbControllerHostElement} host
+	 * @param {UmbControllerHost} host
 	 * @memberof UmbDataTypeTreeServerDataSource
 	 */
-	constructor(host: UmbControllerHostElement) {
+	constructor(host: UmbControllerHost) {
 		this.#host = host;
 	}
 
@@ -39,7 +39,7 @@ export class UmbDataTypeTreeServerDataSource implements UmbTreeDataSource {
 	async getChildrenOf(parentId: string | null) {
 		if (parentId === undefined) throw new Error('Parent id is missing');
 
-		/* TODO: should we make getRootItems() internal 
+		/* TODO: should we make getRootItems() internal
 		so it only is a server concern that there are two endpoints? */
 		if (parentId === null) {
 			return this.getRootItems();

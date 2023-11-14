@@ -80,7 +80,7 @@ export const handlers = [
 
 		if (!data) return;
 
-		data.icon = 'umb:book-alt';
+		data.icon = 'icon-book-alt';
 		data.hasChildren = false;
 		data.type = 'dictionary-item';
 

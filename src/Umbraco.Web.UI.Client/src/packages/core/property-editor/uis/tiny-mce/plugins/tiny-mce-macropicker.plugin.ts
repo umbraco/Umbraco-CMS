@@ -5,7 +5,7 @@ import {
 	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
 	UmbModalManagerContext,
 } from '@umbraco-cms/backoffice/modal';
-import { tinymce } from '@umbraco-cms/backoffice/external/tinymce';
+import type { AstNode } from '@umbraco-cms/backoffice/external/tinymce';
 
 interface DialogData {
 	richTextEditor: boolean;
@@ -23,7 +23,7 @@ export default class UmbTinyMceMacroPickerPlugin extends UmbTinyMcePluginBase {
 	constructor(args: TinyMcePluginArguments) {
 		super(args);
 
-		this.host.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (modalContext) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (modalContext) => {
 			this.#modalContext = modalContext;
 		});
 
@@ -34,7 +34,7 @@ export default class UmbTinyMceMacroPickerPlugin extends UmbTinyMcePluginBase {
 			this.editor.serializer.addRules('div');
 
 			/** This checks if the div is a macro container, if so, checks if its wrapped in a p tag and then unwraps it (removes p tag) */
-			this.editor.serializer.addNodeFilter('div', (nodes: Array<tinymce.AstNode>) => {
+			this.editor.serializer.addNodeFilter('div', (nodes: Array<AstNode>) => {
 				for (let i = 0; i < nodes.length; i++) {
 					if (nodes[i].attr('class') === 'umb-macro-holder' && nodes[i].parent?.name.toLowerCase() === 'p') {
 						nodes[i].parent?.unwrap();
@@ -148,7 +148,7 @@ export default class UmbTinyMceMacroPickerPlugin extends UmbTinyMcePluginBase {
 				class: `umb-macro-holder ${macroObject.macroAlias} ${uniqueId} mceNonEditable`,
 				contenteditable: 'false',
 			},
-			`${macroSyntaxComment}<ins>Macro alias: <strong>${macroObject.macroAlias}</strong></ins>`
+			`${macroSyntaxComment}<ins>Macro alias: <strong>${macroObject.macroAlias}</strong></ins>`,
 		);
 
 		//if there's an activeMacroElement then replace it, otherwise set the contents of the selected node
