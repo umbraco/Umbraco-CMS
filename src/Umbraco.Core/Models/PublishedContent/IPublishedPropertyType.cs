@@ -57,6 +57,12 @@ public interface IPublishedPropertyType
     PropertyCacheLevel DeliveryApiCacheLevel { get; }
 
     /// <summary>
+    ///     Gets the property cache level for Delivery API representation when expanding the property.
+    /// </summary>
+    /// <remarks>Defaults to the value of <see cref="DeliveryApiCacheLevel"/>.</remarks>
+    PropertyCacheLevel DeliveryApiCacheLevelForExpansion => DeliveryApiCacheLevel;
+
+    /// <summary>
     ///     Gets the property model CLR type.
     /// </summary>
     /// <remarks>
