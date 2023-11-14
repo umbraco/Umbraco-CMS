@@ -1,15 +1,12 @@
+import { type UmbTreeItemModel } from '../tree/types.js';
 import { type UmbPagedData } from './data-source/types.js';
 import { type Observable } from '@umbraco-cms/backoffice/external/rxjs';
-import type { UmbTreeRootEntityModel, UmbTreeRootModel } from '@umbraco-cms/backoffice/tree';
-import { ProblemDetails, EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { ProblemDetails } from '@umbraco-cms/backoffice/backend-api';
 import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
-export interface UmbTreeRepository<
-	TreeItemType extends EntityTreeItemResponseModel,
-	TreeRootType extends UmbTreeRootModel = UmbTreeRootEntityModel
-> extends UmbApi {
+export interface UmbTreeRepository<TreeItemType extends UmbTreeItemModel = UmbTreeItemModel> extends UmbApi {
 	requestTreeRoot: () => Promise<{
-		data?: TreeRootType;
+		data?: TreeItemType;
 		error?: ProblemDetails;
 	}>;
 
