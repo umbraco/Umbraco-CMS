@@ -1,5 +1,5 @@
-import { type UmbPagedData } from '../repository/data-source/types.js';
-import { UmbTreeItemModelBase, type UmbTreeItemModel, UmbEntityTreeRootModel } from '@umbraco-cms/backoffice/tree';
+import type { UmbTreeItemModelBase, UmbTreeItemModel, UmbEntityTreeRootModel } from './types.js';
+import type { UmbPagedData } from '@umbraco-cms/backoffice/repository';
 import { type Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { ProblemDetails } from '@umbraco-cms/backoffice/backend-api';
 import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
