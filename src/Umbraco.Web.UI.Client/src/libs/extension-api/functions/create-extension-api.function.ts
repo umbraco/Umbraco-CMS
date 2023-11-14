@@ -7,7 +7,7 @@ export async function createExtensionApi<ApiType extends UmbApi = UmbApi>(manife
 	if(manifest.api) {
 		const apiConstructor = await loadManifestApi<ApiType>(manifest.api);
 		if(apiConstructor) {
-			return new apiConstructor(constructorArguments);
+			return new apiConstructor(...constructorArguments);
 		} else {
 			console.error(
 				`-- Extension of alias "${manifest.alias}" did not succeed instantiate a API class via the extension manifest property 'api', using either a 'api' or 'default' export`,
@@ -19,7 +19,7 @@ export async function createExtensionApi<ApiType extends UmbApi = UmbApi>(manife
 	if(manifest.js) {
 		const apiConstructor2 = await loadManifestApi<ApiType>(manifest.js);
 		if(apiConstructor2) {
-			return new apiConstructor2(constructorArguments);
+			return new apiConstructor2(...constructorArguments);
 		} else {
 			console.error(
 				`-- Extension of alias "${manifest.alias}" did not succeed instantiate a API class via the extension manifest property 'js', using either a 'api' or 'default' export`,
