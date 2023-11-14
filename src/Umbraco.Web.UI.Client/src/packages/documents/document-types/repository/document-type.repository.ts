@@ -1,4 +1,4 @@
-import { UmbDocumentTypeTreeServerDataSource } from './sources/document-type.tree.server.data.js';
+import { UmbDocumentTypeTreeServerDataSource } from '../tree/document-type.tree.server.data-source.js';
 import { UmbDocumentTypeServerDataSource } from './sources/document-type.server.data.js';
 import { UmbDocumentTypeTreeStore, UMB_DOCUMENT_TYPE_TREE_STORE_CONTEXT_TOKEN } from './document-type.tree.store.js';
 import { UmbDocumentTypeStore, UMB_DOCUMENT_TYPE_STORE_CONTEXT_TOKEN } from './document-type.store.js';

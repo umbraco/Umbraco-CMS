@@ -4,42 +4,13 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
- * A data source for the Document tree that fetches data from the server
+ * A data source for the Document Type tree that fetches data from the server
  * @export
  * @class UmbDocumentTypeTreeServerDataSource
  * @implements {UmbTreeDataSource}
  */
 export class UmbDocumentTypeTreeServerDataSource implements UmbTreeDataSource {
 	#host: UmbControllerHost;
-
-	// TODO: how do we handle trashed items?
-	async trashItems(ids: Array<string>) {
-		// TODO: use backend cli when available.
-		return tryExecuteAndNotify(
-			this.#host,
-			fetch('/umbraco/management/api/v1/document-type/trash', {
-				method: 'POST',
-				body: JSON.stringify(ids),
-				headers: {
-					'Content-Type': 'application/json',
-				},
-			}),
-		);
-	}
-
-	async moveItems(ids: Array<string>, destination: string) {
-		// TODO: use backend cli when available.
-		return tryExecuteAndNotify(
-			this.#host,
-			fetch('/umbraco/management/api/v1/document-type/move', {
-				method: 'POST',
-				body: JSON.stringify({ ids: ids, destination }),
-				headers: {
-					'Content-Type': 'application/json',
-				},
-			}),
-		);
-	}
 
 	/**
 	 * Creates an instance of UmbDocumentTypeTreeServerDataSource.
