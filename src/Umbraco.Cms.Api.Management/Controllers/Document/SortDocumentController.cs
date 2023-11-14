@@ -39,14 +39,14 @@ public class SortDocumentController : DocumentControllerBase
     {
         AuthorizationResult authorizationResult;
 
-        if (sortingRequestModel.ParentId is null)
+        if (sortingRequestModel.ParentId.HasValue is false)
         {
             authorizationResult = await _authorizationService.AuthorizeAsync(User, new[] { ActionSort.ActionLetter },
                 $"New{AuthorizationPolicies.ContentPermissionAtRoot}");
         }
         else
         {
-            var resource = new ContentPermissionResource((Guid)sortingRequestModel.ParentId, ActionSort.ActionLetter);
+            var resource = new ContentPermissionResource(sortingRequestModel.ParentId.Value, ActionSort.ActionLetter);
             authorizationResult = await _authorizationService.AuthorizeAsync(User, resource,
                 $"New{AuthorizationPolicies.ContentPermissionByResource}");
         }

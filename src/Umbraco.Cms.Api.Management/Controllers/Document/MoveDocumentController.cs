@@ -40,14 +40,14 @@ public class MoveDocumentController : DocumentControllerBase
     {
         AuthorizationResult authorizationResult;
 
-        if (moveDocumentRequestModel.TargetId is null)
+        if (moveDocumentRequestModel.TargetId.HasValue is false)
         {
             authorizationResult = await _authorizationService.AuthorizeAsync(User, new[] { ActionMove.ActionLetter },
                 $"New{AuthorizationPolicies.ContentPermissionAtRoot}");
         }
         else
         {
-            var resource = new ContentPermissionResource((Guid)moveDocumentRequestModel.TargetId, ActionMove.ActionLetter);
+            var resource = new ContentPermissionResource(moveDocumentRequestModel.TargetId.Value, ActionMove.ActionLetter);
             authorizationResult = await _authorizationService.AuthorizeAsync(User, resource,
                 $"New{AuthorizationPolicies.ContentPermissionByResource}");
         }

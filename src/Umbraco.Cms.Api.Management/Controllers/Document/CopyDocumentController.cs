@@ -40,14 +40,14 @@ public class CopyDocumentController : DocumentControllerBase
     {
         AuthorizationResult authorizationResult;
 
-        if (copyDocumentRequestModel.TargetId is null)
+        if (copyDocumentRequestModel.TargetId.HasValue is false)
         {
             authorizationResult = await _authorizationService.AuthorizeAsync(User, new[] { ActionCopy.ActionLetter },
                 $"New{AuthorizationPolicies.ContentPermissionAtRoot}");
         }
         else
         {
-            var resource = new ContentPermissionResource((Guid)copyDocumentRequestModel.TargetId, ActionCopy.ActionLetter);
+            var resource = new ContentPermissionResource(copyDocumentRequestModel.TargetId.Value, ActionCopy.ActionLetter);
             authorizationResult = await _authorizationService.AuthorizeAsync(User, resource,
                 $"New{AuthorizationPolicies.ContentPermissionByResource}");
         }

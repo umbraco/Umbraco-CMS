@@ -45,14 +45,14 @@ public class CreateDocumentController : DocumentControllerBase
     {
         AuthorizationResult authorizationResult;
 
-        if (requestModel.ParentId is null)
+        if (requestModel.ParentId.HasValue is false)
         {
             authorizationResult = await _authorizationService.AuthorizeAsync(User, new[] { ActionNew.ActionLetter },
                 $"New{AuthorizationPolicies.ContentPermissionAtRoot}");
         }
         else
         {
-            var resource = new ContentPermissionResource((Guid)requestModel.ParentId, ActionNew.ActionLetter);
+            var resource = new ContentPermissionResource(requestModel.ParentId.Value, ActionNew.ActionLetter);
             authorizationResult = await _authorizationService.AuthorizeAsync(User, resource,
                 $"New{AuthorizationPolicies.ContentPermissionByResource}");
         }
