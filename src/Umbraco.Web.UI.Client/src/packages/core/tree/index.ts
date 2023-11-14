@@ -1,3 +1,4 @@
+export * from './components/index.js';
 export * from './entity-tree-item/index.js';
 export * from './file-system-tree-item/index.js';
 export * from './tree-item/index.js';
