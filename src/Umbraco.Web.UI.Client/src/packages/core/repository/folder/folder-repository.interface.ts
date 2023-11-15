@@ -3,7 +3,7 @@ import type { ProblemDetails } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
 // TODO add response types folder folders
-export interface UmbEntityFolderRepository extends UmbApi {
+export interface UmbFolderRepository extends UmbApi {
 	createFolderScaffold(unique: string | null): Promise<{
 		data?: any;
 		error?: ProblemDetails;

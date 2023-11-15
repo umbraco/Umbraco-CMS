@@ -25,7 +25,7 @@ import {
 	DataSourceResponse,
 	UmbDataSourceErrorResponse,
 	UmbDetailRepository,
-	UmbEntityFolderRepository,
+	UmbFolderRepository,
 } from '@umbraco-cms/backoffice/repository';
 import { UmbTreeRepository } from '@umbraco-cms/backoffice/tree';
 import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
@@ -41,7 +41,7 @@ export class UmbPartialViewsRepository
 			PartialViewResponseModel,
 			string
 		>,
-		UmbEntityFolderRepository,
+		UmbFolderRepository,
 		UmbApi
 {
 	#init;

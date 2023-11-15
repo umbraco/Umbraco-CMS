@@ -12,7 +12,7 @@ import {
 	DataSourceResponse,
 	UmbDataSourceErrorResponse,
 	UmbDetailRepository,
-	UmbEntityFolderRepository,
+	UmbFolderRepository,
 } from '@umbraco-cms/backoffice/repository';
 import { UmbTreeRepository } from '@umbraco-cms/backoffice/tree';
 import {
@@ -41,7 +41,7 @@ export class UmbStylesheetRepository
 	implements
 		UmbTreeRepository<FileSystemTreeItemPresentationModel, UmbFileSystemTreeRootModel>,
 		UmbDetailRepository<CreateStylesheetRequestModel, string, UpdateStylesheetRequestModel, StylesheetDetails>,
-		UmbEntityFolderRepository,
+		UmbFolderRepository,
 		UmbApi
 {
 	#dataSource;

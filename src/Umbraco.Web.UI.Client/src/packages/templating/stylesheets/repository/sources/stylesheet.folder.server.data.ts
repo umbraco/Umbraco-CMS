@@ -5,13 +5,13 @@ import {
 	StylesheetResource,
 } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { DataSourceResponse, UmbEntityFolderRepository } from '@umbraco-cms/backoffice/repository';
+import { DataSourceResponse, UmbFolderDataSource } from '@umbraco-cms/backoffice/repository';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 //! this is of any type in the backend-api
 export type StylesheetGetFolderResponse = { path: string; parentPath: string; name: string };
 
-export class UmbStylesheetFolderServerDataSource implements UmbEntityFolderRepository {
+export class UmbStylesheetFolderServerDataSource implements UmbFolderDataSource {
 	#host: UmbControllerHost;
 
 	constructor(host: UmbControllerHost) {

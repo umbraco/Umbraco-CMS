@@ -3,11 +3,11 @@ import { UmbCreateFolderModel, UmbUpdateFolderModel } from './types.js';
 import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { FolderResponseModel, UpdateFolderResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
-export interface UmbEntityFolderDataSourceConstructor {
-	new (host: UmbControllerHost): UmbEntityFolderDataSource;
+export interface UmbFolderDataSourceConstructor {
+	new (host: UmbControllerHost): UmbFolderDataSource;
 }
 
-export interface UmbEntityFolderDataSource {
+export interface UmbFolderDataSource {
 	get(unique: string): Promise<DataSourceResponse<FolderResponseModel>>;
 	insert(args: UmbCreateFolderModel): Promise<DataSourceResponse<string>>;
 	update(args: UmbUpdateFolderModel): Promise<DataSourceResponse<UpdateFolderResponseModel>>;

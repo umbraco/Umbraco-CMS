@@ -7,7 +7,7 @@ import {
 	DataSourceResponse,
 	UmbDataSourceErrorResponse,
 	UmbDetailRepository,
-	UmbEntityFolderRepository,
+	UmbFolderRepository,
 } from '@umbraco-cms/backoffice/repository';
 import { UmbTreeRepository } from '@umbraco-cms/backoffice/tree';
 import {
@@ -31,7 +31,7 @@ export class UmbScriptsRepository
 	implements
 		UmbTreeRepository<FileSystemTreeItemPresentationModel>,
 		UmbDetailRepository<CreateScriptRequestModel, string, UpdateScriptRequestModel, ScriptResponseModel, string>,
-		UmbEntityFolderRepository,
+		UmbFolderRepository,
 		UmbApi
 {
 	#init;
