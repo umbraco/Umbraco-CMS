@@ -1,4 +1,4 @@
-import { UMB_STYLESHEET_ENTITY_TYPE } from '../config.js';
+import { UMB_STYLESHEET_ENTITY_TYPE } from '../entity-type.js';
 import { UmbStylesheetTreeRepository } from './stylesheet-tree.repository.js';
 import { UmbStylesheetTreeStore } from './stylesheet-tree.store.js';
 import type {
