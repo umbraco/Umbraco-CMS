@@ -26,7 +26,7 @@ public class ItemsWebhookEntityController : WebhookEntityControllerBase
     public async Task<ActionResult> Items([FromQuery(Name = "ids")] HashSet<Guid> ids)
     {
         IEnumerable<Core.Models.Webhook> webhooks = await _webhookService.GetMultipleAsync(ids);
-        List<WebhookItemResponseModel> entityResponseModels = _mapper.MapEnumerable<Core.Models.Webhook, WebhooktemResponseModel>(webhooks);
+        List<WebhookItemResponseModel> entityResponseModels = _mapper.MapEnumerable<Core.Models.Webhook, WebhookItemResponseModel>(webhooks);
         return Ok(entityResponseModels);
     }
 }
