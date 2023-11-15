@@ -20,7 +20,7 @@ export class UmbCreateDataTypeEntityAction extends UmbEntityActionBase<UmbDataTy
 		if (!this.repository) throw new Error('Repository is not available');
 
 		this.#modalManagerContext?.open(UMB_DATA_TYPE_CREATE_OPTIONS_MODAL, {
-			parentKey: this.unique,
+			parentId: this.unique,
 		});
 	}
 }
