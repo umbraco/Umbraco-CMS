@@ -1,8 +1,8 @@
-﻿<div ng-controller="Umbraco.Editors.Webhooks.HeaderController as vm">
+<div ng-controller="Umbraco.Editors.Webhooks.HeaderController as vm">
   <umb-editor-view>
     <ng-form name="createWebhookHeader" novalidate val-form-manager>
       <umb-editor-header
-        name="CreateHeader"
+        name="model.title"
         name-locked="true"
         hide-alias="true"
         hide-icon="true"
@@ -11,7 +11,7 @@
       <umb-editor-container>
         <umb-box>
           <umb-box-content>
-            <umb-control-group label="Header name" description="The name of the header" alias="headerNameGroup" required="true">
+            <umb-control-group label="Name" description="The name of the header" alias="headerNameGroup" required="true">
               <input type="text"
                      data-element="webhook-headerName"
                      name="headerName"
@@ -20,10 +20,14 @@
                      no-dirty-check
                      focus-on-filled="true"
                      placeholder="Accept"
+                     list="webhook-headers"
                      umb-auto-focus
-                     required/>
+                     required />
+              <datalist id="webhook-headers">
+                <option ng-repeat="header in vm.headers" ng-value="header"></option>
+              </datalist>
             </umb-control-group>
-            <umb-control-group label="Header value" description="The value of the header" alias="headerValueGroup" required="true">
+            <umb-control-group label="Value" description="The value of the header" alias="headerValueGroup" required="true">
               <input type="text"
                      data-element="webhook-headerValue"
                      name="headerValue"

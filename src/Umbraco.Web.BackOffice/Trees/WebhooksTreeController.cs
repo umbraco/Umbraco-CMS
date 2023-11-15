@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core;
@@ -10,7 +10,7 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Web.BackOffice.Trees;
 
-[Authorize(Policy = AuthorizationPolicies.TreeAccessLogs)]
+[Authorize(Policy = AuthorizationPolicies.TreeAccessWebhooks)]
 [Tree(Constants.Applications.Settings, Constants.Trees.Webhooks, SortOrder = 9, TreeGroup = Constants.Trees.Groups.Settings)]
 [PluginController(Constants.Web.Mvc.BackOfficeTreeArea)]
 [CoreTree]
@@ -52,7 +52,7 @@ public class WebhooksTreeController : TreeController
         {
             // This will load in a custom UI instead of the dashboard for the root node
             root.RoutePath = $"{Constants.Applications.Settings}/{Constants.Trees.Webhooks}/overview";
-            root.Icon = Constants.Icons.Webhooks;
+            root.Icon = Constants.Icons.Webhook;
             root.HasChildren = false;
             root.MenuUrl = null;
         }

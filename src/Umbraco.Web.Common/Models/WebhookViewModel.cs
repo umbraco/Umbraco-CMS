@@ -12,7 +12,7 @@ public class WebhookViewModel
     public string Url { get; set; } = string.Empty;
 
     [DataMember(Name = "events")]
-    public string[] Events { get; set; } = Array.Empty<string>();
+    public WebhookEventViewModel[] Events { get; set; } = Array.Empty<WebhookEventViewModel>();
 
     [DataMember(Name = "contentTypeKeys")]
     public Guid[] ContentTypeKeys { get; set; } = Array.Empty<Guid>();

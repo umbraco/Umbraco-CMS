@@ -1848,6 +1848,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="settingsGroup">Indstillinger</key>
     <key alias="templatingGroup">Design og layout</key>
     <key alias="thirdPartyGroup">Tredjepart</key>
+    <key alias="webhooks">Webhooks</key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">Ny opdatering er klar</key>

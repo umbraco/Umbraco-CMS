@@ -98,6 +98,7 @@ public class UmbracoPlan : MigrationPlan
 
         // To 13.0.0
         To<V_13_0_0.AddWebhooks>("{C76D9C9A-635B-4D2C-A301-05642A523E9D}");
+        To<V_13_0_0.RenameEventNameColumn>("{D5139400-E507-4259-A542-C67358F7E329}");
 
         // To 14.0.0
         To<V_14_0_0.AddPropertyEditorUiAliasColumn>("{419827A0-4FCE-464B-A8F3-247C6092AF55}");
