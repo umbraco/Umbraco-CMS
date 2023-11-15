@@ -17,7 +17,7 @@ export class UmbAuthLayoutElement extends LitElement {
 	protected updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		super.updated(_changedProperties);
 
-		if (_changedProperties.has('image')) {
+		if (_changedProperties.has<keyof this>('backgroundImage')) {
 			this.style.setProperty('--logo-alternative-display', this.backgroundImage ? 'none' : 'unset');
 			this.style.setProperty('--image', `url('${this.backgroundImage}')`);
 		}
