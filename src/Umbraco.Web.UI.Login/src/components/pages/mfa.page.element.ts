@@ -126,7 +126,7 @@ export default class UmbMfaPageElement extends LitElement {
 		return html`
 			<uui-form>
 				<form id="LoginForm" @submit=${this.handleSubmit}>
-					<header>
+					<header id="header">
 						<h1>
 							<umb-localize key="login_2faTitle">One last step</umb-localize>
 						</h1>
@@ -231,6 +231,13 @@ export default class UmbMfaPageElement extends LitElement {
 
 	static styles = [
 		css`
+      #header h1 {
+        margin: 0;
+        font-weight: 400;
+        font-size: var(--header-secondary-font-size);
+        color: var(--uui-color-interactive);
+        line-height: 1;
+      }
 			.text-danger {
 				color: var(--uui-color-danger-standalone);
 			}
