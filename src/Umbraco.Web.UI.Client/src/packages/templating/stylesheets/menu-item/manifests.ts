@@ -1,4 +1,4 @@
-import { STYLESHEET_TREE_ALIAS } from '../tree/manifests.js';
+import { UMB_STYLESHEET_TREE_ALIAS } from '../tree/manifests.js';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const menuItem: ManifestTypes = {
@@ -10,7 +10,7 @@ const menuItem: ManifestTypes = {
 	meta: {
 		label: 'Stylesheets',
 		icon: 'icon-folder',
-		treeAlias: STYLESHEET_TREE_ALIAS,
+		treeAlias: UMB_STYLESHEET_TREE_ALIAS,
 		menus: ['Umb.Menu.Templating'],
 	},
 };
