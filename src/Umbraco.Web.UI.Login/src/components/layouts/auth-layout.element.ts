@@ -49,7 +49,7 @@ export class UmbAuthLayoutElement extends LitElement {
 
 					${when(
 						this.logoImage,
-						() => html`<img id="logo-on-image" src=${this.logoImage!} alt="logo" aria-hidden="true" />`
+						() => html`<img id="logo-on-image" src=${this.logoImage} alt="logo" aria-hidden="true" />`
 					)}
 				</div>
 			</div>
@@ -98,6 +98,7 @@ export class UmbAuthLayoutElement extends LitElement {
 				padding: 8px;
 				box-sizing: border-box;
 				margin: 0 auto;
+        background-color: #f4f4f4;
 			}
 			#image-container {
 				display: none;
@@ -138,17 +139,12 @@ export class UmbAuthLayoutElement extends LitElement {
 				bottom: 0;
 				left: 0;
 			}
-			#logo-on-image {
+			#logo-on-image,
+      #logo-on-background {
 				position: absolute;
 				top: 24px;
 				left: 24px;
-				height: 30px;
-			}
-			#logo-on-background {
-				position: fixed;
-				top: 24px;
-				left: 24px;
-				height: 30px;
+				height: 55px;
 			}
 			@media only screen and (min-width: 900px) {
 				:host {
