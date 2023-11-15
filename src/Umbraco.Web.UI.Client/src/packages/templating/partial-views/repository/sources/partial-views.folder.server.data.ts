@@ -5,13 +5,13 @@ import {
 	PartialViewResource,
 } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { DataSourceResponse, UmbFolderDataSource } from '@umbraco-cms/backoffice/repository';
+import { DataSourceResponse, UmbEntityFolderDataSource } from '@umbraco-cms/backoffice/repository';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 //! this is of any type in the backend-api
-export type PartialViewGetFolderResponse = {path: string, parentPath: string, name: string} ;
+export type PartialViewGetFolderResponse = { path: string; parentPath: string; name: string };
 
-export class UmbPartialViewsFolderServerDataSource implements UmbFolderDataSource {
+export class UmbPartialViewsFolderServerDataSource implements UmbEntityFolderDataSource {
 	#host: UmbControllerHost;
 
 	constructor(host: UmbControllerHost) {
