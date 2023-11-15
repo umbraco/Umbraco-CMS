@@ -17,10 +17,8 @@ export class UmbStylesheetItemStore extends UmbFileSystemItemStore<StylesheetIte
 	 * @memberof UmbStylesheetItemStore
 	 */
 	constructor(host: UmbControllerHostElement) {
-		super(host, UMB_STYLESHEET_ITEM_STORE_CONTEXT_TOKEN.toString());
+		super(host, UMB_STYLESHEET_ITEM_STORE_CONTEXT.toString());
 	}
 }
 
-export const UMB_STYLESHEET_ITEM_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbStylesheetItemStore>(
-	'UmbStylesheetItemStore',
-);
+export const UMB_STYLESHEET_ITEM_STORE_CONTEXT = new UmbContextToken<UmbStylesheetItemStore>('UmbStylesheetItemStore');

@@ -2,10 +2,12 @@ import { UmbStylesheetItemStore } from './stylesheet-item.store.js';
 import { UmbStylesheetItemRepository } from './stylesheet-item.repository.js';
 import type { ManifestRepository, ManifestItemStore } from '@umbraco-cms/backoffice/extension-registry';
 
-export const STYLESHEET_ITEM_REPOSITORY_ALIAS = 'Umb.Repository.StylesheetItem';
+export const UMB_STYLESHEET_ITEM_REPOSITORY_ALIAS = 'Umb.Repository.Stylesheet.Item';
+export const UMB_STYLESHEET_ITEM_STORE_ALIAS = 'Umb.ItemStore.Stylesheet';
+
 const repository: ManifestRepository = {
 	type: 'repository',
-	alias: STYLESHEET_ITEM_REPOSITORY_ALIAS,
+	alias: UMB_STYLESHEET_ITEM_REPOSITORY_ALIAS,
 	name: 'Stylesheet Item Repository',
 	api: UmbStylesheetItemRepository,
 };
