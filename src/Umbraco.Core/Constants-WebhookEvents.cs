@@ -6,6 +6,27 @@ public static partial class Constants
     {
         public static class Aliases
         {
+
+            /// <summary>
+            ///     Webhook event alias for content versions deleted
+            /// </summary>
+            public const string ContentDeletedVersions = "Umbraco.ContentDeletedVersions";
+
+            /// <summary>
+            ///     Webhook event alias for content blueprint saved
+            /// </summary>
+            public const string ContentSavedBlueprint = "Umbraco.ContentSavedBlueprint";
+
+            /// <summary>
+            ///     Webhook event alias for content blueprint deleted
+            /// </summary>
+            public const string ContentDeletedBlueprint = "Umbraco.ContentDeletedBlueprint";
+
+            /// <summary>
+            ///     Webhook event alias for content moved into the recycle bin.
+            /// </summary>
+            public const string ContentMovedToRecycleBin = "Umbraco.ContentMovedToRecycleBin";
+
             /// <summary>
             ///     Webhook event alias for content sorted.
             /// </summary>
