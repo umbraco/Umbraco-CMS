@@ -12,8 +12,9 @@ const menuItem: ManifestTypes = {
 		label: 'Dictionary',
 		icon: 'icon-book-alt',
 		entityType: UMB_DICTIONARY_ENTITY_TYPE,
-		treeAlias: UMB_DICTIONARY_TREE_ALIAS,
 		menus: ['Umb.Menu.Dictionary'],
+		treeAlias: UMB_DICTIONARY_TREE_ALIAS,
+		hideTreeRoot: true,
 	},
 };
 
