@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Api.Management.Routing;
-using Umbraco.Cms.Core.Services.AuthorizationStatus;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Web.Common.Authorization;
 
@@ -83,34 +82,6 @@ public class UserGroupControllerBase : ManagementApiControllerBase
                 .WithTitle("Unknown user group operation status.")
                 .Build()),
         };
-
-    // protected IActionResult UserGroupAuthorizationStatusResult(UserGroupAuthorizationStatus status) =>
-    //     status switch
-    //     {
-    //         UserGroupAuthorizationStatus.UnauthorizedMissingAllowedSectionAccess => Unauthorized(new ProblemDetailsBuilder()
-    //             .WithTitle("Unauthorized section access")
-    //             .WithDetail("The performing user does not have access to all sections specified as allowed for this user group.")
-    //             .Build()),
-    //         UserGroupAuthorizationStatus.UnauthorizedMissingContentStartNodeAccess => Unauthorized(new ProblemDetailsBuilder()
-    //             .WithTitle("Unauthorized content start node access")
-    //             .WithDetail("The performing user does not have access to the specified content start node item.")
-    //             .Build()),
-    //         UserGroupAuthorizationStatus.UnauthorizedMissingMediaStartNodeAccess => Unauthorized(new ProblemDetailsBuilder()
-    //             .WithTitle("Unauthorized media start node access")
-    //             .WithDetail("The performing user does not have access to the specified media start node item.")
-    //             .Build()),
-    //         UserGroupAuthorizationStatus.UnauthorizedMissingUserGroupAccess => Unauthorized(new ProblemDetailsBuilder()
-    //             .WithTitle("Unauthorized user group access")
-    //             .WithDetail("The performing user does not have access to the specified user group(s).")
-    //             .Build()),
-    //         UserGroupAuthorizationStatus.UnauthorizedMissingUserSectionAccess => Unauthorized(new ProblemDetailsBuilder()
-    //             .WithTitle("Unauthorized access to User section")
-    //             .WithDetail("The performing user does not have access to the User section.")
-    //             .Build()),
-    //         _ => StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetailsBuilder()
-    //             .WithTitle("Unknown user group authorization status.")
-    //             .Build())
-    //     };
 
     protected IActionResult UserGroupNotFound() => NotFound(new ProblemDetailsBuilder()
         .WithTitle("The user group could not be found")
