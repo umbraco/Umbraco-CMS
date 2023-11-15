@@ -1,6 +1,6 @@
 import { MemberGroupResource } from '@umbraco-cms/backoffice/backend-api';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbTreeDataSource } from '@umbraco-cms/backoffice/repository';
+import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { type UmbTreeDataSource } from '@umbraco-cms/backoffice/tree';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
@@ -56,7 +56,7 @@ export class UmbMemberGroupTreeServerDataSource implements UmbTreeDataSource {
 			this.#host,
 			MemberGroupResource.getMemberGroupItem({
 				id: ids,
-			})
+			}),
 		);
 	}
 }

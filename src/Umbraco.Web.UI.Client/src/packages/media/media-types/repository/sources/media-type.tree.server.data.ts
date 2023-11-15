@@ -1,6 +1,6 @@
 import { MediaTypeResource } from '@umbraco-cms/backoffice/backend-api';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbTreeDataSource } from '@umbraco-cms/backoffice/repository';
+import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { type UmbTreeDataSource } from '@umbraco-cms/backoffice/tree';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
@@ -48,7 +48,7 @@ export class UmbMediaTypeTreeServerDataSource implements UmbTreeDataSource {
 				this.#host,
 				MediaTypeResource.getTreeMediaTypeChildren({
 					parentId,
-				})
+				}),
 			);
 		}
 	}
@@ -68,7 +68,7 @@ export class UmbMediaTypeTreeServerDataSource implements UmbTreeDataSource {
 			this.#host,
 			MediaTypeResource.getMediaTypeItem({
 				id: ids,
-			})
+			}),
 		);
 	}
 }

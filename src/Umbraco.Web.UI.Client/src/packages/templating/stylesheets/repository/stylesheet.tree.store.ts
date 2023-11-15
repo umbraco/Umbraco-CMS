@@ -1,4 +1,4 @@
-import { UmbFileSystemTreeStore } from '@umbraco-cms/backoffice/store';
+import { UmbFileSystemTreeStore } from '@umbraco-cms/backoffice/tree';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
@@ -20,5 +20,5 @@ export class UmbStylesheetTreeStore extends UmbFileSystemTreeStore {
 }
 
 export const UMB_STYLESHEET_TREE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbStylesheetTreeStore>(
-	'UmbStylesheetTreeStore'
+	'UmbStylesheetTreeStore',
 );
