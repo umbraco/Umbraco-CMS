@@ -18,12 +18,12 @@ namespace Umbraco.Cms.Api.Management.Controllers.Webhook;
 [Authorize(Policy = "New" + AuthorizationPolicies.TreeAccessWebhooks)]
 public class CreateWebhookController : WebhookControllerBase
 {
-    private readonly IWebHookService _webhookService;
+    private readonly IWebhookService _webhookService;
     private readonly IUmbracoMapper _umbracoMapper;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
     public CreateWebhookController(
-        IWebHookService webhookService,
+        IWebhookService webhookService,
         IUmbracoMapper umbracoMapper,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
     {

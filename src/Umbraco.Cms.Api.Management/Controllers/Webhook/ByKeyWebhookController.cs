@@ -12,10 +12,10 @@ namespace Umbraco.Cms.Api.Management.Controllers.Webhook;
 [ApiVersion("1.0")]
 public class ByKeyWebhookController : WebhookControllerBase
 {
-    private readonly IWebHookService _webhookService;
+    private readonly IWebhookService _webhookService;
     private readonly IUmbracoMapper _umbracoMapper;
 
-    public ByKeyWebhookController(IWebHookService webhookService, IUmbracoMapper umbracoMapper)
+    public ByKeyWebhookController(IWebhookService webhookService, IUmbracoMapper umbracoMapper)
     {
         _webhookService = webhookService;
         _umbracoMapper = umbracoMapper;

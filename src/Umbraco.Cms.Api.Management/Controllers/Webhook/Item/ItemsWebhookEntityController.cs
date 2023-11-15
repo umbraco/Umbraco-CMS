@@ -11,10 +11,10 @@ namespace Umbraco.Cms.Api.Management.Controllers.Webhook.Item;
 [ApiVersion("1.0")]
 public class ItemsWebhookEntityController : WebhookEntityControllerBase
 {
-    private readonly IWebHookService _webhookService;
+    private readonly IWebhookService _webhookService;
     private readonly IUmbracoMapper _mapper;
 
-    public ItemsWebhookEntityController(IWebHookService webhookService, IUmbracoMapper mapper)
+    public ItemsWebhookEntityController(IWebhookService webhookService, IUmbracoMapper mapper)
     {
         _webhookService = webhookService;
         _mapper = mapper;
