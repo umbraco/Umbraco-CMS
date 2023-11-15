@@ -107,6 +107,7 @@ export class UmbAuthLayoutElement extends LitElement {
 				display: flex;
 				width: 100%;
 				box-sizing: border-box;
+				overflow: auto;
 			}
 			#content {
 				max-width: 340px;
