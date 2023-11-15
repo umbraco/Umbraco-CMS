@@ -36,8 +36,17 @@ public class MoveMediaController : MediaControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Move(Guid id, MoveMediaRequestModel moveDocumentRequestModel)
     {
-        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeAsync(User, new[] { id },
-            $"New{AuthorizationPolicies.MediaPermissionByResource}");
+        AuthorizationResult authorizationResult;
+
+        if (moveDocumentRequestModel.TargetId.HasValue is false)
+        {
+            authorizationResult = await _authorizationService.AuthorizeAsync(User, $"New{AuthorizationPolicies.MediaPermissionAtRoot}");
+        }
+        else
+        {
+            authorizationResult = await _authorizationService.AuthorizeAsync(User, new[] { moveDocumentRequestModel.TargetId.Value },
+                $"New{AuthorizationPolicies.MediaPermissionByResource}");
+        }
 
         if (!authorizationResult.Succeeded)
         {
