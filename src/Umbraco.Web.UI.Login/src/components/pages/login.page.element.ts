@@ -160,7 +160,7 @@ export default class UmbLoginPageElement extends LitElement {
 				color: var(--uui-color-interactive);
 				text-align: center;
 				font-weight: 400;
-				font-size: 1.5rem;
+				font-size: 2rem;
 				margin: 0 0 var(--uui-size-layout-1);
 				line-height: 1.2;
 			}
