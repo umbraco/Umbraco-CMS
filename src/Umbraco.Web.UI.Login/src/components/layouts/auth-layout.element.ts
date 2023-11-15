@@ -88,7 +88,7 @@ export class UmbAuthLayoutElement extends LitElement {
 
 				--input-height: 40px;
 				--header-font-size: 3rem;
-				--header-secondary-font-size: 2rem;
+				--header-secondary-font-size: 2.4rem;
 			}
 			#main-no-image,
 			#main {
