@@ -7,21 +7,103 @@ import {
 	UmbModalBaseElement,
 } from '@umbraco-cms/backoffice/modal';
 import { ImportDictionaryRequestModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbId } from '@umbraco-cms/backoffice/id';
 
 @customElement('umb-import-dictionary-modal')
 export class UmbImportDictionaryModalLayout extends UmbModalBaseElement<
 	UmbImportDictionaryModalData,
 	UmbImportDictionaryModalValue
 > {
-	static styles = [
-		UmbTextStyles,
-		css`
-			uui-input {
-				width: 100%;
-			}
-		`,
-	];
+	@state()
+	private _parentId?: string;
 
+	@state()
+	private _temporaryFileId?: string;
+
+	@query('#form')
+	private _form!: HTMLFormElement;
+
+	#handleClose() {
+		this.modalContext?.reject();
+	}
+
+	#submit() {
+		this._form.requestSubmit();
+	}
+
+	#handleSubmit(e: Event) {
+		e.preventDefault();
+		const formData = new FormData(this._form);
+		const file = formData.get('file');
+
+		this._temporaryFileId = file ? UmbId.new() : undefined;
+
+		console.log(this._temporaryFileId, file);
+
+		//this.modalContext?.submit({ temporaryFileId: this._temporaryFileId, parentId: this._parentId });
+		//this.modalContext?.submit();
+	}
+
+	#onFileInput() {
+		this._form.requestSubmit();
+	}
+
+	constructor() {
+		super();
+	}
+
+	connectedCallback(): void {
+		super.connectedCallback();
+		this._parentId = this.data?.unique ?? undefined;
+	}
+
+	render() {
+		return html` <umb-body-layout headline=${this.localize.term('general_import')}>
+			<uui-box>
+				<umb-localize key="dictionary_importDictionaryItemHelp"></umb-localize>
+
+				${when(
+					this._temporaryFileId,
+					() => this.#renderImportDestination(),
+					() => this.#renderUploadZone(),
+				)}
+			</uui-box>
+			<uui-button
+				slot="actions"
+				type="button"
+				label=${this.localize.term('general_cancel')}
+				@click=${this.#handleClose}></uui-button>
+			<uui-button
+				slot="actions"
+				type="button"
+				label=${this.localize.term('general_import')}
+				look="primary"
+				@click=${this.#submit}></uui-button>
+		</umb-body-layout>`;
+	}
+
+	#renderImportDestination() {
+		return html`<umb-localize key="actions_chooseWhereToImport">c</umb-localize>Help`;
+	}
+
+	#renderUploadZone() {
+		return html`<uui-form>
+			<form id="form" name="form" @submit=${this.#handleSubmit}>
+				<uui-form-layout-item>
+					<uui-label for="file" slot="label" required>${this.localize.term('formFileUpload_pickFile')}</uui-label>
+					<uui-input-file
+						accept=".udt"
+						name="file"
+						id="file"
+						@change=${this.#onFileInput}
+						required
+						required-message=${this.localize.term('formFileUpload_pickFile')}></uui-input-file>
+				</uui-form-layout-item>
+			</form>
+		</uui-form>`;
+	}
+
+	/*
 	@query('#form')
 	private _form!: HTMLFormElement;
 
@@ -97,7 +179,7 @@ export class UmbImportDictionaryModalLayout extends UmbModalBaseElement<
 		this._selection = element.selection;
 	}
 	*/
-
+	/*
 	#renderUploadView() {
 		return html`<p>
 				To import a dictionary item, find the ".udt" file on your computer by clicking the "Import" button (you'll be
@@ -121,9 +203,10 @@ export class UmbImportDictionaryModalLayout extends UmbModalBaseElement<
 			<uui-button slot="actions" type="button" label="Cancel" @click=${this.#handleClose}></uui-button>
 			<uui-button slot="actions" type="button" label="Import" look="primary" @click=${this.#submitForm}></uui-button>`;
 	}
+	*/
 
 	/// TODO => Tree view needs isolation and single-select option
-	#renderImportView() {
+	/*#renderImportView() {
 		//TODO: gather this data in some other way, we cannot use the feedback from the server anymore. can we use info about the file directly? or is a change to the end point required?
 		/*
 		if (!this._uploadedDictionary?.dictionaryItems) return;
@@ -153,21 +236,30 @@ export class UmbImportDictionaryModalLayout extends UmbModalBaseElement<
 				look="primary"
 				@click=${this.#importDictionary}></uui-button>
 		`;
-		*/
 	}
+	*/
 
 	// TODO => Determine what to display when dictionary import/upload fails
-	#renderErrorView() {
+	/*#renderErrorView() {
 		return html`Something went wrong`;
-	}
-
+	}*/
+	/*
 	render() {
 		return html` <umb-body-layout headline="Import">
 			${when(this._showUploadView, () => this.#renderUploadView())}
 			${when(this._showImportView, () => this.#renderImportView())}
 			${when(this._showErrorView, () => this.#renderErrorView())}
 		</umb-body-layout>`;
-	}
+	}*/
+
+	static styles = [
+		UmbTextStyles,
+		css`
+			uui-input {
+				width: 100%;
+			}
+		`,
+	];
 }
 
 export default UmbImportDictionaryModalLayout;

@@ -1,5 +1,5 @@
 import { UmbDictionaryRepository } from '../../repository/dictionary.repository.js';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import {
@@ -23,10 +23,15 @@ export default class UmbImportDictionaryEntityAction extends UmbEntityActionBase
 
 	async execute() {
 		// TODO: what to do if modal service is not available?
+		console.log('test');
 		if (!this.#modalContext) return;
 
 		const modalContext = this.#modalContext?.open(UMB_IMPORT_DICTIONARY_MODAL, { unique: this.unique });
 
+		const something = await modalContext.onSubmit();
+		console.log('import', something);
+
+		/*
 		// TODO: get type from modal result
 		const { temporaryFileId, parentId } = await modalContext.onSubmit();
 		if (!temporaryFileId) return;
@@ -35,5 +40,6 @@ export default class UmbImportDictionaryEntityAction extends UmbEntityActionBase
 
 		// TODO => get location header to route to new item
 		console.log(result);
+		*/
 	}
 }
