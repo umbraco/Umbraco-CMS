@@ -99,7 +99,7 @@ export class UmbDictionaryRepository
 		return { data, error, asObservable: () => this.#treeStore!.childrenOf(parentId) };
 	}
 
-	async requestItemsLegacy(ids: Array<string>) {
+	async requestItems(ids: Array<string>) {
 		await this.#init;
 
 		if (!ids) {

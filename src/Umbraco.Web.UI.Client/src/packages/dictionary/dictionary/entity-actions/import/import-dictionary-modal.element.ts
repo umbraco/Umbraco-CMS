@@ -1,5 +1,6 @@
+import '../../components/dictionary-item-input/dictionary-item-input.element.js';
+import UmbDictionaryItemInputElement from '../../components/dictionary-item-input/dictionary-item-input.element.js';
 import { UmbDictionaryRepository } from '../../repository/dictionary.repository.js';
-import { UUIInputFileElement } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, query, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import {
@@ -10,9 +11,9 @@ import {
 import { ImportDictionaryRequestModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 
-interface DictionaryItem {
+interface DictionaryItemPreview {
 	name: string;
-	children: Array<DictionaryItem>;
+	children: Array<DictionaryItemPreview>;
 }
 
 @customElement('umb-import-dictionary-modal')
@@ -29,42 +30,18 @@ export class UmbImportDictionaryModalLayout extends UmbModalBaseElement<
 	@query('#form')
 	private _form!: HTMLFormElement;
 
-	@query('#file')
-	private _fileInput!: UUIInputFileElement;
-
 	#fileReader;
 
-	#fileContent: Array<DictionaryItem> = [];
+	#fileContent: Array<DictionaryItemPreview> = [];
 
 	#handleClose() {
 		this.modalContext?.reject();
 	}
 
 	#submit() {
-		this._form.requestSubmit();
-	}
-
-	#handleSubmit(e: Event) {
-		e.preventDefault();
-		const formData = new FormData(this._form);
-		const file = formData.get('file') as File;
-
-		this._temporaryFileId = file ? UmbId.new() : undefined;
-
-		this.#fileReader.readAsText(file);
-
+		// TODO: Gotta do a temp file upload before submitting, so that the server can use it
+		console.log('submit:', this._temporaryFileId, this._parentId);
 		//this.modalContext?.submit({ temporaryFileId: this._temporaryFileId, parentId: this._parentId });
-		//this.modalContext?.submit();
-	}
-
-	async #onFileInput() {
-		requestAnimationFrame(() => {
-			this._form.requestSubmit();
-		});
-	}
-
-	#onClear() {
-		this._temporaryFileId = '';
 	}
 
 	constructor() {
@@ -78,6 +55,11 @@ export class UmbImportDictionaryModalLayout extends UmbModalBaseElement<
 		};
 	}
 
+	connectedCallback(): void {
+		super.connectedCallback();
+		this._parentId = this.data?.unique ?? undefined;
+	}
+
 	#dictionaryItemBuilder(htmlString: string) {
 		const parser = new DOMParser();
 		const doc = parser.parseFromString(htmlString, 'text/html');
@@ -87,8 +69,8 @@ export class UmbImportDictionaryModalLayout extends UmbModalBaseElement<
 		this.requestUpdate();
 	}
 
-	#makeDictionaryItems(nodeList: NodeListOf<ChildNode>): Array<DictionaryItem> {
-		const items: Array<DictionaryItem> = [];
+	#makeDictionaryItems(nodeList: NodeListOf<ChildNode>): Array<DictionaryItemPreview> {
+		const items: Array<DictionaryItemPreview> = [];
 		const list: Array<Element> = [];
 		nodeList.forEach((node) => {
 			if (node.nodeType === Node.ELEMENT_NODE) {
@@ -105,9 +87,28 @@ export class UmbImportDictionaryModalLayout extends UmbModalBaseElement<
 		return items;
 	}
 
-	connectedCallback(): void {
-		super.connectedCallback();
-		this._parentId = this.data?.unique ?? undefined;
+	#onUpload(e: Event) {
+		e.preventDefault();
+		const formData = new FormData(this._form);
+		const file = formData.get('file') as Blob;
+
+		this.#fileReader.readAsText(file);
+		this._temporaryFileId = file ? UmbId.new() : undefined;
+	}
+
+	#onParentChange(event: CustomEvent) {
+		this._parentId = (event.target as UmbDictionaryItemInputElement).selectedIds[0] || undefined;
+		//console.log((event.target as UmbDictionaryItemInputElement).selectedIds[0] || undefined);
+	}
+
+	async #onFileInput() {
+		requestAnimationFrame(() => {
+			this._form.requestSubmit();
+		});
+	}
+
+	#onClear() {
+		this._temporaryFileId = '';
 	}
 
 	render() {
@@ -127,8 +128,8 @@ export class UmbImportDictionaryModalLayout extends UmbModalBaseElement<
 		</umb-body-layout>`;
 	}
 
-	#renderFileContents(items: Array<DictionaryItem>): any {
-		return html`${items.map((item: DictionaryItem) => {
+	#renderFileContents(items: Array<DictionaryItemPreview>): any {
+		return html`${items.map((item: DictionaryItemPreview) => {
 			return html`${item.name}
 				<div>${this.#renderFileContents(item.children)}</div>`;
 		})}`;
@@ -136,23 +137,26 @@ export class UmbImportDictionaryModalLayout extends UmbModalBaseElement<
 
 	#renderImportDestination() {
 		return html`
-			<div>
-				<strong><umb-localize key="visuallyHiddenTexts_dictionaryItems">Dictionary items</umb-localize>:</strong>
+			<div id="wrapper">
+				<div>
+					<strong><umb-localize key="visuallyHiddenTexts_dictionaryItems">Dictionary items</umb-localize>:</strong>
+					<div id="item-list">${this.#renderFileContents(this.#fileContent)}</div>
+				</div>
+				<div>
+					<strong><umb-localize key="actions_chooseWhereToImport">Choose where to import</umb-localize>:</strong>
+					<umb-dictionary-item-input
+						@change=${this.#onParentChange}
+						.selectedIds=${this._parentId ? [this._parentId] : []}
+						max="1"></umb-dictionary-item-input>
+				</div>
 
-				<div id="item-list">${this.#renderFileContents(this.#fileContent)}</div>
+				${this.#renderNavigate()}
 			</div>
-			<div>
-				<strong><umb-localize key="actions_chooseWhereToImport">Choose where to import</umb-localize>:</strong>
-
-				<umb-tree alias="Umb.Tree.Dictionary"></umb-tree>
-			</div>
-
-			${this.#renderNavigate()}
 		`;
 	}
 
 	#renderNavigate() {
-		return html`<div>
+		return html`<div id="nav">
 			<uui-button label=${this.localize.term('general_import')} look="secondary" @click=${this.#onClear}>
 				<uui-icon name="icon-arrow-left"></uui-icon>
 				${this.localize.term('general_back')}
@@ -168,7 +172,7 @@ export class UmbImportDictionaryModalLayout extends UmbModalBaseElement<
 	#renderUploadZone() {
 		return html`<umb-localize key="dictionary_importDictionaryItemHelp"></umb-localize>
 			<uui-form>
-				<form id="form" name="form" @submit=${this.#handleSubmit}>
+				<form id="form" name="form" @submit=${this.#onUpload}>
 					<uui-form-layout-item>
 						<uui-label for="file" slot="label" required>${this.localize.term('formFileUpload_pickFile')}</uui-label>
 						<uui-input-file
@@ -196,6 +200,12 @@ export class UmbImportDictionaryModalLayout extends UmbModalBaseElement<
 			}
 			#item-list div {
 				padding-left: 20px;
+			}
+
+			#wrapper {
+				display: flex;
+				flex-direction: column;
+				gap: var(--uui-size-3);
 			}
 		`,
 	];

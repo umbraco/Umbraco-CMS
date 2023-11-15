@@ -22,24 +22,12 @@ export default class UmbImportDictionaryEntityAction extends UmbEntityActionBase
 	}
 
 	async execute() {
-		// TODO: what to do if modal service is not available?
-		console.log('test');
 		if (!this.#modalContext) return;
 
 		const modalContext = this.#modalContext?.open(UMB_IMPORT_DICTIONARY_MODAL, { unique: this.unique });
 
-		const something = await modalContext.onSubmit();
-		console.log('import', something);
+		const { parentId, temporaryFileId } = await modalContext.onSubmit();
 
-		/*
-		// TODO: get type from modal result
-		const { temporaryFileId, parentId } = await modalContext.onSubmit();
-		if (!temporaryFileId) return;
-
-		const result = await this.repository?.import(temporaryFileId, parentId);
-
-		// TODO => get location header to route to new item
-		console.log(result);
-		*/
+		await this.repository?.import(temporaryFileId, parentId);
 	}
 }
