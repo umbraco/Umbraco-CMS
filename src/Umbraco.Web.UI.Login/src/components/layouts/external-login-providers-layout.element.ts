@@ -47,10 +47,11 @@ export class UmbExternalLoginProvidersLayoutElement extends LitElement {
 			}
 
 			#divider {
-				width: 100%;
+				width: calc(100% - 18px);
+				margin: 0 auto;
+				margin-bottom: 16px;
 				text-align: center;
 				z-index: 0;
-				margin-bottom: 16px;
 				overflow: hidden;
 			}
 
