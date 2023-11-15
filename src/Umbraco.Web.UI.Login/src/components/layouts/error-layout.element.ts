@@ -12,7 +12,7 @@ export default class UmbErrorLayoutElement extends LitElement {
 	render() {
 		return html`
 			<div id="header">
-				<h2>${this.header}</h2>
+				<h1>${this.header}</h1>
 				<span>${this.message}</span>
 			</div>
 			<slot></slot>
@@ -37,7 +37,7 @@ export default class UmbErrorLayoutElement extends LitElement {
 				color: var(--uui-color-text-alt); /* TODO Change to uui color when uui gets a muted text variable */
 				font-size: 14px;
 			}
-			#header h2 {
+			#header h1 {
 				margin: 0;
 				font-weight: 400;
 				font-size: var(--header-secondary-font-size);
