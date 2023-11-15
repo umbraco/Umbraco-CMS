@@ -50,17 +50,13 @@ export class UmbExternalLoginProvidersLayoutElement extends LitElement {
 				width: 100%;
 				text-align: center;
 				color: var(--uui-color-interactive);
-				position: relative;
 				z-index: 0;
 				margin-bottom: 16px;
 				overflow: hidden;
 			}
 
 			#divider span {
-				/* background-color: var(--uui-color-surface); */
-				padding: 0 9px;
-				text-transform: capitalize;
-				overflow: hidden;
+				padding-inline: 10px;
 				position: relative;
 			}
 
@@ -68,13 +64,11 @@ export class UmbExternalLoginProvidersLayoutElement extends LitElement {
 			#divider span::after {
 				content: '';
 				display: block;
-				width: 200px; /* Arbitrary value, just be bigger than 50% of the max width of the container */
+				width: 500px; /* Arbitrary value, just be bigger than 50% of the max width of the container */
 				height: 1px;
-				position: absolute;
-				transform: translateY(-50%);
-				top: calc(50% + 1px);
-				z-index: -1;
 				background-color: var(--uui-color-border);
+				position: absolute;
+				top: calc(50% + 1px);
 			}
 			#divider span::before {
 				right: 100%;
