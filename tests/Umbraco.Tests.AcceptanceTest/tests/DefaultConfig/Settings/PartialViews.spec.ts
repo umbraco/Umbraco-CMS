@@ -23,6 +23,8 @@ test.describe('Partial Views tests', () => {
     await page.locator('umb-tree-item', {hasText: 'Partial Views'}).getByLabel('Open actions menu').click({force: true});
     await page.getByLabel('New empty partial view').click();
     await page.getByLabel('template name').fill(partialViewName);
+    // TODO: Remove this timeout when frontend validation is implemented
+    await page.waitForTimeout(1000);
     await page.getByLabel('Save').click();
 
     // Assert
@@ -45,6 +47,8 @@ test.describe('Partial Views tests', () => {
     await page.getByLabel('New partial view from snippet...').click();
     await page.getByLabel('Breadcrumb').click();
     await page.getByLabel('template name').fill(partialViewName);
+    // TODO: Remove this timeout when frontend validation is implemented
+    await page.waitForTimeout(1000);
     await page.getByLabel('Save').click();
     
 
