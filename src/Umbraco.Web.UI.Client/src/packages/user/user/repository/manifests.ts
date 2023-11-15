@@ -1,12 +1,12 @@
 import { UmbUserRepository } from './user.repository.js';
-import { UmbUserItemStore } from './item/user-item.store.js';
 import { UmbUserStore } from './user.store.js';
 import { UmbDisableUserRepository } from './disable/disable-user.repository.js';
 import { UmbEnableUserRepository } from './enable/enable-user.repository.js';
 import { UmbChangeUserPasswordRepository } from './change-password/change-user-password.repository.js';
 import { UmbUnlockUserRepository } from './unlock/unlock-user.repository.js';
 import { UmbInviteUserRepository } from './invite/invite-user.repository.js';
-import type { ManifestStore, ManifestRepository, ManifestItemStore } from '@umbraco-cms/backoffice/extension-registry';
+import { manifests as itemManifests } from './item/manifests.js';
+import type { ManifestStore, ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
 
 export const USER_REPOSITORY_ALIAS = 'Umb.Repository.User';
 const repository: ManifestRepository = {
@@ -63,13 +63,6 @@ const store: ManifestStore = {
 	api: UmbUserStore,
 };
 
-const itemStore: ManifestItemStore = {
-	type: 'itemStore',
-	alias: 'Umb.ItemStore.User',
-	name: 'User Store',
-	api: UmbUserItemStore,
-};
-
 export const manifests = [
 	repository,
 	disableRepository,
@@ -78,5 +71,5 @@ export const manifests = [
 	unlockRepository,
 	inviteRepository,
 	store,
-	itemStore,
+	...itemManifests,
 ];
