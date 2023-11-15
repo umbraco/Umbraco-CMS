@@ -81,7 +81,10 @@ export class UmbAuthLayoutElement extends LitElement {
 	static styles: CSSResultGroup = [
 		css`
 			:host {
-				--uui-button-background-color: #283a97;
+        --uui-color-interactive: #283a97;
+        --uui-button-border-radius: 45px;
+				--uui-button-background-color: var(--uui-color-interactive);
+        --header-font-size: 3rem;
 			}
 			#main-no-image,
 			#main {
@@ -143,6 +146,9 @@ export class UmbAuthLayoutElement extends LitElement {
 				height: 30px;
 			}
 			@media only screen and (min-width: 900px) {
+        :host {
+          --header-font-size: 4rem;
+        }
 				#main {
 					padding: 32px;
 					padding-right: 0;
