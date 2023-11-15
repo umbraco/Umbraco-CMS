@@ -10,55 +10,55 @@ import { customElement } from 'lit/decorators.js';
  */
 @customElement('umb-login-input')
 export class UmbLoginInputElement extends UUIInputElement {
-	/**
-	 * Remove the id attribute from the inner input element to avoid duplicate ids.
-	 *
-	 * @override
-	 * @protected
-	 */
-	protected firstUpdated() {
-		const innerInput = this.querySelector('input');
-		innerInput?.removeAttribute('id');
+  /**
+   * Remove the id attribute from the inner input element to avoid duplicate ids.
+   *
+   * @override
+   * @protected
+   */
+  protected firstUpdated() {
+    const innerInput = this.querySelector('input');
+    innerInput?.removeAttribute('id');
 
-		innerInput?.addEventListener('mousedown', () => {
-			this.style.setProperty('--uui-show-focus-outline', '0');
-		});
-		innerInput?.addEventListener('blur', () => {
-			this.style.setProperty('--uui-show-focus-outline', '');
-		});
-	}
+    innerInput?.addEventListener('mousedown', () => {
+      this.style.setProperty('--uui-show-focus-outline', '0');
+    });
+    innerInput?.addEventListener('blur', () => {
+      this.style.setProperty('--uui-show-focus-outline', '');
+    });
+  }
 
-	/**
-	 * Since this element does not render a Shadow DOM nor does it have a unique ID,
-	 * we need to override this method to get the form element.
-	 *
-	 * @override
-	 * @protected
-	 */
-	protected getFormElement(): HTMLElement {
-		const formElement = this.querySelector('input');
+  /**
+   * Since this element does not render a Shadow DOM nor does it have a unique ID,
+   * we need to override this method to get the form element.
+   *
+   * @override
+   * @protected
+   */
+  protected getFormElement(): HTMLElement {
+    const formElement = this.querySelector('input');
 
-		if (!formElement) {
-			throw new Error('Form element not found');
-		}
+    if (!formElement) {
+      throw new Error('Form element not found');
+    }
 
-		return formElement;
-	}
+    return formElement;
+  }
 
-	/**
-	 * Instruct Lit to not render a Shadow DOM.
-	 *
-	 * @protected
-	 */
-	protected createRenderRoot() {
-		return this;
-	}
+  /**
+   * Instruct Lit to not render a Shadow DOM.
+   *
+   * @protected
+   */
+  protected createRenderRoot() {
+    return this;
+  }
 
-	static styles = [...UUIInputElement.styles];
+  static styles = [...UUIInputElement.styles];
 }
 
 declare global {
-	interface HTMLElementTagNameMap {
-		'umb-login-input': UmbLoginInputElement;
-	}
+  interface HTMLElementTagNameMap {
+    'umb-login-input': UmbLoginInputElement;
+  }
 }
