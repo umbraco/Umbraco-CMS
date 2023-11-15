@@ -1,16 +1,12 @@
-import { UmbDocumentTypeTreeServerDataSource } from './sources/document-type.tree.server.data.js';
-import { UmbDocumentTypeServerDataSource } from './sources/document-type.server.data.js';
-import { UmbDocumentTypeTreeStore, UMB_DOCUMENT_TYPE_TREE_STORE_CONTEXT_TOKEN } from './document-type.tree.store.js';
-import { UmbDocumentTypeStore, UMB_DOCUMENT_TYPE_STORE_CONTEXT_TOKEN } from './document-type.store.js';
-import { UMB_DOCUMENT_TYPE_ITEM_STORE_CONTEXT_TOKEN, UmbDocumentTypeItemStore } from './document-type-item.store.js';
-import { UmbDocumentTypeItemServerDataSource } from './sources/document-type-item.server.data.js';
+import { UMB_DOCUMENT_TYPE_TREE_STORE_CONTEXT, UmbDocumentTypeTreeStore } from '../../tree/document-type.tree.store.js';
+import { UMB_DOCUMENT_TYPE_ITEM_STORE_CONTEXT, UmbDocumentTypeItemStore } from '../item/document-type-item.store.js';
+import { UmbDocumentTypeServerDataSource } from './document-type.server.data.js';
+import { UmbDocumentTypeDetailStore, UMB_DOCUMENT_TYPE_DETAIL_STORE_CONTEXT } from './document-type-detail.store.js';
 import { type UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
-import type { UmbTreeRepository, UmbTreeDataSource } from '@umbraco-cms/backoffice/tree';
 import { UmbBaseController, type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import {
 	CreateDocumentTypeRequestModel,
 	DocumentTypeResponseModel,
-	EntityTreeItemResponseModel,
 	FolderTreeItemResponseModel,
 	UpdateDocumentTypeRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
@@ -19,22 +15,19 @@ import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
 type ItemType = DocumentTypeResponseModel;
 
-export class UmbDocumentTypeRepository
+export class UmbDocumentTypeDetailRepository
 	extends UmbBaseController
 	implements
-		UmbTreeRepository<EntityTreeItemResponseModel>,
 		UmbDetailRepository<CreateDocumentTypeRequestModel, any, UpdateDocumentTypeRequestModel, DocumentTypeResponseModel>,
 		UmbApi
 {
 	#init!: Promise<unknown>;
 
-	#treeSource: UmbTreeDataSource;
 	#treeStore?: UmbDocumentTypeTreeStore;
 
 	#detailDataSource: UmbDocumentTypeServerDataSource;
-	#detailStore?: UmbDocumentTypeStore;
+	#detailStore?: UmbDocumentTypeDetailStore;
 
-	#itemSource: UmbDocumentTypeItemServerDataSource;
 	#itemStore?: UmbDocumentTypeItemStore;
 
 	#notificationContext?: UmbNotificationContext;
@@ -43,20 +36,18 @@ export class UmbDocumentTypeRepository
 		super(host);
 
 		// TODO: figure out how spin up get the correct data source
-		this.#treeSource = new UmbDocumentTypeTreeServerDataSource(this);
 		this.#detailDataSource = new UmbDocumentTypeServerDataSource(this);
-		this.#itemSource = new UmbDocumentTypeItemServerDataSource(this);
 
 		this.#init = Promise.all([
-			this.consumeContext(UMB_DOCUMENT_TYPE_TREE_STORE_CONTEXT_TOKEN, (instance) => {
+			this.consumeContext(UMB_DOCUMENT_TYPE_TREE_STORE_CONTEXT, (instance) => {
 				this.#treeStore = instance;
 			}),
 
-			this.consumeContext(UMB_DOCUMENT_TYPE_STORE_CONTEXT_TOKEN, (instance) => {
+			this.consumeContext(UMB_DOCUMENT_TYPE_DETAIL_STORE_CONTEXT, (instance) => {
 				this.#detailStore = instance;
 			}),
 
-			this.consumeContext(UMB_DOCUMENT_TYPE_ITEM_STORE_CONTEXT_TOKEN, (instance) => {
+			this.consumeContext(UMB_DOCUMENT_TYPE_ITEM_STORE_CONTEXT, (instance) => {
 				this.#itemStore = instance;
 			}),
 
@@ -64,86 +55,6 @@ export class UmbDocumentTypeRepository
 				this.#notificationContext = instance;
 			}),
 		]);
-	}
-
-	// TODO: Move
-	async requestTreeRoot() {
-		await this.#init;
-
-		const data = {
-			id: null,
-			type: 'document-type-root',
-			name: 'Document Types',
-			icon: 'icon-folder',
-			hasChildren: true,
-		};
-
-		return { data };
-	}
-
-	async requestRootTreeItems() {
-		await this.#init;
-
-		const { data, error } = await this.#treeSource.getRootItems();
-
-		if (data) {
-			this.#treeStore?.appendItems(data.items);
-		}
-
-		return { data, error, asObservable: () => this.#treeStore!.rootItems };
-	}
-
-	async requestTreeItemsOf(parentId: string | null) {
-		await this.#init;
-		if (parentId === undefined) throw new Error('Parent id is missing');
-
-		const { data, error } = await this.#treeSource.getChildrenOf(parentId);
-
-		if (data) {
-			this.#treeStore?.appendItems(data.items);
-		}
-
-		return { data, error, asObservable: () => this.#treeStore!.childrenOf(parentId) };
-	}
-
-	async requestItems(ids: Array<string>) {
-		if (!ids) throw new Error('Document Type Ids are missing');
-		await this.#init;
-
-		const { data, error } = await this.#itemSource.getItems(ids);
-
-		if (data) {
-			this.#itemStore?.appendItems(data);
-		}
-
-		return { data, error, asObservable: () => this.#itemStore!.items(ids) };
-	}
-
-	async requestItemsLegacy(ids: Array<string>) {
-		await this.#init;
-
-		if (!ids) {
-			throw new Error('Ids are missing');
-		}
-
-		const { data, error } = await this.#treeSource.getItems(ids);
-
-		return { data, error, asObservable: () => this.#treeStore!.items(ids) };
-	}
-
-	async rootTreeItems() {
-		await this.#init;
-		return this.#treeStore!.rootItems;
-	}
-
-	async treeItemsOf(parentId: string | null) {
-		await this.#init;
-		return this.#treeStore!.childrenOf(parentId);
-	}
-
-	async itemsLegacy(ids: Array<string>) {
-		await this.#init;
-		return this.#treeStore!.items(ids);
 	}
 
 	// DETAILS:
@@ -242,7 +153,7 @@ export class UmbDocumentTypeRepository
 			// Consider to look up the data before fetching from the server.
 			// Consider notify a workspace if a template is deleted from the store while someone is editing it.
 			// TODO: would be nice to align the stores on methods/methodNames.
-			this.#detailStore?.remove([id]);
+			this.#detailStore?.removeItem(id);
 			this.#treeStore?.removeItem(id);
 			this.#itemStore?.removeItem(id);
 		}

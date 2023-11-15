@@ -4,6 +4,7 @@ import {
 	DocumentTypeTreeItemResponseModel,
 	DocumentTypeResponseModel,
 	ContentTypeCompositionTypeModel,
+	DocumentTypeItemResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 
 export const data: Array<DocumentTypeResponseModel> = [
@@ -1166,6 +1167,20 @@ class UmbDocumentTypeData extends UmbEntityData<DocumentTypeResponseModel> {
 		const items = this.treeData.filter((item) => allowedTypeKeys.includes(item.id ?? ''));
 		return items.map((item) => item);
 	}
+
+	getItems(ids: Array<string>): Array<DocumentTypeItemResponseModel> {
+		const items = this.data.filter((item) => ids.includes(item.id ?? ''));
+		return items.map((item) => createDocumentTypeItem(item));
+	}
 }
+
+const createDocumentTypeItem = (item: DocumentTypeResponseModel): DocumentTypeItemResponseModel => {
+	return {
+		id: item.id,
+		name: item.name,
+		isElement: item.isElement,
+		icon: item.icon,
+	};
+};
 
 export const umbDocumentTypeData = new UmbDocumentTypeData();
