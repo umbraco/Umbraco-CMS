@@ -110,6 +110,7 @@ export class UmbAuthLayoutElement extends LitElement {
 				height: 100%;
 				border-radius: 38px;
 				position: relative;
+				overflow: hidden;
 			}
 			#image svg {
 				position: absolute;
