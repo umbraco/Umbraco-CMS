@@ -80,6 +80,9 @@ export class UmbAuthLayoutElement extends LitElement {
 
 	static styles: CSSResultGroup = [
 		css`
+			:host {
+				--uui-button-background-color: #283a97;
+			}
 			#main-no-image,
 			#main {
 				max-width: 1920px;
