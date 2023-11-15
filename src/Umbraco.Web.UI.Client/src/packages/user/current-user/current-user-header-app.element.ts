@@ -47,8 +47,12 @@ export class UmbCurrentUserHeaderAppElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<uui-button @click=${this._handleUserClick} look="primary" label="${this._currentUser?.name || ''}" compact>
-				<uui-avatar name="${this._currentUser?.name || ''}"></uui-avatar>
+			<uui-button
+				@click=${this._handleUserClick}
+				look="primary"
+				label="${this.localize.term('visuallyHiddenTexts_openCloseBackofficeProfileOptions')}"
+				compact>
+				<uui-avatar name="${this._currentUser?.name || 'Unknown'}"></uui-avatar>
 			</uui-button>
 		`;
 	}

@@ -2,11 +2,7 @@ import { UmbStylesheetRepository } from '../repository/stylesheet.repository.js'
 import { StylesheetDetails } from '../index.js';
 import { UmbSaveableWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import {
-	UmbArrayState,
-	UmbBooleanState,
-	UmbObjectState
-} from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState, UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
 import { RichTextRuleModel, UpdateStylesheetRequestModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
@@ -48,10 +44,10 @@ export class UmbStylesheetWorkspaceContext
 	}
 
 	getEntityId() {
-		const path = this.getData()?.path;
+		const path = this.getData()?.path?.replace(/\//g, '%2F');
 		const name = this.getData()?.name;
 
-		// TODO: %2F is a slash (/). Should we make it an actual slash in the URL? (%2F for now so that the server can find the correct stylesheet via URL)
+		// Note: %2F is a slash (/)
 		return path && name ? `${path}%2F${name}` : name || '';
 	}
 

@@ -111,6 +111,20 @@ export class UmbDictionaryRepository
 		return { data, error, asObservable: () => this.#treeStore!.items(ids) };
 	}
 
+	async requestItems(ids: Array<string>) {
+		// TODO: There is a bug where the item gets removed from the tree before we confirm the delete via the modal. It doesn't delete the item unless we confirm the delete.
+		if (!ids) throw new Error('Dictionary Ids are missing');
+		await this.#init;
+
+		const { data, error } = await this.#treeSource.getItems(ids);
+
+		if (data) {
+			this.#treeStore?.appendItems(data);
+		}
+
+		return { data, error, asObservable: () => this.#treeStore!.items(ids) };
+	}
+
 	async rootTreeItems() {
 		await this.#init;
 		return this.#treeStore!.rootItems;
