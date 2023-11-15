@@ -96,14 +96,14 @@ export default class UmbNewPasswordLayoutElement extends LitElement {
 	renderHeader() {
 		if (this.userName) {
 			return html`
-				<h2>Hi, ${this.userName}</h2>
+        <h1>Hi, ${this.userName}</h1>
 				<umb-localize key="user_userinviteWelcomeMessage"
 					>Welcome to Umbraco! Just need to get your password setup and then you're good to go</umb-localize
 				>
 			`;
 		} else {
 			return html`
-				<h2><umb-localize key="user_newPassword">New password</umb-localize></h2>
+        <h1><umb-localize key="user_newPassword">New password</umb-localize></h1>
 				<umb-localize key="login_setPasswordInstruction">Please provide a new password.</umb-localize>
 			`;
 		}
@@ -113,7 +113,7 @@ export default class UmbNewPasswordLayoutElement extends LitElement {
 		return html`
 			<uui-form>
 				<form id="LoginForm" name="login" @submit=${this.#onSubmit}>
-					<div id="header">${this.renderHeader()}</div>
+					<header id="header">${this.renderHeader()}</header>
 					<uui-form-layout-item>
 						<uui-label id="passwordLabel" for="password" slot="label" required>
 							<umb-localize key="user_newPassword">New password</umb-localize>
@@ -181,8 +181,8 @@ export default class UmbNewPasswordLayoutElement extends LitElement {
 				color: var(--uui-color-text-alt); /* TODO Change to uui color when uui gets a muted text variable */
 				font-size: 14px;
 			}
-			#header h2 {
-				margin: 0px;
+			#header h1 {
+				margin: 0;
 				font-weight: 400;
 				font-size: var(--header-secondary-font-size);
 				color: var(--uui-color-interactive);
