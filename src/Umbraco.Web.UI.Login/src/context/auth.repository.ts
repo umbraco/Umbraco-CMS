@@ -1,9 +1,9 @@
 import type {
-	LoginRequestModel,
-	LoginResponse,
-	MfaProvidersResponse,
-	ResetPasswordResponse,
-	ValidatePasswordResetCodeResponse,
+  LoginRequestModel,
+  LoginResponse,
+  MfaProvidersResponse,
+  ResetPasswordResponse,
+  ValidatePasswordResetCodeResponse,
 } from '../types.js';
 import { umbLocalizationContext } from '../external/localization/localization-context.js';
 
