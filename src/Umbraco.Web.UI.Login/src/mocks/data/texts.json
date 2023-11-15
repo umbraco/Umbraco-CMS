@@ -15,7 +15,7 @@
     "signInWith": "Sign in with",
     "forgottenPasswordInstruction": "Enter your email address and we'll send you a link to reset your password.",
     "returnToLogin": "Return to login",
-    "2fatitle": "Two-factor authentication",
+    "2faTitle": "Two-factor authentication",
     "2faText": "Enter the code from your authenticator app",
     "2faMultipleText": "Select an authentication method",
     "2faCodeInput": "Enter your code",
