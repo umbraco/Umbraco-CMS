@@ -50,12 +50,12 @@ export class UmbDataTypeFolderServerDataSource implements UmbFolderDataSource {
 	 * @memberof UmbDataTypeFolderServerDataSource
 	 */
 	async get(id: string) {
-		if (!id) throw new Error('Key is missing');
+		if (!id) throw new Error('Id is missing');
 		return tryExecuteAndNotify(
 			this.#host,
 			DataTypeResource.getDataTypeFolderById({
 				id: id,
-			})
+			}),
 		);
 	}
 
@@ -65,13 +65,22 @@ export class UmbDataTypeFolderServerDataSource implements UmbFolderDataSource {
 	 * @return {*}
 	 * @memberof UmbDataTypeFolderServerDataSource
 	 */
-	async insert(folder: CreateFolderRequestModel) {
-		if (!folder) throw new Error('Folder is missing');
+	async insert(id: string, parentId: string | null, name: string) {
+		if (!id) throw new Error('Unique is missing');
+		if (parentId === undefined) throw new Error('Parent unique is missing');
+		if (!name) throw new Error('Name is missing');
+
+		const requestBody: CreateFolderRequestModel = {
+			id: id,
+			parentId: parentId,
+			name,
+		};
+
 		return tryExecuteAndNotify(
 			this.#host,
 			DataTypeResource.postDataTypeFolder({
-				requestBody: folder,
-			})
+				requestBody,
+			}),
 		);
 	}
 
@@ -81,15 +90,20 @@ export class UmbDataTypeFolderServerDataSource implements UmbFolderDataSource {
 	 * @return {*}
 	 * @memberof UmbDataTypeFolderServerDataSource
 	 */
-	async update(id: string, folder: FolderModelBaseModel) {
+	async update(id: string, name: string) {
 		if (!id) throw new Error('Key is missing');
-		if (!id) throw new Error('Folder data is missing');
+		if (!name) throw new Error('Folder name is missing');
+
+		const requestBody: FolderModelBaseModel = {
+			name,
+		};
+
 		return tryExecuteAndNotify(
 			this.#host,
 			DataTypeResource.putDataTypeFolderById({
-				id: id,
-				requestBody: folder,
-			})
+				id,
+				requestBody,
+			}),
 		);
 	}
 
@@ -100,12 +114,13 @@ export class UmbDataTypeFolderServerDataSource implements UmbFolderDataSource {
 	 * @memberof UmbDataTypeServerDataSource
 	 */
 	async delete(id: string) {
-		if (!id) throw new Error('Key is missing');
+		if (!id) throw new Error('Id is missing');
+
 		return tryExecuteAndNotify(
 			this.#host,
 			DataTypeResource.deleteDataTypeFolderById({
 				id: id,
-			})
+			}),
 		);
 	}
 }
