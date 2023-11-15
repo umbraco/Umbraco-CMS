@@ -32,11 +32,13 @@ public interface IReadOnlyUserGroup
     ///     By default each permission is simply a single char but we've made this an enumerable{string} to support a more
     ///     flexible permissions structure in the future.
     /// </remarks>
-    IEnumerable<string>? Permissions { get; set; }
-    ISet<string> PermissionNames { get; }
-    IEnumerable<string> AllowedSections { get; }
+    IEnumerable<string>? Permissions { get; set; } // todo v14 remove when old backoffice is removed, is superseded by ContextualPermissions
+
+    IEnumerable<string> AllowedSections { get; } // todo v14 try to move this into ContextualPermissions
 
     IEnumerable<int> AllowedLanguages => Enumerable.Empty<int>();
 
-    public bool HasAccessToLanguage( int languageId) => HasAccessToAllLanguages || AllowedLanguages.Contains(languageId);
+    public bool HasAccessToLanguage(int languageId) => HasAccessToAllLanguages || AllowedLanguages.Contains(languageId);
+
+    ISet<ContextualPermission> ContextualPermissions { get; } // todo v14 rename to permissions when others have been cleaned up
 }

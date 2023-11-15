@@ -13,8 +13,8 @@ public class ReadOnlyUserGroup : IReadOnlyUserGroup, IEquatable<ReadOnlyUserGrou
         IEnumerable<int> allowedLanguages,
         IEnumerable<string> allowedSections,
         IEnumerable<string>? permissions,
-        ISet<string> permissionNames,
-        bool hasAccessToAllLanguages)
+        bool hasAccessToAllLanguages,
+        ISet<ContextualPermission> contextualPermissions)
     {
         Name = name ?? string.Empty;
         Icon = icon;
@@ -24,12 +24,12 @@ public class ReadOnlyUserGroup : IReadOnlyUserGroup, IEquatable<ReadOnlyUserGrou
         AllowedLanguages = allowedLanguages.ToArray();
         AllowedSections = allowedSections.ToArray();
         Permissions = permissions?.ToArray();
+        ContextualPermissions = contextualPermissions;
 
         // Zero is invalid and will be treated as Null
         StartContentId = startContentId == 0 ? null : startContentId;
         StartMediaId = startMediaId == 0 ? null : startMediaId;
         HasAccessToAllLanguages = hasAccessToAllLanguages;
-        PermissionNames = permissionNames;
     }
 
     public int Id { get; }
@@ -73,7 +73,7 @@ public class ReadOnlyUserGroup : IReadOnlyUserGroup, IEquatable<ReadOnlyUserGrou
     public IEnumerable<string>? Permissions { get; set; }
 
     public IEnumerable<int> AllowedLanguages { get; private set; }
-    public ISet<string> PermissionNames { get; private set; }
+
     public IEnumerable<string> AllowedSections { get; private set; }
 
     public static bool operator ==(ReadOnlyUserGroup left, ReadOnlyUserGroup right) => Equals(left, right);
@@ -101,4 +101,6 @@ public class ReadOnlyUserGroup : IReadOnlyUserGroup, IEquatable<ReadOnlyUserGrou
     public override int GetHashCode() => Alias?.GetHashCode() ?? base.GetHashCode();
 
     public static bool operator !=(ReadOnlyUserGroup left, ReadOnlyUserGroup right) => !Equals(left, right);
+
+    public ISet<ContextualPermission> ContextualPermissions { get; private set; }
 }

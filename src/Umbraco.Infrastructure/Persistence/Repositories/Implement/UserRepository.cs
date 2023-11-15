@@ -438,7 +438,7 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
             groups = Database.Fetch<UserGroupDto>(sql)
                 .ToDictionary(x => x.Id, x => x);
         }
-        catch(Exception e)
+        catch(Exception e) //todo v14 figure out when this was added and if this was added before the latest LTS [v13]
         {
             Logger.LogDebug(e, "Couldn't get user groups. This should only happens doing the migration that add new columns to user groups");
 
@@ -487,6 +487,7 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
         }
         catch
         {
+            //todo v14 figure out when this was added and if this was added before the latest LTS [v13]
             // If we get an error, the table has not been made in the database yet, set the list to an empty one
             groups2languages = new Dictionary<int, IGrouping<int, UserGroup2LanguageDto>>();
         }

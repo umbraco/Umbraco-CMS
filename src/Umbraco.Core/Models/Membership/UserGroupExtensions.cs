@@ -25,8 +25,8 @@ public static class UserGroupExtensions
             group.AllowedLanguages,
             group.AllowedSections,
             group.Permissions,
-            group.PermissionNames,
-            group.HasAccessToAllLanguages);
+            group.HasAccessToAllLanguages,
+            group.ContextualPermissions);
     }
 
     public static bool IsSystemUserGroup(this IUserGroup group) =>

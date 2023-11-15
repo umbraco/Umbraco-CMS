@@ -139,7 +139,7 @@ public class UserMapDefinition : IMapDefinition
         target.Permissions = source.DefaultPermissions;
         target.Key = source.Key;
         target.HasAccessToAllLanguages = source.HasAccessToAllLanguages;
-        target.PermissionNames = source.Permissions ?? new HashSet<string>();
+        target.ContextualPermissions = new HashSet<ContextualPermission>(); // todo permissions: verify this whole class gets deleted when old backoffice gets removed.
 
         var id = GetIntId(source.Id);
         if (id > 0)

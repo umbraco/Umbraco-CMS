@@ -19,6 +19,12 @@ public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
             (enum1, enum2) => enum1.UnsortedSequenceEqual(enum2),
             enum1 => enum1.GetHashCode());
 
+    // todo permissions: understand this
+    private static readonly DelegateEqualityComparer<IEnumerable<ContextualPermission>> _contextualPermissionEnumerableComparer =
+        new(
+            (enum1, enum2) => enum1.UnsortedSequenceEqual(enum2),
+            enum1 => enum1.GetHashCode());
+
     private readonly IShortStringHelper _shortStringHelper;
     private string _alias;
     private string? _icon;
@@ -26,6 +32,7 @@ public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
     private bool _hasAccessToAllLanguages;
     private IEnumerable<string>? _permissions;
     private ISet<string> _permissionNames = new HashSet<string>();
+    private ISet<ContextualPermission> _contextualPermissions = new HashSet<ContextualPermission>();
     private List<string> _sectionCollection;
     private List<int> _languageCollection;
     private int? _startContentId;
@@ -127,10 +134,10 @@ public class UserGroup : EntityBase, IUserGroup, IReadOnlyUserGroup
     }
 
     /// <inheritdoc />
-    public ISet<string> PermissionNames
+    public ISet<ContextualPermission> ContextualPermissions
     {
-        get => _permissionNames;
-        set => SetPropertyValueAndDetectChanges(value, ref _permissionNames!, nameof(PermissionNames), _stringEnumerableComparer);
+        get => _contextualPermissions;
+        set => SetPropertyValueAndDetectChanges(value, ref _contextualPermissions!, nameof(ContextualPermissions), _contextualPermissionEnumerableComparer);
     }
 
     public IEnumerable<string> AllowedSections => _sectionCollection;

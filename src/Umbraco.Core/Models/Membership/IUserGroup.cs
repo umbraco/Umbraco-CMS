@@ -38,19 +38,9 @@ public interface IUserGroup : IEntity, IRememberBeingDirty
     ///     By default each permission is simply a single char but we've made this an enumerable{string} to support a more
     ///     flexible permissions structure in the future.
     /// </remarks>
-    IEnumerable<string>? Permissions { get; set; }
+    IEnumerable<string>? Permissions { get; set; } // todo v14 remove when old backoffice is removed, is superseded by ContextualPermissions
 
-    /// <summary>
-    /// The set of permissions provided by the frontend.
-    /// </summary>
-    /// <remarks>
-    /// By default the server has no concept of what these strings mean, we simple store them and return them to the UI.
-    /// FIXME: For now this is named PermissionNames since Permissions already exists, but is subject to change in the future
-    /// when we know more about how we want to handle permissions, potentially those will be migrated in the these "soft" permissions.
-    /// </remarks>
-    ISet<string> PermissionNames { get; set; }
-
-    IEnumerable<string> AllowedSections { get; }
+    IEnumerable<string> AllowedSections { get; } // todo v14 try to move this into ContextualPermissions
 
     void RemoveAllowedSection(string sectionAlias);
 
@@ -76,4 +66,6 @@ public interface IUserGroup : IEntity, IRememberBeingDirty
     ///     Specifies the number of users assigned to this group
     /// </summary>
     int UserCount { get; }
+
+    ISet<ContextualPermission> ContextualPermissions { get; set; } // todo v14 rename to permissions when others have been cleaned up
 }

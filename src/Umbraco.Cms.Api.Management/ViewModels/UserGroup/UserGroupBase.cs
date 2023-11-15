@@ -1,4 +1,6 @@
-﻿namespace Umbraco.Cms.Api.Management.ViewModels.UserGroup;
+﻿using Umbraco.Cms.Core.Models.Membership;
+
+namespace Umbraco.Cms.Api.Management.ViewModels.UserGroup;
 
 /// <summary>
 /// <para>
@@ -51,8 +53,5 @@ public class UserGroupBase
     /// </summary>
     public Guid? MediaStartNodeId { get; init; }
 
-    /// <summary>
-    /// Ad-hoc list of permissions provided, and maintained by the front-end. The server has no concept of what these mean.
-    /// </summary>
-    public required ISet<string> Permissions { get; init; }
+    public required ISet<ContextualPermission> ContextualPermissions { get; set; } // todo permissions: do we need a viewmodel mapping for ContextualPermissions
 }

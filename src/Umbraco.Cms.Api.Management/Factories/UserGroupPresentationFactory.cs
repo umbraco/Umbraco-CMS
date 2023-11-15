@@ -49,8 +49,8 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
             Icon = userGroup.Icon,
             Languages = languageIsoCodesMappingAttempt.Result,
             HasAccessToAllLanguages = userGroup.HasAccessToAllLanguages,
-            Permissions = userGroup.PermissionNames,
             Sections = userGroup.AllowedSections.Select(SectionMapper.GetName),
+            ContextualPermissions = userGroup.ContextualPermissions
         };
     }
     /// <inheritdoc />
@@ -76,8 +76,8 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
             Icon = userGroup.Icon,
             Languages = languageIsoCodesMappingAttempt.Result,
             HasAccessToAllLanguages = userGroup.HasAccessToAllLanguages,
-            Permissions = userGroup.PermissionNames,
             Sections = userGroup.AllowedSections.Select(SectionMapper.GetName),
+            ContextualPermissions = userGroup.ContextualPermissions
         };
     }
 
@@ -115,7 +115,7 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
             Alias = cleanedName,
             Icon = requestModel.Icon,
             HasAccessToAllLanguages = requestModel.HasAccessToAllLanguages,
-            PermissionNames = requestModel.Permissions,
+            ContextualPermissions = requestModel.ContextualPermissions,
         };
 
         Attempt<UserGroupOperationStatus> assignmentAttempt = AssignStartNodesToUserGroup(requestModel, group);
@@ -173,7 +173,7 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
         current.Name = request.Name.CleanForXss('[', ']', '(', ')', ':');
         current.Icon = request.Icon;
         current.HasAccessToAllLanguages = request.HasAccessToAllLanguages;
-        current.PermissionNames = request.Permissions;
+        current.ContextualPermissions = request.ContextualPermissions;
 
 
         return Attempt.SucceedWithStatus(UserGroupOperationStatus.Success, current);

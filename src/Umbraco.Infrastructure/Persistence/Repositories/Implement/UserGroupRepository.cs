@@ -388,7 +388,11 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
                 break;
             case QueryType.Single:
             case QueryType.Many:
-                sql.Select<UserGroupDto>(r => r.Select(x => x.UserGroup2AppDtos), s => s.Append($", COUNT({sql.Columns<User2UserGroupDto>(x => x.UserId)}) AS {SqlSyntax.GetQuotedColumnName("UserCount")}"));
+                sql.Select<UserGroupDto>(
+                    r =>
+                        r.Select(x => x.UserGroup2AppDtos)
+                            .Select(x => x.UserGroup2PermissionDtos),
+                    s => s.Append($", COUNT({sql.Columns<User2UserGroupDto>(x => x.UserId)}) AS {SqlSyntax.GetQuotedColumnName("UserCount")}"));
                 addFrom = true;
                 break;
             default:
@@ -402,7 +406,9 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
                 .LeftJoin<UserGroup2AppDto>()
                 .On<UserGroupDto, UserGroup2AppDto>(left => left.Id, right => right.UserGroupId)
                 .LeftJoin<User2UserGroupDto>()
-                .On<User2UserGroupDto, UserGroupDto>(left => left.UserGroupId, right => right.Id);
+                .On<User2UserGroupDto, UserGroupDto>(left => left.UserGroupId, right => right.Id)
+                .LeftJoin<UserGroup2PermissionDto>()
+                .On<UserGroup2PermissionDto, UserGroupDto>(left => left.UserGroupId, right => right.Id);
         }
 
         return sql;
@@ -512,9 +518,15 @@ public class UserGroupRepository : EntityRepositoryBase<int, IUserGroup>, IUserG
     {
         Database.Delete<UserGroup2PermissionDto>("WHERE UserGroupId = @UserGroupId", new { UserGroupId = userGroup.Id });
 
-        foreach (var permission in userGroup.PermissionNames)
+        foreach (ContextualPermission contextualPermission in userGroup.ContextualPermissions)
         {
-            var permissionDto = new UserGroup2PermissionDto { UserGroupId = userGroup.Id, Permission = permission, };
+            var permissionDto = new UserGroup2PermissionDto
+            {
+                UserGroupId = userGroup.Id,
+                Permission = contextualPermission.Permission,
+                Context = contextualPermission.Context,
+                Identifier = contextualPermission.Identifier,
+            };
             Database.Insert(permissionDto);
         }
     }

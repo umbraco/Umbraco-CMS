@@ -19,4 +19,13 @@ public class UserGroup2PermissionDto
     [Column("permission")]
     [SpecialDbType(SpecialDbTypes.NVARCHARMAX)]
     public required string Permission { get; set; }
+
+    [Column("context")]
+    [SpecialDbType(SpecialDbTypes.NVARCHARMAX)]
+    public required string Context { get; set; }
+
+    [Column("identifier")]
+    [NullSetting(NullSetting = NullSettings.Null)]
+    [SpecialDbType(SpecialDbTypes.NVARCHARMAX)]
+    public string? Identifier { get; set; }
 }

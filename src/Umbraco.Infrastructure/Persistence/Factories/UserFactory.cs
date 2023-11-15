@@ -132,7 +132,9 @@ internal static class UserFactory
             group.UserGroup2LanguageDtos.Select(x => x.LanguageId),
             group.UserGroup2AppDtos.Select(x => x.AppAlias).WhereNotNull().ToArray(),
             permissions,
-            group.UserGroup2PermissionDtos.Select(x => x.Permission).ToHashSet(),
-            group.HasAccessToAllLanguages);
+            group.HasAccessToAllLanguages,
+            group.UserGroup2PermissionDtos
+                .Where(ugp => ugp.Context != null)
+                .Select(ugp => new ContextualPermission(ugp.Context!, ugp.Identifier, ugp.Permission)).ToHashSet());
     }
 }
