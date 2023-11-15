@@ -71,20 +71,24 @@ export class UmbAuthLayoutElement extends LitElement {
 			<div id=${this.backgroundImage ? 'main' : 'main-no-image'}>
 				${this.#renderImageContainer()} ${this.#renderContent()}
 			</div>
-      ${when(
-        this.logoImageAlternative,
-        () => html`<img id="logo-on-background" src=${this.logoImageAlternative} alt="logo" aria-hidden="true" />`
-      )}
+			${when(
+				this.logoImageAlternative,
+				() => html`<img id="logo-on-background" src=${this.logoImageAlternative} alt="logo" aria-hidden="true" />`
+			)}
 		`;
 	}
 
 	static styles: CSSResultGroup = [
 		css`
 			:host {
-        --uui-color-interactive: #283a97;
-        --uui-button-border-radius: 45px;
-				--uui-button-background-color: var(--uui-color-interactive);
-        --header-font-size: 3rem;
+				--uui-color-interactive: #283a97;
+				--uui-button-border-radius: 45px;
+				--uui-color-default: var(--uui-color-interactive);
+				--uui-button-height: 42px;
+
+				--input-height: 40px;
+				--header-font-size: 3rem;
+				--header-secondary-font-size: 2rem;
 			}
 			#main-no-image,
 			#main {
@@ -146,9 +150,9 @@ export class UmbAuthLayoutElement extends LitElement {
 				height: 30px;
 			}
 			@media only screen and (min-width: 900px) {
-        :host {
-          --header-font-size: 4rem;
-        }
+				:host {
+					--header-font-size: 4rem;
+				}
 				#main {
 					padding: 32px;
 					padding-right: 0;

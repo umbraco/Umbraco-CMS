@@ -168,7 +168,6 @@ export default class UmbLoginPageElement extends LitElement {
 			#umb-login-button {
 				margin-top: var(--uui-size-space-4);
 				width: 100%;
-				--uui-button-height: 40px;
 			}
 
 			#forgot-password {

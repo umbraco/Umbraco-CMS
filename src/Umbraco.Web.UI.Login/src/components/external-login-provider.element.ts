@@ -172,7 +172,6 @@ export class UmbExternalLoginProviderElement extends LitElement {
 		css`
 			#defaultView uui-button {
 				width: 100%;
-				--uui-button-height: 40px;
 				--uui-button-font-weight: 400;
 			}
 			#defaultView uui-button div {
@@ -187,7 +186,7 @@ export class UmbExternalLoginProviderElement extends LitElement {
 			#defaultView button {
 				font-size: var(--uui-button-font-size);
 				border: 1px solid var(--uui-color-border);
-				border-radius: var(--uui-border-radius);
+				border-radius: var(--uui-button-border-radius);
 				width: 100%;
 				padding: 9px;
 				text-align: left;

@@ -183,8 +183,9 @@ export default class UmbNewPasswordLayoutElement extends LitElement {
 			}
 			#header h2 {
 				margin: 0px;
-				font-weight: bold;
-				font-size: 1.4rem;
+				font-weight: 400;
+				font-size: var(--header-secondary-font-size);
+				color: var(--uui-color-interactive);
 			}
 			form {
 				display: flex;
@@ -202,6 +203,8 @@ export default class UmbNewPasswordLayoutElement extends LitElement {
 			}
 			uui-input-password {
 				width: 100%;
+				height: var(--input-height);
+				border-radius: var(--uui-border-radius);
 			}
 			uui-button {
 				width: 100%;

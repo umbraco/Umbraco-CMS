@@ -39,8 +39,9 @@ export default class UmbErrorLayoutElement extends LitElement {
 			}
 			#header h2 {
 				margin: 0;
-				font-weight: bold;
-				font-size: 1.4rem;
+				font-weight: 400;
+				font-size: var(--header-secondary-font-size);
+				color: var(--uui-color-interactive);
 			}
 			::slotted(uui-button) {
 				width: 100%;

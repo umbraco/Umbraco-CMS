@@ -35,9 +35,9 @@ export default class UmbResetPasswordPageElement extends LitElement {
 			<uui-form>
 				<form id="LoginForm" name="login" @submit="${this.#handleResetSubmit}">
 					<div id="header">
-						<h1>
+						<h2>
 							<umb-localize key="login_forgottenPassword">Forgotten password?</umb-localize>
-						</h1>
+						</h2>
 						<span>
 							<umb-localize key="login_forgottenPasswordInstruction"
 								>An email will be sent to the address specified with a link to reset your password</umb-localize
@@ -112,11 +112,12 @@ export default class UmbResetPasswordPageElement extends LitElement {
 				color: var(--uui-color-text-alt); /* TODO Change to uui color when uui gets a muted text variable */
 				font-size: 14px;
 			}
-			#header h1 {
+			#header h2 {
 				margin: 0;
 				font-weight: 400;
-				font-size: var(--header-font-size);
-        color: var(--uui-color-interactive);
+				font-size: var(--header-secondary-font-size);
+				color: var(--uui-color-interactive);
+				line-height: 1;
 			}
 			form {
 				display: flex;
@@ -129,6 +130,7 @@ export default class UmbResetPasswordPageElement extends LitElement {
 			uui-input,
 			uui-input-password {
 				width: 100%;
+				height: var(--input-height);
 				border-radius: var(--uui-border-radius);
 			}
 			uui-input {
