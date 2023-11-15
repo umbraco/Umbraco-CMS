@@ -1,13 +1,13 @@
 import { UmbStylesheetTreeServerDataSource } from './stylesheet-tree.server.data-source.js';
 import { UMB_STYLESHEET_TREE_STORE_CONTEXT_TOKEN, UmbStylesheetTreeStore } from './stylesheet-tree.store.js';
 import { FileSystemTreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbRepositoryBase, UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
-import { UmbTreeRootFileSystemModel } from '@umbraco-cms/backoffice/tree';
+import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
+import { UmbFileSystemTreeRootModel, UmbTreeRepository } from '@umbraco-cms/backoffice/tree';
 import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbStylesheetTreeRepository
 	extends UmbRepositoryBase
-	implements UmbTreeRepository<FileSystemTreeItemPresentationModel, UmbTreeRootFileSystemModel>
+	implements UmbTreeRepository<FileSystemTreeItemPresentationModel, UmbFileSystemTreeRootModel>
 {
 	#init;
 	#treeDataSource;
