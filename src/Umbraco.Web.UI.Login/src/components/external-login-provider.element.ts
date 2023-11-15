@@ -177,11 +177,12 @@ export class UmbExternalLoginProviderElement extends LitElement {
 			#defaultView uui-button div {
 				/* TODO: Remove this when uui-button has setting for aligning content */
 				position: absolute;
-				left: 9px;
-				margin: auto;
-				text-align: left;
 				top: 50%;
+				left: 0;
+				margin: auto;
 				transform: translateY(-50%);
+				text-align: left;
+        padding-left: 15px;
 			}
 			#defaultView button {
 				font-size: var(--uui-button-font-size);
