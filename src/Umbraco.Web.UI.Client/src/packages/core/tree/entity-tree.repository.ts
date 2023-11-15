@@ -7,7 +7,7 @@ import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
-export class UmbEntityTreeRepositoryBase<
+export class UmbTreeRepositoryBase<
 		TreeItemType extends UmbEntityTreeItemModel,
 		TreeRootType extends UmbEntityTreeRootModel,
 	>
@@ -34,7 +34,7 @@ export class UmbEntityTreeRepositoryBase<
 	/**
 	 * Request the tree root item
 	 * @return {*}
-	 * @memberof UmbEntityTreeRepositoryBase
+	 * @memberof UmbTreeRepositoryBase
 	 */
 	async requestTreeRoot() {
 		if (!this.#treeSource.getTreeRoot?.()) {
@@ -47,7 +47,7 @@ export class UmbEntityTreeRepositoryBase<
 	/**
 	 * Requests root items of a tree
 	 * @return {*}
-	 * @memberof UmbEntityTreeRepositoryBase
+	 * @memberof UmbTreeRepositoryBase
 	 */
 	async requestRootTreeItems() {
 		await this._init;
@@ -63,27 +63,27 @@ export class UmbEntityTreeRepositoryBase<
 
 	/**
 	 * Requests tree items of a given parent
-	 * @param {(string | null)} parentId
+	 * @param {(string | null)} parentUnique
 	 * @return {*}
-	 * @memberof UmbEntityTreeRepositoryBase
+	 * @memberof UmbTreeRepositoryBase
 	 */
-	async requestTreeItemsOf(parentId: string | null) {
-		if (parentId === undefined) throw new Error('Parent id is missing');
+	async requestTreeItemsOf(parentUnique: string | null) {
+		if (parentUnique === undefined) throw new Error('Parent unique is missing');
 		await this._init;
 
-		const { data, error } = await this.#treeSource.getChildrenOf(parentId);
+		const { data, error } = await this.#treeSource.getChildrenOf(parentUnique);
 
 		if (data) {
 			this._treeStore!.appendItems(data.items);
 		}
 
-		return { data, error, asObservable: () => this._treeStore!.childrenOf(parentId) };
+		return { data, error, asObservable: () => this._treeStore!.childrenOf(parentUnique) };
 	}
 
 	/**
 	 * Returns a promise with an observable of tree root items
 	 * @return {*}
-	 * @memberof UmbEntityTreeRepositoryBase
+	 * @memberof UmbTreeRepositoryBase
 	 */
 	async rootTreeItems() {
 		await this._init;
@@ -92,13 +92,13 @@ export class UmbEntityTreeRepositoryBase<
 
 	/**
 	 * Returns a promise with an observable of children items of a given parent
-	 * @param {(string | null)} parentId
+	 * @param {(string | null)} parentUnique
 	 * @return {*}
-	 * @memberof UmbEntityTreeRepositoryBase
+	 * @memberof UmbTreeRepositoryBase
 	 */
-	async treeItemsOf(parentId: string | null) {
-		if (parentId === undefined) throw new Error('Parent id is missing');
+	async treeItemsOf(parentUnique: string | null) {
+		if (parentUnique === undefined) throw new Error('Parent unique is missing');
 		await this._init;
-		return this._treeStore!.childrenOf(parentId);
+		return this._treeStore!.childrenOf(parentUnique);
 	}
 }

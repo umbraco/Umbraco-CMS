@@ -1,4 +1,4 @@
-import { UmbEntityTreeRepositoryBase } from '../../tree/entity-tree.repository.js';
+import { UmbTreeRepositoryBase } from '../../tree/entity-tree.repository.js';
 import { DATA_TYPE_ROOT_ENTITY_TYPE } from '../entities.js';
 import { UmbDataTypeTreeServerDataSource } from './data-type.tree.server.data.js';
 import { UMB_DATA_TYPE_TREE_STORE_CONTEXT } from './data-type.tree.store.js';
@@ -7,7 +7,7 @@ import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
 export class UmbDataTypeTreeRepository
-	extends UmbEntityTreeRepositoryBase<UmbDataTypeTreeItemModel, UmbDataTypeTreeRootModel>
+	extends UmbTreeRepositoryBase<UmbDataTypeTreeItemModel, UmbDataTypeTreeRootModel>
 	implements UmbApi
 {
 	constructor(host: UmbControllerHost) {
