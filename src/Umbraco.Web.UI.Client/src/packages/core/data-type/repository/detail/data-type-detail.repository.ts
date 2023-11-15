@@ -1,5 +1,5 @@
 import { UmbDataTypeRepositoryBase } from '../data-type-repository-base.js';
-import { dataTypeToTreeItemMapper } from '../utils.js';
+import { createTreeItem } from '../utils.js';
 import { UmbDataTypeServerDataSource } from './data-type-detail.server.data-source.js';
 import type { UmbDetailRepository, UmbDataSource } from '@umbraco-cms/backoffice/repository';
 import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -60,7 +60,7 @@ export class UmbDataTypeDetailRepository
 
 		if (!error) {
 			// TODO: We need to push a new item to the tree store to update the tree. How do we want to create the tree items?
-			const treeItem = dataTypeToTreeItemMapper(dataType);
+			const treeItem = createTreeItem(dataType);
 			this._treeStore!.appendItems([treeItem]);
 			//this.#detailStore?.append(dataType);
 

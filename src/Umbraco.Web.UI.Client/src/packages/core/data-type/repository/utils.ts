@@ -1,34 +1,30 @@
-import { DATA_TYPE_ENTITY_TYPE } from '../entities.js';
 import {
 	CreateDataTypeRequestModel,
-	DataTypeTreeItemResponseModel,
+	CreateFolderRequestModel,
 	FolderTreeItemResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
-import { UmbCreateFolderModel } from '@umbraco-cms/backoffice/repository';
 
-export const dataTypeToTreeItemMapper = (item: CreateDataTypeRequestModel): DataTypeTreeItemResponseModel => {
+export const createTreeItem = (item: CreateDataTypeRequestModel): FolderTreeItemResponseModel => {
 	if (!item) throw new Error('item is null or undefined');
-	if (!item.id) throw new Error('Id is null or undefined');
-	if (item.parentId === undefined) throw new Error('ParentId is undefined');
+	if (!item.id) throw new Error('item.id is null or undefined');
 
 	return {
-		id: item.id,
+		type: 'data-type',
 		parentId: item.parentId,
-		type: DATA_TYPE_ENTITY_TYPE,
 		name: item.name,
+		id: item.id,
+		isFolder: false,
+		isContainer: false,
+		hasChildren: false,
 	};
 };
 
-export const folderToDataTypeTreeItemMapper = (folder: UmbCreateFolderModel): FolderTreeItemResponseModel => {
-	if (!folder) throw new Error('Folder is required');
-	if (!folder.unique) throw new Error('Folder unique required');
-	if (folder.parentUnique === undefined) throw new Error('Folder parent unique is required');
+export const createFolderTreeItem = (item: CreateFolderRequestModel): FolderTreeItemResponseModel => {
+	if (!item) throw new Error('item is null or undefined');
+	if (!item.id) throw new Error('item.id is null or undefined');
 
 	return {
-		id: folder.unique,
-		parentId: folder.parentUnique,
-		type: DATA_TYPE_ENTITY_TYPE,
-		name: folder.name,
+		...createTreeItem(item),
 		isFolder: true,
 	};
 };
