@@ -49,7 +49,6 @@ export class UmbExternalLoginProvidersLayoutElement extends LitElement {
 			#divider {
 				width: 100%;
 				text-align: center;
-				color: var(--uui-color-interactive);
 				z-index: 0;
 				margin-bottom: 16px;
 				overflow: hidden;
@@ -58,6 +57,7 @@ export class UmbExternalLoginProvidersLayoutElement extends LitElement {
 			#divider span {
 				padding-inline: 10px;
 				position: relative;
+				color: var(--uui-color-border-emphasis);
 			}
 
 			#divider span::before,
