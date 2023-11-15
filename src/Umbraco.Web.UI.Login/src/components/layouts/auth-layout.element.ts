@@ -18,8 +18,8 @@ export class UmbAuthLayoutElement extends LitElement {
 		super.updated(_changedProperties);
 
 		if (_changedProperties.has<keyof this>('backgroundImage')) {
-			this.style.setProperty('--logo-alternative-display', this.backgroundImage ? 'none' : 'unset');
-			this.style.setProperty('--image', `url('${this.backgroundImage}')`);
+			this.style.setProperty('--umb-logo-alternative-display', this.backgroundImage ? 'none' : 'unset');
+			this.style.setProperty('--umb-background-image', `url('${this.backgroundImage}')`);
 		}
 	}
 
@@ -102,7 +102,7 @@ export class UmbAuthLayoutElement extends LitElement {
 				width: 100%;
 			}
 			#image {
-				background-image: var(--image);
+				background-image: var(--umb-background-image);
 				background-position: 50%;
 				background-repeat: no-repeat;
 				background-size: cover;
@@ -150,7 +150,7 @@ export class UmbAuthLayoutElement extends LitElement {
 					padding: 16px;
 				}
 				#logo-on-background {
-					display: var(--logo-alternative-display);
+					display: var(--umb-logo-alternative-display);
 				}
 			}
 		`,
