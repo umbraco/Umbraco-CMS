@@ -106,7 +106,7 @@ export default class UmbLoginPageElement extends LitElement {
 						<div id="secondary-actions">
 							${when(
 								umbAuthContext.supportsPersistLogin,
-								() => html` <uui-form-layout-item>
+								() => html`<uui-form-layout-item>
 									<uui-checkbox
 										name="persist"
 										.label=${until(umbLocalizationContext.localize('user_rememberMe', undefined, 'Remember me'))}>
@@ -117,21 +117,19 @@ export default class UmbLoginPageElement extends LitElement {
 							${when(
 								this.allowPasswordReset,
 								() =>
-									html` <button type="button" id="forgot-password" @click=${this.#handleForgottenPassword}>
+									html`<button type="button" id="forgot-password" @click=${this.#handleForgottenPassword}>
 										<umb-localize key="login_forgottenPassword">Forgotten password?</umb-localize>
 									</button>`
 							)}
 						</div>
-						<div id="primary-actions">
-							<uui-button
-								type="submit"
-								id="umb-login-button"
-								look="primary"
-								@click=${this.#onSubmitClick}
-								.label=${until(umbLocalizationContext.localize('general_login', undefined, 'Login'), 'Login')}
-								color="default"
-								.state=${this._loginState}></uui-button>
-						</div>
+						<uui-button
+							type="submit"
+							id="umb-login-button"
+							look="primary"
+							@click=${this.#onSubmitClick}
+							.label=${until(umbLocalizationContext.localize('general_login', undefined, 'Login'), 'Login')}
+							color="default"
+							.state=${this._loginState}></uui-button>
 
 						${this.#renderErrorMessage()}
 				  `}
@@ -159,18 +157,18 @@ export default class UmbLoginPageElement extends LitElement {
 			}
 
 			#greeting {
-				color: #283a97;
-				font-size: 40px;
-				font-weight: 400;
+				color: var(--uui-color-interactive);
 				text-align: center;
+				font-weight: 400;
+				font-size: 1.5rem;
 				margin: 0 0 var(--uui-size-layout-1);
+				line-height: 1.2;
 			}
 
 			#umb-login-button {
 				margin-top: var(--uui-size-space-4);
 				width: 100%;
-				--uui-button-padding-top-factor: 1.5;
-				--uui-button-padding-bottom-factor: 1.5;
+				--uui-button-height: 40px;
 			}
 
 			#forgot-password {
@@ -186,6 +184,8 @@ export default class UmbLoginPageElement extends LitElement {
 				line-height: 1;
 				font-size: 14px;
 				font-family: var(--uui-font-family);
+				margin-left: auto;
+				margin-bottom: var(--uui-size-space-3);
 			}
 
 			#forgot-password:hover {
@@ -199,14 +199,7 @@ export default class UmbLoginPageElement extends LitElement {
 			#secondary-actions {
 				display: flex;
 				align-items: center;
-				justify-content: end;
-			}
-
-			#primary-actions {
-				display: flex;
-				align-items: center;
-				justify-content: center;
-				margin-top: var(--uui-size-space-6);
+				justify-content: space-between;
 			}
 		`,
 	];
