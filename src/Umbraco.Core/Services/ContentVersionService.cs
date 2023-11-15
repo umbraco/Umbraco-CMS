@@ -77,6 +77,7 @@ internal class ContentVersionService : IContentVersionService
 
             if (version is null)
             {
+                scope.Complete();
                 return;
             }
 
@@ -128,6 +129,7 @@ internal class ContentVersionService : IContentVersionService
 
             if (allHistoricVersions is null)
             {
+                scope.Complete();
                 return Array.Empty<ContentVersionMeta>();
             }
 
