@@ -170,7 +170,7 @@ var uSkyGridConfig = [
             }, {
                 grid: 3,
                 percentage: 25
-            }, ]
+            } ]
         }, {
             models: [{
                 grid: 2,
@@ -279,7 +279,7 @@ var uSkyGridConfig = [
             }, {
                 grid: 3,
                 percentage: 25
-            }, ]
+            } ]
         }, {
             models: [{
                 grid: 2,
