@@ -124,10 +124,7 @@ export class UmbExternalLoginProviderElement extends LitElement {
 					type="submit"
 					name="provider"
 					.value=${this.providerName}
-					title=${`Login using your ${this.displayName} account`}
-					.label=${until(umbLocalizationContext.localize('login_signInWith', undefined, 'Sign in with')) +
-					' ' +
-					this.displayName}
+					.label=${until(umbLocalizationContext.localize('login_signInWith', undefined, 'Sign in with').then(str => `${str} ${this.displayName}`))}
 					.look=${this.buttonLook}
 					.color=${this.buttonColor}>
 					${this.displayName
