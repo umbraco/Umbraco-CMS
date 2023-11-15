@@ -57,14 +57,14 @@ public class WebhookRepository : IWebhookRepository
         return webhookDto is null ? null : await DtoToEntity(webhookDto);
     }
 
-    public async Task<PagedModel<Webhook>> GetByEventNameAsync(string eventName)
+    public async Task<PagedModel<Webhook>> GetByAliasAsync(string alias)
     {
         Sql<ISqlContext>? sql = _scopeAccessor.AmbientScope?.Database.SqlContext.Sql()
             .SelectAll()
             .From<WebhookDto>()
             .InnerJoin<Webhook2EventsDto>()
             .On<WebhookDto, Webhook2EventsDto>(left => left.Id, right => right.WebhookId)
-            .Where<Webhook2EventsDto>(x => x.Event == eventName);
+            .Where<Webhook2EventsDto>(x => x.Event == alias);
 
         List<WebhookDto>? webhookDtos = await _scopeAccessor.AmbientScope?.Database.FetchAsync<WebhookDto>(sql)!;
 

@@ -10,28 +10,30 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events;
 
-public class ContentPublishWebhookEvent : WebhookEventBase<ContentPublishedNotification, IContent>
+[WebhookEvent("Content was published", Constants.WebhookEvents.Types.Content)]
+public class ContentPublishWebhookEvent : WebhookEventContentBase<ContentPublishedNotification, IContent>
 {
     private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
     private readonly IApiContentBuilder _apiContentBuilder;
 
     public ContentPublishWebhookEvent(
         IWebhookFiringService webhookFiringService,
-        IWebHookService webHookService,
+        IWebhookService webhookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
         IServerRoleAccessor serverRoleAccessor,
         IPublishedSnapshotAccessor publishedSnapshotAccessor,
         IApiContentBuilder apiContentBuilder)
         : base(
             webhookFiringService,
-            webHookService,
+            webhookService,
             webhookSettings,
-            serverRoleAccessor,
-            Constants.WebhookEvents.ContentPublish)
+            serverRoleAccessor)
     {
         _publishedSnapshotAccessor = publishedSnapshotAccessor;
         _apiContentBuilder = apiContentBuilder;
     }
+
+    public override string Alias => Constants.WebhookEvents.Aliases.ContentPublish;
 
     protected override IEnumerable<IContent> GetEntitiesFromNotification(ContentPublishedNotification notification) => notification.PublishedEntities;
 
