@@ -227,8 +227,11 @@ export default class UmbMfaPageElement extends LitElement {
 
   static styles = [
     css`
+      #header {
+        text-align: center;
+      }
+
       #header h1 {
-        margin: 0;
         font-weight: 400;
         font-size: var(--header-secondary-font-size);
         color: var(--uui-color-interactive);
