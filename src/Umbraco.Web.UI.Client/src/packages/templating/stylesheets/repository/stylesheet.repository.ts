@@ -12,12 +12,14 @@ import {
 	UmbDetailRepository,
 	UmbFolderRepository,
 } from '@umbraco-cms/backoffice/repository';
+import { UmbTreeRepository } from '@umbraco-cms/backoffice/tree';
 import {
 	CreateFolderRequestModel,
 	CreateStylesheetRequestModel,
 	CreateTextFileViewModelBaseModel,
 	ExtractRichTextStylesheetRulesRequestModel,
 	ExtractRichTextStylesheetRulesResponseModel,
+	FileSystemTreeItemPresentationModel,
 	FolderModelBaseModel,
 	FolderResponseModel,
 	InterpolateRichTextStylesheetRequestModel,

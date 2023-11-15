@@ -1,4 +1,4 @@
-import { UmbFileSystemTreeStore } from '@umbraco-cms/backoffice/store';
+import { UmbFileSystemTreeStore } from '@umbraco-cms/backoffice/tree';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 

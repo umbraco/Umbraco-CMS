@@ -3,7 +3,8 @@ import { UmbDictionaryDetailServerDataSource } from './sources/dictionary.detail
 import { UmbDictionaryTreeStore, UMB_DICTIONARY_TREE_STORE_CONTEXT_TOKEN } from './dictionary.tree.store.js';
 import { UmbDictionaryTreeServerDataSource } from './sources/dictionary.tree.server.data.js';
 import { UmbBaseController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UmbTreeDataSource, UmbDetailRepository, UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
+import { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
+import { UmbTreeRepository, UmbTreeDataSource } from '@umbraco-cms/backoffice/tree';
 import {
 	CreateDictionaryItemRequestModel,
 	DictionaryOverviewResponseModel,

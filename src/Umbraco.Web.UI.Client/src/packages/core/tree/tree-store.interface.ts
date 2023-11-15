@@ -1,4 +1,4 @@
-import { UmbStore } from './store.interface.js';
+import { UmbStore } from '@umbraco-cms/backoffice/store';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
