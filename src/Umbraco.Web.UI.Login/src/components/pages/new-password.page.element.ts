@@ -86,11 +86,12 @@ export default class UmbNewPasswordPageElement extends LitElement {
 	render() {
 		return this.userId && this.resetCode
 			? this.#renderRoutes()
-			: html`
-					<h2 style="text-align: center">Password Reset Error</h2>
-					<p>It looks like there's an issue with the information provided</p>
-					<umb-back-to-login-button></umb-back-to-login-button>
-			  `;
+			: html`<umb-error-layout
+					header=${until(umbLocalizationContext.localize('general_error', undefined, 'Error'))}
+					message=${until(
+						umbLocalizationContext.localize('errors_defaultError', undefined, 'An unknown failure has occured')
+					)}>
+			  </umb-error-layout>`;
 	}
 }
 
