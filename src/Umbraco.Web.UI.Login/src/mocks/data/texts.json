@@ -1,6 +1,6 @@
 {
-	"general": {
-		"login": "Login",
+  "general": {
+    "login": "Login",
     "email": "Email",
     "username": "Username",
     "password": "Password",
@@ -9,7 +9,7 @@
     "validate": "Validate",
     "back": "Back",
     "required": "Required"
-	},
+  },
   "login": {
     "forgottenPassword": "Forgot password?",
     "signInWith": "Sign in with",
@@ -21,14 +21,14 @@
     "2faCodeInput": "Enter your code",
     "2faCodeInputHelp": "Enter the code from your authenticator app"
   },
-	"user": {
-		"username": "Username",
-		"email": "Email",
-		"password": "Password"
-	},
-	"placeholders": {
-		"username": "Enter your username",
-		"email": "Enter your email",
-		"password": "Enter your password"
-	}
+  "user": {
+    "username": "Username",
+    "email": "Email",
+    "password": "Password"
+  },
+  "placeholders": {
+    "username": "Enter your username",
+    "email": "Enter your email",
+    "password": "Enter your password"
+  }
 }
