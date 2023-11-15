@@ -18,7 +18,7 @@ export class UmbDictionaryTreeRepository
 		const data = {
 			id: null,
 			type: UMB_DICTIONARY_ROOT_ENTITY_TYPE,
-			name: 'Hello World',
+			name: 'Dictionary',
 			icon: 'icon-folder',
 			hasChildren: true,
 		};
