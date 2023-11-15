@@ -3,6 +3,7 @@ using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Infrastructure.Scoping;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using IScope = Umbraco.Cms.Infrastructure.Scoping.IScope;
 
 namespace Umbraco.Cms.Core.Logging.Viewer;
@@ -60,7 +61,7 @@ public class LogViewerConfig : ILogViewerConfig
         }
 
         // Return the updated object - so we can instantly reset the entire array from the API response
-        IReadOnlyList<SavedLogSearch> result =  GetSavedSearches();
+        IReadOnlyList<SavedLogSearch> result =  GetSavedSearches()!;
         scope.Complete();
         return result;
     }
