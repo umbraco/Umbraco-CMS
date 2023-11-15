@@ -30,14 +30,27 @@ export class UmbAuthContext implements IUmbAuthContext {
    */
   get returnPath(): string {
     const params = new URLSearchParams(window.location.search);
-    let returnUrl = params.get('ReturnUrl') ?? params.get('returnPath') ?? this.#returnPath;
+    let returnPath = params.get('ReturnUrl') ?? params.get('returnPath') ?? this.#returnPath;
 
     // Paths from the old Backoffice are encoded twice and need to be decoded,
     // but we don't want to decode the new paths coming from the Management API.
-    if (returnUrl.indexOf('/security/back-office/authorize') === -1) {
-      returnUrl = decodeURIComponent(returnUrl);
+    if (returnPath.indexOf('/security/back-office/authorize') === -1) {
+      returnPath = decodeURIComponent(returnPath);
     }
-    return returnUrl || '';
+
+    // If return path is empty, return an empty string.
+    if (!returnPath) {
+      return '';
+    }
+
+    // Safely check that the return path is valid and doesn't link to an external site.
+    const url = new URL(returnPath, window.location.origin);
+
+    if (url.origin !== window.location.origin) {
+      return '';
+    }
+
+    return url.toString();
   }
 
   async login(data: LoginRequestModel): Promise<LoginResponse> {
