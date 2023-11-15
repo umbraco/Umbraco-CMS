@@ -21,11 +21,11 @@ export class UmbFileSystemItemStore<T extends FileItemResponseModelBaseModel>
 
 	/**
 	 * Return an observable to observe file system items
-	 * @param {Array<string>} ids
+	 * @param {Array<string>} paths
 	 * @return {*}
 	 * @memberof UmbFileSystemItemStore
 	 */
-	items(ids: Array<string>) {
-		return this._data.asObservablePart((items) => items.filter((item) => ids.includes(item.path ?? '')));
+	items(paths: Array<string>) {
+		return this._data.asObservablePart((items) => items.filter((item) => paths.includes(item.path ?? '')));
 	}
 }
