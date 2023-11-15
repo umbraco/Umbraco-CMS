@@ -73,7 +73,7 @@ export class UmbAuthLayoutElement extends LitElement {
 			</div>
 			${when(
 				this.logoImageAlternative,
-				() => html`<img id="logo-on-background" src=${this.logoImageAlternative} alt="logo" aria-hidden="true" />`
+				() => html`<img id="logo-on-background" src=${this.logoImageAlternative!} alt="logo" aria-hidden="true" />`
 			)}
 		`;
 	}
