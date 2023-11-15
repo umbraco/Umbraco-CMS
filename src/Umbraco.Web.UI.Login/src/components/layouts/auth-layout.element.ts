@@ -1,6 +1,6 @@
-import { css, CSSResultGroup, html, LitElement } from 'lit';
+import { css, CSSResultGroup, html, LitElement, nothing, PropertyValueMap } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { styleMap } from 'lit/directives/style-map.js';
+import { ifDefined } from 'lit/directives/if-defined.js';
 import { when } from 'lit/directives/when.js';
 
 @customElement('umb-auth-layout')
@@ -14,167 +14,142 @@ export class UmbAuthLayoutElement extends LitElement {
 	@property({ attribute: 'logo-image-alternative' })
 	logoImageAlternative?: string;
 
-	#renderLogo() {
-		return html`<div
-			style=${styleMap({
-				'--logo-light': `url(${this.logoImage})`,
-				'--logo-dark': `url(${this.logoImageAlternative})`,
-			})}
-			id="logo"></div>`;
+	protected updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+		super.updated(_changedProperties);
+
+		if (_changedProperties.has('image')) {
+			this.style.setProperty('--logo-alternative-display', this.backgroundImage ? 'none' : 'unset');
+			this.style.setProperty('--image', `url('${this.backgroundImage}')`);
+		}
 	}
 
-	#renderImage() {
-		this.toggleAttribute('has-background-image', this.backgroundImage ? true : false);
-		this.style.setProperty('--background-image', `url(${this.backgroundImage})`);
+	#renderImageContainer() {
+		if (!this.backgroundImage) return nothing;
 
-		return html`<div id="image-column">
-			<div id="image" style=${styleMap({ backgroundImage: `url(${this.backgroundImage})` })}></div>
-		</div>`;
-	}
-
-	render() {
 		return html`
-			<div id="layout">
-				${this.#renderLogo()} ${when(this.backgroundImage, () => this.#renderImage())}
-				<div id="auth-column">
-					<div id="auth-box">
-						<slot></slot>
-					</div>
+			<div id="image-container">
+				<div id="image">
+					<svg
+						id="curve-top"
+						width="1746"
+						height="1374"
+						viewBox="0 0 1746 1374"
+						fill="none"
+						xmlns="http://www.w3.org/2000/svg">
+						<path d="M8 1C61.5 722.5 206.5 1366.5 1745.5 1366.5" stroke="#F5C1BC" stroke-width="15" />
+					</svg>
+					<svg
+						id="curve-bottom"
+						width="1364"
+						height="552"
+						viewBox="0 0 1364 552"
+						fill="none"
+						xmlns="http://www.w3.org/2000/svg">
+						<path d="M1 8C387 24 1109 11 1357 548" stroke="#F5C1BC" stroke-width="15" />
+					</svg>
+
+					${when(
+						this.logoImage,
+						() => html`<img id="logo-on-image" src=${this.logoImage!} alt="umbraco-logo" aria-hidden="true" />`
+					)}
 				</div>
 			</div>
 		`;
 	}
 
+	#renderContent() {
+		return html`
+			<div id="content-container">
+				<div id="content">
+					<slot></slot>
+				</div>
+			</div>
+		`;
+	}
+
+	render() {
+		return html`
+			<div id=${this.backgroundImage ? 'main' : 'main-no-image'}>
+				${this.#renderImageContainer()} ${this.#renderContent()}
+			</div>
+			<img id="logo-on-background" src=${ifDefined(this.logoImageAlternative)} alt="umbraco-logo" aria-hidden="true" />
+		`;
+	}
+
 	static styles: CSSResultGroup = [
 		css`
-			:host {
-				display: block;
-				height: 100dvh;
-				background-color: var(--uui-color-surface);
-				position: relative;
-				z-index: 0;
-			}
-			:host::before {
-				background-image: var(--background-image);
-				background-position: 50%;
-				background-repeat: no-repeat;
-				background-size: cover;
-				content: '';
-				inset: 0;
-				position: absolute;
-				width: 100%;
-				height: 100%;
-				z-index: -2;
-			}
-			:host::after {
-				content: '';
-				position: absolute;
-				inset: 0;
-				width: calc(100% - 32px);
-				height: calc(100% - 32px);
-				margin: auto;
-				background-color: #fff;
-				opacity: 0.95;
-				border-radius: 40px;
-				z-index: -1;
-			}
-			#layout {
+			#main-no-image,
+			#main {
+				max-width: 1920px;
 				display: flex;
-				height: 100%;
+				height: 100vh;
+				padding: 8px;
+				box-sizing: border-box;
+				margin: 0 auto;
 			}
-			:host([has-background-image]) #layout {
-				max-width: 2000px;
-			}
-
-			#image-column {
+			#image-container {
 				display: none;
-				padding: var(--uui-size-layout-2);
 				width: 100%;
-				overflow: hidden;
-				padding-right: 0;
-				box-sizing: border-box;
-				overflow: visible;
-				padding-right: 0;
 			}
-			#logo {
-				position: fixed;
-				background-image: var(--logo-dark);
-				background-repeat: no-repeat;
-				z-index: 1;
-				top: 52px;
-				left: 52px;
-				width: 120px;
-				height: 39px;
-			}
-			#auth-column {
+			#content-container {
 				display: flex;
 				width: 100%;
-				height: 100%;
 				box-sizing: border-box;
-				margin-block: auto;
-				padding-block: var(--uui-size-layout-2);
-				padding-inline: var(--uui-size-space-4);
-				max-height: calc(50% + 100px);
+			}
+			#content {
+				max-width: 340px;
+				margin: auto;
+				width: 100%;
 			}
 			#image {
-				z-index: 0;
-				overflow: hidden;
+				background-image: var(--image);
 				background-position: 50%;
 				background-repeat: no-repeat;
 				background-size: cover;
 				width: 100%;
 				height: 100%;
-				border-radius: 40px;
-				/* border: 1px solid white; */
-				box-sizing: border-box;
-				/* box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 48px; */
+				border-radius: 38px;
+				position: relative;
 			}
-			#auth-box {
-				max-width: 300px;
-				width: 100%;
-				box-sizing: border-box;
-				margin-inline: auto;
+			#image svg {
+				position: absolute;
+				width: 45%;
+				height: fit-content;
 			}
-			@media (min-width: 500px) {
-				:host::after {
-					width: calc(100% - 64px);
-					height: calc(100% - 64px);
-				}
+			#curve-top {
+				top: 0;
+				right: 0;
 			}
-			@media (min-width: 979px) {
-				:host::before {
-					background-image: none;
-				}
-				:host([has-background-image]) #image-column {
-					display: block;
-				}
-				:host([has-background-image]) #auth-box {
-					width: 300px;
-				}
-				:host([has-background-image]) #logo {
-					background-image: var(--logo-light);
-					top: 52px;
-					left: 52px;
-					width: 140px;
-					height: 39px;
-				}
-				:host([has-background-image]) #auth-column {
-					max-height: calc(50% + 200px);
-					width: max-content;
-					padding-inline: 100px;
-				}
+			#curve-bottom {
+				bottom: 0;
+				left: 0;
 			}
-			@media (min-width: 1200px) {
-				:host([has-background-image]) #image-column {
-					padding: var(--uui-size-layout-3);
+			#logo-on-image {
+				position: absolute;
+				top: 24px;
+				left: 24px;
+				height: 30px;
+			}
+			#logo-on-background {
+				position: fixed;
+				top: 24px;
+				left: 24px;
+				height: 30px;
+			}
+			@media only screen and (min-width: 900px) {
+				#main {
+					padding: 32px;
 					padding-right: 0;
 				}
-				:host([has-background-image]) #auth-column {
-					padding-inline: 200px;
+				#image-container {
+					display: block;
 				}
-				:host([has-background-image]) #logo {
-					top: 68px;
-					left: 68px;
+				#content-container {
+					display: flex;
+					padding: 16px;
+				}
+				#logo-on-background {
+					display: var(--logo-alternative-display);
 				}
 			}
 		`,
