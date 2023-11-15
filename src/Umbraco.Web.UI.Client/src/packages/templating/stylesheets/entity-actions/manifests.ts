@@ -1,9 +1,9 @@
 import {
-	STYLESHEET_ENTITY_TYPE,
-	STYLESHEET_FOLDER_EMPTY_ENTITY_TYPE,
-	STYLESHEET_FOLDER_ENTITY_TYPE,
-	STYLESHEET_REPOSITORY_ALIAS,
-	STYLESHEET_ROOT_ENTITY_TYPE,
+	UMB_STYLESHEET_ENTITY_TYPE,
+	UMB_STYLESHEET_FOLDER_EMPTY_ENTITY_TYPE,
+	UMB_STYLESHEET_FOLDER_ENTITY_TYPE,
+	UMB_STYLESHEET_REPOSITORY_ALIAS,
+	UMB_STYLESHEET_ROOT_ENTITY_TYPE,
 } from '../config.js';
 import { UmbCreateRTFStylesheetAction } from './create/create-rtf.action.js';
 import { UmbCreateStylesheetAction } from './create/create.action.js';
@@ -26,8 +26,8 @@ const stylesheetActions: Array<ManifestEntityAction> = [
 		meta: {
 			icon: 'icon-trash',
 			label: 'Delete',
-			repositoryAlias: STYLESHEET_REPOSITORY_ALIAS,
-			entityTypes: [STYLESHEET_ENTITY_TYPE],
+			repositoryAlias: UMB_STYLESHEET_REPOSITORY_ALIAS,
+			entityTypes: [UMB_STYLESHEET_ENTITY_TYPE],
 		},
 	},
 ];
@@ -43,8 +43,12 @@ const stylesheetFolderActions: Array<ManifestEntityAction> = [
 		meta: {
 			icon: 'icon-script',
 			label: 'New stylesheet file',
-			repositoryAlias: STYLESHEET_REPOSITORY_ALIAS,
-			entityTypes: [STYLESHEET_FOLDER_ENTITY_TYPE, STYLESHEET_FOLDER_EMPTY_ENTITY_TYPE, STYLESHEET_ROOT_ENTITY_TYPE],
+			repositoryAlias: UMB_STYLESHEET_REPOSITORY_ALIAS,
+			entityTypes: [
+				UMB_STYLESHEET_FOLDER_ENTITY_TYPE,
+				UMB_STYLESHEET_FOLDER_EMPTY_ENTITY_TYPE,
+				UMB_STYLESHEET_ROOT_ENTITY_TYPE,
+			],
 		},
 	},
 	{
@@ -55,8 +59,12 @@ const stylesheetFolderActions: Array<ManifestEntityAction> = [
 		meta: {
 			icon: 'icon-script',
 			label: 'New Rich Text Editor style sheet file',
-			repositoryAlias: STYLESHEET_REPOSITORY_ALIAS,
-			entityTypes: [STYLESHEET_FOLDER_ENTITY_TYPE, STYLESHEET_FOLDER_EMPTY_ENTITY_TYPE, STYLESHEET_ROOT_ENTITY_TYPE],
+			repositoryAlias: UMB_STYLESHEET_REPOSITORY_ALIAS,
+			entityTypes: [
+				UMB_STYLESHEET_FOLDER_ENTITY_TYPE,
+				UMB_STYLESHEET_FOLDER_EMPTY_ENTITY_TYPE,
+				UMB_STYLESHEET_ROOT_ENTITY_TYPE,
+			],
 		},
 	},
 	{
@@ -67,8 +75,8 @@ const stylesheetFolderActions: Array<ManifestEntityAction> = [
 		meta: {
 			icon: 'icon-trash',
 			label: 'Remove folder',
-			repositoryAlias: STYLESHEET_REPOSITORY_ALIAS,
-			entityTypes: [STYLESHEET_FOLDER_EMPTY_ENTITY_TYPE],
+			repositoryAlias: UMB_STYLESHEET_REPOSITORY_ALIAS,
+			entityTypes: [UMB_STYLESHEET_FOLDER_EMPTY_ENTITY_TYPE],
 		},
 	},
 	{
@@ -79,8 +87,12 @@ const stylesheetFolderActions: Array<ManifestEntityAction> = [
 		meta: {
 			icon: 'icon-add',
 			label: 'Create folder',
-			repositoryAlias: STYLESHEET_REPOSITORY_ALIAS,
-			entityTypes: [STYLESHEET_FOLDER_EMPTY_ENTITY_TYPE, STYLESHEET_FOLDER_ENTITY_TYPE, STYLESHEET_ROOT_ENTITY_TYPE],
+			repositoryAlias: UMB_STYLESHEET_REPOSITORY_ALIAS,
+			entityTypes: [
+				UMB_STYLESHEET_FOLDER_EMPTY_ENTITY_TYPE,
+				UMB_STYLESHEET_FOLDER_ENTITY_TYPE,
+				UMB_STYLESHEET_ROOT_ENTITY_TYPE,
+			],
 		},
 	},
 ];
