@@ -1,6 +1,6 @@
 import { DictionaryResource } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbTreeDataSource } from '@umbraco-cms/backoffice/repository';
+import type { UmbTreeDataSource } from '@umbraco-cms/backoffice/tree';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
@@ -48,7 +48,7 @@ export class UmbDictionaryTreeServerDataSource implements UmbTreeDataSource {
 				this.#host,
 				DictionaryResource.getTreeDictionaryChildren({
 					parentId,
-				})
+				}),
 			);
 		}
 	}
@@ -68,7 +68,7 @@ export class UmbDictionaryTreeServerDataSource implements UmbTreeDataSource {
 			this.#host,
 			DictionaryResource.getDictionaryItem({
 				id: ids,
-			})
+			}),
 		);
 	}
 }

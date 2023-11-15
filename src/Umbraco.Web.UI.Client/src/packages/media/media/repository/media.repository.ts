@@ -5,7 +5,7 @@ import { UmbMediaStore, UMB_MEDIA_STORE_CONTEXT_TOKEN } from './media.store.js';
 import { UmbMediaDetailServerDataSource } from './sources/media.detail.server.data.js';
 import { UmbMediaItemServerDataSource } from './sources/media-item.server.data.js';
 import { UmbMediaItemStore } from './media-item.store.js';
-import type { UmbTreeRepository, UmbTreeDataSource } from '@umbraco-cms/backoffice/repository';
+import type { UmbTreeRepository, UmbTreeDataSource } from '@umbraco-cms/backoffice/tree';
 import { UmbBaseController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import {
 	CreateMediaRequestModel,
@@ -16,7 +16,8 @@ import { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
-export class UmbMediaRepository extends UmbBaseController
+export class UmbMediaRepository
+	extends UmbBaseController
 	implements
 		UmbTreeRepository<EntityTreeItemResponseModel>,
 		UmbDetailRepository<CreateMediaRequestModel, any, UpdateMediaRequestModel, MediaDetails>,

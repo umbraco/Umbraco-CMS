@@ -1,6 +1,6 @@
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UmbEntityTreeStore } from '@umbraco-cms/backoffice/store';
+import { UmbEntityTreeStore } from '@umbraco-cms/backoffice/tree';
 
 /**
  * @export
@@ -21,5 +21,5 @@ export class UmbRelationTypeTreeStore extends UmbEntityTreeStore {
 }
 
 export const UMB_RELATION_TYPE_TREE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbRelationTypeTreeStore>(
-	'UmbRelationTypeTreeStore'
+	'UmbRelationTypeTreeStore',
 );

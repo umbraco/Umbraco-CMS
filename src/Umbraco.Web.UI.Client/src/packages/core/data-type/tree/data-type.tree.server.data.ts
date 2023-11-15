@@ -1,5 +1,5 @@
-import type { UmbTreeDataSource } from '@umbraco-cms/backoffice/repository';
-import { DataTypeResource } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbTreeDataSource } from '@umbraco-cms/backoffice/tree';
+import { DataTypeResource, DataTypeTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -9,7 +9,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
  * @class UmbDataTypeTreeServerDataSource
  * @implements {DocumentTreeDataSource}
  */
-export class UmbDataTypeTreeServerDataSource implements UmbTreeDataSource {
+export class UmbDataTypeTreeServerDataSource implements UmbTreeDataSource<DataTypeTreeItemResponseModel> {
 	#host: UmbControllerHost;
 
 	/**
@@ -48,7 +48,7 @@ export class UmbDataTypeTreeServerDataSource implements UmbTreeDataSource {
 				this.#host,
 				DataTypeResource.getTreeDataTypeChildren({
 					parentId,
-				})
+				}),
 			);
 		}
 	}
@@ -65,7 +65,7 @@ export class UmbDataTypeTreeServerDataSource implements UmbTreeDataSource {
 			this.#host,
 			DataTypeResource.getDataTypeItem({
 				id: ids,
-			})
+			}),
 		);
 	}
 }
