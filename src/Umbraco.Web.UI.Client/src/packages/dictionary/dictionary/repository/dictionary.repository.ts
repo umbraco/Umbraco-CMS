@@ -3,7 +3,8 @@ import { UmbDictionaryDetailServerDataSource } from './sources/dictionary.detail
 import { UmbDictionaryTreeStore, UMB_DICTIONARY_TREE_STORE_CONTEXT_TOKEN } from './dictionary.tree.store.js';
 import { UmbDictionaryTreeServerDataSource } from './sources/dictionary.tree.server.data.js';
 import { UmbBaseController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UmbTreeDataSource, UmbDetailRepository, UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
+import { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
+import { UmbTreeRepository, UmbTreeDataSource } from '@umbraco-cms/backoffice/tree';
 import {
 	CreateDictionaryItemRequestModel,
 	DictionaryOverviewResponseModel,
@@ -14,7 +15,8 @@ import {
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
-export class UmbDictionaryRepository extends UmbBaseController
+export class UmbDictionaryRepository
+	extends UmbBaseController
 	implements
 		UmbTreeRepository<EntityTreeItemResponseModel>,
 		UmbDetailRepository<
@@ -105,6 +107,20 @@ export class UmbDictionaryRepository extends UmbBaseController
 		}
 
 		const { data, error } = await this.#treeSource.getItems(ids);
+
+		return { data, error, asObservable: () => this.#treeStore!.items(ids) };
+	}
+
+	async requestItems(ids: Array<string>) {
+		// TODO: There is a bug where the item gets removed from the tree before we confirm the delete via the modal. It doesn't delete the item unless we confirm the delete.
+		if (!ids) throw new Error('Dictionary Ids are missing');
+		await this.#init;
+
+		const { data, error } = await this.#treeSource.getItems(ids);
+
+		if (data) {
+			this.#treeStore?.appendItems(data);
+		}
 
 		return { data, error, asObservable: () => this.#treeStore!.items(ids) };
 	}

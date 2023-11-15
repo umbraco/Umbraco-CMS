@@ -1,6 +1,6 @@
-import type { UmbTreeDataSource } from '@umbraco-cms/backoffice/repository';
+import { type UmbTreeDataSource } from '@umbraco-cms/backoffice/tree';
 import { DocumentResource } from '@umbraco-cms/backoffice/backend-api';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
@@ -23,7 +23,7 @@ export class UmbDocumentTreeServerDataSource implements UmbTreeDataSource {
 				headers: {
 					'Content-Type': 'application/json',
 				},
-			})
+			}),
 		);
 	}
 
@@ -37,7 +37,7 @@ export class UmbDocumentTreeServerDataSource implements UmbTreeDataSource {
 				headers: {
 					'Content-Type': 'application/json',
 				},
-			})
+			}),
 		);
 	}
 
@@ -77,7 +77,7 @@ export class UmbDocumentTreeServerDataSource implements UmbTreeDataSource {
 				this.#host,
 				DocumentResource.getTreeDocumentChildren({
 					parentId,
-				})
+				}),
 			);
 		}
 	}
@@ -97,7 +97,7 @@ export class UmbDocumentTreeServerDataSource implements UmbTreeDataSource {
 			this.#host,
 			DocumentResource.getDocumentItem({
 				id: ids,
-			})
+			}),
 		);
 	}
 }

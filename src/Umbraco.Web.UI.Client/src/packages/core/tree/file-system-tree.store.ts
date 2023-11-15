@@ -1,5 +1,5 @@
-import { UmbStoreBase } from './store-base.js';
-import { UmbTreeStore } from './tree-store.interface.js';
+import { type UmbTreeStore } from './tree-store.interface.js';
+import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
 import { FileSystemTreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
@@ -31,9 +31,11 @@ export class UmbFileSystemTreeStore
 	 * @memberof UmbFileSystemTreeStore
 	 */
 	childrenOf(parentPath: string | null) {
-		return this._data.asObservablePart((items) =>
-			items.filter((item) => item.path?.startsWith(parentPath + '/') || parentPath === null)
-		);
+		if (parentPath === null) {
+			return this.rootItems;
+		}
+
+		return this._data.asObservablePart((items) => items.filter((item) => item.path?.startsWith(parentPath + '/')));
 	}
 
 	/**

@@ -3,7 +3,7 @@ import {
 	DOCUMENT_TYPE_FOLDER_ENTITY_TYPE,
 	DOCUMENT_TYPE_ROOT_ENTITY_TYPE,
 } from '../../index.js';
-import { DOCUMENT_TYPE_REPOSITORY_ALIAS } from '../../repository/manifests.js';
+import { DOCUMENT_TYPE_DETAIL_REPOSITORY_ALIAS } from '../../repository/index.js';
 import { UmbCreateDataTypeEntityAction } from './create.action.js';
 import { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -17,7 +17,7 @@ const entityActions: Array<ManifestTypes> = [
 		meta: {
 			icon: 'icon-add',
 			label: 'Create...',
-			repositoryAlias: DOCUMENT_TYPE_REPOSITORY_ALIAS,
+			repositoryAlias: DOCUMENT_TYPE_DETAIL_REPOSITORY_ALIAS,
 			entityTypes: [DOCUMENT_TYPE_ENTITY_TYPE, DOCUMENT_TYPE_ROOT_ENTITY_TYPE, DOCUMENT_TYPE_FOLDER_ENTITY_TYPE],
 		},
 	},

@@ -23,7 +23,7 @@ export class UmbDocumentTypeItemStore
 	constructor(host: UmbControllerHostElement) {
 		super(
 			host,
-			UMB_DOCUMENT_TYPE_ITEM_STORE_CONTEXT_TOKEN.toString(),
+			UMB_DOCUMENT_TYPE_ITEM_STORE_CONTEXT.toString(),
 			new UmbArrayState<DocumentTypeItemResponseModel>([], (x) => x.id),
 		);
 	}
@@ -33,6 +33,6 @@ export class UmbDocumentTypeItemStore
 	}
 }
 
-export const UMB_DOCUMENT_TYPE_ITEM_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbDocumentTypeItemStore>(
+export const UMB_DOCUMENT_TYPE_ITEM_STORE_CONTEXT = new UmbContextToken<UmbDocumentTypeItemStore>(
 	'UmbDocumentTypeItemStore',
 );
