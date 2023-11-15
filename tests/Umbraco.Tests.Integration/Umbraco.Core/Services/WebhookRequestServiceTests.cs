@@ -19,7 +19,7 @@ public class WebhookRequestServiceTests : UmbracoIntegrationTest
     public async Task Can_Create_And_Get()
     {
         var createdWebhook = await WebhookService.CreateAsync(new Webhook("https://example.com", true, new[] { Guid.NewGuid() }, new[] { Constants.WebhookEvents.Aliases.ContentPublish }));
-        var created = await WebhookRequestService.CreateAsync(createdWebhook.Key, Constants.WebhookEvents.Aliases.ContentPublish, null);
+        var created = await WebhookRequestService.CreateAsync(createdWebhook.Result.Key, Constants.WebhookEvents.Aliases.ContentPublish, null);
         var webhooks = await WebhookRequestService.GetAllAsync();
         var webhook = webhooks.First(x => x.Id == created.Id);
 
@@ -38,7 +38,7 @@ public class WebhookRequestServiceTests : UmbracoIntegrationTest
     {
         var newRetryCount = 4;
         var createdWebhook = await WebhookService.CreateAsync(new Webhook("https://example.com", true, new[] { Guid.NewGuid() }, new[] { Constants.WebhookEvents.Aliases.ContentPublish }));
-        var created = await WebhookRequestService.CreateAsync(createdWebhook.Key, Constants.WebhookEvents.Aliases.ContentPublish, null);
+        var created = await WebhookRequestService.CreateAsync(createdWebhook.Result.Key, Constants.WebhookEvents.Aliases.ContentPublish, null);
         created.RetryCount = newRetryCount;
         await WebhookRequestService.UpdateAsync(created);
         var webhooks = await WebhookRequestService.GetAllAsync();
@@ -54,7 +54,7 @@ public class WebhookRequestServiceTests : UmbracoIntegrationTest
     public async Task Can_Delete()
     {
         var createdWebhook = await WebhookService.CreateAsync(new Webhook("https://example.com", true, new[] { Guid.NewGuid() }, new[] { Constants.WebhookEvents.Aliases.ContentPublish }));
-        var created = await WebhookRequestService.CreateAsync(createdWebhook.Key, Constants.WebhookEvents.Aliases.ContentPublish, null);
+        var created = await WebhookRequestService.CreateAsync(createdWebhook.Result.Key, Constants.WebhookEvents.Aliases.ContentPublish, null);
         await WebhookRequestService.DeleteAsync(created);
         var webhooks = await WebhookRequestService.GetAllAsync();
         var webhook = webhooks.FirstOrDefault(x => x.Id == created.Id);
