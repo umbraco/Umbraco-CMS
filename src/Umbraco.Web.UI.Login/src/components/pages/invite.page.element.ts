@@ -1,5 +1,5 @@
 import type { UUIButtonState } from '@umbraco-ui/uui';
-import { LitElement, html, nothing } from 'lit';
+import { LitElement, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { until } from 'lit/directives/until.js';
 
@@ -62,7 +62,11 @@ export default class UmbInvitePageElement extends LitElement {
 			? html`<umb-error-layout
 					.header=${until(umbLocalizationContext.localize('general_error', undefined, 'Error'))}
 					.message=${this.error}></umb-error-layout>`
-			: nothing;
+			: html`
+					<h2 style="text-align: center">Invite Error</h2>
+					<p>It looks like there's an issue with the information provided</p>
+					<umb-back-to-login-button></umb-back-to-login-button>
+			  `;
 	}
 }
 
