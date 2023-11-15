@@ -130,13 +130,13 @@ export default class UmbMfaPageElement extends LitElement {
 						<h1>
 							<umb-localize key="login_2faTitle">One last step</umb-localize>
 						</h1>
-					</header>
 
-					<p>
-						<umb-localize key="login_2faText">
-							You have enabled 2-factor authentication and must verify your identity.
-						</umb-localize>
-					</p>
+            <p>
+              <umb-localize key="login_2faText">
+                You have enabled 2-factor authentication and must verify your identity.
+              </umb-localize>
+            </p>
+					</header>
 
 					<!-- if there's only one provider active, it will skip this step! -->
 					${this.providers.length > 1
@@ -177,21 +177,19 @@ export default class UmbMfaPageElement extends LitElement {
 						</uui-input>
 					</uui-form-layout-item>
 
-					<div id="actions">
-						<uui-button
-							.state=${this.buttonState}
-							button-style="success"
-							look="primary"
-							color="default"
-							label=${until(umbLocalizationContext.localize('general_validate'), 'Validate')}
-							type="submit"></uui-button>
-						<uui-button
-							label=${until(umbLocalizationContext.localize('general_back'), 'Back')}
-							@click="${this.onGoBack}"></uui-button>
-					</div>
-					${this.error ? html` <span class="text-danger">${this.error}</span> ` : nothing}
+          ${this.error ? html` <span class="text-danger">${this.error}</span> ` : nothing}
+
+          <uui-button
+            .state=${this.buttonState}
+            button-style="success"
+            look="primary"
+            color="default"
+            label=${until(umbLocalizationContext.localize('general_validate'), 'Validate')}
+            type="submit"></uui-button>
 				</form>
 			</uui-form>
+
+      <umb-back-to-login-button style="margin-top: var(--uui-size-space-6)"></umb-back-to-login-button>
 		`;
 	}
 
@@ -225,10 +223,6 @@ export default class UmbMfaPageElement extends LitElement {
 			: this.renderDefaultView();
 	}
 
-	private onGoBack() {
-		this.dispatchEvent(new CustomEvent('umb-login-flow', { composed: true, detail: { flow: undefined } }));
-	}
-
 	static styles = [
 		css`
       #header h1 {
@@ -237,6 +231,28 @@ export default class UmbMfaPageElement extends LitElement {
         font-size: var(--header-secondary-font-size);
         color: var(--uui-color-interactive);
         line-height: 1;
+      }
+      form {
+        display: flex;
+        flex-direction: column;
+        gap: var(--uui-size-layout-2);
+      }
+      uui-form-layout-item {
+        margin: 0;
+      }
+      uui-input,
+      uui-input-password {
+        width: 100%;
+        height: var(--input-height);
+        border-radius: var(--uui-border-radius);
+      }
+      uui-input {
+        width: 100%;
+      }
+      uui-button {
+        width: 100%;
+        --uui-button-padding-top-factor: 1.5;
+        --uui-button-padding-bottom-factor: 1.5;
       }
 			.text-danger {
 				color: var(--uui-color-danger-standalone);
