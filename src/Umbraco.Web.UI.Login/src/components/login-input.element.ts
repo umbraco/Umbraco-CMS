@@ -19,6 +19,13 @@ export class UmbLoginInputElement extends UUIInputElement {
 	protected firstUpdated() {
 		const innerInput = this.querySelector('input');
 		innerInput?.removeAttribute('id');
+
+		innerInput?.addEventListener('mousedown', () => {
+			this.style.setProperty('--uui-show-focus-outline', '0');
+		});
+		innerInput?.addEventListener('blur', () => {
+			this.style.setProperty('--uui-show-focus-outline', '');
+		});
 	}
 
 	/**
