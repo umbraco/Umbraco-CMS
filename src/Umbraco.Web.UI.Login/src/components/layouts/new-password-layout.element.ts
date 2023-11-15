@@ -71,13 +71,21 @@ export default class UmbNewPasswordLayoutElement extends LitElement {
 		}
 
 		if (passwordIsInvalid) {
-			const passwordValidityText = await umbLocalizationContext.localize('errorHandling_errorInPasswordFormat', [this.passwordConfig.minPasswordLength, this.passwordConfig.minNonAlphaNumericChars], "The password doesn't meet the minimum requirements!");
+			const passwordValidityText = await umbLocalizationContext.localize(
+				'errorHandling_errorInPasswordFormat',
+				[this.passwordConfig.minPasswordLength, this.passwordConfig.minNonAlphaNumericChars],
+				"The password doesn't meet the minimum requirements!"
+			);
 			this.passwordElement.setCustomValidity(passwordValidityText);
 			return;
 		}
 
 		if (password !== passwordConfirm) {
-			const passwordValidityText = await umbLocalizationContext.localize('user_passwordMismatch', undefined, "The confirmed password doesn't match the new password!");
+			const passwordValidityText = await umbLocalizationContext.localize(
+				'user_passwordMismatch',
+				undefined,
+				"The confirmed password doesn't match the new password!"
+			);
 			this.confirmPasswordElement.setCustomValidity(passwordValidityText);
 			return;
 		}
@@ -89,7 +97,9 @@ export default class UmbNewPasswordLayoutElement extends LitElement {
 		if (this.userName) {
 			return html`
 				<h2>Hi, ${this.userName}</h2>
-				<umb-localize key="user_userinviteWelcomeMessage">Welcome to Umbraco! Just need to get your password setup and then you're good to go</umb-localize>
+				<umb-localize key="user_userinviteWelcomeMessage"
+					>Welcome to Umbraco! Just need to get your password setup and then you're good to go</umb-localize
+				>
 			`;
 		} else {
 			return html`
@@ -106,7 +116,7 @@ export default class UmbNewPasswordLayoutElement extends LitElement {
 					<div id="header">${this.renderHeader()}</div>
 					<uui-form-layout-item>
 						<uui-label id="passwordLabel" for="password" slot="label" required>
-						  <umb-localize key="user_newPassword">New password</umb-localize>
+							<umb-localize key="user_newPassword">New password</umb-localize>
 						</uui-label>
 						<uui-input-password
 							type="password"
@@ -115,26 +125,37 @@ export default class UmbNewPasswordLayoutElement extends LitElement {
 							autocomplete="new-password"
 							.label=${until(umbLocalizationContext.localize('user_newPassword', undefined, 'New password'))}
 							required
-							required-message=${until(umbLocalizationContext.localize('user_passwordIsBlank', undefined, 'Your new password cannot be blank!'))}></uui-input-password>
+							required-message=${until(
+								umbLocalizationContext.localize('user_passwordIsBlank', undefined, 'Your new password cannot be blank!')
+							)}></uui-input-password>
 					</uui-form-layout-item>
 
 					<uui-form-layout-item>
 						<uui-label id="confirmPasswordLabel" for="confirmPassword" slot="label" required>
-              				<umb-localize key="user_confirmNewPassword">Confirm new password</umb-localize>
+							<umb-localize key="user_confirmNewPassword">Confirm new password</umb-localize>
 						</uui-label>
 						<uui-input-password
 							type="password"
 							id="confirmPassword"
 							name="confirmPassword"
 							autocomplete="new-password"
-							.label=${until(umbLocalizationContext.localize('user_confirmNewPassword', undefined, 'Confirm new password'))}
-              				required
-              				required-message=${until(umbLocalizationContext.localize('general_required', undefined, 'Required'))}></uui-input-password>
+							.label=${until(
+								umbLocalizationContext.localize('user_confirmNewPassword', undefined, 'Confirm new password')
+							)}
+							required
+							required-message=${until(
+								umbLocalizationContext.localize('general_required', undefined, 'Required')
+							)}></uui-input-password>
 					</uui-form-layout-item>
 
 					${this.#renderErrorMessage()}
 
-					<uui-button type="submit" label=${until(umbLocalizationContext.localize('general_continue', undefined, 'Continue'))} look="primary" color="default" .state=${this.state}></uui-button>
+					<uui-button
+						type="submit"
+						label=${until(umbLocalizationContext.localize('general_continue', undefined, 'Continue'))}
+						look="primary"
+						color="default"
+						.state=${this.state}></uui-button>
 				</form>
 			</uui-form>
 

@@ -39,7 +39,9 @@ export default class UmbResetPasswordPageElement extends LitElement {
 							<umb-localize key="login_forgottenPassword">Forgotten password?</umb-localize>
 						</h2>
 						<span>
-							<umb-localize key="login_forgottenPasswordInstruction">An email will be sent to the address specified with a link to reset your password</umb-localize>
+							<umb-localize key="login_forgottenPasswordInstruction"
+								>An email will be sent to the address specified with a link to reset your password</umb-localize
+							>
 						</span>
 					</div>
 
@@ -53,7 +55,9 @@ export default class UmbResetPasswordPageElement extends LitElement {
 							name="email"
 							.label=${until(umbLocalizationContext.localize('general_email', undefined, 'Email'))}
 							required
-							required-message=${until(umbLocalizationContext.localize('general_required', undefined, 'Required'))}></uui-input>
+							required-message=${until(
+								umbLocalizationContext.localize('general_required', undefined, 'Required')
+							)}></uui-input>
 					</uui-form-layout-item>
 
 					${this.#renderErrorMessage()}
@@ -81,7 +85,13 @@ export default class UmbResetPasswordPageElement extends LitElement {
 		return html`
 			<umb-confirmation-layout
 				header=${until(umbLocalizationContext.localize('login_forgottenPassword', undefined, 'Forgotten password?'))}
-				message=${until(umbLocalizationContext.localize('login_requestPasswordResetConfirmation', undefined, 'An email with password reset instructions will be sent to the specified address if it matched our records'))}>
+				message=${until(
+					umbLocalizationContext.localize(
+						'login_requestPasswordResetConfirmation',
+						undefined,
+						'An email with password reset instructions will be sent to the specified address if it matched our records'
+					)
+				)}>
 			</umb-confirmation-layout>
 		`;
 	}

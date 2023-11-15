@@ -23,9 +23,9 @@ export default class UmbInvitePageElement extends LitElement {
 		const response = await umbAuthContext.getInvitedUser();
 
 		if (!response.user?.id) {
-		  // The login page should already have redirected the user to an error page. They should never get here.
-		  this.error = 'No invited user found';
-		  return;
+			// The login page should already have redirected the user to an error page. They should never get here.
+			this.error = 'No invited user found';
+			return;
 		}
 
 		this.invitedUser = response.user;
@@ -59,8 +59,10 @@ export default class UmbInvitePageElement extends LitElement {
 					.state=${this.state}
 					.error=${this.error}></umb-new-password-layout>`
 			: this.error
-				? html`<umb-error-layout .header=${until(umbLocalizationContext.localize('general_error', undefined, 'Error'))} .message=${this.error}></umb-error-layout>`
-				: nothing;
+			? html`<umb-error-layout
+					.header=${until(umbLocalizationContext.localize('general_error', undefined, 'Error'))}
+					.message=${this.error}></umb-error-layout>`
+			: nothing;
 	}
 }
 

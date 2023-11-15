@@ -116,19 +116,21 @@ export class UmbExternalLoginProviderElement extends LitElement {
 					name="provider"
 					.value=${this.providerName}
 					title=${`Login using your ${this.displayName} account`}
-					.label=${until(umbLocalizationContext.localize('login_signInWith', undefined, 'Sign in with')) + ' ' + this.displayName}
+					.label=${until(umbLocalizationContext.localize('login_signInWith', undefined, 'Sign in with')) +
+					' ' +
+					this.displayName}
 					.look=${this.buttonLook}
 					.color=${this.buttonColor}>
-          ${this.displayName
-			  ? html`
-				  <div>
-					  <uui-icon name=${this.icon}></uui-icon>
-					  <umb-localize key="login_signInWith">Sign in with</umb-localize>
-					  ${this.displayName}
-				  </div>
-			  `
-			  : nothing}
-          			<slot></slot>
+					${this.displayName
+						? html`
+								<div>
+									<uui-icon name=${this.icon}></uui-icon>
+									<umb-localize key="login_signInWith">Sign in with</umb-localize>
+									${this.displayName}
+								</div>
+						  `
+						: nothing}
+					<slot></slot>
 				</uui-button>
 			</form>
 		`;
