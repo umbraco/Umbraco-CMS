@@ -105,7 +105,7 @@ export class UmbExternalLoginProviderElement extends LitElement {
 	protected updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		super.updated(_changedProperties);
 
-		if (this.buttonLook === 'outline') {
+		if (this.buttonLook === 'outline' && !this.customView) {
 			this.style.setProperty('--uui-button-background-color', ' var(--uui-color-surface)');
 			this.style.setProperty('--uui-button-background-color-hover', ' var(--uui-color-surface)');
 		}
