@@ -9,6 +9,8 @@ using Umbraco.Cms.Api.Management.Security.Authorization.Content.Root;
 using Umbraco.Cms.Api.Management.Security.Authorization.DenyLocalLogin;
 using Umbraco.Cms.Api.Management.Security.Authorization.Feature;
 using Umbraco.Cms.Api.Management.Security.Authorization.Media;
+using Umbraco.Cms.Api.Management.Security.Authorization.Media.RecycleBin;
+using Umbraco.Cms.Api.Management.Security.Authorization.Media.Root;
 using Umbraco.Cms.Api.Management.Security.Authorization.User;
 using Umbraco.Cms.Api.Management.Security.Authorization.UserGroup;
 using Umbraco.Cms.Core;
@@ -32,6 +34,8 @@ internal static class BackOfficeAuthPolicyBuilderExtensions
         builder.Services.AddSingleton<IAuthorizationHandler, DenyLocalLoginHandler>();
         builder.Services.AddSingleton<IAuthorizationHandler, FeatureAuthorizeHandler>();
         builder.Services.AddSingleton<IAuthorizationHandler, MediaPermissionHandler>();
+        builder.Services.AddSingleton<IAuthorizationHandler, MediaRecycleBinPermissionHandler>();
+        builder.Services.AddSingleton<IAuthorizationHandler, MediaRootPermissionHandler>();
         builder.Services.AddSingleton<IAuthorizationHandler, UserGroupPermissionHandler>();
         builder.Services.AddSingleton<IAuthorizationHandler, UserPermissionHandler>();
 
@@ -133,10 +137,22 @@ internal static class BackOfficeAuthPolicyBuilderExtensions
             policy.Requirements.Add(new DenyLocalLoginRequirement());
         });
 
+        options.AddPolicy($"New{AuthorizationPolicies.MediaPermissionAtRoot}", policy =>
+        {
+            policy.AuthenticationSchemes.Add(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
+            policy.Requirements.Add(new MediaRootPermissionRequirement());
+        });
+
         options.AddPolicy($"New{AuthorizationPolicies.MediaPermissionByResource}", policy =>
         {
             policy.AuthenticationSchemes.Add(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
             policy.Requirements.Add(new MediaPermissionRequirement());
+        });
+
+        options.AddPolicy($"New{AuthorizationPolicies.MediaPermissionEmptyRecycleBin}", policy =>
+        {
+            policy.AuthenticationSchemes.Add(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
+            policy.Requirements.Add(new MediaRecycleBinPermissionRequirement());
         });
 
         options.AddPolicy($"New{AuthorizationPolicies.UmbracoFeatureEnabled}", policy =>

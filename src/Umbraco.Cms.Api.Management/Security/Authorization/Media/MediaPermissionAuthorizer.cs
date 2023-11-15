@@ -32,4 +32,24 @@ internal sealed class MediaPermissionAuthorizer : IMediaPermissionAuthorizer
 
         return result == MediaAuthorizationStatus.Success;
     }
+
+    /// <inheritdoc/>
+    public async Task<bool> IsAuthorizedAtRootLevelAsync(IPrincipal currentUser)
+    {
+        IUser user = _authorizationHelper.GetCurrentUser(currentUser);
+
+        var result = await _mediaPermissionService.AuthorizeRootAccessAsync(user);
+
+        return result == MediaAuthorizationStatus.Success;
+    }
+
+    /// <inheritdoc/>
+    public async Task<bool> IsAuthorizedAtRecycleBinLevelAsync(IPrincipal currentUser)
+    {
+        IUser user = _authorizationHelper.GetCurrentUser(currentUser);
+
+        var result = await _mediaPermissionService.AuthorizeBinAccessAsync(user);
+
+        return result == MediaAuthorizationStatus.Success;
+    }
 }

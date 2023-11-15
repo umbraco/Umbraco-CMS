@@ -27,6 +27,8 @@ public static class AuthorizationPolicies
 
     public const string MediaPermissionByResource = nameof(MediaPermissionByResource);
     public const string MediaPermissionPathById = nameof(MediaPermissionPathById);
+    public const string MediaPermissionAtRoot = nameof(MediaPermissionAtRoot);
+    public const string MediaPermissionEmptyRecycleBin = nameof(MediaPermissionEmptyRecycleBin);
 
     // Single section access
     public const string SectionAccessContent = nameof(SectionAccessContent);
