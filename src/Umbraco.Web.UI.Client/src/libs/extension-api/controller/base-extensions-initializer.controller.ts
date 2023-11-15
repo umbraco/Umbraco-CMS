@@ -5,7 +5,8 @@ import type {
 	UmbBaseExtensionInitializer,
 	UmbExtensionRegistry,
 } from '@umbraco-cms/backoffice/extension-api';
-import { UmbBaseController, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbBaseController, type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
 export type PermittedControllerType<ControllerType extends { manifest: any }> = ControllerType & {
 	manifest: Required<Pick<ControllerType, 'manifest'>>;
@@ -18,7 +19,7 @@ export abstract class UmbBaseExtensionsInitializer<
 	ManifestTypeName extends keyof ManifestTypeMap<ManifestTypes> | string,
 	ManifestType extends ManifestBase = SpecificManifestTypeOrManifestBase<ManifestTypes, ManifestTypeName>,
 	ControllerType extends UmbBaseExtensionInitializer<ManifestType> = UmbBaseExtensionInitializer<ManifestType>,
-	MyPermittedControllerType extends ControllerType = PermittedControllerType<ControllerType>
+	MyPermittedControllerType extends ControllerType = PermittedControllerType<ControllerType>,
 > extends UmbBaseController {
 	#promiseResolvers: Array<() => void> = [];
 	#extensionRegistry: UmbExtensionRegistry<ManifestType>;
@@ -39,7 +40,7 @@ export abstract class UmbBaseExtensionsInitializer<
 		extensionRegistry: UmbExtensionRegistry<ManifestType>,
 		type: ManifestTypeName | Array<ManifestTypeName>,
 		filter: undefined | null | ((manifest: ManifestType) => boolean),
-		onChange?: (permittedManifests: Array<MyPermittedControllerType>) => void
+		onChange?: (permittedManifests: Array<MyPermittedControllerType>) => void,
 	) {
 		super(host, 'extensionsInitializer_' + (Array.isArray(type) ? type.join('_') : type));
 		this.#extensionRegistry = extensionRegistry;
@@ -109,6 +110,7 @@ export abstract class UmbBaseExtensionsInitializer<
 				hasChanged = true;
 			}
 		}
+
 		if (hasChanged) {
 			// The final list of permitted extensions to be displayed, this will be stripped from extensions that are overwritten by another extension and sorted accordingly.
 			const exposedPermittedExts = [...this._permittedExts];

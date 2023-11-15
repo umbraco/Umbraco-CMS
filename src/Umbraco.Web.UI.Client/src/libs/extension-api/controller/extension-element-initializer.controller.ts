@@ -9,15 +9,15 @@ import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
  * When the extension is permitted to be used, its Element will be instantiated and available for the consumer.
  *
  * @example
-* ```ts
-* const controller = new UmbExtensionElementController(host, extensionRegistry, alias, (permitted, ctrl) => { console.log("Extension is permitted and this is the element: ", ctrl.component) }));
-* ```
+ * ```ts
+ * const controller = new UmbExtensionElementController(host, extensionRegistry, alias, (permitted, ctrl) => { console.log("Extension is permitted and this is the element: ", ctrl.component) }));
+ * ```
  * @export
  * @class UmbExtensionElementController
  */
 export class UmbExtensionElementInitializer<
 	ManifestType extends ManifestWithDynamicConditions = ManifestWithDynamicConditions,
-	ControllerType extends UmbExtensionElementInitializer<ManifestType, any> = any
+	ControllerType extends UmbExtensionElementInitializer<ManifestType, any> = any,
 > extends UmbBaseExtensionInitializer<ManifestType, ControllerType> {
 	#defaultElement?: string;
 	#component?: HTMLElement;
@@ -60,7 +60,7 @@ export class UmbExtensionElementInitializer<
 		extensionRegistry: UmbExtensionRegistry<ManifestCondition>,
 		alias: string,
 		onPermissionChanged: (isPermitted: boolean, controller: ControllerType) => void,
-		defaultElement?: string
+		defaultElement?: string,
 	) {
 		super(host, extensionRegistry, 'extElement_', alias, onPermissionChanged);
 		this.#defaultElement = defaultElement;
@@ -80,7 +80,7 @@ export class UmbExtensionElementInitializer<
 		const manifest = this.manifest!; // In this case we are sure its not undefined.
 
 		const newComponent = await createExtensionElement(manifest, this.#defaultElement);
-		if (!this._positive) {
+		if (!this._isConditionsPositive) {
 			// We are not positive anymore, so we will back out of this creation.
 			return false;
 		}
@@ -90,7 +90,7 @@ export class UmbExtensionElementInitializer<
 			(this.#component as any).manifest = manifest;
 			return true; // we will confirm we have a component and are still good to go.
 		} else {
-			console.warn('Manifest did not provide any useful data for a web component to be created.')
+			console.warn('Manifest did not provide any useful data for a web component to be created.');
 		}
 
 		return false; // we will reject the state, we have no component, we are not good to be shown.
