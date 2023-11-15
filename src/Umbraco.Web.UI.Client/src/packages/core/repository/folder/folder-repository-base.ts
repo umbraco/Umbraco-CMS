@@ -1,24 +1,29 @@
 import { UmbRepositoryBase } from '../repository-base.js';
 import { type UmbFolderRepository } from './folder-repository.interface.js';
 import type { UmbFolderDataSource, UmbFolderDataSourceConstructor } from './folder-data-source.interface.js';
+import { UmbCreateFolderModel, UmbUpdateFolderModel } from './types.js';
 import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbTreeStore } from '@umbraco-cms/backoffice/tree';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { UmbCreateFolderModel, UmbUpdateFolderModel } from './types.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
+
+export type UmbFolderToTreeItemMapper<FolderTreeItemType> = (item: UmbCreateFolderModel) => FolderTreeItemType;
 
 export class UmbFolderRepositoryBase extends UmbRepositoryBase implements UmbFolderRepository {
 	protected _init: Promise<unknown>;
 	protected _treeStore?: UmbTreeStore;
 	#folderDataSource: UmbFolderDataSource;
+	#folderToTreeItemMapper: UmbFolderToTreeItemMapper<any>;
 
 	constructor(
 		host: UmbControllerHost,
 		folderDataSource: UmbFolderDataSourceConstructor,
-		treeStoreContextAlias: string | UmbContextToken<any, any>,
+		treeStoreContextAlias: string | UmbContextToken<any>,
+		folderToTreeItemMapper: UmbFolderToTreeItemMapper<any>,
 	) {
 		super(host);
 		this.#folderDataSource = new folderDataSource(this);
+		this.#folderToTreeItemMapper = folderToTreeItemMapper;
 
 		this._init = this.consumeContext(treeStoreContextAlias, (instance) => {
 			this._treeStore = instance as UmbTreeStore;
@@ -52,13 +57,10 @@ export class UmbFolderRepositoryBase extends UmbRepositoryBase implements UmbFol
 
 		const { error } = await this.#folderDataSource.insert(args);
 
-		/*
 		if (!error) {
-			// TODO: We need to push a new item to the tree store to update the tree. How do we want to create the tree items?
-			const folderTreeItem = createFolderTreeItem(folderRequest);
+			const folderTreeItem = this.#folderToTreeItemMapper(args);
 			this._treeStore!.appendItems([folderTreeItem]);
 		}
-		*/
 
 		return { error };
 	}
