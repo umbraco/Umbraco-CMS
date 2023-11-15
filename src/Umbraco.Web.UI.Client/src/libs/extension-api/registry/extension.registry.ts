@@ -12,7 +12,7 @@ import {
 
 function extensionArrayMemoization<T extends Pick<ManifestBase, 'alias'>>(
 	previousValue: Array<T>,
-	currentValue: Array<T>
+	currentValue: Array<T>,
 ): boolean {
 	// If length is different, data is different:
 	if (previousValue.length !== currentValue.length) {
@@ -25,10 +25,9 @@ function extensionArrayMemoization<T extends Pick<ManifestBase, 'alias'>>(
 	return true;
 }
 
-function extensionAndKindMatchArrayMemoization<T extends Pick<ManifestBase, 'alias'> & { isMatchedWithKind?: boolean }>(
-	previousValue: Array<T>,
-	currentValue: Array<T>
-): boolean {
+function extensionAndKindMatchArrayMemoization<
+	T extends Pick<ManifestBase, 'alias'> & { __isMatchedWithKind?: boolean },
+>(previousValue: Array<T>, currentValue: Array<T>): boolean {
 	// If length is different, data is different:
 	if (previousValue.length !== currentValue.length) {
 		return false;
@@ -43,8 +42,8 @@ function extensionAndKindMatchArrayMemoization<T extends Pick<ManifestBase, 'ali
 		currentValue.find((newValue: T) => {
 			const oldValue = previousValue.find((c) => c.alias === newValue.alias);
 			// First check if we found a previous value, matching this alias.
-			// Then checking isMatchedWithKind, as this is much more performant than checking the whole object. (I assume the only change happening to an extension is the match with a kind, we do not want to watch for other changes)
-			return oldValue === undefined || newValue.isMatchedWithKind !== oldValue.isMatchedWithKind;
+			// Then checking __isMatchedWithKind, as this is much more performant than checking the whole object. (I assume the only change happening to an extension is the match with a kind, we do not want to watch for other changes)
+			return oldValue === undefined || newValue.__isMatchedWithKind !== oldValue.__isMatchedWithKind;
 		})
 	) {
 		return false;
@@ -54,7 +53,7 @@ function extensionAndKindMatchArrayMemoization<T extends Pick<ManifestBase, 'ali
 
 function extensionSingleMemoization<T extends Pick<ManifestBase, 'alias'>>(
 	previousValue: T | undefined,
-	currentValue: T | undefined
+	currentValue: T | undefined,
 ): boolean {
 	if (previousValue && currentValue) {
 		return previousValue.alias === currentValue.alias;
@@ -63,11 +62,12 @@ function extensionSingleMemoization<T extends Pick<ManifestBase, 'alias'>>(
 }
 
 function extensionAndKindMatchSingleMemoization<
-	T extends Pick<ManifestBase, 'alias'> & { isMatchedWithKind?: boolean }
+	T extends Pick<ManifestBase, 'alias'> & { __isMatchedWithKind?: boolean },
 >(previousValue: T | undefined, currentValue: T | undefined): boolean {
 	if (previousValue && currentValue) {
 		return (
-			previousValue.alias === currentValue.alias && previousValue.isMatchedWithKind === currentValue.isMatchedWithKind
+			previousValue.alias === currentValue.alias &&
+			previousValue.__isMatchedWithKind === currentValue.__isMatchedWithKind
 		);
 	}
 	return previousValue === currentValue;
@@ -77,7 +77,7 @@ const sortExtensions = (a: ManifestBase, b: ManifestBase) => (b.weight || 0) - (
 
 export class UmbExtensionRegistry<
 	IncomingManifestTypes extends ManifestBase,
-	ManifestTypes extends ManifestBase = IncomingManifestTypes | ManifestBase
+	ManifestTypes extends ManifestBase = IncomingManifestTypes | ManifestBase,
 > {
 	readonly MANIFEST_TYPES: ManifestTypes = undefined as never;
 
@@ -90,7 +90,7 @@ export class UmbExtensionRegistry<
 	defineKind(kind: ManifestKind<ManifestTypes>) {
 		const extensionsValues = this._extensions.getValue();
 		const extension = extensionsValues.find(
-			(extension) => extension.alias === (kind as ManifestKind<ManifestTypes>).alias
+			(extension) => extension.alias === (kind as ManifestKind<ManifestTypes>).alias,
 		);
 
 		if (extension) {
@@ -105,7 +105,7 @@ export class UmbExtensionRegistry<
 					!(
 						k.matchType === (kind as ManifestKind<ManifestTypes>).matchType &&
 						k.matchKind === (kind as ManifestKind<ManifestTypes>).matchKind
-					)
+					),
 			);
 		nextData.push(kind as ManifestKind<ManifestTypes>);
 		this._kinds.next(nextData);
@@ -186,29 +186,29 @@ export class UmbExtensionRegistry<
 	private _kindsOfType<Key extends keyof ManifestTypeMap<ManifestTypes> | string>(type: Key) {
 		return this.kinds.pipe(
 			map((kinds) => kinds.filter((kind) => kind.matchType === type)),
-			distinctUntilChanged(extensionArrayMemoization)
+			distinctUntilChanged(extensionArrayMemoization),
 		);
 	}
 	private _extensionsOfType<Key extends keyof ManifestTypeMap<ManifestTypes> | string>(type: Key) {
 		return this.extensions.pipe(
 			map((exts) => exts.filter((ext) => ext.type === type)),
-			distinctUntilChanged(extensionArrayMemoization)
+			distinctUntilChanged(extensionArrayMemoization),
 		);
 	}
 	private _kindsOfTypes(types: string[]) {
 		return this.kinds.pipe(
 			map((kinds) => kinds.filter((kind) => types.indexOf(kind.matchType) !== -1)),
-			distinctUntilChanged(extensionArrayMemoization)
+			distinctUntilChanged(extensionArrayMemoization),
 		);
 	}
 
 	// TODO: can we get rid of as unknown here
 	private _extensionsOfTypes<ExtensionType extends ManifestBase = ManifestBase>(
-		types: Array<ExtensionType['type']>
+		types: Array<ExtensionType['type']>,
 	): Observable<Array<ExtensionType>> {
 		return this.extensions.pipe(
 			map((exts) => exts.filter((ext) => types.indexOf(ext.type) !== -1)),
-			distinctUntilChanged(extensionArrayMemoization)
+			distinctUntilChanged(extensionArrayMemoization),
 		) as unknown as Observable<Array<ExtensionType>>;
 	}
 
@@ -226,7 +226,7 @@ export class UmbExtensionRegistry<
 								const baseManifest = kinds.find((kind) => kind.matchKind === ext.kind)?.manifest;
 								// TODO: This check can go away when making a find kind based on type and kind.
 								if (baseManifest) {
-									const merged = { isMatchedWithKind: true, ...baseManifest, ...ext } as any;
+									const merged = { __isMatchedWithKind: true, ...baseManifest, ...ext } as any;
 									if ((baseManifest as any).meta) {
 										merged.meta = { ...(baseManifest as any).meta, ...(ext as any).meta };
 									}
@@ -234,24 +234,24 @@ export class UmbExtensionRegistry<
 								}
 							}
 							return ext;
-						})
+						}),
 					);
 				}
 				return of(ext);
 			}),
 
-			distinctUntilChanged(extensionAndKindMatchSingleMemoization)
+			distinctUntilChanged(extensionAndKindMatchSingleMemoization),
 		) as Observable<T | undefined>;
 	}
 
 	getByTypeAndAlias<
 		Key extends keyof ManifestTypeMap<ManifestTypes> | string,
-		T extends ManifestBase = SpecificManifestTypeOrManifestBase<ManifestTypes, Key>
+		T extends ManifestBase = SpecificManifestTypeOrManifestBase<ManifestTypes, Key>,
 	>(type: Key, alias: string) {
 		return combineLatest([
 			this.extensions.pipe(
 				map((exts) => exts.find((ext) => ext.type === type && ext.alias === alias)),
-				distinctUntilChanged(extensionSingleMemoization)
+				distinctUntilChanged(extensionSingleMemoization),
 			),
 			this._kindsOfType(type),
 		]).pipe(
@@ -261,7 +261,7 @@ export class UmbExtensionRegistry<
 				if (ext) {
 					const baseManifest = kinds.find((kind) => kind.matchKind === ext.kind)?.manifest;
 					if (baseManifest) {
-						const merged = { isMatchedWithKind: true, ...baseManifest, ...ext } as any;
+						const merged = { __isMatchedWithKind: true, ...baseManifest, ...ext } as any;
 						if ((baseManifest as any).meta) {
 							merged.meta = { ...(baseManifest as any).meta, ...(ext as any).meta };
 						}
@@ -270,18 +270,18 @@ export class UmbExtensionRegistry<
 				}
 				return ext;
 			}),
-			distinctUntilChanged(extensionAndKindMatchSingleMemoization)
+			distinctUntilChanged(extensionAndKindMatchSingleMemoization),
 		) as Observable<T | undefined>;
 	}
 
 	getByTypeAndAliases<
 		Key extends keyof ManifestTypeMap<ManifestTypes> | string,
-		T extends ManifestBase = SpecificManifestTypeOrManifestBase<ManifestTypes, Key>
+		T extends ManifestBase = SpecificManifestTypeOrManifestBase<ManifestTypes, Key>,
 	>(type: Key, aliases: Array<string>) {
 		return combineLatest([
 			this.extensions.pipe(
 				map((exts) => exts.filter((ext) => ext.type === type && aliases.indexOf(ext.alias) !== -1)),
-				distinctUntilChanged(extensionArrayMemoization)
+				distinctUntilChanged(extensionArrayMemoization),
 			),
 			this._kindsOfType(type),
 		]).pipe(
@@ -291,7 +291,7 @@ export class UmbExtensionRegistry<
 						// Specific Extension Meta merge (does not merge conditions)
 						const baseManifest = kinds.find((kind) => kind.matchKind === ext.kind)?.manifest;
 						if (baseManifest) {
-							const merged = { isMatchedWithKind: true, ...baseManifest, ...ext } as any;
+							const merged = { __isMatchedWithKind: true, ...baseManifest, ...ext } as any;
 							if ((baseManifest as any).meta) {
 								merged.meta = { ...(baseManifest as any).meta, ...(ext as any).meta };
 							}
@@ -299,15 +299,15 @@ export class UmbExtensionRegistry<
 						}
 						return ext;
 					})
-					.sort(sortExtensions)
+					.sort(sortExtensions),
 			),
-			distinctUntilChanged(extensionAndKindMatchArrayMemoization)
+			distinctUntilChanged(extensionAndKindMatchArrayMemoization),
 		) as Observable<Array<T>>;
 	}
 
 	extensionsOfType<
 		Key extends keyof ManifestTypeMap<ManifestTypes> | string,
-		T extends ManifestBase = SpecificManifestTypeOrManifestBase<ManifestTypes, Key>
+		T extends ManifestBase = SpecificManifestTypeOrManifestBase<ManifestTypes, Key>,
 	>(type: Key) {
 		return combineLatest([this._extensionsOfType(type), this._kindsOfType(type)]).pipe(
 			map(([exts, kinds]) =>
@@ -316,7 +316,7 @@ export class UmbExtensionRegistry<
 						// Specific Extension Meta merge (does not merge conditions)
 						const baseManifest = kinds.find((kind) => kind.matchKind === ext.kind)?.manifest;
 						if (baseManifest) {
-							const merged = { isMatchedWithKind: true, ...baseManifest, ...ext } as any;
+							const merged = { __isMatchedWithKind: true, ...baseManifest, ...ext } as any;
 							if ((baseManifest as any).meta) {
 								merged.meta = { ...(baseManifest as any).meta, ...(ext as any).meta };
 							}
@@ -324,14 +324,14 @@ export class UmbExtensionRegistry<
 						}
 						return ext;
 					})
-					.sort(sortExtensions)
+					.sort(sortExtensions),
 			),
-			distinctUntilChanged(extensionAndKindMatchArrayMemoization)
+			distinctUntilChanged(extensionAndKindMatchArrayMemoization),
 		) as Observable<Array<T>>;
 	}
 
 	extensionsOfTypes<ExtensionTypes extends ManifestBase = ManifestBase>(
-		types: string[]
+		types: string[],
 	): Observable<Array<ExtensionTypes>> {
 		return combineLatest([this._extensionsOfTypes(types), this._kindsOfTypes(types)]).pipe(
 			map(([exts, kinds]) =>
@@ -341,7 +341,7 @@ export class UmbExtensionRegistry<
 						if (ext) {
 							const baseManifest = kinds.find((kind) => kind.matchKind === ext.kind)?.manifest;
 							if (baseManifest) {
-								const merged = { isMatchedWithKind: true, ...baseManifest, ...ext } as any;
+								const merged = { __isMatchedWithKind: true, ...baseManifest, ...ext } as any;
 								if ((baseManifest as any).meta) {
 									merged.meta = { ...(baseManifest as any).meta, ...(ext as any).meta };
 								}
@@ -350,9 +350,9 @@ export class UmbExtensionRegistry<
 						}
 						return ext;
 					})
-					.sort(sortExtensions)
+					.sort(sortExtensions),
 			),
-			distinctUntilChanged(extensionAndKindMatchArrayMemoization)
+			distinctUntilChanged(extensionAndKindMatchArrayMemoization),
 		) as Observable<Array<ExtensionTypes>>;
 	}
 }
