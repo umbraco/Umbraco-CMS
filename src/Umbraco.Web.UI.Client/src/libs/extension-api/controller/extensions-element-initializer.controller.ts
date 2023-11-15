@@ -1,5 +1,8 @@
 import type { ManifestTypeMap, SpecificManifestTypeOrManifestBase } from '../types/map.types.js';
-import { type PermittedControllerType, UmbBaseExtensionsInitializer } from './base-extensions-initializer.controller.js';
+import {
+	type PermittedControllerType,
+	UmbBaseExtensionsInitializer,
+} from './base-extensions-initializer.controller.js';
 import {
 	type ManifestBase,
 	UmbExtensionElementInitializer,
@@ -11,10 +14,10 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
  */
 export class UmbExtensionsElementInitializer<
 	ManifestTypes extends ManifestBase,
-	ManifestTypeName extends keyof ManifestTypeMap<ManifestTypes> | string = ManifestTypes["type"],
+	ManifestTypeName extends keyof ManifestTypeMap<ManifestTypes> | string = ManifestTypes['type'],
 	ManifestType extends ManifestBase = SpecificManifestTypeOrManifestBase<ManifestTypes, ManifestTypeName>,
 	ControllerType extends UmbExtensionElementInitializer<ManifestType> = UmbExtensionElementInitializer<ManifestType>,
-	MyPermittedControllerType extends ControllerType = PermittedControllerType<ControllerType>
+	MyPermittedControllerType extends ControllerType = PermittedControllerType<ControllerType>,
 > extends UmbBaseExtensionsInitializer<
 	ManifestTypes,
 	ManifestTypeName,
@@ -43,7 +46,7 @@ export class UmbExtensionsElementInitializer<
 		type: ManifestTypeName | Array<ManifestTypeName>,
 		filter: undefined | null | ((manifest: ManifestType) => boolean),
 		onChange: (permittedManifests: Array<MyPermittedControllerType>) => void,
-		defaultElement?: string
+		defaultElement?: string,
 	) {
 		super(host, extensionRegistry, type, filter, onChange);
 		this.#extensionRegistry = extensionRegistry;
@@ -57,7 +60,7 @@ export class UmbExtensionsElementInitializer<
 			this.#extensionRegistry,
 			manifest.alias,
 			this._extensionChanged,
-			this._defaultElement
+			this._defaultElement,
 		) as ControllerType;
 
 		extController.properties = this.#props;

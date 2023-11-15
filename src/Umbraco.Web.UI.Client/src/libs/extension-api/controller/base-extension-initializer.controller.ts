@@ -5,6 +5,7 @@ import {
 	type ManifestWithDynamicConditions,
 	type UmbExtensionRegistry,
 	createExtensionApi,
+	UmbConditionConfigBase,
 } from '@umbraco-cms/backoffice/extension-api';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
@@ -12,6 +13,7 @@ export abstract class UmbBaseExtensionInitializer<
 	ManifestType extends ManifestWithDynamicConditions = ManifestWithDynamicConditions,
 	SubClassType = never,
 > extends UmbBaseController {
+	//
 	#promiseResolvers: Array<() => void> = [];
 	#manifestObserver!: UmbObserverController<ManifestType | undefined>;
 	#extensionRegistry: UmbExtensionRegistry<ManifestCondition>;
@@ -74,7 +76,7 @@ export abstract class UmbBaseExtensionInitializer<
 							this.#overwrites = extensionManifest.overwrites;
 						}
 					}
-					this.#gotConditions();
+					this.#gotManifest();
 				} else {
 					this.#overwrites = [];
 					this.#cleanConditions();
@@ -90,16 +92,17 @@ export abstract class UmbBaseExtensionInitializer<
 	}
 
 	#cleanConditions() {
+		if (this.#conditionControllers.length === 0) return;
 		this.#conditionControllers.forEach((controller) => controller.destroy());
 		this.#conditionControllers = [];
 		this.removeControllerByAlias('_observeConditions');
 	}
 
-	#gotConditions() {
+	#gotManifest() {
 		const conditionConfigs = this.#manifest?.conditions ?? [];
 
 		// As conditionConfigs might have been configured as something else than an array, then we ignorer them.
-		if (conditionConfigs.length === undefined || conditionConfigs.length === 0) {
+		if (conditionConfigs.length === 0) {
 			this.#cleanConditions();
 			this.#onConditionsChangedCallback();
 			return;
@@ -131,41 +134,7 @@ export abstract class UmbBaseExtensionInitializer<
 			// Observes the conditions and initialize as they come in.
 			this.observe(
 				this.#extensionRegistry.getByTypeAndAliases('condition', conditionAliases),
-				async (manifests) => {
-					const oldLength = this.#conditionControllers.length;
-
-					// New comers:
-					manifests.forEach((conditionManifest) => {
-						const configsOfThisType = conditionConfigs.filter(
-							(conditionConfig) => conditionConfig.alias === conditionManifest.alias,
-						);
-
-						// Spin up conditions, based of condition configs:
-						configsOfThisType.forEach(async (conditionConfig) => {
-							// Check if we already have a controller for this config:
-							const existing = this.#conditionControllers.find((controller) => controller.config === conditionConfig);
-							if (!existing) {
-								const conditionController = await createExtensionApi(conditionManifest, [
-									{
-										host: this,
-										manifest: conditionManifest,
-										config: conditionConfig,
-										onChange: this.#onConditionsChangedCallback,
-									},
-								]);
-								if (conditionController) {
-									// Some how listen to it? callback/event/onChange something.
-									this.#conditionControllers.push(conditionController);
-								}
-							}
-						});
-					});
-
-					// If a change to amount of condition controllers, this will make sure that when new conditions are added, the callback is fired, so the extensions can be re-evaluated, starting out as bad.
-					if (oldLength !== this.#conditionControllers.length) {
-						this.#onConditionsChangedCallback();
-					}
-				},
+				this.#gotConditions,
 				'_observeConditions',
 			);
 		} else {
@@ -176,6 +145,67 @@ export abstract class UmbBaseExtensionInitializer<
 			// There was not change in the amount of conditions, but the manifest was changed, this means this.#isPermitted is set to undefined and this will always fire the callback:
 			this.#onConditionsChangedCallback();
 		}
+	}
+
+	#gotConditions = (manifests: ManifestCondition[]) => {
+		manifests.forEach(this.#gotCondition);
+	};
+
+	#gotCondition = async (conditionManifest: ManifestCondition) => {
+		const conditionConfigs = this.#manifest?.conditions ?? [];
+		//
+		// Get just the conditions that uses this condition alias:
+		const configsOfThisType = conditionConfigs.filter(
+			(conditionConfig) => conditionConfig.alias === conditionManifest.alias,
+		);
+
+		// Create conditions, based of condition configs:
+		const newConditionControllers = await Promise.all(
+			configsOfThisType.map((conditionConfig) => this.#createConditionController(conditionManifest, conditionConfig)),
+		);
+
+		const oldLength = this.#conditionControllers.length;
+
+		newConditionControllers
+			.filter((x) => x !== undefined)
+			.forEach((emerging) => {
+				// TODO: All of this could use a refactor at one point, when someone is fresh in their mind.
+				// Niels Notes: Current problem being that we are not aware about what is in the making, so we don't know if we end up creating the same condition multiple times.
+				// Because it took some time to create the conditions, it maybe have already gotten created by another cycle, so lets test again.
+				const existing = this.#conditionControllers.find((existing) => existing.config === emerging?.config);
+				if (!existing) {
+					this.#conditionControllers.push(emerging!);
+				} else {
+					emerging?.destroy();
+				}
+			});
+
+		// If a change to amount of condition controllers, this will make sure that when new conditions are added, the callback is fired, so the extensions can be re-evaluated, starting out as bad.
+		if (oldLength !== this.#conditionControllers.length) {
+			this.#onConditionsChangedCallback();
+		}
+	};
+
+	async #createConditionController(
+		conditionManifest: ManifestCondition,
+		conditionConfig: UmbConditionConfigBase,
+	): Promise<UmbExtensionCondition | undefined> {
+		// Check if we already have a controller for this config:
+		const existing = this.#conditionControllers.find((controller) => controller.config === conditionConfig);
+		if (!existing) {
+			const conditionController = await createExtensionApi(conditionManifest, [
+				{
+					host: this,
+					manifest: conditionManifest,
+					config: conditionConfig,
+					onChange: this.#onConditionsChangedCallback,
+				},
+			]);
+			if (conditionController) {
+				return conditionController;
+			}
+		}
+		return undefined;
 	}
 
 	#conditionsAreInitialized() {

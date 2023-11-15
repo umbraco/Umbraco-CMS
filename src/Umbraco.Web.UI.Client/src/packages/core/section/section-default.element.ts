@@ -1,6 +1,6 @@
 import type { UmbWorkspaceElement } from '../workspace/workspace.element.js';
 import type { UmbSectionMainViewElement } from './section-main-views/section-main-views.element.js';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, nothing, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import {
 	ManifestSection,
@@ -82,7 +82,7 @@ export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectio
 							${repeat(
 								this._sidebarApps,
 								(app) => app.alias,
-								(app) => app.component
+								(app) => app.component,
 							)}
 						</umb-section-sidebar>
 				  `

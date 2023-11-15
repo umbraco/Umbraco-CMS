@@ -6,7 +6,6 @@ import type {
 	UmbExtensionRegistry,
 } from '@umbraco-cms/backoffice/extension-api';
 import { UmbBaseController, type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
 export type PermittedControllerType<ControllerType extends { manifest: any }> = ControllerType & {
 	manifest: Required<Pick<ControllerType, 'manifest'>>;
@@ -70,9 +69,9 @@ export abstract class UmbBaseExtensionsInitializer<
 		}
 
 		// Clean up extensions that are no longer.
-		this._extensions = this._extensions.filter((controller) => {
-			if (!manifests.find((manifest) => manifest.alias === controller.alias)) {
-				controller.destroy();
+		this._extensions = this._extensions.filter((extension) => {
+			if (!manifests.find((manifest) => manifest.alias === extension.alias)) {
+				extension.destroy();
 				// destroying the controller will, if permitted, make a last callback with isPermitted = false. This will also remove it from the _permittedExts array.
 				return false;
 			}
