@@ -1,4 +1,5 @@
 ﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Factories;
@@ -9,20 +10,27 @@ using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Media;
 
 [ApiVersion("1.0")]
 public class CreateMediaController : MediaControllerBase
 {
-    private readonly IMediaEditingService _mediaEditingService;
+    private readonly IAuthorizationService _authorizationService;
     private readonly IMediaEditingPresentationFactory _mediaEditingPresentationFactory;
+    private readonly IMediaEditingService _mediaEditingService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
-    public CreateMediaController(IMediaEditingService mediaEditingService, IMediaEditingPresentationFactory mediaEditingPresentationFactory, IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
+    public CreateMediaController(
+        IAuthorizationService authorizationService,
+        IMediaEditingPresentationFactory mediaEditingPresentationFactory,
+        IMediaEditingService mediaEditingService,
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
     {
-        _mediaEditingService = mediaEditingService;
+        _authorizationService = authorizationService;
         _mediaEditingPresentationFactory = mediaEditingPresentationFactory;
+        _mediaEditingService = mediaEditingService;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
@@ -33,6 +41,23 @@ public class CreateMediaController : MediaControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Create(CreateMediaRequestModel createRequestModel)
     {
+        AuthorizationResult authorizationResult;
+
+        if (createRequestModel.ParentId.HasValue is false)
+        {
+            authorizationResult = await _authorizationService.AuthorizeAsync(User, $"New{AuthorizationPolicies.MediaPermissionAtRoot}");
+        }
+        else
+        {
+            authorizationResult = await _authorizationService.AuthorizeAsync(User, new[] { createRequestModel.ParentId.Value },
+                $"New{AuthorizationPolicies.MediaPermissionByResource}");
+        }
+
+        if (!authorizationResult.Succeeded)
+        {
+            return Forbidden();
+        }
+
         MediaCreateModel model = _mediaEditingPresentationFactory.MapCreateModel(createRequestModel);
         Attempt<IMedia?, ContentEditingOperationStatus> result = await _mediaEditingService.CreateAsync(model, CurrentUserKey(_backOfficeSecurityAccessor));
 
