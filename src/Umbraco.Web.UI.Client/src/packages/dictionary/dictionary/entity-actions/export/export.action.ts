@@ -33,32 +33,19 @@ export default class UmbExportDictionaryEntityAction extends UmbEntityActionBase
 		const result = await this.repository?.export(this.unique, includeChildren);
 		const blobContent = await result?.data;
 
-		const promise = new Promise<void>((resolve, reject) => {
-			if (!blobContent) {
-				reject();
-				return;
-			}
+		if (!blobContent) return;
+		const blob = new Blob([blobContent], { type: 'text/plain' });
+		const a = document.createElement('a');
+		const url = window.URL.createObjectURL(blob);
 
-			const blob = new Blob([blobContent], { type: 'text/plain' });
-			const a = document.createElement('a');
+		// Download
+		a.href = url;
+		a.download = `${this.unique}.udt`;
+		document.body.appendChild(a);
+		a.click();
+		document.body.removeChild(a);
 
-			const url = window.URL.createObjectURL(blob);
-			a.href = url;
-			a.download = `${this.unique}.udt`;
-			document.body.appendChild(a);
-			a.click();
-			document.body.removeChild(a);
-			window.URL.revokeObjectURL(url);
-
-			resolve();
-		});
-
-		promise
-			.then(() => {
-				console.log('success');
-			})
-			.catch(() => {
-				console.log('fail');
-			});
+		// Clean up
+		window.URL.revokeObjectURL(url);
 	}
 }
