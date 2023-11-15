@@ -1,5 +1,6 @@
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Dashboards;
+using Umbraco.Cms.Core.DynamicRoot.QuerySteps;
 using Umbraco.Cms.Core.Manifest;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Media;
@@ -144,6 +145,18 @@ public static partial class UmbracoBuilderExtensions
     public static IUmbracoBuilder AddWebhookEvent<T>(this IUmbracoBuilder builder) where T : IWebhookEvent
     {
         builder.WebhookEvents().Append<T>();
+        return builder;
+    }
+
+    /// <summary>
+    /// Add an IDynamicRootQueryStep to the DynamicRootQueryStepCollectionBuilder.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="builder"></param>
+    /// <returns></returns>
+    public static IUmbracoBuilder AddDynamicRootStep<T>(this IUmbracoBuilder builder) where T : IDynamicRootQueryStep
+    {
+        builder.DynamicRootSteps().Append<T>();
         return builder;
     }
 }
