@@ -6,6 +6,7 @@ using Umbraco.Cms.Api.Common.Attributes;
 using Umbraco.Cms.Api.Common.Filters;
 using Umbraco.Cms.Api.Management.DependencyInjection;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Features;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Web.Common.Authorization;
 
@@ -15,7 +16,7 @@ namespace Umbraco.Cms.Api.Management.Controllers;
 [Authorize(Policy = "New" + AuthorizationPolicies.UmbracoFeatureEnabled)]
 [MapToApi(ManagementApiConfiguration.ApiName)]
 [JsonOptionsName(Constants.JsonOptionsNames.BackOffice)]
-public abstract class ManagementApiControllerBase : Controller
+public abstract class ManagementApiControllerBase : Controller, IUmbracoFeature
 {
     protected CreatedAtActionResult CreatedAtAction<T>(Expression<Func<T, string>> action, Guid id)
         => CreatedAtAction(action, new { id = id });
