@@ -1,5 +1,5 @@
 import type { InterfaceColor, InterfaceLook } from '@umbraco-ui/uui';
-import { css, CSSResultGroup, html, LitElement, nothing } from 'lit';
+import { css, CSSResultGroup, html, LitElement, nothing, PropertyValueMap } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { until } from 'lit/directives/until.js';
 
@@ -102,6 +102,15 @@ export class UmbExternalLoginProviderElement extends LitElement {
 
 	#externalLoginUrl = '';
 
+	protected updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+		super.updated(_changedProperties);
+
+		if (this.buttonLook === 'outline') {
+			this.style.setProperty('--uui-button-background-color', ' var(--uui-color-surface)');
+			this.style.setProperty('--uui-button-background-color-hover', ' var(--uui-color-surface)');
+		}
+	}
+
 	protected render() {
 		return this.customView
 			? until(this.renderCustomView(), html`<uui-loader-bar></uui-loader-bar>`)
@@ -163,8 +172,8 @@ export class UmbExternalLoginProviderElement extends LitElement {
 		css`
 			#defaultView uui-button {
 				width: 100%;
-				--uui-button-padding-top-factor: 1.5;
-				--uui-button-padding-bottom-factor: 1.5;
+				--uui-button-height: 40px;
+				--uui-button-font-weight: 400;
 			}
 			#defaultView uui-button div {
 				/* TODO: Remove this when uui-button has setting for aligning content */
