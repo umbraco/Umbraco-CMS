@@ -1,3 +1,4 @@
+import { UmbCreateFolderModel, UmbUpdateFolderModel } from './types.js';
 import type { ProblemDetails } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
@@ -7,11 +8,7 @@ export interface UmbFolderRepository extends UmbApi {
 		data?: any;
 		error?: ProblemDetails;
 	}>;
-	createFolder(
-		unique: string,
-		parentUnique: string | null,
-		name: string,
-	): Promise<{
+	createFolder(args: UmbCreateFolderModel): Promise<{
 		data?: string;
 		error?: ProblemDetails;
 	}>;
@@ -21,10 +18,7 @@ export interface UmbFolderRepository extends UmbApi {
 		error?: ProblemDetails;
 	}>;
 
-	updateFolder(
-		unique: string,
-		name: string,
-	): Promise<{
+	updateFolder(args: UmbUpdateFolderModel): Promise<{
 		data?: any;
 		error?: ProblemDetails;
 	}>;

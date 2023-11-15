@@ -2,9 +2,9 @@ import { css, html, customElement, property, query, state } from '@umbraco-cms/b
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbFolderModalData, UmbFolderModalValue, UmbModalContext } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbFolderRepository } from '@umbraco-cms/backoffice/repository';
+import { UmbFolderModel, UmbFolderRepository } from '@umbraco-cms/backoffice/repository';
 import { createExtensionApi, ManifestBase } from '@umbraco-cms/backoffice/extension-api';
-import { FolderResponseModel, ProblemDetails } from '@umbraco-cms/backoffice/backend-api';
+import { ProblemDetails } from '@umbraco-cms/backoffice/backend-api';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -20,20 +20,20 @@ export class UmbFolderModalElement extends UmbLitElement {
 	}
 	public set data(value: UmbFolderModalData | undefined) {
 		this._data = value;
-		this.#unique = value?.unique || null;
+		this.#unique = value?.unique;
 		this.#parentUnique = value?.parentUnique || null;
 		this.#repositoryAlias = value?.repositoryAlias;
 		this.#observeRepository();
 	}
 
 	#repositoryAlias?: string;
-	#unique: string | null = null;
+	#unique?: string;
 	#parentUnique: string | null = null;
 	#repository?: UmbFolderRepository;
 	#repositoryObserver?: UmbObserverController<ManifestBase | undefined>;
 
 	@state()
-	_folder?: FolderResponseModel;
+	_folder?: UmbFolderModel;
 
 	@state()
 	_headline?: string;
@@ -112,11 +112,18 @@ export class UmbFolderModalElement extends UmbLitElement {
 		this._folder = { ...this._folder, name: folderName };
 
 		if (this._isNew) {
-			const { error: createError } = await this.#repository.createFolder(this._folder);
+			const { error: createError } = await this.#repository.createFolder({
+				unique: this._folder.unique,
+				parentUnique: this._folder.parentUnique,
+				name: folderName,
+			});
 			error = createError;
 		} else {
 			if (!this.#unique) throw new Error('Unique is required to update folder');
-			const { error: updateError } = await this.#repository.updateFolder(this.#unique, this._folder);
+			const { error: updateError } = await this.#repository.updateFolder({
+				unique: this._folder.unique,
+				name: folderName,
+			});
 			error = updateError;
 		}
 

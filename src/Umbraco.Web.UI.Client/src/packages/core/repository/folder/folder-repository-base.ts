@@ -4,6 +4,8 @@ import type { UmbFolderDataSource, UmbFolderDataSourceConstructor } from './fold
 import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbTreeStore } from '@umbraco-cms/backoffice/tree';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { UmbCreateFolderModel, UmbUpdateFolderModel } from './types.js';
+import { UmbId } from '@umbraco-cms/backoffice/id';
 
 export class UmbFolderRepositoryBase extends UmbRepositoryBase implements UmbFolderRepository {
 	protected _init: Promise<unknown>;
@@ -23,19 +25,32 @@ export class UmbFolderRepositoryBase extends UmbRepositoryBase implements UmbFol
 		}).asPromise();
 	}
 
+	/**
+	 * Creates a Data Type folder with the given id from the server
+	 * @param {string} parentId
+	 * @return {*}
+	 * @memberof UmbDataTypeFolderServerDataSource
+	 */
+	/* TODO: revisit this method. 
+	Id is currently not used everywhere, but the method is currently overwritten for file system repos. */
 	async createFolderScaffold(parentUnique: string | null) {
 		if (parentUnique === undefined) throw new Error('Parent unique is missing');
-		await this._init;
-		return this.#folderDataSource.createScaffold(parentUnique);
+
+		const scaffold = {
+			name: '',
+			unique: UmbId.new(),
+			parentUnique,
+		};
+
+		return { data: scaffold };
 	}
 
-	async createFolder(unique: string, parentUnique: string | null, name: string) {
-		if (!unique) throw new Error('Unique is missing');
-		if (parentUnique === undefined) throw new Error('Parent unique is missing');
-		if (!name) throw new Error('Name is missing');
+	async createFolder(args: UmbCreateFolderModel) {
+		if (args.parentUnique === undefined) throw new Error('Parent unique is missing');
+		if (!args.name) throw new Error('Name is missing');
 		await this._init;
 
-		const { error } = await this.#folderDataSource.insert(unique, parentUnique, name);
+		const { error } = await this.#folderDataSource.insert(args);
 
 		/*
 		if (!error) {
@@ -68,15 +83,15 @@ export class UmbFolderRepositoryBase extends UmbRepositoryBase implements UmbFol
 	 * @return {*}
 	 * @memberof UmbFolderRepositoryBase
 	 */
-	async updateFolder(unique: string, name: string) {
-		if (!unique) throw new Error('Unique is missing');
-		if (!name) throw new Error('Folder name is missing');
+	async updateFolder(args: UmbUpdateFolderModel) {
+		if (!args.unique) throw new Error('Unique is missing');
+		if (!args.name) throw new Error('Folder name is missing');
 		await this._init;
 
-		const { error } = await this.#folderDataSource.update(unique, name);
+		const { error } = await this.#folderDataSource.update(args);
 
 		if (!error) {
-			this._treeStore!.updateItem(unique, { name });
+			this._treeStore!.updateItem(args.unique, { name: args.name });
 		}
 
 		return { error };
