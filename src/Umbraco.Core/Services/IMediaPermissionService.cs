@@ -26,14 +26,14 @@ public interface IMediaPermissionService
     Task<MediaAuthorizationStatus> AuthorizeAccessAsync(IUser performingUser, IEnumerable<Guid> mediaKeys);
 
     /// <summary>
-    ///     Authorize that the current user has access to the media root item.
+    ///     Authorize that the current user has access to perform action on the media root item.
     /// </summary>
     /// <param name="performingUser">The user performing the operation.</param>
     /// <returns>A task resolving into a <see cref="MediaAuthorizationStatus"/>.</returns>
     Task<MediaAuthorizationStatus> AuthorizeRootAccessAsync(IUser performingUser);
 
     /// <summary>
-    ///     Authorize that the current user has access to the media bin item.
+    ///     Authorize that the current user has access to perform action on the media bin item.
     /// </summary>
     /// <param name="performingUser">The user performing the operation.</param>
     /// <returns>A task resolving into a <see cref="MediaAuthorizationStatus"/>.</returns>
