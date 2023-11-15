@@ -30,7 +30,7 @@ Use this directive to render an avatar.
             var vm = this;
 
             vm.avatar = [
-                { value: "assets/application/logo.svg" }
+                { value: "assets/img/application/logo.svg" }
             ];
 
         }
