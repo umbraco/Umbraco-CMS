@@ -11,7 +11,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 //! this is of any type in the backend-api
 export type PartialViewGetFolderResponse = { path: string; parentPath: string; name: string };
 
-export class UmbPartialViewsFolderServerDataSource implements UmbFolderDataSource {
+export class UmbPartialViewFolderServerDataSource implements UmbFolderDataSource {
 	#host: UmbControllerHost;
 
 	constructor(host: UmbControllerHost) {

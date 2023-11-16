@@ -4,7 +4,7 @@ import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 const menuItem: ManifestTypes = {
 	type: 'menuItem',
 	kind: 'tree',
-	alias: 'Umb.MenuItem.PartialViews',
+	alias: 'Umb.MenuItem.PartialView',
 	name: 'Partial View Menu Item',
 	weight: 40,
 	meta: {

@@ -7,28 +7,28 @@ import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api
 
 /**
  * @export
- * @class UmbPartialViewsStore
+ * @class UmbPartialViewStore
  * @extends {UmbStoreBase}
  * @description - Data Store for partial views
  */
-export class UmbPartialViewsStore extends UmbStoreBase {
+export class UmbPartialViewStore extends UmbStoreBase {
 	/**
-	 * Creates an instance of UmbPartialViewsStore.
+	 * Creates an instance of UmbPartialViewStore.
 	 * @param {UmbControllerHostInterface} host
-	 * @memberof UmbPartialViewsStore
+	 * @memberof UmbPartialViewStore
 	 */
 	constructor(host: UmbControllerHostElement) {
 		super(
 			host,
 			UMB_PARTIAL_VIEWS_STORE_CONTEXT_TOKEN.toString(),
-			new UmbArrayState<TemplateResponseModel>([], (x) => x.id)
+			new UmbArrayState<TemplateResponseModel>([], (x) => x.id),
 		);
 	}
 
 	/**
 	 * Append a partial view to the store
 	 * @param {Template} template
-	 * @memberof UmbPartialViewsStore
+	 * @memberof UmbPartialViewStore
 	 */
 	append(template: TemplateResponseModel) {
 		this._data.append([template]);
@@ -37,13 +37,13 @@ export class UmbPartialViewsStore extends UmbStoreBase {
 	/**
 	 * Removes partial views in the store with the given uniques
 	 * @param {string[]} uniques
-	 * @memberof UmbPartialViewsStore
+	 * @memberof UmbPartialViewStore
 	 */
 	remove(uniques: string[]) {
 		this._data.remove(uniques);
 	}
 }
 
-export const UMB_PARTIAL_VIEWS_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbPartialViewsStore>(
-	UMB_PARTIAL_VIEW_STORE_CONTEXT_TOKEN_ALIAS
+export const UMB_PARTIAL_VIEWS_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbPartialViewStore>(
+	UMB_PARTIAL_VIEW_STORE_CONTEXT_TOKEN_ALIAS,
 );

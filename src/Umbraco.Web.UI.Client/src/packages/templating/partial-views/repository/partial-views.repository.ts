@@ -1,10 +1,10 @@
 import { PARTIAL_VIEW_ROOT_ENTITY_TYPE } from '../config.js';
 import { UmbPartialViewDetailServerDataSource } from './sources/partial-views.detail.server.data.js';
-import { UmbPartialViewsTreeServerDataSource } from './sources/partial-views.tree.server.data.js';
-import { UmbPartialViewsTreeStore, UMB_PARTIAL_VIEW_TREE_STORE_CONTEXT_TOKEN } from './partial-views.tree.store.js';
+import { UmbPartialViewTreeServerDataSource } from './sources/partial-views.tree.server.data.js';
+import { UmbPartialViewTreeStore, UMB_PARTIAL_VIEW_TREE_STORE_CONTEXT_TOKEN } from './partial-views.tree.store.js';
 import {
 	PartialViewGetFolderResponse,
-	UmbPartialViewsFolderServerDataSource,
+	UmbPartialViewFolderServerDataSource,
 } from './sources/partial-views.folder.server.data.js';
 import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbBaseController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
@@ -30,7 +30,7 @@ import {
 import { UmbTreeRepository } from '@umbraco-cms/backoffice/tree';
 import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
-export class UmbPartialViewsRepository
+export class UmbPartialViewRepository
 	extends UmbBaseController
 	implements
 		UmbTreeRepository<FileSystemTreeItemPresentationModel>,
@@ -46,18 +46,18 @@ export class UmbPartialViewsRepository
 {
 	#init;
 
-	#treeDataSource: UmbPartialViewsTreeServerDataSource;
+	#treeDataSource: UmbPartialViewTreeServerDataSource;
 	#detailDataSource: UmbPartialViewDetailServerDataSource;
-	#folderDataSource: UmbPartialViewsFolderServerDataSource;
+	#folderDataSource: UmbPartialViewFolderServerDataSource;
 
-	#treeStore?: UmbPartialViewsTreeStore;
+	#treeStore?: UmbPartialViewTreeStore;
 
 	constructor(host: UmbControllerHostElement) {
 		super(host);
 
-		this.#treeDataSource = new UmbPartialViewsTreeServerDataSource(this);
+		this.#treeDataSource = new UmbPartialViewTreeServerDataSource(this);
 		this.#detailDataSource = new UmbPartialViewDetailServerDataSource(this);
-		this.#folderDataSource = new UmbPartialViewsFolderServerDataSource(this);
+		this.#folderDataSource = new UmbPartialViewFolderServerDataSource(this);
 
 		this.#init = this.consumeContext(UMB_PARTIAL_VIEW_TREE_STORE_CONTEXT_TOKEN, (instance) => {
 			this.#treeStore = instance;
