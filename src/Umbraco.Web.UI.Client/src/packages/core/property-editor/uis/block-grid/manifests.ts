@@ -11,7 +11,7 @@ const manifest: ManifestPropertyEditorUi = {
 	meta: {
 		label: 'Block Grid',
 		propertyEditorSchemaAlias: 'Umbraco.BlockGrid',
-		icon: 'icon-icon-layout',
+		icon: 'icon-layout',
 		group: 'richContent',
 		settings: {
 			properties: [
