@@ -6,7 +6,6 @@ import type {
 	UmbExtensionRegistry,
 } from '@umbraco-cms/backoffice/extension-api';
 import { UmbBaseController, type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
 export type PermittedControllerType<ControllerType extends { manifest: any }> = ControllerType & {
 	manifest: Required<Pick<ControllerType, 'manifest'>>;
@@ -28,8 +27,6 @@ export abstract class UmbBaseExtensionsInitializer<
 	#onChange?: (permittedManifests: Array<MyPermittedControllerType>) => void;
 	protected _extensions: Array<ControllerType> = [];
 	private _permittedExts: Array<MyPermittedControllerType> = [];
-
-	#observerCtrlTest?: UmbObserverController;
 
 	asPromise(): Promise<void> {
 		return new Promise((resolve) => {
@@ -57,7 +54,7 @@ export abstract class UmbBaseExtensionsInitializer<
 		if (this.#filter) {
 			source = source.pipe(map((extensions: Array<ManifestType>) => extensions.filter(this.#filter!)));
 		}
-		this.#observerCtrlTest = this.observe(source, this.#gotManifests, '_observeManifests') as any;
+		this.observe(source, this.#gotManifests, '_observeManifests') as any;
 	}
 
 	#gotManifests = (manifests: Array<ManifestType>) => {
@@ -154,9 +151,9 @@ export abstract class UmbBaseExtensionsInitializer<
 	}
 
 	public destroy() {
-		super.destroy();
 		this._extensions.length = 0;
 		this._permittedExts.length = 0;
+		super.destroy();
 		this.#onChange?.(this._permittedExts);
 		//this.#onChange = undefined;
 	}
