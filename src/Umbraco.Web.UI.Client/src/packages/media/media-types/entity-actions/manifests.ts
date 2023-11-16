@@ -1,6 +1,6 @@
 import { MEDIA_TYPE_DETAIL_REPOSITORY_ALIAS } from '../index.js';
-import { UmbCreateMediaTypeEntityAction } from './create.action.js';
-import UmbReloadMediaTypeEntityAction from './reload.action.js';
+import { UmbCreateMediaTypeEntityAction } from './create/create.action.js';
+import { manifests as createManifests } from './create/manifests.js';
 import { UmbDeleteEntityAction, UmbMoveEntityAction, UmbCopyEntityAction } from '@umbraco-cms/backoffice/entity-action';
 import type { ManifestEntityAction } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -60,19 +60,6 @@ const entityActions: Array<ManifestEntityAction> = [
 			entityTypes: [entityType],
 		},
 	},
-	{
-		type: 'entityAction',
-		alias: 'Umb.EntityAction.MediaType.Reload',
-		name: 'Reload Media Type Entity Action',
-		weight: 100,
-		api: UmbReloadMediaTypeEntityAction,
-		meta: {
-			icon: 'icon-refresh',
-			label: 'Reload',
-			repositoryAlias,
-			entityTypes: [entityType],
-		},
-	},
 ];
 
-export const manifests = [...entityActions];
+export const manifests = [...entityActions, ...createManifests];
