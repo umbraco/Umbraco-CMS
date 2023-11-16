@@ -557,20 +557,20 @@ describe('UmbBaseExtensionController', () => {
 				conditions: [
 					{
 						alias: 'Umb.Test.Condition.Delay',
-						value: '100',
+						value: '10',
 					},
 					{
 						alias: 'Umb.Test.Condition.Delay',
-						value: '200',
+						value: '20',
 					},
 				],
 			};
 
 			// A ASCII timeline for the conditions, when allowed and then not allowed:
-			// Condition		 				0ms  100ms  200ms  300ms  400ms  500ms
-			// First condition:				-		 +			-		   +      -      +
-			// Second condition:			-		 -			+		   +      -      -
-			// Sum:										-		 -			-		   +      -      -
+			// Condition		 				0ms   10ms   20ms   30ms   40ms   50ms   60ms
+			// First condition:				-		 +			-		   +      -      +	   -
+			// Second condition:			-		 -			+		   +      -      -	   +
+			// Sum:										-		 -			-		   +      -      -	   -
 
 			const conditionManifest = {
 				type: 'condition',
@@ -589,25 +589,31 @@ describe('UmbBaseExtensionController', () => {
 				hostElement,
 				extensionRegistry,
 				'Umb.Test.Section.1',
-				async () => {
+				async (isPermitted) => {
 					count++;
 					// We want the controller callback to first fire when conditions are initialized.
 					expect(extensionController.manifest?.conditions?.length).to.be.equal(2);
 					expect(extensionController?.manifest?.alias).to.eq('Umb.Test.Section.1');
 					if (count === 1) {
+						expect(isPermitted).to.be.true;
 						expect(extensionController?.permitted).to.be.true;
 						// Hack to double check that its two conditions that make up the state:
 						expect(extensionController.getControllers((controller) => (controller as any).permitted).length).to.equal(
 							2,
 						);
 					} else if (count === 2) {
+						expect(isPermitted).to.be.false;
 						expect(extensionController?.permitted).to.be.false;
 						// Hack to double check that its two conditions that make up the state, in this case its one, cause we already got the callback when one of the conditions changed. meaning in this split second one is still good:
 						expect(extensionController.getControllers((controller) => (controller as any).permitted).length).to.equal(
 							1,
 						);
-						extensionController.destroy(); // need to destroy the conditions.
-						done();
+
+						// Then we are done:
+						extensionController.destroy(); // End this test.
+						setTimeout(() => done(), 60); // Lets wait another round of the conditions approve/disapprove, just to see if the destroy stopped the conditions. (60ms, as that should be enough to test that another round does not happen.)
+					} else if (count === 5) {
+						expect(false).to.be.true; // This should not be called.
 					}
 				},
 			);

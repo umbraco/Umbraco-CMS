@@ -285,7 +285,6 @@ describe('UmbBaseExtensionsController', () => {
 				null,
 				(permitted) => {
 					count++;
-					console.log('permitted', permitted.length, permitted[0]?.alias);
 					if (count === 1) {
 						// First callback gives just one. We need to make a feature to gather changes to only reply after a computation cycle if we like to avoid this.
 						expect(permitted.length).to.eq(1);
