@@ -107,7 +107,6 @@ describe('UmbBaseExtensionsController', () => {
 			testExtensionRegistry.unregisterMany(['Umb.Test.Extension.A', 'Umb.Test.Extension.B']);
 		});
 
-		/*
 		it('exposes both manifests', (done) => {
 			let count = 0;
 
@@ -130,7 +129,6 @@ describe('UmbBaseExtensionsController', () => {
 				},
 			);
 		});
-		*/
 
 		it('consumed multiple types', (done) => {
 			const manifestExtra = {
@@ -181,7 +179,7 @@ describe('UmbBaseExtensionsController', () => {
 			);
 		});
 	});
-	/*
+
 	describe('Manifests without conditions overwrites another', () => {
 		let hostElement: UmbTestControllerHostElement;
 
@@ -374,7 +372,6 @@ describe('UmbBaseExtensionsController', () => {
 			);
 		});
 	});
-	*/
 
 	// TODO: Test for late coming kinds.
 });
