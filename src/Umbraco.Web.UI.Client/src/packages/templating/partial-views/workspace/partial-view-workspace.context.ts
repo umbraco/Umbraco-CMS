@@ -42,7 +42,7 @@ export class UmbPartialViewWorkspaceContext
 		return Promise.resolve();
 	}
 
-	#data = new UmbDeepState<PartialViewDetails | undefined>(undefined);
+	#data = new UmbDeepState<UmbPartialViewDetailModel | undefined>(undefined);
 	data = this.#data.asObservable();
 	name = this.#data.asObservablePart((data) => data?.name);
 	content = this.#data.asObservablePart((data) => data?.content);

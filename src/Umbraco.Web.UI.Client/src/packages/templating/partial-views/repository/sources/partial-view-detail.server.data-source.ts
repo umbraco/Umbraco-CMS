@@ -1,4 +1,4 @@
-import { PartialViewDetails } from '../../config.js';
+import { UmbPartialViewDetailModel } from '../../types.js';
 import {
 	CreatePartialViewRequestModel,
 	PagedSnippetItemResponseModel,
@@ -35,7 +35,10 @@ export class UmbPartialViewDetailServerDataSource
 	 * @return {*}  {Promise<DataSourceResponse<PartialViewDetails>>}
 	 * @memberof UmbPartialViewDetailServerDataSource
 	 */
-	createScaffold(parentId: string | null = null, preset: string): Promise<DataSourceResponse<PartialViewDetails>> {
+	createScaffold(
+		parentId: string | null = null,
+		preset: string,
+	): Promise<DataSourceResponse<UmbPartialViewDetailModel>> {
 		return tryExecuteAndNotify(this.#host, PartialViewResource.getPartialViewSnippetByName({ name: preset }));
 	}
 	/**

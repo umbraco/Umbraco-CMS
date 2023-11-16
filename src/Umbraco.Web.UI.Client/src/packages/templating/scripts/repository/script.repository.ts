@@ -1,4 +1,4 @@
-import { UMB_SCRIPT_TREE_STORE_CONTEXT, UmbScriptTreeStore } from '../tree/index.js';
+import { UmbScriptTreeRepository } from '../tree/index.js';
 import { UmbScriptServerDataSource } from './sources/script-detail.server.data.js';
 import { ScriptGetFolderResponse, UmbScriptFolderServerDataSource } from './sources/script-folder.server.data.js';
 import {
@@ -29,22 +29,17 @@ export class UmbScriptRepository
 		UmbFolderRepository,
 		UmbApi
 {
-	#init;
-
 	#detailDataSource: UmbScriptServerDataSource;
 	#folderDataSource: UmbScriptFolderServerDataSource;
 
-	#treeStore?: UmbScriptTreeStore;
+	// TODO: temp solution until it is automated
+	#treeRepository = new UmbScriptTreeRepository(this);
 
 	constructor(host: UmbControllerHost) {
 		super(host);
 
 		this.#detailDataSource = new UmbScriptServerDataSource(this);
 		this.#folderDataSource = new UmbScriptFolderServerDataSource(this);
-
-		this.#init = this.consumeContext(UMB_SCRIPT_TREE_STORE_CONTEXT, (instance) => {
-			this.#treeStore = instance;
-		}).asPromise();
 	}
 
 	//#region FOLDER
@@ -60,20 +55,18 @@ export class UmbScriptRepository
 	async createFolder(
 		requestBody: CreateFolderRequestModel,
 	): Promise<{ data?: string | undefined; error?: ProblemDetails | undefined }> {
-		await this.#init;
 		const req = {
 			parentPath: requestBody.parentId,
 			name: requestBody.name,
 		};
 		const promise = this.#folderDataSource.create(req);
 		await promise;
-		//this.requestTreeItemsOf(requestBody.parentId ? requestBody.parentId : null);
+		this.#treeRepository.requestTreeItemsOf(requestBody.parentId ? requestBody.parentId : null);
 		return promise;
 	}
 	async requestFolder(
 		unique: string,
 	): Promise<{ data?: ScriptGetFolderResponse | undefined; error?: ProblemDetails | undefined }> {
-		await this.#init;
 		return this.#folderDataSource.read(unique);
 	}
 	updateFolder(
@@ -83,11 +76,10 @@ export class UmbScriptRepository
 		throw new Error('Method not implemented.');
 	}
 	async deleteFolder(path: string): Promise<{ error?: ProblemDetails | undefined }> {
-		await this.#init;
 		const { data } = await this.requestFolder(path);
 		const promise = this.#folderDataSource.delete(path);
 		await promise;
-		//this.requestTreeItemsOf(data?.parentPath ? data?.parentPath : null);
+		this.#treeRepository.requestTreeItemsOf(data?.parentPath ? data?.parentPath : null);
 		return promise;
 	}
 	//#endregion
@@ -95,7 +87,6 @@ export class UmbScriptRepository
 	//#region DETAILS
 	async requestByKey(path: string) {
 		if (!path) throw new Error('Path is missing');
-		await this.#init;
 		const { data, error } = await this.#detailDataSource.read(path);
 		return { data, error };
 	}
@@ -113,7 +104,7 @@ export class UmbScriptRepository
 	async create(data: CreateScriptRequestModel): Promise<DataSourceResponse<any>> {
 		const promise = this.#detailDataSource.create(data);
 		await promise;
-		//this.requestTreeItemsOf(data.parentPath ? data.parentPath : null);
+		this.#treeRepository.requestTreeItemsOf(data.parentPath ? data.parentPath : null);
 		return promise;
 	}
 	save(id: string, requestBody: UpdateScriptRequestModel): Promise<UmbDataSourceErrorResponse> {
@@ -122,7 +113,7 @@ export class UmbScriptRepository
 	async delete(id: string): Promise<UmbDataSourceErrorResponse> {
 		const promise = this.#detailDataSource.delete(id);
 		const parentPath = id.substring(0, id.lastIndexOf('/'));
-		//this.requestTreeItemsOf(parentPath ? parentPath : null);
+		this.#treeRepository.requestTreeItemsOf(parentPath ? parentPath : null);
 		return promise;
 	}
 

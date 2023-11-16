@@ -2,9 +2,10 @@ import {
 	UMB_PARTIAL_VIEW_ENTITY_TYPE,
 	UMB_PARTIAL_VIEW_FOLDER_EMPTY_ENTITY_TYPE,
 	UMB_PARTIAL_VIEW_FOLDER_ENTITY_TYPE,
-	UMB_PARTIAL_VIEW_REPOSITORY_ALIAS,
 	UMB_PARTIAL_VIEW_ROOT_ENTITY_TYPE,
 } from '../entity.js';
+import { UMB_PARTIAL_VIEW_REPOSITORY_ALIAS } from '../repository/index.js';
+
 import { UmbCreateFromSnippetPartialViewAction } from './create/create-from-snippet.action.js';
 import { UmbCreateEmptyPartialViewAction } from './create/create-empty.action.js';
 import {

@@ -1,5 +1,5 @@
+import { UmbPartialViewTreeRepository } from '../tree/index.js';
 import { UmbPartialViewDetailServerDataSource } from './sources/partial-view-detail.server.data-source.js';
-import { UmbPartialViewTreeStore, UMB_PARTIAL_VIEW_TREE_STORE_CONTEXT_TOKEN } from './partial-views.tree.store.js';
 import {
 	PartialViewGetFolderResponse,
 	UmbPartialViewFolderServerDataSource,
@@ -39,22 +39,17 @@ export class UmbPartialViewRepository
 		UmbFolderRepository,
 		UmbApi
 {
-	#init;
-
 	#detailDataSource: UmbPartialViewDetailServerDataSource;
 	#folderDataSource: UmbPartialViewFolderServerDataSource;
 
-	#treeStore?: UmbPartialViewTreeStore;
+	// TODO: temp solution until it is automated
+	#treeRepository = new UmbPartialViewTreeRepository(this);
 
 	constructor(host: UmbControllerHostElement) {
 		super(host);
 
 		this.#detailDataSource = new UmbPartialViewDetailServerDataSource(this);
 		this.#folderDataSource = new UmbPartialViewFolderServerDataSource(this);
-
-		this.#init = this.consumeContext(UMB_PARTIAL_VIEW_TREE_STORE_CONTEXT_TOKEN, (instance) => {
-			this.#treeStore = instance;
-		}).asPromise();
 	}
 
 	//#region FOLDER
@@ -67,23 +62,22 @@ export class UmbPartialViewRepository
 		};
 		return Promise.resolve({ data, error: undefined });
 	}
+
 	async createFolder(
 		requestBody: CreateFolderRequestModel,
 	): Promise<{ data?: string | undefined; error?: ProblemDetails | undefined }> {
-		await this.#init;
 		const req = {
 			parentPath: requestBody.parentId,
 			name: requestBody.name,
 		};
 		const promise = this.#folderDataSource.create(req);
 		await promise;
-		this.requestTreeItemsOf(requestBody.parentId ? requestBody.parentId : null);
+		this.#treeRepository.requestTreeItemsOf(requestBody.parentId ? requestBody.parentId : null);
 		return promise;
 	}
 	async requestFolder(
 		unique: string,
 	): Promise<{ data?: PartialViewGetFolderResponse | undefined; error?: ProblemDetails | undefined }> {
-		await this.#init;
 		return this.#folderDataSource.read(unique);
 	}
 	updateFolder(
@@ -93,11 +87,10 @@ export class UmbPartialViewRepository
 		throw new Error('Method not implemented.');
 	}
 	async deleteFolder(path: string): Promise<{ error?: ProblemDetails | undefined }> {
-		await this.#init;
 		const { data } = await this.requestFolder(path);
 		const promise = this.#folderDataSource.delete(path);
 		await promise;
-		this.requestTreeItemsOf(data?.parentPath ? data?.parentPath : null);
+		this.#treeRepository.requestTreeItemsOf(data?.parentPath ? data?.parentPath : null);
 		return promise;
 	}
 	//#endregion
@@ -105,7 +98,6 @@ export class UmbPartialViewRepository
 	//#region DETAILS
 	async requestByKey(path: string) {
 		if (!path) throw new Error('Path is missing');
-		await this.#init;
 		const { data, error } = await this.#detailDataSource.read(path);
 		return { data, error };
 	}
@@ -113,6 +105,7 @@ export class UmbPartialViewRepository
 	requestById(id: string): Promise<DataSourceResponse<any>> {
 		throw new Error('Method not implemented.');
 	}
+
 	byId(id: string): Promise<Observable<any>> {
 		throw new Error('Method not implemented.');
 	}
@@ -120,19 +113,22 @@ export class UmbPartialViewRepository
 	createScaffold(parentId: string | null, preset: string): Promise<DataSourceResponse<TextFileResponseModelBaseModel>> {
 		return this.#detailDataSource.createScaffold(parentId, preset);
 	}
+
 	async create(data: CreatePartialViewRequestModel): Promise<DataSourceResponse<any>> {
 		const promise = this.#detailDataSource.create(data);
 		await promise;
-		this.requestTreeItemsOf(data.parentPath ? data.parentPath : null);
+		this.#treeRepository.requestTreeItemsOf(data.parentPath ? data.parentPath : null);
 		return promise;
 	}
+
 	save(id: string, requestBody: UpdatePartialViewRequestModel): Promise<UmbDataSourceErrorResponse> {
 		return this.#detailDataSource.update(id, requestBody);
 	}
+
 	async delete(id: string): Promise<UmbDataSourceErrorResponse> {
 		const promise = this.#detailDataSource.delete(id);
 		const parentPath = id.substring(0, id.lastIndexOf('/'));
-		this.requestTreeItemsOf(parentPath ? parentPath : null);
+		this.#treeRepository.requestTreeItemsOf(parentPath ? parentPath : null);
 		return promise;
 	}
 
