@@ -1,5 +1,5 @@
-using System.Security.Cryptography;
 using Microsoft.Extensions.DependencyInjection;
+using System.Security.Cryptography;
 using Microsoft.IdentityModel.Tokens;
 using Umbraco.Cms.Api.Common.Security;
 using Umbraco.Cms.Core;
@@ -43,8 +43,8 @@ public static class UmbracoBuilderAuthExtensions
                         Paths.MemberApi.LogoutEndpoint.TrimStart(Constants.CharArrays.ForwardSlash),
                         Paths.BackOfficeApi.LogoutEndpoint.TrimStart(Constants.CharArrays.ForwardSlash))
                     .SetRevocationEndpointUris(
-                        Paths.MemberApi.RevokeEndpoint.TrimStart(Constants.CharArrays.ForwardSlash),
-                        Paths.BackOfficeApi.RevokeEndpoint.TrimStart(Constants.CharArrays.ForwardSlash));
+                        Paths.BackOfficeApi.RevokeEndpoint.TrimStart(Constants.CharArrays.ForwardSlash),
+                        Paths.MemberApi.RevokeEndpoint.TrimStart(Constants.CharArrays.ForwardSlash));
 
                 // Enable authorization code flow with PKCE
                 options

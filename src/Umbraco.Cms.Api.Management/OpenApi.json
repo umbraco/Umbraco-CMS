@@ -16973,6 +16973,75 @@
         }
       }
     },
+    "/umbraco/management/api/v1/user/invite/resend": {
+      "post": {
+        "tags": [
+          "User"
+        ],
+        "operationId": "PostUserInviteResend",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/ResendInviteUserRequestModel"
+                  }
+                ]
+              }
+            },
+            "text/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/ResendInviteUserRequestModel"
+                  }
+                ]
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/ResendInviteUserRequestModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/user/invite/verify": {
       "post": {
         "tags": [
@@ -17357,7 +17426,7 @@
         },
         "additionalProperties": false
       },
-      "ContentResponseModelBaseDocumentValueModelDocumentVariantResponseModel": {
+      "ContentForDocumentResponseModel": {
         "type": "object",
         "properties": {
           "values": {
@@ -17462,7 +17531,7 @@
         "type": "integer",
         "format": "int32"
       },
-      "ContentTypeResponseModelBaseDocumentTypePropertyTypeResponseModelDocumentTypePropertyTypeContainerResponseModel": {
+      "ContentTypeForDocumentTypeResponseModel": {
         "type": "object",
         "properties": {
           "alias": {
@@ -17537,7 +17606,7 @@
         },
         "additionalProperties": false
       },
-      "ContentTypeResponseModelBaseMediaTypePropertyTypeResponseModelMediaTypePropertyTypeContainerResponseModel": {
+      "ContentTypeForMediaTypeResponseModel": {
         "type": "object",
         "properties": {
           "alias": {
@@ -17667,7 +17736,7 @@
         },
         "additionalProperties": false
       },
-      "CreateContentRequestModelBaseDocumentValueModelDocumentVariantRequestModel": {
+      "CreateContentForDocumentRequestModel": {
         "type": "object",
         "properties": {
           "values": {
@@ -17703,7 +17772,7 @@
         },
         "additionalProperties": false
       },
-      "CreateContentRequestModelBaseMediaValueModelMediaVariantRequestModel": {
+      "CreateContentForMediaRequestModel": {
         "type": "object",
         "properties": {
           "values": {
@@ -17739,7 +17808,7 @@
         },
         "additionalProperties": false
       },
-      "CreateContentTypeRequestModelBaseCreateDocumentTypePropertyTypeRequestModelCreateDocumentTypePropertyTypeContainerRequestModel": {
+      "CreateContentTypeForDocumentTypeRequestModel": {
         "type": "object",
         "properties": {
           "alias": {
@@ -17820,7 +17889,7 @@
         },
         "additionalProperties": false
       },
-      "CreateContentTypeRequestModelBaseCreateMediaTypePropertyTypeRequestModelCreateMediaTypePropertyTypeContainerRequestModel": {
+      "CreateContentTypeForMediaTypeRequestModel": {
         "type": "object",
         "properties": {
           "alias": {
@@ -17942,7 +18011,7 @@
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/CreateContentRequestModelBaseDocumentValueModelDocumentVariantRequestModel"
+            "$ref": "#/components/schemas/CreateContentForDocumentRequestModel"
           }
         ],
         "properties": {
@@ -17980,7 +18049,7 @@
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/CreateContentTypeRequestModelBaseCreateDocumentTypePropertyTypeRequestModelCreateDocumentTypePropertyTypeContainerRequestModel"
+            "$ref": "#/components/schemas/CreateContentTypeForDocumentTypeRequestModel"
           }
         ],
         "properties": {
@@ -18059,7 +18128,7 @@
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/CreateContentRequestModelBaseMediaValueModelMediaVariantRequestModel"
+            "$ref": "#/components/schemas/CreateContentForMediaRequestModel"
           }
         ],
         "properties": {
@@ -18092,7 +18161,7 @@
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/CreateContentTypeRequestModelBaseCreateMediaTypePropertyTypeRequestModelCreateMediaTypePropertyTypeContainerRequestModel"
+            "$ref": "#/components/schemas/CreateContentTypeForMediaTypeRequestModel"
           }
         ],
         "additionalProperties": false
@@ -18301,7 +18370,7 @@
           }
         ],
         "properties": {
-          "icon": {
+          "editorUiAlias": {
             "type": "string",
             "nullable": true
           }
@@ -18409,7 +18478,7 @@
           }
         ],
         "properties": {
-          "icon": {
+          "editorUiAlias": {
             "type": "string",
             "nullable": true
           }
@@ -18677,6 +18746,9 @@
           "contentTypeId": {
             "type": "string",
             "format": "uuid"
+          },
+          "isTrashed": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -18697,7 +18769,7 @@
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/ContentResponseModelBaseDocumentValueModelDocumentVariantResponseModel"
+            "$ref": "#/components/schemas/ContentForDocumentResponseModel"
           }
         ],
         "properties": {
@@ -18715,6 +18787,9 @@
             "type": "string",
             "format": "uuid",
             "nullable": true
+          },
+          "isTrashed": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -18796,7 +18871,7 @@
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/ContentTypeResponseModelBaseDocumentTypePropertyTypeResponseModelDocumentTypePropertyTypeContainerResponseModel"
+            "$ref": "#/components/schemas/ContentTypeForDocumentTypeResponseModel"
           }
         ],
         "properties": {
@@ -19633,6 +19708,9 @@
           "icon": {
             "type": "string",
             "nullable": true
+          },
+          "isTrashed": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -19688,7 +19766,7 @@
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/ContentTypeResponseModelBaseMediaTypePropertyTypeResponseModelMediaTypePropertyTypeContainerResponseModel"
+            "$ref": "#/components/schemas/ContentTypeForMediaTypeResponseModel"
           }
         ],
         "additionalProperties": false
@@ -21470,6 +21548,20 @@
         },
         "additionalProperties": false
       },
+      "ResendInviteUserRequestModel": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "ResetPasswordRequestModel": {
         "type": "object",
         "properties": {
@@ -22148,7 +22240,7 @@
         },
         "additionalProperties": false
       },
-      "UpdateContentRequestModelBaseDocumentValueModelDocumentVariantRequestModel": {
+      "UpdateContentForDocumentRequestModel": {
         "type": "object",
         "properties": {
           "values": {
@@ -22174,7 +22266,7 @@
         },
         "additionalProperties": false
       },
-      "UpdateContentRequestModelBaseMediaValueModelMediaVariantRequestModel": {
+      "UpdateContentForMediaRequestModel": {
         "type": "object",
         "properties": {
           "values": {
@@ -22200,7 +22292,7 @@
         },
         "additionalProperties": false
       },
-      "UpdateContentTypeRequestModelBaseUpdateDocumentTypePropertyTypeRequestModelUpdateDocumentTypePropertyTypeContainerRequestModel": {
+      "UpdateContentTypeForDocumentTypeRequestModel": {
         "type": "object",
         "properties": {
           "alias": {
@@ -22271,7 +22363,7 @@
         },
         "additionalProperties": false
       },
-      "UpdateContentTypeRequestModelBaseUpdateMediaTypePropertyTypeRequestModelUpdateMediaTypePropertyTypeContainerRequestModel": {
+      "UpdateContentTypeForMediaTypeRequestModel": {
         "type": "object",
         "properties": {
           "alias": {
@@ -22376,7 +22468,7 @@
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/UpdateContentRequestModelBaseDocumentValueModelDocumentVariantRequestModel"
+            "$ref": "#/components/schemas/UpdateContentForDocumentRequestModel"
           }
         ],
         "properties": {
@@ -22410,7 +22502,7 @@
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/UpdateContentTypeRequestModelBaseUpdateDocumentTypePropertyTypeRequestModelUpdateDocumentTypePropertyTypeContainerRequestModel"
+            "$ref": "#/components/schemas/UpdateContentTypeForDocumentTypeRequestModel"
           }
         ],
         "properties": {
@@ -22467,7 +22559,7 @@
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/UpdateContentRequestModelBaseMediaValueModelMediaVariantRequestModel"
+            "$ref": "#/components/schemas/UpdateContentForMediaRequestModel"
           }
         ],
         "additionalProperties": false
@@ -22494,7 +22586,7 @@
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/UpdateContentTypeRequestModelBaseUpdateMediaTypePropertyTypeRequestModelUpdateMediaTypePropertyTypeContainerRequestModel"
+            "$ref": "#/components/schemas/UpdateContentTypeForMediaTypeRequestModel"
           }
         ],
         "additionalProperties": false

@@ -38,7 +38,7 @@ public class DataTypeTreeControllerBase : FolderTreeControllerBase<DataTypeTreeI
             DataTypeTreeItemResponseModel responseModel = MapTreeItemViewModel(parentId, entity);
             if (dataTypes.TryGetValue(entity.Id, out IDataType? dataType))
             {
-                responseModel.Icon = dataType.Editor?.Icon ?? responseModel.Icon;
+                responseModel.EditorUiAlias = dataType.EditorUiAlias;
             }
 
             return responseModel;

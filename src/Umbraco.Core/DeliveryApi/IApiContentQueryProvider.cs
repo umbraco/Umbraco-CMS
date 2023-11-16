@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 
 namespace Umbraco.Cms.Core.DeliveryApi;
@@ -8,16 +8,6 @@ namespace Umbraco.Cms.Core.DeliveryApi;
 /// </summary>
 public interface IApiContentQueryProvider
 {
-    [Obsolete($"Use the {nameof(ExecuteQuery)} method that accepts {nameof(ProtectedAccess)}. Will be removed in V14.")]
-    PagedModel<Guid> ExecuteQuery(
-        SelectorOption selectorOption,
-        IList<FilterOption> filterOptions,
-        IList<SortOption> sortOptions,
-        string culture,
-        bool preview,
-        int skip,
-        int take);
-
     /// <summary>
     ///     Returns a page of item ids that passed the search criteria.
     /// </summary>
