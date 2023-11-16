@@ -31,12 +31,14 @@ public interface IDataEditor : IDiscoverable
     ///     Gets the icon of the editor.
     /// </summary>
     /// <remarks>Can be used to display editors when presenting them.</remarks>
+    // FIXME: remove this when we are rid of the old backoffice - the server should not know about data editor icons
     string Icon { get; }
 
     /// <summary>
     ///     Gets the group of the editor.
     /// </summary>
     /// <remarks>Can be used to organize editors when presenting them.</remarks>
+    // FIXME: remove this when we are rid of the old backoffice - the server should not know about data editor groups
     string Group { get; }
 
     /// <summary>

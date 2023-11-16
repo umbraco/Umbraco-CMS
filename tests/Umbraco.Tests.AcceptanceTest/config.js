@@ -3,12 +3,12 @@ const fs = require('fs');
 
 const properties = [
     {
-        description: 'Enter your superadmin username/email',
+        description: 'Enter your umbraco superadmin username/email',
         name: 'username',
         required: true
     },
     {
-        description: 'Enter your superadmin password',
+        description: 'Enter your umbraco superadmin password',
         name: 'password',
         hidden: true,
         required: true
@@ -22,7 +22,7 @@ const properties = [
 
 const configPath = './.env'
 
-console.log("Configure your test enviroment")
+console.log("Configure your umbraco test environment")
 
 prompt.start();
 

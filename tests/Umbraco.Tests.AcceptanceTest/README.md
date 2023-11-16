@@ -32,6 +32,18 @@ For example to run the Login Test,
 
     npx playwright test tests/DefaultConfig/Login/Login.spec.ts
 
+### Executing tests in UI Mode
+
+If you would like to have an overview of all your test, to be able to see all the steps in the tests being executed and you would like to be able to run all of your tests one after another, and maybe only just one test. Then you should use UI Mode. As before, you need to run these commands in the 'tests/Umbraco.Tests.AcceptanceTest' folder.
+
+    npx playwright test --ui
+
+You can also specify which tests you want to run
+
+    npx playwright test --ui tests/DefaultConfig
+
+When entering UI Mode, you might only able to see the authenticate test. To fix this you will need to click on the 'Projects' in UI mode and select 'Chromium'. After you've done this. You should be able to see all your tests for the location you specified when running the command.
+
 ### Environment Configuration
 
 The environment configuration is begin setup by the npm installation script.

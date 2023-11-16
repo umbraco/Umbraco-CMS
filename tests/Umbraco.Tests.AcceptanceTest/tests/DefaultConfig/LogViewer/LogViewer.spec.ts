@@ -17,7 +17,8 @@ test.describe('Log Viewer tests', () => {
 
     // Assert
     // Checks if there is a log with the telemetry level to minimal
-    await expect(page.getByRole('group').first()).toContainText('Telemetry level set to "' + telemetryLevel + '"');
+    await page.waitForTimeout(1000);
+    await expect(await page.getByRole('group').first()).toContainText('Telemetry level set to "' + telemetryLevel + '"');
 
     // Clean
     await umbracoApi.telemetry.setLevel(startTelemetryLevel);

@@ -16973,6 +16973,75 @@
         }
       }
     },
+    "/umbraco/management/api/v1/user/invite/resend": {
+      "post": {
+        "tags": [
+          "User"
+        ],
+        "operationId": "PostUserInviteResend",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/ResendInviteUserRequestModel"
+                  }
+                ]
+              }
+            },
+            "text/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/ResendInviteUserRequestModel"
+                  }
+                ]
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/ResendInviteUserRequestModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/user/invite/verify": {
       "post": {
         "tags": [
@@ -18301,7 +18370,7 @@
           }
         ],
         "properties": {
-          "icon": {
+          "editorUiAlias": {
             "type": "string",
             "nullable": true
           }
@@ -18409,7 +18478,7 @@
           }
         ],
         "properties": {
-          "icon": {
+          "editorUiAlias": {
             "type": "string",
             "nullable": true
           }
@@ -21473,6 +21542,20 @@
             "nullable": true
           },
           "childObjectTypeName": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ResendInviteUserRequestModel": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "message": {
             "type": "string",
             "nullable": true
           }
