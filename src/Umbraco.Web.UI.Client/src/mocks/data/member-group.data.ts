@@ -1,9 +1,8 @@
-import type { MemberGroupDetails } from '../../packages/members/member-groups/types.js';
 import { UmbEntityData } from './entity.data.js';
 import { createEntityTreeItem } from './utils.js';
 import { EntityTreeItemResponseModel, PagedEntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
-export const data: Array<MemberGroupDetails> = [
+export const data: Array<any> = [
 	{
 		name: 'Member Group AAA',
 		type: 'member-group',

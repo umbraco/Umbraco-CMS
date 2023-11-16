@@ -1,12 +1,12 @@
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbEntityTreeStore } from '@umbraco-cms/backoffice/tree';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 /**
  * @export
  * @class UmbMemberGroupTreeStore
- * @extends {UmbEntityTreeStore}
- * @description - Tree Data Store for Member Groups
+ * @extends {UmbStoreBase}
+ * @description - Tree Data Store for MemberGroup Items
  */
 export class UmbMemberGroupTreeStore extends UmbEntityTreeStore {
 	/**
@@ -15,10 +15,10 @@ export class UmbMemberGroupTreeStore extends UmbEntityTreeStore {
 	 * @memberof UmbMemberGroupTreeStore
 	 */
 	constructor(host: UmbControllerHostElement) {
-		super(host, UMB_MEMBER_GROUP_TREE_STORE_CONTEXT_TOKEN.toString());
+		super(host, UMB_MEMBER_GROUP_TREE_STORE_CONTEXT.toString());
 	}
 }
 
-export const UMB_MEMBER_GROUP_TREE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbMemberGroupTreeStore>(
+export const UMB_MEMBER_GROUP_TREE_STORE_CONTEXT = new UmbContextToken<UmbMemberGroupTreeStore>(
 	'UmbMemberGroupTreeStore',
 );
