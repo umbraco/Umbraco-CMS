@@ -1,18 +1,15 @@
-import { UmbTemplateTreeStore, UMB_TEMPLATE_TREE_STORE_CONTEXT_TOKEN } from './template.tree.store.js';
-import { UmbTemplateStore, UMB_TEMPLATE_STORE_CONTEXT_TOKEN } from './template.store.js';
-import { UmbTemplateTreeServerDataSource } from './sources/template.tree.server.data.js';
+import { UmbTemplateTreeStore, UMB_TEMPLATE_TREE_STORE_CONTEXT } from '../tree/index.js';
+import { UmbTemplateStore, UMB_TEMPLATE_STORE_CONTEXT } from './template.store.js';
 import { UmbTemplateDetailServerDataSource } from './sources/template.detail.server.data.js';
-import { UMB_TEMPLATE_ITEM_STORE_CONTEXT_TOKEN, UmbTemplateItemStore } from './template-item.store.js';
+import { UMB_TEMPLATE_ITEM_STORE_CONTEXT, UmbTemplateItemStore } from './template-item.store.js';
 import { UmbTemplateItemServerDataSource } from './sources/template.item.server.data.js';
 import { UmbTemplateQueryBuilderServerDataSource } from './sources/template.query-builder.server.data.js';
 import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbDetailRepository, UmbItemDataSource, UmbItemRepository } from '@umbraco-cms/backoffice/repository';
-import { UmbTreeRepository, UmbTreeDataSource } from '@umbraco-cms/backoffice/tree';
 import { UmbBaseController, type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 import type {
 	CreateTemplateRequestModel,
-	EntityTreeItemResponseModel,
 	ItemResponseModelBaseModel,
 	TemplateItemResponseModel,
 	TemplateQueryExecuteModel,
@@ -24,14 +21,12 @@ import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 export class UmbTemplateRepository
 	extends UmbBaseController
 	implements
-		UmbTreeRepository<EntityTreeItemResponseModel>,
 		UmbDetailRepository<CreateTemplateRequestModel, string, UpdateTemplateRequestModel, TemplateResponseModel>,
 		UmbItemRepository<TemplateItemResponseModel>,
 		UmbApi
 {
 	#init;
 
-	#treeDataSource: UmbTreeDataSource<EntityTreeItemResponseModel>;
 	#detailDataSource: UmbTemplateDetailServerDataSource;
 	#itemSource: UmbItemDataSource<TemplateItemResponseModel>;
 
@@ -45,21 +40,20 @@ export class UmbTemplateRepository
 	constructor(host: UmbControllerHost) {
 		super(host);
 
-		this.#treeDataSource = new UmbTemplateTreeServerDataSource(this);
 		this.#detailDataSource = new UmbTemplateDetailServerDataSource(this);
 		this.#itemSource = new UmbTemplateItemServerDataSource(this);
 		this.#queryBuilderSource = new UmbTemplateQueryBuilderServerDataSource(this);
 
 		this.#init = Promise.all([
-			this.consumeContext(UMB_TEMPLATE_ITEM_STORE_CONTEXT_TOKEN, (instance) => {
+			this.consumeContext(UMB_TEMPLATE_ITEM_STORE_CONTEXT, (instance) => {
 				this.#itemStore = instance;
 			}),
 
-			this.consumeContext(UMB_TEMPLATE_TREE_STORE_CONTEXT_TOKEN, (instance) => {
+			this.consumeContext(UMB_TEMPLATE_TREE_STORE_CONTEXT, (instance) => {
 				this.#treeStore = instance;
 			}),
 
-			this.consumeContext(UMB_TEMPLATE_STORE_CONTEXT_TOKEN, (instance) => {
+			this.consumeContext(UMB_TEMPLATE_STORE_CONTEXT, (instance) => {
 				this.#store = instance;
 			}),
 
@@ -68,73 +62,6 @@ export class UmbTemplateRepository
 			}),
 		]);
 	}
-
-	//#region TREE:
-	async requestTreeRoot() {
-		await this.#init;
-
-		const data = {
-			id: null,
-			type: 'template-root',
-			name: 'Templates',
-			icon: 'icon-folder',
-			hasChildren: true,
-		};
-
-		return { data };
-	}
-
-	async requestRootTreeItems() {
-		await this.#init;
-
-		const { data, error } = await this.#treeDataSource.getRootItems();
-		if (data) {
-			this.#treeStore?.appendItems(data.items);
-		}
-
-		return { data, error, asObservable: () => this.#treeStore!.rootItems };
-	}
-
-	async requestTreeItemsOf(parentId: string | null) {
-		if (parentId === undefined) throw new Error('Parent id is missing');
-		await this.#init;
-
-		const { data, error } = await this.#treeDataSource.getChildrenOf(parentId);
-
-		if (data) {
-			this.#treeStore?.appendItems(data.items);
-		}
-
-		return { data, error, asObservable: () => this.#treeStore!.childrenOf(parentId) };
-	}
-
-	async requestItemsLegacy(ids: Array<string>) {
-		await this.#init;
-
-		if (!ids) {
-			throw new Error('Ids are missing');
-		}
-
-		const { data, error } = await this.#treeDataSource.getItems(ids);
-
-		return { data, error, asObservable: () => this.#treeStore!.items(ids) };
-	}
-
-	async rootTreeItems() {
-		await this.#init;
-		return this.#treeStore!.rootItems;
-	}
-
-	async treeItemsOf(parentId: string | null) {
-		await this.#init;
-		return this.#treeStore!.childrenOf(parentId);
-	}
-
-	async itemsLegacy(ids: Array<string | null>) {
-		await this.#init;
-		return this.#treeStore!.items(ids);
-	}
-	//#endregion
 
 	//#region DETAILS:
 

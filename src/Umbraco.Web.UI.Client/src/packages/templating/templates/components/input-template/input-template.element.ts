@@ -94,7 +94,7 @@ export class UmbInputTemplateElement extends FormControlMixin(UmbLitElement) {
 				this._pickedTemplates = data;
 				this.requestUpdate('_pickedTemplates', oldValue);
 			},
-			'_observeTemplates'
+			'_observeTemplates',
 		);
 	}
 
@@ -164,7 +164,7 @@ export class UmbInputTemplateElement extends FormControlMixin(UmbLitElement) {
 							<uui-icon name="icon-trash"></uui-icon>
 						</uui-button>
 					</umb-template-card>
-				`
+				`,
 			)}
 			<uui-button id="add-button" look="placeholder" label="open" @click="${this.#openPicker}">Add</uui-button>
 		`;
