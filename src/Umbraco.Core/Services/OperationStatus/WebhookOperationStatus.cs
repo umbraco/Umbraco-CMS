@@ -1,8 +1,8 @@
-namespace Umbraco.Cms.Core.Services.OperationStatus;
+﻿namespace Umbraco.Cms.Core.Services.OperationStatus;
 
 public enum WebhookOperationStatus
 {
     Success,
     CancelledByNotification,
-    NotFound
+    NotFound,
 }

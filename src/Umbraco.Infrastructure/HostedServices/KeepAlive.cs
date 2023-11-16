@@ -17,6 +17,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices;
 /// <summary>
 ///     Hosted service implementation for keep alive feature.
 /// </summary>
+[Obsolete("Use Umbraco.Cms.Infrastructure.BackgroundJobs.KeepAliveJob instead.  This class will be removed in Umbraco 14.")]
 public class KeepAlive : RecurringHostedServiceBase
 {
     private readonly IHostingEnvironment _hostingEnvironment;

@@ -9,43 +9,40 @@ using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Editors;
-using Umbraco.Cms.Core.Models.Entities;
-using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
 public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference
 {
-    private readonly IEntityService _entityService;
     private readonly ILogger<MultiUrlPickerValueEditor> _logger;
-    private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
     private readonly IPublishedUrlProvider _publishedUrlProvider;
     private readonly IJsonSerializer _jsonSerializer;
+    private readonly IContentService _contentService;
+    private readonly IMediaService _mediaService;
 
     public MultiUrlPickerValueEditor(
-        IEntityService entityService,
-        IPublishedSnapshotAccessor publishedSnapshotAccessor,
         ILogger<MultiUrlPickerValueEditor> logger,
         ILocalizedTextService localizedTextService,
         IShortStringHelper shortStringHelper,
         DataEditorAttribute attribute,
         IPublishedUrlProvider publishedUrlProvider,
         IJsonSerializer jsonSerializer,
-        IIOHelper ioHelper)
+        IIOHelper ioHelper,
+        IContentService contentService,
+        IMediaService mediaService)
         : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute)
     {
-        _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
-        _publishedSnapshotAccessor = publishedSnapshotAccessor ??
-                                     throw new ArgumentNullException(nameof(publishedSnapshotAccessor));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _publishedUrlProvider = publishedUrlProvider;
 
         _jsonSerializer = jsonSerializer;
+        _contentService = contentService;
+        _mediaService = mediaService;
     }
 
     public IEnumerable<UmbracoEntityReference> GetReferences(object? value)
@@ -84,26 +81,6 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference
         {
             List<LinkDto>? links = _jsonSerializer.Deserialize<List<LinkDto>>(value);
 
-            List<LinkDto>? documentLinks = links?.FindAll(link =>
-                link.Udi != null && link.Udi.EntityType == Constants.UdiEntityType.Document);
-            List<LinkDto>? mediaLinks = links?.FindAll(link =>
-                link.Udi != null && link.Udi.EntityType == Constants.UdiEntityType.Media);
-
-            var entities = new List<IEntitySlim>();
-            if (documentLinks?.Count > 0)
-            {
-                entities.AddRange(
-                    _entityService.GetAll(
-                        UmbracoObjectTypes.Document,
-                        documentLinks.Select(link => link.Udi!.Guid).ToArray()));
-            }
-
-            if (mediaLinks?.Count > 0)
-            {
-                entities.AddRange(
-                    _entityService.GetAll(UmbracoObjectTypes.Media, mediaLinks.Select(link => link.Udi!.Guid).ToArray()));
-            }
-
             var result = new List<LinkDisplay>();
             if (links is null)
             {
@@ -112,7 +89,7 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference
 
             foreach (LinkDto dto in links)
             {
-                GuidUdi? udi = null;
+                GuidUdi? udi = dto.Udi;
                 var icon = "icon-link";
                 var published = true;
                 var trashed = false;
@@ -120,35 +97,30 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference
 
                 if (dto.Udi != null)
                 {
-                    IUmbracoEntity? entity = entities.Find(e => e.Key == dto.Udi.Guid);
-                    if (entity == null)
+                    if (dto.Udi.EntityType == Constants.UdiEntityType.Document)
                     {
-                        continue;
-                    }
+                        url =  _publishedUrlProvider.GetUrl(dto.Udi.Guid, UrlMode.Relative, culture);
+                        IContent? c = _contentService.GetById(dto.Udi.Guid);
 
-                    IPublishedSnapshot publishedSnapshot = _publishedSnapshotAccessor.GetRequiredPublishedSnapshot();
-                    if (entity is IDocumentEntitySlim documentEntity)
-                    {
-                        icon = documentEntity.ContentTypeIcon;
-                        published = culture == null
-                            ? documentEntity.Published
-                            : documentEntity.PublishedCultures.Contains(culture);
-                        udi = new GuidUdi(Constants.UdiEntityType.Document, documentEntity.Key);
-                        url = publishedSnapshot.Content?.GetById(entity.Key)?.Url(_publishedUrlProvider) ?? "#";
-                        trashed = documentEntity.Trashed;
+                        if (c is not null)
+                        {
+                            published = culture == null
+                                ? c.Published
+                                : c.PublishedCultures.Contains(culture);
+                            icon = c.ContentType.Icon;
+                            trashed = c.Trashed;
+                        }
                     }
-                    else if (entity is IContentEntitySlim contentEntity)
+                    else if (dto.Udi.EntityType == Constants.UdiEntityType.Media)
                     {
-                        icon = contentEntity.ContentTypeIcon;
-                        published = !contentEntity.Trashed;
-                        udi = new GuidUdi(Constants.UdiEntityType.Media, contentEntity.Key);
-                        url = publishedSnapshot.Media?.GetById(entity.Key)?.Url(_publishedUrlProvider) ?? "#";
-                        trashed = contentEntity.Trashed;
-                    }
-                    else
-                    {
-                        // Not supported
-                        continue;
+                        url = _publishedUrlProvider.GetMediaUrl(dto.Udi.Guid, UrlMode.Relative, culture);
+                        IMedia? m = _mediaService.GetById(dto.Udi.Guid);
+                        if (m is not null)
+                        {
+                            published = m.Trashed is false;
+                            icon = m.ContentType.Icon;
+                            trashed = m.Trashed;
+                        }
                     }
                 }
 

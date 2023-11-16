@@ -22,7 +22,7 @@ public class WebhookServiceTests : UmbracoIntegrationTest
     public async Task Can_Create_And_Get(string url, string webhookEvent, Guid key)
     {
         var createdWebhook = await WebhookService.CreateAsync(new Webhook(url, true, new[] { key }, new[] { webhookEvent }));
-        var webhook = await WebhookService.GetAsync(createdWebhook.Key);
+        var webhook = await WebhookService.GetAsync(createdWebhook.Result.Key);
 
         Assert.Multiple(() =>
         {
@@ -45,9 +45,9 @@ public class WebhookServiceTests : UmbracoIntegrationTest
         Assert.Multiple(() =>
         {
             Assert.IsNotEmpty(webhooks.Items);
-            Assert.IsNotNull(webhooks.Items.FirstOrDefault(x => x.Key == createdWebhookOne.Key));
-            Assert.IsNotNull(webhooks.Items.FirstOrDefault(x => x.Key == createdWebhookTwo.Key));
-            Assert.IsNotNull(webhooks.Items.FirstOrDefault(x => x.Key == createdWebhookThree.Key));
+            Assert.IsNotNull(webhooks.Items.FirstOrDefault(x => x.Key == createdWebhookOne.Result.Key));
+            Assert.IsNotNull(webhooks.Items.FirstOrDefault(x => x.Key == createdWebhookTwo.Result.Key));
+            Assert.IsNotNull(webhooks.Items.FirstOrDefault(x => x.Key == createdWebhookThree.Result.Key));
         });
     }
 
@@ -60,11 +60,11 @@ public class WebhookServiceTests : UmbracoIntegrationTest
     public async Task Can_Delete(string url, string webhookEvent, Guid key)
     {
         var createdWebhook = await WebhookService.CreateAsync(new Webhook(url, true, new[] { key }, new[] { webhookEvent }));
-        var webhook = await WebhookService.GetAsync(createdWebhook.Key);
+        var webhook = await WebhookService.GetAsync(createdWebhook.Result.Key);
 
         Assert.IsNotNull(webhook);
         await WebhookService.DeleteAsync(webhook.Key);
-        var deletedWebhook = await WebhookService.GetAsync(createdWebhook.Key);
+        var deletedWebhook = await WebhookService.GetAsync(createdWebhook.Result.Key);
         Assert.IsNull(deletedWebhook);
     }
 
@@ -72,7 +72,7 @@ public class WebhookServiceTests : UmbracoIntegrationTest
     public async Task Can_Create_With_No_EntityKeys()
     {
         var createdWebhook = await WebhookService.CreateAsync(new Webhook("https://example.com", events: new[] { Constants.WebhookEvents.Aliases.ContentPublish }));
-        var webhook = await WebhookService.GetAsync(createdWebhook.Key);
+        var webhook = await WebhookService.GetAsync(createdWebhook.Result.Key);
 
         Assert.IsNotNull(webhook);
         Assert.IsEmpty(webhook.ContentTypeKeys);
@@ -82,10 +82,10 @@ public class WebhookServiceTests : UmbracoIntegrationTest
     public async Task Can_Update()
     {
         var createdWebhook = await WebhookService.CreateAsync(new Webhook("https://example.com", events: new[] { Constants.WebhookEvents.Aliases.ContentPublish }));
-        createdWebhook.Events = new[] { Constants.WebhookEvents.Aliases.ContentDelete };
-        await WebhookService.UpdateAsync(createdWebhook);
+        createdWebhook.Result.Events = new[] { Constants.WebhookEvents.Aliases.ContentDelete };
+        await WebhookService.UpdateAsync(createdWebhook.Result);
 
-        var updatedWebhook = await WebhookService.GetAsync(createdWebhook.Key);
+        var updatedWebhook = await WebhookService.GetAsync(createdWebhook.Result.Key);
         Assert.IsNotNull(updatedWebhook);
         Assert.AreEqual(1, updatedWebhook.Events.Length);
         Assert.IsTrue(updatedWebhook.Events.Contains(Constants.WebhookEvents.Aliases.ContentDelete));

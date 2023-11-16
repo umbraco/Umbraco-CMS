@@ -1,0 +1,206 @@
+<div data-element="editor-webhooks" ng-controller="Umbraco.Editors.Webhooks.EditController as vm" class="clearfix">
+
+    <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
+
+    <form name="editWebhookForm" novalidate val-form-manager>
+
+        <umb-editor-view ng-if="!vm.loading">
+    
+            <umb-editor-header
+                name="vm.webhook.name"
+                name-locked="true"
+                on-back="vm.back()"
+                show-back-button="true"
+                hide-icon="true"
+                hide-alias="true"
+                hide-description="true">
+            </umb-editor-header>
+    
+            <umb-editor-container class="form-horizontal">
+
+                <div class="umb-package-details">
+
+                    <div class="umb-package-details__main-content">
+
+                      <umb-box>
+                        <umb-box-content>
+
+                          <umb-control-group
+                                label="Url"
+                                description="The url to call when the webhook is triggered."
+                                alias="webhookUrl"
+                                required="true">
+
+                            <input type="url"
+                                   data-element="webhook-url"
+                                   name="webhookUrl"
+                                   ng-model="vm.webhook.url"
+                                   class="umb-property-editor umb-textstring"
+                                   no-dirty-check
+                                   focus-on-filled="true"
+                                   placeholder="https://example.com/api/webhook"
+                                   umb-auto-focus
+                                   required />
+
+                          </umb-control-group>
+
+                          <umb-control-group
+                              label="Events"
+                              description="The events for which the webhook should be triggered."
+                              alias="webhookEvents"
+                              required="true">
+
+                            <umb-node-preview
+                                ng-repeat="event in vm.webhook.events"
+                                ng-show="event"
+                                icon="icon-flag"
+                                name="event.eventName"
+                                alias="event.eventAlias"
+                                description=""
+                                allow-remove="true"
+                                allow-open="false"
+                                on-remove="vm.clearEvent(event)">
+                            </umb-node-preview>
+                            <button type="button"
+                                    class="umb-node-preview-add"
+                                    ng-click="vm.openEventPicker()">
+                              <localize key="general_add">Add</localize>
+                            </button>
+
+                          </umb-control-group>
+
+                          <umb-control-group
+                              label="Content Type"
+                              description="Only trigger the webhook for a specific content type."
+                              alias="webhookContentType">
+
+                            <umb-node-preview
+                                ng-repeat="contentType in vm.contentTypes"
+                                ng-show="contentType"
+                                icon="contentType.icon"
+                                name="contentType.name"
+                                alias="contentType.alias"
+                                description="contentType.description"
+                                allow-remove="true"
+                                allow-open="false"
+                                on-remove="vm.clearContentType(contentType.key)">
+                            </umb-node-preview>
+
+                            <button type="button"
+                                    class="umb-node-preview-add"
+                                    ng-disabled="!vm.webhook.events || vm.webhook.events.length === 0"
+                                    ng-click="vm.openContentTypePicker()">
+                              <span ng-if="vm.webhook.events && vm.webhook.events.length !== 0">
+                                <localize key="general_add">Add</localize>
+                              </span>
+                              <span ng-if="!vm.webhook.events || vm.webhook.events.length === 0">
+                                Please select an event first.
+                              </span>
+                            </button>
+
+                          </umb-control-group>
+
+                          <umb-control-group label="Enabled" description="Is the webhook enabled?" alias="webhookEnabled">
+                            <umb-toggle
+                                checked="vm.webhook.enabled"
+                                on-click="vm.webhook.enabled = !vm.webhook.enabled">
+                            </umb-toggle>
+                          </umb-control-group>
+
+                          <umb-control-group
+                              label="Headers"
+                              description="Custom headers to include in the webhook request."
+                              alias="webhookHeaders">
+
+                            <div class="umb-property-editor--limit-width">
+                              <table class="table table-hover">
+                                <thead>
+                                  <tr>
+                                    <th>Name</th>
+                                    <th>Value</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  <tr ng-repeat="(key, value) in vm.webhook.headers">
+                                    <td>{{key}}</td>
+                                    <td>{{value}}</td>
+                                    <td style="text-align: right;">
+                                      <umb-button
+                                          type="button"
+                                          button-style="danger"
+                                          label-key="general_delete" ,
+                                          size="xxs"
+                                          action="vm.removeHeader(key)">
+                                      </umb-button>
+                                    </td>
+                                  </tr>
+                                  <tr ng-if="!vm.webhook.headers || vm.webhook.headers.length === 0">
+                                    <td colspan="3">
+                                      <localize key="webhooks_noHeaders">No webhook headers have been added.</localize>
+                                    </td>
+                                  </tr>
+                                </tbody>
+                              </table>
+                              <umb-button
+                                  type="button"
+                                  action="vm.openCreateHeader()"
+                                  button-style="outline"
+                                  label-key="webhooks_addWebhookHeader">
+                              </umb-button>
+                            </div>
+
+                          </umb-control-group>
+
+                        </umb-box-content>
+                      </umb-box>
+
+                  </div>
+
+                  <div class="umb-package-details__sidebar">
+                    <umb-box data-element="node-info-general">
+                      <umb-box-header title-key="general_general"></umb-box-header>
+                      <umb-box-content class="block-form">
+
+                        <umb-control-group label="Id" ng-if="vm.showIdentifier">
+                          <div>{{vm.webhook.id}}</div>
+                          <small>{{vm.webhook.key}}</small>
+                        </umb-control-group>
+
+                      </umb-box-content>
+                    </umb-box>
+                  </div>
+
+                </div>
+
+            </umb-editor-container>
+
+            <umb-editor-footer>
+
+                <umb-editor-footer-content-left>
+                    <umb-breadcrumbs
+                        ancestors="vm.breadcrumbs"
+                        allow-on-open="true"
+                        on-open="vm.goToPage(ancestor)">
+                    </umb-breadcrumbs>
+                </umb-editor-footer-content-left>
+
+                <umb-editor-footer-content-right>
+                    <umb-button
+                        type="button"
+                        action="vm.save()"
+                        state="vm.saveButtonState"
+                        button-style="success"
+                        shortcut="ctrl+s"
+                        label="Save"
+                        label-key="buttons_save"
+                        disabled="vm.loading">
+                    </umb-button>
+                </umb-editor-footer-content-right>
+
+            </umb-editor-footer>
+    
+        </umb-editor-view>
+
+    </form>
+    
+</div>

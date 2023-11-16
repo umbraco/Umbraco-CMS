@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Webhooks;
 using Umbraco.Cms.Web.Common.Models;
@@ -14,12 +14,15 @@ internal class WebhookPresentationFactory : IWebhookPresentationFactory
     public WebhookViewModel Create(Webhook webhook)
     {
         var target = new WebhookViewModel
-            {
-                ContentTypeKeys = webhook.ContentTypeKeys, Events = webhook.Events.Select(Create).ToArray(), Url = webhook.Url,
-                Enabled = webhook.Enabled,
-                Key = webhook.Key,
-                Headers = webhook.Headers,
-            };
+        {
+            ContentTypeKeys = webhook.ContentTypeKeys,
+            Events = webhook.Events.Select(Create).ToArray(),
+            Url = webhook.Url,
+            Enabled = webhook.Enabled,
+            Id = webhook.Id,
+            Key = webhook.Key,
+            Headers = webhook.Headers,
+        };
 
         return target;
     }
@@ -27,6 +30,7 @@ internal class WebhookPresentationFactory : IWebhookPresentationFactory
     private WebhookEventViewModel Create(string alias)
     {
         IWebhookEvent? webhookEvent = _webhookEventCollection.FirstOrDefault(x => x.Alias == alias);
+
         return new WebhookEventViewModel
         {
             EventName = webhookEvent?.EventName ?? alias,

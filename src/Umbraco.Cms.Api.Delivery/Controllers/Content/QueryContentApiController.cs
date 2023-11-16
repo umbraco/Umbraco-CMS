@@ -15,6 +15,7 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Api.Delivery.Controllers.Content;
 
 [ApiVersion("1.0")]
+[ApiVersion("2.0")]
 public class QueryContentApiController : ContentApiControllerBase
 {
     private readonly IRequestMemberAccessService _requestMemberAccessService;
@@ -45,6 +46,20 @@ public class QueryContentApiController : ContentApiControllerBase
         _requestMemberAccessService = requestMemberAccessService;
     }
 
+    [HttpGet]
+    [MapToApiVersion("1.0")]
+    [ProducesResponseType(typeof(PagedViewModel<IApiContentResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [Obsolete("Please use version 2 of this API. Will be removed in V15.")]
+    public async Task<IActionResult> Query(
+        string? fetch,
+        [FromQuery] string[] filter,
+        [FromQuery] string[] sort,
+        int skip = 0,
+        int take = 10)
+        => await HandleRequest(fetch, filter, sort, skip, take);
+
     /// <summary>
     ///     Gets a paginated list of content item(s) from query.
     /// </summary>
@@ -55,16 +70,19 @@ public class QueryContentApiController : ContentApiControllerBase
     /// <param name="take">The amount of items to take.</param>
     /// <returns>The paged result of the content item(s).</returns>
     [HttpGet]
-    [MapToApiVersion("1.0")]
+    [MapToApiVersion("2.0")]
     [ProducesResponseType(typeof(PagedViewModel<IApiContentResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Query(
+    public async Task<IActionResult> QueryV20(
         string? fetch,
         [FromQuery] string[] filter,
         [FromQuery] string[] sort,
         int skip = 0,
         int take = 10)
+        => await HandleRequest(fetch, filter, sort, skip, take);
+
+    private async Task<IActionResult> HandleRequest(string? fetch, string[] filter, string[] sort, int skip, int take)
     {
         ProtectedAccess protectedAccess = await _requestMemberAccessService.MemberAccessAsync();
         Attempt<PagedModel<Guid>, ApiContentQueryOperationStatus> queryAttempt = _apiContentQueryService.ExecuteQuery(fetch, filter, sort, protectedAccess, skip, take);

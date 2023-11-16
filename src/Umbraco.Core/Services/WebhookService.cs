@@ -3,6 +3,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -20,30 +21,29 @@ public class WebhookService : IWebhookService
     }
 
     /// <inheritdoc />
-    public async Task<Webhook?> CreateAsync(Webhook webhook)
+    public async Task<Attempt<Webhook, WebhookOperationStatus>> CreateAsync(Webhook webhook)
     {
         using ICoreScope scope = _provider.CreateCoreScope();
 
         EventMessages eventMessages = _eventMessagesFactory.Get();
         var savingNotification = new WebhookSavingNotification(webhook, eventMessages);
-        if (scope.Notifications.PublishCancelable(savingNotification))
+        if (await scope.Notifications.PublishCancelableAsync(savingNotification))
         {
             scope.Complete();
-            return null;
+            return Attempt.FailWithStatus(WebhookOperationStatus.CancelledByNotification, webhook);
         }
 
         Webhook created = await _webhookRepository.CreateAsync(webhook);
 
-        scope.Notifications.Publish(
-            new WebhookSavedNotification(webhook, eventMessages).WithStateFrom(savingNotification));
+        scope.Notifications.Publish(new WebhookSavedNotification(webhook, eventMessages).WithStateFrom(savingNotification));
 
         scope.Complete();
 
-        return created;
+        return Attempt.SucceedWithStatus(WebhookOperationStatus.Success, created);
     }
 
     /// <inheritdoc />
-    public async Task UpdateAsync(Webhook webhook)
+    public async Task<Attempt<Webhook, WebhookOperationStatus>> UpdateAsync(Webhook webhook)
     {
         using ICoreScope scope = _provider.CreateCoreScope();
 
@@ -51,15 +51,16 @@ public class WebhookService : IWebhookService
 
         if (currentWebhook is null)
         {
-            throw new ArgumentException("Webhook does not exist");
+            scope.Complete();
+            return Attempt.FailWithStatus(WebhookOperationStatus.NotFound, webhook);
         }
 
         EventMessages eventMessages = _eventMessagesFactory.Get();
         var savingNotification = new WebhookSavingNotification(webhook, eventMessages);
-        if (scope.Notifications.PublishCancelable(savingNotification))
+        if (await scope.Notifications.PublishCancelableAsync(savingNotification))
         {
             scope.Complete();
-            return;
+            return Attempt.FailWithStatus(WebhookOperationStatus.CancelledByNotification, webhook);
         }
 
         currentWebhook.Enabled = webhook.Enabled;
@@ -70,33 +71,37 @@ public class WebhookService : IWebhookService
 
         await _webhookRepository.UpdateAsync(currentWebhook);
 
-        scope.Notifications.Publish(
-            new WebhookSavedNotification(webhook, eventMessages).WithStateFrom(savingNotification));
+        scope.Notifications.Publish(new WebhookSavedNotification(webhook, eventMessages).WithStateFrom(savingNotification));
 
         scope.Complete();
+
+        return Attempt.SucceedWithStatus(WebhookOperationStatus.Success, webhook);
     }
 
     /// <inheritdoc />
-    public async Task DeleteAsync(Guid key)
+    public async Task<Attempt<Webhook?, WebhookOperationStatus>> DeleteAsync(Guid key)
     {
         using ICoreScope scope = _provider.CreateCoreScope();
         Webhook? webhook = await _webhookRepository.GetAsync(key);
-        if (webhook is not null)
+        if (webhook is null)
         {
-            EventMessages eventMessages = _eventMessagesFactory.Get();
-            var deletingNotification = new WebhookDeletingNotification(webhook, eventMessages);
-            if (scope.Notifications.PublishCancelable(deletingNotification))
-            {
-                scope.Complete();
-                return;
-            }
-
-            await _webhookRepository.DeleteAsync(webhook);
-            scope.Notifications.Publish(
-                new WebhookDeletedNotification(webhook, eventMessages).WithStateFrom(deletingNotification));
+            return Attempt.FailWithStatus(WebhookOperationStatus.NotFound, webhook);
         }
 
+        EventMessages eventMessages = _eventMessagesFactory.Get();
+        var deletingNotification = new WebhookDeletingNotification(webhook, eventMessages);
+        if (await scope.Notifications.PublishCancelableAsync(deletingNotification))
+        {
+            scope.Complete();
+            return Attempt.FailWithStatus<Webhook?, WebhookOperationStatus>(WebhookOperationStatus.CancelledByNotification, webhook);
+        }
+
+        await _webhookRepository.DeleteAsync(webhook);
+        scope.Notifications.Publish(new WebhookDeletedNotification(webhook, eventMessages).WithStateFrom(deletingNotification));
+
         scope.Complete();
+
+        return Attempt.SucceedWithStatus<Webhook?, WebhookOperationStatus>(WebhookOperationStatus.Success, webhook);
     }
 
     /// <inheritdoc />
