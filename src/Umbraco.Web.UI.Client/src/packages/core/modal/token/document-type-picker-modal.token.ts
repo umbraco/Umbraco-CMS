@@ -14,6 +14,6 @@ export const UMB_DOCUMENT_TYPE_PICKER_MODAL = new UmbModalToken<
 		size: 'small',
 	},
 	{
-		treeAlias: 'Umb.Tree.DocumentTypes',
+		treeAlias: 'Umb.Tree.DocumentType',
 	},
 );

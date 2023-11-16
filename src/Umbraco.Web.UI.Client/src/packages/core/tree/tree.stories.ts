@@ -13,7 +13,7 @@ type Story = StoryObj<UmbTreeElement>;
 // TODO: This does not display anything - need help
 export const Overview: Story = {
 	args: {
-		alias: 'Umb.Tree.Documents',
+		alias: 'Umb.Tree.Document',
 		selectable: true,
 	},
 };

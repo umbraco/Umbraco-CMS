@@ -200,7 +200,35 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 		parentId: null,
 		propertyEditorAlias: 'Umbraco.MultiNodeTreePicker',
 		propertyEditorUiAlias: 'Umb.PropertyEditorUi.TreePicker',
-		values: [],
+		values: [
+			{
+				alias: 'startNode',
+				value: {
+					type: 'content',
+					id: null,
+				},
+			},
+			{
+				alias: 'minNumber',
+				value: 0,
+			},
+			{
+				alias: 'maxNumber',
+				value: 3,
+			},
+			{
+				alias: 'ignoreUserStartNodes',
+				value: false,
+			},
+			{
+				alias: 'showOpenButton',
+				value: true,
+			},
+			{
+				alias: 'filter',
+				value: '',
+			},
+		],
 	},
 	{
 		type: 'data-type',

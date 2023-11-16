@@ -7,13 +7,12 @@ import { UmbMediaTypeItemServerDataSource } from './sources/media-type-item.serv
 import { UmbBaseController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 import {
-	UmbTreeRepository,
-	UmbTreeDataSource,
 	UmbDataSource,
 	UmbItemRepository,
 	UmbDetailRepository,
 	UmbItemDataSource,
 } from '@umbraco-cms/backoffice/repository';
+import { UmbTreeRepository, UmbTreeDataSource } from '@umbraco-cms/backoffice/tree';
 import {
 	CreateMediaTypeRequestModel,
 	FolderTreeItemResponseModel,
@@ -23,7 +22,8 @@ import {
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
-export class UmbMediaTypeRepository extends UmbBaseController
+export class UmbMediaTypeRepository
+	extends UmbBaseController
 	implements
 		UmbItemRepository<MediaTypeItemResponseModel>,
 		UmbTreeRepository<FolderTreeItemResponseModel>,

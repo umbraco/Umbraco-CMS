@@ -1,22 +1,20 @@
+import { type UmbDictionaryTreeStore, UMB_DICTIONARY_TREE_STORE_CONTEXT } from '../tree/index.js';
 import { UmbDictionaryStore, UMB_DICTIONARY_STORE_CONTEXT_TOKEN } from './dictionary.store.js';
 import { UmbDictionaryDetailServerDataSource } from './sources/dictionary.detail.server.data.js';
-import { UmbDictionaryTreeStore, UMB_DICTIONARY_TREE_STORE_CONTEXT_TOKEN } from './dictionary.tree.store.js';
-import { UmbDictionaryTreeServerDataSource } from './sources/dictionary.tree.server.data.js';
 import { UmbBaseController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UmbTreeDataSource, UmbDetailRepository, UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
+import { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
 import {
 	CreateDictionaryItemRequestModel,
 	DictionaryOverviewResponseModel,
-	EntityTreeItemResponseModel,
 	ImportDictionaryRequestModel,
 	UpdateDictionaryItemRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
-export class UmbDictionaryRepository extends UmbBaseController
+export class UmbDictionaryRepository
+	extends UmbBaseController
 	implements
-		UmbTreeRepository<EntityTreeItemResponseModel>,
 		UmbDetailRepository<
 			CreateDictionaryItemRequestModel,
 			any,
@@ -27,7 +25,6 @@ export class UmbDictionaryRepository extends UmbBaseController
 {
 	#init!: Promise<unknown>;
 
-	#treeSource: UmbTreeDataSource;
 	#treeStore?: UmbDictionaryTreeStore;
 
 	#detailSource: UmbDictionaryDetailServerDataSource;
@@ -39,7 +36,6 @@ export class UmbDictionaryRepository extends UmbBaseController
 		super(host);
 
 		// TODO: figure out how spin up get the correct data source
-		this.#treeSource = new UmbDictionaryTreeServerDataSource(this);
 		this.#detailSource = new UmbDictionaryDetailServerDataSource(this);
 
 		this.#init = Promise.all([
@@ -47,7 +43,7 @@ export class UmbDictionaryRepository extends UmbBaseController
 				this.#detailStore = instance;
 			}),
 
-			this.consumeContext(UMB_DICTIONARY_TREE_STORE_CONTEXT_TOKEN, (instance) => {
+			this.consumeContext(UMB_DICTIONARY_TREE_STORE_CONTEXT, (instance) => {
 				this.#treeStore = instance;
 			}),
 
@@ -55,68 +51,6 @@ export class UmbDictionaryRepository extends UmbBaseController
 				this.#notificationContext = instance;
 			}),
 		]);
-	}
-
-	// TREE:
-	async requestTreeRoot() {
-		await this.#init;
-
-		const data = {
-			id: null,
-			type: 'dictionary-root',
-			name: 'Dictionary',
-			icon: 'icon-folder',
-			hasChildren: true,
-		};
-
-		return { data };
-	}
-
-	async requestRootTreeItems() {
-		await this.#init;
-
-		const { data, error } = await this.#treeSource.getRootItems();
-
-		if (data) {
-			this.#treeStore?.appendItems(data.items);
-		}
-
-		return { data, error, asObservable: () => this.#treeStore!.rootItems };
-	}
-
-	async requestTreeItemsOf(parentId: string | null) {
-		if (parentId === undefined) throw new Error('Parent id is missing');
-		await this.#init;
-
-		const { data, error } = await this.#treeSource.getChildrenOf(parentId);
-
-		if (data) {
-			this.#treeStore?.appendItems(data.items);
-		}
-
-		return { data, error, asObservable: () => this.#treeStore!.childrenOf(parentId) };
-	}
-
-	async requestItemsLegacy(ids: Array<string>) {
-		await this.#init;
-
-		if (!ids) {
-			throw new Error('Ids are missing');
-		}
-
-		const { data, error } = await this.#treeSource.getItems(ids);
-
-		return { data, error, asObservable: () => this.#treeStore!.items(ids) };
-	}
-
-	async rootTreeItems() {
-		await this.#init;
-		return this.#treeStore!.rootItems;
-	}
-
-	async treeItemsOf(parentId: string | null) {
-		await this.#init;
-		return this.#treeStore!.childrenOf(parentId);
 	}
 
 	async itemsLegacy(ids: Array<string>) {

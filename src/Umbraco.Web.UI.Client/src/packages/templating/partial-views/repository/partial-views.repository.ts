@@ -26,11 +26,12 @@ import {
 	UmbDataSourceErrorResponse,
 	UmbDetailRepository,
 	UmbFolderRepository,
-	UmbTreeRepository,
 } from '@umbraco-cms/backoffice/repository';
+import { UmbTreeRepository } from '@umbraco-cms/backoffice/tree';
 import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
-export class UmbPartialViewsRepository extends UmbBaseController
+export class UmbPartialViewsRepository
+	extends UmbBaseController
 	implements
 		UmbTreeRepository<FileSystemTreeItemPresentationModel>,
 		UmbDetailRepository<

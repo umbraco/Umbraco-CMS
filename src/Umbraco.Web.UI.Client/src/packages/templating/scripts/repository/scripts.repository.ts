@@ -8,8 +8,8 @@ import {
 	UmbDataSourceErrorResponse,
 	UmbDetailRepository,
 	UmbFolderRepository,
-	UmbTreeRepository,
 } from '@umbraco-cms/backoffice/repository';
+import { UmbTreeRepository } from '@umbraco-cms/backoffice/tree';
 import {
 	CreateFolderRequestModel,
 	CreateScriptRequestModel,
@@ -26,7 +26,8 @@ import { UmbBaseController, UmbControllerHost } from '@umbraco-cms/backoffice/co
 import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
-export class UmbScriptsRepository extends UmbBaseController
+export class UmbScriptsRepository
+	extends UmbBaseController
 	implements
 		UmbTreeRepository<FileSystemTreeItemPresentationModel>,
 		UmbDetailRepository<CreateScriptRequestModel, string, UpdateScriptRequestModel, ScriptResponseModel, string>,

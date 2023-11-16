@@ -19,6 +19,7 @@ export class UmbStylesheetWorkspaceElement extends UmbLitElement {
 				const path = info.match.params.path === 'null' ? null : info.match.params.path;
 				const serverPath = path === null ? null : serverFilePathFromUrlFriendlyPath(path);
 				await this.#workspaceContext.create(serverPath);
+				await this.#workspaceContext.setRules([]);
 
 				new UmbWorkspaceIsNewRedirectController(
 					this,

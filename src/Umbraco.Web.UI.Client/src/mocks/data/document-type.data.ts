@@ -4,6 +4,7 @@ import {
 	DocumentTypeTreeItemResponseModel,
 	DocumentTypeResponseModel,
 	ContentTypeCompositionTypeModel,
+	DocumentTypeItemResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 
 export const data: Array<DocumentTypeResponseModel> = [
@@ -608,6 +609,56 @@ export const data: Array<DocumentTypeResponseModel> = [
 			keepLatestVersionPerDayForDays: null,
 		},
 	},
+	{
+		allowedTemplateIds: [],
+		defaultTemplateId: null,
+		id: 'simple-document-type-id',
+		alias: 'blogPost',
+		name: 'All property editors document type',
+		description: null,
+		icon: 'umb:item-arrangement',
+		allowedAsRoot: true,
+		variesByCulture: true,
+		variesBySegment: false,
+		isElement: false,
+		properties: [
+			{
+				id: '6',
+				containerId: 'all-properties-group-key',
+				alias: 'multiNodeTreePicker',
+				name: 'Multi Node Tree Picker',
+				description: '',
+				dataTypeId: 'dt-multiNodeTreePicker',
+				variesByCulture: false,
+				variesBySegment: false,
+				validation: {
+					mandatory: true,
+					mandatoryMessage: null,
+					regEx: null,
+					regExMessage: null,
+				},
+				appearance: {
+					labelOnTop: false,
+				},
+			},
+		],
+		containers: [
+			{
+				id: 'all-properties-group-key',
+				parentId: null,
+				name: 'Content',
+				type: 'Group',
+				sortOrder: 0,
+			},
+		],
+		allowedContentTypes: [],
+		compositions: [],
+		cleanup: {
+			preventCleanup: false,
+			keepAllVersionsNewerThanDays: null,
+			keepLatestVersionPerDayForDays: null,
+		},
+	},
 
 	{
 		allowedTemplateIds: [],
@@ -1009,6 +1060,15 @@ export const treeData: Array<DocumentTypeTreeItemResponseModel> = [
 		icon: '',
 	},
 	{
+		name: 'Simple document type',
+		type: 'document-type',
+		hasChildren: false,
+		id: 'simple-document-type-id',
+		isContainer: false,
+		parentId: null,
+		icon: '',
+	},
+	{
 		name: 'Page Document Type',
 		type: 'document-type',
 		hasChildren: false,
@@ -1107,6 +1167,20 @@ class UmbDocumentTypeData extends UmbEntityData<DocumentTypeResponseModel> {
 		const items = this.treeData.filter((item) => allowedTypeKeys.includes(item.id ?? ''));
 		return items.map((item) => item);
 	}
+
+	getItems(ids: Array<string>): Array<DocumentTypeItemResponseModel> {
+		const items = this.data.filter((item) => ids.includes(item.id ?? ''));
+		return items.map((item) => createDocumentTypeItem(item));
+	}
 }
+
+const createDocumentTypeItem = (item: DocumentTypeResponseModel): DocumentTypeItemResponseModel => {
+	return {
+		id: item.id,
+		name: item.name,
+		isElement: item.isElement,
+		icon: item.icon,
+	};
+};
 
 export const umbDocumentTypeData = new UmbDocumentTypeData();

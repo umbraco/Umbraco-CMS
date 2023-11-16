@@ -4,7 +4,8 @@ import { UmbDocumentTreeStore, UMB_DOCUMENT_TREE_STORE_CONTEXT_TOKEN } from './d
 import { UmbDocumentTreeServerDataSource } from './sources/document.tree.server.data.js';
 import { UMB_DOCUMENT_ITEM_STORE_CONTEXT_TOKEN, type UmbDocumentItemStore } from './document-item.store.js';
 import { UmbDocumentItemServerDataSource } from './sources/document-item.server.data.js';
-import type { UmbTreeDataSource, UmbTreeRepository, UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
+import type { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
+import type { UmbTreeRepository, UmbTreeDataSource } from '@umbraco-cms/backoffice/tree';
 import { UmbBaseController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import {
 	DocumentResponseModel,
@@ -15,7 +16,8 @@ import {
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
-export class UmbDocumentRepository extends UmbBaseController
+export class UmbDocumentRepository
+	extends UmbBaseController
 	implements
 		UmbTreeRepository<DocumentTreeItemResponseModel>,
 		UmbDetailRepository<CreateDocumentRequestModel, any, UpdateDocumentRequestModel, DocumentResponseModel>,

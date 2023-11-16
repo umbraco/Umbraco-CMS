@@ -1,7 +1,7 @@
 import { UmbMemberTreeStore, UMB_MEMBER_TREE_STORE_CONTEXT_TOKEN } from './member.tree.store.js';
 import { UmbMemberTreeServerDataSource } from './sources/member.tree.server.data.js';
 import { UmbBaseController, type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
+import { type UmbTreeRepository } from '@umbraco-cms/backoffice/tree';
 import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
 export class UmbMemberRepository extends UmbBaseController implements UmbTreeRepository<any>, UmbApi {
