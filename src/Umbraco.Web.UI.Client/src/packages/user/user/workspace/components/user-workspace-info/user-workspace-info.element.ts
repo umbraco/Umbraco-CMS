@@ -75,7 +75,6 @@ export class UmbUserWorkspaceInfoElement extends UmbLitElement {
 	};
 
 	#onAvatarUploadSubmit = (event: SubmitEvent) => {
-		debugger;
 		event.preventDefault();
 
 		const form = event.target as HTMLFormElement;
