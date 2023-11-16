@@ -89,16 +89,17 @@ export class UmbUserWorkspaceContext
 		}
 	}
 
+	// TODO: implement upload progress
 	async uploadAvatar(file: File) {
 		const id = this.getEntityId();
 		if (!id) throw new Error('Id is missing');
-		await this.repository.uploadAvatar(id, file);
+		return this.repository.uploadAvatar(id, file);
 	}
 
-	async removeAvatar() {
+	async deleteAvatar() {
 		const id = this.getEntityId();
 		if (!id) throw new Error('Id is missing');
-		await this.repository.deleteAvatar(id);
+		return this.repository.deleteAvatar(id);
 	}
 
 	destroy(): void {

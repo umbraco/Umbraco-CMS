@@ -1,7 +1,16 @@
 import { getDisplayStateFromUserStatus } from '../../../../utils.js';
 import { UMB_USER_WORKSPACE_CONTEXT } from '../../user-workspace.context.js';
 import { UmbUserDetail } from '../../../types.js';
-import { html, customElement, state, css, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import {
+	html,
+	customElement,
+	state,
+	css,
+	repeat,
+	ifDefined,
+	query,
+	nothing,
+} from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
@@ -14,10 +23,13 @@ export class UmbUserWorkspaceInfoElement extends UmbLitElement {
 	private _user?: UmbUserDetail;
 
 	@state()
-	private _userAvatarUrls?: Array<{ url: string; scale: string }>;
+	private _userAvatarUrls: Array<{ url: string; scale: string }> = [];
 
 	@state()
 	private _userInfo: Array<UmbUserWorkspaceInfoItem> = [];
+
+	@query('#AvatarFileField')
+	_avatarFileField?: HTMLInputElement;
 
 	#userWorkspaceContext?: typeof UMB_USER_WORKSPACE_CONTEXT.TYPE;
 
@@ -38,14 +50,17 @@ export class UmbUserWorkspaceInfoElement extends UmbLitElement {
 		});
 	}
 
-	async #getServerUrl() {
+	async #getAppContext() {
 		// TODO: remove this when we get absolute urls from the server
 		return this.consumeContext(UMB_APP_CONTEXT, (instance) => {}).asPromise();
 	}
 
 	// TODO: remove this when we get absolute urls from the server
 	#setUserAvatarUrls = async (user: UmbUserDetail | undefined) => {
-		const serverUrl = (await this.#getServerUrl()).getServerUrl();
+		if (user?.avatarUrls?.length === 0) return;
+
+		const serverUrl = (await this.#getAppContext()).getServerUrl();
+		if (!serverUrl) return;
 
 		this._userAvatarUrls = [
 			{
@@ -60,6 +75,7 @@ export class UmbUserWorkspaceInfoElement extends UmbLitElement {
 	};
 
 	#onAvatarUploadSubmit = (event: SubmitEvent) => {
+		debugger;
 		event.preventDefault();
 
 		const form = event.target as HTMLFormElement;
@@ -69,9 +85,18 @@ export class UmbUserWorkspaceInfoElement extends UmbLitElement {
 
 		const formData = new FormData(form);
 
-		const avatarFile = formData.get('avatarFile');
+		const avatarFile = formData.get('avatarFile') as File;
 
-		this.#userWorkspaceContext?.uploadAvatar(avatarFile as File);
+		this.#userWorkspaceContext?.uploadAvatar(avatarFile);
+	};
+
+	#deleteAvatar = async () => {
+		if (!this.#userWorkspaceContext) return;
+		const { error } = await this.#userWorkspaceContext.deleteAvatar();
+
+		if (!error) {
+			this._userAvatarUrls = [];
+		}
 	};
 
 	#setUserInfoItems = (user: UmbUserDetail | undefined) => {
@@ -131,13 +156,17 @@ export class UmbUserWorkspaceInfoElement extends UmbLitElement {
 		`;
 	}
 
-	getSrcset() {
+	#getAvatarSrcset() {
 		let string = '';
 
 		this._userAvatarUrls?.forEach((url) => {
 			string += `${url.url} ${url.scale},`;
 		});
 		return string;
+	}
+
+	#hasAvatar() {
+		return this._userAvatarUrls.length > 0;
 	}
 
 	#renderAvatar() {
@@ -148,10 +177,19 @@ export class UmbUserWorkspaceInfoElement extends UmbLitElement {
 						<uui-avatar
 							id="Avatar"
 							.name=${this._user?.name || ''}
-							img-src=${ifDefined(this._userAvatarUrls?.[0].url)}
-							img-srcset=${this.getSrcset()}></uui-avatar>
+							img-src=${ifDefined(this.#hasAvatar() ? this._userAvatarUrls[0].url : undefined)}
+							img-srcset=${ifDefined(this.#hasAvatar() ? this.#getAvatarSrcset() : undefined)}></uui-avatar>
+						(WIP)
 						<input id="AvatarFileField" type="file" name="avatarFile" required />
 						<uui-button type="submit" label="${this.localize.term('user_changePhoto')}"></uui-button>
+						${this.#hasAvatar()
+							? html`
+									<uui-button
+										type="button"
+										label=${this.localize.term('user_removePhoto')}
+										@click=${this.#deleteAvatar}></uui-button>
+							  `
+							: nothing}
 					</form>
 				</div>
 			</uui-box>
@@ -190,6 +228,7 @@ export class UmbUserWorkspaceInfoElement extends UmbLitElement {
 			}
 
 			#user-avatar-settings form {
+				text-align: center;
 				display: flex;
 				flex-direction: column;
 				gap: var(--uui-size-space-2);
