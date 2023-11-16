@@ -1,6 +1,6 @@
 import { UmbUserRepositoryBase } from '../user-repository-base.js';
 import { type UmbInviteUserDataSource } from './types.js';
-import { UmbInviteUserServerDataSource } from './invite-user.server.data.js';
+import { UmbInviteUserServerDataSource } from './invite-user.server.data-source.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { InviteUserRequestModel } from '@umbraco-cms/backoffice/backend-api';
 

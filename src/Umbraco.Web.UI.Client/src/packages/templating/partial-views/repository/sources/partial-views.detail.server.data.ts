@@ -55,7 +55,7 @@ export class UmbPartialViewDetailServerDataSource
 	 * @return {*}
 	 * @memberof UmbStylesheetServerDataSource
 	 */
-	get(path: string) {
+	read(path: string) {
 		if (!path) throw new Error('Path is missing');
 		return tryExecuteAndNotify(this.#host, PartialViewResource.getPartialView({ path }));
 	}
@@ -66,7 +66,7 @@ export class UmbPartialViewDetailServerDataSource
 	 * @return {*}  {Promise<DataSourceResponse<string>>}
 	 * @memberof UmbPartialViewDetailServerDataSource
 	 */
-	insert(requestBody: CreatePartialViewRequestModel): Promise<DataSourceResponse<string>> {
+	create(requestBody: CreatePartialViewRequestModel): Promise<DataSourceResponse<string>> {
 		return tryExecuteAndNotify(this.#host, PartialViewResource.postPartialView({ requestBody }));
 	}
 

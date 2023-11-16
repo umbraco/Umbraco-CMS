@@ -23,7 +23,7 @@ export class UmbDataTypeFolderRepository extends UmbDataTypeRepositoryBase imple
 		if (!folderRequest) throw new Error('folder request is missing');
 		await this._init;
 
-		const { error } = await this.#folderSource.insert(folderRequest);
+		const { error } = await this.#folderSource.create(folderRequest);
 
 		if (!error) {
 			// TODO: We need to push a new item to the tree store to update the tree. How do we want to create the tree items?
@@ -64,6 +64,6 @@ export class UmbDataTypeFolderRepository extends UmbDataTypeRepositoryBase imple
 	async requestFolder(id: string) {
 		if (!id) throw new Error('Key is missing');
 		await this._init;
-		return await this.#folderSource.get(id);
+		return await this.#folderSource.read(id);
 	}
 }

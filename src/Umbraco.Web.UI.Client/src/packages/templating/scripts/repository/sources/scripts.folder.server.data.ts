@@ -20,10 +20,10 @@ export class UmbScriptsFolderServerDataSource implements UmbFolderDataSource {
 	createScaffold(parentId: string | null): Promise<DataSourceResponse<FolderResponseModel>> {
 		throw new Error('Method not implemented.');
 	}
-	get(unique: string): Promise<DataSourceResponse<ScriptsGetFolderResponse>> {
+	read(unique: string): Promise<DataSourceResponse<ScriptsGetFolderResponse>> {
 		return tryExecuteAndNotify(this.#host, ScriptResource.getScriptFolder({ path: unique }));
 	}
-	insert(requestBody: CreateFolderRequestModel): Promise<DataSourceResponse<string>> {
+	create(requestBody: CreateFolderRequestModel): Promise<DataSourceResponse<string>> {
 		return tryExecuteAndNotify(this.#host, ScriptResource.postScriptFolder({ requestBody }));
 	}
 	update(unique: string, data: CreateFolderRequestModel): Promise<DataSourceResponse<FolderModelBaseModel>> {

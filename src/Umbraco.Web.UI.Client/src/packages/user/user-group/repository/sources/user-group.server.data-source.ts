@@ -40,11 +40,11 @@ export class UmbUserGroupServerDataSource implements UmbUserGroupDetailDataSourc
 		return { data };
 	}
 
-	get(id: string): Promise<DataSourceResponse<UserGroupResponseModel>> {
+	read(id: string): Promise<DataSourceResponse<UserGroupResponseModel>> {
 		if (!id) throw new Error('Id is missing');
 		return tryExecuteAndNotify(this.#host, UserGroupResource.getUserGroupById({ id }));
 	}
-	insert(data: CreateUserGroupRequestModel) {
+	create(data: CreateUserGroupRequestModel) {
 		return tryExecuteAndNotify(this.#host, UserGroupResource.postUserGroup({ requestBody: data }));
 	}
 	update(id: string, data: UpdateUserGroupRequestModel) {
@@ -55,7 +55,7 @@ export class UmbUserGroupServerDataSource implements UmbUserGroupDetailDataSourc
 			UserGroupResource.putUserGroupById({
 				id,
 				requestBody: data,
-			})
+			}),
 		);
 	}
 	delete(id: string): Promise<DataSourceResponse<undefined>> {

@@ -129,7 +129,7 @@ export class UmbRelationTypeRepository
 			throw new Error('Id is missing');
 		}
 
-		const { data, error } = await this.#detailDataSource.get(id);
+		const { data, error } = await this.#detailDataSource.read(id);
 
 		if (data) {
 			this.#detailStore?.append(data);
@@ -151,7 +151,7 @@ export class UmbRelationTypeRepository
 
 		await this.#init;
 
-		const { error } = await this.#detailDataSource.insert(template);
+		const { error } = await this.#detailDataSource.create(template);
 
 		if (!error) {
 			// TODO: we currently don't use the detail store for anything.
