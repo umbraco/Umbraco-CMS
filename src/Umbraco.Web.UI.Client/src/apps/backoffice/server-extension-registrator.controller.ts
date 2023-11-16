@@ -23,7 +23,7 @@ export class UmbServerExtensionRegistrator extends UmbBaseController {
 
 			This code is copy pasted from the package repository. We probably don't need this is the package repository anymore.
 		*/
-		const { data: packages } = await tryExecuteAndNotify(this._host, PackageResource.getPackageManifest());
+		const { data: packages } = await tryExecuteAndNotify(this, PackageResource.getPackageManifest());
 
 		if (packages) {
 			// Append packages to the store but only if they have a name
@@ -39,13 +39,21 @@ export class UmbServerExtensionRegistrator extends UmbBaseController {
 						 * Crude check to see if extension is of type "js" since it is safe to assume we do not
 						 * need to load any other types of extensions in the backoffice (we need a js file to load)
 						 */
-						
+
 						// Add API base url if the js path is relative
 						if ('js' in e && typeof e.js === 'string' && !e.js.startsWith('http')) {
 							e.js = `${this.#apiBaseUrl}${e.js}`;
 						}
 
-						// TODO: Niels: I assume we also need to do this for, element and api?
+						// Add API base url if the element path is relative
+						if ('element' in e && typeof e.element === 'string' && !e.element.startsWith('http')) {
+							e.element = `${this.#apiBaseUrl}${e.element}`;
+						}
+
+						// Add API base url if the element path api relative
+						if ('api' in e && typeof e.api === 'string' && !e.api.startsWith('http')) {
+							e.api = `${this.#apiBaseUrl}${e.api}`;
+						}
 
 						extensions.push(e);
 					}

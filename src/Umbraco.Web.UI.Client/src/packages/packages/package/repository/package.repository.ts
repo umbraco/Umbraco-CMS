@@ -54,9 +54,19 @@ export class UmbPackageRepository extends UmbBaseController implements UmbApi {
 						 * Crude check to see if extension is of type "js" since it is safe to assume we do not
 						 * need to load any other types of extensions in the backoffice (we need a js file to load)
 						 */
-							// Add API base url if the js path is relative
+						// Add API base url if the js path is relative
 						if ('js' in e && typeof e.js === 'string' && !e.js.startsWith('http')) {
 							e.js = `${this.#apiBaseUrl}${e.js}`;
+						}
+
+						// Add API base url if the element path is relative
+						if ('element' in e && typeof e.element === 'string' && !e.element.startsWith('http')) {
+							e.element = `${this.#apiBaseUrl}${e.element}`;
+						}
+
+						// Add API base url if the element path api relative
+						if ('api' in e && typeof e.api === 'string' && !e.api.startsWith('http')) {
+							e.api = `${this.#apiBaseUrl}${e.api}`;
 						}
 
 						extensions.push(e);
@@ -106,5 +116,4 @@ export class UmbPackageRepository extends UmbBaseController implements UmbApi {
 		await this.#init;
 		return this.#packageStore!.migrations;
 	}
-	
 }
