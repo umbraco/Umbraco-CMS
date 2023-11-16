@@ -1,3 +1,3 @@
 import { PartialViewResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
-export type UmbPartialViewDetail = PartialViewResponseModel;
+export type UmbPartialViewDetailModel = PartialViewResponseModel;
