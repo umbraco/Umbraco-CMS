@@ -1,10 +1,13 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 
 namespace Umbraco.Cms.Web.Common.Models;
 
 [DataContract]
 public class WebhookViewModel
 {
+    [DataMember(Name = "id")]
+    public int Id { get; set; }
+
     [DataMember(Name = "key")]
     public Guid? Key { get; set; }
 

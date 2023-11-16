@@ -1,16 +1,22 @@
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Core.Webhooks;
 using Umbraco.Cms.Web.BackOffice.Services;
 using Umbraco.Cms.Web.Common.Attributes;
+using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Cms.Web.Common.Models;
 
 namespace Umbraco.Cms.Web.BackOffice.Controllers;
 
 [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
+[Authorize(Policy = AuthorizationPolicies.TreeAccessWebhooks)]
 public class WebhookController : UmbracoAuthorizedJsonController
 {
     private readonly IWebhookService _webhookService;
@@ -41,20 +47,18 @@ public class WebhookController : UmbracoAuthorizedJsonController
     [HttpPut]
     public async Task<IActionResult> Update(WebhookViewModel webhookViewModel)
     {
-        Webhook updateModel = _umbracoMapper.Map<Webhook>(webhookViewModel)!;
+        Webhook webhook = _umbracoMapper.Map<Webhook>(webhookViewModel)!;
 
-        await _webhookService.UpdateAsync(updateModel);
-
-        return Ok();
+        Attempt<Webhook, WebhookOperationStatus> result = await _webhookService.UpdateAsync(webhook);
+        return result.Success ? Ok(_webhookPresentationFactory.Create(webhook)) : WebhookOperationStatusResult(result.Status);
     }
 
     [HttpPost]
     public async Task<IActionResult> Create(WebhookViewModel webhookViewModel)
     {
         Webhook webhook = _umbracoMapper.Map<Webhook>(webhookViewModel)!;
-        await _webhookService.CreateAsync(webhook);
-
-        return Ok();
+        Attempt<Webhook, WebhookOperationStatus> result = await _webhookService.CreateAsync(webhook);
+        return result.Success ? Ok(_webhookPresentationFactory.Create(webhook)) : WebhookOperationStatusResult(result.Status);
     }
 
     [HttpGet]
@@ -62,15 +66,14 @@ public class WebhookController : UmbracoAuthorizedJsonController
     {
         Webhook? webhook = await _webhookService.GetAsync(key);
 
-        return webhook is null ? NotFound() : Ok(webhook);
+        return webhook is null ? NotFound() : Ok(_webhookPresentationFactory.Create(webhook));
     }
 
     [HttpDelete]
     public async Task<IActionResult> Delete(Guid key)
     {
-        await _webhookService.DeleteAsync(key);
-
-        return Ok();
+        Attempt<Webhook?, WebhookOperationStatus> result = await _webhookService.DeleteAsync(key);
+        return result.Success ? Ok() : WebhookOperationStatusResult(result.Status);
     }
 
     [HttpGet]
@@ -90,4 +93,15 @@ public class WebhookController : UmbracoAuthorizedJsonController
             Items = mappedLogs,
         });
     }
+
+    private IActionResult WebhookOperationStatusResult(WebhookOperationStatus status) =>
+        status switch
+        {
+            WebhookOperationStatus.CancelledByNotification => ValidationProblem(new SimpleNotificationModel(new BackOfficeNotification[]
+                {
+                    new("Cancelled by notification", "The operation was cancelled by a notification", NotificationStyle.Error),
+                })),
+            WebhookOperationStatus.NotFound => NotFound("Could not find the webhook"),
+            _ => StatusCode(StatusCodes.Status500InternalServerError),
+        };
 }

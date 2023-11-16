@@ -1,5 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Asp.Versioning;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.DependencyInjection;
@@ -24,7 +26,22 @@ public static class UmbracoBuilderExtensions
     public static IUmbracoBuilder AddDeliveryApi(this IUmbracoBuilder builder)
     {
         builder.Services.AddScoped<IRequestStartItemProvider, RequestStartItemProvider>();
-        builder.Services.AddScoped<IOutputExpansionStrategy, RequestContextOutputExpansionStrategy>();
+        builder.Services.AddScoped<RequestContextOutputExpansionStrategy>();
+        builder.Services.AddScoped<RequestContextOutputExpansionStrategyV2>();
+        builder.Services.AddScoped<IOutputExpansionStrategy>(provider =>
+        {
+            HttpContext? httpContext = provider.GetRequiredService<IHttpContextAccessor>().HttpContext;
+            ApiVersion? apiVersion = httpContext?.GetRequestedApiVersion();
+            if (apiVersion is null)
+            {
+                return provider.GetRequiredService<RequestContextOutputExpansionStrategyV2>();
+            }
+
+            // V1 of the Delivery API uses a different expansion strategy than V2+
+            return apiVersion.MajorVersion == 1
+                ? provider.GetRequiredService<RequestContextOutputExpansionStrategy>()
+                : provider.GetRequiredService<RequestContextOutputExpansionStrategyV2>();
+        });
         builder.Services.AddSingleton<IRequestCultureService, RequestCultureService>();
         builder.Services.AddSingleton<IRequestRoutingService, RequestRoutingService>();
         builder.Services.AddSingleton<IRequestRedirectService, RequestRedirectService>();

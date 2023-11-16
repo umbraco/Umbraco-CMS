@@ -144,6 +144,8 @@ public class RteMacroRenderingValueConverter : SimpleTinyMceValueConverter, IDel
 
     public PropertyCacheLevel GetDeliveryApiPropertyCacheLevel(IPublishedPropertyType propertyType) => PropertyCacheLevel.Elements;
 
+    public PropertyCacheLevel GetDeliveryApiPropertyCacheLevelForExpansion(IPublishedPropertyType propertyType) => PropertyCacheLevel.Snapshot;
+
     public Type GetDeliveryApiPropertyValueType(IPublishedPropertyType propertyType)
         => _deliveryApiSettings.RichTextOutputAsJson
             ? typeof(IRichTextElement)
