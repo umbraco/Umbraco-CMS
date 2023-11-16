@@ -27,14 +27,14 @@ internal sealed class UserGroupPermissionService : IUserGroupPermissionService
     }
 
     /// <inheritdoc/>
-    public async Task<UserGroupAuthorizationStatus> AuthorizeAccessAsync(IUser performingUser, IEnumerable<Guid> userGroupKeys)
+    public async Task<UserGroupAuthorizationStatus> AuthorizeAccessAsync(IUser user, IEnumerable<Guid> userGroupKeys)
     {
-        if (performingUser.IsAdmin())
+        if (user.IsAdmin())
         {
             return UserGroupAuthorizationStatus.Success;
         }
 
-        var allowedUserGroupsKeys = performingUser.Groups.Select(x => x.Key).ToArray();
+        var allowedUserGroupsKeys = user.Groups.Select(x => x.Key).ToArray();
         var missingAccess = userGroupKeys.Except(allowedUserGroupsKeys).ToArray();
 
         return missingAccess.Length == 0
@@ -43,65 +43,50 @@ internal sealed class UserGroupPermissionService : IUserGroupPermissionService
     }
 
     /// <inheritdoc/>
-    public async Task<UserGroupAuthorizationStatus> AuthorizeCreateAsync(IUser performingUser, IUserGroup userGroup)
-    {
-        var hasAccessToUserSection = HasAccessToUserSection(performingUser);
-        if (hasAccessToUserSection is false)
-        {
-            return UserGroupAuthorizationStatus.UnauthorizedMissingUserSectionAccess;
-        }
+    public async Task<UserGroupAuthorizationStatus> AuthorizeCreateAsync(IUser user, IUserGroup userGroup)
+        => ValidateAccess(user, userGroup);
 
-        var hasAccessToAllGroupSections = HasAccessToAllUserGroupSections(performingUser, userGroup);
-        if (hasAccessToAllGroupSections is false)
-        {
-            return UserGroupAuthorizationStatus.UnauthorizedMissingAllowedSectionAccess;
-        }
-
-        // Check that the user is not setting start nodes that they don't have access to.
-        var hasContentStartNodeAccess = HasAccessToContentStartNode(performingUser, userGroup);
-        if (hasContentStartNodeAccess is false)
-        {
-            return UserGroupAuthorizationStatus.UnauthorizedMissingContentStartNodeAccess;
-        }
-
-        var hasMediaStartNodeAccess = HasAccessToMediaStartNode(performingUser, userGroup);
-        if (hasMediaStartNodeAccess is false)
-        {
-            return UserGroupAuthorizationStatus.UnauthorizedMissingMediaStartNodeAccess;
-        }
-
-        return UserGroupAuthorizationStatus.Success;
-    }
 
     /// <inheritdoc/>
-    public async Task<UserGroupAuthorizationStatus> AuthorizeUpdateAsync(IUser performingUser, IUserGroup userGroup)
+    public async Task<UserGroupAuthorizationStatus> AuthorizeUpdateAsync(IUser user, IUserGroup userGroup)
     {
-        var hasAccessToUserSection = HasAccessToUserSection(performingUser);
+        // Authorize that a user belongs to user group
+        UserGroupAuthorizationStatus authorizeGroupAccess = await AuthorizeAccessAsync(user, new[] { userGroup.Key });
+
+        return authorizeGroupAccess != UserGroupAuthorizationStatus.Success
+            ? authorizeGroupAccess
+            : ValidateAccess(user, userGroup);
+    }
+
+    /// <summary>
+    ///     Validate user's access to create/modify user group.
+    /// </summary>
+    /// <param name="user"><see cref="IUser" /> to validate access.</param>
+    /// <param name="userGroup">The user group to be validated.</param>
+    /// <returns><see cref="UserGroupAuthorizationStatus"/>.</returns>
+    private UserGroupAuthorizationStatus ValidateAccess(IUser user, IUserGroup userGroup)
+    {
+        var hasAccessToUserSection = HasAccessToUsersSection(user);
         if (hasAccessToUserSection is false)
         {
             return UserGroupAuthorizationStatus.UnauthorizedMissingUserSectionAccess;
         }
 
-        UserGroupAuthorizationStatus authorizeGroupAccess = await AuthorizeAccessAsync(performingUser, new[] { userGroup.Key });
-        if (authorizeGroupAccess != UserGroupAuthorizationStatus.Success)
-        {
-            return authorizeGroupAccess;
-        }
-
-        var hasAccessToAllGroupSections = HasAccessToAllUserGroupSections(performingUser, userGroup);
+        // Check that the user is not obtaining more access by specifying sections that they don't have access to.
+        var hasAccessToAllGroupSections = HasAccessToAllUserGroupSections(user, userGroup);
         if (hasAccessToAllGroupSections is false)
         {
             return UserGroupAuthorizationStatus.UnauthorizedMissingAllowedSectionAccess;
         }
 
         // Check that the user is not setting start nodes that they don't have access to.
-        var hasContentStartNodeAccess = HasAccessToContentStartNode(performingUser, userGroup);
+        var hasContentStartNodeAccess = HasAccessToContentStartNode(user, userGroup);
         if (hasContentStartNodeAccess is false)
         {
             return UserGroupAuthorizationStatus.UnauthorizedMissingContentStartNodeAccess;
         }
 
-        var hasMediaStartNodeAccess = HasAccessToMediaStartNode(performingUser, userGroup);
+        var hasMediaStartNodeAccess = HasAccessToMediaStartNode(user, userGroup);
         if (hasMediaStartNodeAccess is false)
         {
             return UserGroupAuthorizationStatus.UnauthorizedMissingMediaStartNodeAccess;
@@ -111,35 +96,34 @@ internal sealed class UserGroupPermissionService : IUserGroupPermissionService
     }
 
     /// <summary>
-    ///     Check that the user has access to the user section.
+    ///     Check that a user has access to the Users section.
     /// </summary>
-    /// <param name="user">The user performing the action.</param>
+    /// <param name="user"><see cref="IUser" /> to check for access.</param>
     /// <returns><c>true</c> if the user has access; otherwise, <c>false</c>.</returns>
-    private bool HasAccessToUserSection(IUser user)
+    private bool HasAccessToUsersSection(IUser user)
         => user.AllowedSections.Contains(Constants.Applications.Users);
 
     /// <summary>
-    ///     Check that the user is not adding a section to the group that they don't have access to.
+    ///     Check that a user is not adding a section to the group that they don't have access to.
     /// </summary>
-    /// <param name="performingUser">The user performing the action.</param>
+    /// <param name="user"><see cref="IUser" /> to check for access.</param>
     /// <param name="userGroup">The user group being created or updated.</param>
-    /// <returns>An attempt with an operation status.</returns>
     /// <returns><c>true</c> if the user has access; otherwise, <c>false</c>.</returns>
-    private bool HasAccessToAllUserGroupSections(IUser performingUser, IUserGroup userGroup)
+    private bool HasAccessToAllUserGroupSections(IUser user, IUserGroup userGroup)
     {
-        if (performingUser.IsAdmin())
+        if (user.IsAdmin())
         {
             return true;
         }
 
-        var sectionsMissingAccess = userGroup.AllowedSections.Except(performingUser.AllowedSections).ToArray();
+        var sectionsMissingAccess = userGroup.AllowedSections.Except(user.AllowedSections).ToArray();
         return sectionsMissingAccess.Length == 0;
     }
 
     /// <summary>
-    ///     Check that the user has access to the content start node.
+    ///     Check that a user has access to the content start node.
     /// </summary>
-    /// <param name="user">The user performing the action.</param>
+    /// <param name="user"><see cref="IUser" /> to check for access.</param>
     /// <param name="userGroup">The user group being created or updated.</param>
     /// <returns><c>true</c> if the user has access; otherwise, <c>false</c>.</returns>
     private bool HasAccessToContentStartNode(IUser user, IUserGroup userGroup)
@@ -160,9 +144,9 @@ internal sealed class UserGroupPermissionService : IUserGroupPermissionService
     }
 
     /// <summary>
-    ///     Check that the user has access to the media start node.
+    ///     Check that a user has access to the media start node.
     /// </summary>
-    /// <param name="user">The user performing the action.</param>
+    /// <param name="user"><see cref="IUser" /> to check for access.</param>
     /// <param name="userGroup">The user group being created or updated.</param>
     /// <returns><c>true</c> if the user has access; otherwise, <c>false</c>.</returns>
     private bool HasAccessToMediaStartNode(IUser user, IUserGroup userGroup)
