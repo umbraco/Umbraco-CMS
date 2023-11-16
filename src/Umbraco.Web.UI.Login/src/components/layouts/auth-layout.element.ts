@@ -85,6 +85,7 @@ export class UmbAuthLayoutElement extends LitElement {
         --uui-button-border-radius: 45px;
         --uui-color-default: var(--uui-color-interactive);
         --uui-button-height: 42px;
+        --uui-select-height: 38px;
 
         --input-height: 40px;
         --header-font-size: 3rem;
