@@ -4,6 +4,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
+import { UmbWorkspaceIsNewRedirectController } from '@umbraco-cms/backoffice/workspace';
 
 @customElement('umb-media-type-workspace')
 export class UmbMediaTypeWorkspaceElement extends UmbLitElement {
@@ -12,6 +13,20 @@ export class UmbMediaTypeWorkspaceElement extends UmbLitElement {
 
 	@state()
 	_routes: UmbRoute[] = [
+		{
+			path: 'create/:parentId',
+			component: import('./media-type-workspace-editor.element.js'),
+			setup: (_component, info) => {
+				const parentId = info.match.params.parentId === 'null' ? null : info.match.params.parentId;
+				this.#workspaceContext.create(parentId);
+
+				new UmbWorkspaceIsNewRedirectController(
+					this,
+					this.#workspaceContext,
+					this.shadowRoot!.querySelector('umb-router-slot')!,
+				);
+			},
+		},
 		{
 			path: 'edit/:id',
 			component: () => this.#element,
