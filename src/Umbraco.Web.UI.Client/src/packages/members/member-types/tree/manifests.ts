@@ -1,14 +1,37 @@
-import { MEMBER_TYPES_REPOSITORY_ALIAS } from '../repository/manifests.js';
-import type { ManifestTree, ManifestTreeItem } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_MEMBER_TYPE_ENTITY_TYPE, UMB_MEMBER_TYPE_ROOT_ENTITY_TYPE } from '../entity.js';
+import { UmbMemberTypeTreeRepository } from './member-type-tree.repository.js';
+import { UmbMemberTypeTreeStore } from './member-type-tree.store.js';
+import type {
+	ManifestRepository,
+	ManifestTree,
+	ManifestTreeItem,
+	ManifestTreeStore,
+} from '@umbraco-cms/backoffice/extension-registry';
 
-const treeAlias = 'Umb.Tree.MemberTypes';
+export const UMB_MEMBER_TYPE_TREE_REPOSITORY_ALIAS = 'Umb.Repository.MemberType.Tree';
+export const UMB_MEMBER_TYPE_TREE_STORE_ALIAS = 'Umb.Store.MemberType.Tree';
+export const UMB_MEMBER_TYPE_TREE_ALIAS = 'Umb.Tree.MemberType';
+
+const treeRepository: ManifestRepository = {
+	type: 'repository',
+	alias: UMB_MEMBER_TYPE_TREE_REPOSITORY_ALIAS,
+	name: 'Member Type Tree Repository',
+	api: UmbMemberTypeTreeRepository,
+};
+
+const treeStore: ManifestTreeStore = {
+	type: 'treeStore',
+	alias: UMB_MEMBER_TYPE_TREE_STORE_ALIAS,
+	name: 'Member Type Tree Store',
+	api: UmbMemberTypeTreeStore,
+};
 
 const tree: ManifestTree = {
 	type: 'tree',
-	alias: treeAlias,
-	name: 'Member Types Tree',
+	alias: UMB_MEMBER_TYPE_TREE_ALIAS,
+	name: 'Member Type Tree',
 	meta: {
-		repositoryAlias: MEMBER_TYPES_REPOSITORY_ALIAS,
+		repositoryAlias: UMB_MEMBER_TYPE_TREE_REPOSITORY_ALIAS,
 	},
 };
 
@@ -18,8 +41,8 @@ const treeItem: ManifestTreeItem = {
 	alias: 'Umb.TreeItem.MemberType',
 	name: 'Member Type Tree Item',
 	meta: {
-		entityTypes: ['member-type-root', 'member-type'],
+		entityTypes: [UMB_MEMBER_TYPE_ROOT_ENTITY_TYPE, UMB_MEMBER_TYPE_ENTITY_TYPE],
 	},
 };
 
-export const manifests = [tree, treeItem];
+export const manifests = [treeRepository, treeStore, tree, treeItem];

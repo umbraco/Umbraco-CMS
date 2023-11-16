@@ -12,7 +12,7 @@ import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
  */
 export class UmbMemberTypeStore extends UmbStoreBase {
 	constructor(host: UmbControllerHostElement) {
-		super(host, UMB_MEMBER_TYPE_STORE_CONTEXT_TOKEN.toString(), new UmbArrayState<MemberTypeDetails>([], (x) => x.id));
+		super(host, UMB_MEMBER_TYPE_STORE_CONTEXT.toString(), new UmbArrayState<MemberTypeDetails>([], (x) => x.id));
 	}
 
 	append(MemberType: MemberTypeDetails) {
@@ -33,4 +33,4 @@ export class UmbMemberTypeStore extends UmbStoreBase {
 	}
 }
 
-export const UMB_MEMBER_TYPE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbMemberTypeStore>('UmbMemberTypeStore');
+export const UMB_MEMBER_TYPE_STORE_CONTEXT = new UmbContextToken<UmbMemberTypeStore>('UmbMemberTypeStore');
