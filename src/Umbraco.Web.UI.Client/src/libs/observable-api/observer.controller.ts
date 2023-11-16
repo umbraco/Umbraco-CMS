@@ -14,7 +14,7 @@ export class UmbObserverController<T = unknown> extends UmbObserver<T> implement
 		host: UmbControllerHost,
 		source: Observable<T>,
 		callback: ObserverCallback<T>,
-		alias?: UmbControllerAlias
+		alias?: UmbControllerAlias,
 	) {
 		super(source, callback);
 		this.#host = host;

@@ -6,6 +6,7 @@ import type {
 	UmbExtensionRegistry,
 } from '@umbraco-cms/backoffice/extension-api';
 import { UmbBaseController, type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
 export type PermittedControllerType<ControllerType extends { manifest: any }> = ControllerType & {
 	manifest: Required<Pick<ControllerType, 'manifest'>>;
@@ -27,6 +28,8 @@ export abstract class UmbBaseExtensionsInitializer<
 	#onChange?: (permittedManifests: Array<MyPermittedControllerType>) => void;
 	protected _extensions: Array<ControllerType> = [];
 	private _permittedExts: Array<MyPermittedControllerType> = [];
+
+	#observerCtrlTest?: UmbObserverController;
 
 	asPromise(): Promise<void> {
 		return new Promise((resolve) => {
@@ -54,7 +57,7 @@ export abstract class UmbBaseExtensionsInitializer<
 		if (this.#filter) {
 			source = source.pipe(map((extensions: Array<ManifestType>) => extensions.filter(this.#filter!)));
 		}
-		this.observe(source, this.#gotManifests);
+		this.#observerCtrlTest = this.observe(source, this.#gotManifests, '_observeManifests') as any;
 	}
 
 	#gotManifests = (manifests: Array<ManifestType>) => {
@@ -87,7 +90,6 @@ export abstract class UmbBaseExtensionsInitializer<
 			if (!existing) {
 				// Idea: could be abstracted into a createController method, so we can override it in a subclass.
 				// (This should be enough to be able to create a element extension controller instead.)
-
 				this._extensions.push(this._createController(manifest));
 			}
 		});
@@ -156,5 +158,6 @@ export abstract class UmbBaseExtensionsInitializer<
 		this._extensions.length = 0;
 		this._permittedExts.length = 0;
 		this.#onChange?.(this._permittedExts);
+		//this.#onChange = undefined;
 	}
 }

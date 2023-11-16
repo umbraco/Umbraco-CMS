@@ -66,7 +66,7 @@ export abstract class UmbBaseExtensionInitializer<
 		this.#manifestObserver = this.observe(
 			this.#extensionRegistry.getByAlias<ManifestType>(this.#alias),
 			async (extensionManifest) => {
-				this.#isPermitted = undefined;
+				this.#clearPermittedState();
 				this.#manifest = extensionManifest;
 				if (extensionManifest) {
 					if (extensionManifest.overwrites) {
@@ -82,6 +82,7 @@ export abstract class UmbBaseExtensionInitializer<
 					this.#cleanConditions();
 				}
 			},
+			'_observeExtensionManifest',
 		);
 	}
 
@@ -230,9 +231,12 @@ export abstract class UmbBaseExtensionInitializer<
 		if (isPositive) {
 			if (this.#isPermitted !== true) {
 				const newPermission = await this._conditionsAreGood();
+				// Only set new permission if we are still positive, otherwise it means that we have been destroyed in the mean time.
+				if (newPermission === false) {
+					return;
+				}
 				// We update the oldValue as this point, cause in this way we are sure its the value at this point, when doing async code someone else might have changed the state in the mean time.
 				oldValue = this.#isPermitted ?? false;
-				// Only set new permission if we are still positive.
 				this.#isPermitted = newPermission;
 			}
 		} else if (this.#isPermitted !== false) {
@@ -240,7 +244,7 @@ export abstract class UmbBaseExtensionInitializer<
 			this.#isPermitted = false;
 			await this._conditionsAreBad();
 		}
-		if (oldValue !== this.#isPermitted) {
+		if (oldValue !== this.#isPermitted && this.#isPermitted !== undefined) {
 			if (this.#isPermitted) {
 				this.#promiseResolvers.forEach((x) => x());
 				this.#promiseResolvers = [];
@@ -274,17 +278,22 @@ export abstract class UmbBaseExtensionInitializer<
 	}
 	*/
 
-	public destroy(): void {
-		this.#promiseResolvers = [];
-		this.#isPermitted = undefined;
-		this._isConditionsPositive = false;
+	#clearPermittedState() {
 		if (this.#isPermitted === true) {
 			this.#isPermitted = undefined;
 			this._conditionsAreBad();
 			this.#onPermissionChanged?.(false, this as any);
 		}
+	}
+
+	public destroy(): void {
+		this.#promiseResolvers = [];
+		this.#clearPermittedState();
+		this.#isPermitted = undefined;
+		this._isConditionsPositive = false;
 		this.#overwrites = [];
 		this.#cleanConditions();
+		//this.#onPermissionChanged = undefined;
 		super.destroy();
 		// Destroy the conditions controllers, are begin destroyed cause they are controllers.
 	}
