@@ -21,4 +21,5 @@ export interface ManifestMenuItemTreeKind extends ManifestMenuItem {
 
 export interface MetaMenuItemTreeKind extends MetaMenuItem {
 	treeAlias: string;
+	hideTreeRoot?: boolean;
 }
