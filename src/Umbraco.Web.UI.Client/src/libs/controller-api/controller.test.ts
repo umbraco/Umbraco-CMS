@@ -140,24 +140,36 @@ describe('UmbController', () => {
 			const ctrl = new UmbTestControllerImplementationElement(hostElement);
 			const subCtrl = new UmbTestControllerImplementationElement(ctrl);
 			const subCtrl2 = new UmbTestControllerImplementationElement(ctrl);
-			//const subSubCtrl1 = new UmbTestControllerImplementationElement(subCtrl);
-			//const subSubCtrl2 = new UmbTestControllerImplementationElement(subCtrl);
+			const subSubCtrl1 = new UmbTestControllerImplementationElement(subCtrl);
+			const subSubCtrl2 = new UmbTestControllerImplementationElement(subCtrl);
 
 			expect(ctrl.testIsDestroyed).to.be.false;
+			expect(hostElement.hasController(ctrl)).to.be.true;
+			// Subs:
 			expect(subCtrl.testIsDestroyed).to.be.false;
 			expect(subCtrl2.testIsDestroyed).to.be.false;
-			expect(hostElement.hasController(ctrl)).to.be.true;
 			expect(ctrl.hasController(subCtrl)).to.be.true;
 			expect(ctrl.hasController(subCtrl2)).to.be.true;
+			// Sub subs:
+			expect(subSubCtrl1.testIsDestroyed).to.be.false;
+			expect(subSubCtrl2.testIsDestroyed).to.be.false;
+			expect(subCtrl.hasController(subSubCtrl1)).to.be.true;
+			expect(subCtrl.hasController(subSubCtrl2)).to.be.true;
 
 			ctrl.destroy();
 
 			expect(ctrl.testIsDestroyed).to.be.true;
 			expect(hostElement.hasController(ctrl)).to.be.false;
+			// Subs:
 			expect(subCtrl.testIsDestroyed).to.be.true;
 			expect(subCtrl2.testIsDestroyed).to.be.true;
 			expect(ctrl.hasController(subCtrl)).to.be.false;
 			expect(ctrl.hasController(subCtrl2)).to.be.false;
+			// Sub subs:
+			expect(subSubCtrl1.testIsDestroyed).to.be.true;
+			expect(subSubCtrl2.testIsDestroyed).to.be.true;
+			expect(subCtrl.hasController(subSubCtrl1)).to.be.false;
+			expect(subCtrl.hasController(subSubCtrl2)).to.be.false;
 		});
 
 		it('hostConnected & hostDisconnected is triggered accordingly to the state of the controller host.', () => {
