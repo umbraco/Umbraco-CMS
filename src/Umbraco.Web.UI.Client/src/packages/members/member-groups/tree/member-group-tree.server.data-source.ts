@@ -1,6 +1,7 @@
 import type { UmbTreeDataSource } from '@umbraco-cms/backoffice/tree';
-import { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { EntityTreeItemResponseModel, MemberGroupResource } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the MemberGroup tree that fetches data from the server
@@ -25,9 +26,8 @@ export class UmbMemberGroupTreeServerDataSource implements UmbTreeDataSource<Ent
 	 * @return {*}
 	 * @memberof UmbMemberGroupTreeServerDataSource
 	 */
-	async getRootItems(): Promise<any> {
-		alert('not implemented');
-		//return tryExecuteAndNotify(this.#host, MemberGroupResource.getTreeMemberGroupRoot({}));
+	async getRootItems() {
+		return tryExecuteAndNotify(this.#host, MemberGroupResource.getTreeMemberGroupRoot({}));
 	}
 
 	/**
@@ -37,21 +37,21 @@ export class UmbMemberGroupTreeServerDataSource implements UmbTreeDataSource<Ent
 	 * @memberof UmbMemberGroupTreeServerDataSource
 	 */
 	async getChildrenOf(parentId: string | null): Promise<any> {
-		alert('not implemented');
 		/* TODO: should we make getRootItems() internal
 		so it only is a server concern that there are two endpoints? */
-		/*
 		if (parentId === null) {
 			return this.getRootItems();
 		} else {
+			alert('not implemented');
+			/*
 			return tryExecuteAndNotify(
 				this.#host,
 				MemberGroupResource.getTreeMemberGroupChildren({
 					parentId,
 				}),
 			);
+			*/
 		}
-		*/
 	}
 
 	// TODO: remove when interface is cleaned up
