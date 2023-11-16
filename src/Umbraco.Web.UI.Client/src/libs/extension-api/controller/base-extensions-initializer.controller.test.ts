@@ -161,7 +161,7 @@ describe('UmbBaseExtensionsController', () => {
 
 						extensionController.destroy();
 					}
-					// TOOD: Make sure we dont get several callbacks.
+					// TODO: Make sure we dont get several callbacks.
 					if (count === 4) {
 						// Cause we destroyed there will be a last call to reset permitted controllers:
 						expect(permitted.length).to.eq(2);
