@@ -66,12 +66,13 @@ describe('UmbController', () => {
 	describe('Controller Public API', () => {
 		let controller: UmbTestControllerImplementationElement;
 		beforeEach(() => {
-			controller = new UmbTestControllerImplementationElement(hostElement, 'my-test-context');
+			controller = new UmbTestControllerImplementationElement(hostElement, 'my-test-controller-alias');
 		});
 
 		describe('methods', () => {
 			it('has an controllerAlias property', () => {
 				expect(controller).to.have.property('controllerAlias').that.is.a('string');
+				expect(controller.controllerAlias).to.be.equal('my-test-controller-alias');
 			});
 			it('has an hasController method', () => {
 				expect(controller).to.have.property('hasController').that.is.a('function');
@@ -102,8 +103,8 @@ describe('UmbController', () => {
 
 	describe('Controllers lifecycle', () => {
 		it('controller is removed from host when destroyed', () => {
-			const ctrl = new UmbTestControllerImplementationElement(hostElement, 'my-test-context');
-			const subCtrl = new UmbTestControllerImplementationElement(ctrl, 'my-test-context');
+			const ctrl = new UmbTestControllerImplementationElement(hostElement);
+			const subCtrl = new UmbTestControllerImplementationElement(ctrl);
 
 			expect(hostElement.hasController(ctrl)).to.be.true;
 			expect(ctrl.hasController(subCtrl)).to.be.true;
@@ -119,8 +120,8 @@ describe('UmbController', () => {
 		});
 
 		it('controller is destroyed when removed from host', () => {
-			const ctrl = new UmbTestControllerImplementationElement(hostElement, 'my-test-context');
-			const subCtrl = new UmbTestControllerImplementationElement(ctrl, 'my-test-context');
+			const ctrl = new UmbTestControllerImplementationElement(hostElement);
+			const subCtrl = new UmbTestControllerImplementationElement(ctrl);
 
 			expect(ctrl.testIsDestroyed).to.be.false;
 			expect(subCtrl.testIsDestroyed).to.be.false;
@@ -135,9 +136,33 @@ describe('UmbController', () => {
 			expect(ctrl.hasController(subCtrl)).to.be.false;
 		});
 
+		it('all controllers are destroyed when the hosting controller gets destroyed', () => {
+			const ctrl = new UmbTestControllerImplementationElement(hostElement);
+			const subCtrl = new UmbTestControllerImplementationElement(ctrl);
+			const subCtrl2 = new UmbTestControllerImplementationElement(ctrl);
+			//const subSubCtrl1 = new UmbTestControllerImplementationElement(subCtrl);
+			//const subSubCtrl2 = new UmbTestControllerImplementationElement(subCtrl);
+
+			expect(ctrl.testIsDestroyed).to.be.false;
+			expect(subCtrl.testIsDestroyed).to.be.false;
+			expect(subCtrl2.testIsDestroyed).to.be.false;
+			expect(hostElement.hasController(ctrl)).to.be.true;
+			expect(ctrl.hasController(subCtrl)).to.be.true;
+			expect(ctrl.hasController(subCtrl2)).to.be.true;
+
+			ctrl.destroy();
+
+			expect(ctrl.testIsDestroyed).to.be.true;
+			expect(hostElement.hasController(ctrl)).to.be.false;
+			expect(subCtrl.testIsDestroyed).to.be.true;
+			expect(subCtrl2.testIsDestroyed).to.be.true;
+			expect(ctrl.hasController(subCtrl)).to.be.false;
+			expect(ctrl.hasController(subCtrl2)).to.be.false;
+		});
+
 		it('hostConnected & hostDisconnected is triggered accordingly to the state of the controller host.', () => {
-			const ctrl = new UmbTestControllerImplementationElement(hostElement, 'my-test-context');
-			const subCtrl = new UmbTestControllerImplementationElement(ctrl, 'my-test-context');
+			const ctrl = new UmbTestControllerImplementationElement(hostElement);
+			const subCtrl = new UmbTestControllerImplementationElement(ctrl);
 
 			expect(hostElement.hasController(ctrl)).to.be.true;
 			expect(ctrl.hasController(subCtrl)).to.be.true;
@@ -154,12 +179,35 @@ describe('UmbController', () => {
 			expect(ctrl.testIsConnected).to.be.false;
 			expect(subCtrl.testIsConnected).to.be.false;
 		});
+
+		it('hostConnected is triggered if controller host is already connected at time of adding controller.', async () => {
+			document.body.appendChild(hostElement);
+
+			const ctrl = new UmbTestControllerImplementationElement(hostElement);
+			const subCtrl = new UmbTestControllerImplementationElement(ctrl);
+
+			expect(hostElement.hasController(ctrl)).to.be.true;
+			expect(ctrl.hasController(subCtrl)).to.be.true;
+			expect(ctrl.testIsConnected).to.be.false;
+			expect(subCtrl.testIsConnected).to.be.false;
+
+			// Wait one JS cycle, to ensure that the hostConnected is triggered. (Currently its by design that we trigger the hostConnected with one cycle delay)
+			await Promise.resolve();
+
+			expect(ctrl.testIsConnected).to.be.true;
+			expect(subCtrl.testIsConnected).to.be.true;
+
+			document.body.removeChild(hostElement);
+
+			expect(ctrl.testIsConnected).to.be.false;
+			expect(subCtrl.testIsConnected).to.be.false;
+		});
 	});
 
-	describe('Controllers against other Controller', () => {
+	describe('Controllers against other Controllers', () => {
 		it('controller is replaced by another controller using the same string as controller-alias', () => {
-			const firstCtrl = new UmbTestControllerImplementationElement(hostElement, 'my-test-context');
-			const secondCtrl = new UmbTestControllerImplementationElement(hostElement, 'my-test-context');
+			const firstCtrl = new UmbTestControllerImplementationElement(hostElement, 'my-test-alias');
+			const secondCtrl = new UmbTestControllerImplementationElement(hostElement, 'my-test-alias');
 
 			expect(hostElement.hasController(firstCtrl)).to.be.false;
 			expect(hostElement.hasController(secondCtrl)).to.be.true;
