@@ -1,4 +1,4 @@
-import { UMB_SCRIPT_ROOT_ENTITY_TYPE } from '../entities.js';
+import { UMB_SCRIPT_ROOT_ENTITY_TYPE } from '../entity.js';
 import { UmbScriptTreeServerDataSource } from './script-tree.server.data-source.js';
 import { UmbScriptTreeItemModel, UmbScriptTreeRootModel } from './types.js';
 import { UMB_SCRIPT_TREE_STORE_CONTEXT } from './script-tree.store.js';

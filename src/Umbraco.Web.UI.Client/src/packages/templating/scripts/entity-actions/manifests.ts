@@ -4,7 +4,7 @@ import {
 	UMB_SCRIPT_FOLDER_ENTITY_TYPE,
 	UMB_SCRIPT_ROOT_ENTITY_TYPE,
 	UMB_SCRIPT_FOLDER_EMPTY_ENTITY_TYPE,
-} from '../entities.js';
+} from '../entity.js';
 import { UmbCreateScriptAction } from './create/create-empty.action.js';
 import {
 	UmbCreateFolderEntityAction,

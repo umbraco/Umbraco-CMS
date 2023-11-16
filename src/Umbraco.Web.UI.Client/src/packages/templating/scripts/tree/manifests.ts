@@ -1,4 +1,4 @@
-import { UMB_SCRIPT_ENTITY_TYPE, UMB_SCRIPT_ROOT_ENTITY_TYPE } from '../entities.js';
+import { UMB_SCRIPT_ENTITY_TYPE, UMB_SCRIPT_ROOT_ENTITY_TYPE } from '../entity.js';
 import { UmbScriptTreeRepository } from './script-tree.repository.js';
 import { UmbScriptTreeStore } from './script-tree.store.js';
 import type {
