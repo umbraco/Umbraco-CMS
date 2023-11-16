@@ -1,10 +1,10 @@
 import {
-	PARTIAL_VIEW_ENTITY_TYPE,
-	PARTIAL_VIEW_FOLDER_EMPTY_ENTITY_TYPE,
-	PARTIAL_VIEW_FOLDER_ENTITY_TYPE,
-	PARTIAL_VIEW_REPOSITORY_ALIAS,
-	PARTIAL_VIEW_ROOT_ENTITY_TYPE,
-} from '../config.js';
+	UMB_PARTIAL_VIEW_ENTITY_TYPE,
+	UMB_PARTIAL_VIEW_FOLDER_EMPTY_ENTITY_TYPE,
+	UMB_PARTIAL_VIEW_FOLDER_ENTITY_TYPE,
+	UMB_PARTIAL_VIEW_REPOSITORY_ALIAS,
+	UMB_PARTIAL_VIEW_ROOT_ENTITY_TYPE,
+} from '../entity.js';
 import { UmbCreateFromSnippetPartialViewAction } from './create/create-from-snippet.action.js';
 import { UmbCreateEmptyPartialViewAction } from './create/create-empty.action.js';
 import {
@@ -26,8 +26,8 @@ const partialViewActions: Array<ManifestEntityAction> = [
 		meta: {
 			icon: 'icon-trash',
 			label: 'Delete',
-			repositoryAlias: PARTIAL_VIEW_REPOSITORY_ALIAS,
-			entityTypes: [PARTIAL_VIEW_ENTITY_TYPE],
+			repositoryAlias: UMB_PARTIAL_VIEW_REPOSITORY_ALIAS,
+			entityTypes: [UMB_PARTIAL_VIEW_ENTITY_TYPE],
 		},
 	},
 ];
@@ -43,8 +43,8 @@ const partialViewFolderActions: Array<ManifestEntityAction> = [
 		meta: {
 			icon: 'icon-article',
 			label: 'New empty partial view',
-			repositoryAlias: PARTIAL_VIEW_REPOSITORY_ALIAS,
-			entityTypes: [PARTIAL_VIEW_FOLDER_ENTITY_TYPE, PARTIAL_VIEW_ROOT_ENTITY_TYPE],
+			repositoryAlias: UMB_PARTIAL_VIEW_REPOSITORY_ALIAS,
+			entityTypes: [UMB_PARTIAL_VIEW_FOLDER_ENTITY_TYPE, UMB_PARTIAL_VIEW_ROOT_ENTITY_TYPE],
 		},
 	},
 	{
@@ -55,8 +55,8 @@ const partialViewFolderActions: Array<ManifestEntityAction> = [
 		meta: {
 			icon: 'icon-article',
 			label: 'New partial view from snippet...',
-			repositoryAlias: PARTIAL_VIEW_REPOSITORY_ALIAS,
-			entityTypes: [PARTIAL_VIEW_FOLDER_ENTITY_TYPE, PARTIAL_VIEW_ROOT_ENTITY_TYPE],
+			repositoryAlias: UMB_PARTIAL_VIEW_REPOSITORY_ALIAS,
+			entityTypes: [UMB_PARTIAL_VIEW_FOLDER_ENTITY_TYPE, UMB_PARTIAL_VIEW_ROOT_ENTITY_TYPE],
 		},
 	},
 	{
@@ -67,8 +67,8 @@ const partialViewFolderActions: Array<ManifestEntityAction> = [
 		meta: {
 			icon: 'icon-trash',
 			label: 'Remove folder',
-			repositoryAlias: PARTIAL_VIEW_REPOSITORY_ALIAS,
-			entityTypes: [PARTIAL_VIEW_FOLDER_EMPTY_ENTITY_TYPE],
+			repositoryAlias: UMB_PARTIAL_VIEW_REPOSITORY_ALIAS,
+			entityTypes: [UMB_PARTIAL_VIEW_FOLDER_EMPTY_ENTITY_TYPE],
 		},
 	},
 	{
@@ -79,11 +79,11 @@ const partialViewFolderActions: Array<ManifestEntityAction> = [
 		meta: {
 			icon: 'icon-add',
 			label: 'Create folder',
-			repositoryAlias: PARTIAL_VIEW_REPOSITORY_ALIAS,
+			repositoryAlias: UMB_PARTIAL_VIEW_REPOSITORY_ALIAS,
 			entityTypes: [
-				PARTIAL_VIEW_FOLDER_EMPTY_ENTITY_TYPE,
-				PARTIAL_VIEW_FOLDER_ENTITY_TYPE,
-				PARTIAL_VIEW_ROOT_ENTITY_TYPE,
+				UMB_PARTIAL_VIEW_FOLDER_EMPTY_ENTITY_TYPE,
+				UMB_PARTIAL_VIEW_FOLDER_ENTITY_TYPE,
+				UMB_PARTIAL_VIEW_ROOT_ENTITY_TYPE,
 			],
 		},
 	},
