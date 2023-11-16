@@ -2,18 +2,20 @@ import {ConstantHelper, test} from "@umbraco/playwright-testhelpers";
 import {expect} from "@playwright/test";
 
 test.describe('Script tests', () => {
-
   const scriptName = 'TestScript';
   const scriptPath = scriptName + '.js';
   const scriptFolderName = 'TestScriptFolder';
+
+  test.beforeEach(async ({page, umbracoApi, umbracoUi}) => {
+    await page.goto(umbracoApi.baseUrl + '/umbraco');
+    await umbracoUi.goToSection(ConstantHelper.sections.settings);
+  });
 
   test('can create a empty script', async ({page, umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.script.ensureNameNotExists(scriptPath);
 
     // Act
-    await page.goto(umbracoApi.baseUrl + '/umbraco');
-    await umbracoUi.goToSection(ConstantHelper.sections.settings);
     await page.locator('umb-tree-item', {hasText: 'Scripts'}).getByLabel('Open actions menu').click({force: true});
     await page.getByLabel('New empty script').click();
     // TODO: Change the label to script name when the label is updated
@@ -38,8 +40,8 @@ test.describe('Script tests', () => {
     const updatedScriptContent = 'const test = {\r\n    script = \u0022Test\u0022,\r\n    extension = \u0022.js\u0022,\r\n    scriptPath: function() {\r\n        return this.script \u002B this.extension;\r\n    }\r\n};\r\n';
 
     // Act
-    await page.goto(umbracoApi.baseUrl + '/umbraco');
-    await umbracoUi.goToScript(scriptPath);
+    await page.locator('umb-tree-item', {hasText: 'Scripts'}).locator('#caret-button').click();
+    await page.locator('umb-tree-item').getByLabel(scriptName).click();
     await page.locator('textarea.inputarea').clear();
     await page.locator('textarea.inputarea').fill(updatedScriptContent);
     await page.getByLabel('Save').click();
@@ -60,8 +62,6 @@ test.describe('Script tests', () => {
     await umbracoApi.script.create(scriptPath, '');
 
     // Act
-    await page.goto(umbracoApi.baseUrl + '/umbraco');
-    await umbracoUi.goToSection(ConstantHelper.sections.settings);
     await page.locator('umb-tree-item', {hasText: 'Scripts'}).locator('#caret-button').click();
     await page.locator('umb-tree-item').locator('[label="' + scriptPath + '"] >> [label="Open actions menu"]').click();
     await page.getByLabel('Delete').click();
@@ -79,8 +79,6 @@ test.describe('Script tests', () => {
     await umbracoApi.script.ensureNameNotExists(scriptFolderName);
 
     // Act
-    await page.goto(umbracoApi.baseUrl + '/umbraco');
-    await umbracoUi.goToSection(ConstantHelper.sections.settings);
     await page.locator('umb-tree-item', {hasText: 'Scripts'}).getByLabel('Open actions menu').click({force: true});
     await page.getByLabel('Create folder').click();
     await page.locator('[headline="Create Folder"] >> input').fill(scriptFolderName);
@@ -105,8 +103,6 @@ test.describe('Script tests', () => {
     await umbracoApi.script.createFolder(scriptFolderName);
 
     // Act
-    await page.goto(umbracoApi.baseUrl + '/umbraco');
-    await umbracoUi.goToSection(ConstantHelper.sections.settings);
     await page.locator('umb-tree-item', {hasText: 'Scripts'}).locator('#caret-button').click();
     await page.locator('umb-tree-item').locator('[label="' + scriptFolderName + '"] >> [label="Open actions menu"]').click();
     await page.getByLabel('Remove folder').click();
@@ -130,8 +126,6 @@ test.describe('Script tests', () => {
     const scriptContent = 'const test = {\r\n    script = \u0022Test\u0022,\r\n    extension = \u0022.js\u0022,\r\n    scriptPath: function() {\r\n        return this.script \u002B this.extension;\r\n    }\r\n};\r\n';
 
     // Act
-    await page.goto(umbracoApi.baseUrl + '/umbraco');
-    await umbracoUi.goToSection(ConstantHelper.sections.settings);
     await page.locator('umb-tree-item', {hasText: 'Scripts'}).locator('#caret-button').click();
     await page.locator('umb-tree-item').locator('[label="' + scriptFolderName + '"] >> [label="Open actions menu"]').click();
     await page.getByLabel('New empty script').click();
@@ -139,7 +133,6 @@ test.describe('Script tests', () => {
     await page.getByLabel('template name').fill(scriptName);
     await page.locator('textarea.inputarea').clear();
     await page.locator('textarea.inputarea').fill(scriptContent);
-    await page.getByLabel('Save').click();
     // TODO: Remove this timeout when frontend validation is implemented
     await page.waitForTimeout(1000);
     await page.getByLabel('Save').click({force: true});
@@ -165,8 +158,6 @@ test.describe('Script tests', () => {
     const childFolderName = "childFolderName";
 
     // Act
-    await page.goto(umbracoApi.baseUrl + '/umbraco');
-    await umbracoUi.goToSection(ConstantHelper.sections.settings);
     await page.locator('umb-tree-item', {hasText: 'Scripts'}).locator('#caret-button').click();
     await page.locator('umb-tree-item').locator('[label="' + scriptFolderName + '"] >> [label="Open actions menu"]').click();
     await page.getByLabel('Create folder').click();
@@ -194,8 +185,6 @@ test.describe('Script tests', () => {
     await umbracoApi.script.createFolder(childFolderName, scriptFolderName);
 
     // Act
-    await page.goto(umbracoApi.baseUrl + '/umbraco');
-    await umbracoUi.goToSection(ConstantHelper.sections.settings);
     await page.locator('umb-tree-item', {hasText: 'Scripts'}).locator('#caret-button').click();
     await page.locator('umb-tree-item >> [label="' + scriptFolderName + '"]').locator('#caret-button').click();
     await page.locator('umb-tree-item').locator('[label="' + childFolderName + '"] >> [label="Open actions menu"]').click();
@@ -224,8 +213,6 @@ test.describe('Script tests', () => {
     await umbracoApi.script.createFolder(childFolderName, scriptFolderName);
 
     // Act
-    await page.goto(umbracoApi.baseUrl + '/umbraco');
-    await umbracoUi.goToSection(ConstantHelper.sections.settings);
     await page.locator('umb-tree-item', {hasText: 'Scripts'}).locator('#caret-button').click();
     await page.locator('umb-tree-item >> [label="' + scriptFolderName + '"]').locator('#caret-button').click();
     await page.locator('umb-tree-item').locator('[label="' + childFolderName + '"] >> [label="Open actions menu"]').click();
