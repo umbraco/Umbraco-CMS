@@ -287,13 +287,15 @@ export abstract class UmbBaseExtensionInitializer<
 	}
 
 	public destroy(): void {
+		if (!this.#extensionRegistry) return;
 		this.#promiseResolvers = [];
-		this.#clearPermittedState();
+		this.#clearPermittedState(); // This fires the callback as not permitted, if it was permitted before.
 		this.#isPermitted = undefined;
 		this._isConditionsPositive = false;
 		this.#overwrites = [];
 		this.#cleanConditions();
-		//this.#onPermissionChanged = undefined;
+		this.#onPermissionChanged = undefined;
+		(this.#extensionRegistry as any) = undefined;
 		super.destroy();
 		// Destroy the conditions controllers, are begin destroyed cause they are controllers.
 	}

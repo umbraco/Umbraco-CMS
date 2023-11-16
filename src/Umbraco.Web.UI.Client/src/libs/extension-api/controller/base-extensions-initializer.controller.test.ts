@@ -120,11 +120,11 @@ describe('UmbBaseExtensionsController', () => {
 					if (count === 1) {
 						// First callback gives just one. We need to make a feature to gather changes to only reply after a computation cycle if we like to avoid this.
 						expect(permitted.length).to.eq(1);
-					}
-					if (count === 2) {
+					} else if (count === 2) {
 						expect(permitted.length).to.eq(2);
-						done();
 						extensionController.destroy();
+					} else if (count === 3) {
+						done();
 					}
 				},
 			);
@@ -288,7 +288,12 @@ describe('UmbBaseExtensionsController', () => {
 						expect(permitted[0].alias).to.eq('Umb.Test.Extension.A');
 						extensionController.destroy();
 					} else if (count === 4) {
-						done();
+						// Expect that destroy will only result in one last callback with no permitted controllers.
+						expect(permitted.length).to.eq(0);
+						Promise.resolve().then(() => done()); // This wrap is to enable the test to detect if more callbacks are fired.
+					} else if (count === 5) {
+						// This should not happen, we do only want one last callback when destroyed.
+						expect(false).to.eq(true);
 					}
 				},
 			);

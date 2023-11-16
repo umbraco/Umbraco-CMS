@@ -151,10 +151,17 @@ export abstract class UmbBaseExtensionsInitializer<
 	}
 
 	public destroy() {
+		// The this.#extensionRegistry is an indication of wether this is already destroyed.
+		if (!this.#extensionRegistry) return;
+
+		const oldPermittedExtsLength = this._permittedExts.length;
 		this._extensions.length = 0;
 		this._permittedExts.length = 0;
+		if (oldPermittedExtsLength > 0) {
+			this.#onChange?.(this._permittedExts);
+		}
+		this.#onChange = undefined;
+		(this.#extensionRegistry as any) = undefined;
 		super.destroy();
-		this.#onChange?.(this._permittedExts);
-		//this.#onChange = undefined;
 	}
 }
