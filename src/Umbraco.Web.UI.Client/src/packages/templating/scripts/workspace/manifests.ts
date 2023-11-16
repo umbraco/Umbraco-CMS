@@ -15,7 +15,6 @@ const workspace: ManifestWorkspace = {
 	},
 };
 
-//TODO: this does not work for some reason
 const workspaceActions: Array<ManifestWorkspaceAction> = [
 	{
 		type: 'workspaceAction',
