@@ -91,9 +91,8 @@ public class WebhookFiring : IRecurringBackgroundJob
     {
         using var httpClient = new HttpClient();
 
-        var serializedObject = _jsonSerializer.Serialize(payload);
-        var stringContent = new StringContent(serializedObject, Encoding.UTF8, "application/json");
-        stringContent.Headers.TryAddWithoutValidation("Umb-Webhook-Event", eventName);
+        var jsonContent = JsonContent.Create(payload);
+        jsonContent.Headers.TryAddWithoutValidation("Umb-Webhook-Event", eventName);
 
         foreach (KeyValuePair<string, string> header in webhook.Headers)
         {
@@ -103,7 +102,7 @@ public class WebhookFiring : IRecurringBackgroundJob
         HttpResponseMessage? response = null;
         try
         {
-            response = await httpClient.PostAsync(webhook.Url, stringContent, cancellationToken);
+            response = await httpClient.PostAsync(webhook.Url, jsonContent, cancellationToken);
         }
         catch (Exception ex)
         {
