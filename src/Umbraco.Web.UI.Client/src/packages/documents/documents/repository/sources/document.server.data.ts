@@ -35,7 +35,7 @@ export class UmbDocumentServerDataSource
 	 * @param {string} id
 	 * @memberof UmbDocumentServerDataSource
 	 */
-	async get(id: string) {
+	async read(id: string) {
 		if (!id) throw new Error('Id is missing');
 
 		return tryExecuteAndNotify(
@@ -83,7 +83,7 @@ export class UmbDocumentServerDataSource
 	 * @param {Document} document
 	 * @memberof UmbDocumentServerDataSource
 	 */
-	async insert(document: CreateDocumentRequestModel) {
+	async create(document: CreateDocumentRequestModel) {
 		if (!document.id) throw new Error('Id is missing');
 		return tryExecuteAndNotify(this.#host, DocumentResource.postDocument({ requestBody: document }));
 	}

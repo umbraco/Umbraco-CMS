@@ -161,7 +161,7 @@ export class UmbMediaRepository
 		if (!id) throw new Error('Id is missing');
 		await this.#init;
 
-		const { data, error } = await this.#detailDataSource.get(id);
+		const { data, error } = await this.#detailDataSource.read(id);
 
 		if (data) {
 			this.#store?.append(data);
@@ -183,7 +183,7 @@ export class UmbMediaRepository
 
 		await this.#init;
 
-		const { error } = await this.#detailDataSource.insert(media);
+		const { error } = await this.#detailDataSource.create(media);
 
 		if (!error) {
 			// TODO: we currently don't use the detail store for anything.

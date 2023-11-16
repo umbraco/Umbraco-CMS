@@ -11,8 +11,8 @@ export interface UmbDataSource<
 		parentId: string | null,
 		preset?: Partial<CreateRequestType> | CreateScaffoldPresetType,
 	): Promise<DataSourceResponse<CreateRequestType>>;
-	get(unique: string): Promise<DataSourceResponse<ResponseType>>;
-	insert(data: CreateRequestType): Promise<DataSourceResponse<CreateResponseType>>;
+	create(data: CreateRequestType): Promise<DataSourceResponse<CreateResponseType>>;
+	read(unique: string): Promise<DataSourceResponse<ResponseType>>;
 	update(unique: string, data: UpdateRequestType): Promise<DataSourceResponse<ResponseType>>;
 	delete(unique: string): Promise<DataSourceResponse>;
 }

@@ -117,7 +117,7 @@ export class UmbMemberGroupRepository
 		if (!id) {
 			throw new Error('Id is missing');
 		}
-		const { data, error } = await this.#detailSource.get(id);
+		const { data, error } = await this.#detailSource.read(id);
 
 		if (data) {
 			this.#store?.append(data);
@@ -138,7 +138,7 @@ export class UmbMemberGroupRepository
 			throw new Error('Name is missing');
 		}
 
-		const { data, error } = await this.#detailSource.insert(detail);
+		const { data, error } = await this.#detailSource.create(detail);
 
 		if (!error) {
 			const notification = { data: { message: `Member group '${detail.name}' created` } };

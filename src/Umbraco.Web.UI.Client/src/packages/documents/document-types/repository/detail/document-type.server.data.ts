@@ -36,7 +36,7 @@ export class UmbDocumentTypeServerDataSource
 	 * @return {*}
 	 * @memberof UmbDocumentTypeServerDataSource
 	 */
-	async get(id: string) {
+	async read(id: string) {
 		if (!id) {
 			throw new Error('Id is missing');
 		}
@@ -90,7 +90,7 @@ export class UmbDocumentTypeServerDataSource
 	 * @return {*}
 	 * @memberof UmbDocumentTypeServerDataSource
 	 */
-	async insert(documentType: CreateDocumentTypeRequestModel) {
+	async create(documentType: CreateDocumentTypeRequestModel) {
 		if (!documentType) throw new Error('Document Type is missing');
 		return tryExecuteAndNotify(
 			this.#host,

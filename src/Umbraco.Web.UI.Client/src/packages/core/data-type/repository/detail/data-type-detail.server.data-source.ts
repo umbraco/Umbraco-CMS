@@ -36,13 +36,13 @@ export class UmbDataTypeServerDataSource
 	 * @return {*}
 	 * @memberof UmbDataTypeServerDataSource
 	 */
-	async get(id: string) {
+	async read(id: string) {
 		if (!id) throw new Error('Key is missing');
 		return tryExecuteAndNotify(
 			this.#host,
 			DataTypeResource.getDataTypeById({
 				id: id,
-			})
+			}),
 		);
 	}
 
@@ -71,7 +71,7 @@ export class UmbDataTypeServerDataSource
 	 * @return {*}
 	 * @memberof UmbDataTypeServerDataSource
 	 */
-	async insert(dataType: CreateDataTypeRequestModel) {
+	async create(dataType: CreateDataTypeRequestModel) {
 		if (!dataType) throw new Error('Data Type is missing');
 		if (!dataType.id) throw new Error('Data Type id is missing');
 
@@ -79,7 +79,7 @@ export class UmbDataTypeServerDataSource
 			this.#host,
 			DataTypeResource.postDataType({
 				requestBody: dataType,
-			})
+			}),
 		);
 	}
 
@@ -97,7 +97,7 @@ export class UmbDataTypeServerDataSource
 			DataTypeResource.putDataTypeById({
 				id: id,
 				requestBody: data,
-			})
+			}),
 		);
 	}
 
@@ -114,7 +114,7 @@ export class UmbDataTypeServerDataSource
 			this.#host,
 			DataTypeResource.deleteDataTypeById({
 				id: id,
-			})
+			}),
 		);
 	}
 }

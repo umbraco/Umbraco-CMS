@@ -155,7 +155,7 @@ export class UmbMediaTypeRepository
 		if (!id) {
 			throw new Error('Id is missing');
 		}
-		const { data, error } = await this.#detailSource.get(id);
+		const { data, error } = await this.#detailSource.read(id);
 
 		if (data) {
 			this.#detailStore?.append(data);
@@ -208,7 +208,7 @@ export class UmbMediaTypeRepository
 		if (!mediaType || !mediaType.id) throw new Error('Document Type is missing');
 		await this.#init;
 
-		const { error } = await this.#detailSource.insert(mediaType);
+		const { error } = await this.#detailSource.create(mediaType);
 
 		if (!error) {
 			//TODO: Model mismatch. FIX

@@ -70,7 +70,7 @@ export class UmbStylesheetRepository
 			parentPath: folderRequest.parentId,
 			name: folderRequest.name,
 		};
-		const promise = this.#folderDataSource.insert(req);
+		const promise = this.#folderDataSource.create(req);
 		await promise;
 		//this.requestTreeItemsOf(folderRequest.parentId ? folderRequest.parentId : null);
 		return promise;
@@ -79,7 +79,7 @@ export class UmbStylesheetRepository
 	async requestFolder(
 		unique: string,
 	): Promise<{ data?: StylesheetGetFolderResponse | undefined; error?: ProblemDetails | undefined }> {
-		return this.#folderDataSource.get(unique);
+		return this.#folderDataSource.read(unique);
 	}
 
 	updateFolder(
@@ -110,8 +110,7 @@ export class UmbStylesheetRepository
 
 	async requestById(id: string): Promise<DataSourceResponse<TextFileResponseModelBaseModel | undefined>> {
 		if (!id) throw new Error('id is missing');
-		const { data, error } = await this.#dataSource.get(id);
-		return { data, error };
+		return this.#dataSource.read(id);
 	}
 
 	byId(id: string): Promise<Observable<TextFileResponseModelBaseModel | undefined>> {
@@ -119,7 +118,7 @@ export class UmbStylesheetRepository
 	}
 
 	async create(data: CreateTextFileViewModelBaseModel): Promise<DataSourceResponse<string>> {
-		const promise = this.#dataSource.insert(data);
+		const promise = this.#dataSource.create(data);
 		await promise;
 		//this.requestTreeItemsOf(data.parentPath ? data.parentPath : null);
 		return promise;

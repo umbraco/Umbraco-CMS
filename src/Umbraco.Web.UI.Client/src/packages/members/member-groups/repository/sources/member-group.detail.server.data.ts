@@ -36,7 +36,7 @@ export class UmbMemberGroupDetailServerDataSource implements UmbDataSource<any, 
 	 * @return {*}
 	 * @memberof UmbMemberGroupDetailServerDataSource
 	 */
-	get(id: string) {
+	read(id: string) {
 		//return tryExecuteAndNotify(this.#host, MemberGroupResource.getMemberGroup({ id })) as any;
 		// TODO: use backend cli when available.
 		return tryExecuteAndNotify(this.#host, fetch(`/umbraco/management/api/v1/member-group/${id}`)) as any;
@@ -64,7 +64,7 @@ export class UmbMemberGroupDetailServerDataSource implements UmbDataSource<any, 
 				headers: {
 					'Content-Type': 'application/json',
 				},
-			})
+			}),
 		) as any;
 	}
 
@@ -74,7 +74,7 @@ export class UmbMemberGroupDetailServerDataSource implements UmbDataSource<any, 
 	 * @return {*}
 	 * @memberof UmbMemberGroupDetailServerDataSource
 	 */
-	async insert(data: MemberGroupDetails) {
+	async create(data: MemberGroupDetails) {
 		const requestBody = {
 			name: data.name,
 		};
@@ -89,7 +89,7 @@ export class UmbMemberGroupDetailServerDataSource implements UmbDataSource<any, 
 				headers: {
 					'Content-Type': 'application/json',
 				},
-			})
+			}),
 		) as any;
 	}
 
@@ -120,7 +120,7 @@ export class UmbMemberGroupDetailServerDataSource implements UmbDataSource<any, 
 			this.#host,
 			fetch(`/umbraco/management/api/v1/member-group/${id}`, {
 				method: 'DELETE',
-			})
+			}),
 		) as any;
 	}
 }

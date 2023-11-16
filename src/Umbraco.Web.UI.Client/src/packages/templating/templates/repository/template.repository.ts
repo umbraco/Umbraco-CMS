@@ -151,7 +151,7 @@ export class UmbTemplateRepository
 		if (!id) {
 			throw new Error('Id is missing');
 		}
-		const { data, error } = await this.#detailDataSource.get(id);
+		const { data, error } = await this.#detailDataSource.read(id);
 
 		if (data) {
 			this.#store?.append(data);
@@ -175,7 +175,7 @@ export class UmbTemplateRepository
 			throw new Error('Template is missing');
 		}
 
-		const { error } = await this.#detailDataSource.insert(template);
+		const { error } = await this.#detailDataSource.create(template);
 
 		if (!error) {
 			const notification = { data: { message: `Template created` } };
