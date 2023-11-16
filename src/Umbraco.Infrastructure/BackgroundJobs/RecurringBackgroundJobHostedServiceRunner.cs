@@ -31,6 +31,19 @@ public class RecurringBackgroundJobHostedServiceRunner : IHostedService
         _jobFactory = jobFactory;
     }
 
+    private static string PrettyName(Type type)
+    {
+        if (type.GetGenericArguments().Length == 0)
+        {
+            return type.Name;
+        }
+        var genericArguments = type.GetGenericArguments();
+        var typeDefinition = type.Name;
+        var unmangledName = typeDefinition.Substring(0, typeDefinition.IndexOf("`"));
+        return unmangledName + "<" + String.Join(",", genericArguments.Select(PrettyName)) + ">";
+    }
+    
+
     public async Task StartAsync(CancellationToken cancellationToken)
     {
         _logger.LogInformation("Creating recurring background jobs hosted services");
@@ -44,12 +57,12 @@ public class RecurringBackgroundJobHostedServiceRunner : IHostedService
         {
             try
             {
-                _logger.LogInformation($"Starting background hosted service for {hostedService.GetType().Name}");
+                _logger.LogInformation($"Starting background hosted service for {PrettyName(hostedService.GetType())}");
                 await hostedService.StartAsync(cancellationToken).ConfigureAwait(false);
             }
             catch (Exception exception)
             {
-                _logger.LogError(exception, $"Failed to start background hosted service for {hostedService.GetType().Name}");
+                _logger.LogError(exception, $"Failed to start background hosted service for {PrettyName(hostedService.GetType())}");
             }
         }
 
@@ -66,12 +79,12 @@ public class RecurringBackgroundJobHostedServiceRunner : IHostedService
         {
             try
             {
-                _logger.LogInformation($"Stopping background hosted service for {hostedService.GetType().Name}");
+                _logger.LogInformation($"Stopping background hosted service for {PrettyName(hostedService.GetType())}");
                 await hostedService.StopAsync(stoppingToken).ConfigureAwait(false);
             }
             catch (Exception exception)
             {
-                _logger.LogError(exception, $"Failed to stop background hosted service for {hostedService.GetType().Name}");
+                _logger.LogError(exception, $"Failed to stop background hosted service for {PrettyName(hostedService.GetType())}");
             }
         }
 

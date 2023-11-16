@@ -38,6 +38,7 @@ public class RecurringBackgroundJobHostedService<TJob> : RecurringHostedServiceB
     private readonly IServerRoleAccessor _serverRoleAccessor;
     private readonly IEventAggregator _eventAggregator;
     private readonly IRecurringBackgroundJob _job;
+    private readonly string _jobName;
 
     public RecurringBackgroundJobHostedService(
         IRuntimeState runtimeState,
@@ -54,16 +55,21 @@ public class RecurringBackgroundJobHostedService<TJob> : RecurringHostedServiceB
         _serverRoleAccessor = serverRoleAccessor;
         _eventAggregator = eventAggregator;
         _job = job;
+        _jobName = job.GetType().Name;
 
         _job.PeriodChanged += (sender, e) => ChangePeriod(_job.Period);
     }
 
+    public string JobName { get { return _jobName; } }
+
     /// <inheritdoc />
     public override async Task PerformExecuteAsync(object? state)
     {
+        _logger.LogDebug($"Job {_jobName} checking");
+
         if (_runtimeState.Level != RuntimeLevel.Run)
         {
-            _logger.LogDebug("Job not running as runlevel not yet ready");
+            _logger.LogDebug($"Job {_jobName} not running as runlevel not yet ready");
             await _eventAggregator.PublishAsync(new Notifications.RecurringBackgroundJobIgnoredNotification(_job, new EventMessages()));
             return;
         }
@@ -71,7 +77,7 @@ public class RecurringBackgroundJobHostedService<TJob> : RecurringHostedServiceB
         // Don't run on replicas nor unknown role servers
         if (!_job.ServerRoles.Contains(_serverRoleAccessor.CurrentServerRole))
         {
-            _logger.LogDebug("Job not running on this server role");
+            _logger.LogDebug($"Job {_jobName} not running on this server role");
             await _eventAggregator.PublishAsync(new Notifications.RecurringBackgroundJobIgnoredNotification(_job, new EventMessages()));
             return;
         }
@@ -79,7 +85,7 @@ public class RecurringBackgroundJobHostedService<TJob> : RecurringHostedServiceB
         // Ensure we do not run if not main domain, but do NOT lock it
         if (!_mainDom.IsMainDom)
         {
-            _logger.LogDebug("Job not running as not MainDom");
+            _logger.LogDebug($"Job {_jobName} not running as not MainDom");
             await _eventAggregator.PublishAsync(new Notifications.RecurringBackgroundJobIgnoredNotification(_job, new EventMessages()));
             return;
         }
@@ -89,16 +95,16 @@ public class RecurringBackgroundJobHostedService<TJob> : RecurringHostedServiceB
         try
         {
 
-            await _eventAggregator.PublishAsync(executingNotification);
+            _logger.LogDebug($"Job {_jobName} executing");
             await _job.RunJobAsync();
             await _eventAggregator.PublishAsync(new Notifications.RecurringBackgroundJobExecutedNotification(_job, new EventMessages()).WithStateFrom(executingNotification));
-
+            _logger.LogDebug($"Job {_jobName} Completed");
 
         }
         catch (Exception ex)
         {
             await _eventAggregator.PublishAsync(new Notifications.RecurringBackgroundJobFailedNotification(_job, new EventMessages()).WithStateFrom(executingNotification));
-            _logger.LogError(ex, "Unhandled exception in recurring background job.");
+            _logger.LogError(ex, $"Unhandled exception in {_jobName} recurring background job.");
         }
 
     }
