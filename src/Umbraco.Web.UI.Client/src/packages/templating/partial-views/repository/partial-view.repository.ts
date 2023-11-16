@@ -1,9 +1,9 @@
-import { UmbPartialViewDetailServerDataSource } from './sources/partial-views.detail.server.data.js';
+import { UmbPartialViewDetailServerDataSource } from './sources/partial-view-detail.server.data-source.js';
 import { UmbPartialViewTreeStore, UMB_PARTIAL_VIEW_TREE_STORE_CONTEXT_TOKEN } from './partial-views.tree.store.js';
 import {
 	PartialViewGetFolderResponse,
 	UmbPartialViewFolderServerDataSource,
-} from './sources/partial-views.folder.server.data.js';
+} from './sources/partial-view-folder.server.data-source.js';
 import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbBaseController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import {

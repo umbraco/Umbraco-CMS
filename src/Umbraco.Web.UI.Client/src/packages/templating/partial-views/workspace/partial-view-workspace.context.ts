@@ -1,6 +1,6 @@
-import { UmbPartialViewRepository } from '../repository/partial-views.repository.js';
+import { UmbPartialViewRepository } from '../repository/partial-view.repository.js';
 import { PartialViewDetails } from '../config.js';
-import { createObservablePart, UmbBooleanState, UmbDeepState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbBooleanState, UmbDeepState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbSaveableWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';

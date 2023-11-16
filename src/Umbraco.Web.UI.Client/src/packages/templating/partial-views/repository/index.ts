@@ -1,1 +1,1 @@
-export * from './partial-views.repository.js';
+export * from './partial-view.repository.js';

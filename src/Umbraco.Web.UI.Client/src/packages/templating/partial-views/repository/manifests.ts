@@ -1,5 +1,5 @@
-import { UmbPartialViewRepository } from '../repository/partial-views.repository.js';
-import { UmbPartialViewStore } from './partial-views.store.js';
+import { UmbPartialViewRepository } from './partial-view.repository.js';
+import { UmbPartialViewStore } from './partial-view.store.js';
 import { ManifestRepository, ManifestStore } from '@umbraco-cms/backoffice/extension-registry';
 
 export const PARTIAL_VIEW_REPOSITORY_ALIAS = 'Umb.Repository.PartialView';
