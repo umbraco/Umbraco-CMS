@@ -8,7 +8,8 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_13_0_0;
 
 public class AddWebhookDatabaseLock : MigrationBase
 {
-    public AddWebhookDatabaseLock(IMigrationContext context) : base(context)
+    public AddWebhookDatabaseLock(IMigrationContext context)
+        : base(context)
     {
     }
 

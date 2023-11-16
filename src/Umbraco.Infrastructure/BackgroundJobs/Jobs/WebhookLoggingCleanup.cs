@@ -9,6 +9,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
 
+/// <summary>
+/// Daily background job that removes all webhook log data older than x days as defined by <see cref="WebhookSettings.KeepLogsForDays"/>
+/// </summary>
 public class WebhookLoggingCleanup : IRecurringBackgroundJob
 {
     private readonly ILogger<WebhookLoggingCleanup> _logger;
@@ -24,13 +27,20 @@ public class WebhookLoggingCleanup : IRecurringBackgroundJob
         _coreScopeProvider = coreScopeProvider;
     }
 
+    /// <inheritdoc />
+    // No-op event as the period never changes on this job
+    public event EventHandler PeriodChanged
+    {
+        add { } remove { }
+    }
+
+    /// <inheritdoc />
     public TimeSpan Period => TimeSpan.FromDays(1);
 
+    /// <inheritdoc />
     public TimeSpan Delay { get; } = TimeSpan.FromSeconds(20);
 
-    // No-op event as the period never changes on this job
-    public event EventHandler PeriodChanged { add { } remove { } }
-
+    /// <inheritdoc />
     public async Task RunJobAsync()
     {
         if (_webhookSettings.EnableLoggingCleanup is false)
