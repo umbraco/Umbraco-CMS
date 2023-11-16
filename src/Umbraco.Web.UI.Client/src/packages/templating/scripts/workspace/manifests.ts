@@ -1,14 +1,17 @@
-import { SCRIPTS_ENTITY_TYPE, SCRIPTS_WORKSPACE_ACTION_SAVE_ALIAS, SCRIPTS_WORKSPACE_ALIAS } from '../config.js';
+import { UMB_SCRIPT_ENTITY_TYPE } from '../entities.js';
 import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type { ManifestWorkspace, ManifestWorkspaceAction } from '@umbraco-cms/backoffice/extension-registry';
 
+export const UMB_SCRIPT_WORKSPACE_ALIAS = 'Umb.Workspace.Script';
+export const UMB_SAVE_SCRIPT_WORKSPACE_ACTION_ALIAS = 'Umb.WorkspaceAction.Script.Save';
+
 const workspace: ManifestWorkspace = {
 	type: 'workspace',
-	alias: SCRIPTS_WORKSPACE_ALIAS,
-	name: 'Scripts Workspace',
-	loader: () => import('./scripts-workspace.element.js'),
+	alias: UMB_SCRIPT_WORKSPACE_ALIAS,
+	name: 'Script Workspace',
+	loader: () => import('./script-workspace.element.js'),
 	meta: {
-		entityType: SCRIPTS_ENTITY_TYPE,
+		entityType: UMB_SCRIPT_ENTITY_TYPE,
 	},
 };
 
@@ -16,7 +19,7 @@ const workspace: ManifestWorkspace = {
 const workspaceActions: Array<ManifestWorkspaceAction> = [
 	{
 		type: 'workspaceAction',
-		alias: 'Umb.WorkspaceAction.Scripts.Save',
+		alias: UMB_SAVE_SCRIPT_WORKSPACE_ACTION_ALIAS,
 		name: 'Save Script Workspace Action',
 		api: UmbSaveWorkspaceAction,
 		meta: {

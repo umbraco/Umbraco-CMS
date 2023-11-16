@@ -1,13 +1,14 @@
-import { ScriptDetails, SCRIPTS_WORKSPACE_ALIAS } from '../config.js';
-import { UmbScriptsRepository } from '../repository/scripts.repository.js';
+import { UmbScripDetailModel } from '../types.js';
+import { UmbScriptRepository } from '../repository/script.repository.js';
+import { UMB_SCRIPT_WORKSPACE_ALIAS } from './manifests.js';
 import { UmbBooleanState, UmbDeepState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
 import { TextFileResponseModelBaseModel, UpdateScriptRequestModel } from '@umbraco-cms/backoffice/backend-api';
 
-export class UmbScriptsWorkspaceContext extends UmbWorkspaceContext<UmbScriptsRepository, ScriptDetails> {
-	#data = new UmbDeepState<ScriptDetails | undefined>(undefined);
+export class UmbScriptWorkspaceContext extends UmbWorkspaceContext<UmbScriptRepository, UmbScripDetailModel> {
+	#data = new UmbDeepState<UmbScripDetailModel | undefined>(undefined);
 	data = this.#data.asObservable();
 	name = this.#data.asObservablePart((data) => data?.name);
 	content = this.#data.asObservablePart((data) => data?.content);
@@ -17,7 +18,7 @@ export class UmbScriptsWorkspaceContext extends UmbWorkspaceContext<UmbScriptsRe
 	isCodeEditorReady = this.#isCodeEditorReady.asObservable();
 
 	constructor(host: UmbControllerHostElement) {
-		super(host, SCRIPTS_WORKSPACE_ALIAS, new UmbScriptsRepository(host));
+		super(host, UMB_SCRIPT_WORKSPACE_ALIAS, new UmbScriptRepository(host));
 		this.#loadCodeEditor();
 	}
 

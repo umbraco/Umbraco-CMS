@@ -10,7 +10,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { DataSourceResponse, UmbDataSource } from '@umbraco-cms/backoffice/repository';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
-export class UmbScriptsServerDataSource
+export class UmbScriptServerDataSource
 	implements UmbDataSource<CreateScriptRequestModel, string, UpdateScriptRequestModel, ScriptResponseModel, string>
 {
 	#host: UmbControllerHost;
@@ -29,7 +29,7 @@ export class UmbScriptsServerDataSource
 	 * Fetches a script with the given path from the server
 	 * @param {string} path
 	 * @return {*}
-	 * @memberof UmbScriptsDetailServerDataSource
+	 * @memberof UmbScriptDetailServerDataSource
 	 */
 	read(path: string): Promise<DataSourceResponse<ScriptResponseModel>> {
 		if (!path) throw new Error('Path is missing');
@@ -40,7 +40,7 @@ export class UmbScriptsServerDataSource
 	 *
 	 * @param {CreateScriptRequestModel} requestBody
 	 * @return {*}  {Promise<DataSourceResponse<string>>}
-	 * @memberof UmbScriptsDetailServerDataSource
+	 * @memberof UmbScriptDetailServerDataSource
 	 */
 	create(requestBody: CreateScriptRequestModel): Promise<DataSourceResponse<string>> {
 		return tryExecuteAndNotify(this.#host, ScriptResource.postScript({ requestBody }));
@@ -53,7 +53,7 @@ export class UmbScriptsServerDataSource
 	 * @param {string} [unique='']
 	 * @param {UpdateScriptRequestModel} requestBody
 	 * @return {*}  {Promise<DataSourceResponse<any>>}
-	 * @memberof UmbScriptsDetailServerDataSource
+	 * @memberof UmbScriptDetailServerDataSource
 	 */
 	update(unique = '', requestBody: UpdateScriptRequestModel): Promise<DataSourceResponse<any>> {
 		return tryExecuteAndNotify(this.#host, ScriptResource.putScript({ requestBody }));
@@ -63,7 +63,7 @@ export class UmbScriptsServerDataSource
 	 *
 	 * @param {string} path
 	 * @return {*}  {Promise<DataSourceResponse>}
-	 * @memberof UmbScriptsDetailServerDataSource
+	 * @memberof UmbScriptDetailServerDataSource
 	 */
 	delete(path: string): Promise<DataSourceResponse> {
 		return tryExecuteAndNotify(this.#host, ScriptResource.deleteScript({ path }));

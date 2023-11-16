@@ -1,37 +1,37 @@
-import { UmbScriptsWorkspaceContext } from './scripts-workspace.context.js';
+import { UmbScriptWorkspaceContext } from './script-workspace.context.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbRoute, IRoutingInfo, PageComponent } from '@umbraco-cms/backoffice/router';
 import { UmbWorkspaceIsNewRedirectController } from '@umbraco-cms/backoffice/workspace';
 
-@customElement('umb-scripts-workspace')
-export class UmbScriptsWorkspaceElement extends UmbLitElement {
-	#scriptsWorkspaceContext = new UmbScriptsWorkspaceContext(this);
+@customElement('umb-script-workspace')
+export class UmbScriptWorkspaceElement extends UmbLitElement {
+	#scriptWorkspaceContext = new UmbScriptWorkspaceContext(this);
 	@state()
 	_routes: UmbRoute[] = [
 		{
 			path: 'create/:parentKey',
-			component: import('./scripts-workspace-edit.element.js'),
+			component: import('./script-workspace-edit.element.js'),
 			setup: async (component: PageComponent, info: IRoutingInfo) => {
 				const parentKey = info.match.params.parentKey;
 				const decodePath = decodeURIComponent(parentKey);
-				this.#scriptsWorkspaceContext.create(decodePath === 'null' ? '' : decodePath);
+				this.#scriptWorkspaceContext.create(decodePath === 'null' ? '' : decodePath);
 
 				new UmbWorkspaceIsNewRedirectController(
 					this,
-					this.#scriptsWorkspaceContext,
+					this.#scriptWorkspaceContext,
 					this.shadowRoot!.querySelector('umb-router-slot')!,
 				);
 			},
 		},
 		{
 			path: 'edit/:key',
-			component: import('./scripts-workspace-edit.element.js'),
+			component: import('./script-workspace-edit.element.js'),
 			setup: (component: PageComponent, info: IRoutingInfo) => {
 				const key = info.match.params.key;
 				const decodePath = decodeURIComponent(key).replace('-js', '.js');
-				this.#scriptsWorkspaceContext.load(decodePath);
+				this.#scriptWorkspaceContext.load(decodePath);
 			},
 		},
 	];
@@ -43,10 +43,10 @@ export class UmbScriptsWorkspaceElement extends UmbLitElement {
 	static styles = [UmbTextStyles, css``];
 }
 
-export default UmbScriptsWorkspaceElement;
+export default UmbScriptWorkspaceElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-scripts-workspace': UmbScriptsWorkspaceElement;
+		'umb-script-workspace': UmbScriptWorkspaceElement;
 	}
 }

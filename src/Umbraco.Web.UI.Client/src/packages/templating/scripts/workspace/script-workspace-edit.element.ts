@@ -1,14 +1,14 @@
-import { UmbScriptsWorkspaceContext } from './scripts-workspace.context.js';
+import { UmbScriptWorkspaceContext } from './script-workspace.context.js';
 import type { UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
 import { UUITextStyles, UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
-import { css, html, customElement, query, state, PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_MODAL_MANAGER_CONTEXT_TOKEN, UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { Subject, debounceTime } from '@umbraco-cms/backoffice/external/rxjs';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 
-@customElement('umb-scripts-workspace-edit')
-export class UmbScriptsWorkspaceEditElement extends UmbLitElement {
+@customElement('umb-script-workspace-edit')
+export class UmbScriptWorkspaceEditElement extends UmbLitElement {
 	#name: string | undefined = '';
 	@state()
 	private get _name() {
@@ -35,7 +35,7 @@ export class UmbScriptsWorkspaceEditElement extends UmbLitElement {
 	@query('umb-code-editor')
 	private _codeEditor?: UmbCodeEditorElement;
 
-	#scriptsWorkspaceContext?: UmbScriptsWorkspaceContext;
+	#scriptsWorkspaceContext?: UmbScriptWorkspaceContext;
 	private _modalContext?: UmbModalManagerContext;
 
 	#isNew = false;
@@ -50,7 +50,7 @@ export class UmbScriptsWorkspaceEditElement extends UmbLitElement {
 		});
 
 		this.consumeContext(UMB_WORKSPACE_CONTEXT, (workspaceContext) => {
-			this.#scriptsWorkspaceContext = workspaceContext as UmbScriptsWorkspaceContext;
+			this.#scriptsWorkspaceContext = workspaceContext as UmbScriptWorkspaceContext;
 			this.observe(this.#scriptsWorkspaceContext.name, (name) => {
 				this._name = name;
 			});
@@ -99,7 +99,7 @@ export class UmbScriptsWorkspaceEditElement extends UmbLitElement {
 	}
 
 	render() {
-		return html`<umb-workspace-editor alias="Umb.Workspace.Scripts">
+		return html`<umb-workspace-editor alias="Umb.Workspace.Script">
 			<div id="workspace-header" slot="header">
 				<uui-input
 					placeholder="Enter name..."
@@ -170,10 +170,10 @@ export class UmbScriptsWorkspaceEditElement extends UmbLitElement {
 	];
 }
 
-export default UmbScriptsWorkspaceEditElement;
+export default UmbScriptWorkspaceEditElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-scripts-workspace-edit': UmbScriptsWorkspaceEditElement;
+		'umb-script-workspace-edit': UmbScriptWorkspaceEditElement;
 	}
 }

@@ -1,20 +1,16 @@
-import { SCRIPTS_ROOT_ENTITY_TYPE } from '../config.js';
-import { UmbScriptsTreeServerDataSource } from './sources/scripts.tree.server.data.js';
-import { UmbScriptsServerDataSource } from './sources/scripts.detail.server.data.js';
-import { ScriptsGetFolderResponse, UmbScriptsFolderServerDataSource } from './sources/scripts.folder.server.data.js';
-import { UMB_SCRIPTS_TREE_STORE_CONTEXT_TOKEN, UmbScriptsTreeStore } from './scripts.tree.store.js';
+import { UMB_SCRIPT_TREE_STORE_CONTEXT, UmbScriptTreeStore } from '../tree/index.js';
+import { UmbScriptServerDataSource } from './sources/script-detail.server.data.js';
+import { ScriptGetFolderResponse, UmbScriptFolderServerDataSource } from './sources/script-folder.server.data.js';
 import {
 	DataSourceResponse,
 	UmbDataSourceErrorResponse,
 	UmbDetailRepository,
 	UmbFolderRepository,
 } from '@umbraco-cms/backoffice/repository';
-import { UmbTreeRepository } from '@umbraco-cms/backoffice/tree';
 import {
 	CreateFolderRequestModel,
 	CreateScriptRequestModel,
 	FileItemResponseModelBaseModel,
-	FileSystemTreeItemPresentationModel,
 	FolderModelBaseModel,
 	FolderResponseModel,
 	ProblemDetails,
@@ -26,30 +22,27 @@ import { UmbBaseController, UmbControllerHost } from '@umbraco-cms/backoffice/co
 import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
-export class UmbScriptsRepository
+export class UmbScriptRepository
 	extends UmbBaseController
 	implements
-		UmbTreeRepository<FileSystemTreeItemPresentationModel>,
 		UmbDetailRepository<CreateScriptRequestModel, string, UpdateScriptRequestModel, ScriptResponseModel, string>,
 		UmbFolderRepository,
 		UmbApi
 {
 	#init;
 
-	#treeDataSource: UmbScriptsTreeServerDataSource;
-	#detailDataSource: UmbScriptsServerDataSource;
-	#folderDataSource: UmbScriptsFolderServerDataSource;
+	#detailDataSource: UmbScriptServerDataSource;
+	#folderDataSource: UmbScriptFolderServerDataSource;
 
-	#treeStore?: UmbScriptsTreeStore;
+	#treeStore?: UmbScriptTreeStore;
 
 	constructor(host: UmbControllerHost) {
 		super(host);
 
-		this.#treeDataSource = new UmbScriptsTreeServerDataSource(this);
-		this.#detailDataSource = new UmbScriptsServerDataSource(this);
-		this.#folderDataSource = new UmbScriptsFolderServerDataSource(this);
+		this.#detailDataSource = new UmbScriptServerDataSource(this);
+		this.#folderDataSource = new UmbScriptFolderServerDataSource(this);
 
-		this.#init = this.consumeContext(UMB_SCRIPTS_TREE_STORE_CONTEXT_TOKEN, (instance) => {
+		this.#init = this.consumeContext(UMB_SCRIPT_TREE_STORE_CONTEXT, (instance) => {
 			this.#treeStore = instance;
 		}).asPromise();
 	}
@@ -74,12 +67,12 @@ export class UmbScriptsRepository
 		};
 		const promise = this.#folderDataSource.create(req);
 		await promise;
-		this.requestTreeItemsOf(requestBody.parentId ? requestBody.parentId : null);
+		//this.requestTreeItemsOf(requestBody.parentId ? requestBody.parentId : null);
 		return promise;
 	}
 	async requestFolder(
 		unique: string,
-	): Promise<{ data?: ScriptsGetFolderResponse | undefined; error?: ProblemDetails | undefined }> {
+	): Promise<{ data?: ScriptGetFolderResponse | undefined; error?: ProblemDetails | undefined }> {
 		await this.#init;
 		return this.#folderDataSource.read(unique);
 	}
@@ -94,82 +87,8 @@ export class UmbScriptsRepository
 		const { data } = await this.requestFolder(path);
 		const promise = this.#folderDataSource.delete(path);
 		await promise;
-		this.requestTreeItemsOf(data?.parentPath ? data?.parentPath : null);
+		//this.requestTreeItemsOf(data?.parentPath ? data?.parentPath : null);
 		return promise;
-	}
-	//#endregion
-
-	//#region TREE
-
-	async requestTreeRoot() {
-		await this.#init;
-
-		const data = {
-			id: null,
-			path: null,
-			type: SCRIPTS_ROOT_ENTITY_TYPE,
-			name: 'Scripts',
-			icon: 'icon-folder',
-			hasChildren: true,
-		};
-		return { data };
-	}
-
-	async requestRootTreeItems() {
-		await this.#init;
-
-		const { data, error } = await this.#treeDataSource.getRootItems();
-
-		if (data) {
-			this.#treeStore?.appendItems(data.items);
-		}
-
-		return { data, error, asObservable: () => this.#treeStore!.rootItems };
-	}
-
-	async requestTreeItemsOf(path: string | null) {
-		if (path === null || path === '/' || path === '') {
-			return this.requestRootTreeItems();
-		}
-
-		await this.#init;
-		const response = await this.#treeDataSource.getChildrenOf({ path, skip: 0, take: 100 });
-		const { data, error } = response;
-		if (data) {
-			this.#treeStore!.appendItems(data.items);
-		}
-
-		return { data, error, asObservable: () => this.#treeStore!.childrenOf(path) };
-	}
-
-	async requestTreeItems(keys: Array<string>) {
-		await this.#init;
-
-		if (!keys) {
-			const error: ProblemDetails = { title: 'Keys are missing' };
-			return { data: undefined, error };
-		}
-
-		const { data, error } = await this.#treeDataSource.getItem(keys);
-
-		return { data, error, asObservable: () => this.#treeStore!.items(keys) };
-	}
-
-	async rootTreeItems() {
-		await this.#init;
-		return this.#treeStore!.rootItems;
-	}
-
-	async treeItemsOf(parentPath: string | null) {
-		if (!parentPath) throw new Error('Parent Path is missing');
-		await this.#init;
-		return this.#treeStore!.childrenOf(parentPath);
-	}
-
-	async treeItems(paths: Array<string>) {
-		if (!paths) throw new Error('Paths are missing');
-		await this.#init;
-		return this.#treeStore!.items(paths);
 	}
 	//#endregion
 
@@ -194,7 +113,7 @@ export class UmbScriptsRepository
 	async create(data: CreateScriptRequestModel): Promise<DataSourceResponse<any>> {
 		const promise = this.#detailDataSource.create(data);
 		await promise;
-		this.requestTreeItemsOf(data.parentPath ? data.parentPath : null);
+		//this.requestTreeItemsOf(data.parentPath ? data.parentPath : null);
 		return promise;
 	}
 	save(id: string, requestBody: UpdateScriptRequestModel): Promise<UmbDataSourceErrorResponse> {
@@ -203,7 +122,7 @@ export class UmbScriptsRepository
 	async delete(id: string): Promise<UmbDataSourceErrorResponse> {
 		const promise = this.#detailDataSource.delete(id);
 		const parentPath = id.substring(0, id.lastIndexOf('/'));
-		this.requestTreeItemsOf(parentPath ? parentPath : null);
+		//this.requestTreeItemsOf(parentPath ? parentPath : null);
 		return promise;
 	}
 

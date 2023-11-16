@@ -8,9 +8,9 @@ import type {
 	ManifestTreeStore,
 } from '@umbraco-cms/backoffice/extension-registry';
 
-export const UMB_TEMPLATE_TREE_REPOSITORY_ALIAS = 'Umb.Repository.RelationType.Tree';
-export const UMB_TEMPLATE_TREE_STORE_ALIAS = 'Umb.Store.RelationType.Tree';
-export const UMB_TEMPLATE_TREE_ALIAS = 'Umb.Tree.RelationType';
+export const UMB_TEMPLATE_TREE_REPOSITORY_ALIAS = 'Umb.Repository.Template.Tree';
+export const UMB_TEMPLATE_TREE_STORE_ALIAS = 'Umb.Store.Template.Tree';
+export const UMB_TEMPLATE_TREE_ALIAS = 'Umb.Tree.Template';
 
 const treeRepository: ManifestRepository = {
 	type: 'repository',

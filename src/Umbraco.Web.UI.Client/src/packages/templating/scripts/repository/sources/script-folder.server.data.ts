@@ -9,9 +9,9 @@ import { DataSourceResponse, UmbFolderDataSource } from '@umbraco-cms/backoffice
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 //! this is of any type in the backend-api
-export type ScriptsGetFolderResponse = { path: string; parentPath: string; name: string };
+export type ScriptGetFolderResponse = { path: string; parentPath: string; name: string };
 
-export class UmbScriptsFolderServerDataSource implements UmbFolderDataSource {
+export class UmbScriptFolderServerDataSource implements UmbFolderDataSource {
 	#host: UmbControllerHost;
 
 	constructor(host: UmbControllerHost) {
@@ -20,7 +20,7 @@ export class UmbScriptsFolderServerDataSource implements UmbFolderDataSource {
 	createScaffold(parentId: string | null): Promise<DataSourceResponse<FolderResponseModel>> {
 		throw new Error('Method not implemented.');
 	}
-	read(unique: string): Promise<DataSourceResponse<ScriptsGetFolderResponse>> {
+	read(unique: string): Promise<DataSourceResponse<ScriptGetFolderResponse>> {
 		return tryExecuteAndNotify(this.#host, ScriptResource.getScriptFolder({ path: unique }));
 	}
 	create(requestBody: CreateFolderRequestModel): Promise<DataSourceResponse<string>> {
