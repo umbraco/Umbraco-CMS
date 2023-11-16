@@ -42,7 +42,7 @@ export class UmbMediaTypeDetailServerDataSource
 	 * @return {*}
 	 * @memberof UmbMediaTypeDetailServerDataSource
 	 */
-	async get(id: string) {
+	async read(id: string) {
 		if (!id) throw new Error('Key is missing');
 		return tryExecuteAndNotify(
 			this.#host,
@@ -76,7 +76,7 @@ export class UmbMediaTypeDetailServerDataSource
 	 * @return {*}
 	 * @memberof UmbMediaTypeDetailServerDataSource
 	 */
-	async insert(mediaType: CreateMediaTypeRequestModel) {
+	async create(mediaType: CreateMediaTypeRequestModel) {
 		if (!mediaType) throw new Error('Media type is missing');
 		if (!mediaType.id) throw new Error('Media type id is missing');
 

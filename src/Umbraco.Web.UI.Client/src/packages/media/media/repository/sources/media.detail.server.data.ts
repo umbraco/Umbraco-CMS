@@ -30,7 +30,7 @@ export class UmbMediaDetailServerDataSource
 	 * @return {*}
 	 * @memberof UmbMediaDetailServerDataSource
 	 */
-	async get(id: string) {
+	async read(id: string) {
 		if (!id) {
 			throw new Error('Id is missing');
 		}
@@ -40,7 +40,7 @@ export class UmbMediaDetailServerDataSource
 			// TODO: use backend cli when available.
 			fetch(`/umbraco/management/api/v1/media/details/${id}`)
 				.then((res) => res.json())
-				.then((res) => res[0] || undefined)
+				.then((res) => res[0] || undefined),
 		);
 	}
 
@@ -71,7 +71,7 @@ export class UmbMediaDetailServerDataSource
 	 * @return {*}
 	 * @memberof UmbMediaDetailServerDataSource
 	 */
-	async insert(media: CreateMediaRequestModel) {
+	async create(media: CreateMediaRequestModel) {
 		if (!media) throw new Error('Media is missing');
 
 		let body: string;
@@ -91,7 +91,7 @@ export class UmbMediaDetailServerDataSource
 				headers: {
 					'Content-Type': 'application/json',
 				},
-			}).then((res) => res.json())
+			}).then((res) => res.json()),
 		);
 	}
 
@@ -116,7 +116,7 @@ export class UmbMediaDetailServerDataSource
 				headers: {
 					'Content-Type': 'application/json',
 				},
-			}).then((res) => res.json())
+			}).then((res) => res.json()),
 		);
 	}
 
@@ -139,7 +139,7 @@ export class UmbMediaDetailServerDataSource
 				headers: {
 					'Content-Type': 'application/json',
 				},
-			}).then((res) => res.json())
+			}).then((res) => res.json()),
 		);
 	}
 
@@ -162,7 +162,7 @@ export class UmbMediaDetailServerDataSource
 				headers: {
 					'Content-Type': 'application/json',
 				},
-			}).then((res) => res.json())
+			}).then((res) => res.json()),
 		);
 	}
 }

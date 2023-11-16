@@ -8,3 +8,5 @@ import './components/index.js';
 
 export const DOCUMENT_ROOT_ENTITY_TYPE = 'document-root';
 export const DOCUMENT_ENTITY_TYPE = 'document';
+
+export { UMB_DOCUMENT_TREE_ALIAS } from './tree/index.js';

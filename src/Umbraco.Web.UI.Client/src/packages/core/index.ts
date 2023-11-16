@@ -41,6 +41,7 @@ export * from './tree/index.js';
 export * from './variant/index.js';
 export * from './workspace/index.js';
 export * from './culture/index.js';
+export * from './temporary-file/index.js';
 
 const manifests: Array<ManifestTypes | UmbBackofficeManifestKind> = [
 	...conditionManifests,

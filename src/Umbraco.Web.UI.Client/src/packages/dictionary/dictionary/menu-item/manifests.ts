@@ -1,16 +1,20 @@
-import type { ManifestMenuItem } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_DICTIONARY_ENTITY_TYPE } from '../entities.js';
+import { UMB_DICTIONARY_TREE_ALIAS } from '../tree/index.js';
+import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
-const menuItem: ManifestMenuItem = {
+const menuItem: ManifestTypes = {
 	type: 'menuItem',
+	kind: 'tree',
 	alias: 'Umb.MenuItem.Dictionary',
 	name: 'Dictionary Menu Item',
 	weight: 400,
-	js: () => import('./dictionary-menu-item.element.js'),
 	meta: {
 		label: 'Dictionary',
 		icon: 'icon-book-alt',
-		entityType: 'dictionary-item',
+		entityType: UMB_DICTIONARY_ENTITY_TYPE,
 		menus: ['Umb.Menu.Dictionary'],
+		treeAlias: UMB_DICTIONARY_TREE_ALIAS,
+		hideTreeRoot: true,
 	},
 };
 

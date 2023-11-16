@@ -30,7 +30,7 @@ export class UmbDataTypeDetailRepository
 		if (!id) throw new Error('Key is missing');
 		await this._init;
 
-		const { data, error } = await this.#detailSource.get(id);
+		const { data, error } = await this.#detailSource.read(id);
 
 		if (data) {
 			this._detailStore!.append(data);
@@ -56,7 +56,7 @@ export class UmbDataTypeDetailRepository
 		if (!dataType.id) throw new Error('Data Type id is missing');
 		await this._init;
 
-		const { error } = await this.#detailSource.insert(dataType);
+		const { error } = await this.#detailSource.create(dataType);
 
 		if (!error) {
 			// TODO: We need to push a new item to the tree store to update the tree. How do we want to create the tree items?

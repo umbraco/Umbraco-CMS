@@ -1,12 +1,12 @@
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { UmbEntityTreeStore } from '@umbraco-cms/backoffice/tree';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbEntityTreeStore } from '@umbraco-cms/backoffice/tree';
 
 /**
  * @export
  * @class UmbDocumentRecycleBinTreeStore
- * @extends {UmbEntityTreeStore}
- * @description - Tree Data Store for the Document Recycle Bin
+ * @extends {UmbStoreBase}
+ * @description - Tree Data Store for Document Recycle Bin Tree Items
  */
 export class UmbDocumentRecycleBinTreeStore extends UmbEntityTreeStore {
 	/**

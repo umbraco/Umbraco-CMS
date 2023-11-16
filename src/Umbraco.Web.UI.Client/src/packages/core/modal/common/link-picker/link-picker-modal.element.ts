@@ -9,6 +9,7 @@ import {
 	UmbModalBaseElement,
 } from '@umbraco-cms/backoffice/modal';
 import { buildUdi, getKeyFromUdi } from '@umbraco-cms/backoffice/utils';
+import { UMB_DOCUMENT_TREE_ALIAS } from '@umbraco-cms/backoffice/document';
 
 @customElement('umb-link-picker-modal')
 export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPickerModalData, UmbLinkPickerModalValue> {
@@ -190,7 +191,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 				<umb-tree
 					?hide-tree-root=${true}
 					?multiple=${false}
-					alias="Umb.Tree.Documents"
+					alias=${UMB_DOCUMENT_TREE_ALIAS}
 					@selection-change=${(event: CustomEvent) => this._handleSelectionChange(event, 'document')}
 					.selection=${[this._selectedKey ?? '']}
 					selectable></umb-tree>

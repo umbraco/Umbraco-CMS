@@ -18,10 +18,10 @@ export class UmbStylesheetFolderServerDataSource implements UmbFolderDataSource 
 		this.#host = host;
 	}
 
-	get(unique: string): Promise<DataSourceResponse<StylesheetGetFolderResponse>> {
+	read(unique: string): Promise<DataSourceResponse<StylesheetGetFolderResponse>> {
 		return tryExecuteAndNotify(this.#host, StylesheetResource.getStylesheetFolder({ path: unique }));
 	}
-	insert(requestBody: CreateFolderRequestModel): Promise<DataSourceResponse<string>> {
+	create(requestBody: CreateFolderRequestModel): Promise<DataSourceResponse<string>> {
 		return tryExecuteAndNotify(this.#host, StylesheetResource.postStylesheetFolder({ requestBody }));
 	}
 	delete(path: string): Promise<DataSourceResponse<unknown>> {
