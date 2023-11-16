@@ -70,7 +70,7 @@ public class BackOfficeController : SecurityControllerBase
         public required string Password { get; init; }
     }
 
-    [AllowAnonymous]
+    //[AllowAnonymous] // This is handled implicitly by the NewDenyLocalLoginIfConfigured policy on the <see cref="SecurityControllerBase" />. Keep it here for now and check FIXME in <see cref="DenyLocalLoginHandler" />.
     [HttpGet("authorize")]
     [MapToApiVersion("1.0")]
     public async Task<IActionResult> Authorize()
