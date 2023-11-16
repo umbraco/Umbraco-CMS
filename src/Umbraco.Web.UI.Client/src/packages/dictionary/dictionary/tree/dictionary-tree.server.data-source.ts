@@ -1,21 +1,21 @@
-import { DictionaryResource } from '@umbraco-cms/backoffice/backend-api';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbTreeDataSource } from '@umbraco-cms/backoffice/tree';
+import { DictionaryResource, EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the Dictionary tree that fetches data from the server
  * @export
  * @class UmbDictionaryTreeServerDataSource
- * @implements {DictionaryTreeDataSource}
+ * @implements {UmbTreeDataSource}
  */
-export class UmbDictionaryTreeServerDataSource implements UmbTreeDataSource {
+export class UmbDictionaryTreeServerDataSource implements UmbTreeDataSource<EntityTreeItemResponseModel> {
 	#host: UmbControllerHost;
 
 	/**
-	 * Creates an instance of DictionaryTreeDataSource.
+	 * Creates an instance of UmbDictionaryTreeServerDataSource.
 	 * @param {UmbControllerHost} host
-	 * @memberof DictionaryTreeDataSource
+	 * @memberof UmbDictionaryTreeServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
 		this.#host = host;
@@ -32,7 +32,7 @@ export class UmbDictionaryTreeServerDataSource implements UmbTreeDataSource {
 
 	/**
 	 * Fetches the children of a given parent id from the server
-	 * @param {(string | null)} parentId
+	 * @param {(string)} parentId
 	 * @return {*}
 	 * @memberof UmbDictionaryTreeServerDataSource
 	 */
@@ -60,10 +60,7 @@ export class UmbDictionaryTreeServerDataSource implements UmbTreeDataSource {
 	 * @memberof UmbDictionaryTreeServerDataSource
 	 */
 	async getItems(ids: Array<string>) {
-		if (!ids || ids.length === 0) {
-			throw new Error('Ids are missing');
-		}
-
+		if (!ids) throw new Error('Ids are missing');
 		return tryExecuteAndNotify(
 			this.#host,
 			DictionaryResource.getDictionaryItem({
