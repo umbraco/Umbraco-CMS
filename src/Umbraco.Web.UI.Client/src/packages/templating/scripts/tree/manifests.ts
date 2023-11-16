@@ -37,7 +37,7 @@ const tree: ManifestTree = {
 
 const treeItem: ManifestTreeItem = {
 	type: 'treeItem',
-	kind: 'entity',
+	kind: 'fileSystem',
 	alias: 'Umb.TreeItem.Script',
 	name: 'Script Tree Item',
 	meta: {
