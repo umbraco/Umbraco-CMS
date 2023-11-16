@@ -145,8 +145,10 @@ export default class UmbMfaPageElement extends LitElement {
                 <uui-label id="providerLabel" for="provider" slot="label" required>
                   <umb-localize key="login_2faMultipleText">Please choose a 2-factor provider</umb-localize>
                 </uui-label>
-                <uui-select id="provider" name="provider" .options=${this.providers} aria-required="true" required>
-                </uui-select>
+                <div class="uui-input-wrapper">
+                  <uui-select id="provider" name="provider" .options=${this.providers} aria-required="true" required>
+                  </uui-select>
+                </div>
               </uui-form-layout-item>
             `
             : nothing}
@@ -242,6 +244,10 @@ export default class UmbMfaPageElement extends LitElement {
         display: flex;
         flex-direction: column;
         gap: var(--uui-size-layout-2);
+      }
+
+      .uui-input-wrapper {
+        background-color: var(--uui-color-surface);
       }
 
       uui-form-layout-item {
