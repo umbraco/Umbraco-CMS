@@ -1,4 +1,4 @@
-import type { MediaDetails } from '../../index.js';
+import type { UmbMediaDetailModel } from '../../index.js';
 import type { UmbDataSource } from '@umbraco-cms/backoffice/repository';
 import { CreateMediaRequestModel, UpdateMediaRequestModel } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -11,7 +11,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
  * @implements {TemplateDetailDataSource}
  */
 export class UmbMediaDetailServerDataSource
-	implements UmbDataSource<CreateMediaRequestModel, any, UpdateMediaRequestModel, MediaDetails>
+	implements UmbDataSource<CreateMediaRequestModel, any, UpdateMediaRequestModel, UmbMediaDetailModel>
 {
 	#host: UmbControllerHost;
 
@@ -83,7 +83,7 @@ export class UmbMediaDetailServerDataSource
 			return Promise.reject();
 		}
 		//return tryExecuteAndNotify(this.#host, MediaResource.postMedia(payload));
-		return tryExecuteAndNotify<MediaDetails>(
+		return tryExecuteAndNotify<UmbMediaDetailModel>(
 			this.#host,
 			fetch('/umbraco/management/api/v1/media/save', {
 				method: 'POST',
@@ -108,7 +108,7 @@ export class UmbMediaDetailServerDataSource
 
 		const body = JSON.stringify(media);
 
-		return tryExecuteAndNotify<MediaDetails>(
+		return tryExecuteAndNotify<UmbMediaDetailModel>(
 			this.#host,
 			fetch('/umbraco/management/api/v1/media/save', {
 				method: 'POST',
@@ -131,7 +131,7 @@ export class UmbMediaDetailServerDataSource
 			throw new Error('Id is missing');
 		}
 
-		return tryExecuteAndNotify<MediaDetails>(
+		return tryExecuteAndNotify<UmbMediaDetailModel>(
 			this.#host,
 			fetch('/umbraco/management/api/v1/media/trash', {
 				method: 'POST',

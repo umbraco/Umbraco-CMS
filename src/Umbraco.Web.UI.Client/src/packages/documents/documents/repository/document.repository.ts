@@ -215,7 +215,6 @@ export class UmbDocumentRepository
 			// Consider notify a workspace if a document is updated in the store while someone is editing it.
 			this.#store?.append(item);
 			//this.#treeStore?.updateItem(item.id, { name: item.name });// Port data to tree store.
-			// TODO: would be nice to align the stores on methods/methodNames.
 
 			const notification = { data: { message: `Document saved` } };
 			this.#notificationContext?.peek('positive', notification);
