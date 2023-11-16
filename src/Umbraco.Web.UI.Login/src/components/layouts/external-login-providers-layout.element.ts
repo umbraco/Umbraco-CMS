@@ -1,5 +1,7 @@
 import { css, CSSResultGroup, html, LitElement, nothing } from 'lit';
 import { customElement, property, queryAssignedElements } from 'lit/decorators.js';
+import { until } from 'lit/directives/until.js';
+import { umbLocalizationContext } from '../../external/localization/localization-context.js';
 
 @customElement('umb-external-login-providers-layout')
 export class UmbExternalLoginProvidersLayoutElement extends LitElement {
@@ -18,7 +20,7 @@ export class UmbExternalLoginProvidersLayoutElement extends LitElement {
       ${this.showDivider
         ? html`
           <div id="divider" aria-hidden="true">
-            <span><umb-localize key="general_or">Or</umb-localize></span>
+            <span>${until(umbLocalizationContext.localize('general_or', undefined, 'or').then(str => str.toLocaleLowerCase()))}</span>
           </div>
         `
         : nothing}
