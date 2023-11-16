@@ -16,7 +16,7 @@ export class UmbScriptTreeRepository
 
 	async requestTreeRoot() {
 		const data = {
-			id: null,
+			path: null,
 			type: UMB_SCRIPT_ROOT_ENTITY_TYPE,
 			name: 'Scripts',
 			icon: 'icon-folder',
