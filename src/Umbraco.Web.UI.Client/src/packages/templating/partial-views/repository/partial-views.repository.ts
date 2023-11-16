@@ -1,6 +1,4 @@
-import { PARTIAL_VIEW_ROOT_ENTITY_TYPE } from '../config.js';
 import { UmbPartialViewDetailServerDataSource } from './sources/partial-views.detail.server.data.js';
-import { UmbPartialViewTreeServerDataSource } from './sources/partial-views.tree.server.data.js';
 import { UmbPartialViewTreeStore, UMB_PARTIAL_VIEW_TREE_STORE_CONTEXT_TOKEN } from './partial-views.tree.store.js';
 import {
 	PartialViewGetFolderResponse,
@@ -11,7 +9,6 @@ import { UmbBaseController, UmbControllerHostElement } from '@umbraco-cms/backof
 import {
 	CreateFolderRequestModel,
 	CreatePartialViewRequestModel,
-	FileSystemTreeItemPresentationModel,
 	FolderModelBaseModel,
 	FolderResponseModel,
 	PagedSnippetItemResponseModel,
@@ -27,13 +24,11 @@ import {
 	UmbDetailRepository,
 	UmbFolderRepository,
 } from '@umbraco-cms/backoffice/repository';
-import { UmbTreeRepository } from '@umbraco-cms/backoffice/tree';
 import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
 export class UmbPartialViewRepository
 	extends UmbBaseController
 	implements
-		UmbTreeRepository<FileSystemTreeItemPresentationModel>,
 		UmbDetailRepository<
 			CreatePartialViewRequestModel,
 			string,
@@ -46,7 +41,6 @@ export class UmbPartialViewRepository
 {
 	#init;
 
-	#treeDataSource: UmbPartialViewTreeServerDataSource;
 	#detailDataSource: UmbPartialViewDetailServerDataSource;
 	#folderDataSource: UmbPartialViewFolderServerDataSource;
 
@@ -55,7 +49,6 @@ export class UmbPartialViewRepository
 	constructor(host: UmbControllerHostElement) {
 		super(host);
 
-		this.#treeDataSource = new UmbPartialViewTreeServerDataSource(this);
 		this.#detailDataSource = new UmbPartialViewDetailServerDataSource(this);
 		this.#folderDataSource = new UmbPartialViewFolderServerDataSource(this);
 
@@ -106,80 +99,6 @@ export class UmbPartialViewRepository
 		await promise;
 		this.requestTreeItemsOf(data?.parentPath ? data?.parentPath : null);
 		return promise;
-	}
-	//#endregion
-
-	//#region TREE
-
-	async requestTreeRoot() {
-		await this.#init;
-
-		const data = {
-			id: null,
-			path: null,
-			type: PARTIAL_VIEW_ROOT_ENTITY_TYPE,
-			name: 'Partial Views',
-			icon: 'icon-folder',
-			hasChildren: true,
-		};
-		return { data };
-	}
-
-	async requestRootTreeItems() {
-		await this.#init;
-
-		const { data, error } = await this.#treeDataSource.getRootItems();
-
-		if (data) {
-			this.#treeStore?.appendItems(data.items);
-		}
-
-		return { data, error, asObservable: () => this.#treeStore!.rootItems };
-	}
-
-	async requestTreeItemsOf(path: string | null) {
-		if (path === null) {
-			return this.requestRootTreeItems();
-		}
-
-		await this.#init;
-
-		const { data, error } = await this.#treeDataSource.getChildrenOf({ path, skip: 0, take: 100 });
-		if (data) {
-			this.#treeStore!.appendItems(data.items);
-		}
-
-		return { data, error, asObservable: () => this.#treeStore!.childrenOf(path) };
-	}
-
-	async requestTreeItems(keys: Array<string>) {
-		await this.#init;
-
-		if (!keys) {
-			const error: ProblemDetails = { title: 'Keys are missing' };
-			return { data: undefined, error };
-		}
-
-		const { data, error } = await this.#treeDataSource.getItem(keys);
-
-		return { data, error, asObservable: () => this.#treeStore!.items(keys) };
-	}
-
-	async rootTreeItems() {
-		await this.#init;
-		return this.#treeStore!.rootItems;
-	}
-
-	async treeItemsOf(parentPath: string | null) {
-		if (!parentPath) throw new Error('Parent Path is missing');
-		await this.#init;
-		return this.#treeStore!.childrenOf(parentPath);
-	}
-
-	async treeItems(paths: Array<string>) {
-		if (!paths) throw new Error('Paths are missing');
-		await this.#init;
-		return this.#treeStore!.items(paths);
 	}
 	//#endregion
 
