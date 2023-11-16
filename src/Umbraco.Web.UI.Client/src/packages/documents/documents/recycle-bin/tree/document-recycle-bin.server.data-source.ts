@@ -1,6 +1,6 @@
-import { type UmbTreeDataSource } from '@umbraco-cms/backoffice/tree';
-import { DocumentResource } from '@umbraco-cms/backoffice/backend-api';
-import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbTreeDataSource } from '@umbraco-cms/backoffice/tree';
+import { DocumentResource, RecycleBinItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
@@ -9,13 +9,13 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
  * @class UmbDocumentRecycleBinTreeServerDataSource
  * @implements {UmbTreeDataSource}
  */
-export class UmbDocumentRecycleBinTreeServerDataSource implements UmbTreeDataSource {
+export class UmbDocumentRecycleBinTreeServerDataSource implements UmbTreeDataSource<RecycleBinItemResponseModel> {
 	#host: UmbControllerHost;
 
 	/**
 	 * Creates an instance of UmbDocumentRecycleBinTreeServerDataSource.
 	 * @param {UmbControllerHost} host
-	 * @memberof UmbDocumentTreeServerDataSource
+	 * @memberof UmbDocumentRecycleBinTreeServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
 		this.#host = host;
@@ -23,6 +23,7 @@ export class UmbDocumentRecycleBinTreeServerDataSource implements UmbTreeDataSou
 
 	/**
 	 * Fetches the root items for the tree from the server
+	 * @return {*}
 	 * @memberof UmbDocumentRecycleBinTreeServerDataSource
 	 */
 	async getRootItems() {
@@ -31,8 +32,9 @@ export class UmbDocumentRecycleBinTreeServerDataSource implements UmbTreeDataSou
 
 	/**
 	 * Fetches the children of a given parent id from the server
-	 * @param {(string | null)} parentId
-	 * @memberof UmbDocumentTreeServerDataSource
+	 * @param {(string)} parentId
+	 * @return {*}
+	 * @memberof UmbDocumentRecycleBinTreeServerDataSource
 	 */
 	async getChildrenOf(parentId: string | null) {
 		if (parentId === undefined) throw new Error('Parent id is missing');

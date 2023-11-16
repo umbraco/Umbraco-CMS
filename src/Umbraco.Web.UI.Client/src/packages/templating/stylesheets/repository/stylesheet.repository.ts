@@ -1,6 +1,4 @@
 import { StylesheetDetails } from '../index.js';
-import { UmbStylesheetTreeStore, UMB_STYLESHEET_TREE_STORE_CONTEXT_TOKEN } from './stylesheet.tree.store.js';
-import { UmbStylesheetTreeServerDataSource } from './sources/stylesheet.tree.server.data.js';
 import { UmbStylesheetServerDataSource } from './sources/stylesheet.server.data.js';
 import {
 	StylesheetGetFolderResponse,
@@ -33,34 +31,24 @@ import {
 	UpdateStylesheetRequestModel,
 	UpdateTextFileViewModelBaseModel,
 } from '@umbraco-cms/backoffice/backend-api';
-import type { UmbFileSystemTreeRootModel } from '@umbraco-cms/backoffice/tree';
 import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
 export class UmbStylesheetRepository
 	extends UmbBaseController
 	implements
-		UmbTreeRepository<FileSystemTreeItemPresentationModel, UmbFileSystemTreeRootModel>,
 		UmbDetailRepository<CreateStylesheetRequestModel, string, UpdateStylesheetRequestModel, StylesheetDetails>,
 		UmbFolderRepository,
 		UmbApi
 {
 	#dataSource;
-	#treeDataSource;
-	#treeStore?: UmbStylesheetTreeStore;
 	#folderDataSource;
-	#init;
 
 	constructor(host: UmbControllerHostElement) {
 		super(host);
 
 		// TODO: figure out how spin up get the correct data source
 		this.#dataSource = new UmbStylesheetServerDataSource(this);
-		this.#treeDataSource = new UmbStylesheetTreeServerDataSource(this);
 		this.#folderDataSource = new UmbStylesheetFolderServerDataSource(this);
-
-		this.#init = this.consumeContext(UMB_STYLESHEET_TREE_STORE_CONTEXT_TOKEN, (instance) => {
-			this.#treeStore = instance;
-		}).asPromise();
 	}
 
 	//#region FOLDER:
@@ -78,34 +66,34 @@ export class UmbStylesheetRepository
 	async createFolder(
 		folderRequest: CreateFolderRequestModel,
 	): Promise<{ data?: string | undefined; error?: ProblemDetails | undefined }> {
-		await this.#init;
 		const req = {
 			parentPath: folderRequest.parentId,
 			name: folderRequest.name,
 		};
 		const promise = this.#folderDataSource.insert(req);
 		await promise;
-		this.requestTreeItemsOf(folderRequest.parentId ? folderRequest.parentId : null);
+		//this.requestTreeItemsOf(folderRequest.parentId ? folderRequest.parentId : null);
 		return promise;
 	}
+
 	async requestFolder(
 		unique: string,
 	): Promise<{ data?: StylesheetGetFolderResponse | undefined; error?: ProblemDetails | undefined }> {
-		await this.#init;
 		return this.#folderDataSource.get(unique);
 	}
+
 	updateFolder(
 		unique: string,
 		folder: FolderModelBaseModel,
 	): Promise<{ data?: FolderModelBaseModel | undefined; error?: ProblemDetails | undefined }> {
 		throw new Error('Method not implemented.');
 	}
+
 	async deleteFolder(path: string): Promise<{ error?: ProblemDetails | undefined }> {
-		await this.#init;
 		const { data } = await this.requestFolder(path);
 		const promise = this.#folderDataSource.delete(path);
 		await promise;
-		this.requestTreeItemsOf(data?.parentPath ? data?.parentPath : null);
+		//this.requestTreeItemsOf(data?.parentPath ? data?.parentPath : null);
 		return promise;
 	}
 
@@ -122,26 +110,29 @@ export class UmbStylesheetRepository
 
 	async requestById(id: string): Promise<DataSourceResponse<TextFileResponseModelBaseModel | undefined>> {
 		if (!id) throw new Error('id is missing');
-		await this.#init;
 		const { data, error } = await this.#dataSource.get(id);
 		return { data, error };
 	}
+
 	byId(id: string): Promise<Observable<TextFileResponseModelBaseModel | undefined>> {
 		throw new Error('Method not implemented.');
 	}
+
 	async create(data: CreateTextFileViewModelBaseModel): Promise<DataSourceResponse<string>> {
 		const promise = this.#dataSource.insert(data);
 		await promise;
-		this.requestTreeItemsOf(data.parentPath ? data.parentPath : null);
+		//this.requestTreeItemsOf(data.parentPath ? data.parentPath : null);
 		return promise;
 	}
+
 	save(id: string, data: UpdateTextFileViewModelBaseModel): Promise<UmbDataSourceErrorResponse> {
 		return this.#dataSource.update(id, data);
 	}
+
 	delete(id: string): Promise<UmbDataSourceErrorResponse> {
 		const promise = this.#dataSource.delete(id);
 		const parentPath = id.substring(0, id.lastIndexOf('/'));
-		this.requestTreeItemsOf(parentPath ? parentPath : null);
+		//this.requestTreeItemsOf(parentPath ? parentPath : null);
 		return promise;
 	}
 
@@ -177,73 +168,6 @@ export class UmbStylesheetRepository
 		data: ExtractRichTextStylesheetRulesRequestModel,
 	): Promise<DataSourceResponse<ExtractRichTextStylesheetRulesResponseModel>> {
 		return this.#dataSource.postStylesheetRichTextExtractRules(data);
-	}
-
-	//#endregion
-
-	//#region TREE:
-	async requestTreeRoot() {
-		await this.#init;
-
-		const data = {
-			path: null,
-			type: 'stylesheet-root',
-			name: 'Stylesheets',
-			icon: 'icon-folder',
-			hasChildren: true,
-		};
-
-		return { data };
-	}
-
-	async requestRootTreeItems() {
-		await this.#init;
-
-		const { data, error } = await this.#treeDataSource.getRootItems();
-
-		if (data) {
-			this.#treeStore?.appendItems(data.items);
-		}
-
-		return { data, error };
-	}
-
-	async requestTreeItemsOf(path: string | null) {
-		if (path === undefined) throw new Error('Cannot request tree item with missing path');
-
-		await this.#init;
-
-		const { data, error } = await this.#treeDataSource.getChildrenOf(path);
-
-		if (data) {
-			this.#treeStore!.appendItems(data.items);
-		}
-
-		return { data, error, asObservable: () => this.#treeStore!.childrenOf(path) };
-	}
-
-	async requestItems(paths: Array<string>) {
-		if (!paths) throw new Error('Paths are missing');
-		await this.#init;
-		const { data, error } = await this.#treeDataSource.getItems(paths);
-		return { data, error };
-	}
-
-	async rootTreeItems() {
-		await this.#init;
-		return this.#treeStore!.rootItems;
-	}
-
-	async treeItemsOf(parentPath: string | null) {
-		if (!parentPath) throw new Error('Parent Path is missing');
-		await this.#init;
-		return this.#treeStore!.childrenOf(parentPath);
-	}
-
-	async itemsLegacy(paths: Array<string>) {
-		if (!paths) throw new Error('Paths are missing');
-		await this.#init;
-		return this.#treeStore!.items(paths);
 	}
 
 	//#endregion

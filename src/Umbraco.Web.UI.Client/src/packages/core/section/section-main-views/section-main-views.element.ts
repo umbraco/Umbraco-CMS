@@ -1,4 +1,4 @@
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, nothing, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbRoute, UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
 import {
@@ -110,8 +110,8 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 							const dashboardPath = this.#constructDashboardPath(dashboard);
 							return html`
 								<uui-tab
-									.label="${dashboardName}"
 									href="${this._routerPath}/${dashboardPath}"
+									label="${dashboardName}"
 									?active="${this._activePath === dashboardPath}"></uui-tab>
 							`;
 						})}
@@ -129,8 +129,8 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 							const viewPath = this.#constructViewPath(view);
 							return html`
 								<uui-tab
-									.label="${viewName}"
 									href="${this._routerPath}/${viewPath}"
+									label="${viewName}"
 									?active="${this._activePath === viewPath}">
 									<uui-icon slot="icon" name=${view.meta.icon}></uui-icon>
 									${viewName}

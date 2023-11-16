@@ -1,11 +1,11 @@
 import { DOCUMENT_REPOSITORY_ALIAS } from '../repository/manifests.js';
 import type { ManifestTree, ManifestTreeItem } from '@umbraco-cms/backoffice/extension-registry';
 
-export const DOCUMENT_TREE_ALIAS = 'Umb.Tree.Documents';
+export const UMB_DOCUMENT_TREE_ALIAS = 'Umb.Tree.Document';
 
 const tree: ManifestTree = {
 	type: 'tree',
-	alias: DOCUMENT_TREE_ALIAS,
+	alias: UMB_DOCUMENT_TREE_ALIAS,
 	name: 'Documents Tree',
 	meta: {
 		repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
