@@ -9,6 +9,14 @@ import {
 } from '@umbraco-cms/backoffice/extension-api';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
+/**
+ * This abstract Controller holds the core to manage a single Extension.
+ * When the extension is permitted to be used, then the extender of this class can instantiate what is relevant for this type and thereby make it available for the consumer.
+ *
+ * @export
+ * @abstract
+ * @class UmbBaseExtensionInitializer
+ */
 export abstract class UmbBaseExtensionInitializer<
 	ManifestType extends ManifestWithDynamicConditions = ManifestWithDynamicConditions,
 	SubClassType = never,
