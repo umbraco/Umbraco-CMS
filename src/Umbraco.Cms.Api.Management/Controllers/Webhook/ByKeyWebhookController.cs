@@ -23,7 +23,7 @@ public class ByKeyWebhookController : WebhookControllerBase
 
     [HttpGet("{id:guid}")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(WebhookResponseModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ViewModels.Webhook.WebhookResponseModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ByKey(Guid id)
     {
@@ -33,7 +33,7 @@ public class ByKeyWebhookController : WebhookControllerBase
             return WebhookOperationStatusResult(WebhookOperationStatus.NotFound);
         }
 
-        WebhookResponseModel model = _umbracoMapper.Map<WebhookResponseModel>(webhook)!;
+        ViewModels.Webhook.WebhookResponseModel model = _umbracoMapper.Map<ViewModels.Webhook.WebhookResponseModel>(webhook)!;
         return await Task.FromResult(Ok(model));
     }
 }
