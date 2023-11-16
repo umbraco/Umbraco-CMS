@@ -17,26 +17,8 @@ export class UmbPartialViewStore extends UmbStoreBase {
 	 * @memberof UmbPartialViewStore
 	 */
 	constructor(host: UmbControllerHostElement) {
-		super(host, UMB_PARTIAL_VIEWS_STORE_CONTEXT.toString(), new UmbArrayState<TemplateResponseModel>([], (x) => x.id));
-	}
-
-	/**
-	 * Append a partial view to the store
-	 * @param {Template} template
-	 * @memberof UmbPartialViewStore
-	 */
-	append(template: TemplateResponseModel) {
-		this._data.append([template]);
-	}
-
-	/**
-	 * Removes partial views in the store with the given uniques
-	 * @param {string[]} uniques
-	 * @memberof UmbPartialViewStore
-	 */
-	remove(uniques: string[]) {
-		this._data.remove(uniques);
+		super(host, UMB_PARTIAL_VIEW_STORE_CONTEXT.toString(), new UmbArrayState<TemplateResponseModel>([], (x) => x.id));
 	}
 }
 
-export const UMB_PARTIAL_VIEWS_STORE_CONTEXT = new UmbContextToken<UmbPartialViewStore>('UmbPartialViewStore');
+export const UMB_PARTIAL_VIEW_STORE_CONTEXT = new UmbContextToken<UmbPartialViewStore>('UmbPartialViewStore');
