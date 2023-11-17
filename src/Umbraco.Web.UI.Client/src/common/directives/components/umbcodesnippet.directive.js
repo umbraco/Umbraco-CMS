@@ -81,11 +81,11 @@
                     case "js":
                     case "javascript":
                         vm.language = "JavaScript";
-                      break;
+                        break;
                     case "txt":
                     case "text":
-                      vm.language = "Text/Plain";
-                      break;
+                        vm.language = "Text/Plain";
+                        break;
                 }
             }
             
