@@ -90,6 +90,8 @@ export class UmbAuthLayoutElement extends LitElement {
         --input-height: 40px;
         --header-font-size: 3rem;
         --header-secondary-font-size: 2.4rem;
+        display: block;
+        background-color: #f4f4f4;
       }
 
       #main-no-image,
@@ -100,7 +102,6 @@ export class UmbAuthLayoutElement extends LitElement {
         padding: 8px;
         box-sizing: border-box;
         margin: 0 auto;
-        background-color: #f4f4f4;
       }
 
       #image-container {
