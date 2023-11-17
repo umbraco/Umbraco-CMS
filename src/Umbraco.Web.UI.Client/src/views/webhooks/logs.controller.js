@@ -1,7 +1,7 @@
 (function () {
   "use strict";
 
-  function WebhookLogController($q, webhooksResource, overlayService) {
+  function WebhookLogController($q, webhooksResource, overlayService, userService, dateHelper) {
 
     const vm = this;
 
@@ -25,7 +25,16 @@
       return webhooksResource.getLogs()
         .then(data => {
           vm.logs = data.items;
+          vm.logs.forEach(log => {
+            formatDatesToLocal(log);
+          });
         });
+    }
+
+    function formatDatesToLocal(user) {
+      userService.getCurrentUser().then(currentUser => {
+        user.formattedLogDate = dateHelper.getLocalDate(user.date, currentUser.locale, "LLL");
+      });
     }
 
     function openLogOverlay(log) {
