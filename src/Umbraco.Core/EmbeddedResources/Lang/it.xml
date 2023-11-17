@@ -863,7 +863,7 @@
     <key alias="username"><![CDATA[Username]]></key>
     <key alias="value">Valore</key>
     <key alias="view">Vedi</key>
-    <key alias="welcome">Benvenuto...</key>
+    <key alias="welcome">Benvenuto</key>
     <key alias="width">Larghezza</key>
     <key alias="yes">Si</key>
     <key alias="folder">Cartella</key>

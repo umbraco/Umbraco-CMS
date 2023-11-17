@@ -9,9 +9,9 @@ import { umbLocalizationContext } from '../external/localization/localization-co
 type UserViewState = 'loggingIn' | 'loggedIn' | 'loggedOut' | 'timedOut';
 
 type ExternalLoginCustomViewElement = HTMLElement & {
-	displayName?: string;
-	providerName?: string;
-	externalLoginUrl?: string;
+  displayName?: string;
+  providerName?: string;
+  externalLoginUrl?: string;
   userViewState?: UserViewState;
 };
 
@@ -115,45 +115,45 @@ export class UmbExternalLoginProviderElement extends LitElement {
 	@property({ attribute: 'button-color' })
 	buttonColor: InterfaceColor = 'default';
 
-	#externalLoginUrl = '';
+  #externalLoginUrl = '';
 
-	protected render() {
-		return this.customView
-			? until(this.renderCustomView(), html`<uui-loader-bar></uui-loader-bar>`)
-			: this.renderDefaultView();
-	}
+  protected render() {
+    return this.customView
+      ? until(this.renderCustomView(), html`
+        <uui-loader-bar></uui-loader-bar>`)
+      : this.renderDefaultView();
+  }
 
-	protected renderDefaultView() {
-		return html`
-			<form id="defaultView" method="post" action=${this.externalLoginUrl}>
-				<uui-button
-					type="submit"
-					name="provider"
-					.value=${this.providerName}
-					title=${`Login using your ${this.displayName} account`}
-					.label=${until(umbLocalizationContext.localize('login_signInWith', undefined, 'Sign in with')) + ' ' + this.displayName}
-					.look=${this.buttonLook}
-					.color=${this.buttonColor}>
+  protected renderDefaultView() {
+    return html`
+      <form id="defaultView" method="post" action=${this.externalLoginUrl}>
+        <uui-button
+          type="submit"
+          name="provider"
+          .value=${this.providerName}
+          .label=${until(umbLocalizationContext.localize('login_signInWith', undefined, 'Sign in with').then(str => `${str} ${this.displayName}`))}
+          .look=${this.buttonLook}
+          .color=${this.buttonColor}>
           ${this.displayName
-			  ? html`
-				  <div>
-					  <uui-icon name=${this.icon}></uui-icon>
-					  <umb-localize key="login_signInWith">Sign in with</umb-localize>
-					  ${this.displayName}
-				  </div>
-			  `
-			  : nothing}
-          			<slot></slot>
-				</uui-button>
-			</form>
-		`;
-	}
+            ? html`
+              <div>
+                <uui-icon name=${this.icon}></uui-icon>
+                <umb-localize key="login_signInWith">Sign in with</umb-localize>
+                ${this.displayName}
+              </div>
+            `
+            : nothing}
+          <slot></slot>
+        </uui-button>
+      </form>
+    `;
+  }
 
-	protected async renderCustomView() {
-		try {
-			if (!this.customView) return;
+  protected async renderCustomView() {
+    try {
+      if (!this.customView) return;
 
-			const customView = await loadCustomView<ExternalLoginCustomViewElement>(this.customView);
+      const customView = await loadCustomView<ExternalLoginCustomViewElement>(this.customView);
 
 			if (typeof customView === 'object') {
 				customView.displayName = this.displayName;
@@ -162,61 +162,68 @@ export class UmbExternalLoginProviderElement extends LitElement {
         customView.userViewState = this.userViewState;
 			}
 
-			return renderCustomView(customView);
-		} catch (error: unknown) {
-			console.group('[External login] Failed to load custom view');
-			console.log('Provider name', this.providerName);
-			console.log('Element reference', this);
-			console.log('Custom view', this.customView);
-			console.error('Failed to load custom view:', error);
-			console.groupEnd();
-		}
-	}
+      return renderCustomView(customView);
+    } catch (error: unknown) {
+      console.group('[External login] Failed to load custom view');
+      console.log('Provider name', this.providerName);
+      console.log('Element reference', this);
+      console.log('Custom view', this.customView);
+      console.error('Failed to load custom view:', error);
+      console.groupEnd();
+    }
+  }
 
-	static styles: CSSResultGroup = [
-		css`
-			#defaultView uui-button {
-				width: 100%;
-				--uui-button-padding-top-factor: 1.5;
-				--uui-button-padding-bottom-factor: 1.5;
-			}
-			#defaultView uui-button div {
-				/* TODO: Remove this when uui-button has setting for aligning content */
-				position: absolute;
-				left: 9px;
-				margin: auto;
-				text-align: left;
-				top: 50%;
-				transform: translateY(-50%);
-			}
-			#defaultView button {
-				font-size: var(--uui-button-font-size);
-				border: 1px solid var(--uui-color-border);
-				border-radius: var(--uui-border-radius);
-				width: 100%;
-				padding: 9px;
-				text-align: left;
-				background-color: var(--uui-color-surface);
-				cursor: pointer;
-				display: flex;
-				align-items: center;
-				gap: var(--uui-size-space-2);
-				box-sizing: border-box;
+  static styles: CSSResultGroup = [
+    css`
+      #defaultView uui-button {
+        width: 100%;
+        --uui-button-font-weight: 400;
+      }
 
-				line-height: 1.1; /* makes the text vertically centered */
-				color: var(--uui-color-interactive);
-			}
+      #defaultView uui-button div {
+        /* TODO: Remove this when uui-button has setting for aligning content */
+        position: absolute;
+        top: 50%;
+        left: 0;
+        margin: auto;
+        transform: translateY(-50%);
+        text-align: left;
+        padding-left: 15px;
+      }
 
-			#defaultView button:hover {
-				color: var(--uui-color-interactive-emphasis);
-				border-color: var(--uui-color-border-standalone);
-			}
-		`,
-	];
+      #defaultView uui-icon {
+        color: #00000080;
+        padding-right: 2px;
+      }
+
+      #defaultView button {
+        font-size: var(--uui-button-font-size);
+        border: 1px solid var(--uui-color-border);
+        border-radius: var(--uui-button-border-radius);
+        width: 100%;
+        padding: 9px;
+        text-align: left;
+        background-color: var(--uui-color-surface);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: var(--uui-size-space-2);
+        box-sizing: border-box;
+
+        line-height: 1.1; /* makes the text vertically centered */
+        color: var(--uui-color-interactive);
+      }
+
+      #defaultView button:hover {
+        color: var(--uui-color-interactive-emphasis);
+        border-color: var(--uui-color-border-standalone);
+      }
+    `,
+  ];
 }
 
 declare global {
-	interface HTMLElementTagNameMap {
-		'umb-external-login-provider': UmbExternalLoginProviderElement;
-	}
+  interface HTMLElementTagNameMap {
+    'umb-external-login-provider': UmbExternalLoginProviderElement;
+  }
 }
