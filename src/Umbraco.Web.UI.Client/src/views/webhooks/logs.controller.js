@@ -31,9 +31,9 @@
         });
     }
 
-    function formatDatesToLocal(user) {
+    function formatDatesToLocal(log) {
       userService.getCurrentUser().then(currentUser => {
-        user.formattedLogDate = dateHelper.getLocalDate(user.date, currentUser.locale, "LLL");
+        log.formattedLogDate = dateHelper.getLocalDate(log.date, currentUser.locale, "LLL");
       });
     }
 
