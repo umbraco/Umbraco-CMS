@@ -36,16 +36,18 @@ export default class UmbErrorLayoutElement extends LitElement {
 			#header span {
 				color: var(--uui-color-text-alt); /* TODO Change to uui color when uui gets a muted text variable */
 				font-size: 14px;
-			}
-			#header h1 {
-				margin: 0;
-				font-weight: 400;
-				font-size: var(--header-secondary-font-size);
-				color: var(--uui-color-interactive);
+      }
+
+      #header h1 {
+        margin: 0;
+        font-weight: 400;
+        font-size: var(--header-secondary-font-size);
+        color: var(--uui-color-interactive);
         line-height: 1.2;
-			}
-			::slotted(uui-button) {
-				width: 100%;
+      }
+
+      ::slotted(uui-button) {
+        width: 100%;
 				margin-top: var(--uui-size-space-5);
 				--uui-button-padding-top-factor: 1.5;
 				--uui-button-padding-bottom-factor: 1.5;
