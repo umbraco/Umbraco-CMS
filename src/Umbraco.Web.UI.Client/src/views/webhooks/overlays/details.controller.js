@@ -7,7 +7,7 @@
 
     function formatData(data) {
 
-      let obj = null;
+      let obj = data;
 
       if (data.detectIsJson()) {
         try {
