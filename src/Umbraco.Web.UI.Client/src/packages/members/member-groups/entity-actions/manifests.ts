@@ -1,4 +1,5 @@
-import { MEMBER_GROUP_REPOSITORY_ALIAS } from '../repository/manifests.js';
+import { UMB_MEMBER_GROUP_DETAIL_REPOSITORY_ALIAS } from '../repository/index.js';
+import { UMB_MEMBER_GROUP_ENTITY_TYPE } from '../entity.js';
 import type { ManifestEntityAction } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbDeleteEntityAction } from '@umbraco-cms/backoffice/entity-action';
 
@@ -11,8 +12,8 @@ const entityActions: Array<ManifestEntityAction> = [
 		meta: {
 			icon: 'icon-trash',
 			label: 'Delete',
-			repositoryAlias: MEMBER_GROUP_REPOSITORY_ALIAS,
-			entityTypes: ['member-group'],
+			repositoryAlias: UMB_MEMBER_GROUP_DETAIL_REPOSITORY_ALIAS,
+			entityTypes: [UMB_MEMBER_GROUP_ENTITY_TYPE],
 		},
 	},
 ];

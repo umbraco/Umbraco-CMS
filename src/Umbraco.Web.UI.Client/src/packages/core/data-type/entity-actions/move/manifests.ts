@@ -1,4 +1,4 @@
-import { DATA_TYPE_ENTITY_TYPE } from '../../entities.js';
+import { DATA_TYPE_ENTITY_TYPE } from '../../entity.js';
 import { MOVE_DATA_TYPE_REPOSITORY_ALIAS } from '../../repository/move/manifests.js';
 import { UmbMoveDataTypeEntityAction } from './move.action.js';
 import { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
