@@ -66,10 +66,10 @@ internal sealed class UserGroupPermissionService : IUserGroupPermissionService
     /// <returns><see cref="UserGroupAuthorizationStatus"/>.</returns>
     private UserGroupAuthorizationStatus ValidateAccess(IUser user, IUserGroup userGroup)
     {
-        var hasAccessToUserSection = HasAccessToUsersSection(user);
-        if (hasAccessToUserSection is false)
+        var hasAccessToUsersSection = HasAccessToUsersSection(user);
+        if (hasAccessToUsersSection is false)
         {
-            return UserGroupAuthorizationStatus.UnauthorizedMissingUserSectionAccess;
+            return UserGroupAuthorizationStatus.UnauthorizedMissingUsersSectionAccess;
         }
 
         // Check that the user is not obtaining more access by specifying sections that they don't have access to.

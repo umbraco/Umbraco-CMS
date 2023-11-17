@@ -78,9 +78,9 @@ public class UserGroupControllerBase : ManagementApiControllerBase
                 .WithTitle("Unauthorized user group access")
                 .WithDetail("The performing user does not have access to the specified user group(s).")
                 .Build()),
-            UserGroupOperationStatus.UnauthorizedMissingUserSectionAccess => Unauthorized(new ProblemDetailsBuilder()
-                .WithTitle("Unauthorized access to User section")
-                .WithDetail("The performing user does not have access to the User section.")
+            UserGroupOperationStatus.UnauthorizedMissingUsersSectionAccess => Unauthorized(new ProblemDetailsBuilder()
+                .WithTitle("Unauthorized access to Users section")
+                .WithDetail("The performing user does not have access to the Users section.")
                 .Build()),
             _ => StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetailsBuilder()
                 .WithTitle("Unknown user group operation status.")

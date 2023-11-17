@@ -49,8 +49,8 @@ namespace Umbraco.Extensions
                     => UserGroupOperationStatus.UnauthorizedMissingMediaStartNodeAccess,
                 UserGroupAuthorizationStatus.UnauthorizedMissingUserGroupAccess
                     => UserGroupOperationStatus.UnauthorizedMissingUserGroupAccess,
-                UserGroupAuthorizationStatus.UnauthorizedMissingUserSectionAccess
-                    => UserGroupOperationStatus.UnauthorizedMissingUserSectionAccess,
+                UserGroupAuthorizationStatus.UnauthorizedMissingUsersSectionAccess
+                    => UserGroupOperationStatus.UnauthorizedMissingUsersSectionAccess,
                 _ => throw new NotImplementedException("UserGroupAuthorizationStatus does not map to a corresponding UserGroupOperationStatus")
             };
     }
