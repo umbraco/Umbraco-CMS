@@ -7,7 +7,7 @@ import { UmbEditableWorkspaceContextBase } from '@umbraco-cms/backoffice/workspa
 import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
 import { TextFileResponseModelBaseModel, UpdateScriptRequestModel } from '@umbraco-cms/backoffice/backend-api';
 
-export class UmbScriptsWorkspaceContext extends UmbEditableWorkspaceContextBase<
+export class UmbScriptWorkspaceContext extends UmbEditableWorkspaceContextBase<
 	UmbScriptRepository,
 	UmbScripDetailModel
 > {
