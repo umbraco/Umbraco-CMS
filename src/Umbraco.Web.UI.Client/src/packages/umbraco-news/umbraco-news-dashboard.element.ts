@@ -27,6 +27,11 @@ export class UmbUmbracoNewsDashboardElement extends UmbLitElement {
 
 	render() {
 		return html`
+			<div style="width: 200px; position:relative">
+				<uui-card-media name="The card" file-ext="jpg" href=""></uui-card-media>
+				<umb-file-feedback-loader></umb-file-feedback-loader>
+			</div>
+
 			<uui-box class="uui-text">
 				<h1 class="uui-h2" style="margin-top: var(--uui-size-layout-1);">Welcome, ${this.name}</h1>
 				<p class="uui-lead">
@@ -48,6 +53,9 @@ export class UmbUmbracoNewsDashboardElement extends UmbLitElement {
 			:host {
 				display: block;
 				padding: var(--uui-size-layout-1);
+			}
+			p {
+				position: relative;
 			}
 		`,
 	];
