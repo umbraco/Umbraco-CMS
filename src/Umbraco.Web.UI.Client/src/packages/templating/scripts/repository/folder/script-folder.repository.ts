@@ -1,5 +1,7 @@
+import { UMB_SCRIPT_FOLDER_ENTITY_TYPE } from '../../entity.js';
 import { UMB_SCRIPT_TREE_STORE_CONTEXT } from '../../tree/index.js';
 import { UmbScriptFolderServerDataSource } from './script-folder.server.data-source.js';
+import { FileSystemTreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbFolderModel, UmbFolderRepositoryBase } from '@umbraco-cms/backoffice/repository';
 

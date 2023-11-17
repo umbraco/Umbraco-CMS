@@ -1,12 +1,12 @@
 import { UmbRepositoryBase } from '../repository-base.js';
 import { type IUmbFolderRepository } from './folder-repository.interface.js';
 import type { UmbFolderDataSource, UmbFolderDataSourceConstructor } from './folder-data-source.interface.js';
-import { UmbCreateFolderModel, UmbUpdateFolderModel } from './types.js';
+import { UmbCreateFolderModel, UmbFolderModel, UmbUpdateFolderModel } from './types.js';
 import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbTreeStore } from '@umbraco-cms/backoffice/tree';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
-export type UmbFolderToTreeItemMapper<FolderTreeItemType> = (item: UmbCreateFolderModel) => FolderTreeItemType;
+export type UmbFolderToTreeItemMapper<FolderTreeItemType> = (item: UmbFolderModel) => FolderTreeItemType;
 
 export class UmbFolderRepositoryBase extends UmbRepositoryBase implements IUmbFolderRepository {
 	protected _init: Promise<unknown>;
@@ -51,10 +51,10 @@ export class UmbFolderRepositoryBase extends UmbRepositoryBase implements IUmbFo
 		if (!args.name) throw new Error('Name is missing');
 		await this._init;
 
-		const { error } = await this.#folderDataSource.create(args);
+		const { error, data } = await this.#folderDataSource.create(args);
 
-		if (!error) {
-			const folderTreeItem = this.#folderToTreeItemMapper(args);
+		if (data) {
+			const folderTreeItem = this.#folderToTreeItemMapper(folder);
 			this._treeStore!.appendItems([folderTreeItem]);
 		}
 

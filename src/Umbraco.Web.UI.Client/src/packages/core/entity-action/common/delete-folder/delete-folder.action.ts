@@ -22,7 +22,7 @@ export class UmbDeleteFolderEntityAction<T extends UmbFolderRepository> extends 
 	async execute() {
 		if (!this.repository || !this.#modalContext) return;
 
-		const { data: folder } = await this.repository.requestFolder(this.unique);
+		const { data: folder } = await this.repository.request(this.unique);
 
 		if (folder) {
 			// TODO: maybe we can show something about how many items are part of the folder?

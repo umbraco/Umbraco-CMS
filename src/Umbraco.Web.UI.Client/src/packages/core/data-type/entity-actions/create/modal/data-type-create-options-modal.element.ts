@@ -1,4 +1,4 @@
-import { DATA_TYPE_FOLDER_REPOSITORY_ALIAS } from '../../../repository/folder/manifests.js';
+import { UMB_DATA_TYPE_FOLDER_REPOSITORY_ALIAS } from '../../../repository/folder/index.js';
 import { UmbDataTypeCreateOptionsModalData } from './index.js';
 import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -30,7 +30,7 @@ export class UmbDataTypeCreateOptionsModalElement extends UmbLitElement {
 	#onClick(event: PointerEvent) {
 		event.stopPropagation();
 		const folderModalHandler = this.#modalContext?.open(UMB_FOLDER_MODAL, {
-			repositoryAlias: DATA_TYPE_FOLDER_REPOSITORY_ALIAS,
+			repositoryAlias: UMB_DATA_TYPE_FOLDER_REPOSITORY_ALIAS,
 		});
 		folderModalHandler?.onSubmit().then(() => this.modalContext?.submit());
 	}

@@ -24,7 +24,7 @@ export class UmbScriptFolderServerDataSource implements UmbFolderDataSource {
 	/**
 	 * Fetches a Script folder from the server
 	 * @param {string} unique
-	 * @return {*}
+	 * @return {UmbDataSourceResponse<UmbFolderModel>}
 	 * @memberof UmbScriptFolderServerDataSource
 	 */
 	async read(unique: string) {
@@ -40,24 +40,32 @@ export class UmbScriptFolderServerDataSource implements UmbFolderDataSource {
 	/**
 	 * Creates a Script folder on the server
 	 * @param {UmbCreateFolderModel} args
-	 * @return {*}
+	 * @return {UmbDataSourceResponse<UmbFolderModel>}
 	 * @memberof UmbScriptFolderServerDataSource
 	 */
 	async create(args: UmbCreateFolderModel) {
 		if (args.parentUnique === undefined) throw new Error('Parent unique is missing');
 		if (!args.name) throw new Error('Name is missing');
-		return tryExecuteAndNotify(
+
+		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
 			ScriptResource.postScriptFolder({
 				requestBody: { parentPath: args.parentUnique, name: args.name },
 			}),
 		);
+
+		if (data) {
+			const folderData = { unique: data.path, name: data.name };
+			return { data: folderData };
+		}
+
+		return { error };
 	}
 
 	/**
 	 * Updates a Script folder on the server
 	 * @param {UmbUpdateFolderModel} args
-	 * @return {*}
+	 * @return {UmbDataSourceErrorResponse}
 	 * @memberof UmbScriptFolderServerDataSource
 	 */
 	async update(args: UmbUpdateFolderModel): Promise<any> {
@@ -78,7 +86,7 @@ export class UmbScriptFolderServerDataSource implements UmbFolderDataSource {
 	/**
 	 * Deletes a Script folder on the server
 	 * @param {string} unique
-	 * @return {*}
+	 * @return {UmbDataSourceErrorResponse}
 	 * @memberof UmbScriptServerDataSource
 	 */
 	async delete(unique: string) {

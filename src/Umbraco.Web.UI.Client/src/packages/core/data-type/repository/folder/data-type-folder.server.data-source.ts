@@ -44,7 +44,7 @@ export class UmbDataTypeFolderServerDataSource implements UmbFolderDataSource {
 	 * @memberof UmbDataTypeFolderServerDataSource
 	 */
 	async create(args: UmbCreateFolderModel) {
-		if (!args.parentUnique) throw new Error('Parent unique is missing');
+		if (args.parentUnique === undefined) throw new Error('Parent unique is missing');
 		if (!args.name) throw new Error('Name is missing');
 		return tryExecuteAndNotify(
 			this.#host,
