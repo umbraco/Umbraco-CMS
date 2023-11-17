@@ -22,36 +22,36 @@ type ExternalLoginCustomViewElement = HTMLElement & {
  */
 @customElement('umb-external-login-provider')
 export class UmbExternalLoginProviderElement extends LitElement {
-	/**
-	 * Gets or sets the path to the module that should be loaded as the custom view.
-	 * The module should export a default class that extends HTMLElement.
-	 *
-	 * Setting this property will cause the default view to be hidden and the custom view to be loaded.
-	 * The icon, button look and button color will be ignored.
-	 *
-	 * @example App_Plugins/MyPackage/MyCustomLoginView.js
-	 * @attr custom-view
-	 */
-	@property({ attribute: 'custom-view' })
-	customView?: string;
+  /**
+   * Gets or sets the path to the module that should be loaded as the custom view.
+   * The module should export a default class that extends HTMLElement.
+   *
+   * Setting this property will cause the default view to be hidden and the custom view to be loaded.
+   * The icon, button look and button color will be ignored.
+   *
+   * @example App_Plugins/MyPackage/MyCustomLoginView.js
+   * @attr custom-view
+   */
+  @property({attribute: 'custom-view'})
+  customView?: string;
 
-	/**
-	 * Gets or sets the display name of the provider.
-	 *
-	 * @attr display-name
-	 * @example Google
-	 */
-	@property({ attribute: 'display-name' })
-	displayName = '';
+  /**
+   * Gets or sets the display name of the provider.
+   *
+   * @attr display-name
+   * @example Google
+   */
+  @property({attribute: 'display-name'})
+  displayName = '';
 
-	/**
-	 * Gets or sets the name of the provider (otherwise known as authentication type).
-	 *
-	 * @attr provider-name
-	 * @example Umbraco.Google
-	 */
-	@property({ attribute: 'provider-name' })
-	providerName = '';
+  /**
+   * Gets or sets the name of the provider (otherwise known as authentication type).
+   *
+   * @attr provider-name
+   * @example Umbraco.Google
+   */
+  @property({attribute: 'provider-name'})
+  providerName = '';
 
   /**
    * Gets or sets the view state of the user. This indicates in which state the user is in the login process,
@@ -61,16 +61,16 @@ export class UmbExternalLoginProviderElement extends LitElement {
    * @example loggingIn
    * @default loggingIn
    */
-  @property({ attribute: 'user-view-state' })
+  @property({attribute: 'user-view-state'})
   userViewState: UserViewState = 'loggingIn';
 
-	/**
-	 * Gets or sets the url to the external login provider.
-	 *
-	 * @attr external-login-url
-	 * @example /umbraco/ExternalLogin
-	 */
-	@property({ attribute: 'external-login-url' })
+  /**
+   * Gets or sets the url to the external login provider.
+   *
+   * @attr external-login-url
+   * @example /umbraco/ExternalLogin
+   */
+  @property({attribute: 'external-login-url'})
   set externalLoginUrl(value: string) {
     const tempUrl = new URL(value, window.location.origin);
     const searchParams = new URLSearchParams(tempUrl.search);
@@ -78,42 +78,42 @@ export class UmbExternalLoginProviderElement extends LitElement {
     this.#externalLoginUrl = tempUrl.pathname + tempUrl.search;
   }
 
-	get externalLoginUrl() {
-		return this.#externalLoginUrl;
-	}
+  get externalLoginUrl() {
+    return this.#externalLoginUrl;
+  }
 
-	/**
-	 * Gets or sets the icon to display next to the provider name.
-	 * This should be the name of an icon in the Umbraco Backoffice icon set.
-	 *
-	 * @attr icon
-	 * @example icon-google-fill
-	 * @default icon-lock
-	 */
-	@property({ attribute: 'icon' })
-	icon = 'icon-lock';
+  /**
+   * Gets or sets the icon to display next to the provider name.
+   * This should be the name of an icon in the Umbraco Backoffice icon set.
+   *
+   * @attr icon
+   * @example icon-google-fill
+   * @default icon-lock
+   */
+  @property({attribute: 'icon'})
+  icon = 'icon-lock';
 
-	/**
-	 * Gets or sets the look of the underlying uui-button.
-	 *
-	 * @attr button-look
-	 * @example outline
-	 * @default outline
-	 * @see https://uui.umbraco.com/?path=/story/uui-button--looks-and-colors
-	 */
-	@property({ attribute: 'button-look' })
-	buttonLook: InterfaceLook = 'outline';
+  /**
+   * Gets or sets the look of the underlying uui-button.
+   *
+   * @attr button-look
+   * @example outline
+   * @default outline
+   * @see https://uui.umbraco.com/?path=/story/uui-button--looks-and-colors
+   */
+  @property({attribute: 'button-look'})
+  buttonLook: InterfaceLook = 'outline';
 
-	/**
-	 * Gets or sets the color of the underlying uui-button.
-	 *
-	 * @attr button-color
-	 * @example danger
-	 * @default default
-	 * @see https://uui.umbraco.com/?path=/story/uui-button--looks-and-colors
-	 */
-	@property({ attribute: 'button-color' })
-	buttonColor: InterfaceColor = 'default';
+  /**
+   * Gets or sets the color of the underlying uui-button.
+   *
+   * @attr button-color
+   * @example danger
+   * @default default
+   * @see https://uui.umbraco.com/?path=/story/uui-button--looks-and-colors
+   */
+  @property({attribute: 'button-color'})
+  buttonColor: InterfaceColor = 'default';
 
   #externalLoginUrl = '';
 
@@ -155,12 +155,12 @@ export class UmbExternalLoginProviderElement extends LitElement {
 
       const customView = await loadCustomView<ExternalLoginCustomViewElement>(this.customView);
 
-			if (typeof customView === 'object') {
-				customView.displayName = this.displayName;
-				customView.providerName = this.providerName;
-				customView.externalLoginUrl = this.externalLoginUrl;
+      if (typeof customView === 'object') {
+        customView.displayName = this.displayName;
+        customView.providerName = this.providerName;
+        customView.externalLoginUrl = this.externalLoginUrl;
         customView.userViewState = this.userViewState;
-			}
+      }
 
       return renderCustomView(customView);
     } catch (error: unknown) {
