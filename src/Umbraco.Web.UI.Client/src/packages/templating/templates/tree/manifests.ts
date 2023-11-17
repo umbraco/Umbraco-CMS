@@ -1,4 +1,4 @@
-import { UMB_TEMPLATE_ENTITY_TYPE, UMB_TEMPLATE_ROOT_ENTITY_TYPE } from '../entities.js';
+import { UMB_TEMPLATE_ENTITY_TYPE, UMB_TEMPLATE_ROOT_ENTITY_TYPE } from '../entity.js';
 import { UmbTemplateTreeRepository } from './template-tree.repository.js';
 import { UmbTemplateTreeStore } from './template-tree.store.js';
 import type {

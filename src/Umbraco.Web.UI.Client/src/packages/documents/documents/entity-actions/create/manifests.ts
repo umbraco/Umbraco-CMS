@@ -1,7 +1,7 @@
-import { DOCUMENT_REPOSITORY_ALIAS } from '../../repository/manifests.js';
+import { UMB_DOCUMENT_REPOSITORY_ALIAS } from '../../repository/manifests.js';
+import { UMB_DOCUMENT_ENTITY_TYPE, UMB_DOCUMENT_ROOT_ENTITY_TYPE } from '../../entity.js';
 import { UmbCreateDocumentEntityAction } from './create.action.js';
 import { ManifestEntityAction, ManifestModal } from '@umbraco-cms/backoffice/extension-registry';
-import { DOCUMENT_ENTITY_TYPE, DOCUMENT_ROOT_ENTITY_TYPE } from '@umbraco-cms/backoffice/document';
 
 const entityActions: Array<ManifestEntityAction> = [
 	{
@@ -13,8 +13,8 @@ const entityActions: Array<ManifestEntityAction> = [
 		meta: {
 			icon: 'icon-add',
 			label: 'Create',
-			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
-			entityTypes: [DOCUMENT_ROOT_ENTITY_TYPE, DOCUMENT_ENTITY_TYPE],
+			repositoryAlias: UMB_DOCUMENT_REPOSITORY_ALIAS,
+			entityTypes: [UMB_DOCUMENT_ROOT_ENTITY_TYPE, UMB_DOCUMENT_ENTITY_TYPE],
 		},
 		/* removed until we have permissions in place
 		conditions: [
