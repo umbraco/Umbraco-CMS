@@ -7,7 +7,7 @@ const modals: Array<ManifestModal> = [
 		type: 'modal',
 		alias: UMB_MODAL_TEMPLATING_QUERY_BUILDER_SIDEBAR_ALIAS,
 		name: 'Template query builder',
-		loader: () => import('./query-builder/query-builder.element.js'),
+		js: () => import('./query-builder/query-builder.element.js'),
 	},
 ];
 

@@ -1,8 +1,8 @@
-import type { HTMLElementConstructor } from '../extension-api/types.js';
 import type { UmbControllerAlias } from './controller-alias.type.js';
 import { UmbControllerHostBaseMixin } from './controller-host-base.mixin.js';
 import type { UmbControllerHost } from './controller-host.interface.js';
 import type { UmbController } from './controller.interface.js';
+import { HTMLElementConstructor } from '@umbraco-cms/backoffice/extension-api';
 
 export declare class UmbControllerHostElement extends HTMLElement implements UmbControllerHost {
 	hasController(controller: UmbController): boolean;

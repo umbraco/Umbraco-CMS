@@ -1,11 +1,11 @@
 import { UmbMemberRepository } from '../repository/member.repository.js';
 import type { MemberDetails } from '../types.js';
-import { UmbSaveableWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
+import { UmbSaveableWorkspaceContextInterface, UmbEditableWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 export class UmbMemberWorkspaceContext
-	extends UmbWorkspaceContext<UmbMemberRepository, MemberDetails>
+	extends UmbEditableWorkspaceContextBase<UmbMemberRepository, MemberDetails>
 	implements UmbSaveableWorkspaceContextInterface<MemberDetails | undefined>
 {
 	constructor(host: UmbControllerHostElement) {

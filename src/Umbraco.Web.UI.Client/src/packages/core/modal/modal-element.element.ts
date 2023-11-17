@@ -11,7 +11,7 @@ export abstract class UmbModalBaseElement<
 	extends UmbLitElement
 	implements UmbModalExtensionElement<ModalDataType, ModalValueType, ModalManifestType>
 {
-	@property({ type: Array, attribute: false })
+	@property({ type: Object, attribute: false })
 	public manifest?: ModalManifestType;
 
 	@property({ attribute: false })

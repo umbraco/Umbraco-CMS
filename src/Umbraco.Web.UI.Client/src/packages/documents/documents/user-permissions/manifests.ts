@@ -195,7 +195,7 @@ export const granularPermissions: Array<ManifestUserGranularPermission> = [
 		type: 'userGranularPermission',
 		alias: 'Umb.UserGranularPermission.Document',
 		name: 'Document Granular User Permission',
-		loader: () =>
+		js: () =>
 			import('../components/input-document-granular-permission/input-document-granular-permission.element.js'),
 		meta: {
 			entityType: 'document',

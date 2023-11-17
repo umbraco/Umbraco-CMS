@@ -1,5 +1,5 @@
 import { UmbMediaTypeRepository } from '../repository/media-type.repository.js';
-import { UmbSaveableWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
+import { UmbSaveableWorkspaceContextInterface, UmbEditableWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
@@ -7,7 +7,7 @@ import { MediaTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 type EntityType = MediaTypeResponseModel;
 export class UmbMediaTypeWorkspaceContext
-	extends UmbWorkspaceContext<UmbMediaTypeRepository, EntityType>
+	extends UmbEditableWorkspaceContextBase<UmbMediaTypeRepository, EntityType>
 	implements UmbSaveableWorkspaceContextInterface<EntityType | undefined>
 {
 	#data = new UmbObjectState<EntityType | undefined>(undefined);

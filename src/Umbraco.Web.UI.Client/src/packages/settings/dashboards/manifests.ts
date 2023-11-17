@@ -8,7 +8,7 @@ const dashboards: Array<ManifestDashboard> = [
 		alias: 'Umb.Dashboard.SettingsWelcome',
 		name: 'Welcome Settings Dashboard',
 		elementName: 'umb-dashboard-settings-welcome',
-		loader: () => import('./settings-welcome/dashboard-settings-welcome.element.js'),
+		js: () => import('./settings-welcome/dashboard-settings-welcome.element.js'),
 		weight: 500,
 		meta: {
 			label: 'Welcome',
@@ -26,7 +26,7 @@ const dashboards: Array<ManifestDashboard> = [
 		alias: 'Umb.Dashboard.ModelsBuilder',
 		name: 'Models Builder Dashboard',
 		elementName: 'umb-dashboard-models-builder',
-		loader: () => import('./models-builder/dashboard-models-builder.element.js'),
+		js: () => import('./models-builder/dashboard-models-builder.element.js'),
 		weight: 300,
 		meta: {
 			label: 'Models Builder',
@@ -44,7 +44,7 @@ const dashboards: Array<ManifestDashboard> = [
 		alias: 'Umb.Dashboard.PublishedStatus',
 		name: 'Published Status Dashboard',
 		elementName: 'umb-dashboard-published-status',
-		loader: () => import('./published-status/dashboard-published-status.element.js'),
+		js: () => import('./published-status/dashboard-published-status.element.js'),
 		weight: 200,
 		meta: {
 			label: 'Published Status',
@@ -62,7 +62,7 @@ const dashboards: Array<ManifestDashboard> = [
 		alias: 'Umb.Dashboard.Profiling',
 		name: 'Profiling',
 		elementName: 'umb-dashboard-performance-profiling',
-		loader: () => import('./performance-profiling/dashboard-performance-profiling.element.js'),
+		js: () => import('./performance-profiling/dashboard-performance-profiling.element.js'),
 		weight: 101,
 		meta: {
 			label: 'Profiling',
@@ -80,7 +80,7 @@ const dashboards: Array<ManifestDashboard> = [
 		alias: 'Umb.Dashboard.Telemetry',
 		name: 'Telemetry',
 		elementName: 'umb-dashboard-telemetry',
-		loader: () => import('./telemetry/dashboard-telemetry.element.js'),
+		js: () => import('./telemetry/dashboard-telemetry.element.js'),
 		weight: 100,
 		meta: {
 			label: 'Telemetry Data',

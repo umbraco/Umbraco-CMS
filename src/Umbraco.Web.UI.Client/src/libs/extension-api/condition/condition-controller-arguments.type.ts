@@ -1,4 +1,4 @@
-import type { UmbConditionConfigBase } from '../types.js';
+import { UmbConditionConfigBase } from '../types/index.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export type UmbConditionControllerArguments<

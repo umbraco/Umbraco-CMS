@@ -11,7 +11,7 @@ const workspace: ManifestWorkspace = {
 	type: 'workspace',
 	alias: workspaceAlias,
 	name: 'LogViewer Root Workspace',
-	loader: () => import('./logviewer-workspace.element.js'),
+	js: () => import('./logviewer-workspace.element.js'),
 	meta: {
 		entityType: 'logviewer',
 	},
@@ -22,7 +22,7 @@ const workspaceViews: Array<ManifestWorkspaceEditorView> = [
 		type: 'workspaceEditorView',
 		alias: 'Umb.WorkspaceView.LogViewer.Overview',
 		name: 'LogViewer Root Workspace Overview View',
-		loader: () => import('../views/overview/index.js'),
+		js: () => import('../views/overview/index.js'),
 		weight: 300,
 		meta: {
 			label: 'Overview',
@@ -40,7 +40,7 @@ const workspaceViews: Array<ManifestWorkspaceEditorView> = [
 		type: 'workspaceEditorView',
 		alias: 'Umb.WorkspaceView.LogViewer.Search',
 		name: 'LogViewer Root Workspace Search View',
-		loader: () => import('../views/search/index.js'),
+		js: () => import('../views/search/index.js'),
 		weight: 200,
 		meta: {
 			label: 'Search',
@@ -63,7 +63,7 @@ const modals: Array<ManifestModal> = [
 		type: 'modal',
 		alias: 'Umb.Modal.LogViewer.SaveSearch',
 		name: 'Saved Searches Modal',
-		loader: () => import('../views/search/components/log-viewer-search-input-modal.element.js'),
+		js: () => import('../views/search/components/log-viewer-search-input-modal.element.js'),
 	},
 ];
 

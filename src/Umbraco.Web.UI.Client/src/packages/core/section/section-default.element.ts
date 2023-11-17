@@ -1,6 +1,6 @@
 import type { UmbWorkspaceElement } from '../workspace/workspace.element.js';
 import type { UmbSectionMainViewElement } from './section-main-views/section-main-views.element.js';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, nothing, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import {
 	ManifestSection,
@@ -11,7 +11,7 @@ import {
 } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbExtensionElementInitializer, UmbExtensionsElementController } from '@umbraco-cms/backoffice/extension-api';
+import { UmbExtensionElementInitializer, UmbExtensionsElementInitializer } from '@umbraco-cms/backoffice/extension-api';
 
 /**
  * @export
@@ -45,7 +45,7 @@ export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectio
 	constructor() {
 		super();
 
-		new UmbExtensionsElementController(this, umbExtensionsRegistry, 'sectionSidebarApp', null, (sidebarApps) => {
+		new UmbExtensionsElementInitializer(this, umbExtensionsRegistry, 'sectionSidebarApp', null, (sidebarApps) => {
 			const oldValue = this._sidebarApps;
 			this._sidebarApps = sidebarApps;
 			this.requestUpdate('_sidebarApps', oldValue);
@@ -82,7 +82,7 @@ export class UmbSectionDefaultElement extends UmbLitElement implements UmbSectio
 							${repeat(
 								this._sidebarApps,
 								(app) => app.alias,
-								(app) => app.component
+								(app) => app.component,
 							)}
 						</umb-section-sidebar>
 				  `

@@ -1,6 +1,6 @@
 import { UmbUserRepository } from '../repository/user.repository.js';
 import { USER_ENTITY_TYPE, type UmbUserDetail } from '../index.js';
-import { UmbSaveableWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
+import { UmbSaveableWorkspaceContextInterface, UmbEditableWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import type { UpdateUserRequestModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
@@ -9,7 +9,7 @@ import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 
 export class UmbUserWorkspaceContext
-	extends UmbWorkspaceContext<UmbUserRepository, UmbUserDetail>
+	extends UmbEditableWorkspaceContextBase<UmbUserRepository, UmbUserDetail>
 	implements UmbSaveableWorkspaceContextInterface<UmbUserDetail | undefined>
 {
 	#currentUserContext?: typeof UMB_CURRENT_USER_CONTEXT.TYPE;

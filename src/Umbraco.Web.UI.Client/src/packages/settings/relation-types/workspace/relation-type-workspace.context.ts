@@ -1,12 +1,12 @@
 import { UmbRelationTypeRepository } from '../repository/relation-type.repository.js';
-import { UmbSaveableWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
+import { UmbSaveableWorkspaceContextInterface, UmbEditableWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
 import type { RelationTypeBaseModel, RelationTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 export class UmbRelationTypeWorkspaceContext
-	extends UmbWorkspaceContext<UmbRelationTypeRepository, RelationTypeResponseModel>
+	extends UmbEditableWorkspaceContextBase<UmbRelationTypeRepository, RelationTypeResponseModel>
 	implements UmbSaveableWorkspaceContextInterface<RelationTypeResponseModel | undefined>
 {
 	#data = new UmbObjectState<RelationTypeResponseModel | undefined>(undefined);

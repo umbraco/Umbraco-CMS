@@ -4,7 +4,7 @@ export const manifest: ManifestPropertyEditorUi = {
 	type: 'propertyEditorUi',
 	alias: 'Umb.PropertyEditorUi.NumberRange',
 	name: 'Number Range Property Editor UI',
-	loader: () => import('./property-editor-ui-number-range.element.js'),
+	js: () => import('./property-editor-ui-number-range.element.js'),
 	meta: {
 		label: 'Number Range',
 		propertyEditorSchemaAlias: '',

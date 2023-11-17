@@ -5,11 +5,12 @@ export const manifests: Array<ManifestCollectionView> = [
 		type: 'collectionView',
 		alias: 'Umb.CollectionView.Document.Table',
 		name: 'Document Table Collection View',
-		loader: () => import('./views/table/document-table-collection-view.element.js'),
+		js: () => import('./views/table/document-table-collection-view.element.js'),
 		weight: 200,
-		conditions: {
-			entityType: 'document',
-		},
+		conditions: [{
+			alias: 'Umb.Condition.WorkspaceEntityType',
+			match: 'document',
+		}],
 		meta: {
 			label: 'Table',
 			icon: 'icon-box',

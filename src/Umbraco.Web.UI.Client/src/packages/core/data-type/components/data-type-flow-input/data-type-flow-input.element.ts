@@ -28,7 +28,7 @@ export class UmbInputDataTypeElement extends FormControlMixin(UmbLitElement) {
 	 * @param {string} dataTypeId
 	 * @default []
 	 */
-	@property({ attribute: false })
+	@property({ type: String, attribute: false })
 	get value(): string {
 		return super.value?.toString() ?? '';
 	}

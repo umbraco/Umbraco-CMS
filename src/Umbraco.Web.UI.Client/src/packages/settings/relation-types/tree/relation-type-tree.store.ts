@@ -6,9 +6,8 @@ import { UmbEntityTreeStore } from '@umbraco-cms/backoffice/tree';
  * @export
  * @class UmbRelationTypeTreeStore
  * @extends {UmbStoreBase}
- * @description - Tree Data Store for relation-types
+ * @description - Tree Data Store for Relation Type Items
  */
-// TODO: consider if tree store could be turned into a general EntityTreeStore class?
 export class UmbRelationTypeTreeStore extends UmbEntityTreeStore {
 	/**
 	 * Creates an instance of UmbRelationTypeTreeStore.
@@ -16,10 +15,10 @@ export class UmbRelationTypeTreeStore extends UmbEntityTreeStore {
 	 * @memberof UmbRelationTypeTreeStore
 	 */
 	constructor(host: UmbControllerHostElement) {
-		super(host, UMB_RELATION_TYPE_TREE_STORE_CONTEXT_TOKEN.toString());
+		super(host, UMB_RELATION_TYPE_TREE_STORE_CONTEXT.toString());
 	}
 }
 
-export const UMB_RELATION_TYPE_TREE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbRelationTypeTreeStore>(
+export const UMB_RELATION_TYPE_TREE_STORE_CONTEXT = new UmbContextToken<UmbRelationTypeTreeStore>(
 	'UmbRelationTypeTreeStore',
 );

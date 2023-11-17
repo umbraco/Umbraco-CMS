@@ -1,6 +1,6 @@
 import { expect, fixture } from '@open-wc/testing';
 import { UmbExtensionRegistry } from '../registry/extension.registry.js';
-import { ManifestCondition, ManifestWithDynamicConditions, UmbConditionConfigBase } from '../types.js';
+import { ManifestCondition, ManifestWithDynamicConditions, UmbConditionConfigBase } from '../types/index.js';
 import { UmbExtensionCondition } from '../condition/extension-condition.interface.js';
 import { PermittedControllerType, UmbBaseExtensionInitializer, UmbBaseExtensionsInitializer } from './index.js';
 import {
@@ -18,7 +18,7 @@ class UmbTestExtensionController extends UmbBaseExtensionInitializer {
 		host: UmbControllerHost,
 		extensionRegistry: UmbExtensionRegistry<ManifestWithDynamicConditions>,
 		alias: string,
-		onPermissionChanged: (isPermitted: boolean, controller: UmbTestExtensionController) => void
+		onPermissionChanged: (isPermitted: boolean, controller: UmbTestExtensionController) => void,
 	) {
 		super(host, extensionRegistry, 'test_', alias, onPermissionChanged);
 		this._init();
@@ -40,7 +40,7 @@ type myTestManifestTypesUnion = 'extension-type-extra' | 'extension-type';
 type myTestManifestTypes = myTestManifestTypesUnion | myTestManifestTypesUnion[];
 
 class UmbTestExtensionsController<
-	MyPermittedControllerType extends UmbTestExtensionController = PermittedControllerType<UmbTestExtensionController>
+	MyPermittedControllerType extends UmbTestExtensionController = PermittedControllerType<UmbTestExtensionController>,
 > extends UmbBaseExtensionsInitializer<
 	myTestManifests,
 	myTestManifestTypesUnion,
@@ -48,21 +48,21 @@ class UmbTestExtensionsController<
 	UmbTestExtensionController,
 	MyPermittedControllerType
 > {
-	#host: UmbControllerHost;
+	#extensionRegistry: UmbExtensionRegistry<ManifestWithDynamicConditions>;
 	constructor(
 		host: UmbControllerHost,
 		extensionRegistry: UmbExtensionRegistry<ManifestWithDynamicConditions>,
 		type: myTestManifestTypes,
 		filter: null | ((manifest: ManifestWithDynamicConditions) => boolean),
-		onChange: (permittedManifests: Array<MyPermittedControllerType>) => void
+		onChange: (permittedManifests: Array<MyPermittedControllerType>) => void,
 	) {
 		super(host, extensionRegistry, type, filter, onChange);
-		this.#host = host;
+		this.#extensionRegistry = extensionRegistry;
 		this._init();
 	}
 
 	protected _createController(manifest: ManifestWithDynamicConditions) {
-		return new UmbTestExtensionController(this.#host, testExtensionRegistry, manifest.alias, this._extensionChanged);
+		return new UmbTestExtensionController(this, this.#extensionRegistry, manifest.alias, this._extensionChanged);
 	}
 }
 
@@ -109,6 +109,7 @@ describe('UmbBaseExtensionsController', () => {
 
 		it('exposes both manifests', (done) => {
 			let count = 0;
+
 			const extensionController = new UmbTestExtensionsController(
 				hostElement,
 				testExtensionRegistry,
@@ -119,13 +120,13 @@ describe('UmbBaseExtensionsController', () => {
 					if (count === 1) {
 						// First callback gives just one. We need to make a feature to gather changes to only reply after a computation cycle if we like to avoid this.
 						expect(permitted.length).to.eq(1);
-					}
-					if (count === 2) {
+					} else if (count === 2) {
 						expect(permitted.length).to.eq(2);
-						done();
 						extensionController.destroy();
+					} else if (count === 3) {
+						done();
 					}
-				}
+				},
 			);
 		});
 
@@ -136,6 +137,7 @@ describe('UmbBaseExtensionsController', () => {
 				alias: 'Umb.Test.Extension.Extra',
 			};
 			testExtensionRegistry.register(manifestExtra);
+
 			let count = 0;
 			const extensionController = new UmbTestExtensionsController(
 				hostElement,
@@ -147,20 +149,21 @@ describe('UmbBaseExtensionsController', () => {
 					if (count === 1) {
 						// First callback gives just one. We need to make a feature to gather changes to only reply after a computation cycle if we like to avoid this.
 						expect(permitted.length).to.eq(1);
-					}
-					if (count === 2) {
+					} else if (count === 2) {
 						expect(permitted.length).to.eq(2);
-					}
-					if (count === 3) {
+					} else if (count === 3) {
 						expect(permitted.length).to.eq(3);
 						expect(permitted[0].alias).to.eq('Umb.Test.Extension.A');
 						expect(permitted[1].alias).to.eq('Umb.Test.Extension.B');
 						expect(permitted[2].alias).to.eq('Umb.Test.Extension.Extra');
 
-						done();
 						extensionController.destroy();
+					} else if (count === 4) {
+						// Cause we destroyed there will be a last call to reset permitted controllers:
+						expect(permitted.length).to.eq(0);
+						done();
 					}
-				}
+				},
 			);
 		});
 	});
@@ -181,6 +184,7 @@ describe('UmbBaseExtensionsController', () => {
 				alias: 'Umb.Test.Extension.B',
 				overwrites: ['Umb.Test.Extension.A'],
 			};
+
 			testExtensionRegistry.register(manifestA);
 			testExtensionRegistry.register(manifestB);
 		});
@@ -202,8 +206,7 @@ describe('UmbBaseExtensionsController', () => {
 						// First callback gives just one. We need to make a feature to gather changes to only reply after a computation cycle if we like to avoid this.
 						expect(permitted.length).to.eq(1);
 						expect(permitted[0].alias).to.eq('Umb.Test.Extension.A');
-					}
-					if (count === 2) {
+					} else if (count === 2) {
 						// Still just equal one, as the second one overwrites the first one.
 						expect(permitted.length).to.eq(1);
 						expect(permitted[0].alias).to.eq('Umb.Test.Extension.B');
@@ -216,7 +219,7 @@ describe('UmbBaseExtensionsController', () => {
 						done();
 						extensionController.destroy();
 					}
-				}
+				},
 			);
 		});
 	});
@@ -273,8 +276,7 @@ describe('UmbBaseExtensionsController', () => {
 						// First callback gives just one. We need to make a feature to gather changes to only reply after a computation cycle if we like to avoid this.
 						expect(permitted.length).to.eq(1);
 						expect(permitted[0].alias).to.eq('Umb.Test.Extension.A');
-					}
-					if (count === 2) {
+					} else if (count === 2) {
 						// Still just equal one, as the second one overwrites the first one.
 						expect(permitted.length).to.eq(1);
 						expect(permitted[0].alias).to.eq('Umb.Test.Extension.B');
@@ -284,10 +286,16 @@ describe('UmbBaseExtensionsController', () => {
 					} else if (count === 3) {
 						expect(permitted.length).to.eq(1);
 						expect(permitted[0].alias).to.eq('Umb.Test.Extension.A');
-						done();
 						extensionController.destroy();
+					} else if (count === 4) {
+						// Expect that destroy will only result in one last callback with no permitted controllers.
+						expect(permitted.length).to.eq(0);
+						Promise.resolve().then(() => done()); // This wrap is to enable the test to detect if more callbacks are fired.
+					} else if (count === 5) {
+						// This should not happen, we do only want one last callback when destroyed.
+						expect(false).to.eq(true);
 					}
-				}
+				},
 			);
 		});
 	});
@@ -313,6 +321,7 @@ describe('UmbBaseExtensionsController', () => {
 					},
 				],
 			};
+
 			// Register opposite order, to ensure B is there when A comes around. A fix to be able to test this. Cause a late registration of B would not cause a change that is test able.
 			testExtensionRegistry.register(manifestB);
 			testExtensionRegistry.register(manifestA);
@@ -349,7 +358,7 @@ describe('UmbBaseExtensionsController', () => {
 						done();
 						extensionController.destroy();
 					}
-				}
+				},
 			);
 		});
 	});
