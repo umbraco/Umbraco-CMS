@@ -1,15 +1,18 @@
-/* eslint local-rules/enforce-umbraco-external-imports: 0 */
+/* eslint-disable */
+// @ts-ignore
 import styles from 'monaco-editor/min/vs/editor/editor.main.css?inline';
-//eslint-disable-next-line
+// @ts-ignore
 import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker.js?worker';
-//eslint-disable-next-line
+// @ts-ignore
 import cssWorker from 'monaco-editor/esm/vs/language/css/css.worker.js?worker';
-//eslint-disable-next-line
+// @ts-ignore
 import htmlWorker from 'monaco-editor/esm/vs/language/html/html.worker.js?worker';
-//eslint-disable-next-line
+// @ts-ignore
 import jsonWorker from 'monaco-editor/esm/vs/language/json/json.worker.js?worker';
-//eslint-disable-next-line
+// @ts-ignore
 import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker.js?worker';
+/* eslint-enable */
+
 import { css, unsafeCSS } from '@umbraco-cms/backoffice/external/lit';
 
 export const monacoEditorStyles = css`
