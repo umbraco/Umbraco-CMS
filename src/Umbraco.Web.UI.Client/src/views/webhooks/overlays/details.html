@@ -30,14 +30,12 @@
   </div>
   <div class="control-group">
     <span class="bold">Request</span>
-    <pre>{{model.log.requestHeaders}}
----
-{{model.log.requestBody}}</pre>
+    <pre class="code">{{model.log.requestHeaders}}</pre>
+    <umb-code-snippet language="'JSON'" wrap="true">{{model.log.requestBody | json}}</umb-code-snippet>
   </div>
   <div class="control-group">
     <span class="bold">Response</span>
-    <pre>{{model.log.responseHeaders}}
----
-{{model.log.responseBody}}</pre>
+    <pre class="code">{{model.log.responseHeaders}}</pre>
+    <umb-code-snippet language="'TEXT'" wrap="true">{{model.log.responseBody | json}}</umb-code-snippet>
   </div>
 </div>

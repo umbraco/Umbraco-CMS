@@ -1,4 +1,4 @@
-﻿/**
+/**
 @ngdoc directive
 @name umbraco.directives.directive:umbCodeSnippet
 @restrict E
@@ -47,7 +47,8 @@
         controllerAs: 'vm',
         transclude: true,
         bindings: {
-            language: '<'
+            language: '<',
+            wrap: '<?'
         }
     };
 
@@ -79,7 +80,11 @@
                         break;
                     case "javascript":
                         vm.language = "JavaScript";
-                        break;
+                      break;
+                    case "txt":
+                    case "text":
+                      vm.language = "Text/Plain";
+                      break;
                 }
             }
             
