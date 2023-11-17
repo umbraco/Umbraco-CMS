@@ -26,7 +26,7 @@ internal sealed class UserPermissionAuthorizer : IUserPermissionAuthorizer
             return true;
         }
 
-        IUser performingUser = _authorizationHelper.GetCurrentUser(currentUser);
+        IUser performingUser = _authorizationHelper.GetUmbracoUser(currentUser);
 
         var result = await _userPermissionService.AuthorizeAccessAsync(performingUser, userKeys);
 

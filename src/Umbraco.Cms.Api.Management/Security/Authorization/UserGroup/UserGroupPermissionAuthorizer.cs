@@ -26,7 +26,7 @@ internal sealed class UserGroupPermissionAuthorizer : IUserGroupPermissionAuthor
             return true;
         }
 
-        IUser user = _authorizationHelper.GetCurrentUser(currentUser);
+        IUser user = _authorizationHelper.GetUmbracoUser(currentUser);
 
         var result = await _userGroupPermissionService.AuthorizeAccessAsync(user, userGroupKeys);
 
