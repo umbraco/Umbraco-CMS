@@ -17,7 +17,7 @@ export default class UmbBackToLoginButtonElement extends LitElement {
 	}
 
 	#handleClick() {
-		this.dispatchEvent(new CustomEvent('umb-login-flow', {composed: true, detail: {flow: 'login'}}));
+		this.dispatchEvent(new CustomEvent('umb-login-flow', { composed: true, detail: { flow: 'login' } }));
 	}
 
 	static styles: CSSResultGroup = [
