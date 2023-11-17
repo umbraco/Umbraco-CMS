@@ -237,7 +237,7 @@ export default class UmbMfaPageElement extends LitElement {
         font-weight: 400;
         font-size: var(--header-secondary-font-size);
         color: var(--uui-color-interactive);
-        line-height: 1;
+        line-height: 1.2;
       }
 
       form {
