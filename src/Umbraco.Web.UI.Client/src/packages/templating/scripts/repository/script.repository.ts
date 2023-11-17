@@ -1,19 +1,13 @@
 import { UmbScriptTreeRepository } from '../tree/index.js';
 import { UmbScriptServerDataSource } from './sources/script-detail.server.data.js';
-import { ScriptGetFolderResponse, UmbScriptFolderServerDataSource } from './sources/script-folder.server.data.js';
 import {
 	DataSourceResponse,
 	UmbDataSourceErrorResponse,
 	UmbDetailRepository,
-	UmbFolderRepository,
 } from '@umbraco-cms/backoffice/repository';
 import {
-	CreateFolderRequestModel,
 	CreateScriptRequestModel,
 	FileItemResponseModelBaseModel,
-	FolderModelBaseModel,
-	FolderResponseModel,
-	ProblemDetails,
 	ScriptResponseModel,
 	TextFileResponseModelBaseModel,
 	UpdateScriptRequestModel,
@@ -26,11 +20,9 @@ export class UmbScriptRepository
 	extends UmbBaseController
 	implements
 		UmbDetailRepository<CreateScriptRequestModel, string, UpdateScriptRequestModel, ScriptResponseModel, string>,
-		UmbFolderRepository,
 		UmbApi
 {
 	#detailDataSource: UmbScriptServerDataSource;
-	#folderDataSource: UmbScriptFolderServerDataSource;
 
 	// TODO: temp solution until it is automated
 	#treeRepository = new UmbScriptTreeRepository(this);
@@ -39,50 +31,7 @@ export class UmbScriptRepository
 		super(host);
 
 		this.#detailDataSource = new UmbScriptServerDataSource(this);
-		this.#folderDataSource = new UmbScriptFolderServerDataSource(this);
 	}
-
-	//#region FOLDER
-	createFolderScaffold(
-		parentId: string | null,
-	): Promise<{ data?: FolderResponseModel | undefined; error?: ProblemDetails | undefined }> {
-		const data: FolderResponseModel = {
-			name: '',
-			parentId,
-		};
-		return Promise.resolve({ data, error: undefined });
-	}
-	async createFolder(
-		requestBody: CreateFolderRequestModel,
-	): Promise<{ data?: string | undefined; error?: ProblemDetails | undefined }> {
-		const req = {
-			parentPath: requestBody.parentId,
-			name: requestBody.name,
-		};
-		const promise = this.#folderDataSource.create(req);
-		await promise;
-		this.#treeRepository.requestTreeItemsOf(requestBody.parentId ? requestBody.parentId : null);
-		return promise;
-	}
-	async requestFolder(
-		unique: string,
-	): Promise<{ data?: ScriptGetFolderResponse | undefined; error?: ProblemDetails | undefined }> {
-		return this.#folderDataSource.read(unique);
-	}
-	updateFolder(
-		unique: string,
-		folder: FolderModelBaseModel,
-	): Promise<{ data?: FolderModelBaseModel | undefined; error?: ProblemDetails | undefined }> {
-		throw new Error('Method not implemented.');
-	}
-	async deleteFolder(path: string): Promise<{ error?: ProblemDetails | undefined }> {
-		const { data } = await this.requestFolder(path);
-		const promise = this.#folderDataSource.delete(path);
-		await promise;
-		this.#treeRepository.requestTreeItemsOf(data?.parentPath ? data?.parentPath : null);
-		return promise;
-	}
-	//#endregion
 
 	//#region DETAILS
 	async requestByKey(path: string) {

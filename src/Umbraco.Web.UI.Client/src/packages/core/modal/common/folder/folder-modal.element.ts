@@ -2,7 +2,7 @@ import { css, html, customElement, property, query, state } from '@umbraco-cms/b
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbFolderModalData, UmbFolderModalValue, UmbModalContext } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbFolderRepository } from '@umbraco-cms/backoffice/repository';
+import { IUmbFolderRepository } from '@umbraco-cms/backoffice/repository';
 import { createExtensionApi, ManifestBase } from '@umbraco-cms/backoffice/extension-api';
 import { FolderResponseModel, ProblemDetails } from '@umbraco-cms/backoffice/backend-api';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
@@ -29,7 +29,7 @@ export class UmbFolderModalElement extends UmbLitElement {
 	#repositoryAlias?: string;
 	#unique: string | null = null;
 	#parentUnique: string | null = null;
-	#repository?: UmbFolderRepository;
+	#folderRepository?: IUmbFolderRepository;
 	#repositoryObserver?: UmbObserverController<ManifestBase | undefined>;
 
 	@state()
@@ -51,8 +51,8 @@ export class UmbFolderModalElement extends UmbLitElement {
 
 				try {
 					// TODO: Maybe use the UmbExtensionApiController instead of createExtensionApi, to ensure usage of conditions:
-					const result = await createExtensionApi<UmbFolderRepository>(repositoryManifest, [this]);
-					this.#repository = result;
+					const result = await createExtensionApi<IUmbFolderRepository>(repositoryManifest, [this]);
+					this.#folderRepository = result;
 					this.#init();
 				} catch (error) {
 					throw new Error('Could not create repository with alias: ' + this.#repositoryAlias + '');
@@ -72,16 +72,16 @@ export class UmbFolderModalElement extends UmbLitElement {
 	}
 
 	async #create() {
-		if (!this.#repository) throw new Error('Repository is required to create folder');
-		const { data } = await this.#repository.createFolderScaffold(this.#parentUnique);
+		if (!this.#folderRepository) throw new Error('Repository is required to create folder');
+		const { data } = await this.#folderRepository.createScaffold(this.#parentUnique);
 		this._folder = data;
 		this._isNew = true;
 	}
 
 	async #load() {
 		if (!this.#unique) throw new Error('Unique is required to load folder');
-		if (!this.#repository) throw new Error('Repository is required to create folder');
-		const { data } = await this.#repository.requestFolder(this.#unique);
+		if (!this.#folderRepository) throw new Error('Repository is required to create folder');
+		const { data } = await this.#folderRepository.request(this.#unique);
 		this._folder = data;
 		this._isNew = false;
 	}
@@ -100,7 +100,7 @@ export class UmbFolderModalElement extends UmbLitElement {
 	async #onSubmit(event: SubmitEvent) {
 		event.preventDefault();
 		if (!this._folder) throw new Error('Folder is not initialized correctly');
-		if (!this.#repository) throw new Error('Repository is required to create folder');
+		if (!this.#folderRepository) throw new Error('Repository is required to create folder');
 
 		const isValid = this._formElement?.checkValidity();
 		if (!isValid) return;
@@ -112,11 +112,11 @@ export class UmbFolderModalElement extends UmbLitElement {
 		this._folder = { ...this._folder, name: folderName };
 
 		if (this._isNew) {
-			const { error: createError } = await this.#repository.createFolder(this._folder);
+			const { error: createError } = await this.#folderRepository.create(this._folder);
 			error = createError;
 		} else {
 			if (!this.#unique) throw new Error('Unique is required to update folder');
-			const { error: updateError } = await this.#repository.updateFolder(this.#unique, this._folder);
+			const { error: updateError } = await this.#folderRepository.update(this.#unique, this._folder);
 			error = updateError;
 		}
 

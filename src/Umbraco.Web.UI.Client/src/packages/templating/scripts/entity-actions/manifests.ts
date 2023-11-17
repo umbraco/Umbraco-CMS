@@ -5,6 +5,7 @@ import {
 	UMB_SCRIPT_ROOT_ENTITY_TYPE,
 	UMB_SCRIPT_FOLDER_EMPTY_ENTITY_TYPE,
 } from '../entity.js';
+import { UMB_SCRIPT_FOLDER_REPOSITORY_ALIAS } from '../repository/folder/index.js';
 import { UmbCreateScriptAction } from './create/create-empty.action.js';
 import {
 	UmbCreateFolderEntityAction,
@@ -64,9 +65,9 @@ const scriptFolderActions: Array<ManifestEntityAction> = [
 		name: 'Create empty folder',
 		api: UmbCreateFolderEntityAction,
 		meta: {
-			icon: 'icon-add',
+			icon: 'icon-folder',
 			label: 'Create folder',
-			repositoryAlias: UMB_SCRIPT_REPOSITORY_ALIAS,
+			repositoryAlias: UMB_SCRIPT_FOLDER_REPOSITORY_ALIAS,
 			entityTypes: [UMB_SCRIPT_FOLDER_EMPTY_ENTITY_TYPE, UMB_SCRIPT_FOLDER_ENTITY_TYPE, UMB_SCRIPT_ROOT_ENTITY_TYPE],
 		},
 	},

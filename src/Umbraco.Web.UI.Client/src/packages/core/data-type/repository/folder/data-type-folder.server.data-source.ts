@@ -1,11 +1,5 @@
-import { UmbId } from '@umbraco-cms/backoffice/id';
-import { UmbFolderDataSource } from '@umbraco-cms/backoffice/repository';
-import {
-	DataTypeResource,
-	FolderResponseModel,
-	CreateFolderRequestModel,
-	FolderModelBaseModel,
-} from '@umbraco-cms/backoffice/backend-api';
+import { UmbCreateFolderModel, UmbFolderDataSource, UmbUpdateFolderModel } from '@umbraco-cms/backoffice/repository';
+import { DataTypeResource } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -28,83 +22,68 @@ export class UmbDataTypeFolderServerDataSource implements UmbFolderDataSource {
 	}
 
 	/**
-	 * Creates a Data Type folder with the given id from the server
-	 * @param {string} parentId
+	 * Fetches a Data Type folder from the server
+	 * @param {string} unique
 	 * @return {*}
 	 * @memberof UmbDataTypeFolderServerDataSource
 	 */
-	async createScaffold(parentId: string | null) {
-		const scaffold: FolderResponseModel = {
-			name: '',
-			id: UmbId.new(),
-			parentId,
-		};
-
-		return { data: scaffold };
-	}
-
-	/**
-	 * Fetches a Data Type folder with the given id from the server
-	 * @param {string} id
-	 * @return {*}
-	 * @memberof UmbDataTypeFolderServerDataSource
-	 */
-	async read(id: string) {
-		if (!id) throw new Error('Key is missing');
+	async read(unique: string) {
+		if (!unique) throw new Error('Unique is missing');
 		return tryExecuteAndNotify(
 			this.#host,
 			DataTypeResource.getDataTypeFolderById({
-				id: id,
+				id: unique,
 			}),
 		);
 	}
 
 	/**
-	 * Inserts a new Data Type folder on the server
-	 * @param {folder} folder
+	 * Creates a Data Type folder on the server
+	 * @param {UmbCreateFolderModel} args
 	 * @return {*}
 	 * @memberof UmbDataTypeFolderServerDataSource
 	 */
-	async create(folder: CreateFolderRequestModel) {
-		if (!folder) throw new Error('Folder is missing');
+	async create(args: UmbCreateFolderModel) {
+		if (!args.parentUnique) throw new Error('Parent unique is missing');
+		if (!args.name) throw new Error('Name is missing');
 		return tryExecuteAndNotify(
 			this.#host,
 			DataTypeResource.postDataTypeFolder({
-				requestBody: folder,
+				requestBody: { parentId: args.parentUnique, name: args.name },
 			}),
 		);
 	}
 
 	/**
 	 * Updates a Data Type folder on the server
-	 * @param {folder} folder
+	 * @param {UmbUpdateFolderModel} args
 	 * @return {*}
 	 * @memberof UmbDataTypeFolderServerDataSource
 	 */
-	async update(id: string, folder: FolderModelBaseModel) {
-		if (!id) throw new Error('Key is missing');
-		if (!id) throw new Error('Folder data is missing');
+	async update(args: UmbUpdateFolderModel) {
+		if (!args.unique) throw new Error('Unique is missing');
+		if (!args.name) throw new Error('Folder name is missing');
 		return tryExecuteAndNotify(
 			this.#host,
 			DataTypeResource.putDataTypeFolderById({
-				id: id,
-				requestBody: folder,
+				id: args.unique,
+				requestBody: { name: args.name },
 			}),
 		);
 	}
 
 	/**
-	 * Deletes a Data Type folder with the given id on the server
-	 * @param {string} id
+	 * Deletes a Data Type folder on the server
+	 * @param {string} unique
 	 * @return {*}
 	 * @memberof UmbDataTypeServerDataSource
 	 */
-	async delete(id: string) {
-		if (!id) throw new Error('Key is missing');
+	async delete(unique: string) {
+		if (!unique) throw new Error('Unique is missing');
 		return tryExecuteAndNotify(
 			this.#host,
 			DataTypeResource.deleteDataTypeFolderById({
-				id: id,
+				id: unique,
 			}),
 		);
 	}

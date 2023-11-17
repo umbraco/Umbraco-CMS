@@ -1,30 +1,21 @@
 import { StylesheetDetails } from '../index.js';
 import { UmbStylesheetTreeRepository } from '../tree/index.js';
 import { UmbStylesheetServerDataSource } from './sources/stylesheet.server.data.js';
-import {
-	StylesheetGetFolderResponse,
-	UmbStylesheetFolderServerDataSource,
-} from './sources/stylesheet.folder.server.data.js';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbBaseController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import {
 	DataSourceResponse,
 	UmbDataSourceErrorResponse,
 	UmbDetailRepository,
-	UmbFolderRepository,
 } from '@umbraco-cms/backoffice/repository';
 import {
-	CreateFolderRequestModel,
 	CreateStylesheetRequestModel,
 	CreateTextFileViewModelBaseModel,
 	ExtractRichTextStylesheetRulesRequestModel,
 	ExtractRichTextStylesheetRulesResponseModel,
-	FolderModelBaseModel,
-	FolderResponseModel,
 	InterpolateRichTextStylesheetRequestModel,
 	InterpolateRichTextStylesheetResponseModel,
 	PagedStylesheetOverviewResponseModel,
-	ProblemDetails,
 	RichTextStylesheetRulesResponseModel,
 	TextFileResponseModelBaseModel,
 	UpdateStylesheetRequestModel,
@@ -36,11 +27,9 @@ export class UmbStylesheetRepository
 	extends UmbBaseController
 	implements
 		UmbDetailRepository<CreateStylesheetRequestModel, string, UpdateStylesheetRequestModel, StylesheetDetails>,
-		UmbFolderRepository,
 		UmbApi
 {
 	#dataSource;
-	#folderDataSource;
 
 	// TODO: temp solution until it is automated
 	#treeRepository = new UmbStylesheetTreeRepository(this);
@@ -50,56 +39,7 @@ export class UmbStylesheetRepository
 
 		// TODO: figure out how spin up get the correct data source
 		this.#dataSource = new UmbStylesheetServerDataSource(this);
-		this.#folderDataSource = new UmbStylesheetFolderServerDataSource(this);
 	}
-
-	//#region FOLDER:
-
-	createFolderScaffold(
-		parentId: string | null,
-	): Promise<{ data?: FolderResponseModel | undefined; error?: ProblemDetails | undefined }> {
-		const data: FolderResponseModel = {
-			name: '',
-			parentId,
-		};
-		return Promise.resolve({ data, error: undefined });
-	}
-
-	async createFolder(
-		folderRequest: CreateFolderRequestModel,
-	): Promise<{ data?: string | undefined; error?: ProblemDetails | undefined }> {
-		const req = {
-			parentPath: folderRequest.parentId,
-			name: folderRequest.name,
-		};
-		const promise = this.#folderDataSource.create(req);
-		await promise;
-		this.#treeRepository.requestTreeItemsOf(folderRequest.parentId ? folderRequest.parentId : null);
-		return promise;
-	}
-
-	async requestFolder(
-		unique: string,
-	): Promise<{ data?: StylesheetGetFolderResponse | undefined; error?: ProblemDetails | undefined }> {
-		return this.#folderDataSource.read(unique);
-	}
-
-	updateFolder(
-		unique: string,
-		folder: FolderModelBaseModel,
-	): Promise<{ data?: FolderModelBaseModel | undefined; error?: ProblemDetails | undefined }> {
-		throw new Error('Method not implemented.');
-	}
-
-	async deleteFolder(path: string): Promise<{ error?: ProblemDetails | undefined }> {
-		const { data } = await this.requestFolder(path);
-		const promise = this.#folderDataSource.delete(path);
-		await promise;
-		this.#treeRepository.requestTreeItemsOf(data?.parentPath ? data?.parentPath : null);
-		return promise;
-	}
-
-	//#endregion
 
 	//#region DETAIL:
 
