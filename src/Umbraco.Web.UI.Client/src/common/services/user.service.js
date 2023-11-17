@@ -156,7 +156,9 @@ angular.module('umbraco.services')
             lastServerTimeoutSet = null;
             currentUser = null;
 
-            openLoginDialog(isLogout === undefined ? true : !isLogout);
+            if (!isLogout) {
+              openLoginDialog(true);
+            }
         }
 
         // Register a handler for when an item is added to the retry queue
@@ -233,13 +235,9 @@ angular.module('umbraco.services')
                     .then(function (data) {
                         userAuthExpired(true);
 
-                        if (data && data.signOutRedirectUrl) {
-                            $window.location.replace(data.signOutRedirectUrl);
-                        }
-                        else {
-                            //done!
-                            return null;
-                        }
+                        const signOutRedirectUrl = data && data.signOutRedirectUrl ? data.signOutRedirectUrl : 'login?logout=true';
+
+                        $window.location.replace(signOutRedirectUrl);
                     });
             },
 

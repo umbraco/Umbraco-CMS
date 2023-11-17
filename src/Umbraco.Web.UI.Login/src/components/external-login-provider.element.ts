@@ -117,6 +117,17 @@ export class UmbExternalLoginProviderElement extends LitElement {
 
   #externalLoginUrl = '';
 
+  constructor() {
+    super();
+
+    const searchParams = new URLSearchParams(window.location.search);
+    const isLogout = searchParams.get('logout') === 'true';
+
+    if (isLogout) {
+      this.userViewState = 'loggedOut';
+    }
+  }
+
   protected render() {
     return this.customView
       ? until(this.renderCustomView(), html`
