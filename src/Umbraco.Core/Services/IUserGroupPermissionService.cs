@@ -9,19 +9,35 @@ namespace Umbraco.Cms.Core.Services;
 public interface IUserGroupPermissionService
 {
     /// <summary>
-    ///     Authorize that the current user belongs to the specified user group.
+    ///     Authorize that a user belongs to a user group.
     /// </summary>
-    /// <param name="performingUser">The user performing the operation.</param>
+    /// <param name="user"><see cref="IUser" /> to authorize.</param>
     /// <param name="userGroupKey">The identifier of the user group to check for access.</param>
     /// <returns>A task resolving into a <see cref="UserGroupAuthorizationStatus"/>.</returns>
-    Task<UserGroupAuthorizationStatus> AuthorizeAccessAsync(IUser performingUser, Guid userGroupKey)
-        => AuthorizeAccessAsync(performingUser, new[] { userGroupKey });
+    Task<UserGroupAuthorizationStatus> AuthorizeAccessAsync(IUser user, Guid userGroupKey)
+        => AuthorizeAccessAsync(user, new[] { userGroupKey });
 
     /// <summary>
-    ///     Authorize that the current user belongs to these user groups.
+    ///     Authorize that a user belongs to user groups.
     /// </summary>
-    /// <param name="performingUser">The user performing the operation.</param>
+    /// <param name="user"><see cref="IUser" /> to authorize.</param>
     /// <param name="userGroupKeys">The identifiers of the user groups to check for access.</param>
     /// <returns>A task resolving into a <see cref="UserGroupAuthorizationStatus"/>.</returns>
-    Task<UserGroupAuthorizationStatus> AuthorizeAccessAsync(IUser performingUser, IEnumerable<Guid> userGroupKeys);
+    Task<UserGroupAuthorizationStatus> AuthorizeAccessAsync(IUser user, IEnumerable<Guid> userGroupKeys);
+
+    /// <summary>
+    ///     Authorize that a user is allowed to create a new user group.
+    /// </summary>
+    /// <param name="user"><see cref="IUser" /> to authorize.</param>
+    /// <param name="userGroup">The user group to be created.</param>
+    /// <returns>A task resolving into a <see cref="UserGroupAuthorizationStatus"/>.</returns>
+    Task<UserGroupAuthorizationStatus> AuthorizeCreateAsync(IUser user, IUserGroup userGroup);
+
+    /// <summary>
+    ///     Authorize that a user is allowed to update an existing user group.
+    /// </summary>
+    /// <param name="user"><see cref="IUser" /> to authorize.</param>
+    /// <param name="userGroup">The user group to be updated.</param>
+    /// <returns>A task resolving into a <see cref="UserGroupAuthorizationStatus"/>.</returns>
+    Task<UserGroupAuthorizationStatus> AuthorizeUpdateAsync(IUser user, IUserGroup userGroup);
 }

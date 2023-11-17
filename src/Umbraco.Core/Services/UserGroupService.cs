@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Services.AuthorizationStatus;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
 
@@ -19,7 +20,7 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
     public const int MaxUserGroupAliasLength = 200;
 
     private readonly IUserGroupRepository _userGroupRepository;
-    private readonly IUserGroupAuthorizationService _userGroupAuthorizationService;
+    private readonly IUserGroupPermissionService _userGroupPermissionService;
     private readonly IEntityService _entityService;
     private readonly IUserService _userService;
 
@@ -28,13 +29,13 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
         ILoggerFactory loggerFactory,
         IEventMessagesFactory eventMessagesFactory,
         IUserGroupRepository userGroupRepository,
-        IUserGroupAuthorizationService userGroupAuthorizationService,
+        IUserGroupPermissionService userGroupPermissionService,
         IEntityService entityService,
         IUserService userService)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _userGroupRepository = userGroupRepository;
-        _userGroupAuthorizationService = userGroupAuthorizationService;
+        _userGroupPermissionService = userGroupPermissionService;
         _entityService = entityService;
         _userService = userService;
     }
@@ -236,10 +237,12 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
             return validationAttempt;
         }
 
-        Attempt<UserGroupOperationStatus> authorizationAttempt = _userGroupAuthorizationService.AuthorizeUserGroupCreation(performingUser, userGroup);
-        if (authorizationAttempt.Success is false)
+        UserGroupAuthorizationStatus isAuthorized = await _userGroupPermissionService.AuthorizeCreateAsync(performingUser, userGroup);
+        if (isAuthorized != UserGroupAuthorizationStatus.Success)
         {
-            return Attempt.FailWithStatus(authorizationAttempt.Result, userGroup);
+            // Convert from UserGroupAuthorizationStatus to UserGroupOperationStatus
+            UserGroupOperationStatus operationStatus = isAuthorized.ToUserGroupOperationStatus();
+            return Attempt.FailWithStatus(operationStatus, userGroup);
         }
 
         EventMessages eventMessages = EventMessagesFactory.Get();
@@ -309,10 +312,12 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
             return Attempt.FailWithStatus(validationStatus, userGroup);
         }
 
-        Attempt<UserGroupOperationStatus> authorizationAttempt = _userGroupAuthorizationService.AuthorizeUserGroupUpdate(performingUser, userGroup);
-        if (authorizationAttempt.Success is false)
+        UserGroupAuthorizationStatus isAuthorized = await _userGroupPermissionService.AuthorizeUpdateAsync(performingUser, userGroup);
+        if (isAuthorized != UserGroupAuthorizationStatus.Success)
         {
-            return Attempt.FailWithStatus(authorizationAttempt.Result, userGroup);
+            // Convert from UserGroupAuthorizationStatus to UserGroupOperationStatus
+            UserGroupOperationStatus operationStatus = isAuthorized.ToUserGroupOperationStatus();
+            return Attempt.FailWithStatus(operationStatus, userGroup);
         }
 
         EventMessages eventMessages = EventMessagesFactory.Get();
