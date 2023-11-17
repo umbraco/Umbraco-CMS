@@ -1,3 +1,4 @@
+import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
 import { UmbDocumentSaveAndPublishWorkspaceAction } from './actions/save-and-publish.action.js';
 import { UmbDocumentSaveAndPreviewWorkspaceAction } from './actions/save-and-preview.action.js';
 import { UmbSaveAndScheduleDocumentWorkspaceAction } from './actions/save-and-schedule.action.js';
@@ -16,7 +17,7 @@ const workspace: ManifestWorkspace = {
 	element: () => import('./document-workspace.element.js'),
 	api: () => import('./document-workspace.context.js'),
 	meta: {
-		entityType: 'document',
+		entityType: UMB_DOCUMENT_ENTITY_TYPE,
 	},
 };
 
@@ -71,7 +72,7 @@ const workspaceViewCollections: Array<ManifestWorkspaceViewCollection> = [
 			label: 'Documents',
 			pathname: 'collection',
 			icon: 'icon-grid',
-			entityType: 'document',
+			entityType: UMB_DOCUMENT_ENTITY_TYPE,
 			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
 		}
 	},

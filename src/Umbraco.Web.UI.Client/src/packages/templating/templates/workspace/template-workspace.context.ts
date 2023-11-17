@@ -1,17 +1,19 @@
-import { UmbTemplateRepository } from '../repository/template.repository.js';
+import { UmbTemplateRepository } from '../repository/index.js';
+import { UmbTemplateTreeRepository } from '../tree/index.js';
 import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
-import { UmbSaveableWorkspaceContextInterface, UmbEditableWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
 import {
-	createObservablePart,
-	UmbBooleanState,
-	UmbDeepState,
-	UmbObjectState,
-} from '@umbraco-cms/backoffice/observable-api';
+	UmbSaveableWorkspaceContextInterface,
+	UmbEditableWorkspaceContextBase,
+} from '@umbraco-cms/backoffice/workspace';
+import { UmbBooleanState, UmbDeepState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { TemplateItemResponseModel, TemplateResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
-export class UmbTemplateWorkspaceContext extends UmbEditableWorkspaceContextBase<UmbTemplateRepository, TemplateResponseModel> implements UmbSaveableWorkspaceContextInterface {
+export class UmbTemplateWorkspaceContext
+	extends UmbEditableWorkspaceContextBase<UmbTemplateRepository, TemplateResponseModel>
+	implements UmbSaveableWorkspaceContextInterface
+{
 	#data = new UmbDeepState<TemplateResponseModel | undefined>(undefined);
 	data = this.#data.asObservable();
 	#masterTemplate = new UmbObjectState<TemplateItemResponseModel | null>(null);
@@ -24,6 +26,9 @@ export class UmbTemplateWorkspaceContext extends UmbEditableWorkspaceContextBase
 
 	#isCodeEditorReady = new UmbBooleanState(false);
 	isCodeEditorReady = this.#isCodeEditorReady.asObservable();
+
+	// TODO: temp solution until we have automatic tree updates
+	#treeRepository = new UmbTemplateTreeRepository(this.host);
 
 	constructor(host: UmbControllerHostElement) {
 		super(host, 'Umb.Workspace.Template', new UmbTemplateRepository(host));
@@ -111,7 +116,7 @@ export class UmbTemplateWorkspaceContext extends UmbEditableWorkspaceContextBase
 		if (hasLayoutBlock && currentContent) {
 			const string = currentContent.replace(
 				this.getLayoutBlockRegexPattern(),
-				`$1"${newMasterTemplateAlias}.cshtml"$3`
+				`$1"${newMasterTemplateAlias}.cshtml"$3`,
 			);
 			this.setContent(string);
 			return;
@@ -136,9 +141,9 @@ ${currentContent}`;
 				alias: template.alias,
 			});
 			if (this.#masterTemplate.value?.id) {
-				this.repository.requestTreeItemsOf(this.#masterTemplate.value?.id ?? '');
+				this.#treeRepository.requestTreeItemsOf(this.#masterTemplate.value?.id ?? '');
 			} else {
-				this.repository.requestRootTreeItems();
+				this.#treeRepository.requestRootTreeItems();
 			}
 			return;
 		}
@@ -149,7 +154,7 @@ ${currentContent}`;
 				content: template.content,
 				alias: template.alias,
 			});
-			this.repository.requestTreeItemsOf(this.#masterTemplate.value?.id ?? null);
+			this.#treeRepository.requestTreeItemsOf(this.#masterTemplate.value?.id ?? null);
 		}
 	}
 
@@ -168,9 +173,7 @@ ${currentContent}`;
 	}
 }
 
-
-
-export const UMB_TEMPLATE_WORKSPACE_CONTEXT = new UmbContextToken<UmbSaveableWorkspaceContextInterface, UmbTemplateWorkspaceContext>(
-	'UmbWorkspaceContext',
-	(context): context is UmbTemplateWorkspaceContext => context.getEntityType?.() === 'template'
-);
+export const UMB_TEMPLATE_WORKSPACE_CONTEXT = new UmbContextToken<
+	UmbSaveableWorkspaceContextInterface,
+	UmbTemplateWorkspaceContext
+>('UmbWorkspaceContext', (context): context is UmbTemplateWorkspaceContext => context.getEntityType?.() === 'template');

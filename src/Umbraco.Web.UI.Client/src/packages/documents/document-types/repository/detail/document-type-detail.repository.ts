@@ -129,7 +129,6 @@ export class UmbDocumentTypeDetailRepository
 			// Consider notify a workspace if a template is updated in the store while someone is editing it.
 			this.#detailStore?.append(item);
 			this.#treeStore?.updateItem(id, item);
-			// TODO: would be nice to align the stores on methods/methodNames.
 
 			const notification = { data: { message: `Document Type saved` } };
 			this.#notificationContext?.peek('positive', notification);
@@ -152,7 +151,6 @@ export class UmbDocumentTypeDetailRepository
 			// TODO: we currently don't use the detail store for anything.
 			// Consider to look up the data before fetching from the server.
 			// Consider notify a workspace if a template is deleted from the store while someone is editing it.
-			// TODO: would be nice to align the stores on methods/methodNames.
 			this.#detailStore?.removeItem(id);
 			this.#treeStore?.removeItem(id);
 			this.#itemStore?.removeItem(id);

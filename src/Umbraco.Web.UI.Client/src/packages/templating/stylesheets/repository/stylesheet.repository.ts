@@ -1,4 +1,5 @@
 import { StylesheetDetails } from '../index.js';
+import { UmbStylesheetTreeRepository } from '../tree/index.js';
 import { UmbStylesheetServerDataSource } from './sources/stylesheet.server.data.js';
 import {
 	StylesheetGetFolderResponse,
@@ -12,14 +13,12 @@ import {
 	UmbDetailRepository,
 	UmbFolderRepository,
 } from '@umbraco-cms/backoffice/repository';
-import { UmbTreeRepository } from '@umbraco-cms/backoffice/tree';
 import {
 	CreateFolderRequestModel,
 	CreateStylesheetRequestModel,
 	CreateTextFileViewModelBaseModel,
 	ExtractRichTextStylesheetRulesRequestModel,
 	ExtractRichTextStylesheetRulesResponseModel,
-	FileSystemTreeItemPresentationModel,
 	FolderModelBaseModel,
 	FolderResponseModel,
 	InterpolateRichTextStylesheetRequestModel,
@@ -42,6 +41,9 @@ export class UmbStylesheetRepository
 {
 	#dataSource;
 	#folderDataSource;
+
+	// TODO: temp solution until it is automated
+	#treeRepository = new UmbStylesheetTreeRepository(this);
 
 	constructor(host: UmbControllerHostElement) {
 		super(host);
@@ -72,7 +74,7 @@ export class UmbStylesheetRepository
 		};
 		const promise = this.#folderDataSource.create(req);
 		await promise;
-		//this.requestTreeItemsOf(folderRequest.parentId ? folderRequest.parentId : null);
+		this.#treeRepository.requestTreeItemsOf(folderRequest.parentId ? folderRequest.parentId : null);
 		return promise;
 	}
 
@@ -93,7 +95,7 @@ export class UmbStylesheetRepository
 		const { data } = await this.requestFolder(path);
 		const promise = this.#folderDataSource.delete(path);
 		await promise;
-		//this.requestTreeItemsOf(data?.parentPath ? data?.parentPath : null);
+		this.#treeRepository.requestTreeItemsOf(data?.parentPath ? data?.parentPath : null);
 		return promise;
 	}
 
@@ -120,7 +122,7 @@ export class UmbStylesheetRepository
 	async create(data: CreateTextFileViewModelBaseModel): Promise<DataSourceResponse<string>> {
 		const promise = this.#dataSource.create(data);
 		await promise;
-		//this.requestTreeItemsOf(data.parentPath ? data.parentPath : null);
+		this.#treeRepository.requestTreeItemsOf(data.parentPath ? data.parentPath : null);
 		return promise;
 	}
 
@@ -131,7 +133,7 @@ export class UmbStylesheetRepository
 	delete(id: string): Promise<UmbDataSourceErrorResponse> {
 		const promise = this.#dataSource.delete(id);
 		const parentPath = id.substring(0, id.lastIndexOf('/'));
-		//this.requestTreeItemsOf(parentPath ? parentPath : null);
+		this.#treeRepository.requestTreeItemsOf(parentPath ? parentPath : null);
 		return promise;
 	}
 

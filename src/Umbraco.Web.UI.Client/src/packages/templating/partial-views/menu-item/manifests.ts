@@ -1,17 +1,16 @@
-import { PARTIAL_VIEW_TREE_ALIAS } from '../config.js';
+import { UMB_PARTIAL_VIEW_TREE_ALIAS } from '../tree/index.js';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const menuItem: ManifestTypes = {
 	type: 'menuItem',
 	kind: 'tree',
-	alias: 'Umb.MenuItem.PartialViews',
+	alias: 'Umb.MenuItem.PartialView',
 	name: 'Partial View Menu Item',
 	weight: 40,
 	meta: {
 		label: 'Partial Views',
 		icon: 'icon-folder',
-		entityType: 'partial-view',
-		treeAlias: PARTIAL_VIEW_TREE_ALIAS,
+		treeAlias: UMB_PARTIAL_VIEW_TREE_ALIAS,
 		menus: ['Umb.Menu.Templating'],
 	},
 };
