@@ -523,7 +523,7 @@
     <key alias="username">Nazwa użytkownika</key>
     <key alias="value">Wartość</key>
     <key alias="view">Widok</key>
-    <key alias="welcome">Witaj...</key>
+    <key alias="welcome">Witaj</key>
     <key alias="width">Szerokość</key>
     <key alias="yes">Tak</key>
     <key alias="folder">Folder</key>

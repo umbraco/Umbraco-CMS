@@ -114,7 +114,7 @@
   </area>
   <area alias="validation">
     <key alias="entriesShort"><![CDATA[Minsta %0% poster, kräver <strong>%1%</strong> mer.]]></key>
-    <key alias="entriesExceed"><![CDATA[Max %0% poster, <strong>%1%</strong> för många.]]></key>  
+    <key alias="entriesExceed"><![CDATA[Max %0% poster, <strong>%1%</strong> för många.]]></key>
   </area>
   <area alias="blueprints">
     <key alias="createBlueprintFrom"><![CDATA[Skapa en ny innehållsmall för <em>%0%</em>]]></key>
@@ -223,7 +223,7 @@
     <key alias="publishedPendingChanges">Publicerad (osparade ändringar)</key>
     <key alias="listViewNoContent">Inga undernoder har lagts till</key>
     <key alias="noChanges">Inga ändringar har gjorts</key>
-    <key alias="notCreated">Ej skapad</key>    
+    <key alias="notCreated">Ej skapad</key>
   </area>
   <area alias="contentTypeEditor">
     <key alias="yesDelete">Ja, ta bort</key>
@@ -543,7 +543,7 @@
     <key alias="user">Användare</key>
     <key alias="username">Användarnamn</key>
     <key alias="value">Värde</key>
-    <key alias="welcome">Välkommen...</key>
+    <key alias="welcome">Välkommen</key>
     <key alias="width">Bredd</key>
     <key alias="view">Titta på</key>
     <key alias="yes">Ja</key>
