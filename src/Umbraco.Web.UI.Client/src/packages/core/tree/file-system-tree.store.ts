@@ -35,7 +35,12 @@ export class UmbFileSystemTreeStore
 			return this.rootItems;
 		}
 
-		return this._data.asObservablePart((items) => items.filter((item) => item.path?.startsWith(parentPath + '/')));
+		return this._data.asObservablePart((items) =>
+			items.filter((item) => {
+				const pathCut = item.path?.substring(0, item.path?.lastIndexOf('/'));
+				return parentPath === pathCut;
+			}),
+		);
 	}
 
 	/**
