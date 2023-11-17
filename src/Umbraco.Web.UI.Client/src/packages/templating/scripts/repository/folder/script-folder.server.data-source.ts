@@ -55,7 +55,7 @@ export class UmbScriptFolderServerDataSource implements UmbFolderDataSource {
 		);
 
 		if (data) {
-			const folderData = { unique: data.path, name: data.name };
+			const folderData = { unique: data.path, parentUnique: data.parentPath || null, name: data.name };
 			return { data: folderData };
 		}
 

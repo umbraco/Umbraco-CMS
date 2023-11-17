@@ -51,10 +51,10 @@ export class UmbFolderRepositoryBase extends UmbRepositoryBase implements IUmbFo
 		if (!args.name) throw new Error('Name is missing');
 		await this._init;
 
-		const { error, data } = await this.#folderDataSource.create(args);
+		const { data, error } = await this.#folderDataSource.create(args);
 
 		if (data) {
-			const folderTreeItem = this.#folderToTreeItemMapper(folder);
+			const folderTreeItem = this.#folderToTreeItemMapper(data);
 			this._treeStore!.appendItems([folderTreeItem]);
 		}
 
