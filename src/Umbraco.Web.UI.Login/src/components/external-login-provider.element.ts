@@ -6,10 +6,13 @@ import { until } from 'lit/directives/until.js';
 import { loadCustomView, renderCustomView } from '../utils/load-custom-view.function.js';
 import { umbLocalizationContext } from '../external/localization/localization-context.js';
 
+type UserViewState = 'loggingIn' | 'loggedIn' | 'loggedOut' | 'timedOut';
+
 type ExternalLoginCustomViewElement = HTMLElement & {
-	displayName: string;
-	providerName: string;
-	externalLoginUrl: string;
+	displayName?: string;
+	providerName?: string;
+	externalLoginUrl?: string;
+  userViewState?: UserViewState;
 };
 
 /**
@@ -50,6 +53,17 @@ export class UmbExternalLoginProviderElement extends LitElement {
 	@property({ attribute: 'provider-name' })
 	providerName = '';
 
+  /**
+   * Gets or sets the view state of the user. This indicates in which state the user is in the login process,
+   * which can be used to determine where the external-login-provider is being shown.
+   *
+   * @attr user-view-state
+   * @example loggingIn
+   * @default loggingIn
+   */
+  @property({ attribute: 'user-view-state' })
+  userViewState: UserViewState = 'loggingIn';
+
 	/**
 	 * Gets or sets the url to the external login provider.
 	 *
@@ -57,14 +71,15 @@ export class UmbExternalLoginProviderElement extends LitElement {
 	 * @example /umbraco/ExternalLogin
 	 */
 	@property({ attribute: 'external-login-url' })
+  set externalLoginUrl(value: string) {
+    const tempUrl = new URL(value, window.location.origin);
+    const searchParams = new URLSearchParams(tempUrl.search);
+    tempUrl.searchParams.append('redirectUrl', decodeURIComponent(searchParams.get('returnPath') ?? ''));
+    this.#externalLoginUrl = tempUrl.pathname + tempUrl.search;
+  }
+
 	get externalLoginUrl() {
 		return this.#externalLoginUrl;
-	}
-	set externalLoginUrl(value: string) {
-		const tempUrl = new URL(value, window.location.origin);
-		const searchParams = new URLSearchParams(tempUrl.search);
-		tempUrl.searchParams.append('redirectUrl', decodeURIComponent(searchParams.get('returnPath') ?? ''));
-		this.#externalLoginUrl = tempUrl.pathname + tempUrl.search;
 	}
 
 	/**
@@ -144,6 +159,7 @@ export class UmbExternalLoginProviderElement extends LitElement {
 				customView.displayName = this.displayName;
 				customView.providerName = this.providerName;
 				customView.externalLoginUrl = this.externalLoginUrl;
+        customView.userViewState = this.userViewState;
 			}
 
 			return renderCustomView(customView);
