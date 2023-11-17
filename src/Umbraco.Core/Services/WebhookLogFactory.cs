@@ -1,4 +1,5 @@
-﻿using Umbraco.Cms.Core.Models;
+﻿using System.Net;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Webhooks;
 
 namespace Umbraco.Cms.Core.Services;
@@ -20,7 +21,7 @@ public class WebhookLogFactory : IWebhookLogFactory
         {
             log.RequestBody = await responseModel.HttpResponseMessage!.RequestMessage!.Content!.ReadAsStringAsync(cancellationToken);
             log.ResponseBody = await responseModel.HttpResponseMessage.Content.ReadAsStringAsync(cancellationToken);
-            log.StatusCode = responseModel.HttpResponseMessage.StatusCode.ToString();
+            log.StatusCode = MapStatusCodeToMessage(responseModel.HttpResponseMessage.StatusCode);
             log.RetryCount = responseModel.RetryCount;
             log.ResponseHeaders = responseModel.HttpResponseMessage.Headers.ToString();
             log.RequestHeaders = responseModel.HttpResponseMessage.RequestMessage.Headers.ToString();
@@ -28,4 +29,6 @@ public class WebhookLogFactory : IWebhookLogFactory
 
         return log;
     }
+
+    private string MapStatusCodeToMessage(HttpStatusCode statusCode) => $"{statusCode.ToString()} ({(int)statusCode})";
 }

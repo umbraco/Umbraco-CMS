@@ -2,10 +2,10 @@
   <div class="control-group">
     <div class="flex items-center">
       <div class="flx-g0 flx-s0" style="flex-basis: 40px;">
-        <umb-checkmark checked="true" size="m" style="cursor: default"></umb-checkmark>
-        <umb-icon icon="icon-wrong" class="umb-checkmark umb-checkmark--m" style="cursor: default;" ng-if="model.webhookLogEntry.response.isSuccess === false"></umb-icon>
+        <umb-checkmark checked="true" size="m" style="cursor: default" ng-if="model.log.statusCode === 'Ok (200)'"></umb-checkmark>
+        <umb-icon icon="icon-wrong" class="umb-checkmark umb-checkmark--m" style="cursor: default;" ng-if="model.log.statusCode !== 'Ok (200)'"></umb-icon>
       </div>
-      <div class="flx-g1 flx-s1 flx-b2" ng-if="model.webhookLogEntry.responseStatus.description || model.webhookLogEntry.response.statusCode">{{model.webhookLogEntry.response.statusDescription}} ({{model.webhookLogEntry.response.statusCode}})</div>
+      <div class="flx-g1 flx-s1 flx-b2">{{model.log.statusCode}}</div>
     </div>
   </div>
   <div class="control-group">
@@ -15,10 +15,6 @@
   <div class="control-group">
     <span class="bold">Url</span>
     <div class="controls controls-row">{{model.log.url}}</div>
-  </div>
-  <div class="control-group">
-    <span class="bold">Status code</span>
-    <div class="controls controls-row">{{model.log.statusCode}}</div>
   </div>
   <div class="control-group">
     <span class="bold">Event</span>
