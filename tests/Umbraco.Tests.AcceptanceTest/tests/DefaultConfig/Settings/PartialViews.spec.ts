@@ -1,4 +1,4 @@
-﻿import {AliasHelper, ConstantHelper, test} from '@umbraco/playwright-testhelpers';
+﻿import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
 test.describe('Partial Views tests', () => {
@@ -23,7 +23,8 @@ test.describe('Partial Views tests', () => {
     await page.locator('umb-tree-item', {hasText: 'Partial Views'}).getByLabel('Open actions menu').click({force: true});
     await page.getByLabel('New empty partial view').click();
     await page.getByLabel('template name').fill(partialViewName);
-    await page.waitForLoadState('networkidle');
+    // TODO: Remove this timeout when frontend validation is implemented
+    await page.waitForTimeout(1000);
     await page.getByLabel('Save').click();
 
     // Assert
@@ -46,7 +47,8 @@ test.describe('Partial Views tests', () => {
     await page.getByLabel('New partial view from snippet...').click();
     await page.getByLabel('Breadcrumb').click();
     await page.getByLabel('template name').fill(partialViewName);
-    await page.waitForLoadState('networkidle');
+    // TODO: Remove this timeout when frontend validation is implemented
+    await page.waitForTimeout(1000);
     await page.getByLabel('Save').click();
 
     // Assert
@@ -74,7 +76,8 @@ test('can update a partial view name', async ({page, umbracoApi}) => {
     //Act
     await gotoPartialViewDetail(page, partialViewFileName);
     await page.getByLabel('template name').fill(updatedPartialViewName);
-    await page.waitForLoadState('networkidle');
+    // TODO: Remove this timeout when frontend validation is implemented
+    await page.waitForTimeout(1000);
     await page.getByLabel('Save').click();
 
     // Assert
@@ -101,10 +104,11 @@ test('can update a partial view name', async ({page, umbracoApi}) => {
     await umbracoApi.partialView.create(partialViewFileName, "@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage\r\n", "/");
 
     //Act
-    gotoPartialViewDetail(page, partialViewFileName);
+    await gotoPartialViewDetail(page, partialViewFileName);
     await page.locator('textarea.inputarea').clear();
     await page.locator('textarea.inputarea').fill(updatedPartialViewContent);
-    await page.waitForLoadState('networkidle');
+    // TODO: Remove this timeout when frontend validation is implemented
+    await page.waitForTimeout(1000);
     await page.getByLabel('Save').click();
 
     // Assert
@@ -138,9 +142,10 @@ test('can update a partial view name', async ({page, umbracoApi}) => {
     await umbracoApi.partialView.create(partialViewFileName, "@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage\r\n", "/");
 
     // Act
-    gotoPartialViewDetail(page, partialViewFileName);
+    await gotoPartialViewDetail(page, partialViewFileName);
     await page.locator('#query-builder-button').getByLabel('Query builder').click({force:true});
-    await page.waitForLoadState('networkidle');
+    // TODO: Remove this timeout when frontend validation is implemented
+    await page.waitForTimeout(1000);
     await expect(page.locator('uui-modal-container[backdrop]')).toBeTruthy();
     await page.locator('#property-alias-dropdown').getByLabel('Property alias').click({force:true});
     await expect(page.locator('uui-popover[open]')).toBeTruthy();
@@ -170,10 +175,11 @@ test('can update a partial view name', async ({page, umbracoApi}) => {
     const partialViewContent = '@Umbraco.GetDictionaryValue("TestDictionary")@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage\r\n';
 
     // Act
-    gotoPartialViewDetail(page, partialViewFileName);
+    await gotoPartialViewDetail(page, partialViewFileName);
     await page.getByLabel('Choose value to insert').click();
     await page.getByLabel('Insert Dictionary item').click({force: true});
-    await page.waitForLoadState('networkidle');
+    // TODO: Remove this timeout when frontend validation is implemented
+    await page.waitForTimeout(1000);
     await page.locator('umb-tree-picker-modal').locator('#caret-button').click({force: true});
     await page.getByLabel(dictionaryName).click();
     await page.getByLabel('Submit').click();
@@ -215,7 +221,7 @@ test('can update a partial view name', async ({page, umbracoApi}) => {
     // Act
     await page.locator('umb-tree-item', {hasText: 'Partial Views'}).getByLabel('Open actions menu').click({force: true});
     await page.getByLabel('Create folder').click();
-    await page.getByRole('textbox', { name: 'Enter folder name...' }).fill('TestFolder');
+    await page.getByRole('textbox', { name: 'Enter folder name...' }).fill(folderName);
     await page.getByLabel('Create Folder', { exact: true }).click();
 
     // Assert
