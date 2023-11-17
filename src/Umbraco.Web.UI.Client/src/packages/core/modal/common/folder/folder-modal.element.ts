@@ -3,9 +3,8 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbFolderModalData, UmbFolderModalValue, UmbModalContext } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { IUmbFolderRepository } from '@umbraco-cms/backoffice/repository';
-import { createExtensionApi, ManifestBase } from '@umbraco-cms/backoffice/extension-api';
+import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { FolderResponseModel, ProblemDetails } from '@umbraco-cms/backoffice/backend-api';
-import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-folder-modal')
@@ -30,7 +29,6 @@ export class UmbFolderModalElement extends UmbLitElement {
 	#unique: string | null = null;
 	#parentUnique: string | null = null;
 	#folderRepository?: IUmbFolderRepository;
-	#repositoryObserver?: UmbObserverController<ManifestBase | undefined>;
 
 	@state()
 	_folder?: FolderResponseModel;
@@ -42,23 +40,12 @@ export class UmbFolderModalElement extends UmbLitElement {
 	_isNew = false;
 
 	#observeRepository() {
-		this.#repositoryObserver?.destroy();
 		if (!this.#repositoryAlias) return;
-		this.#repositoryObserver = this.observe(
-			umbExtensionsRegistry.getByTypeAndAlias('repository', this.#repositoryAlias),
-			async (repositoryManifest) => {
-				if (!repositoryManifest) return;
 
-				try {
-					// TODO: Maybe use the UmbExtensionApiController instead of createExtensionApi, to ensure usage of conditions:
-					const result = await createExtensionApi<IUmbFolderRepository>(repositoryManifest, [this]);
-					this.#folderRepository = result;
-					this.#init();
-				} catch (error) {
-					throw new Error('Could not create repository with alias: ' + this.#repositoryAlias + '');
-				}
-			},
-		);
+		new UmbExtensionApiInitializer(this, umbExtensionsRegistry, this.#repositoryAlias, [this], (permitted, ctrl) => {
+			this.#folderRepository = permitted ? (ctrl.api as IUmbFolderRepository) : undefined;
+			this.#init();
+		});
 	}
 
 	// TODO: so I ended up building a full workspace in the end. We should look into building the real workspace folder editor
