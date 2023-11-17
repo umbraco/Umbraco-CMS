@@ -78,6 +78,7 @@
                     case "css":
                         vm.language = "CSS";
                         break;
+                    case "js":
                     case "javascript":
                         vm.language = "JavaScript";
                       break;
