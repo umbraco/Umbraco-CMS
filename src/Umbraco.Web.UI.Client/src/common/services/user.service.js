@@ -231,7 +231,7 @@ angular.module('umbraco.services')
 
                 return authResource.performLogout()
                     .then(function (data) {
-                        userAuthExpired();
+                        userAuthExpired(true);
 
                         if (data && data.signOutRedirectUrl) {
                             $window.location.replace(data.signOutRedirectUrl);
