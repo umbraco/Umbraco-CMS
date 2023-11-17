@@ -62,8 +62,8 @@ export class UmbImportDictionaryModalLayout extends UmbModalBaseElement<
 
 	#dictionaryItemBuilder(htmlString: string) {
 		const parser = new DOMParser();
-		const doc = parser.parseFromString(htmlString, 'text/html');
-		const elements = doc.body.childNodes;
+		const doc = parser.parseFromString(htmlString, 'text/xml');
+		const elements = doc.childNodes;
 
 		this.#fileContent = this.#makeDictionaryItems(elements);
 		this.requestUpdate();
@@ -73,17 +73,18 @@ export class UmbImportDictionaryModalLayout extends UmbModalBaseElement<
 		const items: Array<DictionaryItemPreview> = [];
 		const list: Array<Element> = [];
 		nodeList.forEach((node) => {
-			if (node.nodeType === Node.ELEMENT_NODE) {
+			if (node.nodeType === Node.ELEMENT_NODE && node.nodeName === 'DictionaryItem') {
 				list.push(node as Element);
 			}
 		});
 
 		list.forEach((item) => {
 			items.push({
-				name: item.getAttribute('name') ?? '',
+				name: item.getAttribute('Name') ?? '',
 				children: this.#makeDictionaryItems(item.childNodes) ?? undefined,
 			});
 		});
+
 		return items;
 	}
 
@@ -144,10 +145,14 @@ export class UmbImportDictionaryModalLayout extends UmbModalBaseElement<
 				</div>
 				<div>
 					<strong><umb-localize key="actions_chooseWhereToImport">Choose where to import</umb-localize>:</strong>
-					<umb-dictionary-item-input
-						@change=${this.#onParentChange}
-						.selectedIds=${this._parentId ? [this._parentId] : []}
-						max="1"></umb-dictionary-item-input>
+					${
+						console.log('load')
+						//<umb-dictionary-item-input
+						//	@change=${this.#onParentChange}
+						//	.selectedIds=${this._parentId ? [this._parentId] : []}
+						//	max="1">
+						//	</umb-dictionary-item-input>
+					}
 				</div>
 
 				${this.#renderNavigate()}
