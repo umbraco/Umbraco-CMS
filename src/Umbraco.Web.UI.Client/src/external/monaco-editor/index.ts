@@ -1,4 +1,7 @@
 /* eslint local-rules/enforce-umbraco-external-imports: 0 */
+/**
+ * @TJS-ignore
+ */
 import styles from 'monaco-editor/min/vs/editor/editor.main.css?inline';
 //eslint-disable-next-line
 import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker.js?worker';

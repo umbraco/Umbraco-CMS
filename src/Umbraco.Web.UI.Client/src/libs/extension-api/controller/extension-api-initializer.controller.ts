@@ -1,9 +1,9 @@
 import { createExtensionApi } from '../functions/create-extension-api.function.js';
-import { UmbApi } from '../models/api.interface.js';
-import { UmbExtensionRegistry } from '../registry/extension.registry.js';
-import { ManifestApi, ManifestCondition } from '../types/index.js';
+import type { UmbApi } from '../models/api.interface.js';
+import type { UmbExtensionRegistry } from '../registry/extension.registry.js';
+import type { ManifestApi, ManifestCondition } from '../types/index.js';
 import { UmbBaseExtensionInitializer } from './base-extension-initializer.controller.js';
-import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
  * This Controller manages a single Extension and its API instance.
