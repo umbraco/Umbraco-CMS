@@ -13,6 +13,10 @@
     "SkipRestore": {
       "longName": "no-restore",
       "shortName": ""
+    },
+    "SupportPagesAndViews": {
+      "longName": "support-pages-and-views",
+      "shortName": "s"
     }
   }
 }

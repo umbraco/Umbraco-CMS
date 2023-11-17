@@ -9,7 +9,7 @@
     "Plugin"
   ],
   "name": "Umbraco Package",
-  "description": "An empty Umbraco package/plugin project ready to get started.",
+  "description": "An empty Umbraco package/plugin.",
   "groupIdentity": "Umbraco.Templates.UmbracoPackage",
   "identity": "Umbraco.Templates.UmbracoPackage.CSharp",
   "shortName": "umbracopackage",
@@ -51,39 +51,12 @@
       "datatype": "bool",
       "defaultValue": "false"
     },
-    "Namespace": {
-      "type": "derived",
-      "valueSource": "name",
-      "valueTransform": "safe_namespace",
-      "fileRename": "UmbracoPackage",
-      "replaces": "UmbracoPackage"
-    },
-    "MsBuildName": {
-      "type": "generated",
-      "generator": "regex",
-      "dataType": "string",
-      "parameters": {
-        "source": "name",
-        "steps": [
-          {
-            "regex": "\\s",
-            "replacement": ""
-          },
-          {
-            "regex": "\\.",
-            "replacement": ""
-          },
-          {
-            "regex": "-",
-            "replacement": ""
-          },
-          {
-            "regex": "^[^a-zA-Z_]+",
-            "replacement": ""
-          }
-        ]
-      },
-      "replaces": "UmbracoPackageMsBuild"
+    "SupportPagesAndViews": {
+      "type": "parameter",
+      "datatype": "bool",
+      "defaultValue": "false",
+      "displayName": "Support pages and views",
+      "description": "Whether to support adding traditional Razor pages and Views to this library."
     }
   },
   "primaryOutputs": [

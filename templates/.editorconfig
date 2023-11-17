@@ -1,0 +1,2 @@
+# Do not inherit customized EditorConfig for template content
+root = true
