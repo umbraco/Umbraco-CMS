@@ -15,9 +15,9 @@ export interface MetaPropertyEditorUi {
 	 * If not specified, the property editor UI will be grouped under "Common".
 	 * @default "Common"
 	 * @examples [
-	 *  "Common",
-	 * 	"Content",
-	 * 	"Media"
+	 * "Common",
+	 * "Content",
+	 * "Media"
 	 * ]
 	 */
 	group: string;
@@ -25,9 +25,9 @@ export interface MetaPropertyEditorUi {
 	 * The alias of the property editor schema that this property editor UI is for.
 	 * If not specified, the property editor UI can only be used to configure other property editors.
 	 * @examples [
-	 * 	"Umbraco.TextBox",
-	 * 	"Umbraco.TextArea",
-	 * 	"Umbraco.Label",
+	 * "Umbraco.TextBox",
+	 * "Umbraco.TextArea",
+	 * "Umbraco.Label",
 	 * ]
 	 */
 	propertyEditorSchemaAlias?: string;

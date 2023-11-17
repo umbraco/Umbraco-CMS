@@ -7,10 +7,10 @@ export interface ManifestKind<ManifestTypes> {
 	 * Provide pre defined properties for the extension manifest.
 	 * Define the `type`-property and other properties you like to preset for implementations of this kind.
 	 *
-	 * @examples {
-	 *		type: 'section',
-	 *		weight: 123,
-	 *	},
+	 * @example {
+	 *	type: 'section',
+	 * 	weight: 123,
+	 * }
 	 * @TJS-type object
 	 */
 	manifest: Partial<ManifestTypes>;
