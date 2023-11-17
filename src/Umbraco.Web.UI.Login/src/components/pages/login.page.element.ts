@@ -1,21 +1,21 @@
-import type { UUIButtonState } from '@umbraco-ui/uui';
-import { css, CSSResultGroup, html, LitElement, nothing } from 'lit';
-import { customElement, property, queryAssignedElements, state } from 'lit/decorators.js';
-import { when } from 'lit/directives/when.js';
-import { until } from 'lit/directives/until.js';
+import type {UUIButtonState} from '@umbraco-ui/uui';
+import {css, CSSResultGroup, html, LitElement, nothing} from 'lit';
+import {customElement, property, queryAssignedElements, state} from 'lit/decorators.js';
+import {when} from 'lit/directives/when.js';
+import {until} from 'lit/directives/until.js';
 
-import { umbAuthContext } from '../../context/auth.context.js';
-import { umbLocalizationContext } from '../../external/localization/localization-context.js';
+import {umbAuthContext} from '../../context/auth.context.js';
+import {umbLocalizationContext} from '../../external/localization/localization-context.js';
 
 @customElement('umb-login-page')
 export default class UmbLoginPageElement extends LitElement {
-  @property({ type: Boolean, attribute: 'username-is-email' })
+  @property({type: Boolean, attribute: 'username-is-email'})
   usernameIsEmail = false;
 
-  @queryAssignedElements({ flatten: true })
+  @queryAssignedElements({flatten: true})
   protected slottedElements?: HTMLFormElement[];
 
-  @property({ type: Boolean, attribute: 'allow-password-reset' })
+  @property({type: Boolean, attribute: 'allow-password-reset'})
   allowPasswordReset = false;
 
   @state()
@@ -32,7 +32,7 @@ export default class UmbLoginPageElement extends LitElement {
   #formElement?: HTMLFormElement;
 
   async #onSlotChanged() {
-    this.#formElement = this.slottedElements?.[0];
+    this.#formElement = this.slottedElements?.find((el) => el.id === 'umb-login-form');
 
     if (!this.#formElement) return;
 
@@ -71,12 +71,12 @@ export default class UmbLoginPageElement extends LitElement {
         umbAuthContext.twoFactorView = response.twoFactorView;
       }
 
-      this.dispatchEvent(new CustomEvent('umb-login-flow', { composed: true, detail: { flow: 'mfa' } }));
+      this.dispatchEvent(new CustomEvent('umb-login-flow', {composed: true, detail: {flow: 'mfa'}}));
       return;
     }
 
     if (response.error) {
-      this.dispatchEvent(new CustomEvent('umb-login-failed', { bubbles: true, composed: true, detail: response }));
+      this.dispatchEvent(new CustomEvent('umb-login-failed', {bubbles: true, composed: true, detail: response}));
       return;
     }
 
@@ -86,20 +86,8 @@ export default class UmbLoginPageElement extends LitElement {
       location.href = returnPath;
     }
 
-    this.dispatchEvent(new CustomEvent('umb-login-success', { bubbles: true, composed: true, detail: response.data }));
+    this.dispatchEvent(new CustomEvent('umb-login-success', {bubbles: true, composed: true, detail: response.data}));
   };
-
-  get #greetingLocalizationKey() {
-    return [
-      'login_greeting0',
-      'login_greeting1',
-      'login_greeting2',
-      'login_greeting3',
-      'login_greeting4',
-      'login_greeting5',
-      'login_greeting6',
-    ][new Date().getDay()];
-  }
 
   #onSubmitClick = () => {
     this.#formElement?.requestSubmit();
@@ -107,48 +95,50 @@ export default class UmbLoginPageElement extends LitElement {
 
   render() {
     return html`
-			<h1 id="greeting" class="uui-h3">
-				<umb-localize .key=${this.#greetingLocalizationKey}></umb-localize>
-			</h1>
-			<slot name="subheadline"></slot>
-			${this.disableLocalLogin
-      ? nothing
-      : html`
-						<slot @slotchange=${this.#onSlotChanged}></slot>
-						<div id="secondary-actions">
-							${when(
-        umbAuthContext.supportsPersistLogin,
-        () => html`<uui-form-layout-item>
-									<uui-checkbox
-										name="persist"
-										.label=${until(umbLocalizationContext.localize('user_rememberMe', undefined, 'Remember me'))}>
-										<umb-localize key="user_rememberMe">Remember me</umb-localize>
-									</uui-checkbox>
-								</uui-form-layout-item>`
-      )}
-							${when(
-        this.allowPasswordReset,
-        () =>
-          html`<button type="button" id="forgot-password" @click=${this.#handleForgottenPassword}>
-										<umb-localize key="login_forgottenPassword">Forgotten password?</umb-localize>
-									</button>`
-      )}
-						</div>
-						<uui-button
-							type="submit"
-							id="umb-login-button"
-							look="primary"
-              @click=${this.#onSubmitClick}
-							.label=${until(umbLocalizationContext.localize('general_login', undefined, 'Login'), 'Login')}
-							color="default"
-							.state=${this._loginState}></uui-button>
+      <h1 id="greeting">
+        <umb-localize key="general_welcome">Welcome</umb-localize>
+      </h1>
+      <slot name="subheadline"></slot>
+      ${this.disableLocalLogin
+        ? nothing
+        : html`
+          <slot @slotchange=${this.#onSlotChanged}></slot>
+          <div id="secondary-actions">
+            ${when(
+              umbAuthContext.supportsPersistLogin,
+              () => html`
+                <uui-form-layout-item>
+                  <uui-checkbox
+                    name="persist"
+                    .label=${until(umbLocalizationContext.localize('user_rememberMe', undefined, 'Remember me'))}>
+                    <umb-localize key="user_rememberMe">Remember me</umb-localize>
+                  </uui-checkbox>
+                </uui-form-layout-item>`
+            )}
+            ${when(
+              this.allowPasswordReset,
+              () =>
+                html`
+                  <button type="button" id="forgot-password" @click=${this.#handleForgottenPassword}>
+                    <umb-localize key="login_forgottenPassword">Forgotten password?</umb-localize>
+                  </button>`
+            )}
+          </div>
+          <uui-button
+            type="submit"
+            id="umb-login-button"
+            look="primary"
+            @click=${this.#onSubmitClick}
+            .label=${until(umbLocalizationContext.localize('general_login', undefined, 'Login'), 'Login')}
+            color="default"
+            .state=${this._loginState}></uui-button>
 
-						${this.#renderErrorMessage()}
-				  `}
-			<umb-external-login-providers-layout .showDivider=${!this.disableLocalLogin}>
-				<slot name="external"></slot>
-			</umb-external-login-providers-layout>
-		`;
+          ${this.#renderErrorMessage()}
+        `}
+      <umb-external-login-providers-layout .showDivider=${!this.disableLocalLogin}>
+        <slot name="external"></slot>
+      </umb-external-login-providers-layout>
+    `;
   }
 
   #renderErrorMessage() {
@@ -158,7 +148,7 @@ export default class UmbLoginPageElement extends LitElement {
   }
 
   #handleForgottenPassword() {
-    this.dispatchEvent(new CustomEvent('umb-login-flow', { composed: true, detail: { flow: 'reset' } }));
+    this.dispatchEvent(new CustomEvent('umb-login-flow', {composed: true, detail: {flow: 'reset'}}));
   }
 
   static styles: CSSResultGroup = [
@@ -172,7 +162,7 @@ export default class UmbLoginPageElement extends LitElement {
         color: var(--uui-color-interactive);
         text-align: center;
         font-weight: 400;
-        font-size: 1.5rem;
+        font-size: var(--header-font-size);
         margin: 0 0 var(--uui-size-layout-1);
         line-height: 1.2;
       }
@@ -180,8 +170,6 @@ export default class UmbLoginPageElement extends LitElement {
       #umb-login-button {
         margin-top: var(--uui-size-space-4);
         width: 100%;
-        --uui-button-padding-top-factor: 1.5;
-        --uui-button-padding-bottom-factor: 1.5;
       }
 
       #forgot-password {
@@ -197,10 +185,16 @@ export default class UmbLoginPageElement extends LitElement {
         line-height: 1;
         font-size: 14px;
         font-family: var(--uui-font-family);
+        margin-left: auto;
+        margin-bottom: var(--uui-size-space-3);
       }
 
       #forgot-password:hover {
         color: var(--uui-color-interactive-emphasis);
+      }
+
+      .text-error {
+        margin-top: var(--uui-size-space-4);
       }
 
       .text-danger {

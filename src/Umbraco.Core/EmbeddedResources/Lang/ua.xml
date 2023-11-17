@@ -574,7 +574,7 @@
     <key alias="username">Ім'я користувача</key>
     <key alias="value">Значення</key>
     <key alias="view">Перегляд</key>
-    <key alias="welcome">Ласкаво просимо...</key>
+    <key alias="welcome">Ласкаво просимо</key>
     <key alias="width">Ширина</key>
     <key alias="yes">Так</key>
     <key alias="reorder">Пересортувати</key>

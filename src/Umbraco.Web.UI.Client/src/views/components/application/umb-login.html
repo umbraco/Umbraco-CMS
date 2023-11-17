@@ -1,8 +1,9 @@
 <div class="login-overlay">
     <div id="login" class="umb-modalcolumn umb-dialog" ng-cloak>
         <umb-auth
-            logo-image="{{ ::vm.logoImage }}"
-            background-image="{{ ::vm.backgroundImage }}"
+            ng-attr-logo-image="{{ ::vm.logoImage }}"
+            ng-attr-logo-image-alternative="{{ ::vm.logoImageAlternative }}"
+            ng-attr-background-image="{{ ::vm.backgroundImage }}"
             ng-attr-username-is-email="{{ ::vm.usernameIsEmail || undefined }}"
             ng-attr-allow-password-reset="{{ ::vm.allowPasswordReset || undefined }}"
             ng-attr-disable-local-login="{{ ::vm.disableLocalLogin || undefined }}"
@@ -15,13 +16,13 @@
             <umb-external-login-provider
                 ng-repeat="login in vm.externalLoginProviders"
                 slot="external"
-                display-name="{{ ::login.caption }}"
-                provider-name="{{ ::login.authType }}"
+                ng-attr-display-name="{{ ::login.caption }}"
+                ng-attr-provider-name="{{ ::login.authType }}"
                 ng-attr-custom-view="{{ ::login.customView }}"
                 ng-attr-icon="{{ ::login.options.icon }}"
                 external-login-url="{{ ::vm.externalLoginFormAction }}"
-                button-look="{{ ::login.options.buttonLook }}"
-                button-color="{{ ::login.options.buttonColor }}"
+                ng-attr-button-look="{{ ::login.options.buttonLook }}"
+                ng-attr-button-color="{{ ::login.options.buttonColor }}"
             ></umb-external-login-provider>
         </umb-auth>
     </div>

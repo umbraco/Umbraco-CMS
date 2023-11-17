@@ -823,7 +823,7 @@
     <key alias="username">Gebruikersnaam</key>
     <key alias="value">Waarde</key>
     <key alias="view">Bekijk</key>
-    <key alias="welcome">Welkom...</key>
+    <key alias="welcome">Welkom</key>
     <key alias="width">Breedte</key>
     <key alias="yes">Ja</key>
     <key alias="folder">Map</key>

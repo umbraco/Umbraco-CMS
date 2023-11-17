@@ -38,8 +38,9 @@ export const handlers = [
 	rest.post('backoffice/umbracoapi/authentication/PostVerify2faCode', async (req, res, ctx) => {
 		const body = await req.json();
 		if (body.code === 'fail') {
-			return res(ctx.delay(), ctx.status(400), ctx.json({ message: 'Invalid code' }));
+			return res(ctx.delay(), ctx.status(400), ctx.json({ Message: 'Invalid code' }));
 		}
-		return res(ctx.delay(), ctx.status(200));
+    const user = umbLoginData.users[0];
+		return res(ctx.delay(), ctx.status(200), ctx.json(user));
 	}),
 ];
