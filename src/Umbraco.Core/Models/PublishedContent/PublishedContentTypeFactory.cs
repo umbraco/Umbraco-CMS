@@ -73,11 +73,11 @@ public class PublishedContentTypeFactory : IPublishedContentTypeFactory
     }
 
     /// <inheritdoc />
-    public void NotifyDataTypeChanges(int[] ids)
+    public void NotifyDataTypeChanges(params int[] ids)
     {
         lock (_publishedDataTypesLocker)
         {
-            if (_publishedDataTypes == null)
+            if (_publishedDataTypes == null || ids.Length == 0)
             {
                 IEnumerable<IDataType> dataTypes = _dataTypeService.GetAll();
                 _publishedDataTypes = dataTypes.ToDictionary(x => x.Id, CreatePublishedDataType);
