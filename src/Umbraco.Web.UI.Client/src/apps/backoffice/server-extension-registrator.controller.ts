@@ -40,6 +40,7 @@ export class UmbServerExtensionRegistrator extends UmbBaseController {
 						 * need to load any other types of extensions in the backoffice (we need a js file to load)
 						 */
 
+						// TODO: add helper to check for relative paths
 						// Add base url if the js path is relative
 						if ('js' in e && typeof e.js === 'string' && !e.js.startsWith('http')) {
 							e.js = `${this.#apiBaseUrl}${e.js}`;
