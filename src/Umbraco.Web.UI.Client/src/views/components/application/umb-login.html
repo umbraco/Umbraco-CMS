@@ -9,9 +9,9 @@
             return-url=""
             ng-on-umb-login-success="vm.onLoginSuccess($event)"
         >
-            <p ng-if="vm.isTimedOut" slot="subheadline">
-                <localize key="login_timeout">Log in below</localize>.
-            </p>
+            <span ng-if="vm.isTimedOut" slot="subheadline">
+                <umb-localize key="login_timeout">Log in below</umb-localize>.
+            </span>
             <umb-external-login-provider
                 ng-repeat="login in vm.externalLoginProviders"
                 slot="external"
