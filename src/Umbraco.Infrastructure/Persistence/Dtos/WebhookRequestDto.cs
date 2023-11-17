@@ -20,6 +20,7 @@ public class WebhookRequestDto
     public string Alias { get; set; } = string.Empty;
 
     [Column(Name = "requestObject")]
+    [SpecialDbType(SpecialDbTypes.NVARCHARMAX)]
     [NullSetting(NullSetting = NullSettings.Null)]
     public string? RequestObject { get; set; }
 
