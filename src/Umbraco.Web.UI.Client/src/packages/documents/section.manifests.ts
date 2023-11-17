@@ -1,4 +1,4 @@
-import { DOCUMENT_ROOT_ENTITY_TYPE } from './documents/index.js';
+import { UMB_DOCUMENT_ROOT_ENTITY_TYPE, UMB_CONTENT_MENU_ALIAS } from './documents/index.js';
 import type {
 	ManifestSectionSidebarAppMenuWithEntityActionsKind,
 	ManifestTypes,
@@ -25,8 +25,8 @@ const menuSectionSidebarApp: ManifestSectionSidebarAppMenuWithEntityActionsKind 
 	weight: 100,
 	meta: {
 		label: 'Content',
-		menu: 'Umb.Menu.Content',
-		entityType: DOCUMENT_ROOT_ENTITY_TYPE,
+		menu: UMB_CONTENT_MENU_ALIAS,
+		entityType: UMB_DOCUMENT_ROOT_ENTITY_TYPE,
 	},
 	conditions: [
 		{

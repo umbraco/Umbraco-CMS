@@ -1,4 +1,4 @@
-import { MEDIA_REPOSITORY_ALIAS } from './media/repository/manifests.js';
+import { UMB_MEDIA_REPOSITORY_ALIAS } from './media/repository/manifests.js';
 import type {
 	ManifestDashboardCollection,
 	ManifestSection,
@@ -28,7 +28,7 @@ const dashboards: Array<ManifestDashboardCollection> = [
 		meta: {
 			label: 'Media',
 			pathname: 'media-management',
-			repositoryAlias: MEDIA_REPOSITORY_ALIAS,
+			repositoryAlias: UMB_MEDIA_REPOSITORY_ALIAS,
 		},
 		conditions: {
 			sections: [sectionAlias],

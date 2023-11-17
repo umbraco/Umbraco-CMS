@@ -8,7 +8,7 @@ import {
 	UmbSectionViewExtensionElement,
 	umbExtensionsRegistry,
 } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbExtensionsManifestController, createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
+import { UmbExtensionsManifestInitializer, createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { pathFolderName } from '@umbraco-cms/backoffice/utils';
 
@@ -36,12 +36,12 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		new UmbExtensionsManifestController(this, umbExtensionsRegistry, 'dashboard', null, (dashboards) => {
+		new UmbExtensionsManifestInitializer(this, umbExtensionsRegistry, 'dashboard', null, (dashboards) => {
 			this._dashboards = dashboards.map((dashboard) => dashboard.manifest);
 			this.#createRoutes();
 		});
 
-		new UmbExtensionsManifestController(this, umbExtensionsRegistry, 'sectionView', null, (views) => {
+		new UmbExtensionsManifestInitializer(this, umbExtensionsRegistry, 'sectionView', null, (views) => {
 			this._views = views.map((view) => view.manifest);
 			this.#createRoutes();
 		});

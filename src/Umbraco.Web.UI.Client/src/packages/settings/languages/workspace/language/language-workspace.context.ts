@@ -1,12 +1,12 @@
 import { UmbLanguageRepository } from '../../repository/language.repository.js';
-import { UmbSaveableWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
+import { UmbSaveableWorkspaceContextInterface, UmbEditableWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
 import { ApiError, LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 export class UmbLanguageWorkspaceContext
-	extends UmbWorkspaceContext<UmbLanguageRepository, LanguageResponseModel>
+	extends UmbEditableWorkspaceContextBase<UmbLanguageRepository, LanguageResponseModel>
 	implements UmbSaveableWorkspaceContextInterface
 {
 	#data = new UmbObjectState<LanguageResponseModel | undefined>(undefined);

@@ -1,4 +1,4 @@
-import { DATA_TYPE_FOLDER_ENTITY_TYPE, DATA_TYPE_ENTITY_TYPE } from '../entities.js';
+import { DATA_TYPE_FOLDER_ENTITY_TYPE, DATA_TYPE_ENTITY_TYPE } from '../entity.js';
 import { DATA_TYPE_DETAIL_REPOSITORY_ALIAS } from '../repository/detail/manifests.js';
 import { manifests as createManifests } from './create/manifests.js';
 import { manifests as moveManifests } from './move/manifests.js';

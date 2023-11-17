@@ -5,7 +5,7 @@ const manifest: ManifestPropertyEditorUi = {
 	type: 'propertyEditorUi',
 	alias: 'Umb.PropertyEditorUi.TreePicker',
 	name: 'Tree Picker Property Editor UI',
-	loader: () => import('./property-editor-ui-tree-picker.element.js'),
+	js: () => import('./property-editor-ui-tree-picker.element.js'),
 	meta: {
 		label: 'Tree Picker',
 		icon: 'icon-page-add',

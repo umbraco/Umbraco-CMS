@@ -1,4 +1,4 @@
-import { UmbPartialViewsRepository } from '../../repository/index.js';
+import { UmbPartialViewRepository } from '../../repository/index.js';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_MODAL_MANAGER_CONTEXT_TOKEN, UmbModalManagerContext, UmbModalToken } from '@umbraco-cms/backoffice/modal';
@@ -19,7 +19,7 @@ export const UMB_PARTIAL_VIEW_FROM_SNIPPET_MODAL = new UmbModalToken<UmbCreateFr
 
 export class UmbCreateFromSnippetPartialViewAction<
 	T extends { copy(): Promise<void> },
-> extends UmbEntityActionBase<UmbPartialViewsRepository> {
+> extends UmbEntityActionBase<UmbPartialViewRepository> {
 	constructor(host: UmbControllerHostElement, repositoryAlias: string, unique: string) {
 		super(host, repositoryAlias, unique);
 

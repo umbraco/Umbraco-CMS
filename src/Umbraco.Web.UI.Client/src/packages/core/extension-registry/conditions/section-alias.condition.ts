@@ -29,8 +29,7 @@ export type SectionAliasConditionConfig = UmbConditionConfigBase<'Umb.Condition.
 	/**
 	 * Define the section that this extension should be available in
 	 *
-	 * @example
-	 * "Umb.Section.Content"
+	 * @example "Umb.Section.Content"
 	 */
 	match: string;
 };

@@ -3,7 +3,7 @@ import {
 	UMB_STYLESHEET_FOLDER_EMPTY_ENTITY_TYPE,
 	UMB_STYLESHEET_FOLDER_ENTITY_TYPE,
 	UMB_STYLESHEET_ROOT_ENTITY_TYPE,
-} from '../entity-type.js';
+} from '../entity.js';
 
 import { UMB_STYLESHEET_REPOSITORY_ALIAS } from '../repository/index.js';
 import { UmbCreateRTFStylesheetAction } from './create/create-rtf.action.js';

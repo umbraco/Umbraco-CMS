@@ -1,31 +1,21 @@
-import type { MediaDetails } from '../index.js';
-import { UmbMediaTreeServerDataSource } from './sources/media.tree.server.data.js';
-import { UmbMediaTreeStore, UMB_MEDIA_TREE_STORE_CONTEXT_TOKEN } from './media.tree.store.js';
-import { UmbMediaStore, UMB_MEDIA_STORE_CONTEXT_TOKEN } from './media.store.js';
-import { UmbMediaDetailServerDataSource } from './sources/media.detail.server.data.js';
-import { UmbMediaItemServerDataSource } from './sources/media-item.server.data.js';
+import type { UmbMediaDetailModel } from '../index.js';
+import { UMB_MEDIA_TREE_STORE_CONTEXT, type UmbMediaTreeStore } from '../tree/index.js';
+import { UMB_MEDIA_STORE_CONTEXT, UmbMediaStore } from './media.store.js';
+import { UmbMediaDetailServerDataSource } from './sources/media-detail.server.data-source.js';
+import { UmbMediaItemServerDataSource } from './sources/media-item.server.data-source.js';
 import { UmbMediaItemStore } from './media-item.store.js';
-import type { UmbTreeRepository, UmbTreeDataSource } from '@umbraco-cms/backoffice/tree';
 import { UmbBaseController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import {
-	CreateMediaRequestModel,
-	EntityTreeItemResponseModel,
-	UpdateMediaRequestModel,
-} from '@umbraco-cms/backoffice/backend-api';
+import { CreateMediaRequestModel, UpdateMediaRequestModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
 export class UmbMediaRepository
 	extends UmbBaseController
-	implements
-		UmbTreeRepository<EntityTreeItemResponseModel>,
-		UmbDetailRepository<CreateMediaRequestModel, any, UpdateMediaRequestModel, MediaDetails>,
-		UmbApi
+	implements UmbDetailRepository<CreateMediaRequestModel, any, UpdateMediaRequestModel, UmbMediaDetailModel>, UmbApi
 {
 	#init;
 
-	#treeSource: UmbTreeDataSource;
 	#treeStore?: UmbMediaTreeStore;
 
 	#detailDataSource: UmbMediaDetailServerDataSource;
@@ -40,20 +30,19 @@ export class UmbMediaRepository
 		super(host);
 
 		// TODO: figure out how spin up get the correct data source
-		this.#treeSource = new UmbMediaTreeServerDataSource(this);
 		this.#detailDataSource = new UmbMediaDetailServerDataSource(this);
 		this.#itemSource = new UmbMediaItemServerDataSource(this);
 
 		this.#init = Promise.all([
-			this.consumeContext(UMB_MEDIA_TREE_STORE_CONTEXT_TOKEN, (instance) => {
+			this.consumeContext(UMB_MEDIA_TREE_STORE_CONTEXT, (instance) => {
 				this.#treeStore = instance;
 			}).asPromise(),
 
-			this.consumeContext(UMB_MEDIA_STORE_CONTEXT_TOKEN, (instance) => {
+			this.consumeContext(UMB_MEDIA_STORE_CONTEXT, (instance) => {
 				this.#store = instance;
 			}).asPromise(),
 
-			this.consumeContext(UMB_MEDIA_TREE_STORE_CONTEXT_TOKEN, (instance) => {
+			this.consumeContext(UMB_MEDIA_TREE_STORE_CONTEXT, (instance) => {
 				this.#itemStore = instance;
 			}).asPromise(),
 
@@ -61,73 +50,6 @@ export class UmbMediaRepository
 				this.#notificationContext = instance;
 			}).asPromise(),
 		]);
-	}
-
-	// TREE:
-	async requestTreeRoot() {
-		await this.#init;
-
-		const data = {
-			id: null,
-			type: 'media-root',
-			name: 'Media',
-			icon: 'icon-folder',
-			hasChildren: true,
-		};
-
-		return { data };
-	}
-
-	async requestRootTreeItems() {
-		await this.#init;
-
-		const { data, error } = await this.#treeSource.getRootItems();
-
-		if (data) {
-			this.#treeStore?.appendItems(data.items);
-		}
-
-		return { data, error, asObservable: () => this.#treeStore!.rootItems };
-	}
-
-	async requestTreeItemsOf(parentId: string | null) {
-		await this.#init;
-		if (parentId === undefined) throw new Error('Parent id is missing');
-
-		const { data, error } = await this.#treeSource.getChildrenOf(parentId);
-
-		if (data) {
-			this.#treeStore?.appendItems(data.items);
-		}
-
-		return { data, error, asObservable: () => this.#treeStore!.childrenOf(parentId) };
-	}
-
-	async requestItemsLegacy(ids: Array<string>) {
-		await this.#init;
-
-		if (!ids) {
-			throw new Error('Ids are missing');
-		}
-
-		const { data, error } = await this.#treeSource.getItems(ids);
-
-		return { data, error, asObservable: () => this.#treeStore!.items(ids) };
-	}
-
-	async rootTreeItems() {
-		await this.#init;
-		return this.#treeStore!.rootItems;
-	}
-
-	async treeItemsOf(parentId: string | null) {
-		await this.#init;
-		return this.#treeStore!.childrenOf(parentId);
-	}
-
-	async itemsLegacy(ids: Array<string>) {
-		await this.#init;
-		return this.#treeStore!.items(ids);
 	}
 
 	// ITEMS:
@@ -210,7 +132,6 @@ export class UmbMediaRepository
 			// TODO: we currently don't use the detail store for anything.
 			// Consider to look up the data before fetching from the server
 			// Consider notify a workspace if a template is updated in the store while someone is editing it.
-			// TODO: would be nice to align the stores on methods/methodNames.
 			// this.#store?.append(updatedMediaItem);
 			// this.#treeStore?.updateItem(id, updatedItem);
 
@@ -239,9 +160,8 @@ export class UmbMediaRepository
 		// TODO: we currently don't use the detail store for anything.
 		// Consider to look up the data before fetching from the server.
 		// Consider notify a workspace if a template is deleted from the store while someone is editing it.
-		this.#store?.remove([id]);
+		this.#store?.removeItem(id);
 		this.#treeStore?.removeItem(id);
-		// TODO: would be nice to align the stores on methods/methodNames.
 
 		return { error };
 	}

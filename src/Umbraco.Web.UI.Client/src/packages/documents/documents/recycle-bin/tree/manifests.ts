@@ -1,4 +1,4 @@
-import { UMB_DOCUMENT_RECYCLE_BIN_ENTITY_TYPE, UMB_DOCUMENT_RECYCLE_BIN_ROOT_ENTITY_TYPE } from '../entities.js';
+import { UMB_DOCUMENT_RECYCLE_BIN_ENTITY_TYPE, UMB_DOCUMENT_RECYCLE_BIN_ROOT_ENTITY_TYPE } from '../entity.js';
 import { UmbDocumentRecycleBinTreeRepository } from './document-recycle-bin-tree.repository.js';
 import { UmbDocumentRecycleBinTreeStore } from './document-recycle-bin-tree.store.js';
 import type {

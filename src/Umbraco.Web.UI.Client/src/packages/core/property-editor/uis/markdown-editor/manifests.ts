@@ -4,7 +4,7 @@ export const manifest: ManifestPropertyEditorUi = {
 	type: 'propertyEditorUi',
 	alias: 'Umb.PropertyEditorUi.MarkdownEditor',
 	name: 'Markdown Editor Property Editor UI',
-	loader: () => import('./property-editor-ui-markdown-editor.element.js'),
+	js: () => import('./property-editor-ui-markdown-editor.element.js'),
 	meta: {
 		label: 'Markdown Editor',
 		propertyEditorSchemaAlias: 'Umbraco.MarkdownEditor',

@@ -11,7 +11,7 @@ import {
 	PagedDocumentTypeResponseModel,
 	PagedRecycleBinItemResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
-import { DOCUMENT_ENTITY_TYPE } from '@umbraco-cms/backoffice/document';
+import { UMB_DOCUMENT_ENTITY_TYPE } from '@umbraco-cms/backoffice/document';
 
 export const data: Array<DocumentResponseModel> = [
 	{
@@ -767,7 +767,7 @@ class UmbDocumentData extends UmbEntityData<DocumentResponseModel> {
 			.getAll()
 			.items.filter(
 				(permission: any) =>
-					permission.target.entityType === DOCUMENT_ENTITY_TYPE && permission.target.documentId === id,
+					permission.target.entityType === UMB_DOCUMENT_ENTITY_TYPE && permission.target.documentId === id,
 			);
 	}
 }

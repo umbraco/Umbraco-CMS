@@ -41,27 +41,24 @@ ResultType extends BaseType = BaseType> {
 	) {
 		this.#contextAlias = contextAlias.toString();
 		this.#callback = callback;
-		this.#discriminator = (contextAlias as any).getDiscriminator?.();
+		this.#discriminator = (contextAlias as UmbContextToken<BaseType, ResultType>).getDiscriminator?.();
 	}
-
-
-	/* Idea: Niels: If we need to filter for specific contexts, we could make the response method return true/false. If false, the event should then then not be stopped. Alternatively parse the event it self on to the response-callback.
-	This will enable the event to continue to bubble up finding a context that matches.
-	The reason for such would be to have some who are more specific than others. For example, some might just need the current workspace-context, others might need the closest handling a certain entityType.
-	As I'm writing this is not relevant, but I wanted to keep the idea as we have had some circumstance that might be solved with this approach.
-	*/
-	protected _onResponse = (instance: BaseType) => {
+	
+	protected _onResponse = (instance: BaseType): boolean => {
 		if (this.#instance === instance) {
-			return;
+			return false;
 		}
 		if(this.#discriminator) {
 			// Notice if discriminator returns false, we do not want to setInstance.
 			if(this.#discriminator(instance)) {
 				this.setInstance(instance as unknown as ResultType);
+				return true;
 			}
 		} else {
 			this.setInstance(instance as ResultType);
+			return true;
 		}
+		return false;
 	};
 
 	protected setInstance(instance: ResultType) {

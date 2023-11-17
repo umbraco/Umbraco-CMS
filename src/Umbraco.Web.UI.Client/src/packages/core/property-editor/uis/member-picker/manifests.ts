@@ -4,7 +4,7 @@ export const manifest: ManifestPropertyEditorUi = {
 	type: 'propertyEditorUi',
 	alias: 'Umb.PropertyEditorUi.MemberPicker',
 	name: 'Member Picker Property Editor UI',
-	loader: () => import('./property-editor-ui-member-picker.element.js'),
+	js: () => import('./property-editor-ui-member-picker.element.js'),
 	meta: {
 		label: 'Member Picker',
 		propertyEditorSchemaAlias: 'Umbraco.MemberPicker',

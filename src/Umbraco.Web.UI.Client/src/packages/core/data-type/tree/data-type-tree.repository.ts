@@ -1,5 +1,5 @@
 import { UmbTreeRepositoryBase } from '../../tree/tree-repository-base.js';
-import { DATA_TYPE_ROOT_ENTITY_TYPE } from '../entities.js';
+import { DATA_TYPE_ROOT_ENTITY_TYPE } from '../entity.js';
 import { UmbDataTypeTreeServerDataSource } from './data-type.tree.server.data.js';
 import { UMB_DATA_TYPE_TREE_STORE_CONTEXT } from './data-type.tree.store.js';
 import { UmbDataTypeTreeItemModel, UmbDataTypeTreeRootModel } from './types.js';

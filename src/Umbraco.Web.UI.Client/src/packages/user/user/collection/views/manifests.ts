@@ -5,31 +5,33 @@ const tableCollectionView: ManifestCollectionView = {
 	type: 'collectionView',
 	alias: 'Umb.CollectionView.UserTable',
 	name: 'User Table Collection Collection View',
-	loader: () => import('./table/user-table-collection-view.element.js'),
+	js: () => import('./table/user-table-collection-view.element.js'),
 	meta: {
 		label: 'Table',
 		icon: 'icon-box',
 		pathName: 'table',
 	},
-	conditions: {
-		entityType: UMB_USER_ENTITY_TYPE,
-	},
+	conditions: [{
+		alias: 'Umb.Condition.WorkspaceEntityType',
+		match: UMB_USER_ENTITY_TYPE,
+	}],
 };
 
 const gridCollectionView: ManifestCollectionView = {
 	type: 'collectionView',
 	alias: 'Umb.CollectionView.UserGrid',
 	name: 'Media Table Collection View',
-	loader: () => import('./grid/user-grid-collection-view.element.js'),
+	js: () => import('./grid/user-grid-collection-view.element.js'),
 	weight: 200,
 	meta: {
 		label: 'Grid',
 		icon: 'icon-grid',
 		pathName: 'grid',
 	},
-	conditions: {
-		entityType: UMB_USER_ENTITY_TYPE,
-	},
+	conditions: [{
+		alias: 'Umb.Condition.WorkspaceEntityType',
+		match: UMB_USER_ENTITY_TYPE,
+	}],
 };
 
 export const manifests = [tableCollectionView, gridCollectionView];

@@ -5,6 +5,6 @@ export const extensions = [
 		name: 'Tags Management Bundle',
 		alias: 'Umb.Bundle.TagsManagement',
 		type: 'bundle',
-		loader: () => import('./manifests.js'),
+		js: () => import('./manifests.js'),
 	},
 ];

@@ -1,6 +1,6 @@
 import {
+	UmbContextRequestEvent,
 	umbContextRequestEventType,
-	isUmbContextRequestEvent,
 	umbDebugContextEventType,
 } from '../consume/context-request.event.js';
 import { UmbContextToken } from '../token/context-token.js';
@@ -46,13 +46,17 @@ export class UmbContextProvider<BaseType = unknown, ResultType extends BaseType 
 	 * @param {UmbContextRequestEvent} event
 	 * @memberof UmbContextProvider
 	 */
-	#handleContextRequest = (event: Event) => {
-		if (!isUmbContextRequestEvent(event)) return;
+	#handleContextRequest = ((event: UmbContextRequestEvent) => {
 		if (event.contextAlias !== this._contextAlias) return;
 
+		// Since the alias matches, we will stop it from bubbling further up. But we still allow it to ask the other Contexts of the element. Hence not calling `event.stopImmediatePropagation();`
 		event.stopPropagation();
-		event.callback(this.#instance);
-	};
+
+		if(event.callback(this.#instance)) {
+			// Make sure the event not hits any more Contexts as we have found a match.
+			event.stopImmediatePropagation();
+		}
+	}) as EventListener;
 
 	/**
 	 * @memberof UmbContextProvider
