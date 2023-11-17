@@ -6,7 +6,9 @@ import {loadCustomView, renderCustomView} from "../utils/load-custom-view.functi
 @customElement('umb-custom-view')
 export default class UmbCustomViewElement extends LitElement {
   @property({ attribute: 'custom-view' })
-  customView?: string;
+  set customView (view: string) {
+    this.#loadView(view);
+  }
 
   @property({ attribute: 'args' })
   args?: any;
@@ -14,19 +16,12 @@ export default class UmbCustomViewElement extends LitElement {
   @state()
   protected component: any = null;
 
-  attributeChangedCallback(name: string, _old: string | null, value: string | null) {
-    super.attributeChangedCallback(name, _old, value);
-    if (name === 'custom-view') {
-      this.#loadView();
-    }
-  }
-
-  async #loadView() {
-    if (!this.customView || !this.customView.endsWith('.js') && !this.customView.endsWith('.html')) {
+  async #loadView(view: string) {
+    if (!view || !view.endsWith('.js') && !view.endsWith('.html')) {
       return;
     }
 
-    const customView = await loadCustomView(this.customView);
+    const customView = await loadCustomView(view);
 
     if (this.args) {
       Object.entries(this.args).forEach(([key, value]) => {
