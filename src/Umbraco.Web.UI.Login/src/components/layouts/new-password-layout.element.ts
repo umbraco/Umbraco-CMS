@@ -97,17 +97,20 @@ export default class UmbNewPasswordLayoutElement extends LitElement {
     if (this.userName) {
       return html`
         <h1>Hi, ${this.userName}</h1>
-        <umb-localize key="user_userinviteWelcomeMessage">
-          Welcome to Umbraco! Just need to get your password setup and then you're good to go
-        </umb-localize
-        >
+        <span>
+          <umb-localize key="user_userinviteWelcomeMessage">
+            Welcome to Umbraco! Just need to get your password setup and then you're good to go
+          </umb-localize>
+        </span>
       `;
     } else {
       return html`
         <h1>
           <umb-localize key="user_newPassword">New password</umb-localize>
         </h1>
-        <umb-localize key="login_setPasswordInstruction">Please provide a new password.</umb-localize>
+        <span>
+            <umb-localize key="login_setPasswordInstruction">Please provide a new password.</umb-localize>
+        </span>
       `;
     }
   }
@@ -191,6 +194,7 @@ export default class UmbNewPasswordLayoutElement extends LitElement {
         font-weight: 400;
         font-size: var(--header-secondary-font-size);
         color: var(--uui-color-interactive);
+        line-height: 1;
       }
 
       form {

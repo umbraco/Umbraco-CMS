@@ -11,10 +11,10 @@ export default class UmbErrorLayoutElement extends LitElement {
 
 	render() {
 		return html`
-			<div id="header">
+			<header id="header">
 				<h1>${this.header}</h1>
 				<span>${this.message}</span>
-			</div>
+			</header>
 			<slot></slot>
 			<umb-back-to-login-button></umb-back-to-login-button>
 		`;
@@ -42,6 +42,7 @@ export default class UmbErrorLayoutElement extends LitElement {
 				font-weight: 400;
 				font-size: var(--header-secondary-font-size);
 				color: var(--uui-color-interactive);
+        line-height: 1;
 			}
 			::slotted(uui-button) {
 				width: 100%;
