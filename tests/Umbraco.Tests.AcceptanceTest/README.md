@@ -4,7 +4,7 @@ You can watch a video following these instructions [here](https://www.youtube.co
 
 ### Prerequisites
 - NodeJS 16+
-- A running installed Umbraco on url: [https://localhost:44331](https://localhost:44331) (Default development port)
+- A running installed Umbraco on url: [https://localhost:44339](https://localhost:44339) (Default development port)
    - Install using a `SqlServer`/`LocalDb` as the tests execute too fast for `Sqlite` to handle.
 
 ### Getting started
@@ -54,7 +54,7 @@ The file has the following content:
 ```
 UMBRACO_USER_LOGIN=email for superadmin
 UMBRACO_USER_PASSWORD=password for superadmin
-URL=https://localhost:44331
+URL=https://localhost:44339
 ```
 You can change this if you like or run the config script to reset the values, type "npm run config" in your terminal.
 
