@@ -3,39 +3,41 @@ import { customElement, property } from 'lit/decorators.js';
 
 @customElement('umb-error-layout')
 export default class UmbErrorLayoutElement extends LitElement {
-	@property({ type: String })
-	header = '';
+  @property({ type: String })
+  header = '';
 
-	@property({ type: String })
-	message = '';
+  @property({ type: String })
+  message = '';
 
-	render() {
-		return html`
-			<header id="header">
-				<h1>${this.header}</h1>
-				<span>${this.message}</span>
-			</header>
-			<slot></slot>
-			<umb-back-to-login-button></umb-back-to-login-button>
-		`;
-	}
+  render() {
+    return html`
+      <header id="header">
+        <h1>${this.header}</h1>
+        <span>${this.message}</span>
+      </header>
+      <slot></slot>
+      <umb-back-to-login-button></umb-back-to-login-button>
+    `;
+  }
 
-	static styles: CSSResultGroup = [
-		css`
-			:host {
-				display: flex;
-				flex-direction: column;
-				gap: var(--uui-size-layout-1);
-			}
-			#header {
-				text-align: center;
-				display: flex;
-				flex-direction: column;
-				gap: var(--uui-size-space-5);
-			}
-			#header span {
-				color: var(--uui-color-text-alt); /* TODO Change to uui color when uui gets a muted text variable */
-				font-size: 14px;
+  static styles: CSSResultGroup = [
+    css`
+      :host {
+        display: flex;
+        flex-direction: column;
+        gap: var(--uui-size-layout-1);
+      }
+
+      #header {
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        gap: var(--uui-size-space-5);
+      }
+
+      #header span {
+        color: var(--uui-color-text-alt); /* TODO Change to uui color when uui gets a muted text variable */
+        font-size: 14px;
       }
 
       #header h1 {
@@ -48,16 +50,16 @@ export default class UmbErrorLayoutElement extends LitElement {
 
       ::slotted(uui-button) {
         width: 100%;
-				margin-top: var(--uui-size-space-5);
-				--uui-button-padding-top-factor: 1.5;
-				--uui-button-padding-bottom-factor: 1.5;
-			}
-		`,
-	];
+        margin-top: var(--uui-size-space-5);
+        --uui-button-padding-top-factor: 1.5;
+        --uui-button-padding-bottom-factor: 1.5;
+      }
+    `,
+  ];
 }
 
 declare global {
-	interface HTMLElementTagNameMap {
-		'umb-error-layout': UmbErrorLayoutElement;
-	}
+  interface HTMLElementTagNameMap {
+    'umb-error-layout': UmbErrorLayoutElement;
+  }
 }
