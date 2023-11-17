@@ -4,6 +4,6 @@ export const extensions = [
 		name: 'Log Viewer Bundle',
 		alias: 'Umb.Bundle.LogViewer',
 		type: 'bundle',
-		loader: () => import('./manifests.js'),
+		js: () => import('./manifests.js'),
 	},
 ];

@@ -4,6 +4,6 @@ export const extensions = [
 		name: 'Search Bundle',
 		alias: 'Umb.Bundle.Search',
 		type: 'bundle',
-		loader: () => import('./manifests.js'),
+		js: () => import('./manifests.js'),
 	},
 ];

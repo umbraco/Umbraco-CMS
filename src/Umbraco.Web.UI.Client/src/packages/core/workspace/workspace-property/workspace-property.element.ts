@@ -135,7 +135,7 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 		);
 	}
 
-	private _gotEditorUI(manifest?: ManifestPropertyEditorUi | null) {
+	private async _gotEditorUI(manifest?: ManifestPropertyEditorUi | null) {
 		this._propertyContext.setEditor(undefined);
 
 		if (!manifest) {
@@ -143,48 +143,45 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 			return;
 		}
 
-		createExtensionElement(manifest)
-			.then((el) => {
-				const oldValue = this._element;
+		const el = await createExtensionElement(manifest);
+		if(el) {
+			const oldValue = this._element;
 
-				oldValue?.removeEventListener('change', this._onPropertyEditorChange as any as EventListener);
+			oldValue?.removeEventListener('change', this._onPropertyEditorChange as any as EventListener);
 
-				this._element = el as ManifestPropertyEditorUi['ELEMENT_TYPE'];
+			this._element = el as ManifestPropertyEditorUi['ELEMENT_TYPE'];
 
-				this._propertyContext.setEditor(this._element);
+			this._propertyContext.setEditor(this._element);
 
-				this._valueObserver?.destroy();
-				this._configObserver?.destroy();
+			this._valueObserver?.destroy();
+			this._configObserver?.destroy();
 
-				if (this._element) {
-					this._element.addEventListener('property-value-change', this._onPropertyEditorChange as any as EventListener);
+			if (this._element) {
+				this._element.addEventListener('property-value-change', this._onPropertyEditorChange as any as EventListener);
 
-					this._valueObserver = this.observe(
-						this._propertyContext.value,
-						(value) => {
-							this._value = value;
-							if (this._element) {
-								this._element.value = value;
-							}
-						},
-						'_observePropertyValue'
-					);
-					this._configObserver = this.observe(
-						this._propertyContext.config,
-						(config) => {
-							if (this._element && config) {
-								this._element.config = config;
-							}
-						},
-						'_observePropertyConfig'
-					);
-				}
+				this._valueObserver = this.observe(
+					this._propertyContext.value,
+					(value) => {
+						this._value = value;
+						if (this._element) {
+							this._element.value = value;
+						}
+					},
+					'_observePropertyValue'
+				);
+				this._configObserver = this.observe(
+					this._propertyContext.config,
+					(config) => {
+						if (this._element && config) {
+							this._element.config = config;
+						}
+					},
+					'_observePropertyConfig'
+				);
+			}
 
-				this.requestUpdate('element', oldValue);
-			})
-			.catch(() => {
-				// TODO: loading JS failed so we should do some nice UI. (This does only happen if extension has a js prop, otherwise we concluded that no source was needed resolved the load.)
-			});
+			this.requestUpdate('element', oldValue);
+		}
 	}
 
 	render() {

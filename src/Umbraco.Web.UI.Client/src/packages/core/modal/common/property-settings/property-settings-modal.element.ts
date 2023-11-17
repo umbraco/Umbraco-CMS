@@ -237,7 +237,7 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 										.value=${this._returnData.description}></uui-textarea>
 								</div>
 								<umb-data-type-flow-input
-									.value=${this._returnData.dataTypeId}
+									.value=${this._returnData.dataTypeId ?? ''}
 									@change=${this.#onDataTypeIdChange}></umb-data-type-flow-input>
 								<hr />
 								<div class="container">

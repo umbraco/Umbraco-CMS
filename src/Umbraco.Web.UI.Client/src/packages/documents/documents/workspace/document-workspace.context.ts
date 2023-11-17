@@ -6,10 +6,9 @@ import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
 import {
 	UmbSaveableWorkspaceContextInterface,
-	UmbWorkspaceContext,
+	UmbEditableWorkspaceContextBase,
 	UmbWorkspaceSplitViewManager,
 	UmbVariantableWorkspaceContextInterface,
-	type UmbVariantContext,
 } from '@umbraco-cms/backoffice/workspace';
 import type { CreateDocumentRequestModel, DocumentResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import {
@@ -23,7 +22,7 @@ import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 type EntityType = DocumentResponseModel;
 export class UmbDocumentWorkspaceContext
-	extends UmbWorkspaceContext<UmbDocumentRepository, EntityType>
+	extends UmbEditableWorkspaceContextBase<UmbDocumentRepository, EntityType>
 	implements UmbVariantableWorkspaceContextInterface<EntityType | undefined>
 {
 	/**
@@ -53,6 +52,7 @@ export class UmbDocumentWorkspaceContext
 	readonly splitView;
 
 	constructor(host: UmbControllerHostElement) {
+		// TODO: Get Workspace Alias via Manifest.
 		super(host, 'Umb.Workspace.Document', new UmbDocumentRepository(host));
 
 		this.structure = new UmbContentTypePropertyStructureManager(

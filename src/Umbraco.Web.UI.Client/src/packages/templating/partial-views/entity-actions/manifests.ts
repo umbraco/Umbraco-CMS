@@ -94,7 +94,7 @@ const createFromSnippetActionModal = {
 	type: 'modal',
 	alias: 'Umb.Modal.CreateFromSnippetPartialView',
 	name: 'Choose insert type sidebar',
-	loader: () => import('./create/create-from-snippet.modal.js'),
+	js: () => import('./create/create-from-snippet.modal.js'),
 };
 
 export const manifests = [...partialViewActions, ...partialViewFolderActions, createFromSnippetActionModal];

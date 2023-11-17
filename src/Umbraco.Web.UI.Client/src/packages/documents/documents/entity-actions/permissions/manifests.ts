@@ -23,7 +23,7 @@ const modals: Array<ManifestModal> = [
 		type: 'modal',
 		alias: 'Umb.Modal.Permissions',
 		name: 'Permissions Modal',
-		loader: () => import('./permissions-modal.element.js'),
+		js: () => import('./permissions-modal.element.js'),
 	},
 ];
 

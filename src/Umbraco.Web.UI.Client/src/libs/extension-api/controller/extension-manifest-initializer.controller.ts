@@ -1,4 +1,4 @@
-import type { ManifestCondition, ManifestWithDynamicConditions } from '../types.js';
+import type { ManifestCondition, ManifestWithDynamicConditions } from '../types/index.js';
 import type { UmbExtensionRegistry } from '../registry/extension.registry.js';
 import { UmbBaseExtensionInitializer } from './base-extension-initializer.controller.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';

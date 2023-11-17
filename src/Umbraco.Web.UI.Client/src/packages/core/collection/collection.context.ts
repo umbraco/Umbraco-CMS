@@ -7,10 +7,9 @@ import {
 	UmbNumberState,
 	UmbObjectState,
 } from '@umbraco-cms/backoffice/observable-api';
-import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
+import { UmbExtensionsManifestInitializer, createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 import { ManifestCollectionView, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbCollectionFilterModel } from '@umbraco-cms/backoffice/collection';
-import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbSelectionManager, UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
@@ -193,15 +192,10 @@ export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectio
 	}
 
 	#observeViews() {
-		return this.observe(umbExtensionsRegistry.extensionsOfType('collectionView').pipe(
-			map((extensions) => {
-				return extensions.filter((extension) => extension.conditions.entityType === this.getEntityType());
-			}),
-		),
-		(views) => {
-			this.#views.next(views);
+		return new UmbExtensionsManifestInitializer(this, umbExtensionsRegistry, 'collectionView', null, (views) => {
+			this.#views.next(views.map(view => view.manifest));
 			this.#setCurrentView();
-		}, 'umbCollectionViewsObserver');
+		});
 	}
 
 	#onPageChange = (event: UmbChangeEvent) => {

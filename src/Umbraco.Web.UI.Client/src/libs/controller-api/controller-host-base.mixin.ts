@@ -1,4 +1,4 @@
-import { ClassConstructor } from '../extension-api/types.js';
+import { ClassConstructor } from '../extension-api/types/utils.js';
 import { UmbControllerHost } from './controller-host.interface.js';
 import type { UmbController } from './controller.interface.js';
 
@@ -21,7 +21,7 @@ declare class UmbControllerHostBaseDeclaration implements Omit<UmbControllerHost
  * @param {Object} superClass - superclass to be extended.
  * @mixin
  */
-export const UmbControllerHostBaseMixin = <T extends ClassConstructor<any>>(superClass: T) => {
+export const UmbControllerHostBaseMixin = <T extends ClassConstructor>(superClass: T) => {
 	class UmbControllerHostBaseClass extends superClass {
 		#controllers: UmbController[] = [];
 
@@ -59,8 +59,12 @@ export const UmbControllerHostBaseMixin = <T extends ClassConstructor<any>>(supe
 			this.#controllers.push(ctrl);
 			if (this.#attached) {
 				// If a controller is created on a already attached element, then it will be added directly. This might not be optimal. As the controller it self has not finished its constructor method jet. therefor i postpone the call:
-				Promise.resolve().then(() => ctrl.hostConnected());
-				//ctrl.hostConnected();
+				Promise.resolve().then(() => {
+					// Extra check to see if we are still attached at this point:
+					if (this.#attached) {
+						ctrl.hostConnected();
+					}
+				});
 			}
 		}
 
@@ -97,16 +101,22 @@ export const UmbControllerHostBaseMixin = <T extends ClassConstructor<any>>(supe
 
 		hostConnected() {
 			this.#attached = true;
+			// Note: this might not be optimal, as if hostDisconnected remove one of the controllers, then the next controller will be skipped.
 			this.#controllers.forEach((ctrl: UmbController) => ctrl.hostConnected());
 		}
 
 		hostDisconnected() {
 			this.#attached = false;
+			// Note: this might not be optimal, as if hostDisconnected remove one of the controllers, then the next controller will be skipped.
 			this.#controllers.forEach((ctrl: UmbController) => ctrl.hostDisconnected());
 		}
 
 		destroy() {
-			this.#controllers.forEach((ctrl: UmbController) => ctrl.destroy());
+			let ctrl: UmbController | undefined;
+			// Note: A very important way of doing this loop, as foreach will skip over the next item if the current item is removed.
+			while ((ctrl = this.#controllers[0])) {
+				ctrl.destroy();
+			}
 			this.#controllers.length = 0;
 		}
 	}

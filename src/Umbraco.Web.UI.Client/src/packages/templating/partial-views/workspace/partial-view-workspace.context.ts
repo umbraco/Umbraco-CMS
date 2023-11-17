@@ -1,21 +1,25 @@
 import { UmbPartialViewRepository } from '../repository/partial-view.repository.js';
 import { UmbPartialViewDetailModel } from '../types.js';
+import { UMB_PARTIAL_VIEW_ENTITY_TYPE } from '../entity.js';
 import { UmbBooleanState, UmbDeepState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UmbSaveableWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
+import {
+	UmbSaveableWorkspaceContextInterface,
+	UmbEditableWorkspaceContextBase,
+} from '@umbraco-cms/backoffice/workspace';
 import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
 import { UpdatePartialViewRequestModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 export class UmbPartialViewWorkspaceContext
-	extends UmbWorkspaceContext<UmbPartialViewRepository, UmbPartialViewDetailModel>
+	extends UmbEditableWorkspaceContextBase<UmbPartialViewRepository, UmbPartialViewDetailModel>
 	implements UmbSaveableWorkspaceContextInterface
 {
 	getEntityId(): string | undefined {
 		return this.getData()?.path;
 	}
 	getEntityType(): string {
-		return 'partial-view';
+		return UMB_PARTIAL_VIEW_ENTITY_TYPE;
 	}
 	save(): Promise<void> {
 		const partialView = this.getData();
@@ -103,5 +107,5 @@ export const UMB_PARTIAL_VIEW_WORKSPACE_CONTEXT = new UmbContextToken<
 	UmbPartialViewWorkspaceContext
 >(
 	'UmbWorkspaceContext',
-	(context): context is UmbPartialViewWorkspaceContext => context.getEntityType?.() === 'partial-view',
+	(context): context is UmbPartialViewWorkspaceContext => context.getEntityType?.() === UMB_PARTIAL_VIEW_ENTITY_TYPE,
 );

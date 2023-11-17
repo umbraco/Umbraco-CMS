@@ -9,7 +9,7 @@ const workspace: ManifestWorkspace = {
 	type: 'workspace',
 	alias: UMB_SCRIPT_WORKSPACE_ALIAS,
 	name: 'Script Workspace',
-	loader: () => import('./script-workspace.element.js'),
+	js: () => import('./script-workspace.element.js'),
 	meta: {
 		entityType: UMB_SCRIPT_ENTITY_TYPE,
 	},

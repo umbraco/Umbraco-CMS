@@ -1,14 +1,17 @@
 import { UmbTemplateRepository } from '../repository/index.js';
 import { UmbTemplateTreeRepository } from '../tree/index.js';
 import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
-import { UmbSaveableWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
+import {
+	UmbSaveableWorkspaceContextInterface,
+	UmbEditableWorkspaceContextBase,
+} from '@umbraco-cms/backoffice/workspace';
 import { UmbBooleanState, UmbDeepState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { TemplateItemResponseModel, TemplateResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 export class UmbTemplateWorkspaceContext
-	extends UmbWorkspaceContext<UmbTemplateRepository, TemplateResponseModel>
+	extends UmbEditableWorkspaceContextBase<UmbTemplateRepository, TemplateResponseModel>
 	implements UmbSaveableWorkspaceContextInterface
 {
 	#data = new UmbDeepState<TemplateResponseModel | undefined>(undefined);

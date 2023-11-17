@@ -3,11 +3,14 @@ import { UmbScriptRepository } from '../repository/script.repository.js';
 import { UMB_SCRIPT_WORKSPACE_ALIAS } from './manifests.js';
 import { UmbBooleanState, UmbDeepState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
+import { UmbEditableWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
 import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
 import { TextFileResponseModelBaseModel, UpdateScriptRequestModel } from '@umbraco-cms/backoffice/backend-api';
 
-export class UmbScriptWorkspaceContext extends UmbWorkspaceContext<UmbScriptRepository, UmbScripDetailModel> {
+export class UmbScriptsWorkspaceContext extends UmbEditableWorkspaceContextBase<
+	UmbScriptRepository,
+	UmbScripDetailModel
+> {
 	#data = new UmbDeepState<UmbScripDetailModel | undefined>(undefined);
 	data = this.#data.asObservable();
 	name = this.#data.asObservablePart((data) => data?.name);

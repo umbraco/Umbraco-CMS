@@ -8,7 +8,7 @@ export const headerApps: Array<ManifestTypes> = [
 		type: 'store',
 		alias: 'Umb.Store.CurrentUser',
 		name: 'Current User Store',
-		loader: () => import('./current-user-history.store.js'),
+		js: () => import('./current-user-history.store.js'),
 	},
 	{
 		type: 'globalContext',
@@ -20,7 +20,7 @@ export const headerApps: Array<ManifestTypes> = [
 		type: 'headerApp',
 		alias: 'Umb.HeaderApp.CurrentUser',
 		name: 'Current User',
-		loader: () => import('./current-user-header-app.element.js'),
+		js: () => import('./current-user-header-app.element.js'),
 		weight: 0,
 		meta: {
 			label: 'TODO: how should we enable this to not be set.',
