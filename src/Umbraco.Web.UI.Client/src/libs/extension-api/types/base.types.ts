@@ -1,9 +1,12 @@
-import type { UmbApi } from "../models/index.js";
-import type { ManifestBase } from "./manifest-base.interface.js";
-import type { ApiLoaderProperty, CssLoaderProperty, ElementAndApiLoaderProperty, ElementLoaderProperty, JsLoaderProperty } from "./utils.js";
-
-
-
+import type { UmbApi } from '../models/index.js';
+import type { ManifestBase } from './manifest-base.interface.js';
+import type {
+	ApiLoaderProperty,
+	CssLoaderProperty,
+	ElementAndApiLoaderProperty,
+	ElementLoaderProperty,
+	JsLoaderProperty,
+} from './utils.js';
 
 export interface ManifestWithView<ElementType extends HTMLElement = HTMLElement> extends ManifestElement<ElementType> {
 	meta: MetaManifestWithView;
@@ -23,22 +26,18 @@ export interface ManifestElementWithElementName extends ManifestElement {
 	elementName: string;
 }
 
-
-
-
 export interface ManifestPlainCss<CssType = unknown> extends ManifestBase {
 	/**
 	 * The file location of the stylesheet file to load
-   * @TJS-type string
+	 * @TJS-type string
 	 */
-	css?: CssLoaderProperty<CssType>
+	css?: CssLoaderProperty<CssType>;
 }
-
 
 export interface ManifestPlainJs<JsType> extends ManifestBase {
 	/**
 	 * The file location of the javascript file to load
-   * @TJS-type string
+	 * @TJS-type string
 	 */
 	js?: JsLoaderProperty<JsType>;
 }
@@ -54,17 +53,15 @@ export interface ManifestApi<ApiType extends UmbApi = UmbApi> extends ManifestBa
 
 	/**
 	 * The file location of the javascript file to load
-   * @TJS-type string
+	 * @TJS-type string
 	 */
 	js?: ApiLoaderProperty<ApiType>;
 
 	/**
-	 * @TJS-ignore
+	 * @TJS-type string
 	 */
 	api?: ApiLoaderProperty<ApiType>;
-
 }
-
 
 export interface ManifestElement<ElementType extends HTMLElement = HTMLElement> extends ManifestBase {
 	/**
@@ -74,13 +71,13 @@ export interface ManifestElement<ElementType extends HTMLElement = HTMLElement> 
 
 	/**
 	 * The file location of the javascript file to load
-   * @TJS-type string
+	 * @TJS-type string
 	 */
 	js?: ElementLoaderProperty<ElementType>;
 
 	/**
 	 * The file location of the element javascript file to load
-   * @TJS-type string
+	 * @TJS-type string
 	 */
 	element?: ElementLoaderProperty<ElementType>;
 
@@ -96,7 +93,8 @@ export interface ManifestElement<ElementType extends HTMLElement = HTMLElement> 
 	meta?: unknown;
 }
 
-export interface ManifestElementAndApi<ElementType extends HTMLElement = HTMLElement, ApiType extends UmbApi = UmbApi> extends ManifestBase {
+export interface ManifestElementAndApi<ElementType extends HTMLElement = HTMLElement, ApiType extends UmbApi = UmbApi>
+	extends ManifestBase {
 	/**
 	 * @TJS-ignore
 	 */
@@ -106,23 +104,21 @@ export interface ManifestElementAndApi<ElementType extends HTMLElement = HTMLEle
 	 */
 	readonly ELEMENT_TYPE?: ElementType;
 
-
-
 	/**
 	 * The file location of the javascript file to load
-   * @TJS-type string
+	 * @TJS-type string
 	 */
 	js?: ElementAndApiLoaderProperty<ElementType, ApiType>;
 
 	/**
 	 * The file location of the api javascript file to load
-   * @TJS-type string
+	 * @TJS-type string
 	 */
 	api?: ApiLoaderProperty<ApiType>;
 
 	/**
 	 * The file location of the element javascript file to load
-   * @TJS-type string
+	 * @TJS-type string
 	 */
 	element?: ElementLoaderProperty<ElementType>;
 
