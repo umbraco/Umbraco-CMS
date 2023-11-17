@@ -1,6 +1,7 @@
-import type { ManifestElement, ManifestWithConditions } from '@umbraco-cms/backoffice/extension-api';
+import type { ConditionTypes } from '../conditions/types.js';
+import type { ManifestElement, ManifestWithDynamicConditions } from '@umbraco-cms/backoffice/extension-api';
 
-export interface ManifestCollectionView extends ManifestElement, ManifestWithConditions<ConditionsCollectionView> {
+export interface ManifestCollectionView extends ManifestElement, ManifestWithDynamicConditions<ConditionTypes> {
 	type: 'collectionView';
 	meta: MetaCollectionView;
 }

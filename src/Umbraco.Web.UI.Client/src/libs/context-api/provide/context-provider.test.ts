@@ -45,6 +45,7 @@ describe('UmbContextProvider', () => {
 			(_instance: UmbTestContextProviderClass) => {
 				expect(_instance.prop).to.eq('value from provider');
 				done();
+				return true;
 			}
 		);
 

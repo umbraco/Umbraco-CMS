@@ -1,4 +1,4 @@
-import type { MediaDetails } from '../../packages/media/media/index.js';
+import type { UmbMediaDetailModel } from '../../packages/media/media/index.js';
 import { UmbEntityTreeData } from './entity-tree.data.js';
 import { UmbEntityData } from './entity.data.js';
 import { createContentTreeItem } from './utils.js';
@@ -8,7 +8,7 @@ import {
 	PagedMediaTreeItemResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 
-export const data: Array<MediaDetails> = [
+export const data: Array<UmbMediaDetailModel> = [
 	{
 		name: 'Flipped Car',
 		type: 'media',
@@ -187,7 +187,7 @@ export const data: Array<MediaDetails> = [
 	},
 ];
 
-const createMediaItem = (item: MediaDetails): MediaItemResponseModel => {
+const createMediaItem = (item: UmbMediaDetailModel): MediaItemResponseModel => {
 	return {
 		id: item.id,
 		name: item.name,
@@ -199,7 +199,7 @@ const createMediaItem = (item: MediaDetails): MediaItemResponseModel => {
 // TODO: all properties are optional in the server schema. I don't think this is correct.
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-class UmbMediaData extends UmbEntityData<MediaDetails> {
+class UmbMediaData extends UmbEntityData<UmbMediaDetailModel> {
 	#tree = new UmbEntityTreeData<ContentTreeItemResponseModel>(this);
 
 	constructor() {

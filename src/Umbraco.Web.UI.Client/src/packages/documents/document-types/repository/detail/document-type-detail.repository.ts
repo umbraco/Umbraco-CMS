@@ -76,7 +76,7 @@ export class UmbDocumentTypeDetailRepository
 		if (!id) throw new Error('Id is missing');
 		await this.#init;
 
-		const { data, error } = await this.#detailDataSource.get(id);
+		const { data, error } = await this.#detailDataSource.read(id);
 
 		if (data) {
 			this.#detailStore?.append(data);
@@ -104,7 +104,7 @@ export class UmbDocumentTypeDetailRepository
 		if (!documentType || !documentType.id) throw new Error('Document Type is missing');
 		await this.#init;
 
-		const { error } = await this.#detailDataSource.insert(documentType);
+		const { error } = await this.#detailDataSource.create(documentType);
 
 		if (!error) {
 			this.#detailStore?.append(documentType);
@@ -129,7 +129,6 @@ export class UmbDocumentTypeDetailRepository
 			// Consider notify a workspace if a template is updated in the store while someone is editing it.
 			this.#detailStore?.append(item);
 			this.#treeStore?.updateItem(id, item);
-			// TODO: would be nice to align the stores on methods/methodNames.
 
 			const notification = { data: { message: `Document Type saved` } };
 			this.#notificationContext?.peek('positive', notification);
@@ -152,7 +151,6 @@ export class UmbDocumentTypeDetailRepository
 			// TODO: we currently don't use the detail store for anything.
 			// Consider to look up the data before fetching from the server.
 			// Consider notify a workspace if a template is deleted from the store while someone is editing it.
-			// TODO: would be nice to align the stores on methods/methodNames.
 			this.#detailStore?.removeItem(id);
 			this.#treeStore?.removeItem(id);
 			this.#itemStore?.removeItem(id);

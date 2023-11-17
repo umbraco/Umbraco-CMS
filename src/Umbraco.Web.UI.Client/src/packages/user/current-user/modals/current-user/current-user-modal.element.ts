@@ -1,11 +1,11 @@
-import { UMB_CURRENT_USER_CONTEXT } from '../../current-user.context.js';
-import { UmbCurrentUser } from '../../types.js';
 import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
+import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
+import { UMB_CURRENT_USER_CONTEXT } from '../../current-user.context.js';
+import { type UmbCurrentUser } from '../../types.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, CSSResultGroup, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalContext } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 
 @customElement('umb-current-user-modal')
 export class UmbCurrentUserModalElement extends UmbLitElement {

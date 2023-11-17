@@ -1,73 +1,51 @@
-import { UmbMemberGroupRepository } from '../repository/member-group.repository.js';
-import type { MemberGroupDetails } from '../types.js';
-import { UmbSaveableWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
+import { UmbMemberGroupDetailRepository } from '../repository/index.js';
+import type { UmbMemberGroupDetailModel } from '../types.js';
+import { UMB_MEMBER_GROUP_ENTITY_TYPE } from '../entity.js';
+import { UMB_MEMBER_GROUP_WORKSPACE_ALIAS } from './manifests.js';
+import {
+	UmbSaveableWorkspaceContextInterface,
+	UmbEditableWorkspaceContextBase,
+} from '@umbraco-cms/backoffice/workspace';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
-type EntityType = MemberGroupDetails;
 export class UmbMemberGroupWorkspaceContext
-	extends UmbWorkspaceContext<UmbMemberGroupRepository, EntityType>
-	implements UmbSaveableWorkspaceContextInterface<EntityType | undefined>
+	extends UmbEditableWorkspaceContextBase<UmbMemberGroupDetailRepository, UmbMemberGroupDetailModel>
+	implements UmbSaveableWorkspaceContextInterface<UmbMemberGroupDetailModel | undefined>
 {
-	#data = new UmbObjectState<EntityType | undefined>(undefined);
-	data = this.#data.asObservable();
-	name = this.#data.asObservablePart((data) => data?.name);
-
 	constructor(host: UmbControllerHostElement) {
-		super(host, 'Umb.Workspace.MemberGroup', new UmbMemberGroupRepository(host));
+		super(host, UMB_MEMBER_GROUP_WORKSPACE_ALIAS, new UmbMemberGroupDetailRepository(host));
 	}
 
-	getData() {
-		return this.#data.getValue();
+	getEntityType(): string {
+		return UMB_MEMBER_GROUP_ENTITY_TYPE;
 	}
 
 	getEntityId() {
-		return this.getData()?.id || '';
+		return '1234';
 	}
 
-	getEntityType() {
-		return 'member-group';
-	}
-
-	setName(name: string) {
-		this.#data.update({ name });
-	}
-
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	setPropertyValue(alias: string, value: string) {
-		// Not implemented for this context - member groups have no properties for editing
-		return;
-	}
-
-	async load(entityId: string) {
-		const { data } = await this.repository.requestById(entityId);
-		if (data) {
-			this.#data.next(data);
-		}
-	}
-
-	async create() {
-		const { data } = await this.repository.createScaffold();
-		if (!data) return;
-		this.setIsNew(true);
-		this.#data.next(data);
+	getData() {
+		return 'fake' as unknown as UmbMemberGroupDetailModel;
 	}
 
 	async save() {
-		if (!this.#data.value) return;
-		await this.repository.save(this.#data.value.id, this.#data.value);
-		this.setIsNew(true);
+		console.log('save');
+	}
+
+	async load(id: string) {
+		console.log('load', id);
 	}
 
 	public destroy(): void {
-		this.#data.destroy();
+		console.log('destroy');
 	}
 }
 
-
-
-export const UMB_MEMBER_GROUP_WORKSPACE_CONTEXT = new UmbContextToken<UmbSaveableWorkspaceContextInterface, UmbMemberGroupWorkspaceContext>(
+export const UMB_MEMBER_GROUP_WORKSPACE_CONTEXT = new UmbContextToken<
+	UmbSaveableWorkspaceContextInterface,
+	UmbMemberGroupWorkspaceContext
+>(
 	'UmbWorkspaceContext',
-	(context): context is UmbMemberGroupWorkspaceContext => context.getEntityType?.() === 'member-group'
+	(context): context is UmbMemberGroupWorkspaceContext => context.getEntityType?.() === UMB_MEMBER_GROUP_ENTITY_TYPE,
 );

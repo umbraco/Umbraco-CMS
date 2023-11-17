@@ -30,7 +30,7 @@ export class UmbDataTypeDetailRepository
 		if (!id) throw new Error('Key is missing');
 		await this._init;
 
-		const { data, error } = await this.#detailSource.get(id);
+		const { data, error } = await this.#detailSource.read(id);
 
 		if (data) {
 			this._detailStore!.append(data);
@@ -56,7 +56,7 @@ export class UmbDataTypeDetailRepository
 		if (!dataType.id) throw new Error('Data Type id is missing');
 		await this._init;
 
-		const { error } = await this.#detailSource.insert(dataType);
+		const { error } = await this.#detailSource.create(dataType);
 
 		if (!error) {
 			// TODO: We need to push a new item to the tree store to update the tree. How do we want to create the tree items?
@@ -82,7 +82,6 @@ export class UmbDataTypeDetailRepository
 			// TODO: we currently don't use the detail store for anything.
 			// Consider to look up the data before fetching from the server
 			// Consider notify a workspace if a template is updated in the store while someone is editing it.
-			// TODO: would be nice to align the stores on methods/methodNames.
 			this._detailStore!.updateItem(id, updatedDataType);
 			// TODO: This is parsing on the full models to the tree and item store. Those should only contain the data they need. I don't know, at this point, if thats a repository or store responsibility.
 			this._treeStore!.updateItem(id, updatedDataType);
@@ -105,7 +104,6 @@ export class UmbDataTypeDetailRepository
 			// TODO: we currently don't use the detail store for anything.
 			// Consider to look up the data before fetching from the server.
 			// Consider notify a workspace if a template is deleted from the store while someone is editing it.
-			// TODO: would be nice to align the stores on methods/methodNames.
 			this._detailStore!.removeItem(id);
 			this._treeStore!.removeItem(id);
 			this._itemStore!.removeItem(id);

@@ -10,6 +10,8 @@ export class UmbCollectionViewMediaTestElement extends LitElement {
 	static styles = [UmbTextStyles, css``];
 }
 
+export default UmbCollectionViewMediaTestElement;
+
 declare global {
 	interface HTMLElementTagNameMap {
 		'umb-collection-view-media-test': UmbCollectionViewMediaTestElement;

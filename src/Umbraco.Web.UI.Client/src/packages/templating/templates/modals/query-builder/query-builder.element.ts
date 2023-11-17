@@ -3,7 +3,7 @@ import type { UmbQueryBuilderFilterElement } from './query-builder-filter.elemen
 import { UUIComboboxListElement } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state, query, queryAll } from '@umbraco-cms/backoffice/external/lit';
 import {
-	UmbModalBaseElement ,
+	UmbModalBaseElement,
 	UMB_DOCUMENT_PICKER_MODAL,
 	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
 	UmbModalManagerContext,

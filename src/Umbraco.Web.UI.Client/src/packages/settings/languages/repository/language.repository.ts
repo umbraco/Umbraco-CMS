@@ -46,7 +46,7 @@ export class UmbLanguageRepository extends UmbBaseController implements UmbItemR
 			throw new Error('Iso code is missing');
 		}
 
-		return this.#dataSource.get(isoCode);
+		return this.#dataSource.read(isoCode);
 	}
 
 	// TODO: maybe this should be renamed to something more generic.
@@ -93,7 +93,7 @@ export class UmbLanguageRepository extends UmbBaseController implements UmbItemR
 	async create(language: LanguageResponseModel) {
 		await this.#init;
 
-		const { error } = await this.#dataSource.insert(language);
+		const { error } = await this.#dataSource.create(language);
 
 		if (!error) {
 			this.#languageStore?.append(language);

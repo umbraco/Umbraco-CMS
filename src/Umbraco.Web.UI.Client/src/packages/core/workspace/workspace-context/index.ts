@@ -4,7 +4,7 @@ export * from './publishable-workspace-context.interface.js';
 export * from './saveable-workspace-context.interface.js';
 export * from './variant-workspace-context.token.js';
 export * from './workspace-context.interface.js';
-export * from './workspace-context.js';
+export * from './editable-workspace-context-base.js';
 export * from './workspace-context.token.js';
 export * from './workspace-invariantable-context.interface.js';
 export * from './workspace-variantable-context.interface.js';

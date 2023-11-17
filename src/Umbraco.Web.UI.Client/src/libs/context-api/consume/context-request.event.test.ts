@@ -4,6 +4,7 @@ import { UmbContextRequestEventImplementation, UmbContextRequestEvent } from './
 describe('UmbContextRequestEvent', () => {
 	const contextRequestCallback = () => {
 		console.log('hello from callback');
+		return true;
 	};
 
 	const event: UmbContextRequestEvent = new UmbContextRequestEventImplementation(

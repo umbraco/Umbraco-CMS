@@ -1,4 +1,4 @@
-import { UmbUserItemServerDataSource } from './user-item.server.data.js';
+import { UmbUserItemServerDataSource } from './user-item.server.data-source.js';
 import { UMB_USER_ITEM_STORE_CONTEXT } from './user-item.store.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbItemRepositoryBase } from '@umbraco-cms/backoffice/repository';

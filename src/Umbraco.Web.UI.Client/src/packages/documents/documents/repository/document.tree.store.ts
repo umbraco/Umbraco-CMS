@@ -6,7 +6,7 @@ import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api
  * @export
  * @class UmbDocumentTreeStore
  * @extends {UmbEntityTreeStore}
- * @description - Tree Data Store for Templates
+ * @description - Tree Data Store for Documents
  */
 export class UmbDocumentTreeStore extends UmbEntityTreeStore {
 	/**

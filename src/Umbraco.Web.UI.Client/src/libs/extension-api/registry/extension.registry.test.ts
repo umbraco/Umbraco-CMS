@@ -1,10 +1,14 @@
 import { expect } from '@open-wc/testing';
-import type { ManifestElementWithElementName, ManifestKind, ManifestWithMeta } from '../types.js';
+import type { ManifestElementWithElementName, ManifestKind, ManifestBase } from '../types/index.js';
 import { UmbExtensionRegistry } from './extension.registry.js';
 
+interface TestManifestWithMeta extends ManifestBase {
+	meta: unknown;
+}
+
 describe('UmbExtensionRegistry', () => {
-	let extensionRegistry: UmbExtensionRegistry<ManifestWithMeta>;
-	let manifests: Array<ManifestWithMeta>;
+	let extensionRegistry: UmbExtensionRegistry<TestManifestWithMeta>;
+	let manifests: Array<TestManifestWithMeta>;
 
 	beforeEach(() => {
 		extensionRegistry = new UmbExtensionRegistry();
@@ -170,7 +174,7 @@ describe('UmbExtensionRegistry', () => {
 describe('UmbExtensionRegistry with kinds', () => {
 	let extensionRegistry: UmbExtensionRegistry<any>;
 	let manifests: Array<
-		ManifestElementWithElementName | ManifestWithMeta | ManifestKind<ManifestElementWithElementName>
+		ManifestElementWithElementName | TestManifestWithMeta | ManifestKind<ManifestElementWithElementName>
 	>;
 
 	beforeEach(() => {
