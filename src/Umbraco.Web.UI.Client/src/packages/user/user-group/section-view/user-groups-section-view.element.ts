@@ -1,11 +1,11 @@
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbRoute } from '@umbraco-cms/backoffice/router';
 
-@customElement('umb-user-groups-section-view')
-export class UmbUserGroupsSectionViewElement extends UmbLitElement {
+@customElement('umb-user-group-section-view')
+export class UmbUserGroupSectionViewElement extends UmbLitElement {
 	#routes: UmbRoute[] = [
 		{
 			path: 'collection',
@@ -39,10 +39,10 @@ export class UmbUserGroupsSectionViewElement extends UmbLitElement {
 	];
 }
 
-export default UmbUserGroupsSectionViewElement;
+export default UmbUserGroupSectionViewElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-user-groups-section-view': UmbUserGroupsSectionViewElement;
+		'umb-user-group-section-view': UmbUserGroupSectionViewElement;
 	}
 }
