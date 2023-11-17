@@ -20,11 +20,11 @@ public class AddWebhookDatabaseLock : MigrationBase
             .From<LockDto>()
             .Where<LockDto>(x => x.Id == Constants.Locks.WebhookLogs);
 
-        LockDto? webhookRequestLock = Database.FirstOrDefault<LockDto>(sql);
+        LockDto? webhookLogsLock = Database.FirstOrDefault<LockDto>(sql);
 
-        if (webhookRequestLock is null)
+        if (webhookLogsLock is null)
         {
-            Database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.WebhookRequest, Name = "WebhookRequest" });
+            Database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.WebhookLogs, Name = "WebhookLogs" });
         }
     }
 }
