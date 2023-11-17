@@ -33,6 +33,7 @@
         view: "views/webhooks/overlays/details.html",
         title: 'Details',
         position: 'right',
+        size: 'medium',
         log,
         currentUser: this.currentUser,
         close: () => {
