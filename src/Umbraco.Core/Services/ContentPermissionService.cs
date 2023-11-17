@@ -29,7 +29,7 @@ internal sealed class ContentPermissionService : IContentPermissionService
 
     /// <inheritdoc/>
     public async Task<ContentAuthorizationStatus> AuthorizeAccessAsync(
-        IUser performingUser,
+        IUser user,
         IEnumerable<Guid> contentKeys,
         IReadOnlyList<char> permissionsToCheck)
     {
@@ -40,19 +40,19 @@ internal sealed class ContentPermissionService : IContentPermissionService
             return ContentAuthorizationStatus.NotFound;
         }
 
-        if (contentItems.Any(contentItem => performingUser.HasPathAccess(contentItem, _entityService, _appCaches) == false))
+        if (contentItems.Any(contentItem => user.HasPathAccess(contentItem, _entityService, _appCaches) == false))
         {
             return ContentAuthorizationStatus.UnauthorizedMissingPathAccess;
         }
 
-        return HasPermissionAccess(performingUser, contentItems.Select(c => c.Path), permissionsToCheck)
+        return HasPermissionAccess(user, contentItems.Select(c => c.Path), permissionsToCheck)
             ? ContentAuthorizationStatus.Success
             : ContentAuthorizationStatus.UnauthorizedMissingPathAccess;
     }
 
     /// <inheritdoc/>
     public async Task<ContentAuthorizationStatus> AuthorizeDescendantsAccessAsync(
-        IUser performingUser,
+        IUser user,
         Guid parentKey,
         IReadOnlyList<char> permissionsToCheck)
     {
@@ -82,8 +82,8 @@ internal sealed class ContentPermissionService : IContentPermissionService
 
             foreach (IEntitySlim descendant in descendants)
             {
-                var hasPathAccess = performingUser.HasContentPathAccess(descendant, _entityService, _appCaches);
-                var hasPermissionAccess = HasPermissionAccess(performingUser, new[] { descendant.Path }, permissionsToCheck);
+                var hasPathAccess = user.HasContentPathAccess(descendant, _entityService, _appCaches);
+                var hasPermissionAccess = HasPermissionAccess(user, new[] { descendant.Path }, permissionsToCheck);
 
                 // If this item's path has already been denied or if the user doesn't have access to it, add to the deny list.
                 if (denied.Any(x => descendant.Path.StartsWith($"{x.Path},")) || hasPathAccess == false || hasPermissionAccess == false)
@@ -99,9 +99,9 @@ internal sealed class ContentPermissionService : IContentPermissionService
     }
 
     /// <inheritdoc/>
-    public async Task<ContentAuthorizationStatus> AuthorizeRootAccessAsync(IUser performingUser, IReadOnlyList<char> permissionsToCheck)
+    public async Task<ContentAuthorizationStatus> AuthorizeRootAccessAsync(IUser user, IReadOnlyList<char> permissionsToCheck)
     {
-        var hasAccess = performingUser.HasContentRootAccess(_entityService, _appCaches);
+        var hasAccess = user.HasContentRootAccess(_entityService, _appCaches);
 
         if (hasAccess == false)
         {
@@ -109,15 +109,15 @@ internal sealed class ContentPermissionService : IContentPermissionService
         }
 
         // In this case, we have to use the Root id as path (i.e. -1) since we don't have a content item
-        return HasPermissionAccess(performingUser, new[] { Constants.System.RootString }, permissionsToCheck)
+        return HasPermissionAccess(user, new[] { Constants.System.RootString }, permissionsToCheck)
             ? ContentAuthorizationStatus.Success
             : ContentAuthorizationStatus.UnauthorizedMissingPathAccess;
     }
 
     /// <inheritdoc/>
-    public async Task<ContentAuthorizationStatus> AuthorizeBinAccessAsync(IUser performingUser, IReadOnlyList<char> permissionsToCheck)
+    public async Task<ContentAuthorizationStatus> AuthorizeBinAccessAsync(IUser user, IReadOnlyList<char> permissionsToCheck)
     {
-        var hasAccess = performingUser.HasContentBinAccess(_entityService, _appCaches);
+        var hasAccess = user.HasContentBinAccess(_entityService, _appCaches);
 
         if (hasAccess == false)
         {
@@ -125,15 +125,15 @@ internal sealed class ContentPermissionService : IContentPermissionService
         }
 
         // In this case, we have to use the Recycle Bin id as path (i.e. -20) since we don't have a content item
-        return HasPermissionAccess(performingUser, new[] { Constants.System.RecycleBinContentString }, permissionsToCheck)
+        return HasPermissionAccess(user, new[] { Constants.System.RecycleBinContentString }, permissionsToCheck)
             ? ContentAuthorizationStatus.Success
             : ContentAuthorizationStatus.UnauthorizedMissingPathAccess;
     }
 
     /// <summary>
-    ///     Check the implicit/inherited permissions for the user for the given content.
+    ///     Check the implicit/inherited permissions of a user for given content items.
     /// </summary>
-    /// <param name="user">The user performing the operation.</param>
+    /// <param name="user"><see cref="IUser" /> to check for access.</param>
     /// <param name="contentPaths">The paths of the content items to check for access.</param>
     /// <param name="permissionsToCheck">The permissions to authorize.</param>
     /// <returns><c>true</c> if the user has the required permissions; otherwise, <c>false</c>.</returns>

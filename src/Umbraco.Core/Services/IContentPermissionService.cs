@@ -9,64 +9,64 @@ namespace Umbraco.Cms.Core.Services;
 public interface IContentPermissionService
 {
     /// <summary>
-    ///     Authorize that the current user has access to the specified content item.
+    ///     Authorize that a user has access to a content item.
     /// </summary>
-    /// <param name="performingUser">The user performing the operation.</param>
+    /// <param name="user"><see cref="IUser" /> to authorize.</param>
     /// <param name="contentKey">The identifier of the content item to check for access.</param>
     /// <param name="permissionToCheck">The permission to authorize.</param>
     /// <returns>A task resolving into a <see cref="ContentAuthorizationStatus"/>.</returns>
-    Task<ContentAuthorizationStatus> AuthorizeAccessAsync(IUser performingUser, Guid contentKey, char permissionToCheck)
-        => AuthorizeAccessAsync(performingUser, new[] { contentKey }, new[] { permissionToCheck });
+    Task<ContentAuthorizationStatus> AuthorizeAccessAsync(IUser user, Guid contentKey, char permissionToCheck)
+        => AuthorizeAccessAsync(user, new[] { contentKey }, new[] { permissionToCheck });
 
     /// <summary>
-    ///     Authorize that the current user has access to these content items.
+    ///     Authorize that a user has access to content items.
     /// </summary>
-    /// <param name="performingUser">The user performing the operation.</param>
+    /// <param name="user"><see cref="IUser" /> to authorize.</param>
     /// <param name="contentKeys">The identifiers of the content items to check for access.</param>
     /// <param name="permissionsToCheck">The collection of permissions to authorize.</param>
     /// <returns>A task resolving into a <see cref="ContentAuthorizationStatus"/>.</returns>
-    Task<ContentAuthorizationStatus> AuthorizeAccessAsync(IUser performingUser, IEnumerable<Guid> contentKeys, IReadOnlyList<char> permissionsToCheck);
+    Task<ContentAuthorizationStatus> AuthorizeAccessAsync(IUser user, IEnumerable<Guid> contentKeys, IReadOnlyList<char> permissionsToCheck);
 
     /// <summary>
-    ///     Authorize that the current user has access the descendant items of the given content item.
+    ///     Authorize that a user has access to the descendant items of a content item.
     /// </summary>
-    /// <param name="performingUser">The user performing the operation.</param>
+    /// <param name="user"><see cref="IUser" /> to authorize.</param>
     /// <param name="parentKey">The identifier of the parent content item to check its descendants for access.</param>
     /// <param name="permissionsToCheck">The collection of permissions to authorize.</param>
     /// <returns>A task resolving into a <see cref="ContentAuthorizationStatus"/>.</returns>
-    Task<ContentAuthorizationStatus> AuthorizeDescendantsAccessAsync(IUser performingUser, Guid parentKey, IReadOnlyList<char> permissionsToCheck);
+    Task<ContentAuthorizationStatus> AuthorizeDescendantsAccessAsync(IUser user, Guid parentKey, IReadOnlyList<char> permissionsToCheck);
 
     /// <summary>
-    ///     Authorize that the current user has access to perform action on the content root item.
+    ///     Authorize that a user is allowed to perform action on the content root item.
     /// </summary>
-    /// <param name="performingUser">The user performing the operation.</param>
+    /// <param name="user"><see cref="IUser" /> to authorize.</param>
     /// <param name="permissionToCheck">The permission to authorize.</param>
     /// <returns>A task resolving into a <see cref="ContentAuthorizationStatus"/>.</returns>
-    Task<ContentAuthorizationStatus> AuthorizeRootAccessAsync(IUser performingUser, char permissionToCheck)
-        => AuthorizeRootAccessAsync(performingUser, new[] { permissionToCheck });
+    Task<ContentAuthorizationStatus> AuthorizeRootAccessAsync(IUser user, char permissionToCheck)
+        => AuthorizeRootAccessAsync(user, new[] { permissionToCheck });
 
     /// <summary>
-    ///     Authorize that the current user has access to perform actions on the content root item.
+    ///     Authorize that a user is allowed to perform actions on the content root item.
     /// </summary>
-    /// <param name="performingUser">The user performing the operation.</param>
+    /// <param name="user"><see cref="IUser" /> to authorize.</param>
     /// <param name="permissionsToCheck">The collection of permissions to authorize.</param>
     /// <returns>A task resolving into a <see cref="ContentAuthorizationStatus"/>.</returns>
-    Task<ContentAuthorizationStatus> AuthorizeRootAccessAsync(IUser performingUser, IReadOnlyList<char> permissionsToCheck);
+    Task<ContentAuthorizationStatus> AuthorizeRootAccessAsync(IUser user, IReadOnlyList<char> permissionsToCheck);
 
     /// <summary>
-    ///     Authorize that the current user has access to perform action on the content bin item.
+    ///     Authorize that a user is allowed to perform action on the content bin item.
     /// </summary>
-    /// <param name="performingUser">The user performing the operation.</param>
+    /// <param name="user"><see cref="IUser" /> to authorize.</param>
     /// <param name="permissionToCheck">The permission to authorize.</param>
     /// <returns>A task resolving into a <see cref="ContentAuthorizationStatus"/>.</returns>
-    Task<ContentAuthorizationStatus> AuthorizeBinAccessAsync(IUser performingUser, char permissionToCheck)
-        => AuthorizeBinAccessAsync(performingUser, new[] { permissionToCheck });
+    Task<ContentAuthorizationStatus> AuthorizeBinAccessAsync(IUser user, char permissionToCheck)
+        => AuthorizeBinAccessAsync(user, new[] { permissionToCheck });
 
     /// <summary>
-    ///     Authorize that the current user has access to perform actions on the content bin item.
+    ///     Authorize that a user is allowed to perform actions on the content bin item.
     /// </summary>
-    /// <param name="performingUser">The user performing the operation.</param>
+    /// <param name="user"><see cref="IUser" /> to authorize.</param>
     /// <param name="permissionsToCheck">The collection of permissions to authorize.</param>
     /// <returns>A task resolving into a <see cref="ContentAuthorizationStatus"/>.</returns>
-    Task<ContentAuthorizationStatus> AuthorizeBinAccessAsync(IUser performingUser, IReadOnlyList<char> permissionsToCheck);
+    Task<ContentAuthorizationStatus> AuthorizeBinAccessAsync(IUser user, IReadOnlyList<char> permissionsToCheck);
 }
