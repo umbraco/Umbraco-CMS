@@ -145,9 +145,11 @@ export class UmbImportDictionaryModalLayout extends UmbModalBaseElement<
 				</div>
 				<div>
 					<strong><umb-localize key="actions_chooseWhereToImport">Choose where to import</umb-localize>:</strong>
+					Work in progress<br />
 					${
-						console.log('load')
-						//<umb-dictionary-item-input
+						this._parentId
+						// TODO
+						// <umb-dictionary-item-input
 						//	@change=${this.#onParentChange}
 						//	.selectedIds=${this._parentId ? [this._parentId] : []}
 						//	max="1">
