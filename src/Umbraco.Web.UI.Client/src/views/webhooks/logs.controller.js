@@ -1,7 +1,7 @@
 (function () {
   "use strict";
 
-  function WebhookLogController($q, webhooksResource, overlayService, userService, dateHelper) {
+  function WebhookLogController($q, webhooksResource, editorService, userService, dateHelper) {
 
     const vm = this;
 
@@ -38,7 +38,8 @@
     }
 
     function openLogOverlay(log) {
-      overlayService.open({
+
+      const dialog = {
         view: "views/webhooks/overlays/details.html",
         title: 'Details',
         position: 'right',
@@ -46,9 +47,11 @@
         log,
         currentUser: this.currentUser,
         close: () => {
-          overlayService.close();
+          editorService.close();
         }
-      });
+      };
+
+      editorService.open(dialog);
     }
 
     function isChecked(log) {

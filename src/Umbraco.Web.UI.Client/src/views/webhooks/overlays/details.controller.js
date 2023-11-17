@@ -1,8 +1,9 @@
 (function () {
   "use strict";
-  function DetailsController() {
+  function DetailsController($scope) {
     const vm = this;
 
+    vm.close = close;
     vm.formatData = formatData;
 
     function formatData(data) {
@@ -18,6 +19,12 @@
       }
 
       return obj;
+    }
+
+    function close() {
+      if ($scope.model && $scope.model.close) {
+        $scope.model.close();
+      }
     }
 
   }
