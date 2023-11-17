@@ -36,7 +36,6 @@ using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.ContentTypeEditing;
-using Umbraco.Cms.Core.Snippets;
 using Umbraco.Cms.Core.DynamicRoot;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Core.Telemetry;
@@ -281,7 +280,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IKeyValueService, KeyValueService>();
             Services.AddUnique<IPublicAccessService, PublicAccessService>();
             Services.AddUnique<IContentVersionService, ContentVersionService>();
-            Services.AddTransient<IUserGroupAuthorizationService, UserGroupAuthorizationService>();
+            Services.AddUnique<IUserGroupPermissionService, UserGroupPermissionService>();
             Services.AddUnique<IUserGroupService, UserGroupService>();
             Services.AddUnique<IUserService, UserService>();
             Services.AddUnique<ITourService, TourService>();
