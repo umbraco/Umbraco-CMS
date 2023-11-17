@@ -193,6 +193,10 @@ export default class UmbLoginPageElement extends LitElement {
         color: var(--uui-color-interactive-emphasis);
       }
 
+      .text-error {
+        margin-top: var(--uui-size-space-4);
+      }
+
       .text-danger {
         color: var(--uui-color-danger-standalone);
       }
