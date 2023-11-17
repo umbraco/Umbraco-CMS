@@ -71,8 +71,7 @@ public class WebhookFiring : IRecurringBackgroundJob
                         return;
                     }
 
-                    var actualObject = _jsonSerializer.Deserialize<object>(request.RequestObject?.ToString() ?? string.Empty);
-                    HttpResponseMessage? response = await SendRequestAsync(webhook, request.EventAlias, actualObject, request.RetryCount, CancellationToken.None);
+                    HttpResponseMessage? response = await SendRequestAsync(webhook, request.EventAlias, request.RequestObject, request.RetryCount, CancellationToken.None);
 
                     if ((response?.IsSuccessStatusCode ?? false) || request.RetryCount >= _webhookSettings.MaximumRetries)
                     {
@@ -88,12 +87,11 @@ public class WebhookFiring : IRecurringBackgroundJob
         }));
     }
 
-    private async Task<HttpResponseMessage?> SendRequestAsync(Webhook webhook, string eventName, object? payload, int retryCount, CancellationToken cancellationToken)
+    private async Task<HttpResponseMessage?> SendRequestAsync(Webhook webhook, string eventName, string? serializedObject, int retryCount, CancellationToken cancellationToken)
     {
         using var httpClient = new HttpClient();
 
-        var serializedObject = _jsonSerializer.Serialize(payload);
-        var stringContent = new StringContent(serializedObject, Encoding.UTF8, "application/json");
+        var stringContent = new StringContent(serializedObject ?? string.Empty, Encoding.UTF8, "application/json");
         stringContent.Headers.TryAddWithoutValidation("Umb-Webhook-Event", eventName);
 
         foreach (KeyValuePair<string, string> header in webhook.Headers)
