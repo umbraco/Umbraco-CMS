@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Net.Http.Json;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
@@ -96,7 +96,7 @@ public class WebhookFiring : IRecurringBackgroundJob
 
         foreach (KeyValuePair<string, string> header in webhook.Headers)
         {
-            stringContent.Headers.TryAddWithoutValidation(header.Key, header.Value);
+            jsonContent.Headers.TryAddWithoutValidation(header.Key, header.Value);
         }
 
         HttpResponseMessage? response = null;
