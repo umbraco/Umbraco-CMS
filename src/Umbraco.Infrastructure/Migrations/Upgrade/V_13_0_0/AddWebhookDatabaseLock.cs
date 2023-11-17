@@ -24,7 +24,7 @@ public class AddWebhookDatabaseLock : MigrationBase
 
         if (webhookRequestLock is null)
         {
-            Database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.WebhookRequest, Name = "WebhookRequest" });
+            Database.Insert(Constants.DatabaseSchema.Tables.Lock, "id", false, new LockDto { Id = Constants.Locks.WebhookLogs, Name = "WebhookRequest" });
         }
     }
 }
