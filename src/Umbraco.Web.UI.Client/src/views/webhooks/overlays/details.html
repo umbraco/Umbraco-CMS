@@ -1,4 +1,4 @@
-<div class="headless-webhook-log-entry-details-overlay" style="margin-top: 20px;">
+<div ng-controller="Umbraco.Editors.Webhooks.DetailsController as vm" class="headless-webhook-log-entry-details-overlay" style="margin-top: 20px;">
   <div class="control-group">
     <div class="flex items-center">
       <div class="flx-g0 flx-s0" style="flex-basis: 40px;">
@@ -31,11 +31,11 @@
   <div class="control-group">
     <span class="bold">Request</span>
     <pre class="code">{{model.log.requestHeaders}}</pre>
-    <umb-code-snippet language="'JSON'" wrap="true">{{model.log.requestBody | json}}</umb-code-snippet>
+    <umb-code-snippet language="'JSON'" wrap="true">{{vm.formatData(model.log.requestBody) | json}}</umb-code-snippet>
   </div>
   <div class="control-group">
     <span class="bold">Response</span>
     <pre class="code">{{model.log.responseHeaders}}</pre>
-    <umb-code-snippet language="'TEXT'" wrap="true">{{model.log.responseBody | json}}</umb-code-snippet>
+    <umb-code-snippet language="'TEXT'" wrap="true">{{vm.formatData(model.log.responseBody) | json}}</umb-code-snippet>
   </div>
 </div>
