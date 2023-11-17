@@ -5,7 +5,7 @@ const pluginManifests: Array<ManifestTinyMcePlugin> = [
 		type: 'tinyMcePlugin',
 		alias: 'Umb.TinyMcePlugin.CodeEditor',
 		name: 'Code Editor TinyMCE Plugin',
-		loader: () => import('./tiny-mce-code-editor.plugin.js'),
+		js: () => import('./tiny-mce-code-editor.plugin.js'),
 		meta: {
 			toolbar: [
 				{
@@ -20,7 +20,7 @@ const pluginManifests: Array<ManifestTinyMcePlugin> = [
 		type: 'tinyMcePlugin',
 		alias: 'Umb.TinyMcePlugin.LinkPicker',
 		name: 'Link Picker TinyMCE Plugin',
-		loader: () => import('./tiny-mce-linkpicker.plugin.js'),
+		js: () => import('./tiny-mce-linkpicker.plugin.js'),
 		meta: {
 			toolbar: [
 				{
@@ -40,7 +40,7 @@ const pluginManifests: Array<ManifestTinyMcePlugin> = [
 		type: 'tinyMcePlugin',
 		alias: 'Umb.TinyMcePlugin.MediaPicker',
 		name: 'Media Picker TinyMCE Plugin',
-		loader: () => import('./tiny-mce-mediapicker.plugin.js'),
+		js: () => import('./tiny-mce-mediapicker.plugin.js'),
 		meta: {
 			toolbar: [
 				{
@@ -55,7 +55,7 @@ const pluginManifests: Array<ManifestTinyMcePlugin> = [
 		type: 'tinyMcePlugin',
 		alias: 'Umb.TinyMcePlugin.EmbeddedMedia',
 		name: 'Embedded Media TinyMCE Plugin',
-		loader: () => import('./tiny-mce-embeddedmedia.plugin.js'),
+		js: () => import('./tiny-mce-embeddedmedia.plugin.js'),
 		meta: {
 			toolbar: [
 				{
@@ -70,7 +70,7 @@ const pluginManifests: Array<ManifestTinyMcePlugin> = [
 		type: 'tinyMcePlugin',
 		alias: 'Umb.TinyMcePlugin.MacroPicker',
 		name: 'Macro Picker TinyMCE Plugin',
-		loader: () => import('./tiny-mce-macropicker.plugin.js'),
+		js: () => import('./tiny-mce-macropicker.plugin.js'),
 		meta: {
 			toolbar: [
 				{

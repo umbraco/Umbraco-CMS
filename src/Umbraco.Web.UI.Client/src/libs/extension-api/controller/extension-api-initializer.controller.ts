@@ -1,28 +1,28 @@
 import { createExtensionApi } from '../functions/create-extension-api.function.js';
-import { UmbExtensionRegistry } from '../registry/extension.registry.js';
-import { isManifestApiType } from '../type-guards/is-manifest-apiable-type.function.js';
-import { UmbApi, ManifestApi, ManifestCondition } from '../types.js';
+import type { UmbApi } from '../models/api.interface.js';
+import type { UmbExtensionRegistry } from '../registry/extension.registry.js';
+import type { ManifestApi, ManifestCondition } from '../types/index.js';
 import { UmbBaseExtensionInitializer } from './base-extension-initializer.controller.js';
-import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-
+import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
  * This Controller manages a single Extension and its API instance.
  * When the extension is permitted to be used, its API will be instantiated and available for the consumer.
  *
  * @example
-* ```ts
-* const controller = new UmbExtensionApiController(host, extensionRegistry, alias, [], (permitted, ctrl) => { ctrl.api.helloWorld() }));
-* ```
+ * ```ts
+ * const controller = new UmbExtensionApiController(host, extensionRegistry, alias, [], (permitted, ctrl) => { ctrl.api.helloWorld() }));
+ * ```
  * @export
  * @class UmbExtensionApiController
  */
 export class UmbExtensionApiInitializer<
-	ManifestType extends ManifestApi =  ManifestApi,
+	ManifestType extends ManifestApi = ManifestApi,
 	ControllerType extends UmbExtensionApiInitializer<ManifestType, any> = any,
-	ExtensionApiInterface extends UmbApi = ManifestType extends ManifestApi ? NonNullable<ManifestType['API_TYPE']> : UmbApi
+	ExtensionApiInterface extends UmbApi = ManifestType extends ManifestApi
+		? NonNullable<ManifestType['API_TYPE']>
+		: UmbApi,
 > extends UmbBaseExtensionInitializer<ManifestType, ControllerType> {
-
 	#api?: ExtensionApiInterface;
 	#constructorArguments?: Array<unknown>;
 
@@ -34,7 +34,6 @@ export class UmbExtensionApiInitializer<
 	public get api() {
 		return this.#api;
 	}
-
 
 	/**
 	 * The props that are passed to the class.
@@ -67,7 +66,7 @@ export class UmbExtensionApiInitializer<
 		extensionRegistry: UmbExtensionRegistry<ManifestCondition>,
 		alias: string,
 		constructorArguments: Array<unknown> | undefined,
-		onPermissionChanged?: (isPermitted: boolean, controller: ControllerType) => void
+		onPermissionChanged?: (isPermitted: boolean, controller: ControllerType) => void,
 	) {
 		super(host, extensionRegistry, 'extApi_', alias, onPermissionChanged);
 		this.#constructorArguments = constructorArguments;
@@ -88,23 +87,22 @@ export class UmbExtensionApiInitializer<
 	protected async _conditionsAreGood() {
 		const manifest = this.manifest!; // In this case we are sure its not undefined.
 
-		if (isManifestApiType(manifest)) {
-			const newApi = await createExtensionApi<ExtensionApiInterface>(manifest as unknown as ManifestApi<ExtensionApiInterface>, this.#constructorArguments);
-			if (!this._positive) {
-				// We are not positive anymore, so we will back out of this creation.
-				return false;
-			}
-			this.#api = newApi;
-
-		} else {
-			this.#api = undefined;
-			console.warn('Manifest did not provide any useful data for a api class to construct.')
+		const newApi = await createExtensionApi<ExtensionApiInterface>(
+			manifest as unknown as ManifestApi<ExtensionApiInterface>,
+			this.#constructorArguments,
+		);
+		if (!this._isConditionsPositive) {
+			// We are not positive anymore, so we will back out of this creation.
+			return false;
 		}
+		this.#api = newApi;
+
 		if (this.#api) {
 			//this.#assignProperties();
 			return true; // we will confirm we have a component and are still good to go.
 		}
 
+		console.warn('Manifest did not provide any useful data for a api class to construct.');
 		return false; // we will reject the state, we have no component, we are not good to be shown.
 	}
 

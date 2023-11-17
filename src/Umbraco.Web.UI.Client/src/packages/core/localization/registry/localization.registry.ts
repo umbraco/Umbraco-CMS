@@ -5,7 +5,7 @@ import {
 	registerLocalization,
 	localizations,
 } from '@umbraco-cms/backoffice/localization-api';
-import { hasDefaultExport, loadExtension } from '@umbraco-cms/backoffice/extension-api';
+import { hasDefaultExport, loadManifestPlainJs } from '@umbraco-cms/backoffice/extension-api';
 import { UmbBackofficeExtensionRegistry, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import {
 	BehaviorSubject,
@@ -64,11 +64,13 @@ export class UmbLocalizationRegistry {
 						}
 
 						// If extension contains a js file, load it and add the default dictionary to the inner dictionary.
-						const loadedExtension = await loadExtension(extension);
+						if(extension.js) {
+							const loadedExtension = await loadManifestPlainJs(extension.js);
 
-						if (loadedExtension && hasDefaultExport<UmbLocalizationDictionary>(loadedExtension)) {
-							for (const [dictionaryName, dictionary] of Object.entries(loadedExtension.default)) {
-								this.#addOrUpdateDictionary(innerDictionary, dictionaryName, dictionary);
+							if (loadedExtension && hasDefaultExport<UmbLocalizationDictionary>(loadedExtension)) {
+								for (const [dictionaryName, dictionary] of Object.entries(loadedExtension.default)) {
+									this.#addOrUpdateDictionary(innerDictionary, dictionaryName, dictionary);
+								}
 							}
 						}
 

@@ -5,12 +5,7 @@ import type { UmbEntityBase } from '@umbraco-cms/backoffice/models';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UMB_MODAL_CONTEXT_TOKEN, UmbModalContext } from '@umbraco-cms/backoffice/modal';
 
-/*
-
-TODO: We need to figure out if we like to keep using same alias for all workspace contexts.
-If so we need to align on a interface that all of these implements. otherwise consumers cant trust the workspace-context.
-*/
-export abstract class UmbWorkspaceContext<RepositoryType, EntityType extends UmbEntityBase>
+export abstract class UmbEditableWorkspaceContextBase<RepositoryType, EntityType extends UmbEntityBase>
 	extends UmbBaseController
 	implements UmbSaveableWorkspaceContextInterface<EntityType>
 {
@@ -56,8 +51,8 @@ export abstract class UmbWorkspaceContext<RepositoryType, EntityType extends Umb
 		this.modalContext?.submit(data);
 	}
 
-	abstract getEntityId(): string | undefined; // COnsider if this should go away now that we have getUnique()
-	abstract getEntityType(): string; // TODO: consider of this should be on the repository because a repo is responsible for one entity type
+	abstract getEntityId(): string | undefined; // TODO: Consider if this should go away/be renamed? now that we have getUnique()
+	abstract getEntityType(): string; // TODO: consider if this should be on the repository because a repo is responsible for one entity type
 	abstract getData(): EntityType | undefined;
 	abstract save(): Promise<void>;
 }

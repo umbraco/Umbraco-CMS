@@ -35,7 +35,7 @@ const modals: Array<ManifestModal> = [
 		type: 'modal',
 		alias: 'Umb.Modal.CreateDocument',
 		name: 'Create Document Modal',
-		loader: () => import('./create-document-modal.element.js'),
+		js: () => import('./create-document-modal.element.js'),
 	},
 ];
 

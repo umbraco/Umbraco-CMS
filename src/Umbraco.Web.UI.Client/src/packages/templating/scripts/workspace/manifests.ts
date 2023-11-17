@@ -6,7 +6,7 @@ const workspace: ManifestWorkspace = {
 	type: 'workspace',
 	alias: SCRIPTS_WORKSPACE_ALIAS,
 	name: 'Scripts Workspace',
-	loader: () => import('./scripts-workspace.element.js'),
+	js: () => import('./scripts-workspace.element.js'),
 	meta: {
 		entityType: SCRIPTS_ENTITY_TYPE,
 	},

@@ -4,7 +4,7 @@ export const manifest: ManifestPropertyEditorUi = {
 	type: 'propertyEditorUi',
 	alias: 'Umb.PropertyEditorUi.OrderDirection',
 	name: 'Order Direction Property Editor UI',
-	loader: () => import('./property-editor-ui-order-direction.element.js'),
+	js: () => import('./property-editor-ui-order-direction.element.js'),
 	meta: {
 		label: 'Order Direction',
 		propertyEditorSchemaAlias: '',

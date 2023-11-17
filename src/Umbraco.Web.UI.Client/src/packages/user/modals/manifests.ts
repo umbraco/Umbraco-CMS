@@ -5,7 +5,7 @@ const modals: Array<ManifestModal> = [
 		type: 'modal',
 		alias: 'Umb.Modal.ChangePassword',
 		name: 'Change Password Modal',
-		loader: () => import('./change-password/change-password-modal.element.js'),
+		js: () => import('./change-password/change-password-modal.element.js'),
 	},
 ];
 

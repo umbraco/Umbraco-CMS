@@ -26,6 +26,7 @@ import type { ManifestTreeItem } from './tree-item.model.js';
 import type { ManifestUserProfileApp } from './user-profile-app.model.js';
 import type { ManifestWorkspace } from './workspace.model.js';
 import type { ManifestWorkspaceAction } from './workspace-action.model.js';
+import type { ManifestWorkspaceContext } from './workspace-context.model.js';
 import type { ManifestWorkspaceEditorView } from './workspace-editor-view.model.js';
 import type { ManifestWorkspaceViewCollection } from './workspace-view-collection.model.js';
 import type { ManifestUserPermission } from './user-permission.model.js';
@@ -46,6 +47,7 @@ export * from './external-login-provider.model.js';
 export * from './global-context.model.js';
 export * from './header-app.model.js';
 export * from './health-check.model.js';
+export * from './localization.model.js';
 export * from './menu-item.model.js';
 export * from './menu.model.js';
 export * from './modal.model.js';
@@ -59,16 +61,16 @@ export * from './section.model.js';
 export * from './store.model.js';
 export * from './theme.model.js';
 export * from './tinymce-plugin.model.js';
-export * from './localization.model.js';
 export * from './tree-item.model.js';
 export * from './tree.model.js';
+export * from './user-granular-permission.model.js';
+export * from './user-permission.model.js';
 export * from './user-profile-app.model.js';
 export * from './workspace-action.model.js';
-export * from './workspace-view-collection.model.js';
+export * from './workspace-context.model.js';
 export * from './workspace-editor-view.model.js';
+export * from './workspace-view-collection.model.js';
 export * from './workspace.model.js';
-export * from './user-permission.model.js';
-export * from './user-granular-permission.model.js';
 
 export type ManifestTypes =
 	| ManifestBundle<ManifestTypes>
@@ -108,6 +110,7 @@ export type ManifestTypes =
 	| ManifestUserProfileApp
 	| ManifestWorkspace
 	| ManifestWorkspaceAction
+	| ManifestWorkspaceContext
 	| ManifestWorkspaceEditorView
 	| ManifestWorkspaceViewCollection
 	| ManifestUserPermission

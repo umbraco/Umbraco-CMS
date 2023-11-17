@@ -1,5 +1,5 @@
 import { UmbMemberTypeRepository } from '../repository/member-type.repository.js';
-import { UmbSaveableWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
+import { UmbSaveableWorkspaceContextInterface, UmbEditableWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
@@ -8,7 +8,7 @@ import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 type EntityType = any;
 
 export class UmbMemberTypeWorkspaceContext
-	extends UmbWorkspaceContext<UmbMemberTypeRepository, EntityType>
+	extends UmbEditableWorkspaceContextBase<UmbMemberTypeRepository, EntityType>
 	implements UmbSaveableWorkspaceContextInterface<EntityType | undefined>
 {
 	#data = new UmbObjectState<EntityType | undefined>(undefined);
