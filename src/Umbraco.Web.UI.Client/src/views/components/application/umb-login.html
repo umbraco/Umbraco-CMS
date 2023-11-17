@@ -22,6 +22,7 @@
                 external-login-url="{{ ::vm.externalLoginFormAction }}"
                 button-look="{{ ::login.options.buttonLook }}"
                 button-color="{{ ::login.options.buttonColor }}"
+                ng-attr-user-view-state="{{ ::vm.isTimedOut ? 'timedOut' : 'loggedOut' }}"
             ></umb-external-login-provider>
         </umb-auth>
     </div>
