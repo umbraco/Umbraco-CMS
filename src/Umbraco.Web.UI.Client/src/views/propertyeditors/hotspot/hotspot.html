@@ -1,0 +1,24 @@
+<div class="umb-property-editor" ng-controller="Umbraco.PropertyEditors.HotspotController as vm">
+
+  <div class="umb-cropper-imageholder clearfix">
+    <umb-image-gravity
+      src="imageSrc"
+      center="model.value.focalPoint"
+      on-value-changed="vm.focalPointChanged(left, top)"
+      on-image-loaded="vm.imageLoaded(isCroppable, hasDimensions)"
+      disable-focal-point="readonly">
+    </umb-image-gravity>
+
+    <!--<div ng-if="!readonly" class="umb-cropper-imageholder-buttons">
+      <button type="button" class="btn btn-link btn-crop-delete" ng-click="clear()"><umb-icon icon="icon-delete" class="red"></umb-icon> <localize key="content_uploadClear">Remove file</localize></button>
+      <button type="button" class="sr-only" ng-click="vm.clear()"><localize key="content_uploadClearImageContext">Click here to remove the image from the media item</localize></button>
+      <button type="button" ng-show="(model.value.focalPoint.left !== 0.5 && model.value.focalPoint.top !== 0.5)" class="btn btn-link btn-gravity-reset" ng-click="focalPointChanged(0.5,0.5)">
+        <umb-icon icon="icon-axis-rotation"></umb-icon> <localize key="content_resetFocalPoint">Reset focal point</localize>
+      </button>
+    </div>-->
+
+  </div>
+
+  <pre>{{model.value | json}}</pre>
+
+</div>

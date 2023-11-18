@@ -81,6 +81,11 @@ public static partial class Constants
             public const string Grid = "Umbraco.Grid";
 
             /// <summary>
+            ///     Hotspot.
+            /// </summary>
+            public const string Hotspot = "Umbraco.Hotspot";
+
+            /// <summary>
             ///     Image Cropper.
             /// </summary>
             public const string ImageCropper = "Umbraco.ImageCropper";
