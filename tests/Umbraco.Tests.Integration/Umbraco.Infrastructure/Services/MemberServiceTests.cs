@@ -227,7 +227,6 @@ public class MemberServiceTests : UmbracoIntegrationTest
         // contains the other properties, that PublishedContentType adds (BuiltinMemberProperties)
         string[] aliases =
         {
-            Constants.Conventions.Member.Comments,
             nameof(IMember.Email),
             nameof(IMember.Username),
             nameof(IMember.IsApproved),
