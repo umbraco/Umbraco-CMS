@@ -61,7 +61,6 @@ public class MemberTypeBuilderTests
             .WithThumbnail(testThumbnail)
             .WithTrashed(testTrashed)
             .WithPropertyTypeIdsIncrementingFrom(200)
-            .WithMembershipPropertyGroup()
             .AddPropertyGroup()
             .WithId(1)
             .WithName(testPropertyGroupName)
@@ -101,11 +100,11 @@ public class MemberTypeBuilderTests
         Assert.AreEqual(testThumbnail, memberType.Thumbnail);
         Assert.AreEqual(testTrashed, memberType.Trashed);
         Assert.IsFalse(memberType.IsContainer);
-        Assert.AreEqual(3, memberType.PropertyTypes.Count()); // 1 from membership properties group, 2 custom
+        Assert.AreEqual(2, memberType.PropertyTypes.Count());
 
         var propertyTypeIds = memberType.PropertyTypes.Select(x => x.Id).OrderBy(x => x).ToArray();
         Assert.AreEqual(testPropertyTypeIdsIncrementingFrom + 1, propertyTypeIds.Min());
-        Assert.AreEqual(testPropertyTypeIdsIncrementingFrom + 3, propertyTypeIds.Max());
+        Assert.AreEqual(testPropertyTypeIdsIncrementingFrom + 2, propertyTypeIds.Max());
 
         Assert.IsTrue(memberType.MemberCanEditProperty(testPropertyType1.Alias));
         Assert.IsFalse(memberType.MemberCanViewProperty(testPropertyType1.Alias));

@@ -68,7 +68,6 @@ public class MemberBuilderTests
             .WithId(testMemberTypeId)
             .WithAlias(testMemberTypeAlias)
             .WithName(testMemberTypeName)
-            .WithMembershipPropertyGroup()
             .AddPropertyGroup()
             .WithId(1)
             .WithName(testMemberTypePropertyGroupName)
@@ -145,14 +144,14 @@ public class MemberBuilderTests
         Assert.AreEqual(testLastLoginDate, member.LastLoginDate);
         Assert.AreEqual(testLastPasswordChangeDate, member.LastPasswordChangeDate);
         Assert.AreEqual(testGroups, member.Groups.ToArray());
-        Assert.AreEqual(4, member.Properties.Count); // 1 from membership properties group, 3 custom
+        Assert.AreEqual(3, member.Properties.Count);
         Assert.AreEqual(testPropertyData1.Value, member.GetValue<string>(testPropertyData1.Key));
         Assert.AreEqual(testPropertyData2.Value, member.GetValue<string>(testPropertyData2.Key));
         Assert.AreEqual(testPropertyData3.Value, member.GetValue<string>(testPropertyData3.Key));
 
         var propertyIds = member.Properties.Select(x => x.Id).OrderBy(x => x).ToArray();
         Assert.AreEqual(testPropertyIdsIncrementingFrom + 1, propertyIds.Min());
-        Assert.AreEqual(testPropertyIdsIncrementingFrom + 4, propertyIds.Max());
+        Assert.AreEqual(testPropertyIdsIncrementingFrom + 3, propertyIds.Max());
 
         Assert.AreEqual(2, member.AdditionalData.Count);
         Assert.AreEqual(testAdditionalData1.Value, member.AdditionalData[testAdditionalData1.Key]);

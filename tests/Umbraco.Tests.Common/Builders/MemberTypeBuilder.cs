@@ -35,21 +35,6 @@ public class MemberTypeBuilder
         set => _propertyTypeIdsIncrementingFrom = value;
     }
 
-    public MemberTypeBuilder WithMembershipPropertyGroup()
-    {
-        var builder = new PropertyGroupBuilder<MemberTypeBuilder>(this)
-            .WithId(99)
-            .WithName(Constants.Conventions.Member.StandardPropertiesGroupName)
-            .AddPropertyType()
-            .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.TextArea)
-            .WithValueStorageType(ValueStorageType.Ntext)
-            .WithAlias(Constants.Conventions.Member.Comments)
-            .WithName(Constants.Conventions.Member.CommentsLabel)
-            .Done();
-        _propertyGroupBuilders.Add(builder);
-        return this;
-    }
-
     public MemberTypeBuilder WithMemberCanEditProperty(string alias, bool canEdit)
     {
         _memberCanEditProperties.Add(alias, canEdit);

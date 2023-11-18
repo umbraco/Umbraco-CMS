@@ -115,7 +115,6 @@ public class MemberUserStoreTests
             m.Email == "fakeemail@umbraco.com" &&
             m.Username == "fakeUsername" &&
             m.RawPasswordValue == "fakePassword" &&
-            m.Comments == "hello" &&
             m.ContentTypeAlias == fakeMemberType.Alias &&
             m.HasIdentity == true);
 
@@ -146,7 +145,6 @@ public class MemberUserStoreTests
             Name = "fakeName",
             Email = "fakeemail@umbraco.com",
             UserName = "fakeUsername",
-            Comments = "hello",
             LastLoginDateUtc = DateTime.UtcNow,
             LastPasswordChangeDateUtc = DateTime.UtcNow,
             EmailConfirmed = true,
@@ -166,7 +164,6 @@ public class MemberUserStoreTests
             m.Email == "a@b.com" &&
             m.Username == "c" &&
             m.RawPasswordValue == "d" &&
-            m.Comments == "e" &&
             m.ContentTypeAlias == fakeMemberType.Alias &&
             m.HasIdentity == true &&
             m.EmailConfirmedDate == DateTime.MinValue &&
@@ -189,7 +186,6 @@ public class MemberUserStoreTests
         Assert.AreEqual(fakeUser.Name, mockMember.Name);
         Assert.AreEqual(fakeUser.Email, mockMember.Email);
         Assert.AreEqual(fakeUser.UserName, mockMember.Username);
-        Assert.AreEqual(fakeUser.Comments, mockMember.Comments);
         Assert.AreEqual(fakeUser.LastPasswordChangeDateUtc.Value.ToLocalTime(), mockMember.LastPasswordChangeDate);
         Assert.AreEqual(fakeUser.LastLoginDateUtc.Value.ToLocalTime(), mockMember.LastLoginDate);
         Assert.AreEqual(fakeUser.AccessFailedCount, mockMember.FailedPasswordAttempts);

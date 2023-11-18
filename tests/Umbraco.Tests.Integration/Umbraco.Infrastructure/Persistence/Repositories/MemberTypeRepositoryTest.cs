@@ -42,14 +42,9 @@ public class MemberTypeRepositoryTest : UmbracoIntegrationTest
 
             var sut = repository.Get(memberType.Id);
 
-            var standardProps = ConventionsHelper.GetStandardPropertyTypeStubs(ShortStringHelper);
-
-            // if there are any standard properties, they all get added to a single group
-            var expectedGroupCount = standardProps.Count > 0 ? 2 : 1;
-
             Assert.That(sut, Is.Not.Null);
-            Assert.That(sut.PropertyGroups.Count, Is.EqualTo(expectedGroupCount));
-            Assert.That(sut.PropertyTypes.Count(), Is.EqualTo(3 + standardProps.Count));
+            Assert.That(sut.PropertyGroups.Count, Is.EqualTo(1));
+            Assert.That(sut.PropertyTypes.Count(), Is.EqualTo(3));
 
             Assert.That(sut.PropertyGroups.Any(x => x.HasIdentity == false || x.Id == 0), Is.False);
             Assert.That(sut.PropertyTypes.Any(x => x.HasIdentity == false || x.Id == 0), Is.False);

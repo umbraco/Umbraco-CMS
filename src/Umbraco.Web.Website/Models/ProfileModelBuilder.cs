@@ -61,7 +61,6 @@ public class ProfileModelBuilder : MemberModelBuilderBase
             Name = member.Name,
             Email = member.Email,
             UserName = member.UserName,
-            Comments = member.Comments,
             IsApproved = member.IsApproved,
             IsLockedOut = member.IsLockedOut,
             LastLockoutDate = member.LastLockoutDateUtc?.ToLocalTime(),

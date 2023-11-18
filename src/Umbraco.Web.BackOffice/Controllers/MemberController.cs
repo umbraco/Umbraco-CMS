@@ -471,17 +471,6 @@ public class MemberController : ContentControllerBase
         var creatorId = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1;
         member.CreatorId = creatorId;
 
-        // assign the mapped property values that are not part of the identity properties
-        var builtInAliases = ConventionsHelper.GetStandardPropertyTypeStubs(_shortStringHelper).Select(x => x.Key)
-            .ToArray();
-        foreach (ContentPropertyBasic property in contentItem.Properties)
-        {
-            if (builtInAliases.Contains(property.Alias) == false)
-            {
-                member.Properties[property.Alias]?.SetValue(property.Value);
-            }
-        }
-
         // now the member has been saved via identity, resave the member with mapped content properties
         _memberService.Save(member);
         contentItem.PersistedContent = member;

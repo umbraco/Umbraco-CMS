@@ -75,7 +75,6 @@ internal class PublishedMember : PublishedContent
         // see also PublishedContentType
         AddIf(contentType, properties, nameof(IMember.Email), member.Email);
         AddIf(contentType, properties, nameof(IMember.Username), member.Username);
-        AddIf(contentType, properties, nameof(IMember.Comments), member.Comments);
         AddIf(contentType, properties, nameof(IMember.IsApproved), member.IsApproved);
         AddIf(contentType, properties, nameof(IMember.IsLockedOut), member.IsLockedOut);
         AddIf(contentType, properties, nameof(IMember.LastLockoutDate), member.LastLockoutDate);
@@ -104,8 +103,6 @@ internal class PublishedMember : PublishedContent
     public string Email => Member.Email;
 
     public string UserName => Member.Username;
-
-    public string? Comments => Member.Comments;
 
     public bool IsApproved => Member.IsApproved;
 

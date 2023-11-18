@@ -107,7 +107,6 @@ public class UmbProfileController : SurfaceController
         currentMember.Email = model.Email;
         currentMember.Name = model.Name;
         currentMember.UserName = model.UserName;
-        currentMember.Comments = model.Comments;
 
         IdentityResult saveResult = await _memberManager.UpdateAsync(currentMember);
         if (!saveResult.Succeeded)

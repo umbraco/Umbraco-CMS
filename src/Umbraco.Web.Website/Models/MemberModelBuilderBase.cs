@@ -21,10 +21,8 @@ public abstract class MemberModelBuilderBase
     {
         var viewProperties = new List<MemberPropertyModel>();
 
-        var builtIns = ConventionsHelper.GetStandardPropertyTypeStubs(_shortStringHelper).Select(x => x.Key).ToArray();
-
         IOrderedEnumerable<IPropertyType> propertyTypes = memberType.PropertyTypes
-            .Where(x => builtIns.Contains(x.Alias) == false && memberType.MemberCanEditProperty(x.Alias))
+            .Where(x => memberType.MemberCanEditProperty(x.Alias))
             .OrderBy(p => p.SortOrder);
 
         foreach (IPropertyType prop in propertyTypes)

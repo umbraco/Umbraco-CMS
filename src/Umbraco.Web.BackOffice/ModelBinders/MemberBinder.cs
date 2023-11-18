@@ -100,45 +100,10 @@ internal class MemberBinder : IModelBinder
     /// </remarks>
     private IMember CreateNew(MemberSave model)
     {
-        IMemberType? contentType = _memberTypeService.Get(model.ContentTypeAlias);
-        if (contentType == null)
-        {
-            throw new InvalidOperationException("No member type found with alias " + model.ContentTypeAlias);
-        }
+        IMemberType? contentType = _memberTypeService.Get(model.ContentTypeAlias)
+            ?? throw new InvalidOperationException("No member type found with alias " + model.ContentTypeAlias);
 
-        //remove all membership properties, these values are set with the membership provider.
-        FilterMembershipProviderProperties(contentType);
-
-        //return the new member with the details filled in
+        // return the new member with the details filled in
         return new Member(model.Name, model.Email, model.Username, model.Password?.NewPassword, contentType);
-    }
-
-    /// <summary>
-    ///     This will remove all of the special membership provider properties which were required to display the property
-    ///     editors
-    ///     for editing - but the values have been mapped back to the MemberSave object directly - we don't want to keep these
-    ///     properties
-    ///     on the IMember because they will attempt to be persisted which we don't want since they might not even exist.
-    /// </summary>
-    /// <param name="contentType"></param>
-    private void FilterMembershipProviderProperties(IContentTypeBase contentType)
-    {
-        Dictionary<string, PropertyType> defaultProps =
-            ConventionsHelper.GetStandardPropertyTypeStubs(_shortStringHelper);
-        //remove all membership properties, these values are set with the membership provider.
-        var exclude = defaultProps.Select(x => x.Value.Alias).ToArray();
-        FilterContentTypeProperties(contentType, exclude);
-    }
-
-    private void FilterContentTypeProperties(IContentTypeBase contentType, IEnumerable<string> exclude)
-    {
-        //remove all properties based on the exclusion list
-        foreach (var remove in exclude)
-        {
-            if (contentType.PropertyTypeExists(remove))
-            {
-                contentType.RemovePropertyType(remove);
-            }
-        }
     }
 }

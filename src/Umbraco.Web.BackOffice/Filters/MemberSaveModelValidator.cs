@@ -96,13 +96,6 @@ internal class
     public override bool ValidateProperties(MemberSave? model, IContentProperties<ContentPropertyBasic>? modelWithProperties, ActionExecutingContext actionContext)
     {
         var propertiesToValidate = model?.Properties.ToList();
-        Dictionary<string, PropertyType> defaultProps =
-            ConventionsHelper.GetStandardPropertyTypeStubs(_shortStringHelper);
-        var exclude = defaultProps.Select(x => x.Value.Alias).ToArray();
-        foreach (var remove in exclude)
-        {
-            propertiesToValidate?.RemoveAll(property => property.Alias == remove);
-        }
 
         //if the user doesn't have access to sensitive values, then we need to validate the incoming properties to check
         //if a sensitive value is being submitted.

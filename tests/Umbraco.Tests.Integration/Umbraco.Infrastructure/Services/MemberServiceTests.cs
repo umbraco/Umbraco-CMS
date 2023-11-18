@@ -213,29 +213,33 @@ public class MemberServiceTests : UmbracoIntegrationTest
         member = MemberService.GetById(member.Id);
         Assert.AreEqual("xemail", member.Email);
 
-        var contentTypeFactory = new PublishedContentTypeFactory(new NoopPublishedModelFactory(),
+        var contentTypeFactory = new PublishedContentTypeFactory(
+            new NoopPublishedModelFactory(),
             new PropertyValueConverterCollection(() => Enumerable.Empty<IPropertyValueConverter>()),
             GetRequiredService<IDataTypeService>());
         var pmemberType = new PublishedContentType(memberType, contentTypeFactory);
 
         var publishedSnapshotAccessor = new TestPublishedSnapshotAccessor();
         var variationContextAccessor = new TestVariationContextAccessor();
-        var pmember = PublishedMember.Create(member, pmemberType, false, publishedSnapshotAccessor,
-            variationContextAccessor, GetRequiredService<IPublishedModelFactory>());
+        var pmember = PublishedMember.Create(member, pmemberType, false, publishedSnapshotAccessor, variationContextAccessor, GetRequiredService<IPublishedModelFactory>());
 
         // contains the umbracoMember... properties created when installing, on the member type
         // contains the other properties, that PublishedContentType adds (BuiltinMemberProperties)
         string[] aliases =
         {
-            Constants.Conventions.Member.Comments, nameof(IMember.Email), nameof(IMember.Username),
-            nameof(IMember.Comments), nameof(IMember.IsApproved), nameof(IMember.IsLockedOut),
-            nameof(IMember.LastLockoutDate), nameof(IMember.CreateDate), nameof(IMember.LastLoginDate),
+            Constants.Conventions.Member.Comments,
+            nameof(IMember.Email),
+            nameof(IMember.Username),
+            nameof(IMember.IsApproved),
+            nameof(IMember.IsLockedOut),
+            nameof(IMember.LastLockoutDate),
+            nameof(IMember.CreateDate),
+            nameof(IMember.LastLoginDate),
             nameof(IMember.LastPasswordChangeDate)
         };
 
         var properties = pmember.Properties.ToList();
-
-        Assert.IsTrue(properties.Select(x => x.Alias).ContainsAll(aliases));
+        CollectionAssert.AreEquivalent(aliases, properties.Select(x => x.Alias));
 
         var email = properties[aliases.IndexOf(nameof(IMember.Email))];
         Assert.AreEqual("xemail", email.GetSourceValue());
@@ -1345,26 +1349,6 @@ public class MemberServiceTests : UmbracoIntegrationTest
         var found = MemberService.GetCount(MemberCountType.Approved);
 
         Assert.AreEqual(5, found);
-    }
-
-    [Test]
-    public void Setting_Property_On_Built_In_Member_Property_When_Property_Doesnt_Exist_On_Type_Is_Ok()
-    {
-        IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-        MemberTypeService.Save(memberType);
-        memberType.RemovePropertyType(Constants.Conventions.Member.Comments);
-        MemberTypeService.Save(memberType);
-        Assert.IsFalse(memberType.PropertyTypes.Any(x => x.Alias == Constants.Conventions.Member.Comments));
-
-        var customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
-
-        // this should not throw an exception
-        customMember.Comments = "hello world";
-        MemberService.Save(customMember);
-
-        var found = MemberService.GetById(customMember.Id);
-
-        Assert.IsTrue(found.Comments.IsNullOrWhiteSpace());
     }
 
     [Test]

@@ -142,18 +142,6 @@ internal class MemberTypeRepository : ContentTypeRepositoryBase<IMemberType>, IM
             entity.Icon = Constants.Icons.Member;
         }
 
-        // By Convention we add 9 standard PropertyTypes to an Umbraco MemberType
-        Dictionary<string, PropertyType> standardPropertyTypes =
-            ConventionsHelper.GetStandardPropertyTypeStubs(_shortStringHelper);
-        foreach (KeyValuePair<string, PropertyType> standardPropertyType in standardPropertyTypes)
-        {
-            entity.AddPropertyType(
-                standardPropertyType.Value,
-                Constants.Conventions.Member.StandardPropertiesGroupAlias,
-                Constants.Conventions.Member.StandardPropertiesGroupName);
-        }
-
-        EnsureExplicitDataTypeForBuiltInProperties(entity);
         PersistNewBaseContentType(entity);
 
         // Handles the MemberTypeDto (cmsMemberType table)
@@ -186,7 +174,6 @@ internal class MemberTypeRepository : ContentTypeRepositoryBase<IMemberType>, IM
             entity.SortOrder = maxSortOrder + 1;
         }
 
-        EnsureExplicitDataTypeForBuiltInProperties(entity);
         PersistUpdatedBaseContentType(entity);
 
         // remove and insert - handle cmsMemberType table
@@ -208,40 +195,5 @@ internal class MemberTypeRepository : ContentTypeRepositoryBase<IMemberType>, IM
     /// <param name="propertyTypeAlias"></param>
     /// <returns></returns>
     protected override PropertyType CreatePropertyType(string propertyEditorAlias, ValueStorageType storageType, string propertyTypeAlias)
-    {
-        // custom property type constructor logic to set explicit dbtype's for built in properties
-        Dictionary<string, PropertyType> builtinProperties =
-            ConventionsHelper.GetStandardPropertyTypeStubs(_shortStringHelper);
-        var readonlyStorageType = builtinProperties.TryGetValue(propertyTypeAlias, out PropertyType? propertyType);
-        storageType = readonlyStorageType ? propertyType!.ValueStorageType : storageType;
-        return new PropertyType(_shortStringHelper, propertyEditorAlias, storageType, readonlyStorageType, propertyTypeAlias);
-    }
-
-    /// <summary>
-    ///     Ensure that all the built-in membership provider properties have their correct data type
-    ///     and property editors assigned. This occurs prior to saving so that the correct values are persisted.
-    /// </summary>
-    /// <param name="memberType"></param>
-    private void EnsureExplicitDataTypeForBuiltInProperties(IContentTypeBase memberType)
-    {
-        Dictionary<string, PropertyType> builtinProperties =
-            ConventionsHelper.GetStandardPropertyTypeStubs(_shortStringHelper);
-        foreach (IPropertyType propertyType in memberType.PropertyTypes)
-        {
-            if (builtinProperties.ContainsKey(propertyType.Alias))
-            {
-                // this reset's its current data type reference which will be re-assigned based on the property editor assigned on the next line
-                if (builtinProperties.TryGetValue(propertyType.Alias, out PropertyType? propDefinition))
-                {
-                    propertyType.DataTypeId = propDefinition.DataTypeId;
-                    propertyType.DataTypeKey = propDefinition.DataTypeKey;
-                }
-                else
-                {
-                    propertyType.DataTypeId = 0;
-                    propertyType.DataTypeKey = default;
-                }
-            }
-        }
-    }
+        => new PropertyType(_shortStringHelper, propertyEditorAlias, storageType, false, propertyTypeAlias);
 }

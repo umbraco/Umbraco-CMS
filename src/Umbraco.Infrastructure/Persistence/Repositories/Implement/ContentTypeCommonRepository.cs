@@ -295,8 +295,6 @@ internal class ContentTypeCommonRepository : IContentTypeCommonRepository
             .AndBy<PropertyTypeDto>(x => x.SortOrder, x => x.Id);
 
         List<PropertyTypeCommonDto>? propertyDtos = Database?.Fetch<PropertyTypeCommonDto>(sql2);
-        Dictionary<string, PropertyType> builtinProperties =
-            ConventionsHelper.GetStandardPropertyTypeStubs(_shortStringHelper);
 
         var groupIx = 0;
         var propertyIx = 0;
@@ -310,7 +308,7 @@ internal class ContentTypeCommonRepository : IContentTypeCommonRepository
             while (propertyIx < propertyDtos?.Count && propertyDtos[propertyIx].ContentTypeId == contentType.Id &&
                    propertyDtos[propertyIx].PropertyTypeGroupId == null)
             {
-                noGroupPropertyTypes.Add(MapPropertyType(contentType, propertyDtos[propertyIx], builtinProperties));
+                noGroupPropertyTypes.Add(MapPropertyType(contentType, propertyDtos[propertyIx]));
                 propertyIx++;
             }
 
@@ -326,8 +324,7 @@ internal class ContentTypeCommonRepository : IContentTypeCommonRepository
                        propertyDtos[propertyIx].ContentTypeId == contentType.Id &&
                        propertyDtos[propertyIx].PropertyTypeGroupId == group.Id)
                 {
-                    group.PropertyTypes?.Add(MapPropertyType(contentType, propertyDtos[propertyIx],
-                        builtinProperties));
+                    group.PropertyTypes?.Add(MapPropertyType(contentType, propertyDtos[propertyIx]));
                     propertyIx++;
                 }
             }
@@ -338,31 +335,11 @@ internal class ContentTypeCommonRepository : IContentTypeCommonRepository
             while (propertyIx < propertyDtos?.Count && propertyDtos[propertyIx].ContentTypeId == contentType.Id &&
                    propertyDtos[propertyIx].PropertyTypeGroupId == null)
             {
-                noGroupPropertyTypes.Add(MapPropertyType(contentType, propertyDtos[propertyIx], builtinProperties));
+                noGroupPropertyTypes.Add(MapPropertyType(contentType, propertyDtos[propertyIx]));
                 propertyIx++;
             }
 
             contentType.NoGroupPropertyTypes = noGroupPropertyTypes;
-
-            // ensure builtin properties
-            if (contentType is IMemberType memberType)
-            {
-                // ensure that property types exist (ok if they already exist)
-                foreach ((var alias, PropertyType propertyType) in builtinProperties)
-                {
-                    var added = memberType.AddPropertyType(
-                        propertyType,
-                        Constants.Conventions.Member.StandardPropertiesGroupAlias,
-                        Constants.Conventions.Member.StandardPropertiesGroupName);
-
-                    if (added)
-                    {
-                        memberType.SetIsSensitiveProperty(alias, false);
-                        memberType.SetMemberCanEditProperty(alias, false);
-                        memberType.SetMemberCanViewProperty(alias, false);
-                    }
-                }
-            }
         }
     }
 
@@ -377,15 +354,11 @@ internal class ContentTypeCommonRepository : IContentTypeCommonRepository
             SortOrder = dto.SortOrder,
         };
 
-    private PropertyType MapPropertyType(IContentTypeComposition contentType, PropertyTypeCommonDto dto,
-        IDictionary<string, PropertyType> builtinProperties)
+    private PropertyType MapPropertyType(IContentTypeComposition contentType, PropertyTypeCommonDto dto)
     {
         var groupId = dto.PropertyTypeGroupId;
 
-        var readonlyStorageType = builtinProperties.TryGetValue(dto.Alias!, out PropertyType? propertyType);
-        ValueStorageType storageType = readonlyStorageType
-            ? propertyType!.ValueStorageType
-            : Enum<ValueStorageType>.Parse(dto.DataTypeDto.DbType);
+        ValueStorageType storageType = Enum<ValueStorageType>.Parse(dto.DataTypeDto.DbType);
 
         if (contentType is IMemberType memberType && dto.Alias is not null)
         {
@@ -394,9 +367,7 @@ internal class ContentTypeCommonRepository : IContentTypeCommonRepository
             memberType.SetMemberCanViewProperty(dto.Alias, dto.ViewOnProfile);
         }
 
-        return new
-            PropertyType(_shortStringHelper, dto.DataTypeDto.EditorAlias, storageType, readonlyStorageType,
-                dto.Alias)
+        return new PropertyType(_shortStringHelper, dto.DataTypeDto.EditorAlias, storageType, false, dto.Alias)
         {
             Description = dto.Description,
             DataTypeId = dto.DataTypeId,

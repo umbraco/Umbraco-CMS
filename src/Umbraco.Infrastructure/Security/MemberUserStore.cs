@@ -699,13 +699,6 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
             member.LastPasswordChangeDate = identityUser.LastPasswordChangeDateUtc?.ToLocalTime() ?? DateTime.Now;
         }
 
-        if (identityUser.IsPropertyDirty(nameof(MemberIdentityUser.Comments))
-            && member.Comments != identityUser.Comments && identityUser.Comments.IsNullOrWhiteSpace() == false)
-        {
-            anythingChanged = true;
-            member.Comments = identityUser.Comments;
-        }
-
         if (identityUser.IsPropertyDirty(nameof(MemberIdentityUser.EmailConfirmed))
             || (member.EmailConfirmedDate.HasValue && member.EmailConfirmedDate.Value != default &&
                 identityUser.EmailConfirmed == false)

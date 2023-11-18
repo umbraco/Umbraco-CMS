@@ -180,45 +180,6 @@ public class MemberRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void MemberHasBuiltinProperties()
-    {
-        var provider = ScopeProvider;
-        using (var scope = provider.CreateScope())
-        {
-            var repository = CreateRepository(provider);
-
-            var memberType = MemberTypeBuilder.CreateSimpleMemberType();
-            MemberTypeRepository.Save(memberType);
-
-            var member =
-                MemberBuilder.CreateSimpleMember(memberType, "Johnny Hefty", "johnny@example.com", "123", "hefty");
-            repository.Save(member);
-
-            var sut = repository.Get(member.Id);
-            var standardPropertiesCount = ConventionsHelper.GetStandardPropertyTypeStubs(ShortStringHelper).Count;
-
-            // if there are any standard properties, they all get added to a single group
-            var expectedGroupCount = standardPropertiesCount > 0 ? 2 : 1;
-            Assert.That(memberType.CompositionPropertyGroups.Count(), Is.EqualTo(expectedGroupCount));
-            Assert.That(memberType.CompositionPropertyTypes.Count(), Is.EqualTo(3 + standardPropertiesCount));
-            Assert.That(sut.Properties.Count(), Is.EqualTo(3 + standardPropertiesCount));
-            var grp = memberType.CompositionPropertyGroups.FirstOrDefault(x =>
-                x.Name == Constants.Conventions.Member.StandardPropertiesGroupName);
-            if (grp != null)
-            {
-                var aliases = ConventionsHelper.GetStandardPropertyTypeStubs(ShortStringHelper).Select(x => x.Key)
-                    .ToArray();
-
-                foreach (var p in memberType.CompositionPropertyTypes.Where(x => aliases.Contains(x.Alias)))
-                {
-                    Assert.AreEqual(grp.Id, p.PropertyGroupId.Value);
-                }
-
-            }
-        }
-    }
-
-    [Test]
     public void SavingPreservesPassword()
     {
         IMember sut;
