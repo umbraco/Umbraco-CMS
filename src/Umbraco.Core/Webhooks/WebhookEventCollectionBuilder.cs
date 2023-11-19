@@ -11,6 +11,7 @@ using Umbraco.Cms.Core.Webhooks.Events.Language;
 using Umbraco.Cms.Core.Webhooks.Events.Media;
 using Umbraco.Cms.Core.Webhooks.Events.MemberType;
 using Umbraco.Cms.Core.Webhooks.Events.Package;
+using Umbraco.Cms.Core.Webhooks.Events.PublicAccess;
 using Umbraco.Cms.Core.Webhooks.Events.Relation;
 using Umbraco.Cms.Core.Webhooks.Events.Script;
 using Umbraco.Cms.Core.Webhooks.Events.Stylesheet;
@@ -172,6 +173,13 @@ public class WebhookEventCollectionBuilder : OrderedCollectionBuilderBase<Webhoo
     public WebhookEventCollectionBuilder AddPackageWebhooks()
     {
         Append<ImportedPackageWebhookEvent>();
+        return this;
+    }
+
+    public WebhookEventCollectionBuilder AddPublicAccessWebhooks()
+    {
+        Append<PublicAccessEntryDeletedWebhookEvent>();
+        Append<PublicAccessEntrySavedWebhookEvent>();
         return this;
     }
 
