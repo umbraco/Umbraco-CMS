@@ -2,7 +2,7 @@ import { UmbContextDiscriminator, UmbContextToken } from '../token/context-token
 import {
 	isUmbContextProvideEventType,
 	//isUmbContextUnprovidedEventType,
-	umbContextProvideEventType,
+	UMB_CONTEXT_PROVIDE_EVENT_TYPE,
 	//umbContextUnprovidedEventType,
 } from '../provide/context-provide.event.js';
 import { UmbContextRequestEventImplementation, UmbContextCallback } from './context-request.event.js';
@@ -11,9 +11,7 @@ import { UmbContextRequestEventImplementation, UmbContextCallback } from './cont
  * @export
  * @class UmbContextConsumer
  */
-export class UmbContextConsumer<
-BaseType = unknown,
-ResultType extends BaseType = BaseType> {
+export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType = BaseType> {
 	#callback?: UmbContextCallback<ResultType>;
 	#promise?: Promise<ResultType>;
 	#promiseResolver?: (instance: ResultType) => void;
@@ -37,20 +35,20 @@ ResultType extends BaseType = BaseType> {
 	constructor(
 		protected hostElement: EventTarget,
 		contextAlias: string | UmbContextToken<BaseType, ResultType>,
-		callback?: UmbContextCallback<ResultType>
+		callback?: UmbContextCallback<ResultType>,
 	) {
 		this.#contextAlias = contextAlias.toString();
 		this.#callback = callback;
 		this.#discriminator = (contextAlias as UmbContextToken<BaseType, ResultType>).getDiscriminator?.();
 	}
-	
+
 	protected _onResponse = (instance: BaseType): boolean => {
 		if (this.#instance === instance) {
 			return false;
 		}
-		if(this.#discriminator) {
+		if (this.#discriminator) {
 			// Notice if discriminator returns false, we do not want to setInstance.
-			if(this.#discriminator(instance)) {
+			if (this.#discriminator(instance)) {
 				this.setInstance(instance as unknown as ResultType);
 				return true;
 			}
@@ -89,14 +87,14 @@ ResultType extends BaseType = BaseType> {
 
 	public hostConnected() {
 		// TODO: We need to use closets application element. We need this in order to have separate Backoffice running within or next to each other.
-		window.addEventListener(umbContextProvideEventType, this.#handleNewProvider);
+		window.addEventListener(UMB_CONTEXT_PROVIDE_EVENT_TYPE, this.#handleNewProvider);
 		//window.addEventListener(umbContextUnprovidedEventType, this.#handleRemovedProvider);
 		this.request();
 	}
 
 	public hostDisconnected() {
 		// TODO: We need to use closets application element. We need this in order to have separate Backoffice running within or next to each other.
-		window.removeEventListener(umbContextProvideEventType, this.#handleNewProvider);
+		window.removeEventListener(UMB_CONTEXT_PROVIDE_EVENT_TYPE, this.#handleNewProvider);
 		//window.removeEventListener(umbContextUnprovidedEventType, this.#handleRemovedProvider);
 	}
 

@@ -1,6 +1,6 @@
 import { UmbContextToken } from '../token/context-token.js';
 
-export const UMB_CONTEXT_PROVIDER_EVENT_TYPE = 'umb:context-provide';
+export const UMB_CONTEXT_PROVIDE_EVENT_TYPE = 'umb:context-provide';
 
 /**
  * @export
@@ -18,12 +18,12 @@ export interface UmbContextProvideEvent extends Event {
  */
 export class UmbContextProvideEventImplementation extends Event implements UmbContextProvideEvent {
 	public constructor(public readonly contextAlias: string | UmbContextToken) {
-		super(UMB_CONTEXT_PROVIDER_EVENT_TYPE, { bubbles: true, composed: true });
+		super(UMB_CONTEXT_PROVIDE_EVENT_TYPE, { bubbles: true, composed: true });
 	}
 }
 
 export const isUmbContextProvideEventType = (event: Event): event is UmbContextProvideEventImplementation => {
-	return event.type === UMB_CONTEXT_PROVIDER_EVENT_TYPE;
+	return event.type === UMB_CONTEXT_PROVIDE_EVENT_TYPE;
 };
 
 export const UMB_CONTEXT_UNPROVIDED_EVENT_TYPE = 'umb:context-unprovided';
