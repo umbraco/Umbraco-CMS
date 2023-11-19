@@ -11,11 +11,11 @@ const repository: ManifestRepository = {
 	api: UmbTagRepository,
 };
 
-export const TAG_STORE_ALIAS = 'Umb.Store.Tags';
+export const UMB_TAG_STORE_ALIAS = 'Umb.Store.Tags';
 
 const store: ManifestStore = {
 	type: 'store',
-	alias: TAG_STORE_ALIAS,
+	alias: UMB_TAG_STORE_ALIAS,
 	name: 'Tags Store',
 	api: UmbTagStore,
 };

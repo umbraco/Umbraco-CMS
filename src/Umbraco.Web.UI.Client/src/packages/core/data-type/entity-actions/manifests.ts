@@ -10,7 +10,7 @@ import {
 	UmbFolderUpdateEntityAction,
 } from '@umbraco-cms/backoffice/entity-action';
 import { ManifestEntityAction } from '@umbraco-cms/backoffice/extension-registry';
-import { DATA_TYPE_FOLDER_REPOSITORY_ALIAS } from '../repository/folder/manifests.js';
+import { UMB_DATA_TYPE_FOLDER_REPOSITORY_ALIAS } from '../repository/folder/manifests.js';
 
 const entityActions: Array<ManifestEntityAction> = [
 	{
@@ -35,7 +35,7 @@ const entityActions: Array<ManifestEntityAction> = [
 		meta: {
 			icon: 'icon-trash',
 			label: 'Delete Folder...',
-			repositoryAlias: DATA_TYPE_FOLDER_REPOSITORY_ALIAS,
+			repositoryAlias: UMB_DATA_TYPE_FOLDER_REPOSITORY_ALIAS,
 			entityTypes: [UMB_DATA_TYPE_ENTITY_TYPE, UMB_DATA_TYPE_FOLDER_ENTITY_TYPE],
 		},
 	},
@@ -48,7 +48,7 @@ const entityActions: Array<ManifestEntityAction> = [
 		meta: {
 			icon: 'icon-edit',
 			label: 'Rename Folder...',
-			repositoryAlias: DATA_TYPE_FOLDER_REPOSITORY_ALIAS,
+			repositoryAlias: UMB_DATA_TYPE_FOLDER_REPOSITORY_ALIAS,
 			entityTypes: [UMB_DATA_TYPE_ENTITY_TYPE, UMB_DATA_TYPE_FOLDER_ENTITY_TYPE],
 		},
 	},

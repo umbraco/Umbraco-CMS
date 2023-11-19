@@ -11,11 +11,11 @@ const repository: ManifestRepository = {
 	api: UmbRelationTypeRepository,
 };
 
-export const RELATION_TYPE_STORE_ALIAS = 'Umb.Store.RelationType';
+export const UMB_RELATION_TYPE_STORE_ALIAS = 'Umb.Store.RelationType';
 
 const store: ManifestStore = {
 	type: 'store',
-	alias: RELATION_TYPE_STORE_ALIAS,
+	alias: UMB_RELATION_TYPE_STORE_ALIAS,
 	name: 'Relation Type Store',
 	api: UmbRelationTypeStore,
 };

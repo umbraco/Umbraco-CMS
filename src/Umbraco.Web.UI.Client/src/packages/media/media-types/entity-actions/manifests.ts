@@ -1,11 +1,11 @@
-import { MEDIA_TYPE_REPOSITORY_ALIAS } from '../repository/manifests.js';
+import { UMB_MEDIA_TYPE_REPOSITORY_ALIAS } from '../repository/manifests.js';
 import { UmbCreateMediaTypeEntityAction } from './create.action.js';
 import UmbReloadMediaTypeEntityAction from './reload.action.js';
 import { UmbDeleteEntityAction, UmbMoveEntityAction, UmbCopyEntityAction } from '@umbraco-cms/backoffice/entity-action';
 import type { ManifestEntityAction } from '@umbraco-cms/backoffice/extension-registry';
 
 const entityType = 'media-type';
-const repositoryAlias = MEDIA_TYPE_REPOSITORY_ALIAS;
+const repositoryAlias = UMB_MEDIA_TYPE_REPOSITORY_ALIAS;
 
 const entityActions: Array<ManifestEntityAction> = [
 	{

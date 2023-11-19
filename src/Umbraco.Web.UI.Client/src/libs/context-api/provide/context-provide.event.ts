@@ -18,15 +18,15 @@ export interface UmbContextProvideEvent extends Event {
  */
 export class UmbContextProvideEventImplementation extends Event implements UmbContextProvideEvent {
 	public constructor(public readonly contextAlias: string | UmbContextToken) {
-		super(umbContextProvideEventType, { bubbles: true, composed: true });
+		super(UMB_CONTEXT_PROVIDER_EVENT_TYPE, { bubbles: true, composed: true });
 	}
 }
 
 export const isUmbContextProvideEventType = (event: Event): event is UmbContextProvideEventImplementation => {
-	return event.type === umbContextProvideEventType;
+	return event.type === UMB_CONTEXT_PROVIDER_EVENT_TYPE;
 };
 
-export const umbContextUnprovidedEventType = 'umb:context-unprovided';
+export const UMB_CONTEXT_UNPROVIDED_EVENT_TYPE = 'umb:context-unprovided';
 
 /**
  * @export
@@ -48,10 +48,10 @@ export class UmbContextUnprovidedEventImplementation extends Event implements Um
 		public readonly contextAlias: string | UmbContextToken,
 		public readonly instance: unknown,
 	) {
-		super(umbContextUnprovidedEventType, { bubbles: true, composed: true });
+		super(UMB_CONTEXT_UNPROVIDED_EVENT_TYPE, { bubbles: true, composed: true });
 	}
 }
 
 export const isUmbContextUnprovidedEventType = (event: Event): event is UmbContextUnprovidedEventImplementation => {
-	return event.type === umbContextUnprovidedEventType;
+	return event.type === UMB_CONTEXT_UNPROVIDED_EVENT_TYPE;
 };

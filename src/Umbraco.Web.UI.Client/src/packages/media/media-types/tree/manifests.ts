@@ -1,4 +1,4 @@
-import { MEDIA_TYPE_REPOSITORY_ALIAS } from '../repository/manifests.js';
+import { UMB_MEDIA_TYPE_REPOSITORY_ALIAS } from '../repository/manifests.js';
 import type { ManifestTree, ManifestTreeItem } from '@umbraco-cms/backoffice/extension-registry';
 
 const tree: ManifestTree = {
@@ -6,7 +6,7 @@ const tree: ManifestTree = {
 	alias: 'Umb.Tree.MediaTypes',
 	name: 'Media Types Tree',
 	meta: {
-		repositoryAlias: MEDIA_TYPE_REPOSITORY_ALIAS,
+		repositoryAlias: UMB_MEDIA_TYPE_REPOSITORY_ALIAS,
 	},
 };
 
