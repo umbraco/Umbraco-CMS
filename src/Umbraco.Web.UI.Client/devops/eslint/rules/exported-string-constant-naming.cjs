@@ -3,7 +3,7 @@ module.exports = {
 		type: 'problem',
 		docs: {
 			description:
-				'Ensure all exported constants should be in uppercase with words separated by underscores and prefixed with UMB_',
+				'Ensure all exported string constants should be in uppercase with words separated by underscores and prefixed with UMB_',
 		},
 	},
 	create: function (context) {
@@ -28,7 +28,7 @@ module.exports = {
 							context.report({
 								node: id,
 								message:
-									'Exported constant should be in uppercase with words separated by underscores and prefixed with UMB_',
+									'Exported string constant should be in uppercase with words separated by underscores and prefixed with UMB_',
 							});
 						}
 					}
