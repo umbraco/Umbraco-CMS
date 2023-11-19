@@ -1,6 +1,6 @@
 import { UmbContextToken } from '../token/context-token.js';
 
-export const UMB_ContextProvideEventType = 'umb:context-provide';
+export const UMB_CONTEXT_PROVIDER_EVENT_TYPE = 'umb:context-provide';
 
 /**
  * @export

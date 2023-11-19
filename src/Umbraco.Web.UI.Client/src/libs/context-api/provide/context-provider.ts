@@ -1,7 +1,7 @@
 import {
 	UmbContextRequestEvent,
-	UMB_ContextRequestEventType,
-	UMB_umbDebugContextEventType,
+	UMB_CONTENT_REQUEST_EVENT_TYPE,
+	UMB_DEBUG_CONTEXT_EVENT_TYPE,
 } from '../consume/context-request.event.js';
 import { UmbContextToken } from '../token/context-token.js';
 import {
@@ -66,23 +66,23 @@ export class UmbContextProvider<BaseType = unknown, ResultType extends BaseType 
 	 * @memberof UmbContextProvider
 	 */
 	public hostConnected() {
-		this.hostElement.addEventListener(UMB_ContextRequestEventType, this.#handleContextRequest);
+		this.hostElement.addEventListener(UMB_CONTENT_REQUEST_EVENT_TYPE, this.#handleContextRequest);
 		this.hostElement.dispatchEvent(new UmbContextProvideEventImplementation(this._contextAlias));
 
 		// Listen to our debug event 'umb:debug-contexts'
-		this.hostElement.addEventListener(UMB_umbDebugContextEventType, this._handleDebugContextRequest);
+		this.hostElement.addEventListener(UMB_DEBUG_CONTEXT_EVENT_TYPE, this._handleDebugContextRequest);
 	}
 
 	/**
 	 * @memberof UmbContextProvider
 	 */
 	public hostDisconnected() {
-		this.hostElement.removeEventListener(UMB_ContextRequestEventType, this.#handleContextRequest);
+		this.hostElement.removeEventListener(UMB_CONTENT_REQUEST_EVENT_TYPE, this.#handleContextRequest);
 		// Out-commented for now, but kept if we like to reintroduce this:
 		//window.dispatchEvent(new UmbContextUnprovidedEventImplementation(this._contextAlias, this.#instance));
 
 		// Stop listen to our debug event 'umb:debug-contexts'
-		this.hostElement.removeEventListener(UMB_umbDebugContextEventType, this._handleDebugContextRequest);
+		this.hostElement.removeEventListener(UMB_DEBUG_CONTEXT_EVENT_TYPE, this._handleDebugContextRequest);
 	}
 
 	private _handleDebugContextRequest = (event: any) => {

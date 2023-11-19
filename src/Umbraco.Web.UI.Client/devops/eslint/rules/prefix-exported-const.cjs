@@ -2,7 +2,7 @@ module.exports = {
 	meta: {
 		type: 'problem',
 		docs: {
-			description: 'Ensure all exported consts are prefixed with UMB_',
+			description: 'Ensure all exported consts are prefixed with UMB_ and follow the naming convention',
 		},
 	},
 	create: function (context) {
@@ -13,10 +13,13 @@ module.exports = {
 					const { id, init } = declaration;
 
 					if (id && id.type === 'Identifier' && init && init.type === 'Literal' && typeof init.value === 'string') {
-						if (!id.name.startsWith('UMB_')) {
+						const isValidName = /^[A-Z]+(_[A-Z]+)*$/.test(id.name);
+
+						if (!isValidName || !id.name.startsWith('UMB_')) {
 							context.report({
 								node: id,
-								message: 'Exported constant should be prefixed with UMB_',
+								message:
+									'Exported constant should be in uppercase with words separated by underscores and prefixed with UMB_',
 							});
 						}
 					}

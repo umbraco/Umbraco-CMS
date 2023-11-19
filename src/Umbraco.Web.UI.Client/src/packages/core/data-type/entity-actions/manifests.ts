@@ -1,5 +1,5 @@
-import { DATA_TYPE_FOLDER_ENTITY_TYPE, DATA_TYPE_ENTITY_TYPE } from '../entity.js';
-import { DATA_TYPE_DETAIL_REPOSITORY_ALIAS } from '../repository/detail/manifests.js';
+import { UMB_DATA_TYPE_FOLDER_ENTITY_TYPE, UMB_DATA_TYPE_ENTITY_TYPE } from '../entity.js';
+import { UMB_DATA_TYPE_DETAIL_REPOSITORY_ALIAS } from '../repository/detail/manifests.js';
 import { manifests as createManifests } from './create/manifests.js';
 import { manifests as moveManifests } from './move/manifests.js';
 import { manifests as copyManifests } from './copy/manifests.js';
@@ -22,8 +22,8 @@ const entityActions: Array<ManifestEntityAction> = [
 		meta: {
 			icon: 'icon-trash',
 			label: 'Delete...',
-			repositoryAlias: DATA_TYPE_DETAIL_REPOSITORY_ALIAS,
-			entityTypes: [DATA_TYPE_ENTITY_TYPE],
+			repositoryAlias: UMB_DATA_TYPE_DETAIL_REPOSITORY_ALIAS,
+			entityTypes: [UMB_DATA_TYPE_ENTITY_TYPE],
 		},
 	},
 	{
@@ -36,7 +36,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			icon: 'icon-trash',
 			label: 'Delete Folder...',
 			repositoryAlias: DATA_TYPE_FOLDER_REPOSITORY_ALIAS,
-			entityTypes: [DATA_TYPE_ENTITY_TYPE, DATA_TYPE_FOLDER_ENTITY_TYPE],
+			entityTypes: [UMB_DATA_TYPE_ENTITY_TYPE, UMB_DATA_TYPE_FOLDER_ENTITY_TYPE],
 		},
 	},
 	{
@@ -49,7 +49,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			icon: 'icon-edit',
 			label: 'Rename Folder...',
 			repositoryAlias: DATA_TYPE_FOLDER_REPOSITORY_ALIAS,
-			entityTypes: [DATA_TYPE_ENTITY_TYPE, DATA_TYPE_FOLDER_ENTITY_TYPE],
+			entityTypes: [UMB_DATA_TYPE_ENTITY_TYPE, UMB_DATA_TYPE_FOLDER_ENTITY_TYPE],
 		},
 	},
 ];
