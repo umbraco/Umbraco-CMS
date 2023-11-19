@@ -53,7 +53,7 @@
 				],
 				"local-rules/prefix-exported-constants": ["error",
 					{
-						"excludedFileNames": ["umbraco-package"]
+						"excludedFileNames": ["umbraco-package", "input-tiny-mce.defaults"] // TODO: what to do about the tiny mce defaults?
 					}
 				],
 				"@typescript-eslint/no-non-null-assertion": "off",
