@@ -1,7 +1,7 @@
 import { UmbContextToken } from '../token/context-token.js';
 
-export const umbContextRequestEventType = 'umb:context-request';
-export const umbDebugContextEventType = 'umb:debug-contexts';
+export const UMB_ContextRequestEventType = 'umb:context-request';
+export const UMB_umbDebugContextEventType = 'umb:debug-contexts';
 
 export type UmbContextCallback<T> = (instance: T) => void;
 
@@ -20,17 +20,20 @@ export interface UmbContextRequestEvent<ResultType = unknown> extends Event {
  * @extends {Event}
  * @implements {UmbContextRequestEvent}
  */
-export class UmbContextRequestEventImplementation<ResultType = unknown> extends Event implements UmbContextRequestEvent<ResultType> {
+export class UmbContextRequestEventImplementation<ResultType = unknown>
+	extends Event
+	implements UmbContextRequestEvent<ResultType>
+{
 	public constructor(
 		public readonly contextAlias: string | UmbContextToken<any, ResultType>,
-		public readonly callback: (context: ResultType) => boolean
+		public readonly callback: (context: ResultType) => boolean,
 	) {
-		super(umbContextRequestEventType, { bubbles: true, composed: true, cancelable: true });
+		super(UMB_ContextRequestEventType, { bubbles: true, composed: true, cancelable: true });
 	}
 }
 
 export class UmbContextDebugRequest extends Event {
 	public constructor(public readonly callback: any) {
-		super(umbDebugContextEventType, { bubbles: true, composed: true, cancelable: false });
+		super(UMB_umbDebugContextEventType, { bubbles: true, composed: true, cancelable: false });
 	}
 }

@@ -2,7 +2,7 @@ import { expect, oneEvent } from '@open-wc/testing';
 import { UmbContextProvider } from '../provide/context-provider.js';
 import { UmbContextToken } from '../token/context-token.js';
 import { UmbContextConsumer } from './context-consumer.js';
-import { UmbContextRequestEventImplementation, umbContextRequestEventType } from './context-request.event.js';
+import { UmbContextRequestEventImplementation, UMB_ContextRequestEventType } from './context-request.event.js';
 
 const testContextAlias = 'my-test-context';
 
@@ -32,13 +32,13 @@ describe('UmbContextConsumer', () => {
 
 		describe('events', () => {
 			it('dispatches context request event when constructed', async () => {
-				const listener = oneEvent(window, umbContextRequestEventType);
+				const listener = oneEvent(window, UMB_ContextRequestEventType);
 
 				consumer.hostConnected();
 
 				const event = (await listener) as unknown as UmbContextRequestEventImplementation;
 				expect(event).to.exist;
-				expect(event.type).to.eq(umbContextRequestEventType);
+				expect(event.type).to.eq(UMB_ContextRequestEventType);
 				expect(event.contextAlias).to.eq(testContextAlias);
 				consumer.hostDisconnected();
 			});
@@ -62,7 +62,7 @@ describe('UmbContextConsumer', () => {
 					localConsumer.hostDisconnected();
 					provider.hostDisconnected();
 				}
-			}
+			},
 		);
 		localConsumer.hostConnected();
 	});
@@ -99,7 +99,6 @@ describe('UmbContextConsumer', () => {
 });
 
 describe('UmbContextConsumer with discriminator test', () => {
-
 	type A = { prop: string };
 
 	function discriminator(instance: unknown): instance is A {
@@ -111,16 +110,17 @@ describe('UmbContextConsumer with discriminator test', () => {
 	}
 
 	it('discriminator determines the instance type', async () => {
-
 		const localConsumer = new UmbContextConsumer(
 			document.body,
 			new UmbContextToken(testContextAlias, discriminator),
-			(instance: A) => { console.log(instance)}
+			(instance: A) => {
+				console.log(instance);
+			},
 		);
 		localConsumer.hostConnected();
 
 		// This bit of code is not really a test but it serves as a TypeScript type test, making sure the given type is matches the one given from the Discriminator method.
-		type TestType = Exclude<(typeof localConsumer.instance), undefined> extends A ? true : never;
+		type TestType = Exclude<typeof localConsumer.instance, undefined> extends A ? true : never;
 		const test: TestType = true;
 		expect(test).to.be.true;
 
@@ -142,7 +142,7 @@ describe('UmbContextConsumer with discriminator test', () => {
 				done();
 				localConsumer.hostDisconnected();
 				provider.hostDisconnected();
-			}
+			},
 		);
 		localConsumer.hostConnected();
 	});
@@ -159,7 +159,7 @@ describe('UmbContextConsumer with discriminator test', () => {
 			new UmbContextToken(testContextAlias, badDiscriminator),
 			(_instance) => {
 				expect(_instance.prop).to.eq('this must not happen!');
-			}
+			},
 		);
 		localConsumer.hostConnected();
 
@@ -169,6 +169,4 @@ describe('UmbContextConsumer with discriminator test', () => {
 			provider.hostDisconnected();
 		});
 	});
-
-
 });

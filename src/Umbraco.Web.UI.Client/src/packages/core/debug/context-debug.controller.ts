@@ -1,4 +1,4 @@
-import { contextData, umbDebugContextEventType } from '@umbraco-cms/backoffice/context-api';
+import { contextData, UMB_umbDebugContextEventType } from '@umbraco-cms/backoffice/context-api';
 import { UmbBaseController, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 // Temp controller to get the code away from the app.element.ts
@@ -11,7 +11,10 @@ export class UmbContextDebugController extends UmbBaseController {
 		super.hostConnected();
 		// Maybe this could be part of the context-api? When we create a new root, we could attach the debugger to it?
 		// Listen for the debug event from the <umb-debug> component
-		this.getHostElement().addEventListener(umbDebugContextEventType, this.#onContextDebug as unknown as EventListener);
+		this.getHostElement().addEventListener(
+			UMB_umbDebugContextEventType,
+			this.#onContextDebug as unknown as EventListener,
+		);
 	}
 
 	#onContextDebug = (event: any) => {
@@ -38,7 +41,7 @@ export class UmbContextDebugController extends UmbBaseController {
 	hostDisconnected(): void {
 		super.hostDisconnected();
 		this.getHostElement().removeEventListener(
-			umbDebugContextEventType,
+			UMB_umbDebugContextEventType,
 			this.#onContextDebug as unknown as EventListener,
 		);
 	}

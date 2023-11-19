@@ -1,7 +1,7 @@
 import {
 	UmbContextRequestEvent,
-	umbContextRequestEventType,
-	umbDebugContextEventType,
+	UMB_ContextRequestEventType,
+	UMB_umbDebugContextEventType,
 } from '../consume/context-request.event.js';
 import { UmbContextToken } from '../token/context-token.js';
 import {
@@ -35,7 +35,11 @@ export class UmbContextProvider<BaseType = unknown, ResultType extends BaseType 
 	 * @param {*} instance
 	 * @memberof UmbContextProvider
 	 */
-	constructor(hostElement: EventTarget, contextAlias: string | UmbContextToken<BaseType, ResultType>, instance: ResultType) {
+	constructor(
+		hostElement: EventTarget,
+		contextAlias: string | UmbContextToken<BaseType, ResultType>,
+		instance: ResultType,
+	) {
 		this.hostElement = hostElement;
 		this._contextAlias = contextAlias.toString();
 		this.#instance = instance;
@@ -52,7 +56,7 @@ export class UmbContextProvider<BaseType = unknown, ResultType extends BaseType 
 		// Since the alias matches, we will stop it from bubbling further up. But we still allow it to ask the other Contexts of the element. Hence not calling `event.stopImmediatePropagation();`
 		event.stopPropagation();
 
-		if(event.callback(this.#instance)) {
+		if (event.callback(this.#instance)) {
 			// Make sure the event not hits any more Contexts as we have found a match.
 			event.stopImmediatePropagation();
 		}
@@ -62,23 +66,23 @@ export class UmbContextProvider<BaseType = unknown, ResultType extends BaseType 
 	 * @memberof UmbContextProvider
 	 */
 	public hostConnected() {
-		this.hostElement.addEventListener(umbContextRequestEventType, this.#handleContextRequest);
+		this.hostElement.addEventListener(UMB_ContextRequestEventType, this.#handleContextRequest);
 		this.hostElement.dispatchEvent(new UmbContextProvideEventImplementation(this._contextAlias));
 
 		// Listen to our debug event 'umb:debug-contexts'
-		this.hostElement.addEventListener(umbDebugContextEventType, this._handleDebugContextRequest);
+		this.hostElement.addEventListener(UMB_umbDebugContextEventType, this._handleDebugContextRequest);
 	}
 
 	/**
 	 * @memberof UmbContextProvider
 	 */
 	public hostDisconnected() {
-		this.hostElement.removeEventListener(umbContextRequestEventType, this.#handleContextRequest);
+		this.hostElement.removeEventListener(UMB_ContextRequestEventType, this.#handleContextRequest);
 		// Out-commented for now, but kept if we like to reintroduce this:
 		//window.dispatchEvent(new UmbContextUnprovidedEventImplementation(this._contextAlias, this.#instance));
 
 		// Stop listen to our debug event 'umb:debug-contexts'
-		this.hostElement.removeEventListener(umbDebugContextEventType, this._handleDebugContextRequest);
+		this.hostElement.removeEventListener(UMB_umbDebugContextEventType, this._handleDebugContextRequest);
 	}
 
 	private _handleDebugContextRequest = (event: any) => {

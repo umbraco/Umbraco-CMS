@@ -1,10 +1,10 @@
 const { rest } = window.MockServiceWorker;
 import { umbDataTypeData } from '../../data/data-type.data.js';
-import { slug } from './slug.js';
+import { UMB_slug } from './slug.js';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 export const detailHandlers = [
-	rest.post(umbracoPath(`${slug}`), async (req, res, ctx) => {
+	rest.post(umbracoPath(`${UMB_slug}`), async (req, res, ctx) => {
 		const data = await req.json();
 		if (!data) return;
 
@@ -13,7 +13,7 @@ export const detailHandlers = [
 		return res(ctx.status(200));
 	}),
 
-	rest.get(umbracoPath(`${slug}/:id`), (req, res, ctx) => {
+	rest.get(umbracoPath(`${UMB_slug}/:id`), (req, res, ctx) => {
 		const id = req.params.id as string;
 		if (!id) return;
 
@@ -22,7 +22,7 @@ export const detailHandlers = [
 		return res(ctx.status(200), ctx.json(dataType));
 	}),
 
-	rest.put(umbracoPath(`${slug}/:id`), async (req, res, ctx) => {
+	rest.put(umbracoPath(`${UMB_slug}/:id`), async (req, res, ctx) => {
 		const id = req.params.id as string;
 		if (!id) return;
 		const data = await req.json();
@@ -33,7 +33,7 @@ export const detailHandlers = [
 		return res(ctx.status(200), ctx.json(saved));
 	}),
 
-	rest.delete<string>(umbracoPath(`${slug}/:id`), async (req, res, ctx) => {
+	rest.delete<string>(umbracoPath(`${UMB_slug}/:id`), async (req, res, ctx) => {
 		const id = req.params.id as string;
 		if (!id) return;
 
