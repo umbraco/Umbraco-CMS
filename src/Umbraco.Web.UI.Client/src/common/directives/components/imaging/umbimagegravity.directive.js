@@ -3,7 +3,7 @@
 
     function umbImageGravityController($scope, $element, $timeout) {
 
-        var vm = this;
+        const vm = this;
 
         //Internal values for keeping track of the dot and the size of the editor
         vm.dimensions = {
@@ -11,6 +11,11 @@
             height: 0,
             left: 0,
             top: 0
+        };
+
+        vm.focalPointPosition = {
+            left: 0.5,
+            top: 0.5
         };
 
         var imageElement = null; //DOM element reference
@@ -37,14 +42,16 @@
                 'width': vm.dimensions.width + 'px',
                 'height': vm.dimensions.height + 'px'
             };
-
         };
 
         function resetFocalPoint() {
-            vm.onValueChanged({
+            vm.focalPointPosition = {
                 left: 0.5,
                 top: 0.5
-            });
+            };
+
+            vm.onValueChanged(vm.focalPointPosition);
+        };
         };
 
         function setFocalPoint(event) {
@@ -86,13 +93,11 @@
                     $scope.$evalAsync(calculateGravity(offsetX, offsetY));
 
                     $scope.$emit("imageFocalPointStop");
-
                 }
             });
 
             window.addEventListener('resize.umbImageGravity', onResizeHandler);
             window.addEventListener('resize', onResizeHandler);
-
 
             //if any ancestor directive emits this event, we need to resize
             $scope.$on("editors.content.splitViewChanged", function () {
@@ -175,12 +180,17 @@
 
         /** Watches the one way binding changes */
         function onChanges(changes) {
-            if (changes.center && !changes.center.isFirstChange()
-                && changes.center.currentValue
-                && !Utilities.equals(changes.center.currentValue, changes.center.previousValue)) {
-                //when center changes update the dimensions
-                setDimensions();
-                updateStyle();
+            console.log("onChanges", changes);
+            if (changes.center && !changes.center.isFirstChange()) {
+                if (changes.center.currentValue && !Utilities.equals(changes.center.currentValue, changes.center.previousValue)) {
+                    //when center changes update the dimensions
+                    setDimensions();
+                    updateStyle();
+                }
+
+                if (changes.center.currentValue === null) {
+                    clearFocalPoint();
+                }
             }
         }
 
@@ -203,10 +213,13 @@
          * @param {any} offsetY
          */
         function calculateGravity(offsetX, offsetY) {
-            vm.onValueChanged({
+
+            vm.focalPointPosition = {
                 left: Math.min(Math.max(offsetX, 0), vm.dimensions.width) / vm.dimensions.width,
                 top: Math.min(Math.max(offsetY, 0), vm.dimensions.height) / vm.dimensions.height
-            });
+            };
+
+            vm.onValueChanged(vm.focalPointPosition);
         };
 
     }

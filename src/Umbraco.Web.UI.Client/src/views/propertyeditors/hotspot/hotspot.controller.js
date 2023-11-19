@@ -2,6 +2,7 @@ function HotspotController($scope, entityResource) {
 
     const vm = this;
 
+    vm.clear = clear;
     vm.focalPointChanged = focalPointChanged;
     vm.imageLoaded = imageLoaded;
 
@@ -25,7 +26,8 @@ function HotspotController($scope, entityResource) {
 
     function retrieveMedia() {
         
-        var id = $scope.model.config.mediaId || null;
+      var id = $scope.model.config.mediaId || null;
+      console.log("id", id);
         
         if (id == null) {
             return;
@@ -36,7 +38,11 @@ function HotspotController($scope, entityResource) {
             $scope.media = media;
             $scope.imageSrc = media.metaData.MediaPath;
         });
-  }
+    }
+
+    function clear() {
+      focalPointChanged(null, null);
+    }
 
     /**
     * Used to assign a new model value
@@ -56,11 +62,17 @@ function HotspotController($scope, entityResource) {
     */
     function focalPointChanged(left, top) {
         console.log("focalPointChanged", left, top);
-        //update the model focalpoint value
-        $scope.model.value.focalPoint = {
-            left: left,
-            top: top
-        };
+
+        if (left === null && top === null) {
+            $scope.model.value.focalPoint = null;
+        }
+        else {
+            //update the model focalpoint value
+            $scope.model.value.focalPoint = {
+              left: left,
+              top: top
+            };
+        }
 
         //set form to dirty to track changes
         //setDirty();
