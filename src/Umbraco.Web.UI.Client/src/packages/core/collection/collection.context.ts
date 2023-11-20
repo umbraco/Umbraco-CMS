@@ -2,20 +2,30 @@ import { UmbCollectionConfiguration } from './types.js';
 import { UmbCollectionRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbBaseController, type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { UmbArrayState, UmbNumberState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import {
-	UmbArrayState,
-	UmbNumberState,
-	UmbObjectState,
-} from '@umbraco-cms/backoffice/observable-api';
-import { UmbExtensionsManifestInitializer, createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
-import { ManifestCollectionView, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+	UmbExtensionApiInitializer,
+	UmbExtensionsManifestInitializer,
+	createExtensionApi,
+} from '@umbraco-cms/backoffice/extension-api';
+import {
+	ManifestCollectionView,
+	ManifestRepository,
+	umbExtensionsRegistry,
+} from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbCollectionFilterModel } from '@umbraco-cms/backoffice/collection';
 import { UmbSelectionManager, UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import { ManifestCollection } from '../extension-registry/models/collection.models.js';
 
-export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectionFilterModel> extends UmbBaseController {
+export class UmbCollectionContext<
+	ItemType,
+	FilterModelType extends UmbCollectionFilterModel,
+> extends UmbBaseController {
 	protected entityType: string;
 	protected init;
+
+	#alias?: string;
 
 	#items = new UmbArrayState<ItemType>([]);
 	public readonly items = this.#items.asObservable();
@@ -38,9 +48,20 @@ export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectio
 	repository?: UmbCollectionRepository;
 	collectionRootPathname: string;
 
+	#initResolver?: () => void;
+	#initialized = false;
+
+	#init = new Promise<void>((resolve) => {
+		this.#initialized ? resolve() : (this.#initResolver = resolve);
+	});
+
 	public readonly pagination = new UmbPaginationManager();
 
-	constructor(host: UmbControllerHostElement, entityType: string, repositoryAlias: string, config: UmbCollectionConfiguration = { pageSize: 50 }) {
+	constructor(
+		host: UmbControllerHostElement,
+		entityType: string,
+		config: UmbCollectionConfiguration = { pageSize: 50 },
+	) {
 		super(host);
 		this.entityType = entityType;
 
@@ -50,14 +71,28 @@ export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectio
 		const currentUrl = new URL(window.location.href);
 		this.collectionRootPathname = currentUrl.pathname.substring(0, currentUrl.pathname.lastIndexOf('/'));
 
-		this.init = Promise.all([
-			this.#observeRepository(repositoryAlias).asPromise(),
-			this.#observeViews().asPromise(),
-		]);
-
 		this.#configure(config);
 
 		this.provideContext(UMB_COLLECTION_CONTEXT, this);
+	}
+
+	// TODO: find a generic way to do this
+	#checkIfInitialized() {
+		if (this.repository) {
+			this.#initialized = true;
+			this.#initResolver?.();
+		}
+	}
+
+	public async setAlias(alias?: string) {
+		if (this.#alias === alias) return;
+
+		this.#alias = alias;
+		this.#observeCollectionManifest();
+	}
+
+	public getAlias() {
+		return this.#alias;
 	}
 
 	/**
@@ -176,24 +211,9 @@ export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectio
 		this.#filter.next({ ...this.#filter.getValue(), skip: 0, take: configuration.pageSize });
 	}
 
-	#observeRepository(repositoryAlias: string) {
-		return this.observe(
-			umbExtensionsRegistry.getByTypeAndAlias('repository', repositoryAlias),
-			async (repositoryManifest) => {
-				if (repositoryManifest) {
-					// TODO: Maybe use the UmbExtensionApiController instead of createExtensionApi, to ensure usage of conditions:
-					const result = await createExtensionApi(repositoryManifest, [this._host]);
-					this.repository = result as UmbCollectionRepository;
-					this.requestCollection();
-				}
-			},
-			'umbCollectionRepositoryObserver'
-		)
-	}
-
 	#observeViews() {
 		return new UmbExtensionsManifestInitializer(this, umbExtensionsRegistry, 'collectionView', null, (views) => {
-			this.#views.next(views.map(view => view.manifest));
+			this.#views.next(views.map((view) => view.manifest));
 			this.#setCurrentView();
 		});
 	}
@@ -202,7 +222,7 @@ export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectio
 		const target = event.target as UmbPaginationManager;
 		const skipFilter = { skip: target.getSkip() } as Partial<FilterModelType>;
 		this.setFilter(skipFilter);
-	}
+	};
 
 	#setCurrentView() {
 		const currentUrl = new URL(window.location.href);
@@ -216,6 +236,21 @@ export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectio
 		*/
 		const currentView = viewMatch || views[0];
 		this.setCurrentView(currentView);
+	}
+
+	#observeCollectionManifest() {
+		if (!this.#alias) return;
+
+		this.observe(
+			umbExtensionsRegistry.getByTypeAndAlias('collection', this.#alias),
+			async (manifest) => {
+				if (!manifest) return;
+				const repositoryAlias = manifest.meta.repositoryAlias;
+				if (!repositoryAlias) throw new Error('A collection must have a repository alias.');
+				console.log(repositoryAlias);
+			},
+			'umbObserveCollectionManifest',
+		);
 	}
 }
 
