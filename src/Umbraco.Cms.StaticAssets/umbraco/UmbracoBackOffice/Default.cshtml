@@ -113,6 +113,7 @@
         <umb-editors ng-show="infiniteMode"></umb-editors>
 
         <umb-login ng-if="login.show"
+                   is-timed-out="login.isTimedOut"
                    on-login="hideLoginScreen()">
         </umb-login>
     </umb-backoffice-icon-registry>

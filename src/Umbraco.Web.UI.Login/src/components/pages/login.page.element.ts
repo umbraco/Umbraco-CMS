@@ -95,10 +95,12 @@ export default class UmbLoginPageElement extends LitElement {
 
   render() {
     return html`
-      <h1 id="greeting">
-        <umb-localize key="general_welcome">Welcome</umb-localize>
-      </h1>
-      <slot name="subheadline"></slot>
+      <header id="header">
+        <h1 id="greeting">
+          <umb-localize key="general_welcome">Welcome</umb-localize>
+        </h1>
+        <slot name="subheadline"></slot>
+      </header>
       ${this.disableLocalLogin
         ? nothing
         : html`
@@ -156,6 +158,18 @@ export default class UmbLoginPageElement extends LitElement {
       :host {
         display: flex;
         flex-direction: column;
+      }
+
+      #header {
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        gap: var(--uui-size-space-5);
+      }
+
+      #header span {
+        color: var(--uui-color-text-alt); /* TODO Change to uui color when uui gets a muted text variable */
+        font-size: 14px;
       }
 
       #greeting {
