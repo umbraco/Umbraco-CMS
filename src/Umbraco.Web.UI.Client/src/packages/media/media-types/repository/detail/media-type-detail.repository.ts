@@ -142,9 +142,6 @@ export class UmbMediaTypeDetailRepository
 		const { error } = await this.#detailDataSource.delete(id);
 
 		if (!error) {
-			const notification = { data: { message: `Media Type deleted` } };
-			this.#notificationContext?.peek('positive', notification);
-
 			// TODO: we currently don't use the detail store for anything.
 			// Consider to look up the data before fetching from the server.
 			// Consider notify a workspace if a template is deleted from the store while someone is editing it.
@@ -152,6 +149,9 @@ export class UmbMediaTypeDetailRepository
 			this.#detailStore?.removeItem(id);
 			this.#treeStore?.removeItem(id);
 			this.#itemStore?.removeItem(id);
+
+			const notification = { data: { message: `Media Type deleted` } };
+			this.#notificationContext?.peek('positive', notification);
 		}
 
 		return { error };
