@@ -3,4 +3,9 @@ import type { ManifestElement, ManifestWithDynamicConditions } from '@umbraco-cm
 
 export interface ManifestCollection extends ManifestElement, ManifestWithDynamicConditions<ConditionTypes> {
 	type: 'collection';
+	meta: MetaCollection;
+}
+
+export interface MetaCollection {
+	repositoryAlias: string;
 }
