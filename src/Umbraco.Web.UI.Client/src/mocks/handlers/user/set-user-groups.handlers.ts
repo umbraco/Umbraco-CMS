@@ -1,10 +1,10 @@
 const { rest } = window.MockServiceWorker;
 import { umbUsersData } from '../../data/user.data.js';
-import { slug } from './slug.js';
+import { UMB_SLUG } from './slug.js';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 export const handlers = [
-	rest.post(umbracoPath(`${slug}/set-user-groups`), async (req, res, ctx) => {
+	rest.post(umbracoPath(`${UMB_SLUG}/set-user-groups`), async (req, res, ctx) => {
 		const data = await req.json();
 		if (!data) return;
 

@@ -4,6 +4,6 @@ export const extensions = [
 		name: 'Document Management Bundle',
 		alias: 'Umb.Bundle.DocumentManagement',
 		type: 'bundle',
-		loader: () => import('./manifests.js'),
+		js: () => import('./manifests.js'),
 	},
 ];

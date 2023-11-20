@@ -1,5 +1,6 @@
 import { expect } from '@open-wc/testing';
-import { ManifestApi, UmbApi } from '../types.js';
+import { ManifestApi } from '../types/index.js';
+import { UmbApi } from '../models/api.interface.js';
 import { createExtensionApi } from './create-extension-api.function.js';
 
 
@@ -44,7 +45,7 @@ describe('Extension-Api: Create Extension Api', () => {
 
 		const manifest: ManifestApi = {
 			type: 'my-test-type',
-			alias: 'Umb.Test.CreateExtensionApi',
+			alias: 'Umb.Test.createManifestApi',
 			name: 'pretty name'
 		};
 
@@ -56,7 +57,7 @@ describe('Extension-Api: Create Extension Api', () => {
 
 		const manifest: ManifestApi<UmbExtensionApiTrueTestClass> = {
 			type: 'my-test-type',
-			alias: 'Umb.Test.CreateExtensionApi',
+			alias: 'Umb.Test.createManifestApi',
 			name: 'pretty name',
 			api: UmbExtensionApiTrueTestClass
 		};
@@ -72,9 +73,9 @@ describe('Extension-Api: Create Extension Api', () => {
 
 		const manifest: ManifestApi<UmbExtensionApiTrueTestClass> = {
 			type: 'my-test-type',
-			alias: 'Umb.Test.CreateExtensionApi',
+			alias: 'Umb.Test.createManifestApi',
 			name: 'pretty name',
-			loader: () => Promise.resolve(jsModuleWithDefaultExport)
+			js: () => Promise.resolve(jsModuleWithDefaultExport)
 		};
 
 		const api = await createExtensionApi(manifest, []);
@@ -88,9 +89,9 @@ describe('Extension-Api: Create Extension Api', () => {
 
 		const manifest: ManifestApi<UmbExtensionApiTrueTestClass> = {
 			type: 'my-test-type',
-			alias: 'Umb.Test.CreateExtensionApi',
+			alias: 'Umb.Test.createManifestApi',
 			name: 'pretty name',
-			loader: () => Promise.resolve(jsModuleWithApiExport)
+			js: () => Promise.resolve(jsModuleWithApiExport)
 		};
 
 		const api = await createExtensionApi(manifest, []);
@@ -104,9 +105,9 @@ describe('Extension-Api: Create Extension Api', () => {
 
 		const manifest: ManifestApi<UmbExtensionApiTrueTestClass> = {
 			type: 'my-test-type',
-			alias: 'Umb.Test.CreateExtensionApi',
+			alias: 'Umb.Test.createManifestApi',
 			name: 'pretty name',
-			loader: () => Promise.resolve(jsModuleWithDefaultAndApiExport)
+			js: () => Promise.resolve(jsModuleWithDefaultAndApiExport)
 		};
 
 		const api = await createExtensionApi(manifest, []);

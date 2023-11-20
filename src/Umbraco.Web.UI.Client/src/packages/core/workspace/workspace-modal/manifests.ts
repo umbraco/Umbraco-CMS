@@ -4,7 +4,7 @@ const workspaceModal: ManifestModal = {
 	type: 'modal',
 	alias: 'Umb.Modal.Workspace',
 	name: 'Workspace Modal',
-	loader: () => import('./workspace-modal.element.js'),
+	js: () => import('./workspace-modal.element.js'),
 };
 
 export const manifests = [workspaceModal];

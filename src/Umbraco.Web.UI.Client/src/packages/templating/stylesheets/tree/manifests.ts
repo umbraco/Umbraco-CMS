@@ -1,4 +1,4 @@
-import { UMB_STYLESHEET_ENTITY_TYPE } from '../entity-type.js';
+import { UMB_STYLESHEET_ENTITY_TYPE, UMB_STYLESHEET_ROOT_ENTITY_TYPE } from '../entity.js';
 import { UmbStylesheetTreeRepository } from './stylesheet-tree.repository.js';
 import { UmbStylesheetTreeStore } from './stylesheet-tree.store.js';
 import type {
@@ -42,7 +42,7 @@ const treeItem: ManifestTreeItem = {
 	alias: 'Umb.TreeItem.Stylesheet',
 	name: 'Stylesheet Tree Item',
 	meta: {
-		entityTypes: ['stylesheet-root', UMB_STYLESHEET_ENTITY_TYPE],
+		entityTypes: [UMB_STYLESHEET_ROOT_ENTITY_TYPE, UMB_STYLESHEET_ENTITY_TYPE],
 	},
 };
 

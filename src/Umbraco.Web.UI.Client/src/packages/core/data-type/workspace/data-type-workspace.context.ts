@@ -2,7 +2,7 @@ import { UmbDataTypeDetailRepository } from '../repository/detail/data-type-deta
 import { UmbDataTypeVariantContext } from '../variant-context/data-type-variant-context.js';
 import {
 	UmbInvariantableWorkspaceContextInterface,
-	UmbWorkspaceContext,
+	UmbEditableWorkspaceContextBase,
 	UmbWorkspaceContextInterface,
 } from '@umbraco-cms/backoffice/workspace';
 import type { DataTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
@@ -23,7 +23,7 @@ import {
 import { UMB_PROPERTY_EDITOR_SCHEMA_ALIAS_DEFAULT } from '@umbraco-cms/backoffice/property-editor';
 
 export class UmbDataTypeWorkspaceContext
-	extends UmbWorkspaceContext<UmbDataTypeDetailRepository, DataTypeResponseModel>
+	extends UmbEditableWorkspaceContextBase<UmbDataTypeDetailRepository, DataTypeResponseModel>
 	implements UmbInvariantableWorkspaceContextInterface<DataTypeResponseModel | undefined>
 {
 	// TODO: revisit. temp solution because the create and response models are different.

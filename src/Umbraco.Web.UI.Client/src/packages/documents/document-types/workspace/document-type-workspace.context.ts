@@ -1,6 +1,9 @@
 import { UmbDocumentTypeDetailRepository } from '../repository/detail/document-type-detail.repository.js';
 import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
-import { UmbWorkspaceContext, UmbSaveableWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
+import {
+	UmbEditableWorkspaceContextBase,
+	UmbSaveableWorkspaceContextInterface,
+} from '@umbraco-cms/backoffice/workspace';
 import type {
 	ContentTypeCompositionModel,
 	ContentTypeSortModel,
@@ -12,7 +15,7 @@ import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 
 type EntityType = DocumentTypeResponseModel;
 export class UmbDocumentTypeWorkspaceContext
-	extends UmbWorkspaceContext<UmbDocumentTypeDetailRepository, EntityType>
+	extends UmbEditableWorkspaceContextBase<UmbDocumentTypeDetailRepository, EntityType>
 	implements UmbSaveableWorkspaceContextInterface<EntityType | undefined>
 {
 	// Draft is located in structure manager
@@ -135,7 +138,6 @@ export class UmbDocumentTypeWorkspaceContext
 		this.setIsSorting(false);
 		//this.#draft.next(data);
 		return { data } || undefined;
-		// TODO: Is this wrong? should we return { data }??
 	}
 
 	async load(entityId: string) {
@@ -146,7 +148,6 @@ export class UmbDocumentTypeWorkspaceContext
 		this.setIsSorting(false);
 		//this.#draft.next(data);
 		return { data } || undefined;
-		// TODO: Is this wrong? should we return { data }??
 	}
 
 	/**

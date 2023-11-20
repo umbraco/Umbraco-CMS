@@ -1,26 +1,32 @@
+import { ManifestTypeMap, SpecificManifestTypeOrManifestBase } from '../types/map.types.js';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import type {
 	ManifestBase,
-	ManifestTypeMap,
-	SpecificManifestTypeOrManifestBase,
 	UmbBaseExtensionInitializer,
 	UmbExtensionRegistry,
 } from '@umbraco-cms/backoffice/extension-api';
-import { UmbBaseController, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbBaseController, type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export type PermittedControllerType<ControllerType extends { manifest: any }> = ControllerType & {
 	manifest: Required<Pick<ControllerType, 'manifest'>>;
 };
 
 /**
+ * This abstract Controller holds the core to manage a multiple Extensions.
+ * When one or more extensions are permitted to be used, then the extender of this class can instantiate the relevant single extension initiator relevant for this type.
+ *
+ * @export
+ * @abstract
+ * @class UmbBaseExtensionsInitializer
  */
 export abstract class UmbBaseExtensionsInitializer<
 	ManifestTypes extends ManifestBase,
 	ManifestTypeName extends keyof ManifestTypeMap<ManifestTypes> | string,
 	ManifestType extends ManifestBase = SpecificManifestTypeOrManifestBase<ManifestTypes, ManifestTypeName>,
 	ControllerType extends UmbBaseExtensionInitializer<ManifestType> = UmbBaseExtensionInitializer<ManifestType>,
-	MyPermittedControllerType extends ControllerType = PermittedControllerType<ControllerType>
+	MyPermittedControllerType extends ControllerType = PermittedControllerType<ControllerType>,
 > extends UmbBaseController {
+	#promiseResolvers: Array<() => void> = [];
 	#extensionRegistry: UmbExtensionRegistry<ManifestType>;
 	#type: ManifestTypeName | Array<ManifestTypeName>;
 	#filter: undefined | null | ((manifest: ManifestType) => boolean);
@@ -28,14 +34,20 @@ export abstract class UmbBaseExtensionsInitializer<
 	protected _extensions: Array<ControllerType> = [];
 	private _permittedExts: Array<MyPermittedControllerType> = [];
 
+	asPromise(): Promise<void> {
+		return new Promise((resolve) => {
+			this._permittedExts.length > 0 ? resolve() : this.#promiseResolvers.push(resolve);
+		});
+	}
+
 	constructor(
 		host: UmbControllerHost,
 		extensionRegistry: UmbExtensionRegistry<ManifestType>,
 		type: ManifestTypeName | Array<ManifestTypeName>,
 		filter: undefined | null | ((manifest: ManifestType) => boolean),
-		onChange?: (permittedManifests: Array<MyPermittedControllerType>) => void
+		onChange?: (permittedManifests: Array<MyPermittedControllerType>) => void,
 	) {
-		super(host);
+		super(host, 'extensionsInitializer_' + (Array.isArray(type) ? type.join('_') : type));
 		this.#extensionRegistry = extensionRegistry;
 		this.#type = type;
 		this.#filter = filter;
@@ -48,7 +60,7 @@ export abstract class UmbBaseExtensionsInitializer<
 		if (this.#filter) {
 			source = source.pipe(map((extensions: Array<ManifestType>) => extensions.filter(this.#filter!)));
 		}
-		this.observe(source, this.#gotManifests);
+		this.observe(source, this.#gotManifests, '_observeManifests') as any;
 	}
 
 	#gotManifests = (manifests: Array<ManifestType>) => {
@@ -63,9 +75,9 @@ export abstract class UmbBaseExtensionsInitializer<
 		}
 
 		// Clean up extensions that are no longer.
-		this._extensions = this._extensions.filter((controller) => {
-			if (!manifests.find((manifest) => manifest.alias === controller.alias)) {
-				controller.destroy();
+		this._extensions = this._extensions.filter((extension) => {
+			if (!manifests.find((manifest) => manifest.alias === extension.alias)) {
+				extension.destroy();
 				// destroying the controller will, if permitted, make a last callback with isPermitted = false. This will also remove it from the _permittedExts array.
 				return false;
 			}
@@ -81,7 +93,6 @@ export abstract class UmbBaseExtensionsInitializer<
 			if (!existing) {
 				// Idea: could be abstracted into a createController method, so we can override it in a subclass.
 				// (This should be enough to be able to create a element extension controller instead.)
-
 				this._extensions.push(this._createController(manifest));
 			}
 		});
@@ -103,6 +114,7 @@ export abstract class UmbBaseExtensionsInitializer<
 				hasChanged = true;
 			}
 		}
+
 		if (hasChanged) {
 			// The final list of permitted extensions to be displayed, this will be stripped from extensions that are overwritten by another extension and sorted accordingly.
 			const exposedPermittedExts = [...this._permittedExts];
@@ -121,6 +133,10 @@ export abstract class UmbBaseExtensionsInitializer<
 			// Sorting:
 			exposedPermittedExts.sort((a, b) => b.weight - a.weight);
 
+			if (exposedPermittedExts.length > 0) {
+				this.#promiseResolvers.forEach((x) => x());
+				this.#promiseResolvers = [];
+			}
 			this.#onChange?.(exposedPermittedExts);
 		}
 	};
@@ -141,9 +157,17 @@ export abstract class UmbBaseExtensionsInitializer<
 	}
 
 	public destroy() {
-		super.destroy();
+		// The this.#extensionRegistry is an indication of wether this is already destroyed.
+		if (!this.#extensionRegistry) return;
+
+		const oldPermittedExtsLength = this._permittedExts.length;
 		this._extensions.length = 0;
 		this._permittedExts.length = 0;
-		this.#onChange?.(this._permittedExts);
+		if (oldPermittedExtsLength > 0) {
+			this.#onChange?.(this._permittedExts);
+		}
+		this.#onChange = undefined;
+		(this.#extensionRegistry as any) = undefined;
+		super.destroy();
 	}
 }

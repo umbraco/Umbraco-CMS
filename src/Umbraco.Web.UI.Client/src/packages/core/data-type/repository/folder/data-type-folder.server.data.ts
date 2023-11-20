@@ -49,13 +49,13 @@ export class UmbDataTypeFolderServerDataSource implements UmbFolderDataSource {
 	 * @return {*}
 	 * @memberof UmbDataTypeFolderServerDataSource
 	 */
-	async get(id: string) {
+	async read(id: string) {
 		if (!id) throw new Error('Key is missing');
 		return tryExecuteAndNotify(
 			this.#host,
 			DataTypeResource.getDataTypeFolderById({
 				id: id,
-			})
+			}),
 		);
 	}
 
@@ -65,13 +65,13 @@ export class UmbDataTypeFolderServerDataSource implements UmbFolderDataSource {
 	 * @return {*}
 	 * @memberof UmbDataTypeFolderServerDataSource
 	 */
-	async insert(folder: CreateFolderRequestModel) {
+	async create(folder: CreateFolderRequestModel) {
 		if (!folder) throw new Error('Folder is missing');
 		return tryExecuteAndNotify(
 			this.#host,
 			DataTypeResource.postDataTypeFolder({
 				requestBody: folder,
-			})
+			}),
 		);
 	}
 
@@ -89,7 +89,7 @@ export class UmbDataTypeFolderServerDataSource implements UmbFolderDataSource {
 			DataTypeResource.putDataTypeFolderById({
 				id: id,
 				requestBody: folder,
-			})
+			}),
 		);
 	}
 
@@ -105,7 +105,7 @@ export class UmbDataTypeFolderServerDataSource implements UmbFolderDataSource {
 			this.#host,
 			DataTypeResource.deleteDataTypeFolderById({
 				id: id,
-			})
+			}),
 		);
 	}
 }

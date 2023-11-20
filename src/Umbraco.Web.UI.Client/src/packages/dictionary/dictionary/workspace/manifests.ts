@@ -9,7 +9,7 @@ const workspace: ManifestWorkspace = {
 	type: 'workspace',
 	alias: 'Umb.Workspace.Dictionary',
 	name: 'Dictionary Workspace',
-	loader: () => import('./dictionary-workspace.element.js'),
+	js: () => import('./dictionary-workspace.element.js'),
 	meta: {
 		entityType: 'dictionary-item',
 	},
@@ -20,7 +20,7 @@ const workspaceViews: Array<ManifestWorkspaceEditorView> = [
 		type: 'workspaceEditorView',
 		alias: 'Umb.WorkspaceView.Dictionary.Edit',
 		name: 'Dictionary Workspace Edit View',
-		loader: () => import('./views/editor/workspace-view-dictionary-editor.element.js'),
+		js: () => import('./views/editor/workspace-view-dictionary-editor.element.js'),
 		weight: 100,
 		meta: {
 			label: 'Edit',

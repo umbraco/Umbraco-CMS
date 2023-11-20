@@ -1,6 +1,9 @@
 import { UmbUserRepository } from '../repository/user.repository.js';
-import { USER_ENTITY_TYPE, type UmbUserDetail } from '../index.js';
-import { UmbSaveableWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
+import { UMB_USER_ENTITY_TYPE, type UmbUserDetail } from '../index.js';
+import {
+	UmbSaveableWorkspaceContextInterface,
+	UmbEditableWorkspaceContextBase,
+} from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import type { UpdateUserRequestModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
@@ -9,7 +12,7 @@ import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 
 export class UmbUserWorkspaceContext
-	extends UmbWorkspaceContext<UmbUserRepository, UmbUserDetail>
+	extends UmbEditableWorkspaceContextBase<UmbUserRepository, UmbUserDetail>
 	implements UmbSaveableWorkspaceContextInterface<UmbUserDetail | undefined>
 {
 	#currentUserContext?: typeof UMB_CURRENT_USER_CONTEXT.TYPE;
@@ -50,7 +53,7 @@ export class UmbUserWorkspaceContext
 	}
 
 	getEntityType(): string {
-		return USER_ENTITY_TYPE;
+		return UMB_USER_ENTITY_TYPE;
 	}
 
 	getData() {
@@ -89,6 +92,19 @@ export class UmbUserWorkspaceContext
 		}
 	}
 
+	// TODO: implement upload progress
+	async uploadAvatar(file: File) {
+		const id = this.getEntityId();
+		if (!id) throw new Error('Id is missing');
+		return this.repository.uploadAvatar(id, file);
+	}
+
+	async deleteAvatar() {
+		const id = this.getEntityId();
+		if (!id) throw new Error('Id is missing');
+		return this.repository.deleteAvatar(id);
+	}
+
 	destroy(): void {
 		this.#data.destroy();
 	}
@@ -99,5 +115,5 @@ export const UMB_USER_WORKSPACE_CONTEXT = new UmbContextToken<
 	UmbUserWorkspaceContext
 >(
 	'UmbWorkspaceContext',
-	(context): context is UmbUserWorkspaceContext => context.getEntityType?.() === USER_ENTITY_TYPE,
+	(context): context is UmbUserWorkspaceContext => context.getEntityType?.() === UMB_USER_ENTITY_TYPE,
 );

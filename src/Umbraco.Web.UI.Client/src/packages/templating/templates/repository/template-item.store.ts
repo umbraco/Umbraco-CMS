@@ -23,8 +23,8 @@ export class UmbTemplateItemStore
 	constructor(host: UmbControllerHostElement) {
 		super(
 			host,
-			UMB_TEMPLATE_ITEM_STORE_CONTEXT_TOKEN.toString(),
-			new UmbArrayState<TemplateItemResponseModel>([], (x) => x.id)
+			UMB_TEMPLATE_ITEM_STORE_CONTEXT.toString(),
+			new UmbArrayState<TemplateItemResponseModel>([], (x) => x.id),
 		);
 	}
 
@@ -33,4 +33,4 @@ export class UmbTemplateItemStore
 	}
 }
 
-export const UMB_TEMPLATE_ITEM_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbTemplateItemStore>('UmbTemplateItemStore');
+export const UMB_TEMPLATE_ITEM_STORE_CONTEXT = new UmbContextToken<UmbTemplateItemStore>('UmbTemplateItemStore');

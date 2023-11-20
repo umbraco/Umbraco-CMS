@@ -21,10 +21,12 @@ export class UmbMediaTrashEntityBulkAction extends UmbEntityBulkActionBase<UmbMe
 	}
 
 	async execute() {
+		alert('not implemented');
 		// TODO: show error
 		if (!this.#modalContext || !this.repository) return;
 
 		// TODO: should we subscribe in cases like this?
+		/*
 		const { data } = await this.repository.requestItemsLegacy(this.selection);
 
 		if (data) {
@@ -44,5 +46,6 @@ export class UmbMediaTrashEntityBulkAction extends UmbEntityBulkActionBase<UmbMe
 			await modalContext.onSubmit();
 			await this.repository?.trash(this.selection);
 		}
+		*/
 	}
 }

@@ -1,1 +1,1 @@
-export const slug = '/user';
+export const UMB_SLUG = '/user';

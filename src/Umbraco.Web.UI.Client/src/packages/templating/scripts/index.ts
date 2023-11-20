@@ -1,2 +1,4 @@
 export * from './repository/index.js';
-export * from './config.js';
+export * from './tree/index.js';
+export * from './types.js';
+export * from './entity.js';

@@ -2,7 +2,7 @@ import { UmbContextDiscriminator, UmbContextToken } from '../token/context-token
 import {
 	isUmbContextProvideEventType,
 	//isUmbContextUnprovidedEventType,
-	umbContextProvideEventType,
+	UMB_CONTEXT_PROVIDE_EVENT_TYPE,
 	//umbContextUnprovidedEventType,
 } from '../provide/context-provide.event.js';
 import { UmbContextRequestEventImplementation, UmbContextCallback } from './context-request.event.js';
@@ -11,9 +11,7 @@ import { UmbContextRequestEventImplementation, UmbContextCallback } from './cont
  * @export
  * @class UmbContextConsumer
  */
-export class UmbContextConsumer<
-BaseType = unknown,
-ResultType extends BaseType = BaseType> {
+export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType = BaseType> {
 	#callback?: UmbContextCallback<ResultType>;
 	#promise?: Promise<ResultType>;
 	#promiseResolver?: (instance: ResultType) => void;
@@ -37,31 +35,28 @@ ResultType extends BaseType = BaseType> {
 	constructor(
 		protected hostElement: EventTarget,
 		contextAlias: string | UmbContextToken<BaseType, ResultType>,
-		callback?: UmbContextCallback<ResultType>
+		callback?: UmbContextCallback<ResultType>,
 	) {
 		this.#contextAlias = contextAlias.toString();
 		this.#callback = callback;
-		this.#discriminator = (contextAlias as any).getDiscriminator?.();
+		this.#discriminator = (contextAlias as UmbContextToken<BaseType, ResultType>).getDiscriminator?.();
 	}
 
-
-	/* Idea: Niels: If we need to filter for specific contexts, we could make the response method return true/false. If false, the event should then then not be stopped. Alternatively parse the event it self on to the response-callback.
-	This will enable the event to continue to bubble up finding a context that matches.
-	The reason for such would be to have some who are more specific than others. For example, some might just need the current workspace-context, others might need the closest handling a certain entityType.
-	As I'm writing this is not relevant, but I wanted to keep the idea as we have had some circumstance that might be solved with this approach.
-	*/
-	protected _onResponse = (instance: BaseType) => {
+	protected _onResponse = (instance: BaseType): boolean => {
 		if (this.#instance === instance) {
-			return;
+			return false;
 		}
-		if(this.#discriminator) {
+		if (this.#discriminator) {
 			// Notice if discriminator returns false, we do not want to setInstance.
-			if(this.#discriminator(instance)) {
+			if (this.#discriminator(instance)) {
 				this.setInstance(instance as unknown as ResultType);
+				return true;
 			}
 		} else {
 			this.setInstance(instance as ResultType);
+			return true;
 		}
+		return false;
 	};
 
 	protected setInstance(instance: ResultType) {
@@ -92,14 +87,14 @@ ResultType extends BaseType = BaseType> {
 
 	public hostConnected() {
 		// TODO: We need to use closets application element. We need this in order to have separate Backoffice running within or next to each other.
-		window.addEventListener(umbContextProvideEventType, this.#handleNewProvider);
+		window.addEventListener(UMB_CONTEXT_PROVIDE_EVENT_TYPE, this.#handleNewProvider);
 		//window.addEventListener(umbContextUnprovidedEventType, this.#handleRemovedProvider);
 		this.request();
 	}
 
 	public hostDisconnected() {
 		// TODO: We need to use closets application element. We need this in order to have separate Backoffice running within or next to each other.
-		window.removeEventListener(umbContextProvideEventType, this.#handleNewProvider);
+		window.removeEventListener(UMB_CONTEXT_PROVIDE_EVENT_TYPE, this.#handleNewProvider);
 		//window.removeEventListener(umbContextUnprovidedEventType, this.#handleRemovedProvider);
 	}
 

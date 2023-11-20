@@ -1,7 +1,7 @@
 import { UmbUserGroupDetailDataSource } from '../types.js';
-import { UmbUserGroupServerDataSource } from './sources/user-group.server.data.js';
+import { UmbUserGroupServerDataSource } from './sources/user-group.server.data-source.js';
 import { UMB_USER_GROUP_ITEM_STORE_CONTEXT_TOKEN, UmbUserGroupItemStore } from './user-group-item.store.js';
-import { UmbUserGroupItemServerDataSource } from './sources/user-group-item.server.data.js';
+import { UmbUserGroupItemServerDataSource } from './sources/user-group-item.server.data-source.js';
 import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import {
 	CreateUserGroupRequestModel,
@@ -22,7 +22,8 @@ import { UmbBaseController, type UmbControllerHost } from '@umbraco-cms/backoffi
 import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
 // TODO: implement
-export class UmbUserGroupRepository extends UmbBaseController
+export class UmbUserGroupRepository
+	extends UmbBaseController
 	implements
 		UmbDetailRepository<CreateUserGroupRequestModel, any, UpdateUserGroupRequestModel, UserGroupResponseModel>,
 		UmbItemRepository<UserGroupItemResponseModel>,
@@ -87,7 +88,7 @@ export class UmbUserGroupRepository extends UmbBaseController
 	async requestById(id: string) {
 		if (!id) throw new Error('Id is missing');
 
-		const { data, error } = await this.#detailSource.get(id);
+		const { data, error } = await this.#detailSource.read(id);
 
 		//TODO Put it in the store
 
@@ -101,7 +102,7 @@ export class UmbUserGroupRepository extends UmbBaseController
 	async create(userGroupRequestData: any): Promise<DataSourceResponse<any>> {
 		if (!userGroupRequestData) throw new Error('Data is missing');
 
-		const { data, error } = await this.#detailSource.insert(userGroupRequestData);
+		const { data, error } = await this.#detailSource.create(userGroupRequestData);
 
 		//TODO Update store
 

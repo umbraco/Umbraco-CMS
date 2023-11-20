@@ -1,7 +1,7 @@
 import {
-	DOCUMENT_TYPE_ENTITY_TYPE,
-	DOCUMENT_TYPE_FOLDER_ENTITY_TYPE,
-	DOCUMENT_TYPE_ROOT_ENTITY_TYPE,
+	UMB_DOCUMENT_TYPE_ENTITY_TYPE,
+	UMB_DOCUMENT_TYPE_FOLDER_ENTITY_TYPE,
+	UMB_DOCUMENT_TYPE_ROOT_ENTITY_TYPE,
 } from '../../index.js';
 import { DOCUMENT_TYPE_DETAIL_REPOSITORY_ALIAS } from '../../repository/index.js';
 import { UmbCreateDataTypeEntityAction } from './create.action.js';
@@ -18,14 +18,18 @@ const entityActions: Array<ManifestTypes> = [
 			icon: 'icon-add',
 			label: 'Create...',
 			repositoryAlias: DOCUMENT_TYPE_DETAIL_REPOSITORY_ALIAS,
-			entityTypes: [DOCUMENT_TYPE_ENTITY_TYPE, DOCUMENT_TYPE_ROOT_ENTITY_TYPE, DOCUMENT_TYPE_FOLDER_ENTITY_TYPE],
+			entityTypes: [
+				UMB_DOCUMENT_TYPE_ENTITY_TYPE,
+				UMB_DOCUMENT_TYPE_ROOT_ENTITY_TYPE,
+				UMB_DOCUMENT_TYPE_FOLDER_ENTITY_TYPE,
+			],
 		},
 	},
 	{
 		type: 'modal',
 		alias: 'Umb.Modal.DocumentTypeCreateOptions',
 		name: 'Document Type Create Options Modal',
-		loader: () => import('./modal/document-type-create-options-modal.element.js'),
+		js: () => import('./modal/document-type-create-options-modal.element.js'),
 	},
 ];
 

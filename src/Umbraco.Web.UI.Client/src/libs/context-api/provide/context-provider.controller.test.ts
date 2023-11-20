@@ -26,8 +26,8 @@ describe('UmbContextProviderController', () => {
 			it('has a controllerAlias property', () => {
 				expect(provider).to.have.property('controllerAlias');
 			});
-			it('has a controllerAlias property, is equal to the controllerAlias', () => {
-				expect(provider.controllerAlias).to.eq('my-test-context');
+			it('has a controllerAlias property, is equal to the controllerAlias plus instance name', () => {
+				expect(provider.controllerAlias).to.eq('my-test-context' + '_' + instance.constructor.name);
 			});
 		});
 
