@@ -3,11 +3,7 @@ import { UmbCollectionRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbBaseController, type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbArrayState, UmbNumberState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
-import {
-	UmbExtensionApiInitializer,
-	UmbExtensionsManifestInitializer,
-	createExtensionApi,
-} from '@umbraco-cms/backoffice/extension-api';
+import { UmbExtensionApiInitializer, UmbExtensionsManifestInitializer } from '@umbraco-cms/backoffice/extension-api';
 import {
 	ManifestCollectionView,
 	ManifestRepository,
@@ -16,7 +12,6 @@ import {
 import type { UmbCollectionFilterModel } from '@umbraco-cms/backoffice/collection';
 import { UmbSelectionManager, UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import { ManifestCollection } from '../extension-registry/models/collection.models.js';
 
 export class UmbCollectionContext<
 	ItemType,
