@@ -23,7 +23,6 @@ export class UmbCollectionContext<
 	FilterModelType extends UmbCollectionFilterModel,
 > extends UmbBaseController {
 	protected entityType: string;
-	protected init;
 
 	#alias?: string;
 
