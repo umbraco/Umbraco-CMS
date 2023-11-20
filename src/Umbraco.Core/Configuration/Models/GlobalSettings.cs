@@ -130,7 +130,7 @@ public class GlobalSettings
     ///     Gets or sets a value indicating whether to install the database when it is missing.
     /// </summary>
     [DefaultValue(StaticInstallMissingDatabase)]
-    public bool InstallMissingDatabase { get; set; } = StaticInstallMissingDatabase;
+    public bool? InstallMissingDatabase { get; set; } = StaticInstallMissingDatabase;
 
     /// <summary>
     ///     Gets or sets a value indicating whether to disable the election for a single server.
