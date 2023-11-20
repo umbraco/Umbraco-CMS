@@ -102,7 +102,10 @@ export class UmbMediaTypeDetailRepository
 		if (!error) {
 			this.#detailStore?.append(mediaType);
 			const treeItem = createTreeItem(mediaType);
-			this.#treeStore?.appendItems([treeItem]);
+			this.#treeStore?.append(treeItem);
+
+			const notification = { data: { message: `Media Type created` } };
+			this.#notificationContext?.peek('positive', notification);
 		}
 
 		return { error };
@@ -120,9 +123,9 @@ export class UmbMediaTypeDetailRepository
 			// TODO: we currently don't use the detail store for anything.
 			// Consider to look up the data before fetching from the server
 			// Consider notify a workspace if a template is updated in the store while someone is editing it.
-			this.#detailStore?.append(item);
+			this.#detailStore?.updateItem(id, item);
 			this.#treeStore?.updateItem(id, item);
-			// TODO: would be nice to align the stores on methods/methodNames.
+			this.#itemStore?.updateItem(id, item);
 
 			const notification = { data: { message: `Media Type saved` } };
 			this.#notificationContext?.peek('positive', notification);
