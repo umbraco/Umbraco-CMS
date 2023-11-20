@@ -18,6 +18,7 @@ import { UmbContextProviderController } from '@umbraco-cms/backoffice/context-ap
 import { UmbExtensionsApiInitializer, type UmbEntryPointOnInit } from '@umbraco-cms/backoffice/extension-api';
 import type { ManifestTypes, UmbBackofficeManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
+export * from './collection/index.js';
 export * from './localization/index.js';
 export * from './action/index.js';
 export * from './components/index.js';
