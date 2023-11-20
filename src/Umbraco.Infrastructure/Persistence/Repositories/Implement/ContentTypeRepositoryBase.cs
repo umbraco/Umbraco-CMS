@@ -154,10 +154,6 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
 
     protected abstract IEnumerable<TEntity>? GetAllWithFullCachePolicy();
 
-    protected virtual PropertyType CreatePropertyType(string propertyEditorAlias, ValueStorageType storageType,
-        string propertyTypeAlias) =>
-        new PropertyType(_shortStringHelper, propertyEditorAlias, storageType, propertyTypeAlias);
-
     protected override void PersistDeletedItem(TEntity entity)
     {
         base.PersistDeletedItem(entity);

@@ -356,10 +356,6 @@ internal class ContentTypeCommonRepository : IContentTypeCommonRepository
 
     private PropertyType MapPropertyType(IContentTypeComposition contentType, PropertyTypeCommonDto dto)
     {
-        var groupId = dto.PropertyTypeGroupId;
-
-        ValueStorageType storageType = Enum<ValueStorageType>.Parse(dto.DataTypeDto.DbType);
-
         if (contentType is IMemberType memberType && dto.Alias is not null)
         {
             memberType.SetIsSensitiveProperty(dto.Alias, dto.IsSensitive);
@@ -367,7 +363,10 @@ internal class ContentTypeCommonRepository : IContentTypeCommonRepository
             memberType.SetMemberCanViewProperty(dto.Alias, dto.ViewOnProfile);
         }
 
-        return new PropertyType(_shortStringHelper, dto.DataTypeDto.EditorAlias, storageType, false, dto.Alias)
+        ValueStorageType storageType = Enum<ValueStorageType>.Parse(dto.DataTypeDto.DbType);
+        int? groupId = dto.PropertyTypeGroupId;
+
+        return new PropertyType(_shortStringHelper, dto.DataTypeDto.EditorAlias, storageType, dto.Alias)
         {
             Description = dto.Description,
             DataTypeId = dto.DataTypeId,

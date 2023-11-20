@@ -186,14 +186,4 @@ internal class MemberTypeRepository : ContentTypeRepositoryBase<IMemberType>, IM
 
         entity.ResetDirtyProperties();
     }
-
-    /// <summary>
-    ///     Override so we can specify explicit db type's on any property types that are built-in.
-    /// </summary>
-    /// <param name="propertyEditorAlias"></param>
-    /// <param name="storageType"></param>
-    /// <param name="propertyTypeAlias"></param>
-    /// <returns></returns>
-    protected override PropertyType CreatePropertyType(string propertyEditorAlias, ValueStorageType storageType, string propertyTypeAlias)
-        => new PropertyType(_shortStringHelper, propertyEditorAlias, storageType, false, propertyTypeAlias);
 }
