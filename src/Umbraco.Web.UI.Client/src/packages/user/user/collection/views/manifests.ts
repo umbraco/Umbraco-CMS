@@ -1,4 +1,5 @@
-import { UMB_USER_ENTITY_TYPE } from '@umbraco-cms/backoffice/user';
+import { UMB_USER_COLLECTION_ALIAS } from '../manifests.js';
+import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
 import { ManifestCollectionView } from '@umbraco-cms/backoffice/extension-registry';
 
 const tableCollectionView: ManifestCollectionView = {
@@ -11,12 +12,12 @@ const tableCollectionView: ManifestCollectionView = {
 		icon: 'icon-box',
 		pathName: 'table',
 	},
-	/*
-	conditions: [{
-		alias: 'Umb.Condition.WorkspaceEntityType',
-		match: UMB_USER_ENTITY_TYPE,
-	}],
-	*/
+	conditions: [
+		{
+			alias: UMB_COLLECTION_ALIAS_CONDITION,
+			match: UMB_USER_COLLECTION_ALIAS,
+		},
+	],
 };
 
 const gridCollectionView: ManifestCollectionView = {
@@ -30,12 +31,12 @@ const gridCollectionView: ManifestCollectionView = {
 		icon: 'icon-grid',
 		pathName: 'grid',
 	},
-	/*
-	conditions: [{
-		alias: 'Umb.Condition.WorkspaceEntityType',
-		match: UMB_USER_ENTITY_TYPE,
-	}],
-	*/
+	conditions: [
+		{
+			alias: UMB_COLLECTION_ALIAS_CONDITION,
+			match: UMB_USER_COLLECTION_ALIAS,
+		},
+	],
 };
 
 export const manifests = [tableCollectionView, gridCollectionView];
