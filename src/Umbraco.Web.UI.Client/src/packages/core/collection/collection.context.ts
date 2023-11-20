@@ -164,7 +164,8 @@ export class UmbCollectionContext<
 	 * @memberof UmbCollectionContext
 	 */
 	public async requestCollection() {
-		if (!this.repository) return;
+		await this.#init;
+		if (!this.repository) throw new Error(`Missing repository for ${this.#alias}`);
 
 		const filter = this.#filter.getValue();
 		const { data } = await this.repository.requestCollection(filter);
@@ -248,8 +249,22 @@ export class UmbCollectionContext<
 				const repositoryAlias = manifest.meta.repositoryAlias;
 				if (!repositoryAlias) throw new Error('A collection must have a repository alias.');
 				console.log(repositoryAlias);
+				this.#observeRepository(repositoryAlias);
 			},
 			'umbObserveCollectionManifest',
+		);
+	}
+
+	#observeRepository(repositoryAlias: string) {
+		new UmbExtensionApiInitializer<ManifestRepository<UmbCollectionRepository>>(
+			this,
+			umbExtensionsRegistry,
+			repositoryAlias,
+			[this._host],
+			(permitted, ctrl) => {
+				this.repository = permitted ? ctrl.api : undefined;
+				this.#checkIfInitialized();
+			},
 		);
 	}
 }
