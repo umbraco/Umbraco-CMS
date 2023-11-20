@@ -1,6 +1,6 @@
-import { css, customElement, html } from '@umbraco-cms/backoffice/external/lit';
-
+import { css, customElement, html, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { clamp } from '@umbraco-cms/backoffice/external/uui';
 
 /**
  * @element umb-file-feedback-loader
@@ -15,10 +15,25 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-file-feedback-loader')
 export class UmbFileFeedbackLoaderElement extends UmbLitElement {
+	private _progress = 0;
+	@property({ type: Number })
+	public set progress(v: number) {
+		const oldVal = this._progress;
+		const p = clamp(v, 0, 100);
+		this._progress = p;
+		if (p === 100) {
+			this.dispatchEvent(new CustomEvent('complete', { bubbles: true }));
+		}
+		this.requestUpdate('progress', oldVal);
+	}
+	public get progress(): number {
+		return this._progress;
+	}
+
 	render() {
-		return html` <uui-badge>
+		return html`<uui-badge>
 			<div id="wrapper">
-				<uui-loader-circle progress="50"></uui-loader-circle>
+				<uui-loader-circle progress=${this.progress}></uui-loader-circle>
 				<uui-icon name="icon-arrow-up"></uui-icon>
 			</div>
 		</uui-badge>`;
