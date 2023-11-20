@@ -21,7 +21,12 @@ export class UmbSectionViewUsersElement extends UmbLitElement {
 	];
 
 	render() {
-		return html`<umb-router-slot id="router-slot" .routes=${this.#routes}></umb-router-slot>`;
+		return html`
+			<umb-collection alias="Umb.Collection.User"></umb-collection>
+			<!--
+			<umb-router-slot id="router-slot" .routes=${this.#routes}></umb-router-slot>
+	-->
+		`;
 	}
 
 	static styles = [
