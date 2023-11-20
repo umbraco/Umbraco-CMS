@@ -212,13 +212,6 @@ export class UmbCollectionContext<
 		this.#filter.next({ ...this.#filter.getValue(), skip: 0, take: configuration.pageSize });
 	}
 
-	#observeViews() {
-		return new UmbExtensionsManifestInitializer(this, umbExtensionsRegistry, 'collectionView', null, (views) => {
-			this.#views.next(views.map((view) => view.manifest));
-			this.#setCurrentView();
-		});
-	}
-
 	#onPageChange = (event: UmbChangeEvent) => {
 		const target = event.target as UmbPaginationManager;
 		const skipFilter = { skip: target.getSkip() } as Partial<FilterModelType>;
@@ -250,6 +243,7 @@ export class UmbCollectionContext<
 				if (!repositoryAlias) throw new Error('A collection must have a repository alias.');
 				console.log(repositoryAlias);
 				this.#observeRepository(repositoryAlias);
+				this.#observeViews();
 			},
 			'umbObserveCollectionManifest',
 		);
@@ -266,6 +260,13 @@ export class UmbCollectionContext<
 				this.#checkIfInitialized();
 			},
 		);
+	}
+
+	#observeViews() {
+		return new UmbExtensionsManifestInitializer(this, umbExtensionsRegistry, 'collectionView', null, (views) => {
+			this.#views.next(views.map((view) => view.manifest));
+			this.#setCurrentView();
+		});
 	}
 }
 
