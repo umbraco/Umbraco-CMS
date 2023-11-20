@@ -7,30 +7,30 @@ import type {
 	ManifestTreeStore,
 } from '@umbraco-cms/backoffice/extension-registry';
 
-export const MEDIA_TYPE_TREE_REPOSITORY_ALIAS = 'Umb.Repository.MediaType.Tree';
-export const MEDIA_TYPE_TREE_STORE_ALIAS = 'Umb.Store.MediaType.Tree';
-export const MEDIA_TYPE_TREE_ALIAS = 'Umb.Tree.MediaType';
+export const UMB_MEDIA_TYPE_TREE_REPOSITORY_ALIAS = 'Umb.Repository.MediaType.Tree';
+export const UMB_MEDIA_TYPE_TREE_STORE_ALIAS = 'Umb.Store.MediaType.Tree';
+export const UMB_MEDIA_TYPE_TREE_ALIAS = 'Umb.Tree.MediaType';
 
 const treeRepository: ManifestRepository = {
 	type: 'repository',
-	alias: MEDIA_TYPE_TREE_REPOSITORY_ALIAS,
+	alias: UMB_MEDIA_TYPE_TREE_REPOSITORY_ALIAS,
 	name: 'Media Type Tree Repository',
 	api: UmbMediaTypeTreeRepository,
 };
 
 const treeStore: ManifestTreeStore = {
 	type: 'treeStore',
-	alias: MEDIA_TYPE_TREE_STORE_ALIAS,
+	alias: UMB_MEDIA_TYPE_TREE_STORE_ALIAS,
 	name: 'Media Type Tree Store',
 	api: UmbMediaTypeTreeStore,
 };
 
 const tree: ManifestTree = {
 	type: 'tree',
-	alias: MEDIA_TYPE_TREE_ALIAS,
+	alias: UMB_MEDIA_TYPE_TREE_ALIAS,
 	name: 'Media Type Tree',
 	meta: {
-		repositoryAlias: MEDIA_TYPE_TREE_REPOSITORY_ALIAS,
+		repositoryAlias: UMB_MEDIA_TYPE_TREE_REPOSITORY_ALIAS,
 	},
 };
 
