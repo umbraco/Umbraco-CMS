@@ -2,37 +2,32 @@ import { UMB_COLLECTION_CONTEXT, UmbCollectionContext } from './collection.conte
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state, property } from '@umbraco-cms/backoffice/external/lit';
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
-import { ManifestCollectionView } from '@umbraco-cms/backoffice/extension-registry';
+import { type ManifestCollectionView, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 
 @customElement('umb-collection')
 export class UmbCollectionElement extends UmbLitElement {
+	@property({ type: String, reflect: true })
+	get alias() {
+		return this.#collectionContext.getAlias();
+	}
+	set alias(newVal) {
+		this.#collectionContext.setAlias(newVal);
+	}
+
 	@state()
 	private _routes: Array<UmbRoute> = [];
 
-	private _entityType!: string;
-	@property({ type: String, attribute: 'entity-type' })
-	public get entityType(): string {
-		return this._entityType;
-	}
-	public set entityType(value: string) {
-		this._entityType = value;
-	}
-
-	protected collectionContext?: UmbCollectionContext<any, any>;
+	#collectionContext = new UmbCollectionContext(this);
 
 	constructor() {
 		super();
-
-		this.consumeContext(UMB_COLLECTION_CONTEXT, (context) => {
-			this.collectionContext = context;
-			this.#observeCollectionViews();
-		});
+		this.#observeCollectionViews();
 	}
 
 	#observeCollectionViews() {
-		this.observe(this.collectionContext!.views, (views) => {
+		this.observe(this.#collectionContext.views, (views) => {
 			this._createRoutes(views);
 		}),
 			'umbCollectionViewsObserver';
@@ -61,8 +56,7 @@ export class UmbCollectionElement extends UmbLitElement {
 			<umb-body-layout header-transparent>
 				${this.renderToolbar()}
 				<umb-router-slot id="router-slot" .routes="${this._routes}"></umb-router-slot>
-				${this.renderPagination()}
-				${this.renderSelectionActions()}
+				${this.renderPagination()} ${this.renderSelectionActions()}
 			</umb-body-layout>
 		`;
 	}
@@ -71,7 +65,7 @@ export class UmbCollectionElement extends UmbLitElement {
 		return html`<umb-collection-toolbar slot="header"></umb-collection-toolbar>`;
 	}
 
-	protected renderPagination () {
+	protected renderPagination() {
 		return html`<umb-collection-pagination></umb-collection-pagination>`;
 	}
 
