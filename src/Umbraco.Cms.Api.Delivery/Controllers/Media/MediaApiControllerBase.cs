@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Api.Delivery.Filters;
 using Umbraco.Cms.Api.Delivery.Routing;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
@@ -14,6 +16,7 @@ namespace Umbraco.Cms.Api.Delivery.Controllers.Media;
 [DeliveryApiMediaAccess]
 [VersionedDeliveryApiRoute("media")]
 [ApiExplorerSettings(GroupName = "Media")]
+[OutputCache(PolicyName = Constants.DeliveryApi.OutputCache.MediaCachePolicy)]
 public abstract class MediaApiControllerBase : DeliveryApiControllerBase
 {
     private readonly IApiMediaWithCropsResponseBuilder _apiMediaWithCropsResponseBuilder;
