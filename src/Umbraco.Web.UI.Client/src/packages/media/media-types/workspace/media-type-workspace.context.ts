@@ -1,21 +1,17 @@
-import { UmbMediaTypeRepository } from '../repository/media-type.repository.js';
-import { UmbSaveableWorkspaceContextInterface, UmbEditableWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
 import { UmbMediaTypeDetailRepository } from '../repository/detail/media-type-detail.repository.js';
+import {
+	UmbSaveableWorkspaceContextInterface,
+	UmbEditableWorkspaceContextBase,
+} from '@umbraco-cms/backoffice/workspace';
 import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
-import { UmbWorkspaceContext, UmbSaveableWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
-import type {
-	ContentTypeCompositionModel,
-	ContentTypeSortModel,
-	MediaTypeResponseModel,
-} from '@umbraco-cms/backoffice/backend-api';
+import { type MediaTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 
 type EntityType = MediaTypeResponseModel;
 export class UmbMediaTypeWorkspaceContext
-	extends UmbEditableWorkspaceContextBase<UmbMediaTypeRepository, EntityType>
-	extends UmbWorkspaceContext<UmbMediaTypeDetailRepository, EntityType>
+	extends UmbEditableWorkspaceContextBase<UmbMediaTypeDetailRepository, EntityType>
 	implements UmbSaveableWorkspaceContextInterface<EntityType | undefined>
 {
 	// Draft is located in structure manager

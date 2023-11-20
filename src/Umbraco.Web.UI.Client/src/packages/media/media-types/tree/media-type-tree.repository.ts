@@ -1,4 +1,4 @@
-import { MEDIA_TYPE_ROOT_ENTITY_TYPE } from '../index.js';
+import { UMB_MEDIA_TYPE_ROOT_ENTITY_TYPE } from '../index.js';
 import { UmbMediaTypeTreeServerDataSource } from './media-type.tree.server.data-source.js';
 import { UMB_MEDIA_TYPE_TREE_STORE_CONTEXT } from './media-type.tree.store.js';
 import { UmbMediaTypeTreeItemModel, UmbMediaTypeTreeRootModel } from './types.js';
@@ -17,7 +17,7 @@ export class UmbMediaTypeTreeRepository
 	async requestTreeRoot() {
 		const data = {
 			id: null,
-			type: MEDIA_TYPE_ROOT_ENTITY_TYPE,
+			type: UMB_MEDIA_TYPE_ROOT_ENTITY_TYPE,
 			name: 'Media Types',
 			icon: 'icon-folder',
 			hasChildren: true,

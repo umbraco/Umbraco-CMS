@@ -76,7 +76,7 @@ export class UmbMediaTypeDetailRepository
 		if (!id) throw new Error('Id is missing');
 		await this.#init;
 
-		const { data, error } = await this.#detailDataSource.get(id);
+		const { data, error } = await this.#detailDataSource.read(id);
 
 		if (data) {
 			this.#detailStore?.append(data);
@@ -91,20 +91,13 @@ export class UmbMediaTypeDetailRepository
 		return this.#detailStore!.byId(id);
 	}
 
-	// TODO: we need to figure out where to put this
-	async requestAllowedChildTypesOf(id: string) {
-		if (!id) throw new Error('Id is missing');
-		await this.#init;
-		return this.#detailDataSource.getAllowedChildrenOf(id);
-	}
-
 	// Could potentially be general methods:
 
 	async create(mediaType: ItemType) {
 		if (!mediaType || !mediaType.id) throw new Error('Media Type is missing');
 		await this.#init;
 
-		const { error } = await this.#detailDataSource.insert(mediaType);
+		const { error } = await this.#detailDataSource.create(mediaType);
 
 		if (!error) {
 			this.#detailStore?.append(mediaType);

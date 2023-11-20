@@ -22,7 +22,7 @@ const workspaceEditorViews: Array<ManifestWorkspaceEditorView> = [
 		type: 'workspaceEditorView',
 		alias: 'Umb.WorkspaceView.MediaType.Design',
 		name: 'Media Type Workspace Design View',
-		loader: () => import('./views/design/media-type-workspace-view-edit.element.js'),
+		js: () => import('./views/design/media-type-workspace-view-edit.element.js'),
 		weight: 1000,
 		meta: {
 			label: 'Design',
@@ -40,7 +40,7 @@ const workspaceEditorViews: Array<ManifestWorkspaceEditorView> = [
 		type: 'workspaceEditorView',
 		alias: 'Umb.WorkspaceView.MediaType.Structure',
 		name: 'Media Type Workspace Structure View',
-		loader: () => import('./views/structure/media-type-workspace-view-structure.element.js'),
+		js: () => import('./views/structure/media-type-workspace-view-structure.element.js'),
 		weight: 800,
 		meta: {
 			label: 'Structure',
