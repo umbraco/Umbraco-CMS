@@ -1,6 +1,6 @@
 import {
 	UMB_MEDIA_TYPE_ENTITY_TYPE,
-	MEDIA_TYPE_FOLDER_ENTITY_TYPE,
+	UMB_MEDIA_TYPE_FOLDER_ENTITY_TYPE,
 	UMB_MEDIA_TYPE_ROOT_ENTITY_TYPE,
 } from '../../index.js';
 import { MEDIA_TYPE_DETAIL_REPOSITORY_ALIAS } from '../../repository/index.js';
@@ -18,7 +18,7 @@ const entityActions: Array<ManifestTypes> = [
 			icon: 'icon-add',
 			label: 'Create...',
 			repositoryAlias: MEDIA_TYPE_DETAIL_REPOSITORY_ALIAS,
-			entityTypes: [UMB_MEDIA_TYPE_ENTITY_TYPE, UMB_MEDIA_TYPE_ROOT_ENTITY_TYPE, MEDIA_TYPE_FOLDER_ENTITY_TYPE],
+			entityTypes: [UMB_MEDIA_TYPE_ENTITY_TYPE, UMB_MEDIA_TYPE_ROOT_ENTITY_TYPE, UMB_MEDIA_TYPE_FOLDER_ENTITY_TYPE],
 		},
 	},
 	{
