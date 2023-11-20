@@ -28,12 +28,12 @@ export class UmbCollectionElement extends UmbLitElement {
 
 	#observeCollectionViews() {
 		this.observe(this.#collectionContext.views, (views) => {
-			this._createRoutes(views);
+			this.#createRoutes(views);
 		}),
 			'umbCollectionViewsObserver';
 	}
 
-	private _createRoutes(views: ManifestCollectionView[] | null) {
+	#createRoutes(views: ManifestCollectionView[] | null) {
 		this._routes = [];
 
 		if (views) {
@@ -49,6 +49,8 @@ export class UmbCollectionElement extends UmbLitElement {
 			path: '',
 			redirectTo: views?.[0]?.meta.pathName ?? '/',
 		});
+
+		this.requestUpdate();
 	}
 
 	render() {
