@@ -1,4 +1,5 @@
 import { UmbMediaTypeDetailRepository } from '../repository/detail/media-type-detail.repository.js';
+import { UMB_MEDIA_TYPE_ENTITY_TYPE } from '../index.js';
 import {
 	UmbSaveableWorkspaceContextInterface,
 	UmbEditableWorkspaceContextBase,
@@ -65,7 +66,7 @@ export class UmbMediaTypeWorkspaceContext
 	}
 
 	getEntityType() {
-		return 'media-type';
+		return UMB_MEDIA_TYPE_ENTITY_TYPE;
 	}
 
 	updateProperty<PropertyName extends keyof EntityType>(propertyName: PropertyName, value: EntityType[PropertyName]) {
@@ -120,5 +121,5 @@ export const UMB_MEDIA_TYPE_WORKSPACE_CONTEXT = new UmbContextToken<
 	UmbMediaTypeWorkspaceContext
 >(
 	'UmbWorkspaceContext',
-	(context): context is UmbMediaTypeWorkspaceContext => context.getEntityType?.() === 'media-type',
+	(context): context is UmbMediaTypeWorkspaceContext => context.getEntityType?.() === UMB_MEDIA_TYPE_ENTITY_TYPE,
 );

@@ -1,5 +1,5 @@
 import { UmbMediaTypeTreeRepository } from './media-type-tree.repository.js';
-import { UmbMediaTypeTreeStore } from './media-type.tree.store.js';
+import { UmbMediaTypeTreeStore } from './media-type-tree.store.js';
 import type {
 	ManifestRepository,
 	ManifestTree,
