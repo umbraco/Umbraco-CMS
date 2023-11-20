@@ -1,4 +1,4 @@
-import { MEDIA_TYPE_DETAIL_REPOSITORY_ALIAS } from '../../../repository/index.js';
+import { UMB_MEDIA_TYPE_DETAIL_REPOSITORY_ALIAS } from '../../../repository/index.js';
 import { UmbMediaTypeCreateOptionsModalData } from './index.js';
 import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -30,7 +30,7 @@ export class UmbDataTypeCreateOptionsModalElement extends UmbLitElement {
 	#onClick(event: PointerEvent) {
 		event.stopPropagation();
 		const folderModalHandler = this.#modalContext?.open(UMB_FOLDER_MODAL, {
-			repositoryAlias: MEDIA_TYPE_DETAIL_REPOSITORY_ALIAS,
+			repositoryAlias: UMB_MEDIA_TYPE_DETAIL_REPOSITORY_ALIAS,
 		});
 		folderModalHandler?.onSubmit().then(() => this.modalContext?.submit());
 	}
