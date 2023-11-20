@@ -62,7 +62,7 @@ export class UmbMediaTypeServerDataSource
 			name: '',
 			alias: '',
 			description: '',
-			icon: 'icon-media',
+			icon: 'icon-picture',
 			allowedAsRoot: false,
 			variesByCulture: false,
 			variesBySegment: false,
