@@ -1,6 +1,6 @@
 import { UmbStylesheetWorkspaceContext } from './stylesheet-workspace.context.js';
 import { UUIInputElement, UUIInputEvent, UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
-import { css, html, customElement, state, PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { Subject, debounceTime } from '@umbraco-cms/backoffice/external/rxjs';
@@ -23,9 +23,6 @@ export class UmbStylesheetWorkspaceEditorElement extends UmbLitElement {
 	@state()
 	private _path?: string;
 
-	@state()
-	private _dirName?: string;
-
 	private inputQuery$ = new Subject<string>();
 
 	constructor() {
@@ -46,14 +43,7 @@ export class UmbStylesheetWorkspaceEditorElement extends UmbLitElement {
 		if (!this.#workspaceContext) return;
 		this.observe(
 			this.#workspaceContext.path,
-			(path) => {
-				this._path = path;
-				if (this._path?.includes('.css')) {
-					this._dirName = this._path?.substring(0, this._path?.lastIndexOf('\\') + 1)?.replace(/\\/g, '/');
-				} else {
-					this._dirName = path + '/';
-				}
-			},
+			(path) => (this._path = path?.replace(/\\/g, '/')),
 			'_observeStylesheetPath',
 		);
 		this.observe(this.#workspaceContext.name, (name) => (this._name = name), '_observeStylesheetName');
@@ -76,7 +66,7 @@ export class UmbStylesheetWorkspaceEditorElement extends UmbLitElement {
 						.value=${this._name}
 						@input="${this.#onNameChange}">
 					</uui-input>
-					<small>/css/${this._dirName}${this._name}.css</small>
+					<small>/css/${this._path}</small>
 				</div>
 
 				<div slot="footer-info">

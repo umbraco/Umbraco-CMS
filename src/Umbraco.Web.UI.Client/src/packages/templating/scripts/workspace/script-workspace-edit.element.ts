@@ -27,9 +27,6 @@ export class UmbScriptWorkspaceEditElement extends UmbLitElement {
 	private _path?: string | null = '';
 
 	@state()
-	private _dirName?: string | null = '';
-
-	@state()
 	private _ready?: boolean = false;
 
 	@query('umb-code-editor')
@@ -60,8 +57,7 @@ export class UmbScriptWorkspaceEditElement extends UmbLitElement {
 			});
 
 			this.observe(this.#scriptsWorkspaceContext.path, (path) => {
-				this._path = path;
-				this._dirName = this._path?.substring(0, this._path?.lastIndexOf('\\'))?.replace(/\\/g, '/');
+				this._path = path?.replace(/\\/g, '/');
 			});
 
 			this.observe(this.#scriptsWorkspaceContext.isNew, (isNew) => {
@@ -106,7 +102,7 @@ export class UmbScriptWorkspaceEditElement extends UmbLitElement {
 					.value=${this._name}
 					@input=${this.#onNameInput}
 					label="template name"></uui-input>
-				<small>Scripts/${this._dirName}${this._name}.js</small>
+				<small>Scripts/${this._path}</small>
 			</div>
 			<uui-box>
 				<!-- the div below in the header is to make the box display nicely with code editor -->
