@@ -75,6 +75,7 @@ export * from './workspace.model.js';
 export type ManifestTypes =
 	| ManifestBundle<ManifestTypes>
 	| ManifestCondition
+	| ManifestCollection
 	| ManifestCollectionView
 	| ManifestDashboard
 	| ManifestDashboardCollection
