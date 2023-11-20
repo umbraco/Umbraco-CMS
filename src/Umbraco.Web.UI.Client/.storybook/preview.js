@@ -13,7 +13,7 @@ import { UMB_MODAL_MANAGER_CONTEXT_TOKEN, UmbModalManagerContext } from '../src/
 import { UmbDataTypeTreeStore } from '../src/packages/core/data-type/tree/data-type.tree.store';
 import { UmbDocumentStore } from '../src/packages/documents/documents/repository/document.store';
 import { UmbDocumentTreeStore } from '../src/packages/documents/documents/repository/document.tree.store';
-import { UmbDocumentTypeDetailStore } from '../src/packages/documents/document-types/repository/detail/document-type-detail.store.ts';
+import { UmbDocumentTypeDetailStore } from '../src/packages/documents/document-types/repository/detail/document-type-detail.store';
 import { umbExtensionsRegistry } from '../src/packages/core/extension-registry';
 import { UmbIconRegistry } from '../src/shared/icon-registry/icon.registry';
 import { UmbLitElement } from '../src/shared/lit-element';
