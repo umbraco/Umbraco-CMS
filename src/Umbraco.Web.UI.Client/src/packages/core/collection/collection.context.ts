@@ -241,7 +241,6 @@ export class UmbCollectionContext<
 				if (!manifest) return;
 				const repositoryAlias = manifest.meta.repositoryAlias;
 				if (!repositoryAlias) throw new Error('A collection must have a repository alias.');
-				console.log(repositoryAlias);
 				this.#observeRepository(repositoryAlias);
 				this.#observeViews();
 			},
