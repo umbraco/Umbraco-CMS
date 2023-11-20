@@ -1,3 +1,5 @@
+using System.Net;
+using System.Web;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -89,7 +91,7 @@ public class ContentFinderByRedirectUrl : IContentFinder
         }
 
         frequest
-            .SetRedirectPermanent(url)
+            .SetRedirectPermanent(HttpUtility.UrlPathEncode(url))
 
             // From: http://stackoverflow.com/a/22468386/5018
             // See http://issues.umbraco.org/issue/U4-8361#comment=67-30532
