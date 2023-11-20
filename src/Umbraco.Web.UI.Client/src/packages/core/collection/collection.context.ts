@@ -17,8 +17,6 @@ export class UmbCollectionContext<
 	ItemType,
 	FilterModelType extends UmbCollectionFilterModel,
 > extends UmbBaseController {
-	protected entityType: string;
-
 	#alias?: string;
 
 	#items = new UmbArrayState<ItemType>([]);
@@ -51,13 +49,8 @@ export class UmbCollectionContext<
 
 	public readonly pagination = new UmbPaginationManager();
 
-	constructor(
-		host: UmbControllerHostElement,
-		entityType: string,
-		config: UmbCollectionConfiguration = { pageSize: 50 },
-	) {
+	constructor(host: UmbControllerHostElement, config: UmbCollectionConfiguration = { pageSize: 50 }) {
 		super(host);
-		this.entityType = entityType;
 
 		// listen for page changes on the pagination manager
 		this.pagination.addEventListener(UmbChangeEvent.TYPE, this.#onPageChange);
@@ -141,15 +134,6 @@ export class UmbCollectionContext<
 	 */
 	public deselect(id: string) {
 		this.#selectionManager.deselect(id);
-	}
-
-	/**
-	 * Returns the collection entity type
-	 * @return {string}
-	 * @memberof UmbCollectionContext
-	 */
-	public getEntityType() {
-		return this.entityType;
 	}
 
 	/**
