@@ -11,10 +11,12 @@ const tableCollectionView: ManifestCollectionView = {
 		icon: 'icon-box',
 		pathName: 'table',
 	},
+	/*
 	conditions: [{
 		alias: 'Umb.Condition.WorkspaceEntityType',
 		match: UMB_USER_ENTITY_TYPE,
 	}],
+	*/
 };
 
 const gridCollectionView: ManifestCollectionView = {
@@ -28,10 +30,12 @@ const gridCollectionView: ManifestCollectionView = {
 		icon: 'icon-grid',
 		pathName: 'grid',
 	},
+	/*
 	conditions: [{
 		alias: 'Umb.Condition.WorkspaceEntityType',
 		match: UMB_USER_ENTITY_TYPE,
 	}],
+	*/
 };
 
 export const manifests = [tableCollectionView, gridCollectionView];
