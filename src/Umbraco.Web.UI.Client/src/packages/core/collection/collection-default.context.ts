@@ -3,7 +3,11 @@ import { UmbCollectionRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbBaseController, type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbArrayState, UmbNumberState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
-import { UmbExtensionApiInitializer, UmbExtensionsManifestInitializer } from '@umbraco-cms/backoffice/extension-api';
+import {
+	UmbApi,
+	UmbExtensionApiInitializer,
+	UmbExtensionsManifestInitializer,
+} from '@umbraco-cms/backoffice/extension-api';
 import {
 	ManifestCollectionView,
 	ManifestRepository,
@@ -13,10 +17,10 @@ import type { UmbCollectionFilterModel } from '@umbraco-cms/backoffice/collectio
 import { UmbSelectionManager, UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
-export class UmbCollectionDefaultContext<
-	ItemType,
-	FilterModelType extends UmbCollectionFilterModel,
-> extends UmbBaseController {
+export class UmbCollectionDefaultContext<ItemType, FilterModelType extends UmbCollectionFilterModel>
+	extends UmbBaseController
+	implements UmbApi
+{
 	#alias?: string;
 
 	#items = new UmbArrayState<ItemType>([]);
