@@ -86,6 +86,22 @@ public class WebhookEventCollectionBuilder : OrderedCollectionBuilderBase<Webhoo
         return null;
     }
 
+    public WebhookEventCollectionBuilder AddAllTheWebhooks() =>
+        this.AddContentWebhooks()
+            .AddDataTypeWebhooks()
+            .AddDictionaryWebhooks()
+            .AddDictionaryWebhooks()
+            .AddLanguageWebhooks()
+            .AddMediaWebhooks()
+            .AddMemberWebhooks()
+            .AddMemberTypeWebhooks()
+            .AddPackageWebhooks()
+            .AddPublicAccessWebhooks()
+            .AddRelationWebhooks()
+            .AddScriptWebhooks()
+            .AddStylesheetWebhooks()
+            .AddTemplateWebhooks();
+
     public WebhookEventCollectionBuilder AddContentWebhooks()
     {
         Append<ContentCopiedWebhookEvent>();
