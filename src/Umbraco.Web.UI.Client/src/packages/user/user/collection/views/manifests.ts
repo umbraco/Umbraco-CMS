@@ -1,4 +1,3 @@
-import { UMB_USER_COLLECTION_ALIAS } from '../manifests.js';
 import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
 import { ManifestCollectionView } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -15,7 +14,7 @@ const tableCollectionView: ManifestCollectionView = {
 	conditions: [
 		{
 			alias: UMB_COLLECTION_ALIAS_CONDITION,
-			match: UMB_USER_COLLECTION_ALIAS,
+			match: 'Umb.Collection.User',
 		},
 	],
 };
@@ -34,7 +33,7 @@ const gridCollectionView: ManifestCollectionView = {
 	conditions: [
 		{
 			alias: UMB_COLLECTION_ALIAS_CONDITION,
-			match: UMB_USER_COLLECTION_ALIAS,
+			match: 'Umb.Collection.User',
 		},
 	],
 };
