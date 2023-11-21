@@ -1,10 +1,28 @@
-import { UMB_COLLECTION_CONTEXT, UmbCollectionDefaultContext } from './collection.context.js';
+import { UMB_COLLECTION_CONTEXT, UmbCollectionDefaultContext } from './collection-default.context.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
-import { type ManifestCollectionView } from '@umbraco-cms/backoffice/extension-registry';
+import {
+	umbExtensionsRegistry,
+	type ManifestCollectionView,
+	UmbBackofficeManifestKind,
+} from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
+
+const manifest: UmbBackofficeManifestKind = {
+	type: 'kind',
+	alias: 'Umb.Kind.Collection.Default',
+	matchKind: 'default',
+	matchType: 'collection',
+	manifest: {
+		type: 'collection',
+		kind: 'default',
+		elementName: 'umb-collection-default',
+		api: UmbCollectionDefaultContext,
+	},
+};
+umbExtensionsRegistry.register(manifest);
 
 @customElement('umb-collection-default')
 export class UmbCollectionDefaultElement extends UmbLitElement {

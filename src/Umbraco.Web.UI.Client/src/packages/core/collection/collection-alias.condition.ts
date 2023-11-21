@@ -1,4 +1,4 @@
-import { UMB_COLLECTION_CONTEXT } from './collection.context.js';
+import { UMB_COLLECTION_CONTEXT } from './collection-default.context.js';
 import { UmbBaseController } from '@umbraco-cms/backoffice/controller-api';
 import {
 	ManifestCondition,
