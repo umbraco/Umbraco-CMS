@@ -23,7 +23,7 @@ export class UmbCollectionAliasCondition extends UmbBaseController implements Um
 	}
 }
 
-export type CollectionAliasConditionConfig = UmbConditionConfigBase<'Umb.Condition.CollectionAlias'> & {
+export type CollectionAliasConditionConfig = UmbConditionConfigBase<typeof UMB_COLLECTION_ALIAS_CONDITION> & {
 	/**
 	 * The collection that this extension should be available in
 	 *
@@ -37,6 +37,6 @@ export const UMB_COLLECTION_ALIAS_CONDITION = 'Umb.Condition.CollectionAlias';
 export const manifest: ManifestCondition = {
 	type: 'condition',
 	name: 'Collection Alias Condition',
-	alias: 'Umb.Condition.CollectionAlias',
+	alias: UMB_COLLECTION_ALIAS_CONDITION,
 	api: UmbCollectionAliasCondition,
 };
