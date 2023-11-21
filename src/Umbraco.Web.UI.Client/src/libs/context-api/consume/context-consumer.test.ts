@@ -135,7 +135,7 @@ describe('UmbContextConsumer', () => {
 			const element = document.createElement('div');
 			document.body.appendChild(element);
 
-			const localConsumer = new UmbContextConsumer(element, testContextAliasAndNotExstingApiAlias, (_instance) => {
+			const localConsumer = new UmbContextConsumer(element, testContextAliasAndNotExstingApiAlias, () => {
 				expect(false).to.be.true;
 			});
 			localConsumer.hostConnected();
