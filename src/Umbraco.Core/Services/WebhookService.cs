@@ -34,7 +34,7 @@ public class WebhookService : IWebhookService
     public async Task<Attempt<Webhook, WebhookOperationStatus>> CreateAsync(Webhook webhook)
     {
         WebhookOperationStatus validationResult = ValidateWebhook(webhook);
-        if (validationResult != WebhookOperationStatus.Success)
+        if (validationResult is not WebhookOperationStatus.Success)
         {
             return Attempt.FailWithStatus(validationResult, webhook);
         }
