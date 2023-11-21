@@ -165,8 +165,13 @@ public class WebhookEventCollectionBuilder : OrderedCollectionBuilderBase<Webhoo
 
     public WebhookEventCollectionBuilder AddMemberWebhooks()
     {
+        Append<AssignedMemberRolesWebhookEvent>();
+        Append<ExportedMemberWebhookEvent>();
         Append<MemberDeletedWebhookEvent>();
+        Append<MemberGroupDeletedWebhookEvent>();
+        Append<MemberGroupSavedWebhookEvent>();
         Append<MemberSavedWebhookEvent>();
+        Append<RemovedMemberRolesWebhookEvent>();
         return this;
     }
 
