@@ -148,6 +148,17 @@ angular.module("umbraco.directives")
            */
           function _upload(file) {
 
+            if (!file) {
+              return;
+            }
+
+            if (file.$error) {
+                file.done = true;
+                scope.processed.push(file);
+                file.messages.push({type: "Error", header: "Error"});
+                return;
+            }
+
             scope.propertyAlias = scope.propertyAlias ? scope.propertyAlias : "umbracoFile";
             scope.contentTypeAlias = scope.contentTypeAlias ? scope.contentTypeAlias : "umbracoAutoSelect";
 

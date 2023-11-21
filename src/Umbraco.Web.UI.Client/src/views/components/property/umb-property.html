@@ -9,16 +9,16 @@
 
                 <div class="control-header" ng-hide="(vm.hideLabel || vm.property.hideLabel) === true">
 
-                    <label data-element="property-label-{{vm.property.alias}}" class="control-label" for="{{vm.property.alias}}" ng-attr-title="{{vm.controlLabelTitle}}">{{vm.property.label}}<span ng-if="vm.property.validation.mandatory || vm.property.ncMandatory"><strong class="umb-control-required">*</strong></span></label>
+                    <label data-element="property-label-{{vm.property.alias}}" class="control-label" for="{{vm.property.alias}}" ng-attr-title="{{vm.controlLabelTitle}}" aria-label="Property alias: {{vm.controlAriaLabel}}">{{vm.property.label}}<span ng-if="vm.property.validation.mandatory || vm.property.ncMandatory"><strong class="umb-control-required">*</strong></span></label>
 
                     <umb-property-actions actions="vm.propertyActions"></umb-property-actions>
 
-                    <small class="control-description" ng-if="vm.property.description" ng-bind-html="vm.property.description"></small>
+                    <small class="control-description" ng-if="vm.property.description" ng-bind-html="vm.property.description | simpleMarkdown"></small>
 
                     <div ng-if="vm.property.extendedDescription">
 
                       <div ng-if="vm.property.extendedDescriptionVisible">
-                        <small class="control-description" ng-bind-html="vm.property.extendedDescription"></small>
+                        <small class="control-description" ng-bind-html="vm.property.extendedDescription | simpleMarkdown"></small>
                       </div>
 
                       <button type="button" class="btn btn-mini btn-link btn-link-reverse p0" ng-click="vm.property.extendedDescriptionVisible = !vm.property.extendedDescriptionVisible">

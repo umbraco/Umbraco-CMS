@@ -48,7 +48,7 @@ namespace Umbraco.Cms.Web.UI
             {
                 app.UseDeveloperExceptionPage();
             }
-#if (UseHttpsRedirect)
+#if UseHttpsRedirect
 
             app.UseHttpsRedirection();
 #endif

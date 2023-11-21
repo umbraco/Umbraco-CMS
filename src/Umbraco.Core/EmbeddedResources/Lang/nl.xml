@@ -112,6 +112,12 @@
       zijn op de huidige node, tenzij een domein hieronder ook van toepassing is.]]></key>
     <key alias="setDomains">Domeinen</key>
   </area>
+  <area alias="auditTrailsMedia">
+    <key alias="delete">Media verwijderd</key>
+    <key alias="move">Media verplaatst</key>
+    <key alias="copy">Media gekopieerd</key>
+    <key alias="save">Media bewaard</key>
+  </area>
   <area alias="auditTrails">
     <key alias="atViewingFor">Tonen voor</key>
     <key alias="delete">Inhoud verwijderd</key>
@@ -340,6 +346,7 @@
     <key alias="renameFolderFailed">Kan de map met id %0% niet hernoemen</key>
     <key alias="dragAndDropYourFilesIntoTheArea">Sleep en zet je bestand(en) neer in dit gebied</key>
     <key alias="uploadNotAllowed">Upload is niet toegelaten in deze locatie.</key>
+    <key alias="fileSecurityValidationFailure">Een of meerdere veiligheid validaties zijn gefaald voor het bestand</key>
   </area>
   <area alias="member">
     <key alias="createNewMember">Maak nieuw lid aan</key>
@@ -536,6 +543,7 @@
   </area>
   <area alias="dictionary">
     <key alias="noItems">Er zijn geen woordenboekitems.</key>
+    <key alias="noItemsFound">Er zijn geen woordenboekitems gevonden.</key>
     <key alias="createNew">Woordenboekitem aanmaken</key>
   </area>
   <area alias="dictionaryItem">
@@ -737,7 +745,7 @@
     <key alias="history">Geschiedenis</key>
     <key alias="icon">Icoon</key>
     <key alias="id">Id</key>
-    <key alias="import">Import</key>
+    <key alias="import">Importeren</key>
     <key alias="excludeFromSubFolders">Alleen in deze map zoeken</key>
     <key alias="info">Info</key>
     <key alias="innerMargin">Binnenste marge</key>
@@ -1941,12 +1949,11 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
       te loggen in Umbraco
     </key>
     <key alias="userinviteWelcomeMessage">Hallo en welkom in Umbraco! Binnen ongeveer één minuut kan je aan de slag. Je
-      moet enkel je wachtwoord instellen en een foto toevoegen.
+      moet enkel je wachtwoord instellen.
     </key>
     <key alias="userinviteExpiredMessage">Welkom bij Umbraco! Helaas is je uitnodiging vervallen. Vraag aan je
       administrator om de uitnodiging opnieuw te versturen.
     </key>
-    <key alias="userinviteAvatarMessage">Wijzig je foto zodat andere gebruikers je makkelijk kunnen herkennen.</key>
     <key alias="writer">Auteur</key>
     <key alias="configureTwoFactor">Configureer tweestapsverificatie</key>
     <key alias="change">Wijzig</key>

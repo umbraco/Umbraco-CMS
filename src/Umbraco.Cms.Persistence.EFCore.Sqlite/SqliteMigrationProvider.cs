@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Umbraco.Cms.Persistence.EFCore.Migrations;
 using Umbraco.Extensions;
+using Umbraco.Cms.Persistence.EFCore;
 
 namespace Umbraco.Cms.Persistence.EFCore.Sqlite;
 
@@ -11,7 +12,7 @@ public class SqliteMigrationProvider : IMigrationProvider
     public SqliteMigrationProvider(IDbContextFactory<UmbracoDbContext> dbContextFactory)
         => _dbContextFactory = dbContextFactory;
 
-    public string ProviderName => "Microsoft.Data.Sqlite";
+    public string ProviderName => Constants.ProviderNames.SQLLite;
 
     public async Task MigrateAsync(EFCoreMigration migration)
     {
@@ -35,6 +36,7 @@ public class SqliteMigrationProvider : IMigrationProvider
         migration switch
         {
             EFCoreMigration.InitialCreate => typeof(Migrations.InitialCreate),
+            EFCoreMigration.AddOpenIddict => typeof(Migrations.AddOpenIddict),
             _ => throw new ArgumentOutOfRangeException(nameof(migration), $@"Not expected migration value: {migration}")
         };
 }

@@ -2,9 +2,9 @@ namespace Umbraco.Cms.Core.Notifications;
 
 
     /// <summary>
-    /// Notification that occurs when Umbraco is shutting down (after all <see cref="IComponent" />s are terminated).
+    /// Notification that occurs when Umbraco is shutting down (after all <see cref="Composing.IComponent" />s are terminated).
     /// </summary>
-    /// <seealso cref="Umbraco.Cms.Core.Notifications.IUmbracoApplicationLifetimeNotification" />
+    /// <seealso cref="IUmbracoApplicationLifetimeNotification" />
     public class UmbracoApplicationStoppingNotification : IUmbracoApplicationLifetimeNotification
     {
         /// <summary>

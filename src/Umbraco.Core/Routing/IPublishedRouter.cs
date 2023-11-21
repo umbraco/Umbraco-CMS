@@ -26,6 +26,7 @@ public interface IPublishedRouter
     ///     Updates the request to use the specified <see cref="IPublishedContent" /> item, or NULL
     /// </summary>
     /// <param name="request">The request.</param>
+    /// <param name="publishedContent">The published content.</param>
     /// <remarks>
     ///     <returns>
     ///         A new <see cref="IPublishedRequest" /> based on values from the original <see cref="IPublishedRequest" />

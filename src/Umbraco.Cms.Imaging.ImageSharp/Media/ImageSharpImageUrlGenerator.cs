@@ -49,6 +49,7 @@ public sealed class ImageSharpImageUrlGenerator : IImageUrlGenerator
     /// Initializes a new instance of the <see cref="ImageSharpImageUrlGenerator" /> class.
     /// </summary>
     /// <param name="supportedImageFileTypes">The supported image file types/extensions.</param>
+    /// <param name="options">The ImageSharp middleware options.</param>
     /// <param name="requestAuthorizationUtilities">Contains helpers that allow authorization of image requests.</param>
     /// <remarks>
     /// This constructor is only used for testing.

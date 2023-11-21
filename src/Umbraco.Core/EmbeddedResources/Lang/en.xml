@@ -159,6 +159,12 @@
     <key alias="morePublishingOptions">More publishing options</key>
     <key alias="submitChanges">Submit</key>
   </area>
+  <area alias="auditTrailsMedia">
+    <key alias="delete">Media deleted</key>
+    <key alias="move">Media moved</key>
+    <key alias="copy">Media copied</key>
+    <key alias="save">Media saved</key>
+  </area>
   <area alias="auditTrails">
     <key alias="atViewingFor">Viewing for</key>
     <key alias="delete">Content deleted</key>
@@ -342,6 +348,7 @@
     <key alias="createFolderFailed">Failed to create a folder under parent id %0%</key>
     <key alias="renameFolderFailed">Failed to rename the folder with id %0%</key>
     <key alias="dragAndDropYourFilesIntoTheArea">Drag and drop your file(s) into the area</key>
+    <key alias="fileSecurityValidationFailure">One or more file security validations have failed</key>
   </area>
   <area alias="member">
     <key alias="createNewMember">Create a new member</key>
@@ -837,6 +844,7 @@
     <key alias="search">Search</key>
     <key alias="searchNoResult">Sorry, we can not find what you are looking for.</key>
     <key alias="noItemsInList">No items have been added</key>
+    <key alias="selectAll">Select all</key>
     <key alias="server">Server</key>
     <key alias="settings">Settings</key>
     <key alias="shared">Shared</key>
@@ -1472,6 +1480,10 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="rollbackTo">Rollback to</key>
     <key alias="selectVersion">Select version</key>
     <key alias="view">View</key>
+    <key alias="pagination"><![CDATA[Showing version %0% to %1% of %2% versions]]></key>
+    <key alias="versions">Versions</key>
+    <key alias="currentDraftVersion">Current draft version</key>
+    <key alias="currentPublishedVersion">Current published version</key>
   </area>
   <area alias="scripts">
     <key alias="editscript">Edit script file</key>
@@ -2129,13 +2141,10 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
       Umbraco.
     </key>
     <key alias="userinviteWelcomeMessage">Hello there and welcome to Umbraco! In just 1 minute you’ll be good to go, we
-      just need you to setup a password and add a picture for your avatar.
+      just need you to setup a password.
     </key>
     <key alias="userinviteExpiredMessage">Welcome to Umbraco! Unfortunately your invite has expired. Please contact your
       administrator and ask them to resend it.
-    </key>
-    <key alias="userinviteAvatarMessage">Uploading a photo of yourself will make it easy for other users to recognize
-      you. Click the circle above to upload your photo.
     </key>
     <key alias="writer">Writer</key>
     <key alias="change">Change</key>
@@ -2522,6 +2531,8 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="addImageCaption">Add image caption</key>
     <key alias="searchContentTree">Search content tree</key>
     <key alias="maxAmount">Maximum amount</key>
+    <key alias="expandChildItems">Expand child items for</key>
+    <key alias="openContextNode">Open context node for</key>
   </area>
   <area alias="references">
     <key alias="tabName">References</key>
@@ -2674,7 +2685,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     </key>
     <key alias="learningBaseDescription">
       <![CDATA[
-        <p>Want to master Umbraco? Spend a few minutes learning some best practices by visiting <a href="https://www.youtube.com/c/UmbracoLearningBase" target="_blank" rel="noopener">the Umbraco Learning Base Youtube channel</a>. Here you can find a bunch of video material covering many aspects of Umbraco.</p>
+        <p>Want to master Umbraco? Spend a few minutes learning some best practices by visiting <a class="btn-link -underline" href="https://www.youtube.com/c/UmbracoLearningBase" target="_blank" rel="noopener">the Umbraco Learning Base Youtube channel</a>. Here you can find a bunch of video material covering many aspects of Umbraco.</p>
       ]]>
     </key>
     <key alias="getStarted">To get you started</key>

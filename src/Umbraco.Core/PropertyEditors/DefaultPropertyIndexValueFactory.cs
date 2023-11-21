@@ -5,7 +5,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 
 /// <summary>
 ///     Provides a default implementation for
-///     <see ref="IPropertyIndexValueFactory">, returning a single field to index containing the property value.
+///     <see ref="IPropertyIndexValueFactory" />, returning a single field to index containing the property value.
 /// </summary>
 public class DefaultPropertyIndexValueFactory : IPropertyIndexValueFactory
 {

@@ -1,15 +1,21 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.DependencyInjection;
 using Umbraco.Cms.Api.Delivery.Accessors;
 using Umbraco.Cms.Api.Delivery.Configuration;
+using Umbraco.Cms.Api.Delivery.Handlers;
 using Umbraco.Cms.Api.Delivery.Json;
 using Umbraco.Cms.Api.Delivery.Rendering;
+using Umbraco.Cms.Api.Delivery.Routing;
+using Umbraco.Cms.Api.Delivery.Security;
 using Umbraco.Cms.Api.Delivery.Services;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Notifications;
+using Umbraco.Cms.Infrastructure.Security;
 
 namespace Umbraco.Extensions;
 
@@ -28,11 +34,13 @@ public static class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IApiAccessService, ApiAccessService>();
         builder.Services.AddSingleton<IApiContentQueryService, ApiContentQueryService>();
         builder.Services.AddSingleton<IApiContentQueryProvider, ApiContentQueryProvider>();
+        builder.Services.AddSingleton<IApiMediaQueryService, ApiMediaQueryService>();
+        builder.Services.AddTransient<IMemberApplicationManager, MemberApplicationManager>();
+        builder.Services.AddTransient<IRequestMemberAccessService, RequestMemberAccessService>();
 
         builder.Services.ConfigureOptions<ConfigureUmbracoDeliveryApiSwaggerGenOptions>();
         builder.AddUmbracoApiOpenApiUI();
 
-        builder.AddUmbracoEFCoreDbContext();
         builder
             .Services
             .AddControllers()
@@ -44,6 +52,16 @@ public static class UmbracoBuilderExtensions
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
             });
 
+        builder.Services.AddAuthentication();
+        builder.AddUmbracoOpenIddict();
+        builder.AddNotificationAsyncHandler<UmbracoApplicationStartingNotification, InitializeMemberApplicationNotificationHandler>();
+        builder.AddNotificationAsyncHandler<MemberSavedNotification, RevokeMemberAuthenticationTokensNotificationHandler>();
+        builder.AddNotificationAsyncHandler<MemberDeletedNotification, RevokeMemberAuthenticationTokensNotificationHandler>();
+        builder.AddNotificationAsyncHandler<AssignedMemberRolesNotification, RevokeMemberAuthenticationTokensNotificationHandler>();
+        builder.AddNotificationAsyncHandler<RemovedMemberRolesNotification, RevokeMemberAuthenticationTokensNotificationHandler>();
+
+        // FIXME: remove this when Delivery API V1 is removed
+        builder.Services.AddSingleton<MatcherPolicy, DeliveryApiItemsEndpointsMatcherPolicy>();
         return builder;
     }
 }

@@ -293,8 +293,10 @@ public class RichTextPropertyEditor : DataEditor
                 return null;
             }
 
+            var parseAndSaveBase64Images = _pastedImages.FindAndPersistEmbeddedImages(
+                editorValue.Value.ToString()!, mediaParentId, userId);
             var parseAndSavedTempImages =
-                _pastedImages.FindAndPersistPastedTempImages(editorValue.Value.ToString()!, mediaParentId, userId, _imageUrlGenerator);
+                _pastedImages.FindAndPersistPastedTempImages(parseAndSaveBase64Images, mediaParentId, userId);
             var editorValueWithMediaUrlsRemoved = _imageSourceParser.RemoveImageSources(parseAndSavedTempImages);
             var parsed = MacroTagParser.FormatRichTextContentForPersistence(editorValueWithMediaUrlsRemoved);
             var sanitized = _htmlSanitizer.Sanitize(parsed);
@@ -326,6 +328,6 @@ public class RichTextPropertyEditor : DataEditor
 
         [Obsolete("Use the overload with the 'availableCultures' parameter instead, scheduled for removal in v14")]
         public IEnumerable<KeyValuePair<string, IEnumerable<object?>>> GetIndexValues(IProperty property, string? culture, string? segment, bool published)
-            => GetIndexValues(property, culture, segment, published);
+            => GetIndexValues(property, culture, segment, published, Enumerable.Empty<string>());
     }
 }

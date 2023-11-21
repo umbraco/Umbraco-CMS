@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -6,6 +7,7 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Infrastructure.Migrations;
 using Umbraco.Cms.Infrastructure.Migrations.Notifications;
 using Umbraco.Cms.Persistence.EFCore;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Persistence.EFCore.Composition;
 
@@ -17,6 +19,13 @@ public class UmbracoEFCoreComposer : IComposer
 
         builder.AddNotificationAsyncHandler<DatabaseSchemaAndDataCreatedNotification, EFCoreCreateTablesNotificationHandler>();
         builder.AddNotificationAsyncHandler<UnattendedInstallNotification, EFCoreCreateTablesNotificationHandler>();
+
+        builder.Services.AddUmbracoDbContext<UmbracoDbContext>((options) =>
+        {
+            // Register the entity sets needed by OpenIddict.
+            options.UseOpenIddict();
+        });
+
         builder.Services.AddOpenIddict()
 
             // Register the OpenIddict core components.
@@ -46,7 +55,10 @@ public class EFCoreCreateTablesNotificationHandler : INotificationAsyncHandler<D
 
     public async Task HandleAsync(DatabaseSchemaAndDataCreatedNotification notification, CancellationToken cancellationToken)
     {
-        await HandleAsync();
+        if (notification.RequiresUpgrade is false)
+        {
+            await HandleAsync();
+        }
     }
 
     private async Task HandleAsync()

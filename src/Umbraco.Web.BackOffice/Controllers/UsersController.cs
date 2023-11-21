@@ -55,6 +55,7 @@ public class UsersController : BackOfficeNotificationsController
     private readonly GlobalSettings _globalSettings;
     private readonly IHostingEnvironment _hostingEnvironment;
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IFileStreamSecurityValidator? _fileStreamSecurityValidator; // make non nullable in v14
     private readonly IImageUrlGenerator _imageUrlGenerator;
     private readonly LinkGenerator _linkGenerator;
     private readonly ILocalizedTextService _localizedTextService;
@@ -72,6 +73,58 @@ public class UsersController : BackOfficeNotificationsController
     private readonly WebRoutingSettings _webRoutingSettings;
 
     [ActivatorUtilitiesConstructor]
+    public UsersController(
+        MediaFileManager mediaFileManager,
+        IOptionsSnapshot<ContentSettings> contentSettings,
+        IHostingEnvironment hostingEnvironment,
+        ISqlContext sqlContext,
+        IImageUrlGenerator imageUrlGenerator,
+        IOptionsSnapshot<SecuritySettings> securitySettings,
+        IEmailSender emailSender,
+        IBackOfficeSecurityAccessor backofficeSecurityAccessor,
+        AppCaches appCaches,
+        IShortStringHelper shortStringHelper,
+        IUserService userService,
+        ILocalizedTextService localizedTextService,
+        IUmbracoMapper umbracoMapper,
+        IOptionsSnapshot<GlobalSettings> globalSettings,
+        IBackOfficeUserManager backOfficeUserManager,
+        ILoggerFactory loggerFactory,
+        LinkGenerator linkGenerator,
+        IBackOfficeExternalLoginProviders externalLogins,
+        UserEditorAuthorizationHelper userEditorAuthorizationHelper,
+        IPasswordChanger<BackOfficeIdentityUser> passwordChanger,
+        IHttpContextAccessor httpContextAccessor,
+        IOptions<WebRoutingSettings> webRoutingSettings,
+        IFileStreamSecurityValidator fileStreamSecurityValidator)
+    {
+        _mediaFileManager = mediaFileManager;
+        _contentSettings = contentSettings.Value;
+        _hostingEnvironment = hostingEnvironment;
+        _sqlContext = sqlContext;
+        _imageUrlGenerator = imageUrlGenerator;
+        _securitySettings = securitySettings.Value;
+        _emailSender = emailSender;
+        _backofficeSecurityAccessor = backofficeSecurityAccessor;
+        _appCaches = appCaches;
+        _shortStringHelper = shortStringHelper;
+        _userService = userService;
+        _localizedTextService = localizedTextService;
+        _umbracoMapper = umbracoMapper;
+        _globalSettings = globalSettings.Value;
+        _userManager = backOfficeUserManager;
+        _loggerFactory = loggerFactory;
+        _linkGenerator = linkGenerator;
+        _externalLogins = externalLogins;
+        _userEditorAuthorizationHelper = userEditorAuthorizationHelper;
+        _passwordChanger = passwordChanger;
+        _logger = _loggerFactory.CreateLogger<UsersController>();
+        _httpContextAccessor = httpContextAccessor;
+        _fileStreamSecurityValidator = fileStreamSecurityValidator;
+        _webRoutingSettings = webRoutingSettings.Value;
+    }
+
+    [Obsolete("Use constructor overload that has fileStreamSecurityValidator, scheduled for removal in v14")]
     public UsersController(
         MediaFileManager mediaFileManager,
         IOptionsSnapshot<ContentSettings> contentSettings,
@@ -139,13 +192,15 @@ public class UsersController : BackOfficeNotificationsController
 
     [AppendUserModifiedHeader("id")]
     [Authorize(Policy = AuthorizationPolicies.AdminUserEditsRequireAdmin)]
-    public IActionResult PostSetAvatar(int id, IList<IFormFile> file) => PostSetAvatarInternal(file, _userService,
+    public IActionResult PostSetAvatar(int id, IList<IFormFile> file)
+        => PostSetAvatarInternal(file, _userService,
         _appCaches.RuntimeCache, _mediaFileManager, _shortStringHelper, _contentSettings, _hostingEnvironment,
-        _imageUrlGenerator, id);
+        _imageUrlGenerator,_fileStreamSecurityValidator, id);
 
     internal static IActionResult PostSetAvatarInternal(IList<IFormFile> files, IUserService userService,
         IAppCache cache, MediaFileManager mediaFileManager, IShortStringHelper shortStringHelper,
         ContentSettings contentSettings, IHostingEnvironment hostingEnvironment, IImageUrlGenerator imageUrlGenerator,
+        IFileStreamSecurityValidator? fileStreamSecurityValidator,
         int id)
     {
         if (files is null)
@@ -187,9 +242,14 @@ public class UsersController : BackOfficeNotificationsController
             //generate a path of known data, we don't want this path to be guessable
             user.Avatar = "UserAvatars/" + (user.Id + safeFileName).GenerateHash<SHA1>() + "." + ext;
 
-            using (Stream fs = file.OpenReadStream())
+            //todo implement Filestreamsecurity
+            using (var ms = new MemoryStream())
             {
-                mediaFileManager.FileSystem.AddFile(user.Avatar, fs, true);
+                file.CopyTo(ms);
+                if(fileStreamSecurityValidator != null && fileStreamSecurityValidator.IsConsideredSafe(ms) == false)
+                    return new ValidationErrorResult("One or more file security analyzers deemed the contents of the file to be unsafe");
+
+                mediaFileManager.FileSystem.AddFile(user.Avatar, ms, true);
             }
 
             userService.Save(user);
@@ -472,7 +532,7 @@ public class UsersController : BackOfficeNotificationsController
         {
             // first validate the username if we're showing it
             ActionResult<IUser?> userResult = CheckUniqueUsername(userSave.Username,
-                u => u.LastLoginDate != default || u.EmailConfirmedDate.HasValue);
+                u => u.UserState != UserState.Invited);
             if (userResult.Result is not null)
             {
                 return userResult.Result;
@@ -480,7 +540,7 @@ public class UsersController : BackOfficeNotificationsController
         }
 
         IUser? user = CheckUniqueEmail(userSave.Email,
-            u => u.LastLoginDate != default || u.EmailConfirmedDate.HasValue);
+            u => u.UserState != UserState.Invited);
 
         if (ModelState.IsValid == false)
         {
@@ -607,7 +667,7 @@ public class UsersController : BackOfficeNotificationsController
         var emailBody = _localizedTextService.Localize("user", "inviteEmailCopyFormat",
             // Ensure the culture of the found user is used for the email!
             UmbracoUserExtensions.GetUserCulture(to?.Language, _localizedTextService, _globalSettings),
-            new[] { userDisplay?.Name, from, message, inviteUri.ToString(), senderEmail });
+            new[] { userDisplay?.Name, from, WebUtility.HtmlEncode(message)!.ReplaceLineEndings("<br/>"), inviteUri.ToString(), senderEmail });
 
         // This needs to be in the correct mailto format including the name, else
         // the name cannot be captured in the email sending notification.

@@ -231,7 +231,7 @@ public class CoreScope : ICoreScope
         }
     }
 
-    private void HandleScopedFileSystems()
+    protected void HandleScopedFileSystems()
     {
         if (_shouldScopeFileSystems == true)
         {
@@ -250,7 +250,7 @@ public class CoreScope : ICoreScope
         _parentScope = coreScope;
     }
 
-    private void HandleScopedNotifications() => _notificationPublisher?.ScopeExit(Completed.HasValue && Completed.Value);
+    protected void HandleScopedNotifications() => _notificationPublisher?.ScopeExit(Completed.HasValue && Completed.Value);
 
     private void EnsureNotDisposed()
     {

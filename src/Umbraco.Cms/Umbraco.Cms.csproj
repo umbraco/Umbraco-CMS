@@ -11,7 +11,8 @@
     <ProjectReference Include="..\Umbraco.Cms.Imaging.ImageSharp\Umbraco.Cms.Imaging.ImageSharp.csproj" />
     <ProjectReference Include="..\Umbraco.Cms.Persistence.Sqlite\Umbraco.Cms.Persistence.Sqlite.csproj" />
     <ProjectReference Include="..\Umbraco.Cms.Persistence.SqlServer\Umbraco.Cms.Persistence.SqlServer.csproj" />
-    <ProjectReference Include="..\Umbraco.Cms.Persistence.EFCore\Umbraco.Cms.Persistence.EFCore.csproj" />
+    <ProjectReference Include="..\Umbraco.Cms.Persistence.EFCore.Sqlite\Umbraco.Cms.Persistence.EFCore.Sqlite.csproj" />
+    <ProjectReference Include="..\Umbraco.Cms.Persistence.EFCore.SqlServer\Umbraco.Cms.Persistence.EFCore.SqlServer.csproj" />
   </ItemGroup>
 
   <!-- Create and pack empty file to add TFM dependency -->

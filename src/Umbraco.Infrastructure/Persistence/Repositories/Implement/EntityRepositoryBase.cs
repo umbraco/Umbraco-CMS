@@ -37,7 +37,7 @@ public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IRead
     protected ILogger<EntityRepositoryBase<TId, TEntity>> Logger { get; }
 
     /// <summary>
-    ///     Gets the isolated cache for the <see cref="TEntity" />
+    ///     Gets the isolated cache for the <typeparamref name="TEntity"/>
     /// </summary>
     protected IAppPolicyCache GlobalIsolatedCache => AppCaches.IsolatedCaches.GetOrCreate<TEntity>();
 
@@ -185,7 +185,7 @@ public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IRead
         => PerformCount(query);
 
     /// <summary>
-    ///     Get the entity id for the <see cref="TEntity" />
+    ///     Get the entity id for the <typeparamref name="TEntity"/>.
     /// </summary>
     protected virtual TId GetEntityId(TEntity entity)
         => (TId)(object)entity.Id;

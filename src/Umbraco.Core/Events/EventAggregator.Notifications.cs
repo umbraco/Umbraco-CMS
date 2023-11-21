@@ -238,7 +238,7 @@ internal class NotificationAsyncHandlerWrapperImpl<TNotificationType> : Notifica
     ///         confusion.
     ///     </para>
     /// </remarks>
-    public override Task HandleAsync<TNotification, TNotificationHandler>(
+    public override async Task HandleAsync<TNotification, TNotificationHandler>(
         IEnumerable<TNotification> notifications,
         CancellationToken cancellationToken,
         ServiceFactory serviceFactory,
@@ -256,7 +256,7 @@ internal class NotificationAsyncHandlerWrapperImpl<TNotificationType> : Notifica
             .Select(x => new Func<IEnumerable<TNotification>, CancellationToken, Task>(
                 (handlerNotifications, handlerCancellationToken) => x.HandleAsync(handlerNotifications.Cast<TNotificationType>(), handlerCancellationToken)));
 
-        return publish(handlers, notifications, cancellationToken);
+        await publish(handlers, notifications, cancellationToken);
     }
 }
 

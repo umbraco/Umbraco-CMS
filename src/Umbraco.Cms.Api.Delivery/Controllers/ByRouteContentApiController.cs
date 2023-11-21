@@ -1,9 +1,10 @@
-using System.Net;
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Services;
@@ -17,7 +18,9 @@ public class ByRouteContentApiController : ContentApiItemControllerBase
     private readonly IRequestRoutingService _requestRoutingService;
     private readonly IRequestRedirectService _requestRedirectService;
     private readonly IRequestPreviewService _requestPreviewService;
+    private readonly IRequestMemberAccessService _requestMemberAccessService;
 
+    [Obsolete($"Please use the constructor that does not accept {nameof(IPublicAccessService)}. Will be removed in V14.")]
     public ByRouteContentApiController(
         IApiPublishedContentCache apiPublishedContentCache,
         IApiContentResponseBuilder apiContentResponseBuilder,
@@ -25,11 +28,49 @@ public class ByRouteContentApiController : ContentApiItemControllerBase
         IRequestRoutingService requestRoutingService,
         IRequestRedirectService requestRedirectService,
         IRequestPreviewService requestPreviewService)
-        : base(apiPublishedContentCache, apiContentResponseBuilder, publicAccessService)
+        : this(
+            apiPublishedContentCache,
+            apiContentResponseBuilder,
+            requestRoutingService,
+            requestRedirectService,
+            requestPreviewService,
+            StaticServiceProvider.Instance.GetRequiredService<IRequestMemberAccessService>())
+    {
+    }
+
+    [Obsolete($"Please use the constructor that does not accept {nameof(IPublicAccessService)}. Will be removed in V14.")]
+    public ByRouteContentApiController(
+        IApiPublishedContentCache apiPublishedContentCache,
+        IApiContentResponseBuilder apiContentResponseBuilder,
+        IPublicAccessService publicAccessService,
+        IRequestRoutingService requestRoutingService,
+        IRequestRedirectService requestRedirectService,
+        IRequestPreviewService requestPreviewService,
+        IRequestMemberAccessService requestMemberAccessService)
+        : this(
+            apiPublishedContentCache,
+            apiContentResponseBuilder,
+            requestRoutingService,
+            requestRedirectService,
+            requestPreviewService,
+            requestMemberAccessService)
+    {
+    }
+
+    [ActivatorUtilitiesConstructor]
+    public ByRouteContentApiController(
+        IApiPublishedContentCache apiPublishedContentCache,
+        IApiContentResponseBuilder apiContentResponseBuilder,
+        IRequestRoutingService requestRoutingService,
+        IRequestRedirectService requestRedirectService,
+        IRequestPreviewService requestPreviewService,
+        IRequestMemberAccessService requestMemberAccessService)
+        : base(apiPublishedContentCache, apiContentResponseBuilder)
     {
         _requestRoutingService = requestRoutingService;
         _requestRedirectService = requestRedirectService;
         _requestPreviewService = requestPreviewService;
+        _requestMemberAccessService = requestMemberAccessService;
     }
 
     /// <summary>
@@ -45,18 +86,11 @@ public class ByRouteContentApiController : ContentApiItemControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IApiContentResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ByRoute(string path = "")
     {
-        // OpenAPI does not allow reserved chars as "in:path" parameters, so clients based on the Swagger JSON will URL
-        // encode the path. Normally, ASP.NET Core handles that encoding with an automatic decoding - apparently just not
-        // for forward slashes, for whatever reason... so we need to deal with those. Hopefully this will be addressed in
-        // an upcoming version of ASP.NET Core.
-        // See also https://github.com/dotnet/aspnetcore/issues/11544
-        if (path.Contains("%2F", StringComparison.OrdinalIgnoreCase))
-        {
-            path = WebUtility.UrlDecode(path);
-        }
+        path = DecodePath(path);
 
         path = path.TrimStart("/");
         path = path.Length == 0 ? "/" : path;
@@ -64,9 +98,10 @@ public class ByRouteContentApiController : ContentApiItemControllerBase
         IPublishedContent? contentItem = GetContent(path);
         if (contentItem is not null)
         {
-            if (IsProtected(contentItem))
+            IActionResult? deniedAccessResult = await HandleMemberAccessAsync(contentItem, _requestMemberAccessService);
+            if (deniedAccessResult is not null)
             {
-                return Unauthorized();
+                return deniedAccessResult;
             }
 
             return await Task.FromResult(Ok(ApiContentResponseBuilder.Build(contentItem)));

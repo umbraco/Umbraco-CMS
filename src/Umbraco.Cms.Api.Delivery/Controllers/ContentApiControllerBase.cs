@@ -1,13 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Api.Delivery.Filters;
 using Umbraco.Cms.Api.Delivery.Routing;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Delivery.Controllers;
 
+[DeliveryApiAccess]
 [VersionedDeliveryApiRoute("content")]
 [ApiExplorerSettings(GroupName = "Content")]
 [LocalizeFromAcceptLanguageHeader]
@@ -39,5 +40,19 @@ public abstract class ContentApiControllerBase : DeliveryApiControllerBase
                 .WithTitle("Sort option not found")
                 .WithDetail("One of the attempted 'sort' options does not exist")
                 .Build()),
+            _ => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Unknown content query status")
+                .WithDetail($"Content query status \"{status}\" was not expected here")
+                .Build()),
         };
+
+    /// <summary>
+    ///     Creates a 403 Forbidden result.
+    /// </summary>
+    /// <remarks>
+    ///     Use this method instead of <see cref="ControllerBase.Forbid()"/> on the controller base. The latter will yield
+    ///     a redirect to an access denied URL because of the default cookie auth scheme. This method ensures that a proper
+    ///     403 Forbidden status code is returned to the client.
+    /// </remarks>
+    protected IActionResult Forbidden() => new StatusCodeResult(StatusCodes.Status403Forbidden);
 }
