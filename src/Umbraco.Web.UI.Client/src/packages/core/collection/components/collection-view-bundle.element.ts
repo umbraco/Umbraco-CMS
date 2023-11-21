@@ -67,7 +67,7 @@ export class UmbCollectionViewBundleElement extends UmbLitElement {
 	#renderItem(view: ManifestCollectionView) {
 		return html`
 			<uui-button compact href="${this._collectionRootPathname}/${view.meta.pathName}">
-				${this.#renderItemDisplay(view)}
+				${this.#renderItemDisplay(view)} <span class="label">${view.meta.label}</span>
 			</uui-button>
 		`;
 	}
@@ -79,6 +79,12 @@ export class UmbCollectionViewBundleElement extends UmbLitElement {
 	static styles = [
 		UmbTextStyles,
 		css`
+			:host {
+				--uui-button-content-align: left;
+			}
+			.label {
+				margin-left: var(--uui-size-space-1);
+			}
 			.filter-dropdown {
 				display: flex;
 				gap: var(--uui-size-space-3);
