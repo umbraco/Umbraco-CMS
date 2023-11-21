@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <Title>Umbraco CMS - Persistence - Entity Framework Core - SQLite migrations</Title>
     <Description>Adds support for Entity Framework Core SQLite migrations to Umbraco CMS.</Description>
@@ -6,7 +6,6 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.0" />
-
   </ItemGroup>
 
   <ItemGroup>

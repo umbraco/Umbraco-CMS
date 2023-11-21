@@ -22,7 +22,6 @@
   <!-- SourceLink -->
   <PropertyGroup>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
@@ -37,7 +36,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="all" IsImplicitlyDefined="true" />
     <PackageReference Include="Nerdbank.GitVersioning" Version="3.6.133" PrivateAssets="all" IsImplicitlyDefined="true" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.507" PrivateAssets="all" IsImplicitlyDefined="true" />
     <PackageReference Include="Umbraco.Code" Version="2.0.0" PrivateAssets="all" IsImplicitlyDefined="true" />
