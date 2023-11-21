@@ -1,4 +1,4 @@
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbCollectionContext, UMB_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -52,7 +52,7 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 			this._mediaItems = [...mediaItems].sort((a, b) => (a.hasChildren === b.hasChildren ? 0 : a ? -1 : 1));
 		});
 
-		this.observe(this._collectionContext.selection, (selection) => {
+		this.observe(this._collectionContext.selection.selection, (selection) => {
 			this._selection = selection;
 		});
 	}
@@ -64,13 +64,13 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 
 	private _handleSelect(mediaItem: EntityTreeItemResponseModel) {
 		if (mediaItem.id) {
-			this._collectionContext?.select(mediaItem.id);
+			this._collectionContext?.selection.select(mediaItem.id);
 		}
 	}
 
 	private _handleDeselect(mediaItem: EntityTreeItemResponseModel) {
 		if (mediaItem.id) {
-			this._collectionContext?.deselect(mediaItem.id);
+			this._collectionContext?.selection.deselect(mediaItem.id);
 		}
 	}
 
@@ -109,7 +109,7 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 					? repeat(
 							this._mediaItems,
 							(file, index) => (file.id || '') + index,
-							(file) => this._renderMediaItem(file)
+							(file) => this._renderMediaItem(file),
 					  )
 					: ''}
 			</div>

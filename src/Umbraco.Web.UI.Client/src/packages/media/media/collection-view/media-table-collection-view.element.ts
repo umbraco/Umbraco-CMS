@@ -56,7 +56,7 @@ export class UmbMediaTableCollectionViewElement extends UmbLitElement {
 			this._createTableItems(this._mediaItems);
 		});
 
-		this.observe(this._collectionContext.selection, (selection) => {
+		this.observe(this._collectionContext.selection.selection, (selection) => {
 			this._selection = selection;
 		});
 	}
@@ -81,14 +81,14 @@ export class UmbMediaTableCollectionViewElement extends UmbLitElement {
 		event.stopPropagation();
 		const table = event.target as UmbTableElement;
 		const selection = table.selection;
-		this._collectionContext?.setSelection(selection);
+		this._collectionContext?.selection.setSelection(selection);
 	}
 
 	private _handleDeselect(event: UmbTableDeselectedEvent) {
 		event.stopPropagation();
 		const table = event.target as UmbTableElement;
 		const selection = table.selection;
-		this._collectionContext?.setSelection(selection);
+		this._collectionContext?.selection.setSelection(selection);
 	}
 
 	private _handleOrdering(event: UmbTableOrderedEvent) {

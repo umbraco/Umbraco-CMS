@@ -70,7 +70,7 @@ export class UmbUserTableCollectionViewElement extends UmbLitElement {
 		this.consumeContext(UMB_COLLECTION_CONTEXT, (instance) => {
 			this.#collectionContext = instance as UmbUserCollectionContext;
 			this.observe(
-				this.#collectionContext.selection,
+				this.#collectionContext.selection.selection,
 				(selection) => (this._selection = selection),
 				'umbCollectionSelectionObserver',
 			);
@@ -142,14 +142,14 @@ export class UmbUserTableCollectionViewElement extends UmbLitElement {
 		event.stopPropagation();
 		const table = event.target as UmbTableElement;
 		const selection = table.selection;
-		this.#collectionContext?.setSelection(selection);
+		this.#collectionContext?.selection.setSelection(selection);
 	}
 
 	#onDeselected(event: UmbTableDeselectedEvent) {
 		event.stopPropagation();
 		const table = event.target as UmbTableElement;
 		const selection = table.selection;
-		this.#collectionContext?.setSelection(selection);
+		this.#collectionContext?.selection.setSelection(selection);
 	}
 
 	#onOrdering(event: UmbTableOrderedEvent) {

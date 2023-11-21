@@ -61,11 +61,19 @@ export class UmbUserGroupCollectionTableViewElement extends UmbLitElement {
 
 		this.consumeContext(UMB_COLLECTION_CONTEXT, (instance) => {
 			this.#collectionContext = instance;
-			this.observe(this.#collectionContext.selection, (selection) => (this._selection = selection), 'umbCollectionSelectionObserver');
-			this.observe(this.#collectionContext.items, (items) => {
-				this._userGroups = items;
-				this._createTableItems(items);
-			}, 'umbCollectionItemsObserver');
+			this.observe(
+				this.#collectionContext.selection.selection,
+				(selection) => (this._selection = selection),
+				'umbCollectionSelectionObserver',
+			);
+			this.observe(
+				this.#collectionContext.items,
+				(items) => {
+					this._userGroups = items;
+					this._createTableItems(items);
+				},
+				'umbCollectionItemsObserver',
+			);
 		});
 	}
 
@@ -102,14 +110,14 @@ export class UmbUserGroupCollectionTableViewElement extends UmbLitElement {
 		event.stopPropagation();
 		const table = event.target as UmbTableElement;
 		const selection = table.selection;
-		this.#collectionContext?.setSelection(selection);
+		this.#collectionContext?.selection.setSelection(selection);
 	}
 
 	private _handleDeselected(event: UmbTableDeselectedEvent) {
 		event.stopPropagation();
 		const table = event.target as UmbTableElement;
 		const selection = table.selection;
-		this.#collectionContext?.setSelection(selection);
+		this.#collectionContext?.selection.setSelection(selection);
 	}
 
 	render() {

@@ -40,6 +40,8 @@ import type {
 	ManifestEntryPoint,
 } from '@umbraco-cms/backoffice/extension-api';
 
+export * from './collection.models.js';
+export * from './collection-action.model.js';
 export * from './collection-view.model.js';
 export * from './dashboard-collection.model.js';
 export * from './dashboard.model.js';

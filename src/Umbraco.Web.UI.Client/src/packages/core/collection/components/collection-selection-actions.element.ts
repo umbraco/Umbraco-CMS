@@ -34,7 +34,7 @@ export class UmbCollectionSelectionActionsElement extends UmbLitElement {
 	}
 
 	private _handleClearSelection() {
-		this._collectionContext?.clearSelection();
+		this._collectionContext?.selection.clearSelection();
 	}
 
 	private _observeCollectionContext() {
@@ -49,7 +49,7 @@ export class UmbCollectionSelectionActionsElement extends UmbLitElement {
 		);
 
 		this.observe(
-			this._collectionContext.selection,
+			this._collectionContext.selection.selection,
 			(selection) => {
 				this._selectionLength = selection.length;
 				this._selection = selection;
@@ -65,7 +65,7 @@ export class UmbCollectionSelectionActionsElement extends UmbLitElement {
 
 	#onActionExecuted(event: UmbActionExecutedEvent) {
 		event.stopPropagation();
-		this._collectionContext?.clearSelection();
+		this._collectionContext?.selection.clearSelection();
 	}
 
 	render() {

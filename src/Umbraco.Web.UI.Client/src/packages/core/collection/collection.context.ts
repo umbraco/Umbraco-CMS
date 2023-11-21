@@ -25,9 +25,6 @@ export class UmbCollectionContext<
 	#totalItems = new UmbNumberState(0);
 	public readonly totalItems = this.#totalItems.asObservable();
 
-	#selectionManager = new UmbSelectionManager();
-	public readonly selection = this.#selectionManager.selection;
-
 	#filter = new UmbObjectState<FilterModelType | object>({});
 	public readonly filter = this.#filter.asObservable();
 
@@ -48,6 +45,7 @@ export class UmbCollectionContext<
 	});
 
 	public readonly pagination = new UmbPaginationManager();
+	public readonly selection = new UmbSelectionManager();
 
 	constructor(host: UmbControllerHostElement, config: UmbCollectionConfiguration = { pageSize: 50 }) {
 		super(host);
@@ -80,60 +78,6 @@ export class UmbCollectionContext<
 
 	public getAlias() {
 		return this.#alias;
-	}
-
-	/**
-	 * Returns true if the given id is selected.
-	 * @param {string} id
-	 * @return {Boolean}
-	 * @memberof UmbCollectionContext
-	 */
-	public isSelected(id: string) {
-		return this.#selectionManager.isSelected(id);
-	}
-
-	/**
-	 * Sets the current selection.
-	 * @param {Array<string>} selection
-	 * @memberof UmbCollectionContext
-	 */
-	public setSelection(selection: Array<string>) {
-		this.#selectionManager.setSelection(selection);
-	}
-
-	/**
-	 * Returns the current selection.
-	 * @return {Array<string>}
-	 * @memberof UmbCollectionContext
-	 */
-	public getSelection() {
-		this.#selectionManager.getSelection();
-	}
-
-	/**
-	 * Clears the current selection.
-	 * @memberof UmbCollectionContext
-	 */
-	public clearSelection() {
-		this.#selectionManager.clearSelection();
-	}
-
-	/**
-	 * Appends the given id to the current selection.
-	 * @param {string} id
-	 * @memberof UmbCollectionContext
-	 */
-	public select(id: string) {
-		this.#selectionManager.select(id);
-	}
-
-	/**
-	 * Removes the given id from the current selection.
-	 * @param {string} id
-	 * @memberof UmbCollectionContext
-	 */
-	public deselect(id: string) {
-		this.#selectionManager.deselect(id);
 	}
 
 	/**
@@ -185,7 +129,7 @@ export class UmbCollectionContext<
 	}
 
 	#configure(configuration: UmbCollectionConfiguration) {
-		this.#selectionManager.setMultiple(true);
+		this.selection.setMultiple(true);
 		this.pagination.setPageSize(configuration.pageSize);
 		this.#filter.next({ ...this.#filter.getValue(), skip: 0, take: configuration.pageSize });
 	}

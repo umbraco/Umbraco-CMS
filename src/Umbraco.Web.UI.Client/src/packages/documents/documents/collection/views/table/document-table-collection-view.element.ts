@@ -1,4 +1,4 @@
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 
 import {
@@ -68,7 +68,7 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 			this._createTableItems(this._items);
 		});
 
-		this.observe(this._collectionContext.selection, (selection) => {
+		this.observe(this._collectionContext.selection.selection, (selection) => {
 			this._selection = selection;
 		});
 	}
@@ -99,14 +99,14 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 		event.stopPropagation();
 		const table = event.target as UmbTableElement;
 		const selection = table.selection;
-		this._collectionContext?.setSelection(selection);
+		this._collectionContext?.selection.setSelection(selection);
 	}
 
 	private _handleDeselect(event: UmbTableDeselectedEvent) {
 		event.stopPropagation();
 		const table = event.target as UmbTableElement;
 		const selection = table.selection;
-		this._collectionContext?.setSelection(selection);
+		this._collectionContext?.selection.setSelection(selection);
 	}
 
 	private _handleOrdering(event: UmbTableOrderedEvent) {
