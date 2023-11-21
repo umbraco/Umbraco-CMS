@@ -1,9 +1,8 @@
+import { UmbCollectionContext } from './types.js';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { ManifestCollection, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { createExtensionApi, createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
-import { UmbUserCollectionContext } from 'src/packages/user/user/collection/user-collection.context';
-import { UmbCollectionContext } from './types';
 
 @customElement('umb-collection')
 export class UmbCollectionElement extends UmbLitElement {
