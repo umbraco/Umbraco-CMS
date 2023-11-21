@@ -1,14 +1,14 @@
 import { UmbPartialViewRepository } from '../repository/partial-view.repository.js';
-import { UmbPartialViewDetailModel } from '../types.js';
+import type { UmbPartialViewDetailModel } from '../types.js';
 import { UMB_PARTIAL_VIEW_ENTITY_TYPE } from '../entity.js';
 import { UmbBooleanState, UmbDeepState } from '@umbraco-cms/backoffice/observable-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import {
 	UmbSaveableWorkspaceContextInterface,
 	UmbEditableWorkspaceContextBase,
 } from '@umbraco-cms/backoffice/workspace';
 import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
-import { UpdatePartialViewRequestModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UpdatePartialViewRequestModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 export class UmbPartialViewWorkspaceContext
@@ -47,13 +47,13 @@ export class UmbPartialViewWorkspaceContext
 	}
 
 	#data = new UmbDeepState<UmbPartialViewDetailModel | undefined>(undefined);
-	data = this.#data.asObservable();
-	name = this.#data.asObservablePart((data) => data?.name);
-	content = this.#data.asObservablePart((data) => data?.content);
-	path = this.#data.asObservablePart((data) => data?.path);
+	readonly data = this.#data.asObservable();
+	readonly name = this.#data.asObservablePart((data) => data?.name);
+	readonly content = this.#data.asObservablePart((data) => data?.content);
+	readonly path = this.#data.asObservablePart((data) => data?.path);
 
 	#isCodeEditorReady = new UmbBooleanState(false);
-	isCodeEditorReady = this.#isCodeEditorReady.asObservable();
+	readonly isCodeEditorReady = this.#isCodeEditorReady.asObservable();
 
 	constructor(host: UmbControllerHostElement) {
 		super(host, 'Umb.Workspace.PartialView', new UmbPartialViewRepository(host));

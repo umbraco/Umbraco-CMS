@@ -1,9 +1,9 @@
 import { UmbLanguageRepository } from '../../repository/language.repository.js';
 import {
-	UmbSaveableWorkspaceContextInterface,
+	type UmbSaveableWorkspaceContextInterface,
 	UmbEditableWorkspaceContextBase,
 } from '@umbraco-cms/backoffice/workspace';
-import { ApiError, LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { ApiError, type LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
@@ -13,11 +13,11 @@ export class UmbLanguageWorkspaceContext
 	implements UmbSaveableWorkspaceContextInterface
 {
 	#data = new UmbObjectState<LanguageResponseModel | undefined>(undefined);
-	data = this.#data.asObservable();
+	readonly data = this.#data.asObservable();
 
 	// TODO: this is a temp solution to bubble validation errors to the UI
 	#validationErrors = new UmbObjectState<any | undefined>(undefined);
-	validationErrors = this.#validationErrors.asObservable();
+	readonly validationErrors = this.#validationErrors.asObservable();
 
 	constructor(host: UmbControllerHostElement) {
 		super(host, 'Umb.Workspace.Language', new UmbLanguageRepository(host));

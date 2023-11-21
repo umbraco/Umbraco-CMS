@@ -1,13 +1,13 @@
 import { UmbStylesheetRepository } from '../repository/stylesheet.repository.js';
-import { StylesheetDetails } from '../index.js';
+import type { StylesheetDetails } from '../index.js';
 import {
-	UmbSaveableWorkspaceContextInterface,
+	type UmbSaveableWorkspaceContextInterface,
 	UmbEditableWorkspaceContextBase,
 } from '@umbraco-cms/backoffice/workspace';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState, UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
-import { RichTextRuleModel, UpdateStylesheetRequestModel } from '@umbraco-cms/backoffice/backend-api';
+import type { RichTextRuleModel, UpdateStylesheetRequestModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 export type RichTextRuleModelSortable = RichTextRuleModel & { sortOrder?: number };
@@ -18,14 +18,14 @@ export class UmbStylesheetWorkspaceContext
 {
 	#data = new UmbObjectState<StylesheetDetails | undefined>(undefined);
 	#rules = new UmbArrayState<RichTextRuleModelSortable>([], (rule) => rule.name);
-	data = this.#data.asObservable();
-	rules = this.#rules.asObservable();
-	name = this.#data.asObservablePart((data) => data?.name);
-	content = this.#data.asObservablePart((data) => data?.content);
-	path = this.#data.asObservablePart((data) => data?.path);
+	readonly data = this.#data.asObservable();
+	readonly rules = this.#rules.asObservable();
+	readonly name = this.#data.asObservablePart((data) => data?.name);
+	readonly content = this.#data.asObservablePart((data) => data?.content);
+	readonly path = this.#data.asObservablePart((data) => data?.path);
 
 	#isCodeEditorReady = new UmbBooleanState(false);
-	isCodeEditorReady = this.#isCodeEditorReady.asObservable();
+	readonly isCodeEditorReady = this.#isCodeEditorReady.asObservable();
 
 	constructor(host: UmbControllerHostElement) {
 		super(host, 'Umb.Workspace.StyleSheet', new UmbStylesheetRepository(host));
