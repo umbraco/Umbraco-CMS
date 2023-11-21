@@ -173,45 +173,48 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 
 	#renderStatusFilter() {
 		return html`
-			<umb-dropdown class="filter">
-				<uui-button @click=${this.#onDropdownClick} slot="trigger" label="status">
-					<umb-localize key="general_status"></umb-localize>:
-					<umb-localize key=${'user_state' + this._stateFilterSelection}></umb-localize>
-				</uui-button>
-
-				<div slot="dropdown" class="filter-dropdown">
-					${this._stateFilterOptions.map(
-						(option) =>
-							html`<uui-checkbox
-								label=${this.localize.term('user_state' + option)}
-								@change=${this.#onStateFilterChange}
-								name="state"
-								value=${option}></uui-checkbox>`,
-					)}
-				</div>
-			</umb-dropdown>
+			<uui-button popovertarget="popover-user-status-filter" label="status">
+				<umb-localize key="general_status"></umb-localize>:
+				<umb-localize key=${'user_state' + this._stateFilterSelection}></umb-localize>
+			</uui-button>
+			<uui-popover-container id="popover-user-status-filter" popover placement="bottom">
+				<umb-popover-layout>
+					<div class="filter-dropdown">
+						${this._stateFilterOptions.map(
+							(option) =>
+								html`<uui-checkbox
+									label=${this.localize.term('user_state' + option)}
+									@change=${this.#onStateFilterChange}
+									name="state"
+									value=${option}></uui-checkbox>`,
+						)}
+					</div>
+				</umb-popover-layout>
+			</uui-popover-container>
 		`;
 	}
 
 	#renderUserGroupFilter() {
 		return html`
-			<umb-dropdown class="filter">
-				<uui-button @click=${this.#onDropdownClick} slot="trigger" label=${this.localize.term('general_groups')}>
-					<umb-localize key="general_groups"></umb-localize>: ${this.#getUserGroupFilterLabel()}
-				</uui-button>
-				<div slot="dropdown" class="filter-dropdown">
-					${repeat(
-						this._userGroups,
-						(group) => group.id,
-						(group) => html`
-							<uui-checkbox
-								label=${ifDefined(group.name)}
-								value=${ifDefined(group.id)}
-								@change=${this.#onUserGroupFilterChange}></uui-checkbox>
-						`,
-					)}
-				</div>
-			</umb-dropdown>
+			<uui-button popovertarget="popover-user-group-filter" label=${this.localize.term('general_groups')}>
+				<umb-localize key="general_groups"></umb-localize>: ${this.#getUserGroupFilterLabel()}
+			</uui-button>
+			<uui-popover-container id="popover-user-group-filter" popover placement="bottom">
+				<umb-popover-layout>
+					<div class="filter-dropdown">
+						${repeat(
+							this._userGroups,
+							(group) => group.id,
+							(group) => html`
+								<uui-checkbox
+									label=${ifDefined(group.name)}
+									value=${ifDefined(group.id)}
+									@change=${this.#onUserGroupFilterChange}></uui-checkbox>
+							`,
+						)}
+					</div>
+				</umb-popover-layout>
+			</uui-popover-container>
 		`;
 	}
 
@@ -243,7 +246,6 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 				display: flex;
 				gap: var(--uui-size-space-3);
 				flex-direction: column;
-				width: fit-content;
 			}
 		`,
 	];
