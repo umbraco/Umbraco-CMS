@@ -35,7 +35,8 @@ internal static class BackOfficeCorsPolicyBuilderExtensions
                     policy
                         .WithOrigins(customOrigin)
                         .AllowAnyHeader()
-                        .AllowAnyMethod();
+                        .AllowAnyMethod()
+                        .AllowCredentials();
                 });
         });
 
