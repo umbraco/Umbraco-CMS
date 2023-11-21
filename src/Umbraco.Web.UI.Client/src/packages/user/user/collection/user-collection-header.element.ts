@@ -69,15 +69,6 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 		}
 	}
 
-	#onDropdownClick(event: PointerEvent) {
-		const composedPath = event.composedPath();
-
-		const dropdown = composedPath.find((el) => el instanceof UmbDropdownElement) as UmbDropdownElement;
-		if (dropdown) {
-			dropdown.open = !dropdown.open;
-		}
-	}
-
 	private _updateSearch(event: InputEvent) {
 		const target = event.target as HTMLInputElement;
 		const filter = target.value || '';
