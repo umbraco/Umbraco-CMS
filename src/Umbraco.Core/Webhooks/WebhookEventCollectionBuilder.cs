@@ -2,7 +2,6 @@
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Notifications;
-using Umbraco.Cms.Core.Webhooks.Events;
 using Umbraco.Cms.Core.Webhooks.Events.Content;
 using Umbraco.Cms.Core.Webhooks.Events.DataType;
 using Umbraco.Cms.Core.Webhooks.Events.Dictionary;
@@ -17,6 +16,7 @@ using Umbraco.Cms.Core.Webhooks.Events.Relation;
 using Umbraco.Cms.Core.Webhooks.Events.Script;
 using Umbraco.Cms.Core.Webhooks.Events.Stylesheet;
 using Umbraco.Cms.Core.Webhooks.Events.Template;
+using Umbraco.Cms.Core.Webhooks.Events.User;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Webhooks;
@@ -90,7 +90,7 @@ public class WebhookEventCollectionBuilder : OrderedCollectionBuilderBase<Webhoo
         this.AddContentWebhooks()
             .AddDataTypeWebhooks()
             .AddDictionaryWebhooks()
-            .AddDictionaryWebhooks()
+            .AddDomainWebhooks()
             .AddLanguageWebhooks()
             .AddMediaWebhooks()
             .AddMemberWebhooks()
@@ -100,7 +100,8 @@ public class WebhookEventCollectionBuilder : OrderedCollectionBuilderBase<Webhoo
             .AddRelationWebhooks()
             .AddScriptWebhooks()
             .AddStylesheetWebhooks()
-            .AddTemplateWebhooks();
+            .AddTemplateWebhooks()
+            .AddUserWebhooks();
 
     public WebhookEventCollectionBuilder AddContentWebhooks()
     {
@@ -244,6 +245,27 @@ public class WebhookEventCollectionBuilder : OrderedCollectionBuilderBase<Webhoo
 
         Append<TemplateDeletedWebhookEvent>();
         Append<TemplateSavedWebhookEvent>();
+        return this;
+    }
+
+    public WebhookEventCollectionBuilder AddUserWebhooks()
+    {
+        Append<AssignedUserGroupPermissionsWebhookEvent>();
+        Append<UserDeletedWebhookEvent>();
+        Append<UserForgotPasswordRequestedWebhookEvent>();
+        Append<UserForgottenPasswordRequestedWebhookEvent>();
+        Append<UserGroupDeletedWebhookEvent>();
+        Append<UserGroupSavedWebhookEvent>();
+        Append<UserLockedWebhookEvent>();
+        Append<UserLoginFailedWebhookEvent>();
+        Append<UserLoginRequiresVerificationWebhookEvent>();
+        Append<UserLoginSuccessWebhookEvent>();
+        Append<UserLogoutSuccessWebhookEvent>();
+        Append<UserPasswordChangedWebhookEvent>();
+        Append<UserPasswordResetWebhookEvent>();
+        Append<UserSavedWebhookEvent>();
+        Append<UserTwoFactorRequestedWebhookEvent>();
+        Append<UserUnlockedWebhookEvent>();
         return this;
     }
 }
