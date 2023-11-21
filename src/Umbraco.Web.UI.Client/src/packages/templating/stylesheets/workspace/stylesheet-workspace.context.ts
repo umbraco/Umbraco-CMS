@@ -1,6 +1,9 @@
 import { UmbStylesheetRepository } from '../repository/stylesheet.repository.js';
 import { StylesheetDetails } from '../index.js';
-import { UmbSaveableWorkspaceContextInterface, UmbEditableWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
+import {
+	UmbSaveableWorkspaceContextInterface,
+	UmbEditableWorkspaceContextBase,
+} from '@umbraco-cms/backoffice/workspace';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState, UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
@@ -148,7 +151,6 @@ export class UmbStylesheetWorkspaceContext
 			if (!error) {
 				this.setIsNew(false);
 			}
-
 			return Promise.resolve();
 		} else {
 			if (!stylesheet.path) return Promise.reject('There is no path');
@@ -157,8 +159,11 @@ export class UmbStylesheetWorkspaceContext
 				existingPath: stylesheet.path,
 				content: stylesheet.content,
 			};
-			this.repository.save(stylesheet.path, updateRequestBody);
 
+			const { error } = await this.repository.save(stylesheet.path, updateRequestBody);
+			if (!error) {
+				//TODO Update the URL to the new name
+			}
 			return Promise.resolve();
 		}
 	}

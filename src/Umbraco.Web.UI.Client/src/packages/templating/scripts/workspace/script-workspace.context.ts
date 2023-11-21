@@ -64,8 +64,12 @@ export class UmbScriptWorkspaceContext extends UmbEditableWorkspaceContextBase<
 		this.setIsNew(true);
 	}
 
-	getEntityId(): string | undefined {
-		return this.getData()?.path;
+	getEntityId() {
+		const path = this.getData()?.path?.replace(/\//g, '%2F');
+		const name = this.getData()?.name;
+
+		// Note: %2F is a slash (/)
+		return path && name ? `${path}%2F${name}` : name || '';
 	}
 
 	public async save() {
@@ -81,7 +85,10 @@ export class UmbScriptWorkspaceContext extends UmbEditableWorkspaceContextBase<
 				parentPath: script.path + '/',
 			};
 
-			this.repository.create(createRequestBody);
+			const { error } = await this.repository.create(createRequestBody);
+			if (!error) {
+				this.setIsNew(false);
+			}
 			return Promise.resolve();
 		}
 		if (!script.path) return Promise.reject('There is no path');
@@ -90,7 +97,10 @@ export class UmbScriptWorkspaceContext extends UmbEditableWorkspaceContextBase<
 			existingPath: script.path,
 			content: script.content,
 		};
-		this.repository.save(script.path, updateRequestBody);
+		const { error } = await this.repository.save(script.path, updateRequestBody);
+		if (!error) {
+			//TODO Update the URL to the new name
+		}
 		return Promise.resolve();
 	}
 
