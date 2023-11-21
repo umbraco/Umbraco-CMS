@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 
-namespace Umbraco.Cms.Core.Webhooks.Events.Stylesheet;
+namespace Umbraco.Cms.Core.Webhooks.Events.Template;
 
 [WebhookEvent("Template Saved")]
 public class TemplateSavedWebhookEvent : WebhookEventBase<TemplateSavedNotification>

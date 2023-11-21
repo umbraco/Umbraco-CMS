@@ -8,7 +8,7 @@ using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 
-namespace Umbraco.Cms.Core.Webhooks.Events;
+namespace Umbraco.Cms.Core.Webhooks.Events.Media;
 
 [WebhookEvent("Media Saved", Constants.WebhookEvents.Types.Media)]
 public class MediaSavedWebhookEvent : WebhookEventContentBase<MediaSavedNotification, IMedia>
@@ -29,8 +29,8 @@ public class MediaSavedWebhookEvent : WebhookEventContentBase<MediaSavedNotifica
             webhookSettings,
             serverRoleAccessor)
     {
-        _publishedSnapshotAccessor = publishedSnapshotAccessor;
-        _apiMediaBuilder = apiMediaBuilder;
+        this._publishedSnapshotAccessor = publishedSnapshotAccessor;
+        this._apiMediaBuilder = apiMediaBuilder;
     }
 
     public override string Alias => Constants.WebhookEvents.Aliases.MediaSave;
@@ -39,12 +39,12 @@ public class MediaSavedWebhookEvent : WebhookEventContentBase<MediaSavedNotifica
 
     protected override object? ConvertEntityToRequestPayload(IMedia entity)
     {
-        if (_publishedSnapshotAccessor.TryGetPublishedSnapshot(out IPublishedSnapshot? publishedSnapshot) is false || publishedSnapshot!.Content is null)
+        if (this._publishedSnapshotAccessor.TryGetPublishedSnapshot(out IPublishedSnapshot? publishedSnapshot) is false || publishedSnapshot!.Content is null)
         {
             return null;
         }
 
         IPublishedContent? publishedContent = publishedSnapshot.Media?.GetById(entity.Key);
-        return publishedContent is null ? null : _apiMediaBuilder.Build(publishedContent);
+        return publishedContent is null ? null : this._apiMediaBuilder.Build(publishedContent);
     }
 }
