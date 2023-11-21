@@ -23,6 +23,4 @@ export class UmbCreateUserCollectionAction extends UmbCollectionActionBase<UmbUs
 		const modalContext = this.#modalManagerContext?.open(UMB_CREATE_USER_MODAL);
 		await modalContext?.onSubmit();
 	}
-
-	destroy(): void {}
 }
