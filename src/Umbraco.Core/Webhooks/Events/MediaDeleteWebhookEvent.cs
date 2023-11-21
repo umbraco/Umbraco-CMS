@@ -7,21 +7,23 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events;
 
+[WebhookEvent("Media was deleted", Constants.WebhookEvents.Types.Media)]
 public class MediaDeleteWebhookEvent : WebhookEventContentBase<MediaDeletedNotification, IMedia>
 {
     public MediaDeleteWebhookEvent(
         IWebhookFiringService webhookFiringService,
-        IWebHookService webHookService,
+        IWebhookService webhookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
         IServerRoleAccessor serverRoleAccessor)
         : base(
             webhookFiringService,
-            webHookService,
+            webhookService,
             webhookSettings,
-            serverRoleAccessor,
-            Constants.WebhookEvents.MediaDelete)
+            serverRoleAccessor)
     {
     }
+
+    public override string Alias => Constants.WebhookEvents.Aliases.MediaDelete;
 
     protected override IEnumerable<IMedia> GetEntitiesFromNotification(MediaDeletedNotification notification) => notification.DeletedEntities;
 

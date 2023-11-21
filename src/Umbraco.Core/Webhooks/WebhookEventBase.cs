@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Webhooks;
 
@@ -14,25 +15,36 @@ public abstract class WebhookEventBase<TNotification> : IWebhookEvent, INotifica
 {
     private readonly IServerRoleAccessor _serverRoleAccessor;
 
-    /// <InheritDoc />
+    public abstract string Alias { get; }
+
     public string EventName { get; set; }
 
+    public string EventType { get; }
+
     protected IWebhookFiringService WebhookFiringService { get; }
-    protected IWebHookService WebHookService { get; }
+
+    protected IWebhookService WebhookService { get; }
+
     protected WebhookSettings WebhookSettings { get; private set; }
+
+
 
     protected WebhookEventBase(
         IWebhookFiringService webhookFiringService,
-        IWebHookService webHookService,
+        IWebhookService webhookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
-        IServerRoleAccessor serverRoleAccessor,
-        string eventName)
+        IServerRoleAccessor serverRoleAccessor)
     {
-        EventName = eventName;
 
         WebhookFiringService = webhookFiringService;
-        WebHookService = webHookService;
+        WebhookService = webhookService;
         _serverRoleAccessor = serverRoleAccessor;
+
+        // assign properties based on the attribute, if it is found
+        WebhookEventAttribute? attribute = GetType().GetCustomAttribute<WebhookEventAttribute>(false);
+
+        EventType = attribute?.EventType ?? "Others";
+        EventName = attribute?.Name ?? Alias;
 
         WebhookSettings = webhookSettings.CurrentValue;
         webhookSettings.OnChange(x => WebhookSettings = x);
@@ -50,7 +62,7 @@ public abstract class WebhookEventBase<TNotification> : IWebhookEvent, INotifica
                 continue;
             }
 
-            await WebhookFiringService.FireAsync(webhook, EventName, notification, cancellationToken);
+            await WebhookFiringService.FireAsync(webhook, Alias, notification, cancellationToken);
         }
     }
 
@@ -79,7 +91,7 @@ public abstract class WebhookEventBase<TNotification> : IWebhookEvent, INotifica
             return;
         }
 
-        IEnumerable<Webhook> webhooks = await WebHookService.GetByEventNameAsync(EventName);
+        IEnumerable<Webhook> webhooks = await WebhookService.GetByAliasAsync(Alias);
 
         await ProcessWebhooks(notification, webhooks, cancellationToken);
     }

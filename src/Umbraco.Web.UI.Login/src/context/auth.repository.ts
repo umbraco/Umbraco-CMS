@@ -1,262 +1,275 @@
 import type {
-	LoginRequestModel,
-	LoginResponse,
-	MfaProvidersResponse,
-	ResetPasswordResponse,
-	ValidatePasswordResetCodeResponse,
+  LoginRequestModel,
+  LoginResponse,
+  MfaProvidersResponse,
+  ResetPasswordResponse,
+  ValidatePasswordResetCodeResponse,
 } from '../types.js';
 import { umbLocalizationContext } from '../external/localization/localization-context.js';
 
 export class UmbAuthRepository {
 	readonly #authURL = 'backoffice/umbracoapi/authentication/postlogin';
 
-	public async login(data: LoginRequestModel): Promise<LoginResponse> {
-		try {
-			const request = new Request(this.#authURL, {
-				method: 'POST',
-				body: JSON.stringify({
-					username: data.username,
-					password: data.password,
-					rememberMe: data.persist,
-				}),
-				headers: {
-					'Content-Type': 'application/json',
-				},
-			});
-			const response = await fetch(request);
+  public async login(data: LoginRequestModel): Promise<LoginResponse> {
+    try {
+      const request = new Request(this.#authURL, {
+        method: 'POST',
+        body: JSON.stringify({
+          username: data.username,
+          password: data.password,
+          rememberMe: data.persist,
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      const response = await fetch(request);
 
-			const text = await response.text();
-			const responseData = JSON.parse(this.#removeAngularJSResponseData(text));
+      const responseData: LoginResponse = {
+        status: response.status
+      };
 
-			return {
-				status: response.status,
-				error: response.ok ? undefined : await this.#getErrorText(response),
-				data: responseData,
-				twoFactorView: responseData?.twoFactorView,
-			};
-		} catch (error) {
-			return {
-				status: 500,
-				error: error instanceof Error ? error.message : 'Unknown error',
-			};
-		}
-	}
+      if (!response.ok) {
+        responseData.error = await this.#getErrorText(response);
+        return responseData;
+      }
 
-	public async resetPassword(email: string): Promise<ResetPasswordResponse> {
-		const request = new Request('backoffice/umbracoapi/authentication/PostRequestPasswordReset', {
-			method: 'POST',
-			body: JSON.stringify({
-				email,
-			}),
-			headers: {
-				'Content-Type': 'application/json',
-			},
-		});
-		const response = await fetch(request);
+      try {
+        const text = await response.text();
+        if (text) {
+          responseData.data = JSON.parse(this.#removeAngularJSResponseData(text));
+        }
+      } catch {}
 
-		return {
-			status: response.status,
-			error: response.ok ? undefined : await this.#getErrorText(response),
-		};
-	}
+      return {
+        status: response.status,
+        data: responseData?.data,
+        twoFactorView: responseData?.twoFactorView,
+      };
+    } catch (error) {
+      return {
+        status: 500,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      };
+    }
+  }
 
-	public async validatePasswordResetCode(user: string, code: string): Promise<ValidatePasswordResetCodeResponse> {
-		const request = new Request('backoffice/umbracoapi/authentication/validatepasswordresetcode', {
-			method: 'POST',
-			body: JSON.stringify({
-				userId: user,
-				resetCode: code,
-			}),
-			headers: {
-				'Content-Type': 'application/json',
-			},
-		});
-		const response = await fetch(request);
+  public async resetPassword(email: string): Promise<ResetPasswordResponse> {
+    const request = new Request('backoffice/umbracoapi/authentication/PostRequestPasswordReset', {
+      method: 'POST',
+      body: JSON.stringify({
+        email,
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    const response = await fetch(request);
 
-		return {
-			status: response.status,
-			error: response.ok ? undefined : await this.#getErrorText(response),
-		};
-	}
+    return {
+      status: response.status,
+      error: response.ok ? undefined : await this.#getErrorText(response),
+    };
+  }
 
-	public async newPassword(password: string, resetCode: string, userId: number): Promise<LoginResponse> {
-		const request = new Request('backoffice/umbracoapi/authentication/PostSetPassword', {
-			method: 'POST',
-			body: JSON.stringify({
-				password,
-				resetCode,
-				userId,
-			}),
-			headers: {
-				'Content-Type': 'application/json',
-			},
-		});
-		const response = await fetch(request);
+  public async validatePasswordResetCode(user: string, code: string): Promise<ValidatePasswordResetCodeResponse> {
+    const request = new Request('backoffice/umbracoapi/authentication/validatepasswordresetcode', {
+      method: 'POST',
+      body: JSON.stringify({
+        userId: user,
+        resetCode: code,
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    const response = await fetch(request);
 
-		return {
-			status: response.status,
-			error: response.ok ? undefined : await this.#getErrorText(response),
-		};
-	}
+    return {
+      status: response.status,
+      error: response.ok ? undefined : await this.#getErrorText(response),
+    };
+  }
 
-	public async newInvitedUserPassword(newPassWord: string): Promise<LoginResponse> {
-		const request = new Request('backoffice/umbracoapi/authentication/PostSetInvitedUserPassword', {
-			method: 'POST',
-			body: JSON.stringify({
-				newPassWord,
-			}),
-			headers: {
-				'Content-Type': 'application/json',
-			},
-		});
-		const response = await fetch(request);
+  public async newPassword(password: string, resetCode: string, userId: number): Promise<LoginResponse> {
+    const request = new Request('backoffice/umbracoapi/authentication/PostSetPassword', {
+      method: 'POST',
+      body: JSON.stringify({
+        password,
+        resetCode,
+        userId,
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    const response = await fetch(request);
 
-		return {
-			status: response.status,
-			error: response.ok ? undefined : await this.#getErrorText(response),
-		};
-	}
+    return {
+      status: response.status,
+      error: response.ok ? undefined : await this.#getErrorText(response),
+    };
+  }
 
-	public async getPasswordConfig(userId: string): Promise<any> {
-		//TODO: Add type
-		const request = new Request(`backoffice/umbracoapi/authentication/GetPasswordConfig?userId=${userId}`, {
-			method: 'GET',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-		});
-		const response = await fetch(request);
+  public async newInvitedUserPassword(newPassWord: string): Promise<LoginResponse> {
+    const request = new Request('backoffice/umbracoapi/authentication/PostSetInvitedUserPassword', {
+      method: 'POST',
+      body: JSON.stringify({
+        newPassWord,
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    const response = await fetch(request);
 
-		// Check if response contains AngularJS response data
-		if (response.ok) {
-			let text = await response.text();
-			text = this.#removeAngularJSResponseData(text);
-			const data = JSON.parse(text);
+    return {
+      status: response.status,
+      error: response.ok ? undefined : await this.#getErrorText(response),
+    };
+  }
 
-			return {
-				status: response.status,
-				data,
-			};
-		}
+  public async getPasswordConfig(userId: string): Promise<any> {
+    //TODO: Add type
+    const request = new Request(`backoffice/umbracoapi/authentication/GetPasswordConfig?userId=${userId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    const response = await fetch(request);
 
-		return {
-			status: response.status,
-			error: response.ok ? undefined : this.#getErrorText(response),
-		};
-	}
+    // Check if response contains AngularJS response data
+    if (response.ok) {
+      let text = await response.text();
+      text = this.#removeAngularJSResponseData(text);
+      const data = JSON.parse(text);
 
-	public async getInvitedUser(): Promise<any> {
-		//TODO: Add type
-		const request = new Request('backoffice/umbracoapi/authentication/GetCurrentInvitedUser', {
-			method: 'GET',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-		});
-		const response = await fetch(request);
+      return {
+        status: response.status,
+        data,
+      };
+    }
 
-		// Check if response contains AngularJS response data
-		if (response.ok) {
-			let text = await response.text();
-			text = this.#removeAngularJSResponseData(text);
-			const user = JSON.parse(text);
+    return {
+      status: response.status,
+      error: response.ok ? undefined : this.#getErrorText(response),
+    };
+  }
 
-			return {
-				status: response.status,
-				user,
-			};
-		}
+  public async getInvitedUser(): Promise<any> {
+    //TODO: Add type
+    const request = new Request('backoffice/umbracoapi/authentication/GetCurrentInvitedUser', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    const response = await fetch(request);
 
-		return {
-			status: response.status,
-			error: this.#getErrorText(response),
-		};
-	}
+    // Check if response contains AngularJS response data
+    if (response.ok) {
+      let text = await response.text();
+      text = this.#removeAngularJSResponseData(text);
+      const user = JSON.parse(text);
 
-	public async getMfaProviders(): Promise<MfaProvidersResponse> {
-		const request = new Request('backoffice/umbracoapi/authentication/Get2faProviders', {
-			method: 'GET',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-		});
-		const response = await fetch(request);
+      return {
+        status: response.status,
+        user,
+      };
+    }
 
-		// Check if response contains AngularJS response data
-		if (response.ok) {
-			let text = await response.text();
-			text = this.#removeAngularJSResponseData(text);
-			const providers = JSON.parse(text);
+    return {
+      status: response.status,
+      error: this.#getErrorText(response),
+    };
+  }
 
-			return {
-				status: response.status,
-				providers,
-			};
-		}
+  public async getMfaProviders(): Promise<MfaProvidersResponse> {
+    const request = new Request('backoffice/umbracoapi/authentication/Get2faProviders', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    const response = await fetch(request);
 
-		return {
-			status: response.status,
-			error: await this.#getErrorText(response),
-			providers: [],
-		};
-	}
+    // Check if response contains AngularJS response data
+    if (response.ok) {
+      let text = await response.text();
+      text = this.#removeAngularJSResponseData(text);
+      const providers = JSON.parse(text);
 
-	public async validateMfaCode(code: string, provider: string): Promise<LoginResponse> {
-		const request = new Request('backoffice/umbracoapi/authentication/PostVerify2faCode', {
-			method: 'POST',
-			body: JSON.stringify({
-				code,
-				provider,
-			}),
-			headers: {
-				'Content-Type': 'application/json',
-			},
-		});
+      return {
+        status: response.status,
+        providers,
+      };
+    }
 
-		const response = await fetch(request);
+    return {
+      status: response.status,
+      error: await this.#getErrorText(response),
+      providers: [],
+    };
+  }
 
-		if (response.ok) {
-			return {
-				status: response.status,
-			};
-		}
+  public async validateMfaCode(code: string, provider: string): Promise<LoginResponse> {
+    const request = new Request('backoffice/umbracoapi/authentication/PostVerify2faCode', {
+      method: 'POST',
+      body: JSON.stringify({
+        code,
+        provider,
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
 
-		let text = await response.text();
-		text = this.#removeAngularJSResponseData(text);
+    const response = await fetch(request);
 
-		const data = JSON.parse(text);
+    let text = await response.text();
+    text = this.#removeAngularJSResponseData(text);
 
-		return {
-			status: response.status,
-			error: data.Message ?? 'An unknown error occurred.',
-		};
-	}
+    const data = JSON.parse(text);
 
-	async #getErrorText(response: Response): Promise<string> {
-		switch (response.status) {
-			case 400:
-			case 401:
-				return umbLocalizationContext.localize('login_userFailedLogin', undefined, "Oops! We couldn't log you in. Please check your credentials and try again.");
+    if (response.ok) {
+      return {
+        data,
+        status: response.status,
+      };
+    }
 
-			case 402:
-				return umbLocalizationContext.localize('login_2faText', undefined, 'You have enabled 2-factor authentication and must verify your identity.');
+    return {
+      status: response.status,
+      error: data.Message ?? 'An unknown error occurred.',
+    };
+  }
 
-			case 500:
-				return umbLocalizationContext.localize('errors_receivedErrorFromServer', undefined, 'Received error from server');
+  async #getErrorText(response: Response): Promise<string> {
+    switch (response.status) {
+      case 400:
+      case 401:
+        return umbLocalizationContext.localize('login_userFailedLogin', undefined, "Oops! We couldn't log you in. Please check your credentials and try again.");
 
-			default:
-				return response.statusText ?? await umbLocalizationContext.localize('errors_receivedErrorFromServer', undefined, 'Received error from server')
-		}
-	}
+      case 402:
+        return umbLocalizationContext.localize('login_2faText', undefined, 'You have enabled 2-factor authentication and must verify your identity.');
 
-	/**
-	 * AngularJS adds a prefix to the response data, which we need to remove
-	 */
-	#removeAngularJSResponseData(text: string) {
-		if (text.startsWith(")]}',\n")) {
-			text = text.split('\n')[1];
-		}
+      case 500:
+        return umbLocalizationContext.localize('errors_receivedErrorFromServer', undefined, 'Received error from server');
 
-		return text;
-	}
+      default:
+        return response.statusText ?? await umbLocalizationContext.localize('errors_receivedErrorFromServer', undefined, 'Received error from server')
+    }
+  }
+
+  /**
+   * AngularJS adds a prefix to the response data, which we need to remove
+   */
+  #removeAngularJSResponseData(text: string) {
+    if (text.startsWith(")]}',\n")) {
+      text = text.split('\n')[1];
+    }
+
+    return text;
+  }
 }

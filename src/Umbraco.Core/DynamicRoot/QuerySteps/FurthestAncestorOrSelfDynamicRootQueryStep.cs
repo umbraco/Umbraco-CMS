@@ -4,18 +4,18 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.DynamicRoot.QuerySteps;
 
-public class FarthestAncestorOrSelfDynamicRootQueryStep : IDynamicRootQueryStep
+public class FurthestAncestorOrSelfDynamicRootQueryStep : IDynamicRootQueryStep
 {
     private readonly ICoreScopeProvider _scopeProvider;
     private readonly IDynamicRootRepository _nodeFilterRepository;
 
-    public FarthestAncestorOrSelfDynamicRootQueryStep(ICoreScopeProvider scopeProvider, IDynamicRootRepository nodeFilterRepository)
+    public FurthestAncestorOrSelfDynamicRootQueryStep(ICoreScopeProvider scopeProvider, IDynamicRootRepository nodeFilterRepository)
     {
         _scopeProvider = scopeProvider;
         _nodeFilterRepository = nodeFilterRepository;
     }
 
-    protected virtual string SupportedDirectionAlias { get; set; } = "FarthestAncestorOrSelf";
+    protected virtual string SupportedDirectionAlias { get; set; } = "FurthestAncestorOrSelf";
 
     public async Task<Attempt<ICollection<Guid>>> ExecuteAsync(ICollection<Guid> origins, DynamicRootQueryStep filter)
     {
@@ -30,7 +30,7 @@ public class FarthestAncestorOrSelfDynamicRootQueryStep : IDynamicRootQueryStep
         }
 
         using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
-        var result = (await _nodeFilterRepository.FarthestAncestorOrSelfAsync(origins, filter))?.ToSingleItemCollection() ?? Array.Empty<Guid>();
+        var result = (await _nodeFilterRepository.FurthestAncestorOrSelfAsync(origins, filter))?.ToSingleItemCollection() ?? Array.Empty<Guid>();
 
         return Attempt<ICollection<Guid>>.Succeed(result);
     }

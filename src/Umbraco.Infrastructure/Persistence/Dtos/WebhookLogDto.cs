@@ -13,7 +13,7 @@ internal class WebhookLogDto
     [PrimaryKeyColumn(AutoIncrement = true)]
     public int Id { get; set; }
 
-    [Column("webhookId")]
+    [Column("webhookKey")]
     public Guid WebhookKey { get; set; }
 
     [Column(Name = "key")]
@@ -33,27 +33,31 @@ internal class WebhookLogDto
     [NullSetting(NullSetting = NullSettings.NotNull)]
     public string Url { get; set; } = string.Empty;
 
-    [Column(Name = "eventName")]
+    [Column(Name = "eventAlias")]
     [NullSetting(NullSetting = NullSettings.NotNull)]
-    public string EventName { get; set; } = string.Empty;
+    public string EventAlias { get; set; } = string.Empty;
 
     [Column(Name = "retryCount")]
     [NullSetting(NullSetting = NullSettings.NotNull)]
     public int RetryCount { get; set; }
 
     [Column(Name = "requestHeaders")]
+    [SpecialDbType(SpecialDbTypes.NVARCHARMAX)]
     [NullSetting(NullSetting = NullSettings.NotNull)]
     public string RequestHeaders { get; set; } = string.Empty;
 
     [Column(Name = "requestBody")]
+    [SpecialDbType(SpecialDbTypes.NVARCHARMAX)]
     [NullSetting(NullSetting = NullSettings.NotNull)]
     public string RequestBody { get; set; } = string.Empty;
 
     [Column(Name = "responseHeaders")]
+    [SpecialDbType(SpecialDbTypes.NVARCHARMAX)]
     [NullSetting(NullSetting = NullSettings.NotNull)]
     public string ResponseHeaders { get; set; } = string.Empty;
 
     [Column(Name = "responseBody")]
+    [SpecialDbType(SpecialDbTypes.NVARCHARMAX)]
     [NullSetting(NullSetting = NullSettings.NotNull)]
     public string ResponseBody { get; set; } = string.Empty;
 }

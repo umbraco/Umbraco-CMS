@@ -136,6 +136,7 @@ public static class UmbracoEFCoreServiceCollectionExtensions
                 builder.UseSqlServer(connectionString);
                 break;
             case Constants.ProviderNames.SQLLite:
+            case "Microsoft.Data.SQLite":
                 builder.UseSqlite(connectionString);
                 break;
             default:

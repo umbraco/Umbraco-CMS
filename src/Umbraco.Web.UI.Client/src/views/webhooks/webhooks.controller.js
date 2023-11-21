@@ -1,11 +1,12 @@
 (function () {
   "use strict";
 
-  function WebhookController($q, $timeout, $routeParams, webhooksResource, navigationService, notificationsService, editorService, overlayService, contentTypeResource, mediaTypeResource) {
+  function WebhookController($q, $timeout, $location, $routeParams, webhooksResource, navigationService, notificationsService, overlayService, contentTypeResource, mediaTypeResource, memberTypeResource) {
 
     const vm = this;
 
-    vm.openWebhookOverlay = openWebhookOverlay;
+    vm.addWebhook = addWebhook;
+    vm.editWebhook = editWebhook;
     vm.deleteWebhook = deleteWebhook;
     vm.handleSubmissionError = handleSubmissionError;
     vm.resolveTypeNames = resolveTypeNames;
@@ -14,7 +15,7 @@
     vm.page = {};
     vm.webhooks = [];
     vm.events = [];
-    vm.webHooksContentTypes = {};
+    vm.webhooksContentTypes = {};
     vm.webhookEvents = {};
 
     function init() {
@@ -38,128 +39,81 @@
     function loadEvents() {
       return webhooksResource.getAllEvents()
         .then(data => {
-          vm.events = data.map(item => item.eventName);
+          vm.events = data;
         });
     }
 
     function resolveEventNames(webhook) {
       webhook.events.forEach(event => {
         if (!vm.webhookEvents[webhook.key]) {
-          vm.webhookEvents[webhook.key] = event;
+          vm.webhookEvents[webhook.key] = event.eventName;
         } else {
-          vm.webhookEvents[webhook.key] += ", " + event;
+          vm.webhookEvents[webhook.key] += ", " + event.eventName;
         }
       });
     }
 
-    function getEntities(webhook) {
-      const isContent = webhook.events[0].toLowerCase().includes("content");
-      const resource = isContent ? contentTypeResource : mediaTypeResource;
-      let entities = [];
+    function determineResource(resourceType){
+      let resource;
+      switch (resourceType) {
+        case "content":
+          resource = contentTypeResource;
+          break;
+        case "media":
+          resource = mediaTypeResource;
+          break;
+        case "member":
+          resource = memberTypeResource;
+          break;
+        default:
+          return;
+      }
 
-      webhook.contentTypeKeys.forEach(key => {
-        resource.getById(key)
-          .then(data => {
-            entities.push(data);
-          });
-      });
-
-      return entities;
+      return resource;
     }
 
     function resolveTypeNames(webhook) {
-      const isContent = webhook.events[0].toLowerCase().includes("content");
-      const resource = isContent ? contentTypeResource : mediaTypeResource;
+      let resource = determineResource(webhook.events[0].eventType.toLowerCase());
 
-      if (vm.webHooksContentTypes[webhook.key]){
-        delete vm.webHooksContentTypes[webhook.key];
+      if (vm.webhooksContentTypes[webhook.key]){
+        delete vm.webhooksContentTypes[webhook.key];
       }
 
       webhook.contentTypeKeys.forEach(key => {
         resource.getById(key)
           .then(data => {
-            if (!vm.webHooksContentTypes[webhook.key]) {
-              vm.webHooksContentTypes[webhook.key] = data.name;
+            if (!vm.webhooksContentTypes[webhook.key]) {
+              vm.webhooksContentTypes[webhook.key] = data.name;
             } else {
-              vm.webHooksContentTypes[webhook.key] += ", " + data.name;
+              vm.webhooksContentTypes[webhook.key] += ", " + data.name;
             }
           });
       });
     }
 
-    function handleSubmissionError (model, errorMessage) {
+    function handleSubmissionError(model, errorMessage) {
       notificationsService.error(errorMessage);
       model.disableSubmitButton = false;
       model.submitButtonState = 'error';
     }
 
-    function openWebhookOverlay (webhook) {
-      let isCreating = !webhook;
-      editorService.open({
-        title: webhook ? 'Edit webhook' : 'Add webhook',
-        position: 'right',
-        size: 'small',
-        submitButtonLabel: webhook ? 'Save' : 'Create',
-        view: "views/webhooks/overlays/edit.html",
-        events: vm.events,
-        contentTypes : webhook ? getEntities(webhook) : null,
-        webhook: webhook ? webhook : {enabled: true},
-        submit: (model) => {
-          model.disableSubmitButton = true;
-          model.submitButtonState = 'busy';
-          if (!model.webhook.url) {
-            //Due to validation url will only be populated if it's valid, hence we can make do with checking url is there
-            handleSubmissionError(model, 'Please provide a valid URL. Did you include https:// ?');
-            return;
-          }
-          if (!model.webhook.events || model.webhook.events.length === 0) {
-            handleSubmissionError(model, 'Please provide the event for which the webhook should trigger');
-            return;
-          }
+    function addWebhook() {
+      $location.search('create', null);
+      $location.path("/settings/webhooks/edit/-1").search("create", "true");
+    }
 
-          if (isCreating) {
-            webhooksResource.create(model.webhook)
-              .then(() => {
-                loadWebhooks()
-                notificationsService.success('Webhook saved.');
-                editorService.close();
-              }, x => {
-                let errorMessage = undefined;
-                if (x.data.ModelState) {
-                  errorMessage = `Message: ${Object.values(x.data.ModelState).flat().join(' ')}`;
-                }
-                handleSubmissionError(model, `Error saving webhook. ${errorMessage ?? ''}`);
-              });
-          }
-          else {
-            webhooksResource.update(model.webhook)
-              .then(() => {
-                loadWebhooks()
-                notificationsService.success('Webhook saved.');
-                editorService.close();
-              }, x => {
-                let errorMessage = undefined;
-                if (x.data.ModelState) {
-                  errorMessage = `Message: ${Object.values(x.data.ModelState).flat().join(' ')}`;
-                }
-                handleSubmissionError(model, `Error saving webhook. ${errorMessage ?? ''}`);
-              });
-          }
-
-        },
-        close: () => {
-          editorService.close();
-        }
-      });
+    function editWebhook(webhook) {
+      $location.search('create', null);
+      $location.path("/settings/webhooks/edit/" + webhook.key);
     }
 
     function loadWebhooks(){
-      webhooksResource
+      return webhooksResource
         .getAll()
         .then(result => {
           vm.webhooks = result;
           vm.webhookEvents = {};
-          vm.webHooksContentTypes = {};
+          vm.webhooksContentTypes = {};
 
           vm.webhooks.forEach(webhook => {
             resolveTypeNames(webhook);
@@ -168,7 +122,7 @@
         });
     }
 
-    function deleteWebhook (webhook, event) {
+    function deleteWebhook(webhook, event) {
       overlayService.open({
         title: 'Confirm delete webhook',
         content: 'Are you sure you want to delete the webhook?',

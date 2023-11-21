@@ -15,7 +15,9 @@ internal sealed class SwaggerContentDocumentationFilter : SwaggerDocumentationFi
     {
         operation.Parameters ??= new List<OpenApiParameter>();
 
-        AddExpand(operation);
+        AddExpand(operation, context);
+
+        AddFields(operation, context);
 
         operation.Parameters.Add(new OpenApiParameter
         {
