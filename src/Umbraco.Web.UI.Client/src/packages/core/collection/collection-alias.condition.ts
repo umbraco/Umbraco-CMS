@@ -17,7 +17,7 @@ export class UmbCollectionAliasCondition extends UmbBaseController implements Um
 		this.config = args.config;
 		this.#onChange = args.onChange;
 		this.consumeContext(UMB_COLLECTION_CONTEXT, (context) => {
-			this.permitted = context.getAlias() === this.config.match;
+			this.permitted = context.getManifest()?.alias === this.config.match;
 			this.#onChange();
 		});
 	}
