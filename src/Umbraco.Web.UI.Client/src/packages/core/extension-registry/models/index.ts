@@ -32,6 +32,7 @@ import type { ManifestWorkspaceEditorView } from './workspace-editor-view.model.
 import type { ManifestWorkspaceViewCollection } from './workspace-view-collection.model.js';
 import type { ManifestUserPermission } from './user-permission.model.js';
 import type { ManifestUserGranularPermission } from './user-granular-permission.model.js';
+import { ManifestCollectionAction } from './collection-action.model.js';
 import type {
 	ManifestBase,
 	ManifestBundle,
@@ -78,6 +79,7 @@ export type ManifestTypes =
 	| ManifestCondition
 	| ManifestCollection
 	| ManifestCollectionView
+	| ManifestCollectionAction
 	| ManifestDashboard
 	| ManifestDashboardCollection
 	| ManifestEntityAction
