@@ -5,6 +5,7 @@ import { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 export const createManifest: ManifestTypes = {
 	type: 'collectionAction',
 	kind: 'button',
+	name: 'Create User Collection Action',
 	alias: 'Umb.CollectionAction.User.Create',
 	api: UmbCreateUserCollectionAction,
 	weight: 200,
@@ -16,6 +17,7 @@ export const createManifest: ManifestTypes = {
 export const inviteManifest: ManifestTypes = {
 	type: 'collectionAction',
 	kind: 'button',
+	name: 'Invite User Collection Action',
 	alias: 'Umb.CollectionAction.User.Invite',
 	api: UmbInviteUserCollectionAction,
 	weight: 100,
