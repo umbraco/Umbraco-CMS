@@ -11,6 +11,7 @@ const collectionManifest: ManifestTypes = {
 	alias: UMB_USER_COLLECTION_ALIAS,
 	name: 'User Collection',
 	api: UmbUserCollectionContext,
+	element: () => import('./user-collection.element.js'),
 	meta: {
 		repositoryAlias: UMB_USER_COLLECTION_REPOSITORY_ALIAS,
 	},

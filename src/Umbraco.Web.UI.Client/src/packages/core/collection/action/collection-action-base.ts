@@ -1,4 +1,4 @@
-import { type UmbCollectionContext, UMB_COLLECTION_CONTEXT } from '../index.js';
+import { type UmbCollectionDefaultContext, UMB_COLLECTION_CONTEXT } from '../index.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
@@ -9,7 +9,7 @@ export interface UmbCollectionAction<CollectionContextType = unknown> extends Um
 	execute(): Promise<void>;
 }
 
-export abstract class UmbCollectionActionBase<CollectionContextType extends UmbCollectionContext<any, any>>
+export abstract class UmbCollectionActionBase<CollectionContextType extends UmbCollectionDefaultContext<any, any>>
 	implements UmbCollectionAction<CollectionContextType>
 {
 	host: UmbControllerHost;

@@ -10,7 +10,7 @@ import {
 	UmbTableOrderedEvent,
 	UmbTableSelectedEvent,
 } from '@umbraco-cms/backoffice/components';
-import { UMB_COLLECTION_CONTEXT, UmbCollectionContext } from '@umbraco-cms/backoffice/collection';
+import { UMB_COLLECTION_CONTEXT, UmbCollectionDefaultContext } from '@umbraco-cms/backoffice/collection';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { DocumentTreeItemResponseModel, EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
@@ -50,7 +50,7 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 	@state()
 	private _selection: Array<string | null> = [];
 
-	private _collectionContext?: UmbCollectionContext<EntityType, any>;
+	private _collectionContext?: UmbCollectionDefaultContext<EntityType, any>;
 
 	constructor() {
 		super();

@@ -13,7 +13,7 @@ import type { UmbCollectionFilterModel } from '@umbraco-cms/backoffice/collectio
 import { UmbSelectionManager, UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
-export class UmbCollectionContext<
+export class UmbCollectionDefaultContext<
 	ItemType,
 	FilterModelType extends UmbCollectionFilterModel,
 > extends UmbBaseController {
@@ -69,7 +69,7 @@ export class UmbCollectionContext<
 		}
 	}
 
-	public async setAlias(alias?: string) {
+	public setAlias(alias?: string) {
 		if (this.#alias === alias) return;
 
 		this.#alias = alias;
@@ -191,4 +191,6 @@ export class UmbCollectionContext<
 	}
 }
 
-export const UMB_COLLECTION_CONTEXT = new UmbContextToken<UmbCollectionContext<any, any>>('UmbCollectionContext');
+export const UMB_COLLECTION_CONTEXT = new UmbContextToken<UmbCollectionDefaultContext<any, any>>(
+	'UmbCollectionContext',
+);

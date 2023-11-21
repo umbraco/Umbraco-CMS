@@ -1,6 +1,6 @@
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbCollectionContext } from '@umbraco-cms/backoffice/collection';
+import { UmbCollectionDefaultContext } from '@umbraco-cms/backoffice/collection';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { FolderTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import type { ManifestWorkspaceViewCollection } from '@umbraco-cms/backoffice/extension-registry';
@@ -15,7 +15,7 @@ export class UmbWorkspaceViewCollectionElement extends UmbLitElement {
 	private _workspaceContext?: typeof UMB_WORKSPACE_CONTEXT.TYPE;
 
 	// TODO: add type for the collection context.
-	private _collectionContext?: UmbCollectionContext<FolderTreeItemResponseModel, any>;
+	private _collectionContext?: UmbCollectionDefaultContext<FolderTreeItemResponseModel, any>;
 
 	constructor() {
 		super();

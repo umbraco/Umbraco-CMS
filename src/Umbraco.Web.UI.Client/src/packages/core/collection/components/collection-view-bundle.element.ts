@@ -1,4 +1,4 @@
-import { UMB_COLLECTION_CONTEXT, UmbCollectionContext } from '../collection.context.js';
+import { UMB_COLLECTION_CONTEXT, UmbCollectionDefaultContext } from '../collection.context.js';
 import { ManifestCollectionView } from '../../extension-registry/models/collection-view.model.js';
 import { css, html, customElement, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -15,7 +15,7 @@ export class UmbCollectionViewBundleElement extends UmbLitElement {
 	@state()
 	private _collectionRootPathname = '';
 
-	#collectionContext?: UmbCollectionContext<any, any>;
+	#collectionContext?: UmbCollectionDefaultContext<any, any>;
 
 	constructor() {
 		super();
