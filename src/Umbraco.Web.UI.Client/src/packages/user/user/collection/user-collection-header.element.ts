@@ -167,6 +167,12 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 			: this._userGroupFilterSelection.map((group) => group.name).join(', ');
 	}
 
+	#getStatusFilterLabel() {
+		return this._stateFilterSelection.length === 0
+			? this.localize.term('general_all')
+			: this._stateFilterSelection.map((state) => this.localize.term('user_state' + state)).join(', ');
+	}
+
 	#renderFilters() {
 		return html` ${this.#renderStatusFilter()} ${this.#renderUserGroupFilter()} `;
 	}
@@ -174,8 +180,7 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 	#renderStatusFilter() {
 		return html`
 			<uui-button popovertarget="popover-user-status-filter" label="status">
-				<umb-localize key="general_status"></umb-localize>:
-				<umb-localize key=${'user_state' + this._stateFilterSelection}></umb-localize>
+				<umb-localize key="general_status"></umb-localize>: ${this.#getStatusFilterLabel()}
 			</uui-button>
 			<uui-popover-container id="popover-user-status-filter" popover placement="bottom">
 				<umb-popover-layout>
