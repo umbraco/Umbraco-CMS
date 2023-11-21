@@ -19,4 +19,21 @@ public class MemberSavedWebhookEvent : WebhookEventBase<MemberSavedNotification>
     }
 
     public override string Alias => "memberSaved";
+
+    public override object? ConvertNotificationToRequestPayload(MemberSavedNotification notification)
+    {
+        // TODO: Map more stuff here
+        var result = notification.SavedEntities.Select(entity => new
+        {
+            entity.Id,
+            entity.Key,
+            entity.Name,
+            entity.ContentTypeAlias,
+            entity.Email,
+            entity.Username,
+            entity.FailedPasswordAttempts
+        });
+
+        return result;
+    }
 }

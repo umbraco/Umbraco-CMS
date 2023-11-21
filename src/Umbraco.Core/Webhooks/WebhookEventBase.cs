@@ -62,7 +62,7 @@ public abstract class WebhookEventBase<TNotification> : IWebhookEvent, INotifica
                 continue;
             }
 
-            await WebhookFiringService.FireAsync(webhook, Alias, notification, cancellationToken);
+            await WebhookFiringService.FireAsync(webhook, Alias, ConvertNotificationToRequestPayload(notification), cancellationToken);
         }
     }
 
@@ -95,4 +95,14 @@ public abstract class WebhookEventBase<TNotification> : IWebhookEvent, INotifica
 
         await ProcessWebhooks(notification, webhooks, cancellationToken);
     }
+
+    /// <summary>
+    /// Use this method if you wish to change the shape of the object to be serialised
+    /// for the JSON webhook payload.
+    /// For example excluding sensitive data
+    /// </summary>
+    /// <param name="notification"></param>
+    /// <returns></returns>
+    public virtual object? ConvertNotificationToRequestPayload(TNotification notification)
+        => notification;
 }
