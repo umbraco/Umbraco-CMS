@@ -7,6 +7,6 @@ export const isDataTypeVariantContext = (context: UmbVariantContext): context is
 
 export const UMB_DATA_TYPE_VARIANT_CONTEXT = new UmbContextToken<UmbVariantContext, UmbDataTypeVariantContext>(
 	'UmbVariantContext',
-	'default',
+	undefined,
 	isDataTypeVariantContext,
 );

@@ -178,6 +178,6 @@ export const UMB_TEMPLATE_WORKSPACE_CONTEXT = new UmbContextToken<
 	UmbTemplateWorkspaceContext
 >(
 	'UmbWorkspaceContext',
-	'default',
+	undefined,
 	(context): context is UmbTemplateWorkspaceContext => context.getEntityType?.() === 'template',
 );

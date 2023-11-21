@@ -8,6 +8,6 @@ export const UMB_VARIANT_WORKSPACE_CONTEXT_TOKEN = new UmbContextToken<
 	UmbVariantableWorkspaceContextInterface<UmbEntityBase>
 >(
 	'UmbWorkspaceContext',
-	'default',
+	undefined,
 	(context): context is UmbVariantableWorkspaceContextInterface => 'variants' in context,
 );

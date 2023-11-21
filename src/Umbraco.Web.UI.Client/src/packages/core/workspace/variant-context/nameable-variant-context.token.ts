@@ -7,6 +7,6 @@ export const isNameablePropertySetContext = (context: UmbVariantContext): contex
 
 export const UMB_NAMEABLE_VARIANT_CONTEXT = new UmbContextToken<UmbVariantContext, UmbNameableVariantContext>(
 	'UmbVariantContext',
-	'default',
+	undefined,
 	isNameablePropertySetContext,
 );

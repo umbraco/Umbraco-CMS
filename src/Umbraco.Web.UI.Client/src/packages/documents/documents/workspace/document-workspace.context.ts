@@ -235,6 +235,6 @@ export const UMB_DOCUMENT_WORKSPACE_CONTEXT = new UmbContextToken<
 	UmbDocumentWorkspaceContext
 >(
 	'UmbWorkspaceContext',
-	'default',
+	undefined,
 	(context): context is UmbDocumentWorkspaceContext => context.getEntityType?.() === UMB_DOCUMENT_ENTITY_TYPE,
 );

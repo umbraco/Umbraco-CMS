@@ -110,6 +110,6 @@ export const UMB_LANGUAGE_WORKSPACE_CONTEXT = new UmbContextToken<
 	UmbLanguageWorkspaceContext
 >(
 	'UmbWorkspaceContext',
-	'default',
+	undefined,
 	(context): context is UmbLanguageWorkspaceContext => context.getEntityType?.() === 'language',
 );

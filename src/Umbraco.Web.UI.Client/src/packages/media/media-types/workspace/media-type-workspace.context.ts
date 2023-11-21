@@ -86,6 +86,6 @@ export const UMB_MEDIA_TYPE_WORKSPACE_CONTEXT = new UmbContextToken<
 	UmbMediaTypeWorkspaceContext
 >(
 	'UmbWorkspaceContext',
-	'default',
+	undefined,
 	(context): context is UmbMediaTypeWorkspaceContext => context.getEntityType?.() === 'media-type',
 );

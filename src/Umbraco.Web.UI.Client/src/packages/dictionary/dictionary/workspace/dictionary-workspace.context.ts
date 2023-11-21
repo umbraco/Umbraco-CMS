@@ -100,6 +100,6 @@ export const UMB_DICTIONARY_WORKSPACE_CONTEXT = new UmbContextToken<
 	UmbDictionaryWorkspaceContext
 >(
 	'UmbWorkspaceContext',
-	'default',
+	undefined,
 	(context): context is UmbDictionaryWorkspaceContext => context.getEntityType?.() === 'dictionary-item',
 );

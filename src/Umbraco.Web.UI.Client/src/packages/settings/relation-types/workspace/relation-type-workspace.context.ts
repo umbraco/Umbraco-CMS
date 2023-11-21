@@ -85,6 +85,6 @@ export const UMB_RELATION_TYPE_WORKSPACE_CONTEXT = new UmbContextToken<
 	UmbRelationTypeWorkspaceContext
 >(
 	'UmbWorkspaceContext',
-	'default',
+	undefined,
 	(context): context is UmbRelationTypeWorkspaceContext => context.getEntityType?.() === 'relation-type',
 );

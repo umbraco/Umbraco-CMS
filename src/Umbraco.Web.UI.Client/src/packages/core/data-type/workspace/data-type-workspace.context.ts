@@ -265,6 +265,6 @@ export const UMB_DATA_TYPE_WORKSPACE_CONTEXT = new UmbContextToken<
 	UmbDataTypeWorkspaceContext
 >(
 	'UmbWorkspaceContext',
-	'default',
+	undefined,
 	(context): context is UmbDataTypeWorkspaceContext => context.getEntityType?.() === 'data-type',
 );

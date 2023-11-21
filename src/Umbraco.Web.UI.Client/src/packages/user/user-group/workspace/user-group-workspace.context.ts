@@ -156,6 +156,6 @@ export const UMB_USER_GROUP_WORKSPACE_CONTEXT = new UmbContextToken<
 	UmbUserGroupWorkspaceContext
 >(
 	'UmbWorkspaceContext',
-	'default',
+	undefined,
 	(context): context is UmbUserGroupWorkspaceContext => context.getEntityType?.() === 'user-group',
 );

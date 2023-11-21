@@ -47,6 +47,6 @@ export const UMB_MEMBER_WORKSPACE_CONTEXT = new UmbContextToken<
 	UmbMemberWorkspaceContext
 >(
 	'UmbWorkspaceContext',
-	'default',
+	undefined,
 	(context): context is UmbMemberWorkspaceContext => context.getEntityType?.() === UMB_MEMBER_ENTITY_TYPE,
 );
