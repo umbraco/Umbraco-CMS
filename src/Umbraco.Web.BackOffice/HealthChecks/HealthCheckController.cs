@@ -7,7 +7,9 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.HealthChecks;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Web.BackOffice.Controllers;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
@@ -24,14 +26,18 @@ public class HealthCheckController : UmbracoAuthorizedJsonController
     private readonly HealthCheckCollection _checks;
     private readonly IList<Guid> _disabledCheckIds;
     private readonly ILogger<HealthCheckController> _logger;
+    private readonly IEventAggregator _eventAggregator;
+    private readonly HealthChecksSettings _healthChecksSettings;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="HealthCheckController" /> class.
     /// </summary>
-    public HealthCheckController(HealthCheckCollection checks, ILogger<HealthCheckController> logger, IOptions<HealthChecksSettings> healthChecksSettings)
+    public HealthCheckController(HealthCheckCollection checks, ILogger<HealthCheckController> logger, IOptions<HealthChecksSettings> healthChecksSettings, IEventAggregator eventAggregator)
     {
         _checks = checks ?? throw new ArgumentNullException(nameof(checks));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _eventAggregator = eventAggregator ?? throw new ArgumentException(nameof(eventAggregator));
+        _healthChecksSettings = healthChecksSettings?.Value ?? throw new ArgumentException(nameof(healthChecksSettings));
 
         HealthChecksSettings healthCheckConfig =
             healthChecksSettings.Value ?? throw new ArgumentNullException(nameof(healthChecksSettings));
@@ -80,6 +86,16 @@ public class HealthCheckController : UmbracoAuthorizedJsonController
             {
                 _logger.LogDebug("Running health check: " + check.Name);
             }
+
+            if (!_healthChecksSettings.Notification.Enabled)
+            {
+                return await check.GetStatus();
+            }
+
+            HealthCheckResults results = await HealthCheckResults.Create(check);
+            _eventAggregator.Publish(new HealthCheckCompletedNotification(results));
+
+
             return await check.GetStatus();
         }
         catch (Exception ex)
