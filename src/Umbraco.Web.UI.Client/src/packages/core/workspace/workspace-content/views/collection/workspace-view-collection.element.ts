@@ -1,6 +1,6 @@
-import { css, html, customElement, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbCollectionContext, UMB_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
+import { UmbCollectionContext } from '@umbraco-cms/backoffice/collection';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { FolderTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import type { ManifestWorkspaceViewCollection } from '@umbraco-cms/backoffice/extension-registry';
@@ -22,23 +22,11 @@ export class UmbWorkspaceViewCollectionElement extends UmbLitElement {
 
 		this.consumeContext(UMB_WORKSPACE_CONTEXT, (nodeContext) => {
 			this._workspaceContext = nodeContext;
-			this._provideWorkspace();
 		});
 	}
 
-	protected _provideWorkspace() {
-		const entityId = this._workspaceContext?.getEntityId();
-		const entityType = this._workspaceContext?.getEntityType();
-
-		if (entityId != null && entityType != null) {
-			const manifestMeta = this.manifest.meta;
-
-			this._collectionContext = new UmbCollectionContext(this, entityType, manifestMeta.repositoryAlias);
-			this.provideContext(UMB_COLLECTION_CONTEXT, this._collectionContext);
-		}
-	}
-
 	render() {
+		// TODO: figure out what the collection to render
 		return html`<umb-collection></umb-collection>`;
 	}
 
