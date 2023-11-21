@@ -1,4 +1,5 @@
 import { UmbCreateUserCollectionAction } from './create-user.collection-action.js';
+import { UmbInviteUserCollectionAction } from './invite-user.collection-action.js';
 import { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 export const createManifest: ManifestTypes = {
@@ -6,9 +7,21 @@ export const createManifest: ManifestTypes = {
 	kind: 'button',
 	alias: 'Umb.CollectionAction.User.Create',
 	api: UmbCreateUserCollectionAction,
+	weight: 200,
 	meta: {
-		label: 'Create User',
+		label: 'Create',
 	},
 };
 
-export const manifests = [createManifest];
+export const inviteManifest: ManifestTypes = {
+	type: 'collectionAction',
+	kind: 'button',
+	alias: 'Umb.CollectionAction.User.Invite',
+	api: UmbInviteUserCollectionAction,
+	weight: 100,
+	meta: {
+		label: 'Invite',
+	},
+};
+
+export const manifests = [createManifest, inviteManifest];
