@@ -1,8 +1,7 @@
 import type { TooltipMenuItem } from '../../components/tooltip-menu/index.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, nothing, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { map } from '@umbraco-cms/backoffice/external/rxjs';
-import { ManifestCollectionView, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { ManifestCollectionView } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-collection-toolbar')
@@ -80,6 +79,7 @@ export class UmbCollectionToolbarElement extends UmbLitElement {
 	render() {
 		return html`
 			${this._renderCreateButton()}
+			<umb-extension-slot type="collectionAction"></umb-extension-slot>
 			<uui-input id="search" @input=${this._updateSearch}></uui-input>
 			<umb-collection-view-bundle></umb-collection-view-bundle>
 		`;
