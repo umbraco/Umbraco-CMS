@@ -33,6 +33,7 @@ export class UmbCollectionViewBundleElement extends UmbLitElement {
 		this.observe(
 			this.#collectionContext!.currentView,
 			(view) => {
+				//TODO: This is not called when the view is changed
 				this._currentView = view;
 			},
 			'umbCurrentCollectionViewObserver',
