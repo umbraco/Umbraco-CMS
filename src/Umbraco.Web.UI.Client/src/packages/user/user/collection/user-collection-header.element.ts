@@ -153,15 +153,27 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 	}
 
 	#getUserGroupFilterLabel() {
-		return this._userGroupFilterSelection.length === 0
+		const length = this._userGroupFilterSelection.length;
+		const max = 2;
+		//TODO: Temp solution to limit the amount of states shown
+		return length === 0
 			? this.localize.term('general_all')
-			: this._userGroupFilterSelection.map((group) => group.name).join(', ');
+			: this._userGroupFilterSelection
+					.slice(0, max)
+					.map((group) => group.name)
+					.join(', ') + (length > max ? ' + ' + (length - max) : '');
 	}
 
 	#getStatusFilterLabel() {
-		return this._stateFilterSelection.length === 0
+		const length = this._stateFilterSelection.length;
+		const max = 2;
+		//TODO: Temp solution to limit the amount of states shown
+		return length === 0
 			? this.localize.term('general_all')
-			: this._stateFilterSelection.map((state) => this.localize.term('user_state' + state)).join(', ');
+			: this._stateFilterSelection
+					.slice(0, max)
+					.map((state) => this.localize.term('user_state' + state))
+					.join(', ') + (length > max ? ' + ' + (length - max) : '');
 	}
 
 	#renderFilters() {
@@ -171,7 +183,7 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 	#renderStatusFilter() {
 		return html`
 			<uui-button popovertarget="popover-user-status-filter" label="status">
-				<umb-localize key="general_status"></umb-localize>: ${this.#getStatusFilterLabel()}
+				<umb-localize key="general_status"></umb-localize>: <b>${this.#getStatusFilterLabel()}</b>
 			</uui-button>
 			<uui-popover-container id="popover-user-status-filter" popover placement="bottom">
 				<umb-popover-layout>
@@ -193,7 +205,7 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 	#renderUserGroupFilter() {
 		return html`
 			<uui-button popovertarget="popover-user-group-filter" label=${this.localize.term('general_groups')}>
-				<umb-localize key="general_groups"></umb-localize>: ${this.#getUserGroupFilterLabel()}
+				<umb-localize key="general_groups"></umb-localize>: <b>${this.#getUserGroupFilterLabel()}</b>
 			</uui-button>
 			<uui-popover-container id="popover-user-group-filter" popover placement="bottom">
 				<umb-popover-layout>
