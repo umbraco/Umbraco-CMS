@@ -1,27 +1,71 @@
-﻿namespace Umbraco.Cms.Core.Models;
+﻿using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Extensions;
 
-public class Webhook
+namespace Umbraco.Cms.Core.Models;
+
+public class Webhook : EntityBase, IWebhook
 {
+    // Custom comparers for enumerable
+    private static readonly DelegateEqualityComparer<IEnumerable<Guid>>
+        ContentTypeKeysComparer =
+            new(
+                (enumerable, translations) => enumerable.UnsortedSequenceEqual(translations),
+                enumerable => enumerable.GetHashCode());
+
+    private static readonly DelegateEqualityComparer<IEnumerable<string>>
+        EventsComparer =
+            new(
+                (enumerable, translations) => enumerable.UnsortedSequenceEqual(translations),
+                enumerable => enumerable.GetHashCode());
+
+    private static readonly DelegateEqualityComparer<IDictionary<string, string>>
+        HeadersComparer =
+            new(
+                (enumerable, translations) => enumerable.UnsortedSequenceEqual(translations),
+                enumerable => enumerable.GetHashCode());
+
+    private string _url;
+    private string[] _events;
+    private Guid[] _contentTypeKeys;
+    private bool _enabled;
+    private IDictionary<string, string> _headers;
+
     public Webhook(string url, bool? enabled = null, Guid[]? entityKeys = null, string[]? events = null, IDictionary<string, string>? headers = null)
     {
-        Url = url;
-        Headers = headers ?? new Dictionary<string, string>();
-        Events = events ?? Array.Empty<string>();
-        ContentTypeKeys = entityKeys ?? Array.Empty<Guid>();
-        Enabled = enabled ?? false;
+        _url = url;
+        _headers = headers ?? new Dictionary<string, string>();
+        _events = events ?? Array.Empty<string>();
+        _contentTypeKeys = entityKeys ?? Array.Empty<Guid>();
+        _enabled = enabled ?? false;
     }
 
-    public int Id { get; set; }
+    public string Url
+    {
+        get => _url;
+        set => SetPropertyValueAndDetectChanges(value, ref _url!, nameof(Url));
+    }
 
-    public Guid Key { get; set; }
+    public string[] Events
+    {
+        get => _events;
+        set => SetPropertyValueAndDetectChanges(value, ref _events!, nameof(Events), EventsComparer);
+    }
 
-    public string Url { get; set; }
+    public Guid[] ContentTypeKeys
+    {
+        get => _contentTypeKeys;
+        set => SetPropertyValueAndDetectChanges(value, ref _contentTypeKeys!, nameof(ContentTypeKeys), ContentTypeKeysComparer);
+    }
 
-    public string[] Events { get; set; }
+    public bool Enabled
+    {
+        get => _enabled;
+        set => SetPropertyValueAndDetectChanges(value, ref _enabled, nameof(Enabled));
+    }
 
-    public Guid[] ContentTypeKeys {get; set; }
-
-    public bool Enabled { get; set; }
-
-    public IDictionary<string, string> Headers { get; set; }
+    public IDictionary<string, string> Headers
+    {
+        get => _headers;
+        set => SetPropertyValueAndDetectChanges(value, ref _headers!, nameof(Headers), HeadersComparer);
+    }
 }

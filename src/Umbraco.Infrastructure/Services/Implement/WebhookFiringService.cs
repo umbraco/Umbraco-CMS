@@ -9,7 +9,7 @@ public class WebhookFiringService : IWebhookFiringService
 
     public WebhookFiringService(IWebhookRequestService webhookRequestService) => _webhookRequestService = webhookRequestService;
 
-    public async Task FireAsync(Webhook webhook, string eventAlias, object? payload, CancellationToken cancellationToken) =>
+    public async Task FireAsync(IWebhook webhook, string eventAlias, object? payload, CancellationToken cancellationToken) =>
         await _webhookRequestService.CreateAsync(webhook.Key, eventAlias, payload);
 }
 

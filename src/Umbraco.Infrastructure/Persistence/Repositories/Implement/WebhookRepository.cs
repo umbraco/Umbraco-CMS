@@ -14,7 +14,7 @@ public class WebhookRepository : IWebhookRepository
 
     public WebhookRepository(IScopeAccessor scopeAccessor) => _scopeAccessor = scopeAccessor;
 
-    public async Task<PagedModel<Webhook>> GetAllAsync(int skip, int take)
+    public async Task<PagedModel<IWebhook>> GetAllAsync(int skip, int take)
     {
         Sql<ISqlContext>? sql = _scopeAccessor.AmbientScope?.Database.SqlContext.Sql()
             .Select<WebhookDto>()
@@ -22,15 +22,16 @@ public class WebhookRepository : IWebhookRepository
 
         List<WebhookDto>? webhookDtos = await _scopeAccessor.AmbientScope?.Database.FetchAsync<WebhookDto>(sql)!;
 
-        return new PagedModel<Webhook>
+        return new PagedModel<IWebhook>
         {
             Items = await DtosToEntities(webhookDtos.Skip(skip).Take(take)),
             Total = webhookDtos.Count,
         };
     }
 
-    public async Task<Webhook> CreateAsync(Webhook webhook)
+    public async Task<IWebhook> CreateAsync(IWebhook webhook)
     {
+        webhook.AddingEntity();
         WebhookDto webhookDto = WebhookFactory.BuildDto(webhook);
 
         var result = await _scopeAccessor.AmbientScope?.Database.InsertAsync(webhookDto)!;
@@ -45,7 +46,7 @@ public class WebhookRepository : IWebhookRepository
         return webhook;
     }
 
-    public async Task<Webhook?> GetAsync(Guid key)
+    public async Task<IWebhook?> GetAsync(Guid key)
     {
         Sql<ISqlContext>? sql = _scopeAccessor.AmbientScope?.Database.SqlContext.Sql()
             .Select<WebhookDto>()
@@ -57,7 +58,7 @@ public class WebhookRepository : IWebhookRepository
         return webhookDto is null ? null : await DtoToEntity(webhookDto);
     }
 
-    public async Task<PagedModel<Webhook>> GetByAliasAsync(string alias)
+    public async Task<PagedModel<IWebhook>> GetByAliasAsync(string alias)
     {
         Sql<ISqlContext>? sql = _scopeAccessor.AmbientScope?.Database.SqlContext.Sql()
             .SelectAll()
@@ -68,14 +69,14 @@ public class WebhookRepository : IWebhookRepository
 
         List<WebhookDto>? webhookDtos = await _scopeAccessor.AmbientScope?.Database.FetchAsync<WebhookDto>(sql)!;
 
-        return new PagedModel<Webhook>
+        return new PagedModel<IWebhook>
         {
             Items = await DtosToEntities(webhookDtos),
             Total = webhookDtos.Count,
         };
     }
 
-    public async Task DeleteAsync(Webhook webhook)
+    public async Task DeleteAsync(IWebhook webhook)
     {
         Sql<ISqlContext> sql = _scopeAccessor.AmbientScope!.Database.SqlContext.Sql()
             .Delete<WebhookDto>()
@@ -84,8 +85,9 @@ public class WebhookRepository : IWebhookRepository
         await _scopeAccessor.AmbientScope?.Database.ExecuteAsync(sql)!;
     }
 
-    public async Task UpdateAsync(Webhook webhook)
+    public async Task UpdateAsync(IWebhook webhook)
     {
+        webhook.UpdatingEntity();
         WebhookDto dto = WebhookFactory.BuildDto(webhook);
         await _scopeAccessor.AmbientScope?.Database.UpdateAsync(dto)!;
 
@@ -101,7 +103,7 @@ public class WebhookRepository : IWebhookRepository
         _scopeAccessor.AmbientScope?.Database.Delete<Webhook2HeadersDto>("WHERE webhookId = @webhookId", new { webhookId });
     }
 
-    private void InsertManyToOneReferences(Webhook webhook)
+    private void InsertManyToOneReferences(IWebhook webhook)
     {
         IEnumerable<Webhook2ContentTypeKeysDto> buildEntityKey2WebhookDtos = WebhookFactory.BuildEntityKey2WebhookDto(webhook);
         IEnumerable<Webhook2EventsDto> buildEvent2WebhookDtos = WebhookFactory.BuildEvent2WebhookDto(webhook);
@@ -112,9 +114,9 @@ public class WebhookRepository : IWebhookRepository
         _scopeAccessor.AmbientScope?.Database.InsertBulkAsync(header2WebhookDtos);
     }
 
-    private async Task<IEnumerable<Webhook>> DtosToEntities(IEnumerable<WebhookDto> dtos)
+    private async Task<IEnumerable<IWebhook>> DtosToEntities(IEnumerable<WebhookDto> dtos)
     {
-        List<Webhook> result = new();
+        List<IWebhook> result = new();
 
         foreach (WebhookDto webhook in dtos)
         {
@@ -124,7 +126,7 @@ public class WebhookRepository : IWebhookRepository
         return result;
     }
 
-    private async Task<Webhook> DtoToEntity(WebhookDto dto)
+    private async Task<IWebhook> DtoToEntity(WebhookDto dto)
     {
         List<Webhook2ContentTypeKeysDto>? webhookEntityKeyDtos = await _scopeAccessor.AmbientScope?.Database.FetchAsync<Webhook2ContentTypeKeysDto>("WHERE webhookId = @webhookId", new { webhookId = dto.Id })!;
         List<Webhook2EventsDto>? event2WebhookDtos = await _scopeAccessor.AmbientScope?.Database.FetchAsync<Webhook2EventsDto>("WHERE webhookId = @webhookId", new { webhookId = dto.Id })!;

@@ -21,7 +21,7 @@ public class WebhookService : IWebhookService
     }
 
     /// <inheritdoc />
-    public async Task<Attempt<Webhook, WebhookOperationStatus>> CreateAsync(Webhook webhook)
+    public async Task<Attempt<IWebhook, WebhookOperationStatus>> CreateAsync(IWebhook webhook)
     {
         using ICoreScope scope = _provider.CreateCoreScope();
 
@@ -33,7 +33,7 @@ public class WebhookService : IWebhookService
             return Attempt.FailWithStatus(WebhookOperationStatus.CancelledByNotification, webhook);
         }
 
-        Webhook created = await _webhookRepository.CreateAsync(webhook);
+        IWebhook created = await _webhookRepository.CreateAsync(webhook);
 
         scope.Notifications.Publish(new WebhookSavedNotification(webhook, eventMessages).WithStateFrom(savingNotification));
 
@@ -43,11 +43,11 @@ public class WebhookService : IWebhookService
     }
 
     /// <inheritdoc />
-    public async Task<Attempt<Webhook, WebhookOperationStatus>> UpdateAsync(Webhook webhook)
+    public async Task<Attempt<IWebhook, WebhookOperationStatus>> UpdateAsync(IWebhook webhook)
     {
         using ICoreScope scope = _provider.CreateCoreScope();
 
-        Webhook? currentWebhook = await _webhookRepository.GetAsync(webhook.Key);
+        IWebhook? currentWebhook = await _webhookRepository.GetAsync(webhook.Key);
 
         if (currentWebhook is null)
         {
@@ -79,10 +79,10 @@ public class WebhookService : IWebhookService
     }
 
     /// <inheritdoc />
-    public async Task<Attempt<Webhook?, WebhookOperationStatus>> DeleteAsync(Guid key)
+    public async Task<Attempt<IWebhook?, WebhookOperationStatus>> DeleteAsync(Guid key)
     {
         using ICoreScope scope = _provider.CreateCoreScope();
-        Webhook? webhook = await _webhookRepository.GetAsync(key);
+        IWebhook? webhook = await _webhookRepository.GetAsync(key);
         if (webhook is null)
         {
             return Attempt.FailWithStatus(WebhookOperationStatus.NotFound, webhook);
@@ -93,7 +93,7 @@ public class WebhookService : IWebhookService
         if (await scope.Notifications.PublishCancelableAsync(deletingNotification))
         {
             scope.Complete();
-            return Attempt.FailWithStatus<Webhook?, WebhookOperationStatus>(WebhookOperationStatus.CancelledByNotification, webhook);
+            return Attempt.FailWithStatus<IWebhook?, WebhookOperationStatus>(WebhookOperationStatus.CancelledByNotification, webhook);
         }
 
         await _webhookRepository.DeleteAsync(webhook);
@@ -101,33 +101,33 @@ public class WebhookService : IWebhookService
 
         scope.Complete();
 
-        return Attempt.SucceedWithStatus<Webhook?, WebhookOperationStatus>(WebhookOperationStatus.Success, webhook);
+        return Attempt.SucceedWithStatus<IWebhook?, WebhookOperationStatus>(WebhookOperationStatus.Success, webhook);
     }
 
     /// <inheritdoc />
-    public async Task<Webhook?> GetAsync(Guid key)
+    public async Task<IWebhook?> GetAsync(Guid key)
     {
         using ICoreScope scope = _provider.CreateCoreScope();
-        Webhook? webhook = await _webhookRepository.GetAsync(key);
+        IWebhook? webhook = await _webhookRepository.GetAsync(key);
         scope.Complete();
         return webhook;
     }
 
     /// <inheritdoc />
-    public async Task<PagedModel<Webhook>> GetAllAsync(int skip, int take)
+    public async Task<PagedModel<IWebhook>> GetAllAsync(int skip, int take)
     {
         using ICoreScope scope = _provider.CreateCoreScope();
-        PagedModel<Webhook> webhooks = await _webhookRepository.GetAllAsync(skip, take);
+        PagedModel<IWebhook> webhooks = await _webhookRepository.GetAllAsync(skip, take);
         scope.Complete();
 
         return webhooks;
     }
 
     /// <inheritdoc />
-    public async Task<IEnumerable<Webhook>> GetByAliasAsync(string alias)
+    public async Task<IEnumerable<IWebhook>> GetByAliasAsync(string alias)
     {
         using ICoreScope scope = _provider.CreateCoreScope();
-        PagedModel<Webhook> webhooks = await _webhookRepository.GetByAliasAsync(alias);
+        PagedModel<IWebhook> webhooks = await _webhookRepository.GetByAliasAsync(alias);
         scope.Complete();
 
         return webhooks.Items;
