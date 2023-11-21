@@ -89,4 +89,8 @@ export class UmbMediaWorkspaceContext
 export const UMB_MEDIA_WORKSPACE_CONTEXT = new UmbContextToken<
 	UmbSaveableWorkspaceContextInterface,
 	UmbMediaWorkspaceContext
->('UmbWorkspaceContext', (context): context is UmbMediaWorkspaceContext => context.getEntityType?.() === 'media');
+>(
+	'UmbWorkspaceContext',
+	'default',
+	(context): context is UmbMediaWorkspaceContext => context.getEntityType?.() === 'media',
+);

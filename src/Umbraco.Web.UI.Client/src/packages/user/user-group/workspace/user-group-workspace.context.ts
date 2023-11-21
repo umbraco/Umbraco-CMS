@@ -1,6 +1,9 @@
 import { UmbUserGroupRepository } from '../repository/user-group.repository.js';
 import { UmbUserRepository } from '../../user/repository/user.repository.js';
-import { UmbSaveableWorkspaceContextInterface, UmbEditableWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
+import {
+	UmbSaveableWorkspaceContextInterface,
+	UmbEditableWorkspaceContextBase,
+} from '@umbraco-cms/backoffice/workspace';
 import type { UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbArrayState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
@@ -153,5 +156,6 @@ export const UMB_USER_GROUP_WORKSPACE_CONTEXT = new UmbContextToken<
 	UmbUserGroupWorkspaceContext
 >(
 	'UmbWorkspaceContext',
+	'default',
 	(context): context is UmbUserGroupWorkspaceContext => context.getEntityType?.() === 'user-group',
 );

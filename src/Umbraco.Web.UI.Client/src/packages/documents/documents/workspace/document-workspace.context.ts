@@ -235,6 +235,6 @@ export const UMB_DOCUMENT_WORKSPACE_CONTEXT = new UmbContextToken<
 	UmbDocumentWorkspaceContext
 >(
 	'UmbWorkspaceContext',
-	// TODO: Refactor: make a better generic way to identify workspaces, maybe workspaceType or workspaceAlias?.
+	'default',
 	(context): context is UmbDocumentWorkspaceContext => context.getEntityType?.() === UMB_DOCUMENT_ENTITY_TYPE,
 );

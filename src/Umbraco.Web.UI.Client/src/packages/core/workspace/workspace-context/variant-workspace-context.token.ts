@@ -6,4 +6,8 @@ import type { UmbEntityBase } from '@umbraco-cms/backoffice/models';
 export const UMB_VARIANT_WORKSPACE_CONTEXT_TOKEN = new UmbContextToken<
 	UmbWorkspaceContextInterface,
 	UmbVariantableWorkspaceContextInterface<UmbEntityBase>
->('UmbWorkspaceContext', (context): context is UmbVariantableWorkspaceContextInterface => 'variants' in context);
+>(
+	'UmbWorkspaceContext',
+	'default',
+	(context): context is UmbVariantableWorkspaceContextInterface => 'variants' in context,
+);

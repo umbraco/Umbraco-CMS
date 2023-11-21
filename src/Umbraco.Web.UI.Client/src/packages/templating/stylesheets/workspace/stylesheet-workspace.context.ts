@@ -189,5 +189,6 @@ export const UMB_STYLESHEET_WORKSPACE_CONTEXT = new UmbContextToken<
 	UmbStylesheetWorkspaceContext
 >(
 	'UmbWorkspaceContext',
+	'default',
 	(context): context is UmbStylesheetWorkspaceContext => context.getEntityType?.() === 'stylesheet',
 );

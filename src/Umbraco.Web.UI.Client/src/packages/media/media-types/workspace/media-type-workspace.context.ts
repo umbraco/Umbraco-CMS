@@ -1,5 +1,8 @@
 import { UmbMediaTypeRepository } from '../repository/media-type.repository.js';
-import { UmbSaveableWorkspaceContextInterface, UmbEditableWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
+import {
+	UmbSaveableWorkspaceContextInterface,
+	UmbEditableWorkspaceContextBase,
+} from '@umbraco-cms/backoffice/workspace';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
@@ -83,5 +86,6 @@ export const UMB_MEDIA_TYPE_WORKSPACE_CONTEXT = new UmbContextToken<
 	UmbMediaTypeWorkspaceContext
 >(
 	'UmbWorkspaceContext',
+	'default',
 	(context): context is UmbMediaTypeWorkspaceContext => context.getEntityType?.() === 'media-type',
 );

@@ -1,5 +1,8 @@
 import { UmbRelationTypeRepository } from '../repository/relation-type.repository.js';
-import { UmbSaveableWorkspaceContextInterface, UmbEditableWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
+import {
+	UmbSaveableWorkspaceContextInterface,
+	UmbEditableWorkspaceContextBase,
+} from '@umbraco-cms/backoffice/workspace';
 import type { RelationTypeBaseModel, RelationTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
@@ -77,9 +80,11 @@ export class UmbRelationTypeWorkspaceContext
 	}
 }
 
-
-
-export const UMB_RELATION_TYPE_WORKSPACE_CONTEXT = new UmbContextToken<UmbSaveableWorkspaceContextInterface, UmbRelationTypeWorkspaceContext>(
+export const UMB_RELATION_TYPE_WORKSPACE_CONTEXT = new UmbContextToken<
+	UmbSaveableWorkspaceContextInterface,
+	UmbRelationTypeWorkspaceContext
+>(
 	'UmbWorkspaceContext',
-	(context): context is UmbRelationTypeWorkspaceContext => context.getEntityType?.() === 'relation-type'
+	'default',
+	(context): context is UmbRelationTypeWorkspaceContext => context.getEntityType?.() === 'relation-type',
 );

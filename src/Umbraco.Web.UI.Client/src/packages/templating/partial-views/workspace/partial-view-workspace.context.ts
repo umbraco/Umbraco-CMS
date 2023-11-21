@@ -107,5 +107,6 @@ export const UMB_PARTIAL_VIEW_WORKSPACE_CONTEXT = new UmbContextToken<
 	UmbPartialViewWorkspaceContext
 >(
 	'UmbWorkspaceContext',
+	'default',
 	(context): context is UmbPartialViewWorkspaceContext => context.getEntityType?.() === UMB_PARTIAL_VIEW_ENTITY_TYPE,
 );

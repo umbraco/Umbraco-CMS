@@ -8,5 +8,6 @@ export const IsDocumentVariantContext = (context: UmbVariantContext): context is
 
 export const UMB_DOCUMENT_VARIANT_CONTEXT = new UmbContextToken<UmbVariantContext, UmbDocumentVariantContext>(
 	'UmbVariantContext',
+	'default',
 	IsDocumentVariantContext,
 );
