@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Net.Mime;
+using System.Text;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
@@ -87,12 +88,11 @@ public class WebhookFiring : IRecurringBackgroundJob
         }));
     }
 
-    private async Task<HttpResponseMessage?> SendRequestAsync(Webhook webhook, string eventName, object? payload, int retryCount, CancellationToken cancellationToken)
+    private async Task<HttpResponseMessage?> SendRequestAsync(Webhook webhook, string eventName, string? serializedObject, int retryCount, CancellationToken cancellationToken)
     {
         using var httpClient = new HttpClient();
 
-        var serializedObject = _jsonSerializer.Serialize(payload);
-        var stringContent = new StringContent(serializedObject, Encoding.UTF8, "application/json");
+        var stringContent = new StringContent(serializedObject ?? string.Empty, Encoding.UTF8, MediaTypeNames.Application.Json);
         stringContent.Headers.TryAddWithoutValidation("Umb-Webhook-Event", eventName);
 
         foreach (KeyValuePair<string, string> header in webhook.Headers)
