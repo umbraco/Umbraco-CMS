@@ -1,4 +1,4 @@
-import { UmbCollectionConfiguration } from './types.js';
+import { UmbCollectionConfiguration, UmbCollectionContext } from './types.js';
 import { UmbCollectionRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbBaseController, type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
@@ -9,6 +9,7 @@ import {
 	UmbExtensionsManifestInitializer,
 } from '@umbraco-cms/backoffice/extension-api';
 import {
+	ManifestCollection,
 	ManifestCollectionView,
 	ManifestRepository,
 	umbExtensionsRegistry,
@@ -19,9 +20,9 @@ import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 export class UmbCollectionDefaultContext<ItemType, FilterModelType extends UmbCollectionFilterModel>
 	extends UmbBaseController
-	implements UmbApi
+	implements UmbCollectionContext, UmbApi
 {
-	#alias?: string;
+	#manifest?: ManifestCollection;
 
 	#items = new UmbArrayState<ItemType>([]);
 	public readonly items = this.#items.asObservable();
@@ -73,15 +74,27 @@ export class UmbCollectionDefaultContext<ItemType, FilterModelType extends UmbCo
 		}
 	}
 
-	public setAlias(alias?: string) {
-		if (this.#alias === alias) return;
+	/**
+	 * Sets the manifest for the collection.
+	 * @param {ManifestCollection} manifest
+	 * @memberof UmbCollectionContext
+	 */
+	public setManifest(manifest: ManifestCollection | undefined) {
+		if (this.#manifest === manifest) return;
+		this.#manifest = manifest;
 
-		this.#alias = alias;
-		this.#observeCollectionManifest();
+		if (!this.#manifest) return;
+		this.#observeRepository(this.#manifest.meta.repositoryAlias);
+		this.#observeViews();
 	}
 
-	public getAlias() {
-		return this.#alias;
+	/**
+	 * Returns the manifest for the collection.
+	 * @return {ManifestCollection}
+	 * @memberof UmbCollectionContext
+	 */
+	public getManifest() {
+		return this.#manifest;
 	}
 
 	/**
@@ -91,7 +104,7 @@ export class UmbCollectionDefaultContext<ItemType, FilterModelType extends UmbCo
 	 */
 	public async requestCollection() {
 		await this.#init;
-		if (!this.repository) throw new Error(`Missing repository for ${this.#alias}`);
+		if (!this.repository) throw new Error(`Missing repository for ${this.#manifest}`);
 
 		const filter = this.#filter.getValue();
 		const { data } = await this.repository.requestCollection(filter);
@@ -156,22 +169,6 @@ export class UmbCollectionDefaultContext<ItemType, FilterModelType extends UmbCo
 		*/
 		const currentView = viewMatch || views[0];
 		this.setCurrentView(currentView);
-	}
-
-	#observeCollectionManifest() {
-		if (!this.#alias) return;
-
-		this.observe(
-			umbExtensionsRegistry.getByTypeAndAlias('collection', this.#alias),
-			async (manifest) => {
-				if (!manifest) return;
-				const repositoryAlias = manifest.meta.repositoryAlias;
-				if (!repositoryAlias) throw new Error('A collection must have a repository alias.');
-				this.#observeRepository(repositoryAlias);
-				this.#observeViews();
-			},
-			'umbObserveCollectionManifest',
-		);
 	}
 
 	#observeRepository(repositoryAlias: string) {

@@ -2,6 +2,8 @@ import { customElement, html, property, state } from '@umbraco-cms/backoffice/ex
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { ManifestCollection, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { createExtensionApi, createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
+import { UmbUserCollectionContext } from 'src/packages/user/user/collection/user-collection.context';
+import { UmbCollectionContext } from './types';
 
 @customElement('umb-collection')
 export class UmbCollectionElement extends UmbLitElement {
@@ -36,9 +38,9 @@ export class UmbCollectionElement extends UmbLitElement {
 
 	async #createApi() {
 		if (!this.#manifest) throw new Error('No manifest');
-		const api = await createExtensionApi(this.#manifest, [this]);
+		const api = (await createExtensionApi(this.#manifest, [this])) as UmbCollectionContext;
 		if (!api) throw new Error('No api');
-		api.setAlias(this._alias);
+		api.setManifest(this.#manifest);
 	}
 
 	async #createElement() {

@@ -16,7 +16,7 @@ export class UmbCollectionActionBundleElement extends UmbLitElement {
 		this.consumeContext(UMB_COLLECTION_CONTEXT, (context) => {
 			this.#collectionContext = context;
 			if (!this.#collectionContext) return;
-			this._collectionAlias = this.#collectionContext.getAlias();
+			this._collectionAlias = this.#collectionContext.getManifest()?.alias;
 		});
 	}
 
