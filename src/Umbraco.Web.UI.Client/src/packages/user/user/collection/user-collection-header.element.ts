@@ -109,8 +109,9 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 
 	render() {
 		return html`
-			${this.#renderCollectionActions()} ${this.#renderSearch()} ${this.#renderFilters()}
-			${this.#renderCollectionViews()}
+			<div style="display: flex; gap: var(--uui-size-space-4)">${this.#renderCollectionActions()}</div>
+			${this.#renderSearch()}
+			<div>${this.#renderFilters()} ${this.#renderCollectionViews()}</div>
 		`;
 	}
 
