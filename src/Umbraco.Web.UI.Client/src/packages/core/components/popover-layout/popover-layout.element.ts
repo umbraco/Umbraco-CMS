@@ -3,6 +3,7 @@ import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 // TODO: maybe move this to UI Library.
+// TODO: add overwrites for customization.
 @customElement('umb-popover-layout')
 export class UmbPopoverLayoutElement extends UmbLitElement {
 	render() {
