@@ -112,7 +112,7 @@ describe('UmbContextConsumer with discriminator test', () => {
 	it('discriminator determines the instance type', async () => {
 		const localConsumer = new UmbContextConsumer(
 			document.body,
-			new UmbContextToken(testContextAlias, discriminator),
+			new UmbContextToken(testContextAlias, undefined, discriminator),
 			(instance: A) => {
 				console.log(instance);
 			},
@@ -136,7 +136,7 @@ describe('UmbContextConsumer with discriminator test', () => {
 
 		const localConsumer = new UmbContextConsumer(
 			element,
-			new UmbContextToken(testContextAlias, discriminator),
+			new UmbContextToken(testContextAlias, undefined, discriminator),
 			(_instance) => {
 				expect(_instance.prop).to.eq('value from provider');
 				done();
@@ -156,7 +156,7 @@ describe('UmbContextConsumer with discriminator test', () => {
 
 		const localConsumer = new UmbContextConsumer(
 			element,
-			new UmbContextToken(testContextAlias, badDiscriminator),
+			new UmbContextToken(testContextAlias, undefined, badDiscriminator),
 			(_instance) => {
 				expect(_instance.prop).to.eq('this must not happen!');
 			},

@@ -42,11 +42,12 @@ describe('UmbContextProvider', () => {
 	it('handles context request events', (done) => {
 		const event = new UmbContextRequestEventImplementation(
 			'my-test-context',
+			'default',
 			(_instance: UmbTestContextProviderClass) => {
 				expect(_instance.prop).to.eq('value from provider');
 				done();
 				return true;
-			}
+			},
 		);
 
 		document.body.dispatchEvent(event);
@@ -63,7 +64,7 @@ describe('UmbContextProvider', () => {
 				expect(_instance?.prop).to.eq('value from provider');
 				done();
 				localConsumer.hostDisconnected();
-			}
+			},
 		);
 		localConsumer.hostConnected();
 	});
