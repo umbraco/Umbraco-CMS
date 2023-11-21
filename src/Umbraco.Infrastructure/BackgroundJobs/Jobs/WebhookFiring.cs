@@ -66,7 +66,7 @@ public class WebhookFiring : IRecurringBackgroundJob
             {
                 return Task.Run(async () =>
                 {
-                    Webhook? webhook = await _webHookService.GetAsync(request.WebhookKey);
+                    IWebhook? webhook = await _webHookService.GetAsync(request.WebhookKey);
                     if (webhook is null)
                     {
                         return;
@@ -88,7 +88,7 @@ public class WebhookFiring : IRecurringBackgroundJob
         }));
     }
 
-    private async Task<HttpResponseMessage?> SendRequestAsync(Webhook webhook, string eventName, string? serializedObject, int retryCount, CancellationToken cancellationToken)
+    private async Task<HttpResponseMessage?> SendRequestAsync(IWebhook webhook, string eventName, string? serializedObject, int retryCount, CancellationToken cancellationToken)
     {
         using var httpClient = new HttpClient();
 
