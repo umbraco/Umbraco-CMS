@@ -13,18 +13,18 @@ internal sealed class UserPermissionService : IUserPermissionService
         => _userService = userService;
 
     /// <inheritdoc/>
-    public async Task<UserAuthorizationStatus> AuthorizeAccessAsync(IUser performingUser, IEnumerable<Guid> userKeys)
+    public async Task<UserAuthorizationStatus> AuthorizeAccessAsync(IUser user, IEnumerable<Guid> userKeys)
     {
-        var currentIsAdmin = performingUser.IsAdmin();
+        var currentIsAdmin = user.IsAdmin();
 
         if (currentIsAdmin)
         {
             return UserAuthorizationStatus.Success;
         }
 
-        var users = await _userService.GetAsync(userKeys);
+        var usersToCheck = await _userService.GetAsync(userKeys);
 
-        return users.Any(user => user.IsAdmin())
+        return usersToCheck.Any(u => u.IsAdmin())
             ? UserAuthorizationStatus.UnauthorizedMissingAdminAccess
             : UserAuthorizationStatus.Success;
     }

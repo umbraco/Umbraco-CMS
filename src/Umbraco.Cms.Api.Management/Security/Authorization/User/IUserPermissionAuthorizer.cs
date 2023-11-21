@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Api.Management.Security.Authorization.User;
 public interface IUserPermissionAuthorizer
 {
     /// <summary>
-    ///     Authorizes whether the current user has access to perform actions on the specified user account.
+    ///     Authorizes whether the current user has access to the specified user account.
     /// </summary>
     /// <param name="currentUser">The current user's principal.</param>
     /// <param name="userKey">The key of the user to check for.</param>
@@ -17,7 +17,7 @@ public interface IUserPermissionAuthorizer
         => IsAuthorizedAsync(currentUser, new[] { userKey });
 
     /// <summary>
-    ///     Authorizes whether the current user has access to perform actions on the specified user account(s).
+    ///     Authorizes whether the current user has access to the specified user account(s).
     /// </summary>
     /// <param name="currentUser">The current user's principal.</param>
     /// <param name="userKeys">The keys of the users to check for.</param>

@@ -26,7 +26,7 @@ internal sealed class ContentPermissionAuthorizer : IContentPermissionAuthorizer
             return true;
         }
 
-        IUser user = _authorizationHelper.GetCurrentUser(currentUser);
+        IUser user = _authorizationHelper.GetUmbracoUser(currentUser);
 
         var result = await _contentPermissionService.AuthorizeAccessAsync(user, contentKeys, permissionsToCheck);
 
@@ -36,7 +36,7 @@ internal sealed class ContentPermissionAuthorizer : IContentPermissionAuthorizer
     /// <inheritdoc/>
     public async Task<bool> IsAuthorizedWithDescendantsAsync(IPrincipal currentUser, Guid parentKey, IReadOnlyList<char> permissionsToCheck)
     {
-        IUser user = _authorizationHelper.GetCurrentUser(currentUser);
+        IUser user = _authorizationHelper.GetUmbracoUser(currentUser);
 
         var result = await _contentPermissionService.AuthorizeDescendantsAccessAsync(user, parentKey, permissionsToCheck);
 
@@ -46,7 +46,7 @@ internal sealed class ContentPermissionAuthorizer : IContentPermissionAuthorizer
     /// <inheritdoc/>
     public async Task<bool> IsAuthorizedAtRootLevelAsync(IPrincipal currentUser, IReadOnlyList<char> permissionsToCheck)
     {
-        IUser user = _authorizationHelper.GetCurrentUser(currentUser);
+        IUser user = _authorizationHelper.GetUmbracoUser(currentUser);
 
         var result = await _contentPermissionService.AuthorizeRootAccessAsync(user, permissionsToCheck);
 
@@ -56,7 +56,7 @@ internal sealed class ContentPermissionAuthorizer : IContentPermissionAuthorizer
     /// <inheritdoc/>
     public async Task<bool> IsAuthorizedAtRecycleBinLevelAsync(IPrincipal currentUser, IReadOnlyList<char> permissionsToCheck)
     {
-        IUser user = _authorizationHelper.GetCurrentUser(currentUser);
+        IUser user = _authorizationHelper.GetUmbracoUser(currentUser);
 
         var result = await _contentPermissionService.AuthorizeBinAccessAsync(user, permissionsToCheck);
 
