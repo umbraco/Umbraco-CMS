@@ -1,8 +1,9 @@
-import { UmbUserRepository } from '../../repository/user.repository.js';
+import { UmbUserDetailRepository } from '../../repository/index.js';
 import { type UmbUserGroupInputElement } from '@umbraco-cms/backoffice/user-group';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, query } from '@umbraco-cms/backoffice/external/lit';
-import { UmbModalBaseElement ,
+import {
+	UmbModalBaseElement,
 	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
 	UMB_CREATE_USER_SUCCESS_MODAL,
 	UmbModalManagerContext,
@@ -10,7 +11,7 @@ import { UmbModalBaseElement ,
 
 @customElement('umb-user-create-modal')
 export class UmbUserCreateModalElement extends UmbModalBaseElement {
-	#userRepository = new UmbUserRepository(this);
+	#userDetailRepository = new UmbUserDetailRepository(this);
 	#modalManagerContext?: UmbModalManagerContext;
 
 	@query('#CreateUserForm')
@@ -42,7 +43,7 @@ export class UmbUserCreateModalElement extends UmbModalBaseElement {
 		const userGroups = userGroupPicker?.selectedIds;
 
 		// TODO: figure out when to use email or username
-		const { data } = await this.#userRepository.create({
+		const { data } = await this.#userDetailRepository.create({
 			name,
 			email,
 			userName: email,
