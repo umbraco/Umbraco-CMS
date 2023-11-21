@@ -7,7 +7,6 @@ import type {
 	WorkspaceEntityTypeConditionConfig,
 } from '@umbraco-cms/backoffice/workspace';
 import type { UmbConditionConfigBase } from '@umbraco-cms/backoffice/extension-api';
-import type { CollectionEntityTypeConditionConfig } from '@umbraco-cms/backoffice/collection';
 
 /* TODO: in theory should't the core package import from other packages.
 Are there any other way we can do this?
@@ -15,7 +14,6 @@ Niels: Sadly I don't see any other solutions currently. But are very open for id
 */
 export type ConditionTypes =
 	| CollectionAliasConditionConfig
-	| CollectionEntityTypeConditionConfig
 	| SectionAliasConditionConfig
 	| WorkspaceAliasConditionConfig
 	| WorkspaceEntityTypeConditionConfig
