@@ -6,10 +6,13 @@ import { until } from 'lit/directives/until.js';
 import { loadCustomView, renderCustomView } from '../utils/load-custom-view.function.js';
 import { umbLocalizationContext } from '../external/localization/localization-context.js';
 
+type UserViewState = 'loggingIn' | 'loggedIn' | 'loggedOut' | 'timedOut';
+
 type ExternalLoginCustomViewElement = HTMLElement & {
-  displayName: string;
-  providerName: string;
-  externalLoginUrl: string;
+  displayName?: string;
+  providerName?: string;
+  externalLoginUrl?: string;
+  userViewState?: UserViewState;
 };
 
 /**
@@ -51,6 +54,17 @@ export class UmbExternalLoginProviderElement extends LitElement {
   providerName = '';
 
   /**
+   * Gets or sets the view state of the user. This indicates in which state the user is in the login process,
+   * which can be used to determine where the external-login-provider is being shown.
+   *
+   * @attr user-view-state
+   * @example loggingIn
+   * @default loggingIn
+   */
+  @property({attribute: 'user-view-state'})
+  userViewState: UserViewState = 'loggingIn';
+
+  /**
    * Gets or sets the url to the external login provider.
    *
    * @attr external-login-url
@@ -67,7 +81,6 @@ export class UmbExternalLoginProviderElement extends LitElement {
   get externalLoginUrl() {
     return this.#externalLoginUrl;
   }
-
 
   /**
    * Gets or sets the icon to display next to the provider name.
@@ -103,6 +116,17 @@ export class UmbExternalLoginProviderElement extends LitElement {
   buttonColor: InterfaceColor = 'default';
 
   #externalLoginUrl = '';
+
+  constructor() {
+    super();
+
+    const searchParams = new URLSearchParams(window.location.search);
+    const isLogout = searchParams.get('logout') === 'true';
+
+    if (isLogout) {
+      this.userViewState = 'loggedOut';
+    }
+  }
 
   protected render() {
     return this.customView
@@ -146,6 +170,7 @@ export class UmbExternalLoginProviderElement extends LitElement {
         customView.displayName = this.displayName;
         customView.providerName = this.providerName;
         customView.externalLoginUrl = this.externalLoginUrl;
+        customView.userViewState = this.userViewState;
       }
 
       return renderCustomView(customView);
