@@ -52,7 +52,7 @@
             promises.push(loadEvents());
 
             if (!$routeParams.create) {
-                
+
                 promises.push(webhooksResource.getByKey($routeParams.id).then(webhook => {
 
                     vm.webhook = webhook;
@@ -60,7 +60,7 @@
 
                     const eventType = vm.webhook ? vm.webhook.events[0].eventType.toLowerCase() : null;
                     const contentTypes = webhook.contentTypeKeys.map(x => ({ key: x }));
-                    
+
                     getEntities(contentTypes, eventType);
 
                     makeBreadcrumbs();
@@ -154,10 +154,34 @@
           selection.forEach(entity => {
             resource.getById(entity.key)
               .then(data => {
+                console.log("data", data);
                 if (!vm.contentTypes.some(x => x.key === data.key)) {
                   vm.contentTypes.push(data);
                 }
-              });
+              }).catch(err => {
+                let name;
+                switch (eventType.toCamelCase()) {
+                  case "content":
+                    name = "Deleted content type";
+                    break;
+                  case "media":
+                    name = "Deleted media type";
+                    break;
+                  case "member":
+                    name = "Deleted member type";
+                    break;
+                  default:
+                    name = "Deleted type";
+                }
+
+                let data = {
+                  icon: "icon-alert",
+                  name: name,
+                  description: "An error occurred while loading the content type.",
+                  key: entity.key
+                }
+                vm.contentTypes.push(data);
+            });
           });
         }
 
