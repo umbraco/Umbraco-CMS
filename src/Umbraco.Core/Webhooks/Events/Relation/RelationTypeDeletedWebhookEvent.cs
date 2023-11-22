@@ -20,4 +20,7 @@ public class RelationTypeDeletedWebhookEvent : WebhookEventBase<RelationTypeDele
 
 
     public override string Alias => "relationTypeDeleted";
+
+    public override object? ConvertNotificationToRequestPayload(RelationTypeDeletedNotification notification)
+        => notification.DeletedEntities;
 }
