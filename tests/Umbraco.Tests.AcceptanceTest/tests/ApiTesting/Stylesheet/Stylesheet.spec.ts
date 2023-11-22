@@ -18,7 +18,7 @@ test.describe('Stylesheet tests', () => {
     stylesheetPath = await umbracoApi.stylesheet.create(stylesheetName, 'content');
 
     // Assert
-    await expect(await umbracoApi.stylesheet.doesExists(stylesheetPath)).toBeTruthy();
+    await expect(await umbracoApi.stylesheet.doesExist(stylesheetPath)).toBeTruthy();
   });
 
   test('can update a stylesheet', async ({umbracoApi}) => {
@@ -40,13 +40,13 @@ test.describe('Stylesheet tests', () => {
   test('can delete a stylesheet', async ({umbracoApi}) => {
     // Arrange
     stylesheetPath = await umbracoApi.stylesheet.create(stylesheetName, 'content');
-    await expect(await umbracoApi.stylesheet.doesExists(stylesheetPath)).toBeTruthy();
+    await expect(await umbracoApi.stylesheet.doesExist(stylesheetPath)).toBeTruthy();
 
     // Act
     await umbracoApi.stylesheet.delete(stylesheetPath);
 
     // Assert
-    await expect(await umbracoApi.stylesheet.doesExists(stylesheetPath)).toBeFalsy();
+    await expect(await umbracoApi.stylesheet.doesExist(stylesheetPath)).toBeFalsy();
   });
 
   test('can create a stylesheet in a folder', async ({umbracoApi}) => {

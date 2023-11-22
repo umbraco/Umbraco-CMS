@@ -20,13 +20,13 @@ test.describe('Stylesheets tests', () => {
     await umbracoApi.stylesheet.ensureNameNotExists(styleSheetFileName);
 
     //Act
-    await umbracoUi.stylesheet.clickOnThreeDotsBesideText("Stylesheets");
-    await umbracoUi.stylesheet.clickOnNewStylesheetFileButton();
+    await umbracoUi.stylesheet.openActionsMenuForName("Stylesheets");
+    await umbracoUi.stylesheet.clickNewStylesheetFileButton();
     await umbracoUi.stylesheet.enterStylesheetName(styleSheetName);
-    await umbracoUi.stylesheet.clickOnSaveButton();
+    await umbracoUi.stylesheet.clickSaveButton();
 
     // Assert
-    expect(await umbracoApi.stylesheet.doesExists(styleSheetFileName)).toBeTruthy;
+    expect(await umbracoApi.stylesheet.doesExist(styleSheetFileName)).toBeTruthy;
     // TODO: when frontend is ready, verify the new stylesheet is displayed under the Stylesheets section 
     // TODO: when frontend is ready, verify the notification displays
     
@@ -39,15 +39,15 @@ test.describe('Stylesheets tests', () => {
     await umbracoApi.stylesheet.ensureNameNotExists(styleSheetFileName);
 
     //Act
-    await umbracoUi.stylesheet.clickOnThreeDotsBesideText("Stylesheets");
-    await umbracoUi.stylesheet.clickOnNewRTEStylesheetFileButton();
+    await umbracoUi.stylesheet.openActionsMenuForName("Stylesheets");
+    await umbracoUi.stylesheet.clickNewRTEStylesheetFileButton();
     await umbracoUi.stylesheet.enterStylesheetName(styleSheetName);
-    await umbracoUi.stylesheet.addANewRule(ruleName, 'h1', 'color:red');
-    await umbracoUi.stylesheet.clickOnSaveButton();
+    await umbracoUi.stylesheet.addNewRule(ruleName, 'h1', 'color:red');
+    await umbracoUi.stylesheet.clickSaveButton();
 
     // Assert
-    expect(await umbracoApi.stylesheet.doesExists(styleSheetFileName)).toBeTruthy;
-    expect(await umbracoApi.stylesheet.doesRuleNameExists(styleSheetFileName, ruleName)).toBeTruthy;
+    expect(await umbracoApi.stylesheet.doesExist(styleSheetFileName)).toBeTruthy;
+    expect(await umbracoApi.stylesheet.doesRuleNameExist(styleSheetFileName, ruleName)).toBeTruthy;
     // TODO: when frontend is ready, verify the new stylesheet is displayed under the Stylesheets section
     // TODO: when frontend is ready, verify the notification displays
     
@@ -61,12 +61,12 @@ test.describe('Stylesheets tests', () => {
     await umbracoApi.stylesheet.create(styleSheetFileName, '', '/');
 
     //Act
-    await umbracoUi.stylesheet.openAStylesheetFile(styleSheetFileName);
-    await umbracoUi.stylesheet.addANewRule(ruleName, 'h1', 'color:red');
-    await umbracoUi.stylesheet.clickOnSaveButton();
+    await umbracoUi.stylesheet.openStylesheetFileByNameAtRoot(styleSheetFileName);
+    await umbracoUi.stylesheet.addNewRule(ruleName, 'h1', 'color:red');
+    await umbracoUi.stylesheet.clickSaveButton();
 
     // Assert
-    expect(await umbracoApi.stylesheet.doesRuleNameExists(styleSheetFileName, ruleName)).toBeTruthy;
+    expect(await umbracoApi.stylesheet.doesRuleNameExist(styleSheetFileName, ruleName)).toBeTruthy;
     // TODO: when frontend is ready, verify the notification displays
       
     // Clean
@@ -79,12 +79,12 @@ test.describe('Stylesheets tests', () => {
     await umbracoApi.stylesheet.create(styleSheetFileName, '', '/');
 
     //Act
-    await umbracoUi.stylesheet.clickOnCaretButton();
-    await umbracoUi.stylesheet.clickOnThreeDotsBesideText(styleSheetFileName);
+    await umbracoUi.stylesheet.clickRootFolderCaretButton();
+    await umbracoUi.stylesheet.openActionsMenuForName(styleSheetFileName);
     await umbracoUi.stylesheet.deleteStylesheetFile();
 
     // Assert
-    expect(await umbracoApi.stylesheet.doesNameExists(styleSheetFileName)).toBeFalsy();
+    expect(await umbracoApi.stylesheet.doesNameExist(styleSheetFileName)).toBeFalsy();
     // TODO: when frontend is ready, verify the new stylesheet is NOT displayed under the Stylesheets section
     // TODO: when frontend is ready, verify the notification displays
   });
@@ -94,11 +94,11 @@ test.describe('Stylesheets tests', () => {
     await umbracoApi.stylesheet.ensureNameNotExists(styleFolderName);  
 
     // Act
-    await umbracoUi.stylesheet.clickOnThreeDotsBesideText("Stylesheets");
+    await umbracoUi.stylesheet.openActionsMenuForName("Stylesheets");
     await umbracoUi.stylesheet.createNewFolder(styleFolderName);
 
     // Assert
-    expect(await umbracoApi.stylesheet.doesFolderExists(styleFolderName)).toBeTruthy();
+    expect(await umbracoApi.stylesheet.doesFolderExist(styleFolderName)).toBeTruthy();
     // TODO: when frontend is ready, verify the new folder is displayed under the Stylesheets section
     // TODO: when frontend is ready, verify the notification displays
 
@@ -112,12 +112,12 @@ test.describe('Stylesheets tests', () => {
     await umbracoApi.stylesheet.createFolder(styleFolderName, '');
 
     // Act
-    await umbracoUi.stylesheet.clickOnCaretButton();
-    await umbracoUi.stylesheet.clickOnThreeDotsBesideText(styleFolderName);
+    await umbracoUi.stylesheet.clickRootFolderCaretButton();
+    await umbracoUi.stylesheet.openActionsMenuForName(styleFolderName);
     await umbracoUi.stylesheet.removeFolder();
 
     // Assert
-    expect(await umbracoApi.stylesheet.doesFolderExists(styleFolderName)).toBeFalsy();
+    expect(await umbracoApi.stylesheet.doesFolderExist(styleFolderName)).toBeFalsy();
     // TODO: when frontend is ready, verify the removed folder is NOT displayed under the Stylesheets section
     // TODO: when frontend is ready, verify the notification displays
   });
@@ -130,12 +130,12 @@ test.describe('Stylesheets tests', () => {
     const childsFolderName = "ChildFolderName";
 
     // Act
-    await umbracoUi.stylesheet.clickOnCaretButton();
-    await umbracoUi.stylesheet.clickOnThreeDotsBesideText(styleFolderName);
+    await umbracoUi.stylesheet.clickRootFolderCaretButton();
+    await umbracoUi.stylesheet.openActionsMenuForName(styleFolderName);
     await umbracoUi.stylesheet.createNewFolder(childsFolderName);
 
     //Assert 
-    expect(await umbracoApi.stylesheet.doesNameExists(childsFolderName)).toBeTruthy();
+    expect(await umbracoApi.stylesheet.doesNameExist(childsFolderName)).toBeTruthy();
     const styleChildren = await umbracoApi.stylesheet.getChildren(styleFolderName);
     expect(styleChildren[0].path).toBe(styleFolderName + '/' + childsFolderName);
     // TODO: when frontend is ready, verify the new folder is displayed under the Stylesheets section
@@ -155,13 +155,13 @@ test.describe('Stylesheets tests', () => {
     await umbracoApi.stylesheet.createFolder(childFolderName, styleFolderName);
 
     // Act
-    await umbracoUi.stylesheet.clickOnCaretButton();
-    await umbracoUi.stylesheet.clickOnCaretButtonBeforeText(styleFolderName);
-    await umbracoUi.stylesheet.clickOnThreeDotsBesideText(childFolderName);
+    await umbracoUi.stylesheet.clickRootFolderCaretButton();
+    await umbracoUi.stylesheet.clickCaretButtonForName(styleFolderName);
+    await umbracoUi.stylesheet.openActionsMenuForName(childFolderName);
     await umbracoUi.stylesheet.createNewFolder(childOfChildFolderName);
 
     //Assert 
-    expect(await umbracoApi.stylesheet.doesNameExists(childOfChildFolderName)).toBeTruthy();
+    expect(await umbracoApi.stylesheet.doesNameExist(childOfChildFolderName)).toBeTruthy();
     const styleChildren = await umbracoApi.stylesheet.getChildren(styleFolderName + '/' + childFolderName);
     expect(styleChildren[0].path).toBe(styleFolderName + '/' + childFolderName + '/' + childOfChildFolderName);
     // TODO: when frontend is ready, verify the new folder is displayed under the Stylesheets section
