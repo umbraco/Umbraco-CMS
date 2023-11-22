@@ -22,29 +22,32 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 	}
 
 	#contextAlias: string;
+	#apiAlias: string;
 
 	#discriminator?: UmbContextDiscriminator<BaseType, ResultType>;
 
 	/**
 	 * Creates an instance of UmbContextConsumer.
 	 * @param {EventTarget} hostElement
-	 * @param {string} contextAlias
+	 * @param {string} contextIdentifier
 	 * @param {UmbContextCallback} callback
 	 * @memberof UmbContextConsumer
 	 */
 	constructor(
 		protected hostElement: EventTarget,
-		contextAlias: string | UmbContextToken<BaseType, ResultType>,
+		contextIdentifier: string | UmbContextToken<BaseType, ResultType>,
 		callback?: UmbContextCallback<ResultType>,
 	) {
-		this.#contextAlias = contextAlias.toString();
+		const idSplit = contextIdentifier.toString().split('#');
+		this.#contextAlias = idSplit[0];
+		this.#apiAlias = idSplit[1] ?? 'default';
 		this.#callback = callback;
-		this.#discriminator = (contextAlias as UmbContextToken<BaseType, ResultType>).getDiscriminator?.();
+		this.#discriminator = (contextIdentifier as UmbContextToken<BaseType, ResultType>).getDiscriminator?.();
 	}
 
 	protected _onResponse = (instance: BaseType): boolean => {
 		if (this.#instance === instance) {
-			return false;
+			return true;
 		}
 		if (this.#discriminator) {
 			// Notice if discriminator returns false, we do not want to setInstance.
@@ -68,6 +71,11 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 		}
 	}
 
+	/**
+	 * @public
+	 * @memberof UmbContextConsumer
+	 * @description Get the context as a promise.
+	 */
 	public asPromise() {
 		return (
 			this.#promise ??
@@ -78,10 +86,12 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 	}
 
 	/**
+	 * @public
 	 * @memberof UmbContextConsumer
+	 * @description Request the context from the host element.
 	 */
 	public request() {
-		const event = new UmbContextRequestEventImplementation(this.#contextAlias, this._onResponse);
+		const event = new UmbContextRequestEventImplementation(this.#contextAlias, this.#apiAlias, this._onResponse);
 		this.hostElement.dispatchEvent(event);
 	}
 
@@ -126,7 +136,6 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 	}
 	*/
 
-	// TODO: Test destroy scenarios:
 	public destroy() {
 		this.hostDisconnected();
 		this.#callback = undefined;

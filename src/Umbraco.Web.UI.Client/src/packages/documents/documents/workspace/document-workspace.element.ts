@@ -17,9 +17,6 @@ export class UmbDocumentWorkspaceElement extends UmbLitElement {
 	_routes: UmbRoute[] = [];
 
 	public set manifest(manifest: ManifestWorkspace) {
-		console.log('got manifest', manifest.alias);
-		// TODO: Make context declaration.
-
 		createExtensionApi(manifest, [this]).then((context) => {
 			if (context) {
 				this.#gotWorkspaceContext(context);

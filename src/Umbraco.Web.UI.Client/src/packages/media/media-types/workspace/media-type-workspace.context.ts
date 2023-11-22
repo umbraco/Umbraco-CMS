@@ -1,6 +1,9 @@
 import { UmbMediaTypeRepository } from '../repository/media-type.repository.js';
-import { UmbSaveableWorkspaceContextInterface, UmbEditableWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import {
+	type UmbSaveableWorkspaceContextInterface,
+	UmbEditableWorkspaceContextBase,
+} from '@umbraco-cms/backoffice/workspace';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { MediaTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
@@ -11,14 +14,14 @@ export class UmbMediaTypeWorkspaceContext
 	implements UmbSaveableWorkspaceContextInterface<EntityType | undefined>
 {
 	#data = new UmbObjectState<EntityType | undefined>(undefined);
-	data = this.#data.asObservable();
+	readonly data = this.#data.asObservable();
 	#getDataPromise?: Promise<any>;
 
-	name = this.#data.asObservablePart((data) => data?.name);
-	id = this.#data.asObservablePart((data) => data?.id);
-	alias = this.#data.asObservablePart((data) => data?.alias);
-	description = this.#data.asObservablePart((data) => data?.description);
-	icon = this.#data.asObservablePart((data) => data?.icon);
+	readonly name = this.#data.asObservablePart((data) => data?.name);
+	readonly id = this.#data.asObservablePart((data) => data?.id);
+	readonly alias = this.#data.asObservablePart((data) => data?.alias);
+	readonly description = this.#data.asObservablePart((data) => data?.description);
+	readonly icon = this.#data.asObservablePart((data) => data?.icon);
 
 	constructor(host: UmbControllerHostElement) {
 		super(host, 'Umb.Workspace.MediaType', new UmbMediaTypeRepository(host));
@@ -83,5 +86,6 @@ export const UMB_MEDIA_TYPE_WORKSPACE_CONTEXT = new UmbContextToken<
 	UmbMediaTypeWorkspaceContext
 >(
 	'UmbWorkspaceContext',
+	undefined,
 	(context): context is UmbMediaTypeWorkspaceContext => context.getEntityType?.() === 'media-type',
 );

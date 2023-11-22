@@ -1,9 +1,3 @@
-// TODO: we can try and make pretty urls if we want to
-export const urlFriendlyPathFromServerFilePath = (path: string) => encodeURIComponent(path).replace('.', '-');
-
-// TODO: we can try and make pretty urls if we want to
-export const serverFilePathFromUrlFriendlyPath = (unique: string) => decodeURIComponent(unique.replace('-', '.'));
-
 //Below are a copy of
 export const getInsertDictionarySnippet = (nodeName: string) => {
 	return `@Umbraco.GetDictionaryValue("${nodeName}")`;
@@ -31,10 +25,10 @@ export const getRenderBodySnippet = () => '@RenderBody()';
 export const getRenderSectionSnippet = (sectionName: string, isMandatory: boolean) =>
 	`@RenderSection("${sectionName}", ${isMandatory})`;
 
-export const getAddSectionSnippet = (sectionName: string) => `@section ${sectionName} 
+export const getAddSectionSnippet = (sectionName: string) => `@section ${sectionName}
 {
 
-	
+
 
 }`;
 
