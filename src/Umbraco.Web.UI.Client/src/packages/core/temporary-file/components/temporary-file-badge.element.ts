@@ -2,28 +2,17 @@ import { css, customElement, html, property } from '@umbraco-cms/backoffice/exte
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { clamp } from '@umbraco-cms/backoffice/external/uui';
 
-/**
- * @element umb-file-feedback-loader
- * @description A element which renders the progress when uploading a file.
- * @slot default - slot for inserting additional things into this slot.
- * @export
- * @class UmbExtensionSlot
- * @extends {UmbLitElement}
- */
-
-//TODO: Give a better name... umb-file-progress?
-
-@customElement('umb-file-feedback-loader')
-export class UmbFileFeedbackLoaderElement extends UmbLitElement {
+@customElement('umb-temporary-file-badge')
+export class UmbTemporaryFileBadgeElement extends UmbLitElement {
 	private _progress = 0;
+
 	@property({ type: Number })
 	public set progress(v: number) {
 		const oldVal = this._progress;
+
 		const p = clamp(v, 0, 100);
 		this._progress = p;
-		if (p === 100) {
-			this.dispatchEvent(new CustomEvent('complete', { bubbles: true }));
-		}
+
 		this.requestUpdate('progress', oldVal);
 	}
 	public get progress(): number {
@@ -77,6 +66,6 @@ export class UmbFileFeedbackLoaderElement extends UmbLitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-file-feedback-loader': UmbFileFeedbackLoaderElement;
+		'umb-temporary-file-badge': UmbTemporaryFileBadgeElement;
 	}
 }
