@@ -9,6 +9,7 @@ import {
 	UmbEditableWorkspaceContextBase,
 	UmbWorkspaceSplitViewManager,
 	UmbVariantableWorkspaceContextInterface,
+	UmbPublishableWorkspaceContextInterface,
 } from '@umbraco-cms/backoffice/workspace';
 import type { CreateDocumentRequestModel, DocumentResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import {
@@ -23,7 +24,7 @@ import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 type EntityType = DocumentResponseModel;
 export class UmbDocumentWorkspaceContext
 	extends UmbEditableWorkspaceContextBase<UmbDocumentRepository, EntityType>
-	implements UmbVariantableWorkspaceContextInterface<EntityType | undefined>
+	implements UmbVariantableWorkspaceContextInterface<EntityType | undefined>, UmbPublishableWorkspaceContextInterface<EntityType | undefined>
 {
 	/**
 	 * The document is the current stored version of the document.
@@ -201,16 +202,40 @@ export class UmbDocumentWorkspaceContext
 		this.saveComplete(this.getData());
 	}
 
-	async delete(id: string) {
-		await this.repository.delete(id);
+	async delete() {
+		const id = this.getEntityId();
+		if(id) {
+			await this.repository.delete(id);
+		}
+	}
+
+
+	public async publish() {
+		// TODO: This might be right to publish all, but we need a method that just publishes a declared range of variants.
+		const currentData = this.#currentData.value;
+		if(currentData) {
+			const variantIds = currentData.variants?.map((x) => UmbVariantId.Create(x));
+			const id = this.getEntityId();
+			if(variantIds && id) {
+				await this.repository.saveAndPublish(id, variantIds);
+			}
+		}
+	}
+
+	public async unpublish() {
+		// TODO: This might be right to unpublish all, but we need a method that just publishes a declared range of variants.
+		const currentData = this.#currentData.value;
+		if(currentData) {
+			const variantIds = currentData.variants?.map((x) => UmbVariantId.Create(x));
+			const id = this.getEntityId();
+			if(variantIds && id) {
+				await this.repository.unpublish(id, variantIds);
+			}
+		}
 	}
 
 	/*
 	concept notes:
-
-	public saveAndPublish() {
-
-	}
 
 	public saveAndPreview() {
 

@@ -8,7 +8,8 @@ export class UmbUnpublishDocumentEntityAction extends UmbEntityActionBase<UmbDoc
 	}
 
 	async execute() {
-		console.log(`execute for: ${this.unique}`);
-		await this.repository?.unpublish();
+		console.log(`unpublish: ${this.unique}`);
+		// TODO: implement dialog or something to handle variants.
+		//await this.repository?.unpublish();
 	}
 }

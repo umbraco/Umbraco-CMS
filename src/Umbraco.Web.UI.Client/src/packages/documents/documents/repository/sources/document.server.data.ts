@@ -6,9 +6,12 @@ import {
 	ContentStateModel,
 	CreateDocumentRequestModel,
 	UpdateDocumentRequestModel,
+	PublishDocumentRequestModel,
+	UnpublishDocumentRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 /**
  * A data source for the Document that fetches data from the server
@@ -112,6 +115,43 @@ export class UmbDocumentServerDataSource
 		};
 
 		return tryExecuteAndNotify(this.#host, DocumentResource.putDocumentById({ id, requestBody }));
+	}
+
+
+	/**
+	 * Publish one or more variants of a Document
+	 * @param {string} id
+	 * @param {Array<UmbVariantId>} variantIds
+	 * @return {*}
+	 * @memberof UmbDocumentServerDataSource
+	 */
+	async saveAndPublish(id: string, variantIds: Array<UmbVariantId>) {
+		if (!id) throw new Error('Id is missing');
+
+		// TODO: THIS DOES NOT TAKE SEGMENTS INTO ACCOUNT!!!!!!
+		const requestBody: PublishDocumentRequestModel = {
+			cultures: variantIds.map((variant) => variant.toCultureString()),
+		};
+
+		return tryExecuteAndNotify(this.#host, DocumentResource.putDocumentByIdPublish({ id, requestBody }));
+	}
+
+	/**
+	 * Unpublish one or more variants of a Document
+	 * @param {string} id
+	 * @param {Array<UmbVariantId>} variantIds
+	 * @return {*}
+	 * @memberof UmbDocumentServerDataSource
+	 */
+	async unpublish(id: string, variantIds: Array<UmbVariantId>) {
+		if (!id) throw new Error('Id is missing');
+
+		// TODO: THIS DOES NOT TAKE SEGMENTS INTO ACCOUNT!!!!!!
+		const requestBody: UnpublishDocumentRequestModel = {
+			culture: variantIds.map((variant) => variant.toCultureString())[0],
+		};
+
+		return tryExecuteAndNotify(this.#host, DocumentResource.putDocumentByIdUnpublish({ id, requestBody }));
 	}
 
 	/**
