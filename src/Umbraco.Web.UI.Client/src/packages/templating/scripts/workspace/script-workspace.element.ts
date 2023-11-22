@@ -7,20 +7,20 @@ import { UmbWorkspaceIsNewRedirectController } from '@umbraco-cms/backoffice/wor
 
 @customElement('umb-script-workspace')
 export class UmbScriptWorkspaceElement extends UmbLitElement {
-	#scriptWorkspaceContext = new UmbScriptWorkspaceContext(this);
+	#workspaceContext = new UmbScriptWorkspaceContext(this);
 	@state()
 	_routes: UmbRoute[] = [
 		{
 			path: 'create/:parentKey',
 			component: import('./script-workspace-edit.element.js'),
-			setup: async (component: PageComponent, info: IRoutingInfo) => {
+			setup: async (_component: PageComponent, info: IRoutingInfo) => {
 				const parentKey = info.match.params.parentKey;
 				const decodePath = decodeURIComponent(parentKey);
-				this.#scriptWorkspaceContext.create(decodePath === 'null' ? '' : decodePath);
+				this.#workspaceContext.create(decodePath === 'null' ? '' : decodePath);
 
 				new UmbWorkspaceIsNewRedirectController(
 					this,
-					this.#scriptWorkspaceContext,
+					this.#workspaceContext,
 					this.shadowRoot!.querySelector('umb-router-slot')!,
 				);
 			},
@@ -31,7 +31,7 @@ export class UmbScriptWorkspaceElement extends UmbLitElement {
 			setup: (component: PageComponent, info: IRoutingInfo) => {
 				const key = info.match.params.key;
 				const decodePath = decodeURIComponent(key).replace('-js', '.js');
-				this.#scriptWorkspaceContext.load(decodePath);
+				this.#workspaceContext.load(decodePath);
 			},
 		},
 	];

@@ -13,9 +13,6 @@ export class UmbCollectionViewBundleElement extends UmbLitElement {
 	_currentView?: ManifestCollectionView;
 
 	@state()
-	private _isOpen = false;
-
-	@state()
 	private _collectionRootPathname = '';
 
 	#collectionContext?: UmbCollectionContext<any, any>;
@@ -33,56 +30,65 @@ export class UmbCollectionViewBundleElement extends UmbLitElement {
 	}
 
 	#observeCurrentView() {
-		this.observe(this.#collectionContext!.currentView, (view) => {
-			this._currentView = view;
-		}, 'umbCurrentCollectionViewObserver');
+		this.observe(
+			this.#collectionContext!.currentView,
+			(view) => {
+				//TODO: This is not called when the view is changed
+				this._currentView = view;
+			},
+			'umbCurrentCollectionViewObserver',
+		);
 	}
 
 	#observeViews() {
-		this.observe(this.#collectionContext!.views, (views) => {
-			this._views = views;
-		}, 'umbCollectionViewsObserver');
+		this.observe(
+			this.#collectionContext!.views,
+			(views) => {
+				this._views = views;
+			},
+			'umbCollectionViewsObserver',
+		);
 	}
-
-	#toggleDropdown() {
-		this._isOpen = !this._isOpen;
-	}
-
-	#closeDropdown() {
-		this._isOpen = false;
-	}
-
 	render() {
-		return html`${this.#renderLayoutButton()}`;
-	}
-
-	#renderLayoutButton() {
 		if (!this._currentView) return nothing;
 
-		return html` <umb-dropdown .open="${this._isOpen}" @close=${this.#closeDropdown}>
-			<uui-button slot="trigger" label="status" @click=${this.#toggleDropdown}
-				>${this.#renderItemDisplay(this._currentView)}</uui-button
-			>
-			<div slot="dropdown" class="filter-dropdown">${this._views.map((view) => this.#renderItem(view))}</div>
-		</umb-dropdown>`;
+		return html`
+			<uui-button compact popovertarget="collection-view-bundle-popover" label="status">
+				${this.#renderItemDisplay(this._currentView)}
+			</uui-button>
+			<uui-popover-container id="collection-view-bundle-popover" popover placement="bottom">
+				<umb-popover-layout>
+					<div class="filter-dropdown">${this._views.map((view) => this.#renderItem(view))}</div>
+				</umb-popover-layout>
+			</uui-popover-container>
+		`;
 	}
 
 	#renderItem(view: ManifestCollectionView) {
-		return html`<a href="${this._collectionRootPathname}/${view.meta.pathName}">${this.#renderItemDisplay(view)}</a>`;
+		return html`
+			<uui-button compact href="${this._collectionRootPathname}/${view.meta.pathName}">
+				${this.#renderItemDisplay(view)} <span class="label">${view.meta.label}</span>
+			</uui-button>
+		`;
 	}
 
 	#renderItemDisplay(view: ManifestCollectionView) {
-		return html`<span class="item"><uui-icon name=${view.meta.icon}></uui-icon> ${view.meta.label}</span>`;
+		return html`<uui-icon name=${view.meta.icon}></uui-icon>`;
 	}
 
 	static styles = [
 		UmbTextStyles,
 		css`
-			.item {
+			:host {
+				--uui-button-content-align: left;
 			}
-
-			a {
-				display: block;
+			.label {
+				margin-left: var(--uui-size-space-1);
+			}
+			.filter-dropdown {
+				display: flex;
+				gap: var(--uui-size-space-3);
+				flex-direction: column;
 			}
 		`,
 	];
