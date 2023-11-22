@@ -11,7 +11,7 @@ using Umbraco.Cms.Core.Sync;
 namespace Umbraco.Cms.Core.Webhooks.Events.Content;
 
 [WebhookEvent("Content Sorted", Constants.WebhookEvents.Types.Content)]
-public class ContentSortedWebhookEvent : WebhookEventContentBase<ContentSortedNotification, IContent>
+public class ContentSortedWebhookEvent : WebhookEventBase<ContentSortedNotification>
 {
     private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
     private readonly IApiContentBuilder _apiContentBuilder;
@@ -35,16 +35,19 @@ public class ContentSortedWebhookEvent : WebhookEventContentBase<ContentSortedNo
 
     public override string Alias => Constants.WebhookEvents.Aliases.ContentSorted;
 
-    protected override IEnumerable<IContent> GetEntitiesFromNotification(ContentSortedNotification notification) => notification.SortedEntities;
-
-    protected override object? ConvertEntityToRequestPayload(IContent entity)
+    public override object? ConvertNotificationToRequestPayload(ContentSortedNotification notification)
     {
         if (_publishedSnapshotAccessor.TryGetPublishedSnapshot(out IPublishedSnapshot? publishedSnapshot) is false || publishedSnapshot!.Content is null)
         {
             return null;
         }
-
-        IPublishedContent? publishedContent = publishedSnapshot.Content.GetById(entity.Key);
-        return publishedContent is null ? null : _apiContentBuilder.Build(publishedContent);
+        var sortedEntities = new List<object?>();
+        foreach (var entity in notification.SortedEntities)
+        {
+            IPublishedContent? publishedContent = publishedSnapshot.Content.GetById(entity.Key);
+            object? payload = publishedContent is null ? null : _apiContentBuilder.Build(publishedContent);
+            sortedEntities.Add(payload);
+        }
+        return sortedEntities;
     }
 }

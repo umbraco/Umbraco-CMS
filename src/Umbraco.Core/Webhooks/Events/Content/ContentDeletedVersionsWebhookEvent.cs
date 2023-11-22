@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
@@ -24,4 +23,15 @@ public class ContentDeletedVersionsWebhookEvent : WebhookEventBase<ContentDelete
     }
 
     public override string Alias => Constants.WebhookEvents.Aliases.ContentDeletedVersions;
+
+    public override object? ConvertNotificationToRequestPayload(ContentDeletedVersionsNotification notification)
+    {
+        return new
+        {
+            notification.Id,
+            notification.DeletePriorVersions,
+            notification.SpecificVersion,
+            notification.DateToRetain
+        };
+    }
 }

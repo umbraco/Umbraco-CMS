@@ -45,7 +45,7 @@ public class ContentRolledBackWebhookEvent : WebhookEventContentBase<ContentRoll
             return null;
         }
 
-        // Get preview/saved version of content as a rollback
+        // Get preview/saved version of content for a rollback
         IPublishedContent? publishedContent = publishedSnapshot.Content.GetById(true, entity.Key);
         return publishedContent is null ? null : _apiContentBuilder.Build(publishedContent);
     }

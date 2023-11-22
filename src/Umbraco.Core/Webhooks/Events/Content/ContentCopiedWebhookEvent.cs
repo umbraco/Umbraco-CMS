@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
@@ -24,4 +23,15 @@ public class ContentCopiedWebhookEvent : WebhookEventBase<ContentCopiedNotificat
     }
 
     public override string Alias => Constants.WebhookEvents.Aliases.ContentCopied;
+
+    public override object? ConvertNotificationToRequestPayload(ContentCopiedNotification notification)
+    {
+        return new
+        {
+            notification.Copy,
+            notification.Original,
+            notification.ParentId,
+            notification.RelateToOriginal
+        };
+    }
 }
