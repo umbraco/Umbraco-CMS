@@ -19,4 +19,7 @@ public class StylesheetSavedWebhookEvent : WebhookEventBase<StylesheetSavedNotif
     }
 
     public override string Alias => "stylesheetSaved";
+
+    public override object? ConvertNotificationToRequestPayload(StylesheetSavedNotification notification)
+        => notification.SavedEntities;
 }
