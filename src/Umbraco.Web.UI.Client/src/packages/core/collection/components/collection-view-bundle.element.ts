@@ -51,6 +51,7 @@ export class UmbCollectionViewBundleElement extends UmbLitElement {
 	}
 	render() {
 		if (!this._currentView) return nothing;
+		if (this._views.length <= 1) return nothing;
 
 		return html`
 			<uui-button compact popovertarget="collection-view-bundle-popover" label="status">
