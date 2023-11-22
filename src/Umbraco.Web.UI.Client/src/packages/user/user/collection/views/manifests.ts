@@ -8,7 +8,7 @@ const tableCollectionView: ManifestCollectionView = {
 	js: () => import('./table/user-table-collection-view.element.js'),
 	meta: {
 		label: 'Table',
-		icon: 'icon-box',
+		icon: 'icon-list',
 		pathName: 'table',
 	},
 	conditions: [
