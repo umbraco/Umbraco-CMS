@@ -8,7 +8,8 @@
     "or": "Or",
     "validate": "Validate",
     "back": "Back",
-    "required": "Required"
+    "required": "Required",
+    "continue": "Continue"
   },
   "login": {
     "greeting0": "Welcome",
@@ -18,7 +19,7 @@
     "greeting4": "Welcome",
     "greeting5": "Welcome",
     "greeting6": "Welcome",
-    "forgottenPassword": "Forgot password?",
+    "forgottenPassword": "Forgotten password?",
     "signInWith": "Sign in with",
     "forgottenPasswordInstruction": "Enter your email address and we'll send you a link to reset your password.",
     "returnToLogin": "Return to login",
@@ -31,11 +32,8 @@
   "user": {
     "username": "Username",
     "email": "Email",
-    "password": "Password"
-  },
-  "placeholders": {
-    "username": "Enter your username",
-    "email": "Enter your email",
-    "password": "Enter your password"
+    "password": "Password",
+    "newPassword": "New password",
+    "confirmNewPassword": "Confirm password"
   }
 }
