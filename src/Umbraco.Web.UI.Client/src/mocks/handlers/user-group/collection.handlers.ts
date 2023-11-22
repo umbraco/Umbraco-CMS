@@ -1,5 +1,5 @@
 const { rest } = window.MockServiceWorker;
-import { umbUserGroupData } from '../../data/user-group.data.js';
+import { umbUserGroupData } from '../../data/user-group/user-group.data.js';
 import { UMB_SLUG } from './slug.js';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 

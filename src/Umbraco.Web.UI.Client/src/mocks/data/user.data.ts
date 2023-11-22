@@ -1,5 +1,5 @@
 import { UmbEntityData } from './entity.data.js';
-import { umbUserGroupData } from './user-group.data.js';
+import { umbUserGroupData } from './user-group/user-group.data.js';
 import { arrayFilter, stringFilter, queryFilter } from './utils.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbCurrentUser } from '@umbraco-cms/backoffice/current-user';

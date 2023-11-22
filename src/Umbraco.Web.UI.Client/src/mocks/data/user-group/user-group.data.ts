@@ -1,4 +1,4 @@
-import { UmbEntityData } from './entity.data.js';
+import { UmbEntityData } from '../entity.data.js';
 import {
 	UMB_USER_PERMISSION_DOCUMENT_CREATE,
 	UMB_USER_PERMISSION_DOCUMENT_DELETE,
