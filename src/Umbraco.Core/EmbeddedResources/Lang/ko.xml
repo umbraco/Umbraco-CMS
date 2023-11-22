@@ -328,7 +328,7 @@
     <key alias="username">사용자</key>
     <key alias="value">값</key>
     <key alias="view">보기</key>
-    <key alias="welcome">환영합니다</key>
+    <key alias="welcome">환영합니다...</key>
     <key alias="width">너비</key>
     <key alias="yes">예</key>
     <key alias="reorder">Reorder</key>

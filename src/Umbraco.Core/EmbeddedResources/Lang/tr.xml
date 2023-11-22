@@ -739,7 +739,7 @@
     <key alias="username">Kullanıcı adı</key>
     <key alias="value">Değer</key>
     <key alias="view">Görüntüle</key>
-    <key alias="welcome">Hoş geldiniz </key>
+    <key alias="welcome">Hoş geldiniz ...</key>
     <key alias="width">Genişlik</key>
     <key alias="yes">Evet</key>
     <key alias="folder">Klasör</key>

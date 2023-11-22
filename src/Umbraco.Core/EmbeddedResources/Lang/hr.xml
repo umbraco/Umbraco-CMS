@@ -846,7 +846,7 @@
     <key alias="username">Korisničko ime</key>
     <key alias="value">Vrijednost</key>
     <key alias="view">Pogled</key>
-    <key alias="welcome">Dobrodošli</key>
+    <key alias="welcome">Dobrodošli...</key>
     <key alias="width">Širina</key>
     <key alias="yes">Da</key>
     <key alias="folder">Mapa</key>

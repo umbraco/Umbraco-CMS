@@ -382,7 +382,7 @@
     <key alias="username">Brukernavn</key>
     <key alias="value">Verdi</key>
     <key alias="view">Visning</key>
-    <key alias="welcome">Velkommen</key>
+    <key alias="welcome">Velkommen...</key>
     <key alias="width">Bredde</key>
     <key alias="yes">Ja</key>
     <key alias="folder">Mappe</key>

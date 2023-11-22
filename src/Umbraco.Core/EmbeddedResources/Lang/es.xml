@@ -556,7 +556,7 @@
     <key alias="username">Nombre de usuario</key>
     <key alias="value">Valor</key>
     <key alias="view">Ver</key>
-    <key alias="welcome">Bienvenido</key>
+    <key alias="welcome">Bienvenido...</key>
     <key alias="width">Ancho</key>
     <key alias="yes">Si</key>
     <key alias="folder">Carpeta</key>

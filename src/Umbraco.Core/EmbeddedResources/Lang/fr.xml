@@ -727,7 +727,7 @@
     <key alias="username">Nom d'utilisateur</key>
     <key alias="value">Valeur</key>
     <key alias="view">Voir</key>
-    <key alias="welcome">Bienvenue</key>
+    <key alias="welcome">Bienvenue...</key>
     <key alias="width">Largeur</key>
     <key alias="yes">Oui</key>
     <key alias="folder">Dossier</key>

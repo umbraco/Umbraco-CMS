@@ -596,7 +596,7 @@
     <key alias="indexCannotRebuild">Ni ellir ailadeiladu'r mynegai hwn oherwydd nad yw wedi'i aseinio</key>
     <key alias="iIndexPopulator">IIndexPopulator</key>
 
-
+    
     <key alias="contentInIndex">Cynnwys yn y mynegai</key>
     <key alias="noResults">Ni ddarganfuwyd unrhyw ganlyniadau</key>
     <key alias="searchResultsFound">Dangos %0% - %1% o %2% canlyniad(au) - Tudalen %3% o %4%</key>
@@ -822,7 +822,7 @@
     <key alias="username">Enw defnyddiwr</key>
     <key alias="value">Gwerth</key>
     <key alias="view">Gwedd</key>
-    <key alias="welcome">Croeso</key>
+    <key alias="welcome">Croeso...</key>
     <key alias="width">Lled</key>
     <key alias="yes">Ie</key>
     <key alias="folder">Ffolder</key>

@@ -417,7 +417,7 @@
     <key alias="username">ユーザー名</key>
     <key alias="value">値</key>
     <key alias="view">ビュー</key>
-    <key alias="welcome">ようこそ</key>
+    <key alias="welcome">ようこそ...</key>
     <key alias="width">幅</key>
     <key alias="yes">はい</key>
     <key alias="folder">フォルダー</key>
