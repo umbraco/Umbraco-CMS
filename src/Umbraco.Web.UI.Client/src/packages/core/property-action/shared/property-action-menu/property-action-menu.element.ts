@@ -94,7 +94,9 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 						<uui-symbol-more id="more-symbol"></uui-symbol-more>
 					</uui-button>
 					<uui-popover-container id="property-action-popover" popover>
-						<div id="dropdown">${repeat(this._actions, (action) => action.component)}</div>
+						<umb-popover-layout style="--umb-popover-layout-padding: 0">
+							<div id="dropdown">${repeat(this._actions, (action) => action.component)}</div>
+						</umb-popover-layout>
 					</uui-popover-container>
 			  `
 			: nothing;
@@ -112,17 +114,6 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 				--uui-button-padding-bottom-factor: 0.1;
 				--uui-button-height: 18px;
 				--uui-button-border-radius: 6px;
-			}
-
-			#dropdown {
-				background-color: var(--uui-color-surface);
-				border-radius: var(--uui-border-radius);
-				width: 100%;
-				height: 100%;
-				box-sizing: border-box;
-				box-shadow: var(--uui-shadow-depth-3);
-				min-width: 200px;
-				color: var(--uui-color-text);
 			}
 		`,
 	];
