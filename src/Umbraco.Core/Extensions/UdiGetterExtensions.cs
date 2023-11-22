@@ -363,7 +363,7 @@ public static class UdiGetterExtensions
     /// </summary>
     /// <param name="entity">The entity.</param>
     /// <returns>The entity identifier of the entity.</returns>
-    public static GuidUdi GetUdi(this Webhook entity)
+    public static GuidUdi GetUdi(this IWebhook entity)
     {
         if (entity == null)
         {
@@ -495,6 +495,11 @@ public static class UdiGetterExtensions
         if (entity is ILanguage language)
         {
             return language.GetUdi();
+        }
+
+        if (entity is IWebhook webhook)
+        {
+            return webhook.GetUdi();
         }
 
         throw new NotSupportedException(string.Format("Entity type {0} is not supported.", entity.GetType().FullName));
