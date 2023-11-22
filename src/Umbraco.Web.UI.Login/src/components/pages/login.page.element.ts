@@ -89,6 +89,18 @@ export default class UmbLoginPageElement extends LitElement {
     this.dispatchEvent(new CustomEvent('umb-login-success', {bubbles: true, composed: true, detail: response.data}));
   };
 
+  get #greetingLocalizationKey() {
+    return [
+      'login_greeting0',
+      'login_greeting1',
+      'login_greeting2',
+      'login_greeting3',
+      'login_greeting4',
+      'login_greeting5',
+      'login_greeting6',
+    ][new Date().getDay()];
+  }
+
   #onSubmitClick = () => {
     this.#formElement?.requestSubmit();
   };
@@ -97,7 +109,7 @@ export default class UmbLoginPageElement extends LitElement {
     return html`
       <header id="header">
         <h1 id="greeting">
-          <umb-localize key="general_welcome">Welcome</umb-localize>
+          <umb-localize .key=${this.#greetingLocalizationKey}></umb-localize>
         </h1>
         <slot name="subheadline"></slot>
       </header>
