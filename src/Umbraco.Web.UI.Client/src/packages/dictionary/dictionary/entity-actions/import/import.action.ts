@@ -7,17 +7,22 @@ import {
 	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
 	UMB_IMPORT_DICTIONARY_MODAL,
 } from '@umbraco-cms/backoffice/modal';
+import { UMB_DICTIONARY_TREE_STORE_CONTEXT, UmbDictionaryTreeStore } from '@umbraco-cms/backoffice/dictionary';
 
 export default class UmbImportDictionaryEntityAction extends UmbEntityActionBase<UmbDictionaryRepository> {
 	static styles = [UmbTextStyles];
 
 	#modalContext?: UmbModalManagerContext;
+	#treeStore?: UmbDictionaryTreeStore;
 
 	constructor(host: UmbControllerHostElement, repositoryAlias: string, unique: string) {
 		super(host, repositoryAlias, unique);
 
 		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
 			this.#modalContext = instance;
+		});
+		this.consumeContext(UMB_DICTIONARY_TREE_STORE_CONTEXT, (instance) => {
+			this.#treeStore = instance;
 		});
 	}
 
@@ -26,8 +31,12 @@ export default class UmbImportDictionaryEntityAction extends UmbEntityActionBase
 
 		const modalContext = this.#modalContext?.open(UMB_IMPORT_DICTIONARY_MODAL, { unique: this.unique });
 
-		const { parentId, temporaryFileId } = await modalContext.onSubmit();
+		const { entityItems, parentId } = await modalContext.onSubmit();
 
-		await this.repository?.import(temporaryFileId, parentId);
+		if (!entityItems?.length) return;
+
+		this.#treeStore?.appendItems(entityItems);
+
+		if (parentId) this.#treeStore?.updateItem(parentId, { hasChildren: true });
 	}
 }

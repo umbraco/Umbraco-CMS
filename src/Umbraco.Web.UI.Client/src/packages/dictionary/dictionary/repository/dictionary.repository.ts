@@ -6,11 +6,11 @@ import { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
 import {
 	CreateDictionaryItemRequestModel,
 	DictionaryOverviewResponseModel,
-	ImportDictionaryRequestModel,
 	UpdateDictionaryItemRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
+import { UmbTemporaryFileRepository } from '@umbraco-cms/backoffice/temporary-file';
 
 export class UmbDictionaryRepository
 	extends UmbBaseController
@@ -30,6 +30,8 @@ export class UmbDictionaryRepository
 	#detailSource: UmbDictionaryDetailServerDataSource;
 	#detailStore?: UmbDictionaryStore;
 
+	#temporaryFileRepository: UmbTemporaryFileRepository;
+
 	#notificationContext?: UmbNotificationContext;
 
 	constructor(host: UmbControllerHostElement) {
@@ -37,6 +39,7 @@ export class UmbDictionaryRepository
 
 		// TODO: figure out how spin up get the correct data source
 		this.#detailSource = new UmbDictionaryDetailServerDataSource(this);
+		this.#temporaryFileRepository = new UmbTemporaryFileRepository(host);
 
 		this.#init = Promise.all([
 			this.consumeContext(UMB_DICTIONARY_STORE_CONTEXT_TOKEN, (instance) => {
@@ -92,6 +95,7 @@ export class UmbDictionaryRepository
 
 	async delete(id: string) {
 		await this.#init;
+		await this.#treeStore?.removeItem(id);
 		return this.#detailSource.delete(id);
 	}
 
@@ -154,14 +158,12 @@ export class UmbDictionaryRepository
 		return this.#detailSource.import(temporaryFileId, parentId);
 	}
 
-	async upload(formData: ImportDictionaryRequestModel) {
+	async upload(UmbId: string, file: File) {
 		await this.#init;
+		if (!UmbId) throw new Error('UmbId is missing');
+		if (!file) throw new Error('File is missing');
 
-		if (!formData) {
-			throw new Error('Form data is missing');
-		}
-
-		return this.#detailSource.upload(formData);
+		return this.#temporaryFileRepository.upload(UmbId, file);
 	}
 
 	// TODO => temporary only, until languages data source exists, or might be
