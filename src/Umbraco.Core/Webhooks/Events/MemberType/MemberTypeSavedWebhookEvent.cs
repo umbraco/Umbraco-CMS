@@ -19,4 +19,7 @@ public class MemberTypeSavedWebhookEvent : WebhookEventBase<MemberTypeSavedNotif
     }
 
     public override string Alias => "memberTypeSaved";
+
+    public override object? ConvertNotificationToRequestPayload(MemberTypeSavedNotification notification) =>
+        notification.SavedEntities;
 }

@@ -19,4 +19,7 @@ public class MemberTypeChangedWebhookEvent : WebhookEventBase<MemberTypeChangedN
     }
 
     public override string Alias => "memberTypeChanged";
+
+    public override object? ConvertNotificationToRequestPayload(MemberTypeChangedNotification notification)
+        => notification.Changes;
 }
