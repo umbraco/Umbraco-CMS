@@ -19,4 +19,7 @@ public class MediaTypeDeletedWebhookEvent : WebhookEventBase<MediaTypeDeletedNot
     }
 
     public override string Alias => "mediaTypeDeleted";
+
+    public override object? ConvertNotificationToRequestPayload(MediaTypeDeletedNotification notification)
+        => notification.DeletedEntities;
 }

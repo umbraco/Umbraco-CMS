@@ -19,4 +19,7 @@ public class MediaTypeMovedWebhookEvent : WebhookEventBase<MediaTypeMovedNotific
     }
 
     public override string Alias => "mediaTypeMoved";
+
+    public override object? ConvertNotificationToRequestPayload(MediaTypeMovedNotification notification)
+        => notification.MoveInfoCollection;
 }
