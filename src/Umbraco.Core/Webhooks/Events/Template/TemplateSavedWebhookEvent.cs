@@ -19,4 +19,15 @@ public class TemplateSavedWebhookEvent : WebhookEventBase<TemplateSavedNotificat
     }
 
     public override string Alias => "templateSaved";
+
+    public override object? ConvertNotificationToRequestPayload(TemplateSavedNotification notification)
+    {
+       // Create a new anonymous object with the properties we want
+       return new
+       {
+           notification.CreateTemplateForContentType,
+           notification.ContentTypeAlias,
+           notification.SavedEntities
+       };
+    }
 }

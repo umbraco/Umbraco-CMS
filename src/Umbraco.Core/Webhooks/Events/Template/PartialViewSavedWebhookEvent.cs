@@ -19,4 +19,7 @@ public class PartialViewSavedWebhookEvent : WebhookEventBase<PartialViewSavedNot
     }
 
     public override string Alias => "partialViewSaved";
+
+    public override object? ConvertNotificationToRequestPayload(PartialViewSavedNotification notification) =>
+        notification.SavedEntities;
 }

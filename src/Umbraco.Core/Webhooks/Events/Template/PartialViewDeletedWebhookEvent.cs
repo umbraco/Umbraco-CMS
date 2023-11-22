@@ -19,4 +19,7 @@ public class PartialViewDeletedWebhookEvent : WebhookEventBase<PartialViewDelete
     }
 
     public override string Alias => "partialViewDeleted";
+
+    public override object? ConvertNotificationToRequestPayload(PartialViewDeletedNotification notification)
+        => notification.DeletedEntities;
 }

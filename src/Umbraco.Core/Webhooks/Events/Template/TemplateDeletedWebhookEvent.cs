@@ -19,4 +19,7 @@ public class TemplateDeletedWebhookEvent : WebhookEventBase<TemplateDeletedNotif
     }
 
     public override string Alias => "templateDeleted";
+
+    public override object? ConvertNotificationToRequestPayload(TemplateDeletedNotification notification) =>
+        notification.DeletedEntities;
 }
