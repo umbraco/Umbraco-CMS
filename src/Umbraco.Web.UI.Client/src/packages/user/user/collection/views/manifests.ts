@@ -3,8 +3,8 @@ import { ManifestCollectionView } from '@umbraco-cms/backoffice/extension-regist
 
 const tableCollectionView: ManifestCollectionView = {
 	type: 'collectionView',
-	alias: 'Umb.CollectionView.UserTable',
-	name: 'User Table Collection Collection View',
+	alias: 'Umb.CollectionView.User.Table',
+	name: 'User Table Collection View',
 	js: () => import('./table/user-table-collection-view.element.js'),
 	meta: {
 		label: 'Table',
@@ -21,8 +21,8 @@ const tableCollectionView: ManifestCollectionView = {
 
 const gridCollectionView: ManifestCollectionView = {
 	type: 'collectionView',
-	alias: 'Umb.CollectionView.UserGrid',
-	name: 'Media Table Collection View',
+	alias: 'Umb.CollectionView.User.Grid',
+	name: 'User Table Collection View',
 	js: () => import('./grid/user-grid-collection-view.element.js'),
 	weight: 200,
 	meta: {
