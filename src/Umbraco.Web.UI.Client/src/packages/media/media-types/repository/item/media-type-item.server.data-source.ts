@@ -7,7 +7,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
  * A data source for Media Type items that fetches data from the server
  * @export
  * @class UmbMediaTypeItemServerDataSource
- * @implements {DocumentTreeDataSource}
+ * @implements {UmbItemDataSource}
  */
 export class UmbMediaTypeItemServerDataSource implements UmbItemDataSource<MediaTypeItemResponseModel> {
 	#host: UmbControllerHost;
