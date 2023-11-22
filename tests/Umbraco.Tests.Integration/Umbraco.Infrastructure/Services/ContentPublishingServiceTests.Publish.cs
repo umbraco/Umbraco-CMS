@@ -134,6 +134,49 @@ public partial class ContentPublishingServiceTests
     }
 
     [Test]
+    public async Task Can_Publish_All_Variants_And_Unpublish_All_Variants_And_Publish_A_Single_Variant()
+    {
+        var (langEn, langDa, contentType) = await SetupVariantTest();
+
+        IContent content = new ContentBuilder()
+            .WithContentType(contentType)
+            .WithCultureName(langEn.IsoCode, "EN root")
+            .WithCultureName(langDa.IsoCode, "DA root")
+            .Build();
+        content.SetValue("title", "EN title", culture: langEn.IsoCode);
+        content.SetValue("title", "DA title", culture: langDa.IsoCode);
+        ContentService.Save(content);
+
+        var result = await ContentPublishingService.PublishAsync(content.Key, new[] { langEn.IsoCode, langDa.IsoCode }, Constants.Security.SuperUserKey);
+
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(ContentPublishingOperationStatus.Success, result.Result);
+
+        content = ContentService.GetById(content.Key)!;
+        Assert.AreEqual(2, content.PublishedCultures.Count());
+        Assert.IsTrue(content.PublishedCultures.InvariantContains(langEn.IsoCode));
+        Assert.IsTrue(content.PublishedCultures.InvariantContains(langDa.IsoCode));
+
+        result = await ContentPublishingService.UnpublishAsync(content.Key, "*", Constants.Security.SuperUserKey);
+
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(ContentPublishingOperationStatus.Success, result.Result);
+
+        content = ContentService.GetById(content.Key)!;
+        Assert.AreEqual(2, content.PublishedCultures.Count());
+
+        result = await ContentPublishingService.PublishAsync(content.Key, new[] { langDa.IsoCode }, Constants.Security.SuperUserKey);
+
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(ContentPublishingOperationStatus.Success, result.Result);
+
+        content = ContentService.GetById(content.Key)!;
+        // FIXME: when work item 32809 has been fixed, this should assert for 1 expected published cultures
+        Assert.AreEqual(2, content.PublishedCultures.Count());
+        Assert.IsTrue(content.PublishedCultures.InvariantContains(langDa.IsoCode));
+    }
+
+    [Test]
     public async Task Can_Publish_Branch_Of_Variant_Content()
     {
         var (langEn, langDa, contentType) = await SetupVariantTest();
@@ -210,6 +253,47 @@ public partial class ContentPublishingServiceTests
         root.SetValue("title", "EN title", culture: langEn.IsoCode);
         root.SetValue("title", null, culture: langDa.IsoCode);
         ContentService.Save(root);
+
+        IContent child = new ContentBuilder()
+            .WithContentType(contentType)
+            .WithCultureName(langEn.IsoCode, "EN child")
+            .WithCultureName(langDa.IsoCode, "DA child")
+            .WithParent(root)
+            .Build();
+        child.SetValue("title", "EN child title", culture: langEn.IsoCode);
+        child.SetValue("title", "DA child title", culture: langDa.IsoCode);
+        ContentService.Save(child);
+
+        var result = await ContentPublishingService.PublishBranchAsync(root.Key, new[] { langEn.IsoCode }, true, Constants.Security.SuperUserKey);
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(2, result.Result!.Count);
+        Assert.AreEqual(ContentPublishingOperationStatus.Success, result.Result[root.Key]);
+        Assert.AreEqual(ContentPublishingOperationStatus.Success, result.Result[child.Key]);
+
+        root = ContentService.GetById(root.Key)!;
+        Assert.AreEqual(1, root.PublishedCultures.Count());
+        Assert.IsTrue(root.PublishedCultures.InvariantContains(langEn.IsoCode));
+
+        child = ContentService.GetById(child.Key)!;
+        Assert.AreEqual(1, child.PublishedCultures.Count());
+        Assert.IsTrue(child.PublishedCultures.InvariantContains(langEn.IsoCode));
+    }
+
+    [Test]
+    public async Task Can_Publish_Culture_Branch_Without_Other_Culture()
+    {
+        var (langEn, langDa, contentType) = await SetupVariantTest();
+
+        IContent root = new ContentBuilder()
+            .WithContentType(contentType)
+            .WithCultureName(langEn.IsoCode, "EN root")
+            .WithCultureName(langDa.IsoCode, "DA root")
+            .Build();
+        root.SetValue("title", "EN title", culture: langEn.IsoCode);
+        root.SetValue("title", "DA title", culture: langDa.IsoCode);
+        ContentService.Save(root);
+
+        root = ContentService.GetById(root.Key)!;
 
         IContent child = new ContentBuilder()
             .WithContentType(contentType)
