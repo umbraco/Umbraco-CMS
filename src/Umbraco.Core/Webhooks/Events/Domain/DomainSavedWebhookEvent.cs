@@ -19,4 +19,7 @@ public class DomainSavedWebhookEvent : WebhookEventBase<DomainSavedNotification>
     }
 
     public override string Alias => "domainSaved";
+
+    public override object? ConvertNotificationToRequestPayload(DomainSavedNotification notification)
+        => notification.SavedEntities;
 }
