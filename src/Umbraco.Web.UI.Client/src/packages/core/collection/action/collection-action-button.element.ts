@@ -53,6 +53,7 @@ export class UmbCollectionActionButtonElement extends UmbLitElement {
 
 	private async _onClick() {
 		if (!this.#api) return;
+
 		this._buttonState = 'waiting';
 
 		try {
