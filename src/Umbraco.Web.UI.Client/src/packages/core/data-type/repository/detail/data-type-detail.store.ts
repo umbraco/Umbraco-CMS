@@ -4,31 +4,35 @@ import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
-export const UMB_DATA_TYPE_STORE_CONTEXT = new UmbContextToken<UmbDataTypeDetailStore>('UmbDataTypeStore');
+export const UMB_DATA_TYPE_DETAIL_STORE_CONTEXT = new UmbContextToken<UmbDataTypeDetailStore>('UmbDataTypeDetailStore');
 
 /**
  * @export
- * @class UmbDataTypeStore
+ * @class UmbDataTypeDetailStore
  * @extends {UmbStoreBase}
- * @description - Data Store for Template Details
+ * @description - Data Store for Data Type Details
  */
 export class UmbDataTypeDetailStore extends UmbStoreBase<UmbDataTypeDetailModel> {
 	/**
-	 * Creates an instance of UmbDataTypeStore.
+	 * Creates an instance of UmbDataTypeDetailStore.
 	 * @param {UmbControllerHostElement} host
-	 * @memberof UmbDataTypeStore
+	 * @memberof UmbDataTypeDetailStore
 	 */
 	constructor(host: UmbControllerHostElement) {
-		super(host, UMB_DATA_TYPE_STORE_CONTEXT.toString(), new UmbArrayState<UmbDataTypeDetailModel>([], (x) => x.id));
+		super(
+			host,
+			UMB_DATA_TYPE_DETAIL_STORE_CONTEXT.toString(),
+			new UmbArrayState<UmbDataTypeDetailModel>([], (x) => x.unique),
+		);
 	}
 
 	/**
 	 * Retrieve a data-type from the store
-	 * @param {id} string id.
-	 * @memberof UmbDataTypeStore
+	 * @param {unique} string unique
+	 * @memberof UmbDataTypeDetailStore
 	 */
-	byId(id: UmbDataTypeDetailModel['id']) {
-		return this._data.asObservablePart((x) => x.find((y) => y.id === id));
+	byUnique(unique: UmbDataTypeDetailModel['unique']) {
+		return this._data.asObservablePart((x) => x.find((y) => y.unique === unique));
 	}
 
 	withPropertyEditorUiAlias(propertyEditorUiAlias: string) {

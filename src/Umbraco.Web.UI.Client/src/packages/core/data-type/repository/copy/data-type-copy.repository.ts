@@ -20,7 +20,7 @@ export class UmbCopyDataTypeRepository extends UmbDataTypeRepositoryBase impleme
 		if (error) return { error };
 
 		if (dataTypeCopyId) {
-			const { data: dataTypeCopy } = await this.#detailRepository.requestById(dataTypeCopyId);
+			const { data: dataTypeCopy } = await this.#detailRepository.requestByUnique(dataTypeCopyId);
 			if (!dataTypeCopy) throw new Error('Could not find copied data type');
 
 			// TODO: Be aware about this responsibility.

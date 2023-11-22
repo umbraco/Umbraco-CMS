@@ -41,7 +41,7 @@ export class UmbWorkspaceViewDataTypeInfoElement
 		return html`
 			<uui-box headline="General" style="margin-bottom: 20px;">
 				<umb-workspace-property-layout label="Id">
-					<div slot="editor">${this._dataType?.id}</div>
+					<div slot="editor">${this._dataType?.unique}</div>
 				</umb-workspace-property-layout>
 				<umb-workspace-property-layout label="Property Editor Alias">
 					<div slot="editor">${this._dataType?.propertyEditorAlias}</div>

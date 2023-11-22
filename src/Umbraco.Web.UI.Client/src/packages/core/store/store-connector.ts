@@ -1,3 +1,4 @@
+/*
 import { UmbContextConsumerController, UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbStoreCreateEvent, UmbStoreDeleteEvent, UmbStoreUpdateEvent } from './events/index.js';
@@ -54,3 +55,4 @@ export class UmbStoreConnector {
 		this.#store.removeItems(event.uniques);
 	};
 }
+*/

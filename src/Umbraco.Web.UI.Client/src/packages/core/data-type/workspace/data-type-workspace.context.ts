@@ -32,7 +32,7 @@ export class UmbDataTypeWorkspaceContext
 	#getDataPromise?: Promise<any>;
 
 	readonly name = this.#data.asObservablePart((data) => data?.name);
-	readonly id = this.#data.asObservablePart((data) => data?.id);
+	readonly id = this.#data.asObservablePart((data) => data?.unique);
 
 	readonly propertyEditorUiAlias = this.#data.asObservablePart((data) => data?.propertyEditorUiAlias);
 	readonly propertyEditorSchemaAlias = this.#data.asObservablePart((data) => data?.propertyEditorAlias);
@@ -152,8 +152,8 @@ export class UmbDataTypeWorkspaceContext
 		return new UmbDataTypeVariantContext(host, this);
 	}
 
-	async load(id: string) {
-		this.#getDataPromise = this.repository.requestById(id);
+	async load(unique: string) {
+		this.#getDataPromise = this.repository.requestByUnique(unique);
 		const { data } = await this.#getDataPromise;
 		if (data) {
 			this.setIsNew(false);
@@ -161,8 +161,8 @@ export class UmbDataTypeWorkspaceContext
 		}
 	}
 
-	async create(parentId: string | null) {
-		this.#getDataPromise = this.repository.createScaffold(parentId);
+	async create(parentUnique: string | null) {
+		this.#getDataPromise = this.repository.createScaffold(parentUnique);
 		let { data } = await this.#getDataPromise;
 		if (this.modalContext) {
 			data = { ...data, ...this.modalContext.data.preset };
@@ -179,7 +179,7 @@ export class UmbDataTypeWorkspaceContext
 	}
 
 	getEntityId() {
-		return this.getData()?.id || '';
+		return this.getData()?.unique || '';
 	}
 
 	getEntityType() {
@@ -240,12 +240,12 @@ export class UmbDataTypeWorkspaceContext
 
 	async save() {
 		if (!this.#data.value) return;
-		if (!this.#data.value.id) return;
+		if (!this.#data.value.unique) return;
 
 		if (this.getIsNew()) {
 			await this.repository.create(this.#data.value);
 		} else {
-			await this.repository.save(this.#data.value.id, this.#data.value);
+			await this.repository.save(this.#data.value);
 		}
 
 		this.saveComplete(this.#data.value);

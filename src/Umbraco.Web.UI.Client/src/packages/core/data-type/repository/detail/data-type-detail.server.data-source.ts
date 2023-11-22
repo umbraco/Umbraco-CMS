@@ -1,12 +1,7 @@
 import { UmbDataTypeDetailModel } from '../../types.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import { UmbDataSource } from '@umbraco-cms/backoffice/repository';
-import {
-	DataTypeResource,
-	DataTypeModelBaseModel,
-	CreateDataTypeRequestModel,
-	UpdateDataTypeRequestModel,
-} from '@umbraco-cms/backoffice/backend-api';
+import { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
+import { DataTypeResource } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -16,9 +11,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
  * @class UmbDataTypeServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
-export class UmbDataTypeServerDataSource
-	implements UmbDataSource<CreateDataTypeRequestModel, any, UpdateDataTypeRequestModel, UmbDataTypeDetailModel>
-{
+export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataTypeDetailModel> {
 	#host: UmbControllerHost;
 
 	/**
@@ -36,10 +29,11 @@ export class UmbDataTypeServerDataSource
 	 * @return { CreateDataTypeRequestModel }
 	 * @memberof UmbDataTypeServerDataSource
 	 */
-	async createScaffold(parentId?: string | null) {
-		const data: CreateDataTypeRequestModel = {
-			id: UmbId.new(),
-			parentId,
+	async createScaffold(parentUnique: string | null) {
+		const data: UmbDataTypeDetailModel = {
+			entityType: 'data-type',
+			unique: UmbId.new(),
+			parentUnique,
 			name: '',
 			propertyEditorAlias: undefined,
 			propertyEditorUiAlias: null,
@@ -55,32 +49,50 @@ export class UmbDataTypeServerDataSource
 	 * @return {*}
 	 * @memberof UmbDataTypeServerDataSource
 	 */
-	async read(id: string) {
-		if (!id) throw new Error('Key is missing');
-		return tryExecuteAndNotify(
-			this.#host,
-			DataTypeResource.getDataTypeById({
-				id: id,
-			}),
-		);
+	async read(unique: string) {
+		if (!unique) throw new Error('Unique is missing');
+
+		const { data, error } = await tryExecuteAndNotify(this.#host, DataTypeResource.getDataTypeById({ id: unique }));
+
+		if (data) {
+			const dataType = {
+				entityType: 'data-type',
+				unique: data.id,
+				parentUnique: data.parentId,
+				name: data.name,
+				propertyEditorAlias: data.propertyEditorAlias,
+				propertyEditorUiAlias: data.propertyEditorAlias,
+				values: data.values,
+			};
+
+			return { data: dataType };
+		}
+
+		return { error };
 	}
 
 	/**
 	 * Inserts a new Data Type on the server
-	 * @param {Document} dataType
+	 * @param {UmbDataTypeDetailModel} dataType
 	 * @return {*}
 	 * @memberof UmbDataTypeServerDataSource
 	 */
-	async create(dataType: CreateDataTypeRequestModel) {
+	async create(dataType: UmbDataTypeDetailModel) {
 		if (!dataType) throw new Error('Data Type is missing');
-		if (!dataType.id) throw new Error('Data Type id is missing');
+		if (!dataType.unique) throw new Error('Data Type id is missing');
 
-		return tryExecuteAndNotify(
+		const { error: createError } = await tryExecuteAndNotify(
 			this.#host,
 			DataTypeResource.postDataType({
 				requestBody: dataType,
 			}),
 		);
+
+		if (createError) {
+			return { error: createError };
+		}
+
+		return this.read(dataType.unique);
 	}
 
 	/**
@@ -89,31 +101,33 @@ export class UmbDataTypeServerDataSource
 	 * @return {*}
 	 * @memberof UmbDataTypeServerDataSource
 	 */
-	async update(id: string, data: DataTypeModelBaseModel) {
-		if (!id) throw new Error('Key is missing');
+	async update(data: UmbDataTypeDetailModel) {
+		if (!data.unique) throw new Error('Unique is missing');
 
-		return tryExecuteAndNotify(
+		const { error } = await tryExecuteAndNotify(
 			this.#host,
 			DataTypeResource.putDataTypeById({
-				id: id,
+				id: data.unique,
 				requestBody: data,
 			}),
 		);
+
+		return { error };
 	}
 
 	/**
 	 * Deletes a Data Type on the server
-	 * @param {string} id
+	 * @param {string} unique
 	 * @return {*}
 	 * @memberof UmbDataTypeServerDataSource
 	 */
-	async delete(id: string) {
-		if (!id) throw new Error('Key is missing');
+	async delete(unique: string) {
+		if (!unique) throw new Error('Unique is missing');
 
 		return tryExecuteAndNotify(
 			this.#host,
 			DataTypeResource.deleteDataTypeById({
-				id: id,
+				id: unique,
 			}),
 		);
 	}
