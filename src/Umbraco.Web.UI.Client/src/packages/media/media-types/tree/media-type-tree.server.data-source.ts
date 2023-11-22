@@ -1,10 +1,10 @@
+import type { UmbTreeDataSource } from '@umbraco-cms/backoffice/tree';
 import { MediaTypeResource } from '@umbraco-cms/backoffice/backend-api';
-import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { type UmbTreeDataSource } from '@umbraco-cms/backoffice/tree';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
- * A data source for the MediaType tree that fetches data from the server
+ * A data source for the Media Type tree that fetches data from the server
  * @export
  * @class UmbMediaTypeTreeServerDataSource
  * @implements {UmbTreeDataSource}
@@ -13,9 +13,9 @@ export class UmbMediaTypeTreeServerDataSource implements UmbTreeDataSource {
 	#host: UmbControllerHost;
 
 	/**
-	 * Creates an instance of MediaTypeTreeDataSource.
+	 * Creates an instance of UmbMediaTypeTreeServerDataSource.
 	 * @param {UmbControllerHost} host
-	 * @memberof MediaTypeTreeDataSource
+	 * @memberof UmbMediaTypeTreeServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
 		this.#host = host;
@@ -60,8 +60,8 @@ export class UmbMediaTypeTreeServerDataSource implements UmbTreeDataSource {
 	 * @memberof UmbMediaTypeTreeServerDataSource
 	 */
 	async getItems(ids: Array<string>) {
-		if (!ids || ids.length === 0) {
-			throw new Error('Keys are missing');
+		if (ids) {
+			throw new Error('Ids are missing');
 		}
 
 		return tryExecuteAndNotify(

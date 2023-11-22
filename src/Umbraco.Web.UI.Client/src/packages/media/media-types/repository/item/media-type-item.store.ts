@@ -23,7 +23,7 @@ export class UmbMediaTypeItemStore
 	constructor(host: UmbControllerHostElement) {
 		super(
 			host,
-			UMB_MEDIA_TYPE_ITEM_STORE_CONTEXT_TOKEN.toString(),
+			UMB_MEDIA_TYPE_ITEM_STORE_CONTEXT.toString(),
 			new UmbArrayState<MediaTypeItemResponseModel>([], (x) => x.id),
 		);
 	}
@@ -33,6 +33,4 @@ export class UmbMediaTypeItemStore
 	}
 }
 
-export const UMB_MEDIA_TYPE_ITEM_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbMediaTypeItemStore>(
-	'UmbMediaTypeItemStore',
-);
+export const UMB_MEDIA_TYPE_ITEM_STORE_CONTEXT = new UmbContextToken<UmbMediaTypeItemStore>('UmbMediaTypeItemStore');
