@@ -20,7 +20,7 @@ test.describe('Stylesheets tests', () => {
     await umbracoApi.stylesheet.ensureNameNotExists(styleSheetFileName);
 
     //Act
-    await umbracoUi.stylesheet.openActionsMenuForName("Stylesheets");
+    await umbracoUi.stylesheet.openActionsMenuAtRoot();
     await umbracoUi.stylesheet.clickNewStylesheetFileButton();
     await umbracoUi.stylesheet.enterStylesheetName(styleSheetName);
     await umbracoUi.stylesheet.clickSaveButton();
@@ -39,7 +39,7 @@ test.describe('Stylesheets tests', () => {
     await umbracoApi.stylesheet.ensureNameNotExists(styleSheetFileName);
 
     //Act
-    await umbracoUi.stylesheet.openActionsMenuForName("Stylesheets");
+    await umbracoUi.stylesheet.openActionsMenuAtRoot();
     await umbracoUi.stylesheet.clickNewRTEStylesheetFileButton();
     await umbracoUi.stylesheet.enterStylesheetName(styleSheetName);
     await umbracoUi.stylesheet.addNewRule(ruleName, 'h1', 'color:red');
@@ -94,7 +94,7 @@ test.describe('Stylesheets tests', () => {
     await umbracoApi.stylesheet.ensureNameNotExists(styleFolderName);  
 
     // Act
-    await umbracoUi.stylesheet.openActionsMenuForName("Stylesheets");
+    await umbracoUi.stylesheet.openActionsMenuAtRoot();
     await umbracoUi.stylesheet.createNewFolder(styleFolderName);
 
     // Assert
