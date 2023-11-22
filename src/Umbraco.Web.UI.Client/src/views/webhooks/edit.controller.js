@@ -162,16 +162,16 @@
                 let name;
                 switch (eventType.toCamelCase()) {
                   case "content":
-                    name = "Deleted content type";
+                    name = "Unknown content type";
                     break;
                   case "media":
-                    name = "Deleted media type";
+                    name = "Unknown media type";
                     break;
                   case "member":
-                    name = "Deleted member type";
+                    name = "Unknown member type";
                     break;
                   default:
-                    name = "Deleted type";
+                    name = "Unknown type";
                 }
 
                 let data = {
