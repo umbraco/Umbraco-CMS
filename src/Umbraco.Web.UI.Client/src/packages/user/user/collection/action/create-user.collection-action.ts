@@ -23,4 +23,7 @@ export class UmbCreateUserCollectionAction extends UmbCollectionActionBase<UmbUs
 		const modalContext = this.#modalManagerContext?.open(UMB_CREATE_USER_MODAL);
 		await modalContext?.onSubmit();
 	}
+
+	// TODO: look into why this is needed to satisfy the manifest
+	destroy() {}
 }
