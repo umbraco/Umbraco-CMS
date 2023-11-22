@@ -223,14 +223,16 @@ public class EntityControllerTests : UmbracoTestServerTestBase
                 .WithContentType(contentType);
 
             var root = builder.WithName("foo").Build();
-            contentService.SaveAndPublish(root);
+            contentService.Save(root);
+            contentService.Publish(root, root.AvailableCultures.ToArray());
 
             contentItems.Add(builder.WithParent(root).WithName("bar").Build());
             contentItems.Add(builder.WithParent(root).WithName("baz").Build());
 
             foreach (var content in contentItems)
             {
-                contentService.SaveAndPublish(content);
+                contentService.Save(content);
+                contentService.Publish(content, content.AvailableCultures.ToArray());
             }
         }
 
@@ -273,14 +275,16 @@ public class EntityControllerTests : UmbracoTestServerTestBase
                 .WithContentType(contentType);
 
             var root = builder.WithName("foo").Build();
-            contentService.SaveAndPublish(root);
+            contentService.Save(root);
+            contentService.Publish(root, root.AvailableCultures.ToArray());
 
             contentItems.Add(builder.WithParent(root).WithName("bar").Build());
             contentItems.Add(builder.WithParent(root).WithName("baz").Build());
 
             foreach (var content in contentItems)
             {
-                contentService.SaveAndPublish(content);
+                contentService.Save(content);
+                contentService.Publish(content, content.AvailableCultures.ToArray());
             }
         }
 
@@ -323,14 +327,16 @@ public class EntityControllerTests : UmbracoTestServerTestBase
                 .WithContentType(contentType);
 
             var root = builder.WithName("foo").Build();
-            contentService.SaveAndPublish(root);
+            contentService.Save(root);
+            contentService.Publish(root, root.AvailableCultures.ToArray());
 
             contentItems.Add(builder.WithParent(root).WithName("bar").Build());
             contentItems.Add(builder.WithParent(root).WithName("baz").Build());
 
             foreach (var content in contentItems)
             {
-                contentService.SaveAndPublish(content);
+                contentService.Save(content);
+                contentService.Publish(content, content.AvailableCultures.ToArray());
             }
         }
 
@@ -373,14 +379,16 @@ public class EntityControllerTests : UmbracoTestServerTestBase
                 .WithContentType(contentType);
 
             var root = builder.WithName("foo").Build();
-            contentService.SaveAndPublish(root);
+            contentService.Save(root);
+            contentService.Publish(root, root.AvailableCultures.ToArray());
 
             contentItems.Add(builder.WithParent(root).WithName("bar").Build());
             contentItems.Add(builder.WithParent(root).WithName("baz").Build());
 
             foreach (var content in contentItems)
             {
-                contentService.SaveAndPublish(content);
+                contentService.Save(content);
+                contentService.Publish(content, root.AvailableCultures.ToArray());
             }
         }
 

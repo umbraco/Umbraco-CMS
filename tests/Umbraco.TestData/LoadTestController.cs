@@ -224,7 +224,8 @@ public class LoadTestController : Controller
         _contentTypeService.Save(containerType);
 
         var content = _contentService.Create("LoadTestContainer", -1, ContainerAlias);
-        _contentService.SaveAndPublish(content);
+        _contentService.Save(content);
+        _contentService.Publish(content, content.AvailableCultures.ToArray());
 
         return ContentHtml("Installed.");
     }
@@ -276,7 +277,8 @@ public class LoadTestController : Controller
             var name = Guid.NewGuid().ToString("N").ToUpper() + "-" + (restart ? "R" : "X") + "-" + o;
             var content = _contentService.Create(name, s_containerId, ContentAlias);
             content.SetValue("origin", o);
-            _contentService.SaveAndPublish(content);
+            _contentService.Save(content);
+            _contentService.Publish(content, content.AvailableCultures.ToArray());
         }
 
         if (restart)
