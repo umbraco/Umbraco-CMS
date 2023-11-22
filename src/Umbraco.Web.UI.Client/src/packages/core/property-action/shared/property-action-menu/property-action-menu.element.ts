@@ -1,15 +1,26 @@
 import { UmbPropertyActionMenuContext } from './property-action-menu.context.js';
-import { css, CSSResultGroup, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
-import { ManifestPropertyAction, ManifestTypes, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import {
+	css,
+	CSSResultGroup,
+	html,
+	customElement,
+	property,
+	state,
+	repeat,
+	nothing,
+} from '@umbraco-cms/backoffice/external/lit';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import {
+	ManifestPropertyAction,
+	ManifestTypes,
+	umbExtensionsRegistry,
+} from '@umbraco-cms/backoffice/extension-registry';
 import { UmbExtensionElementInitializer, UmbExtensionsElementInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-property-action-menu')
 export class UmbPropertyActionMenuElement extends UmbLitElement {
-
 	#actionsInitializer?: UmbExtensionsElementInitializer<ManifestTypes, 'propertyAction'>;
-
 
 	@property({ attribute: false })
 	public get value(): unknown {
@@ -17,7 +28,7 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 	}
 	public set value(value: unknown) {
 		this._value = value;
-		if(this.#actionsInitializer) {
+		if (this.#actionsInitializer) {
 			this.#actionsInitializer.properties = { value };
 		}
 	}
@@ -25,18 +36,25 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 
 	@property()
 	set propertyEditorUiAlias(alias: string) {
-
 		// TODO: Align property actions with entity actions.
-		this.#actionsInitializer = new UmbExtensionsElementInitializer(this, umbExtensionsRegistry, 'propertyAction', (propertyAction) => propertyAction.meta.propertyEditors.includes(alias), (ctrls) => {
-			this._actions = ctrls;
-		});
+		this.#actionsInitializer = new UmbExtensionsElementInitializer(
+			this,
+			umbExtensionsRegistry,
+			'propertyAction',
+			(propertyAction) => propertyAction.meta.propertyEditors.includes(alias),
+			(ctrls) => {
+				this._actions = ctrls;
+			},
+		);
 	}
 	@state()
 	private _actions: Array<UmbExtensionElementInitializer<ManifestPropertyAction, any>> = [];
 
 	@state()
-	private _open = false;
+	private _open = false; //TODO: Is this still needed? now that we don't use the old popover anymore?
 
+	//TODO: What is this context used for?
+	//TODO: Is this still needed? now that we don't use the old popover anymore?
 	private _propertyActionMenuContext = new UmbPropertyActionMenuContext(this);
 
 	constructor() {
@@ -53,10 +71,12 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 	}
 
 	private _toggleMenu() {
+		//TODO: Is this still needed? now that we don't use the old popover anymore?
 		this._propertyActionMenuContext.toggle();
 	}
 
 	private _handleClose(event: CustomEvent) {
+		//TODO: Is this still needed? now that we don't use the old popover anymore?
 		this._propertyActionMenuContext.close();
 		event.stopPropagation();
 	}
@@ -64,34 +84,25 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 	render() {
 		return this._actions.length > 0
 			? html`
-					<uui-popover id="popover" placement="bottom-start" .open=${this._open} @close="${this._handleClose}">
-						<uui-button
-							id="popover-trigger"
-							slot="trigger"
-							look="secondary"
-							label="More"
-							@click="${this._toggleMenu}"
-							compact>
-							<uui-symbol-more id="more-symbol"></uui-symbol-more>
-						</uui-button>
-
-						<div slot="popover" id="dropdown">
-							${repeat(this._actions,
-								(action) => action.component
-							)}
-						</div>
-					</uui-popover>
+					<uui-button
+						id="popover-trigger"
+						popovertarget="property-action-popover"
+						look="secondary"
+						label="More"
+						@click="${this._toggleMenu}"
+						compact>
+						<uui-symbol-more id="more-symbol"></uui-symbol-more>
+					</uui-button>
+					<uui-popover-container id="property-action-popover" popover>
+						<div id="dropdown">${repeat(this._actions, (action) => action.component)}</div>
+					</uui-popover-container>
 			  `
-			: '';
+			: nothing;
 	}
 
 	static styles: CSSResultGroup = [
 		UmbTextStyles,
 		css`
-			#popover {
-				width: auto;
-			}
-
 			#more-symbol {
 				font-size: 0.6em;
 			}
