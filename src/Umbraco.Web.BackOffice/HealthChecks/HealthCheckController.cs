@@ -3,10 +3,12 @@
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.HealthChecks;
 using Umbraco.Cms.Core.Notifications;
@@ -32,6 +34,15 @@ public class HealthCheckController : UmbracoAuthorizedJsonController
     /// <summary>
     ///     Initializes a new instance of the <see cref="HealthCheckController" /> class.
     /// </summary>
+    [Obsolete("Use constructor that accepts IEventAggregator as a parameter, scheduled for removal in V14")]
+    public HealthCheckController(HealthCheckCollection checks, ILogger<HealthCheckController> logger, IOptions<HealthChecksSettings> healthChecksSettings)
+        : this(checks, logger, healthChecksSettings, StaticServiceProvider.Instance.GetRequiredService<IEventAggregator>())
+    { }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="HealthCheckController" /> class.
+    /// </summary>
+    [ActivatorUtilitiesConstructor]
     public HealthCheckController(HealthCheckCollection checks, ILogger<HealthCheckController> logger, IOptions<HealthChecksSettings> healthChecksSettings, IEventAggregator eventAggregator)
     {
         _checks = checks ?? throw new ArgumentNullException(nameof(checks));
