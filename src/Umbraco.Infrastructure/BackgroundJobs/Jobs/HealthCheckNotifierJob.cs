@@ -1,11 +1,13 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.HealthChecks;
 using Umbraco.Cms.Core.HealthChecks.NotificationMethods;
@@ -43,6 +45,26 @@ public class HealthCheckNotifierJob : IRecurringBackgroundJob
     private readonly IEventAggregator _eventAggregator;
     private readonly ICoreScopeProvider _scopeProvider;
     private HealthChecksSettings _healthChecksSettings;
+
+    [Obsolete("Use constructor that accepts IEventAggregator as a parameter, scheduled for removal in V14")]
+    public HealthCheckNotifierJob(
+        IOptionsMonitor<HealthChecksSettings> healthChecksSettings,
+        HealthCheckCollection healthChecks,
+        HealthCheckNotificationMethodCollection notifications,
+        ICoreScopeProvider scopeProvider,
+        ILogger<HealthCheckNotifierJob> logger,
+        IProfilingLogger profilingLogger,
+        ICronTabParser cronTabParser)
+        : this(
+            healthChecksSettings,
+            healthChecks,
+            notifications,
+            scopeProvider,
+            logger,
+            profilingLogger,
+            cronTabParser,
+            StaticServiceProvider.Instance.GetRequiredService<IEventAggregator>())
+    { }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="HealthCheckNotifierJob" /> class.
