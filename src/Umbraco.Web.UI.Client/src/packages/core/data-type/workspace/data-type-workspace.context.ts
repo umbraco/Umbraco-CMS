@@ -32,7 +32,7 @@ export class UmbDataTypeWorkspaceContext
 	#getDataPromise?: Promise<any>;
 
 	readonly name = this.#data.asObservablePart((data) => data?.name);
-	readonly id = this.#data.asObservablePart((data) => data?.unique);
+	readonly unique = this.#data.asObservablePart((data) => data?.unique);
 
 	readonly propertyEditorUiAlias = this.#data.asObservablePart((data) => data?.propertyEditorUiAlias);
 	readonly propertyEditorSchemaAlias = this.#data.asObservablePart((data) => data?.propertyEditorAlias);
@@ -251,8 +251,8 @@ export class UmbDataTypeWorkspaceContext
 		this.saveComplete(this.#data.value);
 	}
 
-	async delete(id: string) {
-		await this.repository.delete(id);
+	async delete(unique: string) {
+		await this.repository.delete(unique);
 	}
 
 	public destroy(): void {
