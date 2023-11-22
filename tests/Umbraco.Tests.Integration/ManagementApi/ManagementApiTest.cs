@@ -72,7 +72,7 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
             var token = await userManager.GeneratePasswordResetTokenAsync(user);
 
 
-            userService.ChangePasswordAsync(Constants.Security.SuperUserKey,
+            var changePasswordAttempt = await userService.ChangePasswordAsync(Constants.Security.SuperUserKey,
                 new ChangeUserPasswordModel
                 {
                     NewPassword = password,
@@ -80,6 +80,7 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
                     UserKey = Constants.Security.SuperUserKey
                 });
 
+            Assert.IsTrue(changePasswordAttempt.Success);
 
             var backOfficeApplicationManager =
                 serviceScope.ServiceProvider.GetRequiredService<IBackOfficeApplicationManager>() as
@@ -94,6 +95,8 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
         // Login to ensure the cookie is set (used in next request)
         var loginResponse = await client.PostAsync(
             GetManagementApiUrl<BackOfficeController>(x => x.Login(null)), JsonContent.Create(loginModel));
+
+        Assert.AreEqual(HttpStatusCode.OK, loginResponse.StatusCode, await loginResponse.Content.ReadAsStringAsync());
 
         var codeVerifier = "12345"; // Just a dummy value we use in tests
         var codeChallange = Convert.ToBase64String(SHA256.Create().ComputeHash(Encoding.UTF8.GetBytes(codeVerifier)))
