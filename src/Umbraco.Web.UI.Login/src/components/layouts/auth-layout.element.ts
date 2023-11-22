@@ -18,7 +18,7 @@ export class UmbAuthLayoutElement extends LitElement {
 
     if (_changedProperties.has<keyof this>('backgroundImage')) {
       this.style.setProperty('--logo-alternative-display', this.backgroundImage ? 'none' : 'unset');
-      this.style.setProperty('--image', `url('${this.backgroundImage}')`);
+      this.style.setProperty('--background', `url('${this.backgroundImage}') no-repeat center center/cover`);
     }
   }
 
@@ -35,7 +35,7 @@ export class UmbAuthLayoutElement extends LitElement {
             viewBox="0 0 1746 1374"
             fill="none"
             xmlns="http://www.w3.org/2000/svg">
-            <path d="M8 1C61.5 722.5 206.5 1366.5 1745.5 1366.5" stroke="#F5C1BC" stroke-width="15"/>
+            <path d="M8 1C61.5 722.5 206.5 1366.5 1745.5 1366.5" stroke="currentColor" stroke-width="15"/>
           </svg>
           <svg
             id="curve-bottom"
@@ -44,7 +44,7 @@ export class UmbAuthLayoutElement extends LitElement {
             viewBox="0 0 1364 552"
             fill="none"
             xmlns="http://www.w3.org/2000/svg">
-            <path d="M1 8C387 24 1109 11 1357 548" stroke="#F5C1BC" stroke-width="15"/>
+            <path d="M1 8C387 24 1109 11 1357 548" stroke="currentColor" stroke-width="15"/>
           </svg>
 
           ${when(
@@ -90,6 +90,9 @@ export class UmbAuthLayoutElement extends LitElement {
         --input-height: 40px;
         --header-font-size: 3rem;
         --header-secondary-font-size: 2.4rem;
+        --curves-color: var(--umb-curves-color, #f5c1bc);
+        --curves-display: var(--umb-curves-display, inline);
+
         display: block;
         background-color: #f4f4f4;
       }
@@ -123,21 +126,20 @@ export class UmbAuthLayoutElement extends LitElement {
       }
 
       #image {
-        background-image: var(--image);
-        background-position: 50%;
-        background-repeat: no-repeat;
-        background-size: cover;
+        background: var(--background);
         width: 100%;
         height: 100%;
         border-radius: 38px;
         position: relative;
         overflow: hidden;
+        color: var(--curves-color);
       }
 
       #image svg {
         position: absolute;
         width: 45%;
         height: fit-content;
+        display: var(--curves-display);
       }
 
       #curve-top {
