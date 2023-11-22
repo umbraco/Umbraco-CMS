@@ -19,4 +19,7 @@ public class ScriptSavedWebhookEvent : WebhookEventBase<ScriptDeletedNotificatio
     }
 
     public override string Alias => "scriptSaved";
+
+    public override object? ConvertNotificationToRequestPayload(ScriptDeletedNotification notification)
+        => notification.DeletedEntities;
 }
