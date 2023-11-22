@@ -28,17 +28,17 @@ export class UmbDataTypeWorkspaceContext
 {
 	// TODO: revisit. temp solution because the create and response models are different.
 	#data = new UmbObjectState<DataTypeResponseModel | undefined>(undefined);
-	data = this.#data.asObservable();
+	readonly data = this.#data.asObservable();
 	#getDataPromise?: Promise<any>;
 
-	name = this.#data.asObservablePart((data) => data?.name);
-	id = this.#data.asObservablePart((data) => data?.id);
+	readonly name = this.#data.asObservablePart((data) => data?.name);
+	readonly id = this.#data.asObservablePart((data) => data?.id);
 
-	propertyEditorUiAlias = this.#data.asObservablePart((data) => data?.propertyEditorUiAlias);
-	propertyEditorSchemaAlias = this.#data.asObservablePart((data) => data?.propertyEditorAlias);
+	readonly propertyEditorUiAlias = this.#data.asObservablePart((data) => data?.propertyEditorUiAlias);
+	readonly propertyEditorSchemaAlias = this.#data.asObservablePart((data) => data?.propertyEditorAlias);
 
 	#properties = new UmbObjectState<Array<PropertyEditorConfigProperty> | undefined>(undefined);
-	properties: Observable<Array<PropertyEditorConfigProperty> | undefined> = this.#properties.asObservable();
+	readonly properties: Observable<Array<PropertyEditorConfigProperty> | undefined> = this.#properties.asObservable();
 
 	private _propertyEditorSchemaConfigDefaultData: Array<PropertyEditorConfigDefaultData> = [];
 	private _propertyEditorUISettingsDefaultData: Array<PropertyEditorConfigDefaultData> = [];
@@ -53,13 +53,13 @@ export class UmbDataTypeWorkspaceContext
 	private _propertyEditorUISettingsSchemaAlias?: string;
 
 	#defaults = new UmbArrayState<PropertyEditorConfigDefaultData>([], (entry) => entry.alias);
-	defaults = this.#defaults.asObservable();
+	readonly defaults = this.#defaults.asObservable();
 
 	#propertyEditorUiIcon = new UmbStringState<string | null>(null);
-	propertyEditorUiIcon = this.#propertyEditorUiIcon.asObservable();
+	readonly propertyEditorUiIcon = this.#propertyEditorUiIcon.asObservable();
 
 	#propertyEditorUiName = new UmbStringState<string | null>(null);
-	propertyEditorUiName = this.#propertyEditorUiName.asObservable();
+	readonly propertyEditorUiName = this.#propertyEditorUiName.asObservable();
 
 	constructor(host: UmbControllerHostElement) {
 		super(host, 'Umb.Workspace.DataType', new UmbDataTypeDetailRepository(host));
@@ -265,5 +265,6 @@ export const UMB_DATA_TYPE_WORKSPACE_CONTEXT = new UmbContextToken<
 	UmbDataTypeWorkspaceContext
 >(
 	'UmbWorkspaceContext',
+	undefined,
 	(context): context is UmbDataTypeWorkspaceContext => context.getEntityType?.() === 'data-type',
 );
