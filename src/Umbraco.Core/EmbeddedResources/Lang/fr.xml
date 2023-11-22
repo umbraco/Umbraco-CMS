@@ -892,13 +892,13 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="renewSession">Renouvellez votre session maintenant pour sauvegarder votre travail</key>
   </area>
   <area alias="login">
-    <key alias="greeting0">Joyeux dimanche détonnant</key>
-    <key alias="greeting1">Joyeux lundi lumineux</key>
-    <key alias="greeting2">Joyeux mardi magique</key>
-    <key alias="greeting3">Joyeux mercredi merveilleux</key>
-    <key alias="greeting4">Joyeux jeudi</key>
-    <key alias="greeting5">Joyeux vendredi</key>
-    <key alias="greeting6">Joyeux chamedi</key>
+    <key alias="greeting0">Bienvenue</key>
+    <key alias="greeting1">Bienvenue</key>
+    <key alias="greeting2">Bienvenue</key>
+    <key alias="greeting3">Bienvenue</key>
+    <key alias="greeting4">Bienvenue</key>
+    <key alias="greeting5">Bienvenue</key>
+    <key alias="greeting6">Bienvenue</key>
     <key alias="instruction">Connectez-vous ci-dessous</key>
     <key alias="signInWith">Identifiez-vous avec</key>
     <key alias="timeout">La session a expiré</key>
