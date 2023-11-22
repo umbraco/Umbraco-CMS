@@ -2,7 +2,7 @@ import { UmbCollectionConfiguration, UmbCollectionContext } from './types.js';
 import { UmbCollectionRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbBaseController, type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { UmbArrayState, UmbNumberState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState, UmbNumberState, UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import {
 	UmbApi,
 	UmbExtensionApiInitializer,
@@ -39,8 +39,10 @@ export class UmbDefaultCollectionContext<ItemType = any, FilterModelType extends
 	#currentView = new UmbObjectState<ManifestCollectionView | undefined>(undefined);
 	public readonly currentView = this.#currentView.asObservable();
 
+	#rootPathname = new UmbStringState('');
+	public readonly rootPathname = this.#rootPathname.asObservable();
+
 	repository?: UmbCollectionRepository;
-	collectionRootPathname: string;
 
 	#initResolver?: () => void;
 	#initialized = false;
@@ -58,8 +60,11 @@ export class UmbDefaultCollectionContext<ItemType = any, FilterModelType extends
 		// listen for page changes on the pagination manager
 		this.pagination.addEventListener(UmbChangeEvent.TYPE, this.#onPageChange);
 
-		const currentUrl = new URL(window.location.href);
-		this.collectionRootPathname = currentUrl.pathname.substring(0, currentUrl.pathname.lastIndexOf('/'));
+		// TODO: hack - we need to figure out how to get the "parent path" from the router
+		setTimeout(() => {
+			const currentUrl = new URL(window.location.href);
+			this.#rootPathname.next(currentUrl.pathname.substring(0, currentUrl.pathname.lastIndexOf('/')));
+		}, 100);
 
 		this.#configure(config);
 

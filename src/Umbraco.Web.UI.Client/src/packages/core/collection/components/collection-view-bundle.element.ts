@@ -13,7 +13,7 @@ export class UmbCollectionViewBundleElement extends UmbLitElement {
 	_currentView?: ManifestCollectionView;
 
 	@state()
-	private _collectionRootPathname = '';
+	private _collectionRootPathname?: string;
 
 	#collectionContext?: UmbDefaultCollectionContext<any, any>;
 
@@ -23,10 +23,20 @@ export class UmbCollectionViewBundleElement extends UmbLitElement {
 		this.consumeContext(UMB_COLLECTION_CONTEXT, (context) => {
 			this.#collectionContext = context;
 			if (!this.#collectionContext) return;
-			this._collectionRootPathname = this.#collectionContext.collectionRootPathname;
+			this.#observeRootPathname();
 			this.#observeViews();
 			this.#observeCurrentView();
 		});
+	}
+
+	#observeRootPathname() {
+		this.observe(
+			this.#collectionContext!.rootPathname,
+			(rootPathname) => {
+				this._collectionRootPathname = rootPathname;
+			},
+			'umbCollectionRootPathnameObserver',
+		);
 	}
 
 	#observeCurrentView() {
