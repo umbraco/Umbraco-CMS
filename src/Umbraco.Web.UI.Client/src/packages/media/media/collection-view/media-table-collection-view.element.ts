@@ -10,7 +10,7 @@ import type {
 	UmbTableOrderedEvent,
 	UmbTableSelectedEvent,
 } from '@umbraco-cms/backoffice/components';
-import { UmbCollectionDefaultContext, UMB_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
+import { UmbDefaultCollectionContext, UMB_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
@@ -38,7 +38,7 @@ export class UmbMediaTableCollectionViewElement extends UmbLitElement {
 	@state()
 	private _selection: Array<string | null> = [];
 
-	private _collectionContext?: UmbCollectionDefaultContext<UmbMediaDetailModel, any>;
+	private _collectionContext?: UmbDefaultCollectionContext<UmbMediaDetailModel, any>;
 
 	constructor() {
 		super();

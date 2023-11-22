@@ -18,7 +18,7 @@ import type { UmbCollectionFilterModel } from '@umbraco-cms/backoffice/collectio
 import { UmbSelectionManager, UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
-export class UmbCollectionDefaultContext<ItemType, FilterModelType extends UmbCollectionFilterModel>
+export class UmbDefaultCollectionContext<ItemType = any, FilterModelType extends UmbCollectionFilterModel = any>
 	extends UmbBaseController
 	implements UmbCollectionContext, UmbApi
 {
@@ -192,6 +192,6 @@ export class UmbCollectionDefaultContext<ItemType, FilterModelType extends UmbCo
 	}
 }
 
-export const UMB_COLLECTION_CONTEXT = new UmbContextToken<UmbCollectionDefaultContext<any, any>>(
+export const UMB_COLLECTION_CONTEXT = new UmbContextToken<UmbDefaultCollectionContext<any, any>>(
 	'UmbCollectionContext',
 );

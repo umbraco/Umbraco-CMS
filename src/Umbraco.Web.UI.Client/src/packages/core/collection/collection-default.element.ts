@@ -1,4 +1,4 @@
-import { UMB_COLLECTION_CONTEXT, UmbCollectionDefaultContext } from './collection-default.context.js';
+import { UMB_COLLECTION_CONTEXT, UmbDefaultCollectionContext } from './collection-default.context.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
@@ -19,7 +19,7 @@ const manifest: UmbBackofficeManifestKind = {
 		type: 'collection',
 		kind: 'default',
 		elementName: 'umb-collection-default',
-		api: UmbCollectionDefaultContext,
+		api: UmbDefaultCollectionContext,
 	},
 };
 umbExtensionsRegistry.register(manifest);
@@ -29,7 +29,7 @@ export class UmbCollectionDefaultElement extends UmbLitElement {
 	@state()
 	private _routes: Array<UmbRoute> = [];
 
-	#collectionContext?: UmbCollectionDefaultContext<any, any>;
+	#collectionContext?: UmbDefaultCollectionContext<any, any>;
 
 	constructor() {
 		super();

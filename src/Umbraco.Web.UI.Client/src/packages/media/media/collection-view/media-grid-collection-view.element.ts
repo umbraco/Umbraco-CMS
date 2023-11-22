@@ -1,6 +1,6 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
-import { UmbCollectionDefaultContext, UMB_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
+import { UmbDefaultCollectionContext, UMB_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
@@ -12,7 +12,7 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 	@state()
 	private _selection: Array<string | null> = [];
 
-	private _collectionContext?: UmbCollectionDefaultContext<EntityTreeItemResponseModel, any>;
+	private _collectionContext?: UmbDefaultCollectionContext<EntityTreeItemResponseModel, any>;
 
 	constructor() {
 		super();
