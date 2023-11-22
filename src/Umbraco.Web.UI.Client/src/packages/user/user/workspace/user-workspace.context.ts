@@ -1,6 +1,9 @@
 import { UmbUserRepository } from '../repository/user.repository.js';
-import { USER_ENTITY_TYPE, type UmbUserDetail } from '../index.js';
-import { UmbSaveableWorkspaceContextInterface, UmbEditableWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
+import { UMB_USER_ENTITY_TYPE, type UmbUserDetail } from '../index.js';
+import {
+	UmbSaveableWorkspaceContextInterface,
+	UmbEditableWorkspaceContextBase,
+} from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import type { UpdateUserRequestModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
@@ -50,7 +53,7 @@ export class UmbUserWorkspaceContext
 	}
 
 	getEntityType(): string {
-		return USER_ENTITY_TYPE;
+		return UMB_USER_ENTITY_TYPE;
 	}
 
 	getData() {
@@ -112,5 +115,6 @@ export const UMB_USER_WORKSPACE_CONTEXT = new UmbContextToken<
 	UmbUserWorkspaceContext
 >(
 	'UmbWorkspaceContext',
-	(context): context is UmbUserWorkspaceContext => context.getEntityType?.() === USER_ENTITY_TYPE,
+	undefined,
+	(context): context is UmbUserWorkspaceContext => context.getEntityType?.() === UMB_USER_ENTITY_TYPE,
 );

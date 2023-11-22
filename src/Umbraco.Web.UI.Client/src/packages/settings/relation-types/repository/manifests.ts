@@ -2,20 +2,20 @@ import { UmbRelationTypeRepository } from '../repository/relation-type.repositor
 import { UmbRelationTypeStore } from './relation-type.store.js';
 import { ManifestStore, ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
 
-export const RELATION_TYPE_REPOSITORY_ALIAS = 'Umb.Repository.RelationType';
+export const UMB_RELATION_TYPE_REPOSITORY_ALIAS = 'Umb.Repository.RelationType';
 
 const repository: ManifestRepository = {
 	type: 'repository',
-	alias: RELATION_TYPE_REPOSITORY_ALIAS,
+	alias: UMB_RELATION_TYPE_REPOSITORY_ALIAS,
 	name: 'Relation Type Repository',
 	api: UmbRelationTypeRepository,
 };
 
-export const RELATION_TYPE_STORE_ALIAS = 'Umb.Store.RelationType';
+export const UMB_RELATION_TYPE_STORE_ALIAS = 'Umb.Store.RelationType';
 
 const store: ManifestStore = {
 	type: 'store',
-	alias: RELATION_TYPE_STORE_ALIAS,
+	alias: UMB_RELATION_TYPE_STORE_ALIAS,
 	name: 'Relation Type Store',
 	api: UmbRelationTypeStore,
 };

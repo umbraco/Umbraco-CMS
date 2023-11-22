@@ -1,10 +1,10 @@
 const { rest } = window.MockServiceWorker;
 import { umbMediaTypeData } from '../../data/media-type.data.js';
-import { slug } from './slug.js';
+import { UMB_SLUG } from './slug.js';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 export const treeHandlers = [
-	rest.get(umbracoPath(`/tree${slug}/root`), (req, res, ctx) => {
+	rest.get(umbracoPath(`/tree${UMB_SLUG}/root`), (req, res, ctx) => {
 		const rootItems = umbMediaTypeData.getTreeRoot();
 		const response = {
 			total: rootItems.length,
@@ -13,7 +13,7 @@ export const treeHandlers = [
 		return res(ctx.status(200), ctx.json(response));
 	}),
 
-	rest.get(umbracoPath(`/tree${slug}/children`), (req, res, ctx) => {
+	rest.get(umbracoPath(`/tree${UMB_SLUG}/children`), (req, res, ctx) => {
 		const parentId = req.url.searchParams.get('parentId');
 		if (!parentId) return;
 

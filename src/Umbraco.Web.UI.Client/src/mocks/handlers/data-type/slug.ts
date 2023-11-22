@@ -1,1 +1,1 @@
-export const slug = '/data-type';
+export const UMB_SLUG = '/data-type';

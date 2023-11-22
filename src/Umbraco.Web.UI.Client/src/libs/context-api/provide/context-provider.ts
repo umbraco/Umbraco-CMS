@@ -1,7 +1,7 @@
 import {
 	UmbContextRequestEvent,
-	umbContextRequestEventType,
-	umbDebugContextEventType,
+	UMB_CONTENT_REQUEST_EVENT_TYPE,
+	UMB_DEBUG_CONTEXT_EVENT_TYPE,
 } from '../consume/context-request.event.js';
 import { UmbContextToken } from '../token/context-token.js';
 import {
@@ -17,6 +17,7 @@ export class UmbContextProvider<BaseType = unknown, ResultType extends BaseType 
 	protected hostElement: EventTarget;
 
 	protected _contextAlias: string;
+	protected _apiAlias: string;
 	#instance: unknown;
 
 	/**
@@ -31,13 +32,20 @@ export class UmbContextProvider<BaseType = unknown, ResultType extends BaseType 
 	/**
 	 * Creates an instance of UmbContextProvider.
 	 * @param {EventTarget} host
-	 * @param {string} contextAlias
+	 * @param {string | UmbContextToken} contextIdentifier
 	 * @param {*} instance
 	 * @memberof UmbContextProvider
 	 */
-	constructor(hostElement: EventTarget, contextAlias: string | UmbContextToken<BaseType, ResultType>, instance: ResultType) {
+	constructor(
+		hostElement: EventTarget,
+		contextIdentifier: string | UmbContextToken<BaseType, ResultType>,
+		instance: ResultType,
+	) {
 		this.hostElement = hostElement;
-		this._contextAlias = contextAlias.toString();
+
+		const idSplit = contextIdentifier.toString().split('#');
+		this._contextAlias = idSplit[0];
+		this._apiAlias = idSplit[1] ?? 'default';
 		this.#instance = instance;
 	}
 
@@ -52,7 +60,8 @@ export class UmbContextProvider<BaseType = unknown, ResultType extends BaseType 
 		// Since the alias matches, we will stop it from bubbling further up. But we still allow it to ask the other Contexts of the element. Hence not calling `event.stopImmediatePropagation();`
 		event.stopPropagation();
 
-		if(event.callback(this.#instance)) {
+		// First and importantly, check that the apiAlias matches and then call the callback. If that returns true then we can stop the event completely.
+		if (this._apiAlias === event.apiAlias && event.callback(this.#instance)) {
 			// Make sure the event not hits any more Contexts as we have found a match.
 			event.stopImmediatePropagation();
 		}
@@ -62,23 +71,23 @@ export class UmbContextProvider<BaseType = unknown, ResultType extends BaseType 
 	 * @memberof UmbContextProvider
 	 */
 	public hostConnected() {
-		this.hostElement.addEventListener(umbContextRequestEventType, this.#handleContextRequest);
+		this.hostElement.addEventListener(UMB_CONTENT_REQUEST_EVENT_TYPE, this.#handleContextRequest);
 		this.hostElement.dispatchEvent(new UmbContextProvideEventImplementation(this._contextAlias));
 
 		// Listen to our debug event 'umb:debug-contexts'
-		this.hostElement.addEventListener(umbDebugContextEventType, this._handleDebugContextRequest);
+		this.hostElement.addEventListener(UMB_DEBUG_CONTEXT_EVENT_TYPE, this._handleDebugContextRequest);
 	}
 
 	/**
 	 * @memberof UmbContextProvider
 	 */
 	public hostDisconnected() {
-		this.hostElement.removeEventListener(umbContextRequestEventType, this.#handleContextRequest);
+		this.hostElement.removeEventListener(UMB_CONTENT_REQUEST_EVENT_TYPE, this.#handleContextRequest);
 		// Out-commented for now, but kept if we like to reintroduce this:
 		//window.dispatchEvent(new UmbContextUnprovidedEventImplementation(this._contextAlias, this.#instance));
 
 		// Stop listen to our debug event 'umb:debug-contexts'
-		this.hostElement.removeEventListener(umbDebugContextEventType, this._handleDebugContextRequest);
+		this.hostElement.removeEventListener(UMB_DEBUG_CONTEXT_EVENT_TYPE, this._handleDebugContextRequest);
 	}
 
 	private _handleDebugContextRequest = (event: any) => {

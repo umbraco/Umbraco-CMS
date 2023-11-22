@@ -1,10 +1,10 @@
 import {
-	CHANGE_USER_PASSWORD_REPOSITORY_ALIAS,
-	DISABLE_USER_REPOSITORY_ALIAS,
-	ENABLE_USER_REPOSITORY_ALIAS,
-	INVITE_USER_REPOSITORY_ALIAS,
-	UNLOCK_USER_REPOSITORY_ALIAS,
-	USER_REPOSITORY_ALIAS,
+	UMB_CHANGE_USER_PASSWORD_REPOSITORY_ALIAS,
+	UMB_DISABLE_USER_REPOSITORY_ALIAS,
+	UMB_ENABLE_USER_REPOSITORY_ALIAS,
+	UMB_INVITE_USER_REPOSITORY_ALIAS,
+	UMB_UNLOCK_USER_REPOSITORY_ALIAS,
+	UMB_USER_REPOSITORY_ALIAS,
 } from '../repository/manifests.js';
 import { UMB_USER_ENTITY_TYPE } from '../index.js';
 import { UmbDisableUserEntityAction } from './disable/disable-user.action.js';
@@ -25,7 +25,7 @@ const entityActions: Array<ManifestTypes> = [
 		meta: {
 			icon: 'icon-trash',
 			label: 'Delete',
-			repositoryAlias: USER_REPOSITORY_ALIAS,
+			repositoryAlias: UMB_USER_REPOSITORY_ALIAS,
 			entityTypes: [UMB_USER_ENTITY_TYPE],
 		},
 		conditions: [
@@ -43,7 +43,7 @@ const entityActions: Array<ManifestTypes> = [
 		meta: {
 			icon: 'icon-check',
 			label: 'Enable',
-			repositoryAlias: ENABLE_USER_REPOSITORY_ALIAS,
+			repositoryAlias: UMB_ENABLE_USER_REPOSITORY_ALIAS,
 			entityTypes: [UMB_USER_ENTITY_TYPE],
 		},
 		conditions: [
@@ -61,7 +61,7 @@ const entityActions: Array<ManifestTypes> = [
 		meta: {
 			icon: 'icon-block',
 			label: 'Disable',
-			repositoryAlias: DISABLE_USER_REPOSITORY_ALIAS,
+			repositoryAlias: UMB_DISABLE_USER_REPOSITORY_ALIAS,
 			entityTypes: [UMB_USER_ENTITY_TYPE],
 		},
 		conditions: [
@@ -79,7 +79,7 @@ const entityActions: Array<ManifestTypes> = [
 		meta: {
 			icon: 'icon-key',
 			label: 'Change Password',
-			repositoryAlias: CHANGE_USER_PASSWORD_REPOSITORY_ALIAS,
+			repositoryAlias: UMB_CHANGE_USER_PASSWORD_REPOSITORY_ALIAS,
 			entityTypes: [UMB_USER_ENTITY_TYPE],
 		},
 	},
@@ -92,7 +92,7 @@ const entityActions: Array<ManifestTypes> = [
 		meta: {
 			icon: 'icon-unlocked',
 			label: 'Unlock',
-			repositoryAlias: UNLOCK_USER_REPOSITORY_ALIAS,
+			repositoryAlias: UMB_UNLOCK_USER_REPOSITORY_ALIAS,
 			entityTypes: [UMB_USER_ENTITY_TYPE],
 		},
 		conditions: [
@@ -110,7 +110,7 @@ const entityActions: Array<ManifestTypes> = [
 		meta: {
 			icon: 'icon-message',
 			label: 'Resend Invite',
-			repositoryAlias: INVITE_USER_REPOSITORY_ALIAS,
+			repositoryAlias: UMB_INVITE_USER_REPOSITORY_ALIAS,
 			entityTypes: [UMB_USER_ENTITY_TYPE],
 		},
 		conditions: [

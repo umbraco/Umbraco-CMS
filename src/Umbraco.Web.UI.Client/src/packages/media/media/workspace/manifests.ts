@@ -11,7 +11,8 @@ const workspace: ManifestWorkspace = {
 	type: 'workspace',
 	alias: 'Umb.Workspace.Media',
 	name: 'Media Workspace',
-	js: () => import('./media-workspace.element.js'),
+	element: () => import('./media-workspace.element.js'),
+	api: () => import('./media-workspace.context.js'),
 	meta: {
 		entityType: 'media',
 	},
