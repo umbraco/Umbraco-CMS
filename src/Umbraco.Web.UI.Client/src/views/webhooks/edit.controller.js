@@ -150,11 +150,10 @@
             default:
               return;
           }
-
+          vm.contentTypes = [];
           selection.forEach(entity => {
             resource.getById(entity.key)
               .then(data => {
-                console.log("data", data);
                 if (!vm.contentTypes.some(x => x.key === data.key)) {
                   vm.contentTypes.push(data);
                 }
