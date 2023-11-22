@@ -1,8 +1,8 @@
+import { UmbDataTypeDetailModel } from '../../types.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbDataSource } from '@umbraco-cms/backoffice/repository';
 import {
 	DataTypeResource,
-	DataTypeResponseModel,
 	DataTypeModelBaseModel,
 	CreateDataTypeRequestModel,
 	UpdateDataTypeRequestModel,
@@ -17,7 +17,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
  * @implements {RepositoryDetailDataSource}
  */
 export class UmbDataTypeServerDataSource
-	implements UmbDataSource<CreateDataTypeRequestModel, any, UpdateDataTypeRequestModel, DataTypeResponseModel>
+	implements UmbDataSource<CreateDataTypeRequestModel, any, UpdateDataTypeRequestModel, UmbDataTypeDetailModel>
 {
 	#host: UmbControllerHost;
 
@@ -28,22 +28,6 @@ export class UmbDataTypeServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
 		this.#host = host;
-	}
-
-	/**
-	 * Fetches a Data Type with the given id from the server
-	 * @param {string} id
-	 * @return {*}
-	 * @memberof UmbDataTypeServerDataSource
-	 */
-	async read(id: string) {
-		if (!id) throw new Error('Key is missing');
-		return tryExecuteAndNotify(
-			this.#host,
-			DataTypeResource.getDataTypeById({
-				id: id,
-			}),
-		);
 	}
 
 	/**
@@ -66,6 +50,22 @@ export class UmbDataTypeServerDataSource
 	}
 
 	/**
+	 * Fetches a Data Type with the given id from the server
+	 * @param {string} id
+	 * @return {*}
+	 * @memberof UmbDataTypeServerDataSource
+	 */
+	async read(id: string) {
+		if (!id) throw new Error('Key is missing');
+		return tryExecuteAndNotify(
+			this.#host,
+			DataTypeResource.getDataTypeById({
+				id: id,
+			}),
+		);
+	}
+
+	/**
 	 * Inserts a new Data Type on the server
 	 * @param {Document} dataType
 	 * @return {*}
@@ -85,7 +85,7 @@ export class UmbDataTypeServerDataSource
 
 	/**
 	 * Updates a DataType on the server
-	 * @param {DataTypeResponseModel} DataType
+	 * @param {UmbDataTypeDetailModel} DataType
 	 * @return {*}
 	 * @memberof UmbDataTypeServerDataSource
 	 */

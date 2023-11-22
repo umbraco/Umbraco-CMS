@@ -1,13 +1,13 @@
 import { UMB_DATA_TYPE_WORKSPACE_CONTEXT } from '../../data-type-workspace.context.js';
+import { UmbDataTypeDetailModel } from '../../../types.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import {
 	UmbModalManagerContext,
 	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
 	UMB_PROPERTY_EDITOR_UI_PICKER_MODAL,
 } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { DataTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbWorkspaceEditorViewExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-data-type-details-workspace-view')
@@ -16,7 +16,7 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement
 	implements UmbWorkspaceEditorViewExtensionElement
 {
 	@state()
-	_dataType?: DataTypeResponseModel;
+	_dataType?: UmbDataTypeDetailModel;
 
 	@state()
 	private _propertyEditorUiIcon?: string | null = null;

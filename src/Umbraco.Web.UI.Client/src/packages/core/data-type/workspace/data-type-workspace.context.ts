@@ -1,11 +1,11 @@
 import { UmbDataTypeDetailRepository } from '../repository/detail/data-type-detail.repository.js';
 import { UmbDataTypeVariantContext } from '../variant-context/data-type-variant-context.js';
+import type { UmbDataTypeDetailModel } from '../types.js';
 import {
 	UmbInvariantableWorkspaceContextInterface,
 	UmbEditableWorkspaceContextBase,
 	UmbWorkspaceContextInterface,
 } from '@umbraco-cms/backoffice/workspace';
-import type { DataTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import {
 	appendToFrozenArray,
 	UmbArrayState,
@@ -23,11 +23,11 @@ import {
 import { UMB_PROPERTY_EDITOR_SCHEMA_ALIAS_DEFAULT } from '@umbraco-cms/backoffice/property-editor';
 
 export class UmbDataTypeWorkspaceContext
-	extends UmbEditableWorkspaceContextBase<UmbDataTypeDetailRepository, DataTypeResponseModel>
-	implements UmbInvariantableWorkspaceContextInterface<DataTypeResponseModel | undefined>
+	extends UmbEditableWorkspaceContextBase<UmbDataTypeDetailRepository, UmbDataTypeDetailModel>
+	implements UmbInvariantableWorkspaceContextInterface<UmbDataTypeDetailModel | undefined>
 {
 	// TODO: revisit. temp solution because the create and response models are different.
-	#data = new UmbObjectState<DataTypeResponseModel | undefined>(undefined);
+	#data = new UmbObjectState<UmbDataTypeDetailModel | undefined>(undefined);
 	readonly data = this.#data.asObservable();
 	#getDataPromise?: Promise<any>;
 
@@ -170,7 +170,7 @@ export class UmbDataTypeWorkspaceContext
 		this.setIsNew(true);
 		// TODO: This is a hack to get around the fact that the data is not typed correctly.
 		// Create and response models are different. We need to look into this.
-		this.#data.next(data as unknown as DataTypeResponseModel);
+		this.#data.next(data as unknown as UmbDataTypeDetailModel);
 		return { data };
 	}
 

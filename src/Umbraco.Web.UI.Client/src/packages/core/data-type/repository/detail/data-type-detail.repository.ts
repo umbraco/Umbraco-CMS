@@ -1,18 +1,17 @@
 import { UmbDataTypeRepositoryBase } from '../data-type-repository-base.js';
-import { createTreeItem } from '../utils.js';
 import { UmbDataTypeServerDataSource } from './data-type-detail.server.data-source.js';
 import type { UmbDetailRepository, UmbDataSource } from '@umbraco-cms/backoffice/repository';
 import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import {
 	CreateDataTypeRequestModel,
-	DataTypeResponseModel,
+	UmbDataTypeDetailModel,
 	UpdateDataTypeRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
 export class UmbDataTypeDetailRepository
 	extends UmbDataTypeRepositoryBase
-	implements UmbDetailRepository<CreateDataTypeRequestModel, any, UpdateDataTypeRequestModel, DataTypeResponseModel>
+	implements UmbDetailRepository<CreateDataTypeRequestModel, any, UpdateDataTypeRequestModel, UmbDataTypeDetailModel>
 {
-	#detailSource: UmbDataSource<CreateDataTypeRequestModel, any, UpdateDataTypeRequestModel, DataTypeResponseModel>;
+	#detailSource: UmbDataSource<CreateDataTypeRequestModel, any, UpdateDataTypeRequestModel, UmbDataTypeDetailModel>;
 
 	constructor(host: UmbControllerHost) {
 		super(host);
@@ -59,10 +58,13 @@ export class UmbDataTypeDetailRepository
 		const { error } = await this.#detailSource.create(dataType);
 
 		if (!error) {
+			/*
 			// TODO: We need to push a new item to the tree store to update the tree. How do we want to create the tree items?
 			const treeItem = createTreeItem(dataType);
 			this._treeStore!.appendItems([treeItem]);
 			//this.#detailStore?.append(dataType);
+			*/
+			this._detailStore?.append(dataType);
 
 			const notification = { data: { message: `Data Type created` } };
 			this._notificationContext!.peek('positive', notification);
