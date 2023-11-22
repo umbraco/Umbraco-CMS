@@ -1,7 +1,6 @@
 ﻿import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
-
 test.describe('Stylesheets tests', () => {
 
   const styleSheetName = 'TestStyleSheetFile';
@@ -14,7 +13,6 @@ test.describe('Stylesheets tests', () => {
     await umbracoUi.goToSection(ConstantHelper.sections.settings);
   });
   
-
   test('can create a stylesheet file', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.stylesheet.ensureNameNotExists(styleSheetFileName);
@@ -26,7 +24,7 @@ test.describe('Stylesheets tests', () => {
     await umbracoUi.stylesheet.clickSaveButton();
 
     // Assert
-    expect(await umbracoApi.stylesheet.doesExist(styleSheetFileName)).toBeTruthy;
+    expect(await umbracoApi.stylesheet.doesExist(styleSheetFileName)).toBeTruthy();
     // TODO: when frontend is ready, verify the new stylesheet is displayed under the Stylesheets section 
     // TODO: when frontend is ready, verify the notification displays
     
@@ -46,8 +44,8 @@ test.describe('Stylesheets tests', () => {
     await umbracoUi.stylesheet.clickSaveButton();
 
     // Assert
-    expect(await umbracoApi.stylesheet.doesExist(styleSheetFileName)).toBeTruthy;
-    expect(await umbracoApi.stylesheet.doesRuleNameExist(styleSheetFileName, ruleName)).toBeTruthy;
+    expect(await umbracoApi.stylesheet.doesExist(styleSheetFileName)).toBeTruthy();
+    expect(await umbracoApi.stylesheet.doesRuleNameExist(styleSheetFileName, ruleName)).toBeTruthy();
     // TODO: when frontend is ready, verify the new stylesheet is displayed under the Stylesheets section
     // TODO: when frontend is ready, verify the notification displays
     
@@ -66,7 +64,7 @@ test.describe('Stylesheets tests', () => {
     await umbracoUi.stylesheet.clickSaveButton();
 
     // Assert
-    expect(await umbracoApi.stylesheet.doesRuleNameExist(styleSheetFileName, ruleName)).toBeTruthy;
+    expect(await umbracoApi.stylesheet.doesRuleNameExist(styleSheetFileName, ruleName)).toBeTruthy();
     // TODO: when frontend is ready, verify the notification displays
       
     // Clean
@@ -127,17 +125,17 @@ test.describe('Stylesheets tests', () => {
     // Arrange
     await umbracoApi.stylesheet.ensureNameNotExists(styleFolderName);
     await umbracoApi.stylesheet.createFolder(styleFolderName);
-    const childsFolderName = "ChildFolderName";
+    const childFolderName = "ChildFolderName";
 
     // Act
     await umbracoUi.stylesheet.clickRootFolderCaretButton();
     await umbracoUi.stylesheet.openActionsMenuForName(styleFolderName);
-    await umbracoUi.stylesheet.createNewFolder(childsFolderName);
+    await umbracoUi.stylesheet.createNewFolder(childFolderName);
 
     //Assert 
-    expect(await umbracoApi.stylesheet.doesNameExist(childsFolderName)).toBeTruthy();
+    expect(await umbracoApi.stylesheet.doesNameExist(childFolderName)).toBeTruthy();
     const styleChildren = await umbracoApi.stylesheet.getChildren(styleFolderName);
-    expect(styleChildren[0].path).toBe(styleFolderName + '/' + childsFolderName);
+    expect(styleChildren[0].path).toBe(styleFolderName + '/' + childFolderName);
     // TODO: when frontend is ready, verify the new folder is displayed under the Stylesheets section
     // TODO: when frontend is ready, verify the notification displays
     
