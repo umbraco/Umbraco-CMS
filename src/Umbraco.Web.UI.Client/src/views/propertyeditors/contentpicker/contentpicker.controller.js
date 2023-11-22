@@ -257,11 +257,13 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
         });
     }
     else if ($scope.model.config.startNode.dynamicRoot) {
+
         entityResource.getDynamicRoot(
           JSON.stringify($scope.model.config.startNode.dynamicRoot),
             editorState.current.id,
             editorState.current.parentId,
-            "Document"
+            $scope.model.culture,
+            $scope.model.segment
         ).then(function (ent) {
           if(ent) {
             dialogOptions.startNodeId = ($scope.model.config.idType === "udi" ? ent.udi : ent.id).toString();
