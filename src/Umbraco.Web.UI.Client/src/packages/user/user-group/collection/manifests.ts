@@ -3,6 +3,7 @@ import {
 	manifests as repositoryManifests,
 } from './repository/manifests.js';
 import { manifests as collectionViewManifests } from './views/manifests.js';
+import { manifests as collectionActionManifests } from './action/manifests.js';
 import { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_USER_GROUP_COLLECTION_ALIAS = 'Umb.Collection.UserGroup';
@@ -16,4 +17,4 @@ const collection: ManifestTypes = {
 	},
 };
 
-export const manifests = [collection, ...repositoryManifests, ...collectionViewManifests];
+export const manifests = [collection, ...repositoryManifests, ...collectionViewManifests, ...collectionActionManifests];

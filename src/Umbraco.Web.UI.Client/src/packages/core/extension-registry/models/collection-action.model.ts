@@ -12,4 +12,5 @@ export interface ManifestCollectionAction extends ManifestElementAndApi, Manifes
 
 export interface MetaCollectionAction {
 	label: string;
+	href?: string;
 }

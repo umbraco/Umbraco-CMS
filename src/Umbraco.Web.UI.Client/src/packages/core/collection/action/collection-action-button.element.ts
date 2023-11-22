@@ -1,12 +1,11 @@
 import { UmbCollectionAction } from './collection-action-base.js';
 import { UmbActionExecutedEvent } from '@umbraco-cms/backoffice/event';
-import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import {
 	umbExtensionsRegistry,
-	type ManifestWorkspaceAction as ManifestCollectionAction,
+	type ManifestCollectionAction,
 	UmbBackofficeManifestKind,
 } from '@umbraco-cms/backoffice/extension-registry';
 import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
@@ -25,7 +24,7 @@ const manifest: UmbBackofficeManifestKind = {
 umbExtensionsRegistry.register(manifest);
 
 @customElement('umb-collection-action-button')
-export class UmbCollectionActionElement extends UmbLitElement {
+export class UmbCollectionActionButtonElement extends UmbLitElement {
 	@state()
 	private _buttonState?: UUIButtonState;
 
@@ -45,13 +44,15 @@ export class UmbCollectionActionElement extends UmbLitElement {
 	}
 
 	async #createApi() {
-		if (!this._manifest) return;
-		this.#api = await createExtensionApi(this._manifest, [this]);
+		if (!this._manifest) throw new Error('No manifest defined');
+		if (!this._manifest.api) return;
+		this.#api = (await createExtensionApi(this._manifest, [this])) as unknown as UmbCollectionAction;
 	}
 
 	#api?: UmbCollectionAction;
 
 	private async _onClick() {
+		if (!this.#api) return;
 		this._buttonState = 'waiting';
 
 		try {
@@ -73,17 +74,16 @@ export class UmbCollectionActionElement extends UmbLitElement {
 				look="outline"
 				color="default"
 				label=${this.manifest?.meta.label || ''}
+				href="${ifDefined(this.manifest?.meta.href)}"
 				.state=${this._buttonState}></uui-button>
 		`;
 	}
-
-	static styles = [UmbTextStyles, css``];
 }
 
-export default UmbCollectionActionElement;
+export default UmbCollectionActionButtonElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-collection-action': UmbCollectionActionElement;
+		'umb-collection-action': UmbCollectionActionButtonElement;
 	}
 }
