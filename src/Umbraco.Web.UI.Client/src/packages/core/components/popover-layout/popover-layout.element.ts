@@ -10,7 +10,6 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
  *
  * @element umb-popover-layout
  *
- * @cssprop {String} --umb-popover-layout-background-color - Override background color.
  */
 @customElement('umb-popover-layout')
 export class UmbPopoverLayoutElement extends UmbLitElement {
@@ -22,7 +21,7 @@ export class UmbPopoverLayoutElement extends UmbLitElement {
 		UmbTextStyles,
 		css`
 			:host {
-				background-color: var(--umb-popover-layout-background-color, var(--uui-color-surface));
+				background-color: var(--uui-color-surface);
 				display: block;
 				border: 1px solid var(--uui-color-border);
 				border-radius: var(--uui-border-radius);
