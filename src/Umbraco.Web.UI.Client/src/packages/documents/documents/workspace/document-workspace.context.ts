@@ -217,7 +217,19 @@ export class UmbDocumentWorkspaceContext
 			const variantIds = currentData.variants?.map((x) => UmbVariantId.Create(x));
 			const id = this.getEntityId();
 			if(variantIds && id) {
-				await this.repository.saveAndPublish(id, variantIds);
+				await this.repository.publish(id, variantIds);
+			}
+		}
+	}
+
+	public async saveAndPublish() {
+		// TODO: This might be right to publish all, but we need a method that just saves and publishes a declared range of variants.
+		const currentData = this.#currentData.value;
+		if(currentData) {
+			const variantIds = currentData.variants?.map((x) => UmbVariantId.Create(x));
+			const id = currentData.id;
+			if(variantIds && id) {
+				await this.repository.saveAndPublish(id, currentData, variantIds);
 			}
 		}
 	}
