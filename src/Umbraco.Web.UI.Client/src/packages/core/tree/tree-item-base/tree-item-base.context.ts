@@ -1,6 +1,7 @@
 import { UmbTreeItemContext } from '../tree-item/tree-item.context.interface.js';
 import { UmbTreeContextBase } from '../tree.context.js';
 import { UmbTreeItemModelBase } from '../types.js';
+import { UmbTreeStore } from '../tree-store.interface.js';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import { UMB_SECTION_CONTEXT_TOKEN, UMB_SECTION_SIDEBAR_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/section';
 import type { UmbSectionContext, UmbSectionSidebarContext } from '@umbraco-cms/backoffice/section';
@@ -102,12 +103,12 @@ export class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemModelBase>
 	}
 
 	public select() {
-		if (this.unique === undefined) throw new Error('Could not request children, unique key is missing');
+		if (this.unique === undefined) throw new Error('Could not select, unique key is missing');
 		this.treeContext?.select(this.unique);
 	}
 
 	public deselect() {
-		if (this.unique === undefined) throw new Error('Could not request children, unique key is missing');
+		if (this.unique === undefined) throw new Error('Could not deselect, unique key is missing');
 		this.treeContext?.deselect(this.unique);
 	}
 
@@ -125,6 +126,7 @@ export class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemModelBase>
 			this.treeContext = treeContext;
 			this.#observeIsSelectable();
 			this.#observeIsSelected();
+			this.#observeHasChildren();
 		});
 	}
 
@@ -185,6 +187,17 @@ export class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemModelBase>
 			},
 			'observeActions',
 		);
+	}
+
+	async #observeHasChildren() {
+		if (!this.treeContext || !this.unique) return;
+
+		const observable = await this.treeContext.childrenOf(this.unique);
+
+		// observe if any children will be added runtime to a tree item
+		this.observe(observable.pipe(map((children) => children.length > 0)), (hasChildren) => {
+			this.#hasChildren.next(hasChildren);
+		});
 	}
 
 	// TODO: use router context
