@@ -90,7 +90,6 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement
 	}
 
 	#renderPropertyEditorReference() {
-		console.log(this._dataType);
 		return html`
 			<umb-workspace-property-layout label="Property Editor" description="Select a property editor">
 				${this._propertyEditorUiAlias && this._propertyEditorSchemaAlias
