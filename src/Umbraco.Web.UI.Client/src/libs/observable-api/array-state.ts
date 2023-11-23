@@ -12,10 +12,10 @@ import { pushToUniqueArray } from './push-to-unique-array.function.js';
  * The ArrayState provides methods to append data when the data is an Object.
  */
 export class UmbArrayState<T> extends UmbDeepState<T[]> {
-	getUnique?: (entry: T) => unknown;
+	getUnique: (entry: T) => unknown;
 	#sortMethod?: (a: T, b: T) => number;
 
-	constructor(initialData: T[], getUniqueMethod?: (entry: T) => unknown) {
+	constructor(initialData: T[], getUniqueMethod: (entry: T) => unknown) {
 		super(initialData);
 		this.getUnique = getUniqueMethod;
 	}
