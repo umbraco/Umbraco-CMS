@@ -47,6 +47,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers;
 [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
 [Authorize(Policy = AuthorizationPolicies.SectionAccessMedia)]
 [ParameterSwapControllerActionSelector(nameof(GetById), "id", typeof(int), typeof(Guid), typeof(Udi))]
+[ParameterSwapControllerActionSelector(nameof(GetByIds), "ids", typeof(int), typeof(Guid), typeof(Udi))]
 [ParameterSwapControllerActionSelector(nameof(GetChildren), "id", typeof(int), typeof(Guid), typeof(Udi))]
 public class MediaController : ContentControllerBase
 {
@@ -291,6 +292,30 @@ public class MediaController : ContentControllerBase
     /// <returns></returns>
     [FilterAllowedOutgoingMedia(typeof(IEnumerable<MediaItemDisplay>))]
     public IEnumerable<MediaItemDisplay?> GetByIds([FromQuery] int[] ids)
+    {
+        IEnumerable<IMedia> foundMedia = _mediaService.GetByIds(ids);
+        return foundMedia.Select(media => _umbracoMapper.Map<MediaItemDisplay>(media));
+    }
+
+    /// <summary>
+    ///     Return media for the specified ids
+    /// </summary>
+    /// <param name="ids"></param>
+    /// <returns></returns>
+    [FilterAllowedOutgoingMedia(typeof(IEnumerable<MediaItemDisplay>))]
+    public IEnumerable<MediaItemDisplay?> GetByIds([FromQuery] Guid[] ids)
+    {
+        IEnumerable<IMedia> foundMedia = _mediaService.GetByIds(ids);
+        return foundMedia.Select(media => _umbracoMapper.Map<MediaItemDisplay>(media));
+    }
+
+    /// <summary>
+    ///     Return media for the specified ids
+    /// </summary>
+    /// <param name="ids"></param>
+    /// <returns></returns>
+    [FilterAllowedOutgoingMedia(typeof(IEnumerable<MediaItemDisplay>))]
+    public IEnumerable<MediaItemDisplay?> GetByIds([FromQuery] Udi[] ids)
     {
         IEnumerable<IMedia> foundMedia = _mediaService.GetByIds(ids);
         return foundMedia.Select(media => _umbracoMapper.Map<MediaItemDisplay>(media));
