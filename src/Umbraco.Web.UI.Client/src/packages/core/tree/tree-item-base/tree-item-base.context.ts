@@ -1,5 +1,6 @@
 import { UmbTreeItemContext } from '../tree-item/tree-item.context.interface.js';
 import { UmbTreeContextBase } from '../tree.context.js';
+import { UmbTreeItemModelBase } from '../types.js';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import { UMB_SECTION_CONTEXT_TOKEN, UMB_SECTION_SIDEBAR_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/section';
 import type { UmbSectionContext, UmbSectionSidebarContext } from '@umbraco-cms/backoffice/section';
@@ -7,14 +8,12 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registr
 import { UmbBooleanState, UmbDeepState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbBaseController, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import type { TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 
-// add type for unique function
-export type UmbTreeItemUniqueFunction<TreeItemType extends TreeItemPresentationModel> = (
-	x: TreeItemType
+export type UmbTreeItemUniqueFunction<TreeItemType extends UmbTreeItemModelBase> = (
+	x: TreeItemType,
 ) => string | null | undefined;
 
-export class UmbTreeItemContextBase<TreeItemType extends TreeItemPresentationModel>
+export class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemModelBase>
 	extends UmbBaseController
 	implements UmbTreeItemContext<TreeItemType>
 {
@@ -146,7 +145,7 @@ export class UmbTreeItemContextBase<TreeItemType extends TreeItemPresentationMod
 					this.#isSelectable.next(isSelectable);
 				}
 			},
-			'observeIsSelectable'
+			'observeIsSelectable',
 		);
 	}
 
@@ -158,7 +157,7 @@ export class UmbTreeItemContextBase<TreeItemType extends TreeItemPresentationMod
 			(isSelected) => {
 				this.#isSelected.next(isSelected);
 			},
-			'observeIsSelected'
+			'observeIsSelected',
 		);
 	}
 
@@ -172,7 +171,7 @@ export class UmbTreeItemContextBase<TreeItemType extends TreeItemPresentationMod
 				const path = this.constructPath(pathname, this.type, this.unique);
 				this.#path.next(path);
 			},
-			'observeSectionPath'
+			'observeSectionPath',
 		);
 	}
 
@@ -184,7 +183,7 @@ export class UmbTreeItemContextBase<TreeItemType extends TreeItemPresentationMod
 			(actions) => {
 				this.#hasActions.next(actions.length > 0);
 			},
-			'observeActions'
+			'observeActions',
 		);
 	}
 
