@@ -14,9 +14,6 @@ export class UmbBackofficeHeaderSectionsElement extends UmbLitElement {
 	private _sections: Array<UmbExtensionManifestInitializer<ManifestSection>> = [];
 
 	@state()
-	private _extraSections: Array<ManifestSection> = [];
-
-	@state()
 	private _currentSectionAlias = '';
 
 	private _backofficeContext?: UmbBackofficeContext;
@@ -72,37 +69,10 @@ export class UmbBackofficeHeaderSectionsElement extends UmbLitElement {
 							?active="${this._currentSectionAlias === section.alias}"
 							href="${`section/${section.manifest?.meta.pathname}`}"
 							label="${section.manifest?.meta.label ?? section.manifest?.name ?? ''}"></uui-tab>
-					`
+					`,
 				)}
-				${this._renderExtraSections()}
 			</uui-tab-group>
 		`;
-	}
-
-	private _renderExtraSections() {
-		return when(
-			this._extraSections.length > 0,
-			() => html`
-				<uui-tab id="moreTab">
-					<uui-popover .open=${this._open} placement="bottom-start" @close="${() => (this._open = false)}">
-						<uui-button slot="trigger" look="primary" label="More" @click="${this._handleMore}" compact>
-							<uui-symbol-more></uui-symbol-more>
-						</uui-button>
-
-						<div slot="popover" id="dropdown">
-							${this._extraSections.map(
-								(section) => html`
-									<uui-menu-item
-										?active="${this._currentSectionAlias === section.alias}"
-										label="${section.meta.label || section.name}"
-										@click-label="${this._handleLabelClick}"></uui-menu-item>
-								`
-							)}
-						</div>
-					</uui-popover>
-				</uui-tab>
-			`
-		);
 	}
 
 	render() {
