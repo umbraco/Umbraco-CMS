@@ -40,7 +40,7 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 		return this._entityId && this._entityType
 			? html`
 					<uui-button popovertarget="workspace-action-menu-popover" label="Actions"></uui-button>
-					<uui-popover-container id="workspace-action-menu-popover" popover placement="bottom-end">
+					<uui-popover-container id="workspace-action-menu-popover" placement="bottom-end">
 						<umb-popover-layout>
 							<uui-scroll-container>
 								<umb-entity-action-list

@@ -93,7 +93,7 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 						compact>
 						<uui-symbol-more id="more-symbol"></uui-symbol-more>
 					</uui-button>
-					<uui-popover-container id="property-action-popover" popover>
+					<uui-popover-container id="property-action-popover">
 						<umb-popover-layout>
 							<div id="dropdown">${repeat(this._actions, (action) => action.component)}</div>
 						</umb-popover-layout>

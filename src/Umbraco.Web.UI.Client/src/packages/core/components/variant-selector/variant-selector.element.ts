@@ -188,7 +188,7 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 			${
 				this._variants && this._variants.length > 0
 					? html`
-							<uui-popover-container id="variant-selector-popover" @toggle=${this.#onPopoverToggle} popover>
+							<uui-popover-container id="variant-selector-popover" @toggle=${this.#onPopoverToggle}>
 								<div id="variant-selector-dropdown">
 									<uui-scroll-container>
 										<ul>
