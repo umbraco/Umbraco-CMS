@@ -41,7 +41,7 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 			? html`
 					<uui-button popovertarget="workspace-action-menu-popover" label="Actions"></uui-button>
 					<uui-popover-container id="workspace-action-menu-popover" popover placement="bottom-end">
-						<umb-popover-layout style="--umb-popover-layout-padding: 0">
+						<umb-popover-layout>
 							<uui-scroll-container>
 								<umb-entity-action-list
 									@action-executed=${this.#onActionExecuted}
@@ -55,7 +55,14 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 			: nothing;
 	}
 
-	static styles = [UmbTextStyles, css``];
+	static styles = [
+		UmbTextStyles,
+		css`
+			umb-popover-layout {
+				padding: 0;
+			}
+		`,
+	];
 }
 
 declare global {
