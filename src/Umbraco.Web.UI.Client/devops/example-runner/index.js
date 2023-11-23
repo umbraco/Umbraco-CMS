@@ -1,6 +1,6 @@
-import * as globModule from 'tiny-glob';
 import * as readline from 'readline';
-import { readdir } from 'fs/promises'
+import { execSync } from 'child_process';
+import { readdir } from 'fs/promises';
 
 const exampleDirectory = 'examples';
 
@@ -14,20 +14,29 @@ async function pickExampleUI(){
 	// Find sub folder:
 	const exampleFolderNames = await getDirectories(`${exampleDirectory}`);
 
+	// Create UI:
 	const rl = readline.createInterface({
 		input: process.stdin,
 		output: process.stdout
 	});
 
-	console.log('Please select a folder by entering the corresponding number:');
+	// List examples:
+	console.log('Please select an example by entering the corresponding number:');
 	exampleFolderNames.forEach((folder, index) => {
-		console.log(`${index + 1}. ${folder}`);
+		console.log(`[${index + 1}]	${folder}`);
 	});
 
+	// Ask user to select an example:
 	rl.question('Enter your selection: ', (answer) => {
+
+		// User picked an example:
 		const selectedFolder = exampleFolderNames[parseInt(answer) - 1];
 		console.log(`You selected: ${selectedFolder}`);
-		rl.close();
+
+		process.env['VITE_EXAMPLE_PATH'] = `${exampleDirectory}/${selectedFolder}`;
+
+		// Start vite server:
+		execSync('npm run dev', {stdio: 'inherit'});
 	});
 
 };

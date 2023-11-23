@@ -5,6 +5,6 @@ export const manifests: ManifestTypes = [
 		type: 'workspaceContext',
 		name: 'workspaceContextCounter',
 		alias: 'example.workspaceCounter.counter',
-		js: 'workspace-context-counter.js',
+		js: () => import('./workspace-context-counter.js'),
 	}
 ]

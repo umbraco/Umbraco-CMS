@@ -3,7 +3,7 @@ import { UmbBaseController, type UmbControllerHost } from '@umbraco-cms/backoffi
 export class WorkspaceContextCounter extends UmbBaseController {
 
 	constructor(host: UmbControllerHost) {
-		super();
+		super(host);
 
 		console.log("HELLOOOOO WORLLLDDD")
 	}
