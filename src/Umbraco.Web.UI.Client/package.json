@@ -120,7 +120,8 @@
 		"new-extension": "plop  --plopfile ./devops/plop/plop.js",
 		"compile": "tsc",
 		"check": "npm run lint:errors && npm run compile && npm run build-storybook && npm run generate:jsonschema:dist",
-		"prepublishOnly": "node ./devops/publish/cleanse-pkg.js"
+		"prepublishOnly": "node ./devops/publish/cleanse-pkg.js",
+		"example": "node ./devops/example-runner/index.js"
 	},
 	"engines": {
 		"node": ">=20.9 <21",
