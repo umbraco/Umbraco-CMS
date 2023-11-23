@@ -6,6 +6,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Tests.Common.Builders;
+using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Extensions;
@@ -55,10 +56,10 @@ public class UdiGetterExtensionsTests
     [TestCase("6ad82c70-685c-4e04-9b36-d81bd779d16f", "umb://webhook/6ad82c70685c4e049b36d81bd779d16f")]
     public void GetUdiForWebhook(string key, string expected)
     {
-        IWebhook webhook = new Webhook("https://example.com")
-        {
-            Key = Guid.Parse(key)
-        };
+        var builder = new WebhookBuilder();
+        var webhook = builder
+            .WithKey(Guid.Parse(key))
+            .Build();
 
         Udi result = webhook.GetUdi();
         Assert.AreEqual(expected, result.ToString());
