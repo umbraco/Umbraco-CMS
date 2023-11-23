@@ -1,12 +1,13 @@
 import { UmbStore } from './store.interface.js';
+import { UmbStoreDeleteEvent } from './events/store-delete.event.js';
+import { UmbStoreUpdateEvent } from './events/store-update.event.js';
+import { UmbStoreCreateEvent } from './events/store-create.event.js';
 import { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
 import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { type UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 
-// TODO: Make a Store interface?
-export class UmbStoreBase<StoreItemType = any> implements UmbStore<StoreItemType>, UmbApi {
-
+export class UmbStoreBase<StoreItemType = any> extends EventTarget implements UmbStore<StoreItemType>, UmbApi {
 	#provider;
 
 	protected _host: UmbControllerHost;
@@ -15,6 +16,7 @@ export class UmbStoreBase<StoreItemType = any> implements UmbStore<StoreItemType
 	public readonly storeAlias: string;
 
 	constructor(_host: UmbControllerHost, storeAlias: string, data: UmbArrayState<StoreItemType>) {
+		super();
 		this._host = _host;
 		this.storeAlias = storeAlias;
 		this._data = data;
@@ -29,6 +31,8 @@ export class UmbStoreBase<StoreItemType = any> implements UmbStore<StoreItemType
 	 */
 	append(item: StoreItemType) {
 		this._data.append([item]);
+		const unique = this._data.getUnique(item) as string;
+		this.dispatchEvent(new UmbStoreCreateEvent([unique]));
 	}
 
 	/**
@@ -38,6 +42,8 @@ export class UmbStoreBase<StoreItemType = any> implements UmbStore<StoreItemType
 	 */
 	appendItems(items: Array<StoreItemType>) {
 		this._data.append(items);
+		const uniques = items.map((item) => this._data.getUnique(item)) as Array<string>;
+		this.dispatchEvent(new UmbStoreCreateEvent(uniques));
 	}
 
 	/**
@@ -48,6 +54,7 @@ export class UmbStoreBase<StoreItemType = any> implements UmbStore<StoreItemType
 	 */
 	updateItem(unique: string, data: Partial<StoreItemType>) {
 		this._data.updateOne(unique, data);
+		this.dispatchEvent(new UmbStoreUpdateEvent([unique]));
 	}
 
 	/**
@@ -57,6 +64,7 @@ export class UmbStoreBase<StoreItemType = any> implements UmbStore<StoreItemType
 	 */
 	removeItem(unique: string) {
 		this._data.removeOne(unique);
+		this.dispatchEvent(new UmbStoreDeleteEvent([unique]));
 	}
 
 	/**
@@ -66,6 +74,7 @@ export class UmbStoreBase<StoreItemType = any> implements UmbStore<StoreItemType
 	 */
 	removeItems(uniques: Array<string>) {
 		this._data.remove(uniques);
+		this.dispatchEvent(new UmbStoreDeleteEvent(uniques));
 	}
 
 	/**
