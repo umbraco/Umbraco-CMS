@@ -4,19 +4,22 @@ import { UmbStore } from './store.interface.js';
 import { UmbContextConsumerController, UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-export class UmbStoreConnector {
+export class UmbStoreConnector<StoreType, ConnectedStoreType> {
 	#store: UmbStoreBase;
-	#connectedStore?: UmbStore<any>;
-	#mapperFunction: (item: any) => any;
+	#connectedStore?: UmbStore<ConnectedStoreType>;
+	#createMapperFunction: (item: ConnectedStoreType) => StoreType;
+	#updateMapperFunction?: (item: ConnectedStoreType) => StoreType;
 
 	constructor(
 		host: UmbControllerHost,
 		store: UmbStoreBase,
 		connectToStoreAlias: UmbContextToken<any, any> | string,
-		mapperFunction: (item: any) => any,
+		createMapperFunction: (item: ConnectedStoreType) => StoreType,
+		updateMapperFunction: (item: ConnectedStoreType) => StoreType,
 	) {
 		this.#store = store;
-		this.#mapperFunction = mapperFunction;
+		this.#createMapperFunction = createMapperFunction;
+		this.#updateMapperFunction = updateMapperFunction;
 
 		new UmbContextConsumerController(host, connectToStoreAlias, (instance) => {
 			this.#connectedStore = instance;
@@ -36,14 +39,14 @@ export class UmbStoreConnector {
 
 	#onConnectedStoreCreate = (event: UmbStoreCreateEvent) => {
 		const items = this.#connectedStore!.getItems(event.uniques);
-		const mappedItems = items.map((item) => this.#mapperFunction(item));
+		const mappedItems = items.map((item) => this.#createMapperFunction(item));
 		this.#store.appendItems(mappedItems);
 	};
 
 	#onConnectedStoreUpdate = (event: UmbStoreUpdateEvent) => {
 		const uniques = event.uniques;
 		const items = this.#connectedStore!.getItems(uniques);
-		const mappedItems = items.map((item) => this.#mapperFunction(item));
+		const mappedItems = items.map((item) => this.#updateMapperFunction(item));
 		mappedItems.forEach((mappedItem, index) => this.#store.updateItem(uniques[index], mappedItem));
 	};
 

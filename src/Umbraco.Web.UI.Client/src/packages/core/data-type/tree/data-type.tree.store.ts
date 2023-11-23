@@ -35,7 +35,7 @@ export class UmbDataTypeTreeStore extends UmbUniqueTreeStore {
 			unique: item.unique!,
 			parentUnique: item.parentUnique,
 			name: item.name,
-			entityType: item.entityType,
+			type: item.type,
 			isFolder: false,
 			isContainer: false,
 			hasChildren: false,

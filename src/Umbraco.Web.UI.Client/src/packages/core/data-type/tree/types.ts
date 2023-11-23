@@ -7,7 +7,7 @@ export type UmbDataTypeTreeItemModel = {
 	isFolder: boolean;
 	isContainer: boolean;
 	name: string;
-	entityType: string;
+	type: string;
 	hasChildren: boolean;
 };
 
