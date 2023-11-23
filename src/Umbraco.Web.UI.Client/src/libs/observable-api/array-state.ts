@@ -12,12 +12,12 @@ import { pushToUniqueArray } from './push-to-unique-array.function.js';
  * The ArrayState provides methods to append data when the data is an Object.
  */
 export class UmbArrayState<T> extends UmbDeepState<T[]> {
-	#getUnique?: (entry: T) => unknown;
+	getUnique?: (entry: T) => unknown;
 	#sortMethod?: (a: T, b: T) => number;
 
 	constructor(initialData: T[], getUniqueMethod?: (entry: T) => unknown) {
 		super(initialData);
-		this.#getUnique = getUniqueMethod;
+		this.getUnique = getUniqueMethod;
 	}
 
 	/**
@@ -60,12 +60,12 @@ export class UmbArrayState<T> extends UmbDeepState<T[]> {
 	 */
 	remove(uniques: unknown[]) {
 		let next = this.getValue();
-		if (this.#getUnique) {
+		if (this.getUnique) {
 			uniques.forEach((unique) => {
 				next = next.filter((x) => {
 					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 					// @ts-ignore
-					return this.#getUnique(x) !== unique;
+					return this.getUnique(x) !== unique;
 				});
 			});
 
@@ -89,11 +89,11 @@ export class UmbArrayState<T> extends UmbDeepState<T[]> {
 	 */
 	removeOne(unique: unknown) {
 		let next = this.getValue();
-		if (this.#getUnique) {
+		if (this.getUnique) {
 			next = next.filter((x) => {
 				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 				// @ts-ignore
-				return this.#getUnique(x) !== unique;
+				return this.getUnique(x) !== unique;
 			});
 
 			this.next(next);
@@ -142,8 +142,8 @@ export class UmbArrayState<T> extends UmbDeepState<T[]> {
 	 */
 	appendOne(entry: T) {
 		const next = [...this.getValue()];
-		if (this.#getUnique) {
-			pushToUniqueArray(next, entry, this.#getUnique);
+		if (this.getUnique) {
+			pushToUniqueArray(next, entry, this.getUnique);
 		} else {
 			next.push(entry);
 		}
@@ -168,10 +168,10 @@ export class UmbArrayState<T> extends UmbDeepState<T[]> {
 	 * ]);
 	 */
 	append(entries: T[]) {
-		if (this.#getUnique) {
+		if (this.getUnique) {
 			const next = [...this.getValue()];
 			entries.forEach((entry) => {
-				pushToUniqueArray(next, entry, this.#getUnique!);
+				pushToUniqueArray(next, entry, this.getUnique!);
 			});
 			this.next(next);
 		} else {
@@ -195,10 +195,10 @@ export class UmbArrayState<T> extends UmbDeepState<T[]> {
 	 * myState.updateOne(2, {value: 'updated-bar'});
 	 */
 	updateOne(unique: unknown, entry: Partial<T>) {
-		if (!this.#getUnique) {
+		if (!this.getUnique) {
 			throw new Error("Can't partial update an ArrayState without a getUnique method provided when constructed.");
 		}
-		this.next(partialUpdateFrozenArray(this.getValue(), entry, (x) => unique === this.#getUnique!(x)));
+		this.next(partialUpdateFrozenArray(this.getValue(), entry, (x) => unique === this.getUnique!(x)));
 		return this;
 	}
 }
