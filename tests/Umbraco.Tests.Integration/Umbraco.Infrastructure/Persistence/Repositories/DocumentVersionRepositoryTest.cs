@@ -35,11 +35,12 @@ public class DocumentVersionRepositoryTest : UmbracoIntegrationTest
         ContentTypeService.Save(contentType);
 
         var content = ContentBuilder.CreateSimpleContent(contentType);
+        ContentService.Save(content);
 
-        ContentService.SaveAndPublish(content);
+        ContentService.Publish(content, Array.Empty<string>());
         // At this point content has 2 versions, a draft version and a published version.
 
-        ContentService.SaveAndPublish(content);
+        ContentService.Publish(content, Array.Empty<string>());
         // At this point content has 3 versions, a historic version, a draft version and a published version.
 
         using (ScopeProvider.CreateScope())
@@ -67,12 +68,13 @@ public class DocumentVersionRepositoryTest : UmbracoIntegrationTest
         ContentTypeService.Save(contentType);
 
         var content = ContentBuilder.CreateSimpleContent(contentType);
+        ContentService.Save(content);
 
-        ContentService.SaveAndPublish(content);
+        ContentService.Publish(content, Array.Empty<string>());
         // At this point content has 2 versions, a draft version and a published version.
-        ContentService.SaveAndPublish(content);
-        ContentService.SaveAndPublish(content);
-        ContentService.SaveAndPublish(content);
+        ContentService.Publish(content, Array.Empty<string>());
+        ContentService.Publish(content, Array.Empty<string>());
+        ContentService.Publish(content, Array.Empty<string>());
         // At this point content has 5 versions, 3 historic versions, a draft version and a published version.
 
         var allVersions = ContentService.GetVersions(content.Id);
@@ -109,11 +111,12 @@ public class DocumentVersionRepositoryTest : UmbracoIntegrationTest
         ContentTypeService.Save(contentType);
 
         var content = ContentBuilder.CreateSimpleContent(contentType);
+        ContentService.Save(content);
 
-        ContentService.SaveAndPublish(content);
-        ContentService.SaveAndPublish(content);
-        ContentService.SaveAndPublish(content);
-        ContentService.SaveAndPublish(content);
+        ContentService.Publish(content, Array.Empty<string>());
+        ContentService.Publish(content, Array.Empty<string>());
+        ContentService.Publish(content, Array.Empty<string>());
+        ContentService.Publish(content, Array.Empty<string>());
         using (var scope = ScopeProvider.CreateScope())
         {
             var query = ScopeAccessor.AmbientScope.SqlContext.Sql();
@@ -146,9 +149,10 @@ public class DocumentVersionRepositoryTest : UmbracoIntegrationTest
         ContentTypeService.Save(contentType);
 
         var content = ContentBuilder.CreateSimpleContent(contentType);
+        ContentService.Save(content);
 
-        ContentService.SaveAndPublish(content); // Draft + Published
-        ContentService.SaveAndPublish(content); // New Draft
+        ContentService.Publish(content, Array.Empty<string>()); // Draft + Published
+        ContentService.Publish(content, Array.Empty<string>()); // New Draft
 
         using (ScopeProvider.CreateScope())
         {
@@ -187,8 +191,9 @@ public class DocumentVersionRepositoryTest : UmbracoIntegrationTest
         var content = ContentBuilder.CreateSimpleContent(contentType, "foo", culture: "en-US");
         content.SetCultureName("foo", "en-US");
 
-        ContentService.SaveAndPublish(content, "en-US"); // Draft + Published
-        ContentService.SaveAndPublish(content, "en-US"); // New Draft
+        ContentService.Save(content);
+        ContentService.Publish(content, new[] { "en-US" }); // Draft + Published
+        ContentService.Publish(content, new[] { "en-US" }); // New Draft
 
         using (ScopeProvider.CreateScope())
         {

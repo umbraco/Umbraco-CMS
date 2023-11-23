@@ -183,6 +183,8 @@ public class MultiNodeTreePickerValueConverter : PropertyValueConverterBase, IDe
 
     public PropertyCacheLevel GetDeliveryApiPropertyCacheLevel(IPublishedPropertyType propertyType) => PropertyCacheLevel.Elements;
 
+    public PropertyCacheLevel GetDeliveryApiPropertyCacheLevelForExpansion(IPublishedPropertyType propertyType) => PropertyCacheLevel.Snapshot;
+
     public Type GetDeliveryApiPropertyValueType(IPublishedPropertyType propertyType)
         => GetEntityType(propertyType) switch
         {

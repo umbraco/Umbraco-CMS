@@ -16,7 +16,7 @@ public class ContentControllerBase : ManagementApiControllerBase
                 .WithDetail("A notification handler prevented the content operation.")
                 .Build()),
             ContentEditingOperationStatus.ContentTypeNotFound => NotFound(new ProblemDetailsBuilder()
-                .WithTitle("Cancelled by notification")
+                .WithTitle("The requested content could not be found")
                 .Build()),
             ContentEditingOperationStatus.ContentTypeCultureVarianceMismatch => BadRequest(new ProblemDetailsBuilder()
                 .WithTitle("Content type culture variance mismatch")
@@ -64,6 +64,67 @@ public class ContentControllerBase : ManagementApiControllerBase
             _ => StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetailsBuilder()
                 .WithTitle("Unknown content operation status.")
                 .Build()),
+        };
+
+    protected IActionResult ContentPublishingOperationStatusResult(ContentPublishingOperationStatus status) =>
+        status switch
+        {
+            ContentPublishingOperationStatus.ContentNotFound => NotFound(new ProblemDetailsBuilder()
+                .WithTitle("The requested content could not be found")
+                .Build()),
+            ContentPublishingOperationStatus.CancelledByEvent => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Publish cancelled by event")
+                .WithDetail("The publish operation was cancelled by an event.")
+                .Build()),
+            ContentPublishingOperationStatus.ContentInvalid => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Invalid content")
+                .WithDetail("The specified content had an invalid configuration.")
+                .Build()),
+            ContentPublishingOperationStatus.NothingToPublish => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Nothing to publish")
+                .WithDetail("None of the specified cultures needed publishing.")
+                .Build()),
+            ContentPublishingOperationStatus.MandatoryCultureMissing => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Mandatory culture missing")
+                .WithDetail("Must include all mandatory cultures when publishing.")
+                .Build()),
+            ContentPublishingOperationStatus.HasExpired => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Content expired")
+                .WithDetail("Could not publish the content because it was expired.")
+                .Build()),
+            ContentPublishingOperationStatus.CultureHasExpired => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Content culture expired")
+                .WithDetail("Could not publish the content because some of the specified cultures were expired.")
+                .Build()),
+            ContentPublishingOperationStatus.AwaitingRelease => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Content awaiting release")
+                .WithDetail("Could not publish the content because it was awaiting release.")
+                .Build()),
+            ContentPublishingOperationStatus.CultureAwaitingRelease => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Content culture awaiting release")
+                .WithDetail("Could not publish the content because some of the specified cultures were awaiting release.")
+                .Build()),
+            ContentPublishingOperationStatus.InTrash => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Content in the recycle bin")
+                .WithDetail("Could not publish the content because it was in the recycle bin.")
+                .Build()),
+            ContentPublishingOperationStatus.PathNotPublished => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Parent not published")
+                .WithDetail("Could not publish the content because its parent was not published.")
+                .Build()),
+            ContentPublishingOperationStatus.ConcurrencyViolation => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Concurrency violation detected")
+                .WithDetail("An attempt was made to publish a version older than the latest version.")
+                .Build()),
+            ContentPublishingOperationStatus.UnsavedChanges => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Unsaved changes")
+                .WithDetail("Could not publish the content because it had unsaved changes. Make sure to save all changes before attempting a publish.")
+                .Build()),
+            ContentPublishingOperationStatus.Failed => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Publish or unpublish failed")
+                .WithDetail("An unspecified error occurred while (un)publishing. Please check the logs for additional information.")
+                .Build()),
+            _ => StatusCode(StatusCodes.Status500InternalServerError, "Unknown content operation status."),
         };
 
     protected IActionResult ContentCreatingOperationStatusResult(ContentCreatingOperationStatus status) =>
