@@ -21,6 +21,8 @@ test.describe('Stylesheets tests', () => {
     await umbracoUi.stylesheet.openActionsMenuAtRoot();
     await umbracoUi.stylesheet.clickNewStylesheetFileButton();
     await umbracoUi.stylesheet.enterStylesheetName(styleSheetName);
+    // TODO: Remove this timeout when frontend validation is implemented
+    await await umbracoUi.waitForTimeout(1000); 
     await umbracoUi.stylesheet.clickSaveButton();
 
     // Assert
@@ -41,6 +43,8 @@ test.describe('Stylesheets tests', () => {
     await umbracoUi.stylesheet.clickNewRTEStylesheetFileButton();
     await umbracoUi.stylesheet.enterStylesheetName(styleSheetName);
     await umbracoUi.stylesheet.addNewRule(ruleName, 'h1', 'color:red');
+    // TODO: Remove this timeout when frontend validation is implemented 
+    await umbracoUi.waitForTimeout(1000);
     await umbracoUi.stylesheet.clickSaveButton();
 
     // Assert
