@@ -47,7 +47,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers;
 [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
 [Authorize(Policy = AuthorizationPolicies.SectionAccessMedia)]
 [ParameterSwapControllerActionSelector(nameof(GetById), "id", typeof(int), typeof(Guid), typeof(Udi))]
-[ParameterSwapControllerActionSelector(nameof(GetByIds), "ids", typeof(int), typeof(Guid), typeof(Udi))]
+[ParameterSwapControllerActionSelector(nameof(GetByIds), "ids", typeof(int[]), typeof(Guid[]), typeof(Udi[]))]
 [ParameterSwapControllerActionSelector(nameof(GetChildren), "id", typeof(int), typeof(Guid), typeof(Udi))]
 public class MediaController : ContentControllerBase
 {
