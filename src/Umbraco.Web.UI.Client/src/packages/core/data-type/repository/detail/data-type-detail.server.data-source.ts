@@ -1,7 +1,11 @@
 import { UmbDataTypeDetailModel } from '../../types.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
-import { DataTypeResource } from '@umbraco-cms/backoffice/backend-api';
+import {
+	CreateDataTypeRequestModel,
+	DataTypeModelBaseModel,
+	DataTypeResource,
+} from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -54,21 +58,22 @@ export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataT
 
 		const { data, error } = await tryExecuteAndNotify(this.#host, DataTypeResource.getDataTypeById({ id: unique }));
 
-		if (data) {
-			const dataType = {
-				entityType: 'data-type',
-				unique: data.id,
-				parentUnique: data.parentId,
-				name: data.name,
-				propertyEditorAlias: data.propertyEditorAlias,
-				propertyEditorUiAlias: data.propertyEditorAlias,
-				values: data.values,
-			};
-
-			return { data: dataType };
+		if (error) {
+			return { error };
 		}
 
-		return { error };
+		// map to client model
+		const dataType = {
+			entityType: 'data-type',
+			unique: data.id,
+			parentUnique: data.parentId,
+			name: data.name,
+			propertyEditorAlias: data.propertyEditorAlias,
+			propertyEditorUiAlias: data.propertyEditorAlias,
+			values: data.values,
+		};
+
+		return { data: dataType };
 	}
 
 	/**
@@ -81,10 +86,20 @@ export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataT
 		if (!dataType) throw new Error('Data Type is missing');
 		if (!dataType.unique) throw new Error('Data Type id is missing');
 
+		// map to server model
+		const requestBody: CreateDataTypeRequestModel = {
+			id: dataType.unique,
+			parentId: dataType.parentUnique,
+			name: dataType.name,
+			propertyEditorAlias: dataType.propertyEditorAlias,
+			propertyEditorUiAlias: dataType.propertyEditorUiAlias,
+			values: dataType.values,
+		};
+
 		const { error: createError } = await tryExecuteAndNotify(
 			this.#host,
 			DataTypeResource.postDataType({
-				requestBody: dataType,
+				requestBody,
 			}),
 		);
 
@@ -92,6 +107,7 @@ export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataT
 			return { error: createError };
 		}
 
+		// we have to fetch the data type again. The server can have modified the data after creation
 		return this.read(dataType.unique);
 	}
 
@@ -104,15 +120,20 @@ export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataT
 	async update(data: UmbDataTypeDetailModel) {
 		if (!data.unique) throw new Error('Unique is missing');
 
-		const { error } = await tryExecuteAndNotify(
+		const requestBody: DataTypeModelBaseModel = {
+			name: data.name,
+			propertyEditorAlias: data.propertyEditorAlias,
+			propertyEditorUiAlias: data.propertyEditorUiAlias,
+			values: data.values,
+		};
+
+		return tryExecuteAndNotify(
 			this.#host,
 			DataTypeResource.putDataTypeById({
 				id: data.unique,
-				requestBody: data,
+				requestBody,
 			}),
 		);
-
-		return { error };
 	}
 
 	/**
