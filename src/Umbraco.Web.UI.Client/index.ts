@@ -1,6 +1,6 @@
 import { UmbAppElement } from './src/apps/app/app.element.js';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { startMockServiceWorker } from './src/mocks/index.js';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
 if (import.meta.env.VITE_UMBRACO_USE_MSW === 'on') {
 	startMockServiceWorker();
@@ -22,9 +22,9 @@ appElement.bypassAuth = isMocking;
 
 document.body.appendChild(appElement);
 
-// Move this elsewhere:
+
+// Example injector:
 if(import.meta.env.VITE_EXAMPLE_PATH) {
-	console.log(import.meta.env.VITE_EXAMPLE_PATH);
 	import(/* @vite-ignore */ './'+import.meta.env.VITE_EXAMPLE_PATH+'/index.ts').then((js) => {
 		console.log("js", js);
 		if (js) {

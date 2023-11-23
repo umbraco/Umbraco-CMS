@@ -1,6 +1,6 @@
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifests: ManifestTypes = [
+export const manifests: Array<ManifestTypes> = [
 	{
 		type: 'workspaceContext',
 		name: 'workspaceContextCounter',

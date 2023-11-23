@@ -6,3 +6,4 @@ schemas
 temp-schema-generator
 APP_PLUGINS
 /src/external/router-slot
+/examples
