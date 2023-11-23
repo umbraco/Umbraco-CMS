@@ -480,7 +480,7 @@
     <key alias="editDictionary">Rediger ordbogsnøgle</key>
     <key alias="editLanguage">Rediger sprog</key>
     <key alias="editSelectedMedia">Rediger det valgte medie</key>
-    <key alias="editWebhook">Edit webhook</key> 
+    <key alias="editWebhook">Edit webhook</key>
     <key alias="insertAnchor">Indsæt lokalt link</key>
     <key alias="insertCharacter">Indsæt tegn</key>
     <key alias="insertgraphicheadline">Indsæt grafisk overskrift</key>
@@ -849,7 +849,7 @@
     <key alias="username">Brugernavn</key>
     <key alias="value">Værdi</key>
     <key alias="view">Vis</key>
-    <key alias="welcome">Velkommen</key>
+    <key alias="welcome">Velkommen...</key>
     <key alias="width">Bredde</key>
     <key alias="yes">Ja</key>
     <key alias="folder">Mappe</key>
@@ -1024,13 +1024,13 @@
     <key alias="renewSession">Forny for at gemme dine ændringer</key>
   </area>
   <area alias="login">
-    <key alias="greeting0">Så er det søndag!</key>
-    <key alias="greeting1">Smil, det er mandag!</key>
-    <key alias="greeting2">Hurra, det er tirsdag!</key>
-    <key alias="greeting3">Hvilken herlig onsdag!</key>
-    <key alias="greeting4">Glædelig torsdag!</key>
-    <key alias="greeting5">Endelig fredag!</key>
-    <key alias="greeting6">Glædelig lørdag</key>
+    <key alias="greeting0">Velkommen</key>
+    <key alias="greeting1">Velkommen</key>
+    <key alias="greeting2">Velkommen</key>
+    <key alias="greeting3">Velkommen</key>
+    <key alias="greeting4">Velkommen</key>
+    <key alias="greeting5">Velkommen</key>
+    <key alias="greeting6">Velkommen</key>
     <key alias="instruction">Log ind nedenfor</key>
     <key alias="signInWith">Log ind med</key>
     <key alias="timeout">Din session er udløbet</key>

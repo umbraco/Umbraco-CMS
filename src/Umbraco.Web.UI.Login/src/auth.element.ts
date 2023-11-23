@@ -152,8 +152,8 @@ export default class UmbAuthElement extends LitElement {
    */
   async #initializeForm() {
     const labelUsername = this.usernameIsEmail
-      ? await umbLocalizationContext.localize('general_username', undefined, 'Username')
-      : await umbLocalizationContext.localize('general_email', undefined, 'Email');
+      ? await umbLocalizationContext.localize('general_email', undefined, 'Email')
+      : await umbLocalizationContext.localize('general_username', undefined, 'Username');
     const labelPassword = await umbLocalizationContext.localize('general_password', undefined, 'Password');
     const requiredMessage = await umbLocalizationContext.localize('general_required', undefined, 'Required');
 
@@ -179,7 +179,7 @@ export default class UmbAuthElement extends LitElement {
       forId: 'username-input',
       localizeAlias: this.usernameIsEmail ? 'general_email' : 'general_username',
     });
-    this._passwordLabel = createLabel({forId: 'password-input', localizeAlias: 'user_password'});
+    this._passwordLabel = createLabel({forId: 'password-input', localizeAlias: 'general_password'});
 
     this._usernameLayoutItem = createFormLayoutItem(this._usernameLabel, this._usernameInput);
     this._passwordLayoutItem = createFormLayoutItem(this._passwordLabel, this._passwordInput);

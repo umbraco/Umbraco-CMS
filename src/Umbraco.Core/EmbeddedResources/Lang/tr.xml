@@ -739,7 +739,7 @@
     <key alias="username">Kullanıcı adı</key>
     <key alias="value">Değer</key>
     <key alias="view">Görüntüle</key>
-    <key alias="welcome">Hoş geldiniz </key>
+    <key alias="welcome">Hoş geldiniz ...</key>
     <key alias="width">Genişlik</key>
     <key alias="yes">Evet</key>
     <key alias="folder">Klasör</key>
@@ -937,13 +937,13 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="renewSession">Çalışmanızı kaydetmek için şimdi yenileyin</key>
   </area>
   <area alias="login">
-    <key alias="greeting0">Mutlu Pazarlar</key>
-    <key alias="greeting1">Mutlu manik Pazartesi</key>
-    <key alias="greeting2">Mutlu salı günleri</key>
-    <key alias="greeting3">Harika Çarşamba Günleri</key>
-    <key alias="greeting4">Mutlu, gök gürültülü Perşembe</key>
-    <key alias="greeting5">Mutlu Cuma Günü</key>
-    <key alias="greeting6">Mutlu Yıllar</key>
+    <key alias="greeting0">Hoş geldiniz</key>
+    <key alias="greeting1">Hoş geldiniz</key>
+    <key alias="greeting2">Hoş geldiniz</key>
+    <key alias="greeting3">Hoş geldiniz</key>
+    <key alias="greeting4">Hoş geldiniz</key>
+    <key alias="greeting5">Hoş geldiniz</key>
+    <key alias="greeting6">Hoş geldiniz</key>
     <key alias="instruction">Aşağıda oturum açın</key>
     <key alias="signInWith">ile oturum açın</key>
     <key alias="timeout">Oturum zaman aşımına uğradı</key>

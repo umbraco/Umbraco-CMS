@@ -822,7 +822,7 @@
     <key alias="username">Enw defnyddiwr</key>
     <key alias="value">Gwerth</key>
     <key alias="view">Gwedd</key>
-    <key alias="welcome">Croeso</key>
+    <key alias="welcome">Croeso...</key>
     <key alias="width">Lled</key>
     <key alias="yes">Ie</key>
     <key alias="folder">Ffolder</key>
@@ -1051,13 +1051,13 @@ Er mwyn gweinyddu eich gwefan, agorwch swyddfa gefn Umbraco a dechreuwch ychwang
     <key alias="renewSession">Adnewyddwch rwan er mwyn achub eich gwaith</key>
   </area>
   <area alias="login">
-    <key alias="greeting0">Dydd Sul Swmpus</key>
-    <key alias="greeting1">Dydd Llun Llwyddiannus</key>
-    <key alias="greeting2">Dydd Mawrth Moethus</key>
-    <key alias="greeting3">Dydd Mercher Melys</key>
-    <key alias="greeting4">Dydd Iau Iachus</key>
-    <key alias="greeting5">Dydd Gwener Gwych</key>
-    <key alias="greeting6">Dydd Sadwrn Syfrdannus</key>
+    <key alias="greeting0">Croeso</key>
+    <key alias="greeting1">Croeso</key>
+    <key alias="greeting2">Croeso</key>
+    <key alias="greeting3">Croeso</key>
+    <key alias="greeting4">Croeso</key>
+    <key alias="greeting5">Croeso</key>
+    <key alias="greeting6">Croeso</key>
     <key alias="instruction">Mewngofnodwch isod</key>
     <key alias="signInWith">Mewngofnodwch gyda</key>
     <key alias="timeout">Sesiwn wedi cyrraedd terfyn amser</key>

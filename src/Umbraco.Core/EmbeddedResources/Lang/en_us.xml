@@ -899,7 +899,7 @@
     <key alias="validate">Validate</key>
     <key alias="value">Value</key>
     <key alias="view">View</key>
-    <key alias="welcome">Welcome</key>
+    <key alias="welcome">Welcome...</key>
     <key alias="width">Width</key>
     <key alias="yes">Yes</key>
     <key alias="folder">Folder</key>
@@ -1096,13 +1096,13 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="renewSession">Renew now to save your work</key>
   </area>
   <area alias="login">
-    <key alias="greeting0">Happy super Sunday</key>
-    <key alias="greeting1">Happy marvelous Monday</key>
-    <key alias="greeting2">Happy tubular Tuesday</key>
-    <key alias="greeting3">Happy wonderful Wednesday</key>
-    <key alias="greeting4">Happy thunderous Thursday</key>
-    <key alias="greeting5">Happy funky Friday</key>
-    <key alias="greeting6">Happy Caturday</key>
+    <key alias="greeting0">Welcome</key>
+    <key alias="greeting1">Welcome</key>
+    <key alias="greeting2">Welcome</key>
+    <key alias="greeting3">Welcome</key>
+    <key alias="greeting4">Welcome</key>
+    <key alias="greeting5">Welcome</key>
+    <key alias="greeting6">Welcome</key>
     <key alias="instruction">Log in below</key>
     <key alias="signInWith">Sign in with</key>
     <key alias="timeout">Session timed out</key>

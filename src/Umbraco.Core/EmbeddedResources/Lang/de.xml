@@ -892,7 +892,7 @@
     <key alias="validate">Validieren</key>
     <key alias="value">Wert</key>
     <key alias="view">Ansicht</key>
-    <key alias="welcome">Willkommen </key>
+    <key alias="welcome">Willkommen ...</key>
     <key alias="width">Breite</key>
     <key alias="yes">Ja</key>
     <key alias="folder">Ordner</key>
@@ -1054,13 +1054,13 @@
     <key alias="renewSession">Erneuern Sie, um Ihre Arbeit zu speichern ...</key>
   </area>
   <area alias="login">
-    <key alias="greeting0">Einen wunderbaren Sonntag</key>
-    <key alias="greeting1">Schönen Montag</key>
-    <key alias="greeting2">Einen großartigen Dienstag</key>
-    <key alias="greeting3">Wunderbaren Mittwoch</key>
-    <key alias="greeting4">Donnerwetter Donnerstag</key>
-    <key alias="greeting5">Frohen freundlichen Freitag</key>
-    <key alias="greeting6">Wunderbaren sonnigen Samstag</key>
+    <key alias="greeting0">Willkommen</key>
+    <key alias="greeting1">Willkommen</key>
+    <key alias="greeting2">Willkommen</key>
+    <key alias="greeting3">Willkommen</key>
+    <key alias="greeting4">Willkommen</key>
+    <key alias="greeting5">Willkommen</key>
+    <key alias="greeting6">Willkommen</key>
     <key alias="instruction">Hier anmelden:</key>
     <key alias="signInWith">Anmelden mit</key>
     <key alias="timeout">Sitzung abgelaufen</key>

@@ -863,7 +863,7 @@
     <key alias="username"><![CDATA[Username]]></key>
     <key alias="value">Valore</key>
     <key alias="view">Vedi</key>
-    <key alias="welcome">Benvenuto</key>
+    <key alias="welcome">Benvenuto...</key>
     <key alias="width">Larghezza</key>
     <key alias="yes">Si</key>
     <key alias="folder">Cartella</key>
@@ -1074,13 +1074,13 @@ Per gestire il tuo sito web, è sufficiente aprire il backoffice di Umbraco e in
     <key alias="renewSession">Riconnetti adesso per salvare il tuo lavoro</key>
   </area>
   <area alias="login">
-    <key alias="greeting0"><![CDATA[Buona Domenica!]]></key>
-    <key alias="greeting1"><![CDATA[Buon Lunedì!]]></key>
-    <key alias="greeting2"><![CDATA[Buon Martedì!]]></key>
-    <key alias="greeting3"><![CDATA[Buon Mercoledì!]]></key>
-    <key alias="greeting4"><![CDATA[Buon Giovedì!]]></key>
-    <key alias="greeting5"><![CDATA[Buon Venerdì!]]></key>
-    <key alias="greeting6"><![CDATA[Buon Sabato!]]></key>
+    <key alias="greeting0">Benvenuto</key>
+    <key alias="greeting1">Benvenuto</key>
+    <key alias="greeting2">Benvenuto</key>
+    <key alias="greeting3">Benvenuto</key>
+    <key alias="greeting4">Benvenuto</key>
+    <key alias="greeting5">Benvenuto</key>
+    <key alias="greeting6">Benvenuto</key>
     <key alias="instruction">Fai il login qui sotto</key>
     <key alias="signInWith">Fai il login con</key>
     <key alias="timeout">Sessione scaduta</key>
