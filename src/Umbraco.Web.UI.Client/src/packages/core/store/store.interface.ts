@@ -8,4 +8,5 @@ export interface UmbStore<T> extends EventTarget {
 	removeItems: (uniques: Array<string>) => void;
 	getItems: (uniques: Array<string>) => Array<T>;
 	all: () => Observable<Array<T>>;
+	getAll: () => Array<T>;
 }
