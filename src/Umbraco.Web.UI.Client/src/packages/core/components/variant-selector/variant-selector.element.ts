@@ -40,6 +40,9 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 	@state()
 	private _variantTitleName?: string;
 
+	@state()
+	private _variantSelectorOpen = false;
+
 	// TODO: make adapt to backoffice locale.
 	private _cultureNames = new Intl.DisplayNames('en', { type: 'language' });
 
@@ -152,6 +155,10 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 		return state !== ContentStateModel.PUBLISHED && !this._isVariantActive(culture!);
 	}
 
+	#onPopoverToggle(event: any) {
+		this._variantSelectorOpen = event.newState === 'open';
+	}
+
 	render() {
 		return html`
 			<uui-input id="name-input" .value=${this._name} @input="${this._handleInput}">
@@ -164,7 +171,7 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 									popovertarget="variant-selector-popover"
 									title=${ifDefined(this._variantTitleName)}>
 									${this._variantDisplayName}
-									<uui-symbol-expand></uui-symbol-expand>
+									<uui-symbol-expand .open=${this._variantSelectorOpen}></uui-symbol-expand>
 								</uui-button>
 								${this._activeVariants.length > 1
 									? html`
@@ -181,7 +188,7 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 			${
 				this._variants && this._variants.length > 0
 					? html`
-							<uui-popover-container id="variant-selector-popover" popover>
+							<uui-popover-container id="variant-selector-popover" @toggle=${this.#onPopoverToggle} popover>
 								<div id="variant-selector-dropdown">
 									<uui-scroll-container>
 										<ul>
