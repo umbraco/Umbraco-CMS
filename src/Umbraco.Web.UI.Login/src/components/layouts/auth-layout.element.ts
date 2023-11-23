@@ -2,6 +2,22 @@ import { css, CSSResultGroup, html, LitElement, nothing, PropertyValueMap } from
 import { customElement, property } from 'lit/decorators.js';
 import { when } from 'lit/directives/when.js';
 
+/**
+ * The auth layout component.
+ *
+ * @element umb-auth-layout
+ * @slot - The content of the layout
+ * @cssprop --umb-login-background - The background of the layout (default: #f4f4f4)
+ * @cssprop --umb-login-image - The background of the image wrapper (default: the value of the backgroundImage property)
+ * @cssprop --umb-login-image-display - The display of the image wrapper (default: flex)
+ * @cssprop --umb-login-content-background - The background of the content wrapper (default: none)
+ * @cssprop --umb-login-content-display - The display of the content wrapper (default: flex)
+ * @cssprop --umb-login-content-width - The width of the content wrapper (default: 100%)
+ * @cssprop --umb-login-content-height - The height of the content wrapper (default: 100%)
+ * @cssprop --umb-login-align-items - The align-items of the main wrapper (default: unset)
+ * @cssprop --umb-curves-color - The color of the curves (default: #f5c1bc)
+ * @cssprop --umb-curves-display - The display of the curves (default: inline)
+ */
 @customElement('umb-auth-layout')
 export class UmbAuthLayoutElement extends LitElement {
   @property({ attribute: 'background-image' })
@@ -18,7 +34,7 @@ export class UmbAuthLayoutElement extends LitElement {
 
     if (_changedProperties.has<keyof this>('backgroundImage')) {
       this.style.setProperty('--logo-alternative-display', this.backgroundImage ? 'none' : 'unset');
-      this.style.setProperty('--image', `url('${this.backgroundImage}')`);
+      this.style.setProperty('--image', `url('${this.backgroundImage}') no-repeat center center/cover`);
     }
   }
 
@@ -35,7 +51,7 @@ export class UmbAuthLayoutElement extends LitElement {
             viewBox="0 0 1746 1374"
             fill="none"
             xmlns="http://www.w3.org/2000/svg">
-            <path d="M8 1C61.5 722.5 206.5 1366.5 1745.5 1366.5" stroke="#F5C1BC" stroke-width="15"/>
+            <path d="M8 1C61.5 722.5 206.5 1366.5 1745.5 1366.5" stroke="currentColor" stroke-width="15"/>
           </svg>
           <svg
             id="curve-bottom"
@@ -44,7 +60,7 @@ export class UmbAuthLayoutElement extends LitElement {
             viewBox="0 0 1364 552"
             fill="none"
             xmlns="http://www.w3.org/2000/svg">
-            <path d="M1 8C387 24 1109 11 1357 548" stroke="#F5C1BC" stroke-width="15"/>
+            <path d="M1 8C387 24 1109 11 1357 548" stroke="currentColor" stroke-width="15"/>
           </svg>
 
           ${when(
@@ -90,14 +106,18 @@ export class UmbAuthLayoutElement extends LitElement {
         --input-height: 40px;
         --header-font-size: 3rem;
         --header-secondary-font-size: 2.4rem;
+        --curves-color: var(--umb-curves-color, #f5c1bc);
+        --curves-display: var(--umb-curves-display, inline);
+
         display: block;
-        background-color: #f4f4f4;
+        background: var(--umb-login-background, #f4f4f4);
       }
 
       #main-no-image,
       #main {
         max-width: 1920px;
         display: flex;
+        justify-content: center;
         height: 100vh;
         padding: 8px;
         box-sizing: border-box;
@@ -105,13 +125,15 @@ export class UmbAuthLayoutElement extends LitElement {
       }
 
       #image-container {
-        display: none;
+        display: var(--umb-login-image-display, none);
         width: 100%;
       }
 
       #content-container {
-        display: flex;
-        width: 100%;
+        background: var(--umb-login-content-background, none);
+        display: var(--umb-login-content-display, flex);
+        width: var(--umb-login-content-width, 100%);
+        height: var(--umb-login-content-height, 100%);
         box-sizing: border-box;
         overflow: auto;
       }
@@ -123,21 +145,20 @@ export class UmbAuthLayoutElement extends LitElement {
       }
 
       #image {
-        background-image: var(--image);
-        background-position: 50%;
-        background-repeat: no-repeat;
-        background-size: cover;
+        background: var(--umb-login-image, var(--image));
         width: 100%;
         height: 100%;
         border-radius: 38px;
         position: relative;
         overflow: hidden;
+        color: var(--curves-color);
       }
 
       #image svg {
         position: absolute;
         width: 45%;
         height: fit-content;
+        display: var(--curves-display);
       }
 
       #curve-top {
@@ -166,14 +187,15 @@ export class UmbAuthLayoutElement extends LitElement {
         #main {
           padding: 32px;
           padding-right: 0;
+          align-items: var(--umb-login-align-items, unset);
         }
 
         #image-container {
-          display: block;
+          display: var(--umb-login-image-display, block);
         }
 
         #content-container {
-          display: flex;
+          display: var(--umb-login-content-display, flex);
           padding: 16px;
         }
 

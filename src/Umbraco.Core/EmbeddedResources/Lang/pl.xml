@@ -523,7 +523,7 @@
     <key alias="username">Nazwa użytkownika</key>
     <key alias="value">Wartość</key>
     <key alias="view">Widok</key>
-    <key alias="welcome">Witaj</key>
+    <key alias="welcome">Witaj...</key>
     <key alias="width">Szerokość</key>
     <key alias="yes">Tak</key>
     <key alias="folder">Folder</key>
@@ -683,13 +683,13 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
     <key alias="renewSession">Wznów sesję teraz, aby zapisać swoją pracę</key>
   </area>
   <area alias="login">
-    <key alias="greeting0">Szczęśliwej super niedzieli</key>
-    <key alias="greeting1">Szczęśliwego maniakalnego poniedziałku </key>
-    <key alias="greeting2">Szczęśliwego świetnego wtorku</key>
-    <key alias="greeting3">Szczęśliwej niesamowitej środy</key>
-    <key alias="greeting4">Szczęśliwego wyjątkowego czwartku</key>
-    <key alias="greeting5">Szczęśliwego odjechanego piątku</key>
-    <key alias="greeting6">Szczęśliwej cudownej soboty</key>
+    <key alias="greeting0">Witaj</key>
+    <key alias="greeting1">Witaj</key>
+    <key alias="greeting2">Witaj</key>
+    <key alias="greeting3">Witaj</key>
+    <key alias="greeting4">Witaj</key>
+    <key alias="greeting5">Witaj</key>
+    <key alias="greeting6">Witaj</key>
     <key alias="instruction">Zaloguj się poniżej</key>
     <key alias="signInWith">Zaloguj się z</key>
     <key alias="timeout">Sesja wygasła</key>

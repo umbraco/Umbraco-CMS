@@ -543,7 +543,7 @@
     <key alias="user">Användare</key>
     <key alias="username">Användarnamn</key>
     <key alias="value">Värde</key>
-    <key alias="welcome">Välkommen</key>
+    <key alias="welcome">Välkommen...</key>
     <key alias="width">Bredd</key>
     <key alias="view">Titta på</key>
     <key alias="yes">Ja</key>
@@ -636,13 +636,13 @@
   </area>
   <area alias="login">
     <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">umbraco.com</a></p> ]]></key>
-    <key alias="greeting0">Happy super Sunday</key>
-    <key alias="greeting1">Happy manic Monday</key>
-    <key alias="greeting2">Happy tremendous Tuesday</key>
-    <key alias="greeting3">Happy wonderful Wednesday</key>
-    <key alias="greeting4">Happy thunderous Thursday</key>
-    <key alias="greeting5">Happy friendly Friday</key>
-    <key alias="greeting6">Happy shiny Saturday</key>
+    <key alias="greeting0">Välkommen</key>
+    <key alias="greeting1">Välkommen</key>
+    <key alias="greeting2">Välkommen</key>
+    <key alias="greeting3">Välkommen</key>
+    <key alias="greeting4">Välkommen</key>
+    <key alias="greeting5">Välkommen</key>
+    <key alias="greeting6">Välkommen</key>
     <key alias="instruction">Logga in nedan</key>
     <key alias="signInWith">Logga in med</key>
     <key alias="timeout">Sessionen har nått sin maxgräns</key>
