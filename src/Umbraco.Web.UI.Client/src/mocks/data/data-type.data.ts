@@ -19,6 +19,14 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 	},
 	{
 		type: 'data-type',
+		name: 'Folder 2',
+		id: 'dt-folder2',
+		parentId: null,
+		isFolder: true,
+		hasChildren: true,
+	},
+	{
+		type: 'data-type',
 		id: '0cc0eba1-9960-42c9-bf9b-60e150b429ae',
 		parentId: null,
 		name: 'Textstring',
