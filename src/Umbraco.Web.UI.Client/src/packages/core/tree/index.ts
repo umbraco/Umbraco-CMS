@@ -13,5 +13,8 @@ export * from './tree-store.interface.js';
 export * from './entity-tree-store.js';
 export * from './file-system-tree.store.js';
 
+// unique
+export * from './unique-tree-store.js';
+export * from './unique-tree-item/index.js';
+
 export { UmbTreeRepositoryBase } from './tree-repository-base.js';
-export { UmbUniqueTreeStore } from './unique-tree-store.js';
