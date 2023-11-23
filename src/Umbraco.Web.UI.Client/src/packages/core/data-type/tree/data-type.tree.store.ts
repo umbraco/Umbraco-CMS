@@ -20,6 +20,7 @@ export class UmbDataTypeTreeStore extends UmbUniqueTreeStore {
 	 */
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_DATA_TYPE_TREE_STORE_CONTEXT.toString());
+
 		new UmbStoreConnector<UmbDataTypeTreeItemModel, UmbDataTypeDetailModel>(
 			host,
 			this,
@@ -30,7 +31,6 @@ export class UmbDataTypeTreeStore extends UmbUniqueTreeStore {
 	}
 
 	#createTreeItemMapper = (item: UmbDataTypeDetailModel) => {
-		console.log('create tree item for', item);
 		return {
 			unique: item.unique!,
 			parentUnique: item.parentUnique,
@@ -43,8 +43,9 @@ export class UmbDataTypeTreeStore extends UmbUniqueTreeStore {
 	};
 
 	#updateTreeItemMapper = (item: UmbDataTypeDetailModel) => {
-		console.log('update tree item for', item);
-		return item;
+		return {
+			name: item.name,
+		};
 	};
 }
 

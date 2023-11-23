@@ -1,4 +1,4 @@
-import { UmbDataTypeDetailModel } from '../../types.js';
+import { UmbDataTypeDetailModel, UmbDataTypePropertyModel } from '../../types.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
 import {
@@ -49,7 +49,7 @@ export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataT
 
 	/**
 	 * Fetches a Data Type with the given id from the server
-	 * @param {string} id
+	 * @param {string} unique
 	 * @return {*}
 	 * @memberof UmbDataTypeServerDataSource
 	 */
@@ -58,19 +58,20 @@ export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataT
 
 		const { data, error } = await tryExecuteAndNotify(this.#host, DataTypeResource.getDataTypeById({ id: unique }));
 
-		if (error) {
+		if (error || !data) {
 			return { error };
 		}
 
 		// map to client model
+		// TODO: investigate why all server fields are optional
 		const dataType = {
-			entityType: 'data-type',
-			unique: data.id,
-			parentUnique: data.parentId,
-			name: data.name,
-			propertyEditorAlias: data.propertyEditorAlias,
-			propertyEditorUiAlias: data.propertyEditorAlias,
-			values: data.values,
+			type: 'data-type',
+			unique: data.id!,
+			parentUnique: data.parentId!,
+			name: data.name!,
+			propertyEditorAlias: data.propertyEditorAlias!,
+			propertyEditorUiAlias: data.propertyEditorAlias!,
+			values: data.values as Array<UmbDataTypePropertyModel>,
 		};
 
 		return { data: dataType };
@@ -84,7 +85,7 @@ export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataT
 	 */
 	async create(dataType: UmbDataTypeDetailModel) {
 		if (!dataType) throw new Error('Data Type is missing');
-		if (!dataType.unique) throw new Error('Data Type id is missing');
+		if (!dataType.unique) throw new Error('Data Type unique is missing');
 
 		// map to server model
 		const requestBody: CreateDataTypeRequestModel = {
@@ -107,7 +108,7 @@ export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataT
 			return { error: createError };
 		}
 
-		// we have to fetch the data type again. The server can have modified the data after creation
+		// We have to fetch the data type again. The server can have modified the data after creation
 		return this.read(dataType.unique);
 	}
 
@@ -127,13 +128,20 @@ export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataT
 			values: data.values,
 		};
 
-		return tryExecuteAndNotify(
+		const { error } = await tryExecuteAndNotify(
 			this.#host,
 			DataTypeResource.putDataTypeById({
 				id: data.unique,
 				requestBody,
 			}),
 		);
+
+		if (error) {
+			return { error };
+		}
+
+		// We have to fetch the data type again. The server can have modified the data after update
+		return this.read(data.unique);
 	}
 
 	/**

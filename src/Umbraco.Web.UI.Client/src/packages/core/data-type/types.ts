@@ -1,7 +1,14 @@
-import { DataTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
-
-export type UmbDataTypeDetailModel = Omit<DataTypeResponseModel, 'id' | 'parentId'> & {
+export type UmbDataTypeDetailModel = {
 	type: string;
-	unique: string | undefined; // TODO - remove this when server doesn't allow undefined
-	parentUnique: string | null | undefined; // TODO - remove this when server doesn't allow undefined
+	unique: string;
+	parentUnique: string | null;
+	name: string;
+	propertyEditorAlias: string | undefined;
+	propertyEditorUiAlias: string | null;
+	values: Array<UmbDataTypePropertyModel>;
 };
+
+export interface UmbDataTypePropertyModel {
+	alias: string;
+	value: any;
+}

@@ -5,21 +5,21 @@ import { UmbContextConsumerController, UmbContextToken } from '@umbraco-cms/back
 import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbStoreConnector<StoreType, ConnectedStoreType> {
-	#store: UmbStoreBase;
+	#store: UmbStore<StoreType>;
 	#connectedStore?: UmbStore<ConnectedStoreType>;
-	#createMapperFunction: (item: ConnectedStoreType) => StoreType;
-	#updateMapperFunction?: (item: ConnectedStoreType) => StoreType;
+	#onNewStoreItem: (item: ConnectedStoreType) => StoreType;
+	#onUpdateStoreItem: (item: ConnectedStoreType) => StoreType;
 
 	constructor(
 		host: UmbControllerHost,
 		store: UmbStoreBase,
 		connectToStoreAlias: UmbContextToken<any, any> | string,
-		createMapperFunction: (item: ConnectedStoreType) => StoreType,
-		updateMapperFunction: (item: ConnectedStoreType) => StoreType,
+		onNewStoreItem: (item: ConnectedStoreType) => StoreType,
+		onUpdateStoreItem: (item: ConnectedStoreType) => Partial<StoreType>,
 	) {
 		this.#store = store;
-		this.#createMapperFunction = createMapperFunction;
-		this.#updateMapperFunction = updateMapperFunction;
+		this.#onNewStoreItem = onNewStoreItem;
+		this.#onUpdateStoreItem = onUpdateStoreItem;
 
 		new UmbContextConsumerController(host, connectToStoreAlias, (instance) => {
 			this.#connectedStore = instance;
@@ -32,25 +32,25 @@ export class UmbStoreConnector<StoreType, ConnectedStoreType> {
 
 	#listenToConnectedStore = () => {
 		if (!this.#connectedStore) return;
-		this.#connectedStore.addEventListener(UmbStoreCreateEvent.TYPE, this.#onConnectedStoreCreate as EventListener);
-		this.#connectedStore.addEventListener(UmbStoreUpdateEvent.TYPE, this.#onConnectedStoreUpdate as EventListener);
-		this.#connectedStore.addEventListener(UmbStoreDeleteEvent.TYPE, this.#onConnectedStoreDelete as EventListener);
+		this.#connectedStore.addEventListener(UmbStoreCreateEvent.TYPE, this.#updateStoreItems as EventListener);
+		this.#connectedStore.addEventListener(UmbStoreUpdateEvent.TYPE, this.#updateStoreItems as EventListener);
+		this.#connectedStore.addEventListener(UmbStoreDeleteEvent.TYPE, this.#removeStoreItems as EventListener);
 	};
 
-	#onConnectedStoreCreate = (event: UmbStoreCreateEvent) => {
-		const items = this.#connectedStore!.getItems(event.uniques);
-		const mappedItems = items.map((item) => this.#createMapperFunction(item));
-		this.#store.appendItems(mappedItems);
+	#updateStoreItems = (event: UmbStoreCreateEvent | UmbStoreUpdateEvent) => {
+		event.uniques.forEach((unique) => {
+			const storeHasItem = this.#store.getItems([unique]).length > 0;
+			const connectedStoreItem = this.#connectedStore!.getItems([unique])[0];
+
+			if (storeHasItem) {
+				this.#store.updateItem(unique, this.#onUpdateStoreItem(connectedStoreItem!));
+			} else {
+				this.#store.append(this.#onNewStoreItem(connectedStoreItem!));
+			}
+		});
 	};
 
-	#onConnectedStoreUpdate = (event: UmbStoreUpdateEvent) => {
-		const uniques = event.uniques;
-		const items = this.#connectedStore!.getItems(uniques);
-		const mappedItems = items.map((item) => this.#updateMapperFunction(item));
-		mappedItems.forEach((mappedItem, index) => this.#store.updateItem(uniques[index], mappedItem));
-	};
-
-	#onConnectedStoreDelete = (event: UmbStoreDeleteEvent) => {
+	#removeStoreItems = (event: UmbStoreDeleteEvent) => {
 		this.#store.removeItems(event.uniques);
 	};
 }
