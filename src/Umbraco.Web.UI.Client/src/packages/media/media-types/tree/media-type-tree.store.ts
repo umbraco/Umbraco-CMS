@@ -1,11 +1,11 @@
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbEntityTreeStore } from '@umbraco-cms/backoffice/tree';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 /**
  * @export
  * @class UmbMediaTypeTreeStore
- * @extends {UmbEntityTreeStore}
+ * @extends {UmbStoreBase}
  * @description - Tree Data Store for Media Types
  */
 export class UmbMediaTypeTreeStore extends UmbEntityTreeStore {
@@ -15,10 +15,8 @@ export class UmbMediaTypeTreeStore extends UmbEntityTreeStore {
 	 * @memberof UmbMediaTypeTreeStore
 	 */
 	constructor(host: UmbControllerHostElement) {
-		super(host, UMB_MEDIA_TYPE_TREE_STORE_CONTEXT_TOKEN.toString());
+		super(host, UMB_MEDIA_TYPE_TREE_STORE_CONTEXT.toString());
 	}
 }
 
-export const UMB_MEDIA_TYPE_TREE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbMediaTypeTreeStore>(
-	'UmbMediaTypeTreeStore',
-);
+export const UMB_MEDIA_TYPE_TREE_STORE_CONTEXT = new UmbContextToken<UmbMediaTypeTreeStore>('UmbMediaTypeTreeStore');

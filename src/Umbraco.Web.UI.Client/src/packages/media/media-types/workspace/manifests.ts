@@ -17,17 +17,17 @@ const workspace: ManifestWorkspace = {
 	},
 };
 
-const workspaceViews: Array<ManifestWorkspaceEditorView> = [
+const workspaceEditorViews: Array<ManifestWorkspaceEditorView> = [
 	{
 		type: 'workspaceEditorView',
 		alias: 'Umb.WorkspaceView.MediaType.Design',
 		name: 'Media Type Workspace Design View',
-		js: () => import('./views/details/media-type-design-workspace-view.element.js'),
-		weight: 90,
+		js: () => import('./views/design/media-type-workspace-view-edit.element.js'),
+		weight: 1000,
 		meta: {
-			label: 'Details',
-			pathname: 'details',
-			icon: 'document',
+			label: 'Design',
+			pathname: 'design',
+			icon: 'icon-document-dashed-line',
 		},
 		conditions: [
 			{
@@ -38,32 +38,14 @@ const workspaceViews: Array<ManifestWorkspaceEditorView> = [
 	},
 	{
 		type: 'workspaceEditorView',
-		alias: 'Umb.WorkspaceView.MediaType.ListView',
-		name: 'Media Type Workspace ListView View',
-		js: () => import('./views/details/media-type-list-view-workspace-view.element.js'),
-		weight: 90,
+		alias: 'Umb.WorkspaceView.MediaType.Structure',
+		name: 'Media Type Workspace Structure View',
+		js: () => import('./views/structure/media-type-workspace-view-structure.element.js'),
+		weight: 800,
 		meta: {
-			label: 'List View',
-			pathname: 'list-view',
-			icon: 'document',
-		},
-		conditions: [
-			{
-				alias: 'Umb.Condition.WorkspaceAlias',
-				match: workspace.alias,
-			},
-		],
-	},
-	{
-		type: 'workspaceEditorView',
-		alias: 'Umb.WorkspaceView.MediaType.Permissions',
-		name: 'Media Type Workspace Permissions View',
-		js: () => import('./views/details/media-type-permissions-workspace-view.element.js'),
-		weight: 90,
-		meta: {
-			label: 'Permissions',
-			pathname: 'permissions',
-			icon: 'document',
+			label: 'Structure',
+			pathname: 'structure',
+			icon: 'icon-mindmap',
 		},
 		conditions: [
 			{
@@ -94,4 +76,4 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 	},
 ];
 
-export const manifests = [workspace, ...workspaceViews, ...workspaceViewCollections, ...workspaceActions];
+export const manifests = [workspace, ...workspaceEditorViews, ...workspaceViewCollections, ...workspaceActions];

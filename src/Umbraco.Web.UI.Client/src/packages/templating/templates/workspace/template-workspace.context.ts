@@ -176,4 +176,8 @@ ${currentContent}`;
 export const UMB_TEMPLATE_WORKSPACE_CONTEXT = new UmbContextToken<
 	UmbSaveableWorkspaceContextInterface,
 	UmbTemplateWorkspaceContext
->('UmbWorkspaceContext', (context): context is UmbTemplateWorkspaceContext => context.getEntityType?.() === 'template');
+>(
+	'UmbWorkspaceContext',
+	undefined,
+	(context): context is UmbTemplateWorkspaceContext => context.getEntityType?.() === 'template',
+);
