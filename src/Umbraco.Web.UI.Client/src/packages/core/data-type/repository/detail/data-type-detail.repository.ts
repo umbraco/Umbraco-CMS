@@ -39,7 +39,7 @@ export class UmbDataTypeDetailRepository extends UmbRepositoryBase {
 		const { data, error } = await this.#detailSource.read(unique);
 
 		if (data) {
-			this.#detailStore!.append(data);
+			this.#detailStore!.updateItem(unique, data);
 		}
 
 		return { data, error, asObservable: () => this.#detailStore!.byUnique(unique) };
