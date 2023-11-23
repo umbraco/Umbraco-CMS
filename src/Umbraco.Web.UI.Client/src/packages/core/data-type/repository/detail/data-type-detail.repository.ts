@@ -39,7 +39,7 @@ export class UmbDataTypeDetailRepository extends UmbRepositoryBase {
 		const { data, error } = await this.#detailSource.read(unique);
 
 		if (data) {
-			this.#detailStore!.updateItem(unique, data);
+			this.#detailStore!.append(data);
 		}
 
 		return { data, error, asObservable: () => this.#detailStore!.byUnique(unique) };
@@ -82,7 +82,7 @@ export class UmbDataTypeDetailRepository extends UmbRepositoryBase {
 		const { data, error } = await this.#detailSource.update(dataType);
 
 		if (data) {
-			this.#detailStore!.updateItem(data.unique!, data);
+			this.#detailStore!.updateItem(data.unique, data);
 
 			const notification = { data: { message: `Data Type saved` } };
 			this.#notificationContext!.peek('positive', notification);
