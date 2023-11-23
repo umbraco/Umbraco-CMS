@@ -105,6 +105,9 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 	static styles: CSSResultGroup = [
 		UmbTextStyles,
 		css`
+			:host {
+				--uui-menu-item-flat-structure: 1;
+			}
 			#more-symbol {
 				font-size: 0.6em;
 			}
