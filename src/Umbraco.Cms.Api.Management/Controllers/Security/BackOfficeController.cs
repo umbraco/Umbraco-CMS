@@ -45,7 +45,7 @@ public class BackOfficeController : SecurityControllerBase
 
     // FIXME: this is a temporary solution to get the new backoffice auth rolling.
     //        once the old backoffice auth is no longer necessary, clean this up and merge with 2FA handling etc.
-    //[AllowAnonymous] // This is handled implicitly by the NewDenyLocalLoginIfConfigured policy on the <see cref="SecurityControllerBase" />. Keep it here for now and check FIXME in <see cref="DenyLocalLoginHandler" />.
+    [AllowAnonymous] // This is handled implicitly by the NewDenyLocalLoginIfConfigured policy on the <see cref="SecurityControllerBase" />. Keep it here for now and check FIXME in <see cref="DenyLocalLoginHandler" />.
     [HttpPost("login")]
     [MapToApiVersion("1.0")]
     public async Task<IActionResult> Login(LoginRequestModel model)
@@ -70,7 +70,7 @@ public class BackOfficeController : SecurityControllerBase
         public required string Password { get; init; }
     }
 
-    //[AllowAnonymous] // This is handled implicitly by the NewDenyLocalLoginIfConfigured policy on the <see cref="SecurityControllerBase" />. Keep it here for now and check FIXME in <see cref="DenyLocalLoginHandler" />.
+    [AllowAnonymous] // This is handled implicitly by the NewDenyLocalLoginIfConfigured policy on the <see cref="SecurityControllerBase" />. Keep it here for now and check FIXME in <see cref="DenyLocalLoginHandler" />.
     [HttpGet("authorize")]
     [MapToApiVersion("1.0")]
     public async Task<IActionResult> Authorize()
