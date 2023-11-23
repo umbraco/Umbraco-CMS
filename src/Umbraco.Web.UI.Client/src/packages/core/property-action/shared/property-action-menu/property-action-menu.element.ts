@@ -115,10 +115,6 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 				--uui-button-height: 18px;
 				--uui-button-border-radius: 6px;
 			}
-
-			umb-popover-layout {
-				padding: 0;
-			}
 		`,
 	];
 }

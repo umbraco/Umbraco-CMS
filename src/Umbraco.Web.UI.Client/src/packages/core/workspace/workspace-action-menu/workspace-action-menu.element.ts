@@ -55,14 +55,7 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 			: nothing;
 	}
 
-	static styles = [
-		UmbTextStyles,
-		css`
-			umb-popover-layout {
-				padding: 0;
-			}
-		`,
-	];
+	static styles = [UmbTextStyles, css``];
 }
 
 declare global {

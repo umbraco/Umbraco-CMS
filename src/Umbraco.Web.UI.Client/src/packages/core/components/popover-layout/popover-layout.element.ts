@@ -11,7 +11,6 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
  * @element umb-popover-layout
  *
  * @cssprop {String} --umb-popover-layout-background-color - Override background color.
- * @cssprop {String} --umb-popover-layout-padding - Override padding.
  */
 @customElement('umb-popover-layout')
 export class UmbPopoverLayoutElement extends UmbLitElement {
@@ -28,7 +27,6 @@ export class UmbPopoverLayoutElement extends UmbLitElement {
 				border: 1px solid var(--uui-color-border);
 				border-radius: var(--uui-border-radius);
 				box-shadow: var(--uui-shadow-depth-3);
-				padding: var(--umb-popover-layout-padding, var(--uui-size-space-3));
 				overflow: clip;
 			}
 		`,
