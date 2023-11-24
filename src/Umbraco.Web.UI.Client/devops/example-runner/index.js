@@ -36,7 +36,12 @@ async function pickExampleUI(){
 		process.env['VITE_EXAMPLE_PATH'] = `${exampleDirectory}/${selectedFolder}`;
 
 		// Start vite server:
-		execSync('npm run dev', {stdio: 'inherit'});
+		try {
+			execSync('npm run dev', {stdio: 'inherit'});
+		} catch (error) {
+			// Nothing, cause this is most likely just the server begin stopped.
+			//console.log(error);
+		}
 	});
 
 };
