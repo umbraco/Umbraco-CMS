@@ -703,6 +703,15 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 		propertyEditorUiAlias: 'Umb.PropertyEditorUi.MemberGroupPicker',
 		values: [],
 	},
+	{
+		type: 'data-type',
+		name: 'Data Type in folder',
+		id: 'dt-data-type-in-folder',
+		parentId: 'dt-folder2',
+		propertyEditorAlias: 'Umbraco.MemberGroupPicker',
+		propertyEditorUiAlias: 'Umb.PropertyEditorUi.MemberGroupPicker',
+		values: [],
+	},
 ];
 
 const createDataTypeItem = (item: DataTypeResponseModel | FolderTreeItemResponseModel): DataTypeItemResponseModel => {
