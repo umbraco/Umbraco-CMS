@@ -15,6 +15,7 @@ using Umbraco.Cms.Api.Management.Controllers;
 using Umbraco.Cms.Api.Management.Controllers.Security;
 using Umbraco.Cms.Api.Management.Security;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Security;
@@ -47,6 +48,7 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
 
     protected async Task AuthenticateClientAsync(HttpClient client, string username, string password, bool isAdmin)
     {
+        Guid userKey = Constants.Security.SuperUserKey;
         OpenIddictApplicationDescriptor backofficeOpenIddictApplicationDescriptor;
         var scopeProvider = GetRequiredService<ICoreScopeProvider>();
         using (var scope = scopeProvider.CreateCoreScope())
@@ -58,26 +60,35 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
             IUser user;
             if (isAdmin)
             {
-                user = await userService.GetAsync(Constants.Security.SuperUserKey) ??
+                user = await userService.GetAsync(userKey) ??
                        throw new Exception("Super user not found.");
                 user.Username = user.Email = username;
                 userService.Save(user);
             }
             else
             {
-                throw new NotSupportedException("We need to handle non admins by creating a new user");
+                user = (await userService.CreateAsync(Constants.Security.SuperUserKey,
+                    new UserCreateModel()
+                    {
+                        Email = username,
+                        Name = username,
+                        UserName = username,
+                        UserGroupKeys = new HashSet<Guid>(new[] { Constants.Security.EditorGroupKey })
+                    },
+                    true)).Result.CreatedUser;
+                userKey = user.Key;
             }
 
 
             var token = await userManager.GeneratePasswordResetTokenAsync(user);
 
 
-            var changePasswordAttempt = await userService.ChangePasswordAsync(Constants.Security.SuperUserKey,
+            var changePasswordAttempt = await userService.ChangePasswordAsync(userKey,
                 new ChangeUserPasswordModel
                 {
                     NewPassword = password,
                     ResetPasswordToken = token.Result.ToUrlBase64(),
-                    UserKey = Constants.Security.SuperUserKey
+                    UserKey = userKey
                 });
 
             Assert.IsTrue(changePasswordAttempt.Success);

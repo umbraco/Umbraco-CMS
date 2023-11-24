@@ -27,6 +27,16 @@ public class ByKeyAuditLogControllerTests : ManagementApiTest<ByKeyAuditLogContr
     }
 
     [Test]
+    public virtual async Task As_Editor_I_Have_Access()
+    {
+        await AuthenticateClientAsync(Client, "editor@umbraco.com", "1234567890", false);
+
+        var response = await Client.GetAsync(Url);
+
+        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode,  await response.Content.ReadAsStringAsync());
+    }
+
+    [Test]
     public virtual async Task Unauthourized_when_no_token_is_provided()
     {
         var response = await Client.GetAsync(Url);
