@@ -26,7 +26,6 @@ document.body.appendChild(appElement);
 // Example injector:
 if(import.meta.env.VITE_EXAMPLE_PATH) {
 	import(/* @vite-ignore */ './'+import.meta.env.VITE_EXAMPLE_PATH+'/index.ts').then((js) => {
-		console.log("js", js);
 		if (js) {
 			Object.keys(js).forEach((key) => {
 				const value = js[key];
