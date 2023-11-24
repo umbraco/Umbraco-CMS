@@ -1,4 +1,4 @@
-﻿(function () {
+(function () {
   "use strict";
 
   function mediaItemResolverFilterService(mediaResource, eventsService) {
@@ -11,15 +11,15 @@
       getByKey: function (key) {
         // Is it cached, then get that:
         const cachedMediaItem = mediaItemCache.find(cache => key === cache.key);
-        if(cachedMediaItem) {
+        if (cachedMediaItem) {
           return cachedMediaItem;
         }
 
         // check its not already being loaded, and then start loading:
-        if(mediaKeysRequest.indexOf(key) === -1) {
+        if (mediaKeysRequest.indexOf(key) === -1) {
           mediaKeysRequest.push(key);
-          mediaResource.getById(key).then(function (mediaItem) {
-            if(mediaItem) {
+          mediaResource.getById(key).then(mediaItem => {
+            if (mediaItem) {
               mediaItemCache.push(mediaItem);
             }
           });
@@ -31,7 +31,7 @@
 
     eventsService.on("editors.media.saved", function (name, args) {
       const index = mediaItemCache.findIndex(cache => cache.key === args.media.key);
-      if(index !== -1) {
+      if (index !== -1) {
         mediaItemCache[index] = args.media;
       }
     });
