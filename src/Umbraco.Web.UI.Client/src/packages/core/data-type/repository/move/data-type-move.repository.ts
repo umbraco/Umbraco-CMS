@@ -11,17 +11,13 @@ export class UmbMoveDataTypeRepository extends UmbDataTypeRepositoryBase impleme
 		this.#moveSource = new UmbDataTypeMoveServerDataSource(this);
 	}
 
-	async move(id: string, targetId: string | null) {
+	async move(unique: string, targetUnique: string | null) {
 		await this._init;
-		const { error } = await this.#moveSource.move(id, targetId);
+		const { error } = await this.#moveSource.move(unique, targetUnique);
 
 		if (!error) {
 			// TODO: Be aware about this responsibility.
-			this._treeStore!.updateItem(id, { parentId: targetId });
-			// only update the target if its not the root
-			if (targetId) {
-				this._treeStore!.updateItem(targetId, { hasChildren: true });
-			}
+			this._treeStore!.updateItem(unique, { parentUnique: targetUnique });
 
 			const notification = { data: { message: `Data type moved` } };
 			this._notificationContext!.peek('positive', notification);
