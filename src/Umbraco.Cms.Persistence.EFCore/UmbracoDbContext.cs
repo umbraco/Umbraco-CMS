@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Persistence.EFCore.Migrations;
@@ -77,7 +76,7 @@ public class UmbracoDbContext : DbContext
 
         foreach (IMutableEntityType entity in modelBuilder.Model.GetEntityTypes())
         {
-            entity.SetTableName(Constants.DatabaseSchema.TableNamePrefix + entity.GetTableName());
+            entity.SetTableName(Core.Constants.DatabaseSchema.TableNamePrefix + entity.GetTableName());
         }
     }
 }

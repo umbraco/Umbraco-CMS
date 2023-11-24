@@ -73,6 +73,7 @@ Use this directive to render a group of toggle buttons.
         function link(scope, el, attr, ctrl) {
             for(let i = 0; i < scope.items.length; i++) {
                 scope.items[i].inputId = "umb-toggle-group-item_" + String.CreateGuid();
+                scope.items[i].labelId = "umb-toggle-group-item_" + String.CreateGuid();
             }
             scope.change = function(item) {
                 if (item.disabled) {

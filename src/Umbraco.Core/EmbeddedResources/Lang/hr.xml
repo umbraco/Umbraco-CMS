@@ -158,6 +158,12 @@
     <key alias="morePublishingOptions">Više opcija za objavljivanje</key>
     <key alias="submitChanges">Pošalji</key>
   </area>
+  <area alias="auditTrailsMedia">
+    <key alias="delete">Mediji je obrisan</key>
+    <key alias="move">Mediji premješten</key>
+    <key alias="copy">Mediji kopiran</key>
+    <key alias="save">Mediji spremljen</key>
+  </area>
   <area alias="auditTrails">
     <key alias="atViewingFor">Pregled za</key>
     <key alias="delete">Sadržaj je obrisan</key>

@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Integration.TestServerTest;
@@ -32,6 +33,7 @@ public class ContentVariantAllowedActionTests : UmbracoTestServerTestBase
     }
 
     [Test]
+    [LongRunning]
     public void CanCheckIfUserHasAccessToLanguage()
     {
         // setup user groups

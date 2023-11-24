@@ -112,6 +112,12 @@
       zijn op de huidige node, tenzij een domein hieronder ook van toepassing is.]]></key>
     <key alias="setDomains">Domeinen</key>
   </area>
+  <area alias="auditTrailsMedia">
+    <key alias="delete">Media verwijderd</key>
+    <key alias="move">Media verplaatst</key>
+    <key alias="copy">Media gekopieerd</key>
+    <key alias="save">Media bewaard</key>
+  </area>
   <area alias="auditTrails">
     <key alias="atViewingFor">Tonen voor</key>
     <key alias="delete">Inhoud verwijderd</key>

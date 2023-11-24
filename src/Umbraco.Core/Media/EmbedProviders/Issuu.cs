@@ -19,6 +19,9 @@ public class Issuu : OEmbedProviderBase
 
     public override Dictionary<string, string> RequestParams => new()
     {
+        // ApiUrl/?iframe=true
+        { "iframe", "true" },
+
         // ApiUrl/?format=xml
         { "format", "xml" },
     };

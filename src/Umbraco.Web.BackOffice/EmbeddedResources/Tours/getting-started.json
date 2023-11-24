@@ -126,7 +126,7 @@
     "steps": [
       {
         "title": "Create your first Document Type",
-        "content": "<p>Step 1 of any site is to create a <strong>Document Type</strong>.<br> A Document Type is a template for content. For each <em>type</em> of content you want to create you'll create a Document Type. This will define where content based on this Document Type can be created, how many properties it holds and what the input method should be for these properties.</p><p>When you have at least one Document Type in place you can start creating content and this content can then be used in a template.</p><p>In this tour you will learn how to set up a basic Document Type with a property to enter a short text.</p>",
+        "content": "<p>Step 1 of any site is to create a <strong>Document Type</strong>.<br> A Document Type is a template for content. For each <em>type</em> of content you want to create, you will need to create a Document Type. This will define where content based on this Document Type can be created, how many properties it holds and what the input method should be for these properties.</p><p>When you have at least one Document Type in place you can start creating content and this content can then be used in a template.</p><p>In this tour you will learn how to set up a basic Document Type with a property to enter a short text.</p>",
         "type": "intro"
       },
       {

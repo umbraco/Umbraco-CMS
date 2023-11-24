@@ -20,6 +20,7 @@ public class PublishedValueFallback : IPublishedValueFallback
         _variationContextAccessor = variationContextAccessor;
     }
 
+    [Obsolete("Scheduled for removal in v14")]
     public IVariationContextAccessor VariationContextAccessor { get { return _variationContextAccessor; } }
 
     /// <inheritdoc />
