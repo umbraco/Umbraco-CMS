@@ -1,4 +1,4 @@
-import { html, customElement, state, ifDefined, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, state, ifDefined, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { PropertyEditorConfigProperty } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -39,7 +39,7 @@ export class UmbPropertyEditorConfigElement extends UmbLitElement {
 	}
 
 	render() {
-		return this._properties.length > 0
+		return this._properties?.length > 0
 			? repeat(
 					this._properties,
 					(property) => property.alias,
