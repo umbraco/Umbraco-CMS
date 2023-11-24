@@ -29,7 +29,7 @@ export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataT
 
 	/**
 	 * Creates a new Data Type scaffold
-	 * @param {(string | null)} parentId
+	 * @param {(string | null)} parentUnique
 	 * @return { CreateDataTypeRequestModel }
 	 * @memberof UmbDataTypeServerDataSource
 	 */
