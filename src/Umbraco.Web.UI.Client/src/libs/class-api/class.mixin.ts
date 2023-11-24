@@ -21,7 +21,7 @@ type UmbClassMixinConstructor = new (
 ) => UmbClassMixinDeclaration;
 
 declare class UmbClassMixinDeclaration implements UmbClassMixinInterface {
-	_host: UmbControllerHost;
+	protected _host: UmbControllerHost;
 	observe<T>(
 		source: Observable<T>,
 		callback: (_value: T) => void,

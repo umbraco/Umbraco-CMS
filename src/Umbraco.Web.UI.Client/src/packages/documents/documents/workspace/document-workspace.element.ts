@@ -54,6 +54,7 @@ export class UmbDocumentWorkspaceElement extends UmbLitElement {
 			},
 		];
 
+		// TODO: We need to recreate when ID changed?
 		new UmbExtensionsApiInitializer(this, umbExtensionsRegistry, 'workspaceContext', [this, this.#workspaceContext]);
 	}
 
