@@ -12,7 +12,6 @@ export class WorkspaceContextCounter extends UmbBaseController {
 	constructor(host: UmbControllerHost) {
 		super(host);
 		this.provideContext(EXAMPLE_COUNTER_CONTEXT, this);
-		console.log("Hey new context")
 	}
 
 	// Lets expose methods to update the state:
