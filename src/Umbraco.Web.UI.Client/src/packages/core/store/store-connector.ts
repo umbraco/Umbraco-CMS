@@ -42,6 +42,7 @@ export class UmbStoreConnector<StoreType, ConnectedStoreType> {
 			const storeHasItem = this.#store.getItems([unique]).length > 0;
 			const connectedStoreItem = this.#connectedStore!.getItems([unique])[0];
 
+			// we check if the current store has the item from the connected store, if it does we update it, if it doesn't we append it
 			if (storeHasItem) {
 				this.#store.updateItem(unique, this.#onUpdateStoreItem(connectedStoreItem!));
 			} else {
