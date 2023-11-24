@@ -26,6 +26,7 @@ export class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemModelBase>
 
 	#hasChildren = new UmbBooleanState(false);
 	hasChildren = this.#hasChildren.asObservable();
+	#hasChildrenInitValueFlag = false;
 
 	#isLoading = new UmbBooleanState(false);
 	isLoading = this.#isLoading.asObservable();
@@ -194,9 +195,14 @@ export class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemModelBase>
 
 		const observable = await this.treeContext.childrenOf(this.unique);
 
-		// observe if any children will be added runtime to a tree item
+		// observe if any children will be added runtime to a tree item. Nested items/folders etc.
 		this.observe(observable.pipe(map((children) => children.length > 0)), (hasChildren) => {
-			this.#hasChildren.next(hasChildren);
+			// we need to skip the first value, because it will also return false until a child is in the store
+			// we therefor rely on the value from the tree item itself
+			if (this.#hasChildrenInitValueFlag === true) {
+				this.#hasChildren.next(hasChildren);
+			}
+			this.#hasChildrenInitValueFlag = true;
 		});
 	}
 
