@@ -4,6 +4,7 @@ import { UmbStore } from './store.interface.js';
 import { UmbContextConsumerController, UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
+// WIP: get back to this when we have decided on detail model sizes
 export class UmbStoreConnector<StoreType, ConnectedStoreType> {
 	#store: UmbStore<StoreType>;
 	#connectedStore?: UmbStore<ConnectedStoreType>;
