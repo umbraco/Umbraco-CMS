@@ -64,13 +64,14 @@ export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataT
 
 		// map to client model
 		// TODO: investigate why all server fields are optional
+		// TODO: make data mapper to prevent errors
 		const dataType = {
 			type: 'data-type',
 			unique: data.id!,
 			parentUnique: data.parentId!,
 			name: data.name!,
 			propertyEditorAlias: data.propertyEditorAlias!,
-			propertyEditorUiAlias: data.propertyEditorAlias!,
+			propertyEditorUiAlias: data.propertyEditorUiAlias!,
 			values: data.values as Array<UmbDataTypePropertyModel>,
 		};
 
@@ -88,6 +89,7 @@ export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataT
 		if (!dataType.unique) throw new Error('Data Type unique is missing');
 
 		// map to server model
+		// TODO: make data mapper to prevent errors
 		const requestBody: CreateDataTypeRequestModel = {
 			id: dataType.unique,
 			parentId: dataType.parentUnique,
@@ -121,6 +123,7 @@ export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataT
 	async update(data: UmbDataTypeDetailModel) {
 		if (!data.unique) throw new Error('Unique is missing');
 
+		// TODO: make data mapper to prevent errors
 		const requestBody: DataTypeModelBaseModel = {
 			name: data.name,
 			propertyEditorAlias: data.propertyEditorAlias,
