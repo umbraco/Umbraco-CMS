@@ -60,7 +60,7 @@
     <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.7.0"/>
     <PackageReference Include="System.Runtime.Caching" Version="6.0.0"/>
     <PackageReference Include="Umbraco.CSharpTest.Net.Collections" Version="14.906.1403.1085"/>
-    
+
     <!--   Add dependencies that we force an update to, even that we do not use them explicitly and they seems to be taken from the framework instead of from Nuget -->
     <PackageReference Include="System.Net.Http" Version="4.3.4"/>
     <PackageReference Include="System.Security.Cryptography.Xml" Version="6.0.1"/>
