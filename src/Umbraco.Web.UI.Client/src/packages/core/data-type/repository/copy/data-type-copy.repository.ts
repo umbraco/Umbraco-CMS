@@ -14,26 +14,22 @@ export class UmbCopyDataTypeRepository extends UmbDataTypeRepositoryBase impleme
 		this.#detailRepository = new UmbDataTypeDetailRepository(this);
 	}
 
-	async copy(id: string, targetId: string | null) {
+	async copy(unique: string, targetUnique: string | null) {
 		await this._init;
-		const { data: dataTypeCopyId, error } = await this.#copySource.copy(id, targetId);
+		const { data: dataTypeCopyUnique, error } = await this.#copySource.copy(unique, targetUnique);
 		if (error) return { error };
 
-		if (dataTypeCopyId) {
-			const { data: dataTypeCopy } = await this.#detailRepository.requestByUnique(dataTypeCopyId);
+		if (dataTypeCopyUnique) {
+			const { data: dataTypeCopy } = await this.#detailRepository.requestByUnique(dataTypeCopyUnique);
 			if (!dataTypeCopy) throw new Error('Could not find copied data type');
 
 			// TODO: Be aware about this responsibility.
-			this._treeStore!.appendItems([dataTypeCopy]);
-			// only update the target if its not the root
-			if (targetId) {
-				this._treeStore!.updateItem(targetId, { hasChildren: true });
-			}
+			this._treeStore!.append(dataTypeCopy);
 
 			const notification = { data: { message: `Data type copied` } };
 			this._notificationContext!.peek('positive', notification);
 		}
 
-		return { data: dataTypeCopyId };
+		return { data: dataTypeCopyUnique };
 	}
 }
