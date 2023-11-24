@@ -16,11 +16,3 @@ export interface UmbDataSource<
 	update(unique: string, data: UpdateRequestType): Promise<DataSourceResponse<ResponseType>>;
 	delete(unique: string): Promise<DataSourceResponse>;
 }
-
-export interface UmbDetailDataSource<DetailType> {
-	createScaffold(parentUnique: string | null, preset?: Partial<DetailType>): Promise<DataSourceResponse<DetailType>>;
-	create(data: DetailType): Promise<DataSourceResponse<DetailType>>;
-	read(unique: string): Promise<DataSourceResponse<DetailType>>;
-	update(data: DetailType): Promise<DataSourceResponse<DetailType>>;
-	delete(unique: string): Promise<DataSourceResponse>;
-}
