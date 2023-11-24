@@ -42,6 +42,8 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Web.BackOffice.Controllers;
 
 [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
+[ParameterSwapControllerActionSelector(nameof(GetById), "id", typeof(int), typeof(Guid))]
+[ParameterSwapControllerActionSelector(nameof(GetByIds), "ids", typeof(int[]), typeof(Guid[]))]
 [Authorize(Policy = AuthorizationPolicies.SectionAccessUsers)]
 [PrefixlessBodyModelValidator]
 [IsCurrentUserModelFilter]
@@ -316,6 +318,25 @@ public class UsersController : BackOfficeNotificationsController
     }
 
     /// <summary>
+    ///     Gets a user by Id
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    [OutgoingEditorModelEvent]
+    [Authorize(Policy = AuthorizationPolicies.AdminUserEditsRequireAdmin)]
+    public ActionResult<UserDisplay?> GetById(Guid id)
+    {
+        IUser? user = _userService.GetAsync(id).Result;
+        if (user == null)
+        {
+            return NotFound();
+        }
+
+        UserDisplay? result = _umbracoMapper.Map<IUser, UserDisplay>(user);
+        return result;
+    }
+
+    /// <summary>
     ///     Get users by integer ids
     /// </summary>
     /// <param name="ids"></param>
@@ -335,6 +356,35 @@ public class UsersController : BackOfficeNotificationsController
         }
 
         IEnumerable<IUser>? users = _userService.GetUsersById(ids);
+        if (users == null)
+        {
+            return NotFound();
+        }
+
+        List<UserDisplay> result = _umbracoMapper.MapEnumerable<IUser, UserDisplay>(users);
+        return result;
+    }
+
+    /// <summary>
+    ///     Get users by guid ids
+    /// </summary>
+    /// <param name="ids"></param>
+    /// <returns></returns>
+    [OutgoingEditorModelEvent]
+    [Authorize(Policy = AuthorizationPolicies.AdminUserEditsRequireAdmin)]
+    public ActionResult<IEnumerable<UserDisplay?>> GetByIds([FromJsonPath] Guid[] ids)
+    {
+        if (ids == null)
+        {
+            return NotFound();
+        }
+
+        if (ids.Length == 0)
+        {
+            return Enumerable.Empty<UserDisplay>().ToList();
+        }
+
+        IEnumerable<IUser>? users = _userService.GetAsync(ids).Result;
         if (users == null)
         {
             return NotFound();
