@@ -2,22 +2,21 @@ import { UmbCollectionConfiguration } from './types.js';
 import { UmbCollectionRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbBaseController, type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import {
-	UmbArrayState,
-	UmbNumberState,
-	UmbObjectState,
-} from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState, UmbNumberState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbExtensionsManifestInitializer, createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 import { ManifestCollectionView, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbCollectionFilterModel } from '@umbraco-cms/backoffice/collection';
 import { UmbSelectionManager, UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
-export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectionFilterModel> extends UmbBaseController {
+export class UmbCollectionContext<
+	ItemType,
+	FilterModelType extends UmbCollectionFilterModel,
+> extends UmbBaseController {
 	protected entityType: string;
 	protected init;
 
-	#items = new UmbArrayState<ItemType>([]);
+	#items = new UmbArrayState<ItemType>([], (x) => x);
 	public readonly items = this.#items.asObservable();
 
 	#totalItems = new UmbNumberState(0);
@@ -29,7 +28,7 @@ export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectio
 	#filter = new UmbObjectState<FilterModelType | object>({});
 	public readonly filter = this.#filter.asObservable();
 
-	#views = new UmbArrayState<ManifestCollectionView>([]);
+	#views = new UmbArrayState<ManifestCollectionView>([], (x) => x.alias);
 	public readonly views = this.#views.asObservable();
 
 	#currentView = new UmbObjectState<ManifestCollectionView | undefined>(undefined);
@@ -40,7 +39,12 @@ export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectio
 
 	public readonly pagination = new UmbPaginationManager();
 
-	constructor(host: UmbControllerHostElement, entityType: string, repositoryAlias: string, config: UmbCollectionConfiguration = { pageSize: 50 }) {
+	constructor(
+		host: UmbControllerHostElement,
+		entityType: string,
+		repositoryAlias: string,
+		config: UmbCollectionConfiguration = { pageSize: 50 },
+	) {
 		super(host);
 		this.entityType = entityType;
 
@@ -50,10 +54,7 @@ export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectio
 		const currentUrl = new URL(window.location.href);
 		this.collectionRootPathname = currentUrl.pathname.substring(0, currentUrl.pathname.lastIndexOf('/'));
 
-		this.init = Promise.all([
-			this.#observeRepository(repositoryAlias).asPromise(),
-			this.#observeViews().asPromise(),
-		]);
+		this.init = Promise.all([this.#observeRepository(repositoryAlias).asPromise(), this.#observeViews().asPromise()]);
 
 		this.#configure(config);
 
@@ -187,13 +188,13 @@ export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectio
 					this.requestCollection();
 				}
 			},
-			'umbCollectionRepositoryObserver'
-		)
+			'umbCollectionRepositoryObserver',
+		);
 	}
 
 	#observeViews() {
 		return new UmbExtensionsManifestInitializer(this, umbExtensionsRegistry, 'collectionView', null, (views) => {
-			this.#views.next(views.map(view => view.manifest));
+			this.#views.next(views.map((view) => view.manifest));
 			this.#setCurrentView();
 		});
 	}
@@ -202,7 +203,7 @@ export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectio
 		const target = event.target as UmbPaginationManager;
 		const skipFilter = { skip: target.getSkip() } as Partial<FilterModelType>;
 		this.setFilter(skipFilter);
-	}
+	};
 
 	#setCurrentView() {
 		const currentUrl = new URL(window.location.href);
