@@ -75,6 +75,7 @@
 	},
 	"files": [
 		"dist-cms",
+		"examples",
 		"README.md"
 	],
 	"repository": {
