@@ -44,7 +44,7 @@
 
 
   // Filter loads content Item Model from a content Key.
-  // Usage: {{ mycontentProperty[0].contentKey | contentItemResolver }}
+  // Usage: {{ mycontentProperty[0].key | contentItemResolver }}
   angular.module("umbraco.filters").filter("contentItemResolver", function (contentItemResolverFilterService) {
 
     contentItemResolverFilter.$stateful = true;
