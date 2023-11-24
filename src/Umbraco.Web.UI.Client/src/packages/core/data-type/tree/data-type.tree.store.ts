@@ -4,7 +4,7 @@ import { UMB_DATA_TYPE_DETAIL_STORE_CONTEXT } from '../repository/detail/data-ty
 import { UmbDataTypeDetailModel } from '../types.js';
 import { UmbDataTypeTreeItemModel } from './types.js';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 /**
  * @export
@@ -15,10 +15,10 @@ import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 export class UmbDataTypeTreeStore extends UmbUniqueTreeStore {
 	/**
 	 * Creates an instance of UmbDataTypeTreeStore.
-	 * @param {UmbControllerHost} host
+	 * @param {UmbControllerHostElement} host
 	 * @memberof UmbDataTypeTreeStore
 	 */
-	constructor(host: UmbControllerHost) {
+	constructor(host: UmbControllerHostElement) {
 		super(host, UMB_DATA_TYPE_TREE_STORE_CONTEXT.toString());
 
 		new UmbStoreConnector<UmbDataTypeTreeItemModel, UmbDataTypeDetailModel>(
