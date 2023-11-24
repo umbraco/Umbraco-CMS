@@ -75,7 +75,7 @@ export abstract class UmbDetailRepositoryBase<DetailModelType extends { unique: 
 
 		const { data: createdData, error } = await this.#detailSource.create(data);
 
-		if (!error) {
+		if (createdData) {
 			this.#detailStore?.append(createdData);
 
 			// TODO: how do we handle generic notifications? Is this the correct place to do it?
