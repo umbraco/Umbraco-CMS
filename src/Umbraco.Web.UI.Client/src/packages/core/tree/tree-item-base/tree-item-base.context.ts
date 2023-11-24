@@ -1,7 +1,6 @@
 import { UmbTreeItemContext } from '../tree-item/tree-item.context.interface.js';
 import { UmbTreeContextBase } from '../tree.context.js';
 import { UmbTreeItemModelBase } from '../types.js';
-import { UmbTreeStore } from '../tree-store.interface.js';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import { UMB_SECTION_CONTEXT_TOKEN, UMB_SECTION_SIDEBAR_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/section';
 import type { UmbSectionContext, UmbSectionSidebarContext } from '@umbraco-cms/backoffice/section';
