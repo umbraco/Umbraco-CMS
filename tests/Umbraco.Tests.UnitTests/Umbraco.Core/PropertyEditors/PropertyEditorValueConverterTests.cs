@@ -3,7 +3,9 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Moq;
+using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -132,5 +134,20 @@ public class PropertyEditorValueConverterTests
         var result = converter.ConvertIntermediateToObject(null, null, PropertyCacheLevel.Unknown, inter, false);
 
         Assert.AreEqual(expected, result);
+    }
+
+    [Test]
+    public void CanConvertManifestBasedPropertyWithValueTypeJson()
+    {
+        var valueEditor = Mock.Of<IDataValueEditor>(x => x.ValueType == ValueTypes.Json);
+        var dataEditor = Mock.Of<IDataEditor>(x => x.GetValueEditor() == valueEditor);
+        var propertyEditors = new PropertyEditorCollection(new DataEditorCollection(() => new[] { dataEditor }));
+        var propertyType = Mock.Of<IPublishedPropertyType>(x => x.EditorAlias == "My.Custom.Json");
+
+        var valueConverter = new JsonValueConverter(propertyEditors, Mock.Of<ILogger<JsonValueConverter>>());
+        var inter = valueConverter.ConvertSourceToIntermediate(Mock.Of<IPublishedElement>(), propertyType, "{\"message\": \"Hello, JSON\"}", false);
+        var result = valueConverter.ConvertIntermediateToObject(Mock.Of<IPublishedElement>(), propertyType, PropertyCacheLevel.Element, inter, false) as JObject;
+        Assert.IsNotNull(result);
+        Assert.AreEqual("Hello, JSON", result["message"]!.Value<string>());
     }
 }

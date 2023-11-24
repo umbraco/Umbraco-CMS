@@ -119,8 +119,7 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
             }
 
             EventMessages evtMsgs = _eventMessagesFactory.Get();
-
-            using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
+            using ICoreScope scope = _scopeProvider.CreateCoreScope();
 
             // create member
             IMember memberEntity = _memberService.CreateMember(
@@ -183,6 +182,7 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
                         x.Value)));
             }
 
+            scope.Complete();
             return Task.FromResult(IdentityResult.Success);
         }
         catch (Exception ex)
@@ -212,7 +212,7 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
                 throw new InvalidOperationException("The user id must be an integer to work with the Umbraco");
             }
 
-            using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
+            using ICoreScope scope = _scopeProvider.CreateCoreScope();
 
             IMember? found = _memberService.GetById(asInt);
             if (found != null)
@@ -253,6 +253,7 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
                 }
             }
 
+            scope.Complete();
             return Task.FromResult(IdentityResult.Success);
         }
         catch (Exception ex)

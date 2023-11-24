@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Notifications;
+using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Integration.TestServerTest;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Events;
@@ -19,6 +20,7 @@ public class EventAggregatorTests : UmbracoTestServerTestBase
     }
 
     [Test]
+    [LongRunning]
     public async Task Publish_HandlerWithScopedDependency_DoesNotThrow()
     {
         var result = await Client.GetAsync("/test-handler-with-scoped-services");

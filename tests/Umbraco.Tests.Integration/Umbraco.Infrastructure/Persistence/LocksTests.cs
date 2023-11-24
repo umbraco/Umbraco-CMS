@@ -11,6 +11,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DistributedLocking.Exceptions;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Persistence.Sqlite.Interceptors;
+using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Extensions;
@@ -154,6 +155,7 @@ public class LocksTests : UmbracoIntegrationTest
     }
 
     [Test]
+    [LongRunning]
     public void ConcurrentWritersTest()
     {
         const int threadCount = 8;
@@ -428,6 +430,7 @@ public class LocksTests : UmbracoIntegrationTest
     }
 
     [Test]
+    [LongRunning]
     public void Throws_When_Lock_Timeout_Is_Exceeded_Write()
     {
         var counter = 0;
