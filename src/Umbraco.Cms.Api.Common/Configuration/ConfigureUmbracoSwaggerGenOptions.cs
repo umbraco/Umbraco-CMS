@@ -1,3 +1,4 @@
+using System.Reflection;
 using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Controllers;
@@ -57,9 +58,26 @@ public class ConfigureUmbracoSwaggerGenOptions : IConfigureOptions<SwaggerGenOpt
         swaggerGenOptions.SchemaFilter<EnumSchemaFilter>();
         swaggerGenOptions.CustomSchemaIds(_schemaIdSelector.SchemaId);
         swaggerGenOptions.SupportNonNullableReferenceTypes();
+
+        AddXmlCommentsToSwagger(swaggerGenOptions);
     }
 
     // see https://github.com/domaindrivendev/Swashbuckle.AspNetCore#change-operation-sort-order-eg-for-ui-sorting
     private static string ActionOrderBy(ApiDescription apiDesc)
         => $"{apiDesc.GroupName}_{apiDesc.ActionDescriptor.AttributeRouteInfo?.Template ?? apiDesc.ActionDescriptor.RouteValues["controller"]}_{apiDesc.ActionDescriptor.RouteValues["action"]}_{apiDesc.HttpMethod}";
+
+    private static void AddXmlCommentsToSwagger(SwaggerGenOptions options)
+    {
+        Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
+
+        foreach (Assembly assembly in assemblies)
+        {
+            string xmlFile = $"{assembly.GetName().Name}.xml";
+            string xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+            if (File.Exists(xmlPath))
+            {
+                options.IncludeXmlComments(xmlPath);
+            }
+        }
+    }
 }
