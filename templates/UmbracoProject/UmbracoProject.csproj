@@ -4,6 +4,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <RootNamespace Condition="'$(name)' != '$(name{-VALUE-FORMS-}safe_namespace)'">Umbraco.Cms.Web.UI</RootNamespace>
+    <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
   </PropertyGroup>
 
   <ItemGroup>
@@ -26,7 +27,7 @@
     <RazorCompileOnBuild>false</RazorCompileOnBuild>
     <RazorCompileOnPublish>false</RazorCompileOnPublish>
   </PropertyGroup>
-  
+
   <Import Project="..\PACKAGE_PROJECT_NAME_FROM_TEMPLATE\buildTransitive\PACKAGE_PROJECT_NAME_FROM_TEMPLATE.targets" Condition="'$(PackageProjectName)' != ''" />
   <ItemGroup Condition="'$(PackageProjectName)' != ''">
     <ProjectReference Include="..\PACKAGE_PROJECT_NAME_FROM_TEMPLATE\PACKAGE_PROJECT_NAME_FROM_TEMPLATE.csproj" />
