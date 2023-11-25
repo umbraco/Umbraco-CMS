@@ -486,7 +486,7 @@ stages:
               docker ps
             condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
             displayName: Build and run container (Linux only)
-            workingDirectory: tests/Umbraco.Tests.AcceptanceTest/misc
+            workingDirectory: $(Build.SourcesDirectory)/
           - pwsh: |
               dotnet new --install $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/misc/nupkg/Umbraco.Templates.*.nupkg
               dotnet new umbraco --name AcceptanceTestProject --no-restore --output .
@@ -500,14 +500,14 @@ stages:
             workingDirectory: $(Build.SourcesDirectory)/
           - pwsh: npx wait-on -v --interval 1000 --timeout 120000 $(ASPNETCORE_URLS)
             displayName: Wait for app
-            workingDirectory: tests/Umbraco.Tests.AcceptanceTest
+            workingDirectory: $(Build.SourcesDirectory)/
           - pwsh: npx playwright install --with-deps
             displayName: Install Playwright
-            workingDirectory: tests/Umbraco.Tests.AcceptanceTest
+            workingDirectory: $(Build.SourcesDirectory)/
           - pwsh: npm run test --ignore-certificate-errors
             displayName: Run Playwright (Desktop)
             continueOnError: true
-            workingDirectory: tests/Umbraco.Tests.AcceptanceTest
+            workingDirectory: $(Build.SourcesDirectory)/
             env:
               CI: true
           - pwsh: |
