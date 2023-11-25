@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Api.Common.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
@@ -55,7 +56,8 @@ public static partial class UmbracoBuilderExtensions
             .AddExamine()
             .AddExamineIndexes()
             .AddControllersWithAmbiguousConstructors()
-            .AddSupplemenataryLocalizedTextFileSources();
+            .AddSupplemenataryLocalizedTextFileSources()
+            .AddUmbracoApiOpenApiUI();
 
     public static IUmbracoBuilder AddUnattendedInstallInstallCreateUser(this IUmbracoBuilder builder)
     {

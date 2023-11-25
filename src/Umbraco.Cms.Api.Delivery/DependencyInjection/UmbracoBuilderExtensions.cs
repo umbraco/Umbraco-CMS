@@ -39,7 +39,6 @@ public static class UmbracoBuilderExtensions
         builder.Services.AddTransient<IRequestMemberAccessService, RequestMemberAccessService>();
 
         builder.Services.ConfigureOptions<ConfigureUmbracoDeliveryApiSwaggerGenOptions>();
-        builder.AddUmbracoApiOpenApiUI();
 
         builder
             .Services
