@@ -486,11 +486,11 @@ stages:
               docker ps
             condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
             displayName: Build and run container (Linux only)
-            workingDirectory: tests-Umbraco.Tests.AcceptanceTest-misc
+            workingDirectory: tests/Umbraco.Tests.AcceptanceTest/misc
           - pwsh: |
-              dotnet new --install ./nupkg/Umbraco.Templates.*.nupkg
+              dotnet new --install $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/misc/nupkg/Umbraco.Templates.*.nupkg
               dotnet new umbraco --name AcceptanceTestProject --no-restore --output .
-              dotnet restore --configfile ./nuget.config
+              dotnet restore --configfile $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/misc/nuget.config
               dotnet build --configuration $(buildConfiguration) --no-restore
               dotnet dev-certs https
               $process = Start-Process -FilePath "dotnet" -ArgumentList "run --configuration $(buildConfiguration) --no-build --no-launch-profile 2>&1" -PassThru -RedirectStandardOutput $(Build.ArtifactStagingDirectory)/playwright.log
