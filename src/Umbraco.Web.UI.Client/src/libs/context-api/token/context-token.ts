@@ -1,10 +1,14 @@
+export type UmbContextDiscriminator<BaseType, DiscriminatorResult extends BaseType> = (
+	instance: BaseType,
+) => instance is DiscriminatorResult;
 
-export type UmbContextDiscriminator<BaseType, DiscriminatorResult extends BaseType> = (instance: BaseType) => instance is DiscriminatorResult;
-
-export class UmbContextToken<
-BaseType = unknown,
-ResultType extends BaseType = BaseType> {
-
+/**
+ * @export
+ * @class UmbContextToken
+ * @template BaseType - A generic type of the API before decimated.
+ * @template ResultType - A concrete type of the API after decimation, use this when you apply a discriminator method. Note this is optional and defaults to the BaseType.
+ */
+export class UmbContextToken<BaseType = unknown, ResultType extends BaseType = BaseType> {
 	#discriminator: UmbContextDiscriminator<BaseType, ResultType> | undefined;
 	/**
 	 * Get the type of the token
@@ -18,12 +22,23 @@ ResultType extends BaseType = BaseType> {
 	readonly TYPE: ResultType = undefined as never;
 
 	/**
-	 * @param alias   Unique identifier for the token
+	 * @param contextAlias   	Unique identifier for the context
+	 * @param apiAlias   			Unique identifier for the api
+	 * @param discriminator   A discriminator that will be used to discriminate the API — testing if the API lives up to a certain requirement. If the API does not meet the requirement then the consumer will not receive this API.
 	 */
-	constructor(protected alias: string, discriminator?: UmbContextDiscriminator<BaseType, ResultType>) {
+	constructor(
+		protected contextAlias: string,
+		protected apiAlias: string = 'default',
+		discriminator?: UmbContextDiscriminator<BaseType, ResultType>,
+	) {
 		this.#discriminator = discriminator;
 	}
 
+	/**
+	 * Get the discriminator method for the token
+	 *
+	 * @returns the discriminator method
+	 */
 	getDiscriminator(): UmbContextDiscriminator<BaseType, ResultType> | undefined {
 		return this.#discriminator;
 	}
@@ -35,8 +50,6 @@ ResultType extends BaseType = BaseType> {
 	 * @returns the unique alias of the token
 	 */
 	toString(): string {
-		return this.alias;
+		return this.contextAlias + '#' + this.apiAlias;
 	}
-
-
 }

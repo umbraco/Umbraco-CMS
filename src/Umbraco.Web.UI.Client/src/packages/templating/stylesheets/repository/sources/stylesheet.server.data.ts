@@ -1,6 +1,6 @@
 import type { StylesheetDetails } from '../../index.js';
 import { DataSourceResponse, UmbDataSource } from '@umbraco-cms/backoffice/repository';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import {
 	CreateStylesheetRequestModel,
 	ExtractRichTextStylesheetRulesRequestModel,
@@ -22,14 +22,14 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 export class UmbStylesheetServerDataSource
 	implements UmbDataSource<CreateStylesheetRequestModel, string, UpdateStylesheetRequestModel, StylesheetDetails>
 {
-	#host: UmbControllerHostElement;
+	#host: UmbControllerHost;
 
 	/**
 	 * Creates an instance of UmbStylesheetServerDataSource.
-	 * @param {UmbControllerHostElement} host
+	 * @param {UmbControllerHost} host
 	 * @memberof UmbStylesheetServerDataSource
 	 */
-	constructor(host: UmbControllerHostElement) {
+	constructor(host: UmbControllerHost) {
 		this.#host = host;
 	}
 	createScaffold(parentId: string | null): Promise<DataSourceResponse<StylesheetDetails>> {
@@ -42,7 +42,7 @@ export class UmbStylesheetServerDataSource
 	 * @return {*}
 	 * @memberof UmbStylesheetServerDataSource
 	 */
-	async get(path: string) {
+	async read(path: string) {
 		if (!path) throw new Error('Path is missing');
 		return tryExecuteAndNotify(this.#host, StylesheetResource.getStylesheet({ path }));
 	}
@@ -63,7 +63,7 @@ export class UmbStylesheetServerDataSource
 	 * @return {*}  {Promise<DataSourceResponse<any>>}
 	 * @memberof UmbStylesheetServerDataSource
 	 */
-	insert(data: StylesheetDetails): Promise<DataSourceResponse<any>> {
+	create(data: StylesheetDetails): Promise<DataSourceResponse<any>> {
 		return tryExecuteAndNotify(this.#host, StylesheetResource.postStylesheet({ requestBody: data }));
 	}
 	/**

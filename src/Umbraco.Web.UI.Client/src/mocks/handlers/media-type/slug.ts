@@ -1,1 +1,1 @@
-export const slug = '/media-type';
+export const UMB_SLUG = '/media-type';

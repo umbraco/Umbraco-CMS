@@ -1,8 +1,8 @@
 import { type ManifestTypes, umbExtensionsRegistry } from '../../extension-registry/index.js';
 import { css, repeat, customElement, property, state, TemplateResult } from '@umbraco-cms/backoffice/external/lit';
 import {
-	type UmbExtensionElementController,
-	UmbExtensionsElementController,
+	type UmbExtensionElementInitializer,
+	UmbExtensionsElementInitializer,
 } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
@@ -20,10 +20,10 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 @customElement('umb-extension-slot')
 export class UmbExtensionSlotElement extends UmbLitElement {
 	#attached = false;
-	#extensionsController?: UmbExtensionsElementController<ManifestTypes>;
+	#extensionsController?: UmbExtensionsElementInitializer<ManifestTypes>;
 
 	@state()
-	private _permittedExts: Array<UmbExtensionElementController> = [];
+	private _permittedExts: Array<UmbExtensionElementInitializer> = [];
 
 	/**
 	 * The type or types of extensions to render.
@@ -95,7 +95,7 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 	public defaultElement?:string;
 
 	@property()
-	public renderMethod?: (extension: UmbExtensionElementController) => TemplateResult | HTMLElement | null | undefined;
+	public renderMethod?: (extension: UmbExtensionElementInitializer) => TemplateResult | HTMLElement | null | undefined;
 
 	connectedCallback(): void {
 		super.connectedCallback();
@@ -106,7 +106,7 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 	private _observeExtensions() {
 		this.#extensionsController?.destroy();
 		if (this.#type) {
-			this.#extensionsController = new UmbExtensionsElementController(
+			this.#extensionsController = new UmbExtensionsElementInitializer(
 				this,
 				umbExtensionsRegistry,
 				this.#type,

@@ -1,5 +1,7 @@
-import { UMB_APP } from '@umbraco-cms/backoffice/app';
-import { UMB_AUTH_CONTEXT, type UmbLoggedInUser } from '@umbraco-cms/backoffice/auth';
+import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
+import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
+import { UMB_CURRENT_USER_CONTEXT } from '../../current-user.context.js';
+import { type UmbCurrentUser } from '../../types.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, CSSResultGroup, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalContext } from '@umbraco-cms/backoffice/modal';
@@ -11,31 +13,39 @@ export class UmbCurrentUserModalElement extends UmbLitElement {
 	modalContext?: UmbModalContext;
 
 	@state()
-	private _currentUser?: UmbLoggedInUser;
+	private _currentUser?: UmbCurrentUser;
 
 	#authContext?: typeof UMB_AUTH_CONTEXT.TYPE;
-
-	#appContext?: typeof UMB_APP.TYPE;
+	#currentUserContext?: typeof UMB_CURRENT_USER_CONTEXT.TYPE;
+	#appContext?: typeof UMB_APP_CONTEXT.TYPE;
 
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_AUTH_CONTEXT, (instance) => {
-			this.#authContext = instance;
+		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (instance) => {
+			this.#currentUserContext = instance;
 			this._observeCurrentUser();
 		});
 
-		this.consumeContext(UMB_APP, (instance) => {
+		this.consumeContext(UMB_AUTH_CONTEXT, (instance) => {
+			this.#authContext = instance;
+		});
+
+		this.consumeContext(UMB_APP_CONTEXT, (instance) => {
 			this.#appContext = instance;
 		});
 	}
 
 	private async _observeCurrentUser() {
-		if (!this.#authContext) return;
+		if (!this.#currentUserContext) return;
 
-		this.observe(this.#authContext.currentUser, (currentUser) => {
-			this._currentUser = currentUser;
-		}, 'umbCurrentUserObserver');
+		this.observe(
+			this.#currentUserContext.currentUser,
+			(currentUser) => {
+				this._currentUser = currentUser;
+			},
+			'umbCurrentUserObserver',
+		);
 	}
 
 	private _close() {

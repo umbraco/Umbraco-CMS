@@ -4,9 +4,9 @@ import type { ManifestSectionView } from '@umbraco-cms/backoffice/extension-regi
 const sectionsViews: Array<ManifestSectionView> = [
 	{
 		type: 'sectionView',
-		alias: 'Umb.SectionView.UserGroups',
-		name: 'User Groups Section View',
-		loader: () => import('./user-groups-section-view.element.js'),
+		alias: 'Umb.SectionView.UserGroup',
+		name: 'User Group Section View',
+		js: () => import('./user-group-section-view.element.js'),
 		weight: 100,
 		meta: {
 			label: 'User Groups',

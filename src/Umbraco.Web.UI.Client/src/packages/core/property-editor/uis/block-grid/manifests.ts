@@ -7,11 +7,11 @@ const manifest: ManifestPropertyEditorUi = {
 	type: 'propertyEditorUi',
 	alias: 'Umb.PropertyEditorUi.BlockGrid',
 	name: 'Block Grid Property Editor UI',
-	loader: () => import('./property-editor-ui-block-grid.element.js'),
+	js: () => import('./property-editor-ui-block-grid.element.js'),
 	meta: {
 		label: 'Block Grid',
 		propertyEditorSchemaAlias: 'Umbraco.BlockGrid',
-		icon: 'icon-icon-layout',
+		icon: 'icon-layout',
 		group: 'richContent',
 		settings: {
 			properties: [

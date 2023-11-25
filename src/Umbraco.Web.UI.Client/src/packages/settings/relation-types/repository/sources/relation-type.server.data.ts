@@ -5,7 +5,7 @@ import {
 	CreateRelationTypeRequestModel,
 	UpdateRelationTypeRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
@@ -18,14 +18,14 @@ export class UmbRelationTypeServerDataSource
 	implements
 		UmbDataSource<CreateRelationTypeRequestModel, any, UpdateRelationTypeRequestModel, RelationTypeResponseModel>
 {
-	#host: UmbControllerHostElement;
+	#host: UmbControllerHost;
 
 	/**
 	 * Creates an instance of UmbRelationTypeServerDataSource.
-	 * @param {UmbControllerHostElement} host
+	 * @param {UmbControllerHost} host
 	 * @memberof UmbRelationTypeServerDataSource
 	 */
-	constructor(host: UmbControllerHostElement) {
+	constructor(host: UmbControllerHost) {
 		this.#host = host;
 	}
 
@@ -35,7 +35,7 @@ export class UmbRelationTypeServerDataSource
 	 * @return {*}
 	 * @memberof UmbRelationTypeServerDataSource
 	 */
-	async get(id: string) {
+	async read(id: string) {
 		if (!id) {
 			throw new Error('Id is missing');
 		}
@@ -44,7 +44,7 @@ export class UmbRelationTypeServerDataSource
 			this.#host,
 			RelationTypeResource.getRelationTypeById({
 				id,
-			})
+			}),
 		);
 	}
 
@@ -66,14 +66,14 @@ export class UmbRelationTypeServerDataSource
 	 * @return {*}
 	 * @memberof UmbRelationTypeServerDataSource
 	 */
-	async insert(relationType: CreateRelationTypeRequestModel) {
+	async create(relationType: CreateRelationTypeRequestModel) {
 		if (!relationType.id) throw new Error('RelationType id is missing');
 
 		return tryExecuteAndNotify(
 			this.#host,
 			RelationTypeResource.postRelationType({
 				requestBody: relationType,
-			})
+			}),
 		);
 	}
 
@@ -91,7 +91,7 @@ export class UmbRelationTypeServerDataSource
 			RelationTypeResource.putRelationTypeById({
 				id,
 				requestBody: relationType,
-			})
+			}),
 		);
 	}
 
@@ -110,7 +110,7 @@ export class UmbRelationTypeServerDataSource
 			this.#host,
 			RelationTypeResource.deleteRelationTypeById({
 				id,
-			})
+			}),
 		);
 	}
 }

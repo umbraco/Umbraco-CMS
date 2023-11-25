@@ -1,13 +1,16 @@
 import { UmbUserGroupRepository } from '../repository/user-group.repository.js';
 import { UmbUserRepository } from '../../user/repository/user.repository.js';
-import { UmbSaveableWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
+import {
+	UmbSaveableWorkspaceContextInterface,
+	UmbEditableWorkspaceContextBase,
+} from '@umbraco-cms/backoffice/workspace';
 import type { UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbArrayState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 export class UmbUserGroupWorkspaceContext
-	extends UmbWorkspaceContext<UmbUserGroupRepository, UserGroupResponseModel>
+	extends UmbEditableWorkspaceContextBase<UmbUserGroupRepository, UserGroupResponseModel>
 	implements UmbSaveableWorkspaceContextInterface<UserGroupResponseModel | undefined>
 {
 	#data = new UmbObjectState<UserGroupResponseModel | undefined>(undefined);
@@ -93,7 +96,7 @@ export class UmbUserGroupWorkspaceContext
 	}
 
 	destroy(): void {
-		this.#data.complete();
+		this.#data.destroy();
 	}
 
 	async delete(id: string) {
@@ -153,5 +156,6 @@ export const UMB_USER_GROUP_WORKSPACE_CONTEXT = new UmbContextToken<
 	UmbUserGroupWorkspaceContext
 >(
 	'UmbWorkspaceContext',
+	undefined,
 	(context): context is UmbUserGroupWorkspaceContext => context.getEntityType?.() === 'user-group',
 );

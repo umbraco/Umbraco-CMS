@@ -1,5 +1,5 @@
 import { UmbDocumentPickerContext } from './input-document.context.js';
-import { css, html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, state, ifDefined, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { DocumentItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
@@ -95,11 +95,26 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 
 	render() {
 		return html`
-			<uui-ref-list>${this._items?.map((item) => this._renderItem(item))}</uui-ref-list>
-			<uui-button id="add-button" look="placeholder" @click=${() => this.#pickerContext.openPicker()} label="open"
-				>Add</uui-button
-			>
+			${this._items
+				? html` <uui-ref-list
+						>${repeat(
+							this._items,
+							(item) => item.id,
+							(item) => this._renderItem(item),
+						)}
+				  </uui-ref-list>`
+				: ''}
+			${this.#renderAddButton()}
 		`;
+	}
+
+	#renderAddButton() {
+		if (this.max > 0 && this.selectedIds.length >= this.max) return;
+		return html`<uui-button
+			id="add-button"
+			look="placeholder"
+			@click=${() => this.#pickerContext.openPicker()}
+			label=${this.localize.term('general_add')}></uui-button>`;
 	}
 
 	private _renderItem(item: DocumentItemResponseModel) {

@@ -10,7 +10,7 @@ const localizationManifests: Array<ManifestLocalization> = [
 		meta: {
 			culture: 'en-us',
 		},
-		loader: () => import('../../../assets/lang/en-us.js'),
+		js: () => import('../../../assets/lang/en-us.js'),
 	},
 	{
 		type: 'localization',
@@ -20,7 +20,7 @@ const localizationManifests: Array<ManifestLocalization> = [
 		meta: {
 			culture: 'da-dk',
 		},
-		loader: () => import('../../../assets/lang/da-dk.js'),
+		js: () => import('../../../assets/lang/da-dk.js'),
 	},
 ];
 

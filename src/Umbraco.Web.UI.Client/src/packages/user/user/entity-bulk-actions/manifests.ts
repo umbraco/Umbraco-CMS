@@ -1,10 +1,10 @@
 import {
-	DISABLE_USER_REPOSITORY_ALIAS,
-	ENABLE_USER_REPOSITORY_ALIAS,
-	UNLOCK_USER_REPOSITORY_ALIAS,
-	USER_REPOSITORY_ALIAS,
+	UMB_DISABLE_USER_REPOSITORY_ALIAS,
+	UMB_ENABLE_USER_REPOSITORY_ALIAS,
+	UMB_UNLOCK_USER_REPOSITORY_ALIAS,
+	UMB_USER_REPOSITORY_ALIAS,
 } from '../repository/manifests.js';
-import { USER_ENTITY_TYPE } from '../types.js';
+import { UMB_USER_ENTITY_TYPE } from '../types.js';
 import { UmbEnableUserEntityBulkAction } from './enable/enable.action.js';
 import { UmbSetGroupUserEntityBulkAction } from './set-group/set-group.action.js';
 import { UmbUnlockUserEntityBulkAction } from './unlock/unlock.action.js';
@@ -20,12 +20,12 @@ const entityActions: Array<ManifestEntityBulkAction> = [
 		api: UmbSetGroupUserEntityBulkAction,
 		meta: {
 			label: 'SetGroup',
-			repositoryAlias: USER_REPOSITORY_ALIAS,
+			repositoryAlias: UMB_USER_REPOSITORY_ALIAS,
 		},
 		conditions: [
 			{
 				alias: 'Umb.Condition.CollectionEntityType',
-				match: USER_ENTITY_TYPE,
+				match: UMB_USER_ENTITY_TYPE,
 			},
 		],
 	},
@@ -37,12 +37,12 @@ const entityActions: Array<ManifestEntityBulkAction> = [
 		api: UmbEnableUserEntityBulkAction,
 		meta: {
 			label: 'Enable',
-			repositoryAlias: ENABLE_USER_REPOSITORY_ALIAS,
+			repositoryAlias: UMB_ENABLE_USER_REPOSITORY_ALIAS,
 		},
 		conditions: [
 			{
 				alias: 'Umb.Condition.CollectionEntityType',
-				match: USER_ENTITY_TYPE,
+				match: UMB_USER_ENTITY_TYPE,
 			},
 		],
 	},
@@ -54,12 +54,12 @@ const entityActions: Array<ManifestEntityBulkAction> = [
 		api: UmbUnlockUserEntityBulkAction,
 		meta: {
 			label: 'Unlock',
-			repositoryAlias: UNLOCK_USER_REPOSITORY_ALIAS,
+			repositoryAlias: UMB_UNLOCK_USER_REPOSITORY_ALIAS,
 		},
 		conditions: [
 			{
 				alias: 'Umb.Condition.CollectionEntityType',
-				match: USER_ENTITY_TYPE,
+				match: UMB_USER_ENTITY_TYPE,
 			},
 		],
 	},
@@ -71,12 +71,12 @@ const entityActions: Array<ManifestEntityBulkAction> = [
 		api: UmbDisableUserEntityBulkAction,
 		meta: {
 			label: 'Disable',
-			repositoryAlias: DISABLE_USER_REPOSITORY_ALIAS,
+			repositoryAlias: UMB_DISABLE_USER_REPOSITORY_ALIAS,
 		},
 		conditions: [
 			{
 				alias: 'Umb.Condition.CollectionEntityType',
-				match: USER_ENTITY_TYPE,
+				match: UMB_USER_ENTITY_TYPE,
 			},
 		],
 	},

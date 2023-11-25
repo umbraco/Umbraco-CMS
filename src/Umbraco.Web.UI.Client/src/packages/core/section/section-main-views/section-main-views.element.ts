@@ -1,4 +1,4 @@
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, nothing, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbRoute, UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
 import {
@@ -8,7 +8,7 @@ import {
 	UmbSectionViewExtensionElement,
 	umbExtensionsRegistry,
 } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbExtensionsManifestController, createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
+import { UmbExtensionsManifestInitializer, createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { pathFolderName } from '@umbraco-cms/backoffice/utils';
 
@@ -36,12 +36,12 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		new UmbExtensionsManifestController(this, umbExtensionsRegistry, 'dashboard', null, (dashboards) => {
+		new UmbExtensionsManifestInitializer(this, umbExtensionsRegistry, 'dashboard', null, (dashboards) => {
 			this._dashboards = dashboards.map((dashboard) => dashboard.manifest);
 			this.#createRoutes();
 		});
 
-		new UmbExtensionsManifestController(this, umbExtensionsRegistry, 'sectionView', null, (views) => {
+		new UmbExtensionsManifestInitializer(this, umbExtensionsRegistry, 'sectionView', null, (views) => {
 			this._views = views.map((view) => view.manifest);
 			this.#createRoutes();
 		});
@@ -110,8 +110,8 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 							const dashboardPath = this.#constructDashboardPath(dashboard);
 							return html`
 								<uui-tab
-									.label="${dashboardName}"
 									href="${this._routerPath}/${dashboardPath}"
+									label="${dashboardName}"
 									?active="${this._activePath === dashboardPath}"></uui-tab>
 							`;
 						})}
@@ -129,8 +129,8 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 							const viewPath = this.#constructViewPath(view);
 							return html`
 								<uui-tab
-									.label="${viewName}"
 									href="${this._routerPath}/${viewPath}"
+									label="${viewName}"
 									?active="${this._activePath === viewPath}">
 									<uui-icon slot="icon" name=${view.meta.icon}></uui-icon>
 									${viewName}

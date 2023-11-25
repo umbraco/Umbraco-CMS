@@ -1,6 +1,9 @@
-import { UmbDocumentTypeRepository } from '../repository/document-type.repository.js';
+import { UmbDocumentTypeDetailRepository } from '../repository/detail/document-type-detail.repository.js';
 import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
-import { UmbWorkspaceContext, UmbSaveableWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
+import {
+	UmbEditableWorkspaceContextBase,
+	UmbSaveableWorkspaceContextInterface,
+} from '@umbraco-cms/backoffice/workspace';
 import type {
 	ContentTypeCompositionModel,
 	ContentTypeSortModel,
@@ -12,7 +15,7 @@ import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 
 type EntityType = DocumentTypeResponseModel;
 export class UmbDocumentTypeWorkspaceContext
-	extends UmbWorkspaceContext<UmbDocumentTypeRepository, EntityType>
+	extends UmbEditableWorkspaceContextBase<UmbDocumentTypeDetailRepository, EntityType>
 	implements UmbSaveableWorkspaceContextInterface<EntityType | undefined>
 {
 	// Draft is located in structure manager
@@ -42,7 +45,7 @@ export class UmbDocumentTypeWorkspaceContext
 	isSorting = this.#isSorting.asObservable();
 
 	constructor(host: UmbControllerHostElement) {
-		super(host, 'Umb.Workspace.DocumentType', new UmbDocumentTypeRepository(host));
+		super(host, 'Umb.Workspace.DocumentType', new UmbDocumentTypeDetailRepository(host));
 
 		this.structure = new UmbContentTypePropertyStructureManager(this.host, this.repository);
 
@@ -135,7 +138,6 @@ export class UmbDocumentTypeWorkspaceContext
 		this.setIsSorting(false);
 		//this.#draft.next(data);
 		return { data } || undefined;
-		// TODO: Is this wrong? should we return { data }??
 	}
 
 	async load(entityId: string) {
@@ -146,7 +148,6 @@ export class UmbDocumentTypeWorkspaceContext
 		this.setIsSorting(false);
 		//this.#draft.next(data);
 		return { data } || undefined;
-		// TODO: Is this wrong? should we return { data }??
 	}
 
 	/**
@@ -175,5 +176,6 @@ export const UMB_DOCUMENT_TYPE_WORKSPACE_CONTEXT = new UmbContextToken<
 	UmbDocumentTypeWorkspaceContext
 >(
 	'UmbWorkspaceContext',
+	undefined,
 	(context): context is UmbDocumentTypeWorkspaceContext => context.getEntityType?.() === 'document-type',
 );

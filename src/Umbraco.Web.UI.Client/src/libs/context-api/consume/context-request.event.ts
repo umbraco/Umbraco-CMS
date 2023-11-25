@@ -1,7 +1,5 @@
-import { UmbContextToken } from '../token/context-token.js';
-
-export const umbContextRequestEventType = 'umb:context-request';
-export const umbDebugContextEventType = 'umb:debug-contexts';
+export const UMB_CONTENT_REQUEST_EVENT_TYPE = 'umb:context-request';
+export const UMB_DEBUG_CONTEXT_EVENT_TYPE = 'umb:debug-contexts';
 
 export type UmbContextCallback<T> = (instance: T) => void;
 
@@ -10,8 +8,9 @@ export type UmbContextCallback<T> = (instance: T) => void;
  * @interface UmbContextRequestEvent
  */
 export interface UmbContextRequestEvent<ResultType = unknown> extends Event {
-	readonly contextAlias: string | UmbContextToken<unknown, ResultType>;
-	readonly callback: UmbContextCallback<ResultType>;
+	readonly contextAlias: string;
+	readonly apiAlias: string;
+	readonly callback: (context: ResultType) => boolean;
 }
 
 /**
@@ -20,21 +19,21 @@ export interface UmbContextRequestEvent<ResultType = unknown> extends Event {
  * @extends {Event}
  * @implements {UmbContextRequestEvent}
  */
-export class UmbContextRequestEventImplementation<ResultType = unknown> extends Event implements UmbContextRequestEvent<ResultType> {
+export class UmbContextRequestEventImplementation<ResultType = unknown>
+	extends Event
+	implements UmbContextRequestEvent<ResultType>
+{
 	public constructor(
-		public readonly contextAlias: string | UmbContextToken<any, ResultType>,
-		public readonly callback: UmbContextCallback<ResultType>
+		public readonly contextAlias: string,
+		public readonly apiAlias: string,
+		public readonly callback: (context: ResultType) => boolean,
 	) {
-		super(umbContextRequestEventType, { bubbles: true, composed: true, cancelable: true });
+		super(UMB_CONTENT_REQUEST_EVENT_TYPE, { bubbles: true, composed: true, cancelable: true });
 	}
 }
 
-export const isUmbContextRequestEvent = (event: Event): event is UmbContextRequestEventImplementation => {
-	return event.type === umbContextRequestEventType;
-};
-
 export class UmbContextDebugRequest extends Event {
 	public constructor(public readonly callback: any) {
-		super(umbDebugContextEventType, { bubbles: true, composed: true, cancelable: false });
+		super(UMB_DEBUG_CONTEXT_EVENT_TYPE, { bubbles: true, composed: true, cancelable: false });
 	}
 }

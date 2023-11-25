@@ -1,57 +1,57 @@
 import { UmbUserRepository } from './user.repository.js';
-import { UmbUserItemStore } from './item/user-item.store.js';
 import { UmbUserStore } from './user.store.js';
 import { UmbDisableUserRepository } from './disable/disable-user.repository.js';
 import { UmbEnableUserRepository } from './enable/enable-user.repository.js';
 import { UmbChangeUserPasswordRepository } from './change-password/change-user-password.repository.js';
 import { UmbUnlockUserRepository } from './unlock/unlock-user.repository.js';
 import { UmbInviteUserRepository } from './invite/invite-user.repository.js';
-import type { ManifestStore, ManifestRepository, ManifestItemStore } from '@umbraco-cms/backoffice/extension-registry';
+import { manifests as itemManifests } from './item/manifests.js';
+import type { ManifestStore, ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
 
-export const USER_REPOSITORY_ALIAS = 'Umb.Repository.User';
+export const UMB_USER_REPOSITORY_ALIAS = 'Umb.Repository.User';
 const repository: ManifestRepository = {
 	type: 'repository',
-	alias: USER_REPOSITORY_ALIAS,
+	alias: UMB_USER_REPOSITORY_ALIAS,
 	name: 'User Repository',
 	api: UmbUserRepository,
 };
 
-export const DISABLE_USER_REPOSITORY_ALIAS = 'Umb.Repository.User.Disable';
+export const UMB_DISABLE_USER_REPOSITORY_ALIAS = 'Umb.Repository.User.Disable';
 const disableRepository: ManifestRepository = {
 	type: 'repository',
-	alias: DISABLE_USER_REPOSITORY_ALIAS,
+	alias: UMB_DISABLE_USER_REPOSITORY_ALIAS,
 	name: 'Disable User Repository',
 	api: UmbDisableUserRepository,
 };
 
-export const ENABLE_USER_REPOSITORY_ALIAS = 'Umb.Repository.User.Enable';
+export const UMB_ENABLE_USER_REPOSITORY_ALIAS = 'Umb.Repository.User.Enable';
 const enableRepository: ManifestRepository = {
 	type: 'repository',
-	alias: ENABLE_USER_REPOSITORY_ALIAS,
+	alias: UMB_ENABLE_USER_REPOSITORY_ALIAS,
 	name: 'Disable User Repository',
 	api: UmbEnableUserRepository,
 };
 
-export const CHANGE_USER_PASSWORD_REPOSITORY_ALIAS = 'Umb.Repository.User.ChangePassword';
+export const UMB_CHANGE_USER_PASSWORD_REPOSITORY_ALIAS = 'Umb.Repository.User.ChangePassword';
 const changePasswordRepository: ManifestRepository = {
 	type: 'repository',
-	alias: CHANGE_USER_PASSWORD_REPOSITORY_ALIAS,
+	alias: UMB_CHANGE_USER_PASSWORD_REPOSITORY_ALIAS,
 	name: 'Change User Password Repository',
 	api: UmbChangeUserPasswordRepository,
 };
 
-export const UNLOCK_USER_REPOSITORY_ALIAS = 'Umb.Repository.User.Unlock';
+export const UMB_UNLOCK_USER_REPOSITORY_ALIAS = 'Umb.Repository.User.Unlock';
 const unlockRepository: ManifestRepository = {
 	type: 'repository',
-	alias: UNLOCK_USER_REPOSITORY_ALIAS,
+	alias: UMB_UNLOCK_USER_REPOSITORY_ALIAS,
 	name: 'Unlock User Repository',
 	api: UmbUnlockUserRepository,
 };
 
-export const INVITE_USER_REPOSITORY_ALIAS = 'Umb.Repository.User.Invite';
+export const UMB_INVITE_USER_REPOSITORY_ALIAS = 'Umb.Repository.User.Invite';
 const inviteRepository: ManifestRepository = {
 	type: 'repository',
-	alias: INVITE_USER_REPOSITORY_ALIAS,
+	alias: UMB_INVITE_USER_REPOSITORY_ALIAS,
 	name: 'Invite User Repository',
 	api: UmbInviteUserRepository,
 };
@@ -63,13 +63,6 @@ const store: ManifestStore = {
 	api: UmbUserStore,
 };
 
-const itemStore: ManifestItemStore = {
-	type: 'itemStore',
-	alias: 'Umb.ItemStore.User',
-	name: 'User Store',
-	api: UmbUserItemStore,
-};
-
 export const manifests = [
 	repository,
 	disableRepository,
@@ -78,5 +71,5 @@ export const manifests = [
 	unlockRepository,
 	inviteRepository,
 	store,
-	itemStore,
+	...itemManifests,
 ];

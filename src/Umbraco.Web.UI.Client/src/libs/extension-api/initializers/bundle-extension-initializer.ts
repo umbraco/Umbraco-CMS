@@ -1,6 +1,6 @@
-import type { ManifestBase, ManifestBundle } from '../types.js';
+import type { ManifestBase, ManifestBundle } from '../types/index.js';
 import { UmbExtensionRegistry } from '../registry/extension.registry.js';
-import { loadExtension } from '../functions/load-extension.function.js';
+import { loadManifestPlainJs } from '../functions/load-manifest-plain-js.function.js';
 import { UmbBaseController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbBundleExtensionInitializer extends UmbBaseController {
@@ -29,34 +29,38 @@ export class UmbBundleExtensionInitializer extends UmbBaseController {
 	}
 
 	async instantiateBundle(manifest: ManifestBundle) {
-		const js = await loadExtension(manifest);
+		if(manifest.js) {
+			const js = await loadManifestPlainJs(manifest.js);
 
-		if (js) {
-			Object.keys(js).forEach((key) => {
-				const value = js[key];
+			if (js) {
+				Object.keys(js).forEach((key) => {
+					const value = js[key];
 
-				if (Array.isArray(value)) {
-					this.#extensionRegistry.registerMany(value);
-				} else if (typeof value === 'object') {
-					this.#extensionRegistry.register(value);
-				}
-			});
+					if (Array.isArray(value)) {
+						this.#extensionRegistry.registerMany(value);
+					} else if (typeof value === 'object') {
+						this.#extensionRegistry.register(value);
+					}
+				});
+			}
 		}
 	}
 
 	async unregisterBundle(manifest: ManifestBundle) {
-		const js = await loadExtension(manifest);
+		if(manifest.js) {
+			const js = await loadManifestPlainJs(manifest.js);
 
-		if (js) {
-			Object.keys(js).forEach((key) => {
-				const value = js[key];
+			if (js) {
+				Object.keys(js).forEach((key) => {
+					const value = js[key];
 
-				if (Array.isArray(value)) {
-					this.#extensionRegistry.unregisterMany(value.map((v) => v.alias));
-				} else if (typeof value === 'object') {
-					this.#extensionRegistry.unregister((value as ManifestBase).alias);
-				}
-			});
+					if (Array.isArray(value)) {
+						this.#extensionRegistry.unregisterMany(value.map((v) => v.alias));
+					} else if (typeof value === 'object') {
+						this.#extensionRegistry.unregister((value as ManifestBase).alias);
+					}
+				});
+			}
 		}
 	}
 }

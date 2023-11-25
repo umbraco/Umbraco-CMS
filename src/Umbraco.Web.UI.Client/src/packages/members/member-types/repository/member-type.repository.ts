@@ -1,24 +1,13 @@
 import type { MemberTypeDetails } from '../types.js';
-import { UmbMemberTypeTreeServerDataSource } from './sources/member-type.tree.server.data.js';
-import { UmbMemberTypeTreeStore, UMB_MEMBER_TYPE_TREE_STORE_CONTEXT_TOKEN } from './member-type.tree.store.js';
-import { UmbMemberTypeStore, UMB_MEMBER_TYPE_STORE_CONTEXT_TOKEN } from './member-type.store.js';
+import { UmbMemberTypeTreeStore, UMB_MEMBER_TYPE_TREE_STORE_CONTEXT } from '../tree/index.js';
+import { UmbMemberTypeStore, UMB_MEMBER_TYPE_STORE_CONTEXT } from './member-type.store.js';
 import { UmbMemberTypeDetailServerDataSource } from './sources/member-type.detail.server.data.js';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
-import { UmbTreeDataSource, UmbDetailRepository, UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
+import { UmbBaseController, type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
-import { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
-// TODO => use correct type when available
-type ItemType = any;
-type TreeItemType = EntityTreeItemResponseModel;
-
-export class UmbMemberTypeRepository implements UmbTreeRepository<TreeItemType>, UmbDetailRepository<ItemType> {
+export class UmbMemberTypeRepository extends UmbBaseController {
 	#init!: Promise<unknown>;
 
-	#host: UmbControllerHostElement;
-
-	#treeSource: UmbTreeDataSource;
 	#treeStore?: UmbMemberTypeTreeStore;
 
 	#detailSource: UmbMemberTypeDetailServerDataSource;
@@ -26,93 +15,25 @@ export class UmbMemberTypeRepository implements UmbTreeRepository<TreeItemType>,
 
 	#notificationContext?: UmbNotificationContext;
 
-	constructor(host: UmbControllerHostElement) {
-		this.#host = host;
+	constructor(host: UmbControllerHost) {
+		super(host);
 
 		// TODO: figure out how spin up get the correct data source
-		this.#treeSource = new UmbMemberTypeTreeServerDataSource(this.#host);
-		this.#detailSource = new UmbMemberTypeDetailServerDataSource(this.#host);
+		this.#detailSource = new UmbMemberTypeDetailServerDataSource(this);
 
 		this.#init = Promise.all([
-			new UmbContextConsumerController(this.#host, UMB_MEMBER_TYPE_STORE_CONTEXT_TOKEN, (instance) => {
+			this.consumeContext(UMB_MEMBER_TYPE_STORE_CONTEXT, (instance) => {
 				this.#store = instance;
 			}),
 
-			new UmbContextConsumerController(this.#host, UMB_MEMBER_TYPE_TREE_STORE_CONTEXT_TOKEN, (instance) => {
+			this.consumeContext(UMB_MEMBER_TYPE_TREE_STORE_CONTEXT, (instance) => {
 				this.#treeStore = instance;
 			}),
 
-			new UmbContextConsumerController(this.#host, UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
+			this.consumeContext(UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
 				this.#notificationContext = instance;
 			}),
 		]);
-	}
-
-	// TREE:
-	async requestTreeRoot() {
-		await this.#init;
-
-		const data = {
-			id: null,
-			type: 'member-type-root',
-			name: 'Member Types',
-			icon: 'icon-folder',
-			hasChildren: true,
-		};
-
-		return { data };
-	}
-
-	async requestRootTreeItems() {
-		await this.#init;
-
-		const { data, error } = await this.#treeSource.getRootItems();
-
-		if (data) {
-			this.#treeStore?.appendItems(data.items);
-		}
-
-		return { data, error, asObservable: () => this.#treeStore!.rootItems };
-	}
-
-	async requestTreeItemsOf(parentId: string | null) {
-		await this.#init;
-		if (parentId === undefined) throw new Error('Parent id is missing');
-
-		const { data, error } = await this.#treeSource.getChildrenOf(parentId);
-
-		if (data) {
-			this.#treeStore?.appendItems(data.items);
-		}
-
-		return { data, error, asObservable: () => this.#treeStore!.childrenOf(parentId) };
-	}
-
-	async requestItemsLegacy(ids: Array<string>) {
-		await this.#init;
-
-		if (!ids) {
-			throw new Error('Ids are missing');
-		}
-
-		const { data, error } = await this.#treeSource.getItems(ids);
-
-		return { data, error, asObservable: () => this.#treeStore!.items(ids) };
-	}
-
-	async rootTreeItems() {
-		await this.#init;
-		return this.#treeStore!.rootItems;
-	}
-
-	async treeItemsOf(parentId: string | null) {
-		await this.#init;
-		return this.#treeStore!.childrenOf(parentId);
-	}
-
-	async itemsLegacy(ids: Array<string>) {
-		await this.#init;
-		return this.#treeStore!.items(ids);
 	}
 
 	// DETAILS
@@ -160,9 +81,8 @@ export class UmbMemberTypeRepository implements UmbTreeRepository<TreeItemType>,
 		// TODO: we currently don't use the detail store for anything.
 		// Consider to look up the data before fetching from the server.
 		// Consider notify a workspace if a member type is deleted from the store while someone is editing it.
-		this.#store?.remove([id]);
+		this.#store?.removeItem(id);
 		this.#treeStore?.removeItem(id);
-		// TODO: would be nice to align the stores on methods/methodNames.
 
 		return { error };
 	}
@@ -179,7 +99,6 @@ export class UmbMemberTypeRepository implements UmbTreeRepository<TreeItemType>,
 			// TODO: we currently don't use the detail store for anything.
 			// Consider to look up the data before fetching from the server
 			// Consider notify a workspace if a member type is updated in the store while someone is editing it.
-			// TODO: would be nice to align the stores on methods/methodNames.
 			//this.#store?.append(detail);
 			this.#treeStore?.updateItem(id, updatedMemberType);
 
@@ -197,7 +116,7 @@ export class UmbMemberTypeRepository implements UmbTreeRepository<TreeItemType>,
 			throw new Error('Name is missing');
 		}
 
-		const { data, error } = await this.#detailSource.insert(detail);
+		const { data, error } = await this.#detailSource.create(detail);
 
 		if (!error) {
 			const notification = { data: { message: `Member type '${detail.name}' created` } };

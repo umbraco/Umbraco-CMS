@@ -5,7 +5,7 @@ import {
 	UmbModalManagerContext,
 	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
 } from '@umbraco-cms/backoffice/modal';
-import { UMB_AUTH_CONTEXT, UmbLoggedInUser } from '@umbraco-cms/backoffice/auth';
+import { UMB_CURRENT_USER_CONTEXT, UmbCurrentUser } from '@umbraco-cms/backoffice/current-user';
 
 interface MediaPickerTargetData {
 	altText?: string;
@@ -26,23 +26,23 @@ interface MediaPickerResultData {
 
 export default class UmbTinyMceMediaPickerPlugin extends UmbTinyMcePluginBase {
 	#mediaHelper: UmbMediaHelper;
-	#currentUser?: UmbLoggedInUser;
+	#currentUser?: UmbCurrentUser;
 	#modalContext?: UmbModalManagerContext;
-	#auth?: typeof UMB_AUTH_CONTEXT.TYPE;
+	#currentUserContext?: typeof UMB_CURRENT_USER_CONTEXT.TYPE;
 
 	constructor(args: TinyMcePluginArguments) {
 		super(args);
 
 		this.#mediaHelper = new UmbMediaHelper();
 
-		this.host.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (modalContext) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (modalContext) => {
 			this.#modalContext = modalContext;
 		});
 
 		// TODO => this breaks tests. disabling for now
 		// will ignore user media start nodes
-		// this.host.consumeContext(UMB_AUTH, (instance) => {
-		// 	this.#auth = instance;
+		// this.host.consumeContext(UMB_CURRENT_USER_CONTEXT, (instance) => {
+		// 	this.#currentUserContext = instance;
 		// 	this.#observeCurrentUser();
 		// });
 
@@ -55,9 +55,9 @@ export default class UmbTinyMceMediaPickerPlugin extends UmbTinyMcePluginBase {
 	}
 
 	async #observeCurrentUser() {
-		if (!this.#auth) return;
+		if (!this.#currentUserContext) return;
 
-		this.host.observe(this.#auth.currentUser, (currentUser) => (this.#currentUser = currentUser));
+		this.observe(this.#currentUserContext.currentUser, (currentUser) => (this.#currentUser = currentUser));
 	}
 
 	async #onAction() {

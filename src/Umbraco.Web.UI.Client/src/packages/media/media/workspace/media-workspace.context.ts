@@ -1,14 +1,18 @@
 import { UmbMediaRepository } from '../repository/media.repository.js';
-import type { MediaDetails } from '../index.js';
-import { UmbSaveableWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
+import type { UmbMediaDetailModel } from '../index.js';
+import {
+	UmbSaveableWorkspaceContextInterface,
+	UmbEditableWorkspaceContextBase,
+} from '@umbraco-cms/backoffice/workspace';
 import { appendToFrozenArray, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
-type EntityType = MediaDetails;
+type EntityType = UmbMediaDetailModel;
 export class UmbMediaWorkspaceContext
-	extends UmbWorkspaceContext<UmbMediaRepository, EntityType>
-	implements UmbSaveableWorkspaceContextInterface<EntityType | undefined>
+	extends UmbEditableWorkspaceContextBase<UmbMediaRepository, EntityType>
+	implements UmbSaveableWorkspaceContextInterface<EntityType | undefined>, UmbApi
 {
 	#data = new UmbObjectState<EntityType | undefined>(undefined);
 	data = this.#data.asObservable();
@@ -60,7 +64,7 @@ export class UmbMediaWorkspaceContext
 		this.setIsNew(true);
 		// TODO: This is a hack to get around the fact that the data is not typed correctly.
 		// Create and response models are different. We need to look into this.
-		this.#data.next(data as unknown as MediaDetails);
+		this.#data.next(data as unknown as UmbMediaDetailModel);
 	}
 
 	async save() {
@@ -79,11 +83,16 @@ export class UmbMediaWorkspaceContext
 	}
 
 	public destroy(): void {
-		this.#data.complete();
+		this.#data.destroy();
 	}
 }
+export const api = UmbMediaWorkspaceContext;
 
-export const UMB_MEDIA_WORKSPACE_CONTEXT = new UmbContextToken<UmbSaveableWorkspaceContextInterface, UmbMediaWorkspaceContext>(
+export const UMB_MEDIA_WORKSPACE_CONTEXT = new UmbContextToken<
+	UmbSaveableWorkspaceContextInterface,
+	UmbMediaWorkspaceContext
+>(
 	'UmbWorkspaceContext',
-	(context): context is UmbMediaWorkspaceContext => context.getEntityType?.() === 'media'
+	undefined,
+	(context): context is UmbMediaWorkspaceContext => context.getEntityType?.() === 'media',
 );

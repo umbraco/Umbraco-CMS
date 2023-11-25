@@ -1,19 +1,22 @@
 import { UmbDictionaryRepository } from '../repository/dictionary.repository.js';
-import { UmbSaveableWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import {
+	type UmbSaveableWorkspaceContextInterface,
+	UmbEditableWorkspaceContextBase,
+} from '@umbraco-cms/backoffice/workspace';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { DictionaryItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 export class UmbDictionaryWorkspaceContext
-	extends UmbWorkspaceContext<UmbDictionaryRepository, DictionaryItemResponseModel>
+	extends UmbEditableWorkspaceContextBase<UmbDictionaryRepository, DictionaryItemResponseModel>
 	implements UmbSaveableWorkspaceContextInterface<DictionaryItemResponseModel | undefined>
 {
 	#data = new UmbObjectState<DictionaryItemResponseModel | undefined>(undefined);
-	data = this.#data.asObservable();
+	readonly data = this.#data.asObservable();
 
-	name = this.#data.asObservablePart((data) => data?.name);
-	dictionary = this.#data.asObservablePart((data) => data);
+	readonly name = this.#data.asObservablePart((data) => data?.name);
+	readonly dictionary = this.#data.asObservablePart((data) => data);
 
 	constructor(host: UmbControllerHostElement) {
 		super(host, 'Umb.Workspace.Dictionary', new UmbDictionaryRepository(host));
@@ -68,9 +71,8 @@ export class UmbDictionaryWorkspaceContext
 		const { data } = await this.repository.createScaffold(parentId);
 		if (!data) return;
 		this.setIsNew(true);
-		// TODO: This is a hack to get around the fact that the data is not typed correctly.
-		// Create and response models are different. We need to look into this.
-		this.#data.next(data as unknown as DictionaryItemResponseModel);
+
+		this.#data.next(data as DictionaryItemResponseModel);
 	}
 
 	async save() {
@@ -89,7 +91,7 @@ export class UmbDictionaryWorkspaceContext
 	}
 
 	public destroy(): void {
-		this.#data.complete();
+		this.#data.destroy();
 	}
 }
 
@@ -98,5 +100,6 @@ export const UMB_DICTIONARY_WORKSPACE_CONTEXT = new UmbContextToken<
 	UmbDictionaryWorkspaceContext
 >(
 	'UmbWorkspaceContext',
+	undefined,
 	(context): context is UmbDictionaryWorkspaceContext => context.getEntityType?.() === 'dictionary-item',
 );

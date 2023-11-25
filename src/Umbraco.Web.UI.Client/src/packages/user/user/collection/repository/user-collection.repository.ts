@@ -1,6 +1,6 @@
 import { UmbUserCollectionFilterModel } from '../../types.js';
 import { UmbUserRepositoryBase } from '../../repository/user-repository-base.js';
-import { UmbUserCollectionServerDataSource } from './user-collection.server.data.js';
+import { UmbUserCollectionServerDataSource } from './user-collection.server.data-source.js';
 import { UserResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbCollectionDataSource, UmbCollectionRepository } from '@umbraco-cms/backoffice/repository';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';

@@ -1,3 +1,4 @@
+import { UMB_MEMBER_MENU_ALIAS } from './menu.manifests.js';
 import type { ManifestDashboard, ManifestSection, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const sectionAlias = 'Umb.Section.Members';
@@ -19,7 +20,7 @@ const dashboards: Array<ManifestDashboard> = [
 		alias: 'Umb.Dashboard.Members',
 		name: 'Members Dashboard',
 		weight: 10,
-		loader: () => import('./dashboards/welcome/dashboard-members-welcome.element.js'),
+		js: () => import('./dashboards/welcome/dashboard-members-welcome.element.js'),
 		meta: {
 			label: 'Members',
 			pathname: 'members',
@@ -41,7 +42,7 @@ const menuSectionSidebarApp: ManifestTypes = {
 	weight: 100,
 	meta: {
 		label: 'Members',
-		menu: 'Umb.Menu.Members',
+		menu: UMB_MEMBER_MENU_ALIAS,
 	},
 	conditions: [
 		{

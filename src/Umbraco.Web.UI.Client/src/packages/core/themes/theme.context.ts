@@ -3,6 +3,7 @@ import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbStringState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { UmbBaseController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { ManifestTheme, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { loadManifestPlainCss } from '@umbraco-cms/backoffice/extension-api';
 
 const LOCAL_STORAGE_KEY = 'umb-theme-alias';
 
@@ -37,31 +38,34 @@ export class UmbThemeContext extends UmbBaseController {
 					.pipe(map((extensions) => extensions.filter((extension) => extension.alias === themeAlias))),
 				async (themes) => {
 					this.#styleElement?.remove();
-					if (themes.length > 0) {
-						if (themes[0].loader) {
+					if (themes.length > 0 && themes[0].css) {
+						const activeTheme = themes[0];
+						if (typeof activeTheme.css === 'function') {
 							const styleEl = (this.#styleElement = document.createElement('style'));
 							styleEl.setAttribute('type', 'text/css');
 							document.head.appendChild(styleEl);
 
-							const result = await themes[0].loader();
+							const result = await loadManifestPlainCss(activeTheme.css);
 							// Checking that this is still our styleElement, it has not been replaced with another theme in between.
-							if (styleEl === this.#styleElement) {
-								(styleEl as any).appendChild(document.createTextNode(result));
+							if (result && styleEl === this.#styleElement) {
+								styleEl.appendChild(document.createTextNode(result));
 							}
-						} else if (themes[0].css) {
+						} else if (typeof activeTheme.css === 'string') {
 							this.#styleElement = document.createElement('link');
 							this.#styleElement.setAttribute('rel', 'stylesheet');
-							this.#styleElement.setAttribute('href', themes[0].css);
+							this.#styleElement.setAttribute('href', activeTheme.css);
 							document.head.appendChild(this.#styleElement);
 						}
 					} else {
 						localStorage.removeItem(LOCAL_STORAGE_KEY);
+						this.#styleElement?.childNodes.forEach((node) => node.remove());
 						this.#styleElement?.setAttribute('href', '');
 					}
 				}
 			);
 		} else {
 			localStorage.removeItem(LOCAL_STORAGE_KEY);
+			this.#styleElement?.childNodes.forEach((node) => node.remove());
 			this.#styleElement?.setAttribute('href', '');
 		}
 	}

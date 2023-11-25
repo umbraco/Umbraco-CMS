@@ -29,8 +29,10 @@ export class UmbStylesheetWorkspaceEditorElement extends UmbLitElement {
 		super();
 
 		this.consumeContext(UMB_WORKSPACE_CONTEXT, (instance) => {
-			this.#workspaceContext = instance as unknown as UmbStylesheetWorkspaceContext;
+			this.#workspaceContext = instance as UmbStylesheetWorkspaceContext;
+
 			this.#observeNameAndPath();
+
 			this.inputQuery$.pipe(debounceTime(250)).subscribe((nameInputValue: string) => {
 				this.#workspaceContext?.setName(`${nameInputValue}.css`);
 			});
@@ -39,8 +41,12 @@ export class UmbStylesheetWorkspaceEditorElement extends UmbLitElement {
 
 	#observeNameAndPath() {
 		if (!this.#workspaceContext) return;
-		this.observe(this.#workspaceContext.name, (name) => (this._name = name ?? ''), '_observeName');
-		this.observe(this.#workspaceContext.path, (path) => (this._path = path ?? ''), '_observePath');
+		this.observe(
+			this.#workspaceContext.path,
+			(path) => (this._path = path?.replace(/\\/g, '/')),
+			'_observeStylesheetPath',
+		);
+		this.observe(this.#workspaceContext.name, (name) => (this._name = name), '_observeStylesheetName');
 	}
 
 	#onNameChange(event: UUIInputEvent) {

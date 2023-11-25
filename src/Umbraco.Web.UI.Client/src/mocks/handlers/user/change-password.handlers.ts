@@ -1,10 +1,10 @@
 const { rest } = window.MockServiceWorker;
-import { slug } from './slug.js';
+import { UMB_SLUG } from './slug.js';
 import { ChangePasswordUserRequestModel } from '@umbraco-cms/backoffice/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 export const handlers = [
-	rest.post<ChangePasswordUserRequestModel>(umbracoPath(`${slug}/change-password/:id`), async (req, res, ctx) => {
+	rest.post<ChangePasswordUserRequestModel>(umbracoPath(`${UMB_SLUG}/change-password/:id`), async (req, res, ctx) => {
 		const data = await req.json();
 		if (!data) return;
 		if (!data.newPassword) return;

@@ -2,7 +2,7 @@ import { expect, fixture, html } from '@open-wc/testing';
 import { UmbExtensionSlotElement } from './extension-slot.element.js';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { ManifestDashboard, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbExtensionElementController } from '@umbraco-cms/backoffice/extension-api';
+import { UmbExtensionElementInitializer } from '@umbraco-cms/backoffice/extension-api';
 
 @customElement('umb-test-extension-slot-manifest-element')
 class UmbTestExtensionSlotManifestElement extends HTMLElement {}
@@ -89,7 +89,7 @@ describe('UmbExtensionSlotElement', () => {
 				html` <umb-extension-slot
 					type="dashboard"
 					.filter=${(x: ManifestDashboard) => x.alias === 'unit-test-ext-slot-element-manifest'}
-					.renderMethod=${(controller: UmbExtensionElementController) => html`<bla>${controller.component}</bla>`}>
+					.renderMethod=${(controller: UmbExtensionElementInitializer) => html`<bla>${controller.component}</bla>`}>
 				</umb-extension-slot>`
 			);
 

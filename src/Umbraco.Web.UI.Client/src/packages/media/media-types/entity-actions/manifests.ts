@@ -1,11 +1,9 @@
-import { MEDIA_TYPE_REPOSITORY_ALIAS } from '../repository/manifests.js';
-import { UmbCreateMediaTypeEntityAction } from './create.action.js';
-import UmbReloadMediaTypeEntityAction from './reload.action.js';
+import { UMB_MEDIA_TYPE_ENTITY_TYPE } from '../entity.js';
+import { UMB_MEDIA_TYPE_DETAIL_REPOSITORY_ALIAS } from '../repository/index.js';
+import { UmbCreateMediaTypeEntityAction } from './create/create.action.js';
+import { manifests as createManifests } from './create/manifests.js';
 import { UmbDeleteEntityAction, UmbMoveEntityAction, UmbCopyEntityAction } from '@umbraco-cms/backoffice/entity-action';
 import type { ManifestEntityAction } from '@umbraco-cms/backoffice/extension-registry';
-
-const entityType = 'media-type';
-const repositoryAlias = MEDIA_TYPE_REPOSITORY_ALIAS;
 
 const entityActions: Array<ManifestEntityAction> = [
 	{
@@ -17,8 +15,8 @@ const entityActions: Array<ManifestEntityAction> = [
 		meta: {
 			icon: 'icon-add',
 			label: 'Create',
-			repositoryAlias,
-			entityTypes: [entityType],
+			repositoryAlias: UMB_MEDIA_TYPE_DETAIL_REPOSITORY_ALIAS,
+			entityTypes: [UMB_MEDIA_TYPE_ENTITY_TYPE],
 		},
 	},
 	{
@@ -30,8 +28,8 @@ const entityActions: Array<ManifestEntityAction> = [
 		meta: {
 			icon: 'icon-enter',
 			label: 'Move',
-			repositoryAlias,
-			entityTypes: [entityType],
+			repositoryAlias: UMB_MEDIA_TYPE_DETAIL_REPOSITORY_ALIAS,
+			entityTypes: [UMB_MEDIA_TYPE_ENTITY_TYPE],
 		},
 	},
 	{
@@ -43,8 +41,8 @@ const entityActions: Array<ManifestEntityAction> = [
 		meta: {
 			icon: 'icon-documents',
 			label: 'Copy',
-			repositoryAlias,
-			entityTypes: [entityType],
+			repositoryAlias: UMB_MEDIA_TYPE_DETAIL_REPOSITORY_ALIAS,
+			entityTypes: [UMB_MEDIA_TYPE_ENTITY_TYPE],
 		},
 	},
 	{
@@ -56,23 +54,10 @@ const entityActions: Array<ManifestEntityAction> = [
 		meta: {
 			icon: 'icon-trash',
 			label: 'Delete',
-			repositoryAlias,
-			entityTypes: [entityType],
-		},
-	},
-	{
-		type: 'entityAction',
-		alias: 'Umb.EntityAction.MediaType.Reload',
-		name: 'Reload Media Type Entity Action',
-		weight: 100,
-		api: UmbReloadMediaTypeEntityAction,
-		meta: {
-			icon: 'icon-refresh',
-			label: 'Reload',
-			repositoryAlias,
-			entityTypes: [entityType],
+			repositoryAlias: UMB_MEDIA_TYPE_DETAIL_REPOSITORY_ALIAS,
+			entityTypes: [UMB_MEDIA_TYPE_ENTITY_TYPE],
 		},
 	},
 ];
 
-export const manifests = [...entityActions];
+export const manifests = [...entityActions, ...createManifests];

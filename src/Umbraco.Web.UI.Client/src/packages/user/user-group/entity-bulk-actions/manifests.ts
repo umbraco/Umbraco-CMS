@@ -1,4 +1,4 @@
-import { USER_GROUP_REPOSITORY_ALIAS } from '../repository/manifests.js';
+import { UMB_USER_GROUP_REPOSITORY_ALIAS } from '../repository/manifests.js';
 import { UmbDeleteUserGroupEntityBulkAction } from './delete/delete.action.js';
 import type { ManifestEntityBulkAction } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -13,12 +13,14 @@ const entityActions: Array<ManifestEntityBulkAction> = [
 		api: UmbDeleteUserGroupEntityBulkAction,
 		meta: {
 			label: 'Delete',
-			repositoryAlias: USER_GROUP_REPOSITORY_ALIAS,
+			repositoryAlias: UMB_USER_GROUP_REPOSITORY_ALIAS,
 		},
-		conditions: [{
-			alias: 'Umb.Condition.CollectionEntityType',
-			match: entityType,
-		}],
+		conditions: [
+			{
+				alias: 'Umb.Condition.CollectionEntityType',
+				match: entityType,
+			},
+		],
 	},
 ];
 

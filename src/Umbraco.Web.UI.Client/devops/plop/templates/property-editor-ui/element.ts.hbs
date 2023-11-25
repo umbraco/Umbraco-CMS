@@ -1,5 +1,6 @@
-import { html } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
+import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
+import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/element';
 
@@ -7,14 +8,14 @@ import { UmbLitElement } from '@umbraco-cms/element';
  * @element {{ extensionTagName extensionType name }}
  */
 @customElement('{{ extensionTagName extensionType name }}')
-export class {{className extensionType name }} extends UmbLitElement {
+export class {{className extensionType name }} extends UmbLitElement implements UmbPropertyEditorUiElement {
 	static styles = [UmbTextStyles];
 
 	@property()
 	value = '';
 
 	@property({ type: Array, attribute: false })
-	public config = [];
+	public config?: UmbPropertyEditorConfigCollection;
 
 	render() {
 		return html`<div>{{ extensionTagName extensionType name }}</div>`;

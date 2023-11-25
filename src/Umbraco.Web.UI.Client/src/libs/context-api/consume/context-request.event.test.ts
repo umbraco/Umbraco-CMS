@@ -4,15 +4,21 @@ import { UmbContextRequestEventImplementation, UmbContextRequestEvent } from './
 describe('UmbContextRequestEvent', () => {
 	const contextRequestCallback = () => {
 		console.log('hello from callback');
+		return true;
 	};
 
 	const event: UmbContextRequestEvent = new UmbContextRequestEventImplementation(
 		'my-test-context-alias',
-		contextRequestCallback
+		'my-test-api-alias',
+		contextRequestCallback,
 	);
 
-	it('has context', () => {
+	it('has context alias', () => {
 		expect(event.contextAlias).to.eq('my-test-context-alias');
+	});
+
+	it('has api alias', () => {
+		expect(event.apiAlias).to.eq('my-test-api-alias');
 	});
 
 	it('has a callback', () => {

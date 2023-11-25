@@ -1,28 +1,22 @@
-import { SCRIPTS_REPOSITORY_ALIAS, SCRIPTS_STORE_ALIAS, SCRIPTS_TREE_STORE_ALIAS } from '../config.js';
-import { UmbScriptsRepository } from './scripts.repository.js';
-import { UmbScriptsStore } from './scripts.store.js';
-import { UmbScriptsTreeStore } from './scripts.tree.store.js';
-import { ManifestRepository, ManifestStore, ManifestTreeStore } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbScriptRepository } from './script.repository.js';
+import { UmbScriptStore } from './script.store.js';
+import { ManifestRepository, ManifestStore } from '@umbraco-cms/backoffice/extension-registry';
+
+export const UMB_SCRIPT_REPOSITORY_ALIAS = 'Umb.Repository.Script';
+export const UMB_SCRIPT_STORE_ALIAS = 'Umb.Store.Script';
 
 const repository: ManifestRepository = {
 	type: 'repository',
-	alias: SCRIPTS_REPOSITORY_ALIAS,
-	name: 'Scripts Repository',
-	api: UmbScriptsRepository,
+	alias: UMB_SCRIPT_REPOSITORY_ALIAS,
+	name: 'Script Repository',
+	api: UmbScriptRepository,
 };
 
 const store: ManifestStore = {
 	type: 'store',
-	alias: SCRIPTS_STORE_ALIAS,
-	name: 'Scripts Store',
-	api: UmbScriptsStore,
+	alias: UMB_SCRIPT_STORE_ALIAS,
+	name: 'Script Store',
+	api: UmbScriptStore,
 };
 
-const treeStore: ManifestTreeStore = {
-	type: 'treeStore',
-	alias: SCRIPTS_TREE_STORE_ALIAS,
-	name: 'Scripts Tree Store',
-	api: UmbScriptsTreeStore,
-};
-
-export const manifests = [repository, store, treeStore];
+export const manifests = [repository, store];
