@@ -486,28 +486,28 @@ stages:
               docker ps
             condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
             displayName: Build and run container (Linux only)
-            workingDirectory: $(Build.SourcesDirectory)/
+            workingDirectory: tests/Umbraco.Tests.AcceptanceTest/misc
           - pwsh: |
-              dotnet new --install $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/misc/nupkg/Umbraco.Templates.*.nupkg
+              dotnet new --install ./nupkg/Umbraco.Templates.*.nupkg
               dotnet new umbraco --name AcceptanceTestProject --no-restore --output .
-              dotnet restore --configfile $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/misc/nuget.config
+              dotnet restore --configfile ./nuget.config
               dotnet build --configuration $(buildConfiguration) --no-restore
               dotnet dev-certs https
               $process = Start-Process -FilePath "dotnet" -ArgumentList "run --configuration $(buildConfiguration) --no-build --no-launch-profile 2>&1" -PassThru -RedirectStandardOutput $(Build.ArtifactStagingDirectory)/playwright.log
               Write-Host "##vso[task.setvariable variable=AcceptanceTestProcessId]$($process.Id)"
             condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))
             displayName: Build and run app (Windows only)
-            workingDirectory: $(Build.SourcesDirectory)/
+            workingDirectory: tests/Umbraco.Tests.AcceptanceTest/misc
           - pwsh: npx wait-on -v --interval 1000 --timeout 120000 $(ASPNETCORE_URLS)
             displayName: Wait for app
-            workingDirectory: $(Build.SourcesDirectory)/
+            workingDirectory: tests/Umbraco.Tests.AcceptanceTest
           - pwsh: npx playwright install --with-deps
             displayName: Install Playwright
-            workingDirectory: $(Build.SourcesDirectory)/
+            workingDirectory: tests/Umbraco.Tests.AcceptanceTest
           - pwsh: npm run test --ignore-certificate-errors
             displayName: Run Playwright (Desktop)
             continueOnError: true
-            workingDirectory: $(Build.SourcesDirectory)/
+            workingDirectory: tests/Umbraco.Tests.AcceptanceTest
             env:
               CI: true
           - pwsh: |
