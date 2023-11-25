@@ -497,7 +497,7 @@ stages:
               Write-Host "##vso[task.setvariable variable=AcceptanceTestProcessId]$($process.Id)"
             condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))
             displayName: Build and run app (Windows only)
-            workingDirectory: tests-Umbraco.Tests.AcceptanceTest-misc
+            workingDirectory: $(Build.SourcesDirectory)/
           - pwsh: npx wait-on -v --interval 1000 --timeout 120000 $(ASPNETCORE_URLS)
             displayName: Wait for app
             workingDirectory: tests/Umbraco.Tests.AcceptanceTest
