@@ -156,7 +156,7 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 				>
 				${this._masterTemplateName
 					? html` <uui-button look="secondary" id="save-button" label="Remove master template" compact
-							><uui-icon name="umb:delete" @click=${this.#resetMasterTemplate}></uui-icon
+							><uui-icon name="icon-delete" @click=${this.#resetMasterTemplate}></uui-icon
 					  ></uui-button>`
 					: nothing}
 			</uui-button-group>
@@ -195,14 +195,14 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 							id="query-builder-button"
 							label="Query builder"
 							@click=${this.#openQueryBuilder}>
-							<uui-icon name="umb:wand"></uui-icon>Query builder
+							<uui-icon name="icon-wand"></uui-icon>Query builder
 						</uui-button>
 						<uui-button
 							look="secondary"
 							id="sections-button"
 							label="Query builder"
 							@click=${this.#openInsertSectionModal}>
-							<uui-icon name="umb:indent"></uui-icon>Sections
+							<uui-icon name="icon-indent"></uui-icon>Sections
 						</uui-button>
 					</div>
 				</div>
@@ -246,7 +246,7 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 				margin: 1em;
 			}
 
-			#code-editor-menu-container uui-icon:not([name='umb:delete']) {
+			#code-editor-menu-container uui-icon:not([name='icon-delete']) {
 				margin-right: var(--uui-size-space-3);
 			}
 

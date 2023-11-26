@@ -1,3 +1,4 @@
+import { UMB_MEDIA_TYPE_TREE_ALIAS } from '../tree/manifests.js';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const menuItem: ManifestTypes = {
@@ -8,8 +9,8 @@ const menuItem: ManifestTypes = {
 	weight: 800,
 	meta: {
 		label: 'Media Types',
-		icon: 'umb:folder',
-		treeAlias: 'Umb.Tree.MediaTypes',
+		icon: 'icon-folder',
+		treeAlias: UMB_MEDIA_TYPE_TREE_ALIAS,
 		menus: ['Umb.Menu.Settings'],
 	},
 };

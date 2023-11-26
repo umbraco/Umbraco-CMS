@@ -4,10 +4,10 @@ export const manifest: ManifestPropertyEditorUi = {
 	type: 'propertyEditorUi',
 	alias: 'Umb.PropertyEditorUi.EyeDropper',
 	name: 'Eye Dropper Color Picker Property Editor UI',
-	loader: () => import('./property-editor-ui-eye-dropper.element.js'),
+	js: () => import('./property-editor-ui-eye-dropper.element.js'),
 	meta: {
 		label: 'Eye Dropper Color Picker',
-		icon: 'umb:colorpicker',
+		icon: 'icon-colorpicker',
 		group: 'pickers',
 		propertyEditorSchemaAlias: 'Umbraco.ColorPicker.EyeDropper',
 		settings: {

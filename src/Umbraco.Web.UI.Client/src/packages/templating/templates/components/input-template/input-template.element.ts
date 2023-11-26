@@ -94,7 +94,7 @@ export class UmbInputTemplateElement extends FormControlMixin(UmbLitElement) {
 				this._pickedTemplates = data;
 				this.requestUpdate('_pickedTemplates', oldValue);
 			},
-			'_observeTemplates'
+			'_observeTemplates',
 		);
 	}
 
@@ -161,10 +161,10 @@ export class UmbInputTemplateElement extends FormControlMixin(UmbLitElement) {
 							label="Remove document ${template.name}"
 							@click="${() => this.#removeTemplate(template.id ?? '')}"
 							compact>
-							<uui-icon name="umb:trash"></uui-icon>
+							<uui-icon name="icon-trash"></uui-icon>
 						</uui-button>
 					</umb-template-card>
-				`
+				`,
 			)}
 			<uui-button id="add-button" look="placeholder" label="open" @click="${this.#openPicker}">Add</uui-button>
 		`;

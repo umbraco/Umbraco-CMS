@@ -8,11 +8,11 @@ const manifest: ManifestPropertyEditorUi = {
 	type: 'propertyEditorUi',
 	alias: 'Umb.PropertyEditorUi.CollectionView',
 	name: 'Collection View Property Editor UI',
-	loader: () => import('./property-editor-ui-collection-view.element.js'),
+	js: () => import('./property-editor-ui-collection-view.element.js'),
 	meta: {
 		label: 'Collection View',
 		propertyEditorSchemaAlias: 'Umbraco.ListView',
-		icon: 'umb:bulleted-list',
+		icon: 'icon-bulleted-list',
 		group: 'lists',
 		settings: {
 			properties: [

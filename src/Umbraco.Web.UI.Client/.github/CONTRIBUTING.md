@@ -15,9 +15,9 @@ Here is the LIT documentation and playground: [https://lit.dev](https://lit.dev)
 
 - Read the [README](README.md) to learn how to get the project up and running
 - Find an issue marked as [community/up-for-grabs](https://github.com/umbraco/Umbraco.CMS.Backoffice/issues?q=is%3Aissue+is%3Aopen+label%3Acommunity%2Fup-for-grabs) - note that some are also marked [good first issue](https://github.com/umbraco/Umbraco.CMS.Backoffice/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) which indicates they are simple to get started on
-- Umbraco HQ owns the Management API on the backend, so features can be worked on in the frontend only when there is an API, or otherwise, if no API is required
+- Umbraco HQ owns the Management API on the backend, so features can be worked on in the frontend only when there is an API, or otherwise if no API is required
 - A contribution should be made in a fork of the repository
-- Once a contribution is ready, a pull request should be made towards this repository and HQ will assign a reviewer
+- Once a contribution is ready, a pull request should be made to this repository and HQ will assign a reviewer
 - A pull request should always indicate what part of a feature it tries to solve, i.e. does it close the targeted issue (if any) or does the developer expect Umbraco HQ to take over
 
 ## Contributing in general terms
@@ -115,7 +115,7 @@ To declare the Published Cache Status Dashboard as a new manifest, we need to ad
 	alias: 'Umb.Dashboard.PublishedStatus',
 	name: 'Published Status Dashboard',
 	elementName: 'umb-dashboard-published-status',
-	loader: () => import('./published-status/dashboard-published-status.element.js'),
+	element: () => import('./published-status/dashboard-published-status.element.js'),
 	weight: 200,
 	meta: {
 		label: 'Published Status',
@@ -152,17 +152,17 @@ Let’s go through each of these properties…
 @customElement('umb-dashboard-published-status')
 ```
 
-- Loader: references a function call to import the file that the element is declared within
+- Js: references a function call to import the file that the element is declared within
 
 - Weight: allows us to specify the order in which the dashboard will be displayed within the tabs bar
 
-- Meta: allows us to reference additional data - in our case we can specify the label that is shown in the tabs bar and the pathname that will be displayed in the url
+- Meta: allows us to reference additional data - in our case, we can specify the label that is shown in the tabs bar and the pathname that will be displayed in the URL
 
-- Conditions: allows us to specify the conditions that must be met in order for the dashboard to be displayed. In our case we are specifying that the dashboard will only be displayed within the Settings section
+- Conditions: allows us to specify the conditions that must be met for the dashboard to be displayed. In our case, we are specifying that the dashboard will only be displayed within the Settings section
 
 ## API mock handlers
 
-Running the app with `npm run dev`, you will quickly notice the API requests turn into 404 errors. In order to hit the API, we need to add a mock handler to define the endpoints which our dashboard will call. In the case of the Published Cache Status section, we have a number of calls to work through. Let’s start by looking at the call to retrieve the current status of the cache:
+Running the app with `npm run dev`, you will quickly notice the API requests turn into 404 errors. To hit the API, we need to add a mock handler to define the endpoints that our dashboard will call. In the case of the Published Cache Status section, we have several calls to work through. Let’s start by looking at the call to retrieve the current status of the cache:
 
 ![Published Status Dashboard](/.github/images/contributing/status-of-cache.png)
 
@@ -180,8 +180,8 @@ export const handlers = [
 			// Respond with a 200 status code
 			ctx.status(200),
 			ctx.json<string>(
-				'Database cache is ok. ContentStore contains 1 item and has 1 generation and 0 snapshot. MediaStore contains 5 items and has 1 generation and 0 snapshot.'
-			)
+				'Database cache is ok. ContentStore contains 1 item and has 1 generation and 0 snapshot. MediaStore contains 5 items and has 1 generation and 0 snapshot.',
+			),
 		);
 	}),
 ];
@@ -195,7 +195,7 @@ An example `POST` is similar. Let’s take the “Refresh status” button as an
 
 ![Published Status Dashboard](/.github/images/contributing/refresh-status.png)
 
-From our existing functionality we can see that this makes a `POST`call to the server to prompt a reload of the published cache. So we would add a new endpoint to the mock handler that would look like:
+From our existing functionality, we can see that this makes a `POST` call to the server to prompt a reload of the published cache. So we would add a new endpoint to the mock handler that would look like:
 
 ```typescript
 rest.post(umbracoPath('/published-cache/reload'), async (_req, res, ctx) => {
@@ -216,7 +216,7 @@ This call returns a simple `OK` status code and no other object.
 
 We try to make good Storybook stories for new components, which is a nice way to work with a component in an isolated state. Imagine you are working with a dialog on page 3 and have to navigate back to that every time you make a change - this is now eliminated with Storybook as you can just make a story that displays that step. Storybook can only show one component at a time, so it also helps us to isolate view logic into more and smaller components, which in turn are more testable.
 
-In depth: [https://storybook.js.org/docs/web-components/get-started/introduction](https://storybook.js.org/docs/web-components/get-started/introduction)
+In-depth: [https://storybook.js.org/docs/web-components/get-started/introduction](https://storybook.js.org/docs/web-components/get-started/introduction)
 
 Reference: [https://ambitious-stone-0033b3603.1.azurestaticapps.net/](https://ambitious-stone-0033b3603.1.azurestaticapps.net/)
 

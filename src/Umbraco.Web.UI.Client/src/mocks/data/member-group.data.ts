@@ -1,9 +1,9 @@
-import type { MemberGroupDetails } from '../../packages/members/member-groups/types.js';
 import { UmbEntityData } from './entity.data.js';
 import { createEntityTreeItem } from './utils.js';
 import { EntityTreeItemResponseModel, PagedEntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbMemberGroupDetailModel } from '@umbraco-cms/backoffice/member-group';
 
-export const data: Array<MemberGroupDetails> = [
+export const data: Array<any> = [
 	{
 		name: 'Member Group AAA',
 		type: 'member-group',
@@ -18,7 +18,7 @@ export const data: Array<MemberGroupDetails> = [
 // TODO: all properties are optional in the server schema. I don't think this is correct.
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-class UmbMemberGroupData extends UmbEntityData<MemberGroupDetails> {
+class UmbMemberGroupData extends UmbEntityData<UmbMemberGroupDetailModel> {
 	constructor() {
 		super(data);
 	}

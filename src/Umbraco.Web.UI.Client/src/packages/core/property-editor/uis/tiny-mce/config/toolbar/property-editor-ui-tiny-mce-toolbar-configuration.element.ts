@@ -1,4 +1,4 @@
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { customElement, css, html, property, map, state, PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbPropertyEditorUiElement, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -6,7 +6,7 @@ import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import { tinymce } from '@umbraco-cms/backoffice/external/tinymce';
 
-const tinyIconSet = tinymce.default?.IconManager.get('default');
+const tinyIconSet = tinymce.IconManager.get('default');
 
 type ToolbarConfig = {
 	alias: string;
@@ -87,7 +87,7 @@ export class UmbPropertyEditorUITinyMceToolbarConfigurationElement
 					this._toolbarConfig.push({
 						alias: t.alias,
 						label: t.label,
-						icon: t.icon ?? 'umb:autofill',
+						icon: t.icon ?? 'icon-autofill',
 						selected: this.value.includes(t.alias),
 					});
 				});
@@ -112,12 +112,13 @@ export class UmbPropertyEditorUITinyMceToolbarConfigurationElement
 		return html`<ul>
 			${map(
 				this._toolbarConfig,
-				(v) => html`<li>
-					<uui-checkbox value=${v.alias} ?checked=${v.selected} @change=${this.onChange}>
-						<uui-icon .svg=${tinyIconSet?.icons[v.icon ?? 'alignjustify']}></uui-icon>
-						${v.label}
-					</uui-checkbox>
-				</li>`
+				(v) =>
+					html`<li>
+						<uui-checkbox label=${v.label} value=${v.alias} ?checked=${v.selected} @change=${this.onChange}>
+							<uui-icon .svg=${tinyIconSet?.icons[v.icon ?? 'alignjustify']}></uui-icon>
+							${v.label}
+						</uui-checkbox>
+					</li>`,
 			)}
 		</ul>`;
 	}

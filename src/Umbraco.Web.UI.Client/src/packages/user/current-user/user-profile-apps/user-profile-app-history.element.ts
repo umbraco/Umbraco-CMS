@@ -27,7 +27,7 @@ export class UmbUserProfileAppHistoryElement extends UmbLitElement {
 		if (this.#currentUserHistoryStore) {
 			this.observe(this.#currentUserHistoryStore.latestHistory, (history) => {
 				this._history = history;
-			});
+			}, 'umbCurrentUserHistoryObserver');
 		}
 	}
 
@@ -45,7 +45,7 @@ export class UmbUserProfileAppHistoryElement extends UmbLitElement {
 	#renderHistoryItem(item: UmbCurrentUserHistoryItem) {
 		return html`
 			<a href=${item.path} class="history-item">
-				<uui-icon name="umb:link"></uui-icon>
+				<uui-icon name="icon-link"></uui-icon>
 				<div>
 					<b>${Array.isArray(item.label) ? item.label[0] : item.label}</b>
 					<span>

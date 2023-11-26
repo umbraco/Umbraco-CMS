@@ -1,28 +1,24 @@
-import { UmbRelationTypeTreeStore, UMB_RELATION_TYPE_TREE_STORE_CONTEXT_TOKEN } from './relation-type.tree.store.js';
+import { UmbRelationTypeTreeStore, UMB_RELATION_TYPE_TREE_STORE_CONTEXT } from '../tree/index.js';
 import { UmbRelationTypeServerDataSource } from './sources/relation-type.server.data.js';
 import { UmbRelationTypeStore, UMB_RELATION_TYPE_STORE_CONTEXT_TOKEN } from './relation-type.store.js';
-import { UmbRelationTypeTreeServerDataSource } from './sources/relation-type.tree.server.data.js';
-import { UmbRelationTypeTreeDataSource } from './sources/index.js';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
+import { UmbBaseController, type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import {
 	CreateRelationTypeRequestModel,
 	RelationTypeResponseModel,
 	UpdateRelationTypeRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
-import { UmbDetailRepository, UmbTreeRepository } from '@umbraco-cms/backoffice/repository';
+import { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
+import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
 export class UmbRelationTypeRepository
+	extends UmbBaseController
 	implements
-		UmbTreeRepository<any>,
-		UmbDetailRepository<CreateRelationTypeRequestModel, any, UpdateRelationTypeRequestModel, RelationTypeResponseModel>
+		UmbDetailRepository<CreateRelationTypeRequestModel, any, UpdateRelationTypeRequestModel, RelationTypeResponseModel>,
+		UmbApi
 {
 	#init!: Promise<unknown>;
 
-	#host: UmbControllerHostElement;
-
-	#treeSource: UmbRelationTypeTreeDataSource;
 	#treeStore?: UmbRelationTypeTreeStore;
 
 	#detailDataSource: UmbRelationTypeServerDataSource;
@@ -30,86 +26,29 @@ export class UmbRelationTypeRepository
 
 	#notificationContext?: UmbNotificationContext;
 
-	constructor(host: UmbControllerHostElement) {
-		this.#host = host;
+	constructor(host: UmbControllerHost) {
+		super(host);
 
 		// TODO: figure out how spin up get the correct data source
-		this.#treeSource = new UmbRelationTypeTreeServerDataSource(this.#host);
-		this.#detailDataSource = new UmbRelationTypeServerDataSource(this.#host);
+		this.#detailDataSource = new UmbRelationTypeServerDataSource(this._host);
 
 		this.#init = Promise.all([
-			new UmbContextConsumerController(this.#host, UMB_RELATION_TYPE_TREE_STORE_CONTEXT_TOKEN, (instance) => {
+			this.consumeContext(UMB_RELATION_TYPE_TREE_STORE_CONTEXT, (instance) => {
 				this.#treeStore = instance;
-			}),
+			}).asPromise(),
 
-			new UmbContextConsumerController(this.#host, UMB_RELATION_TYPE_STORE_CONTEXT_TOKEN, (instance) => {
+			this.consumeContext(UMB_RELATION_TYPE_STORE_CONTEXT_TOKEN, (instance) => {
 				this.#detailStore = instance;
-			}),
+			}).asPromise(),
 
-			new UmbContextConsumerController(this.#host, UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
+			this.consumeContext(UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
 				this.#notificationContext = instance;
-			}),
+			}).asPromise(),
 		]);
 	}
 
 	// TODO: Trash
 	// TODO: Move
-
-	// TREE:
-	async requestTreeRoot() {
-		await this.#init;
-
-		const data = {
-			id: null,
-			type: 'relation-type-root',
-			name: 'Relation Types',
-			icon: 'umb:folder',
-			hasChildren: true,
-		};
-
-		return { data };
-	}
-
-	async requestRootTreeItems() {
-		await this.#init;
-
-		const { data, error } = await this.#treeSource.getRootItems();
-
-		if (data) {
-			this.#treeStore?.appendItems(data.items);
-		}
-
-		return { data, error, asObservable: () => this.#treeStore!.rootItems };
-	}
-
-	//TODO RelationTypes can't have children. But this method is required by the tree interface.
-	async requestTreeItemsOf(parentId: string | null) {
-		return { data: undefined, error: { title: 'Not implemented', message: 'Not implemented' } };
-	}
-
-	async requestItemsLegacy(ids: Array<string>) {
-		if (!ids) throw new Error('Ids are missing');
-		await this.#init;
-
-		const { data, error } = await this.#treeSource.getItems(ids);
-
-		return { data, error, asObservable: () => this.#treeStore!.items(ids) };
-	}
-
-	async rootTreeItems() {
-		await this.#init;
-		return this.#treeStore!.rootItems;
-	}
-
-	async treeItemsOf(parentId: string | null) {
-		await this.#init;
-		return this.#treeStore!.childrenOf(parentId);
-	}
-
-	async itemsLegacy(ids: Array<string>) {
-		await this.#init;
-		return this.#treeStore!.items(ids);
-	}
 
 	// DETAILS:
 
@@ -128,7 +67,7 @@ export class UmbRelationTypeRepository
 			throw new Error('Id is missing');
 		}
 
-		const { data, error } = await this.#detailDataSource.get(id);
+		const { data, error } = await this.#detailDataSource.read(id);
 
 		if (data) {
 			this.#detailStore?.append(data);
@@ -150,7 +89,7 @@ export class UmbRelationTypeRepository
 
 		await this.#init;
 
-		const { error } = await this.#detailDataSource.insert(template);
+		const { error } = await this.#detailDataSource.create(template);
 
 		if (!error) {
 			// TODO: we currently don't use the detail store for anything.
@@ -177,7 +116,6 @@ export class UmbRelationTypeRepository
 			// TODO: we currently don't use the detail store for anything.
 			// Consider to look up the data before fetching from the server
 			// Consider notify a workspace if a template is updated in the store while someone is editing it.
-			// TODO: would be nice to align the stores on methods/methodNames.
 			this.#detailStore?.append(item);
 			this.#treeStore?.updateItem(id, { name: item.name });
 
@@ -201,9 +139,8 @@ export class UmbRelationTypeRepository
 			// TODO: we currently don't use the detail store for anything.
 			// Consider to look up the data before fetching from the server.
 			// Consider notify a workspace if a template is deleted from the store while someone is editing it.
-			// TODO: would be nice to align the stores on methods/methodNames.
 
-			this.#detailStore?.remove([id]);
+			this.#detailStore?.removeItem(id);
 			this.#treeStore?.removeItem(id);
 
 			const notification = { data: { message: `Relation Type deleted` } };

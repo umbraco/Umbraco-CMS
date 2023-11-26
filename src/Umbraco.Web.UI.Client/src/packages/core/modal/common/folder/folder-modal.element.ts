@@ -50,6 +50,7 @@ export class UmbFolderModalElement extends UmbLitElement {
 				if (!repositoryManifest) return;
 
 				try {
+					// TODO: Maybe use the UmbExtensionApiController instead of createExtensionApi, to ensure usage of conditions:
 					const result = await createExtensionApi<UmbFolderRepository>(repositoryManifest, [this]);
 					this.#repository = result;
 					this.#init();

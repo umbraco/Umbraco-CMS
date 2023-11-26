@@ -1,5 +1,5 @@
 import type { MemberTypeDetails } from '../../types.js';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { UmbDataSource } from '@umbraco-cms/backoffice/repository';
 
@@ -10,9 +10,9 @@ import { UmbDataSource } from '@umbraco-cms/backoffice/repository';
  * @implements {MemberTypeDetailDataSource}
  */
 export class UmbMemberTypeDetailServerDataSource implements UmbDataSource<any, any, any, any> {
-	#host: UmbControllerHostElement;
+	#host: UmbControllerHost;
 
-	constructor(host: UmbControllerHostElement) {
+	constructor(host: UmbControllerHost) {
 		this.#host = host;
 	}
 
@@ -22,7 +22,7 @@ export class UmbMemberTypeDetailServerDataSource implements UmbDataSource<any, a
 	 * @return {*}
 	 * @memberof UmbMediaDetailServerDataSource
 	 */
-	async get(id: string) {
+	async read(id: string) {
 		if (!id) {
 			throw new Error('Id is missing');
 		}
@@ -83,7 +83,7 @@ export class UmbMemberTypeDetailServerDataSource implements UmbDataSource<any, a
 				headers: {
 					'Content-Type': 'application/json',
 				},
-			})
+			}),
 		) as any;
 	}
 
@@ -93,7 +93,7 @@ export class UmbMemberTypeDetailServerDataSource implements UmbDataSource<any, a
 	 * @return {*}
 	 * @memberof UmbMemberTypeDetailServerDataSource
 	 */
-	async insert(data: MemberTypeDetails) {
+	async create(data: MemberTypeDetails) {
 		const requestBody = {
 			name: data.name,
 		};
@@ -108,7 +108,7 @@ export class UmbMemberTypeDetailServerDataSource implements UmbDataSource<any, a
 				headers: {
 					'Content-Type': 'application/json',
 				},
-			})
+			}),
 		) as any;
 	}
 
@@ -129,7 +129,7 @@ export class UmbMemberTypeDetailServerDataSource implements UmbDataSource<any, a
 			this.#host,
 			fetch(`/umbraco/management/api/v1/member-type/${id}`, {
 				method: 'DELETE',
-			})
+			}),
 		) as any;
 	}
 }

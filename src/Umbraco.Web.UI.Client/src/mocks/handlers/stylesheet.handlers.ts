@@ -39,8 +39,8 @@ const detailHandlers = [
 		const response = umbStylesheetData.getStylesheet(path);
 		return res(ctx.status(200), ctx.json(response));
 	}),
-	rest.post(umbracoPath('/stylesheet'), (req, res, ctx) => {
-		const requestBody = req.json() as CreateTextFileViewModelBaseModel;
+	rest.post(umbracoPath('/stylesheet'), async (req, res, ctx) => {
+		const requestBody = (await req.json()) as CreateTextFileViewModelBaseModel;
 		if (!requestBody) return res(ctx.status(400, 'no body found'));
 		const response = umbStylesheetData.insertStyleSheet(requestBody);
 		return res(ctx.status(200), ctx.json(response));
@@ -53,7 +53,7 @@ const detailHandlers = [
 		return res(ctx.status(200), ctx.json(response));
 	}),
 	rest.put(umbracoPath('/stylesheet'), async (req, res, ctx) => {
-		const requestBody = await req.json() as UpdateStylesheetRequestModel;
+		const requestBody = (await req.json()) as UpdateStylesheetRequestModel;
 		if (!requestBody) return res(ctx.status(400, 'no body found'));
 		umbStylesheetData.updateData(requestBody);
 		return res(ctx.status(200));
@@ -74,7 +74,6 @@ const detailHandlers = [
 		return res(ctx.status(200), ctx.json(items));
 	}),
 ];
-
 
 const rulesHandlers = [
 	rest.post(umbracoPath('/stylesheet/rich-text/extract-rules'), async (req, res, ctx) => {

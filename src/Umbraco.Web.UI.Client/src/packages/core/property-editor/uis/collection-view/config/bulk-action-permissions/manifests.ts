@@ -4,11 +4,11 @@ export const manifest: ManifestPropertyEditorUi = {
 	type: 'propertyEditorUi',
 	alias: 'Umb.PropertyEditorUi.CollectionView.BulkActionPermissions',
 	name: 'Collection View Bulk Action Permissions Property Editor UI',
-	loader: () => import('./property-editor-ui-collection-view-bulk-action-permissions.element.js'),
+	js: () => import('./property-editor-ui-collection-view-bulk-action-permissions.element.js'),
 	meta: {
 		label: 'Collection View Bulk Action Permissions',
 		propertyEditorSchemaAlias: '',
-		icon: 'umb:autofill',
+		icon: 'icon-autofill',
 		group: 'lists',
 	},
 };

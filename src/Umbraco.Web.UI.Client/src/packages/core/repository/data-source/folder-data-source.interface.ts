@@ -7,8 +7,8 @@ import {
 
 export interface UmbFolderDataSource {
 	createScaffold(parentId: string | null): Promise<DataSourceResponse<FolderResponseModel>>;
-	get(unique: string): Promise<DataSourceResponse<FolderResponseModel>>;
-	insert(data: CreateFolderRequestModel): Promise<DataSourceResponse<string>>;
+	create(data: CreateFolderRequestModel): Promise<DataSourceResponse<string>>;
+	read(unique: string): Promise<DataSourceResponse<FolderResponseModel>>;
 	update(unique: string, data: CreateFolderRequestModel): Promise<DataSourceResponse<UpdateFolderResponseModel>>;
 	delete(unique: string): Promise<DataSourceResponse>;
 }

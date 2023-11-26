@@ -1,4 +1,4 @@
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, nothing, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbRoute, UmbRouterSlotInitEvent, UmbRouterSlotChangeEvent } from '@umbraco-cms/backoffice/router';
 import {
@@ -6,7 +6,7 @@ import {
 	ManifestWorkspaceViewCollection,
 	umbExtensionsRegistry,
 } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbExtensionsManifestController, createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
+import { UmbExtensionsManifestInitializer, createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { componentHasManifestProperty } from '@umbraco-cms/backoffice/utils';
@@ -21,10 +21,10 @@ import { componentHasManifestProperty } from '@umbraco-cms/backoffice/utils';
  * @slot actions - Slot for workspace footer actions
  * @slot default - slot for main content
  * @export
- * @class UmbWorkspaceLayout
+ * @class UmbWorkspaceEditor
  * @extends {UmbLitElement}
  */
-// TODO: This element has a bug in the tabs. After the url changes - for example a new entity/file is chosen in the tree and loaded to the workspace the links in the tabs still point to the previous url and therefore views do not change correctly 
+// TODO: This element has a bug in the tabs. After the url changes - for example a new entity/file is chosen in the tree and loaded to the workspace the links in the tabs still point to the previous url and therefore views do not change correctly
 @customElement('umb-workspace-editor')
 export class UmbWorkspaceEditorElement extends UmbLitElement {
 	@property()
@@ -35,16 +35,6 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 
 	@property({ type: Boolean })
 	public enforceNoFooter = false;
-
-	// TODO: Revisit if we can remove the alias from the workspace-editor. Its not used for anything, as the context now takes care of it.
-	/**
-	 * Alias of the workspace. Currently not used for anything.
-	 * @public
-	 * @type {string | undefined}
-	 * @attr
-	 */
-	@property()
-	public alias?: string;
 
 	@state()
 	private _workspaceViews: Array<ManifestWorkspaceEditorView | ManifestWorkspaceViewCollection> = [];
@@ -60,7 +50,7 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		new UmbExtensionsManifestController(
+		new UmbExtensionsManifestInitializer(
 			this,
 			umbExtensionsRegistry,
 			['workspaceEditorView', 'workspaceViewCollection'],
@@ -68,7 +58,7 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 			(workspaceViews) => {
 				this._workspaceViews = workspaceViews.map((view) => view.manifest);
 				this._createRoutes();
-			}
+			},
 		);
 	}
 
@@ -142,7 +132,7 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 										<uui-icon slot="icon" name="${view.meta.icon}"></uui-icon>
 										${view.meta.label || view.name}
 									</uui-tab>
-								`
+								`,
 							)}
 						</uui-tab-group>
 				  `

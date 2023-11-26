@@ -1,4 +1,4 @@
-import { MEDIA_REPOSITORY_ALIAS } from '../repository/manifests.js';
+import { UMB_MEDIA_REPOSITORY_ALIAS } from '../repository/manifests.js';
 import { UmbMediaMoveEntityBulkAction } from './move/move.action.js';
 import { UmbMediaCopyEntityBulkAction } from './copy/copy.action.js';
 import { UmbMediaTrashEntityBulkAction } from './trash/trash.action.js';
@@ -15,12 +15,14 @@ const entityActions: Array<ManifestEntityBulkAction> = [
 		api: UmbMediaMoveEntityBulkAction,
 		meta: {
 			label: 'Move',
-			repositoryAlias: MEDIA_REPOSITORY_ALIAS,
+			repositoryAlias: UMB_MEDIA_REPOSITORY_ALIAS,
 		},
-		conditions: [{
-			alias: 'Umb.Condition.CollectionEntityType',
-			match: entityType,
-		}],
+		conditions: [
+			{
+				alias: 'Umb.Condition.CollectionEntityType',
+				match: entityType,
+			},
+		],
 	},
 	{
 		type: 'entityBulkAction',
@@ -30,12 +32,14 @@ const entityActions: Array<ManifestEntityBulkAction> = [
 		api: UmbMediaCopyEntityBulkAction,
 		meta: {
 			label: 'Copy',
-			repositoryAlias: MEDIA_REPOSITORY_ALIAS,
+			repositoryAlias: UMB_MEDIA_REPOSITORY_ALIAS,
 		},
-		conditions: [{
-			alias: 'Umb.Condition.CollectionEntityType',
-			match: entityType,
-		}],
+		conditions: [
+			{
+				alias: 'Umb.Condition.CollectionEntityType',
+				match: entityType,
+			},
+		],
 	},
 	{
 		type: 'entityBulkAction',
@@ -45,12 +49,14 @@ const entityActions: Array<ManifestEntityBulkAction> = [
 		api: UmbMediaTrashEntityBulkAction,
 		meta: {
 			label: 'Trash',
-			repositoryAlias: MEDIA_REPOSITORY_ALIAS,
+			repositoryAlias: UMB_MEDIA_REPOSITORY_ALIAS,
 		},
-		conditions: [{
-			alias: 'Umb.Condition.CollectionEntityType',
-			match: entityType,
-		}],
+		conditions: [
+			{
+				alias: 'Umb.Condition.CollectionEntityType',
+				match: entityType,
+			},
+		],
 	},
 ];
 

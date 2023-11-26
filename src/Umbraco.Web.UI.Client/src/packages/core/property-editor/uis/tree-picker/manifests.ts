@@ -5,17 +5,17 @@ const manifest: ManifestPropertyEditorUi = {
 	type: 'propertyEditorUi',
 	alias: 'Umb.PropertyEditorUi.TreePicker',
 	name: 'Tree Picker Property Editor UI',
-	loader: () => import('./property-editor-ui-tree-picker.element.js'),
+	js: () => import('./property-editor-ui-tree-picker.element.js'),
 	meta: {
 		label: 'Tree Picker',
-		icon: 'umb:page-add',
+		icon: 'icon-page-add',
 		group: 'pickers',
 		propertyEditorSchemaAlias: 'Umbraco.MultiNodeTreePicker',
 		settings: {
 			properties: [
 				{
 					alias: 'startNode',
-					label: 'Start node',
+					label: 'Node type',
 					description: '',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.TreePicker.StartNode',
 				},

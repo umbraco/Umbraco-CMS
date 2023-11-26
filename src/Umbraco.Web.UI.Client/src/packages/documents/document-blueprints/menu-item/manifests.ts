@@ -7,7 +7,7 @@ const menuItem: ManifestMenuItem = {
 	weight: 100,
 	meta: {
 		label: 'Document Blueprints',
-		icon: 'umb:blueprint',
+		icon: 'icon-blueprint',
 		entityType: 'document-blueprint-root',
 		menus: ['Umb.Menu.Settings'],
 	},

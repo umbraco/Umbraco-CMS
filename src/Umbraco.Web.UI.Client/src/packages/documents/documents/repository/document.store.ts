@@ -8,7 +8,7 @@ import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api
  * @export
  * @class UmbDocumentDetailStore
  * @extends {UmbStoreBase}
- * @description - Data Store for Template Details
+ * @description - Data Store for Document Details
  */
 export class UmbDocumentStore extends UmbStoreBase {
 	/**

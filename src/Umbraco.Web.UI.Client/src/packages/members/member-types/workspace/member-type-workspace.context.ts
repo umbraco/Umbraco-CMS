@@ -1,14 +1,17 @@
 import { UmbMemberTypeRepository } from '../repository/member-type.repository.js';
-import { UmbSaveableWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
+import {
+	type UmbSaveableWorkspaceContextInterface,
+	UmbEditableWorkspaceContextBase,
+} from '@umbraco-cms/backoffice/workspace';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 // TODO => use correct tpye
 type EntityType = any;
 
 export class UmbMemberTypeWorkspaceContext
-	extends UmbWorkspaceContext<UmbMemberTypeRepository, EntityType>
+	extends UmbEditableWorkspaceContextBase<UmbMemberTypeRepository, EntityType>
 	implements UmbSaveableWorkspaceContextInterface<EntityType | undefined>
 {
 	#data = new UmbObjectState<EntityType | undefined>(undefined);
@@ -71,11 +74,15 @@ export class UmbMemberTypeWorkspaceContext
 	}
 
 	public destroy(): void {
-		this.#data.complete();
+		this.#data.destroy();
 	}
 }
 
-export const UMB_MEMBER_TYPE_WORKSPACE_CONTEXT = new UmbContextToken<UmbSaveableWorkspaceContextInterface, UmbMemberTypeWorkspaceContext>(
+export const UMB_MEMBER_TYPE_WORKSPACE_CONTEXT = new UmbContextToken<
+	UmbSaveableWorkspaceContextInterface,
+	UmbMemberTypeWorkspaceContext
+>(
 	'UmbWorkspaceContext',
-	(context): context is UmbMemberTypeWorkspaceContext => context.getEntityType?.() === 'member-type'
+	undefined,
+	(context): context is UmbMemberTypeWorkspaceContext => context.getEntityType?.() === 'member-type',
 );

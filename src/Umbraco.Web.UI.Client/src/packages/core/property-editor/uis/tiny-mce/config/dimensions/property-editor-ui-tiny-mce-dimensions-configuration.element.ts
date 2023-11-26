@@ -1,4 +1,4 @@
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { customElement, html, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
@@ -11,8 +11,18 @@ export class UmbPropertyEditorUITinyMceDimensionsConfigurationElement extends Um
 	value: { width?: number; height?: number } = {};
 
 	render() {
-		return html`<uui-input type="number" placeholder="Width" .value=${this.value.width}></uui-input> x
-			<uui-input type="number" placeholder="Height" .value=${this.value.height}></uui-input> pixels`;
+		return html`<uui-input
+				type="number"
+				label=${this.localize.term('general_width')}
+				placeholder=${this.localize.term('general_width')}
+				.value=${this.value?.width}></uui-input>
+			x
+			<uui-input
+				type="number"
+				label=${this.localize.term('general_height')}
+				placeholder=${this.localize.term('general_height')}
+				.value=${this.value?.height}></uui-input>
+			pixels`;
 	}
 
 	static styles = [UmbTextStyles];

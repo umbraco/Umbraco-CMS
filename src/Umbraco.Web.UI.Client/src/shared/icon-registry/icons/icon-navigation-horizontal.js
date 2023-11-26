@@ -1,1 +1,14 @@
-export default `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M475.189 255.305l-89.517-73.889v48.204h-261.62v-48.204l-89.519 73.885 89.519 73.89v-48.209h261.62v48.209z"/></svg>`;
+export default `<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="1.75"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <polyline points="18 8 22 12 18 16" />
+  <polyline points="6 8 2 12 6 16" />
+  <line x1="2" x2="22" y1="12" y2="12" />
+</svg>
+`;

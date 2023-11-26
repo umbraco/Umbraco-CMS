@@ -10,7 +10,7 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 	private _mediaItems?: Array<EntityTreeItemResponseModel>;
 
 	@state()
-	private _selection: Array<string> = [];
+	private _selection: Array<string | null> = [];
 
 	private _collectionContext?: UmbCollectionContext<EntityTreeItemResponseModel, any>;
 

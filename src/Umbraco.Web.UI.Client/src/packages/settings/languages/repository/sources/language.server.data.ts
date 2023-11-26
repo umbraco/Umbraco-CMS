@@ -3,7 +3,7 @@ import {
 	LanguageResponseModel,
 	CreateLanguageRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import type { UmbDataSource } from '@umbraco-cms/backoffice/repository';
 
@@ -16,14 +16,14 @@ import type { UmbDataSource } from '@umbraco-cms/backoffice/repository';
 export class UmbLanguageServerDataSource
 	implements UmbDataSource<CreateLanguageRequestModel, any, any, LanguageResponseModel>
 {
-	#host: UmbControllerHostElement;
+	#host: UmbControllerHost;
 
 	/**
 	 * Creates an instance of UmbLanguageServerDataSource.
-	 * @param {UmbControllerHostElement} host
+	 * @param {UmbControllerHost} host
 	 * @memberof UmbLanguageServerDataSource
 	 */
-	constructor(host: UmbControllerHostElement) {
+	constructor(host: UmbControllerHost) {
 		this.#host = host;
 	}
 
@@ -33,13 +33,13 @@ export class UmbLanguageServerDataSource
 	 * @return {*}
 	 * @memberof UmbLanguageServerDataSource
 	 */
-	async get(isoCode: string) {
+	async read(isoCode: string) {
 		if (!isoCode) throw new Error('Iso Code is missing');
 		return tryExecuteAndNotify(
 			this.#host,
 			LanguageResource.getLanguageByIsoCode({
 				isoCode,
-			})
+			}),
 		);
 	}
 
@@ -66,7 +66,7 @@ export class UmbLanguageServerDataSource
 	 * @return {*}
 	 * @memberof UmbLanguageServerDataSource
 	 */
-	async insert(language: CreateLanguageRequestModel) {
+	async create(language: CreateLanguageRequestModel) {
 		if (!language.isoCode) {
 			throw new Error('Language iso code is missing');
 		}
@@ -87,7 +87,7 @@ export class UmbLanguageServerDataSource
 
 		return tryExecuteAndNotify(
 			this.#host,
-			LanguageResource.putLanguageByIsoCode({ isoCode: language.isoCode, requestBody: language })
+			LanguageResource.putLanguageByIsoCode({ isoCode: language.isoCode, requestBody: language }),
 		);
 	}
 

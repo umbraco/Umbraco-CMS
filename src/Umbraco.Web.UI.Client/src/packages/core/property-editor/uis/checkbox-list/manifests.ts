@@ -4,11 +4,11 @@ export const manifest: ManifestPropertyEditorUi = {
 	type: 'propertyEditorUi',
 	alias: 'Umb.PropertyEditorUi.CheckboxList',
 	name: 'Checkbox List Property Editor UI',
-	loader: () => import('./property-editor-ui-checkbox-list.element.js'),
+	js: () => import('./property-editor-ui-checkbox-list.element.js'),
 	meta: {
 		label: 'Checkbox List',
 		propertyEditorSchemaAlias: 'Umbraco.CheckboxList',
-		icon: 'umb:bulleted-list',
+		icon: 'icon-bulleted-list',
 		group: 'lists',
 		settings: {
 			properties: [

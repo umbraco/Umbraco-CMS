@@ -10,10 +10,10 @@ import { setCustomElements } from '@storybook/web-components';
 import { startMockServiceWorker } from '../src/mocks';
 
 import { UMB_MODAL_MANAGER_CONTEXT_TOKEN, UmbModalManagerContext } from '../src/packages/core/modal';
-import { UmbDataTypeStore } from '../src/packages/settings/data-types/repository/data-type.store.ts';
-import { UmbDocumentStore } from '../src/packages/documents/documents/repository/document.store.ts';
-import { UmbDocumentTreeStore } from '../src/packages/documents/documents/repository/document.tree.store.ts';
-import { UmbDocumentTypeStore } from '../src/packages/documents/document-types/repository/document-type.store.ts';
+import { UmbDataTypeTreeStore } from '../src/packages/core/data-type/tree/data-type.tree.store';
+import { UmbDocumentStore } from '../src/packages/documents/documents/repository/document.store';
+import { UmbDocumentTreeStore } from '../src/packages/documents/documents/repository/document.tree.store';
+import { UmbDocumentTypeDetailStore } from '../src/packages/documents/document-types/repository/detail/document-type-detail.store';
 import { umbExtensionsRegistry } from '../src/packages/core/extension-registry';
 import { UmbIconRegistry } from '../src/shared/icon-registry/icon.registry';
 import { UmbLitElement } from '../src/shared/lit-element';
@@ -21,7 +21,6 @@ import { umbLocalizationRegistry } from '../src/packages/core/localization';
 import customElementManifests from '../dist-cms/custom-elements.json';
 
 import '../src/libs/context-api/provide/context-provider.element';
-import '../src/libs/controller-api/controller-host-initializer.element.ts';
 import '../src/packages/core/components';
 
 import { manifests as documentManifests } from '../src/packages/documents';
@@ -61,26 +60,26 @@ customElements.define('umb-storybook', UmbStoryBookElement);
 const storybookProvider = (story) => html` <umb-storybook>${story()}</umb-storybook> `;
 
 const dataTypeStoreProvider = (story) => html`
-	<umb-controller-host-initializer .create=${(host) => new UmbDataTypeStore(host)}
-		>${story()}</umb-controller-host-initializer
+	<umb-controller-host-provider .create=${(host) => new UmbDataTypeTreeStore(host)}
+		>${story()}</umb-controller-host-provider
 	>
 `;
 
 const documentTypeStoreProvider = (story) => html`
-	<umb-controller-host-initializer .create=${(host) => new UmbDocumentTypeStore(host)}
-		>${story()}</umb-controller-host-initializer
+	<umb-controller-host-provider .create=${(host) => new UmbDocumentTypeStore(host)}
+		>${story()}</umb-controller-host-provider
 	>
 `;
 
 const documentStoreProvider = (story) => html`
-	<umb-controller-host-initializer .create=${(host) => new UmbDocumentStore(host)}
-		>${story()}</umb-controller-host-initializer
+	<umb-controller-host-provider .create=${(host) => new UmbDocumentStore(host)}
+		>${story()}</umb-controller-host-provider
 	>
 `;
 
 const documentTreeStoreProvider = (story) => html`
-	<umb-controller-host-initializer .create=${(host) => new UmbDocumentTreeStore(host)}
-		>${story()}</umb-controller-host-initializer
+	<umb-controller-host-provider .create=${(host) => new UmbDocumentTreeStore(host)}
+		>${story()}</umb-controller-host-provider
 	>
 `;
 

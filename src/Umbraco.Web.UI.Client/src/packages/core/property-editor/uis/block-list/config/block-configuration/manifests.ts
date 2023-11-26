@@ -4,11 +4,11 @@ export const manifest: ManifestPropertyEditorUi = {
 	type: 'propertyEditorUi',
 	alias: 'Umb.PropertyEditorUi.BlockList.BlockConfiguration',
 	name: 'Block List Block Configuration Property Editor UI',
-	loader: () => import('./property-editor-ui-block-list-block-configuration.element.js'),
+	js: () => import('./property-editor-ui-block-list-block-configuration.element.js'),
 	meta: {
 		label: 'Block List Block Configuration',
 		propertyEditorSchemaAlias: '',
-		icon: 'umb:autofill',
+		icon: 'icon-autofill',
 		group: 'common',
 	},
 };

@@ -4,10 +4,10 @@ export const manifest: ManifestPropertyEditorUi = {
 	type: 'propertyEditorUi',
 	alias: 'Umb.PropertyEditorUi.ValueType',
 	name: 'Value Type Property Editor UI',
-	loader: () => import('./property-editor-ui-value-type.element.js'),
+	js: () => import('./property-editor-ui-value-type.element.js'),
 	meta: {
 		label: 'Value Type',
-		icon: 'umb:autofill',
+		icon: 'icon-autofill',
 		group: 'common',
 	},
 };

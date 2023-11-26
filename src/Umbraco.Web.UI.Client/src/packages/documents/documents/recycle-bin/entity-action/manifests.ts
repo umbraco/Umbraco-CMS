@@ -1,5 +1,5 @@
-import { DOCUMENT_ENTITY_TYPE } from '../../index.js';
-import { DOCUMENT_REPOSITORY_ALIAS } from '../../repository/manifests.js';
+import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
+import { UMB_DOCUMENT_REPOSITORY_ALIAS } from '../../repository/index.js';
 import { UmbTrashEntityAction } from '@umbraco-cms/backoffice/entity-action';
 
 export const manifests = [
@@ -10,10 +10,10 @@ export const manifests = [
 		weight: 900,
 		api: UmbTrashEntityAction,
 		meta: {
-			icon: 'umb:trash',
+			icon: 'icon-trash',
 			label: 'Trash',
-			repositoryAlias: DOCUMENT_REPOSITORY_ALIAS,
-			entityTypes: [DOCUMENT_ENTITY_TYPE],
+			repositoryAlias: UMB_DOCUMENT_REPOSITORY_ALIAS,
+			entityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		},
 		conditions: [
 			{

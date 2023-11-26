@@ -5,11 +5,11 @@ const manifest: ManifestPropertyEditorUi = {
 	type: 'propertyEditorUi',
 	alias: 'Umb.PropertyEditorUi.TinyMCE',
 	name: 'Rich Text Editor Property Editor UI',
-	loader: () => import('./property-editor-ui-tiny-mce.element.js'),
+	js: () => import('./property-editor-ui-tiny-mce.element.js'),
 	meta: {
 		label: 'Rich Text Editor',
-		propertyEditorSchemaAlias: 'Umbraco.TinyMCE',
-		icon: 'umb:browser-window',
+		propertyEditorSchemaAlias: 'Umbraco.RichText',
+		icon: 'icon-browser-window',
 		group: 'richText',
 		settings: {
 			properties: [

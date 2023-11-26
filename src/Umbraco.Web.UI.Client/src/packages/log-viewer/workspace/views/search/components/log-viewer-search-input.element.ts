@@ -170,10 +170,10 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 					${this._inputQuery
 						? html`${!this._isQuerySaved
 									? html`<uui-button compact slot="append" label="Save search" @click=${this.#openSaveSearchDialog}
-											><uui-icon name="umb:favorite"></uui-icon
+											><uui-icon name="icon-favorite"></uui-icon
 									  ></uui-button>`
 									: ''}<uui-button compact slot="append" label="Clear" @click=${this.#clearQuery}
-									><uui-icon name="umb:delete"></uui-icon
+									><uui-icon name="icon-delete"></uui-icon
 								></uui-button>`
 						: html``}
 					<uui-button
@@ -200,7 +200,7 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 									label="Remove saved search"
 									color="danger"
 									@click=${() => this.#removeSearch(search.name ?? '')}
-									><uui-icon name="umb:trash"></uui-icon
+									><uui-icon name="icon-trash"></uui-icon
 								></uui-button>
 							</li>`
 					)}

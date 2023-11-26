@@ -4,9 +4,9 @@
 /* eslint-disable */
 
 import type { ContentTypeCleanupModel } from './ContentTypeCleanupModel';
-import type { UpdateContentTypeRequestModelBaseUpdateDocumentTypePropertyTypeRequestModelUpdateDocumentTypePropertyTypeContainerRequestModel } from './UpdateContentTypeRequestModelBaseUpdateDocumentTypePropertyTypeRequestModelUpdateDocumentTypePropertyTypeContainerRequestModel';
+import type { UpdateContentTypeForDocumentTypeRequestModel } from './UpdateContentTypeForDocumentTypeRequestModel';
 
-export type UpdateDocumentTypeRequestModel = (UpdateContentTypeRequestModelBaseUpdateDocumentTypePropertyTypeRequestModelUpdateDocumentTypePropertyTypeContainerRequestModel & {
+export type UpdateDocumentTypeRequestModel = (UpdateContentTypeForDocumentTypeRequestModel & {
     allowedTemplateIds?: Array<string>;
     defaultTemplateId?: string | null;
     cleanup?: ContentTypeCleanupModel;

@@ -1,16 +1,10 @@
-import type { HTMLElementConstructor } from '../extension-api/types.js';
 import type { UmbControllerAlias } from './controller-alias.type.js';
 import { UmbControllerHostBaseMixin } from './controller-host-base.mixin.js';
 import type { UmbControllerHost } from './controller-host.interface.js';
 import type { UmbController } from './controller.interface.js';
-import type { UmbLocalizeController } from '@umbraco-cms/backoffice/localization-api';
+import { HTMLElementConstructor } from '@umbraco-cms/backoffice/extension-api';
 
 export declare class UmbControllerHostElement extends HTMLElement implements UmbControllerHost {
-	/**
-	 * Use the UmbLocalizeController to localize your element.
-	 * @see UmbLocalizeController
-	 */
-	localize: UmbLocalizeController;
 	hasController(controller: UmbController): boolean;
 	getControllers(filterMethod: (ctrl: UmbController) => boolean): UmbController[];
 	addController(controller: UmbController): void;

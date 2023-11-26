@@ -13,12 +13,12 @@ type Story = StoryObj<UmbTooltipMenuElement>;
 const items: Array<TooltipMenuItem> = [
 	{
 		label: 'Item 1',
-		icon: 'umb:document',
+		icon: 'icon-document',
 		action: () => alert('Item 1 clicked'),
 	},
 	{
 		label: 'Item 2',
-		icon: 'umb:home',
+		icon: 'icon-home',
 		action: () => alert('Item 2 clicked'),
 	},
 ];

@@ -10,16 +10,13 @@ import { manifests as modalManifests } from './modal/common/manifests.js';
 import { manifests as themeManifests } from './themes/manifests.js';
 import { manifests as conditionManifests } from './extension-registry/conditions/manifests.js';
 import { manifests as cultureManifests } from './culture/manifests.js';
+import { manifests as dataTypeManifests } from './data-type/manifests.js';
 
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 import { UmbModalManagerContext, UMB_MODAL_MANAGER_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
 import { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
-import type { UmbEntryPointOnInit } from '@umbraco-cms/backoffice/extension-api';
-import {
-	ManifestTypes,
-	UmbBackofficeManifestKind,
-	UmbMultiExtensionsApiInitializer,
-} from '@umbraco-cms/backoffice/extension-registry';
+import { UmbExtensionsApiInitializer, type UmbEntryPointOnInit } from '@umbraco-cms/backoffice/extension-api';
+import type { ManifestTypes, UmbBackofficeManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 export * from './localization/index.js';
 export * from './action/index.js';
@@ -44,6 +41,7 @@ export * from './tree/index.js';
 export * from './variant/index.js';
 export * from './workspace/index.js';
 export * from './culture/index.js';
+export * from './temporary-file/index.js';
 
 const manifests: Array<ManifestTypes | UmbBackofficeManifestKind> = [
 	...conditionManifests,
@@ -57,12 +55,14 @@ const manifests: Array<ManifestTypes | UmbBackofficeManifestKind> = [
 	...modalManifests,
 	...themeManifests,
 	...cultureManifests,
+	...dataTypeManifests,
 ];
 
 export const onInit: UmbEntryPointOnInit = (host, extensionRegistry) => {
-
-	// TODO: replace this with a Extension Controller:
-	new UmbMultiExtensionsApiInitializer(host, ['globalContext', 'store', 'treeStore', 'itemStore']);
+	new UmbExtensionsApiInitializer(host, extensionRegistry, 'globalContext', [host]);
+	new UmbExtensionsApiInitializer(host, extensionRegistry, 'store', [host]);
+	new UmbExtensionsApiInitializer(host, extensionRegistry, 'treeStore', [host]);
+	new UmbExtensionsApiInitializer(host, extensionRegistry, 'itemStore', [host]);
 
 	extensionRegistry.registerMany(manifests);
 

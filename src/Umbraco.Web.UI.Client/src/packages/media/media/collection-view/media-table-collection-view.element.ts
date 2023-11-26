@@ -1,5 +1,5 @@
-import type { MediaDetails } from '../index.js';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import type { UmbMediaDetailModel } from '../index.js';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import type {
 	UmbTableColumn,
@@ -36,9 +36,9 @@ export class UmbMediaTableCollectionViewElement extends UmbLitElement {
 	private _tableItems: Array<UmbTableItem> = [];
 
 	@state()
-	private _selection: Array<string> = [];
+	private _selection: Array<string | null> = [];
 
-	private _collectionContext?: UmbCollectionContext<MediaDetails, any>;
+	private _collectionContext?: UmbCollectionContext<UmbMediaDetailModel, any>;
 
 	constructor() {
 		super();

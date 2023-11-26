@@ -4,6 +4,7 @@ import {
 	DocumentTypeTreeItemResponseModel,
 	DocumentTypeResponseModel,
 	ContentTypeCompositionTypeModel,
+	DocumentTypeItemResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 
 export const data: Array<DocumentTypeResponseModel> = [
@@ -14,7 +15,7 @@ export const data: Array<DocumentTypeResponseModel> = [
 		alias: 'blogPost',
 		name: 'All property editors document type',
 		description: null,
-		icon: 'umb:item-arrangement',
+		icon: 'icon-item-arrangement',
 		allowedAsRoot: true,
 		variesByCulture: true,
 		variesBySegment: false,
@@ -608,6 +609,56 @@ export const data: Array<DocumentTypeResponseModel> = [
 			keepLatestVersionPerDayForDays: null,
 		},
 	},
+	{
+		allowedTemplateIds: [],
+		defaultTemplateId: null,
+		id: 'simple-document-type-id',
+		alias: 'blogPost',
+		name: 'All property editors document type',
+		description: null,
+		icon: 'umb:item-arrangement',
+		allowedAsRoot: true,
+		variesByCulture: true,
+		variesBySegment: false,
+		isElement: false,
+		properties: [
+			{
+				id: '6',
+				containerId: 'all-properties-group-key',
+				alias: 'multiNodeTreePicker',
+				name: 'Multi Node Tree Picker',
+				description: '',
+				dataTypeId: 'dt-multiNodeTreePicker',
+				variesByCulture: false,
+				variesBySegment: false,
+				validation: {
+					mandatory: true,
+					mandatoryMessage: null,
+					regEx: null,
+					regExMessage: null,
+				},
+				appearance: {
+					labelOnTop: false,
+				},
+			},
+		],
+		containers: [
+			{
+				id: 'all-properties-group-key',
+				parentId: null,
+				name: 'Content',
+				type: 'Group',
+				sortOrder: 0,
+			},
+		],
+		allowedContentTypes: [],
+		compositions: [],
+		cleanup: {
+			preventCleanup: false,
+			keepAllVersionsNewerThanDays: null,
+			keepLatestVersionPerDayForDays: null,
+		},
+	},
 
 	{
 		allowedTemplateIds: [],
@@ -616,7 +667,7 @@ export const data: Array<DocumentTypeResponseModel> = [
 		alias: 'blogPost',
 		name: 'Page Document Type',
 		description: null,
-		icon: 'umb:document',
+		icon: 'icon-document',
 		allowedAsRoot: true,
 		variesByCulture: true,
 		variesBySegment: false,
@@ -777,7 +828,7 @@ export const data: Array<DocumentTypeResponseModel> = [
 		alias: 'masterPage',
 		name: 'Master Page',
 		description: null,
-		icon: 'umb:document',
+		icon: 'icon-document',
 		allowedAsRoot: false,
 		variesByCulture: false,
 		variesBySegment: false,
@@ -827,7 +878,7 @@ export const data: Array<DocumentTypeResponseModel> = [
 		alias: 'baseElementType',
 		name: 'Base Element Type',
 		description: null,
-		icon: 'umb:science',
+		icon: 'icon-science',
 		allowedAsRoot: false,
 		variesByCulture: false,
 		variesBySegment: false,
@@ -881,7 +932,7 @@ export const data: Array<DocumentTypeResponseModel> = [
 		alias: 'simpleDocumentType',
 		name: 'Simple Document Type',
 		description: null,
-		icon: 'umb:document',
+		icon: 'icon-document',
 		allowedAsRoot: true,
 		variesByCulture: false,
 		variesBySegment: false,
@@ -934,7 +985,7 @@ export const data: Array<DocumentTypeResponseModel> = [
 		alias: 'simpleDocumentType2',
 		name: 'Simple Document Type 2',
 		description: null,
-		icon: 'umb:document',
+		icon: 'icon-document',
 		allowedAsRoot: true,
 		variesByCulture: false,
 		variesBySegment: false,
@@ -1009,13 +1060,22 @@ export const treeData: Array<DocumentTypeTreeItemResponseModel> = [
 		icon: '',
 	},
 	{
+		name: 'Simple document type',
+		type: 'document-type',
+		hasChildren: false,
+		id: 'simple-document-type-id',
+		isContainer: false,
+		parentId: null,
+		icon: '',
+	},
+	{
 		name: 'Page Document Type',
 		type: 'document-type',
 		hasChildren: false,
 		id: '29643452-cff9-47f2-98cd-7de4b6807681',
 		isContainer: false,
 		parentId: null,
-		icon: 'umb:document',
+		icon: 'icon-document',
 	},
 	{
 		name: 'Page Document Type Compositional',
@@ -1024,7 +1084,7 @@ export const treeData: Array<DocumentTypeTreeItemResponseModel> = [
 		id: '5035d7d9-0a63-415c-9e75-ee2cf931db92',
 		isContainer: false,
 		parentId: null,
-		icon: 'umb:document',
+		icon: 'icon-document',
 	},
 	{
 		name: 'Page Document Type Inherited',
@@ -1033,7 +1093,7 @@ export const treeData: Array<DocumentTypeTreeItemResponseModel> = [
 		id: '8f68ba66-6fb2-4778-83b8-6ab4ca3a7c5d',
 		isContainer: false,
 		parentId: null,
-		icon: 'umb:document',
+		icon: 'icon-document',
 	},
 	{
 		name: 'Simple Document Type',
@@ -1042,7 +1102,7 @@ export const treeData: Array<DocumentTypeTreeItemResponseModel> = [
 		id: 'simple-document-type-key',
 		isContainer: false,
 		parentId: null,
-		icon: 'umb:document',
+		icon: 'icon-document',
 	},
 	{
 		name: 'Simple Document Type 2',
@@ -1051,7 +1111,7 @@ export const treeData: Array<DocumentTypeTreeItemResponseModel> = [
 		id: 'simple-document-type-2-key',
 		isContainer: false,
 		parentId: null,
-		icon: 'umb:document',
+		icon: 'icon-document',
 	},
 ];
 
@@ -1107,6 +1167,20 @@ class UmbDocumentTypeData extends UmbEntityData<DocumentTypeResponseModel> {
 		const items = this.treeData.filter((item) => allowedTypeKeys.includes(item.id ?? ''));
 		return items.map((item) => item);
 	}
+
+	getItems(ids: Array<string>): Array<DocumentTypeItemResponseModel> {
+		const items = this.data.filter((item) => ids.includes(item.id ?? ''));
+		return items.map((item) => createDocumentTypeItem(item));
+	}
 }
+
+const createDocumentTypeItem = (item: DocumentTypeResponseModel): DocumentTypeItemResponseModel => {
+	return {
+		id: item.id,
+		name: item.name,
+		isElement: item.isElement,
+		icon: item.icon,
+	};
+};
 
 export const umbDocumentTypeData = new UmbDocumentTypeData();

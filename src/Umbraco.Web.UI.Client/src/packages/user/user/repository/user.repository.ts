@@ -1,129 +1,73 @@
-import {
-	UmbUserCollectionFilterModel,
-	UmbUserDetail,
-	UmbUserDetailDataSource,
-	UmbUserDetailRepository,
-	UmbUserSetGroupDataSource,
-} from '../types.js';
+import { UmbTemporaryFileRepository } from '@umbraco-cms/backoffice/temporary-file';
+import { UmbUserDetailDataSource, UmbUserSetGroupDataSource } from '../types.js';
+import { UmbUserServerDataSource } from './sources/user.server.data-source.js';
+import { UmbUserSetGroupsServerDataSource } from './sources/user-set-group.server.data-source.js';
 
-import { UMB_USER_STORE_CONTEXT_TOKEN, UmbUserStore } from './user.store.js';
-import { UmbUserServerDataSource } from './sources/user.server.data.js';
-import { UmbUserCollectionServerDataSource } from './sources/user-collection.server.data.js';
-import { UmbUserItemServerDataSource } from './sources/user-item.server.data.js';
-import { UMB_USER_ITEM_STORE_CONTEXT_TOKEN, UmbUserItemStore } from './user-item.store.js';
-import { UmbUserSetGroupsServerDataSource } from './sources/user-set-group.server.data.js';
-import { UmbUserEnableServerDataSource } from './sources/user-enable.server.data.js';
-import { UmbUserDisableServerDataSource } from './sources/user-disable.server.data.js';
-import { UmbUserUnlockServerDataSource } from './sources/user-unlock.server.data.js';
-
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import {
-	UmbCollectionDataSource,
-	UmbCollectionRepository,
-	UmbItemDataSource,
-	UmbItemRepository,
-} from '@umbraco-cms/backoffice/repository';
+import { UmbUserRepositoryBase } from './user-repository-base.js';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbDataSourceErrorResponse, UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
 import {
 	CreateUserRequestModel,
-	InviteUserRequestModel,
+	CreateUserResponseModel,
 	UpdateUserRequestModel,
-	UserItemResponseModel,
+	UserResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
-import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
-import { UMB_NOTIFICATION_CONTEXT_TOKEN, UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
+import { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
+import { UmbId } from '@umbraco-cms/backoffice/id';
 
-export class UmbUserRepository
-	implements UmbUserDetailRepository, UmbCollectionRepository, UmbItemRepository<UserItemResponseModel>
-{
-	#host: UmbControllerHostElement;
-	#init;
+export interface IUmbUserDetailRepository
+	extends UmbDetailRepository<
+		CreateUserRequestModel,
+		CreateUserResponseModel,
+		UpdateUserRequestModel,
+		UserResponseModel
+	> {
+	uploadAvatar(id: string, file: File): Promise<UmbDataSourceErrorResponse>;
+	deleteAvatar(id: string): Promise<UmbDataSourceErrorResponse>;
+}
 
+export class UmbUserRepository extends UmbUserRepositoryBase implements IUmbUserDetailRepository {
 	#detailSource: UmbUserDetailDataSource;
-	#detailStore?: UmbUserStore;
-	#itemSource: UmbItemDataSource<UserItemResponseModel>;
-	#itemStore?: UmbUserItemStore;
 	#setUserGroupsSource: UmbUserSetGroupDataSource;
-
-	//ACTIONS
-	#enableSource: UmbUserEnableServerDataSource;
-	#disableSource: UmbUserDisableServerDataSource;
-	#unlockSource: UmbUserUnlockServerDataSource;
-
-	#collectionSource: UmbCollectionDataSource<UmbUserDetail>;
-
 	#notificationContext?: UmbNotificationContext;
+	#temporaryFileRepository: UmbTemporaryFileRepository;
 
-	constructor(host: UmbControllerHostElement) {
-		this.#host = host;
+	constructor(host: UmbControllerHost) {
+		super(host);
 
-		this.#detailSource = new UmbUserServerDataSource(this.#host);
-		this.#collectionSource = new UmbUserCollectionServerDataSource(this.#host);
-		this.#enableSource = new UmbUserEnableServerDataSource(this.#host);
-		this.#disableSource = new UmbUserDisableServerDataSource(this.#host);
-		this.#unlockSource = new UmbUserUnlockServerDataSource(this.#host);
-		this.#itemSource = new UmbUserItemServerDataSource(this.#host);
-		this.#setUserGroupsSource = new UmbUserSetGroupsServerDataSource(this.#host);
-
-		this.#init = Promise.all([
-			new UmbContextConsumerController(this.#host, UMB_USER_STORE_CONTEXT_TOKEN, (instance) => {
-				this.#detailStore = instance;
-			}).asPromise(),
-
-			new UmbContextConsumerController(this.#host, UMB_USER_ITEM_STORE_CONTEXT_TOKEN, (instance) => {
-				this.#itemStore = instance;
-			}).asPromise(),
-
-			new UmbContextConsumerController(this.#host, UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
-				this.#notificationContext = instance;
-			}).asPromise(),
-		]);
+		this.#detailSource = new UmbUserServerDataSource(host);
+		this.#setUserGroupsSource = new UmbUserSetGroupsServerDataSource(host);
+		this.#temporaryFileRepository = new UmbTemporaryFileRepository(host);
 	}
 
-	// COLLECTION
-	async requestCollection(filter: UmbUserCollectionFilterModel = { skip: 0, take: 100000 }) {
-		//TODO: missing observable
-		return this.#collectionSource.filterCollection(filter);
-	}
-
-	async filterCollection(filter: UmbUserCollectionFilterModel) {
-		return this.#collectionSource.filterCollection(filter);
-	}
-
-	// ITEMS:
-	async requestItems(ids: Array<string>) {
-		if (!ids) throw new Error('Ids are missing');
-		await this.#init;
-
-		const { data, error } = await this.#itemSource.getItems(ids);
-
-		if (data) {
-			this.#itemStore?.appendItems(data);
-		}
-
-		return { data, error, asObservable: () => this.#itemStore!.items(ids) };
-	}
-
-	async items(ids: Array<string>) {
-		await this.#init;
-		return this.#itemStore!.items(ids);
-	}
-
-	// DETAILS
+	/**
+	 * Creates a new user scaffold
+	 * @param {(string | null)} parentId
+	 * @return {*}
+	 * @memberof UmbUserRepository
+	 */
 	createScaffold(parentId: string | null) {
 		if (parentId === undefined) throw new Error('Parent id is missing');
 		return this.#detailSource.createScaffold(parentId);
 	}
 
+	/**
+	 * Requests the user with the given id
+	 * @param {string} id
+	 * @return {*}
+	 * @memberof UmbUserRepository
+	 */
 	async requestById(id: string) {
 		if (!id) throw new Error('Id is missing');
+		await this.init;
 
-		const { data, error } = await this.#detailSource.get(id);
+		const { data, error } = await this.#detailSource.read(id);
 
 		if (data) {
-			this.#detailStore?.append(data);
+			this.detailStore!.append(data);
 		}
 
-		return { data, error };
+		return { data, error, asObservable: () => this.detailStore!.byId(id) };
 	}
 
 	async setUserGroups(userIds: Array<string>, userGroupIds: Array<string>) {
@@ -139,45 +83,46 @@ export class UmbUserRepository
 		return { error };
 	}
 
+	/**
+	 * Returns an observable for the user with the given id
+	 * @param {string} id
+	 * @return {Promise<Observable<UserDetailModel>>}
+	 * @memberof UmbUserRepository
+	 */
 	async byId(id: string) {
 		if (!id) throw new Error('Key is missing');
-		await this.#init;
-		return this.#detailStore!.byId(id);
+		await this.init;
+		return this.detailStore!.byId(id);
 	}
 
+	/**
+	 * Creates a new user
+	 * @param {CreateUserRequestModel} userRequestData
+	 * @return { Promise<UmbDataSourceSuccessResponse, UmbDataSourceErrorResponse>}
+	 * @memberof UmbUserRepository
+	 */
 	async create(userRequestData: CreateUserRequestModel) {
 		if (!userRequestData) throw new Error('Data is missing');
 
-		const { data: createdData, error } = await this.#detailSource.insert(userRequestData);
+		const { data, error } = await this.#detailSource.create(userRequestData);
 
-		if (createdData && createdData.userId) {
-			const { data: user, error } = await this.#detailSource.get(createdData?.userId);
+		if (data) {
+			this.detailStore?.append(data);
 
-			if (user) {
-				this.#detailStore?.append(user);
-
-				const notification = { data: { message: `User created` } };
-				this.#notificationContext?.peek('positive', notification);
-
-				const hello = {
-					user,
-					createData: createdData,
-				};
-
-				return { data: hello, error };
-			}
+			const notification = { data: { message: `User created` } };
+			this.#notificationContext?.peek('positive', notification);
 		}
-
-		return { error };
-	}
-
-	async invite(inviteRequestData: InviteUserRequestModel) {
-		if (!inviteRequestData) throw new Error('Data is missing');
-		const { data, error } = await this.#detailSource.invite(inviteRequestData);
 
 		return { data, error };
 	}
 
+	/**
+	 * Saves the user with the given id
+	 * @param {string} id
+	 * @param {UpdateUserRequestModel} user
+	 * @return {Promise<UmbDataSourceSuccessResponse, UmbDataSourceErrorResponse>}
+	 * @memberof UmbUserRepository
+	 */
 	async save(id: string, user: UpdateUserRequestModel) {
 		if (!id) throw new Error('User id is missing');
 		if (!user) throw new Error('User update data is missing');
@@ -185,12 +130,15 @@ export class UmbUserRepository
 		const { data, error } = await this.#detailSource.update(id, user);
 
 		if (data) {
-			this.#detailStore?.append(data);
+			this.detailStore?.append(data);
 		}
 
 		if (!error) {
+			// TODO: how do we localize here?
+			// The localize method shouldn't be part of the UmbControllerHost interface
+			// this._host.localize?.term('speechBubbles_editUserSaved') ??
 			const notification = {
-				data: { message: this.#host.localize?.term('speechBubbles_editUserSaved') ?? 'User saved' },
+				data: { message: 'User saved' },
 			};
 			this.#notificationContext?.peek('positive', notification);
 		}
@@ -198,13 +146,19 @@ export class UmbUserRepository
 		return { data, error };
 	}
 
+	/**
+	 * Deletes the user with the given id
+	 * @param {string} id
+	 * @return {Promise<UmbDataSourceErrorResponse>}
+	 * @memberof UmbUserRepository
+	 */
 	async delete(id: string) {
 		if (!id) throw new Error('Id is missing');
 
 		const { error } = await this.#detailSource.delete(id);
 
 		if (!error) {
-			this.#detailStore?.remove([id]);
+			this.detailStore?.removeItem(id);
 
 			const notification = { data: { message: `User deleted` } };
 			this.#notificationContext?.peek('positive', notification);
@@ -213,39 +167,49 @@ export class UmbUserRepository
 		return { error };
 	}
 
-	async enable(ids: Array<string>) {
-		if (ids.length === 0) throw new Error('User ids are missing');
+	/**
+	 * Uploads an avatar for the user with the given id
+	 * @param {string} id
+	 * @param {File} file
+	 * @return {Promise<UmbDataSourceErrorResponse>}
+	 * @memberof UmbUserRepository
+	 */
+	async uploadAvatar(id: string, file: File) {
+		if (!id) throw new Error('Id is missing');
 
-		const { error } = await this.#enableSource.enable(ids);
+		// upload temp file
+		const fileId = UmbId.new();
+		await this.#temporaryFileRepository.upload(fileId, file);
+
+		// assign temp file to avatar
+		const { error } = await this.#detailSource.createAvatar(id, fileId);
 
 		if (!error) {
-			//TODO: UPDATE STORE
-			const notification = { data: { message: `${ids.length > 1 ? 'Users' : 'User'} enabled` } };
+			// TODO: update store + current user
+			const notification = { data: { message: `Avatar uploaded` } };
 			this.#notificationContext?.peek('positive', notification);
 		}
+
+		return { error };
 	}
 
-	async disable(ids: Array<string>) {
-		if (ids.length === 0) throw new Error('User ids are missing');
+	/**
+	 * Removes the avatar for the user with the given id
+	 * @param {string} id
+	 * @return {Promise<UmbDataSourceErrorResponse>}
+	 * @memberof UmbUserRepository
+	 */
+	async deleteAvatar(id: string) {
+		if (!id) throw new Error('Id is missing');
 
-		const { error } = await this.#disableSource.disable(ids);
-
-		if (!error) {
-			//TODO: UPDATE STORE
-			const notification = { data: { message: `${ids.length > 1 ? 'Users' : 'User'} disabled` } };
-			this.#notificationContext?.peek('positive', notification);
-		}
-	}
-
-	async unlock(ids: Array<string>) {
-		if (ids.length === 0) throw new Error('User ids are missing');
-
-		const { error } = await this.#unlockSource.unlock(ids);
+		const { error } = await this.#detailSource.deleteAvatar(id);
 
 		if (!error) {
-			//TODO: UPDATE STORE
-			const notification = { data: { message: `${ids.length > 1 ? 'Users' : 'User'} unlocked` } };
+			// TODO: update store + current user
+			const notification = { data: { message: `Avatar deleted` } };
 			this.#notificationContext?.peek('positive', notification);
 		}
+
+		return { error };
 	}
 }

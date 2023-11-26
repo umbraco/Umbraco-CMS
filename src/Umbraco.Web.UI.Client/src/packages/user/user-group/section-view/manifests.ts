@@ -1,22 +1,22 @@
-import { UMB_USER_SECTION_ALIAS } from '../../user-section/manifests.js';
+import { UMB_USER_MANAGEMENT_SECTION_ALIAS } from '../../user-section/manifests.js';
 import type { ManifestSectionView } from '@umbraco-cms/backoffice/extension-registry';
 
 const sectionsViews: Array<ManifestSectionView> = [
 	{
 		type: 'sectionView',
-		alias: 'Umb.SectionView.UserGroups',
-		name: 'User Groups Section View',
-		loader: () => import('./user-groups-section-view.element.js'),
+		alias: 'Umb.SectionView.UserGroup',
+		name: 'User Group Section View',
+		js: () => import('./user-group-section-view.element.js'),
 		weight: 100,
 		meta: {
 			label: 'User Groups',
 			pathname: 'user-groups',
-			icon: 'umb:users',
+			icon: 'icon-users',
 		},
 		conditions: [
 			{
 				alias: 'Umb.Condition.SectionAlias',
-				match: UMB_USER_SECTION_ALIAS,
+				match: UMB_USER_MANAGEMENT_SECTION_ALIAS,
 			},
 		],
 	},

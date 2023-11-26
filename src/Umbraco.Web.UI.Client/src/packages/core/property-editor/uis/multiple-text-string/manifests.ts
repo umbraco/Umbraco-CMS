@@ -4,11 +4,11 @@ export const manifest: ManifestPropertyEditorUi = {
 	type: 'propertyEditorUi',
 	alias: 'Umb.PropertyEditorUi.MultipleTextString',
 	name: 'Multiple Text String Property Editor UI',
-	loader: () => import('./property-editor-ui-multiple-text-string.element.js'),
+	js: () => import('./property-editor-ui-multiple-text-string.element.js'),
 	meta: {
 		label: 'Multiple Text String',
 		propertyEditorSchemaAlias: 'Umbraco.MultipleTextString',
-		icon: 'umb:ordered-list',
+		icon: 'icon-ordered-list',
 		group: '',
 		supportsReadOnly: true,
 	},

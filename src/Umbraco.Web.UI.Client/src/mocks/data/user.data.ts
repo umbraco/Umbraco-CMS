@@ -1,7 +1,13 @@
 import { UmbEntityData } from './entity.data.js';
 import { umbUserGroupData } from './user-group.data.js';
-import { UmbLoggedInUser } from '@umbraco-cms/backoffice/auth';
+import { arrayFilter, stringFilter, queryFilter } from './utils.js';
+import { UmbId } from '@umbraco-cms/backoffice/id';
+import { UmbCurrentUser } from '@umbraco-cms/backoffice/current-user';
 import {
+	CreateUserRequestModel,
+	CreateUserResponseModel,
+	InviteUserRequestModel,
+	PagedUserResponseModel,
 	UpdateUserGroupsOnUserRequestModel,
 	UserItemResponseModel,
 	UserResponseModel,
@@ -15,17 +21,64 @@ const createUserItem = (item: UserResponseModel): UserItemResponseModel => {
 	};
 };
 
+const userGroupFilter = (filterOptions: any, item: UserResponseModel) =>
+	arrayFilter(filterOptions.userGroupIds, item.userGroupIds);
+const userStateFilter = (filterOptions: any, item: UserResponseModel) =>
+	stringFilter(filterOptions.userStates, item.state);
+const userQueryFilter = (filterOptions: any, item: UserResponseModel) => queryFilter(filterOptions.filter, item.name);
+
 // Temp mocked database
 class UmbUserData extends UmbEntityData<UserResponseModel> {
 	constructor(data: UserResponseModel[]) {
 		super(data);
 	}
 
+	/**
+	 * Create user
+	 * @param {CreateUserRequestModel} data
+	 * @memberof UmbUserData
+	 */
+	createUser = (data: CreateUserRequestModel): CreateUserResponseModel => {
+		const userId = UmbId.new();
+		const initialPassword = 'mocked-initial-password';
+
+		const user: UserResponseModel = {
+			id: userId,
+			languageIsoCode: null,
+			contentStartNodeIds: [],
+			mediaStartNodeIds: [],
+			avatarUrls: [],
+			state: UserStateModel.INACTIVE,
+			failedLoginAttempts: 0,
+			createDate: new Date().toUTCString(),
+			updateDate: new Date().toUTCString(),
+			lastLoginDate: null,
+			lastLockoutDate: null,
+			lastPasswordChangeDate: null,
+			...data,
+		};
+
+		this.insert(user);
+
+		return { userId, initialPassword };
+	};
+
+	/**
+	 * Get user items
+	 * @param {Array<string>} ids
+	 * @return {*}  {Array<UserItemResponseModel>}
+	 * @memberof UmbUserData
+	 */
 	getItems(ids: Array<string>): Array<UserItemResponseModel> {
 		const items = this.data.filter((item) => ids.includes(item.id ?? ''));
 		return items.map((item) => createUserItem(item));
 	}
 
+	/**
+	 * Set user groups
+	 * @param {UpdateUserGroupsOnUserRequestModel} data
+	 * @memberof UmbUserData
+	 */
 	setUserGroups(data: UpdateUserGroupsOnUserRequestModel): void {
 		const users = this.data.filter((user) => data.userIds?.includes(user.id ?? ''));
 		users.forEach((user) => {
@@ -33,7 +86,12 @@ class UmbUserData extends UmbEntityData<UserResponseModel> {
 		});
 	}
 
-	getCurrentUser(): UmbLoggedInUser {
+	/**
+	 * Get current user
+	 * @return {*}  {UmbLoggedInUser}
+	 * @memberof UmbUserData
+	 */
+	getCurrentUser(): UmbCurrentUser {
 		const firstUser = this.data[0];
 		const permissions = firstUser.userGroupIds?.length ? umbUserGroupData.getPermissions(firstUser.userGroupIds) : [];
 
@@ -50,6 +108,83 @@ class UmbUserData extends UmbEntityData<UserResponseModel> {
 			mediaStartNodeIds: firstUser.mediaStartNodeIds,
 			permissions,
 		};
+	}
+
+	/**
+	 * Disable users
+	 * @param {Array<string>} ids
+	 * @memberof UmbUserData
+	 */
+	disable(ids: Array<string>): void {
+		const users = this.data.filter((user) => ids.includes(user.id ?? ''));
+		users.forEach((user) => {
+			user.state = UserStateModel.DISABLED;
+		});
+	}
+
+	/**
+	 * Enable users
+	 * @param {Array<string>} ids
+	 * @memberof UmbUserData
+	 */
+	enable(ids: Array<string>): void {
+		const users = this.data.filter((user) => ids.includes(user.id ?? ''));
+		users.forEach((user) => {
+			user.state = UserStateModel.ACTIVE;
+		});
+	}
+
+	/**
+	 * Unlock users
+	 * @param {Array<string>} ids
+	 * @memberof UmbUserData
+	 */
+	unlock(ids: Array<string>): void {
+		const users = this.data.filter((user) => ids.includes(user.id ?? ''));
+		users.forEach((user) => {
+			user.failedLoginAttempts = 0;
+			user.state = UserStateModel.ACTIVE;
+		});
+	}
+
+	/**
+	 * Invites a user
+	 * @param {InviteUserRequestModel} data
+	 * @memberof UmbUserData
+	 */
+	invite(data: InviteUserRequestModel): void {
+		const invitedUser = {
+			status: UserStateModel.INVITED,
+			...data,
+		};
+
+		this.createUser(invitedUser);
+	}
+
+	filter(options: any): PagedUserResponseModel {
+		const { items: allItems } = this.getAll();
+
+		const filterOptions = {
+			skip: options.skip || 0,
+			take: options.take || 25,
+			orderBy: options.orderBy || 'name',
+			orderDirection: options.orderDirection || 'asc',
+			userGroupIds: options.userGroupIds,
+			userStates: options.userStates,
+			filter: options.filter,
+		};
+
+		const filteredItems = allItems.filter(
+			(item) =>
+				userGroupFilter(filterOptions, item) &&
+				userStateFilter(filterOptions, item) &&
+				userQueryFilter(filterOptions, item),
+		);
+		const totalItems = filteredItems.length;
+
+		const paginatedItems = filteredItems.slice(filterOptions.skip, filterOptions.skip + filterOptions.take);
+
+		return { total: totalItems, items: paginatedItems };
 	}
 }
 
@@ -78,17 +213,17 @@ export const data: Array<UserResponseModel & { type: string }> = [
 	{
 		id: '82e11d3d-b91d-43c9-9071-34d28e62e81d',
 		type: 'user',
-		contentStartNodeIds: [],
-		mediaStartNodeIds: [],
+		contentStartNodeIds: ['simple-document-id'],
+		mediaStartNodeIds: ['f2f81a40-c989-4b6b-84e2-057cecd3adc1'],
 		name: 'Amelie Walker',
 		email: 'awalker1@domain.com',
 		languageIsoCode: 'Japanese',
 		state: UserStateModel.INACTIVE,
-		lastLoginDate: '4/12/2023',
-		lastLockoutDate: '',
-		lastPasswordChangeDate: '4/1/2023',
-		updateDate: '4/12/2023',
-		createDate: '4/12/2023',
+		lastLoginDate: '2023-10-12T18:30:32.879Z',
+		lastLockoutDate: null,
+		lastPasswordChangeDate: '2023-10-12T18:30:32.879Z',
+		updateDate: '2023-10-12T18:30:32.879Z',
+		createDate: '2023-10-12T18:30:32.879Z',
 		failedLoginAttempts: 0,
 		userGroupIds: ['c630d49e-4e7b-42ea-b2bc-edc0edacb6b1'],
 	},
@@ -101,11 +236,11 @@ export const data: Array<UserResponseModel & { type: string }> = [
 		email: 'okim1@domain.com',
 		languageIsoCode: 'Russian',
 		state: UserStateModel.ACTIVE,
-		lastLoginDate: '4/11/2023',
-		lastLockoutDate: '',
-		lastPasswordChangeDate: '4/5/2023',
-		updateDate: '4/11/2023',
-		createDate: '4/11/2023',
+		lastLoginDate: '2023-10-12T18:30:32.879Z',
+		lastLockoutDate: null,
+		lastPasswordChangeDate: '2023-10-12T18:30:32.879Z',
+		updateDate: '2023-10-12T18:30:32.879Z',
+		createDate: '2023-10-12T18:30:32.879Z',
 		failedLoginAttempts: 0,
 		userGroupIds: ['c630d49e-4e7b-42ea-b2bc-edc0edacb6b1'],
 	},
@@ -118,11 +253,11 @@ export const data: Array<UserResponseModel & { type: string }> = [
 		email: 'enieves1@domain.com',
 		languageIsoCode: 'Spanish',
 		state: UserStateModel.INVITED,
-		lastLoginDate: '4/10/2023',
-		lastLockoutDate: '',
-		lastPasswordChangeDate: '4/6/2023',
-		updateDate: '4/10/2023',
-		createDate: '4/10/2023',
+		lastLoginDate: '2023-10-12T18:30:32.879Z',
+		lastLockoutDate: null,
+		lastPasswordChangeDate: null,
+		updateDate: '2023-10-12T18:30:32.879Z',
+		createDate: '2023-10-12T18:30:32.879Z',
 		failedLoginAttempts: 0,
 		userGroupIds: ['c630d49e-4e7b-42ea-b2bc-edc0edacb6b1'],
 	},
@@ -134,13 +269,13 @@ export const data: Array<UserResponseModel & { type: string }> = [
 		name: 'Jasmine Patel',
 		email: 'jpatel1@domain.com',
 		languageIsoCode: 'Hindi',
-		state: UserStateModel.DISABLED,
-		lastLoginDate: '4/9/2023',
-		lastLockoutDate: '',
-		lastPasswordChangeDate: '4/7/2023',
-		updateDate: '4/9/2023',
-		createDate: '4/9/2023',
-		failedLoginAttempts: 0,
+		state: UserStateModel.LOCKED_OUT,
+		lastLoginDate: '2023-10-12T18:30:32.879Z',
+		lastLockoutDate: '2023-10-12T18:30:32.879Z',
+		lastPasswordChangeDate: null,
+		updateDate: '2023-10-12T18:30:32.879Z',
+		createDate: '2023-10-12T18:30:32.879Z',
+		failedLoginAttempts: 25,
 		userGroupIds: ['c630d49e-4e7b-42ea-b2bc-edc0edacb6b1'],
 	},
 ];

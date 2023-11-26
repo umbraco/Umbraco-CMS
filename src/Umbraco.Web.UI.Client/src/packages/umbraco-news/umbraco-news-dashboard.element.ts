@@ -1,26 +1,26 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UMB_AUTH } from '@umbraco-cms/backoffice/auth';
+import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-umbraco-news-dashboard')
 export class UmbUmbracoNewsDashboardElement extends UmbLitElement {
-	#auth?: typeof UMB_AUTH.TYPE;
+	#currentUserContext?: typeof UMB_CURRENT_USER_CONTEXT.TYPE;
 
 	@state()
 	private name = '';
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_AUTH, (instance) => {
-			this.#auth = instance;
+		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (instance) => {
+			this.#currentUserContext = instance;
 			this.#observeCurrentUser();
 		});
 	}
 
 	#observeCurrentUser(): void {
-		if (!this.#auth) return;
-		this.observe(this.#auth.currentUser, (user) => {
+		if (!this.#currentUserContext) return;
+		this.observe(this.#currentUserContext.currentUser, (user) => {
 			this.name = user?.name ?? '';
 		});
 	}

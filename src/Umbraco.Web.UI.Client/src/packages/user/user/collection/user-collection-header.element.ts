@@ -5,7 +5,7 @@ import {
 	UUIRadioGroupElement,
 	UUIRadioGroupEvent,
 } from '@umbraco-cms/backoffice/external/uui';
-import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbDropdownElement } from '@umbraco-cms/backoffice/components';
 import { UMB_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
@@ -15,13 +15,11 @@ import {
 	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
 	UmbModalManagerContext,
 } from '@umbraco-cms/backoffice/modal';
-import { UserOrderModel, UserStateModel } from '@umbraco-cms/backoffice/backend-api';
+import { UserGroupResponseModel, UserOrderModel, UserStateModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbUserGroupCollectionRepository } from '@umbraco-cms/backoffice/user-group';
 
 @customElement('umb-user-collection-header')
 export class UmbUserCollectionHeaderElement extends UmbLitElement {
-	@state()
-	private _isCloud = false; //NOTE: Used to show either invite or create user buttons and views.
-
 	@state()
 	private _stateFilterOptions: Array<UserStateModel> = Object.values(UserStateModel);
 
@@ -34,10 +32,18 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 	@state()
 	private _orderBy?: UserOrderModel;
 
+	@state()
+	private _userGroups: Array<UserGroupResponseModel> = [];
+
+	@state()
+	private _userGroupFilterSelection: Array<UserGroupResponseModel> = [];
+
 	#modalContext?: UmbModalManagerContext;
 	#collectionContext?: UmbUserCollectionContext;
 	#inputTimer?: NodeJS.Timeout;
 	#inputTimerAmount = 500;
+
+	#userGroupCollectionRepository = new UmbUserGroupCollectionRepository(this);
 
 	constructor() {
 		super();
@@ -51,23 +57,15 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 		});
 	}
 
-	// TODO: we need to render collection view extension
-	private _toggleViewType() {
-		/*
-		const isList = window.location.pathname.split('/').pop() === 'list';
-
-		isList
-			? history.pushState(null, '', 'section/users/view/users/overview/grid')
-			: history.pushState(null, '', 'section/users/view/users/overview/list');
-			*/
+	protected firstUpdated() {
+		this.#requestUserGroups();
 	}
 
-	#onDropdownClick(event: PointerEvent) {
-		const composedPath = event.composedPath();
+	async #requestUserGroups() {
+		const { data } = await this.#userGroupCollectionRepository.requestCollection();
 
-		const dropdown = composedPath.find((el) => el instanceof UmbDropdownElement) as UmbDropdownElement;
-		if (dropdown) {
-			dropdown.open = !dropdown.open;
+		if (data) {
+			this._userGroups = data.items;
 		}
 	}
 
@@ -78,16 +76,12 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 		this.#inputTimer = setTimeout(() => this.#collectionContext?.setFilter({ filter }), this.#inputTimerAmount);
 	}
 
-	private _showInviteOrCreate() {
-		let token = undefined;
-		// TODO: we need to find a better way to determine if we should create or invite
-		if (this._isCloud) {
-			token = UMB_INVITE_USER_MODAL;
-		} else {
-			token = UMB_CREATE_USER_MODAL;
-		}
+	#onCreateUserClick() {
+		this.#modalContext?.open(UMB_CREATE_USER_MODAL);
+	}
 
-		this.#modalContext?.open(token);
+	#onInviteUserClick() {
+		this.#modalContext?.open(UMB_INVITE_USER_MODAL);
 	}
 
 	#onStateFilterChange(event: UUIBooleanInputEvent) {
@@ -115,65 +109,128 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<uui-button
-				@click=${this._showInviteOrCreate}
-				label=${this.localize.term(this._isCloud ? 'user_inviteUser' : 'user_createUser')}
+			<div style="display: flex; gap: var(--uui-size-space-4)">${this.#renderCollectionActions()}</div>
+			${this.#renderSearch()}
+			<div>${this.#renderFilters()} ${this.#renderCollectionViews()}</div>
+		`;
+	}
+
+	#renderCollectionActions() {
+		return html` <uui-button
+				@click=${this.#onCreateUserClick}
+				label=${this.localize.term('user_createUser')}
 				look="outline"></uui-button>
-			<uui-input @input=${this._updateSearch} label=${this.localize.term('visuallyHiddenTexts_userSearchLabel')} placeholder=${this.localize.term('visuallyHiddenTexts_userSearchLabel')} id="input-search"></uui-input>
-			<div>
-				<!-- TODO: we should consider using the uui-combobox. We need to add a multiple options to it first -->
-				<umb-dropdown margin="8">
-					<uui-button @click=${this.#onDropdownClick} slot="trigger" label="status">
-						<umb-localize key="general_status"></umb-localize>:
-						<umb-localize key=${'user_state'+this._stateFilterSelection}></umb-localize>
-					</uui-button>
-					<div slot="dropdown" class="filter-dropdown">
+
+			<uui-button
+				@click=${this.#onInviteUserClick}
+				label=${this.localize.term('user_inviteUser')}
+				look="outline"></uui-button>`;
+	}
+
+	#renderSearch() {
+		return html`
+			<uui-input
+				@input=${this._updateSearch}
+				label=${this.localize.term('visuallyHiddenTexts_userSearchLabel')}
+				placeholder=${this.localize.term('visuallyHiddenTexts_userSearchLabel')}
+				id="input-search"></uui-input>
+		`;
+	}
+
+	#onUserGroupFilterChange(event: UUIBooleanInputEvent) {
+		const target = event.currentTarget as UUICheckboxElement;
+		const item = this._userGroups.find((group) => group.id === target.value);
+
+		if (!item) return;
+
+		if (target.checked) {
+			this._userGroupFilterSelection = [...this._userGroupFilterSelection, item];
+		} else {
+			this._userGroupFilterSelection = this._userGroupFilterSelection.filter((group) => group.id !== item.id);
+		}
+
+		const ids = this._userGroupFilterSelection.map((group) => group.id!);
+		this.#collectionContext?.setUserGroupFilter(ids);
+	}
+
+	#getUserGroupFilterLabel() {
+		const length = this._userGroupFilterSelection.length;
+		const max = 2;
+		//TODO: Temp solution to limit the amount of states shown
+		return length === 0
+			? this.localize.term('general_all')
+			: this._userGroupFilterSelection
+					.slice(0, max)
+					.map((group) => group.name)
+					.join(', ') + (length > max ? ' + ' + (length - max) : '');
+	}
+
+	#getStatusFilterLabel() {
+		const length = this._stateFilterSelection.length;
+		const max = 2;
+		//TODO: Temp solution to limit the amount of states shown
+		return length === 0
+			? this.localize.term('general_all')
+			: this._stateFilterSelection
+					.slice(0, max)
+					.map((state) => this.localize.term('user_state' + state))
+					.join(', ') + (length > max ? ' + ' + (length - max) : '');
+	}
+
+	#renderFilters() {
+		return html` ${this.#renderStatusFilter()} ${this.#renderUserGroupFilter()} `;
+	}
+
+	#renderStatusFilter() {
+		return html`
+			<uui-button popovertarget="popover-user-status-filter" label="status">
+				<umb-localize key="general_status"></umb-localize>: <b>${this.#getStatusFilterLabel()}</b>
+			</uui-button>
+			<uui-popover-container id="popover-user-status-filter" popover placement="bottom">
+				<umb-popover-layout>
+					<div class="filter-dropdown">
 						${this._stateFilterOptions.map(
 							(option) =>
 								html`<uui-checkbox
-									label=${this.localize.term('user_state'+option)}
+									label=${this.localize.term('user_state' + option)}
 									@change=${this.#onStateFilterChange}
 									name="state"
-									value=${option}></uui-checkbox>`
+									value=${option}></uui-checkbox>`,
 						)}
 					</div>
-				</umb-dropdown>
-
-				<!-- TODO: we should consider using the uui-combobox. We need to add a multiple options to it first -->
-				<umb-dropdown margin="8">
-					<uui-button @click=${this.#onDropdownClick} slot="trigger" label=${this.localize.term('general_groups')}>
-						<umb-localize key="general_groups"></umb-localize>:
-						<!-- TODO: show the value here -->
-					</uui-button>
-					<div slot="dropdown" class="filter-dropdown">
-						<!-- TODO: GET THESE FROM SERVER (not localized) -->
-						<uui-checkbox label="Administrators"></uui-checkbox>
-						<uui-checkbox label="Editors"></uui-checkbox>
-						<uui-checkbox label="Sensitive Data"></uui-checkbox>
-						<uui-checkbox label="Translators"></uui-checkbox>
-						<uui-checkbox label="Writers"></uui-checkbox>
-					</div>
-				</umb-dropdown>
-
-				<!-- TODO: we should consider using the uui-combobox. We need to add a multiple options to it first -->
-				<umb-dropdown margin="8">
-					<uui-button @click=${this.#onDropdownClick} slot="trigger" label=${this.localize.term('general_orderBy')}>
-						<umb-localize key="general_orderBy"></umb-localize>:
-						<b>${this._orderBy}</b>
-					</uui-button>
-					<div slot="dropdown" class="filter-dropdown" name="orderBy">
-						<uui-radio-group name="radioGroup" @change=${this.#onOrderByChange}>
-							${this._orderByOptions.map((option) => html`<uui-radio label=${option} value=${option}></uui-radio>`)}
-						</uui-radio-group>
-					</div>
-				</umb-dropdown>
-
-				<uui-button label="view toggle" @click=${this._toggleViewType} compact look="outline">
-					<uui-icon name="settings"></uui-icon>
-				</uui-button>
-			</div>
+				</umb-popover-layout>
+			</uui-popover-container>
 		`;
 	}
+
+	#renderUserGroupFilter() {
+		return html`
+			<uui-button popovertarget="popover-user-group-filter" label=${this.localize.term('general_groups')}>
+				<umb-localize key="general_groups"></umb-localize>: <b>${this.#getUserGroupFilterLabel()}</b>
+			</uui-button>
+			<uui-popover-container id="popover-user-group-filter" popover placement="bottom">
+				<umb-popover-layout>
+					<div class="filter-dropdown">
+						${repeat(
+							this._userGroups,
+							(group) => group.id,
+							(group) => html`
+								<uui-checkbox
+									label=${ifDefined(group.name)}
+									value=${ifDefined(group.id)}
+									@change=${this.#onUserGroupFilterChange}></uui-checkbox>
+							`,
+						)}
+					</div>
+				</umb-popover-layout>
+			</uui-popover-container>
+		`;
+	}
+
+	#renderCollectionViews() {
+		return html` <umb-collection-view-bundle></umb-collection-view-bundle> `;
+	}
+
 	static styles = [
 		css`
 			:host {
@@ -190,11 +247,14 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 				width: 100%;
 			}
 
+			.filter {
+				max-width: 200px;
+			}
+
 			.filter-dropdown {
 				display: flex;
 				gap: var(--uui-size-space-3);
 				flex-direction: column;
-				width: fit-content;
 			}
 		`,
 	];

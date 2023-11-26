@@ -1,11 +1,15 @@
-import { USER_REPOSITORY_ALIAS } from '../repository/manifests.js';
+import {
+	UMB_DISABLE_USER_REPOSITORY_ALIAS,
+	UMB_ENABLE_USER_REPOSITORY_ALIAS,
+	UMB_UNLOCK_USER_REPOSITORY_ALIAS,
+	UMB_USER_REPOSITORY_ALIAS,
+} from '../repository/manifests.js';
+import { UMB_USER_ENTITY_TYPE } from '../types.js';
 import { UmbEnableUserEntityBulkAction } from './enable/enable.action.js';
 import { UmbSetGroupUserEntityBulkAction } from './set-group/set-group.action.js';
 import { UmbUnlockUserEntityBulkAction } from './unlock/unlock.action.js';
 import { UmbDisableUserEntityBulkAction } from './disable/disable.action.js';
 import { ManifestEntityBulkAction } from '@umbraco-cms/backoffice/extension-registry';
-
-const entityType = 'user';
 
 const entityActions: Array<ManifestEntityBulkAction> = [
 	{
@@ -16,12 +20,14 @@ const entityActions: Array<ManifestEntityBulkAction> = [
 		api: UmbSetGroupUserEntityBulkAction,
 		meta: {
 			label: 'SetGroup',
-			repositoryAlias: USER_REPOSITORY_ALIAS,
+			repositoryAlias: UMB_USER_REPOSITORY_ALIAS,
 		},
-		conditions: [{
-			alias: 'Umb.Condition.CollectionEntityType',
-			match: entityType,
-		}],
+		conditions: [
+			{
+				alias: 'Umb.Condition.CollectionEntityType',
+				match: UMB_USER_ENTITY_TYPE,
+			},
+		],
 	},
 	{
 		type: 'entityBulkAction',
@@ -31,12 +37,14 @@ const entityActions: Array<ManifestEntityBulkAction> = [
 		api: UmbEnableUserEntityBulkAction,
 		meta: {
 			label: 'Enable',
-			repositoryAlias: USER_REPOSITORY_ALIAS,
+			repositoryAlias: UMB_ENABLE_USER_REPOSITORY_ALIAS,
 		},
-		conditions: [{
-			alias: 'Umb.Condition.CollectionEntityType',
-			match: entityType,
-		}],
+		conditions: [
+			{
+				alias: 'Umb.Condition.CollectionEntityType',
+				match: UMB_USER_ENTITY_TYPE,
+			},
+		],
 	},
 	{
 		type: 'entityBulkAction',
@@ -46,12 +54,14 @@ const entityActions: Array<ManifestEntityBulkAction> = [
 		api: UmbUnlockUserEntityBulkAction,
 		meta: {
 			label: 'Unlock',
-			repositoryAlias: USER_REPOSITORY_ALIAS,
+			repositoryAlias: UMB_UNLOCK_USER_REPOSITORY_ALIAS,
 		},
-		conditions: [{
-			alias: 'Umb.Condition.CollectionEntityType',
-			match: entityType,
-		}],
+		conditions: [
+			{
+				alias: 'Umb.Condition.CollectionEntityType',
+				match: UMB_USER_ENTITY_TYPE,
+			},
+		],
 	},
 	{
 		type: 'entityBulkAction',
@@ -61,12 +71,14 @@ const entityActions: Array<ManifestEntityBulkAction> = [
 		api: UmbDisableUserEntityBulkAction,
 		meta: {
 			label: 'Disable',
-			repositoryAlias: USER_REPOSITORY_ALIAS,
+			repositoryAlias: UMB_DISABLE_USER_REPOSITORY_ALIAS,
 		},
-		conditions: [{
-			alias: 'Umb.Condition.CollectionEntityType',
-			match: entityType,
-		}],
+		conditions: [
+			{
+				alias: 'Umb.Condition.CollectionEntityType',
+				match: UMB_USER_ENTITY_TYPE,
+			},
+		],
 	},
 ];
 

@@ -2,7 +2,7 @@
 // contains only functions referenced by the TinyMCE editor
 // TODO: This should not be done in this way, we need to split this into seperate defined helper methods. This is also very specific to TinyMCE, so should be named that way.
 
-import { Editor, EditorEvent } from 'tinymce';
+import type { Editor, EditorEvent } from '@umbraco-cms/backoffice/external/tinymce';
 
 export class UmbMediaHelper {
 	/**
@@ -173,7 +173,7 @@ export class UmbMediaHelper {
 			width: number;
 			height: number;
 			origin: string;
-		}>
+		}>,
 	) {
 		const srcAttr = e.target.getAttribute('src');
 

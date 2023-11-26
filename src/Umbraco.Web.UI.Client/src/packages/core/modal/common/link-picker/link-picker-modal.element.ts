@@ -1,5 +1,5 @@
 import { UmbTreeElement } from '../../../tree/tree.element.js';
-import { css, html, nothing, customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, nothing, customElement, query, state, styleMap } from '@umbraco-cms/backoffice/external/lit';
 import { UUIBooleanInputEvent, UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import {
 	UmbLinkPickerConfig,
@@ -9,6 +9,7 @@ import {
 	UmbModalBaseElement,
 } from '@umbraco-cms/backoffice/modal';
 import { buildUdi, getKeyFromUdi } from '@umbraco-cms/backoffice/utils';
+import { UMB_DOCUMENT_TREE_ALIAS } from '@umbraco-cms/backoffice/document';
 
 @customElement('umb-link-picker-modal')
 export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPickerModalData, UmbLinkPickerModalValue> {
@@ -36,6 +37,12 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 		ignoreUserStartNodes: false,
 	};
 
+	@state()
+	documentExpand = false;
+
+	@state()
+	mediaExpanded = false;
+
 	@query('#link-input')
 	private _linkInput!: UUIInputElement;
 
@@ -59,9 +66,17 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 	private _handleQueryString() {
 		if (!this._linkQueryInput) return;
 		const query = this._linkQueryInput.value as string;
-		//TODO: Handle query strings (add # etc)
 
-		this._link.queryString = query;
+		if (query.startsWith('#') || query.startsWith('?')) {
+			this._link.queryString = query;
+			return;
+		}
+
+		if (query.includes('=')) {
+			this._link.queryString = `?${query}`;
+		} else {
+			this._link.queryString = `#${query}`;
+		}
 	}
 
 	private _handleSelectionChange(e: CustomEvent, entityType: string) {
@@ -69,13 +84,20 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 		e.stopPropagation();
 		const element = e.target as UmbTreeElement;
 		const selectedKey = element.selection[element.selection.length - 1];
-		if (!selectedKey) return;
+
+		if (!selectedKey) {
+			this._link.url = '';
+			this._link.udi = undefined;
+			this._selectedKey = undefined;
+			this.requestUpdate();
+			return;
+		}
 
 		const udi = buildUdi(entityType, selectedKey);
 
 		this._selectedKey = selectedKey;
 		this._link.udi = udi;
-		this._link.url = udi; // TODO
+		this._link.url = udi;
 		this.requestUpdate();
 	}
 
@@ -93,22 +115,22 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 				<uui-box>
 					<div class="url-link">${this._renderLinkUrlInput()} ${this._renderAnchorInput()}</div>
 
-					<uui-label for="link-title-input">Link Title</uui-label>
+					<uui-label for="link-title-input">${this.localize.term('defaultdialogs_nodeNameLinkPicker')}</uui-label>
 					<uui-input
 						id="link-title-input"
-						placeholder="Enter a title"
-						label="link title"
+						placeholder=${this.localize.term('defaultdialogs_nodeNameLinkPicker')}
+						label=${this.localize.term('defaultdialogs_nodeNameLinkPicker')}
 						@input=${() => (this._link.name = this._linkTitleInput.value as string)}
 						.value="${this._link.name ?? ''}"></uui-input>
 
-					<uui-label>Target</uui-label>
+					<uui-label>${this.localize.term('content_target')}</uui-label>
 					<uui-toggle
 						id="#target-toggle"
-						label="Toggle if link should open in a new tab"
+						label=${this.localize.term('defaultdialogs_openInNewWindow')}
 						.checked="${this._link.target === '_blank' ? true : false}"
 						@change="${(e: UUIBooleanInputEvent) =>
 							e.target.checked ? (this._link.target = '_blank') : (this._link.target = '')}">
-						Open the link in a new tab
+						${this.localize.term('defaultdialogs_openInNewWindow')}
 					</uui-toggle>
 
 					<hr />
@@ -116,8 +138,12 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 					${this._renderTrees()}
 				</uui-box>
 				<div slot="actions">
-					<uui-button label="Close" @click=${this._close}></uui-button>
-					<uui-button label="Submit" look="primary" color="positive" @click=${this._submit}></uui-button>
+					<uui-button label=${this.localize.term('general_close')} @click=${this._close}></uui-button>
+					<uui-button
+						label=${this.localize.term('general_submit')}
+						look="primary"
+						color="positive"
+						@click=${this._submit}></uui-button>
 				</div>
 			</umb-body-layout>
 		`;
@@ -125,50 +151,67 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 
 	private _renderLinkUrlInput() {
 		return html`<span>
-			<uui-label for="link-input">Link</uui-label>
+			<uui-label for="link-input">${this.localize.term('defaultdialogs_link')}</uui-label>
 			<uui-input
 				id="link-input"
-				placeholder="URL"
-				label="URL"
+				placeholder=${this.localize.term('general_url')}
+				label=${this.localize.term('general_url')}
 				.value="${this._link.udi ?? this._link.url ?? ''}"
 				@input=${() => (this._link.url = this._linkInput.value as string)}
-				.disabled="${this._link.udi ? true : false}"></uui-input>
+				?disabled="${this._link.udi ? true : false}"></uui-input>
 		</span>`;
 	}
 
 	private _renderAnchorInput() {
 		if (this._layout.hideAnchor) return nothing;
 		return html`<span>
-			<uui-label for="anchor-input">Anchor / querystring</uui-label>
+			<uui-label for="anchor-input">${this.localize.term('defaultdialogs_anchorLinkPicker')}</uui-label>
 			<uui-input
 				id="anchor-input"
-				placeholder="#value or ?key=value"
-				label="#value or ?key=value"
+				placeholder=${this.localize.term('placeholders_anchor')}
+				label=${this.localize.term('placeholders_anchor')}
 				@input=${this._handleQueryString}
 				.value="${this._link.queryString ?? ''}"></uui-input>
 		</span>`;
 	}
 
 	private _renderTrees() {
-		return html`<uui-label for="search-input">Link to page</uui-label>
-			<uui-input id="search-input" placeholder="Type to search" label="Type to search"></uui-input>
-			<umb-tree
-				?multiple=${false}
-				alias="Umb.Tree.Documents"
-				@selection-change=${(event: CustomEvent) => this._handleSelectionChange(event, 'document')}
-				.selection=${[this._selectedKey ?? '']}
-				selectable></umb-tree>
-
+		//TODO: Make search work
+		return html`
+			<uui-symbol-expand
+				id="document-expand"
+				@click=${() => (this.documentExpand = !this.documentExpand)}
+				.open=${!this.documentExpand}></uui-symbol-expand>
+			<uui-label for="document-expand">${this.localize.term('defaultdialogs_linkToPage')}</uui-label>
+			<div style="${styleMap({ display: !this.documentExpand ? 'block' : 'none' })}">
+				<uui-input
+					id="search-input"
+					placeholder=${this.localize.term('placeholders_search')}
+					label=${this.localize.term('placeholders_search')}></uui-input>
+				<umb-tree
+					?hide-tree-root=${true}
+					?multiple=${false}
+					alias=${UMB_DOCUMENT_TREE_ALIAS}
+					@selection-change=${(event: CustomEvent) => this._handleSelectionChange(event, 'document')}
+					.selection=${[this._selectedKey ?? '']}
+					selectable></umb-tree>
+			</div>
 			<hr />
-
-			<uui-label>Link to media</uui-label>
-
-			<umb-tree
-				?multiple=${false}
-				alias="Umb.Tree.Media"
-				@selection-change=${(event: CustomEvent) => this._handleSelectionChange(event, 'media')}
-				.selection=${[this._selectedKey ?? '']}
-				selectable></umb-tree>`;
+			<uui-symbol-expand
+				id="media-expand"
+				@click=${() => (this.mediaExpanded = !this.mediaExpanded)}
+				.open=${!this.mediaExpanded}></uui-symbol-expand>
+			<uui-label for="media-expand">${this.localize.term('defaultdialogs_linkToMedia')}</uui-label>
+			<div style="${styleMap({ display: !this.mediaExpanded ? 'block' : 'none' })}">
+				<umb-tree
+					?hide-tree-root=${true}
+					?multiple=${false}
+					alias="Umb.Tree.Media"
+					@selection-change=${(event: CustomEvent) => this._handleSelectionChange(event, 'media')}
+					.selection=${[this._selectedKey ?? '']}
+					selectable></umb-tree>
+			</div>
+		`;
 	}
 
 	static styles = [
@@ -185,7 +228,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 				width: 100%;
 			}
 
-			uui-input,
+			uui-input:not(#search-input),
 			uui-label {
 				margin-bottom: var(--uui-size-space-6);
 			}

@@ -1,15 +1,13 @@
-import { t } from 'msw/lib/glossary-de6278a9.js';
 import { UmbDocumentPermissionServerDataSource } from './document-permission.server.data.js';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbBaseController, type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
-export class UmbDocumentPermissionRepository {
-	#host: UmbControllerHostElement;
+export class UmbDocumentPermissionRepository extends UmbBaseController {
 
 	#permissionSource: UmbDocumentPermissionServerDataSource;
 
 	constructor(host: UmbControllerHostElement) {
-		this.#host = host;
-		this.#permissionSource = new UmbDocumentPermissionServerDataSource(this.#host);
+		super(host);
+		this.#permissionSource = new UmbDocumentPermissionServerDataSource(this);
 	}
 
 	async requestPermissions(id: string) {

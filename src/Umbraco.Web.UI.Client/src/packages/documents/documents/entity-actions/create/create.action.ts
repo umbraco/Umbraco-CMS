@@ -6,7 +6,6 @@ import {
 	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
 	UMB_CREATE_DOCUMENT_MODAL as UMB_CREATE_DOCUMENT_MODAL,
 } from '@umbraco-cms/backoffice/modal';
-import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 
 export class UmbCreateDocumentEntityAction extends UmbEntityActionBase<UmbDocumentRepository> {
 	#modalContext?: UmbModalManagerContext;
@@ -14,7 +13,7 @@ export class UmbCreateDocumentEntityAction extends UmbEntityActionBase<UmbDocume
 	constructor(host: UmbControllerHostElement, repositoryAlias: string, unique: string) {
 		super(host, repositoryAlias, unique);
 
-		new UmbContextConsumerController(this.host, UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
 			this.#modalContext = instance;
 		});
 	}

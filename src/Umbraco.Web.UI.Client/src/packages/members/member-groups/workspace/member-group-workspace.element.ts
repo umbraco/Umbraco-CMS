@@ -1,14 +1,10 @@
-import { UmbMemberGroupWorkspaceContext } from './member-group-workspace.context.js';
 import { UmbMemberGroupWorkspaceEditorElement } from './member-group-workspace-editor.element.js';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbMemberGroupWorkspaceContext } from './member-group-workspace.context.js';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
-/**
- * @element umb-member-group-workspace
- * @description - Element for displaying a Member Group Workspace
- */
 @customElement('umb-member-group-workspace')
 export class UmbMemberGroupWorkspaceElement extends UmbLitElement {
 	#workspaceContext = new UmbMemberGroupWorkspaceContext(this);
@@ -27,7 +23,7 @@ export class UmbMemberGroupWorkspaceElement extends UmbLitElement {
 	];
 
 	render() {
-		return html`<umb-router-slot .routes=${this._routes}></umb-router-slot> `;
+		return html` <umb-router-slot .routes=${this._routes}></umb-router-slot> `;
 	}
 
 	static styles = [

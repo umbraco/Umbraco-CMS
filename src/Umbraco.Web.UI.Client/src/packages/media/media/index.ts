@@ -1,6 +1,7 @@
 import { ContentTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 export * from './components/index.js';
+export * from './repository/index.js';
 
 // Content
 export interface ContentProperty {
@@ -16,7 +17,7 @@ export interface ContentPropertyData {
 }
 
 // Media
-export interface MediaDetails extends ContentTreeItemResponseModel {
+export interface UmbMediaDetailModel extends ContentTreeItemResponseModel {
 	id: string; // TODO: Remove this when the backend is fixed
 	isTrashed: boolean; // TODO: remove only temp part of refactor
 	properties: Array<ContentProperty>;

@@ -1,17 +1,18 @@
-import { SCRIPTS_ENTITY_TYPE, SCRIPTS_MENU_ITEM_ALIAS, SCRIPTS_TREE_ALIAS } from '../config.js';
+import { UMB_SCRIPT_TREE_ALIAS } from '../tree/index.js';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
+
+export const UMB_SCRIPT_MENU_ITEM_ALIAS = 'Umb.MenuItem.Script';
 
 const menuItem: ManifestTypes = {
 	type: 'menuItem',
 	kind: 'tree',
-	alias: SCRIPTS_MENU_ITEM_ALIAS,
+	alias: UMB_SCRIPT_MENU_ITEM_ALIAS,
 	name: 'Scripts Menu Item',
 	weight: 10,
 	meta: {
 		label: 'Scripts',
-		icon: 'umb:folder',
-		entityType: SCRIPTS_ENTITY_TYPE,
-		treeAlias: SCRIPTS_TREE_ALIAS,
+		icon: 'icon-folder',
+		treeAlias: UMB_SCRIPT_TREE_ALIAS,
 		menus: ['Umb.Menu.Templating'],
 	},
 };

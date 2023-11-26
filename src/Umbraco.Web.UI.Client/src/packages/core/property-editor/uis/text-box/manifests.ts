@@ -13,11 +13,11 @@ export const manifests: Array<ManifestPropertyEditorUi> = [
 		type: 'propertyEditorUi',
 		alias: 'Umb.PropertyEditorUi.TextBox',
 		name: 'Text Box Property Editor UI',
-		loader: () => import('./property-editor-ui-text-box.element.js'),
+		js: () => import('./property-editor-ui-text-box.element.js'),
 		meta: {
 			label: 'Text Box',
 			propertyEditorSchemaAlias: 'Umbraco.TextBox',
-			icon: 'umb:autofill',
+			icon: 'icon-autofill',
 			group: 'common',
 			settings: {
 				properties: [inputTypeConfig],
@@ -34,11 +34,11 @@ export const manifests: Array<ManifestPropertyEditorUi> = [
 		type: 'propertyEditorUi',
 		alias: 'Umb.PropertyEditorUi.Email',
 		name: 'Email Property Editor UI',
-		loader: () => import('./property-editor-ui-text-box.element.js'),
+		js: () => import('./property-editor-ui-text-box.element.js'),
 		meta: {
 			label: 'Email',
 			propertyEditorSchemaAlias: 'Umbraco.EmailAddress',
-			icon: 'umb:message',
+			icon: 'icon-message',
 			group: 'common',
 			settings: {
 				properties: [inputTypeConfig],

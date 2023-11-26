@@ -1,54 +1,57 @@
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import {
 	UmbModalManagerContext,
 	UMB_CHANGE_PASSWORD_MODAL,
 	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
 } from '@umbraco-cms/backoffice/modal';
-import { UMB_AUTH, type UmbLoggedInUser } from '@umbraco-cms/backoffice/auth';
+import { UMB_CURRENT_USER_CONTEXT, type UmbCurrentUser } from '@umbraco-cms/backoffice/current-user';
 
 @customElement('umb-user-profile-app-profile')
 export class UmbUserProfileAppProfileElement extends UmbLitElement {
 	@state()
-	private _currentUser?: UmbLoggedInUser;
+	private _currentUser?: UmbCurrentUser;
 
-	private _modalContext?: UmbModalManagerContext;
-	private _auth?: typeof UMB_AUTH.TYPE;
+	#modalManagerContext?: UmbModalManagerContext;
+	#currentUserContext?: typeof UMB_CURRENT_USER_CONTEXT.TYPE;
 
 	constructor() {
 		super();
 
 		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
-			this._modalContext = instance;
+			this.#modalManagerContext = instance;
 		});
 
-		this.consumeContext(UMB_AUTH, (instance) => {
-			this._auth = instance;
+		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (instance) => {
+			this.#currentUserContext = instance;
 			this._observeCurrentUser();
 		});
 	}
 
 	private async _observeCurrentUser() {
-		if (!this._auth) return;
+		if (!this.#currentUserContext) return;
 
-		this.observe(this._auth.currentUser, (currentUser) => {
-			this._currentUser = currentUser;
-		});
+		this.observe(
+			this.#currentUserContext.currentUser,
+			(currentUser) => {
+				this._currentUser = currentUser;
+			},
+			'umbCurrentUserObserver',
+		);
 	}
 
 	private _edit() {
 		if (!this._currentUser) return;
 
-		history.pushState(null, '', 'section/users/view/users/user/' + this._currentUser.id); //TODO Change to a tag with href and make dynamic
+		history.pushState(null, '', 'section/user-management/view/users/user/' + this._currentUser.id); //TODO Change to a tag with href and make dynamic
 		//TODO Implement modal routing for the current-user-modal, so that the modal closes when navigating to the edit profile page
 	}
 	private _changePassword() {
-		if (!this._modalContext) return;
+		if (!this.#modalManagerContext) return;
 
-		// TODO: check if current user is admin
-		this._modalContext.open(UMB_CHANGE_PASSWORD_MODAL, {
-			requireOldPassword: false,
+		this.#modalManagerContext.open(UMB_CHANGE_PASSWORD_MODAL, {
+			userId: this._currentUser?.id ?? '',
 		});
 	}
 

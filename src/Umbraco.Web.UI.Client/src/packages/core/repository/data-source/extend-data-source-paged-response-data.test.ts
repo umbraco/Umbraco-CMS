@@ -1,5 +1,5 @@
 import { expect } from '@open-wc/testing';
-import { type UmbPagedData } from '../tree-repository.interface.js';
+import { type UmbPagedData } from './types.js';
 import { type DataSourceResponse } from './data-source-response.interface.js';
 import { extendDataSourcePagedResponseData } from './extend-data-source-paged-response-data.function.js';
 

@@ -38,7 +38,7 @@ export class UmbLogViewerMessageTemplatesOverviewElement extends UmbLitElement {
 				label="${searchListItem.name ?? ''}"
 				title="${searchListItem.name ?? ''}"
 				href=${`section/settings/workspace/logviewer/search/?lq=${searchListItem.query}`}>
-				<uui-icon name="umb:search"></uui-icon>${searchListItem.name}
+				<uui-icon name="icon-search"></uui-icon>${searchListItem.name}
 			</uui-button>
 		</li>`;
 	};

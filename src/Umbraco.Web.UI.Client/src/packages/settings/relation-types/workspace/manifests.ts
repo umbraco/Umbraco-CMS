@@ -9,7 +9,7 @@ const workspace: ManifestWorkspace = {
 	type: 'workspace',
 	alias: 'Umb.Workspace.RelationType',
 	name: 'Relation Type Workspace',
-	loader: () => import('./relation-type-workspace.element.js'),
+	js: () => import('./relation-type-workspace.element.js'),
 	meta: {
 		entityType: 'relation-type',
 	},
@@ -20,12 +20,12 @@ const workspaceViews: Array<ManifestWorkspaceEditorView> = [
 		type: 'workspaceEditorView',
 		alias: 'Umb.WorkspaceView.RelationType.RelationType',
 		name: 'Relation Type Workspace RelationType View',
-		loader: () => import('./views/relation-type/relation-type-workspace-view-relation-type.element.js'),
+		js: () => import('./views/relation-type/relation-type-workspace-view-relation-type.element.js'),
 		weight: 20,
 		meta: {
 			label: 'RelationType',
 			pathname: 'relation-type',
-			icon: 'umb:info',
+			icon: 'icon-info',
 		},
 		conditions: [
 			{
@@ -38,12 +38,12 @@ const workspaceViews: Array<ManifestWorkspaceEditorView> = [
 		type: 'workspaceEditorView',
 		alias: 'Umb.WorkspaceView.RelationType.Relation',
 		name: 'Relation Type Workspace Relation View',
-		loader: () => import('./views/relation/workspace-view-relation-type-relation.element.js'),
+		js: () => import('./views/relation/workspace-view-relation-type-relation.element.js'),
 		weight: 10,
 		meta: {
 			label: 'Relation',
 			pathname: 'relation',
-			icon: 'umb:trafic',
+			icon: 'icon-trafic',
 		},
 		conditions: [
 			{

@@ -1,4 +1,4 @@
-import { MEDIA_REPOSITORY_ALIAS } from '../repository/manifests.js';
+import { UMB_MEDIA_REPOSITORY_ALIAS } from '../repository/manifests.js';
 import type { ManifestEntityAction } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbTrashEntityAction } from '@umbraco-cms/backoffice/entity-action';
 
@@ -9,9 +9,9 @@ const entityActions: Array<ManifestEntityAction> = [
 		name: 'Trash Media Entity Action ',
 		api: UmbTrashEntityAction,
 		meta: {
-			icon: 'umb:trash',
+			icon: 'icon-trash',
 			label: 'Trash',
-			repositoryAlias: MEDIA_REPOSITORY_ALIAS,
+			repositoryAlias: UMB_MEDIA_REPOSITORY_ALIAS,
 			entityTypes: ['media'],
 		},
 	},

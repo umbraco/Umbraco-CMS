@@ -1,7 +1,7 @@
 import { expect } from '@open-wc/testing';
-import { customElement } from 'lit/decorators.js';
-import { ManifestElement, ManifestElementAndApi } from '../types.js';
+import { ManifestElement, ManifestElementAndApi } from '../types/index.js';
 import { createExtensionElement } from './create-extension-element.function.js';
+import { customElement } from '@umbraco-cms/backoffice/external/lit';
 
 
 
@@ -43,7 +43,7 @@ describe('Extension-Api: Create Extension Element', () => {
 
 		const manifest: ManifestElement = {
 			type: 'my-test-type',
-			alias: 'Umb.Test.CreateExtensionElement',
+			alias: 'Umb.Test.CreateManifestElement',
 			name: 'pretty name'
 		};
 
@@ -55,7 +55,7 @@ describe('Extension-Api: Create Extension Element', () => {
 
 		const manifest: ManifestElement<UmbExtensionApiTrueTestElement> = {
 			type: 'my-test-type',
-			alias: 'Umb.Test.CreateExtensionElement',
+			alias: 'Umb.Test.CreateManifestElement',
 			name: 'pretty name'
 		};
 
@@ -71,7 +71,7 @@ describe('Extension-Api: Create Extension Element', () => {
 
 		const manifest: ManifestElementAndApi<UmbExtensionApiTrueTestElement> = {
 			type: 'my-test-type',
-			alias: 'Umb.Test.CreateExtensionElement',
+			alias: 'Umb.Test.CreateManifestElement',
 			name: 'pretty name',
 			api: class TestApi {}
 		};
@@ -87,7 +87,7 @@ describe('Extension-Api: Create Extension Element', () => {
 
 		const manifest: ManifestElement<UmbExtensionApiTrueTestElement> = {
 			type: 'my-test-type',
-			alias: 'Umb.Test.CreateExtensionElement',
+			alias: 'Umb.Test.CreateManifestElement',
 			name: 'pretty name',
 			elementName: 'umb-extension-api-true-test-element'
 		};
@@ -103,9 +103,9 @@ describe('Extension-Api: Create Extension Element', () => {
 
 		const manifest: ManifestElement<UmbExtensionApiTrueTestElement> = {
 			type: 'my-test-type',
-			alias: 'Umb.Test.CreateExtensionElement',
+			alias: 'Umb.Test.CreateManifestElement',
 			name: 'pretty name',
-			loader: () => Promise.resolve(jsModuleWithDefaultExport)
+			js: () => Promise.resolve(jsModuleWithDefaultExport)
 		};
 
 		const element = await createExtensionElement(manifest);
@@ -119,9 +119,9 @@ describe('Extension-Api: Create Extension Element', () => {
 
 		const manifest: ManifestElement<UmbExtensionApiTrueTestElement> = {
 			type: 'my-test-type',
-			alias: 'Umb.Test.CreateExtensionElement',
+			alias: 'Umb.Test.CreateManifestElement',
 			name: 'pretty name',
-			loader: () => Promise.resolve(jsModuleWithElementExport)
+			js: () => Promise.resolve(jsModuleWithElementExport)
 		};
 
 		const element = await createExtensionElement(manifest);
@@ -135,9 +135,9 @@ describe('Extension-Api: Create Extension Element', () => {
 
 		const manifest: ManifestElement<UmbExtensionApiTrueTestElement> = {
 			type: 'my-test-type',
-			alias: 'Umb.Test.CreateExtensionElement',
+			alias: 'Umb.Test.CreateManifestElement',
 			name: 'pretty name',
-			loader: () => Promise.resolve(jsModuleWithDefaultAndElementExport)
+			js: () => Promise.resolve(jsModuleWithDefaultAndElementExport)
 		};
 
 		const element = await createExtensionElement(manifest);

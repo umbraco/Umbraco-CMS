@@ -1,11 +1,11 @@
 import { UmbLanguageRepository } from '../repository/language.repository.js';
-import { UmbObjectState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UmbContextProviderController, UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbBaseController, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
-export class UmbAppLanguageContext {
-	#host: UmbControllerHostElement;
+export class UmbAppLanguageContext extends UmbBaseController implements UmbApi {
 	#languageRepository: UmbLanguageRepository;
 
 	#languages: Array<LanguageResponseModel> = [];
@@ -13,12 +13,12 @@ export class UmbAppLanguageContext {
 	#appLanguage = new UmbObjectState<LanguageResponseModel | undefined>(undefined);
 	appLanguage = this.#appLanguage.asObservable();
 
-	constructor(host: UmbControllerHostElement) {
-		this.#host = host;
+	constructor(host: UmbControllerHost) {
+		super(host);
 
-		new UmbContextProviderController(host, UMB_APP_LANGUAGE_CONTEXT_TOKEN, this);
+		this.provideContext(UMB_APP_LANGUAGE_CONTEXT_TOKEN, this);
 
-		this.#languageRepository = new UmbLanguageRepository(this.#host);
+		this.#languageRepository = new UmbLanguageRepository(this);
 		this.#observeLanguages();
 	}
 
@@ -30,14 +30,14 @@ export class UmbAppLanguageContext {
 	async #observeLanguages() {
 		const { asObservable } = await this.#languageRepository.requestLanguages();
 
-		new UmbObserverController(this.#host, asObservable(), (languages) => {
+		this.observe(asObservable(), (languages) => {
 			this.#languages = languages;
 
 			// If the app language is not set, set it to the default language
 			if (!this.#appLanguage.getValue()) {
 				this.#initAppLanguage();
 			}
-		});
+		}, '_observeLanguages');
 	}
 
 	#initAppLanguage() {

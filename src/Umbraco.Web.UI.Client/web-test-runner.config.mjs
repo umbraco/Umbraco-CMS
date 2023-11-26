@@ -1,6 +1,10 @@
 import { esbuildPlugin } from '@web/dev-server-esbuild';
 import { playwrightLauncher } from '@web/test-runner-playwright';
 import { importMapsPlugin } from '@web/dev-server-import-maps';
+import rollupCommonjs from '@rollup/plugin-commonjs';
+import { fromRollup } from '@web/dev-server-rollup';
+
+const commonjs = fromRollup(rollupCommonjs);
 
 const mode = process.env.MODE || 'dev';
 if (!['dev', 'prod'].includes(mode)) {
@@ -11,7 +15,7 @@ if (!['dev', 'prod'].includes(mode)) {
 export default {
 	rootDir: '.',
 	files: ['./src/**/*.test.ts'],
-	nodeResolve: { exportConditions: mode === 'dev' ? ['development'] : [] },
+	nodeResolve: { exportConditions: mode === 'dev' ? ['development'] : [], preferBuiltins: false, browser: true },
 	plugins: [
 		esbuildPlugin({ ts: true, tsconfig: './tsconfig.json', target: 'auto', json: true }),
 		importMapsPlugin({
@@ -31,8 +35,8 @@ export default {
 						'@umbraco-cms/backoffice/external/tinymce': './src/external/tinymce/index.ts',
 						'@umbraco-cms/backoffice/external/uui': './src/external/uui/index.ts',
 						'@umbraco-cms/backoffice/external/uuid': './src/external/uuid/index.ts',
-						'@umbraco-cms/backoffice/external/sanitize-html': './src/external/sanitize-html/index.ts',
-						'@umbraco-cms/backoffice/external/marked': 'src/external/marked/index.ts',
+						'@umbraco-cms/backoffice/external/dompurify': './src/external/dompurify/index.ts',
+						'@umbraco-cms/backoffice/external/marked': './src/external/marked/index.ts',
 
 						'@umbraco-cms/backoffice/backend-api': './src/external/backend-api/index.ts',
 						'@umbraco-cms/backoffice/class-api': './src/libs/class-api/index.ts',
@@ -80,6 +84,7 @@ export default {
 						'@umbraco-cms/backoffice/culture': './src/packages/core/culture/index.ts',
 						'@umbraco-cms/backoffice/event': './src/packages/core/event/index.ts',
 						'@umbraco-cms/backoffice/repository': './src/packages/core/repository/index.ts',
+						'@umbraco-cms/backoffice/temporary-file': './src/packages/core/temporary-file/index.ts',
 
 						'@umbraco-cms/backoffice/dictionary': './src/packages/dictionary/dictionary/index.ts',
 
@@ -93,7 +98,7 @@ export default {
 						'@umbraco-cms/backoffice/member-type': './src/packages/members/member-types/index.ts',
 						'@umbraco-cms/backoffice/package': './src/packages/packages/package/index.ts',
 
-						'@umbraco-cms/backoffice/data-type': './src/packages/settings/data-types/index.ts',
+						'@umbraco-cms/backoffice/data-type': './src/packages/core/data-type/index.ts',
 						'@umbraco-cms/backoffice/language': './src/packages/settings/languages/index.ts',
 						'@umbraco-cms/backoffice/logviewer': './src/packages/settings/logviewer/index.ts',
 						'@umbraco-cms/backoffice/webhooks': './src/packages/settings/webhooks/index.ts',
@@ -115,6 +120,9 @@ export default {
 				},
 			},
 		}),
+		commonjs({
+			include: ['node_modules/**', 'src/external/**'],
+		}),
 	],
 	browsers: [playwrightLauncher({ product: 'chromium' }), playwrightLauncher({ product: 'webkit' })],
 	coverageConfig: {
@@ -134,6 +142,16 @@ export default {
 			</head>
       <body>
         <script type="module" src="${testFramework}"></script>
+				<script type="module">
+					/* Hack to disable Lit dev mode warnings */
+					const systemWarn = window.console.warn;
+					window.console.warn = (...args) => {
+						if (args[0].indexOf('Lit is in dev mode.') === 0) {
+							return;
+						}
+						systemWarn(...args);
+					};
+				</script>
         <script type="module">
 					import 'element-internals-polyfill';
 					import '@umbraco-ui/uui';
