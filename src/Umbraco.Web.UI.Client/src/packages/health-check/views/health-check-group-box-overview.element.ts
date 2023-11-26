@@ -33,9 +33,11 @@ export class UmbHealthCheckGroupBoxOverviewElement extends UmbLitElement {
 			if (!this._healthCheckContext || !this.manifest?.meta.label) return;
 			this._api = this._healthCheckContext?.apis.get(this.manifest?.meta.label);
 
-			this._api?.results.subscribe((results) => {
-				this._keyResults = results;
-			});
+			if(this._api) {
+				this.observe(this._api.results, (results) => {
+					this._keyResults = results;
+				}, '_observeApiResults');
+			}
 		});
 	}
 

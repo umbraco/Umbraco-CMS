@@ -1,18 +1,21 @@
 import { UmbRelationTypeRepository } from '../repository/relation-type.repository.js';
-import { UmbSaveableWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
+import {
+	type UmbSaveableWorkspaceContextInterface,
+	UmbEditableWorkspaceContextBase,
+} from '@umbraco-cms/backoffice/workspace';
 import type { RelationTypeBaseModel, RelationTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 export class UmbRelationTypeWorkspaceContext
-	extends UmbWorkspaceContext<UmbRelationTypeRepository, RelationTypeResponseModel>
+	extends UmbEditableWorkspaceContextBase<UmbRelationTypeRepository, RelationTypeResponseModel>
 	implements UmbSaveableWorkspaceContextInterface<RelationTypeResponseModel | undefined>
 {
 	#data = new UmbObjectState<RelationTypeResponseModel | undefined>(undefined);
-	data = this.#data.asObservable();
-	name = this.#data.asObservablePart((data) => data?.name);
-	id = this.#data.asObservablePart((data) => data?.id);
+	readonly data = this.#data.asObservable();
+	readonly name = this.#data.asObservablePart((data) => data?.name);
+	readonly id = this.#data.asObservablePart((data) => data?.id);
 
 	constructor(host: UmbControllerHostElement) {
 		super(host, 'Umb.Workspace.RelationType', new UmbRelationTypeRepository(host));
@@ -73,13 +76,15 @@ export class UmbRelationTypeWorkspaceContext
 	}
 
 	public destroy(): void {
-		this.#data.complete();
+		this.#data.destroy();
 	}
 }
 
-
-
-export const UMB_RELATION_TYPE_WORKSPACE_CONTEXT = new UmbContextToken<UmbSaveableWorkspaceContextInterface, UmbRelationTypeWorkspaceContext>(
+export const UMB_RELATION_TYPE_WORKSPACE_CONTEXT = new UmbContextToken<
+	UmbSaveableWorkspaceContextInterface,
+	UmbRelationTypeWorkspaceContext
+>(
 	'UmbWorkspaceContext',
-	(context): context is UmbRelationTypeWorkspaceContext => context.getEntityType?.() === 'relation-type'
+	undefined,
+	(context): context is UmbRelationTypeWorkspaceContext => context.getEntityType?.() === 'relation-type',
 );

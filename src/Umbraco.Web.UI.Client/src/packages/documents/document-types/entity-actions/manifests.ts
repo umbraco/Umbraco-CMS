@@ -1,4 +1,4 @@
-import { DOCUMENT_TYPE_REPOSITORY_ALIAS } from '../repository/manifests.js';
+import { DOCUMENT_TYPE_DETAIL_REPOSITORY_ALIAS } from '../repository/index.js';
 import { manifests as createManifests } from './create/manifests.js';
 import {
 	UmbCopyEntityAction,
@@ -20,7 +20,7 @@ const entityActions: Array<ManifestEntityAction> = [
 		meta: {
 			icon: 'icon-trash',
 			label: 'Delete',
-			repositoryAlias: DOCUMENT_TYPE_REPOSITORY_ALIAS,
+			repositoryAlias: DOCUMENT_TYPE_DETAIL_REPOSITORY_ALIAS,
 			entityTypes: [entityType],
 		},
 	},
@@ -33,7 +33,7 @@ const entityActions: Array<ManifestEntityAction> = [
 		meta: {
 			icon: 'icon-enter',
 			label: 'Move',
-			repositoryAlias: DOCUMENT_TYPE_REPOSITORY_ALIAS,
+			repositoryAlias: DOCUMENT_TYPE_DETAIL_REPOSITORY_ALIAS,
 			entityTypes: [entityType],
 		},
 	},
@@ -46,7 +46,7 @@ const entityActions: Array<ManifestEntityAction> = [
 		meta: {
 			icon: 'icon-documents',
 			label: 'Copy',
-			repositoryAlias: DOCUMENT_TYPE_REPOSITORY_ALIAS,
+			repositoryAlias: DOCUMENT_TYPE_DETAIL_REPOSITORY_ALIAS,
 			entityTypes: [entityType],
 		},
 	},
@@ -59,7 +59,7 @@ const entityActions: Array<ManifestEntityAction> = [
 		meta: {
 			icon: 'icon-navigation-vertical',
 			label: 'Sort',
-			repositoryAlias: DOCUMENT_TYPE_REPOSITORY_ALIAS,
+			repositoryAlias: DOCUMENT_TYPE_DETAIL_REPOSITORY_ALIAS,
 			entityTypes: [entityType],
 		},
 	},

@@ -1,12 +1,12 @@
-import { USER_ENTITY_TYPE, UmbUserCollectionFilterModel, UmbUserDetail } from '../types.js';
-import { USER_COLLECTION_REPOSITORY_ALIAS } from './repository/manifests.js';
+import { UMB_USER_ENTITY_TYPE, UmbUserCollectionFilterModel, UmbUserDetail } from '../types.js';
+import { UMB_USER_COLLECTION_REPOSITORY_ALIAS } from './repository/manifests.js';
 import { UmbCollectionContext } from '@umbraco-cms/backoffice/collection';
 import { UserOrderModel, UserStateModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbUserCollectionContext extends UmbCollectionContext<UmbUserDetail, UmbUserCollectionFilterModel> {
 	constructor(host: UmbControllerHostElement) {
-		super(host, USER_ENTITY_TYPE, USER_COLLECTION_REPOSITORY_ALIAS, { pageSize: 50 });
+		super(host, UMB_USER_ENTITY_TYPE, UMB_USER_COLLECTION_REPOSITORY_ALIAS, { pageSize: 50 });
 	}
 
 	/**

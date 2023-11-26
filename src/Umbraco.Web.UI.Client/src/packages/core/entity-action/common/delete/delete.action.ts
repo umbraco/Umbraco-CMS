@@ -9,14 +9,14 @@ import {
 import { UmbDetailRepository, UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 
 export class UmbDeleteEntityAction<
-	T extends UmbDetailRepository & UmbItemRepository<any>
+	T extends UmbDetailRepository & UmbItemRepository<any>,
 > extends UmbEntityActionBase<T> {
 	#modalManager?: UmbModalManagerContext;
 
 	constructor(host: UmbControllerHostElement, repositoryAlias: string, unique: string) {
 		super(host, repositoryAlias, unique);
 
-		new UmbContextConsumerController(this.host, UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
+		new UmbContextConsumerController(this._host, UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
 			this.#modalManager = instance;
 		});
 	}
@@ -24,20 +24,17 @@ export class UmbDeleteEntityAction<
 	async execute() {
 		if (!this.repository || !this.#modalManager) return;
 
-		const { data } = await this.repository.requestItems([this.unique]);
+		// TOOD: add back when entity actions can support multiple repositories
+		//const { data } = await this.repository.requestItems([this.unique]);
 
-		if (data) {
-			const item = data[0];
+		const modalContext = this.#modalManager.open(UMB_CONFIRM_MODAL, {
+			headline: `Delete`,
+			content: 'Are you sure you want to delete this item?',
+			color: 'danger',
+			confirmLabel: 'Delete',
+		});
 
-			const modalContext = this.#modalManager.open(UMB_CONFIRM_MODAL, {
-				headline: `Delete ${item.name}`,
-				content: 'Are you sure you want to delete this item?',
-				color: 'danger',
-				confirmLabel: 'Delete',
-			});
-
-			await modalContext.onSubmit();
-			await this.repository?.delete(this.unique);
-		}
+		await modalContext.onSubmit();
+		await this.repository?.delete(this.unique);
 	}
 }

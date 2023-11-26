@@ -5,7 +5,7 @@ export const themes: Array<ManifestTypes> = [
 		type: 'globalContext',
 		alias: 'Umb.GlobalContext.Theme',
 		name: 'Theme Context',
-		loader: () => import('./theme.context.js'),
+		js: () => import('./theme.context.js'),
 	},
 	{
 		type: 'theme',

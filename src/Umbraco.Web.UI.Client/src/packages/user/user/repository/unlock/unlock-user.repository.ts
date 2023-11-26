@@ -1,5 +1,5 @@
 import { UmbUserRepositoryBase } from '../user-repository-base.js';
-import { UmbUnlockUserServerDataSource } from './unlock-user.server.data.js';
+import { UmbUnlockUserServerDataSource } from './unlock-user.server.data-source.js';
 import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UserStateModel } from '@umbraco-cms/backoffice/backend-api';
 

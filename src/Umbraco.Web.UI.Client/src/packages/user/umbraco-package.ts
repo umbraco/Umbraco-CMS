@@ -5,6 +5,6 @@ export const extensions = [
 		name: 'User Management Bundle',
 		alias: 'Umb.Bundle.UserManagement',
 		type: 'bundle',
-		loader: () => import('./manifests.js'),
+		js: () => import('./manifests.js'),
 	},
 ];

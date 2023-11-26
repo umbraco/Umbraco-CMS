@@ -1,7 +1,7 @@
+import { UmbDataTypeDetailRepository } from '@umbraco-cms/backoffice/data-type';
 import { UmbPropertyEditorConfig } from '../../property-editor/index.js';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, ifDefined, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbDataTypeRepository } from '@umbraco-cms/backoffice/data-type';
 import type { DataTypeResponseModel, PropertyTypeModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
@@ -27,16 +27,16 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 	@state()
 	private _dataTypeData?: UmbPropertyEditorConfig;
 
-	private _dataTypeRepository: UmbDataTypeRepository = new UmbDataTypeRepository(this);
+	private _dataTypeDetailRepository = new UmbDataTypeDetailRepository(this);
 	private _dataTypeObserver?: UmbObserverController<DataTypeResponseModel | undefined>;
 
 	private async _observeDataType(dataTypeId?: string) {
 		this._dataTypeObserver?.destroy();
 		if (dataTypeId) {
 			// Its not technically needed to have await here, this is only to ensure that the data is loaded before we observe it, and thereby only updating the DOM with the latest data.
-			await this._dataTypeRepository.requestById(dataTypeId);
+			await this._dataTypeDetailRepository.requestById(dataTypeId);
 			this._dataTypeObserver = this.observe(
-				await this._dataTypeRepository.byId(dataTypeId),
+				await this._dataTypeDetailRepository.byId(dataTypeId),
 				(dataType) => {
 					this._dataTypeData = dataType?.values;
 					this._propertyEditorUiAlias = dataType?.propertyEditorUiAlias || undefined;
@@ -50,11 +50,11 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 								this._propertyEditorUiAlias = extension?.meta.defaultPropertyEditorUiAlias;
 								this.removeControllerByAlias('_observePropertyEditorSchema');
 							},
-							'_observePropertyEditorSchema'
+							'_observePropertyEditorSchema',
 						);
 					}
 				},
-				'_observeDataType'
+				'_observeDataType',
 			);
 		}
 	}

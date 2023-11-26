@@ -170,6 +170,9 @@ export class UmbDashboardModelsBuilderElement extends UmbLitElement {
 	];
 }
 
+
+export default UmbDashboardModelsBuilderElement;
+
 declare global {
 	interface HTMLElementTagNameMap {
 		'umb-dashboard-models-builder': UmbDashboardModelsBuilderElement;

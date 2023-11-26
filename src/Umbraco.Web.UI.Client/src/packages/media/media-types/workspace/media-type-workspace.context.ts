@@ -1,80 +1,118 @@
-import { UmbMediaTypeRepository } from '../repository/media-type.repository.js';
-import { UmbSaveableWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
+import { UmbMediaTypeDetailRepository } from '../repository/detail/media-type-detail.repository.js';
+import { UMB_MEDIA_TYPE_ENTITY_TYPE } from '../index.js';
+import {
+	UmbSaveableWorkspaceContextInterface,
+	UmbEditableWorkspaceContextBase,
+} from '@umbraco-cms/backoffice/workspace';
+import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
+import { type MediaTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { MediaTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 
 type EntityType = MediaTypeResponseModel;
 export class UmbMediaTypeWorkspaceContext
-	extends UmbWorkspaceContext<UmbMediaTypeRepository, EntityType>
+	extends UmbEditableWorkspaceContextBase<UmbMediaTypeDetailRepository, EntityType>
 	implements UmbSaveableWorkspaceContextInterface<EntityType | undefined>
 {
-	#data = new UmbObjectState<EntityType | undefined>(undefined);
-	data = this.#data.asObservable();
-	#getDataPromise?: Promise<any>;
+	// Draft is located in structure manager
 
-	name = this.#data.asObservablePart((data) => data?.name);
-	id = this.#data.asObservablePart((data) => data?.id);
-	alias = this.#data.asObservablePart((data) => data?.alias);
-	description = this.#data.asObservablePart((data) => data?.description);
-	icon = this.#data.asObservablePart((data) => data?.icon);
+	// General for content types:
+	readonly data;
+	readonly name;
+	readonly alias;
+	readonly description;
+	readonly icon;
+
+	readonly allowedAsRoot;
+	readonly allowedContentTypes;
+	readonly compositions;
+
+	readonly structure;
+
+	#isSorting = new UmbBooleanState(undefined);
+	isSorting = this.#isSorting.asObservable();
 
 	constructor(host: UmbControllerHostElement) {
-		super(host, 'Umb.Workspace.MediaType', new UmbMediaTypeRepository(host));
+		super(host, 'Umb.Workspace.MediaType', new UmbMediaTypeDetailRepository(host));
+
+		this.structure = new UmbContentTypePropertyStructureManager(this.host, this.repository);
+
+		// General for content types:
+		this.data = this.structure.ownerContentType;
+		this.name = this.structure.ownerContentTypeObservablePart((data) => data?.name);
+		this.alias = this.structure.ownerContentTypeObservablePart((data) => data?.alias);
+		this.description = this.structure.ownerContentTypeObservablePart((data) => data?.description);
+		this.icon = this.structure.ownerContentTypeObservablePart((data) => data?.icon);
+		this.allowedAsRoot = this.structure.ownerContentTypeObservablePart((data) => data?.allowedAsRoot);
+		this.allowedContentTypes = this.structure.ownerContentTypeObservablePart((data) => data?.allowedContentTypes);
+		this.compositions = this.structure.ownerContentTypeObservablePart((data) => data?.compositions);
+	}
+
+	getIsSorting() {
+		return this.#isSorting.getValue();
+	}
+
+	setIsSorting(isSorting: boolean) {
+		this.#isSorting.next(isSorting);
 	}
 
 	getData() {
-		return this.#data.getValue();
+		return this.structure.getOwnerContentType() || {};
 	}
 
 	getEntityId() {
-		return this.getData()?.id || '';
+		return this.getData().id;
 	}
 
 	getEntityType() {
-		return 'media-type';
+		return UMB_MEDIA_TYPE_ENTITY_TYPE;
 	}
 
 	updateProperty<PropertyName extends keyof EntityType>(propertyName: PropertyName, value: EntityType[PropertyName]) {
-		this.#data.update({ [propertyName]: value });
-	}
-
-	async load(id: string) {
-		this.#getDataPromise = this.repository.requestById(id);
-		const { data } = await this.#getDataPromise;
-		if (data) {
-			this.setIsNew(false);
-			this.#data.update(data);
-		}
+		this.structure.updateOwnerContentType({ [propertyName]: value });
 	}
 
 	async create(parentId: string | null) {
-		this.#getDataPromise = this.repository.createScaffold(parentId);
-		const { data } = await this.#getDataPromise;
-		if (!data) return;
+		const { data } = await this.structure.createScaffold(parentId);
+		if (!data) return undefined;
 
 		this.setIsNew(true);
-
-		//TODO: Model mismatch. FIX
-		this.#data.next(data as unknown as MediaTypeResponseModel);
+		this.setIsSorting(false);
+		//this.#draft.next(data);
+		return { data } || undefined;
+		// TODO: Is this wrong? should we return { data }??
 	}
 
-	async save() {
-		if (!this.#data.value) return;
-		if (!this.#data.value.id) return;
+	async load(entityId: string) {
+		const { data } = await this.structure.loadType(entityId);
+		if (!data) return undefined;
 
+		this.setIsNew(false);
+		this.setIsSorting(false);
+		//this.#draft.next(data);
+		return { data } || undefined;
+		// TODO: Is this wrong? should we return { data }??
+	}
+
+	/**
+	 * Save or creates the media type, based on wether its a new one or existing.
+	 */
+	async save() {
 		if (this.getIsNew()) {
-			await this.repository.create(this.#data.value);
+			if ((await this.structure.create()) === true) {
+				this.setIsNew(false);
+			}
 		} else {
-			await this.repository.save(this.#data.value.id, this.#data.value);
+			await this.structure.save();
 		}
 
-		this.saveComplete(this.#data.value);
+		this.saveComplete(this.getData());
 	}
 
 	public destroy(): void {
-		this.#data.complete();
+		this.structure.destroy();
+		super.destroy();
 	}
 }
 
@@ -83,5 +121,6 @@ export const UMB_MEDIA_TYPE_WORKSPACE_CONTEXT = new UmbContextToken<
 	UmbMediaTypeWorkspaceContext
 >(
 	'UmbWorkspaceContext',
-	(context): context is UmbMediaTypeWorkspaceContext => context.getEntityType?.() === 'media-type',
+	undefined,
+	(context): context is UmbMediaTypeWorkspaceContext => context.getEntityType?.() === UMB_MEDIA_TYPE_ENTITY_TYPE,
 );

@@ -1,19 +1,24 @@
-import { UmbMemberRepository } from '../repository/member.repository.js';
-import type { MemberDetails } from '../types.js';
-import { UmbSaveableWorkspaceContextInterface, UmbWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
+import { UmbMemberDetailRepository } from '../repository/index.js';
+import type { UmbMemberDetailModel } from '../types.js';
+import { UMB_MEMBER_ENTITY_TYPE } from '../entity.js';
+import { UMB_MEMBER_WORKSPACE_ALIAS } from './manifests.js';
+import {
+	type UmbSaveableWorkspaceContextInterface,
+	UmbEditableWorkspaceContextBase,
+} from '@umbraco-cms/backoffice/workspace';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 export class UmbMemberWorkspaceContext
-	extends UmbWorkspaceContext<UmbMemberRepository, MemberDetails>
-	implements UmbSaveableWorkspaceContextInterface<MemberDetails | undefined>
+	extends UmbEditableWorkspaceContextBase<UmbMemberDetailRepository, UmbMemberDetailModel>
+	implements UmbSaveableWorkspaceContextInterface<UmbMemberDetailModel | undefined>
 {
 	constructor(host: UmbControllerHostElement) {
-		super(host, 'Umb.Workspace.Member', new UmbMemberRepository(host));
+		super(host, UMB_MEMBER_WORKSPACE_ALIAS, new UmbMemberDetailRepository(host));
 	}
 
 	getEntityType(): string {
-		return 'member';
+		return UMB_MEMBER_ENTITY_TYPE;
 	}
 
 	getEntityId() {
@@ -21,7 +26,7 @@ export class UmbMemberWorkspaceContext
 	}
 
 	getData() {
-		return 'fake' as unknown as MemberDetails;
+		return 'fake' as unknown as UmbMemberDetailModel;
 	}
 
 	async save() {
@@ -37,7 +42,11 @@ export class UmbMemberWorkspaceContext
 	}
 }
 
-export const UMB_MEMBER_WORKSPACE_CONTEXT = new UmbContextToken<UmbSaveableWorkspaceContextInterface, UmbMemberWorkspaceContext>(
+export const UMB_MEMBER_WORKSPACE_CONTEXT = new UmbContextToken<
+	UmbSaveableWorkspaceContextInterface,
+	UmbMemberWorkspaceContext
+>(
 	'UmbWorkspaceContext',
-	(context): context is UmbMemberWorkspaceContext => context.getEntityType?.() === 'member'
+	undefined,
+	(context): context is UmbMemberWorkspaceContext => context.getEntityType?.() === UMB_MEMBER_ENTITY_TYPE,
 );

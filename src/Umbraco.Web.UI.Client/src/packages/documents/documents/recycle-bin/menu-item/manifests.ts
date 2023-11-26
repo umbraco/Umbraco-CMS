@@ -1,3 +1,4 @@
+import { UMB_CONTENT_MENU_ALIAS } from '../../menu.manifests.js';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const menuItem: ManifestTypes = {
@@ -10,7 +11,7 @@ const menuItem: ManifestTypes = {
 		treeAlias: 'Umb.Tree.DocumentRecycleBin',
 		label: 'Recycle Bin',
 		icon: 'icon-trash',
-		menus: ['Umb.Menu.Content'],
+		menus: [UMB_CONTENT_MENU_ALIAS],
 	},
 };
 

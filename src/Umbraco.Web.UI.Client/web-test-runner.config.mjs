@@ -84,6 +84,7 @@ export default {
 						'@umbraco-cms/backoffice/culture': './src/packages/core/culture/index.ts',
 						'@umbraco-cms/backoffice/event': './src/packages/core/event/index.ts',
 						'@umbraco-cms/backoffice/repository': './src/packages/core/repository/index.ts',
+						'@umbraco-cms/backoffice/temporary-file': './src/packages/core/temporary-file/index.ts',
 
 						'@umbraco-cms/backoffice/dictionary': './src/packages/dictionary/dictionary/index.ts',
 
@@ -97,7 +98,7 @@ export default {
 						'@umbraco-cms/backoffice/member-type': './src/packages/members/member-types/index.ts',
 						'@umbraco-cms/backoffice/package': './src/packages/packages/package/index.ts',
 
-						'@umbraco-cms/backoffice/data-type': './src/packages/settings/data-types/index.ts',
+						'@umbraco-cms/backoffice/data-type': './src/packages/core/data-type/index.ts',
 						'@umbraco-cms/backoffice/language': './src/packages/settings/languages/index.ts',
 						'@umbraco-cms/backoffice/logviewer': './src/packages/settings/logviewer/index.ts',
 						'@umbraco-cms/backoffice/relation-type': './src/packages/settings/relation-types/index.ts',
@@ -140,6 +141,16 @@ export default {
 			</head>
       <body>
         <script type="module" src="${testFramework}"></script>
+				<script type="module">
+					/* Hack to disable Lit dev mode warnings */
+					const systemWarn = window.console.warn;
+					window.console.warn = (...args) => {
+						if (args[0].indexOf('Lit is in dev mode.') === 0) {
+							return;
+						}
+						systemWarn(...args);
+					};
+				</script>
         <script type="module">
 					import 'element-internals-polyfill';
 					import '@umbraco-ui/uui';

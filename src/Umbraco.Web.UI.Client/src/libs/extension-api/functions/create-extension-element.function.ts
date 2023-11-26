@@ -1,45 +1,42 @@
-import { hasDefaultExport, hasElementExport, isManifestElementNameType } from '../type-guards/index.js';
-import type { HTMLElementConstructor, ManifestElement } from '../types.js';
-import { loadExtensionElement } from '../functions/load-extension-element.function.js';
+import { ManifestElement, ManifestElementAndApi } from "../types/base.types.js";
+import { loadManifestElement } from "./load-manifest-element.function.js";
 
-export async function createExtensionElement<ElementType extends HTMLElement>(
-	manifest: ManifestElement<ElementType>, fallbackElementName?: string
-): Promise<ElementType | undefined> {
-	//TODO: Write tests for these extension options:
-	const js = await loadExtensionElement(manifest);
+export async function createExtensionElement<ElementType extends HTMLElement>(manifest: ManifestElement<ElementType> | ManifestElementAndApi<ElementType>, fallbackElement?: string): Promise<ElementType | undefined> {
 
-	if (isManifestElementNameType(manifest)) {
-		// created by manifest method providing HTMLElement
+	if(manifest.element) {
+		const elementConstructor = await loadManifestElement<ElementType>(manifest.element);
+		if(elementConstructor) {
+			return new elementConstructor();
+		} else {
+			console.error(
+				`-- Extension of alias "${manifest.alias}" did not succeed creating an element class instance via the extension manifest property 'element', using either a 'element' or 'default' export`,
+				manifest
+			);
+		}
+	}
+
+	if(manifest.js) {
+		const elementConstructor2 = await loadManifestElement<ElementType>(manifest.js);
+		if(elementConstructor2) {
+			return new elementConstructor2();
+		} else {
+			console.error(
+				`-- Extension of alias "${manifest.alias}" did not succeed creating an element class instance via the extension manifest property 'js', using either a 'element' or 'default' export`,
+				manifest
+			);
+		}
+	}
+
+	if(manifest.elementName) {
 		return document.createElement(manifest.elementName) as ElementType;
 	}
 
-	// TODO: Do we need this except for the default() loader?
-	if (js) {
-		if (hasElementExport<HTMLElementConstructor<ElementType>>(js)) {
-			// Element will be created by default class
-			return new js.element();
-		}
-		if (hasDefaultExport<HTMLElementConstructor<ElementType>>(js)) {
-			// Element will be created by default class
-			return new js.default();
-		}
-
-		if(!fallbackElementName) {
-			console.error(
-				`-- Extension of alias "${manifest.alias}" did not succeed creating an api class instance, missing a 'element' or 'default' export of the served JavaScript file`,
-				manifest
-			);
-			return undefined;
-		}
+	if(fallbackElement) {
+		return document.createElement(fallbackElement) as ElementType;
 	}
 
-	if(fallbackElementName) {
-		return document.createElement(fallbackElementName) as ElementType;
-	}
-
-	// If some JS was loaded and manifest did not have a elementName neither it the JS file contain a default export, so we will fail:
 	console.error(
-		`-- Extension of alias "${manifest.alias}" did not succeed creating an element, missing a JavaScript file via the 'elementJs' or 'js' property or a Element Name in 'elementName' in the manifest.`,
+		`-- Extension of alias "${manifest.alias}" did not succeed creating an element, missing a JavaScript file via the 'element' or 'js' property or a Element Name in 'elementName' in the manifest.`,
 		manifest
 	);
 	return undefined;

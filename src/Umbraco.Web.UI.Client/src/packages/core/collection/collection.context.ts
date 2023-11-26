@@ -7,10 +7,9 @@ import {
 	UmbNumberState,
 	UmbObjectState,
 } from '@umbraco-cms/backoffice/observable-api';
-import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
+import { UmbExtensionsManifestInitializer, createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 import { ManifestCollectionView, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbCollectionFilterModel } from '@umbraco-cms/backoffice/collection';
-import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbSelectionManager, UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
@@ -182,6 +181,7 @@ export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectio
 			umbExtensionsRegistry.getByTypeAndAlias('repository', repositoryAlias),
 			async (repositoryManifest) => {
 				if (repositoryManifest) {
+					// TODO: Maybe use the UmbExtensionApiController instead of createExtensionApi, to ensure usage of conditions:
 					const result = await createExtensionApi(repositoryManifest, [this._host]);
 					this.repository = result as UmbCollectionRepository;
 					this.requestCollection();
@@ -192,15 +192,10 @@ export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectio
 	}
 
 	#observeViews() {
-		return this.observe(umbExtensionsRegistry.extensionsOfType('collectionView').pipe(
-			map((extensions) => {
-				return extensions.filter((extension) => extension.conditions.entityType === this.getEntityType());
-			}),
-		),
-		(views) => {
-			this.#views.next(views);
+		return new UmbExtensionsManifestInitializer(this, umbExtensionsRegistry, 'collectionView', null, (views) => {
+			this.#views.next(views.map(view => view.manifest));
 			this.#setCurrentView();
-		}, 'umbCollectionViewsObserver');
+		});
 	}
 
 	#onPageChange = (event: UmbChangeEvent) => {
@@ -216,7 +211,7 @@ export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectio
 		const viewMatch = views.find((view) => view.meta.pathName === lastPathSegment);
 
 		/* TODO: Find a way to figure out which layout it starts with and set _currentLayout to that instead of [0]. eg. '/table'
-			For document, media and members this will come as part of a data type configuration, but in other cases "users" we should find another way. 
+			For document, media and members this will come as part of a data type configuration, but in other cases "users" we should find another way.
 			This should only happen if the current layout is not set in the URL.
 		*/
 		const currentView = viewMatch || views[0];

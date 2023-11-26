@@ -97,9 +97,9 @@ export class UmbCodeEditorController {
 	set value(newValue: string) {
 		if (!this.#editor) throw new Error('Editor object not found');
 
-		const oldValue = this.value;
+		const oldValue = this.value ?? '';
 		if (newValue !== oldValue) {
-			this.#editor.setValue(newValue);
+			this.#editor.setValue(newValue ?? '');
 		}
 	}
 	/**

@@ -1,4 +1,4 @@
-import { MEDIA_REPOSITORY_ALIAS } from '../repository/manifests.js';
+import { UMB_MEDIA_REPOSITORY_ALIAS } from '../repository/manifests.js';
 import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type {
 	ManifestWorkspace,
@@ -11,7 +11,8 @@ const workspace: ManifestWorkspace = {
 	type: 'workspace',
 	alias: 'Umb.Workspace.Media',
 	name: 'Media Workspace',
-	loader: () => import('./media-workspace.element.js'),
+	element: () => import('./media-workspace.element.js'),
+	api: () => import('./media-workspace.context.js'),
 	meta: {
 		entityType: 'media',
 	},
@@ -22,7 +23,7 @@ const workspaceEditorViews: Array<ManifestWorkspaceEditorView> = [
 		type: 'workspaceEditorView',
 		alias: 'Umb.WorkspaceView.Media.Edit',
 		name: 'Media Workspace Edit View',
-		loader: () => import('./views/edit/media-edit-workspace-view.element.js'),
+		js: () => import('./views/edit/media-edit-workspace-view.element.js'),
 		weight: 200,
 		meta: {
 			label: 'Media',
@@ -40,7 +41,7 @@ const workspaceEditorViews: Array<ManifestWorkspaceEditorView> = [
 		type: 'workspaceEditorView',
 		alias: 'Umb.WorkspaceView.Media.Info',
 		name: 'Media Workspace Info View',
-		loader: () => import('./views/info/media-info-workspace-view.element.js'),
+		js: () => import('./views/info/media-info-workspace-view.element.js'),
 		weight: 100,
 		meta: {
 			label: 'Info',
@@ -67,7 +68,7 @@ const workspaceViewCollections: Array<ManifestWorkspaceViewCollection> = [
 			pathname: 'collection',
 			icon: 'icon-grid',
 			entityType: 'media',
-			repositoryAlias: MEDIA_REPOSITORY_ALIAS,
+			repositoryAlias: UMB_MEDIA_REPOSITORY_ALIAS,
 		},
 		conditions: [
 			{

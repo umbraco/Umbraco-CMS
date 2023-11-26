@@ -2,13 +2,13 @@ import './member-group-workspace.element.js';
 
 import { Meta, Story } from '@storybook/web-components';
 
-import { data } from '../../../../mocks/data/member-group.data.js';
+import { data } from '../../../../mocks/data/member.data.js';
 
 import type { UmbMemberGroupWorkspaceElement } from './member-group-workspace.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 export default {
-	title: 'Workspaces/Member Group',
+	title: 'Workspaces/MemberGroup',
 	component: 'umb-member-group-workspace',
 	id: 'umb-member-group-workspace',
 } as Meta;

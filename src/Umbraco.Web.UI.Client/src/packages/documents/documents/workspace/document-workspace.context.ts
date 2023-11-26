@@ -1,14 +1,14 @@
 import { UmbDocumentRepository } from '../repository/document.repository.js';
-import { UmbDocumentTypeRepository } from '../../document-types/repository/document-type.repository.js';
+import { UmbDocumentTypeDetailRepository } from '../../document-types/repository/detail/document-type-detail.repository.js';
 import { UmbDocumentVariantContext } from '../variant-context/document-variant-context.js';
+import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
 import {
 	UmbSaveableWorkspaceContextInterface,
-	UmbWorkspaceContext,
+	UmbEditableWorkspaceContextBase,
 	UmbWorkspaceSplitViewManager,
 	UmbVariantableWorkspaceContextInterface,
-	type UmbVariantContext,
 } from '@umbraco-cms/backoffice/workspace';
 import type { CreateDocumentRequestModel, DocumentResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import {
@@ -22,7 +22,7 @@ import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 type EntityType = DocumentResponseModel;
 export class UmbDocumentWorkspaceContext
-	extends UmbWorkspaceContext<UmbDocumentRepository, EntityType>
+	extends UmbEditableWorkspaceContextBase<UmbDocumentRepository, EntityType>
 	implements UmbVariantableWorkspaceContextInterface<EntityType | undefined>
 {
 	/**
@@ -52,9 +52,13 @@ export class UmbDocumentWorkspaceContext
 	readonly splitView;
 
 	constructor(host: UmbControllerHostElement) {
+		// TODO: Get Workspace Alias via Manifest.
 		super(host, 'Umb.Workspace.Document', new UmbDocumentRepository(host));
 
-		this.structure = new UmbContentTypePropertyStructureManager(this.host, new UmbDocumentTypeRepository(this.host));
+		this.structure = new UmbContentTypePropertyStructureManager(
+			this.host,
+			new UmbDocumentTypeDetailRepository(this.host),
+		);
 		this.splitView = new UmbWorkspaceSplitViewManager(this.host);
 
 		new UmbObserverController(this.host, this.documentTypeKey, (id) => this.structure.loadType(id));
@@ -100,7 +104,7 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	getEntityType() {
-		return 'document';
+		return UMB_DOCUMENT_ENTITY_TYPE;
 	}
 
 	getContentTypeId() {
@@ -130,7 +134,7 @@ export class UmbDocumentWorkspaceContext
 		const variants = partialUpdateFrozenArray(
 			oldVariants,
 			{ name },
-			variantId ? (x) => variantId.compare(x) : () => true
+			variantId ? (x) => variantId.compare(x) : () => true,
 		);
 		this.#currentData.update({ variants });
 	}
@@ -142,7 +146,8 @@ export class UmbDocumentWorkspaceContext
 	async propertyValueByAlias<PropertyValueType = unknown>(propertyAlias: string, variantId?: UmbVariantId) {
 		return this.#currentData.asObservablePart(
 			(data) =>
-				data?.values?.find((x) => x?.alias === propertyAlias && (variantId ? variantId.compare(x) : true))?.value as PropertyValueType
+				data?.values?.find((x) => x?.alias === propertyAlias && (variantId ? variantId.compare(x) : true))
+					?.value as PropertyValueType,
 		);
 	}
 
@@ -156,20 +161,24 @@ export class UmbDocumentWorkspaceContext
 		const currentData = this.#currentData.value;
 		if (currentData) {
 			const newDataSet = currentData.values?.find(
-				(x) => x.alias === alias && (variantId ? variantId.compare(x) : true)
+				(x) => x.alias === alias && (variantId ? variantId.compare(x) : true),
 			);
 			return newDataSet?.value as ReturnType;
 		}
 		return undefined;
 	}
-	async setPropertyValue<PropertyValueType = unknown>(alias: string, value: PropertyValueType, variantId?: UmbVariantId) {
+	async setPropertyValue<PropertyValueType = unknown>(
+		alias: string,
+		value: PropertyValueType,
+		variantId?: UmbVariantId,
+	) {
 		const entry = { ...variantId?.toObject(), alias, value };
 		const currentData = this.#currentData.value;
 		if (currentData) {
 			const values = appendToFrozenArray(
 				currentData.values || [],
 				entry,
-				(x) => x.alias === alias && (variantId ? variantId.compare(x) : true)
+				(x) => x.alias === alias && (variantId ? variantId.compare(x) : true),
 			);
 			this.#currentData.update({ values });
 		}
@@ -213,7 +222,7 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	public destroy(): void {
-		this.#currentData.complete();
+		this.#currentData.destroy();
 		this.structure.destroy();
 		super.destroy();
 	}
@@ -221,9 +230,11 @@ export class UmbDocumentWorkspaceContext
 
 export default UmbDocumentWorkspaceContext;
 
-
-export const UMB_DOCUMENT_WORKSPACE_CONTEXT = new UmbContextToken<UmbSaveableWorkspaceContextInterface, UmbDocumentWorkspaceContext>(
+export const UMB_DOCUMENT_WORKSPACE_CONTEXT = new UmbContextToken<
+	UmbSaveableWorkspaceContextInterface,
+	UmbDocumentWorkspaceContext
+>(
 	'UmbWorkspaceContext',
-	// TODO: Refactor: make a better generic way to identify workspaces, maybe workspaceType or workspaceAlias?.
-	(context): context is UmbDocumentWorkspaceContext => context.getEntityType?.() === 'document'
+	undefined,
+	(context): context is UmbDocumentWorkspaceContext => context.getEntityType?.() === UMB_DOCUMENT_ENTITY_TYPE,
 );

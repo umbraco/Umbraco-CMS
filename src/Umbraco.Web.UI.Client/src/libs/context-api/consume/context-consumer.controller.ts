@@ -14,7 +14,7 @@ export class UmbContextConsumerController<
 	public get controllerAlias() {
 		return this.#controllerAlias;
 	}
-
+	
 	constructor(host: UmbControllerHost, contextAlias: string | UmbContextToken<BaseType, ResultType>, callback: UmbContextCallback<ResultType>) {
 		super(host.getHostElement(), contextAlias, callback);
 		this.#host = host;

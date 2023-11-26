@@ -1,13 +1,11 @@
-import { DICTIONARY_REPOSITORY_ALIAS } from '../repository/manifests.js';
+import { UMB_DICTIONARY_REPOSITORY_ALIAS } from '../repository/manifests.js';
+import { UMB_DICTIONARY_ENTITY_TYPE } from '../entities.js';
 import UmbReloadDictionaryEntityAction from './reload.action.js';
 import UmbImportDictionaryEntityAction from './import/import.action.js';
 import UmbExportDictionaryEntityAction from './export/export.action.js';
 import UmbCreateDictionaryEntityAction from './create/create.action.js';
 import { UmbDeleteEntityAction, UmbMoveEntityAction } from '@umbraco-cms/backoffice/entity-action';
 import type { ManifestEntityAction, ManifestModal } from '@umbraco-cms/backoffice/extension-registry';
-
-const entityType = 'dictionary-item';
-const repositoryAlias = DICTIONARY_REPOSITORY_ALIAS;
 
 const entityActions: Array<ManifestEntityAction> = [
 	{
@@ -19,8 +17,8 @@ const entityActions: Array<ManifestEntityAction> = [
 		meta: {
 			icon: 'icon-add',
 			label: 'Create',
-			repositoryAlias,
-			entityTypes: [entityType],
+			repositoryAlias: UMB_DICTIONARY_REPOSITORY_ALIAS,
+			entityTypes: [UMB_DICTIONARY_ENTITY_TYPE],
 		},
 	},
 	{
@@ -32,8 +30,8 @@ const entityActions: Array<ManifestEntityAction> = [
 		meta: {
 			icon: 'icon-enter',
 			label: 'Move',
-			repositoryAlias,
-			entityTypes: [entityType],
+			repositoryAlias: UMB_DICTIONARY_REPOSITORY_ALIAS,
+			entityTypes: [UMB_DICTIONARY_ENTITY_TYPE],
 		},
 	},
 	{
@@ -45,8 +43,8 @@ const entityActions: Array<ManifestEntityAction> = [
 		meta: {
 			icon: 'icon-download-alt',
 			label: 'Export',
-			repositoryAlias,
-			entityTypes: [entityType],
+			repositoryAlias: UMB_DICTIONARY_REPOSITORY_ALIAS,
+			entityTypes: [UMB_DICTIONARY_ENTITY_TYPE],
 		},
 	},
 	{
@@ -58,8 +56,8 @@ const entityActions: Array<ManifestEntityAction> = [
 		meta: {
 			icon: 'icon-page-up',
 			label: 'Import',
-			repositoryAlias,
-			entityTypes: [entityType],
+			repositoryAlias: UMB_DICTIONARY_REPOSITORY_ALIAS,
+			entityTypes: [UMB_DICTIONARY_ENTITY_TYPE],
 		},
 	},
 	{
@@ -71,8 +69,8 @@ const entityActions: Array<ManifestEntityAction> = [
 		meta: {
 			icon: 'icon-refresh',
 			label: 'Reload',
-			repositoryAlias,
-			entityTypes: [entityType],
+			repositoryAlias: UMB_DICTIONARY_REPOSITORY_ALIAS,
+			entityTypes: [UMB_DICTIONARY_ENTITY_TYPE],
 		},
 	},
 	{
@@ -84,8 +82,8 @@ const entityActions: Array<ManifestEntityAction> = [
 		meta: {
 			icon: 'icon-trash',
 			label: 'Delete',
-			repositoryAlias,
-			entityTypes: [entityType],
+			repositoryAlias: UMB_DICTIONARY_REPOSITORY_ALIAS,
+			entityTypes: [UMB_DICTIONARY_ENTITY_TYPE],
 		},
 	},
 ];
@@ -95,19 +93,19 @@ const modals: Array<ManifestModal> = [
 		type: 'modal',
 		alias: 'Umb.Modal.CreateDictionary',
 		name: 'Create Dictionary Modal',
-		loader: () => import('./create/create-dictionary-modal.element.js'),
+		js: () => import('./create/create-dictionary-modal.element.js'),
 	},
 	{
 		type: 'modal',
 		alias: 'Umb.Modal.ExportDictionary',
 		name: 'Export Dictionary Modal',
-		loader: () => import('./export/export-dictionary-modal.element.js'),
+		js: () => import('./export/export-dictionary-modal.element.js'),
 	},
 	{
 		type: 'modal',
 		alias: 'Umb.Modal.ImportDictionary',
 		name: 'Import Dictionary Modal',
-		loader: () => import('./import/import-dictionary-modal.element.js'),
+		js: () => import('./import/import-dictionary-modal.element.js'),
 	},
 ];
 

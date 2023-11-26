@@ -5,7 +5,7 @@ export interface UmbImportDictionaryModalData {
 }
 
 export interface UmbImportDictionaryModalValue {
-	temporaryFileId?: string;
+	temporaryFileId: string;
 	parentId?: string;
 }
 

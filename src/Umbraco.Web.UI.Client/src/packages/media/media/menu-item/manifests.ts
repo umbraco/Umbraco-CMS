@@ -1,15 +1,17 @@
-import type { ManifestMenuItem } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
-const menuItem: ManifestMenuItem = {
+const menuItem: ManifestTypes = {
 	type: 'menuItem',
+	kind: 'tree',
 	alias: 'Umb.MenuItem.Media',
 	name: 'Media Menu Item',
 	weight: 100,
-	loader: () => import('./media-menu-item.element.js'),
 	meta: {
 		label: 'Media',
 		icon: 'icon-folder',
 		menus: ['Umb.Menu.Media'],
+		treeAlias: 'Umb.Tree.Media',
+		hideTreeRoot: true,
 	},
 };
 

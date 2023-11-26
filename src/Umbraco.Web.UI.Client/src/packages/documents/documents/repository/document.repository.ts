@@ -1,30 +1,26 @@
 import { UmbDocumentServerDataSource } from './sources/document.server.data.js';
 import { UmbDocumentStore, UMB_DOCUMENT_STORE_CONTEXT_TOKEN } from './document.store.js';
 import { UmbDocumentTreeStore, UMB_DOCUMENT_TREE_STORE_CONTEXT_TOKEN } from './document.tree.store.js';
-import { UmbDocumentTreeServerDataSource } from './sources/document.tree.server.data.js';
 import { UMB_DOCUMENT_ITEM_STORE_CONTEXT_TOKEN, type UmbDocumentItemStore } from './document-item.store.js';
 import { UmbDocumentItemServerDataSource } from './sources/document-item.server.data.js';
-import type { UmbTreeDataSource, UmbTreeRepository, UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
+import type { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
+import { UmbBaseController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import {
 	DocumentResponseModel,
 	CreateDocumentRequestModel,
 	UpdateDocumentRequestModel,
-	DocumentTreeItemResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
+import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
 export class UmbDocumentRepository
+	extends UmbBaseController
 	implements
-		UmbTreeRepository<DocumentTreeItemResponseModel>,
-		UmbDetailRepository<CreateDocumentRequestModel, any, UpdateDocumentRequestModel, DocumentResponseModel>
+		UmbDetailRepository<CreateDocumentRequestModel, any, UpdateDocumentRequestModel, DocumentResponseModel>,
+		UmbApi
 {
 	#init!: Promise<unknown>;
 
-	#host: UmbControllerHostElement;
-
-	#treeSource: UmbTreeDataSource;
 	#treeStore?: UmbDocumentTreeStore;
 
 	#detailDataSource: UmbDocumentServerDataSource;
@@ -36,27 +32,26 @@ export class UmbDocumentRepository
 	#notificationContext?: UmbNotificationContext;
 
 	constructor(host: UmbControllerHostElement) {
-		this.#host = host;
+		super(host);
 
 		// TODO: figure out how spin up get the correct data source
-		this.#treeSource = new UmbDocumentTreeServerDataSource(this.#host);
-		this.#detailDataSource = new UmbDocumentServerDataSource(this.#host);
-		this.#itemSource = new UmbDocumentItemServerDataSource(this.#host);
+		this.#detailDataSource = new UmbDocumentServerDataSource(this);
+		this.#itemSource = new UmbDocumentItemServerDataSource(this);
 
 		this.#init = Promise.all([
-			new UmbContextConsumerController(this.#host, UMB_DOCUMENT_TREE_STORE_CONTEXT_TOKEN, (instance) => {
+			this.consumeContext(UMB_DOCUMENT_TREE_STORE_CONTEXT_TOKEN, (instance) => {
 				this.#treeStore = instance;
 			}).asPromise(),
 
-			new UmbContextConsumerController(this.#host, UMB_DOCUMENT_STORE_CONTEXT_TOKEN, (instance) => {
+			this.consumeContext(UMB_DOCUMENT_STORE_CONTEXT_TOKEN, (instance) => {
 				this.#store = instance;
 			}).asPromise(),
 
-			new UmbContextConsumerController(this.#host, UMB_DOCUMENT_ITEM_STORE_CONTEXT_TOKEN, (instance) => {
+			this.consumeContext(UMB_DOCUMENT_ITEM_STORE_CONTEXT_TOKEN, (instance) => {
 				this.#itemStore = instance;
 			}).asPromise(),
 
-			new UmbContextConsumerController(this.#host, UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
+			this.consumeContext(UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
 				this.#notificationContext = instance;
 			}).asPromise(),
 		]);
@@ -64,61 +59,11 @@ export class UmbDocumentRepository
 
 	// TODO: Move
 
-	// TREE:
-	async requestTreeRoot() {
-		await this.#init;
-
-		const data = {
-			id: null,
-			type: 'document-root',
-			name: 'Documents',
-			icon: 'icon-folder',
-			hasChildren: true,
-		};
-
-		return { data };
-	}
-
-	async requestRootTreeItems() {
-		await this.#init;
-
-		const { data, error } = await this.#treeSource.getRootItems();
-
-		if (data) {
-			this.#treeStore?.appendItems(data.items);
-		}
-
-		return { data, error, asObservable: () => this.#treeStore!.rootItems };
-	}
-
-	async requestTreeItemsOf(parentId: string | null) {
-		await this.#init;
-		if (parentId === undefined) throw new Error('Parent id is missing');
-
-		const { data, error } = await this.#treeSource.getChildrenOf(parentId);
-
-		if (data) {
-			this.#treeStore?.appendItems(data.items);
-		}
-
-		return { data, error, asObservable: () => this.#treeStore!.childrenOf(parentId) };
-	}
-
 	// Structure permissions;
 	async requestAllowedDocumentTypesOf(id: string | null) {
 		if (id === undefined) throw new Error('Id is missing');
 		await this.#init;
 		return this.#detailDataSource.getAllowedDocumentTypesOf(id);
-	}
-
-	async rootTreeItems() {
-		await this.#init;
-		return this.#treeStore!.rootItems;
-	}
-
-	async treeItemsOf(parentId: string | null) {
-		await this.#init;
-		return this.#treeStore!.childrenOf(parentId);
 	}
 
 	// ITEMS:
@@ -157,7 +102,7 @@ export class UmbDocumentRepository
 			throw new Error('Id is missing');
 		}
 
-		const { data, error } = await this.#detailDataSource.get(id);
+		const { data, error } = await this.#detailDataSource.read(id);
 
 		if (data) {
 			this.#store?.append(data);
@@ -180,7 +125,7 @@ export class UmbDocumentRepository
 			throw new Error('Document is missing');
 		}
 
-		const { error } = await this.#detailDataSource.insert(item);
+		const { error } = await this.#detailDataSource.create(item);
 
 		if (!error) {
 			// TODO: we currently don't use the detail store for anything.
@@ -192,7 +137,7 @@ export class UmbDocumentRepository
 			this.#notificationContext?.peek('positive', notification);
 
 			// TODO: Revisit this call, as we should be able to update tree on client.
-			await this.requestRootTreeItems();
+			//await this.requestRootTreeItems();
 
 			return { data: item };
 		}
@@ -214,13 +159,12 @@ export class UmbDocumentRepository
 			// Consider notify a workspace if a document is updated in the store while someone is editing it.
 			this.#store?.append(item);
 			//this.#treeStore?.updateItem(item.id, { name: item.name });// Port data to tree store.
-			// TODO: would be nice to align the stores on methods/methodNames.
 
 			const notification = { data: { message: `Document saved` } };
 			this.#notificationContext?.peek('positive', notification);
 
 			// TODO: Revisit this call, as we should be able to update tree on client.
-			await this.requestRootTreeItems();
+			//await this.requestRootTreeItems();
 		}
 
 		return { error };

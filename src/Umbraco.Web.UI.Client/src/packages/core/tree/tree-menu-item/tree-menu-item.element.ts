@@ -26,7 +26,13 @@ export class UmbMenuItemTreeElement extends UmbLitElement implements UmbMenuItem
 	manifest?: ManifestMenuItemTreeKind;
 
 	render() {
-		return this.manifest ? html` <umb-tree alias=${this.manifest?.meta.treeAlias}></umb-tree> ` : nothing;
+		return this.manifest
+			? html`
+					<umb-tree
+						alias=${this.manifest?.meta.treeAlias}
+						?hide-tree-root=${this.manifest.meta.hideTreeRoot === true}></umb-tree>
+			  `
+			: nothing;
 	}
 }
 

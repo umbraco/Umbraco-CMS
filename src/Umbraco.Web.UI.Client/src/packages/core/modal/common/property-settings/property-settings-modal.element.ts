@@ -7,7 +7,7 @@ import {
 	UmbModalBaseElement,
 } from '@umbraco-cms/backoffice/modal';
 import { generateAlias } from '@umbraco-cms/backoffice/utils';
-import { UMB_DOCUMENT_TYPE_STORE_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/document-type';
+import { UMB_DOCUMENT_TYPE_DETAIL_STORE_CONTEXT } from '@umbraco-cms/backoffice/document-type';
 // TODO: Could base take a token to get its types?.
 // TODO: Missing a workspace context... unless this should not be a workspace any way.
 @customElement('umb-property-settings-modal')
@@ -53,7 +53,7 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 		super.connectedCallback();
 
 		// TODO: This is actually not good enough, we need to be able to get to the DOCUMENT_WORKSPACE_CONTEXT, so we can have a look at the draft/runtime version of the document. Otherwise 'Vary by culture' is first updated when saved.
-		this.consumeContext(UMB_DOCUMENT_TYPE_STORE_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_DOCUMENT_TYPE_DETAIL_STORE_CONTEXT, (instance) => {
 			this.observe(
 				instance.byId(this.data?.documentTypeId),
 				(documentType) => {
@@ -237,7 +237,7 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 										.value=${this._returnData.description}></uui-textarea>
 								</div>
 								<umb-data-type-flow-input
-									.value=${this._returnData.dataTypeId}
+									.value=${this._returnData.dataTypeId ?? ''}
 									@change=${this.#onDataTypeIdChange}></umb-data-type-flow-input>
 								<hr />
 								<div class="container">

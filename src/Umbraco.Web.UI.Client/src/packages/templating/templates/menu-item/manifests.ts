@@ -1,3 +1,4 @@
+import { UMB_TEMPLATE_TREE_ALIAS } from '../tree/index.js';
 import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const menuItem: ManifestTypes = {
@@ -10,7 +11,7 @@ const menuItem: ManifestTypes = {
 		label: 'Templates',
 		icon: 'icon-folder',
 		entityType: 'template',
-		treeAlias: 'Umb.Tree.Templates',
+		treeAlias: UMB_TEMPLATE_TREE_ALIAS,
 		menus: ['Umb.Menu.Templating'],
 	},
 };
