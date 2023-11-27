@@ -30,6 +30,7 @@ export class UmbDataTypeTreeStore extends UmbUniqueTreeStore {
 		);
 	}
 
+	// TODO: revisit this when we have decided on detail model sizes
 	#createTreeItemMapper = (item: UmbDataTypeDetailModel) => {
 		return {
 			unique: item.unique!,
@@ -42,6 +43,7 @@ export class UmbDataTypeTreeStore extends UmbUniqueTreeStore {
 		};
 	};
 
+	// TODO: revisit this when we have decided on detail model sizes
 	#updateTreeItemMapper = (item: UmbDataTypeDetailModel) => {
 		return {
 			name: item.name,

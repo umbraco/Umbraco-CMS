@@ -1,5 +1,5 @@
 import { UmbStoreBase } from './store-base.js';
-import { UmbStoreCreateEvent, UmbStoreDeleteEvent, UmbStoreUpdateEvent } from './events/index.js';
+import { UmbStoreAppendEvent, UmbStoreRemoveEvent, UmbStoreUpdateEvent } from './events/index.js';
 import { UmbStore } from './store.interface.js';
 import { UmbContextConsumerController, UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -9,7 +9,7 @@ export class UmbStoreConnector<StoreType, ConnectedStoreType> {
 	#store: UmbStore<StoreType>;
 	#connectedStore?: UmbStore<ConnectedStoreType>;
 	#onNewStoreItem: (item: ConnectedStoreType) => StoreType;
-	#onUpdateStoreItem: (item: ConnectedStoreType) => StoreType;
+	#onUpdateStoreItem: (item: ConnectedStoreType) => Partial<StoreType>;
 
 	constructor(
 		host: UmbControllerHost,
@@ -22,6 +22,8 @@ export class UmbStoreConnector<StoreType, ConnectedStoreType> {
 		this.#onNewStoreItem = onNewStoreItem;
 		this.#onUpdateStoreItem = onUpdateStoreItem;
 
+		console.warn('UmbStoreConnector is a work in progress and should not be used yet');
+
 		new UmbContextConsumerController(host, connectToStoreAlias, (instance) => {
 			this.#connectedStore = instance;
 
@@ -33,12 +35,12 @@ export class UmbStoreConnector<StoreType, ConnectedStoreType> {
 
 	#listenToConnectedStore = () => {
 		if (!this.#connectedStore) return;
-		this.#connectedStore.addEventListener(UmbStoreCreateEvent.TYPE, this.#updateStoreItems as EventListener);
+		this.#connectedStore.addEventListener(UmbStoreAppendEvent.TYPE, this.#updateStoreItems as EventListener);
 		this.#connectedStore.addEventListener(UmbStoreUpdateEvent.TYPE, this.#updateStoreItems as EventListener);
-		this.#connectedStore.addEventListener(UmbStoreDeleteEvent.TYPE, this.#removeStoreItems as EventListener);
+		this.#connectedStore.addEventListener(UmbStoreRemoveEvent.TYPE, this.#removeStoreItems as EventListener);
 	};
 
-	#updateStoreItems = (event: UmbStoreCreateEvent | UmbStoreUpdateEvent) => {
+	#updateStoreItems = (event: UmbStoreAppendEvent | UmbStoreUpdateEvent) => {
 		event.uniques.forEach((unique) => {
 			const storeHasItem = this.#store.getItems([unique]).length > 0;
 			const connectedStoreItem = this.#connectedStore!.getItems([unique])[0];
@@ -52,7 +54,7 @@ export class UmbStoreConnector<StoreType, ConnectedStoreType> {
 		});
 	};
 
-	#removeStoreItems = (event: UmbStoreDeleteEvent) => {
+	#removeStoreItems = (event: UmbStoreRemoveEvent) => {
 		this.#store.removeItems(event.uniques);
 	};
 }
