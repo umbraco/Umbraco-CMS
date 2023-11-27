@@ -17,24 +17,27 @@ import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
 type UmbClassMixinConstructor = new (
 	host: UmbControllerHost,
-	controllerAlias: UmbControllerAlias
+	controllerAlias: UmbControllerAlias,
 ) => UmbClassMixinDeclaration;
 
 declare class UmbClassMixinDeclaration implements UmbClassMixinInterface {
-	protected _host: UmbControllerHost;
+	_host: UmbControllerHost;
 	observe<T>(
 		source: Observable<T>,
 		callback: (_value: T) => void,
-		controllerAlias?: UmbControllerAlias
+		controllerAlias?: UmbControllerAlias,
 	): UmbObserverController<T>;
 	provideContext<
 		BaseType = unknown,
 		ResultType extends BaseType = BaseType,
-		InstanceType extends ResultType = ResultType
-	>(alias: string | UmbContextToken<BaseType, ResultType>, instance: InstanceType): UmbContextProviderController<BaseType, ResultType, InstanceType>;
+		InstanceType extends ResultType = ResultType,
+	>(
+		alias: string | UmbContextToken<BaseType, ResultType>,
+		instance: InstanceType,
+	): UmbContextProviderController<BaseType, ResultType, InstanceType>;
 	consumeContext<BaseType = unknown, ResultType extends BaseType = BaseType>(
 		alias: string | UmbContextToken<BaseType, ResultType>,
-		callback: UmbContextCallback<ResultType>
+		callback: UmbContextCallback<ResultType>,
 	): UmbContextConsumerController<BaseType, ResultType>;
 	hasController(controller: UmbController): boolean;
 	getControllers(filterMethod: (ctrl: UmbController) => boolean): UmbController[];
@@ -86,15 +89,13 @@ export const UmbClassMixin = <T extends ClassConstructor>(superClass: T) => {
 		 * @return {UmbContextProviderController} Reference to a Context Provider Controller instance
 		 * @memberof UmbElementMixin
 		 */
-		provideContext
-		<
+		provideContext<
 			BaseType = unknown,
 			ResultType extends BaseType = BaseType,
-			InstanceType extends ResultType = ResultType
-		>
-		(
+			InstanceType extends ResultType = ResultType,
+		>(
 			contextAlias: string | UmbContextToken<BaseType, ResultType>,
-			instance: InstanceType
+			instance: InstanceType,
 		): UmbContextProviderController {
 			return new UmbContextProviderController<BaseType, ResultType, InstanceType>(this, contextAlias, instance);
 		}
@@ -108,8 +109,8 @@ export const UmbClassMixin = <T extends ClassConstructor>(superClass: T) => {
 		 */
 		consumeContext<BaseType = unknown, ResultType extends BaseType = BaseType>(
 			contextAlias: string | UmbContextToken<BaseType, ResultType>,
-			callback: UmbContextCallback<ResultType>
-		): UmbContextConsumerController<BaseType, ResultType>  {
+			callback: UmbContextCallback<ResultType>,
+		): UmbContextConsumerController<BaseType, ResultType> {
 			return new UmbContextConsumerController(this, contextAlias, callback);
 		}
 	}
