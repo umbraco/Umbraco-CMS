@@ -74,8 +74,7 @@ export class UmbUserCreateModalElement extends UmbModalBaseElement {
 	}
 
 	render() {
-		return html`<uui-dialog-layout>
-			<h1>Create user</h1>
+		return html`<uui-dialog-layout headline="Create user">
 			<p>
 				Create new users to give them access to Umbraco. When a user is created a password will be generated that you
 				can share with the user.
