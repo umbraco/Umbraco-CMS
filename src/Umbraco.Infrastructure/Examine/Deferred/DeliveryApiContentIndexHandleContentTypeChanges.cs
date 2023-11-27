@@ -1,6 +1,8 @@
 ﻿using Examine;
 using Examine.Search;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Changes;
@@ -18,6 +20,7 @@ internal sealed class DeliveryApiContentIndexHandleContentTypeChanges : Delivery
     private readonly IDeliveryApiContentIndexValueSetBuilder _deliveryApiContentIndexValueSetBuilder;
     private readonly IContentService _contentService;
     private readonly IBackgroundTaskQueue _backgroundTaskQueue;
+    private readonly IDeliveryApiCompositeIdHandler _deliveryApiCompositeIdHandler;
 
     public DeliveryApiContentIndexHandleContentTypeChanges(
         IList<KeyValuePair<int, ContentTypeChangeTypes>> changes,
@@ -25,12 +28,24 @@ internal sealed class DeliveryApiContentIndexHandleContentTypeChanges : Delivery
         IDeliveryApiContentIndexValueSetBuilder deliveryApiContentIndexValueSetBuilder,
         IContentService contentService,
         IBackgroundTaskQueue backgroundTaskQueue)
+    : this(changes, deliveryApiIndexingHandler, deliveryApiContentIndexValueSetBuilder, contentService, backgroundTaskQueue, StaticServiceProvider.Instance.GetRequiredService<IDeliveryApiCompositeIdHandler>())
+    {
+    }
+
+    public DeliveryApiContentIndexHandleContentTypeChanges(
+        IList<KeyValuePair<int, ContentTypeChangeTypes>> changes,
+        DeliveryApiIndexingHandler deliveryApiIndexingHandler,
+        IDeliveryApiContentIndexValueSetBuilder deliveryApiContentIndexValueSetBuilder,
+        IContentService contentService,
+        IBackgroundTaskQueue backgroundTaskQueue,
+        IDeliveryApiCompositeIdHandler deliveryApiCompositeIdHandler)
     {
         _changes = changes;
         _deliveryApiIndexingHandler = deliveryApiIndexingHandler;
         _deliveryApiContentIndexValueSetBuilder = deliveryApiContentIndexValueSetBuilder;
         _contentService = contentService;
         _backgroundTaskQueue = backgroundTaskQueue;
+        _deliveryApiCompositeIdHandler = deliveryApiCompositeIdHandler;
     }
 
     public void Execute() => _backgroundTaskQueue.QueueBackgroundWorkItem(_ =>
@@ -79,10 +94,13 @@ internal sealed class DeliveryApiContentIndexHandleContentTypeChanges : Delivery
             var indexIdsByContentIds = indexIds
                 .Select(id =>
                 {
-                    var parts = id.Split(Constants.CharArrays.VerticalTab);
-                    return parts.Length == 2 && int.TryParse(parts[0], out var contentId)
-                        ? (ContentId: contentId, IndexId: id)
-                        : throw new InvalidOperationException($"Delivery API identifier should be composite of ID and culture, got: {id}");
+                    DeliveryApiIndexCompositeIdModel compositeIdModel = _deliveryApiCompositeIdHandler.Decompose(id);
+                    if (int.TryParse(compositeIdModel.Id, out var contentId) is false)
+                    {
+                        throw new InvalidOperationException($"Delivery API identifier should be composite of ID and culture, got: {id}");
+                    }
+
+                    return (ContentId: contentId, IndexId: compositeIdModel.Culture!);
                 })
                 .GroupBy(tuple => tuple.ContentId)
                 .ToDictionary(
