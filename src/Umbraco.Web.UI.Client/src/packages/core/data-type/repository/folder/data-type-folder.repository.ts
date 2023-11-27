@@ -37,7 +37,7 @@ export class UmbDataTypeFolderRepository extends UmbRepositoryBase implements Um
 	}
 
 	// TODO: temp create type until backend is ready. Remove the id addition when new types are generated.
-	async createFolder(folderRequest: CreateFolderRequestModel & { id?: string | undefined }) {
+	async createFolder(folderRequest: CreateFolderRequestModel) {
 		if (!folderRequest) throw new Error('folder request is missing');
 		await this.#init;
 
@@ -46,7 +46,7 @@ export class UmbDataTypeFolderRepository extends UmbRepositoryBase implements Um
 		if (!error) {
 			// TODO: We need to push a new item to the tree store to update the tree. How do we want to create the tree items?
 			const folderTreeItem = createFolderTreeItem(folderRequest);
-			this.#treeStore!.appendItems([folderTreeItem]);
+			this.#treeStore!.append(folderTreeItem);
 		}
 
 		return { error };
