@@ -55,7 +55,7 @@
     }
 
     function isChecked(log) {
-      return log.statusCode === "OK";
+      return log.statusCode === "OK (200)";
     }
 
     init();
