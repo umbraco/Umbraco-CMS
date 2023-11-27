@@ -8,9 +8,9 @@ using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_13_0_0;
 
-public class UseNvarcharMaxForInsteadOfNText : MigrationBase
+public class ChangeWebhookRequestObjectColumnToNvarcharMax : MigrationBase
 {
-    public UseNvarcharMaxForInsteadOfNText(IMigrationContext context) : base(context)
+    public ChangeWebhookRequestObjectColumnToNvarcharMax(IMigrationContext context) : base(context)
     {
     }
 
