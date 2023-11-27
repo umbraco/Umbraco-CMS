@@ -1,6 +1,6 @@
-import { UmbDeepState } from './deep-state.js';
 import { partialUpdateFrozenArray } from '../utils/partial-update-frozen-array.function.js';
 import { pushToUniqueArray } from '../utils/push-to-unique-array.function.js';
+import { UmbDeepState } from './deep-state.js';
 
 /**
  * @export
@@ -15,9 +15,9 @@ export class UmbArrayState<T> extends UmbDeepState<T[]> {
 	readonly getUnique: (entry: T) => unknown;
 	#sortMethod?: (a: T, b: T) => number;
 
-	constructor(initialData: T[], getUniqueMethod: (entry: T) => unknown) {
+	constructor(initialData: T[], getUniqueOfEntryMethod: (entry: T) => unknown) {
 		super(initialData);
-		this.getUnique = getUniqueMethod;
+		this.getUnique = getUniqueOfEntryMethod;
 	}
 
 	/**
