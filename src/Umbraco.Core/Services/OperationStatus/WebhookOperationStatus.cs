@@ -5,4 +5,5 @@ public enum WebhookOperationStatus
     Success,
     CancelledByNotification,
     NotFound,
+    NoEvents,
 }

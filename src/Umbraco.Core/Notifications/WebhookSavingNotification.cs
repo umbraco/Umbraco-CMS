@@ -3,14 +3,14 @@ using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Notifications;
 
-public class WebhookSavingNotification : SavingNotification<Webhook>
+public class WebhookSavingNotification : SavingNotification<IWebhook>
 {
-    public WebhookSavingNotification(Webhook target, EventMessages messages)
+    public WebhookSavingNotification(IWebhook target, EventMessages messages)
         : base(target, messages)
     {
     }
 
-    public WebhookSavingNotification(IEnumerable<Webhook> target, EventMessages messages)
+    public WebhookSavingNotification(IEnumerable<IWebhook> target, EventMessages messages)
         : base(target, messages)
     {
     }
