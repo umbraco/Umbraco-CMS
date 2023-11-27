@@ -1,5 +1,5 @@
 import { expect } from '@open-wc/testing';
-import { UmbObjectState } from './object-state.js';
+import { UmbObjectState } from './states/object-state.js';
 import { UmbObserver } from './observer.js';
 
 describe('UmbObserver', () => {

@@ -27,7 +27,6 @@ export * from './input-section/index.js';
 export * from './input-slider/index.js';
 export * from './input-toggle/index.js';
 export * from './input-upload-field/index.js';
-export * from './property-editor-config/index.js';
 export * from './property-type-based-property/index.js';
 export * from './ref-property-editor-ui/index.js';
 export * from './table/index.js';

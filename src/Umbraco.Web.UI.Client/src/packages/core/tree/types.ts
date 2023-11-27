@@ -9,6 +9,10 @@ export interface UmbTreeItemModel extends UmbTreeItemModelBase {
 	parentId?: string | null; // TODO: remove option to be undefined when server returns the same or when we get our own types
 }
 
+export interface UmbUniqueTreeItemModel extends UmbTreeItemModelBase {
+	unique: string | null;
+}
+
 export interface UmbEntityTreeItemModel extends UmbTreeItemModel {
 	id?: string; // TODO: remove option to be undefined when server returns the same or when we get our own types
 }

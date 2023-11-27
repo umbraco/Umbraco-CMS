@@ -1,26 +1,28 @@
-import { UMB_USER_ENTITY_TYPE } from '@umbraco-cms/backoffice/user';
+import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
 import { ManifestCollectionView } from '@umbraco-cms/backoffice/extension-registry';
 
 const tableCollectionView: ManifestCollectionView = {
 	type: 'collectionView',
-	alias: 'Umb.CollectionView.UserTable',
-	name: 'User Table Collection Collection View',
+	alias: 'Umb.CollectionView.User.Table',
+	name: 'User Table Collection View',
 	js: () => import('./table/user-table-collection-view.element.js'),
 	meta: {
 		label: 'Table',
-		icon: 'icon-box',
+		icon: 'icon-list',
 		pathName: 'table',
 	},
-	conditions: [{
-		alias: 'Umb.Condition.WorkspaceEntityType',
-		match: UMB_USER_ENTITY_TYPE,
-	}],
+	conditions: [
+		{
+			alias: UMB_COLLECTION_ALIAS_CONDITION,
+			match: 'Umb.Collection.User',
+		},
+	],
 };
 
 const gridCollectionView: ManifestCollectionView = {
 	type: 'collectionView',
-	alias: 'Umb.CollectionView.UserGrid',
-	name: 'Media Table Collection View',
+	alias: 'Umb.CollectionView.User.Grid',
+	name: 'User Table Collection View',
 	js: () => import('./grid/user-grid-collection-view.element.js'),
 	weight: 200,
 	meta: {
@@ -28,10 +30,12 @@ const gridCollectionView: ManifestCollectionView = {
 		icon: 'icon-grid',
 		pathName: 'grid',
 	},
-	conditions: [{
-		alias: 'Umb.Condition.WorkspaceEntityType',
-		match: UMB_USER_ENTITY_TYPE,
-	}],
+	conditions: [
+		{
+			alias: UMB_COLLECTION_ALIAS_CONDITION,
+			match: 'Umb.Collection.User',
+		},
+	],
 };
 
 export const manifests = [tableCollectionView, gridCollectionView];

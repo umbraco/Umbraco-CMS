@@ -112,6 +112,7 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 				<p>Search the ${this.searcherName} and view the results</p>
 				<div class="flex">
 					<uui-input
+						type="search"
 						id="search-input"
 						placeholder="Type to filter..."
 						label="Type to filter"
