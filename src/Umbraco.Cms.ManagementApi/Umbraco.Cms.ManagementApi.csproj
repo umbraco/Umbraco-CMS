@@ -4,6 +4,7 @@
     <Description>Contains the presentation layer for the Umbraco CMS Management API.</Description>
     <IsPackable>false</IsPackable>
     <EnablePackageValidation>false</EnablePackageValidation>
+    <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
   </PropertyGroup>
 
   <ItemGroup>
