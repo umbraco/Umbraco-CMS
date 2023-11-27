@@ -1,6 +1,6 @@
 import { UmbDeepState } from './deep-state.js';
-import { partialUpdateFrozenArray } from './partial-update-frozen-array.function.js';
-import { pushToUniqueArray } from './push-to-unique-array.function.js';
+import { partialUpdateFrozenArray } from '../utils/partial-update-frozen-array.function.js';
+import { pushToUniqueArray } from '../utils/push-to-unique-array.function.js';
 
 /**
  * @export

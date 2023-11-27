@@ -1,6 +1,6 @@
-import { MemoizationFunction } from './memoization-function.js';
-import { MappingFunction } from './mapping-function.js';
-import { defaultMemoization } from './default-memoization.js';
+import { MemoizationFunction } from '../types/memoization-function.type.js';
+import { MappingFunction } from '../types/mapping-function.type.js';
+import { defaultMemoization } from './default-memoization.function.js';
 import { distinctUntilChanged, map, Observable, shareReplay } from '@umbraco-cms/backoffice/external/rxjs';
 
 /**
@@ -17,11 +17,11 @@ import { distinctUntilChanged, map, Observable, shareReplay } from '@umbraco-cms
 export function createObservablePart<R, T>(
 	source: Observable<T>,
 	mappingFunction: MappingFunction<T, R>,
-	memoizationFunction?: MemoizationFunction<R>
+	memoizationFunction?: MemoizationFunction<R>,
 ): Observable<R> {
 	return source.pipe(
 		map(mappingFunction),
 		distinctUntilChanged(memoizationFunction || defaultMemoization),
-		shareReplay(1)
+		shareReplay(1),
 	);
 }

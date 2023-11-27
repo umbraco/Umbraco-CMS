@@ -9,7 +9,7 @@ export class ExampleCounterWorkspaceView extends UmbElementMixin(LitElement) {
 	#counterContext?: typeof EXAMPLE_COUNTER_CONTEXT.TYPE;
 
 	@state()
-	private count = '';
+	private count = 0;
 
 	constructor() {
 		super();
@@ -30,12 +30,8 @@ export class ExampleCounterWorkspaceView extends UmbElementMixin(LitElement) {
 		return html`
 			<uui-box class="uui-text">
 				<h1 class="uui-h2" style="margin-top: var(--uui-size-layout-1);">Counter Example</h1>
-				<p class="uui-lead">
-					Current count value: ${this.count}
-				</p>
-				<p>
-					This is a Workspace View, that consumes the Counter Context, and displays the current count.
-				</p>
+				<p class="uui-lead">Current count value: ${this.count}</p>
+				<p>This is a Workspace View, that consumes the Counter Context, and displays the current count.</p>
 			</uui-box>
 		`;
 	}
