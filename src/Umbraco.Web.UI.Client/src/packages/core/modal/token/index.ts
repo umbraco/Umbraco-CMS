@@ -15,7 +15,6 @@ export * from './examine-fields-settings-modal.token.js';
 export * from './export-dictionary-modal.token.js';
 export * from './icon-picker-modal.token.js';
 export * from './import-dictionary-modal.token.js';
-export * from '../../../user/user/modals/invite/user-invite-modal.token.js';
 export * from './language-picker-modal.token.js';
 export * from './link-picker-modal.token.js';
 export * from './media-tree-picker-modal.token.js';
