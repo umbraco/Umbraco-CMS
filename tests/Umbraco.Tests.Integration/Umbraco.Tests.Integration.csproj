@@ -50,8 +50,4 @@
     <EmbeddedResource Include="Umbraco.Web.BackOffice\UrlAndDomains\package.xml" />
     <Content Include="appsettings.Tests.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
-
-  <ItemGroup>
-    <None Remove="appsettings-schema.Umbraco.Cms.json" />
-  </ItemGroup>
 </Project>
