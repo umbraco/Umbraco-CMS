@@ -9,7 +9,7 @@ export class UmbStoreConnector<StoreType, ConnectedStoreType> {
 	#store: UmbStore<StoreType>;
 	#connectedStore?: UmbStore<ConnectedStoreType>;
 	#onNewStoreItem: (item: ConnectedStoreType) => StoreType;
-	#onUpdateStoreItem: (item: ConnectedStoreType) => StoreType;
+	#onUpdateStoreItem: (item: ConnectedStoreType) => Partial<StoreType>;
 
 	constructor(
 		host: UmbControllerHost,
