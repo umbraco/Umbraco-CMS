@@ -84,7 +84,7 @@ export class UmbStoreBase<StoreItemType = any> extends EventTarget implements Um
 	 * @memberof UmbStoreBase
 	 */
 	getItems(uniques: Array<string>) {
-		return this._data.getValue().filter((item) => uniques.includes(this._data.getUnique(item)));
+		return this._data.getValue().filter((item) => uniques.includes(this._data.getUnique(item) as string));
 	}
 
 	/**
