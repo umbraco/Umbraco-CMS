@@ -366,7 +366,7 @@ function entityResource($q, $http, umbRequestHelper) {
                'Failed to retrieve entity data for query ' + query);
         },
 
-      getDynamicRoot: function (query, currentId, parentId) {
+      getDynamicRoot: function (query, currentId, parentId, culture, segment) {
         return umbRequestHelper.resourcePromise(
           $http.post(
             umbRequestHelper.getApiUrl(
@@ -375,7 +375,9 @@ function entityResource($q, $http, umbRequestHelper) {
             {
               query: JSON.parse(query),
               parentId: parentId,
-              currentId: currentId
+              currentId: currentId,
+              currentCulture: culture,
+              currentSegment: segment
             }),
           'Failed to retrieve entity data for query ' + query);
       },

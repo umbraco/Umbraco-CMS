@@ -102,6 +102,11 @@ public class WebhookController : UmbracoAuthorizedJsonController
                     new("Cancelled by notification", "The operation was cancelled by a notification", NotificationStyle.Error),
                 })),
             WebhookOperationStatus.NotFound => NotFound("Could not find the webhook"),
+            WebhookOperationStatus.NoEvents => ValidationProblem(new SimpleNotificationModel(new BackOfficeNotification[]
+            {
+                new("No events", "The webhook does not have any events", NotificationStyle.Error),
+            })),
             _ => StatusCode(StatusCodes.Status500InternalServerError),
+
         };
 }

@@ -579,13 +579,13 @@
     <key alias="renewSession">已更新，繼續工作。</key>
   </area>
   <area alias="login">
-    <key alias="greeting0">超級星期天快樂</key>
-    <key alias="greeting1">瘋狂星期一快樂</key>
-    <key alias="greeting2">熱鬧星期二快樂</key>
-    <key alias="greeting3">美妙星期三快樂</key>
-    <key alias="greeting4">悅耳星期四快樂</key>
-    <key alias="greeting5">時髦星期五快樂</key>
-    <key alias="greeting6">喵喵星期六快樂</key>
+    <key alias="greeting0">歡迎</key>
+    <key alias="greeting1">歡迎</key>
+    <key alias="greeting2">歡迎</key>
+    <key alias="greeting3">歡迎</key>
+    <key alias="greeting4">歡迎</key>
+    <key alias="greeting5">歡迎</key>
+    <key alias="greeting6">歡迎</key>
     <key alias="instruction">下方登入</key>
     <key alias="signInWith">登入使用</key>
     <key alias="timeout">連線時間過了</key>

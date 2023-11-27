@@ -20,9 +20,25 @@ public class WebhookService : IWebhookService
         _eventMessagesFactory = eventMessagesFactory;
     }
 
+    private WebhookOperationStatus ValidateWebhook(IWebhook webhook)
+    {
+        if (webhook.Events.Length <= 0)
+        {
+            return WebhookOperationStatus.NoEvents;
+        }
+
+        return WebhookOperationStatus.Success;
+    }
+
     /// <inheritdoc />
     public async Task<Attempt<IWebhook, WebhookOperationStatus>> CreateAsync(IWebhook webhook)
     {
+        WebhookOperationStatus validationResult = ValidateWebhook(webhook);
+        if (validationResult is not WebhookOperationStatus.Success)
+        {
+            return Attempt.FailWithStatus(validationResult, webhook);
+        }
+
         using ICoreScope scope = _provider.CreateCoreScope();
 
         EventMessages eventMessages = _eventMessagesFactory.Get();
@@ -45,6 +61,12 @@ public class WebhookService : IWebhookService
     /// <inheritdoc />
     public async Task<Attempt<IWebhook, WebhookOperationStatus>> UpdateAsync(IWebhook webhook)
     {
+        WebhookOperationStatus validationResult = ValidateWebhook(webhook);
+        if (validationResult is not WebhookOperationStatus.Success)
+        {
+            return Attempt.FailWithStatus(validationResult, webhook);
+        }
+
         using ICoreScope scope = _provider.CreateCoreScope();
 
         IWebhook? currentWebhook = await _webhookRepository.GetAsync(webhook.Key);
