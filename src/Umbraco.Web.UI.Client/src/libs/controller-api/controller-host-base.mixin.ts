@@ -1,4 +1,4 @@
-import { ClassConstructor } from '../extension-api/types/utils.js';
+import type { ClassConstructor } from '../extension-api/types/utils.js';
 import { UmbControllerHost } from './controller-host.interface.js';
 import type { UmbController } from './controller.interface.js';
 
