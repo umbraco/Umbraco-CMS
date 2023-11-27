@@ -73,6 +73,8 @@ export class UmbDataTypeFolderRepository extends UmbRepositoryBase implements Um
 		const { error } = await this.#folderSource.update(id, folder);
 
 		if (!error) {
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
 			this.#treeStore!.updateItem(id, { name: folder.name });
 		}
 
