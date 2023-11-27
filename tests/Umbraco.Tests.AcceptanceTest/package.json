@@ -15,7 +15,8 @@
     "tslib": "^2.4.0",
     "del": "^6.0.0",
     "ncp": "^2.0.0",
-    "prompt": "^1.2.0"
+    "prompt": "^1.2.0",
+    "wait-on": "^6.0.1"
   },
   "dependencies": {
     "@umbraco/json-models-builders": "^1.0.6",
