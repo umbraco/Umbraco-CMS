@@ -1,10 +1,10 @@
 const { rest } = window.MockServiceWorker;
-import { umbUserGroupData } from '../../data/user-group.data.js';
-import { slug } from './slug.js';
+import { umbUserGroupData } from '../../data/user-group/user-group.db.js';
+import { UMB_SLUG } from './slug.js';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 export const collectionHandlers = [
-	rest.get(umbracoPath(`${slug}`), (req, res, ctx) => {
+	rest.get(umbracoPath(`${UMB_SLUG}`), (req, res, ctx) => {
 		const response = umbUserGroupData.getAll();
 		return res(ctx.status(200), ctx.json(response));
 	}),

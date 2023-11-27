@@ -129,10 +129,11 @@ export class UmbDashboardTranslationDictionaryElement extends UmbLitElement {
 						${this.localize.term('dictionary_createNew')}
 					</uui-button>
 					<uui-input
-						@keyup="${this.#filter}"
+						type="search"
+						id="searchbar"
 						placeholder=${this.localize.term('placeholders_filter')}
 						label=${this.localize.term('placeholders_filter')}
-						id="searchbar">
+						@keyup="${this.#filter}">
 						<div slot="prepend">
 							<uui-icon name="search" id="searchbar_icon"></uui-icon>
 						</div>

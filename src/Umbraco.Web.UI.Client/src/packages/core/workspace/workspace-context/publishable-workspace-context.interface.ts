@@ -3,5 +3,7 @@ import type { UmbSaveableWorkspaceContextInterface } from './saveable-workspace-
 export interface UmbPublishableWorkspaceContextInterface<EntityType = unknown>
 	extends UmbSaveableWorkspaceContextInterface<EntityType> {
 	//getData(): EntityType | undefined;
+	saveAndPublish(): Promise<void>;
 	publish(): Promise<void>;
+	unpublish(): Promise<void>;
 }

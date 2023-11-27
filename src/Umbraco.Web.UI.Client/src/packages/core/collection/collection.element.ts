@@ -1,100 +1,56 @@
-import { UMB_COLLECTION_CONTEXT, UmbCollectionContext } from './collection.context.js';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, customElement, state, property } from '@umbraco-cms/backoffice/external/lit';
-import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
-import { ManifestCollectionView } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbCollectionContext } from './types.js';
+import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { UmbRoute } from '@umbraco-cms/backoffice/router';
+import { ManifestCollection, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { createExtensionApi, createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 
 @customElement('umb-collection')
 export class UmbCollectionElement extends UmbLitElement {
+	_alias?: string;
+	@property({ type: String, reflect: true })
+	get alias() {
+		return this._alias;
+	}
+	set alias(newVal) {
+		this._alias = newVal;
+		this.#observeManifest();
+	}
+
 	@state()
-	private _routes: Array<UmbRoute> = [];
+	_element: HTMLElement | undefined;
 
-	private _entityType!: string;
-	@property({ type: String, attribute: 'entity-type' })
-	public get entityType(): string {
-		return this._entityType;
-	}
-	public set entityType(value: string) {
-		this._entityType = value;
-	}
+	#manifest?: ManifestCollection;
 
-	protected collectionContext?: UmbCollectionContext<any, any>;
-
-	constructor() {
-		super();
-
-		this.consumeContext(UMB_COLLECTION_CONTEXT, (context) => {
-			this.collectionContext = context;
-			this.#observeCollectionViews();
-		});
+	#observeManifest() {
+		if (!this._alias) return;
+		this.observe(
+			umbExtensionsRegistry.getByTypeAndAlias('collection', this._alias),
+			async (manifest) => {
+				if (!manifest) return;
+				this.#manifest = manifest;
+				this.#createApi();
+				this.#createElement();
+			},
+			'umbObserveCollectionManifest',
+		);
 	}
 
-	#observeCollectionViews() {
-		this.observe(this.collectionContext!.views, (views) => {
-			this._createRoutes(views);
-		}),
-			'umbCollectionViewsObserver';
+	async #createApi() {
+		if (!this.#manifest) throw new Error('No manifest');
+		const api = (await createExtensionApi(this.#manifest, [this])) as UmbCollectionContext;
+		if (!api) throw new Error('No api');
+		api.setManifest(this.#manifest);
 	}
 
-	private _createRoutes(views: ManifestCollectionView[] | null) {
-		this._routes = [];
-
-		if (views) {
-			this._routes = views.map((view) => {
-				return {
-					path: `${view.meta.pathName}`,
-					component: () => createExtensionElement(view),
-				};
-			});
-		}
-
-		this._routes.push({
-			path: '',
-			redirectTo: views?.[0]?.meta.pathName ?? '/',
-		});
+	async #createElement() {
+		if (!this.#manifest) throw new Error('No manifest');
+		this._element = await createExtensionElement(this.#manifest);
+		this.requestUpdate();
 	}
 
 	render() {
-		return html`
-			<umb-body-layout header-transparent>
-				${this.renderToolbar()}
-				<umb-router-slot id="router-slot" .routes="${this._routes}"></umb-router-slot>
-				${this.renderPagination()}
-				${this.renderSelectionActions()}
-			</umb-body-layout>
-		`;
+		return html`${this._element}`;
 	}
-
-	protected renderToolbar() {
-		return html`<umb-collection-toolbar slot="header"></umb-collection-toolbar>`;
-	}
-
-	protected renderPagination () {
-		return html`<umb-collection-pagination></umb-collection-pagination>`;
-	}
-
-	protected renderSelectionActions() {
-		return html`<umb-collection-selection-actions slot="footer-info"></umb-collection-selection-actions>`;
-	}
-
-	static styles = [
-		UmbTextStyles,
-		css`
-			:host {
-				display: flex;
-				flex-direction: column;
-				box-sizing: border-box;
-				gap: var(--uui-size-space-5);
-				height: 100%;
-			}
-			router-slot {
-				width: 100%;
-				height: 100%;
-			}
-		`,
-	];
 }
 
 declare global {

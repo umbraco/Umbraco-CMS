@@ -18,4 +18,5 @@ module.exports = {
 	'prefer-import-aliases': preferImportAliasesRule,
 	'prefer-static-styles-last': preferStaticStylesLastRule,
 	'umb-class-prefix': umbClassPrefixRule,
+	'exported-string-constant-naming': require('./devops/eslint/rules/exported-string-constant-naming.cjs'),
 };

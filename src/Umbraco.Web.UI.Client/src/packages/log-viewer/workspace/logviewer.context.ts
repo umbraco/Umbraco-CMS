@@ -1,10 +1,5 @@
 import { UmbLogViewerRepository } from '../repository/log-viewer.repository.js';
-import {
-	UmbBasicState,
-	UmbArrayState,
-	UmbObjectState,
-	UmbStringState,
-} from '@umbraco-cms/backoffice/observable-api';
+import { UmbBasicState, UmbArrayState, UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import {
 	DirectionModel,
 	LogLevelCountsReponseModel,
@@ -94,7 +89,7 @@ export class UmbLogViewerWorkspaceContext extends UmbBaseController implements U
 	#messageTemplates = new UmbObjectState<PagedLogTemplateResponseModel | null>(null);
 	messageTemplates = this.#messageTemplates.asObservable();
 
-	#logLevelsFilter = new UmbArrayState<LogLevelModel>([]);
+	#logLevelsFilter = new UmbArrayState<LogLevelModel>([], (x) => x);
 	logLevelsFilter = this.#logLevelsFilter.asObservable();
 
 	#logs = new UmbObjectState<PagedLogMessageResponseModel | null>(null);

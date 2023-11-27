@@ -7,11 +7,12 @@ import {
 import { appendToFrozenArray, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
 type EntityType = UmbMediaDetailModel;
 export class UmbMediaWorkspaceContext
 	extends UmbEditableWorkspaceContextBase<UmbMediaRepository, EntityType>
-	implements UmbSaveableWorkspaceContextInterface<EntityType | undefined>
+	implements UmbSaveableWorkspaceContextInterface<EntityType | undefined>, UmbApi
 {
 	#data = new UmbObjectState<EntityType | undefined>(undefined);
 	data = this.#data.asObservable();
@@ -85,8 +86,13 @@ export class UmbMediaWorkspaceContext
 		this.#data.destroy();
 	}
 }
+export const api = UmbMediaWorkspaceContext;
 
 export const UMB_MEDIA_WORKSPACE_CONTEXT = new UmbContextToken<
 	UmbSaveableWorkspaceContextInterface,
 	UmbMediaWorkspaceContext
->('UmbWorkspaceContext', (context): context is UmbMediaWorkspaceContext => context.getEntityType?.() === 'media');
+>(
+	'UmbWorkspaceContext',
+	undefined,
+	(context): context is UmbMediaWorkspaceContext => context.getEntityType?.() === 'media',
+);

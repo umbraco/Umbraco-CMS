@@ -3,10 +3,10 @@ import type { UmbMemberGroupDetailModel } from '../types.js';
 import { UMB_MEMBER_GROUP_ENTITY_TYPE } from '../entity.js';
 import { UMB_MEMBER_GROUP_WORKSPACE_ALIAS } from './manifests.js';
 import {
-	UmbSaveableWorkspaceContextInterface,
+	type UmbSaveableWorkspaceContextInterface,
 	UmbEditableWorkspaceContextBase,
 } from '@umbraco-cms/backoffice/workspace';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 export class UmbMemberGroupWorkspaceContext
@@ -47,5 +47,6 @@ export const UMB_MEMBER_GROUP_WORKSPACE_CONTEXT = new UmbContextToken<
 	UmbMemberGroupWorkspaceContext
 >(
 	'UmbWorkspaceContext',
+	undefined,
 	(context): context is UmbMemberGroupWorkspaceContext => context.getEntityType?.() === UMB_MEMBER_GROUP_ENTITY_TYPE,
 );

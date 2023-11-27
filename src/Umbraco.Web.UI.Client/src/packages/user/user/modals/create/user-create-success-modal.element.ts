@@ -87,13 +87,15 @@ export class UmbUserCreateSuccessModalElement extends UmbModalBaseElement<
 				@click=${this.#onCreateAnotherUser}
 				slot="actions"
 				label="Create another user"
-				look="secondary"></uui-button>
+				look="secondary">
+			</uui-button>
 			<uui-button
 				@click=${this.#onGoToProfile}
 				slot="actions"
 				label="Go to profile"
 				look="primary"
-				color="positive"></uui-button>
+				color="positive">
+			</uui-button>
 		</uui-dialog-layout>`;
 	}
 

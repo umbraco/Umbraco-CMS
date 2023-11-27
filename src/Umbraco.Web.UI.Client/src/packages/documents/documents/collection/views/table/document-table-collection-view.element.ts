@@ -1,4 +1,4 @@
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 
 import {
@@ -10,7 +10,7 @@ import {
 	UmbTableOrderedEvent,
 	UmbTableSelectedEvent,
 } from '@umbraco-cms/backoffice/components';
-import { UMB_COLLECTION_CONTEXT, UmbCollectionContext } from '@umbraco-cms/backoffice/collection';
+import { UMB_COLLECTION_CONTEXT, UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { DocumentTreeItemResponseModel, EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
@@ -50,7 +50,7 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 	@state()
 	private _selection: Array<string | null> = [];
 
-	private _collectionContext?: UmbCollectionContext<EntityType, any>;
+	private _collectionContext?: UmbDefaultCollectionContext<EntityType, any>;
 
 	constructor() {
 		super();
@@ -68,7 +68,7 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 			this._createTableItems(this._items);
 		});
 
-		this.observe(this._collectionContext.selection, (selection) => {
+		this.observe(this._collectionContext.selection.selection, (selection) => {
 			this._selection = selection;
 		});
 	}
@@ -99,14 +99,14 @@ export class UmbDocumentTableCollectionViewElement extends UmbLitElement {
 		event.stopPropagation();
 		const table = event.target as UmbTableElement;
 		const selection = table.selection;
-		this._collectionContext?.setSelection(selection);
+		this._collectionContext?.selection.setSelection(selection);
 	}
 
 	private _handleDeselect(event: UmbTableDeselectedEvent) {
 		event.stopPropagation();
 		const table = event.target as UmbTableElement;
 		const selection = table.selection;
-		this._collectionContext?.setSelection(selection);
+		this._collectionContext?.selection.setSelection(selection);
 	}
 
 	private _handleOrdering(event: UmbTableOrderedEvent) {

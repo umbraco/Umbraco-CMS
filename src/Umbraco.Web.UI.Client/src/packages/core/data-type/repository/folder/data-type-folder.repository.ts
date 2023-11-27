@@ -1,4 +1,4 @@
-import { DATA_TYPE_FOLDER_ENTITY_TYPE } from '../../entity.js';
+import { UMB_DATA_TYPE_FOLDER_ENTITY_TYPE } from '../../entity.js';
 import { UMB_DATA_TYPE_TREE_STORE_CONTEXT } from '../../tree/index.js';
 import { UmbDataTypeFolderServerDataSource } from './data-type-folder.server.data-source.js';
 import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -14,7 +14,7 @@ const folderToDataTypeTreeItemFolder = (folder: UmbFolderModel) => {
 	return {
 		id: folder.unique,
 		name: folder.name,
-		type: DATA_TYPE_FOLDER_ENTITY_TYPE,
+		type: UMB_DATA_TYPE_FOLDER_ENTITY_TYPE,
 		hasChildren: false,
 		isFolder: true,
 	};

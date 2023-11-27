@@ -71,10 +71,13 @@
 		"./user": "./dist-cms/packages/user/user/index.js",
 		"./user-permission": "./dist-cms/packages/user/user-permission/index.js",
 		"./code-editor": "./dist-cms/packages/templating/code-editor/index.js",
-		"./external/*": "./dist-cms/external/*/index.js"
+		"./external/*": "./dist-cms/external/*/index.js",
+		"./examples/*": "./examples/*/index.js",
+		"./examples": "./examples/index.js"
 	},
 	"files": [
 		"dist-cms",
+		"examples",
 		"README.md"
 	],
 	"repository": {
@@ -120,7 +123,8 @@
 		"new-extension": "plop  --plopfile ./devops/plop/plop.js",
 		"compile": "tsc",
 		"check": "npm run lint:errors && npm run compile && npm run build-storybook && npm run generate:jsonschema:dist",
-		"prepublishOnly": "node ./devops/publish/cleanse-pkg.js"
+		"prepublishOnly": "node ./devops/publish/cleanse-pkg.js",
+		"example": "node ./devops/example-runner/index.js"
 	},
 	"engines": {
 		"node": ">=20.9 <21",
@@ -139,7 +143,7 @@
 		"marked": "^9.1.0",
 		"monaco-editor": "^0.41.0",
 		"rxjs": "^7.8.1",
-		"tinymce": "^6.7.1",
+		"tinymce": "^6.7.3",
 		"tinymce-i18n": "^23.8.7",
 		"uuid": "^9.0.0"
 	},

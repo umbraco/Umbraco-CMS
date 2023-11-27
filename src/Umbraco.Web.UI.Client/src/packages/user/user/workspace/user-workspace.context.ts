@@ -1,6 +1,9 @@
-import { UmbUserRepository } from '../repository/user.repository.js';
-import { USER_ENTITY_TYPE, type UmbUserDetail } from '../index.js';
-import { UmbSaveableWorkspaceContextInterface, UmbEditableWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
+import { UMB_USER_ENTITY_TYPE, type UmbUserDetail } from '../types.js';
+import { UmbUserDetailRepository } from '../repository/index.js';
+import {
+	UmbSaveableWorkspaceContextInterface,
+	UmbEditableWorkspaceContextBase,
+} from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import type { UpdateUserRequestModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
@@ -9,13 +12,13 @@ import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 
 export class UmbUserWorkspaceContext
-	extends UmbEditableWorkspaceContextBase<UmbUserRepository, UmbUserDetail>
+	extends UmbEditableWorkspaceContextBase<UmbUserDetailRepository, UmbUserDetail>
 	implements UmbSaveableWorkspaceContextInterface<UmbUserDetail | undefined>
 {
 	#currentUserContext?: typeof UMB_CURRENT_USER_CONTEXT.TYPE;
 
 	constructor(host: UmbControllerHostElement) {
-		super(host, 'Umb.Workspace.User', new UmbUserRepository(host));
+		super(host, 'Umb.Workspace.User', new UmbUserDetailRepository(host));
 
 		new UmbContextConsumerController(host, UMB_CURRENT_USER_CONTEXT, (instance) => {
 			this.#currentUserContext = instance;
@@ -50,7 +53,7 @@ export class UmbUserWorkspaceContext
 	}
 
 	getEntityType(): string {
-		return USER_ENTITY_TYPE;
+		return UMB_USER_ENTITY_TYPE;
 	}
 
 	getData() {
@@ -112,5 +115,6 @@ export const UMB_USER_WORKSPACE_CONTEXT = new UmbContextToken<
 	UmbUserWorkspaceContext
 >(
 	'UmbWorkspaceContext',
-	(context): context is UmbUserWorkspaceContext => context.getEntityType?.() === USER_ENTITY_TYPE,
+	undefined,
+	(context): context is UmbUserWorkspaceContext => context.getEntityType?.() === UMB_USER_ENTITY_TYPE,
 );
