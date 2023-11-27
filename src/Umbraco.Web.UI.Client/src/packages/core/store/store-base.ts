@@ -1,7 +1,7 @@
 import { UmbStore } from './store.interface.js';
-import { UmbStoreDeleteEvent } from './events/store-delete.event.js';
+import { UmbStoreRemoveEvent } from './events/store-remove.event.js';
 import { UmbStoreUpdateEvent } from './events/store-update.event.js';
-import { UmbStoreCreateEvent } from './events/store-create.event.js';
+import { UmbStoreAppendEvent } from './events/store-append.event.js';
 import { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
 import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { type UmbApi } from '@umbraco-cms/backoffice/extension-api';
@@ -32,7 +32,7 @@ export class UmbStoreBase<StoreItemType = any> extends EventTarget implements Um
 	append(item: StoreItemType) {
 		this._data.append([item]);
 		const unique = this._data.getUnique(item) as string;
-		this.dispatchEvent(new UmbStoreCreateEvent([unique]));
+		this.dispatchEvent(new UmbStoreAppendEvent([unique]));
 	}
 
 	/**
@@ -43,7 +43,7 @@ export class UmbStoreBase<StoreItemType = any> extends EventTarget implements Um
 	appendItems(items: Array<StoreItemType>) {
 		this._data.append(items);
 		const uniques = items.map((item) => this._data.getUnique(item)) as Array<string>;
-		this.dispatchEvent(new UmbStoreCreateEvent(uniques));
+		this.dispatchEvent(new UmbStoreAppendEvent(uniques));
 	}
 
 	/**
@@ -64,7 +64,7 @@ export class UmbStoreBase<StoreItemType = any> extends EventTarget implements Um
 	 */
 	removeItem(unique: string) {
 		this._data.removeOne(unique);
-		this.dispatchEvent(new UmbStoreDeleteEvent([unique]));
+		this.dispatchEvent(new UmbStoreRemoveEvent([unique]));
 	}
 
 	/**
@@ -74,7 +74,7 @@ export class UmbStoreBase<StoreItemType = any> extends EventTarget implements Um
 	 */
 	removeItems(uniques: Array<string>) {
 		this._data.remove(uniques);
-		this.dispatchEvent(new UmbStoreDeleteEvent(uniques));
+		this.dispatchEvent(new UmbStoreRemoveEvent(uniques));
 	}
 
 	/**
