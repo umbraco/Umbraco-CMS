@@ -3,9 +3,9 @@ import { umbDataTypeData } from '../../../../../../../mocks/data/data-type.data.
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 import './property-editor-ui-tiny-mce-stylesheets-configuration.element.js';
-import { DataTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbDataTypeDetailModel } from '@umbraco-cms/backoffice/data-type';
 
-const dataTypeData = umbDataTypeData.getById('dt-richTextEditor') as DataTypeResponseModel;
+const dataTypeData = umbDataTypeData.getById('dt-richTextEditor') as UmbDataTypeDetailModel;
 
 export default {
 	title: 'Property Editor UIs/Tiny Mce Stylesheets Configuration',

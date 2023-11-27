@@ -1,11 +1,10 @@
+import { UmbDataTypeDetailModel, UmbDataTypePropertyModel } from '../../types.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import { UmbDataSource } from '@umbraco-cms/backoffice/repository';
+import { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
 import {
-	DataTypeResource,
-	DataTypeResponseModel,
-	DataTypeModelBaseModel,
 	CreateDataTypeRequestModel,
-	UpdateDataTypeRequestModel,
+	DataTypeModelBaseModel,
+	DataTypeResource,
 } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
@@ -16,9 +15,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
  * @class UmbDataTypeServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
-export class UmbDataTypeServerDataSource
-	implements UmbDataSource<CreateDataTypeRequestModel, any, UpdateDataTypeRequestModel, DataTypeResponseModel>
-{
+export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataTypeDetailModel> {
 	#host: UmbControllerHost;
 
 	/**
@@ -31,31 +28,16 @@ export class UmbDataTypeServerDataSource
 	}
 
 	/**
-	 * Fetches a Data Type with the given id from the server
-	 * @param {string} id
-	 * @return {*}
-	 * @memberof UmbDataTypeServerDataSource
-	 */
-	async read(id: string) {
-		if (!id) throw new Error('Key is missing');
-		return tryExecuteAndNotify(
-			this.#host,
-			DataTypeResource.getDataTypeById({
-				id: id,
-			}),
-		);
-	}
-
-	/**
 	 * Creates a new Data Type scaffold
-	 * @param {(string | null)} parentId
+	 * @param {(string | null)} parentUnique
 	 * @return { CreateDataTypeRequestModel }
 	 * @memberof UmbDataTypeServerDataSource
 	 */
-	async createScaffold(parentId?: string | null) {
-		const data: CreateDataTypeRequestModel = {
-			id: UmbId.new(),
-			parentId,
+	async createScaffold(parentUnique: string | null) {
+		const data: UmbDataTypeDetailModel = {
+			type: 'data-type',
+			unique: UmbId.new(),
+			parentUnique,
 			name: '',
 			propertyEditorAlias: undefined,
 			propertyEditorUiAlias: null,
@@ -66,54 +48,118 @@ export class UmbDataTypeServerDataSource
 	}
 
 	/**
-	 * Inserts a new Data Type on the server
-	 * @param {Document} dataType
+	 * Fetches a Data Type with the given id from the server
+	 * @param {string} unique
 	 * @return {*}
 	 * @memberof UmbDataTypeServerDataSource
 	 */
-	async create(dataType: CreateDataTypeRequestModel) {
-		if (!dataType) throw new Error('Data Type is missing');
-		if (!dataType.id) throw new Error('Data Type id is missing');
+	async read(unique: string) {
+		if (!unique) throw new Error('Unique is missing');
 
-		return tryExecuteAndNotify(
+		const { data, error } = await tryExecuteAndNotify(this.#host, DataTypeResource.getDataTypeById({ id: unique }));
+
+		if (error || !data) {
+			return { error };
+		}
+
+		// map to client model
+		// TODO: investigate why all server fields are optional
+		// TODO: make data mapper to prevent errors
+		const dataType = {
+			type: 'data-type',
+			unique: data.id!,
+			parentUnique: data.parentId!,
+			name: data.name!,
+			propertyEditorAlias: data.propertyEditorAlias!,
+			propertyEditorUiAlias: data.propertyEditorUiAlias!,
+			values: data.values as Array<UmbDataTypePropertyModel>,
+		};
+
+		return { data: dataType };
+	}
+
+	/**
+	 * Inserts a new Data Type on the server
+	 * @param {UmbDataTypeDetailModel} dataType
+	 * @return {*}
+	 * @memberof UmbDataTypeServerDataSource
+	 */
+	async create(dataType: UmbDataTypeDetailModel) {
+		if (!dataType) throw new Error('Data Type is missing');
+		if (!dataType.unique) throw new Error('Data Type unique is missing');
+
+		// map to server model
+		// TODO: make data mapper to prevent errors
+		const requestBody: CreateDataTypeRequestModel = {
+			id: dataType.unique,
+			parentId: dataType.parentUnique,
+			name: dataType.name,
+			propertyEditorAlias: dataType.propertyEditorAlias,
+			propertyEditorUiAlias: dataType.propertyEditorUiAlias,
+			values: dataType.values,
+		};
+
+		const { error: createError } = await tryExecuteAndNotify(
 			this.#host,
 			DataTypeResource.postDataType({
-				requestBody: dataType,
+				requestBody,
 			}),
 		);
+
+		if (createError) {
+			return { error: createError };
+		}
+
+		// We have to fetch the data type again. The server can have modified the data after creation
+		return this.read(dataType.unique);
 	}
 
 	/**
 	 * Updates a DataType on the server
-	 * @param {DataTypeResponseModel} DataType
+	 * @param {UmbDataTypeDetailModel} DataType
 	 * @return {*}
 	 * @memberof UmbDataTypeServerDataSource
 	 */
-	async update(id: string, data: DataTypeModelBaseModel) {
-		if (!id) throw new Error('Key is missing');
+	async update(data: UmbDataTypeDetailModel) {
+		if (!data.unique) throw new Error('Unique is missing');
 
-		return tryExecuteAndNotify(
+		// TODO: make data mapper to prevent errors
+		const requestBody: DataTypeModelBaseModel = {
+			name: data.name,
+			propertyEditorAlias: data.propertyEditorAlias,
+			propertyEditorUiAlias: data.propertyEditorUiAlias,
+			values: data.values,
+		};
+
+		const { error } = await tryExecuteAndNotify(
 			this.#host,
 			DataTypeResource.putDataTypeById({
-				id: id,
-				requestBody: data,
+				id: data.unique,
+				requestBody,
 			}),
 		);
+
+		if (error) {
+			return { error };
+		}
+
+		// We have to fetch the data type again. The server can have modified the data after update
+		return this.read(data.unique);
 	}
 
 	/**
 	 * Deletes a Data Type on the server
-	 * @param {string} id
+	 * @param {string} unique
 	 * @return {*}
 	 * @memberof UmbDataTypeServerDataSource
 	 */
-	async delete(id: string) {
-		if (!id) throw new Error('Key is missing');
+	async delete(unique: string) {
+		if (!unique) throw new Error('Unique is missing');
 
 		return tryExecuteAndNotify(
 			this.#host,
 			DataTypeResource.deleteDataTypeById({
-				id: id,
+				id: unique,
 			}),
 		);
 	}
