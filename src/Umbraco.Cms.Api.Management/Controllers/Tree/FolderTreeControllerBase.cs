@@ -66,6 +66,17 @@ public abstract class FolderTreeControllerBase<TItem> : EntityTreeControllerBase
     {
         totalItems = 0;
 
+        if (pageSize == 0)
+        {
+            totalItems = EntityService.CountChildren(
+                parentId,
+                ItemObjectType);
+            totalItems += EntityService.CountChildren(
+                parentId,
+                FolderObjectType);
+            return Array.Empty<IEntitySlim>();
+        }
+
         // EntityService is not able to paginate children of multiple item types, so we will only paginate the
         // item type entities and always return all folders as part of the the first result page
         IEntitySlim[] folderEntities = pageNumber == 0

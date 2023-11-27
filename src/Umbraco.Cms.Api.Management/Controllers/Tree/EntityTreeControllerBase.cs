@@ -31,7 +31,7 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
 
     protected async Task<ActionResult<PagedViewModel<TItem>>> GetRoot(int skip, int take)
     {
-        if (PaginationService.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize, out ProblemDetails? error) == false)
+        if (PaginationService.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize, out ProblemDetails? error, true) == false)
         {
             return BadRequest(error);
         }
@@ -46,7 +46,7 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
 
     protected async Task<ActionResult<PagedViewModel<TItem>>> GetChildren(Guid parentId, int skip, int take)
     {
-        if (PaginationService.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize, out ProblemDetails? error) == false)
+        if (PaginationService.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize, out ProblemDetails? error, true) == false)
         {
             return BadRequest(error);
         }
@@ -74,7 +74,17 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
     }
 
     protected virtual IEntitySlim[] GetPagedRootEntities(long pageNumber, int pageSize, out long totalItems)
-        => EntityService
+    {
+        // just count
+        if (pageSize == 0)
+        {
+            totalItems = EntityService.CountChildren(
+                Constants.System.Root,
+                ItemObjectType);
+            return Array.Empty<IEntitySlim>();
+        }
+
+        return EntityService
             .GetPagedChildren(
                 Constants.System.Root,
                 ItemObjectType,
@@ -83,6 +93,7 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
                 out totalItems,
                 ordering: ItemOrdering)
             .ToArray();
+    }
 
     protected virtual IEntitySlim[] GetPagedChildEntities(Guid parentKey, long pageNumber, int pageSize, out long totalItems)
     {
@@ -92,6 +103,15 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
         {
             // not much else we can do here but return nothing
             totalItems = 0;
+            return Array.Empty<IEntitySlim>();
+        }
+
+        // just count
+        if (pageSize == 0)
+        {
+            totalItems = EntityService.CountChildren(
+                parentId.Result,
+                ItemObjectType);
             return Array.Empty<IEntitySlim>();
         }
 

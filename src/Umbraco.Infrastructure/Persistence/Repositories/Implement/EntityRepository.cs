@@ -30,6 +30,23 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
 
     #region Repository
 
+    public int CountByQuery(IQuery<IUmbracoEntity> query, Guid objectType, IQuery<IUmbracoEntity>? filter)
+    {
+        Sql<ISqlContext> sql = Sql();
+        sql.SelectCount();
+        sql
+            .From<NodeDto>();
+        sql.WhereIn<NodeDto>(x => x.NodeObjectType, new[] { objectType } );
+        if (filter != null)
+        {
+            foreach (Tuple<string, object[]> filterClause in filter.GetWhereClauses())
+            {
+                sql.Where(filterClause.Item1, filterClause.Item2);
+            }
+        }
+        return Database.ExecuteScalar<int>(sql);
+    }
+
     public IEnumerable<IEntitySlim> GetPagedResultsByQuery(IQuery<IUmbracoEntity> query, Guid objectType,
         long pageIndex, int pageSize, out long totalRecords,
         IQuery<IUmbracoEntity>? filter, Ordering? ordering) =>
