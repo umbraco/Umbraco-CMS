@@ -15,6 +15,24 @@ export const handlers = [
 		return res(ctx.status(200));
 	}),
 
+	rest.put(umbracoPath('/document/:id/publish'), async (req, res, ctx) => {
+		const id = req.params.id as string;
+		if (!id) return;
+		const data = await req.json();
+		if (!data) return;
+		umbDocumentData.publish(id, data);
+		return res(ctx.status(200));
+	}),
+
+	rest.put(umbracoPath('/document/:id/unpublish'), async (req, res, ctx) => {
+		const id = req.params.id as string;
+		if (!id) return;
+		const data = await req.json();
+		if (!data) return;
+		umbDocumentData.unpublish(id, data);
+		return res(ctx.status(200));
+	}),
+
 	rest.get(umbracoPath('/document/:id/allowed-document-types'), (req, res, ctx) => {
 		const id = req.params.id as string;
 		if (!id) return;

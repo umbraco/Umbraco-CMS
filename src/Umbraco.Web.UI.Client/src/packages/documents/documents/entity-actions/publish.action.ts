@@ -8,7 +8,8 @@ export class UmbPublishDocumentEntityAction extends UmbEntityActionBase<UmbDocum
 	}
 
 	async execute() {
-		console.log(`execute for: ${this.unique}`);
-		await this.repository?.publish();
+		console.log(`publish: ${this.unique}`);
+		// TODO: implement dialog or something to handle variants.
+		//await this.repository?.publish();
 	}
 }

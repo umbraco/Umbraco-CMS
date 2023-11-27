@@ -80,7 +80,6 @@ const workspaceViewCollections: Array<ManifestWorkspaceViewCollection> = [
 ];
 
 const workspaceActions: Array<ManifestWorkspaceAction> = [
-	/*
 	{
 		type: 'workspaceAction',
 		alias: 'Umb.WorkspaceAction.Document.SaveAndPublish',
@@ -99,7 +98,6 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 			},
 		],
 	},
-	*/
 	{
 		type: 'workspaceAction',
 		alias: 'Umb.WorkspaceAction.Document.Save',
@@ -108,7 +106,7 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 		api: UmbSaveWorkspaceAction,
 		meta: {
 			label: 'Save',
-			look: 'primary',
+			look: 'secondary',
 			color: 'positive',
 		},
 		conditions: [
