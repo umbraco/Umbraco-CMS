@@ -28,7 +28,11 @@ export class UmbUserGridCollectionViewElement extends UmbLitElement {
 
 		this.consumeContext(UMB_COLLECTION_CONTEXT, (instance) => {
 			this.#collectionContext = instance as UmbUserCollectionContext;
-			this.observe(this.#collectionContext.selection, (selection) => (this._selection = selection), 'umbCollectionSelectionObserver');
+			this.observe(
+				this.#collectionContext.selection.selection,
+				(selection) => (this._selection = selection),
+				'umbCollectionSelectionObserver',
+			);
 			this.observe(this.#collectionContext.items, (items) => (this._users = items), 'umbCollectionItemsObserver');
 		});
 
@@ -50,11 +54,11 @@ export class UmbUserGridCollectionViewElement extends UmbLitElement {
 	}
 
 	#onSelect(user: UmbUserDetail) {
-		this.#collectionContext?.select(user.id ?? '');
+		this.#collectionContext?.selection.select(user.id ?? '');
 	}
 
 	#onDeselect(user: UmbUserDetail) {
-		this.#collectionContext?.deselect(user.id ?? '');
+		this.#collectionContext?.selection.deselect(user.id ?? '');
 	}
 
 	render() {
@@ -76,7 +80,7 @@ export class UmbUserGridCollectionViewElement extends UmbLitElement {
 				.name=${user.name ?? 'Unnamed user'}
 				selectable
 				?select-only=${this._selection.length > 0}
-				?selected=${this.#collectionContext?.isSelected(user.id ?? '')}
+				?selected=${this.#collectionContext?.selection.isSelected(user.id ?? '')}
 				@open=${() => this._handleOpenCard(user.id ?? '')}
 				@selected=${() => this.#onSelect(user)}
 				@deselected=${() => this.#onDeselect(user)}>

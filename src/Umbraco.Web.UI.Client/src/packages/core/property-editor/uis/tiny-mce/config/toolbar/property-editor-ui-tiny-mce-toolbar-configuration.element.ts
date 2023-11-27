@@ -83,7 +83,7 @@ export class UmbPropertyEditorUITinyMceToolbarConfigurationElement
 		plugins.forEach((p) => {
 			// If the plugin has a toolbar, add it to the config
 			if (p.meta?.toolbar) {
-				p.meta.toolbar.forEach((t) => {
+				p.meta.toolbar.forEach((t: any) => {
 					this._toolbarConfig.push({
 						alias: t.alias,
 						label: t.label,
