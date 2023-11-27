@@ -22,10 +22,14 @@ export class UmbUserActionConditionBase extends UmbBaseController implements Umb
 
 		this.consumeContext(UMB_WORKSPACE_CONTEXT, (context) => {
 			const userContext = context as UmbUserWorkspaceContext;
-			this.observe(userContext.data, (data) => {
-				this.userData = data;
-				this.onUserDataChange();
-			}, 'umbUserDataActionConditionObserver');
+			this.observe(
+				userContext.data,
+				(data) => {
+					this.userData = data;
+					this.onUserDataChange();
+				},
+				'umbUserDataActionConditionObserver',
+			);
 		});
 	}
 

@@ -1,30 +1,34 @@
-import { UmbCollectionConfiguration } from './types.js';
+import { UmbCollectionConfiguration, UmbCollectionContext } from './types.js';
 import { UmbCollectionRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbBaseController, type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { UmbArrayState, UmbNumberState, UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import {
-	UmbArrayState,
-	UmbNumberState,
-	UmbObjectState,
-} from '@umbraco-cms/backoffice/observable-api';
-import { UmbExtensionsManifestInitializer, createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
-import { ManifestCollectionView, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+	UmbApi,
+	UmbExtensionApiInitializer,
+	UmbExtensionsManifestInitializer,
+} from '@umbraco-cms/backoffice/extension-api';
+import {
+	ManifestCollection,
+	ManifestCollectionView,
+	ManifestRepository,
+	umbExtensionsRegistry,
+} from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbCollectionFilterModel } from '@umbraco-cms/backoffice/collection';
 import { UmbSelectionManager, UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
-export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectionFilterModel> extends UmbBaseController {
-	protected entityType: string;
-	protected init;
+export class UmbDefaultCollectionContext<ItemType = any, FilterModelType extends UmbCollectionFilterModel = any>
+	extends UmbBaseController
+	implements UmbCollectionContext, UmbApi
+{
+	#manifest?: ManifestCollection;
 
 	#items = new UmbArrayState<ItemType>([]);
 	public readonly items = this.#items.asObservable();
 
 	#totalItems = new UmbNumberState(0);
 	public readonly totalItems = this.#totalItems.asObservable();
-
-	#selectionManager = new UmbSelectionManager();
-	public readonly selection = this.#selectionManager.selection;
 
 	#filter = new UmbObjectState<FilterModelType | object>({});
 	public readonly filter = this.#filter.asObservable();
@@ -35,92 +39,67 @@ export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectio
 	#currentView = new UmbObjectState<ManifestCollectionView | undefined>(undefined);
 	public readonly currentView = this.#currentView.asObservable();
 
+	#rootPathname = new UmbStringState('');
+	public readonly rootPathname = this.#rootPathname.asObservable();
+
 	repository?: UmbCollectionRepository;
-	collectionRootPathname: string;
+
+	#initResolver?: () => void;
+	#initialized = false;
+
+	#init = new Promise<void>((resolve) => {
+		this.#initialized ? resolve() : (this.#initResolver = resolve);
+	});
 
 	public readonly pagination = new UmbPaginationManager();
+	public readonly selection = new UmbSelectionManager();
 
-	constructor(host: UmbControllerHostElement, entityType: string, repositoryAlias: string, config: UmbCollectionConfiguration = { pageSize: 50 }) {
+	constructor(host: UmbControllerHostElement, config: UmbCollectionConfiguration = { pageSize: 50 }) {
 		super(host);
-		this.entityType = entityType;
 
 		// listen for page changes on the pagination manager
 		this.pagination.addEventListener(UmbChangeEvent.TYPE, this.#onPageChange);
 
-		const currentUrl = new URL(window.location.href);
-		this.collectionRootPathname = currentUrl.pathname.substring(0, currentUrl.pathname.lastIndexOf('/'));
-
-		this.init = Promise.all([
-			this.#observeRepository(repositoryAlias).asPromise(),
-			this.#observeViews().asPromise(),
-		]);
+		// TODO: hack - we need to figure out how to get the "parent path" from the router
+		setTimeout(() => {
+			const currentUrl = new URL(window.location.href);
+			this.#rootPathname.next(currentUrl.pathname.substring(0, currentUrl.pathname.lastIndexOf('/')));
+		}, 100);
 
 		this.#configure(config);
 
 		this.provideContext(UMB_COLLECTION_CONTEXT, this);
 	}
 
-	/**
-	 * Returns true if the given id is selected.
-	 * @param {string} id
-	 * @return {Boolean}
-	 * @memberof UmbCollectionContext
-	 */
-	public isSelected(id: string) {
-		return this.#selectionManager.isSelected(id);
+	// TODO: find a generic way to do this
+	#checkIfInitialized() {
+		if (this.repository) {
+			this.#initialized = true;
+			this.#initResolver?.();
+		}
 	}
 
 	/**
-	 * Sets the current selection.
-	 * @param {Array<string>} selection
+	 * Sets the manifest for the collection.
+	 * @param {ManifestCollection} manifest
 	 * @memberof UmbCollectionContext
 	 */
-	public setSelection(selection: Array<string>) {
-		this.#selectionManager.setSelection(selection);
+	public setManifest(manifest: ManifestCollection | undefined) {
+		if (this.#manifest === manifest) return;
+		this.#manifest = manifest;
+
+		if (!this.#manifest) return;
+		this.#observeRepository(this.#manifest.meta.repositoryAlias);
+		this.#observeViews();
 	}
 
 	/**
-	 * Returns the current selection.
-	 * @return {Array<string>}
+	 * Returns the manifest for the collection.
+	 * @return {ManifestCollection}
 	 * @memberof UmbCollectionContext
 	 */
-	public getSelection() {
-		this.#selectionManager.getSelection();
-	}
-
-	/**
-	 * Clears the current selection.
-	 * @memberof UmbCollectionContext
-	 */
-	public clearSelection() {
-		this.#selectionManager.clearSelection();
-	}
-
-	/**
-	 * Appends the given id to the current selection.
-	 * @param {string} id
-	 * @memberof UmbCollectionContext
-	 */
-	public select(id: string) {
-		this.#selectionManager.select(id);
-	}
-
-	/**
-	 * Removes the given id from the current selection.
-	 * @param {string} id
-	 * @memberof UmbCollectionContext
-	 */
-	public deselect(id: string) {
-		this.#selectionManager.deselect(id);
-	}
-
-	/**
-	 * Returns the collection entity type
-	 * @return {string}
-	 * @memberof UmbCollectionContext
-	 */
-	public getEntityType() {
-		return this.entityType;
+	public getManifest() {
+		return this.#manifest;
 	}
 
 	/**
@@ -129,7 +108,8 @@ export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectio
 	 * @memberof UmbCollectionContext
 	 */
 	public async requestCollection() {
-		if (!this.repository) return;
+		await this.#init;
+		if (!this.repository) throw new Error(`Missing repository for ${this.#manifest}`);
 
 		const filter = this.#filter.getValue();
 		const { data } = await this.repository.requestCollection(filter);
@@ -171,38 +151,16 @@ export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectio
 	}
 
 	#configure(configuration: UmbCollectionConfiguration) {
-		this.#selectionManager.setMultiple(true);
+		this.selection.setMultiple(true);
 		this.pagination.setPageSize(configuration.pageSize);
 		this.#filter.next({ ...this.#filter.getValue(), skip: 0, take: configuration.pageSize });
-	}
-
-	#observeRepository(repositoryAlias: string) {
-		return this.observe(
-			umbExtensionsRegistry.getByTypeAndAlias('repository', repositoryAlias),
-			async (repositoryManifest) => {
-				if (repositoryManifest) {
-					// TODO: Maybe use the UmbExtensionApiController instead of createExtensionApi, to ensure usage of conditions:
-					const result = await createExtensionApi(repositoryManifest, [this._host]);
-					this.repository = result as UmbCollectionRepository;
-					this.requestCollection();
-				}
-			},
-			'umbCollectionRepositoryObserver'
-		)
-	}
-
-	#observeViews() {
-		return new UmbExtensionsManifestInitializer(this, umbExtensionsRegistry, 'collectionView', null, (views) => {
-			this.#views.next(views.map(view => view.manifest));
-			this.#setCurrentView();
-		});
 	}
 
 	#onPageChange = (event: UmbChangeEvent) => {
 		const target = event.target as UmbPaginationManager;
 		const skipFilter = { skip: target.getSkip() } as Partial<FilterModelType>;
 		this.setFilter(skipFilter);
-	}
+	};
 
 	#setCurrentView() {
 		const currentUrl = new URL(window.location.href);
@@ -217,6 +175,28 @@ export class UmbCollectionContext<ItemType, FilterModelType extends UmbCollectio
 		const currentView = viewMatch || views[0];
 		this.setCurrentView(currentView);
 	}
+
+	#observeRepository(repositoryAlias: string) {
+		new UmbExtensionApiInitializer<ManifestRepository<UmbCollectionRepository>>(
+			this,
+			umbExtensionsRegistry,
+			repositoryAlias,
+			[this._host],
+			(permitted, ctrl) => {
+				this.repository = permitted ? ctrl.api : undefined;
+				this.#checkIfInitialized();
+			},
+		);
+	}
+
+	#observeViews() {
+		return new UmbExtensionsManifestInitializer(this, umbExtensionsRegistry, 'collectionView', null, (views) => {
+			this.#views.next(views.map((view) => view.manifest));
+			this.#setCurrentView();
+		});
+	}
 }
 
-export const UMB_COLLECTION_CONTEXT = new UmbContextToken<UmbCollectionContext<any, any>>('UmbCollectionContext');
+export const UMB_COLLECTION_CONTEXT = new UmbContextToken<UmbDefaultCollectionContext<any, any>>(
+	'UmbCollectionContext',
+);

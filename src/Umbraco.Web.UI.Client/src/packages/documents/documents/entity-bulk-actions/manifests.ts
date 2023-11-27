@@ -1,8 +1,10 @@
 import { UMB_DOCUMENT_REPOSITORY_ALIAS } from '../repository/manifests.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
+import { UMB_DOCUMENT_COLLECTION_ALIAS } from '../collection/index.js';
 import { UmbDocumentMoveEntityBulkAction } from './move/move.action.js';
 import { UmbDocumentCopyEntityBulkAction } from './copy/copy.action.js';
 import { ManifestEntityBulkAction } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
 
 const entityActions: Array<ManifestEntityBulkAction> = [
 	{
@@ -17,8 +19,9 @@ const entityActions: Array<ManifestEntityBulkAction> = [
 		},
 		conditions: [
 			{
-				alias: 'Umb.Condition.CollectionEntityType',
-				match: UMB_DOCUMENT_ENTITY_TYPE,
+				// TODO: this condition should be based on entity types in the selection
+				alias: UMB_COLLECTION_ALIAS_CONDITION,
+				match: UMB_DOCUMENT_COLLECTION_ALIAS,
 			},
 		],
 	},
@@ -34,7 +37,8 @@ const entityActions: Array<ManifestEntityBulkAction> = [
 		},
 		conditions: [
 			{
-				alias: 'Umb.Condition.CollectionEntityType',
+				// TODO: this condition should be based on entity types in the selection
+				alias: UMB_COLLECTION_ALIAS_CONDITION,
 				match: UMB_DOCUMENT_ENTITY_TYPE,
 			},
 		],
