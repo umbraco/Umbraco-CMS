@@ -9,6 +9,7 @@ import { when } from 'lit/directives/when.js';
  * @slot - The content of the layout
  * @cssprop --umb-login-background - The background of the layout (default: #f4f4f4)
  * @cssprop --umb-login-primary-color - The color of the headline (default: #283a97)
+ * @cssprop --umb-login-text-color - The color of the text (default: #000)
  * @cssprop --umb-login-image - The background of the image wrapper (default: the value of the backgroundImage property)
  * @cssprop --umb-login-image-display - The display of the image wrapper (default: flex)
  * @cssprop --umb-login-image-border-radius - The border-radius of the image wrapper (default: 38px)
@@ -115,6 +116,7 @@ export class UmbAuthLayoutElement extends LitElement {
 
         display: block;
         background: var(--umb-login-background, #f4f4f4);
+        color: var(--umb-login-text-color, #000);
       }
 
       #main-no-image,
