@@ -80,7 +80,7 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 
 	async setDataType(dataTypeId: string | undefined) {
 		if (!dataTypeId) return;
-		this.#dataTypeDetailRepository.requestById(dataTypeId).then((x) => (this._dataTypeName = x?.data?.name));
+		this.#dataTypeDetailRepository.requestByUnique(dataTypeId).then((x) => (this._dataTypeName = x?.data?.name));
 	}
 
 	constructor() {

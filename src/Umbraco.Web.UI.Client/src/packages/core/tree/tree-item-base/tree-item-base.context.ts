@@ -1,5 +1,6 @@
 import { UmbTreeItemContext } from '../tree-item/tree-item.context.interface.js';
 import { UmbTreeContextBase } from '../tree.context.js';
+import { UmbTreeItemModelBase } from '../types.js';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import { UMB_SECTION_CONTEXT_TOKEN, UMB_SECTION_SIDEBAR_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/section';
 import type { UmbSectionContext, UmbSectionSidebarContext } from '@umbraco-cms/backoffice/section';
@@ -7,14 +8,12 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registr
 import { UmbBooleanState, UmbDeepState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbBaseController, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import type { TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 
-// add type for unique function
-export type UmbTreeItemUniqueFunction<TreeItemType extends TreeItemPresentationModel> = (
-	x: TreeItemType
+export type UmbTreeItemUniqueFunction<TreeItemType extends UmbTreeItemModelBase> = (
+	x: TreeItemType,
 ) => string | null | undefined;
 
-export class UmbTreeItemContextBase<TreeItemType extends TreeItemPresentationModel>
+export class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemModelBase>
 	extends UmbBaseController
 	implements UmbTreeItemContext<TreeItemType>
 {
@@ -26,6 +25,7 @@ export class UmbTreeItemContextBase<TreeItemType extends TreeItemPresentationMod
 
 	#hasChildren = new UmbBooleanState(false);
 	hasChildren = this.#hasChildren.asObservable();
+	#hasChildrenInitValueFlag = false;
 
 	#isLoading = new UmbBooleanState(false);
 	isLoading = this.#isLoading.asObservable();
@@ -103,12 +103,12 @@ export class UmbTreeItemContextBase<TreeItemType extends TreeItemPresentationMod
 	}
 
 	public select() {
-		if (this.unique === undefined) throw new Error('Could not request children, unique key is missing');
+		if (this.unique === undefined) throw new Error('Could not select, unique key is missing');
 		this.treeContext?.select(this.unique);
 	}
 
 	public deselect() {
-		if (this.unique === undefined) throw new Error('Could not request children, unique key is missing');
+		if (this.unique === undefined) throw new Error('Could not deselect, unique key is missing');
 		this.treeContext?.deselect(this.unique);
 	}
 
@@ -126,6 +126,7 @@ export class UmbTreeItemContextBase<TreeItemType extends TreeItemPresentationMod
 			this.treeContext = treeContext;
 			this.#observeIsSelectable();
 			this.#observeIsSelected();
+			this.#observeHasChildren();
 		});
 	}
 
@@ -146,7 +147,7 @@ export class UmbTreeItemContextBase<TreeItemType extends TreeItemPresentationMod
 					this.#isSelectable.next(isSelectable);
 				}
 			},
-			'observeIsSelectable'
+			'observeIsSelectable',
 		);
 	}
 
@@ -158,7 +159,7 @@ export class UmbTreeItemContextBase<TreeItemType extends TreeItemPresentationMod
 			(isSelected) => {
 				this.#isSelected.next(isSelected);
 			},
-			'observeIsSelected'
+			'observeIsSelected',
 		);
 	}
 
@@ -172,7 +173,7 @@ export class UmbTreeItemContextBase<TreeItemType extends TreeItemPresentationMod
 				const path = this.constructPath(pathname, this.type, this.unique);
 				this.#path.next(path);
 			},
-			'observeSectionPath'
+			'observeSectionPath',
 		);
 	}
 
@@ -184,8 +185,24 @@ export class UmbTreeItemContextBase<TreeItemType extends TreeItemPresentationMod
 			(actions) => {
 				this.#hasActions.next(actions.length > 0);
 			},
-			'observeActions'
+			'observeActions',
 		);
+	}
+
+	async #observeHasChildren() {
+		if (!this.treeContext || !this.unique) return;
+
+		const observable = await this.treeContext.childrenOf(this.unique);
+
+		// observe if any children will be added runtime to a tree item. Nested items/folders etc.
+		this.observe(observable.pipe(map((children) => children.length > 0)), (hasChildren) => {
+			// we need to skip the first value, because it will also return false until a child is in the store
+			// we therefor rely on the value from the tree item itself
+			if (this.#hasChildrenInitValueFlag === true) {
+				this.#hasChildren.next(hasChildren);
+			}
+			this.#hasChildrenInitValueFlag = true;
+		});
 	}
 
 	// TODO: use router context

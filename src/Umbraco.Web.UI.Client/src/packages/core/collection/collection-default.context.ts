@@ -24,7 +24,7 @@ export class UmbDefaultCollectionContext<ItemType = any, FilterModelType extends
 {
 	#manifest?: ManifestCollection;
 
-	#items = new UmbArrayState<ItemType>([]);
+	#items = new UmbArrayState<ItemType>([], (x) => x);
 	public readonly items = this.#items.asObservable();
 
 	#totalItems = new UmbNumberState(0);
@@ -33,7 +33,7 @@ export class UmbDefaultCollectionContext<ItemType = any, FilterModelType extends
 	#filter = new UmbObjectState<FilterModelType | object>({});
 	public readonly filter = this.#filter.asObservable();
 
-	#views = new UmbArrayState<ManifestCollectionView>([]);
+	#views = new UmbArrayState<ManifestCollectionView>([], (x) => x.alias);
 	public readonly views = this.#views.asObservable();
 
 	#currentView = new UmbObjectState<ManifestCollectionView | undefined>(undefined);

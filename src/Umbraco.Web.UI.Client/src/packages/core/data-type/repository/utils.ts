@@ -1,30 +1,16 @@
-import {
-	CreateDataTypeRequestModel,
-	CreateFolderRequestModel,
-	FolderTreeItemResponseModel,
-} from '@umbraco-cms/backoffice/backend-api';
+import { CreateFolderRequestModel } from '@umbraco-cms/backoffice/backend-api';
 
-export const createTreeItem = (item: CreateDataTypeRequestModel): FolderTreeItemResponseModel => {
+export const createFolderTreeItem = (item: CreateFolderRequestModel) => {
 	if (!item) throw new Error('item is null or undefined');
 	if (!item.id) throw new Error('item.id is null or undefined');
 
 	return {
-		type: 'data-type',
-		parentId: item.parentId,
-		name: item.name,
-		id: item.id,
-		isFolder: false,
+		unique: item.id!,
+		parentUnique: item.parentId!,
+		name: item.name!,
+		type: 'data-type-folder',
+		isFolder: true,
 		isContainer: false,
 		hasChildren: false,
-	};
-};
-
-export const createFolderTreeItem = (item: CreateFolderRequestModel): FolderTreeItemResponseModel => {
-	if (!item) throw new Error('item is null or undefined');
-	if (!item.id) throw new Error('item.id is null or undefined');
-
-	return {
-		...createTreeItem(item),
-		isFolder: true,
 	};
 };

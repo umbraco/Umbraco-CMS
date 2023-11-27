@@ -6,7 +6,7 @@ import { UmbArrayState, UmbBooleanState } from '@umbraco-cms/backoffice/observab
  * @class UmbSelectionManager
  */
 export class UmbSelectionManager {
-	#selection = new UmbArrayState(<Array<string | null>>[]);
+	#selection = new UmbArrayState(<Array<string | null>>[], (x) => x);
 	public readonly selection = this.#selection.asObservable();
 
 	#multiple = new UmbBooleanState(false);
@@ -14,7 +14,7 @@ export class UmbSelectionManager {
 
 	/**
 	 * Returns the current selection.
-	 * @return {*} 
+	 * @return {*}
 	 * @memberof UmbSelectionManager
 	 */
 	public getSelection() {
@@ -33,7 +33,7 @@ export class UmbSelectionManager {
 
 	/**
 	 * Returns whether multiple items can be selected.
-	 * @return {*} 
+	 * @return {*}
 	 * @memberof UmbSelectionManager
 	 */
 	public getMultiple() {
@@ -81,7 +81,7 @@ export class UmbSelectionManager {
 	/**
 	 * Returns true if the given unique id is selected.
 	 * @param {(string | null)} unique
-	 * @return {*} 
+	 * @return {*}
 	 * @memberof UmbSelectionManager
 	 */
 	public isSelected(unique: string | null) {
