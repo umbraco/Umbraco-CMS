@@ -19,15 +19,17 @@
 
         let defaultMinPwdLength = Umbraco.Sys.ServerVariables.umbracoSettings.minimumPasswordLength;
         let defaultMinPwdNonAlphaNum = Umbraco.Sys.ServerVariables.umbracoSettings.minimumPasswordNonAlphaNum;
+        let defaultMinPwdDigit = Umbraco.Sys.ServerVariables.umbracoSettings.minimumPasswordDigit;
+        let defaultMinPwdUppercase = Umbraco.Sys.ServerVariables.umbracoSettings.minimumPasswordUppercase;
+        let defaultMinPwdLowercase = Umbraco.Sys.ServerVariables.umbracoSettings.minimumPasswordLowercase;
 
         var vm = this;
 
-        vm.passwordNonAlphaTip = '';
-        vm.passwordTip = '';
-        vm.passwordLength = 0;
 
         vm.$onInit = onInit;
-        vm.$onChanges = onChanges;
+      vm.$onChanges = onChanges;
+
+
 
         function onInit() {
             if (vm.minPwdLength === undefined) {
@@ -38,13 +40,60 @@
                 vm.minPwdNonAlphaNum = defaultMinPwdNonAlphaNum;
             }
 
+            if (vm.minPwdDigit === undefined) {
+                vm.minPwdDigit = defaultMinPwdDigit;
+            }
+
+            if (vm.minPwdDigit === undefined) {
+                vm.minPwdDigit = defaultMinPwdDigit;
+            }
+
+            if (vm.minPwdUppercase === undefined) {
+                vm.minPwdUppercase = defaultMinPwdUppercase;
+            }
+
+            if (vm.minPwdLowercase === undefined) {
+              vm.minPwdLowercase = defaultMinPwdLowercase;
+          }
+
+          vm.passwordLength = 0;
+          vm.passwordNonAlphaTip = '';
+          vm.passwordDigitTip = '';
+          vm.passwordUppercaseTip = '';
+          vm.passwordLowercaseTip = '';
+          vm.passwordTip = '';
+
+          vm.tips = []
+          vm.tipStrs = ['NonAlpha', 'Digit', 'Uppercase', 'Lowercase']
+          vm.mins = [vm.minPwdNonAlphaNum, vm.minPwdDigit, vm.minPwdUppercase, vm.minPwdLowercase]
+
+
+          for (var i = 0; i < vm.tipStrs.length; i++) {
+            setUpTip(vm.tipStrs[i], vm.mins[i]);
+            }
+
+            /*
             if (vm.minPwdNonAlphaNum > 0) {
-                localizationService.localize('user_newPasswordFormatNonAlphaTip', [vm.minPwdNonAlphaNum]).then(data => {
+                localizationService.localize('user_newPasswordFormatNonAlphaTip', [tip]).then(data => {
                     vm.passwordNonAlphaTip = data;
                     updatePasswordTip(vm.passwordLength);
                 });
             } else {
                 vm.passwordNonAlphaTip = '';
+                updatePasswordTip(vm.passwordLength);
+            }
+            */
+        }
+
+        // Need to use minimum here
+        function setUpTip(str, min) {
+          if (min > 0) {
+            localizationService.localize(`user_newPasswordFormat${str}Tip`, [min]).then(data => {
+                    vm.tips.push(data);
+                    updatePasswordTip(vm.passwordLength);
+                });
+            } else {
+                vm.tips.push('')
                 updatePasswordTip(vm.passwordLength);
             }
         }
@@ -65,12 +114,11 @@
             if (remainingLength > 0) {
                 localizationService.localize('user_newPasswordFormatLengthTip', [remainingLength]).then(data => {
                     vm.passwordTip = data;
-                    if (vm.passwordNonAlphaTip) {
-                        vm.passwordTip += `<br/>${vm.passwordNonAlphaTip}`;
-                    }
+                    vm.tips.forEach((tip) => vm.passwordTip += `<br/>${tip}`);
                 });
             } else {
-                vm.passwordTip = vm.passwordNonAlphaTip;
+              vm.passwordTip = '';
+              vm.tips.forEach((tip) => vm.passwordTip += `<br/>${tip}`);
             }
         }
     }

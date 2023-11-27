@@ -31,4 +31,14 @@ public static class PasswordConfigurationExtensions
 
     public static int GetMinNonAlphaNumericChars(this IPasswordConfiguration passwordConfiguration) =>
         passwordConfiguration.RequireNonLetterOrDigit ? 1 : 0;
+
+    public static int GetMinDigits(this IPasswordConfiguration passwordConfiguration) =>
+        passwordConfiguration.RequireDigit ? 1 : 0;
+
+    public static int GetMinUppercase(this IPasswordConfiguration passwordConfiguration) =>
+        passwordConfiguration.RequireUppercase ? 1 : 0;
+
+    public static int GetMinLowercase(this IPasswordConfiguration passwordConfiguration) =>
+        passwordConfiguration.RequireLowercase ? 1 : 0;
+
 }

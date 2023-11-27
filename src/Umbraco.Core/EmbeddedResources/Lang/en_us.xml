@@ -2139,6 +2139,9 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="newPassword">New password</key>
     <key alias="newPasswordFormatLengthTip">Minimum %0% character(s) to go!</key>
     <key alias="newPasswordFormatNonAlphaTip">There should be at least %0% special character(s) in there.</key>
+    <key alias="newPasswordFormatDigitTip">There should be at least %0% digit(s) in there.</key>
+    <key alias="newPasswordFormatUppercaseTip">There should be at least %0% uppercase characters in there.</key>
+    <key alias="newPasswordFormatLowercaseTip">There should be at least %0% lowercase characters in there.</key>
     <key alias="noLockouts">hasn't been locked out</key>
     <key alias="noPasswordChange">The password hasn't been changed</key>
     <key alias="confirmNewPassword">Confirm new password</key>

@@ -279,7 +279,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             // add a few extras for backoffice users (server vars we don't want floating around for anonymous users)
             if (isBackofficeUser)
             {
-                umbracoSettings.AddRange(new[] { "maxFileSize", "minimumPasswordLength", "minimumPasswordNonAlphaNum" });
+                umbracoSettings.AddRange(new[] { "maxFileSize", "minimumPasswordLength", "minimumPasswordNonAlphaNum", "minimumPasswordDigit", "minimumPasswordUppercase", "minimumPasswordLowercase"});
             }
 
             var keepOnlyKeys = new Dictionary<string, string[]>
@@ -623,6 +623,9 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         {"showAllowSegmentationForDocumentTypes", false},
                         {"minimumPasswordLength", _memberPasswordConfigurationSettings.RequiredLength},
                         {"minimumPasswordNonAlphaNum", _memberPasswordConfigurationSettings.GetMinNonAlphaNumericChars()},
+                        {"minimumPasswordDigit", _memberPasswordConfigurationSettings.GetMinDigits() },
+                        {"minimumPasswordUppercase", _memberPasswordConfigurationSettings.GetMinUppercase()},
+                        {"minimumPasswordLowercase", _memberPasswordConfigurationSettings.GetMinLowercase()},
                         {"sanitizeTinyMce", _globalSettings.SanitizeTinyMce},
                         {"dataTypesCanBeChanged", _dataTypesSettings.CanBeChanged.ToString()},
                         {"allowEditInvariantFromNonDefault", _contentSettings.AllowEditInvariantFromNonDefault},
