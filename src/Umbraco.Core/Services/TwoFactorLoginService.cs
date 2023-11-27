@@ -59,8 +59,10 @@ public class TwoFactorLoginService : ITwoFactorLoginService2
     /// <inheritdoc />
     public async Task DeleteUserLoginsAsync(Guid userOrMemberKey)
     {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
+        using ICoreScope scope = _scopeProvider.CreateCoreScope();
         await _twoFactorLoginRepository.DeleteUserLoginsAsync(userOrMemberKey);
+
+        scope.Complete();
     }
 
     /// <inheritdoc />
@@ -155,8 +157,12 @@ public class TwoFactorLoginService : ITwoFactorLoginService2
     /// <inheritdoc />
     public async Task<bool> DisableAsync(Guid userOrMemberKey, string providerName)
     {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
-        return await _twoFactorLoginRepository.DeleteUserLoginsAsync(userOrMemberKey, providerName);
+        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+        var result = await _twoFactorLoginRepository.DeleteUserLoginsAsync(userOrMemberKey, providerName);
+
+        scope.Complete();
+
+        return result;
     }
 
     /// <inheritdoc />
@@ -173,9 +179,10 @@ public class TwoFactorLoginService : ITwoFactorLoginService2
     /// <inheritdoc />
     public Task SaveAsync(TwoFactorLogin twoFactorLogin)
     {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
+        using ICoreScope scope = _scopeProvider.CreateCoreScope();
         _twoFactorLoginRepository.Save(twoFactorLogin);
 
+        scope.Complete();
         return Task.CompletedTask;
     }
 
