@@ -10,6 +10,9 @@ import { when } from 'lit/directives/when.js';
  * @cssprop --umb-login-background - The background of the layout (default: #f4f4f4)
  * @cssprop --umb-login-primary-color - The color of the headline (default: #283a97)
  * @cssprop --umb-login-text-color - The color of the text (default: #000)
+ * @cssprop --umb-login-header-font-size - The font-size of the headline (default: 3rem)
+ * @cssprop --umb-login-header-font-size-large - The font-size of the headline on large screens (default: 4rem)
+ * @cssprop --umb-login-header-secondary-font-size - The font-size of the secondary headline (default: 2.4rem)
  * @cssprop --umb-login-image - The background of the image wrapper (default: the value of the backgroundImage property)
  * @cssprop --umb-login-image-display - The display of the image wrapper (default: flex)
  * @cssprop --umb-login-image-border-radius - The border-radius of the image wrapper (default: 38px)
@@ -109,8 +112,8 @@ export class UmbAuthLayoutElement extends LitElement {
         --uui-select-height: 38px;
 
         --input-height: 40px;
-        --header-font-size: 3rem;
-        --header-secondary-font-size: 2.4rem;
+        --header-font-size: var(--umb-login-header-font-size, 3rem);
+        --header-secondary-font-size: var(--umb-login-header-secondary-font-size, 2.4rem);
         --curves-color: var(--umb-curves-color, #f5c1bc);
         --curves-display: var(--umb-curves-display, inline);
 
@@ -188,7 +191,7 @@ export class UmbAuthLayoutElement extends LitElement {
 
       @media only screen and (min-width: 900px) {
         :host {
-          --header-font-size: 4rem;
+          --header-font-size: var(--umb-login-header-font-size-large, 4rem);
         }
 
         #main {
