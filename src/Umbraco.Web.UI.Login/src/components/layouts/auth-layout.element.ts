@@ -8,13 +8,17 @@ import { when } from 'lit/directives/when.js';
  * @element umb-auth-layout
  * @slot - The content of the layout
  * @cssprop --umb-login-background - The background of the layout (default: #f4f4f4)
+ * @cssprop --umb-login-primary-color - The color of the headline (default: #283a97)
  * @cssprop --umb-login-image - The background of the image wrapper (default: the value of the backgroundImage property)
  * @cssprop --umb-login-image-display - The display of the image wrapper (default: flex)
+ * @cssprop --umb-login-image-border-radius - The border-radius of the image wrapper (default: 38px)
  * @cssprop --umb-login-content-background - The background of the content wrapper (default: none)
  * @cssprop --umb-login-content-display - The display of the content wrapper (default: flex)
  * @cssprop --umb-login-content-width - The width of the content wrapper (default: 100%)
  * @cssprop --umb-login-content-height - The height of the content wrapper (default: 100%)
+ * @cssprop --umb-login-content-border-radius - The border-radius of the content wrapper (default: 0)
  * @cssprop --umb-login-align-items - The align-items of the main wrapper (default: unset)
+ * @cssprop --umb-login-button-border-radius - The border-radius of the buttons (default: 45px)
  * @cssprop --umb-curves-color - The color of the curves (default: #f5c1bc)
  * @cssprop --umb-curves-display - The display of the curves (default: inline)
  */
@@ -97,8 +101,8 @@ export class UmbAuthLayoutElement extends LitElement {
   static styles: CSSResultGroup = [
     css`
       :host {
-        --uui-color-interactive: #283a97;
-        --uui-button-border-radius: 45px;
+        --uui-color-interactive: var(--umb-login-primary-color, #283a97);
+        --uui-button-border-radius: var(--umb-login-button-border-radius, 45px);
         --uui-color-default: var(--uui-color-interactive);
         --uui-button-height: 42px;
         --uui-select-height: 38px;
@@ -136,6 +140,7 @@ export class UmbAuthLayoutElement extends LitElement {
         height: var(--umb-login-content-height, 100%);
         box-sizing: border-box;
         overflow: auto;
+        border-radius: var(--umb-login-content-border-radius, 0);
       }
 
       #content {
@@ -148,7 +153,7 @@ export class UmbAuthLayoutElement extends LitElement {
         background: var(--umb-login-image, var(--image));
         width: 100%;
         height: 100%;
-        border-radius: 38px;
+        border-radius: var(--umb-login-image-border-radius, 38px);
         position: relative;
         overflow: hidden;
         color: var(--curves-color);
