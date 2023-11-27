@@ -3,9 +3,9 @@ using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Notifications;
 
-public class WebhookDeletedNotification : DeletedNotification<Webhook>
+public class WebhookDeletedNotification : DeletedNotification<IWebhook>
 {
-    public WebhookDeletedNotification(Webhook target, EventMessages messages)
+    public WebhookDeletedNotification(IWebhook target, EventMessages messages)
         : base(target, messages)
     {
     }

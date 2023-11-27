@@ -16,11 +16,12 @@
           <umb-checkmark
             ng-if="vm.isChecked(log)"
             checked="vm.isChecked(log)"
-            size="xs">
+            size="m">
           </umb-checkmark>
+          <umb-icon icon="icon-wrong" class="umb-checkmark umb-checkmark--m" style="cursor: default;" ng-if="!vm.isChecked(log)"></umb-icon>
         </td>
         <td>{{ log.webhookKey }}</td>
-        <td>{{ log.date }}</td>
+        <td>{{ log.formattedLogDate }}</td>
         <td>{{ log.url }}</td>
         <td>{{ log.eventAlias }}</td>
         <td>{{ log.retryCount }}</td>
