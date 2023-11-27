@@ -31,7 +31,7 @@ export class UmbStoreBase<StoreItemType = any> extends EventTarget implements Um
 	 */
 	append(item: StoreItemType) {
 		this._data.append([item]);
-		const unique = this._data.getUnique(item) as string;
+		const unique = this._data.getUniqueMethod(item) as string;
 		this.dispatchEvent(new UmbStoreAppendEvent([unique]));
 	}
 
@@ -42,7 +42,7 @@ export class UmbStoreBase<StoreItemType = any> extends EventTarget implements Um
 	 */
 	appendItems(items: Array<StoreItemType>) {
 		this._data.append(items);
-		const uniques = items.map((item) => this._data.getUnique(item)) as Array<string>;
+		const uniques = items.map((item) => this._data.getUniqueMethod(item)) as Array<string>;
 		this.dispatchEvent(new UmbStoreAppendEvent(uniques));
 	}
 
@@ -84,7 +84,7 @@ export class UmbStoreBase<StoreItemType = any> extends EventTarget implements Um
 	 * @memberof UmbStoreBase
 	 */
 	getItems(uniques: Array<string>) {
-		return this._data.getValue().filter((item) => uniques.includes(this._data.getUnique(item) as string));
+		return this._data.getValue().filter((item) => uniques.includes(this._data.getUniqueMethod(item) as string));
 	}
 
 	/**

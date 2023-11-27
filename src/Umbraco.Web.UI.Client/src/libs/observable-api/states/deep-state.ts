@@ -1,9 +1,9 @@
 import { UmbBasicState } from './basic-state.js';
-import { createObservablePart } from './create-observable-part.function.js';
-import { deepFreeze } from './deep-freeze.function.js';
-import type { MappingFunction } from './mapping-function.js';
-import type { MemoizationFunction } from './memoization-function.js';
-import { naiveObjectComparison } from './naive-object-comparison.js';
+import { createObservablePart } from '../utils/create-observable-part.function.js';
+import { deepFreeze } from '../utils/deep-freeze.function.js';
+import type { MappingFunction } from '../types/mapping-function.type.js';
+import type { MemoizationFunction } from '../types/memoization-function.type.js';
+import { naiveObjectComparison } from '../utils/naive-object-comparison.function.js';
 
 /**
  * @export
@@ -13,14 +13,13 @@ import { naiveObjectComparison } from './naive-object-comparison.js';
  * Additionally the Subject ensures the data is unique, not updating any Observes unless there is an actual change of the content.
  */
 export class UmbDeepState<T> extends UmbBasicState<T> {
-
 	constructor(initialData: T) {
 		super(deepFreeze(initialData));
 	}
 
 	asObservablePart<ReturnType>(
 		mappingFunction: MappingFunction<T, ReturnType>,
-		memoizationFunction?: MemoizationFunction<ReturnType>
+		memoizationFunction?: MemoizationFunction<ReturnType>,
 	) {
 		return createObservablePart(this._subject, mappingFunction, memoizationFunction);
 	}
