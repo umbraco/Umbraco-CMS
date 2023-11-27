@@ -1,30 +1,12 @@
-import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UMB_COLLECTION_CONTEXT, UmbCollectionContext } from '@umbraco-cms/backoffice/collection';
+import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import type { ManifestDashboardCollection } from '@umbraco-cms/backoffice/extension-registry';
-import type { FolderTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-dashboard-collection')
 export class UmbDashboardCollectionElement extends UmbLitElement {
-	// TODO: Use the right type here:
-	private _collectionContext?: UmbCollectionContext<FolderTreeItemResponseModel, any>;
-
 	public manifest!: ManifestDashboardCollection;
 
-	@state()
-	private _entityType?: string;
-
-	connectedCallback(): void {
-		super.connectedCallback();
-
-		if (!this._collectionContext) {
-			const repositoryAlias = this.manifest.meta.repositoryAlias;
-			this._entityType = this.manifest.conditions.entityType;
-			this._collectionContext = new UmbCollectionContext(this, this._entityType, repositoryAlias);
-			this.provideContext(UMB_COLLECTION_CONTEXT, this._collectionContext);
-		}
-	}
-
+	// TODO: figure out what collection to render
 	render() {
 		return html`<umb-collection></umb-collection>`;
 	}

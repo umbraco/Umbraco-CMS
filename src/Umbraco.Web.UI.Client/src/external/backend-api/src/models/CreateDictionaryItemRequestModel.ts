@@ -6,6 +6,7 @@
 import type { DictionaryItemModelBaseModel } from './DictionaryItemModelBaseModel';
 
 export type CreateDictionaryItemRequestModel = (DictionaryItemModelBaseModel & {
+    id?: string | null;
     parentId?: string | null;
 });
 
