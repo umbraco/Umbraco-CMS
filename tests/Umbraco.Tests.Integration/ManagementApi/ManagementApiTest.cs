@@ -46,7 +46,7 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
 
     protected virtual string Url => GetManagementApiUrl(MethodSelector);
 
-    protected async Task AuthenticateClientAsync(HttpClient client, string username, string password, bool isAdmin)
+    protected async Task AuthenticateClientAsync(HttpClient client, string username, string password, Guid userGroupKey)
     {
         Guid userKey = Constants.Security.SuperUserKey;
         OpenIddictApplicationDescriptor backofficeOpenIddictApplicationDescriptor;
@@ -58,7 +58,7 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
             var userManager = serviceScope.ServiceProvider.GetRequiredService<ICoreBackOfficeUserManager>();
 
             IUser user;
-            if (isAdmin)
+            if (userGroupKey == Constants.Security.AdminGroupKey)
             {
                 user = await userService.GetAsync(userKey) ??
                        throw new Exception("Super user not found.");
@@ -73,7 +73,7 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
                         Email = username,
                         Name = username,
                         UserName = username,
-                        UserGroupKeys = new HashSet<Guid>(new[] { Constants.Security.EditorGroupKey })
+                        UserGroupKeys = new HashSet<Guid>(new[] { userGroupKey })
                     },
                     true)).Result.CreatedUser;
                 userKey = user.Key;
