@@ -102,5 +102,6 @@ public class UmbracoPlan : MigrationPlan
         To<V_13_0_0.RenameWebhookIdToKey>("{148714C8-FE0D-4553-B034-439D91468761}");
         To<V_13_0_0.AddWebhookDatabaseLock>("{23BA95A4-FCCE-49B0-8AA1-45312B103A9B}");
         To<V_13_0_0.ChangeLogStatusCode>("{7DDCE198-9CA4-430C-8BBC-A66D80CA209F}");
+        To<V_13_0_0.ChangeWebhookRequestObjectColumnToNvarcharMax>("{F74CDA0C-7AAA-48C8-94C6-C6EC3C06F599}");
     }
 }
