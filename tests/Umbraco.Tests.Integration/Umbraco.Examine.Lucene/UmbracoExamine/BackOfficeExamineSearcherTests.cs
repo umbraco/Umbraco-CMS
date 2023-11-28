@@ -97,7 +97,7 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
         await BackOfficeSignInManager.SignInAsync(identity, false);
     }
 
-    private PublishResult CreateDefaultPublishedContent(string contentName)
+    private async Task<PublishResult> CreateDefaultPublishedContent(string contentName)
     {
         var contentType = new ContentTypeBuilder()
             .WithId(0)
@@ -109,15 +109,13 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
             .WithName(contentName)
             .WithContentType(contentType)
             .Build();
-        var createdContent = ContentService.SaveAndPublish(content);
 
-        // It seems like we need this timeout for the moment, otherwise our indexes would not be built in time and the test could fail.
-        Thread.Sleep(1000);
+        var createdContent = await ExecuteAndWaitForIndexing(() => ContentService.SaveAndPublish(content), Constants.UmbracoIndexes.InternalIndexName);
 
         return createdContent;
     }
 
-    private PublishResult CreateDefaultPublishedContentWithTwoLanguages(string englishNodeName, string danishNodeName)
+    private async Task<PublishResult> CreateDefaultPublishedContentWithTwoLanguages(string englishNodeName, string danishNodeName)
     {
         string usIso = "en-US";
         string dkIso = "da";
@@ -139,20 +137,19 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
             .WithCultureName(dkIso, danishNodeName)
             .WithContentType(contentType)
             .Build();
-        var createdContent = ContentService.SaveAndPublish(content);
-        Thread.Sleep(1000);
+        var createdContent = await ExecuteAndWaitForIndexing(() => ContentService.SaveAndPublish(content), Constants.UmbracoIndexes.InternalIndexName);
 
         return createdContent;
     }
 
     [Test]
-    public void Search_Published_Content_With_Empty_Query()
+    public async Task Search_Published_Content_With_Empty_Query()
     {
         SetupUserIdentity(Constants.Security.SuperUserIdAsString);
 
         // Arrange
         var contentName = "TestContent";
-        CreateDefaultPublishedContent(contentName);
+        await CreateDefaultPublishedContent(contentName);
 
         string query = string.Empty;
 
@@ -164,13 +161,13 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
     }
 
     [Test]
-    public void Search_Published_Content_With_Query_By_Content_Name()
+    public async Task Search_Published_Content_With_Query_By_Content_Name()
     {
         // Arrange
-        SetupUserIdentity(Constants.Security.SuperUserIdAsString);
+        await SetupUserIdentity(Constants.Security.SuperUserIdAsString);
 
         string contentName = "TestContent";
-        CreateDefaultPublishedContent(contentName);
+        await CreateDefaultPublishedContent(contentName);
 
         string query = contentName;
 
@@ -200,13 +197,13 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
     }
 
     [Test]
-    public void Search_Published_Content_With_Query_By_Content_Id()
+    public async Task Search_Published_Content_With_Query_By_Content_Id()
     {
         // Arrange
         SetupUserIdentity(Constants.Security.SuperUserIdAsString);
 
         string contentName = "RandomContentName";
-        PublishResult createdContent = CreateDefaultPublishedContent(contentName);
+        PublishResult createdContent = await CreateDefaultPublishedContent(contentName);
 
         string contentId = createdContent.Content.Id.ToString();
 
@@ -222,7 +219,7 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
     }
 
     [Test]
-    public void Search_Two_Published_Content_With_Similar_Names_By_Name()
+    public async Task Search_Two_Published_Content_With_Similar_Names_By_Name()
     {
         // Arrange
         SetupUserIdentity(Constants.Security.SuperUserIdAsString);
@@ -240,16 +237,14 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
             .WithName(contentName)
             .WithContentType(contentType)
             .Build();
-        ContentService.SaveAndPublish(firstContent);
-        Thread.Sleep(1000);
+        await ExecuteAndWaitForIndexing(() => ContentService.SaveAndPublish(firstContent), Constants.UmbracoIndexes.InternalIndexName);
 
         var secondContent = new ContentBuilder()
             .WithId(0)
             .WithName(secondContentName)
             .WithContentType(contentType)
             .Build();
-        ContentService.SaveAndPublish(secondContent);
-        Thread.Sleep(1000);
+        await ExecuteAndWaitForIndexing(() => ContentService.SaveAndPublish(secondContent), Constants.UmbracoIndexes.InternalIndexName);
 
         // IndexRebuilder.RebuildIndex("InternalIndex");
         string query = contentName;
@@ -268,7 +263,7 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
     }
 
     [Test]
-    public void Search_For_Child_Published_Content_With_Query_By_Content_Name()
+    public async Task Search_For_Child_Published_Content_With_Query_By_Content_Name()
     {
         // Arrange
         SetupUserIdentity(Constants.Security.SuperUserIdAsString);
@@ -285,18 +280,15 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
             .WithName(contentName)
             .WithContentType(contentType)
             .Build();
-        ContentService.SaveAndPublish(content);
-
-        Thread.Sleep(1000);
+        await ExecuteAndWaitForIndexing(() => ContentService.SaveAndPublish(content), Constants.UmbracoIndexes.InternalIndexName);
 
         var childContent = new ContentBuilder()
             .WithName(childContentName)
             .WithContentType(contentType)
             .WithParentId(content.Id)
             .Build();
-        ContentService.SaveAndPublish(childContent);
+        await ExecuteAndWaitForIndexing(() => ContentService.SaveAndPublish(childContent), Constants.UmbracoIndexes.InternalIndexName);
 
-        Thread.Sleep(1000);
 
         IndexRebuilder.RebuildIndex("InternalIndex");
 
@@ -386,12 +378,12 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
     }
 
     [Test]
-    public void Search_Published_Content_With_Query_With_Content_Name_No_User_Logged_In()
+    public async Task Search_Published_Content_With_Query_With_Content_Name_No_User_Logged_In()
     {
         // Arrange
         string contentName = "TestContent";
 
-        PublishResult createdContent = CreateDefaultPublishedContent(contentName);
+        PublishResult createdContent = await CreateDefaultPublishedContent(contentName);
 
         string query = createdContent.Content.Id.ToString();
 
@@ -453,7 +445,7 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
     }
 
     [Test]
-    public void Search_For_Published_Content_Name_With_Two_Languages_By_Default_Language_Content_Name()
+    public async Task Search_For_Published_Content_Name_With_Two_Languages_By_Default_Language_Content_Name()
     {
         // Arrange
         SetupUserIdentity(Constants.Security.SuperUserIdAsString);
@@ -463,7 +455,7 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
         string englishNodeName = "EnglishNode";
         string danishNodeName = "DanishNode";
 
-        CreateDefaultPublishedContentWithTwoLanguages(englishNodeName, danishNodeName);
+        await CreateDefaultPublishedContentWithTwoLanguages(englishNodeName, danishNodeName);
 
         string query = englishNodeName;
 
@@ -481,7 +473,7 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
     }
 
     [Test]
-    public void Search_For_Published_Content_Name_With_Two_Languages_By_Non_Default_Language_Content_Name()
+    public async Task Search_For_Published_Content_Name_With_Two_Languages_By_Non_Default_Language_Content_Name()
     {
         // Arrange
         SetupUserIdentity(Constants.Security.SuperUserIdAsString);
@@ -491,7 +483,7 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
         string englishNodeName = "EnglishNode";
         string danishNodeName = "DanishNode";
 
-        CreateDefaultPublishedContentWithTwoLanguages(englishNodeName, danishNodeName);
+        await CreateDefaultPublishedContentWithTwoLanguages(englishNodeName, danishNodeName);
 
         string query = danishNodeName;
 
@@ -507,7 +499,7 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
     }
 
     [Test]
-    public void Search_Published_Content_With_Two_Languages_By_Id()
+    public async Task Search_Published_Content_With_Two_Languages_By_Id()
     {
         // Arrange
         SetupUserIdentity(Constants.Security.SuperUserIdAsString);
@@ -517,7 +509,7 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
         string englishNodeName = "EnglishNode";
         string danishNodeName = "DanishNode";
 
-        var contentNode = CreateDefaultPublishedContentWithTwoLanguages(englishNodeName, danishNodeName);
+        var contentNode = await CreateDefaultPublishedContentWithTwoLanguages(englishNodeName, danishNodeName);
 
         string query = contentNode.Content.Id.ToString();
 
@@ -534,10 +526,10 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
 
     // Check All Indexed Values
     [Test]
-    public void Check_All_Indexed_Values_For_Published_Content_With_No_Properties()
+    public async Task Check_All_Indexed_Values_For_Published_Content_With_No_Properties()
     {
         // Arrange
-        SetupUserIdentity(Constants.Security.SuperUserIdAsString);
+        await SetupUserIdentity(Constants.Security.SuperUserIdAsString);
 
         string contentName = "TestContent";
         var contentType = new ContentTypeBuilder()
@@ -550,10 +542,7 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
             .WithName(contentName)
             .WithContentType(contentType)
             .Build();
-        ContentService.SaveAndPublish(contentNode);
-
-        // It seems like we need this timeout for the moment, otherwise our indexes would not be built in time and the test could fail.
-        Thread.Sleep(1000);
+        await ExecuteAndWaitForIndexing(() => ContentService.SaveAndPublish(contentNode), Constants.UmbracoIndexes.InternalIndexName);
 
         string query = contentName;
 
@@ -593,10 +582,10 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
     }
 
     [Test]
-    public void Check_All_Indexed_Values_For_Published_Content_With_Properties()
+    public async Task Check_All_Indexed_Values_For_Published_Content_With_Properties()
     {
         // Arrange
-        SetupUserIdentity(Constants.Security.SuperUserIdAsString);
+        await SetupUserIdentity(Constants.Security.SuperUserIdAsString);
 
         string contentName = "TestContent";
         string propertyEditorName = "TestBox";
@@ -617,10 +606,7 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
             .WithContentType(contentType)
             .WithPropertyValues(new { testBox = "TestValue" })
             .Build();
-        ContentService.SaveAndPublish(contentNode);
-
-        // It seems like we need this timeout for the moment, otherwise our indexes would not be built in time and the test could fail.
-        Thread.Sleep(1000);
+        await ExecuteAndWaitForIndexing(() => ContentService.SaveAndPublish(contentNode), Constants.UmbracoIndexes.InternalIndexName);
 
         string query = contentName;
 
