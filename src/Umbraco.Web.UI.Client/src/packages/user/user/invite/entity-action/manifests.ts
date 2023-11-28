@@ -1,6 +1,7 @@
 import { UMB_INVITE_USER_REPOSITORY_ALIAS } from '../repository/manifests.js';
 import { UMB_USER_ENTITY_TYPE } from '../../index.js';
-import { UmbResendInviteToUserEntityAction } from './resend-invite/resend-invite-to-user.action.js';
+import { UmbResendInviteToUserEntityAction } from './resend-invite/resend-invite.action.js';
+import { manifest as conditionManifest } from './resend-invite/resend-invite.action.condition.js';
 import { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const entityActions: Array<ManifestTypes> = [
@@ -22,6 +23,7 @@ const entityActions: Array<ManifestTypes> = [
 			},
 		],
 	},
+	conditionManifest,
 ];
 
 export const manifests = [...entityActions];
