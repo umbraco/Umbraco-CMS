@@ -76,6 +76,9 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
     public async Task<IEnumerable<IDictionaryItem>> GetChildrenAsync(Guid parentId)
         => await GetByQueryAsync(Query<IDictionaryItem>().Where(x => x.ParentId == parentId));
 
+    public async Task<int> CountChildrenAsync(Guid parentId)
+        => await CountByQueryAsync(Query<IDictionaryItem>().Where(x => x.ParentId == parentId));
+
     /// <inheritdoc />
     public async Task<IEnumerable<IDictionaryItem>> GetDescendantsAsync(Guid? parentId)
     {
@@ -89,6 +92,9 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
     /// <inheritdoc/>
     public async Task<IEnumerable<IDictionaryItem>> GetAtRootAsync()
         => await GetByQueryAsync(Query<IDictionaryItem>().Where(x => x.ParentId == null));
+
+    public async Task<int> CountRootAsync()
+        => await CountByQueryAsync(Query<IDictionaryItem>().Where(x => x.ParentId == null));
 
     /// <inheritdoc/>
     public async Task<bool> ExistsAsync(string key)
@@ -234,6 +240,15 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
             scope.Complete();
 
             return await Task.FromResult(Attempt.SucceedWithStatus(DictionaryItemOperationStatus.Success, dictionaryItem));
+        }
+    }
+
+    private async Task<int> CountByQueryAsync(IQuery<IDictionaryItem> query)
+    {
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            var items = _dictionaryRepository.Count(query);
+            return await Task.FromResult(items);
         }
     }
 

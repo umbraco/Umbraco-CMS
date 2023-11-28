@@ -53,15 +53,29 @@ public class DictionaryTreeControllerBase : EntityTreeControllerBase<EntityTreeI
     }
 
     // language service does not (yet) allow pagination of dictionary items, we have to do it in memory for now
-    protected IDictionaryItem[] PaginatedDictionaryItems(long pageNumber, int pageSize, IEnumerable<IDictionaryItem> allDictionaryItems, out long totalItems)
+    protected async Task<PagedModel<IDictionaryItem>> PaginatedDictionaryItems(long pageNumber, int pageSize, Guid? parentId)
     {
-        IDictionaryItem[] allDictionaryItemsAsArray = allDictionaryItems.ToArray();
+        if (pageSize == 0)
+        {
+            return new PagedModel<IDictionaryItem>
+            {
+                Items = Enumerable.Empty<IDictionaryItem>(),
+                Total = parentId.HasValue
+                    ? await DictionaryItemService.CountChildrenAsync(parentId.Value)
+                    : await DictionaryItemService.CountRootAsync()
+            };
+        }
 
-        totalItems = allDictionaryItemsAsArray.Length;
-        return allDictionaryItemsAsArray
+        IDictionaryItem[] allDictionaryItemsAsArray = parentId.HasValue
+            ? (await DictionaryItemService.GetChildrenAsync(parentId.Value)).ToArray()
+            : (await DictionaryItemService.GetAtRootAsync()).ToArray();
+
+        IDictionaryItem[] items = allDictionaryItemsAsArray
             .OrderBy(item => item.ItemKey)
             .Skip((int)pageNumber * pageSize)
             .Take(pageSize)
             .ToArray();
+
+        return new PagedModel<IDictionaryItem> { Items = items, Total = items.Length };
     }
 }
