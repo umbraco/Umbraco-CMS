@@ -1,4 +1,4 @@
-import { UMB_USER_ENTITY_TYPE } from '../types.js';
+import { UMB_USER_ENTITY_TYPE } from '../entity.js';
 import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type {
 	ManifestWorkspace,

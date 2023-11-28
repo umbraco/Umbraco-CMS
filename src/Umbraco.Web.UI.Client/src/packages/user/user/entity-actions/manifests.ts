@@ -5,7 +5,7 @@ import {
 	UMB_UNLOCK_USER_REPOSITORY_ALIAS,
 	UMB_USER_REPOSITORY_ALIAS,
 } from '../repository/manifests.js';
-import { UMB_USER_ENTITY_TYPE } from '../index.js';
+import { UMB_USER_ENTITY_TYPE } from '../entity.js';
 import { UmbDisableUserEntityAction } from './disable/disable-user.action.js';
 import { UmbEnableUserEntityAction } from './enable/enable-user.action.js';
 import { UmbChangeUserPasswordEntityAction } from './change-password/change-user-password.action.js';

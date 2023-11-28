@@ -10,8 +10,6 @@ import type {
 
 import { UmbDataSource, UmbDataSourceErrorResponse } from '@umbraco-cms/backoffice/repository';
 
-export const UMB_USER_ENTITY_TYPE = 'user';
-
 export type UmbUserDetailModel = UserResponseModel & {
 	entityType: 'user';
 };

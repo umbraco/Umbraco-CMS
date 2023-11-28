@@ -1,4 +1,5 @@
-import { UMB_USER_ENTITY_TYPE, type UmbUserDetailModel } from '../index.js';
+import { type UmbUserDetailModel } from '../index.js';
+import { UMB_USER_ENTITY_TYPE } from '../entity.js';
 import { UmbUserWorkspaceContext } from './user-workspace.context.js';
 import { UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';

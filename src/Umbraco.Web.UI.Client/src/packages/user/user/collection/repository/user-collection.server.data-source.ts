@@ -1,4 +1,5 @@
-import { UMB_USER_ENTITY_TYPE, type UmbUserCollectionFilterModel, type UmbUserDetailModel } from '../../types.js';
+import { type UmbUserCollectionFilterModel, type UmbUserDetailModel } from '../../types.js';
+import { UMB_USER_ENTITY_TYPE } from '../../entity.js';
 import { UmbCollectionDataSource, extendDataSourcePagedResponseData } from '@umbraco-cms/backoffice/repository';
 import { UserResource } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';

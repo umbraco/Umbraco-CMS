@@ -1,4 +1,5 @@
-import { UMB_USER_ENTITY_TYPE, UmbUserDetailModel, UmbUserDetailDataSource } from '../../types.js';
+import { UmbUserDetailModel, UmbUserDetailDataSource } from '../../types.js';
+import { UMB_USER_ENTITY_TYPE } from '../../entity.js';
 import {
 	DataSourceResponse,
 	UmbDataSourceErrorResponse,
