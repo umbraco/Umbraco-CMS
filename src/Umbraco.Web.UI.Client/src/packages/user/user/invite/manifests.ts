@@ -2,4 +2,4 @@ import { manifests as collectionActionManifests } from './collection-action/mani
 import { manifests as modalManifests } from './modal/manifests.js';
 import { manifests as repositoryManifests } from './repository/manifests.js';
 
-export const manifests = [collectionActionManifests, modalManifests, repositoryManifests];
+export const manifests = [...collectionActionManifests, ...modalManifests, ...repositoryManifests];

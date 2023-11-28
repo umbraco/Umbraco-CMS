@@ -1,11 +1,8 @@
-import { type UmbEnableUserRepository } from '../../repository/enable/enable-user.repository.js';
+import { type UmbEnableUserRepository } from '../../../repository/enable/enable-user.repository.js';
+import { UMB_RESEND_INVITE_TO_USER_MODAL } from '../../index.js';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import {
-	type UmbModalManagerContext,
-	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
-	UMB_RESEND_INVITE_TO_USER_MODAL,
-} from '@umbraco-cms/backoffice/modal';
+import { type UmbModalManagerContext, UMB_MODAL_MANAGER_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
 
 export class UmbResendInviteToUserEntityAction extends UmbEntityActionBase<UmbEnableUserRepository> {
 	#modalManager?: UmbModalManagerContext;
