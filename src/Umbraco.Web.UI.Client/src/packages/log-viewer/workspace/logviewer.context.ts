@@ -10,7 +10,8 @@ import {
 	PagedSavedLogSearchResponseModel,
 	SavedLogSearchPresenationBaseModel,
 } from '@umbraco-cms/backoffice/backend-api';
-import { UmbBaseController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { query } from '@umbraco-cms/backoffice/router';
 import { UMB_WORKSPACE_CONTEXT, UmbWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';

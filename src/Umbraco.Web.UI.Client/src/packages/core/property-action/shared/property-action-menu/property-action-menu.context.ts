@@ -1,4 +1,5 @@
-import { UmbBaseController, type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 
 export class UmbPropertyActionMenuContext extends UmbBaseController {

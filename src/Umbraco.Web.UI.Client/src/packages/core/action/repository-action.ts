@@ -1,4 +1,5 @@
-import { UmbBaseController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import { type UmbApi, UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -9,7 +10,7 @@ export class UmbActionBase<RepositoryType> extends UmbBaseController implements 
 		super(host);
 
 		new UmbExtensionApiInitializer(this, umbExtensionsRegistry, repositoryAlias, [this._host], (permitted, ctrl) => {
-			this.repository = permitted ? ctrl.api as RepositoryType : undefined;
+			this.repository = permitted ? (ctrl.api as RepositoryType) : undefined;
 		});
 		/*this.observe(
 			umbExtensionsRegistry.getByTypeAndAlias('repository', repositoryAlias),

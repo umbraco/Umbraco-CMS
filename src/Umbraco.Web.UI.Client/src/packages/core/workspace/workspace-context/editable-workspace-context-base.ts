@@ -1,5 +1,6 @@
 import { UmbSaveableWorkspaceContextInterface } from './saveable-workspace-context.interface.js';
-import { UmbBaseController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbEntityBase } from '@umbraco-cms/backoffice/models';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';

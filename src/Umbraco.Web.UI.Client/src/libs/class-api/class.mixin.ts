@@ -3,7 +3,7 @@ import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { ClassConstructor } from '@umbraco-cms/backoffice/extension-api';
 import {
 	type UmbControllerHost,
-	UmbControllerHostBaseMixin,
+	UmbControllerHostMixin,
 	UmbController,
 	UmbControllerAlias,
 } from '@umbraco-cms/backoffice/controller-api';
@@ -17,7 +17,7 @@ import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
 type UmbClassMixinConstructor = new (
 	host: UmbControllerHost,
-	controllerAlias: UmbControllerAlias,
+	controllerAlias?: UmbControllerAlias,
 ) => UmbClassMixinDeclaration;
 
 declare class UmbClassMixinDeclaration implements UmbClassMixinInterface {
@@ -53,11 +53,11 @@ declare class UmbClassMixinDeclaration implements UmbClassMixinInterface {
 }
 
 export const UmbClassMixin = <T extends ClassConstructor>(superClass: T) => {
-	class UmbClassMixinClass extends UmbControllerHostBaseMixin(superClass) implements UmbControllerHost {
+	class UmbClassMixinClass extends UmbControllerHostMixin(superClass) implements UmbControllerHost {
 		protected _host: UmbControllerHost;
 		protected _controllerAlias: UmbControllerAlias;
 
-		constructor(host: UmbControllerHost, controllerAlias: UmbControllerAlias) {
+		constructor(host: UmbControllerHost, controllerAlias?: UmbControllerAlias) {
 			super();
 			this._host = host;
 			this._controllerAlias = controllerAlias ?? Symbol(); // This will fallback to a Symbol, ensuring that this class is only appended to the controller host once.
@@ -122,8 +122,8 @@ export const UmbClassMixin = <T extends ClassConstructor>(superClass: T) => {
 		public destroy() {
 			if (this._host) {
 				this._host.removeController(this);
+				this._host = undefined as any;
 			}
-			//delete this._host;
 			super.destroy();
 		}
 	}
