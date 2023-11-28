@@ -7,31 +7,51 @@
       name-locked="true"
       hide-alias="true"
       hide-icon="true"
-      hide-description="true"></umb-editor-header>
+      hide-description="true">
+    </umb-editor-header>
 
     <umb-editor-container>
-
-      <umb-load-indicator ng-if="vm.loading">
-      </umb-load-indicator>
-
-      <umb-box ng-if="!vm.loading">
+      <umb-box>
         <umb-box-content>
-          <ul class="umb-tree">
-            <li class="umb-tree-item" ng-repeat="event in vm.events | orderBy: '+eventName'">
-              <div class="umb-tree-item__inner" style="padding: 5px 10px;">
-                <button type="button"
-                        class="btn-reset text-left flex-auto"
-                        ng-class="{ 'umb-tree-node-checked': event.selected }"
-                        ng-click="vm.selectEvent(event)">
-                  <umb-icon icon="{{ event.selected ? 'icon-check' : 'icon-flag'}}"
-                            class="icon umb-tree-icon"
-                            ng-class="{ 'color-green': event.selected }">
-                  </umb-icon>
-                  <span>{{ event.eventName }}</span>
-                </button>
-              </div>
-            </li>
-          </ul>
+
+          <div class="umb-control-group">
+            <umb-search-filter
+              input-id="event-search"
+              model="vm.filter.searchTerm"
+              label-key="placeholders_search"
+              text="Type to search"
+              css-class="w-100"
+              auto-focus="true">
+            </umb-search-filter>
+          </div>
+
+          <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
+
+          <div ng-show="vm.loading === false && filtered.length > 0">
+            <ul class="umb-tree">
+              <li class="umb-tree-item" ng-repeat="event in filtered = (vm.events | filter: { 'eventName': vm.filter.searchTerm } | orderBy: '+eventName')">
+                <div class="umb-tree-item__inner" style="padding: 5px 10px;">
+                  <button type="button"
+                          class="btn-reset text-left flex-auto"
+                          ng-class="{ 'umb-tree-node-checked': event.selected }"
+                          ng-click="vm.selectEvent(event)">
+                    <umb-icon icon="{{ event.selected ? 'icon-check' : 'icon-flag'}}"
+                              class="icon umb-tree-icon"
+                              ng-class="{ 'color-green': event.selected }">
+                    </umb-icon>
+                    <span>{{ event.eventName }}</span>
+                  </button>
+                </div>
+              </li>
+            </ul>
+          </div>
+
+          <umb-empty-state
+            ng-if="filtered.length === 0"
+            position="center">
+                No events were found
+<!--            <localize key="defaultdialogs_noIconsFound">No icons were found.</localize>-->
+          </umb-empty-state>
         </umb-box-content>
       </umb-box>
     </umb-editor-container>
