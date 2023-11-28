@@ -155,8 +155,8 @@ class UmbUserData extends UmbEntityData<UserResponseModel> {
 	 */
 	invite(data: InviteUserRequestModel): void {
 		const invitedUser = {
-			status: UserStateModel.INVITED,
 			...data,
+			state: UserStateModel.INVITED,
 		};
 
 		this.createUser(invitedUser);
