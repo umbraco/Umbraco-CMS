@@ -77,6 +77,12 @@ export class UmbSelectionManager extends UmbBaseController {
 	 */
 	public setMultiple(value: boolean) {
 		this.#multiple.next(value);
+
+		/* If multiple is set to false, and the current selection is more than one, 
+		then we need to set the selection to the first item. */
+		if (value === false && this.getSelection().length > 1) {
+			this.setSelection([this.getSelection()[0]]);
+		}
 	}
 
 	/**

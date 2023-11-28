@@ -248,5 +248,12 @@ describe('UmbSelectionManager', () => {
 			manager.select('2');
 			expect(manager.getSelection()).to.deep.equal(['2']);
 		});
+
+		it('keeps the first item if multiple is disabled mid selection', () => {
+			manager.select('1');
+			manager.select('2');
+			manager.setMultiple(false);
+			expect(manager.getSelection()).to.deep.equal(['1']);
+		});
 	});
 });
