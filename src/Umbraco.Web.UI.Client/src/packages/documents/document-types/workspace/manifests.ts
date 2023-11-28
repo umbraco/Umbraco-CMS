@@ -2,7 +2,7 @@ import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type {
 	ManifestWorkspace,
 	ManifestWorkspaceAction,
-	ManifestWorkspaceEditorView,
+	ManifestWorkspaceView,
 } from '@umbraco-cms/backoffice/extension-registry';
 
 const workspace: ManifestWorkspace = {
@@ -15,9 +15,9 @@ const workspace: ManifestWorkspace = {
 	},
 };
 
-const workspaceEditorViews: Array<ManifestWorkspaceEditorView> = [
+const workspaceViews: Array<ManifestWorkspaceView> = [
 	{
-		type: 'workspaceEditorView',
+		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.DocumentType.Design',
 		name: 'Document Type Workspace Design View',
 		js: () => import('./views/design/document-type-workspace-view-edit.element.js'),
@@ -35,7 +35,7 @@ const workspaceEditorViews: Array<ManifestWorkspaceEditorView> = [
 		],
 	},
 	{
-		type: 'workspaceEditorView',
+		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.DocumentType.Structure',
 		name: 'Document Type Workspace Structure View',
 		js: () => import('./views/structure/document-type-workspace-view-structure.element.js'),
@@ -53,7 +53,7 @@ const workspaceEditorViews: Array<ManifestWorkspaceEditorView> = [
 		],
 	},
 	{
-		type: 'workspaceEditorView',
+		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.DocumentType.Settings',
 		name: 'Document Type Workspace Settings View',
 		js: () => import('./views/settings/document-type-workspace-view-settings.element.js'),
@@ -71,7 +71,7 @@ const workspaceEditorViews: Array<ManifestWorkspaceEditorView> = [
 		],
 	},
 	{
-		type: 'workspaceEditorView',
+		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.DocumentType.Templates',
 		name: 'Document Type Workspace Templates View',
 		js: () => import('./views/templates/document-type-workspace-view-templates.element.js'),
@@ -110,4 +110,4 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 	},
 ];
 
-export const manifests = [workspace, ...workspaceEditorViews, ...workspaceActions];
+export const manifests = [workspace, ...workspaceViews, ...workspaceActions];

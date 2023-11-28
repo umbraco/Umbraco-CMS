@@ -1,5 +1,5 @@
 import { UMB_MENU_CONTEXT_TOKEN } from '../../menu/menu.context.js';
-import { UmbBaseController } from '@umbraco-cms/backoffice/controller-api';
+import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import {
 	ManifestCondition,
 	UmbConditionConfigBase,

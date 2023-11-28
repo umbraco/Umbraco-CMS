@@ -1,7 +1,7 @@
 import { UmbDocumentPermissionRepository } from '../../user-permissions/index.js';
 import { UmbDocumentRepository } from '../../repository/index.js';
 import { UmbUserGroupRepository } from '@umbraco-cms/backoffice/user-group';
-import { html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, state, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import {
 	UMB_ENTITY_USER_PERMISSION_MODAL,
@@ -137,7 +137,7 @@ export class UmbPermissionsModalElement extends UmbLitElement {
 									.userPermissionAliases=${userGroup.permissions}
 									@open=${() => this.#openUserPermissionsModal(userGroup.id)}
 									border>
-									<uui-icon slot="icon" .icon=${userGroup.icon}></uui-icon>
+									${userGroup.icon ? html`<uui-icon slot="icon" name=${userGroup.icon}></uui-icon>` : nothing}
 								</umb-user-group-ref>`,
 						)}
 					</uui-ref-list>

@@ -1,7 +1,8 @@
 import { UmbRelationTypeTreeStore, UMB_RELATION_TYPE_TREE_STORE_CONTEXT } from '../tree/index.js';
 import { UmbRelationTypeServerDataSource } from './sources/relation-type.server.data.js';
 import { UmbRelationTypeStore, UMB_RELATION_TYPE_STORE_CONTEXT_TOKEN } from './relation-type.store.js';
-import { UmbBaseController, type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import {
 	CreateRelationTypeRequestModel,
 	RelationTypeResponseModel,

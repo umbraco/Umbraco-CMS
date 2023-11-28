@@ -4,7 +4,7 @@ import { TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
-import './tree-item/tree-item.element.js';
+import './tree-item-default/tree-item.element.js';
 import './tree-item-base/tree-item-base.element.js';
 
 @customElement('umb-tree')
@@ -109,7 +109,7 @@ export class UmbTreeElement extends UmbLitElement {
 
 	#renderTreeRoot() {
 		if (this.hideTreeRoot || this._treeRoot === undefined) return nothing;
-		return html` <umb-tree-item .item=${this._treeRoot}></umb-tree-item> `;
+		return html` <umb-tree-item-default .item=${this._treeRoot}></umb-tree-item-default> `;
 	}
 
 	#renderRootItems() {
@@ -119,7 +119,7 @@ export class UmbTreeElement extends UmbLitElement {
 				this._items,
 				// TODO: use unique here:
 				(item, index) => item.name + '___' + index,
-				(item) => html`<umb-tree-item .item=${item}></umb-tree-item>`,
+				(item) => html`<umb-tree-item-default .item=${item}></umb-tree-item-default>`,
 			)}
 		`;
 	}

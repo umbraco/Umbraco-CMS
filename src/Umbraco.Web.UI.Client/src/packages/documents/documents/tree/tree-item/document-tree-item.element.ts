@@ -1,12 +1,12 @@
 import { UmbDocumentTreeItemContext } from './document-tree-item.context.js';
 import { css, html, nothing, customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { DocumentTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbTreeItemExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbTreeItemElement } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-document-tree-item')
-export class UmbDocumentTreeItemElement extends UmbLitElement implements UmbTreeItemExtensionElement {
+export class UmbDocumentTreeItemElement extends UmbLitElement implements UmbTreeItemElement {
 	private _item?: DocumentTreeItemResponseModel;
 	@property({ type: Object, attribute: false })
 	public get item() {

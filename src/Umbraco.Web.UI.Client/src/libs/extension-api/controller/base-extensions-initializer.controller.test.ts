@@ -3,11 +3,8 @@ import { UmbExtensionRegistry } from '../registry/extension.registry.js';
 import { ManifestCondition, ManifestWithDynamicConditions, UmbConditionConfigBase } from '../types/index.js';
 import { UmbExtensionCondition } from '../condition/extension-condition.interface.js';
 import { PermittedControllerType, UmbBaseExtensionInitializer, UmbBaseExtensionsInitializer } from './index.js';
-import {
-	UmbBaseController,
-	UmbControllerHost,
-	UmbControllerHostElementMixin,
-} from '@umbraco-cms/backoffice/controller-api';
+import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { UmbControllerHost, UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import { customElement, html } from '@umbraco-cms/backoffice/external/lit';
 
 @customElement('umb-test-controller-host')

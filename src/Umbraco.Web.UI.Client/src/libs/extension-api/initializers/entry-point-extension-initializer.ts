@@ -1,11 +1,10 @@
-import { UmbBaseController } from '../../controller-api/controller.class.js';
 import type { ManifestEntryPoint } from '../types/index.js';
 import { UmbExtensionRegistry } from '../registry/extension.registry.js';
 import { hasInitExport, loadManifestPlainJs } from '../functions/index.js';
+import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import { UmbElement } from '@umbraco-cms/backoffice/element-api';
 
 export class UmbEntryPointExtensionInitializer extends UmbBaseController {
-
 	#host;
 	#extensionRegistry;
 	#entryPointMap = new Map();
@@ -25,7 +24,7 @@ export class UmbEntryPointExtensionInitializer extends UmbBaseController {
 	}
 
 	async instantiateEntryPoint(manifest: ManifestEntryPoint) {
-		if(manifest.js) {
+		if (manifest.js) {
 			const js = await loadManifestPlainJs(manifest.js);
 			// If the extension has an onInit export, be sure to run that or else let the module handle itself
 			if (hasInitExport(js)) {

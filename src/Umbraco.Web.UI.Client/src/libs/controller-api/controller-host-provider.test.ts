@@ -27,10 +27,10 @@ describe('UmbControllerHostTestElement', () => {
 				.create=${(host: UmbControllerHostElement) =>
 					new UmbContextProviderController(host, 'my-test-context-alias', contextValue)}>
 				<umb-test-controller-host-initializer-consumer></umb-test-controller-host-initializer-consumer>
-			</umb-controller-host-provider>`
+			</umb-controller-host-provider>`,
 		);
 		consumer = element.getElementsByTagName(
-			'umb-test-controller-host-initializer-consumer'
+			'umb-test-controller-host-initializer-consumer',
 		)[0] as UmbTestControllerHostInitializerConsumerElement;
 	});
 
@@ -39,6 +39,7 @@ describe('UmbControllerHostTestElement', () => {
 	});
 
 	it('provides the context', () => {
+		// Potentially we need to wait a bit here, cause the value might not be set already? as of the context consumption...
 		expect(consumer.value).to.equal(contextValue);
 	});
 });
