@@ -15,7 +15,6 @@ export class UmbInviteUserServerDataSource implements UmbInviteUserDataSource {
 
 	/**
 	 * Creates an instance of UmbInviteUserServerDataSource.
-	 * @param {UmbControllerHost} host
 	 * @memberof UmbInviteUserServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
@@ -40,8 +39,7 @@ export class UmbInviteUserServerDataSource implements UmbInviteUserDataSource {
 		);
 
 		if (newUserId) {
-			const newUser = await this.#detailSource.read(newUserId);
-			return { data: newUser, error };
+			return this.#detailSource.read(newUserId);
 		}
 
 		return { error };
