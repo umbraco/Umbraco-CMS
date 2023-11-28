@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Persistence.EFCore.Migrations;
@@ -59,7 +58,7 @@ public class UmbracoDbContext : DbContext
         }
 
         IEnumerable<IMigrationProviderSetup> migrationProviders = StaticServiceProvider.Instance.GetServices<IMigrationProviderSetup>();
-        IMigrationProviderSetup? migrationProvider = migrationProviders.FirstOrDefault(x => x.ProviderName == connectionStrings.ProviderName);
+        IMigrationProviderSetup? migrationProvider = migrationProviders.FirstOrDefault(x => x.ProviderName.CompareProviderNames(connectionStrings.ProviderName));
 
         if (migrationProvider == null && connectionStrings.ProviderName != null)
         {
@@ -77,7 +76,7 @@ public class UmbracoDbContext : DbContext
 
         foreach (IMutableEntityType entity in modelBuilder.Model.GetEntityTypes())
         {
-            entity.SetTableName(Constants.DatabaseSchema.TableNamePrefix + entity.GetTableName());
+            entity.SetTableName(Core.Constants.DatabaseSchema.TableNamePrefix + entity.GetTableName());
         }
     }
 }

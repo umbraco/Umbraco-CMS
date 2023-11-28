@@ -34,22 +34,6 @@ public class UserGroupControllerBase : ManagementApiControllerBase
                 .WithTitle("System user group")
                 .WithDetail("The operation is not allowed on a system user group.")
                 .Build()),
-            UserGroupOperationStatus.UnauthorizedMissingUserSection => Unauthorized(new ProblemDetailsBuilder()
-                .WithTitle("Unauthorized")
-                .WithDetail("The performing user does not have access to the required section")
-                .Build()),
-            UserGroupOperationStatus.UnauthorizedMissingSections => Unauthorized(new ProblemDetailsBuilder()
-                .WithTitle("Unauthorized section")
-                .WithDetail("The specified allowed section contained a section the performing user doesn't have access to.")
-                .Build()),
-            UserGroupOperationStatus.UnauthorizedStartNodes => Unauthorized(new ProblemDetailsBuilder()
-                .WithTitle("Unauthorized start node")
-                .WithDetail("The specified start nodes contained a start node the performing user doesn't have access to.")
-                .Build()),
-            UserGroupOperationStatus.UnauthorizedMissingUserGroup => Unauthorized(new ProblemDetailsBuilder()
-                .WithTitle("User not in user group")
-                .WithDetail("The current user is not in the user group")
-                .Build()),
             UserGroupOperationStatus.CancelledByNotification => BadRequest(new ProblemDetailsBuilder()
                 .WithTitle("Cancelled by notification")
                 .WithDetail("A notification handler prevented the language operation.")
@@ -78,6 +62,26 @@ public class UserGroupControllerBase : ManagementApiControllerBase
                 .WithTitle("Missing user group name.")
                 .WithDetail("The user group name is required, and cannot be an empty string.")
                 .Build()),
+            UserGroupOperationStatus.UnauthorizedMissingAllowedSectionAccess => Unauthorized(new ProblemDetailsBuilder()
+                .WithTitle("Unauthorized section access")
+                .WithDetail("The performing user does not have access to all sections specified as allowed for this user group.")
+                .Build()),
+            UserGroupOperationStatus.UnauthorizedMissingContentStartNodeAccess => Unauthorized(new ProblemDetailsBuilder()
+                .WithTitle("Unauthorized content start node access")
+                .WithDetail("The performing user does not have access to the specified content start node item.")
+                .Build()),
+            UserGroupOperationStatus.UnauthorizedMissingMediaStartNodeAccess => Unauthorized(new ProblemDetailsBuilder()
+                .WithTitle("Unauthorized media start node access")
+                .WithDetail("The performing user does not have access to the specified media start node item.")
+                .Build()),
+            UserGroupOperationStatus.UnauthorizedMissingUserGroupAccess => Unauthorized(new ProblemDetailsBuilder()
+                .WithTitle("Unauthorized user group access")
+                .WithDetail("The performing user does not have access to the specified user group(s).")
+                .Build()),
+            UserGroupOperationStatus.UnauthorizedMissingUsersSectionAccess => Unauthorized(new ProblemDetailsBuilder()
+                .WithTitle("Unauthorized access to Users section")
+                .WithDetail("The performing user does not have access to the Users section.")
+                .Build()),
             _ => StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetailsBuilder()
                 .WithTitle("Unknown user group operation status.")
                 .Build()),
@@ -86,5 +90,4 @@ public class UserGroupControllerBase : ManagementApiControllerBase
     protected IActionResult UserGroupNotFound() => NotFound(new ProblemDetailsBuilder()
         .WithTitle("The user group could not be found")
         .Build());
-
 }

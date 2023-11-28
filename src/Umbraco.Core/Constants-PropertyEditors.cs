@@ -179,7 +179,7 @@ public static partial class Constants
             ///     TinyMCE
             /// </summary>
             [Obsolete("Please use RichText constant instead, scheduled for removal in v16")]
-            public const string TinyMce = "Umbraco.RichText";
+            public const string TinyMce = "Umbraco.TinyMCE";
 
             /// <summary>
             ///     Boolean.

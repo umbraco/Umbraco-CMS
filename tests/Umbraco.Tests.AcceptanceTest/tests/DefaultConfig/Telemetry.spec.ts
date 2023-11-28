@@ -20,13 +20,12 @@ test.describe('Telemetry tests', () => {
     await page.getByRole('tab', { name: 'Settings' }).click();
     await page.getByRole('tab', {name: 'Telemetry Data'}).click();
     await page.locator('[name="telemetryLevel"] >> input[id=input]').fill('1');
-    await page.getByRole('button', { name: 'Save telemetry settings' }).click();
-
+    await page.getByLabel('Save').click();
     // Assert
     // UI
     await page.reload();
-    await expect(await page.locator('[name="telemetryLevel"] >> input[id=input]')).toHaveValue('1');
+    await expect(page.locator('[name="telemetryLevel"] >> input[id=input]')).toHaveValue('1');
     // API
-    await expect(await umbracoApi.telemetry.checkLevel(expectedLevel)).toBeTruthy();
+    expect(await umbracoApi.telemetry.getLevel() == "Minimal").toBeTruthy();
   });
 });

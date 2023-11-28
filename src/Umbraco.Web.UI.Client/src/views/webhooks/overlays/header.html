@@ -1,0 +1,65 @@
+<div ng-controller="Umbraco.Editors.Webhooks.HeaderController as vm">
+  <umb-editor-view>
+    <ng-form name="createWebhookHeader" novalidate val-form-manager>
+      <umb-editor-header
+        name="model.title"
+        name-locked="true"
+        hide-alias="true"
+        hide-icon="true"
+        hide-description="true">
+      </umb-editor-header>
+      <umb-editor-container>
+        <umb-box>
+          <umb-box-content>
+            <umb-control-group label="Name" description="The name of the header" alias="headerNameGroup" required="true">
+              <input type="text"
+                     data-element="webhook-headerName"
+                     name="headerName"
+                     ng-model="headerModel.key"
+                     class="umb-property-editor umb-textstring"
+                     no-dirty-check
+                     focus-on-filled="true"
+                     placeholder="Accept"
+                     list="webhook-headers"
+                     umb-auto-focus
+                     required />
+              <datalist id="webhook-headers">
+                <option ng-repeat="header in vm.headers" ng-value="header"></option>
+              </datalist>
+            </umb-control-group>
+            <umb-control-group label="Value" description="The value of the header" alias="headerValueGroup" required="true">
+              <input type="text"
+                     data-element="webhook-headerValue"
+                     name="headerValue"
+                     ng-model="headerModel.value"
+                     class="umb-property-editor umb-textstring"
+                     no-dirty-check
+                     focus-on-filled="true"
+                     placeholder="application/json"
+                     umb-auto-focus
+                     required/>
+            </umb-control-group>
+          </umb-box-content>
+        </umb-box>
+      </umb-editor-container>
+      <umb-editor-footer>
+        <umb-editor-footer-content-right>
+          <umb-button
+            type="button"
+            button-style="link"
+            label-key="general_close"
+            shortcut="esc"
+            action="vm.close()">
+          </umb-button>
+          <umb-button
+            type="button"
+            button-style="action"
+            disabled="disableSubmitButton"
+            label="Create"
+            action="vm.submit()">
+          </umb-button>
+        </umb-editor-footer-content-right>
+      </umb-editor-footer>
+    </ng-form>
+  </umb-editor-view>
+</div>

@@ -8,15 +8,16 @@ public enum UserGroupOperationStatus
     DuplicateAlias,
     MissingUser,
     IsSystemUserGroup,
-    UnauthorizedMissingUserSection,
-    UnauthorizedMissingSections,
-    UnauthorizedStartNodes,
-    UnauthorizedMissingUserGroup,
     CancelledByNotification,
     MediaStartNodeKeyNotFound,
     DocumentStartNodeKeyNotFound,
     LanguageNotFound,
     NameTooLong,
     AliasTooLong,
-    MissingName
+    MissingName,
+    UnauthorizedMissingAllowedSectionAccess,
+    UnauthorizedMissingContentStartNodeAccess,
+    UnauthorizedMissingMediaStartNodeAccess,
+    UnauthorizedMissingUserGroupAccess,
+    UnauthorizedMissingUsersSectionAccess
 }

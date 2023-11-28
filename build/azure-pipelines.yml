@@ -47,7 +47,7 @@ parameters:
     default: ' '
 
 variables:
-  nodeVersion: 18.18.x
+  nodeVersion: 20
   dotnetVersion: 8.x
   dotnetIncludePreviewVersions: true
   solution: umbraco.sln
@@ -74,22 +74,9 @@ stages:
         steps:
           - checkout: self
             submodules: true
-          - task: UseDotNet@2
-            displayName: Use .NET $(dotnetVersion)
-            inputs:
-              version: $(dotnetVersion)
-              includePreviewVersions: $(dotnetIncludePreviewVersions)
-          - task: DotNetCoreCLI@2
-            inputs:
-              command: custom
-              custom: tool
-              arguments: install --tool-path . nbgv
-            displayName: Install NBGV tool
-          - script: nbgv cloud
-            displayName: Set version variables
-            name: version
           - task: NodeTool@0
             displayName: Use Node.js $(nodeVersion)
+            retryCountOnTaskFailure: 3
             inputs:
               versionSpec: $(nodeVersion)
           - task: Cache@2
@@ -102,9 +89,9 @@ stages:
               path: $(npm_config_cache)
           - script: npm ci --no-fund --no-audit --prefer-offline
             workingDirectory:  src/Umbraco.Web.UI.Client
-            displayName: Run npm ci
+            displayName: Run npm ci (Backoffice)
           - task: gulp@0
-            displayName: Run gulp build
+            displayName: Run gulp build (Backoffice)
             inputs:
               gulpFile: src/Umbraco.Web.UI.Client/gulpfile.js
               targets: coreBuild
@@ -121,6 +108,11 @@ stages:
           - script: npm run build
             displayName: Run Login Build
             workingDirectory: src/Umbraco.Web.UI.New.Client/apps/auth
+          - task: UseDotNet@2
+            displayName: Use .NET $(dotnetVersion)
+            inputs:
+              version: $(dotnetVersion)
+              includePreviewVersions: $(dotnetIncludePreviewVersions)
           - task: DotNetCoreCLI@2
             displayName: Run dotnet restore
             inputs:
@@ -163,56 +155,61 @@ stages:
               artifactName: build_output
 
   - stage: Build_Docs
-    condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.version.NBGV_PublicRelease'], 'True'), ${{parameters.buildApiDocs}}))
+    condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.buildApiDocs}}))
     displayName: Prepare API Documentation
     dependsOn: Build
     variables:
-      umbracoMajorVersion: $[ stageDependencies.Build.A.outputs['version.NBGV_VersionMajor'] ]
+      umbracoMajorVersion: $[ stageDependencies.Build.A.outputs['build.NBGV_VersionMajor'] ]
     jobs:
       # C# API Reference
-#      - job:
-#        displayName: Build C# API Reference
-#        pool:
-#          vmImage: 'windows-latest'
-#        steps:
-#          - task: PowerShell@2
-#            displayName: Install DocFX
-#            inputs:
-#              targetType: inline
-#              script: |
-#                choco install docfx --version=2.59.4 -y
-#                if ($lastexitcode -ne 0){
-#                    throw ("Error installing DocFX")
-#                }
-#          - task: PowerShell@2
-#            displayName: Generate metadata
-#            inputs:
-#              targetType: inline
-#              script: |
-#                docfx metadata "$(Build.SourcesDirectory)/build/csharp-docs/docfx.json"
-#                if ($lastexitcode -ne 0){
-#                    throw ("Error generating metadata.")
-#                }
-#          - task: PowerShell@2
-#            displayName: Generate documentation
-#            inputs:
-#              targetType: inline
-#              script: |
-#                docfx build "$(Build.SourcesDirectory)/build/csharp-docs/docfx.json"
-#                if ($lastexitcode -ne 0){
-#                      throw ("Error generating documentation.")
-#                }
-#          - task: ArchiveFiles@2
-#            displayName: Archive C# Docs
-#            inputs:
-#              rootFolderOrFile: $(Build.SourcesDirectory)/build/csharp-docs/_site
-#              includeRootFolder: false
-#              archiveFile: $(Build.ArtifactStagingDirectory)/csharp-docs.zip
-#          - task: PublishPipelineArtifact@1
-#            displayName: Publish C# Docs
-#            inputs:
-#              targetPath: $(Build.ArtifactStagingDirectory)/csharp-docs.zip
-#              artifact: csharp-docs
+      - job:
+        displayName: Build C# API Reference
+        pool:
+          vmImage: 'windows-latest'
+        steps:
+          - task: UseDotNet@2
+            displayName: Use .NET $(dotnetVersion)
+            inputs:
+              version: $(dotnetVersion)
+              includePreviewVersions: $(dotnetIncludePreviewVersions)
+          - task: PowerShell@2
+            displayName: Install DocFX
+            inputs:
+              targetType: inline
+              script: |
+                dotnet tool install -g docfx --version 2.72.1
+                if ($lastexitcode -ne 0){
+                    throw ("Error installing DocFX")
+                }
+          - task: PowerShell@2
+            displayName: Generate metadata
+            inputs:
+              targetType: inline
+              script: |
+                docfx metadata "$(Build.SourcesDirectory)/build/csharp-docs/docfx.json"
+                if ($lastexitcode -ne 0){
+                    throw ("Error generating metadata.")
+                }
+          - task: PowerShell@2
+            displayName: Generate documentation
+            inputs:
+              targetType: inline
+              script: |
+                docfx build "$(Build.SourcesDirectory)/build/csharp-docs/docfx.json"
+                if ($lastexitcode -ne 0){
+                      throw ("Error generating documentation.")
+                }
+          - task: ArchiveFiles@2
+            displayName: Archive C# Docs
+            inputs:
+              rootFolderOrFile: $(Build.SourcesDirectory)/build/csharp-docs/_site
+              includeRootFolder: false
+              archiveFile: $(Build.ArtifactStagingDirectory)/csharp-docs.zip
+          - task: PublishPipelineArtifact@1
+            displayName: Publish C# Docs
+            inputs:
+              targetPath: $(Build.ArtifactStagingDirectory)/csharp-docs.zip
+              artifact: csharp-docs
 
       # js API Reference
       - job:
@@ -304,7 +301,7 @@ stages:
     displayName: Integration Tests
     dependsOn: Build
     variables:
-      releaseTestFilter: eq(dependencies.Build.outputs['A.version.NBGV_PublicRelease'], 'True')
+      releaseTestFilter: eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True')
     jobs:
       # Integration Tests (SQLite)
       - job:
@@ -476,6 +473,7 @@ stages:
 #              path: $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/misc/nupkg
 #          - task: NodeTool@0
 #            displayName: Use Node.js $(nodeVersion)
+#            retryCountOnTaskFailure: 3
 #            inputs:
 #              versionSpec: $(nodeVersion)
 #          - task: Cache@2
@@ -580,7 +578,7 @@ stages:
       - Unit
       - Integration
       # - E2E # TODO: Enable when stable.
-    condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.version.NBGV_PublicRelease'], 'True'), ${{parameters.myGetDeploy}}))
+    condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.myGetDeploy}}))
     jobs:
       - job:
         displayName: Push to pre-release feed
@@ -603,7 +601,7 @@ stages:
     dependsOn:
       - Deploy_MyGet
       - Build_Docs
-    condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.version.NBGV_PublicRelease'], 'True'), ${{parameters.nuGetDeploy}}))
+    condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.nuGetDeploy}}))
     jobs:
       - job:
         displayName: Push to NuGet
@@ -682,7 +680,7 @@ stages:
     dependsOn:
       - Build
       - Deploy_MyGet # Change to "Deploy_Nuget" after release of v14
-    condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.version.NBGV_PublicRelease'], 'True'), ${{parameters.uploadApiDocs}}))
+    condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.uploadApiDocs}}))
     jobs:
 #      - job:
 #        displayName: Upload C# Docs

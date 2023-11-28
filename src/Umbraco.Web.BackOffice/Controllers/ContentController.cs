@@ -771,6 +771,7 @@ public class ContentController : ContentControllerBase
 
         return pagedResult;
     }
+
     /// <summary>
     ///     Creates a blueprint from a content item
     /// </summary>
@@ -1056,7 +1057,7 @@ public class ContentController : ContentControllerBase
                 AddDomainWarnings(publishStatus.Content, successfulCultures, globalNotifications);
                 AddPublishStatusNotifications(new[] { publishStatus }, globalNotifications, notifications, successfulCultures);
             }
-            break;
+                break;
             case ContentSaveAction.PublishWithDescendants:
             case ContentSaveAction.PublishWithDescendantsNew:
             {
@@ -1073,7 +1074,7 @@ public class ContentController : ContentControllerBase
                 AddDomainWarnings(publishStatus, successfulCultures, globalNotifications);
                 AddPublishStatusNotifications(publishStatus, globalNotifications, notifications, successfulCultures);
             }
-            break;
+                break;
             case ContentSaveAction.PublishWithDescendantsForce:
             case ContentSaveAction.PublishWithDescendantsForceNew:
             {
@@ -1089,7 +1090,7 @@ public class ContentController : ContentControllerBase
                 var publishStatus = PublishBranchInternal(contentItem, true, cultureForInvariantErrors, out wasCancelled, out var successfulCultures).ToList();
                 AddPublishStatusNotifications(publishStatus, globalNotifications, notifications, successfulCultures);
             }
-            break;
+                break;
             default:
                 throw new ArgumentOutOfRangeException();
         }
@@ -1542,7 +1543,9 @@ public class ContentController : ContentControllerBase
         if (!contentItem.PersistedContent?.ContentType.VariesByCulture() ?? false)
         {
             //its invariant, proceed normally
-            IEnumerable<PublishResult> publishStatus = _contentService.SaveAndPublishBranch(contentItem.PersistedContent!, force, userId: _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
+            // NOTE: we don't really care about the correctness of this anymore, as this controller is being replaced by the Management API ... let's just ensure that save and publish works for happy paths
+            _contentService.Save(contentItem.PersistedContent!);
+            IEnumerable<PublishResult> publishStatus = _contentService.PublishBranch(contentItem.PersistedContent!, force, Array.Empty<string>(), userId: _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
             // TODO: Deal with multiple cancellations
             wasCancelled = publishStatus.Any(x => x.Result == PublishResultType.FailedPublishCancelledByEvent);
             successfulCultures = null; //must be null! this implies invariant
@@ -1577,7 +1580,9 @@ public class ContentController : ContentControllerBase
         if (canPublish)
         {
             //proceed to publish if all validation still succeeds
-            IEnumerable<PublishResult> publishStatus = _contentService.SaveAndPublishBranch(
+            // NOTE: we don't really care about the correctness of this anymore, as this controller is being replaced by the Management API ... let's just ensure that save and publish works for happy paths
+            _contentService.Save(contentItem.PersistedContent!);
+            IEnumerable<PublishResult> publishStatus = _contentService.PublishBranch(
                 contentItem.PersistedContent!, force, culturesToPublish.WhereNotNull().ToArray(), _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
             // TODO: Deal with multiple cancellations
             wasCancelled = publishStatus.Any(x => x.Result == PublishResultType.FailedPublishCancelledByEvent);
@@ -1591,7 +1596,7 @@ public class ContentController : ContentControllerBase
             OperationResult saveResult = _contentService.Save(contentItem.PersistedContent!, _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
             PublishResult[] publishStatus =
             {
-                new PublishResult(PublishResultType.FailedPublishMandatoryCultureMissing, null, contentItem.PersistedContent)
+                new PublishResult(PublishResultType.FailedPublishMandatoryCultureMissing, null, contentItem.PersistedContent!)
             };
             wasCancelled = saveResult.Result == OperationResultType.FailedCancelledByEvent;
             successfulCultures = Array.Empty<string>();
@@ -1617,7 +1622,9 @@ public class ContentController : ContentControllerBase
         if (!contentItem.PersistedContent?.ContentType.VariesByCulture() ?? false)
         {
             //its invariant, proceed normally
-            PublishResult publishStatus = _contentService.SaveAndPublish(contentItem.PersistedContent!, userId: _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
+            // NOTE: we don't really care about the correctness of this anymore, as this controller is being replaced by the Management API ... let's just ensure that save and publish works for happy paths
+            _contentService.Save(contentItem.PersistedContent!);
+            PublishResult publishStatus = _contentService.Publish(contentItem.PersistedContent!, new [] {"*"}, userId: _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
             wasCancelled = publishStatus.Result == PublishResultType.FailedPublishCancelledByEvent;
             successfulCultures = null; //must be null! this implies invariant
             return publishStatus;
@@ -1659,15 +1666,10 @@ public class ContentController : ContentControllerBase
 
         if (canPublish)
         {
-            //try to publish all the values on the model - this will generally only fail if someone is tampering with the request
-            //since there's no reason variant rules would be violated in normal cases.
-            canPublish = PublishCulture(contentItem.PersistedContent!, variants, defaultCulture);
-        }
-
-        if (canPublish)
-        {
             //proceed to publish if all validation still succeeds
-            PublishResult publishStatus = _contentService.SaveAndPublish(
+            // NOTE: we don't really care about the correctness of this anymore, as this controller is being replaced by the Management API ... let's just ensure that save and publish works for happy paths
+            _contentService.Save(contentItem.PersistedContent!);
+            PublishResult publishStatus = _contentService.Publish(
                 contentItem.PersistedContent!,
                 culturesToPublish,
                 _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
@@ -1682,7 +1684,7 @@ public class ContentController : ContentControllerBase
             OperationResult saveResult = _contentService.Save(
                 contentItem.PersistedContent!,
                 _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ?? -1);
-            var publishStatus = new PublishResult(PublishResultType.FailedPublishMandatoryCultureMissing, null, contentItem.PersistedContent);
+            var publishStatus = new PublishResult(PublishResultType.FailedPublishMandatoryCultureMissing, null, contentItem.PersistedContent!);
             wasCancelled = saveResult.Result == OperationResultType.FailedCancelledByEvent;
             successfulCultures = Array.Empty<string>();
             return publishStatus;
@@ -1838,32 +1840,6 @@ public class ContentController : ContentControllerBase
         return canPublish;
     }
 
-    /// <summary>
-    ///     Call PublishCulture on the content item for each culture to get a validation result for each culture
-    /// </summary>
-    /// <param name="persistentContent"></param>
-    /// <param name="cultureVariants"></param>
-    /// <param name="defaultCulture"></param>
-    /// <returns></returns>
-    /// <remarks>
-    ///     This would generally never fail unless someone is tampering with the request
-    /// </remarks>
-    private bool PublishCulture(IContent persistentContent, IEnumerable<ContentVariantSave> cultureVariants, string? defaultCulture)
-    {
-        foreach (ContentVariantSave variant in cultureVariants.Where(x => x.Publish))
-        {
-            // publishing any culture, implies the invariant culture
-            var valid = persistentContent.PublishCulture(_cultureImpactFactory.ImpactExplicit(variant.Culture, defaultCulture.InvariantEquals(variant.Culture)));
-            if (!valid)
-            {
-                AddVariantValidationError(variant.Culture, variant.Segment, "speechBubbles", "contentCultureValidationError");
-                return false;
-            }
-        }
-
-        return true;
-    }
-
     private IEnumerable<string> GetPublishedCulturesFromAncestors(IContent? content)
     {
         if (content?.ParentId is not -1 && content?.HasIdentity is false)
@@ -1953,7 +1929,8 @@ public class ContentController : ContentControllerBase
             return HandleContentNotFound(id);
         }
 
-        PublishResult publishResult = _contentService.SaveAndPublish(foundContent, userId: _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? 0);
+        // NOTE: we don't really care about the correctness of this anymore, as this controller is being replaced by the Management API ... let's just ensure that save and publish works for happy paths
+        PublishResult publishResult = _contentService.Publish(foundContent, foundContent.AvailableCultures.ToArray(), userId: _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? 0);
 
         if (publishResult.Success == false)
         {
@@ -1996,7 +1973,8 @@ public class ContentController : ContentControllerBase
 
         foreach (var culture in model.Cultures)
         {
-            PublishResult publishResult = _contentService.SaveAndPublish(foundContent, culture, _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? 0);
+            // NOTE: we don't really care about the correctness of this anymore, as this controller is being replaced by the Management API ... let's just ensure that save and publish works for happy paths
+            PublishResult publishResult = _contentService.Publish(foundContent, new[] { culture }, _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? 0);
             results[culture] = publishResult;
         }
 
@@ -2743,7 +2721,7 @@ public class ContentController : ContentControllerBase
                         }
                     }
                 }
-                break;
+                    break;
                 case PublishResultType.SuccessPublish:
                 {
                     // TODO: Here we should have messaging for when there are release dates specified like https://github.com/umbraco/Umbraco-CMS/pull/3507
@@ -2771,7 +2749,7 @@ public class ContentController : ContentControllerBase
                         }
                     }
                 }
-                break;
+                    break;
                 case PublishResultType.FailedPublishPathNotPublished:
                 {
                     //TODO: This doesn't take into account variations with the successfulCultures param
@@ -2780,14 +2758,14 @@ public class ContentController : ContentControllerBase
                         _localizedTextService.Localize(null, "publish"),
                         _localizedTextService.Localize("publish", "contentPublishedFailedByParent", new[] { names }).Trim());
                 }
-                break;
+                    break;
                 case PublishResultType.FailedPublishCancelledByEvent:
                 {
                     //TODO: This doesn't take into account variations with the successfulCultures param
                     var names = string.Join(", ", status.Select(x => $"'{x.Content?.Name}'"));
                     AddCancelMessage(display, "publish", "contentPublishedFailedByEvent", new[] { names });
                 }
-                break;
+                    break;
                 case PublishResultType.FailedPublishAwaitingRelease:
                 {
                     //TODO: This doesn't take into account variations with the successfulCultures param
@@ -2796,7 +2774,7 @@ public class ContentController : ContentControllerBase
                         _localizedTextService.Localize(null, "publish"),
                         _localizedTextService.Localize("publish", "contentPublishedFailedAwaitingRelease", new[] { names }).Trim());
                 }
-                break;
+                    break;
                 case PublishResultType.FailedPublishHasExpired:
                 {
                     //TODO: This doesn't take into account variations with the successfulCultures param
@@ -2805,7 +2783,7 @@ public class ContentController : ContentControllerBase
                         _localizedTextService.Localize(null, "publish"),
                         _localizedTextService.Localize("publish", "contentPublishedFailedExpired", new[] { names }).Trim());
                 }
-                break;
+                    break;
                 case PublishResultType.FailedPublishIsTrashed:
                 {
                     //TODO: This doesn't take into account variations with the successfulCultures param
@@ -2814,7 +2792,7 @@ public class ContentController : ContentControllerBase
                         _localizedTextService.Localize(null, "publish"),
                         _localizedTextService.Localize("publish", "contentPublishedFailedIsTrashed", new[] { names }).Trim());
                 }
-                break;
+                    break;
                 case PublishResultType.FailedPublishContentInvalid:
                 {
                     if (successfulCultures == null)
@@ -2838,7 +2816,7 @@ public class ContentController : ContentControllerBase
                         }
                     }
                 }
-                break;
+                    break;
                 case PublishResultType.FailedPublishMandatoryCultureMissing:
                     display.AddWarningNotification(
                         _localizedTextService.Localize(null, "publish"),

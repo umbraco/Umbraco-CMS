@@ -1,0 +1,114 @@
+@import "../../../less/variables.less";
+@import "../../../less/mixins.less";
+@import "../../../less/icons.less";
+@import "../../../less/buttons.less";
+@import "../../../less/accessibility/sr-only.less";
+
+@umb-block-rte__item_minimum_height: 48px;
+
+
+.umb-block-rte__block {
+  position: relative;
+}
+
+ng-form.ng-invalid .umb-block-rte__block--actions {
+    opacity: 1;
+}
+
+
+.umb-block-rte--view {
+  position: relative;
+}
+.umb-block-rte--view::after {
+  position:absolute;
+  content: '';
+  inset: 0;
+  border-style: solid;
+  border-color: #6ab4f0;
+  border-width: calc(var(--umb-rte-block--selected, 0) * 2px);
+  border-radius:3px;
+  pointer-events:none;
+}
+
+.umb-block-rte__block--actions {
+    
+    position: absolute;
+    top: 0px;
+    padding-top:10px;/** set to make sure programmatic scrolling gets the top of the block into view. */
+
+    right: 10px;
+
+    /*
+    If child block, it can be hidden if a parents sets: --umb-block-rte--block-ui-display: none;
+    */
+    display: flex;
+    opacity: 1;
+    z-index:3;
+    
+    font-size: 0;
+    background-color: rgba(255, 255, 255, .96);
+    border-radius: 16px;
+    align-items: center;
+    padding: 0 5px;
+    margin-top:10px;
+
+    .action {
+        color: @ui-action-discreet-type;
+        font-size: 18px;
+        padding: 5px;
+        &:hover {
+            color: @ui-action-discreet-type-hover;
+        }
+    }
+
+    .action {
+        position: relative;
+        display: inline-block;
+ 
+        &.--error {
+            color: @errorBackground;
+            /** TODO: warning color class does not work in shadowDOM. */
+            .show-validation-type-warning & {
+                color: @warningBackground;
+            }
+        }
+
+        > .__error-badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            min-width: 8px;
+            color: @white;
+            background-color: @ui-active-type;
+            border: 2px solid @white;
+            border-radius: 50%;
+            font-size: 8px;
+            font-weight: bold;
+            padding: 2px;
+            line-height: 8px;
+            background-color: @errorBackground;
+            .show-validation-type-warning & {
+                background-color: @warningBackground;
+            }
+            display: none;
+            font-weight: 900;
+        }
+        &.--error > .__error-badge {
+            display: block;
+
+            animation-duration: 1.4s;
+            animation-iteration-count: infinite;
+            animation-name: umb-block-rte__action--badge-bounce;
+            animation-timing-function: ease;
+            @keyframes umb-block-rte__action--badge-bounce {
+                0%   { transform: translateY(0); }
+                20%  { transform: translateY(-4px); }
+                40%  { transform: translateY(0); }
+                55%  { transform: translateY(-2px); }
+                70%  { transform: translateY(0); }
+                100% { transform: translateY(0); }
+            }
+
+        }
+    }
+}

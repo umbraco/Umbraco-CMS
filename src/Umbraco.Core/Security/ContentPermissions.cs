@@ -165,12 +165,7 @@ public class ContentPermissions
             throw new ArgumentNullException(nameof(user));
         }
 
-        if (permissionsToCheck == null)
-        {
-            permissionsToCheck = Array.Empty<char>();
-        }
-
-        bool? hasPathAccess = null;
+        bool hasPathAccess;
         entity = null;
 
         if (nodeId == Constants.System.Root)
@@ -181,19 +176,17 @@ public class ContentPermissions
         {
             hasPathAccess = user.HasContentBinAccess(_entityService, _appCaches);
         }
-
-        if (hasPathAccess.HasValue)
+        else
         {
-            return hasPathAccess.Value ? ContentAccess.Granted : ContentAccess.Denied;
-        }
+            entity = _entityService.Get(nodeId, UmbracoObjectTypes.Document);
 
-        entity = _entityService.Get(nodeId, UmbracoObjectTypes.Document);
-        if (entity == null)
-        {
-            return ContentAccess.NotFound;
-        }
+            if (entity == null)
+            {
+                return ContentAccess.NotFound;
+            }
 
-        hasPathAccess = user.HasContentPathAccess(entity, _entityService, _appCaches);
+            hasPathAccess = user.HasContentPathAccess(entity, _entityService, _appCaches);
+        }
 
         if (hasPathAccess == false)
         {
@@ -206,7 +199,8 @@ public class ContentPermissions
         }
 
         // get the implicit/inherited permissions for the user for this path
-        return CheckPermissionsPath(entity.Path, user, permissionsToCheck)
+        // if there is no entity for this id, than just use the id as the path (i.e. -1 or -20)
+        return CheckPermissionsPath(entity?.Path ?? nodeId.ToString(), user, permissionsToCheck)
             ? ContentAccess.Granted
             : ContentAccess.Denied;
     }
@@ -230,12 +224,7 @@ public class ContentPermissions
             throw new ArgumentNullException(nameof(user));
         }
 
-        if (permissionsToCheck == null)
-        {
-            permissionsToCheck = Array.Empty<char>();
-        }
-
-        bool? hasPathAccess = null;
+        bool hasPathAccess;
         contentItem = null;
 
         if (nodeId == Constants.System.Root)
@@ -246,19 +235,17 @@ public class ContentPermissions
         {
             hasPathAccess = user.HasContentBinAccess(_entityService, _appCaches);
         }
-
-        if (hasPathAccess.HasValue)
+        else
         {
-            return hasPathAccess.Value ? ContentAccess.Granted : ContentAccess.Denied;
-        }
+            contentItem = _contentService.GetById(nodeId);
 
-        contentItem = _contentService.GetById(nodeId);
-        if (contentItem == null)
-        {
-            return ContentAccess.NotFound;
-        }
+            if (contentItem == null)
+            {
+                return ContentAccess.NotFound;
+            }
 
-        hasPathAccess = user.HasPathAccess(contentItem, _entityService, _appCaches);
+            hasPathAccess = user.HasPathAccess(contentItem, _entityService, _appCaches);
+        }
 
         if (hasPathAccess == false)
         {
@@ -271,7 +258,8 @@ public class ContentPermissions
         }
 
         // get the implicit/inherited permissions for the user for this path
-        return CheckPermissionsPath(contentItem.Path, user, permissionsToCheck)
+        // if there is no content item for this id, than just use the id as the path (i.e. -1 or -20)
+        return CheckPermissionsPath(contentItem?.Path ?? nodeId.ToString(), user, permissionsToCheck)
             ? ContentAccess.Granted
             : ContentAccess.Denied;
     }
@@ -283,8 +271,7 @@ public class ContentPermissions
             permissionsToCheck = Array.Empty<char>();
         }
 
-        // get the implicit/inherited permissions for the user for this path,
-        // if there is no content item for this id, than just use the id as the path (i.e. -1 or -20)
+        // get the implicit/inherited permissions for the user for this path
         EntityPermissionSet permission = _userService.GetPermissionsForPath(user, path);
 
         var allowed = true;
