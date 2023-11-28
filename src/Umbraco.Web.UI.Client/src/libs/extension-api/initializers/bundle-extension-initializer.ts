@@ -1,7 +1,8 @@
 import type { ManifestBase, ManifestBundle } from '../types/index.js';
 import { UmbExtensionRegistry } from '../registry/extension.registry.js';
 import { loadManifestPlainJs } from '../functions/load-manifest-plain-js.function.js';
-import { UmbBaseController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbBundleExtensionInitializer extends UmbBaseController {
 	#extensionRegistry;
@@ -29,7 +30,7 @@ export class UmbBundleExtensionInitializer extends UmbBaseController {
 	}
 
 	async instantiateBundle(manifest: ManifestBundle) {
-		if(manifest.js) {
+		if (manifest.js) {
 			const js = await loadManifestPlainJs(manifest.js);
 
 			if (js) {
@@ -47,7 +48,7 @@ export class UmbBundleExtensionInitializer extends UmbBaseController {
 	}
 
 	async unregisterBundle(manifest: ManifestBundle) {
-		if(manifest.js) {
+		if (manifest.js) {
 			const js = await loadManifestPlainJs(manifest.js);
 
 			if (js) {

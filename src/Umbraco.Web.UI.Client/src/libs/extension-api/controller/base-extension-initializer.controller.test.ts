@@ -11,11 +11,11 @@ import {
 	UmbControllerHostElement,
 	UmbControllerHostElementMixin,
 } from '../../controller-api/controller-host-element.mixin.js';
-import { UmbBaseController } from '../../controller-api/controller.class.js';
-import { UmbControllerHost } from '../../controller-api/controller-host.interface.js';
 import { UmbBaseExtensionInitializer } from './index.js';
+import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import { customElement, html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbSwitchCondition } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 @customElement('umb-test-controller-host')
 export class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}

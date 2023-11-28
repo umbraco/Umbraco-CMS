@@ -1,5 +1,6 @@
 import { UmbEditableWorkspaceContextBase } from '../workspace-context/index.js';
-import { UmbBaseController, type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import type { UmbEntityBase } from '@umbraco-cms/backoffice/models';
 import { createRoutePathBuilder, type UmbRouterSlotElement } from '@umbraco-cms/backoffice/router';
 import { ensurePathEndsWithSlash } from '@umbraco-cms/backoffice/utils';

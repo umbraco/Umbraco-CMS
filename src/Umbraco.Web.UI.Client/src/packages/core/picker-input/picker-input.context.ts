@@ -1,6 +1,7 @@
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbItemRepository, UmbRepositoryItemsManager } from '@umbraco-cms/backoffice/repository';
-import { UmbBaseController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import {
 	UMB_CONFIRM_MODAL,
 	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
@@ -11,7 +12,7 @@ import {
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { ItemResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 
-export class UmbPickerInputContext<ItemType extends ItemResponseModelBaseModel>extends UmbBaseController {
+export class UmbPickerInputContext<ItemType extends ItemResponseModelBaseModel> extends UmbBaseController {
 	modalAlias: string | UmbModalToken;
 	repository?: UmbItemRepository<ItemType>;
 	#getUnique: (entry: ItemType) => string | undefined;

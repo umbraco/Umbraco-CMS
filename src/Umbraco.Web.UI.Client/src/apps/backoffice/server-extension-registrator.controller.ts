@@ -1,5 +1,6 @@
 import { PackageResource, OpenAPI } from '@umbraco-cms/backoffice/backend-api';
-import { UmbBaseController, type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBackofficeExtensionRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { ManifestBase, isManifestBaseType } from '@umbraco-cms/backoffice/extension-api';

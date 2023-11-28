@@ -1,5 +1,5 @@
 import { UMB_CURRENT_USER_CONTEXT } from '../../current-user/current-user.context.js';
-import { UmbBaseController } from '@umbraco-cms/backoffice/controller-api';
+import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import {
 	ManifestCondition,
 	UmbConditionConfigBase,

@@ -1,9 +1,9 @@
-import { UmbBasicState } from './basic-state.js';
 import { createObservablePart } from '../utils/create-observable-part.function.js';
 import { deepFreeze } from '../utils/deep-freeze.function.js';
 import type { MappingFunction } from '../types/mapping-function.type.js';
 import type { MemoizationFunction } from '../types/memoization-function.type.js';
 import { naiveObjectComparison } from '../utils/naive-object-comparison.function.js';
+import { UmbBasicState } from './basic-state.js';
 
 /**
  * @export

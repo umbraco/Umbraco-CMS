@@ -3,7 +3,8 @@ import { UMB_DOCUMENT_TYPE_ITEM_STORE_CONTEXT, UmbDocumentTypeItemStore } from '
 import { UmbDocumentTypeServerDataSource } from './document-type.server.data.js';
 import { UmbDocumentTypeDetailStore, UMB_DOCUMENT_TYPE_DETAIL_STORE_CONTEXT } from './document-type-detail.store.js';
 import { type UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
-import { UmbBaseController, type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import {
 	CreateDocumentTypeRequestModel,
 	DocumentTypeResponseModel,

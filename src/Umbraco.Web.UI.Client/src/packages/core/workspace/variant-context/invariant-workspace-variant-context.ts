@@ -1,11 +1,20 @@
-import { DocumentVariantResponseModel } from "@umbraco-cms/backoffice/backend-api";
-import { UmbBaseController, UmbControllerHost } from "@umbraco-cms/backoffice/controller-api";
-import { UmbObjectState } from "@umbraco-cms/backoffice/observable-api";
-import { UmbVariantId } from "@umbraco-cms/backoffice/variant";
-import { UMB_VARIANT_CONTEXT, UmbVariantContext, UmbInvariantableWorkspaceContextInterface } from "@umbraco-cms/backoffice/workspace";
+import { DocumentVariantResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import {
+	UMB_VARIANT_CONTEXT,
+	UmbVariantContext,
+	UmbInvariantableWorkspaceContextInterface,
+} from '@umbraco-cms/backoffice/workspace';
 
-export class UmbInvariantWorkspaceVariantContext<WorkspaceType extends UmbInvariantableWorkspaceContextInterface= UmbInvariantableWorkspaceContextInterface> extends UmbBaseController implements UmbVariantContext {
-
+export class UmbInvariantWorkspaceVariantContext<
+		WorkspaceType extends UmbInvariantableWorkspaceContextInterface = UmbInvariantableWorkspaceContextInterface,
+	>
+	extends UmbBaseController
+	implements UmbVariantContext
+{
 	protected _workspace: WorkspaceType;
 
 	#currentVariant = new UmbObjectState<DocumentVariantResponseModel | undefined>(undefined);
@@ -33,8 +42,6 @@ export class UmbInvariantWorkspaceVariantContext<WorkspaceType extends UmbInvari
 		this._workspace.setName(name);
 	}
 
-
-
 	constructor(host: UmbControllerHost, workspace: WorkspaceType) {
 		// The controller alias, is a very generic name cause we want only one of these for this controller host.
 		super(host, 'variantContext');
@@ -42,8 +49,6 @@ export class UmbInvariantWorkspaceVariantContext<WorkspaceType extends UmbInvari
 
 		this.provideContext(UMB_VARIANT_CONTEXT, this);
 	}
-
-
 
 	/**
 	 * TODO: Write proper JSDocs here.
