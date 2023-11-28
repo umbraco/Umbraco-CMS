@@ -39,18 +39,22 @@ export class UmbInviteUserModalElement extends UmbModalBaseElement {
 		});
 
 		if (!error) {
-			this.#closeModal();
+			this.#submitModal();
 		}
 	}
 
-	#closeModal() {
+	#submitModal() {
+		this.modalContext?.submit();
+	}
+
+	#rejectModal() {
 		this.modalContext?.reject();
 	}
 
 	render() {
 		return html`<uui-dialog-layout headline="Invite User">
 			${this.#renderForm()}
-			<uui-button @click=${this.#closeModal} slot="actions" label="Cancel" look="secondary"></uui-button>
+			<uui-button @click=${this.#rejectModal} slot="actions" label="Cancel" look="secondary"></uui-button>
 			<uui-button
 				form="InviteUserForm"
 				slot="actions"

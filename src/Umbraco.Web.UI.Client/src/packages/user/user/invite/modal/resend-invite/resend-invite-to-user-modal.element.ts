@@ -28,12 +28,19 @@ export class UmbResendInviteToUserModalElement extends UmbModalBaseElement<
 		const formData = new FormData(form);
 		const message = formData.get('message') as string;
 
-		const { error } = await this.#userInviteUserRepository.resendInvite(this.modalContext.data.userId, {
+		await this.#userInviteUserRepository.resendInvite({
+			userId: this.modalContext.data.userId,
 			message,
 		});
+
+		this.#submitModal();
 	}
 
-	private _closeModal() {
+	#submitModal() {
+		this.modalContext?.submit();
+	}
+
+	#rejectModal() {
 		this.modalContext?.reject();
 	}
 
@@ -41,7 +48,7 @@ export class UmbResendInviteToUserModalElement extends UmbModalBaseElement<
 		return html`<uui-dialog-layout headline="Resend invite">
 			${this.#renderForm()}
 
-			<uui-button @click=${this._closeModal} slot="actions" label="Cancel" look="secondary"></uui-button>
+			<uui-button @click=${this.#rejectModal} slot="actions" label="Cancel" look="secondary"></uui-button>
 			<uui-button
 				slot="actions"
 				type="submit"

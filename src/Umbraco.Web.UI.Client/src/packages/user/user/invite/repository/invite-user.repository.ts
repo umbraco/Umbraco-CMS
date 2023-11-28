@@ -1,7 +1,7 @@
 import { UmbUserRepositoryBase } from '../../repository/user-repository-base.js';
 import { UmbInviteUserServerDataSource } from './invite-user-server.data-source.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { InviteUserRequestModel } from '@umbraco-cms/backoffice/backend-api';
+import { InviteUserRequestModel, ResendInviteUserRequestModel } from '@umbraco-cms/backoffice/backend-api';
 
 export class UmbInviteUserRepository extends UmbUserRepositoryBase {
 	#inviteSource: UmbInviteUserServerDataSource;
@@ -35,17 +35,17 @@ export class UmbInviteUserRepository extends UmbUserRepositoryBase {
 
 	/**
 	 * Resend an invite to a user
-	 * @param {string} userId
+	 * @param {string} userUnique
 	 * @param {InviteUserRequestModel} requestModel
 	 * @return {*}
 	 * @memberof UmbInviteUserRepository
 	 */
-	async resendInvite(userId: string, requestModel: any) {
-		if (!userId) throw new Error('User id is missing');
+	async resendInvite(requestModel: ResendInviteUserRequestModel) {
+		if (!requestModel.userId) throw new Error('User unique is missing');
 		if (!requestModel) throw new Error('data is missing');
 		await this.init;
 
-		const { error } = await this.#inviteSource.resendInvite(userId, requestModel);
+		const { error } = await this.#inviteSource.resendInvite(requestModel);
 
 		if (!error) {
 			const notification = { data: { message: `Invite resent to user` } };
