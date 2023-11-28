@@ -17708,6 +17708,22 @@
         },
         "additionalProperties": false
       },
+      "ContextualPermissionModel": {
+        "type": "object",
+        "properties": {
+          "context": {
+            "type": "string"
+          },
+          "identifier": {
+            "type": "string",
+            "nullable": true
+          },
+          "permission": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
       "CopyDataTypeRequestModel": {
         "type": "object",
         "properties": {
@@ -17999,6 +18015,11 @@
           }
         ],
         "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
           "parentId": {
             "type": "string",
             "format": "uuid",
@@ -18352,11 +18373,11 @@
           "hasAccessToAllLanguages": {
             "type": "boolean"
           },
-          "permissions": {
+          "contextualPermissions": {
             "uniqueItems": true,
             "type": "array",
             "items": {
-              "type": "string"
+              "$ref": "#/components/schemas/ContextualPermissionModel"
             }
           }
         },
@@ -22810,11 +22831,11 @@
             "format": "uuid",
             "nullable": true
           },
-          "permissions": {
+          "contextualPermissions": {
             "uniqueItems": true,
             "type": "array",
             "items": {
-              "type": "string"
+              "$ref": "#/components/schemas/ContextualPermissionModel"
             }
           }
         },
