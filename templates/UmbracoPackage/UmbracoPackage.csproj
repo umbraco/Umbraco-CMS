@@ -8,6 +8,7 @@
     <Description>...</Description>
     <PackageTags>umbraco plugin package</PackageTags>
     <RootNamespace Condition="'$(name)' != '$(name{-VALUE-FORMS-}safe_namespace)'">UmbracoPackage</RootNamespace>
+    <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
   </PropertyGroup>
 
   <ItemGroup>
