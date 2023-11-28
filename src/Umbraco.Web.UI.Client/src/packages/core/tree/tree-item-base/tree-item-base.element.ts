@@ -150,7 +150,7 @@ export class UmbTreeItemBaseElement extends UmbLitElement {
 						this._childItems,
 						// TODO: get unique here instead of name. we might be able to get it from the context
 						(item) => item.name,
-						(item) => html`<umb-tree-item .item=${item}></umb-tree-item>`,
+						(item) => html`<umb-tree-item-default .item=${item}></umb-tree-item-default>`,
 				  )
 				: ''}
 		`;
