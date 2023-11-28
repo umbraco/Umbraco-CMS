@@ -2,7 +2,8 @@ import { UmbPropertyEditorUiElement } from '../../extension-registry/interfaces/
 import { type WorkspacePropertyData } from '../types/workspace-property-data.type.js';
 import { UMB_VARIANT_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import { UmbBaseController, type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import {
 	UmbClassState,
 	UmbObjectState,
@@ -10,14 +11,10 @@ import {
 	UmbObserverController,
 	UmbBasicState,
 } from '@umbraco-cms/backoffice/observable-api';
-import {
-	UmbContextProviderController,
-	UmbContextToken,
-} from '@umbraco-cms/backoffice/context-api';
+import { UmbContextProviderController, UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
 export class UmbWorkspacePropertyContext<ValueType = any> extends UmbBaseController {
-
 	private _providerController: UmbContextProviderController;
 
 	#data = new UmbObjectState<WorkspacePropertyData<ValueType>>({});
@@ -73,44 +70,37 @@ export class UmbWorkspacePropertyContext<ValueType = any> extends UmbBaseControl
 		});
 	}
 
-
 	private _observePropertyVariant?: UmbObserverController<UmbVariantId | undefined>;
 	private _observePropertyValue?: UmbObserverController<ValueType | undefined>;
 	private async _observeProperty() {
 		const alias = this.#data.getValue().alias;
 		if (!this.#variantContext || !alias) return;
 
-		const variantIdSubject = await this.#variantContext.propertyVariantId?.(alias) ?? undefined;
+		const variantIdSubject = (await this.#variantContext.propertyVariantId?.(alias)) ?? undefined;
 		this._observePropertyVariant?.destroy();
-		if(variantIdSubject) {
-			this._observePropertyVariant = this.observe(
-				variantIdSubject,
-				(variantId) => {
-					this.#variantId.next(variantId);
-				}
-			);
+		if (variantIdSubject) {
+			this._observePropertyVariant = this.observe(variantIdSubject, (variantId) => {
+				this.#variantId.next(variantId);
+			});
 		}
 
 		// TODO: Verify if we need to optimize runtime by parsing the propertyVariantID, cause this method retrieves it again:
-		const subject = await this.#variantContext.propertyValueByAlias<ValueType>(alias)
+		const subject = await this.#variantContext.propertyValueByAlias<ValueType>(alias);
 
 		this._observePropertyValue?.destroy();
-		if(subject) {
-			this._observePropertyValue = this.observe(
-				subject,
-				(value) => {
-					// Note: Do not try to compare new / old value, as it can of any type. We trust the UmbObjectState in doing such.
-					this.#data.update({ value });
-				}
-			);
+		if (subject) {
+			this._observePropertyValue = this.observe(subject, (value) => {
+				// Note: Do not try to compare new / old value, as it can of any type. We trust the UmbObjectState in doing such.
+				this.#data.update({ value });
+			});
 		}
 	}
 
 	private _generateVariantDifferenceString() {
-		if(!this.#variantContext) return;
+		if (!this.#variantContext) return;
 		const contextVariantId = this.#variantContext.getVariantId?.() ?? undefined;
 		this._variantDifference.next(
-			contextVariantId ? this.#variantId.getValue()?.toDifferencesString(contextVariantId) : ''
+			contextVariantId ? this.#variantId.getValue()?.toDifferencesString(contextVariantId) : '',
 		);
 	}
 
@@ -150,5 +140,5 @@ export class UmbWorkspacePropertyContext<ValueType = any> extends UmbBaseControl
 }
 
 export const UMB_WORKSPACE_PROPERTY_CONTEXT_TOKEN = new UmbContextToken<UmbWorkspacePropertyContext>(
-	'UmbWorkspacePropertyContext'
+	'UmbWorkspacePropertyContext',
 );

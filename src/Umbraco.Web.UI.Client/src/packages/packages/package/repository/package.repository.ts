@@ -1,6 +1,7 @@
 import { UmbPackageStore, UMB_PACKAGE_STORE_TOKEN } from './package.store.js';
 import { UmbPackageServerDataSource } from './sources/package.server.data.js';
-import { UmbBaseController, type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import { UmbApi, ManifestBase, isManifestBaseType } from '@umbraco-cms/backoffice/extension-api';
 import { OpenAPI } from '@umbraco-cms/backoffice/backend-api';
 

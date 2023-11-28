@@ -2,7 +2,8 @@ import type { MemberTypeDetails } from '../types.js';
 import { UmbMemberTypeTreeStore, UMB_MEMBER_TYPE_TREE_STORE_CONTEXT } from '../tree/index.js';
 import { UmbMemberTypeStore, UMB_MEMBER_TYPE_STORE_CONTEXT } from './member-type.store.js';
 import { UmbMemberTypeDetailServerDataSource } from './sources/member-type.detail.server.data.js';
-import { UmbBaseController, type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 
 export class UmbMemberTypeRepository extends UmbBaseController {

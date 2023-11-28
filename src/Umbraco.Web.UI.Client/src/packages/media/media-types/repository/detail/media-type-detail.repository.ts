@@ -3,7 +3,8 @@ import { UMB_MEDIA_TYPE_ITEM_STORE_CONTEXT, UmbMediaTypeItemStore } from '../ite
 import { UmbMediaTypeServerDataSource } from './media-type-detail.server.data-source.js';
 import { UmbMediaTypeDetailStore, UMB_MEDIA_TYPE_DETAIL_STORE_CONTEXT } from './media-type-detail.store.js';
 import { type UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
-import { UmbBaseController, type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import {
 	CreateMediaTypeRequestModel,
 	MediaTypeResponseModel,

@@ -2,7 +2,8 @@ import type { UmbRoute } from './route.interface.js';
 import { createRoutePathBuilder } from './generate-route-path-builder.function.js';
 import type { IRoutingInfo, IRouterSlot } from '@umbraco-cms/backoffice/external/router-slot';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { UmbBaseController, type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import { UMB_MODAL_MANAGER_CONTEXT_TOKEN, UmbModalRouteRegistration } from '@umbraco-cms/backoffice/modal';
 
 const EmptyDiv = document.createElement('div');
@@ -51,7 +52,11 @@ export class UmbRouteContext extends UmbBaseController {
 			component: EmptyDiv,
 			setup: async (component, info) => {
 				if (!this.#modalContext) return;
-				const modalContext = await modalRegistration.routeSetup(this.#modalRouter, this.#modalContext, info.match.params);
+				const modalContext = await modalRegistration.routeSetup(
+					this.#modalRouter,
+					this.#modalContext,
+					info.match.params,
+				);
 				if (modalContext) {
 					modalContext.onSubmit().then(
 						() => {
@@ -59,7 +64,7 @@ export class UmbRouteContext extends UmbBaseController {
 						},
 						() => {
 							this.#removeModalPath(info);
-						}
+						},
 					);
 				}
 			},
@@ -74,10 +79,10 @@ export class UmbRouteContext extends UmbBaseController {
 
 	#generateModalRoutes() {
 		const newModals = this.#modalRegistrations.filter(
-			(x) => !this.#modalRoutes.find((route) => x.key === route.__modalKey)
+			(x) => !this.#modalRoutes.find((route) => x.key === route.__modalKey),
 		);
 		const routesToRemove = this.#modalRoutes.filter(
-			(route) => !this.#modalRegistrations.find((x) => x.key === route.__modalKey)
+			(route) => !this.#modalRegistrations.find((x) => x.key === route.__modalKey),
 		);
 
 		const cleanedRoutes = this.#modalRoutes.filter((route) => !routesToRemove.includes(route));
