@@ -1,4 +1,4 @@
-import { UmbTreeItemContext } from '../tree-item/tree-item.context.interface.js';
+import { UmbTreeItemContext } from '../tree-item-default/tree-item.context.interface.js';
 import { UmbTreeContextBase } from '../tree.context.js';
 import { UmbTreeItemModelBase } from '../types.js';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';

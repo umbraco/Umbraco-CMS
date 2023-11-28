@@ -1,11 +1,11 @@
 import { css, html, nothing, customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 import { ManifestTreeItem } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
-@customElement('umb-tree-item')
-export class UmbTreeItemElement extends UmbLitElement {
+@customElement('umb-tree-item-default')
+export class UmbTreeItemDefaultElement extends UmbLitElement {
 	@property({ type: Object, attribute: false })
 	item?: TreeItemPresentationModel;
 
@@ -31,6 +31,6 @@ export class UmbTreeItemElement extends UmbLitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-tree-item': UmbTreeItemElement;
+		'umb-tree-item-default': UmbTreeItemDefaultElement;
 	}
 }

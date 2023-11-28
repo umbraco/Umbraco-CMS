@@ -3,7 +3,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import {
 	ManifestMenuItemTreeKind,
 	UmbBackofficeManifestKind,
-	UmbMenuItemExtensionElement,
+	UmbMenuItemElement,
 	umbExtensionsRegistry,
 } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -15,13 +15,13 @@ const manifest: UmbBackofficeManifestKind = {
 	matchType: 'menuItem',
 	manifest: {
 		type: 'menuItem',
-		elementName: 'umb-menu-item-tree',
+		elementName: 'umb-menu-item-tree-default',
 	},
 };
 umbExtensionsRegistry.register(manifest);
 
-@customElement('umb-menu-item-tree')
-export class UmbMenuItemTreeElement extends UmbLitElement implements UmbMenuItemExtensionElement {
+@customElement('umb-menu-item-tree-default')
+export class UmbMenuItemTreeDefaultElement extends UmbLitElement implements UmbMenuItemElement {
 	@property({ type: Object })
 	manifest?: ManifestMenuItemTreeKind;
 
@@ -36,10 +36,10 @@ export class UmbMenuItemTreeElement extends UmbLitElement implements UmbMenuItem
 	}
 }
 
-export default UmbMenuItemTreeElement;
+export default UmbMenuItemTreeDefaultElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-menu-item-tree': UmbMenuItemTreeElement;
+		'umb-menu-item-tree-default': UmbMenuItemTreeDefaultElement;
 	}
 }

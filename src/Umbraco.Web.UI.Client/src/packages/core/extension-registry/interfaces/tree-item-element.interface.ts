@@ -1,5 +1,5 @@
 import { TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 
-export interface UmbTreeItemExtensionElement extends HTMLElement {
+export interface UmbTreeItemElement extends HTMLElement {
 	item?: TreeItemPresentationModel;
 }

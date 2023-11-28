@@ -4,8 +4,8 @@ import type { UmbTreeItemBaseElement } from './tree-item-base.element.js';
 
 // TODO: provide tree item context to make this element render properly
 const meta: Meta<UmbTreeItemBaseElement> = {
-	title: 'Components/Tree/Tree Item',
-	component: 'umb-tree-item',
+	title: 'Components/Tree/Tree Item Default',
+	component: 'umb-tree-item-default',
 };
 
 export default meta;

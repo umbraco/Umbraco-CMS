@@ -1,5 +1,5 @@
 import type { ManifestDashboard } from '../models/index.js';
 
-export interface UmbDashboardExtensionElement extends HTMLElement {
+export interface UmbDashboardElement extends HTMLElement {
 	manifest?: ManifestDashboard;
 }
