@@ -1,11 +1,10 @@
-import { UmbUserRepositoryBase } from '../user-repository-base.js';
-import { type UmbInviteUserDataSource } from './types.js';
-import { UmbInviteUserServerDataSource } from './invite-user.server.data-source.js';
+import { UmbUserRepositoryBase } from '../../repository/user-repository-base.js';
+import { UmbInviteUserServerDataSource } from './invite-user-server.data-source.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { InviteUserRequestModel } from '@umbraco-cms/backoffice/backend-api';
+import { InviteUserRequestModel, ResendInviteUserRequestModel } from '@umbraco-cms/backoffice/backend-api';
 
 export class UmbInviteUserRepository extends UmbUserRepositoryBase {
-	#inviteSource: UmbInviteUserDataSource;
+	#inviteSource: UmbInviteUserServerDataSource;
 
 	constructor(host: UmbControllerHost) {
 		super(host);
@@ -22,9 +21,11 @@ export class UmbInviteUserRepository extends UmbUserRepositoryBase {
 		if (!requestModel) throw new Error('data is missing');
 		await this.init;
 
-		const { error } = await this.#inviteSource.invite(requestModel);
+		const { data, error } = await this.#inviteSource.invite(requestModel);
 
-		if (!error) {
+		if (data) {
+			this.detailStore!.append(data);
+
 			const notification = { data: { message: `Invite sent to user` } };
 			this.notificationContext?.peek('positive', notification);
 		}
@@ -34,17 +35,17 @@ export class UmbInviteUserRepository extends UmbUserRepositoryBase {
 
 	/**
 	 * Resend an invite to a user
-	 * @param {string} userId
+	 * @param {string} userUnique
 	 * @param {InviteUserRequestModel} requestModel
 	 * @return {*}
 	 * @memberof UmbInviteUserRepository
 	 */
-	async resendInvite(userId: string, requestModel: any) {
-		if (!userId) throw new Error('User id is missing');
+	async resendInvite(requestModel: ResendInviteUserRequestModel) {
+		if (!requestModel.userId) throw new Error('User unique is missing');
 		if (!requestModel) throw new Error('data is missing');
 		await this.init;
 
-		const { error } = await this.#inviteSource.resendInvite(userId, requestModel);
+		const { error } = await this.#inviteSource.resendInvite(requestModel);
 
 		if (!error) {
 			const notification = { data: { message: `Invite resent to user` } };

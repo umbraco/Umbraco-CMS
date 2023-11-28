@@ -1,4 +1,4 @@
-import { type UmbUserDetail } from '../index.js';
+import { type UmbUserDetailModel } from '../index.js';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
@@ -14,7 +14,7 @@ export const UMB_USER_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbUserStore>('U
  */
 export class UmbUserStore extends UmbStoreBase {
 	constructor(host: UmbControllerHostElement) {
-		super(host, UMB_USER_STORE_CONTEXT_TOKEN.toString(), new UmbArrayState<UmbUserDetail>([], (x) => x.id));
+		super(host, UMB_USER_STORE_CONTEXT_TOKEN.toString(), new UmbArrayState<UmbUserDetailModel>([], (x) => x.id));
 	}
 
 	/**
@@ -22,7 +22,7 @@ export class UmbUserStore extends UmbStoreBase {
 	 * @param {id} string id.
 	 * @memberof UmbUserStore
 	 */
-	byId(id: UmbUserDetail['id']) {
+	byId(id: UmbUserDetailModel['id']) {
 		return this._data.asObservablePart((x) => x.find((y) => y.id === id));
 	}
 }

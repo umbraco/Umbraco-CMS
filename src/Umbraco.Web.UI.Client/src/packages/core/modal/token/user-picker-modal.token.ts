@@ -1,7 +1,7 @@
-import { UmbUserDetail } from '@umbraco-cms/backoffice/user';
+import { UmbUserDetailModel } from '@umbraco-cms/backoffice/user';
 import { UmbModalToken, UmbPickerModalData } from '@umbraco-cms/backoffice/modal';
 
-export type UmbUserPickerModalData = UmbPickerModalData<UmbUserDetail>;
+export type UmbUserPickerModalData = UmbPickerModalData<UmbUserDetailModel>;
 
 export interface UmbUserPickerModalValue {
 	selection: Array<string | null>;

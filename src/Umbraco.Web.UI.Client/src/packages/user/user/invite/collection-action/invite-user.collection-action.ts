@@ -1,10 +1,7 @@
+import { UMB_INVITE_USER_MODAL } from '../modal/index.js';
 import { UmbCollectionActionBase } from '@umbraco-cms/backoffice/collection';
 import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import {
-	UMB_INVITE_USER_MODAL,
-	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
-	UmbModalManagerContext,
-} from '@umbraco-cms/backoffice/modal';
+import { UMB_MODAL_MANAGER_CONTEXT_TOKEN, UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 
 export class UmbInviteUserCollectionAction extends UmbCollectionActionBase {
 	#modalManagerContext: UmbModalManagerContext | undefined;
