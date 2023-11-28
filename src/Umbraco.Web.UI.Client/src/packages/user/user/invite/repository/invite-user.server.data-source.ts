@@ -1,3 +1,4 @@
+import { UmbUserServerDataSource } from '../../repository/detail/user-detail.server.data-source.js';
 import { type UmbInviteUserDataSource } from './types.js';
 import { InviteUserRequestModel, UserResource } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -10,6 +11,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
  */
 export class UmbInviteUserServerDataSource implements UmbInviteUserDataSource {
 	#host: UmbControllerHost;
+	#detailSource: UmbUserServerDataSource;
 
 	/**
 	 * Creates an instance of UmbInviteUserServerDataSource.
@@ -18,6 +20,7 @@ export class UmbInviteUserServerDataSource implements UmbInviteUserDataSource {
 	 */
 	constructor(host: UmbControllerHost) {
 		this.#host = host;
+		this.#detailSource = new UmbUserServerDataSource(host);
 	}
 
 	/**
@@ -29,12 +32,19 @@ export class UmbInviteUserServerDataSource implements UmbInviteUserDataSource {
 	async invite(requestModel: InviteUserRequestModel) {
 		if (!requestModel) throw new Error('Data is missing');
 
-		return tryExecuteAndNotify(
+		const { data: newUserId, error } = await tryExecuteAndNotify(
 			this.#host,
 			UserResource.postUserInvite({
 				requestBody: requestModel,
 			}),
 		);
+
+		if (newUserId) {
+			const newUser = await this.#detailSource.read(newUserId);
+			return { data: newUser, error };
+		}
+
+		return { error };
 	}
 
 	/**
