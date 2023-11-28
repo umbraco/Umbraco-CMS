@@ -217,4 +217,36 @@ describe('UmbSelectionManager', () => {
 			expect(manager.getSelection()).to.deep.equal(['1', '2']);
 		});
 	});
+
+	describe('Multi selection', () => {
+		it('selects multiple items', () => {
+			manager.select('1');
+			manager.select('2');
+			expect(manager.getSelection()).to.deep.equal(['1', '2']);
+		});
+
+		it('deselects multiple items', () => {
+			manager.setSelection(['1', '2', '3']);
+			manager.deselect('1');
+			manager.deselect('2');
+			expect(manager.getSelection()).to.deep.equal(['3']);
+		});
+
+		it('toggles multiple items', () => {
+			manager.toggleSelect('1');
+			manager.toggleSelect('2');
+			expect(manager.getSelection()).to.deep.equal(['1', '2']);
+			manager.toggleSelect('1');
+			expect(manager.getSelection()).to.deep.equal(['2']);
+		});
+	});
+
+	describe('Single selection', () => {
+		it('selects a single item', () => {
+			manager.setMultiple(false);
+			manager.select('1');
+			manager.select('2');
+			expect(manager.getSelection()).to.deep.equal(['2']);
+		});
+	});
 });
