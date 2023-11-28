@@ -53,9 +53,9 @@ public abstract class WebhookEventBase<TNotification> : IWebhookEvent, INotifica
     /// <summary>
     ///  Process the webhooks for the given notification.
     /// </summary>
-    public virtual async Task ProcessWebhooks(TNotification notification, IEnumerable<Webhook> webhooks, CancellationToken cancellationToken)
+    public virtual async Task ProcessWebhooks(TNotification notification, IEnumerable<IWebhook> webhooks, CancellationToken cancellationToken)
     {
-        foreach (Webhook webhook in webhooks)
+        foreach (IWebhook webhook in webhooks)
         {
             if (webhook.Enabled is false)
             {
@@ -91,7 +91,7 @@ public abstract class WebhookEventBase<TNotification> : IWebhookEvent, INotifica
             return;
         }
 
-        IEnumerable<Webhook> webhooks = await WebhookService.GetByAliasAsync(Alias);
+        IEnumerable<IWebhook> webhooks = await WebhookService.GetByAliasAsync(Alias);
 
         await ProcessWebhooks(notification, webhooks, cancellationToken);
     }

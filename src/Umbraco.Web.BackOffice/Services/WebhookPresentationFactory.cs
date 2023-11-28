@@ -11,7 +11,7 @@ internal class WebhookPresentationFactory : IWebhookPresentationFactory
 
     public WebhookPresentationFactory(WebhookEventCollection webhookEventCollection) => _webhookEventCollection = webhookEventCollection;
 
-    public WebhookViewModel Create(Webhook webhook)
+    public WebhookViewModel Create(IWebhook webhook)
     {
         var target = new WebhookViewModel
         {

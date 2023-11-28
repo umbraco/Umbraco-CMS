@@ -15,27 +15,23 @@
        <umb-box>
           <umb-box-header title-key="general_general"></umb-box-header>
           <umb-box-content class="block-form">
-              
+
               <umb-control-group>
                 <div class="flex items-center">
                   <div class="flx-g0 flx-s0" style="flex-basis: 40px;">
-                    <umb-checkmark checked="true" size="m" style="cursor: default"></umb-checkmark>
-                    <umb-icon icon="icon-wrong" class="umb-checkmark umb-checkmark--m" style="cursor: default;" ng-if="model.webhookLogEntry.response.isSuccess === false"></umb-icon>
+                    <umb-checkmark checked="true" size="m" style="cursor: default" ng-if="model.log.statusCode === 'OK (200)'"></umb-checkmark>
+                    <umb-icon icon="icon-wrong" class="umb-checkmark umb-checkmark--m" style="cursor: default;" ng-if="model.log.statusCode !== 'OK (200)'"></umb-icon>
                   </div>
-                  <div class="flx-g1 flx-s1 flx-b2" ng-if="model.webhookLogEntry.responseStatus.description || model.webhookLogEntry.response.statusCode">{{model.webhookLogEntry.response.statusDescription}} ({{model.webhookLogEntry.response.statusCode}})</div>
+                  <div class="flx-g1 flx-s1 flx-b2">{{model.log.statusCode}}</div>
                 </div>
               </umb-control-group>
-              
+
               <umb-control-group label="@general_date">
                   <div>{{model.log.formattedLogDate}}</div>
               </umb-control-group>
 
               <umb-control-group label="@general_url">
                   <div>{{model.log.url}}</div>
-              </umb-control-group>
-
-              <umb-control-group label="Status code">
-                <div>{{model.log.statusCode}}</div>
               </umb-control-group>
 
               <umb-control-group label="Event">
