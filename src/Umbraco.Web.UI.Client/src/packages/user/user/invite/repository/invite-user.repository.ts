@@ -22,9 +22,11 @@ export class UmbInviteUserRepository extends UmbUserRepositoryBase {
 		if (!requestModel) throw new Error('data is missing');
 		await this.init;
 
-		const { error } = await this.#inviteSource.invite(requestModel);
+		const { data, error } = await this.#inviteSource.invite(requestModel);
 
-		if (!error) {
+		if (data) {
+			this.detailStore!.append(data);
+
 			const notification = { data: { message: `Invite sent to user` } };
 			this.notificationContext?.peek('positive', notification);
 		}
