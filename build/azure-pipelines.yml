@@ -77,6 +77,7 @@ stages:
           #- download: current
           #  artifact: npm
           - checkout: self
+            fetchDepth: 0
             submodules: true
           - task: UseDotNet@2
             displayName: Use .NET $(dotnetVersion)
@@ -84,14 +85,26 @@ stages:
               version: $(dotnetVersion)
               includePreviewVersions: $(dotnetIncludePreviewVersions)
           - task: DotNetCoreCLI@2
+            displayName: Run dotnet restore
             inputs:
-              command: custom
-              custom: tool
-              arguments: install --tool-path . nbgv
-            displayName: Install NBGV tool
-          - script: nbgv cloud
-            displayName: Set version variables
-            name: version
+              command: restore
+              projects: $(solution)
+          - task: DotNetCoreCLI@2
+            name: build
+            displayName: Run dotnet build and generate NuGet packages
+            inputs:
+              command: build
+              projects: $(solution)
+              arguments: '--configuration $(buildConfiguration) --no-restore --property:ContinuousIntegrationBuild=true --property:GeneratePackageOnBuild=true --property:PackageOutputPath=$(Build.ArtifactStagingDirectory)/nupkg'
+#          - task: DotNetCoreCLI@2
+#            inputs:
+#              command: custom
+#              custom: tool
+#              arguments: install --tool-path . nbgv
+#            displayName: Install NBGV tool
+#          - script: nbgv cloud
+#            displayName: Set version variables
+#            name: version
           - task: NodeTool@0
             displayName: Use Node.js $(nodeVersion)
             retryCountOnTaskFailure: 3
@@ -122,10 +135,10 @@ stages:
               mkdir $(Build.ArtifactStagingDirectory)/npm
               npm pack --pack-destination $(Build.ArtifactStagingDirectory)/npm
               mv .npmrc $(Build.ArtifactStagingDirectory)/npm/
-            displayName: Prepare Backoffice npm package
+            displayName: Prepare Bellissima npm package
             workingDirectory: src/Umbraco.Web.UI.New.Client
           - task: PublishPipelineArtifact@1
-            displayName: Publish Backoffice NPM Artifact
+            displayName: Publish Bellissima NPM Artifact
             inputs:
               targetPath: $(Build.ArtifactStagingDirectory)/npm
               artifactName: npm
