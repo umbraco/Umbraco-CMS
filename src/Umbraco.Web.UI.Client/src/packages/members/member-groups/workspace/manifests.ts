@@ -2,7 +2,7 @@ import { UMB_MEMBER_GROUP_ENTITY_TYPE } from '../entity.js';
 import type {
 	ManifestWorkspace,
 	ManifestWorkspaceAction,
-	ManifestWorkspaceEditorView,
+	ManifestWorkspaceView,
 } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_MEMBER_GROUP_WORKSPACE_ALIAS = 'Umb.Workspace.MemberGroup';
@@ -17,10 +17,10 @@ const workspace: ManifestWorkspace = {
 	},
 };
 
-const workspaceViews: Array<ManifestWorkspaceEditorView> = [
+const workspaceViews: Array<ManifestWorkspaceView> = [
 	/*
 	{
-		type: 'workspaceEditorView',
+		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.MemberGroup.Info',
 		name: 'Member Group Workspace Info View',
 		js: () => import('./views/info/workspace-view-member-group-info.element.js'),

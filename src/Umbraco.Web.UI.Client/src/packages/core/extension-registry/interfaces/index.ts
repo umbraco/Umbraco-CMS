@@ -7,4 +7,4 @@ export * from './section-element.interface.js';
 export * from './section-sidebar-app-extension-element.interface.js';
 export * from './section-view-extension-element.interface.js';
 export * from './tree-item-extension-element.interface.js';
-export * from './workspace-editor-view-extension-element.interface.js';
+export * from './workspace-view-element.interface.js';
