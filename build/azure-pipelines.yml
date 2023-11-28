@@ -107,6 +107,7 @@ stages:
               command: restore
               projects: $(solution)
           - task: DotNetCoreCLI@2
+            name: build
             displayName: Run dotnet build and generate NuGet packages
             inputs:
               command: build
@@ -140,7 +141,7 @@ stages:
               mv .npmrc $(Build.ArtifactStagingDirectory)/npm/
             displayName: Prepare Bellissima npm package
             env:
-              PACKAGE_VERSION: $(NBGV_NpmPackageVersion)
+              PACKAGE_VERSION: $(build.NBGV_NpmPackageVersion)
             workingDirectory: src/Umbraco.Web.UI.New.Client
           - task: PublishPipelineArtifact@1
             displayName: Publish Bellissima NPM Artifact
