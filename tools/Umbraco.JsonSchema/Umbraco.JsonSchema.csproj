@@ -3,6 +3,7 @@
     <OutputType>Exe</OutputType>
     <IsPackable>false</IsPackable>
     <EnablePackageValidation>false</EnablePackageValidation>
+    <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
   </PropertyGroup>
 
   <ItemGroup>
