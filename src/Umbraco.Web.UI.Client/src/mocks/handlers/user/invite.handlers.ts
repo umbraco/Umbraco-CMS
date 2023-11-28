@@ -11,9 +11,11 @@ export const handlers = [
 		const data = await req.json();
 		if (!data) return;
 
-		umbUsersData.invite(data);
+		const { userId } = umbUsersData.invite(data);
 
-		return res(ctx.status(201));
+		if (!userId) return res(ctx.status(400));
+
+		return res(ctx.status(201), ctx.set('Location', userId));
 	}),
 
 	rest.post<any>(umbracoPath(`${inviteSlug}/resend`), async (req, res, ctx) => {
