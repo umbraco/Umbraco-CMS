@@ -1,4 +1,4 @@
-import { UMB_USER_ENTITY_TYPE, type UmbUserCollectionFilterModel, type UmbUserDetail } from '../../types.js';
+import { UMB_USER_ENTITY_TYPE, type UmbUserCollectionFilterModel, type UmbUserDetailModel } from '../../types.js';
 import { UmbCollectionDataSource, extendDataSourcePagedResponseData } from '@umbraco-cms/backoffice/repository';
 import { UserResource } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -10,7 +10,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
  * @class UmbUserCollectionServerDataSource
  * @implements {UmbCollectionDataSource}
  */
-export class UmbUserCollectionServerDataSource implements UmbCollectionDataSource<UmbUserDetail> {
+export class UmbUserCollectionServerDataSource implements UmbCollectionDataSource<UmbUserDetailModel> {
 	#host: UmbControllerHost;
 
 	/**
@@ -30,7 +30,7 @@ export class UmbUserCollectionServerDataSource implements UmbCollectionDataSourc
 	 */
 	async getCollection(filter: UmbUserCollectionFilterModel) {
 		const response = await tryExecuteAndNotify(this.#host, UserResource.getUserFilter(filter));
-		return extendDataSourcePagedResponseData<UmbUserDetail>(response, {
+		return extendDataSourcePagedResponseData<UmbUserDetailModel>(response, {
 			entityType: UMB_USER_ENTITY_TYPE,
 		});
 	}

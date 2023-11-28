@@ -1,4 +1,4 @@
-import { UMB_USER_ENTITY_TYPE, type UmbUserDetail } from '../index.js';
+import { UMB_USER_ENTITY_TYPE, type UmbUserDetailModel } from '../index.js';
 import { UmbUserWorkspaceContext } from './user-workspace.context.js';
 import { UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
@@ -14,7 +14,7 @@ import './components/user-workspace-info/user-workspace-info.element.js';
 @customElement('umb-user-workspace-editor')
 export class UmbUserWorkspaceEditorElement extends UmbLitElement {
 	@state()
-	private _user?: UmbUserDetail;
+	private _user?: UmbUserDetailModel;
 
 	#workspaceContext?: UmbUserWorkspaceContext;
 

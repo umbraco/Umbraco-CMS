@@ -12,7 +12,7 @@ import { UmbDataSource, UmbDataSourceErrorResponse } from '@umbraco-cms/backoffi
 
 export const UMB_USER_ENTITY_TYPE = 'user';
 
-export type UmbUserDetail = UserResponseModel & {
+export type UmbUserDetailModel = UserResponseModel & {
 	entityType: 'user';
 };
 
@@ -27,7 +27,7 @@ export interface UmbUserCollectionFilterModel {
 }
 
 export interface UmbUserDetailDataSource
-	extends UmbDataSource<CreateUserRequestModel, CreateUserResponseModel, UpdateUserRequestModel, UmbUserDetail> {
+	extends UmbDataSource<CreateUserRequestModel, CreateUserResponseModel, UpdateUserRequestModel, UmbUserDetailModel> {
 	createAvatar(id: string, fileId: string): Promise<UmbDataSourceErrorResponse>;
 	deleteAvatar(id: string): Promise<UmbDataSourceErrorResponse>;
 }
