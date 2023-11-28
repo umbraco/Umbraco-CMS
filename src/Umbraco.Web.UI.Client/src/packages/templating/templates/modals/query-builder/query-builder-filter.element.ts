@@ -93,13 +93,13 @@ export class UmbQueryBuilderFilterElement extends UmbLitElement {
 			<uui-combobox-list slot="dropdown" @change=${this.#setOperator} class="options-list">
 				${this.settings?.operators
 					?.filter((operator) =>
-						this.currentPropertyType ? operator.applicableTypes?.includes(this.currentPropertyType) : true
+						this.currentPropertyType ? operator.applicableTypes?.includes(this.currentPropertyType) : true,
 					)
 					.map(
 						(operator) =>
 							html`<uui-combobox-list-option .value=${(operator.operator as string) ?? ''}
 								>${operator.operator}</uui-combobox-list-option
-							>`
+							>`,
 					)}</uui-combobox-list
 			>
 		</umb-button-with-dropdown>`;
@@ -126,21 +126,21 @@ export class UmbQueryBuilderFilterElement extends UmbLitElement {
 				<uui-combobox-list slot="dropdown" @change=${this.#setPropertyAlias} class="options-list">
 					${this.settings?.properties?.map(
 						(property) =>
-							html`<uui-combobox-list-option tabindex="0" .value=${property.alias ?? ''}
-								>${property.alias}</uui-combobox-list-option
-							>`
+							html`<uui-combobox-list-option tabindex="0" .value=${property.alias ?? ''}>
+								${property.alias}
+							</uui-combobox-list-option>`,
 					)}
 				</uui-combobox-list></umb-button-with-dropdown
 			>
 			${this.filter?.propertyAlias ? this._renderOperatorsDropdown() : ''}
 			${this.filter?.operator ? this._renderConstraintValueInput() : ''}
 			<uui-button-group>
-				<uui-button title="Add filter" label="Add filter" compact @click=${this.#addFilter}
-					><uui-icon name="add"></uui-icon
-				></uui-button>
-				<uui-button title="Remove filter" label="Remove filter" compact @click=${this.#removeOrReset}
-					><uui-icon name="delete"></uui-icon
-				></uui-button>
+				<uui-button title="Add filter" label="Add filter" compact @click=${this.#addFilter}>
+					<uui-icon name="icon-add"></uui-icon>
+				</uui-button>
+				<uui-button title="Remove filter" label="Remove filter" compact @click=${this.#removeOrReset}>
+					<uui-icon name="delete"></uui-icon>
+				</uui-button>
 			</uui-button-group>
 		`;
 	}

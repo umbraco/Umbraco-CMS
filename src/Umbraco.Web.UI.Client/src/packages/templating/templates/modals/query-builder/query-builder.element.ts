@@ -252,7 +252,7 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 								ms</span
 							>
 						</div>
-						<umb-code-block language="C#" copy> ${this._templateQuery?.queryExpression ?? ''} </umb-code-block>
+						<umb-code-block language="C#" copy>${this._templateQuery?.queryExpression ?? ''}</umb-code-block>
 					</uui-box>
 				</div>
 
