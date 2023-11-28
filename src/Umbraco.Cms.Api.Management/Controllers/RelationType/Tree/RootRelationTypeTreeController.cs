@@ -23,9 +23,15 @@ public class RootRelationTypeTreeController : RelationTypeTreeControllerBase
     [ProducesResponseType(typeof(PagedViewModel<EntityTreeItemResponseModel>), StatusCodes.Status200OK)]
     public async Task<ActionResult<PagedViewModel<EntityTreeItemResponseModel>>> Root(int skip = 0, int take = 100)
     {
-        if (PaginationService.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize, out ProblemDetails? error) == false)
+        if (PaginationService.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize, out ProblemDetails? error, true) == false)
         {
             return BadRequest(error);
+        }
+
+        if (pageSize == 0)
+        {
+            PagedViewModel<EntityTreeItemResponseModel> countResult = PagedViewModel(Enumerable.Empty<EntityTreeItemResponseModel>(), _relationService.CountRelationTypes());
+            return await Task.FromResult(Ok(countResult));
         }
 
         // pagination is not supported (yet) by relation service, so we do it in memory for now

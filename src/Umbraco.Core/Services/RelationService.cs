@@ -122,6 +122,11 @@ public class RelationService : RepositoryService, IRelationService
         }
     }
 
+    public int CountRelationTypes()
+    {
+        return _relationTypeRepository.Count(null);
+    }
+
     /// <inheritdoc />
     public IEnumerable<IRelation> GetByParentId(int id) => GetByParentId(id, null);
 
