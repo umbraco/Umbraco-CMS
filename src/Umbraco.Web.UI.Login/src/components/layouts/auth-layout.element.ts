@@ -23,8 +23,8 @@ import { when } from 'lit/directives/when.js';
  * @cssprop --umb-login-content-border-radius - The border-radius of the content wrapper (default: 0)
  * @cssprop --umb-login-align-items - The align-items of the main wrapper (default: unset)
  * @cssprop --umb-login-button-border-radius - The border-radius of the buttons (default: 45px)
- * @cssprop --umb-curves-color - The color of the curves (default: #f5c1bc)
- * @cssprop --umb-curves-display - The display of the curves (default: inline)
+ * @cssprop --umb-login-curves-color - The color of the curves (default: #f5c1bc)
+ * @cssprop --umb-login-curves-display - The display of the curves (default: inline)
  */
 @customElement('umb-auth-layout')
 export class UmbAuthLayoutElement extends LitElement {
@@ -114,8 +114,8 @@ export class UmbAuthLayoutElement extends LitElement {
         --input-height: 40px;
         --header-font-size: var(--umb-login-header-font-size, 3rem);
         --header-secondary-font-size: var(--umb-login-header-secondary-font-size, 2.4rem);
-        --curves-color: var(--umb-curves-color, #f5c1bc);
-        --curves-display: var(--umb-curves-display, inline);
+        --curves-color: var(--umb-login-curves-color, #f5c1bc);
+        --curves-display: var(--umb-login-curves-display, inline);
 
         display: block;
         background: var(--umb-login-background, #f4f4f4);
