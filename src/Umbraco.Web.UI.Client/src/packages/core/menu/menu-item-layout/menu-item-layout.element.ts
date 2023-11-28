@@ -1,10 +1,10 @@
 import { html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/section';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
-@customElement('umb-menu-item-base')
-export class UmbMenuItemBaseElement extends UmbLitElement {
+@customElement('umb-menu-item-layout')
+export class UmbMenuItemLayoutElement extends UmbLitElement {
 	@property({ type: String, attribute: 'entity-type' })
 	public entityType?: string;
 
@@ -59,7 +59,7 @@ export class UmbMenuItemBaseElement extends UmbLitElement {
 	#renderActions() {
 		return html`<umb-entity-actions-bundle
 			slot="actions"
-			entity-type=${this.entityType}
+			.entityType=${this.entityType}
 			.unique=${null}
 			.label=${this.label}>
 		</umb-entity-actions-bundle>`;
@@ -70,6 +70,6 @@ export class UmbMenuItemBaseElement extends UmbLitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-menu-item-base': UmbMenuItemBaseElement;
+		'umb-menu-item-layout': UmbMenuItemLayoutElement;
 	}
 }

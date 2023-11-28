@@ -1,10 +1,14 @@
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbBasicState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
-import { UmbExtensionManifestInitializer, UmbExtensionsManifestInitializer } from '@umbraco-cms/backoffice/extension-api';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { ManifestSection, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import {
+	type UmbExtensionManifestInitializer,
+	UmbExtensionsManifestInitializer,
+} from '@umbraco-cms/backoffice/extension-api';
+import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
+import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { type ManifestSection, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
-export class UmbBackofficeContext {
+export class UmbBackofficeContext extends UmbContextBase<UmbBackofficeContext> {
 	#activeSectionAlias = new UmbStringState(undefined);
 	public readonly activeSectionAlias = this.#activeSectionAlias.asObservable();
 
@@ -13,7 +17,8 @@ export class UmbBackofficeContext {
 	public readonly allowedSections = this.#allowedSections.asObservable();
 
 	constructor(host: UmbControllerHost) {
-		new UmbExtensionsManifestInitializer(host, umbExtensionsRegistry, 'section', null, (sections) => {
+		super(host, UMB_BACKOFFICE_CONTEXT_TOKEN);
+		new UmbExtensionsManifestInitializer(this, umbExtensionsRegistry, 'section', null, (sections) => {
 			this.#allowedSections.next([...sections]);
 		});
 	}

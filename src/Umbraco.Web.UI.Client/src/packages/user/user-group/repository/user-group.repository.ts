@@ -18,7 +18,8 @@ import {
 	DataSourceResponse,
 } from '@umbraco-cms/backoffice/repository';
 import { UMB_NOTIFICATION_CONTEXT_TOKEN, UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
-import { UmbBaseController, type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
 // TODO: implement

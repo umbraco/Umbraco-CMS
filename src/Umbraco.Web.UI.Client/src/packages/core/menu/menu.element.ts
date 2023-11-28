@@ -1,9 +1,9 @@
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { ManifestMenu, ManifestMenuItem } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
-import './menu-item/menu-item.element.js';
+import './menu-item/menu-item-default.element.js';
 
 @customElement('umb-menu')
 export class UmbMenuElement extends UmbLitElement {
@@ -19,7 +19,7 @@ export class UmbMenuElement extends UmbLitElement {
 		return html` <umb-extension-slot
 			type="menuItem"
 			.filter=${(items: ManifestMenuItem) => items.meta.menus.includes(this.manifest!.alias)}
-			default-element="umb-menu-item"></umb-extension-slot>`;
+			default-element="umb-menu-item-default"></umb-extension-slot>`;
 	}
 
 	static styles = [UmbTextStyles];

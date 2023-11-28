@@ -3,13 +3,10 @@ import { css, html, customElement, state } from '@umbraco-cms/backoffice/externa
 import { UmbTableColumn, UmbTableConfig } from '@umbraco-cms/backoffice/components';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { RelationResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbWorkspaceEditorViewExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-workspace-view-relation-type-relation')
-export class UmbWorkspaceViewRelationTypeRelationElement
-	extends UmbLitElement
-	implements UmbWorkspaceEditorViewExtensionElement
-{
+export class UmbWorkspaceViewRelationTypeRelationElement extends UmbLitElement implements UmbWorkspaceViewElement {
 	//TODO Use real data
 	@state()
 	_relations: Array<RelationResponseModel> = MockData;

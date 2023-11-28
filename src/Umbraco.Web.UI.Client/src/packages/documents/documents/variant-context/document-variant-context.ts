@@ -1,14 +1,14 @@
-import type { UmbDocumentWorkspaceContext } from "../workspace/index.js";
-import { DocumentVariantResponseModel, PropertyTypeModelBaseModel } from "@umbraco-cms/backoffice/backend-api";
-import { UmbBaseController, UmbControllerHost } from "@umbraco-cms/backoffice/controller-api";
-import { map } from "@umbraco-cms/backoffice/external/rxjs";
-import { UmbObjectState } from "@umbraco-cms/backoffice/observable-api";
-import { UmbVariantId } from "@umbraco-cms/backoffice/variant";
-import { UMB_VARIANT_CONTEXT, UmbVariantContext } from "@umbraco-cms/backoffice/workspace";
+import type { UmbDocumentWorkspaceContext } from '../workspace/index.js';
+import { DocumentVariantResponseModel, PropertyTypeModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
+import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { map } from '@umbraco-cms/backoffice/external/rxjs';
+import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { UMB_VARIANT_CONTEXT, UmbVariantContext } from '@umbraco-cms/backoffice/workspace';
 
 // TODO: This code can be split into a UmbContentTypeVariantContext, leaving just the publishing state and methods to this class.
 export class UmbDocumentVariantContext extends UmbBaseController implements UmbVariantContext {
-
 	#workspace: UmbDocumentWorkspaceContext;
 	#variantId: UmbVariantId;
 	public getVariantId() {
@@ -27,7 +27,6 @@ export class UmbDocumentVariantContext extends UmbBaseController implements UmbV
 	// This will actually make it simpler if multiple are watching the same property.
 	// But it will also mean that we wil watch all properties and their structure, for variantID, all the time for all of the properties.
 
-
 	getType(): string {
 		return this.#workspace.getEntityType();
 	}
@@ -44,8 +43,6 @@ export class UmbDocumentVariantContext extends UmbBaseController implements UmbV
 		return this.#workspace.getVariant(this.#variantId);
 	}
 
-
-
 	constructor(host: UmbControllerHost, workspace: UmbDocumentWorkspaceContext, variantId?: UmbVariantId) {
 		// The controller alias, is a very generic name cause we want only one of these for this controller host.
 		super(host, 'variantContext');
@@ -58,15 +55,14 @@ export class UmbDocumentVariantContext extends UmbBaseController implements UmbV
 				if (!variantInfo) return;
 				this.#currentVariant.next(variantInfo);
 			},
-			'_observeActiveVariant'
+			'_observeActiveVariant',
 		);
 
 		// TODO: Refactor: use the document dataset context token.
 		this.provideContext(UMB_VARIANT_CONTEXT, this);
 	}
 
-
-	#createPropertyVariantId(property:PropertyTypeModelBaseModel) {
+	#createPropertyVariantId(property: PropertyTypeModelBaseModel) {
 		return UmbVariantId.Create({
 			culture: property.variesByCulture ? this.#variantId.culture : null,
 			segment: property.variesBySegment ? this.#variantId.segment : null,
@@ -78,7 +74,9 @@ export class UmbDocumentVariantContext extends UmbBaseController implements UmbV
 	 * Ideally do not use these methods, its better to communicate directly with the workspace, but if you do not know the property variant id, then this will figure it out for you. So good for externals to set or get values of a property.
 	 */
 	async propertyVariantId(propertyAlias: string) {
-		return (await this.#workspace.structure.propertyStructureByAlias(propertyAlias)).pipe(map((property) => property ? this.#createPropertyVariantId(property) : undefined));
+		return (await this.#workspace.structure.propertyStructureByAlias(propertyAlias)).pipe(
+			map((property) => (property ? this.#createPropertyVariantId(property) : undefined)),
+		);
 	}
 
 	/**
@@ -87,7 +85,13 @@ export class UmbDocumentVariantContext extends UmbBaseController implements UmbV
 	 */
 	async propertyValueByAlias<ReturnType = unknown>(propertyAlias: string) {
 		await this.#workspace.isLoaded();
-		return (await this.#workspace.structure.propertyStructureByAlias(propertyAlias)).pipe(map((property) => property?.alias ? this.#workspace.getPropertyValue<ReturnType>(property.alias, this.#createPropertyVariantId(property)) : undefined));
+		return (await this.#workspace.structure.propertyStructureByAlias(propertyAlias)).pipe(
+			map((property) =>
+				property?.alias
+					? this.#workspace.getPropertyValue<ReturnType>(property.alias, this.#createPropertyVariantId(property))
+					: undefined,
+			),
+		);
 	}
 
 	// TODO: Refactor: Not used currently, but should investigate if we can implement this, to spare some energy.
@@ -102,7 +106,7 @@ export class UmbDocumentVariantContext extends UmbBaseController implements UmbV
 	async setPropertyValue(propertyAlias: string, value: unknown) {
 		// This is not reacting to if the property variant settings changes while running.
 		const property = await this.#workspace.structure.getPropertyStructureByAlias(propertyAlias);
-		if(property) {
+		if (property) {
 			const variantId = this.#createPropertyVariantId(property);
 
 			// This is not reacting to if the property variant settings changes while running.

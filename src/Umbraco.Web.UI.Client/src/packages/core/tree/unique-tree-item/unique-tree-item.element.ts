@@ -5,7 +5,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import {
 	UmbBackofficeManifestKind,
-	UmbTreeItemExtensionElement,
+	UmbTreeItemElement,
 	umbExtensionsRegistry,
 } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -23,7 +23,7 @@ const manifest: UmbBackofficeManifestKind = {
 umbExtensionsRegistry.register(manifest);
 
 @customElement('umb-unique-tree-item')
-export class UmbUniqueTreeItemElement extends UmbLitElement implements UmbTreeItemExtensionElement {
+export class UmbUniqueTreeItemElement extends UmbLitElement implements UmbTreeItemElement {
 	private _item?: UmbUniqueTreeItemModel;
 	@property({ type: Object, attribute: false })
 	public get item() {
