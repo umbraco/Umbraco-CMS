@@ -77,8 +77,12 @@ stages:
           #- download: current
           #  artifact: npm
           - checkout: self
-            fetchDepth: 0
             submodules: true
+          - task: NodeTool@0
+            displayName: Use Node.js $(nodeVersion)
+            retryCountOnTaskFailure: 3
+            inputs:
+              versionSpec: $(nodeVersion)
           - task: UseDotNet@2
             displayName: Use .NET $(dotnetVersion)
             inputs:
@@ -90,7 +94,6 @@ stages:
               command: restore
               projects: $(solution)
           - task: DotNetCoreCLI@2
-            name: build
             displayName: Run dotnet build and generate NuGet packages
             inputs:
               command: build
@@ -105,11 +108,6 @@ stages:
 #          - script: nbgv cloud
 #            displayName: Set version variables
 #            name: version
-          - task: NodeTool@0
-            displayName: Use Node.js $(nodeVersion)
-            retryCountOnTaskFailure: 3
-            inputs:
-              versionSpec: $(nodeVersion)
           - task: Cache@2
             displayName: Cache node_modules
             inputs:
@@ -127,15 +125,17 @@ stages:
           - bash: |
               echo "##[group]npm pack details"
               echo "##[command]Running npm version"
-              echo "##[debug]Version: $NBGV_NPMPackageVersion"
+              echo "##[debug]Version: $PACKAGE_VERSION"
               echo "##[command]Running npm pack"
               echo "##[debug]Output directory: $(Build.ArtifactStagingDirectory)"
               echo "##[endgroup]"
-              npm version $NBGV_NPMPackageVersion --allow-same-version --no-git-tag-version
+              npm version $PACKAGE_VERSION --allow-same-version --no-git-tag-version
               mkdir $(Build.ArtifactStagingDirectory)/npm
               npm pack --pack-destination $(Build.ArtifactStagingDirectory)/npm
               mv .npmrc $(Build.ArtifactStagingDirectory)/npm/
             displayName: Prepare Bellissima npm package
+            env:
+              PACKAGE_VERSION: $[ variables['NBGV_NpmPackageVersion'] ]
             workingDirectory: src/Umbraco.Web.UI.New.Client
           - task: PublishPipelineArtifact@1
             displayName: Publish Bellissima NPM Artifact
