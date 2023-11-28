@@ -29,6 +29,11 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 	public set keys(fileKeys: Array<string>) {
 		this._keys = fileKeys;
 		super.value = this._keys.join(',');
+		fileKeys.forEach((key) => {
+			if (!UmbId.validate(key)) {
+				this._filePaths.push(key);
+			}
+		});
 	}
 	public get keys(): Array<string> {
 		return this._keys;
@@ -53,6 +58,9 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 
 	@state()
 	_currentFiles: Array<TemporaryFileQueueItem> = [];
+
+	@state()
+	_filePaths: Array<string> = [];
 
 	@state()
 	extensions?: string[];
@@ -118,13 +126,14 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 	}
 
 	render() {
-		return html`${this.#renderUploadedFiles()} ${this.#renderDropzone()}${this.#renderButtonRemove()}`;
+		return html`${this.#renderFilesWithPath()} ${this.#renderFilesUploaded()}
+		${this.#renderDropzone()}${this.#renderButtonRemove()}`;
 	}
 
 	//TODO When the property editor gets saved, it seems that the property editor gets the file path from the server rather than key/id.
 	// Image/files needs to be displayed from a previous save (not just when it just got uploaded).
 	#renderDropzone() {
-		if (!this.multiple && this._currentFiles.length) return nothing;
+		if (!this.multiple && (this._currentFiles.length || this._filePaths.length)) return nothing;
 		return html`
 			<uui-file-dropzone
 				id="dropzone"
@@ -136,7 +145,15 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 			</uui-file-dropzone>
 		`;
 	}
-	#renderUploadedFiles() {
+
+	#renderFilesWithPath() {
+		if (!this._filePaths.length) return nothing;
+		return html`${this._filePaths.map(
+			(path) => html`<umb-input-upload-field-file .path=${path}></umb-input-upload-field-file>`,
+		)}`;
+	}
+
+	#renderFilesUploaded() {
 		if (!this._currentFiles.length) return nothing;
 		return html`<div id="wrapper">
 			${repeat(
@@ -152,13 +169,14 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 	}
 
 	#renderButtonRemove() {
-		if (!this._currentFiles.length) return;
+		if (!this._currentFiles.length && !this._filePaths.length) return;
 		return html`<uui-button compact @click=${this.#handleRemove} label="Remove files">
 			<uui-icon name="icon-trash"></uui-icon> Remove file(s)
 		</uui-button>`;
 	}
 
 	#handleRemove() {
+		this._filePaths = [];
 		const ids = this._currentFiles.map((item) => item.id) as string[];
 		this.#manager.remove(ids);
 

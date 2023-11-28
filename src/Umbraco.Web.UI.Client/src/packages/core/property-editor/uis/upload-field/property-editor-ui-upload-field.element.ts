@@ -35,7 +35,7 @@ export class UmbPropertyEditorUIUploadFieldElement extends UmbLitElement impleme
 			@change="${this._onChange}"
 			?multiple="${this._multiple}"
 			.fileExtensions="${this._fileExtensions}"
-			.value=${this.value}></umb-input-upload-field>`;
+			.keys=${(this.value as string).split(',')}></umb-input-upload-field>`;
 	}
 
 	static styles = [UmbTextStyles];
