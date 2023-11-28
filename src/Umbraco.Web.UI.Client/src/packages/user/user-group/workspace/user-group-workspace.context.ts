@@ -16,7 +16,7 @@ export class UmbUserGroupWorkspaceContext
 	#data = new UmbObjectState<UserGroupResponseModel | undefined>(undefined);
 	data = this.#data.asObservable();
 
-	#userIds = new UmbArrayState<string>([]);
+	#userIds = new UmbArrayState<string>([], (x) => x);
 	userIds = this.#userIds.asObservable();
 
 	#userRepository: UmbUserRepository;

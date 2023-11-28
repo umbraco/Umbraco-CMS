@@ -15,18 +15,6 @@ const modals: Array<ManifestModal> = [
 	},
 	{
 		type: 'modal',
-		alias: 'Umb.Modal.User.Invite',
-		name: 'Invite User Modal',
-		js: () => import('./invite/user-invite-modal.element.js'),
-	},
-	{
-		type: 'modal',
-		alias: 'Umb.Modal.User.ResendInvite',
-		name: 'Resend Invite to User Modal',
-		js: () => import('./resend-invite/resend-invite-to-user-modal.element.js'),
-	},
-	{
-		type: 'modal',
 		alias: 'Umb.Modal.User.Picker',
 		name: 'User Picker Modal',
 		js: () => import('./user-picker/user-picker-modal.element.js'),

@@ -1,6 +1,6 @@
 import { getDisplayStateFromUserStatus } from '../../../../utils.js';
 import { UmbUserCollectionContext } from '../../user-collection.context.js';
-import { type UmbUserDetail } from '../../../types.js';
+import { type UmbUserDetailModel } from '../../../types.js';
 import { css, html, nothing, customElement, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
@@ -11,7 +11,7 @@ import { UmbUserGroupCollectionRepository } from '@umbraco-cms/backoffice/user-g
 @customElement('umb-user-grid-collection-view')
 export class UmbUserGridCollectionViewElement extends UmbLitElement {
 	@state()
-	private _users: Array<UmbUserDetail> = [];
+	private _users: Array<UmbUserDetailModel> = [];
 
 	@state()
 	private _selection: Array<string | null> = [];
@@ -28,7 +28,11 @@ export class UmbUserGridCollectionViewElement extends UmbLitElement {
 
 		this.consumeContext(UMB_COLLECTION_CONTEXT, (instance) => {
 			this.#collectionContext = instance as UmbUserCollectionContext;
-			this.observe(this.#collectionContext.selection, (selection) => (this._selection = selection), 'umbCollectionSelectionObserver');
+			this.observe(
+				this.#collectionContext.selection.selection,
+				(selection) => (this._selection = selection),
+				'umbCollectionSelectionObserver',
+			);
 			this.observe(this.#collectionContext.items, (items) => (this._users = items), 'umbCollectionItemsObserver');
 		});
 
@@ -49,12 +53,12 @@ export class UmbUserGridCollectionViewElement extends UmbLitElement {
 		history.pushState(null, '', 'section/user-management/view/users/user/' + id); //TODO Change to a tag with href and make dynamic
 	}
 
-	#onSelect(user: UmbUserDetail) {
-		this.#collectionContext?.select(user.id ?? '');
+	#onSelect(user: UmbUserDetailModel) {
+		this.#collectionContext?.selection.select(user.id ?? '');
 	}
 
-	#onDeselect(user: UmbUserDetail) {
-		this.#collectionContext?.deselect(user.id ?? '');
+	#onDeselect(user: UmbUserDetailModel) {
+		this.#collectionContext?.selection.deselect(user.id ?? '');
 	}
 
 	render() {
@@ -70,13 +74,13 @@ export class UmbUserGridCollectionViewElement extends UmbLitElement {
 		`;
 	}
 
-	#renderUserCard(user: UmbUserDetail) {
+	#renderUserCard(user: UmbUserDetailModel) {
 		return html`
 			<uui-card-user
 				.name=${user.name ?? 'Unnamed user'}
 				selectable
 				?select-only=${this._selection.length > 0}
-				?selected=${this.#collectionContext?.isSelected(user.id ?? '')}
+				?selected=${this.#collectionContext?.selection.isSelected(user.id ?? '')}
 				@open=${() => this._handleOpenCard(user.id ?? '')}
 				@selected=${() => this.#onSelect(user)}
 				@deselected=${() => this.#onDeselect(user)}>
@@ -85,7 +89,7 @@ export class UmbUserGridCollectionViewElement extends UmbLitElement {
 		`;
 	}
 
-	#renderUserTag(user: UmbUserDetail) {
+	#renderUserTag(user: UmbUserDetailModel) {
 		if (user.state && user.state === UserStateModel.ACTIVE) {
 			return nothing;
 		}
@@ -100,7 +104,7 @@ export class UmbUserGridCollectionViewElement extends UmbLitElement {
 		</uui-tag>`;
 	}
 
-	#renderUserGroupNames(user: UmbUserDetail) {
+	#renderUserGroupNames(user: UmbUserDetailModel) {
 		const userGroupNames = this.#userGroups
 			.filter((userGroup) => user.userGroupIds?.includes(userGroup.id!))
 			.map((userGroup) => userGroup.name)
@@ -109,7 +113,7 @@ export class UmbUserGridCollectionViewElement extends UmbLitElement {
 		return html`<div>${userGroupNames}</div>`;
 	}
 
-	#renderUserLoginDate(user: UmbUserDetail) {
+	#renderUserLoginDate(user: UmbUserDetailModel) {
 		if (!user.lastLoginDate) {
 			return html`<div class="user-login-time">${`${user.name} ${this.localize.term('user_noLogin')}`}</div>`;
 		}

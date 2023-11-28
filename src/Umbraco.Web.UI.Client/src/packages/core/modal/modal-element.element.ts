@@ -27,4 +27,22 @@ export abstract class UmbModalBaseElement<
 	public set _value(value: ModalValueType) {
 		this.modalContext?.setValue(value);
 	}
+
+	/**
+	 * Submits the modal
+	 * @protected
+	 * @memberof UmbModalBaseElement
+	 */
+	protected _submitModal() {
+		this.modalContext?.submit(this._value);
+	}
+
+	/**
+	 * Rejects the modal
+	 * @protected
+	 * @memberof UmbModalBaseElement
+	 */
+	protected _rejectModal() {
+		this.modalContext?.reject();
+	}
 }

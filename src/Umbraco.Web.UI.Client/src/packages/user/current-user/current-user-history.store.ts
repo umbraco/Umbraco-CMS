@@ -1,11 +1,13 @@
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
 
 export type UmbModelType = 'dialog' | 'sidebar';
 
 export type UmbCurrentUserHistoryItem = {
+	unique: string;
 	path: string;
 	label: string | Array<string>;
 	icon?: string;
@@ -19,12 +21,16 @@ export class UmbCurrentUserHistoryStore extends UmbStoreBase<UmbCurrentUserHisto
 		super(
 			host,
 			UMB_CURRENT_USER_HISTORY_STORE_CONTEXT_TOKEN.toString(),
-			new UmbArrayState<UmbCurrentUserHistoryItem>([])
+			new UmbArrayState<UmbCurrentUserHistoryItem>([], (x) => x.unique),
 		);
 		if (!('navigation' in window)) return;
 		(window as any).navigation.addEventListener('navigate', (event: any) => {
 			const url = new URL(event.destination.url);
-			const historyItem = { path: url.pathname, label: event.destination.url.split('/').pop() };
+			const historyItem = {
+				unique: new UmbId().toString(),
+				path: url.pathname,
+				label: event.destination.url.split('/').pop(),
+			};
 			this.push(historyItem);
 		});
 	}
@@ -56,7 +62,7 @@ export class UmbCurrentUserHistoryStore extends UmbStoreBase<UmbCurrentUserHisto
 }
 
 export const UMB_CURRENT_USER_HISTORY_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbCurrentUserHistoryStore>(
-	'UmbCurrentUserHistoryStore'
+	'UmbCurrentUserHistoryStore',
 );
 
 // Default export for the globalContext manifest:

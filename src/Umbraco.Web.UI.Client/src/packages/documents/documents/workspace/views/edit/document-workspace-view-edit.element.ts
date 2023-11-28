@@ -1,7 +1,7 @@
 import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../document-workspace.context.js';
 import type { UmbDocumentWorkspaceViewEditTabElement } from './document-workspace-view-edit-tab.element.js';
 import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/content-type';
 import {
 	encodeFolderName,
@@ -11,13 +11,10 @@ import {
 } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { PropertyTypeContainerModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbWorkspaceEditorViewExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-document-workspace-view-edit')
-export class UmbDocumentWorkspaceViewEditElement
-	extends UmbLitElement
-	implements UmbWorkspaceEditorViewExtensionElement
-{
+export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement implements UmbWorkspaceViewElement {
 	//private _hasRootProperties = false;
 	private _hasRootGroups = false;
 
@@ -65,7 +62,7 @@ export class UmbDocumentWorkspaceViewEditElement
 				this._hasRootGroups = hasRootGroups;
 				this._createRoutes();
 			},
-			'_observeGroups'
+			'_observeGroups',
 		);
 	}
 
@@ -135,7 +132,7 @@ export class UmbDocumentWorkspaceViewEditElement
 									return html`<uui-tab label=${tab.name ?? 'Unnamed'} .active=${path === this._activePath} href=${path}
 										>${tab.name}</uui-tab
 									>`;
-								}
+								},
 							)}
 					  </uui-tab-group>`
 					: ''}

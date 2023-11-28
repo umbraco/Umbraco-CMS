@@ -17,10 +17,10 @@ export class UmbRepositoryItemsManager<ItemType extends ItemResponseModelBaseMod
 		return this.#init;
 	}
 
-	#uniques = new UmbArrayState<string>([]);
+	#uniques = new UmbArrayState<string>([], (x) => x);
 	uniques = this.#uniques.asObservable();
 
-	#items = new UmbArrayState<ItemType>([]);
+	#items = new UmbArrayState<ItemType>([], (x) => this.#getUnique(x));
 	items = this.#items.asObservable();
 
 	itemsObserver?: UmbObserverController<ItemType[]>;
@@ -35,9 +35,15 @@ export class UmbRepositoryItemsManager<ItemType extends ItemResponseModelBaseMod
 		this.host = host;
 		this.#getUnique = getUniqueMethod || ((entry) => entry.id || '');
 
-		this.#init = new UmbExtensionApiInitializer<ManifestRepository<UmbItemRepository<ItemType>>>(host, umbExtensionsRegistry, repositoryAlias, [host], (permitted, repository) => {
-			this.repository = permitted ? repository.api : undefined;
-		}).asPromise();
+		this.#init = new UmbExtensionApiInitializer<ManifestRepository<UmbItemRepository<ItemType>>>(
+			host,
+			umbExtensionsRegistry,
+			repositoryAlias,
+			[host],
+			(permitted, repository) => {
+				this.repository = permitted ? repository.api : undefined;
+			},
+		).asPromise();
 	}
 
 	getUniques() {

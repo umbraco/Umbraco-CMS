@@ -6,7 +6,7 @@ import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type {
 	ManifestWorkspace,
 	ManifestWorkspaceAction,
-	ManifestWorkspaceEditorView,
+	ManifestWorkspaceView,
 	ManifestWorkspaceViewCollection,
 } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -21,9 +21,9 @@ const workspace: ManifestWorkspace = {
 	},
 };
 
-const workspaceEditorViews: Array<ManifestWorkspaceEditorView> = [
+const workspaceViews: Array<ManifestWorkspaceView> = [
 	{
-		type: 'workspaceEditorView',
+		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.Document.Edit',
 		name: 'Document Workspace Edit View',
 		js: () => import('./views/edit/document-workspace-view-edit.element.js'),
@@ -41,7 +41,7 @@ const workspaceEditorViews: Array<ManifestWorkspaceEditorView> = [
 		],
 	},
 	{
-		type: 'workspaceEditorView',
+		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.Document.Info',
 		name: 'Document Workspace Info View',
 		js: () => import('./views/info/document-info-workspace-view.element.js'),
@@ -80,7 +80,6 @@ const workspaceViewCollections: Array<ManifestWorkspaceViewCollection> = [
 ];
 
 const workspaceActions: Array<ManifestWorkspaceAction> = [
-	/*
 	{
 		type: 'workspaceAction',
 		alias: 'Umb.WorkspaceAction.Document.SaveAndPublish',
@@ -99,7 +98,6 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 			},
 		],
 	},
-	*/
 	{
 		type: 'workspaceAction',
 		alias: 'Umb.WorkspaceAction.Document.Save',
@@ -108,7 +106,7 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 		api: UmbSaveWorkspaceAction,
 		meta: {
 			label: 'Save',
-			look: 'primary',
+			look: 'secondary',
 			color: 'positive',
 		},
 		conditions: [
@@ -154,4 +152,4 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 	*/
 ];
 
-export const manifests = [workspace, ...workspaceEditorViews, ...workspaceViewCollections, ...workspaceActions];
+export const manifests = [workspace, ...workspaceViews, ...workspaceViewCollections, ...workspaceActions];

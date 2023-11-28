@@ -46,7 +46,7 @@ export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbLitEleme
 		await Promise.all(
 			data.items.map((item) => {
 				if (item.id) {
-					return dataTypeDetailRepository.requestById(item.id);
+					return dataTypeDetailRepository.requestByUnique(item.id);
 				}
 				return Promise.resolve();
 			}),

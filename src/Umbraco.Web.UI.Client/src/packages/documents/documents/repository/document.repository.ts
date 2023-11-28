@@ -4,7 +4,8 @@ import { UmbDocumentTreeStore, UMB_DOCUMENT_TREE_STORE_CONTEXT_TOKEN } from './d
 import { UMB_DOCUMENT_ITEM_STORE_CONTEXT_TOKEN, type UmbDocumentItemStore } from './document-item.store.js';
 import { UmbDocumentItemServerDataSource } from './sources/document-item.server.data.js';
 import type { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
-import { UmbBaseController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import {
 	DocumentResponseModel,
 	CreateDocumentRequestModel,
@@ -12,6 +13,7 @@ import {
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 export class UmbDocumentRepository
 	extends UmbBaseController
@@ -217,11 +219,57 @@ export class UmbDocumentRepository
 		return { error };
 	}
 
-	// Listing all currently known methods we need to implement:
-	// these currently only covers posting data
-	// TODO: find a good way to split these
-	async saveAndPublish() {
-		alert('save and publish');
+	async saveAndPublish(id: string, item: UpdateDocumentRequestModel, variantIds: Array<UmbVariantId>) {
+		if (!id) throw new Error('id is missing');
+		if (!variantIds) throw new Error('variant IDs are missing');
+		//await this.#init;
+
+		await this.save(id, item);
+
+		const { error } = await this.#detailDataSource.saveAndPublish(id, variantIds);
+
+		if (!error) {
+			// TODO: Update other stores based on above effect.
+
+			const notification = { data: { message: `Document saved and published` } };
+			this.#notificationContext?.peek('positive', notification);
+		}
+
+		return { error };
+	}
+
+	async publish(id: string, variantIds: Array<UmbVariantId>) {
+		if (!id) throw new Error('id is missing');
+		if (!variantIds) throw new Error('variant IDs are missing');
+		await this.#init;
+
+		const { error } = await this.#detailDataSource.saveAndPublish(id, variantIds);
+
+		if (!error) {
+			// TODO: Update other stores based on above effect.
+
+			const notification = { data: { message: `Document published` } };
+			this.#notificationContext?.peek('positive', notification);
+		}
+
+		return { error };
+	}
+
+	async unpublish(id: string, variantIds: Array<UmbVariantId>) {
+		if (!id) throw new Error('id is missing');
+		if (!variantIds) throw new Error('variant IDs are missing');
+		await this.#init;
+
+		const { error } = await this.#detailDataSource.unpublish(id, variantIds);
+
+		if (!error) {
+			// TODO: Update other stores based on above effect.
+
+			const notification = { data: { message: `Document unpublished` } };
+			this.#notificationContext?.peek('positive', notification);
+		}
+
+		return { error };
 	}
 
 	async saveAndPreview() {
@@ -258,14 +306,6 @@ export class UmbDocumentRepository
 
 	async setPublicAccess() {
 		alert('set public access');
-	}
-
-	async publish() {
-		alert('publish');
-	}
-
-	async unpublish() {
-		alert('unpublish');
 	}
 
 	async rollback() {

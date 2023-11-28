@@ -1,7 +1,8 @@
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbStringState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
-import { UmbBaseController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import { ManifestTheme, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { loadManifestPlainCss } from '@umbraco-cms/backoffice/extension-api';
 
@@ -61,7 +62,7 @@ export class UmbThemeContext extends UmbBaseController {
 						this.#styleElement?.childNodes.forEach((node) => node.remove());
 						this.#styleElement?.setAttribute('href', '');
 					}
-				}
+				},
 			);
 		} else {
 			localStorage.removeItem(LOCAL_STORAGE_KEY);

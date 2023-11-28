@@ -1,3 +1,4 @@
+import type { ManifestCollection } from './collection.models.js';
 import type { ManifestCollectionView } from './collection-view.model.js';
 import type { ManifestDashboard } from './dashboard.model.js';
 import type { ManifestDashboardCollection } from './dashboard-collection.model.js';
@@ -27,10 +28,11 @@ import type { ManifestUserProfileApp } from './user-profile-app.model.js';
 import type { ManifestWorkspace } from './workspace.model.js';
 import type { ManifestWorkspaceAction } from './workspace-action.model.js';
 import type { ManifestWorkspaceContext } from './workspace-context.model.js';
-import type { ManifestWorkspaceEditorView } from './workspace-editor-view.model.js';
+import type { ManifestWorkspaceView } from './workspace-view.model.js';
 import type { ManifestWorkspaceViewCollection } from './workspace-view-collection.model.js';
 import type { ManifestUserPermission } from './user-permission.model.js';
 import type { ManifestUserGranularPermission } from './user-granular-permission.model.js';
+import { ManifestCollectionAction } from './collection-action.model.js';
 import type {
 	ManifestBase,
 	ManifestBundle,
@@ -38,6 +40,8 @@ import type {
 	ManifestEntryPoint,
 } from '@umbraco-cms/backoffice/extension-api';
 
+export * from './collection.models.js';
+export * from './collection-action.model.js';
 export * from './collection-view.model.js';
 export * from './dashboard-collection.model.js';
 export * from './dashboard.model.js';
@@ -68,14 +72,16 @@ export * from './user-permission.model.js';
 export * from './user-profile-app.model.js';
 export * from './workspace-action.model.js';
 export * from './workspace-context.model.js';
-export * from './workspace-editor-view.model.js';
+export * from './workspace-view.model.js';
 export * from './workspace-view-collection.model.js';
 export * from './workspace.model.js';
 
 export type ManifestTypes =
 	| ManifestBundle<ManifestTypes>
 	| ManifestCondition
+	| ManifestCollection
 	| ManifestCollectionView
+	| ManifestCollectionAction
 	| ManifestDashboard
 	| ManifestDashboardCollection
 	| ManifestEntityAction
@@ -111,7 +117,7 @@ export type ManifestTypes =
 	| ManifestWorkspace
 	| ManifestWorkspaceAction
 	| ManifestWorkspaceContext
-	| ManifestWorkspaceEditorView
+	| ManifestWorkspaceView
 	| ManifestWorkspaceViewCollection
 	| ManifestUserPermission
 	| ManifestUserGranularPermission

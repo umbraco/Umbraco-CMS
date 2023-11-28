@@ -5,7 +5,8 @@ import type {
 	UmbBaseExtensionInitializer,
 	UmbExtensionRegistry,
 } from '@umbraco-cms/backoffice/extension-api';
-import { UmbBaseController, type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export type PermittedControllerType<ControllerType extends { manifest: any }> = ControllerType & {
 	manifest: Required<Pick<ControllerType, 'manifest'>>;

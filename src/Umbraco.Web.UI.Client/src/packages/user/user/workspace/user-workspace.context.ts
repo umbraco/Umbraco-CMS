@@ -1,5 +1,6 @@
-import { UmbUserRepository } from '../repository/user.repository.js';
-import { UMB_USER_ENTITY_TYPE, type UmbUserDetail } from '../index.js';
+import { type UmbUserDetailModel } from '../types.js';
+import { UMB_USER_ENTITY_TYPE } from '../entity.js';
+import { UmbUserDetailRepository } from '../repository/index.js';
 import {
 	UmbSaveableWorkspaceContextInterface,
 	UmbEditableWorkspaceContextBase,
@@ -12,20 +13,20 @@ import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 
 export class UmbUserWorkspaceContext
-	extends UmbEditableWorkspaceContextBase<UmbUserRepository, UmbUserDetail>
-	implements UmbSaveableWorkspaceContextInterface<UmbUserDetail | undefined>
+	extends UmbEditableWorkspaceContextBase<UmbUserDetailRepository, UmbUserDetailModel>
+	implements UmbSaveableWorkspaceContextInterface<UmbUserDetailModel | undefined>
 {
 	#currentUserContext?: typeof UMB_CURRENT_USER_CONTEXT.TYPE;
 
 	constructor(host: UmbControllerHostElement) {
-		super(host, 'Umb.Workspace.User', new UmbUserRepository(host));
+		super(host, 'Umb.Workspace.User', new UmbUserDetailRepository(host));
 
 		new UmbContextConsumerController(host, UMB_CURRENT_USER_CONTEXT, (instance) => {
 			this.#currentUserContext = instance;
 		});
 	}
 
-	#data = new UmbObjectState<UmbUserDetail | undefined>(undefined);
+	#data = new UmbObjectState<UmbUserDetailModel | undefined>(undefined);
 	data = this.#data.asObservable();
 
 	async load(id: string) {
@@ -43,7 +44,7 @@ export class UmbUserWorkspaceContext
 		Therefore we have to subscribe to the user store to update the state in the workspace data.
 		There might be a less manual way to do this.
 	*/
-	onUserStoreChanges(user: UmbUserDetail) {
+	onUserStoreChanges(user: UmbUserDetailModel) {
 		if (!user) return;
 		this.#data.update({ state: user.state });
 	}
@@ -60,9 +61,9 @@ export class UmbUserWorkspaceContext
 		return this.#data.getValue();
 	}
 
-	updateProperty<PropertyName extends keyof UmbUserDetail>(
+	updateProperty<PropertyName extends keyof UmbUserDetailModel>(
 		propertyName: PropertyName,
-		value: UmbUserDetail[PropertyName],
+		value: UmbUserDetailModel[PropertyName],
 	) {
 		this.#data.update({ [propertyName]: value });
 	}

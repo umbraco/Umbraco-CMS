@@ -111,6 +111,7 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbLitElement {
 
 	private _renderFilter() {
 		return html` <uui-input
+			type="search"
 			id="filter"
 			@input="${this._handleFilterInput}"
 			placeholder="Type to filter..."

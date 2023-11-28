@@ -6,7 +6,8 @@ import {
 	UmbStylesheetFolderServerDataSource,
 } from './sources/stylesheet.folder.server.data.js';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
-import { UmbBaseController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import {
 	DataSourceResponse,
 	UmbDataSourceErrorResponse,

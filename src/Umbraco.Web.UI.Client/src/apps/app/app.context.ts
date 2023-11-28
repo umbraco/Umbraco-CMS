@@ -1,5 +1,6 @@
 import { UmbAppContextConfig } from './app-context-config.interface.js';
-import { UmbBaseController, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 export class UmbAppContext extends UmbBaseController {

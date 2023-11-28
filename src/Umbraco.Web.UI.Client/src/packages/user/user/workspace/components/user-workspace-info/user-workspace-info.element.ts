@@ -1,6 +1,6 @@
 import { getDisplayStateFromUserStatus } from '../../../../utils.js';
 import { UMB_USER_WORKSPACE_CONTEXT } from '../../user-workspace.context.js';
-import { UmbUserDetail } from '../../../types.js';
+import { UmbUserDetailModel } from '../../../types.js';
 import {
 	html,
 	customElement,
@@ -20,7 +20,7 @@ type UmbUserWorkspaceInfoItem = { labelKey: string; value: string | number | und
 @customElement('umb-user-workspace-info')
 export class UmbUserWorkspaceInfoElement extends UmbLitElement {
 	@state()
-	private _user?: UmbUserDetail;
+	private _user?: UmbUserDetailModel;
 
 	@state()
 	private _userAvatarUrls: Array<{ url: string; scale: string }> = [];
@@ -56,7 +56,7 @@ export class UmbUserWorkspaceInfoElement extends UmbLitElement {
 	}
 
 	// TODO: remove this when we get absolute urls from the server
-	#setUserAvatarUrls = async (user: UmbUserDetail | undefined) => {
+	#setUserAvatarUrls = async (user: UmbUserDetailModel | undefined) => {
 		if (user?.avatarUrls?.length === 0) return;
 
 		const serverUrl = (await this.#getAppContext()).getServerUrl();
@@ -98,7 +98,7 @@ export class UmbUserWorkspaceInfoElement extends UmbLitElement {
 		}
 	};
 
-	#setUserInfoItems = (user: UmbUserDetail | undefined) => {
+	#setUserInfoItems = (user: UmbUserDetailModel | undefined) => {
 		if (!user) {
 			this._userInfo = [];
 			return;

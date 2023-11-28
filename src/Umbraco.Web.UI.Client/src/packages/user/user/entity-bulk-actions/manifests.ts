@@ -4,12 +4,14 @@ import {
 	UMB_UNLOCK_USER_REPOSITORY_ALIAS,
 	UMB_USER_REPOSITORY_ALIAS,
 } from '../repository/manifests.js';
-import { UMB_USER_ENTITY_TYPE } from '../types.js';
+import { UMB_USER_ENTITY_TYPE } from '../entity.js';
+import { UMB_USER_COLLECTION_ALIAS } from '../collection/manifests.js';
 import { UmbEnableUserEntityBulkAction } from './enable/enable.action.js';
 import { UmbSetGroupUserEntityBulkAction } from './set-group/set-group.action.js';
 import { UmbUnlockUserEntityBulkAction } from './unlock/unlock.action.js';
 import { UmbDisableUserEntityBulkAction } from './disable/disable.action.js';
 import { ManifestEntityBulkAction } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
 
 const entityActions: Array<ManifestEntityBulkAction> = [
 	{
@@ -24,8 +26,8 @@ const entityActions: Array<ManifestEntityBulkAction> = [
 		},
 		conditions: [
 			{
-				alias: 'Umb.Condition.CollectionEntityType',
-				match: UMB_USER_ENTITY_TYPE,
+				alias: UMB_COLLECTION_ALIAS_CONDITION,
+				match: UMB_USER_COLLECTION_ALIAS,
 			},
 		],
 	},
@@ -41,8 +43,8 @@ const entityActions: Array<ManifestEntityBulkAction> = [
 		},
 		conditions: [
 			{
-				alias: 'Umb.Condition.CollectionEntityType',
-				match: UMB_USER_ENTITY_TYPE,
+				alias: UMB_COLLECTION_ALIAS_CONDITION,
+				match: UMB_USER_COLLECTION_ALIAS,
 			},
 		],
 	},
@@ -58,8 +60,8 @@ const entityActions: Array<ManifestEntityBulkAction> = [
 		},
 		conditions: [
 			{
-				alias: 'Umb.Condition.CollectionEntityType',
-				match: UMB_USER_ENTITY_TYPE,
+				alias: UMB_COLLECTION_ALIAS_CONDITION,
+				match: UMB_USER_COLLECTION_ALIAS,
 			},
 		],
 	},
@@ -75,8 +77,8 @@ const entityActions: Array<ManifestEntityBulkAction> = [
 		},
 		conditions: [
 			{
-				alias: 'Umb.Condition.CollectionEntityType',
-				match: UMB_USER_ENTITY_TYPE,
+				alias: UMB_COLLECTION_ALIAS_CONDITION,
+				match: UMB_USER_COLLECTION_ALIAS,
 			},
 		],
 	},

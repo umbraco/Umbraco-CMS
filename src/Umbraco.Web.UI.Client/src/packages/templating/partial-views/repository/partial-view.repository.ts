@@ -5,7 +5,8 @@ import {
 	UmbPartialViewFolderServerDataSource,
 } from './sources/partial-view-folder.server.data-source.js';
 import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
-import { UmbBaseController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import {
 	CreateFolderRequestModel,
 	CreatePartialViewRequestModel,

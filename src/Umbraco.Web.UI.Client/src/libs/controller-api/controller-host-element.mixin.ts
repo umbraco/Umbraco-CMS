@@ -1,8 +1,8 @@
 import type { UmbControllerAlias } from './controller-alias.type.js';
-import { UmbControllerHostBaseMixin } from './controller-host-base.mixin.js';
+import { UmbControllerHostMixin } from './controller-host.mixin.js';
 import type { UmbControllerHost } from './controller-host.interface.js';
 import type { UmbController } from './controller.interface.js';
-import { HTMLElementConstructor } from '@umbraco-cms/backoffice/extension-api';
+import type { HTMLElementConstructor } from '@umbraco-cms/backoffice/extension-api';
 
 export declare class UmbControllerHostElement extends HTMLElement implements UmbControllerHost {
 	hasController(controller: UmbController): boolean;
@@ -21,7 +21,7 @@ export declare class UmbControllerHostElement extends HTMLElement implements Umb
  * @mixin
  */
 export const UmbControllerHostElementMixin = <T extends HTMLElementConstructor>(superClass: T) => {
-	class UmbControllerHostElementClass extends UmbControllerHostBaseMixin(superClass) implements UmbControllerHost {
+	class UmbControllerHostElementClass extends UmbControllerHostMixin(superClass) implements UmbControllerHost {
 		getHostElement(): EventTarget {
 			return this;
 		}

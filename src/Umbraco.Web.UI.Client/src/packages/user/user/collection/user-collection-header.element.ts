@@ -7,14 +7,8 @@ import {
 } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbDropdownElement } from '@umbraco-cms/backoffice/components';
 import { UMB_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
-import {
-	UMB_CREATE_USER_MODAL,
-	UMB_INVITE_USER_MODAL,
-	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
-	UmbModalManagerContext,
-} from '@umbraco-cms/backoffice/modal';
+import { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UserGroupResponseModel, UserOrderModel, UserStateModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbUserGroupCollectionRepository } from '@umbraco-cms/backoffice/user-group';
 
@@ -48,10 +42,6 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
-			this.#modalContext = instance;
-		});
-
 		this.consumeContext(UMB_COLLECTION_CONTEXT, (instance) => {
 			this.#collectionContext = instance as UmbUserCollectionContext;
 		});
@@ -74,14 +64,6 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 		const filter = target.value || '';
 		clearTimeout(this.#inputTimer);
 		this.#inputTimer = setTimeout(() => this.#collectionContext?.setFilter({ filter }), this.#inputTimerAmount);
-	}
-
-	#onCreateUserClick() {
-		this.#modalContext?.open(UMB_CREATE_USER_MODAL);
-	}
-
-	#onInviteUserClick() {
-		this.#modalContext?.open(UMB_INVITE_USER_MODAL);
 	}
 
 	#onStateFilterChange(event: UUIBooleanInputEvent) {
@@ -109,22 +91,10 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<div style="display: flex; gap: var(--uui-size-space-4)">${this.#renderCollectionActions()}</div>
+			<umb-collection-action-bundle></umb-collection-action-bundle>
 			${this.#renderSearch()}
 			<div>${this.#renderFilters()} ${this.#renderCollectionViews()}</div>
 		`;
-	}
-
-	#renderCollectionActions() {
-		return html` <uui-button
-				@click=${this.#onCreateUserClick}
-				label=${this.localize.term('user_createUser')}
-				look="outline"></uui-button>
-
-			<uui-button
-				@click=${this.#onInviteUserClick}
-				label=${this.localize.term('user_inviteUser')}
-				look="outline"></uui-button>`;
 	}
 
 	#renderSearch() {

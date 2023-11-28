@@ -1,5 +1,5 @@
 import { UmbUserCollectionContext } from '../../user-collection.context.js';
-import type { UmbUserDetail } from '../../../types.js';
+import type { UmbUserDetailModel } from '../../../types.js';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import {
@@ -57,7 +57,7 @@ export class UmbUserTableCollectionViewElement extends UmbLitElement {
 	#UmbUserGroupRepository = new UmbUserGroupRepository(this);
 
 	@state()
-	private _users: Array<UmbUserDetail> = [];
+	private _users: Array<UmbUserDetailModel> = [];
 
 	@state()
 	private _selection: Array<string | null> = [];
@@ -69,11 +69,19 @@ export class UmbUserTableCollectionViewElement extends UmbLitElement {
 
 		this.consumeContext(UMB_COLLECTION_CONTEXT, (instance) => {
 			this.#collectionContext = instance as UmbUserCollectionContext;
-			this.observe(this.#collectionContext.selection, (selection) => (this._selection = selection), 'umbCollectionSelectionObserver');
-			this.observe(this.#collectionContext.items, (items) => {
-				this._users = items;
-				this.#observeUserGroups();
-			}, 'umbCollectionItemsObserver');
+			this.observe(
+				this.#collectionContext.selection.selection,
+				(selection) => (this._selection = selection),
+				'umbCollectionSelectionObserver',
+			);
+			this.observe(
+				this.#collectionContext.items,
+				(items) => {
+					this._users = items;
+					this.#observeUserGroups();
+				},
+				'umbCollectionItemsObserver',
+			);
 		});
 	}
 
@@ -81,10 +89,14 @@ export class UmbUserTableCollectionViewElement extends UmbLitElement {
 		if (this._users.length === 0) return;
 		const userGroupsIds = [...new Set(this._users.flatMap((user) => user.userGroupIds ?? []))];
 		const { asObservable } = await this.#UmbUserGroupRepository.requestItems(userGroupsIds);
-		this.observe(asObservable(), (userGroups) => {
-			this._userGroupItems = userGroups;
-			this.#createTableItems();
-		}, 'umbUserGroupItemsObserver');
+		this.observe(
+			asObservable(),
+			(userGroups) => {
+				this._userGroupItems = userGroups;
+				this.#createTableItems();
+			},
+			'umbUserGroupItemsObserver',
+		);
 	}
 
 	#getUserGroupNames(ids: Array<string>) {
@@ -130,14 +142,14 @@ export class UmbUserTableCollectionViewElement extends UmbLitElement {
 		event.stopPropagation();
 		const table = event.target as UmbTableElement;
 		const selection = table.selection;
-		this.#collectionContext?.setSelection(selection);
+		this.#collectionContext?.selection.setSelection(selection);
 	}
 
 	#onDeselected(event: UmbTableDeselectedEvent) {
 		event.stopPropagation();
 		const table = event.target as UmbTableElement;
 		const selection = table.selection;
-		this.#collectionContext?.setSelection(selection);
+		this.#collectionContext?.selection.setSelection(selection);
 	}
 
 	#onOrdering(event: UmbTableOrderedEvent) {

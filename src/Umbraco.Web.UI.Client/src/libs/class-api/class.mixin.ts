@@ -3,7 +3,7 @@ import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { ClassConstructor } from '@umbraco-cms/backoffice/extension-api';
 import {
 	type UmbControllerHost,
-	UmbControllerHostBaseMixin,
+	UmbControllerHostMixin,
 	UmbController,
 	UmbControllerAlias,
 } from '@umbraco-cms/backoffice/controller-api';
@@ -17,7 +17,7 @@ import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
 type UmbClassMixinConstructor = new (
 	host: UmbControllerHost,
-	controllerAlias: UmbControllerAlias
+	controllerAlias?: UmbControllerAlias,
 ) => UmbClassMixinDeclaration;
 
 declare class UmbClassMixinDeclaration implements UmbClassMixinInterface {
@@ -25,16 +25,19 @@ declare class UmbClassMixinDeclaration implements UmbClassMixinInterface {
 	observe<T>(
 		source: Observable<T>,
 		callback: (_value: T) => void,
-		controllerAlias?: UmbControllerAlias
+		controllerAlias?: UmbControllerAlias,
 	): UmbObserverController<T>;
 	provideContext<
 		BaseType = unknown,
 		ResultType extends BaseType = BaseType,
-		InstanceType extends ResultType = ResultType
-	>(alias: string | UmbContextToken<BaseType, ResultType>, instance: InstanceType): UmbContextProviderController<BaseType, ResultType, InstanceType>;
+		InstanceType extends ResultType = ResultType,
+	>(
+		alias: string | UmbContextToken<BaseType, ResultType>,
+		instance: InstanceType,
+	): UmbContextProviderController<BaseType, ResultType, InstanceType>;
 	consumeContext<BaseType = unknown, ResultType extends BaseType = BaseType>(
 		alias: string | UmbContextToken<BaseType, ResultType>,
-		callback: UmbContextCallback<ResultType>
+		callback: UmbContextCallback<ResultType>,
 	): UmbContextConsumerController<BaseType, ResultType>;
 	hasController(controller: UmbController): boolean;
 	getControllers(filterMethod: (ctrl: UmbController) => boolean): UmbController[];
@@ -50,14 +53,15 @@ declare class UmbClassMixinDeclaration implements UmbClassMixinInterface {
 }
 
 export const UmbClassMixin = <T extends ClassConstructor>(superClass: T) => {
-	class UmbClassMixinClass extends UmbControllerHostBaseMixin(superClass) implements UmbControllerHost {
+	class UmbClassMixinClass extends UmbControllerHostMixin(superClass) implements UmbControllerHost {
 		protected _host: UmbControllerHost;
 		protected _controllerAlias: UmbControllerAlias;
 
-		constructor(host: UmbControllerHost, controllerAlias: UmbControllerAlias) {
+		constructor(host: UmbControllerHost, controllerAlias?: UmbControllerAlias) {
 			super();
 			this._host = host;
 			this._controllerAlias = controllerAlias ?? Symbol(); // This will fallback to a Symbol, ensuring that this class is only appended to the controller host once.
+			this._host.addController(this);
 		}
 
 		getHostElement(): EventTarget {
@@ -86,15 +90,13 @@ export const UmbClassMixin = <T extends ClassConstructor>(superClass: T) => {
 		 * @return {UmbContextProviderController} Reference to a Context Provider Controller instance
 		 * @memberof UmbElementMixin
 		 */
-		provideContext
-		<
+		provideContext<
 			BaseType = unknown,
 			ResultType extends BaseType = BaseType,
-			InstanceType extends ResultType = ResultType
-		>
-		(
+			InstanceType extends ResultType = ResultType,
+		>(
 			contextAlias: string | UmbContextToken<BaseType, ResultType>,
-			instance: InstanceType
+			instance: InstanceType,
 		): UmbContextProviderController {
 			return new UmbContextProviderController<BaseType, ResultType, InstanceType>(this, contextAlias, instance);
 		}
@@ -108,9 +110,21 @@ export const UmbClassMixin = <T extends ClassConstructor>(superClass: T) => {
 		 */
 		consumeContext<BaseType = unknown, ResultType extends BaseType = BaseType>(
 			contextAlias: string | UmbContextToken<BaseType, ResultType>,
-			callback: UmbContextCallback<ResultType>
-		): UmbContextConsumerController<BaseType, ResultType>  {
+			callback: UmbContextCallback<ResultType>,
+		): UmbContextConsumerController<BaseType, ResultType> {
 			return new UmbContextConsumerController(this, contextAlias, callback);
+		}
+
+		/**
+		 * @description Destroys the controller and removes it from the host.
+		 * @memberof UmbClassMixin
+		 */
+		public destroy() {
+			if (this._host) {
+				this._host.removeController(this);
+				this._host = undefined as any;
+			}
+			super.destroy();
 		}
 	}
 

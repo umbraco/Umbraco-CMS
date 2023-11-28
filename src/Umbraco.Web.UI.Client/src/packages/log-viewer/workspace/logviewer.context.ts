@@ -1,10 +1,5 @@
 import { UmbLogViewerRepository } from '../repository/log-viewer.repository.js';
-import {
-	UmbBasicState,
-	UmbArrayState,
-	UmbObjectState,
-	UmbStringState,
-} from '@umbraco-cms/backoffice/observable-api';
+import { UmbBasicState, UmbArrayState, UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import {
 	DirectionModel,
 	LogLevelCountsReponseModel,
@@ -15,7 +10,8 @@ import {
 	PagedSavedLogSearchResponseModel,
 	SavedLogSearchPresenationBaseModel,
 } from '@umbraco-cms/backoffice/backend-api';
-import { UmbBaseController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { query } from '@umbraco-cms/backoffice/router';
 import { UMB_WORKSPACE_CONTEXT, UmbWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
@@ -94,7 +90,7 @@ export class UmbLogViewerWorkspaceContext extends UmbBaseController implements U
 	#messageTemplates = new UmbObjectState<PagedLogTemplateResponseModel | null>(null);
 	messageTemplates = this.#messageTemplates.asObservable();
 
-	#logLevelsFilter = new UmbArrayState<LogLevelModel>([]);
+	#logLevelsFilter = new UmbArrayState<LogLevelModel>([], (x) => x);
 	logLevelsFilter = this.#logLevelsFilter.asObservable();
 
 	#logs = new UmbObjectState<PagedLogMessageResponseModel | null>(null);

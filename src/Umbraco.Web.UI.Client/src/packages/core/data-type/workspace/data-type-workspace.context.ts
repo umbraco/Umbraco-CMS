@@ -1,11 +1,11 @@
 import { UmbDataTypeDetailRepository } from '../repository/detail/data-type-detail.repository.js';
 import { UmbDataTypeVariantContext } from '../variant-context/data-type-variant-context.js';
+import type { UmbDataTypeDetailModel } from '../types.js';
 import {
 	UmbInvariantableWorkspaceContextInterface,
 	UmbEditableWorkspaceContextBase,
 	UmbWorkspaceContextInterface,
 } from '@umbraco-cms/backoffice/workspace';
-import type { DataTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import {
 	appendToFrozenArray,
 	UmbArrayState,
@@ -23,16 +23,16 @@ import {
 import { UMB_PROPERTY_EDITOR_SCHEMA_ALIAS_DEFAULT } from '@umbraco-cms/backoffice/property-editor';
 
 export class UmbDataTypeWorkspaceContext
-	extends UmbEditableWorkspaceContextBase<UmbDataTypeDetailRepository, DataTypeResponseModel>
-	implements UmbInvariantableWorkspaceContextInterface<DataTypeResponseModel | undefined>
+	extends UmbEditableWorkspaceContextBase<UmbDataTypeDetailRepository, UmbDataTypeDetailModel>
+	implements UmbInvariantableWorkspaceContextInterface<UmbDataTypeDetailModel | undefined>
 {
 	// TODO: revisit. temp solution because the create and response models are different.
-	#data = new UmbObjectState<DataTypeResponseModel | undefined>(undefined);
+	#data = new UmbObjectState<UmbDataTypeDetailModel | undefined>(undefined);
 	readonly data = this.#data.asObservable();
 	#getDataPromise?: Promise<any>;
 
 	readonly name = this.#data.asObservablePart((data) => data?.name);
-	readonly id = this.#data.asObservablePart((data) => data?.id);
+	readonly unique = this.#data.asObservablePart((data) => data?.unique);
 
 	readonly propertyEditorUiAlias = this.#data.asObservablePart((data) => data?.propertyEditorUiAlias);
 	readonly propertyEditorSchemaAlias = this.#data.asObservablePart((data) => data?.propertyEditorAlias);
@@ -152,8 +152,8 @@ export class UmbDataTypeWorkspaceContext
 		return new UmbDataTypeVariantContext(host, this);
 	}
 
-	async load(id: string) {
-		this.#getDataPromise = this.repository.requestById(id);
+	async load(unique: string) {
+		this.#getDataPromise = this.repository.requestByUnique(unique);
 		const { data } = await this.#getDataPromise;
 		if (data) {
 			this.setIsNew(false);
@@ -161,8 +161,8 @@ export class UmbDataTypeWorkspaceContext
 		}
 	}
 
-	async create(parentId: string | null) {
-		this.#getDataPromise = this.repository.createScaffold(parentId);
+	async create(parentUnique: string | null) {
+		this.#getDataPromise = this.repository.createScaffold(parentUnique);
 		let { data } = await this.#getDataPromise;
 		if (this.modalContext) {
 			data = { ...data, ...this.modalContext.data.preset };
@@ -170,7 +170,7 @@ export class UmbDataTypeWorkspaceContext
 		this.setIsNew(true);
 		// TODO: This is a hack to get around the fact that the data is not typed correctly.
 		// Create and response models are different. We need to look into this.
-		this.#data.next(data as unknown as DataTypeResponseModel);
+		this.#data.next(data as unknown as UmbDataTypeDetailModel);
 		return { data };
 	}
 
@@ -179,7 +179,7 @@ export class UmbDataTypeWorkspaceContext
 	}
 
 	getEntityId() {
-		return this.getData()?.id || '';
+		return this.getData()?.unique || '';
 	}
 
 	getEntityType() {
@@ -240,19 +240,19 @@ export class UmbDataTypeWorkspaceContext
 
 	async save() {
 		if (!this.#data.value) return;
-		if (!this.#data.value.id) return;
+		if (!this.#data.value.unique) return;
 
 		if (this.getIsNew()) {
 			await this.repository.create(this.#data.value);
 		} else {
-			await this.repository.save(this.#data.value.id, this.#data.value);
+			await this.repository.save(this.#data.value);
 		}
 
 		this.saveComplete(this.#data.value);
 	}
 
-	async delete(id: string) {
-		await this.repository.delete(id);
+	async delete(unique: string) {
+		await this.repository.delete(unique);
 	}
 
 	public destroy(): void {

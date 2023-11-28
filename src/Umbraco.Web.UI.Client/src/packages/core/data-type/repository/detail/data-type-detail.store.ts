@@ -1,34 +1,22 @@
-import type { DataTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbDataTypeDetailModel } from '../../types.js';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
-import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
+import { UmbDetailStoreBase } from '@umbraco-cms/backoffice/store';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-
-export const UMB_DATA_TYPE_STORE_CONTEXT = new UmbContextToken<UmbDataTypeDetailStore>('UmbDataTypeStore');
 
 /**
  * @export
- * @class UmbDataTypeStore
+ * @class UmbDataTypeDetailStore
  * @extends {UmbStoreBase}
- * @description - Data Store for Template Details
+ * @description - Data Store for Data Type Details
  */
-export class UmbDataTypeDetailStore extends UmbStoreBase<DataTypeResponseModel> {
+export class UmbDataTypeDetailStore extends UmbDetailStoreBase<UmbDataTypeDetailModel> {
 	/**
-	 * Creates an instance of UmbDataTypeStore.
+	 * Creates an instance of UmbDataTypeDetailStore.
 	 * @param {UmbControllerHostElement} host
-	 * @memberof UmbDataTypeStore
+	 * @memberof UmbDataTypeDetailStore
 	 */
 	constructor(host: UmbControllerHostElement) {
-		super(host, UMB_DATA_TYPE_STORE_CONTEXT.toString(), new UmbArrayState<DataTypeResponseModel>([], (x) => x.id));
-	}
-
-	/**
-	 * Retrieve a data-type from the store
-	 * @param {id} string id.
-	 * @memberof UmbDataTypeStore
-	 */
-	byId(id: DataTypeResponseModel['id']) {
-		return this._data.asObservablePart((x) => x.find((y) => y.id === id));
+		super(host, UMB_DATA_TYPE_DETAIL_STORE_CONTEXT.toString());
 	}
 
 	withPropertyEditorUiAlias(propertyEditorUiAlias: string) {
@@ -38,3 +26,5 @@ export class UmbDataTypeDetailStore extends UmbStoreBase<DataTypeResponseModel> 
 		);
 	}
 }
+
+export const UMB_DATA_TYPE_DETAIL_STORE_CONTEXT = new UmbContextToken<UmbDataTypeDetailStore>('UmbDataTypeDetailStore');

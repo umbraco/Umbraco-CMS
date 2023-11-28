@@ -106,10 +106,11 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 
 	renderSearchbar() {
 		return html` <uui-input
-			@keyup="${this.#filterIcons}"
+			type="search"
 			placeholder="Type to filter..."
 			label="Type to filter icons"
-			id="searchbar">
+			id="searchbar"
+			@keyup="${this.#filterIcons}">
 			<uui-icon name="search" slot="prepend" id="searchbar_icon"></uui-icon>
 		</uui-input>`;
 	}

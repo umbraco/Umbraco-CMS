@@ -9,10 +9,11 @@ export class UmbDocumentSaveAndPublishWorkspaceAction extends UmbWorkspaceAction
 
 	async execute() {
 		if (!this.workspaceContext) return;
+		// TODO: Revisit, its unclear to me why we check the data of the context, should not matter IMO.
 		// TODO: it doesn't get the updated value
-		const document = this.workspaceContext.getData();
+		//const document = this.workspaceContext.getData();
 		// TODO: handle errors
-		if (!document) return;
-		this.workspaceContext.repository.saveAndPublish();
+		//if (!document) return;
+		this.workspaceContext.publish();
 	}
 }
