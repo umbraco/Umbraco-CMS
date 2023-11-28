@@ -69,3 +69,5 @@ declare global {
 		'umb-temporary-file-badge': UmbTemporaryFileBadgeElement;
 	}
 }
+
+export default UmbTemporaryFileBadgeElement;

@@ -1,13 +1,15 @@
+import { UmbId } from '../../index.js';
+import { TemporaryFileQueueItem, UmbTemporaryFileManager } from '../../temporary-file/temporary-file-manager.class.js';
 import {
 	css,
 	html,
 	nothing,
-	map,
 	ifDefined,
 	customElement,
 	property,
 	query,
 	state,
+	repeat,
 } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import type { UUIFileDropzoneElement, UUIFileDropzoneEvent } from '@umbraco-cms/backoffice/external/uui';
@@ -50,7 +52,7 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 	multiple = false;
 
 	@state()
-	_currentFiles: File[] = [];
+	_currentFiles: Array<TemporaryFileQueueItem> = [];
 
 	@state()
 	extensions?: string[];
@@ -58,8 +60,18 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 	@query('#dropzone')
 	private _dropzone?: UUIFileDropzoneElement;
 
+	#manager;
+
 	protected getFormElement() {
 		return undefined;
+	}
+
+	constructor() {
+		super();
+		this.#manager = new UmbTemporaryFileManager(this);
+
+		this.observe(this.#manager.isReady, (value) => (this.error = !value));
+		this.observe(this.#manager.items, (value) => (this._currentFiles = value));
 	}
 
 	connectedCallback(): void {
@@ -85,12 +97,19 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 	}
 
 	#setFiles(files: File[]) {
-		this._currentFiles = [...this._currentFiles, ...files];
+		const items = files.map(
+			(file): TemporaryFileQueueItem => ({
+				id: UmbId.new(),
+				file,
+				status: 'waiting',
+			}),
+		);
+		this.#manager.upload(items);
 
-		//TODO: set keys when possible, not names
-		this.keys = this._currentFiles.map((file) => file.name);
-		this.dispatchEvent(new CustomEvent('change', { bubbles: true }));
+		this.keys = items.map((item) => item.id);
 		this.value = this.keys.join(',');
+
+		this.dispatchEvent(new CustomEvent('change', { bubbles: true }));
 	}
 
 	#handleBrowse() {
@@ -99,9 +118,11 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 	}
 
 	render() {
-		return html`${this.#renderFiles()} ${this.#renderDropzone()}`;
+		return html`${this.#renderUploadedFiles()} ${this.#renderDropzone()}${this.#renderButtonRemove()}`;
 	}
 
+	//TODO When the property editor gets saved, it seems that the property editor gets the file path from the server rather than key/id.
+	// Image/files needs to be displayed from a previous save (not just when it just got uploaded).
 	#renderDropzone() {
 		if (!this.multiple && this._currentFiles.length) return nothing;
 		return html`
@@ -115,22 +136,33 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 			</uui-file-dropzone>
 		`;
 	}
-
-	#renderFiles() {
+	#renderUploadedFiles() {
 		if (!this._currentFiles.length) return nothing;
-		return html` <div id="wrapper">
-				${map(this._currentFiles, (file) => {
-					return html`<umb-input-upload-field-file .file=${file}></umb-input-upload-field-file>`;
-				})}
-			</div>
-			<uui-button compact @click=${this.#handleRemove} label="Remove files">
-				<uui-icon name="icon-trash"></uui-icon> Remove file(s)
-			</uui-button>`;
+		return html`<div id="wrapper">
+			${repeat(
+				this._currentFiles,
+				(item) => item.id + item.status,
+				(item) =>
+					html`<div style="position:relative;">
+						<umb-input-upload-field-file .file=${item.file as any}></umb-input-upload-field-file>
+						${item.status === 'waiting' ? html`<umb-temporary-file-badge></umb-temporary-file-badge>` : nothing}
+					</div>`,
+			)}
+		</div>`;
+	}
+
+	#renderButtonRemove() {
+		if (!this._currentFiles.length) return;
+		return html`<uui-button compact @click=${this.#handleRemove} label="Remove files">
+			<uui-icon name="icon-trash"></uui-icon> Remove file(s)
+		</uui-button>`;
 	}
 
 	#handleRemove() {
-		// Remove via endpoint?
-		this._currentFiles = [];
+		const ids = this._currentFiles.map((item) => item.id) as string[];
+		this.#manager.remove(ids);
+
+		this.dispatchEvent(new CustomEvent('change', { bubbles: true }));
 	}
 
 	static styles = [
