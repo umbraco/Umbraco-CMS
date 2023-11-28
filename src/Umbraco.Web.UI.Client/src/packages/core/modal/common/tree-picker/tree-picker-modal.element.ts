@@ -43,6 +43,7 @@ export class UmbTreePickerModalElement<TreeItemType extends TreeItemPresentation
 			<umb-body-layout headline="Select">
 				<uui-box>
 					<umb-tree
+						hide-tree-root
 						alias=${this.data?.treeAlias}
 						@selection-change=${this.#onSelectionChange}
 						.selection=${this._selection}
