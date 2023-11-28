@@ -1,4 +1,4 @@
-import { UmbUserRepository } from '../../repository/user.repository.js';
+import { UmbUserDetailRepository } from '../../repository/index.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbEntityBulkActionBase } from '@umbraco-cms/backoffice/entity-bulk-action';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
@@ -9,7 +9,7 @@ import {
 	UMB_CONFIRM_MODAL,
 } from '@umbraco-cms/backoffice/modal';
 
-export class UmbUserDeleteEntityBulkAction extends UmbEntityBulkActionBase<UmbUserRepository> {
+export class UmbUserDeleteEntityBulkAction extends UmbEntityBulkActionBase<UmbUserDetailRepository> {
 	#modalContext?: UmbModalManagerContext;
 
 	constructor(host: UmbControllerHostElement, repositoryAlias: string, selection: Array<string>) {

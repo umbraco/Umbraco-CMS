@@ -1,8 +1,8 @@
-import { UmbDataTypeDetailRepository } from '@umbraco-cms/backoffice/data-type';
 import { UmbPropertyEditorConfig } from '../../property-editor/index.js';
+import { UmbDataTypeDetailModel, UmbDataTypeDetailRepository } from '@umbraco-cms/backoffice/data-type';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, ifDefined, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import type { DataTypeResponseModel, PropertyTypeModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { PropertyTypeModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -28,15 +28,15 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 	private _dataTypeData?: UmbPropertyEditorConfig;
 
 	private _dataTypeDetailRepository = new UmbDataTypeDetailRepository(this);
-	private _dataTypeObserver?: UmbObserverController<DataTypeResponseModel | undefined>;
+	private _dataTypeObserver?: UmbObserverController<UmbDataTypeDetailModel>;
 
-	private async _observeDataType(dataTypeId?: string) {
+	private async _observeDataType(dataTypeUnique?: string) {
 		this._dataTypeObserver?.destroy();
-		if (dataTypeId) {
+		if (dataTypeUnique) {
 			// Its not technically needed to have await here, this is only to ensure that the data is loaded before we observe it, and thereby only updating the DOM with the latest data.
-			await this._dataTypeDetailRepository.requestById(dataTypeId);
+			await this._dataTypeDetailRepository.requestByUnique(dataTypeUnique);
 			this._dataTypeObserver = this.observe(
-				await this._dataTypeDetailRepository.byId(dataTypeId),
+				await this._dataTypeDetailRepository.byUnique(dataTypeUnique),
 				(dataType) => {
 					this._dataTypeData = dataType?.values;
 					this._propertyEditorUiAlias = dataType?.propertyEditorUiAlias || undefined;

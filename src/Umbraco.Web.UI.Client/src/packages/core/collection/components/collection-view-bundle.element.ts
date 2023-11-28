@@ -1,4 +1,4 @@
-import { UMB_COLLECTION_CONTEXT, UmbCollectionContext } from '../collection.context.js';
+import { UMB_COLLECTION_CONTEXT, UmbDefaultCollectionContext } from '../collection-default.context.js';
 import { ManifestCollectionView } from '../../extension-registry/models/collection-view.model.js';
 import { css, html, customElement, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -13,9 +13,9 @@ export class UmbCollectionViewBundleElement extends UmbLitElement {
 	_currentView?: ManifestCollectionView;
 
 	@state()
-	private _collectionRootPathname = '';
+	private _collectionRootPathname?: string;
 
-	#collectionContext?: UmbCollectionContext<any, any>;
+	#collectionContext?: UmbDefaultCollectionContext<any, any>;
 
 	constructor() {
 		super();
@@ -23,10 +23,20 @@ export class UmbCollectionViewBundleElement extends UmbLitElement {
 		this.consumeContext(UMB_COLLECTION_CONTEXT, (context) => {
 			this.#collectionContext = context;
 			if (!this.#collectionContext) return;
-			this._collectionRootPathname = this.#collectionContext.collectionRootPathname;
+			this.#observeRootPathname();
 			this.#observeViews();
 			this.#observeCurrentView();
 		});
+	}
+
+	#observeRootPathname() {
+		this.observe(
+			this.#collectionContext!.rootPathname,
+			(rootPathname) => {
+				this._collectionRootPathname = rootPathname;
+			},
+			'umbCollectionRootPathnameObserver',
+		);
 	}
 
 	#observeCurrentView() {
@@ -51,6 +61,7 @@ export class UmbCollectionViewBundleElement extends UmbLitElement {
 	}
 	render() {
 		if (!this._currentView) return nothing;
+		if (this._views.length <= 1) return nothing;
 
 		return html`
 			<uui-button compact popovertarget="collection-view-bundle-popover" label="status">

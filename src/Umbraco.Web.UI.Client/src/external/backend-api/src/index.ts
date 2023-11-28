@@ -213,6 +213,8 @@ export type { PropertyTypeValidationModel } from './models/PropertyTypeValidatio
 export type { PublicAccessBaseModel } from './models/PublicAccessBaseModel';
 export type { PublicAccessRequestModel } from './models/PublicAccessRequestModel';
 export type { PublicAccessResponseModel } from './models/PublicAccessResponseModel';
+export type { PublishDocumentRequestModel } from './models/PublishDocumentRequestModel';
+export type { PublishDocumentWithDescendantsRequestModel } from './models/PublishDocumentWithDescendantsRequestModel';
 export { PublishedStateModel } from './models/PublishedStateModel';
 export type { RecycleBinItemResponseModel } from './models/RecycleBinItemResponseModel';
 export { RedirectStatusModel } from './models/RedirectStatusModel';
@@ -223,6 +225,7 @@ export type { RelationResponseModel } from './models/RelationResponseModel';
 export type { RelationTypeBaseModel } from './models/RelationTypeBaseModel';
 export type { RelationTypeItemResponseModel } from './models/RelationTypeItemResponseModel';
 export type { RelationTypeResponseModel } from './models/RelationTypeResponseModel';
+export type { ResendInviteUserRequestModel } from './models/ResendInviteUserRequestModel';
 export type { ResetPasswordRequestModel } from './models/ResetPasswordRequestModel';
 export type { ResetPasswordTokenRequestModel } from './models/ResetPasswordTokenRequestModel';
 export type { RichTextRuleModel } from './models/RichTextRuleModel';
@@ -273,6 +276,7 @@ export type { TextFileViewModelBaseModel } from './models/TextFileViewModelBaseM
 export type { TourStatusModel } from './models/TourStatusModel';
 export type { TreeItemPresentationModel } from './models/TreeItemPresentationModel';
 export type { UnlockUsersRequestModel } from './models/UnlockUsersRequestModel';
+export type { UnpublishDocumentRequestModel } from './models/UnpublishDocumentRequestModel';
 export type { UpdateContentForDocumentRequestModel } from './models/UpdateContentForDocumentRequestModel';
 export type { UpdateContentForMediaRequestModel } from './models/UpdateContentForMediaRequestModel';
 export type { UpdateContentTypeForDocumentTypeRequestModel } from './models/UpdateContentTypeForDocumentTypeRequestModel';

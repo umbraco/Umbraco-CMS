@@ -1,3 +1,4 @@
+import { UMB_USER_COLLECTION_ALIAS } from '../collection/manifests.js';
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
@@ -8,7 +9,11 @@ export class UmbSectionViewUsersElement extends UmbLitElement {
 	#routes: UmbRoute[] = [
 		{
 			path: 'collection',
-			component: () => import('../collection/user-collection.element.js'),
+			component: () => {
+				const element = document.createElement('umb-collection');
+				element.setAttribute('alias', UMB_USER_COLLECTION_ALIAS);
+				return element;
+			},
 		},
 		{
 			path: 'user',
@@ -21,7 +26,7 @@ export class UmbSectionViewUsersElement extends UmbLitElement {
 	];
 
 	render() {
-		return html`<umb-router-slot id="router-slot" .routes=${this.#routes}></umb-router-slot>`;
+		return html` <umb-router-slot id="router-slot" .routes=${this.#routes}></umb-router-slot> `;
 	}
 
 	static styles = [

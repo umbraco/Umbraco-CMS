@@ -1,10 +1,10 @@
 import { Meta } from '@storybook/web-components';
 import './property-editor-ui-tiny-mce-dimensions-configuration.element.js';
 import { umbDataTypeData } from '../../../../../../../mocks/data/data-type.data.js';
-import { DataTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { html } from '@umbraco-cms/backoffice/external/lit';
+import { UmbDataTypeDetailModel } from '@umbraco-cms/backoffice/data-type';
 
-const dataTypeData = umbDataTypeData.getById('dt-richTextEditor') as DataTypeResponseModel;
+const dataTypeData = umbDataTypeData.getById('dt-richTextEditor') as UmbDataTypeDetailModel;
 
 export default {
 	title: 'Property Editor UIs/Tiny Mce Dimensions Configuration',

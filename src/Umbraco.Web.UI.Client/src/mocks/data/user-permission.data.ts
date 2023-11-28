@@ -17,7 +17,7 @@ export const data: Array<UserPermissionModel> = [
 		target: {
 			entityType: UMB_DOCUMENT_ENTITY_TYPE,
 			documentId: 'simple-document-id',
-			userGroupId: '9d24dc47-a4bf-427f-8a4a-b900f03b8a12',
+			userGroupId: 'user-group-administrators-id',
 		},
 		permissions: [UMB_USER_PERMISSION_DOCUMENT_READ],
 	},
@@ -26,7 +26,7 @@ export const data: Array<UserPermissionModel> = [
 		target: {
 			entityType: UMB_DOCUMENT_ENTITY_TYPE,
 			documentId: 'simple-document-id',
-			userGroupId: 'f4626511-b0d7-4ab1-aebc-a87871a5dcfa',
+			userGroupId: 'user-group-editors-id',
 		},
 		permissions: [UMB_USER_PERMISSION_DOCUMENT_READ, UMB_USER_PERMISSION_DOCUMENT_CREATE],
 	},
@@ -35,7 +35,7 @@ export const data: Array<UserPermissionModel> = [
 		target: {
 			entityType: UMB_DOCUMENT_ENTITY_TYPE,
 			documentId: 'c05da24d-7740-447b-9cdc-bd8ce2172e38',
-			userGroupId: '9d24dc47-a4bf-427f-8a4a-b900f03b8a12',
+			userGroupId: 'user-group-administrators-id',
 		},
 		permissions: [UMB_USER_PERMISSION_DOCUMENT_READ],
 	},

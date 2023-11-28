@@ -21,23 +21,23 @@ export class UmbDataTypeCopyServerDataSource implements UmbCopyDataSource {
 	}
 
 	/**
-	 * Copy an item for the given id to the target id
-	 * @param {Array<string>} id
+	 * Copy an item for the given unique to the target unique
+	 * @param {Array<string>} unique
 	 * @return {*}
 	 * @memberof UmbDataTypeCopyServerDataSource
 	 */
-	async copy(id: string, targetId: string | null) {
-		if (!id) throw new Error('Id is missing');
-		if (targetId === undefined) throw new Error('Target Id is missing');
+	async copy(unique: string, targetUnique: string | null) {
+		if (!unique) throw new Error('Unique is missing');
+		if (targetUnique === undefined) throw new Error('Target unique is missing');
 
 		return tryExecuteAndNotify(
 			this.#host,
 			DataTypeResource.postDataTypeByIdCopy({
-				id,
+				id: unique,
 				requestBody: {
-					targetId,
+					targetId: targetUnique,
 				},
-			})
+			}),
 		);
 	}
 }

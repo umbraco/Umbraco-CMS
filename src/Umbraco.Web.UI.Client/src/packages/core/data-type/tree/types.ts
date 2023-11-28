@@ -1,5 +1,14 @@
 import { type DataTypeTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import type { UmbEntityTreeItemModel, UmbEntityTreeRootModel } from '@umbraco-cms/backoffice/tree';
+import type { UmbEntityTreeRootModel } from '@umbraco-cms/backoffice/tree';
 
-export type UmbDataTypeTreeItemModel = DataTypeTreeItemResponseModel & UmbEntityTreeItemModel;
+export type UmbDataTypeTreeItemModel = {
+	unique: string;
+	parentUnique: string | null;
+	isFolder: boolean;
+	isContainer: boolean;
+	name: string;
+	type: string;
+	hasChildren: boolean;
+};
+
 export type UmbDataTypeTreeRootModel = DataTypeTreeItemResponseModel & UmbEntityTreeRootModel;

@@ -10,6 +10,7 @@ import {
 	PagedDocumentTreeItemResponseModel,
 	PagedDocumentTypeResponseModel,
 	PagedRecycleBinItemResponseModel,
+	PublishDocumentRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '@umbraco-cms/backoffice/document';
 
@@ -691,6 +692,55 @@ class UmbDocumentData extends UmbEntityData<DocumentResponseModel> {
 			}
 		});
 		return result;
+	}
+
+	publish(id: string, data: PublishDocumentRequestModel) {
+
+		// Update detail data:
+		const foundIndex = this.data.findIndex((item) => item.id === id);
+		if (foundIndex !== -1) {
+			// update
+			this.data[foundIndex].variants?.forEach((variant) => {
+				if (data.cultures?.includes(variant.culture ?? '')) {
+					variant.state = ContentStateModel.PUBLISHED;
+				}
+			});
+		}
+
+		// TODO: Tree data is not aware about variants and status of variants: so this is not good enough:
+		this.treeData = this.treeData.map((x) => {
+			if (x.id && x.id === id) {
+				return { ...x, isPublished: true };
+			} else {
+				return x;
+			}
+		});
+		return true;
+	}
+
+	unpublish(id: string, data: PublishDocumentRequestModel) {
+
+		// Update detail data:
+		const foundIndex = this.data.findIndex((item) => item.id === id);
+		if (foundIndex !== -1) {
+			// update
+			this.data[foundIndex].variants?.forEach((variant) => {
+				if (data.cultures?.includes(variant.culture ?? '')) {
+					variant.state = ContentStateModel.DRAFT;
+				}
+			});
+		}
+
+		// TODO: Tree data is not aware about variants and status of variants: so this is not good enough:
+		this.treeData = this.treeData.map((x) => {
+			if (x.id && x.id === id) {
+				return { ...x, isPublished: false };
+			} else {
+				return x;
+			}
+		});
+
+		return true;
 	}
 
 	trash(ids: string[]): DocumentResponseModel[] {

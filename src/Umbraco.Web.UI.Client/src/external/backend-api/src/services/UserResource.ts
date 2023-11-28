@@ -14,6 +14,7 @@ import type { EnableUserRequestModel } from '../models/EnableUserRequestModel';
 import type { InviteUserRequestModel } from '../models/InviteUserRequestModel';
 import type { LinkedLoginsRequestModel } from '../models/LinkedLoginsRequestModel';
 import type { PagedUserResponseModel } from '../models/PagedUserResponseModel';
+import type { ResendInviteUserRequestModel } from '../models/ResendInviteUserRequestModel';
 import type { SetAvatarRequestModel } from '../models/SetAvatarRequestModel';
 import type { UnlockUsersRequestModel } from '../models/UnlockUsersRequestModel';
 import type { UpdateUserGroupsOnUserRequestModel } from '../models/UpdateUserGroupsOnUserRequestModel';
@@ -326,6 +327,24 @@ export class UserResource {
      * @returns any Success
      * @throws ApiError
      */
+    public static getUserCurrentPermissionsDocument1({
+        id,
+    }: {
+        id?: Array<string>,
+    }): CancelablePromise<Array<UserPermissionsResponseModel>> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v2/user/current/permissions/document',
+            query: {
+                'id': id,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
     public static getUserCurrentPermissionsMedia({
         id,
     }: {
@@ -334,6 +353,24 @@ export class UserResource {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/user/current/permissions/media',
+            query: {
+                'id': id,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getUserCurrentPermissionsMedia1({
+        id,
+    }: {
+        id?: Array<string>,
+    }): CancelablePromise<Array<UserPermissionsResponseModel>> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v2/user/current/permissions/media',
             query: {
                 'id': id,
             },
@@ -450,6 +487,26 @@ export class UserResource {
             mediaType: 'application/json',
             errors: {
                 404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static postUserInviteResend({
+        requestBody,
+    }: {
+        requestBody?: ResendInviteUserRequestModel,
+    }): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/umbraco/management/api/v1/user/invite/resend',
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                400: `Bad Request`,
             },
         });
     }

@@ -1,7 +1,7 @@
 import { UmbActionExecutedEvent } from '@umbraco-cms/backoffice/event';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UMB_COLLECTION_CONTEXT, UmbCollectionContext } from '@umbraco-cms/backoffice/collection';
+import { UMB_COLLECTION_CONTEXT, UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-collection-selection-actions')
@@ -17,7 +17,7 @@ export class UmbCollectionSelectionActionsElement extends UmbLitElement {
 
 	private _selection: Array<string | null> = [];
 
-	private _collectionContext?: UmbCollectionContext<any, any>;
+	private _collectionContext?: UmbDefaultCollectionContext<any, any>;
 
 	constructor() {
 		super();
@@ -34,7 +34,7 @@ export class UmbCollectionSelectionActionsElement extends UmbLitElement {
 	}
 
 	private _handleClearSelection() {
-		this._collectionContext?.clearSelection();
+		this._collectionContext?.selection.clearSelection();
 	}
 
 	private _observeCollectionContext() {
@@ -49,7 +49,7 @@ export class UmbCollectionSelectionActionsElement extends UmbLitElement {
 		);
 
 		this.observe(
-			this._collectionContext.selection,
+			this._collectionContext.selection.selection,
 			(selection) => {
 				this._selectionLength = selection.length;
 				this._selection = selection;
@@ -65,7 +65,7 @@ export class UmbCollectionSelectionActionsElement extends UmbLitElement {
 
 	#onActionExecuted(event: UmbActionExecutedEvent) {
 		event.stopPropagation();
-		this._collectionContext?.clearSelection();
+		this._collectionContext?.selection.clearSelection();
 	}
 
 	render() {
