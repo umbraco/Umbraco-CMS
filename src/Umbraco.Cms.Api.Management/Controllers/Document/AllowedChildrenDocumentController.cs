@@ -13,6 +13,7 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Document;
 
+[ApiVersion("1.0")]
 [Authorize(Policy = "New" + AuthorizationPolicies.TreeAccessDocumentsOrDocumentTypes)]
 public class AllowedChildrenDocumentController : DocumentControllerBase
 {
