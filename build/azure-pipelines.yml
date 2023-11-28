@@ -91,6 +91,12 @@ stages:
                 "npm_client" | "$(Agent.OS)"
                 "npm_client"
               path: $(npm_config_cache)
+          - script: npm ci --no-fund --no-audit --prefer-offline
+            displayName: Run npm ci (Bellissima)
+            workingDirectory: src/Umbraco.Web.UI.New.Client
+          - script: npm run build:for:npm
+            displayName: Run build:for:npm (Bellissima)
+            workingDirectory: src/Umbraco.Web.UI.New.Client
           - bash: |
               mkdir -p src/Umbraco.Cms.StaticAssets/wwwroot/umbraco/auth
               mkdir -p src/Umbraco.Cms.StaticAssets/wwwroot/umbraco/backoffice
@@ -122,12 +128,6 @@ stages:
 #          - script: nbgv cloud
 #            displayName: Set version variables
 #            name: version
-          - script: npm ci --no-fund --no-audit --prefer-offline
-            displayName: Run npm ci (Bellissima)
-            workingDirectory: src/Umbraco.Web.UI.New.Client
-          - script: npm run build:for:npm
-            displayName: Run build:for:npm (Bellissima)
-            workingDirectory: src/Umbraco.Web.UI.New.Client
           - bash: |
               echo "##[group]npm pack details"
               echo "##[command]Running npm version"
