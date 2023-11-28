@@ -12,7 +12,7 @@ export class UmbUserGroupPickerModalElement extends UmbModalBaseElement<any, any
 	@state()
 	private _userGroups: Array<UserGroupResponseModel> = [];
 
-	#selectionManager = new UmbSelectionManager();
+	#selectionManager = new UmbSelectionManager(this);
 	#userGroupCollectionRepository = new UmbUserGroupCollectionRepository(this);
 
 	connectedCallback(): void {

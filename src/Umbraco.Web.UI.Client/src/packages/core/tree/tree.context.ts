@@ -13,20 +13,10 @@ import { type UmbControllerHostElement } from '@umbraco-cms/backoffice/controlle
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { ProblemDetails } from '@umbraco-cms/backoffice/backend-api';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
-import { UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
 
 // TODO: update interface
 export interface UmbTreeContext<TreeItemType extends UmbTreeItemModelBase> extends UmbBaseController {
-	readonly selectable: Observable<boolean>;
-	readonly selection: Observable<Array<string | null>>;
-	setSelectable(value: boolean): void;
-	getSelectable(): boolean;
-	setMultiple(value: boolean): void;
-	getMultiple(): boolean;
-	setSelection(value: Array<string | null>): void;
-	getSelection(): Array<string | null>;
-	select(unique: string | null): void;
-	deselect(unique: string | null): void;
+	selection: UmbSelectionManager;
 	requestChildrenOf: (parentUnique: string | null) => Promise<{
 		data?: UmbPagedData<TreeItemType>;
 		error?: ProblemDetails;
@@ -38,16 +28,10 @@ export class UmbTreeContextBase<TreeItemType extends UmbTreeItemModelBase>
 	extends UmbBaseController
 	implements UmbTreeContext<TreeItemType>
 {
-	#selectionManager = new UmbSelectionManager();
-
-	#selectable = new UmbBooleanState(false);
-	public readonly selectable = this.#selectable.asObservable();
-
-	public readonly multiple = this.#selectionManager.multiple;
-	public readonly selection = this.#selectionManager.selection;
-
 	public repository?: UmbTreeRepository<TreeItemType>;
 	public selectableFilter?: (item: TreeItemType) => boolean = () => true;
+
+	public readonly selection = new UmbSelectionManager(this._host);
 
 	#treeAlias?: string;
 
@@ -80,41 +64,6 @@ export class UmbTreeContextBase<TreeItemType extends UmbTreeItemModelBase>
 
 	public getTreeAlias() {
 		return this.#treeAlias;
-	}
-
-	public setSelectable(value: boolean) {
-		this.#selectable.next(value);
-	}
-
-	public getSelectable() {
-		return this.#selectable.getValue();
-	}
-
-	public setMultiple(value: boolean) {
-		this.#selectionManager.setMultiple(value);
-	}
-
-	public getMultiple() {
-		return this.#selectionManager.getMultiple();
-	}
-
-	public setSelection(value: Array<string | null>) {
-		this.#selectionManager.setSelection(value);
-	}
-
-	public getSelection() {
-		return this.#selectionManager.getSelection();
-	}
-
-	public select(unique: string | null) {
-		if (!this.getSelectable()) return;
-		this.#selectionManager.select(unique);
-		this._host.getHostElement().dispatchEvent(new UmbSelectionChangeEvent());
-	}
-
-	public deselect(unique: string | null) {
-		this.#selectionManager.deselect(unique);
-		this._host.getHostElement().dispatchEvent(new UmbSelectionChangeEvent());
 	}
 
 	public async requestTreeRoot() {

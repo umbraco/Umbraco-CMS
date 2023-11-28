@@ -16,7 +16,7 @@ export class UmbSectionPickerModalElement extends UmbModalBaseElement<
 	@state()
 	private _sections: Array<ManifestSection> = [];
 
-	#selectionManager = new UmbSelectionManager();
+	#selectionManager = new UmbSelectionManager(this);
 
 	#submit() {
 		this.modalContext?.submit({
@@ -38,7 +38,8 @@ export class UmbSectionPickerModalElement extends UmbModalBaseElement<
 		this.observe(
 			umbExtensionsRegistry.extensionsOfType('section'),
 			(sections: Array<ManifestSection>) => (this._sections = sections),
-		), 'umbSectionsObserver';
+		),
+			'umbSectionsObserver';
 	}
 
 	render() {

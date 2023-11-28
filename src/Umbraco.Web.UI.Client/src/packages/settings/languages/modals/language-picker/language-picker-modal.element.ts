@@ -18,7 +18,7 @@ export class UmbLanguagePickerModalElement extends UmbModalBaseElement<
 	private _languages: Array<LanguageResponseModel> = [];
 
 	#languageRepository = new UmbLanguageRepository(this);
-	#selectionManager = new UmbSelectionManager();
+	#selectionManager = new UmbSelectionManager(this);
 
 	connectedCallback(): void {
 		super.connectedCallback();

@@ -105,12 +105,12 @@ export class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemModelBase>
 
 	public select() {
 		if (this.unique === undefined) throw new Error('Could not select, unique key is missing');
-		this.treeContext?.select(this.unique);
+		this.treeContext?.selection.select(this.unique);
 	}
 
 	public deselect() {
 		if (this.unique === undefined) throw new Error('Could not deselect, unique key is missing');
-		this.treeContext?.deselect(this.unique);
+		this.treeContext?.selection.deselect(this.unique);
 	}
 
 	#consumeContexts() {
@@ -138,7 +138,7 @@ export class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemModelBase>
 	#observeIsSelectable() {
 		if (!this.treeContext) return;
 		this.observe(
-			this.treeContext.selectable,
+			this.treeContext.selection.selectable,
 			(value) => {
 				this.#isSelectableContext.next(value);
 
@@ -156,7 +156,7 @@ export class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemModelBase>
 		if (!this.treeContext || !this.unique) return;
 
 		this.observe(
-			this.treeContext.selection.pipe(map((selection) => selection.includes(this.unique!))),
+			this.treeContext.selection.selection.pipe(map((selection) => selection.includes(this.unique!))),
 			(isSelected) => {
 				this.#isSelected.next(isSelected);
 			},

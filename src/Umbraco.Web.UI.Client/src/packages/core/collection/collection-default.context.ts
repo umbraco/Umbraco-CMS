@@ -53,7 +53,7 @@ export class UmbDefaultCollectionContext<ItemType = any, FilterModelType extends
 	});
 
 	public readonly pagination = new UmbPaginationManager();
-	public readonly selection = new UmbSelectionManager();
+	public readonly selection = new UmbSelectionManager(this);
 
 	constructor(host: UmbControllerHostElement, config: UmbCollectionConfiguration = { pageSize: 50 }) {
 		super(host);

@@ -19,27 +19,27 @@ export class UmbTreeElement extends UmbLitElement {
 
 	@property({ type: Boolean, reflect: true })
 	get selectable() {
-		return this.#treeContext.getSelectable();
+		return this.#treeContext.selection.getSelectable();
 	}
 	set selectable(newVal) {
-		this.#treeContext.setSelectable(newVal);
+		this.#treeContext.selection.setSelectable(newVal);
 	}
 
 	@property({ type: Array })
 	get selection() {
-		return this.#treeContext.getSelection();
+		return this.#treeContext.selection.getSelection();
 	}
 	set selection(newVal) {
 		if (!Array.isArray(newVal)) return;
-		this.#treeContext?.setSelection(newVal);
+		this.#treeContext?.selection.setSelection(newVal);
 	}
 
 	@property({ type: Boolean, reflect: true })
 	get multiple() {
-		return this.#treeContext.getMultiple();
+		return this.#treeContext.selection.getMultiple();
 	}
 	set multiple(newVal) {
-		this.#treeContext.setMultiple(newVal);
+		this.#treeContext.selection.setMultiple(newVal);
 	}
 
 	// TODO: what is the best name for this functionality?
