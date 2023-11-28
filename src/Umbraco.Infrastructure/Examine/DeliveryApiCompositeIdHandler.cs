@@ -9,11 +9,11 @@ public class DeliveryApiCompositeIdHandler : IDeliveryApiCompositeIdHandler
     public DeliveryApiIndexCompositeIdModel Decompose(string indexId)
     {
         var parts = indexId.Split(Constants.CharArrays.VerticalTab);
-        if (parts.Length == 2 && int.TryParse(parts[0], out _))
+        if (parts.Length == 2 && int.TryParse(parts[0], out var id))
         {
             return new DeliveryApiIndexCompositeIdModel
             {
-                Id = parts[0],
+                Id = id,
                 Culture = parts[1],
             };
         }

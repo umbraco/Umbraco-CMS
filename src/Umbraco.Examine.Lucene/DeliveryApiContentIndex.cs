@@ -125,7 +125,7 @@ public class DeliveryApiContentIndex : UmbracoExamineIndex
     private (string? ContentId, string? Culture) ParseItemId(string id)
     {
         DeliveryApiIndexCompositeIdModel compositeIdModel = _deliveryApiCompositeIdHandler.Decompose(id);
-        return (compositeIdModel.Id ?? id, compositeIdModel.Culture);
+        return (compositeIdModel.Id.ToString() ?? id, compositeIdModel.Culture);
     }
 
     protected override void OnTransformingIndexValues(IndexingItemEventArgs e)

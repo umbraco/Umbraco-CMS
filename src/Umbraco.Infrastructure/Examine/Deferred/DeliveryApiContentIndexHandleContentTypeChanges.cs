@@ -96,12 +96,12 @@ internal sealed class DeliveryApiContentIndexHandleContentTypeChanges : Delivery
                 .Select(id =>
                 {
                     DeliveryApiIndexCompositeIdModel compositeIdModel = _deliveryApiCompositeIdHandler.Decompose(id);
-                    if (int.TryParse(compositeIdModel.Id, out var contentId) is false)
+                    if (compositeIdModel.Id is null)
                     {
                         throw new InvalidOperationException($"Delivery API identifier should be composite of ID and culture, got: {id}");
                     }
 
-                    return (ContentId: contentId, IndexId: compositeIdModel.Culture!);
+                    return (ContentId: compositeIdModel.Id.Value, IndexId: compositeIdModel.Culture!);
                 })
                 .GroupBy(tuple => tuple.ContentId)
                 .ToDictionary(
