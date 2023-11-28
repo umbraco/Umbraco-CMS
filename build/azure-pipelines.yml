@@ -68,14 +68,12 @@ stages:
       #- Build
       #- Deploy_MyGet
       #- Build_Docs
-    condition: and(succeeded(), or(startsWith(variables['Build.SourceBranch'], 'refs/heads/release/'), ${{parameters.npmDeploy}}))
     jobs:
       - job:
-        displayName: Push to NPM
+        name: Prepare
+        displayName: Prepare NPM artifact
+        condition: and(succeeded(), or(startsWith(variables['Build.SourceBranch'], 'refs/heads/release/'), ${{parameters.npmDeploy}}))
         steps:
-          #- checkout: none
-          #- download: current
-          #  artifact: npm
           - checkout: self
             submodules: true
           - task: NodeTool@0
@@ -119,15 +117,6 @@ stages:
               command: build
               projects: $(solution)
               arguments: '--configuration $(buildConfiguration) --no-restore --property:ContinuousIntegrationBuild=true --property:GeneratePackageOnBuild=true --property:PackageOutputPath=$(Build.ArtifactStagingDirectory)/nupkg'
-#          - task: DotNetCoreCLI@2
-#            inputs:
-#              command: custom
-#              custom: tool
-#              arguments: install --tool-path . nbgv
-#            displayName: Install NBGV tool
-#          - script: nbgv cloud
-#            displayName: Set version variables
-#            name: version
           - bash: |
               echo "##[group]npm pack details"
               echo "##[command]Running npm version"
@@ -148,39 +137,49 @@ stages:
             inputs:
               targetPath: $(Build.ArtifactStagingDirectory)/npm
               artifactName: npm
-#          - task: npmAuthenticate@0
-#            displayName: Authenticate with npm
-#            inputs:
-#              workingFile: $(Pipeline.Workspace)/npm/.npmrc
-#              customEndpoint: 'NPM - Umbraco Backoffice'
-#          - script: |
-#              # Setup temp npm project to load in defaults from the local .npmrc
-#              npm init -y
-#
-#              echo "Npm config"
-#              npm config ls -l
-#
-#              echo "Testing npm is authenticated"
-#              npm whoami
-#            displayName: npm whoami
-#            workingDirectory: $(Pipeline.Workspace)/npm
-#          - script: |
-#              # Calculate npm tag based on the PublicRelease variable
-#              if [[ "$PUBLIC_RELEASE" = true ]]; then
-#                  npmTag=latest
-#              else
-#                  npmTag=next
-#              fi
-#
-#              echo "##[debug]Publishing Backoffice package with version '$NPM_VERSION'"
-#              echo "##[debug]Publishing Backoffice package with tag '$npmTag'"
-#
-#              npm publish --tag $npmTag $NPM_VERSION.tgz
-#            displayName: Publish npm
-#            env:
-#              PUBLIC_RELEASE: $[ stageDependencies.Build.A.outputs['dotnetBuild.PublicRelease'] ]
-#              NPM_VERSION: $[ stageDependencies.Build.A.outputs['dotnetBuild.NPMPackageVersion'] ]
-#            workingDirectory: $(Pipeline.Workspace)/npm
+      - job:
+        name: Publish
+        displayName: Push to NPM
+        condition: and(succeeded(), or(startsWith(variables['Build.SourceBranch'], 'refs/heads/release/'), ${{parameters.npmDeploy}}))
+        dependsOn: Prepare
+        steps:
+          - checkout: none
+          - download: current
+            artifact: npm
+          - task: npmAuthenticate@0
+            displayName: Authenticate with npm
+            inputs:
+              workingFile: $(Pipeline.Workspace)/npm/.npmrc
+              customEndpoint: 'NPM - Umbraco Backoffice'
+          - script: |
+              # Setup temp npm project to load in defaults from the local .npmrc
+              npm init -y
+
+              echo "Npm config"
+              npm config ls -l
+
+              echo "Testing npm is authenticated"
+              npm whoami
+            displayName: npm whoami
+            workingDirectory: $(Pipeline.Workspace)/npm
+          - bash: |
+              # Calculate npm tag based on the NBGV_PublicRelease variable
+              if [[ "$PUBLIC_RELEASE" = "True" ]]; then
+                  npmTag=latest
+              else
+                  npmTag=next
+              fi
+
+              echo "##[debug]Publishing Backoffice package as public release '$PUBLIC_RELEASE'"
+              echo "##[debug]Publishing Backoffice package with tag '$npmTag'"
+
+              files=( ./*.tgz )
+              npm publish --dry-run --tag $npmTag "${files[0]}"
+            displayName: Publish npm
+            continueOnError: true
+            env:
+              PUBLIC_RELEASE: $[ dependencies.Prepare.outputs['build.NBGV_PublicRelease'] ]
+            workingDirectory: $(Pipeline.Workspace)/npm
   ###############################################
   ## Build
   ###############################################
