@@ -12,6 +12,6 @@ export abstract class UmbContextBase<
 > extends UmbBaseController {
 	constructor(host: UmbControllerHost, contextToken: GivenContextToken | string) {
 		super(host, contextToken.toString());
-		//this.provideContext(contextToken, this as unknown as ContextType);
+		this.provideContext(contextToken, this as unknown as ContextType);
 	}
 }
