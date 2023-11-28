@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Infrastructure.Examine;
+﻿namespace Umbraco.Cms.Core.DeliveryApi;
 
 public class DeliveryApiIndexCompositeIdModel
 {
