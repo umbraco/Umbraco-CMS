@@ -46,7 +46,6 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
     {
         // Sometimes we do not dispose all services in time and the test fails because the log file is locked. Resulting in all other tests failing aswell
         Services.DisposeIfDisposable();
-        Thread.Sleep(1000);
         TestHelper.DeleteDirectory(_examinePath + "InternalIndex");
         TestHelper.DeleteDirectory(_examinePath + "ExternalIndex");
     }
@@ -54,8 +53,6 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
     private IBackOfficeExamineSearcher BackOfficeExamineSearcher => GetRequiredService<IBackOfficeExamineSearcher>();
 
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
-
-    private IIndexRebuilder IndexRebuilder => GetRequiredService<IIndexRebuilder>();
 
     private ILocalizationService LocalizationService => GetRequiredService<ILocalizationService>();
 
@@ -102,7 +99,7 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
         var contentType = new ContentTypeBuilder()
             .WithId(0)
             .Build();
-        ContentTypeService.Save(contentType);
+        await ExecuteAndWaitForIndexing(() => ContentTypeService.Save(contentType), Constants.UmbracoIndexes.InternalIndexName);
 
         var content = new ContentBuilder()
             .WithId(0)
@@ -129,7 +126,7 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
             .WithId(0)
             .WithContentVariation(ContentVariation.Culture)
             .Build();
-        ContentTypeService.Save(contentType);
+        await ExecuteAndWaitForIndexing(() => ContentTypeService.Save(contentType), Constants.UmbracoIndexes.InternalIndexName);
 
         var content = new ContentBuilder()
             .WithId(0)
@@ -145,7 +142,7 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
     [Test]
     public async Task Search_Published_Content_With_Empty_Query()
     {
-        SetupUserIdentity(Constants.Security.SuperUserIdAsString);
+        await SetupUserIdentity(Constants.Security.SuperUserIdAsString);
 
         // Arrange
         var contentName = "TestContent";
@@ -180,13 +177,13 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
     }
 
     [Test]
-    public void Search_Published_Content_With_Query_By_Non_Existing_Content_Name()
+    public async Task Search_Published_Content_With_Query_By_Non_Existing_Content_Name()
     {
         // Arrange
-        SetupUserIdentity(Constants.Security.SuperUserIdAsString);
+        await SetupUserIdentity(Constants.Security.SuperUserIdAsString);
 
         string contentName = "TestContent";
-        CreateDefaultPublishedContent(contentName);
+        await CreateDefaultPublishedContent(contentName);
 
         string query = "ContentTest";
         // Act
@@ -200,7 +197,7 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
     public async Task Search_Published_Content_With_Query_By_Content_Id()
     {
         // Arrange
-        SetupUserIdentity(Constants.Security.SuperUserIdAsString);
+        await SetupUserIdentity(Constants.Security.SuperUserIdAsString);
 
         string contentName = "RandomContentName";
         PublishResult createdContent = await CreateDefaultPublishedContent(contentName);
@@ -222,7 +219,7 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
     public async Task Search_Two_Published_Content_With_Similar_Names_By_Name()
     {
         // Arrange
-        SetupUserIdentity(Constants.Security.SuperUserIdAsString);
+        await SetupUserIdentity(Constants.Security.SuperUserIdAsString);
 
         string contentName = "TestName Original";
         string secondContentName = "TestName Copy";
@@ -230,7 +227,7 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
         var contentType = new ContentTypeBuilder()
             .WithId(0)
             .Build();
-        ContentTypeService.Save(contentType);
+        await ExecuteAndWaitForIndexing(() => ContentTypeService.Save(contentType), Constants.UmbracoIndexes.InternalIndexName);
 
         var firstContent = new ContentBuilder()
             .WithId(0)
@@ -245,8 +242,6 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
             .WithContentType(contentType)
             .Build();
         await ExecuteAndWaitForIndexing(() => ContentService.SaveAndPublish(secondContent), Constants.UmbracoIndexes.InternalIndexName);
-
-        // IndexRebuilder.RebuildIndex("InternalIndex");
         string query = contentName;
 
         // Act
@@ -258,18 +253,61 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
         Assert.AreEqual(actual.First().Id, firstContent.Id.ToString());
         // Checks if the score for the original name is higher than the score for the copy
         Assert.Greater(actual.First().Score, actual.Last().Score);
-
-        Thread.Sleep(3000);
     }
 
     [Test]
     public async Task Search_For_Child_Published_Content_With_Query_By_Content_Name()
     {
         // Arrange
-        SetupUserIdentity(Constants.Security.SuperUserIdAsString);
+        await SetupUserIdentity(Constants.Security.SuperUserIdAsString);
 
         string contentName = "ParentTestContent";
         string childContentName = "ChildTestContent";
+
+        var contentType = new ContentTypeBuilder()
+            .WithName("Document")
+            .Build();
+        await ExecuteAndWaitForIndexing(() => ContentTypeService.Save(contentType), Constants.UmbracoIndexes.InternalIndexName);
+
+        var content = new ContentBuilder()
+            .WithName(contentName)
+            .WithContentType(contentType)
+            .Build();
+        await ExecuteAndWaitForIndexing(() => ContentService.SaveAndPublish(content), Constants.UmbracoIndexes.InternalIndexName);
+
+        var childContent = new ContentBuilder()
+            .WithName(childContentName)
+            .WithContentType(contentType)
+            .WithParentId(content.Id)
+            .Build();
+        await ExecuteAndWaitForIndexing(() => ContentService.SaveAndPublish(childContent), Constants.UmbracoIndexes.InternalIndexName);
+
+        string parentQuery = content.Id.ToString();
+
+        string childQuery = childContent.Id.ToString();
+
+        // Act
+        IEnumerable<ISearchResult> parentContentActual = BackOfficeExamineSearch(parentQuery);
+
+        IEnumerable<ISearchResult> childContentActual = BackOfficeExamineSearch(childQuery);
+
+        // Assert
+        Assert.AreEqual(1, parentContentActual.Count());
+        Assert.AreEqual(1, childContentActual.Count());
+
+        Assert.AreEqual(parentContentActual.First().Values["nodeName"], contentName);
+        Assert.AreEqual(childContentActual.First().Values["nodeName"], childContentName);
+    }
+
+    [Test]
+    public async Task Search_For_Child_In_Child_Published_Content_With_Query_By_Content_Name()
+    {
+        // Arrange
+        await SetupUserIdentity(Constants.Security.SuperUserIdAsString);
+
+        string contentName = "ParentTestContent";
+        string childContentName = "ChildTestContent";
+        string childChildContentName = "ChildChildTestContent";
 
         var contentType = new ContentTypeBuilder()
             .WithName("Document")
@@ -289,67 +327,12 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
             .Build();
         await ExecuteAndWaitForIndexing(() => ContentService.SaveAndPublish(childContent), Constants.UmbracoIndexes.InternalIndexName);
 
-
-        IndexRebuilder.RebuildIndex("InternalIndex");
-
-        string parentQuery = content.Id.ToString();
-
-        string childQuery = childContent.Id.ToString();
-
-        // Act
-        IEnumerable<ISearchResult> parentContentActual = BackOfficeExamineSearch(parentQuery);
-
-        IEnumerable<ISearchResult> childContentActual = BackOfficeExamineSearch(childQuery);
-
-        // Assert
-        Assert.AreEqual(1, parentContentActual.Count());
-        Assert.AreEqual(1, childContentActual.Count());
-
-        Assert.AreEqual(parentContentActual.First().Values["nodeName"], contentName);
-        Assert.AreEqual(childContentActual.First().Values["nodeName"], childContentName);
-
-        Thread.Sleep(1000);
-    }
-
-    [Test]
-    public void Search_For_Child_In_Child_Published_Content_With_Query_By_Content_Name()
-    {
-        // Arrange
-        SetupUserIdentity(Constants.Security.SuperUserIdAsString);
-
-        string contentName = "ParentTestContent";
-        string childContentName = "ChildTestContent";
-        string childChildContentName = "ChildChildTestContent";
-
-        var contentType = new ContentTypeBuilder()
-            .WithName("Document")
-            .Build();
-        ContentTypeService.Save(contentType);
-
-        var content = new ContentBuilder()
-            .WithName(contentName)
-            .WithContentType(contentType)
-            .Build();
-        ContentService.SaveAndPublish(content);
-        Thread.Sleep(1000);
-
-        var childContent = new ContentBuilder()
-            .WithName(childContentName)
-            .WithContentType(contentType)
-            .WithParentId(content.Id)
-            .Build();
-        ContentService.SaveAndPublish(childContent);
-        Thread.Sleep(1000);
-
         var childChildContent = new ContentBuilder()
             .WithName(childChildContentName)
             .WithContentType(contentType)
             .WithParentId(childContent.Id)
             .Build();
-        ContentService.SaveAndPublish(childChildContent);
-        Thread.Sleep(1000);
-
-        IndexRebuilder.RebuildIndex("InternalIndex");
+        await ExecuteAndWaitForIndexing(() => ContentService.SaveAndPublish(childChildContent), Constants.UmbracoIndexes.InternalIndexName);
 
         string parentQuery = content.Id.ToString();
 
@@ -372,9 +355,6 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
         Assert.AreEqual(parentContentActual.First().Values["nodeName"], contentName);
         Assert.AreEqual(childContentActual.First().Values["nodeName"], childContentName);
         Assert.AreEqual(childChildContentActual.First().Values["nodeName"], childChildContentName);
-
-        // If we do not have this wait the IndexFile will be locked
-        Thread.Sleep(5000);
     }
 
     [Test]
@@ -392,16 +372,14 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
 
         // Assert
         Assert.AreEqual(0, actual.Count());
-
-        Thread.Sleep(1000);
     }
 
     // Multiple Languages
     [Test]
-    public void Search_Published_Content_By_Content_Name_With_Two_Languages()
+    public async Task Search_Published_Content_By_Content_Name_With_Two_Languages()
     {
         // Arrange
-        SetupUserIdentity(Constants.Security.SuperUserIdAsString);
+        await SetupUserIdentity(Constants.Security.SuperUserIdAsString);
 
         string usIso = "en-US";
         string dkIso = "da";
@@ -418,7 +396,7 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
             .WithId(0)
             .WithContentVariation(ContentVariation.Culture)
             .Build();
-        ContentTypeService.Save(contentType);
+        await ExecuteAndWaitForIndexing(() => ContentTypeService.Save(contentType), Constants.UmbracoIndexes.InternalIndexName);
 
         var content = new ContentBuilder()
             .WithId(0)
@@ -426,9 +404,7 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
             .WithCultureName(dkIso, danishNodeName)
             .WithContentType(contentType)
             .Build();
-        createdContent = ContentService.SaveAndPublish(content);
-        Thread.Sleep(1000);
-
+        createdContent = await ExecuteAndWaitForIndexing(() => ContentService.SaveAndPublish(content), Constants.UmbracoIndexes.InternalIndexName);
         string query = createdContent.Content.Id.ToString();
 
         // Act
@@ -440,15 +416,13 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
         var nodeNameDa = actual.First().Values["nodeName_da"];
         Assert.AreEqual(nodeNameEn, englishNodeName);
         Assert.AreEqual(nodeNameDa, danishNodeName);
-
-        // Thread.Sleep(3000);
     }
 
     [Test]
     public async Task Search_For_Published_Content_Name_With_Two_Languages_By_Default_Language_Content_Name()
     {
         // Arrange
-        SetupUserIdentity(Constants.Security.SuperUserIdAsString);
+        await SetupUserIdentity(Constants.Security.SuperUserIdAsString);
 
         string usIso = "en-US";
         string dkIso = "da";
@@ -468,15 +442,13 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
         var nodeNameDa = actual.First().Values["nodeName_da"];
         Assert.AreEqual(nodeNameEn, englishNodeName);
         Assert.AreEqual(nodeNameDa, danishNodeName);
-
-        Thread.Sleep(2000);
     }
 
     [Test]
     public async Task Search_For_Published_Content_Name_With_Two_Languages_By_Non_Default_Language_Content_Name()
     {
         // Arrange
-        SetupUserIdentity(Constants.Security.SuperUserIdAsString);
+        await SetupUserIdentity(Constants.Security.SuperUserIdAsString);
 
         string usIso = "en-US";
         string dkIso = "da";
@@ -502,7 +474,7 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
     public async Task Search_Published_Content_With_Two_Languages_By_Id()
     {
         // Arrange
-        SetupUserIdentity(Constants.Security.SuperUserIdAsString);
+        await SetupUserIdentity(Constants.Security.SuperUserIdAsString);
 
         string usIso = "en-US";
         string dkIso = "da";
@@ -578,7 +550,6 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
             Assert.AreEqual(actual.First().Values["__VariesByCulture"], contentTypeCultureVariations);
             Assert.AreEqual(actual.First().Values["__Icon"], contentNode.ContentType.Icon);
         });
-        Thread.Sleep(1000);
     }
 
     [Test]
@@ -642,6 +613,5 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
             Assert.AreEqual(actual.First().Values["__VariesByCulture"], contentTypeCultureVariations);
             Assert.AreEqual(actual.First().Values["__Icon"], contentNode.ContentType.Icon);
         });
-        Thread.Sleep(1000);
     }
 }

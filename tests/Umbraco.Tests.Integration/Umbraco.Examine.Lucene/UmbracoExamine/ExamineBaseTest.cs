@@ -118,6 +118,14 @@ public abstract class ExamineBaseTest : UmbracoIntegrationTest
 
     private AutoResetEvent indexingHandle = new(false);
 
+    protected async Task ExecuteAndWaitForIndexing(Action indexUpdatingAction, string indexName) =>
+        await ExecuteAndWaitForIndexing<int?>(
+            () =>
+            {
+                indexUpdatingAction();
+                return null;
+            }, indexName);
+
     /// <summary>
     /// Performs and action and waits for the specified index to be done indexing.
     /// </summary>
