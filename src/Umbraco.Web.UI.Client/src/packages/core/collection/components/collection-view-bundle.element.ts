@@ -1,4 +1,4 @@
-import { UMB_COLLECTION_CONTEXT, UmbDefaultCollectionContext } from '../collection-default.context.js';
+import { UMB_COLLECTION_CONTEXT, UmbDefaultCollectionContext } from '../default/collection-default.context.js';
 import { ManifestCollectionView } from '../../extension-registry/models/collection-view.model.js';
 import { css, html, customElement, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';

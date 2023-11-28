@@ -1,5 +1,5 @@
-import { UmbCollectionConfiguration, UmbCollectionContext } from './types.js';
-import { UmbCollectionViewManager } from './collection-view.manager.js';
+import { UmbCollectionConfiguration, UmbCollectionContext } from '../types.js';
+import { UmbCollectionViewManager } from '../collection-view.manager.js';
 import { UmbCollectionRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import { type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
