@@ -83,6 +83,19 @@ stages:
             retryCountOnTaskFailure: 3
             inputs:
               versionSpec: $(nodeVersion)
+          - task: Cache@2
+            displayName: Cache node_modules
+            inputs:
+              key: '"npm_client" | "$(Agent.OS)" | $(Build.SourcesDirectory)/src/Umbraco.Web.UI.New.Client/package-lock.json'
+              restoreKeys: |
+                "npm_client" | "$(Agent.OS)"
+                "npm_client"
+              path: $(npm_config_cache)
+          - bash: |
+              mkdir -p src/Umbraco.Cms.StatisAssets/wwwroot/umbraco/auth
+              mkdir -p src/Umbraco.Cms.StatisAssets/wwwroot/umbraco/backoffice
+              mkdir -p src/Umbraco.Cms.StatisAssets/wwwroot/umbraco/login
+              mkdir -p src/Umbraco.Cms.StatisAssets/wwwroot/umbraco/lib
           - task: UseDotNet@2
             displayName: Use .NET $(dotnetVersion)
             inputs:
@@ -108,14 +121,6 @@ stages:
 #          - script: nbgv cloud
 #            displayName: Set version variables
 #            name: version
-          - task: Cache@2
-            displayName: Cache node_modules
-            inputs:
-              key: '"npm_client" | "$(Agent.OS)" | $(Build.SourcesDirectory)/src/Umbraco.Web.UI.New.Client/package-lock.json'
-              restoreKeys: |
-                "npm_client" | "$(Agent.OS)"
-                "npm_client"
-              path: $(npm_config_cache)
           - script: npm ci --no-fund --no-audit --prefer-offline
             displayName: Run npm ci (Bellissima)
             workingDirectory: src/Umbraco.Web.UI.New.Client
