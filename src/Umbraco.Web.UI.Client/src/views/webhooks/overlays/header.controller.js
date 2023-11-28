@@ -10,13 +10,13 @@
 
     $scope.headerModel = { key: "", value: "" };
 
-    function submit () {
+    function submit() {
       if ($scope.headerModel.key && $scope.headerModel.value) {
         $scope.model.submit($scope.headerModel);
       }
     }
 
-    function close () {
+    function close() {
       $scope.model.close();
     }
   }

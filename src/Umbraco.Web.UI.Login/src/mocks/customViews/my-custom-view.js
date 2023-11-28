@@ -8,7 +8,7 @@ template.innerHTML = `
   <div>
     <uui-button id="button" look="primary" label="My custom button">
         <uui-icon name="favorite"></uui-icon>
-        My Custom button (<span id="providerName"></span>)
+        My Custom button (<span id="providerName"></span> / <span id="userViewState"></span>)
     </uui-button>
   </div>
 `;
@@ -16,6 +16,7 @@ template.innerHTML = `
 export class MyCustomView extends HTMLElement {
   providerName = '';
   displayName = '';
+  userViewState = '';
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
@@ -29,6 +30,7 @@ export class MyCustomView extends HTMLElement {
   connectedCallback() {
     console.log('My custom view connected');
     this.shadowRoot.getElementById('providerName').innerText = this.providerName;
+    this.shadowRoot.getElementById('userViewState').innerText = this.userViewState;
   }
 }
 

@@ -114,7 +114,7 @@
   </area>
   <area alias="validation">
     <key alias="entriesShort"><![CDATA[Minsta %0% poster, kräver <strong>%1%</strong> mer.]]></key>
-    <key alias="entriesExceed"><![CDATA[Max %0% poster, <strong>%1%</strong> för många.]]></key>  
+    <key alias="entriesExceed"><![CDATA[Max %0% poster, <strong>%1%</strong> för många.]]></key>
   </area>
   <area alias="blueprints">
     <key alias="createBlueprintFrom"><![CDATA[Skapa en ny innehållsmall för <em>%0%</em>]]></key>
@@ -223,7 +223,7 @@
     <key alias="publishedPendingChanges">Publicerad (osparade ändringar)</key>
     <key alias="listViewNoContent">Inga undernoder har lagts till</key>
     <key alias="noChanges">Inga ändringar har gjorts</key>
-    <key alias="notCreated">Ej skapad</key>    
+    <key alias="notCreated">Ej skapad</key>
   </area>
   <area alias="contentTypeEditor">
     <key alias="yesDelete">Ja, ta bort</key>
@@ -636,13 +636,13 @@
   </area>
   <area alias="login">
     <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">umbraco.com</a></p> ]]></key>
-    <key alias="greeting0">Happy super Sunday</key>
-    <key alias="greeting1">Happy manic Monday</key>
-    <key alias="greeting2">Happy tremendous Tuesday</key>
-    <key alias="greeting3">Happy wonderful Wednesday</key>
-    <key alias="greeting4">Happy thunderous Thursday</key>
-    <key alias="greeting5">Happy friendly Friday</key>
-    <key alias="greeting6">Happy shiny Saturday</key>
+    <key alias="greeting0">Välkommen</key>
+    <key alias="greeting1">Välkommen</key>
+    <key alias="greeting2">Välkommen</key>
+    <key alias="greeting3">Välkommen</key>
+    <key alias="greeting4">Välkommen</key>
+    <key alias="greeting5">Välkommen</key>
+    <key alias="greeting6">Välkommen</key>
     <key alias="instruction">Logga in nedan</key>
     <key alias="signInWith">Logga in med</key>
     <key alias="timeout">Sessionen har nått sin maxgräns</key>
