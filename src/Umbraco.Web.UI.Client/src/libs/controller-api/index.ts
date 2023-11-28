@@ -4,3 +4,4 @@ export * from './controller-host-element.mixin.js';
 export * from './controller.class.js';
 export * from './controller.interface.js';
 export * from './controller-alias.type.js';
+export * from './context-base.class.js';

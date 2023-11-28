@@ -61,6 +61,7 @@ export const UmbClassMixin = <T extends ClassConstructor>(superClass: T) => {
 			super();
 			this._host = host;
 			this._controllerAlias = controllerAlias ?? Symbol(); // This will fallback to a Symbol, ensuring that this class is only appended to the controller host once.
+			this._host.addController(this);
 		}
 
 		getHostElement(): EventTarget {
@@ -112,6 +113,18 @@ export const UmbClassMixin = <T extends ClassConstructor>(superClass: T) => {
 			callback: UmbContextCallback<ResultType>,
 		): UmbContextConsumerController<BaseType, ResultType> {
 			return new UmbContextConsumerController(this, contextAlias, callback);
+		}
+
+		/**
+		 * @description Destroys the controller and removes it from the host.
+		 * @memberof UmbClassMixin
+		 */
+		public destroy() {
+			if (this._host) {
+				this._host.removeController(this);
+			}
+			//delete this._host;
+			super.destroy();
 		}
 	}
 
