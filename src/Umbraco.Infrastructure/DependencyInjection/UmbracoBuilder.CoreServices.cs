@@ -370,7 +370,9 @@ public static partial class UmbracoBuilderExtensions
             .AddNotificationHandler<ContentDeletedNotification, ImageCropperPropertyEditor>()
             .AddNotificationHandler<MediaDeletedNotification, ImageCropperPropertyEditor>()
             .AddNotificationHandler<MediaSavingNotification, ImageCropperPropertyEditor>()
-            .AddNotificationHandler<MemberDeletedNotification, ImageCropperPropertyEditor>();
+            .AddNotificationHandler<MemberDeletedNotification, ImageCropperPropertyEditor>()
+            .AddNotificationHandler<ContentTypeCacheRefresherNotification, ConstructorCacheClearNotificationHandler>()
+            .AddNotificationHandler<DataTypeCacheRefresherNotification, ConstructorCacheClearNotificationHandler>();
 
         // add notification handlers for redirect tracking
         builder
