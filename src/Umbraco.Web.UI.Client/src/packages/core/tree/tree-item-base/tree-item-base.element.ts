@@ -1,7 +1,7 @@
-import type { UmbTreeItemContext } from '../tree-item/index.js';
+import type { UmbTreeItemContext } from '../tree-item-default/index.js';
 import { UMB_TREE_ITEM_CONTEXT_TOKEN } from './tree-item-base.context.js';
 import { css, html, nothing, customElement, state, ifDefined, repeat } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 
@@ -150,7 +150,7 @@ export class UmbTreeItemBaseElement extends UmbLitElement {
 						this._childItems,
 						// TODO: get unique here instead of name. we might be able to get it from the context
 						(item) => item.name,
-						(item) => html`<umb-tree-item .item=${item}></umb-tree-item>`
+						(item) => html`<umb-tree-item-default .item=${item}></umb-tree-item-default>`,
 				  )
 				: ''}
 		`;

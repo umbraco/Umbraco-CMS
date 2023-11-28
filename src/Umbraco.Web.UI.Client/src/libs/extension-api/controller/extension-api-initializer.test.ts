@@ -2,26 +2,28 @@ import { expect, fixture } from '@open-wc/testing';
 import { UmbExtensionRegistry } from '../registry/extension.registry.js';
 import { ManifestApi, ManifestWithDynamicConditions } from '../types/index.js';
 import { UmbExtensionApiInitializer } from './index.js';
-import { UmbBaseController, UmbControllerHost, UmbControllerHostElement, UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
+import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import {
+	type UmbControllerHost,
+	UmbControllerHostElement,
+	UmbControllerHostElementMixin,
+} from '@umbraco-cms/backoffice/controller-api';
 import { customElement, html } from '@umbraco-cms/backoffice/external/lit';
 import { type ManifestSection, UmbSwitchCondition } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-test-controller-host')
 export class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
 
-
 export class UmbTestApiController extends UmbBaseController {
-
 	public i_am_test_api_controller = true;
 
-	constructor(host:UmbControllerHost) {
+	constructor(host: UmbControllerHost) {
 		super(host);
 	}
-
 }
 
 interface TestManifest extends ManifestWithDynamicConditions, ManifestApi<UmbTestApiController> {
-	type: 'test-type'
+	type: 'test-type';
 }
 
 describe('UmbExtensionApiController', () => {
@@ -37,7 +39,7 @@ describe('UmbExtensionApiController', () => {
 				type: 'test-type',
 				name: 'test-type-1',
 				alias: 'Umb.Test.Type-1',
-				api: UmbTestApiController
+				api: UmbTestApiController,
 			};
 
 			extensionRegistry.register(manifest);
@@ -61,7 +63,7 @@ describe('UmbExtensionApiController', () => {
 							extensionController.destroy();
 						}
 					}
-				}
+				},
 			);
 			/*
 			TODO: Consider if builder pattern would be a more nice way to setup this:
@@ -151,7 +153,7 @@ describe('UmbExtensionApiController', () => {
 						done();
 						extensionController.destroy(); // need to destroy the controller.
 					}
-				}
+				},
 			);
 		});
 	});

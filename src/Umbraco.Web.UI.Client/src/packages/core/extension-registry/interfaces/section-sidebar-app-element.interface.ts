@@ -1,5 +1,5 @@
 import type { ManifestSectionSidebarApp } from '../models/index.js';
 
-export interface UmbSectionSidebarAppExtensionElement extends HTMLElement {
+export interface UmbSectionSidebarAppElement extends HTMLElement {
 	manifest?: ManifestSectionSidebarApp;
 }

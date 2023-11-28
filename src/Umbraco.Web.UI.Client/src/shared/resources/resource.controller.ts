@@ -5,7 +5,8 @@ import {
 	UMB_NOTIFICATION_CONTEXT_TOKEN,
 	UmbNotificationOptions,
 } from '@umbraco-cms/backoffice/notification';
-import { UmbBaseController, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import type { DataSourceResponse } from '@umbraco-cms/backoffice/repository';
 

@@ -1,9 +1,9 @@
 import { UMB_MEDIA_REPOSITORY_ALIAS } from '../repository/manifests.js';
+import { UMB_MEDIA_COLLECTION_ALIAS } from '../collection/index.js';
 import { UmbMediaMoveEntityBulkAction } from './move/move.action.js';
 import { UmbMediaCopyEntityBulkAction } from './copy/copy.action.js';
 import { UmbMediaTrashEntityBulkAction } from './trash/trash.action.js';
 import { ManifestEntityBulkAction } from '@umbraco-cms/backoffice/extension-registry';
-import { UMB_MEDIA_COLLECTION_ALIAS } from '../collection/index.js';
 import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
 
 const entityActions: Array<ManifestEntityBulkAction> = [

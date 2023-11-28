@@ -2,14 +2,14 @@ import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import {
 	ManifestWorkspace,
-	UmbSectionViewExtensionElement,
+	UmbSectionViewElement,
 	umbExtensionsRegistry,
 } from '@umbraco-cms/backoffice/extension-registry';
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-created-packages-section-view')
-export class UmbCreatedPackagesSectionViewElement extends UmbLitElement implements UmbSectionViewExtensionElement {
+export class UmbCreatedPackagesSectionViewElement extends UmbLitElement implements UmbSectionViewElement {
 	@state()
 	private _routes: UmbRoute[] = [];
 

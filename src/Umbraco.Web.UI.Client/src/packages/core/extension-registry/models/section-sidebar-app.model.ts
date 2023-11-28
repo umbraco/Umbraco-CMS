@@ -1,9 +1,9 @@
 import { ConditionTypes } from '../conditions/types.js';
-import type { UmbSectionSidebarAppExtensionElement } from '../interfaces/section-sidebar-app-extension-element.interface.js';
+import type { UmbSectionSidebarAppElement } from '../interfaces/section-sidebar-app-element.interface.js';
 import type { ManifestElement, ManifestWithDynamicConditions } from '@umbraco-cms/backoffice/extension-api';
 
 export interface ManifestSectionSidebarApp
-	extends ManifestElement<UmbSectionSidebarAppExtensionElement>,
+	extends ManifestElement<UmbSectionSidebarAppElement>,
 		ManifestWithDynamicConditions<ConditionTypes> {
 	type: 'sectionSidebarApp';
 }

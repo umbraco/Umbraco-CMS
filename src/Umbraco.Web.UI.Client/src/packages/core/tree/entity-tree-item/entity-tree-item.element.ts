@@ -1,11 +1,11 @@
 import { UmbEntityTreeItemContext } from './entity-tree-item.context.js';
 import { css, html, nothing, customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import {
 	UmbBackofficeManifestKind,
-	UmbTreeItemExtensionElement,
+	UmbTreeItemElement,
 	umbExtensionsRegistry,
 } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -23,7 +23,7 @@ const manifest: UmbBackofficeManifestKind = {
 umbExtensionsRegistry.register(manifest);
 
 @customElement('umb-entity-tree-item')
-export class UmbEntityTreeItemElement extends UmbLitElement implements UmbTreeItemExtensionElement {
+export class UmbEntityTreeItemElement extends UmbLitElement implements UmbTreeItemElement {
 	private _item?: EntityTreeItemResponseModel;
 	@property({ type: Object, attribute: false })
 	public get item() {
