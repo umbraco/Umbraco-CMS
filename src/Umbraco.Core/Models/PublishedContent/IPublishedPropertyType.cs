@@ -71,7 +71,7 @@ public interface IPublishedPropertyType
     /// <remarks>
     ///     <para>The model CLR type may be a <see cref="ModelType" /> type, or may contain <see cref="ModelType" /> types.</para>
     /// </remarks>
-    Type DeliveryApiModelClrType { get; }
+    Type DeliveryApiModelClrType => ModelClrType;
 
     /// <summary>
     ///     Gets the property CLR type.
