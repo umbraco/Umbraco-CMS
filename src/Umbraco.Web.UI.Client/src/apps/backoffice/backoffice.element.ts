@@ -40,6 +40,7 @@ export class UmbBackofficeElement extends UmbLitElement {
 	constructor() {
 		super();
 
+		new UmbBackofficeContext(this);
 		new UmbBundleExtensionInitializer(this, umbExtensionsRegistry);
 		new UmbEntryPointExtensionInitializer(this, umbExtensionsRegistry);
 		new UmbServerExtensionRegistrator(this, umbExtensionsRegistry);
