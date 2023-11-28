@@ -85,8 +85,16 @@ export class UmbUserGroupInputElement extends FormControlMixin(UmbLitElement) {
 			() => !!this.max && this.#pickerContext.getSelection().length > this.max,
 		);
 
-		this.observe(this.#pickerContext.selection, (selection) => (super.value = selection.join(',')), 'umbUserGroupInputSelectionObserver');
-		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems), 'umbUserGroupInputItemsObserver');
+		this.observe(
+			this.#pickerContext.selection,
+			(selection) => (super.value = selection.join(',')),
+			'umbUserGroupInputSelectionObserver',
+		);
+		this.observe(
+			this.#pickerContext.selectedItems,
+			(selectedItems) => (this._items = selectedItems),
+			'umbUserGroupInputItemsObserver',
+		);
 	}
 
 	protected getFormElement() {
@@ -106,7 +114,7 @@ export class UmbUserGroupInputElement extends FormControlMixin(UmbLitElement) {
 		if (!item.id) return;
 		return html`
 			<umb-user-group-ref name="${ifDefined(item.name)}">
-				${item.icon ? html`<uui-icon slot="icon" icon=${item.icon}></uui-icon>` : nothing}
+				${item.icon ? html`<uui-icon slot="icon" name=${item.icon}></uui-icon>` : nothing}
 
 				<uui-action-bar slot="actions">
 					<uui-button @click=${() => this.#pickerContext.requestRemoveItem(item.id!)} label="Remove ${item.name}"
