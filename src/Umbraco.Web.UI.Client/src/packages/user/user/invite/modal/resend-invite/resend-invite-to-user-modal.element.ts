@@ -33,22 +33,14 @@ export class UmbResendInviteToUserModalElement extends UmbModalBaseElement<
 			message,
 		});
 
-		this.#submitModal();
-	}
-
-	#submitModal() {
-		this.modalContext?.submit();
-	}
-
-	#rejectModal() {
-		this.modalContext?.reject();
+		this._submitModal();
 	}
 
 	render() {
 		return html`<uui-dialog-layout headline="Resend invite">
 			${this.#renderForm()}
 
-			<uui-button @click=${this.#rejectModal} slot="actions" label="Cancel" look="secondary"></uui-button>
+			<uui-button @click=${this._rejectModal} slot="actions" label="Cancel" look="secondary"></uui-button>
 			<uui-button
 				slot="actions"
 				type="submit"
