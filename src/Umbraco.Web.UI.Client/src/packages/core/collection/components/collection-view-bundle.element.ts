@@ -31,7 +31,7 @@ export class UmbCollectionViewBundleElement extends UmbLitElement {
 
 	#observeRootPathname() {
 		this.observe(
-			this.#collectionContext!.rootPathname,
+			this.#collectionContext!.view.rootPathname,
 			(rootPathname) => {
 				this._collectionRootPathname = rootPathname;
 			},
@@ -41,7 +41,7 @@ export class UmbCollectionViewBundleElement extends UmbLitElement {
 
 	#observeCurrentView() {
 		this.observe(
-			this.#collectionContext!.currentView,
+			this.#collectionContext!.view.currentView,
 			(view) => {
 				//TODO: This is not called when the view is changed
 				this._currentView = view;
@@ -52,7 +52,7 @@ export class UmbCollectionViewBundleElement extends UmbLitElement {
 
 	#observeViews() {
 		this.observe(
-			this.#collectionContext!.views,
+			this.#collectionContext!.view.views,
 			(views) => {
 				this._views = views;
 			},

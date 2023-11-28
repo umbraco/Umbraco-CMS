@@ -4,6 +4,7 @@ import { UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
 
 export interface UmbCollectionConfiguration {
 	pageSize: number;
+	defaultView?: string;
 }
 
 export interface UmbCollectionContext {

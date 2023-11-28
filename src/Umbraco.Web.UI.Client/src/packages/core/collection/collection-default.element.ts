@@ -44,7 +44,7 @@ export class UmbCollectionDefaultElement extends UmbLitElement {
 	#observeCollectionViews() {
 		if (!this.#collectionContext) return;
 
-		this.observe(this.#collectionContext.views, (views) => {
+		this.observe(this.#collectionContext.view.views, (views) => {
 			this.#createRoutes(views);
 		}),
 			'umbCollectionViewsObserver';
