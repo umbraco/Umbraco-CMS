@@ -140,7 +140,7 @@ stages:
               mv .npmrc $(Build.ArtifactStagingDirectory)/npm/
             displayName: Prepare Bellissima npm package
             env:
-              PACKAGE_VERSION: $[ variables['NBGV_NpmPackageVersion'] ]
+              PACKAGE_VERSION: $(NBGV_NpmPackageVersion)
             workingDirectory: src/Umbraco.Web.UI.New.Client
           - task: PublishPipelineArtifact@1
             displayName: Publish Bellissima NPM Artifact
