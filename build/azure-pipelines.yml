@@ -92,10 +92,10 @@ stages:
                 "npm_client"
               path: $(npm_config_cache)
           - bash: |
-              mkdir -p src/Umbraco.Cms.StatisAssets/wwwroot/umbraco/auth
-              mkdir -p src/Umbraco.Cms.StatisAssets/wwwroot/umbraco/backoffice
-              mkdir -p src/Umbraco.Cms.StatisAssets/wwwroot/umbraco/login
-              mkdir -p src/Umbraco.Cms.StatisAssets/wwwroot/umbraco/lib
+              mkdir -p src/Umbraco.Cms.StaticAssets/wwwroot/umbraco/auth
+              mkdir -p src/Umbraco.Cms.StaticAssets/wwwroot/umbraco/backoffice
+              mkdir -p src/Umbraco.Cms.StaticAssets/wwwroot/umbraco/login
+              mkdir -p src/Umbraco.Cms.StaticAssets/wwwroot/umbraco/lib
           - task: UseDotNet@2
             displayName: Use .NET $(dotnetVersion)
             inputs:
