@@ -4,8 +4,8 @@ import type { UmbRoute, UmbRouterSlotChangeEvent, UmbRouterSlotInitEvent } from 
 import {
 	ManifestDashboard,
 	ManifestSectionView,
-	UmbDashboardExtensionElement,
-	UmbSectionViewExtensionElement,
+	UmbDashboardElement,
+	UmbSectionViewElement,
 	umbExtensionsRegistry,
 } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbExtensionsManifestInitializer, createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
@@ -62,7 +62,7 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 			return {
 				path: this.#constructDashboardPath(manifest),
 				component: () => createExtensionElement(manifest),
-				setup: (component: UmbDashboardExtensionElement) => {
+				setup: (component: UmbDashboardElement) => {
 					component.manifest = manifest;
 				},
 			} as UmbRoute;
@@ -72,7 +72,7 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 			return {
 				path: this.#constructViewPath(manifest),
 				component: () => createExtensionElement(manifest),
-				setup: (component: UmbSectionViewExtensionElement) => {
+				setup: (component: UmbSectionViewElement) => {
 					component.manifest = manifest;
 				},
 			} as UmbRoute;

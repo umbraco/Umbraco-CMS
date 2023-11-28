@@ -1,9 +1,9 @@
 import { ConditionTypes } from '../conditions/types.js';
-import type { UmbSectionViewExtensionElement } from '../interfaces/section-view-extension-element.interface.js';
+import type { UmbSectionViewElement } from '../interfaces/section-view-element.interface.js';
 import type { ManifestElement, ManifestWithDynamicConditions } from '@umbraco-cms/backoffice/extension-api';
 
 export interface ManifestSectionView
-	extends ManifestElement<UmbSectionViewExtensionElement>,
+	extends ManifestElement<UmbSectionViewElement>,
 		ManifestWithDynamicConditions<ConditionTypes> {
 	type: 'sectionView';
 	meta: MetaSectionView;

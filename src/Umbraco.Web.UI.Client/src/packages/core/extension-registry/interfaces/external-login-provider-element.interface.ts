@@ -1,5 +1,5 @@
 import type { ManifestExternalLoginProvider } from '../models/index.js';
 
-export interface UmbExternalLoginProviderExtensionElement extends HTMLElement {
+export interface UmbExternalLoginProviderElement extends HTMLElement {
 	manifest?: ManifestExternalLoginProvider;
 }
