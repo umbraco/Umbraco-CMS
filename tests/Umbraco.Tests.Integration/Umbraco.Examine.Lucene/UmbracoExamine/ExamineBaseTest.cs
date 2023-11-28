@@ -1,4 +1,5 @@
 using System.Data;
+using Examine;
 using Examine.Lucene.Providers;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
@@ -24,6 +25,8 @@ public abstract class ExamineBaseTest : UmbracoIntegrationTest
     protected IHostingEnvironment HostingEnvironment => Services.GetRequiredService<IHostingEnvironment>();
 
     protected IRuntimeState RunningRuntimeState { get; } = Mock.Of<IRuntimeState>(x => x.Level == RuntimeLevel.Run);
+
+    protected IExamineManager ExamineManager => GetRequiredService<IExamineManager>();
 
     protected override void ConfigureTestServices(IServiceCollection services)
         => services.AddSingleton<IndexInitializer>();
@@ -111,6 +114,35 @@ public abstract class ExamineBaseTest : UmbracoIntegrationTest
         var syncMode = index.WithThreadingMode(IndexThreadingMode.Synchronous);
 
         return new DisposableWrapper(syncMode, index, luceneDir);
+    }
+
+    private AutoResetEvent indexingHandle = new(false);
+
+    /// <summary>
+    /// Performs and action and waits for the specified index to be done indexing.
+    /// </summary>
+    /// <param name="indexUpdatingAction">The action that causes the index to be updated.</param>
+    /// <param name="indexName">The name of the index to wait for rebuild.</param>
+    /// <typeparam name="T">The type returned from the action.</typeparam>
+    /// <returns>The result of the action.</returns>
+    protected async Task<T> ExecuteAndWaitForIndexing<T> (Func<T> indexUpdatingAction, string indexName)
+    {
+        // Set up an action to release the handle when the index is populated.
+        if (ExamineManager.TryGetIndex(indexName, out IIndex index) is false)
+        {
+            throw new InvalidOperationException($"Could not find index: {indexName}");
+        }
+
+        index.IndexOperationComplete += (_, _) =>
+        {
+            indexingHandle.Set();
+        };
+
+        // Perform the action, and wait for the handle to be freed, meaning the index is done populating.
+        var result = indexUpdatingAction();
+        await indexingHandle.WaitOneAsync();
+
+        return result;
     }
 
     private class DisposableWrapper : IDisposable
