@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Examine" Version="3.1.0" />
+    <PackageReference Include="Examine" />
   </ItemGroup>
 
   <ItemGroup>
