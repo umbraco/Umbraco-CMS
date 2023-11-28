@@ -57,7 +57,8 @@ export class UmbSelectionManager extends UmbBaseController {
 	public setSelection(value: Array<string | null>) {
 		if (this.getSelectable() === false) return;
 		if (value === undefined) throw new Error('Value cannot be undefined');
-		this.#selection.next(value);
+		const newSelection = this.getMultiple() ? value : [value[0]];
+		this.#selection.next(newSelection);
 	}
 
 	/**
@@ -95,6 +96,7 @@ export class UmbSelectionManager extends UmbBaseController {
 	 */
 	public select(unique: string | null) {
 		if (this.getSelectable() === false) return;
+		if (this.isSelected(unique)) return;
 		const newSelection = this.getMultiple() ? [...this.getSelection(), unique] : [unique];
 		this.#selection.next(newSelection);
 		this._host.getHostElement().dispatchEvent(new UmbSelectionChangeEvent());
@@ -127,6 +129,7 @@ export class UmbSelectionManager extends UmbBaseController {
 	 * @memberof UmbSelectionManager
 	 */
 	public clearSelection() {
+		if (this.getSelectable() === false) return;
 		this.#selection.next([]);
 	}
 }
