@@ -22,6 +22,7 @@ internal sealed class DeliveryApiContentIndexHandleContentTypeChanges : Delivery
     private readonly IBackgroundTaskQueue _backgroundTaskQueue;
     private readonly IDeliveryApiCompositeIdHandler _deliveryApiCompositeIdHandler;
 
+    [Obsolete("Use the constructor that takes an IDeliveryApiCompositeIdHandler instead, scheduled for removal in v15")]
     public DeliveryApiContentIndexHandleContentTypeChanges(
         IList<KeyValuePair<int, ContentTypeChangeTypes>> changes,
         DeliveryApiIndexingHandler deliveryApiIndexingHandler,

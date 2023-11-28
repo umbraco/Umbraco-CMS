@@ -16,6 +16,7 @@ public class DeliveryApiContentIndex : UmbracoExamineIndex
     private readonly IDeliveryApiCompositeIdHandler _deliveryApiCompositeIdHandler;
     private readonly ILogger<DeliveryApiContentIndex> _logger;
 
+    [Obsolete("Use the constructor that takes an IDeliveryApiCompositeIdHandler instead, scheduled for removal in v15")]
     public DeliveryApiContentIndex(
         ILoggerFactory loggerFactory,
         string name,
