@@ -153,13 +153,15 @@ class UmbUserData extends UmbEntityData<UserResponseModel> {
 	 * @param {InviteUserRequestModel} data
 	 * @memberof UmbUserData
 	 */
-	invite(data: InviteUserRequestModel): void {
+	invite(data: InviteUserRequestModel) {
 		const invitedUser = {
 			...data,
 			state: UserStateModel.INVITED,
 		};
 
-		this.createUser(invitedUser);
+		const response = this.createUser(invitedUser);
+
+		return { userId: response.userId };
 	}
 
 	filter(options: any): PagedUserResponseModel {
