@@ -59,7 +59,7 @@ variables:
   DOTNET_CLI_TELEMETRY_OPTOUT: true
 
 stages:
-  - stage: Prepare_Npm
+  - stage: Backoffice_Npm
     displayName: Prepare NPM package
     variables:
       npm_config_cache: $(Pipeline.Workspace)/.npm_client
@@ -69,8 +69,7 @@ stages:
       #- Deploy_MyGet
       #- Build_Docs
     jobs:
-      - job:
-        name: Prepare
+      - job: Prepare
         displayName: Prepare NPM artifact
         condition: and(succeeded(), or(startsWith(variables['Build.SourceBranch'], 'refs/heads/release/'), ${{parameters.npmDeploy}}))
         steps:
@@ -137,8 +136,7 @@ stages:
             inputs:
               targetPath: $(Build.ArtifactStagingDirectory)/npm
               artifactName: npm
-      - job:
-        name: Publish
+      - job: Publish
         displayName: Push to NPM
         condition: and(succeeded(), or(startsWith(variables['Build.SourceBranch'], 'refs/heads/release/'), ${{parameters.npmDeploy}}))
         dependsOn: Prepare
