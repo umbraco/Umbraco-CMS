@@ -77,7 +77,6 @@ stages:
           #- download: current
           #  artifact: npm
           - checkout: self
-            fetchDepth: 1 # Fetch only one commit to save time
             submodules: true
           - task: NodeTool@0
             displayName: Use Node.js $(nodeVersion)
