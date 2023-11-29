@@ -96,6 +96,13 @@ export class UmbCollectionSelectionActionsElement extends UmbLitElement {
 	static styles = [
 		UmbTextStyles,
 		css`
+			:host {
+				width: 100%;
+				margin-right: calc(
+					-1 * var(--uui-size-space-6)
+				); // compensate for the padding on the container. TODO: make a better solution
+			}
+
 			#container {
 				display: flex;
 				gap: var(--uui-size-3);
