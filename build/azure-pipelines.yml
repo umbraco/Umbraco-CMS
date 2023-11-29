@@ -686,7 +686,7 @@ stages:
             workingDirectory: $(Pipeline.Workspace)/npm
           - bash: |
               # Calculate npm tag based on the umbracoPublicRelease job variable
-              if [[ "$PUBLIC_RELEASE" = "true" ]]; then
+              if [[ "$PUBLIC_RELEASE" = "True" ]]; then
                   npmTag=latest
               else
                   npmTag=next
