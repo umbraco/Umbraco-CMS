@@ -168,7 +168,7 @@ stages:
             workingDirectory: $(Pipeline.Workspace)/npm
           - bash: |
               # Calculate npm tag based on the umbracoPublicRelease job variable
-              if [[ "$(umbracoPublicRelease)" = "True" ]]; then
+              if [[ "$PUBLIC_RELEASE" = "true" ]]; then
                   npmTag=latest
               else
                   npmTag=next
@@ -179,6 +179,8 @@ stages:
 
               files=( ./*.tgz )
               npm publish --dry-run --tag $npmTag "${files[0]}"
+            env:
+                PUBLIC_RELEASE: $(umbracoPublicRelease)
             displayName: Publish npm
             continueOnError: true
             workingDirectory: $(Pipeline.Workspace)/npm
