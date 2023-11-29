@@ -60,7 +60,7 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 	private _selectedRootContentName? = 'all pages';
 
 	@state()
-	private _defaultSortDirection: SortOrder = SortOrder.Descending;
+	private _defaultSortDirection: SortOrder = SortOrder.Ascending;
 
 	#documentRepository: UmbDocumentRepository;
 	#modalManagerContext?: UmbModalManagerContext;
