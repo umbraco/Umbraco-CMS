@@ -612,7 +612,6 @@ stages:
       npmPackageVersion: $[ stageDependencies.Build.A.outputs['build.NBGV_NpmPackageVersion'] ]
     dependsOn:
       - Build
-      #- Deploy_MyGet
     jobs:
       - job: Prepare
         displayName: Prepare NPM artifact
