@@ -144,6 +144,8 @@ stages:
         displayName: Push to NPM
         condition: and(succeeded(), or(startsWith(variables['Build.SourceBranch'], 'refs/heads/release/'), ${{parameters.npmDeploy}}))
         dependsOn: Prepare
+        variables:
+          umbracoPublicRelease: $[ dependencies.Prepare.outputs['build.NBGV_PublicRelease'] ]
         steps:
           - checkout: none
           - download: current
@@ -165,8 +167,8 @@ stages:
             displayName: npm whoami
             workingDirectory: $(Pipeline.Workspace)/npm
           - bash: |
-              # Calculate npm tag based on the NBGV_PublicRelease variable
-              if [[ "$PUBLIC_RELEASE" = "True" ]]; then
+              # Calculate npm tag based on the umbracoPublicRelease job variable
+              if [[ "$(umbracoPublicRelease)" = "True" ]]; then
                   npmTag=latest
               else
                   npmTag=next
@@ -179,8 +181,6 @@ stages:
               npm publish --dry-run --tag $npmTag "${files[0]}"
             displayName: Publish npm
             continueOnError: true
-            env:
-              PUBLIC_RELEASE: $[ dependencies.Prepare.outputs['build.NBGV_PublicRelease'] ]
             workingDirectory: $(Pipeline.Workspace)/npm
   ###############################################
   ## Build
