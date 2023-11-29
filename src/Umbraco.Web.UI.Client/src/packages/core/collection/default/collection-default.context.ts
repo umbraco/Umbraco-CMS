@@ -116,7 +116,7 @@ export class UmbDefaultCollectionContext<ItemType = any, FilterModelType extends
 
 	#configure(configuration: UmbCollectionConfiguration) {
 		this.selection.setMultiple(true);
-		this.pagination.setPageSize(configuration.pageSize);
+		this.pagination.setPageSize(configuration.pageSize!);
 		this.#filter.next({ ...this.#filter.getValue(), skip: 0, take: configuration.pageSize });
 	}
 

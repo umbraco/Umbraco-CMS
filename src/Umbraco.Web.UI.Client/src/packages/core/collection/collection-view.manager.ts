@@ -6,7 +6,7 @@ import { UmbArrayState, UmbObjectState, UmbStringState } from '@umbraco-cms/back
 import { UmbRoute } from '@umbraco-cms/backoffice/router';
 
 export interface UmbCollectionViewManagerConfig {
-	defaultViewAlias: string;
+	defaultViewAlias?: string;
 }
 
 export class UmbCollectionViewManager extends UmbBaseController {

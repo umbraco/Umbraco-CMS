@@ -3,8 +3,8 @@ import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
 
 export interface UmbCollectionConfiguration {
-	pageSize: number;
-	defaultViewAlias: string;
+	pageSize?: number;
+	defaultViewAlias?: string;
 }
 
 export interface UmbCollectionContext {
