@@ -12744,6 +12744,53 @@
         }
       }
     },
+    "/umbraco/management/api/v1/server/information": {
+      "get": {
+        "tags": [
+          "Server"
+        ],
+        "operationId": "GetServerInformation",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ServerInformationResponseModel"
+                    }
+                  ]
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ServerInformationResponseModel"
+                    }
+                  ]
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ServerInformationResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/server/status": {
       "get": {
         "tags": [
@@ -16625,53 +16672,6 @@
         "responses": {
           "200": {
             "description": "Success"
-          }
-        },
-        "security": [
-          {
-            "Backoffice User": [ ]
-          }
-        ]
-      }
-    },
-    "/umbraco/management/api/v1/user/current/data": {
-      "get": {
-        "tags": [
-          "User"
-        ],
-        "operationId": "GetUserCurrentData",
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/UserDataResponseModel"
-                    }
-                  ]
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/UserDataResponseModel"
-                    }
-                  ]
-                }
-              },
-              "text/plain": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/UserDataResponseModel"
-                    }
-                  ]
-                }
-              }
-            }
           }
         },
         "security": [
@@ -22071,6 +22071,34 @@
         },
         "additionalProperties": false
       },
+      "ServerInformationItemResponseModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "data": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ServerInformationResponseModel": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ServerInformationItemResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
       "ServerStatusResponseModel": {
         "type": "object",
         "properties": {
@@ -23093,34 +23121,6 @@
           "reportUrl": {
             "type": "string",
             "readOnly": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "UserDataModel": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "data": {
-            "type": "string"
-          }
-        },
-        "additionalProperties": false
-      },
-      "UserDataResponseModel": {
-        "type": "object",
-        "properties": {
-          "userData": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/UserDataModel"
-                }
-              ]
-            }
           }
         },
         "additionalProperties": false
