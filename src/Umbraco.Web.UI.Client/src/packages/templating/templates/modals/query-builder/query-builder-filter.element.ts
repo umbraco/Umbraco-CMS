@@ -120,15 +120,15 @@ export class UmbQueryBuilderFilterElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<span>${this.unremovable ? 'where' : 'and'}</span>
+			<span>${this.unremovable ? this.localize.term('template_where') : this.localize.term('template_and')}</span>
 			<umb-button-with-dropdown look="outline" id="property-alias-dropdown" label="Property alias"
 				>${this.filter?.propertyAlias ?? ''}
 				<uui-combobox-list slot="dropdown" @change=${this.#setPropertyAlias} class="options-list">
 					${this.settings?.properties?.map(
 						(property) =>
 							html`<uui-combobox-list-option tabindex="0" .value=${property.alias ?? ''}>
-								${property.alias}
-							</uui-combobox-list-option>`,
+									${property.alias} </uui-combobox-list-option
+								>${console.log(property)}`,
 					)}
 				</uui-combobox-list></umb-button-with-dropdown
 			>
