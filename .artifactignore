@@ -1,3 +1,4 @@
 **/*
-!tests/**/bin/**
-!tests/**/obj/**
+!tests/*.Tests.UnitTests/bin/**
+!tests/*.Tests.Integration/bin/**
+tests/*/bin/**/refs/**
