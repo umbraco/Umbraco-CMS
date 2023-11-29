@@ -4,31 +4,16 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UUISelectElement } from '@umbraco-cms/backoffice/external/uui';
 import { UserResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UMB_CURRENT_USER_CONTEXT, UmbCurrentUser } from '@umbraco-cms/backoffice/current-user';
-import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-user-workspace-profile-settings')
 export class UmbUserWorkspaceProfileSettingsElement extends UmbLitElement {
 	@state()
 	private _user?: UserResponseModel;
 
-	@state()
-	private _currentUser?: UmbCurrentUser;
-
-	@state()
-	private languages: Array<{ name: string; value: string; selected: boolean }> = [];
-
-	#currentUserContext?: typeof UMB_CURRENT_USER_CONTEXT.TYPE;
 	#userWorkspaceContext?: typeof UMB_USER_WORKSPACE_CONTEXT.TYPE;
 
 	constructor() {
 		super();
-
-		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (instance) => {
-			this.#currentUserContext = instance;
-			this.#observeCurrentUser();
-		});
 
 		this.consumeContext(UMB_USER_WORKSPACE_CONTEXT, (instance) => {
 			this.#userWorkspaceContext = instance;
@@ -42,49 +27,6 @@ export class UmbUserWorkspaceProfileSettingsElement extends UmbLitElement {
 		if (typeof target?.value === 'string') {
 			this.#userWorkspaceContext?.updateProperty('languageIsoCode', target.value);
 		}
-	}
-
-	#observeCurrentUser() {
-		if (!this.#currentUserContext) return;
-		this.observe(
-			this.#currentUserContext.currentUser,
-			async (currentUser) => {
-				this._currentUser = currentUser;
-
-				if (!currentUser) {
-					return;
-				}
-
-				// Find all translations and make a unique list of iso codes
-				const translations = await firstValueFrom(umbExtensionsRegistry.extensionsOfType('localization'));
-
-				this.languages = translations
-					.filter((isoCode) => isoCode !== undefined)
-					.map((translation) => ({
-						value: translation.meta.culture.toLowerCase(),
-						name: translation.name,
-						selected: false,
-					}));
-
-				const currentUserLanguageCode = currentUser.languageIsoCode?.toLowerCase();
-
-				// Set the current user's language as selected
-				const currentUserLanguage = this.languages.find((language) => language.value === currentUserLanguageCode);
-
-				if (currentUserLanguage) {
-					currentUserLanguage.selected = true;
-				} else {
-					// If users language code did not fit any of the options. We will create an option that fits, named unknown.
-					// In this way the user can keep their choice though a given language was not present at this time.
-					this.languages.push({
-						value: currentUserLanguageCode ?? 'en-us',
-						name: currentUserLanguageCode ? `${currentUserLanguageCode} (unknown)` : 'Unknown',
-						selected: true,
-					});
-				}
-			},
-			'umbUserObserver',
-		);
 	}
 
 	render() {
@@ -112,13 +54,11 @@ export class UmbUserWorkspaceProfileSettingsElement extends UmbLitElement {
 			<umb-workspace-property-layout
 				label="${this.localize.term('user_language')}"
 				description=${this.localize.term('user_languageHelp')}>
-				<uui-select
+				<umb-ui-culture-input
 					slot="editor"
+					@change="${this.#onLanguageChange}"
 					name="language"
-					label="${this.localize.term('user_language')}"
-					.options=${this.languages}
-					@change="${this.#onLanguageChange}">
-				</uui-select>
+					label="${this.localize.term('user_language')}"></umb-ui-culture-input>
 			</umb-workspace-property-layout>
 		`;
 	}
