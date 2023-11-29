@@ -116,7 +116,10 @@ public class RedirectUrlManagementController : UmbracoAuthorizedApiController
         {
             var errorMessage =
                 "User is not a member of the administrators group and so is not allowed to toggle the URL tracker";
-            _logger.LogDebug(errorMessage);
+            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                _logger.LogDebug(errorMessage);
+            }
             throw new SecurityException(errorMessage);
         }
 

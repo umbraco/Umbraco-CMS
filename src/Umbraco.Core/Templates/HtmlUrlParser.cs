@@ -46,14 +46,17 @@ public sealed class HtmlUrlParser
             return text;
         }
 
-        using (DisposableTimer? timer = _profilingLogger.DebugDuration(
+        using (DisposableTimer? timer = !(_profilingLogger.IsEnabled(Core.Logging.LogLevel.Debug)) ? null : _profilingLogger.DebugDuration(
                    typeof(IOHelper),
                    "ResolveUrlsFromTextString starting",
                    "ResolveUrlsFromTextString complete"))
         {
             // find all relative URLs (ie. URLs that contain ~)
             MatchCollection tags = ResolveUrlPattern.Matches(text);
-            _logger.LogDebug("After regex: {Duration} matched: {TagsCount}", timer?.Stopwatch.ElapsedMilliseconds, tags.Count);
+            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                _logger.LogDebug("After regex: {Duration} matched: {TagsCount}", timer?.Stopwatch.ElapsedMilliseconds, tags.Count);
+            }
             foreach (Match tag in tags)
             {
                 var url = string.Empty;

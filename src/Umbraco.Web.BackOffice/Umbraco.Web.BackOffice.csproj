@@ -3,7 +3,6 @@
     <PackageId>Umbraco.Cms.Web.BackOffice</PackageId>
     <Title>Umbraco CMS - Web - Backoffice</Title>
     <Description>Contains the backoffice assembly needed to run the backend of Umbraco CMS.</Description>
-    <OutputType>Library</OutputType>
     <RootNamespace>Umbraco.Cms.Web.BackOffice</RootNamespace>
   </PropertyGroup>
 
@@ -12,8 +11,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
-    <PackageReference Include="Serilog.AspNetCore" Version="6.1.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="Serilog.AspNetCore" Version="7.0.0" />
   </ItemGroup>
 
   <ItemGroup>

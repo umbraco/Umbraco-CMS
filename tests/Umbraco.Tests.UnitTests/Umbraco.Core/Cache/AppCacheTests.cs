@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
@@ -80,6 +79,25 @@ public abstract class AppCacheTests
         }
 
         Assert.Greater(counter, 1);
+    }
+
+    [Test]
+    public void Does_Not_Cache_Null_Values()
+    {
+        var counter = 0;
+
+        object? Factory()
+        {
+            counter++;
+            return counter == 3 ? "Not a null value" : null;
+        }
+
+        object? Get() => AppCache.Get("Blah", Factory);
+
+        Assert.IsNull(Get());
+        Assert.IsNull(Get());
+        Assert.AreEqual("Not a null value", Get());
+        Assert.AreEqual(3, counter);
     }
 
     [Test]

@@ -19,7 +19,7 @@ public class ContentVersionDto
 
     [Column("nodeId")]
     [ForeignKey(typeof(ContentDto))]
-    [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_NodeId", ForColumns = "nodeId,current", IncludeColumns = "id,versionDate,text,userId")]
+    [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_NodeId", ForColumns = "nodeId,current", IncludeColumns = "id,versionDate,text,userId,preventCleanup")]
     public int NodeId { get; set; }
 
     [Column("versionDate")] // TODO: db rename to 'updateDate'

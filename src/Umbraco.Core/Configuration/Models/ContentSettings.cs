@@ -191,7 +191,7 @@ public class ContentSettings
     ///     Gets or sets a value for the macro error behaviour.
     /// </summary>
     [DefaultValue(StaticMacroErrors)]
-    public MacroErrorBehaviour MacroErrors { get; set; } = Enum<MacroErrorBehaviour>.Parse(StaticMacroErrors);
+    public MacroErrorBehaviour MacroErrors { get; set; } = Enum.Parse<MacroErrorBehaviour>(StaticMacroErrors);
 
     /// <summary>
     ///     Gets or sets a value for the collection of file extensions that are disallowed for upload.
@@ -243,7 +243,7 @@ public class ContentSettings
     public bool DisableUnpublishWhenReferenced { get; set; } = StaticDisableUnpublishWhenReferenced;
 
     /// <summary>
-    ///     Get or sets the model representing the global content version cleanup policy
+    ///     Gets or sets the model representing the global content version cleanup policy
     /// </summary>
     public ContentVersionCleanupPolicySettings ContentVersionCleanupPolicy { get; set; } = new();
 

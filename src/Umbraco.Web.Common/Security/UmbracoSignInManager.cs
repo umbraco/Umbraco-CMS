@@ -2,26 +2,32 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Common.Security;
 
 /// <summary>
-///     Abstract sign in manager implementation allowing modifying all defeault authentication schemes
+///     Abstract sign in manager implementation allowing modifying all default authentication schemes.
 /// </summary>
 /// <typeparam name="TUser"></typeparam>
 public abstract class UmbracoSignInManager<TUser> : SignInManager<TUser>
     where TUser : UmbracoIdentityUser
 {
+    private SecuritySettings _securitySettings;
+
     // borrowed from https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Core/src/SignInManager.cs
     protected const string UmbracoSignInMgrLoginProviderKey = "LoginProvider";
 
     // borrowed from https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Core/src/SignInManager.cs
     protected const string UmbracoSignInMgrXsrfKey = "XsrfId";
 
+    [Obsolete("Use non-obsolete constructor. This is scheduled for removal in V14.")]
     public UmbracoSignInManager(
         UserManager<TUser> userManager,
         IHttpContextAccessor contextAccessor,
@@ -30,8 +36,30 @@ public abstract class UmbracoSignInManager<TUser> : SignInManager<TUser>
         ILogger<SignInManager<TUser>> logger,
         IAuthenticationSchemeProvider schemes,
         IUserConfirmation<TUser> confirmation)
+        : this(
+            userManager,
+            contextAccessor,
+            claimsFactory,
+            optionsAccessor,
+            logger,
+            schemes,
+            confirmation,
+            StaticServiceProvider.Instance.GetRequiredService<IOptions<SecuritySettings>>())
+    {
+    }
+
+    public UmbracoSignInManager(
+        UserManager<TUser> userManager,
+        IHttpContextAccessor contextAccessor,
+        IUserClaimsPrincipalFactory<TUser> claimsFactory,
+        IOptions<IdentityOptions> optionsAccessor,
+        ILogger<SignInManager<TUser>> logger,
+        IAuthenticationSchemeProvider schemes,
+        IUserConfirmation<TUser> confirmation,
+        IOptions<SecuritySettings> securitySettingsOptions)
         : base(userManager, contextAccessor, claimsFactory, optionsAccessor, logger, schemes, confirmation)
     {
+        _securitySettings = securitySettingsOptions.Value;
     }
 
     protected abstract string AuthenticationType { get; }
@@ -47,7 +75,7 @@ public abstract class UmbracoSignInManager<TUser> : SignInManager<TUser>
     {
         // override to handle logging/events
         SignInResult result = await base.PasswordSignInAsync(user, password, isPersistent, lockoutOnFailure);
-        return await HandleSignIn(user, user.UserName, result);
+        return result;
     }
 
     /// <inheritdoc />
@@ -59,8 +87,11 @@ public abstract class UmbracoSignInManager<TUser> : SignInManager<TUser>
         IDictionary<string, string?>? items = auth.Properties?.Items;
         if (auth.Principal == null || items == null)
         {
-            Logger.LogDebug(
+            if (Logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                Logger.LogDebug(
                 "The external login authentication failed. No user Principal or authentication items was resolved.");
+            }
             return null;
         }
 
@@ -238,6 +269,14 @@ public abstract class UmbracoSignInManager<TUser> : SignInManager<TUser>
     /// <inheritdoc />
     public override async Task SignOutAsync()
     {
+        // Update the security stamp to sign out everywhere.
+        TUser? user = await UserManager.GetUserAsync(Context.User);
+
+        if (user is not null)
+        {
+            await UserManager.UpdateSecurityStampAsync(user);
+        }
+
         // override to replace IdentityConstants.ApplicationScheme with custom auth types
         // code taken from aspnetcore: https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Core/src/SignInManager.cs
         await Context.SignOutAsync(AuthenticationType);
@@ -328,6 +367,11 @@ public abstract class UmbracoSignInManager<TUser> : SignInManager<TUser>
             }
 
             await UserManager.UpdateAsync(user);
+
+            if (_securitySettings.AllowConcurrentLogins is false)
+            {
+                await UserManager.UpdateSecurityStampAsync(user);
+            }
 
             Logger.LogInformation("User: {UserName} logged in from IP address {IpAddress}", username, Context.Connection.RemoteIpAddress);
         }

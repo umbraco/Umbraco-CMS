@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+using System.Text.RegularExpressions;
+using System.Diagnostics.CodeAnalysis;
 #if !NETSTANDARD
 using System.Globalization;
 using System.Runtime.Serialization;
@@ -195,7 +196,7 @@ namespace Umbraco.Cms.Core.Semver
         /// </param>
         /// <param name="strict">If set to <c>true</c> minor and patch version are required, else they default to 0.</param>
         /// <returns><c>False</c> when a invalid version string is passed, otherwise <c>true</c>.</returns>
-        public static bool TryParse(string version, out SemVersion? semver, bool strict = false)
+        public static bool TryParse(string version, [NotNullWhen(true)] out SemVersion? semver, bool strict = false)
         {
             try
             {

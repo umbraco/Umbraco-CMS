@@ -14,6 +14,7 @@ public interface IRuntimeMinifier
     /// Creates a css bundle
     /// </summary>
     /// <param name="bundleName"></param>
+    /// <param name="bundleOptions"></param>
     /// <param name="filePaths"></param>
     /// <remarks>
     /// All files must be absolute paths, relative paths will throw <see cref="InvalidOperationException" />
@@ -36,7 +37,7 @@ public interface IRuntimeMinifier
     ///     Creates a JS bundle
     /// </summary>
     /// <param name="bundleName"></param>
-    /// <param name="optimizeOutput"></param>
+    /// <param name="bundleOptions"></param>
     /// <param name="filePaths"></param>
     /// <remarks>
     /// All files must be absolute paths, relative paths will throw <see cref="InvalidOperationException" />

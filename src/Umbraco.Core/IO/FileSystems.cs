@@ -283,8 +283,10 @@ namespace Umbraco.Cms.Core.IO
                 }
 
                 _shadowCurrentId = id;
-
-                _logger.LogDebug("Shadow '{ShadowId}'", _shadowCurrentId);
+                if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                {
+                    _logger.LogDebug("Shadow '{ShadowId}'", _shadowCurrentId);
+                }
 
                 foreach (ShadowWrapper wrapper in _shadowWrappers)
                 {
@@ -307,8 +309,10 @@ namespace Umbraco.Cms.Core.IO
                 {
                     throw new InvalidOperationException("Not the current shadow.");
                 }
-
-                _logger.LogDebug("UnShadow '{ShadowId}' {Status}", id, completed ? "complete" : "abort");
+                if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                {
+                    _logger.LogDebug("UnShadow '{ShadowId}' {Status}", id, completed ? "complete" : "abort");
+                }
 
                 var exceptions = new List<Exception>();
                 foreach (ShadowWrapper wrapper in _shadowWrappers)

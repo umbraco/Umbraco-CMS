@@ -47,7 +47,7 @@ public class UnattendedUpgrader : INotificationAsyncHandler<RuntimeUnattendedUpg
                 case RuntimeLevelReason.UpgradeMigrations:
                 {
                     var plan = new UmbracoPlan(_umbracoVersion);
-                    using (_profilingLogger.TraceDuration<UnattendedUpgrader>(
+                    using (!_profilingLogger.IsEnabled(Core.Logging.LogLevel.Verbose) ? null : _profilingLogger.TraceDuration<UnattendedUpgrader>(
                                "Starting unattended upgrade.",
                                "Unattended upgrade completed."))
                     {

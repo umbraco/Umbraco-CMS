@@ -19,8 +19,7 @@ public class RuntimeMinificationSettings
     ///     The cache buster type to use
     /// </summary>
     [DefaultValue(StaticCacheBuster)]
-    public RuntimeMinificationCacheBuster CacheBuster { get; set; } =
-        Enum<RuntimeMinificationCacheBuster>.Parse(StaticCacheBuster);
+    public RuntimeMinificationCacheBuster CacheBuster { get; set; } = Enum.Parse<RuntimeMinificationCacheBuster>(StaticCacheBuster);
 
     /// <summary>
     ///     The unique version string used if CacheBuster is 'Version'.

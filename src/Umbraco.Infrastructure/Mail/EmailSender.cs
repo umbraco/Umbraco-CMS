@@ -83,18 +83,24 @@ public class EmailSender : IEmailSender
             // if a handler handled sending the email then don't continue.
             if (notification.IsHandled)
             {
-                _logger.LogDebug(
+                if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                {
+                    _logger.LogDebug(
                     "The email sending for {Subject} was handled by a notification handler",
                     notification.Message.Subject);
+                }
                 return;
             }
         }
 
         if (!_globalSettings.IsSmtpServerConfigured && !_globalSettings.IsPickupDirectoryLocationConfigured)
         {
-            _logger.LogDebug(
+            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                _logger.LogDebug(
                 "Could not send email for {Subject}. It was not handled by a notification handler and there is no SMTP configured.",
                 message.Subject);
+            }
             return;
         }
 

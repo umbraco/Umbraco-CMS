@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
@@ -22,6 +21,7 @@ using Umbraco.Cms.Tests.Common;
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HostedServices;
 
 [TestFixture]
+[Obsolete("Replaced by BackgroundJobs.Jobs.KeepAliveJobTests")]
 public class KeepAliveTests
 {
     private Mock<HttpMessageHandler> _mockHttpMessageHandler;

@@ -20,7 +20,7 @@
         </p>
 
         <!-- Drag and drop illustration -->
-        <img class="illustration" src="assets/img/uploader/upload-illustration.svg" alt="" draggable="false" />
+        <img class="illustration" src="assets/img/uploader/upload-illustration.svg" alt=" " draggable="false" />
 
         <!-- Select files -->
         <button type="button"
@@ -56,7 +56,7 @@
           <div>
             <span>{{ file.name }}</span>
             <span ng-if="file.messages.length > 0 || file.$error" class="file-messages">
-              <span class="errorMessage color-red" ng-repeat="message in file.messages">{{message.header}}: {{message.message}}</span>
+              <span class="errorMessage color-red" ng-repeat="message in ::file.messages" ng-if="message.message">{{::message.header}}: {{::message.message}}</span>
               <span ng-if="file.$error === 'pattern'" class="errorMessage color-red"><localize key="media_disallowedFileType"></localize></span>
               <span ng-if="file.$error === 'maxSize'" class="errorMessage color-red"><localize key="media_maxFileSize"></localize> "{{maxFileSize}}"</span>
             </span>

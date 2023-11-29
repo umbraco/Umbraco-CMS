@@ -62,4 +62,11 @@ public interface IProfilingLogger
         object[]? startMessageArgs = null,
         object[]? endMessageArgs = null,
         object[]? failMessageArgs = null);
+
+    /// <summary>
+    /// Checks if the given logLevel is enabled.
+    /// </summary>
+    /// <param name="logLevel">Level to be checked.</param>
+    /// <returns>true if enabled.</returns>
+    bool IsEnabled(LogLevel logLevel) => true;
 }

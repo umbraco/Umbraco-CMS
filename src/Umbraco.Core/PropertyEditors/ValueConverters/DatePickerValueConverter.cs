@@ -39,6 +39,7 @@ public class DatePickerValueConverter : PropertyValueConverterBase
     }
 
     // default ConvertSourceToObject just returns source ie a DateTime value
+    [Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
     public override object? ConvertIntermediateToXPath(
         IPublishedElement owner,
         IPublishedPropertyType propertyType,

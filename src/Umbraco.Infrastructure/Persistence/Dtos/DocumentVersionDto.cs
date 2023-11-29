@@ -9,11 +9,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [ExplicitColumns]
 public class DocumentVersionDto
 {
-    private const string TableName = Constants.DatabaseSchema.Tables.DocumentVersion;
+    public const string TableName = Constants.DatabaseSchema.Tables.DocumentVersion;
 
     [Column("id")]
     [PrimaryKeyColumn(AutoIncrement = false)]
     [ForeignKey(typeof(ContentVersionDto))]
+    [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_id_published", ForColumns = "id,published", IncludeColumns = "templateId")]
     public int Id { get; set; }
 
     [Column("templateId")]
@@ -22,6 +23,7 @@ public class DocumentVersionDto
     public int? TemplateId { get; set; }
 
     [Column("published")]
+    [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_published", ForColumns = "published", IncludeColumns = "id,templateId")]
     public bool Published { get; set; }
 
     [ResultColumn]

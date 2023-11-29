@@ -30,6 +30,7 @@ public static partial class Constants
         public const string ConfigMarketplace = ConfigPrefix + "Marketplace";
         public const string ConfigLegacyPasswordMigration = ConfigPrefix + "LegacyPasswordMigration";
         public const string ConfigContent = ConfigPrefix + "Content";
+        public const string ConfigDeliveryApi = ConfigPrefix + "DeliveryApi";
         public const string ConfigCoreDebug = ConfigCorePrefix + "Debug";
         public const string ConfigExceptionFilter = ConfigPrefix + "ExceptionFilter";
         public const string ConfigGlobal = ConfigPrefix + "Global";
@@ -38,6 +39,7 @@ public static partial class Constants
         public const string ConfigHosting = ConfigPrefix + "Hosting";
         public const string ConfigImaging = ConfigPrefix + "Imaging";
         public const string ConfigExamine = ConfigPrefix + "Examine";
+        public const string ConfigIndexing = ConfigPrefix + "Indexing";
         public const string ConfigKeepAlive = ConfigPrefix + "KeepAlive";
         public const string ConfigLogging = ConfigPrefix + "Logging";
         public const string ConfigMemberPassword = ConfigPrefix + "Security:MemberPassword";

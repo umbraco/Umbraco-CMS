@@ -154,7 +154,7 @@ namespace Umbraco.Cms
                 DateTime lastPruned,
                 int lastId)
             {
-                using (_profilingLogger.DebugDuration<CacheInstructionService>("Syncing from database..."))
+                using (!_profilingLogger.IsEnabled(Core.Logging.LogLevel.Debug) ? null : _profilingLogger.DebugDuration<CacheInstructionService>("Syncing from database..."))
                 using (ICoreScope scope = ScopeProvider.CreateCoreScope())
                 {
                     var numberOfInstructionsProcessed = ProcessDatabaseInstructions(cacheRefreshers, cancellationToken, localIdentity, ref lastId);
@@ -185,8 +185,18 @@ namespace Umbraco.Cms
                 }
             }
 
-            private CacheInstruction CreateCacheInstruction(IEnumerable<RefreshInstruction> instructions, string localIdentity) =>
-                new(0, DateTime.UtcNow, JsonConvert.SerializeObject(instructions, Formatting.None), localIdentity, instructions.Sum(x => x.JsonIdCount));
+            private CacheInstruction CreateCacheInstruction(IEnumerable<RefreshInstruction> instructions, string localIdentity)
+                => new(
+                    0,
+                    DateTime.UtcNow,
+                    JsonConvert.SerializeObject(instructions, new JsonSerializerSettings()
+                    {
+                        Formatting = Formatting.None,
+                        DefaultValueHandling = DefaultValueHandling.Ignore,
+                        NullValueHandling = NullValueHandling.Ignore,
+                    }),
+                    localIdentity,
+                    instructions.Sum(x => x.JsonIdCount));
 
             /// <summary>
             ///     Process instructions from the database.
@@ -328,9 +338,14 @@ namespace Umbraco.Cms
             /// <summary>
             ///     Processes the instruction batch and checks for errors.
             /// </summary>
+            /// <param name="cacheRefreshers"></param>
+            /// <param name="instructionBatch"></param>
+            /// <param name="instruction"></param>
             /// <param name="processed">
             ///     Tracks which instructions have already been processed to avoid duplicates
             /// </param>
+            /// <param name="cancellationToken"></param>
+            /// <param name="lastId"></param>
             /// <returns>
             /// Returns true if all instructions in the batch were processed, otherwise false if they could not be due to the app being shut down
             /// </returns>

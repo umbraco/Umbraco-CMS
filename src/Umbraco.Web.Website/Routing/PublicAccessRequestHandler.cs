@@ -50,7 +50,10 @@ public class PublicAccessRequestHandler : IPublicAccessRequestHandler
         PublicAccessStatus publicAccessStatus;
         do
         {
-            _logger.LogDebug(nameof(RewriteForPublishedContentAccessAsync) + ": Loop {LoopCounter}", i);
+            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                _logger.LogDebug(nameof(RewriteForPublishedContentAccessAsync) + ": Loop {LoopCounter}", i);
+            }
 
             IPublishedContent? publishedContent = routeValues.PublishedRequest?.PublishedContent;
             if (publishedContent == null)
@@ -64,7 +67,10 @@ public class PublicAccessRequestHandler : IPublicAccessRequestHandler
 
             if (publicAccessAttempt.Success)
             {
-                _logger.LogDebug("EnsurePublishedContentAccess: Page is protected, check for access");
+                if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                {
+                    _logger.LogDebug("EnsurePublishedContentAccess: Page is protected, check for access");
+                }
 
                 // manually authenticate the request
                 AuthenticateResult authResult =
@@ -87,7 +93,10 @@ public class PublicAccessRequestHandler : IPublicAccessRequestHandler
                         // redirect if this is not the login page
                         if (publicAccessAttempt.Result!.LoginNodeId != publishedContent.Id)
                         {
-                            _logger.LogDebug("EnsurePublishedContentAccess: Not logged in, redirect to login page");
+                            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                            {
+                                _logger.LogDebug("EnsurePublishedContentAccess: Not logged in, redirect to login page");
+                            }
                             routeValues = await SetPublishedContentAsOtherPageAsync(
                                 httpContext, routeValues.PublishedRequest, publicAccessAttempt.Result!.LoginNodeId);
                         }
@@ -97,32 +106,47 @@ public class PublicAccessRequestHandler : IPublicAccessRequestHandler
                         // Redirect if this is not the access denied page
                         if (publicAccessAttempt.Result!.NoAccessNodeId != publishedContent.Id)
                         {
-                            _logger.LogDebug(
+                            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                            {
+                                _logger.LogDebug(
                                 "EnsurePublishedContentAccess: Current member has not access, redirect to error page");
+                            }
                             routeValues = await SetPublishedContentAsOtherPageAsync(
                                 httpContext, routeValues.PublishedRequest, publicAccessAttempt.Result!.NoAccessNodeId);
                         }
 
                         break;
                     case PublicAccessStatus.LockedOut:
-                        _logger.LogDebug("Current member is locked out, redirect to error page");
+                        if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                        {
+                            _logger.LogDebug("Current member is locked out, redirect to error page");
+                        }
                         routeValues = await SetPublishedContentAsOtherPageAsync(
                             httpContext, routeValues.PublishedRequest, publicAccessAttempt.Result!.NoAccessNodeId);
                         break;
                     case PublicAccessStatus.NotApproved:
-                        _logger.LogDebug("Current member is unapproved, redirect to error page");
+                        if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                        {
+                            _logger.LogDebug("Current member is unapproved, redirect to error page");
+                        }
                         routeValues = await SetPublishedContentAsOtherPageAsync(
                             httpContext, routeValues.PublishedRequest, publicAccessAttempt.Result!.NoAccessNodeId);
                         break;
                     case PublicAccessStatus.AccessAccepted:
-                        _logger.LogDebug("Current member has access");
+                        if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                        {
+                            _logger.LogDebug("Current member has access");
+                        }
                         break;
                 }
             }
             else
             {
                 publicAccessStatus = PublicAccessStatus.AccessAccepted;
-                _logger.LogDebug("EnsurePublishedContentAccess: Page is not protected");
+                if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                {
+                    _logger.LogDebug("EnsurePublishedContentAccess: Page is not protected");
+                }
             }
 
             // loop until we have access or reached max loops
@@ -130,8 +154,11 @@ public class PublicAccessRequestHandler : IPublicAccessRequestHandler
 
         if (i == maxLoop)
         {
-            _logger.LogDebug(nameof(RewriteForPublishedContentAccessAsync) +
+            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                _logger.LogDebug(nameof(RewriteForPublishedContentAccessAsync) +
                              ": Looks like we are running into an infinite loop, abort");
+            }
         }
 
         return routeValues;

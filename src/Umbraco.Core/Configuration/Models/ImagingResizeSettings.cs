@@ -6,7 +6,7 @@ using System.ComponentModel;
 namespace Umbraco.Cms.Core.Configuration.Models;
 
 /// <summary>
-///     Typed configuration options for image resize settings.
+/// Typed configuration options for image resize settings.
 /// </summary>
 public class ImagingResizeSettings
 {
@@ -14,13 +14,13 @@ public class ImagingResizeSettings
     internal const int StaticMaxHeight = 5000;
 
     /// <summary>
-    ///     Gets or sets a value for the maximim resize width.
+    /// Gets or sets a value for the maximum resize width.
     /// </summary>
     [DefaultValue(StaticMaxWidth)]
     public int MaxWidth { get; set; } = StaticMaxWidth;
 
     /// <summary>
-    ///     Gets or sets a value for the maximim resize height.
+    /// Gets or sets a value for the maximum resize height.
     /// </summary>
     [DefaultValue(StaticMaxHeight)]
     public int MaxHeight { get; set; } = StaticMaxHeight;

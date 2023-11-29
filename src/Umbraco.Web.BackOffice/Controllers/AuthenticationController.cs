@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -429,6 +430,8 @@ public class AuthenticationController : UmbracoApiControllerBase
             }
         }
 
+        await Task.Delay(RandomNumberGenerator.GetInt32(400, 2500));
+
         return Ok();
     }
 
@@ -633,7 +636,7 @@ public class AuthenticationController : UmbracoApiControllerBase
         await _signInManager.SignOutAsync();
 
         _logger.LogInformation("User {UserName} from IP address {RemoteIpAddress} has logged out",
-            User.Identity == null ? "UNKNOWN" : User.Identity.Name, HttpContext.Connection.RemoteIpAddress);
+            result.Principal.Identity == null ? "UNKNOWN" : result.Principal.Identity.Name, HttpContext.Connection.RemoteIpAddress);
 
         var userId = result.Principal.Identity?.GetUserId();
         SignOutSuccessResult args = _userManager.NotifyLogoutSuccess(User, userId);
@@ -650,7 +653,6 @@ public class AuthenticationController : UmbracoApiControllerBase
     ///     Return the <see cref="UserDetail" /> for the given <see cref="IUser" />
     /// </summary>
     /// <param name="user"></param>
-    /// <param name="principal"></param>
     /// <returns></returns>
     private UserDetail? GetUserDetail(IUser? user)
     {

@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -49,7 +48,7 @@ public class LogviewerTests
         File.Copy(exampleLogfilePath, _newLogfilePath, true);
 
         var logger = Mock.Of<ILogger<SerilogJsonLogViewer>>();
-        var logViewerConfig = new LogViewerConfig(LogViewerQueryRepository, Mock.Of<IScopeProvider>());
+        var logViewerConfig = new LogViewerConfig(LogViewerQueryRepository, TestHelper.ScopeProvider);
         var logLevelLoader = Mock.Of<ILogLevelLoader>();
         _logViewer =
             new SerilogJsonLogViewer(logger, logViewerConfig, loggingConfiguration, logLevelLoader, Log.Logger);
@@ -225,7 +224,7 @@ public class LogviewerTests
         // Assert.That(searches, Contains.Item(savedSearch));
 
         // Remove the search from above & ensure it no longer exists
-        _logViewer.DeleteSavedSearch("Unit Test Example", "Has(UnitTest)");
+        _logViewer.DeleteSavedSearch("Unit Test Example");
 
         searches = _logViewer.GetSavedSearches();
         findItem = searches.Where(x => x.Name == "Unit Test Example" && x.Query == "Has(UnitTest)");

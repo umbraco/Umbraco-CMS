@@ -145,7 +145,7 @@ internal class UserRepository : EntityRepositoryBase<int, IUser>, IUserRepositor
     /// </summary>
     /// <param name="username"></param>
     /// <param name="includeSecurityData">
-    ///     Can be used for slightly faster user lookups if the result doesn't require security data (i.e. groups, apps & start nodes).
+    ///     Can be used for slightly faster user lookups if the result doesn't require security data (i.e. groups, apps &amp; start nodes).
     ///     This is really only used for a shim in order to upgrade to 7.6.
     /// </param>
     /// <returns>
@@ -160,7 +160,7 @@ internal class UserRepository : EntityRepositoryBase<int, IUser>, IUserRepositor
     /// <param name="id"></param>
     /// <param name="includeSecurityData">
     ///     This is really only used for a shim in order to upgrade to 7.6 but could be used
-    ///     for slightly faster user lookups if the result doesn't require security data (i.e. groups, apps & start nodes)
+    ///     for slightly faster user lookups if the result doesn't require security data (i.e. groups, apps &amp; start nodes)
     /// </param>
     /// <returns>
     ///     A non cached <see cref="IUser"/> instance
@@ -265,12 +265,20 @@ SELECT 4 AS [Key], COUNT(id) AS [Value] FROM umbracoUser WHERE userDisabled = 0 
         if (DateTime.UtcNow - found.LastValidatedUtc > _globalSettings.TimeOut)
         {
             //timeout detected, update the record
-            Logger.LogDebug("ClearLoginSession for sessionId {sessionId}", sessionId);ClearLoginSession(sessionId);
+            if (Logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                Logger.LogDebug("ClearLoginSession for sessionId {sessionId}", sessionId);
+            }
+            ClearLoginSession(sessionId);
             return false;
         }
 
         //update the validate date
-        Logger.LogDebug("Updating LastValidatedUtc for sessionId {sessionId}", sessionId);found.LastValidatedUtc = DateTime.UtcNow;
+        if (Logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+        {
+            Logger.LogDebug("Updating LastValidatedUtc for sessionId {sessionId}", sessionId);
+        }
+        found.LastValidatedUtc = DateTime.UtcNow;
         Database.Update(found);
         return true;
     }

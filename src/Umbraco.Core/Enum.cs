@@ -22,7 +22,7 @@ public static class Enum<T>
         IntToValue = new Dictionary<int, T>();
         ValueToName = new Dictionary<T, string>();
         SensitiveNameToValue = new Dictionary<string, T>();
-        InsensitiveNameToValue = new Dictionary<string, T>();
+        InsensitiveNameToValue = new Dictionary<string, T>(StringComparer.InvariantCultureIgnoreCase);
 
         foreach (T value in Values)
         {
@@ -31,15 +31,15 @@ public static class Enum<T>
             IntToValue[Convert.ToInt32(value)] = value;
             ValueToName[value] = name!;
             SensitiveNameToValue[name!] = value;
-            InsensitiveNameToValue[name!.ToLowerInvariant()] = value;
+            InsensitiveNameToValue[name!] = value;
         }
     }
 
-    public static bool IsDefined(T value) => ValueToName.Keys.Contains(value);
+    public static bool IsDefined(T value) => ValueToName.ContainsKey(value);
 
-    public static bool IsDefined(string value) => SensitiveNameToValue.Keys.Contains(value);
+    public static bool IsDefined(string value) => SensitiveNameToValue.ContainsKey(value);
 
-    public static bool IsDefined(int value) => IntToValue.Keys.Contains(value);
+    public static bool IsDefined(int value) => IntToValue.ContainsKey(value);
 
     public static IEnumerable<T> GetValues() => Values;
 
@@ -50,28 +50,15 @@ public static class Enum<T>
     public static T Parse(string value, bool ignoreCase = false)
     {
         Dictionary<string, T> names = ignoreCase ? InsensitiveNameToValue : SensitiveNameToValue;
-        if (ignoreCase)
-        {
-            value = value.ToLowerInvariant();
-        }
 
-        if (names.TryGetValue(value, out T parsed))
-        {
-            return parsed;
-        }
+        return names.TryGetValue(value, out T parsed) ? parsed : Throw();
 
-        throw new ArgumentException(
-            $"Value \"{value}\"is not a valid {typeof(T).Name} enumeration value.",
-            nameof(value));
+        T Throw() => throw new ArgumentException($"Value \"{value}\"is not a valid {typeof(T).Name} enumeration value.", nameof(value));
     }
 
     public static bool TryParse(string value, out T returnValue, bool ignoreCase = false)
     {
         Dictionary<string, T> names = ignoreCase ? InsensitiveNameToValue : SensitiveNameToValue;
-        if (ignoreCase)
-        {
-            value = value.ToLowerInvariant();
-        }
 
         return names.TryGetValue(value, out returnValue);
     }
@@ -83,7 +70,7 @@ public static class Enum<T>
             return null;
         }
 
-        if (InsensitiveNameToValue.TryGetValue(value.ToLowerInvariant(), out T parsed))
+        if (InsensitiveNameToValue.TryGetValue(value, out T parsed))
         {
             return parsed;
         }

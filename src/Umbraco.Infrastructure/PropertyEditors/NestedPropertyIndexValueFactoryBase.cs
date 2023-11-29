@@ -1,7 +1,11 @@
 using System.Text;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Infrastructure.Examine;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
@@ -10,23 +14,45 @@ internal abstract class NestedPropertyIndexValueFactoryBase<TSerialized, TItem> 
 {
     private readonly PropertyEditorCollection _propertyEditorCollection;
 
+
     protected NestedPropertyIndexValueFactoryBase(
         PropertyEditorCollection propertyEditorCollection,
-        IJsonSerializer jsonSerializer)
-        : base(jsonSerializer)
+        IJsonSerializer jsonSerializer,
+        IOptionsMonitor<IndexingSettings> indexingSettings)
+        : base(jsonSerializer, indexingSettings)
     {
         _propertyEditorCollection = propertyEditorCollection;
     }
+
+    [Obsolete("Use non-obsolete constructor. This will be removed in Umbraco 14.")]
+    protected NestedPropertyIndexValueFactoryBase(
+        PropertyEditorCollection propertyEditorCollection,
+        IJsonSerializer jsonSerializer)
+        : this(propertyEditorCollection, jsonSerializer, StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<IndexingSettings>>())
+    {
+
+    }
+
+    [Obsolete("Use the overload that specifies availableCultures, scheduled for removal in v14")]
+    protected override IEnumerable<KeyValuePair<string, IEnumerable<object?>>> Handle(
+        TSerialized deserializedPropertyValue,
+        IProperty property,
+        string? culture,
+        string? segment,
+        bool published) =>
+        Handle(deserializedPropertyValue, property, culture, segment, published, Enumerable.Empty<string>());
 
     protected override IEnumerable<KeyValuePair<string, IEnumerable<object?>>> Handle(
         TSerialized deserializedPropertyValue,
         IProperty property,
         string? culture,
         string? segment,
-        bool published)
+        bool published,
+        IEnumerable<string> availableCultures)
     {
         var result = new List<KeyValuePair<string, IEnumerable<object?>>>();
 
+        var index = 0;
         foreach (TItem nestedContentRowValue in GetDataItems(deserializedPropertyValue))
         {
             IContentType? contentType = GetContentTypeOfNestedItem(nestedContentRowValue);
@@ -38,17 +64,37 @@ internal abstract class NestedPropertyIndexValueFactoryBase<TSerialized, TItem> 
 
             var propertyTypeDictionary =
                 contentType
-                    .PropertyGroups
+                    .CompositionPropertyGroups
                     .SelectMany(x => x.PropertyTypes!)
+                    .Select(propertyType =>
+                    {
+                        // We want to ensure that the nested properties are set vary by culture if the parent is
+                        // This is because it's perfectly valid to have a nested property type that's set to invariant even if the parent varies.
+                        // For instance in a block list, the list it self can vary, but the elements can be invariant, at the same time.
+                        if (culture is not null)
+                        {
+                            propertyType.Variations |= ContentVariation.Culture;
+                        }
+
+                        if (segment is not null)
+                        {
+                            propertyType.Variations |= ContentVariation.Segment;
+                        }
+
+                        return propertyType;
+                    })
                     .ToDictionary(x => x.Alias);
 
             result.AddRange(GetNestedResults(
-                property.Alias,
+                $"{property.Alias}.items[{index}]",
                 culture,
                 segment,
                 published,
                 propertyTypeDictionary,
-                nestedContentRowValue));
+                nestedContentRowValue,
+                availableCultures));
+
+            index++;
         }
 
         return RenameKeysToEnsureRawSegmentsIsAPrefix(result);
@@ -143,39 +189,51 @@ internal abstract class NestedPropertyIndexValueFactoryBase<TSerialized, TItem> 
         string? segment,
         bool published,
         IDictionary<string, IPropertyType> propertyTypeDictionary,
-        TItem nestedContentRowValue)
+        TItem nestedContentRowValue,
+        IEnumerable<string> availableCultures)
     {
-        var blockIndex = 0;
-
         foreach ((var propertyAlias, var propertyValue) in GetRawProperty(nestedContentRowValue))
         {
             if (propertyTypeDictionary.TryGetValue(propertyAlias, out IPropertyType? propertyType))
             {
-                IProperty subProperty = new Property(propertyType);
-                subProperty.SetValue(propertyValue, culture, segment);
-
-                if (published)
-                {
-                    subProperty.PublishValues(culture, segment ?? "*");
-                }
-
                 IDataEditor? editor = _propertyEditorCollection[propertyType.PropertyEditorAlias];
                 if (editor is null)
                 {
                     continue;
                 }
 
-                IEnumerable<KeyValuePair<string, IEnumerable<object?>>> indexValues =
-                    editor.PropertyIndexValueFactory.GetIndexValues(subProperty, culture, segment, published);
+                IProperty subProperty = new Property(propertyType);
+                IEnumerable<KeyValuePair<string, IEnumerable<object?>>> indexValues = null!;
+
+                if (propertyType.VariesByCulture() && culture is null)
+                {
+                    foreach (var availableCulture in availableCultures)
+                    {
+                        subProperty.SetValue(propertyValue, availableCulture, segment);
+                        if (published)
+                        {
+                            subProperty.PublishValues(availableCulture, segment ?? "*");
+                        }
+                        indexValues =
+                            editor.PropertyIndexValueFactory.GetIndexValues(subProperty, availableCulture, segment, published, availableCultures);
+                    }
+                }
+                else
+                {
+                    subProperty.SetValue(propertyValue, culture, segment);
+                    if (published)
+                    {
+                        subProperty.PublishValues(culture ?? "*", segment ?? "*");
+                    }
+                    indexValues = editor.PropertyIndexValueFactory.GetIndexValues(subProperty, culture, segment, published, availableCultures);
+                }
 
                 foreach ((var nestedAlias, IEnumerable<object?> nestedValue) in indexValues)
                 {
                     yield return new KeyValuePair<string, IEnumerable<object?>>(
-                        $"{keyPrefix}.items[{blockIndex}].{nestedAlias}", nestedValue!);
+                        $"{keyPrefix}.{nestedAlias}", nestedValue!);
                 }
             }
-
-            blockIndex++;
         }
     }
 }

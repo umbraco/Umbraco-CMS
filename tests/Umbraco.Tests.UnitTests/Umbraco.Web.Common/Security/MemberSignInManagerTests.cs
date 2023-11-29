@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -71,7 +70,8 @@ public class MemberSignInManagerTests
             Mock.Of<IAuthenticationSchemeProvider>(),
             Mock.Of<IUserConfirmation<MemberIdentityUser>>(),
             Mock.Of<IMemberExternalLoginProviders>(),
-            Mock.Of<IEventAggregator>());
+            Mock.Of<IEventAggregator>(),
+            Mock.Of<IOptions<SecuritySettings>>(x => x.Value == new SecuritySettings()));
     }
 
     private static Mock<MemberManager> MockMemberManager()

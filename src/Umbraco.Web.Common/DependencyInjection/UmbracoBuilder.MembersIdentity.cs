@@ -65,6 +65,7 @@ public static partial class UmbracoBuilderExtensions
 
         services.ConfigureOptions<ConfigureSecurityStampOptions>();
         services.ConfigureOptions<ConfigureMemberCookieOptions>();
+        services.AddScoped<MemberSecurityStampValidator>();
 
         services.AddUnique<IMemberExternalLoginProviders, MemberExternalLoginProviders>();
 

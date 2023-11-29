@@ -40,31 +40,42 @@ public abstract class PublishedCacheBase : IPublishedCache
 
     public IEnumerable<IPublishedContent> GetAtRoot(string? culture = null) => GetAtRoot(PreviewDefault, culture);
 
+    [Obsolete("The current implementation of this method is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
     public abstract IPublishedContent? GetSingleByXPath(bool preview, string xpath, XPathVariable[] vars);
 
+    [Obsolete("The current implementation of this method is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
     public IPublishedContent? GetSingleByXPath(string xpath, XPathVariable[] vars) =>
         GetSingleByXPath(PreviewDefault, xpath, vars);
 
+    [Obsolete("The current implementation of this method is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
     public abstract IPublishedContent? GetSingleByXPath(bool preview, XPathExpression xpath, XPathVariable[] vars);
 
+    [Obsolete("The current implementation of this method is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
     public IPublishedContent? GetSingleByXPath(XPathExpression xpath, XPathVariable[] vars) =>
         GetSingleByXPath(PreviewDefault, xpath, vars);
 
+    [Obsolete("The current implementation of this method is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
     public abstract IEnumerable<IPublishedContent> GetByXPath(bool preview, string xpath, XPathVariable[] vars);
 
+    [Obsolete("The current implementation of this method is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
     public IEnumerable<IPublishedContent> GetByXPath(string xpath, XPathVariable[] vars) =>
         GetByXPath(PreviewDefault, xpath, vars);
 
+    [Obsolete("The current implementation of this method is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
     public abstract IEnumerable<IPublishedContent>
         GetByXPath(bool preview, XPathExpression xpath, XPathVariable[] vars);
 
+    [Obsolete("The current implementation of this method is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
     public IEnumerable<IPublishedContent> GetByXPath(XPathExpression xpath, XPathVariable[] vars) =>
         GetByXPath(PreviewDefault, xpath, vars);
 
+    [Obsolete("The current implementation of this method is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
     public abstract XPathNavigator CreateNavigator(bool preview);
 
+    [Obsolete("The current implementation of this method is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
     public XPathNavigator CreateNavigator() => CreateNavigator(PreviewDefault);
 
+    [Obsolete("The current implementation of this method is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
     public abstract XPathNavigator? CreateNodeNavigator(int id, bool preview);
 
     public abstract bool HasContent(bool preview);

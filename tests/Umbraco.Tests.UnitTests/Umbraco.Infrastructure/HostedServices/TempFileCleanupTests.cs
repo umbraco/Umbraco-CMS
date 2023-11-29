@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -14,6 +13,7 @@ using Umbraco.Cms.Infrastructure.HostedServices;
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
 {
     [TestFixture]
+    [Obsolete("Replaced by BackgroundJobs.Jobs.TempFileCleanupTests")]
     public class TempFileCleanupTests
     {
         private Mock<IIOHelper> _mockIOHelper;

@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
@@ -434,7 +433,7 @@ public class BlockEditorComponentTests
             ""contentTypeKey"": ""36ccf44a-aac8-40a6-8685-73ab03bc9709"",
             ""udi"": ""umb://element/90549d94555647fdbe4d111c7178ada4"",
             ""title"": ""One more element one - 12 cols"",
-            ""subFeatures"": " + subFeatures.OrIfNullOrWhiteSpace(@"""""") + @"            
+            ""subFeatures"": " + subFeatures.OrIfNullOrWhiteSpace(@"""""") + @"
         }, {
             ""contentTypeKey"": ""5cc488aa-ba24-41f2-a01e-8f2d1982f865"",
             ""udi"": ""umb://element/5fc866c590be4d01a28a979472a1ffee"",

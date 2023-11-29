@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -17,6 +16,7 @@ using Umbraco.Cms.Tests.Common;
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HostedServices.ServerRegistration;
 
 [TestFixture]
+[Obsolete("Replaced by BackgroundJobs.Jobs.ServerRegistration.TouchServerJobTests")]
 public class TouchServerTaskTests
 {
     private Mock<IServerRegistrationService> _mockServerRegistrationService;

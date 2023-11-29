@@ -37,7 +37,7 @@ public class MemberValueSetBuilder : BaseValueSetBuilder<IMember>
 
             foreach (IProperty property in m.Properties)
             {
-                AddPropertyValue(property, null, null, values);
+                AddPropertyValue(property, null, null, values, m.AvailableCultures);
             }
 
             var vs = new ValueSet(m.Id.ToInvariantString(), IndexTypes.Member, m.ContentType.Alias, values);

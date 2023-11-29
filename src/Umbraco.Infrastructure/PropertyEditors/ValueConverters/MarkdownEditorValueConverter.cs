@@ -3,13 +3,15 @@
 
 using HeyRed.MarkdownSharp;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PropertyEditors.DeliveryApi;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Templates;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
 [DefaultPropertyValueConverter]
-public class MarkdownEditorValueConverter : PropertyValueConverterBase
+public class MarkdownEditorValueConverter : PropertyValueConverterBase, IDeliveryApiPropertyValueConverter
 {
     private readonly HtmlLocalLinkParser _localLinkParser;
     private readonly HtmlUrlParser _urlParser;
@@ -54,8 +56,23 @@ public class MarkdownEditorValueConverter : PropertyValueConverterBase
         return new HtmlEncodedString(inter == null ? string.Empty : mark.Transform((string)inter));
     }
 
+    [Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
     public override object ConvertIntermediateToXPath(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview) =>
 
         // source should come from ConvertSource and be a string (or null) already
         inter?.ToString() ?? string.Empty;
+
+    public PropertyCacheLevel GetDeliveryApiPropertyCacheLevel(IPublishedPropertyType propertyType) => PropertyCacheLevel.Element;
+
+    public Type GetDeliveryApiPropertyValueType(IPublishedPropertyType propertyType) => typeof(string);
+
+    public object ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview, bool expanding)
+    {
+        if (inter is not string markdownString || markdownString.IsNullOrWhiteSpace())
+        {
+            return string.Empty;
+        }
+
+        return markdownString;
+    }
 }

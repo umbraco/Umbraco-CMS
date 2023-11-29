@@ -50,8 +50,10 @@ public static partial class UmbracoBuilderExtensions
         builder
             .AddUmbracoOptions<ModelsBuilderSettings>()
             .AddUmbracoOptions<ActiveDirectorySettings>()
+            .AddUmbracoOptions<IndexCreatorSettings>()
             .AddUmbracoOptions<MarketplaceSettings>()
             .AddUmbracoOptions<ContentSettings>()
+            .AddUmbracoOptions<DeliveryApiSettings>()
             .AddUmbracoOptions<CoreDebugSettings>()
             .AddUmbracoOptions<ExceptionFilterSettings>()
             .AddUmbracoOptions<GlobalSettings>(optionsBuilder => optionsBuilder.PostConfigure(options =>
@@ -64,7 +66,7 @@ public static partial class UmbracoBuilderExtensions
             .AddUmbracoOptions<HealthChecksSettings>()
             .AddUmbracoOptions<HostingSettings>()
             .AddUmbracoOptions<ImagingSettings>()
-            .AddUmbracoOptions<IndexCreatorSettings>()
+            .AddUmbracoOptions<IndexingSettings>()
             .AddUmbracoOptions<KeepAliveSettings>()
             .AddUmbracoOptions<LoggingSettings>()
             .AddUmbracoOptions<MemberPasswordConfigurationSettings>()

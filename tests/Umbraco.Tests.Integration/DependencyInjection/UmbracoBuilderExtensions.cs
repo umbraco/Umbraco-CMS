@@ -1,12 +1,9 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using Examine;
-using Examine.Lucene.Directories;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
@@ -16,7 +13,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Services;
@@ -25,9 +22,12 @@ using Umbraco.Cms.Core.WebAssets;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Infrastructure.HostedServices;
 using Umbraco.Cms.Infrastructure.PublishedCache;
+using Umbraco.Cms.Persistence.EFCore.Locking;
+using Umbraco.Cms.Persistence.EFCore.Scoping;
 using Umbraco.Cms.Tests.Common.TestHelpers.Stubs;
 using Umbraco.Cms.Tests.Integration.Implementations;
-using Umbraco.Extensions;
+using Umbraco.Cms.Tests.Integration.Testing;
+using Umbraco.Cms.Tests.Integration.Umbraco.Persistence.EFCore.DbContext;
 
 namespace Umbraco.Cms.Tests.Integration.DependencyInjection;
 
@@ -62,6 +62,43 @@ public static class UmbracoBuilderExtensions
 
         builder.Services.AddUnique<IServerMessenger, NoopServerMessenger>();
         builder.Services.AddUnique<IProfiler, TestProfiler>();
+
+        builder.Services.AddDbContext<TestUmbracoDbContext>(
+            (serviceProvider, options) =>
+            {
+                var testDatabaseType = builder.Config.GetValue<TestDatabaseSettings.TestDatabaseType>("Tests:Database:DatabaseType");
+                if (testDatabaseType is TestDatabaseSettings.TestDatabaseType.Sqlite)
+                {
+                    options.UseSqlite(serviceProvider.GetRequiredService<IOptionsMonitor<ConnectionStrings>>().CurrentValue.ConnectionString);
+                }
+                else
+                {
+                    // If not Sqlite, assume SqlServer
+                    options.UseSqlServer(serviceProvider.GetRequiredService<IOptionsMonitor<ConnectionStrings>>().CurrentValue.ConnectionString);
+                }
+            },
+            optionsLifetime: ServiceLifetime.Singleton);
+
+        builder.Services.AddDbContextFactory<TestUmbracoDbContext>(
+            (serviceProvider, options) =>
+            {
+                var testDatabaseType = builder.Config.GetValue<TestDatabaseSettings.TestDatabaseType>("Tests:Database:DatabaseType");
+                if (testDatabaseType is TestDatabaseSettings.TestDatabaseType.Sqlite)
+                {
+                    options.UseSqlite(serviceProvider.GetRequiredService<IOptionsMonitor<ConnectionStrings>>().CurrentValue.ConnectionString);
+                }
+                else
+                {
+                    // If not Sqlite, assume SqlServer
+                    options.UseSqlServer(serviceProvider.GetRequiredService<IOptionsMonitor<ConnectionStrings>>().CurrentValue.ConnectionString);
+                }
+            });
+
+        builder.Services.AddUnique<IAmbientEFCoreScopeStack<TestUmbracoDbContext>, AmbientEFCoreScopeStack<TestUmbracoDbContext>>();
+        builder.Services.AddUnique<IEFCoreScopeAccessor<TestUmbracoDbContext>, EFCoreScopeAccessor<TestUmbracoDbContext>>();
+        builder.Services.AddUnique<IEFCoreScopeProvider<TestUmbracoDbContext>, EFCoreScopeProvider<TestUmbracoDbContext>>();
+        builder.Services.AddSingleton<IDistributedLockingMechanism, SqliteEFCoreDistributedLockingMechanism<TestUmbracoDbContext>>();
+        builder.Services.AddSingleton<IDistributedLockingMechanism, SqlServerEFCoreDistributedLockingMechanism<TestUmbracoDbContext>>();
 
         return builder;
     }

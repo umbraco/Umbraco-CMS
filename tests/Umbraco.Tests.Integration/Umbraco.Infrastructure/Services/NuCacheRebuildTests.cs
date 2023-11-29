@@ -1,4 +1,3 @@
-using System;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.PublishedCache;

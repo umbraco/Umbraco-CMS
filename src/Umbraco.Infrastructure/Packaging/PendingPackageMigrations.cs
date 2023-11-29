@@ -48,12 +48,14 @@ public class PendingPackageMigrations
                 // If there is nothing in the DB then we need to run
                 pendingMigrations.Add(plan.Name);
             }
-
-            _logger.LogDebug(
+            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                _logger.LogDebug(
                 "Final package migration for {PackagePlan} state is {FinalMigrationState}, database contains {DatabaseState}",
                 plan.Name,
                 plan.FinalState,
                 currentMigrationState ?? "<null>");
+            }
         }
 
         return pendingMigrations;

@@ -271,11 +271,17 @@ public class UmbracoDatabase : Database, IUmbracoDatabase
     protected override void OnException(Exception ex)
     {
         _logger.LogError(ex, "Exception ({InstanceId}).", InstanceId);
-        _logger.LogDebug("At:\r\n{StackTrace}", Environment.StackTrace);
+        if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+        {
+            _logger.LogDebug("At:\r\n{StackTrace}", Environment.StackTrace);
+        }
 
         if (EnableSqlTrace == false)
         {
-            _logger.LogDebug("Sql:\r\n{Sql}", CommandToString(LastSQL, LastArgs));
+            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                _logger.LogDebug("Sql:\r\n{Sql}", CommandToString(LastSQL, LastArgs));
+            }
         }
 
         base.OnException(ex);
@@ -293,7 +299,10 @@ public class UmbracoDatabase : Database, IUmbracoDatabase
 
         if (EnableSqlTrace)
         {
-            _logger.LogDebug("SQL Trace:\r\n{Sql}", CommandToString(cmd).Replace("{", "{{").Replace("}", "}}")); // TODO: these escapes should be builtin
+            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                _logger.LogDebug("SQL Trace:\r\n{Sql}", CommandToString(cmd).Replace("{", "{{").Replace("}", "}}")); // TODO: these escapes should be builtin
+            }
         }
 
 #if DEBUG_DATABASES
@@ -381,7 +390,7 @@ public class UmbracoDatabase : Database, IUmbracoDatabase
     public new T ExecuteScalar<T>(string sql, params object[] args)
         => ExecuteScalar<T>(new Sql(sql, args));
 
-    /// <inheritdoc cref="Database.ExecuteScalar{T}(sql)" />
+    /// <inheritdoc cref="Database.ExecuteScalar{T}(Sql)" />
     public new T ExecuteScalar<T>(Sql sql)
         => ExecuteScalar<T>(sql.SQL, CommandType.Text, sql.Arguments);
 

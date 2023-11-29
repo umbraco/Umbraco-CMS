@@ -53,7 +53,13 @@ function sortByPreValsController($rootScope, $scope, localizationService, editor
             { value: "ContentTypeAlias", key: "content_documentType" },
             { value: "Published", key: "content_isPublished" },
             { value: "Email", key: "general_email" },
-            { value: "Username", key: "general_username" }
+            { value: "Username", key: "general_username" },
+            { value: "failedPasswordAttempts", key: "user_failedPasswordAttempts" },
+            { value: "approved", key: "user_stateApproved" },
+            { value: "lockedOut", key: "user_stateLockedOut" },
+            { value: "lastLockoutDate", key: "user_lastLockoutDate" },
+            { value: "lastLoginDate", key: "user_lastLogin" },
+            { value: "lastPasswordChangeDate", key: "user_lastPasswordChangeDate" }
         ];
         _.each(systemFields, function (e) {
             localizationService.localize(e.key).then(function (v) {

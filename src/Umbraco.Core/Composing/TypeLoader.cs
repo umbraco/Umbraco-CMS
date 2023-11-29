@@ -190,10 +190,13 @@ public sealed class TypeLoader
         if (!typeof(IDiscoverable).IsAssignableFrom(typeof(T)))
         {
             // warn
-            _logger.LogDebug(
+            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                _logger.LogDebug(
                 "Running a full, " + (cache ? string.Empty : "non-") +
                 "cached, scan for non-discoverable type {TypeName} (slow).",
                 typeof(T).FullName);
+            }
 
             return GetTypesInternal(
                 typeof(T),
@@ -214,9 +217,12 @@ public sealed class TypeLoader
         // warn
         if (!cache)
         {
-            _logger.LogDebug(
+            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                _logger.LogDebug(
                 "Running a non-cached, filter for discoverable type {TypeName} (slowish).",
                 typeof(T).FullName);
+            }
         }
 
         // filter the cached discovered types (and maybe cache the result)
@@ -253,11 +259,14 @@ public sealed class TypeLoader
         // if not IDiscoverable, directly get types
         if (!typeof(IDiscoverable).IsAssignableFrom(typeof(T)))
         {
-            _logger.LogDebug(
+            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                _logger.LogDebug(
                 "Running a full, " + (cache ? string.Empty : "non-") +
                 "cached, scan for non-discoverable type {TypeName} / attribute {AttributeName} (slow).",
                 typeof(T).FullName,
                 typeof(TAttribute).FullName);
+            }
 
             return GetTypesInternal(
                 typeof(T),
@@ -278,10 +287,13 @@ public sealed class TypeLoader
         // warn
         if (!cache)
         {
-            _logger.LogDebug(
+            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                _logger.LogDebug(
                 "Running a non-cached, filter for discoverable type {TypeName}  / attribute {AttributeName} (slowish).",
                 typeof(T).FullName,
                 typeof(TAttribute).FullName);
+            }
         }
 
         // filter the cached discovered types (and maybe cache the result)
@@ -318,9 +330,12 @@ public sealed class TypeLoader
 
         if (!cache)
         {
-            _logger.LogDebug(
+            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                _logger.LogDebug(
                 "Running a full, non-cached, scan for types / attribute {AttributeName} (slow).",
                 typeof(TAttribute).FullName);
+            }
         }
 
         return GetTypesInternal(
@@ -376,7 +391,10 @@ public sealed class TypeLoader
         if (typeList != null)
         {
             // need to put some logging here to try to figure out why this is happening: http://issues.umbraco.org/issue/U4-3505
-            _logger.LogDebug("Getting {TypeName}: found a cached type list.", GetName(baseType, attributeType));
+            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                _logger.LogDebug("Getting {TypeName}: found a cached type list.", GetName(baseType, attributeType));
+            }
             return typeList.Types;
         }
 
@@ -384,7 +402,10 @@ public sealed class TypeLoader
         typeList = new TypeList(baseType, attributeType);
 
         // either we had to scan, or we could not get the types from the cache file - scan now
-        _logger.LogDebug("Getting {TypeName}: " + action + ".", GetName(baseType, attributeType));
+        if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+        {
+            _logger.LogDebug("Getting {TypeName}: " + action + ".", GetName(baseType, attributeType));
+        }
 
         foreach (Type t in finder())
         {
@@ -399,12 +420,17 @@ public sealed class TypeLoader
             {
                 _types[listKey] = typeList;
             }
-
-            _logger.LogDebug("Got {TypeName}, caching ({CacheType}).", GetName(baseType, attributeType), added.ToString().ToLowerInvariant());
+            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                _logger.LogDebug("Got {TypeName}, caching ({CacheType}).", GetName(baseType, attributeType), added.ToString().ToLowerInvariant());
+            }
         }
         else
         {
-            _logger.LogDebug("Got {TypeName}.", GetName(baseType, attributeType));
+            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                _logger.LogDebug("Got {TypeName}.", GetName(baseType, attributeType));
+            }
         }
 
         return typeList.Types;

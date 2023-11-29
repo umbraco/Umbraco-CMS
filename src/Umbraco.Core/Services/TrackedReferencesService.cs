@@ -1,7 +1,6 @@
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
-using Umbraco.New.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Services;
 

@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Examine;
@@ -9,6 +8,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Examine;
+using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Extensions;
 
@@ -19,6 +19,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine;
 public class SearchTests : ExamineBaseTest
 {
     [Test]
+    [LongRunning]
     public void Test_Sort_Order_Sorting()
     {
         long totalRecs;

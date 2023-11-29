@@ -215,7 +215,10 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto
         // tells the factory that it should build a new generation of models
         private void ResetModels()
         {
-            _logger.LogDebug("Resetting models.");
+            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                _logger.LogDebug("Resetting models.");
+            }
 
             try
             {
@@ -257,7 +260,10 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto
         {
             if (_debugLevel > 0)
             {
-                _logger.LogDebug("Ensuring models.");
+                if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                {
+                    _logger.LogDebug("Ensuring models.");
+                }
             }
 
             // don't use an upgradeable lock here because only 1 thread at a time could enter it
@@ -291,7 +297,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto
                 // we don't have models,
                 // either they haven't been loaded from the cache yet
                 // or they have been reseted and are pending a rebuild
-                using (_profilingLogger.DebugDuration<InMemoryModelFactory>("Get models.", "Got models."))
+                using (!_profilingLogger.IsEnabled(Core.Logging.LogLevel.Debug) ? null : _profilingLogger.DebugDuration<InMemoryModelFactory>("Get models.", "Got models."))
                 {
                     try
                     {
@@ -396,13 +402,19 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto
             // currentHash hashes both the types & the user's partials
             if (!forceRebuild)
             {
-                _logger.LogDebug("Looking for cached models.");
+                if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                {
+                    _logger.LogDebug("Looking for cached models.");
+                }
                 if (File.Exists(modelsHashFile) && File.Exists(projFile))
                 {
                     var cachedHash = File.ReadAllText(modelsHashFile);
                     if (currentHash != cachedHash)
                     {
-                        _logger.LogDebug("Found obsolete cached models.");
+                        if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                        {
+                            _logger.LogDebug("Found obsolete cached models.");
+                        }
                         forceRebuild = true;
                     }
 
@@ -426,8 +438,10 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto
                 if (File.Exists(dllPathFile))
                 {
                     var dllPath = File.ReadAllText(dllPathFile);
-
-                    _logger.LogDebug($"Cached models dll at {dllPath}.");
+                    if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                    {
+                        _logger.LogDebug("Cached models dll at {dllPath}.",dllPath);
+                    }
 
                     if (File.Exists(dllPath) && !File.Exists(dllPath + ".delete"))
                     {
@@ -441,24 +455,37 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto
                             // ver 1, but we remember we want to skip that one - so we never end up
                             // with the "same but different" version of the assembly in memory
                             _skipver = assembly.GetName().Version?.Revision;
-
-                            _logger.LogDebug("Loading cached models (dll).");
+                            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                            {
+                                _logger.LogDebug("Loading cached models (dll).");
+                            }
                             return assembly;
                         }
-
-                        _logger.LogDebug("Cached models dll cannot be loaded (invalid assembly).");
+                        if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                        {
+                            _logger.LogDebug("Cached models dll cannot be loaded (invalid assembly).");
+                        }
                     }
                     else if (!File.Exists(dllPath))
                     {
-                        _logger.LogDebug("Cached models dll does not exist.");
+                        if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                        {
+                            _logger.LogDebug("Cached models dll does not exist.");
+                        }
                     }
                     else if (File.Exists(dllPath + ".delete"))
                     {
-                        _logger.LogDebug("Cached models dll is marked for deletion.");
+                        if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                        {
+                            _logger.LogDebug("Cached models dll is marked for deletion.");
+                        }
                     }
                     else
                     {
-                        _logger.LogDebug("Cached models dll cannot be loaded (why?).");
+                        if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                        {
+                            _logger.LogDebug("Cached models dll cannot be loaded (why?).");
+                        }
                     }
                 }
 
@@ -487,13 +514,18 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto
                     ClearOnFailingToCompile(dllPathFile, modelsHashFile, projFile);
                     throw;
                 }
-
-                _logger.LogDebug("Loading cached models (source).");
+                if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                {
+                    _logger.LogDebug("Loading cached models (source).");
+                }
                 return assembly;
             }
 
             // need to rebuild
-            _logger.LogDebug("Rebuilding models.");
+            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                _logger.LogDebug("Rebuilding models.");
+            }
 
             // generate code, save
             var code = GenerateModelsCode(typeModels);
@@ -531,8 +563,10 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto
                 ClearOnFailingToCompile(dllPathFile, modelsHashFile, projFile);
                 throw;
             }
-
-            _logger.LogDebug("Done rebuilding.");
+            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                _logger.LogDebug("Done rebuilding.");
+            }
             return assembly;
         }
 
@@ -577,7 +611,10 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder.InMemoryAuto
 
         private void ClearOnFailingToCompile(string dllPathFile, string modelsHashFile, string projFile)
         {
-            _logger.LogDebug("Failed to compile.");
+            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                _logger.LogDebug("Failed to compile.");
+            }
 
             // the dll file reference still points to the previous dll, which is obsolete
             // now and will be deleted by ASP.NET eventually, so better clear that reference.

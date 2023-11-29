@@ -105,7 +105,7 @@
                         <div class="umb-panel-group__details-status" ng-repeat="status in check.status">
                             <div class="umb-panel-group__details-status-icon-container" aria-hidden="true">
                                 <umb-icon icon="icon-check" class="umb-healthcheck-status-icon color-green" ng-if="status.resultType === 'Success'"></umb-icon>
-                                <umb-icon icon="icon-alert" class="umb-healthcheck-status-icon color-yellow" ng-if="status.resultType === 'Warning'"></umb-icon>
+                                <umb-icon icon="icon-alert" class="umb-healthcheck-status-icon color-orange" ng-if="status.resultType === 'Warning'"></umb-icon>
                                 <umb-icon icon="icon-delete" class="umb-healthcheck-status-icon color-red" ng-if="status.resultType === 'Error'"></umb-icon>
                                 <umb-icon icon="icon-info" class="umb-healthcheck-status-icon" ng-if="status.resultType === 'Info'"></umb-icon>
                             </div>

@@ -60,7 +60,7 @@ public class MetricsConsentService : IMetricsConsentService
         if (analyticsLevelString is null ||
             Enum.TryParse(analyticsLevelString, out TelemetryLevel analyticsLevel) is false)
         {
-            return TelemetryLevel.Basic;
+            return TelemetryLevel.Detailed;
         }
 
         return analyticsLevel;

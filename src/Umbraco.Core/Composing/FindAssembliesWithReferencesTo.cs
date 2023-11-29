@@ -57,7 +57,10 @@ internal class FindAssembliesWithReferencesTo
                 catch (FileNotFoundException ex)
                 {
                     // occurs if we cannot load this ... for example in a test project where we aren't currently referencing Umbraco.Web, etc...
-                    _logger.LogDebug(ex, "Could not load assembly " + target);
+                    if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                    {
+                        _logger.LogDebug(ex, "Could not load assembly " + target);
+                    }
                 }
             }
         }

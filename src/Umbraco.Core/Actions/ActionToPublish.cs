@@ -6,6 +6,7 @@ namespace Umbraco.Cms.Core.Actions;
 /// <summary>
 ///     This action is invoked when children to a document is being sent to published (by an editor without publishrights).
 /// </summary>
+[Obsolete("Scheduled for removal in v13")]
 public class ActionToPublish : IAction
 {
     /// <inheritdoc cref="IAction.ActionLetter"/>

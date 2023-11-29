@@ -22,4 +22,9 @@ public class TypeFinderSettings
     ///     scanning for plugins based on different root referenced assemblies you can add the assembly name to this list.
     /// </summary>
     public IEnumerable<string>? AdditionalEntryAssemblies { get; set; }
+
+    /// <summary>
+    ///     Gets or sets a value for the assemblies that will be excluded from scanning.
+    /// </summary>
+    public string[] AdditionalAssemblyExclusionEntries { get; set; } = Array.Empty<string>();
 }

@@ -47,7 +47,6 @@ public class DefaultUrlProvider : IUrlProvider
     /// <summary>
     ///     Gets the other URLs of a published content.
     /// </summary>
-    /// <param name="umbracoContextAccessor">The Umbraco context.</param>
     /// <param name="id">The published content id.</param>
     /// <param name="current">The current absolute URL.</param>
     /// <returns>The other URLs for the published content.</returns>
@@ -137,9 +136,12 @@ public class DefaultUrlProvider : IUrlProvider
     {
         if (string.IsNullOrWhiteSpace(route))
         {
-            _logger.LogDebug(
+            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                _logger.LogDebug(
                 "Couldn't find any page with nodeId={NodeId}. This is most likely caused by the page not being published.",
                 id);
+            }
             return null;
         }
 

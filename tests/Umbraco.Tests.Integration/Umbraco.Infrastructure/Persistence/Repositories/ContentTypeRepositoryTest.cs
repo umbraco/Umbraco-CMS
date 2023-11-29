@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
@@ -20,6 +19,7 @@ using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Cms.Infrastructure.Scoping;
+using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Extensions;
 using Umbraco.Cms.Tests.Common.Testing;
@@ -848,6 +848,7 @@ public class ContentTypeRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
+    [LongRunning]
     public void Can_Verify_Addition_Of_PropertyType_After_ContentType_Is_Used()
     {
         // Arrange

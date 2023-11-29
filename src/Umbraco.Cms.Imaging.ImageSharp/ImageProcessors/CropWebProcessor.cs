@@ -1,10 +1,7 @@
 using System.Globalization;
 using System.Numerics;
 using Microsoft.Extensions.Logging;
-using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Metadata.Profiles.Exif;
-using SixLabors.ImageSharp.Processing;
-using SixLabors.ImageSharp.Web;
 using SixLabors.ImageSharp.Web.Commands;
 using SixLabors.ImageSharp.Web.Processors;
 
@@ -48,7 +45,8 @@ public class CropWebProcessor : IImageWebProcessor
     private static Rectangle? GetCropRectangle(FormattedImage image, CommandCollection commands, CommandParser parser, CultureInfo culture)
     {
         var coordinates = parser.ParseValue<float[]>(commands.GetValueOrDefault(Coordinates), culture);
-        if (coordinates.Length != 4 ||
+        if (coordinates is null ||
+            coordinates.Length != 4 ||
             (coordinates[0] == 0 && coordinates[1] == 0 && coordinates[2] == 0 && coordinates[3] == 0))
         {
             return null;
@@ -64,7 +62,7 @@ public class CropWebProcessor : IImageWebProcessor
         Vector2 xy2 = ExifOrientationUtilities.Transform(new Vector2(right, bottom), Vector2.Zero, Vector2.One, orientation);
 
         // Scale points to a pixel based rectangle
-        Size size = image.Image.Size();
+        Size size = image.Image.Size;
 
         return Rectangle.Round(RectangleF.FromLTRB(
             MathF.Min(xy1.X, xy2.X) * size.Width,

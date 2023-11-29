@@ -35,14 +35,14 @@ internal class LogDto
     [NullSetting(NullSetting = NullSettings.Null)]
     public string? EntityType { get; set; }
 
-    // TODO: Should we have an index on this since we allow searching on it?
     [Column("Datestamp")]
     [Constraint(Default = SystemMethods.CurrentDateTime)]
+    [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_datestamp", ForColumns = "Datestamp,userId,NodeId")]
     public DateTime Datestamp { get; set; }
 
-    // TODO: Should we have an index on this since we allow searching on it?
     [Column("logHeader")]
     [Length(50)]
+    [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_datestamp_logheader", ForColumns = "Datestamp,logHeader")]
     public string Header { get; set; } = null!;
 
     [Column("logComment")]

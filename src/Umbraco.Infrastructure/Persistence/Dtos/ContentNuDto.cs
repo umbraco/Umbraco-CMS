@@ -10,12 +10,15 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [ExplicitColumns]
 public class ContentNuDto
 {
+    public const string TableName = Constants.DatabaseSchema.Tables.NodeData;
+
     [Column("nodeId")]
     [PrimaryKeyColumn(AutoIncrement = false, Name = "PK_cmsContentNu", OnColumns = "nodeId, published")]
     [ForeignKey(typeof(ContentDto), Column = "nodeId", OnDelete = Rule.Cascade)]
     public int NodeId { get; set; }
 
     [Column("published")]
+    [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_published", ForColumns = "published,nodeId,rv", IncludeColumns = "dataRaw")]
     public bool Published { get; set; }
 
     /// <summary>
@@ -25,7 +28,7 @@ public class ContentNuDto
     ///     Pretty much anything that would require a 1:M lookup is serialized here
     /// </remarks>
     [Column("data")]
-    [SpecialDbType(SpecialDbTypes.NTEXT)]
+    [SpecialDbType(SpecialDbTypes.NVARCHARMAX)]
     [NullSetting(NullSetting = NullSettings.Null)]
     public string? Data { get; set; }
 

@@ -55,8 +55,14 @@ public static class DefinitionFactory
             }
 
             // Creates an index definition and adds it to the collection on the table definition
-            IndexAttribute? indexAttribute = propertyInfo.FirstAttribute<IndexAttribute>();
-            if (indexAttribute != null)
+            IEnumerable<IndexAttribute>? indexAttributes = propertyInfo.MultipleAttribute<IndexAttribute>();
+
+            if (indexAttributes == null)
+            {
+                continue;
+            }
+
+            foreach (IndexAttribute indexAttribute in indexAttributes)
             {
                 IndexDefinition indexDefinition =
                     GetIndexDefinition(modelType, propertyInfo, indexAttribute, columnName, tableName);

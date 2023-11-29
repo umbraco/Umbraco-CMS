@@ -4,6 +4,7 @@ namespace Umbraco.Cms.Core.Xml.XPath;
 ///     Represents the type of a field of a content that can be navigated via XPath.
 /// </summary>
 /// <remarks>A field can be an attribute or a property.</remarks>
+[Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
 public interface INavigableFieldType
 {
     /// <summary>

@@ -37,18 +37,16 @@ test.describe('Partial Views', () => {
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.save));
 
     //Assert
-    await umbracoUi.isSuccessNotificationVisible({timeout: 20000});
+    await umbracoUi.isSuccessNotificationVisible();
 
     //Clean up
     await umbracoApi.partialViews.ensureNameNotExists('', fileName);
-  });  
-  
+  });
   test('Create partial view from snippet', async ({page, umbracoApi, umbracoUi}) => {
     const name = "TestPartialViewFromSnippet";
     const fileName = name + ".cshtml";
 
     await umbracoApi.partialViews.ensureNameNotExists('', fileName);
-    
     await openPartialViewsCreatePanel(page, umbracoUi);
 
     await umbracoUi.clickElement(umbracoUi.getContextMenuAction("action-create"));
@@ -61,14 +59,13 @@ test.describe('Partial Views', () => {
 
     // Save
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.save));
-    
+
     // Assert
-    await umbracoUi.isSuccessNotificationVisible({timeout:20000});
+    await umbracoUi.isSuccessNotificationVisible();
 
     // Clean up
     await umbracoApi.partialViews.ensureNameNotExists('', fileName);
-  });  
-  
+  });
   test('Partial view with no name', async ({page, umbracoApi, umbracoUi}) => {
     await openPartialViewsCreatePanel(page, umbracoUi);
 
@@ -84,8 +81,8 @@ test.describe('Partial Views', () => {
 
     // Asserts
     await umbracoUi.isErrorNotificationVisible();
-  });  
-  
+  });
+
   test('Delete partial view', async ({page, umbracoApi, umbracoUi}) => {
     const name = "TestDeletePartialView";
     const fileName = name + ".cshtml";
@@ -112,8 +109,7 @@ test.describe('Partial Views', () => {
 
     // Clean
     await umbracoApi.partialViews.ensureNameNotExists('', fileName);
-  });  
-  
+  });
   test('Edit partial view', async ({page, umbracoApi, umbracoUi}) => {
     const name = 'EditPartialView';
     const fileName = name + ".cshtml";
@@ -135,8 +131,7 @@ test.describe('Partial Views', () => {
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.save));
 
     // Assert
-    await umbracoUi.isSuccessNotificationVisible({timeout:20000});
-    
+    await umbracoUi.isSuccessNotificationVisible();
     // Clean
     await umbracoApi.partialViews.ensureNameNotExists('', fileName);
   });

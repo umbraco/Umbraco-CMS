@@ -5,6 +5,7 @@
 
         var vm = this;
         vm.loading = true;
+        vm.selectedVariants = [];
 
         vm.changeSelection = changeSelection;
 
@@ -22,38 +23,42 @@
             vm.variants.forEach(variant => {
                 variant.isMandatory = isMandatoryFilter(variant);
             });
-            
+
             vm.availableVariants = vm.variants.filter(publishableVariantFilter);
-            
+
             if (vm.availableVariants.length !== 0) {
 
                 vm.availableVariants = contentEditingHelper.getSortedVariantsAndSegments(vm.availableVariants);
-
-                vm.availableVariants.forEach(v => {
-                    if(v.active) {
-                        v.save = true;
-                    }
-                });
-
-            } else {
-                //disable save button if we have nothing to save
-                $scope.model.disableSubmitButton = true;
             }
 
+            $scope.model.disableSubmitButton = true;
             vm.loading = false;
-            
         }
 
         function allowSendToPublish (variant) {
             return variant.allowedActions.includes("H");
         }
 
-        function changeSelection() {
-            var firstSelected = vm.variants.find(v => v.save);
-            $scope.model.disableSubmitButton = !firstSelected; //disable submit button if there is none selected
+        function changeSelection(variant) {
+          let foundVariant = vm.selectedVariants.find(x => x.compositeId === variant.compositeId);
+
+          if (foundVariant === undefined) {
+            variant.save = true;
+            vm.selectedVariants.push(variant);
+          } else {
+            variant.save = false;
+            let index = vm.selectedVariants.indexOf(foundVariant);
+            if (index !== -1) {
+              vm.selectedVariants.splice(index, 1);
+            }
+          }
+
+          let firstSelected = vm.variants.find(v => v.save);
+          $scope.model.disableSubmitButton = !firstSelected;
         }
 
-        function isMandatoryFilter(variant) {
+
+      function isMandatoryFilter(variant) {
             //determine a variant is 'dirty' (meaning it will show up as publish-able) if it's
             // * has a mandatory language
             // * without having a segment, segments cant be mandatory at current state of code.
@@ -79,9 +84,7 @@
         });
 
         onInit();
-
     }
 
     angular.module("umbraco").controller("Umbraco.Overlays.SendToPublishController", SendToPublishController);
-
 })();

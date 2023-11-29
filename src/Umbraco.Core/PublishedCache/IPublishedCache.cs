@@ -102,6 +102,7 @@ public interface IPublishedCache : IXPathNavigable
     /// <param name="vars">Optional XPath variables.</param>
     /// <returns>The content, or null.</returns>
     /// <remarks>The value of <paramref name="preview" /> overrides defaults.</remarks>
+    [Obsolete("The current implementation of this method is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
     IPublishedContent? GetSingleByXPath(bool preview, string xpath, params XPathVariable[] vars);
 
     /// <summary>
@@ -111,6 +112,7 @@ public interface IPublishedCache : IXPathNavigable
     /// <param name="vars">Optional XPath variables.</param>
     /// <returns>The content, or null.</returns>
     /// <remarks>Considers published or unpublished content depending on defaults.</remarks>
+    [Obsolete("The current implementation of this method is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
     IPublishedContent? GetSingleByXPath(string xpath, params XPathVariable[] vars);
 
     /// <summary>
@@ -121,6 +123,7 @@ public interface IPublishedCache : IXPathNavigable
     /// <param name="vars">Optional XPath variables.</param>
     /// <returns>The content, or null.</returns>
     /// <remarks>The value of <paramref name="preview" /> overrides defaults.</remarks>
+    [Obsolete("The current implementation of this method is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
     IPublishedContent? GetSingleByXPath(bool preview, XPathExpression xpath, params XPathVariable[] vars);
 
     /// <summary>
@@ -130,6 +133,7 @@ public interface IPublishedCache : IXPathNavigable
     /// <param name="vars">Optional XPath variables.</param>
     /// <returns>The content, or null.</returns>
     /// <remarks>Considers published or unpublished content depending on defaults.</remarks>
+    [Obsolete("The current implementation of this method is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
     IPublishedContent? GetSingleByXPath(XPathExpression xpath, params XPathVariable[] vars);
 
     /// <summary>
@@ -140,6 +144,7 @@ public interface IPublishedCache : IXPathNavigable
     /// <param name="vars">Optional XPath variables.</param>
     /// <returns>The contents.</returns>
     /// <remarks>The value of <paramref name="preview" /> overrides defaults.</remarks>
+    [Obsolete("The current implementation of this method is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
     IEnumerable<IPublishedContent> GetByXPath(bool preview, string xpath, params XPathVariable[] vars);
 
     /// <summary>
@@ -149,6 +154,7 @@ public interface IPublishedCache : IXPathNavigable
     /// <param name="vars">Optional XPath variables.</param>
     /// <returns>The contents.</returns>
     /// <remarks>Considers published or unpublished content depending on defaults.</remarks>
+    [Obsolete("The current implementation of this method is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
     IEnumerable<IPublishedContent> GetByXPath(string xpath, params XPathVariable[] vars);
 
     /// <summary>
@@ -159,6 +165,7 @@ public interface IPublishedCache : IXPathNavigable
     /// <param name="vars">Optional XPath variables.</param>
     /// <returns>The contents.</returns>
     /// <remarks>The value of <paramref name="preview" /> overrides defaults.</remarks>
+    [Obsolete("The current implementation of this method is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
     IEnumerable<IPublishedContent> GetByXPath(bool preview, XPathExpression xpath, params XPathVariable[] vars);
 
     /// <summary>
@@ -168,6 +175,7 @@ public interface IPublishedCache : IXPathNavigable
     /// <param name="vars">Optional XPath variables.</param>
     /// <returns>The contents.</returns>
     /// <remarks>Considers published or unpublished content depending on defaults.</remarks>
+    [Obsolete("The current implementation of this method is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
     IEnumerable<IPublishedContent> GetByXPath(XPathExpression xpath, params XPathVariable[] vars);
 
     /// <summary>
@@ -179,6 +187,7 @@ public interface IPublishedCache : IXPathNavigable
     ///     <para>The value of <paramref name="preview" /> overrides the context.</para>
     ///     <para>The navigator is already a safe clone (no need to clone it again).</para>
     /// </remarks>
+    [Obsolete("The current implementation of this method is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
     XPathNavigator CreateNavigator(bool preview);
 
     /// <summary>
@@ -196,6 +205,7 @@ public interface IPublishedCache : IXPathNavigable
     ///     </para>
     ///     <para>If the node does not exist, returns null.</para>
     /// </remarks>
+    [Obsolete("The current implementation of this method is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
     XPathNavigator? CreateNodeNavigator(int id, bool preview);
 
     /// <summary>

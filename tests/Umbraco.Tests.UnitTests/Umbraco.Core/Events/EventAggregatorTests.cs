@@ -1,12 +1,11 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Notifications;
@@ -17,6 +16,11 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Events;
 [TestFixture]
 public class EventAggregatorTests
 {
+    private const int A = 3;
+    private const int B = 5;
+    private const int C = 7;
+    private IUmbracoBuilder _builder;
+
     [SetUp]
     public void Setup()
     {
@@ -24,41 +28,192 @@ public class EventAggregatorTests
         _builder = new UmbracoBuilder(register, Mock.Of<IConfiguration>(), TestHelper.GetMockedTypeLoader());
     }
 
-    private const int A = 3;
-    private const int B = 5;
-    private const int C = 7;
-    private IUmbracoBuilder _builder;
-
     [Test]
-    public async Task CanPublishAsyncEvents()
-    {
-        _builder.Services.AddScoped<Adder>();
-        _builder.AddNotificationAsyncHandler<Notification, NotificationAsyncHandlerA>();
-        _builder.AddNotificationAsyncHandler<Notification, NotificationAsyncHandlerB>();
-        _builder.AddNotificationAsyncHandler<Notification, NotificationAsyncHandlerC>();
-        var provider = _builder.Services.BuildServiceProvider();
-
-        var notification = new Notification();
-        var aggregator = provider.GetService<IEventAggregator>();
-        await aggregator.PublishAsync(notification);
-
-        Assert.AreEqual(A + B + C, notification.SubscriberCount);
-    }
-
-    [Test]
-    public async Task CanPublishEvents()
+    public void CanPublish()
     {
         _builder.Services.AddScoped<Adder>();
         _builder.AddNotificationHandler<Notification, NotificationHandlerA>();
         _builder.AddNotificationHandler<Notification, NotificationHandlerB>();
-        _builder.AddNotificationHandler<Notification, NotificationHandlerC>();
+        _builder.AddNotificationAsyncHandler<Notification, NotificationAsyncHandlerC>();
+        _builder.AddNotificationHandler<ChildNotification, NotificationHandlerA>();
+
         var provider = _builder.Services.BuildServiceProvider();
+        var aggregator = provider.GetService<IEventAggregator>();
 
         var notification = new Notification();
+        aggregator.Publish(notification);
+
+        var childNotification = new ChildNotification();
+        aggregator.Publish(childNotification);
+
+        Assert.AreEqual(A + B + C, notification.SubscriberCount, "Notification should be handled by all 3 registered INotificationHandlers (A, B and C).");
+        Assert.AreEqual(A, childNotification.SubscriberCount, "ChildNotification should only be handled by a single registered INotificationHandler (A).");
+    }
+
+    [Test]
+    public async Task CanPublishAsync()
+    {
+        _builder.Services.AddScoped<Adder>();
+        _builder.AddNotificationAsyncHandler<Notification, NotificationAsyncHandlerA>();
+        _builder.AddNotificationAsyncHandler<Notification, NotificationAsyncHandlerB>();
+        _builder.AddNotificationHandler<Notification, NotificationHandlerC>();
+        _builder.AddNotificationAsyncHandler<ChildNotification, NotificationAsyncHandlerA>();
+
+        var provider = _builder.Services.BuildServiceProvider();
         var aggregator = provider.GetService<IEventAggregator>();
+
+        var notification = new Notification();
         await aggregator.PublishAsync(notification);
 
-        Assert.AreEqual(A + B + C, notification.SubscriberCount);
+        var childNotification = new ChildNotification();
+        await aggregator.PublishAsync(childNotification);
+
+        Assert.AreEqual(A + B + C, notification.SubscriberCount, "Notification should be handled by all 3 registered INotificationAsyncHandlers (A, B and C).");
+        Assert.AreEqual(A, childNotification.SubscriberCount, "ChildNotification should only be handled by a single registered INotificationAsyncHandler (A).");
+    }
+
+    [Test]
+    public void CanPublishMultiple()
+    {
+        _builder.Services.AddScoped<Adder>();
+        _builder.AddNotificationHandler<Notification, NotificationHandlerA>();
+        _builder.AddNotificationHandler<Notification, NotificationHandlerB>();
+        _builder.AddNotificationAsyncHandler<Notification, NotificationAsyncHandlerC>();
+        _builder.AddNotificationHandler<ChildNotification, NotificationHandlerA>();
+
+        var provider = _builder.Services.BuildServiceProvider();
+        var aggregator = provider.GetService<IEventAggregator>();
+
+        var notifications = new Notification[]
+        {
+            new Notification(),
+            new Notification(),
+            new ChildNotification()
+        };
+        aggregator.Publish(notifications);
+
+        Assert.AreEqual(A + B + C, notifications[0].SubscriberCount, "Notification should be handled by all 3 registered INotificationHandlers (A, B and C).");
+        Assert.AreEqual(A + B + C, notifications[1].SubscriberCount, "Notification should be handled by all 3 registered INotificationHandlers (A, B and C).");
+        Assert.AreEqual(A, notifications[2].SubscriberCount, "ChildNotification should only be handled by a single registered INotificationHandler (A).");
+    }
+
+    [Test]
+    public async Task CanPublishMultipleAsync()
+    {
+        _builder.Services.AddScoped<Adder>();
+        _builder.AddNotificationAsyncHandler<Notification, NotificationAsyncHandlerA>();
+        _builder.AddNotificationAsyncHandler<Notification, NotificationAsyncHandlerB>();
+        _builder.AddNotificationHandler<Notification, NotificationHandlerC>();
+        _builder.AddNotificationAsyncHandler<ChildNotification, NotificationAsyncHandlerA>();
+
+        var provider = _builder.Services.BuildServiceProvider();
+        var aggregator = provider.GetService<IEventAggregator>();
+
+        var notifications = new Notification[]
+        {
+            new Notification(),
+            new Notification(),
+            new ChildNotification()
+        };
+        await aggregator.PublishAsync(notifications);
+
+        Assert.AreEqual(A + B + C, notifications[0].SubscriberCount, "Notification should be handled by all 3 registered INotificationAsyncHandlers (A, B and C).");
+        Assert.AreEqual(A + B + C, notifications[1].SubscriberCount, "Notification should be handled by all 3 registered INotificationAsyncHandlers (A, B and C).");
+        Assert.AreEqual(A, notifications[2].SubscriberCount, "ChildNotification should only be handled by a single registered INotificationAsyncHandler (A).");
+    }
+
+    [Test]
+    public void CanPublishDistributedCache()
+    {
+        _builder.Services.AddScoped<Adder>();
+        _builder.AddNotificationHandler<Notification, NotificationHandlerA>();
+        _builder.AddNotificationHandler<Notification, NotificationHandlerB>();
+        _builder.AddNotificationAsyncHandler<Notification, NotificationAsyncHandlerC>();
+        _builder.AddNotificationHandler<ChildNotification, NotificationHandlerA>();
+
+        var provider = _builder.Services.BuildServiceProvider();
+        var aggregator = provider.GetService<IEventAggregator>();
+
+        var notification = new Notification();
+        aggregator.Publish<INotification, IDistributedCacheNotificationHandler>(notification);
+
+        var childNotification = new ChildNotification();
+        aggregator.Publish<INotification, IDistributedCacheNotificationHandler>(childNotification);
+
+        Assert.AreEqual(B, notification.SubscriberCount, "Notification should only be handled by a single registered IDistributedCacheNotificationHandler (B).");
+        Assert.AreEqual(0, childNotification.SubscriberCount, "ChildNotification should not be handled, since it has no registered IDistributedCacheNotificationHandler.");
+    }
+
+    [Test]
+    public async Task CanPublishDistributedCacheAsync()
+    {
+        _builder.Services.AddScoped<Adder>();
+        _builder.AddNotificationAsyncHandler<Notification, NotificationAsyncHandlerA>();
+        _builder.AddNotificationAsyncHandler<Notification, NotificationAsyncHandlerB>();
+        _builder.AddNotificationHandler<Notification, NotificationHandlerC>();
+        _builder.AddNotificationAsyncHandler<ChildNotification, NotificationAsyncHandlerA>();
+
+        var provider = _builder.Services.BuildServiceProvider();
+        var aggregator = provider.GetService<IEventAggregator>();
+
+        var notification = new Notification();
+        await aggregator.PublishAsync<INotification, IDistributedCacheNotificationHandler>(notification);
+
+        var childNotification = new ChildNotification();
+        await aggregator.PublishAsync<INotification, IDistributedCacheNotificationHandler>(childNotification);
+
+        Assert.AreEqual(B, notification.SubscriberCount, "Notification should only be handled by a single registered IDistributedCacheNotificationHandler (B).");
+        Assert.AreEqual(0, childNotification.SubscriberCount, "ChildNotification should not be handled, since it has no registered IDistributedCacheNotificationHandler.");
+    }
+
+    [Test]
+    public void CanPublishMultipleDistributedCache()
+    {
+        _builder.Services.AddScoped<Adder>();
+        _builder.AddNotificationHandler<Notification, NotificationHandlerA>();
+        _builder.AddNotificationHandler<Notification, NotificationHandlerB>();
+        _builder.AddNotificationAsyncHandler<Notification, NotificationAsyncHandlerC>();
+        _builder.AddNotificationHandler<ChildNotification, NotificationHandlerA>();
+
+        var provider = _builder.Services.BuildServiceProvider();
+        var aggregator = provider.GetService<IEventAggregator>();
+
+        var notifications = new Notification[]
+        {
+            new Notification(),
+            new Notification(),
+            new ChildNotification()
+        };
+        aggregator.Publish<INotification, IDistributedCacheNotificationHandler>(notifications);
+
+        Assert.AreEqual(B, notifications[0].SubscriberCount, "Notification should only be handled by a single registered IDistributedCacheNotificationHandler (B).");
+        Assert.AreEqual(B, notifications[1].SubscriberCount, "Notification should only be handled by a single registered IDistributedCacheNotificationHandler (B).");
+        Assert.AreEqual(0, notifications[2].SubscriberCount, "ChildNotification should not be handled, since it has no registered IDistributedCacheNotificationHandler.");
+    }
+
+    [Test]
+    public async Task CanPublishMultipleDistributedCacheAsync()
+    {
+        _builder.Services.AddScoped<Adder>();
+        _builder.AddNotificationAsyncHandler<Notification, NotificationAsyncHandlerA>();
+        _builder.AddNotificationAsyncHandler<Notification, NotificationAsyncHandlerB>();
+        _builder.AddNotificationHandler<Notification, NotificationHandlerC>();
+        _builder.AddNotificationAsyncHandler<ChildNotification, NotificationAsyncHandlerA>();
+
+        var provider = _builder.Services.BuildServiceProvider();
+        var aggregator = provider.GetService<IEventAggregator>();
+
+        var notifications = new Notification[]
+        {
+            new Notification(),
+            new Notification(),
+            new ChildNotification()
+        };
+        await aggregator.PublishAsync<INotification, IDistributedCacheNotificationHandler>(notifications);
+
+        Assert.AreEqual(B, notifications[0].SubscriberCount, "Notification should only be handled by a single registered IDistributedCacheNotificationHandler (B).");
+        Assert.AreEqual(B, notifications[1].SubscriberCount, "Notification should only be handled by a single registered IDistributedCacheNotificationHandler (B).");
+        Assert.AreEqual(0, notifications[2].SubscriberCount, "ChildNotification should not be handled, since it has no registered IDistributedCacheNotificationHandler.");
     }
 
     public class Notification : INotification
@@ -66,12 +221,15 @@ public class EventAggregatorTests
         public int SubscriberCount { get; set; }
     }
 
+    public class ChildNotification : Notification
+    { }
+
     public class NotificationHandlerA : INotificationHandler<Notification>
     {
         public void Handle(Notification notification) => notification.SubscriberCount += A;
     }
 
-    public class NotificationHandlerB : INotificationHandler<Notification>
+    public class NotificationHandlerB : IDistributedCacheNotificationHandler<Notification>
     {
         public void Handle(Notification notification) => notification.SubscriberCount += B;
     }
@@ -95,7 +253,7 @@ public class EventAggregatorTests
         }
     }
 
-    public class NotificationAsyncHandlerB : INotificationAsyncHandler<Notification>
+    public class NotificationAsyncHandlerB : INotificationAsyncHandler<Notification>, IDistributedCacheNotificationHandler
     {
         public Task HandleAsync(Notification notification, CancellationToken cancellationToken)
         {

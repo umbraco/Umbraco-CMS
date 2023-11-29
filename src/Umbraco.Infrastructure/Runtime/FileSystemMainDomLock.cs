@@ -44,16 +44,22 @@ internal class FileSystemMainDomLock : IMainDomLock
             try
             {
                 Directory.CreateDirectory(_hostingEnvironment.LocalTempPath);
-                _logger.LogDebug("Attempting to obtain MainDom lock file handle {lockFilePath}", _lockFilePath);
+                if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                {
+                    _logger.LogDebug("Attempting to obtain MainDom lock file handle {lockFilePath}", _lockFilePath);
+                }
                 _lockFileStream = File.Open(_lockFilePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None);
                 DeleteLockReleaseSignalFile();
                 return Task.FromResult(true);
             }
             catch (IOException)
             {
-                _logger.LogDebug(
+                if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                {
+                    _logger.LogDebug(
                     "Couldn't obtain MainDom lock file handle, signalling for release of {lockFilePath}",
                     _lockFilePath);
+                }
                 CreateLockReleaseSignalFile();
             }
             catch (Exception ex)
@@ -107,13 +113,19 @@ internal class FileSystemMainDomLock : IMainDomLock
         {
             if (_cancellationTokenSource.IsCancellationRequested)
             {
-                _logger.LogDebug("ListenAsync Task canceled, exiting loop");
+                if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                {
+                    _logger.LogDebug("ListenAsync Task canceled, exiting loop");
+                }
                 return;
             }
 
             if (File.Exists(_releaseSignalFilePath))
             {
-                _logger.LogDebug("Found lock release signal file, releasing lock on {lockFilePath}", _lockFilePath);
+                if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                {
+                    _logger.LogDebug("Found lock release signal file, releasing lock on {lockFilePath}", _lockFilePath);
+                }
                 _lockFileStream?.Close();
                 _lockFileStream = null;
                 break;

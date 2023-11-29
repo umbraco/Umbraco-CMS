@@ -34,13 +34,12 @@
                 <div class="umb-editor-header__name-wrapper" ng-show="!nameLocked || !hideAlias">
                     <label for="headerName" class="sr-only" ng-show="accessibility.a11yNameVisible">{{accessibility.a11yName}}</label>
                     <ng-form name="headerNameForm">
-                        <input data-element="editor-name-field"
-                               no-password-manager
-                               type="text"
+                        <input type="text"
                                id="headerName"
                                class="umb-editor-header__name-input"
                                localize="placeholder"
                                placeholder="@placeholders_entername"
+                               data-element="editor-name-field"
                                name="headerName"
                                ng-show="!nameLocked"
                                ng-model="name"
@@ -48,6 +47,7 @@
                                umb-auto-focus
                                focus-on-filled="true"
                                val-server-field="Name"
+                               no-password-manager
                                ng-required="nameRequired != null ? nameRequired : true"
                                aria-required="{{nameRequired != null ? nameRequired : true}}"
                                aria-invalid="{{contentForm.headerNameForm.headerName.$invalid ? true : false}}"

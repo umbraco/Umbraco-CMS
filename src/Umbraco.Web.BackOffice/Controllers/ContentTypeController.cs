@@ -549,7 +549,8 @@ public class ContentTypeController : ContentTypeControllerBase<IContentType>
     [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentsOrDocumentTypes)]
     public IEnumerable<ContentTypeBasic> GetAll()
     {
-        IEnumerable<IContentType> types = _contentTypeService.GetAll();
+        IEnumerable<IContentType> types = _contentTypeService.GetAll().Where(x => x.IsElement == false);
+
         IEnumerable<ContentTypeBasic> basics = types.Select(_umbracoMapper.Map<IContentType, ContentTypeBasic>)
             .WhereNotNull();
 

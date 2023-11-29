@@ -322,7 +322,6 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         }
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-
         {
             scope.ReadLock(ReadLockIds);
             return Repository.GetMany(ids.ToArray());

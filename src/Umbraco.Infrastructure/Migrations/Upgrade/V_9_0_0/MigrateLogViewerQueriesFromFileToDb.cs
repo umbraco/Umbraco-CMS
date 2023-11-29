@@ -101,7 +101,5 @@ public class MigrateLogViewerQueriesFromFileToDb : MigrationBase
         }
 
         Database.InsertBulk(logQueriesInFile!);
-
-        Context.AddPostMigration<DeleteLogViewerQueryFile>();
     }
 }

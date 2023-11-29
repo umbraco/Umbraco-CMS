@@ -25,4 +25,40 @@ public static class UmbracoExamineFieldNames
     public const string ItemIdFieldName = "__NodeId";
     public const string CategoryFieldName = "__IndexType";
     public const string ItemTypeFieldName = "__NodeTypeAlias";
+
+    /// <summary>
+    ///     Field names specifically used in the Delivery API content index
+    /// </summary>
+    public static class DeliveryApiContentIndex
+    {
+        /// <summary>
+        ///     The content ID
+        /// </summary>
+        public const string Id = "id";
+
+        /// <summary>
+        ///     The content type ID
+        /// </summary>
+        public const string ContentTypeId = "contentTypeId";
+
+        /// <summary>
+        ///     The content culture
+        /// </summary>
+        public const string Culture = "culture";
+
+        /// <summary>
+        ///     Whether or not the content exists in a published state
+        /// </summary>
+        public const string Published = "published";
+
+        /// <summary>
+        ///     Whether or not the content is protected
+        /// </summary>
+        public const string Protected = "protected";
+
+        /// <summary>
+        ///     The allowed members and member roles (for protected content)
+        /// </summary>
+        public const string ProtectedAccess = "protectedAccess";
+    }
 }

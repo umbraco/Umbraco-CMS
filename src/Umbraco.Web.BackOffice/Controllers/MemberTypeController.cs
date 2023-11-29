@@ -57,6 +57,8 @@ public class MemberTypeController : ContentTypeControllerBase<IMemberType>
             localizedTextService ?? throw new ArgumentNullException(nameof(localizedTextService));
     }
 
+    public int GetCount() => _memberTypeService.Count();
+
     /// <summary>
     ///     Gets the member type a given id
     /// </summary>
@@ -169,6 +171,21 @@ public class MemberTypeController : ContentTypeControllerBase<IMemberType>
 
         var result = actionResult.Value?
             .Select(x => new { contentType = x.Item1, allowed = x.Item2 });
+        return Ok(result);
+    }
+
+    /// <summary>
+    ///     Returns where a particular composition has been used
+    ///     This has been wrapped in a dto instead of simple parameters to support having multiple parameters in post request
+    ///     body
+    /// </summary>
+    /// <param name="contentTypeId"></param>
+    /// <returns></returns>
+    public IActionResult GetWhereCompositionIsUsedInMemberTypes(int contentTypeId)
+    {
+        var result =
+            PerformGetWhereCompositionIsUsedInContentTypes(contentTypeId, UmbracoObjectTypes.MemberType).Value?
+                .Select(x => new { contentType = x });
         return Ok(result);
     }
 

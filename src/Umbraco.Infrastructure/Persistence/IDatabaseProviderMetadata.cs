@@ -82,6 +82,12 @@ public interface IDatabaseProviderMetadata
     /// </summary>
     public bool ForceCreateDatabase { get; }
 
+
+    /// <summary>
+    /// Gets a value indicating whether this connections could have been build using <see cref="GenerateConnectionString"/>.
+    /// </summary>
+    public bool CanRecognizeConnectionString(string? connectionString) => false;
+
     /// <summary>
     ///     Creates a connection string for this provider.
     /// </summary>

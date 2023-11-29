@@ -9,6 +9,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Integration.TestServerTest;
@@ -24,6 +25,7 @@ public class EntityControllerTests : UmbracoTestServerTestBase
     private IScopeProvider ScopeProvider => GetRequiredService<IScopeProvider>();
 
     [Test]
+    [LongRunning]
     public async Task GetUrlsByIds_MediaWithIntegerIds_ReturnsValidMap()
     {
         var mediaTypeService = Services.GetRequiredService<IMediaTypeService>();
@@ -67,6 +69,7 @@ public class EntityControllerTests : UmbracoTestServerTestBase
     }
 
     [Test]
+    [LongRunning]
     public async Task GetUrlsByIds_Media_ReturnsEmptyStringsInMapForUnknownItems()
     {
         var queryParameters = new Dictionary<string, object> { ["type"] = Constants.UdiEntityType.Media };
@@ -91,6 +94,7 @@ public class EntityControllerTests : UmbracoTestServerTestBase
     }
 
     [Test]
+    [LongRunning]
     public async Task GetUrlsByIds_MediaWithGuidIds_ReturnsValidMap()
     {
         var mediaTypeService = Services.GetRequiredService<IMediaTypeService>();
@@ -177,6 +181,7 @@ public class EntityControllerTests : UmbracoTestServerTestBase
     }
 
     [Test]
+    [LongRunning]
     public async Task GetUrlsByIds_Documents_ReturnsHashesInMapForUnknownItems()
     {
         var queryParameters = new Dictionary<string, object> { ["type"] = Constants.UdiEntityType.Document };
@@ -201,6 +206,7 @@ public class EntityControllerTests : UmbracoTestServerTestBase
     }
 
     [Test]
+    [LongRunning]
     public async Task GetUrlsByIds_DocumentWithIntIds_ReturnsValidMap()
     {
         var contentTypeService = Services.GetRequiredService<IContentTypeService>();
@@ -250,6 +256,7 @@ public class EntityControllerTests : UmbracoTestServerTestBase
     }
 
     [Test]
+    [LongRunning]
     public async Task GetUrlsByIds_DocumentWithGuidIds_ReturnsValidMap()
     {
         var contentTypeService = Services.GetRequiredService<IContentTypeService>();
@@ -299,6 +306,7 @@ public class EntityControllerTests : UmbracoTestServerTestBase
     }
 
     [Test]
+    [LongRunning]
     public async Task GetUrlsByIds_DocumentWithUdiIds_ReturnsValidMap()
     {
         var contentTypeService = Services.GetRequiredService<IContentTypeService>();
@@ -348,6 +356,7 @@ public class EntityControllerTests : UmbracoTestServerTestBase
     }
 
     [Test]
+    [LongRunning]
     public async Task GetByIds_MultipleCalls_WorksAsExpected()
     {
         var contentTypeService = Services.GetRequiredService<IContentTypeService>();

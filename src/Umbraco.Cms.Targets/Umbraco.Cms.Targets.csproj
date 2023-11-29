@@ -4,11 +4,10 @@
     <Description>Installs Umbraco CMS with minimal dependencies in your ASP.NET Core project.</Description>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <IncludeSymbols>false</IncludeSymbols>
-    <!-- TODO: Enable when final version is shipped (because there's currently no previous version) -->
-    <EnablePackageValidation>false</EnablePackageValidation>
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Umbraco.Cms.Api.Delivery\Umbraco.Cms.Api.Delivery.csproj" />
     <ProjectReference Include="..\Umbraco.Cms.StaticAssets\Umbraco.Cms.StaticAssets.csproj" />
   </ItemGroup>
 
@@ -50,10 +49,10 @@
   </Target>
 
   <!-- Create and pack empty file to add TFM dependency -->
-  <Target Name="PackTargetFrameworkFile" BeforeTargets="Build">
+  <Target Name="GetTargetFrameworkPackageFiles" BeforeTargets="GenerateNuspec">
     <WriteLinesToFile File="$(IntermediateOutputPath)_._" />
     <ItemGroup>
-      <None Include="$(IntermediateOutputPath)_._" Pack="true" PackagePath="lib\$(TargetFramework)" />
+      <_PackageFiles Include="$(IntermediateOutputPath)_._" PackagePath="lib\$(TargetFramework)" />
     </ItemGroup>
   </Target>
 </Project>

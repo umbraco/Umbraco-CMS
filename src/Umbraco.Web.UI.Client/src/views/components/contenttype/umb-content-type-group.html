@@ -22,7 +22,7 @@
                         ng-focus="vm.whenNameFocus()"
                         required
                         val-server-field="{{vm.valServerFieldName}}"
-                        data-lpignore="true" />
+                        no-password-manager />
 
                 <div class="umb-group-builder__group-title-val-message" ng-messages="groupNameForm.groupName.$error" show-validation-on-submit>
                     <div class="umb-validation-label -arrow-left" ng-message="valServerField">{{groupNameForm.groupName.errorMsg}}</div>

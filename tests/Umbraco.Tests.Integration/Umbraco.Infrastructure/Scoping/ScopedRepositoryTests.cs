@@ -46,14 +46,14 @@ public class ScopedRepositoryTests : UmbracoIntegrationTest
         builder.AddNuCache();
         builder.Services.AddUnique<IServerMessenger, LocalServerMessenger>();
         builder
-            .AddNotificationHandler<DictionaryItemDeletedNotification, DistributedCacheBinder>()
-            .AddNotificationHandler<DictionaryItemSavedNotification, DistributedCacheBinder>()
-            .AddNotificationHandler<LanguageSavedNotification, DistributedCacheBinder>()
-            .AddNotificationHandler<LanguageDeletedNotification, DistributedCacheBinder>()
-            .AddNotificationHandler<UserSavedNotification, DistributedCacheBinder>()
-            .AddNotificationHandler<LanguageDeletedNotification, DistributedCacheBinder>()
-            .AddNotificationHandler<MemberGroupDeletedNotification, DistributedCacheBinder>()
-            .AddNotificationHandler<MemberGroupSavedNotification, DistributedCacheBinder>();
+            .AddNotificationHandler<DictionaryItemDeletedNotification, DictionaryItemDeletedDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<DictionaryItemSavedNotification, DictionaryItemSavedDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<LanguageSavedNotification, LanguageSavedDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<LanguageDeletedNotification, LanguageDeletedDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<UserSavedNotification, UserSavedDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<LanguageDeletedNotification, LanguageDeletedDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<MemberGroupDeletedNotification, MemberGroupDeletedDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<MemberGroupSavedNotification, MemberGroupSavedDistributedCacheNotificationHandler>();
         builder.AddNotificationHandler<LanguageSavedNotification, PublishedSnapshotServiceEventHandler>();
     }
 

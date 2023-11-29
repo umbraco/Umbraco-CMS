@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using System.Text;
 using Microsoft.AspNetCore.Http;
 using NUnit.Framework;

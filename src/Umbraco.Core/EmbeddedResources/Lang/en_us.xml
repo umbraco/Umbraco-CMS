@@ -57,6 +57,7 @@
     <key alias="unlock">Unlock</key>
     <key alias="createblueprint">Create Content Template</key>
     <key alias="resendInvite">Resend Invitation</key>
+    <key alias="toggleHideUnavailable">Hide unavailable options</key>
   </area>
   <area alias="actionCategories">
     <key alias="content">Content</key>
@@ -158,6 +159,12 @@
     <key alias="confirmActionConfirm">Confirm</key>
     <key alias="morePublishingOptions">More publishing options</key>
     <key alias="submitChanges">Submit</key>
+  </area>
+  <area alias="auditTrailsMedia">
+    <key alias="delete">Media deleted</key>
+    <key alias="move">Media moved</key>
+    <key alias="copy">Media copied</key>
+    <key alias="save">Media saved</key>
   </area>
   <area alias="auditTrails">
     <key alias="atViewingFor">Viewing for</key>
@@ -352,6 +359,7 @@
     <key alias="renameFolderFailed">Failed to rename the folder with id %0%</key>
     <key alias="dragAndDropYourFilesIntoTheArea">Drag and drop your file(s) into the area</key>
     <key alias="uploadNotAllowed">Upload is not allowed in this location.</key>
+    <key alias="fileSecurityValidationFailure">One or more file security validations have failed</key>
   </area>
   <area alias="member">
     <key alias="createNewMember">Create a new member</key>
@@ -503,7 +511,7 @@
     <key alias="insertlink">Insert link</key>
     <key alias="insertMacro">Click to add a Macro</key>
     <key alias="inserttable">Insert table</key>
-    <key alias="languagedeletewarning">This will delete the language</key>
+    <key alias="languagedeletewarning">This will delete the language and all content related to the language</key>
     <key alias="languageChangeWarning">Changing the culture for a language may be an expensive operation and will result
       in the content cache and indexes being rebuilt
     </key>
@@ -644,6 +652,8 @@
     </key>
     <key alias="indexCannotRebuild">This index cannot be rebuilt because it has no assigned</key>
     <key alias="iIndexPopulator">IIndexPopulator</key>
+    <key alias="noResults">No results were found</key>
+    <key alias="searchResultsFound">Showing %0% - %1% of %2% result(s) - Page %3% of %4%</key>
   </area>
   <area alias="placeholders">
     <key alias="username">Enter your username</key>
@@ -757,6 +767,7 @@
     <key alias="by">by</key>
     <key alias="cancel">Cancel</key>
     <key alias="cellMargin">Cell margin</key>
+    <key alias="change">Change</key>
     <key alias="choose">Choose</key>
     <key alias="clear">Clear</key>
     <key alias="close">Close</key>
@@ -1190,6 +1201,8 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
 </body>
 </html>
 	]]>    </key>
+    <key alias="mfaSecurityCodeSubject">Umbraco: Security Code</key>
+    <key alias="mfaSecurityCodeMessage">Your security code is: %0%</key>
     <key alias="2faTitle">One last step</key>
     <key alias="2faText">You have enabled 2-factor authentication and must verify your identity.</key>
     <key alias="2faMultipleText">Please choose a 2-factor provider</key>
@@ -1864,14 +1877,14 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
       type.
     </key>
     <key alias="chooseChildNode">Choose child node</key>
-    <key alias="compositionsDescription">Inherit tabs and properties from an existing Document Type. New tabs will be
-      added to the current Document Type or merged if a tab with an identical name exists.
+    <key alias="compositionsDescription">Inherit tabs and properties from an existing Content Type. New tabs will be
+      added to the current Content Type or merged if a tab with an identical name exists.
     </key>
     <key alias="compositionInUse">This Content Type is used in a composition, and therefore cannot be composed itself.
     </key>
     <key alias="noAvailableCompositions">There are no Content Types available to use as a composition.</key>
     <key alias="compositionRemoveWarning">Removing a composition will delete all the associated property data. Once you
-      save the Document Type there's no way back.
+      save the Content Type there's no way back.
     </key>
     <key alias="availableEditors">Create new</key>
     <key alias="reuse">Use existing</key>
@@ -2221,13 +2234,10 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
       Umbraco.
     </key>
     <key alias="userinviteWelcomeMessage">Hello there and welcome to Umbraco! In just 1 minute you’ll be good to go, we
-      just need you to setup a password and add a picture for your avatar.
+      just need you to setup a password.
     </key>
     <key alias="userinviteExpiredMessage">Welcome to Umbraco! Unfortunately your invite has expired. Please contact your
       administrator and ask them to resend it.
-    </key>
-    <key alias="userinviteAvatarMessage">Uploading a photo of yourself will make it easy for other users to recognize
-      you. Click the circle above to upload your photo.
     </key>
     <key alias="writer">Writer</key>
     <key alias="configureTwoFactor">Configure Two-Factor</key>
@@ -2343,8 +2353,8 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="stateInactive">Inactive</key>
     <key alias="sortNameAscending">Name (A-Z)</key>
     <key alias="sortNameDescending">Name (Z-A)</key>
-    <key alias="sortCreateDateAscending">Newest</key>
-    <key alias="sortCreateDateDescending">Oldest</key>
+    <key alias="sortCreateDateAscending">Oldest</key>
+    <key alias="sortCreateDateDescending">Newest</key>
     <key alias="sortLastLoginDateDescending">Last login</key>
     <key alias="noUserGroupsAdded">No user groups have been added</key>
     <key alias="2faDisableText">If you wish to disable this two-factor provider, then you must enter the code shown on your authentication device:</key>
@@ -2369,7 +2379,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="items">items</key>
     <key alias="urls">URL(s)</key>
     <key alias="urlsSelected">URL(s) selected</key>
-    <key alias="itemsSelected">items selected</key>
+    <key alias="itemsSelected">item(s) selected</key>
     <key alias="invalidDate">Invalid date</key>
     <key alias="invalidNumber">Not a number</key>
     <key alias="invalidNumberStepSize">Not a valid numeric step size</key>
@@ -2622,6 +2632,8 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="addImageCaption">Add image caption</key>
     <key alias="searchContentTree">Search content tree</key>
     <key alias="maxAmount">Maximum amount</key>
+    <key alias="expandChildItems">Expand child items for</key>
+    <key alias="openContextNode">Open context node for</key>
   </area>
   <area alias="references">
     <key alias="tabName">References</key>
@@ -3010,9 +3022,9 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
           We will send:
           <ul>
             <li>Anonymized site ID, Umbraco version, and packages installed.</li>
-            <li>Number of: Root nodes, Content nodes, Macros, Media, Document Types, Templates, Languages, Domains, User Group, Users, Members, and Property Editors in use.</li>
+            <li>Number of: Root nodes, Content nodes, Macros, Media, Document Types, Templates, Languages, Domains, User Group, Users, Members, Backoffice external login providers, and Property Editors in use.</li>
             <li>System information: Webserver, server OS, server framework, server OS language, and database provider.</li>
-            <li>Configuration settings: Modelsbuilder mode, if custom Umbraco path exists, ASP environment, and if you are in debug mode.</li>
+            <li>Configuration settings: Modelsbuilder mode, if custom Umbraco path exists, ASP environment, whether the delivery API is enabled, and allows public access, and if you are in debug mode.</li>
           </ul>
           <em>We might change what we send on the Detailed level in the future. If so, it will be listed above.
           <br>By choosing "Detailed" you agree to current and future anonymized information being collected.</em>

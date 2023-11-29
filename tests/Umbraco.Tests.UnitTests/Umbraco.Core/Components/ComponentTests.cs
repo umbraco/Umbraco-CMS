@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -87,7 +86,7 @@ public class ComponentTests
             new TestOptionsMonitor<CoreDebugSettings>(coreDebug),
             mediaFileManager,
             loggerFactory,
-            
+
             eventAggregator);
 
         mock.Setup(x => x.GetService(typeof(ILogger))).Returns(logger);

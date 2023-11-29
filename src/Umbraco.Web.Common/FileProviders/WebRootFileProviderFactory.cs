@@ -18,7 +18,7 @@ public class WebRootFileProviderFactory : IManifestFileProviderFactory, IGridEdi
     }
 
     /// <summary>
-    ///     Creates a new <see cref="IFileProvider" /> instance, pointing at <see cref="WebRootPath"/>.
+    ///     Creates a new <see cref="IFileProvider" /> instance, pointing at <see cref="IWebHostEnvironment.WebRootPath"/>.
     /// </summary>
     /// <returns>
     ///     The newly created <see cref="IFileProvider" /> instance.

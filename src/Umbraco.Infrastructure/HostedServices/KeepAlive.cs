@@ -17,6 +17,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices;
 /// <summary>
 ///     Hosted service implementation for keep alive feature.
 /// </summary>
+[Obsolete("Use Umbraco.Cms.Infrastructure.BackgroundJobs.KeepAliveJob instead.  This class will be removed in Umbraco 14.")]
 public class KeepAlive : RecurringHostedServiceBase
 {
     private readonly IHostingEnvironment _hostingEnvironment;
@@ -69,10 +70,16 @@ public class KeepAlive : RecurringHostedServiceBase
         switch (_serverRegistrar.CurrentServerRole)
         {
             case ServerRole.Subscriber:
-                _logger.LogDebug("Does not run on subscriber servers.");
+                if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                {
+                    _logger.LogDebug("Does not run on subscriber servers.");
+                }
                 return;
             case ServerRole.Unknown:
-                _logger.LogDebug("Does not run on servers with unknown role.");
+                if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                {
+                    _logger.LogDebug("Does not run on servers with unknown role.");
+                }
                 return;
         }
 
@@ -83,7 +90,7 @@ public class KeepAlive : RecurringHostedServiceBase
             return;
         }
 
-        using (_profilingLogger.DebugDuration<KeepAlive>("Keep alive executing", "Keep alive complete"))
+        using (!_profilingLogger.IsEnabled(Core.Logging.LogLevel.Debug) ? null : _profilingLogger.DebugDuration<KeepAlive>("Keep alive executing", "Keep alive complete"))
         {
             var umbracoAppUrl = _hostingEnvironment.ApplicationMainUrl?.ToString();
             if (umbracoAppUrl.IsNullOrWhiteSpace())

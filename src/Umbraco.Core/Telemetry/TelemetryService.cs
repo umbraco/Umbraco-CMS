@@ -2,8 +2,8 @@
 // See LICENSE for more details.
 
 using Umbraco.Cms.Core.Configuration;
-using Umbraco.Cms.Core.Manifest;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Telemetry.Models;
 using Umbraco.Extensions;
@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Core.Telemetry;
 /// <inheritdoc />
 internal class TelemetryService : ITelemetryService
 {
-    private readonly IManifestParser _manifestParser;
+    private readonly IPackagingService _packagingService;
     private readonly IMetricsConsentService _metricsConsentService;
     private readonly ISiteIdentifierService _siteIdentifierService;
     private readonly IUmbracoVersion _umbracoVersion;
@@ -23,13 +23,13 @@ internal class TelemetryService : ITelemetryService
     ///     Initializes a new instance of the <see cref="TelemetryService" /> class.
     /// </summary>
     public TelemetryService(
-        IManifestParser manifestParser,
+        IPackagingService packagingService,
         IUmbracoVersion umbracoVersion,
         ISiteIdentifierService siteIdentifierService,
         IUsageInformationService usageInformationService,
         IMetricsConsentService metricsConsentService)
     {
-        _manifestParser = manifestParser;
+        _packagingService = packagingService;
         _umbracoVersion = umbracoVersion;
         _siteIdentifierService = siteIdentifierService;
         _usageInformationService = usageInformationService;
@@ -73,19 +73,20 @@ internal class TelemetryService : ITelemetryService
         }
 
         List<PackageTelemetry> packages = new();
-        IEnumerable<PackageManifest> manifests = _manifestParser.GetManifests();
+        IEnumerable<InstalledPackage> installedPackages = _packagingService.GetAllInstalledPackages();
 
-        foreach (PackageManifest manifest in manifests)
+        foreach (InstalledPackage installedPackage in installedPackages)
         {
-            if (manifest.AllowPackageTelemetry is false)
+            if (installedPackage.AllowPackageTelemetry is false)
             {
                 continue;
             }
 
             packages.Add(new PackageTelemetry
             {
-                Name = manifest.PackageName,
-                Version = manifest.Version ?? string.Empty,
+                Id = installedPackage.PackageId,
+                Name = installedPackage.PackageName,
+                Version = installedPackage.Version,
             });
         }
 

@@ -17,6 +17,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices;
 /// <remarks>
 ///     Runs only on non-replica servers.
 /// </remarks>
+[Obsolete("Use Umbraco.Cms.Infrastructure.BackgroundJobs.ScheduledPublishingJob instead.  This class will be removed in Umbraco 14.")]
 public class ScheduledPublishing : RecurringHostedServiceBase
 {
     private readonly IContentService _contentService;
@@ -62,24 +63,36 @@ public class ScheduledPublishing : RecurringHostedServiceBase
         switch (_serverRegistrar.CurrentServerRole)
         {
             case ServerRole.Subscriber:
-                _logger.LogDebug("Does not run on subscriber servers.");
+                if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                {
+                    _logger.LogDebug("Does not run on subscriber servers.");
+                }
                 return Task.CompletedTask;
             case ServerRole.Unknown:
-                _logger.LogDebug("Does not run on servers with unknown role.");
+                if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                {
+                    _logger.LogDebug("Does not run on servers with unknown role.");
+                }
                 return Task.CompletedTask;
         }
 
         // Ensure we do not run if not main domain, but do NOT lock it
         if (_mainDom.IsMainDom == false)
         {
-            _logger.LogDebug("Does not run if not MainDom.");
+            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                _logger.LogDebug("Does not run if not MainDom.");
+            }
             return Task.CompletedTask;
         }
 
         // Do NOT run publishing if not properly running
         if (_runtimeState.Level != RuntimeLevel.Run)
         {
-            _logger.LogDebug("Does not run if run level is not Run.");
+            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                _logger.LogDebug("Does not run if run level is not Run.");
+            }
             return Task.CompletedTask;
         }
 
@@ -94,7 +107,7 @@ public class ScheduledPublishing : RecurringHostedServiceBase
             //    but then what should be its "scope"? could we attach it to scopes?
             // - and we should definitively *not* have to flush it here (should be auto)
             using UmbracoContextReference contextReference = _umbracoContextFactory.EnsureUmbracoContext();
-            using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
+            using ICoreScope scope = _scopeProvider.CreateCoreScope();
 
             /* We used to assume that there will never be two instances running concurrently where (IsMainDom && ServerRole == SchedulingPublisher)
              * However this is possible during an azure deployment slot swap for the SchedulingPublisher instance when trying to achieve zero downtime deployments.
@@ -113,6 +126,8 @@ public class ScheduledPublishing : RecurringHostedServiceBase
                         grouped.Count(),
                         grouped.Key);
                 }
+
+                scope.Complete();
             }
             finally
             {

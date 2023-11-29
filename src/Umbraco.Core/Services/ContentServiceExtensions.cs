@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.Text.RegularExpressions;
@@ -16,7 +16,8 @@ public static class ContentServiceExtensions
 {
     #region RTE Anchor values
 
-    private static readonly Regex AnchorRegex = new("<a id=\"(.*?)\">", RegexOptions.Compiled);
+    private static readonly Regex AnchorRegex = new(@"<a id=\\*""(.*?)\\*"">", RegexOptions.Compiled);
+    private static readonly string[] _propertyTypesWithRte = new[] { Constants.PropertyEditors.Aliases.TinyMce, Constants.PropertyEditors.Aliases.BlockList, Constants.PropertyEditors.Aliases.BlockGrid };
 
     public static IEnumerable<IContent>? GetByIds(this IContentService contentService, IEnumerable<Udi> ids)
     {
@@ -67,21 +68,22 @@ public static class ContentServiceExtensions
     public static IEnumerable<string> GetAnchorValuesFromRTEs(this IContentService contentService, int id, string? culture = "*")
     {
         var result = new List<string>();
+
+        culture = culture is not "*" ? culture : null;
+
         IContent? content = contentService.GetById(id);
 
-        if (content is not null)
+        if (content is null)
         {
-            foreach (IProperty contentProperty in content.Properties)
+            return result;
+        }
+
+        foreach (IProperty contentProperty in content.Properties.Where(s => _propertyTypesWithRte.Contains(s.PropertyType.PropertyEditorAlias)))
+        {
+            var value = contentProperty.GetValue(culture)?.ToString();
+            if (!string.IsNullOrEmpty(value))
             {
-                if (contentProperty.PropertyType.PropertyEditorAlias.InvariantEquals(Constants.PropertyEditors.Aliases
-                        .TinyMce))
-                {
-                    var value = contentProperty.GetValue(culture)?.ToString();
-                    if (!string.IsNullOrEmpty(value))
-                    {
-                        result.AddRange(contentService.GetAnchorValuesFromRTEContent(value));
-                    }
-                }
+                result.AddRange(contentService.GetAnchorValuesFromRTEContent(value));
             }
         }
 
@@ -96,7 +98,7 @@ public static class ContentServiceExtensions
         MatchCollection matches = AnchorRegex.Matches(rteContent);
         foreach (Match match in matches)
         {
-            result.Add(match.Value.Split(Constants.CharArrays.DoubleQuote)[1]);
+            result.Add(match.Groups[1].Value);
         }
 
         return result;

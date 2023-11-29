@@ -36,6 +36,7 @@ public static class ModelStateExtensions
     /// <param name="result"></param>
     /// <param name="propertyAlias"></param>
     /// <param name="culture">The culture for the property, if the property is invariant than this is empty</param>
+    /// <param name="segment"></param>
     internal static void AddPropertyError(this ModelStateDictionary modelState,
         ValidationResult result, string propertyAlias, string culture = "", string segment = "") =>
         modelState.AddPropertyValidationError(new ContentPropertyValidationResult(result, culture, segment),

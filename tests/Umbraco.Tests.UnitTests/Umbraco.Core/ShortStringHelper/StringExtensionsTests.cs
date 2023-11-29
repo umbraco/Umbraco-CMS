@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -333,7 +332,7 @@ public class StringExtensionsTests
         var output = input.ReplaceFirst(search, replacement);
         Assert.AreEqual(expected, output);
     }
-    
+
     [Test]
     public void IsFullPath()
     {

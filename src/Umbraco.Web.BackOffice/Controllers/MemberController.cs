@@ -623,7 +623,7 @@ public class MemberController : ContentControllerBase
 
             // Change and persist the password
             Attempt<PasswordChangedModel?> passwordChangeResult =
-                await _passwordChanger.ChangePasswordWithIdentityAsync(changingPasswordModel, _memberManager);
+                await _passwordChanger.ChangePasswordWithIdentityAsync(changingPasswordModel, _memberManager, _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser);
 
             if (!passwordChangeResult.Success)
             {

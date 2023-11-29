@@ -30,7 +30,7 @@ angular.module("umbraco.install").factory('installerService', function ($rootSco
 					"At least 4 people have the Umbraco logo tattooed on them",
 					"'Umbraco' is the Danish name for an allen key",
 					"Umbraco has been around since 2005, that's a looong time in IT",
-					"More than 700 people from all over the world meet each year in Denmark in May for our annual conference <a target='_blank' rel='noopener' href='https://umbra.co/codegarden'>CodeGarden</a>",
+          "Every year around 1500 Umbraco enthusiasts from around the world join the biggest hybrid Umbraco conference <a target='_blank' rel='noopener' href='https://codegarden.umbraco.com/'>Codegarden</a>",
 					"While you are installing Umbraco someone else on the other side of the planet is probably doing it too",
 					"You can extend Umbraco without modifying the source code using either JavaScript or C#",
 					"Umbraco has been installed in more than 198 countries"

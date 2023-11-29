@@ -128,5 +128,6 @@ public interface IPropertyValueConverter : IDiscoverable
     ///         the cache levels of property values. It is not meant to be used by the converter.
     ///     </para>
     /// </remarks>
+    [Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
     object? ConvertIntermediateToXPath(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview);
 }

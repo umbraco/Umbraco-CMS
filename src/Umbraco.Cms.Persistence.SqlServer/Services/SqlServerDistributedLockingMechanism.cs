@@ -70,8 +70,10 @@ public class SqlServerDistributedLockingMechanism : IDistributedLockingMechanism
             _timeout = timeout;
             LockId = lockId;
             LockType = lockType;
-
-            _parent._logger.LogDebug("Requesting {lockType} for id {id}", LockType, LockId);
+            if (_parent._logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                _parent._logger.LogDebug("Requesting {lockType} for id {id}", LockType, LockId);
+            }
 
             try
             {
@@ -96,17 +98,24 @@ public class SqlServerDistributedLockingMechanism : IDistributedLockingMechanism
 
                 throw new DistributedWriteLockTimeoutException(LockId);
             }
-
-            _parent._logger.LogDebug("Acquired {lockType} for id {id}", LockType, LockId);
+            if (_parent._logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                _parent._logger.LogDebug("Acquired {lockType} for id {id}", LockType, LockId);
+            }
         }
 
         public int LockId { get; }
 
         public DistributedLockType LockType { get; }
 
-        public void Dispose() =>
-            // Mostly no op, cleaned up by completing transaction in scope.
-            _parent._logger.LogDebug("Dropped {lockType} for id {id}", LockType, LockId);
+        public void Dispose()
+        {
+            if (_parent._logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                // Mostly no op, cleaned up by completing transaction in scope.
+                _parent._logger.LogDebug("Dropped {lockType} for id {id}", LockType, LockId);
+            }
+        }
 
         public override string ToString()
             => $"SqlServerDistributedLock({LockId}, {LockType}";

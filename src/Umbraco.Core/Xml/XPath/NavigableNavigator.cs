@@ -21,6 +21,8 @@ namespace Umbraco.Cms.Core.Xml.XPath;
 /// <summary>
 ///     Provides a cursor model for navigating Umbraco data as if it were XML.
 /// </summary>
+
+[Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
 public class NavigableNavigator : XPathNavigator
 {
     // "The XmlNameTable stores atomized strings of any local name, namespace URI,

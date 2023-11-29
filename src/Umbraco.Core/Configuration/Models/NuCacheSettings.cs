@@ -14,6 +14,7 @@ public class NuCacheSettings
     internal const string StaticNuCacheSerializerType = "MessagePack";
     internal const int StaticSqlPageSize = 1000;
     internal const int StaticKitBatchSize = 1;
+    internal const bool StaticUsePagedSqlQuery = true;
 
     /// <summary>
     ///     Gets or sets a value defining the BTree block size.
@@ -24,8 +25,7 @@ public class NuCacheSettings
     ///     The serializer type that nucache uses to persist documents in the database.
     /// </summary>
     [DefaultValue(StaticNuCacheSerializerType)]
-    public NuCacheSerializerType NuCacheSerializerType { get; set; } =
-        Enum<NuCacheSerializerType>.Parse(StaticNuCacheSerializerType);
+    public NuCacheSerializerType NuCacheSerializerType { get; set; } = Enum.Parse<NuCacheSerializerType>(StaticNuCacheSerializerType);
 
     /// <summary>
     ///     The paging size to use for nucache SQL queries.
@@ -40,4 +40,7 @@ public class NuCacheSettings
     public int KitBatchSize { get; set; } = StaticKitBatchSize;
 
     public bool UnPublishedContentCompression { get; set; } = false;
+
+    [DefaultValue(StaticUsePagedSqlQuery)]
+    public bool UsePagedSqlQuery { get; set; } = true;
 }

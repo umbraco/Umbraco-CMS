@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using System.Diagnostics;
 using System.Linq;
 using Microsoft.Extensions.Logging;
@@ -196,18 +195,25 @@ public class MemberRepositoryTest : UmbracoIntegrationTest
             repository.Save(member);
 
             var sut = repository.Get(member.Id);
+            var standardPropertiesCount = ConventionsHelper.GetStandardPropertyTypeStubs(ShortStringHelper).Count;
 
-            Assert.That(memberType.CompositionPropertyGroups.Count(), Is.EqualTo(2));
-            Assert.That(memberType.CompositionPropertyTypes.Count(), Is.EqualTo(3 + ConventionsHelper.GetStandardPropertyTypeStubs(ShortStringHelper).Count));
-            Assert.That(sut.Properties.Count(), Is.EqualTo(3 + ConventionsHelper.GetStandardPropertyTypeStubs(ShortStringHelper).Count));
+            // if there are any standard properties, they all get added to a single group
+            var expectedGroupCount = standardPropertiesCount > 0 ? 2 : 1;
+            Assert.That(memberType.CompositionPropertyGroups.Count(), Is.EqualTo(expectedGroupCount));
+            Assert.That(memberType.CompositionPropertyTypes.Count(), Is.EqualTo(3 + standardPropertiesCount));
+            Assert.That(sut.Properties.Count(), Is.EqualTo(3 + standardPropertiesCount));
             var grp = memberType.CompositionPropertyGroups.FirstOrDefault(x =>
                 x.Name == Constants.Conventions.Member.StandardPropertiesGroupName);
-            Assert.IsNotNull(grp);
-            var aliases = ConventionsHelper.GetStandardPropertyTypeStubs(ShortStringHelper).Select(x => x.Key)
-                .ToArray();
-            foreach (var p in memberType.CompositionPropertyTypes.Where(x => aliases.Contains(x.Alias)))
+            if (grp != null)
             {
-                Assert.AreEqual(grp.Id, p.PropertyGroupId.Value);
+                var aliases = ConventionsHelper.GetStandardPropertyTypeStubs(ShortStringHelper).Select(x => x.Key)
+                    .ToArray();
+
+                foreach (var p in memberType.CompositionPropertyTypes.Where(x => aliases.Contains(x.Alias)))
+                {
+                    Assert.AreEqual(grp.Id, p.PropertyGroupId.Value);
+                }
+
             }
         }
     }

@@ -6,6 +6,7 @@ namespace Umbraco.Cms.Core.Xml;
 ///     Represents a variable in an XPath query.
 /// </summary>
 /// <remarks>The name must be <c>foo</c> in the constructor and <c>$foo</c> in the XPath query.</remarks>
+[Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
 public class XPathVariable
 {
     /// <summary>

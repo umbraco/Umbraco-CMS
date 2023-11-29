@@ -1,13 +1,13 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using System.IO;
 using System.Text;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.IO.MediaPathSchemes;
+using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 
@@ -33,6 +33,7 @@ public class FileSystemsTests : UmbracoIntegrationTest
     }
 
     [Test]
+    [LongRunning]
     public void Can_Delete_MediaFiles()
     {
         var mediaFileManager = GetRequiredService<MediaFileManager>();

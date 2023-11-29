@@ -2,7 +2,7 @@
 
     <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
 
-<div ng-if="vm.loading === false"
+    <div ng-if="vm.loading === false"
         class="umb-block-grid-area-editor__grid-wrapper"
         style="--umb-block-grid--block-grid-columns: {{vm.block.areaGridColumns || vm.rootLayoutColumns}}"
         umb-block-grid-sorter="::vm.sorterOptions"

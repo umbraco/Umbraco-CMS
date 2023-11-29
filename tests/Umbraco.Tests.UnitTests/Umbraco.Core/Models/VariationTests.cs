@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
@@ -119,6 +118,9 @@ public class VariationTests
     /// <summary>
     ///     Asserts the result of <see cref="ContentVariationExtensions.ValidateVariation" />
     /// </summary>
+    /// <param name="variation">The variation to validate</param>
+    /// <param name="culture">The culture to validate</param>
+    /// <param name="segment">The segment to validate</param>
     /// <param name="exactAndWildcards">Validate using Exact + Wildcards flags</param>
     /// <param name="nonExactAndNoWildcards">Validate using non Exact + no Wildcard flags</param>
     /// <param name="exactAndNoWildcards">Validate using Exact + no Wildcard flags</param>

@@ -1,7 +1,9 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using Umbraco.Cms.Core.Semver;
 
 namespace Umbraco.Extensions;
 
@@ -103,5 +105,36 @@ public static class AssemblyExtensions
         }
 
         return null;
+    }
+
+    /// <summary>
+    /// Gets the assembly informational version for the specified <paramref name="assembly" />.
+    /// </summary>
+    /// <param name="assembly">The assembly.</param>
+    /// <param name="version">The assembly version.</param>
+    /// <returns>
+    ///   <c>true</c> if the assembly information version is retrieved; otherwise, <c>false</c>.
+    /// </returns>
+    public static bool TryGetInformationalVersion(this Assembly assembly, [NotNullWhen(true)] out string? version)
+    {
+        AssemblyInformationalVersionAttribute? assemblyInformationalVersionAttribute = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>();
+        if (assemblyInformationalVersionAttribute is not null &&
+            SemVersion.TryParse(assemblyInformationalVersionAttribute.InformationalVersion, out SemVersion? semVersion))
+        {
+            version = semVersion.ToSemanticStringWithoutBuild();
+            return true;
+        }
+        else
+        {
+            AssemblyName assemblyName = assembly.GetName();
+            if (assemblyName.Version is not null)
+            {
+                version = assemblyName.Version.ToString(3);
+                return true;
+            }
+        }
+
+        version = null;
+        return false;
     }
 }

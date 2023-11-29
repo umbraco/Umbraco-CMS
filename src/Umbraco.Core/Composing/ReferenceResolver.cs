@@ -70,7 +70,10 @@ internal class ReferenceResolver
                 }
                 catch (BadImageFormatException e)
                 {
-                    _logger.LogDebug(e, "Could not load {dll} for type scanning, skipping", dll);
+                    if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                    {
+                        _logger.LogDebug(e, "Could not load {dll} for type scanning, skipping", dll);
+                    }
                 }
                 catch (SecurityException e)
                 {

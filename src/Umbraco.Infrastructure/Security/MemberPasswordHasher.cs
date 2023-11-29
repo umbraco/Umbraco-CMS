@@ -107,8 +107,11 @@ public class MemberPasswordHasher : UmbracoPasswordHasher<MemberIdentityUser>
             }
             else
             {
-                _logger.LogDebug(
+                if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                {
+                    _logger.LogDebug(
                     "Unable to determine member password hashing algorithm, but this can happen when member enters a wrong password, before it has be rehashed");
+                }
             }
 
             return PasswordVerificationResult.Failed;
@@ -128,7 +131,9 @@ public class MemberPasswordHasher : UmbracoPasswordHasher<MemberIdentityUser>
         switch (algorithmName)
         {
             case "AES":
-                algorithm = new AesCryptoServiceProvider { Key = StringToByteArray(decryptionKey), IV = new byte[16] };
+                algorithm = Aes.Create();
+                algorithm.Key = StringToByteArray(decryptionKey);
+                algorithm.IV = new byte[16];
                 break;
             default:
                 throw new NotSupportedException($"The algorithm ({algorithmName}) is not supported");

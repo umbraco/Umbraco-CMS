@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Serilog.Extensions.Logging;
@@ -37,6 +38,9 @@ using Umbraco.Cms.Core.Telemetry;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Core.WebAssets;
+using Umbraco.Cms.Infrastructure.BackgroundJobs;
+using Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
+using Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs.ServerRegistration;
 using Umbraco.Cms.Infrastructure.DependencyInjection;
 using Umbraco.Cms.Infrastructure.HostedServices;
 using Umbraco.Cms.Infrastructure.HostedServices.ServerRegistration;
@@ -46,6 +50,7 @@ using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 using Umbraco.Cms.Web.Common;
 using Umbraco.Cms.Web.Common.ApplicationModels;
 using Umbraco.Cms.Web.Common.AspNetCore;
+using Umbraco.Cms.Web.Common.Configuration;
 using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Cms.Web.Common.FileProviders;
@@ -175,6 +180,7 @@ public static partial class UmbracoBuilderExtensions
     /// <summary>
     ///     Add Umbraco hosted services
     /// </summary>
+    [Obsolete("Use AddRecurringBackgroundJobs instead")]
     public static IUmbracoBuilder AddHostedServices(this IUmbracoBuilder builder)
     {
         builder.Services.AddHostedService<QueuedHostedService>();
@@ -190,6 +196,36 @@ public static partial class UmbracoBuilderExtensions
             new ReportSiteTask(
                 provider.GetRequiredService<ILogger<ReportSiteTask>>(),
                 provider.GetRequiredService<ITelemetryService>()));
+
+
+        return builder;
+    }
+
+    /// <summary>
+    ///     Add Umbraco recurring background jobs
+    /// </summary>
+    public static IUmbracoBuilder AddRecurringBackgroundJobs(this IUmbracoBuilder builder)
+    {
+        // Add background jobs
+        builder.Services.AddRecurringBackgroundJob<HealthCheckNotifierJob>();
+        builder.Services.AddRecurringBackgroundJob<KeepAliveJob>();
+        builder.Services.AddRecurringBackgroundJob<LogScrubberJob>();
+        builder.Services.AddRecurringBackgroundJob<ContentVersionCleanupJob>();
+        builder.Services.AddRecurringBackgroundJob<ScheduledPublishingJob>();
+        builder.Services.AddRecurringBackgroundJob<TempFileCleanupJob>();
+        builder.Services.AddRecurringBackgroundJob<InstructionProcessJob>();
+        builder.Services.AddRecurringBackgroundJob<TouchServerJob>();
+        builder.Services.AddRecurringBackgroundJob(provider =>
+            new ReportSiteJob(
+                provider.GetRequiredService<ILogger<ReportSiteJob>>(),
+                provider.GetRequiredService<ITelemetryService>()));
+
+
+        builder.Services.AddHostedService<QueuedHostedService>();
+        builder.Services.AddSingleton(RecurringBackgroundJobHostedService.CreateHostedServiceFactory);
+        builder.Services.AddHostedService<RecurringBackgroundJobHostedServiceRunner>();
+        
+
         return builder;
     }
 
@@ -291,6 +327,9 @@ public static partial class UmbracoBuilderExtensions
             options.Cookie.HttpOnly = true;
         });
 
+        builder.Services.ConfigureOptions<ConfigureApiVersioningOptions>();
+        builder.Services.ConfigureOptions<ConfigureApiExplorerOptions>();
+        builder.Services.AddApiVersioning().AddApiExplorer();
         builder.Services.ConfigureOptions<UmbracoMvcConfigureOptions>();
         builder.Services.ConfigureOptions<UmbracoRequestLocalizationOptions>();
         builder.Services.TryAddEnumerable(ServiceDescriptor

@@ -88,6 +88,12 @@ public class MemberMapDefinition : IMapDefinition
         target.Udi = Udi.Create(Constants.UdiEntityType.Member, source.Key);
         target.UpdateDate = source.UpdateDate;
         target.Username = source.Username;
+        target.FailedPasswordAttempts = source.FailedPasswordAttempts;
+        target.Approved = source.IsApproved;
+        target.LockedOut = source.IsLockedOut;
+        target.LastLockoutDate = source.LastLockoutDate;
+        target.LastLoginDate = source.LastLoginDate;
+        target.LastPasswordChangeDate = source.LastPasswordChangeDate;
     }
 
     // Umbraco.Code.MapAll -Icon -Trashed -ParentId -Alias

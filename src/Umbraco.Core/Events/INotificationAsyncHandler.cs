@@ -6,17 +6,35 @@ using Umbraco.Cms.Core.Notifications;
 namespace Umbraco.Cms.Core.Events;
 
 /// <summary>
-///     Defines a handler for a async notification.
+/// Defines a handler for a async notification.
 /// </summary>
 /// <typeparam name="TNotification">The type of notification being handled.</typeparam>
-public interface INotificationAsyncHandler<in TNotification>
+public interface INotificationAsyncHandler<in TNotification> : INotificationHandler
     where TNotification : INotification
 {
     /// <summary>
-    ///     Handles a notification
+    /// Handles a notification.
     /// </summary>
-    /// <param name="notification">The notification</param>
+    /// <param name="notification">The notification.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+    /// <returns>
+    /// A <see cref="Task" /> representing the asynchronous operation.
+    /// </returns>
     Task HandleAsync(TNotification notification, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Handles the notifications.
+    /// </summary>
+    /// <param name="notifications">The notifications.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>
+    /// A <see cref="Task" /> representing the asynchronous operation.
+    /// </returns>
+    async Task HandleAsync(IEnumerable<TNotification> notifications, CancellationToken cancellationToken)
+    {
+        foreach (TNotification notification in notifications)
+        {
+            await HandleAsync(notification, cancellationToken);
+        }
+    }
 }

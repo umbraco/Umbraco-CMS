@@ -14,6 +14,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices;
 ///     Will run on all servers - even though file upload should only be handled on the scheduling publisher, this will
 ///     ensure that in the case it happens on subscribers that they are cleaned up too.
 /// </remarks>
+[Obsolete("Use Umbraco.Cms.Infrastructure.BackgroundJobs.TempFileCleanupJob instead.  This class will be removed in Umbraco 14.")]
 public class TempFileCleanup : RecurringHostedServiceBase
 {
     private readonly TimeSpan _age = TimeSpan.FromDays(1);
@@ -44,7 +45,10 @@ public class TempFileCleanup : RecurringHostedServiceBase
         // Ensure we do not run if not main domain
         if (_mainDom.IsMainDom == false)
         {
-            _logger.LogDebug("Does not run if not MainDom.");
+            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                _logger.LogDebug("Does not run if not MainDom.");
+            }
             return Task.CompletedTask;
         }
 
@@ -62,7 +66,10 @@ public class TempFileCleanup : RecurringHostedServiceBase
         switch (result.Status)
         {
             case CleanFolderResultStatus.FailedAsDoesNotExist:
-                _logger.LogDebug("The cleanup folder doesn't exist {Folder}", folder.FullName);
+                if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+                {
+                    _logger.LogDebug("The cleanup folder doesn't exist {Folder}", folder.FullName);
+                }
                 break;
             case CleanFolderResultStatus.FailedWithException:
                 foreach (CleanFolderResult.Error error in result.Errors!)
@@ -77,7 +84,10 @@ public class TempFileCleanup : RecurringHostedServiceBase
         folder.Refresh(); // In case it's changed during runtime
         if (!folder.Exists)
         {
-            _logger.LogDebug("The cleanup folder doesn't exist {Folder}", folder.FullName);
+            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                _logger.LogDebug("The cleanup folder doesn't exist {Folder}", folder.FullName);
+            }
             return;
         }
 

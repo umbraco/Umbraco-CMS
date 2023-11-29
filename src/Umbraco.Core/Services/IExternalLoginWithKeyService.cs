@@ -35,7 +35,7 @@ public interface IExternalLoginWithKeyService : IService
     /// <summary>
     ///     Saves the external login tokens associated with the user
     /// </summary>
-    /// <param name="userId">
+    /// <param name="userOrMemberKey">
     ///     The user or member key associated with the logins
     /// </param>
     /// <param name="tokens"></param>

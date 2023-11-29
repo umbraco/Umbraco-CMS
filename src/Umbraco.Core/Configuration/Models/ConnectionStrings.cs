@@ -15,7 +15,7 @@ public class ConnectionStrings // TODO: Rename to [Umbraco]ConnectionString (sin
     /// <summary>
     ///     The DataDirectory placeholder.
     /// </summary>
-    public const string DataDirectoryPlaceholder = ConfigurationExtensions.DataDirectoryPlaceholder;
+    public const string DataDirectoryPlaceholder = Constants.System.DataDirectoryPlaceholder;
 
     /// <summary>
     ///     The postfix used to identify a connection strings provider setting.

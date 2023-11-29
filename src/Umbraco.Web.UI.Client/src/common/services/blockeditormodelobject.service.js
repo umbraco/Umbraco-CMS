@@ -13,7 +13,7 @@
 (function () {
     'use strict';
 
-    function blockEditorModelObjectFactory($interpolate, $q, udiService, contentResource, localizationService, umbRequestHelper, clipboardService, notificationsService, $compile) {
+    function blockEditorModelObjectFactory($interpolate, $q, udiService, contentResource, localizationService, umbRequestHelper, clipboardService, notificationsService, $compile, editorState) {
 
         /**
          * Simple mapping from property model content entry to editing model,
@@ -396,7 +396,11 @@
                 // removing duplicates.
                 scaffoldKeys = scaffoldKeys.filter((value, index, self) => self.indexOf(value) === index);
 
-                tasks.push(contentResource.getScaffoldByKeys(-20, scaffoldKeys).then(scaffolds => {
+                // get current node (for page context)
+                var currentPage = editorState.getCurrent();
+                var currentPageId = currentPage ? (currentPage.id > 0 ? currentPage.id : currentPage.parentId) : null || -20;
+
+                tasks.push(contentResource.getScaffoldByKeys(currentPageId, scaffoldKeys).then(scaffolds => {
                     Object.values(scaffolds).forEach(scaffold => {
                         // self.scaffolds might not exists anymore, this happens if this instance has been destroyed before the load is complete.
                         if (self.scaffolds) {
@@ -639,12 +643,17 @@
                         mapToPropertyModel(this.settings, this.settingsData);
                     }
                 };
-
                 // first time instant update of label.
-                blockObject.label = (blockObject.config.label || blockObject.content?.contentTypeName) ?? "" ;
-                blockObject.index = 0;
+              blockObject.label = blockObject.content?.contentTypeName || "";
+                blockObject.index = 0; 
 
                 if (blockObject.config.label && blockObject.config.label !== "" && blockObject.config.unsupported !== true) {
+
+                    // If the label does not contain any AngularJS template, then the MutationObserver wont give us any updates. To ensure labels without angular JS template code, we will just set the label directly for ones without '{{':
+                    if(blockObject.config.label.indexOf("{{") === -1) {
+                        blockObject.label = blockObject.config.label;
+                    }
+
                     var labelElement = $('<div></div>', { text: blockObject.config.label});
 
                     var observer = new MutationObserver(function(mutations) {
@@ -674,6 +683,7 @@
                         this.__labelScope = Object.assign(this.__labelScope, labelVars);
 
                         $compile(labelElement.contents())(this.__labelScope);
+
                     }.bind(blockObject)
                 } else {
                     blockObject.__renderLabel = function() {};

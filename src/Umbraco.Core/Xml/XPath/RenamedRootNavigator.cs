@@ -3,6 +3,7 @@ using System.Xml.XPath;
 
 namespace Umbraco.Cms.Core.Xml.XPath;
 
+[Obsolete("The current implementation of XPath is suboptimal and will be removed entirely in a future version. Scheduled for removal in v14")]
 public class RenamedRootNavigator : XPathNavigator
 {
     private readonly XPathNavigator _navigator;

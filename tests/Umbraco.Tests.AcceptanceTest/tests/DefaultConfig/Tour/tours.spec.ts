@@ -76,7 +76,9 @@ test.describe('Tours', () => {
 
   }
 
-  test('Backoffice introduction tour should run', async ({page, umbracoApi, umbracoUi}) => {
+  test('Backoffice introduction tour should run', async ({page, umbracoApi, umbracoUi}, testInfo) => {
+    await testInfo.slow();
+
     // We have to reload this page, as we already get a page context after login
     // before we have reset a users tour data
     await expect(await umbracoUi.getGlobalHelp()).toBeVisible();
@@ -87,7 +89,9 @@ test.describe('Tours', () => {
     await getPercentage(17, timeout, page);
   });
 
-  test('Backoffice introduction tour should run, then rerun', async ({page, umbracoApi, umbracoUi}) => {
+  test('Backoffice introduction tour should run, then rerun', async ({page, umbracoApi, umbracoUi}, testInfo) => {
+    await testInfo.slow();
+
     await expect(await umbracoUi.getGlobalHelp()).toBeVisible();
     await umbracoUi.clickElement(umbracoUi.getGlobalHelp());
     await runBackOfficeIntroTour(0, 'Start', timeout, page, umbracoUi);

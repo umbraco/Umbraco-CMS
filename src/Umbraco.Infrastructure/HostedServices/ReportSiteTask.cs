@@ -13,6 +13,7 @@ using Umbraco.Cms.Core.Telemetry.Models;
 
 namespace Umbraco.Cms.Infrastructure.HostedServices;
 
+[Obsolete("Use Umbraco.Cms.Infrastructure.BackgroundJobs.ReportSiteJob instead.  This class will be removed in Umbraco 14.")]
 public class ReportSiteTask : RecurringHostedServiceBase
 {
     private static HttpClient _httpClient = new();
@@ -91,7 +92,10 @@ public class ReportSiteTask : RecurringHostedServiceBase
             // Silently swallow
             // The user does not need the logs being polluted if our service has fallen over or is down etc
             // Hence only logging this at a more verbose level (which users should not be using in production)
-            _logger.LogDebug("There was a problem sending a request to the Umbraco telemetry service");
+            if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+            {
+                _logger.LogDebug("There was a problem sending a request to the Umbraco telemetry service");
+            }
         }
     }
 }

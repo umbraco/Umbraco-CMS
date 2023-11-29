@@ -32,6 +32,7 @@ namespace Umbraco.Cms.Web.UI
             services.AddUmbraco(_env, _config)
                 .AddBackOffice()
                 .AddWebsite()
+                .AddDeliveryApi()
                 .AddComposers()
                 .Build();
         }
@@ -47,7 +48,7 @@ namespace Umbraco.Cms.Web.UI
             {
                 app.UseDeveloperExceptionPage();
             }
-#if (UseHttpsRedirect)
+#if UseHttpsRedirect
 
             app.UseHttpsRedirection();
 #endif

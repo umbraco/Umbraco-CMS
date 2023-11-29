@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -24,6 +23,7 @@ using Umbraco.Cms.Tests.Common;
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HostedServices;
 
 [TestFixture]
+[Obsolete("Replaced by BackgroundJobs.Jobs.HealthCheckNotifierJobTests")]
 public class HealthCheckNotifierTests
 {
     private Mock<IHealthCheckNotificationMethod> _mockNotificationMethod;

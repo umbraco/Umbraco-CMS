@@ -8,7 +8,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 namespace Umbraco.Cms.Web.BackOffice.Security;
 
 /// <summary>
-///     Antiforgery implementation for the Umbraco back office
+///     Anti-forgery implementation for the Umbraco back office
 /// </summary>
 /// <remarks>
 ///     This is a wrapper around the global/default <see cref="IAntiforgery" /> .net service. Because this service is a
@@ -33,14 +33,12 @@ public class BackOfficeAntiforgery : IBackOfficeAntiforgery
         {
             x.HeaderName = Constants.Web.AngularHeadername;
             x.Cookie.Name = Constants.Web.CsrfValidationCookieName;
+            x.Cookie.SecurePolicy = globalSettings.CurrentValue.UseHttps ? CookieSecurePolicy.Always : CookieSecurePolicy.SameAsRequest;
         });
         ServiceProvider container = services.BuildServiceProvider();
         _internalAntiForgery = container.GetRequiredService<IAntiforgery>();
         _globalSettings = globalSettings.CurrentValue;
-        globalSettings.OnChange(x =>
-        {
-            _globalSettings = x;
-        });
+        globalSettings.OnChange(x => _globalSettings = x);
     }
 
     /// <inheritdoc />

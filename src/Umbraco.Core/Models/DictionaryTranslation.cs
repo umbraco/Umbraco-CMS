@@ -1,5 +1,8 @@
 using System.Runtime.Serialization;
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Core.Models;
 
@@ -11,6 +14,7 @@ namespace Umbraco.Cms.Core.Models;
 public class DictionaryTranslation : EntityBase, IDictionaryTranslation
 {
     private ILanguage? _language;
+    private string? _languageIsoCode;
 
     // note: this will be memberwise cloned
     private string _value;
@@ -20,6 +24,7 @@ public class DictionaryTranslation : EntityBase, IDictionaryTranslation
         _language = language ?? throw new ArgumentNullException("language");
         LanguageId = _language.Id;
         _value = value;
+        LanguageIsoCode = language.IsoCode;
     }
 
     public DictionaryTranslation(ILanguage language, string value, Guid uniqueId)
@@ -27,17 +32,18 @@ public class DictionaryTranslation : EntityBase, IDictionaryTranslation
         _language = language ?? throw new ArgumentNullException("language");
         LanguageId = _language.Id;
         _value = value;
+        LanguageIsoCode = language.IsoCode;
         Key = uniqueId;
     }
 
-    [Obsolete("Please use constructor that accepts ILanguage. This will be removed in V13.")]
+    [Obsolete("Please use constructor that accepts ILanguage. This will be removed in V14.")]
     public DictionaryTranslation(int languageId, string value)
     {
         LanguageId = languageId;
         _value = value;
     }
 
-    [Obsolete("Please use constructor that accepts ILanguage. This will be removed in V13.")]
+    [Obsolete("Please use constructor that accepts ILanguage. This will be removed in V14.")]
     public DictionaryTranslation(int languageId, string value, Guid uniqueId)
     {
         LanguageId = languageId;
@@ -58,7 +64,7 @@ public class DictionaryTranslation : EntityBase, IDictionaryTranslation
     ///     returned
     ///     on a callback.
     /// </remarks>
-    [Obsolete("This will be removed in V13. From V13 onwards you should get languages by ISO code from ILanguageService.")]
+    [Obsolete("This will be removed in V14. From V14 onwards you should get languages by ISO code from ILanguageService.")]
     [DataMember]
     [DoNotClone]
     public ILanguage? Language
@@ -86,7 +92,7 @@ public class DictionaryTranslation : EntityBase, IDictionaryTranslation
         }
     }
 
-    [Obsolete("This will be replaced by language ISO code in V13.")]
+    [Obsolete("This will be replaced by language ISO code in V14.")]
     public int LanguageId { get; private set; }
 
     /// <summary>
@@ -97,6 +103,24 @@ public class DictionaryTranslation : EntityBase, IDictionaryTranslation
     {
         get => _value;
         set => SetPropertyValueAndDetectChanges(value, ref _value!, nameof(Value));
+    }
+
+    /// <inheritdoc />
+    public string LanguageIsoCode
+    {
+        get
+        {
+            // TODO: this won't be necessary after obsoleted ctors are removed in v14.
+            if (_languageIsoCode is null)
+            {
+                var _languageService = StaticServiceProvider.Instance.GetRequiredService<ILocalizationService>();
+                _languageIsoCode = _languageService.GetLanguageById(LanguageId)?.IsoCode ?? string.Empty;
+            }
+
+            return _languageIsoCode;
+        }
+
+        private set => SetPropertyValueAndDetectChanges(value, ref _languageIsoCode!, nameof(LanguageIsoCode));
     }
 
     protected override void PerformDeepClone(object clone)

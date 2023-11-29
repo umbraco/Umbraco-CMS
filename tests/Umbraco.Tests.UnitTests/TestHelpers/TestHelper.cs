@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -32,6 +31,7 @@ using Umbraco.Cms.Core.Net;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Runtime;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Mail;
@@ -43,6 +43,7 @@ using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Extensions;
 using File = System.IO.File;
 using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
+using IScopeProvider = Umbraco.Cms.Infrastructure.Scoping.IScopeProvider;
 
 namespace Umbraco.Cms.Tests.UnitTests.TestHelpers;
 
@@ -59,6 +60,8 @@ public static class TestHelper
     /// <value>The assembly directory.</value>
     public static string WorkingDirectory => s_testHelperInternal.WorkingDirectory;
 
+    public static IScopeProvider ScopeProvider => s_testHelperInternal.ScopeProvider;
+    public static ICoreScopeProvider CoreScopeProvider => s_testHelperInternal.ScopeProvider;
     public static IShortStringHelper ShortStringHelper => s_testHelperInternal.ShortStringHelper;
 
     public static IJsonSerializer JsonSerializer => s_testHelperInternal.JsonSerializer;
