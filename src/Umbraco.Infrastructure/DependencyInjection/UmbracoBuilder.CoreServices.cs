@@ -162,6 +162,9 @@ public static partial class UmbracoBuilderExtensions
 
         builder.Services.AddSingleton<RichTextEditorPastedImages>();
         builder.Services.AddSingleton<BlockEditorConverter>();
+        builder.Services.AddSingleton<BlockListPropertyValueConstructorCache>();
+        builder.Services.AddSingleton<BlockGridPropertyValueConstructorCache>();
+        builder.Services.AddSingleton<RichTextBlockPropertyValueConstructorCache>();
 
         // both TinyMceValueConverter (in Core) and RteMacroRenderingValueConverter (in Web) will be
         // discovered when CoreBootManager configures the converters. We will remove the basic one defined
@@ -367,7 +370,9 @@ public static partial class UmbracoBuilderExtensions
             .AddNotificationHandler<ContentDeletedNotification, ImageCropperPropertyEditor>()
             .AddNotificationHandler<MediaDeletedNotification, ImageCropperPropertyEditor>()
             .AddNotificationHandler<MediaSavingNotification, ImageCropperPropertyEditor>()
-            .AddNotificationHandler<MemberDeletedNotification, ImageCropperPropertyEditor>();
+            .AddNotificationHandler<MemberDeletedNotification, ImageCropperPropertyEditor>()
+            .AddNotificationHandler<ContentTypeCacheRefresherNotification, ConstructorCacheClearNotificationHandler>()
+            .AddNotificationHandler<DataTypeCacheRefresherNotification, ConstructorCacheClearNotificationHandler>();
 
         // add notification handlers for redirect tracking
         builder

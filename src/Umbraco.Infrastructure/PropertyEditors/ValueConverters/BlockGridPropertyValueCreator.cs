@@ -7,10 +7,14 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 internal class BlockGridPropertyValueCreator : BlockPropertyValueCreatorBase<BlockGridModel, BlockGridItem, BlockGridLayoutItem, BlockGridConfiguration.BlockGridBlockConfiguration>
 {
     private readonly IJsonSerializer _jsonSerializer;
+    private readonly BlockGridPropertyValueConstructorCache _constructorCache;
 
-    public BlockGridPropertyValueCreator(BlockEditorConverter blockEditorConverter, IJsonSerializer jsonSerializer)
+    public BlockGridPropertyValueCreator(BlockEditorConverter blockEditorConverter, IJsonSerializer jsonSerializer, BlockGridPropertyValueConstructorCache constructorCache)
         : base(blockEditorConverter)
-        => _jsonSerializer = jsonSerializer;
+    {
+        _jsonSerializer = jsonSerializer;
+        _constructorCache = constructorCache;
+    }
 
     public BlockGridModel CreateBlockModel(PropertyCacheLevel referenceCacheLevel, string intermediateBlockModelValue, bool preview, BlockGridConfiguration.BlockGridBlockConfiguration[] blockConfigurations, int? gridColumns)
     {
@@ -55,11 +59,12 @@ internal class BlockGridPropertyValueCreator : BlockPropertyValueCreatorBase<Blo
 
     protected override BlockEditorDataConverter CreateBlockEditorDataConverter() => new BlockGridEditorDataConverter(_jsonSerializer);
 
-    protected override BlockItemActivator<BlockGridItem> CreateBlockItemActivator() => new BlockGridItemActivator(BlockEditorConverter);
+    protected override BlockItemActivator<BlockGridItem> CreateBlockItemActivator() => new BlockGridItemActivator(BlockEditorConverter, _constructorCache);
 
     private class BlockGridItemActivator : BlockItemActivator<BlockGridItem>
     {
-        public BlockGridItemActivator(BlockEditorConverter blockConverter) : base(blockConverter)
+        public BlockGridItemActivator(BlockEditorConverter blockConverter, BlockGridPropertyValueConstructorCache constructorCache)
+            : base(blockConverter, constructorCache)
         {
         }
 

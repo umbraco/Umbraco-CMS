@@ -23,6 +23,7 @@ public class BlockListPropertyValueConverter : PropertyValueConverterBase, IDeli
     private readonly IProfilingLogger _proflog;
     private readonly BlockEditorConverter _blockConverter;
     private readonly IApiElementBuilder _apiElementBuilder;
+    private readonly BlockListPropertyValueConstructorCache _constructorCache;
 
     [Obsolete("Use the constructor that takes all parameters, scheduled for removal in V14")]
     public BlockListPropertyValueConverter(IProfilingLogger proflog, BlockEditorConverter blockConverter)
@@ -36,12 +37,19 @@ public class BlockListPropertyValueConverter : PropertyValueConverterBase, IDeli
     {
     }
 
+    [Obsolete("Use the constructor that takes all parameters, scheduled for removal in V15")]
     public BlockListPropertyValueConverter(IProfilingLogger proflog, BlockEditorConverter blockConverter, IContentTypeService contentTypeService, IApiElementBuilder apiElementBuilder)
+        : this(proflog, blockConverter, contentTypeService, apiElementBuilder, StaticServiceProvider.Instance.GetRequiredService<BlockListPropertyValueConstructorCache>())
+    {
+    }
+
+    public BlockListPropertyValueConverter(IProfilingLogger proflog, BlockEditorConverter blockConverter, IContentTypeService contentTypeService, IApiElementBuilder apiElementBuilder, BlockListPropertyValueConstructorCache constructorCache)
     {
         _proflog = proflog;
         _blockConverter = blockConverter;
         _contentTypeService = contentTypeService;
         _apiElementBuilder = apiElementBuilder;
+        _constructorCache = constructorCache;
     }
 
     /// <inheritdoc />
@@ -153,7 +161,7 @@ public class BlockListPropertyValueConverter : PropertyValueConverterBase, IDeli
                 return null;
             }
 
-            var creator = new BlockListPropertyValueCreator(_blockConverter);
+            var creator = new BlockListPropertyValueCreator(_blockConverter, _constructorCache);
             return creator.CreateBlockModel(referenceCacheLevel, intermediateBlockModelValue, preview, configuration.Blocks);
         }
     }
