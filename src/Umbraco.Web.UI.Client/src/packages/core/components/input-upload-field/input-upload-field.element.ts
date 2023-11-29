@@ -25,12 +25,13 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 	 * @type {Array<String>}
 	 * @default []
 	 */
-	@property({ type: Array<string> })
+	@property({ type: Array })
 	public set keys(fileKeys: Array<string>) {
 		this._keys = fileKeys;
 		super.value = this._keys.join(',');
 		fileKeys.forEach((key) => {
 			if (!UmbId.validate(key)) {
+				//TODO push when its a path
 				this._filePaths.push(key);
 			}
 		});
@@ -44,7 +45,7 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 	 * @type {Array<String>}
 	 * @default undefined
 	 */
-	@property({ type: Array<string> })
+	@property({ type: Array })
 	fileExtensions?: Array<string>;
 
 	/**
@@ -79,7 +80,7 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 		this.#manager = new UmbTemporaryFileManager(this);
 
 		this.observe(this.#manager.isReady, (value) => (this.error = !value));
-		this.observe(this.#manager.items, (value) => (this._currentFiles = value));
+		this.observe(this.#manager.queue, (value) => (this._currentFiles = value));
 	}
 
 	connectedCallback(): void {
@@ -107,14 +108,14 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 	#setFiles(files: File[]) {
 		const items = files.map(
 			(file): TemporaryFileQueueItem => ({
-				id: UmbId.new(),
+				unique: UmbId.new(),
 				file,
 				status: 'waiting',
 			}),
 		);
 		this.#manager.upload(items);
 
-		this.keys = items.map((item) => item.id);
+		this.keys = items.map((item) => item.unique);
 		this.value = this.keys.join(',');
 
 		this.dispatchEvent(new CustomEvent('change', { bubbles: true }));
@@ -126,12 +127,12 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 	}
 
 	render() {
-		return html`${this.#renderFilesWithPath()} ${this.#renderFilesUploaded()}
-		${this.#renderDropzone()}${this.#renderButtonRemove()}`;
+		return html`<div id="wrapper">${this.#renderFilesWithPath()} ${this.#renderFilesUploaded()}</div>
+			${this.#renderDropzone()}${this.#renderButtonRemove()}`;
 	}
 
 	//TODO When the property editor gets saved, it seems that the property editor gets the file path from the server rather than key/id.
-	// Image/files needs to be displayed from a previous save (not just when it just got uploaded).
+	// This however does not work when there is multiple files. Can the server not handle multiple files uploaded into one property editor?
 	#renderDropzone() {
 		if (!this.multiple && (this._currentFiles.length || this._filePaths.length)) return nothing;
 		return html`
@@ -155,15 +156,15 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 
 	#renderFilesUploaded() {
 		if (!this._currentFiles.length) return nothing;
-		return html`<div id="wrapper">
+		return html`
 			${repeat(
 				this._currentFiles,
-				(item) => item.id + item.status,
+				(item) => item.unique + item.status,
 				(item) =>
 					html`<div style="position:relative;">
 						<umb-input-upload-field-file .file=${item.file as any}></umb-input-upload-field-file>
 						${item.status === 'waiting' ? html`<umb-temporary-file-badge></umb-temporary-file-badge>` : nothing}
-					</div>`,
+					</div> `,
 			)}
 		</div>`;
 	}
@@ -177,8 +178,8 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 
 	#handleRemove() {
 		this._filePaths = [];
-		const ids = this._currentFiles.map((item) => item.id) as string[];
-		this.#manager.remove(ids);
+		const uniques = this._currentFiles.map((item) => item.unique) as string[];
+		this.#manager.remove(uniques);
 
 		this.dispatchEvent(new CustomEvent('change', { bubbles: true }));
 	}
@@ -205,6 +206,10 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 				display: grid;
 				grid-template-columns: repeat(auto-fit, 200px);
 				gap: var(--uui-size-space-4);
+			}
+
+			uui-file-dropzone {
+				padding: 3px; /** Dropzone background is blurry and covers slightly into other elements. Hack to avoid this */
 			}
 		`,
 	];

@@ -1,74 +1,74 @@
 import { UmbTemporaryFileRepository } from './temporary-file.repository.js';
 import { UmbArrayState, UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 
 export type TemporaryFileStatus = 'complete' | 'waiting' | 'error';
 
 export interface TemporaryFileQueueItem {
-	id: string;
+	unique: string;
 	file: File;
 	status?: TemporaryFileStatus;
-	//type?: string;
 }
 
-export class UmbTemporaryFileManager {
+export class UmbTemporaryFileManager extends UmbBaseController {
 	#temporaryFileRepository;
 
-	#items = new UmbArrayState<TemporaryFileQueueItem>([], (item) => item.id);
-	public readonly items = this.#items.asObservable();
+	#queue = new UmbArrayState<TemporaryFileQueueItem>([], (item) => item.unique);
+	public readonly queue = this.#queue.asObservable();
 
 	#isReady = new UmbBooleanState(true);
 	public readonly isReady = this.#isReady.asObservable();
 
 	constructor(host: UmbControllerHostElement) {
+		super(host);
 		this.#temporaryFileRepository = new UmbTemporaryFileRepository(host);
-		//this.items.subscribe(() => this.handleQueue());
 	}
 
-	uploadOne(id: string, file: File, status: TemporaryFileStatus = 'waiting') {
-		this.#items.appendOne({ id, file, status });
+	uploadOne(unique: string, file: File, status: TemporaryFileStatus = 'waiting') {
+		this.#queue.appendOne({ unique, file, status });
 		this.handleQueue();
 	}
 
-	upload(items: Array<TemporaryFileQueueItem>) {
-		this.#items.append(items);
+	upload(queueItems: Array<TemporaryFileQueueItem>) {
+		this.#queue.append(queueItems);
 		this.handleQueue();
 	}
 
-	removeOne(id: string) {
-		this.#items.removeOne(id);
+	removeOne(unique: string) {
+		this.#queue.removeOne(unique);
 	}
 
-	remove(ids: Array<string>) {
-		this.#items.remove(ids);
+	remove(uniques: Array<string>) {
+		this.#queue.remove(uniques);
 	}
 
 	private async handleQueue() {
-		const items = this.#items.getValue();
+		const queue = this.#queue.getValue();
 
-		if (!items.length && this.getIsReady()) return;
+		if (!queue.length && this.getIsReady()) return;
 
 		this.#isReady.next(false);
 
-		items.forEach(async (item) => {
+		queue.forEach(async (item) => {
 			if (item.status !== 'waiting') return;
 
-			const { error } = await this.#temporaryFileRepository.upload(item.id, item.file);
+			const { error } = await this.#temporaryFileRepository.upload(item.unique, item.file);
 			await new Promise((resolve) => setTimeout(resolve, (Math.random() + 0.5) * 1000)); // simulate small delay so that the upload badge is properly shown
 
 			if (error) {
-				this.#items.updateOne(item.id, { ...item, status: 'error' });
+				this.#queue.updateOne(item.unique, { ...item, status: 'error' });
 			} else {
-				this.#items.updateOne(item.id, { ...item, status: 'complete' });
+				this.#queue.updateOne(item.unique, { ...item, status: 'complete' });
 			}
 		});
 
-		if (!items.find((item) => item.status === 'waiting') && !this.getIsReady()) {
+		if (!queue.find((item) => item.status === 'waiting') && !this.getIsReady()) {
 			this.#isReady.next(true);
 		}
 	}
 
 	getIsReady() {
-		return this.#items.getValue();
+		return this.#queue.getValue();
 	}
 }
