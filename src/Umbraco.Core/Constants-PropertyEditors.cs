@@ -221,6 +221,12 @@ public static partial class Constants
             /// </summary>
             /// <remarks>Must be a valid <see cref="ValueTypes" /> value.</remarks>
             public const string DataValueType = "umbracoDataValueType";
+
+            /// <summary>
+            ///     The sort by type of property data (i.e., name asc, update date asc, etc)
+            /// </summary>
+            /// <remarks>Must be a valid <see cref="SortByTypes" /> value.</remarks>
+            public const string SortByType = "sortByType";
         }
 
         /// <summary>
@@ -242,3 +248,4 @@ public static partial class Constants
         }
     }
 }
+

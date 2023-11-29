@@ -36,6 +36,13 @@ public class MediaPicker3Configuration : IIgnoreUserStartNodesConfig
         Description = "Selecting this option allows a user to choose nodes that they normally don't have access to.")]
     public bool IgnoreUserStartNodes { get; set; }
 
+    [ConfigurationField(
+        Constants.PropertyEditors.ConfigurationKeys.SortByType,
+        "Sort by",
+        "sortByType",
+        Description = "Default sort by for media grid")]
+    public string DefaultSorting { get; set; } = SortByTypes.UpdateDateAsc;
+
     [DataContract]
     public class NumberRange
     {

@@ -246,11 +246,21 @@
         function addMediaAt(createIndex, $event) {
             if (!vm.allowAddMedia) return;
 
+            let sortBy = "name";
+            let sortType = "asc";
+            if (vm.model.config.sortByType) {
+              const sortPart = vm.model.config.sortByType.split('-');
+              sortBy = sortPart[0];
+              sortType = sortPart[1];
+            }
+
             const mediaPicker = {
                 startNodeId: vm.model.config.startNodeId,
                 startNodeIsVirtual: vm.model.config.startNodeIsVirtual,
                 dataTypeKey: vm.model.dataTypeKey,
                 multiPicker: vm.singleMode !== true,
+                sortBy: sortBy,
+                sortType: sortType,
                 clickPasteItem: function(item, mouseEvent) {
 
                     if (Array.isArray(item.data)) {

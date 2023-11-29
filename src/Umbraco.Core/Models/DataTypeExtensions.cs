@@ -44,6 +44,10 @@ public static class DataTypeExtensions
         Constants.DataTypes.Guids.LabelBigIntGuid,
         Constants.DataTypes.Guids.LabelTimeGuid,
         Constants.DataTypes.Guids.LabelDateTimeGuid,
+        Constants.DataTypes.Guids.LabelSortByNameAscGuid,
+        Constants.DataTypes.Guids.LabelSortByNameDescGuid,
+        Constants.DataTypes.Guids.LabelSortByUpdateDateAscGuid,
+        Constants.DataTypes.Guids.LabelSortByUpdateDateDescGuid,
     };
 
     /// <summary>

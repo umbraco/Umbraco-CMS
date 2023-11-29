@@ -557,6 +557,11 @@ angular.module("umbraco")
 
                     var allowedTypes = dialogOptions.filter ? dialogOptions.filter.split(",") : null;
 
+                    if ($scope.model.sortBy === "updateDate") {
+                      data = sortByUpdateDate(data, $scope.model.sortType);
+                    } else {
+                      data = sortByUpdateName(data, $scope.model.sortType);
+                    }
                     for (var i = 0; i < data.length; i++) {
                         setDefaultData(data[i]);
                         data[i].filtered = allowedTypes && allowedTypes.indexOf(data[i].metaData.ContentTypeAlias) < 0;
@@ -569,6 +574,32 @@ angular.module("umbraco")
                     preSelectMedia();
                     vm.loading = false;
                 });
+            }
+
+            function sortByUpdateDate(data, sortType) {
+              data.sort(function(a, b){
+                // Turn your strings into dates, and then subtract them
+                // to get a value that is either negative, positive, or zero.
+                return new Date(b).date - new Date(a).date;
+              });
+
+              if (sortType === "desc") {
+                data = data.reverse();
+              }
+
+              return data;
+            }
+
+            function sortByUpdateName(data, sortType) {
+              data.sort(function(a, b){
+                return a.name.localeCompare(b.name);
+              });
+
+              if (sortType === "desc") {
+                data = data.reverse();
+              }
+
+              return data;
             }
 
             function setDefaultData(item) {
