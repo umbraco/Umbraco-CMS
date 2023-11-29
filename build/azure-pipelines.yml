@@ -13,6 +13,10 @@ parameters:
     displayName: Deploy to NuGet
     type: boolean
     default: false
+  - name: npmPrepare
+    displayName: Prepare Npm artifact
+    type: boolean
+    default: false
   - name: npmDeploy
     displayName: Deploy to Npm
     type: boolean
@@ -59,8 +63,8 @@ variables:
   DOTNET_CLI_TELEMETRY_OPTOUT: true
 
 stages:
-  - stage: Backoffice_Npm
-    displayName: Prepare NPM package
+  - stage: Deploy_Npm
+    displayName: Npm release
     variables:
       npm_config_cache: $(Pipeline.Workspace)/.npm_client
       NODE_OPTIONS: --max_old_space_size=16384
@@ -71,7 +75,7 @@ stages:
     jobs:
       - job: Prepare
         displayName: Prepare NPM artifact
-        condition: and(succeeded(), or(startsWith(variables['Build.SourceBranch'], 'refs/heads/release/'), ${{parameters.npmDeploy}}))
+        condition: and(succeeded(), or(startsWith(variables['Build.SourceBranch'], 'refs/heads/release/'), or(${{parameters.npmPrepare}}, ${{parameters.npmDeploy}})))
         steps:
           - checkout: self
             submodules: true
@@ -132,7 +136,7 @@ stages:
               PACKAGE_VERSION: $(build.NBGV_NpmPackageVersion)
             workingDirectory: src/Umbraco.Web.UI.New.Client
           - task: PublishPipelineArtifact@1
-            displayName: Publish Bellissima NPM Artifact
+            displayName: Publish Bellissima npm artifact
             inputs:
               targetPath: $(Build.ArtifactStagingDirectory)/npm
               artifactName: npm
