@@ -664,6 +664,9 @@ stages:
     dependsOn:
       - Build
       - Prepare_Npm
+      - Unit
+      - Integration
+      #- E2E # TODO: Enable when stable.
     jobs:
       - job: Publish
         displayName: Push to NPM
