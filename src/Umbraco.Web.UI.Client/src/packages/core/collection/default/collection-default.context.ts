@@ -1,7 +1,7 @@
 import { UmbCollectionConfiguration, UmbCollectionContext } from '../types.js';
 import { UmbCollectionViewManager } from '../collection-view.manager.js';
 import { UmbCollectionRepository } from '@umbraco-cms/backoffice/repository';
-import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbArrayState, UmbNumberState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
@@ -16,7 +16,7 @@ import { UmbSelectionManager, UmbPaginationManager } from '@umbraco-cms/backoffi
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 export class UmbDefaultCollectionContext<ItemType = any, FilterModelType extends UmbCollectionFilterModel = any>
-	extends UmbBaseController
+	extends UmbContextBase<UmbDefaultCollectionContext>
 	implements UmbCollectionContext, UmbApi
 {
 	#manifest?: ManifestCollection;
@@ -44,15 +44,13 @@ export class UmbDefaultCollectionContext<ItemType = any, FilterModelType extends
 	public readonly view;
 
 	constructor(host: UmbControllerHostElement, config: UmbCollectionConfiguration = { pageSize: 50 }) {
-		super(host);
+		super(host, UMB_DEFAULT_COLLECTION_CONTEXT);
 
 		// listen for page changes on the pagination manager
 		this.pagination.addEventListener(UmbChangeEvent.TYPE, this.#onPageChange);
 
 		this.view = new UmbCollectionViewManager(this, { defaultViewAlias: config.defaultViewAlias });
 		this.#configure(config);
-
-		this.provideContext(UMB_COLLECTION_CONTEXT, this);
 	}
 
 	// TODO: find a generic way to do this
@@ -140,6 +138,6 @@ export class UmbDefaultCollectionContext<ItemType = any, FilterModelType extends
 	}
 }
 
-export const UMB_COLLECTION_CONTEXT = new UmbContextToken<UmbDefaultCollectionContext<any, any>>(
+export const UMB_DEFAULT_COLLECTION_CONTEXT = new UmbContextToken<UmbDefaultCollectionContext<any, any>>(
 	'UmbCollectionContext',
 );

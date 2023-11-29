@@ -1,4 +1,4 @@
-import { UMB_COLLECTION_CONTEXT, UmbDefaultCollectionContext } from '../default/collection-default.context.js';
+import { UMB_DEFAULT_COLLECTION_CONTEXT, UmbDefaultCollectionContext } from '../default/collection-default.context.js';
 import { html, customElement, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -13,7 +13,7 @@ export class UmbCollectionActionBundleElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_COLLECTION_CONTEXT, (context) => {
+		this.consumeContext(UMB_DEFAULT_COLLECTION_CONTEXT, (context) => {
 			this.#collectionContext = context;
 			if (!this.#collectionContext) return;
 			this._collectionAlias = this.#collectionContext.getManifest()?.alias;
