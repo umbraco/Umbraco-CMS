@@ -13,10 +13,6 @@ parameters:
     displayName: Deploy to NuGet
     type: boolean
     default: false
-  - name: npmPrepare
-    displayName: Prepare Npm artifact
-    type: boolean
-    default: false
   - name: npmDeploy
     displayName: Deploy to Npm
     type: boolean
@@ -139,7 +135,7 @@ stages:
 
   - stage: Prepare_Npm
     displayName: Prepare Npm artifact
-    condition: and(succeeded(), or(eq(stageDependencies.Build.A.outputs['build.NBGV_PublicRelease'], 'True'), ${{parameters.npmPrepare}}, ${{parameters.npmDeploy}}))
+    condition: and(succeeded(), or(eq(stageDependencies.Build.A.outputs['build.NBGV_PublicRelease'], 'True'), ${{parameters.npmDeploy}}))
     variables:
       npm_config_cache: $(Pipeline.Workspace)/.npm_client
       NODE_OPTIONS: --max_old_space_size=16384
@@ -668,7 +664,6 @@ stages:
     dependsOn:
       - Build
       - Prepare_Npm
-      - Deploy_MyGet
     jobs:
       - job: Publish
         displayName: Push to NPM
