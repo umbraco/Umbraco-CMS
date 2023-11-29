@@ -234,7 +234,7 @@ stages:
             displayName: Run dotnet test
             inputs:
               command: test
-              projects: '**/*.Tests.UnitTests.csproj'
+              projects: 'tests/*.Tests.UnitTests/*.Tests.UnitTests.csproj'
               arguments: '--configuration $(buildConfiguration) --no-build'
               testRunTitle: Unit Tests - $(Agent.OS)
 
@@ -272,7 +272,7 @@ stages:
             condition: eq(variables['Agent.OS'],'Windows_NT')
             inputs:
               command: test
-              projects: '**/*.Tests.Integration.csproj'
+              projects: 'tests/*.Tests.Integration/*.Tests.Integration.csproj'
               testRunTitle: Integration Tests SQLite - $(Agent.OS)
               ${{ if or(variables.releaseTestFilter, parameters.forceReleaseTestFilter) }}:
                 arguments: '--configuration $(buildConfiguration) --no-build ${{parameters.integrationReleaseTestFilter}}'
@@ -286,7 +286,7 @@ stages:
             condition: ne(variables['Agent.OS'],'Windows_NT')
             inputs:
               command: test
-              projects: '**/*.Tests.Integration.csproj'
+              projects: 'tests/*.Tests.Integration/*.Tests.Integration.csproj'
               testRunTitle: Integration Tests SQLite - $(Agent.OS)
               ${{ if or(variables.releaseTestFilter, parameters.forceReleaseTestFilter) }}:
                 arguments: '--configuration $(buildConfiguration) --no-build ${{parameters.nonWindowsIntegrationReleaseTestFilter}}'
@@ -336,7 +336,7 @@ stages:
             condition: eq(variables['Agent.OS'],'Windows_NT')
             inputs:
               command: test
-              projects: '**/*.Tests.Integration.csproj'
+              projects: 'tests/*.Tests.Integration/*.Tests.Integration.csproj'
               testRunTitle: Integration Tests SQL Server - $(Agent.OS)
               ${{ if or(variables.releaseTestFilter, parameters.forceReleaseTestFilter) }}:
                 arguments: '--configuration $(buildConfiguration) --no-build ${{parameters.integrationReleaseTestFilter}}'
@@ -351,7 +351,7 @@ stages:
             condition: ne(variables['Agent.OS'],'Windows_NT')
             inputs:
               command: test
-              projects: '**/*.Tests.Integration.csproj'
+              projects: 'tests/*.Tests.Integration/*.Tests.Integration.csproj'
               testRunTitle: Integration Tests SQL Server - $(Agent.OS)
               ${{ if or(variables.releaseTestFilter, parameters.forceReleaseTestFilter) }}:
                 arguments: '--configuration $(buildConfiguration) --no-build ${{parameters.nonWindowsIntegrationReleaseTestFilter}}'
