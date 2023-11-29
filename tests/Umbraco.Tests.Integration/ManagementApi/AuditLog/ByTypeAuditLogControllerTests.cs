@@ -37,23 +37,23 @@ public class ByTypeAuditLogControllerTests : ManagementApiTest<ByTypeAuditLogCon
     }
 
     [Test]
-    public virtual async Task As_Sensitive_Data_I_Have_No_Access()
+    public virtual async Task As_Sensitive_Data_I_Have_Access()
     {
         await AuthenticateClientAsync(Client, "sensitiveData@umbraco.com", "1234567890", Constants.Security.SensitiveDataGroupKey);
 
         var response = await Client.GetAsync(Url);
 
-        Assert.AreEqual(HttpStatusCode.Forbidden, response.StatusCode, await response.Content.ReadAsStringAsync());
+        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, await response.Content.ReadAsStringAsync());
     }
 
     [Test]
-    public virtual async Task As_Translator_I_Have_No_Access()
+    public virtual async Task As_Translator_I_Have_Access()
     {
         await AuthenticateClientAsync(Client, "translator@umbraco.com", "1234567890", Constants.Security.TranslatorGroupKey);
 
         var response = await Client.GetAsync(Url);
 
-        Assert.AreEqual(HttpStatusCode.Forbidden, response.StatusCode, await response.Content.ReadAsStringAsync());
+        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, await response.Content.ReadAsStringAsync());
     }
 
     [Test]
