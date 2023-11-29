@@ -238,7 +238,7 @@ stages:
             displayName: Run dotnet test
             inputs:
               command: test
-              projects: '**/*.Tests.UnitTests.csproj'
+              projects: 'tests/**/*.Tests.UnitTests.csproj'
               arguments: '--configuration $(buildConfiguration) --no-build'
               testRunTitle: Unit Tests - $(Agent.OS)
 
@@ -277,12 +277,12 @@ stages:
             condition: eq(variables['Agent.OS'],'Windows_NT')
             inputs:
               command: test
-              projects: '**/*.Tests.Integration.csproj'
+              projects: 'tests/**/*.Tests.Integration.csproj'
               testRunTitle: Integration Tests SQLite - $(Agent.OS)
               ${{ if or(variables.releaseTestFilter, parameters.forceReleaseTestFilter) }}:
                 arguments: '--configuration $(buildConfiguration) --no-build ${{parameters.integrationReleaseTestFilter}}'
               ${{ else }}:
-                arguments: '--configuration $(buildConfiguration) ${{parameters.integrationNonReleaseTestFilter}}'
+                arguments: '--configuration $(buildConfiguration) --no-build ${{parameters.integrationNonReleaseTestFilter}}'
             env:
               Tests__Database__DatabaseType: 'Sqlite'
               Umbraco__CMS__Global__MainDomLock: 'FileSystemMainDomLock'
@@ -291,12 +291,12 @@ stages:
             condition: ne(variables['Agent.OS'],'Windows_NT')
             inputs:
               command: test
-              projects: '**/*.Tests.Integration.csproj'
+              projects: 'tests/**/*.Tests.Integration.csproj'
               testRunTitle: Integration Tests SQLite - $(Agent.OS)
               ${{ if or(variables.releaseTestFilter, parameters.forceReleaseTestFilter) }}:
                 arguments: '--configuration $(buildConfiguration) --no-build ${{parameters.nonWindowsIntegrationReleaseTestFilter}}'
               ${{ else }}:
-                arguments: '--configuration $(buildConfiguration) ${{parameters.nonWindowsIntegrationNonReleaseTestFilter}}'
+                arguments: '--configuration $(buildConfiguration) --no-build ${{parameters.nonWindowsIntegrationNonReleaseTestFilter}}'
             env:
               Tests__Database__DatabaseType: 'Sqlite'
               Umbraco__CMS__Global__MainDomLock: 'FileSystemMainDomLock'
@@ -342,7 +342,7 @@ stages:
             condition: eq(variables['Agent.OS'],'Windows_NT')
             inputs:
               command: test
-              projects: '**/*.Tests.Integration.csproj'
+              projects: 'tests/**/*.Tests.Integration.csproj'
               testRunTitle: Integration Tests SQL Server - $(Agent.OS)
               ${{ if or(variables.releaseTestFilter, parameters.forceReleaseTestFilter) }}:
                 arguments: '--configuration $(buildConfiguration) --no-build ${{parameters.integrationReleaseTestFilter}}'
@@ -357,7 +357,7 @@ stages:
             condition: ne(variables['Agent.OS'],'Windows_NT')
             inputs:
               command: test
-              projects: '**/*.Tests.Integration.csproj'
+              projects: 'tests/**/*.Tests.Integration.csproj'
               testRunTitle: Integration Tests SQL Server - $(Agent.OS)
               ${{ if or(variables.releaseTestFilter, parameters.forceReleaseTestFilter) }}:
                 arguments: '--configuration $(buildConfiguration) --no-build ${{parameters.nonWindowsIntegrationReleaseTestFilter}}'
