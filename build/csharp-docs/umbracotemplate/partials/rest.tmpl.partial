@@ -1,8 +1,6 @@
 {{!Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. See LICENSE file in the project root for full license information.}}
 
-{{^_disableContribution}}
 {{#sourceurl}}<a href="{{sourceurl}}" class="btn btn-primary pull-right mobile-hide">View Source</a>{{/sourceurl}}
-{{/_disableContribution}}
 <h1 id="{{htmlId}}" data-uid="{{uid}}" class="text-capitalize">{{name}}</h1>
 {{#summary}}
 <div class="markdown level0 summary">{{{summary}}}</div>
@@ -14,12 +12,10 @@
   <div class="markdown level0 conceptual">{{{conceptual}}}</div>
 {{/conceptual}}
 {{#children}}
-{{^_disableContribution}}
 {{#sourceurl}}
 <span class="small pull-right mobile-hide">
   <a href="{{sourceurl}}">View Source</a>
 </span>{{/sourceurl}}
-{{/_disableContribution}}
  <h3 id="{{htmlId}}" data-uid="{{uid}}" class="text-capitalize">{{operationId}}</h3>
 {{#summary}}
 <div class="markdown level1 summary">{{{summary}}}</div>

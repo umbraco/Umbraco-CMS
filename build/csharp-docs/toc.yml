@@ -1,9 +1,8 @@
 - name: Core
-  href: api/Umbraco.Cms.Core.html
+  topicUid: Umbraco.Cms.Core
 - name: Infrastructure
-  href: api/Umbraco.Cms.Infrastructure.html
+  topicUid: Umbraco.Cms.Infrastructure
 - name: Web
-  href: api/Umbraco.Cms.Web.Common.html
+  topicUid: Umbraco.Cms.Web.Common
 - name: Extensions
-  href: api/Umbraco.Extensions.html
-
+  topicUid: Umbraco.Extensions

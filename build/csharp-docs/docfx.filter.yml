@@ -3,14 +3,3 @@ apiRules:
       uidRegex: ^Umbraco\.Cms
   - include:
       uidRegex: ^Umbraco\.Extensions
-  - exclude:
-      hasAttribute:
-      uid: System.ComponentModel.EditorBrowsableAttribute
-      ctorArguments:
-        - System.ComponentModel.EditorBrowsableState.Never
-  - exclude:
-      uidRegex: ^umbraco\.
-  - exclude:
-      uidRegex: ^CookComputing\.
-  - exclude:
-      uidRegex: ^.*$
