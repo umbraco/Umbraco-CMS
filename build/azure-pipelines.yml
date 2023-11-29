@@ -17,6 +17,10 @@ parameters:
     displayName: Deploy to Npm
     type: boolean
     default: false
+  - name: npmPublishTag
+    displayName: Npm publish tag
+    type: string
+    default: 'next'
   - name: buildApiDocs
     displayName: Build API docs
     type: boolean
@@ -695,7 +699,7 @@ stages:
               if [[ "$PUBLIC_RELEASE" = "True" ]]; then
                   npmTag=latest
               else
-                  npmTag=next
+                  npmTag=$NPM_PUBLISH_TAG
               fi
 
               echo "##[debug]Publishing Backoffice package as public release '$PUBLIC_RELEASE'"
@@ -705,6 +709,7 @@ stages:
               npm publish --tag $npmTag "${files[0]}"
             env:
               PUBLIC_RELEASE: $(umbracoPublicRelease)
+              NPM_PUBLISH_TAG: ${{parameters.npmPublishTag}}
             displayName: Publish npm
             continueOnError: true
             workingDirectory: $(Pipeline.Workspace)/npm
