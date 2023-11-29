@@ -55,10 +55,10 @@ public class ArtifactDependency
     public ArtifactDependencyMode Mode { get; }
 
     /// <summary>
-    /// Gets the checksum.
+    /// Gets or sets the checksum.
     /// </summary>
     /// <value>
     /// The checksum.
     /// </value>
-    public string? Checksum { get; }
+    public string? Checksum { get; set; }
 }
