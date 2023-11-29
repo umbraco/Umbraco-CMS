@@ -57,7 +57,7 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 	private _queryBuilderSettings?: TemplateQuerySettingsResponseModel;
 
 	@state()
-	private _selectedRootContentName? = 'all pages';
+	private _selectedRootContentName? = this.localize.term('template_websiteRoot');
 
 	@state()
 	private _defaultSortDirection: SortOrder = SortOrder.Ascending;
