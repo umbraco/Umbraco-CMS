@@ -41,15 +41,16 @@ export class UmbDefaultCollectionContext<ItemType = any, FilterModelType extends
 
 	public readonly pagination = new UmbPaginationManager();
 	public readonly selection = new UmbSelectionManager();
-	public readonly view = new UmbCollectionViewManager(this);
+	public readonly view;
 
 	constructor(host: UmbControllerHostElement, config: UmbCollectionConfiguration = { pageSize: 50 }) {
 		super(host);
 
+		this.view = new UmbCollectionViewManager(this, { defaultViewAlias: config.defaultViewAlias });
+		this.#configure(config);
+
 		// listen for page changes on the pagination manager
 		this.pagination.addEventListener(UmbChangeEvent.TYPE, this.#onPageChange);
-
-		this.#configure(config);
 
 		this.provideContext(UMB_COLLECTION_CONTEXT, this);
 	}
