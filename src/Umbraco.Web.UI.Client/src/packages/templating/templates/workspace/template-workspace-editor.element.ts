@@ -6,7 +6,7 @@ import { UMB_TEMPLATE_WORKSPACE_CONTEXT } from './template-workspace.context.js'
 import type { UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
 import { camelCase } from '@umbraco-cms/backoffice/external/lodash';
 import { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
-import { css, html, customElement, query, state, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, query, state, nothing, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import {
 	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
 	UMB_TEMPLATE_PICKER_MODAL,
@@ -179,12 +179,10 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 				slot="header"
 				.value=${this._name}
 				@input=${this.#onNameInput}
-				label="template name"
-				><umb-template-alias-input
-					slot="append"
-					.value=${this._alias ?? ''}
-					@change=${this.#onAliasInput}></umb-template-alias-input
-			></uui-input>
+				label="template name">
+				<umb-alias-input slot="append" value=${ifDefined(this._alias!)} @change=${this.#onAliasInput}></umb-alias-input>
+			</uui-input>
+
 			<uui-box>
 				<div slot="header" id="code-editor-menu-container">
 					${this.#renderMasterTemplatePicker()}

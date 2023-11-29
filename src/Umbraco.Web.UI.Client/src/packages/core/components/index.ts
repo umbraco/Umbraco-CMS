@@ -33,3 +33,4 @@ export * from './table/index.js';
 export * from './tooltip-menu/index.js';
 export * from './variant-selector/index.js';
 export * from './popover-layout/index.js';
+export * from './alias-input/index.js';
