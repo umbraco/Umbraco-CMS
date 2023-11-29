@@ -65,7 +65,7 @@ variables:
 stages:
   - stage: Deploy_Npm
     displayName: Npm release
-    condition: and(succeeded(), or(startsWith(variables['Build.SourceBranch'], 'refs/heads/release/'), or(${{parameters.npmPrepare}}, ${{parameters.npmDeploy}})))
+    condition: and(succeeded(), or(startsWith(variables['Build.SourceBranch'], 'refs/heads/release/'), ${{parameters.npmPrepare}}, ${{parameters.npmDeploy}}))
     variables:
       npm_config_cache: $(Pipeline.Workspace)/.npm_client
       NODE_OPTIONS: --max_old_space_size=16384
