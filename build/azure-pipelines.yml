@@ -63,127 +63,6 @@ variables:
   DOTNET_CLI_TELEMETRY_OPTOUT: true
 
 stages:
-  - stage: Deploy_Npm
-    displayName: Npm release
-    condition: and(succeeded(), or(startsWith(variables['Build.SourceBranch'], 'refs/heads/release/'), ${{parameters.npmPrepare}}, ${{parameters.npmDeploy}}))
-    variables:
-      npm_config_cache: $(Pipeline.Workspace)/.npm_client
-      NODE_OPTIONS: --max_old_space_size=16384
-      #dependsOn:
-      #- Build
-      #- Deploy_MyGet
-      #- Build_Docs
-    jobs:
-      - job: Prepare
-        displayName: Prepare NPM artifact
-        steps:
-          - checkout: self
-            submodules: true
-          - task: NodeTool@0
-            displayName: Use Node.js $(nodeVersion)
-            retryCountOnTaskFailure: 3
-            inputs:
-              versionSpec: $(nodeVersion)
-          - task: Cache@2
-            displayName: Cache node_modules
-            inputs:
-              key: '"npm_client" | "$(Agent.OS)" | $(Build.SourcesDirectory)/src/Umbraco.Web.UI.New.Client/package-lock.json'
-              restoreKeys: |
-                "npm_client" | "$(Agent.OS)"
-                "npm_client"
-              path: $(npm_config_cache)
-          - script: npm ci --no-fund --no-audit --prefer-offline
-            displayName: Run npm ci (Bellissima)
-            workingDirectory: src/Umbraco.Web.UI.New.Client
-          - script: npm run build:for:npm
-            displayName: Run build:for:npm (Bellissima)
-            workingDirectory: src/Umbraco.Web.UI.New.Client
-          - bash: |
-              mkdir -p src/Umbraco.Cms.StaticAssets/wwwroot/umbraco/auth
-              mkdir -p src/Umbraco.Cms.StaticAssets/wwwroot/umbraco/backoffice
-              mkdir -p src/Umbraco.Cms.StaticAssets/wwwroot/umbraco/login
-              mkdir -p src/Umbraco.Cms.StaticAssets/wwwroot/umbraco/lib
-          - task: UseDotNet@2
-            displayName: Use .NET $(dotnetVersion)
-            inputs:
-              version: $(dotnetVersion)
-              includePreviewVersions: $(dotnetIncludePreviewVersions)
-          - task: DotNetCoreCLI@2
-            displayName: Run dotnet restore
-            inputs:
-              command: restore
-              projects: $(solution)
-          - task: DotNetCoreCLI@2
-            name: build
-            displayName: Run dotnet build and generate NuGet packages
-            inputs:
-              command: build
-              projects: $(solution)
-              arguments: '--configuration $(buildConfiguration) --no-restore --property:ContinuousIntegrationBuild=true --property:GeneratePackageOnBuild=true --property:PackageOutputPath=$(Build.ArtifactStagingDirectory)/nupkg'
-          - bash: |
-              echo "##[group]npm pack details"
-              echo "##[command]Running npm version"
-              echo "##[debug]Version: $PACKAGE_VERSION"
-              echo "##[command]Running npm pack"
-              echo "##[debug]Output directory: $(Build.ArtifactStagingDirectory)"
-              echo "##[endgroup]"
-              npm version $PACKAGE_VERSION --allow-same-version --no-git-tag-version
-              mkdir $(Build.ArtifactStagingDirectory)/npm
-              npm pack --pack-destination $(Build.ArtifactStagingDirectory)/npm
-              mv .npmrc $(Build.ArtifactStagingDirectory)/npm/
-            displayName: Prepare Bellissima npm package
-            env:
-              PACKAGE_VERSION: $(build.NBGV_NpmPackageVersion)
-            workingDirectory: src/Umbraco.Web.UI.New.Client
-          - task: PublishPipelineArtifact@1
-            displayName: Publish Bellissima npm artifact
-            inputs:
-              targetPath: $(Build.ArtifactStagingDirectory)/npm
-              artifactName: npm
-      - job: Publish
-        displayName: Push to NPM
-        condition: and(succeeded(), or(startsWith(variables['Build.SourceBranch'], 'refs/heads/release/'), ${{parameters.npmDeploy}}))
-        dependsOn: Prepare
-        variables:
-          umbracoPublicRelease: $[ dependencies.Prepare.outputs['build.NBGV_PublicRelease'] ]
-        steps:
-          - checkout: none
-          - download: current
-            artifact: npm
-          - task: npmAuthenticate@0
-            displayName: Authenticate with npm
-            inputs:
-              workingFile: $(Pipeline.Workspace)/npm/.npmrc
-              customEndpoint: 'NPM - Umbraco Backoffice'
-          - script: |
-              # Setup temp npm project to load in defaults from the local .npmrc
-              npm init -y
-
-              echo "Npm config"
-              npm config ls -l
-
-              echo "Testing npm is authenticated"
-              npm whoami
-            displayName: npm whoami
-            workingDirectory: $(Pipeline.Workspace)/npm
-          - bash: |
-              # Calculate npm tag based on the umbracoPublicRelease job variable
-              if [[ "$PUBLIC_RELEASE" = "true" ]]; then
-                  npmTag=latest
-              else
-                  npmTag=next
-              fi
-
-              echo "##[debug]Publishing Backoffice package as public release '$PUBLIC_RELEASE'"
-              echo "##[debug]Publishing Backoffice package with tag '$npmTag'"
-
-              files=( ./*.tgz )
-              npm publish --dry-run --tag $npmTag "${files[0]}"
-            env:
-                PUBLIC_RELEASE: $(umbracoPublicRelease)
-            displayName: Publish npm
-            continueOnError: true
-            workingDirectory: $(Pipeline.Workspace)/npm
   ###############################################
   ## Build
   ###############################################
@@ -723,6 +602,106 @@ stages:
               packagesToPush: $(Build.ArtifactStagingDirectory)/**/*.nupkg
               nuGetFeedType: 'external'
               publishFeedCredentials: 'NuGet - Umbraco.*'
+
+  - stage: Deploy_Npm
+    displayName: Npm release
+    condition: and(succeeded(), or(eq(stageDependencies.Build.A.outputs['build.NBGV_PublicRelease'], 'True'), ${{parameters.npmPrepare}}, ${{parameters.npmDeploy}}))
+    variables:
+      npm_config_cache: $(Pipeline.Workspace)/.npm_client
+      NODE_OPTIONS: --max_old_space_size=16384
+      npmPackageVersion: $[ stageDependencies.Build.A.outputs['build.NBGV_NpmPackageVersion'] ]
+    dependsOn:
+      - Build
+      #- Deploy_MyGet
+    jobs:
+      - job: Prepare
+        displayName: Prepare NPM artifact
+        steps:
+          - checkout: self
+            fetchDepth: 1 # We only need the latest commit
+            submodules: true
+          - task: NodeTool@0
+            displayName: Use Node.js $(nodeVersion)
+            retryCountOnTaskFailure: 3
+            inputs:
+              versionSpec: $(nodeVersion)
+          - task: Cache@2
+            displayName: Cache node_modules
+            inputs:
+              key: '"npm_client" | "$(Agent.OS)" | $(Build.SourcesDirectory)/src/Umbraco.Web.UI.New.Client/package-lock.json'
+              restoreKeys: |
+                "npm_client" | "$(Agent.OS)"
+                "npm_client"
+              path: $(npm_config_cache)
+          - script: npm ci --no-fund --no-audit --prefer-offline
+            displayName: Run npm ci (Bellissima)
+            workingDirectory: src/Umbraco.Web.UI.New.Client
+          - script: npm run build:for:npm
+            displayName: Run build:for:npm (Bellissima)
+            workingDirectory: src/Umbraco.Web.UI.New.Client
+          - bash: |
+              echo "##[command]Running npm version"
+              echo "##[debug]Version: $PACKAGE_VERSION"
+              echo "##[command]Running npm pack"
+              echo "##[debug]Output directory: $(Build.ArtifactStagingDirectory)"
+              echo " "
+              npm version $PACKAGE_VERSION --allow-same-version --no-git-tag-version
+              mkdir $(Build.ArtifactStagingDirectory)/npm
+              npm pack --pack-destination $(Build.ArtifactStagingDirectory)/npm
+              mv .npmrc $(Build.ArtifactStagingDirectory)/npm/
+            displayName: Prepare Bellissima npm package
+            env:
+              PACKAGE_VERSION: $(npmPackageVersion)
+            workingDirectory: src/Umbraco.Web.UI.New.Client
+          - task: PublishPipelineArtifact@1
+            displayName: Publish Bellissima npm artifact
+            inputs:
+              targetPath: $(Build.ArtifactStagingDirectory)/npm
+              artifactName: npm
+      - job: Publish
+        displayName: Push to NPM
+        condition: and(succeeded(), or(eq(stageDependencies.Build.A.outputs['build.NBGV_PublicRelease'], 'True'), ${{parameters.npmDeploy}}))
+        dependsOn: Prepare
+        variables:
+          umbracoPublicRelease: $[ stageDependencies.Build.A.outputs['build.NBGV_PublicRelease'] ]
+        steps:
+          - checkout: none
+          - download: current
+            artifact: npm
+          - task: npmAuthenticate@0
+            displayName: Authenticate with npm
+            inputs:
+              workingFile: $(Pipeline.Workspace)/npm/.npmrc
+              customEndpoint: 'NPM - Umbraco Backoffice'
+          - script: |
+              # Setup temp npm project to load in defaults from the local .npmrc
+              npm init -y
+
+              echo "Npm config"
+              npm config ls -l
+
+              echo "Testing npm is authenticated"
+              npm whoami
+            displayName: npm whoami
+            workingDirectory: $(Pipeline.Workspace)/npm
+          - bash: |
+              # Calculate npm tag based on the umbracoPublicRelease job variable
+              if [[ "$PUBLIC_RELEASE" = "true" ]]; then
+                  npmTag=latest
+              else
+                  npmTag=next
+              fi
+
+              echo "##[debug]Publishing Backoffice package as public release '$PUBLIC_RELEASE'"
+              echo "##[debug]Publishing Backoffice package with tag '$npmTag'"
+
+              files=( ./*.tgz )
+              npm publish --tag $npmTag "${files[0]}"
+            env:
+              PUBLIC_RELEASE: $(umbracoPublicRelease)
+            displayName: Publish npm
+            continueOnError: true
+            workingDirectory: $(Pipeline.Workspace)/npm
 
   - stage: Upload_API_Docs
     pool:
