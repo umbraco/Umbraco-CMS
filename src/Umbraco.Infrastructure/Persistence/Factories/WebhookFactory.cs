@@ -21,7 +21,7 @@ internal static class WebhookFactory
         return entity;
     }
 
-    public static WebhookDto BuildDto(Webhook webhook)
+    public static WebhookDto BuildDto(IWebhook webhook)
     {
         var dto = new WebhookDto
         {
@@ -34,21 +34,21 @@ internal static class WebhookFactory
         return dto;
     }
 
-    public static IEnumerable<Webhook2ContentTypeKeysDto> BuildEntityKey2WebhookDto(Webhook webhook) =>
+    public static IEnumerable<Webhook2ContentTypeKeysDto> BuildEntityKey2WebhookDto(IWebhook webhook) =>
         webhook.ContentTypeKeys.Select(x => new Webhook2ContentTypeKeysDto
         {
             ContentTypeKey = x,
             WebhookId = webhook.Id,
         });
 
-    public static IEnumerable<Webhook2EventsDto> BuildEvent2WebhookDto(Webhook webhook) =>
+    public static IEnumerable<Webhook2EventsDto> BuildEvent2WebhookDto(IWebhook webhook) =>
         webhook.Events.Select(x => new Webhook2EventsDto
         {
             Event = x,
             WebhookId = webhook.Id,
         });
 
-    public static IEnumerable<Webhook2HeadersDto> BuildHeaders2WebhookDtos(Webhook webhook) =>
+    public static IEnumerable<Webhook2HeadersDto> BuildHeaders2WebhookDtos(IWebhook webhook) =>
         webhook.Headers.Select(x => new Webhook2HeadersDto
         {
             Key = x.Key,

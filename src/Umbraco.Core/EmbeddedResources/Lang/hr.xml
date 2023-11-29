@@ -1041,13 +1041,13 @@ Da bi upravljali svojom web lokacijom, jednostavno otvorite Umbraco backoffice i
     <key alias="renewSession">Obnovite sada da sačuvate svoj rad</key>
   </area>
   <area alias="login">
-    <key alias="greeting0">Sretna super nedelja</key>
-    <key alias="greeting1">Sretan divan ponedeljak</key>
-    <key alias="greeting2">Sretan specifičan utorak</key>
-    <key alias="greeting3">Sretna divna srijeda</key>
-    <key alias="greeting4">Sretan gromoglasan četvrtak</key>
-    <key alias="greeting5">Sretan zanimljiv petak</key>
-    <key alias="greeting6">Sretna opuštena subota</key>
+    <key alias="greeting0">Dobrodošli</key>
+    <key alias="greeting1">Dobrodošli</key>
+    <key alias="greeting2">Dobrodošli</key>
+    <key alias="greeting3">Dobrodošli</key>
+    <key alias="greeting4">Dobrodošli</key>
+    <key alias="greeting5">Dobrodošli</key>
+    <key alias="greeting6">Dobrodošli</key>
     <key alias="instruction">Prijavite se u nastavku</key>
     <key alias="signInWith">Prijav sa</key>
     <key alias="timeout">Isteklo je vrijeme sesije</key>

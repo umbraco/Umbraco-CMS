@@ -5,6 +5,7 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Document;
 
+[ApiVersion("1.0")]
 public class DeletePublicAccessDocumentController : DocumentControllerBase
 {
     private readonly IPublicAccessService _publicAccessService;

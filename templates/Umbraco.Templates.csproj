@@ -10,6 +10,7 @@
     <IncludeContentInPack>true</IncludeContentInPack>
     <ContentTargetFolders>.</ContentTargetFolders>
     <NoWarn>NU5128</NoWarn>
+    <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
   </PropertyGroup>
 
   <ItemGroup>

@@ -21,9 +21,9 @@ public abstract class WebhookEventContentBase<TNotification, TEntity> : WebhookE
     {
     }
 
-    public override async Task ProcessWebhooks(TNotification notification, IEnumerable<Webhook> webhooks, CancellationToken cancellationToken)
+    public override async Task ProcessWebhooks(TNotification notification, IEnumerable<IWebhook> webhooks, CancellationToken cancellationToken)
     {
-        foreach (Webhook webhook in webhooks)
+        foreach (IWebhook webhook in webhooks)
         {
             if (!webhook.Enabled)
             {

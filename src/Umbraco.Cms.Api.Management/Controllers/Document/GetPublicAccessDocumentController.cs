@@ -10,6 +10,7 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Document;
 
+[ApiVersion("1.0")]
 public class GetPublicAccessDocumentController : DocumentControllerBase
 {
     private readonly IPublicAccessService _publicAccessService;
