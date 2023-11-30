@@ -479,26 +479,28 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             return dtos;
         }
 
-        private IEnumerable<ContentSourceDto> GetMediaNodeDtos(Sql<ISqlContext> sql)
+        private IEnumerable<ContentSourceDto> GetMediaNodeDtos(Sql<ISqlContext> sql, IScope scope)
         {
+            var usePagedSqlQuery = ConfigurationManager.AppSettings[NuCacheSerializerComponent.Nucache_UsePagedSqlQuery_Key];
+
+
             // We need to page here. We don't want to iterate over every single row in one connection cuz this can cause an SQL Timeout.
             // We also want to read with a db reader and not load everything into memory, QueryPaged lets us do that.
             // QueryPaged is very slow on large sites however, so use fetch if UsePagedSqlQuery is disabled.
             IEnumerable<ContentSourceDto> dtos;
-            if (_nucacheSettings.Value.UsePagedSqlQuery)
+            if (usePagedSqlQuery == "false")
             {
-                // Use a more efficient COUNT query
-                Sql<ISqlContext>? sqlCountQuery = SqlMediaSourcesCount()
-                    .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Media));
-
-                Sql<ISqlContext>? sqlCount =
-                    SqlContext.Sql("SELECT COUNT(*) FROM (").Append(sqlCountQuery).Append(") npoco_tbl");
-
-                dtos = Database.QueryPaged<ContentSourceDto>(_nucacheSettings.Value.SqlPageSize, sql, sqlCount);
+                dtos = scope.Database.Fetch<ContentSourceDto>(sql);
             }
             else
             {
-                dtos = Database.Fetch<ContentSourceDto>(sql);
+                // Use a more efficient COUNT query
+                var sqlCountQuery = SqlMediaSourcesCount(scope)
+                    .Append(SqlObjectTypeNotTrashed(scope.SqlContext, Constants.ObjectTypes.Media));
+
+                var sqlCount = scope.SqlContext.Sql("SELECT COUNT(*) FROM (").Append(sqlCountQuery).Append(") npoco_tbl");
+
+                dtos = scope.Database.QueryPaged<ContentSourceDto>(PageSize, sql, sqlCount);
             }
 
             return dtos;
