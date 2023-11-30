@@ -5,27 +5,27 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 
-namespace Umbraco.Cms.Core.Webhooks.Events;
+namespace Umbraco.Cms.Core.Webhooks.Events.Media;
 
-[WebhookEvent("Media was deleted", Constants.WebhookEvents.Types.Media)]
-public class MediaDeleteWebhookEvent : WebhookEventContentBase<MediaDeletedNotification, IMedia>
+[WebhookEvent("Media Moved to Recycle Bin", Constants.WebhookEvents.Types.Media)]
+public class MediaMovedToRecycleBinWebhookEvent : WebhookEventContentBase<MediaMovedToRecycleBinNotification, IMedia>
 {
-    public MediaDeleteWebhookEvent(
+    public MediaMovedToRecycleBinWebhookEvent(
         IWebhookFiringService webhookFiringService,
-        IWebhookService webhookService,
+        IWebhookService webHookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
         IServerRoleAccessor serverRoleAccessor)
         : base(
             webhookFiringService,
-            webhookService,
+            webHookService,
             webhookSettings,
             serverRoleAccessor)
     {
     }
 
-    public override string Alias => Constants.WebhookEvents.Aliases.MediaDelete;
+    public override string Alias => "mediaMovedToRecycleBin";
 
-    protected override IEnumerable<IMedia> GetEntitiesFromNotification(MediaDeletedNotification notification) => notification.DeletedEntities;
+    protected override IEnumerable<IMedia> GetEntitiesFromNotification(MediaMovedToRecycleBinNotification notification) => notification.MoveInfoCollection.Select(x => x.Entity);
 
     protected override object ConvertEntityToRequestPayload(IMedia entity) => new DefaultPayloadModel { Id = entity.Key };
 }

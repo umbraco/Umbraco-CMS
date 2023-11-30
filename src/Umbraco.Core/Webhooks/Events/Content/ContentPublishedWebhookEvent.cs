@@ -8,21 +8,21 @@ using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 
-namespace Umbraco.Cms.Core.Webhooks.Events;
+namespace Umbraco.Cms.Core.Webhooks.Events.Content;
 
-[WebhookEvent("Media was saved", Constants.WebhookEvents.Types.Media)]
-public class MediaSaveWebhookEvent : WebhookEventContentBase<MediaSavedNotification, IMedia>
+[WebhookEvent("Content Published", Constants.WebhookEvents.Types.Content)]
+public class ContentPublishedWebhookEvent : WebhookEventContentBase<ContentPublishedNotification, IContent>
 {
     private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
-    private readonly IApiMediaBuilder _apiMediaBuilder;
+    private readonly IApiContentBuilder _apiContentBuilder;
 
-    public MediaSaveWebhookEvent(
+    public ContentPublishedWebhookEvent(
         IWebhookFiringService webhookFiringService,
         IWebhookService webhookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
         IServerRoleAccessor serverRoleAccessor,
         IPublishedSnapshotAccessor publishedSnapshotAccessor,
-        IApiMediaBuilder apiMediaBuilder)
+        IApiContentBuilder apiContentBuilder)
         : base(
             webhookFiringService,
             webhookService,
@@ -30,21 +30,21 @@ public class MediaSaveWebhookEvent : WebhookEventContentBase<MediaSavedNotificat
             serverRoleAccessor)
     {
         _publishedSnapshotAccessor = publishedSnapshotAccessor;
-        _apiMediaBuilder = apiMediaBuilder;
+        _apiContentBuilder = apiContentBuilder;
     }
 
-    public override string Alias => Constants.WebhookEvents.Aliases.MediaSave;
+    public override string Alias => Constants.WebhookEvents.Aliases.ContentPublish;
 
-    protected override IEnumerable<IMedia> GetEntitiesFromNotification(MediaSavedNotification notification) => notification.SavedEntities;
+    protected override IEnumerable<IContent> GetEntitiesFromNotification(ContentPublishedNotification notification) => notification.PublishedEntities;
 
-    protected override object? ConvertEntityToRequestPayload(IMedia entity)
+    protected override object? ConvertEntityToRequestPayload(IContent entity)
     {
         if (_publishedSnapshotAccessor.TryGetPublishedSnapshot(out IPublishedSnapshot? publishedSnapshot) is false || publishedSnapshot!.Content is null)
         {
             return null;
         }
 
-        IPublishedContent? publishedContent = publishedSnapshot.Media?.GetById(entity.Key);
-        return publishedContent is null ? null : _apiMediaBuilder.Build(publishedContent);
+        IPublishedContent? publishedContent = publishedSnapshot.Content.GetById(entity.Key);
+        return publishedContent is null ? null : _apiContentBuilder.Build(publishedContent);
     }
 }
