@@ -6,7 +6,7 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events.Package;
 
-[WebhookEvent("Imported Package")]
+[WebhookEvent("Package Imported")]
 public class ImportedPackageWebhookEvent : WebhookEventBase<ImportedPackageNotification>
 {
     public ImportedPackageWebhookEvent(
@@ -18,5 +18,5 @@ public class ImportedPackageWebhookEvent : WebhookEventBase<ImportedPackageNotif
     {
     }
 
-    public override string Alias => "importedPackage";
+    public override string Alias => "packageImported";
 }
