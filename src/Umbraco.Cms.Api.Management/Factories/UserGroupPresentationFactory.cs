@@ -51,6 +51,7 @@ public class UserGroupPresentationFactory : IUserGroupPresentationFactory
             HasAccessToAllLanguages = userGroup.HasAccessToAllLanguages,
             Permissions = userGroup.PermissionNames,
             Sections = userGroup.AllowedSections.Select(SectionMapper.GetName),
+            IsSystemGroup = userGroup.IsSystemUserGroup()
         };
     }
     /// <inheritdoc />
