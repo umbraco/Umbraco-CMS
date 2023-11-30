@@ -638,7 +638,6 @@ stages:
               command: 'push'
               packagesToPush: $(Build.ArtifactStagingDirectory)/**/*.nupkg
               nuGetFeedType: 'external'
-              publishFeedCredentials: $(mygetFeed)
             ${{ if eq(parameters.isNightly, true) }}:
               publishFeedCredentials: 'MyGet - Pre-releases'
             ${{ else }}:
@@ -652,7 +651,6 @@ stages:
           - task: npmAuthenticate@0
             inputs:
               workingFile: '$(Pipeline.Workspace)/npm/.npmrc'
-              customEndpoint: $(npmFeed)
             ${{ if eq(parameters.isNightly, true) }}:
               customEndpoint: 'MyGet (npm) - Umbraconightly'
             ${{ else }}:
