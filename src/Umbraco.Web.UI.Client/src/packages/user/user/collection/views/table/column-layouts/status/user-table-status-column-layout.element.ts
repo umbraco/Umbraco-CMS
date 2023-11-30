@@ -1,4 +1,4 @@
-import { getDisplayStateFromUserStatus } from '../../../../../../utils.js';
+import { getDisplayStateFromUserStatus } from '../../../../../utils.js';
 import { html, LitElement, nothing, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 
 @customElement('umb-user-table-status-column-layout')

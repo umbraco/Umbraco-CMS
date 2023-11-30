@@ -1,4 +1,4 @@
-import { getDisplayStateFromUserStatus } from '../../../../utils.js';
+import { getDisplayStateFromUserStatus } from '../../../utils.js';
 import { UmbUserCollectionContext } from '../../user-collection.context.js';
 import { type UmbUserDetailModel } from '../../../types.js';
 import { css, html, nothing, customElement, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
