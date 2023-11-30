@@ -8,12 +8,12 @@ using Umbraco.Cms.Core.Services;
 namespace Umbraco.Cms.Api.Management.Controllers.Server;
 
 [ApiVersion("1.0")]
-public class ServerInformationServerController : ServerControllerBase
+public class InformationServerController : ServerControllerBase
 {
     private readonly ISystemInformationService _systemInformationService;
     private readonly IUmbracoMapper _mapper;
 
-    public ServerInformationServerController(ISystemInformationService systemInformationService, IUmbracoMapper mapper)
+    public InformationServerController(ISystemInformationService systemInformationService, IUmbracoMapper mapper)
     {
         _systemInformationService = systemInformationService;
         _mapper = mapper;
