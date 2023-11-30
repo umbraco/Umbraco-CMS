@@ -1,5 +1,5 @@
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import { css, html, customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, query, state, property } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { ManifestLocalization, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -17,6 +17,10 @@ export class UmbUiCultureInputElement extends FormControlMixin(UmbLitElement) {
 	@query('uui-combobox')
 	private _selectElement!: HTMLInputElement;
 
+	@property({ type: String })
+	get value() {
+		return this._value;
+	}
 	set value(value: string) {
 		const oldValue = this._value;
 		this._value = value.toLowerCase();
