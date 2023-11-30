@@ -1,0 +1,24 @@
+import { InterfaceColor, InterfaceLook } from '@umbraco-cms/backoffice/external/uui';
+import { UserStateModel } from '@umbraco-cms/backoffice/backend-api';
+
+export interface UmbUserDisplayStatus {
+	look: InterfaceLook;
+	color: InterfaceColor;
+	key: string;
+}
+const userStates: UmbUserDisplayStatus[] = [
+	{ key: 'All', color: 'positive', look: 'secondary' },
+	{ key: 'Active', color: 'positive', look: 'primary' },
+	{ key: 'Disabled', color: 'danger', look: 'primary' },
+	{ key: 'LockedOut', color: 'danger', look: 'secondary' },
+	{ key: 'Invited', color: 'warning', look: 'primary' },
+	{ key: 'Inactive', color: 'warning', look: 'primary' },
+];
+
+export const getDisplayStateFromUserStatus = (status?: UserStateModel): UmbUserDisplayStatus =>
+	userStates
+		.filter((state) => state.key === status)!
+		.map((state) => ({
+			...state,
+			key: 'state' + state.key,
+		}))[0];
