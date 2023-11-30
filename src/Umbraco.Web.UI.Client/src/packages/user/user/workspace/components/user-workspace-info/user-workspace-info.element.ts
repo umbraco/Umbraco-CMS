@@ -1,35 +1,19 @@
-import { getDisplayStateFromUserStatus } from '../../../../utils.js';
+import { UmbUserDisplayStatus, getDisplayStateFromUserStatus } from '../../../utils.js';
 import { UMB_USER_WORKSPACE_CONTEXT } from '../../user-workspace.context.js';
 import { UmbUserDetailModel } from '../../../types.js';
-import {
-	html,
-	customElement,
-	state,
-	css,
-	repeat,
-	ifDefined,
-	query,
-	nothing,
-} from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, state, css, repeat, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
 
 type UmbUserWorkspaceInfoItem = { labelKey: string; value: string | number | undefined };
 
 @customElement('umb-user-workspace-info')
 export class UmbUserWorkspaceInfoElement extends UmbLitElement {
 	@state()
-	private _user?: UmbUserDetailModel;
-
-	@state()
-	private _userAvatarUrls: Array<{ url: string; scale: string }> = [];
-
-	@state()
 	private _userInfo: Array<UmbUserWorkspaceInfoItem> = [];
 
-	@query('#AvatarFileField')
-	_avatarFileField?: HTMLInputElement;
+	@state()
+	private _userDisplayState: UmbUserDisplayStatus | null = null;
 
 	#userWorkspaceContext?: typeof UMB_USER_WORKSPACE_CONTEXT.TYPE;
 
@@ -41,62 +25,14 @@ export class UmbUserWorkspaceInfoElement extends UmbLitElement {
 			this.observe(
 				this.#userWorkspaceContext.data,
 				async (user) => {
-					this._user = user;
-					this.#setUserAvatarUrls(user);
+					if (!user) return;
 					this.#setUserInfoItems(user);
+					this._userDisplayState = getDisplayStateFromUserStatus(user.state);
 				},
 				'umbUserObserver',
 			);
 		});
 	}
-
-	async #getAppContext() {
-		// TODO: remove this when we get absolute urls from the server
-		return this.consumeContext(UMB_APP_CONTEXT, (instance) => {}).asPromise();
-	}
-
-	// TODO: remove this when we get absolute urls from the server
-	#setUserAvatarUrls = async (user: UmbUserDetailModel | undefined) => {
-		if (user?.avatarUrls?.length === 0) return;
-
-		const serverUrl = (await this.#getAppContext()).getServerUrl();
-		if (!serverUrl) return;
-
-		this._userAvatarUrls = [
-			{
-				scale: '1x',
-				url: `${serverUrl}${user?.avatarUrls?.[3]}`,
-			},
-			{
-				scale: '2x',
-				url: `${serverUrl}${user?.avatarUrls?.[4]}`,
-			},
-		];
-	};
-
-	#onAvatarUploadSubmit = (event: SubmitEvent) => {
-		event.preventDefault();
-
-		const form = event.target as HTMLFormElement;
-		if (!form) return;
-
-		if (!form.checkValidity()) return;
-
-		const formData = new FormData(form);
-
-		const avatarFile = formData.get('avatarFile') as File;
-
-		this.#userWorkspaceContext?.uploadAvatar(avatarFile);
-	};
-
-	#deleteAvatar = async () => {
-		if (!this.#userWorkspaceContext) return;
-		const { error } = await this.#userWorkspaceContext.deleteAvatar();
-
-		if (!error) {
-			this._userAvatarUrls = [];
-		}
-	};
 
 	#setUserInfoItems = (user: UmbUserDetailModel | undefined) => {
 		if (!user) {
@@ -131,67 +67,27 @@ export class UmbUserWorkspaceInfoElement extends UmbLitElement {
 	};
 
 	render() {
-		if (!this._user) return html`User not found`;
+		if (this._userInfo.length === 0) return nothing;
+		return html`<uui-box id="user-info">${this.#renderState()} ${this.#renderInfoList()} </uui-box>`;
+	}
 
-		const displayState = getDisplayStateFromUserStatus(this._user.state);
-
+	#renderState() {
 		return html`
-			${this.#renderAvatar()}
-
-			<uui-box id="user-info">
-				<div id="user-status-info" class="user-info-item">
-					<b><umb-localize key="general_status">Status</umb-localize>:</b>
-					<uui-tag look="${ifDefined(displayState?.look)}" color="${ifDefined(displayState?.color)}">
-						${this.localize.term('user_' + displayState.key)}
-					</uui-tag>
-				</div>
-
-				${repeat(
-					this._userInfo,
-					(item) => item.labelKey,
-					(item) => this.#renderInfoItem(item.labelKey, item.value),
-				)}
-			</uui-box>
+			<div id="state" class="user-info-item">
+				<uui-tag look="${ifDefined(this._userDisplayState?.look)}" color="${ifDefined(this._userDisplayState?.color)}">
+					${this.localize.term('user_' + this._userDisplayState?.key)}
+				</uui-tag>
+			</div>
 		`;
 	}
 
-	#getAvatarSrcset() {
-		let string = '';
-
-		this._userAvatarUrls?.forEach((url) => {
-			string += `${url.url} ${url.scale},`;
-		});
-		return string;
-	}
-
-	#hasAvatar() {
-		return this._userAvatarUrls.length > 0;
-	}
-
-	#renderAvatar() {
+	#renderInfoList() {
 		return html`
-			<uui-box>
-				<div id="user-avatar-settings" class="user-info-item">
-					<form id="AvatarUploadForm" @submit=${this.#onAvatarUploadSubmit}>
-						<uui-avatar
-							id="Avatar"
-							.name=${this._user?.name || ''}
-							img-src=${ifDefined(this.#hasAvatar() ? this._userAvatarUrls[0].url : undefined)}
-							img-srcset=${ifDefined(this.#hasAvatar() ? this.#getAvatarSrcset() : undefined)}></uui-avatar>
-						(WIP)
-						<input id="AvatarFileField" type="file" name="avatarFile" required />
-						<uui-button type="submit" label="${this.localize.term('user_changePhoto')}"></uui-button>
-						${this.#hasAvatar()
-							? html`
-									<uui-button
-										type="button"
-										label=${this.localize.term('user_removePhoto')}
-										@click=${this.#deleteAvatar}></uui-button>
-							  `
-							: nothing}
-					</form>
-				</div>
-			</uui-box>
+			${repeat(
+				this._userInfo,
+				(item) => item.labelKey,
+				(item) => this.#renderInfoItem(item.labelKey, item.value),
+			)}
 		`;
 	}
 
@@ -211,26 +107,19 @@ export class UmbUserWorkspaceInfoElement extends UmbLitElement {
 				width: fit-content;
 			}
 
-			#Avatar {
-				font-size: 75px;
-				place-self: center;
-			}
-
 			#user-info {
 				margin-bottom: var(--uui-size-space-4);
 			}
 
-			#user-info > .user-info-item {
+			#state {
+				border-bottom: 1px solid var(--uui-color-divider);
+				padding-bottom: var(--uui-size-space-4);
+			}
+
+			.user-info-item {
 				display: flex;
 				flex-direction: column;
 				margin-bottom: var(--uui-size-space-3);
-			}
-
-			#user-avatar-settings form {
-				text-align: center;
-				display: flex;
-				flex-direction: column;
-				gap: var(--uui-size-space-2);
 			}
 		`,
 	];
