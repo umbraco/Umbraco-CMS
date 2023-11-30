@@ -625,11 +625,6 @@ stages:
     jobs:
       - job:
         displayName: Push to pre-release feed
-        variables:
-          ${{ if eq(parameters.isNightly, true) }}:
-            mygetFeed: 'MyGet - Pre-releases'
-          ${{ else }}:
-            mygetFeed: 'MyGet - Umbraco Nightly'
         steps:
           - checkout: none
           - task: DownloadPipelineArtifact@2
@@ -644,13 +639,12 @@ stages:
               packagesToPush: $(Build.ArtifactStagingDirectory)/**/*.nupkg
               nuGetFeedType: 'external'
               publishFeedCredentials: $(mygetFeed)
+            ${{ if eq(parameters.isNightly, true) }}:
+              publishFeedCredentials: 'MyGet - Pre-releases'
+            ${{ else }}:
+              publishFeedCredentials: 'MyGet - Umbraco Nightly'
       - job:
         displayName: Push to pre-release feed (npm)
-        variables:
-          ${{ if eq(parameters.isNightly, true) }}:
-            npmFeed: 'MyGet (npm) - Umbraconightly'
-          ${{ else }}:
-            npmFeed: 'MyGet (npm) - Umbracoprereleases'
         steps:
           - checkout: none
           - download: current
@@ -659,6 +653,10 @@ stages:
             inputs:
               workingFile: '$(Pipeline.Workspace)/npm/.npmrc'
               customEndpoint: $(npmFeed)
+            ${{ if eq(parameters.isNightly, true) }}:
+              customEndpoint: 'MyGet (npm) - Umbraconightly'
+            ${{ else }}:
+              customEndpoint: 'MyGet (npm) - Umbracoprereleases'
           - bash: |
               # Setup temp npm project to load in defaults from the local .npmrc
               npm init -y
