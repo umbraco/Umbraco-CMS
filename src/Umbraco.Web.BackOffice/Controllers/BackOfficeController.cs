@@ -486,11 +486,22 @@ public class BackOfficeController : UmbracoController
             // if the user is not logged in, check if there's any auto login redirects specified
             if (!authenticateResult.Succeeded)
             {
-                var oauthRedirectAuthProvider = _externalLogins.GetAutoLoginProvider();
-                if (!oauthRedirectAuthProvider.IsNullOrWhiteSpace())
-                {
-                    return ExternalLogin(oauthRedirectAuthProvider!);
-                }
+                return defaultResponse();
+            }
+
+            var oauthRedirectAuthProvider = _externalLogins.GetAutoLoginProvider();
+
+            // If there's no auto login provider specified, then we'll render the default view
+            if (oauthRedirectAuthProvider.IsNullOrWhiteSpace())
+            {
+                return defaultResponse();
+            }
+
+            // If the ?logout=true query string is not specified, then we'll redirect to the external login provider
+            // which will then redirect back to the ExternalLoginCallback action
+            if (Request.Query.TryGetValue("logout", out StringValues logout) == false || logout != "true")
+            {
+                return ExternalLogin(oauthRedirectAuthProvider);
             }
 
             return defaultResponse();
