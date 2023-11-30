@@ -20,7 +20,7 @@ parameters:
   - name: npmPublishTag
     displayName: Npm publish tag
     type: string
-    default: 'next'
+    default: 'latest'
   - name: buildApiDocs
     displayName: Build API docs
     type: boolean
@@ -49,6 +49,10 @@ parameters:
     displayName: TestFilter used for release type builds on non windows agents
     type: string
     default: ' '
+  - name: isNightly
+    displayName: 'Indicate if this is a nightly build (meaning it will release to the nightly feeds)'
+    type: boolean
+    default: false
 
 variables:
   nodeVersion: 20
@@ -616,10 +620,16 @@ stages:
       - Unit
       - Integration
       # - E2E # TODO: Enable when stable.
+      - Prepare_Npm
     condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.myGetDeploy}}))
     jobs:
       - job:
         displayName: Push to pre-release feed
+        variables:
+          ${{ if eq(parameters.isNightly, true) }}:
+            mygetFeed: 'MyGet - Pre-releases'
+          ${{ else }}:
+            mygetFeed: 'MyGet - Umbraco Nightly'
         steps:
           - checkout: none
           - task: DownloadPipelineArtifact@2
@@ -633,7 +643,37 @@ stages:
               command: 'push'
               packagesToPush: $(Build.ArtifactStagingDirectory)/**/*.nupkg
               nuGetFeedType: 'external'
-              publishFeedCredentials: 'MyGet - Pre-releases'
+              publishFeedCredentials: $(mygetFeed)
+      - job:
+        displayName: Push to pre-release feed (npm)
+        variables:
+          ${{ if eq(parameters.isNightly, true) }}:
+            npmFeed: 'MyGet (npm) - Umbraconightly'
+          ${{ else }}:
+            npmFeed: 'MyGet (npm) - Umbracoprereleases'
+        steps:
+          - checkout: none
+          - download: current
+            artifact: npm
+          - task: npmAuthenticate@0
+            inputs:
+              workingFile: '$(Pipeline.Workspace)/npm/.npmrc'
+              customEndpoint: $(npmFeed)
+          - bash: |
+              # Setup temp npm project to load in defaults from the local .npmrc
+              npm init -y
+
+              echo "Testing npm is authenticated"
+              npm whoami
+
+              echo "Npm config"
+              npm config ls -l
+
+              files=( ./*.tgz )
+              npm publish "${files[0]}"
+            displayName: MyGet (npm) push
+            workingDirectory: $(Pipeline.Workspace)/npm
+
   - stage: Deploy_NuGet
     displayName: NuGet release
     dependsOn:
@@ -660,15 +700,9 @@ stages:
 
   - stage: Deploy_Npm
     displayName: Npm release
-    condition: and(succeeded(), or(eq(stageDependencies.Build.A.outputs['build.NBGV_PublicRelease'], 'True'), ${{parameters.npmDeploy}}))
-    variables:
-      npm_config_cache: $(Pipeline.Workspace)/.npm_client
-      NODE_OPTIONS: --max_old_space_size=16384
-      umbracoPublicRelease: $[ stageDependencies.Build.A.outputs['build.NBGV_PublicRelease'] ]
+    condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.npmDeploy}}))
     dependsOn:
-      - Build
-      - Prepare_Npm
-      - Deploy_MyGet
+      - Deploy_NuGet
     jobs:
       - job: Publish
         displayName: Push to NPM
@@ -685,41 +719,21 @@ stages:
               # Setup temp npm project to load in defaults from the local .npmrc
               npm init -y
 
-              echo "Npm config"
-              npm config ls -l
-
               echo "Testing npm is authenticated"
               npm whoami
-            displayName: npm whoami
-            workingDirectory: $(Pipeline.Workspace)/npm
-          - bash: |
-              # Calculate npm tag based on the umbracoPublicRelease job variable
-              if [[ "$PUBLIC_RELEASE" = "True" ]]; then
-                  npmTag=latest
-              else
-                  npmTag=$NPM_PUBLISH_TAG
-              fi
-
-              echo "##[debug]Publishing Backoffice package as public release '$PUBLIC_RELEASE'"
-              echo "##[debug]Publishing Backoffice package with tag '$npmTag'"
 
               files=( ./*.tgz )
               npm publish --tag $npmTag "${files[0]}"
-            env:
-              PUBLIC_RELEASE: $(umbracoPublicRelease)
-              NPM_PUBLISH_TAG: ${{parameters.npmPublishTag}}
-            displayName: Publish npm
-            continueOnError: true
+            displayName: Push to npm
             workingDirectory: $(Pipeline.Workspace)/npm
 
   - stage: Upload_API_Docs
     pool:
       vmImage: 'windows-latest' # Apparently AzureFileCopy is windows only :(
     variables:
-      umbracoMajorVersion:  $[ stageDependencies.Build.A.outputs['build.NBGV_VersionMajor'] ]
+      umbracoMajorVersion:  $[ dependencies.Build.outputs['A.build.NBGV_VersionMajor'] ]
     displayName: Upload API Documentation
     dependsOn:
-      - Build
       - Deploy_MyGet # Change to "Deploy_Nuget" after release of v14
     condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.uploadApiDocs}}))
     jobs:
