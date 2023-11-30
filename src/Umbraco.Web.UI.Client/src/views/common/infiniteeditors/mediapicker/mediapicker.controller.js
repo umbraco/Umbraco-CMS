@@ -557,11 +557,8 @@ angular.module("umbraco")
 
                     var allowedTypes = dialogOptions.filter ? dialogOptions.filter.split(",") : null;
 
-                    if ($scope.model.sortBy === "updateDate") {
-                      data = sortByUpdateDate(data, $scope.model.sortType);
-                    } else {
-                      data = sortByUpdateName(data, $scope.model.sortType);
-                    }
+                    sortByProperty(data, $scope.model.orderBy, $scope.model.orderDirection)
+
                     for (var i = 0; i < data.length; i++) {
                         setDefaultData(data[i]);
                         data[i].filtered = allowedTypes && allowedTypes.indexOf(data[i].metaData.ContentTypeAlias) < 0;
@@ -576,26 +573,18 @@ angular.module("umbraco")
                 });
             }
 
-            function sortByUpdateDate(data, sortType) {
-              data.sort(function(a, b){
-                // Turn your strings into dates, and then subtract them
-                // to get a value that is either negative, positive, or zero.
-                return new Date(b).date - new Date(a).date;
+            function sortByProperty(data, property, direction) {
+              data.sort((a, b) => {
+                if (a[property] < b[property]) {
+                  return -1;
+                } else if (a[property] > b[property]) {
+                  return 1;
+                } else {
+                  return 0;
+                }
               });
 
-              if (sortType === "desc") {
-                data = data.reverse();
-              }
-
-              return data;
-            }
-
-            function sortByUpdateName(data, sortType) {
-              data.sort(function(a, b){
-                return a.name.localeCompare(b.name);
-              });
-
-              if (sortType === "desc") {
+              if (direction === "desc") {
                 data = data.reverse();
               }
 

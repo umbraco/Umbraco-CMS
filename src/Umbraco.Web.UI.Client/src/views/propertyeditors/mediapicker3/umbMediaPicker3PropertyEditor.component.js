@@ -246,15 +246,13 @@
         function addMediaAt(createIndex, $event) {
             if (!vm.allowAddMedia) return;
 
-
-
             const mediaPicker = {
                 startNodeId: vm.model.config.startNodeId,
                 startNodeIsVirtual: vm.model.config.startNodeIsVirtual,
                 dataTypeKey: vm.model.dataTypeKey,
                 multiPicker: vm.singleMode !== true,
-                sortBy: getSortBy(),
-                sortType: getSortByType(),
+                orderBy: vm.model.config.orderBy,
+                orderDirection: vm.model.config.orderDirection,
                 clickPasteItem: function(item, mouseEvent) {
 
                     if (Array.isArray(item.data)) {
@@ -307,25 +305,6 @@
             editorService.mediaPicker(mediaPicker);
         }
 
-        function getSortBy() {
-          let sortBy = "name";
-          if (vm.model.config.sortByType) {
-            const sortPart = vm.model.config.sortByType.split('-');
-            sortBy = sortPart[0];
-          }
-
-          return sortBy;
-        }
-
-      function getSortByType() {
-        let sortType = "asc";
-        if (vm.model.config.sortByType) {
-          const sortPart = vm.model.config.sortByType.split('-');
-          sortType = sortPart[1];
-        }
-
-        return sortType;
-      }
         // To be used by infinite editor. (defined here cause we need configuration from property editor)
         function changeMediaFor(mediaEntry, onSuccess) {
             if (!vm.allowAddMedia) return;

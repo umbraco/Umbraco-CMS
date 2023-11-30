@@ -15,24 +15,14 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 public static class SortByTypes
 {
     /// <summary>
-    ///     Name ascending.
+    ///     Name.
     /// </summary>
-    public const string NameAsc = "name-asc";
+    public const string Name = "name";
 
     /// <summary>
-    ///     Name descending.
+    ///     Update date.
     /// </summary>
-    public const string NameDesc = "name-desc";
-
-    /// <summary>
-    ///     Update date ascending.
-    /// </summary>
-    public const string UpdateDateAsc = "updateDate-asc";
-
-    /// <summary>
-    ///     Update date descending.
-    /// </summary>
-    public const string UpdateDateDesc = "updateDate-desc";
+    public const string UpdateDate = "updateDate";
 
     // the auto, static, set of valid values
     private static readonly HashSet<string?> Values
@@ -54,10 +44,8 @@ public static class SortByTypes
     {
         switch (valueType.ToUpperInvariant())
         {
-            case NameAsc:
-            case NameDesc:
-            case UpdateDateAsc:
-            case UpdateDateDesc:
+            case Name:
+            case UpdateDate:
                 return ValueStorageType.Nvarchar;
 
             default:

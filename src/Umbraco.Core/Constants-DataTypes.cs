@@ -235,24 +235,14 @@ public static partial class Constants
             public const string LabelDecimal = "8f1ef1e1-9de4-40d3-a072-6673f631ca64";
 
             /// <summary>
-            ///     Guid for Label as sort by name asc
+            ///     Guid for Label as sort by name
             /// </summary>
-            public const string LabelSortByNameAsc = "7e4473a8-bf83-426e-bbf0-64e176181eca";
+            public const string LabelSortByName = "84cb8b65-dbf5-4cd2-a501-2f5795dd0382";
 
             /// <summary>
-            ///     Guid for Label as sort by name desc
+            ///     Guid for Label as sort by update date
             /// </summary>
-            public const string LabelSortByNameDesc = "84cb8b65-dbf5-4cd2-a501-2f5795dd0382";
-
-            /// <summary>
-            ///     Guid for Label as sort by update date asc
-            /// </summary>
-            public const string LabelSortByUpdateDateAsc = "ef51bfde-872e-4863-aa14-87aa00a12b34";
-
-            /// <summary>
-            ///     Guid for Label as sort by update date desc
-            /// </summary>
-            public const string LabelSortByUpdateDateDesc = "6ba464c2-fc5f-4428-ae0e-91067486ec1c";
+            public const string LabelSortByUpdateDate = "6ba464c2-fc5f-4428-ae0e-91067486ec1c";
 
             /// <summary>
             ///     Guid for Content Picker
@@ -445,24 +435,14 @@ public static partial class Constants
             public static readonly Guid LabelDecimalGuid = new(LabelDecimal);
 
             /// <summary>
-            ///     GGuid for Label as sort by name asc
+            ///     Guid for Label as sort by name
             /// </summary>
-            public static readonly Guid LabelSortByNameAscGuid = new(LabelSortByNameAsc);
+            public static readonly Guid LabelSortByNameGuid = new(LabelSortByName);
 
             /// <summary>
-            ///     Guid for Label as sort by name desc
+            ///     Guid for Label as sort by update date
             /// </summary>
-            public static readonly Guid LabelSortByNameDescGuid = new(LabelSortByNameDesc);
-
-            /// <summary>
-            ///     Guid for Label as sort by update date asc
-            /// </summary>
-            public static readonly Guid LabelSortByUpdateDateAscGuid = new(LabelSortByUpdateDateAsc);
-
-            /// <summary>
-            ///     Guid for Label as sort by update date desc
-            /// </summary>
-            public static readonly Guid LabelSortByUpdateDateDescGuid = new(LabelSortByUpdateDateDesc);
+            public static readonly Guid LabelSortByUpdateDateGuid = new(LabelSortByUpdateDate);
         }
     }
 }
