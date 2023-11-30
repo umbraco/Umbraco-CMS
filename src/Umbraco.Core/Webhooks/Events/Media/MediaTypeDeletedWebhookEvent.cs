@@ -6,7 +6,7 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events.Media;
 
-[WebhookEvent("Media Type Deleted")]
+[WebhookEvent("MediaType Deleted")]
 public class MediaTypeDeletedWebhookEvent : WebhookEventBase<MediaTypeDeletedNotification>
 {
     public MediaTypeDeletedWebhookEvent(

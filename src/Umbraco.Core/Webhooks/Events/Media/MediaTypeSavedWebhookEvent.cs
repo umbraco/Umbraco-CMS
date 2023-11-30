@@ -6,7 +6,7 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events.Media;
 
-[WebhookEvent("Media Type Saved")]
+[WebhookEvent("MediaType Saved")]
 public class MediaTypeSavedWebhookEvent : WebhookEventBase<MediaTypeSavedNotification>
 {
     public MediaTypeSavedWebhookEvent(
