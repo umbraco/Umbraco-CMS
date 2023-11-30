@@ -6,7 +6,7 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events.Relation;
 
-[WebhookEvent("Relation Type Saved")]
+[WebhookEvent("RelationType Saved")]
 public class RelationTypeSavedWebhookEvent : WebhookEventBase<RelationTypeSavedNotification>
 {
     public RelationTypeSavedWebhookEvent(
