@@ -21,7 +21,7 @@ public class EfCoreMigrationExecutor : IEFCoreMigrationExecutor
 
     public async Task ExecuteSingleMigrationAsync(EFCoreMigration migration)
     {
-        IMigrationProvider? provider = _migrationProviders.FirstOrDefault(x => x.ProviderName == _options.Value.ProviderName);
+        IMigrationProvider? provider = _migrationProviders.FirstOrDefault(x => x.ProviderName.CompareProviderNames(_options.Value.ProviderName));
 
         if (provider is not null)
         {
@@ -31,8 +31,7 @@ public class EfCoreMigrationExecutor : IEFCoreMigrationExecutor
 
     public async Task ExecuteAllMigrationsAsync()
     {
-        IMigrationProvider? provider = _migrationProviders.FirstOrDefault(x => x.ProviderName == _options.Value.ProviderName);
-
+        IMigrationProvider? provider = _migrationProviders.FirstOrDefault(x => x.ProviderName.CompareProviderNames(_options.Value.ProviderName));
         if (provider is not null)
         {
             await provider.MigrateAllAsync();

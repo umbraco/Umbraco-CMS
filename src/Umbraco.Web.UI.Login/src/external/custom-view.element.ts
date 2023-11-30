@@ -6,30 +6,32 @@ import {loadCustomView, renderCustomView} from "../utils/load-custom-view.functi
 @customElement('umb-custom-view')
 export default class UmbCustomViewElement extends LitElement {
   @property({ attribute: 'custom-view' })
-  customView?: string;
+  set customView (value: string) {
+    this.#customView = value;
+    this.#loadView();
+  }
 
-  @property({ attribute: 'args' })
-  args?: any;
+  @property({ type: Object, attribute: 'args'})
+  set args (value: any) {
+    this.#args = value;
+    this.#loadView();
+  }
 
   @state()
   protected component: any = null;
 
-  attributeChangedCallback(name: string, _old: string | null, value: string | null) {
-    super.attributeChangedCallback(name, _old, value);
-    if (name === 'custom-view') {
-      this.#loadView();
-    }
-  }
+  #args?: any;
+  #customView?: string;
 
   async #loadView() {
-    if (!this.customView || !this.customView.endsWith('.js') && !this.customView.endsWith('.html')) {
+    if (!this.#customView || !this.#customView.endsWith('.js') && !this.#customView.endsWith('.html')) {
       return;
     }
 
-    const customView = await loadCustomView(this.customView);
+    const customView = await loadCustomView(this.#customView);
 
-    if (this.args) {
-      Object.entries(this.args).forEach(([key, value]) => {
+    if (this.#args) {
+      Object.entries(this.#args).forEach(([key, value]) => {
         (customView as any)[key] = value;
       });
     }

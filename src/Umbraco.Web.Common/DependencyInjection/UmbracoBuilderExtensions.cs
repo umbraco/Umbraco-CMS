@@ -215,6 +215,8 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddRecurringBackgroundJob<TempFileCleanupJob>();
         builder.Services.AddRecurringBackgroundJob<InstructionProcessJob>();
         builder.Services.AddRecurringBackgroundJob<TouchServerJob>();
+        builder.Services.AddRecurringBackgroundJob<WebhookFiring>();
+        builder.Services.AddRecurringBackgroundJob<WebhookLoggingCleanup>();
         builder.Services.AddRecurringBackgroundJob(provider =>
             new ReportSiteJob(
                 provider.GetRequiredService<ILogger<ReportSiteJob>>(),
@@ -224,7 +226,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddHostedService<QueuedHostedService>();
         builder.Services.AddSingleton(RecurringBackgroundJobHostedService.CreateHostedServiceFactory);
         builder.Services.AddHostedService<RecurringBackgroundJobHostedServiceRunner>();
-        
+
 
         return builder;
     }
