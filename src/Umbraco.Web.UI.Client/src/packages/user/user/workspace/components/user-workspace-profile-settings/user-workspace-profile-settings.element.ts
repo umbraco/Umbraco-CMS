@@ -56,6 +56,7 @@ export class UmbUserWorkspaceProfileSettingsElement extends UmbLitElement {
 				description=${this.localize.term('user_languageHelp')}>
 				<umb-ui-culture-input
 					slot="editor"
+					value=${ifDefined(this._user?.languageIsoCode)}
 					@change="${this.#onLanguageChange}"
 					name="language"
 					label="${this.localize.term('user_language')}"></umb-ui-culture-input>

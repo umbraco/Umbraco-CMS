@@ -1,76 +1,50 @@
-import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { css, html, customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin, UUISelectElement } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { ManifestLocalization, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
 interface UmbCultureInputOption {
 	name: string;
 	value: string;
-	selected: boolean;
 }
 
 @customElement('umb-ui-culture-input')
 export class UmbUiCultureInputElement extends FormControlMixin(UmbLitElement) {
 	@state()
-	private _cultures: Array<UmbCultureInputOption> = [];
+	private _options: Array<UmbCultureInputOption> = [];
 
-	@query('uui-select')
+	@query('uui-combobox')
 	private _selectElement!: HTMLInputElement;
 
-	#currentUserContext?: typeof UMB_CURRENT_USER_CONTEXT.TYPE;
+	set value(value: string) {
+		const oldValue = this._value;
+		this._value = value.toLowerCase();
+		this.requestUpdate('value', oldValue);
+	}
 
 	constructor() {
 		super();
-
-		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (instance) => {
-			this.#currentUserContext = instance;
-			this.#observeCurrentUser();
-		});
+		this.#observeTranslations();
 	}
 
-	#observeCurrentUser() {
-		if (!this.#currentUserContext) return;
-
+	#observeTranslations() {
 		this.observe(
-			this.#currentUserContext.currentUser,
-			async (currentUser) => {
-				if (!currentUser) {
-					return;
-				}
-
-				// Find all translations and make a unique list of iso codes
-				const translations = await firstValueFrom(umbExtensionsRegistry.extensionsOfType('localization'));
-
-				this._cultures = translations
-					.filter((isoCode) => isoCode !== undefined)
-					.map((translation) => ({
-						value: translation.meta.culture.toLowerCase(),
-						name: translation.name,
-						selected: false,
-					}));
-
-				const currentUserLanguageCode = currentUser.languageIsoCode?.toLowerCase();
-
-				// Set the current user's language as selected
-				const currentUserLanguage = this._cultures.find((language) => language.value === currentUserLanguageCode);
-
-				if (currentUserLanguage) {
-					currentUserLanguage.selected = true;
-				} else {
-					// If users language code did not fit any of the options. We will create an option that fits, named unknown.
-					// In this way the user can keep their choice though a given language was not present at this time.
-					this._cultures.push({
-						value: currentUserLanguageCode ?? 'en-us',
-						name: currentUserLanguageCode ? `${currentUserLanguageCode} (unknown)` : 'Unknown',
-						selected: true,
-					});
-				}
+			umbExtensionsRegistry.extensionsOfType('localization'),
+			(localizationManifests) => {
+				this.#mapToOptions(localizationManifests);
 			},
-			'umbUserObserver',
+			'umbObserveLocalizationManifests',
 		);
+	}
+
+	#mapToOptions(manifests: Array<ManifestLocalization>) {
+		this._options = manifests
+			.filter((isoCode) => isoCode !== undefined)
+			.map((manifest) => ({
+				name: manifest.name,
+				value: manifest.meta.culture.toLowerCase(),
+			}));
 	}
 
 	protected getFormElement() {
@@ -88,7 +62,13 @@ export class UmbUiCultureInputElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	render() {
-		return html` <uui-select .options=${this._cultures} @change="${this.#onChange}"> </uui-select>`;
+		return html` <uui-combobox value="${this._value}">
+			<uui-combobox-list>
+				${this._options.map(
+					(option) => html`<uui-combobox-list-option value="${option.value}">${option.name}</uui-combobox-list-option>`,
+				)}
+			</uui-combobox-list>
+		</uui-combobox>`;
 	}
 
 	static styles = [
