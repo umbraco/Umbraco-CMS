@@ -28,14 +28,11 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine;
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
 public class BackOfficeExamineSearcherTests : ExamineBaseTest
 {
-    // TODO: Find a way to remove all the timeouts
-    private string _examinePath = "../../../umbraco/Data/TEMP/ExamineIndexes/";
-
     [SetUp]
     public void Setup()
     {
-        TestHelper.DeleteDirectory(_examinePath + "InternalIndex");
-        TestHelper.DeleteDirectory(_examinePath + "ExternalIndex");
+        TestHelper.DeleteDirectory(GetIndexPath(Constants.UmbracoIndexes.InternalIndexName));
+        TestHelper.DeleteDirectory(GetIndexPath(Constants.UmbracoIndexes.ExternalIndexName));
         var httpContext = new DefaultHttpContext();
         httpContext.RequestServices = Services;
         Mock.Get(TestHelper.GetHttpContextAccessor()).Setup(x => x.HttpContext).Returns(httpContext);
@@ -44,10 +41,10 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
     [TearDown]
     public void TearDown()
     {
-        // Sometimes we do not dispose all services in time and the test fails because the log file is locked. Resulting in all other tests failing aswell
+        // When disposing examine, it does a final write, which ends up locking the file if the indexing is not done yet. So we have this wait to circumvent that.
+        Thread.Sleep(1500);
+        // Sometimes we do not dispose all services in time and the test fails because the log file is locked. Resulting in all other tests failing as well
         Services.DisposeIfDisposable();
-        TestHelper.DeleteDirectory(_examinePath + "InternalIndex");
-        TestHelper.DeleteDirectory(_examinePath + "ExternalIndex");
     }
 
     private IBackOfficeExamineSearcher BackOfficeExamineSearcher => GetRequiredService<IBackOfficeExamineSearcher>();
@@ -63,13 +60,9 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
 
     private IBackOfficeSignInManager BackOfficeSignInManager => GetRequiredService<IBackOfficeSignInManager>();
 
-    protected override void ConfigureTestServices(IServiceCollection services)
-    {
-        services.AddUnique<IBackOfficeExamineSearcher, BackOfficeExamineSearcher>();
-    }
-
     protected override void CustomTestSetup(IUmbracoBuilder builder)
     {
+        builder.Services.AddUnique<IBackOfficeExamineSearcher, BackOfficeExamineSearcher>();
         builder.Services.AddUnique<IServerMessenger, ContentEventsTests.LocalServerMessenger>();
         builder
             .AddNotificationHandler<ContentTreeChangeNotification,
@@ -80,12 +73,9 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
         builder.Services.AddHostedService<QueuedHostedService>();
     }
 
-    private IEnumerable<ISearchResult> BackOfficeExamineSearch(string query, int pageSize = 20, int pageIndex = 0)
-    {
-        long totalFound = long.MinValue;
-        return BackOfficeExamineSearcher.Search(query, UmbracoEntityTypes.Document,
-            pageSize, pageIndex, out totalFound, ignoreUserStartNodes: true);
-    }
+    private IEnumerable<ISearchResult> BackOfficeExamineSearch(string query, int pageSize = 20, int pageIndex = 0) =>
+        BackOfficeExamineSearcher.Search(query, UmbracoEntityTypes.Document,
+            pageSize, pageIndex, out _, ignoreUserStartNodes: true);
 
     private async Task SetupUserIdentity(string userId)
     {
@@ -114,8 +104,8 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
 
     private async Task<PublishResult> CreateDefaultPublishedContentWithTwoLanguages(string englishNodeName, string danishNodeName)
     {
-        string usIso = "en-US";
-        string dkIso = "da";
+        const string usIso = "en-US";
+        const string dkIso = "da";
 
         var langDa = new LanguageBuilder()
             .WithCultureInfo(dkIso)
@@ -145,7 +135,7 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
         await SetupUserIdentity(Constants.Security.SuperUserIdAsString);
 
         // Arrange
-        var contentName = "TestContent";
+        const string contentName = "TestContent";
         await CreateDefaultPublishedContent(contentName);
 
         string query = string.Empty;
@@ -163,7 +153,7 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
         // Arrange
         await SetupUserIdentity(Constants.Security.SuperUserIdAsString);
 
-        string contentName = "TestContent";
+        const string contentName = "TestContent";
         await CreateDefaultPublishedContent(contentName);
 
         string query = contentName;
@@ -172,8 +162,9 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
         IEnumerable<ISearchResult> actual = BackOfficeExamineSearch(query);
 
         // Assert
-        Assert.AreEqual(1, actual.Count());
-        Assert.AreEqual(actual.First().Values["nodeName"], contentName);
+        IEnumerable<ISearchResult> searchResults = actual.ToArray();
+        Assert.AreEqual(1, searchResults.Count());
+        Assert.AreEqual(searchResults.First().Values["nodeName"], contentName);
     }
 
     [Test]
@@ -182,7 +173,7 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
         // Arrange
         await SetupUserIdentity(Constants.Security.SuperUserIdAsString);
 
-        string contentName = "TestContent";
+        const string contentName = "TestContent";
         await CreateDefaultPublishedContent(contentName);
 
         string query = "ContentTest";
@@ -199,7 +190,7 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
         // Arrange
         await SetupUserIdentity(Constants.Security.SuperUserIdAsString);
 
-        string contentName = "RandomContentName";
+        const string contentName = "RandomContentName";
         PublishResult createdContent = await CreateDefaultPublishedContent(contentName);
 
         string contentId = createdContent.Content.Id.ToString();
@@ -210,9 +201,10 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
         IEnumerable<ISearchResult> actual = BackOfficeExamineSearch(query);
 
         // Assert
-        Assert.AreEqual(1, actual.Count());
-        Assert.AreEqual(actual.First().Values["nodeName"], contentName);
-        Assert.AreEqual(actual.First().Id, contentId);
+        IEnumerable<ISearchResult> searchResults = actual.ToArray();
+        Assert.AreEqual(1, searchResults.Count());
+        Assert.AreEqual(searchResults.First().Values["nodeName"], contentName);
+        Assert.AreEqual(searchResults.First().Id, contentId);
     }
 
     [Test]
@@ -221,8 +213,8 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
         // Arrange
         await SetupUserIdentity(Constants.Security.SuperUserIdAsString);
 
-        string contentName = "TestName Original";
-        string secondContentName = "TestName Copy";
+        const string contentName = "TestName Original";
+        const string secondContentName = "TestName Copy";
 
         var contentType = new ContentTypeBuilder()
             .WithId(0)
@@ -242,17 +234,19 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
             .WithContentType(contentType)
             .Build();
         await ExecuteAndWaitForIndexing(() => ContentService.SaveAndPublish(secondContent), Constants.UmbracoIndexes.InternalIndexName);
+
         string query = contentName;
 
         // Act
         IEnumerable<ISearchResult> actual = BackOfficeExamineSearch(query);
 
         // Assert
-        Assert.AreEqual(2, actual.Count());
+        IEnumerable<ISearchResult> searchResults = actual.ToArray();
+        Assert.AreEqual(2, searchResults.Count());
         // Checks if the first content in the search is the original content
-        Assert.AreEqual(actual.First().Id, firstContent.Id.ToString());
+        Assert.AreEqual(searchResults.First().Id, firstContent.Id.ToString());
         // Checks if the score for the original name is higher than the score for the copy
-        Assert.Greater(actual.First().Score, actual.Last().Score);
+        Assert.Greater(searchResults.First().Score, searchResults.Last().Score);
     }
 
     [Test]
@@ -261,8 +255,8 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
         // Arrange
         await SetupUserIdentity(Constants.Security.SuperUserIdAsString);
 
-        string contentName = "ParentTestContent";
-        string childContentName = "ChildTestContent";
+        const string contentName = "ParentTestContent";
+        const string childContentName = "ChildTestContent";
 
         var contentType = new ContentTypeBuilder()
             .WithName("Document")
@@ -288,15 +282,15 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
 
         // Act
         IEnumerable<ISearchResult> parentContentActual = BackOfficeExamineSearch(parentQuery);
-
         IEnumerable<ISearchResult> childContentActual = BackOfficeExamineSearch(childQuery);
 
         // Assert
-        Assert.AreEqual(1, parentContentActual.Count());
-        Assert.AreEqual(1, childContentActual.Count());
-
-        Assert.AreEqual(parentContentActual.First().Values["nodeName"], contentName);
-        Assert.AreEqual(childContentActual.First().Values["nodeName"], childContentName);
+        IEnumerable<ISearchResult> contentActual = parentContentActual.ToArray();
+        IEnumerable<ISearchResult> searchResults = childContentActual.ToArray();
+        Assert.AreEqual(1, contentActual.Count());
+        Assert.AreEqual(1, searchResults.Count());
+        Assert.AreEqual(contentActual.First().Values["nodeName"], contentName);
+        Assert.AreEqual(searchResults.First().Values["nodeName"], childContentName);
     }
 
     [Test]
@@ -305,9 +299,9 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
         // Arrange
         await SetupUserIdentity(Constants.Security.SuperUserIdAsString);
 
-        string contentName = "ParentTestContent";
-        string childContentName = "ChildTestContent";
-        string childChildContentName = "ChildChildTestContent";
+        const string contentName = "ParentTestContent";
+        const string childContentName = "ChildTestContent";
+        const string childChildContentName = "ChildChildTestContent";
 
         var contentType = new ContentTypeBuilder()
             .WithName("Document")
@@ -335,33 +329,32 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
         await ExecuteAndWaitForIndexing(() => ContentService.SaveAndPublish(childChildContent), Constants.UmbracoIndexes.InternalIndexName);
 
         string parentQuery = content.Id.ToString();
-
         string childQuery = childContent.Id.ToString();
-
         string childChildQuery = childChildContent.Id.ToString();
 
         // Act
         IEnumerable<ISearchResult> parentContentActual = BackOfficeExamineSearch(parentQuery);
-
         IEnumerable<ISearchResult> childContentActual = BackOfficeExamineSearch(childQuery);
-
         IEnumerable<ISearchResult> childChildContentActual = BackOfficeExamineSearch(childChildQuery);
 
-        // Assert
-        Assert.AreEqual(1, parentContentActual.Count());
-        Assert.AreEqual(1, childContentActual.Count());
-        Assert.AreEqual(1, childChildContentActual.Count());
+        IEnumerable<ISearchResult> parentSearchResults = parentContentActual.ToArray();
+        IEnumerable<ISearchResult> childSearchResults = childContentActual.ToArray();
+        IEnumerable<ISearchResult> childChildSearchResults = childChildContentActual.ToArray();
 
-        Assert.AreEqual(parentContentActual.First().Values["nodeName"], contentName);
-        Assert.AreEqual(childContentActual.First().Values["nodeName"], childContentName);
-        Assert.AreEqual(childChildContentActual.First().Values["nodeName"], childChildContentName);
+        // Assert
+        Assert.AreEqual(1, parentSearchResults.Count());
+        Assert.AreEqual(1, childSearchResults.Count());
+        Assert.AreEqual(1, childChildSearchResults.Count());
+        Assert.AreEqual(parentSearchResults.First().Values["nodeName"], contentName);
+        Assert.AreEqual(childSearchResults.First().Values["nodeName"], childContentName);
+        Assert.AreEqual(childChildSearchResults.First().Values["nodeName"], childChildContentName);
     }
 
     [Test]
     public async Task Search_Published_Content_With_Query_With_Content_Name_No_User_Logged_In()
     {
         // Arrange
-        string contentName = "TestContent";
+        const string contentName = "TestContent";
 
         PublishResult createdContent = await CreateDefaultPublishedContent(contentName);
 
@@ -381,17 +374,16 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
         // Arrange
         await SetupUserIdentity(Constants.Security.SuperUserIdAsString);
 
-        string usIso = "en-US";
-        string dkIso = "da";
-        string englishNodeName = "EnglishNode";
-        string danishNodeName = "DanishNode";
+        const string usIso = "en-US";
+        const string dkIso = "da";
+        const string englishNodeName = "EnglishNode";
+        const string danishNodeName = "DanishNode";
 
         var langDa = new LanguageBuilder()
             .WithCultureInfo(dkIso)
             .Build();
         LocalizationService.Save(langDa);
 
-        PublishResult createdContent;
         var contentType = new ContentTypeBuilder()
             .WithId(0)
             .WithContentVariation(ContentVariation.Culture)
@@ -404,18 +396,20 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
             .WithCultureName(dkIso, danishNodeName)
             .WithContentType(contentType)
             .Build();
-        createdContent = await ExecuteAndWaitForIndexing(() => ContentService.SaveAndPublish(content), Constants.UmbracoIndexes.InternalIndexName);
+        PublishResult createdContent = await ExecuteAndWaitForIndexing(() => ContentService.SaveAndPublish(content), Constants.UmbracoIndexes.InternalIndexName);
+
         string query = createdContent.Content.Id.ToString();
 
         // Act
         IEnumerable<ISearchResult> actual = BackOfficeExamineSearch(query);
 
         // Assert
-        Assert.AreEqual(1, actual.Count());
-        var nodeNameEn = actual.First().Values["nodeName_en-us"];
-        var nodeNameDa = actual.First().Values["nodeName_da"];
-        Assert.AreEqual(nodeNameEn, englishNodeName);
-        Assert.AreEqual(nodeNameDa, danishNodeName);
+        IEnumerable<ISearchResult> searchResults = actual.ToArray();
+        Assert.AreEqual(1, searchResults.Count());
+        var nodeNameEn = searchResults.First().Values["nodeName_en-us"];
+        var nodeNameDa = searchResults.First().Values["nodeName_da"];
+        Assert.AreEqual(englishNodeName, nodeNameEn);
+        Assert.AreEqual(danishNodeName, nodeNameDa);
     }
 
     [Test]
@@ -424,10 +418,8 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
         // Arrange
         await SetupUserIdentity(Constants.Security.SuperUserIdAsString);
 
-        string usIso = "en-US";
-        string dkIso = "da";
-        string englishNodeName = "EnglishNode";
-        string danishNodeName = "DanishNode";
+        const string englishNodeName = "EnglishNode";
+        const string danishNodeName = "DanishNode";
 
         await CreateDefaultPublishedContentWithTwoLanguages(englishNodeName, danishNodeName);
 
@@ -437,11 +429,12 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
         IEnumerable<ISearchResult> actual = BackOfficeExamineSearch(query);
 
         // Assert
-        Assert.AreEqual(1, actual.Count());
-        var nodeNameEn = actual.First().Values["nodeName_en-us"];
-        var nodeNameDa = actual.First().Values["nodeName_da"];
-        Assert.AreEqual(nodeNameEn, englishNodeName);
-        Assert.AreEqual(nodeNameDa, danishNodeName);
+        IEnumerable<ISearchResult> searchResults = actual.ToArray();
+        Assert.AreEqual(1, searchResults.Count());
+        var nodeNameEn = searchResults.First().Values["nodeName_en-us"];
+        var nodeNameDa = searchResults.First().Values["nodeName_da"];
+        Assert.AreEqual(englishNodeName, nodeNameEn);
+        Assert.AreEqual(danishNodeName, nodeNameDa);
     }
 
     [Test]
@@ -450,10 +443,8 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
         // Arrange
         await SetupUserIdentity(Constants.Security.SuperUserIdAsString);
 
-        string usIso = "en-US";
-        string dkIso = "da";
-        string englishNodeName = "EnglishNode";
-        string danishNodeName = "DanishNode";
+        const string englishNodeName = "EnglishNode";
+        const string danishNodeName = "DanishNode";
 
         await CreateDefaultPublishedContentWithTwoLanguages(englishNodeName, danishNodeName);
 
@@ -463,11 +454,12 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
         IEnumerable<ISearchResult> actual = BackOfficeExamineSearch(query);
 
         // Assert
-        Assert.AreEqual(1, actual.Count());
-        var nodeNameDa = actual.First().Values["nodeName_da"];
-        var nodeNameEn = actual.First().Values["nodeName_en-us"];
-        Assert.AreEqual(nodeNameEn, englishNodeName);
-        Assert.AreEqual(nodeNameDa, danishNodeName);
+        IEnumerable<ISearchResult> searchResults = actual.ToArray();
+        Assert.AreEqual(1, searchResults.Count());
+        var nodeNameDa = searchResults.First().Values["nodeName_da"];
+        var nodeNameEn = searchResults.First().Values["nodeName_en-us"];
+        Assert.AreEqual(englishNodeName, nodeNameEn);
+        Assert.AreEqual(danishNodeName, nodeNameDa);
     }
 
     [Test]
@@ -476,10 +468,8 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
         // Arrange
         await SetupUserIdentity(Constants.Security.SuperUserIdAsString);
 
-        string usIso = "en-US";
-        string dkIso = "da";
-        string englishNodeName = "EnglishNode";
-        string danishNodeName = "DanishNode";
+        const string englishNodeName = "EnglishNode";
+        const string danishNodeName = "DanishNode";
 
         var contentNode = await CreateDefaultPublishedContentWithTwoLanguages(englishNodeName, danishNodeName);
 
@@ -489,11 +479,12 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
         IEnumerable<ISearchResult> actual = BackOfficeExamineSearch(query);
 
         // Assert
-        Assert.AreEqual(1, actual.Count());
-        var nodeNameDa = actual.First().Values["nodeName_da"];
-        var nodeNameEn = actual.First().Values["nodeName_en-us"];
-        Assert.AreEqual(nodeNameEn, englishNodeName);
-        Assert.AreEqual(nodeNameDa, danishNodeName);
+        IEnumerable<ISearchResult> searchResults = actual.ToArray();
+        Assert.AreEqual(1, searchResults.Count());
+        var nodeNameDa = searchResults.First().Values["nodeName_da"];
+        var nodeNameEn = searchResults.First().Values["nodeName_en-us"];
+        Assert.AreEqual(englishNodeName, nodeNameEn);
+        Assert.AreEqual(danishNodeName, nodeNameDa);
     }
 
     // Check All Indexed Values
@@ -503,7 +494,8 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
         // Arrange
         await SetupUserIdentity(Constants.Security.SuperUserIdAsString);
 
-        string contentName = "TestContent";
+        const string contentName = "TestContent";
+
         var contentType = new ContentTypeBuilder()
             .WithId(0)
             .Build();
@@ -522,7 +514,8 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
         IEnumerable<ISearchResult> actual = BackOfficeExamineSearch(query);
 
         // Assert
-        Assert.AreEqual(1, actual.Count());
+        IEnumerable<ISearchResult> searchResults = actual.ToArray();
+        Assert.AreEqual(1, searchResults.Count());
 
         string contentNodePublish = string.Empty;
         if (contentNode.Published)
@@ -539,16 +532,16 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(actual.First().Values["__NodeId"], contentNode.Id.ToString());
-            Assert.AreEqual(actual.First().Values["__IndexType"], "content");
-            Assert.AreEqual(actual.First().Values["__NodeTypeAlias"], contentNode.ContentType.Alias);
-            Assert.AreEqual(actual.First().Values["__Published"], contentNodePublish);
-            Assert.AreEqual(actual.First().Values["id"], contentNode.Id.ToString());
-            Assert.AreEqual(actual.First().Values["__Key"], contentNode.Key.ToString());
-            Assert.AreEqual(actual.First().Values["parentID"], contentNode.ParentId.ToString());
-            Assert.AreEqual(actual.First().Values["nodeName"], contentNode.Name);
-            Assert.AreEqual(actual.First().Values["__VariesByCulture"], contentTypeCultureVariations);
-            Assert.AreEqual(actual.First().Values["__Icon"], contentNode.ContentType.Icon);
+            Assert.AreEqual(searchResults.First().Values["__NodeId"], contentNode.Id.ToString());
+            Assert.AreEqual(searchResults.First().Values["__IndexType"], "content");
+            Assert.AreEqual(searchResults.First().Values["__NodeTypeAlias"], contentNode.ContentType.Alias);
+            Assert.AreEqual(searchResults.First().Values["__Published"], contentNodePublish);
+            Assert.AreEqual(searchResults.First().Values["id"], contentNode.Id.ToString());
+            Assert.AreEqual(searchResults.First().Values["__Key"], contentNode.Key.ToString());
+            Assert.AreEqual(searchResults.First().Values["parentID"], contentNode.ParentId.ToString());
+            Assert.AreEqual(searchResults.First().Values["nodeName"], contentNode.Name);
+            Assert.AreEqual(searchResults.First().Values["__VariesByCulture"], contentTypeCultureVariations);
+            Assert.AreEqual(searchResults.First().Values["__Icon"], contentNode.ContentType.Icon);
         });
     }
 
@@ -558,8 +551,8 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
         // Arrange
         await SetupUserIdentity(Constants.Security.SuperUserIdAsString);
 
-        string contentName = "TestContent";
-        string propertyEditorName = "TestBox";
+        const string contentName = "TestContent";
+        const string propertyEditorName = "TestBox";
 
         var contentType = new ContentTypeBuilder()
             .WithId(0)
@@ -585,7 +578,8 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
         IEnumerable<ISearchResult> actual = BackOfficeExamineSearch(query);
 
         // Assert
-        Assert.AreEqual(1, actual.Count());
+        IEnumerable<ISearchResult> searchResults = actual.ToArray();
+        Assert.AreEqual(1, searchResults.Count());
 
         string contentNodePublish = string.Empty;
         string contentTypeCultureVariations = string.Empty;
@@ -602,16 +596,16 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
 
         Assert.Multiple(() =>
         {
-            Assert.AreEqual(actual.First().Values["__NodeId"], contentNode.Id.ToString());
-            Assert.AreEqual(actual.First().Values["__IndexType"], "content");
-            Assert.AreEqual(actual.First().Values["__NodeTypeAlias"], contentNode.ContentType.Alias);
-            Assert.AreEqual(actual.First().Values["__Published"], contentNodePublish);
-            Assert.AreEqual(actual.First().Values["id"], contentNode.Id.ToString());
-            Assert.AreEqual(actual.First().Values["__Key"], contentNode.Key.ToString());
-            Assert.AreEqual(actual.First().Values["parentID"], contentNode.ParentId.ToString());
-            Assert.AreEqual(actual.First().Values["nodeName"], contentNode.Name);
-            Assert.AreEqual(actual.First().Values["__VariesByCulture"], contentTypeCultureVariations);
-            Assert.AreEqual(actual.First().Values["__Icon"], contentNode.ContentType.Icon);
+            Assert.AreEqual(searchResults.First().Values["__NodeId"], contentNode.Id.ToString());
+            Assert.AreEqual(searchResults.First().Values["__IndexType"], "content");
+            Assert.AreEqual(searchResults.First().Values["__NodeTypeAlias"], contentNode.ContentType.Alias);
+            Assert.AreEqual(searchResults.First().Values["__Published"], contentNodePublish);
+            Assert.AreEqual(searchResults.First().Values["id"], contentNode.Id.ToString());
+            Assert.AreEqual(searchResults.First().Values["__Key"], contentNode.Key.ToString());
+            Assert.AreEqual(searchResults.First().Values["parentID"], contentNode.ParentId.ToString());
+            Assert.AreEqual(searchResults.First().Values["nodeName"], contentNode.Name);
+            Assert.AreEqual(searchResults.First().Values["__VariesByCulture"], contentTypeCultureVariations);
+            Assert.AreEqual(searchResults.First().Values["__Icon"], contentNode.ContentType.Icon);
         });
     }
 }
