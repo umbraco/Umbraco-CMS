@@ -3,6 +3,8 @@ import { html, customElement, state, ifDefined, css } from '@umbraco-cms/backoff
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UserResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import { UmbUiCultureInputElement } from '@umbraco-cms/backoffice/localization';
 
 @customElement('umb-user-workspace-profile-settings')
 export class UmbUserWorkspaceProfileSettingsElement extends UmbLitElement {
