@@ -1,6 +1,6 @@
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { css, html, customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
-import { FormControlMixin, UUISelectElement } from '@umbraco-cms/backoffice/external/uui';
+import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { ManifestLocalization, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -51,9 +51,9 @@ export class UmbUiCultureInputElement extends FormControlMixin(UmbLitElement) {
 		return this._selectElement;
 	}
 
-	#onChange(event: Event) {
+	#onChange(event: UUIComboBoxChangeEvent) {
 		event.stopPropagation();
-		const target = event.composedPath()[0] as UUISelectElement;
+		const target = event.target;
 
 		if (typeof target?.value === 'string') {
 			this.value = target.value;
@@ -62,7 +62,7 @@ export class UmbUiCultureInputElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	render() {
-		return html` <uui-combobox value="${this._value}">
+		return html` <uui-combobox value="${this._value}" @change=${this.#onChange}>
 			<uui-combobox-list>
 				${this._options.map(
 					(option) => html`<uui-combobox-list-option value="${option.value}">${option.name}</uui-combobox-list-option>`,
