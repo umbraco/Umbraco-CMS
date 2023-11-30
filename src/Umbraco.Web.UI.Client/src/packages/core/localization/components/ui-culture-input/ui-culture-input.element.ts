@@ -1,6 +1,6 @@
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { css, html, customElement, query, state, property } from '@umbraco-cms/backoffice/external/lit';
-import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { FormControlMixin, UUIComboboxElement, UUIComboboxEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { ManifestLocalization, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -21,10 +21,12 @@ export class UmbUiCultureInputElement extends FormControlMixin(UmbLitElement) {
 	get value() {
 		return this._value;
 	}
-	set value(value: string) {
-		const oldValue = this._value;
-		this._value = value.toLowerCase();
-		this.requestUpdate('value', oldValue);
+	set value(value: FormDataEntryValue | FormData) {
+		if (typeof value === 'string') {
+			const oldValue = this._value;
+			this._value = value.toLowerCase();
+			this.requestUpdate('value', oldValue);
+		}
 	}
 
 	constructor() {
@@ -55,9 +57,9 @@ export class UmbUiCultureInputElement extends FormControlMixin(UmbLitElement) {
 		return this._selectElement;
 	}
 
-	#onChange(event: UUIComboBoxChangeEvent) {
+	#onChange(event: UUIComboboxEvent) {
 		event.stopPropagation();
-		const target = event.target;
+		const target = event.target as UUIComboboxElement;
 
 		if (typeof target?.value === 'string') {
 			this.value = target.value;
