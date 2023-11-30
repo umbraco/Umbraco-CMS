@@ -52,6 +52,7 @@ public class ManagementApiComposer : IComposer
             .AddScripts()
             .AddPartialViews()
             .AddStylesheets()
+            .AddServer()
             .AddCorsPolicy()
             .AddBackOfficeAuthentication();
 
