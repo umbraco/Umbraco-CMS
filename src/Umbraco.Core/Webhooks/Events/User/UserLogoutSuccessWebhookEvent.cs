@@ -6,7 +6,7 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events.User;
 
-[WebhookEvent("User Login Success")]
+[WebhookEvent("User Logout Success")]
 public class UserLogoutSuccessWebhookEvent : WebhookEventBase<UserLogoutSuccessNotification>
 {
     public UserLogoutSuccessWebhookEvent(

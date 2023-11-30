@@ -6,7 +6,7 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events.User;
 
-[WebhookEvent("User Locked")]
+[WebhookEvent("User unlocked")]
 public class UserUnlockedWebhookEvent : WebhookEventBase<UserUnlockedNotification>
 {
     public UserUnlockedWebhookEvent(
