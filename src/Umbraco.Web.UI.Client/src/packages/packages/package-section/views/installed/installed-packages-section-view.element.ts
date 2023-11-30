@@ -2,14 +2,14 @@ import { UmbPackageRepository } from '../../../package/repository/package.reposi
 import type { UmbPackageWithMigrationStatus } from '../../../types.js';
 import { html, css, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { combineLatest } from '@umbraco-cms/backoffice/external/rxjs';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbSectionViewExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbSectionViewElement } from '@umbraco-cms/backoffice/extension-registry';
 
 import './installed-packages-section-view-item.element.js';
 
 @customElement('umb-installed-packages-section-view')
-export class UmbInstalledPackagesSectionViewElement extends UmbLitElement implements UmbSectionViewExtensionElement {
+export class UmbInstalledPackagesSectionViewElement extends UmbLitElement implements UmbSectionViewElement {
 	@state()
 	private _installedPackages: UmbPackageWithMigrationStatus[] = [];
 
@@ -81,10 +81,11 @@ export class UmbInstalledPackagesSectionViewElement extends UmbLitElement implem
 				${repeat(
 					this._installedPackages,
 					(item) => item.name,
-					(item) => html`<umb-installed-packages-section-view-item
-						.name=${item.name}
-						.version=${item.version}
-						.hasPendingMigrations=${item.hasPendingMigrations}></umb-installed-packages-section-view-item>`
+					(item) =>
+						html`<umb-installed-packages-section-view-item
+							.name=${item.name}
+							.version=${item.version}
+							.hasPendingMigrations=${item.hasPendingMigrations}></umb-installed-packages-section-view-item>`,
 				)}
 			</uui-ref-list>
 		</uui-box>`;
@@ -97,11 +98,12 @@ export class UmbInstalledPackagesSectionViewElement extends UmbLitElement implem
 				${repeat(
 					this._migrationPackages,
 					(item) => item.name,
-					(item) => html`<umb-installed-packages-section-view-item
-						.name=${item.name}
-						.version=${item.version}
-						.customIcon="${'icon-sync'}"
-						.hasPendingMigrations=${item.hasPendingMigrations}></umb-installed-packages-section-view-item>`
+					(item) =>
+						html`<umb-installed-packages-section-view-item
+							.name=${item.name}
+							.version=${item.version}
+							.customIcon="${'icon-sync'}"
+							.hasPendingMigrations=${item.hasPendingMigrations}></umb-installed-packages-section-view-item>`,
 				)}
 			</uui-ref-list>
 		</uui-box>`;

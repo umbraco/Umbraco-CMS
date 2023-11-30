@@ -6,7 +6,8 @@ import { UmbTemplateItemServerDataSource } from './sources/template.item.server.
 import { UmbTemplateQueryBuilderServerDataSource } from './sources/template.query-builder.server.data.js';
 import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbDetailRepository, UmbItemDataSource, UmbItemRepository } from '@umbraco-cms/backoffice/repository';
-import { UmbBaseController, type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 import type {
 	CreateTemplateRequestModel,

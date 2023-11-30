@@ -32,7 +32,7 @@ export const manifests: Array<ManifestTypes> = [
 		],
 	},
 	{
-		type: 'workspaceEditorView',
+		type: 'workspaceView',
 		name: 'Example Counter Workspace View',
 		alias: 'example.workspaceView.counter',
 		element: () => import('./counter-workspace-view.js'),
@@ -49,4 +49,4 @@ export const manifests: Array<ManifestTypes> = [
 			},
 		],
 	},
-]
+];

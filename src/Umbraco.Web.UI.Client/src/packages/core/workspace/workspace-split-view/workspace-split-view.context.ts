@@ -1,17 +1,12 @@
 import { UmbVariantContext } from '../variant-context/index.js';
 import { UMB_VARIANT_WORKSPACE_CONTEXT_TOKEN } from '../index.js';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import {
-	UmbContextToken,
-} from '@umbraco-cms/backoffice/context-api';
-import { UmbBaseController, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import {
-	UmbNumberState,
-} from '@umbraco-cms/backoffice/observable-api';
-
+import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { UmbNumberState } from '@umbraco-cms/backoffice/observable-api';
 
 export class UmbWorkspaceSplitViewContext extends UmbBaseController {
-
 	#workspaceContext?: typeof UMB_VARIANT_WORKSPACE_CONTEXT_TOKEN.TYPE;
 	public getWorkspaceContext() {
 		return this.#workspaceContext;
@@ -37,7 +32,6 @@ export class UmbWorkspaceSplitViewContext extends UmbBaseController {
 			this._observeVariant();
 		});
 
-
 		this.provideContext(UMB_WORKSPACE_SPLIT_VIEW_CONTEXT, this);
 	}
 
@@ -59,10 +53,9 @@ export class UmbWorkspaceSplitViewContext extends UmbBaseController {
 				const variantId = UmbVariantId.Create(activeVariantInfo);
 				this.#variantContext = this.#workspaceContext?.createVariantContext(this, variantId);
 			},
-			'_observeActiveVariant'
+			'_observeActiveVariant',
 		);
 	}
-
 
 	public switchVariant(variant: UmbVariantId) {
 		const index = this.#index.value;
@@ -87,9 +80,6 @@ export class UmbWorkspaceSplitViewContext extends UmbBaseController {
 		this.#index.next(index);
 	}
 
-
-
-
 	/**
 	 *
 	 * concept this class could have methods to set and get the culture and segment of the active variant? just by using the index.
@@ -103,5 +93,5 @@ export class UmbWorkspaceSplitViewContext extends UmbBaseController {
 }
 
 export const UMB_WORKSPACE_SPLIT_VIEW_CONTEXT = new UmbContextToken<UmbWorkspaceSplitViewContext>(
-	'umbWorkspaceSplitViewContext'
+	'umbWorkspaceSplitViewContext',
 );

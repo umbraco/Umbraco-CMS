@@ -7,14 +7,8 @@ import {
 } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbDropdownElement } from '@umbraco-cms/backoffice/components';
 import { UMB_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
-import {
-	UMB_CREATE_USER_MODAL,
-	UMB_INVITE_USER_MODAL,
-	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
-	UmbModalManagerContext,
-} from '@umbraco-cms/backoffice/modal';
+import { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UserGroupResponseModel, UserOrderModel, UserStateModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbUserGroupCollectionRepository } from '@umbraco-cms/backoffice/user-group';
 
@@ -70,10 +64,6 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 		const filter = target.value || '';
 		clearTimeout(this.#inputTimer);
 		this.#inputTimer = setTimeout(() => this.#collectionContext?.setFilter({ filter }), this.#inputTimerAmount);
-	}
-
-	#onInviteUserClick() {
-		this.#modalContext?.open(UMB_INVITE_USER_MODAL);
 	}
 
 	#onStateFilterChange(event: UUIBooleanInputEvent) {

@@ -1,4 +1,5 @@
-import { UMB_USER_ENTITY_TYPE, UmbUserDetail, UmbUserDetailDataSource } from '../../types.js';
+import { UmbUserDetailModel, UmbUserDetailDataSource } from '../../types.js';
+import { UMB_USER_ENTITY_TYPE } from '../../entity.js';
 import {
 	DataSourceResponse,
 	UmbDataSourceErrorResponse,
@@ -45,7 +46,7 @@ export class UmbUserServerDataSource implements UmbUserDetailDataSource {
 	async read(id: string) {
 		if (!id) throw new Error('Id is missing');
 		const response = await tryExecuteAndNotify(this.#host, UserResource.getUserById({ id }));
-		return extendDataSourceResponseData<UmbUserDetail>(response, {
+		return extendDataSourceResponseData<UmbUserDetailModel>(response, {
 			entityType: UMB_USER_ENTITY_TYPE,
 		});
 	}

@@ -2,7 +2,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, nothing, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbRoute, UmbRouterSlotInitEvent, UmbRouterSlotChangeEvent } from '@umbraco-cms/backoffice/router';
 import {
-	ManifestWorkspaceEditorView,
+	ManifestWorkspaceView,
 	ManifestWorkspaceViewCollection,
 	umbExtensionsRegistry,
 } from '@umbraco-cms/backoffice/extension-registry';
@@ -37,7 +37,7 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 	public enforceNoFooter = false;
 
 	@state()
-	private _workspaceViews: Array<ManifestWorkspaceEditorView | ManifestWorkspaceViewCollection> = [];
+	private _workspaceViews: Array<ManifestWorkspaceView | ManifestWorkspaceViewCollection> = [];
 
 	@state()
 	private _routes?: UmbRoute[];
@@ -53,7 +53,7 @@ export class UmbWorkspaceEditorElement extends UmbLitElement {
 		new UmbExtensionsManifestInitializer(
 			this,
 			umbExtensionsRegistry,
-			['workspaceEditorView', 'workspaceViewCollection'],
+			['workspaceView', 'workspaceViewCollection'],
 			null,
 			(workspaceViews) => {
 				this._workspaceViews = workspaceViews.map((view) => view.manifest);

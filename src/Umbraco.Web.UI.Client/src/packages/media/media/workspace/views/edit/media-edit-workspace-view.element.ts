@@ -1,10 +1,10 @@
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbWorkspaceEditorViewExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-media-edit-workspace-view')
-export class UmbMediaEditWorkspaceViewElement extends UmbLitElement implements UmbWorkspaceEditorViewExtensionElement {
+export class UmbMediaEditWorkspaceViewElement extends UmbLitElement implements UmbWorkspaceViewElement {
 	render() {
 		return html`<div>Render Media Props</div>`;
 	}

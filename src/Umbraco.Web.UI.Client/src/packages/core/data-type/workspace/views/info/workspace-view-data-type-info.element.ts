@@ -3,13 +3,10 @@ import { UmbDataTypeDetailModel } from '../../../types.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbWorkspaceEditorViewExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-workspace-view-data-type-info')
-export class UmbWorkspaceViewDataTypeInfoElement
-	extends UmbLitElement
-	implements UmbWorkspaceEditorViewExtensionElement
-{
+export class UmbWorkspaceViewDataTypeInfoElement extends UmbLitElement implements UmbWorkspaceViewElement {
 	@state()
 	_dataType?: UmbDataTypeDetailModel;
 

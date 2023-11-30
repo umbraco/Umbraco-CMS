@@ -1,5 +1,5 @@
 import { UmbUserCollectionContext } from '../../user-collection.context.js';
-import type { UmbUserDetail } from '../../../types.js';
+import type { UmbUserDetailModel } from '../../../types.js';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import {
@@ -57,7 +57,7 @@ export class UmbUserTableCollectionViewElement extends UmbLitElement {
 	#UmbUserGroupRepository = new UmbUserGroupRepository(this);
 
 	@state()
-	private _users: Array<UmbUserDetail> = [];
+	private _users: Array<UmbUserDetailModel> = [];
 
 	@state()
 	private _selection: Array<string | null> = [];

@@ -5,13 +5,10 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UUIToggleElement } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
-import { UmbWorkspaceEditorViewExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-document-type-workspace-view-structure')
-export class UmbDocumentTypeWorkspaceViewStructureElement
-	extends UmbLitElement
-	implements UmbWorkspaceEditorViewExtensionElement
-{
+export class UmbDocumentTypeWorkspaceViewStructureElement extends UmbLitElement implements UmbWorkspaceViewElement {
 	#workspaceContext?: UmbDocumentTypeWorkspaceContext;
 
 	@state()

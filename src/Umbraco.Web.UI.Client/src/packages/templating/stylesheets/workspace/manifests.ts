@@ -2,7 +2,7 @@ import type {
 	ManifestModal,
 	ManifestWorkspace,
 	ManifestWorkspaceAction,
-	ManifestWorkspaceEditorView,
+	ManifestWorkspaceView,
 } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 
@@ -16,9 +16,9 @@ const workspace: ManifestWorkspace = {
 	},
 };
 
-const workspaceEditorViews: Array<ManifestWorkspaceEditorView> = [
+const workspaceViews: Array<ManifestWorkspaceView> = [
 	{
-		type: 'workspaceEditorView',
+		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.Stylesheet.CodeEditor',
 		name: 'Stylesheet Workspace Code Editor View',
 		js: () => import('./views/code-editor/stylesheet-workspace-view-code-editor.element.js'),
@@ -36,7 +36,7 @@ const workspaceEditorViews: Array<ManifestWorkspaceEditorView> = [
 		],
 	},
 	{
-		type: 'workspaceEditorView',
+		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.Stylesheet.RichTextEditor',
 		name: 'Stylesheet Workspace Rich Text Editor View',
 		js: () => import('./views/rich-text-editor/stylesheet-workspace-view-rich-text-editor.element.js'),
@@ -82,9 +82,8 @@ const modals: Array<ManifestModal> = [
 		type: 'modal',
 		alias: UMB_MODAL_TEMPLATING_STYLESHEET_RTF_STYLE_SIDEBAR,
 		name: 'Rich text editor style modal',
-		js: () =>
-			import('./views/rich-text-editor/stylesheet-workspace-view-rich-text-editor-style-sidebar.element.js'),
+		js: () => import('./views/rich-text-editor/stylesheet-workspace-view-rich-text-editor-style-sidebar.element.js'),
 	},
 ];
 
-export const manifests = [workspace, ...workspaceEditorViews, ...workspaceActions, ...modals];
+export const manifests = [workspace, ...workspaceViews, ...workspaceActions, ...modals];
