@@ -145,7 +145,6 @@ public class BackOfficeController : UmbracoController
 
         return await RenderDefaultOrProcessExternalLoginAsync(
             result,
-            () => defaultView,
             () => defaultView);
     }
 
@@ -172,7 +171,6 @@ public class BackOfficeController : UmbracoController
 
         return await RenderDefaultOrProcessExternalLoginAsync(
             result,
-            () => View(viewPath),
             () => View(viewPath));
     }
 
@@ -460,11 +458,9 @@ public class BackOfficeController : UmbracoController
     /// <returns></returns>
     private async Task<IActionResult> RenderDefaultOrProcessExternalLoginAsync(
         AuthenticateResult authenticateResult,
-        Func<IActionResult> defaultResponse,
-        Func<IActionResult> externalSignInResponse)
+        Func<IActionResult> defaultResponse)
     {
         ArgumentNullException.ThrowIfNull(defaultResponse);
-        ArgumentNullException.ThrowIfNull(externalSignInResponse);
 
         ViewData.SetUmbracoPath(_globalSettings.GetUmbracoMvcArea(_hostingEnvironment));
 
@@ -483,8 +479,8 @@ public class BackOfficeController : UmbracoController
 
         if (loginInfo == null || loginInfo.Principal == null)
         {
-            // if the user is not logged in, check if there's any auto login redirects specified
-            if (!authenticateResult.Succeeded)
+            // If the user is not logged in, check if there's any auto login redirects specified
+            if (authenticateResult.Succeeded)
             {
                 return defaultResponse();
             }
@@ -508,7 +504,7 @@ public class BackOfficeController : UmbracoController
         }
 
         // we're just logging in with an external source, not linking accounts
-        return await ExternalSignInAsync(loginInfo, externalSignInResponse);
+        return await ExternalSignInAsync(loginInfo, defaultResponse);
     }
 
     private async Task<IActionResult> ExternalSignInAsync(ExternalLoginInfo loginInfo, Func<IActionResult> response)
