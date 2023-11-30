@@ -868,6 +868,7 @@
     <key alias="avatar">Avatar til</key>
     <key alias="header">Overskrift</key>
     <key alias="systemField">system felt</key>
+    <key alias="primary">Primær</key>
   </area>
   <area alias="colors">
     <key alias="blue">Blå</key>
