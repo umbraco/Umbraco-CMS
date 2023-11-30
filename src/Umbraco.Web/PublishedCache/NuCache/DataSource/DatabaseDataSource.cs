@@ -301,7 +301,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             // We need to page here. We don't want to iterate over every single row in one connection cuz this can cause an SQL Timeout.
             // We also want to read with a db reader and not load everything into memory, QueryPaged lets us do that.
 
-            foreach (var row in GetContentNodeDtos(sql, scope))
+            foreach (var row in GetMediaNodeDtos(sql, scope))
             {
                 yield return CreateMediaNodeKit(row, serializer);
             }
@@ -319,7 +319,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             // We need to page here. We don't want to iterate over every single row in one connection cuz this can cause an SQL Timeout.
             // We also want to read with a db reader and not load everything into memory, QueryPaged lets us do that.
 
-            foreach (var row in GetContentNodeDtos(sql, scope))
+            foreach (var row in GetMediaNodeDtos(sql, scope))
             {
                 yield return CreateMediaNodeKit(row, serializer);
             }
@@ -339,7 +339,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             // We need to page here. We don't want to iterate over every single row in one connection cuz this can cause an SQL Timeout.
             // We also want to read with a db reader and not load everything into memory, QueryPaged lets us do that.
 
-            foreach (var row in GetContentNodeDtos(sql, scope))
+            foreach (var row in GetMediaNodeDtos(sql, scope))
             {
                 yield return CreateMediaNodeKit(row, serializer);
             }
@@ -474,6 +474,31 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 var sqlCount = scope.SqlContext.Sql("SELECT COUNT(*) FROM (").Append(sqlCountQuery).Append(") npoco_tbl");
 
                 dtos = scope.Database.QueryPaged<ContentSourceDto>(PageSize, sql, sqlCount);
+            }
+
+            return dtos;
+        }
+
+        private IEnumerable<ContentSourceDto> GetMediaNodeDtos(Sql<ISqlContext> sql)
+        {
+            // We need to page here. We don't want to iterate over every single row in one connection cuz this can cause an SQL Timeout.
+            // We also want to read with a db reader and not load everything into memory, QueryPaged lets us do that.
+            // QueryPaged is very slow on large sites however, so use fetch if UsePagedSqlQuery is disabled.
+            IEnumerable<ContentSourceDto> dtos;
+            if (_nucacheSettings.Value.UsePagedSqlQuery)
+            {
+                // Use a more efficient COUNT query
+                Sql<ISqlContext>? sqlCountQuery = SqlMediaSourcesCount()
+                    .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Media));
+
+                Sql<ISqlContext>? sqlCount =
+                    SqlContext.Sql("SELECT COUNT(*) FROM (").Append(sqlCountQuery).Append(") npoco_tbl");
+
+                dtos = Database.QueryPaged<ContentSourceDto>(_nucacheSettings.Value.SqlPageSize, sql, sqlCount);
+            }
+            else
+            {
+                dtos = Database.Fetch<ContentSourceDto>(sql);
             }
 
             return dtos;
