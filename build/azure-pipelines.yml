@@ -638,10 +638,10 @@ stages:
               command: 'push'
               packagesToPush: $(Build.ArtifactStagingDirectory)/**/*.nupkg
               nuGetFeedType: 'external'
-            ${{ if eq(parameters.isNightly, true) }}:
-              publishFeedCredentials: 'MyGet - Pre-releases'
-            ${{ else }}:
-              publishFeedCredentials: 'MyGet - Umbraco Nightly'
+              ${{ if eq(parameters.isNightly, true) }}:
+                publishFeedCredentials: 'MyGet - Pre-releases'
+              ${{ else }}:
+                publishFeedCredentials: 'MyGet - Umbraco Nightly'
       - job:
         displayName: Push to pre-release feed (npm)
         steps:
@@ -651,10 +651,10 @@ stages:
           - task: npmAuthenticate@0
             inputs:
               workingFile: '$(Pipeline.Workspace)/npm/.npmrc'
-            ${{ if eq(parameters.isNightly, true) }}:
-              customEndpoint: 'MyGet (npm) - Umbraconightly'
-            ${{ else }}:
-              customEndpoint: 'MyGet (npm) - Umbracoprereleases'
+              ${{ if eq(parameters.isNightly, true) }}:
+                customEndpoint: 'MyGet (npm) - Umbraconightly'
+              ${{ else }}:
+                customEndpoint: 'MyGet (npm) - Umbracoprereleases'
           - bash: |
               # Setup temp npm project to load in defaults from the local .npmrc
               npm init -y
