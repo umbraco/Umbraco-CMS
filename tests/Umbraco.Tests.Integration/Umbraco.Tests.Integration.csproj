@@ -10,11 +10,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Bogus" Version="34.0.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
-    <PackageReference Include="Moq" Version="4.18.4" />
-    <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" PrivateAssets="all" />
+    <PackageReference Include="Bogus" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="Moq" />
+    <PackageReference Include="NUnit3TestAdapter" PrivateAssets="all" />
   </ItemGroup>
 
   <Import Project="..\..\src\Umbraco.Cms.Targets\buildTransitive\Umbraco.Cms.Targets.props" />
@@ -74,6 +74,12 @@
     </Compile>
     <Compile Update="Umbraco.Infrastructure\Services\ContentEditingServiceTests.Sort.cs">
       <DependentUpon>ContentEditingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ContentPublishingServiceTests.Publish.cs">
+      <DependentUpon>ContentPublishingServiceTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Infrastructure\Services\ContentPublishingServiceTests.Unpublish.cs">
+      <DependentUpon>ContentPublishingServiceTests.cs</DependentUpon>
     </Compile>
     <Compile Update="Umbraco.Core\Services\UserServiceCrudTests.Create.cs">
       <DependentUpon>UserServiceCrudTests.cs</DependentUpon>

@@ -220,6 +220,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddRecurringBackgroundJob<InstructionProcessJob>();
         builder.Services.AddRecurringBackgroundJob<TouchServerJob>();
         builder.Services.AddRecurringBackgroundJob<WebhookFiring>();
+        builder.Services.AddRecurringBackgroundJob<WebhookLoggingCleanup>();
         builder.Services.AddRecurringBackgroundJob(provider =>
             new ReportSiteJob(
                 provider.GetRequiredService<ILogger<ReportSiteJob>>(),

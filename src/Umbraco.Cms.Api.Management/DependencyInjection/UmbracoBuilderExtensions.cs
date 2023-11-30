@@ -52,6 +52,7 @@ public static class UmbracoBuilderExtensions
                 .AddScripts()
                 .AddPartialViews()
                 .AddStylesheets()
+                .AddCorsPolicy()
                 .AddBackOfficeAuthentication();
 
             services

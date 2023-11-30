@@ -3,9 +3,11 @@ using System.Text.Json.Serialization;
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.DependencyInjection;
 using Umbraco.Cms.Api.Delivery.Accessors;
+using Umbraco.Cms.Api.Delivery.Caching;
 using Umbraco.Cms.Api.Delivery.Configuration;
 using Umbraco.Cms.Api.Delivery.Handlers;
 using Umbraco.Cms.Api.Delivery.Json;
@@ -14,10 +16,12 @@ using Umbraco.Cms.Api.Delivery.Routing;
 using Umbraco.Cms.Api.Delivery.Security;
 using Umbraco.Cms.Api.Delivery.Services;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Infrastructure.Security;
+using Umbraco.Cms.Web.Common.ApplicationBuilder;
 
 namespace Umbraco.Extensions;
 
@@ -79,7 +83,38 @@ public static class UmbracoBuilderExtensions
 
         // FIXME: remove this when Delivery API V1 is removed
         builder.Services.AddSingleton<MatcherPolicy, DeliveryApiItemsEndpointsMatcherPolicy>();
+
+        builder.AddOutputCache();
+        return builder;
+    }
+
+    private static IUmbracoBuilder AddOutputCache(this IUmbracoBuilder builder)
+    {
+        DeliveryApiSettings.OutputCacheSettings outputCacheSettings =
+            builder.Config.GetSection(Constants.Configuration.ConfigDeliveryApi).Get<DeliveryApiSettings>()?.OutputCache
+            ?? new DeliveryApiSettings.OutputCacheSettings();
+
+        if (outputCacheSettings.Enabled is false || outputCacheSettings is { ContentDuration.TotalSeconds: <= 0, MediaDuration.TotalSeconds: <= 0 })
+        {
+            return builder;
+        }
+
+        builder.Services.AddOutputCache(options =>
+        {
+            options.AddBasePolicy(_ => { });
+
+            if (outputCacheSettings.ContentDuration.TotalSeconds > 0)
+            {
+                options.AddPolicy(Constants.DeliveryApi.OutputCache.ContentCachePolicy, new DeliveryApiOutputCachePolicy(outputCacheSettings.ContentDuration));
+            }
+
+            if (outputCacheSettings.MediaDuration.TotalSeconds > 0)
+            {
+                options.AddPolicy(Constants.DeliveryApi.OutputCache.MediaCachePolicy, new DeliveryApiOutputCachePolicy(outputCacheSettings.MediaDuration));
+            }
+        });
+
+        builder.Services.Configure<UmbracoPipelineOptions>(options => options.AddFilter(new OutputCachePipelineFilter("UmbracoDeliveryApiOutputCache")));
         return builder;
     }
 }
-

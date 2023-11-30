@@ -8,34 +8,34 @@ public interface IWebhookService
     /// <summary>
     ///     Creates a webhook.
     /// </summary>
-    /// <param name="webhook"><see cref="Webhook" /> to create.</param>
-    Task<Attempt<Webhook, WebhookOperationStatus>> CreateAsync(Webhook webhook);
+    /// <param name="webhook"><see cref="IWebhook" /> to create.</param>
+    Task<Attempt<IWebhook, WebhookOperationStatus>> CreateAsync(IWebhook webhook);
 
     /// <summary>
     ///     Updates a webhook.
     /// </summary>
-    /// <param name="webhook"><see cref="Webhook" /> to update.</param>
-    Task<Attempt<Webhook, WebhookOperationStatus>> UpdateAsync(Webhook webhook);
+    /// <param name="webhook"><see cref="IWebhook" /> to update.</param>
+    Task<Attempt<IWebhook, WebhookOperationStatus>> UpdateAsync(IWebhook webhook);
 
     /// <summary>
     ///     Deletes a webhook.
     /// </summary>
     /// <param name="key">The unique key of the webhook.</param>
-    Task<Attempt<Webhook?, WebhookOperationStatus>> DeleteAsync(Guid key);
+    Task<Attempt<IWebhook?, WebhookOperationStatus>> DeleteAsync(Guid key);
 
     /// <summary>
     ///     Gets a webhook by its key.
     /// </summary>
     /// <param name="key">The unique key of the webhook.</param>
-    Task<Webhook?> GetAsync(Guid key);
+    Task<IWebhook?> GetAsync(Guid key);
 
     /// <summary>
     ///     Gets all webhooks.
     /// </summary>
-    Task<PagedModel<Webhook>> GetAllAsync(int skip, int take);
+    Task<PagedModel<IWebhook>> GetAllAsync(int skip, int take);
 
     /// <summary>
     ///     Gets webhooks by event name.
     /// </summary>
-    Task<IEnumerable<Webhook>> GetByAliasAsync(string alias);
+    Task<IEnumerable<IWebhook>> GetByAliasAsync(string alias);
 }

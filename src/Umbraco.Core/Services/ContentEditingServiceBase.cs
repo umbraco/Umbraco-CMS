@@ -18,7 +18,6 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     private readonly PropertyEditorCollection _propertyEditorCollection;
     private readonly IDataTypeService _dataTypeService;
     private readonly ILogger<ContentEditingServiceBase<TContent, TContentType, TContentService, TContentTypeService>> _logger;
-    private readonly ICoreScopeProvider _scopeProvider;
     private readonly ITreeEntitySortingService _treeEntitySortingService;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
 
@@ -35,9 +34,9 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         _propertyEditorCollection = propertyEditorCollection;
         _dataTypeService = dataTypeService;
         _logger = logger;
-        _scopeProvider = scopeProvider;
         _userIdKeyResolver = userIdKeyResolver;
         _treeEntitySortingService = treeEntitySortingService;
+        CoreScopeProvider = scopeProvider;
         ContentService = contentService;
         ContentTypeService = contentTypeService;
     }
@@ -55,6 +54,8 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     protected abstract IEnumerable<TContent> GetPagedChildren(int parentId, int pageIndex, int pageSize, out long total);
 
     protected abstract ContentEditingOperationStatus Sort(IEnumerable<TContent> items, int userId);
+
+    protected ICoreScopeProvider CoreScopeProvider { get; }
 
     protected TContentService ContentService { get; }
 
@@ -110,7 +111,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     // helper method to perform move-to-recycle-bin and delete for content as they are very much handled in the same way
     private async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleDeletionAsync(Guid key, Guid userKey, bool mustBeTrashed, Func<TContent, int, OperationResult?> performDelete)
     {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+        using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
         TContent? content = ContentService.GetById(key);
         if (content == null)
         {
@@ -135,7 +136,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
 
     protected async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleMoveAsync(Guid key, Guid? parentKey, Guid userKey)
     {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+        using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
         TContent? content = ContentService.GetById(key);
         if (content is null)
         {
@@ -172,7 +173,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
 
     protected async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleCopyAsync(Guid key, Guid? parentKey, bool relateToOriginal, bool includeDescendants, Guid userKey)
     {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+        using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
         TContent? content = ContentService.GetById(key);
         if (content is null)
         {
