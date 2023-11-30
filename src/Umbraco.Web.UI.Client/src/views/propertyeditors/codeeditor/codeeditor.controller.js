@@ -29,6 +29,8 @@ function CodeEditorController($scope) {
 
     function init() {
 
+      vm.cssClasses = !$scope.model.labelOnTop ? ["umb-property-editor--limit-width"] : [];
+
       vm.readonly = Object.toBoolean(config.readonly);
 
       vm.aceOption = {
