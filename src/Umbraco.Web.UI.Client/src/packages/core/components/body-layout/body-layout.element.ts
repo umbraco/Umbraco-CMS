@@ -1,4 +1,4 @@
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import {
 	css,
 	html,
@@ -191,6 +191,7 @@ export class UmbBodyLayoutElement extends LitElement {
 				height: 100%;
 				align-items: center;
 				box-sizing: border-box;
+				min-width: 0;
 			}
 
 			#navigation-slot,
