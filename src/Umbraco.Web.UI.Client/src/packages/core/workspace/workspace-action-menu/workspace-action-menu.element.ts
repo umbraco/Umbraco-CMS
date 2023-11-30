@@ -13,6 +13,9 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 	@state()
 	_entityType?: string;
 
+	@state()
+	_popoverOpen = false;
+
 	constructor() {
 		super();
 
@@ -32,6 +35,10 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 		event.stopPropagation();
 	}
 
+	#onPopoverToggle(event: ToggleEvent) {
+		this._popoverOpen = event.newState === 'open';
+	}
+
 	render() {
 		return html` ${this.#renderActionsMenu()} `;
 	}
@@ -39,8 +46,14 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 	#renderActionsMenu() {
 		return this._entityId && this._entityType
 			? html`
-					<uui-button popovertarget="workspace-action-menu-popover" label="Actions"></uui-button>
-					<uui-popover-container id="workspace-action-menu-popover" placement="bottom-end">
+					<uui-button popovertarget="workspace-action-menu-popover" label="Actions">
+						Actions
+						<uui-symbol-expand slot="extra" .open=${this._popoverOpen}></uui-symbol-expand>
+					</uui-button>
+					<uui-popover-container
+						id="workspace-action-menu-popover"
+						placement="bottom-end"
+						@toggle=${this.#onPopoverToggle}>
 						<umb-popover-layout>
 							<uui-scroll-container>
 								<umb-entity-action-list
@@ -55,7 +68,18 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 			: nothing;
 	}
 
-	static styles = [UmbTextStyles, css``];
+	static styles = [
+		UmbTextStyles,
+		css`
+			:host {
+				height: 100%;
+			}
+
+			:host > uui-button {
+				height: 100%;
+			}
+		`,
+	];
 }
 
 declare global {
