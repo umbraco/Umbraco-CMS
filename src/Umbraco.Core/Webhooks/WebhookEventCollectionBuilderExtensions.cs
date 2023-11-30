@@ -1,3 +1,4 @@
+using Umbraco.Cms.Core.Webhooks;
 using Umbraco.Cms.Core.Webhooks.Events.Content;
 using Umbraco.Cms.Core.Webhooks.Events.DataType;
 using Umbraco.Cms.Core.Webhooks.Events.Dictionary;
@@ -16,11 +17,26 @@ using Umbraco.Cms.Core.Webhooks.Events.Stylesheet;
 using Umbraco.Cms.Core.Webhooks.Events.Template;
 using Umbraco.Cms.Core.Webhooks.Events.User;
 
-namespace Umbraco.Cms.Core.Webhooks;
+namespace Umbraco.Cms.Core.DependencyInjection;
 
 public static class WebhookEventCollectionBuilderExtensions
 {
-    public static WebhookEventCollectionBuilder AddAllAvailableWebhooks(this WebhookEventCollectionBuilder builder)
+    internal static WebhookEventCollectionBuilder AddDefaultWebhooks(this WebhookEventCollectionBuilder builder)
+        => builder
+            .Append<ContentDeletedWebhookEvent>()
+            .Append<ContentPublishedWebhookEvent>()
+            .Append<ContentUnpublishedWebhookEvent>()
+            .Append<MediaDeletedWebhookEvent>()
+            .Append<MediaSavedWebhookEvent>();
+
+    /// <summary>
+    /// Adds all available CMS webhook events.
+    /// </summary>
+    /// <param name="builder">The builder.</param>
+    /// <returns>
+    /// The builder.
+    /// </returns>
+    public static WebhookEventCollectionBuilder AddCmsWebhooks(this WebhookEventCollectionBuilder builder)
         => builder
             .AddContentWebhooks()
             .AddDataTypeWebhooks()
@@ -38,6 +54,13 @@ public static class WebhookEventCollectionBuilderExtensions
             .AddTemplateWebhooks()
             .AddUserWebhooks();
 
+    /// <summary>
+    /// Adds the content webhook events.
+    /// </summary>
+    /// <param name="builder">The builder.</param>
+    /// <returns>
+    /// The builder.
+    /// </returns>
     public static WebhookEventCollectionBuilder AddContentWebhooks(this WebhookEventCollectionBuilder builder)
         => builder
             .Append<ContentCopiedWebhookEvent>()
@@ -54,41 +77,64 @@ public static class WebhookEventCollectionBuilderExtensions
             .Append<ContentSortedWebhookEvent>()
             .Append<ContentUnpublishedWebhookEvent>();
 
-    public static WebhookEventCollectionBuilder AddCoreWebhooks(this WebhookEventCollectionBuilder builder)
-        => builder
-            .Append<ContentDeletedWebhookEvent>()
-            .Append<ContentPublishedWebhookEvent>()
-            .Append<ContentUnpublishedWebhookEvent>()
-            .Append<MediaDeletedWebhookEvent>()
-            .Append<MediaSavedWebhookEvent>();
-
+    /// <summary>
+    /// Adds the data type webhook events.
+    /// </summary>
+    /// <param name="builder">The builder.</param>
+    /// <returns>
+    /// The builder.
+    /// </returns>
     public static WebhookEventCollectionBuilder AddDataTypeWebhooks(this WebhookEventCollectionBuilder builder)
         => builder
             .Append<DataTypeDeletedWebhookEvent>()
             .Append<DataTypeMovedWebhookEvent>()
             .Append<DataTypeSavedWebhookEvent>();
 
+    /// <summary>
+    /// Adds the dictionary webhook events.
+    /// </summary>
+    /// <param name="builder">The builder.</param>
+    /// <returns>
+    /// The builder.
+    /// </returns>
     public static WebhookEventCollectionBuilder AddDictionaryWebhooks(this WebhookEventCollectionBuilder builder)
         => builder
             .Append<DictionaryItemDeletedWebhookEvent>()
             .Append<DictionaryItemSavedWebhookEvent>();
 
+    /// <summary>
+    /// Adds the domain webhook events.
+    /// </summary>
+    /// <param name="builder">The builder.</param>
+    /// <returns>
+    /// The builder.
+    /// </returns>
     public static WebhookEventCollectionBuilder AddDomainWebhooks(this WebhookEventCollectionBuilder builder)
         => builder
             .Append<DomainDeletedWebhookEvent>()
             .Append<DomainSavedWebhookEvent>();
 
+    /// <summary>
+    /// Adds the language webhook events.
+    /// </summary>
+    /// <param name="builder">The builder.</param>
+    /// <returns>
+    /// The builder.
+    /// </returns>
     public static WebhookEventCollectionBuilder AddLanguageWebhooks(this WebhookEventCollectionBuilder builder)
         => builder
         .Append<LanguageDeletedWebhookEvent>()
         .Append<LanguageSavedWebhookEvent>();
 
+    /// <summary>
+    /// Adds the media webhook events.
+    /// </summary>
+    /// <param name="builder">The builder.</param>
+    /// <returns>
+    /// The builder.
+    /// </returns>
     public static WebhookEventCollectionBuilder AddMediaWebhooks(this WebhookEventCollectionBuilder builder)
         => builder
-            // Even though these two are in the AddCoreWebhooks()
-            // The job of the CollectionBuilder should be removing duplicates
-            // Would allow someone to use .AddCoreWebhooks().AddMediaWebhooks()
-            // Or if they explicitly they could skip over CoreWebHooks and just add this perhaps
             .Append<MediaDeletedWebhookEvent>()
             .Append<MediaSavedWebhookEvent>()
             .Append<MediaEmptiedRecycleBinWebhookEvent>()
@@ -99,6 +145,13 @@ public static class WebhookEventCollectionBuilderExtensions
             .Append<MediaTypeMovedWebhookEvent>()
             .Append<MediaTypeSavedWebhookEvent>();
 
+    /// <summary>
+    /// Adds the member webhook events.
+    /// </summary>
+    /// <param name="builder">The builder.</param>
+    /// <returns>
+    /// The builder.
+    /// </returns>
     public static WebhookEventCollectionBuilder AddMemberWebhooks(this WebhookEventCollectionBuilder builder)
         => builder
             .Append<AssignedMemberRolesWebhookEvent>()
@@ -109,6 +162,13 @@ public static class WebhookEventCollectionBuilderExtensions
             .Append<MemberSavedWebhookEvent>()
             .Append<RemovedMemberRolesWebhookEvent>();
 
+    /// <summary>
+    /// Adds the member type webhook events.
+    /// </summary>
+    /// <param name="builder">The builder.</param>
+    /// <returns>
+    /// The builder.
+    /// </returns>
     public static WebhookEventCollectionBuilder AddMemberTypeWebhooks(this WebhookEventCollectionBuilder builder)
         => builder
             .Append<MemberTypeChangedWebhookEvent>()
@@ -116,15 +176,36 @@ public static class WebhookEventCollectionBuilderExtensions
             .Append<MemberTypeMovedWebhookEvent>()
             .Append<MemberTypeSavedWebhookEvent>();
 
+    /// <summary>
+    /// Adds the package webhook events.
+    /// </summary>
+    /// <param name="builder">The builder.</param>
+    /// <returns>
+    /// The builder.
+    /// </returns>
     public static WebhookEventCollectionBuilder AddPackageWebhooks(this WebhookEventCollectionBuilder builder)
         => builder
             .Append<ImportedPackageWebhookEvent>();
 
+    /// <summary>
+    /// Adds the public access webhook events.
+    /// </summary>
+    /// <param name="builder">The builder.</param>
+    /// <returns>
+    /// The builder.
+    /// </returns>
     public static WebhookEventCollectionBuilder AddPublicAccessWebhooks(this WebhookEventCollectionBuilder builder)
         => builder
             .Append<PublicAccessEntryDeletedWebhookEvent>()
             .Append<PublicAccessEntrySavedWebhookEvent>();
 
+    /// <summary>
+    /// Adds the relation webhook events.
+    /// </summary>
+    /// <param name="builder">The builder.</param>
+    /// <returns>
+    /// The builder.
+    /// </returns>
     public static WebhookEventCollectionBuilder AddRelationWebhooks(this WebhookEventCollectionBuilder builder)
         => builder
             .Append<RelationDeletedWebhookEvent>()
@@ -132,16 +213,37 @@ public static class WebhookEventCollectionBuilderExtensions
             .Append<RelationTypeDeletedWebhookEvent>()
             .Append<RelationTypeSavedWebhookEvent>();
 
+    /// <summary>
+    /// Adds the script webhook events.
+    /// </summary>
+    /// <param name="builder">The builder.</param>
+    /// <returns>
+    /// The builder.
+    /// </returns>
     public static WebhookEventCollectionBuilder AddScriptWebhooks(this WebhookEventCollectionBuilder builder)
         => builder
             .Append<ScriptDeletedWebhookEvent>()
             .Append<ScriptSavedWebhookEvent>();
 
+    /// <summary>
+    /// Adds the stylesheet webhook events.
+    /// </summary>
+    /// <param name="builder">The builder.</param>
+    /// <returns>
+    /// The builder.
+    /// </returns>
     public static WebhookEventCollectionBuilder AddStylesheetWebhooks(this WebhookEventCollectionBuilder builder)
         => builder
             .Append<StylesheetDeletedWebhookEvent>()
             .Append<StylesheetSavedWebhookEvent>();
 
+    /// <summary>
+    /// Adds the template webhook events.
+    /// </summary>
+    /// <param name="builder">The builder.</param>
+    /// <returns>
+    /// The builder.
+    /// </returns>
     public static WebhookEventCollectionBuilder AddTemplateWebhooks(this WebhookEventCollectionBuilder builder)
         => builder
             .Append<PartialViewDeletedWebhookEvent>()
@@ -149,6 +251,13 @@ public static class WebhookEventCollectionBuilderExtensions
             .Append<TemplateDeletedWebhookEvent>()
             .Append<TemplateSavedWebhookEvent>();
 
+    /// <summary>
+    /// Adds the user webhook events.
+    /// </summary>
+    /// <param name="builder">The builder.</param>
+    /// <returns>
+    /// The builder.
+    /// </returns>
     public static WebhookEventCollectionBuilder AddUserWebhooks(this WebhookEventCollectionBuilder builder)
         => builder
             .Append<AssignedUserGroupPermissionsWebhookEvent>()
@@ -167,4 +276,4 @@ public static class WebhookEventCollectionBuilderExtensions
             .Append<UserSavedWebhookEvent>()
             .Append<UserTwoFactorRequestedWebhookEvent>()
             .Append<UserUnlockedWebhookEvent>();
-    }
+}
