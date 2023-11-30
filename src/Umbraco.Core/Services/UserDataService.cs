@@ -1,34 +1,29 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
-[Obsolete("Use the IUserDataService interface instead")]
+[Obsolete($"Use {nameof(ISystemInformationService)} instead. Will be removed in V16.")]
 public class UserDataService : IUserDataService
 {
-    private readonly ILocalizationService _localizationService;
-    private readonly IUmbracoVersion _version;
+    private readonly ISystemInformationService _systemInformationService;
 
+    [Obsolete($"Use the constructor that accepts {nameof(ISystemInformationService)}")]
     public UserDataService(IUmbracoVersion version, ILocalizationService localizationService)
+        : this(version, localizationService, StaticServiceProvider.Instance.GetRequiredService<ISystemInformationService>())
     {
-        _version = version;
-        _localizationService = localizationService;
     }
 
+    public UserDataService(IUmbracoVersion version, ILocalizationService localizationService, ISystemInformationService systemInformationService)
+        => _systemInformationService = systemInformationService;
+
+    [Obsolete($"Use {nameof(ISystemInformationService)} instead. Will be removed in V16.")]
     public IEnumerable<UserData> GetUserData() =>
-        new List<UserData>
-        {
-            new("Server OS", RuntimeInformation.OSDescription),
-            new("Server Framework", RuntimeInformation.FrameworkDescription),
-            new("Default Language", _localizationService.GetDefaultLanguageIsoCode()),
-            new("Umbraco Version", _version.SemanticVersion.ToSemanticStringWithoutBuild()),
-            new("Current Culture", Thread.CurrentThread.CurrentCulture.ToString()),
-            new("Current UI Culture", Thread.CurrentThread.CurrentUICulture.ToString()),
-            new("Current Webserver", GetCurrentWebServer()),
-        };
+        _systemInformationService.GetSystemInformation().Select(kvp => new UserData(kvp.Key, kvp.Value)).ToArray();
 
     public bool IsRunningInProcessIIS()
     {
@@ -40,6 +35,4 @@ public class UserDataService : IUserDataService
         var processName = Path.GetFileNameWithoutExtension(Process.GetCurrentProcess().ProcessName);
         return processName.Contains("w3wp") || processName.Contains("iisexpress");
     }
-
-    private string GetCurrentWebServer() => IsRunningInProcessIIS() ? "IIS" : "Kestrel";
 }

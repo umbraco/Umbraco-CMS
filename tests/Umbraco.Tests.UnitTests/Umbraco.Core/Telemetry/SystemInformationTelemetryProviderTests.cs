@@ -1,6 +1,4 @@
 using System.Globalization;
-using System.Linq;
-using System.Threading;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Moq;

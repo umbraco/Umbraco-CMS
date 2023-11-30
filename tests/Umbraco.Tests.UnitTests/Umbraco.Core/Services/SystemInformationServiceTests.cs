@@ -1,7 +1,4 @@
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Threading;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -9,7 +6,6 @@ using NPoco;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Semver;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
@@ -19,7 +15,7 @@ using Umbraco.Cms.Infrastructure.Telemetry.Providers;
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Services;
 
 [TestFixture]
-public class UserDataServiceTests
+public class SystemInformationServiceTests
 {
     [OneTimeSetUp]
     public void CreateMocks() => CreateUmbracoVersion(9, 0, 0);
@@ -33,12 +29,12 @@ public class UserDataServiceTests
     [TestCase("sv-SE")]
     public void GetCorrectDefaultLanguageTest(string culture)
     {
-        var userDataService = CreateUserDataService(culture);
-        var defaultLanguage = userDataService.GetUserData().FirstOrDefault(x => x.Name == "Default Language");
+        var userDataService = CreateSystemInformationService(culture);
+        var defaultLanguage = userDataService.GetSystemInformation().FirstOrDefault(x => x.Key == "Default Language");
         Assert.Multiple(() =>
         {
             Assert.IsNotNull(defaultLanguage);
-            Assert.AreEqual(culture, defaultLanguage.Data);
+            Assert.AreEqual(culture, defaultLanguage.Value);
         });
     }
 
@@ -50,12 +46,12 @@ public class UserDataServiceTests
     public void GetCorrectCultureTest(string culture)
     {
         Thread.CurrentThread.CurrentCulture = new CultureInfo(culture);
-        var userDataService = CreateUserDataService(culture);
-        var currentCulture = userDataService.GetUserData().FirstOrDefault(x => x.Name == "Current Culture");
+        var userDataService = CreateSystemInformationService(culture);
+        var currentCulture = userDataService.GetSystemInformation().FirstOrDefault(x => x.Key == "Current Culture");
         Assert.Multiple(() =>
         {
             Assert.IsNotNull(currentCulture);
-            Assert.AreEqual(culture, currentCulture.Data);
+            Assert.AreEqual(culture, currentCulture.Value);
         });
     }
 
@@ -67,12 +63,12 @@ public class UserDataServiceTests
     public void GetCorrectUICultureTest(string culture)
     {
         Thread.CurrentThread.CurrentUICulture = new CultureInfo(culture);
-        var userDataService = CreateUserDataService(culture);
-        var currentCulture = userDataService.GetUserData().FirstOrDefault(x => x.Name == "Current UI Culture");
+        var userDataService = CreateSystemInformationService(culture);
+        var currentCulture = userDataService.GetSystemInformation().FirstOrDefault(x => x.Key == "Current UI Culture");
         Assert.Multiple(() =>
         {
             Assert.IsNotNull(currentCulture);
-            Assert.AreEqual(culture, currentCulture.Data);
+            Assert.AreEqual(culture, currentCulture.Value);
         });
     }
 
@@ -83,13 +79,13 @@ public class UserDataServiceTests
     [TestCase("sv-SE")]
     public void RunTimeInformationNotNullTest(string culture)
     {
-        var userDataService = CreateUserDataService(culture);
-        IEnumerable<UserData> userData = userDataService.GetUserData().ToList();
+        var userDataService = CreateSystemInformationService(culture);
+        var userData = userDataService.GetSystemInformation().ToList();
         Assert.Multiple(() =>
         {
-            Assert.IsNotNull(userData.Select(x => x.Name == "Server OS"));
-            Assert.IsNotNull(userData.Select(x => x.Name == "Server Framework"));
-            Assert.IsNotNull(userData.Select(x => x.Name == "Current Webserver"));
+            Assert.IsNotNull(userData.Select(x => x.Key == "Server OS"));
+            Assert.IsNotNull(userData.Select(x => x.Key == "Server Framework"));
+            Assert.IsNotNull(userData.Select(x => x.Key == "Current Webserver"));
         });
     }
 
@@ -100,12 +96,12 @@ public class UserDataServiceTests
     [TestCase(ModelsMode.SourceCodeManual)]
     public void ReportsModelsModeCorrectly(ModelsMode modelsMode)
     {
-        var userDataService = CreateUserDataService(modelsMode: modelsMode);
-        var userData = userDataService.GetUserData().ToArray();
+        var userDataService = CreateSystemInformationService(modelsMode: modelsMode);
+        var userData = userDataService.GetSystemInformation().ToArray();
 
-        var actual = userData.FirstOrDefault(x => x.Name == "Models Builder Mode");
-        Assert.IsNotNull(actual?.Data);
-        Assert.AreEqual(modelsMode.ToString(), actual.Data);
+        var actual = userData.FirstOrDefault(x => x.Key == "Models Builder Mode");
+        Assert.IsNotNull(actual.Value);
+        Assert.AreEqual(modelsMode.ToString(), actual.Value);
     }
 
     [Test]
@@ -114,12 +110,12 @@ public class UserDataServiceTests
     [TestCase(RuntimeMode.Production)]
     public void ReportsRuntimeModeCorrectly(RuntimeMode runtimeMode)
     {
-        var userDataService = CreateUserDataService(runtimeMode: runtimeMode);
-        var userData = userDataService.GetUserData().ToArray();
+        var userDataService = CreateSystemInformationService(runtimeMode: runtimeMode);
+        var userData = userDataService.GetSystemInformation().ToArray();
 
-        var actual = userData.FirstOrDefault(x => x.Name == "Runtime Mode");
-        Assert.IsNotNull(actual?.Data);
-        Assert.AreEqual(runtimeMode.ToString(), actual.Data);
+        var actual = userData.FirstOrDefault(x => x.Key == "Runtime Mode");
+        Assert.IsNotNull(actual.Value);
+        Assert.AreEqual(runtimeMode.ToString(), actual.Value);
     }
 
     [Test]
@@ -127,15 +123,15 @@ public class UserDataServiceTests
     [TestCase(false)]
     public void ReportsDebugModeCorrectly(bool isDebug)
     {
-        var userDataService = CreateUserDataService(isDebug: isDebug);
-        var userData = userDataService.GetUserData().ToArray();
+        var userDataService = CreateSystemInformationService(isDebug: isDebug);
+        var userData = userDataService.GetSystemInformation().ToArray();
 
-        var actual = userData.FirstOrDefault(x => x.Name == "Debug Mode");
-        Assert.IsNotNull(actual?.Data);
-        Assert.AreEqual(isDebug.ToString(), actual.Data);
+        var actual = userData.FirstOrDefault(x => x.Key == "Debug Mode");
+        Assert.IsNotNull(actual.Value);
+        Assert.AreEqual(isDebug.ToString(), actual.Value);
     }
 
-    private SystemInformationTelemetryProvider CreateUserDataService(
+    private ISystemInformationService CreateSystemInformationService(
         string culture = "",
         ModelsMode modelsMode = ModelsMode.InMemoryAuto,
         bool isDebug = true,
