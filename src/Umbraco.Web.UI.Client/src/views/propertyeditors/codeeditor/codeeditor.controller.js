@@ -13,7 +13,7 @@ function CodeEditorController($scope) {
         theme: "chrome",
         mode: "razor",
         firstLineNumber: 1,
-        fontSize: "small",
+        fontSize: "14px",
         enableSnippets: 0,
         enableBasicAutocompletion: 0,
         enableLiveAutocompletion: 0,
@@ -40,7 +40,7 @@ function CodeEditorController($scope) {
           useSoftTabs: Object.toBoolean(config.useSoftTabs),
           showPrintMargin: Object.toBoolean(config.showPrintMargin),
           disableSearch: Object.toBoolean(config.disableSearch),
-          mode: config.theme,
+          mode: config.mode,
           theme: config.theme,
           firstLineNumber: config.firstLineNumber,
           advanced: {
