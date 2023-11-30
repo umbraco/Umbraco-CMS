@@ -15,6 +15,7 @@ schedules:
     - v14/dev
 
 steps:
+- checkout: none
 - task: TriggerBuild@4
   inputs:
     definitionIsInCurrentTeamProject: true
