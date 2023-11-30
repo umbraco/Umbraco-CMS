@@ -2,7 +2,6 @@ import { UMB_USER_WORKSPACE_CONTEXT } from '../../user-workspace.context.js';
 import { html, customElement, state, ifDefined, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UUISelectElement } from '@umbraco-cms/backoffice/external/uui';
 import { UserResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-user-workspace-profile-settings')
@@ -21,8 +20,8 @@ export class UmbUserWorkspaceProfileSettingsElement extends UmbLitElement {
 		});
 	}
 
-	#onLanguageChange(event: Event) {
-		const target = event.composedPath()[0] as UUISelectElement;
+	#onLanguageChange(event: UmbChangeEvent) {
+		const target = event.target as UmbUiCultureInputElement;
 
 		if (typeof target?.value === 'string') {
 			this.#userWorkspaceContext?.updateProperty('languageIsoCode', target.value);
