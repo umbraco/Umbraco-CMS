@@ -48,7 +48,7 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 			? html`
 					<uui-button popovertarget="workspace-action-menu-popover" label="Actions">
 						Actions
-						<uui-symbol-expand slot="extra" .open=${this._popoverOpen}></uui-symbol-expand>
+						<uui-symbol-expand .open=${this._popoverOpen}></uui-symbol-expand>
 					</uui-button>
 					<uui-popover-container
 						id="workspace-action-menu-popover"
