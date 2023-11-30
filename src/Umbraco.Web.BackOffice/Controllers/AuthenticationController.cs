@@ -526,7 +526,7 @@ public class AuthenticationController : UmbracoApiControllerBase
             await _signInManager.TwoFactorSignInAsync(model.Provider, model.Code, model.IsPersistent, model.RememberClient);
         if (result.Succeeded)
         {
-            return GetUserDetail(_userService.GetByUsername(user.UserName));
+            return Ok(GetUserDetail(_userService.GetByUsername(user.UserName)));
         }
 
         if (result.IsLockedOut)
