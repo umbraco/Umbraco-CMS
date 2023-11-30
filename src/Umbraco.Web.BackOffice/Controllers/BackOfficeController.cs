@@ -477,34 +477,35 @@ public class BackOfficeController : UmbracoController
         // First check if there's external login info, if there's not proceed as normal
         ExternalLoginInfo? loginInfo = await _signInManager.GetExternalLoginInfoAsync();
 
-        if (loginInfo == null || loginInfo.Principal == null)
+        if (loginInfo != null)
         {
-            // If the user is not logged in, check if there's any auto login redirects specified
-            if (authenticateResult.Succeeded)
-            {
-                return defaultResponse();
-            }
+            // we're just logging in with an external source, not linking accounts
+            return await ExternalSignInAsync(loginInfo, defaultResponse);
+        }
 
-            var oauthRedirectAuthProvider = _externalLogins.GetAutoLoginProvider();
-
-            // If there's no auto login provider specified, then we'll render the default view
-            if (oauthRedirectAuthProvider.IsNullOrWhiteSpace())
-            {
-                return defaultResponse();
-            }
-
-            // If the ?logout=true query string is not specified, then we'll redirect to the external login provider
-            // which will then redirect back to the ExternalLoginCallback action
-            if (Request.Query.TryGetValue("logout", out StringValues logout) == false || logout != "true")
-            {
-                return ExternalLogin(oauthRedirectAuthProvider);
-            }
-
+        // If we are authenticated then we can just render the default view
+        if (authenticateResult.Succeeded)
+        {
             return defaultResponse();
         }
 
-        // we're just logging in with an external source, not linking accounts
-        return await ExternalSignInAsync(loginInfo, defaultResponse);
+        // If the user is not logged in, check if there's any auto login redirects specified
+        var oauthRedirectAuthProvider = _externalLogins.GetAutoLoginProvider();
+
+        // If there's no auto login provider specified, then we'll render the default view
+        if (oauthRedirectAuthProvider.IsNullOrWhiteSpace())
+        {
+            return defaultResponse();
+        }
+
+        // If the ?logout=true query string is not specified, then we'll redirect to the external login provider
+        // which will then redirect back to the ExternalLoginCallback action
+        if (Request.Query.TryGetValue("logout", out StringValues logout) == false || logout != "true")
+        {
+            return ExternalLogin(oauthRedirectAuthProvider);
+        }
+
+        return defaultResponse();
     }
 
     private async Task<IActionResult> ExternalSignInAsync(ExternalLoginInfo loginInfo, Func<IActionResult> response)
