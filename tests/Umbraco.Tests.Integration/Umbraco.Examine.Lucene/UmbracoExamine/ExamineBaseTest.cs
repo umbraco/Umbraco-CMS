@@ -167,4 +167,10 @@ public abstract class ExamineBaseTest : UmbracoIntegrationTest
             }
         }
     }
+
+    protected string GetIndexPath(string indexName)
+    {
+        var root = TestContext.CurrentContext.TestDirectory.Split("Umbraco.Tests.Integration")[0];
+        return Path.Combine(root, "Umbraco.Tests.Integration", "umbraco", "Data", "TEMP", "ExamineIndexes", indexName);
+    }
 }
