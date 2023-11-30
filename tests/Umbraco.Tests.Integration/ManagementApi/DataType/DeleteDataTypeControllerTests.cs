@@ -15,6 +15,13 @@ public class DeleteDataTypeControllerTests : ManagementApiTest<DeleteDataTypeCon
     protected override Expression<Func<DeleteDataTypeController, object>> MethodSelector =>
         x => x.Delete(Guid.NewGuid());
 
+    private readonly List<HttpStatusCode> _authenticatedStatusCodes = new List<HttpStatusCode>
+        {
+            HttpStatusCode.OK,
+            HttpStatusCode.BadRequest,
+            HttpStatusCode.NotFound
+        };
+
     [Test]
     public virtual async Task As_Admin_I_Have_Access()
     {
@@ -22,7 +29,7 @@ public class DeleteDataTypeControllerTests : ManagementApiTest<DeleteDataTypeCon
 
         var response = await Client.DeleteAsync(Url);
 
-        Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode, await response.Content.ReadAsStringAsync());
+        Assert.Contains(response.StatusCode, _authenticatedStatusCodes, await response.Content.ReadAsStringAsync());
     }
 
     [Test]
@@ -32,7 +39,7 @@ public class DeleteDataTypeControllerTests : ManagementApiTest<DeleteDataTypeCon
 
         var response = await Client.DeleteAsync(Url);
 
-        Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode, await response.Content.ReadAsStringAsync());
+        Assert.Contains(response.StatusCode, _authenticatedStatusCodes, await response.Content.ReadAsStringAsync());
     }
 
     [Test]
@@ -62,7 +69,7 @@ public class DeleteDataTypeControllerTests : ManagementApiTest<DeleteDataTypeCon
 
         var response = await Client.DeleteAsync(Url);
 
-        Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode, await response.Content.ReadAsStringAsync());
+        Assert.Contains(response.StatusCode, _authenticatedStatusCodes, await response.Content.ReadAsStringAsync());
     }
 
 

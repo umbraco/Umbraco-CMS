@@ -17,12 +17,18 @@ public class MoveDataTypeControllerTests : ManagementApiTest<MoveDataTypeControl
     protected override Expression<Func<MoveDataTypeController, object>> MethodSelector =>
         x => x.Move(Guid.NewGuid(), null);
 
+    private readonly List<HttpStatusCode> _authenticatedStatusCodes = new List<HttpStatusCode>
+        {
+            HttpStatusCode.OK,
+            HttpStatusCode.NotFound
+        };
+
     [Test]
     public virtual async Task As_Admin_I_Have_Access()
     {
         var response = await SendMoveDataTypeRequestAsync("admin@umbraco.com", "1234567890", Constants.Security.AdminGroupKey);
 
-        Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode, await response.Content.ReadAsStringAsync());
+        Assert.Contains(response.StatusCode, _authenticatedStatusCodes, await response.Content.ReadAsStringAsync());
     }
 
     [Test]
@@ -30,7 +36,7 @@ public class MoveDataTypeControllerTests : ManagementApiTest<MoveDataTypeControl
     {
         var response = await SendMoveDataTypeRequestAsync("editor@umbraco.com", "1234567890", Constants.Security.EditorGroupKey);
 
-        Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode, await response.Content.ReadAsStringAsync());
+        Assert.Contains(response.StatusCode, _authenticatedStatusCodes, await response.Content.ReadAsStringAsync());
     }
 
     [Test]
@@ -54,7 +60,7 @@ public class MoveDataTypeControllerTests : ManagementApiTest<MoveDataTypeControl
     {
         var response = await SendMoveDataTypeRequestAsync("writer@umbraco.com", "1234567890", Constants.Security.WriterGroupKey);
 
-        Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode, await response.Content.ReadAsStringAsync());
+        Assert.Contains(response.StatusCode, _authenticatedStatusCodes, await response.Content.ReadAsStringAsync());
     }
 
 

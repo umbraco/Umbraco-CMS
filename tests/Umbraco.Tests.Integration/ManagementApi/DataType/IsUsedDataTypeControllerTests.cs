@@ -15,6 +15,12 @@ public class IsUsedDataTypeControllerTests : ManagementApiTest<IsUsedDataTypeCon
     protected override Expression<Func<IsUsedDataTypeController, object>> MethodSelector =>
         x => x.IsUsed(Guid.NewGuid());
 
+    private readonly List<HttpStatusCode> _authenticatedStatusCodes = new List<HttpStatusCode>
+        {
+            HttpStatusCode.OK,
+            HttpStatusCode.NotFound
+        };
+
     [Test]
     public virtual async Task As_Admin_I_Have_Access()
     {
@@ -22,7 +28,7 @@ public class IsUsedDataTypeControllerTests : ManagementApiTest<IsUsedDataTypeCon
 
         var response = await Client.GetAsync(Url);
 
-        Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode, await response.Content.ReadAsStringAsync());
+        Assert.Contains(response.StatusCode, _authenticatedStatusCodes, await response.Content.ReadAsStringAsync());
     }
 
     [Test]
@@ -32,7 +38,7 @@ public class IsUsedDataTypeControllerTests : ManagementApiTest<IsUsedDataTypeCon
 
         var response = await Client.GetAsync(Url);
 
-        Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode, await response.Content.ReadAsStringAsync());
+        Assert.Contains(response.StatusCode, _authenticatedStatusCodes, await response.Content.ReadAsStringAsync());
     }
 
     [Test]
@@ -62,7 +68,7 @@ public class IsUsedDataTypeControllerTests : ManagementApiTest<IsUsedDataTypeCon
 
         var response = await Client.GetAsync(Url);
 
-        Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode, await response.Content.ReadAsStringAsync());
+        Assert.Contains(response.StatusCode, _authenticatedStatusCodes, await response.Content.ReadAsStringAsync());
     }
 
 

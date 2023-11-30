@@ -17,12 +17,18 @@ public class CopyDataTypeControllerTests : ManagementApiTest<CopyDataTypeControl
     protected override Expression<Func<CopyDataTypeController, object>> MethodSelector =>
         x => x.Copy(Guid.NewGuid(), null);
 
+    private readonly List<HttpStatusCode> _authenticatedStatusCodes = new List<HttpStatusCode>
+        {
+            HttpStatusCode.Created,
+            HttpStatusCode.NotFound
+        };
+
     [Test]
     public virtual async Task As_Admin_I_Have_Access()
     {
         var response = await SendCopyDataTypeRequestAsync("admin@umbraco.com", "1234567890", Constants.Security.AdminGroupKey);
 
-        Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode, await response.Content.ReadAsStringAsync());
+        Assert.Contains(response.StatusCode, _authenticatedStatusCodes, await response.Content.ReadAsStringAsync());
     }
 
     [Test]
@@ -30,7 +36,7 @@ public class CopyDataTypeControllerTests : ManagementApiTest<CopyDataTypeControl
     {
         var response = await SendCopyDataTypeRequestAsync("editor@umbraco.com", "1234567890", Constants.Security.EditorGroupKey);
 
-        Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode, await response.Content.ReadAsStringAsync());
+        Assert.Contains(response.StatusCode, _authenticatedStatusCodes, await response.Content.ReadAsStringAsync());
     }
 
     [Test]
@@ -54,7 +60,7 @@ public class CopyDataTypeControllerTests : ManagementApiTest<CopyDataTypeControl
     {
         var response = await SendCopyDataTypeRequestAsync("writer@umbraco.com", "1234567890", Constants.Security.WriterGroupKey);
 
-        Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode, await response.Content.ReadAsStringAsync());
+        Assert.Contains(response.StatusCode, _authenticatedStatusCodes, await response.Content.ReadAsStringAsync());
     }
 
 

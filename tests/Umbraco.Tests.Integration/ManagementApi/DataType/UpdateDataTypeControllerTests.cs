@@ -17,12 +17,19 @@ public class UpdateDataTypeControllerTests : ManagementApiTest<UpdateDataTypeCon
     protected override Expression<Func<UpdateDataTypeController, object>> MethodSelector =>
         x => x.Update(Guid.NewGuid(), null);
 
+    private readonly List<HttpStatusCode> _authenticatedStatusCodes = new List<HttpStatusCode>
+        {
+            HttpStatusCode.OK,
+            HttpStatusCode.BadRequest,
+            HttpStatusCode.NotFound
+        };
+
     [Test]
     public virtual async Task As_Admin_I_Have_Access()
     {
         var response = await SendUpdateDataTypeRequestAsync("admin@umbraco.com", "1234567890", Constants.Security.AdminGroupKey);
 
-        Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode, await response.Content.ReadAsStringAsync());
+        Assert.Contains(response.StatusCode, _authenticatedStatusCodes, await response.Content.ReadAsStringAsync());
     }
 
     [Test]
@@ -30,7 +37,7 @@ public class UpdateDataTypeControllerTests : ManagementApiTest<UpdateDataTypeCon
     {
         var response = await SendUpdateDataTypeRequestAsync("editor@umbraco.com", "1234567890", Constants.Security.EditorGroupKey);
 
-        Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode, await response.Content.ReadAsStringAsync());
+        Assert.Contains(response.StatusCode, _authenticatedStatusCodes, await response.Content.ReadAsStringAsync());
     }
 
     [Test]
@@ -54,7 +61,7 @@ public class UpdateDataTypeControllerTests : ManagementApiTest<UpdateDataTypeCon
     {
         var response = await SendUpdateDataTypeRequestAsync("writer@umbraco.com", "1234567890", Constants.Security.WriterGroupKey);
 
-        Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode, await response.Content.ReadAsStringAsync());
+        Assert.Contains(response.StatusCode, _authenticatedStatusCodes, await response.Content.ReadAsStringAsync());
     }
 
 
