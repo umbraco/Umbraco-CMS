@@ -11,7 +11,10 @@
             bindings: {
                 passwordVal: "<",
                 minPwdLength: "<",
-                minPwdNonAlphaNum: "<"
+                minPwdNonAlphaNum: "<",
+                minPwdDigit: "<",
+                minPwdUppercase: "<",
+                minPwdLowercase: "<"
             }
         });
 
@@ -27,7 +30,7 @@
 
 
         vm.$onInit = onInit;
-      vm.$onChanges = onChanges;
+        vm.$onChanges = onChanges;
 
 
 
@@ -113,12 +116,21 @@
             
             if (remainingLength > 0) {
                 localizationService.localize('user_newPasswordFormatLengthTip', [remainingLength]).then(data => {
-                    vm.passwordTip = data;
-                    vm.tips.forEach((tip) => vm.passwordTip += `<br/>${tip}`);
+                  vm.passwordTip = data;
+                  vm.passwordTip += `<br/>`
+                  vm.tips.forEach((tip) => {
+                    if (tip != '') {
+                      vm.passwordTip += `${tip}<br/>`
+                    }
+                  });
                 });
             } else {
               vm.passwordTip = '';
-              vm.tips.forEach((tip) => vm.passwordTip += `<br/>${tip}`);
+              vm.tips.forEach((tip) => {
+                if (tip != '') {
+                  vm.passwordTip += `${tip}<br/>`
+                }
+              });
             }
         }
     }
