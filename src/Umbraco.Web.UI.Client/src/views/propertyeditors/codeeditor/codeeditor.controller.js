@@ -11,7 +11,7 @@ function CodeEditorController($scope) {
         showPrintMargin: 0,
         disableSearch: 0,
         theme: "chrome",
-        mode: "javascript",
+        mode: "razor",
         firstLineNumber: 1,
         fontSize: "small",
         enableSnippets: 0,
@@ -31,42 +31,26 @@ function CodeEditorController($scope) {
 
       vm.readonly = Object.toBoolean(config.readonly);
 
-      //vm.options = {
-      //    autoFocus: false,
-      //    showGutter: Object.toBoolean(config.showGutter),
-      //    useWrapMode: Object.toBoolean(config.useWrapMode),
-      //    showInvisibles: Object.toBoolean(config.showInvisibles),
-      //    showIndentGuides: Object.toBoolean(config.showIndentGuides),
-      //    useSoftTabs: Object.toBoolean(config.useSoftTabs),
-      //    showPrintMargin: Object.toBoolean(config.showPrintMargin),
-      //    disableSearch: Object.toBoolean(config.disableSearch),
-      //    theme: config.theme,
-      //    mode: config.mode,
-      //    firstLineNumber: config.firstLineNumber,
-      //    advanced: {
-      //        fontSize: config.fontSize,
-      //        enableSnippets: Object.toBoolean(config.enableSnippets),
-      //        enableBasicAutocompletion: Object.toBoolean(config.enableBasicAutocompletion),
-      //        enableLiveAutocompletion: Object.toBoolean(config.enableLiveAutocompletion),
-      //        minLines: config.minLines,
-      //        maxLines: config.maxLines,
-      //        wrap: Object.toBoolean(config.useWrapMode)
-      //    }
-      //};
-
       vm.aceOption = {
-          mode: "razor",
-          theme: "chrome",
-          showPrintMargin: false,
           autoFocus: false,
+          showGutter: Object.toBoolean(config.showGutter),
+          useWrapMode: Object.toBoolean(config.useWrapMode),
+          showInvisibles: Object.toBoolean(config.showInvisibles),
+          showIndentGuides: Object.toBoolean(config.showIndentGuides),
+          useSoftTabs: Object.toBoolean(config.useSoftTabs),
+          showPrintMargin: Object.toBoolean(config.showPrintMargin),
+          disableSearch: Object.toBoolean(config.disableSearch),
+          mode: config.theme,
+          theme: config.theme,
+          firstLineNumber: config.firstLineNumber,
           advanced: {
-              fontSize: "14px",
-              enableSnippets: false,
-              enableBasicAutocompletion: true,
-              enableLiveAutocompletion: false,
-              //minLines: config.minLines,
-              //maxLines: config.maxLines,
-              wrap: true
+              fontSize: config.fontSize,
+              enableSnippets: Object.toBoolean(config.enableSnippets),
+              enableBasicAutocompletion: Object.toBoolean(config.enableBasicAutocompletion),
+              enableLiveAutocompletion: Object.toBoolean(config.enableLiveAutocompletion),
+              minLines: config.minLines,
+              maxLines: config.maxLines,
+              wrap: Object.toBoolean(config.useWrapMode)
           },
           onLoad: function (aceEditor) {
               vm.aceEditor = aceEditor;
