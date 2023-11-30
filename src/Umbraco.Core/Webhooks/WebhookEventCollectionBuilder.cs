@@ -86,7 +86,7 @@ public class WebhookEventCollectionBuilder : OrderedCollectionBuilderBase<Webhoo
         return null;
     }
 
-    public WebhookEventCollectionBuilder AddAllTheWebhooks() =>
+    public WebhookEventCollectionBuilder AddAllAvailableWebhooks() =>
         this.AddContentWebhooks()
             .AddDataTypeWebhooks()
             .AddDictionaryWebhooks()
