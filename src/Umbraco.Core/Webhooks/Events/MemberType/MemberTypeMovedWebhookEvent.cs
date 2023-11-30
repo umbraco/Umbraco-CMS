@@ -6,7 +6,7 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events.MemberType;
 
-[WebhookEvent("MemberType Moved")]
+[WebhookEvent("Member Type Moved")]
 public class MemberTypeMovedWebhookEvent : WebhookEventBase<MemberTypeMovedNotification>
 {
     public MemberTypeMovedWebhookEvent(

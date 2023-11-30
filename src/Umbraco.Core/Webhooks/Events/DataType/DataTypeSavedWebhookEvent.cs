@@ -6,7 +6,7 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events.DataType;
 
-[WebhookEvent("DataType Saved")]
+[WebhookEvent("Data Type Saved")]
 public class DataTypeSavedWebhookEvent : WebhookEventBase<DataTypeSavedNotification>
 {
     public DataTypeSavedWebhookEvent(

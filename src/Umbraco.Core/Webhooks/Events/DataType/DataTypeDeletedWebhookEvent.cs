@@ -6,7 +6,7 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events.DataType;
 
-[WebhookEvent("DataType Deleted")]
+[WebhookEvent("Data Type Deleted")]
 public class DataTypeDeletedWebhookEvent : WebhookEventBase<DataTypeSavedNotification>
 {
     public DataTypeDeletedWebhookEvent(

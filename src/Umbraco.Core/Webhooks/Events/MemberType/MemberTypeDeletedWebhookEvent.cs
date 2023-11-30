@@ -6,7 +6,7 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events.MemberType;
 
-[WebhookEvent("MemberType Deleted")]
+[WebhookEvent("Member Type Deleted")]
 public class MemberTypeDeletedWebhookEvent : WebhookEventBase<MemberTypeDeletedNotification>
 {
     public MemberTypeDeletedWebhookEvent(

@@ -4,12 +4,12 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 
-namespace Umbraco.Cms.Core.Webhooks.Events.Media;
+namespace Umbraco.Cms.Core.Webhooks.Events.RelationType;
 
-[WebhookEvent("MediaType Deleted")]
-public class MediaTypeDeletedWebhookEvent : WebhookEventBase<MediaTypeDeletedNotification>
+[WebhookEvent("Relation Type Deleted")]
+public class RelationTypeDeletedWebhookEvent : WebhookEventBase<RelationTypeDeletedNotification>
 {
-    public MediaTypeDeletedWebhookEvent(
+    public RelationTypeDeletedWebhookEvent(
         IWebhookFiringService webhookFiringService,
         IWebhookService webHookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
@@ -18,8 +18,9 @@ public class MediaTypeDeletedWebhookEvent : WebhookEventBase<MediaTypeDeletedNot
     {
     }
 
-    public override string Alias => "mediaTypeDeleted";
 
-    public override object? ConvertNotificationToRequestPayload(MediaTypeDeletedNotification notification)
+    public override string Alias => "relationTypeDeleted";
+
+    public override object? ConvertNotificationToRequestPayload(RelationTypeDeletedNotification notification)
         => notification.DeletedEntities;
 }
