@@ -1585,6 +1585,13 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="elementDoesNotSupport">Ceci n'est pas d'application pour un Type d'Elément</key>
     <key alias="propertyHasChanges">Vous avez apporté des modifications à cette propriété. Etes-vous certain.e de vouloir les annuler?</key>
   </area>
+ <area alias="webhooks">
+    <key alias="addWebhook">Créer un webhook</key>
+    <key alias="addWebhookHeader">Ajouter un header au webhook</key>
+    <key alias="logs">Logs</key>
+    <key alias="addDocumentType">Ajouter un Type de Document</key>
+    <key alias="addMediaType">Ajouter un Type de Media</key>
+  </area>
   <area alias="languages">
     <key alias="addLanguage">Ajouter une langue</key>
     <key alias="mandatoryLanguage">Langue obligatoire</key>
@@ -1715,6 +1722,7 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="settingsGroup">Configuration</key>
     <key alias="templatingGroup">Modélisation</key>
     <key alias="thirdPartyGroup">Parties Tierces</key>
+    <key alias="webhooks">Webhooks</key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">Nouvelle mise à jour disponible</key>
