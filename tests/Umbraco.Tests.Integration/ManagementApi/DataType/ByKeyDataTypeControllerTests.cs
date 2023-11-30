@@ -6,9 +6,6 @@ using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.DataType;
 
-/// <summary>
-///
-/// </summary>
 [TestFixture]
 public class ByKeyDataTypeControllerTests : ManagementApiTest<ByKeyDataTypeController>
 {

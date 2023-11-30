@@ -6,9 +6,7 @@ using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.AuditLog;
 
-/// <summary>
-///
-/// </summary>
+
 [TestFixture]
 public class ByKeyAuditLogControllerTests : ManagementApiTest<ByKeyAuditLogController>
 {

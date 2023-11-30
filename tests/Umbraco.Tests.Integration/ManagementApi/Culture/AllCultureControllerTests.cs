@@ -6,9 +6,6 @@ using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.Culture;
 
-/// <summary>
-///
-/// </summary>
 [TestFixture]
 public class AllCultureControllerTests : ManagementApiTest<AllCultureController>
 {

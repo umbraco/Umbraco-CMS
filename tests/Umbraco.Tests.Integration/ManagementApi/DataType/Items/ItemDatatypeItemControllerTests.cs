@@ -6,9 +6,6 @@ using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.DataType.Items;
 
-/// <summary>
-///
-/// </summary>
 [TestFixture]
 public class ItemDatatypeItemControllerTests : ManagementApiTest<ItemDatatypeItemController>
 {
