@@ -8,13 +8,7 @@ import { UmbExtensionManifestInitializer } from '@umbraco-cms/backoffice/extensi
 @customElement('umb-backoffice-header-sections')
 export class UmbBackofficeHeaderSectionsElement extends UmbLitElement {
 	@state()
-	private _open = false;
-
-	@state()
 	private _sections: Array<UmbExtensionManifestInitializer<ManifestSection>> = [];
-
-	@state()
-	private _extraSections: Array<ManifestSection> = [];
 
 	@state()
 	private _currentSectionAlias = '';
@@ -29,18 +23,6 @@ export class UmbBackofficeHeaderSectionsElement extends UmbLitElement {
 			this._observeSections();
 			this._observeCurrentSection();
 		});
-	}
-
-	private _handleMore(e: MouseEvent) {
-		e.stopPropagation();
-		this._open = !this._open;
-	}
-
-	private _handleLabelClick() {
-		const moreTab = this.shadowRoot?.getElementById('moreTab');
-		moreTab?.setAttribute('active', 'true');
-
-		this._open = false;
 	}
 
 	private _observeSections() {
