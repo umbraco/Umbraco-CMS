@@ -1942,6 +1942,13 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="logs">Logs</key>
     <key alias="noHeaders">No webhook headers have been added</key>
     <key alias="noEventsFound">No events were found.</key>
+    <key alias="enabled">Enabled</key>
+    <key alias="events">Events</key>
+    <key alias="event">Event</key>
+    <key alias="url">Url</key>
+    <key alias="types">Types</key>
+    <key alias="webhookKey">Webhook key</key>
+    <key alias="retryCount">Retry count</key>
   </area>
   <area alias="languages">
     <key alias="addLanguage">Add language</key>
