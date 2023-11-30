@@ -1,16 +1,13 @@
 import { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context.js';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UUIToggleElement } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
-import { UmbWorkspaceEditorViewExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-document-type-workspace-view-settings')
-export class UmbDocumentTypeWorkspaceViewSettingsElement
-	extends UmbLitElement
-	implements UmbWorkspaceEditorViewExtensionElement
-{
+export class UmbDocumentTypeWorkspaceViewSettingsElement extends UmbLitElement implements UmbWorkspaceViewElement {
 	#workspaceContext?: UmbDocumentTypeWorkspaceContext;
 
 	@state()
@@ -34,11 +31,11 @@ export class UmbDocumentTypeWorkspaceViewSettingsElement
 		if (!this.#workspaceContext) return;
 		this.observe(
 			this.#workspaceContext.variesByCulture,
-			(variesByCulture) => (this._variesByCulture = variesByCulture)
+			(variesByCulture) => (this._variesByCulture = variesByCulture),
 		);
 		this.observe(
 			this.#workspaceContext.variesBySegment,
-			(variesBySegment) => (this._variesBySegment = variesBySegment)
+			(variesBySegment) => (this._variesBySegment = variesBySegment),
 		);
 		this.observe(this.#workspaceContext.isElement, (isElement) => (this._isElement = isElement));
 	}

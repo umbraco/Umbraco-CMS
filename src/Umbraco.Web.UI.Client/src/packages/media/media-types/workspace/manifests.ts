@@ -1,7 +1,7 @@
 import type {
 	ManifestWorkspace,
 	ManifestWorkspaceAction,
-	ManifestWorkspaceEditorView,
+	ManifestWorkspaceView,
 	ManifestWorkspaceViewCollection,
 } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -17,9 +17,9 @@ const workspace: ManifestWorkspace = {
 	},
 };
 
-const workspaceEditorViews: Array<ManifestWorkspaceEditorView> = [
+const workspaceViews: Array<ManifestWorkspaceView> = [
 	{
-		type: 'workspaceEditorView',
+		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.MediaType.Design',
 		name: 'Media Type Workspace Design View',
 		js: () => import('./views/design/media-type-workspace-view-edit.element.js'),
@@ -37,7 +37,7 @@ const workspaceEditorViews: Array<ManifestWorkspaceEditorView> = [
 		],
 	},
 	{
-		type: 'workspaceEditorView',
+		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.MediaType.Structure',
 		name: 'Media Type Workspace Structure View',
 		js: () => import('./views/structure/media-type-workspace-view-structure.element.js'),
@@ -76,4 +76,4 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 	},
 ];
 
-export const manifests = [workspace, ...workspaceEditorViews, ...workspaceViewCollections, ...workspaceActions];
+export const manifests = [workspace, ...workspaceViews, ...workspaceViewCollections, ...workspaceActions];

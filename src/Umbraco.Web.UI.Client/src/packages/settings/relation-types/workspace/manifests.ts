@@ -2,7 +2,7 @@ import { UmbSaveWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 import type {
 	ManifestWorkspace,
 	ManifestWorkspaceAction,
-	ManifestWorkspaceEditorView,
+	ManifestWorkspaceView,
 } from '@umbraco-cms/backoffice/extension-registry';
 
 const workspace: ManifestWorkspace = {
@@ -15,9 +15,9 @@ const workspace: ManifestWorkspace = {
 	},
 };
 
-const workspaceViews: Array<ManifestWorkspaceEditorView> = [
+const workspaceViews: Array<ManifestWorkspaceView> = [
 	{
-		type: 'workspaceEditorView',
+		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.RelationType.RelationType',
 		name: 'Relation Type Workspace RelationType View',
 		js: () => import('./views/relation-type/relation-type-workspace-view-relation-type.element.js'),
@@ -35,7 +35,7 @@ const workspaceViews: Array<ManifestWorkspaceEditorView> = [
 		],
 	},
 	{
-		type: 'workspaceEditorView',
+		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.RelationType.Relation',
 		name: 'Relation Type Workspace Relation View',
 		js: () => import('./views/relation/workspace-view-relation-type-relation.element.js'),

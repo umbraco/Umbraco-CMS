@@ -1,7 +1,7 @@
-import type { UmbMenuItemExtensionElement } from '../interfaces/menu-item-extension-element.interface.js';
+import type { UmbMenuItemElement } from '../interfaces/menu-item-element.interface.js';
 import type { ManifestElement } from '@umbraco-cms/backoffice/extension-api';
 
-export interface ManifestMenuItem extends ManifestElement<UmbMenuItemExtensionElement> {
+export interface ManifestMenuItem extends ManifestElement<UmbMenuItemElement> {
 	type: 'menuItem';
 	meta: MetaMenuItem;
 }

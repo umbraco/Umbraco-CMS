@@ -1,5 +1,6 @@
 import type { UmbExtensionCondition } from '../condition/extension-condition.interface.js';
-import { UmbBaseController, type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import {
 	type ManifestCondition,
 	type ManifestWithDynamicConditions,

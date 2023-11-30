@@ -1,6 +1,7 @@
 import { UmbCollectionConfiguration, UmbCollectionContext } from './types.js';
 import { UmbCollectionRepository } from '@umbraco-cms/backoffice/repository';
-import { UmbBaseController, type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbArrayState, UmbNumberState, UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import {

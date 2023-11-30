@@ -12,7 +12,8 @@ import {
 	TextFileResponseModelBaseModel,
 	UpdateScriptRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
-import { UmbBaseController, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 

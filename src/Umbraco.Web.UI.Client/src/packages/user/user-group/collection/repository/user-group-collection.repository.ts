@@ -3,7 +3,8 @@ import { UMB_USER_GROUP_STORE_CONTEXT_TOKEN, UmbUserGroupStore } from '../../rep
 import { UmbUserGroupCollectionServerDataSource } from './user-group-collection.server.data-source.js';
 import { UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbCollectionDataSource, UmbCollectionRepository } from '@umbraco-cms/backoffice/repository';
-import { UmbBaseController, type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 
 export class UmbUserGroupCollectionRepository extends UmbBaseController implements UmbCollectionRepository {
 	#init;

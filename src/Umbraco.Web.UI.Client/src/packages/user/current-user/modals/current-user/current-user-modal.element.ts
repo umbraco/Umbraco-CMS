@@ -1,7 +1,7 @@
-import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
-import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 import { UMB_CURRENT_USER_CONTEXT } from '../../current-user.context.js';
 import { type UmbCurrentUser } from '../../types.js';
+import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
+import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, CSSResultGroup, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalContext } from '@umbraco-cms/backoffice/modal';

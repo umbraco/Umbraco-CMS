@@ -1,6 +1,6 @@
-import { UmbUserDetail } from '../types.js';
+import { UmbUserDetailModel } from '../types.js';
 import { UmbUserWorkspaceContext } from '../workspace/user-workspace.context.js';
-import { UmbBaseController } from '@umbraco-cms/backoffice/controller-api';
+import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import { isCurrentUser } from '@umbraco-cms/backoffice/current-user';
 import {
 	UmbConditionConfigBase,
@@ -13,7 +13,7 @@ export class UmbUserActionConditionBase extends UmbBaseController implements Umb
 	config: UmbConditionConfigBase;
 	permitted = false;
 	#onChange: () => void;
-	protected userData?: UmbUserDetail;
+	protected userData?: UmbUserDetailModel;
 
 	constructor(args: UmbConditionControllerArguments<UmbConditionConfigBase>) {
 		super(args.host);
