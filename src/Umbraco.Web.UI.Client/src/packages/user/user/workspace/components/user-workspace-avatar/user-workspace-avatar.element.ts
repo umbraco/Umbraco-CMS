@@ -69,18 +69,34 @@ export class UmbUserAvatarElement extends UmbLitElement {
 		];
 	};
 
-	#onAvatarUploadSubmit = (event: SubmitEvent) => {
-		event.preventDefault();
+	#uploadAvatar = async () => {
+		try {
+			const selectedFile = await this.#selectAvatar();
+			this.#userWorkspaceContext?.uploadAvatar(selectedFile);
+		} catch (error) {
+			console.log(error);
+		}
+	};
 
-		const form = event.target as HTMLFormElement;
-		if (!form) return;
+	#selectAvatar = async () => {
+		return new Promise((resolve, reject) => {
+			if (!this._avatarFileField) {
+				reject("Can't find avatar file field");
+				return;
+			}
 
-		if (!form.checkValidity()) return;
+			this._avatarFileField.addEventListener('change', (event) => {
+				const file = event.target.files?.[0];
+				if (!file) {
+					reject("Can't find avatar file");
+					return;
+				}
 
-		const formData = new FormData(form);
-		const avatarFile = formData.get('avatarFile') as File;
+				resolve(file);
+			});
 
-		this.#userWorkspaceContext?.uploadAvatar(avatarFile);
+			this._avatarFileField.click();
+		});
 	};
 
 	#deleteAvatar = async () => {
@@ -108,15 +124,14 @@ export class UmbUserAvatarElement extends UmbLitElement {
 	render() {
 		return html`
 			<uui-box>
-				<form id="AvatarUploadForm" @submit=${this.#onAvatarUploadSubmit}>
+				<form id="AvatarUploadForm" novalidate>
 					<uui-avatar
 						id="Avatar"
 						.name=${this._user?.name || ''}
 						img-src=${ifDefined(this.#hasAvatar() ? this._userAvatarUrls[0].url : undefined)}
 						img-srcset=${ifDefined(this.#hasAvatar() ? this.#getAvatarSrcset() : undefined)}></uui-avatar>
-					(WIP)
-					<input id="AvatarFileField" type="file" name="avatarFile" required />
-					<uui-button type="submit" label="${this.localize.term('user_changePhoto')}"></uui-button>
+					<input id="AvatarFileField" type="file" name="avatarFile" required hidden />
+					<uui-button label="${this.localize.term('user_changePhoto')}" @click=${this.#uploadAvatar}></uui-button>
 					${this.#hasAvatar()
 						? html`
 								<uui-button
