@@ -1,7 +1,6 @@
-import { manifest as prevalues } from './config/prevalues/manifests.js';
 import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension-registry';
 
-const manifest: ManifestPropertyEditorUi = {
+export const manifest: ManifestPropertyEditorUi = {
 	type: 'propertyEditorUi',
 	alias: 'Umb.PropertyEditorUi.ColorPicker',
 	name: 'Color Picker Property Editor UI',
@@ -13,7 +12,3 @@ const manifest: ManifestPropertyEditorUi = {
 		group: 'pickers',
 	},
 };
-
-const config: Array<ManifestPropertyEditorUi> = [prevalues];
-
-export const manifests = [manifest, ...config];

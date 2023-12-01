@@ -23,7 +23,7 @@ const SORTER_CONFIG: UmbSorterConfig<UmbSwatchDetails> = {
 	querySelectModelToElement: (container: HTMLElement, modelEntry: UmbSwatchDetails) => {
 		return container.querySelector('data-sort-entry-id=[' + modelEntry.value + ']');
 	},
-	identifier: 'Umb.SorterIdentifier.ColorPicker.Prevalues',
+	identifier: 'Umb.SorterIdentifier.ColorEditor',
 	itemSelector: 'umb-multiple-color-picker-item-input',
 	containerSelector: '#sorter-wrapper',
 };
@@ -44,6 +44,8 @@ export class UmbMultipleColorPickerInputElement extends FormControlMixin(UmbLitE
 			frozenArray.splice(indexToMove, 1);
 			frozenArray.splice(args.newIndex, 0, args.item);
 			this.items = frozenArray;
+
+			console.log(args.newIndex);
 
 			return true;
 		},

@@ -2,11 +2,11 @@ import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension
 
 export const manifest: ManifestPropertyEditorUi = {
 	type: 'propertyEditorUi',
-	alias: 'Umb.PropertyEditorUi.ColorPicker.Prevalues',
-	name: 'Color Picker Prevalues Property Editor UI',
-	js: () => import('./property-editor-ui-color-picker-prevalues.element.js'),
+	alias: 'Umb.PropertyEditorUi.ColorEditor',
+	name: 'Color Editor Property Editor UI',
+	js: () => import('./property-editor-ui-color-editor.element.js'),
 	meta: {
-		label: 'Color Picker Prevalues',
+		label: 'Color Editor',
 		icon: 'icon-page-add',
 		group: 'Umbraco.DropDown.Flexible',
 	},
