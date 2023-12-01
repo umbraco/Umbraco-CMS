@@ -45,9 +45,7 @@ export class UmbAliasInput2Element extends FormControlMixin(UmbLitElement) {
 	}
 
 	disconnectedCallback(): void {
-		if (this.parentElement) {
-			this.parentElement.removeEventListener('input', this.#parentChange);
-		}
+	  this.listenToElement?.removeEventListener('input', this.#parentChange);
 	}
 
 	#onToggleAliasLock() {
