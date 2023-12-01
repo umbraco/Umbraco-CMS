@@ -111,7 +111,7 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 
 	#openDocumentPicker = () => {
 		this.#modalManagerContext
-			?.open(UMB_DOCUMENT_PICKER_MODAL)
+			?.open(UMB_DOCUMENT_PICKER_MODAL, { hideTreeRoot: true })
 			.onSubmit()
 			.then((result) => {
 				this.#updateQueryRequest({ rootContentId: result.selection[0] });
