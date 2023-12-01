@@ -651,7 +651,7 @@ stages:
             artifact: npm
           - bash: |
               # Check if we are on a nightly build
-              if [ $isNightly = true ]; then
+              if [ $isNightly = "true" ]; then
                   echo "##[debug]Nightly build detected"
                   registry="https://www.myget.org/F/umbraconightly/npm/"
               else
