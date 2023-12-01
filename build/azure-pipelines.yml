@@ -664,14 +664,11 @@ stages:
             env:
               isNightly: ${{parameters.isNightly}}
           - task: npmAuthenticate@0
+            displayName: Authenticate with npm
             inputs:
               workingFile: '$(Pipeline.Workspace)/npm/.npmrc'
               customEndpoint: 'MyGet (npm) - Umbracoprereleases, MyGet (npm) - Umbraconightly'
           - bash: |
-              # Log content of .npmrc to debug
-              echo "##[debug]Content of .npmrc"
-              cat .npmrc
-
               # Setup temp npm project to load in defaults from the local .npmrc
               npm init -y
 
@@ -722,6 +719,9 @@ stages:
           - checkout: none
           - download: current
             artifact: npm
+          - bash: echo "@umbraco-cms:registry=https://registry.npmjs.org" >> .npmrc
+            workingDirectory: $(Pipeline.Workspace)/npm
+            displayName: Add scoped registry to .npmrc
           - task: npmAuthenticate@0
             displayName: Authenticate with npm
             inputs:
