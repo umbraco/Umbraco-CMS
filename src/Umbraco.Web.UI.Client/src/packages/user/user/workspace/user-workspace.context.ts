@@ -97,13 +97,27 @@ export class UmbUserWorkspaceContext
 	async uploadAvatar(file: File) {
 		const id = this.getEntityId();
 		if (!id) throw new Error('Id is missing');
-		return this.repository.uploadAvatar(id, file);
+		const { error } = await this.repository.uploadAvatar(id, file);
+
+		// TODO: temp solution until we know how to update stores
+		if (!error) {
+			await this.#reloadCurrentUser(id);
+		}
+
+		return { error };
 	}
 
 	async deleteAvatar() {
 		const id = this.getEntityId();
 		if (!id) throw new Error('Id is missing');
-		return this.repository.deleteAvatar(id);
+		const { error } = await this.repository.deleteAvatar(id);
+
+		// TODO: temp solution until we know how to update stores
+		if (!error) {
+			await this.#reloadCurrentUser(id);
+		}
+
+		return { error };
 	}
 
 	destroy(): void {
