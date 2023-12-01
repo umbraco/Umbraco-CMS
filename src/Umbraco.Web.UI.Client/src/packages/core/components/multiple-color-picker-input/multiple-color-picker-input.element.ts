@@ -15,7 +15,6 @@ import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbInputEvent, UmbChangeEvent, UmbDeleteEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbSorterConfig, UmbSorterController } from '@umbraco-cms/backoffice/sorter';
-import { c } from 'msw/lib/glossary-de6278a9.js';
 
 const SORTER_CONFIG: UmbSorterConfig<UmbSwatchDetails> = {
 	compareElementToModel: (element: HTMLElement, model: UmbSwatchDetails) => {
