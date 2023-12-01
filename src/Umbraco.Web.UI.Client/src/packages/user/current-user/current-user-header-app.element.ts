@@ -57,7 +57,10 @@ export class UmbCurrentUserHeaderAppElement extends UmbLitElement {
 	}
 
 	#setUserAvatarUrls = async (user: UmbCurrentUser | undefined) => {
-		if (!user || !user.avatarUrls || user.avatarUrls.length === 0) return;
+		if (!user || !user.avatarUrls || user.avatarUrls.length === 0) {
+			this._userAvatarUrls = [];
+			return;
+		}
 
 		// TODO: remove this when we get absolute urls from the server
 		// TODO: temp hack because we can't prefix local urls with the server url.
