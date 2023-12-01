@@ -1,4 +1,4 @@
-import { UmbId } from '../../index.js';
+import { UmbId } from '@umbraco-cms/backoffice/id';
 import { TemporaryFileQueueItem, UmbTemporaryFileManager } from '../../temporary-file/temporary-file-manager.class.js';
 import {
 	css,
