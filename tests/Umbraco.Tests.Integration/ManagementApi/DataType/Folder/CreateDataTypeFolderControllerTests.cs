@@ -9,86 +9,59 @@ using Umbraco.Cms.Core;
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.DataType.Folder;
 
 [TestFixture]
-public class CreateDataTypeFolderControllerTests : ManagementApiTest<CreateDataTypeFolderController>
+public class CreateDataTypeFolderControllerTests : ManagementApiUserGroupTestBase<CreateDataTypeFolderController>
 {
     protected override Expression<Func<CreateDataTypeFolderController, object>> MethodSelector =>
         x => x.Create(null);
 
-    private readonly List<HttpStatusCode> _authenticatedStatusCodes = new List<HttpStatusCode>
-        {
-            HttpStatusCode.Created,
-            HttpStatusCode.BadRequest,
-            HttpStatusCode.NotFound
-        };
+    protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
+    {
+        Allowed = true, ExpectedStatusCode = HttpStatusCode.Created,
+    };
+
+    protected override UserGroupAssertionModel EditorUserGroupAssertionModel => new()
+    {
+        Allowed = true, ExpectedStatusCode = HttpStatusCode.Created,
+    };
+
+    protected override UserGroupAssertionModel SensitiveDataUserGroupAssertionModel => new()
+    {
+        Allowed = false, ExpectedStatusCode = HttpStatusCode.Forbidden,
+    };
+
+    protected override UserGroupAssertionModel TranslatorUserGroupAssertionModel => new()
+    {
+        Allowed = false, ExpectedStatusCode = HttpStatusCode.Forbidden,
+    };
+
+    protected override UserGroupAssertionModel WriterUserGroupAssertionModel => new()
+    {
+        Allowed = true, ExpectedStatusCode = HttpStatusCode.Created,
+    };
+
+    protected override UserGroupAssertionModel UnauthorizedUserGroupAssertionModel => new()
+    {
+        Allowed = false, ExpectedStatusCode = HttpStatusCode.Unauthorized,
+    };
 
     [Test]
-    public virtual async Task As_Admin_I_Have_Access()
+    public override async Task As_Unauthorized_I_Dont_Have_Access()
     {
-        var response = await SendCreateDataTypeFolderRequestAsync("admin@umbraco.com", "1234567890", Constants.Security.AdminGroupKey);
-
-        Assert.Contains(response.StatusCode, _authenticatedStatusCodes, await response.Content.ReadAsStringAsync());
-    }
-
-    [Test]
-    public virtual async Task As_Editor_I_Have_Access()
-    {
-        var response = await SendCreateDataTypeFolderRequestAsync("editor@umbraco.com", "1234567890", Constants.Security.EditorGroupKey);
-
-        Assert.Contains(response.StatusCode, _authenticatedStatusCodes, await response.Content.ReadAsStringAsync());
-    }
-
-    [Test]
-    public virtual async Task As_Sensitive_Data_I_Have_No_Access()
-    {
-        var response = await SendCreateDataTypeFolderRequestAsync("sensitiveData@umbraco.com", "1234567890", Constants.Security.SensitiveDataGroupKey);
-
-        Assert.AreEqual(HttpStatusCode.Forbidden, response.StatusCode, await response.Content.ReadAsStringAsync());
-    }
-
-    [Test]
-    public virtual async Task As_Translator_I_Have_No_Access()
-    {
-        var response = await SendCreateDataTypeFolderRequestAsync("translator@umbraco.com", "1234567890", Constants.Security.TranslatorGroupKey);
-
-        Assert.AreEqual(HttpStatusCode.Forbidden, response.StatusCode, await response.Content.ReadAsStringAsync());
-    }
-
-    [Test]
-    public virtual async Task As_Writer_I_Have_Access()
-    {
-        var response = await SendCreateDataTypeFolderRequestAsync("writer@umbraco.com", "1234567890", Constants.Security.WriterGroupKey);
-
-        Assert.Contains(response.StatusCode, _authenticatedStatusCodes, await response.Content.ReadAsStringAsync());
-    }
-
-
-    [Test]
-    public virtual async Task Unauthorized_When_No_Token_Is_Provided()
-    {
-        var createFolderModel = GenerateCreateFolderRequestModel();
+        CreateFolderRequestModel createFolderModel =
+            new() { Id = Guid.NewGuid(), ParentId = null, Name = "TestFolderName" };
 
         var response = await Client.PostAsync(Url, JsonContent.Create(createFolderModel));
 
-        Assert.AreEqual(HttpStatusCode.Unauthorized, response.StatusCode, await response.Content.ReadAsStringAsync());
+        Assert.AreEqual(UnauthorizedUserGroupAssertionModel.ExpectedStatusCode, response.StatusCode, await response.Content.ReadAsStringAsync());
     }
 
-    private async Task<HttpResponseMessage> SendCreateDataTypeFolderRequestAsync(string userEmail, string userPassword, Guid userGroupKey)
+    protected override async Task<HttpResponseMessage> AuthorizedRequest(Guid userGroupKey)
     {
-        await AuthenticateClientAsync(Client, userEmail, userPassword, userGroupKey);
+        await AuthenticateClientAsync(Client, UserEmail, UserPassword, userGroupKey);
 
-        var createFolderModel = GenerateCreateFolderRequestModel();
+        CreateFolderRequestModel createFolderModel =
+            new() { Id = Guid.NewGuid(), ParentId = null, Name = "TestFolderName" };
 
         return await Client.PostAsync(Url, JsonContent.Create(createFolderModel));
     }
-
-    private CreateFolderRequestModel GenerateCreateFolderRequestModel()
-    {
-        return new CreateFolderRequestModel
-        {
-            Id = Guid.NewGuid(),
-            ParentId = null,
-            Name = "TestFolderName"
-        };
-    }
-
 }

@@ -6,55 +6,39 @@ using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.AuditLog;
 
-
 [TestFixture]
-public class ByKeyAuditLogControllerTests : ManagementApiBaseTest<ByKeyAuditLogController>
+public class ByKeyAuditLogControllerTests : ManagementApiUserGroupTestBase<ByKeyAuditLogController>
 {
     protected override Expression<Func<ByKeyAuditLogController, object>> MethodSelector =>
         x => x.ByKey(Constants.Security.SuperUserKey, Direction.Ascending, null, 0, 100);
 
-    protected override List<HttpStatusCode> AuthenticatedStatusCodes { get; } = new()
+    protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
-        HttpStatusCode.OK
+        Allowed = true, ExpectedStatusCode = HttpStatusCode.OK,
     };
 
-    [Test]
-    public virtual async Task As_Admin_I_Have_Access()
+    protected override UserGroupAssertionModel EditorUserGroupAssertionModel => new()
     {
-        var response = await AccessAsAdmin();
+        Allowed = true, ExpectedStatusCode = HttpStatusCode.OK,
+    };
 
-        AssertStatusCode(response, true);
-    }
-
-    [Test]
-    public virtual async Task As_Editor_I_Have_Access()
+    protected override UserGroupAssertionModel SensitiveDataUserGroupAssertionModel => new()
     {
-        var response = await AccessAsEditor();
+        Allowed = false, ExpectedStatusCode = HttpStatusCode.Forbidden,
+    };
 
-        AssertStatusCode(response, true);
-    }
-
-    [Test]
-    public virtual async Task As_Sensitive_Data_I_Have_No_Access()
+    protected override UserGroupAssertionModel TranslatorUserGroupAssertionModel => new()
     {
-        var response = await AccessAsSensitiveData();
+        Allowed = false, ExpectedStatusCode = HttpStatusCode.Forbidden,
+    };
 
-        AssertStatusCode(response, false);
-    }
-
-    [Test]
-    public virtual async Task As_Translator_I_Have_No_Access()
+    protected override UserGroupAssertionModel WriterUserGroupAssertionModel => new()
     {
-        var response = await AccessAsTranslator();
+        Allowed = true, ExpectedStatusCode = HttpStatusCode.OK,
+    };
 
-        AssertStatusCode(response, false);
-    }
-
-    [Test]
-    public virtual async Task As_Writer_I_Have_Access()
+    protected override UserGroupAssertionModel UnauthorizedUserGroupAssertionModel => new()
     {
-        var response = await AccessAsWriter();
-
-        AssertStatusCode(response, true);
-    }
+        Allowed = false, ExpectedStatusCode = HttpStatusCode.Unauthorized,
+    };
 }

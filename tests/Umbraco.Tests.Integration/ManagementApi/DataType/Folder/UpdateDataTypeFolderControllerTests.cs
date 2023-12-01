@@ -5,88 +5,69 @@ using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Controllers.DataType.Folder;
 using Umbraco.Cms.Api.Management.ViewModels.Folder;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.DataType.Folder;
 
 [TestFixture]
-public class UpdateDataTypeFolderControllerTests : ManagementApiTest<UpdateDataTypeFolderController>
+public class UpdateDataTypeFolderControllerTests : ManagementApiUserGroupTestBase<UpdateDataTypeFolderController>
 {
+    private readonly Guid _folderId = Guid.NewGuid();
+
+    private IDataTypeContainerService DataTypeContainerService => GetRequiredService<IDataTypeContainerService>();
+
     protected override Expression<Func<UpdateDataTypeFolderController, object>> MethodSelector =>
-        x => x.Update(Guid.NewGuid(), null);
+        x => x.Update(_folderId, null);
 
-    private readonly List<HttpStatusCode> _authenticatedStatusCodes = new List<HttpStatusCode>
-        {
-            HttpStatusCode.OK,
-            HttpStatusCode.BadRequest,
-            HttpStatusCode.NotFound
-        };
+    [SetUp]
+    public void Setup() => DataTypeContainerService.CreateAsync(_folderId, "FolderName", null, Constants.Security.SuperUserKey);
+
+    protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
+    {
+        Allowed = true, ExpectedStatusCode = HttpStatusCode.OK,
+    };
+
+    protected override UserGroupAssertionModel EditorUserGroupAssertionModel => new()
+    {
+        Allowed = true, ExpectedStatusCode = HttpStatusCode.OK,
+    };
+
+    protected override UserGroupAssertionModel SensitiveDataUserGroupAssertionModel => new()
+    {
+        Allowed = false, ExpectedStatusCode = HttpStatusCode.Forbidden,
+    };
+
+    protected override UserGroupAssertionModel TranslatorUserGroupAssertionModel => new()
+    {
+        Allowed = false, ExpectedStatusCode = HttpStatusCode.Forbidden,
+    };
+
+    protected override UserGroupAssertionModel WriterUserGroupAssertionModel => new()
+    {
+        Allowed = true, ExpectedStatusCode = HttpStatusCode.OK,
+    };
+
+    protected override UserGroupAssertionModel UnauthorizedUserGroupAssertionModel => new()
+    {
+        Allowed = false, ExpectedStatusCode = HttpStatusCode.Unauthorized,
+    };
 
     [Test]
-    public virtual async Task As_Admin_I_Have_Access()
+    public override async Task As_Unauthorized_I_Dont_Have_Access()
     {
-        var response = await SendUpdateDataTypeFolderRequestAsync("admin@umbraco.com", "1234567890", Constants.Security.AdminGroupKey);
-
-        Assert.Contains(response.StatusCode, _authenticatedStatusCodes, await response.Content.ReadAsStringAsync());
-    }
-
-    [Test]
-    public virtual async Task As_Editor_I_Have_Access()
-    {
-        var response = await SendUpdateDataTypeFolderRequestAsync("editor@umbraco.com", "1234567890", Constants.Security.EditorGroupKey);
-
-        Assert.Contains(response.StatusCode, _authenticatedStatusCodes, await response.Content.ReadAsStringAsync());
-    }
-
-    [Test]
-    public virtual async Task As_Sensitive_Data_I_Have_No_Access()
-    {
-        var response = await SendUpdateDataTypeFolderRequestAsync("sensitiveData@umbraco.com", "1234567890", Constants.Security.SensitiveDataGroupKey);
-
-        Assert.AreEqual(HttpStatusCode.Forbidden, response.StatusCode, await response.Content.ReadAsStringAsync());
-    }
-
-    [Test]
-    public virtual async Task As_Translator_I_Have_No_Access()
-    {
-        var response = await SendUpdateDataTypeFolderRequestAsync("translator@umbraco.com", "1234567890", Constants.Security.TranslatorGroupKey);
-
-        Assert.AreEqual(HttpStatusCode.Forbidden, response.StatusCode, await response.Content.ReadAsStringAsync());
-    }
-
-    [Test]
-    public virtual async Task As_Writer_I_Have_Access()
-    {
-        var response = await SendUpdateDataTypeFolderRequestAsync("writer@umbraco.com", "1234567890", Constants.Security.WriterGroupKey);
-
-        Assert.Contains(response.StatusCode, _authenticatedStatusCodes, await response.Content.ReadAsStringAsync());
-    }
-
-
-    [Test]
-    public virtual async Task Unauthorized_When_No_Token_Is_Provided()
-    {
-        var updateFolderModel = GenerateUpdateFolderResponseModel();
+        UpdateFolderResponseModel updateFolderModel = new() { Name = "UpdatedName" };
 
         var response = await Client.PutAsync(Url, JsonContent.Create(updateFolderModel));
 
-        Assert.AreEqual(HttpStatusCode.Unauthorized, response.StatusCode, await response.Content.ReadAsStringAsync());
+        Assert.AreEqual(UnauthorizedUserGroupAssertionModel.ExpectedStatusCode, response.StatusCode, await response.Content.ReadAsStringAsync());
     }
 
-    private async Task<HttpResponseMessage> SendUpdateDataTypeFolderRequestAsync(string userEmail, string userPassword, Guid userGroupKey)
+    protected override async Task<HttpResponseMessage> AuthorizedRequest(Guid userGroupKey)
     {
-        await AuthenticateClientAsync(Client, userEmail, userPassword, userGroupKey);
+        await AuthenticateClientAsync(Client, UserEmail, UserPassword, userGroupKey);
 
-        var updateFolderModel = GenerateUpdateFolderResponseModel();
+        UpdateFolderResponseModel updateFolderModel = new() { Name = "UpdatedName" };
 
         return await Client.PutAsync(Url, JsonContent.Create(updateFolderModel));
     }
-
-    private UpdateFolderResponseModel GenerateUpdateFolderResponseModel()
-    {
-        return new UpdateFolderResponseModel
-        {
-            Name = "TestUpdateFolder"
-        };
-    }
-
 }

@@ -7,67 +7,38 @@ using Umbraco.Cms.Core;
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.AuditLog;
 
 [TestFixture]
-public class CurrentUserAuditLogControllerTests : ManagementApiTest<CurrentUserAuditLogController>
+public class CurrentUserAuditLogControllerTests : ManagementApiUserGroupTestBase<CurrentUserAuditLogController>
 {
     protected override Expression<Func<CurrentUserAuditLogController, object>> MethodSelector =>
         x => x.CurrentUser(Direction.Ascending, null, 0, 100);
 
-    [Test]
-    public virtual async Task As_Admin_I_Have_Access()
+    protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
-        await AuthenticateClientAsync(Client, "admin@umbraco.com", "1234567890", Constants.Security.AdminGroupKey);
+        Allowed = true, ExpectedStatusCode = HttpStatusCode.OK,
+    };
 
-        var response = await Client.GetAsync(Url);
-
-        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, await response.Content.ReadAsStringAsync());
-    }
-
-    [Test]
-    public virtual async Task As_Editor_I_Have_Access()
+    protected override UserGroupAssertionModel EditorUserGroupAssertionModel => new()
     {
-        await AuthenticateClientAsync(Client, "editor@umbraco.com", "1234567890", Constants.Security.EditorGroupKey);
+        Allowed = true, ExpectedStatusCode = HttpStatusCode.OK,
+    };
 
-        var response = await Client.GetAsync(Url);
-
-        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, await response.Content.ReadAsStringAsync());
-    }
-
-    [Test]
-    public virtual async Task As_Sensitive_Data_I_Have_Access()
+    protected override UserGroupAssertionModel SensitiveDataUserGroupAssertionModel => new()
     {
-        await AuthenticateClientAsync(Client, "sensitiveData@umbraco.com", "1234567890", Constants.Security.SensitiveDataGroupKey);
+        Allowed = true, ExpectedStatusCode = HttpStatusCode.OK,
+    };
 
-        var response = await Client.GetAsync(Url);
-
-        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, await response.Content.ReadAsStringAsync());
-    }
-
-    [Test]
-    public virtual async Task As_Translator_I_Have_Access()
+    protected override UserGroupAssertionModel TranslatorUserGroupAssertionModel => new()
     {
-        await AuthenticateClientAsync(Client, "translator@umbraco.com", "1234567890", Constants.Security.TranslatorGroupKey);
+        Allowed = true, ExpectedStatusCode = HttpStatusCode.OK,
+    };
 
-        var response = await Client.GetAsync(Url);
-
-        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, await response.Content.ReadAsStringAsync());
-    }
-
-    [Test]
-    public virtual async Task As_Writer_I_Have_Access()
+    protected override UserGroupAssertionModel WriterUserGroupAssertionModel => new()
     {
-        await AuthenticateClientAsync(Client, "writer@umbraco.com", "1234567890", Constants.Security.WriterGroupKey);
+        Allowed = true, ExpectedStatusCode = HttpStatusCode.OK,
+    };
 
-        var response = await Client.GetAsync(Url);
-
-        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, await response.Content.ReadAsStringAsync());
-    }
-
-
-    [Test]
-    public virtual async Task Unauthorized_When_No_Token_Is_Provided()
+    protected override UserGroupAssertionModel UnauthorizedUserGroupAssertionModel => new()
     {
-        var response = await Client.GetAsync(Url);
-
-        Assert.AreEqual(HttpStatusCode.Unauthorized, response.StatusCode, await response.Content.ReadAsStringAsync());
-    }
+        Allowed = false, ExpectedStatusCode = HttpStatusCode.Unauthorized,
+    };
 }

@@ -3,71 +3,67 @@ using System.Net;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Controllers.DataType.Folder;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.DataType.Folder;
 
 [TestFixture]
-public class DeleteDataTypeFolderControllerTests : ManagementApiTest<DeleteDataTypeFolderController>
+public class DeleteDataTypeFolderControllerTests : ManagementApiUserGroupTestBase<DeleteDataTypeFolderController>
 {
+    private readonly Guid _folderId = Guid.NewGuid();
+
+    private IDataTypeContainerService DataTypeContainerService => GetRequiredService<IDataTypeContainerService>();
+
     protected override Expression<Func<DeleteDataTypeFolderController, object>> MethodSelector =>
-        x => x.Delete(Guid.NewGuid());
+        x => x.Delete(_folderId);
+
+
+    [SetUp]
+    public void Setup() =>
+        DataTypeContainerService.CreateAsync(_folderId, "FolderName", null, Constants.Security.SuperUserKey);
+
+    protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
+    {
+        Allowed = true, ExpectedStatusCode = HttpStatusCode.OK,
+    };
+
+    protected override UserGroupAssertionModel EditorUserGroupAssertionModel => new()
+    {
+        Allowed = true, ExpectedStatusCode = HttpStatusCode.OK,
+    };
+
+    protected override UserGroupAssertionModel SensitiveDataUserGroupAssertionModel => new()
+    {
+        Allowed = false, ExpectedStatusCode = HttpStatusCode.Forbidden,
+    };
+
+    protected override UserGroupAssertionModel TranslatorUserGroupAssertionModel => new()
+    {
+        Allowed = false, ExpectedStatusCode = HttpStatusCode.Forbidden,
+    };
+
+    protected override UserGroupAssertionModel WriterUserGroupAssertionModel => new()
+    {
+        Allowed = true, ExpectedStatusCode = HttpStatusCode.OK,
+    };
+
+    protected override UserGroupAssertionModel UnauthorizedUserGroupAssertionModel => new()
+    {
+        Allowed = false, ExpectedStatusCode = HttpStatusCode.Unauthorized,
+    };
 
     [Test]
-    public virtual async Task As_Admin_I_Have_Access()
+    public override async Task As_Unauthorized_I_Dont_Have_Access()
     {
-        await AuthenticateClientAsync(Client, "admin@umbraco.com", "1234567890", Constants.Security.AdminGroupKey);
-
         var response = await Client.DeleteAsync(Url);
 
-        Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode, await response.Content.ReadAsStringAsync());
+        Assert.AreEqual(UnauthorizedUserGroupAssertionModel.ExpectedStatusCode, response.StatusCode, await response.Content.ReadAsStringAsync());
     }
 
-    [Test]
-    public virtual async Task As_Editor_I_Have_Access()
+    protected override async Task<HttpResponseMessage> AuthorizedRequest(Guid userGroupKey)
     {
-        await AuthenticateClientAsync(Client, "editor@umbraco.com", "1234567890", Constants.Security.EditorGroupKey);
+        await AuthenticateClientAsync(Client, UserEmail, UserPassword, userGroupKey);
 
-        var response = await Client.DeleteAsync(Url);
-
-        Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode, await response.Content.ReadAsStringAsync());
-    }
-
-    [Test]
-    public virtual async Task As_Sensitive_Data_I_Have_No_Access()
-    {
-        await AuthenticateClientAsync(Client, "sensitiveData@umbraco.com", "1234567890", Constants.Security.SensitiveDataGroupKey);
-
-        var response = await Client.DeleteAsync(Url);
-
-        Assert.AreEqual(HttpStatusCode.Forbidden, response.StatusCode, await response.Content.ReadAsStringAsync());
-    }
-
-    [Test]
-    public virtual async Task As_Translator_I_Have_No_Access()
-    {
-        await AuthenticateClientAsync(Client, "translator@umbraco.com", "1234567890", Constants.Security.TranslatorGroupKey);
-
-        var response = await Client.DeleteAsync(Url);
-
-        Assert.AreEqual(HttpStatusCode.Forbidden, response.StatusCode, await response.Content.ReadAsStringAsync());
-    }
-
-    [Test]
-    public virtual async Task As_Writer_I_Have_Access()
-    {
-        await AuthenticateClientAsync(Client, "writer@umbraco.com", "1234567890", Constants.Security.WriterGroupKey);
-
-        var response = await Client.DeleteAsync(Url);
-
-        Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode, await response.Content.ReadAsStringAsync());
-    }
-
-
-    [Test]
-    public virtual async Task Unauthorized_When_No_Token_Is_Provided()
-    {
-        var response = await Client.DeleteAsync(Url);
-
-        Assert.AreEqual(HttpStatusCode.Unauthorized, response.StatusCode, await response.Content.ReadAsStringAsync());
+        return await Client.DeleteAsync(Url);
     }
 }
