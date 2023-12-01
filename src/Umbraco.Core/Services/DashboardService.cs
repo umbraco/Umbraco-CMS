@@ -49,7 +49,7 @@ public class DashboardService : IDashboardService
             tabs.Add(new Tab<IDashboard>
             {
                 Id = tabId++,
-                Label = label == $"[{label}]"
+                Label = !string.IsNullOrEmpty(label) && label.StartsWith("[") && label.EndsWith("]")
                     ? !string.IsNullOrEmpty(dashboard.Name)
                         ? dashboard.Name
                         : label
