@@ -60,6 +60,7 @@ function DataTypeInfoController($scope, $routeParams, dataTypeResource, $timeout
 
         const editor = {
             id: id,
+            entityType: type,
             submit: function (model) {
                 editorService.close();
                 vm.view.loading = true;
@@ -71,17 +72,7 @@ function DataTypeInfoController($scope, $routeParams, dataTypeResource, $timeout
             }
         };
 
-        switch (type) {
-            case "documentType":
-                editorService.documentTypeEditor(editor);
-                break;
-            case "mediaType":
-                editorService.mediaTypeEditor(editor);
-                break;
-            case "memberType":
-                editorService.memberTypeEditor(editor);
-                break;
-        }
+        editorService.contentTypeEditor(editor);
     }
 
     loadRelations();

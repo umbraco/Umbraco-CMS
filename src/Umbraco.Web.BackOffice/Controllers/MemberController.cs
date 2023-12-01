@@ -376,7 +376,10 @@ public class MemberController : ContentControllerBase
             }
 
             // map the custom properties - this will already be set for new entities in our member binder
-            contentItem.PersistedContent.IsApproved = contentItem.IsApproved;
+            if (_backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.HasAccessToSensitiveData() ?? false)
+            {
+                contentItem.PersistedContent.IsApproved = contentItem.IsApproved;
+            }
             contentItem.PersistedContent.Email = contentItem.Email.Trim();
             contentItem.PersistedContent.Username = contentItem.Username;
         }
@@ -548,6 +551,13 @@ public class MemberController : ContentControllerBase
                     }
                 }
             }
+            //thoese properties defaulting to sensitive, change the value of the contentItem model to the persisted value
+            if (contentItem.PersistedContent is not null)
+            {
+                contentItem.IsApproved = contentItem.PersistedContent.IsApproved;
+                contentItem.IsLockedOut = contentItem.PersistedContent.IsLockedOut;
+            }
+            contentItem.IsTwoFactorEnabled = await _twoFactorLoginService.IsTwoFactorEnabledAsync(contentItem.Key);
         }
 
         if (contentItem.PersistedContent is not null)
