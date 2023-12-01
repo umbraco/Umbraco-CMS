@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 using OpenIddict.Validation.AspNetCore;
 using Umbraco.Cms.Api.Management.Security.Authorization;
-using Umbraco.Cms.Api.Management.Security.Authorization.BackOffice;
 using Umbraco.Cms.Api.Management.Security.Authorization.Content;
 using Umbraco.Cms.Api.Management.Security.Authorization.Content.Branch;
 using Umbraco.Cms.Api.Management.Security.Authorization.Content.RecycleBin;
@@ -28,7 +27,6 @@ internal static class BackOfficeAuthPolicyBuilderExtensions
     {
         // NOTE: Even though we are registering these handlers globally they will only actually execute their logic for
         // any auth defining a matching requirement and scheme.
-        builder.Services.AddSingleton<IAuthorizationHandler, BackOfficePermissionHandler>();
         builder.Services.AddSingleton<IAuthorizationHandler, ContentBranchPermissionHandler>();
         builder.Services.AddSingleton<IAuthorizationHandler, ContentPermissionHandler>();
         builder.Services.AddSingleton<IAuthorizationHandler, ContentRecycleBinPermissionHandler>();
@@ -42,7 +40,6 @@ internal static class BackOfficeAuthPolicyBuilderExtensions
         builder.Services.AddSingleton<IAuthorizationHandler, UserPermissionHandler>();
 
         builder.Services.AddSingleton<IAuthorizationHelper, AuthorizationHelper>();
-        builder.Services.AddSingleton<IBackOfficePermissionAuthorizer, BackOfficePermissionAuthorizer>();
         builder.Services.AddSingleton<IContentPermissionAuthorizer, ContentPermissionAuthorizer>();
         builder.Services.AddSingleton<IFeatureAuthorizer, FeatureAuthorizer>();
         builder.Services.AddSingleton<IMediaPermissionAuthorizer, MediaPermissionAuthorizer>();
@@ -63,6 +60,12 @@ internal static class BackOfficeAuthPolicyBuilderExtensions
                 policy.RequireClaim(claimType, allowedClaimValues);
             });
         }
+
+        options.AddPolicy($"New{AuthorizationPolicies.BackOfficeAccess}", policy =>
+        {
+            policy.AuthenticationSchemes.Add(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
+            policy.RequireAuthenticatedUser();
+        });
 
         options.AddPolicy($"New{AuthorizationPolicies.RequireAdminAccess}", policy =>
         {
@@ -101,18 +104,6 @@ internal static class BackOfficeAuthPolicyBuilderExtensions
         AddPolicy(AuthorizationPolicies.TreeAccessScripts, Constants.Security.AllowedApplicationsClaimType, Constants.Applications.Settings);
         AddPolicy(AuthorizationPolicies.TreeAccessStylesheets, Constants.Security.AllowedApplicationsClaimType, Constants.Applications.Settings);
         AddPolicy(AuthorizationPolicies.TreeAccessTemplates, Constants.Security.AllowedApplicationsClaimType, Constants.Applications.Settings);
-
-        options.AddPolicy($"New{AuthorizationPolicies.BackOfficeAccess}", policy =>
-        {
-            policy.AuthenticationSchemes.Add(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
-            policy.Requirements.Add(new BackOfficePermissionRequirement());
-        });
-
-        options.AddPolicy($"New{AuthorizationPolicies.BackOfficeAccessWithoutApproval}", policy =>
-        {
-            policy.AuthenticationSchemes.Add(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
-            policy.Requirements.Add(new BackOfficePermissionRequirement(false));
-        });
 
         // Contextual permissions
         // TODO: Rename policies once we have the old ones removed
