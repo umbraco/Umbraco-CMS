@@ -26,12 +26,12 @@ export interface ManifestElementWithElementName extends ManifestElement {
 	elementName: string;
 }
 
-export interface ManifestPlainCss<CssType = unknown> extends ManifestBase {
+export interface ManifestPlainCss extends ManifestBase {
 	/**
 	 * The file location of the stylesheet file to load
 	 * @TJS-type string
 	 */
-	css?: CssLoaderProperty<CssType>;
+	css?: CssLoaderProperty;
 }
 
 export interface ManifestPlainJs<JsType> extends ManifestBase {
