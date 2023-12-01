@@ -204,7 +204,7 @@ public class ContentPermissions
         }
 
         // get the implicit/inherited permissions for the user for this path
-        // if there is no entity for this id, than just use the id as the path (i.e. -1 or -20)
+        // if there is no entity for this id, then just use the id as the path (i.e. -1 or -20)
         return CheckPermissionsPath(entity?.Path ?? nodeId.ToString(), user, permissionsToCheck)
             ? ContentAccess.Granted
             : ContentAccess.Denied;
@@ -264,7 +264,7 @@ public class ContentPermissions
         }
 
         // get the implicit/inherited permissions for the user for this path
-        // if there is no content item for this id, than just use the id as the path (i.e. -1 or -20)
+        // if there is no content item for this id, then just use the id as the path (i.e. -1 or -20)
         return CheckPermissionsPath(contentItem?.Path ?? nodeId.ToString(), user, permissionsToCheck)
             ? ContentAccess.Granted
             : ContentAccess.Denied;
