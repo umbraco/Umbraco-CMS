@@ -74,7 +74,6 @@ export class UmbUserAvatarElement extends UmbLitElement {
 				url: isRelativeUrl ? serverUrl + avatarScale2 : avatarScale2,
 			},
 		];
-		debugger;
 	};
 
 	#uploadAvatar = async () => {
