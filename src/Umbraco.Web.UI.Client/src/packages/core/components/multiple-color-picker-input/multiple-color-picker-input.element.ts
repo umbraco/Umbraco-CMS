@@ -14,12 +14,45 @@ import {
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbInputEvent, UmbChangeEvent, UmbDeleteEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbSorterConfig, UmbSorterController } from '@umbraco-cms/backoffice/sorter';
+import { c } from 'msw/lib/glossary-de6278a9.js';
+
+const SORTER_CONFIG: UmbSorterConfig<UmbSwatchDetails> = {
+	compareElementToModel: (element: HTMLElement, model: UmbSwatchDetails) => {
+		return element.getAttribute('data-sort-entry-id') === model.value;
+	},
+	querySelectModelToElement: (container: HTMLElement, modelEntry: UmbSwatchDetails) => {
+		return container.querySelector('data-sort-entry-id=[' + modelEntry.value + ']');
+	},
+	identifier: 'Umb.SorterIdentifier.ColorPicker.Prevalues',
+	itemSelector: 'umb-multiple-color-picker-item-input',
+	containerSelector: '#sorter-wrapper',
+};
 
 /**
  * @element umb-multiple-color-picker-input
  */
 @customElement('umb-multiple-color-picker-input')
 export class UmbMultipleColorPickerInputElement extends FormControlMixin(UmbLitElement) {
+	#prevalueSorter = new UmbSorterController(this, {
+		...SORTER_CONFIG,
+
+		//TODO: Fix sorting when UmbSorterController gets fixed
+		performItemInsert: (args) => {
+			const frozenArray = [...this.items];
+			const indexToMove = frozenArray.findIndex((x) => x.value === args.item.value);
+
+			frozenArray.splice(indexToMove, 1);
+			frozenArray.splice(args.newIndex, 0, args.item);
+			this.items = frozenArray;
+
+			return true;
+		},
+		performItemRemove: (args) => {
+			return true;
+		},
+	});
+
 	/**
 	 * This is a minimum amount of selected items in this input.
 	 * @type {number}
@@ -79,6 +112,15 @@ export class UmbMultipleColorPickerInputElement extends FormControlMixin(UmbLitE
 
 	constructor() {
 		super();
+
+		this.consumeContext(UMB_DATA_TYPE_WORKSPACE_CONTEXT, (instance) => {
+			const workspace = instance;
+			this.observe(workspace.data, (data) => {
+				const property = data?.values.find((setting) => setting.alias === 'useLabel');
+				if (property) this.showLabels = property.value as boolean;
+			});
+		});
+
 		this.addValidator(
 			'rangeUnderflow',
 			() => this.minMessage,
@@ -89,14 +131,6 @@ export class UmbMultipleColorPickerInputElement extends FormControlMixin(UmbLitE
 			() => this.maxMessage,
 			() => !!this.max && this._items.length > this.max,
 		);
-
-		this.consumeContext(UMB_DATA_TYPE_WORKSPACE_CONTEXT, (instance) => {
-			const workspace = instance;
-			this.observe(workspace.data, (data) => {
-				const property = data?.values.find((setting) => setting.alias === 'useLabel');
-				if (property) this.showLabels = property.value as boolean;
-			});
-		});
 	}
 
 	@state()
@@ -108,6 +142,7 @@ export class UmbMultipleColorPickerInputElement extends FormControlMixin(UmbLitE
 	}
 	public set items(items: Array<UmbSwatchDetails>) {
 		this._items = items ?? [];
+		this.#prevalueSorter.setModel(this.items);
 	}
 
 	#onAdd() {
@@ -149,7 +184,8 @@ export class UmbMultipleColorPickerInputElement extends FormControlMixin(UmbLitE
 	}
 
 	render() {
-		return html`${this.#renderItems()} ${this.#renderAddButton()} `;
+		return html`<div id="sorter-wrapper">${this.#renderItems()}</div>
+			${this.#renderAddButton()} `;
 	}
 
 	#renderItems() {
@@ -161,6 +197,7 @@ export class UmbMultipleColorPickerInputElement extends FormControlMixin(UmbLitE
 					html` <umb-multiple-color-picker-item-input
 						?showLabels=${this.showLabels}
 						value=${item.value}
+						data-sort-entry-id=${item.value}
 						label=${ifDefined(item.label)}
 						name="item-${index}"
 						@input=${(event: UmbInputEvent) => this.#onInput(event, index)}
@@ -191,6 +228,18 @@ export class UmbMultipleColorPickerInputElement extends FormControlMixin(UmbLitE
 		css`
 			#action {
 				display: block;
+			}
+
+			.--umb-sorter-placeholder {
+				position: relative;
+				visibility: hidden;
+			}
+			.--umb-sorter-placeholder::after {
+				content: '';
+				position: absolute;
+				inset: 0px;
+				border-radius: var(--uui-border-radius);
+				border: 1px dashed var(--uui-color-divider-emphasis);
 			}
 		`,
 	];
