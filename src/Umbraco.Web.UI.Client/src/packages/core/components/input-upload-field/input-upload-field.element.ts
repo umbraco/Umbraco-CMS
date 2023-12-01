@@ -16,6 +16,7 @@ import type { UUIFileDropzoneElement, UUIFileDropzoneEvent } from '@umbraco-cms/
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 import './input-upload-field-file.element.js';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 @customElement('umb-input-upload-field')
 export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) {
@@ -118,7 +119,7 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 		this.keys = items.map((item) => item.unique);
 		this.value = this.keys.join(',');
 
-		this.dispatchEvent(new CustomEvent('change', { bubbles: true }));
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	#handleBrowse() {
@@ -181,7 +182,7 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 		const uniques = this._currentFiles.map((item) => item.unique) as string[];
 		this.#manager.remove(uniques);
 
-		this.dispatchEvent(new CustomEvent('change', { bubbles: true }));
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	static styles = [
