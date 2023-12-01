@@ -656,6 +656,13 @@ stages:
               ${{ else }}:
                 customEndpoint: 'MyGet (npm) - Umbracoprereleases'
           - bash: |
+              # Add correct scope to .npmrc
+              sed -i 's/registry=/@umbraco-cms:registry=/g' .npmrc
+
+              # Log content of .npmrc to debug
+              echo "##[debug]Content of .npmrc"
+              cat .npmrc
+
               # Setup temp npm project to load in defaults from the local .npmrc
               npm init -y
 
