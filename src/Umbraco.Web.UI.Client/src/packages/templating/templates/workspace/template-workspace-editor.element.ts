@@ -180,7 +180,7 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 				.value=${this._name}
 				@input=${this.#onNameInput}
 				label="template name">
-				<umb-alias-input slot="append" value=${ifDefined(this._alias!)} @change=${this.#onAliasInput}></umb-alias-input>
+				<uui-input-lock slot="append" value=${ifDefined(this._alias!)} @change=${this.#onAliasInput}></uui-input-lock>
 			</uui-input>
 
 			<uui-box>
