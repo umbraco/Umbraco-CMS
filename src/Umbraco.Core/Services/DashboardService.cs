@@ -43,11 +43,17 @@ public class DashboardService : IDashboardService
                 throw new NotSupportedException("Legacy UserControl (.ascx) dashboards are no longer supported.");
             }
 
+            var label = _localizedText.Localize("dashboardTabs", dashboard.Alias);
+
             var dashboards = new List<IDashboard> { dashboard };
             tabs.Add(new Tab<IDashboard>
             {
                 Id = tabId++,
-                Label = _localizedText.Localize("dashboardTabs", dashboard.Alias),
+                Label = !string.IsNullOrEmpty(label)
+                    ? label
+                    : !string.IsNullOrEmpty(dashboard.Name)
+                        ? dashboard.Name
+                        : dashboard.Alias,
                 Alias = dashboard.Alias,
                 Properties = dashboards,
             });

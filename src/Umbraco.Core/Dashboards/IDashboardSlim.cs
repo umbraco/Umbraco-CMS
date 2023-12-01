@@ -14,6 +14,12 @@ public interface IDashboardSlim
     string? Alias { get; }
 
     /// <summary>
+    ///     Gets the name of the dashboard.
+    /// </summary>
+    [DataMember(Name = "name")]
+    string? Name => null;
+
+    /// <summary>
     ///     Gets the view used to render the dashboard.
     /// </summary>
     [DataMember(Name = "view")]

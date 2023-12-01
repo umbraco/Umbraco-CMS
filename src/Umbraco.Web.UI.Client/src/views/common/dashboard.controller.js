@@ -9,21 +9,25 @@
  */
 
 function DashboardController($scope, $q, $routeParams, $location, dashboardResource, localizationService) {
-    const DASHBOARD_QUERY_PARAM = 'dashboard';
 
-    $scope.page = {};
-    $scope.page.nameLocked = true;
-    $scope.page.loading = true;
+    const DASHBOARD_QUERY_PARAM = 'dashboard';
+    const promises = [];
+
+    const vm = this;
+
+    vm.page = {};
+    vm.page.nameLocked = true;
+    vm.page.loading = true;
+
+    vm.changeTab = changeTab;
 
     $scope.dashboard = {};
 
-    var promises = [];
-
-    promises.push(localizationService.localize("sections_" + $routeParams.section).then(function (name) {
+    promises.push(localizationService.localize("sections_" + $routeParams.section).then(name => {
     	$scope.dashboard.name = name;
     }));
 
-    promises.push(dashboardResource.getDashboard($routeParams.section).then(function (tabs) {
+    promises.push(dashboardResource.getDashboard($routeParams.section).then(tabs => {
         $scope.dashboard.tabs = tabs;
 
         if ($scope.dashboard.tabs && $scope.dashboard.tabs.length > 0) {
@@ -31,20 +35,20 @@ function DashboardController($scope, $q, $routeParams, $location, dashboardResou
         }
     }));
 
-    $q.all(promises).then(function () {
-        $scope.page.loading = false;
+    $q.all(promises).then(() => {
+        vm.page.loading = false;
     });
 
-    $scope.changeTab = function (tab) {
+    function changeTab(tab) {
         if ($scope.dashboard.tabs && $scope.dashboard.tabs.length > 0) {
-            $scope.dashboard.tabs.forEach(function (tab) {
+            $scope.dashboard.tabs.forEach(tab => {
                 tab.active = false;
             });
         }
 
         tab.active = true;
         $location.search(DASHBOARD_QUERY_PARAM, tab.alias);
-    };
+    }
 
     function initActiveTab() {
         // Check the query parameter for a dashboard alias
