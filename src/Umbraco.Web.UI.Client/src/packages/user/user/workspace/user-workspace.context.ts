@@ -46,7 +46,7 @@ export class UmbUserWorkspaceContext
 	*/
 	onUserStoreChanges(user: UmbUserDetailModel) {
 		if (!user) return;
-		this.#data.update({ state: user.state });
+		this.#data.update({ state: user.state, avatarUrls: user.avatarUrls });
 	}
 
 	getEntityId(): string | undefined {

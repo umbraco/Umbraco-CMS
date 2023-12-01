@@ -51,46 +51,51 @@ export class UmbUserAvatarElement extends UmbLitElement {
 	}
 
 	#setUserAvatarUrls = async (user: UmbUserDetailModel | undefined) => {
-		if (user?.avatarUrls?.length === 0) return;
+		if (!user || !user.avatarUrls || user.avatarUrls.length === 0) return;
 
 		// TODO: remove this when we get absolute urls from the server
+		// TODO: temp hack because we can't prefix local urls with the server url.
+		// these are preview urls for newly uploaded avatars
 		const serverUrl = (await this.#getAppContext()).getServerUrl();
 		if (!serverUrl) return;
+
+		// TODO: hack to only use size 3 and 4 from the array. The server should only return 1 url.
+		const isRelativeUrl = user.avatarUrls[3].startsWith('/');
+		const avatarScale1 = user.avatarUrls?.[3];
+		const avatarScale2 = user.avatarUrls?.[4];
 
 		this._userAvatarUrls = [
 			{
 				scale: '1x',
-				url: `${serverUrl}${user?.avatarUrls?.[3]}`,
+				url: isRelativeUrl ? serverUrl + avatarScale1 : avatarScale1,
 			},
 			{
 				scale: '2x',
-				url: `${serverUrl}${user?.avatarUrls?.[4]}`,
+				url: isRelativeUrl ? serverUrl + avatarScale2 : avatarScale2,
 			},
 		];
+		debugger;
 	};
 
 	#uploadAvatar = async () => {
 		try {
 			const selectedFile = await this.#selectAvatar();
-			const { error } = await this.#userWorkspaceContext.uploadAvatar(selectedFile);
-			if (!error) {
-				const preview = URL.createObjectURL(selectedFile);
-				this._userAvatarUrls = [{ url: preview, scale: '1x' }];
-			}
+			this.#userWorkspaceContext?.uploadAvatar(selectedFile);
 		} catch (error) {
 			console.log(error);
 		}
 	};
 
-	#selectAvatar = async () => {
-		return new Promise((resolve, reject) => {
+	#selectAvatar() {
+		return new Promise<File>((resolve, reject) => {
 			if (!this._avatarFileField) {
 				reject("Can't find avatar file field");
 				return;
 			}
 
 			this._avatarFileField.addEventListener('change', (event) => {
-				const file = event.target.files?.[0];
+				const target = event?.target as HTMLInputElement;
+				const file = target.files?.[0] as File;
 				if (!file) {
 					reject("Can't find avatar file");
 					return;
@@ -101,7 +106,7 @@ export class UmbUserAvatarElement extends UmbLitElement {
 
 			this._avatarFileField.click();
 		});
-	};
+	}
 
 	#deleteAvatar = async () => {
 		if (!this.#userWorkspaceContext) return;

@@ -154,7 +154,13 @@ export class UmbUserDetailRepository extends UmbUserRepositoryBase implements IU
 		const { error } = await this.#detailSource.createAvatar(id, fileId);
 
 		if (!error) {
-			// TODO: update store + current user
+			const preview = URL.createObjectURL(file);
+			// TODO: temp solution until we know the final avatar url format.
+			// the server currently returns a list of urls for different sizes.
+			// We need to fake a size list here.
+			const avatarUrls = [preview, preview, preview, preview, preview];
+			this.detailStore!.updateItem(id, { avatarUrls });
+
 			const notification = { data: { message: `Avatar uploaded` } };
 			this.notificationContext?.peek('positive', notification);
 		}
