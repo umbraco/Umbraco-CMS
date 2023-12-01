@@ -649,22 +649,22 @@ stages:
           - checkout: none
           - download: current
             artifact: npm
-            ${{ if eq(parameters.isNightly, true) }}:
-              - bash: echo "@umbraco-cms:registry=https://www.myget.org/F/umbraconightly/npm/" >> .npmrc
-                workingDirectory: $(Pipeline.Workspace)/npm
-                displayName: Add scoped umbraconightly registry to .npmrc
-              - task: npmAuthenticate@0
-                inputs:
-                  workingFile: '$(Pipeline.Workspace)/npm/.npmrc'
-                  customEndpoint: 'MyGet (npm) - Umbraconightly'
-            ${{ else }}:
-              - bash: echo "@umbraco-cms:registry=https://www.myget.org/F/umbracoprereleases/npm/" >> .npmrc
-                workingDirectory: $(Pipeline.Workspace)/npm
-                displayName: Add scoped umbracoprereleases registry to .npmrc
-              - task: npmAuthenticate@0
-                inputs:
-                  workingFile: '$(Pipeline.Workspace)/npm/.npmrc'
-                  customEndpoint: 'MyGet (npm) - Umbracoprereleases'
+          ${{ if eq(parameters.isNightly, true) }}:
+            - bash: echo "@umbraco-cms:registry=https://www.myget.org/F/umbraconightly/npm/" >> .npmrc
+              workingDirectory: $(Pipeline.Workspace)/npm
+              displayName: Add scoped umbraconightly registry to .npmrc
+            - task: npmAuthenticate@0
+              inputs:
+                workingFile: '$(Pipeline.Workspace)/npm/.npmrc'
+                customEndpoint: 'MyGet (npm) - Umbraconightly'
+          ${{ else }}:
+            - bash: echo "@umbraco-cms:registry=https://www.myget.org/F/umbracoprereleases/npm/" >> .npmrc
+              workingDirectory: $(Pipeline.Workspace)/npm
+              displayName: Add scoped umbracoprereleases registry to .npmrc
+            - task: npmAuthenticate@0
+              inputs:
+                workingFile: '$(Pipeline.Workspace)/npm/.npmrc'
+                customEndpoint: 'MyGet (npm) - Umbracoprereleases'
           - bash: |
               # Log content of .npmrc to debug
               echo "##[debug]Content of .npmrc"
