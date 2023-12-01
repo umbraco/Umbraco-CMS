@@ -651,18 +651,18 @@ stages:
             artifact: npm
           - bash: |
               # Check if we are on a nightly build
-              if [ $isNightly = "true" ]; then
-                  echo "##[debug]Nightly build detected"
-                  registry="https://www.myget.org/F/umbraconightly/npm/"
-              else
+              if [ $isNightly = "False" ]; then
                   echo "##[debug]Prerelease build detected"
                   registry="https://www.myget.org/F/umbracoprereleases/npm/"
+              else
+                  echo "##[debug]Nightly build detected"
+                  registry="https://www.myget.org/F/umbraconightly/npm/"
               fi
               echo "@umbraco-cms:registry=$registry" >> .npmrc
-            workingDirectory: $(Pipeline.Workspace)/npm
-            displayName: Add scoped registry to .npmrc
             env:
               isNightly: ${{parameters.isNightly}}
+            workingDirectory: $(Pipeline.Workspace)/npm
+            displayName: Add scoped registry to .npmrc
           - task: npmAuthenticate@0
             displayName: Authenticate with npm
             inputs:
