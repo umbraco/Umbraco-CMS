@@ -666,7 +666,7 @@ stages:
               npm config ls -l
 
               files=( ./*.tgz )
-              npm publish "${files[0]}"
+              npm publish --access public "${files[0]}"
             displayName: MyGet (npm) push
             workingDirectory: $(Pipeline.Workspace)/npm
 
@@ -719,7 +719,7 @@ stages:
               npm whoami
 
               files=( ./*.tgz )
-              npm publish --tag $npmTag "${files[0]}"
+              npm publish --tag $npmTag --access public "${files[0]}"
             displayName: Push to npm
             workingDirectory: $(Pipeline.Workspace)/npm
 
