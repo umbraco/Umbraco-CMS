@@ -140,55 +140,18 @@ stages:
             inputs:
               targetPath: $(Build.SourcesDirectory)
               artifactName: build_output
-
-  - stage: Prepare_Npm
-    displayName: Prepare Npm artifact
-    condition: and(succeeded(), or(eq(stageDependencies.Build.A.outputs['build.NBGV_PublicRelease'], 'True'), ${{parameters.myGetDeploy}}))
-    variables:
-      npm_config_cache: $(Pipeline.Workspace)/.npm_client
-      NODE_OPTIONS: --max_old_space_size=16384
-      npmPackageVersion: $[ stageDependencies.Build.A.outputs['build.NBGV_NpmPackageVersion'] ]
-    dependsOn:
-      - Build
-    jobs:
-      - job: Prepare
-        displayName: Prepare NPM artifact
-        steps:
-          - checkout: self
-            fetchDepth: 1 # We only need the latest commit
-            submodules: true
-          - task: NodeTool@0
-            displayName: Use Node.js $(nodeVersion)
-            retryCountOnTaskFailure: 3
-            inputs:
-              versionSpec: $(nodeVersion)
-          - task: Cache@2
-            displayName: Cache node_modules
-            inputs:
-              key: '"npm_client" | "$(Agent.OS)" | $(Build.SourcesDirectory)/src/Umbraco.Web.UI.New.Client/package-lock.json'
-              restoreKeys: |
-                "npm_client" | "$(Agent.OS)"
-                "npm_client"
-              path: $(npm_config_cache)
-          - script: npm ci --no-fund --no-audit --prefer-offline
-            displayName: Run npm ci (Bellissima)
-            workingDirectory: src/Umbraco.Web.UI.New.Client
-          - script: npm run build:for:npm
-            displayName: Run build:for:npm (Bellissima)
-            workingDirectory: src/Umbraco.Web.UI.New.Client
           - bash: |
               echo "##[command]Running npm version"
               echo "##[debug]Version: $PACKAGE_VERSION"
               echo "##[command]Running npm pack"
               echo "##[debug]Output directory: $(Build.ArtifactStagingDirectory)"
-              echo " "
               npm version $PACKAGE_VERSION --allow-same-version --no-git-tag-version
               mkdir $(Build.ArtifactStagingDirectory)/npm
               npm pack --pack-destination $(Build.ArtifactStagingDirectory)/npm
               mv .npmrc $(Build.ArtifactStagingDirectory)/npm/
             displayName: Prepare Bellissima npm package
             env:
-              PACKAGE_VERSION: $(npmPackageVersion)
+              PACKAGE_VERSION: $(build.NBGV_NpmPackageVersion)
             workingDirectory: src/Umbraco.Web.UI.New.Client
           - task: PublishPipelineArtifact@1
             displayName: Publish Bellissima npm artifact
@@ -621,7 +584,6 @@ stages:
       # - Integration
       # - E2E # TODO: Enable when stable.
       - Build
-      - Prepare_Npm
     condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.myGetDeploy}}))
     jobs:
       - job:
