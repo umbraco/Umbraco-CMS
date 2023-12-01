@@ -9,6 +9,5 @@ export const manifest: ManifestPropertyEditorUi = {
 		label: 'Color Picker Prevalues',
 		icon: 'icon-page-add',
 		group: 'Umbraco.DropDown.Flexible',
-		//propertyEditorSchemaAlias: '',
 	},
 };
