@@ -28,11 +28,11 @@ public class DenyLocalLoginHandler : MustSatisfyRequirementAuthorizationHandler<
     protected override Task<bool> IsAuthorized(AuthorizationHandlerContext context, DenyLocalLoginRequirement requirement)
     {
         // Some logic here - for now we will always authorize successfully
-        var isDenied = true;
+        var isDenied = false;
 
-        if (isDenied)
+        if (isDenied is false)
         {
-            // Now allow anonymous - necessary for some of the endpoints (BackOfficeController.Login())
+            // Now allow anonymous (RequireAuthenticatedUser() adds this requirement) - necessary for some of the endpoints (BackOfficeController.Login())
             var denyAnonymousUserRequirements = context.PendingRequirements.OfType<DenyAnonymousAuthorizationRequirement>();
             foreach (var denyAnonymousUserRequirement in denyAnonymousUserRequirements)
             {
@@ -40,6 +40,6 @@ public class DenyLocalLoginHandler : MustSatisfyRequirementAuthorizationHandler<
             }
         }
 
-        return Task.FromResult(isDenied);
+        return Task.FromResult(isDenied is false);
     }
 }
