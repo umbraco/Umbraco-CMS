@@ -72,7 +72,11 @@ export class UmbUserAvatarElement extends UmbLitElement {
 	#uploadAvatar = async () => {
 		try {
 			const selectedFile = await this.#selectAvatar();
-			this.#userWorkspaceContext?.uploadAvatar(selectedFile);
+			const { error } = await this.#userWorkspaceContext.uploadAvatar(selectedFile);
+			if (!error) {
+				const preview = URL.createObjectURL(selectedFile);
+				this._userAvatarUrls = [{ url: preview, scale: '1x' }];
+			}
 		} catch (error) {
 			console.log(error);
 		}
