@@ -50,7 +50,7 @@ parameters:
     type: string
     default: ' '
   - name: isNightly
-    displayName: 'Indicate if this is a nightly build (meaning it will release to the nightly feeds)'
+    displayName: 'Is nightly build (used for MyGet feed)'
     type: boolean
     default: false
 
