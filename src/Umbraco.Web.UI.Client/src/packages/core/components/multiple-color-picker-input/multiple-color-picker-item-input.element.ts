@@ -60,10 +60,10 @@ export class UmbMultipleColorPickerItemInputElement extends FormControlMixin(Umb
 
 	#onDelete() {
 		const modalContext = this._modalContext?.open(UMB_CONFIRM_MODAL, {
-			headline: `Delete ${this.value || 'item'}`,
-			content: 'Are you sure you want to delete this item?',
+			headline: `${this.localize.term('actions_delete')} ${this.value || ''}`,
+			content: this.localize.term('content_nestedContentDeleteItem'),
 			color: 'danger',
-			confirmLabel: 'Delete',
+			confirmLabel: this.localize.term('actions_delete'),
 		});
 
 		modalContext?.onSubmit().then(() => {
@@ -134,15 +134,15 @@ export class UmbMultipleColorPickerItemInputElement extends FormControlMixin(Umb
 						<uui-input
 							id="input"
 							value=${this.value}
-							label="Value"
-							placeholder="value"
+							label=${this.localize.term('general_value')}
+							placeholder=${this.localize.term('general_value')}
 							@input="${this.#onValueInput}"
 							@change="${this.#onValueChange}"
 							required="${this.required}"
 							required-message="Value is missing">
 							<uui-color-swatch
 								slot="prepend"
-								label="Black"
+								label=${this.value}
 								value="${this.value}"
 								@click=${this.#onColorClick}></uui-color-swatch>
 						</uui-input>
@@ -150,28 +150,27 @@ export class UmbMultipleColorPickerItemInputElement extends FormControlMixin(Umb
 					</div>
 					${this.showLabels
 						? html` <uui-input
-								label="Label"
-								placeholder="Label"
+								label=${this.localize.term('placeholders_label')}
+								placeholder=${this.localize.term('placeholders_label')}
 								value=${ifDefined(this.label)}
 								@input="${this.#onLabelInput}"
 								@change="${this.#onLabelChange}"
 								?disabled=${this.disabled}
 								?readonly=${this.readonly}></uui-input>`
 						: nothing}
+					${this.readonly
+						? nothing
+						: html`<uui-button
+								label="${this.localize.term('actions_delete')} ${this.value}"
+								look="primary"
+								color="danger"
+								@click="${this.#onDelete}"
+								?disabled=${this.disabled}
+								compact>
+								<uui-icon name="icon-trash"></uui-icon>
+						  </uui-button>`}
 				</div>
 			</uui-form-validation-message>
-
-			${this.readonly
-				? nothing
-				: html`<uui-button
-						label="Delete ${this.value}"
-						look="primary"
-						color="danger"
-						@click="${this.#onDelete}"
-						?disabled=${this.disabled}
-						compact>
-						<uui-icon name="icon-trash"></uui-icon>
-				  </uui-button>`}
 		`;
 	}
 

@@ -1,3 +1,4 @@
+import { UMB_DATA_TYPE_WORKSPACE_CONTEXT } from '../../data-type/workspace/data-type-workspace.context.js';
 import { UmbMultipleColorPickerItemInputElement } from './multiple-color-picker-item-input.element.js';
 import type { UmbSwatchDetails } from '@umbraco-cms/backoffice/models';
 import {
@@ -13,7 +14,6 @@ import {
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbInputEvent, UmbChangeEvent, UmbDeleteEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UMB_DATA_TYPE_WORKSPACE_CONTEXT } from '../../data-type/workspace/data-type-workspace.context.js';
 
 /**
  * @element umb-multiple-color-picker-input
@@ -107,8 +107,6 @@ export class UmbMultipleColorPickerInputElement extends FormControlMixin(UmbLitE
 		return this._items;
 	}
 	public set items(items: Array<UmbSwatchDetails>) {
-		// TODO: when we have a way to overwrite the missing value validator we can remove this
-		this.value = items?.length > 0 ? 'some value' : '';
 		this._items = items ?? [];
 	}
 
@@ -181,7 +179,7 @@ export class UmbMultipleColorPickerInputElement extends FormControlMixin(UmbLitE
 				? nothing
 				: html`<uui-button
 						id="action"
-						label="Add"
+						label=${this.localize.term('general_add')}
 						look="placeholder"
 						color="default"
 						@click="${this.#onAdd}"
