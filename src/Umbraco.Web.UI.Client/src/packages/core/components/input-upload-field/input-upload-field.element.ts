@@ -1,5 +1,5 @@
-import { UmbId } from '@umbraco-cms/backoffice/id';
 import { TemporaryFileQueueItem, UmbTemporaryFileManager } from '../../temporary-file/temporary-file-manager.class.js';
+import { UmbId } from '@umbraco-cms/backoffice/id';
 import {
 	css,
 	html,
@@ -31,10 +31,7 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 		this._keys = fileKeys;
 		super.value = this._keys.join(',');
 		fileKeys.forEach((key) => {
-			if (!UmbId.validate(key)) {
-				//TODO push when its a path
-				this._filePaths.push(key);
-			}
+			if (!UmbId.validate(key) && key.startsWith('/')) this._filePaths.push(key);
 		});
 	}
 	public get keys(): Array<string> {
