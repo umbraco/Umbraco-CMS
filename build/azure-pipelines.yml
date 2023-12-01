@@ -143,7 +143,7 @@ stages:
 
   - stage: Prepare_Npm
     displayName: Prepare Npm artifact
-    condition: and(succeeded(), or(eq(stageDependencies.Build.A.outputs['build.NBGV_PublicRelease'], 'True'), ${{parameters.npmDeploy}}))
+    condition: and(succeeded(), or(eq(stageDependencies.Build.A.outputs['build.NBGV_PublicRelease'], 'True'), ${{parameters.myGetDeploy}}))
     variables:
       npm_config_cache: $(Pipeline.Workspace)/.npm_client
       NODE_OPTIONS: --max_old_space_size=16384
