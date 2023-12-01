@@ -626,7 +626,7 @@ stages:
             workingDirectory: $(Pipeline.Workspace)/npm
             displayName: Add scoped registry to .npmrc
           - task: npmAuthenticate@0
-            displayName: Authenticate with npm
+            displayName: Authenticate with npm (MyGet)
             inputs:
               workingFile: '$(Pipeline.Workspace)/npm/.npmrc'
               customEndpoint: 'MyGet (npm) - Umbracoprereleases, MyGet (npm) - Umbraconightly'
@@ -634,15 +634,10 @@ stages:
               # Setup temp npm project to load in defaults from the local .npmrc
               npm init -y
 
-              echo "Testing npm is authenticated"
-              npm whoami
-
-              echo "Npm config"
-              npm config ls -l
-
+              # Find the first .tgz file in the current directory and publish it
               files=( ./*.tgz )
               npm publish --access public "${files[0]}"
-            displayName: MyGet (npm) push
+            displayName: Push to npm (MyGet)
             workingDirectory: $(Pipeline.Workspace)/npm
 
   - stage: Deploy_NuGet
@@ -693,9 +688,7 @@ stages:
               # Setup temp npm project to load in defaults from the local .npmrc
               npm init -y
 
-              echo "Testing npm is authenticated"
-              npm whoami
-
+              # Find the first .tgz file in the current directory and publish it
               files=( ./*.tgz )
               npm publish --tag $npmTag --access public "${files[0]}"
             displayName: Push to npm
