@@ -1,4 +1,4 @@
-import { manifest as colorPicker } from './color-picker/manifests.js';
+import { manifests as colorPicker } from './color-picker/manifests.js';
 import { manifest as datePicker } from './date-picker/manifests.js';
 import { manifest as eyeDropper } from './eye-dropper/manifests.js';
 import { manifest as multiUrlPicker } from './multi-url-picker/manifests.js';
@@ -33,7 +33,7 @@ import { manifest as memberGroupPicker } from './member-group-picker/manifests.j
 import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension-registry';
 
 export const manifests: Array<ManifestPropertyEditorUi> = [
-	colorPicker,
+	...colorPicker,
 	datePicker,
 	eyeDropper,
 	multiUrlPicker,
