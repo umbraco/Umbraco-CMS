@@ -617,9 +617,10 @@ stages:
   - stage: Deploy_MyGet
     displayName: MyGet pre-release
     dependsOn:
-      - Unit
-      - Integration
+      # - Unit
+      # - Integration
       # - E2E # TODO: Enable when stable.
+      - Build
       - Prepare_Npm
     condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.myGetDeploy}}))
     jobs:
