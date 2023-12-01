@@ -1,34 +1,29 @@
-<div
-  class="umb-property-editor umb-datepicker"
-  ng-controller="Umbraco.PropertyEditors.DatepickerController"
->
+<div class="umb-property-editor umb-datepicker" ng-controller="Umbraco.PropertyEditors.DatepickerController as vm">
+
   <ng-form name="datePickerForm">
     <div id="datepicker{{model.alias}}">
       <umb-date-time-picker
         ng-model="model.datetimePickerValue"
         options="datePickerConfig"
         on-setup="datePickerSetup(fpItem)"
-        on-change="datePickerChange(dateStr)"
-      >
+        on-change="datePickerChange(dateStr)">
         <div class="input-append">
           <input
             type="text"
             name="datepicker"
             id="{{model.alias}}"
             ng-model="model.datetimePickerInputValue"
-            ng-blur="inputChanged()"
+            ng-blur="vm.inputChanged()"
             ng-required="model.validation.mandatory"
             val-server="value"
             class="datepickerinput"
-            ng-readonly="readonly"
-          />
+            ng-readonly="readonly" />
           <button
             ng-if="!readonly"
             type="button"
             class="btn-clear"
-            ng-click="clearDate()"
-            ng-show="hasDatetimePickerValue === true || datePickerForm.datepicker.$error.pickerError === true"
-          >
+            ng-click="vm.clearDatePicker($event)"
+            ng-show="hasDatetimePickerValue === true || datePickerForm.datepicker.$error.pickerError === true">
             <umb-icon icon="icon-delete"></umb-icon>
             <span class="sr-only">
               <localize key="content_removeDate">Clear date</localize>
@@ -36,8 +31,8 @@
           </button>
           <span ng-if="!readonly" class="add-on">
             <umb-icon
-              icon="icon-{{ datePickerConfig.noCalendar ? 'time' : 'calendar' }}"
-            ></umb-icon>
+              icon="icon-{{ datePickerConfig.noCalendar ? 'time' : 'calendar' }}">
+            </umb-icon>
           </span>
         </div>
       </umb-date-time-picker>
@@ -45,8 +40,7 @@
 
     <div
       ng-messages="datePickerForm.datepicker.$error"
-      show-validation-on-submit
-    >
+      show-validation-on-submit>
       <p class="help-inline" ng-message="required">{{mandatoryMessage}}</p>
       <p class="help-inline" ng-message="valServer">
         {{datePickerForm.datepicker.errorMsg}}
@@ -58,18 +52,14 @@
 
     <p
       ng-if="model.config.offsetTime === '1' && serverTimeNeedsOffsetting && model.value"
-      class="muted"
-    >
+      class="muted">
       <small>
         <localize key="content_scheduledPublishServerTime"
           >This translates to the following time on the server:
         </localize>
-        {{serverTime}} </small
-      ><br />
+        {{serverTime}} </small><br />
       <small>
-        <localize key="content_scheduledPublishDocumentation"
-          >What does this mean?</localize
-        >
+        <localize key="content_scheduledPublishDocumentation">What does this mean?</localize>
       </small>
     </p>
   </ng-form>
