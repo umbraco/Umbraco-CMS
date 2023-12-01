@@ -49,11 +49,11 @@ public class DashboardService : IDashboardService
             tabs.Add(new Tab<IDashboard>
             {
                 Id = tabId++,
-                Label = !string.IsNullOrEmpty(label)
-                    ? label
-                    : !string.IsNullOrEmpty(dashboard.Name)
+                Label = label == $"[{label}]"
+                    ? !string.IsNullOrEmpty(dashboard.Name)
                         ? dashboard.Name
-                        : dashboard.Alias,
+                        : label
+                    : label,
                 Alias = dashboard.Alias,
                 Properties = dashboards,
             });
