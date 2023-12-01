@@ -649,22 +649,24 @@ stages:
           - checkout: none
           - download: current
             artifact: npm
-            ${{ if eq(parameters.isNightly, true) }}:
-              - bash: echo "@umbraco-cms:registry=https://www.myget.org/F/umbraconightly/npm/" >> .npmrc
-                workingDirectory: $(Pipeline.Workspace)/npm
-                displayName: Add scoped umbraconightly registry to .npmrc
-              - task: npmAuthenticate@0
-                inputs:
-                  workingFile: '$(Pipeline.Workspace)/npm/.npmrc'
-                  customEndpoint: 'MyGet (npm) - Umbraconightly'
-            ${{ else }}:
-              - bash: echo "@umbraco-cms:registry=https://www.myget.org/F/umbracoprereleases/npm/" >> .npmrc
-                workingDirectory: $(Pipeline.Workspace)/npm
-                displayName: Add scoped umbracoprereleases registry to .npmrc
-              - task: npmAuthenticate@0
-                inputs:
-                  workingFile: '$(Pipeline.Workspace)/npm/.npmrc'
-                  customEndpoint: 'MyGet (npm) - Umbracoprereleases'
+          - bash: |
+              # Check if we are on a nightly build
+              if [ $isNightly = true ]; then
+                  echo "##[debug]Nightly build detected"
+                  registry="https://www.myget.org/F/umbraconightly/npm/"
+              else
+                  echo "##[debug]Prerelease build detected"
+                  registry="https://www.myget.org/F/umbracoprereleases/npm/"
+              fi
+              echo "@umbraco-cms:registry=$registry" >> .npmrc
+            workingDirectory: $(Pipeline.Workspace)/npm
+            displayName: Add scoped registry to .npmrc
+            env:
+              isNightly: ${{parameters.isNightly}}
+          - task: npmAuthenticate@0
+            inputs:
+              workingFile: '$(Pipeline.Workspace)/npm/.npmrc'
+              customEndpoint: 'MyGet (npm) - Umbracoprereleases, MyGet (npm) - Umbraconightly'
           - bash: |
               # Log content of .npmrc to debug
               echo "##[debug]Content of .npmrc"
