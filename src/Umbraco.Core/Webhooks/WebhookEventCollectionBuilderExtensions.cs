@@ -21,39 +21,42 @@ namespace Umbraco.Cms.Core.DependencyInjection;
 
 public static class WebhookEventCollectionBuilderExtensions
 {
-    internal static WebhookEventCollectionBuilder AddDefaultWebhooks(this WebhookEventCollectionBuilder builder)
-        => builder
-            .Append<ContentDeletedWebhookEvent>()
-            .Append<ContentPublishedWebhookEvent>()
-            .Append<ContentUnpublishedWebhookEvent>()
-            .Append<MediaDeletedWebhookEvent>()
-            .Append<MediaSavedWebhookEvent>();
-
     /// <summary>
     /// Adds all available CMS webhook events.
     /// </summary>
     /// <param name="builder">The builder.</param>
+    /// <param name="onlyDefault">If set to <c>true</c> only adds the default webhook events instead of all available.</param>
     /// <returns>
     /// The builder.
     /// </returns>
-    public static WebhookEventCollectionBuilder AddCmsWebhooks(this WebhookEventCollectionBuilder builder)
-        => builder.AddCmsWebhooks(builder => builder
-            .AddContentWebhooks()
-            .AddDataTypeWebhooks()
-            .AddDictionaryWebhooks()
-            .AddDomainWebhooks()
-            .AddLanguageWebhooks()
-            .AddMediaWebhooks()
-            .AddMediaTypeWebhooks()
-            .AddMemberWebhooks()
-            .AddMemberTypeWebhooks()
-            .AddPackageWebhooks()
-            .AddPublicAccessWebhooks()
-            .AddRelationWebhooks()
-            .AddScriptWebhooks()
-            .AddStylesheetWebhooks()
-            .AddTemplateWebhooks()
-            .AddUserWebhooks());
+    public static WebhookEventCollectionBuilder AddCms(this WebhookEventCollectionBuilder builder, bool onlyDefault = false)
+        => builder.AddCms(builder =>
+        {
+            if (onlyDefault)
+            {
+                builder.AddDefault();
+            }
+            else
+            {
+                builder
+                    .AddContent()
+                    .AddDataType()
+                    .AddDictionary()
+                    .AddDomain()
+                    .AddLanguage()
+                    .AddMedia()
+                    .AddMediaType()
+                    .AddMember()
+                    .AddMemberType()
+                    .AddPackage()
+                    .AddPublicAccess()
+                    .AddRelation()
+                    .AddScript()
+                    .AddStylesheet()
+                    .AddTemplate()
+                    .AddUser();
+            }
+        });
 
     /// <summary>
     /// Adds CMS webhook events specified in the <see cref="CmsWebhookEventCollectionBuilder" /> action.
@@ -63,9 +66,31 @@ public static class WebhookEventCollectionBuilderExtensions
     /// <returns>
     /// The builder.
     /// </returns>
-    public static WebhookEventCollectionBuilder AddCmsWebhooks(this WebhookEventCollectionBuilder builder, Action<CmsWebhookEventCollectionBuilder> cmsBuilder)
+    public static WebhookEventCollectionBuilder AddCms(this WebhookEventCollectionBuilder builder, Action<CmsWebhookEventCollectionBuilder> cmsBuilder)
     {
         cmsBuilder(new CmsWebhookEventCollectionBuilder(builder));
+
+        return builder;
+    }
+
+    /// <summary>
+    /// Adds the default CMS webhook events.
+    /// </summary>
+    /// <param name="builder">The builder.</param>
+    /// <returns>
+    /// The builder.
+    /// </returns>
+    /// <remarks>
+    /// This is a special subset of webhook events that is added by default.
+    /// </remarks>
+    public static CmsWebhookEventCollectionBuilder AddDefault(this CmsWebhookEventCollectionBuilder builder)
+    {
+        builder.Builder
+            .Append<ContentDeletedWebhookEvent>()
+            .Append<ContentPublishedWebhookEvent>()
+            .Append<ContentUnpublishedWebhookEvent>()
+            .Append<MediaDeletedWebhookEvent>()
+            .Append<MediaSavedWebhookEvent>();
 
         return builder;
     }
@@ -77,7 +102,7 @@ public static class WebhookEventCollectionBuilderExtensions
     /// <returns>
     /// The builder.
     /// </returns>
-    public static CmsWebhookEventCollectionBuilder AddContentWebhooks(this CmsWebhookEventCollectionBuilder builder)
+    public static CmsWebhookEventCollectionBuilder AddContent(this CmsWebhookEventCollectionBuilder builder)
     {
         builder.Builder
             .Append<ContentCopiedWebhookEvent>()
@@ -104,7 +129,7 @@ public static class WebhookEventCollectionBuilderExtensions
     /// <returns>
     /// The builder.
     /// </returns>
-    public static CmsWebhookEventCollectionBuilder AddDataTypeWebhooks(this CmsWebhookEventCollectionBuilder builder)
+    public static CmsWebhookEventCollectionBuilder AddDataType(this CmsWebhookEventCollectionBuilder builder)
     {
         builder.Builder
             .Append<DataTypeDeletedWebhookEvent>()
@@ -121,7 +146,7 @@ public static class WebhookEventCollectionBuilderExtensions
     /// <returns>
     /// The builder.
     /// </returns>
-    public static CmsWebhookEventCollectionBuilder AddDictionaryWebhooks(this CmsWebhookEventCollectionBuilder builder)
+    public static CmsWebhookEventCollectionBuilder AddDictionary(this CmsWebhookEventCollectionBuilder builder)
     {
         builder.Builder
             .Append<DictionaryItemDeletedWebhookEvent>()
@@ -137,7 +162,7 @@ public static class WebhookEventCollectionBuilderExtensions
     /// <returns>
     /// The builder.
     /// </returns>
-    public static CmsWebhookEventCollectionBuilder AddDomainWebhooks(this CmsWebhookEventCollectionBuilder builder)
+    public static CmsWebhookEventCollectionBuilder AddDomain(this CmsWebhookEventCollectionBuilder builder)
     {
         builder.Builder
             .Append<DomainDeletedWebhookEvent>()
@@ -153,7 +178,7 @@ public static class WebhookEventCollectionBuilderExtensions
     /// <returns>
     /// The builder.
     /// </returns>
-    public static CmsWebhookEventCollectionBuilder AddLanguageWebhooks(this CmsWebhookEventCollectionBuilder builder)
+    public static CmsWebhookEventCollectionBuilder AddLanguage(this CmsWebhookEventCollectionBuilder builder)
     {
         builder.Builder
             .Append<LanguageDeletedWebhookEvent>()
@@ -169,7 +194,7 @@ public static class WebhookEventCollectionBuilderExtensions
     /// <returns>
     /// The builder.
     /// </returns>
-    public static CmsWebhookEventCollectionBuilder AddMediaWebhooks(this CmsWebhookEventCollectionBuilder builder)
+    public static CmsWebhookEventCollectionBuilder AddMedia(this CmsWebhookEventCollectionBuilder builder)
     {
         builder.Builder
             .Append<MediaDeletedWebhookEvent>()
@@ -188,7 +213,7 @@ public static class WebhookEventCollectionBuilderExtensions
     /// <returns>
     /// The builder.
     /// </returns>
-    public static CmsWebhookEventCollectionBuilder AddMediaTypeWebhooks(this CmsWebhookEventCollectionBuilder builder)
+    public static CmsWebhookEventCollectionBuilder AddMediaType(this CmsWebhookEventCollectionBuilder builder)
     {
         builder.Builder
             .Append<MediaTypeChangedWebhookEvent>()
@@ -206,7 +231,7 @@ public static class WebhookEventCollectionBuilderExtensions
     /// <returns>
     /// The builder.
     /// </returns>
-    public static CmsWebhookEventCollectionBuilder AddMemberWebhooks(this CmsWebhookEventCollectionBuilder builder)
+    public static CmsWebhookEventCollectionBuilder AddMember(this CmsWebhookEventCollectionBuilder builder)
     {
         builder.Builder
             .Append<AssignedMemberRolesWebhookEvent>()
@@ -227,7 +252,7 @@ public static class WebhookEventCollectionBuilderExtensions
     /// <returns>
     /// The builder.
     /// </returns>
-    public static CmsWebhookEventCollectionBuilder AddMemberTypeWebhooks(this CmsWebhookEventCollectionBuilder builder)
+    public static CmsWebhookEventCollectionBuilder AddMemberType(this CmsWebhookEventCollectionBuilder builder)
     {
         builder.Builder
             .Append<MemberTypeChangedWebhookEvent>()
@@ -245,7 +270,7 @@ public static class WebhookEventCollectionBuilderExtensions
     /// <returns>
     /// The builder.
     /// </returns>
-    public static CmsWebhookEventCollectionBuilder AddPackageWebhooks(this CmsWebhookEventCollectionBuilder builder)
+    public static CmsWebhookEventCollectionBuilder AddPackage(this CmsWebhookEventCollectionBuilder builder)
     {
         builder.Builder
             .Append<ImportedPackageWebhookEvent>();
@@ -260,7 +285,7 @@ public static class WebhookEventCollectionBuilderExtensions
     /// <returns>
     /// The builder.
     /// </returns>
-    public static CmsWebhookEventCollectionBuilder AddPublicAccessWebhooks(this CmsWebhookEventCollectionBuilder builder)
+    public static CmsWebhookEventCollectionBuilder AddPublicAccess(this CmsWebhookEventCollectionBuilder builder)
     {
         builder.Builder
             .Append<PublicAccessEntryDeletedWebhookEvent>()
@@ -276,7 +301,7 @@ public static class WebhookEventCollectionBuilderExtensions
     /// <returns>
     /// The builder.
     /// </returns>
-    public static CmsWebhookEventCollectionBuilder AddRelationWebhooks(this CmsWebhookEventCollectionBuilder builder)
+    public static CmsWebhookEventCollectionBuilder AddRelation(this CmsWebhookEventCollectionBuilder builder)
     {
         builder.Builder
             .Append<RelationDeletedWebhookEvent>()
@@ -294,7 +319,7 @@ public static class WebhookEventCollectionBuilderExtensions
     /// <returns>
     /// The builder.
     /// </returns>
-    public static CmsWebhookEventCollectionBuilder AddScriptWebhooks(this CmsWebhookEventCollectionBuilder builder)
+    public static CmsWebhookEventCollectionBuilder AddScript(this CmsWebhookEventCollectionBuilder builder)
     {
         builder.Builder
             .Append<ScriptDeletedWebhookEvent>()
@@ -310,7 +335,7 @@ public static class WebhookEventCollectionBuilderExtensions
     /// <returns>
     /// The builder.
     /// </returns>
-    public static CmsWebhookEventCollectionBuilder AddStylesheetWebhooks(this CmsWebhookEventCollectionBuilder builder)
+    public static CmsWebhookEventCollectionBuilder AddStylesheet(this CmsWebhookEventCollectionBuilder builder)
     {
         builder.Builder
             .Append<StylesheetDeletedWebhookEvent>()
@@ -326,7 +351,7 @@ public static class WebhookEventCollectionBuilderExtensions
     /// <returns>
     /// The builder.
     /// </returns>
-    public static CmsWebhookEventCollectionBuilder AddTemplateWebhooks(this CmsWebhookEventCollectionBuilder builder)
+    public static CmsWebhookEventCollectionBuilder AddTemplate(this CmsWebhookEventCollectionBuilder builder)
     {
         builder.Builder
             .Append<PartialViewDeletedWebhookEvent>()
@@ -341,15 +366,23 @@ public static class WebhookEventCollectionBuilderExtensions
     /// Adds all available user webhook events.
     /// </summary>
     /// <param name="builder">The builder.</param>
+    /// <param name="onlyDefault">If set to <c>true</c> only adds the default webhook events instead of all available.</param>
     /// <returns>
     /// The builder.
     /// </returns>
-    public static CmsWebhookEventCollectionBuilder AddUserWebhooks(this CmsWebhookEventCollectionBuilder builder)
-        => builder.AddUserWebhooks(builder => builder
-            .AddUserEvents()
-            .AddUserGroupEvents()
-            .AddLoginEvents()
-            .AddPasswordEvents());
+    public static CmsWebhookEventCollectionBuilder AddUser(this CmsWebhookEventCollectionBuilder builder, bool onlyDefault = false)
+        => builder.AddUser(builder =>
+        {
+            builder.AddDefault();
+
+            if (onlyDefault is false)
+            {
+                builder
+                    .AddUserGroup()
+                    .AddLogin()
+                    .AddPassword();
+            }
+        });
 
     /// <summary>
     /// Adds CMS user webhook events specified in the <see cref="CmsUserWebhookEventCollectionBuilder" /> action.
@@ -359,7 +392,7 @@ public static class WebhookEventCollectionBuilderExtensions
     /// <returns>
     /// The builder.
     /// </returns>
-    public static CmsWebhookEventCollectionBuilder AddUserWebhooks(this CmsWebhookEventCollectionBuilder builder, Action<CmsUserWebhookEventCollectionBuilder> userCmsBuilder)
+    public static CmsWebhookEventCollectionBuilder AddUser(this CmsWebhookEventCollectionBuilder builder, Action<CmsUserWebhookEventCollectionBuilder> userCmsBuilder)
     {
         userCmsBuilder(new CmsUserWebhookEventCollectionBuilder(builder.Builder));
 
@@ -373,7 +406,7 @@ public static class WebhookEventCollectionBuilderExtensions
     /// <returns>
     /// The builder.
     /// </returns>
-    public static CmsUserWebhookEventCollectionBuilder AddUserEvents(this CmsUserWebhookEventCollectionBuilder builder)
+    public static CmsUserWebhookEventCollectionBuilder AddDefault(this CmsUserWebhookEventCollectionBuilder builder)
     {
         builder.Builder
             .Append<UserDeletedWebhookEvent>()
@@ -389,7 +422,7 @@ public static class WebhookEventCollectionBuilderExtensions
     /// <returns>
     /// The builder.
     /// </returns>
-    public static CmsUserWebhookEventCollectionBuilder AddUserGroupEvents(this CmsUserWebhookEventCollectionBuilder builder)
+    public static CmsUserWebhookEventCollectionBuilder AddUserGroup(this CmsUserWebhookEventCollectionBuilder builder)
     {
         builder.Builder
             .Append<AssignedUserGroupPermissionsWebhookEvent>()
@@ -406,7 +439,7 @@ public static class WebhookEventCollectionBuilderExtensions
     /// <returns>
     /// The builder.
     /// </returns>
-    public static CmsUserWebhookEventCollectionBuilder AddLoginEvents(this CmsUserWebhookEventCollectionBuilder builder)
+    public static CmsUserWebhookEventCollectionBuilder AddLogin(this CmsUserWebhookEventCollectionBuilder builder)
     {
         builder.Builder
             .Append<UserLockedWebhookEvent>()
@@ -427,7 +460,7 @@ public static class WebhookEventCollectionBuilderExtensions
     /// <returns>
     /// The builder.
     /// </returns>
-    public static CmsUserWebhookEventCollectionBuilder AddPasswordEvents(this CmsUserWebhookEventCollectionBuilder builder)
+    public static CmsUserWebhookEventCollectionBuilder AddPassword(this CmsUserWebhookEventCollectionBuilder builder)
     {
         builder.Builder
             .Append<UserForgotPasswordRequestedWebhookEvent>()
