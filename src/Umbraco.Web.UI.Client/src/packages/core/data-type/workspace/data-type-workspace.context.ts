@@ -5,6 +5,7 @@ import {
 	UmbInvariantableWorkspaceContextInterface,
 	UmbEditableWorkspaceContextBase,
 	UmbWorkspaceContextInterface,
+	UmbBasicVariantContext,
 } from '@umbraco-cms/backoffice/workspace';
 import {
 	appendToFrozenArray,
@@ -148,8 +149,26 @@ export class UmbDataTypeWorkspaceContext
 		return this._configDefaultData?.find((x) => x.alias === alias)?.value;
 	}
 
-	createVariantContext(host: UmbControllerHost): UmbDataTypeVariantContext {
-		return new UmbDataTypeVariantContext(host, this);
+	createVariantContext(host: UmbControllerHost) {
+		const context = new UmbBasicVariantContext(host);
+		this.observe(
+			this.properties,
+			(properties) => {
+				if (properties) {
+					properties.forEach(async (property) => {
+						this.observe(
+							await this.propertyValueByAlias(property.alias),
+							(value) => {
+								context.setPropertyValue(property.alias, value);
+							},
+							'observePropertyOf_' + property.alias,
+						);
+					});
+				}
+			},
+			'observePropertyValues',
+		);
+		return context;
 	}
 
 	async load(unique: string) {

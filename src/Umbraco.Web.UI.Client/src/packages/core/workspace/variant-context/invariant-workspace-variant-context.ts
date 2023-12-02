@@ -1,7 +1,5 @@
-import { DocumentVariantResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
-import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import {
 	UMB_VARIANT_CONTEXT,
@@ -17,12 +15,7 @@ export class UmbInvariantWorkspaceVariantContext<
 {
 	protected _workspace: WorkspaceType;
 
-	#currentVariant = new UmbObjectState<DocumentVariantResponseModel | undefined>(undefined);
-	currentVariant = this.#currentVariant.asObservable();
-
-	name = this.#currentVariant.asObservablePart((x) => x?.name);
-	culture = this.#currentVariant.asObservablePart((x) => x?.culture);
-	segment = this.#currentVariant.asObservablePart((x) => x?.segment);
+	name;
 
 	// default data:
 
@@ -46,6 +39,8 @@ export class UmbInvariantWorkspaceVariantContext<
 		// The controller alias, is a very generic name cause we want only one of these for this controller host.
 		super(host, 'variantContext');
 		this._workspace = workspace;
+
+		this.name = this._workspace.name;
 
 		this.provideContext(UMB_VARIANT_CONTEXT, this);
 	}
