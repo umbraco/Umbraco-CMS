@@ -44,6 +44,7 @@ public static class WebhookEventCollectionBuilderExtensions
             .AddDomainWebhooks()
             .AddLanguageWebhooks()
             .AddMediaWebhooks()
+            .AddMediaTypeWebhooks()
             .AddMemberWebhooks()
             .AddMemberTypeWebhooks()
             .AddPackageWebhooks()
@@ -175,7 +176,21 @@ public static class WebhookEventCollectionBuilderExtensions
             .Append<MediaSavedWebhookEvent>()
             .Append<MediaEmptiedRecycleBinWebhookEvent>()
             .Append<MediaMovedWebhookEvent>()
-            .Append<MediaMovedToRecycleBinWebhookEvent>()
+            .Append<MediaMovedToRecycleBinWebhookEvent>();
+
+        return builder;
+    }
+
+    /// <summary>
+    /// Adds the media type webhook events.
+    /// </summary>
+    /// <param name="builder">The builder.</param>
+    /// <returns>
+    /// The builder.
+    /// </returns>
+    public static CmsWebhookEventCollectionBuilder AddMediaTypeWebhooks(this CmsWebhookEventCollectionBuilder builder)
+    {
+        builder.Builder
             .Append<MediaTypeChangedWebhookEvent>()
             .Append<MediaTypeDeletedWebhookEvent>()
             .Append<MediaTypeMovedWebhookEvent>()
