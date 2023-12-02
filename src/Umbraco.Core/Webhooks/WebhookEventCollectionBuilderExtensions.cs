@@ -338,43 +338,125 @@ public static class WebhookEventCollectionBuilderExtensions
     }
 
     /// <summary>
-    /// Adds the user webhook events.
+    /// Adds all available user webhook events.
     /// </summary>
     /// <param name="builder">The builder.</param>
     /// <returns>
     /// The builder.
     /// </returns>
     public static CmsWebhookEventCollectionBuilder AddUserWebhooks(this CmsWebhookEventCollectionBuilder builder)
+        => builder.AddUserWebhooks(builder => builder
+            .AddUserEvents()
+            .AddUserGroupEvents()
+            .AddLoginEvents()
+            .AddPasswordEvents());
+
+    /// <summary>
+    /// Adds CMS user webhook events specified in the <see cref="CmsUserWebhookEventCollectionBuilder" /> action.
+    /// </summary>
+    /// <param name="builder">The builder.</param>
+    /// <param name="userCmsBuilder">The CMS user builder.</param>
+    /// <returns>
+    /// The builder.
+    /// </returns>
+    public static CmsWebhookEventCollectionBuilder AddUserWebhooks(this CmsWebhookEventCollectionBuilder builder, Action<CmsUserWebhookEventCollectionBuilder> userCmsBuilder)
+    {
+        userCmsBuilder(new CmsUserWebhookEventCollectionBuilder(builder.Builder));
+
+        return builder;
+    }
+
+    /// <summary>
+    /// Adds the user events.
+    /// </summary>
+    /// <param name="builder">The builder.</param>
+    /// <returns>
+    /// The builder.
+    /// </returns>
+    public static CmsUserWebhookEventCollectionBuilder AddUserEvents(this CmsUserWebhookEventCollectionBuilder builder)
+    {
+        builder.Builder
+            .Append<UserDeletedWebhookEvent>()
+            .Append<UserSavedWebhookEvent>();
+
+        return builder;
+    }
+
+    /// <summary>
+    /// Adds the user group events.
+    /// </summary>
+    /// <param name="builder">The builder.</param>
+    /// <returns>
+    /// The builder.
+    /// </returns>
+    public static CmsUserWebhookEventCollectionBuilder AddUserGroupEvents(this CmsUserWebhookEventCollectionBuilder builder)
     {
         builder.Builder
             .Append<AssignedUserGroupPermissionsWebhookEvent>()
-            .Append<UserDeletedWebhookEvent>()
-            .Append<UserForgotPasswordRequestedWebhookEvent>()
-            .Append<UserForgottenPasswordRequestedWebhookEvent>()
             .Append<UserGroupDeletedWebhookEvent>()
-            .Append<UserGroupSavedWebhookEvent>()
+            .Append<UserGroupSavedWebhookEvent>();
+
+        return builder;
+    }
+
+    /// <summary>
+    /// Adds the login events.
+    /// </summary>
+    /// <param name="builder">The builder.</param>
+    /// <returns>
+    /// The builder.
+    /// </returns>
+    public static CmsUserWebhookEventCollectionBuilder AddLoginEvents(this CmsUserWebhookEventCollectionBuilder builder)
+    {
+        builder.Builder
             .Append<UserLockedWebhookEvent>()
             .Append<UserLoginFailedWebhookEvent>()
             .Append<UserLoginRequiresVerificationWebhookEvent>()
             .Append<UserLoginSuccessWebhookEvent>()
             .Append<UserLogoutSuccessWebhookEvent>()
-            .Append<UserPasswordChangedWebhookEvent>()
-            .Append<UserPasswordResetWebhookEvent>()
-            .Append<UserSavedWebhookEvent>()
             .Append<UserTwoFactorRequestedWebhookEvent>()
             .Append<UserUnlockedWebhookEvent>();
 
         return builder;
     }
-}
 
-/// <summary>
-/// Fluent <see cref="WebhookEventCollectionBuilder" /> for adding CMS specific webhook events.
-/// </summary>
-public sealed class CmsWebhookEventCollectionBuilder
-{
-    internal CmsWebhookEventCollectionBuilder(WebhookEventCollectionBuilder builder)
-        => Builder = builder;
+    /// <summary>
+    /// Adds the password events.
+    /// </summary>
+    /// <param name="builder">The builder.</param>
+    /// <returns>
+    /// The builder.
+    /// </returns>
+    public static CmsUserWebhookEventCollectionBuilder AddPasswordEvents(this CmsUserWebhookEventCollectionBuilder builder)
+    {
+        builder.Builder
+            .Append<UserForgotPasswordRequestedWebhookEvent>()
+            .Append<UserForgottenPasswordRequestedWebhookEvent>()
+            .Append<UserPasswordChangedWebhookEvent>()
+            .Append<UserPasswordResetWebhookEvent>();
 
-    internal WebhookEventCollectionBuilder Builder { get; }
+        return builder;
+    }
+
+    /// <summary>
+    /// Fluent <see cref="WebhookEventCollectionBuilder" /> for adding CMS specific webhook events.
+    /// </summary>
+    public sealed class CmsWebhookEventCollectionBuilder
+    {
+        internal CmsWebhookEventCollectionBuilder(WebhookEventCollectionBuilder builder)
+            => Builder = builder;
+
+        internal WebhookEventCollectionBuilder Builder { get; }
+    }
+
+    /// <summary>
+    /// Fluent <see cref="WebhookEventCollectionBuilder" /> for adding CMS user specific webhook events.
+    /// </summary>
+    public sealed class CmsUserWebhookEventCollectionBuilder
+    {
+        internal CmsUserWebhookEventCollectionBuilder(WebhookEventCollectionBuilder builder)
+            => Builder = builder;
+
+        internal WebhookEventCollectionBuilder Builder { get; }
+    }
 }
