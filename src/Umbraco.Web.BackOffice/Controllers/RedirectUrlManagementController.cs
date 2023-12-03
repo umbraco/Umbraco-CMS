@@ -20,7 +20,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.BackOffice.Controllers;
 
-[Authorize(Policy = AuthorizationPolicies.SectionAccessSettings)]
+[Authorize(Policy = AuthorizationPolicies.SectionAccessContent)]
 [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
 public class RedirectUrlManagementController : UmbracoAuthorizedApiController
 {

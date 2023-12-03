@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="NPoco.SqlServer" Version="5.7.1" />
+    <PackageReference Include="NPoco.SqlServer" />
   </ItemGroup>
 
   <ItemGroup>

@@ -5,12 +5,12 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 
-namespace Umbraco.Cms.Core.Webhooks.Events;
+namespace Umbraco.Cms.Core.Webhooks.Events.Content;
 
-[WebhookEvent("Content was unpublished", Constants.WebhookEvents.Types.Content)]
-public class ContentUnpublishWebhookEvent : WebhookEventContentBase<ContentUnpublishedNotification, IContent>
+[WebhookEvent("Content Deleted", Constants.WebhookEvents.Types.Content)]
+public class ContentDeletedWebhookEvent : WebhookEventContentBase<ContentDeletedNotification, IContent>
 {
-    public ContentUnpublishWebhookEvent(
+    public ContentDeletedWebhookEvent(
         IWebhookFiringService webhookFiringService,
         IWebhookService webhookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
@@ -23,9 +23,10 @@ public class ContentUnpublishWebhookEvent : WebhookEventContentBase<ContentUnpub
     {
     }
 
-    public override string Alias => Constants.WebhookEvents.Aliases.ContentDelete;
+    public override string Alias => Constants.WebhookEvents.Aliases.ContentUnpublish;
 
-    protected override IEnumerable<IContent> GetEntitiesFromNotification(ContentUnpublishedNotification notification) => notification.UnpublishedEntities;
+    protected override IEnumerable<IContent> GetEntitiesFromNotification(ContentDeletedNotification notification) =>
+        notification.DeletedEntities;
 
     protected override object ConvertEntityToRequestPayload(IContent entity) => new DefaultPayloadModel { Id = entity.Key };
 }
