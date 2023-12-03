@@ -1,15 +1,15 @@
-﻿using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 
-namespace Umbraco.Cms.Core.Webhooks.Events.Member;
+namespace Umbraco.Cms.Core.Webhooks.Events.ContentType;
 
-[WebhookEvent("Member Group Deleted")]
-public class MemberGroupDeletedWebhookEvent : WebhookEventBase<MemberGroupDeletedNotification>
+[WebhookEvent("Document Type Deleted")]
+public class DocumentTypeDeletedWebhookEvent : WebhookEventBase<ContentTypeDeletedNotification>
 {
-    public MemberGroupDeletedWebhookEvent(
+    public DocumentTypeDeletedWebhookEvent(
         IWebhookFiringService webhookFiringService,
         IWebhookService webHookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
@@ -18,8 +18,8 @@ public class MemberGroupDeletedWebhookEvent : WebhookEventBase<MemberGroupDelete
     {
     }
 
-    public override string Alias => "memberGroupDeleted";
+    public override string Alias => "documentTypeDeleted";
 
-    public override object? ConvertNotificationToRequestPayload(MemberGroupDeletedNotification notification)
+    public override object? ConvertNotificationToRequestPayload(ContentTypeDeletedNotification notification)
         => notification.DeletedEntities;
 }

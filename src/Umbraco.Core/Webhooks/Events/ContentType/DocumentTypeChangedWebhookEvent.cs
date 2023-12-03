@@ -1,15 +1,15 @@
-﻿using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 
-namespace Umbraco.Cms.Core.Webhooks.Events.MediaType;
+namespace Umbraco.Cms.Core.Webhooks.Events.ContentType;
 
-[WebhookEvent("Media Type Changed")]
-public class MediaTypeChangedWebhookEvent : WebhookEventBase<MediaTypeChangedNotification>
+[WebhookEvent("Document Type Changed")]
+public class DocumentTypeChangedWebhookEvent : WebhookEventBase<ContentTypeChangedNotification>
 {
-    public MediaTypeChangedWebhookEvent(
+    public DocumentTypeChangedWebhookEvent(
         IWebhookFiringService webhookFiringService,
         IWebhookService webHookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
@@ -18,8 +18,8 @@ public class MediaTypeChangedWebhookEvent : WebhookEventBase<MediaTypeChangedNot
     {
     }
 
-    public override string Alias => "mediaTypeChanged";
+    public override string Alias => "documentTypeChanged";
 
-    public override object? ConvertNotificationToRequestPayload(MediaTypeChangedNotification notification)
+    public override object? ConvertNotificationToRequestPayload(ContentTypeChangedNotification notification)
         => notification.Changes;
 }

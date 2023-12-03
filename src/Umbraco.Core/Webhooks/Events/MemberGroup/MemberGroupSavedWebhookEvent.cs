@@ -4,12 +4,12 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 
-namespace Umbraco.Cms.Core.Webhooks.Events.MemberType;
+namespace Umbraco.Cms.Core.Webhooks.Events.MemberGroup;
 
-[WebhookEvent("Member Type Changed")]
-public class MemberTypeChangedWebhookEvent : WebhookEventBase<MemberTypeChangedNotification>
+[WebhookEvent("Member Group Saved")]
+public class MemberGroupSavedWebhookEvent : WebhookEventBase<MemberGroupSavedNotification>
 {
-    public MemberTypeChangedWebhookEvent(
+    public MemberGroupSavedWebhookEvent(
         IWebhookFiringService webhookFiringService,
         IWebhookService webHookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
@@ -18,8 +18,8 @@ public class MemberTypeChangedWebhookEvent : WebhookEventBase<MemberTypeChangedN
     {
     }
 
-    public override string Alias => "memberTypeChanged";
+    public override string Alias => "memberGroupSaved";
 
-    public override object? ConvertNotificationToRequestPayload(MemberTypeChangedNotification notification)
-        => notification.Changes;
+    public override object? ConvertNotificationToRequestPayload(MemberGroupSavedNotification notification)
+        => notification.SavedEntities;
 }

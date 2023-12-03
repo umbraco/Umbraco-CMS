@@ -4,12 +4,12 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 
-namespace Umbraco.Cms.Core.Webhooks.Events.Member;
+namespace Umbraco.Cms.Core.Webhooks.Events.ContentType;
 
-[WebhookEvent("Member Group Saved")]
-public class MemberGroupSavedWebhookEvent : WebhookEventBase<MemberGroupSavedNotification>
+[WebhookEvent("Media Type Moved")]
+public class MediaTypeMovedWebhookEvent : WebhookEventBase<MediaTypeMovedNotification>
 {
-    public MemberGroupSavedWebhookEvent(
+    public MediaTypeMovedWebhookEvent(
         IWebhookFiringService webhookFiringService,
         IWebhookService webHookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
@@ -18,8 +18,8 @@ public class MemberGroupSavedWebhookEvent : WebhookEventBase<MemberGroupSavedNot
     {
     }
 
-    public override string Alias => "memberGroupSaved";
+    public override string Alias => "mediaTypeMoved";
 
-    public override object? ConvertNotificationToRequestPayload(MemberGroupSavedNotification notification)
-        => notification.SavedEntities;
+    public override object? ConvertNotificationToRequestPayload(MediaTypeMovedNotification notification)
+        => notification.MoveInfoCollection;
 }

@@ -1,15 +1,15 @@
-﻿using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 
-namespace Umbraco.Cms.Core.Webhooks.Events.MediaType;
+namespace Umbraco.Cms.Core.Webhooks.Events.MemberGroup;
 
-[WebhookEvent("Media Type Deleted")]
-public class MediaTypeDeletedWebhookEvent : WebhookEventBase<MediaTypeDeletedNotification>
+[WebhookEvent("Member Group Deleted")]
+public class MemberGroupDeletedWebhookEvent : WebhookEventBase<MemberGroupDeletedNotification>
 {
-    public MediaTypeDeletedWebhookEvent(
+    public MemberGroupDeletedWebhookEvent(
         IWebhookFiringService webhookFiringService,
         IWebhookService webHookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
@@ -18,8 +18,8 @@ public class MediaTypeDeletedWebhookEvent : WebhookEventBase<MediaTypeDeletedNot
     {
     }
 
-    public override string Alias => "mediaTypeDeleted";
+    public override string Alias => "memberGroupDeleted";
 
-    public override object? ConvertNotificationToRequestPayload(MediaTypeDeletedNotification notification)
+    public override object? ConvertNotificationToRequestPayload(MemberGroupDeletedNotification notification)
         => notification.DeletedEntities;
 }
