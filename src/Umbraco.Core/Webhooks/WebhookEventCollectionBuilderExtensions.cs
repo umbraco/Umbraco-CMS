@@ -464,7 +464,6 @@ public static class WebhookEventCollectionBuilderExtensions
     {
         builder.Builder
             .Append<UserForgotPasswordRequestedWebhookEvent>()
-            .Append<UserForgottenPasswordRequestedWebhookEvent>()
             .Append<UserPasswordChangedWebhookEvent>()
             .Append<UserPasswordResetWebhookEvent>();
 
