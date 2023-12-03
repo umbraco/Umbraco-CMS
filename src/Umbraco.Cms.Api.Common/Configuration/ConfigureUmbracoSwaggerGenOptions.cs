@@ -5,7 +5,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using Umbraco.Cms.Api.Common.Attributes;
 using Umbraco.Cms.Api.Common.OpenApi;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Common.Configuration;
@@ -38,28 +40,89 @@ public class ConfigureUmbracoSwaggerGenOptions : IConfigureOptions<SwaggerGenOpt
             });
 
         swaggerGenOptions.CustomOperationIds(description => _operationIdSelector.OperationId(description, _apiVersioningOptions.Value));
-        swaggerGenOptions.DocInclusionPredicate((name, api) =>
+        swaggerGenOptions.DocInclusionPredicate((documentGroupName, apiDescription) =>
         {
-            if (string.IsNullOrWhiteSpace(api.GroupName))
+            if (apiDescription.ActionDescriptor is ControllerActionDescriptor controllerActionDescriptor)
+            {
+                MapToApiAttribute? mapToApiAttribute = controllerActionDescriptor.MethodInfo.GetMapToApiAttribute();
+
+                if (mapToApiAttribute != null)
+                {
+                    return mapToApiAttribute.ApiName == documentGroupName;
+                }
+            }
+
+            if (string.IsNullOrWhiteSpace(apiDescription.GroupName))
+            {
+                return documentGroupName == DefaultApiConfiguration.ApiName;
+            }
+
+            if (documentGroupName == apiDescription.GroupName)
+            {
+                return true;
+            }
+
+            IOptions<SwaggerGenOptions> swaggerOptions = StaticServiceProvider.Instance.GetRequiredService<IOptions<SwaggerGenOptions>>();
+            if (swaggerOptions.Value.SwaggerGeneratorOptions.SwaggerDocs.ContainsKey(apiDescription.GroupName))
             {
                 return false;
             }
-
-            if (api.ActionDescriptor is ControllerActionDescriptor controllerActionDescriptor)
+            else
             {
-                return controllerActionDescriptor.MethodInfo.HasMapToApiAttribute(name);
+                return documentGroupName == DefaultApiConfiguration.ApiName;
             }
-
-            return false;
         });
-        swaggerGenOptions.TagActionsBy(api => new[] { api.GroupName });
+
+        swaggerGenOptions.TagActionsBy(TagActionsBy);
         swaggerGenOptions.OrderActionsBy(ActionOrderBy);
         swaggerGenOptions.SchemaFilter<EnumSchemaFilter>();
         swaggerGenOptions.CustomSchemaIds(_schemaIdSelector.SchemaId);
         swaggerGenOptions.SupportNonNullableReferenceTypes();
     }
 
+    private static List<string> TagActionsBy(ApiDescription apiDescription)
+    {
+        if (apiDescription.GroupName != null)
+        {
+            return new List<string> { apiDescription.GroupName };
+        }
+
+        return new List<string>();
+    }
+
     // see https://github.com/domaindrivendev/Swashbuckle.AspNetCore#change-operation-sort-order-eg-for-ui-sorting
-    private static string ActionOrderBy(ApiDescription apiDesc)
-        => $"{apiDesc.GroupName}_{apiDesc.ActionDescriptor.AttributeRouteInfo?.Template ?? apiDesc.ActionDescriptor.RouteValues["controller"]}_{apiDesc.ActionDescriptor.RouteValues["action"]}_{apiDesc.HttpMethod}";
+    private static string ActionOrderBy(ApiDescription apiDescription)
+    {
+        var orderBySections = new List<string>();
+
+        if (apiDescription.GroupName != null)
+        {
+            orderBySections.Add(apiDescription.GroupName);
+        }
+        else
+        {
+            orderBySections.Add(DefaultApiConfiguration.ApiName);
+        }
+
+        if (apiDescription.ActionDescriptor.AttributeRouteInfo?.Template != null)
+        {
+            orderBySections.Add(apiDescription.ActionDescriptor.AttributeRouteInfo.Template);
+        }
+        else if (apiDescription.ActionDescriptor.RouteValues.TryGetValue("controller", out string? controllerValue) && !string.IsNullOrEmpty(controllerValue))
+        {
+            orderBySections.Add(controllerValue);
+        }
+
+        if (apiDescription.ActionDescriptor.RouteValues.TryGetValue("action", out string? actionValue) && !string.IsNullOrEmpty(actionValue))
+        {
+            orderBySections.Add(actionValue);
+        }
+
+        if (apiDescription.HttpMethod != null)
+        {
+            orderBySections.Add(apiDescription.HttpMethod);
+        }
+
+        return string.Join('_', orderBySections);
+    }
 }
