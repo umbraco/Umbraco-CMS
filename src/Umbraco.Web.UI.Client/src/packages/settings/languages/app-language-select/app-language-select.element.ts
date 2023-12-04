@@ -1,12 +1,15 @@
 import { UmbLanguageRepository } from '../repository/language.repository.js';
 import { UMB_APP_LANGUAGE_CONTEXT_TOKEN, UmbAppLanguageContext } from './app-language.context.js';
-import { UUIMenuItemEvent } from '@umbraco-cms/backoffice/external/uui';
-import { css, html, customElement, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { UUIMenuItemEvent, UUIPopoverContainerElement } from '@umbraco-cms/backoffice/external/uui';
+import { css, html, customElement, state, repeat, ifDefined, query } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-app-language-select')
 export class UmbAppLanguageSelectElement extends UmbLitElement {
+	@query('#dropdown-popover')
+	private _popoverElement?: UUIPopoverContainerElement;
+
 	@state()
 	private _languages: Array<LanguageResponseModel> = [];
 
@@ -45,25 +48,16 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 		});
 	}
 
-	#onClick() {
-		this.#toggleDropdown();
-	}
+	#onPopoverToggle(event: ToggleEvent) {
+		this._isOpen = event.newState === 'open';
+		if (this._isOpen) {
+			if (this._popoverElement) {
+				const host = this.getBoundingClientRect();
+				this._popoverElement.style.width = `${host.width}px`;
+			}
 
-	#onClose() {
-		this.#closeDropdown();
-	}
-
-	#toggleDropdown() {
-		this._isOpen = !this._isOpen;
-
-		// first start observing the languages when the dropdown is opened
-		if (this._isOpen && !this.#languagesObserver) {
 			this.#observeLanguages();
 		}
-	}
-
-	#closeDropdown() {
-		this._isOpen = false;
 	}
 
 	#onLabelClick(event: UUIMenuItemEvent) {
@@ -75,34 +69,35 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 
 		this.#appLanguageContext?.setLanguage(isoCode);
 		this._isOpen = false;
+		this._popoverElement?.hidePopover();
 	}
 
 	render() {
-		return html` <umb-dropdown .open="${this._isOpen}" @close=${this.#onClose}>
-			${this.#renderTrigger()} ${this.#renderContent()}
-		</umb-dropdown>`;
+		return html`${this.#renderTrigger()} ${this.#renderContent()}`;
 	}
 
 	#renderTrigger() {
-		return html`<button id="toggle" slot="trigger" @click=${this.#onClick}>
+		return html`<button id="toggle" popovertarget="dropdown-popover">
 			${this._appLanguage?.name} <uui-symbol-expand .open=${this._isOpen}></uui-symbol-expand>
 		</button>`;
 	}
 
 	#renderContent() {
-		return html`<div slot="dropdown">
-			${repeat(
-				this._languages,
-				(language) => language.isoCode,
-				(language) => html`
-					<uui-menu-item
-						label=${ifDefined(language.name)}
-						@click-label=${this.#onLabelClick}
-						data-iso-code=${ifDefined(language.isoCode)}
-						?active=${language.isoCode === this._appLanguage?.isoCode}></uui-menu-item>
-				`,
-			)}
-		</div>`;
+		return html` <uui-popover-container id="dropdown-popover" @toggle=${this.#onPopoverToggle}>
+			<umb-popover-layout>
+				${repeat(
+					this._languages,
+					(language) => language.isoCode,
+					(language) => html`
+						<uui-menu-item
+							label=${ifDefined(language.name)}
+							@click-label=${this.#onLabelClick}
+							data-iso-code=${ifDefined(language.isoCode)}
+							?active=${language.isoCode === this._appLanguage?.isoCode}></uui-menu-item>
+					`,
+				)}
+			</umb-popover-layout>
+		</uui-popover-container>`;
 	}
 
 	static styles = [
