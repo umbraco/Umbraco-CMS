@@ -57,10 +57,10 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 	private _queryBuilderSettings?: TemplateQuerySettingsResponseModel;
 
 	@state()
-	private _selectedRootContentName? = 'all pages';
+	private _selectedRootContentName? = this.localize.term('template_websiteRoot');
 
 	@state()
-	private _defaultSortDirection: SortOrder = SortOrder.Descending;
+	private _defaultSortDirection: SortOrder = SortOrder.Ascending;
 
 	#documentRepository: UmbDocumentRepository;
 	#modalManagerContext?: UmbModalManagerContext;
@@ -111,7 +111,7 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 
 	#openDocumentPicker = () => {
 		this.#modalManagerContext
-			?.open(UMB_DOCUMENT_PICKER_MODAL)
+			?.open(UMB_DOCUMENT_PICKER_MODAL, { hideTreeRoot: true })
 			.onSubmit()
 			.then((result) => {
 				this.#updateQueryRequest({ rootContentId: result.selection[0] });
@@ -252,7 +252,7 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 								ms</span
 							>
 						</div>
-						<umb-code-block language="C#" copy> ${this._templateQuery?.queryExpression ?? ''} </umb-code-block>
+						<umb-code-block language="C#" copy>${this._templateQuery?.queryExpression ?? ''}</umb-code-block>
 					</uui-box>
 				</div>
 
