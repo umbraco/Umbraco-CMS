@@ -31,6 +31,7 @@ public static class WebhookEventCollectionBuilderExtensions
                     .AddDictionary()
                     .AddDomain()
                     .AddFile()
+                    .AddHealthCheck()
                     .AddLanguage()
                     .AddMedia()
                     .AddMember()
@@ -38,8 +39,7 @@ public static class WebhookEventCollectionBuilderExtensions
                     .AddPublicAccess()
                     .AddRelation()
                     .AddRelationType()
-                    .AddUser()
-                    .AddHealthCheck();
+                    .AddUser();
             }
         });
 

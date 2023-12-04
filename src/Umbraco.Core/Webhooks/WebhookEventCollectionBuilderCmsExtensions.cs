@@ -1,6 +1,5 @@
 using Umbraco.Cms.Core.Webhooks;
 using Umbraco.Cms.Core.Webhooks.Events;
-using Umbraco.Cms.Core.Webhooks.Events.HealthCheck;
 using static Umbraco.Cms.Core.DependencyInjection.WebhookEventCollectionBuilderExtensions;
 
 namespace Umbraco.Cms.Core.DependencyInjection;
@@ -181,6 +180,21 @@ public static class WebhookEventCollectionBuilderCmsExtensions
     }
 
     /// <summary>
+    /// Adds the health check webhook events.
+    /// </summary>
+    /// <param name="builder">The builder.</param>
+    /// <returns>
+    /// The builder.
+    /// </returns>
+    public static WebhookEventCollectionBuilderCms AddHealthCheck(this WebhookEventCollectionBuilderCms builder)
+    {
+        builder.Builder
+            .Append<HealthCheckCompletedWebhookEvent>();
+
+        return builder;
+    }
+
+    /// <summary>
     /// Adds the language webhook events.
     /// </summary>
     /// <param name="builder">The builder.</param>
@@ -313,17 +327,6 @@ public static class WebhookEventCollectionBuilderCmsExtensions
 
         return builder;
     }
-
-    /// <summary>
-    /// Adds the healthcheck webhook events.
-    /// </summary>
-    /// <param name="builder">The builder.</param>
-    /// <returns>
-    /// The builder.
-    /// </returns>
-    public static WebhookEventCollectionBuilder AddHealthCheck(this WebhookEventCollectionBuilder builder)
-        => builder
-            .Append<HealthCheckCompletedWebhookEvent>();
 
     /// <summary>
     /// Adds all available user (including password, login and user group) webhook events.

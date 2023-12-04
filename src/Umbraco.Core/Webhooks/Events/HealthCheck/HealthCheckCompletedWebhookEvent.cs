@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 
-namespace Umbraco.Cms.Core.Webhooks.Events.HealthCheck;
+namespace Umbraco.Cms.Core.Webhooks.Events;
 
 [WebhookEvent("Health Check Completed")]
 public class HealthCheckCompletedWebhookEvent : WebhookEventBase<HealthCheckCompletedNotification>
