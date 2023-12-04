@@ -1,5 +1,5 @@
 import { UmbLogViewerWorkspaceContext, UMB_APP_LOG_VIEWER_CONTEXT_TOKEN } from '../../../logviewer.context.js';
-import { UUIInputElement, UUIPopoverElement, UUISymbolExpandElement } from '@umbraco-cms/backoffice/external/uui';
+import { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { Subject, debounceTime, tap } from '@umbraco-cms/backoffice/external/rxjs';
 import { SavedLogSearchResponseModel } from '@umbraco-cms/backoffice/backend-api';
