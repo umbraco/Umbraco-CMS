@@ -50,6 +50,12 @@ internal sealed class ApiContentQueryFilterBuilder
                 case FilterOperation.DoesNotContain:
                     ApplyContainsFilter(queryOperation.Not(), filterOption.FieldName, values);
                     break;
+                case FilterOperation.LessThan:
+                case FilterOperation.LessThanOrEqual:
+                case FilterOperation.GreaterThan:
+                case FilterOperation.GreaterThanOrEqual:
+                    ApplyRangeFilter(queryOperation.And(), filterOption.FieldName, values, fieldType, filterOption.Operator);
+                    break;
                 default:
                     continue;
             }
@@ -141,6 +147,67 @@ internal sealed class ApiContentQueryFilterBuilder
                 .ToArray();
             query.GroupedOr(new[] { fieldName }, examineValues);
         }
+    }
+
+    private void ApplyRangeFilter(IQuery query, string fieldName, string[] values, FieldType fieldType, FilterOperation filterOperation)
+    {
+        switch (fieldType)
+        {
+            case FieldType.Number:
+                ApplyRangeNumberFilter(query, fieldName, values, filterOperation);
+                break;
+            case FieldType.Date:
+                ApplyRangeDateFilter(query, fieldName, values, filterOperation);
+                break;
+            default:
+                _logger.LogWarning("Range filtering cannot be used with String fields. Only Number and Date fields support range filtering.");
+                break;
+        }
+    }
+
+    private void ApplyRangeNumberFilter(IQuery query, string fieldName, string[] values, FilterOperation filterOperation)
+    {
+        if (TryParseIntFilterValue(values.First(), out int intValue) is false)
+        {
+            return;
+        }
+
+        AddRangeFilter(query, fieldName, intValue, filterOperation);
+    }
+
+    private void ApplyRangeDateFilter(IQuery query, string fieldName, string[] values, FilterOperation filterOperation)
+    {
+        if (TryParseDateTimeFilterValue(values.First(), out DateTime dateValue) is false)
+        {
+            return;
+        }
+
+        AddRangeFilter(query, fieldName, dateValue, filterOperation);
+    }
+
+    private void AddRangeFilter<T>(IQuery query, string fieldName, T value, FilterOperation filterOperation)
+        where T : struct
+    {
+        T? min = null, max = null;
+        bool minInclusive = false, maxInclusive = false;
+
+        switch (filterOperation)
+        {
+            case FilterOperation.GreaterThan:
+            case FilterOperation.GreaterThanOrEqual:
+                min = value;
+                minInclusive = filterOperation is FilterOperation.GreaterThanOrEqual;
+                break;
+            case FilterOperation.LessThan:
+            case FilterOperation.LessThanOrEqual:
+                max = value;
+                maxInclusive = filterOperation is FilterOperation.LessThanOrEqual;
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(filterOperation));
+        }
+
+        query.RangeQuery(new[] { fieldName }, min, max, minInclusive, maxInclusive);
     }
 
     private void AddGroupedOrFilter<T>(IQuery query, string fieldName, params T[] values)
