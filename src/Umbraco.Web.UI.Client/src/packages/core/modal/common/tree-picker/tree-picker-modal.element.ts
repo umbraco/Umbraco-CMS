@@ -1,5 +1,5 @@
 import { type UmbTreeElement } from '../../../tree/tree.element.js';
-import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbTreePickerModalData, UmbPickerModalValue, UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
@@ -43,7 +43,8 @@ export class UmbTreePickerModalElement<TreeItemType extends TreeItemPresentation
 			<umb-body-layout headline="Select">
 				<uui-box>
 					<umb-tree
-						alias=${this.data?.treeAlias}
+						?hide-tree-root=${this.data?.hideTreeRoot}
+						alias=${ifDefined(this.data?.treeAlias)}
 						@selection-change=${this.#onSelectionChange}
 						.selection=${this._selection}
 						selectable

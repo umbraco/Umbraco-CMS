@@ -103,7 +103,7 @@ export class UmbQueryBuilderFilterElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<span>${this.unremovable ? 'where' : 'and'}</span>
+			<span>${this.unremovable ? this.localize.term('template_where') : this.localize.term('template_and')}</span>
 			<umb-dropdown look="outline" id="property-alias-dropdown" label="Property alias">
 				<span slot="label">${this.filter?.propertyAlias ?? ''}</span>
 				<uui-combobox-list @change=${this.#setPropertyAlias} class="options-list">
@@ -118,12 +118,12 @@ export class UmbQueryBuilderFilterElement extends UmbLitElement {
 			${this.filter?.propertyAlias ? this._renderOperatorsDropdown() : ''}
 			${this.filter?.operator ? this._renderConstraintValueInput() : ''}
 			<uui-button-group>
-				<uui-button title="Add filter" label="Add filter" compact @click=${this.#addFilter}
-					><uui-icon name="add"></uui-icon
-				></uui-button>
-				<uui-button title="Remove filter" label="Remove filter" compact @click=${this.#removeOrReset}
-					><uui-icon name="delete"></uui-icon
-				></uui-button>
+				<uui-button title="Add filter" label="Add filter" compact @click=${this.#addFilter}>
+					<uui-icon name="icon-add"></uui-icon>
+				</uui-button>
+				<uui-button title="Remove filter" label="Remove filter" compact @click=${this.#removeOrReset}>
+					<uui-icon name="delete"></uui-icon>
+				</uui-button>
 			</uui-button-group>
 		`;
 	}
