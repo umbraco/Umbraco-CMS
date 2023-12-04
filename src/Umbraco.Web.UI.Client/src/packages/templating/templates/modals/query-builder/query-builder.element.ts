@@ -14,7 +14,6 @@ import {
 	TemplateQuerySettingsResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbDocumentRepository } from '@umbraco-cms/backoffice/document';
-import { UmbButtonWithDropdownElement } from '@umbraco-cms/backoffice/components';
 import './query-builder-filter.element.js';
 
 export interface TemplateQueryBuilderModalData {
@@ -35,12 +34,6 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 	TemplateQueryBuilderModalData,
 	UmbTemplateQueryBuilderModalValue
 > {
-	@query('#content-type-dropdown')
-	private _contentTypeDropdown?: UmbButtonWithDropdownElement;
-
-	@query('#sort-dropdown')
-	private _sortDropdown?: UmbButtonWithDropdownElement;
-
 	@query('#filter-container')
 	private _filterContainer?: HTMLElement;
 
@@ -148,7 +141,6 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 	#setContentType(event: Event) {
 		const target = event.target as UUIComboboxListElement;
 		this.#updateQueryRequest({ contentTypeAlias: (target.value as string) ?? '' });
-		this._contentTypeDropdown!.closePopover();
 	}
 
 	#setSortProperty(event: Event) {
@@ -159,7 +151,6 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 		this.#updateQueryRequest({
 			sort: { ...this._queryRequest.sort, propertyAlias: (target.value as string) ?? '' },
 		});
-		this._sortDropdown!.closePopover();
 	}
 
 	#setSortDirection() {

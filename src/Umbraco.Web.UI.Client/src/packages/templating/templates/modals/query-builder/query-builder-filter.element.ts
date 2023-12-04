@@ -15,16 +15,9 @@ import {
 	TemplateQueryPropertyTypeModel,
 	TemplateQuerySettingsResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
-import { UmbButtonWithDropdownElement } from '@umbraco-cms/backoffice/components';
 
 @customElement('umb-query-builder-filter')
 export class UmbQueryBuilderFilterElement extends UmbLitElement {
-	@query('#property-alias-dropdown')
-	private _propertyAliasDropdown?: UmbButtonWithDropdownElement;
-
-	@query('#operator-dropdown')
-	private _operatorDropdown?: UmbButtonWithDropdownElement;
-
 	@property({ type: Object, attribute: false })
 	filter: TemplateQueryExecuteFilterPresentationModel = <TemplateQueryExecuteFilterPresentationModel>{};
 
@@ -44,7 +37,6 @@ export class UmbQueryBuilderFilterElement extends UmbLitElement {
 		this.currentPropertyType =
 			this.settings?.properties?.find((p) => p.alias === this.filter.propertyAlias)?.type ?? null;
 		if (oldCurrentPropertyType !== this.currentPropertyType) this.#resetOperator();
-		this._propertyAliasDropdown?.closePopover();
 	};
 
 	#setConstrainValue = (e: Event) => {
@@ -55,7 +47,6 @@ export class UmbQueryBuilderFilterElement extends UmbLitElement {
 	#setOperator = (e: Event) => {
 		const target = e.target as UUIComboboxListElement;
 		this.filter = { ...this.filter, operator: target.value as OperatorModel };
-		this._operatorDropdown?.closePopover();
 	};
 
 	#resetOperator() {
