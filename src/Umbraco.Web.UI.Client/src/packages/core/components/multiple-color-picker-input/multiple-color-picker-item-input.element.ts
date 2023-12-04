@@ -98,7 +98,7 @@ export class UmbMultipleColorPickerItemInputElement extends FormControlMixin(Umb
 	#onColorInput(event: InputEvent) {
 		event.stopPropagation();
 		this.value = this._colorPicker.value;
-		this.dispatchEvent(new UmbInputEvent());
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	// Prevent valid events from bubbling outside the message element
