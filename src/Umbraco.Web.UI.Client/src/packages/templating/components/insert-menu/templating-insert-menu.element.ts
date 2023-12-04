@@ -113,28 +113,20 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 		return html`
 			<uui-button-group>
 				<uui-button look="secondary" @click=${this.#openChooseTypeModal} label="Choose value to insert">
-					<uui-icon name="icon-add"></uui-icon>Insert</uui-button
-				>
-				<umb-button-with-dropdown
-					look="secondary"
-					compact
-					placement="bottom-start"
-					id="insert-button"
-					label="open insert menu">
-					<ul id="insert-menu" slot="dropdown">
-						<li>
-							<uui-menu-item
-								class="insert-menu-item"
-								label="Dictionary item"
-								title="Dictionary item"
-								@click=${this.#openInsertDictionaryItemModal}>
-							</uui-menu-item>
-						</li>
-						<!-- <li>
+					<uui-icon name="icon-add"></uui-icon>Insert
+				</uui-button>
+				<umb-dropdown look="secondary" compact placement="bottom-end" id="insert-button" label="open insert menu">
+					<uui-menu-item
+						class="insert-menu-item"
+						label="Dictionary item"
+						title="Dictionary item"
+						@click=${this.#openInsertDictionaryItemModal}>
+					</uui-menu-item>
+
+					<!-- <li>
 							<uui-menu-item class="insert-menu-item" label="Macro" title="Macro"> </uui-menu-item>
 						</li> -->
-					</ul>
-				</umb-button-with-dropdown>
+				</umb-dropdown>
 			</uui-button-group>
 		`;
 	}
@@ -158,32 +150,8 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 				--umb-header-layout-height: 70px;
 			}
 
-			#insert-menu {
-				margin: 0;
-				padding: 0;
-				margin-top: var(--uui-size-space-3);
-				background-color: var(--uui-color-surface);
-				box-shadow: var(--uui-shadow-depth-3);
-				min-width: 150px;
-			}
-
-			#insert-menu > li,
-			ul {
-				padding: 0;
-				width: 100%;
-				list-style: none;
-			}
-
-			ul {
-				transform: translateX(-100px);
-			}
-
 			.insert-menu-item {
 				width: 100%;
-			}
-
-			umb-button-with-dropdown {
-				--umb-button-with-dropdown-symbol-expand-margin-left: 0;
 			}
 
 			uui-icon[name='icon-add'] {
