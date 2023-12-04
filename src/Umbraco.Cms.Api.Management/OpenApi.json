@@ -17724,12 +17724,16 @@
         "additionalProperties": false
       },
       "ConsentLevelPresentationModel": {
+        "required": [
+          "description"
+        ],
         "type": "object",
         "properties": {
           "level": {
             "$ref": "#/components/schemas/TelemetryLevelModel"
           },
           "description": {
+            "minLength": 1,
             "type": "string"
           }
         },
@@ -17841,12 +17845,20 @@
         "format": "int32"
       },
       "ContentTypeForDocumentTypeResponseModel": {
+        "required": [
+          "alias",
+          "icon",
+          "name",
+          "properties"
+        ],
         "type": "object",
         "properties": {
           "alias": {
+            "minLength": 1,
             "type": "string"
           },
           "name": {
+            "minLength": 1,
             "type": "string"
           },
           "description": {
@@ -17854,6 +17866,7 @@
             "nullable": true
           },
           "icon": {
+            "minLength": 1,
             "type": "string"
           },
           "allowedAsRoot": {
@@ -17916,12 +17929,20 @@
         "additionalProperties": false
       },
       "ContentTypeForMediaTypeResponseModel": {
+        "required": [
+          "alias",
+          "icon",
+          "name",
+          "properties"
+        ],
         "type": "object",
         "properties": {
           "alias": {
+            "minLength": 1,
             "type": "string"
           },
           "name": {
+            "minLength": 1,
             "type": "string"
           },
           "description": {
@@ -17929,6 +17950,7 @@
             "nullable": true
           },
           "icon": {
+            "minLength": 1,
             "type": "string"
           },
           "allowedAsRoot": {
@@ -18118,12 +18140,20 @@
         "additionalProperties": false
       },
       "CreateContentTypeForDocumentTypeRequestModel": {
+        "required": [
+          "alias",
+          "icon",
+          "name",
+          "properties"
+        ],
         "type": "object",
         "properties": {
           "alias": {
+            "minLength": 1,
             "type": "string"
           },
           "name": {
+            "minLength": 1,
             "type": "string"
           },
           "description": {
@@ -18131,6 +18161,7 @@
             "nullable": true
           },
           "icon": {
+            "minLength": 1,
             "type": "string"
           },
           "allowedAsRoot": {
@@ -18199,12 +18230,20 @@
         "additionalProperties": false
       },
       "CreateContentTypeForMediaTypeRequestModel": {
+        "required": [
+          "alias",
+          "icon",
+          "name",
+          "properties"
+        ],
         "type": "object",
         "properties": {
           "alias": {
+            "minLength": 1,
             "type": "string"
           },
           "name": {
+            "minLength": 1,
             "type": "string"
           },
           "description": {
@@ -18212,6 +18251,7 @@
             "nullable": true
           },
           "icon": {
+            "minLength": 1,
             "type": "string"
           },
           "allowedAsRoot": {
@@ -18425,6 +18465,9 @@
         "additionalProperties": false
       },
       "CreateLanguageRequestModel": {
+        "required": [
+          "isoCode"
+        ],
         "type": "object",
         "allOf": [
           {
@@ -18433,6 +18476,7 @@
         ],
         "properties": {
           "isoCode": {
+            "minLength": 1,
             "type": "string"
           }
         },
@@ -18604,12 +18648,18 @@
         "additionalProperties": false
       },
       "CultureReponseModel": {
+        "required": [
+          "englishName",
+          "name"
+        ],
         "type": "object",
         "properties": {
           "name": {
+            "minLength": 1,
             "type": "string"
           },
           "englishName": {
+            "minLength": 1,
             "type": "string"
           }
         },
@@ -18692,12 +18742,18 @@
         "additionalProperties": false
       },
       "DataTypeModelBaseModel": {
+        "required": [
+          "name",
+          "propertyEditorAlias"
+        ],
         "type": "object",
         "properties": {
           "name": {
+            "minLength": 1,
             "type": "string"
           },
           "propertyEditorAlias": {
+            "minLength": 1,
             "type": "string"
           },
           "propertyEditorUiAlias": {
@@ -18844,6 +18900,12 @@
         "additionalProperties": false
       },
       "DatabaseSettingsPresentationModel": {
+        "required": [
+          "defaultDatabaseName",
+          "displayName",
+          "providerName",
+          "serverPlaceholder"
+        ],
         "type": "object",
         "properties": {
           "id": {
@@ -18855,12 +18917,15 @@
             "format": "int32"
           },
           "displayName": {
+            "minLength": 1,
             "type": "string"
           },
           "defaultDatabaseName": {
+            "minLength": 1,
             "type": "string"
           },
           "providerName": {
+            "minLength": 1,
             "type": "string"
           },
           "isConfigured": {
@@ -18870,6 +18935,7 @@
             "type": "boolean"
           },
           "serverPlaceholder": {
+            "minLength": 1,
             "type": "string"
           },
           "requiresCredentials": {
@@ -18922,9 +18988,13 @@
         "additionalProperties": false
       },
       "DictionaryItemModelBaseModel": {
+        "required": [
+          "name"
+        ],
         "type": "object",
         "properties": {
           "name": {
+            "minLength": 1,
             "type": "string"
           },
           "translations": {
@@ -18956,12 +19026,18 @@
         "additionalProperties": false
       },
       "DictionaryItemTranslationModel": {
+        "required": [
+          "isoCode",
+          "translation"
+        ],
         "type": "object",
         "properties": {
           "isoCode": {
+            "minLength": 1,
             "type": "string"
           },
           "translation": {
+            "minLength": 1,
             "type": "string"
           }
         },
@@ -19409,9 +19485,13 @@
         "additionalProperties": false
       },
       "FolderModelBaseModel": {
+        "required": [
+          "name"
+        ],
         "type": "object",
         "properties": {
           "name": {
+            "minLength": 1,
             "type": "string"
           }
         },
@@ -19705,6 +19785,9 @@
         "additionalProperties": false
       },
       "InstallSettingsResponseModel": {
+        "required": [
+          "user"
+        ],
         "type": "object",
         "properties": {
           "user": {
@@ -19827,21 +19910,31 @@
         "additionalProperties": false
       },
       "LanguageItemResponseModel": {
+        "required": [
+          "isoCode",
+          "name"
+        ],
         "type": "object",
         "properties": {
           "name": {
+            "minLength": 1,
             "type": "string"
           },
           "isoCode": {
+            "minLength": 1,
             "type": "string"
           }
         },
         "additionalProperties": false
       },
       "LanguageModelBaseModel": {
+        "required": [
+          "name"
+        ],
         "type": "object",
         "properties": {
           "name": {
+            "minLength": 1,
             "type": "string"
           },
           "isDefault": {
@@ -19858,6 +19951,9 @@
         "additionalProperties": false
       },
       "LanguageResponseModel": {
+        "required": [
+          "isoCode"
+        ],
         "type": "object",
         "allOf": [
           {
@@ -19866,6 +19962,7 @@
         ],
         "properties": {
           "isoCode": {
+            "minLength": 1,
             "type": "string"
           }
         },
@@ -20030,6 +20127,9 @@
         "additionalProperties": false
       },
       "MediaTreeItemResponseModel": {
+        "required": [
+          "icon"
+        ],
         "type": "object",
         "allOf": [
           {
@@ -20038,6 +20138,7 @@
         ],
         "properties": {
           "icon": {
+            "minLength": 1,
             "type": "string"
           }
         },
@@ -20324,9 +20425,13 @@
         "additionalProperties": false
       },
       "PackageManifestResponseModel": {
+        "required": [
+          "name"
+        ],
         "type": "object",
         "properties": {
           "name": {
+            "minLength": 1,
             "type": "string"
           },
           "version": {
@@ -21466,6 +21571,9 @@
         "additionalProperties": false
       },
       "PropertyTypeContainerModelBaseModel": {
+        "required": [
+          "type"
+        ],
         "type": "object",
         "properties": {
           "id": {
@@ -21482,6 +21590,7 @@
             "nullable": true
           },
           "type": {
+            "minLength": 1,
             "type": "string"
           },
           "sortOrder": {
@@ -21492,6 +21601,10 @@
         "additionalProperties": false
       },
       "PropertyTypeModelBaseModel": {
+        "required": [
+          "alias",
+          "name"
+        ],
         "type": "object",
         "properties": {
           "id": {
@@ -21508,9 +21621,11 @@
             "format": "int32"
           },
           "alias": {
+            "minLength": 1,
             "type": "string"
           },
           "name": {
+            "minLength": 1,
             "type": "string"
           },
           "description": {
@@ -21670,6 +21785,11 @@
         "format": "int32"
       },
       "RecycleBinItemResponseModel": {
+        "required": [
+          "icon",
+          "name",
+          "type"
+        ],
         "type": "object",
         "properties": {
           "id": {
@@ -21677,12 +21797,15 @@
             "format": "uuid"
           },
           "name": {
+            "minLength": 1,
             "type": "string"
           },
           "type": {
+            "minLength": 1,
             "type": "string"
           },
           "icon": {
+            "minLength": 1,
             "type": "string"
           },
           "hasChildren": {
@@ -21822,9 +21945,13 @@
         "additionalProperties": false
       },
       "RelationTypeBaseModel": {
+        "required": [
+          "name"
+        ],
         "type": "object",
         "properties": {
           "name": {
+            "minLength": 1,
             "type": "string"
           },
           "isBidirectional": {
@@ -21856,6 +21983,9 @@
         "additionalProperties": false
       },
       "RelationTypeResponseModel": {
+        "required": [
+          "path"
+        ],
         "type": "object",
         "allOf": [
           {
@@ -21872,6 +22002,7 @@
             "nullable": true
           },
           "path": {
+            "minLength": 1,
             "type": "string"
           },
           "isSystemRelationType": {
@@ -21889,6 +22020,9 @@
         "additionalProperties": false
       },
       "ResendInviteUserRequestModel": {
+        "required": [
+          "userId"
+        ],
         "type": "object",
         "properties": {
           "userId": {
@@ -21903,15 +22037,22 @@
         "additionalProperties": false
       },
       "ResetPasswordRequestModel": {
+        "required": [
+          "email"
+        ],
         "type": "object",
         "properties": {
           "email": {
+            "minLength": 1,
             "type": "string"
           }
         },
         "additionalProperties": false
       },
       "ResetPasswordTokenRequestModel": {
+        "required": [
+          "password"
+        ],
         "type": "object",
         "allOf": [
           {
@@ -21920,6 +22061,7 @@
         ],
         "properties": {
           "password": {
+            "minLength": 1,
             "type": "string"
           }
         },
@@ -22035,9 +22177,13 @@
         "additionalProperties": false
       },
       "SearchResultResponseModel": {
+        "required": [
+          "id"
+        ],
         "type": "object",
         "properties": {
           "id": {
+            "minLength": 1,
             "type": "string"
           },
           "score": {
@@ -22063,9 +22209,13 @@
         "additionalProperties": false
       },
       "SearcherResponseModel": {
+        "required": [
+          "name"
+        ],
         "type": "object",
         "properties": {
           "name": {
+            "minLength": 1,
             "type": "string"
           }
         },
@@ -22260,12 +22410,18 @@
         "additionalProperties": false
       },
       "TemplateModelBaseModel": {
+        "required": [
+          "alias",
+          "name"
+        ],
         "type": "object",
         "properties": {
           "name": {
+            "minLength": 1,
             "type": "string"
           },
           "alias": {
+            "minLength": 1,
             "type": "string"
           },
           "content": {
@@ -22276,12 +22432,18 @@
         "additionalProperties": false
       },
       "TemplateQueryExecuteFilterPresentationModel": {
+        "required": [
+          "constraintValue",
+          "propertyAlias"
+        ],
         "type": "object",
         "properties": {
           "propertyAlias": {
+            "minLength": 1,
             "type": "string"
           },
           "constraintValue": {
+            "minLength": 1,
             "type": "string"
           },
           "operator": {
@@ -22469,15 +22631,22 @@
         "additionalProperties": false
       },
       "TemplateScaffoldResponseModel": {
+        "required": [
+          "content"
+        ],
         "type": "object",
         "properties": {
           "content": {
+            "minLength": 1,
             "type": "string"
           }
         },
         "additionalProperties": false
       },
       "TemporaryFileResponseModel": {
+        "required": [
+          "fileName"
+        ],
         "type": "object",
         "properties": {
           "id": {
@@ -22490,12 +22659,16 @@
             "nullable": true
           },
           "fileName": {
+            "minLength": 1,
             "type": "string"
           }
         },
         "additionalProperties": false
       },
       "TextFileResponseModelBaseModel": {
+        "required": [
+          "path"
+        ],
         "type": "object",
         "allOf": [
           {
@@ -22504,6 +22677,7 @@
         ],
         "properties": {
           "path": {
+            "minLength": 1,
             "type": "string"
           }
         },
@@ -22643,12 +22817,20 @@
         "additionalProperties": false
       },
       "UpdateContentTypeForDocumentTypeRequestModel": {
+        "required": [
+          "alias",
+          "icon",
+          "name",
+          "properties"
+        ],
         "type": "object",
         "properties": {
           "alias": {
+            "minLength": 1,
             "type": "string"
           },
           "name": {
+            "minLength": 1,
             "type": "string"
           },
           "description": {
@@ -22656,6 +22838,7 @@
             "nullable": true
           },
           "icon": {
+            "minLength": 1,
             "type": "string"
           },
           "allowedAsRoot": {
@@ -22714,12 +22897,20 @@
         "additionalProperties": false
       },
       "UpdateContentTypeForMediaTypeRequestModel": {
+        "required": [
+          "alias",
+          "icon",
+          "name",
+          "properties"
+        ],
         "type": "object",
         "properties": {
           "alias": {
+            "minLength": 1,
             "type": "string"
           },
           "name": {
+            "minLength": 1,
             "type": "string"
           },
           "description": {
@@ -22727,6 +22918,7 @@
             "nullable": true
           },
           "icon": {
+            "minLength": 1,
             "type": "string"
           },
           "allowedAsRoot": {
@@ -23076,18 +23268,28 @@
         "additionalProperties": false
       },
       "UpgradeSettingsResponseModel": {
+        "required": [
+          "currentState",
+          "newState",
+          "newVersion",
+          "oldVersion"
+        ],
         "type": "object",
         "properties": {
           "currentState": {
+            "minLength": 1,
             "type": "string"
           },
           "newState": {
+            "minLength": 1,
             "type": "string"
           },
           "newVersion": {
+            "minLength": 1,
             "type": "string"
           },
           "oldVersion": {
+            "minLength": 1,
             "type": "string"
           },
           "reportUrl": {
@@ -23436,6 +23638,9 @@
         "additionalProperties": false
       },
       "ValueModelBaseModel": {
+        "required": [
+          "alias"
+        ],
         "type": "object",
         "properties": {
           "culture": {
@@ -23447,6 +23652,7 @@
             "nullable": true
           },
           "alias": {
+            "minLength": 1,
             "type": "string"
           },
           "value": {
@@ -23456,6 +23662,9 @@
         "additionalProperties": false
       },
       "VariantModelBaseModel": {
+        "required": [
+          "name"
+        ],
         "type": "object",
         "properties": {
           "culture": {
@@ -23467,12 +23676,16 @@
             "nullable": true
           },
           "name": {
+            "minLength": 1,
             "type": "string"
           }
         },
         "additionalProperties": false
       },
       "VariantResponseModelBaseModel": {
+        "required": [
+          "name"
+        ],
         "type": "object",
         "properties": {
           "culture": {
@@ -23484,6 +23697,7 @@
             "nullable": true
           },
           "name": {
+            "minLength": 1,
             "type": "string"
           },
           "createDate": {
@@ -23514,6 +23728,10 @@
         "additionalProperties": false
       },
       "VerifyInviteUserRequestModel": {
+        "required": [
+          "token",
+          "userId"
+        ],
         "type": "object",
         "properties": {
           "userId": {
@@ -23521,12 +23739,16 @@
             "format": "uuid"
           },
           "token": {
+            "minLength": 1,
             "type": "string"
           }
         },
         "additionalProperties": false
       },
       "VerifyResetPasswordTokenRequestModel": {
+        "required": [
+          "resetCode"
+        ],
         "type": "object",
         "properties": {
           "userId": {
@@ -23534,15 +23756,20 @@
             "format": "uuid"
           },
           "resetCode": {
+            "minLength": 1,
             "type": "string"
           }
         },
         "additionalProperties": false
       },
       "VersionResponseModel": {
+        "required": [
+          "version"
+        ],
         "type": "object",
         "properties": {
           "version": {
+            "minLength": 1,
             "type": "string"
           }
         },
