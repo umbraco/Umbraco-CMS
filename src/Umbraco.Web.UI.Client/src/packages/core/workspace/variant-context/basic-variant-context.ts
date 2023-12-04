@@ -20,7 +20,7 @@ export class UmbBasicVariantContext
 	#name = new UmbStringState(undefined);
 	name = this.#name.asObservable();
 
-	#values = new UmbArrayState<UmbPropertyValueData<unknown>>([], (x) => x.alias);
+	#values = new UmbArrayState<UmbPropertyValueData>([], (x) => x.alias);
 	private _entityType!: string;
 	private _unique!: string;
 
@@ -33,7 +33,7 @@ export class UmbBasicVariantContext
 	getName() {
 		return this.#name.getValue();
 	}
-	setName(name: string) {
+	setName(name: string | undefined) {
 		this.#name.next(name);
 	}
 	getVariantId() {
@@ -61,5 +61,12 @@ export class UmbBasicVariantContext
 	 */
 	setPropertyValue(alias: string, value: unknown) {
 		this.#values.appendOne({ alias, value });
+	}
+
+	getPropertyMap() {
+		return this.#values.getValue();
+	}
+	setPropertyMap(map: Array<UmbPropertyValueData>) {
+		this.#values.next(map);
 	}
 }

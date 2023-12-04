@@ -1,5 +1,4 @@
 import { UmbDataTypeDetailRepository } from '../repository/detail/data-type-detail.repository.js';
-import { UmbDataTypeVariantContext } from '../variant-context/data-type-variant-context.js';
 import type { UmbDataTypeDetailModel } from '../types.js';
 import {
 	UmbInvariantableWorkspaceContextInterface,
@@ -27,7 +26,6 @@ export class UmbDataTypeWorkspaceContext
 	extends UmbEditableWorkspaceContextBase<UmbDataTypeDetailRepository, UmbDataTypeDetailModel>
 	implements UmbInvariantableWorkspaceContextInterface<UmbDataTypeDetailModel | undefined>
 {
-	// TODO: revisit. temp solution because the create and response models are different.
 	#data = new UmbObjectState<UmbDataTypeDetailModel | undefined>(undefined);
 	readonly data = this.#data.asObservable();
 	#getDataPromise?: Promise<any>;
@@ -124,9 +122,6 @@ export class UmbDataTypeWorkspaceContext
 	}
 
 	private _mergeConfigProperties() {
-		console.log('schema properties', this._propertyEditorSchemaConfigProperties);
-		console.log('ui properties', this._propertyEditorUISettingsProperties);
-
 		if (this._propertyEditorSchemaConfigProperties && this._propertyEditorUISettingsProperties) {
 			this.#properties.next([
 				...this._propertyEditorSchemaConfigProperties,
@@ -176,7 +171,7 @@ export class UmbDataTypeWorkspaceContext
 						);
 						// Observe value of variant:
 						this.observe(
-							context.propertyValueByAlias(property.alias),
+							await context.propertyValueByAlias(property.alias),
 							(value) => {
 								console.log('gets value back...');
 								this.setPropertyValue(property.alias, value);
@@ -228,7 +223,7 @@ export class UmbDataTypeWorkspaceContext
 	getName() {
 		return this.#data.getValue()?.name;
 	}
-	setName(name: string) {
+	setName(name: string | undefined) {
 		this.#data.update({ name });
 	}
 

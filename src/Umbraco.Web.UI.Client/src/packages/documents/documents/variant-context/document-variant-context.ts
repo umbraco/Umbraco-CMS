@@ -5,10 +5,13 @@ import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import { UMB_VARIANT_CONTEXT, UmbVariantContext } from '@umbraco-cms/backoffice/workspace';
+import { UMB_VARIANT_CONTEXT, UmbNameableVariantContext, UmbVariantContext } from '@umbraco-cms/backoffice/workspace';
 
 // TODO: This code can be split into a UmbContentTypeVariantContext, leaving just the publishing state and methods to this class.
-export class UmbDocumentVariantContext extends UmbBaseController implements UmbVariantContext {
+export class UmbDocumentVariantContext
+	extends UmbBaseController
+	implements UmbVariantContext, UmbNameableVariantContext
+{
 	#workspace: UmbDocumentWorkspaceContext;
 	#variantId: UmbVariantId;
 	public getVariantId() {
