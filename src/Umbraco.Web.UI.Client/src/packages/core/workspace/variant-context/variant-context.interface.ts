@@ -17,7 +17,6 @@ import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 export interface UmbVariantContext {
 	getType(): string;
 	getUnique(): string | undefined;
-	//getUniqueName(): string;
 	getVariantId: () => UmbVariantId;
 
 	getName(): string | undefined;
@@ -29,7 +28,7 @@ export interface UmbVariantContext {
 	destroy(): void;
 
 	// Property methods:
-	propertyVariantId?: (propertyAlias: string) => Observable<UmbVariantId | undefined>;
-	propertyValueByAlias<ReturnType = unknown>(propertyAlias: string): Observable<ReturnType | undefined>;
+	propertyVariantId?: (propertyAlias: string) => Promise<Observable<UmbVariantId | undefined>>;
+	propertyValueByAlias<ReturnType = unknown>(propertyAlias: string): Promise<Observable<ReturnType | undefined>>;
 	setPropertyValue(propertyAlias: string, value: unknown): void;
 }

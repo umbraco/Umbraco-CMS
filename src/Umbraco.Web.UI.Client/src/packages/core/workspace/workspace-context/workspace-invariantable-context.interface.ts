@@ -7,6 +7,7 @@ import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 export interface UmbInvariantableWorkspaceContextInterface<T = unknown>
 	extends UmbSaveableWorkspaceContextInterface<T> {
 	// Name:
+	name: Observable<string | undefined>;
 	getName(): string | undefined;
 	setName(name: string): void;
 

@@ -1,7 +1,11 @@
 import type { UmbPropertyValueData } from '../types/property-value-data.type.js';
 import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
-import { UMB_VARIANT_CONTEXT, UmbVariantContext } from '@umbraco-cms/backoffice/workspace';
+import {
+	UMB_VARIANT_CONTEXT,
+	type UmbNameableVariantContext,
+	type UmbVariantContext,
+} from '@umbraco-cms/backoffice/workspace';
 import { UmbArrayState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
@@ -11,9 +15,9 @@ import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
  */
 export class UmbBasicVariantContext
 	extends UmbContextBase<typeof UMB_VARIANT_CONTEXT.TYPE>
-	implements UmbVariantContext
+	implements UmbVariantContext, UmbNameableVariantContext
 {
-	#name = new UmbStringState('');
+	#name = new UmbStringState(undefined);
 	name = this.#name.asObservable();
 
 	#values = new UmbArrayState<UmbPropertyValueData<unknown>>([], (x) => x.alias);
@@ -45,7 +49,7 @@ export class UmbBasicVariantContext
 	/**
 	 * TODO: Write proper JSDocs here.
 	 */
-	propertyValueByAlias<ReturnType = unknown>(propertyAlias: string) {
+	async propertyValueByAlias<ReturnType = unknown>(propertyAlias: string) {
 		return this.#values.asObservablePart((values) => {
 			const valueObj = values.find((x) => x.alias === propertyAlias);
 			return valueObj ? (valueObj.value as ReturnType) : undefined;

@@ -47,15 +47,13 @@ export class UmbInvariantWorkspaceVariantContext<
 
 	/**
 	 * TODO: Write proper JSDocs here.
-	 * Ideally do not use these methods, its better to communicate directly with the workspace, but if you do not know the property variant id, then this will figure it out for you. So good for externals to set or get values of a property.
 	 */
 	async propertyValueByAlias<ReturnType = unknown>(propertyAlias: string) {
-		return this._workspace.propertyValueByAlias<ReturnType>(propertyAlias);
+		return await this._workspace.propertyValueByAlias<ReturnType>(propertyAlias);
 	}
 
 	/**
 	 * TODO: Write proper JSDocs here.
-	 * Ideally do not use these methods, its better to communicate directly with the workspace, but if you do not know the property variant id, then this will figure it out for you. So good for externals to set or get values of a property.
 	 */
 	async setPropertyValue(propertyAlias: string, value: unknown) {
 		return this._workspace.setPropertyValue(propertyAlias, value);
