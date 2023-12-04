@@ -1,3 +1,4 @@
+import { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbImportDictionaryModalData {
@@ -5,7 +6,7 @@ export interface UmbImportDictionaryModalData {
 }
 
 export interface UmbImportDictionaryModalValue {
-	temporaryFileId: string;
+	entityItems: Array<EntityTreeItemResponseModel>;
 	parentId?: string;
 }
 

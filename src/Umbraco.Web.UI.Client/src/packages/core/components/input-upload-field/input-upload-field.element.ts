@@ -1,19 +1,22 @@
+import { TemporaryFileQueueItem, UmbTemporaryFileManager } from '../../temporary-file/temporary-file-manager.class.js';
+import { UmbId } from '@umbraco-cms/backoffice/id';
 import {
 	css,
 	html,
 	nothing,
-	map,
 	ifDefined,
 	customElement,
 	property,
 	query,
 	state,
+	repeat,
 } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import type { UUIFileDropzoneElement, UUIFileDropzoneEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 import './input-upload-field-file.element.js';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 @customElement('umb-input-upload-field')
 export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) {
@@ -23,10 +26,13 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 	 * @type {Array<String>}
 	 * @default []
 	 */
-	@property({ type: Array<string> })
+	@property({ type: Array })
 	public set keys(fileKeys: Array<string>) {
 		this._keys = fileKeys;
 		super.value = this._keys.join(',');
+		fileKeys.forEach((key) => {
+			if (!UmbId.validate(key) && key.startsWith('/')) this._filePaths.push(key);
+		});
 	}
 	public get keys(): Array<string> {
 		return this._keys;
@@ -37,7 +43,7 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 	 * @type {Array<String>}
 	 * @default undefined
 	 */
-	@property({ type: Array<string> })
+	@property({ type: Array })
 	fileExtensions?: Array<string>;
 
 	/**
@@ -50,7 +56,10 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 	multiple = false;
 
 	@state()
-	_currentFiles: File[] = [];
+	_currentFiles: Array<TemporaryFileQueueItem> = [];
+
+	@state()
+	_filePaths: Array<string> = [];
 
 	@state()
 	extensions?: string[];
@@ -58,8 +67,18 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 	@query('#dropzone')
 	private _dropzone?: UUIFileDropzoneElement;
 
+	#manager;
+
 	protected getFormElement() {
 		return undefined;
+	}
+
+	constructor() {
+		super();
+		this.#manager = new UmbTemporaryFileManager(this);
+
+		this.observe(this.#manager.isReady, (value) => (this.error = !value));
+		this.observe(this.#manager.queue, (value) => (this._currentFiles = value));
 	}
 
 	connectedCallback(): void {
@@ -85,12 +104,19 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 	}
 
 	#setFiles(files: File[]) {
-		this._currentFiles = [...this._currentFiles, ...files];
+		const items = files.map(
+			(file): TemporaryFileQueueItem => ({
+				unique: UmbId.new(),
+				file,
+				status: 'waiting',
+			}),
+		);
+		this.#manager.upload(items);
 
-		//TODO: set keys when possible, not names
-		this.keys = this._currentFiles.map((file) => file.name);
-		this.dispatchEvent(new CustomEvent('change', { bubbles: true }));
+		this.keys = items.map((item) => item.unique);
 		this.value = this.keys.join(',');
+
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	#handleBrowse() {
@@ -99,11 +125,14 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 	}
 
 	render() {
-		return html`${this.#renderFiles()} ${this.#renderDropzone()}`;
+		return html`<div id="wrapper">${this.#renderFilesWithPath()} ${this.#renderFilesUploaded()}</div>
+			${this.#renderDropzone()}${this.#renderButtonRemove()}`;
 	}
 
+	//TODO When the property editor gets saved, it seems that the property editor gets the file path from the server rather than key/id.
+	// This however does not work when there is multiple files. Can the server not handle multiple files uploaded into one property editor?
 	#renderDropzone() {
-		if (!this.multiple && this._currentFiles.length) return nothing;
+		if (!this.multiple && (this._currentFiles.length || this._filePaths.length)) return nothing;
 		return html`
 			<uui-file-dropzone
 				id="dropzone"
@@ -116,21 +145,41 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 		`;
 	}
 
-	#renderFiles() {
+	#renderFilesWithPath() {
+		if (!this._filePaths.length) return nothing;
+		return html`${this._filePaths.map(
+			(path) => html`<umb-input-upload-field-file .path=${path}></umb-input-upload-field-file>`,
+		)}`;
+	}
+
+	#renderFilesUploaded() {
 		if (!this._currentFiles.length) return nothing;
-		return html` <div id="wrapper">
-				${map(this._currentFiles, (file) => {
-					return html`<umb-input-upload-field-file .file=${file}></umb-input-upload-field-file>`;
-				})}
-			</div>
-			<uui-button compact @click=${this.#handleRemove} label="Remove files">
-				<uui-icon name="icon-trash"></uui-icon> Remove file(s)
-			</uui-button>`;
+		return html`
+			${repeat(
+				this._currentFiles,
+				(item) => item.unique + item.status,
+				(item) =>
+					html`<div style="position:relative;">
+						<umb-input-upload-field-file .file=${item.file as any}></umb-input-upload-field-file>
+						${item.status === 'waiting' ? html`<umb-temporary-file-badge></umb-temporary-file-badge>` : nothing}
+					</div> `,
+			)}
+		</div>`;
+	}
+
+	#renderButtonRemove() {
+		if (!this._currentFiles.length && !this._filePaths.length) return;
+		return html`<uui-button compact @click=${this.#handleRemove} label="Remove files">
+			<uui-icon name="icon-trash"></uui-icon> Remove file(s)
+		</uui-button>`;
 	}
 
 	#handleRemove() {
-		// Remove via endpoint?
-		this._currentFiles = [];
+		this._filePaths = [];
+		const uniques = this._currentFiles.map((item) => item.unique) as string[];
+		this.#manager.remove(uniques);
+
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	static styles = [
@@ -155,6 +204,10 @@ export class UmbInputUploadFieldElement extends FormControlMixin(UmbLitElement) 
 				display: grid;
 				grid-template-columns: repeat(auto-fit, 200px);
 				gap: var(--uui-size-space-4);
+			}
+
+			uui-file-dropzone {
+				padding: 3px; /** Dropzone background is blurry and covers slightly into other elements. Hack to avoid this */
 			}
 		`,
 	];
