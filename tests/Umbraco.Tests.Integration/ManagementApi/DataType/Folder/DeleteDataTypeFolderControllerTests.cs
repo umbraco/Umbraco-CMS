@@ -17,43 +17,42 @@ public class DeleteDataTypeFolderControllerTests : ManagementApiUserGroupTestBas
     protected override Expression<Func<DeleteDataTypeFolderController, object>> MethodSelector =>
         x => x.Delete(_folderId);
 
-
     [SetUp]
     public void Setup() =>
         DataTypeContainerService.CreateAsync(_folderId, "FolderName", null, Constants.Security.SuperUserKey);
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
-        Allowed = true, ExpectedStatusCode = HttpStatusCode.OK,
+        Allowed = true, ExpectedStatusCode = HttpStatusCode.OK
     };
 
     protected override UserGroupAssertionModel EditorUserGroupAssertionModel => new()
     {
-        Allowed = true, ExpectedStatusCode = HttpStatusCode.OK,
+        Allowed = true, ExpectedStatusCode = HttpStatusCode.OK
     };
 
     protected override UserGroupAssertionModel SensitiveDataUserGroupAssertionModel => new()
     {
-        Allowed = false, ExpectedStatusCode = HttpStatusCode.Forbidden,
+        Allowed = false, ExpectedStatusCode = HttpStatusCode.Forbidden
     };
 
     protected override UserGroupAssertionModel TranslatorUserGroupAssertionModel => new()
     {
-        Allowed = false, ExpectedStatusCode = HttpStatusCode.Forbidden,
+        Allowed = false, ExpectedStatusCode = HttpStatusCode.Forbidden
     };
 
     protected override UserGroupAssertionModel WriterUserGroupAssertionModel => new()
     {
-        Allowed = true, ExpectedStatusCode = HttpStatusCode.OK,
+        Allowed = true, ExpectedStatusCode = HttpStatusCode.OK
     };
 
     protected override UserGroupAssertionModel UnauthorizedUserGroupAssertionModel => new()
     {
-        Allowed = false, ExpectedStatusCode = HttpStatusCode.Unauthorized,
+        Allowed = false, ExpectedStatusCode = HttpStatusCode.Unauthorized
     };
 
     [Test]
-    public override async Task As_Unauthorized_I_Dont_Have_Access()
+    public override async Task As_Unauthorized_I_Have_Specified_Access()
     {
         var response = await Client.DeleteAsync(Url);
 

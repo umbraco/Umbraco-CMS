@@ -4,7 +4,6 @@ using System.Net.Http.Json;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Controllers.DataType.Folder;
 using Umbraco.Cms.Api.Management.ViewModels.Folder;
-using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.DataType.Folder;
 
@@ -16,36 +15,36 @@ public class CreateDataTypeFolderControllerTests : ManagementApiUserGroupTestBas
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
-        Allowed = true, ExpectedStatusCode = HttpStatusCode.Created,
+        Allowed = true, ExpectedStatusCode = HttpStatusCode.Created
     };
 
     protected override UserGroupAssertionModel EditorUserGroupAssertionModel => new()
     {
-        Allowed = true, ExpectedStatusCode = HttpStatusCode.Created,
+        Allowed = true, ExpectedStatusCode = HttpStatusCode.Created
     };
 
     protected override UserGroupAssertionModel SensitiveDataUserGroupAssertionModel => new()
     {
-        Allowed = false, ExpectedStatusCode = HttpStatusCode.Forbidden,
+        Allowed = false, ExpectedStatusCode = HttpStatusCode.Forbidden
     };
 
     protected override UserGroupAssertionModel TranslatorUserGroupAssertionModel => new()
     {
-        Allowed = false, ExpectedStatusCode = HttpStatusCode.Forbidden,
+        Allowed = false, ExpectedStatusCode = HttpStatusCode.Forbidden
     };
 
     protected override UserGroupAssertionModel WriterUserGroupAssertionModel => new()
     {
-        Allowed = true, ExpectedStatusCode = HttpStatusCode.Created,
+        Allowed = true, ExpectedStatusCode = HttpStatusCode.Created
     };
 
     protected override UserGroupAssertionModel UnauthorizedUserGroupAssertionModel => new()
     {
-        Allowed = false, ExpectedStatusCode = HttpStatusCode.Unauthorized,
+        Allowed = false, ExpectedStatusCode = HttpStatusCode.Unauthorized
     };
 
     [Test]
-    public override async Task As_Unauthorized_I_Dont_Have_Access()
+    public override async Task As_Unauthorized_I_Have_Specified_Access()
     {
         CreateFolderRequestModel createFolderModel =
             new() { Id = Guid.NewGuid(), ParentId = null, Name = "TestFolderName" };
