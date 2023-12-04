@@ -9,13 +9,13 @@ public class WebhookMapDefinition : IMapDefinition
 {
     public void DefineMaps(IUmbracoMapper mapper)
     {
-        mapper.Define<WebhookViewModel, Webhook>((_, _) => new Webhook(string.Empty), Map);
+        mapper.Define<WebhookViewModel, IWebhook>((_, _) => new Webhook(string.Empty), Map);
         mapper.Define<IWebhookEvent, WebhookEventViewModel>((_, _) => new WebhookEventViewModel(), Map);
         mapper.Define<WebhookLog, WebhookLogViewModel>((_, _) => new WebhookLogViewModel(), Map);
     }
 
     // Umbraco.Code.MapAll -CreateDate -DeleteDate -Id -Key -UpdateDate
-    private void Map(WebhookViewModel source, Webhook target, MapperContext context)
+    private void Map(WebhookViewModel source, IWebhook target, MapperContext context)
     {
         target.ContentTypeKeys = source.ContentTypeKeys;
         target.Events = source.Events.Select(x => x.Alias).ToArray();

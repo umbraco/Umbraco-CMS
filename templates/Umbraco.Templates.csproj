@@ -1,15 +1,16 @@
 <Project Sdk="Microsoft.NET.Sdk">
-	<PropertyGroup>
-		<Title>Umbraco CMS - Templates</Title>
-		<Description>Contains templates for Umbraco CMS, as well as the templates for creating new packages for the Umbraco CMS.</Description>
-		<PackageType>Template</PackageType>
-		<IncludeBuildOutput>false</IncludeBuildOutput>
-		<IncludeSymbols>false</IncludeSymbols>
-		<NoDefaultExcludes>true</NoDefaultExcludes>
-		<IncludeContentInPack>true</IncludeContentInPack>
-		<ContentTargetFolders>.</ContentTargetFolders>
-		<NoWarn>NU5128</NoWarn>
-	</PropertyGroup>
+  <PropertyGroup>
+    <Title>Umbraco CMS - Templates</Title>
+    <Description>Contains templates for Umbraco CMS, as well as the templates for creating new packages for the Umbraco CMS.</Description>
+    <PackageType>Template</PackageType>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <IncludeSymbols>false</IncludeSymbols>
+    <NoDefaultExcludes>true</NoDefaultExcludes>
+    <IncludeContentInPack>true</IncludeContentInPack>
+    <ContentTargetFolders>.</ContentTargetFolders>
+    <NoWarn>NU5128</NoWarn>
+    <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
+  </PropertyGroup>
 
 	<ItemGroup>
 		<Content Include="UmbracoPackage\**" Exclude="bin;obj" />

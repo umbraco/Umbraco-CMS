@@ -4,10 +4,11 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
 internal class BlockListPropertyValueCreator : BlockPropertyValueCreatorBase<BlockListModel, BlockListItem, BlockListLayoutItem, BlockListConfiguration.BlockConfiguration>
 {
-    public BlockListPropertyValueCreator(BlockEditorConverter blockEditorConverter)
-        : base(blockEditorConverter)
-    {
-    }
+    private readonly BlockListPropertyValueConstructorCache _constructorCache;
+
+    public BlockListPropertyValueCreator(BlockEditorConverter blockEditorConverter, BlockListPropertyValueConstructorCache constructorCache)
+        : base(blockEditorConverter) =>
+        _constructorCache = constructorCache;
 
     public BlockListModel CreateBlockModel(PropertyCacheLevel referenceCacheLevel, string intermediateBlockModelValue, bool preview, BlockListConfiguration.BlockConfiguration[] blockConfigurations)
     {
@@ -22,11 +23,12 @@ internal class BlockListPropertyValueCreator : BlockPropertyValueCreatorBase<Blo
 
     protected override BlockEditorDataConverter CreateBlockEditorDataConverter() => new BlockListEditorDataConverter();
 
-    protected override BlockItemActivator<BlockListItem> CreateBlockItemActivator() => new BlockListItemActivator(BlockEditorConverter);
+    protected override BlockItemActivator<BlockListItem> CreateBlockItemActivator() => new BlockListItemActivator(BlockEditorConverter, _constructorCache);
 
     private class BlockListItemActivator : BlockItemActivator<BlockListItem>
     {
-        public BlockListItemActivator(BlockEditorConverter blockConverter) : base(blockConverter)
+        public BlockListItemActivator(BlockEditorConverter blockConverter, BlockListPropertyValueConstructorCache constructorCache)
+            : base(blockConverter, constructorCache)
         {
         }
 

@@ -1067,13 +1067,13 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="renewSession">Renew now to save your work</key>
   </area>
   <area alias="login">
-    <key alias="greeting0">Happy super Sunday</key>
-    <key alias="greeting1">Happy marvelous Monday</key>
-    <key alias="greeting2">Happy tubular Tuesday</key>
-    <key alias="greeting3">Happy wonderful Wednesday</key>
-    <key alias="greeting4">Happy thunderous Thursday</key>
-    <key alias="greeting5">Happy funky Friday</key>
-    <key alias="greeting6">Happy Caturday</key>
+    <key alias="greeting0">Welcome</key>
+    <key alias="greeting1">Welcome</key>
+    <key alias="greeting2">Welcome</key>
+    <key alias="greeting3">Welcome</key>
+    <key alias="greeting4">Welcome</key>
+    <key alias="greeting5">Welcome</key>
+    <key alias="greeting6">Welcome</key>
     <key alias="instruction">Log in below</key>
     <key alias="signInWith">Sign in with</key>
     <key alias="timeout">Session timed out</key>
@@ -1941,6 +1941,14 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="createHeader">Create header</key>
     <key alias="logs">Logs</key>
     <key alias="noHeaders">No webhook headers have been added</key>
+    <key alias="noEventsFound">No events were found.</key>
+    <key alias="enabled">Enabled</key>
+    <key alias="events">Events</key>
+    <key alias="event">Event</key>
+    <key alias="url">Url</key>
+    <key alias="types">Types</key>
+    <key alias="webhookKey">Webhook key</key>
+    <key alias="retryCount">Retry count</key>
   </area>
   <area alias="languages">
     <key alias="addLanguage">Add language</key>

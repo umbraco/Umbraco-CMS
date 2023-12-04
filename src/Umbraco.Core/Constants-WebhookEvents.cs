@@ -6,6 +6,57 @@ public static partial class Constants
     {
         public static class Aliases
         {
+
+            /// <summary>
+            ///     Webhook event alias for content versions deleted
+            /// </summary>
+            public const string ContentDeletedVersions = "Umbraco.ContentDeletedVersions";
+
+            /// <summary>
+            ///     Webhook event alias for content blueprint saved
+            /// </summary>
+            public const string ContentSavedBlueprint = "Umbraco.ContentSavedBlueprint";
+
+            /// <summary>
+            ///     Webhook event alias for content blueprint deleted
+            /// </summary>
+            public const string ContentDeletedBlueprint = "Umbraco.ContentDeletedBlueprint";
+
+            /// <summary>
+            ///     Webhook event alias for content moved into the recycle bin.
+            /// </summary>
+            public const string ContentMovedToRecycleBin = "Umbraco.ContentMovedToRecycleBin";
+
+            /// <summary>
+            ///     Webhook event alias for content sorted.
+            /// </summary>
+            public const string ContentSorted = "Umbraco.ContentSorted";
+
+            /// <summary>
+            ///     Webhook event alias for content moved.
+            /// </summary>
+            public const string ContentMoved = "Umbraco.ContentMoved";
+
+            /// <summary>
+            ///     Webhook event alias for content copied.
+            /// </summary>
+            public const string ContentCopied = "Umbraco.ContentCopied";
+
+            /// <summary>
+            ///     Webhook event alias for content emptied recycle bin.
+            /// </summary>
+            public const string ContentEmptiedRecycleBin = "Umbraco.ContentEmptiedRecycleBin";
+
+            /// <summary>
+            ///     Webhook event alias for content rolled back.
+            /// </summary>
+            public const string ContentRolledBack = "Umbraco.ContentRolledBack";
+
+            /// <summary>
+            ///     Webhook event alias for content saved.
+            /// </summary>
+            public const string ContentSaved = "Umbraco.ContentSaved";
+
             /// <summary>
             ///     Webhook event alias for content publish.
             /// </summary>
