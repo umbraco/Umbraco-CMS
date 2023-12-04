@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 
-namespace Umbraco.Cms.Core.Webhooks.Events.ContentType;
+namespace Umbraco.Cms.Core.Webhooks.Events;
 
 [WebhookEvent("Document Type Saved")]
 public class DocumentTypeSavedWebhookEvent : WebhookEventBase<ContentTypeSavedNotification>

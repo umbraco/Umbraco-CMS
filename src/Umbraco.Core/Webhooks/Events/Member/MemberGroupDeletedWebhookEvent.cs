@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 
-namespace Umbraco.Cms.Core.Webhooks.Events.Member;
+namespace Umbraco.Cms.Core.Webhooks.Events;
 
 [WebhookEvent("Member Group Deleted")]
 public class MemberGroupDeletedWebhookEvent : WebhookEventBase<MemberGroupDeletedNotification>

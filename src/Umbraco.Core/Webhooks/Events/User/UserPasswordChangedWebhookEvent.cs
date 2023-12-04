@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 
-namespace Umbraco.Cms.Core.Webhooks.Events.User;
+namespace Umbraco.Cms.Core.Webhooks.Events;
 
 [WebhookEvent("User Password Changed")]
 public class UserPasswordChangedWebhookEvent : WebhookEventBase<UserPasswordChangedNotification>

@@ -1,14 +1,5 @@
 using Umbraco.Cms.Core.Webhooks;
-using Umbraco.Cms.Core.Webhooks.Events.Content;
-using Umbraco.Cms.Core.Webhooks.Events.DataType;
-using Umbraco.Cms.Core.Webhooks.Events.Dictionary;
-using Umbraco.Cms.Core.Webhooks.Events.Domain;
-using Umbraco.Cms.Core.Webhooks.Events.Language;
-using Umbraco.Cms.Core.Webhooks.Events.Media;
-using Umbraco.Cms.Core.Webhooks.Events.Package;
-using Umbraco.Cms.Core.Webhooks.Events.PublicAccess;
-using Umbraco.Cms.Core.Webhooks.Events.Relation;
-using Umbraco.Cms.Core.Webhooks.Events.RelationType;
+using Umbraco.Cms.Core.Webhooks.Events;
 using static Umbraco.Cms.Core.DependencyInjection.WebhookEventCollectionBuilderExtensions;
 
 namespace Umbraco.Cms.Core.DependencyInjection;

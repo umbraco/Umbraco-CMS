@@ -1,4 +1,4 @@
-using Umbraco.Cms.Core.Webhooks.Events.Content;
+using Umbraco.Cms.Core.Webhooks.Events;
 using static Umbraco.Cms.Core.DependencyInjection.WebhookEventCollectionBuilderCmsExtensions;
 
 namespace Umbraco.Cms.Core.DependencyInjection;

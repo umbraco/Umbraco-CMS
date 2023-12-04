@@ -1,10 +1,10 @@
-﻿using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 
-namespace Umbraco.Cms.Core.Webhooks.Events.Relation;
+namespace Umbraco.Cms.Core.Webhooks.Events;
 
 [WebhookEvent("Relation Saved")]
 public class RelationSavedWebhookEvent : WebhookEventBase<RelationSavedNotification>

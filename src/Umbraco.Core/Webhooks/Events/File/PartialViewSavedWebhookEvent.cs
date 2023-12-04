@@ -1,10 +1,10 @@
-﻿using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 
-namespace Umbraco.Cms.Core.Webhooks.Events.File;
+namespace Umbraco.Cms.Core.Webhooks.Events;
 
 [WebhookEvent("Partial View Saved")]
 public class PartialViewSavedWebhookEvent : WebhookEventBase<PartialViewSavedNotification>
