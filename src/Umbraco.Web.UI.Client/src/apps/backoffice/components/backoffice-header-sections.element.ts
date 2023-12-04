@@ -70,14 +70,18 @@ export class UmbBackofficeHeaderSectionsElement extends UmbLitElement {
 
 	static styles: CSSResultGroup = [
 		css`
+			:host {
+				display: contents;
+			}
 			#tabs {
-				color: var(--uui-color-header-contrast);
 				height: 60px;
+				flex-basis: 100%;
 				font-size: 16px;
 				--uui-tab-text: var(--uui-color-header-contrast);
 				--uui-tab-text-hover: var(--uui-color-header-contrast-emphasis);
 				--uui-tab-text-active: var(--uui-color-header-contrast-emphasis);
-				--uui-tab-background: var(--uui-color-header-background);
+				background-color: var(--uui-color-header-background);
+				--uui-tab-group-dropdown-background: var(--uui-color-header-surface);
 			}
 		`,
 	];
