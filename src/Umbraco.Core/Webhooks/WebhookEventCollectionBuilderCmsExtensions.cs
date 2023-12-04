@@ -32,7 +32,7 @@ public static class WebhookEventCollectionBuilderCmsExtensions
     }
 
     /// <summary>
-    /// Adds the content webhook events.
+    /// Adds all available content (including blueprint and version) webhook events.
     /// </summary>
     /// <param name="builder">The builder.</param>
     /// <param name="onlyDefault">If set to <c>true</c> only adds the default webhook events instead of all available.</param>
@@ -84,7 +84,7 @@ public static class WebhookEventCollectionBuilderCmsExtensions
         });
 
     /// <summary>
-    /// Adds content type (document, media and member type) webhook events specified in the <paramref name="contentTypeBuilder" /> action.
+    /// Adds content type webhook events specified in the <paramref name="contentTypeBuilder" /> action.
     /// </summary>
     /// <param name="builder">The builder.</param>
     /// <param name="contentTypeBuilder">The content type builder.</param>
@@ -148,7 +148,7 @@ public static class WebhookEventCollectionBuilderCmsExtensions
     }
 
     /// <summary>
-    /// Adds all available file (template, partial view, script and stylesheet) webhook events.
+    /// Adds all available file (partial view, script, stylesheet and template) webhook events.
     /// </summary>
     /// <param name="builder">The builder.</param>
     /// <returns>
@@ -163,6 +163,21 @@ public static class WebhookEventCollectionBuilderCmsExtensions
                 .AddStylesheet()
                 .AddTemplate();
         });
+
+    /// <summary>
+    /// Adds file webhook events specified in the <paramref name="fileBuilder" /> action.
+    /// </summary>
+    /// <param name="builder">The builder.</param>
+    /// <param name="fileBuilder">The file builder.</param>
+    /// <returns>
+    /// The builder.
+    /// </returns>
+    public static WebhookEventCollectionBuilderCms AddFile(this WebhookEventCollectionBuilderCms builder, Action<WebhookEventCollectionBuilderCmsFile> fileBuilder)
+    {
+        fileBuilder(new WebhookEventCollectionBuilderCmsFile(builder.Builder));
+
+        return builder;
+    }
 
     /// <summary>
     /// Adds the language webhook events.
@@ -200,7 +215,7 @@ public static class WebhookEventCollectionBuilderCmsExtensions
     }
 
     /// <summary>
-    /// Adds all available member webhook events.
+    /// Adds all available member (including member role and member group) webhook events.
     /// </summary>
     /// <param name="builder">The builder.</param>
     /// <param name="onlyDefault">If set to <c>true</c> only adds the default webhook events instead of all available.</param>
@@ -299,22 +314,7 @@ public static class WebhookEventCollectionBuilderCmsExtensions
     }
 
     /// <summary>
-    /// Adds file webhook events specified in the <paramref name="fileBuilder" /> action.
-    /// </summary>
-    /// <param name="builder">The builder.</param>
-    /// <param name="fileBuilder">The file builder.</param>
-    /// <returns>
-    /// The builder.
-    /// </returns>
-    public static WebhookEventCollectionBuilderCms AddFile(this WebhookEventCollectionBuilderCms builder, Action<WebhookEventCollectionBuilderCmsFile> fileBuilder)
-    {
-        fileBuilder(new WebhookEventCollectionBuilderCmsFile(builder.Builder));
-
-        return builder;
-    }
-
-    /// <summary>
-    /// Adds all available user webhook events.
+    /// Adds all available user (including password, login and user group) webhook events.
     /// </summary>
     /// <param name="builder">The builder.</param>
     /// <param name="onlyDefault">If set to <c>true</c> only adds the default webhook events instead of all available.</param>
