@@ -13,32 +13,32 @@ public class ManagementApiUserGroupTestBase<T> : ManagementApiTest<T> where T : 
 
     protected virtual UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
-        Allowed = true, ExpectedStatusCode = HttpStatusCode.OK,
+        ExpectedStatusCode = HttpStatusCode.OK
     };
 
     protected virtual UserGroupAssertionModel EditorUserGroupAssertionModel => new()
     {
-        Allowed = false, ExpectedStatusCode = HttpStatusCode.Forbidden,
+        ExpectedStatusCode = HttpStatusCode.Forbidden
     };
 
     protected virtual UserGroupAssertionModel SensitiveDataUserGroupAssertionModel => new()
     {
-        Allowed = false, ExpectedStatusCode = HttpStatusCode.Forbidden,
+        ExpectedStatusCode = HttpStatusCode.Forbidden
     };
 
     protected virtual UserGroupAssertionModel TranslatorUserGroupAssertionModel => new()
     {
-        Allowed = false, ExpectedStatusCode = HttpStatusCode.Forbidden,
+        ExpectedStatusCode = HttpStatusCode.Forbidden
     };
 
     protected virtual UserGroupAssertionModel WriterUserGroupAssertionModel => new()
     {
-        Allowed = false, ExpectedStatusCode = HttpStatusCode.Forbidden,
+        ExpectedStatusCode = HttpStatusCode.Forbidden
     };
 
     protected virtual UserGroupAssertionModel UnauthorizedUserGroupAssertionModel => new()
     {
-        Allowed = false, ExpectedStatusCode = HttpStatusCode.Unauthorized,
+        ExpectedStatusCode = HttpStatusCode.Unauthorized
     };
 
     protected const string UserEmail = "test@umbraco.com";
@@ -93,15 +93,19 @@ public class ManagementApiUserGroupTestBase<T> : ManagementApiTest<T> where T : 
     [Test]
     public virtual async Task As_Unauthorized_I_Have_Specified_Access()
     {
-        var response = await Client.GetAsync(Url);
+        var response = await ClientRequest();
 
         Assert.AreEqual(UnauthorizedUserGroupAssertionModel.ExpectedStatusCode, response.StatusCode, await response.Content.ReadAsStringAsync());
     }
 
     protected virtual async Task<HttpResponseMessage> AuthorizedRequest(Guid userGroupKey)
     {
-        await AuthenticateClientAsync(Client, UserEmail, UserPassword, userGroupKey);
+        await AuthenticateUser(userGroupKey);
 
-        return await Client.GetAsync(Url);
+        return await ClientRequest();
     }
+
+    protected virtual async Task AuthenticateUser(Guid userGroupKey) => await AuthenticateClientAsync(Client, UserEmail, UserPassword, userGroupKey);
+
+    protected virtual async Task<HttpResponseMessage> ClientRequest() => await Client.GetAsync(Url);
 }
