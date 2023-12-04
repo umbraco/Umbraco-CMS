@@ -1,15 +1,15 @@
-﻿using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 
-namespace Umbraco.Cms.Core.Webhooks.Events.User;
+namespace Umbraco.Cms.Core.Webhooks.Events;
 
-[WebhookEvent("User Forgotten Password Requested")]
-public class UserForgottenPasswordRequestedWebhookEvent : WebhookEventBase<UserForgotPasswordRequestedNotification>
+[WebhookEvent("Template Deleted")]
+public class TemplateDeletedWebhookEvent : WebhookEventBase<TemplateDeletedNotification>
 {
-    public UserForgottenPasswordRequestedWebhookEvent(
+    public TemplateDeletedWebhookEvent(
         IWebhookFiringService webhookFiringService,
         IWebhookService webHookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
@@ -18,5 +18,8 @@ public class UserForgottenPasswordRequestedWebhookEvent : WebhookEventBase<UserF
     {
     }
 
-    public override string Alias => "userForgottenPasswordRequested";
+    public override string Alias => "templateDeleted";
+
+    public override object? ConvertNotificationToRequestPayload(TemplateDeletedNotification notification) =>
+        notification.DeletedEntities;
 }

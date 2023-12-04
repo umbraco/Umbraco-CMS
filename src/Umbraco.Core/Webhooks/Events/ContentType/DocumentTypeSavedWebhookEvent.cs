@@ -1,15 +1,15 @@
-﻿using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 
-namespace Umbraco.Cms.Core.Webhooks.Events.MediaType;
+namespace Umbraco.Cms.Core.Webhooks.Events;
 
-[WebhookEvent("Media Type Saved")]
-public class MediaTypeSavedWebhookEvent : WebhookEventBase<MediaTypeSavedNotification>
+[WebhookEvent("Document Type Saved")]
+public class DocumentTypeSavedWebhookEvent : WebhookEventBase<ContentTypeSavedNotification>
 {
-    public MediaTypeSavedWebhookEvent(
+    public DocumentTypeSavedWebhookEvent(
         IWebhookFiringService webhookFiringService,
         IWebhookService webHookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
@@ -18,8 +18,8 @@ public class MediaTypeSavedWebhookEvent : WebhookEventBase<MediaTypeSavedNotific
     {
     }
 
-    public override string Alias => "mediaTypeSaved";
+    public override string Alias => "documentTypeSaved";
 
-    public override object? ConvertNotificationToRequestPayload(MediaTypeSavedNotification notification)
+    public override object? ConvertNotificationToRequestPayload(ContentTypeSavedNotification notification)
         => notification.SavedEntities;
 }

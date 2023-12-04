@@ -6,10 +6,10 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events;
 
-[WebhookEvent("Member Roles Assigned")]
-public class AssignedMemberRolesWebhookEvent : WebhookEventBase<AssignedMemberRolesNotification>
+[WebhookEvent("Stylesheet Saved")]
+public class StylesheetSavedWebhookEvent : WebhookEventBase<StylesheetSavedNotification>
 {
-    public AssignedMemberRolesWebhookEvent(
+    public StylesheetSavedWebhookEvent(
         IWebhookFiringService webhookFiringService,
         IWebhookService webHookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
@@ -18,5 +18,8 @@ public class AssignedMemberRolesWebhookEvent : WebhookEventBase<AssignedMemberRo
     {
     }
 
-    public override string Alias => "assignedMemberRoles";
+    public override string Alias => "stylesheetSaved";
+
+    public override object? ConvertNotificationToRequestPayload(StylesheetSavedNotification notification)
+        => notification.SavedEntities;
 }
