@@ -46,28 +46,8 @@ public class ManagementApiUserGroupTestBase<T> : ManagementApiTest<T> where T : 
 
     // Admin
     [Test]
-    public virtual async Task As_Admin_I_Have_Access()
+    public virtual async Task As_Admin_I_Have_Specified_Access()
     {
-        if (AdminUserGroupAssertionModel.Allowed is false)
-        {
-            Assert.Ignore();
-            return;
-        }
-
-        var response = await AuthorizedRequest(Constants.Security.AdminGroupKey);
-
-        Assert.AreEqual(AdminUserGroupAssertionModel.ExpectedStatusCode, response.StatusCode, await response.Content.ReadAsStringAsync());
-    }
-
-    [Test]
-    public virtual async Task As_Admin_I_Dont_Have_Access()
-    {
-        if (AdminUserGroupAssertionModel.Allowed)
-        {
-            Assert.Ignore();
-            return;
-        }
-
         var response = await AuthorizedRequest(Constants.Security.AdminGroupKey);
 
         Assert.AreEqual(AdminUserGroupAssertionModel.ExpectedStatusCode, response.StatusCode, await response.Content.ReadAsStringAsync());
@@ -75,28 +55,8 @@ public class ManagementApiUserGroupTestBase<T> : ManagementApiTest<T> where T : 
 
     // Editor
     [Test]
-    public virtual async Task As_Editor_I_Have_Access()
+    public virtual async Task As_Editor_I_Have_Specified_Access()
     {
-        if (EditorUserGroupAssertionModel.Allowed is false)
-        {
-            Assert.Ignore();
-            return;
-        }
-
-        var response = await AuthorizedRequest(Constants.Security.EditorGroupKey);
-
-        Assert.AreEqual(EditorUserGroupAssertionModel.ExpectedStatusCode, response.StatusCode, await response.Content.ReadAsStringAsync());
-    }
-
-    [Test]
-    public virtual async Task As_Editor_I_Have_Dont_Access()
-    {
-        if (EditorUserGroupAssertionModel.Allowed)
-        {
-            Assert.Ignore();
-            return;
-        }
-
         var response = await AuthorizedRequest(Constants.Security.EditorGroupKey);
 
         Assert.AreEqual(EditorUserGroupAssertionModel.ExpectedStatusCode, response.StatusCode, await response.Content.ReadAsStringAsync());
@@ -104,28 +64,8 @@ public class ManagementApiUserGroupTestBase<T> : ManagementApiTest<T> where T : 
 
     // SensitiveData
     [Test]
-    public virtual async Task As_Sensitive_Data_I_Have_Access()
+    public virtual async Task As_Sensitive_Data_I_Have_Specified_Access()
     {
-        if (SensitiveDataUserGroupAssertionModel.Allowed is false)
-        {
-            Assert.Ignore();
-            return;
-        }
-
-        var response = await AuthorizedRequest(Constants.Security.SensitiveDataGroupKey);
-
-        Assert.AreEqual(SensitiveDataUserGroupAssertionModel.ExpectedStatusCode, response.StatusCode, await response.Content.ReadAsStringAsync());
-    }
-
-    [Test]
-    public virtual async Task As_Sensitive_Data_I_Dont_Have_Access()
-    {
-        if (SensitiveDataUserGroupAssertionModel.Allowed)
-        {
-            Assert.Ignore();
-            return;
-        }
-
         var response = await AuthorizedRequest(Constants.Security.SensitiveDataGroupKey);
 
         Assert.AreEqual(SensitiveDataUserGroupAssertionModel.ExpectedStatusCode, response.StatusCode, await response.Content.ReadAsStringAsync());
@@ -133,58 +73,17 @@ public class ManagementApiUserGroupTestBase<T> : ManagementApiTest<T> where T : 
 
     // Translator
     [Test]
-    public virtual async Task As_Translator_I_Have_Access()
+    public virtual async Task As_Translator_I_Have_Specified_Access()
     {
-        if (TranslatorUserGroupAssertionModel.Allowed is false)
-        {
-            Assert.Ignore();
-            return;
-        }
-
-        var response = await AuthorizedRequest(Constants.Security.TranslatorGroupKey);
-
-        Assert.AreEqual(TranslatorUserGroupAssertionModel.ExpectedStatusCode, response.StatusCode, await response.Content.ReadAsStringAsync());
-    }
-
-    [Test]
-    public virtual async Task As_Translator_I_Dont_Have_Access()
-    {
-        if (TranslatorUserGroupAssertionModel.Allowed)
-        {
-            Assert.Ignore();
-            return;
-        }
-
         var response = await AuthorizedRequest(Constants.Security.TranslatorGroupKey);
 
         Assert.AreEqual(TranslatorUserGroupAssertionModel.ExpectedStatusCode, response.StatusCode, await response.Content.ReadAsStringAsync());
     }
 
     // Writer
-
     [Test]
-    public virtual async Task As_Writer_I_Have_Access()
+    public virtual async Task As_Writer_I_Have_Specified_Access()
     {
-        if (WriterUserGroupAssertionModel.Allowed is false)
-        {
-            Assert.Ignore();
-            return;
-        }
-
-        var response = await AuthorizedRequest(Constants.Security.WriterGroupKey);
-
-        Assert.AreEqual(WriterUserGroupAssertionModel.ExpectedStatusCode, response.StatusCode, await response.Content.ReadAsStringAsync());
-    }
-
-    [Test]
-    public virtual async Task As_Writer_I_Dont_Have_Access()
-    {
-        if (WriterUserGroupAssertionModel.Allowed)
-        {
-            Assert.Ignore();
-            return;
-        }
-
         var response = await AuthorizedRequest(Constants.Security.WriterGroupKey);
 
         Assert.AreEqual(WriterUserGroupAssertionModel.ExpectedStatusCode, response.StatusCode, await response.Content.ReadAsStringAsync());
@@ -192,28 +91,8 @@ public class ManagementApiUserGroupTestBase<T> : ManagementApiTest<T> where T : 
 
     // Unauthorized
     [Test]
-    public virtual async Task As_Unauthorized_I_Have_Access()
+    public virtual async Task As_Unauthorized_I_Have_Specified_Access()
     {
-        if (UnauthorizedUserGroupAssertionModel.Allowed is false)
-        {
-            Assert.Ignore();
-            return;
-        }
-
-        var response = await Client.GetAsync(Url);
-
-        Assert.AreEqual(UnauthorizedUserGroupAssertionModel.ExpectedStatusCode, response.StatusCode, await response.Content.ReadAsStringAsync());
-    }
-
-    [Test]
-    public virtual async Task As_Unauthorized_I_Dont_Have_Access()
-    {
-        if (UnauthorizedUserGroupAssertionModel.Allowed)
-        {
-            Assert.Ignore();
-            return;
-        }
-
         var response = await Client.GetAsync(Url);
 
         Assert.AreEqual(UnauthorizedUserGroupAssertionModel.ExpectedStatusCode, response.StatusCode, await response.Content.ReadAsStringAsync());
