@@ -9,9 +9,6 @@ using Umbraco.Cms.Core.Webhooks.Events.Package;
 using Umbraco.Cms.Core.Webhooks.Events.PublicAccess;
 using Umbraco.Cms.Core.Webhooks.Events.Relation;
 using Umbraco.Cms.Core.Webhooks.Events.RelationType;
-using Umbraco.Cms.Core.Webhooks.Events.Script;
-using Umbraco.Cms.Core.Webhooks.Events.Stylesheet;
-using Umbraco.Cms.Core.Webhooks.Events.Template;
 using static Umbraco.Cms.Core.DependencyInjection.WebhookEventCollectionBuilderExtensions;
 
 namespace Umbraco.Cms.Core.DependencyInjection;
@@ -160,6 +157,23 @@ public static class WebhookEventCollectionBuilderCmsExtensions
     }
 
     /// <summary>
+    /// Adds all available file (template, partial view, script and stylesheet) webhook events.
+    /// </summary>
+    /// <param name="builder">The builder.</param>
+    /// <returns>
+    /// The builder.
+    /// </returns>
+    public static WebhookEventCollectionBuilderCms AddFile(this WebhookEventCollectionBuilderCms builder)
+        => builder.AddFile(builder =>
+        {
+            builder
+                .AddPartialView()
+                .AddScript()
+                .AddStylesheet()
+                .AddTemplate();
+        });
+
+    /// <summary>
     /// Adds the language webhook events.
     /// </summary>
     /// <param name="builder">The builder.</param>
@@ -294,68 +308,16 @@ public static class WebhookEventCollectionBuilderCmsExtensions
     }
 
     /// <summary>
-    /// Adds the script webhook events.
+    /// Adds file webhook events specified in the <paramref name="fileBuilder" /> action.
     /// </summary>
     /// <param name="builder">The builder.</param>
+    /// <param name="fileBuilder">The file builder.</param>
     /// <returns>
     /// The builder.
     /// </returns>
-    public static WebhookEventCollectionBuilderCms AddScript(this WebhookEventCollectionBuilderCms builder)
+    public static WebhookEventCollectionBuilderCms AddFile(this WebhookEventCollectionBuilderCms builder, Action<WebhookEventCollectionBuilderCmsFile> fileBuilder)
     {
-        builder.Builder
-            .Append<ScriptDeletedWebhookEvent>()
-            .Append<ScriptSavedWebhookEvent>();
-
-        return builder;
-    }
-
-    /// <summary>
-    /// Adds the stylesheet webhook events.
-    /// </summary>
-    /// <param name="builder">The builder.</param>
-    /// <returns>
-    /// The builder.
-    /// </returns>
-    public static WebhookEventCollectionBuilderCms AddStylesheet(this WebhookEventCollectionBuilderCms builder)
-    {
-        builder.Builder
-            .Append<StylesheetDeletedWebhookEvent>()
-            .Append<StylesheetSavedWebhookEvent>();
-
-        return builder;
-    }
-
-    /// <summary>
-    /// Adds all available template webhook events.
-    /// </summary>
-    /// <param name="builder">The builder.</param>
-    /// <param name="onlyDefault">If set to <c>true</c> only adds the default webhook events instead of all available.</param>
-    /// <returns>
-    /// The builder.
-    /// </returns>
-    public static WebhookEventCollectionBuilderCms AddTemplate(this WebhookEventCollectionBuilderCms builder, bool onlyDefault = false)
-        => builder.AddTemplate(builder =>
-        {
-            builder.AddDefault();
-
-            if (onlyDefault is false)
-            {
-                builder
-                    .AddPartialView();
-            }
-        });
-
-    /// <summary>
-    /// Adds template webhook events specified in the <paramref name="templateBuilder" /> action.
-    /// </summary>
-    /// <param name="builder">The builder.</param>
-    /// <param name="templateBuilder">The template builder.</param>
-    /// <returns>
-    /// The builder.
-    /// </returns>
-    public static WebhookEventCollectionBuilderCms AddTemplate(this WebhookEventCollectionBuilderCms builder, Action<WebhookEventCollectionBuilderCmsTemplate> templateBuilder)
-    {
-        templateBuilder(new WebhookEventCollectionBuilderCmsTemplate(builder.Builder));
+        fileBuilder(new WebhookEventCollectionBuilderCmsFile(builder.Builder));
 
         return builder;
     }
@@ -431,11 +393,11 @@ public static class WebhookEventCollectionBuilderCmsExtensions
     }
 
     /// <summary>
-    /// Fluent <see cref="WebhookEventCollectionBuilder" /> for adding CMS template specific webhook events.
+    /// Fluent <see cref="WebhookEventCollectionBuilder" /> for adding CMS file specific webhook events.
     /// </summary>
-    public sealed class WebhookEventCollectionBuilderCmsTemplate
+    public sealed class WebhookEventCollectionBuilderCmsFile
     {
-        internal WebhookEventCollectionBuilderCmsTemplate(WebhookEventCollectionBuilder builder)
+        internal WebhookEventCollectionBuilderCmsFile(WebhookEventCollectionBuilder builder)
             => Builder = builder;
 
         internal WebhookEventCollectionBuilder Builder { get; }

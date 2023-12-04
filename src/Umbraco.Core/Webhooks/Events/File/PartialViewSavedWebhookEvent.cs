@@ -4,12 +4,12 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 
-namespace Umbraco.Cms.Core.Webhooks.Events.Stylesheet;
+namespace Umbraco.Cms.Core.Webhooks.Events.File;
 
-[WebhookEvent("Stylesheet Deleted")]
-public class StylesheetDeletedWebhookEvent : WebhookEventBase<StylesheetDeletedNotification>
+[WebhookEvent("Partial View Saved")]
+public class PartialViewSavedWebhookEvent : WebhookEventBase<PartialViewSavedNotification>
 {
-    public StylesheetDeletedWebhookEvent(
+    public PartialViewSavedWebhookEvent(
         IWebhookFiringService webhookFiringService,
         IWebhookService webHookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
@@ -18,8 +18,8 @@ public class StylesheetDeletedWebhookEvent : WebhookEventBase<StylesheetDeletedN
     {
     }
 
-    public override string Alias => "stylesheetDeleted";
+    public override string Alias => "partialViewSaved";
 
-    public override object? ConvertNotificationToRequestPayload(StylesheetDeletedNotification notification) =>
-        notification.DeletedEntities;
+    public override object? ConvertNotificationToRequestPayload(PartialViewSavedNotification notification) =>
+        notification.SavedEntities;
 }

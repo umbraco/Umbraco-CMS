@@ -4,12 +4,12 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 
-namespace Umbraco.Cms.Core.Webhooks.Events.Template;
+namespace Umbraco.Cms.Core.Webhooks.Events.File;
 
-[WebhookEvent("Partial View Saved")]
-public class PartialViewSavedWebhookEvent : WebhookEventBase<PartialViewSavedNotification>
+[WebhookEvent("Stylesheet Saved")]
+public class StylesheetSavedWebhookEvent : WebhookEventBase<StylesheetSavedNotification>
 {
-    public PartialViewSavedWebhookEvent(
+    public StylesheetSavedWebhookEvent(
         IWebhookFiringService webhookFiringService,
         IWebhookService webHookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
@@ -18,8 +18,8 @@ public class PartialViewSavedWebhookEvent : WebhookEventBase<PartialViewSavedNot
     {
     }
 
-    public override string Alias => "partialViewSaved";
+    public override string Alias => "stylesheetSaved";
 
-    public override object? ConvertNotificationToRequestPayload(PartialViewSavedNotification notification) =>
-        notification.SavedEntities;
+    public override object? ConvertNotificationToRequestPayload(StylesheetSavedNotification notification)
+        => notification.SavedEntities;
 }
