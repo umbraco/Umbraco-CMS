@@ -11,13 +11,13 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Primitives;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Grid;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Manifest;
-using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
@@ -145,7 +145,6 @@ public class BackOfficeController : UmbracoController
 
         return await RenderDefaultOrProcessExternalLoginAsync(
             result,
-            () => defaultView,
             () => defaultView);
     }
 
@@ -172,7 +171,6 @@ public class BackOfficeController : UmbracoController
 
         return await RenderDefaultOrProcessExternalLoginAsync(
             result,
-            () => View(viewPath),
             () => View(viewPath));
     }
 
@@ -460,11 +458,9 @@ public class BackOfficeController : UmbracoController
     /// <returns></returns>
     private async Task<IActionResult> RenderDefaultOrProcessExternalLoginAsync(
         AuthenticateResult authenticateResult,
-        Func<IActionResult> defaultResponse,
-        Func<IActionResult> externalSignInResponse)
+        Func<IActionResult> defaultResponse)
     {
         ArgumentNullException.ThrowIfNull(defaultResponse);
-        ArgumentNullException.ThrowIfNull(externalSignInResponse);
 
         ViewData.SetUmbracoPath(_globalSettings.GetUmbracoMvcArea(_hostingEnvironment));
 
@@ -481,23 +477,35 @@ public class BackOfficeController : UmbracoController
         // First check if there's external login info, if there's not proceed as normal
         ExternalLoginInfo? loginInfo = await _signInManager.GetExternalLoginInfoAsync();
 
-        if (loginInfo == null || loginInfo.Principal == null)
+        if (loginInfo != null)
         {
-            // if the user is not logged in, check if there's any auto login redirects specified
-            if (!authenticateResult.Succeeded)
-            {
-                var oauthRedirectAuthProvider = _externalLogins.GetAutoLoginProvider();
-                if (!oauthRedirectAuthProvider.IsNullOrWhiteSpace())
-                {
-                    return ExternalLogin(oauthRedirectAuthProvider!);
-                }
-            }
+            // we're just logging in with an external source, not linking accounts
+            return await ExternalSignInAsync(loginInfo, defaultResponse);
+        }
 
+        // If we are authenticated then we can just render the default view
+        if (authenticateResult.Succeeded)
+        {
             return defaultResponse();
         }
 
-        // we're just logging in with an external source, not linking accounts
-        return await ExternalSignInAsync(loginInfo, externalSignInResponse);
+        // If the user is not logged in, check if there's any auto login redirects specified
+        var oauthRedirectAuthProvider = _externalLogins.GetAutoLoginProvider();
+
+        // If there's no auto login provider specified, then we'll render the default view
+        if (oauthRedirectAuthProvider.IsNullOrWhiteSpace())
+        {
+            return defaultResponse();
+        }
+
+        // If the ?logout=true query string is not specified, then we'll redirect to the external login provider
+        // which will then redirect back to the ExternalLoginCallback action
+        if (Request.Query.TryGetValue("logout", out StringValues logout) == false || logout != "true")
+        {
+            return ExternalLogin(oauthRedirectAuthProvider);
+        }
+
+        return defaultResponse();
     }
 
     private async Task<IActionResult> ExternalSignInAsync(ExternalLoginInfo loginInfo, Func<IActionResult> response)
