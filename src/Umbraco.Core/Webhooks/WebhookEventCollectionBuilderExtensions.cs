@@ -3,6 +3,7 @@ using Umbraco.Cms.Core.Webhooks.Events.Content;
 using Umbraco.Cms.Core.Webhooks.Events.DataType;
 using Umbraco.Cms.Core.Webhooks.Events.Dictionary;
 using Umbraco.Cms.Core.Webhooks.Events.Domain;
+using Umbraco.Cms.Core.Webhooks.Events.HealthCheck;
 using Umbraco.Cms.Core.Webhooks.Events.Language;
 using Umbraco.Cms.Core.Webhooks.Events.Media;
 using Umbraco.Cms.Core.Webhooks.Events.MediaType;
@@ -42,6 +43,7 @@ public static class WebhookEventCollectionBuilderExtensions
             .AddDataTypeWebhooks()
             .AddDictionaryWebhooks()
             .AddDomainWebhooks()
+            .AddHealthCheckWebhooks()
             .AddLanguageWebhooks()
             .AddMediaWebhooks()
             .AddMemberWebhooks()
@@ -113,6 +115,15 @@ public static class WebhookEventCollectionBuilderExtensions
         => builder
             .Append<DomainDeletedWebhookEvent>()
             .Append<DomainSavedWebhookEvent>();
+
+    /// <summary>
+    /// Adds the health check webhook events.
+    /// </summary>
+    /// <param name="builder"></param>
+    /// <returns></returns>
+    public static WebhookEventCollectionBuilder AddHealthCheckWebhooks(this WebhookEventCollectionBuilder builder)
+        => builder
+            .Append<HealthCheckCompletedWebhookEvent>();
 
     /// <summary>
     /// Adds the language webhook events.
