@@ -51,7 +51,7 @@ export class UmbDropdownElement extends UmbLitElement {
 				.compact=${this.compact}>
 				<slot name="label"></slot>
 			</uui-button>
-			<uui-popover-container id="dropdown-popover">
+			<uui-popover-container id="dropdown-popover" .placement=${this.placement}>
 				<umb-popover-layout>
 					<slot></slot>
 				</umb-popover-layout>
