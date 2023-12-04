@@ -6,10 +6,10 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events;
 
-[WebhookEvent("Member Roles Assigned")]
-public class AssignedMemberRolesWebhookEvent : WebhookEventBase<AssignedMemberRolesNotification>
+[WebhookEvent("Media Type Changed")]
+public class MediaTypeChangedWebhookEvent : WebhookEventBase<MediaTypeChangedNotification>
 {
-    public AssignedMemberRolesWebhookEvent(
+    public MediaTypeChangedWebhookEvent(
         IWebhookFiringService webhookFiringService,
         IWebhookService webHookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
@@ -18,5 +18,8 @@ public class AssignedMemberRolesWebhookEvent : WebhookEventBase<AssignedMemberRo
     {
     }
 
-    public override string Alias => "assignedMemberRoles";
+    public override string Alias => "mediaTypeChanged";
+
+    public override object? ConvertNotificationToRequestPayload(MediaTypeChangedNotification notification)
+        => notification.Changes;
 }

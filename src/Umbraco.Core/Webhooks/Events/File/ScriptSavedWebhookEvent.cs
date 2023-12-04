@@ -1,15 +1,15 @@
-﻿using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 
-namespace Umbraco.Cms.Core.Webhooks.Events.Template;
+namespace Umbraco.Cms.Core.Webhooks.Events;
 
-[WebhookEvent("Partial View Deleted")]
-public class PartialViewDeletedWebhookEvent : WebhookEventBase<PartialViewDeletedNotification>
+[WebhookEvent("Script Saved")]
+public class ScriptSavedWebhookEvent : WebhookEventBase<ScriptDeletedNotification>
 {
-    public PartialViewDeletedWebhookEvent(
+    public ScriptSavedWebhookEvent(
         IWebhookFiringService webhookFiringService,
         IWebhookService webHookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
@@ -18,8 +18,8 @@ public class PartialViewDeletedWebhookEvent : WebhookEventBase<PartialViewDelete
     {
     }
 
-    public override string Alias => "partialViewDeleted";
+    public override string Alias => "scriptSaved";
 
-    public override object? ConvertNotificationToRequestPayload(PartialViewDeletedNotification notification)
+    public override object? ConvertNotificationToRequestPayload(ScriptDeletedNotification notification)
         => notification.DeletedEntities;
 }

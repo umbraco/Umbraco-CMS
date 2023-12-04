@@ -6,10 +6,10 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events;
 
-[WebhookEvent("Member Roles Assigned")]
-public class AssignedMemberRolesWebhookEvent : WebhookEventBase<AssignedMemberRolesNotification>
+[WebhookEvent("Partial View Deleted")]
+public class PartialViewDeletedWebhookEvent : WebhookEventBase<PartialViewDeletedNotification>
 {
-    public AssignedMemberRolesWebhookEvent(
+    public PartialViewDeletedWebhookEvent(
         IWebhookFiringService webhookFiringService,
         IWebhookService webHookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
@@ -18,5 +18,8 @@ public class AssignedMemberRolesWebhookEvent : WebhookEventBase<AssignedMemberRo
     {
     }
 
-    public override string Alias => "assignedMemberRoles";
+    public override string Alias => "partialViewDeleted";
+
+    public override object? ConvertNotificationToRequestPayload(PartialViewDeletedNotification notification)
+        => notification.DeletedEntities;
 }

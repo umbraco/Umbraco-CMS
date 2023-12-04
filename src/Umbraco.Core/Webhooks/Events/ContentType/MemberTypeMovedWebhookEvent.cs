@@ -4,12 +4,12 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 
-namespace Umbraco.Cms.Core.Webhooks.Events.Template;
+namespace Umbraco.Cms.Core.Webhooks.Events;
 
-[WebhookEvent("Partial View Saved")]
-public class PartialViewSavedWebhookEvent : WebhookEventBase<PartialViewSavedNotification>
+[WebhookEvent("Member Type Moved")]
+public class MemberTypeMovedWebhookEvent : WebhookEventBase<MemberTypeMovedNotification>
 {
-    public PartialViewSavedWebhookEvent(
+    public MemberTypeMovedWebhookEvent(
         IWebhookFiringService webhookFiringService,
         IWebhookService webHookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
@@ -18,8 +18,8 @@ public class PartialViewSavedWebhookEvent : WebhookEventBase<PartialViewSavedNot
     {
     }
 
-    public override string Alias => "partialViewSaved";
+    public override string Alias => "memberTypeMoved";
 
-    public override object? ConvertNotificationToRequestPayload(PartialViewSavedNotification notification) =>
-        notification.SavedEntities;
+    public override object? ConvertNotificationToRequestPayload(MemberTypeMovedNotification notification)
+        => notification.MoveInfoCollection;
 }

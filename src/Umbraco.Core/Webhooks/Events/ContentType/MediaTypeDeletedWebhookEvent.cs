@@ -4,12 +4,12 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 
-namespace Umbraco.Cms.Core.Webhooks.Events.Stylesheet;
+namespace Umbraco.Cms.Core.Webhooks.Events;
 
-[WebhookEvent("Stylesheet Saved")]
-public class StylesheetSavedWebhookEvent : WebhookEventBase<StylesheetSavedNotification>
+[WebhookEvent("Media Type Deleted")]
+public class MediaTypeDeletedWebhookEvent : WebhookEventBase<MediaTypeDeletedNotification>
 {
-    public StylesheetSavedWebhookEvent(
+    public MediaTypeDeletedWebhookEvent(
         IWebhookFiringService webhookFiringService,
         IWebhookService webHookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
@@ -18,8 +18,8 @@ public class StylesheetSavedWebhookEvent : WebhookEventBase<StylesheetSavedNotif
     {
     }
 
-    public override string Alias => "stylesheetSaved";
+    public override string Alias => "mediaTypeDeleted";
 
-    public override object? ConvertNotificationToRequestPayload(StylesheetSavedNotification notification)
-        => notification.SavedEntities;
+    public override object? ConvertNotificationToRequestPayload(MediaTypeDeletedNotification notification)
+        => notification.DeletedEntities;
 }

@@ -6,10 +6,10 @@ using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Webhooks.Events;
 
-[WebhookEvent("Member Roles Assigned")]
-public class AssignedMemberRolesWebhookEvent : WebhookEventBase<AssignedMemberRolesNotification>
+[WebhookEvent("Document Type Changed")]
+public class DocumentTypeChangedWebhookEvent : WebhookEventBase<ContentTypeChangedNotification>
 {
-    public AssignedMemberRolesWebhookEvent(
+    public DocumentTypeChangedWebhookEvent(
         IWebhookFiringService webhookFiringService,
         IWebhookService webHookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
@@ -18,5 +18,8 @@ public class AssignedMemberRolesWebhookEvent : WebhookEventBase<AssignedMemberRo
     {
     }
 
-    public override string Alias => "assignedMemberRoles";
+    public override string Alias => "documentTypeChanged";
+
+    public override object? ConvertNotificationToRequestPayload(ContentTypeChangedNotification notification)
+        => notification.Changes;
 }

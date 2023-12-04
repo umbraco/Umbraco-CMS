@@ -1,15 +1,15 @@
-﻿using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 
-namespace Umbraco.Cms.Core.Webhooks.Events.Template;
+namespace Umbraco.Cms.Core.Webhooks.Events;
 
-[WebhookEvent("Template Deleted")]
-public class TemplateDeletedWebhookEvent : WebhookEventBase<TemplateDeletedNotification>
+[WebhookEvent("Stylesheet Deleted")]
+public class StylesheetDeletedWebhookEvent : WebhookEventBase<StylesheetDeletedNotification>
 {
-    public TemplateDeletedWebhookEvent(
+    public StylesheetDeletedWebhookEvent(
         IWebhookFiringService webhookFiringService,
         IWebhookService webHookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
@@ -18,8 +18,8 @@ public class TemplateDeletedWebhookEvent : WebhookEventBase<TemplateDeletedNotif
     {
     }
 
-    public override string Alias => "templateDeleted";
+    public override string Alias => "stylesheetDeleted";
 
-    public override object? ConvertNotificationToRequestPayload(TemplateDeletedNotification notification) =>
+    public override object? ConvertNotificationToRequestPayload(StylesheetDeletedNotification notification) =>
         notification.DeletedEntities;
 }
