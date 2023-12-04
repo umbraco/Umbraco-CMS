@@ -36,7 +36,6 @@ export class UmbMultipleColorPickerInputElement extends FormControlMixin(UmbLitE
 	#prevalueSorter = new UmbSorterController(this, {
 		...SORTER_CONFIG,
 
-		//TODO: Fix sorting when UmbSorterController gets fixed
 		performItemInsert: (args) => {
 			const frozenArray = [...this.items];
 			const indexToMove = frozenArray.findIndex((x) => x.value === args.item.value);
@@ -45,7 +44,7 @@ export class UmbMultipleColorPickerInputElement extends FormControlMixin(UmbLitE
 			frozenArray.splice(args.newIndex, 0, args.item);
 			this.items = frozenArray;
 
-			console.log(args.newIndex);
+			this.dispatchEvent(new UmbChangeEvent());
 
 			return true;
 		},
@@ -153,7 +152,7 @@ export class UmbMultipleColorPickerInputElement extends FormControlMixin(UmbLitE
 		this.#focusNewItem();
 	}
 
-	#onInput(event: UmbInputEvent, currentIndex: number) {
+	#onChange(event: UmbInputEvent, currentIndex: number) {
 		event.stopPropagation();
 		const target = event.currentTarget as UmbMultipleColorPickerItemInputElement;
 		const value = target.value as string;
@@ -193,7 +192,7 @@ export class UmbMultipleColorPickerInputElement extends FormControlMixin(UmbLitE
 		return html`
 			${repeat(
 				this._items,
-				(item, index) => index,
+				(item) => item.value,
 				(item, index) =>
 					html` <umb-multiple-color-picker-item-input
 						?showLabels=${this.showLabels}
@@ -201,7 +200,7 @@ export class UmbMultipleColorPickerInputElement extends FormControlMixin(UmbLitE
 						data-sort-entry-id=${item.value}
 						label=${ifDefined(item.label)}
 						name="item-${index}"
-						@input=${(event: UmbInputEvent) => this.#onInput(event, index)}
+						@change=${(event: UmbChangeEvent) => this.#onChange(event, index)}
 						@delete="${(event: UmbDeleteEvent) => this.#deleteItem(event, index)}"
 						?disabled=${this.disabled}
 						?readonly=${this.readonly}
