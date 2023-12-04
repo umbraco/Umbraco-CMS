@@ -51,10 +51,6 @@ export class UmbTestPropertyEditorElement extends UmbElementMixin(LitElement) {
 			this._observeProperty();
 		});
 	}
-
-	render() {
-		return html`${this._value}`;
-	}
 }
 
 const dataSet: Array<UmbPropertyValueData> = [
