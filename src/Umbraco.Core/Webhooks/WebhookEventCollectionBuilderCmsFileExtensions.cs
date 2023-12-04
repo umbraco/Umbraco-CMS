@@ -18,8 +18,8 @@ public static class WebhookEventCollectionBuilderCmsFileExtensions
     public static WebhookEventCollectionBuilderCmsFile AddPartialView(this WebhookEventCollectionBuilderCmsFile builder)
     {
         builder.Builder
-            .Append<PartialViewDeletedWebhookEvent>()
-            .Append<PartialViewSavedWebhookEvent>();
+            .Add<PartialViewDeletedWebhookEvent>()
+            .Add<PartialViewSavedWebhookEvent>();
 
         return builder;
     }
@@ -34,8 +34,8 @@ public static class WebhookEventCollectionBuilderCmsFileExtensions
     public static WebhookEventCollectionBuilderCmsFile AddScript(this WebhookEventCollectionBuilderCmsFile builder)
     {
         builder.Builder
-            .Append<ScriptDeletedWebhookEvent>()
-            .Append<ScriptSavedWebhookEvent>();
+            .Add<ScriptDeletedWebhookEvent>()
+            .Add<ScriptSavedWebhookEvent>();
 
         return builder;
     }
@@ -50,8 +50,8 @@ public static class WebhookEventCollectionBuilderCmsFileExtensions
     public static WebhookEventCollectionBuilderCmsFile AddStylesheet(this WebhookEventCollectionBuilderCmsFile builder)
     {
         builder.Builder
-            .Append<StylesheetDeletedWebhookEvent>()
-            .Append<StylesheetSavedWebhookEvent>();
+            .Add<StylesheetDeletedWebhookEvent>()
+            .Add<StylesheetSavedWebhookEvent>();
 
         return builder;
     }
@@ -66,8 +66,8 @@ public static class WebhookEventCollectionBuilderCmsFileExtensions
     public static WebhookEventCollectionBuilderCmsFile AddTemplate(this WebhookEventCollectionBuilderCmsFile builder)
     {
         builder.Builder
-            .Append<TemplateDeletedWebhookEvent>()
-            .Append<TemplateSavedWebhookEvent>();
+            .Add<TemplateDeletedWebhookEvent>()
+            .Add<TemplateSavedWebhookEvent>();
 
         return builder;
     }

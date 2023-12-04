@@ -18,10 +18,10 @@ public static class WebhookEventCollectionBuilderCmsContentTypeExtensions
     public static WebhookEventCollectionBuilderCmsContentType AddDocumentType(this WebhookEventCollectionBuilderCmsContentType builder)
     {
         builder.Builder
-            .Append<DocumentTypeChangedWebhookEvent>()
-            .Append<DocumentTypeDeletedWebhookEvent>()
-            .Append<DocumentTypeMovedWebhookEvent>()
-            .Append<DocumentTypeSavedWebhookEvent>();
+            .Add<DocumentTypeChangedWebhookEvent>()
+            .Add<DocumentTypeDeletedWebhookEvent>()
+            .Add<DocumentTypeMovedWebhookEvent>()
+            .Add<DocumentTypeSavedWebhookEvent>();
 
         return builder;
     }
@@ -36,10 +36,10 @@ public static class WebhookEventCollectionBuilderCmsContentTypeExtensions
     public static WebhookEventCollectionBuilderCmsContentType AddMediaType(this WebhookEventCollectionBuilderCmsContentType builder)
     {
         builder.Builder
-            .Append<MediaTypeChangedWebhookEvent>()
-            .Append<MediaTypeDeletedWebhookEvent>()
-            .Append<MediaTypeMovedWebhookEvent>()
-            .Append<MediaTypeSavedWebhookEvent>();
+            .Add<MediaTypeChangedWebhookEvent>()
+            .Add<MediaTypeDeletedWebhookEvent>()
+            .Add<MediaTypeMovedWebhookEvent>()
+            .Add<MediaTypeSavedWebhookEvent>();
 
         return builder;
     }
@@ -55,10 +55,10 @@ public static class WebhookEventCollectionBuilderCmsContentTypeExtensions
     public static WebhookEventCollectionBuilderCmsContentType AddMemberType(this WebhookEventCollectionBuilderCmsContentType builder)
     {
         builder.Builder
-            .Append<MemberTypeChangedWebhookEvent>()
-            .Append<MemberTypeDeletedWebhookEvent>()
-            .Append<MemberTypeMovedWebhookEvent>()
-            .Append<MemberTypeSavedWebhookEvent>();
+            .Add<MemberTypeChangedWebhookEvent>()
+            .Add<MemberTypeDeletedWebhookEvent>()
+            .Add<MemberTypeMovedWebhookEvent>()
+            .Add<MemberTypeSavedWebhookEvent>();
 
         return builder;
     }

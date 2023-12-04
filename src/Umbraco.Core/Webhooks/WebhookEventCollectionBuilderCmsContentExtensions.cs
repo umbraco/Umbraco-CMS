@@ -18,15 +18,15 @@ public static class WebhookEventCollectionBuilderCmsContentExtensions
     public static WebhookEventCollectionBuilderCmsContent AddDefault(this WebhookEventCollectionBuilderCmsContent builder)
     {
         builder.Builder
-           .Append<ContentCopiedWebhookEvent>()
-           .Append<ContentDeletedWebhookEvent>()
-           .Append<ContentEmptiedRecycleBinWebhookEvent>()
-           .Append<ContentMovedToRecycleBinWebhookEvent>()
-           .Append<ContentMovedWebhookEvent>()
-           .Append<ContentPublishedWebhookEvent>()
-           .Append<ContentSavedWebhookEvent>()
-           .Append<ContentSortedWebhookEvent>()
-           .Append<ContentUnpublishedWebhookEvent>();
+           .Add<ContentCopiedWebhookEvent>()
+           .Add<ContentDeletedWebhookEvent>()
+           .Add<ContentEmptiedRecycleBinWebhookEvent>()
+           .Add<ContentMovedToRecycleBinWebhookEvent>()
+           .Add<ContentMovedWebhookEvent>()
+           .Add<ContentPublishedWebhookEvent>()
+           .Add<ContentSavedWebhookEvent>()
+           .Add<ContentSortedWebhookEvent>()
+           .Add<ContentUnpublishedWebhookEvent>();
 
         return builder;
     }
@@ -41,8 +41,8 @@ public static class WebhookEventCollectionBuilderCmsContentExtensions
     public static WebhookEventCollectionBuilderCmsContent AddBlueprint(this WebhookEventCollectionBuilderCmsContent builder)
     {
         builder.Builder
-           .Append<ContentDeletedBlueprintWebhookEvent>()
-           .Append<ContentSavedBlueprintWebhookEvent>();
+           .Add<ContentDeletedBlueprintWebhookEvent>()
+           .Add<ContentSavedBlueprintWebhookEvent>();
 
         return builder;
     }
@@ -57,8 +57,8 @@ public static class WebhookEventCollectionBuilderCmsContentExtensions
     public static WebhookEventCollectionBuilderCmsContent AddVersion(this WebhookEventCollectionBuilderCmsContent builder)
     {
         builder.Builder
-           .Append<ContentDeletedVersionsWebhookEvent>()
-           .Append<ContentRolledBackWebhookEvent>();
+           .Add<ContentDeletedVersionsWebhookEvent>()
+           .Add<ContentRolledBackWebhookEvent>();
 
         return builder;
     }

@@ -18,8 +18,8 @@ public static class WebhookEventCollectionBuilderCmsUserExtensions
     public static WebhookEventCollectionBuilderCmsUser AddDefault(this WebhookEventCollectionBuilderCmsUser builder)
     {
         builder.Builder
-            .Append<UserDeletedWebhookEvent>()
-            .Append<UserSavedWebhookEvent>();
+            .Add<UserDeletedWebhookEvent>()
+            .Add<UserSavedWebhookEvent>();
 
         return builder;
     }
@@ -34,13 +34,13 @@ public static class WebhookEventCollectionBuilderCmsUserExtensions
     public static WebhookEventCollectionBuilderCmsUser AddLogin(this WebhookEventCollectionBuilderCmsUser builder)
     {
         builder.Builder
-            .Append<UserLockedWebhookEvent>()
-            .Append<UserLoginFailedWebhookEvent>()
-            .Append<UserLoginRequiresVerificationWebhookEvent>()
-            .Append<UserLoginSuccessWebhookEvent>()
-            .Append<UserLogoutSuccessWebhookEvent>()
-            .Append<UserTwoFactorRequestedWebhookEvent>()
-            .Append<UserUnlockedWebhookEvent>();
+            .Add<UserLockedWebhookEvent>()
+            .Add<UserLoginFailedWebhookEvent>()
+            .Add<UserLoginRequiresVerificationWebhookEvent>()
+            .Add<UserLoginSuccessWebhookEvent>()
+            .Add<UserLogoutSuccessWebhookEvent>()
+            .Add<UserTwoFactorRequestedWebhookEvent>()
+            .Add<UserUnlockedWebhookEvent>();
 
         return builder;
     }
@@ -55,9 +55,9 @@ public static class WebhookEventCollectionBuilderCmsUserExtensions
     public static WebhookEventCollectionBuilderCmsUser AddPassword(this WebhookEventCollectionBuilderCmsUser builder)
     {
         builder.Builder
-            .Append<UserForgotPasswordRequestedWebhookEvent>()
-            .Append<UserPasswordChangedWebhookEvent>()
-            .Append<UserPasswordResetWebhookEvent>();
+            .Add<UserForgotPasswordRequestedWebhookEvent>()
+            .Add<UserPasswordChangedWebhookEvent>()
+            .Add<UserPasswordResetWebhookEvent>();
 
         return builder;
     }
@@ -72,9 +72,9 @@ public static class WebhookEventCollectionBuilderCmsUserExtensions
     public static WebhookEventCollectionBuilderCmsUser AddGroup(this WebhookEventCollectionBuilderCmsUser builder)
     {
         builder.Builder
-            .Append<AssignedUserGroupPermissionsWebhookEvent>()
-            .Append<UserGroupDeletedWebhookEvent>()
-            .Append<UserGroupSavedWebhookEvent>();
+            .Add<AssignedUserGroupPermissionsWebhookEvent>()
+            .Add<UserGroupDeletedWebhookEvent>()
+            .Add<UserGroupSavedWebhookEvent>();
 
         return builder;
     }
