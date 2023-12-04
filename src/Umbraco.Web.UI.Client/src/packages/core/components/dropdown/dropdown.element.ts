@@ -74,6 +74,9 @@ export class UmbDropdownElement extends UmbLitElement {
 	static styles = [
 		UmbTextStyles,
 		css`
+			#dropdown-button {
+				min-width: max-content;
+			}
 			:host(:not([hide-expand]):not([compact])) #dropdown-button {
 				--uui-button-padding-right-factor: 2;
 			}
