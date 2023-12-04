@@ -1,51 +1,65 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, nothing, customElement, property } from '@umbraco-cms/backoffice/external/lit';
+import {
+	css,
+	html,
+	nothing,
+	customElement,
+	property,
+	PropertyValueMap,
+	query,
+} from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { InterfaceColor, InterfaceLook, PopoverContainerPlacement, UUIPopoverContainerElement } from '@umbraco-ui/uui';
 
 // TODO: maybe move this to UI Library.
 @customElement('umb-dropdown')
 export class UmbDropdownElement extends UmbLitElement {
+	@query('#dropdown-popover')
+	popoverContainerElement?: UUIPopoverContainerElement;
 	@property({ type: Boolean, reflect: true })
 	open = false;
 
+	@property()
+	label = '';
+
+	@property()
+	look: InterfaceLook = 'default';
+
+	@property()
+	color: InterfaceColor = 'default';
+
+	@property()
+	placement: PopoverContainerPlacement = 'bottom-start';
+
+	@property({ type: Boolean })
+	compact = false;
+
+	protected updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+		super.updated(_changedProperties);
+		if (_changedProperties.has('open') && this.popoverContainerElement) {
+			this.open ? this.popoverContainerElement.showPopover() : this.popoverContainerElement.hidePopover();
+		}
+	}
+
 	render() {
 		return html`
-			<uui-popover id="container" .open=${this.open} @close=${() => (this.open = false)}>
-				<slot name="trigger" slot="trigger"></slot>
-				${this.open ? this.#renderDropdown() : nothing}
-			</uui-popover>
+			<uui-button
+				popovertarget="dropdown-popover"
+				.look=${this.look}
+				.color=${this.color}
+				.label=${this.label}
+				.compact=${this.compact}>
+				<slot name="label"></slot>
+			</uui-button>
+			<uui-popover-container id="dropdown-popover">
+				<umb-popover-layout>
+					<slot></slot>
+				</umb-popover-layout>
+			</uui-popover-container>
 		`;
 	}
 
-	#renderDropdown() {
-		return html`
-			<div id="dropdown" slot="popover">
-				<slot name="dropdown"></slot>
-			</div>
-		`;
-	}
-
-	static styles = [
-		UmbTextStyles,
-		css`
-			#container {
-				display: inline-block;
-				width: unset;
-			}
-
-			#dropdown {
-				overflow: hidden;
-				z-index: -1;
-				background-color: var(--uui-combobox-popover-background-color, var(--uui-color-surface));
-				border: 1px solid var(--uui-color-border);
-				border-radius: var(--uui-border-radius);
-				width: 100%;
-				height: 100%;
-				box-sizing: border-box;
-				box-shadow: var(--uui-shadow-depth-3);
-			}
-		`,
-	];
+	static styles = [UmbTextStyles, css``];
 }
 
 declare global {
