@@ -7,6 +7,7 @@ import {
 	property,
 	PropertyValueMap,
 	query,
+	when,
 } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { InterfaceColor, InterfaceLook, PopoverContainerPlacement, UUIPopoverContainerElement } from '@umbraco-ui/uui';
@@ -34,6 +35,9 @@ export class UmbDropdownElement extends UmbLitElement {
 	@property({ type: Boolean })
 	compact = false;
 
+	@property({ type: Boolean, attribute: 'hide-expand' })
+	hideExpand = false;
+
 	protected updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		super.updated(_changedProperties);
 		if (_changedProperties.has('open') && this.popoverContainerElement) {
@@ -41,17 +45,26 @@ export class UmbDropdownElement extends UmbLitElement {
 		}
 	}
 
+	#onToggle(event: ToggleEvent) {
+		this.open = event.newState === 'open';
+	}
+
 	render() {
 		return html`
 			<uui-button
+				id="dropdown-button"
 				popovertarget="dropdown-popover"
 				.look=${this.look}
 				.color=${this.color}
 				.label=${this.label}
 				.compact=${this.compact}>
 				<slot name="label"></slot>
+				${when(
+					!this.hideExpand,
+					() => html`<uui-symbol-expand id="symbol-expand" .open=${this.open}></uui-symbol-expand>`,
+				)}
 			</uui-button>
-			<uui-popover-container id="dropdown-popover" .placement=${this.placement}>
+			<uui-popover-container id="dropdown-popover" .placement=${this.placement} @toggle=${this.#onToggle}>
 				<umb-popover-layout>
 					<slot></slot>
 				</umb-popover-layout>
@@ -59,7 +72,18 @@ export class UmbDropdownElement extends UmbLitElement {
 		`;
 	}
 
-	static styles = [UmbTextStyles, css``];
+	static styles = [
+		UmbTextStyles,
+		css`
+			:host(:not([hide-expand])) #dropdown-button {
+				--uui-button-padding-right-factor: 1;
+			}
+
+			:host(:not([compact])) #symbol-expand {
+				margin-left: var(--uui-size-space-2);
+			}
+		`,
+	];
 }
 
 declare global {
