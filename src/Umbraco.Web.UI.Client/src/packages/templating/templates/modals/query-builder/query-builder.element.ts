@@ -200,9 +200,9 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 					<uui-box>
 						<div class="row">
 							I want
-							<umb-button-with-dropdown look="outline" id="content-type-dropdown" label="Choose content type"
-								>${this._queryRequest?.contentTypeAlias ?? 'all content'}
-								<uui-combobox-list slot="dropdown" @change=${this.#setContentType} class="options-list">
+							<umb-dropdown look="outline" id="content-type-dropdown" label="Choose content type">
+								<span slot="label">${this._queryRequest?.contentTypeAlias ?? 'all content'}</span>
+								<uui-combobox-list @change=${this.#setContentType} class="options-list">
 									<uui-combobox-list-option value="">all content</uui-combobox-list-option>
 									${this._queryBuilderSettings?.contentTypeAliases?.map(
 										(alias) =>
@@ -210,7 +210,7 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 												>content of type "${alias}"</uui-combobox-list-option
 											>`,
 									)}
-								</uui-combobox-list></umb-button-with-dropdown
+								</uui-combobox-list></umb-dropdown
 							>
 							from
 							<uui-button look="outline" @click=${this.#openDocumentPicker} label="Choose root content"
@@ -228,16 +228,16 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 						</div>
 						<div class="row">
 							ordered by
-							<umb-button-with-dropdown look="outline" id="sort-dropdown" label="Property alias"
-								>${this._queryRequest.sort?.propertyAlias ?? ''}
-								<uui-combobox-list slot="dropdown" @change=${this.#setSortProperty} class="options-list">
+							<umb-dropdown look="outline" id="sort-dropdown" label="Property alias">
+								<span slot="label">${this._queryRequest.sort?.propertyAlias ?? ''}</span>
+								<uui-combobox-list @change=${this.#setSortProperty} class="options-list">
 									${this._queryBuilderSettings?.properties?.map(
 										(property) =>
 											html`<uui-combobox-list-option .value=${property.alias ?? ''}
 												>${property.alias}</uui-combobox-list-option
 											>`,
 									)}
-								</uui-combobox-list></umb-button-with-dropdown
+								</uui-combobox-list></umb-dropdown
 							>
 
 							${this._queryRequest.sort?.propertyAlias
@@ -279,14 +279,9 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 				);
 			}
 
-			.options-list {
-				min-width: 30ch;
-				background-color: var(--uui-color-surface);
-				box-shadow: var(--uui-shadow-depth-3);
-			}
-
 			uui-combobox-list-option {
 				padding: 8px 20px;
+				margin: 0;
 			}
 
 			.row {

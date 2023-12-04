@@ -88,21 +88,21 @@ export class UmbQueryBuilderFilterElement extends UmbLitElement {
 	}
 
 	private _renderOperatorsDropdown() {
-		return html`<umb-button-with-dropdown look="outline" id="operator-dropdown" label="choose operator">
-			${this.filter?.operator ?? ''}
-			<uui-combobox-list slot="dropdown" @change=${this.#setOperator} class="options-list">
+		return html`<umb-dropdown look="outline" id="operator-dropdown" label="choose operator">
+			<span slot="label">${this.filter?.operator ?? ''}</span>
+			<uui-combobox-list @change=${this.#setOperator} class="options-list">
 				${this.settings?.operators
 					?.filter((operator) =>
-						this.currentPropertyType ? operator.applicableTypes?.includes(this.currentPropertyType) : true
+						this.currentPropertyType ? operator.applicableTypes?.includes(this.currentPropertyType) : true,
 					)
 					.map(
 						(operator) =>
 							html`<uui-combobox-list-option .value=${(operator.operator as string) ?? ''}
 								>${operator.operator}</uui-combobox-list-option
-							>`
+							>`,
 					)}</uui-combobox-list
 			>
-		</umb-button-with-dropdown>`;
+		</umb-dropdown>`;
 	}
 
 	private _renderConstraintValueInput() {
@@ -121,16 +121,16 @@ export class UmbQueryBuilderFilterElement extends UmbLitElement {
 	render() {
 		return html`
 			<span>${this.unremovable ? 'where' : 'and'}</span>
-			<umb-button-with-dropdown look="outline" id="property-alias-dropdown" label="Property alias"
-				>${this.filter?.propertyAlias ?? ''}
-				<uui-combobox-list slot="dropdown" @change=${this.#setPropertyAlias} class="options-list">
+			<umb-dropdown look="outline" id="property-alias-dropdown" label="Property alias">
+				<span slot="label">${this.filter?.propertyAlias ?? ''}</span>
+				<uui-combobox-list @change=${this.#setPropertyAlias} class="options-list">
 					${this.settings?.properties?.map(
 						(property) =>
 							html`<uui-combobox-list-option tabindex="0" .value=${property.alias ?? ''}
 								>${property.alias}</uui-combobox-list-option
-							>`
+							>`,
 					)}
-				</uui-combobox-list></umb-button-with-dropdown
+				</uui-combobox-list></umb-dropdown
 			>
 			${this.filter?.propertyAlias ? this._renderOperatorsDropdown() : ''}
 			${this.filter?.operator ? this._renderConstraintValueInput() : ''}
@@ -155,14 +155,9 @@ export class UmbQueryBuilderFilterElement extends UmbLitElement {
 				padding: 20px 0;
 			}
 
-			.options-list {
-				min-width: 25ch;
-				background-color: var(--uui-color-surface);
-				box-shadow: var(--uui-shadow-depth-3);
-			}
-
 			uui-combobox-list-option {
 				padding: 8px 20px;
+				margin: 0;
 			}
 		`,
 	];
