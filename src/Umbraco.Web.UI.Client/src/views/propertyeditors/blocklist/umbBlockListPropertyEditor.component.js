@@ -256,7 +256,7 @@
 
             updateClipboard(true);
 
-            if (vm.singleBlockMode && vm.layout.length == 0) {
+            if (vm.singleBlockMode && vm.layout.length == 0 && vm.availableBlockTypes?.length > 0) {
                 var wasAdded = false;
                 var blockType = vm.availableBlockTypes[0];
 
@@ -306,12 +306,13 @@
          */
         function ensureCultureData(content) {
 
-            if (!content) return;
+            if (!content || !vm.umbVariantContent) return;
 
             if (vm.umbVariantContent.editor.content.language) {
                 // set the scaffolded content's language to the language of the current editor
                 content.language = vm.umbVariantContent.editor.content.language;
             }
+
             // currently we only ever deal with invariant content for blocks so there's only one
             content.variants[0].tabs.forEach(tab => {
                 tab.properties.forEach(prop => {
