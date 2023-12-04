@@ -180,6 +180,21 @@ public static class WebhookEventCollectionBuilderCmsExtensions
     }
 
     /// <summary>
+    /// Adds the health check webhook events.
+    /// </summary>
+    /// <param name="builder">The builder.</param>
+    /// <returns>
+    /// The builder.
+    /// </returns>
+    public static WebhookEventCollectionBuilderCms AddHealthCheck(this WebhookEventCollectionBuilderCms builder)
+    {
+        builder.Builder
+            .Append<HealthCheckCompletedWebhookEvent>();
+
+        return builder;
+    }
+
+    /// <summary>
     /// Adds the language webhook events.
     /// </summary>
     /// <param name="builder">The builder.</param>

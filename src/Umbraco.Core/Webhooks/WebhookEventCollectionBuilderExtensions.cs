@@ -31,6 +31,7 @@ public static class WebhookEventCollectionBuilderExtensions
                     .AddDictionary()
                     .AddDomain()
                     .AddFile()
+                    .AddHealthCheck()
                     .AddLanguage()
                     .AddMedia()
                     .AddMember()
