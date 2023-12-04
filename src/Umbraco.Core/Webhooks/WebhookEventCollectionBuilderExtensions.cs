@@ -38,7 +38,8 @@ public static class WebhookEventCollectionBuilderExtensions
                     .AddPublicAccess()
                     .AddRelation()
                     .AddRelationType()
-                    .AddUser();
+                    .AddUser()
+                    .AddHealthCheck();
             }
         });
 
