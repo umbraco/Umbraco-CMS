@@ -1,4 +1,3 @@
-import '../../components/dictionary-item-input/dictionary-item-input.element.js';
 import { UMB_DICTIONARY_TREE_ALIAS } from '../../tree/manifests.js';
 import { UmbDictionaryRepository } from '../../repository/dictionary.repository.js';
 import { css, html, customElement, query, state, when } from '@umbraco-cms/backoffice/external/lit';
