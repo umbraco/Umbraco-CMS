@@ -20,5 +20,5 @@ public class DictionaryOverviewResponseModel
     /// <summary>
     ///     Sets the translations.
     /// </summary>
-    public IEnumerable<string> TranslatedIsoCodes { get; set; } = Array.Empty<string>();
+    public IEnumerable<string> TranslatedIsoCodes { get; set; } = Enumerable.Empty<string>();
 }
