@@ -1,8 +1,9 @@
-import { expect, fixture } from '@open-wc/testing';
+import { expect, fixture, oneEvent } from '@open-wc/testing';
 import type { UmbPropertyValueData } from '../types/property-value-data.type.js';
 import { UMB_VARIANT_CONTEXT } from './variant-context.token.js';
 import { UmbBasicVariantElement } from './basic-variant.element.js';
 import { customElement, html, property, state, LitElement } from '@umbraco-cms/backoffice/external/lit';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
 
 @customElement('test-property-editor')
@@ -28,6 +29,7 @@ export class UmbTestPropertyEditorElement extends UmbElementMixin(LitElement) {
 	}
 	setValue(value: string) {
 		if (this._alias) {
+			this.dispatchEvent(new UmbChangeEvent());
 			this.#variantContext?.setPropertyValue(this._alias, value);
 		}
 	}
@@ -93,8 +95,20 @@ describe('UmbBasicVariantElement', () => {
 
 		it('property editor sets value on context', () => {
 			propertyEditor.setValue('testValue2');
-			expect(variantElement.context.getPropertyMap()[0].alias).to.equal('testAlias');
-			expect(variantElement.context.getPropertyMap()[0].value).to.equal('testValue2');
+			expect(variantElement.context.getValues()[0].alias).to.equal('testAlias');
+			expect(variantElement.context.getValues()[0].value).to.equal('testValue2');
+		});
+
+		it('variant element fires change event', async () => {
+			const listener = oneEvent(variantElement, UmbChangeEvent.TYPE);
+
+			propertyEditor.setValue('testValue3');
+
+			const event = (await listener) as unknown as UmbChangeEvent;
+			expect(event).to.exist;
+			expect(event.type).to.eq(UmbChangeEvent.TYPE);
+
+			expect(event.target).to.equal(variantElement);
 		});
 	});
 });

@@ -21,6 +21,7 @@ export class UmbBasicVariantContext
 	name = this.#name.asObservable();
 
 	#values = new UmbArrayState<UmbPropertyValueData>([], (x) => x.alias);
+	public readonly values = this.#values.asObservable();
 	private _entityType!: string;
 	private _unique!: string;
 
@@ -63,10 +64,10 @@ export class UmbBasicVariantContext
 		this.#values.appendOne({ alias, value });
 	}
 
-	getPropertyMap() {
+	getValues() {
 		return this.#values.getValue();
 	}
-	setPropertyMap(map: Array<UmbPropertyValueData>) {
+	setValues(map: Array<UmbPropertyValueData>) {
 		this.#values.next(map);
 	}
 }
