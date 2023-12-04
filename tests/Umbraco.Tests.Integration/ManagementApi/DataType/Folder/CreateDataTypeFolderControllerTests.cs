@@ -15,49 +15,36 @@ public class CreateDataTypeFolderControllerTests : ManagementApiUserGroupTestBas
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
-        Allowed = true, ExpectedStatusCode = HttpStatusCode.Created
+        ExpectedStatusCode = HttpStatusCode.Created
     };
 
     protected override UserGroupAssertionModel EditorUserGroupAssertionModel => new()
     {
-        Allowed = true, ExpectedStatusCode = HttpStatusCode.Created
+        ExpectedStatusCode = HttpStatusCode.Created
     };
 
     protected override UserGroupAssertionModel SensitiveDataUserGroupAssertionModel => new()
     {
-        Allowed = false, ExpectedStatusCode = HttpStatusCode.Forbidden
+        ExpectedStatusCode = HttpStatusCode.Forbidden
     };
 
     protected override UserGroupAssertionModel TranslatorUserGroupAssertionModel => new()
     {
-        Allowed = false, ExpectedStatusCode = HttpStatusCode.Forbidden
+        ExpectedStatusCode = HttpStatusCode.Forbidden
     };
 
     protected override UserGroupAssertionModel WriterUserGroupAssertionModel => new()
     {
-        Allowed = true, ExpectedStatusCode = HttpStatusCode.Created
+        ExpectedStatusCode = HttpStatusCode.Created
     };
 
     protected override UserGroupAssertionModel UnauthorizedUserGroupAssertionModel => new()
     {
-        Allowed = false, ExpectedStatusCode = HttpStatusCode.Unauthorized
+        ExpectedStatusCode = HttpStatusCode.Unauthorized
     };
 
-    [Test]
-    public override async Task As_Unauthorized_I_Have_Specified_Access()
+    protected override async Task<HttpResponseMessage> ClientRequest()
     {
-        CreateFolderRequestModel createFolderModel =
-            new() { Id = Guid.NewGuid(), ParentId = null, Name = "TestFolderName" };
-
-        var response = await Client.PostAsync(Url, JsonContent.Create(createFolderModel));
-
-        Assert.AreEqual(UnauthorizedUserGroupAssertionModel.ExpectedStatusCode, response.StatusCode, await response.Content.ReadAsStringAsync());
-    }
-
-    protected override async Task<HttpResponseMessage> AuthorizedRequest(Guid userGroupKey)
-    {
-        await AuthenticateClientAsync(Client, UserEmail, UserPassword, userGroupKey);
-
         CreateFolderRequestModel createFolderModel =
             new() { Id = Guid.NewGuid(), ParentId = null, Name = "TestFolderName" };
 

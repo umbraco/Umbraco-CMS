@@ -24,48 +24,36 @@ public class UpdateDataTypeFolderControllerTests : ManagementApiUserGroupTestBas
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
-        Allowed = true, ExpectedStatusCode = HttpStatusCode.OK
+        ExpectedStatusCode = HttpStatusCode.OK
     };
 
     protected override UserGroupAssertionModel EditorUserGroupAssertionModel => new()
     {
-        Allowed = true, ExpectedStatusCode = HttpStatusCode.OK
+        ExpectedStatusCode = HttpStatusCode.OK
     };
 
     protected override UserGroupAssertionModel SensitiveDataUserGroupAssertionModel => new()
     {
-        Allowed = false, ExpectedStatusCode = HttpStatusCode.Forbidden
+        ExpectedStatusCode = HttpStatusCode.Forbidden
     };
 
     protected override UserGroupAssertionModel TranslatorUserGroupAssertionModel => new()
     {
-        Allowed = false, ExpectedStatusCode = HttpStatusCode.Forbidden
+        ExpectedStatusCode = HttpStatusCode.Forbidden
     };
 
     protected override UserGroupAssertionModel WriterUserGroupAssertionModel => new()
     {
-        Allowed = true, ExpectedStatusCode = HttpStatusCode.OK
+        ExpectedStatusCode = HttpStatusCode.OK
     };
 
     protected override UserGroupAssertionModel UnauthorizedUserGroupAssertionModel => new()
     {
-        Allowed = false, ExpectedStatusCode = HttpStatusCode.Unauthorized
+        ExpectedStatusCode = HttpStatusCode.Unauthorized
     };
 
-    [Test]
-    public override async Task As_Unauthorized_I_Have_Specified_Access()
+    protected override async Task<HttpResponseMessage> ClientRequest()
     {
-        UpdateFolderResponseModel updateFolderModel = new() { Name = "UpdatedName" };
-
-        var response = await Client.PutAsync(Url, JsonContent.Create(updateFolderModel));
-
-        Assert.AreEqual(UnauthorizedUserGroupAssertionModel.ExpectedStatusCode, response.StatusCode, await response.Content.ReadAsStringAsync());
-    }
-
-    protected override async Task<HttpResponseMessage> AuthorizedRequest(Guid userGroupKey)
-    {
-        await AuthenticateClientAsync(Client, UserEmail, UserPassword, userGroupKey);
-
         UpdateFolderResponseModel updateFolderModel = new() { Name = "UpdatedName" };
 
         return await Client.PutAsync(Url, JsonContent.Create(updateFolderModel));

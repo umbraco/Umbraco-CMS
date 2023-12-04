@@ -23,46 +23,33 @@ public class DeleteDataTypeFolderControllerTests : ManagementApiUserGroupTestBas
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
-        Allowed = true, ExpectedStatusCode = HttpStatusCode.OK
+        ExpectedStatusCode = HttpStatusCode.OK
     };
 
     protected override UserGroupAssertionModel EditorUserGroupAssertionModel => new()
     {
-        Allowed = true, ExpectedStatusCode = HttpStatusCode.OK
+        ExpectedStatusCode = HttpStatusCode.OK
     };
 
     protected override UserGroupAssertionModel SensitiveDataUserGroupAssertionModel => new()
     {
-        Allowed = false, ExpectedStatusCode = HttpStatusCode.Forbidden
+        ExpectedStatusCode = HttpStatusCode.Forbidden
     };
 
     protected override UserGroupAssertionModel TranslatorUserGroupAssertionModel => new()
     {
-        Allowed = false, ExpectedStatusCode = HttpStatusCode.Forbidden
+        ExpectedStatusCode = HttpStatusCode.Forbidden
     };
 
     protected override UserGroupAssertionModel WriterUserGroupAssertionModel => new()
     {
-        Allowed = true, ExpectedStatusCode = HttpStatusCode.OK
+        ExpectedStatusCode = HttpStatusCode.OK
     };
 
     protected override UserGroupAssertionModel UnauthorizedUserGroupAssertionModel => new()
     {
-        Allowed = false, ExpectedStatusCode = HttpStatusCode.Unauthorized
+        ExpectedStatusCode = HttpStatusCode.Unauthorized
     };
 
-    [Test]
-    public override async Task As_Unauthorized_I_Have_Specified_Access()
-    {
-        var response = await Client.DeleteAsync(Url);
-
-        Assert.AreEqual(UnauthorizedUserGroupAssertionModel.ExpectedStatusCode, response.StatusCode, await response.Content.ReadAsStringAsync());
-    }
-
-    protected override async Task<HttpResponseMessage> AuthorizedRequest(Guid userGroupKey)
-    {
-        await AuthenticateClientAsync(Client, UserEmail, UserPassword, userGroupKey);
-
-        return await Client.DeleteAsync(Url);
-    }
+    protected override async Task<HttpResponseMessage> ClientRequest() => await Client.DeleteAsync(Url);
 }
