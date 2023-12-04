@@ -63,7 +63,7 @@ export class UmbLogViewerPollingButtonElement extends UmbLitElement {
 						: 'Polling'}</uui-button
 				>
 
-				<umb-dropdown id="polling-rate-dropdown" compact label="Choose pooling time" .open=${this.dropdownOpen}>
+				<umb-dropdown id="polling-rate-dropdown" compact label="Choose pooling time">
 					${this.#pollingIntervals.map(
 						(interval: PoolingInterval) =>
 							html`<uui-menu-item
