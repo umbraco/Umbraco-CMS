@@ -151,17 +151,37 @@ export class UmbDataTypeWorkspaceContext
 
 	createVariantContext(host: UmbControllerHost) {
 		const context = new UmbBasicVariantContext(host);
+
+		// Observe workspace name:
+		this.observe(this.name, (name) => {
+			context.setName(name ?? '');
+		});
+		// Observe the variant name:
+		this.observe(context.name, (name) => {
+			this.setName(name);
+		});
+
 		this.observe(
 			this.properties,
 			(properties) => {
 				if (properties) {
 					properties.forEach(async (property) => {
+						// Observe value of workspace:
 						this.observe(
 							await this.propertyValueByAlias(property.alias),
 							(value) => {
 								context.setPropertyValue(property.alias, value);
 							},
-							'observePropertyOf_' + property.alias,
+							'observeWorkspacePropertyOf_' + property.alias,
+						);
+						// Observe value of variant:
+						this.observe(
+							context.propertyValueByAlias(property.alias),
+							(value) => {
+								console.log('gets value back...');
+								this.setPropertyValue(property.alias, value);
+							},
+							'observeVariantPropertyOf_' + property.alias,
 						);
 					});
 				}

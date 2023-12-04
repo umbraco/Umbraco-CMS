@@ -5,6 +5,10 @@ import { UMB_VARIANT_CONTEXT, UmbVariantContext } from '@umbraco-cms/backoffice/
 import { UmbArrayState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
+/**
+ * A basic variant context, holds a name and a a set of properties.
+ * This is the base type for all variant contexts.
+ */
 export class UmbBasicVariantContext
 	extends UmbContextBase<typeof UMB_VARIANT_CONTEXT.TYPE>
 	implements UmbVariantContext
@@ -31,6 +35,7 @@ export class UmbBasicVariantContext
 	getVariantId() {
 		return UmbVariantId.CreateInvariant();
 	}
+	// variant id for a specific property?
 
 	constructor(host: UmbControllerHost) {
 		// The controller alias, is a very generic name cause we want only one of these for this controller host.
@@ -39,7 +44,6 @@ export class UmbBasicVariantContext
 
 	/**
 	 * TODO: Write proper JSDocs here.
-	 * Ideally do not use these methods, its better to communicate directly with the workspace, but if you do not know the property variant id, then this will figure it out for you. So good for externals to set or get values of a property.
 	 */
 	propertyValueByAlias<ReturnType = unknown>(propertyAlias: string) {
 		return this.#values.asObservablePart((values) => {
@@ -50,7 +54,6 @@ export class UmbBasicVariantContext
 
 	/**
 	 * TODO: Write proper JSDocs here.
-	 * Ideally do not use these methods, its better to communicate directly with the workspace, but if you do not know the property variant id, then this will figure it out for you. So good for externals to set or get values of a property.
 	 */
 	setPropertyValue(alias: string, value: unknown) {
 		this.#values.appendOne({ alias, value });
