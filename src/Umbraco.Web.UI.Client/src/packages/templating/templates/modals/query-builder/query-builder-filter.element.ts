@@ -1,13 +1,5 @@
 import { type UUIComboboxListElement } from '@umbraco-cms/backoffice/external/uui';
-import {
-	PropertyValueMap,
-	css,
-	html,
-	customElement,
-	property,
-	query,
-	state,
-} from '@umbraco-cms/backoffice/external/lit';
+import { PropertyValueMap, css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import {
 	OperatorModel,

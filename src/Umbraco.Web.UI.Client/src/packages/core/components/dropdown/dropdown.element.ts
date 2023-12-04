@@ -2,7 +2,6 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import {
 	css,
 	html,
-	nothing,
 	customElement,
 	property,
 	PropertyValueMap,
