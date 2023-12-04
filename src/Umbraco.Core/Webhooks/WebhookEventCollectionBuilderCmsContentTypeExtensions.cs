@@ -3,6 +3,9 @@ using static Umbraco.Cms.Core.DependencyInjection.WebhookEventCollectionBuilderC
 
 namespace Umbraco.Cms.Core.DependencyInjection;
 
+/// <summary>
+/// Extension methods for <see cref="WebhookEventCollectionBuilderCmsContentType" />.
+/// </summary>
 public static class WebhookEventCollectionBuilderCmsContentTypeExtensions
 {
     /// <summary>

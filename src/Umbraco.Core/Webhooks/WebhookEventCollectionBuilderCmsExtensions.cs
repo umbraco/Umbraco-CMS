@@ -5,8 +5,6 @@ using Umbraco.Cms.Core.Webhooks.Events.Dictionary;
 using Umbraco.Cms.Core.Webhooks.Events.Domain;
 using Umbraco.Cms.Core.Webhooks.Events.Language;
 using Umbraco.Cms.Core.Webhooks.Events.Media;
-using Umbraco.Cms.Core.Webhooks.Events.Member;
-using Umbraco.Cms.Core.Webhooks.Events.MemberGroup;
 using Umbraco.Cms.Core.Webhooks.Events.Package;
 using Umbraco.Cms.Core.Webhooks.Events.PublicAccess;
 using Umbraco.Cms.Core.Webhooks.Events.Relation;
@@ -18,10 +16,13 @@ using static Umbraco.Cms.Core.DependencyInjection.WebhookEventCollectionBuilderE
 
 namespace Umbraco.Cms.Core.DependencyInjection;
 
+/// <summary>
+/// Extension methods for <see cref="WebhookEventCollectionBuilderCms" />.
+/// </summary>
 public static class WebhookEventCollectionBuilderCmsExtensions
 {
     /// <summary>
-    /// Adds the default CMS webhook events.
+    /// Adds the default webhook events.
     /// </summary>
     /// <param name="builder">The builder.</param>
     /// <returns>
@@ -64,16 +65,16 @@ public static class WebhookEventCollectionBuilderCmsExtensions
         });
 
     /// <summary>
-    /// Adds CMS content webhook events specified in the <see cref="WebhookEventCollectionBuilderCmsContent" /> action.
+    /// Adds content webhook events specified in the <paramref name="contentBuilder" /> action.
     /// </summary>
     /// <param name="builder">The builder.</param>
-    /// <param name="cmsContentBuilder">The CMS content builder.</param>
+    /// <param name="contentBuilder">The content builder.</param>
     /// <returns>
     /// The builder.
     /// </returns>
-    public static WebhookEventCollectionBuilderCms AddContent(this WebhookEventCollectionBuilderCms builder, Action<WebhookEventCollectionBuilderCmsContent> cmsContentBuilder)
+    public static WebhookEventCollectionBuilderCms AddContent(this WebhookEventCollectionBuilderCms builder, Action<WebhookEventCollectionBuilderCmsContent> contentBuilder)
     {
-        cmsContentBuilder(new WebhookEventCollectionBuilderCmsContent(builder.Builder));
+        contentBuilder(new WebhookEventCollectionBuilderCmsContent(builder.Builder));
 
         return builder;
     }
@@ -95,16 +96,16 @@ public static class WebhookEventCollectionBuilderCmsExtensions
         });
 
     /// <summary>
-    /// Adds CMS content type (document, media and member type) webhook events specified in the <see cref="WebhookEventCollectionBuilderCmsContentType" /> action.
+    /// Adds content type (document, media and member type) webhook events specified in the <paramref name="contentTypeBuilder" /> action.
     /// </summary>
     /// <param name="builder">The builder.</param>
-    /// <param name="cmsContentTypeBuilder">The CMS content type builder.</param>
+    /// <param name="contentTypeBuilder">The content type builder.</param>
     /// <returns>
     /// The builder.
     /// </returns>
-    public static WebhookEventCollectionBuilderCms AddContentType(this WebhookEventCollectionBuilderCms builder, Action<WebhookEventCollectionBuilderCmsContentType> cmsContentTypeBuilder)
+    public static WebhookEventCollectionBuilderCms AddContentType(this WebhookEventCollectionBuilderCms builder, Action<WebhookEventCollectionBuilderCmsContentType> contentTypeBuilder)
     {
-        cmsContentTypeBuilder(new WebhookEventCollectionBuilderCmsContentType(builder.Builder));
+        contentTypeBuilder(new WebhookEventCollectionBuilderCmsContentType(builder.Builder));
 
         return builder;
     }
@@ -194,36 +195,37 @@ public static class WebhookEventCollectionBuilderCmsExtensions
     }
 
     /// <summary>
-    /// Adds the member webhook events.
+    /// Adds all available member webhook events.
     /// </summary>
     /// <param name="builder">The builder.</param>
+    /// <param name="onlyDefault">If set to <c>true</c> only adds the default webhook events instead of all available.</param>
     /// <returns>
     /// The builder.
     /// </returns>
-    public static WebhookEventCollectionBuilderCms AddMember(this WebhookEventCollectionBuilderCms builder)
-    {
-        builder.Builder
-            .Append<AssignedMemberRolesWebhookEvent>()
-            .Append<ExportedMemberWebhookEvent>()
-            .Append<MemberDeletedWebhookEvent>()
-            .Append<MemberSavedWebhookEvent>()
-            .Append<RemovedMemberRolesWebhookEvent>();
+    public static WebhookEventCollectionBuilderCms AddMember(this WebhookEventCollectionBuilderCms builder, bool onlyDefault = false)
+        => builder.AddMember(builder =>
+        {
+            builder.AddDefault();
 
-        return builder;
-    }
+            if (onlyDefault is false)
+            {
+                builder
+                    .AddRoles()
+                    .AddGroup();
+            }
+        });
 
     /// <summary>
-    /// Adds the member group webhook events.
+    /// Adds member webhook events specified in the <paramref name="memberBuilder" /> action.
     /// </summary>
     /// <param name="builder">The builder.</param>
+    /// <param name="memberBuilder">The member builder.</param>
     /// <returns>
     /// The builder.
     /// </returns>
-    public static WebhookEventCollectionBuilderCms AddMemberGroup(this WebhookEventCollectionBuilderCms builder)
+    public static WebhookEventCollectionBuilderCms AddMember(this WebhookEventCollectionBuilderCms builder, Action<WebhookEventCollectionBuilderCmsMember> memberBuilder)
     {
-        builder.Builder
-            .Append<MemberGroupDeletedWebhookEvent>()
-            .Append<MemberGroupSavedWebhookEvent>();
+        memberBuilder(new WebhookEventCollectionBuilderCmsMember(builder.Builder));
 
         return builder;
     }
@@ -359,21 +361,21 @@ public static class WebhookEventCollectionBuilderCmsExtensions
                 builder
                     .AddPassword()
                     .AddLogin()
-                    .AddUserGroup();
+                    .AddGroup();
             }
         });
 
     /// <summary>
-    /// Adds CMS user webhook events specified in the <see cref="WebhookEventCollectionBuilderCmsUser" /> action.
+    /// Adds user webhook events specified in the <paramref name="userBuilder" /> action.
     /// </summary>
     /// <param name="builder">The builder.</param>
-    /// <param name="cmsUserBuilder">The CMS user builder.</param>
+    /// <param name="userBuilder">The user builder.</param>
     /// <returns>
     /// The builder.
     /// </returns>
-    public static WebhookEventCollectionBuilderCms AddUser(this WebhookEventCollectionBuilderCms builder, Action<WebhookEventCollectionBuilderCmsUser> cmsUserBuilder)
+    public static WebhookEventCollectionBuilderCms AddUser(this WebhookEventCollectionBuilderCms builder, Action<WebhookEventCollectionBuilderCmsUser> userBuilder)
     {
-        cmsUserBuilder(new WebhookEventCollectionBuilderCmsUser(builder.Builder));
+        userBuilder(new WebhookEventCollectionBuilderCmsUser(builder.Builder));
 
         return builder;
     }
@@ -395,6 +397,17 @@ public static class WebhookEventCollectionBuilderCmsExtensions
     public sealed class WebhookEventCollectionBuilderCmsContentType
     {
         internal WebhookEventCollectionBuilderCmsContentType(WebhookEventCollectionBuilder builder)
+            => Builder = builder;
+
+        internal WebhookEventCollectionBuilder Builder { get; }
+    }
+
+    /// <summary>
+    /// Fluent <see cref="WebhookEventCollectionBuilder" /> for adding CMS member specific webhook events.
+    /// </summary>
+    public sealed class WebhookEventCollectionBuilderCmsMember
+    {
+        internal WebhookEventCollectionBuilderCmsMember(WebhookEventCollectionBuilder builder)
             => Builder = builder;
 
         internal WebhookEventCollectionBuilder Builder { get; }

@@ -3,6 +3,9 @@ using static Umbraco.Cms.Core.DependencyInjection.WebhookEventCollectionBuilderC
 
 namespace Umbraco.Cms.Core.DependencyInjection;
 
+/// <summary>
+/// Extension methods for <see cref="WebhookEventCollectionBuilderCmsUser" />.
+/// </summary>
 public static class WebhookEventCollectionBuilderCmsUserExtensions
 {
     /// <summary>
@@ -22,7 +25,7 @@ public static class WebhookEventCollectionBuilderCmsUserExtensions
     }
 
     /// <summary>
-    /// Adds the login events.
+    /// Adds the user login events.
     /// </summary>
     /// <param name="builder">The builder.</param>
     /// <returns>
@@ -43,7 +46,7 @@ public static class WebhookEventCollectionBuilderCmsUserExtensions
     }
 
     /// <summary>
-    /// Adds the password events.
+    /// Adds the user password events.
     /// </summary>
     /// <param name="builder">The builder.</param>
     /// <returns>
@@ -66,7 +69,7 @@ public static class WebhookEventCollectionBuilderCmsUserExtensions
     /// <returns>
     /// The builder.
     /// </returns>
-    public static WebhookEventCollectionBuilderCmsUser AddUserGroup(this WebhookEventCollectionBuilderCmsUser builder)
+    public static WebhookEventCollectionBuilderCmsUser AddGroup(this WebhookEventCollectionBuilderCmsUser builder)
     {
         builder.Builder
             .Append<AssignedUserGroupPermissionsWebhookEvent>()

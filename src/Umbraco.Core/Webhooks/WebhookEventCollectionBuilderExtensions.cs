@@ -2,6 +2,9 @@ using Umbraco.Cms.Core.Webhooks;
 
 namespace Umbraco.Cms.Core.DependencyInjection;
 
+/// <summary>
+/// Extension methods for <see cref="WebhookEventCollectionBuilder" />.
+/// </summary>
 public static class WebhookEventCollectionBuilderExtensions
 {
     /// <summary>
@@ -30,7 +33,6 @@ public static class WebhookEventCollectionBuilderExtensions
                     .AddLanguage()
                     .AddMedia()
                     .AddMember()
-                    .AddMemberGroup()
                     .AddPackage()
                     .AddPublicAccess()
                     .AddRelation()
@@ -43,7 +45,7 @@ public static class WebhookEventCollectionBuilderExtensions
         });
 
     /// <summary>
-    /// Adds CMS webhook events specified in the <see cref="WebhookEventCollectionBuilderCms" /> action.
+    /// Adds CMS webhook events specified in the <paramref name="cmsBuilder" /> action.
     /// </summary>
     /// <param name="builder">The builder.</param>
     /// <param name="cmsBuilder">The CMS builder.</param>
