@@ -48,6 +48,7 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 		});
 	}
 
+	// @ts-ignore //TODO: It does exist. Popover API is not supported in TS yet?
 	#onPopoverToggle(event: ToggleEvent) {
 		this._isOpen = event.newState === 'open';
 		if (this._isOpen && !this.#languagesObserver) {
@@ -69,6 +70,7 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 
 		this.#appLanguageContext?.setLanguage(isoCode);
 		this._isOpen = false;
+		// @ts-ignore //TODO: It does exist. Popover API is not supported in TS yet?
 		this._popoverElement?.hidePopover();
 	}
 

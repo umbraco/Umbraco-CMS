@@ -35,6 +35,7 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 		event.stopPropagation();
 	}
 
+	// @ts-ignore //TODO: It does exist. Popover API is not supported in TS yet?
 	#onPopoverToggle(event: ToggleEvent) {
 		this._popoverOpen = event.newState === 'open';
 	}

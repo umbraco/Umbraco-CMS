@@ -40,10 +40,11 @@ export class UmbDropdownElement extends UmbLitElement {
 	protected updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		super.updated(_changedProperties);
 		if (_changedProperties.has('open') && this.popoverContainerElement) {
+			// @ts-ignore //TODO: It does exist. Popover API is not supported in TS yet?
 			this.open ? this.popoverContainerElement.showPopover() : this.popoverContainerElement.hidePopover();
 		}
 	}
-
+	// @ts-ignore //TODO: It does exist. Popover API is not supported in TS yet?
 	#onToggle(event: ToggleEvent) {
 		this.open = event.newState === 'open';
 	}
