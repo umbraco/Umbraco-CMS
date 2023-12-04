@@ -50,7 +50,7 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 
 	#onPopoverToggle(event: ToggleEvent) {
 		this._isOpen = event.newState === 'open';
-		if (this._isOpen) {
+		if (this._isOpen && !this.#languagesObserver) {
 			if (this._popoverElement) {
 				const host = this.getBoundingClientRect();
 				this._popoverElement.style.width = `${host.width}px`;
