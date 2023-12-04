@@ -189,7 +189,7 @@ public static class WebhookEventCollectionBuilderCmsExtensions
     public static WebhookEventCollectionBuilderCms AddHealthCheck(this WebhookEventCollectionBuilderCms builder)
     {
         builder.Builder
-            .Append<HealthCheckCompletedWebhookEvent>();
+            .Add<HealthCheckCompletedWebhookEvent>();
 
         return builder;
     }
