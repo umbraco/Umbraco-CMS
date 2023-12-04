@@ -326,19 +326,36 @@ public static class WebhookEventCollectionBuilderCmsExtensions
     }
 
     /// <summary>
-    /// Adds the template webhook events.
+    /// Adds all available template webhook events.
     /// </summary>
     /// <param name="builder">The builder.</param>
+    /// <param name="onlyDefault">If set to <c>true</c> only adds the default webhook events instead of all available.</param>
     /// <returns>
     /// The builder.
     /// </returns>
-    public static WebhookEventCollectionBuilderCms AddTemplate(this WebhookEventCollectionBuilderCms builder)
+    public static WebhookEventCollectionBuilderCms AddTemplate(this WebhookEventCollectionBuilderCms builder, bool onlyDefault = false)
+        => builder.AddTemplate(builder =>
+        {
+            builder.AddDefault();
+
+            if (onlyDefault is false)
+            {
+                builder
+                    .AddPartialView();
+            }
+        });
+
+    /// <summary>
+    /// Adds template webhook events specified in the <paramref name="templateBuilder" /> action.
+    /// </summary>
+    /// <param name="builder">The builder.</param>
+    /// <param name="templateBuilder">The template builder.</param>
+    /// <returns>
+    /// The builder.
+    /// </returns>
+    public static WebhookEventCollectionBuilderCms AddTemplate(this WebhookEventCollectionBuilderCms builder, Action<WebhookEventCollectionBuilderCmsTemplate> templateBuilder)
     {
-        builder.Builder
-            .Append<PartialViewDeletedWebhookEvent>()
-            .Append<PartialViewSavedWebhookEvent>()
-            .Append<TemplateDeletedWebhookEvent>()
-            .Append<TemplateSavedWebhookEvent>();
+        templateBuilder(new WebhookEventCollectionBuilderCmsTemplate(builder.Builder));
 
         return builder;
     }
@@ -408,6 +425,17 @@ public static class WebhookEventCollectionBuilderCmsExtensions
     public sealed class WebhookEventCollectionBuilderCmsMember
     {
         internal WebhookEventCollectionBuilderCmsMember(WebhookEventCollectionBuilder builder)
+            => Builder = builder;
+
+        internal WebhookEventCollectionBuilder Builder { get; }
+    }
+
+    /// <summary>
+    /// Fluent <see cref="WebhookEventCollectionBuilder" /> for adding CMS template specific webhook events.
+    /// </summary>
+    public sealed class WebhookEventCollectionBuilderCmsTemplate
+    {
+        internal WebhookEventCollectionBuilderCmsTemplate(WebhookEventCollectionBuilder builder)
             => Builder = builder;
 
         internal WebhookEventCollectionBuilder Builder { get; }
