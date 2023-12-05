@@ -31,6 +31,7 @@ export class UmbTestPropertyEditorElement extends UmbElementMixin(LitElement) {
 		if (this._alias) {
 			this.dispatchEvent(new UmbChangeEvent());
 			this.#variantContext?.setPropertyValue(this._alias, value);
+			this.dispatchEvent(new UmbChangeEvent());
 		}
 	}
 
@@ -74,8 +75,6 @@ describe('UmbBasicVariantElement', () => {
 				</umb-basic-variant>`,
 			);
 
-			await variantElement.updateComplete;
-
 			propertyEditor = variantElement.querySelector('test-property-editor') as UmbTestPropertyEditorElement;
 		});
 
@@ -100,15 +99,21 @@ describe('UmbBasicVariantElement', () => {
 		});
 
 		it('variant element fires change event', async () => {
+			console.log('START!');
 			const listener = oneEvent(variantElement, UmbChangeEvent.TYPE);
 
+			expect(propertyEditor.alias).to.eq('testAlias');
 			propertyEditor.setValue('testValue3');
 
+			console.log('BEFORE!');
 			const event = (await listener) as unknown as UmbChangeEvent;
+			console.log('AFTER!', event.target);
 			expect(event).to.exist;
+			console.log('#1');
 			expect(event.type).to.eq(UmbChangeEvent.TYPE);
-
+			console.log('#2');
 			expect(event.target).to.equal(variantElement);
+			console.log('DONE!');
 		});
 	});
 });

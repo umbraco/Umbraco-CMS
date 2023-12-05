@@ -40,7 +40,9 @@ export class UmbBasicVariantElement extends UmbLitElement {
 			}
 		});
 		this.observe(this.context.values, () => {
+			console.log('value change');
 			if (!this.#silent) {
+				console.log('value fire event!');
 				this.dispatchEvent(new UmbChangeEvent());
 			}
 		});
