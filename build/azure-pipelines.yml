@@ -48,8 +48,8 @@ parameters:
 
 variables:
   nodeVersion: 20
-  dotnetVersion: 6.x
-  dotnetIncludePreviewVersions: false
+  dotnetVersion: 8.x
+  dotnetIncludePreviewVersions: true
   solution: umbraco.sln
   buildConfiguration: Release
   UMBRACO__CMS__GLOBAL__ID: 00000000-0000-0000-0000-000000000042
