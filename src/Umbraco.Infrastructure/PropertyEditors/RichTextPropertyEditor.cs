@@ -307,7 +307,7 @@ public class RichTextPropertyEditor : DataEditor
 
     internal class RichTextPropertyIndexValueFactory : IPropertyIndexValueFactory
     {
-        public IEnumerable<KeyValuePair<string, IEnumerable<object?>>> GetIndexValues(IProperty property, string? culture, string? segment, bool published, IEnumerable<string> availableCultures)
+        public IEnumerable<KeyValuePair<string, IEnumerable<object?>>> GetIndexValues(IProperty property, string? culture, string? segment, bool published, IEnumerable<string> availableCultures, IDictionary<Guid, IContentType> contentTypeDictionary)
         {
             var val = property.GetValue(culture, segment, published);
 
@@ -328,6 +328,6 @@ public class RichTextPropertyEditor : DataEditor
 
         [Obsolete("Use the overload with the 'availableCultures' parameter instead, scheduled for removal in v14")]
         public IEnumerable<KeyValuePair<string, IEnumerable<object?>>> GetIndexValues(IProperty property, string? culture, string? segment, bool published)
-            => GetIndexValues(property, culture, segment, published, Enumerable.Empty<string>());
+            => GetIndexValues(property, culture, segment, published, Enumerable.Empty<string>(), StaticServiceProvider.Instance.GetRequiredService<IContentTypeService>().GetAll().ToDictionary(x=>x.Key));
     }
 }
