@@ -385,8 +385,12 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
           plugins.push('quickbars');
         }
 
+        // Ensure that plugins are not duplicated
+        plugins = _.uniq(plugins);
+
         //create a baseline Config to extend upon
         var config = {
+          cloudApiKey: tinyMceConfig.cloudApiKey,
           inline: modeInline,
           plugins: plugins,
           custom_elements: 'umb-rte-block,~umb-rte-block-inline',
