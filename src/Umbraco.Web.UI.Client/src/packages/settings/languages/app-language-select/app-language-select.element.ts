@@ -48,6 +48,9 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 		});
 	}
 
+	// TODO: This ignorer is just neede for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
+	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+	// @ts-ignore
 	#onPopoverToggle(event: ToggleEvent) {
 		this._isOpen = event.newState === 'open';
 		if (this._isOpen && !this.#languagesObserver) {
@@ -69,6 +72,10 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 
 		this.#appLanguageContext?.setLanguage(isoCode);
 		this._isOpen = false;
+
+		// TODO: This ignorer is just neede for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
 		this._popoverElement?.hidePopover();
 	}
 

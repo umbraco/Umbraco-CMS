@@ -45,9 +45,16 @@ export class UmbDropdownElement extends UmbLitElement {
 	protected updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		super.updated(_changedProperties);
 		if (_changedProperties.has('open') && this.popoverContainerElement) {
+			// TODO: This ignorer is just neede for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
 			this.open ? this.popoverContainerElement.showPopover() : this.popoverContainerElement.hidePopover();
 		}
 	}
+
+	// TODO: This ignorer is just neede for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
+	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+	// @ts-ignore
 	#onToggle(event: ToggleEvent) {
 		this.open = event.newState === 'open';
 	}
