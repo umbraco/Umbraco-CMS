@@ -10,7 +10,7 @@ using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Cms.Tests.Integration.ManagementApi;
+namespace Umbraco.Cms.Tests.Integration.ManagementApi.DataType;
 
 [TestFixture]
 public abstract class DataTypeTestBase<T> : ManagementApiUserGroupTestBase<T> where T : ManagementApiControllerBase
@@ -30,21 +30,21 @@ public abstract class DataTypeTestBase<T> : ManagementApiUserGroupTestBase<T> wh
 
     protected IDataTypeContainerService DataTypeContainerService => GetRequiredService<IDataTypeContainerService>();
 
-    protected async Task<Guid> CreateDataType()
+    protected Guid CreateDataType()
     {
         IDataType dataTypeModel = new Core.Models.DataType(new LabelPropertyEditor(DataValueEditorFactory, IOHelper, EditorConfigurationParser), ConfigurationEditorJsonSerializer)
         {
             Name = "TestText",
             DatabaseType = ValueStorageType.Ntext
         };
-        await DataTypeService.CreateAsync(dataTypeModel, Constants.Security.SuperUserKey);
+        DataTypeService.CreateAsync(dataTypeModel, Constants.Security.SuperUserKey);
         return dataTypeModel.Key;
     }
 
-    protected async Task<Guid> CreateDataTypeFolder()
+    protected Guid CreateDataTypeFolder()
     {
         var folderId = Guid.NewGuid();
-        await DataTypeContainerService.CreateAsync(folderId, "TestFolderName", null, Constants.Security.SuperUserKey);
+        DataTypeContainerService.CreateAsync(folderId, "TestFolderName", null, Constants.Security.SuperUserKey);
         return folderId;
     }
 }
