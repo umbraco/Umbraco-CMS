@@ -139,8 +139,7 @@ public partial class ContentPublishingServiceTests
         VerifyIsNotPublished(content.Key);
 
         content = ContentService.GetById(content.Key)!;
-        // FIXME: when work item 32809 has been fixed, this should assert for 0 expected published cultures
-        Assert.AreEqual(2, content.PublishedCultures.Count());
+        Assert.AreEqual(0, content.PublishedCultures.Count());
     }
 
     [Test]
@@ -165,8 +164,7 @@ public partial class ContentPublishingServiceTests
         VerifyIsNotPublished(content.Key);
 
         content = ContentService.GetById(content.Key)!;
-        // FIXME: when work item 32809 has been fixed, this should assert for 0 expected published cultures
-        Assert.AreEqual(2, content.PublishedCultures.Count());
+        Assert.AreEqual(0, content.PublishedCultures.Count());
     }
 
     [Test]

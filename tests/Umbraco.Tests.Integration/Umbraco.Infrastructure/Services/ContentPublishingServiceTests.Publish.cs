@@ -1,14 +1,8 @@
 ﻿using NUnit.Framework;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Notifications;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Tests.Common.Builders;
-using Umbraco.Cms.Tests.Common.Builders.Extensions;
-using Umbraco.Cms.Tests.Common.Testing;
-using Umbraco.Cms.Tests.Integration.Testing;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
@@ -163,7 +157,7 @@ public partial class ContentPublishingServiceTests
         Assert.AreEqual(ContentPublishingOperationStatus.Success, result.Result);
 
         content = ContentService.GetById(content.Key)!;
-        Assert.AreEqual(2, content.PublishedCultures.Count());
+        Assert.AreEqual(0, content.PublishedCultures.Count());
 
         result = await ContentPublishingService.PublishAsync(content.Key, new[] { langDa.IsoCode }, Constants.Security.SuperUserKey);
 
@@ -171,8 +165,7 @@ public partial class ContentPublishingServiceTests
         Assert.AreEqual(ContentPublishingOperationStatus.Success, result.Result);
 
         content = ContentService.GetById(content.Key)!;
-        // FIXME: when work item 32809 has been fixed, this should assert for 1 expected published cultures
-        Assert.AreEqual(2, content.PublishedCultures.Count());
+        Assert.AreEqual(1, content.PublishedCultures.Count());
         Assert.IsTrue(content.PublishedCultures.InvariantContains(langDa.IsoCode));
     }
 
