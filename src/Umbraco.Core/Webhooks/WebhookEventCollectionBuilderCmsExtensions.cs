@@ -22,11 +22,11 @@ public static class WebhookEventCollectionBuilderCmsExtensions
     public static WebhookEventCollectionBuilderCms AddDefault(this WebhookEventCollectionBuilderCms builder)
     {
         builder.Builder
-            .Append<ContentDeletedWebhookEvent>()
-            .Append<ContentPublishedWebhookEvent>()
-            .Append<ContentUnpublishedWebhookEvent>()
-            .Append<MediaDeletedWebhookEvent>()
-            .Append<MediaSavedWebhookEvent>();
+            .Add<ContentDeletedWebhookEvent>()
+            .Add<ContentPublishedWebhookEvent>()
+            .Add<ContentUnpublishedWebhookEvent>()
+            .Add<MediaDeletedWebhookEvent>()
+            .Add<MediaSavedWebhookEvent>();
 
         return builder;
     }
@@ -108,9 +108,9 @@ public static class WebhookEventCollectionBuilderCmsExtensions
     public static WebhookEventCollectionBuilderCms AddDataType(this WebhookEventCollectionBuilderCms builder)
     {
         builder.Builder
-            .Append<DataTypeDeletedWebhookEvent>()
-            .Append<DataTypeMovedWebhookEvent>()
-            .Append<DataTypeSavedWebhookEvent>();
+            .Add<DataTypeDeletedWebhookEvent>()
+            .Add<DataTypeMovedWebhookEvent>()
+            .Add<DataTypeSavedWebhookEvent>();
 
         return builder;
     }
@@ -125,8 +125,8 @@ public static class WebhookEventCollectionBuilderCmsExtensions
     public static WebhookEventCollectionBuilderCms AddDictionary(this WebhookEventCollectionBuilderCms builder)
     {
         builder.Builder
-            .Append<DictionaryItemDeletedWebhookEvent>()
-            .Append<DictionaryItemSavedWebhookEvent>();
+            .Add<DictionaryItemDeletedWebhookEvent>()
+            .Add<DictionaryItemSavedWebhookEvent>();
 
         return builder;
     }
@@ -141,8 +141,8 @@ public static class WebhookEventCollectionBuilderCmsExtensions
     public static WebhookEventCollectionBuilderCms AddDomain(this WebhookEventCollectionBuilderCms builder)
     {
         builder.Builder
-            .Append<DomainDeletedWebhookEvent>()
-            .Append<DomainSavedWebhookEvent>();
+            .Add<DomainDeletedWebhookEvent>()
+            .Add<DomainSavedWebhookEvent>();
 
         return builder;
     }
@@ -189,7 +189,7 @@ public static class WebhookEventCollectionBuilderCmsExtensions
     public static WebhookEventCollectionBuilderCms AddHealthCheck(this WebhookEventCollectionBuilderCms builder)
     {
         builder.Builder
-            .Append<HealthCheckCompletedWebhookEvent>();
+            .Add<HealthCheckCompletedWebhookEvent>();
 
         return builder;
     }
@@ -204,8 +204,8 @@ public static class WebhookEventCollectionBuilderCmsExtensions
     public static WebhookEventCollectionBuilderCms AddLanguage(this WebhookEventCollectionBuilderCms builder)
     {
         builder.Builder
-            .Append<LanguageDeletedWebhookEvent>()
-            .Append<LanguageSavedWebhookEvent>();
+            .Add<LanguageDeletedWebhookEvent>()
+            .Add<LanguageSavedWebhookEvent>();
 
         return builder;
     }
@@ -220,11 +220,11 @@ public static class WebhookEventCollectionBuilderCmsExtensions
     public static WebhookEventCollectionBuilderCms AddMedia(this WebhookEventCollectionBuilderCms builder)
     {
         builder.Builder
-            .Append<MediaDeletedWebhookEvent>()
-            .Append<MediaSavedWebhookEvent>()
-            .Append<MediaEmptiedRecycleBinWebhookEvent>()
-            .Append<MediaMovedWebhookEvent>()
-            .Append<MediaMovedToRecycleBinWebhookEvent>();
+            .Add<MediaDeletedWebhookEvent>()
+            .Add<MediaSavedWebhookEvent>()
+            .Add<MediaEmptiedRecycleBinWebhookEvent>()
+            .Add<MediaMovedWebhookEvent>()
+            .Add<MediaMovedToRecycleBinWebhookEvent>();
 
         return builder;
     }
@@ -275,7 +275,7 @@ public static class WebhookEventCollectionBuilderCmsExtensions
     public static WebhookEventCollectionBuilderCms AddPackage(this WebhookEventCollectionBuilderCms builder)
     {
         builder.Builder
-            .Append<ImportedPackageWebhookEvent>();
+            .Add<ImportedPackageWebhookEvent>();
 
         return builder;
     }
@@ -290,8 +290,8 @@ public static class WebhookEventCollectionBuilderCmsExtensions
     public static WebhookEventCollectionBuilderCms AddPublicAccess(this WebhookEventCollectionBuilderCms builder)
     {
         builder.Builder
-            .Append<PublicAccessEntryDeletedWebhookEvent>()
-            .Append<PublicAccessEntrySavedWebhookEvent>();
+            .Add<PublicAccessEntryDeletedWebhookEvent>()
+            .Add<PublicAccessEntrySavedWebhookEvent>();
 
         return builder;
     }
@@ -306,8 +306,8 @@ public static class WebhookEventCollectionBuilderCmsExtensions
     public static WebhookEventCollectionBuilderCms AddRelation(this WebhookEventCollectionBuilderCms builder)
     {
         builder.Builder
-            .Append<RelationDeletedWebhookEvent>()
-            .Append<RelationSavedWebhookEvent>();
+            .Add<RelationDeletedWebhookEvent>()
+            .Add<RelationSavedWebhookEvent>();
 
         return builder;
     }
@@ -322,8 +322,8 @@ public static class WebhookEventCollectionBuilderCmsExtensions
     public static WebhookEventCollectionBuilderCms AddRelationType(this WebhookEventCollectionBuilderCms builder)
     {
         builder.Builder
-            .Append<RelationTypeDeletedWebhookEvent>()
-            .Append<RelationTypeSavedWebhookEvent>();
+            .Add<RelationTypeDeletedWebhookEvent>()
+            .Add<RelationTypeSavedWebhookEvent>();
 
         return builder;
     }

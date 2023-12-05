@@ -18,9 +18,9 @@ public static class WebhookEventCollectionBuilderCmsMemberExtensions
     public static WebhookEventCollectionBuilderCmsMember AddDefault(this WebhookEventCollectionBuilderCmsMember builder)
     {
         builder.Builder
-            .Append<ExportedMemberWebhookEvent>()
-            .Append<MemberDeletedWebhookEvent>()
-            .Append<MemberSavedWebhookEvent>();
+            .Add<ExportedMemberWebhookEvent>()
+            .Add<MemberDeletedWebhookEvent>()
+            .Add<MemberSavedWebhookEvent>();
 
         return builder;
     }
@@ -35,8 +35,8 @@ public static class WebhookEventCollectionBuilderCmsMemberExtensions
     public static WebhookEventCollectionBuilderCmsMember AddRoles(this WebhookEventCollectionBuilderCmsMember builder)
     {
         builder.Builder
-            .Append<AssignedMemberRolesWebhookEvent>()
-            .Append<RemovedMemberRolesWebhookEvent>();
+            .Add<AssignedMemberRolesWebhookEvent>()
+            .Add<RemovedMemberRolesWebhookEvent>();
 
         return builder;
     }
@@ -51,8 +51,8 @@ public static class WebhookEventCollectionBuilderCmsMemberExtensions
     public static WebhookEventCollectionBuilderCmsMember AddGroup(this WebhookEventCollectionBuilderCmsMember builder)
     {
         builder.Builder
-            .Append<MemberGroupDeletedWebhookEvent>()
-            .Append<MemberGroupSavedWebhookEvent>();
+            .Add<MemberGroupDeletedWebhookEvent>()
+            .Add<MemberGroupSavedWebhookEvent>();
 
         return builder;
     }
