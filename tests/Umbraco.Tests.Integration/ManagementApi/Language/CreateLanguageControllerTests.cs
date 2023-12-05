@@ -1,17 +1,14 @@
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 using System.Net;
 using System.Net.Http.Json;
-using NUnit.Framework;
-using Umbraco.Cms.Api.Management.Controllers.DataType.Folder;
-using Umbraco.Cms.Api.Management.ViewModels.Folder;
+using Umbraco.Cms.Api.Management.Controllers.Language;
+using Umbraco.Cms.Api.Management.ViewModels.Language;
 
-namespace Umbraco.Cms.Tests.Integration.ManagementApi.DataType.Folder;
+namespace Umbraco.Cms.Tests.Integration.ManagementApi.Language;
 
-[TestFixture]
-public class CreateDataTypeFolderControllerTests : ManagementApiUserGroupTestBase<CreateDataTypeFolderController>
+public class CreateLanguageControllerTests : ManagementApiUserGroupTestBase<CreateLanguageController>
 {
-    protected override Expression<Func<CreateDataTypeFolderController, object>> MethodSelector =>
-        x => x.Create(null);
+    protected override Expression<Func<CreateLanguageController, object>> MethodSelector => x => x.Create(null);
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
@@ -20,7 +17,7 @@ public class CreateDataTypeFolderControllerTests : ManagementApiUserGroupTestBas
 
     protected override UserGroupAssertionModel EditorUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.Created
+        ExpectedStatusCode = HttpStatusCode.Forbidden
     };
 
     protected override UserGroupAssertionModel SensitiveDataUserGroupAssertionModel => new()
@@ -35,7 +32,7 @@ public class CreateDataTypeFolderControllerTests : ManagementApiUserGroupTestBas
 
     protected override UserGroupAssertionModel WriterUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.Created
+        ExpectedStatusCode = HttpStatusCode.Forbidden
     };
 
     protected override UserGroupAssertionModel UnauthorizedUserGroupAssertionModel => new()
@@ -45,9 +42,8 @@ public class CreateDataTypeFolderControllerTests : ManagementApiUserGroupTestBas
 
     protected override async Task<HttpResponseMessage> ClientRequest()
     {
-        CreateFolderRequestModel createFolderModel =
-            new() { Id = Guid.NewGuid(), ParentId = null, Name = "TestFolderName" };
+        CreateLanguageRequestModel createLanguageModel = new() { IsoCode = "da-DK", Name = "Danish", IsDefault = false, IsMandatory = false };
 
-        return await Client.PostAsync(Url, JsonContent.Create(createFolderModel));
+        return await Client.PostAsync(Url, JsonContent.Create(createLanguageModel));
     }
 }

@@ -1,25 +1,25 @@
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 using System.Net;
 using NUnit.Framework;
-using Umbraco.Cms.Api.Management.Controllers.DataType.Folder;
+using Umbraco.Cms.Api.Management.Controllers.Language;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Cms.Tests.Integration.ManagementApi.DataType.Folder;
+namespace Umbraco.Cms.Tests.Integration.ManagementApi.Language;
 
-[TestFixture]
-public class DeleteDataTypeFolderControllerTests : ManagementApiUserGroupTestBase<DeleteDataTypeFolderController>
+public class DeleteLanguageControllerTests : ManagementApiUserGroupTestBase<DeleteLanguageController>
 {
-    private readonly Guid _folderId = Guid.NewGuid();
+    private ILanguageService LanguageService => GetRequiredService<ILanguageService>();
 
-    private IDataTypeContainerService DataTypeContainerService => GetRequiredService<IDataTypeContainerService>();
+    private const string IsoCode = "da";
 
-    protected override Expression<Func<DeleteDataTypeFolderController, object>> MethodSelector =>
-        x => x.Delete(_folderId);
+    private readonly ILanguage _languageResponseModel = new Core.Models.Language(IsoCode, "Danish");
+
+    protected override Expression<Func<DeleteLanguageController, object>> MethodSelector => x => x.Delete(IsoCode);
 
     [SetUp]
-    public void Setup() =>
-        DataTypeContainerService.CreateAsync(_folderId, "FolderName", null, Constants.Security.SuperUserKey);
+    public void Setup() => LanguageService.CreateAsync(_languageResponseModel, Constants.Security.SuperUserKey);
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
@@ -28,7 +28,7 @@ public class DeleteDataTypeFolderControllerTests : ManagementApiUserGroupTestBas
 
     protected override UserGroupAssertionModel EditorUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.OK
+        ExpectedStatusCode = HttpStatusCode.Forbidden
     };
 
     protected override UserGroupAssertionModel SensitiveDataUserGroupAssertionModel => new()
@@ -43,7 +43,7 @@ public class DeleteDataTypeFolderControllerTests : ManagementApiUserGroupTestBas
 
     protected override UserGroupAssertionModel WriterUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.OK
+        ExpectedStatusCode = HttpStatusCode.Forbidden
     };
 
     protected override UserGroupAssertionModel UnauthorizedUserGroupAssertionModel => new()

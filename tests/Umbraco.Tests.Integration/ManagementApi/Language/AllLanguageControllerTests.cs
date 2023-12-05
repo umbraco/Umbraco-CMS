@@ -1,16 +1,12 @@
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 using System.Net;
-using NUnit.Framework;
-using Umbraco.Cms.Api.Management.Controllers.AuditLog;
-using Umbraco.Cms.Core;
+using Umbraco.Cms.Api.Management.Controllers.Language;
 
-namespace Umbraco.Cms.Tests.Integration.ManagementApi.AuditLog;
+namespace Umbraco.Cms.Tests.Integration.ManagementApi.Language;
 
-[TestFixture]
-public class CurrentUserAuditLogControllerTests : ManagementApiUserGroupTestBase<CurrentUserAuditLogController>
+public class AllLanguageControllerTests: ManagementApiUserGroupTestBase<AllLanguageController>
 {
-    protected override Expression<Func<CurrentUserAuditLogController, object>> MethodSelector =>
-        x => x.CurrentUser(Direction.Ascending, null, 0, 100);
+    protected override Expression<Func<AllLanguageController, object>> MethodSelector => x => x.All(0, 100);
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
