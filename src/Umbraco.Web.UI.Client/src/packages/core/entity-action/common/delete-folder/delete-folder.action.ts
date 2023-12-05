@@ -27,10 +27,12 @@ export class UmbDeleteFolderEntityAction<T extends UmbFolderRepository> extends 
 		if (folder) {
 			// TODO: maybe we can show something about how many items are part of the folder?
 			const modalContext = this.#modalContext.open(UMB_CONFIRM_MODAL, {
-				headline: `Delete folder ${folder.name}`,
-				content: 'Are you sure you want to delete this folder?',
-				color: 'danger',
-				confirmLabel: 'Delete',
+				data: {
+					headline: `Delete folder ${folder.name}`,
+					content: 'Are you sure you want to delete this folder?',
+					color: 'danger',
+					confirmLabel: 'Delete',
+				},
 			});
 
 			await modalContext.onSubmit();

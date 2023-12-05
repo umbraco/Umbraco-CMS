@@ -13,6 +13,7 @@ import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-ap
 import { ItemResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 
 export class UmbPickerInputContext<ItemType extends ItemResponseModelBaseModel> extends UmbBaseController {
+	// TODO: We are way too unsecure about the requirements for the Modal Token, as we have certain expectation for the data and value.
 	modalAlias: string | UmbModalToken;
 	repository?: UmbItemRepository<ItemType>;
 	#getUnique: (entry: ItemType) => string | undefined;
@@ -68,11 +69,16 @@ export class UmbPickerInputContext<ItemType extends ItemResponseModelBaseModel> 
 	openPicker(pickerData?: Partial<UmbPickerModalData<ItemType>>) {
 		if (!this.modalManager) throw new Error('Modal manager context is not initialized');
 
+		// TODO: Update so selection is part of value...
 		const modalContext = this.modalManager.open(this.modalAlias, {
-			multiple: this.max === 1 ? false : true,
-			selection: [...this.getSelection()],
-			pickableFilter: this.pickableFilter,
-			...pickerData,
+			data: {
+				multiple: this.max === 1 ? false : true,
+				pickableFilter: this.pickableFilter,
+				...pickerData,
+			},
+			value: {
+				selection: [...this.getSelection()],
+			},
 		});
 
 		modalContext?.onSubmit().then(({ selection }: any) => {
@@ -87,10 +93,12 @@ export class UmbPickerInputContext<ItemType extends ItemResponseModelBaseModel> 
 		if (!item) throw new Error('Could not find item with unique: ' + unique);
 
 		const modalContext = this.modalManager?.open(UMB_CONFIRM_MODAL, {
-			color: 'danger',
-			headline: `Remove ${item.name}?`,
-			content: 'Are you sure you want to remove this item',
-			confirmLabel: 'Remove',
+			data: {
+				color: 'danger',
+				headline: `Remove ${item.name}?`,
+				content: 'Are you sure you want to remove this item',
+				confirmLabel: 'Remove',
+			},
 		});
 
 		await modalContext?.onSubmit();

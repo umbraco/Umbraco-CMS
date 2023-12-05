@@ -7,32 +7,25 @@ import {
 	UMB_WORKSPACE_MODAL,
 	UmbDataTypePickerFlowModalData,
 	UmbDataTypePickerFlowModalValue,
-	UmbModalContext,
+	UmbModalBaseElement,
 	UmbModalRouteBuilder,
 	UmbModalRouteRegistrationController,
 } from '@umbraco-cms/backoffice/modal';
 import { ManifestPropertyEditorUi, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 interface GroupedItems<T> {
 	[key: string]: Array<T>;
 }
 @customElement('umb-data-type-picker-flow-modal')
-export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
-	@property({ attribute: false })
-	modalContext?: UmbModalContext<UmbDataTypePickerFlowModalData, UmbDataTypePickerFlowModalValue>;
-
-	@property({ type: Object })
-	public get data(): UmbDataTypePickerFlowModalData | undefined {
-		return this._data;
-	}
-	public set data(value: UmbDataTypePickerFlowModalData | undefined) {
-		this._data = value;
-		this._selection = this.data?.selection ?? [];
+export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
+	UmbDataTypePickerFlowModalData,
+	UmbDataTypePickerFlowModalValue
+> {
+	public set data(value: UmbDataTypePickerFlowModalData) {
+		super.data = value;
 		this._submitLabel = this.data?.submitLabel ?? this._submitLabel;
 	}
-	private _data?: UmbDataTypePickerFlowModalData | undefined;
 
 	@state()
 	private _groupedDataTypes?: GroupedItems<EntityTreeItemResponseModel>;
@@ -64,14 +57,17 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 			.addAdditionalPath(':uiAlias')
 			.onSetup((routingInfo) => {
 				return {
-					propertyEditorUiAlias: routingInfo.uiAlias,
+					data: {
+						propertyEditorUiAlias: routingInfo.uiAlias,
+					},
+					value: undefined,
 				};
 			})
 			.onSubmit((submitData) => {
-				if (submitData.dataTypeId) {
+				if (submitData?.dataTypeId) {
 					this._select(submitData.dataTypeId);
-					this._submit();
-				} else if (submitData.createNewWithPropertyEditorUiAlias) {
+					this._submitModal();
+				} else if (submitData?.createNewWithPropertyEditorUiAlias) {
 					this._createDataType(submitData.createNewWithPropertyEditorUiAlias);
 				}
 			})
@@ -83,11 +79,11 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 		this._createDataTypeModal = new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
 			.addAdditionalPath(':uiAlias')
 			.onSetup((params) => {
-				return { entityType: 'data-type', preset: { propertyEditorUiAlias: params.uiAlias } };
+				return { data: { entityType: 'data-type', preset: { propertyEditorUiAlias: params.uiAlias } } };
 			})
-			.onSubmit((submitData) => {
-				this._select(submitData.id);
-				this._submit();
+			.onSubmit((value) => {
+				this._select(value?.id);
+				this._submitModal();
 			});
 
 		this.#init();
@@ -120,15 +116,25 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 		});
 	}
 
-	private _handleDataTypeClick(dataType: EntityTreeItemResponseModel) {
-		if (dataType.id) {
-			this._select(dataType.id);
-			this._submit();
+	connectedCallback(): void {
+		super.connectedCallback();
+
+		if (this.modalContext) {
+			this.observe(this.modalContext.value, (value) => {
+				this._selection = value?.selection ?? [];
+			});
 		}
 	}
 
-	private _select(id: string) {
-		this._selection = [id];
+	private _handleDataTypeClick(dataType: EntityTreeItemResponseModel) {
+		if (dataType.id) {
+			this._select(dataType.id);
+			this._submitModal();
+		}
+	}
+
+	private _select(id: string | undefined) {
+		this._selection = id ? [id] : [];
 	}
 
 	private _handleFilterInput(event: UUIInputEvent) {
@@ -142,8 +148,8 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 				(dataType) => dataType.name?.toLowerCase().includes(this.#currentFilterQuery),
 			);
 
-			/* TODO: data type items doesn't have a group property. We will need a reference to the property editor UI to get the group.
-				this is a temp solution to group them as uncategorized. The same result as with the lodash groupBy.
+			/* TODO: data type items doesn't have a group property. We will need a reference to the Property Editor UI to get the group.
+			this is a temp solution to group them as uncategorized. The same result as with the lodash groupBy.
 			*/
 			this._groupedDataTypes = {
 				undefined: filteredDataTypes,
@@ -170,20 +176,12 @@ export class UmbDataTypePickerFlowModalElement extends UmbLitElement {
 		);
 	}
 
-	private _close() {
-		this.modalContext?.reject();
-	}
-
-	private _submit() {
-		this.modalContext?.submit({ selection: this._selection });
-	}
-
 	render() {
 		return html`
 			<umb-body-layout headline="Select editor" class="uui-text">
 				<uui-box> ${this._renderFilter()} ${this._renderGrid()} </uui-box>
 				<div slot="actions">
-					<uui-button label="Close" @click=${this._close}></uui-button>
+					<uui-button label="Close" @click=${this._rejectModal}></uui-button>
 				</div>
 			</umb-body-layout>
 		`;

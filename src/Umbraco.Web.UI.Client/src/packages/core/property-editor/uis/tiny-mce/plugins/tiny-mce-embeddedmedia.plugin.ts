@@ -77,7 +77,7 @@ export default class UmbTinyMceEmbeddedMediaPlugin extends UmbTinyMcePluginBase 
 	}
 
 	async #showModal(selectedElm: HTMLElement, embeddedMediaModalData: UmbEmbeddedMediaModalData) {
-		const modalHandler = this.#modalContext?.open(UMB_EMBEDDED_MEDIA_MODAL, embeddedMediaModalData);
+		const modalHandler = this.#modalContext?.open(UMB_EMBEDDED_MEDIA_MODAL, { data: embeddedMediaModalData });
 
 		if (!modalHandler) return;
 

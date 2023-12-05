@@ -64,7 +64,10 @@ export default class UmbTemplatingInsertSectionModalElement extends UmbModalBase
 
 	#submit() {
 		const value = this.selectedCheckbox?.snippet;
-		if (this.selectedCheckbox?.validate()) this.modalContext?.submit({ value: value ?? '' });
+		if (this.selectedCheckbox?.validate()) {
+			this._value = { value: value ?? '' };
+			this.modalContext?.submit();
+		}
 	}
 
 	render() {

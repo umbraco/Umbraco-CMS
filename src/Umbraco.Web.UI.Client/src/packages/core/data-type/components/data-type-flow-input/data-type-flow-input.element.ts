@@ -49,19 +49,21 @@ export class UmbInputDataTypeElement extends FormControlMixin(UmbLitElement) {
 		super();
 
 		this.#editDataTypeModal = new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL).onSetup(() => {
-			return { entityType: 'data-type', preset: {} };
+			return { data: { entityType: 'data-type', preset: {} } };
 		});
 
 		new UmbModalRouteRegistrationController(this, UMB_DATA_TYPE_PICKER_FLOW_MODAL)
 			.onSetup(() => {
 				return {
-					selection: this._ids,
-					submitLabel: 'Submit',
+					data: {
+						submitLabel: 'Submit',
+					},
+					value: { selection: this._ids ?? [] },
 				};
 			})
 			.onSubmit((submitData) => {
-				// TODO: we might should set the alias to null or empty string, if no selection.
-				this.value = submitData.selection.join(',');
+				// TODO: we maybe should set the alias to null, if no selection?
+				this.value = submitData?.selection.join(',') ?? '';
 				this.dispatchEvent(new CustomEvent('change', { composed: true, bubbles: true }));
 			})
 			.observeRouteBuilder((routeBuilder) => {

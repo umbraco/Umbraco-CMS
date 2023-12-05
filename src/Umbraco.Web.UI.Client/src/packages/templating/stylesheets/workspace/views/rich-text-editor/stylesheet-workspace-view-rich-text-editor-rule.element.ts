@@ -30,7 +30,9 @@ export default class UmbStylesheetRichTextEditorRuleElement extends UmbLitElemen
 	openModal = () => {
 		if (!this._modalContext) throw new Error('Modal context not found');
 		const modal = this._modalContext.open(UMB_MODAL_TEMPLATING_STYLESHEET_RTF_STYLE_SIDEBAR_MODAL, {
-			rule: this.rule,
+			value: {
+				rule: this.rule,
+			},
 		});
 		modal?.onSubmit().then((result) => {
 			if (result.rule && this.rule?.name) {

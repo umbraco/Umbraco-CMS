@@ -3,7 +3,6 @@ import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export type UmbPropertySettingsModalData = {
 	documentTypeId: string;
-	propertyData: PropertyTypeModelBaseModel;
 };
 export type UmbPropertySettingsModalValue = PropertyTypeModelBaseModel;
 

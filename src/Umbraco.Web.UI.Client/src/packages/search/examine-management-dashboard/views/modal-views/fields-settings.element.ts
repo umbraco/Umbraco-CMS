@@ -16,7 +16,8 @@ export default class UmbExamineFieldsSettingsModalElement
 	private _fields?: UmbExamineFieldsSettingsModalData;
 
 	private _handleClose() {
-		this.modalContext?.submit({ fields: this._fields });
+		this._value = { fields: this._fields };
+		this.modalContext?.submit();
 	}
 
 	disconnectedCallback(): void {

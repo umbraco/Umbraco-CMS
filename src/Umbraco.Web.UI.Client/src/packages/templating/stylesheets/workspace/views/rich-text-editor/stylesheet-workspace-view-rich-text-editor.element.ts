@@ -1,9 +1,6 @@
 import { RichTextRuleModelSortable, UmbStylesheetWorkspaceContext } from '../../stylesheet-workspace.context.js';
 import { UMB_MODAL_TEMPLATING_STYLESHEET_RTF_STYLE_SIDEBAR } from '../../manifests.js';
-import {
-	StylesheetRichTextEditorStyleModalData,
-	UmbStylesheetRichTextEditorStyleModalValue,
-} from './stylesheet-workspace-view-rich-text-editor-style-sidebar.element.js';
+import { StylesheetRichTextEditorStyleModalValue } from './stylesheet-workspace-view-rich-text-editor-style-sidebar.element.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
@@ -15,12 +12,17 @@ import { css, html, customElement, state, ifDefined, repeat } from '@umbraco-cms
 import './stylesheet-workspace-view-rich-text-editor-rule.element.js';
 
 export const UMB_MODAL_TEMPLATING_STYLESHEET_RTF_STYLE_SIDEBAR_MODAL = new UmbModalToken<
-	StylesheetRichTextEditorStyleModalData,
-	UmbStylesheetRichTextEditorStyleModalValue
->(UMB_MODAL_TEMPLATING_STYLESHEET_RTF_STYLE_SIDEBAR, {
-	type: 'sidebar',
-	size: 'medium',
-});
+	never,
+	StylesheetRichTextEditorStyleModalValue
+>(
+	UMB_MODAL_TEMPLATING_STYLESHEET_RTF_STYLE_SIDEBAR,
+	{
+		type: 'sidebar',
+		size: 'medium',
+	},
+	undefined,
+	{ rule: null },
+);
 
 const SORTER_CONFIG: UmbSorterConfig<RichTextRuleModel> = {
 	compareElementToModel: (element: HTMLElement, model: RichTextRuleModel) => {
@@ -73,7 +75,9 @@ export class UmbStylesheetWorkspaceViewRichTextEditorElement extends UmbLitEleme
 	openModal = (rule: RichTextRuleModelSortable | null = null) => {
 		if (!this._modalContext) throw new Error('Modal context not found');
 		const modal = this._modalContext.open(UMB_MODAL_TEMPLATING_STYLESHEET_RTF_STYLE_SIDEBAR_MODAL, {
-			rule,
+			value: {
+				rule,
+			},
 		});
 		modal?.onSubmit().then((result) => {
 			if (result.rule) {

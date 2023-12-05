@@ -71,7 +71,8 @@ export class UmbImportDictionaryModalLayout extends UmbModalBaseElement<
 		const { error } = await this.#dictionaryRepository.import(this._temporaryFileId, this._parentId);
 		if (error) return;
 
-		this.modalContext?.submit({ entityItems: this.#createTreeEntitiesFromTempFile(), parentId: this._parentId });
+		this._value = { entityItems: this.#createTreeEntitiesFromTempFile(), parentId: this._parentId };
+		this.modalContext?.submit();
 	}
 
 	constructor() {

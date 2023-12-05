@@ -31,9 +31,11 @@ export class UmbEnableUserEntityAction extends UmbEntityActionBase<UmbEnableUser
 			const item = data[0];
 
 			const modalContext = this.#modalManager.open(UMB_CONFIRM_MODAL, {
-				headline: `Enable ${item.name}`,
-				content: 'Are you sure you want to enable this user?',
-				confirmLabel: 'Enable',
+				data: {
+					headline: `Enable ${item.name}`,
+					content: 'Are you sure you want to enable this user?',
+					confirmLabel: 'Enable',
+				},
 			});
 
 			await modalContext.onSubmit();

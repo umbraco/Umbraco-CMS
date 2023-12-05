@@ -192,7 +192,7 @@ class MyElement extends UmbElementMixin(LitElement) {
 		const options {'options go here'};
 		const modalContext = this.#modalManagerContext?.open(MY_MODAL_TOKEN), data, options);
 
-		modalContext?.onSubmit().then((data) => {
+		modalContext?.onSubmit().then((value) => {
 			// if modal submitted, then data is supplied here.
 		});
 	}
@@ -257,7 +257,8 @@ class MyDialog extends UmbElementMixin(LitElement) {
 	private _handleSubmit() {
 		/* Optional data of any type can be applied to the submit method to pass it
 		   to the modal parent through the onSubmit promise. */
-		this.modalContext?.submit({ myReturnData: 'hello world' });
+		this.modalContext?.setValue({ myReturnData: 'hello world' });
+		this.modalContext?.submit();
 	}
 
 	render() {

@@ -19,9 +19,10 @@ export class UmbSectionPickerModalElement extends UmbModalBaseElement<
 	#selectionManager = new UmbSelectionManager();
 
 	#submit() {
-		this.modalContext?.submit({
+		this._value = {
 			selection: this.#selectionManager.getSelection(),
-		});
+		};
+		this.modalContext?.submit();
 	}
 
 	#close() {

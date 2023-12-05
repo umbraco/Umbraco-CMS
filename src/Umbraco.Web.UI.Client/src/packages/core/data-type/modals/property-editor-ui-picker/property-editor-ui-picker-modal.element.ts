@@ -31,7 +31,7 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbModalBaseElement<
 	connectedCallback(): void {
 		super.connectedCallback();
 
-		this._selection = this.data?.selection ?? [];
+		this._selection = this._value?.selection ?? [];
 		this._submitLabel = this.data?.submitLabel ?? this._submitLabel;
 
 		this._usePropertyEditorUIs();

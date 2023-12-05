@@ -6,11 +6,13 @@ export interface UmbWorkspaceData {
 	preset: Partial<CreateDataTypeRequestModel>;
 }
 
-export type UmbWorkspaceResult = {
-	id: string;
-};
+export type UmbWorkspaceValue =
+	| {
+			id: string;
+	  }
+	| undefined;
 
-export const UMB_WORKSPACE_MODAL = new UmbModalToken<UmbWorkspaceData, UmbWorkspaceResult>('Umb.Modal.Workspace', {
+export const UMB_WORKSPACE_MODAL = new UmbModalToken<UmbWorkspaceData, UmbWorkspaceValue>('Umb.Modal.Workspace', {
 	type: 'sidebar',
 	size: 'large',
 });

@@ -1,7 +1,6 @@
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbPropertyEditorUIPickerModalData {
-	selection?: Array<string>;
 	submitLabel?: string;
 }
 

@@ -46,8 +46,7 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 	@state()
 	protected _ownerDocumentType?: UmbPropertySettingsModalValue;
 
-	@state()
-	protected _returnData!: UmbPropertySettingsModalValue;
+	protected _originalPropertyData!: UmbPropertySettingsModalValue;
 
 	connectedCallback(): void {
 		super.connectedCallback();
@@ -64,20 +63,22 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 			);
 		});
 
-		this._returnData = JSON.parse(JSON.stringify(this.data?.propertyData ?? {}));
+		this._originalPropertyData = this._value;
+		// TODO: Use some utility method for this deep clone:
+		this._value = JSON.parse(JSON.stringify(this._value ?? {}));
 
-		this._returnData.validation ??= {};
+		this._value.validation ??= {};
 
-		const regEx = this._returnData.validation.regEx ?? null;
+		const regEx = this._value.validation.regEx ?? null;
 		const newlySelected = this._customValidationOptions.find((option) => {
 			option.selected = option.value === regEx;
 			return option.selected;
 		});
 		if (newlySelected === undefined) {
 			this._customValidationOptions[4].selected = true;
-			this._returnData.validation.regEx = this._customValidationOptions[4].value;
+			this._value.validation.regEx = this._customValidationOptions[4].value;
 		} else {
-			this._returnData.validation.regEx = regEx;
+			this._value.validation.regEx = regEx;
 		}
 	}
 
@@ -99,18 +100,18 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 		const isValid = form.checkValidity();
 		if (!isValid) return;
 
-		this.modalContext?.submit(this._returnData);
+		this.modalContext?.submit();
 	}
 
 	#onNameChange(event: UUIInputEvent) {
-		const oldName = this._returnData.name;
-		const oldAlias = this._returnData.alias;
-		this._returnData.name = event.target.value.toString();
+		const oldName = this._value.name;
+		const oldAlias = this._value.alias;
+		this._value.name = event.target.value.toString();
 		if (this._aliasLocked) {
 			const expectedOldAlias = generateAlias(oldName ?? '');
 			// Only update the alias if the alias matches a generated alias of the old name (otherwise the alias is considered one written by the user.)
 			if (expectedOldAlias === oldAlias) {
-				this._returnData.alias = generateAlias(this._returnData.name);
+				this._value.alias = generateAlias(this._value.name);
 				this.requestUpdate('_returnData');
 			}
 		}
@@ -119,43 +120,43 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 	#onAliasChange(event: UUIInputEvent) {
 		const alias = generateAlias(event.target.value.toString());
 		if (!this._aliasLocked) {
-			this._returnData.alias = alias;
+			this._value.alias = alias;
 		} else {
-			this._returnData.alias = this.data?.propertyData?.alias;
+			this._value.alias = this._originalPropertyData.alias;
 		}
 		this.requestUpdate('_returnData');
 	}
 
 	#onDataTypeIdChange(event: UUIInputEvent) {
 		const dataTypeId = event.target.value.toString();
-		this._returnData.dataTypeId = dataTypeId;
+		this._value.dataTypeId = dataTypeId;
 		this.requestUpdate('_returnData');
 	}
 
 	#onMandatoryChange(event: UUIBooleanInputEvent) {
 		const value = event.target.checked;
-		this._returnData.validation!.mandatory = value;
+		this._value.validation!.mandatory = value;
 		this.requestUpdate('_returnData');
 	}
 
 	#onMandatoryMessageChange(event: UUIInputEvent) {
 		const value = event.target.value.toString();
-		this._returnData.validation!.mandatoryMessage = value;
+		this._value.validation!.mandatoryMessage = value;
 		this.requestUpdate('_returnData');
 	}
 
 	#setAppearanceNormal() {
-		const currentValue = this._returnData.appearance?.labelOnTop;
+		const currentValue = this._value.appearance?.labelOnTop;
 		if (currentValue !== true) return;
 
-		this._returnData.appearance!.labelOnTop = false;
+		this._value.appearance!.labelOnTop = false;
 		this.requestUpdate('_returnData');
 	}
 	#setAppearanceTop() {
-		const currentValue = this._returnData.appearance?.labelOnTop;
+		const currentValue = this._value.appearance?.labelOnTop;
 		if (currentValue === true) return;
 
-		this._returnData.appearance!.labelOnTop = true;
+		this._value.appearance!.labelOnTop = true;
 		this.requestUpdate('_returnData');
 	}
 
@@ -170,7 +171,7 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 			option.selected = option.value === regEx;
 		});
 
-		this._returnData.validation!.regEx = regEx ?? null;
+		this._value.validation!.regEx = regEx ?? null;
 		this.requestUpdate('_returnData');
 		this.requestUpdate('_customValidationOptions');
 	}
@@ -184,17 +185,17 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 		if (betterChoice === undefined) {
 			this._customValidationOptions[4].selected = true;
 		}
-		this._returnData.validation!.regEx = regEx;
+		this._value.validation!.regEx = regEx;
 		this.requestUpdate('_returnData');
 		this.requestUpdate('_customValidationOptions');
 	}
 	#onValidationMessageChange(event: UUIInputEvent) {
-		this._returnData.validation!.regExMessage = event.target.value.toString();
+		this._value.validation!.regExMessage = event.target.value.toString();
 		this.requestUpdate('_returnData');
 	}
 
 	#onVaryByCultureChange(event: UUIBooleanInputEvent) {
-		this._returnData.variesByCulture = event.target.checked;
+		this._value.variesByCulture = event.target.checked;
 		this.requestUpdate('_returnData');
 	}
 
@@ -214,7 +215,7 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 										id="name-input"
 										name="name"
 										@input=${this.#onNameChange}
-										.value=${this._returnData.name}
+										.value=${this._value.name}
 										placeholder="Enter a name...">
 										<!-- TODO: validation for bad characters -->
 									</uui-input>
@@ -222,7 +223,7 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 										id="alias-input"
 										name="alias"
 										@input=${this.#onAliasChange}
-										.value=${this._returnData.alias}
+										.value=${this._value.alias}
 										placeholder="Enter alias..."
 										?disabled=${this._aliasLocked}>
 										<!-- TODO: validation for bad characters -->
@@ -234,10 +235,10 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 										id="description-input"
 										name="description"
 										placeholder="Enter description..."
-										.value=${this._returnData.description}></uui-textarea>
+										.value=${this._value.description}></uui-textarea>
 								</div>
 								<umb-data-type-flow-input
-									.value=${this._returnData.dataTypeId ?? ''}
+									.value=${this._value.dataTypeId ?? ''}
 									@change=${this.#onDataTypeIdChange}></umb-data-type-flow-input>
 								<hr />
 								<div class="container">
@@ -267,7 +268,7 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 		return html`<button
 			type="button"
 			@click=${this.#setAppearanceNormal}
-			class="appearance left ${this._returnData.appearance?.labelOnTop ? '' : 'selected'}">
+			class="appearance left ${this._value.appearance?.labelOnTop ? '' : 'selected'}">
 			<svg width="200" height="48" viewBox="0 0 200 60" fill="none" xmlns="http://www.w3.org/2000/svg">
 				<rect width="94" height="14" rx="6" fill="currentColor" />
 				<rect y="22" width="64" height="9" rx="4" fill="currentColor" fill-opacity="0.4" />
@@ -282,7 +283,7 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 			<button
 				type="button"
 				@click=${this.#setAppearanceTop}
-				class="appearance top ${this._returnData.appearance?.labelOnTop ? 'selected' : ''}">
+				class="appearance top ${this._value.appearance?.labelOnTop ? 'selected' : ''}">
 				<svg width="140" height="48" viewBox="0 0 140 60" fill="none" xmlns="http://www.w3.org/2000/svg">
 					<rect width="90" height="14" rx="6" fill="currentColor" />
 					<rect y="22" width="64" height="9" rx="4" fill="currentColor" fill-opacity="0.4" />
@@ -299,13 +300,13 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 				<uui-toggle
 					@change=${this.#onMandatoryChange}
 					id="mandatory"
-					.checked=${this._returnData.validation?.mandatory ?? false}
+					.checked=${this._value.validation?.mandatory ?? false}
 					slot="editor"></uui-toggle>
 			</div>
-			${this._returnData.validation?.mandatory
+			${this._value.validation?.mandatory
 				? html`<uui-input
 						name="mandatory-message"
-						value=${this._returnData.validation?.mandatoryMessage ?? ''}
+						value=${this._value.validation?.mandatoryMessage ?? ''}
 						@change=${this.#onMandatoryMessageChange}
 						style="margin-top: var(--uui-size-space-1)"
 						id="mandatory-message"
@@ -319,17 +320,17 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 				@change=${this.#onCustomValidationChange}
 				.options=${this._customValidationOptions}></uui-select>
 
-			${this._returnData.validation?.regEx !== null
+			${this._value.validation?.regEx !== null
 				? html`
 						<uui-input
 							name="pattern"
 							style="margin-bottom: var(--uui-size-space-1); margin-top: var(--uui-size-space-5);"
 							@change=${this.#onValidationRegExChange}
-							.value=${this._returnData.validation?.regEx ?? ''}></uui-input>
+							.value=${this._value.validation?.regEx ?? ''}></uui-input>
 						<uui-textarea
 							name="pattern-message"
 							@change=${this.#onValidationMessageChange}
-							.value=${this._returnData.validation?.regExMessage ?? ''}></uui-textarea>
+							.value=${this._value.validation?.regExMessage ?? ''}></uui-textarea>
 				  `
 				: nothing} `;
 	}
@@ -346,7 +347,7 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 	#renderVaryByCulture() {
 		return html`<uui-toggle
 			@change=${this.#onVaryByCultureChange}
-			.checked=${this._returnData.variesByCulture ?? false}
+			.checked=${this._value.variesByCulture ?? false}
 			label="Vary by culture"></uui-toggle> `;
 	}
 

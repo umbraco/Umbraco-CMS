@@ -1,6 +1,5 @@
 import type { UmbModalToken } from './token/modal-token.js';
-import { UmbModalContext, UmbModalContextClass } from './index.js';
-import type { IRouterSlot } from '@umbraco-cms/backoffice/external/router-slot';
+import { UmbModalContext, type UmbModalContextClassArgs } from './index.js';
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 import { BehaviorSubject } from '@umbraco-cms/backoffice/external/rxjs';
 import { appendToFrozenArray } from '@umbraco-cms/backoffice/observable-api';
@@ -29,22 +28,19 @@ export class UmbModalManagerContext {
 	 * Opens a modal or sidebar modal
 	 * @public
 	 * @param {(string | UmbModalToken)} modalAlias
-	 * @param {ModalData} data
-	 * @param {UmbModalConfig} config
-	 * @param {IRouterSlot | null} router
+	 * @param {UmbModalContextClassArgs} args
 	 * @return {*}  {UmbModalHandler}
 	 * @memberof UmbModalManagerContext
 	 */
-	public open<ModalData extends object = object, ModalValue = unknown>(
-		modalAlias: string | UmbModalToken<ModalData, ModalValue>,
-		data?: ModalData,
-		config?: UmbModalConfig,
-		router: IRouterSlot | null = null,
+	public open<
+		ModalData extends object = object,
+		ModalValue = unknown,
+		ModalAliasTypeAsToken extends UmbModalToken = UmbModalToken<ModalData, ModalValue>,
+	>(
+		modalAlias: UmbModalToken<ModalData, ModalValue> | string,
+		args: UmbModalContextClassArgs<ModalAliasTypeAsToken> = {},
 	) {
-		const modalContext = new UmbModalContextClass(router, modalAlias, data, config) as unknown as UmbModalContext<
-			ModalData,
-			ModalValue
-		>;
+		const modalContext = new UmbModalContext(modalAlias, args);
 
 		this.#modals.next(
 			appendToFrozenArray(this.#modals.getValue(), modalContext, (entry) => entry.key === modalContext.key),

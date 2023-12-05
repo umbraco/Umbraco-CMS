@@ -16,7 +16,8 @@ export default class UmbLogViewerSaveSearchModalElement extends UmbModalBaseElem
 	}
 
 	private _handleSubmit() {
-		this.modalContext?.submit({ name: this._input.value as string, query: this.data?.query });
+		this._value = { name: this._input.value as string, query: this.data?.query };
+		this.modalContext?.submit();
 	}
 
 	@state()

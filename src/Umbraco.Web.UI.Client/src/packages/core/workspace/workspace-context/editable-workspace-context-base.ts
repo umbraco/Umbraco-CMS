@@ -49,7 +49,8 @@ export abstract class UmbEditableWorkspaceContextBase<RepositoryType, EntityType
 	}
 
 	protected submitModal(data: EntityType) {
-		this.modalContext?.submit(data);
+		this.modalContext?.setValue(data);
+		this.modalContext?.submit();
 	}
 
 	abstract getEntityId(): string | undefined; // TODO: Consider if this should go away/be renamed? now that we have getUnique()

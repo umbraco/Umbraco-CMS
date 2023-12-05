@@ -17,19 +17,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 	_selectedKey?: string;
 
 	@state()
-	_index: number | null = null;
-
-	@state()
-	_link: UmbLinkPickerLink = {
-		icon: null,
-		name: null,
-		published: true,
-		queryString: null,
-		target: null,
-		trashed: false,
-		udi: null,
-		url: null,
-	};
+	_link: UmbLinkPickerLink = {};
 
 	@state()
 	_layout: UmbLinkPickerConfig = {
@@ -52,15 +40,21 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 	@query('#link-title-input')
 	private _linkTitleInput!: UUIInputElement;
 
+	constructor() {
+		super();
+	}
+
 	connectedCallback() {
 		super.connectedCallback();
 		if (!this.data) return;
-		this._index = this.data?.index;
-		this._link = this.data?.link;
-		this._layout = this.data?.config;
 
-		if (!this._link.udi) return;
-		this._selectedKey = getKeyFromUdi(this._link.udi);
+		if (this.modalContext) {
+			this.observe(this.modalContext.value, (value) => {
+				this._link = value?.link ?? {};
+				this._selectedKey = this._link?.udi ? getKeyFromUdi(this._link.udi) : undefined;
+			});
+		}
+		this._layout = this.data?.config;
 	}
 
 	private _handleQueryString() {
@@ -69,13 +63,16 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 
 		if (query.startsWith('#') || query.startsWith('?')) {
 			this._link.queryString = query;
+			this.modalContext?.updateValue({ link: this._link });
 			return;
 		}
 
 		if (query.includes('=')) {
 			this._link.queryString = `?${query}`;
+			this.modalContext?.updateValue({ link: this._link });
 		} else {
 			this._link.queryString = `#${query}`;
+			this.modalContext?.updateValue({ link: this._link });
 		}
 	}
 
@@ -88,6 +85,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 		if (!selectedKey) {
 			this._link.url = '';
 			this._link.udi = undefined;
+			this.modalContext?.updateValue({ link: this._link });
 			this._selectedKey = undefined;
 			this.requestUpdate();
 			return;
@@ -98,11 +96,12 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 		this._selectedKey = selectedKey;
 		this._link.udi = udi;
 		this._link.url = udi;
+		this.modalContext?.updateValue({ link: this._link });
 		this.requestUpdate();
 	}
 
 	private _submit() {
-		this.modalContext?.submit({ index: this._index, link: this._link });
+		this.modalContext?.submit();
 	}
 
 	private _close() {

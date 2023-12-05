@@ -3,7 +3,6 @@ import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbLanguagePickerModalData {
 	multiple?: boolean;
-	selection?: Array<string | null>;
 	filter?: (language: LanguageResponseModel) => boolean;
 }
 

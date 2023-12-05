@@ -4,57 +4,48 @@ import { css, html, customElement, ifDefined, state } from '@umbraco-cms/backoff
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { RichTextRuleModel } from '@umbraco-cms/backoffice/backend-api';
 
-export interface StylesheetRichTextEditorStyleModalData {
+export interface StylesheetRichTextEditorStyleModalValue {
 	rule: RichTextRuleModelSortable | null;
 }
 
-export type UmbStylesheetRichTextEditorStyleModalValue = NonNullable<Required<StylesheetRichTextEditorStyleModalData>>;
-
 @customElement('umb-stylesheet-rich-text-editor-style-modal')
 export default class UmbStylesheetRichTextEditorStyleModalElement extends UmbModalBaseElement<
-	StylesheetRichTextEditorStyleModalData,
-	UmbStylesheetRichTextEditorStyleModalValue
+	never,
+	StylesheetRichTextEditorStyleModalValue
 > {
-	private _close() {
-		this.modalContext?.reject();
-	}
-
-	#submit() {
-		this.modalContext?.submit({ rule: this._rule });
-	}
-
-	connectedCallback() {
-		super.connectedCallback();
-		this._rule = this.data?.rule ?? null;
-	}
-
 	@state()
 	private _rule: RichTextRuleModel | null = null;
 
 	#updateName(event: Event) {
 		const name = (event.target as HTMLInputElement).value;
 
-		this._rule = {
-			...this._rule,
-			name,
+		this._value = {
+			rule: {
+				...this._value.rule,
+				name,
+			},
 		};
 	}
 
 	#updateSelector(event: Event) {
 		const selector = (event.target as HTMLInputElement).value;
 
-		this._rule = {
-			...this._rule,
-			selector,
+		this._value = {
+			rule: {
+				...this._value.rule,
+				selector,
+			},
 		};
 	}
 
 	#updateStyles(event: Event) {
 		const styles = (event.target as HTMLInputElement).value;
 
-		this._rule = {
-			...this._rule,
-			styles,
+		this._value = {
+			rule: {
+				...this._value.rule,
+				styles,
+			},
 		};
 	}
 
@@ -120,8 +111,8 @@ export default class UmbStylesheetRichTextEditorStyleModalElement extends UmbMod
 					</uui-box>
 				</div>
 				<div slot="actions">
-					<uui-button @click=${this._close} look="secondary" label="Close">Close</uui-button>
-					<uui-button @click=${this.#submit} look="primary" color="positive" label="Submit">Submit</uui-button>
+					<uui-button @click=${this._rejectModal} look="secondary" label="Close">Close</uui-button>
+					<uui-button @click=${this._submitModal} look="primary" color="positive" label="Submit">Submit</uui-button>
 				</div>
 			</umb-body-layout>
 		`;

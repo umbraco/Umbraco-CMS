@@ -6,15 +6,15 @@ import {
 	UmbModalContext,
 	UmbDataTypePickerFlowDataTypePickerModalData,
 	UmbDataTypePickerFlowDataTypePickerModalValue,
+	UmbModalBaseElement,
 } from '@umbraco-cms/backoffice/modal';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { FolderTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-data-type-picker-flow-data-type-picker-modal')
-export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbLitElement {
-	@property({ type: Object })
-	data?: UmbDataTypePickerFlowDataTypePickerModalData;
-
+export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbModalBaseElement<
+	UmbDataTypePickerFlowDataTypePickerModalData,
+	UmbDataTypePickerFlowDataTypePickerModalValue
+> {
 	@state()
 	private _dataTypes?: Array<FolderTreeItemResponseModel>;
 
@@ -61,12 +61,14 @@ export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbLitEleme
 
 	private _handleClick(dataType: FolderTreeItemResponseModel) {
 		if (dataType.id) {
-			this.modalContext?.submit({ dataTypeId: dataType.id });
+			this._value = { dataTypeId: dataType.id };
+			this.modalContext?.submit();
 		}
 	}
 
 	private _handleCreate() {
-		this.modalContext?.submit({ createNewWithPropertyEditorUiAlias: this._propertyEditorUiAlias });
+		this._value = { createNewWithPropertyEditorUiAlias: this._propertyEditorUiAlias };
+		this.modalContext?.submit();
 	}
 
 	private _close() {

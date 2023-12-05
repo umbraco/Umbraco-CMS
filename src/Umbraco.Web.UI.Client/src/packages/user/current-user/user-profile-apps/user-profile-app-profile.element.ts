@@ -51,7 +51,9 @@ export class UmbUserProfileAppProfileElement extends UmbLitElement {
 		if (!this.#modalManagerContext) return;
 
 		this.#modalManagerContext.open(UMB_CHANGE_PASSWORD_MODAL, {
-			userId: this._currentUser?.id ?? '',
+			data: {
+				userId: this._currentUser?.id ?? '',
+			},
 		});
 	}
 

@@ -48,15 +48,6 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 		}
 	}
 
-	#close() {
-		this.modalContext?.reject();
-	}
-
-	#submit() {
-		// TODO: Shouldnt we stop sending the value here, instead let the modal context send of its value. and then its up to any one using it to make sure Modal Context value is up to date.
-		this.modalContext?.submit(this._modalValue);
-	}
-
 	#onColorChange(e: UUIColorSwatchesEvent) {
 		this.modalContext?.updateValue({ icon: e.target.value });
 	}
@@ -104,8 +95,8 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 					<hr />
 					<uui-scroll-container id="icon-selection">${this.renderIconSelection()}</uui-scroll-container>
 				</div>
-				<uui-button slot="actions" label="close" @click="${this.#close}">Close</uui-button>
-				<uui-button slot="actions" color="positive" look="primary" @click="${this.#submit}" label="Submit">
+				<uui-button slot="actions" label="close" @click="${this._rejectModal}">Close</uui-button>
+				<uui-button slot="actions" color="positive" look="primary" @click="${this._submitModal}" label="Submit">
 					Submit
 				</uui-button>
 			</umb-body-layout>

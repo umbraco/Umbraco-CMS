@@ -8,23 +8,38 @@ import type { Params } from '@umbraco-cms/backoffice/router';
 
 export type UmbModalRouteBuilder = (params: { [key: string]: string | number } | null) => string;
 
-export class UmbModalRouteRegistration<UmbModalTokenData extends object = object, UmbModalTokenResult = any> {
+export type UmbModalRouteSetupReturn<UmbModalTokenData, UmbModalTokenValue> = UmbModalTokenValue extends undefined
+	? {
+			data: UmbModalTokenData;
+			value?: UmbModalTokenValue;
+	  }
+	: {
+			data: UmbModalTokenData;
+			value: UmbModalTokenValue;
+	  };
+
+export class UmbModalRouteRegistration<UmbModalTokenData extends object = object, UmbModalTokenValue = any> {
 	#key: string;
 	#path: string | null;
-	#modalAlias: UmbModalToken<UmbModalTokenData, UmbModalTokenResult> | string;
+	#modalAlias: UmbModalToken<UmbModalTokenData, UmbModalTokenValue> | string;
 	#modalConfig?: UmbModalConfig;
 
-	#onSetupCallback?: (routingInfo: Params) => Promise<UmbModalTokenData | false> | UmbModalTokenData | false;
-	#onSubmitCallback?: (data: UmbModalTokenResult) => void;
+	#onSetupCallback?: (
+		routingInfo: Params,
+	) =>
+		| Promise<UmbModalRouteSetupReturn<UmbModalTokenData, UmbModalTokenValue> | false>
+		| UmbModalRouteSetupReturn<UmbModalTokenData, UmbModalTokenValue>
+		| false;
+	#onSubmitCallback?: (data: UmbModalTokenValue) => void;
 	#onRejectCallback?: () => void;
 
-	#modalManagerContext: UmbModalContext<UmbModalTokenData, UmbModalTokenResult> | undefined;
+	#modalManagerContext: UmbModalContext<UmbModalTokenData, UmbModalTokenValue> | undefined;
 	#routeBuilder?: UmbModalRouteBuilder;
 	#urlBuilderCallback: ((urlBuilder: UmbModalRouteBuilder) => void) | undefined;
 
 	// Notice i removed the key in the transferring to this class.
 	constructor(
-		modalAlias: UmbModalToken<UmbModalTokenData, UmbModalTokenResult> | string,
+		modalAlias: UmbModalToken<UmbModalTokenData, UmbModalTokenValue> | string,
 		path: string | null = null,
 		modalConfig?: UmbModalConfig,
 	) {
@@ -87,11 +102,18 @@ export class UmbModalRouteRegistration<UmbModalTokenData extends object = object
 		this.#urlBuilderCallback?.(urlBuilder);
 	}
 
-	public onSetup(callback: (routingInfo: Params) => Promise<UmbModalTokenData | false> | UmbModalTokenData | false) {
+	public onSetup(
+		callback: (
+			routingInfo: Params,
+		) =>
+			| Promise<UmbModalRouteSetupReturn<UmbModalTokenData, UmbModalTokenValue> | false>
+			| UmbModalRouteSetupReturn<UmbModalTokenData, UmbModalTokenValue>
+			| false,
+	) {
 		this.#onSetupCallback = callback;
 		return this;
 	}
-	public onSubmit(callback: (data: UmbModalTokenResult) => void) {
+	public onSubmit(callback: (value: UmbModalTokenValue) => void) {
 		this.#onSubmitCallback = callback;
 		return this;
 	}
@@ -100,7 +122,7 @@ export class UmbModalRouteRegistration<UmbModalTokenData extends object = object
 		return this;
 	}
 
-	#onSubmit = (data: UmbModalTokenResult) => {
+	#onSubmit = (data: UmbModalTokenValue) => {
 		this.#onSubmitCallback?.(data);
 		this.#modalManagerContext = undefined;
 	};
@@ -115,7 +137,14 @@ export class UmbModalRouteRegistration<UmbModalTokenData extends object = object
 
 		const modalData = this.#onSetupCallback ? await this.#onSetupCallback(params) : undefined;
 		if (modalData !== false) {
-			this.#modalManagerContext = modalManagerContext.open(this.#modalAlias, modalData, this.modalConfig, router);
+			this.#modalManagerContext = modalManagerContext.open(this.#modalAlias, {
+				data: {
+					data: modalData?.data,
+					value: modalData?.value,
+					config: this.modalConfig,
+					router,
+				},
+			});
 			this.#modalManagerContext.onSubmit().then(this.#onSubmit, this.#onReject);
 			return this.#modalManagerContext;
 		}

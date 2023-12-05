@@ -1,25 +1,19 @@
-import { html, customElement, property, css, nothing, state } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, css, nothing, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import {
 	UmbEntityUserPermissionSettingsModalData,
 	UmbEntityUserPermissionSettingsModalValue,
-	UmbModalContext,
+	UmbModalBaseElement,
 } from '@umbraco-cms/backoffice/modal';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
 
 @customElement('umb-entity-user-permission-settings-modal')
-export class UmbEntityUserPermissionSettingsModalElement extends UmbLitElement {
-	@property({ attribute: false })
-	modalContext?: UmbModalContext<UmbEntityUserPermissionSettingsModalData, UmbEntityUserPermissionSettingsModalValue>;
-
-	#data?: UmbEntityUserPermissionSettingsModalData;
-
-	@property({ type: Object })
-	get data(): UmbEntityUserPermissionSettingsModalData | undefined {
-		return this.#data;
-	}
+export class UmbEntityUserPermissionSettingsModalElement extends UmbModalBaseElement<
+	UmbEntityUserPermissionSettingsModalData,
+	UmbEntityUserPermissionSettingsModalValue
+> {
 	set data(data: UmbEntityUserPermissionSettingsModalData | undefined) {
+		super.data = data;
 		this._entityType = data?.entityType;
 		this._allowedPermissions = data?.allowedPermissions ?? [];
 		this._headline = data?.headline ?? this._headline;
@@ -35,11 +29,8 @@ export class UmbEntityUserPermissionSettingsModalElement extends UmbLitElement {
 	_allowedPermissions: Array<string> = [];
 
 	private _handleConfirm() {
-		this.modalContext?.submit({ allowedPermissions: this._allowedPermissions });
-	}
-
-	private _handleCancel() {
-		this.modalContext?.reject();
+		this._value = { allowedPermissions: this._allowedPermissions };
+		this.modalContext?.submit();
 	}
 
 	#onSelectedUserPermission(event: UmbSelectionChangeEvent) {
@@ -59,7 +50,7 @@ export class UmbEntityUserPermissionSettingsModalElement extends UmbLitElement {
 						: nothing}
 				</uui-box>
 
-				<uui-button slot="actions" id="cancel" label="Cancel" @click="${this._handleCancel}">Cancel</uui-button>
+				<uui-button slot="actions" id="cancel" label="Cancel" @click="${this._rejectModal}">Cancel</uui-button>
 				<uui-button
 					slot="actions"
 					id="confirm"

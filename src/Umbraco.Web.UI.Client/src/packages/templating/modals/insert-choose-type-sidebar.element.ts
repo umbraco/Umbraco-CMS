@@ -47,21 +47,27 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 	#openInsertPartialViewSidebar() {
 		this.#openModal = this._modalContext?.open(UMB_PARTIAL_VIEW_PICKER_MODAL);
 		this.#openModal?.onSubmit().then((partialViewPickerModalValue) => {
-			if (partialViewPickerModalValue)
-				this.modalContext?.submit({
+			if (partialViewPickerModalValue) {
+				this._value = {
 					type: CodeSnippetType.partialView,
 					value: partialViewPickerModalValue.selection[0],
-				});
+				};
+				this.modalContext?.submit();
+			}
 		});
 	}
 
 	#openInsertDictionaryItemModal() {
 		this.#openModal = this._modalContext?.open(UMB_DICTIONARY_ITEM_PICKER_MODAL, {
-			pickableFilter: (item) => item.id !== null,
+			data: {
+				pickableFilter: (item) => item.id !== null,
+			},
 		});
 		this.#openModal?.onSubmit().then((dictionaryItemPickerModalValue) => {
-			if (dictionaryItemPickerModalValue)
-				this.modalContext?.submit({ value: dictionaryItemPickerModalValue, type: CodeSnippetType.dictionaryItem });
+			if (dictionaryItemPickerModalValue) {
+				this._value = { value: dictionaryItemPickerModalValue, type: CodeSnippetType.dictionaryItem };
+				this.modalContext?.submit();
+			}
 		});
 	}
 

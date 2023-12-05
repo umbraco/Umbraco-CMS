@@ -20,7 +20,7 @@ export default class UmbPartialViewPickerModalElement extends UmbModalBaseElemen
 
 	connectedCallback() {
 		super.connectedCallback();
-		this._selection = this.data?.selection ?? [];
+		this._selection = this._value?.selection ?? [];
 		this._multiple = this.data?.multiple ?? true;
 	}
 
@@ -32,7 +32,8 @@ export default class UmbPartialViewPickerModalElement extends UmbModalBaseElemen
 	}
 
 	private _submit() {
-		this.modalContext?.submit({ selection: this._selection });
+		this._value = { selection: this._selection };
+		this.modalContext?.submit();
 	}
 
 	private _close() {

@@ -13,15 +13,15 @@ export class UmbModalToken<ModalDataType extends object = object, ModalValueType
 	readonly DATA: ModalDataType = undefined as never;
 
 	/**
-	 * Get the result type of the token
+	 * Get the value type of the token
 	 *
 	 * @public
 	 * @type      {ModalValueType}
 	 * @memberOf  UmbModalToken
-	 * @example   `typeof MyModal.RESULT`
+	 * @example   `typeof MyModal.VALUE`
 	 * @returns   undefined
 	 */
-	readonly RESULT: ModalValueType = undefined as never;
+	readonly VALUE: ModalValueType = undefined as never;
 
 	/**
 	 * @param alias   Unique identifier for the token,
@@ -32,6 +32,7 @@ export class UmbModalToken<ModalDataType extends object = object, ModalValueType
 		protected alias: string,
 		protected defaultConfig?: UmbModalConfig,
 		protected defaultData?: ModalDataType,
+		protected defaultValue?: ModalValueType,
 	) {}
 
 	/**
@@ -50,5 +51,9 @@ export class UmbModalToken<ModalDataType extends object = object, ModalValueType
 
 	public getDefaultData(): ModalDataType | undefined {
 		return this.defaultData;
+	}
+
+	public getDefaultValue(): ModalValueType | undefined {
+		return this.defaultValue;
 	}
 }

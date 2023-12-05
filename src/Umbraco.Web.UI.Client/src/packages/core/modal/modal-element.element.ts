@@ -18,7 +18,13 @@ export abstract class UmbModalBaseElement<
 	public modalContext?: UmbModalContext<ModalDataType, ModalValueType>;
 
 	@property({ type: Object, attribute: false })
-	public data?: ModalDataType;
+	public get data(): ModalDataType | undefined {
+		return this._data;
+	}
+	public set data(value: ModalDataType | undefined) {
+		this._data = value;
+	}
+	private _data?: ModalDataType | undefined;
 
 	@state()
 	public get _value(): ModalValueType {
@@ -34,7 +40,7 @@ export abstract class UmbModalBaseElement<
 	 * @memberof UmbModalBaseElement
 	 */
 	protected _submitModal() {
-		this.modalContext?.submit(this._value);
+		this.modalContext?.submit();
 	}
 
 	/**
