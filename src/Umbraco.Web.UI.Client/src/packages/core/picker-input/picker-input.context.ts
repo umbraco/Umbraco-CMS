@@ -8,13 +8,14 @@ import {
 	UmbModalManagerContext,
 	UmbModalToken,
 	UmbPickerModalData,
+	UmbPickerModalValue,
 } from '@umbraco-cms/backoffice/modal';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { ItemResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 
 export class UmbPickerInputContext<ItemType extends ItemResponseModelBaseModel> extends UmbBaseController {
 	// TODO: We are way too unsecure about the requirements for the Modal Token, as we have certain expectation for the data and value.
-	modalAlias: string | UmbModalToken;
+	modalAlias: string | UmbModalToken<UmbPickerModalData<ItemType>, UmbPickerModalValue>;
 	repository?: UmbItemRepository<ItemType>;
 	#getUnique: (entry: ItemType) => string | undefined;
 
@@ -37,7 +38,7 @@ export class UmbPickerInputContext<ItemType extends ItemResponseModelBaseModel> 
 	constructor(
 		host: UmbControllerHostElement,
 		repositoryAlias: string,
-		modalAlias: string | UmbModalToken,
+		modalAlias: string | UmbModalToken<UmbPickerModalData<ItemType>, UmbPickerModalValue>,
 		getUniqueMethod?: (entry: ItemType) => string | undefined,
 	) {
 		super(host);
@@ -61,8 +62,9 @@ export class UmbPickerInputContext<ItemType extends ItemResponseModelBaseModel> 
 		return this.#itemManager.getUniques();
 	}
 
-	setSelection(selection: string[]) {
-		this.#itemManager.setUniques(selection);
+	setSelection(selection: Array<string | null>) {
+		// Note: Currently we do not support picking root item. So we filter out null values:
+		this.#itemManager.setUniques(selection.filter((value) => value !== null) as Array<string>);
 	}
 
 	// TODO: If modalAlias is a ModalToken, then via TS, we should get the correct type for pickerData. Otherwise fallback to unknown.
@@ -77,12 +79,12 @@ export class UmbPickerInputContext<ItemType extends ItemResponseModelBaseModel> 
 				...pickerData,
 			},
 			value: {
-				selection: [...this.getSelection()],
+				selection: this.getSelection(),
 			},
 		});
 
-		modalContext?.onSubmit().then(({ selection }: any) => {
-			this.setSelection(selection);
+		modalContext?.onSubmit().then((value) => {
+			this.setSelection(value.selection);
 			this.getHostElement().dispatchEvent(new UmbChangeEvent());
 		});
 	}

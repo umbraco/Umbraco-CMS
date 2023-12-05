@@ -2,7 +2,7 @@ import type { UmbModalToken } from './token/modal-token.js';
 import { UmbModalContext, type UmbModalContextClassArgs } from './index.js';
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 import { BehaviorSubject } from '@umbraco-cms/backoffice/external/rxjs';
-import { appendToFrozenArray } from '@umbraco-cms/backoffice/observable-api';
+import { UmbBasicState, appendToFrozenArray } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
@@ -17,7 +17,7 @@ export interface UmbModalConfig {
 export class UmbModalManagerContext {
 	host: UmbControllerHostElement;
 	// TODO: Investigate if we can get rid of HTML elements in our store, so we can use one of our states.
-	#modals = new BehaviorSubject(<Array<UmbModalContext>>[]);
+	#modals = new UmbBasicState(<Array<UmbModalContext>>[]);
 	public readonly modals = this.#modals.asObservable();
 
 	constructor(host: UmbControllerHostElement) {
@@ -42,9 +42,10 @@ export class UmbModalManagerContext {
 	) {
 		const modalContext = new UmbModalContext(modalAlias, args);
 
-		this.#modals.next(
-			appendToFrozenArray(this.#modals.getValue(), modalContext, (entry) => entry.key === modalContext.key),
-		);
+		// Append to store:
+		this.#modals.next(appendToFrozenArray(this.#modals.value, modalContext, (entry) => entry.key === modalContext.key));
+
+		// Return to implementor:
 		return modalContext;
 	}
 

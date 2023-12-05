@@ -57,7 +57,7 @@ export class UmbModalContext<ModalPreset extends object = object, ModalValue = a
 		this.data = Object.freeze({ ...defaultData, ...args.data } as ModalPreset);
 
 		const initValue =
-			args.value ?? this.alias instanceof UmbModalToken ? (this.alias as UmbModalToken).getDefaultValue() : undefined;
+			args.value ?? (this.alias instanceof UmbModalToken ? (this.alias as UmbModalToken).getDefaultValue() : undefined);
 
 		this.#value = new UmbObjectState(initValue) as UmbObjectState<ModalValue>;
 		this.value = this.#value.asObservable();
