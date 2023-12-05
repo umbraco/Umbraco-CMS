@@ -184,17 +184,28 @@
               promises.push(assetsService.loadJs(tinyJsAsset, $scope));
           });
 
-          promises.push(tinyMceService.getTinyMceEditorConfig({
-              htmlId: vm.textAreaHtmlId,
-              stylesheets: editorConfig.stylesheets,
-              toolbar: editorConfig.toolbar,
-              mode: editorConfig.mode
-          }));
+          const standardConfigPromise = tinyMceService.getTinyMceEditorConfig({
+            htmlId: vm.textAreaHtmlId,
+            stylesheets: editorConfig.stylesheets,
+            toolbar: editorConfig.toolbar,
+            mode: editorConfig.mode
+          }).then(function (tinyMceConfig) {
+            // Load the plugins.min.js file from the TinyMCE Cloud if a Cloud Api Key is specified
+            if (tinyMceConfig.cloudApiKey) {
+              promises.push(
+                assetsService.loadJs(`https://cdn.tiny.cloud/1/${tinyMceConfig.cloudApiKey}/tinymce/${tinymce.majorVersion}.${tinymce.minorVersion}/plugins.min.js`)
+              );
+            }
+
+            return tinyMceConfig;
+          });
+
+          promises.push(standardConfigPromise);
 
           //wait for queue to end
           $q.all(promises).then(function (result) {
 
-              var standardConfig = result[promises.length - 1];
+              var standardConfig = result[result.length - 1];
 
               if (height !== null) {
                   standardConfig.plugins.splice(standardConfig.plugins.indexOf("autoresize"), 1);
