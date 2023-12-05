@@ -4,8 +4,6 @@
     <Description>Installs Umbraco CMS with minimal dependencies in your ASP.NET Core project.</Description>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <IncludeSymbols>false</IncludeSymbols>
-    <!-- TODO: Enable when final version is shipped (because there's currently no previous version) -->
-    <EnablePackageValidation>false</EnablePackageValidation>
   </PropertyGroup>
 
   <ItemGroup>
