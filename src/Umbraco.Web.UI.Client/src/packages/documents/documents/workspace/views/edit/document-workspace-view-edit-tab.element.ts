@@ -1,6 +1,6 @@
 import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../document-workspace.context.js';
 import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/content-type';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { PropertyTypeContainerModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
@@ -78,12 +78,13 @@ export class UmbDocumentWorkspaceViewEditTabElement extends UmbLitElement {
 			${repeat(
 				this._groups,
 				(group) => group.name,
-				(group) => html`<uui-box .headline=${group.name || ''}>
-					<umb-document-workspace-view-edit-properties
-						class="properties"
-						container-type="Group"
-						container-name=${group.name || ''}></umb-document-workspace-view-edit-properties>
-				</uui-box>`
+				(group) =>
+					html`<uui-box .headline=${group.name || ''}>
+						<umb-document-workspace-view-edit-properties
+							class="properties"
+							container-type="Group"
+							container-name=${group.name || ''}></umb-document-workspace-view-edit-properties>
+					</uui-box>`,
 			)}
 		`;
 	}

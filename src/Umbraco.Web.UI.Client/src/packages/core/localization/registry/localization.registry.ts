@@ -64,7 +64,7 @@ export class UmbLocalizationRegistry {
 						}
 
 						// If extension contains a js file, load it and add the default dictionary to the inner dictionary.
-						if(extension.js) {
+						if (extension.js) {
 							const loadedExtension = await loadManifestPlainJs(extension.js);
 
 							if (loadedExtension && hasDefaultExport<UmbLocalizationDictionary>(loadedExtension)) {

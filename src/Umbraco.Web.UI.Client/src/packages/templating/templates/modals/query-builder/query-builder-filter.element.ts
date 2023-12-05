@@ -127,7 +127,7 @@ export class UmbQueryBuilderFilterElement extends UmbLitElement {
 					${this.settings?.properties?.map(
 						(property) =>
 							html`<uui-combobox-list-option tabindex="0" .value=${property.alias ?? ''}>
-									${property.alias}
+								${property.alias}
 							</uui-combobox-list-option>`,
 					)}
 				</uui-combobox-list></umb-button-with-dropdown

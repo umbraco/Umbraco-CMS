@@ -78,7 +78,7 @@ export class UmbLogViewerPollingButtonElement extends UmbLitElement {
 						(interval: PoolingInterval) =>
 							html`<uui-menu-item
 								label="Every ${interval / 1000} seconds"
-								@click-label=${() => this.#setPolingInterval(interval)}></uui-menu-item>`
+								@click-label=${() => this.#setPolingInterval(interval)}></uui-menu-item>`,
 					)}
 				</ul>
 			</uui-popover>

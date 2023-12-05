@@ -117,7 +117,6 @@ export class UmbDocumentServerDataSource
 		return tryExecuteAndNotify(this.#host, DocumentResource.putDocumentById({ id, requestBody }));
 	}
 
-
 	/**
 	 * Publish one or more variants of a Document
 	 * @param {string} id

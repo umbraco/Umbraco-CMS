@@ -104,7 +104,7 @@ export class UmbModalElement extends UmbLitElement {
 
 	async #createInnerElement(manifest: ManifestModal) {
 		// TODO: add inner fallback element if no extension element is found
-		const innerElement = (await createExtensionElement(manifest));
+		const innerElement = await createExtensionElement(manifest);
 
 		if (innerElement) {
 			innerElement.data = this.#modalContext!.data;

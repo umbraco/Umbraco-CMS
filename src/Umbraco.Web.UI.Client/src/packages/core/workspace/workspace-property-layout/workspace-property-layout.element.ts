@@ -1,5 +1,5 @@
 import { css, html, LitElement, customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 /**
  *  @element umb-workspace-property-layout
@@ -83,9 +83,9 @@ export class UmbWorkspacePropertyLayoutElement extends LitElement {
 				grid-column: span 2;
 			}
 			/*@container (width > 600px) {*/
-				:host(:not([orientation='vertical'])) > div {
-					grid-column: span 1;
-				}
+			:host(:not([orientation='vertical'])) > div {
+				grid-column: span 1;
+			}
 			/*}*/
 
 			#headerColumn {
@@ -93,10 +93,10 @@ export class UmbWorkspacePropertyLayoutElement extends LitElement {
 				height: min-content;
 			}
 			/*@container (width > 600px) {*/
-				#headerColumn {
-					position: sticky;
-					top: calc(var(--uui-size-space-2) * -1);
-				}
+			#headerColumn {
+				position: sticky;
+				top: calc(var(--uui-size-space-2) * -1);
+			}
 			/*}*/
 
 			#description {
@@ -107,9 +107,9 @@ export class UmbWorkspacePropertyLayoutElement extends LitElement {
 				margin-top: var(--uui-size-space-3);
 			}
 			/*@container (width > 600px) {*/
-				#editorColumn {
-					margin-top: 0;
-				}
+			#editorColumn {
+				margin-top: 0;
+			}
 			/*}*/
 		`,
 	];

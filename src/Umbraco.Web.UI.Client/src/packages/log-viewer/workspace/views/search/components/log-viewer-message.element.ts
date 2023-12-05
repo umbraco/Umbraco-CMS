@@ -1,5 +1,5 @@
 import { UmbLogViewerWorkspaceContext, UMB_APP_LOG_VIEWER_CONTEXT_TOKEN } from '../../../logviewer.context.js';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import {
 	css,
 	html,
@@ -95,18 +95,18 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 			label: 'Search Umbraco Source',
 			title: 'Search within Umbraco source code on Github',
 			href: () =>
-				`https://github.com/umbraco/Umbraco-CMS/search?q=${
-					this.properties.find((property) => property.name === 'SourceContext')?.value
-				}`,
+				`https://github.com/umbraco/Umbraco-CMS/search?q=${this.properties.find(
+					(property) => property.name === 'SourceContext',
+				)?.value}`,
 			icon: 'https://github.githubassets.com/favicon.ico',
 		},
 		{
 			label: 'Search Umbraco Issues',
 			title: 'Search Umbraco Issues on Github',
 			href: () =>
-				`https://github.com/umbraco/Umbraco-CMS/issues?q=${
-					this.properties.find((property) => property.name === 'SourceContext')?.value
-				}`,
+				`https://github.com/umbraco/Umbraco-CMS/issues?q=${this.properties.find(
+					(property) => property.name === 'SourceContext',
+				)?.value}`,
 			icon: 'https://github.githubassets.com/favicon.ico',
 		},
 	];
@@ -175,7 +175,7 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 										  </uui-button>`
 										: ''}
 								</div>
-							</li>`
+							</li>`,
 					)}
 				</ul>
 				<umb-button-with-dropdown look="secondary" placement="bottom-start" id="search-button" label="Search">
@@ -193,7 +193,7 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 										<img slot="icon" src="${menuItem.icon}" width="16" height="16" alt="" />
 									</uui-menu-item>
 								</li>
-							`
+							`,
 						)}
 					</ul>
 				</umb-button-with-dropdown>
@@ -253,7 +253,12 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 				border-left: 4px solid #d42054;
 				color: #303033;
 				display: block;
-				font-family: Lato, Helvetica Neue, Helvetica, Arial, sans-serif;
+				font-family:
+					Lato,
+					Helvetica Neue,
+					Helvetica,
+					Arial,
+					sans-serif;
 				line-height: 20px;
 				overflow-x: auto;
 				padding: 9.5px;

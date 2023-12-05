@@ -6,9 +6,9 @@ describe('UmbPropertyEditorUITreePickerStartNodeElement', () => {
 	let element: UmbPropertyEditorUITreePickerStartNodeElement;
 
 	beforeEach(async () => {
-		element = await fixture(
-			html` <umb-property-editor-ui-tree-picker-start-node></umb-property-editor-ui-tree-picker-start-node> `
-		);
+		element = await fixture(html`
+			<umb-property-editor-ui-tree-picker-start-node></umb-property-editor-ui-tree-picker-start-node>
+		`);
 	});
 
 	it('is defined with its own instance', () => {

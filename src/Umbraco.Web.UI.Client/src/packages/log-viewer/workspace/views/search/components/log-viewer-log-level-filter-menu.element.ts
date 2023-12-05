@@ -73,7 +73,7 @@ export class UmbLogViewerLogLevelFilterMenuElement extends UmbLitElement {
 							.value=${logLevel}
 							label="${logLevel}">
 							<umb-log-viewer-level-tag .level=${logLevel}></umb-log-viewer-level-tag>
-						</uui-checkbox>`
+						</uui-checkbox>`,
 				)}
 				<uui-button class="log-level-menu-item" @click=${this.#selectAllLogLevels} label="Select all"
 					>Select all</uui-button

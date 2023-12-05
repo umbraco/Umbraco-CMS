@@ -1,11 +1,11 @@
-import { ROUTER_SLOT_TAG_NAME } from "../config";
-import { IRouterSlot } from "../model";
+import { ROUTER_SLOT_TAG_NAME } from '../config';
+import { IRouterSlot } from '../model';
 
 /**
  * Queries the parent router.
  * @param $elem
  */
-export function queryParentRouterSlot<D = any> ($elem: Element): IRouterSlot<D> | null {
+export function queryParentRouterSlot<D = any>($elem: Element): IRouterSlot<D> | null {
 	return queryParentRoots<IRouterSlot<D>>($elem, ROUTER_SLOT_TAG_NAME);
 }
 
@@ -17,14 +17,12 @@ export function queryParentRouterSlot<D = any> ($elem: Element): IRouterSlot<D> 
  * @param minRoots
  * @param roots
  */
-export function queryParentRoots<T> ($elem: Element, query: string, minRoots: number = 0, roots: number = 0): T | null {
-
+export function queryParentRoots<T>($elem: Element, query: string, minRoots: number = 0, roots: number = 0): T | null {
 	// Grab the rood node and query it
 	const $root = (<any>$elem).getRootNode();
 
 	// If we are at the right level or above we can query!
 	if (roots >= minRoots) {
-
 		// See if there's a match
 		const match = $root.querySelector(query);
 		if (match != null && match != $elem) {

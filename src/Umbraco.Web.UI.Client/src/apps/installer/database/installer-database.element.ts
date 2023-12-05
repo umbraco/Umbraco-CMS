@@ -169,7 +169,7 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 				};
 
 				const { error } = await tryExecute(
-					InstallResource.postInstallValidateDatabase({ requestBody: databaseDetails })
+					InstallResource.postInstallValidateDatabase({ requestBody: databaseDetails }),
 				);
 
 				if (error) {
@@ -199,7 +199,7 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 		this._installerContext.nextStep();
 
 		const { error } = await tryExecute(
-			InstallResource.postInstallSetup({ requestBody: this._installerContext.getData() })
+			InstallResource.postInstallSetup({ requestBody: this._installerContext.getData() }),
 		);
 
 		if (error) {
@@ -243,7 +243,7 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 		}
 
 		result.push(
-			this._renderDatabaseName(this.databaseFormData.name ?? this._selectedDatabase.defaultDatabaseName ?? 'umbraco')
+			this._renderDatabaseName(this.databaseFormData.name ?? this._selectedDatabase.defaultDatabaseName ?? 'umbraco'),
 		);
 
 		if (this._selectedDatabase.requiresCredentials) {
@@ -271,19 +271,20 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 		</uui-form-layout-item>
 	`;
 
-	private _renderDatabaseName = (value: string) => html` <uui-form-layout-item>
-		<uui-label for="database-name" slot="label" required>Database Name</uui-label>
-		<uui-input
-			type="text"
-			.value=${value}
-			id="database-name"
-			name="name"
-			label="Database name"
-			@input=${this._handleChange}
-			placeholder="umbraco"
-			required
-			required-message="Database name is required"></uui-input>
-	</uui-form-layout-item>`;
+	private _renderDatabaseName = (value: string) =>
+		html` <uui-form-layout-item>
+			<uui-label for="database-name" slot="label" required>Database Name</uui-label>
+			<uui-input
+				type="text"
+				.value=${value}
+				id="database-name"
+				name="name"
+				label="Database name"
+				@input=${this._handleChange}
+				placeholder="umbraco"
+				required
+				required-message="Database name is required"></uui-input>
+		</uui-form-layout-item>`;
 
 	private _renderCredentials = () => html`
 		<h2 class="uui-h4">Credentials</h2>

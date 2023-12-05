@@ -29,7 +29,7 @@ export class UmbLanguageItemServerDataSource implements UmbItemDataSource<Langua
 			this.#host,
 			LanguageResource.getLanguageItem({
 				isoCode: isoCodes,
-			})
+			}),
 		);
 	}
 }

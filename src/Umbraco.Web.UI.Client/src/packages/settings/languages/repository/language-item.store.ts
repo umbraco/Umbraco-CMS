@@ -21,7 +21,7 @@ export class UmbLanguageItemStore
 		super(
 			host,
 			UMB_LANGUAGE_ITEM_STORE_CONTEXT_TOKEN.toString(),
-			new UmbArrayState<LanguageResponseModel>([], (x) => x.isoCode)
+			new UmbArrayState<LanguageResponseModel>([], (x) => x.isoCode),
 		);
 	}
 

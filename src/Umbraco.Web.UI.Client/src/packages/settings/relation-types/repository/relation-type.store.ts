@@ -22,7 +22,7 @@ export class UmbRelationTypeStore extends UmbStoreBase {
 		super(
 			host,
 			UMB_RELATION_TYPE_STORE_CONTEXT_TOKEN.toString(),
-			new UmbArrayState<RelationTypeResponseModel>([], (x) => x.id)
+			new UmbArrayState<RelationTypeResponseModel>([], (x) => x.id),
 		);
 	}
 

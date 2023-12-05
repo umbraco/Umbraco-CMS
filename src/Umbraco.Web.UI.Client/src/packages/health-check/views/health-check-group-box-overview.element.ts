@@ -3,7 +3,7 @@ import {
 	UMB_HEALTHCHECK_DASHBOARD_CONTEXT_TOKEN,
 	UmbHealthCheckDashboardContext,
 } from '../health-check-dashboard.context.js';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, nothing, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { ensureSlash, path } from '@umbraco-cms/backoffice/router';
 import type { ManifestHealthCheck } from '@umbraco-cms/backoffice/extension-registry';
@@ -33,10 +33,14 @@ export class UmbHealthCheckGroupBoxOverviewElement extends UmbLitElement {
 			if (!this._healthCheckContext || !this.manifest?.meta.label) return;
 			this._api = this._healthCheckContext?.apis.get(this.manifest?.meta.label);
 
-			if(this._api) {
-				this.observe(this._api.results, (results) => {
-					this._keyResults = results;
-				}, '_observeApiResults');
+			if (this._api) {
+				this.observe(
+					this._api.results,
+					(results) => {
+						this._keyResults = results;
+					},
+					'_observeApiResults',
+				);
 			}
 		});
 	}

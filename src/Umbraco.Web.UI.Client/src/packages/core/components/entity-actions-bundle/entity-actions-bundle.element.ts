@@ -1,5 +1,5 @@
 import { css, html, nothing, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbSectionSidebarContext, UMB_SECTION_SIDEBAR_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/section';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -48,7 +48,7 @@ export class UmbEntityActionsBundleElement extends UmbLitElement {
 			(actions) => {
 				this._hasActions = actions.length > 0;
 			},
-			'umbEntityActionsObserver'
+			'umbEntityActionsObserver',
 		);
 	}
 

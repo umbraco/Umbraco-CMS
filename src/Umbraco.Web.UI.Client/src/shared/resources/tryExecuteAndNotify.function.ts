@@ -6,7 +6,7 @@ import type { UmbNotificationOptions } from '@umbraco-cms/backoffice/notificatio
 export function tryExecuteAndNotify<T>(
 	host: UmbControllerHost,
 	resource: Promise<T>,
-	options?: UmbNotificationOptions
+	options?: UmbNotificationOptions,
 ) {
 	return new UmbResourceController(host, resource).tryExecuteAndNotify<T>(options);
 }

@@ -92,7 +92,7 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 	#props?: Record<string, unknown> = {};
 
 	@property({ type: String, attribute: 'default-element' })
-	public defaultElement?:string;
+	public defaultElement?: string;
 
 	@property()
 	public renderMethod?: (extension: UmbExtensionElementInitializer) => TemplateResult | HTMLElement | null | undefined;
@@ -114,7 +114,7 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 				(extensionControllers) => {
 					this._permittedExts = extensionControllers;
 				},
-				this.defaultElement
+				this.defaultElement,
 			);
 			this.#extensionsController.properties = this.#props;
 		}
@@ -124,7 +124,7 @@ export class UmbExtensionSlotElement extends UmbLitElement {
 		return repeat(
 			this._permittedExts,
 			(ext) => ext.alias,
-			(ext) => (this.renderMethod ? this.renderMethod(ext) : ext.component)
+			(ext) => (this.renderMethod ? this.renderMethod(ext) : ext.component),
 		);
 	}
 

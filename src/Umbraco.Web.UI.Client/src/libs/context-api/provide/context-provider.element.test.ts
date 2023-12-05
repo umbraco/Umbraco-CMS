@@ -25,7 +25,7 @@ describe('UmbContextProvider', () => {
 		element = await fixture(
 			html` <umb-context-provider key="test-context" .value=${contextValue}>
 				<umb-test-context></umb-test-context>
-			</umb-context-provider>`
+			</umb-context-provider>`,
 		);
 		consumer = element.getElementsByTagName('umb-test-context')[0] as unknown as UmbTestContextElement;
 	});

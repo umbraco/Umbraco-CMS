@@ -13,7 +13,6 @@ import { DocumentVariantResponseModel, ContentStateModel } from '@umbraco-cms/ba
 
 @customElement('umb-variant-selector')
 export class UmbVariantSelectorElement extends UmbLitElement {
-
 	@state()
 	_variants: Array<DocumentVariantResponseModel> = [];
 
@@ -21,7 +20,7 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 	@state()
 	_activeVariants: Array<ActiveVariant> = [];
 
-	@property({attribute: false})
+	@property({ attribute: false })
 	public get _activeVariantsCultures(): string[] {
 		return this._activeVariants.map((el) => el.culture ?? '') ?? [];
 	}
@@ -70,7 +69,7 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 						this._variants = variants;
 					}
 				},
-				'_observeVariants'
+				'_observeVariants',
 			);
 		}
 	}
@@ -87,7 +86,7 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 						this._activeVariants = activeVariants;
 					}
 				},
-				'_observeActiveVariants'
+				'_observeActiveVariants',
 			);
 		}
 	}
@@ -105,7 +104,7 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 			(name) => {
 				this._name = name;
 			},
-			'_name'
+			'_name',
 		);
 	}
 
@@ -123,7 +122,11 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 		if (event instanceof UUIInputEvent) {
 			const target = event.composedPath()[0] as UUIInputElement;
 
-			if (typeof target?.value === 'string' && this.#variantContext && isNameablePropertySetContext(this.#variantContext)) {
+			if (
+				typeof target?.value === 'string' &&
+				this.#variantContext &&
+				isNameablePropertySetContext(this.#variantContext)
+			) {
 				this.#variantContext.setName(target.value);
 			}
 		}
@@ -196,33 +199,32 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 									<uui-scroll-container>
 										<ul>
 											${this._variants.map(
-												(variant) =>
-													html`
-														<li class="${this._isVariantActive(variant.culture!) ? 'selected' : ''}">
-															<button
-																class="variant-selector-switch-button
+												(variant) => html`
+													<li class="${this._isVariantActive(variant.culture!) ? 'selected' : ''}">
+														<button
+															class="variant-selector-switch-button
 																${this._isNotPublishedMode(variant.culture!, variant.state!) ? 'add-mode' : ''}"
-																@click=${() => this._switchVariant(variant)}>
-																${this._isNotPublishedMode(variant.culture!, variant.state!)
-																	? html`<uui-icon class="add-icon" name="icon-add"></uui-icon>`
-																	: nothing}
-																<div>
-																	${variant.name} <i>(${variant.culture})</i> ${variant.segment}
-																	<div class="variant-selector-state">${variant.state}</div>
-																</div>
-															</button>
+															@click=${() => this._switchVariant(variant)}>
+															${this._isNotPublishedMode(variant.culture!, variant.state!)
+																? html`<uui-icon class="add-icon" name="icon-add"></uui-icon>`
+																: nothing}
+															<div>
+																${variant.name} <i>(${variant.culture})</i> ${variant.segment}
+																<div class="variant-selector-state">${variant.state}</div>
+															</div>
+														</button>
 
-															${this._isVariantActive(variant.culture!)
-																? nothing
-																: html`
-																		<uui-button
-																			class="variant-selector-split-view"
-																			@click=${() => this._openSplitView(variant)}>
-																			Split view
-																		</uui-button>
-																  `}
-														</li>
-													`
+														${this._isVariantActive(variant.culture!)
+															? nothing
+															: html`
+																	<uui-button
+																		class="variant-selector-split-view"
+																		@click=${() => this._openSplitView(variant)}>
+																		Split view
+																	</uui-button>
+															  `}
+													</li>
+												`,
 											)}
 										</ul>
 									</uui-scroll-container>
@@ -307,7 +309,12 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 				font-size: 14px;
 				cursor: pointer;
 				border-bottom: 1px solid var(--uui-color-divider-standalone);
-				font-family: Lato, Helvetica Neue, Helvetica, Arial, sans-serif;
+				font-family:
+					Lato,
+					Helvetica Neue,
+					Helvetica,
+					Arial,
+					sans-serif;
 			}
 
 			.variant-selector-switch-button:hover {

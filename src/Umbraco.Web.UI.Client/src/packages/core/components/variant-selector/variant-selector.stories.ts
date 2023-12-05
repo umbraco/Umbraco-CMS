@@ -11,6 +11,5 @@ export default meta;
 type Story = StoryObj<UmbVariantSelectorElement>;
 
 export const Overview: Story = {
-	args: {
-	},
+	args: {},
 };

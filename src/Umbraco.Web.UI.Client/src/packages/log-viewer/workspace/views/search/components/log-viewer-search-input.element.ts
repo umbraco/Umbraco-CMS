@@ -1,9 +1,5 @@
 import { UmbLogViewerWorkspaceContext, UMB_APP_LOG_VIEWER_CONTEXT_TOKEN } from '../../../logviewer.context.js';
-import {
-	UUIInputElement,
-	UUIPopoverElement,
-	UUISymbolExpandElement,
-} from '@umbraco-cms/backoffice/external/uui';
+import { UUIInputElement, UUIPopoverElement, UUISymbolExpandElement } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { Subject, debounceTime, tap } from '@umbraco-cms/backoffice/external/rxjs';
 import { SavedLogSearchResponseModel } from '@umbraco-cms/backoffice/backend-api';
@@ -26,7 +22,7 @@ export const UMB_LOG_VIEWER_SAVE_SEARCH_MODAL = new UmbModalToken<UmbContextSave
 	{
 		type: 'dialog',
 		size: 'small',
-	}
+	},
 );
 
 @customElement('umb-log-viewer-search-input')
@@ -70,7 +66,7 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 		this.inputQuery$
 			.pipe(
 				tap(() => (this._showLoader = true)),
-				debounceTime(250)
+				debounceTime(250),
 			)
 			.subscribe((query) => {
 				this.#logViewerContext?.setFilterExpression(query);
@@ -202,7 +198,7 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 									@click=${() => this.#removeSearch(search.name ?? '')}
 									><uui-icon name="icon-trash"></uui-icon
 								></uui-button>
-							</li>`
+							</li>`,
 					)}
 				</uui-scroll-container>
 			</uui-popover>

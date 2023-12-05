@@ -1,15 +1,25 @@
 import { UmbPropertyActionMenuContext } from './property-action-menu.context.js';
-import { css, CSSResultGroup, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
-import { ManifestPropertyAction, ManifestTypes, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import {
+	css,
+	CSSResultGroup,
+	html,
+	customElement,
+	property,
+	state,
+	repeat,
+} from '@umbraco-cms/backoffice/external/lit';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import {
+	ManifestPropertyAction,
+	ManifestTypes,
+	umbExtensionsRegistry,
+} from '@umbraco-cms/backoffice/extension-registry';
 import { UmbExtensionElementInitializer, UmbExtensionsElementInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-property-action-menu')
 export class UmbPropertyActionMenuElement extends UmbLitElement {
-
 	#actionsInitializer?: UmbExtensionsElementInitializer<ManifestTypes, 'propertyAction'>;
-
 
 	@property({ attribute: false })
 	public get value(): unknown {
@@ -17,7 +27,7 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 	}
 	public set value(value: unknown) {
 		this._value = value;
-		if(this.#actionsInitializer) {
+		if (this.#actionsInitializer) {
 			this.#actionsInitializer.properties = { value };
 		}
 	}
@@ -25,11 +35,16 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 
 	@property()
 	set propertyEditorUiAlias(alias: string) {
-
 		// TODO: Align property actions with entity actions.
-		this.#actionsInitializer = new UmbExtensionsElementInitializer(this, umbExtensionsRegistry, 'propertyAction', (propertyAction) => propertyAction.meta.propertyEditors.includes(alias), (ctrls) => {
-			this._actions = ctrls;
-		});
+		this.#actionsInitializer = new UmbExtensionsElementInitializer(
+			this,
+			umbExtensionsRegistry,
+			'propertyAction',
+			(propertyAction) => propertyAction.meta.propertyEditors.includes(alias),
+			(ctrls) => {
+				this._actions = ctrls;
+			},
+		);
 	}
 	@state()
 	private _actions: Array<UmbExtensionElementInitializer<ManifestPropertyAction, any>> = [];
@@ -75,11 +90,7 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 							<uui-symbol-more id="more-symbol"></uui-symbol-more>
 						</uui-button>
 
-						<div slot="popover" id="dropdown">
-							${repeat(this._actions,
-								(action) => action.component
-							)}
-						</div>
+						<div slot="popover" id="dropdown">${repeat(this._actions, (action) => action.component)}</div>
 					</uui-popover>
 			  `
 			: '';

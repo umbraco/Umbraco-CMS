@@ -76,7 +76,7 @@ describe('UmbExtensionSlotElement', () => {
 			element = await fixture(
 				html`<umb-extension-slot
 					type="dashboard"
-					.filter=${(x: ManifestDashboard) => x.alias === 'unit-test-ext-slot-element-manifest'}></umb-extension-slot>`
+					.filter=${(x: ManifestDashboard) => x.alias === 'unit-test-ext-slot-element-manifest'}></umb-extension-slot>`,
 			);
 
 			await sleep(0);
@@ -90,14 +90,14 @@ describe('UmbExtensionSlotElement', () => {
 					type="dashboard"
 					.filter=${(x: ManifestDashboard) => x.alias === 'unit-test-ext-slot-element-manifest'}
 					.renderMethod=${(controller: UmbExtensionElementInitializer) => html`<bla>${controller.component}</bla>`}>
-				</umb-extension-slot>`
+				</umb-extension-slot>`,
 			);
 
 			await sleep(0);
 
 			expect(element.shadowRoot!.firstElementChild?.nodeName).to.be.equal('BLA');
 			expect(element.shadowRoot!.firstElementChild?.firstElementChild).to.be.instanceOf(
-				UmbTestExtensionSlotManifestElement
+				UmbTestExtensionSlotManifestElement,
 			);
 		});
 
@@ -107,7 +107,7 @@ describe('UmbExtensionSlotElement', () => {
 					type="dashboard"
 					.filter=${(x: ManifestDashboard) => x.alias === 'unit-test-ext-slot-element-manifest'}
 					.props=${{ testProp: 'fooBar' }}>
-				</umb-extension-slot>`
+				</umb-extension-slot>`,
 			);
 
 			await sleep(0);

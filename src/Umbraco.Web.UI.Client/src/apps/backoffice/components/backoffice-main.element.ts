@@ -3,9 +3,7 @@ import { css, html, customElement, state } from '@umbraco-cms/backoffice/externa
 import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/section';
 import type { UmbRoute, UmbRouterSlotChangeEvent } from '@umbraco-cms/backoffice/router';
 import type { ManifestSection, UmbSectionElement } from '@umbraco-cms/backoffice/extension-registry';
-import {
-	UmbExtensionManifestInitializer, createExtensionElement
-} from '@umbraco-cms/backoffice/extension-api';
+import { UmbExtensionManifestInitializer, createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-backoffice-main')
@@ -37,7 +35,7 @@ export class UmbBackofficeMainElement extends UmbLitElement {
 					this._sections = sections;
 					this._createRoutes();
 				},
-				'observeAllowedSections'
+				'observeAllowedSections',
 			);
 		}
 	}
@@ -47,21 +45,23 @@ export class UmbBackofficeMainElement extends UmbLitElement {
 		const oldValue = this._routes;
 
 		// TODO: Refactor this for re-use across the app where the routes are re-generated at any time.
-		this._routes = this._sections.filter(x => x.manifest).map((section) => {
-			const existingRoute = this._routes.find((r) => r.alias === section.alias);
-			if (existingRoute) {
-				return existingRoute;
-			} else {
-				return {
-					alias: section.alias,
-					path: this._routePrefix + (section.manifest as ManifestSection).meta.pathname,
-					component: () => createExtensionElement(section.manifest!, 'umb-section-default'),
-					setup: (component) => {
-						(component as UmbSectionElement).manifest = section.manifest as ManifestSection;
-					},
-				};
-			}
-		});
+		this._routes = this._sections
+			.filter((x) => x.manifest)
+			.map((section) => {
+				const existingRoute = this._routes.find((r) => r.alias === section.alias);
+				if (existingRoute) {
+					return existingRoute;
+				} else {
+					return {
+						alias: section.alias,
+						path: this._routePrefix + (section.manifest as ManifestSection).meta.pathname,
+						component: () => createExtensionElement(section.manifest!, 'umb-section-default'),
+						setup: (component) => {
+							(component as UmbSectionElement).manifest = section.manifest as ManifestSection;
+						},
+					};
+				}
+			});
 
 		if (this._sections.length > 0) {
 			this._routes.push({
@@ -79,7 +79,7 @@ export class UmbBackofficeMainElement extends UmbLitElement {
 		const section = this._sections.find((s) => this._routePrefix + (s.manifest as any).meta.pathname === currentPath);
 		if (!section) return;
 		await section.asPromise();
-		if(section.manifest) {
+		if (section.manifest) {
 			this._backofficeContext?.setActiveSectionAlias(section.alias);
 			this._provideSectionContext(section.manifest);
 		}
@@ -105,7 +105,9 @@ export class UmbBackofficeMainElement extends UmbLitElement {
 			:host {
 				background-color: var(--uui-color-background);
 				display: block;
-				height: calc(100% - 60px); // 60 => top header height, TODO: Make sure this comes from somewhere so it is maintainable and eventually responsive.
+				height: calc(
+					100% - 60px
+				); // 60 => top header height, TODO: Make sure this comes from somewhere so it is maintainable and eventually responsive.
 			}
 		`,
 	];

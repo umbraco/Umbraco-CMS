@@ -6,9 +6,9 @@ describe('UmbPropertyEditorUIRadioButtonListElement', () => {
 	let element: UmbPropertyEditorUIRadioButtonListElement;
 
 	beforeEach(async () => {
-		element = await fixture(
-			html` <umb-property-editor-ui-radio-button-list></umb-property-editor-ui-radio-button-list> `
-		);
+		element = await fixture(html`
+			<umb-property-editor-ui-radio-button-list></umb-property-editor-ui-radio-button-list>
+		`);
 	});
 
 	it('is defined with its own instance', () => {
