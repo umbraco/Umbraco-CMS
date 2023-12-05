@@ -113,12 +113,20 @@ internal sealed class SwaggerContentDocumentationFilter : SwaggerDocumentationFi
         {
             { "Default filter", new OpenApiExample { Value = new OpenApiString(string.Empty) } },
             {
-                "Filter by content type",
+                "Filter by content type (equals)",
                 new OpenApiExample { Value = new OpenApiArray { new OpenApiString("contentType:alias1") } }
             },
             {
-                "Filter by name",
+                "Filter by name (contains)",
                 new OpenApiExample { Value = new OpenApiArray { new OpenApiString("name:nodeName") } }
+            },
+            {
+                "Filter by creation date (less than)",
+                new OpenApiExample { Value = new OpenApiArray { new OpenApiString("createDate<2024-01-01") } }
+            },
+            {
+                "Filter by update date (greater than or equal)",
+                new OpenApiExample { Value = new OpenApiArray { new OpenApiString("updateDate>:2023-01-01") } }
             }
         };
 
