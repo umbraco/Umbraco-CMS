@@ -83,12 +83,12 @@ describe('UmbBasicVariantElement', () => {
 			expect(variantElement).to.be.instanceOf(UmbBasicVariantElement);
 		});
 
-		it('property editor gets value', async () => {
+		it('property editor gets value', () => {
 			expect(propertyEditor.alias).to.equal('testAlias');
 			expect(propertyEditor.getValue()).to.equal('testValue');
 		});
 
-		it('property editor sets value on it self', async () => {
+		it('property editor sets value on it self', () => {
 			propertyEditor.setValue('testValue2');
 			expect(propertyEditor.getValue()).to.equal('testValue2');
 		});
