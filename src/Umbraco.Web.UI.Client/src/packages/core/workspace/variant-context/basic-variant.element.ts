@@ -6,6 +6,9 @@ import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 @customElement('umb-basic-variant')
 export class UmbBasicVariantElement extends UmbLitElement {
+	// A take on only firing events when the value is changed from the outside.
+	#silent = false;
+
 	public readonly context: UmbBasicVariantContext;
 
 	@property({ attribute: false })
@@ -13,7 +16,9 @@ export class UmbBasicVariantElement extends UmbLitElement {
 		return this.context.getValues();
 	}
 	public set value(value: Array<UmbPropertyValueData>) {
+		this.#silent = true;
 		this.context.setValues(value);
+		this.#silent = false;
 	}
 
 	@property({ attribute: false })
@@ -21,14 +26,23 @@ export class UmbBasicVariantElement extends UmbLitElement {
 		return this.context.getName();
 	}
 	public set name(value: string | undefined) {
+		this.#silent = true;
 		this.context.setName(value);
+		this.#silent = false;
 	}
 
 	constructor() {
 		super();
 		this.context = new UmbBasicVariantContext(this);
+		this.observe(this.context.name, () => {
+			if (!this.#silent) {
+				this.dispatchEvent(new UmbChangeEvent());
+			}
+		});
 		this.observe(this.context.values, () => {
-			this.dispatchEvent(new UmbChangeEvent());
+			if (!this.#silent) {
+				this.dispatchEvent(new UmbChangeEvent());
+			}
 		});
 	}
 
