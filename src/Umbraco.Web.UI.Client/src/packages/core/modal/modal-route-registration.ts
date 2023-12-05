@@ -138,12 +138,9 @@ export class UmbModalRouteRegistration<UmbModalTokenData extends object = object
 		const modalData = this.#onSetupCallback ? await this.#onSetupCallback(params) : undefined;
 		if (modalData !== false) {
 			this.#modalManagerContext = modalManagerContext.open(this.#modalAlias, {
-				data: {
-					data: modalData?.data,
-					value: modalData?.value,
-					config: this.modalConfig,
-					router,
-				},
+				...modalData,
+				config: this.modalConfig,
+				router,
 			});
 			this.#modalManagerContext.onSubmit().then(this.#onSubmit, this.#onReject);
 			return this.#modalManagerContext;

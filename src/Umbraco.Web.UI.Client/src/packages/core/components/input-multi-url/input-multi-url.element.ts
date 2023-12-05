@@ -74,7 +74,7 @@ export class UmbInputMultiUrlElement extends FormControlMixin(UmbLitElement) {
 	@property({ type: Boolean, attribute: 'hide-anchor' })
 	hideAnchor?: boolean;
 
-	@property()
+	@property({ type: Boolean, attribute: 'ignore-user-start-nodes' })
 	ignoreUserStartNodes?: boolean;
 
 	/**
