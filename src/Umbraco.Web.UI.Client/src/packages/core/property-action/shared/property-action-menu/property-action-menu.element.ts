@@ -1,4 +1,3 @@
-import { UmbPropertyActionMenuContext } from './property-action-menu.context.js';
 import {
 	css,
 	CSSResultGroup,
@@ -7,6 +6,7 @@ import {
 	property,
 	state,
 	repeat,
+	nothing,
 } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import {
@@ -35,6 +35,7 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 
 	@property()
 	set propertyEditorUiAlias(alias: string) {
+		// TODO: Stop using string for 'propertyAction', we need to start using Const.
 		// TODO: Align property actions with entity actions.
 		this.#actionsInitializer = new UmbExtensionsElementInitializer(
 			this,
@@ -49,60 +50,32 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 	@state()
 	private _actions: Array<UmbExtensionElementInitializer<ManifestPropertyAction, any>> = [];
 
-	@state()
-	private _open = false;
-
-	private _propertyActionMenuContext = new UmbPropertyActionMenuContext(this);
-
-	constructor() {
-		super();
-
-		this.observe(this._propertyActionMenuContext.isOpen, (isOpen) => {
-			this._open = isOpen;
-		});
-
-		this.addEventListener('close', (e) => {
-			this._propertyActionMenuContext.close();
-			e.stopPropagation();
-		});
-	}
-
-	private _toggleMenu() {
-		this._propertyActionMenuContext.toggle();
-	}
-
-	private _handleClose(event: CustomEvent) {
-		this._propertyActionMenuContext.close();
-		event.stopPropagation();
-	}
-
 	render() {
 		return this._actions.length > 0
 			? html`
-					<uui-popover id="popover" placement="bottom-start" .open=${this._open} @close="${this._handleClose}">
-						<uui-button
-							id="popover-trigger"
-							slot="trigger"
-							look="secondary"
-							label="More"
-							@click="${this._toggleMenu}"
-							compact>
-							<uui-symbol-more id="more-symbol"></uui-symbol-more>
-						</uui-button>
-
-						<div slot="popover" id="dropdown">${repeat(this._actions, (action) => action.component)}</div>
-					</uui-popover>
+					<uui-button
+						id="popover-trigger"
+						popovertarget="property-action-popover"
+						look="secondary"
+						label="More"
+						compact>
+						<uui-symbol-more id="more-symbol"></uui-symbol-more>
+					</uui-button>
+					<uui-popover-container id="property-action-popover">
+						<umb-popover-layout>
+							<div id="dropdown">${repeat(this._actions, (action) => action.component)}</div>
+						</umb-popover-layout>
+					</uui-popover-container>
 			  `
-			: '';
+			: nothing;
 	}
 
 	static styles: CSSResultGroup = [
 		UmbTextStyles,
 		css`
-			#popover {
-				width: auto;
+			:host {
+				--uui-menu-item-flat-structure: 1;
 			}
-
 			#more-symbol {
 				font-size: 0.6em;
 			}
@@ -112,17 +85,6 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 				--uui-button-padding-bottom-factor: 0.1;
 				--uui-button-height: 18px;
 				--uui-button-border-radius: 6px;
-			}
-
-			#dropdown {
-				background-color: var(--uui-color-surface);
-				border-radius: var(--uui-border-radius);
-				width: 100%;
-				height: 100%;
-				box-sizing: border-box;
-				box-shadow: var(--uui-shadow-depth-3);
-				min-width: 200px;
-				color: var(--uui-color-text);
 			}
 		`,
 	];

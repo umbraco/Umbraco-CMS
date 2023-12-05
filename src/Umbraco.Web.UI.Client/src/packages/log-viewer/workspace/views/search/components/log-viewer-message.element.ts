@@ -178,25 +178,21 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 							</li>`,
 					)}
 				</ul>
-				<umb-button-with-dropdown look="secondary" placement="bottom-start" id="search-button" label="Search">
-					<uui-icon name="icon-search"></uui-icon>Search
-					<ul id="search-menu" slot="dropdown">
-						${this._searchMenuData.map(
-							(menuItem) => html`
-								<li>
-									<uui-menu-item
-										class="search-item"
-										href="${menuItem.href()}"
-										target="_blank"
-										label="${menuItem.label}"
-										title="${menuItem.title}">
-										<img slot="icon" src="${menuItem.icon}" width="16" height="16" alt="" />
-									</uui-menu-item>
-								</li>
-							`,
-						)}
-					</ul>
-				</umb-button-with-dropdown>
+				<umb-dropdown look="secondary" placement="bottom-start" id="search-button" label="Search">
+					<span slot="label"><uui-icon name="icon-search"></uui-icon> Search</span>
+					${this._searchMenuData.map(
+						(menuItem) => html`
+							<uui-menu-item
+								class="search-item"
+								href="${menuItem.href()}"
+								target="_blank"
+								label="${menuItem.label}"
+								title="${menuItem.title}">
+								<img slot="icon" src="${menuItem.icon}" width="16" height="16" alt="" />
+							</uui-menu-item>
+						`,
+					)}
+				</umb-dropdown>
 			</details>
 		`;
 	}
@@ -281,6 +277,10 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 				flex: 1 0 14ch;
 			}
 
+			uui-menu-item {
+				--uui-menu-item-flat-structure: 1;
+			}
+
 			#message {
 				flex: 6 0 14ch;
 				word-break: break-all;
@@ -302,19 +302,6 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 
 			.property-value {
 				flex: 3 0 20ch;
-			}
-
-			#search-menu {
-				margin: 0;
-				padding: 0;
-				margin-top: var(--uui-size-space-3);
-				background-color: var(--uui-color-surface);
-				box-shadow: var(--uui-shadow-depth-3);
-				max-width: 25%;
-			}
-
-			#search-menu > li {
-				padding: 0;
 			}
 
 			.search-item {

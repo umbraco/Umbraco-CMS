@@ -40,6 +40,9 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 	@state()
 	private _variantTitleName?: string;
 
+	@state()
+	private _variantSelectorOpen = false;
+
 	// TODO: make adapt to backoffice locale.
 	private _cultureNames = new Intl.DisplayNames('en', { type: 'language' });
 
@@ -132,25 +135,12 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 		}
 	}
 
-	private _toggleVariantSelector() {
-		this._variantSelectorIsOpen = !this._variantSelectorIsOpen;
-	}
-
-	@state()
-	private _variantSelectorIsOpen = false;
-
-	private _close() {
-		this._variantSelectorIsOpen = false;
-	}
-
 	private _switchVariant(variant: DocumentVariantResponseModel) {
 		this.#splitViewContext?.switchVariant(UmbVariantId.Create(variant));
-		this._close();
 	}
 
 	private _openSplitView(variant: DocumentVariantResponseModel) {
 		this.#splitViewContext?.openSplitView(UmbVariantId.Create(variant));
-		this._close();
 	}
 
 	private _closeSplitView() {
@@ -165,6 +155,10 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 		return state !== ContentStateModel.PUBLISHED && !this._isVariantActive(culture!);
 	}
 
+	#onPopoverToggle(event: any) {
+		this._variantSelectorOpen = event.newState === 'open';
+	}
+
 	render() {
 		return html`
 			<uui-input id="name-input" .value=${this._name} @input="${this._handleInput}">
@@ -172,12 +166,12 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 					this._variants && this._variants.length > 0
 						? html`
 								<uui-button
-									slot="append"
 									id="variant-selector-toggle"
-									@click=${this._toggleVariantSelector}
+									slot="append"
+									popovertarget="variant-selector-popover"
 									title=${ifDefined(this._variantTitleName)}>
 									${this._variantDisplayName}
-									<uui-symbol-expand></uui-symbol-expand>
+									<uui-symbol-expand .open=${this._variantSelectorOpen}></uui-symbol-expand>
 								</uui-button>
 								${this._activeVariants.length > 1
 									? html`
@@ -194,8 +188,8 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 			${
 				this._variants && this._variants.length > 0
 					? html`
-							<uui-popover id="variant-selector-popover" .open=${this._variantSelectorIsOpen} @close=${this._close}>
-								<div id="variant-selector-dropdown" slot="popover">
+							<uui-popover-container id="variant-selector-popover" @toggle=${this.#onPopoverToggle}>
+								<div id="variant-selector-dropdown">
 									<uui-scroll-container>
 										<ul>
 											${this._variants.map(
@@ -203,7 +197,7 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 													<li class="${this._isVariantActive(variant.culture!) ? 'selected' : ''}">
 														<button
 															class="variant-selector-switch-button
-																${this._isNotPublishedMode(variant.culture!, variant.state!) ? 'add-mode' : ''}"
+																	${this._isNotPublishedMode(variant.culture!, variant.state!) ? 'add-mode' : ''}"
 															@click=${() => this._switchVariant(variant)}>
 															${this._isNotPublishedMode(variant.culture!, variant.state!)
 																? html`<uui-icon class="add-icon" name="icon-add"></uui-icon>`
@@ -213,7 +207,6 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 																<div class="variant-selector-state">${variant.state}</div>
 															</div>
 														</button>
-
 														${this._isVariantActive(variant.culture!)
 															? nothing
 															: html`
@@ -229,7 +222,7 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 										</ul>
 									</uui-scroll-container>
 								</div>
-							</uui-popover>
+							</uui-popover-container>
 					  `
 					: nothing
 			}
@@ -246,10 +239,6 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 
 			#variant-selector-toggle {
 				white-space: nowrap;
-			}
-
-			#variant-selector-popover {
-				display: block;
 			}
 
 			#variant-selector-dropdown {

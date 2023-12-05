@@ -1,13 +1,5 @@
 import { type UUIComboboxListElement } from '@umbraco-cms/backoffice/external/uui';
-import {
-	PropertyValueMap,
-	css,
-	html,
-	customElement,
-	property,
-	query,
-	state,
-} from '@umbraco-cms/backoffice/external/lit';
+import { PropertyValueMap, css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import {
 	OperatorModel,
@@ -15,16 +7,9 @@ import {
 	TemplateQueryPropertyTypeModel,
 	TemplateQuerySettingsResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
-import { UmbButtonWithDropdownElement } from '@umbraco-cms/backoffice/components';
 
 @customElement('umb-query-builder-filter')
 export class UmbQueryBuilderFilterElement extends UmbLitElement {
-	@query('#property-alias-dropdown')
-	private _propertyAliasDropdown?: UmbButtonWithDropdownElement;
-
-	@query('#operator-dropdown')
-	private _operatorDropdown?: UmbButtonWithDropdownElement;
-
 	@property({ type: Object, attribute: false })
 	filter: TemplateQueryExecuteFilterPresentationModel = <TemplateQueryExecuteFilterPresentationModel>{};
 
@@ -44,7 +29,6 @@ export class UmbQueryBuilderFilterElement extends UmbLitElement {
 		this.currentPropertyType =
 			this.settings?.properties?.find((p) => p.alias === this.filter.propertyAlias)?.type ?? null;
 		if (oldCurrentPropertyType !== this.currentPropertyType) this.#resetOperator();
-		this._propertyAliasDropdown?.closePopover();
 	};
 
 	#setConstrainValue = (e: Event) => {
@@ -55,7 +39,6 @@ export class UmbQueryBuilderFilterElement extends UmbLitElement {
 	#setOperator = (e: Event) => {
 		const target = e.target as UUIComboboxListElement;
 		this.filter = { ...this.filter, operator: target.value as OperatorModel };
-		this._operatorDropdown?.closePopover();
 	};
 
 	#resetOperator() {
@@ -88,9 +71,9 @@ export class UmbQueryBuilderFilterElement extends UmbLitElement {
 	}
 
 	private _renderOperatorsDropdown() {
-		return html`<umb-button-with-dropdown look="outline" id="operator-dropdown" label="choose operator">
-			${this.filter?.operator ?? ''}
-			<uui-combobox-list slot="dropdown" @change=${this.#setOperator} class="options-list">
+		return html`<umb-dropdown look="outline" id="operator-dropdown" label="choose operator">
+			<span slot="label">${this.filter?.operator ?? ''}</span>
+			<uui-combobox-list @change=${this.#setOperator} class="options-list">
 				${this.settings?.operators
 					?.filter((operator) =>
 						this.currentPropertyType ? operator.applicableTypes?.includes(this.currentPropertyType) : true,
@@ -102,7 +85,7 @@ export class UmbQueryBuilderFilterElement extends UmbLitElement {
 							>`,
 					)}</uui-combobox-list
 			>
-		</umb-button-with-dropdown>`;
+		</umb-dropdown>`;
 	}
 
 	private _renderConstraintValueInput() {
@@ -121,16 +104,16 @@ export class UmbQueryBuilderFilterElement extends UmbLitElement {
 	render() {
 		return html`
 			<span>${this.unremovable ? this.localize.term('template_where') : this.localize.term('template_and')}</span>
-			<umb-button-with-dropdown look="outline" id="property-alias-dropdown" label="Property alias"
-				>${this.filter?.propertyAlias ?? ''}
-				<uui-combobox-list slot="dropdown" @change=${this.#setPropertyAlias} class="options-list">
+			<umb-dropdown look="outline" id="property-alias-dropdown" label="Property alias">
+				<span slot="label">${this.filter?.propertyAlias ?? ''}</span>
+				<uui-combobox-list @change=${this.#setPropertyAlias} class="options-list">
 					${this.settings?.properties?.map(
 						(property) =>
-							html`<uui-combobox-list-option tabindex="0" .value=${property.alias ?? ''}>
-								${property.alias}
-							</uui-combobox-list-option>`,
+							html`<uui-combobox-list-option tabindex="0" .value=${property.alias ?? ''}
+								>${property.alias}</uui-combobox-list-option
+							>`,
 					)}
-				</uui-combobox-list></umb-button-with-dropdown
+				</uui-combobox-list></umb-dropdown
 			>
 			${this.filter?.propertyAlias ? this._renderOperatorsDropdown() : ''}
 			${this.filter?.operator ? this._renderConstraintValueInput() : ''}
@@ -155,14 +138,9 @@ export class UmbQueryBuilderFilterElement extends UmbLitElement {
 				padding: 20px 0;
 			}
 
-			.options-list {
-				min-width: 25ch;
-				background-color: var(--uui-color-surface);
-				box-shadow: var(--uui-shadow-depth-3);
-			}
-
 			uui-combobox-list-option {
 				padding: 8px 20px;
+				margin: 0;
 			}
 		`,
 	];

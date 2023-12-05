@@ -64,7 +64,7 @@ export class UmbLogViewerLogLevelFilterMenuElement extends UmbLitElement {
 
 	#renderLogLevelSelector() {
 		return html`
-			<div slot="dropdown" id="log-level-selector" @change=${this.setLogLevelDebounce}>
+			<div id="log-level-selector" @change=${this.setLogLevelDebounce}>
 				${Object.values(LogLevelModel).map(
 					(logLevel) =>
 						html`<uui-checkbox
@@ -87,13 +87,15 @@ export class UmbLogViewerLogLevelFilterMenuElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<umb-button-with-dropdown label="Select log levels">
-				Log Level:
-				${this._logLevelFilter.length > 0
-					? this._logLevelFilter.map((level) => html`<span class="log-level-button-indicator">${level}</span>`)
-					: 'All'}
+			<umb-dropdown label="Select log levels">
+				<span slot="label">
+					Log Level:
+					${this._logLevelFilter.length > 0
+						? this._logLevelFilter.map((level) => html`<span class="log-level-button-indicator">${level}</span>`)
+						: 'All'}
+				</span>
 				${this.#renderLogLevelSelector()}
-			</umb-button-with-dropdown>
+			</umb-dropdown>
 		`;
 	}
 

@@ -15,26 +15,15 @@ export class UmbLanguageRootTableDeleteColumnLayoutElement extends UmbLitElement
 		this._isOpen = false;
 	}
 
-	#onClick() {
-		this._isOpen = !this._isOpen;
-	}
-
-	#onClose() {
-		this._isOpen = false;
-	}
-
 	render() {
 		// TODO: we need to use conditionals on each action here. But until we have that in place
 		// we'll just remove all actions on the default language.
 		if (this.value.isDefault) return nothing;
 
 		return html`
-			<umb-dropdown .open="${this._isOpen}" @close=${this.#onClose}>
-				<uui-button label="actions" slot="trigger" compact @click=${this.#onClick}>
-					<uui-symbol-more></uui-symbol-more>
-				</uui-button>
+			<umb-dropdown .open=${this._isOpen} compact hide-expand>
+				<uui-symbol-more slot="label"></uui-symbol-more>
 				<umb-entity-action-list
-					slot="dropdown"
 					@action-executed=${this.#onActionExecuted}
 					entity-type="language"
 					unique=${ifDefined(this.value.isoCode)}></umb-entity-action-list>

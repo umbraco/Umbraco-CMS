@@ -4,18 +4,14 @@ import {
 	UmbLogViewerWorkspaceContext,
 	UMB_APP_LOG_VIEWER_CONTEXT_TOKEN,
 } from '../../../logviewer.context.js';
-import { UUIPopoverElement, UUISymbolExpandElement } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbDropdownElement } from '@umbraco-cms/backoffice/components';
 
 @customElement('umb-log-viewer-polling-button')
 export class UmbLogViewerPollingButtonElement extends UmbLitElement {
-	@query('#polling-popover')
-	private _pollingPopover!: UUIPopoverElement;
-
-	@query('#polling-expand-symbol')
-	private _polingExpandSymbol!: UUISymbolExpandElement;
-
+	@query('#polling-rate-dropdown')
+	private dropdownElement?: UmbDropdownElement;
 	@state()
 	private _poolingConfig: PoolingCOnfig = { enabled: false, interval: 0 };
 
@@ -49,55 +45,38 @@ export class UmbLogViewerPollingButtonElement extends UmbLitElement {
 		this.#closePoolingPopover();
 	};
 
-	#openPoolingPopover() {
-		this._pollingPopover.open = true;
-		this._polingExpandSymbol.open = true;
-	}
-
 	#closePoolingPopover() {
-		this._pollingPopover.open = false;
-		this._polingExpandSymbol.open = false;
+		if (this.dropdownElement) {
+			this.dropdownElement.open = false;
+		}
+
 		this.#togglePolling();
 	}
 
 	render() {
-		return html` <uui-button-group>
-			<uui-button label="Start pooling" @click=${this.#togglePolling}
-				>${this._poolingConfig.enabled
-					? html`<uui-icon name="icon-axis-rotation" id="polling-enabled-icon"></uui-icon>Polling
-							${this._poolingConfig.interval / 1000} seconds`
-					: 'Polling'}</uui-button
-			>
-			<uui-popover placement="bottom-end" id="polling-popover" @close=${() => (this._polingExpandSymbol.open = false)}>
-				<uui-button slot="trigger" compact label="Choose pooling time" @click=${this.#openPoolingPopover}>
-					<uui-symbol-expand id="polling-expand-symbol"></uui-symbol-expand>
-				</uui-button>
+		return html`
+			<uui-button-group>
+				<uui-button label="Start pooling" @click=${this.#togglePolling}
+					>${this._poolingConfig.enabled
+						? html`<uui-icon name="icon-axis-rotation" id="polling-enabled-icon"></uui-icon>Polling
+								${this._poolingConfig.interval / 1000} seconds`
+						: 'Polling'}</uui-button
+				>
 
-				<ul id="polling-interval-menu" slot="popover">
+				<umb-dropdown id="polling-rate-dropdown" compact label="Choose pooling time">
 					${this.#pollingIntervals.map(
 						(interval: PoolingInterval) =>
 							html`<uui-menu-item
 								label="Every ${interval / 1000} seconds"
 								@click-label=${() => this.#setPolingInterval(interval)}></uui-menu-item>`,
 					)}
-				</ul>
-			</uui-popover>
-		</uui-button-group>`;
+				</umb-dropdown>
+			</uui-button-group>
+		`;
 	}
 
 	static styles = [
 		css`
-			#polling-interval-menu {
-				margin: 0;
-				padding: 0;
-				width: 20ch;
-				background-color: var(--uui-color-surface);
-				box-shadow: var(--uui-shadow-depth-3);
-				display: flex;
-				flex-direction: column;
-				transform: translateX(calc((100% - 33px) * -1));
-			}
-
 			#polling-enabled-icon {
 				margin-right: var(--uui-size-space-3);
 				margin-bottom: 1px;
