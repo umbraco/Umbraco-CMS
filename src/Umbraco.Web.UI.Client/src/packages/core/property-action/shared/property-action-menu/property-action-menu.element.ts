@@ -1,4 +1,3 @@
-import { UmbPropertyActionMenuContext } from './property-action-menu.context.js';
 import {
 	css,
 	CSSResultGroup,
@@ -50,37 +49,6 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 	@state()
 	private _actions: Array<UmbExtensionElementInitializer<ManifestPropertyAction, any>> = [];
 
-	@state()
-	private _open = false; //TODO: Is this still needed? now that we don't use the old popover anymore?
-
-	//TODO: What is this context used for?
-	//TODO: Is this still needed? now that we don't use the old popover anymore?
-	private _propertyActionMenuContext = new UmbPropertyActionMenuContext(this);
-
-	constructor() {
-		super();
-
-		this.observe(this._propertyActionMenuContext.isOpen, (isOpen) => {
-			this._open = isOpen;
-		});
-
-		this.addEventListener('close', (e) => {
-			this._propertyActionMenuContext.close();
-			e.stopPropagation();
-		});
-	}
-
-	private _toggleMenu() {
-		//TODO: Is this still needed? now that we don't use the old popover anymore?
-		this._propertyActionMenuContext.toggle();
-	}
-
-	private _handleClose(event: CustomEvent) {
-		//TODO: Is this still needed? now that we don't use the old popover anymore?
-		this._propertyActionMenuContext.close();
-		event.stopPropagation();
-	}
-
 	render() {
 		return this._actions.length > 0
 			? html`
@@ -89,7 +57,6 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 						popovertarget="property-action-popover"
 						look="secondary"
 						label="More"
-						@click="${this._toggleMenu}"
 						compact>
 						<uui-symbol-more id="more-symbol"></uui-symbol-more>
 					</uui-button>
