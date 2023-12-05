@@ -2,13 +2,13 @@
   "$schema": "https://json.schemastore.org/dotnetcli.host.json",
   "symbolInfo": {
     "Framework": {
-      "longName": "Framework",
-      "shortName": "F",
+      "longName": "framework",
+      "shortName": "f",
       "isHidden": true
     },
     "UmbracoVersion": {
       "longName": "version",
-      "shortName": "v"
+      "shortName": ""
     },
     "UseHttpsRedirect": {
       "longName": "use-https-redirect",
@@ -53,11 +53,6 @@
     "NoNodesViewPath": {
       "longName": "no-nodes-view-path",
       "shortName": ""
-    },
-    "PackageProjectName": {
-      "longName": "PackageTestSiteName",
-      "shortName": "p",
-      "isHidden": true
     }
   },
   "usageExamples": [

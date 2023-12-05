@@ -23,7 +23,7 @@
       "applicationUrl": "https://localhost:HTTPS_PORT_FROM_TEMPLATE;http://localhost:HTTP_PORT_FROM_TEMPLATE",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
-      }      
+      }
     }
   }
 }
