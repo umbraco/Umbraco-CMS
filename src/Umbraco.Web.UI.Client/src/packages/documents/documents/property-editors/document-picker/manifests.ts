@@ -18,18 +18,6 @@ export const manifest: ManifestPropertyEditorUi = {
 					description: 'Opens the node in a dialog',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
 				},
-				{
-					alias: 'validationLimit',
-					label: 'Amount of Documents',
-					description: 'Require a certain amount of documents',
-					propertyEditorUiAlias: 'Umb.PropertyEditorUi.NumberRange',
-				},
-				{
-					alias: 'ignoreUserStartNodes',
-					label: 'Ignore User Start Nodes',
-					description: 'Selecting this option allows a user to choose nodes that they normally dont have access to',
-					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
-				},
 			],
 		},
 	},
