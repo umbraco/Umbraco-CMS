@@ -62,7 +62,7 @@ export class UmbInstalledPackagesSectionViewItemElement extends UmbLitElement {
 			umbExtensionsRegistry.extensionsOfType('packageView').pipe(
 				map((extensions) => {
 					return extensions.filter((extension) => extension.meta.packageName === this.#name);
-				})
+				}),
 			),
 			(manifests) => {
 				if (manifests.length === 0) {
@@ -71,7 +71,7 @@ export class UmbInstalledPackagesSectionViewItemElement extends UmbLitElement {
 				}
 				this._packageView = manifests[0];
 			},
-			'_observePackageViewExtension'
+			'_observePackageViewExtension',
 		);
 	}
 
@@ -89,7 +89,7 @@ export class UmbInstalledPackagesSectionViewItemElement extends UmbLitElement {
 		this._migrationButtonState = 'waiting';
 		const { error } = await tryExecuteAndNotify(
 			this,
-			PackageResource.postPackageByNameRunMigration({ name: this.name })
+			PackageResource.postPackageByNameRunMigration({ name: this.name }),
 		);
 		if (error) return;
 		this.#notificationContext?.peek('positive', { data: { message: 'Migrations completed' } });

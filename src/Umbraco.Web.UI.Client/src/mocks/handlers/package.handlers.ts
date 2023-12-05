@@ -30,7 +30,7 @@ export const handlers = [
 						packageName: 'Package with a view',
 					},
 				],
-			})
+			}),
 		);
 	}),
 
@@ -47,7 +47,7 @@ export const handlers = [
 			ctx.json<PagedPackageDefinitionResponseModel>({
 				total: packageArray.length,
 				items: packageArray,
-			})
+			}),
 		);
 	}),
 

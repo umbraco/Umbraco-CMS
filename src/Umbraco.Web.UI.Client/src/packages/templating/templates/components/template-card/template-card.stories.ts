@@ -30,11 +30,12 @@ export const LongName: Story = {
 };
 
 export const TemplateCardList: Story = {
-	render: () => html`<div style="display:flex;align-items:stretch; gap:10px; padding:10px">
-		<umb-template-card name="Template with a name" default="true"></umb-template-card>
-		<umb-template-card
-			name="Another template that someone gave a way way too long name without really thinking twice about it"></umb-template-card>
-		<umb-template-card name="Another template"></umb-template-card>
-		<umb-template-card name="Templates really shouldn't have such long names"></umb-template-card>
-	</div>`,
+	render: () =>
+		html`<div style="display:flex;align-items:stretch; gap:10px; padding:10px">
+			<umb-template-card name="Template with a name" default="true"></umb-template-card>
+			<umb-template-card
+				name="Another template that someone gave a way way too long name without really thinking twice about it"></umb-template-card>
+			<umb-template-card name="Another template"></umb-template-card>
+			<umb-template-card name="Templates really shouldn't have such long names"></umb-template-card>
+		</div>`,
 };

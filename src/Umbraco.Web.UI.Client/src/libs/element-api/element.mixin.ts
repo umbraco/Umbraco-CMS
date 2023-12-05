@@ -22,16 +22,19 @@ export declare class UmbElement extends UmbControllerHostElement {
 	observe<T>(
 		source: Observable<T> | { asObservable: () => Observable<T> },
 		callback: ObserverCallback<T>,
-		unique?: string
+		unique?: string,
 	): UmbObserverController<T>;
 	provideContext<
 		BaseType = unknown,
 		ResultType extends BaseType = BaseType,
-		InstanceType extends ResultType = ResultType
-	>(alias: string | UmbContextToken<BaseType, ResultType>, instance: InstanceType): UmbContextProviderController<BaseType, ResultType, InstanceType>;
+		InstanceType extends ResultType = ResultType,
+	>(
+		alias: string | UmbContextToken<BaseType, ResultType>,
+		instance: InstanceType,
+	): UmbContextProviderController<BaseType, ResultType, InstanceType>;
 	consumeContext<BaseType = unknown, ResultType extends BaseType = BaseType>(
 		alias: string | UmbContextToken<BaseType, ResultType>,
-		callback: UmbContextCallback<ResultType>
+		callback: UmbContextCallback<ResultType>,
 	): UmbContextConsumerController<BaseType, ResultType>;
 	/**
 	 * Use the UmbLocalizeController to localize your element.
@@ -65,9 +68,11 @@ export const UmbElementMixin = <T extends HTMLElementConstructor>(superClass: T)
 		provideContext<
 			BaseType = unknown,
 			ResultType extends BaseType = BaseType,
-			InstanceType extends ResultType = ResultType
-		>
-		(alias: string | UmbContextToken<BaseType, ResultType>, instance: InstanceType): UmbContextProviderController<BaseType, ResultType, InstanceType> {
+			InstanceType extends ResultType = ResultType,
+		>(
+			alias: string | UmbContextToken<BaseType, ResultType>,
+			instance: InstanceType,
+		): UmbContextProviderController<BaseType, ResultType, InstanceType> {
 			return new UmbContextProviderController(this, alias, instance);
 		}
 
@@ -80,7 +85,7 @@ export const UmbElementMixin = <T extends HTMLElementConstructor>(superClass: T)
 		 */
 		consumeContext<BaseType = unknown, ResultType extends BaseType = BaseType>(
 			alias: string | UmbContextToken<BaseType, ResultType>,
-			callback: UmbContextCallback<ResultType>
+			callback: UmbContextCallback<ResultType>,
 		): UmbContextConsumerController<BaseType, ResultType> {
 			return new UmbContextConsumerController(this, alias, callback);
 		}

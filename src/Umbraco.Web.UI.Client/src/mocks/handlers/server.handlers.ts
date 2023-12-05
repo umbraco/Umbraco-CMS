@@ -12,7 +12,7 @@ export const serverRunningHandler = rest.get(umbracoPath('/server/status'), (_re
 		ctx.status(200),
 		ctx.json<ServerStatusResponseModel>({
 			serverStatus: RuntimeLevelModel.RUN,
-		})
+		}),
 	);
 });
 
@@ -22,7 +22,7 @@ export const serverMustInstallHandler = rest.get(umbracoPath('/server/status'), 
 		ctx.status(200),
 		ctx.json<ServerStatusResponseModel>({
 			serverStatus: RuntimeLevelModel.INSTALL,
-		})
+		}),
 	);
 });
 
@@ -32,7 +32,7 @@ export const serverMustUpgradeHandler = rest.get(umbracoPath('/server/status'), 
 		ctx.status(200),
 		ctx.json<ServerStatusResponseModel>({
 			serverStatus: RuntimeLevelModel.UPGRADE,
-		})
+		}),
 	);
 });
 
@@ -42,6 +42,6 @@ export const serverVersionHandler = rest.get(umbracoPath('/server/version'), (_r
 		ctx.status(200),
 		ctx.json<VersionResponseModel>({
 			version: '13.0.0',
-		})
+		}),
 	);
 });

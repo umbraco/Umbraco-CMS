@@ -105,7 +105,9 @@ export class UmbDashboardTelemetryElement extends UmbLitElement {
 	render() {
 		return html`
 			<uui-box class="uui-text">
-				<h1 class="uui-h2"><umb-localize key="analytics_consentForAnalytics">Consent for telemetry data</umb-localize></h1>
+				<h1 class="uui-h2">
+					<umb-localize key="analytics_consentForAnalytics">Consent for telemetry data</umb-localize>
+				</h1>
 				<div style="max-width:75ch">
 					<umb-localize key="analytics_analyticsDescription"></umb-localize>
 					${this._renderSettingSlider()}

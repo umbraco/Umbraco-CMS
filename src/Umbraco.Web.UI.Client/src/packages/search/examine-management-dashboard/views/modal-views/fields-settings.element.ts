@@ -8,10 +8,10 @@ import {
 import { ManifestModal, UmbModalExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-examine-fields-settings-modal')
-export default class UmbExamineFieldsSettingsModalElement extends UmbModalBaseElement<
-	UmbExamineFieldsSettingsModalData,
-	UmbExamineFieldsSettingsModalValue
-> implements UmbModalExtensionElement<any, any, ManifestModal>{
+export default class UmbExamineFieldsSettingsModalElement
+	extends UmbModalBaseElement<UmbExamineFieldsSettingsModalData, UmbExamineFieldsSettingsModalValue>
+	implements UmbModalExtensionElement<any, any, ManifestModal>
+{
 	@state()
 	private _fields?: UmbExamineFieldsSettingsModalData;
 

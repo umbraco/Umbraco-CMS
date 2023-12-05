@@ -265,7 +265,7 @@ export class UmbSorterController<T> implements UmbController {
 			throw new Error(
 				'Could not find drag element, query was made with the `draggableSelector` of "' +
 					this.#config.draggableSelector +
-					'"'
+					'"',
 			);
 			return;
 		}
@@ -446,7 +446,7 @@ export class UmbSorterController<T> implements UmbController {
 		const orderedContainerElements = Array.from(
 			this.#currentContainerElement.shadowRoot
 				? this.#currentContainerElement.shadowRoot.querySelectorAll(this.#config.itemSelector)
-				: this.#currentContainerElement.querySelectorAll(this.#config.itemSelector)
+				: this.#currentContainerElement.querySelectorAll(this.#config.itemSelector),
 		);
 
 		const currentContainerRect = this.#currentContainerElement.getBoundingClientRect();
@@ -510,7 +510,7 @@ export class UmbSorterController<T> implements UmbController {
 					const subBoundaryRect = subBoundaryElement.getBoundingClientRect();
 
 					const subContainerHasItems = subLayoutEl.querySelector(
-						this.#config.itemSelector + ':not(.' + this.#config.placeholderClass + ')'
+						this.#config.itemSelector + ':not(.' + this.#config.placeholderClass + ')',
 					);
 					// gather elements on the same row.
 					const subOffsetEdge = subContainerHasItems ? -10 : 20;

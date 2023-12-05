@@ -6,11 +6,9 @@ describe('UmbPropertyEditorUIBlockGridStylesheetPickerElement', () => {
 	let element: UmbPropertyEditorUIBlockGridStylesheetPickerElement;
 
 	beforeEach(async () => {
-		element = await fixture(
-			html`
-				<umb-property-editor-ui-block-grid-stylesheet-picker></umb-property-editor-ui-block-grid-stylesheet-picker>
-			`
-		);
+		element = await fixture(html`
+			<umb-property-editor-ui-block-grid-stylesheet-picker></umb-property-editor-ui-block-grid-stylesheet-picker>
+		`);
 	});
 
 	it('is defined with its own instance', () => {

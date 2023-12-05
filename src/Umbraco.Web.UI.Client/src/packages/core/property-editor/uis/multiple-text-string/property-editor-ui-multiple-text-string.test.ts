@@ -6,9 +6,9 @@ describe('UmbPropertyEditorUIMultipleTextStringElement', () => {
 	let element: UmbPropertyEditorUIMultipleTextStringElement;
 
 	beforeEach(async () => {
-		element = await fixture(
-			html` <umb-property-editor-ui-multiple-text-string></umb-property-editor-ui-multiple-text-string> `
-		);
+		element = await fixture(html`
+			<umb-property-editor-ui-multiple-text-string></umb-property-editor-ui-multiple-text-string>
+		`);
 	});
 
 	it('is defined with its own instance', () => {

@@ -19,8 +19,8 @@ export class UmbPropertyActionCopyElement extends UmbLitElement implements UmbPr
 		super();
 
 		//this.consumeContext(UMB_WORKSPACE_PROPERTY_CONTEXT_TOKEN, (property) => {
-			//console.log('Got a reference to the editor element', property.getEditor());
-			// Be aware that the element might switch, so using the direct reference is not recommended, instead observe the .element Observable()
+		//console.log('Got a reference to the editor element', property.getEditor());
+		// Be aware that the element might switch, so using the direct reference is not recommended, instead observe the .element Observable()
 		//});
 
 		this.consumeContext(UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {

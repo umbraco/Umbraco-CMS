@@ -19,7 +19,7 @@ export class UmbDashboardHealthCheckActionElement extends UmbLitElement {
 		this._buttonState = 'waiting';
 		const { error } = await tryExecuteAndNotify(
 			this,
-			HealthCheckResource.postHealthCheckExecuteAction({ requestBody: this.action })
+			HealthCheckResource.postHealthCheckExecuteAction({ requestBody: this.action }),
 		);
 
 		if (error) {

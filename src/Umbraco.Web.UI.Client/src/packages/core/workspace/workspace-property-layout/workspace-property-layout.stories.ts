@@ -10,11 +10,10 @@ export default {
 	id: 'umb-workspace-property-layout',
 } as Meta;
 
-export const AAAOverview: Story<UmbWorkspacePropertyLayoutElement> = () => html` <umb-workspace-property-layout
-	label="Label"
-	description="Description">
-	<div slot="property-action-menu"><uui-button color="" look="placeholder">Menu</uui-button></div>
+export const AAAOverview: Story<UmbWorkspacePropertyLayoutElement> = () =>
+	html` <umb-workspace-property-layout label="Label" description="Description">
+		<div slot="property-action-menu"><uui-button color="" look="placeholder">Menu</uui-button></div>
 
-	<div slot="editor"><uui-button color="" look="placeholder">Editor</uui-button></div>
-</umb-workspace-property-layout>`;
+		<div slot="editor"><uui-button color="" look="placeholder">Editor</uui-button></div>
+	</umb-workspace-property-layout>`;
 AAAOverview.storyName = 'Overview';

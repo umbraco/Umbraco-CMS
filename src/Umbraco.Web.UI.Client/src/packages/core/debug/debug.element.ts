@@ -1,4 +1,4 @@
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import {
 	css,
 	html,
@@ -60,7 +60,7 @@ export class UmbDebugElement extends UmbLitElement {
 				// Massage the data into a simplier array of objects
 				// From a function in the context-api '
 				this.contextData = contextData(contexts);
-			})
+			}),
 		);
 	}
 
@@ -118,7 +118,7 @@ export class UmbDebugElement extends UmbLitElement {
 					<ul>
 						${this._renderInstance(contextData.data)}
 					</ul>
-				</li>`
+				</li>`,
 			);
 		});
 
@@ -132,16 +132,14 @@ export class UmbDebugElement extends UmbLitElement {
 			return instanceTemplates.push(html`<li>Callable Function</li>`);
 		} else if (instance.type === 'object') {
 			if (instance.methods?.length) {
-				instanceTemplates.push(
-					html`
-						<li>
-							<strong>Methods</strong>
-							<ul>
-								${instance.methods?.map((methodName) => html`<li>${methodName}</li>`)}
-							</ul>
-						</li>
-					`
-				);
+				instanceTemplates.push(html`
+					<li>
+						<strong>Methods</strong>
+						<ul>
+							${instance.methods?.map((methodName) => html`<li>${methodName}</li>`)}
+						</ul>
+					</li>
+				`);
 			}
 
 			const props: TemplateResult[] = [];

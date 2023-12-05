@@ -13,8 +13,7 @@ export default {
 	id: 'umb-icon-picker-modal',
 } as Meta;
 
-const data: UmbIconPickerModalData = {
-};
+const data: UmbIconPickerModalData = {};
 
 const value: UmbIconPickerModalValue = {
 	color: undefined,

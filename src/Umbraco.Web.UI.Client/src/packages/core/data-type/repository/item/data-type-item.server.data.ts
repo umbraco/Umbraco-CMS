@@ -33,7 +33,7 @@ export class UmbDataTypeItemServerDataSource implements UmbItemDataSource<DataTy
 			this.#host,
 			DataTypeResource.getDataTypeItem({
 				id: ids,
-			})
+			}),
 		);
 	}
 }

@@ -1,4 +1,4 @@
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, CSSResultGroup, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import {
 	UmbNotificationHandler,
@@ -38,7 +38,7 @@ export class UmbBackofficeNotificationContainerElement extends UmbLitElement {
 					? repeat(
 							this._notifications,
 							(notification: UmbNotificationHandler) => notification.key,
-							(notification) => html`${notification.element}`
+							(notification) => html`${notification.element}`,
 					  )
 					: ''}
 			</uui-toast-notification-container>

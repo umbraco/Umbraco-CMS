@@ -70,7 +70,7 @@ export class UmbPackagesCreatedOverviewElement extends UmbLitElement {
 				${repeat(
 					this._createdPackages,
 					(item) => item.id,
-					(item) => this.#renderPackageItem(item)
+					(item) => this.#renderPackageItem(item),
 				)}
 			</uui-ref-list>
 		</uui-box>`;

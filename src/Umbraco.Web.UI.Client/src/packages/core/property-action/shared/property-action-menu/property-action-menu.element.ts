@@ -35,7 +35,7 @@ export class UmbPropertyActionMenuElement extends UmbLitElement {
 
 	@property()
 	set propertyEditorUiAlias(alias: string) {
-		// TODO: Stop using string for 'propertyAction', we need to start using Consts.
+		// TODO: Stop using string for 'propertyAction', we need to start using Const.
 		// TODO: Align property actions with entity actions.
 		this.#actionsInitializer = new UmbExtensionsElementInitializer(
 			this,

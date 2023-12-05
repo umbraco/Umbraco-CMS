@@ -48,7 +48,7 @@ describe('UmbExtensionElementController', () => {
 							extensionController.destroy();
 						}
 					}
-				}
+				},
 			);
 		});
 
@@ -75,7 +75,7 @@ describe('UmbExtensionElementController', () => {
 						}
 					}
 				},
-				'umb-test-fallback-element'
+				'umb-test-fallback-element',
 			);
 		});
 	});
@@ -143,7 +143,7 @@ describe('UmbExtensionElementController', () => {
 						done();
 						extensionController.destroy(); // need to destroy the controller.
 					}
-				}
+				},
 			);
 		});
 	});

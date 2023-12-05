@@ -10,8 +10,6 @@ import { UmbIconPickerModalData, UmbIconPickerModalValue, UmbModalBaseElement } 
 // TODO: to prevent element extension we need to move the Picker logic into a separate class we can reuse across all pickers
 @customElement('umb-icon-picker-modal')
 export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPickerModalData, UmbIconPickerModalValue> {
-
-
 	private _iconList = icons.filter((icon) => !icon.legacy);
 
 	@state()
@@ -19,26 +17,26 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 
 	@state()
 	private _colorList = [
-		{alias:'text', varName:'--uui-color-text'},
-		{alias:'yellow', varName:'--uui-palette-sunglow'},
-		{alias:'pink', varName:'--uui-palette-spanish-pink'},
-		{alias:'dark', varName:'--uui-palette-gunmetal'},
-		{alias:'darkblue', varName:'--uui-palette-space-cadet'},
-		{alias:'blue', varName:'--uui-palette-violet-blue'},
-		{alias:'red', varName:'--uui-palette-maroon-flush'},
-		{alias:'green', varName:'--uui-palette-jungle-green'},
-		{alias:'brown', varName:'--uui-palette-chamoisee'},
+		{ alias: 'text', varName: '--uui-color-text' },
+		{ alias: 'yellow', varName: '--uui-palette-sunglow' },
+		{ alias: 'pink', varName: '--uui-palette-spanish-pink' },
+		{ alias: 'dark', varName: '--uui-palette-gunmetal' },
+		{ alias: 'darkblue', varName: '--uui-palette-space-cadet' },
+		{ alias: 'blue', varName: '--uui-palette-violet-blue' },
+		{ alias: 'red', varName: '--uui-palette-maroon-flush' },
+		{ alias: 'green', varName: '--uui-palette-jungle-green' },
+		{ alias: 'brown', varName: '--uui-palette-chamoisee' },
 	];
 
 	@state()
-	_modalValue?:UmbIconPickerModalValue;
+	_modalValue?: UmbIconPickerModalValue;
 
 	@state()
 	_currentColorVarName = '--uui-color-text';
 
 	#changeIcon(e: { target: HTMLInputElement; type: any; key: unknown }) {
 		if (e.type == 'click' || (e.type == 'keyup' && e.key == 'Enter')) {
-			this.modalContext?.updateValue({icon: e.target.id});
+			this.modalContext?.updateValue({ icon: e.target.id });
 		}
 	}
 
@@ -60,18 +58,23 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 	}
 
 	#onColorChange(e: UUIColorSwatchesEvent) {
-		this.modalContext?.updateValue({icon: e.target.value});
+		this.modalContext?.updateValue({ icon: e.target.value });
 	}
 
 	connectedCallback() {
 		super.connectedCallback();
 		this._iconListFiltered = this._iconList;
 
-		if(this.modalContext) {
-			this.observe(this.modalContext?.value, (newValue) => {
-				this._modalValue = newValue;
-				this._currentColorVarName = this._colorList.find(x => x.alias === newValue?.color)?.alias ?? this._colorList[0].varName;
-			}, '_observeModalContextValue');
+		if (this.modalContext) {
+			this.observe(
+				this.modalContext?.value,
+				(newValue) => {
+					this._modalValue = newValue;
+					this._currentColorVarName =
+						this._colorList.find((x) => x.alias === newValue?.color)?.alias ?? this._colorList[0].varName;
+				},
+				'_observeModalContextValue',
+			);
 		}
 	}
 
@@ -88,10 +91,15 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 						${
 							// TODO: Missing translation for the color aliases.
 							this._colorList.map(
-							(color) => html`
-								<uui-color-swatch label="${color.alias}" title="${color.alias}" value=${color.alias} style="--uui-swatch-color: var(${color.varName})"></uui-color-swatch>
-							`,
-						)}
+								(color) => html`
+									<uui-color-swatch
+										label="${color.alias}"
+										title="${color.alias}"
+										value=${color.alias}
+										style="--uui-swatch-color: var(${color.varName})"></uui-color-swatch>
+								`,
+							)
+						}
 					</uui-color-swatches>
 					<hr />
 					<uui-scroll-container id="icon-selection">${this.renderIconSelection()}</uui-scroll-container>
@@ -116,7 +124,8 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 	}
 
 	renderIconSelection() {
-		return repeat(this._iconListFiltered,
+		return repeat(
+			this._iconListFiltered,
 			(icon) => icon.name,
 			(icon) => html`
 				<uui-icon
@@ -130,7 +139,7 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 					@click="${this.#changeIcon}"
 					@keyup="${this.#changeIcon}">
 				</uui-icon>
-			`
+			`,
 		);
 	}
 
