@@ -4,86 +4,48 @@ using System.Net.Http.Json;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Controllers.DataType;
 using Umbraco.Cms.Api.Management.ViewModels.DataType;
-using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.DataType;
 
 [TestFixture]
-public class CreateDataTypeControllerTests : ManagementApiTest<CreateDataTypeController>
+public class CreateDataTypeControllerTests : ManagementApiUserGroupTestBase<CreateDataTypeController>
 {
     protected override Expression<Func<CreateDataTypeController, object>> MethodSelector =>
         x => x.Create(null);
 
-    private readonly List<HttpStatusCode> _authenticatedStatusCodes = new List<HttpStatusCode>
-        {
-            HttpStatusCode.Created,
-            HttpStatusCode.BadRequest,
-            HttpStatusCode.NotFound
-        };
-
-    [Test]
-    public virtual async Task As_Admin_I_Have_Access()
+    protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
-        var response = await SendCreateDataTypeRequestAsync("admin@umbraco.com", "1234567890", Constants.Security.AdminGroupKey);
+        ExpectedStatusCode = HttpStatusCode.Created
+    };
 
-        Assert.Contains(response.StatusCode, _authenticatedStatusCodes, await response.Content.ReadAsStringAsync());
-    }
-
-    [Test]
-    public virtual async Task As_Editor_I_Have_Access()
+    protected override UserGroupAssertionModel EditorUserGroupAssertionModel => new()
     {
-        var response = await SendCreateDataTypeRequestAsync("editor@umbraco.com", "1234567890", Constants.Security.EditorGroupKey);
+        ExpectedStatusCode = HttpStatusCode.Created
+    };
 
-        Assert.Contains(response.StatusCode, _authenticatedStatusCodes, await response.Content.ReadAsStringAsync());
-    }
-
-    [Test]
-    public virtual async Task As_Sensitive_Data_I_Have_No_Access()
+    protected override UserGroupAssertionModel SensitiveDataUserGroupAssertionModel => new()
     {
-        var response = await SendCreateDataTypeRequestAsync("sensitiveData@umbraco.com", "1234567890", Constants.Security.SensitiveDataGroupKey);
+        ExpectedStatusCode = HttpStatusCode.Forbidden,
+    };
 
-        Assert.AreEqual(HttpStatusCode.Forbidden, response.StatusCode, await response.Content.ReadAsStringAsync());
-    }
-
-    [Test]
-    public virtual async Task As_Translator_I_Have_No_Access()
+    protected override UserGroupAssertionModel TranslatorUserGroupAssertionModel => new()
     {
-        var response = await SendCreateDataTypeRequestAsync("translator@umbraco.com", "1234567890", Constants.Security.TranslatorGroupKey);
+        ExpectedStatusCode = HttpStatusCode.Forbidden
+    };
 
-        Assert.AreEqual(HttpStatusCode.Forbidden, response.StatusCode, await response.Content.ReadAsStringAsync());
-    }
-
-    [Test]
-    public virtual async Task As_Writer_I_Have_Access()
+    protected override UserGroupAssertionModel WriterUserGroupAssertionModel => new()
     {
-        var response = await SendCreateDataTypeRequestAsync("writer@umbraco.com", "1234567890", Constants.Security.WriterGroupKey);
+        ExpectedStatusCode = HttpStatusCode.Created
+    };
 
-        Assert.Contains(response.StatusCode, _authenticatedStatusCodes, await response.Content.ReadAsStringAsync());
-    }
-
-
-    [Test]
-    public virtual async Task Unauthorized_When_No_Token_Is_Provided()
+    protected override UserGroupAssertionModel UnauthorizedUserGroupAssertionModel => new()
     {
-        var createDataTypeModel = GenerateCreateDataTypeRequestModel();
+        ExpectedStatusCode = HttpStatusCode.Unauthorized
+    };
 
-        var response = await Client.PostAsync(Url, JsonContent.Create(createDataTypeModel));
-
-        Assert.AreEqual(HttpStatusCode.Unauthorized, response.StatusCode, await response.Content.ReadAsStringAsync());
-    }
-
-    private async Task<HttpResponseMessage> SendCreateDataTypeRequestAsync(string userEmail, string userPassword, Guid userGroupKey)
+    protected override async Task<HttpResponseMessage> ClientRequest()
     {
-        await AuthenticateClientAsync(Client, userEmail, userPassword, userGroupKey);
-
-        var createDataTypeModel = GenerateCreateDataTypeRequestModel();
-
-        return await Client.PostAsync(Url, JsonContent.Create(createDataTypeModel));
-    }
-
-    private CreateDataTypeRequestModel GenerateCreateDataTypeRequestModel()
-    {
-        return new CreateDataTypeRequestModel
+        CreateDataTypeRequestModel createDataTypeRequestModel = new()
         {
             Id = Guid.NewGuid(),
             ParentId = null,
@@ -99,6 +61,7 @@ public class CreateDataTypeControllerTests : ManagementApiTest<CreateDataTypeCon
                 }
             }
         };
-    }
 
+        return await Client.PostAsync(Url, JsonContent.Create(createDataTypeRequestModel));
+    }
 }

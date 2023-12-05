@@ -4,88 +4,61 @@ using System.Net.Http.Json;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Controllers.DataType;
 using Umbraco.Cms.Api.Management.ViewModels.DataType;
-using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.DataType;
 
 [TestFixture]
-public class CopyDataTypeControllerTests : ManagementApiTest<CopyDataTypeController>
+public class CopyDataTypeControllerTests : DataTypeTestBase<CopyDataTypeController>
 {
+    private Guid _dataTypeId;
+
+    private Guid _targetId;
+
     protected override Expression<Func<CopyDataTypeController, object>> MethodSelector =>
-        x => x.Copy(Guid.NewGuid(), null);
+        x => x.Copy(_dataTypeId, null);
 
-    private readonly List<HttpStatusCode> _authenticatedStatusCodes = new List<HttpStatusCode>
-        {
-            HttpStatusCode.Created,
-            HttpStatusCode.NotFound
-        };
-
-    [Test]
-    public virtual async Task As_Admin_I_Have_Access()
+    [SetUp]
+    public void Setup()
     {
-        var response = await SendCopyDataTypeRequestAsync("admin@umbraco.com", "1234567890", Constants.Security.AdminGroupKey);
-
-        Assert.Contains(response.StatusCode, _authenticatedStatusCodes, await response.Content.ReadAsStringAsync());
+        _dataTypeId = CreateDataType();
+        _targetId = CreateDataTypeFolder();
     }
 
-    [Test]
-    public virtual async Task As_Editor_I_Have_Access()
+    protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
-        var response = await SendCopyDataTypeRequestAsync("editor@umbraco.com", "1234567890", Constants.Security.EditorGroupKey);
+        ExpectedStatusCode = HttpStatusCode.Created
+    };
 
-        Assert.Contains(response.StatusCode, _authenticatedStatusCodes, await response.Content.ReadAsStringAsync());
-    }
-
-    [Test]
-    public virtual async Task As_Sensitive_Data_I_Have_No_Access()
+    protected override UserGroupAssertionModel EditorUserGroupAssertionModel => new()
     {
-        var response = await SendCopyDataTypeRequestAsync("sensitiveData@umbraco.com", "1234567890", Constants.Security.SensitiveDataGroupKey);
+        ExpectedStatusCode = HttpStatusCode.Created
+    };
 
-        Assert.AreEqual(HttpStatusCode.Forbidden, response.StatusCode, await response.Content.ReadAsStringAsync());
-    }
-
-    [Test]
-    public virtual async Task As_Translator_I_Have_No_Access()
+    protected override UserGroupAssertionModel SensitiveDataUserGroupAssertionModel => new()
     {
-        var response = await SendCopyDataTypeRequestAsync("translator@umbraco.com", "1234567890", Constants.Security.TranslatorGroupKey);
+        ExpectedStatusCode = HttpStatusCode.Forbidden,
+    };
 
-        Assert.AreEqual(HttpStatusCode.Forbidden, response.StatusCode, await response.Content.ReadAsStringAsync());
-    }
-
-    [Test]
-    public virtual async Task As_Writer_I_Have_Access()
+    protected override UserGroupAssertionModel TranslatorUserGroupAssertionModel => new()
     {
-        var response = await SendCopyDataTypeRequestAsync("writer@umbraco.com", "1234567890", Constants.Security.WriterGroupKey);
+        ExpectedStatusCode = HttpStatusCode.Forbidden
+    };
 
-        Assert.Contains(response.StatusCode, _authenticatedStatusCodes, await response.Content.ReadAsStringAsync());
-    }
-
-
-    [Test]
-    public virtual async Task Unauthorized_When_No_Token_Is_Provided()
+    protected override UserGroupAssertionModel WriterUserGroupAssertionModel => new()
     {
-        var copyDataTypeModel = GenerateCopyDataTypeRequestModel();
+        ExpectedStatusCode = HttpStatusCode.Created
+    };
 
-        var response = await Client.PostAsync(Url, JsonContent.Create(copyDataTypeModel));
-
-        Assert.AreEqual(HttpStatusCode.Unauthorized, response.StatusCode, await response.Content.ReadAsStringAsync());
-    }
-
-    private async Task<HttpResponseMessage> SendCopyDataTypeRequestAsync(string userEmail, string userPassword, Guid userGroupKey)
+    protected override UserGroupAssertionModel UnauthorizedUserGroupAssertionModel => new()
     {
-        await AuthenticateClientAsync(Client, userEmail, userPassword, userGroupKey);
+        ExpectedStatusCode = HttpStatusCode.Unauthorized
+    };
 
-        var copyDataTypeModel = GenerateCopyDataTypeRequestModel();
-
-        return await Client.PostAsync(Url, JsonContent.Create(copyDataTypeModel));
-    }
-
-    private CopyDataTypeRequestModel GenerateCopyDataTypeRequestModel()
+    protected override async Task<HttpResponseMessage> ClientRequest()
     {
-        return new CopyDataTypeRequestModel
-        {
-            TargetId = Guid.NewGuid()
-        };
-    }
+        CopyDataTypeRequestModel copyDataTypeRequestModel =
+            new() { TargetId = _targetId };
 
+        return await Client.PostAsync(Url, JsonContent.Create(copyDataTypeRequestModel));
+    }
 }

@@ -4,88 +4,62 @@ using System.Net.Http.Json;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Controllers.DataType;
 using Umbraco.Cms.Api.Management.ViewModels.DataType;
-using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.DataType;
 
 [TestFixture]
-public class MoveDataTypeControllerTests : ManagementApiTest<MoveDataTypeController>
+public class MoveDataTypeControllerTests : DataTypeTestBase<MoveDataTypeController>
 {
+    private Guid _dataTypeId;
+
+    private Guid _targetId;
+
     protected override Expression<Func<MoveDataTypeController, object>> MethodSelector =>
-        x => x.Move(Guid.NewGuid(), null);
+        x => x.Move(_dataTypeId, null);
 
-    private readonly List<HttpStatusCode> _authenticatedStatusCodes = new List<HttpStatusCode>
-        {
-            HttpStatusCode.OK,
-            HttpStatusCode.NotFound
-        };
-
-    [Test]
-    public virtual async Task As_Admin_I_Have_Access()
+    [SetUp]
+    public void Setup()
     {
-        var response = await SendMoveDataTypeRequestAsync("admin@umbraco.com", "1234567890", Constants.Security.AdminGroupKey);
-
-        Assert.Contains(response.StatusCode, _authenticatedStatusCodes, await response.Content.ReadAsStringAsync());
-    }
-
-    [Test]
-    public virtual async Task As_Editor_I_Have_Access()
-    {
-        var response = await SendMoveDataTypeRequestAsync("editor@umbraco.com", "1234567890", Constants.Security.EditorGroupKey);
-
-        Assert.Contains(response.StatusCode, _authenticatedStatusCodes, await response.Content.ReadAsStringAsync());
-    }
-
-    [Test]
-    public virtual async Task As_Sensitive_Data_I_Have_No_Access()
-    {
-        var response = await SendMoveDataTypeRequestAsync("sensitiveData@umbraco.com", "1234567890", Constants.Security.SensitiveDataGroupKey);
-
-        Assert.AreEqual(HttpStatusCode.Forbidden, response.StatusCode, await response.Content.ReadAsStringAsync());
-    }
-
-    [Test]
-    public virtual async Task As_Translator_I_Have_No_Access()
-    {
-        var response = await SendMoveDataTypeRequestAsync("translator@umbraco.com", "1234567890", Constants.Security.TranslatorGroupKey);
-
-        Assert.AreEqual(HttpStatusCode.Forbidden, response.StatusCode, await response.Content.ReadAsStringAsync());
-    }
-
-    [Test]
-    public virtual async Task As_Writer_I_Have_Access()
-    {
-        var response = await SendMoveDataTypeRequestAsync("writer@umbraco.com", "1234567890", Constants.Security.WriterGroupKey);
-
-        Assert.Contains(response.StatusCode, _authenticatedStatusCodes, await response.Content.ReadAsStringAsync());
+        _dataTypeId = CreateDataType();
+        _targetId = CreateDataTypeFolder();
     }
 
 
-    [Test]
-    public virtual async Task Unauthorized_When_No_Token_Is_Provided()
+    protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
-        var moveDataTypeModel = GenerateMoveDataTypeRequestModel();
+        ExpectedStatusCode = HttpStatusCode.OK
+    };
 
-        var response = await Client.PostAsync(Url, JsonContent.Create(moveDataTypeModel));
-
-        Assert.AreEqual(HttpStatusCode.Unauthorized, response.StatusCode, await response.Content.ReadAsStringAsync());
-    }
-
-    private async Task<HttpResponseMessage> SendMoveDataTypeRequestAsync(string userEmail, string userPassword, Guid userGroupKey)
+    protected override UserGroupAssertionModel EditorUserGroupAssertionModel => new()
     {
-        await AuthenticateClientAsync(Client, userEmail, userPassword, userGroupKey);
+        ExpectedStatusCode = HttpStatusCode.OK
+    };
 
-        var moveDataTypeModel = GenerateMoveDataTypeRequestModel();
-
-        return await Client.PostAsync(Url, JsonContent.Create(moveDataTypeModel));
-    }
-
-    private MoveDataTypeRequestModel GenerateMoveDataTypeRequestModel()
+    protected override UserGroupAssertionModel SensitiveDataUserGroupAssertionModel => new()
     {
-        return new MoveDataTypeRequestModel
-        {
-            TargetId = Guid.NewGuid()
-        };
-    }
+        ExpectedStatusCode = HttpStatusCode.Forbidden,
+    };
 
+    protected override UserGroupAssertionModel TranslatorUserGroupAssertionModel => new()
+    {
+        ExpectedStatusCode = HttpStatusCode.Forbidden
+    };
+
+    protected override UserGroupAssertionModel WriterUserGroupAssertionModel => new()
+    {
+        ExpectedStatusCode = HttpStatusCode.OK
+    };
+
+    protected override UserGroupAssertionModel UnauthorizedUserGroupAssertionModel => new()
+    {
+        ExpectedStatusCode = HttpStatusCode.Unauthorized
+    };
+
+    protected override async Task<HttpResponseMessage> ClientRequest()
+    {
+        MoveDataTypeRequestModel moveDataTypeRequestModel =
+            new() { TargetId = _targetId };
+
+        return await Client.PostAsync(Url, JsonContent.Create(moveDataTypeRequestModel));
+    }
 }
