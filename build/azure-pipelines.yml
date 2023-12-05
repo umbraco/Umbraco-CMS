@@ -90,7 +90,7 @@ stages:
           - task: Cache@2
             displayName: Cache node_modules
             inputs:
-              key: '"npm_client" | "$(Agent.OS)"| $(Build.SourcesDirectory)/src/Umbraco.Web.UI.Client/package-lock.json | $(Build.SourcesDirectory)/src/Umbraco.Web.UI.New.Client/package-lock.json'
+              key: '"npm_client" | "$(Agent.OS)" | $(Build.SourcesDirectory)/src/Umbraco.Web.UI.Client/package-lock.json'
               restoreKeys: |
                 "npm_client" | "$(Agent.OS)"
                 "npm_client"
@@ -117,6 +117,7 @@ stages:
             displayName: Use .NET $(dotnetVersion)
             inputs:
               version: $(dotnetVersion)
+              performMultiLevelLookup: true
               includePreviewVersions: $(dotnetIncludePreviewVersions)
           - task: DotNetCoreCLI@2
             displayName: Run dotnet restore
@@ -230,6 +231,7 @@ stages:
             submodules: true
           - task: NodeTool@0
             displayName: Use Node.js $(nodeVersion)
+            retryCountOnTaskFailure: 3
             inputs:
               versionSpec: $(nodeVersion)
           - task: Cache@2
@@ -293,6 +295,7 @@ stages:
             displayName: Use .NET $(dotnetVersion)
             inputs:
               version: $(dotnetVersion)
+              performMultiLevelLookup: true
               includePreviewVersions: $(dotnetIncludePreviewVersions)
           - task: DotNetCoreCLI@2
             displayName: Run dotnet test
@@ -333,6 +336,7 @@ stages:
             displayName: Use .NET $(dotnetVersion)
             inputs:
               version: $(dotnetVersion)
+              performMultiLevelLookup: true
               includePreviewVersions: $(dotnetIncludePreviewVersions)
           - task: DotNetCoreCLI@2
             displayName: Run dotnet test Windows
@@ -703,28 +707,28 @@ stages:
       - Deploy_MyGet # Change to "Deploy_Nuget" after release of v14
     condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.uploadApiDocs}}))
     jobs:
-#      - job:
-#        displayName: Upload C# Docs
-#        steps:
-#          - checkout: none
-#          - task: DownloadPipelineArtifact@2
-#            displayName: Download artifact
-#            inputs:
-#              artifact: csharp-docs
-#              path: $(Build.SourcesDirectory)
-#          - task: ExtractFiles@1
-#            inputs:
-#              archiveFilePatterns: $(Build.SourcesDirectory)/csharp-docs.zip
-#              destinationFolder: $(Build.ArtifactStagingDirectory)/csharp-docs
-#          - task: AzureFileCopy@4
-#            displayName: 'Copy C# Docs to blob storage'
-#            inputs:
-#              SourcePath: '$(Build.ArtifactStagingDirectory)/csharp-docs/*'
-#              azureSubscription: umbraco-storage
-#              Destination: AzureBlob
-#              storage: umbracoapidocs
-#              ContainerName: '$web'
-#              BlobPrefix: v$(umbracoMajorVersion)/csharp
+      - job:
+        displayName: Upload C# Docs
+        steps:
+          - checkout: none
+          - task: DownloadPipelineArtifact@2
+            displayName: Download artifact
+            inputs:
+              artifact: csharp-docs
+              path: $(Build.SourcesDirectory)
+          - task: ExtractFiles@1
+            inputs:
+              archiveFilePatterns: $(Build.SourcesDirectory)/csharp-docs.zip
+              destinationFolder: $(Build.ArtifactStagingDirectory)/csharp-docs
+          - task: AzureFileCopy@4
+            displayName: 'Copy C# Docs to blob storage'
+            inputs:
+              SourcePath: '$(Build.ArtifactStagingDirectory)/csharp-docs/*'
+              azureSubscription: umbraco-storage
+              Destination: AzureBlob
+              storage: umbracoapidocs
+              ContainerName: '$web'
+              BlobPrefix: v$(umbracoMajorVersion)/csharp
       - job:
         displayName: Upload js Docs
         steps:
