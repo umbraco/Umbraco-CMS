@@ -399,12 +399,14 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
     private UserGroupOperationStatus ValidateStartNodesExists(IUserGroup userGroup)
     {
         if (userGroup.StartContentId is not null
-        && _entityService.Exists(userGroup.StartContentId.Value, UmbracoObjectTypes.Document) is false)
+            && userGroup.StartContentId is not Constants.System.Root
+            && _entityService.Exists(userGroup.StartContentId.Value, UmbracoObjectTypes.Document) is false)
         {
             return UserGroupOperationStatus.DocumentStartNodeKeyNotFound;
         }
 
         if (userGroup.StartMediaId is not null
+            && userGroup.StartMediaId is not Constants.System.Root
             && _entityService.Exists(userGroup.StartMediaId.Value, UmbracoObjectTypes.Media) is false)
         {
             return UserGroupOperationStatus.MediaStartNodeKeyNotFound;
