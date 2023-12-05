@@ -41,6 +41,10 @@ parameters:
     displayName: TestFilter used for release type builds on non windows agents
     type: string
     default: ' '
+  - name: isNightly
+    displayName: 'Is nightly build (used for MyGet feed)'
+    type: boolean
+    default: false
 
 variables:
   nodeVersion: 18.16.x
