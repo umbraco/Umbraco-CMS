@@ -60,6 +60,7 @@
     <PackageVersion Include="MiniProfiler.Shared" Version="4.3.8" />
     <PackageVersion Include="ncrontab" Version="3.3.3" />
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageVersion Include="NPoco" Version="5.7.1" />
     <PackageVersion Include="NPoco.SqlServer" Version="5.7.1" />
     <PackageVersion Include="OpenIddict.Abstractions" Version="4.10.1" />
     <PackageVersion Include="OpenIddict.AspNetCore" Version="4.10.1" />

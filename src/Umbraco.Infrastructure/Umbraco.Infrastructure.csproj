@@ -24,7 +24,7 @@
     <PackageReference Include="MiniProfiler.Shared" />
     <PackageReference Include="ncrontab" />
     <PackageReference Include="Newtonsoft.Json" />
-    <PackageReference Include="NPoco.SqlServer" />
+    <PackageReference Include="NPoco" />
     <PackageReference Include="OpenIddict.Abstractions" />
     <PackageReference Include="Serilog" />
     <PackageReference Include="Serilog.Enrichers.Process" />
@@ -37,10 +37,6 @@
     <PackageReference Include="Serilog.Sinks.Async" />
     <PackageReference Include="Serilog.Sinks.File" />
     <PackageReference Include="Serilog.Sinks.Map" />
-    <PackageReference Include="System.IO.FileSystem.AccessControl" />
-    <PackageReference Include="System.Security.Cryptography.Pkcs" />
-    <PackageReference Include="System.Threading.Tasks.Dataflow" />
-
   </ItemGroup>
 
   <ItemGroup>
