@@ -57,13 +57,13 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 	 * @attr
 	 * @default ''
 	 */
-	private _propertyEditorUiAlias = '';
 	@property({ type: String, attribute: 'property-editor-ui-alias' })
 	public set propertyEditorUiAlias(value: string) {
 		if (this._propertyEditorUiAlias === value) return;
 		this._propertyEditorUiAlias = value;
 		this._observePropertyEditorUI();
 	}
+	private _propertyEditorUiAlias = '';
 
 	/**
 	 * Config. Configuration to pass to the Property Editor UI. This is also the configuration data stored on the Data Type.
@@ -144,43 +144,38 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 		}
 
 		const el = await createExtensionElement(manifest);
-		if (el) {
-			const oldValue = this._element;
 
-			oldValue?.removeEventListener('change', this._onPropertyEditorChange as any as EventListener);
+		if (el) {
+			const oldElement = this._element;
+
+			// cleanup:
+			this._valueObserver?.destroy();
+			this._configObserver?.destroy();
+			oldElement?.removeEventListener('property-value-change', this._onPropertyEditorChange as any as EventListener);
 
 			this._element = el as ManifestPropertyEditorUi['ELEMENT_TYPE'];
 
 			this._propertyContext.setEditor(this._element);
 
-			this._valueObserver?.destroy();
-			this._configObserver?.destroy();
-
 			if (this._element) {
+				// TODO: Could this be changed to change event? (or additionally support change?)
 				this._element.addEventListener('property-value-change', this._onPropertyEditorChange as any as EventListener);
 
-				this._valueObserver = this.observe(
-					this._propertyContext.value,
-					(value) => {
-						this._value = value;
-						if (this._element) {
-							this._element.value = value;
-						}
-					},
-					'_observePropertyValue',
-				);
-				this._configObserver = this.observe(
-					this._propertyContext.config,
-					(config) => {
-						if (this._element && config) {
-							this._element.config = config;
-						}
-					},
-					'_observePropertyConfig',
-				);
+				// No need for a controller alias, as the clean is handled via the observer prop:
+				this._valueObserver = this.observe(this._propertyContext.value, (value) => {
+					this._value = value;
+					if (this._element) {
+						this._element.value = value;
+					}
+				});
+				this._configObserver = this.observe(this._propertyContext.config, (config) => {
+					if (this._element && config) {
+						this._element.config = config;
+					}
+				});
 			}
 
-			this.requestUpdate('element', oldValue);
+			this.requestUpdate('element', oldElement);
 		}
 	}
 
