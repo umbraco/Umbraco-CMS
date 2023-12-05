@@ -4,7 +4,7 @@ import {
 	UMB_CURRENT_USER_HISTORY_STORE_CONTEXT_TOKEN,
 } from '../current-user-history.store.js';
 import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-user-profile-app-history')
@@ -25,9 +25,13 @@ export class UmbUserProfileAppHistoryElement extends UmbLitElement {
 
 	#observeHistory() {
 		if (this.#currentUserHistoryStore) {
-			this.observe(this.#currentUserHistoryStore.latestHistory, (history) => {
-				this._history = history;
-			}, 'umbCurrentUserHistoryObserver');
+			this.observe(
+				this.#currentUserHistoryStore.latestHistory,
+				(history) => {
+					this._history = history;
+				},
+				'umbCurrentUserHistoryObserver',
+			);
 		}
 	}
 

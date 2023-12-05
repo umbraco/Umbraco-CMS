@@ -36,13 +36,13 @@ export class UmbExtensionRootWorkspaceElement extends UmbLitElement {
 						}
 						// Otherwise sort by type
 						return a.type.localeCompare(b.type);
-					})
-				)
+					}),
+				),
 			),
 			(extensions) => {
 				this._extensions = extensions || undefined;
 			},
-			'_observeExtensionRegistry'
+			'_observeExtensionRegistry',
 		);
 	}
 
@@ -75,9 +75,7 @@ export class UmbExtensionRootWorkspaceElement extends UmbLitElement {
 							(extension) => html`
 								<uui-table-row>
 									<uui-table-cell>${extension.type}</uui-table-cell>
-									<uui-table-cell>
-										${extension.name}
-									</uui-table-cell>
+									<uui-table-cell> ${extension.name} </uui-table-cell>
 									<uui-table-cell>${extension.alias}</uui-table-cell>
 									<uui-table-cell>${extension.weight ? extension.weight : ''} </uui-table-cell>
 									<uui-table-cell>
@@ -90,7 +88,7 @@ export class UmbExtensionRootWorkspaceElement extends UmbLitElement {
 										</uui-button>
 									</uui-table-cell>
 								</uui-table-row>
-							`
+							`,
 						)}
 					</uui-table>
 				</uui-box>

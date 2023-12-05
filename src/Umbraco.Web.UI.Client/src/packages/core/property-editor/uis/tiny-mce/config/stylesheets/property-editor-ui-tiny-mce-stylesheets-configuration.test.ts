@@ -6,11 +6,9 @@ describe('UmbPropertyEditorUITinyMceStylesheetsConfigurationElement', () => {
 	let element: UmbPropertyEditorUITinyMceStylesheetsConfigurationElement;
 
 	beforeEach(async () => {
-		element = await fixture(
-			html`
-				<umb-property-editor-ui-tiny-mce-stylesheets-configuration></umb-property-editor-ui-tiny-mce-stylesheets-configuration>
-			`
-		);
+		element = await fixture(html`
+			<umb-property-editor-ui-tiny-mce-stylesheets-configuration></umb-property-editor-ui-tiny-mce-stylesheets-configuration>
+		`);
 	});
 
 	it('is defined with its own instance', () => {

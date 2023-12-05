@@ -6,11 +6,9 @@ describe('UmbPropertyEditorUICollectionViewLayoutConfigurationElement', () => {
 	let element: UmbPropertyEditorUICollectionViewLayoutConfigurationElement;
 
 	beforeEach(async () => {
-		element = await fixture(
-			html`
-				<umb-property-editor-ui-collection-view-layout-configuration></umb-property-editor-ui-collection-view-layout-configuration>
-			`
-		);
+		element = await fixture(html`
+			<umb-property-editor-ui-collection-view-layout-configuration></umb-property-editor-ui-collection-view-layout-configuration>
+		`);
 	});
 
 	it('is defined with its own instance', () => {

@@ -57,7 +57,7 @@ export class UmbLogSearchesServerDataSource implements LogSearchDataSource {
 	async postLogViewerSavedSearch({ name, query }: SavedLogSearchResponseModel) {
 		return await tryExecuteAndNotify(
 			this.#host,
-			LogViewerResource.postLogViewerSavedSearch({ requestBody: { name, query } })
+			LogViewerResource.postLogViewerSavedSearch({ requestBody: { name, query } }),
 		);
 	}
 	/**
@@ -114,7 +114,7 @@ export class UmbLogMessagesServerDataSource implements LogMessagesDataSource {
 			LogViewerResource.getLogViewerLevelCount({
 				startDate,
 				endDate,
-			})
+			}),
 		);
 	}
 	/**
@@ -167,7 +167,7 @@ export class UmbLogMessagesServerDataSource implements LogMessagesDataSource {
 				logLevel,
 				startDate,
 				endDate,
-			})
+			}),
 		);
 	}
 	/**
@@ -205,7 +205,7 @@ export class UmbLogMessagesServerDataSource implements LogMessagesDataSource {
 				take,
 				startDate,
 				endDate,
-			})
+			}),
 		);
 	}
 
@@ -215,7 +215,7 @@ export class UmbLogMessagesServerDataSource implements LogMessagesDataSource {
 			LogViewerResource.getLogViewerValidateLogsSize({
 				startDate,
 				endDate,
-			})
+			}),
 		);
 	}
 }

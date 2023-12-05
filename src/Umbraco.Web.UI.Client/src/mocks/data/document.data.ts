@@ -695,7 +695,6 @@ class UmbDocumentData extends UmbEntityData<DocumentResponseModel> {
 	}
 
 	publish(id: string, data: PublishDocumentRequestModel) {
-
 		// Update detail data:
 		const foundIndex = this.data.findIndex((item) => item.id === id);
 		if (foundIndex !== -1) {
@@ -719,7 +718,6 @@ class UmbDocumentData extends UmbEntityData<DocumentResponseModel> {
 	}
 
 	unpublish(id: string, data: PublishDocumentRequestModel) {
-
 		// Update detail data:
 		const foundIndex = this.data.findIndex((item) => item.id === id);
 		if (foundIndex !== -1) {

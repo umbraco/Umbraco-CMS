@@ -1,4 +1,4 @@
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, nothing, customElement, state, query, property } from '@umbraco-cms/backoffice/external/lit';
 import {
 	UmbModalManagerContext,
@@ -67,7 +67,7 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 				term: this._searchInput.value,
 				take: 100,
 				skip: 0,
-			})
+			}),
 		);
 
 		this._searchResults = data?.items ?? [];

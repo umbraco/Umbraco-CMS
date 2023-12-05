@@ -79,13 +79,14 @@ export class UmbLogViewerMessagesListElement extends UmbLitElement {
 	#renderLogs() {
 		return html`${this._logs.length > 0
 			? html` ${this._logs.map(
-					(log) => html`<umb-log-viewer-message
-						.timestamp=${log.timestamp ?? ''}
-						.level=${log.level ?? ''}
-						.renderedMessage=${log.renderedMessage ?? ''}
-						.properties=${log.properties ?? []}
-						.exception=${log.exception ?? ''}
-						.messageTemplate=${log.messageTemplate ?? ''}></umb-log-viewer-message>`
+					(log) =>
+						html`<umb-log-viewer-message
+							.timestamp=${log.timestamp ?? ''}
+							.level=${log.level ?? ''}
+							.renderedMessage=${log.renderedMessage ?? ''}
+							.properties=${log.properties ?? []}
+							.exception=${log.exception ?? ''}
+							.messageTemplate=${log.messageTemplate ?? ''}></umb-log-viewer-message>`,
 			  )}`
 			: html`<umb-empty-state size="small"
 					><span id="empty">

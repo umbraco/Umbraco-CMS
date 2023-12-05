@@ -1,5 +1,5 @@
 import { UmbPartialViewWorkspaceContext } from './partial-view-workspace.context.js';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbRoute, IRoutingInfo, PageComponent } from '@umbraco-cms/backoffice/router';
@@ -29,7 +29,7 @@ export class UmbPartialViewWorkspaceElement extends UmbLitElement {
 				new UmbWorkspaceIsNewRedirectController(
 					this,
 					this.#partialViewWorkspaceContext,
-					this.shadowRoot!.querySelector('umb-router-slot')!
+					this.shadowRoot!.querySelector('umb-router-slot')!,
 				);
 			},
 		},

@@ -23,7 +23,7 @@ describe('UmbNotificationLayoutDefault', () => {
 		element = await fixture(
 			html`<umb-notification-layout-default
 				.notificationHandler=${notificationHandler}
-				.data=${options.data}></umb-notification-layout-default>`
+				.data=${options.data}></umb-notification-layout-default>`,
 		);
 	});
 

@@ -9,5 +9,5 @@ export const UMB_DATA_TYPE_CREATE_OPTIONS_MODAL = new UmbModalToken<UmbDataTypeC
 	{
 		type: 'sidebar',
 		size: 'small',
-	}
+	},
 );

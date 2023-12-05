@@ -14,7 +14,7 @@ export const handlers = [
 		return res(
 			// Respond with a 200 status code
 			ctx.status(200),
-			ctx.json<PagedIndexResponseModel>(PagedIndexers)
+			ctx.json<PagedIndexResponseModel>(PagedIndexers),
 		);
 	}),
 
@@ -51,7 +51,7 @@ export const handlers = [
 			ctx.json<PagedSearcherResponseModel>({
 				total: 0,
 				items: [{ name: 'ExternalSearcher' }, { name: 'InternalSearcher' }, { name: 'InternalMemberSearcher' }],
-			})
+			}),
 		);
 	}),
 
@@ -69,7 +69,7 @@ export const handlers = [
 				ctx.json<PagedSearchResultResponseModel>({
 					total: 0,
 					items: searchResultMockData,
-				})
+				}),
 			);
 		} else {
 			return res(ctx.status(404));

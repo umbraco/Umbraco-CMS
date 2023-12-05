@@ -3,7 +3,6 @@
 export * from './backoffice-modal-container/backoffice-modal-container.element.js';
 export * from './backoffice-notification-container/backoffice-notification-container.element.js';
 export * from './body-layout/body-layout.element.js';
-export * from './button-with-dropdown/button-with-dropdown.element.js'; // TODO: delete this and change usage to umb-dropdown
 export * from './code-block/index.js';
 export * from './input-date/index.js';
 export * from './input-dropdown/index.js';

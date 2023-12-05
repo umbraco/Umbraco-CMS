@@ -9,7 +9,7 @@ import {
 import { UmbFolderRepository } from '@umbraco-cms/backoffice/repository';
 
 export class UmbFolderUpdateEntityAction<
-	T extends UmbFolderRepository = UmbFolderRepository
+	T extends UmbFolderRepository = UmbFolderRepository,
 > extends UmbEntityActionBase<T> {
 	#modalContext?: UmbModalManagerContext;
 

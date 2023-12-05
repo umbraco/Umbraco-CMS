@@ -47,7 +47,7 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 
 			this._api = this._healthCheckContext?.apis.get(this.groupName);
 
-			if(this._api) {
+			if (this._api) {
 				this._api.getGroupChecks(this.groupName);
 
 				this.observe(this._api.checks, (group) => {
@@ -58,7 +58,6 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 				this.observe(this._api.results, (results) => {
 					this._idResults = results?.checks;
 				});
-
 			}
 		});
 	}
@@ -161,7 +160,7 @@ export class UmbDashboardHealthCheckGroupElement extends UmbLitElement {
 					(action) =>
 						html`<umb-dashboard-health-check-action
 							.action=${action}
-							@action-executed=${() => this._buttonHandler()}></umb-dashboard-health-check-action>`
+							@action-executed=${() => this._buttonHandler()}></umb-dashboard-health-check-action>`,
 				)}
 			</div>`;
 		else return nothing;

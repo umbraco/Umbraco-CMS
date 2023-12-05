@@ -23,10 +23,10 @@ export function extendDataSourcePagedResponseData<
 	IncomingDataType extends object = object,
 	MissingPropsType extends object = Diff<IncomingDataType, ExtendedDataType>,
 	// Maybe this Omit<..., "$ype"> can be removed, but for now it kept showing up as a difference, though its not a difference on the two types.
-	ToType = IncomingDataType & ExtendedDataType
+	ToType = IncomingDataType & ExtendedDataType,
 >(
 	response: DataSourceResponse<UmbPagedData<IncomingDataType>>,
-	appendData: MissingPropsType
+	appendData: MissingPropsType,
 ): DataSourceResponse<UmbPagedData<ToType>> {
 	if (response.data === undefined) return response as unknown as DataSourceResponse<UmbPagedData<ToType>>;
 	return {

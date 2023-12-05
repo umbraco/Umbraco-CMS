@@ -6,11 +6,9 @@ describe('UmbPropertyEditorUITinyMceToolbarConfigurationElement', () => {
 	let element: UmbPropertyEditorUITinyMceToolbarConfigurationElement;
 
 	beforeEach(async () => {
-		element = await fixture(
-			html`
-				<umb-property-editor-ui-tiny-mce-toolbar-configuration></umb-property-editor-ui-tiny-mce-toolbar-configuration>
-			`
-		);
+		element = await fixture(html`
+			<umb-property-editor-ui-tiny-mce-toolbar-configuration></umb-property-editor-ui-tiny-mce-toolbar-configuration>
+		`);
 	});
 
 	it('is defined with its own instance', () => {

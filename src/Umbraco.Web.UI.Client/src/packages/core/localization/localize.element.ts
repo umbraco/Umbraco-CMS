@@ -9,7 +9,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 @customElement('umb-localize')
 export class UmbLocalizeElement extends UmbLitElement {
 	/**
-	 * The key to localize. The key is case sensitive. 
+	 * The key to localize. The key is case sensitive.
 	 * @attr
 	 * @example key="general_ok"
 	 */
@@ -33,7 +33,7 @@ export class UmbLocalizeElement extends UmbLitElement {
 	 */
 	@property()
 	debug = false;
-	
+
 	@state()
 	protected get text(): string {
 		const localizedValue = this.localize.term(this.key, ...(this.args ?? []));
@@ -53,8 +53,8 @@ export class UmbLocalizeElement extends UmbLitElement {
 		return this.text.trim()
 			? html`${unsafeHTML(this.text)}`
 			: this.debug
-				? html`<span style="color:red">${this.key}</span>`
-				: html`<slot></slot>`;
+			? html`<span style="color:red">${this.key}</span>`
+			: html`<slot></slot>`;
 	}
 
 	static styles = [

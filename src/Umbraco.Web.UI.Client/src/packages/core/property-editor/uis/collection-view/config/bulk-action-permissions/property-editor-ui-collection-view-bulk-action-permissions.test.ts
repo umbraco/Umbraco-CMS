@@ -6,11 +6,9 @@ describe('UmbPropertyEditorUICollectionViewBulkActionPermissionsElement', () => 
 	let element: UmbPropertyEditorUICollectionViewBulkActionPermissionsElement;
 
 	beforeEach(async () => {
-		element = await fixture(
-			html`
-				<umb-property-editor-ui-collection-view-bulk-action-permissions></umb-property-editor-ui-collection-view-bulk-action-permissions>
-			`
-		);
+		element = await fixture(html`
+			<umb-property-editor-ui-collection-view-bulk-action-permissions></umb-property-editor-ui-collection-view-bulk-action-permissions>
+		`);
 	});
 
 	it('is defined with its own instance', () => {

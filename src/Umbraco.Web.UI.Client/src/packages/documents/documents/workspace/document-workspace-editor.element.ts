@@ -1,6 +1,6 @@
 import { UmbDocumentWorkspaceSplitViewElement } from './document-workspace-split-view.element.js';
 import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from './document-workspace.context.js';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { customElement, state, css, html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbRoute, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
@@ -43,7 +43,7 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 				this._availableVariants = variants;
 				this._generateRoutes();
 			},
-			'_observeVariants'
+			'_observeVariants',
 		);
 	}
 
@@ -54,7 +54,7 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 			(variants) => {
 				this._workspaceSplitViews = variants;
 			},
-			'_observeSplitViews'
+			'_observeSplitViews',
 		);
 	}
 

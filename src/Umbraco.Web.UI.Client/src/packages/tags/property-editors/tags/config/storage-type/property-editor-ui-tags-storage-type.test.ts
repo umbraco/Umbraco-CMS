@@ -6,9 +6,9 @@ describe('UmbPropertyEditorUITagsStorageTypeElement', () => {
 	let element: UmbPropertyEditorUITagsStorageTypeElement;
 
 	beforeEach(async () => {
-		element = await fixture(
-			html` <umb-property-editor-ui-tags-storage-type></umb-property-editor-ui-tags-storage-type> `
-		);
+		element = await fixture(html`
+			<umb-property-editor-ui-tags-storage-type></umb-property-editor-ui-tags-storage-type>
+		`);
 	});
 
 	it('is defined with its own instance', () => {

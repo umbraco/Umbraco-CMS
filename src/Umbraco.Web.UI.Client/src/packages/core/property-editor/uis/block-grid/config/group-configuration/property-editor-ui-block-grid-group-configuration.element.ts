@@ -1,19 +1,22 @@
 import { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 /**
  * @element umb-property-editor-ui-block-grid-group-configuration
  */
 @customElement('umb-property-editor-ui-block-grid-group-configuration')
-export class UmbPropertyEditorUIBlockGridGroupConfigurationElement extends UmbLitElement implements UmbPropertyEditorUiElement {
+export class UmbPropertyEditorUIBlockGridGroupConfigurationElement
+	extends UmbLitElement
+	implements UmbPropertyEditorUiElement
+{
 	@property()
 	value = '';
 
 	@property({ type: Object, attribute: false })
-	public config?: UmbPropertyEditorConfigCollection
+	public config?: UmbPropertyEditorConfigCollection;
 
 	render() {
 		return html`<div>umb-property-editor-ui-block-grid-group-configuration</div>`;

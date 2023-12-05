@@ -74,7 +74,7 @@ export const handlers = [
 						requiresConnectionTest: true,
 					},
 				],
-			})
+			}),
 		);
 	}),
 
@@ -88,13 +88,13 @@ export const handlers = [
 					type: 'connection',
 					status: 400,
 					detail: 'Database connection failed',
-				})
+				}),
 			);
 		}
 
 		return res(
 			// Respond with a 200 status code
-			ctx.status(201)
+			ctx.status(201),
 		);
 	}),
 
@@ -113,12 +113,12 @@ export const handlers = [
 					errors: {
 						name: ['Database name is invalid'],
 					},
-				})
+				}),
 			);
 		}
 		return res(
 			// Respond with a 200 status code
-			ctx.status(201)
+			ctx.status(201),
 		);
 	}),
 ];

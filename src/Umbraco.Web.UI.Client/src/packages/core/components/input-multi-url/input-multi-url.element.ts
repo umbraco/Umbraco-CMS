@@ -112,12 +112,12 @@ export class UmbInputMultiUrlElement extends FormControlMixin(UmbLitElement) {
 		this.addValidator(
 			'rangeUnderflow',
 			() => this.minMessage,
-			() => !!this.min && this.urls.length < this.min
+			() => !!this.min && this.urls.length < this.min,
 		);
 		this.addValidator(
 			'rangeOverflow',
 			() => this.maxMessage,
-			() => !!this.max && this.urls.length > this.max
+			() => !!this.max && this.urls.length > this.max,
 		);
 
 		this.myModalRegistration = new UmbModalRouteRegistrationController(this, UMB_LINK_PICKER_MODAL)

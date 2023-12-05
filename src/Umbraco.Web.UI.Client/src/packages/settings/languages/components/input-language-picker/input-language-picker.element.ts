@@ -79,13 +79,13 @@ export class UmbInputLanguagePickerElement extends FormControlMixin(UmbLitElemen
 		this.addValidator(
 			'rangeUnderflow',
 			() => this.minMessage,
-			() => !!this.min && this.#pickerContext.getSelection().length < this.min
+			() => !!this.min && this.#pickerContext.getSelection().length < this.min,
 		);
 
 		this.addValidator(
 			'rangeOverflow',
 			() => this.maxMessage,
-			() => !!this.max && this.#pickerContext.getSelection().length > this.max
+			() => !!this.max && this.#pickerContext.getSelection().length > this.max,
 		);
 
 		this.observe(this.#pickerContext.selection, (selection) => (super.value = selection.join(',')));

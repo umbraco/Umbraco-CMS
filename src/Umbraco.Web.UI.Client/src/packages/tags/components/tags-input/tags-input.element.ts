@@ -10,12 +10,7 @@ import {
 	state,
 	repeat,
 } from '@umbraco-cms/backoffice/external/lit';
-import {
-	FormControlMixin,
-	UUIInputElement,
-	UUIInputEvent,
-	UUITagElement,
-} from '@umbraco-cms/backoffice/external/uui';
+import { FormControlMixin, UUIInputElement, UUIInputEvent, UUITagElement } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { TagResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
@@ -239,7 +234,7 @@ export class UmbTagsInputElement extends FormControlMixin(UmbLitElement) {
 								@keydown="${(e: KeyboardEvent) => this.#optionKeydown(e, index)}"
 								value="${tag.text}" />
 							<label for="tag-${tag.id}"> ${tag.text} </label>`;
-					}
+					},
 				)}
 			</div>
 		`;

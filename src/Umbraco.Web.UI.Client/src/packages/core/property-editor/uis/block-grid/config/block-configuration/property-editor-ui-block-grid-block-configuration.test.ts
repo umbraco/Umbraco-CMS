@@ -6,11 +6,9 @@ describe('UmbPropertyEditorUIBlockGridBlockConfigurationElement', () => {
 	let element: UmbPropertyEditorUIBlockGridBlockConfigurationElement;
 
 	beforeEach(async () => {
-		element = await fixture(
-			html`
-				<umb-property-editor-ui-block-grid-block-configuration></umb-property-editor-ui-block-grid-block-configuration>
-			`
-		);
+		element = await fixture(html`
+			<umb-property-editor-ui-block-grid-block-configuration></umb-property-editor-ui-block-grid-block-configuration>
+		`);
 	});
 
 	it('is defined with its own instance', () => {

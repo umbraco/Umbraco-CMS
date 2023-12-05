@@ -14,7 +14,7 @@ export const handlers = [
 		return res(
 			// Respond with a 200 status code
 			ctx.status(200),
-			ctx.json({})
+			ctx.json({}),
 		);
 	}),
 
@@ -26,7 +26,7 @@ export const handlers = [
 		return res(
 			// Respond with a 200 status code
 			ctx.status(200),
-			ctx.json<OutOfDateStatusResponseModel>({})
+			ctx.json<OutOfDateStatusResponseModel>({}),
 		);
 	}),
 ];
