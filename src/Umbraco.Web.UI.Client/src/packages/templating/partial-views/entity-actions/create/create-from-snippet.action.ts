@@ -34,7 +34,9 @@ export class UmbCreateFromSnippetPartialViewAction<
 		const snippets = (await this.repository?.getSnippets({}))?.data?.items ?? [];
 
 		const modalContext = this.#modalContext?.open(UMB_PARTIAL_VIEW_FROM_SNIPPET_MODAL, {
-			snippets,
+			data: {
+				snippets,
+			},
 		});
 
 		await modalContext?.onSubmit().then((snippetName) => {

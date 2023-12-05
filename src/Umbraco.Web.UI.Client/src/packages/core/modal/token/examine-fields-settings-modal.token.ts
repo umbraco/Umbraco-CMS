@@ -1,13 +1,15 @@
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
-export type UmbExamineFieldsSettingsModalData = Array<{
+export type UmbExamineFieldsSettingsModalData = never;
+
+type FieldSettingsType = {
 	name: string;
 	exposed: boolean;
-}>;
+};
 
-export interface UmbExamineFieldsSettingsModalValue {
-	fields?: UmbExamineFieldsSettingsModalData;
-}
+export type UmbExamineFieldsSettingsModalValue = {
+	fields: Array<FieldSettingsType>;
+};
 
 export const UMB_EXAMINE_FIELDS_SETTINGS_MODAL = new UmbModalToken<
 	UmbExamineFieldsSettingsModalData,

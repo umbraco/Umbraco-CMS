@@ -55,14 +55,6 @@ export class UmbUserGroupPickerModalElement extends UmbModalBaseElement<any, any
 		this.modalContext?.updateValue({ selection: this.#selectionManager.getSelection() });
 	}
 
-	#submit() {
-		this.modalContext?.submit(this._value);
-	}
-
-	#close() {
-		this.modalContext?.reject();
-	}
-
 	render() {
 		return html`
 			<umb-body-layout headline=${this.localize.term('user_selectUserGroup', false)}>
@@ -81,8 +73,8 @@ export class UmbUserGroupPickerModalElement extends UmbModalBaseElement<any, any
 					)}
 				</uui-box>
 				<div slot="actions">
-					<uui-button label="Close" @click=${this.#close}></uui-button>
-					<uui-button label="Submit" look="primary" color="positive" @click=${this.#submit}></uui-button>
+					<uui-button label="Close" @click=${this._rejectModal}></uui-button>
+					<uui-button label="Submit" look="primary" color="positive" @click=${this._submitModal}></uui-button>
 				</div>
 			</umb-body-layout>
 		`;

@@ -132,7 +132,9 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 	}
 
 	#openSaveSearchDialog() {
-		this.modalContext = this._modalContext?.open(UMB_LOG_VIEWER_SAVE_SEARCH_MODAL, { query: this._inputQuery });
+		this.modalContext = this._modalContext?.open(UMB_LOG_VIEWER_SAVE_SEARCH_MODAL, {
+			data: { query: this._inputQuery },
+		});
 		this.modalContext?.onSubmit().then((savedSearch) => {
 			if (savedSearch) {
 				this.#saveSearch(savedSearch);

@@ -75,10 +75,12 @@ export class UmbInputDocumentGranularPermissionElement extends FormControlMixin(
 
 	async #removeItem(item: DocumentItemResponseModel) {
 		const modalContext = this.#modalContext?.open(UMB_CONFIRM_MODAL, {
-			color: 'danger',
-			headline: `Remove ${item.name}?`,
-			content: 'Are you sure you want to remove this item',
-			confirmLabel: 'Remove',
+			data: {
+				color: 'danger',
+				headline: `Remove ${item.name}?`,
+				content: 'Are you sure you want to remove this item',
+				confirmLabel: 'Remove',
+			},
 		});
 
 		await modalContext?.onSubmit();
