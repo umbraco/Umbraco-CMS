@@ -3,7 +3,7 @@ import {
 	InterfaceLook,
 	PopoverContainerPlacement,
 	UUIPopoverContainerElement,
-} from '@umbraco-cms/backoffice/external/@umbraco-ui/uui';
+} from '@umbraco-cms/backoffice/external/uui';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import {
 	css,
