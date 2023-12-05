@@ -1,22 +1,21 @@
-import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import {
 	UmbPropertyEditorUIPickerModalData,
 	UmbPropertyEditorUIPickerModalValue,
-	UmbModalContext,
+	UmbModalBaseElement,
 } from '@umbraco-cms/backoffice/modal';
 import { ManifestPropertyEditorUi, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 interface GroupedPropertyEditorUIs {
 	[key: string]: Array<ManifestPropertyEditorUi>;
 }
 @customElement('umb-property-editor-ui-picker-modal')
-export class UmbPropertyEditorUIPickerModalElement extends UmbLitElement {
-	@property({ type: Object })
-	data?: UmbPropertyEditorUIPickerModalData;
-
+export class UmbPropertyEditorUIPickerModalElement extends UmbModalBaseElement<
+	UmbPropertyEditorUIPickerModalData,
+	UmbPropertyEditorUIPickerModalValue
+> {
 	@state()
 	private _groupedPropertyEditorUIs: GroupedPropertyEditorUIs = {};
 
@@ -28,9 +27,6 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbLitElement {
 
 	@state()
 	private _submitLabel = 'Select';
-
-	@property({ attribute: false })
-	modalContext?: UmbModalContext<UmbPropertyEditorUIPickerModalData, UmbPropertyEditorUIPickerModalValue>;
 
 	connectedCallback(): void {
 		super.connectedCallback();
@@ -89,21 +85,17 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbLitElement {
 		);
 	}
 
-	private _close() {
-		this.modalContext?.reject();
-	}
-
-	private _submit() {
-		this.modalContext?.submit({ selection: this._selection });
-	}
-
 	render() {
 		return html`
 			<umb-body-layout headline="Select Property Editor UI">
 				<uui-box> ${this._renderFilter()} ${this._renderGrid()} </uui-box>
 				<div slot="actions">
-					<uui-button label="Close" @click=${this._close}></uui-button>
-					<uui-button label="${this._submitLabel}" look="primary" color="positive" @click=${this._submit}></uui-button>
+					<uui-button label="Close" @click=${this._rejectModal}></uui-button>
+					<uui-button
+						label="${this._submitLabel}"
+						look="primary"
+						color="positive"
+						@click=${this._submitModal}></uui-button>
 				</div>
 			</umb-body-layout>
 		`;
