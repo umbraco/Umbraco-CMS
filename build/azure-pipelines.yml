@@ -13,6 +13,14 @@ parameters:
     displayName: Deploy to NuGet
     type: boolean
     default: false
+  - name: npmDeploy
+    displayName: Deploy to Npm
+    type: boolean
+    default: false
+  - name: npmPublishTag
+    displayName: Npm publish tag
+    type: string
+    default: 'latest'
   - name: buildApiDocs
     displayName: Build API docs
     type: boolean
@@ -41,6 +49,10 @@ parameters:
     displayName: TestFilter used for release type builds on non windows agents
     type: string
     default: ' '
+  - name: isNightly
+    displayName: 'Is nightly build (used for MyGet feed)'
+    type: boolean
+    default: false
 
 variables:
   nodeVersion: 20
@@ -93,13 +105,13 @@ stages:
               targets: coreBuild
               workingDirectory: src/Umbraco.Web.UI.Client
           - script: npm ci --no-fund --no-audit --prefer-offline
-            workingDirectory:  src/Umbraco.Web.UI.New.Client
-            displayName: Run npm ci
+            displayName: Run npm ci (Bellissima)
+            workingDirectory: src/Umbraco.Web.UI.New.Client
           - script: npm run build:for:cms
-            displayName: Run New Backoffice Build
+            displayName: Run build (Bellissima)
             workingDirectory: src/Umbraco.Web.UI.New.Client
           - script: npm run build
-            displayName: Run Login Build
+            displayName: Run Login Build (Bellissima)
             workingDirectory: src/Umbraco.Web.UI.New.Client/apps/auth
           - task: UseDotNet@2
             displayName: Use .NET $(dotnetVersion)
@@ -128,6 +140,24 @@ stages:
             inputs:
               targetPath: $(Build.SourcesDirectory)
               artifactName: build_output
+          - bash: |
+              echo "##[command]Running npm version"
+              echo "##[debug]Version: $PACKAGE_VERSION"
+              echo "##[command]Running npm pack"
+              echo "##[debug]Output directory: $(Build.ArtifactStagingDirectory)"
+              npm version $PACKAGE_VERSION --allow-same-version --no-git-tag-version
+              mkdir $(Build.ArtifactStagingDirectory)/npm
+              npm pack --pack-destination $(Build.ArtifactStagingDirectory)/npm
+              mv .npmrc $(Build.ArtifactStagingDirectory)/npm/
+            displayName: Prepare Bellissima npm package
+            env:
+              PACKAGE_VERSION: $(build.NBGV_NpmPackageVersion)
+            workingDirectory: src/Umbraco.Web.UI.New.Client
+          - task: PublishPipelineArtifact@1
+            displayName: Publish Bellissima npm artifact
+            inputs:
+              targetPath: $(Build.ArtifactStagingDirectory)/npm
+              artifactName: npm
 
   - stage: Build_Docs
     condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.buildApiDocs}}))
@@ -570,7 +600,45 @@ stages:
               command: 'push'
               packagesToPush: $(Build.ArtifactStagingDirectory)/**/*.nupkg
               nuGetFeedType: 'external'
-              publishFeedCredentials: 'MyGet - Pre-releases'
+              ${{ if eq(parameters.isNightly, true) }}:
+                publishFeedCredentials: 'MyGet - Umbraco Nightly'
+              ${{ else }}:
+                publishFeedCredentials: 'MyGet - Pre-releases'
+      - job:
+        displayName: Push to pre-release feed (npm)
+        steps:
+          - checkout: none
+          - download: current
+            artifact: npm
+          - bash: |
+              # Check if we are on a nightly build
+              if [ $isNightly = "False" ]; then
+                  echo "##[debug]Prerelease build detected"
+                  registry="https://www.myget.org/F/umbracoprereleases/npm/"
+              else
+                  echo "##[debug]Nightly build detected"
+                  registry="https://www.myget.org/F/umbraconightly/npm/"
+              fi
+              echo "@umbraco-cms:registry=$registry" >> .npmrc
+            env:
+              isNightly: ${{parameters.isNightly}}
+            workingDirectory: $(Pipeline.Workspace)/npm
+            displayName: Add scoped registry to .npmrc
+          - task: npmAuthenticate@0
+            displayName: Authenticate with npm (MyGet)
+            inputs:
+              workingFile: '$(Pipeline.Workspace)/npm/.npmrc'
+              customEndpoint: 'MyGet (npm) - Umbracoprereleases, MyGet (npm) - Umbraconightly'
+          - bash: |
+              # Setup temp npm project to load in defaults from the local .npmrc
+              npm init -y
+
+              # Find the first .tgz file in the current directory and publish it
+              files=( ./*.tgz )
+              npm publish --access public "${files[0]}"
+            displayName: Push to npm (MyGet)
+            workingDirectory: $(Pipeline.Workspace)/npm
+
   - stage: Deploy_NuGet
     displayName: NuGet release
     dependsOn:
@@ -595,14 +663,43 @@ stages:
               nuGetFeedType: 'external'
               publishFeedCredentials: 'NuGet - Umbraco.*'
 
+  - stage: Deploy_Npm
+    displayName: Npm release
+    condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.npmDeploy}}))
+    dependsOn:
+      - Deploy_NuGet
+    jobs:
+      - job: Publish
+        displayName: Push to NPM
+        steps:
+          - checkout: none
+          - download: current
+            artifact: npm
+          - bash: echo "@umbraco-cms:registry=https://registry.npmjs.org" >> .npmrc
+            workingDirectory: $(Pipeline.Workspace)/npm
+            displayName: Add scoped registry to .npmrc
+          - task: npmAuthenticate@0
+            displayName: Authenticate with npm
+            inputs:
+              workingFile: $(Pipeline.Workspace)/npm/.npmrc
+              customEndpoint: 'NPM - Umbraco Backoffice'
+          - script: |
+              # Setup temp npm project to load in defaults from the local .npmrc
+              npm init -y
+
+              # Find the first .tgz file in the current directory and publish it
+              files=( ./*.tgz )
+              npm publish --tag $npmTag --access public "${files[0]}"
+            displayName: Push to npm
+            workingDirectory: $(Pipeline.Workspace)/npm
+
   - stage: Upload_API_Docs
     pool:
       vmImage: 'windows-latest' # Apparently AzureFileCopy is windows only :(
     variables:
-      umbracoMajorVersion:  $[ stageDependencies.Build.A.outputs['build.NBGV_VersionMajor'] ]
+      umbracoMajorVersion:  $[ dependencies.Build.outputs['A.build.NBGV_VersionMajor'] ]
     displayName: Upload API Documentation
     dependsOn:
-      - Build
       - Deploy_MyGet # Change to "Deploy_Nuget" after release of v14
     condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.uploadApiDocs}}))
     jobs:
