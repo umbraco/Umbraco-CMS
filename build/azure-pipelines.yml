@@ -540,7 +540,10 @@ stages:
               command: 'push'
               packagesToPush: $(Build.ArtifactStagingDirectory)/**/*.nupkg
               nuGetFeedType: 'external'
-              publishFeedCredentials: 'MyGet - Pre-releases'
+              ${{ if eq(parameters.isNightly, true) }}:
+                publishFeedCredentials: 'MyGet - Umbraco Nightly'
+              ${{ else }}:
+                publishFeedCredentials: 'MyGet - Pre-releases'
   - stage: Deploy_NuGet
     displayName: NuGet release
     dependsOn:
