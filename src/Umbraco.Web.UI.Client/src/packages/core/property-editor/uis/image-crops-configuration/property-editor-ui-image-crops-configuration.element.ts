@@ -117,7 +117,7 @@ export class UmbPropertyEditorUIImageCropsConfigurationElement
 							<span class="append" slot="append">px</span>
 						</uui-input>
 					</div>
-					${this.#renderActions()}
+					<div class="action-wrapper">${this.#renderActions()}</div>
 				</form>
 			</uui-form>
 			<div class="crops">
@@ -144,7 +144,6 @@ export class UmbPropertyEditorUIImageCropsConfigurationElement
 		UmbTextStyles,
 		css`
 			:host {
-				max-width: 500px;
 				display: block;
 			}
 			.crops {
@@ -191,6 +190,10 @@ export class UmbPropertyEditorUIImageCropsConfigurationElement
 				font-size: 0.8em;
 				display: flex;
 				align-items: center;
+			}
+			.action-wrapper {
+				display: flex;
+				align-items: flex-end;
 			}
 		`,
 	];
