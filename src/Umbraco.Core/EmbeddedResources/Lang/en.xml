@@ -2011,6 +2011,14 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="types">Types</key>
     <key alias="webhookKey">Webhook key</key>
     <key alias="retryCount">Retry count</key>
+    <key alias="urlDescription">The url to call when the webhook is triggered.</key>
+    <key alias="eventDescription">The events for which the webhook should be triggered.</key>
+    <key alias="contentTypeDescription">Only trigger the webhook for a specific content type.</key>
+    <key alias="enabledDescription">Is the webhook enabled?</key>
+    <key alias="headersDescription">Custom headers to include in the webhook request.</key>
+    <key alias="contentType">Content Type</key>
+    <key alias="headers">Headers</key>
+    <key alias="selectEventFirst">Please select an event first.</key>
   </area>
   <area alias="languages">
     <key alias="addLanguage">Add language</key>
