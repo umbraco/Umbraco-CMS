@@ -17,10 +17,10 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 > {
 	//TODO: Should these options come from the server?
 	// TODO: Or should they come from a extension point?
-	@state() private _customValidationOptions = [
+	@state() private _customValidationOptions: Array<Option> = [
 		{
 			name: 'No validation',
-			value: null,
+			value: '!NOVALIDATION!',
 			selected: true,
 		},
 		{
@@ -66,19 +66,21 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 		this._originalPropertyData = this._value;
 
 		const regEx = this._value.validation?.regEx ?? null;
-		const newlySelected = this._customValidationOptions.find((option) => {
-			option.selected = option.value === regEx;
-			return option.selected;
-		});
-		if (newlySelected === undefined) {
-			this._customValidationOptions[4].selected = true;
-			this.updateValue({
-				validation: { ...this._value.validation, regEx: this._customValidationOptions[4].value },
+		if (regEx) {
+			const newlySelected = this._customValidationOptions.find((option) => {
+				option.selected = option.value === regEx;
+				return option.selected;
 			});
-		} else {
-			this.updateValue({
-				validation: { ...this._value.validation, regEx: regEx },
-			});
+			if (newlySelected === undefined) {
+				this._customValidationOptions[4].selected = true;
+				this.updateValue({
+					validation: { ...this._value.validation, regEx: this._customValidationOptions[4].value },
+				});
+			} else {
+				this.updateValue({
+					validation: { ...this._value.validation, regEx: regEx },
+				});
+			}
 		}
 	}
 
@@ -163,7 +165,8 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 	}
 
 	#onCustomValidationChange(event: UUISelectEvent) {
-		const regEx = event.target.value || event.target.value === '' ? event.target.value.toString() : null;
+		const value = event.target.value.toString();
+		const regEx = value !== '!NOVALIDATION!' ? value : null;
 
 		this._customValidationOptions.forEach((option) => {
 			option.selected = option.value === regEx;
@@ -175,9 +178,10 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 	}
 
 	#onValidationRegExChange(event: UUIInputEvent) {
-		const regEx = event.target.value || event.target.value === '' ? event.target.value.toString() : null;
+		const value = event.target.value.toString();
+		const regEx = value !== '!NOVALIDATION!' ? value : null;
 		const betterChoice = this._customValidationOptions.find((option) => {
-			option.selected = option.value === regEx;
+			option.selected = option.value === value;
 			return option.selected;
 		});
 		if (betterChoice === undefined) {
