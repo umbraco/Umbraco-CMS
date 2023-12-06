@@ -9,7 +9,14 @@ export type UmbPropertySettingsModalValue = PropertyTypeModelBaseModel;
 export const UMB_PROPERTY_SETTINGS_MODAL = new UmbModalToken<
 	UmbPropertySettingsModalData,
 	UmbPropertySettingsModalValue
->('Umb.Modal.PropertySettings', {
-	type: 'sidebar',
-	size: 'small',
-});
+>(
+	'Umb.Modal.PropertySettings',
+	{
+		type: 'sidebar',
+		size: 'small',
+	},
+	undefined,
+	{
+		validation: {},
+	},
+);
