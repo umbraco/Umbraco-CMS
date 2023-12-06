@@ -1,4 +1,5 @@
 using System.Data.Common;
+using System.Net.Http.Headers;
 using System.Reflection;
 using Dazinator.Extensions.FileProviders.GlobPatternFilter;
 using Microsoft.AspNetCore.Builder;
@@ -22,6 +23,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Blocks;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Diagnostics;
@@ -260,7 +262,11 @@ public static partial class UmbracoBuilderExtensions
                 ServerCertificateCustomValidationCallback =
                     HttpClientHandler.DangerousAcceptAnyServerCertificateValidator,
             });
-        builder.Services.AddHttpClient(Constants.HttpClients.WebhookFiring);
+        builder.Services.AddHttpClient(Constants.HttpClients.WebhookFiring, (services, client) =>
+        {
+            var productVersion = services.GetRequiredService<IUmbracoVersion>().SemanticVersion.ToSemanticStringWithoutBuild();
+            client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("Umbraco", productVersion));
+        });
         return builder;
     }
 
