@@ -101,6 +101,7 @@ public class WebhookFiring : IRecurringBackgroundJob
         {
             // Add headers
             request.Headers.Add("Umb-Webhook-Event", eventName);
+            request.Headers.Add("Umb-Webhook-Retry-Count", retryCount.ToString());
 
             foreach (KeyValuePair<string, string> header in webhook.Headers)
             {
@@ -115,7 +116,7 @@ public class WebhookFiring : IRecurringBackgroundJob
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error while sending webhook request for webhook {WebhookKey}.", webhook);
+            _logger.LogError(ex, "Error while sending webhook request for webhook {WebhookKey}.", webhook.Key);
         }
 
         var webhookResponseModel = new WebhookResponseModel
