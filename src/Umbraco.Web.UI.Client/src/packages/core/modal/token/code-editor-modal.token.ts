@@ -18,7 +18,9 @@ export interface UmbCodeEditorModalValue {
 export const UMB_CODE_EDITOR_MODAL = new UmbModalToken<UmbCodeEditorModalData, UmbCodeEditorModalValue>(
 	'Umb.Modal.CodeEditor',
 	{
-		type: 'sidebar',
-		size: 'large',
+		config: {
+			type: 'sidebar',
+			size: 'large',
+		},
 	},
 );

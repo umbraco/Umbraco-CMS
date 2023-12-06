@@ -14,6 +14,8 @@ export type UmbWorkspaceValue =
 	| undefined;
 
 export const UMB_WORKSPACE_MODAL = new UmbModalToken<UmbWorkspaceData, UmbWorkspaceValue>('Umb.Modal.Workspace', {
-	type: 'sidebar',
-	size: 'large',
+	config: {
+		type: 'sidebar',
+		size: 'large',
+	},
 });

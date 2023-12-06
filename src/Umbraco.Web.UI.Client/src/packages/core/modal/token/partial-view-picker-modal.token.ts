@@ -15,6 +15,8 @@ export const UMB_PARTIAL_VIEW_PICKER_MODAL = new UmbModalToken<
 	UmbPartialViewPickerModalData,
 	UmbPartialViewPickerModalValue
 >(UMB_PARTIAL_VIEW_PICKER_MODAL_ALIAS, {
-	type: 'sidebar',
-	size: 'small',
+	config: {
+		type: 'sidebar',
+		size: 'small',
+	},
 });

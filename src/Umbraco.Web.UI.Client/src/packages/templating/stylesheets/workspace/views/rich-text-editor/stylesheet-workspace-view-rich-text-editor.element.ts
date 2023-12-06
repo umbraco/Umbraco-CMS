@@ -14,15 +14,13 @@ import './stylesheet-workspace-view-rich-text-editor-rule.element.js';
 export const UMB_MODAL_TEMPLATING_STYLESHEET_RTF_STYLE_SIDEBAR_MODAL = new UmbModalToken<
 	never,
 	StylesheetRichTextEditorStyleModalValue
->(
-	UMB_MODAL_TEMPLATING_STYLESHEET_RTF_STYLE_SIDEBAR,
-	{
+>(UMB_MODAL_TEMPLATING_STYLESHEET_RTF_STYLE_SIDEBAR, {
+	config: {
 		type: 'sidebar',
 		size: 'medium',
 	},
-	undefined,
-	{ rule: null },
-);
+	value: { rule: null },
+});
 
 const SORTER_CONFIG: UmbSorterConfig<RichTextRuleModel> = {
 	compareElementToModel: (element: HTMLElement, model: RichTextRuleModel) => {

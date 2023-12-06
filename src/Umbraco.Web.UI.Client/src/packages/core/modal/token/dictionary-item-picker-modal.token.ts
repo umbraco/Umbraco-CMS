@@ -7,13 +7,12 @@ export type UmbDictionaryItemPickerModalValue = UmbPickerModalValue;
 export const UMB_DICTIONARY_ITEM_PICKER_MODAL = new UmbModalToken<
 	UmbDictionaryItemPickerModalData,
 	UmbDictionaryItemPickerModalValue
->(
-	'Umb.Modal.TreePicker',
-	{
+>('Umb.Modal.TreePicker', {
+	config: {
 		type: 'sidebar',
 		size: 'small',
 	},
-	{
+	data: {
 		treeAlias: 'Umb.Tree.Dictionary',
 	},
-);
+});

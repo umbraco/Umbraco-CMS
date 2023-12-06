@@ -19,8 +19,10 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 export const UMB_MODAL_TEMPLATING_INSERT_CHOOSE_TYPE_SIDEBAR_MODAL = new UmbModalToken<{ hidePartialView: boolean }>(
 	UMB_MODAL_TEMPLATING_INSERT_CHOOSE_TYPE_SIDEBAR_ALIAS,
 	{
-		type: 'sidebar',
-		size: 'small',
+		config: {
+			type: 'sidebar',
+			size: 'small',
+		},
 	},
 );
 

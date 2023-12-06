@@ -1,5 +1,11 @@
 import { UmbModalConfig } from '../modal-manager.context.js';
 
+export interface UmbModalTokenDefaults<ModalDataType extends object = object, ModalValueType = unknown> {
+	config?: UmbModalConfig;
+	data?: ModalDataType;
+	value?: ModalValueType;
+}
+
 export class UmbModalToken<ModalDataType extends object = object, ModalValueType = unknown> {
 	/**
 	 * Get the data type of the token's data.
@@ -23,17 +29,17 @@ export class UmbModalToken<ModalDataType extends object = object, ModalValueType
 	 */
 	readonly VALUE: ModalValueType = undefined as never;
 
+	#alias;
+	#defaults;
+
 	/**
 	 * @param alias   Unique identifier for the token,
-	 * @param defaultConfig  Default configuration for the modal,
-	 * @param defaultData  Default data for the modal,
+	 * @param defaults  Defaults for the modal,
 	 */
-	constructor(
-		protected alias: string,
-		protected defaultConfig?: UmbModalConfig,
-		protected defaultData?: ModalDataType,
-		protected defaultValue?: ModalValueType,
-	) {}
+	constructor(alias: string, defaults?: UmbModalTokenDefaults<ModalDataType, ModalValueType>) {
+		this.#alias = alias;
+		this.#defaults = defaults;
+	}
 
 	/**
 	 * This method must always return the unique alias of the token since that
@@ -42,18 +48,18 @@ export class UmbModalToken<ModalDataType extends object = object, ModalValueType
 	 * @returns the unique alias of the token
 	 */
 	toString(): string {
-		return this.alias;
+		return this.#alias;
 	}
 
 	public getDefaultConfig(): UmbModalConfig | undefined {
-		return this.defaultConfig;
+		return this.#defaults?.config;
 	}
 
 	public getDefaultData(): ModalDataType | undefined {
-		return this.defaultData;
+		return this.#defaults?.data;
 	}
 
 	public getDefaultValue(): ModalValueType | undefined {
-		return this.defaultValue;
+		return this.#defaults?.value;
 	}
 }

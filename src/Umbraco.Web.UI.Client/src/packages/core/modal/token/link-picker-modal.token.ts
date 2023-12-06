@@ -29,7 +29,9 @@ export interface UmbLinkPickerConfig {
 export const UMB_LINK_PICKER_MODAL = new UmbModalToken<UmbLinkPickerModalData, UmbLinkPickerModalValue>(
 	'Umb.Modal.LinkPicker',
 	{
-		type: 'sidebar',
-		size: 'small',
+		config: {
+			type: 'sidebar',
+			size: 'small',
+		},
 	},
 );

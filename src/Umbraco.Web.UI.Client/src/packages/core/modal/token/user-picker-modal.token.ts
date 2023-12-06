@@ -10,7 +10,9 @@ export interface UmbUserPickerModalValue {
 export const UMB_USER_PICKER_MODAL = new UmbModalToken<UmbUserPickerModalData, UmbUserPickerModalValue>(
 	'Umb.Modal.User.Picker',
 	{
-		type: 'sidebar',
-		size: 'small',
+		config: {
+			type: 'sidebar',
+			size: 'small',
+		},
 	},
 );
