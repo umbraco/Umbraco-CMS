@@ -1,6 +1,6 @@
 import { UMB_BACKOFFICE_CONTEXT_TOKEN } from '../backoffice.context.js';
 import type { UmbBackofficeContext } from '../backoffice.context.js';
-import { css, CSSResultGroup, html, when, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { css, CSSResultGroup, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import type { ManifestSection } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbExtensionManifestInitializer } from '@umbraco-cms/backoffice/extension-api';
@@ -28,22 +28,30 @@ export class UmbBackofficeHeaderSectionsElement extends UmbLitElement {
 	private _observeSections() {
 		if (!this._backofficeContext) return;
 
-		this.observe(this._backofficeContext.allowedSections, (allowedSections) => {
-			const oldValue = this._sections;
-			this._sections = allowedSections;
-			this.requestUpdate('_sections', oldValue);
-		});
+		this.observe(
+			this._backofficeContext.allowedSections,
+			(allowedSections) => {
+				const oldValue = this._sections;
+				this._sections = allowedSections;
+				this.requestUpdate('_sections', oldValue);
+			},
+			'observeSections',
+		);
 	}
 
 	private _observeCurrentSection() {
 		if (!this._backofficeContext) return;
 
-		this.observe(this._backofficeContext.activeSectionAlias, (currentSectionAlias) => {
-			this._currentSectionAlias = currentSectionAlias || '';
-		});
+		this.observe(
+			this._backofficeContext.activeSectionAlias,
+			(currentSectionAlias) => {
+				this._currentSectionAlias = currentSectionAlias || '';
+			},
+			'observeCurrentSection',
+		);
 	}
 
-	private _renderSections() {
+	render() {
 		return html`
 			<uui-tab-group id="tabs">
 				${repeat(
@@ -58,10 +66,6 @@ export class UmbBackofficeHeaderSectionsElement extends UmbLitElement {
 				)}
 			</uui-tab-group>
 		`;
-	}
-
-	render() {
-		return html` ${this._renderSections()} `;
 	}
 
 	static styles: CSSResultGroup = [

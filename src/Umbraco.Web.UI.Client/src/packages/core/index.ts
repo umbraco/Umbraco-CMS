@@ -12,9 +12,8 @@ import { manifests as conditionManifests } from './extension-registry/conditions
 import { manifests as cultureManifests } from './culture/manifests.js';
 import { manifests as dataTypeManifests } from './data-type/manifests.js';
 
-import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
-import { UmbModalManagerContext, UMB_MODAL_MANAGER_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
-import { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
+import { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
+import { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UmbExtensionsApiInitializer, type UmbEntryPointOnInit } from '@umbraco-cms/backoffice/extension-api';
 import type { ManifestTypes, UmbBackofficeManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -73,6 +72,6 @@ export const onInit: UmbEntryPointOnInit = (host, extensionRegistry) => {
 	const modalContainerElement = new UmbBackofficeModalContainerElement();
 	host.appendChild(modalContainerElement);
 
-	new UmbContextProviderController(host, UMB_NOTIFICATION_CONTEXT_TOKEN, new UmbNotificationContext());
-	new UmbContextProviderController(host, UMB_MODAL_MANAGER_CONTEXT_TOKEN, new UmbModalManagerContext(host));
+	new UmbNotificationContext(host);
+	new UmbModalManagerContext(host);
 };

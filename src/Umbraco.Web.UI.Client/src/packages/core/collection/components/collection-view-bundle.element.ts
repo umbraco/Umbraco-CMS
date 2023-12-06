@@ -67,7 +67,7 @@ export class UmbCollectionViewBundleElement extends UmbLitElement {
 			<uui-button compact popovertarget="collection-view-bundle-popover" label="status">
 				${this.#renderItemDisplay(this._currentView)}
 			</uui-button>
-			<uui-popover-container id="collection-view-bundle-popover" popover placement="bottom">
+			<uui-popover-container id="collection-view-bundle-popover" placement="bottom">
 				<umb-popover-layout>
 					<div class="filter-dropdown">${this._views.map((view) => this.#renderItem(view))}</div>
 				</umb-popover-layout>

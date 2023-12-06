@@ -1,4 +1,4 @@
-import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, state, css } from '@umbraco-cms/backoffice/external/lit';
 import { ManifestEntityAction } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
@@ -34,6 +34,14 @@ export class UmbEntityActionListElement extends UmbLitElement {
 			  `
 			: '';
 	}
+
+	static styles = [
+		css`
+			:host {
+				--uui-menu-item-flat-structure: 1;
+			}
+		`,
+	];
 }
 
 declare global {

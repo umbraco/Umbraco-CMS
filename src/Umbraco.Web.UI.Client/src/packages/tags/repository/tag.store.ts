@@ -43,7 +43,7 @@ export class UmbTagStore extends UmbStoreBase {
 
 	items(group: TagResponseModel['group'], culture: string) {
 		return this._data.asObservablePart((items) =>
-			items.filter((item) => item.group === group && item.culture === culture)
+			items.filter((item) => item.group === group && item.culture === culture),
 		);
 	}
 
@@ -59,8 +59,8 @@ export class UmbTagStore extends UmbStoreBase {
 				(item) =>
 					item.group === group &&
 					item.culture === culture &&
-					item.query?.toLocaleLowerCase().includes(query.toLocaleLowerCase())
-			)
+					item.query?.toLocaleLowerCase().includes(query.toLocaleLowerCase()),
+			),
 		);
 	}
 

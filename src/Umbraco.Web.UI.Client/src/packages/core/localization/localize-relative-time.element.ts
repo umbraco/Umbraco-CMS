@@ -16,15 +16,15 @@ export class UmbLocalizeRelativeTimeElement extends UmbLitElement {
 	@property()
 	time!: number;
 
-    /**
+	/**
 	 * Formatting options
 	 * @attr
 	 * @example options={ dateStyle: 'full', timeStyle: 'long', timeZone: 'Australia/Sydney' }
 	 */
-	@property() 
+	@property()
 	options?: Intl.RelativeTimeFormatOptions;
-	
-    /**
+
+	/**
 	 * Unit
 	 * @attr
 	 * @example unit='seconds'
@@ -34,13 +34,11 @@ export class UmbLocalizeRelativeTimeElement extends UmbLitElement {
 
 	@state()
 	protected get text(): string {
-	    return this.localize.relativeTime(this.time, this.unit, this.options);
+		return this.localize.relativeTime(this.time, this.unit, this.options);
 	}
 
 	protected render() {
-		return this.time 
-            ? html`${unsafeHTML(this.text)}`
-            : html`<slot></slot>`
+		return this.time ? html`${unsafeHTML(this.text)}` : html`<slot></slot>`;
 	}
 
 	static styles = [

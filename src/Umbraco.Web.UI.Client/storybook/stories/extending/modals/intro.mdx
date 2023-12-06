@@ -46,8 +46,10 @@ export type OurSomethingPickerModalValue = {
 export const MY_SOMETHING_PICKER_MODAL = new UmbModalToken<UmbLinkPickerModalData, UmbLinkPickerModalValue>(
 	'Our.Modal.SomethingPicker',
 	{
-		type: 'sidebar',
-		size: 'small',
+		config: {
+			type: 'sidebar',
+			size: 'small',
+		},
 	},
 );
 ```

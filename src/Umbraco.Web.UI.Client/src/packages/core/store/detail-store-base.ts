@@ -11,7 +11,7 @@ import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
  */
 
 export abstract class UmbDetailStoreBase<T extends { unique: string }>
-	extends UmbStoreBase
+	extends UmbStoreBase<T>
 	implements UmbDetailStore<T>
 {
 	/**

@@ -5,8 +5,8 @@ import { type UmbTreeStore } from '@umbraco-cms/backoffice/tree';
 export interface ManifestStore extends ManifestApi<UmbStoreBase> {
 	type: 'store';
 }
-
-export interface ManifestTreeStore extends ManifestApi<UmbTreeStore> {
+// TODO: TREE STORE TYPE PROBLEM: Provide a base tree item type?
+export interface ManifestTreeStore extends ManifestApi<UmbTreeStore<any>> {
 	type: 'treeStore';
 }
 

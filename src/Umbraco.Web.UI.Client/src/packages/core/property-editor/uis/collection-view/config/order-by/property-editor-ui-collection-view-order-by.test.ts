@@ -6,9 +6,9 @@ describe('UmbPropertyEditorUICollectionViewOrderByElement', () => {
 	let element: UmbPropertyEditorUICollectionViewOrderByElement;
 
 	beforeEach(async () => {
-		element = await fixture(
-			html` <umb-property-editor-ui-collection-view-order-by></umb-property-editor-ui-collection-view-order-by> `
-		);
+		element = await fixture(html`
+			<umb-property-editor-ui-collection-view-order-by></umb-property-editor-ui-collection-view-order-by>
+		`);
 	});
 
 	it('is defined with its own instance', () => {

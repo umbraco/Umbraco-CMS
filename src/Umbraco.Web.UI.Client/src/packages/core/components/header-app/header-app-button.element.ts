@@ -1,4 +1,4 @@
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, CSSResultGroup, html, LitElement, customElement, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import {
 	ManifestHeaderAppButtonKind,

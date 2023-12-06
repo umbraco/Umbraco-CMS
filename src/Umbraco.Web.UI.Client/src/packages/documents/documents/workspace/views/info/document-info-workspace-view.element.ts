@@ -105,7 +105,7 @@ export class UmbDocumentInfoWorkspaceViewElement extends UmbLitElement {
 		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
 			.addAdditionalPath('document-type')
 			.onSetup(() => {
-				return { entityType: 'document-type', preset: {} };
+				return { data: { entityType: 'document-type', preset: {} } };
 			})
 			.observeRouteBuilder((routeBuilder) => {
 				this._editDocumentTypePath = routeBuilder({});
@@ -138,13 +138,15 @@ export class UmbDocumentInfoWorkspaceViewElement extends UmbLitElement {
 
 	render() {
 		return html`<div class="container">
-				<uui-box headline=${this.localize.term('general_links')} style="--uui-box-default-padding: 0;"> ${this.#renderLinksSection()} </uui-box>
+				<uui-box headline=${this.localize.term('general_links')} style="--uui-box-default-padding: 0;">
+					${this.#renderLinksSection()}
+				</uui-box>
 				<uui-box headline=${this.localize.term('general_history')}>
 					<umb-history-list>
 						${repeat(
 							this._historyList,
 							(item) => item.timestamp,
-							(item) => this.#renderHistory(item)
+							(item) => this.#renderHistory(item),
 						)}
 					</umb-history-list>
 					${this.#renderHistoryPagination()}
@@ -173,11 +175,14 @@ export class UmbDocumentInfoWorkspaceViewElement extends UmbLitElement {
 		return html`
 			<div class="general-item">
 				<strong>${this.localize.term('content_publishStatus')}</strong>
-				<span><uui-tag color="positive" look="primary" label=${this.localize.term('content_published')}><umb-localize key="content_published"></umb-localize></uui-tag></span>
+				<span
+					><uui-tag color="positive" look="primary" label=${this.localize.term('content_published')}
+						><umb-localize key="content_published"></umb-localize></uui-tag
+				></span>
 			</div>
 			<div class="general-item">
 				<strong><umb-localize key="content_createDate"></umb-localize></strong>
-				<span><umb-localize-date date="${new Date}"></umb-localize-date></span>
+				<span><umb-localize-date date="${new Date()}"></umb-localize-date></span>
 			</div>
 			<div class="general-item">
 				<strong><umb-localize key="content_documentType"></umb-localize></strong>
@@ -198,9 +203,11 @@ export class UmbDocumentInfoWorkspaceViewElement extends UmbLitElement {
 
 	#renderHistory(history: HistoryNode) {
 		return html` <umb-history-item .name="${history.userName}" .detail="${this.localize.date(history.timestamp!)}">
-			<span class="log-type">${this.#renderTag(history.logType)} ${this.#renderTagDescription(history.logType, history)}</span>
+			<span class="log-type"
+				>${this.#renderTag(history.logType)} ${this.#renderTagDescription(history.logType, history)}</span
+			>
 			<uui-button label=${this.localize.term('actions_rollback')} look="secondary" slot="actions">
-				<uui-icon name="icon-undo"></uui-icon> 
+				<uui-icon name="icon-undo"></uui-icon>
 				<umb-localize key="actions_rollback"></umb-localize>
 			</uui-button>
 		</umb-history-item>`;
@@ -221,15 +228,29 @@ export class UmbDocumentInfoWorkspaceViewElement extends UmbLitElement {
 	#renderTag(type?: HistoryLogType) {
 		switch (type) {
 			case 'Publish':
-				return html`<uui-tag look="primary" color="positive" label=${this.localize.term('content_publish')}><umb-localize key="content_publish"></umb-localize></uui-tag>`;
+				return html`<uui-tag look="primary" color="positive" label=${this.localize.term('content_publish')}
+					><umb-localize key="content_publish"></umb-localize
+				></uui-tag>`;
 			case 'Unpublish':
-				return html`<uui-tag look="primary" color="warning" label=${this.localize.term('content_unpublish')}><umb-localize key="content_unpublish"></umb-localize></uui-tag>`;
+				return html`<uui-tag look="primary" color="warning" label=${this.localize.term('content_unpublish')}
+					><umb-localize key="content_unpublish"></umb-localize
+				></uui-tag>`;
 			case 'Save':
-				return html`<uui-tag look="primary" label=${this.localize.term('auditTrails_smallSave')}><umb-localize key="auditTrails_smallSave"></umb-localize></uui-tag>`;
+				return html`<uui-tag look="primary" label=${this.localize.term('auditTrails_smallSave')}
+					><umb-localize key="auditTrails_smallSave"></umb-localize
+				></uui-tag>`;
 			case 'ContentVersionEnableCleanup':
-				return html`<uui-tag look="secondary" label=${this.localize.term('contentTypeEditor_historyCleanupEnableCleanup')}><umb-localize key="contentTypeEditor_historyCleanupEnableCleanup"></umb-localize></uui-tag>`;
+				return html`<uui-tag
+					look="secondary"
+					label=${this.localize.term('contentTypeEditor_historyCleanupEnableCleanup')}
+					><umb-localize key="contentTypeEditor_historyCleanupEnableCleanup"></umb-localize
+				></uui-tag>`;
 			case 'ContentVersionPreventCleanup':
-				return html`<uui-tag look="secondary" label=${this.localize.term('contentTypeEditor_historyCleanupPreventCleanup')}><umb-localize key="contentTypeEditor_historyCleanupPreventCleanup"></umb-localize></uui-tag>`;
+				return html`<uui-tag
+					look="secondary"
+					label=${this.localize.term('contentTypeEditor_historyCleanupPreventCleanup')}
+					><umb-localize key="contentTypeEditor_historyCleanupPreventCleanup"></umb-localize
+				></uui-tag>`;
 			default:
 				return 'Could not detect log type';
 		}

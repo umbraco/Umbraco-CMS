@@ -18,13 +18,21 @@ export class UmbUserProfileAppThemesElement extends UmbLitElement {
 		super();
 		this.consumeContext(UMB_THEME_CONTEXT_TOKEN, (context) => {
 			this.#themeContext = context;
-			this.observe(context.theme, (themeAlias) => {
-				this._themeAlias = themeAlias;
-			}, '_observeCurrentTheme');
+			this.observe(
+				context.theme,
+				(themeAlias) => {
+					this._themeAlias = themeAlias;
+				},
+				'_observeCurrentTheme',
+			);
 
-			this.observe(umbExtensionsRegistry.extensionsOfType('theme'), (themes) => {
-				this._themes = themes;
-			}, '_observeThemeExtensions');
+			this.observe(
+				umbExtensionsRegistry.extensionsOfType('theme'),
+				(themes) => {
+					this._themes = themes;
+				},
+				'_observeThemeExtensions',
+			);
 		});
 	}
 

@@ -22,8 +22,12 @@ export class UmbMediaMoveEntityBulkAction extends UmbEntityBulkActionBase<UmbMed
 	async execute() {
 		// TODO: the picker should be single picker by default
 		const modalContext = this.#modalContext?.open(UMB_MEDIA_TREE_PICKER_MODAL, {
-			selection: [],
-			multiple: false,
+			data: {
+				multiple: false,
+			},
+			value: {
+				selection: [],
+			},
 		});
 		if (modalContext) {
 			const { selection } = await modalContext.onSubmit();

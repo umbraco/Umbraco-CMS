@@ -57,8 +57,10 @@ export class UmbUserCreateModalElement extends UmbModalBaseElement {
 
 	#openSuccessModal(userId: string, initialPassword: string) {
 		const modalContext = this.#modalManagerContext?.open(UMB_CREATE_USER_SUCCESS_MODAL, {
-			userId,
-			initialPassword,
+			data: {
+				userId,
+				initialPassword,
+			},
 		});
 
 		modalContext?.onSubmit().catch((reason) => {

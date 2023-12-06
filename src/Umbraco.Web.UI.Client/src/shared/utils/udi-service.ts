@@ -18,6 +18,6 @@ export function getKeyFromUdi(udi: string) {
 
 	return `${withoutHost.substring(0, 8)}-${withoutHost.substring(8, 12)}-${withoutHost.substring(
 		12,
-		16
+		16,
 	)}-${withoutHost.substring(16, 20)}-${withoutHost.substring(20)}`;
 }

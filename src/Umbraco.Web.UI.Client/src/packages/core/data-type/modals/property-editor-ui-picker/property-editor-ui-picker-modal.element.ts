@@ -1,22 +1,21 @@
-import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import {
 	UmbPropertyEditorUIPickerModalData,
 	UmbPropertyEditorUIPickerModalValue,
-	UmbModalContext,
+	UmbModalBaseElement,
 } from '@umbraco-cms/backoffice/modal';
 import { ManifestPropertyEditorUi, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 interface GroupedPropertyEditorUIs {
 	[key: string]: Array<ManifestPropertyEditorUi>;
 }
 @customElement('umb-property-editor-ui-picker-modal')
-export class UmbPropertyEditorUIPickerModalElement extends UmbLitElement {
-	@property({ type: Object })
-	data?: UmbPropertyEditorUIPickerModalData;
-
+export class UmbPropertyEditorUIPickerModalElement extends UmbModalBaseElement<
+	UmbPropertyEditorUIPickerModalData,
+	UmbPropertyEditorUIPickerModalValue
+> {
 	@state()
 	private _groupedPropertyEditorUIs: GroupedPropertyEditorUIs = {};
 
@@ -24,24 +23,17 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbLitElement {
 	private _propertyEditorUIs: Array<ManifestPropertyEditorUi> = [];
 
 	@state()
-	private _selection: Array<string> = [];
-
-	@state()
 	private _submitLabel = 'Select';
-
-	@property({ attribute: false })
-	modalContext?: UmbModalContext<UmbPropertyEditorUIPickerModalData, UmbPropertyEditorUIPickerModalValue>;
 
 	connectedCallback(): void {
 		super.connectedCallback();
 
-		this._selection = this.data?.selection ?? [];
 		this._submitLabel = this.data?.submitLabel ?? this._submitLabel;
 
-		this._usePropertyEditorUIs();
+		this.#usePropertyEditorUIs();
 	}
 
-	private _usePropertyEditorUIs() {
+	#usePropertyEditorUIs() {
 		if (!this.data) return;
 
 		this.observe(umbExtensionsRegistry.extensionsOfType('propertyEditorUi'), (propertyEditorUIs) => {
@@ -60,15 +52,15 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbLitElement {
 		});
 	}
 
-	private _handleClick(propertyEditorUi: ManifestPropertyEditorUi) {
-		this._select(propertyEditorUi.alias);
+	#handleClick(propertyEditorUi: ManifestPropertyEditorUi) {
+		this.#select(propertyEditorUi.alias);
 	}
 
-	private _select(alias: string) {
-		this._selection = [alias];
+	#select(alias: string) {
+		this.value = { selection: [alias] };
 	}
 
-	private _handleFilterInput(event: UUIInputEvent) {
+	#handleFilterInput(event: UUIInputEvent) {
 		let query = (event.target.value as string) || '';
 		query = query.toLowerCase();
 
@@ -89,21 +81,17 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbLitElement {
 		);
 	}
 
-	private _close() {
-		this.modalContext?.reject();
-	}
-
-	private _submit() {
-		this.modalContext?.submit({ selection: this._selection });
-	}
-
 	render() {
 		return html`
 			<umb-body-layout headline="Select Property Editor UI">
 				<uui-box> ${this._renderFilter()} ${this._renderGrid()} </uui-box>
 				<div slot="actions">
-					<uui-button label="Close" @click=${this._close}></uui-button>
-					<uui-button label="${this._submitLabel}" look="primary" color="positive" @click=${this._submit}></uui-button>
+					<uui-button label="Close" @click=${this._rejectModal}></uui-button>
+					<uui-button
+						label="${this._submitLabel}"
+						look="primary"
+						color="positive"
+						@click=${this._submitModal}></uui-button>
 				</div>
 			</umb-body-layout>
 		`;
@@ -113,7 +101,7 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbLitElement {
 		return html` <uui-input
 			type="search"
 			id="filter"
-			@input="${this._handleFilterInput}"
+			@input="${this.#handleFilterInput}"
 			placeholder="Type to filter..."
 			label="Type to filter icons">
 			<uui-icon name="search" slot="prepend" id="filter-icon"></uui-icon>
@@ -134,8 +122,8 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbLitElement {
 				groupItems,
 				(propertyEditorUI) => propertyEditorUI.alias,
 				(propertyEditorUI) =>
-					html` <li class="item" ?selected=${this._selection.includes(propertyEditorUI.alias)}>
-						<button type="button" @click="${() => this._handleClick(propertyEditorUI)}">
+					html` <li class="item" ?selected=${this.value.selection.includes(propertyEditorUI.alias)}>
+						<button type="button" @click="${() => this.#handleClick(propertyEditorUI)}">
 							<uui-icon name="${propertyEditorUI.meta.icon}" class="icon"></uui-icon>
 							${propertyEditorUI.meta.label || propertyEditorUI.name}
 						</button>

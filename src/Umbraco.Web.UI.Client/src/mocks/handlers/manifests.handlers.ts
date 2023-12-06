@@ -75,7 +75,7 @@ export const manifestDevelopmentHandler = rest.get(umbracoPath('/package/manifes
 					},
 				],
 			},
-		])
+		]),
 	);
 });
 
@@ -83,6 +83,6 @@ export const manifestEmptyHandler = rest.get(umbracoPath('/package/manifest'), (
 	return res(
 		// Respond with a 200 status code
 		ctx.status(200),
-		ctx.json<PackageManifestResponse>([])
+		ctx.json<PackageManifestResponse>([]),
 	);
 });

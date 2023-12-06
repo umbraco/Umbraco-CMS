@@ -1,4 +1,4 @@
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, LitElement, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 
 @customElement('umb-empty-state')
