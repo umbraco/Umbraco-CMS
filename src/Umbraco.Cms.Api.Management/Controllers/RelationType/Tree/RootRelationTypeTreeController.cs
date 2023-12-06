@@ -26,7 +26,7 @@ public class RootRelationTypeTreeController : RelationTypeTreeControllerBase
         PagedModel<IRelationType> pagedRelationTypes = await _relationService.GetPagedRelationTypesAsync(skip, take);
 
         PagedViewModel<EntityTreeItemResponseModel> pagedResult = PagedViewModel(
-            MapTreeItemViewModels(null, pagedRelationTypes.Items.ToArray()),
+            MapTreeItemViewModels(null, pagedRelationTypes.Items),
             pagedRelationTypes.Total);
 
         return Ok(pagedResult);

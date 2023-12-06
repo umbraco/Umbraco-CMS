@@ -124,22 +124,24 @@ public class RelationService : RepositoryService, IRelationService
 
     /// <summary>
     /// Gets the Relation types in a paged manner.
-    /// Currently implements the paging in memory on the name attribute because the underlying repository does not support paging yet
+    /// Currently implements the paging in memory on the name property because the underlying repository does not support paging yet
     /// </summary>
     public async Task<PagedModel<IRelationType>> GetPagedRelationTypesAsync(int skip, int take, params int[] ids)
     {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+
         if (take == 0)
         {
             return new PagedModel<IRelationType>(CountRelationTypes(), Enumerable.Empty<IRelationType>());
         }
 
-        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
-
         IRelationType[] items = await Task.FromResult(_relationTypeRepository.GetMany(ids).ToArray());
 
-        return new PagedModel<IRelationType>(items.Length, items.OrderBy(relationType => relationType.Name)
-            .Skip(skip)
-            .Take(take));
+        return new PagedModel<IRelationType>(
+            items.Length,
+            items.OrderBy(relationType => relationType.Name)
+                .Skip(skip)
+                .Take(take));
     }
 
     public int CountRelationTypes()
