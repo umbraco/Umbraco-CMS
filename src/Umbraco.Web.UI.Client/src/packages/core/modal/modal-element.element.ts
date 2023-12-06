@@ -11,11 +11,31 @@ export abstract class UmbModalBaseElement<
 	extends UmbLitElement
 	implements UmbModalExtensionElement<ModalDataType, ModalValueType, ModalManifestType>
 {
+	#value: ModalValueType = {} as ModalValueType;
+
 	@property({ type: Object, attribute: false })
 	public manifest?: ModalManifestType;
 
 	@property({ attribute: false })
-	public modalContext?: UmbModalContext<ModalDataType, ModalValueType>;
+	public get modalContext(): UmbModalContext<ModalDataType, ModalValueType> | undefined {
+		return this.#modalContext;
+	}
+	public set modalContext(context: UmbModalContext<ModalDataType, ModalValueType> | undefined) {
+		this.#modalContext = context;
+		if (context) {
+			this.observe(
+				context.value,
+				(value) => {
+					const oldValue = this.#value;
+					this.#value = value;
+					this.requestUpdate('_value', oldValue);
+					// Idea: we could implement a callback method on class.
+				},
+				'observeModalContextValue',
+			);
+		}
+	}
+	#modalContext?: UmbModalContext<ModalDataType, ModalValueType> | undefined;
 
 	@property({ type: Object, attribute: false })
 	public get data(): ModalDataType | undefined {
@@ -28,10 +48,14 @@ export abstract class UmbModalBaseElement<
 
 	@state()
 	public get _value(): ModalValueType {
-		return this.modalContext?.getValue() ?? ({} as ModalValueType);
+		return this.#value;
 	}
 	public set _value(value: ModalValueType) {
-		this.modalContext?.setValue(value);
+		this.#modalContext?.setValue(value);
+	}
+
+	public updateValue(partialValue: Partial<ModalValueType>) {
+		this.#modalContext?.updateValue(partialValue);
 	}
 
 	/**
@@ -40,7 +64,7 @@ export abstract class UmbModalBaseElement<
 	 * @memberof UmbModalBaseElement
 	 */
 	protected _submitModal() {
-		this.modalContext?.submit();
+		this.#modalContext?.submit();
 	}
 
 	/**
@@ -49,6 +73,6 @@ export abstract class UmbModalBaseElement<
 	 * @memberof UmbModalBaseElement
 	 */
 	protected _rejectModal() {
-		this.modalContext?.reject();
+		this.#modalContext?.reject();
 	}
 }

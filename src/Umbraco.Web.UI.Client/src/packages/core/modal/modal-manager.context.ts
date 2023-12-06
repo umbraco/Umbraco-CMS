@@ -33,7 +33,7 @@ export class UmbModalManagerContext {
 	 */
 	public open<
 		ModalData extends object = object,
-		ModalValue extends object = object,
+		ModalValue = unknown,
 		ModalAliasTypeAsToken extends UmbModalToken = UmbModalToken<ModalData, ModalValue>,
 	>(
 		modalAlias: UmbModalToken<ModalData, ModalValue> | string,

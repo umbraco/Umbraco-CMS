@@ -64,21 +64,21 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 		});
 
 		this._originalPropertyData = this._value;
-		// TODO: Use some utility method for this deep clone:
-		this._value = JSON.parse(JSON.stringify(this._value ?? {}));
 
-		this._value.validation ??= {};
-
-		const regEx = this._value.validation.regEx ?? null;
+		const regEx = this._value.validation?.regEx ?? null;
 		const newlySelected = this._customValidationOptions.find((option) => {
 			option.selected = option.value === regEx;
 			return option.selected;
 		});
 		if (newlySelected === undefined) {
 			this._customValidationOptions[4].selected = true;
-			this._value.validation.regEx = this._customValidationOptions[4].value;
+			this.updateValue({
+				validation: { ...this._value.validation, regEx: this._customValidationOptions[4].value },
+			});
 		} else {
-			this._value.validation.regEx = regEx;
+			this.updateValue({
+				validation: { ...this._value.validation, regEx: regEx },
+			});
 		}
 	}
 
@@ -106,58 +106,56 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 	#onNameChange(event: UUIInputEvent) {
 		const oldName = this._value.name;
 		const oldAlias = this._value.alias;
-		this._value.name = event.target.value.toString();
+		this.updateValue({ name: event.target.value.toString() });
 		if (this._aliasLocked) {
 			const expectedOldAlias = generateAlias(oldName ?? '');
 			// Only update the alias if the alias matches a generated alias of the old name (otherwise the alias is considered one written by the user.)
 			if (expectedOldAlias === oldAlias) {
-				this._value.alias = generateAlias(this._value.name);
-				this.requestUpdate('_returnData');
+				this.updateValue({ alias: generateAlias(this._value.name ?? '') });
 			}
 		}
 	}
 
 	#onAliasChange(event: UUIInputEvent) {
 		const alias = generateAlias(event.target.value.toString());
-		if (!this._aliasLocked) {
-			this._value.alias = alias;
-		} else {
-			this._value.alias = this._originalPropertyData.alias;
-		}
-		this.requestUpdate('_returnData');
+		this.updateValue({ alias: this._aliasLocked ? this._originalPropertyData.alias : alias });
 	}
 
 	#onDataTypeIdChange(event: UUIInputEvent) {
 		const dataTypeId = event.target.value.toString();
-		this._value.dataTypeId = dataTypeId;
-		this.requestUpdate('_returnData');
+		this.updateValue({ dataTypeId });
 	}
 
 	#onMandatoryChange(event: UUIBooleanInputEvent) {
-		const value = event.target.checked;
-		this._value.validation!.mandatory = value;
-		this.requestUpdate('_returnData');
+		const mandatory = event.target.checked;
+		this._value.validation!.mandatory = mandatory;
+		this.updateValue({
+			validation: { ...this._value.validation, mandatory },
+		});
 	}
 
 	#onMandatoryMessageChange(event: UUIInputEvent) {
-		const value = event.target.value.toString();
-		this._value.validation!.mandatoryMessage = value;
-		this.requestUpdate('_returnData');
+		const mandatoryMessage = event.target.value.toString();
+		this.updateValue({
+			validation: { ...this._value.validation, mandatoryMessage },
+		});
 	}
 
 	#setAppearanceNormal() {
 		const currentValue = this._value.appearance?.labelOnTop;
 		if (currentValue !== true) return;
 
-		this._value.appearance!.labelOnTop = false;
-		this.requestUpdate('_returnData');
+		this.updateValue({
+			appearance: { ...this._value.appearance, labelOnTop: false },
+		});
 	}
 	#setAppearanceTop() {
 		const currentValue = this._value.appearance?.labelOnTop;
 		if (currentValue === true) return;
 
-		this._value.appearance!.labelOnTop = true;
-		this.requestUpdate('_returnData');
+		this.updateValue({
+			appearance: { ...this._value.appearance, labelOnTop: true },
+		});
 	}
 
 	#onToggleAliasLock() {
@@ -170,10 +168,10 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 		this._customValidationOptions.forEach((option) => {
 			option.selected = option.value === regEx;
 		});
-
-		this._value.validation!.regEx = regEx ?? null;
-		this.requestUpdate('_returnData');
 		this.requestUpdate('_customValidationOptions');
+		this.updateValue({
+			validation: { ...this._value.validation, regEx },
+		});
 	}
 
 	#onValidationRegExChange(event: UUIInputEvent) {
@@ -184,19 +182,24 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 		});
 		if (betterChoice === undefined) {
 			this._customValidationOptions[4].selected = true;
+			this.requestUpdate('_customValidationOptions');
 		}
-		this._value.validation!.regEx = regEx;
-		this.requestUpdate('_returnData');
-		this.requestUpdate('_customValidationOptions');
+		this.updateValue({
+			validation: { ...this._value.validation, regEx },
+		});
 	}
 	#onValidationMessageChange(event: UUIInputEvent) {
-		this._value.validation!.regExMessage = event.target.value.toString();
-		this.requestUpdate('_returnData');
+		const regExMessage = event.target.value.toString();
+		this.updateValue({
+			validation: { ...this._value.validation, regExMessage },
+		});
 	}
 
 	#onVaryByCultureChange(event: UUIBooleanInputEvent) {
-		this._value.variesByCulture = event.target.checked;
-		this.requestUpdate('_returnData');
+		const variesByCulture = event.target.checked;
+		this.updateValue({
+			variesByCulture,
+		});
 	}
 
 	// TODO: This would conceptually be a Property Editor Workspace, should be changed at one point in the future.
