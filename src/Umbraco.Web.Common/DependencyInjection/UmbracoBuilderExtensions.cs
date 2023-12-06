@@ -260,7 +260,7 @@ public static partial class UmbracoBuilderExtensions
                 ServerCertificateCustomValidationCallback =
                     HttpClientHandler.DangerousAcceptAnyServerCertificateValidator,
             });
-        builder.Services.AddHttpClient<IRecurringBackgroundJob, WebhookFiring>();
+        builder.Services.AddHttpClient(Constants.HttpClients.WebhookFiring);
         return builder;
     }
 
