@@ -101,6 +101,7 @@ public class WebhookFiring : IRecurringBackgroundJob
         {
             // Add headers
             request.Headers.Add("Umb-Webhook-Event", eventName);
+            request.Headers.Add("Umb-Webhook-RetryCount", retryCount.ToString());
 
             foreach (KeyValuePair<string, string> header in webhook.Headers)
             {
