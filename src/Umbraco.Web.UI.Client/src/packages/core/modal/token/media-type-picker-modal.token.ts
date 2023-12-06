@@ -7,7 +7,7 @@ export type UmbMediaTypePickerModalValue = UmbPickerModalValue;
 export const UMB_MEDIA_TYPE_PICKER_MODAL = new UmbModalToken<UmbMediaTypePickerModalData, UmbMediaTypePickerModalValue>(
 	'Umb.Modal.TreePicker',
 	{
-		config: {
+		modal: {
 			type: 'sidebar',
 			size: 'small',
 		},

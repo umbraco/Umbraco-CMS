@@ -17,7 +17,7 @@ export type UmbModalContextClassArgs<
 	router?: IRouterSlot | null;
 	data?: ModalAliasTypeAsToken['DATA'];
 	value?: ModalAliasTypeAsToken['VALUE'];
-	config?: UmbModalConfig;
+	modal?: UmbModalConfig;
 };
 
 // TODO: consider splitting this into two separate handlers
@@ -41,17 +41,17 @@ export class UmbModalContext<ModalPreset extends object = object, ModalValue = a
 		args: UmbModalContextClassArgs<UmbModalToken>,
 	) {
 		super();
-		this.key = args.config?.key || UmbId.new();
+		this.key = args.modal?.key || UmbId.new();
 		this.router = args.router ?? null;
 		this.alias = modalAlias;
 
 		if (this.alias instanceof UmbModalToken) {
-			this.type = this.alias.getDefaultConfig()?.type || this.type;
-			this.size = this.alias.getDefaultConfig()?.size || this.size;
+			this.type = this.alias.getDefaultModal()?.type || this.type;
+			this.size = this.alias.getDefaultModal()?.size || this.size;
 		}
 
-		this.type = args.config?.type || this.type;
-		this.size = args.config?.size || this.size;
+		this.type = args.modal?.type || this.type;
+		this.size = args.modal?.size || this.size;
 
 		const defaultData = this.alias instanceof UmbModalToken ? this.alias.getDefaultData() : undefined;
 		this.data = Object.freeze({ ...defaultData, ...args.data } as ModalPreset);

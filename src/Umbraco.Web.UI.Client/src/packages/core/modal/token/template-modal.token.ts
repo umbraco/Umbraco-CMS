@@ -10,7 +10,7 @@ export interface UmbTemplateModalValue {
 }
 
 export const UMB_TEMPLATE_MODAL = new UmbModalToken<UmbTemplateModalData, UmbTemplateModalValue>('Umb.Modal.Template', {
-	config: {
+	modal: {
 		type: 'sidebar',
 		size: 'full',
 	},

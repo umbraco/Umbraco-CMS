@@ -21,7 +21,7 @@ export interface UmbContextSaveSearchModalData {
 export const UMB_LOG_VIEWER_SAVE_SEARCH_MODAL = new UmbModalToken<UmbContextSaveSearchModalData>(
 	'Umb.Modal.LogViewer.SaveSearch',
 	{
-		config: {
+		modal: {
 			type: 'dialog',
 			size: 'small',
 		},

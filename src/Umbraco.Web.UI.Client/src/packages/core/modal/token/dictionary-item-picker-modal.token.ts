@@ -8,7 +8,7 @@ export const UMB_DICTIONARY_ITEM_PICKER_MODAL = new UmbModalToken<
 	UmbDictionaryItemPickerModalData,
 	UmbDictionaryItemPickerModalValue
 >('Umb.Modal.TreePicker', {
-	config: {
+	modal: {
 		type: 'sidebar',
 		size: 'small',
 	},

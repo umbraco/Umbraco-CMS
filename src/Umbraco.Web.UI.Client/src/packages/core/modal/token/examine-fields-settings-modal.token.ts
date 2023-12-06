@@ -15,7 +15,7 @@ export const UMB_EXAMINE_FIELDS_SETTINGS_MODAL = new UmbModalToken<
 	UmbExamineFieldsSettingsModalData,
 	UmbExamineFieldsSettingsModalValue
 >('Umb.Modal.ExamineFieldsSettings', {
-	config: {
+	modal: {
 		type: 'sidebar',
 		size: 'small',
 	},

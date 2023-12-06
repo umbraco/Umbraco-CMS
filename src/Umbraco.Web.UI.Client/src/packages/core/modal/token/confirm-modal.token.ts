@@ -11,7 +11,7 @@ export interface UmbConfirmModalData {
 export type UmbConfirmModalValue = undefined;
 
 export const UMB_CONFIRM_MODAL = new UmbModalToken<UmbConfirmModalData, UmbConfirmModalValue>('Umb.Modal.Confirm', {
-	config: {
+	modal: {
 		type: 'dialog',
 	},
 });

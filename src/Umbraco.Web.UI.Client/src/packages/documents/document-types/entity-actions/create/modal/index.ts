@@ -7,7 +7,7 @@ export interface UmbDocumentTypeCreateOptionsModalData {
 export const UMB_DOCUMENT_TYPE_CREATE_OPTIONS_MODAL = new UmbModalToken<UmbDocumentTypeCreateOptionsModalData>(
 	'Umb.Modal.DocumentTypeCreateOptions',
 	{
-		config: {
+		modal: {
 			type: 'sidebar',
 			size: 'small',
 		},

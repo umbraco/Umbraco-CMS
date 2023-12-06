@@ -1,7 +1,7 @@
 import { UmbModalConfig } from '../modal-manager.context.js';
 
 export interface UmbModalTokenDefaults<ModalDataType extends object = object, ModalValueType = unknown> {
-	config?: UmbModalConfig;
+	modal?: UmbModalConfig;
 	data?: ModalDataType;
 	value?: ModalValueType;
 }
@@ -51,8 +51,8 @@ export class UmbModalToken<ModalDataType extends object = object, ModalValueType
 		return this.#alias;
 	}
 
-	public getDefaultConfig(): UmbModalConfig | undefined {
-		return this.#defaults?.config;
+	public getDefaultModal(): UmbModalConfig | undefined {
+		return this.#defaults?.modal;
 	}
 
 	public getDefaultData(): ModalDataType | undefined {

@@ -9,7 +9,7 @@ export const UMB_TEMPLATE_QUERY_BUILDER_MODAL = new UmbModalToken<
 	TemplateQueryBuilderModalData,
 	UmbTemplateQueryBuilderModalValue
 >(UMB_MODAL_TEMPLATING_QUERY_BUILDER_SIDEBAR_ALIAS, {
-	config: {
+	modal: {
 		type: 'sidebar',
 		size: 'large',
 	},

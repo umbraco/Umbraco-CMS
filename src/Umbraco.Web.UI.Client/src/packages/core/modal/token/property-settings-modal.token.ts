@@ -10,7 +10,7 @@ export const UMB_PROPERTY_SETTINGS_MODAL = new UmbModalToken<
 	UmbPropertySettingsModalData,
 	UmbPropertySettingsModalValue
 >('Umb.Modal.PropertySettings', {
-	config: {
+	modal: {
 		type: 'sidebar',
 		size: 'small',
 	},

@@ -15,7 +15,7 @@ export const UMB_MODAL_TEMPLATING_STYLESHEET_RTF_STYLE_SIDEBAR_MODAL = new UmbMo
 	never,
 	StylesheetRichTextEditorStyleModalValue
 >(UMB_MODAL_TEMPLATING_STYLESHEET_RTF_STYLE_SIDEBAR, {
-	config: {
+	modal: {
 		type: 'sidebar',
 		size: 'medium',
 	},

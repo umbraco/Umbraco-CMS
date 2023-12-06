@@ -11,7 +11,7 @@ import type { UmbInsertSectionCheckboxElement } from './insert-section-input.ele
 export const UMB_MODAL_TEMPLATING_INSERT_SECTION_MODAL = new UmbModalToken<object, UmbInsertSectionModalModalValue>(
 	UMB_MODAL_TEMPLATING_INSERT_SECTION_SIDEBAR_ALIAS,
 	{
-		config: {
+		modal: {
 			type: 'sidebar',
 			size: 'small',
 		},

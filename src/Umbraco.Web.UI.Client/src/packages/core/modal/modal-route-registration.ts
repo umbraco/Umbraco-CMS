@@ -10,12 +10,12 @@ export type UmbModalRouteBuilder = (params: { [key: string]: string | number } |
 
 export type UmbModalRouteSetupReturn<UmbModalTokenData, UmbModalTokenValue> = UmbModalTokenValue extends undefined
 	? {
-			config?: UmbModalConfig;
+			modal?: UmbModalConfig;
 			data: UmbModalTokenData;
 			value?: UmbModalTokenValue;
 	  }
 	: {
-			config?: UmbModalConfig;
+			modal?: UmbModalConfig;
 			data: UmbModalTokenData;
 			value: UmbModalTokenValue;
 	  };
@@ -24,7 +24,6 @@ export class UmbModalRouteRegistration<UmbModalTokenData extends object = object
 	#key: string;
 	#path: string | null;
 	#modalAlias: UmbModalToken<UmbModalTokenData, UmbModalTokenValue> | string;
-	#modalConfig?: UmbModalConfig;
 
 	#onSetupCallback?: (
 		routingInfo: Params,
@@ -64,10 +63,6 @@ export class UmbModalRouteRegistration<UmbModalTokenData extends object = object
 
 	protected _setPath(path: string | null) {
 		this.#path = path;
-	}
-
-	public get modalConfig() {
-		return this.#modalConfig;
 	}
 
 	/**
@@ -135,11 +130,11 @@ export class UmbModalRouteRegistration<UmbModalTokenData extends object = object
 		const modalData = this.#onSetupCallback ? await this.#onSetupCallback(params) : undefined;
 		if (modalData !== false) {
 			const args = {
-				config: {},
+				modal: {},
 				...modalData,
 				router,
 			};
-			args.config.key = this.#key;
+			args.modal.key = this.#key;
 
 			this.#modalManagerContext = modalManagerContext.open(this.#modalAlias, args);
 			this.#modalManagerContext.onSubmit().then(this.#onSubmit, this.#onReject);

@@ -14,7 +14,7 @@ export const UMB_IMPORT_DICTIONARY_MODAL = new UmbModalToken<
 	UmbImportDictionaryModalData,
 	UmbImportDictionaryModalValue
 >('Umb.Modal.ImportDictionary', {
-	config: {
+	modal: {
 		type: 'sidebar',
 		size: 'small',
 	},

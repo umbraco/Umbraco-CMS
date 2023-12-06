@@ -31,7 +31,7 @@ export interface UmbEmbeddedMediaModalValue extends UmbEmbeddedMediaModalData {
 export const UMB_EMBEDDED_MEDIA_MODAL = new UmbModalToken<UmbEmbeddedMediaModalData, UmbEmbeddedMediaModalValue>(
 	'Umb.Modal.EmbeddedMedia',
 	{
-		config: {
+		modal: {
 			type: 'sidebar',
 			size: 'medium',
 		},

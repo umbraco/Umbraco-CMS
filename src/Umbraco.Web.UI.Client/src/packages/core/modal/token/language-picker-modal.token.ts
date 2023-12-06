@@ -13,7 +13,7 @@ export interface UmbLanguagePickerModalValue {
 export const UMB_LANGUAGE_PICKER_MODAL = new UmbModalToken<UmbLanguagePickerModalData, UmbLanguagePickerModalValue>(
 	'Umb.Modal.LanguagePicker',
 	{
-		config: {
+		modal: {
 			type: 'sidebar',
 			size: 'small',
 		},

@@ -15,7 +15,7 @@ export const UMB_CREATE_DICTIONARY_MODAL = new UmbModalToken<
 	UmbCreateDictionaryModalData,
 	UmbCreateDictionaryModalValue
 >('Umb.Modal.CreateDictionary', {
-	config: {
+	modal: {
 		type: 'sidebar',
 		size: 'small',
 	},

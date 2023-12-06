@@ -10,7 +10,7 @@ export type UmbPermissionsModalValue = undefined;
 export const UMB_PERMISSIONS_MODAL = new UmbModalToken<UmbPermissionsModalData, UmbPermissionsModalValue>(
 	'Umb.Modal.Permissions',
 	{
-		config: {
+		modal: {
 			type: 'sidebar',
 		},
 	},

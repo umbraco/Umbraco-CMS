@@ -163,7 +163,7 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 									label="Open sidebar to see all fields"
 									@click="${() =>
 										this._modalContext?.open('umb-modal-element-fields-viewer', {
-											config: {
+											modal: {
 												type: 'sidebar',
 												size: 'medium',
 											},

@@ -10,7 +10,7 @@ export interface UmbIconPickerModalValue {
 export const UMB_ICON_PICKER_MODAL = new UmbModalToken<UmbIconPickerModalData, UmbIconPickerModalValue>(
 	'Umb.Modal.IconPicker',
 	{
-		config: {
+		modal: {
 			type: 'sidebar',
 			size: 'medium',
 		},

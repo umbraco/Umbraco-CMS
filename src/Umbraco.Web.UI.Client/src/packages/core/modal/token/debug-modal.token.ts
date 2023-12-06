@@ -6,7 +6,7 @@ export interface UmbContextDebuggerModalData {
 }
 
 export const UMB_CONTEXT_DEBUGGER_MODAL = new UmbModalToken<UmbContextDebuggerModalData>('Umb.Modal.ContextDebugger', {
-	config: {
+	modal: {
 		type: 'sidebar',
 		size: 'small',
 	},

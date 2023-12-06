@@ -11,7 +11,7 @@ export const UMB_CREATE_USER_SUCCESS_MODAL = new UmbModalToken<
 	UmbCreateUserSuccessModalData,
 	UmbCreateUserSuccessModalValue
 >('Umb.Modal.User.CreateSuccess', {
-	config: {
+	modal: {
 		type: 'dialog',
 		size: 'small',
 	},

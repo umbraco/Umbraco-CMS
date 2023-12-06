@@ -12,7 +12,7 @@ export interface UmbFolderModalValue {
 }
 
 export const UMB_FOLDER_MODAL = new UmbModalToken<UmbFolderModalData, UmbFolderModalValue>('Umb.Modal.Folder', {
-	config: {
+	modal: {
 		type: 'sidebar',
 		size: 'small',
 	},

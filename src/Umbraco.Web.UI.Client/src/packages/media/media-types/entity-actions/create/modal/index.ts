@@ -7,7 +7,7 @@ export interface UmbMediaTypeCreateOptionsModalData {
 export const UMB_MEDIA_TYPE_CREATE_OPTIONS_MODAL = new UmbModalToken<UmbMediaTypeCreateOptionsModalData>(
 	'Umb.Modal.MediaTypeCreateOptions',
 	{
-		config: {
+		modal: {
 			type: 'sidebar',
 			size: 'small',
 		},

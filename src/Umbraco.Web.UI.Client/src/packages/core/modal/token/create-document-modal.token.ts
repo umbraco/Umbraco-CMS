@@ -11,7 +11,7 @@ export interface UmbCreateDocumentModalValue {
 export const UMB_CREATE_DOCUMENT_MODAL = new UmbModalToken<UmbCreateDocumentModalData, UmbCreateDocumentModalValue>(
 	'Umb.Modal.CreateDocument',
 	{
-		config: {
+		modal: {
 			type: 'sidebar',
 			size: 'small',
 		},

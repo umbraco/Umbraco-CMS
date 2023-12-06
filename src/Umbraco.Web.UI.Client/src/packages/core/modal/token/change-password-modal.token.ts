@@ -12,7 +12,7 @@ export interface UmbChangePasswordModalValue {
 export const UMB_CHANGE_PASSWORD_MODAL = new UmbModalToken<UmbChangePasswordModalData, UmbChangePasswordModalValue>(
 	'Umb.Modal.ChangePassword',
 	{
-		config: {
+		modal: {
 			type: 'dialog',
 		},
 	},

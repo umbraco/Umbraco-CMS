@@ -3,7 +3,7 @@ import { UmbModalToken, UmbPickerModalData, UmbPickerModalValue } from '@umbraco
 export const UMB_USER_GROUP_PICKER_MODAL = new UmbModalToken<UmbPickerModalData<any>, UmbPickerModalValue>(
 	'Umb.Modal.UserGroupPicker',
 	{
-		config: {
+		modal: {
 			type: 'sidebar',
 			size: 'small',
 		},
