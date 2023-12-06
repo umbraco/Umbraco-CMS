@@ -265,7 +265,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddHttpClient(Constants.HttpClients.WebhookFiring, (services, client) =>
         {
             var productVersion = services.GetRequiredService<IUmbracoVersion>().SemanticVersion.ToSemanticStringWithoutBuild();
-            client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("Umbraco-CMS", productVersion));
+            client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue(Constants.HttpClients.Headers.UserAgentProductName, productVersion));
         });
         return builder;
     }
