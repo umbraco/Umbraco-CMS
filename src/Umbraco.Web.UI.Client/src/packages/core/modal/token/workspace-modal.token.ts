@@ -6,9 +6,10 @@ export interface UmbWorkspaceData {
 	preset: Partial<CreateDataTypeRequestModel>;
 }
 
+// TODO: It would be good with a WorkspaceValueBaseType, to avoid the  hardcoded type for unique here:
 export type UmbWorkspaceValue =
 	| {
-			id: string;
+			unique: string;
 	  }
 	| undefined;
 

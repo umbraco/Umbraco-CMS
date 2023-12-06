@@ -34,9 +34,6 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 	private _groupedPropertyEditorUIs: GroupedItems<ManifestPropertyEditorUi> = {};
 
 	@state()
-	private _selection: Array<string> = [];
-
-	@state()
 	private _submitLabel = 'Select';
 
 	@state()
@@ -82,7 +79,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 				return { data: { entityType: 'data-type', preset: { propertyEditorUiAlias: params.uiAlias } } };
 			})
 			.onSubmit((value) => {
-				this._select(value?.id);
+				this._select(value?.unique);
 				this._submitModal();
 			});
 
@@ -116,16 +113,6 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 		});
 	}
 
-	connectedCallback(): void {
-		super.connectedCallback();
-
-		if (this.modalContext) {
-			this.observe(this.modalContext.value, (value) => {
-				this._selection = value?.selection ?? [];
-			});
-		}
-	}
-
 	private _handleDataTypeClick(dataType: EntityTreeItemResponseModel) {
 		if (dataType.id) {
 			this._select(dataType.id);
@@ -134,7 +121,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 	}
 
 	private _select(id: string | undefined) {
-		this._selection = id ? [id] : [];
+		this._value = { selection: id ? [id] : [] };
 	}
 
 	private _handleFilterInput(event: UUIInputEvent) {
@@ -284,7 +271,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 				dataTypes,
 				(dataType) => dataType.id,
 				(dataType) =>
-					html`<li class="item" ?selected=${this._selection.includes(dataType.id!)}>
+					html`<li class="item" ?selected=${this._value.selection.includes(dataType.id!)}>
 						<uui-button .label=${dataType.name} type="button" @click="${() => this._handleDataTypeClick(dataType)}">
 							<div class="item-content">
 								<uui-icon name="${'icon-bug'}" class="icon"></uui-icon>

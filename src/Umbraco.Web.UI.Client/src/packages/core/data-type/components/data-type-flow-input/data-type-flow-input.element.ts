@@ -63,7 +63,6 @@ export class UmbInputDataTypeElement extends FormControlMixin(UmbLitElement) {
 				};
 			})
 			.onSubmit((submitData) => {
-				console.log('submit Data');
 				// TODO: we maybe should set the alias to null, if no selection?
 				this.value = submitData?.selection.join(',') ?? '';
 				this.dispatchEvent(new UmbChangeEvent());
