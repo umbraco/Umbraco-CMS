@@ -72,6 +72,32 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
         }
     }
 
+    /// <summary>
+    /// Gets the dictionary items in a paged manner.
+    /// Currently implements the paging in memory on the itenkey property because the underlying repository does not support paging yet
+    /// </summary>
+    public async Task<PagedModel<IDictionaryItem>> GetPagedAsync(Guid? parentId, int skip, int take)
+    {
+        using ICoreScope coreScope = ScopeProvider.CreateCoreScope(autoComplete: true);
+
+        if (take == 0)
+        {
+            return parentId is null
+                ? new PagedModel<IDictionaryItem>(await CountRootAsync(),Enumerable.Empty<IDictionaryItem>())
+                : new PagedModel<IDictionaryItem>(await CountChildrenAsync(parentId.Value),Enumerable.Empty<IDictionaryItem>());
+        }
+
+        IDictionaryItem[] items = (parentId is null
+            ? await GetAtRootAsync()
+            : await GetChildrenAsync(parentId.Value)).ToArray();
+
+        return new PagedModel<IDictionaryItem>(
+            items.Length,
+            items.OrderBy(i => i.ItemKey)
+                .Skip(skip)
+                .Take(take));
+    }
+
     /// <inheritdoc />
     public async Task<IEnumerable<IDictionaryItem>> GetChildrenAsync(Guid parentId)
         => await GetByQueryAsync(Query<IDictionaryItem>().Where(x => x.ParentId == parentId));

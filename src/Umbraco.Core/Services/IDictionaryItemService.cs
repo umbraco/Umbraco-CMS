@@ -102,4 +102,10 @@ public interface IDictionaryItemService
 
     Task<int> CountChildrenAsync(Guid parentId);
     Task<int> CountRootAsync();
+
+    /// <summary>
+    /// Gets the dictionary items in a paged manner.
+    /// Currently implements the paging in memory on the itenkey property because the underlying repository does not support paging yet
+    /// </summary>
+    Task<PagedModel<IDictionaryItem>> GetPagedAsync(Guid? parentId, int skip, int take);
 }

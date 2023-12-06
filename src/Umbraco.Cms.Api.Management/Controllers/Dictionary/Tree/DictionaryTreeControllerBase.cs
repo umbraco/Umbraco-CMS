@@ -27,11 +27,11 @@ public class DictionaryTreeControllerBase : EntityTreeControllerBase<EntityTreeI
 
     protected IDictionaryItemService DictionaryItemService { get; }
 
-    protected async Task<EntityTreeItemResponseModel[]> MapTreeItemViewModels(Guid? parentKey, IDictionaryItem[] dictionaryItems)
+    protected async Task<IEnumerable<EntityTreeItemResponseModel>> MapTreeItemViewModels(Guid? parentKey, IEnumerable<IDictionaryItem> dictionaryItems)
     {
         async Task<EntityTreeItemResponseModel> CreateEntityTreeItemViewModelAsync(IDictionaryItem dictionaryItem)
         {
-            var hasChildren = (await DictionaryItemService.GetChildrenAsync(dictionaryItem.Key)).Any();
+            var hasChildren = await DictionaryItemService.CountChildrenAsync(dictionaryItem.Key) > 0;
             return new EntityTreeItemResponseModel
             {
                 Name = dictionaryItem.ItemKey,
@@ -43,39 +43,6 @@ public class DictionaryTreeControllerBase : EntityTreeControllerBase<EntityTreeI
             };
         }
 
-        var items = new List<EntityTreeItemResponseModel>(dictionaryItems.Length);
-        foreach (IDictionaryItem dictionaryItem in dictionaryItems)
-        {
-            items.Add(await CreateEntityTreeItemViewModelAsync(dictionaryItem));
-        }
-
-        return items.ToArray();
-    }
-
-    // language service does not (yet) allow pagination of dictionary items, we have to do it in memory for now
-    protected async Task<PagedModel<IDictionaryItem>> PaginatedDictionaryItems(long pageNumber, int pageSize, Guid? parentId)
-    {
-        if (pageSize == 0)
-        {
-            return new PagedModel<IDictionaryItem>
-            {
-                Items = Enumerable.Empty<IDictionaryItem>(),
-                Total = parentId.HasValue
-                    ? await DictionaryItemService.CountChildrenAsync(parentId.Value)
-                    : await DictionaryItemService.CountRootAsync()
-            };
-        }
-
-        IDictionaryItem[] allDictionaryItemsAsArray = parentId.HasValue
-            ? (await DictionaryItemService.GetChildrenAsync(parentId.Value)).ToArray()
-            : (await DictionaryItemService.GetAtRootAsync()).ToArray();
-
-        IDictionaryItem[] items = allDictionaryItemsAsArray
-            .OrderBy(item => item.ItemKey)
-            .Skip((int)pageNumber * pageSize)
-            .Take(pageSize)
-            .ToArray();
-
-        return new PagedModel<IDictionaryItem> { Items = items, Total = items.Length };
+        return await Task.WhenAll(dictionaryItems.Select(CreateEntityTreeItemViewModelAsync));
     }
 }
