@@ -90,7 +90,7 @@ public class WebhookFiring : IRecurringBackgroundJob
     {
         using HttpClient httpClient = _httpClientFactory.CreateClient(Constants.HttpClients.WebhookFiring);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, webhook.Url)
+        using var request = new HttpRequestMessage(HttpMethod.Post, webhook.Url)
         {
             Version = httpClient.DefaultRequestVersion,
             VersionPolicy = httpClient.DefaultVersionPolicy,
