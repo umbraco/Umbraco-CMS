@@ -66,4 +66,30 @@ test.describe('Login', () => {
     await expect(usernameField).toBeVisible();
     await expect(passwordField).toBeVisible();
   });
+
+  test('Ensure show/hide password button works', async ({page}) => {
+
+    // Precondition
+    let error = page.locator('.text-error');
+    await expect(error).toBeHidden();
+
+    let passwordField = await page.locator('#umb-passwordTwo');
+    await expect(passwordField).toBeVisible();
+    await expect(passwordField).toHaveAttribute('type', 'password');
+
+    // Action
+    await page.fill('#umb-passwordTwo',  process.env.UMBRACO_USER_PASSWORD);
+    let showPassword = await page.locator('[key="login_showPassword"]');
+    await showPassword.click();
+
+    // Assert
+    await expect(passwordField).toHaveAttribute('type', 'text');
+
+    // Action
+    let hidePassword = await page.locator('[key="login_hidePassword"]');
+    await hidePassword.click();
+
+    // Assert
+    await expect(passwordField).toHaveAttribute('type', 'password');
+  });
 });

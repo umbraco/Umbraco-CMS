@@ -58,10 +58,12 @@ internal class PublishedSnapshotService : IPublishedSnapshotService
     private long _domainGen;
     private SnapDictionary<int, Domain> _domainStore = null!;
     private IAppCache? _elementsCache;
-    private bool _isReadSet;
 
+    private bool _isReadSet;
     private bool _isReady;
     private object? _isReadyLock;
+
+    private bool _mainDomRegistered;
 
     private BPlusTree<int, ContentNodeKit>? _localContentDb;
     private bool _localContentDbExists;
@@ -508,9 +510,20 @@ internal class PublishedSnapshotService : IPublishedSnapshotService
             // it will not be able to close the stores until we are done populating (if the store is empty)
             lock (_storesLock)
             {
+                SyncBootState bootState = _syncBootStateAccessor.GetSyncBootState();
+
                 if (!_options.IgnoreLocalDb)
                 {
-                    _mainDom.Register(MainDomRegister, MainDomRelease);
+                    if (!_mainDomRegistered)
+                    {
+                        _mainDom.Register(MainDomRegister, MainDomRelease);
+                    }
+                    else
+                    {
+                        // MainDom is already registered, so we must be retrying to load cache data
+                        // We can't trust the localdb state, so always perform a cold boot
+                        bootState = SyncBootState.ColdBoot;
+                    }
 
                     // stores are created with a db so they can write to it, but they do not read from it,
                     // stores need to be populated, happens in OnResolutionFrozen which uses _localDbExists to
@@ -558,8 +571,6 @@ internal class PublishedSnapshotService : IPublishedSnapshotService
 
                 var okContent = false;
                 var okMedia = false;
-
-                SyncBootState bootState = _syncBootStateAccessor.GetSyncBootState();
 
                 try
                 {
@@ -631,6 +642,8 @@ internal class PublishedSnapshotService : IPublishedSnapshotService
         // if both local databases exist then GetTree will open them, else new databases will be created
         _localContentDb = BTree.GetTree(localContentDbPath, _localContentDbExists, _config, _contentDataSerializer);
         _localMediaDb = BTree.GetTree(localMediaDbPath, _localMediaDbExists, _config, _contentDataSerializer);
+
+        _mainDomRegistered = true;
 
         _logger.LogInformation(
             "Registered with MainDom, localContentDbExists? {LocalContentDbExists}, localMediaDbExists? {LocalMediaDbExists}",
@@ -717,21 +730,10 @@ internal class PublishedSnapshotService : IPublishedSnapshotService
             _localContentDb?.Clear();
 
             // IMPORTANT GetAllContentSources sorts kits by level + parentId + sortOrder
-            try
-            {
-                IEnumerable<ContentNodeKit> kits = _publishedContentService.GetAllContentSources();
-                return onStartup
-                    ? _contentStore.SetAllFastSortedLocked(kits, _config.KitBatchSize, true)
-                    : _contentStore.SetAllLocked(kits, _config.KitBatchSize, true);
-            }
-            catch (ThreadAbortException tae)
-            {
-                // Caught a ThreadAbortException, most likely from a database timeout.
-                // If we don't catch it here, the whole local cache can remain locked causing widespread panic (see above comment).
-                _logger.LogWarning(tae, tae.Message);
-            }
-
-            return false;
+            IEnumerable<ContentNodeKit> kits = _publishedContentService.GetAllContentSources();
+            return onStartup
+                ? _contentStore.SetAllFastSortedLocked(kits, _config.KitBatchSize, true)
+                : _contentStore.SetAllLocked(kits, _config.KitBatchSize, true);
         }
     }
 
@@ -780,21 +782,10 @@ internal class PublishedSnapshotService : IPublishedSnapshotService
             }
 
             // IMPORTANT GetAllMediaSources sorts kits by level + parentId + sortOrder
-            try
-            {
-                IEnumerable<ContentNodeKit> kits = _publishedContentService.GetAllMediaSources();
-                return onStartup
-                    ? _mediaStore.SetAllFastSortedLocked(kits, _config.KitBatchSize, true)
-                    : _mediaStore.SetAllLocked(kits, _config.KitBatchSize, true);
-            }
-            catch (ThreadAbortException tae)
-            {
-                // Caught a ThreadAbortException, most likely from a database timeout.
-                // If we don't catch it here, the whole local cache can remain locked causing widespread panic (see above comment).
-                _logger.LogWarning(tae, tae.Message);
-            }
-
-            return false;
+            IEnumerable<ContentNodeKit> kits = _publishedContentService.GetAllMediaSources();
+            return onStartup
+                ? _mediaStore.SetAllFastSortedLocked(kits, _config.KitBatchSize, true)
+                : _mediaStore.SetAllLocked(kits, _config.KitBatchSize, true);
         }
     }
 

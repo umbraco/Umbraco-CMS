@@ -921,6 +921,7 @@
     <key alias="lastUpdated">Last Updated</key>
     <key alias="skipToMenu">Skip to menu</key>
     <key alias="skipToContent">Skip to content</key>
+    <key alias="primary">Primary</key>
   </area>
   <area alias="colors">
     <key alias="blue">Blue</key>
