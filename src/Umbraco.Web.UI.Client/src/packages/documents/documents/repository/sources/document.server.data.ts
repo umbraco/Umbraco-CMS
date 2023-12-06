@@ -129,7 +129,9 @@ export class UmbDocumentServerDataSource
 
 		// TODO: THIS DOES NOT TAKE SEGMENTS INTO ACCOUNT!!!!!!
 		const requestBody: PublishDocumentRequestModel = {
-			cultures: variantIds.map((variant) => variant.toCultureString()),
+			cultures: variantIds
+				.map((variant) => (variant.isCultureInvariant() ? null : variant.toCultureString()))
+				.filter((x) => x !== null) as Array<string>,
 		};
 
 		return tryExecuteAndNotify(this.#host, DocumentResource.putDocumentByIdPublish({ id, requestBody }));
