@@ -48,8 +48,8 @@ parameters:
 
 variables:
   nodeVersion: 20
-  dotnetVersion: 7.x
-  dotnetIncludePreviewVersions: false
+  dotnetVersion: 8.x
+  dotnetIncludePreviewVersions: true
   solution: umbraco.sln
   buildConfiguration: Release
   UMBRACO__CMS__GLOBAL__ID: 00000000-0000-0000-0000-000000000042
@@ -93,10 +93,25 @@ stages:
               gulpFile: src/Umbraco.Web.UI.Client/gulpfile.js
               targets: coreBuild
               workingDirectory: src/Umbraco.Web.UI.Client
+          - task: npm@1
+            displayName: Run npm ci (Login)
+            inputs:
+              command: custom
+              workingDir: src/Umbraco.Web.UI.Login
+              verbose: false
+              customCommand: ci
+          - task: npm@1
+            displayName: Run npm build (Login)
+            inputs:
+              command: custom
+              workingDir: src/Umbraco.Web.UI.Login
+              verbose: false
+              customCommand: run build
           - task: UseDotNet@2
             displayName: Use .NET $(dotnetVersion)
             inputs:
               version: $(dotnetVersion)
+              performMultiLevelLookup: true
               includePreviewVersions: $(dotnetIncludePreviewVersions)
           - task: DotNetCoreCLI@2
             displayName: Run dotnet restore
@@ -134,6 +149,11 @@ stages:
         pool:
           vmImage: 'windows-latest'
         steps:
+          - task: UseDotNet@2
+            displayName: Use .NET $(dotnetVersion)
+            inputs:
+              version: $(dotnetVersion)
+              includePreviewVersions: $(dotnetIncludePreviewVersions)
           - task: PowerShell@2
             displayName: Install DocFX
             inputs:
@@ -239,6 +259,7 @@ stages:
             displayName: Use .NET $(dotnetVersion)
             inputs:
               version: $(dotnetVersion)
+              performMultiLevelLookup: true
               includePreviewVersions: $(dotnetIncludePreviewVersions)
           - task: DotNetCoreCLI@2
             displayName: Run dotnet test
@@ -277,6 +298,7 @@ stages:
             displayName: Use .NET $(dotnetVersion)
             inputs:
               version: $(dotnetVersion)
+              performMultiLevelLookup: true
               includePreviewVersions: $(dotnetIncludePreviewVersions)
           - task: DotNetCoreCLI@2
             displayName: Run dotnet test Windows
@@ -383,6 +405,7 @@ stages:
       # E2E Tests
       - job:
         displayName: E2E Tests
+        timeoutInMinutes: 120
         variables:
           Umbraco__CMS__Unattended__UnattendedUserName: Playwright Test
           Umbraco__CMS__Unattended__UnattendedUserPassword: UmbracoAcceptance123!
@@ -451,6 +474,7 @@ stages:
             displayName: Use .NET $(dotnetVersion)
             inputs:
               version: $(dotnetVersion)
+              performMultiLevelLookup: true
               includePreviewVersions: $(dotnetIncludePreviewVersions)
           - pwsh: |
               $sha = 'g$(Build.SourceVersion)'.substring(0, 8)

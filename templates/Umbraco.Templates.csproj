@@ -9,7 +9,6 @@
     <IncludeContentInPack>true</IncludeContentInPack>
     <ContentTargetFolders>.</ContentTargetFolders>
     <NoWarn>NU5128</NoWarn>
-    <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,10 +17,6 @@
     <Content Include="UmbracoProject\**" Exclude="bin;obj" />
     <Content Include="..\src\Umbraco.Web.UI\Program.cs">
       <Link>UmbracoProject\Program.cs</Link>
-      <PackagePath>UmbracoProject</PackagePath>
-    </Content>
-    <Content Include="..\src\Umbraco.Web.UI\Startup.cs">
-      <Link>UmbracoProject\Startup.cs</Link>
       <PackagePath>UmbracoProject</PackagePath>
     </Content>
     <Content Include="..\src\Umbraco.Web.UI\Views\Partials\blocklist\**">
@@ -48,7 +43,7 @@
 
   <!-- Update template.json files with the default UmbracoVersion value set to the current build version -->
   <ItemGroup>
-    <PackageReference Include="Umbraco.JsonSchema.Extensions" Version="0.3.0" PrivateAssets="all" />
+    <PackageReference Include="Umbraco.JsonSchema.Extensions" PrivateAssets="all" />
   </ItemGroup>
   <ItemGroup>
     <Content Update="**\.template.config\template.json" Pack="false" />

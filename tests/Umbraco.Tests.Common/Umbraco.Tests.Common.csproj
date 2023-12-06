@@ -5,7 +5,7 @@
     <Description>Contains commonly used tools to write tests for Umbraco CMS, such as various builders for content etc.</Description>
     <RootNamespace>Umbraco.Cms.Tests.Common</RootNamespace>
     <IsPackable>true</IsPackable>
-    <EnablePackageValidation>true</EnablePackageValidation>
+    <EnablePackageValidation>$(BaseEnablePackageValidation)</EnablePackageValidation>
   </PropertyGroup>
 
   <ItemGroup>

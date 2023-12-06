@@ -20,6 +20,7 @@ using Smidge.FileProcessors;
 using Smidge.InMemory;
 using Smidge.Nuglify;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Blocks;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -50,6 +51,7 @@ using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 using Umbraco.Cms.Web.Common;
 using Umbraco.Cms.Web.Common.ApplicationModels;
 using Umbraco.Cms.Web.Common.AspNetCore;
+using Umbraco.Cms.Web.Common.Blocks;
 using Umbraco.Cms.Web.Common.Configuration;
 using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Cms.Web.Common.DependencyInjection;
@@ -146,8 +148,6 @@ public static partial class UmbracoBuilderExtensions
                 sp,
                 sp.GetRequiredService<IApplicationDiscriminator>()));
 
-        builder.Services.AddHostedService(factory => factory.GetRequiredService<IRuntime>());
-
         builder.Services.AddSingleton<DatabaseSchemaCreatorFactory>();
         builder.Services.TryAddEnumerable(ServiceDescriptor
             .Singleton<IDatabaseProviderMetadata, CustomConnectionStringDatabaseProviderMetadata>());
@@ -215,6 +215,8 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddRecurringBackgroundJob<TempFileCleanupJob>();
         builder.Services.AddRecurringBackgroundJob<InstructionProcessJob>();
         builder.Services.AddRecurringBackgroundJob<TouchServerJob>();
+        builder.Services.AddRecurringBackgroundJob<WebhookFiring>();
+        builder.Services.AddRecurringBackgroundJob<WebhookLoggingCleanup>();
         builder.Services.AddRecurringBackgroundJob(provider =>
             new ReportSiteJob(
                 provider.GetRequiredService<ILogger<ReportSiteJob>>(),
@@ -224,7 +226,6 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddHostedService<QueuedHostedService>();
         builder.Services.AddSingleton(RecurringBackgroundJobHostedService.CreateHostedServiceFactory);
         builder.Services.AddHostedService<RecurringBackgroundJobHostedServiceRunner>();
-        
 
         return builder;
     }
@@ -376,6 +377,7 @@ public static partial class UmbracoBuilderExtensions
         });
 
         builder.Services.AddSingleton<PartialViewMacroEngine>();
+        builder.Services.AddSingleton<IPartialViewBlockEngine, PartialViewBlockEngine>();
 
         // register the umbraco context factory
         builder.Services.AddUnique<IUmbracoContextFactory, UmbracoContextFactory>();

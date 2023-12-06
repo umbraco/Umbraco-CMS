@@ -21,6 +21,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         private IPropertyValueConverter? _converter;
         private PropertyCacheLevel _cacheLevel;
         private PropertyCacheLevel _deliveryApiCacheLevel;
+        private PropertyCacheLevel _deliveryApiCacheLevelForExpansion;
 
         private Type? _modelClrType;
         private Type? _deliveryApiModelClrType;
@@ -196,6 +197,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
 
             _cacheLevel = _converter?.GetPropertyCacheLevel(this) ?? PropertyCacheLevel.Snapshot;
             _deliveryApiCacheLevel = deliveryApiPropertyValueConverter?.GetDeliveryApiPropertyCacheLevel(this) ?? _cacheLevel;
+            _deliveryApiCacheLevelForExpansion = deliveryApiPropertyValueConverter?.GetDeliveryApiPropertyCacheLevelForExpansion(this) ?? _cacheLevel;
             _modelClrType = _converter?.GetPropertyValueType(this) ?? typeof(object);
             _deliveryApiModelClrType = deliveryApiPropertyValueConverter?.GetDeliveryApiPropertyValueType(this) ?? _modelClrType;
         }
@@ -243,6 +245,20 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
                 }
 
                 return _deliveryApiCacheLevel;
+            }
+        }
+
+        /// <inheritdoc />
+        public PropertyCacheLevel DeliveryApiCacheLevelForExpansion
+        {
+            get
+            {
+                if (!_initialized)
+                {
+                    Initialize();
+                }
+
+                return _deliveryApiCacheLevelForExpansion;
             }
         }
 

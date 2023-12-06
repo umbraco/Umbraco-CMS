@@ -940,13 +940,13 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="renewSession">Çalışmanızı kaydetmek için şimdi yenileyin</key>
   </area>
   <area alias="login">
-    <key alias="greeting0">Mutlu Pazarlar</key>
-    <key alias="greeting1">Muhteşem Pazartesiler</key>
-    <key alias="greeting2">Mükemmel Salılar</key>
-    <key alias="greeting3">Harika Çarşambalar</key>
-    <key alias="greeting4">Şahane Perşembeler</key>
-    <key alias="greeting5">Mutlu Cumalar</key>
-    <key alias="greeting6">Eğlenceli Cumartesiler</key>
+    <key alias="greeting0">Hoş geldiniz</key>
+    <key alias="greeting1">Hoş geldiniz</key>
+    <key alias="greeting2">Hoş geldiniz</key>
+    <key alias="greeting3">Hoş geldiniz</key>
+    <key alias="greeting4">Hoş geldiniz</key>
+    <key alias="greeting5">Hoş geldiniz</key>
+    <key alias="greeting6">Hoş geldiniz</key>
     <key alias="instruction">Aşağıda oturum açın</key>
     <key alias="signInWith">ile oturum açın</key>
     <key alias="timeout">Oturum zaman aşımına uğradı</key>

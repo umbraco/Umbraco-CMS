@@ -191,6 +191,9 @@ internal class PublishedSnapshotService : IPublishedSnapshotService
             }
         }
 
+        // Ensure all published data types are updated
+        _publishedContentTypeFactory.NotifyDataTypeChanges();
+
         Notify<IContentType>(_contentStore, payloads, RefreshContentTypesLocked);
         Notify<IMediaType>(_mediaStore, payloads, RefreshMediaTypesLocked);
 

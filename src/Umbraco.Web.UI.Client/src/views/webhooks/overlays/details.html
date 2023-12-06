@@ -1,0 +1,81 @@
+<div ng-controller="Umbraco.Editors.Webhooks.DetailsController as vm" class="headless-webhook-log-entry-details-overlay" style="margin-top: 20px;">
+
+  <umb-editor-view>
+
+    <umb-editor-header
+        name="model.title"
+        name-locked="true"
+        hide-alias="true"
+        hide-icon="true"
+        hide-description="true">
+    </umb-editor-header>
+
+    <umb-editor-container>
+
+       <umb-box>
+          <umb-box-header title-key="general_general"></umb-box-header>
+          <umb-box-content class="block-form">
+
+              <umb-control-group>
+                <div class="flex items-center">
+                  <div class="flx-g0 flx-s0" style="flex-basis: 40px;">
+                    <umb-checkmark checked="true" size="m" style="cursor: default" ng-if="model.log.statusCode === 'OK (200)'"></umb-checkmark>
+                    <umb-icon icon="icon-wrong" class="umb-checkmark umb-checkmark--m" style="cursor: default;" ng-if="model.log.statusCode !== 'OK (200)'"></umb-icon>
+                  </div>
+                  <div class="flx-g1 flx-s1 flx-b2">{{model.log.statusCode}}</div>
+                </div>
+              </umb-control-group>
+
+              <umb-control-group label="@general_date">
+                  <div>{{model.log.formattedLogDate}}</div>
+              </umb-control-group>
+
+              <umb-control-group label="@general_url">
+                  <div>{{model.log.url}}</div>
+              </umb-control-group>
+
+              <umb-control-group label="Event">
+                <div>{{model.log.eventAlias}}</div>
+              </umb-control-group>
+
+              <umb-control-group label="Retry count">
+                <div>{{model.log.retryCount}}</div>
+              </umb-control-group>
+
+          </umb-box-content>
+
+        </umb-box>
+
+        <umb-box>
+          <umb-box-header title="Request"></umb-box-header>
+          <umb-box-content class="block-form">
+            <pre class="code">{{model.log.requestHeaders}}</pre>
+            <umb-code-snippet language="'JSON'" wrap="true">{{vm.formatData(model.log.requestBody) | json}}</umb-code-snippet>
+          </umb-box-content>
+        </umb-box>
+
+        <umb-box>
+          <umb-box-header title="Response"></umb-box-header>
+          <umb-box-content class="block-form">
+            <pre class="code">{{model.log.responseHeaders}}</pre>
+            <umb-code-snippet language="'TEXT'" wrap="true">{{vm.formatData(model.log.responseBody) | json}}</umb-code-snippet>
+          </umb-box-content>
+        </umb-box>
+
+    </umb-editor-container>
+
+    <umb-editor-footer>
+        <umb-editor-footer-content-right>
+            <umb-button
+                type="button"
+                button-style="link"
+                label-key="general_close"
+                shortcut="esc"
+                action="vm.close()">
+            </umb-button>
+        </umb-editor-footer-content-right>
+    </umb-editor-footer>
+
+  </umb-editor-view>
+
+</div>

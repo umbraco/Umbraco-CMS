@@ -3,7 +3,6 @@
     <OutputType>Exe</OutputType>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <IsPackable>false</IsPackable>
-    <EnablePackageValidation>false</EnablePackageValidation>
     <GenerateProgramFile>false</GenerateProgramFile>
   </PropertyGroup>
 
@@ -11,8 +10,6 @@
     <PackageReference Include="BenchmarkDotNet" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" />
     <PackageReference Include="Moq"  />
-    <PackageReference Include="System.Data.DataSetExtensions" />
-    <PackageReference Include="System.Reflection.Emit" />
   </ItemGroup>
 
   <ItemGroup>
