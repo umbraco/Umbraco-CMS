@@ -6,6 +6,7 @@ import {
 	UMB_DATA_TYPE_PICKER_FLOW_MODAL,
 	UMB_WORKSPACE_MODAL,
 } from '@umbraco-cms/backoffice/modal';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 // Note: Does only support picking a single data type. But this could be developed later into this same component. To follow other picker input components.
 /**
@@ -62,9 +63,10 @@ export class UmbInputDataTypeElement extends FormControlMixin(UmbLitElement) {
 				};
 			})
 			.onSubmit((submitData) => {
+				console.log('submit Data');
 				// TODO: we maybe should set the alias to null, if no selection?
 				this.value = submitData?.selection.join(',') ?? '';
-				this.dispatchEvent(new CustomEvent('change', { composed: true, bubbles: true }));
+				this.dispatchEvent(new UmbChangeEvent());
 			})
 			.observeRouteBuilder((routeBuilder) => {
 				this._createRoute = routeBuilder(null);
