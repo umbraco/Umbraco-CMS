@@ -10,8 +10,6 @@ namespace Umbraco.Cms.Tests.Integration.ManagementApi.Dictionary;
 [TestFixture]
 public class ImportDictionaryControllerTests : DictionaryBaseTest<ImportDictionaryController>
 {
-    private Guid _temporaryFileId;
-
     protected override Expression<Func<ImportDictionaryController, object>> MethodSelector =>
         x => x.Import(null);
 
