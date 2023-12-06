@@ -10,11 +10,11 @@ namespace Umbraco.Cms.Api.Management.Services.Paging;
 // an injectable service, but that would require a greater clean-up effort later on.
 internal static class PaginationService
 {
-    internal static bool ConvertSkipTakeToPaging(int skip, int take, out long pageNumber, out int pageSize, out ProblemDetails? error, bool allowZeroTake = false)
+    internal static bool ConvertSkipTakeToPaging(int skip, int take, out long pageNumber, out int pageSize, out ProblemDetails? error)
     {
-        if ((allowZeroTake && take < 0) || (allowZeroTake == false && take <= 0))
+        if (take < 0)
         {
-            throw new ArgumentException(allowZeroTake ? "Must be equal to or greater than zero" : "Must be greater than zero", nameof(take));
+            throw new ArgumentException("Must be equal to or greater than zero", nameof(take));
         }
 
         if (take != 0 && skip % take != 0)
