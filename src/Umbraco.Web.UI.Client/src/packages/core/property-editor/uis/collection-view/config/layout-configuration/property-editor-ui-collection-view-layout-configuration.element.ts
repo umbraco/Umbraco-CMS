@@ -1,6 +1,10 @@
 import { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { html, customElement, property, state, repeat, css, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import { UUIBooleanInputEvent, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import {
+	UmbPropertyEditorConfigCollection,
+	UmbPropertyValueChangeEvent,
+} from '@umbraco-cms/backoffice/property-editor';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
@@ -27,14 +31,36 @@ export class UmbPropertyEditorUICollectionViewLayoutConfigurationElement
 	public config?: UmbPropertyEditorConfigCollection;
 
 	#onAdd() {
-		this.value = [...this.value, {}];
-		console.log(this.value);
+		this.value = [...this.value, { isSystem: false, icon: 'icon-stop', selected: true }];
+		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
-	#onRemove(index: number) {
+	#onRemove(unique: number) {
 		const values = [...this.value];
-		values.splice(index, 1);
+		values.splice(unique, 1);
 		this.value = values;
+		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+	}
+
+	#onChangePath(e: UUIInputEvent, index: number) {
+		const values = [...this.value];
+		values[index] = { ...values[index], path: e.target.value as string };
+		this.value = values;
+		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+	}
+
+	#onChangeName(e: UUIInputEvent, index: number) {
+		const values = [...this.value];
+		values[index] = { ...values[index], name: e.target.value as string };
+		this.value = values;
+		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+	}
+
+	#onChangeSelected(e: UUIBooleanInputEvent, index: number) {
+		const values = [...this.value];
+		values[index] = { ...values[index], selected: e.target.checked };
+		this.value = values;
+		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
 	render() {
@@ -63,7 +89,11 @@ export class UmbPropertyEditorUICollectionViewLayoutConfigurationElement
 			</uui-button>
 			${index}
 			<span><strong>${ifDefined(layout.name)}</strong> <small>(system field)</small></span>
-			<uui-checkbox ?checked=${layout.selected}></uui-checkbox>`;
+			<uui-checkbox
+				?checked=${layout.selected}
+				label="Show"
+				@change=${(e: UUIBooleanInputEvent) => this.#onChangeSelected(e, index)}>
+			</uui-checkbox>`;
 	}
 
 	renderCustomFieldRow(layout: LayoutConfig, index: number) {
@@ -71,8 +101,16 @@ export class UmbPropertyEditorUICollectionViewLayoutConfigurationElement
 				<uui-icon name=${ifDefined(layout.icon)}></uui-icon>
 			</uui-button>
 			${index}
-			<uui-input value=${ifDefined(layout.name)} placeholder="Name..."></uui-input>
-			<uui-input value=${ifDefined(layout.path)} placeholder="Layout path..."></uui-input>
+			<uui-input
+				label="name"
+				value=${ifDefined(layout.name)}
+				placeholder="Name..."
+				@change=${(e: UUIInputEvent) => this.#onChangeName(e, index)}></uui-input>
+			<uui-input
+				label="path"
+				value=${ifDefined(layout.path)}
+				placeholder="Layout path..."
+				@change=${(e: UUIInputEvent) => this.#onChangePath(e, index)}></uui-input>
 			<uui-button
 				label=${this.localize.term('actions_remove')}
 				look="secondary"
