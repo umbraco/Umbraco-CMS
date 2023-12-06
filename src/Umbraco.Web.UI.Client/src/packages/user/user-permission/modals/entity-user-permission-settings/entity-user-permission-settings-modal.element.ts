@@ -29,7 +29,7 @@ export class UmbEntityUserPermissionSettingsModalElement extends UmbModalBaseEle
 	_allowedPermissions: Array<string> = [];
 
 	private _handleConfirm() {
-		this._value = { allowedPermissions: this._allowedPermissions };
+		this.value = { allowedPermissions: this._allowedPermissions };
 		this.modalContext?.submit();
 	}
 

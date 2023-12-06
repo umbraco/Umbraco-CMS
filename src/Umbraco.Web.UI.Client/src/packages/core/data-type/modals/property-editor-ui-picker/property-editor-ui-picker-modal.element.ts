@@ -57,7 +57,7 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbModalBaseElement<
 	}
 
 	#select(alias: string) {
-		this._value = { selection: [alias] };
+		this.value = { selection: [alias] };
 	}
 
 	#handleFilterInput(event: UUIInputEvent) {
@@ -122,7 +122,7 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbModalBaseElement<
 				groupItems,
 				(propertyEditorUI) => propertyEditorUI.alias,
 				(propertyEditorUI) =>
-					html` <li class="item" ?selected=${this._value.selection.includes(propertyEditorUI.alias)}>
+					html` <li class="item" ?selected=${this.value.selection.includes(propertyEditorUI.alias)}>
 						<button type="button" @click="${() => this.#handleClick(propertyEditorUI)}">
 							<uui-icon name="${propertyEditorUI.meta.icon}" class="icon"></uui-icon>
 							${propertyEditorUI.meta.label || propertyEditorUI.name}

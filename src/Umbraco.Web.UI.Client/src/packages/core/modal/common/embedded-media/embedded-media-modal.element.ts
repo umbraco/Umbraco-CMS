@@ -29,7 +29,7 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 	#embedResult!: OEmbedResult;
 
 	#handleConfirm() {
-		this._value = {
+		this.value = {
 			preview: this.#embedResult.markup,
 			originalWidth: this._model.width,
 			originalHeight: this._model.originalHeight,

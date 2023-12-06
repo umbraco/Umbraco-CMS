@@ -18,7 +18,7 @@ export default class UmbPartialViewCreateFromSnippetModalElement extends UmbModa
 	}
 
 	private _submit(snippetName: string) {
-		this._value = snippetName;
+		this.value = snippetName;
 		this.modalContext?.submit();
 	}
 

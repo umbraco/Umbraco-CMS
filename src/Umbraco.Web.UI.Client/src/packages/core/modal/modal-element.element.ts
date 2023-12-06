@@ -28,7 +28,7 @@ export abstract class UmbModalBaseElement<
 				(value) => {
 					const oldValue = this.#value;
 					this.#value = value;
-					this.requestUpdate('_value', oldValue);
+					this.requestUpdate('value', oldValue);
 					// Idea: we could implement a callback method on class.
 				},
 				'observeModalContextValue',
@@ -47,10 +47,10 @@ export abstract class UmbModalBaseElement<
 	private _data?: ModalDataType | undefined;
 
 	@state()
-	public get _value(): ModalValueType {
+	public get value(): ModalValueType {
 		return this.#value;
 	}
-	public set _value(value: ModalValueType) {
+	public set value(value: ModalValueType) {
 		this.#modalContext?.setValue(value);
 	}
 

@@ -52,7 +52,7 @@ export class UmbTemplateModalElement extends UmbModalBaseElement<UmbTemplateModa
 
 		this.#saveTemplate();
 
-		this._value = { id: this._template.id };
+		this.value = { id: this._template.id };
 		this.modalContext?.submit();
 	}
 

@@ -48,7 +48,7 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 		this.#openModal = this._modalContext?.open(UMB_PARTIAL_VIEW_PICKER_MODAL);
 		this.#openModal?.onSubmit().then((partialViewPickerModalValue) => {
 			if (partialViewPickerModalValue) {
-				this._value = {
+				this.value = {
 					type: CodeSnippetType.partialView,
 					value: partialViewPickerModalValue.selection[0],
 				};
@@ -65,7 +65,7 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 		});
 		this.#openModal?.onSubmit().then((dictionaryItemPickerModalValue) => {
 			if (dictionaryItemPickerModalValue) {
-				this._value = { value: dictionaryItemPickerModalValue, type: CodeSnippetType.dictionaryItem };
+				this.value = { value: dictionaryItemPickerModalValue, type: CodeSnippetType.dictionaryItem };
 				this.modalContext?.submit();
 			}
 		});

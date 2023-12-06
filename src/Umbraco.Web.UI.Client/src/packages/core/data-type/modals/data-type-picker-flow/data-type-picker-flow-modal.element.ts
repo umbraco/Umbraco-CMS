@@ -121,7 +121,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 	}
 
 	private _select(id: string | undefined) {
-		this._value = { selection: id ? [id] : [] };
+		this.value = { selection: id ? [id] : [] };
 	}
 
 	private _handleFilterInput(event: UUIInputEvent) {
@@ -271,7 +271,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 				dataTypes,
 				(dataType) => dataType.id,
 				(dataType) =>
-					html`<li class="item" ?selected=${this._value.selection.includes(dataType.id!)}>
+					html`<li class="item" ?selected=${this.value.selection.includes(dataType.id!)}>
 						<uui-button .label=${dataType.name} type="button" @click="${() => this._handleDataTypeClick(dataType)}">
 							<div class="item-content">
 								<uui-icon name="${'icon-bug'}" class="icon"></uui-icon>

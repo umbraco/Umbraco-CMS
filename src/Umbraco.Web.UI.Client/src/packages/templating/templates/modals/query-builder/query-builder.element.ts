@@ -99,7 +99,7 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 		});
 		if (data) {
 			this._templateQuery = { ...data };
-			this._value = { value: this._templateQuery?.queryExpression ?? '' };
+			this.value = { value: this._templateQuery?.queryExpression ?? '' };
 		}
 	};
 

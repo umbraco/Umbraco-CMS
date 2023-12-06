@@ -58,7 +58,7 @@ export class UmbCreateDocumentModalElement extends UmbModalBaseElement<
 		const target = event.target as HTMLButtonElement;
 		const documentTypeId = target.dataset.id;
 		if (!documentTypeId) throw new Error('No document type id found');
-		this._value = { documentTypeId };
+		this.value = { documentTypeId };
 		this.modalContext?.submit();
 	}
 

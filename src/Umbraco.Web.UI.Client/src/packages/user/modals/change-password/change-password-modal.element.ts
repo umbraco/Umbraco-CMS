@@ -42,7 +42,7 @@ export class UmbChangePasswordModalElement extends UmbModalBaseElement<
 		const newPassword = formData.get('newPassword') as string;
 		//const confirmPassword = formData.get('confirmPassword') as string;
 
-		this._value = { oldPassword, newPassword };
+		this.value = { oldPassword, newPassword };
 		this.modalContext?.submit();
 	}
 

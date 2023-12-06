@@ -30,7 +30,7 @@ export class UmbExportDictionaryModalElement extends UmbModalBaseElement<
 
 		const formData = new FormData(form);
 
-		this._value = { includeChildren: (formData.get('includeDescendants') as string) === 'on' };
+		this.value = { includeChildren: (formData.get('includeDescendants') as string) === 'on' };
 		this.modalContext?.submit();
 	}
 

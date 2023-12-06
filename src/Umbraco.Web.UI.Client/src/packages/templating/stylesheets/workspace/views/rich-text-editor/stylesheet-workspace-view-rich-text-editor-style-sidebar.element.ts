@@ -17,7 +17,7 @@ export default class UmbStylesheetRichTextEditorStyleModalElement extends UmbMod
 
 		this.updateValue({
 			rule: {
-				...this._value.rule,
+				...this.value.rule,
 				name,
 			},
 		});
@@ -28,7 +28,7 @@ export default class UmbStylesheetRichTextEditorStyleModalElement extends UmbMod
 
 		this.updateValue({
 			rule: {
-				...this._value.rule,
+				...this.value.rule,
 				selector,
 			},
 		});
@@ -39,7 +39,7 @@ export default class UmbStylesheetRichTextEditorStyleModalElement extends UmbMod
 
 		this.updateValue({
 			rule: {
-				...this._value.rule,
+				...this.value.rule,
 				styles,
 			},
 		});
@@ -58,7 +58,7 @@ export default class UmbStylesheetRichTextEditorStyleModalElement extends UmbMod
 									<uui-input
 										id="name"
 										name="name"
-										.value=${this._value.rule?.name ?? ''}
+										.value=${this.value.rule?.name ?? ''}
 										label="Rule name"
 										required
 										@input=${this.#updateName}>
@@ -70,7 +70,7 @@ export default class UmbStylesheetRichTextEditorStyleModalElement extends UmbMod
 									<uui-input
 										id="selector"
 										name="selector"
-										.value=${this._value.rule?.selector ?? ''}
+										.value=${this.value.rule?.selector ?? ''}
 										label="Rule selector"
 										@input=${this.#updateSelector}
 										required>
@@ -85,14 +85,14 @@ export default class UmbStylesheetRichTextEditorStyleModalElement extends UmbMod
 										@input=${this.#updateStyles}
 										id="styles"
 										name="styles"
-										.value=${this._value.rule?.styles ?? ''}
+										.value=${this.value.rule?.styles ?? ''}
 										label="Rule styles">
 									</uui-textarea>
 								</uui-form-layout-item>
 								<uui-form-layout-item>
 									<uui-label for="styles" slot="label" required="">Preview</uui-label>
 									<span slot="description">How the text will look like in the rich text editor.</span>
-									<div style="${ifDefined(this._value.rule?.styles)}">
+									<div style="${ifDefined(this.value.rule?.styles)}">
 										a b c d e f g h i j k l m n o p q r s t u v w x t z
 										<br />
 										A B C D E F G H I J K L M N O P Q R S T U V W X Y Z

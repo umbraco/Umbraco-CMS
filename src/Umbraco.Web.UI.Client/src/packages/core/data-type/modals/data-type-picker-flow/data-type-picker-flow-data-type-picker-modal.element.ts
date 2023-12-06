@@ -60,13 +60,13 @@ export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbModalBas
 
 	private _handleClick(dataType: UmbDataTypeDetailModel) {
 		if (dataType.unique) {
-			this._value = { dataTypeId: dataType.unique };
+			this.value = { dataTypeId: dataType.unique };
 			this.modalContext?.submit();
 		}
 	}
 
 	private _handleCreate() {
-		this._value = { createNewWithPropertyEditorUiAlias: this._propertyEditorUiAlias };
+		this.value = { createNewWithPropertyEditorUiAlias: this._propertyEditorUiAlias };
 		this.modalContext?.submit();
 	}
 

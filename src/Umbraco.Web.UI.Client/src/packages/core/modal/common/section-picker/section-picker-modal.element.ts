@@ -33,7 +33,7 @@ export class UmbSectionPickerModalElement extends UmbModalBaseElement<
 	}
 
 	#submit() {
-		this._value = {
+		this.value = {
 			selection: this.#selectionManager.getSelection(),
 		};
 		this.modalContext?.submit();

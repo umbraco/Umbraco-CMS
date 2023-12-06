@@ -32,7 +32,7 @@ export class UmbTreePickerModalElement<TreeItemType extends TreeItemPresentation
 	#onSelectionChange(e: CustomEvent) {
 		e.stopPropagation();
 		const element = e.target as UmbTreeElement;
-		this._value = { selection: element.selection };
+		this.value = { selection: element.selection };
 		this.dispatchEvent(new UmbSelectionChangeEvent());
 	}
 

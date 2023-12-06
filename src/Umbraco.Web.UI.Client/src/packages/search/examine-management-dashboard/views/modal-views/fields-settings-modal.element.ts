@@ -12,18 +12,18 @@ export default class UmbExamineFieldsSettingsModalElement extends UmbModalBaseEl
 	UmbExamineFieldsSettingsModalValue
 > {
 	render() {
-		if (this._value.fields) {
+		if (this.value.fields) {
 			return html`
 				<uui-dialog-layout headline="Show fields">
 					<uui-scroll-container id="field-settings">
 						<span>
-							${Object.values(this._value.fields).map((field, index) => {
+							${Object.values(this.value.fields).map((field, index) => {
 								return html`<uui-toggle
 										name="${field.name}"
 										label="${field.name}"
 										.checked="${field.exposed}"
 										@change="${() => {
-											this._value.fields ? (this._value.fields[index].exposed = !field.exposed) : '';
+											this.value.fields ? (this.value.fields[index].exposed = !field.exposed) : '';
 										}}"></uui-toggle>
 									<br />`;
 							})}

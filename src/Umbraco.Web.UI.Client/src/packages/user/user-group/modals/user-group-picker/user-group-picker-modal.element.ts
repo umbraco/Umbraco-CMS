@@ -22,7 +22,7 @@ export class UmbUserGroupPickerModalElement extends UmbModalBaseElement<
 
 		// TODO: in theory this config could change during the lifetime of the modal, so we could observe it
 		this.#selectionManager.setMultiple(this.data?.multiple ?? false);
-		this.#selectionManager.setSelection(this._value?.selection ?? []);
+		this.#selectionManager.setSelection(this.value?.selection ?? []);
 		this.observe(this.#selectionManager.selection, (selection) => this.updateValue({ selection }), 'selectionObserver');
 	}
 
