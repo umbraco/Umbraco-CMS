@@ -112,7 +112,9 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 	#openInsertSectionModal() {
 		const sectionModal = this._modalContext?.open(UMB_MODAL_TEMPLATING_INSERT_SECTION_MODAL);
 		sectionModal?.onSubmit().then((insertSectionModalValue) => {
-			if (insertSectionModalValue.value) this._codeEditor?.insert(insertSectionModalValue.value);
+			if (insertSectionModalValue?.value) {
+				this._codeEditor?.insert(insertSectionModalValue.value);
+			}
 		});
 	}
 
@@ -122,15 +124,19 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 
 	#openMasterTemplatePicker() {
 		const modalContext = this._modalContext?.open(UMB_TEMPLATE_PICKER_MODAL, {
-			selection: [this.#masterTemplateId],
-			pickableFilter: (item) => {
-				return item.id !== null && item.id !== this.#templateWorkspaceContext?.getEntityId();
+			data: {
+				pickableFilter: (item) => {
+					return item.id !== null && item.id !== this.#templateWorkspaceContext?.getEntityId();
+				},
+			},
+			value: {
+				selection: [this.#masterTemplateId],
 			},
 		});
 
-		modalContext?.onSubmit().then((data) => {
-			if (!data.selection) return;
-			this.#templateWorkspaceContext?.setMasterTemplate(data.selection[0] ?? '');
+		modalContext?.onSubmit().then((value) => {
+			if (!value?.selection) return;
+			this.#templateWorkspaceContext?.setMasterTemplate(value.selection[0] ?? '');
 		});
 	}
 
@@ -138,7 +144,9 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 		const queryBuilderModal = this._modalContext?.open(UMB_TEMPLATE_QUERY_BUILDER_MODAL);
 
 		queryBuilderModal?.onSubmit().then((queryBuilderModalValue) => {
-			if (queryBuilderModalValue.value) this._codeEditor?.insert(getQuerySnippet(queryBuilderModalValue.value));
+			if (queryBuilderModalValue?.value) {
+				this._codeEditor?.insert(getQuerySnippet(queryBuilderModalValue.value));
+			}
 		});
 	}
 

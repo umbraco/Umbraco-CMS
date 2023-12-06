@@ -107,9 +107,9 @@ export class UmbModalElement extends UmbLitElement {
 		const innerElement = await createExtensionElement(manifest);
 
 		if (innerElement) {
+			innerElement.manifest = manifest;
 			innerElement.data = this.#modalContext!.data;
 			innerElement.modalContext = this.#modalContext;
-			innerElement.manifest = manifest;
 		}
 
 		return innerElement;

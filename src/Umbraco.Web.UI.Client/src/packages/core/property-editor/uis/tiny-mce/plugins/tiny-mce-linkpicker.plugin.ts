@@ -94,11 +94,15 @@ export default class UmbTinyMceLinkPickerPlugin extends UmbTinyMcePluginBase {
 
 	async #openLinkPicker(currentTarget?: UmbLinkPickerLink) {
 		const modalHandler = this.#modalContext?.open(UMB_LINK_PICKER_MODAL, {
-			config: {
-				ignoreUserStartNodes: this.configuration?.getValueByAlias<boolean>('ignoreUserStartNodes') ?? false,
+			data: {
+				config: {
+					ignoreUserStartNodes: this.configuration?.getValueByAlias<boolean>('ignoreUserStartNodes') ?? false,
+				},
+				index: null,
 			},
-			link: currentTarget ?? {},
-			index: null,
+			value: {
+				link: currentTarget ?? {},
+			},
 		});
 
 		if (!modalHandler) return;

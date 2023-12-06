@@ -78,10 +78,12 @@ export class UmbInstalledPackagesSectionViewItemElement extends UmbLitElement {
 	async _onMigration() {
 		if (!this.name) return;
 		const modalContext = this.#modalContext?.open(UMB_CONFIRM_MODAL, {
-			color: 'positive',
-			headline: `Run migrations for ${this.name}?`,
-			content: `Do you want to start run migrations for ${this.name}`,
-			confirmLabel: 'Run migrations',
+			data: {
+				color: 'positive',
+				headline: `Run migrations for ${this.name}?`,
+				content: `Do you want to start run migrations for ${this.name}`,
+				confirmLabel: 'Run migrations',
+			},
 		});
 
 		await modalContext?.onSubmit();

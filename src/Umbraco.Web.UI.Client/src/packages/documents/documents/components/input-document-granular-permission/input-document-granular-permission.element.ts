@@ -61,21 +61,26 @@ export class UmbInputDocumentGranularPermissionElement extends FormControlMixin(
 
 	#openDocumentPicker() {
 		// We send a shallow copy(good enough as its just an array of ids) of our this._selectedIds, as we don't want the modal to manipulate our data:
+		// TODO: Use value instead:
 		const modalContext = this.#modalContext?.open(UMB_DOCUMENT_PICKER_MODAL, {
-			selection: [...this._selectedIds],
+			value: {
+				selection: [...this._selectedIds],
+			},
 		});
 
-		modalContext?.onSubmit().then(({ selection }: any) => {
+		modalContext?.onSubmit().then((value) => {
 			//this.#setSelection(selection);
 		});
 	}
 
 	async #removeItem(item: DocumentItemResponseModel) {
 		const modalContext = this.#modalContext?.open(UMB_CONFIRM_MODAL, {
-			color: 'danger',
-			headline: `Remove ${item.name}?`,
-			content: 'Are you sure you want to remove this item',
-			confirmLabel: 'Remove',
+			data: {
+				color: 'danger',
+				headline: `Remove ${item.name}?`,
+				content: 'Are you sure you want to remove this item',
+				confirmLabel: 'Remove',
+			},
 		});
 
 		await modalContext?.onSubmit();

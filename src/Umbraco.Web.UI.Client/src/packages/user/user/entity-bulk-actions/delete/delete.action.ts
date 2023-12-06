@@ -24,10 +24,12 @@ export class UmbUserDeleteEntityBulkAction extends UmbEntityBulkActionBase<UmbUs
 		if (!this.#modalContext || this.selection.length === 0) return;
 
 		const modalContext = this.#modalContext.open(UMB_CONFIRM_MODAL, {
-			color: 'danger',
-			headline: `Delete users?`,
-			content: html`Are you sure you want to delete selected users?`,
-			confirmLabel: 'Delete',
+			data: {
+				color: 'danger',
+				headline: `Delete users?`,
+				content: html`Are you sure you want to delete selected users?`,
+				confirmLabel: 'Delete',
+			},
 		});
 
 		await modalContext.onSubmit();

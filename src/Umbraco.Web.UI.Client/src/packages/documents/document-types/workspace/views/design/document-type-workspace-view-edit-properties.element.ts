@@ -120,10 +120,10 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 				if (documentTypeId === undefined) return false;
 				const propertyData = await this._propertyStructureHelper.createPropertyScaffold(this._containerId);
 				if (propertyData === undefined) return false;
-				return { propertyData, documentTypeId };
+				return { data: { documentTypeId }, value: propertyData };
 			})
-			.onSubmit((result) => {
-				this.#addProperty(result);
+			.onSubmit((value) => {
+				this.#addProperty(value);
 			})
 			.observeRouteBuilder((routeBuilder) => {
 				this._modalRouteNewProperty = routeBuilder(null);

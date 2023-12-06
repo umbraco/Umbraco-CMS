@@ -80,9 +80,7 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 	}
 
 	#submit() {
-		this.modalContext?.submit({
-			value: this._templateQuery?.queryExpression ?? '',
-		});
+		this.modalContext?.submit();
 	}
 
 	#updateQueryRequest(update: TemplateQueryExecuteModel) {
@@ -99,12 +97,15 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 		const { data, error } = await this.#templateRepository.postTemplateQueryExecute({
 			requestBody: this._queryRequest,
 		});
-		if (data) this._templateQuery = { ...data };
+		if (data) {
+			this._templateQuery = { ...data };
+			this.value = { value: this._templateQuery?.queryExpression ?? '' };
+		}
 	};
 
 	#openDocumentPicker = () => {
 		this.#modalManagerContext
-			?.open(UMB_DOCUMENT_PICKER_MODAL, { hideTreeRoot: true })
+			?.open(UMB_DOCUMENT_PICKER_MODAL, { data: { hideTreeRoot: true } })
 			.onSubmit()
 			.then((result) => {
 				this.#updateQueryRequest({ rootContentId: result.selection[0] });

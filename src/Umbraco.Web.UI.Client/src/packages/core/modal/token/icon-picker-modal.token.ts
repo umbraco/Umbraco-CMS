@@ -1,6 +1,6 @@
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
-export interface UmbIconPickerModalData {}
+export type UmbIconPickerModalData = never;
 
 export interface UmbIconPickerModalValue {
 	color: string | undefined;
@@ -10,7 +10,9 @@ export interface UmbIconPickerModalValue {
 export const UMB_ICON_PICKER_MODAL = new UmbModalToken<UmbIconPickerModalData, UmbIconPickerModalValue>(
 	'Umb.Modal.IconPicker',
 	{
-		type: 'sidebar',
-		size: 'medium',
+		modal: {
+			type: 'sidebar',
+			size: 'medium',
+		},
 	},
 );

@@ -105,7 +105,7 @@ export class UmbDocumentInfoWorkspaceViewElement extends UmbLitElement {
 		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
 			.addAdditionalPath('document-type')
 			.onSetup(() => {
-				return { entityType: 'document-type', preset: {} };
+				return { data: { entityType: 'document-type', preset: {} } };
 			})
 			.observeRouteBuilder((routeBuilder) => {
 				this._editDocumentTypePath = routeBuilder({});

@@ -24,7 +24,7 @@ export default class UmbExportDictionaryEntityAction extends UmbEntityActionBase
 	async execute() {
 		if (!this.#modalContext) return;
 
-		const modalContext = this.#modalContext?.open(UMB_EXPORT_DICTIONARY_MODAL, { unique: this.unique });
+		const modalContext = this.#modalContext?.open(UMB_EXPORT_DICTIONARY_MODAL, { data: { unique: this.unique } });
 
 		const { includeChildren } = await modalContext.onSubmit();
 		if (includeChildren === undefined) return;
