@@ -1,12 +1,13 @@
 import { expect } from '@open-wc/testing';
 
 import { UmbNotificationHandler, UmbNotificationContext } from './index.js';
+import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 describe('UmbNotificationContext', () => {
 	let notificationContext: UmbNotificationContext;
 
 	beforeEach(async () => {
-		notificationContext = new UmbNotificationContext();
+		notificationContext = new UmbNotificationContext(new UmbControllerHostElement());
 	});
 
 	describe('Public API', () => {
