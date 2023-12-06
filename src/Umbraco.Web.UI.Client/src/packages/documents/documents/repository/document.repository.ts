@@ -226,7 +226,7 @@ export class UmbDocumentRepository
 
 		await this.save(id, item);
 
-		const { error } = await this.#detailDataSource.saveAndPublish(id, variantIds);
+		const { error } = await this.#detailDataSource.publish(id, variantIds);
 
 		if (!error) {
 			// TODO: Update other stores based on above effect.
@@ -243,7 +243,7 @@ export class UmbDocumentRepository
 		if (!variantIds) throw new Error('variant IDs are missing');
 		await this.#init;
 
-		const { error } = await this.#detailDataSource.saveAndPublish(id, variantIds);
+		const { error } = await this.#detailDataSource.publish(id, variantIds);
 
 		if (!error) {
 			// TODO: Update other stores based on above effect.

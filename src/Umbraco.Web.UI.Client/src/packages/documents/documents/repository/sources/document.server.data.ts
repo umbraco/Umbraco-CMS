@@ -117,7 +117,6 @@ export class UmbDocumentServerDataSource
 		return tryExecuteAndNotify(this.#host, DocumentResource.putDocumentById({ id, requestBody }));
 	}
 
-
 	/**
 	 * Publish one or more variants of a Document
 	 * @param {string} id
@@ -125,7 +124,7 @@ export class UmbDocumentServerDataSource
 	 * @return {*}
 	 * @memberof UmbDocumentServerDataSource
 	 */
-	async saveAndPublish(id: string, variantIds: Array<UmbVariantId>) {
+	async publish(id: string, variantIds: Array<UmbVariantId>) {
 		if (!id) throw new Error('Id is missing');
 
 		// TODO: THIS DOES NOT TAKE SEGMENTS INTO ACCOUNT!!!!!!
