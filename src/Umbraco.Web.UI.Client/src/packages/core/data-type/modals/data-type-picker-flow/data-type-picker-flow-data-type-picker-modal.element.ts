@@ -1,9 +1,8 @@
 import { UmbDataTypeDetailRepository } from '../../repository/detail/data-type-detail.repository.js';
 import { UmbDataTypeTreeRepository } from '../../tree/data-type-tree.repository.js';
-import { css, html, customElement, property, state, repeat, when } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, repeat, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import {
-	UmbModalContext,
 	UmbDataTypePickerFlowDataTypePickerModalData,
 	UmbDataTypePickerFlowDataTypePickerModalValue,
 	UmbModalBaseElement,
@@ -74,12 +73,6 @@ export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbModalBas
 	private _close() {
 		this.modalContext?.reject();
 	}
-
-	@property({ attribute: false })
-	modalContext?: UmbModalContext<
-		UmbDataTypePickerFlowDataTypePickerModalData,
-		UmbDataTypePickerFlowDataTypePickerModalValue
-	>;
 
 	render() {
 		return html`
