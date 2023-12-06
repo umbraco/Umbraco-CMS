@@ -1,0 +1,43 @@
+using System.Linq.Expressions;
+using System.Net;
+using NUnit.Framework;
+using Umbraco.Cms.Api.Management.Controllers.Indexer;
+
+namespace Umbraco.Cms.Tests.Integration.ManagementApi.Indexer;
+
+[TestFixture]
+public class AllIndexerControllerTests : ManagementApiUserGroupTestBase<AllIndexerController>
+{
+    protected override Expression<Func<AllIndexerController, object>> MethodSelector =>
+        x => x.All(0, 100);
+
+    protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
+    {
+        ExpectedStatusCode = HttpStatusCode.OK
+    };
+
+    protected override UserGroupAssertionModel EditorUserGroupAssertionModel => new()
+    {
+        ExpectedStatusCode = HttpStatusCode.OK
+    };
+
+    protected override UserGroupAssertionModel SensitiveDataUserGroupAssertionModel => new()
+    {
+        ExpectedStatusCode = HttpStatusCode.OK
+    };
+
+    protected override UserGroupAssertionModel TranslatorUserGroupAssertionModel => new()
+    {
+        ExpectedStatusCode = HttpStatusCode.OK
+    };
+
+    protected override UserGroupAssertionModel WriterUserGroupAssertionModel => new()
+    {
+        ExpectedStatusCode = HttpStatusCode.OK
+    };
+
+    protected override UserGroupAssertionModel UnauthorizedUserGroupAssertionModel => new()
+    {
+        ExpectedStatusCode = HttpStatusCode.Unauthorized
+    };
+}
