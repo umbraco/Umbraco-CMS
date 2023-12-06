@@ -77,6 +77,7 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement im
 		});
 
 		modalContext?.onSubmit().then((value) => {
+			console.log('got', value);
 			this._workspaceContext?.setPropertyEditorUiAlias(value?.selection[0]);
 		});
 	}

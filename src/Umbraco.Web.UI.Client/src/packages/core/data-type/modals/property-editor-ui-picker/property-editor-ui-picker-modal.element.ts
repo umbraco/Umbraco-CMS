@@ -23,21 +23,17 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbModalBaseElement<
 	private _propertyEditorUIs: Array<ManifestPropertyEditorUi> = [];
 
 	@state()
-	private _selection: Array<string> = [];
-
-	@state()
 	private _submitLabel = 'Select';
 
 	connectedCallback(): void {
 		super.connectedCallback();
 
-		this._selection = this._value?.selection ?? [];
 		this._submitLabel = this.data?.submitLabel ?? this._submitLabel;
 
-		this._usePropertyEditorUIs();
+		this.#usePropertyEditorUIs();
 	}
 
-	private _usePropertyEditorUIs() {
+	#usePropertyEditorUIs() {
 		if (!this.data) return;
 
 		this.observe(umbExtensionsRegistry.extensionsOfType('propertyEditorUi'), (propertyEditorUIs) => {
@@ -56,15 +52,15 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbModalBaseElement<
 		});
 	}
 
-	private _handleClick(propertyEditorUi: ManifestPropertyEditorUi) {
-		this._select(propertyEditorUi.alias);
+	#handleClick(propertyEditorUi: ManifestPropertyEditorUi) {
+		this.#select(propertyEditorUi.alias);
 	}
 
-	private _select(alias: string) {
-		this._selection = [alias];
+	#select(alias: string) {
+		this._value = { selection: [alias] };
 	}
 
-	private _handleFilterInput(event: UUIInputEvent) {
+	#handleFilterInput(event: UUIInputEvent) {
 		let query = (event.target.value as string) || '';
 		query = query.toLowerCase();
 
@@ -105,7 +101,7 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbModalBaseElement<
 		return html` <uui-input
 			type="search"
 			id="filter"
-			@input="${this._handleFilterInput}"
+			@input="${this.#handleFilterInput}"
 			placeholder="Type to filter..."
 			label="Type to filter icons">
 			<uui-icon name="search" slot="prepend" id="filter-icon"></uui-icon>
@@ -126,8 +122,8 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbModalBaseElement<
 				groupItems,
 				(propertyEditorUI) => propertyEditorUI.alias,
 				(propertyEditorUI) =>
-					html` <li class="item" ?selected=${this._selection.includes(propertyEditorUI.alias)}>
-						<button type="button" @click="${() => this._handleClick(propertyEditorUI)}">
+					html` <li class="item" ?selected=${this._value.selection.includes(propertyEditorUI.alias)}>
+						<button type="button" @click="${() => this.#handleClick(propertyEditorUI)}">
 							<uui-icon name="${propertyEditorUI.meta.icon}" class="icon"></uui-icon>
 							${propertyEditorUI.meta.label || propertyEditorUI.name}
 						</button>
