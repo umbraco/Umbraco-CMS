@@ -71,8 +71,7 @@ public class WebhookFiring : IRecurringBackgroundJob
                         return;
                     }
 
-                    HttpResponseMessage? response = await SendRequestAsync(webhook, request.EventAlias, request.RequestObject, request.RetryCount, CancellationToken.None);
-
+                    using HttpResponseMessage? response = await SendRequestAsync(webhook, request.EventAlias, request.RequestObject, request.RetryCount, CancellationToken.None);
                     if ((response?.IsSuccessStatusCode ?? false) || request.RetryCount >= _webhookSettings.MaximumRetries)
                     {
                         await _webhookRequestService.DeleteAsync(request);
