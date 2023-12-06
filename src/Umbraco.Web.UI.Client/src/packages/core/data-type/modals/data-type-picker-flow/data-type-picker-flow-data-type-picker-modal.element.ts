@@ -1,5 +1,6 @@
 import { UmbDataTypeDetailRepository } from '../../repository/detail/data-type-detail.repository.js';
 import { UmbDataTypeTreeRepository } from '../../tree/data-type-tree.repository.js';
+import type { UmbDataTypeDetailModel } from '../../types.js';
 import { css, html, customElement, state, repeat, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import {
@@ -7,7 +8,6 @@ import {
 	UmbDataTypePickerFlowDataTypePickerModalValue,
 	UmbModalBaseElement,
 } from '@umbraco-cms/backoffice/modal';
-import { FolderTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-data-type-picker-flow-data-type-picker-modal')
 export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbModalBaseElement<
@@ -15,7 +15,7 @@ export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbModalBas
 	UmbDataTypePickerFlowDataTypePickerModalValue
 > {
 	@state()
-	private _dataTypes?: Array<FolderTreeItemResponseModel>;
+	private _dataTypes?: Array<UmbDataTypeDetailModel>;
 
 	private _propertyEditorUiAlias!: string;
 
@@ -44,8 +44,8 @@ export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbModalBas
 
 		await Promise.all(
 			data.items.map((item) => {
-				if (item.id) {
-					return dataTypeDetailRepository.requestByUnique(item.id);
+				if (item.unique) {
+					return dataTypeDetailRepository.requestByUnique(item.unique);
 				}
 				return Promise.resolve();
 			}),
@@ -58,9 +58,9 @@ export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbModalBas
 		});
 	}
 
-	private _handleClick(dataType: FolderTreeItemResponseModel) {
-		if (dataType.id) {
-			this._value = { dataTypeId: dataType.id };
+	private _handleClick(dataType: UmbDataTypeDetailModel) {
+		if (dataType.unique) {
+			this._value = { dataTypeId: dataType.unique };
 			this.modalContext?.submit();
 		}
 	}
@@ -87,29 +87,26 @@ export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbModalBas
 
 	private _renderDataTypes() {
 		const shouldRender = this._dataTypes && this._dataTypes.length > 0;
-		console.log(this._dataTypes, 'yo', shouldRender);
 
 		return when(
 			shouldRender,
 			() =>
 				html`<ul id="item-grid">
-					${this._dataTypes
-						? repeat(
-								this._dataTypes,
-								(dataType) => dataType.id,
-								(dataType) =>
-									dataType.id
-										? html` <li class="item">
-												<uui-button label="dataType.name" type="button" @click="${() => this._handleClick(dataType)}">
-													<div class="item-content">
-														<uui-icon name="${'icon-bug'}" class="icon"></uui-icon>
-														${dataType.name}
-													</div>
-												</uui-button>
-										  </li>`
-										: '',
-						  )
-						: ''}
+					${repeat(
+						this._dataTypes!,
+						(dataType) => dataType.unique,
+						(dataType) =>
+							dataType.unique
+								? html` <li class="item">
+										<uui-button label="dataType.name" type="button" @click="${() => this._handleClick(dataType)}">
+											<div class="item-content">
+												<uui-icon name="${'icon-bug'}" class="icon"></uui-icon>
+												${dataType.name}
+											</div>
+										</uui-button>
+								  </li>`
+								: '',
+					)}
 				</ul>`,
 		);
 	}
