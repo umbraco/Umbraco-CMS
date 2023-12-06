@@ -101,7 +101,4 @@ describe('Extension-Api: Create Extension Api', () => {
 			expect(api.isValidClassInstance()).to.be.true;
 		}
 	});
-
-	//TODO: Test apiJs
-	//TODO: Test js
 });
