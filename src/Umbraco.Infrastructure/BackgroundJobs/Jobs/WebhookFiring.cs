@@ -93,24 +93,25 @@ public class WebhookFiring : IRecurringBackgroundJob
 
         var request = new HttpRequestMessage(HttpMethod.Post, webhook.Url)
         {
-            Version = httpClient.DefaultRequestVersion, VersionPolicy = httpClient.DefaultVersionPolicy,
+            Version = httpClient.DefaultRequestVersion,
+            VersionPolicy = httpClient.DefaultVersionPolicy,
         };
 
-        // Add headers
-        request.Headers.TryAddWithoutValidation("Umb-Webhook-Event", eventName);
-
-        foreach (KeyValuePair<string, string> header in webhook.Headers)
-        {
-            request.Headers.TryAddWithoutValidation(header.Key, header.Value);
-        }
-
-        // Set content
-        request.Content = new StringContent(serializedObject ?? string.Empty, Encoding.UTF8, MediaTypeNames.Application.Json);
-
-        // Send request
         HttpResponseMessage? response = null;
         try
         {
+            // Add headers
+            request.Headers.Add("Umb-Webhook-Event", eventName);
+
+            foreach (KeyValuePair<string, string> header in webhook.Headers)
+            {
+                request.Headers.Add(header.Key, header.Value);
+            }
+
+            // Set content
+            request.Content = new StringContent(serializedObject ?? string.Empty, Encoding.UTF8, MediaTypeNames.Application.Json);
+
+            // Send request
             response = await httpClient.SendAsync(request, cancellationToken);
         }
         catch (Exception ex)
