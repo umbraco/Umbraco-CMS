@@ -49,7 +49,7 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 	}
 
 	#onColorChange(e: UUIColorSwatchesEvent) {
-		this.modalContext?.updateValue({ icon: e.target.value });
+		this.modalContext?.updateValue({ color: e.target.value });
 	}
 
 	connectedCallback() {

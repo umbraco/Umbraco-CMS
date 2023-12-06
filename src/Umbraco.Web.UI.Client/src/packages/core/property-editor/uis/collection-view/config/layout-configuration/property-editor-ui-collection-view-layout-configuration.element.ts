@@ -1,6 +1,12 @@
 import { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { html, customElement, property, state, repeat, css, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UUIBooleanInputEvent, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import { getUmbracoColor } from '@umbraco-cms/backoffice/resources';
+import {
+	UMB_ICON_PICKER_MODAL,
+	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
+	UmbModalManagerContext,
+} from '@umbraco-cms/backoffice/modal';
 import {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyValueChangeEvent,
@@ -29,6 +35,15 @@ export class UmbPropertyEditorUICollectionViewLayoutConfigurationElement
 
 	@property({ type: Object, attribute: false })
 	public config?: UmbPropertyEditorConfigCollection;
+
+	private _modalContext?: UmbModalManagerContext;
+
+	constructor() {
+		super();
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
+			this._modalContext = instance;
+		});
+	}
 
 	#onAdd() {
 		this.value = [...this.value, { isSystem: false, icon: 'icon-stop', selected: true }];
@@ -63,11 +78,25 @@ export class UmbPropertyEditorUICollectionViewLayoutConfigurationElement
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
+	async #onIconChange(index: number) {
+		const icon = this.#iconReader(this.value[index].icon ?? '');
+
+		// TODO: send icon data to modal
+		const modalContext = this._modalContext?.open(UMB_ICON_PICKER_MODAL);
+		const picked = await modalContext?.onSubmit();
+		if (!picked) return;
+
+		const values = [...this.value];
+		values[index] = { ...values[index], icon: `${picked.icon} color-${picked.color}` };
+		this.value = values;
+		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+	}
+
 	render() {
 		return html`<div id="layout-wrapper">
 				${repeat(
 					this.value,
-					(layout, index) => layout.name + '' + index,
+					(layout, index) => '' + layout.name + layout.icon,
 					(layout, index) =>
 						html` <div class="layout-item">
 							<uui-icon name="icon-navigation"></uui-icon> ${layout.isSystem
@@ -83,9 +112,25 @@ export class UmbPropertyEditorUICollectionViewLayoutConfigurationElement
 				@click=${this.#onAdd}></uui-button>`;
 	}
 
+	#iconReader(iconString: string): { icon: string; color?: string } {
+		if (!iconString) return { icon: '' };
+
+		const parts = iconString.split(' ');
+
+		if (parts.length === 2) {
+			const [icon, color] = parts;
+			return { icon, color: color.replace('color-', '') };
+		} else {
+			const [icon] = parts;
+			return { icon };
+		}
+	}
+
 	renderSystemFieldRow(layout: LayoutConfig, index: number) {
+		const icon = this.#iconReader(layout.icon ?? '');
+
 		return html` <uui-button compact disabled label="Icon" look="outline">
-				<uui-icon name=${ifDefined(layout.icon)}></uui-icon>
+				<uui-icon name=${ifDefined(icon.icon)}></uui-icon>
 			</uui-button>
 			${index}
 			<span><strong>${ifDefined(layout.name)}</strong> <small>(system field)</small></span>
@@ -97,8 +142,10 @@ export class UmbPropertyEditorUICollectionViewLayoutConfigurationElement
 	}
 
 	renderCustomFieldRow(layout: LayoutConfig, index: number) {
-		return html`<uui-button compact look="outline" label="pick icon">
-				<uui-icon name=${ifDefined(layout.icon)}></uui-icon>
+		const icon = this.#iconReader(layout.icon ?? '');
+
+		return html`<uui-button compact look="outline" label="pick icon" @click=${() => this.#onIconChange(index)}>
+				<uui-icon name=${ifDefined(icon.icon)} style="color:var(${getUmbracoColor(icon.color ?? '')})"></uui-icon>
 			</uui-button>
 			${index}
 			<uui-input
