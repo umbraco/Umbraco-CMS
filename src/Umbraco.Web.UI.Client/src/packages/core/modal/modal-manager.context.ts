@@ -3,6 +3,8 @@ import { UmbModalContext, type UmbModalContextClassArgs } from './index.js';
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 import { UmbBasicState, appendToFrozenArray } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
+import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export type UmbModalType = 'dialog' | 'sidebar';
 
@@ -12,10 +14,14 @@ export interface UmbModalConfig {
 	size?: UUIModalSidebarSize;
 }
 
-export class UmbModalManagerContext {
+export class UmbModalManagerContext extends UmbContextBase<UmbModalManagerContext> {
 	// TODO: Investigate if we can get rid of HTML elements in our store, so we can use one of our states.
 	#modals = new UmbBasicState(<Array<UmbModalContext>>[]);
 	public readonly modals = this.#modals.asObservable();
+
+	constructor(host: UmbControllerHost) {
+		super(host, UMB_MODAL_MANAGER_CONTEXT_TOKEN);
+	}
 
 	/**
 	 * Opens a modal or sidebar modal
@@ -60,4 +66,6 @@ export class UmbModalManagerContext {
 	}
 }
 
-export const UMB_MODAL_MANAGER_CONTEXT_TOKEN = new UmbContextToken<UmbModalManagerContext>('UmbModalManagerContext');
+export const UMB_MODAL_MANAGER_CONTEXT_TOKEN = new UmbContextToken<UmbModalManagerContext, UmbModalManagerContext>(
+	'UmbModalManagerContext',
+);
