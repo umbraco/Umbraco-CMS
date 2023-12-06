@@ -15,7 +15,10 @@ export class UmbDataTypeTreeRepository
 	}
 
 	async requestTreeRoot() {
+		// TODO: TREE STORE TYPE PROBLEM:
+		// TODO: This is wrong, either this should be adapted to use unique, or ID. If so the types above should be updated and the UmbTreeRepositoryBase should also be updated to use unique.
 		const data = {
+			id: null,
 			unique: null,
 			type: UMB_DATA_TYPE_ROOT_ENTITY_TYPE,
 			name: 'Data Types',

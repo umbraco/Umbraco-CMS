@@ -18,16 +18,6 @@ export class UmbSectionPickerModalElement extends UmbModalBaseElement<
 
 	#selectionManager = new UmbSelectionManager();
 
-	#submit() {
-		this.modalContext?.submit({
-			selection: this.#selectionManager.getSelection(),
-		});
-	}
-
-	#close() {
-		this.modalContext?.reject();
-	}
-
 	connectedCallback(): void {
 		super.connectedCallback();
 
@@ -40,6 +30,17 @@ export class UmbSectionPickerModalElement extends UmbModalBaseElement<
 			(sections: Array<ManifestSection>) => (this._sections = sections),
 		),
 			'umbSectionsObserver';
+	}
+
+	#submit() {
+		this.value = {
+			selection: this.#selectionManager.getSelection(),
+		};
+		this.modalContext?.submit();
+	}
+
+	#close() {
+		this.modalContext?.reject();
 	}
 
 	render() {

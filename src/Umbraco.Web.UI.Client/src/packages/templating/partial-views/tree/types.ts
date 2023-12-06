@@ -1,5 +1,8 @@
 import { FileSystemTreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbFileSystemTreeItemModel, UmbFileSystemTreeRootModel } from '@umbraco-cms/backoffice/tree';
 
-export type UmbPartialViewTreeItemModel = FileSystemTreeItemPresentationModel & UmbFileSystemTreeItemModel;
-export type UmbPartialViewTreeRootModel = FileSystemTreeItemPresentationModel & UmbFileSystemTreeRootModel;
+export interface UmbPartialViewTreeItemModel extends FileSystemTreeItemPresentationModel, UmbFileSystemTreeItemModel {}
+// TODO: TREE STORE TYPE PROBLEM:
+export interface UmbPartialViewTreeRootModel
+	extends Omit<FileSystemTreeItemPresentationModel, 'path'>,
+		UmbFileSystemTreeRootModel {}

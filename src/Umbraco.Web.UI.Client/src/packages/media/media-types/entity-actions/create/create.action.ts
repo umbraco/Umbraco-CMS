@@ -20,7 +20,9 @@ export class UmbCreateMediaTypeEntityAction extends UmbEntityActionBase<UmbMedia
 		if (!this.repository) throw new Error('Repository is not available');
 
 		this.#modalManagerContext?.open(UMB_MEDIA_TYPE_CREATE_OPTIONS_MODAL, {
-			parentKey: this.unique,
+			data: {
+				parentKey: this.unique,
+			},
 		});
 	}
 }

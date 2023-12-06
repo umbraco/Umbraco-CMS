@@ -22,7 +22,7 @@ export class UmbDataTypeDetailStore extends UmbDetailStoreBase<UmbDataTypeDetail
 	withPropertyEditorUiAlias(propertyEditorUiAlias: string) {
 		// TODO: Use a model for the data-type tree items: ^^Most likely it should be parsed to the UmbEntityTreeStore as a generic type.
 		return this._data.asObservablePart((items) =>
-			items.filter((item) => (item as any).propertyEditorUiAlias === propertyEditorUiAlias),
+			items.filter((item) => item.propertyEditorUiAlias === propertyEditorUiAlias),
 		);
 	}
 }

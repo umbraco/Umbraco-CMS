@@ -58,15 +58,17 @@ export class UmbDashboardExamineIndexElement extends UmbLitElement {
 
 	private async _onRebuildHandler() {
 		const modalContext = this._modalContext?.open(UMB_CONFIRM_MODAL, {
-			headline: `Rebuild ${this.indexName}`,
-			content: html`
-				This will cause the index to be rebuilt.<br />
-				Depending on how much content there is in your site this could take a while.<br />
-				It is not recommended to rebuild an index during times of high website traffic or when editors are editing
-				content.
-			`,
-			color: 'danger',
-			confirmLabel: 'Rebuild',
+			data: {
+				headline: `Rebuild ${this.indexName}`,
+				content: html`
+					This will cause the index to be rebuilt.<br />
+					Depending on how much content there is in your site this could take a while.<br />
+					It is not recommended to rebuild an index during times of high website traffic or when editors are editing
+					content.
+				`,
+				color: 'danger',
+				confirmLabel: 'Rebuild',
+			},
 		});
 		modalContext?.onSubmit().then(() => {
 			this._rebuild();

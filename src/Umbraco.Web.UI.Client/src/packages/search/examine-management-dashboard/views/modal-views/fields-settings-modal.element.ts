@@ -1,60 +1,42 @@
-import { html, css, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { html, css, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import {
 	UmbExamineFieldsSettingsModalValue,
 	UmbExamineFieldsSettingsModalData,
 	UmbModalBaseElement,
 } from '@umbraco-cms/backoffice/modal';
-import { ManifestModal, UmbModalExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-examine-fields-settings-modal')
-export default class UmbExamineFieldsSettingsModalElement
-	extends UmbModalBaseElement<UmbExamineFieldsSettingsModalData, UmbExamineFieldsSettingsModalValue>
-	implements UmbModalExtensionElement<any, any, ManifestModal>
-{
-	@state()
-	private _fields?: UmbExamineFieldsSettingsModalData;
-
-	private _handleClose() {
-		this.modalContext?.submit({ fields: this._fields });
-	}
-
-	disconnectedCallback(): void {
-		super.disconnectedCallback();
-		this._handleClose();
-	}
-
-	firstUpdated() {
-		this._fields =
-			this.data?.map((field) => {
-				return { name: field.name, exposed: field.exposed };
-			}) || undefined;
-	}
-
+export default class UmbExamineFieldsSettingsModalElement extends UmbModalBaseElement<
+	UmbExamineFieldsSettingsModalData,
+	UmbExamineFieldsSettingsModalValue
+> {
 	render() {
-		if (this._fields) {
+		if (this.value.fields) {
 			return html`
 				<uui-dialog-layout headline="Show fields">
 					<uui-scroll-container id="field-settings">
 						<span>
-							${Object.values(this._fields).map((field, index) => {
+							${Object.values(this.value.fields).map((field, index) => {
 								return html`<uui-toggle
 										name="${field.name}"
 										label="${field.name}"
 										.checked="${field.exposed}"
 										@change="${() => {
-											this._fields ? (this._fields[index].exposed = !field.exposed) : '';
+											this.value.fields ? (this.value.fields[index].exposed = !field.exposed) : '';
 										}}"></uui-toggle>
 									<br />`;
 							})}
 						</span>
 					</uui-scroll-container>
 					<div>
-						<uui-button look="primary" label="Close sidebar" @click="${this._handleClose}">Close</uui-button>
+						<uui-button look="primary" label="Close sidebar" @click="${this._submitModal}">Close</uui-button>
 					</div>
 				</uui-dialog-layout>
 			`;
-		} else return html``;
+		} else {
+			return '';
+		}
 	}
 
 	static styles = [

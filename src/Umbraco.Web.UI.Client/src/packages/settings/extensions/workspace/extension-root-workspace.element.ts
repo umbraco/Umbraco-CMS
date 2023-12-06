@@ -1,6 +1,5 @@
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
-import { isManifestElementNameType } from '@umbraco-cms/backoffice/extension-api';
 import { ManifestTypes, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import {
@@ -48,10 +47,12 @@ export class UmbExtensionRootWorkspaceElement extends UmbLitElement {
 
 	async #removeExtension(extension: ManifestTypes) {
 		const modalContext = this._modalContext?.open(UMB_CONFIRM_MODAL, {
-			headline: 'Unload extension',
-			confirmLabel: 'Unload',
-			content: html`<p>Are you sure you want to unload the extension <strong>${extension.alias}</strong>?</p>`,
-			color: 'danger',
+			data: {
+				headline: 'Unload extension',
+				confirmLabel: 'Unload',
+				content: html`<p>Are you sure you want to unload the extension <strong>${extension.alias}</strong>?</p>`,
+				color: 'danger',
+			},
 		});
 
 		await modalContext?.onSubmit();

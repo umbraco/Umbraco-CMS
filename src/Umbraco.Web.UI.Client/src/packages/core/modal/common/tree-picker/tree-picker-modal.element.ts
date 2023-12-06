@@ -19,23 +19,21 @@ export class UmbTreePickerModalElement<TreeItemType extends TreeItemPresentation
 	connectedCallback() {
 		super.connectedCallback();
 
-		this._selection = this.data?.selection ?? [];
+		// TODO: We should make a nicer way to observe the value..
+		if (this.modalContext) {
+			this.observe(this.modalContext.value, (value) => {
+				this._selection = value?.selection ?? [];
+			});
+		}
+
 		this._multiple = this.data?.multiple ?? false;
 	}
 
 	#onSelectionChange(e: CustomEvent) {
 		e.stopPropagation();
 		const element = e.target as UmbTreeElement;
-		this._selection = element.selection;
+		this.value = { selection: element.selection };
 		this.dispatchEvent(new UmbSelectionChangeEvent());
-	}
-
-	#submit() {
-		this.modalContext?.submit({ selection: this._selection });
-	}
-
-	#close() {
-		this.modalContext?.reject();
 	}
 
 	render() {
@@ -52,8 +50,8 @@ export class UmbTreePickerModalElement<TreeItemType extends TreeItemPresentation
 						?multiple=${this._multiple}></umb-tree>
 				</uui-box>
 				<div slot="actions">
-					<uui-button label="Close" @click=${this.#close}></uui-button>
-					<uui-button label="Submit" look="primary" color="positive" @click=${this.#submit}></uui-button>
+					<uui-button label="Close" @click=${this._rejectModal}></uui-button>
+					<uui-button label="Submit" look="primary" color="positive" @click=${this._submitModal}></uui-button>
 				</div>
 			</umb-body-layout>
 		`;

@@ -19,8 +19,10 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 export const UMB_MODAL_TEMPLATING_INSERT_CHOOSE_TYPE_SIDEBAR_MODAL = new UmbModalToken<{ hidePartialView: boolean }>(
 	UMB_MODAL_TEMPLATING_INSERT_CHOOSE_TYPE_SIDEBAR_ALIAS,
 	{
-		type: 'sidebar',
-		size: 'small',
+		modal: {
+			type: 'sidebar',
+			size: 'small',
+		},
 	},
 );
 
@@ -75,7 +77,9 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 
 	#openChooseTypeModal = () => {
 		this.#openModal = this._modalContext?.open(UMB_MODAL_TEMPLATING_INSERT_CHOOSE_TYPE_SIDEBAR_MODAL, {
-			hidePartialView: this.hidePartialView,
+			data: {
+				hidePartialView: this.hidePartialView,
+			},
 		});
 		this.#openModal?.onSubmit().then((closedModal: UmbChooseInsertTypeModalValue) => {
 			this.determineInsertValue(closedModal);
@@ -93,7 +97,9 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 
 	#openInsertDictionaryItemModal() {
 		this.#openModal = this._modalContext?.open(UMB_DICTIONARY_ITEM_PICKER_MODAL, {
-			pickableFilter: (item) => item.id !== null,
+			data: {
+				pickableFilter: (item) => item.id !== null,
+			},
 		});
 		this.#openModal?.onSubmit().then((value) => {
 			this.#getDictionaryItemSnippet(value).then(() => {

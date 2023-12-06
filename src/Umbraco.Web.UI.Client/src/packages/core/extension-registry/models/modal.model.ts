@@ -2,6 +2,8 @@ import type { UmbModalExtensionElement } from '../interfaces/modal-extension-ele
 import type { ManifestElement } from '@umbraco-cms/backoffice/extension-api';
 
 export interface ManifestModal
-	extends ManifestElement<UmbModalExtensionElement<any, any> | UmbModalExtensionElement<any, undefined>> {
+	extends ManifestElement<
+		UmbModalExtensionElement<any, any> | UmbModalExtensionElement<any, never> | UmbModalExtensionElement<never, never>
+	> {
 	type: 'modal';
 }
