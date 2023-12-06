@@ -90,7 +90,7 @@ public class WebhookFiring : IRecurringBackgroundJob
     {
         using HttpClient httpClient = _httpClientFactory.CreateClient(Constants.HttpClients.WebhookFiring);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, webhook.Url)
+        using var request = new HttpRequestMessage(HttpMethod.Post, webhook.Url)
         {
             Version = httpClient.DefaultRequestVersion,
             VersionPolicy = httpClient.DefaultVersionPolicy,
@@ -101,7 +101,7 @@ public class WebhookFiring : IRecurringBackgroundJob
         {
             // Add headers
             request.Headers.Add("Umb-Webhook-Event", eventName);
-            request.Headers.Add("Umb-Webhook-Retry-Count", retryCount.ToString());
+            request.Headers.Add("Umb-Webhook-RetryCount", retryCount.ToString());
 
             foreach (KeyValuePair<string, string> header in webhook.Headers)
             {
