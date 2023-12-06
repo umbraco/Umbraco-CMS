@@ -10,10 +10,12 @@ export type UmbModalRouteBuilder = (params: { [key: string]: string | number } |
 
 export type UmbModalRouteSetupReturn<UmbModalTokenData, UmbModalTokenValue> = UmbModalTokenValue extends undefined
 	? {
+			config?: UmbModalConfig;
 			data: UmbModalTokenData;
 			value?: UmbModalTokenValue;
 	  }
 	: {
+			config?: UmbModalConfig;
 			data: UmbModalTokenData;
 			value: UmbModalTokenValue;
 	  };
@@ -38,15 +40,10 @@ export class UmbModalRouteRegistration<UmbModalTokenData extends object = object
 	#urlBuilderCallback: ((urlBuilder: UmbModalRouteBuilder) => void) | undefined;
 
 	// Notice i removed the key in the transferring to this class.
-	constructor(
-		modalAlias: UmbModalToken<UmbModalTokenData, UmbModalTokenValue> | string,
-		path: string | null = null,
-		modalConfig?: UmbModalConfig,
-	) {
-		this.#key = modalConfig?.key || UmbId.new();
+	constructor(modalAlias: UmbModalToken<UmbModalTokenData, UmbModalTokenValue> | string, path: string | null = null) {
+		this.#key = UmbId.new();
 		this.#modalAlias = modalAlias;
 		this.#path = path;
-		this.#modalConfig = { ...modalConfig, key: this.#key };
 	}
 
 	public get key() {
@@ -137,11 +134,14 @@ export class UmbModalRouteRegistration<UmbModalTokenData extends object = object
 
 		const modalData = this.#onSetupCallback ? await this.#onSetupCallback(params) : undefined;
 		if (modalData !== false) {
-			this.#modalManagerContext = modalManagerContext.open(this.#modalAlias, {
+			const args = {
+				config: {},
 				...modalData,
-				config: this.modalConfig,
 				router,
-			});
+			};
+			args.config.key = this.#key;
+
+			this.#modalManagerContext = modalManagerContext.open(this.#modalAlias, args);
 			this.#modalManagerContext.onSubmit().then(this.#onSubmit, this.#onReject);
 			return this.#modalManagerContext;
 		}
