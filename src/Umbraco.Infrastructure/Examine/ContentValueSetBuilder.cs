@@ -1,5 +1,7 @@
 using Examine;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -8,7 +10,6 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
-using IScope = Umbraco.Cms.Infrastructure.Scoping.IScope;
 
 namespace Umbraco.Cms.Infrastructure.Examine;
 
@@ -28,6 +29,7 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
     private readonly IUserService _userService;
     private readonly ILocalizationService _localizationService;
     private readonly IContentTypeService _contentTypeService;
+    private readonly ILogger<ContentValueSetBuilder> _logger;
 
     public ContentValueSetBuilder(
         PropertyEditorCollection propertyEditors,
@@ -37,7 +39,8 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
         ICoreScopeProvider scopeProvider,
         bool publishedValuesOnly,
         ILocalizationService localizationService,
-        IContentTypeService contentTypeService)
+        IContentTypeService contentTypeService,
+        ILogger<ContentValueSetBuilder> logger)
         : base(propertyEditors, publishedValuesOnly)
     {
         _urlSegmentProviders = urlSegmentProviders;
@@ -46,6 +49,30 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
         _scopeProvider = scopeProvider;
         _localizationService = localizationService;
         _contentTypeService = contentTypeService;
+        _logger = logger;
+    }
+
+    [Obsolete("Use non-obsolete ctor, scheduled for removal in v14")]
+    public ContentValueSetBuilder(
+        PropertyEditorCollection propertyEditors,
+        UrlSegmentProviderCollection urlSegmentProviders,
+        IUserService userService,
+        IShortStringHelper shortStringHelper,
+        ICoreScopeProvider scopeProvider,
+        bool publishedValuesOnly,
+        ILocalizationService localizationService,
+        IContentTypeService contentTypeService)
+        : this(
+            propertyEditors,
+            urlSegmentProviders,
+            userService,
+            shortStringHelper,
+            scopeProvider,
+            publishedValuesOnly,
+            localizationService,
+            StaticServiceProvider.Instance.GetRequiredService<IContentTypeService>(),
+            StaticServiceProvider.Instance.GetRequiredService<ILogger<ContentValueSetBuilder>>())
+    {
     }
 
     [Obsolete("Use non-obsolete ctor, scheduled for removal in v14")]
@@ -65,9 +92,9 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
             scopeProvider,
             publishedValuesOnly,
             localizationService,
-            StaticServiceProvider.Instance.GetRequiredService<IContentTypeService>())
+            StaticServiceProvider.Instance.GetRequiredService<IContentTypeService>(),
+            StaticServiceProvider.Instance.GetRequiredService<ILogger<ContentValueSetBuilder>>())
     {
-
     }
 
     [Obsolete("Use non-obsolete ctor, scheduled for removal in v14")]
@@ -86,7 +113,8 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
             scopeProvider,
             publishedValuesOnly,
             StaticServiceProvider.Instance.GetRequiredService<ILocalizationService>(),
-            StaticServiceProvider.Instance.GetRequiredService<IContentTypeService>())
+            StaticServiceProvider.Instance.GetRequiredService<IContentTypeService>(),
+            StaticServiceProvider.Instance.GetRequiredService<ILogger<ContentValueSetBuilder>>())
     {
     }
 
@@ -190,13 +218,34 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
             {
                 if (!property.PropertyType.VariesByCulture())
                 {
-                    AddPropertyValue(property, null, null, values, availableCultures, contentTypeDictionary);
+                    try
+                    {
+                        AddPropertyValue(property, null, null, values, availableCultures, contentTypeDictionary);
+                    }
+                    catch (JsonSerializationException ex)
+                    {
+                        _logger.LogError(ex, "Failed to add property '{PropertyAlias}' to index for content {ContentId}", property.Alias, c.Id);
+                        throw;
+                    }
                 }
                 else
                 {
                     foreach (var culture in c.AvailableCultures)
                     {
-                        AddPropertyValue(property, culture.ToLowerInvariant(), null, values, availableCultures, contentTypeDictionary);
+                        try
+                        {
+                            AddPropertyValue(property, culture.ToLowerInvariant(), null, values, availableCultures, contentTypeDictionary);
+                        }
+                        catch (JsonSerializationException ex)
+                        {
+                            _logger.LogError(
+                                ex,
+                                "Failed to add property '{PropertyAlias}' to index for content {ContentId} in culture {Culture}",
+                                property.Alias,
+                                c.Id,
+                                culture);
+                            throw;
+                        }
                     }
                 }
             }

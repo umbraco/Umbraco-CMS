@@ -12,6 +12,8 @@ public class EnumSchemaFilter : ISchemaFilter
     {
         if (context.Type.IsEnum)
         {
+            model.Type = "string";
+            model.Format = null;
             model.Enum.Clear();
             foreach (var name in Enum.GetNames(context.Type))
             {
