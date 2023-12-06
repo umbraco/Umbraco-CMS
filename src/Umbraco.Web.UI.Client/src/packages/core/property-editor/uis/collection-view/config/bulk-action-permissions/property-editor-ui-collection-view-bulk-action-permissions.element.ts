@@ -69,6 +69,7 @@ export class UmbPropertyEditorUICollectionViewBulkActionPermissionsElement
 				this.value = { ...this.value, allowBulkDelete: e.target.checked };
 				break;
 		}
+
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
