@@ -1,6 +1,6 @@
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import { UmbItemRepository, UmbRepositoryItemsManager } from '@umbraco-cms/backoffice/repository';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { type UmbItemRepository, UmbRepositoryItemsManager } from '@umbraco-cms/backoffice/repository';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import {
 	UMB_CONFIRM_MODAL,
@@ -36,7 +36,7 @@ export class UmbPickerInputContext<ItemType extends ItemResponseModelBaseModel> 
 	/* TODO: find a better way to have a getUniqueMethod. If we want to support trees/items of different types,
 	then it need to be bound to the type and can't be a generic method we pass in. */
 	constructor(
-		host: UmbControllerHostElement,
+		host: UmbControllerHost,
 		repositoryAlias: string,
 		modalAlias: string | UmbModalToken<UmbPickerModalData<ItemType>, UmbPickerModalValue>,
 		getUniqueMethod?: (entry: ItemType) => string | undefined,

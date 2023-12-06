@@ -1,12 +1,12 @@
-import { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
-import { ManifestRepository, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { ItemResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
+import { type ManifestRepository, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { type ItemResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 
 export class UmbRepositoryItemsManager<ItemType extends ItemResponseModelBaseModel> {
-	host: UmbControllerHostElement;
+	host: UmbControllerHost;
 	repository?: UmbItemRepository<ItemType>;
 	#getUnique: (entry: ItemType) => string | undefined;
 
@@ -28,7 +28,7 @@ export class UmbRepositoryItemsManager<ItemType extends ItemResponseModelBaseMod
 	/* TODO: find a better way to have a getUniqueMethod. If we want to support trees/items of different types,
 	then it need to be bound to the type and can't be a generic method we pass in. */
 	constructor(
-		host: UmbControllerHostElement,
+		host: UmbControllerHost,
 		repositoryAlias: string,
 		getUniqueMethod?: (entry: ItemType) => string | undefined,
 	) {
