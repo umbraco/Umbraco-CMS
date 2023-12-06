@@ -15,15 +15,9 @@ public class ImportDictionaryControllerTests : DictionaryBaseTest<ImportDictiona
     protected override Expression<Func<ImportDictionaryController, object>> MethodSelector =>
         x => x.Import(null);
 
-    [SetUp]
-    public void Setup()
-    {
-        _temporaryFileId = CreateDictionaryItem("TestDictionaryItem");
-    }
-
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.OK
+        ExpectedStatusCode = HttpStatusCode.NotFound
     };
 
     protected override UserGroupAssertionModel EditorUserGroupAssertionModel => new()
@@ -38,7 +32,7 @@ public class ImportDictionaryControllerTests : DictionaryBaseTest<ImportDictiona
 
     protected override UserGroupAssertionModel TranslatorUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.OK
+        ExpectedStatusCode = HttpStatusCode.NotFound
     };
 
     protected override UserGroupAssertionModel WriterUserGroupAssertionModel => new()
@@ -54,7 +48,7 @@ public class ImportDictionaryControllerTests : DictionaryBaseTest<ImportDictiona
     protected override async Task<HttpResponseMessage> ClientRequest()
     {
         ImportDictionaryRequestModel importDictionaryRequestModel =
-            new() { TemporaryFileId = _temporaryFileId, ParentId = null };
+            new() { TemporaryFileId = Guid.NewGuid(), ParentId = null };
         return await Client.PostAsync(Url, JsonContent.Create(importDictionaryRequestModel));
     }
 }
