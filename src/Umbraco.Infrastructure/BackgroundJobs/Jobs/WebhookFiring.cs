@@ -15,11 +15,11 @@ public class WebhookFiring : IRecurringBackgroundJob
 {
     private readonly ILogger<WebhookFiring> _logger;
     private readonly IWebhookRequestService _webhookRequestService;
-    private readonly IJsonSerializer _jsonSerializer;
     private readonly IWebhookLogFactory _webhookLogFactory;
     private readonly IWebhookLogService _webhookLogService;
     private readonly IWebhookService _webHookService;
     private readonly ICoreScopeProvider _coreScopeProvider;
+    private readonly IHttpClientFactory _httpClientFactory;
     private WebhookSettings _webhookSettings;
 
     public TimeSpan Period => _webhookSettings.Period;
@@ -32,20 +32,20 @@ public class WebhookFiring : IRecurringBackgroundJob
     public WebhookFiring(
         ILogger<WebhookFiring> logger,
         IWebhookRequestService webhookRequestService,
-        IJsonSerializer jsonSerializer,
         IWebhookLogFactory webhookLogFactory,
         IWebhookLogService webhookLogService,
         IWebhookService webHookService,
         IOptionsMonitor<WebhookSettings> webhookSettings,
-        ICoreScopeProvider coreScopeProvider)
+        ICoreScopeProvider coreScopeProvider,
+        IHttpClientFactory httpClientFactory)
     {
         _logger = logger;
         _webhookRequestService = webhookRequestService;
-        _jsonSerializer = jsonSerializer;
         _webhookLogFactory = webhookLogFactory;
         _webhookLogService = webhookLogService;
         _webHookService = webHookService;
         _coreScopeProvider = coreScopeProvider;
+        _httpClientFactory = httpClientFactory;
         _webhookSettings = webhookSettings.CurrentValue;
         webhookSettings.OnChange(x => _webhookSettings = x);
     }
@@ -90,7 +90,7 @@ public class WebhookFiring : IRecurringBackgroundJob
 
     private async Task<HttpResponseMessage?> SendRequestAsync(IWebhook webhook, string eventName, string? serializedObject, int retryCount, CancellationToken cancellationToken)
     {
-        using var httpClient = new HttpClient();
+        using HttpClient httpClient = _httpClientFactory.CreateClient(Constants.HttpClients.WebhookFiring);
 
         var stringContent = new StringContent(serializedObject ?? string.Empty, Encoding.UTF8, MediaTypeNames.Application.Json);
         stringContent.Headers.TryAddWithoutValidation("Umb-Webhook-Event", eventName);
