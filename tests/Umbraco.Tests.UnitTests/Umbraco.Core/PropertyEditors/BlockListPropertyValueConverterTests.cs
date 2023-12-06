@@ -27,7 +27,8 @@ public class BlockListPropertyValueConverterTests : BlockPropertyValueConverterT
             Mock.Of<IProfilingLogger>(),
             new BlockEditorConverter(publishedSnapshotAccessor, publishedModelFactory),
             Mock.Of<IContentTypeService>(),
-            new ApiElementBuilder(Mock.Of<IOutputExpansionStrategyAccessor>()));
+            new ApiElementBuilder(Mock.Of<IOutputExpansionStrategyAccessor>()),
+            new BlockListPropertyValueConstructorCache());
         return editor;
     }
 

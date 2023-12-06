@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
+  </PropertyGroup>
+  
+  <!-- Global packages (private, build-time packages for all projects) -->
+  <ItemGroup>
+    <GlobalPackageReference Include="Nerdbank.GitVersioning" Version="3.6.133" />
+    <GlobalPackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.507" />
+    <GlobalPackageReference Include="Umbraco.Code" Version="2.0.0" />
+    <GlobalPackageReference Include="Umbraco.GitVersioning.Extensions" Version="0.2.0" />
+  </ItemGroup>
+  
+  <!-- Microsoft packages -->
+  <ItemGroup>
+    <PackageVersion Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.0" />
+    <PackageVersion Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="8.0.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="4.8.0" />
+    <PackageVersion Include="Microsoft.Data.Sqlite" Version="8.0.0" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.0" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.0" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Abstractions" Version="8.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.FileProviders.Embedded" Version="8.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.FileProviders.Physical" Version="8.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Http" Version="8.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Identity.Core" Version="8.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Identity.Stores" Version="8.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Logging" Version="8.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Options" Version="8.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="8.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Options.DataAnnotations" Version="8.0.0" />
+    <PackageVersion Include="System.Runtime.Caching" Version="8.0.0" />
+  </ItemGroup>
+  
+  <!-- Umbraco packages -->
+  <ItemGroup>
+    <PackageVersion Include="Umbraco.JsonSchema.Extensions" Version="0.3.0" />
+    <PackageVersion Include="Umbraco.CSharpTest.Net.Collections" Version="15.0.0" />
+  </ItemGroup>
+  
+  <!-- Third-party packages -->
+  <ItemGroup>
+    <PackageVersion Include="Asp.Versioning.Mvc" Version="7.1.0" />
+    <PackageVersion Include="Asp.Versioning.Mvc.ApiExplorer" Version="7.1.0" />
+    <PackageVersion Include="Dazinator.Extensions.FileProviders" Version="2.0.0" />
+    <PackageVersion Include="Examine" Version="3.1.0" />
+    <PackageVersion Include="Examine.Core" Version="3.1.0" />
+    <PackageVersion Include="HtmlAgilityPack" Version="1.11.54" />
+    <PackageVersion Include="K4os.Compression.LZ4" Version="1.3.6" />
+    <PackageVersion Include="MailKit" Version="4.3.0" />
+    <PackageVersion Include="Markdown" Version="2.2.1" />
+    <PackageVersion Include="MessagePack" Version="2.5.140" />
+    <PackageVersion Include="MiniProfiler.AspNetCore.Mvc" Version="4.3.8" />
+    <PackageVersion Include="MiniProfiler.Shared" Version="4.3.8" />
+    <PackageVersion Include="ncrontab" Version="3.3.3" />
+    <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageVersion Include="NPoco" Version="5.7.1" />
+    <PackageVersion Include="NPoco.SqlServer" Version="5.7.1" />
+    <PackageVersion Include="OpenIddict.Abstractions" Version="4.10.1" />
+    <PackageVersion Include="OpenIddict.AspNetCore" Version="4.10.1" />
+    <PackageVersion Include="OpenIddict.EntityFrameworkCore" Version="4.10.1" />
+    <PackageVersion Include="Serilog" Version="3.1.1" />
+    <PackageVersion Include="Serilog.AspNetCore" Version="8.0.0" />
+    <PackageVersion Include="Serilog.Enrichers.Process" Version="2.0.2" />
+    <PackageVersion Include="Serilog.Enrichers.Thread" Version="3.1.0" />
+    <PackageVersion Include="Serilog.Expressions" Version="4.0.0" />
+    <PackageVersion Include="Serilog.Extensions.Hosting" Version="8.0.0" />
+    <PackageVersion Include="Serilog.Formatting.Compact" Version="2.0.0" />
+    <PackageVersion Include="Serilog.Formatting.Compact.Reader" Version="3.0.0" />
+    <PackageVersion Include="Serilog.Settings.Configuration" Version="8.0.0" />
+    <PackageVersion Include="Serilog.Sinks.Async" Version="1.5.0" />
+    <PackageVersion Include="Serilog.Sinks.File" Version="5.0.0" />
+    <PackageVersion Include="Serilog.Sinks.Map" Version="1.0.2" />
+    <PackageVersion Include="SixLabors.ImageSharp" Version="3.1.0" />
+    <PackageVersion Include="SixLabors.ImageSharp.Web" Version="3.1.0" />
+    <PackageVersion Include="Smidge.InMemory" Version="4.3.0" />
+    <PackageVersion Include="Smidge.Nuglify" Version="4.3.0" />
+    <PackageVersion Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+  </ItemGroup>
+  
+  <!-- Transitive pinned versions -->
+  <ItemGroup>
+    <!-- NPoco.SqlServer brings in a vulnerable version of Azure.Identity -->
+    <PackageVersion Include="Azure.Identity" Version="1.10.4" />
+    <!-- Umbraco.Code depends on an outdated Microsoft.CodeAnalysis.CSharp.Workspaces version-->
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.8.0" />
+    <!-- Dazinator.Extensions.FileProviders brings in a vulnerable version of System.Net.Http -->
+    <PackageVersion Include="System.Net.Http" Version="4.3.4" />
+  </ItemGroup>
+</Project>

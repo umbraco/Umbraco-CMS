@@ -3,7 +3,6 @@
     <OutputType>Exe</OutputType>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <IsPackable>false</IsPackable>
-    <EnablePackageValidation>false</EnablePackageValidation>
     <GenerateProgramFile>false</GenerateProgramFile>
   </PropertyGroup>
 
