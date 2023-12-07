@@ -1,5 +1,5 @@
 import type { UmbPropertyEditorUiElement } from '../interfaces/index.js';
-import type { UmbPropertyEditorConfig } from '../../property/property-editor/index.js';
+import type { UmbPropertyEditorConfig } from '../../property-editor/index.js';
 import type { ManifestElement, ManifestBase } from '@umbraco-cms/backoffice/extension-api';
 
 export interface ManifestPropertyEditorUi extends ManifestElement<UmbPropertyEditorUiElement> {

@@ -1,4 +1,4 @@
-import { type UmbPropertyEditorConfig } from '../../property/property-editor/index.js';
+import { type UmbPropertyEditorConfig } from '../../property-editor/index.js';
 
 export type WorkspacePropertyData<ValueType> = {
 	alias?: string;

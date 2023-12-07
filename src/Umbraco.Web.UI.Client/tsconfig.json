@@ -70,8 +70,8 @@
 			"@umbraco-cms/backoffice/modal": ["src/packages/core/modal"],
 			"@umbraco-cms/backoffice/notification": ["src/packages/core/notification"],
 			"@umbraco-cms/backoffice/picker-input": ["src/packages/core/picker-input"],
-			"@umbraco-cms/backoffice/property-action": ["src/packages/core/property/property-action"],
-			"@umbraco-cms/backoffice/property-editor": ["src/packages/core/property/property-editor"],
+			"@umbraco-cms/backoffice/property-action": ["src/packages/core/property-action"],
+			"@umbraco-cms/backoffice/property-editor": ["src/packages/core/property-editor"],
 			"@umbraco-cms/backoffice/section": ["src/packages/core/section"],
 			"@umbraco-cms/backoffice/sorter": ["src/packages/core/sorter"],
 			"@umbraco-cms/backoffice/store": ["src/packages/core/store"],
@@ -126,14 +126,7 @@
 			"@umbraco-cms/internal/test-utils": ["utils/test-utils.ts"]
 		}
 	},
-	"include": [
-		"src/**/*.ts",
-		"apps/**/*.ts",
-		"e2e/**/*.ts",
-		"index.ts",
-		"storybook/stories/**/*.ts",
-		"examples/**/*.ts"
-	],
+	"include": ["src/**/*.ts", "apps/**/*.ts", "e2e/**/*.ts", "index.ts", "storybook/stories/**/*.ts", "examples/**/*.ts", ],
 	"references": [
 		{
 			"path": "./tsconfig.node.json"

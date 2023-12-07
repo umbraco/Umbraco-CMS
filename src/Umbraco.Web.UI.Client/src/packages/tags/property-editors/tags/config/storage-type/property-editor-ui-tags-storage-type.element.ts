@@ -1,6 +1,6 @@
 import { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import { UmbPropertyEditorConfigCollection } from 'src/packages/core/property/property-editor';
+import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
