@@ -66,14 +66,6 @@ export const createMediaTreeItem = (item: UmbMediaDetailModel): MediaTreeItemRes
 	};
 };
 
-export const createDocumentTypeTreeItem = (item: DocumentTypeResponseModel): DocumentTypeTreeItemResponseModel => {
-	return {
-		...createEntityTreeItem(item),
-		type: 'document-type',
-		isElement: item.isElement,
-	};
-};
-
 export const createMediaTypeTreeItem = (item: MediaTypeResponseModel): MediaTypeTreeItemResponseModel => {
 	return {
 		...createEntityTreeItem(item),

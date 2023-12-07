@@ -1,5 +1,5 @@
 import { UmbEntityData } from './entity.data.js';
-import { createDocumentTypeTreeItem } from './utils.js';
+import { createEntityTreeItem } from './utils.js';
 import {
 	DocumentTypeTreeItemResponseModel,
 	DocumentTypeResponseModel,
@@ -7,7 +7,9 @@ import {
 	DocumentTypeItemResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 
-export const data: Array<DocumentTypeResponseModel> = [
+type UmbMockDocumentTypeModel = DocumentTypeResponseModel & DocumentTypeTreeItemResponseModel;
+
+export const data: Array<UmbMockDocumentTypeModel> = [
 	{
 		allowedTemplateIds: [],
 		defaultTemplateId: null,
@@ -20,6 +22,9 @@ export const data: Array<DocumentTypeResponseModel> = [
 		variesByCulture: true,
 		variesBySegment: false,
 		isElement: false,
+		hasChildren: false,
+		isContainer: false,
+		parentId: null,
 		properties: [
 			{
 				id: '1',
@@ -621,6 +626,10 @@ export const data: Array<DocumentTypeResponseModel> = [
 		variesByCulture: true,
 		variesBySegment: false,
 		isElement: false,
+		type: 'document-type',
+		hasChildren: false,
+		isContainer: false,
+		parentId: null,
 		properties: [
 			{
 				id: '6',
@@ -672,6 +681,10 @@ export const data: Array<DocumentTypeResponseModel> = [
 		variesByCulture: true,
 		variesBySegment: false,
 		isElement: false,
+		type: 'document-type',
+		hasChildren: false,
+		isContainer: false,
+		parentId: null,
 		properties: [
 			{
 				id: '5b4ca208-134e-4865-b423-06e5e97adf3c',
@@ -833,6 +846,10 @@ export const data: Array<DocumentTypeResponseModel> = [
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
+		type: 'document-type',
+		hasChildren: false,
+		isContainer: false,
+		parentId: null,
 		properties: [
 			{
 				id: '5e5f7456-c751-4846-9f2b-47965cc96ec6',
@@ -883,6 +900,10 @@ export const data: Array<DocumentTypeResponseModel> = [
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: true,
+		type: 'document-type',
+		hasChildren: false,
+		isContainer: false,
+		parentId: null,
 		properties: [
 			{
 				id: 'b92de6ac-1a22-4a45-a481-b6cae1cccbbf',
@@ -937,6 +958,10 @@ export const data: Array<DocumentTypeResponseModel> = [
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
+		type: 'document-type',
+		hasChildren: false,
+		isContainer: false,
+		parentId: null,
 		properties: [
 			{
 				id: '1680d4d2-cda8-4ac2-affd-a69fc10382b1',
@@ -990,6 +1015,10 @@ export const data: Array<DocumentTypeResponseModel> = [
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
+		type: 'document-type',
+		hasChildren: false,
+		isContainer: false,
+		parentId: null,
 		properties: [
 			{
 				id: '82d4b050-b128-42fe-ac8e-d5586e533592',
@@ -1049,113 +1078,37 @@ export const data: Array<DocumentTypeResponseModel> = [
 	},
 ];
 
-export const treeData: Array<DocumentTypeTreeItemResponseModel> = [
-	{
-		name: 'All property editors document type',
-		type: 'document-type',
-		hasChildren: false,
-		id: 'all-property-editors-document-type-id',
-		isContainer: false,
-		parentId: null,
-		icon: '',
-	},
-	{
-		name: 'Simple document type',
-		type: 'document-type',
-		hasChildren: false,
-		id: 'simple-document-type-id',
-		isContainer: false,
-		parentId: null,
-		icon: '',
-	},
-	{
-		name: 'Page Document Type',
-		type: 'document-type',
-		hasChildren: false,
-		id: '29643452-cff9-47f2-98cd-7de4b6807681',
-		isContainer: false,
-		parentId: null,
-		icon: 'icon-document',
-	},
-	{
-		name: 'Page Document Type Compositional',
-		type: 'document-type',
-		hasChildren: false,
-		id: '5035d7d9-0a63-415c-9e75-ee2cf931db92',
-		isContainer: false,
-		parentId: null,
-		icon: 'icon-document',
-	},
-	{
-		name: 'Page Document Type Inherited',
-		type: 'document-type',
-		hasChildren: false,
-		id: '8f68ba66-6fb2-4778-83b8-6ab4ca3a7c5d',
-		isContainer: false,
-		parentId: null,
-		icon: 'icon-document',
-	},
-	{
-		name: 'Simple Document Type',
-		type: 'document-type',
-		hasChildren: false,
-		id: 'simple-document-type-key',
-		isContainer: false,
-		parentId: null,
-		icon: 'icon-document',
-	},
-	{
-		name: 'Simple Document Type 2',
-		type: 'document-type',
-		hasChildren: false,
-		id: 'simple-document-type-2-key',
-		isContainer: false,
-		parentId: null,
-		icon: 'icon-document',
-	},
-];
-
 // Temp mocked database
 // TODO: all properties are optional in the server schema. I don't think this is correct.
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-class UmbDocumentTypeData extends UmbEntityData<DocumentTypeResponseModel> {
-	private treeData = treeData;
-
+class UmbDocumentTypeData extends UmbEntityData<UmbMockDocumentTypeModel> {
 	constructor() {
 		super(data);
 	}
 
 	// TODO: Can we do this smarter so we don't need to make this for each mock data:
 	insert(item: DocumentTypeResponseModel) {
-		const result = super.insert(item);
-		this.treeData.push(createDocumentTypeTreeItem(result));
-		return result;
+		return super.insert(item);
 	}
 
 	update(id: string, item: DocumentTypeResponseModel) {
-		const result = super.save(id, item);
-		this.treeData = this.treeData.map((x) => {
-			if (x.id === result.id) {
-				return createDocumentTypeTreeItem(result);
-			} else {
-				return x;
-			}
-		});
-		return result;
+		return super.save(id, item);
 	}
 
 	getTreeRoot(): Array<DocumentTypeTreeItemResponseModel> {
-		return this.treeData.filter((item) => item.parentId === null);
+		const rootItems = this.data.filter((item) => item.parentId === null);
+		return rootItems.map((item) => createDocumentTypeTreeItem(item));
 	}
 
 	getTreeItemChildren(id: string): Array<DocumentTypeTreeItemResponseModel> {
-		return this.treeData.filter((item) => item.parentId === id);
+		const childItems = this.data.filter((item) => item.parentId === id);
+		return childItems.map((item) => createDocumentTypeTreeItem(item));
 	}
 
 	getTreeItem(ids: Array<string>): Array<DocumentTypeTreeItemResponseModel> {
-		const items = this.treeData.filter((item) => ids.includes(item.id ?? ''));
-		return items.map((item) => item);
+		const items = this.data.filter((item) => ids.includes(item.id ?? ''));
+		return items.map((item) => createDocumentTypeTreeItem(item));
 	}
 
 	getAllowedTypesOf(id: string): Array<DocumentTypeTreeItemResponseModel> {
@@ -1170,6 +1123,14 @@ class UmbDocumentTypeData extends UmbEntityData<DocumentTypeResponseModel> {
 		return items.map((item) => createDocumentTypeItem(item));
 	}
 }
+
+export const createDocumentTypeTreeItem = (item: DocumentTypeResponseModel): DocumentTypeTreeItemResponseModel => {
+	return {
+		...createEntityTreeItem(item),
+		type: 'document-type',
+		isElement: item.isElement,
+	};
+};
 
 const createDocumentTypeItem = (item: DocumentTypeResponseModel): DocumentTypeItemResponseModel => {
 	return {
