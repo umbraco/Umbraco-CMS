@@ -7,7 +7,6 @@ using Umbraco.Cms.Api.Management.ViewModels.Folder;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.ModelsBuilder;
 
-[TestFixture]
 public class BuildModelsBuilderControllerTests : ManagementApiUserGroupTestBase<BuildModelsBuilderController>
 {
     protected override Expression<Func<BuildModelsBuilderController, object>> MethodSelector =>

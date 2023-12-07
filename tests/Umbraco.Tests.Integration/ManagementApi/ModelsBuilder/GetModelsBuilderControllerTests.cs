@@ -5,7 +5,6 @@ using Umbraco.Cms.Api.Management.Controllers.ModelsBuilder;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.ModelsBuilder;
 
-[TestFixture]
 public class GetModelsBuilderControllerTests : ManagementApiUserGroupTestBase<GetModelsBuilderController>
 {
     protected override Expression<Func<GetModelsBuilderController, object>> MethodSelector =>

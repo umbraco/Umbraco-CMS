@@ -5,7 +5,6 @@ using Umbraco.Cms.Api.Management.Controllers.ModelsBuilder;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.ModelsBuilder;
 
-[TestFixture]
 public class StatusModelsBuilderControllerTests : ManagementApiUserGroupTestBase<StatusModelsBuilderController>
 {
     protected override Expression<Func<StatusModelsBuilderController, object>> MethodSelector =>
