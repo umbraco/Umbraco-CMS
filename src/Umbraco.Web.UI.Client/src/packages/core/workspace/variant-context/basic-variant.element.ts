@@ -73,6 +73,14 @@ export class UmbBasicVariantElement extends UmbLitElement {
 
 	constructor() {
 		super();
+
+		// Prevent any child events escaping this element.
+		this.addEventListener('change', (e) => {
+			if (e.target !== this) {
+				e.stopImmediatePropagation();
+			}
+		});
+
 		this.context = new UmbBasicVariantContext(this);
 		this.observe(this.context.name, () => {
 			if (!this.#silentOnce) {
