@@ -5,7 +5,6 @@ using Umbraco.Cms.Api.Management.Controllers.MemberGroup.Tree;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.MemberGroup.Tree;
 
-[TestFixture]
 public class RootMemberGroupTreeControllerTests : ManagementApiUserGroupTestBase<RootMemberGroupTreeController>
 {
     protected override Expression<Func<RootMemberGroupTreeController, object>> MethodSelector =>
