@@ -575,6 +575,12 @@ public class EntityService : RepositoryService, IEntityService
         {
             IQuery<IUmbracoEntity> query = Query<IUmbracoEntity>().Where(x => x.ParentId == id && x.Trashed == trashed);
 
+            if (pageSize == 0)
+            {
+                totalRecords = _entityRepository.CountByQuery(query, objectType.GetGuid(), query);
+                return Enumerable.Empty<IEntitySlim>();
+            }
+
             return _entityRepository.GetPagedResultsByQuery(query, objectType.GetGuid(), pageIndex, pageSize, out totalRecords, filter, ordering);
         }
     }
