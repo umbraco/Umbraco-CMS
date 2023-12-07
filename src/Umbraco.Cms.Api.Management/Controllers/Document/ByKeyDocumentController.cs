@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Document;
 
@@ -36,8 +37,7 @@ public class ByKeyDocumentController : DocumentControllerBase
     public async Task<IActionResult> ByKey(Guid id)
     {
         var resource = new ContentPermissionResource(id, ActionBrowse.ActionLetter);
-        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeAsync(User, resource,
-            $"New{AuthorizationPolicies.ContentPermissionByResource}");
+        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(User, resource, AuthorizationPolicies.ContentPermissionByResource);
 
         if (!authorizationResult.Succeeded)
         {

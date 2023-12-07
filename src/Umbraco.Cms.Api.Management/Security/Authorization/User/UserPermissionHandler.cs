@@ -5,7 +5,7 @@ namespace Umbraco.Cms.Api.Management.Security.Authorization.User;
 /// <summary>
 ///     Authorizes that the current user has the correct permission access to perform actions on the user account(s) specified in the request.
 /// </summary>
-public class UserPermissionHandler : MustSatisfyRequirementAuthorizationHandler<UserPermissionRequirement, IEnumerable<Guid>>
+public class UserPermissionHandler : MustSatisfyRequirementAuthorizationHandler<UserPermissionRequirement, UserPermissionResource>
 {
     private readonly IUserPermissionAuthorizer _userPermissionAuthorizer;
 
@@ -20,6 +20,6 @@ public class UserPermissionHandler : MustSatisfyRequirementAuthorizationHandler<
     protected override async Task<bool> IsAuthorized(
         AuthorizationHandlerContext context,
         UserPermissionRequirement requirement,
-        IEnumerable<Guid> resource) =>
-        await _userPermissionAuthorizer.IsAuthorizedAsync(context.User, resource);
+        UserPermissionResource resource) =>
+        await _userPermissionAuthorizer.IsAuthorizedAsync(context.User, resource.UserKeys);
 }

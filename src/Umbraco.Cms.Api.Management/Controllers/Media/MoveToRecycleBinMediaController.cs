@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Management.Security.Authorization.Media;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
@@ -35,8 +36,7 @@ public class MoveToRecycleBinMediaController : MediaControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> MoveToRecycleBin(Guid id)
     {
-        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeAsync(User, new[] { id },
-            $"New{AuthorizationPolicies.MediaPermissionByResource}");
+        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeAsync(User, new MediaPermissionResource(id), AuthorizationPolicies.MediaPermissionByResource);
 
         if (!authorizationResult.Succeeded)
         {

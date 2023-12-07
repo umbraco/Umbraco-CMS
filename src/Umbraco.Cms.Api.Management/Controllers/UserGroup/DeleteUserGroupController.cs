@@ -2,10 +2,12 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Management.Security.Authorization.UserGroup;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.UserGroup;
 
@@ -27,8 +29,7 @@ public class DeleteUserGroupController : UserGroupControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(Guid id)
     {
-        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeAsync(User, new[] { id },
-            $"New{AuthorizationPolicies.UserBelongsToUserGroupInRequest}");
+        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(User, new UserGroupPermissionResource(id), AuthorizationPolicies.UserBelongsToUserGroupInRequest);
 
         if (!authorizationResult.Succeeded)
         {

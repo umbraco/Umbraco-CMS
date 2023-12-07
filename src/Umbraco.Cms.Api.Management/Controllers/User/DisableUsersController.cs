@@ -2,11 +2,13 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Management.Security.Authorization.User;
 using Umbraco.Cms.Api.Management.ViewModels.User;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.User;
 
@@ -33,8 +35,7 @@ public class DisableUserController : UserControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> DisableUsers(DisableUserRequestModel model)
     {
-        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeAsync(User, model.UserIds,
-            $"New{AuthorizationPolicies.AdminUserEditsRequireAdmin}");
+        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(User, new UserPermissionResource(model.UserIds),AuthorizationPolicies.AdminUserEditsRequireAdmin);
 
         if (!authorizationResult.Succeeded)
         {

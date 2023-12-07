@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Management.Security.Authorization.Media;
 using Umbraco.Cms.Api.Management.ViewModels.Media;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
@@ -9,6 +10,7 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Media;
 
@@ -43,8 +45,7 @@ public class MoveMediaController : MediaControllerBase
         }
         else
         {
-            authorizationResult = await _authorizationService.AuthorizeAsync(User, new[] { moveDocumentRequestModel.TargetId.Value },
-                $"New{AuthorizationPolicies.MediaPermissionByResource}");
+            authorizationResult = await _authorizationService.AuthorizeResourceAsync(User, new MediaPermissionResource(moveDocumentRequestModel.TargetId.Value),AuthorizationPolicies.MediaPermissionByResource);
         }
 
         if (!authorizationResult.Succeeded)

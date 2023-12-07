@@ -5,7 +5,7 @@ namespace Umbraco.Cms.Api.Management.Security.Authorization.Media;
 /// <summary>
 ///     Authorizes that the current user has the correct permission access to the media item(s) specified in the request.
 /// </summary>
-public class MediaPermissionHandler : MustSatisfyRequirementAuthorizationHandler<MediaPermissionRequirement, IEnumerable<Guid>>
+public class MediaPermissionHandler : MustSatisfyRequirementAuthorizationHandler<MediaPermissionRequirement, MediaPermissionResource>
 {
     private readonly IMediaPermissionAuthorizer _mediaPermissionAuthorizer;
 
@@ -20,6 +20,6 @@ public class MediaPermissionHandler : MustSatisfyRequirementAuthorizationHandler
     protected override async Task<bool> IsAuthorized(
         AuthorizationHandlerContext context,
         MediaPermissionRequirement requirement,
-        IEnumerable<Guid> resource) =>
-        await _mediaPermissionAuthorizer.IsAuthorizedAsync(context.User, resource);
+        MediaPermissionResource resource) =>
+        await _mediaPermissionAuthorizer.IsAuthorizedAsync(context.User, resource.MediaKeys);
 }

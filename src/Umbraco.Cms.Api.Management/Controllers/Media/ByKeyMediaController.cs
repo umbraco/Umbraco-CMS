@@ -3,11 +3,13 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Factories;
+using Umbraco.Cms.Api.Management.Security.Authorization.Media;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Api.Management.ViewModels.Media;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Media;
 
@@ -34,8 +36,7 @@ public class ByKeyMediaController : MediaControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ByKey(Guid id)
     {
-        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeAsync(User, new[] { id },
-            $"New{AuthorizationPolicies.MediaPermissionByResource}");
+        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(User, new MediaPermissionResource(id), AuthorizationPolicies.MediaPermissionByResource);
 
         if (!authorizationResult.Succeeded)
         {

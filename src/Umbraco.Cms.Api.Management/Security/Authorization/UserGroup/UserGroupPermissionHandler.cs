@@ -5,7 +5,7 @@ namespace Umbraco.Cms.Api.Management.Security.Authorization.UserGroup;
 /// <summary>
 ///     Authorizes that the current user has access to the user group(s) specified in the request.
 /// </summary>
-public class UserGroupPermissionHandler : MustSatisfyRequirementAuthorizationHandler<UserGroupPermissionRequirement, IEnumerable<Guid>>
+public class UserGroupPermissionHandler : MustSatisfyRequirementAuthorizationHandler<UserGroupPermissionRequirement, UserGroupPermissionResource>
 {
     private readonly IUserGroupPermissionAuthorizer _userGroupPermissionAuthorizer;
 
@@ -20,6 +20,6 @@ public class UserGroupPermissionHandler : MustSatisfyRequirementAuthorizationHan
     protected override async Task<bool> IsAuthorized(
         AuthorizationHandlerContext context,
         UserGroupPermissionRequirement requirement,
-        IEnumerable<Guid> resource) =>
-        await _userGroupPermissionAuthorizer.IsAuthorizedAsync(context.User, resource);
+        UserGroupPermissionResource resource) =>
+        await _userGroupPermissionAuthorizer.IsAuthorizedAsync(context.User, resource.UserGroupKeys);
 }

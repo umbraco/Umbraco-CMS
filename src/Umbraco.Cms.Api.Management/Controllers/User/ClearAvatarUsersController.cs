@@ -1,9 +1,11 @@
 ﻿using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Management.Security.Authorization.User;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.User;
 
@@ -23,8 +25,7 @@ public class ClearAvatarUserController : UserControllerBase
     [HttpDelete("avatar/{id:guid}")]
     public async Task<IActionResult> ClearAvatar(Guid id)
     {
-        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeAsync(User, new[] { id },
-            $"New{AuthorizationPolicies.AdminUserEditsRequireAdmin}");
+        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(User, new UserPermissionResource(id), AuthorizationPolicies.AdminUserEditsRequireAdmin);
 
         if (!authorizationResult.Succeeded)
         {

@@ -3,11 +3,13 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Factories;
+using Umbraco.Cms.Api.Management.Security.Authorization.User;
 using Umbraco.Cms.Api.Management.ViewModels.User.Current;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.User.Current;
 
@@ -38,8 +40,7 @@ public class GetCurrentUserController : CurrentUserControllerBase
     {
         var currentUserKey = CurrentUserKey(_backOfficeSecurityAccessor);
 
-        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeAsync(User, new[] { currentUserKey },
-            $"New{AuthorizationPolicies.AdminUserEditsRequireAdmin}");
+        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(User, new UserPermissionResource(currentUserKey), AuthorizationPolicies.AdminUserEditsRequireAdmin);
 
         if (!authorizationResult.Succeeded)
         {

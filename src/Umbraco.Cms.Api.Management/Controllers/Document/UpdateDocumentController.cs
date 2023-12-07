@@ -13,6 +13,7 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Document;
 
@@ -43,8 +44,7 @@ public class UpdateDocumentController : DocumentControllerBase
     public async Task<IActionResult> Update(Guid id, UpdateDocumentRequestModel requestModel)
     {
         var resource = new ContentPermissionResource(id, ActionUpdate.ActionLetter);
-        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeAsync(User, resource,
-            $"New{AuthorizationPolicies.ContentPermissionByResource}");
+        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(User, resource,AuthorizationPolicies.ContentPermissionByResource);
 
         if (!authorizationResult.Succeeded)
         {

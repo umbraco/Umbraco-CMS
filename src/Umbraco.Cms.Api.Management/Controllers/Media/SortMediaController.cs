@@ -2,12 +2,14 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Management.Security.Authorization.Media;
 using Umbraco.Cms.Api.Management.ViewModels.Sorting;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Media;
 
@@ -43,8 +45,7 @@ public class SortMediaController : MediaControllerBase
         }
         else
         {
-            authorizationResult = await _authorizationService.AuthorizeAsync(User, new[] { sortingRequestModel.ParentId.Value },
-                $"New{AuthorizationPolicies.MediaPermissionByResource}");
+            authorizationResult = await _authorizationService.AuthorizeResourceAsync(User, new MediaPermissionResource(sortingRequestModel.ParentId.Value),AuthorizationPolicies.MediaPermissionByResource);
         }
 
         if (!authorizationResult.Succeeded)

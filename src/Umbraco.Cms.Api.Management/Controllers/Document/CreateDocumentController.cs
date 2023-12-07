@@ -13,6 +13,7 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Document;
 
@@ -52,8 +53,7 @@ public class CreateDocumentController : DocumentControllerBase
         else
         {
             var resource = new ContentPermissionResource(requestModel.ParentId.Value, ActionNew.ActionLetter);
-            authorizationResult = await _authorizationService.AuthorizeAsync(User, resource,
-                $"New{AuthorizationPolicies.ContentPermissionByResource}");
+            authorizationResult = await _authorizationService.AuthorizeResourceAsync(User, resource, AuthorizationPolicies.ContentPermissionByResource);
         }
 
         if (!authorizationResult.Succeeded)
