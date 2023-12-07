@@ -2,7 +2,9 @@
 // See LICENSE for more details.
 
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Tests.Integration.TestServerTest;
 
@@ -27,6 +29,8 @@ public class UmbracoWebApplicationFactory<TStartup> : WebApplicationFactory<TSta
         _beforeStart?.Invoke(host);
 
         host.Start();
+
+        var x = host.Services;
 
         return host;
     }

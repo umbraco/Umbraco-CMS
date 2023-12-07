@@ -14,6 +14,7 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Document;
 
+[ApiVersion("1.0")]
 public class GetPublicAccessDocumentController : DocumentControllerBase
 {
     private readonly IAuthorizationService _authorizationService;

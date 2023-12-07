@@ -1,76 +1,80 @@
-@using System.Globalization
-@using Microsoft.AspNetCore.Routing
-@using Microsoft.Extensions.Options;
-@using Umbraco.Cms.Core
-@using Umbraco.Cms.Core.Configuration.Models
-@using Umbraco.Cms.Core.Hosting
-@using Umbraco.Cms.Core.Mail
-@using Umbraco.Cms.Web.BackOffice.Controllers
-@using Umbraco.Cms.Web.BackOffice.Security
 @using Umbraco.Extensions
-@inject IOptions<ContentSettings> ContentSettings
-@inject IOptions<SecuritySettings> SecuritySettings
-@inject IEmailSender EmailSender
-@inject IHostingEnvironment HostingEnvironment
-@inject IOptions<GlobalSettings> GlobalSettings
-@inject IBackOfficeExternalLoginProviders ExternalLogins
-@inject LinkGenerator LinkGenerator
 @{
-    var backOfficePath = GlobalSettings.Value.GetBackOfficePath(HostingEnvironment);
-    var loginLogoImage = ContentSettings.Value.LoginLogoImage;
-    var loginBackgroundImage = ContentSettings.Value.LoginBackgroundImage;
-    var usernameIsEmail = SecuritySettings.Value.UsernameIsEmail;
-    var allowUserInvite = EmailSender.CanSendRequiredEmail();
-    var allowPasswordReset = SecuritySettings.Value.AllowPasswordReset && EmailSender.CanSendRequiredEmail();
-    var disableLocalLogin = ExternalLogins.HasDenyLocalLogin();
-    var externalLoginsUrl = LinkGenerator.GetPathByAction(nameof(BackOfficeController.ExternalLogin), ControllerExtensions.GetControllerName<BackOfficeController>(), new { area = Constants.Web.Mvc.BackOfficeArea });
-    var externalLoginProviders = await ExternalLogins.GetBackOfficeProvidersAsync();
+    Layout = null;
 }
-@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+<!doctype html>
+<html lang="en">
+<head>
+    <base href="@ViewData.GetUmbracoBaseFolder()/" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!DOCTYPE html>
-<html lang="@CultureInfo.CurrentCulture.Name.ToLowerInvariant()">
-    <head>
-        <meta charset="UTF-8"/>
-        <base href="@backOfficePath.EnsureEndsWith('/')"/>
-        <link rel="icon" type="image/svg+xml" href="~/umbraco/login/favicon.svg"/>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-        <title>Umbraco</title>
-        <link rel="stylesheet" href="~/umbraco/login/style.css" asp-append-version="true" />
-        <script type="module" src="~/umbraco/login/external.js" asp-append-version="true"></script>
-        <script type="module" src="~/umbraco/login/index.js" asp-append-version="true"></script>
-        <style>
-          body {
-            margin: 0;
-            padding: 0;
-          }
-        </style>
-    </head>
+    <title>Install Umbraco</title>
+    <link rel="stylesheet" href="assets/css/installer.min.css" />
+    <link rel="stylesheet" href="lib/nouislider/nouislider.min.css" />
+</head>
 
-    <body class="uui-font uui-text" style="margin: 0; padding: 0; overflow: hidden">
-        <umb-backoffice-icon-registry>
-            <umb-auth
-                return-url="@backOfficePath"
-                logo-image="@loginLogoImage"
-                background-image="@loginBackgroundImage"
-                username-is-email="@usernameIsEmail"
-                allow-user-invite="@allowUserInvite"
-                allow-password-reset="@allowPasswordReset"
-                disable-local-login="@disableLocalLogin">
-                @foreach (var provider in externalLoginProviders)
-                {
-                    <umb-external-login-provider
-                        slot="external"
-                        display-name="@provider.AuthenticationScheme.DisplayName"
-                        provider-name="@provider.ExternalLoginProvider.AuthenticationType"
-                        icon="@provider.ExternalLoginProvider.Options.Icon"
-                        external-login-url="@externalLoginsUrl"
-                        button-look="@provider.ExternalLoginProvider.Options.ButtonLook.ToString().ToLowerInvariant()"
-                        button-color="@provider.ExternalLoginProvider.Options.ButtonColor.ToString().ToLowerInvariant()"
-                        custom-view="@provider.ExternalLoginProvider.Options.CustomBackOfficeView">
-                    </umb-external-login-provider>
-                }
-            </umb-auth>
-        </umb-backoffice-icon-registry>
-    </body>
+<body ng-class="{loading:installer.loading}" ng-controller="Umbraco.InstallerController" id="umbracoInstallPageBody">
+
+    <img src="assets/img/application/logo_white.svg" aria-hidden="true" width="91" height="91" alt="Umbraco" draggable="false" id="logo" />
+
+    <umb-loader position="bottom"
+                class="umb-installer-loader"
+                ng-if="installer.loading"
+                ng-style="{'width': installer.progress}">
+    </umb-loader>
+
+    <div id="overlay" ng-cloak ng-animate="'fade'" ng-show="installer.done"></div>
+
+    <div id="installer"
+         ng-cloak
+         ng-animate="'fade'"
+         ng-show="installer.configuring">
+
+        <div id="contentwrapper" ng-if="installer.current" ng-switch on="installer.current.view">
+            <div ng-switch-when="ysod">
+                <h1>A server error occurred</h1>
+                <p>This is most likely due to an error during application startup</p>
+                <iframe id="ysod" title="Error details"></iframe>
+            </div>
+            <div ng-switch-default>
+                <div ng-include="installer.current.view"></div>
+            </div>
+        </div>
+    </div>
+
+
+    <div ng-cloak ng-animate="'fade'" id="fact" class="absolute-center clearfix" ng-show="installer.fact">
+        <h2>Did you know</h2>
+        <p ng-bind-html="installer.fact"></p>
+    </div>
+
+    <h3 ng-cloak ng-animate="'fade'" id="feedback" ng-show="installer.feedback">{{installer.feedback}}</h3>
+
+    <div id="missinglazyload" style="display: none;">
+        <h3>There has been a problem with the build.</h3>
+        <p>This might be because you could be offline or on a slow connection. Please try the following steps</p>
+        <ol>
+            <li>Make sure you have <a href="https://nodejs.org" target="_blank">Node.js</a> installed.</li>
+            <li>Open command prompt and cd to \src\Umbraco.Web.UI.Client.</li>
+            <li>Check to see if \src\Umbraco.Web.UI.Client\node_modules folder exists (this could be hidden); if so, delete it.</li>
+            <li>Run npm ci; if successfull the node_modules folder should be created in the Umbraco.Web.UI.Client directory.</li>
+            <li>Run \build\build.ps1.</li>
+        </ol>
+    </div>
+
+    <script type="text/javascript">
+        var Umbraco = {};
+        Umbraco.Sys = {};
+        Umbraco.Sys.ServerVariables = {
+            "installApiBaseUrl": "@ViewData.GetInstallApiBaseUrl()",
+            "umbracoBaseUrl": "@ViewData.GetUmbracoBaseFolder()",
+            "application": {
+               version: "@ViewData.GetUmbracoVersion()?.Major"
+           }
+        };
+    </script>
+    <script src="lib/lazyload-js/LazyLoad.min.js"></script>
+    <script src="js/install.loader.min.js"></script>
+</body>
 </html>

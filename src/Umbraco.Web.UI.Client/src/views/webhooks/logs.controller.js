@@ -1,7 +1,7 @@
 (function () {
   "use strict";
 
-  function WebhookLogController($q, webhooksResource, overlayService) {
+  function WebhookLogController($q, webhooksResource, editorService, userService, dateHelper) {
 
     const vm = this;
 
@@ -25,24 +25,37 @@
       return webhooksResource.getLogs()
         .then(data => {
           vm.logs = data.items;
+          vm.logs.forEach(log => {
+            formatDatesToLocal(log);
+          });
         });
     }
 
-    function openLogOverlay(log) {
-      overlayService.open({
-        view: "views/webhooks/overlays/details.html",
-        title: 'Details',
-        position: 'right',
-        log,
-        currentUser: this.currentUser,
-        close: () => {
-          overlayService.close();
-        }
+    function formatDatesToLocal(log) {
+      userService.getCurrentUser().then(currentUser => {
+        log.formattedLogDate = dateHelper.getLocalDate(log.date, currentUser.locale, "LLL");
       });
     }
 
+    function openLogOverlay(log) {
+
+      const dialog = {
+        view: "views/webhooks/overlays/details.html",
+        title: 'Details',
+        position: 'right',
+        size: 'medium',
+        log,
+        currentUser: this.currentUser,
+        close: () => {
+          editorService.close();
+        }
+      };
+
+      editorService.open(dialog);
+    }
+
     function isChecked(log) {
-      return log.statusCode === "OK";
+      return log.statusCode === "OK (200)";
     }
 
     init();

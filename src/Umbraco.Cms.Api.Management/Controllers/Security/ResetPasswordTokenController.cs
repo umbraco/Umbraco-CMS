@@ -20,7 +20,7 @@ public class ResetPasswordTokenController : SecurityControllerBase
 
     [HttpPost("forgot-password/reset")]
     [MapToApiVersion("1.0")]
-    //[AllowAnonymous] // This is handled implicitly by the NewDenyLocalLoginIfConfigured policy on the <see cref="SecurityControllerBase" />. Keep it here for now and check FIXME in <see cref="DenyLocalLoginHandler" />.
+    // [AllowAnonymous] // This is handled implicitly by the NewDenyLocalLoginIfConfigured policy on the <see cref="SecurityControllerBase" />. Keep it here for now and check FIXME in <see cref="DenyLocalLoginHandler" />.
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetailsBuilder), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetailsBuilder), StatusCodes.Status404NotFound)]

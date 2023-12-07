@@ -8,7 +8,7 @@ import type {
 import { umbLocalizationContext } from '../external/localization/localization-context.js';
 
 export class UmbAuthRepository {
-	readonly #authURL = 'backoffice/umbracoapi/authentication/postlogin';
+  readonly #authURL = 'backoffice/umbracoapi/authentication/postlogin';
 
   public async login(data: LoginRequestModel): Promise<LoginResponse> {
     try {
@@ -26,7 +26,7 @@ export class UmbAuthRepository {
       const response = await fetch(request);
 
       const responseData: LoginResponse = {
-        status: response.status
+        status: response.status,
       };
 
       if (!response.ok) {
@@ -42,7 +42,8 @@ export class UmbAuthRepository {
         if (text) {
           responseData.data = JSON.parse(this.#removeAngularJSResponseData(text));
         }
-      } catch {}
+      } catch {
+      }
 
       return {
         status: response.status,
@@ -252,16 +253,35 @@ export class UmbAuthRepository {
     switch (response.status) {
       case 400:
       case 401:
-        return umbLocalizationContext.localize('login_userFailedLogin', undefined, "Oops! We couldn't log you in. Please check your credentials and try again.");
+        return umbLocalizationContext.localize(
+          'login_userFailedLogin',
+          undefined,
+          "Oops! We couldn't log you in. Please check your credentials and try again."
+        );
 
       case 402:
-        return umbLocalizationContext.localize('login_2faText', undefined, 'You have enabled 2-factor authentication and must verify your identity.');
+        return umbLocalizationContext.localize(
+          'login_2faText',
+          undefined,
+          'You have enabled 2-factor authentication and must verify your identity.'
+        );
 
       case 500:
-        return umbLocalizationContext.localize('errors_receivedErrorFromServer', undefined, 'Received error from server');
+        return umbLocalizationContext.localize(
+          'errors_receivedErrorFromServer',
+          undefined,
+          'Received error from server'
+        );
 
       default:
-        return response.statusText ?? await umbLocalizationContext.localize('errors_receivedErrorFromServer', undefined, 'Received error from server')
+        return (
+          response.statusText ??
+          (await umbLocalizationContext.localize(
+            'errors_receivedErrorFromServer',
+            undefined,
+            'Received error from server'
+          ))
+        );
     }
   }
 

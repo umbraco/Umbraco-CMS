@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Web.BackOffice.Security;
 /// </summary>
 public class BackOfficeExternalLoginProviderOptions
 {
-    private string _buttonStyle = "btn-openid";
+    private string _buttonStyle = string.Empty;
 
     public BackOfficeExternalLoginProviderOptions(
         string buttonStyle,
@@ -30,8 +30,11 @@ public class BackOfficeExternalLoginProviderOptions
     }
 
     /// <summary>
-    ///     Gets or sets the icon to use for the login button.
+    ///     Gets or sets the style of the login button.
     /// </summary>
+    /// <remarks>
+    ///     The default look is an outlined button, which has been optimized for the login screen.
+    /// </remarks>
     [Obsolete("This is no longer used and will be removed in V15. Please set the ButtonLook and ButtonColor properties instead.")]
     public string ButtonStyle
     {
@@ -71,12 +74,18 @@ public class BackOfficeExternalLoginProviderOptions
     ///     Gets or sets the look to use for the login button.
     ///     See the UUI documentation for more details: https://uui.umbraco.com/?path=/story/uui-button--looks-and-colors.
     /// </summary>
+    /// <remarks>
+    ///     The default value is <see cref="UuiButtonLook.Outline" />, which has been optimized for the login screen.
+    /// </remarks>
     public UuiButtonLook ButtonLook { get; set; } = UuiButtonLook.Outline;
 
     /// <summary>
     ///     Gets or sets the color to use for the login button.
     ///     See the UUI documentation for more details: https://uui.umbraco.com/?path=/story/uui-button--looks-and-colors.
     /// </summary>
+    /// <remarks>
+    ///     The default value is <see cref="UuiButtonColor.Default" />, which has been optimized for the login screen.
+    /// </remarks>
     public UuiButtonColor ButtonColor { get; set; } = UuiButtonColor.Default;
 
     /// <summary>

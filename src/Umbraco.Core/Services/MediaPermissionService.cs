@@ -23,7 +23,7 @@ internal sealed class MediaPermissionService : IMediaPermissionService
     }
 
     /// <inheritdoc/>
-    public async Task<MediaAuthorizationStatus> AuthorizeAccessAsync(IUser performingUser, IEnumerable<Guid> mediaKeys)
+    public async Task<MediaAuthorizationStatus> AuthorizeAccessAsync(IUser user, IEnumerable<Guid> mediaKeys)
     {
         foreach (Guid mediaKey in mediaKeys)
         {
@@ -33,7 +33,7 @@ internal sealed class MediaPermissionService : IMediaPermissionService
                 return MediaAuthorizationStatus.NotFound;
             }
 
-            if (performingUser.HasPathAccess(media, _entityService, _appCaches) == false)
+            if (user.HasPathAccess(media, _entityService, _appCaches) == false)
             {
                 return MediaAuthorizationStatus.UnauthorizedMissingPathAccess;
             }
@@ -43,14 +43,14 @@ internal sealed class MediaPermissionService : IMediaPermissionService
     }
 
     /// <inheritdoc/>
-    public async Task<MediaAuthorizationStatus> AuthorizeRootAccessAsync(IUser performingUser)
-        => performingUser.HasMediaRootAccess(_entityService, _appCaches)
+    public async Task<MediaAuthorizationStatus> AuthorizeRootAccessAsync(IUser user)
+        => user.HasMediaRootAccess(_entityService, _appCaches)
             ? MediaAuthorizationStatus.Success
             : MediaAuthorizationStatus.UnauthorizedMissingRootAccess;
 
     /// <inheritdoc/>
-    public async Task<MediaAuthorizationStatus> AuthorizeBinAccessAsync(IUser performingUser)
-        => performingUser.HasMediaBinAccess(_entityService, _appCaches)
+    public async Task<MediaAuthorizationStatus> AuthorizeBinAccessAsync(IUser user)
+        => user.HasMediaBinAccess(_entityService, _appCaches)
             ? MediaAuthorizationStatus.Success
             : MediaAuthorizationStatus.UnauthorizedMissingBinAccess;
 }

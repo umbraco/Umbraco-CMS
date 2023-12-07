@@ -301,7 +301,7 @@ AND cmsContentNu.nodeId IS NULL
         IContentCacheDataSerializer serializer =
             _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Media);
 
-        IEnumerable<ContentSourceDto> dtos = GetContentNodeDtos(sql);
+        IEnumerable<ContentSourceDto> dtos = GetMediaNodeDtos(sql);
 
         foreach (ContentSourceDto row in dtos)
         {
@@ -319,7 +319,7 @@ AND cmsContentNu.nodeId IS NULL
         IContentCacheDataSerializer serializer =
             _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Media);
 
-        IEnumerable<ContentSourceDto> dtos = GetContentNodeDtos(sql);
+        IEnumerable<ContentSourceDto> dtos = GetMediaNodeDtos(sql);
 
         foreach (ContentSourceDto row in dtos)
         {
@@ -342,7 +342,7 @@ AND cmsContentNu.nodeId IS NULL
         IContentCacheDataSerializer serializer =
             _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Media);
 
-        IEnumerable<ContentSourceDto> dtos = GetContentNodeDtos(sql);
+        IEnumerable<ContentSourceDto> dtos = GetMediaNodeDtos(sql);
 
         foreach (ContentSourceDto row in dtos)
         {
@@ -988,6 +988,31 @@ WHERE cmsContentNu.nodeId IN (
         var s = new ContentNodeKit(n, dto.ContentTypeId, null, p);
 
         return s;
+    }
+
+    private IEnumerable<ContentSourceDto> GetMediaNodeDtos(Sql<ISqlContext> sql)
+    {
+        // We need to page here. We don't want to iterate over every single row in one connection cuz this can cause an SQL Timeout.
+        // We also want to read with a db reader and not load everything into memory, QueryPaged lets us do that.
+        // QueryPaged is very slow on large sites however, so use fetch if UsePagedSqlQuery is disabled.
+        IEnumerable<ContentSourceDto> dtos;
+        if (_nucacheSettings.Value.UsePagedSqlQuery)
+        {
+            // Use a more efficient COUNT query
+            Sql<ISqlContext>? sqlCountQuery = SqlMediaSourcesCount()
+                .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Media));
+
+            Sql<ISqlContext>? sqlCount =
+                SqlContext.Sql("SELECT COUNT(*) FROM (").Append(sqlCountQuery).Append(") npoco_tbl");
+
+            dtos = Database.QueryPaged<ContentSourceDto>(_nucacheSettings.Value.SqlPageSize, sql, sqlCount);
+        }
+        else
+        {
+            dtos = Database.Fetch<ContentSourceDto>(sql);
+        }
+
+        return dtos;
     }
 
     private IEnumerable<ContentSourceDto> GetContentNodeDtos(Sql<ISqlContext> sql)

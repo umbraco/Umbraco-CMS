@@ -2,6 +2,7 @@
   <PropertyGroup>
     <RootNamespace>Umbraco.Cms.Web.UI.New</RootNamespace>
     <EnablePackageValidation>false</EnablePackageValidation>
+    <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
   </PropertyGroup>
 
   <Import Project="..\Umbraco.Cms.Targets\buildTransitive\Umbraco.Cms.Targets.props" />

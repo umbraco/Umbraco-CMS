@@ -477,9 +477,10 @@
     <key alias="confirmlogout">Er du sikker på at du vil forlade Umbraco?</key>
     <key alias="confirmSure">Er du sikker?</key>
     <key alias="cut">Klip</key>
-    <key alias="editdictionary">Rediger ordbogsnøgle</key>
-    <key alias="editlanguage">Rediger sprog</key>
+    <key alias="editDictionary">Rediger ordbogsnøgle</key>
+    <key alias="editLanguage">Rediger sprog</key>
     <key alias="editSelectedMedia">Rediger det valgte medie</key>
+    <key alias="editWebhook">Edit webhook</key>
     <key alias="insertAnchor">Indsæt lokalt link</key>
     <key alias="insertCharacter">Indsæt tegn</key>
     <key alias="insertgraphicheadline">Indsæt grafisk overskrift</key>
@@ -531,6 +532,7 @@
     <key alias="openInNewWindow">Åben linket i et nyt vindue eller fane</key>
     <key alias="linkToMedia">Link til medie</key>
     <key alias="selectContentStartNode">Vælg startnode for indhold</key>
+    <key alias="selectEvent">Vælg event</key>
     <key alias="selectMedia">Vælg medie</key>
     <key alias="selectMediaType">Vælg medietype</key>
     <key alias="selectIcon">Vælg ikon</key>
@@ -1009,6 +1011,9 @@
     <key alias="addWebhookHeader">Tilføj webhook header</key>
     <key alias="addDocumentType">Tilføj dokument type</key>
     <key alias="addMediaType">Tilføj medie Type</key>
+    <key alias="createHeader">Opret header</key>
+    <key alias="logs">Logs</key>
+    <key alias="noHeaders">Der er ikke tilføjet nogen webhook headers</key>
   </area>
   <area alias="language">
     <key alias="cultureCode">Culture Code</key>
@@ -1019,13 +1024,13 @@
     <key alias="renewSession">Forny for at gemme dine ændringer</key>
   </area>
   <area alias="login">
-    <key alias="greeting0">Så er det søndag!</key>
-    <key alias="greeting1">Smil, det er mandag!</key>
-    <key alias="greeting2">Hurra, det er tirsdag!</key>
-    <key alias="greeting3">Hvilken herlig onsdag!</key>
-    <key alias="greeting4">Glædelig torsdag!</key>
-    <key alias="greeting5">Endelig fredag!</key>
-    <key alias="greeting6">Glædelig lørdag</key>
+    <key alias="greeting0">Velkommen</key>
+    <key alias="greeting1">Velkommen</key>
+    <key alias="greeting2">Velkommen</key>
+    <key alias="greeting3">Velkommen</key>
+    <key alias="greeting4">Velkommen</key>
+    <key alias="greeting5">Velkommen</key>
+    <key alias="greeting6">Velkommen</key>
     <key alias="instruction">Log ind nedenfor</key>
     <key alias="signInWith">Log ind med</key>
     <key alias="timeout">Din session er udløbet</key>
@@ -1463,6 +1468,7 @@ Mange hilsner fra Umbraco robotten
     </key>
     <key alias="copySuccessMessage">Dit systems information er blevet kopieret til udklipsholderen</key>
     <key alias="cannotCopyInformation">Kunne desværre ikke kopiere dit systems information til udklipsholderen</key>
+    <key alias="webhookSaved">Webhook gemt</key>
   </area>
   <area alias="stylesheet">
     <key alias="addRule">Tilføj style</key>

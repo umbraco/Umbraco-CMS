@@ -27,7 +27,7 @@ public class DomainAndUrlsTests : UmbracoIntegrationTest
         InstallationSummary = packagingService.InstallCompiledPackageData(xml);
 
         Root = InstallationSummary.ContentInstalled.First();
-        ContentService.SaveAndPublish(Root);
+        ContentService.Publish(Root, Root.AvailableCultures.ToArray());
 
         var cultures = new List<string>
         {
@@ -336,7 +336,7 @@ public class DomainAndUrlsTests : UmbracoIntegrationTest
     public async Task Cannot_Assign_Already_Used_Domains()
     {
         var copy = ContentService.Copy(Root, Root.ParentId, false);
-        ContentService.SaveAndPublish(copy!);
+        ContentService.Publish(copy!, copy!.AvailableCultures.ToArray());
 
         var domainService = GetRequiredService<IDomainService>();
         var updateModel = new DomainsUpdateModel

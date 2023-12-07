@@ -19,7 +19,7 @@ internal sealed class AuthorizationHelper : IAuthorizationHelper
         => _userService = userService;
 
     /// <inheritdoc/>
-    public IUser GetCurrentUser(IPrincipal currentUser)
+    public IUser GetUmbracoUser(IPrincipal currentUser)
     {
         IUser? user = null;
         ClaimsIdentity? umbIdentity = currentUser.GetUmbracoIdentity();

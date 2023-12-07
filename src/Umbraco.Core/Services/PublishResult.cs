@@ -11,7 +11,7 @@ public class PublishResult : OperationResult<PublishResultType, IContent>
     /// <summary>
     ///     Initializes a new instance of the <see cref="PublishResult" /> class.
     /// </summary>
-    public PublishResult(PublishResultType resultType, EventMessages? eventMessages, IContent? content)
+    public PublishResult(PublishResultType resultType, EventMessages? eventMessages, IContent content)
         : base(resultType, eventMessages, content)
     {
     }
@@ -27,7 +27,7 @@ public class PublishResult : OperationResult<PublishResultType, IContent>
     /// <summary>
     ///     Gets the document.
     /// </summary>
-    public IContent? Content => Entity;
+    public IContent Content => Entity ?? throw new InvalidOperationException("The content entity was null. Nullability must have been circumvented when constructing this instance. Please don't do that.");
 
     /// <summary>
     ///     Gets or sets the invalid properties, if the status failed due to validation.

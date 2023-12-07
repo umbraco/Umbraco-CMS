@@ -833,7 +833,8 @@ public class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         document.SetCultureName("doc1fr", "fr");
         document.SetValue("value1", "v1en-init", "en");
         document.SetValue("value1", "v1fr-init", "fr");
-        ContentService.SaveAndPublish(document); // all values are published which means the document is not 'edited'
+        ContentService.Save(document);
+        ContentService.Publish(document, document.AvailableCultures.ToArray()); // all values are published which means the document is not 'edited'
 
         document = ContentService.GetById(document.Id);
         Assert.IsFalse(document.IsCultureEdited("en"));
@@ -877,7 +878,8 @@ public class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
 
         // update the invariant value and publish
         document.SetValue("value1", "v1inv");
-        ContentService.SaveAndPublish(document);
+        ContentService.Save(document);
+        ContentService.Publish(document, document.AvailableCultures.ToArray());
 
         document = ContentService.GetById(document.Id);
         Assert.AreEqual("doc1en", document.Name);
@@ -918,7 +920,8 @@ public class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         // publish again
         document.SetValue("value1", "v1en2", "en"); // update the value now that it's variant again
         document.SetValue("value1", "v1fr2", "fr"); // update the value now that it's variant again
-        ContentService.SaveAndPublish(document);
+        ContentService.Save(document);
+        ContentService.Publish(document, document.AvailableCultures.ToArray());
 
         document = ContentService.GetById(document.Id);
         Assert.AreEqual("doc1en", document.Name);
@@ -956,7 +959,8 @@ public class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         document.SetCultureName("doc1en", "en");
         document.SetCultureName("doc1fr", "fr");
         document.SetValue("value1", "v1en-init");
-        ContentService.SaveAndPublish(document); // all values are published which means the document is not 'edited'
+        ContentService.Save(document); // all values are published which means the document is not 'edited'
+        ContentService.Publish(document, document.AvailableCultures.ToArray());
 
         document = ContentService.GetById(document.Id);
         Assert.IsFalse(document.IsCultureEdited("en"));
@@ -990,7 +994,8 @@ public class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
 
         // update the culture value and publish
         document.SetValue("value1", "v1en2", "en");
-        ContentService.SaveAndPublish(document);
+        ContentService.Save(document);
+        ContentService.Publish(document, document.AvailableCultures.ToArray());
 
         document = ContentService.GetById(document.Id);
         Assert.AreEqual("doc1en", document.Name);

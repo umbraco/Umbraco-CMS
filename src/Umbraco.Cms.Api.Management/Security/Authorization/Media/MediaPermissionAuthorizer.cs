@@ -26,7 +26,7 @@ internal sealed class MediaPermissionAuthorizer : IMediaPermissionAuthorizer
             return true;
         }
 
-        IUser user = _authorizationHelper.GetCurrentUser(currentUser);
+        IUser user = _authorizationHelper.GetUmbracoUser(currentUser);
 
         var result = await _mediaPermissionService.AuthorizeAccessAsync(user, mediaKeys);
 
@@ -36,7 +36,7 @@ internal sealed class MediaPermissionAuthorizer : IMediaPermissionAuthorizer
     /// <inheritdoc/>
     public async Task<bool> IsAuthorizedAtRootLevelAsync(IPrincipal currentUser)
     {
-        IUser user = _authorizationHelper.GetCurrentUser(currentUser);
+        IUser user = _authorizationHelper.GetUmbracoUser(currentUser);
 
         var result = await _mediaPermissionService.AuthorizeRootAccessAsync(user);
 
@@ -46,7 +46,7 @@ internal sealed class MediaPermissionAuthorizer : IMediaPermissionAuthorizer
     /// <inheritdoc/>
     public async Task<bool> IsAuthorizedAtRecycleBinLevelAsync(IPrincipal currentUser)
     {
-        IUser user = _authorizationHelper.GetCurrentUser(currentUser);
+        IUser user = _authorizationHelper.GetUmbracoUser(currentUser);
 
         var result = await _mediaPermissionService.AuthorizeBinAccessAsync(user);
 
