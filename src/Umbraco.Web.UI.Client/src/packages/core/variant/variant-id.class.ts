@@ -39,6 +39,14 @@ export class UmbVariantId {
 		return this.segment || '';
 	}
 
+	public isCultureInvariant(): boolean {
+		return this.culture === null;
+	}
+
+	public isSegmentInvariant(): boolean {
+		return this.segment === null;
+	}
+
 	public isInvariant(): boolean {
 		return this.culture === null && this.segment === null;
 	}
