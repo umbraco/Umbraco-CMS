@@ -5,7 +5,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-workspace-modal')
 export class UmbWorkspaceModalElement extends UmbLitElement {
-	@property()
+	@property({ attribute: false })
 	data?: UmbWorkspaceData;
 
 	/**
@@ -13,7 +13,7 @@ export class UmbWorkspaceModalElement extends UmbLitElement {
 	 *
 	 */
 	render() {
-		return html`<umb-workspace .entityType=${this.data?.entityType}></umb-workspace>`;
+		return this.data ? html`<umb-workspace .entityType=${this.data.entityType}></umb-workspace>` : '';
 	}
 
 	static styles: CSSResultGroup = [
