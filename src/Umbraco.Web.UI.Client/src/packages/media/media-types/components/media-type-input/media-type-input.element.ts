@@ -61,6 +61,9 @@ export class UmbMediaTypeInputElement extends FormControlMixin(UmbLitElement) {
 
 	@property()
 	public set value(idsString: string) {
+		const isEmpty = idsString.trim().length === 0;
+		if (isEmpty) return;
+
 		// Its with full purpose we don't call super.value, as thats being handled by the observation of the context selection.
 		this.selectedIds = idsString.split(/[ ,]+/);
 	}
