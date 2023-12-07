@@ -2021,7 +2021,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="addDocumentType">Add Document Type</key>
     <key alias="addMediaType">Add Media Type</key>
     <key alias="createHeader">Create header</key>
-    <key alias="logs">Logs</key>
+    <key alias="deliveries">Deliveries</key>
     <key alias="noHeaders">No webhook headers have been added</key>
     <key alias="noEventsFound">No events were found.</key>
     <key alias="enabled">Enabled</key>
