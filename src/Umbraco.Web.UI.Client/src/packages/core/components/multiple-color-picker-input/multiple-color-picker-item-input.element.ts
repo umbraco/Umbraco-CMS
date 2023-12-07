@@ -60,10 +60,12 @@ export class UmbMultipleColorPickerItemInputElement extends FormControlMixin(Umb
 
 	#onDelete() {
 		const modalContext = this._modalContext?.open(UMB_CONFIRM_MODAL, {
-			headline: `${this.localize.term('actions_delete')} ${this.value || ''}`,
-			content: this.localize.term('content_nestedContentDeleteItem'),
-			color: 'danger',
-			confirmLabel: this.localize.term('actions_delete'),
+			data: {
+				headline: `${this.localize.term('actions_delete')} ${this.value || ''}`,
+				content: this.localize.term('content_nestedContentDeleteItem'),
+				color: 'danger',
+				confirmLabel: this.localize.term('actions_delete'),
+			}
 		});
 
 		modalContext?.onSubmit().then(() => {
