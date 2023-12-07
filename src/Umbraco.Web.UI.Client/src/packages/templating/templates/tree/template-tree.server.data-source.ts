@@ -1,5 +1,5 @@
-import type { UmbTreeDataSource } from '@umbraco-cms/backoffice/tree';
-import { EntityTreeItemResponseModel, TemplateResource } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbEntityTreeItemModel, UmbTreeDataSource } from '@umbraco-cms/backoffice/tree';
+import { TemplateResource } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -9,7 +9,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
  * @class UmbTemplateTreeServerDataSource
  * @implements {UmbTreeDataSource}
  */
-export class UmbTemplateTreeServerDataSource implements UmbTreeDataSource<EntityTreeItemResponseModel> {
+export class UmbTemplateTreeServerDataSource implements UmbTreeDataSource<UmbEntityTreeItemModel> {
 	#host: UmbControllerHost;
 
 	/**
