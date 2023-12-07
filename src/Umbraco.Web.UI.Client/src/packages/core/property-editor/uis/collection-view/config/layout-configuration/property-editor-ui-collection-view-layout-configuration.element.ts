@@ -1,7 +1,7 @@
 import { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
-import { html, customElement, property, state, repeat, css, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, repeat, css, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UUIBooleanInputEvent, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
-import { getUmbracoColor } from '@umbraco-cms/backoffice/resources';
+import { extractUmbColorVariable } from '@umbraco-cms/backoffice/resources';
 import {
 	UMB_ICON_PICKER_MODAL,
 	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
@@ -119,7 +119,8 @@ export class UmbPropertyEditorUICollectionViewLayoutConfigurationElement
 
 		if (parts.length === 2) {
 			const [icon, color] = parts;
-			return { icon, color: color.replace('color-', '') };
+			const varName = extractUmbColorVariable(color.replace('color-', ''));
+			return { icon, color: varName };
 		} else {
 			const [icon] = parts;
 			return { icon };
@@ -145,7 +146,9 @@ export class UmbPropertyEditorUICollectionViewLayoutConfigurationElement
 		const icon = this.#iconReader(layout.icon ?? '');
 
 		return html`<uui-button compact look="outline" label="pick icon" @click=${() => this.#onIconChange(index)}>
-				<uui-icon name=${ifDefined(icon.icon)} style="color:var(${getUmbracoColor(icon.color ?? '')})"></uui-icon>
+				${icon.color
+					? html`<uui-icon name=${icon.icon} style="color:var(${icon.color})"></uui-icon>`
+					: html`<uui-icon name=${icon.icon}></uui-icon>`}
 			</uui-button>
 			${index}
 			<uui-input

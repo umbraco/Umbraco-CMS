@@ -10,7 +10,7 @@ const umbracoColors = [
 	{ alias: 'brown', varName: '--uui-palette-chamoisee' },
 ];
 
-export function getUmbracoColor(color: string): string | undefined {
-	const found = umbracoColors.find((umbColor) => umbColor.alias === color);
+export function extractUmbColorVariable(colorAlias: string): string | undefined {
+	const found = umbracoColors.find((umbColor) => umbColor.alias === colorAlias);
 	return found?.varName;
 }

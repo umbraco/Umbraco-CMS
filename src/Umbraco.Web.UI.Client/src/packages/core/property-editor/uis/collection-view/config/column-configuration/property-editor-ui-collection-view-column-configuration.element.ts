@@ -39,7 +39,7 @@ export class UmbPropertyEditorUICollectionViewColumnConfigurationElement
 		{ value: 'contentTypeAlias', name: this.localize.term('content_documentType'), group: 'System Fields' },
 		{ value: 'email', name: this.localize.term('general_email'), group: 'System Fields' },
 		{ value: 'username', name: this.localize.term('general_username'), group: 'System Fields' },
-
+		/*
 		{ value: 'contentTreePicker', name: 'contentTreePicker', group: 'Custom Fields' },
 		{ value: 'ete', name: 'ete', group: 'Custom Fields' },
 		{ value: 'link', name: 'link', group: 'Custom Fields' },
@@ -57,6 +57,7 @@ export class UmbPropertyEditorUICollectionViewColumnConfigurationElement
 		{ value: 'umbracoWidth', name: 'umbracoWidth', group: 'Custom Fields' },
 		{ value: 'uploadAFile', name: 'uploadAFile', group: 'Custom Fields' },
 		{ value: 'uploader', name: 'uploader', group: 'Custom Fields' },
+		*/
 	];
 
 	@query('uui-select')
