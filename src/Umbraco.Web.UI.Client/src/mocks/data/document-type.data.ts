@@ -1078,10 +1078,6 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 	},
 ];
 
-// Temp mocked database
-// TODO: all properties are optional in the server schema. I don't think this is correct.
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
 class UmbDocumentTypeData extends UmbEntityData<UmbMockDocumentTypeModel> {
 	constructor() {
 		super(data);
