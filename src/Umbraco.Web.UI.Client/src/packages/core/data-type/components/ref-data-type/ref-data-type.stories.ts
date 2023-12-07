@@ -1,7 +1,7 @@
 import { Meta, StoryObj } from '@storybook/web-components';
 import type { UmbRefDataTypeElement } from './ref-data-type.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
-import { UMB_PROPERTY_EDITOR_SCHEMA_ALIAS_DEFAULT } from '@umbraco-cms/backoffice/property-editor';
+import { UMB_PROPERTY_EDITOR_SCHEMA_ALIAS_DEFAULT } from 'src/packages/core/property/property-editor/index.js';
 import './ref-data-type.element.js';
 
 const meta: Meta<UmbRefDataTypeElement> = {

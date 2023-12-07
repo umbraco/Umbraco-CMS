@@ -1,4 +1,4 @@
-import { UMB_PROPERTY_EDITOR_SCHEMA_ALIAS_DEFAULT } from '@umbraco-cms/backoffice/property-editor';
+import { UMB_PROPERTY_EDITOR_SCHEMA_ALIAS_DEFAULT } from 'src/packages/core/property/property-editor';
 import { UUIRefNodeElement } from '@umbraco-cms/backoffice/external/uui';
 import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 

@@ -12,7 +12,7 @@ import {
 	UmbBasicState,
 } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextProviderController, UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import { UmbPropertyEditorConfigCollection } from 'src/packages/core/property/property-editor/index.js';
 
 export class UmbWorkspacePropertyContext<ValueType = any> extends UmbBaseController {
 	private _providerController: UmbContextProviderController;

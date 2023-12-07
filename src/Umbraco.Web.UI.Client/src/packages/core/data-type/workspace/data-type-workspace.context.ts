@@ -20,7 +20,7 @@ import {
 	PropertyEditorConfigProperty,
 	umbExtensionsRegistry,
 } from '@umbraco-cms/backoffice/extension-registry';
-import { UMB_PROPERTY_EDITOR_SCHEMA_ALIAS_DEFAULT } from '@umbraco-cms/backoffice/property-editor';
+import { UMB_PROPERTY_EDITOR_SCHEMA_ALIAS_DEFAULT } from 'src/packages/core/property/property-editor/index.js';
 
 export class UmbDataTypeWorkspaceContext
 	extends UmbEditableWorkspaceContextBase<UmbDataTypeDetailRepository, UmbDataTypeDetailModel>
