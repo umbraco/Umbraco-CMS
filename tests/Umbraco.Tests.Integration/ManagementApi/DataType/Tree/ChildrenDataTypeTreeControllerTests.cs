@@ -6,7 +6,6 @@ using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.DataType.Tree;
 
-[TestFixture]
 public class ChildrenDataTypeTreeControllerTests : ManagementApiTest<ChildrenDataTypeTreeController>
 {
     protected override Expression<Func<ChildrenDataTypeTreeController, object>> MethodSelector =>

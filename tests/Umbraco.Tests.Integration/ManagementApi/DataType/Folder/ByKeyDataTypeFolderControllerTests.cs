@@ -7,7 +7,6 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.DataType.Folder;
 
-[TestFixture]
 public class ByKeyDataTypeFolderControllerTests : ManagementApiUserGroupTestBase<ByKeyDataTypeFolderController>
 {
     private readonly Guid _folderId = Guid.NewGuid();

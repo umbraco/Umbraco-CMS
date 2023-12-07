@@ -8,7 +8,6 @@ using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.DataType;
 
-[TestFixture]
 public class CreateDataTypeControllerTests : ManagementApiTest<CreateDataTypeController>
 {
     protected override Expression<Func<CreateDataTypeController, object>> MethodSelector =>
@@ -92,7 +91,7 @@ public class CreateDataTypeControllerTests : ManagementApiTest<CreateDataTypeCon
             PropertyEditorUiAlias = "Umb.PropertyEditorUi.Label",
             Values = new List<DataTypePropertyPresentationModel>
             {
-                new DataTypePropertyPresentationModel
+                new()
                 {
                     Alias = "ValueAlias",
                     Value = "TestValue"

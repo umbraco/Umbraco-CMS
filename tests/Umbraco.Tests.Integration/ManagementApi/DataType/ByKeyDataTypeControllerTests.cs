@@ -6,7 +6,6 @@ using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.DataType;
 
-[TestFixture]
 public class ByKeyDataTypeControllerTests : ManagementApiTest<ByKeyDataTypeController>
 {
     protected override Expression<Func<ByKeyDataTypeController, object>> MethodSelector =>

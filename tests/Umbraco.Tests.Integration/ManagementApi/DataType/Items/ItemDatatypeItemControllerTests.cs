@@ -6,7 +6,6 @@ using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.DataType.Items;
 
-[TestFixture]
 public class ItemDatatypeItemControllerTests : ManagementApiTest<ItemDatatypeItemController>
 {
     protected override Expression<Func<ItemDatatypeItemController, object>> MethodSelector =>

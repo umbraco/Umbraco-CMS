@@ -6,7 +6,6 @@ using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.AuditLog;
 
-[TestFixture]
 public class ByTypeAuditLogControllerTests : ManagementApiUserGroupTestBase<ByTypeAuditLogController>
 {
     protected override Expression<Func<ByTypeAuditLogController, object>> MethodSelector =>

@@ -5,7 +5,6 @@ using Umbraco.Cms.Api.Management.Controllers.Culture;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.Culture;
 
-[TestFixture]
 public class AllCultureControllerTests : ManagementApiUserGroupTestBase<AllCultureController>
 {
     protected override Expression<Func<AllCultureController, object>> MethodSelector =>

@@ -6,7 +6,6 @@ using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.DataType;
 
-[TestFixture]
 public class IsUsedDataTypeControllerTests : ManagementApiTest<IsUsedDataTypeController>
 {
     protected override Expression<Func<IsUsedDataTypeController, object>> MethodSelector =>

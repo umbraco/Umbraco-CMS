@@ -6,7 +6,6 @@ using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.DataType;
 
-[TestFixture]
 public class DeleteDataTypeControllerTests : ManagementApiTest<DeleteDataTypeController>
 {
     protected override Expression<Func<DeleteDataTypeController, object>> MethodSelector =>

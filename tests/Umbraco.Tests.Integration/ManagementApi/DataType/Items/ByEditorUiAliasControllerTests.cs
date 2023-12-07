@@ -6,7 +6,6 @@ using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.DataType.Items;
 
-[TestFixture]
 public class ByEditorUiAliasControllerTests : ManagementApiTest<ByEditorUiAliasController>
 {
     protected override Expression<Func<ByEditorUiAliasController, object>> MethodSelector =>

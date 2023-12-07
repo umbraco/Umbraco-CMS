@@ -7,7 +7,6 @@ using Umbraco.Cms.Api.Management.ViewModels.Folder;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.DataType.Folder;
 
-[TestFixture]
 public class CreateDataTypeFolderControllerTests : ManagementApiUserGroupTestBase<CreateDataTypeFolderController>
 {
     protected override Expression<Func<CreateDataTypeFolderController, object>> MethodSelector =>
