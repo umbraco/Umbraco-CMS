@@ -37,7 +37,7 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
         sql
             .From<NodeDto>();
         sql.WhereIn<NodeDto>(x => x.NodeObjectType, new[] { objectType } );
-        if (filter != null)
+        if (filter is not null)
         {
             foreach (Tuple<string, object[]> filterClause in filter.GetWhereClauses())
             {

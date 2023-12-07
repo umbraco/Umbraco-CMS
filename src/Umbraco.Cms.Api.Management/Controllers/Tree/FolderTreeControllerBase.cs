@@ -68,12 +68,10 @@ public abstract class FolderTreeControllerBase<TItem> : EntityTreeControllerBase
 
         if (pageSize == 0)
         {
-            totalItems = EntityService.CountChildren(
-                parentId,
-                ItemObjectType);
-            totalItems += EntityService.CountChildren(
-                parentId,
-                FolderObjectType);
+            totalItems = _foldersOnly
+                ? EntityService.CountChildren(parentId, FolderObjectType)
+                : EntityService.CountChildren(parentId, FolderObjectType)
+                  + EntityService.CountChildren(parentId, ItemObjectType);
             return Array.Empty<IEntitySlim>();
         }
 
@@ -92,6 +90,12 @@ public abstract class FolderTreeControllerBase<TItem> : EntityTreeControllerBase
                     out totalItems,
                     ordering: ItemOrdering)
                 .ToArray();
+
+        // the GetChildren for folders does not return an amount and does not get executed when beyond the first page
+        // but the items still count towards the total, so add these to either 0 when only folders, or the out param from paged
+        totalItems += pageNumber == 0
+            ? folderEntities.Length
+            : EntityService.CountChildren(parentId, FolderObjectType);
 
         return folderEntities.Union(itemEntities).ToArray();
     }

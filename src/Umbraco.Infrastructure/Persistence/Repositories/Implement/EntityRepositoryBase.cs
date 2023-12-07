@@ -224,7 +224,7 @@ public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IRead
     protected virtual int PerformCount(IQuery<TEntity>? query)
     {
         Sql<ISqlContext> sqlClause = GetBaseQuery(true);
-        if (query == null)
+        if (query is null)
         {
             return Database.ExecuteScalar<int>(sqlClause);
         }
