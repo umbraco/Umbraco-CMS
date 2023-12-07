@@ -109,8 +109,8 @@ export class UmbInputImageCropperElement extends LitElement {
 						.focalPoint=${this.focalPoint}
 						.src=${this.src}></umb-image-cropper-focus-setter>
 					<div id="actions">
-						<uui-button>Remove files (NOT IMPLEMENTED YET)</uui-button>
-						<uui-button @click=${this.#onResetFocalPoint}>Reset focal point</uui-button>
+						<uui-button label="Remove files">Remove files (NOT IMPLEMENTED YET)</uui-button>
+						<uui-button label="Reset focal point" @click=${this.#onResetFocalPoint}>Reset focal point</uui-button>
 					</div> `;
 	}
 
