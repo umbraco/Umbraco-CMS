@@ -42,7 +42,7 @@ export class UmbPropertyEditorUICollectionViewOrderByElement
 	}
 
 	render() {
-		return html`<uui-select .options=${this._options} @change=${this.#onChange}></uui-select>`;
+		return html`<uui-select label="select" .options=${this._options} @change=${this.#onChange}></uui-select>`;
 	}
 
 	static styles = [UmbTextStyles];
