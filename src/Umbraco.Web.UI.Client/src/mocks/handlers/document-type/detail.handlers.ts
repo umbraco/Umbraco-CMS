@@ -1,5 +1,5 @@
 const { rest } = window.MockServiceWorker;
-import { umbDocumentTypeData } from '../../data/document-type.data.js';
+import { umbDocumentTypeData } from '../../data/document-type/document-type.db.js';
 import { UMB_SLUG } from './slug.js';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 

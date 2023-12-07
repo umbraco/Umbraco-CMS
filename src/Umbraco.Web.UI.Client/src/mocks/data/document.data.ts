@@ -1,4 +1,4 @@
-import { umbDocumentTypeData } from './document-type.data.js';
+import { umbDocumentTypeData } from './document-type/document-type.db.js';
 import { umbUserPermissionData } from './user-permission.data.js';
 import { UmbEntityData } from './entity.data.js';
 import { createDocumentTreeItem } from './utils.js';
