@@ -34,7 +34,6 @@ public class CreatePublicAccessDocumentController : DocumentControllerBase
     [HttpPost("{id:guid}/public-access")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Create(Guid id, PublicAccessRequestModel publicAccessRequestModel)
     {
         var resource = new ContentPermissionResource(id, ActionProtect.ActionLetter);

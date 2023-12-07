@@ -38,7 +38,6 @@ public class UpdateMediaController : MediaControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Update(Guid id, UpdateMediaRequestModel updateRequestModel)
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeAsync(User, new[] { id },
