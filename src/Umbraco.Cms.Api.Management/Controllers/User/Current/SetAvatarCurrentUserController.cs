@@ -36,7 +36,10 @@ public class SetAvatarCurrentUserController : CurrentUserControllerBase
     {
         Guid userKey = CurrentUserKey(_backOfficeSecurityAccessor);
 
-        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(User, new UserPermissionResource(userKey),AuthorizationPolicies.AdminUserEditsRequireAdmin);
+        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
+            User,
+            UserPermissionResource.WithKeys(userKey),
+            AuthorizationPolicies.AdminUserEditsRequireAdmin);
 
         if (!authorizationResult.Succeeded)
         {

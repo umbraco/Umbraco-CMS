@@ -35,7 +35,10 @@ public class BulkDeleteUsersController : UserControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> DeleteUsers(DeleteUsersRequestModel model)
     {
-        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(User, new UserPermissionResource(model.UserIds),AuthorizationPolicies.AdminUserEditsRequireAdmin);
+        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
+            User,
+            UserPermissionResource.WithKeys(model.UserIds),
+            AuthorizationPolicies.AdminUserEditsRequireAdmin);
 
         if (!authorizationResult.Succeeded)
         {

@@ -25,7 +25,10 @@ public class ClearAvatarUserController : UserControllerBase
     [HttpDelete("avatar/{id:guid}")]
     public async Task<IActionResult> ClearAvatar(Guid id)
     {
-        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(User, new UserPermissionResource(id), AuthorizationPolicies.AdminUserEditsRequireAdmin);
+        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
+            User,
+            UserPermissionResource.WithKeys(id),
+            AuthorizationPolicies.AdminUserEditsRequireAdmin);
 
         if (!authorizationResult.Succeeded)
         {

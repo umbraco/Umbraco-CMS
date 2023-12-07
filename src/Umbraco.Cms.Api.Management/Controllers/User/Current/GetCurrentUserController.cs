@@ -40,7 +40,10 @@ public class GetCurrentUserController : CurrentUserControllerBase
     {
         var currentUserKey = CurrentUserKey(_backOfficeSecurityAccessor);
 
-        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(User, new UserPermissionResource(currentUserKey), AuthorizationPolicies.AdminUserEditsRequireAdmin);
+        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
+            User,
+            UserPermissionResource.WithKeys(currentUserKey),
+            AuthorizationPolicies.AdminUserEditsRequireAdmin);
 
         if (!authorizationResult.Succeeded)
         {
