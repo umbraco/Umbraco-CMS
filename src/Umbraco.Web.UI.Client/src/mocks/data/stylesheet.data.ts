@@ -8,6 +8,7 @@ import {
 	InterpolateRichTextStylesheetRequestModel,
 	PagedFileSystemTreeItemPresentationModel,
 	PagedStylesheetOverviewResponseModel,
+	StylesheetItemResponseModel,
 	StylesheetResponseModel,
 	UpdateStylesheetRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
@@ -138,8 +139,9 @@ class UmbStylesheetData extends UmbData<StylesheetDBItem> {
 		return items.map((item) => createFileSystemTreeItem(item));
 	}
 
-	getStylesheetItem(path: string): StylesheetDBItem | undefined {
-		return createFileItemResponseModelBaseModel(this.data.find((item) => item.path === path));
+	getItems(paths: Array<string>): Array<StylesheetItemResponseModel> {
+		const items = this.data.filter((item) => paths.includes(item.path ?? ''));
+		return items.map((item) => createFileItemResponseModelBaseModel(item));
 	}
 
 	getStylesheet(path: string): StylesheetResponseModel | undefined {
