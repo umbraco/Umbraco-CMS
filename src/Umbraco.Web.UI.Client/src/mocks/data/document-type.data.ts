@@ -1146,14 +1146,11 @@ class UmbDocumentTypeData extends UmbEntityData<DocumentTypeResponseModel> {
 	}
 
 	getTreeRoot(): Array<DocumentTypeTreeItemResponseModel> {
-		const rootItems = this.treeData.filter((item) => item.parentId === null);
-		const result = rootItems.map((item) => createDocumentTypeTreeItem(item));
-		return result;
+		return this.treeData.filter((item) => item.parentId === null);
 	}
 
 	getTreeItemChildren(id: string): Array<DocumentTypeTreeItemResponseModel> {
-		const childItems = this.treeData.filter((item) => item.parentId === id);
-		return childItems.map((item) => item);
+		return this.treeData.filter((item) => item.parentId === id);
 	}
 
 	getTreeItem(ids: Array<string>): Array<DocumentTypeTreeItemResponseModel> {
