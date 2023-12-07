@@ -127,7 +127,7 @@ export default {
 	coverageConfig: {
 		reporters: ['lcovonly', 'text-summary'],
 	},
-	testRunnerHtml: (testFramework) =>
+	testRunnerHtml: (testFramework, devMode) =>
 		`<html lang="en-us">
 			<head>
 				<meta charset="UTF-8" />
@@ -135,6 +135,9 @@ export default {
 				<link rel="icon" type="image/svg+xml" href="src/assets/favicon.svg" />
 				<title>Umbraco</title>
 				<base href="/" />
+				<script>
+					window.__UMBRACO_TEST_RUN_A11Y_TEST = !devMode;
+				</script>
 				<script src="/node_modules/msw/lib/iife/index.js"></script>
 				<link rel="stylesheet" href="node_modules/@umbraco-ui/uui-css/dist/uui-css.css">
 				<link rel="stylesheet" href="src/css/umb-css.css">

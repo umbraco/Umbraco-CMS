@@ -120,6 +120,7 @@
 		"storybook:build": "npm run wc-analyze && storybook build",
 		"storybook": "npm run wc-analyze && storybook dev -p 6006",
 		"test:e2e": "npm run auth:test:e2e && npm run backoffice:test:e2e",
+		"test:dev-watch": "web-test-runner --watch --config ./web-test-runner.dev.config.mjs",
 		"test:watch": "web-test-runner --watch",
 		"test": "web-test-runner --coverage",
 		"wc-analyze:vscode": "wca **/*.element.ts --format vscode --outFile dist-cms/vscode-html-custom-data.json",
