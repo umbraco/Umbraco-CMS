@@ -1110,8 +1110,8 @@ class UmbDocumentTypeData extends UmbEntityData<UmbMockDocumentTypeModel> {
 	getAllowedTypesOf(id: string): Array<DocumentTypeTreeItemResponseModel> {
 		const documentType = this.getById(id);
 		const allowedTypeKeys = documentType?.allowedContentTypes?.map((documentType) => documentType.id) ?? [];
-		const items = this.treeData.filter((item) => allowedTypeKeys.includes(item.id ?? ''));
-		return items.map((item) => item);
+		const items = this.data.filter((item) => allowedTypeKeys.includes(item.id ?? ''));
+		return items.map((item) => createDocumentTypeTreeItem(item));
 	}
 
 	getItems(ids: Array<string>): Array<DocumentTypeItemResponseModel> {
