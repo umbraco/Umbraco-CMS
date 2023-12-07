@@ -1,8 +1,7 @@
 import { UmbTemplateTreeItemModel } from './types.js';
-import type { UmbTreeDataSource } from '@umbraco-cms/backoffice/tree';
-import { TemplateResource } from '@umbraco-cms/backoffice/backend-api';
+import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
+import { EntityTreeItemResponseModel, TemplateResource } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the Template tree that fetches data from the server
@@ -10,50 +9,42 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
  * @class UmbTemplateTreeServerDataSource
  * @implements {UmbTreeDataSource}
  */
-export class UmbTemplateTreeServerDataSource implements UmbTreeDataSource<UmbTemplateTreeItemModel> {
-	#host: UmbControllerHost;
-
+export class UmbTemplateTreeServerDataSource extends UmbTreeServerDataSourceBase<
+	EntityTreeItemResponseModel,
+	UmbTemplateTreeItemModel
+> {
 	/**
 	 * Creates an instance of UmbTemplateTreeServerDataSource.
 	 * @param {UmbControllerHost} host
 	 * @memberof UmbTemplateTreeServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
-		this.#host = host;
-	}
-
-	/**
-	 * Fetches the root items for the tree from the server
-	 * @return {*}
-	 * @memberof UmbTemplateTreeServerDataSource
-	 */
-	async getRootItems() {
-		return tryExecuteAndNotify(this.#host, TemplateResource.getTreeTemplateRoot({}));
-	}
-
-	/**
-	 * Fetches the children of a given parent id from the server
-	 * @param {(string)} parentId
-	 * @return {*}
-	 * @memberof UmbTemplateTreeServerDataSource
-	 */
-	async getChildrenOf(parentId: string | null) {
-		/* TODO: should we make getRootItems() internal
-		so it only is a server concern that there are two endpoints? */
-		if (parentId === null) {
-			return this.getRootItems();
-		} else {
-			return tryExecuteAndNotify(
-				this.#host,
-				TemplateResource.getTreeTemplateChildren({
-					parentId,
-				}),
-			);
-		}
-	}
-
-	// TODO: remove when interface is cleaned up
-	async getItems(unique: Array<string>): Promise<any> {
-		throw new Error('Dot not use this method. Use the item source instead');
+		super(host, {
+			getChildrenOf,
+			mapper,
+		});
 	}
 }
+
+const getChildrenOf = (parentUnique: string | null) => {
+	if (parentUnique === null) {
+		// eslint-disable-next-line local-rules/no-direct-api-import
+		return TemplateResource.getTreeTemplateRoot({});
+	} else {
+		// eslint-disable-next-line local-rules/no-direct-api-import
+		return TemplateResource.getTreeTemplateChildren({
+			parentId: parentUnique,
+		});
+	}
+};
+
+const mapper = (item: EntityTreeItemResponseModel): UmbTemplateTreeItemModel => {
+	return {
+		id: item.id!,
+		parentId: item.parentId || null,
+		name: item.name!,
+		type: 'template',
+		isContainer: item.isContainer!,
+		hasChildren: item.hasChildren!,
+	};
+};
