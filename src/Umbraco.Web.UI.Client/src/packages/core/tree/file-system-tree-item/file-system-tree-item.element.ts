@@ -1,8 +1,8 @@
+import { UmbFileSystemTreeItemModel } from '../types.js';
 import { UmbFileSystemTreeItemContext } from './file-system-tree-item.context.js';
 import { css, html, nothing, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { FileSystemTreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 import {
 	UmbBackofficeManifestKind,
 	UmbTreeItemElement,
@@ -31,12 +31,12 @@ umbExtensionsRegistry.register(manifest);
  */
 @customElement('umb-file-system-tree-item')
 export class UmbFileSystemTreeItemElement extends UmbLitElement implements UmbTreeItemElement {
-	private _item?: FileSystemTreeItemPresentationModel;
+	private _item?: UmbFileSystemTreeItemModel;
 	@property({ type: Object, attribute: false })
 	public get item() {
 		return this._item;
 	}
-	public set item(value: FileSystemTreeItemPresentationModel | undefined) {
+	public set item(value: UmbFileSystemTreeItemModel | undefined) {
 		this._item = value;
 		this.#context.setTreeItem(value);
 		this.#context.checkIfIsFolder();
