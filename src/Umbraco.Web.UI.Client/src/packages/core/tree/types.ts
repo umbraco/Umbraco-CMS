@@ -1,34 +1,38 @@
 export interface UmbTreeItemModelBase {
-	type?: string; // TODO: remove option to be undefined when we have our own types
-	name?: string;
-	hasChildren?: boolean;
-	icon?: string | null;
+	type: string;
+	name: string;
+	hasChildren: boolean;
+	icon: string | null;
 }
 
 export interface UmbTreeItemModel extends UmbTreeItemModelBase {
-	parentId?: string | null; // TODO: remove option to be undefined when server returns the same or when we get our own types
+	parentId: string | null;
 }
 
 export interface UmbUniqueTreeItemModel extends UmbTreeItemModelBase {
 	unique: string | null;
 }
 
+// TODO: remove this when we have unique for everything
 export interface UmbEntityTreeItemModel extends UmbTreeItemModel {
-	id?: string; // TODO: remove option to be undefined when server returns the same or when we get our own types
+	id: string;
 }
 
+// TODO: remove this when we have unique for everything
 export interface UmbFileSystemTreeItemModel extends UmbTreeItemModel {
-	path?: string; // TODO: remove option to be undefined when server returns the same or when we get our own types
+	path: string;
 }
 
 // Root
 export interface UmbUniqueTreeRootModel extends UmbTreeItemModelBase {
 	unique: null;
 }
+// TODO: remove this when we have unique for everything
 export interface UmbEntityTreeRootModel extends UmbTreeItemModelBase {
 	id: null;
 }
 
+// TODO: remove this when we have unique for everything
 export interface UmbFileSystemTreeRootModel extends UmbTreeItemModelBase {
 	path: null;
 }
