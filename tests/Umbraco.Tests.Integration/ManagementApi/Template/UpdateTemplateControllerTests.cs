@@ -1,16 +1,19 @@
 ﻿using System.Linq.Expressions;
 using System.Net;
-using Umbraco.Cms.Api.Management.Controllers.Language.Item;
+using System.Net.Http.Json;
+using Umbraco.Cms.Api.Management.Controllers.Template;
+using Umbraco.Cms.Api.Management.ViewModels.Template;
 
-namespace Umbraco.Cms.Tests.Integration.ManagementApi.Language.Item;
+namespace Umbraco.Cms.Tests.Integration.ManagementApi.Template;
 
-public class ItemsLanguageEntityControllerTests: ManagementApiUserGroupTestBase<ItemsLanguageEntityController>
+public class UpdateTemplateControllerTests : ManagementApiUserGroupTestBase<UpdateTemplateController>
 {
-    protected override Expression<Func<ItemsLanguageEntityController, object>> MethodSelector => x => x.Items(new HashSet<string> { "da" });
+    protected override Expression<Func<UpdateTemplateController, object>> MethodSelector =>
+        x => x.Update(Guid.Empty, null);
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.OK
+        ExpectedStatusCode = HttpStatusCode.NotFound
     };
 
     protected override UserGroupAssertionModel EditorUserGroupAssertionModel => new()
@@ -38,5 +41,13 @@ public class ItemsLanguageEntityControllerTests: ManagementApiUserGroupTestBase<
         ExpectedStatusCode = HttpStatusCode.Unauthorized
     };
 
-    protected override async Task<HttpResponseMessage> ClientRequest() => await Client.GetAsync(Url);
+    protected override async Task<HttpResponseMessage> ClientRequest()
+    {
+        UpdateTemplateRequestModel updateTemplateModel = new()
+        {
+            Name = "UpdatedTestTemplate", Alias = "testTemplate", Content = "<h1>Test Template</h1>"
+        };
+
+        return await Client.PutAsync(Url, JsonContent.Create(updateTemplateModel));
+    }
 }

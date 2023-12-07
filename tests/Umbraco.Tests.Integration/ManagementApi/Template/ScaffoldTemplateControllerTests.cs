@@ -1,12 +1,12 @@
 ﻿using System.Linq.Expressions;
 using System.Net;
-using Umbraco.Cms.Api.Management.Controllers.Language.Item;
+using Umbraco.Cms.Api.Management.Controllers.Template;
 
-namespace Umbraco.Cms.Tests.Integration.ManagementApi.Language.Item;
+namespace Umbraco.Cms.Tests.Integration.ManagementApi.Template;
 
-public class ItemsLanguageEntityControllerTests: ManagementApiUserGroupTestBase<ItemsLanguageEntityController>
+public class ScaffoldTemplateControllerTests : ManagementApiUserGroupTestBase<ScaffoldTemplateController>
 {
-    protected override Expression<Func<ItemsLanguageEntityController, object>> MethodSelector => x => x.Items(new HashSet<string> { "da" });
+    protected override Expression<Func<ScaffoldTemplateController, object>> MethodSelector => x => x.Scaffold(null);
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
@@ -37,6 +37,4 @@ public class ItemsLanguageEntityControllerTests: ManagementApiUserGroupTestBase<
     {
         ExpectedStatusCode = HttpStatusCode.Unauthorized
     };
-
-    protected override async Task<HttpResponseMessage> ClientRequest() => await Client.GetAsync(Url);
 }

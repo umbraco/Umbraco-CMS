@@ -1,12 +1,16 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using System.Net;
-using Umbraco.Cms.Api.Management.Controllers.Language.Item;
+using NUnit.Framework;
+using Umbraco.Cms.Api.Management.Controllers.Help;
+using Umbraco.Cms.Core;
 
-namespace Umbraco.Cms.Tests.Integration.ManagementApi.Language.Item;
+namespace Umbraco.Cms.Tests.Integration.ManagementApi.Help;
 
-public class ItemsLanguageEntityControllerTests: ManagementApiUserGroupTestBase<ItemsLanguageEntityController>
+[TestFixture]
+public class GetHelpControllerTests : ManagementApiUserGroupTestBase<GetHelpController>
 {
-    protected override Expression<Func<ItemsLanguageEntityController, object>> MethodSelector => x => x.Items(new HashSet<string> { "da" });
+    protected override Expression<Func<GetHelpController, object>> MethodSelector =>
+        x => x.Get("TestSection", "TestTree", 0, 100, "https://our.umbraco.com");
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
@@ -15,28 +19,26 @@ public class ItemsLanguageEntityControllerTests: ManagementApiUserGroupTestBase<
 
     protected override UserGroupAssertionModel EditorUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.Forbidden
+        ExpectedStatusCode = HttpStatusCode.OK
     };
 
     protected override UserGroupAssertionModel SensitiveDataUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.Forbidden
+        ExpectedStatusCode = HttpStatusCode.OK
     };
 
     protected override UserGroupAssertionModel TranslatorUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.Forbidden
+        ExpectedStatusCode = HttpStatusCode.OK
     };
 
     protected override UserGroupAssertionModel WriterUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.Forbidden
+        ExpectedStatusCode = HttpStatusCode.OK
     };
 
     protected override UserGroupAssertionModel UnauthorizedUserGroupAssertionModel => new()
     {
         ExpectedStatusCode = HttpStatusCode.Unauthorized
     };
-
-    protected override async Task<HttpResponseMessage> ClientRequest() => await Client.GetAsync(Url);
 }

@@ -1,7 +1,6 @@
 using System.Collections.Concurrent;
 using System.Linq.Expressions;
 using System.Reflection;
-using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Persistence;
 
 namespace Umbraco.Cms.Core;
@@ -153,7 +152,7 @@ public static class ExpressionHelper
         }
 
         var rVal = new Dictionary<string, object?>();
-        var parameters = body.Method.GetParameters().Select(x => x.GetCustomAttribute<FromQueryAttribute>()?.Name ?? x.Name).Where(x => x is not null).ToArray();
+        var parameters = body.Method.GetParameters().Select(x => x.Name).Where(x => x is not null).ToArray();
         var i = 0;
         foreach (Expression argument in body.Arguments)
         {

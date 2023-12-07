@@ -1,12 +1,14 @@
 ﻿using System.Linq.Expressions;
 using System.Net;
-using Umbraco.Cms.Api.Management.Controllers.Language.Item;
+using System.Net.Http.Json;
+using Umbraco.Cms.Api.Management.Controllers.Template.Query;
+using Umbraco.Cms.Api.Management.ViewModels.Template.Query;
 
-namespace Umbraco.Cms.Tests.Integration.ManagementApi.Language.Item;
+namespace Umbraco.Cms.Tests.Integration.ManagementApi.Template.Query;
 
-public class ItemsLanguageEntityControllerTests: ManagementApiUserGroupTestBase<ItemsLanguageEntityController>
+public class ExecuteTemplateQueryControllerTests : ManagementApiUserGroupTestBase<ExecuteTemplateQueryController>
 {
-    protected override Expression<Func<ItemsLanguageEntityController, object>> MethodSelector => x => x.Items(new HashSet<string> { "da" });
+    protected override Expression<Func<ExecuteTemplateQueryController, object>> MethodSelector => x => x.Execute(null);
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
@@ -38,5 +40,10 @@ public class ItemsLanguageEntityControllerTests: ManagementApiUserGroupTestBase<
         ExpectedStatusCode = HttpStatusCode.Unauthorized
     };
 
-    protected override async Task<HttpResponseMessage> ClientRequest() => await Client.GetAsync(Url);
+    protected override async Task<HttpResponseMessage> ClientRequest()
+    {
+        TemplateQueryExecuteModel templateQueryExecuteModel = new() { Take = 10 };
+
+        return await Client.PostAsync(Url, JsonContent.Create(templateQueryExecuteModel));
+    }
 }
