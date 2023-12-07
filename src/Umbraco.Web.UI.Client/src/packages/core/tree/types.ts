@@ -2,7 +2,7 @@ export interface UmbTreeItemModelBase {
 	type: string;
 	name: string;
 	hasChildren: boolean;
-	icon: string | null;
+	icon?: string | null;
 }
 
 export interface UmbTreeItemModel extends UmbTreeItemModelBase {
