@@ -1,5 +1,10 @@
 import { UmbTreeStore } from './tree-store.interface.js';
-import type { UmbEntityTreeItemModel, UmbEntityTreeRootModel } from './types.js';
+import type {
+	UmbEntityTreeItemModel,
+	UmbEntityTreeRootModel,
+	UmbFileSystemTreeItemModel,
+	UmbFileSystemTreeRootModel,
+} from './types.js';
 import { UmbTreeRepository } from './tree-repository.interface.js';
 import type { UmbTreeDataSource, UmbTreeDataSourceConstructor } from './tree-data-source.interface.js';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
@@ -8,8 +13,9 @@ import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 export class UmbTreeRepositoryBase<
-		TreeItemType extends UmbEntityTreeItemModel,
-		TreeRootType extends UmbEntityTreeRootModel,
+		// TODO: remove UmbEntityTreeItemModel and UmbFileSystemTreeItemModel when we have unique in place
+		TreeItemType extends UmbEntityTreeItemModel | UmbFileSystemTreeItemModel,
+		TreeRootType extends UmbEntityTreeRootModel | UmbFileSystemTreeRootModel,
 	>
 	extends UmbRepositoryBase
 	implements UmbTreeRepository<TreeItemType, TreeRootType>, UmbApi
