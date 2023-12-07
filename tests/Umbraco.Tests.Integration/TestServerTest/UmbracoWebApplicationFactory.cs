@@ -30,8 +30,6 @@ public class UmbracoWebApplicationFactory<TStartup> : WebApplicationFactory<TSta
 
         host.Start();
 
-        var x = host.Services;
-
         return host;
     }
 }
