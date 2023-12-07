@@ -1,10 +1,8 @@
 import type {
 	ContentTreeItemResponseModel,
 	DocumentTreeItemResponseModel,
-	DocumentTypeTreeItemResponseModel,
 	EntityTreeItemResponseModel,
 	FolderTreeItemResponseModel,
-	DocumentTypeResponseModel,
 	FileSystemTreeItemPresentationModel,
 	DocumentResponseModel,
 	TextFileResponseModelBaseModel,
