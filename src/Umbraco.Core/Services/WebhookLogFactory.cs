@@ -18,6 +18,7 @@ public class WebhookLogFactory : IWebhookLogFactory
             RetryCount = retryCount,
             RequestHeaders = requestMessage.Headers.ToString(),
             RequestBody = await requestMessage.Content?.ReadAsStringAsync(cancellationToken)!,
+            ExceptionOccured = exception is not null,
         };
 
         if (httpResponseMessage is not null)
@@ -31,6 +32,10 @@ public class WebhookLogFactory : IWebhookLogFactory
             if (httpRequestException.StatusCode is not null)
             {
                 log.StatusCode = MapStatusCodeToMessage(httpRequestException.StatusCode.Value);
+            }
+            else
+            {
+                log.StatusCode = httpRequestException.HttpRequestError.ToString();
             }
 
             log.ResponseBody = $"{httpRequestException.HttpRequestError}: {httpRequestException.Message}";
