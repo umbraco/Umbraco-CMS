@@ -1,11 +1,9 @@
 using System.Linq.Expressions;
 using System.Net;
-using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Controllers.ObjectTypes;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.ObjectTypes;
 
-[TestFixture]
 public class AllowedObjectTypesControllerTests : ManagementApiUserGroupTestBase<AllowedObjectTypesController>
 {
     protected override Expression<Func<AllowedObjectTypesController, object>> MethodSelector =>
