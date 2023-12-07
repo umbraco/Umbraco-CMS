@@ -7,7 +7,6 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Web;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using OpenIddict.Abstractions;
@@ -45,8 +44,6 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
     protected abstract Expression<Func<T, object>> MethodSelector { get; }
 
     protected virtual string Url => GetManagementApiUrl(MethodSelector);
-
-    protected virtual List<HttpStatusCode> AuthenticatedStatusCodes { get; }
 
     protected async Task AuthenticateClientAsync(HttpClient client, string username, string password, Guid userGroupKey)
     {
@@ -112,12 +109,12 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
         Assert.AreEqual(HttpStatusCode.OK, loginResponse.StatusCode, await loginResponse.Content.ReadAsStringAsync());
 
         var codeVerifier = "12345"; // Just a dummy value we use in tests
-        var codeChallange = Convert.ToBase64String(SHA256.Create().ComputeHash(Encoding.UTF8.GetBytes(codeVerifier)))
+        var codeChallenge = Convert.ToBase64String(SHA256.Create().ComputeHash(Encoding.UTF8.GetBytes(codeVerifier)))
             .TrimEnd("=");
 
         var authorizeResponse = await client.GetAsync(
             GetManagementApiUrl<BackOfficeController>(x => x.Authorize()) +
-            $"?client_id={backofficeOpenIddictApplicationDescriptor.ClientId}&response_type=code&redirect_uri={WebUtility.UrlEncode(backofficeOpenIddictApplicationDescriptor.RedirectUris.FirstOrDefault()?.AbsoluteUri)}&code_challenge_method=S256&code_challenge={codeChallange}");
+            $"?client_id={backofficeOpenIddictApplicationDescriptor.ClientId}&response_type=code&redirect_uri={WebUtility.UrlEncode(backofficeOpenIddictApplicationDescriptor.RedirectUris.FirstOrDefault()?.AbsoluteUri)}&code_challenge_method=S256&code_challenge={codeChallenge}");
 
         Assert.AreEqual(HttpStatusCode.Found, authorizeResponse.StatusCode, await authorizeResponse.Content.ReadAsStringAsync());
 
@@ -141,32 +138,4 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
     {
         [JsonPropertyName("access_token")] public string AccessToken { get; set; }
     }
-
-    protected void AssertStatusCode(HttpResponseMessage response, bool isAccess)
-    {
-        if (isAccess)
-        {
-            Assert.Contains(response.StatusCode, AuthenticatedStatusCodes, response.Content.ReadAsStringAsync().Result);
-        }
-        else
-        {
-            Assert.AreEqual(HttpStatusCode.Forbidden, response.StatusCode, response.Content.ReadAsStringAsync().Result);
-        }
-    }
-
-    protected async Task<HttpResponseMessage> SendAuthenticatedRequest(string userEmail, string userPassword, Guid userGroupKey)
-    {
-        await AuthenticateClientAsync(Client, userEmail, userPassword, userGroupKey);
-
-        return await SendUnauthenticatedRequest();
-    }
-
-    protected virtual async Task<HttpResponseMessage> SendUnauthenticatedRequest() => await Client.GetAsync(Url);
-
-    protected async Task<HttpResponseMessage> AccessAsAdmin() => await SendAuthenticatedRequest("admin@umbraco.com", "1234567890", Constants.Security.AdminGroupKey);
-    protected async Task<HttpResponseMessage> AccessAsEditor() => await SendAuthenticatedRequest("editor@umbraco.com", "1234567890", Constants.Security.EditorGroupKey);
-    protected async Task<HttpResponseMessage> AccessAsSensitiveData() => await SendAuthenticatedRequest("sensitiveData@umbraco.com", "1234567890", Constants.Security.SensitiveDataGroupKey);
-    protected async Task<HttpResponseMessage> AccessAsTranslator() => await SendAuthenticatedRequest("translator@umbraco.com", "1234567890", Constants.Security.TranslatorGroupKey);
-    protected async Task<HttpResponseMessage> AccessAsWriter() => await SendAuthenticatedRequest("writer@umbraco.com", "1234567890", Constants.Security.WriterGroupKey);
-
 }
