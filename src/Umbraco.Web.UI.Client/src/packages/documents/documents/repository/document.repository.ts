@@ -219,31 +219,12 @@ export class UmbDocumentRepository
 		return { error };
 	}
 
-	async saveAndPublish(id: string, item: UpdateDocumentRequestModel, variantIds: Array<UmbVariantId>) {
-		if (!id) throw new Error('id is missing');
-		if (!variantIds) throw new Error('variant IDs are missing');
-		//await this.#init;
-
-		await this.save(id, item);
-
-		const { error } = await this.#detailDataSource.saveAndPublish(id, variantIds);
-
-		if (!error) {
-			// TODO: Update other stores based on above effect.
-
-			const notification = { data: { message: `Document saved and published` } };
-			this.#notificationContext?.peek('positive', notification);
-		}
-
-		return { error };
-	}
-
 	async publish(id: string, variantIds: Array<UmbVariantId>) {
 		if (!id) throw new Error('id is missing');
 		if (!variantIds) throw new Error('variant IDs are missing');
 		await this.#init;
 
-		const { error } = await this.#detailDataSource.saveAndPublish(id, variantIds);
+		const { error } = await this.#detailDataSource.publish(id, variantIds);
 
 		if (!error) {
 			// TODO: Update other stores based on above effect.

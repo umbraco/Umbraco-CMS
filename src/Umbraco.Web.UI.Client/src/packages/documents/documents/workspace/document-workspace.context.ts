@@ -187,9 +187,8 @@ export class UmbDocumentWorkspaceContext
 		}
 	}
 
-	async save() {
-		if (!this.#currentData.value) return;
-		if (!this.#currentData.value.id) return;
+	async #createOrSave() {
+		if (!this.#currentData.value?.id) throw new Error('Id is missing');
 
 		if (this.getIsNew()) {
 			// TODO: typescript hack until we get the create type
@@ -200,6 +199,10 @@ export class UmbDocumentWorkspaceContext
 		} else {
 			await this.repository.save(this.#currentData.value.id, this.#currentData.value);
 		}
+	}
+
+	async save() {
+		await this.#createOrSave();
 
 		this.saveComplete(this.getData());
 	}
@@ -211,6 +214,19 @@ export class UmbDocumentWorkspaceContext
 		}
 	}
 
+	public async saveAndPublish() {
+		await this.#createOrSave();
+		// TODO: This might be right to publish all, but we need a method that just saves and publishes a declared range of variants.
+		const currentData = this.#currentData.value;
+		if (currentData) {
+			const variantIds = currentData.variants?.map((x) => UmbVariantId.Create(x));
+			const id = currentData.id;
+			if (variantIds && id) {
+				await this.repository.publish(id, variantIds);
+			}
+		}
+	}
+
 	public async publish() {
 		// TODO: This might be right to publish all, but we need a method that just publishes a declared range of variants.
 		const currentData = this.#currentData.value;
@@ -219,18 +235,6 @@ export class UmbDocumentWorkspaceContext
 			const id = this.getEntityId();
 			if (variantIds && id) {
 				await this.repository.publish(id, variantIds);
-			}
-		}
-	}
-
-	public async saveAndPublish() {
-		// TODO: This might be right to publish all, but we need a method that just saves and publishes a declared range of variants.
-		const currentData = this.#currentData.value;
-		if (currentData) {
-			const variantIds = currentData.variants?.map((x) => UmbVariantId.Create(x));
-			const id = currentData.id;
-			if (variantIds && id) {
-				await this.repository.saveAndPublish(id, currentData, variantIds);
 			}
 		}
 	}
