@@ -5,21 +5,19 @@ export interface UmbTreeItemModelBase {
 	icon?: string | null;
 }
 
-export interface UmbTreeItemModel extends UmbTreeItemModelBase {
+export interface UmbUniqueTreeItemModel extends UmbTreeItemModelBase {
+	unique: string;
+	parentUnique: string | null;
+}
+
+// TODO: remove this when we have unique for everything
+export interface UmbEntityTreeItemModel extends UmbTreeItemModelBase {
+	id: string;
 	parentId: string | null;
 }
 
-export interface UmbUniqueTreeItemModel extends UmbTreeItemModelBase {
-	unique: string | null;
-}
-
 // TODO: remove this when we have unique for everything
-export interface UmbEntityTreeItemModel extends UmbTreeItemModel {
-	id: string;
-}
-
-// TODO: remove this when we have unique for everything
-export interface UmbFileSystemTreeItemModel extends UmbTreeItemModel {
+export interface UmbFileSystemTreeItemModel extends UmbTreeItemModelBase {
 	path: string;
 }
 
@@ -27,6 +25,7 @@ export interface UmbFileSystemTreeItemModel extends UmbTreeItemModel {
 export interface UmbUniqueTreeRootModel extends UmbTreeItemModelBase {
 	unique: null;
 }
+
 // TODO: remove this when we have unique for everything
 export interface UmbEntityTreeRootModel extends UmbTreeItemModelBase {
 	id: null;
