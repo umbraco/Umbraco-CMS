@@ -1,3 +1,4 @@
+import { UmbDocumentTypeTreeItemModel } from './types.js';
 import type { UmbTreeDataSource } from '@umbraco-cms/backoffice/tree';
 import { DocumentTypeResource } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -9,7 +10,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
  * @class UmbDocumentTypeTreeServerDataSource
  * @implements {UmbTreeDataSource}
  */
-export class UmbDocumentTypeTreeServerDataSource implements UmbTreeDataSource {
+export class UmbDocumentTypeTreeServerDataSource implements UmbTreeDataSource<UmbDocumentTypeTreeItemModel> {
 	#host: UmbControllerHost;
 
 	/**

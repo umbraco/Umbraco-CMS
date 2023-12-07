@@ -1,4 +1,5 @@
-import type { UmbEntityTreeItemModel, UmbTreeDataSource } from '@umbraco-cms/backoffice/tree';
+import { UmbTemplateTreeItemModel } from './types.js';
+import type { UmbTreeDataSource } from '@umbraco-cms/backoffice/tree';
 import { TemplateResource } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
@@ -9,7 +10,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
  * @class UmbTemplateTreeServerDataSource
  * @implements {UmbTreeDataSource}
  */
-export class UmbTemplateTreeServerDataSource implements UmbTreeDataSource<UmbEntityTreeItemModel> {
+export class UmbTemplateTreeServerDataSource implements UmbTreeDataSource<UmbTemplateTreeItemModel> {
 	#host: UmbControllerHost;
 
 	/**
@@ -36,7 +37,7 @@ export class UmbTemplateTreeServerDataSource implements UmbTreeDataSource<UmbEnt
 	 * @return {*}
 	 * @memberof UmbTemplateTreeServerDataSource
 	 */
-	async getChildrenOf(parentId: string | null): Promise<any> {
+	async getChildrenOf(parentId: string | null) {
 		/* TODO: should we make getRootItems() internal
 		so it only is a server concern that there are two endpoints? */
 		if (parentId === null) {

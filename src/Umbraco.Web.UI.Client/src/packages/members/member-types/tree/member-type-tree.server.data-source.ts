@@ -36,7 +36,7 @@ export class UmbMemberTypeTreeServerDataSource implements UmbTreeDataSource<Enti
 	 * @return {*}
 	 * @memberof UmbMemberTypeTreeServerDataSource
 	 */
-	async getChildrenOf(parentId: string | null): Promise<any> {
+	async getChildrenOf(parentId: string | null) {
 		/* TODO: should we make getRootItems() internal
 		so it only is a server concern that there are two endpoints? */
 		if (parentId === null) {

@@ -1,3 +1,4 @@
+import { UmbMediaTypeTreeItemModel } from './types.js';
 import type { UmbTreeDataSource } from '@umbraco-cms/backoffice/tree';
 import { MediaTypeResource } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -9,7 +10,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
  * @class UmbMediaTypeTreeServerDataSource
  * @implements {UmbTreeDataSource}
  */
-export class UmbMediaTypeTreeServerDataSource implements UmbTreeDataSource {
+export class UmbMediaTypeTreeServerDataSource implements UmbTreeDataSource<UmbMediaTypeTreeItemModel> {
 	#host: UmbControllerHost;
 
 	/**

@@ -25,7 +25,7 @@ export class UmbMemberTreeServerDataSource implements UmbTreeDataSource<EntityTr
 	 * @return {*}
 	 * @memberof UmbMemberTreeServerDataSource
 	 */
-	async getRootItems(): Promise<any> {
+	async getRootItems() {
 		alert('not implemented');
 		//return tryExecuteAndNotify(this.#host, MemberResource.getTreeMemberRoot({}));
 	}
@@ -36,7 +36,7 @@ export class UmbMemberTreeServerDataSource implements UmbTreeDataSource<EntityTr
 	 * @return {*}
 	 * @memberof UmbMemberTreeServerDataSource
 	 */
-	async getChildrenOf(parentId: string | null): Promise<any> {
+	async getChildrenOf(parentId: string | null) {
 		alert('not implemented');
 		/* TODO: should we make getRootItems() internal
 		so it only is a server concern that there are two endpoints? */
