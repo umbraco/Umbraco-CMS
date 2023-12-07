@@ -1,7 +1,7 @@
-import type { UmbTreeDataSource } from '@umbraco-cms/backoffice/tree';
+import { UmbPartialViewTreeItemModel } from './types.js';
+import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
 import { FileSystemTreeItemPresentationModel, PartialViewResource } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the PartialView tree that fetches data from the server
@@ -9,50 +9,40 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
  * @class UmbPartialViewTreeServerDataSource
  * @implements {UmbTreeDataSource}
  */
-export class UmbPartialViewTreeServerDataSource implements UmbTreeDataSource<FileSystemTreeItemPresentationModel> {
-	#host: UmbControllerHost;
-
+export class UmbPartialViewTreeServerDataSource extends UmbTreeServerDataSourceBase<
+	FileSystemTreeItemPresentationModel,
+	UmbPartialViewTreeItemModel
+> {
 	/**
 	 * Creates an instance of UmbPartialViewTreeServerDataSource.
 	 * @param {UmbControllerHost} host
 	 * @memberof UmbPartialViewTreeServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
-		this.#host = host;
-	}
-
-	/**
-	 * Fetches the root items for the tree from the server
-	 * @return {*}
-	 * @memberof UmbPartialViewTreeServerDataSource
-	 */
-	async getRootItems() {
-		return tryExecuteAndNotify(this.#host, PartialViewResource.getTreePartialViewRoot({}));
-	}
-
-	/**
-	 * Fetches the children of a given parent path from the server
-	 * @param {(string)} parentPath
-	 * @return {*}
-	 * @memberof UmbPartialViewTreeServerDataSource
-	 */
-	async getChildrenOf(parentPath: string | null) {
-		/* TODO: should we make getRootItems() internal
-		so it only is a server concern that there are two endpoints? */
-		if (parentPath === null) {
-			return this.getRootItems();
-		} else {
-			return tryExecuteAndNotify(
-				this.#host,
-				PartialViewResource.getTreePartialViewChildren({
-					path: parentPath,
-				}),
-			);
-		}
-	}
-
-	// TODO: remove when interface is cleaned up
-	async getItems(unique: Array<string>): Promise<any> {
-		throw new Error('Dot not use this method. Use the item source instead');
+		super(host, {
+			getChildrenOf,
+			mapper,
+		});
 	}
 }
+
+const getChildrenOf = (parentUnique: string | null) => {
+	if (parentUnique === null) {
+		return PartialViewResource.getTreePartialViewRoot({});
+	} else {
+		return PartialViewResource.getTreePartialViewChildren({
+			path: parentUnique,
+		});
+	}
+};
+
+const mapper = (item: FileSystemTreeItemPresentationModel): UmbPartialViewTreeItemModel => {
+	return {
+		path: item.path!,
+		name: item.name!,
+		type: 'partial-view',
+		isFolder: item.isFolder!,
+		hasChildren: item.hasChildren!,
+		isContainer: false,
+	};
+};
