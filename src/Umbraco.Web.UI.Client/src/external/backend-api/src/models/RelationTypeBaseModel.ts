@@ -4,7 +4,7 @@
 /* eslint-disable */
 
 export type RelationTypeBaseModel = {
-    name?: string;
+    name: string;
     isBidirectional?: boolean;
     parentObjectType?: string | null;
     childObjectType?: string | null;

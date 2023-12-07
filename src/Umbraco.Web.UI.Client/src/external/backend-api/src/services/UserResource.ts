@@ -327,24 +327,6 @@ export class UserResource {
      * @returns any Success
      * @throws ApiError
      */
-    public static getUserCurrentPermissionsDocument1({
-        id,
-    }: {
-        id?: Array<string>,
-    }): CancelablePromise<Array<UserPermissionsResponseModel>> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/umbraco/management/api/v2/user/current/permissions/document',
-            query: {
-                'id': id,
-            },
-        });
-    }
-
-    /**
-     * @returns any Success
-     * @throws ApiError
-     */
     public static getUserCurrentPermissionsMedia({
         id,
     }: {
@@ -353,24 +335,6 @@ export class UserResource {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/user/current/permissions/media',
-            query: {
-                'id': id,
-            },
-        });
-    }
-
-    /**
-     * @returns any Success
-     * @throws ApiError
-     */
-    public static getUserCurrentPermissionsMedia1({
-        id,
-    }: {
-        id?: Array<string>,
-    }): CancelablePromise<Array<UserPermissionsResponseModel>> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/umbraco/management/api/v2/user/current/permissions/media',
             query: {
                 'id': id,
             },

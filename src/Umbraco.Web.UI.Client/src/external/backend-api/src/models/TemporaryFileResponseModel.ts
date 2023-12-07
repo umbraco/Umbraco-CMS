@@ -6,6 +6,6 @@
 export type TemporaryFileResponseModel = {
     id?: string;
     availableUntil?: string | null;
-    fileName?: string;
+    fileName: string;
 };
 

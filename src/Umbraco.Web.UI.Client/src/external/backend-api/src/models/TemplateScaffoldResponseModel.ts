@@ -4,6 +4,6 @@
 /* eslint-disable */
 
 export type TemplateScaffoldResponseModel = {
-    content?: string;
+    content: string;
 };
 

@@ -7,7 +7,7 @@ export type PropertyTypeContainerModelBaseModel = {
     id?: string;
     parentId?: string | null;
     name?: string | null;
-    type?: string;
+    type: string;
     sortOrder?: number;
 };
 

@@ -9,15 +9,15 @@ import type { UpdateDocumentTypePropertyTypeContainerRequestModel } from './Upda
 import type { UpdateDocumentTypePropertyTypeRequestModel } from './UpdateDocumentTypePropertyTypeRequestModel';
 
 export type UpdateContentTypeForDocumentTypeRequestModel = {
-    alias?: string;
-    name?: string;
+    alias: string;
+    name: string;
     description?: string | null;
-    icon?: string;
+    icon: string;
     allowedAsRoot?: boolean;
     variesByCulture?: boolean;
     variesBySegment?: boolean;
     isElement?: boolean;
-    properties?: Array<UpdateDocumentTypePropertyTypeRequestModel>;
+    properties: Array<UpdateDocumentTypePropertyTypeRequestModel>;
     containers?: Array<UpdateDocumentTypePropertyTypeContainerRequestModel>;
     allowedContentTypes?: Array<ContentTypeSortModel>;
     compositions?: Array<ContentTypeCompositionModel>;

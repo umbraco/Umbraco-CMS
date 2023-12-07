@@ -9,15 +9,15 @@ import type { CreateMediaTypePropertyTypeContainerRequestModel } from './CreateM
 import type { CreateMediaTypePropertyTypeRequestModel } from './CreateMediaTypePropertyTypeRequestModel';
 
 export type CreateContentTypeForMediaTypeRequestModel = {
-    alias?: string;
-    name?: string;
+    alias: string;
+    name: string;
     description?: string | null;
-    icon?: string;
+    icon: string;
     allowedAsRoot?: boolean;
     variesByCulture?: boolean;
     variesBySegment?: boolean;
     isElement?: boolean;
-    properties?: Array<CreateMediaTypePropertyTypeRequestModel>;
+    properties: Array<CreateMediaTypePropertyTypeRequestModel>;
     containers?: Array<CreateMediaTypePropertyTypeContainerRequestModel>;
     allowedContentTypes?: Array<ContentTypeSortModel>;
     compositions?: Array<ContentTypeCompositionModel>;

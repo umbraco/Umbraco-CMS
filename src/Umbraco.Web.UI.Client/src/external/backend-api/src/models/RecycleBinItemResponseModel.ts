@@ -5,9 +5,9 @@
 
 export type RecycleBinItemResponseModel = {
     id?: string;
-    name?: string;
-    type?: string;
-    icon?: string;
+    name: string;
+    type: string;
+    icon: string;
     hasChildren?: boolean;
     isContainer?: boolean;
     parentId?: string | null;

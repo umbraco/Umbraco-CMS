@@ -6,12 +6,12 @@
 export type DatabaseSettingsPresentationModel = {
     id?: string;
     sortOrder?: number;
-    displayName?: string;
-    defaultDatabaseName?: string;
-    providerName?: string;
+    displayName: string;
+    defaultDatabaseName: string;
+    providerName: string;
     isConfigured?: boolean;
     requiresServer?: boolean;
-    serverPlaceholder?: string;
+    serverPlaceholder: string;
     requiresCredentials?: boolean;
     supportsIntegratedAuthentication?: boolean;
     requiresConnectionTest?: boolean;
