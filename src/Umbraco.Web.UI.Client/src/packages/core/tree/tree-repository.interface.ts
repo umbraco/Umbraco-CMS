@@ -22,7 +22,7 @@ export interface UmbTreeRepository<
 	treeItemsOf: (parentUnique: string | null) => Promise<Observable<TreeItemType[]>>;
 
 	/* TODO: remove this. It is not used client side.
-	Logic to call the root endpoint should be in the data source 
+	Logic to call the root endpoint should be in the data source
 	because it is a server decision to split them
 	*/
 	requestRootTreeItems: () => Promise<{

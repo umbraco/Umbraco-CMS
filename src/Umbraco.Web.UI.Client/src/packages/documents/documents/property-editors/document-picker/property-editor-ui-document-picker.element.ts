@@ -5,10 +5,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
 @customElement('umb-property-editor-ui-document-picker')
-export class UmbPropertyEditorUIContentPickerElement
-	extends UmbLitElement
-	implements UmbPropertyEditorUiElement
-{
+export class UmbPropertyEditorUIContentPickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	private _value: Array<string> = [];
 
 	@property({ type: Array })

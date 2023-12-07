@@ -102,7 +102,8 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 	}
 
 	#renderDashboards() {
-		return this._dashboards.length > 0
+		// Only show dashboards if there are more than one dashboard or if there are both dashboards and views
+		return (this._dashboards.length > 0 && this._views.length > 0) || this._dashboards.length > 1
 			? html`
 					<uui-tab-group slot="header" id="dashboards">
 						${this._dashboards.map((dashboard) => {
@@ -121,7 +122,8 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 	}
 
 	#renderViews() {
-		return this._views.length > 0
+		// Only show views if there are more than one view or if there are both dashboards and views
+		return (this._views.length > 0 && this._dashboards.length > 0) || this._views.length > 1
 			? html`
 					<uui-tab-group slot="navigation" id="views">
 						${this._views.map((view) => {

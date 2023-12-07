@@ -10,7 +10,10 @@ import { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-re
  * @element umb-property-editor-ui-tiny-mce-stylesheets-configuration
  */
 @customElement('umb-property-editor-ui-tiny-mce-stylesheets-configuration')
-export class UmbPropertyEditorUITinyMceStylesheetsConfigurationElement extends UmbLitElement implements UmbPropertyEditorUiElement {
+export class UmbPropertyEditorUITinyMceStylesheetsConfigurationElement
+	extends UmbLitElement
+	implements UmbPropertyEditorUiElement
+{
 	@property({ type: Array })
 	value: string[] = [];
 

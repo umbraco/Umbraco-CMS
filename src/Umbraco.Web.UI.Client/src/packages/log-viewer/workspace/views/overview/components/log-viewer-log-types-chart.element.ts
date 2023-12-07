@@ -74,7 +74,7 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 														style="color: var(--umb-log-viewer-${level.toLowerCase()}-color);"></uui-icon
 													>${level}
 												</button>
-											</li>`
+											</li>`,
 								  )
 								: ''}
 						</ul>
@@ -87,7 +87,7 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 											.name=${level}
 											.amount=${number}
 											.kind=${'messages'}
-											.color="${`var(--umb-log-viewer-${level.toLowerCase()}-color)`}"></umb-donut-slice> `
+											.color="${`var(--umb-log-viewer-${level.toLowerCase()}-color)`}"></umb-donut-slice> `,
 							  )
 							: ''}
 					</umb-donut-chart>

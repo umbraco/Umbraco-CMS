@@ -1,5 +1,4 @@
-import '../../components/dictionary-item-input/dictionary-item-input.element.js';
-import UmbDictionaryItemInputElement from '../../components/dictionary-item-input/dictionary-item-input.element.js';
+import { UMB_DICTIONARY_TREE_ALIAS } from '../../tree/manifests.js';
 import { UmbDictionaryRepository } from '../../repository/dictionary.repository.js';
 import { css, html, customElement, query, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -8,11 +7,13 @@ import {
 	UmbImportDictionaryModalValue,
 	UmbModalBaseElement,
 } from '@umbraco-cms/backoffice/modal';
-import { ImportDictionaryRequestModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbId } from '@umbraco-cms/backoffice/id';
+import { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbTreeElement } from '@umbraco-cms/backoffice/tree';
 
 interface DictionaryItemPreview {
 	name: string;
+	id: string;
 	children: Array<DictionaryItemPreview>;
 }
 
@@ -25,32 +26,65 @@ export class UmbImportDictionaryModalLayout extends UmbModalBaseElement<
 	private _parentId?: string;
 
 	@state()
-	private _temporaryFileId?: string;
+	private _temporaryFileId = '';
 
 	@query('#form')
 	private _form!: HTMLFormElement;
 
+	@query('umb-tree')
+	private _treeElement?: UmbTreeElement;
+
 	#fileReader;
 
+	#fileNodes!: NodeListOf<ChildNode>;
+
 	#fileContent: Array<DictionaryItemPreview> = [];
+
+	#dictionaryRepository: UmbDictionaryRepository;
 
 	#handleClose() {
 		this.modalContext?.reject();
 	}
 
-	#submit() {
-		// TODO: Gotta do a temp file upload before submitting, so that the server can use it
-		console.log('submit:', this._temporaryFileId, this._parentId);
-		//this.modalContext?.submit({ temporaryFileId: this._temporaryFileId, parentId: this._parentId });
+	#createTreeEntitiesFromTempFile(): Array<EntityTreeItemResponseModel> {
+		const data: Array<EntityTreeItemResponseModel> = [];
+
+		const list = this.#dictionaryPreviewItemBuilder(this.#fileNodes);
+		const scaffold = (items: Array<DictionaryItemPreview>, parentId?: string) => {
+			items.forEach((item) => {
+				data.push({
+					id: item.id,
+					name: item.name,
+					type: 'dictionary-item',
+					hasChildren: item.children.length ? true : false,
+					parentId: parentId,
+				});
+				scaffold(item.children, item.id);
+			});
+		};
+
+		scaffold(list, this._parentId);
+		return data;
+	}
+
+	async #submit() {
+		const { error } = await this.#dictionaryRepository.import(this._temporaryFileId, this._parentId);
+		if (error) return;
+
+		this.value = { entityItems: this.#createTreeEntitiesFromTempFile(), parentId: this._parentId };
+		this.modalContext?.submit();
 	}
 
 	constructor() {
 		super();
+		this.#dictionaryRepository = new UmbDictionaryRepository(this);
+
 		this.#fileReader = new FileReader();
+
 		this.#fileReader.onload = (e) => {
 			if (typeof e.target?.result === 'string') {
 				const fileContent = e.target.result;
-				this.#dictionaryItemBuilder(fileContent);
+				this.#dictionaryPreviewBuilder(fileContent);
 			}
 		};
 	}
@@ -60,16 +94,17 @@ export class UmbImportDictionaryModalLayout extends UmbModalBaseElement<
 		this._parentId = this.data?.unique ?? undefined;
 	}
 
-	#dictionaryItemBuilder(htmlString: string) {
+	#dictionaryPreviewBuilder(htmlString: string) {
 		const parser = new DOMParser();
 		const doc = parser.parseFromString(htmlString, 'text/xml');
 		const elements = doc.childNodes;
+		this.#fileNodes = elements;
 
-		this.#fileContent = this.#makeDictionaryItems(elements);
+		this.#fileContent = this.#dictionaryPreviewItemBuilder(elements);
 		this.requestUpdate();
 	}
 
-	#makeDictionaryItems(nodeList: NodeListOf<ChildNode>): Array<DictionaryItemPreview> {
+	#dictionaryPreviewItemBuilder(nodeList: NodeListOf<ChildNode>): Array<DictionaryItemPreview> {
 		const items: Array<DictionaryItemPreview> = [];
 		const list: Array<Element> = [];
 		nodeList.forEach((node) => {
@@ -81,25 +116,29 @@ export class UmbImportDictionaryModalLayout extends UmbModalBaseElement<
 		list.forEach((item) => {
 			items.push({
 				name: item.getAttribute('Name') ?? '',
-				children: this.#makeDictionaryItems(item.childNodes) ?? undefined,
+				id: item.getAttribute('Key') ?? '',
+				children: this.#dictionaryPreviewItemBuilder(item.childNodes) ?? undefined,
 			});
 		});
 
 		return items;
 	}
 
-	#onUpload(e: Event) {
+	async #onUpload(e: Event) {
 		e.preventDefault();
 		const formData = new FormData(this._form);
-		const file = formData.get('file') as Blob;
+		const file = formData.get('file') as File;
+
+		if (!file) throw new Error('File is missing');
 
 		this.#fileReader.readAsText(file);
-		this._temporaryFileId = file ? UmbId.new() : undefined;
+		this._temporaryFileId = UmbId.new();
+
+		this.#dictionaryRepository.upload(this._temporaryFileId, file);
 	}
 
-	#onParentChange(event: CustomEvent) {
-		this._parentId = (event.target as UmbDictionaryItemInputElement).selectedIds[0] || undefined;
-		//console.log((event.target as UmbDictionaryItemInputElement).selectedIds[0] || undefined);
+	#onParentChange() {
+		this._parentId = this._treeElement?.selection[0] ?? undefined;
 	}
 
 	async #onFileInput() {
@@ -145,16 +184,15 @@ export class UmbImportDictionaryModalLayout extends UmbModalBaseElement<
 				</div>
 				<div>
 					<strong><umb-localize key="actions_chooseWhereToImport">Choose where to import</umb-localize>:</strong>
-					Work in progress<br />
-					${
-						this._parentId
-						// TODO
-						// <umb-dictionary-item-input
-						//	@change=${this.#onParentChange}
-						//	.selectedIds=${this._parentId ? [this._parentId] : []}
-						//	max="1">
-						//	</umb-dictionary-item-input>
-					}
+					<br />parentId:
+
+					<umb-tree
+						?hide-tree-root=${true}
+						?multiple=${false}
+						alias=${UMB_DICTIONARY_TREE_ALIAS}
+						@selection-change=${this.#onParentChange}
+						.selection=${[this._parentId ?? '']}
+						selectable></umb-tree>
 				</div>
 
 				${this.#renderNavigate()}

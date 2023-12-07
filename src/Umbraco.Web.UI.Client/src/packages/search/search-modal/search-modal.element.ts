@@ -1,4 +1,4 @@
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import {
 	css,
 	html,
@@ -97,7 +97,7 @@ export class UmbSearchModalElement extends LitElement {
 							? repeat(
 									this._groups,
 									(group) => group.name,
-									(group) => this.#renderGroup(group.name, group.items)
+									(group) => this.#renderGroup(group.name, group.items),
 							  )
 							: html`<div id="no-results">Only mock data for now <strong>Search for blog</strong></div>`}
 				  </div>`

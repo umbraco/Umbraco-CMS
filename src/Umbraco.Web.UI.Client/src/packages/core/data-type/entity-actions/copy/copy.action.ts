@@ -24,7 +24,8 @@ export class UmbCopyDataTypeEntityAction extends UmbEntityActionBase<UmbCopyData
 		if (!this.repository) throw new Error('Repository is not available');
 
 		const modalContext = this.#modalManagerContext?.open(UMB_DATA_TYPE_PICKER_MODAL);
-		const { selection } = await modalContext.onSubmit();
-		await this.repository.copy(this.unique, selection[0]);
+		const value = await modalContext.onSubmit();
+		if (!value) return;
+		await this.repository.copy(this.unique, value.selection[0]);
 	}
 }

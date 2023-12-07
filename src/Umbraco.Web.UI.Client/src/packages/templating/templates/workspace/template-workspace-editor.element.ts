@@ -6,7 +6,7 @@ import { UMB_TEMPLATE_WORKSPACE_CONTEXT } from './template-workspace.context.js'
 import type { UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
 import { camelCase } from '@umbraco-cms/backoffice/external/lodash';
 import { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
-import { css, html, customElement, query, state, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, query, state, nothing, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import {
 	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
 	UMB_TEMPLATE_PICKER_MODAL,
@@ -112,7 +112,9 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 	#openInsertSectionModal() {
 		const sectionModal = this._modalContext?.open(UMB_MODAL_TEMPLATING_INSERT_SECTION_MODAL);
 		sectionModal?.onSubmit().then((insertSectionModalValue) => {
-			if (insertSectionModalValue.value) this._codeEditor?.insert(insertSectionModalValue.value);
+			if (insertSectionModalValue?.value) {
+				this._codeEditor?.insert(insertSectionModalValue.value);
+			}
 		});
 	}
 
@@ -122,15 +124,19 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 
 	#openMasterTemplatePicker() {
 		const modalContext = this._modalContext?.open(UMB_TEMPLATE_PICKER_MODAL, {
-			selection: [this.#masterTemplateId],
-			pickableFilter: (item) => {
-				return item.id !== null && item.id !== this.#templateWorkspaceContext?.getEntityId();
+			data: {
+				pickableFilter: (item) => {
+					return item.id !== null && item.id !== this.#templateWorkspaceContext?.getEntityId();
+				},
+			},
+			value: {
+				selection: [this.#masterTemplateId],
 			},
 		});
 
-		modalContext?.onSubmit().then((data) => {
-			if (!data.selection) return;
-			this.#templateWorkspaceContext?.setMasterTemplate(data.selection[0] ?? '');
+		modalContext?.onSubmit().then((value) => {
+			if (!value?.selection) return;
+			this.#templateWorkspaceContext?.setMasterTemplate(value.selection[0] ?? '');
 		});
 	}
 
@@ -138,7 +144,9 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 		const queryBuilderModal = this._modalContext?.open(UMB_TEMPLATE_QUERY_BUILDER_MODAL);
 
 		queryBuilderModal?.onSubmit().then((queryBuilderModalValue) => {
-			if (queryBuilderModalValue.value) this._codeEditor?.insert(getQuerySnippet(queryBuilderModalValue.value));
+			if (queryBuilderModalValue?.value) {
+				this._codeEditor?.insert(getQuerySnippet(queryBuilderModalValue.value));
+			}
 		});
 	}
 
@@ -179,12 +187,10 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 				slot="header"
 				.value=${this._name}
 				@input=${this.#onNameInput}
-				label="template name"
-				><umb-template-alias-input
-					slot="append"
-					.value=${this._alias ?? ''}
-					@change=${this.#onAliasInput}></umb-template-alias-input
-			></uui-input>
+				label="template name">
+				<uui-input-lock slot="append" value=${ifDefined(this._alias!)} @change=${this.#onAliasInput}></uui-input-lock>
+			</uui-input>
+
 			<uui-box>
 				<div slot="header" id="code-editor-menu-container">
 					${this.#renderMasterTemplatePicker()}

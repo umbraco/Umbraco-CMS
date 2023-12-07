@@ -1,5 +1,5 @@
 import { css, html, LitElement, customElement } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 /**
  * @element umb-footer-layout

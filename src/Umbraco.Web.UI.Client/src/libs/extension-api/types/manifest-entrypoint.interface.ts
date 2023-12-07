@@ -1,5 +1,5 @@
-import type { UmbEntryPointModule } from "../models/index.js";
-import type { ManifestPlainJs } from "./base.types.js";
+import type { UmbEntryPointModule } from '../models/index.js';
+import type { ManifestPlainJs } from './base.types.js';
 
 /**
  * This type of extension gives full control and will simply load the specified JS file

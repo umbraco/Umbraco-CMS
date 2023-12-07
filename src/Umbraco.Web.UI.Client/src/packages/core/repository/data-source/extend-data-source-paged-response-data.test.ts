@@ -27,8 +27,12 @@ describe('extendDataSourcePagedResponseData', () => {
 			const extendedResponse = extendDataSourcePagedResponseData(response, { foo: 'bar' });
 
 			expect(extendedResponse.data).that.is.a('object');
-			expect(extendedResponse.data?.items[1]).to.have.property('original').to.be.equal('prop');
-			expect(extendedResponse.data?.items[1]).to.have.property('foo').to.be.equal('bar');
+			expect(extendedResponse.data?.items[1])
+				.to.have.property('original')
+				.to.be.equal('prop');
+			expect(extendedResponse.data?.items[1])
+				.to.have.property('foo')
+				.to.be.equal('bar');
 		});
 	});
 });

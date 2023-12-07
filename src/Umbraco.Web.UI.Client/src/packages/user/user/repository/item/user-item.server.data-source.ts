@@ -1,5 +1,5 @@
 import type { UmbItemDataSource } from '@umbraco-cms/backoffice/repository';
-import type { UmbControllerHost} from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { UserItemResponseModel, UserResource } from '@umbraco-cms/backoffice/backend-api';
 
@@ -34,7 +34,7 @@ export class UmbUserItemServerDataSource implements UmbItemDataSource<UserItemRe
 			this.#host,
 			UserResource.getUserItem({
 				id: ids,
-			})
+			}),
 		);
 	}
 }

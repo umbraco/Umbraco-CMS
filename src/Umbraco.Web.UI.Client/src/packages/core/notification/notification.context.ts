@@ -1,6 +1,8 @@
 import { UmbNotificationHandler } from './notification-handler.js';
-import { BehaviorSubject } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
+import { UmbBasicState } from '@umbraco-cms/backoffice/observable-api';
 
 /**
  * The default data of notifications
@@ -26,10 +28,14 @@ export interface UmbNotificationOptions<UmbNotificationData = UmbNotificationDef
 
 export type UmbNotificationColor = '' | 'default' | 'positive' | 'warning' | 'danger';
 
-export class UmbNotificationContext {
+export class UmbNotificationContext extends UmbContextBase<UmbNotificationContext> {
 	// Notice this cannot use UniqueBehaviorSubject as it holds a HTML Element. which cannot be Serialized to JSON (it has some circular references)
-	private _notifications = new BehaviorSubject(<Array<UmbNotificationHandler>>[]);
+	private _notifications = new UmbBasicState(<Array<UmbNotificationHandler>>[]);
 	public readonly notifications = this._notifications.asObservable();
+
+	constructor(host: UmbControllerHost) {
+		super(host, UMB_NOTIFICATION_CONTEXT_TOKEN);
+	}
 
 	/**
 	 * @private

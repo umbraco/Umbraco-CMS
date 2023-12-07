@@ -28,10 +28,12 @@ export class UmbDeleteEntityAction<
 		//const { data } = await this.repository.requestItems([this.unique]);
 
 		const modalContext = this.#modalManager.open(UMB_CONFIRM_MODAL, {
-			headline: `Delete`,
-			content: 'Are you sure you want to delete this item?',
-			color: 'danger',
-			confirmLabel: 'Delete',
+			data: {
+				headline: `Delete`,
+				content: 'Are you sure you want to delete this item?',
+				color: 'danger',
+				confirmLabel: 'Delete',
+			},
 		});
 
 		await modalContext.onSubmit();

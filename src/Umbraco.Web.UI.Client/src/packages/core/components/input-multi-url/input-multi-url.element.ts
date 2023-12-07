@@ -74,7 +74,7 @@ export class UmbInputMultiUrlElement extends FormControlMixin(UmbLitElement) {
 	@property({ type: Boolean, attribute: 'hide-anchor' })
 	hideAnchor?: boolean;
 
-	@property()
+	@property({ type: Boolean, attribute: 'ignore-user-start-nodes' })
 	ignoreUserStartNodes?: boolean;
 
 	/**
@@ -112,12 +112,12 @@ export class UmbInputMultiUrlElement extends FormControlMixin(UmbLitElement) {
 		this.addValidator(
 			'rangeUnderflow',
 			() => this.minMessage,
-			() => !!this.min && this.urls.length < this.min
+			() => !!this.min && this.urls.length < this.min,
 		);
 		this.addValidator(
 			'rangeOverflow',
 			() => this.maxMessage,
-			() => !!this.max && this.urls.length > this.max
+			() => !!this.max && this.urls.length > this.max,
 		);
 
 		this.myModalRegistration = new UmbModalRouteRegistrationController(this, UMB_LINK_PICKER_MODAL)
@@ -140,26 +140,30 @@ export class UmbInputMultiUrlElement extends FormControlMixin(UmbLitElement) {
 				}
 
 				return {
-					index: index,
-					link: {
-						name: data?.name,
-						published: data?.published,
-						queryString: data?.queryString,
-						target: data?.target,
-						trashed: data?.trashed,
-						udi: data?.udi,
-						url: data?.url,
+					data: {
+						index: index,
+						config: {
+							hideAnchor: this.hideAnchor,
+							ignoreUserStartNodes: this.ignoreUserStartNodes,
+							overlaySize: this.overlaySize || 'small',
+						},
 					},
-					config: {
-						hideAnchor: this.hideAnchor,
-						ignoreUserStartNodes: this.ignoreUserStartNodes,
-						overlaySize: this.overlaySize || 'small',
+					value: {
+						link: {
+							name: data?.name,
+							published: data?.published,
+							queryString: data?.queryString,
+							target: data?.target,
+							trashed: data?.trashed,
+							udi: data?.udi,
+							url: data?.url,
+						},
 					},
 				};
 			})
-			.onSubmit((submitData) => {
-				if (!submitData) return;
-				this._setSelection(submitData.link, submitData.index);
+			.onSubmit((value) => {
+				if (!value) return;
+				this._setSelection(value.link, this.myModalRegistration.modalContext?.data.index ?? null);
 			})
 			.observeRouteBuilder((routeBuilder) => {
 				this._modalRoute = routeBuilder;

@@ -17,7 +17,8 @@ export class UmbCodeEditorModalElement extends UmbModalBaseElement<UmbCodeEditor
 	}
 
 	#handleConfirm() {
-		this.modalContext?.submit({ content: this._codeEditor?.editor?.monacoEditor?.getValue() ?? '' });
+		this.value = { content: this._codeEditor?.editor?.monacoEditor?.getValue() ?? '' };
+		this.modalContext?.submit();
 	}
 
 	#handleCancel() {

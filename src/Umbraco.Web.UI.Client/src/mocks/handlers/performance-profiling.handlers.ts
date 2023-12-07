@@ -8,14 +8,14 @@ export const handlers = [
 		return res(
 			// Respond with a 200 status code
 			ctx.status(200),
-			ctx.json<ProfilingStatusResponseModel>({ enabled: true })
+			ctx.json<ProfilingStatusResponseModel>({ enabled: true }),
 		);
 	}),
 
 	rest.put(umbracoPath('/profiling/status'), (_req, res, ctx) => {
 		return res(
 			// Respond with a 200 status code
-			ctx.status(200)
+			ctx.status(200),
 		);
 	}),
 ];

@@ -8,21 +8,21 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
  * When the extension is permitted to be used, the manifest is available for the consumer.
  *
  * @example
-* ```ts
-* const controller = new UmbExtensionManifestController(host, extensionRegistry, alias, (permitted, ctrl) => { console.log("Extension is permitted and this is the manifest: ", ctrl.manifest) }));
-* ```
+ * ```ts
+ * const controller = new UmbExtensionManifestController(host, extensionRegistry, alias, (permitted, ctrl) => { console.log("Extension is permitted and this is the manifest: ", ctrl.manifest) }));
+ * ```
  * @export
  * @class UmbExtensionManifestController
  */
 export class UmbExtensionManifestInitializer<
 	ManifestType extends ManifestWithDynamicConditions = ManifestWithDynamicConditions,
-	ControllerType extends UmbBaseExtensionInitializer<ManifestType, any> = any
+	ControllerType extends UmbBaseExtensionInitializer<ManifestType, any> = any,
 > extends UmbBaseExtensionInitializer<ManifestType, ControllerType> {
 	constructor(
 		host: UmbControllerHost,
 		extensionRegistry: UmbExtensionRegistry<ManifestCondition>,
 		alias: string,
-		onPermissionChanged: (isPermitted: boolean, controller: ControllerType) => void
+		onPermissionChanged: (isPermitted: boolean, controller: ControllerType) => void,
 	) {
 		super(host, extensionRegistry, 'extManifest_', alias, onPermissionChanged);
 		this._init();

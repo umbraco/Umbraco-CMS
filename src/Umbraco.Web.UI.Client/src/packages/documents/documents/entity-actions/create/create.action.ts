@@ -27,7 +27,9 @@ export class UmbCreateDocumentEntityAction extends UmbEntityActionBase<UmbDocume
 		// TODO: what to do if modal service is not available?
 		if (!this.#modalContext) return;
 		const modalContext = this.#modalContext.open(UMB_CREATE_DOCUMENT_MODAL, {
-			id,
+			data: {
+				id,
+			},
 		});
 
 		const { documentTypeId: documentTypeKey } = await modalContext.onSubmit();

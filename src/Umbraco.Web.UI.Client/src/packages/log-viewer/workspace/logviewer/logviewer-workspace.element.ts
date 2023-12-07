@@ -2,7 +2,7 @@
 import '../../components/index.js';
 import { UmbLogViewerWorkspaceContext } from '../logviewer.context.js';
 import { PropertyValueMap, css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 //TODO make uui-input accept min and max values

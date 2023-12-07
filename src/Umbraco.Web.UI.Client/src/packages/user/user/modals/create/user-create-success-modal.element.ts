@@ -83,18 +83,9 @@ export class UmbUserCreateSuccessModalElement extends UmbModalBaseElement<
 			</uui-form-layout-item>
 
 			<uui-button @click=${this.#onCloseModal} slot="actions" label="Close" look="secondary"></uui-button>
-			<uui-button
-				@click=${this.#onCreateAnotherUser}
-				slot="actions"
-				label="Create another user"
-				look="secondary">
+			<uui-button @click=${this.#onCreateAnotherUser} slot="actions" label="Create another user" look="secondary">
 			</uui-button>
-			<uui-button
-				@click=${this.#onGoToProfile}
-				slot="actions"
-				label="Go to profile"
-				look="primary"
-				color="positive">
+			<uui-button @click=${this.#onGoToProfile} slot="actions" label="Go to profile" look="primary" color="positive">
 			</uui-button>
 		</uui-dialog-layout>`;
 	}

@@ -4,3 +4,4 @@ import './localize-number.element.js';
 import './localize-relative-time.element.js';
 
 export * from './registry/localization.registry.js';
+export { UmbUiCultureInputElement } from './components/index.js';

@@ -6,11 +6,16 @@ export interface UmbWorkspaceData {
 	preset: Partial<CreateDataTypeRequestModel>;
 }
 
-export type UmbWorkspaceResult = {
-	id: string;
-};
+// TODO: It would be good with a WorkspaceValueBaseType, to avoid the  hardcoded type for unique here:
+export type UmbWorkspaceValue =
+	| {
+			unique: string;
+	  }
+	| undefined;
 
-export const UMB_WORKSPACE_MODAL = new UmbModalToken<UmbWorkspaceData, UmbWorkspaceResult>('Umb.Modal.Workspace', {
-	type: 'sidebar',
-	size: 'large',
+export const UMB_WORKSPACE_MODAL = new UmbModalToken<UmbWorkspaceData, UmbWorkspaceValue>('Umb.Modal.Workspace', {
+	modal: {
+		type: 'sidebar',
+		size: 'large',
+	},
 });

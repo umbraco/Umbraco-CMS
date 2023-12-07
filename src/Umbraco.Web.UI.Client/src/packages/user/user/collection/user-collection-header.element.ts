@@ -156,7 +156,7 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 			<uui-button popovertarget="popover-user-status-filter" label="status">
 				<umb-localize key="general_status"></umb-localize>: <b>${this.#getStatusFilterLabel()}</b>
 			</uui-button>
-			<uui-popover-container id="popover-user-status-filter" popover placement="bottom">
+			<uui-popover-container id="popover-user-status-filter" placement="bottom">
 				<umb-popover-layout>
 					<div class="filter-dropdown">
 						${this._stateFilterOptions.map(
@@ -178,7 +178,7 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 			<uui-button popovertarget="popover-user-group-filter" label=${this.localize.term('general_groups')}>
 				<umb-localize key="general_groups"></umb-localize>: <b>${this.#getUserGroupFilterLabel()}</b>
 			</uui-button>
-			<uui-popover-container id="popover-user-group-filter" popover placement="bottom">
+			<uui-popover-container id="popover-user-group-filter" placement="bottom">
 				<umb-popover-layout>
 					<div class="filter-dropdown">
 						${repeat(

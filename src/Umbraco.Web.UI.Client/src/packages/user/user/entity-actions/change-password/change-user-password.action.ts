@@ -22,7 +22,9 @@ export class UmbChangeUserPasswordEntityAction extends UmbEntityActionBase<UmbCh
 		if (!this.repository || !this.#modalManager) return;
 
 		const modalContext = this.#modalManager.open(UMB_CHANGE_PASSWORD_MODAL, {
-			userId: this.unique,
+			data: {
+				userId: this.unique,
+			},
 		});
 
 		const data = await modalContext.onSubmit();

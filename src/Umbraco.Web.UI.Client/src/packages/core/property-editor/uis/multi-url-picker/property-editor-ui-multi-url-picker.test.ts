@@ -6,9 +6,9 @@ describe('UmbPropertyEditorUIMultiUrlPickerElement', () => {
 	let element: UmbPropertyEditorUIMultiUrlPickerElement;
 
 	beforeEach(async () => {
-		element = await fixture(
-			html` <umb-property-editor-ui-multi-url-picker></umb-property-editor-ui-multi-url-picker> `
-		);
+		element = await fixture(html`
+			<umb-property-editor-ui-multi-url-picker></umb-property-editor-ui-multi-url-picker>
+		`);
 	});
 
 	it('is defined with its own instance', () => {

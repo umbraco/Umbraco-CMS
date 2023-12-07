@@ -22,6 +22,9 @@ export interface UmbFileSystemTreeItemModel extends UmbTreeItemModel {
 }
 
 // Root
+export interface UmbUniqueTreeRootModel extends UmbTreeItemModelBase {
+	unique: null;
+}
 export interface UmbEntityTreeRootModel extends UmbTreeItemModelBase {
 	id: null;
 }

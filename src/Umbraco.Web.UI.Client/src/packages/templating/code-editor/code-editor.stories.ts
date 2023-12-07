@@ -221,7 +221,7 @@ const [Javascript, Css, Html, Razor, Markdown, Typescript, Json]: Story[] = Obje
 				code: codeSnippets[language as CodeEditorLanguage],
 			},
 		};
-	}
+	},
 );
 
 const Themes: Story = {

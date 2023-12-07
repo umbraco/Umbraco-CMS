@@ -112,14 +112,18 @@ export class UmbInputTemplateElement extends FormControlMixin(UmbLitElement) {
 	#openPicker() {
 		// TODO: Change experience, so its not multi selectable. But instead already picked templates should be unpickable. (awaiting general picker features for such)
 		const modalContext = this._modalContext?.open(UMB_TEMPLATE_PICKER_MODAL, {
-			multiple: true,
-			selection: [...this._selectedIds],
-			pickableFilter: (template: TemplateResponseModel) => template.id !== null,
+			data: {
+				multiple: true,
+				pickableFilter: (template: TemplateResponseModel) => template.id !== null,
+			},
+			value: {
+				selection: [...this._selectedIds],
+			},
 		});
 
-		modalContext?.onSubmit().then((data) => {
-			if (!data.selection) return;
-			this.selectedIds = data.selection.filter((x) => x !== null) as Array<string>;
+		modalContext?.onSubmit().then((value) => {
+			if (!value?.selection) return;
+			this.selectedIds = value.selection.filter((x) => x !== null) as Array<string>;
 			this.dispatchEvent(new CustomEvent('change'));
 		});
 	}
@@ -141,8 +145,10 @@ export class UmbInputTemplateElement extends FormControlMixin(UmbLitElement) {
 		const id = (e.target as UmbTemplateCardElement).value;
 
 		this._modalContext?.open(UMB_TEMPLATE_MODAL, {
-			id: id as string,
-			language: 'razor',
+			data: {
+				id: id as string,
+				language: 'razor',
+			},
 		});
 	}
 

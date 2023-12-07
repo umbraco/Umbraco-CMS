@@ -13,7 +13,9 @@ export type UmbConfirmModalValue = undefined;
 export const UMB_PARTIAL_VIEW_FROM_SNIPPET_MODAL = new UmbModalToken<UmbCreateFromSnippetPartialViewModalData, string>(
 	'Umb.Modal.CreateFromSnippetPartialView',
 	{
-		type: 'sidebar',
+		modal: {
+			type: 'sidebar',
+		},
 	},
 );
 
@@ -34,7 +36,9 @@ export class UmbCreateFromSnippetPartialViewAction<
 		const snippets = (await this.repository?.getSnippets({}))?.data?.items ?? [];
 
 		const modalContext = this.#modalContext?.open(UMB_PARTIAL_VIEW_FROM_SNIPPET_MODAL, {
-			snippets,
+			data: {
+				snippets,
+			},
 		});
 
 		await modalContext?.onSubmit().then((snippetName) => {

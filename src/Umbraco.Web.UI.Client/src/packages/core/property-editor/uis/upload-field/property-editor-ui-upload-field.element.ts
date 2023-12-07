@@ -1,6 +1,6 @@
 import { UmbInputUploadFieldElement } from '../../../components/input-upload-field/input-upload-field.element.js';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
@@ -34,7 +34,8 @@ export class UmbPropertyEditorUIUploadFieldElement extends UmbLitElement impleme
 		return html`<umb-input-upload-field
 			@change="${this._onChange}"
 			?multiple="${this._multiple}"
-			.fileExtensions="${this._fileExtensions}"></umb-input-upload-field>`;
+			.fileExtensions="${this._fileExtensions}"
+			.keys=${(this.value as string)?.split(',') ?? []}></umb-input-upload-field>`;
 	}
 
 	static styles = [UmbTextStyles];
