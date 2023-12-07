@@ -6,21 +6,21 @@ import {BlockListDataTypeBuilder} from "@umbraco/json-models-builders/dist/lib/b
 test.describe('BlockListEditorDataType', () => {
   const blockListName = 'BlockListTest';
   const elementName = 'TestElement';
-  
+
   const elementAlias = AliasHelper.toAlias(elementName);
-  
+
   test.beforeEach(async ({page, umbracoApi, umbracoUi}, testInfo) => {
     await umbracoApi.report.report(testInfo);
     await umbracoApi.login();
     await umbracoApi.dataTypes.ensureNameNotExists(blockListName);
     await umbracoApi.documentTypes.ensureNameNotExists(elementName);
   });
-  
+
   test.afterEach(async({page, umbracoApi, umbracoUi}) => {
     await umbracoApi.dataTypes.ensureNameNotExists(blockListName);
     await umbracoApi.documentTypes.ensureNameNotExists(elementName);
   })
-  
+
   test('can create an empty block list datatype', async ({page, umbracoApi, umbracoUi}) => {
     await umbracoUi.goToSection(ConstantHelper.sections.settings);
 
@@ -52,7 +52,7 @@ test.describe('BlockListEditorDataType', () => {
     await umbracoUi.navigateToDataType(blockListName);
 
     // Adds an element to the block list
-    await umbracoUi.clickElement(umbracoUi.getButtonByKey(ConstantHelper.buttons.add));
+    await umbracoUi.clickElement(umbracoUi.getButtonByKey('blockEditor_addBlockType'));
     await page.locator('[data-element="editor-container"]').locator('[data-element="tree-item-' + elementName + '"]').click();
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.submitChanges));
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.save));
@@ -83,7 +83,7 @@ test.describe('BlockListEditorDataType', () => {
     await umbracoUi.navigateToDataType(blockListName);
 
     // Adds an element to the block list
-    await umbracoUi.clickElement(umbracoUi.getButtonByKey(ConstantHelper.buttons.add));
+    await umbracoUi.clickElement(umbracoUi.getButtonByKey('blockEditor_addBlockType'));
     await page.locator('[data-element="editor-container"]').locator('[data-element="tree-item-' + elementNameTwo + '"]').click();
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.submitChanges));
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.save));
@@ -138,7 +138,7 @@ test.describe('BlockListEditorDataType', () => {
     await umbracoUi.navigateToDataType(blockListName);
 
     // Tries adding the same element to the block list editor
-    await umbracoUi.clickElement(umbracoUi.getButtonByKey(ConstantHelper.buttons.add));
+    await umbracoUi.clickElement(umbracoUi.getButtonByKey('blockEditor_addBlockType'));
     await page.locator('[data-element="editor-container"]').locator('[data-element="tree-item-' + elementName + '"]').click();
 
     // Assert
@@ -147,12 +147,12 @@ test.describe('BlockListEditorDataType', () => {
     await expect(page.locator('[label-key="blockEditor_labelcreateNewElementType"]')).toBeVisible();
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.close));
     await expect(page.locator('[block-config-model="block"]')).toHaveCount(1);
-  });  
+  });
 
   test('can edit a block list editor', async ({page, umbracoApi, umbracoUi}, testInfo) => {
     // We need to increase the timeout because the test is taking too long to end
     await testInfo.slow()
-    
+
     const elementNameTwo = 'SecondElement';
     const elementTwoAlias = AliasHelper.toAlias(elementNameTwo);
     const stylesheetName = 'TestStyleSheet';
@@ -254,7 +254,7 @@ test.describe('BlockListEditorDataType', () => {
   test('can delete a block list editor', async ({page, umbracoApi, umbracoUi}) => {
     const elementNameTwo = 'SecondElement';
     const elementTwoAlias = AliasHelper.toAlias(elementNameTwo);
-    
+
     await umbracoApi.documentTypes.ensureNameNotExists(elementNameTwo);
 
     const element = await umbracoApi.documentTypes.createDefaultElementType(elementName, elementAlias);
