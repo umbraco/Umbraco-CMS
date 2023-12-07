@@ -1,4 +1,3 @@
-import { DataTypeTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbEntityTreeRootModel } from '@umbraco-cms/backoffice/tree';
 
 export type UmbDataTypeTreeItemModel = {
@@ -10,5 +9,6 @@ export type UmbDataTypeTreeItemModel = {
 	type: string;
 	hasChildren: boolean;
 };
+
 // TODO: TREE STORE TYPE PROBLEM:
-export interface UmbDataTypeTreeRootModel extends Omit<DataTypeTreeItemResponseModel, 'id'>, UmbEntityTreeRootModel {}
+export interface UmbDataTypeTreeRootModel extends UmbEntityTreeRootModel {}
