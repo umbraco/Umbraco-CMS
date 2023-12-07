@@ -55,6 +55,7 @@ const detailHandlers: RestHandler<MockedRequest<DefaultBodyType>>[] = [
 		const response = umbScriptsData.delete([path]);
 		return res(ctx.status(200), ctx.json(response));
 	}),
+
 	rest.put(umbracoPath('/script'), async (req, res, ctx) => {
 		const requestBody = (await req.json()) as CreateTextFileViewModelBaseModel;
 		if (!requestBody) return res(ctx.status(400, 'no body found'));
@@ -70,11 +71,13 @@ const folderHandlers: RestHandler<MockedRequest<DefaultBodyType>>[] = [
 		const response = umbScriptsData.getFolder(path);
 		return res(ctx.status(200), ctx.json(response));
 	}),
+
 	rest.post(umbracoPath('script/folder'), (req, res, ctx) => {
-		const requestBody = req.json() as CreatePathFolderRequestModel;
+		const requestBody = req.json();
 		if (!requestBody) return res(ctx.status(400, 'no body found'));
 		return res(ctx.status(200));
 	}),
+
 	rest.delete(umbracoPath('script/folder'), (req, res, ctx) => {
 		const path = decodeURIComponent(req.url.searchParams.get('path') ?? '').replace('-js', '.js');
 		if (!path) return res(ctx.status(400));
