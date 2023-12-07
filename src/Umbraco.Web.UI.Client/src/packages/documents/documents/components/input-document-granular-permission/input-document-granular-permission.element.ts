@@ -27,7 +27,7 @@ export class UmbInputDocumentGranularPermissionElement extends FormControlMixin(
 	@property()
 	public set value(idsString: string) {
 		if (idsString !== this._value) {
-			this.selectedIds = idsString.split(/[ ,]+/);
+			this.selectedIds = idsString !== '' ? idsString.split(/[ ,]+/) : [];
 		}
 	}
 
