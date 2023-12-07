@@ -5,7 +5,6 @@ using Umbraco.Cms.Api.Management.Controllers.MemberType.Items;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.MemberType.Items;
 
-[TestFixture]
 public class ItemMemberTypeItemControllerTests : ManagementApiUserGroupTestBase<ItemMemberTypeItemController>
 {
     protected override Expression<Func<ItemMemberTypeItemController, object>> MethodSelector =>
