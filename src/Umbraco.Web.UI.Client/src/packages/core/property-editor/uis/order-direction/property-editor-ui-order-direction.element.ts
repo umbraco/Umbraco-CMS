@@ -19,15 +19,15 @@ export class UmbPropertyEditorUIOrderDirectionElement extends UmbLitElement impl
 	@property({ attribute: false })
 	public config?: UmbPropertyEditorConfigCollection;
 
-	#onChange(e: UUIBooleanInputEvent) {
+	#onInput(e: UUIBooleanInputEvent) {
 		this.value = e.target.value;
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
 	render() {
-		return html`<uui-radio-group @input=${this.#onChange}>
-			<uui-radio name="order" label="Ascending [a-z]" ?checked=${this.value === 'asc'} value="asc"></uui-radio>
-			<uui-radio name="order" label="Descending [z-a]" ?checked=${this.value === 'desc'} value="desc"></uui-radio>
+		return html`<uui-radio-group @input=${this.#onInput} value=${this.value}>
+			<uui-radio name="order" label="Ascending [a-z]" value="asc"></uui-radio>
+			<uui-radio name="order" label="Descending [z-a]" value="desc"></uui-radio>
 		</uui-radio-group>`;
 	}
 
