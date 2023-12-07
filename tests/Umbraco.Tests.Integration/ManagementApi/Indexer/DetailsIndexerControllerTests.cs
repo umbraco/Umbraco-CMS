@@ -5,7 +5,6 @@ using Umbraco.Cms.Api.Management.Controllers.Indexer;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.Indexer;
 
-[TestFixture]
 public class DetailsIndexerControllerTests : ManagementApiUserGroupTestBase<DetailsIndexerController>
 {
     protected override Expression<Func<DetailsIndexerController, object>> MethodSelector =>

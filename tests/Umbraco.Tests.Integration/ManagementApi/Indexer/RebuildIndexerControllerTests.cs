@@ -5,7 +5,6 @@ using Umbraco.Cms.Api.Management.Controllers.Indexer;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.Indexer;
 
-[TestFixture]
 public class RebuildIndexerControllerTests : ManagementApiUserGroupTestBase<RebuildIndexerController>
 {
     protected override Expression<Func<RebuildIndexerController, object>> MethodSelector =>
