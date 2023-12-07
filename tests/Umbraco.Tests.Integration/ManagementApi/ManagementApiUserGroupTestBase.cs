@@ -7,7 +7,7 @@ using Umbraco.Cms.Core;
 namespace Umbraco.Cms.Tests.Integration.ManagementApi;
 
 [TestFixture]
-public class ManagementApiUserGroupTestBase<T> : ManagementApiTest<T> where T : ManagementApiControllerBase
+public abstract class ManagementApiUserGroupTestBase<T> : ManagementApiTest<T> where T : ManagementApiControllerBase
 {
     protected override Expression<Func<T, object>> MethodSelector { get; }
 
