@@ -87,6 +87,7 @@ export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataT
 	async create(dataType: UmbDataTypeDetailModel) {
 		if (!dataType) throw new Error('Data Type is missing');
 		if (!dataType.unique) throw new Error('Data Type unique is missing');
+		if (!dataType.propertyEditorAlias) throw new Error('Property Editor Alias is missing');
 
 		// map to server model
 		// TODO: make data mapper to prevent errors
@@ -122,6 +123,7 @@ export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataT
 	 */
 	async update(data: UmbDataTypeDetailModel) {
 		if (!data.unique) throw new Error('Unique is missing');
+		if (!data.propertyEditorAlias) throw new Error('Property Editor Alias is missing');
 
 		// TODO: make data mapper to prevent errors
 		const requestBody: DataTypeModelBaseModel = {
