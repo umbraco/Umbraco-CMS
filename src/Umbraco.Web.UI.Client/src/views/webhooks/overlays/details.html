@@ -46,6 +46,7 @@
 
         </umb-box>
 
+      <div ng-if="model.log.statusCode === 'OK (200)'">
         <umb-box>
           <umb-box-header title="Request"></umb-box-header>
           <umb-box-content class="block-form">
@@ -61,6 +62,18 @@
             <umb-code-snippet language="'TEXT'" wrap="true">{{vm.formatData(model.log.responseBody) | json}}</umb-code-snippet>
           </umb-box-content>
         </umb-box>
+      </div>
+      <div ng-if="model.log.statusCode !== 'OK (200)'">
+        <umb-box>
+          <umb-box-header title="Request failed"></umb-box-header>
+          <umb-box-content class="block-form">
+            <a href="/umbraco#/settings/logViewer/search?lq=WebhookKey%3D'{{model.log.webhookKey}}'">
+              The webhook request has failed, please look at the logs for a more detailed description of the error.
+            </a>
+          </umb-box-content>
+        </umb-box>
+      </div>
+
 
     </umb-editor-container>
 
