@@ -8,10 +8,25 @@ namespace Umbraco.Cms.Api.Management.Security.Authorization.Media;
 /// </summary>
 public class MediaPermissionResource : IPermissionResource
 {
+    /// <summary>
+    ///     Creates a MediaPermissionResource with the specified key.
+    /// </summary>
+    /// <param name="mediaKey">The key of the media or null if root.</param>
+    /// <returns>An instance of MediaPermissionResource.</returns>
     public static MediaPermissionResource WithKeys(Guid? mediaKey) => mediaKey is null ? Root() : WithKeys(mediaKey.Value.Yield());
 
+    /// <summary>
+    ///     Creates a MediaPermissionResource with the specified key.
+    /// </summary>
+    /// <param name="mediaKey">The key of the media.</param>
+    /// <returns>An instance of MediaPermissionResource.</returns>
     public static MediaPermissionResource WithKeys(Guid mediaKey) => WithKeys(mediaKey.Yield());
 
+    /// <summary>
+    ///     Creates a MediaPermissionResource with the specified Keys.
+    /// </summary>
+    /// <param name="mediaKeys">The keys of the medias or null if root.</param>
+    /// <returns>An instance of MediaPermissionResource.</returns>
     public static MediaPermissionResource WithKeys(IEnumerable<Guid?> mediaKeys)
     {
         bool hasRoot = mediaKeys.Any(x => x is null);
@@ -19,12 +34,25 @@ public class MediaPermissionResource : IPermissionResource
         return new MediaPermissionResource(keys, hasRoot, false);
     }
 
+    /// <summary>
+    ///     Creates a MediaPermissionResource with the specified Keys.
+    /// </summary>
+    /// <param name="mediaKeys">The keys of the medias.</param>
+    /// <returns>An instance of MediaPermissionResource.</returns>
     public static MediaPermissionResource WithKeys(IEnumerable<Guid> mediaKeys) =>
         new MediaPermissionResource(mediaKeys, false, false);
 
+    /// <summary>
+    ///     Creates a MediaPermissionResource with the root.
+    /// </summary>
+    /// <returns>An instance of MediaPermissionResource.</returns>
     public static MediaPermissionResource Root() =>
         new MediaPermissionResource(Enumerable.Empty<Guid>(), true, false);
 
+    /// <summary>
+    ///     Creates a MediaPermissionResource with the recycle bin.
+    /// </summary>
+    /// <returns>An instance of MediaPermissionResource.</returns>
     public static MediaPermissionResource RecycleBin() =>
         new MediaPermissionResource(Enumerable.Empty<Guid>(), false, true);
 
@@ -46,7 +74,7 @@ public class MediaPermissionResource : IPermissionResource
     public bool CheckRoot { get; }
 
     /// <summary>
-    ///     Gets whether to check the recylce bin.
+    ///     Gets whether to check the recycle bin.
     /// </summary>
     public bool CheckRecycleBin { get; }
 }

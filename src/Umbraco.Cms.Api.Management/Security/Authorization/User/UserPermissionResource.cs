@@ -1,3 +1,5 @@
+using Umbraco.Extensions;
+
 namespace Umbraco.Cms.Api.Management.Security.Authorization.User;
 
 /// <summary>
@@ -6,22 +8,24 @@ namespace Umbraco.Cms.Api.Management.Security.Authorization.User;
 public class UserPermissionResource : IPermissionResource
 {
     /// <summary>
-    ///     Initializes a new instance of the <see cref="UserPermissionResource" /> class.
+    ///     Creates a UserPermissionResource with the specified Keys.
     /// </summary>
-    /// <param name="userKey">The key of the user item.</param>
-    public UserPermissionResource(Guid userKey)
-    {
-        UserKeys = new List<Guid> { userKey };
-    }
+    /// <param name="userKey">The key of the user.</param>
+    /// <returns>An instance of UserPermissionResource.</returns>
+    public static UserPermissionResource WithKeys(Guid userKey) => WithKeys(userKey.Yield());
+
+    /// <summary>
+    ///     Creates a UserPermissionResource with the specified Keys.
+    /// </summary>
+    /// <param name="userKeys">The keys of the users.</param>
+    /// <returns>An instance of UserPermissionResource.</returns>
+    public static UserPermissionResource WithKeys(IEnumerable<Guid> userKeys) => new(userKeys);
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="UserPermissionResource" /> class.
     /// </summary>
     /// <param name="userKeys">The keys of the user items.</param>
-    public UserPermissionResource(IEnumerable<Guid> userKeys)
-    {
-        UserKeys = userKeys;
-    }
+    private UserPermissionResource(IEnumerable<Guid> userKeys) => UserKeys = userKeys;
 
     /// <summary>
     ///     Gets the content keys.

@@ -29,14 +29,14 @@ public class ContentPermissionHandler : MustSatisfyRequirementAuthorizationHandl
             result &= await _contentPermissionAuthorizer.IsAuthorizedAtRootLevelAsync(context.User, resource.PermissionsToCheck);
         }
 
-        if (resource.CheckRecyleBin)
+        if (resource.CheckRecycleBin)
         {
             result &= await _contentPermissionAuthorizer.IsAuthorizedAtRecycleBinLevelAsync(context.User, resource.PermissionsToCheck);
         }
 
-        if (resource.ParentKey is not null)
+        if (resource.ParentKeyForBranch is not null)
         {
-            result &= await _contentPermissionAuthorizer.IsAuthorizedWithDescendantsAsync(context.User, resource.ParentKey.Value, resource.PermissionsToCheck);
+            result &= await _contentPermissionAuthorizer.IsAuthorizedWithDescendantsAsync(context.User, resource.ParentKeyForBranch.Value, resource.PermissionsToCheck);
         }
 
         if (resource.ContentKeys.Any())
