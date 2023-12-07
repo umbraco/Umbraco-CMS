@@ -40,7 +40,7 @@ public class SortDocumentController : DocumentControllerBase
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,
-            ContentPermissionResource.WithKeys(ActionSort.ActionLetter, sortingRequestModel.ParentId),
+            ContentPermissionResource.WithKeys(ActionSort.ActionLetter,  new List<Guid?>(sortingRequestModel.Sorting.Select(x=>x.Id).Cast<Guid?>()){sortingRequestModel.ParentId}),
             AuthorizationPolicies.ContentPermissionByResource);
 
         if (!authorizationResult.Succeeded)
