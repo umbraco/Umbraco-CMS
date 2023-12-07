@@ -113,7 +113,7 @@ export class UmbPropertyEditorUICollectionViewColumnConfigurationElement
 
 	render() {
 		return html`<div>
-				<uui-select .options=${this._options}></uui-select>
+				<uui-select .options=${this._options} label="Select"></uui-select>
 				<uui-button label=${this.localize.term('general_add')} look="secondary" @click=${this.#onAdd}></uui-button>
 			</div>
 			${this.#renderTable()}`;
