@@ -6,7 +6,7 @@ namespace Umbraco.Cms.Core.Services;
 
 public class WebhookLogFactory : IWebhookLogFactory
 {
-    public async Task<WebhookLog> CreateAsync(string eventAlias, WebhookResponseModel responseModel, IWebhook webhook, CancellationToken cancellationToken)
+    public async Task<WebhookLog> CreateAsync(string eventAlias, HttpRequestMessage requestMessage, HttpResponseMessage? httpResponseMessage, int retryCount, Exception? exception, IWebhook webhook, CancellationToken cancellationToken)
     {
         var log = new WebhookLog
         {
@@ -15,20 +15,29 @@ public class WebhookLogFactory : IWebhookLogFactory
             Key = Guid.NewGuid(),
             Url = webhook.Url,
             WebhookKey = webhook.Key,
-            RetryCount = responseModel.RetryCount,
+            RetryCount = retryCount,
+            RequestHeaders = requestMessage.Headers.ToString(),
+            RequestBody = await requestMessage.Content?.ReadAsStringAsync(cancellationToken)!,
         };
 
-        if (responseModel.HttpResponseMessage is not null)
+        if (httpResponseMessage is not null)
         {
-            if (responseModel.HttpResponseMessage.RequestMessage?.Content is not null)
+            log.StatusCode = MapStatusCodeToMessage(httpResponseMessage.StatusCode);
+            log.ResponseHeaders = httpResponseMessage.Headers.ToString();
+            log.ResponseBody = await httpResponseMessage.Content.ReadAsStringAsync(cancellationToken);
+        }
+        else if (exception is HttpRequestException httpRequestException)
+        {
+            if (httpRequestException.StatusCode is not null)
             {
-                log.RequestBody = await responseModel.HttpResponseMessage.RequestMessage.Content.ReadAsStringAsync(cancellationToken);
-                log.RequestHeaders = CalculateHeaders(responseModel.HttpResponseMessage);
+                log.StatusCode = MapStatusCodeToMessage(httpRequestException.StatusCode.Value);
             }
 
-            log.ResponseBody = await responseModel.HttpResponseMessage.Content.ReadAsStringAsync(cancellationToken);
-            log.ResponseHeaders = responseModel.HttpResponseMessage.Headers.ToString();
-            log.StatusCode = MapStatusCodeToMessage(responseModel.HttpResponseMessage.StatusCode);
+            log.ResponseBody = $"{httpRequestException.HttpRequestError}: {httpRequestException.Message}";
+        }
+        else if (exception is not null)
+        {
+            log.ResponseBody = exception.Message;
         }
 
         return log;

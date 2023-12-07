@@ -1,4 +1,5 @@
-﻿using System.Net.Mime;
+﻿using System.Net;
+using System.Net.Mime;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -97,6 +98,7 @@ public class WebhookFiring : IRecurringBackgroundJob
         };
 
         HttpResponseMessage? response = null;
+        Exception? exception = null;
         try
         {
             // Add headers
@@ -117,16 +119,11 @@ public class WebhookFiring : IRecurringBackgroundJob
         }
         catch (Exception ex)
         {
+            exception = ex;
             _logger.LogError(ex, "Error while sending webhook request for webhook {WebhookKey}.", webhook.Key);
         }
 
-        var webhookResponseModel = new WebhookResponseModel
-        {
-            HttpResponseMessage = response,
-            RetryCount = retryCount,
-        };
-
-        WebhookLog log = await _webhookLogFactory.CreateAsync(eventName, webhookResponseModel, webhook, cancellationToken);
+        WebhookLog log = await _webhookLogFactory.CreateAsync(eventName, request, response, retryCount, exception, webhook, cancellationToken);
         await _webhookLogService.CreateAsync(log);
 
         return response;
