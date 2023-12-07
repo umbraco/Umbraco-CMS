@@ -8,7 +8,7 @@ export * from './tree.context.js';
 export * from './tree.element.js';
 export * from './types.js';
 export * from './tree-repository.interface.js';
-export * from './tree-data-source.interface.js';
+export * from './data-source/tree-data-source.interface.js';
 export * from './tree-store.interface.js';
 export * from './entity-tree-store.js';
 export * from './file-system-tree.store.js';

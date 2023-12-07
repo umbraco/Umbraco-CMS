@@ -7,7 +7,7 @@ import type {
 	UmbUniqueTreeItemModel,
 } from './types.js';
 import { UmbTreeRepository } from './tree-repository.interface.js';
-import type { UmbTreeDataSource, UmbTreeDataSourceConstructor } from './tree-data-source.interface.js';
+import type { UmbTreeDataSource, UmbTreeDataSourceConstructor } from './data-source/tree-data-source.interface.js';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
