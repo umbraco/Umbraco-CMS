@@ -1,29 +1,16 @@
 ﻿using System.Linq.Expressions;
 using System.Net;
-using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Controllers.Language;
-using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.Language;
 
 public class DeleteLanguageControllerTests : ManagementApiUserGroupTestBase<DeleteLanguageController>
 {
-    private ILanguageService LanguageService => GetRequiredService<ILanguageService>();
-
-    private const string IsoCode = "da";
-
-    private readonly ILanguage _languageResponseModel = new Core.Models.Language(IsoCode, "Danish");
-
-    protected override Expression<Func<DeleteLanguageController, object>> MethodSelector => x => x.Delete(IsoCode);
-
-    [SetUp]
-    public void Setup() => LanguageService.CreateAsync(_languageResponseModel, Constants.Security.SuperUserKey);
+    protected override Expression<Func<DeleteLanguageController, object>> MethodSelector => x => x.Delete("da");
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.OK
+        ExpectedStatusCode = HttpStatusCode.NotFound
     };
 
     protected override UserGroupAssertionModel EditorUserGroupAssertionModel => new()
