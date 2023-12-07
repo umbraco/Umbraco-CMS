@@ -136,7 +136,7 @@ export default {
 				<title>Umbraco</title>
 				<base href="/" />
 				<script>
-					window.__UMBRACO_TEST_RUN_A11Y_TEST = !devMode;
+					window.__UMBRACO_TEST_RUN_A11Y_TEST = ${!devMode};
 				</script>
 				<script src="/node_modules/msw/lib/iife/index.js"></script>
 				<link rel="stylesheet" href="node_modules/@umbraco-ui/uui-css/dist/uui-css.css">
