@@ -103,17 +103,17 @@ export class UmbPropertyEditorUIImageCropsConfigurationElement
 				<form @submit=${this.#onSubmit}>
 					<div class="input">
 						<uui-label for="alias">Alias</uui-label>
-						<uui-input id="alias" name="alias" type="text" autocomplete="false" value=""></uui-input>
+						<uui-input label="Alias" id="alias" name="alias" type="text" autocomplete="false" value=""></uui-input>
 					</div>
 					<div class="input">
 						<uui-label for="width">Width</uui-label>
-						<uui-input id="width" name="width" type="number" autocomplete="false" value="">
+						<uui-input label="Width" id="width" name="width" type="number" autocomplete="false" value="">
 							<span class="append" slot="append">px</span>
 						</uui-input>
 					</div>
 					<div class="input">
 						<uui-label for="height">Height</uui-label>
-						<uui-input id="height" name="height" type="number" autocomplete="false" value="">
+						<uui-input label="Height" id="height" name="height" type="number" autocomplete="false" value="">
 							<span class="append" slot="append">px</span>
 						</uui-input>
 					</div>
@@ -130,8 +130,8 @@ export class UmbPropertyEditorUIImageCropsConfigurationElement
 							<span class="crop-alias">${item.alias}</span>
 							<span class="crop-size">(${item.width} x ${item.height}px)</span>
 							<div class="crop-actions">
-								<uui-button @click=${() => this.#onEdit(item)}>Edit</uui-button>
-								<uui-button color="danger" @click=${() => this.#onRemove(item.alias)}>Remove</uui-button>
+								<uui-button label="Edit" @click=${() => this.#onEdit(item)}>Edit</uui-button>
+								<uui-button label="Remove" color="danger" @click=${() => this.#onRemove(item.alias)}>Remove</uui-button>
 							</div>
 						</div>
 					`,
