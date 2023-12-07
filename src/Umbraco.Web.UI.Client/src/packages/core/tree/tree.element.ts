@@ -1,6 +1,6 @@
 import { UmbTreeContextBase } from './tree.context.js';
+import { UmbTreeItemModelBase } from './types.js';
 import { html, nothing, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
-import { TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
@@ -67,14 +67,14 @@ export class UmbTreeElement extends UmbLitElement {
 	}
 
 	@state()
-	private _items: TreeItemPresentationModel[] = [];
+	private _items: UmbTreeItemModelBase[] = [];
 
 	@state()
-	private _treeRoot?: TreeItemPresentationModel;
+	private _treeRoot?: UmbTreeItemModelBase;
 
-	#treeContext = new UmbTreeContextBase<TreeItemPresentationModel>(this);
+	#treeContext = new UmbTreeContextBase<UmbTreeItemModelBase>(this);
 
-	#rootItemsObserver?: UmbObserverController<Array<TreeItemPresentationModel>>;
+	#rootItemsObserver?: UmbObserverController<Array<UmbTreeItemModelBase>>;
 
 	constructor() {
 		super();
