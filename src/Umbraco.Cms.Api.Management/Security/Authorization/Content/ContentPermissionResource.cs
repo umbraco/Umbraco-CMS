@@ -15,6 +15,14 @@ public class ContentPermissionResource : IPermissionResource
             : WithKeys(permissionToCheck, contentKey.Value.Yield());
     }
 
+    public static ContentPermissionResource WithKeys(char permissionToCheck, IEnumerable<Guid?> contentKeys)
+    {
+        bool hasRoot = contentKeys.Any(x => x is null);
+        IEnumerable<Guid> keys = contentKeys.Where(x => x.HasValue).Select(x => x!.Value);
+
+        return new ContentPermissionResource(keys, new HashSet<char>(){permissionToCheck}, hasRoot, false, null);
+    }
+
     public static ContentPermissionResource WithKeys(char permissionToCheck, Guid contentKey) => WithKeys(permissionToCheck, contentKey.Yield());
 
     public static ContentPermissionResource WithKeys(char permissionToCheck, IEnumerable<Guid> contentKeys) =>

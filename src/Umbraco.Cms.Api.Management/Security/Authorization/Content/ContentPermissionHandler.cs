@@ -21,22 +21,29 @@ public class ContentPermissionHandler : MustSatisfyRequirementAuthorizationHandl
         AuthorizationHandlerContext context,
         ContentPermissionRequirement requirement,
         ContentPermissionResource resource)
-     {
+    {
+        bool result = true;
+
         if (resource.CheckRoot)
         {
-            return await _contentPermissionAuthorizer.IsAuthorizedAtRootLevelAsync(context.User, resource.PermissionsToCheck);
+            result &= await _contentPermissionAuthorizer.IsAuthorizedAtRootLevelAsync(context.User, resource.PermissionsToCheck);
         }
 
         if (resource.CheckRecyleBin)
         {
-            return await _contentPermissionAuthorizer.IsAuthorizedAtRecycleBinLevelAsync(context.User, resource.PermissionsToCheck);
+            result &= await _contentPermissionAuthorizer.IsAuthorizedAtRecycleBinLevelAsync(context.User, resource.PermissionsToCheck);
         }
 
         if (resource.ParentKey is not null)
         {
-            return await _contentPermissionAuthorizer.IsAuthorizedWithDescendantsAsync(context.User, resource.ParentKey.Value, resource.PermissionsToCheck);
+            result &= await _contentPermissionAuthorizer.IsAuthorizedWithDescendantsAsync(context.User, resource.ParentKey.Value, resource.PermissionsToCheck);
         }
 
-        return await _contentPermissionAuthorizer.IsAuthorizedAsync(context.User, resource.ContentKeys, resource.PermissionsToCheck);
+        if (resource.ContentKeys.Any())
+        {
+            result &= await _contentPermissionAuthorizer.IsAuthorizedAsync(context.User, resource.ContentKeys, resource.PermissionsToCheck);
+        }
+
+        return result;
     }
 }

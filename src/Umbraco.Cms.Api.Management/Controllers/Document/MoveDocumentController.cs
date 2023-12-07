@@ -40,7 +40,7 @@ public class MoveDocumentController : DocumentControllerBase
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,
-            ContentPermissionResource.WithKeys(ActionMove.ActionLetter, moveDocumentRequestModel.TargetId),
+            ContentPermissionResource.WithKeys(ActionMove.ActionLetter, new []{ moveDocumentRequestModel.TargetId, id }),
             AuthorizationPolicies.ContentPermissionByResource);
 
         if (!authorizationResult.Succeeded)

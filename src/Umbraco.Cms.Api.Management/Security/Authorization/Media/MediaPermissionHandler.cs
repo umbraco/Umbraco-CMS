@@ -22,16 +22,23 @@ public class MediaPermissionHandler : MustSatisfyRequirementAuthorizationHandler
         MediaPermissionRequirement requirement,
         MediaPermissionResource resource)
     {
+        bool result = true;
+
         if (resource.CheckRoot)
         {
-            return await _mediaPermissionAuthorizer.IsAuthorizedAtRootLevelAsync(context.User);
+            result &= await _mediaPermissionAuthorizer.IsAuthorizedAtRootLevelAsync(context.User);
         }
 
         if (resource.CheckRecycleBin)
         {
-            return await _mediaPermissionAuthorizer.IsAuthorizedAtRecycleBinLevelAsync(context.User);
+            result &= await _mediaPermissionAuthorizer.IsAuthorizedAtRecycleBinLevelAsync(context.User);
         }
 
-        return await _mediaPermissionAuthorizer.IsAuthorizedAsync(context.User, resource.MediaKeys);
+        if (resource.MediaKeys.Any())
+        {
+            result &= await _mediaPermissionAuthorizer.IsAuthorizedAsync(context.User, resource.MediaKeys);
+        }
+
+        return result;
     }
 }

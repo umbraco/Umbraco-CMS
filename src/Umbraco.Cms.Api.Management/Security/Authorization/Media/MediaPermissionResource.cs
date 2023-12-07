@@ -12,6 +12,13 @@ public class MediaPermissionResource : IPermissionResource
 
     public static MediaPermissionResource WithKeys(Guid mediaKey) => WithKeys(mediaKey.Yield());
 
+    public static MediaPermissionResource WithKeys(IEnumerable<Guid?> mediaKeys)
+    {
+        bool hasRoot = mediaKeys.Any(x => x is null);
+        IEnumerable<Guid> keys = mediaKeys.Where(x => x.HasValue).Select(x => x!.Value);
+        return new MediaPermissionResource(keys, hasRoot, false);
+    }
+
     public static MediaPermissionResource WithKeys(IEnumerable<Guid> mediaKeys) =>
         new MediaPermissionResource(mediaKeys, false, false);
 
