@@ -65,7 +65,7 @@ export class UmbInputLanguagePickerElement extends FormControlMixin(UmbLitElemen
 	@property()
 	public set value(isoCodesString: string) {
 		// Its with full purpose we don't call super.value, as thats being handled by the observation of the context selection.
-		this.selectedIsoCodes = isoCodesString.split(/[ ,]+/);
+		this.selectedIsoCodes = isoCodesString !== '' ? isoCodesString.split(/[ ,]+/) : [];
 	}
 
 	@state()
