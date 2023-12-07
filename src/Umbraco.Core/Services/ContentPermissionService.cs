@@ -31,7 +31,7 @@ internal sealed class ContentPermissionService : IContentPermissionService
     public async Task<ContentAuthorizationStatus> AuthorizeAccessAsync(
         IUser user,
         IEnumerable<Guid> contentKeys,
-        IReadOnlyList<char> permissionsToCheck)
+        ISet<char> permissionsToCheck)
     {
         var contentItems = _contentService.GetByIds(contentKeys).ToArray();
 
@@ -54,7 +54,7 @@ internal sealed class ContentPermissionService : IContentPermissionService
     public async Task<ContentAuthorizationStatus> AuthorizeDescendantsAccessAsync(
         IUser user,
         Guid parentKey,
-        IReadOnlyList<char> permissionsToCheck)
+        ISet<char> permissionsToCheck)
     {
         var denied = new List<IUmbracoEntity>();
         var page = 0;
@@ -99,7 +99,7 @@ internal sealed class ContentPermissionService : IContentPermissionService
     }
 
     /// <inheritdoc/>
-    public async Task<ContentAuthorizationStatus> AuthorizeRootAccessAsync(IUser user, IReadOnlyList<char> permissionsToCheck)
+    public async Task<ContentAuthorizationStatus> AuthorizeRootAccessAsync(IUser user, ISet<char> permissionsToCheck)
     {
         var hasAccess = user.HasContentRootAccess(_entityService, _appCaches);
 
@@ -115,7 +115,7 @@ internal sealed class ContentPermissionService : IContentPermissionService
     }
 
     /// <inheritdoc/>
-    public async Task<ContentAuthorizationStatus> AuthorizeBinAccessAsync(IUser user, IReadOnlyList<char> permissionsToCheck)
+    public async Task<ContentAuthorizationStatus> AuthorizeBinAccessAsync(IUser user, ISet<char> permissionsToCheck)
     {
         var hasAccess = user.HasContentBinAccess(_entityService, _appCaches);
 

@@ -3,14 +3,9 @@ using Microsoft.Extensions.DependencyInjection;
 using OpenIddict.Validation.AspNetCore;
 using Umbraco.Cms.Api.Management.Security.Authorization;
 using Umbraco.Cms.Api.Management.Security.Authorization.Content;
-using Umbraco.Cms.Api.Management.Security.Authorization.Content.Branch;
-using Umbraco.Cms.Api.Management.Security.Authorization.Content.RecycleBin;
-using Umbraco.Cms.Api.Management.Security.Authorization.Content.Root;
 using Umbraco.Cms.Api.Management.Security.Authorization.DenyLocalLogin;
 using Umbraco.Cms.Api.Management.Security.Authorization.Feature;
 using Umbraco.Cms.Api.Management.Security.Authorization.Media;
-using Umbraco.Cms.Api.Management.Security.Authorization.Media.RecycleBin;
-using Umbraco.Cms.Api.Management.Security.Authorization.Media.Root;
 using Umbraco.Cms.Api.Management.Security.Authorization.User;
 using Umbraco.Cms.Api.Management.Security.Authorization.UserGroup;
 using Umbraco.Cms.Core;
@@ -27,15 +22,10 @@ internal static class BackOfficeAuthPolicyBuilderExtensions
     {
         // NOTE: Even though we are registering these handlers globally they will only actually execute their logic for
         // any auth defining a matching requirement and scheme.
-        builder.Services.AddSingleton<IAuthorizationHandler, ContentBranchPermissionHandler>();
         builder.Services.AddSingleton<IAuthorizationHandler, ContentPermissionHandler>();
-        builder.Services.AddSingleton<IAuthorizationHandler, ContentRecycleBinPermissionHandler>();
-        builder.Services.AddSingleton<IAuthorizationHandler, ContentRootPermissionHandler>();
         builder.Services.AddSingleton<IAuthorizationHandler, DenyLocalLoginHandler>();
         builder.Services.AddSingleton<IAuthorizationHandler, FeatureAuthorizeHandler>();
         builder.Services.AddSingleton<IAuthorizationHandler, MediaPermissionHandler>();
-        builder.Services.AddSingleton<IAuthorizationHandler, MediaRecycleBinPermissionHandler>();
-        builder.Services.AddSingleton<IAuthorizationHandler, MediaRootPermissionHandler>();
         builder.Services.AddSingleton<IAuthorizationHandler, UserGroupPermissionHandler>();
         builder.Services.AddSingleton<IAuthorizationHandler, UserPermissionHandler>();
 
@@ -113,22 +103,10 @@ internal static class BackOfficeAuthPolicyBuilderExtensions
             policy.Requirements.Add(new UserPermissionRequirement());
         });
 
-        options.AddPolicy($"New{AuthorizationPolicies.ContentPermissionAtRoot}", policy =>
-        {
-            policy.AuthenticationSchemes.Add(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
-            policy.Requirements.Add(new ContentRootPermissionRequirement());
-        });
-
         options.AddPolicy($"New{AuthorizationPolicies.ContentPermissionByResource}", policy =>
         {
             policy.AuthenticationSchemes.Add(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
             policy.Requirements.Add(new ContentPermissionRequirement());
-        });
-
-        options.AddPolicy($"New{AuthorizationPolicies.ContentPermissionEmptyRecycleBin}", policy =>
-        {
-            policy.AuthenticationSchemes.Add(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
-            policy.Requirements.Add(new ContentRecycleBinPermissionRequirement());
         });
 
         options.AddPolicy($"New{AuthorizationPolicies.DenyLocalLoginIfConfigured}", policy =>
@@ -137,22 +115,10 @@ internal static class BackOfficeAuthPolicyBuilderExtensions
             policy.Requirements.Add(new DenyLocalLoginRequirement());
         });
 
-        options.AddPolicy($"New{AuthorizationPolicies.MediaPermissionAtRoot}", policy =>
-        {
-            policy.AuthenticationSchemes.Add(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
-            policy.Requirements.Add(new MediaRootPermissionRequirement());
-        });
-
         options.AddPolicy($"New{AuthorizationPolicies.MediaPermissionByResource}", policy =>
         {
             policy.AuthenticationSchemes.Add(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
             policy.Requirements.Add(new MediaPermissionRequirement());
-        });
-
-        options.AddPolicy($"New{AuthorizationPolicies.MediaPermissionEmptyRecycleBin}", policy =>
-        {
-            policy.AuthenticationSchemes.Add(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
-            policy.Requirements.Add(new MediaRecycleBinPermissionRequirement());
         });
 
         options.AddPolicy($"New{AuthorizationPolicies.UmbracoFeatureEnabled}", policy =>

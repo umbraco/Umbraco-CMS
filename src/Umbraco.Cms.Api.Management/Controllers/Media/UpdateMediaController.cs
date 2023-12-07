@@ -42,7 +42,7 @@ public class UpdateMediaController : MediaControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Update(Guid id, UpdateMediaRequestModel updateRequestModel)
     {
-        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(User, new MediaPermissionResource(id),AuthorizationPolicies.MediaPermissionByResource);
+        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(User, MediaPermissionResource.WithKeys(id),AuthorizationPolicies.MediaPermissionByResource);
 
         if (!authorizationResult.Succeeded)
         {

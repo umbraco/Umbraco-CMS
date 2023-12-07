@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Authorization;
-using Umbraco.Cms.Api.Management.Security.Authorization.Content.Branch;
 
 namespace Umbraco.Cms.Api.Management.Security.Authorization.Content;
 

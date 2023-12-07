@@ -38,8 +38,10 @@ public class CreatePublicAccessDocumentController : DocumentControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Create(Guid id, PublicAccessRequestModel publicAccessRequestModel)
     {
-        var resource = new ContentPermissionResource(id, ActionProtect.ActionLetter);
-        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(User, resource, AuthorizationPolicies.ContentPermissionByResource);
+        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
+            User,
+            ContentPermissionResource.WithKeys(ActionProtect.ActionLetter, id),
+            AuthorizationPolicies.ContentPermissionByResource);
 
         if (!authorizationResult.Succeeded)
         {

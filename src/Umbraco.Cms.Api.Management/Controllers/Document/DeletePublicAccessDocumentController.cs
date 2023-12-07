@@ -28,8 +28,10 @@ public class DeletePublicAccessDocumentController : DocumentControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(Guid id)
     {
-        var resource = new ContentPermissionResource(id, ActionProtect.ActionLetter);
-        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(User, resource,AuthorizationPolicies.ContentPermissionByResource);
+        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
+            User,
+            ContentPermissionResource.WithKeys(ActionProtect.ActionLetter, id),
+            AuthorizationPolicies.ContentPermissionByResource);
 
         if (!authorizationResult.Succeeded)
         {

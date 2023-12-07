@@ -38,8 +38,11 @@ public class UnpublishDocumentController : DocumentControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Unpublish(Guid id, UnpublishDocumentRequestModel requestModel)
     {
-        var resource = new ContentPermissionResource(id, ActionUnpublish.ActionLetter);
-        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(User, resource, AuthorizationPolicies.ContentPermissionByResource);
+
+        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
+            User,
+            ContentPermissionResource.WithKeys(ActionUnpublish.ActionLetter, id),
+            AuthorizationPolicies.ContentPermissionByResource);
 
         if (!authorizationResult.Succeeded)
         {

@@ -38,18 +38,10 @@ public class MoveDocumentController : DocumentControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Move(Guid id, MoveDocumentRequestModel moveDocumentRequestModel)
     {
-        AuthorizationResult authorizationResult;
-
-        if (moveDocumentRequestModel.TargetId.HasValue is false)
-        {
-            authorizationResult = await _authorizationService.AuthorizeAsync(User, new[] { ActionMove.ActionLetter },
-                $"New{AuthorizationPolicies.ContentPermissionAtRoot}");
-        }
-        else
-        {
-            var resource = new ContentPermissionResource(moveDocumentRequestModel.TargetId.Value, ActionMove.ActionLetter);
-            authorizationResult = await _authorizationService.AuthorizeResourceAsync(User, resource, AuthorizationPolicies.ContentPermissionByResource);
-        }
+        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
+            User,
+            ContentPermissionResource.WithKeys(ActionMove.ActionLetter, moveDocumentRequestModel.TargetId),
+            AuthorizationPolicies.ContentPermissionByResource);
 
         if (!authorizationResult.Succeeded)
         {

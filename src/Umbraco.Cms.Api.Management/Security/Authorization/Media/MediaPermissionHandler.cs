@@ -20,6 +20,18 @@ public class MediaPermissionHandler : MustSatisfyRequirementAuthorizationHandler
     protected override async Task<bool> IsAuthorized(
         AuthorizationHandlerContext context,
         MediaPermissionRequirement requirement,
-        MediaPermissionResource resource) =>
-        await _mediaPermissionAuthorizer.IsAuthorizedAsync(context.User, resource.MediaKeys);
+        MediaPermissionResource resource)
+    {
+        if (resource.CheckRoot)
+        {
+            return await _mediaPermissionAuthorizer.IsAuthorizedAtRootLevelAsync(context.User);
+        }
+
+        if (resource.CheckRecycleBin)
+        {
+            return await _mediaPermissionAuthorizer.IsAuthorizedAtRecycleBinLevelAsync(context.User);
+        }
+
+        return await _mediaPermissionAuthorizer.IsAuthorizedAsync(context.User, resource.MediaKeys);
+    }
 }

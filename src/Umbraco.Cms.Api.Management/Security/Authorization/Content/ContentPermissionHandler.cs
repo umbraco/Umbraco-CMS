@@ -20,6 +20,23 @@ public class ContentPermissionHandler : MustSatisfyRequirementAuthorizationHandl
     protected override async Task<bool> IsAuthorized(
         AuthorizationHandlerContext context,
         ContentPermissionRequirement requirement,
-        ContentPermissionResource resource) =>
-        await _contentPermissionAuthorizer.IsAuthorizedAsync(context.User, resource.ContentKeys, resource.PermissionsToCheck);
+        ContentPermissionResource resource)
+     {
+        if (resource.CheckRoot)
+        {
+            return await _contentPermissionAuthorizer.IsAuthorizedAtRootLevelAsync(context.User, resource.PermissionsToCheck);
+        }
+
+        if (resource.CheckRecyleBin)
+        {
+            return await _contentPermissionAuthorizer.IsAuthorizedAtRecycleBinLevelAsync(context.User, resource.PermissionsToCheck);
+        }
+
+        if (resource.ParentKey is not null)
+        {
+            return await _contentPermissionAuthorizer.IsAuthorizedWithDescendantsAsync(context.User, resource.ParentKey.Value, resource.PermissionsToCheck);
+        }
+
+        return await _contentPermissionAuthorizer.IsAuthorizedAsync(context.User, resource.ContentKeys, resource.PermissionsToCheck);
+    }
 }

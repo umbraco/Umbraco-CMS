@@ -38,8 +38,7 @@ public class PublishDocumentWithDescendantsController : DocumentControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> PublishWithDescendants(Guid id, PublishDocumentWithDescendantsRequestModel requestModel)
     {
-        var resource = new ContentPermissionResource(id, ActionPublish.ActionLetter);
-        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(User, resource,AuthorizationPolicies.ContentPermissionByResource);
+        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(User, ContentPermissionResource.Branch(ActionPublish.ActionLetter, id),AuthorizationPolicies.ContentPermissionByResource);
 
         if (!authorizationResult.Succeeded)
         {

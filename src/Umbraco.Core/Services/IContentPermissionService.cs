@@ -16,7 +16,7 @@ public interface IContentPermissionService
     /// <param name="permissionToCheck">The permission to authorize.</param>
     /// <returns>A task resolving into a <see cref="ContentAuthorizationStatus"/>.</returns>
     Task<ContentAuthorizationStatus> AuthorizeAccessAsync(IUser user, Guid contentKey, char permissionToCheck)
-        => AuthorizeAccessAsync(user, new[] { contentKey }, new[] { permissionToCheck });
+        => AuthorizeAccessAsync(user, new[] { contentKey }, new HashSet<char> { permissionToCheck });
 
     /// <summary>
     ///     Authorize that a user has access to content items.
@@ -25,7 +25,7 @@ public interface IContentPermissionService
     /// <param name="contentKeys">The identifiers of the content items to check for access.</param>
     /// <param name="permissionsToCheck">The collection of permissions to authorize.</param>
     /// <returns>A task resolving into a <see cref="ContentAuthorizationStatus"/>.</returns>
-    Task<ContentAuthorizationStatus> AuthorizeAccessAsync(IUser user, IEnumerable<Guid> contentKeys, IReadOnlyList<char> permissionsToCheck);
+    Task<ContentAuthorizationStatus> AuthorizeAccessAsync(IUser user, IEnumerable<Guid> contentKeys, ISet<char> permissionsToCheck);
 
     /// <summary>
     ///     Authorize that a user has access to the descendant items of a content item.
@@ -34,7 +34,7 @@ public interface IContentPermissionService
     /// <param name="parentKey">The identifier of the parent content item to check its descendants for access.</param>
     /// <param name="permissionsToCheck">The collection of permissions to authorize.</param>
     /// <returns>A task resolving into a <see cref="ContentAuthorizationStatus"/>.</returns>
-    Task<ContentAuthorizationStatus> AuthorizeDescendantsAccessAsync(IUser user, Guid parentKey, IReadOnlyList<char> permissionsToCheck);
+    Task<ContentAuthorizationStatus> AuthorizeDescendantsAccessAsync(IUser user, Guid parentKey, ISet<char> permissionsToCheck);
 
     /// <summary>
     ///     Authorize that a user is allowed to perform action on the content root item.
@@ -43,7 +43,7 @@ public interface IContentPermissionService
     /// <param name="permissionToCheck">The permission to authorize.</param>
     /// <returns>A task resolving into a <see cref="ContentAuthorizationStatus"/>.</returns>
     Task<ContentAuthorizationStatus> AuthorizeRootAccessAsync(IUser user, char permissionToCheck)
-        => AuthorizeRootAccessAsync(user, new[] { permissionToCheck });
+        => AuthorizeRootAccessAsync(user, new HashSet<char> { permissionToCheck });
 
     /// <summary>
     ///     Authorize that a user is allowed to perform actions on the content root item.
@@ -51,7 +51,7 @@ public interface IContentPermissionService
     /// <param name="user"><see cref="IUser" /> to authorize.</param>
     /// <param name="permissionsToCheck">The collection of permissions to authorize.</param>
     /// <returns>A task resolving into a <see cref="ContentAuthorizationStatus"/>.</returns>
-    Task<ContentAuthorizationStatus> AuthorizeRootAccessAsync(IUser user, IReadOnlyList<char> permissionsToCheck);
+    Task<ContentAuthorizationStatus> AuthorizeRootAccessAsync(IUser user, ISet<char> permissionsToCheck);
 
     /// <summary>
     ///     Authorize that a user is allowed to perform action on the content bin item.
@@ -60,7 +60,7 @@ public interface IContentPermissionService
     /// <param name="permissionToCheck">The permission to authorize.</param>
     /// <returns>A task resolving into a <see cref="ContentAuthorizationStatus"/>.</returns>
     Task<ContentAuthorizationStatus> AuthorizeBinAccessAsync(IUser user, char permissionToCheck)
-        => AuthorizeBinAccessAsync(user, new[] { permissionToCheck });
+        => AuthorizeBinAccessAsync(user, new HashSet<char> { permissionToCheck });
 
     /// <summary>
     ///     Authorize that a user is allowed to perform actions on the content bin item.
@@ -68,5 +68,5 @@ public interface IContentPermissionService
     /// <param name="user"><see cref="IUser" /> to authorize.</param>
     /// <param name="permissionsToCheck">The collection of permissions to authorize.</param>
     /// <returns>A task resolving into a <see cref="ContentAuthorizationStatus"/>.</returns>
-    Task<ContentAuthorizationStatus> AuthorizeBinAccessAsync(IUser user, IReadOnlyList<char> permissionsToCheck);
+    Task<ContentAuthorizationStatus> AuthorizeBinAccessAsync(IUser user, ISet<char> permissionsToCheck);
 }

@@ -38,18 +38,10 @@ public class CopyDocumentController : DocumentControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Copy(Guid id, CopyDocumentRequestModel copyDocumentRequestModel)
     {
-        AuthorizationResult authorizationResult;
-
-        if (copyDocumentRequestModel.TargetId.HasValue is false)
-        {
-            authorizationResult = await _authorizationService.AuthorizeAsync(User, new[] { ActionCopy.ActionLetter },
-                $"New{AuthorizationPolicies.ContentPermissionAtRoot}");
-        }
-        else
-        {
-            var resource = new ContentPermissionResource(copyDocumentRequestModel.TargetId.Value, ActionCopy.ActionLetter);
-            authorizationResult = await _authorizationService.AuthorizeResourceAsync(User, resource, AuthorizationPolicies.ContentPermissionByResource);
-        }
+        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
+            User,
+            ContentPermissionResource.WithKeys(ActionCopy.ActionLetter, copyDocumentRequestModel.TargetId),
+            AuthorizationPolicies.ContentPermissionByResource);
 
         if (!authorizationResult.Succeeded)
         {

@@ -37,17 +37,10 @@ public class SortMediaController : MediaControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Sort(SortingRequestModel sortingRequestModel)
     {
-        AuthorizationResult authorizationResult;
-
-        if (sortingRequestModel.ParentId.HasValue is false)
-        {
-            authorizationResult = await _authorizationService.AuthorizeAsync(User, $"New{AuthorizationPolicies.MediaPermissionAtRoot}");
-        }
-        else
-        {
-            authorizationResult = await _authorizationService.AuthorizeResourceAsync(User, new MediaPermissionResource(sortingRequestModel.ParentId.Value),AuthorizationPolicies.MediaPermissionByResource);
-        }
-
+        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
+            User,
+            MediaPermissionResource.WithKeys(sortingRequestModel.ParentId),
+            AuthorizationPolicies.MediaPermissionByResource);
         if (!authorizationResult.Succeeded)
         {
             return Forbidden();

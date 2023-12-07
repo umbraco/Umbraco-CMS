@@ -42,16 +42,7 @@ public class CreateMediaController : MediaControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Create(CreateMediaRequestModel createRequestModel)
     {
-        AuthorizationResult authorizationResult;
-
-        if (createRequestModel.ParentId.HasValue is false)
-        {
-            authorizationResult = await _authorizationService.AuthorizeAsync(User, $"New{AuthorizationPolicies.MediaPermissionAtRoot}");
-        }
-        else
-        {
-            authorizationResult = await _authorizationService.AuthorizeResourceAsync(User, new MediaPermissionResource(createRequestModel.ParentId.Value),AuthorizationPolicies.MediaPermissionByResource);
-        }
+        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(User, MediaPermissionResource.WithKeys(createRequestModel.ParentId),AuthorizationPolicies.MediaPermissionByResource);;
 
         if (!authorizationResult.Succeeded)
         {

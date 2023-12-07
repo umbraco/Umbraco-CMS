@@ -38,18 +38,10 @@ public class SortDocumentController : DocumentControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Sort(SortingRequestModel sortingRequestModel)
     {
-        AuthorizationResult authorizationResult;
-
-        if (sortingRequestModel.ParentId.HasValue is false)
-        {
-            authorizationResult = await _authorizationService.AuthorizeAsync(User, new[] { ActionSort.ActionLetter },
-                $"New{AuthorizationPolicies.ContentPermissionAtRoot}");
-        }
-        else
-        {
-            var resource = new ContentPermissionResource(sortingRequestModel.ParentId.Value, ActionSort.ActionLetter);
-            authorizationResult = await _authorizationService.AuthorizeResourceAsync(User, resource,AuthorizationPolicies.ContentPermissionByResource);
-        }
+        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
+            User,
+            ContentPermissionResource.WithKeys(ActionSort.ActionLetter, sortingRequestModel.ParentId),
+            AuthorizationPolicies.ContentPermissionByResource);
 
         if (!authorizationResult.Succeeded)
         {
