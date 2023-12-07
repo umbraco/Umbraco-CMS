@@ -11,7 +11,9 @@ import type {
 	FileItemResponseModelBaseModel,
 	MediaTypeResponseModel,
 	MediaTypeTreeItemResponseModel,
+	MediaTreeItemResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
+import { UmbMediaDetailModel } from '@umbraco-cms/backoffice/media';
 
 export const createEntityTreeItem = (item: any): EntityTreeItemResponseModel => {
 	return {
@@ -31,8 +33,7 @@ export const createFolderTreeItem = (item: any): FolderTreeItemResponseModel => 
 	};
 };
 
-// TODO: remove isTrashed type extension when we have found a solution to trashed items
-export const createContentTreeItem = (item: any): ContentTreeItemResponseModel & { isTrashed: boolean } => {
+export const createContentTreeItem = (item: any): ContentTreeItemResponseModel => {
 	// TODO: There we have to adapt to variants as part of the tree model:
 	return {
 		...createEntityTreeItem(item),
@@ -41,10 +42,7 @@ export const createContentTreeItem = (item: any): ContentTreeItemResponseModel &
 	};
 };
 
-// TODO: remove isTrashed type extension when we have found a solution to trashed items
-export const createDocumentTreeItem = (
-	item: DocumentResponseModel,
-): DocumentTreeItemResponseModel & { isTrashed: boolean } => {
+export const createDocumentTreeItem = (item: DocumentResponseModel): DocumentTreeItemResponseModel => {
 	return {
 		...createContentTreeItem(item),
 		type: 'document',
@@ -57,6 +55,14 @@ export const createDocumentTreeItem = (
 		isTrashed: false,
 		hasChildren: false,
 		isContainer: false,
+	};
+};
+
+export const createMediaTreeItem = (item: UmbMediaDetailModel): MediaTreeItemResponseModel => {
+	return {
+		...createContentTreeItem(item),
+		type: 'media',
+		icon: 'media', // TODO: Should get this from media type...
 	};
 };
 
