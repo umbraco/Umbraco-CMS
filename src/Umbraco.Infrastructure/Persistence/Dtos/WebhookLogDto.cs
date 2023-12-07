@@ -30,6 +30,7 @@ internal class WebhookLogDto
     public DateTime Date { get; set; }
 
     [Column(Name = "url")]
+    [SpecialDbType(SpecialDbTypes.NVARCHARMAX)]
     [NullSetting(NullSetting = NullSettings.NotNull)]
     public string Url { get; set; } = string.Empty;
 
