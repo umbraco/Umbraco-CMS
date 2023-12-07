@@ -1,9 +1,7 @@
 
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
-using Umbraco.Cms.Api.Common.Attributes;
 using Umbraco.Cms.Api.Management.DependencyInjection;
 using Umbraco.Extensions;
 

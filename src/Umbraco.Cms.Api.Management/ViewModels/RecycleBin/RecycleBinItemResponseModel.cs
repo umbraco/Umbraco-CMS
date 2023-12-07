@@ -22,7 +22,6 @@ public class RecycleBinItemResponseModel : INamedEntityPresentationModel
     [Required]
     public bool IsContainer { get; set; }
 
-    [Required]
     public Guid? ParentId { get; set; }
 }
 

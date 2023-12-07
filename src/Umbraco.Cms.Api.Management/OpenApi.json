@@ -17616,6 +17616,11 @@
   "components": {
     "schemas": {
       "AuditLogBaseModel": {
+        "required": [
+          "logType",
+          "timestamp",
+          "userId"
+        ],
         "type": "object",
         "properties": {
           "userId": {
@@ -17659,6 +17664,9 @@
         "additionalProperties": false
       },
       "AuditLogWithUsernameResponseModel": {
+        "required": [
+          "userAvatars"
+        ],
         "type": "object",
         "allOf": [
           {
@@ -17674,8 +17682,7 @@
             "type": "array",
             "items": {
               "type": "string"
-            },
-            "nullable": true
+            }
           }
         },
         "additionalProperties": false
@@ -17711,6 +17718,9 @@
         "format": "int32"
       },
       "ChangePasswordUserRequestModel": {
+        "required": [
+          "newPassword"
+        ],
         "type": "object",
         "properties": {
           "newPassword": {
@@ -17725,7 +17735,8 @@
       },
       "ConsentLevelPresentationModel": {
         "required": [
-          "description"
+          "description",
+          "level"
         ],
         "type": "object",
         "properties": {
@@ -17740,6 +17751,12 @@
         "additionalProperties": false
       },
       "ContentForDocumentResponseModel": {
+        "required": [
+          "contentTypeId",
+          "id",
+          "values",
+          "variants"
+        ],
         "type": "object",
         "properties": {
           "values": {
@@ -17784,6 +17801,11 @@
         "format": "int32"
       },
       "ContentTreeItemResponseModel": {
+        "required": [
+          "id",
+          "isTrashed",
+          "noAccess"
+        ],
         "type": "object",
         "allOf": [
           {
@@ -17805,6 +17827,9 @@
         "additionalProperties": false
       },
       "ContentTypeCleanupModel": {
+        "required": [
+          "preventCleanup"
+        ],
         "type": "object",
         "properties": {
           "preventCleanup": {
@@ -17824,6 +17849,10 @@
         "additionalProperties": false
       },
       "ContentTypeCompositionModel": {
+        "required": [
+          "compositionType",
+          "id"
+        ],
         "type": "object",
         "properties": {
           "id": {
@@ -17847,9 +17876,17 @@
       "ContentTypeForDocumentTypeResponseModel": {
         "required": [
           "alias",
+          "allowedAsRoot",
+          "allowedContentTypes",
+          "compositions",
+          "containers",
           "icon",
+          "id",
+          "isElement",
           "name",
-          "properties"
+          "properties",
+          "variesByCulture",
+          "variesBySegment"
         ],
         "type": "object",
         "properties": {
@@ -17931,9 +17968,17 @@
       "ContentTypeForMediaTypeResponseModel": {
         "required": [
           "alias",
+          "allowedAsRoot",
+          "allowedContentTypes",
+          "compositions",
+          "containers",
           "icon",
+          "id",
+          "isElement",
           "name",
-          "properties"
+          "properties",
+          "variesByCulture",
+          "variesBySegment"
         ],
         "type": "object",
         "properties": {
@@ -18013,6 +18058,10 @@
         "additionalProperties": false
       },
       "ContentTypeSortModel": {
+        "required": [
+          "id",
+          "sortOrder"
+        ],
         "type": "object",
         "properties": {
           "id": {
@@ -18027,6 +18076,9 @@
         "additionalProperties": false
       },
       "ContentUrlInfoModel": {
+        "required": [
+          "url"
+        ],
         "type": "object",
         "properties": {
           "culture": {
@@ -18051,6 +18103,10 @@
         "additionalProperties": false
       },
       "CopyDocumentRequestModel": {
+        "required": [
+          "includeDescendants",
+          "relateToOriginal"
+        ],
         "type": "object",
         "properties": {
           "targetId": {
@@ -18068,6 +18124,10 @@
         "additionalProperties": false
       },
       "CreateContentForDocumentRequestModel": {
+        "required": [
+          "values",
+          "variants"
+        ],
         "type": "object",
         "properties": {
           "values": {
@@ -18104,6 +18164,10 @@
         "additionalProperties": false
       },
       "CreateContentForMediaRequestModel": {
+        "required": [
+          "values",
+          "variants"
+        ],
         "type": "object",
         "properties": {
           "values": {
@@ -18142,9 +18206,16 @@
       "CreateContentTypeForDocumentTypeRequestModel": {
         "required": [
           "alias",
+          "allowedAsRoot",
+          "allowedContentTypes",
+          "compositions",
+          "containers",
           "icon",
+          "isElement",
           "name",
-          "properties"
+          "properties",
+          "variesByCulture",
+          "variesBySegment"
         ],
         "type": "object",
         "properties": {
@@ -18232,9 +18303,16 @@
       "CreateContentTypeForMediaTypeRequestModel": {
         "required": [
           "alias",
+          "allowedAsRoot",
+          "allowedContentTypes",
+          "compositions",
+          "containers",
           "icon",
+          "isElement",
           "name",
-          "properties"
+          "properties",
+          "variesByCulture",
+          "variesBySegment"
         ],
         "type": "object",
         "properties": {
@@ -18362,6 +18440,9 @@
         "additionalProperties": false
       },
       "CreateDocumentRequestModel": {
+        "required": [
+          "contentTypeId"
+        ],
         "type": "object",
         "allOf": [
           {
@@ -18400,6 +18481,10 @@
         "additionalProperties": false
       },
       "CreateDocumentTypeRequestModel": {
+        "required": [
+          "allowedTemplateIds",
+          "cleanup"
+        ],
         "type": "object",
         "allOf": [
           {
@@ -18451,6 +18536,9 @@
         "additionalProperties": false
       },
       "CreateInitialPasswordUserRequestModel": {
+        "required": [
+          "password"
+        ],
         "type": "object",
         "allOf": [
           {
@@ -18483,6 +18571,9 @@
         "additionalProperties": false
       },
       "CreateMediaRequestModel": {
+        "required": [
+          "contentTypeId"
+        ],
         "type": "object",
         "allOf": [
           {
@@ -18634,6 +18725,9 @@
         "additionalProperties": false
       },
       "CreateUserResponseModel": {
+        "required": [
+          "userId"
+        ],
         "type": "object",
         "properties": {
           "userId": {
@@ -18666,6 +18760,18 @@
         "additionalProperties": false
       },
       "CurrentUserResponseModel": {
+        "required": [
+          "avatarUrls",
+          "contentStartNodeIds",
+          "email",
+          "hasAccessToAllLanguages",
+          "id",
+          "languages",
+          "mediaStartNodeIds",
+          "name",
+          "permissions",
+          "userName"
+        ],
         "type": "object",
         "properties": {
           "id": {
@@ -18744,7 +18850,8 @@
       "DataTypeModelBaseModel": {
         "required": [
           "name",
-          "propertyEditorAlias"
+          "propertyEditorAlias",
+          "values"
         ],
         "type": "object",
         "properties": {
@@ -18774,6 +18881,9 @@
         "additionalProperties": false
       },
       "DataTypePropertyPresentationModel": {
+        "required": [
+          "alias"
+        ],
         "type": "object",
         "properties": {
           "alias": {
@@ -18786,6 +18896,10 @@
         "additionalProperties": false
       },
       "DataTypePropertyReferenceModel": {
+        "required": [
+          "alias",
+          "name"
+        ],
         "type": "object",
         "properties": {
           "name": {
@@ -18798,6 +18912,11 @@
         "additionalProperties": false
       },
       "DataTypeReferenceResponseModel": {
+        "required": [
+          "id",
+          "properties",
+          "type"
+        ],
         "type": "object",
         "properties": {
           "id": {
@@ -18821,6 +18940,9 @@
         "additionalProperties": false
       },
       "DataTypeResponseModel": {
+        "required": [
+          "id"
+        ],
         "type": "object",
         "allOf": [
           {
@@ -18858,7 +18980,9 @@
       "DatabaseInstallResponseModel": {
         "required": [
           "id",
-          "providerName"
+          "providerName",
+          "trustServerCertificate",
+          "useIntegratedAuthentication"
         ],
         "type": "object",
         "properties": {
@@ -18903,8 +19027,15 @@
         "required": [
           "defaultDatabaseName",
           "displayName",
+          "id",
+          "isConfigured",
           "providerName",
-          "serverPlaceholder"
+          "requiresConnectionTest",
+          "requiresCredentials",
+          "requiresServer",
+          "serverPlaceholder",
+          "sortOrder",
+          "supportsIntegratedAuthentication"
         ],
         "type": "object",
         "properties": {
@@ -18951,6 +19082,9 @@
         "additionalProperties": false
       },
       "DeleteUserGroupsRequestModel": {
+        "required": [
+          "userGroupIds"
+        ],
         "type": "object",
         "properties": {
           "userGroupIds": {
@@ -18965,6 +19099,9 @@
         "additionalProperties": false
       },
       "DeleteUsersRequestModel": {
+        "required": [
+          "userIds"
+        ],
         "type": "object",
         "properties": {
           "userIds": {
@@ -18989,7 +19126,8 @@
       },
       "DictionaryItemModelBaseModel": {
         "required": [
-          "name"
+          "name",
+          "translations"
         ],
         "type": "object",
         "properties": {
@@ -19011,6 +19149,9 @@
         "additionalProperties": false
       },
       "DictionaryItemResponseModel": {
+        "required": [
+          "id"
+        ],
         "type": "object",
         "allOf": [
           {
@@ -19044,6 +19185,10 @@
         "additionalProperties": false
       },
       "DictionaryOverviewResponseModel": {
+        "required": [
+          "id",
+          "translatedIsoCodes"
+        ],
         "type": "object",
         "properties": {
           "name": {
@@ -19077,6 +19222,9 @@
         "format": "int32"
       },
       "DisableUserRequestModel": {
+        "required": [
+          "userIds"
+        ],
         "type": "object",
         "properties": {
           "userIds": {
@@ -19100,6 +19248,10 @@
         "additionalProperties": false
       },
       "DocumentBlueprintTreeItemResponseModel": {
+        "required": [
+          "documentTypeAlias",
+          "documentTypeId"
+        ],
         "type": "object",
         "allOf": [
           {
@@ -19122,6 +19274,10 @@
         "additionalProperties": false
       },
       "DocumentItemResponseModel": {
+        "required": [
+          "contentTypeId",
+          "isTrashed"
+        ],
         "type": "object",
         "allOf": [
           {
@@ -19144,6 +19300,10 @@
         "additionalProperties": false
       },
       "DocumentNotificationResponseModel": {
+        "required": [
+          "actionId",
+          "subscribed"
+        ],
         "type": "object",
         "properties": {
           "actionId": {
@@ -19156,6 +19316,10 @@
         "additionalProperties": false
       },
       "DocumentResponseModel": {
+        "required": [
+          "isTrashed",
+          "urls"
+        ],
         "type": "object",
         "allOf": [
           {
@@ -19185,6 +19349,14 @@
         "additionalProperties": false
       },
       "DocumentTreeItemResponseModel": {
+        "required": [
+          "contentTypeId",
+          "icon",
+          "isEdited",
+          "isProtected",
+          "isPublished",
+          "variants"
+        ],
         "type": "object",
         "allOf": [
           {
@@ -19222,6 +19394,9 @@
         "additionalProperties": false
       },
       "DocumentTypeItemResponseModel": {
+        "required": [
+          "isElement"
+        ],
         "type": "object",
         "allOf": [
           {
@@ -19258,6 +19433,10 @@
         "additionalProperties": false
       },
       "DocumentTypeResponseModel": {
+        "required": [
+          "allowedTemplateIds",
+          "cleanup"
+        ],
         "type": "object",
         "allOf": [
           {
@@ -19288,6 +19467,10 @@
         "additionalProperties": false
       },
       "DocumentTypeTreeItemResponseModel": {
+        "required": [
+          "icon",
+          "isElement"
+        ],
         "type": "object",
         "allOf": [
           {
@@ -19323,6 +19506,9 @@
         "additionalProperties": false
       },
       "DocumentVariantResponseModel": {
+        "required": [
+          "state"
+        ],
         "type": "object",
         "allOf": [
           {
@@ -19342,6 +19528,10 @@
         "additionalProperties": false
       },
       "DomainPresentationModel": {
+        "required": [
+          "domainName",
+          "isoCode"
+        ],
         "type": "object",
         "properties": {
           "domainName": {
@@ -19354,6 +19544,9 @@
         "additionalProperties": false
       },
       "DomainsPresentationModelBaseModel": {
+        "required": [
+          "domains"
+        ],
         "type": "object",
         "properties": {
           "defaultIsoCode": {
@@ -19383,6 +19576,9 @@
         "additionalProperties": false
       },
       "EnableUserRequestModel": {
+        "required": [
+          "userIds"
+        ],
         "type": "object",
         "properties": {
           "userIds": {
@@ -19397,6 +19593,10 @@
         "additionalProperties": false
       },
       "EntityTreeItemResponseModel": {
+        "required": [
+          "id",
+          "isContainer"
+        ],
         "type": "object",
         "allOf": [
           {
@@ -19420,6 +19620,9 @@
         "additionalProperties": false
       },
       "ExtractRichTextStylesheetRulesRequestModel": {
+        "required": [
+          "content"
+        ],
         "type": "object",
         "properties": {
           "content": {
@@ -19438,6 +19641,10 @@
         "additionalProperties": false
       },
       "FieldPresentationModel": {
+        "required": [
+          "name",
+          "values"
+        ],
         "type": "object",
         "properties": {
           "name": {
@@ -19453,6 +19660,11 @@
         "additionalProperties": false
       },
       "FileItemResponseModelBaseModel": {
+        "required": [
+          "icon",
+          "name",
+          "path"
+        ],
         "type": "object",
         "properties": {
           "name": {
@@ -19468,6 +19680,10 @@
         "additionalProperties": false
       },
       "FileSystemTreeItemPresentationModel": {
+        "required": [
+          "isFolder",
+          "path"
+        ],
         "type": "object",
         "allOf": [
           {
@@ -19498,6 +19714,9 @@
         "additionalProperties": false
       },
       "FolderResponseModel": {
+        "required": [
+          "id"
+        ],
         "type": "object",
         "allOf": [
           {
@@ -19518,6 +19737,9 @@
         "additionalProperties": false
       },
       "FolderTreeItemResponseModel": {
+        "required": [
+          "isFolder"
+        ],
         "type": "object",
         "allOf": [
           {
@@ -19532,6 +19754,10 @@
         "additionalProperties": false
       },
       "HealthCheckActionRequestModel": {
+        "required": [
+          "healthCheckId",
+          "valueRequired"
+        ],
         "type": "object",
         "properties": {
           "healthCheckId": {
@@ -19569,6 +19795,9 @@
         "additionalProperties": false
       },
       "HealthCheckGroupPresentationBaseModel": {
+        "required": [
+          "name"
+        ],
         "type": "object",
         "properties": {
           "name": {
@@ -19578,6 +19807,9 @@
         "additionalProperties": false
       },
       "HealthCheckGroupPresentationModel": {
+        "required": [
+          "checks"
+        ],
         "type": "object",
         "allOf": [
           {
@@ -19608,6 +19840,9 @@
         "additionalProperties": false
       },
       "HealthCheckGroupWithResultResponseModel": {
+        "required": [
+          "checks"
+        ],
         "type": "object",
         "properties": {
           "checks": {
@@ -19624,6 +19859,9 @@
         "additionalProperties": false
       },
       "HealthCheckModel": {
+        "required": [
+          "name"
+        ],
         "type": "object",
         "allOf": [
           {
@@ -19642,6 +19880,9 @@
         "additionalProperties": false
       },
       "HealthCheckModelBaseModel": {
+        "required": [
+          "id"
+        ],
         "type": "object",
         "properties": {
           "id": {
@@ -19652,6 +19893,10 @@
         "additionalProperties": false
       },
       "HealthCheckResultResponseModel": {
+        "required": [
+          "message",
+          "resultType"
+        ],
         "type": "object",
         "properties": {
           "message": {
@@ -19732,6 +19977,9 @@
         "additionalProperties": false
       },
       "ImportDictionaryRequestModel": {
+        "required": [
+          "temporaryFileId"
+        ],
         "type": "object",
         "properties": {
           "temporaryFileId": {
@@ -19751,7 +19999,9 @@
           "canRebuild",
           "documentCount",
           "fieldCount",
-          "name"
+          "healthStatus",
+          "name",
+          "searcherName"
         ],
         "type": "object",
         "properties": {
@@ -19786,6 +20036,7 @@
       },
       "InstallSettingsResponseModel": {
         "required": [
+          "databases",
           "user"
         ],
         "type": "object",
@@ -19813,6 +20064,7 @@
       "InstallVResponseModel": {
         "required": [
           "database",
+          "telemetryLevel",
           "user"
         ],
         "type": "object",
@@ -19859,6 +20111,9 @@
         "additionalProperties": false
       },
       "InterpolateRichTextStylesheetResponseModel": {
+        "required": [
+          "content"
+        ],
         "type": "object",
         "properties": {
           "content": {
@@ -19883,6 +20138,10 @@
         "additionalProperties": false
       },
       "ItemResponseModelBaseModel": {
+        "required": [
+          "id",
+          "name"
+        ],
         "type": "object",
         "properties": {
           "name": {
@@ -19896,6 +20155,10 @@
         "additionalProperties": false
       },
       "ItemSortingRequestModel": {
+        "required": [
+          "id",
+          "sortOrder"
+        ],
         "type": "object",
         "properties": {
           "id": {
@@ -19929,6 +20192,8 @@
       },
       "LanguageModelBaseModel": {
         "required": [
+          "isDefault",
+          "isMandatory",
           "name"
         ],
         "type": "object",
@@ -19969,6 +20234,10 @@
         "additionalProperties": false
       },
       "LinkedLoginModel": {
+        "required": [
+          "providerKey",
+          "providerName"
+        ],
         "type": "object",
         "properties": {
           "providerName": {
@@ -19981,6 +20250,9 @@
         "additionalProperties": false
       },
       "LinkedLoginsRequestModel": {
+        "required": [
+          "linkedLogins"
+        ],
         "type": "object",
         "properties": {
           "linkedLogins": {
@@ -19997,6 +20269,13 @@
         "additionalProperties": false
       },
       "LogLevelCountsReponseModel": {
+        "required": [
+          "debug",
+          "error",
+          "fatal",
+          "information",
+          "warning"
+        ],
         "type": "object",
         "properties": {
           "information": {
@@ -20035,6 +20314,9 @@
         "format": "int32"
       },
       "LogMessagePropertyPresentationModel": {
+        "required": [
+          "name"
+        ],
         "type": "object",
         "properties": {
           "name": {
@@ -20048,6 +20330,11 @@
         "additionalProperties": false
       },
       "LogMessageResponseModel": {
+        "required": [
+          "level",
+          "properties",
+          "timestamp"
+        ],
         "type": "object",
         "properties": {
           "timestamp": {
@@ -20083,6 +20370,9 @@
         "additionalProperties": false
       },
       "LogTemplateResponseModel": {
+        "required": [
+          "count"
+        ],
         "type": "object",
         "properties": {
           "messageTemplate": {
@@ -20097,6 +20387,10 @@
         "additionalProperties": false
       },
       "LoggerResponseModel": {
+        "required": [
+          "level",
+          "name"
+        ],
         "type": "object",
         "properties": {
           "name": {
@@ -20109,6 +20403,9 @@
         "additionalProperties": false
       },
       "MediaItemResponseModel": {
+        "required": [
+          "isTrashed"
+        ],
         "type": "object",
         "allOf": [
           {
@@ -20187,6 +20484,9 @@
         "additionalProperties": false
       },
       "MediaTypeTreeItemResponseModel": {
+        "required": [
+          "icon"
+        ],
         "type": "object",
         "allOf": [
           {
@@ -20267,6 +20567,12 @@
         "additionalProperties": false
       },
       "ModelsBuilderResponseModel": {
+        "required": [
+          "canGenerate",
+          "mode",
+          "outOfDateModels",
+          "trackingOutOfDateModels"
+        ],
         "type": "object",
         "properties": {
           "mode": {
@@ -20351,6 +20657,9 @@
         "additionalProperties": false
       },
       "ObjectTypeResponseModel": {
+        "required": [
+          "id"
+        ],
         "type": "object",
         "properties": {
           "name": {
@@ -20365,6 +20674,9 @@
         "additionalProperties": false
       },
       "OkResult": {
+        "required": [
+          "statusCode"
+        ],
         "type": "object",
         "properties": {
           "statusCode": {
@@ -20389,6 +20701,9 @@
         "format": "int32"
       },
       "OutOfDateStatusResponseModel": {
+        "required": [
+          "status"
+        ],
         "type": "object",
         "properties": {
           "status": {
@@ -20407,6 +20722,10 @@
         "format": "int32"
       },
       "PackageDefinitionResponseModel": {
+        "required": [
+          "id",
+          "packagePath"
+        ],
         "type": "object",
         "allOf": [
           {
@@ -20426,6 +20745,7 @@
       },
       "PackageManifestResponseModel": {
         "required": [
+          "extensions",
           "name"
         ],
         "type": "object",
@@ -20446,6 +20766,10 @@
         "additionalProperties": false
       },
       "PackageMigrationStatusResponseModel": {
+        "required": [
+          "hasPendingMigrations",
+          "packageName"
+        ],
         "type": "object",
         "properties": {
           "packageName": {
@@ -20458,6 +20782,21 @@
         "additionalProperties": false
       },
       "PackageModelBaseModel": {
+        "required": [
+          "contentLoadChildNodes",
+          "dataTypes",
+          "dictionaryItems",
+          "documentTypes",
+          "languages",
+          "mediaIds",
+          "mediaLoadChildNodes",
+          "mediaTypes",
+          "name",
+          "partialViews",
+          "scripts",
+          "stylesheets",
+          "templates"
+        ],
         "type": "object",
         "properties": {
           "name": {
@@ -21464,6 +21803,10 @@
         "additionalProperties": false
       },
       "PartialViewSnippetResponseModel": {
+        "required": [
+          "content",
+          "name"
+        ],
         "type": "object",
         "properties": {
           "name": {
@@ -21494,6 +21837,9 @@
         "additionalProperties": false
       },
       "PathFolderResponseModel": {
+        "required": [
+          "path"
+        ],
         "type": "object",
         "allOf": [
           {
@@ -21544,6 +21890,9 @@
         "additionalProperties": false
       },
       "ProfilingStatusRequestModel": {
+        "required": [
+          "enabled"
+        ],
         "type": "object",
         "properties": {
           "enabled": {
@@ -21553,6 +21902,9 @@
         "additionalProperties": false
       },
       "ProfilingStatusResponseModel": {
+        "required": [
+          "enabled"
+        ],
         "type": "object",
         "properties": {
           "enabled": {
@@ -21562,6 +21914,9 @@
         "additionalProperties": false
       },
       "PropertyTypeAppearanceModel": {
+        "required": [
+          "labelOnTop"
+        ],
         "type": "object",
         "properties": {
           "labelOnTop": {
@@ -21572,6 +21927,8 @@
       },
       "PropertyTypeContainerModelBaseModel": {
         "required": [
+          "id",
+          "sortOrder",
           "type"
         ],
         "type": "object",
@@ -21603,7 +21960,14 @@
       "PropertyTypeModelBaseModel": {
         "required": [
           "alias",
-          "name"
+          "appearance",
+          "dataTypeId",
+          "id",
+          "name",
+          "sortOrder",
+          "validation",
+          "variesByCulture",
+          "variesBySegment"
         ],
         "type": "object",
         "properties": {
@@ -21660,6 +22024,9 @@
         "additionalProperties": false
       },
       "PropertyTypeValidationModel": {
+        "required": [
+          "mandatory"
+        ],
         "type": "object",
         "properties": {
           "mandatory": {
@@ -21681,6 +22048,10 @@
         "additionalProperties": false
       },
       "PublicAccessBaseModel": {
+        "required": [
+          "errorPageId",
+          "loginPageId"
+        ],
         "type": "object",
         "properties": {
           "loginPageId": {
@@ -21695,6 +22066,10 @@
         "additionalProperties": false
       },
       "PublicAccessRequestModel": {
+        "required": [
+          "memberGroupNames",
+          "memberUserNames"
+        ],
         "type": "object",
         "allOf": [
           {
@@ -21718,6 +22093,10 @@
         "additionalProperties": false
       },
       "PublicAccessResponseModel": {
+        "required": [
+          "groups",
+          "members"
+        ],
         "type": "object",
         "allOf": [
           {
@@ -21749,6 +22128,9 @@
         "additionalProperties": false
       },
       "PublishDocumentRequestModel": {
+        "required": [
+          "cultures"
+        ],
         "type": "object",
         "properties": {
           "cultures": {
@@ -21761,6 +22143,9 @@
         "additionalProperties": false
       },
       "PublishDocumentWithDescendantsRequestModel": {
+        "required": [
+          "includeUnpublishedDescendants"
+        ],
         "type": "object",
         "allOf": [
           {
@@ -21786,7 +22171,10 @@
       },
       "RecycleBinItemResponseModel": {
         "required": [
+          "hasChildren",
           "icon",
+          "id",
+          "isContainer",
           "name",
           "type"
         ],
@@ -21831,6 +22219,13 @@
         "format": "int32"
       },
       "RedirectUrlResponseModel": {
+        "required": [
+          "contentId",
+          "created",
+          "destinationUrl",
+          "id",
+          "originalUrl"
+        ],
         "type": "object",
         "properties": {
           "id": {
@@ -21859,6 +22254,10 @@
         "additionalProperties": false
       },
       "RedirectUrlStatusResponseModel": {
+        "required": [
+          "status",
+          "userIsAdmin"
+        ],
         "type": "object",
         "properties": {
           "status": {
@@ -21871,6 +22270,11 @@
         "additionalProperties": false
       },
       "RelationItemResponseModel": {
+        "required": [
+          "nodeId",
+          "relationTypeIsBidirectional",
+          "relationTypeIsDependency"
+        ],
         "type": "object",
         "properties": {
           "nodeId": {
@@ -21915,6 +22319,11 @@
         "additionalProperties": false
       },
       "RelationResponseModel": {
+        "required": [
+          "childId",
+          "createDate",
+          "parentId"
+        ],
         "type": "object",
         "properties": {
           "parentId": {
@@ -21946,6 +22355,8 @@
       },
       "RelationTypeBaseModel": {
         "required": [
+          "isBidirectional",
+          "isDependency",
           "name"
         ],
         "type": "object",
@@ -21984,6 +22395,8 @@
       },
       "RelationTypeResponseModel": {
         "required": [
+          "id",
+          "isSystemRelationType",
           "path"
         ],
         "type": "object",
@@ -22068,6 +22481,11 @@
         "additionalProperties": false
       },
       "RichTextRuleModel": {
+        "required": [
+          "name",
+          "selector",
+          "styles"
+        ],
         "type": "object",
         "properties": {
           "name": {
@@ -22083,6 +22501,9 @@
         "additionalProperties": false
       },
       "RichTextStylesheetRulesResponseModel": {
+        "required": [
+          "rules"
+        ],
         "type": "object",
         "properties": {
           "rules": {
@@ -22111,6 +22532,10 @@
         "format": "int32"
       },
       "SavedLogSearchPresenationBaseModel": {
+        "required": [
+          "name",
+          "query"
+        ],
         "type": "object",
         "properties": {
           "name": {
@@ -22178,7 +22603,10 @@
       },
       "SearchResultResponseModel": {
         "required": [
-          "id"
+          "fieldCount",
+          "fields",
+          "id",
+          "score"
         ],
         "type": "object",
         "properties": {
@@ -22222,6 +22650,9 @@
         "additionalProperties": false
       },
       "ServerStatusResponseModel": {
+        "required": [
+          "serverStatus"
+        ],
         "type": "object",
         "properties": {
           "serverStatus": {
@@ -22231,6 +22662,9 @@
         "additionalProperties": false
       },
       "SetAvatarRequestModel": {
+        "required": [
+          "fileId"
+        ],
         "type": "object",
         "properties": {
           "fileId": {
@@ -22250,6 +22684,9 @@
         "additionalProperties": false
       },
       "SnippetItemResponseModel": {
+        "required": [
+          "name"
+        ],
         "type": "object",
         "properties": {
           "name": {
@@ -22259,6 +22696,9 @@
         "additionalProperties": false
       },
       "SortingRequestModel": {
+        "required": [
+          "sorting"
+        ],
         "type": "object",
         "properties": {
           "parentId": {
@@ -22308,6 +22748,10 @@
         "additionalProperties": false
       },
       "StylesheetOverviewResponseModel": {
+        "required": [
+          "name",
+          "path"
+        ],
         "type": "object",
         "properties": {
           "name": {
@@ -22338,6 +22782,10 @@
         "additionalProperties": false
       },
       "TagResponseModel": {
+        "required": [
+          "id",
+          "nodeCount"
+        ],
         "type": "object",
         "properties": {
           "id": {
@@ -22369,6 +22817,9 @@
         "format": "int32"
       },
       "TelemetryRepresentationBaseModel": {
+        "required": [
+          "telemetryLevel"
+        ],
         "type": "object",
         "properties": {
           "telemetryLevel": {
@@ -22396,6 +22847,9 @@
         "additionalProperties": false
       },
       "TemplateItemResponseModel": {
+        "required": [
+          "alias"
+        ],
         "type": "object",
         "allOf": [
           {
@@ -22434,6 +22888,7 @@
       "TemplateQueryExecuteFilterPresentationModel": {
         "required": [
           "constraintValue",
+          "operator",
           "propertyAlias"
         ],
         "type": "object",
@@ -22453,6 +22908,9 @@
         "additionalProperties": false
       },
       "TemplateQueryExecuteModel": {
+        "required": [
+          "take"
+        ],
         "type": "object",
         "properties": {
           "rootContentId": {
@@ -22491,6 +22949,9 @@
         "additionalProperties": false
       },
       "TemplateQueryExecuteSortModel": {
+        "required": [
+          "propertyAlias"
+        ],
         "type": "object",
         "properties": {
           "propertyAlias": {
@@ -22504,6 +22965,10 @@
         "additionalProperties": false
       },
       "TemplateQueryOperatorModel": {
+        "required": [
+          "applicableTypes",
+          "operator"
+        ],
         "type": "object",
         "properties": {
           "operator": {
@@ -22519,6 +22984,10 @@
         "additionalProperties": false
       },
       "TemplateQueryPropertyPresentationModel": {
+        "required": [
+          "alias",
+          "type"
+        ],
         "type": "object",
         "properties": {
           "alias": {
@@ -22540,6 +23009,10 @@
         "format": "int32"
       },
       "TemplateQueryResultItemPresentationModel": {
+        "required": [
+          "icon",
+          "name"
+        ],
         "type": "object",
         "properties": {
           "icon": {
@@ -22552,6 +23025,12 @@
         "additionalProperties": false
       },
       "TemplateQueryResultResponseModel": {
+        "required": [
+          "executionTime",
+          "queryExpression",
+          "resultCount",
+          "sampleResults"
+        ],
         "type": "object",
         "properties": {
           "queryExpression": {
@@ -22579,6 +23058,11 @@
         "additionalProperties": false
       },
       "TemplateQuerySettingsResponseModel": {
+        "required": [
+          "contentTypeAliases",
+          "operators",
+          "properties"
+        ],
         "type": "object",
         "properties": {
           "contentTypeAliases": {
@@ -22611,6 +23095,9 @@
         "additionalProperties": false
       },
       "TemplateResponseModel": {
+        "required": [
+          "id"
+        ],
         "type": "object",
         "allOf": [
           {
@@ -22645,7 +23132,8 @@
       },
       "TemporaryFileResponseModel": {
         "required": [
-          "fileName"
+          "fileName",
+          "id"
         ],
         "type": "object",
         "properties": {
@@ -22684,6 +23172,11 @@
         "additionalProperties": false
       },
       "TextFileUpdateModel": {
+        "required": [
+          "content",
+          "existingPath",
+          "name"
+        ],
         "type": "object",
         "properties": {
           "name": {
@@ -22699,6 +23192,10 @@
         "additionalProperties": false
       },
       "TextFileViewModelBaseModel": {
+        "required": [
+          "content",
+          "name"
+        ],
         "type": "object",
         "properties": {
           "name": {
@@ -22711,6 +23208,11 @@
         "additionalProperties": false
       },
       "TourStatusModel": {
+        "required": [
+          "alias",
+          "completed",
+          "disabled"
+        ],
         "type": "object",
         "properties": {
           "alias": {
@@ -22726,6 +23228,11 @@
         "additionalProperties": false
       },
       "TreeItemPresentationModel": {
+        "required": [
+          "hasChildren",
+          "name",
+          "type"
+        ],
         "type": "object",
         "properties": {
           "name": {
@@ -22741,6 +23248,9 @@
         "additionalProperties": false
       },
       "UnlockUsersRequestModel": {
+        "required": [
+          "userIds"
+        ],
         "type": "object",
         "properties": {
           "userIds": {
@@ -22765,6 +23275,10 @@
         "additionalProperties": false
       },
       "UpdateContentForDocumentRequestModel": {
+        "required": [
+          "values",
+          "variants"
+        ],
         "type": "object",
         "properties": {
           "values": {
@@ -22791,6 +23305,10 @@
         "additionalProperties": false
       },
       "UpdateContentForMediaRequestModel": {
+        "required": [
+          "values",
+          "variants"
+        ],
         "type": "object",
         "properties": {
           "values": {
@@ -22819,9 +23337,16 @@
       "UpdateContentTypeForDocumentTypeRequestModel": {
         "required": [
           "alias",
+          "allowedAsRoot",
+          "allowedContentTypes",
+          "compositions",
+          "containers",
           "icon",
+          "isElement",
           "name",
-          "properties"
+          "properties",
+          "variesByCulture",
+          "variesBySegment"
         ],
         "type": "object",
         "properties": {
@@ -22899,9 +23424,16 @@
       "UpdateContentTypeForMediaTypeRequestModel": {
         "required": [
           "alias",
+          "allowedAsRoot",
+          "allowedContentTypes",
+          "compositions",
+          "containers",
           "icon",
+          "isElement",
           "name",
-          "properties"
+          "properties",
+          "variesByCulture",
+          "variesBySegment"
         ],
         "type": "object",
         "properties": {
@@ -22995,6 +23527,9 @@
         "additionalProperties": false
       },
       "UpdateDocumentNotificationsRequestModel": {
+        "required": [
+          "subscribedActionIds"
+        ],
         "type": "object",
         "properties": {
           "subscribedActionIds": {
@@ -23041,6 +23576,10 @@
         "additionalProperties": false
       },
       "UpdateDocumentTypeRequestModel": {
+        "required": [
+          "allowedTemplateIds",
+          "cleanup"
+        ],
         "type": "object",
         "allOf": [
           {
@@ -23134,6 +23673,9 @@
         "additionalProperties": false
       },
       "UpdatePackageRequestModel": {
+        "required": [
+          "packagePath"
+        ],
         "type": "object",
         "allOf": [
           {
@@ -23193,6 +23735,9 @@
         "additionalProperties": false
       },
       "UpdateTextFileViewModelBaseModel": {
+        "required": [
+          "existingPath"
+        ],
         "type": "object",
         "allOf": [
           {
@@ -23216,6 +23761,10 @@
         "additionalProperties": false
       },
       "UpdateUserGroupsOnUserRequestModel": {
+        "required": [
+          "userGroupIds",
+          "userIds"
+        ],
         "type": "object",
         "properties": {
           "userIds": {
@@ -23238,6 +23787,11 @@
         "additionalProperties": false
       },
       "UpdateUserRequestModel": {
+        "required": [
+          "contentStartNodeIds",
+          "languageIsoCode",
+          "mediaStartNodeIds"
+        ],
         "type": "object",
         "allOf": [
           {
@@ -23272,7 +23826,8 @@
           "currentState",
           "newState",
           "newVersion",
-          "oldVersion"
+          "oldVersion",
+          "reportUrl"
         ],
         "type": "object",
         "properties": {
@@ -23300,6 +23855,10 @@
         "additionalProperties": false
       },
       "UserDataModel": {
+        "required": [
+          "data",
+          "name"
+        ],
         "type": "object",
         "properties": {
           "name": {
@@ -23312,6 +23871,9 @@
         "additionalProperties": false
       },
       "UserDataResponseModel": {
+        "required": [
+          "userData"
+        ],
         "type": "object",
         "properties": {
           "userData": {
@@ -23328,6 +23890,13 @@
         "additionalProperties": false
       },
       "UserGroupBaseModel": {
+        "required": [
+          "hasAccessToAllLanguages",
+          "languages",
+          "name",
+          "permissions",
+          "sections"
+        ],
         "type": "object",
         "properties": {
           "name": {
@@ -23388,6 +23957,9 @@
         "additionalProperties": false
       },
       "UserGroupResponseModel": {
+        "required": [
+          "id"
+        ],
         "type": "object",
         "allOf": [
           {
@@ -23406,7 +23978,8 @@
         "required": [
           "email",
           "name",
-          "password"
+          "password",
+          "subscribeToNewsletter"
         ],
         "type": "object",
         "properties": {
@@ -23457,6 +24030,10 @@
         "format": "int32"
       },
       "UserPermissionModel": {
+        "required": [
+          "nodeKey",
+          "permissions"
+        ],
         "type": "object",
         "properties": {
           "nodeKey": {
@@ -23473,6 +24050,9 @@
         "additionalProperties": false
       },
       "UserPermissionsResponseModel": {
+        "required": [
+          "permissions"
+        ],
         "type": "object",
         "properties": {
           "permissions": {
@@ -23489,6 +24069,12 @@
         "additionalProperties": false
       },
       "UserPresentationBaseModel": {
+        "required": [
+          "email",
+          "name",
+          "userGroupIds",
+          "userName"
+        ],
         "type": "object",
         "properties": {
           "email": {
@@ -23512,6 +24098,16 @@
         "additionalProperties": false
       },
       "UserResponseModel": {
+        "required": [
+          "avatarUrls",
+          "contentStartNodeIds",
+          "createDate",
+          "failedLoginAttempts",
+          "id",
+          "mediaStartNodeIds",
+          "state",
+          "updateDate"
+        ],
         "type": "object",
         "allOf": [
           {
@@ -23583,6 +24179,11 @@
         "additionalProperties": false
       },
       "UserSettingsModel": {
+        "required": [
+          "consentLevels",
+          "minCharLength",
+          "minNonAlphaNumericLength"
+        ],
         "type": "object",
         "properties": {
           "minCharLength": {
@@ -23619,6 +24220,9 @@
         "format": "int32"
       },
       "UserTourStatusesResponseModel": {
+        "required": [
+          "tourStatuses"
+        ],
         "type": "object",
         "properties": {
           "tourStatuses": {
@@ -23684,7 +24288,9 @@
       },
       "VariantResponseModelBaseModel": {
         "required": [
-          "name"
+          "createDate",
+          "name",
+          "updateDate"
         ],
         "type": "object",
         "properties": {
@@ -23712,6 +24318,10 @@
         "additionalProperties": false
       },
       "VariantTreeItemModel": {
+        "required": [
+          "name",
+          "state"
+        ],
         "type": "object",
         "properties": {
           "name": {
@@ -23747,7 +24357,8 @@
       },
       "VerifyResetPasswordTokenRequestModel": {
         "required": [
-          "resetCode"
+          "resetCode",
+          "userId"
         ],
         "type": "object",
         "properties": {
