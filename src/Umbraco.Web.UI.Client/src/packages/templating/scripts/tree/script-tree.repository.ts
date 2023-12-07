@@ -8,7 +8,7 @@ import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
 // TODO: TREE STORE TYPE PROBLEM:
 export class UmbScriptTreeRepository
-	extends UmbTreeRepositoryBase<UmbScriptTreeItemModel, { id: null } & UmbScriptTreeRootModel>
+	extends UmbTreeRepositoryBase<UmbScriptTreeItemModel, UmbScriptTreeRootModel>
 	implements UmbApi
 {
 	constructor(host: UmbControllerHost) {
