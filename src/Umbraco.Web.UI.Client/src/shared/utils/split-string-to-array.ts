@@ -14,7 +14,7 @@
  * const customDelimiterResult = splitStringToArray('apple | orange | banana', ' | ');
  * // customDelimiterResult: ['apple', 'orange', 'banana']
  */
-export function splitStringToArray(string: string, split = ',') {
+export function splitStringToArray(string: string, split: string = ','): string[] {
 	return (
 		string
 			.split(split)
