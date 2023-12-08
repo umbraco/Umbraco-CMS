@@ -145,7 +145,7 @@ export class UmbDataTypeWorkspaceContext
 		return this._configDefaultData?.find((x) => x.alias === alias)?.value;
 	}
 
-	createVariantContext(host: UmbControllerHost) {
+	createPropertyDatasetContext(host: UmbControllerHost) {
 		const context = new UmbPropertyDatasetBaseContext(host);
 
 		// Observe workspace name:

@@ -259,7 +259,7 @@ export class UmbDocumentWorkspaceContext
 	}
 	*/
 
-	public createVariantContext(host: UmbControllerHost, variantId: UmbVariantId) {
+	public createPropertyDatasetContext(host: UmbControllerHost, variantId: UmbVariantId) {
 		return new UmbDocumentPropertyDataContext(host, this, variantId);
 	}
 

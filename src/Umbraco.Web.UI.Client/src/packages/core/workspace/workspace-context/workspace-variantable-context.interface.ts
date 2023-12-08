@@ -27,5 +27,5 @@ export interface UmbVariantableWorkspaceContextInterface<EntityType = unknown>
 	setPropertyValue(alias: string, value: unknown, variantId?: UmbVariantId): Promise<void>;
 	//propertyDataByAlias(alias: string, variantId?: UmbVariantId): Observable<ValueModelBaseModel | undefined>;
 
-	createVariantContext(host: UmbControllerHost, variantId?: UmbVariantId): UmbPropertyDatasetContext;
+	createPropertyDatasetContext(host: UmbControllerHost, variantId?: UmbVariantId): UmbPropertyDatasetContext;
 }
