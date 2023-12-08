@@ -20,6 +20,7 @@ export const data: Array<ScriptsDataItem> = [
 		name: 'some-folder',
 		type: 'script',
 		hasChildren: true,
+		content: '',
 	},
 	{
 		path: 'another-folder',
@@ -27,6 +28,7 @@ export const data: Array<ScriptsDataItem> = [
 		name: 'another-folder',
 		type: 'script',
 		hasChildren: true,
+		content: '',
 	},
 	{
 		path: 'very important folder',
@@ -34,6 +36,7 @@ export const data: Array<ScriptsDataItem> = [
 		name: 'very important folder',
 		type: 'script',
 		hasChildren: true,
+		content: '',
 	},
 	{
 		path: 'some-folder/ugly script.js',

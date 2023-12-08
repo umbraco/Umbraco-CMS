@@ -74,43 +74,43 @@ export const data: Array<RelationTypeResponseModel> = [
 export const treeData: Array<EntityTreeItemResponseModel> = [
 	{
 		id: 'e0d39ff5-71d8-453f-b682-9d8d31ee5e06',
-
 		isContainer: false,
 		parentId: null,
 		name: 'Relate Document On Copy',
 		type: 'relation-type',
+		hasChildren: false,
 	},
 	{
 		id: 'ac68cde6-763f-4231-a751-1101b57defd2',
-
 		isContainer: false,
 		parentId: null,
 		name: 'Relate Parent Document On Delete',
 		type: 'relation-type',
+		hasChildren: false,
 	},
 	{
 		id: '6f9b800c-762c-42d4-85d9-bf40a77d689e',
-
 		isContainer: false,
 		parentId: null,
 		name: 'Relate Parent Media Folder On Delete',
 		type: 'relation-type',
+		hasChildren: false,
 	},
 	{
 		id: 'd421727d-43de-4205-b4c6-037404f309ad',
-
 		isContainer: false,
 		parentId: null,
 		name: 'Related Media',
 		type: 'relation-type',
+		hasChildren: false,
 	},
 	{
 		id: 'e9a0a28e-2d5b-4229-ac00-66f2df230513',
-
 		isContainer: false,
 		parentId: null,
 		name: 'Related Document',
 		type: 'relation-type',
+		hasChildren: false,
 	},
 ];
 
