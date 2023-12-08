@@ -88,7 +88,7 @@ export class UmbEntityData<T extends UmbEntityBase> extends UmbData<T> {
 		});
 	}
 
-	updateData(updateItem: T) {
+	updateData(updateItem: Partial<T>) {
 		const itemIndex = this.data.findIndex((item) => item.id === updateItem.id);
 		const item = this.data[itemIndex];
 		if (!item) return;
