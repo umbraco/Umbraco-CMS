@@ -30,7 +30,10 @@ public class BulkDeleteUserGroupsController : UserGroupControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> BulkDelete(DeleteUserGroupsRequestModel model)
     {
-        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(User, new UserGroupPermissionResource(model.UserGroupIds), AuthorizationPolicies.UserBelongsToUserGroupInRequest);
+        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
+            User,
+            new UserGroupPermissionResource(model.UserGroupIds),
+            AuthorizationPolicies.UserBelongsToUserGroupInRequest);
 
         if (!authorizationResult.Succeeded)
         {

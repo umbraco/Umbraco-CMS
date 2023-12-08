@@ -39,7 +39,7 @@ public class SortMediaController : MediaControllerBase
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,
-            MediaPermissionResource.WithKeys(new List<Guid?>(sortingRequestModel.Sorting.Select(x=>x.Id).Cast<Guid?>()){sortingRequestModel.ParentId}),
+            MediaPermissionResource.WithKeys(new List<Guid?>(sortingRequestModel.Sorting.Select(x => x.Id).Cast<Guid?>()) { sortingRequestModel.ParentId }),
             AuthorizationPolicies.MediaPermissionByResource);
         if (!authorizationResult.Succeeded)
         {

@@ -36,7 +36,10 @@ public class ByKeyMediaController : MediaControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ByKey(Guid id)
     {
-        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(User, MediaPermissionResource.WithKeys(id), AuthorizationPolicies.MediaPermissionByResource);
+        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
+            User,
+            MediaPermissionResource.WithKeys(id),
+            AuthorizationPolicies.MediaPermissionByResource);
 
         if (!authorizationResult.Succeeded)
         {

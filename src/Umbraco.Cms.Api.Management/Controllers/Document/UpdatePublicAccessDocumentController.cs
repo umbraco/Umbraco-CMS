@@ -38,7 +38,10 @@ public class UpdatePublicAccessDocumentController : DocumentControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Update(Guid id, PublicAccessRequestModel requestModel)
     {
-        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(User, ContentPermissionResource.WithKeys(ActionProtect.ActionLetter, id),AuthorizationPolicies.ContentPermissionByResource);
+        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
+            User,
+            ContentPermissionResource.WithKeys(ActionProtect.ActionLetter, id),
+            AuthorizationPolicies.ContentPermissionByResource);
 
         if (!authorizationResult.Succeeded)
         {

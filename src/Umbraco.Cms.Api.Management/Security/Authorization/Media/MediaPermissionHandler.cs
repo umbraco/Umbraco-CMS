@@ -22,7 +22,7 @@ public class MediaPermissionHandler : MustSatisfyRequirementAuthorizationHandler
         MediaPermissionRequirement requirement,
         MediaPermissionResource resource)
     {
-        bool result = true;
+        var result = true;
 
         if (resource.CheckRoot)
         {

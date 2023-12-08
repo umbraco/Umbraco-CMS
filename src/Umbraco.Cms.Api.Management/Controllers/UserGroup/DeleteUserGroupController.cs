@@ -29,7 +29,10 @@ public class DeleteUserGroupController : UserGroupControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(Guid id)
     {
-        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(User, UserGroupPermissionResource.WithKeys(id), AuthorizationPolicies.UserBelongsToUserGroupInRequest);
+        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
+            User,
+            UserGroupPermissionResource.WithKeys(id),
+            AuthorizationPolicies.UserBelongsToUserGroupInRequest);
 
         if (!authorizationResult.Succeeded)
         {

@@ -22,7 +22,7 @@ public class ContentPermissionHandler : MustSatisfyRequirementAuthorizationHandl
         ContentPermissionRequirement requirement,
         ContentPermissionResource resource)
     {
-        bool result = true;
+        var result = true;
 
         if (resource.CheckRoot)
         {
