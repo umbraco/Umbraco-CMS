@@ -1,5 +1,5 @@
 import { UmbStylesheetRepository } from '../repository/stylesheet.repository.js';
-import type { StylesheetDetails } from '../index.js';
+import type { UmbStylesheetDetailModel } from '../index.js';
 import {
 	type UmbSaveableWorkspaceContextInterface,
 	UmbEditableWorkspaceContextBase,
@@ -13,10 +13,10 @@ import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 export type RichTextRuleModelSortable = RichTextRuleModel & { sortOrder?: number };
 
 export class UmbStylesheetWorkspaceContext
-	extends UmbEditableWorkspaceContextBase<UmbStylesheetRepository, StylesheetDetails>
-	implements UmbSaveableWorkspaceContextInterface<StylesheetDetails | undefined>
+	extends UmbEditableWorkspaceContextBase<UmbStylesheetRepository, UmbStylesheetDetailModel>
+	implements UmbSaveableWorkspaceContextInterface<UmbStylesheetDetailModel | undefined>
 {
-	#data = new UmbObjectState<StylesheetDetails | undefined>(undefined);
+	#data = new UmbObjectState<UmbStylesheetDetailModel | undefined>(undefined);
 	#rules = new UmbArrayState<RichTextRuleModelSortable>([], (rule) => rule.name);
 	readonly data = this.#data.asObservable();
 	readonly rules = this.#rules.asObservable();
