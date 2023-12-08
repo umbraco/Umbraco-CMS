@@ -16,6 +16,8 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 		id: 'dt-folder1',
 		parentId: null,
 		isFolder: true,
+		hasChildren: false,
+		isContainer: false,
 	},
 	{
 		type: 'data-type',
@@ -24,6 +26,7 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 		parentId: null,
 		isFolder: true,
 		hasChildren: true,
+		isContainer: false,
 	},
 	{
 		type: 'data-type',
