@@ -1,4 +1,4 @@
-import { UmbPropertyDatasetContext } from '../property-dataset/index.js';
+import { UmbPropertyDatasetContext } from '../../property/property-dataset/index.js';
 import { UMB_VARIANT_WORKSPACE_CONTEXT_TOKEN } from '../index.js';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';

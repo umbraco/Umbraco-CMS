@@ -1,8 +1,8 @@
+import { UMB_PROPERTY_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/property';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 import { UmbInputMultiUrlElement } from '@umbraco-cms/backoffice/components';
-import { UMB_PROPERTY_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/workspace';
 import { UmbLinkPickerLink } from '@umbraco-cms/backoffice/modal';
 import { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';

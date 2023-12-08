@@ -1,4 +1,4 @@
-import { UMB_PROPERTY_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/workspace';
+import { UMB_PROPERTY_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/property';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';

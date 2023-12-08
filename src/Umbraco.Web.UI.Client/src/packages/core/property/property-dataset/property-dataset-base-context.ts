@@ -1,4 +1,4 @@
-import type { UmbPropertyValueData } from '../types/property-value-data.type.js';
+import type { UmbPropertyValueData } from '../../workspace/types/property-value-data.type.js';
 import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import {
