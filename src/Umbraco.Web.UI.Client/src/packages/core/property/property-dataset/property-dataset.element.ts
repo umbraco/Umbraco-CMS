@@ -35,13 +35,13 @@ export class UmbPropertyDatasetElement extends UmbLitElement {
 	 *
 	 * html`
 	 * <umb-property-dataset .value="${dataSet}">
-	 * 	<umb-workspace-property
+	 * 	<umb-property
 	 * 		label="My label for this property"
 	 * 		description="The description to show on the property"
 	 * 		alias="testAlias"
 	 * 		property-editor-ui-alias="Umb.PropertyEditorUi.TextBox"
 	 * 		.config=${...}>
-	 * 	</umb-workspace-property>
+	 * 	</umb-property>
 	 * </umb-property-dataset>
 	 * `
 	 * ```

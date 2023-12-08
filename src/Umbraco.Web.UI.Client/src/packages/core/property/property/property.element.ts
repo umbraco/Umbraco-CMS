@@ -11,14 +11,14 @@ import {
 } from '@umbraco-cms/backoffice/property-editor';
 
 /**
- *  @element umb-workspace-property
+ *  @element umb-property
  *  @description Component for displaying a property with editor from extension registry.
  *	The Element will render a Property Editor based on the Property Editor UI alias passed to the element.
  *  This will also render all Property Actions related to the Property Editor UI Alias.
  */
 
-@customElement('umb-workspace-property')
-export class UmbWorkspacePropertyElement extends UmbLitElement {
+@customElement('umb-property')
+export class UmbPropertyElement extends UmbLitElement {
 	/**
 	 * Label. Name of the property
 	 * @type {string}
@@ -238,6 +238,6 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-workspace-property': UmbWorkspacePropertyElement;
+		'umb-property': UmbPropertyElement;
 	}
 }

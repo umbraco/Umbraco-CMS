@@ -45,12 +45,12 @@ export class UmbPropertyEditorConfigElement extends UmbLitElement {
 					this._properties,
 					(property) => property.alias,
 					(property) =>
-						html`<umb-workspace-property
+						html`<umb-property
 							label="${property.label}"
 							description="${ifDefined(property.description)}"
 							alias="${property.alias}"
 							property-editor-ui-alias="${property.propertyEditorUiAlias}"
-							.config=${property.config}></umb-workspace-property>`,
+							.config=${property.config}></umb-property>`,
 			  )
 			: html`<div>No configuration</div>`;
 	}

@@ -1,5 +1,5 @@
 import { Meta, Story } from '@storybook/web-components';
-import type { UmbWorkspacePropertyElement } from './property.element.js';
+import type { UmbPropertyElement } from './property.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 import './property.element.js';
@@ -10,11 +10,11 @@ export default {
 	id: 'umb-property',
 } as Meta;
 
-export const AAAOverview: Story<UmbWorkspacePropertyElement> = () =>
-	html` <umb-workspace-property
+export const AAAOverview: Story<UmbPropertyElement> = () =>
+	html` <umb-property
 		label="Property"
 		description="Description"
 		alias="textProperty"
 		property-editor-ui-alias="Umb.PropertyEditorUi.TextBox"
-		.value="${'Hello'}"></umb-workspace-property>`;
+		.value="${'Hello'}"></umb-property>`;
 AAAOverview.storyName = 'Overview';
