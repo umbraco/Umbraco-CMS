@@ -58,6 +58,7 @@ export class UmbImportDictionaryModalLayout extends UmbModalBaseElement<
 					type: 'dictionary-item',
 					hasChildren: item.children.length ? true : false,
 					parentId: parentId,
+					isContainer: false,
 				});
 				scaffold(item.children, item.id);
 			});
