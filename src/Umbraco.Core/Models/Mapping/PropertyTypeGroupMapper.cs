@@ -124,24 +124,6 @@ public class PropertyTypeGroupMapper<TPropertyType>
             groups.Add(genericGroup);
         }
 
-        // handle locked properties
-        var lockedPropertyAliases = new List<string>();
-
-        // add built-in member property aliases to list of aliases to be locked
-        foreach (var propertyAlias in ConventionsHelper.GetStandardPropertyTypeStubs(_shortStringHelper).Keys)
-        {
-            lockedPropertyAliases.Add(propertyAlias);
-        }
-
-        // lock properties by aliases
-        foreach (TPropertyType property in groups.SelectMany(x => x.Properties))
-        {
-            if (property.Alias is not null)
-            {
-                property.Locked = lockedPropertyAliases.Contains(property.Alias);
-            }
-        }
-
         // now merge tabs based on alias
         // as for one name, we might have one local tab, plus some inherited tabs
         IGrouping<string, PropertyGroupDisplay<TPropertyType>>[] groupsGroupsByAlias =

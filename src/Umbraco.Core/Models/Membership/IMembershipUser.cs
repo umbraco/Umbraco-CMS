@@ -23,8 +23,6 @@ public interface IMembershipUser : IEntity
     /// </summary>
     string? PasswordConfiguration { get; set; }
 
-    string? Comments { get; set; }
-
     bool IsApproved { get; set; }
 
     bool IsLockedOut { get; set; }

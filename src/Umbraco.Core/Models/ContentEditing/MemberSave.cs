@@ -23,11 +23,6 @@ public class MemberSave : ContentBaseSave<IMember>
     [DataMember(Name = "memberGroups")]
     public IEnumerable<string>? Groups { get; set; }
 
-    /// <summary>
-    ///     Returns the value from the Comments property
-    /// </summary>
-    public string? Comments => GetPropertyValue<string>(Constants.Conventions.Member.Comments);
-
     [DataMember(Name = "isLockedOut")]
     public bool IsLockedOut { get; set; }
 
@@ -36,16 +31,4 @@ public class MemberSave : ContentBaseSave<IMember>
 
     [DataMember(Name = "isTwoFactorEnabled")]
     public bool IsTwoFactorEnabled { get; set; }
-
-    private T? GetPropertyValue<T>(string alias)
-    {
-        ContentPropertyBasic? prop = Properties.FirstOrDefault(x => x.Alias == alias);
-        if (prop == null)
-        {
-            return default;
-        }
-
-        Attempt<T> converted = prop.Value.TryConvertTo<T>();
-        return converted.Result ?? default;
-    }
 }

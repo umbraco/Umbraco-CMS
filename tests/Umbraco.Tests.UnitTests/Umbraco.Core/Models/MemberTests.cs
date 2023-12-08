@@ -38,7 +38,6 @@ public class MemberTests
         Assert.AreEqual(clone.ContentTypeId, member.ContentTypeId);
         Assert.AreEqual(clone.CreateDate, member.CreateDate);
         Assert.AreEqual(clone.CreatorId, member.CreatorId);
-        Assert.AreEqual(clone.Comments, member.Comments);
         Assert.AreEqual(clone.Key, member.Key);
         Assert.AreEqual(clone.FailedPasswordAttempts, member.FailedPasswordAttempts);
         Assert.AreEqual(clone.Level, member.Level);
@@ -89,7 +88,6 @@ public class MemberTests
             .WithId(99)
             .WithAlias("memberType")
             .WithName("Member Type")
-            .WithMembershipPropertyGroup()
             .AddPropertyGroup()
             .WithName("Content")
             .AddPropertyType()

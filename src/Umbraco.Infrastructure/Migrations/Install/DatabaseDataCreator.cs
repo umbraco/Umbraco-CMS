@@ -1347,21 +1347,6 @@ internal class DatabaseDataCreator
                     SortOrder = 1,
                 });
         }
-
-        // Membership property group.
-        if (_database.Exists<NodeDto>(1044))
-        {
-            _database.Insert(Constants.DatabaseSchema.Tables.PropertyTypeGroup, "id", false,
-                new PropertyTypeGroupDto
-                {
-                    Id = 11,
-                    UniqueId = new Guid(Constants.PropertyTypeGroups.Membership),
-                    ContentTypeNodeId = 1044,
-                    Text = Constants.Conventions.Member.StandardPropertiesGroupName,
-                    Alias = Constants.Conventions.Member.StandardPropertiesGroupAlias,
-                    SortOrder = 1,
-                });
-        }
     }
 
     private void CreatePropertyTypeData()
@@ -1710,27 +1695,6 @@ internal class DatabaseDataCreator
                     Mandatory = false,
                     ValidationRegExp = null,
                     Description = "in bytes",
-                    Variations = (byte)ContentVariation.Nothing,
-                });
-        }
-
-        // Membership property types.
-        if (_database.Exists<PropertyTypeGroupDto>(11))
-        {
-            _database.Insert(Constants.DatabaseSchema.Tables.PropertyType, "id", false,
-                new PropertyTypeDto
-                {
-                    Id = 28,
-                    UniqueId = 28.ToGuid(),
-                    DataTypeId = Constants.DataTypes.Textarea,
-                    ContentTypeId = 1044,
-                    PropertyTypeGroupId = 11,
-                    Alias = Constants.Conventions.Member.Comments,
-                    Name = Constants.Conventions.Member.CommentsLabel,
-                    SortOrder = 0,
-                    Mandatory = false,
-                    ValidationRegExp = null,
-                    Description = null,
                     Variations = (byte)ContentVariation.Nothing,
                 });
         }

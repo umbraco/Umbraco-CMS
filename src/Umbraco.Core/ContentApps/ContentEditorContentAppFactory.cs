@@ -37,7 +37,7 @@ public class ContentEditorContentAppFactory : IContentAppFactory
                     Weight = Weight,
                 };
 
-            case IMember _:
+            case IMember member when member.Properties.Count > 0:
                 return _memberApp ??= new ContentApp
                 {
                     Alias = "umbContent",

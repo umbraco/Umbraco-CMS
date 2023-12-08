@@ -42,8 +42,6 @@ public sealed class MemberMapper : BaseMapper
         DefineMap<Member, MemberDto>(nameof(Member.LastLoginDate), nameof(MemberDto.LastLoginDate));
         DefineMap<Member, MemberDto>(nameof(Member.LastPasswordChangeDate), nameof(MemberDto.LastPasswordChangeDate));
 
-        DefineMap<Member, PropertyDataDto>(nameof(Member.Comments), nameof(PropertyDataDto.TextValue));
-
         /* Internal experiment */
         DefineMap<Member, PropertyDataDto>(nameof(Member.DateTimePropertyValue), nameof(PropertyDataDto.DateValue));
         DefineMap<Member, PropertyDataDto>(nameof(Member.IntegerPropertyValue), nameof(PropertyDataDto.IntegerValue));

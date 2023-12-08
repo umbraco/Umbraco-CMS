@@ -16,7 +16,6 @@ public class MemberMapDefinition : IMapDefinition
         target.Email = source.Email;
         target.Key = source.Key;
         target.Username = source.Username;
-        target.Comments = source.Comments;
         target.CreateDate = source.CreateDate;
         target.UpdateDate = source.UpdateDate;
         target.Email = source.Email;

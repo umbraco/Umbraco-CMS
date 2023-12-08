@@ -27,9 +27,6 @@ public class ProfileModel : PostRedirectModel
     public string UserName { get; set; } = null!;
 
     [ReadOnly(true)]
-    public string? Comments { get; set; }
-
-    [ReadOnly(true)]
     public bool IsApproved { get; set; }
 
     [ReadOnly(true)]

@@ -14,87 +14,49 @@ namespace Umbraco.Cms.Core.Models;
 [DebuggerDisplay("Id: {Id}, Name: {Name}, Alias: {Alias}")]
 public class PropertyType : EntityBase, IPropertyType, IEquatable<PropertyType>
 {
-    private readonly bool _forceValueStorageType;
     private readonly IShortStringHelper _shortStringHelper;
-    private string _alias;
+    private string _alias = string.Empty;
     private int _dataTypeId;
     private Guid _dataTypeKey;
     private string? _description;
     private bool _labelOnTop;
     private bool _mandatory;
     private string? _mandatoryMessage;
-    private string _name;
+    private string _name = string.Empty;
     private string _propertyEditorAlias;
     private Lazy<int>? _propertyGroupId;
     private int _sortOrder;
     private string? _validationRegExp;
     private string? _validationRegExpMessage;
     private ValueStorageType _valueStorageType;
-    private ContentVariation _variations;
+    private ContentVariation _variations = ContentVariation.Nothing;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="PropertyType" /> class.
     /// </summary>
-    public PropertyType(IShortStringHelper shortStringHelper, IDataType dataType)
+    public PropertyType(IShortStringHelper shortStringHelper, IDataType dataType, string? propertyTypeAlias = null)
+        : this(shortStringHelper, dataType.EditorAlias, dataType.DatabaseType, propertyTypeAlias)
     {
-        if (dataType == null)
-        {
-            throw new ArgumentNullException(nameof(dataType));
-        }
-
-        _shortStringHelper = shortStringHelper;
-
         if (dataType.HasIdentity)
         {
             _dataTypeId = dataType.Id;
+            _dataTypeKey = dataType.Key;
         }
-
-        _propertyEditorAlias = dataType.EditorAlias;
-        _valueStorageType = dataType.DatabaseType;
-        _variations = ContentVariation.Nothing;
-        _alias = string.Empty;
-        _name = string.Empty;
     }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="PropertyType" /> class.
     /// </summary>
-    public PropertyType(IShortStringHelper shortStringHelper, IDataType dataType, string propertyTypeAlias)
-        : this(shortStringHelper, dataType) =>
-        _alias = SanitizeAlias(propertyTypeAlias);
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="PropertyType" /> class.
-    /// </summary>
-    public PropertyType(IShortStringHelper shortStringHelper, string propertyEditorAlias, ValueStorageType valueStorageType)
-        : this(shortStringHelper, propertyEditorAlias, valueStorageType, false)
-    {
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="PropertyType" /> class.
-    /// </summary>
-    public PropertyType(IShortStringHelper shortStringHelper, string propertyEditorAlias, ValueStorageType valueStorageType, string propertyTypeAlias)
-        : this(shortStringHelper, propertyEditorAlias, valueStorageType, false, propertyTypeAlias)
-    {
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="PropertyType" /> class.
-    /// </summary>
-    /// <remarks>
-    ///     Set <paramref name="forceValueStorageType" /> to true to force the value storage type. Values assigned to
-    ///     the property, eg from the underlying datatype, will be ignored.
-    /// </remarks>
-    public PropertyType(IShortStringHelper shortStringHelper, string propertyEditorAlias, ValueStorageType valueStorageType, bool forceValueStorageType, string? propertyTypeAlias = null)
+    public PropertyType(IShortStringHelper shortStringHelper, string propertyEditorAlias, ValueStorageType valueStorageType, string? propertyTypeAlias = null)
     {
         _shortStringHelper = shortStringHelper;
         _propertyEditorAlias = propertyEditorAlias;
         _valueStorageType = valueStorageType;
-        _forceValueStorageType = forceValueStorageType;
-        _alias = propertyTypeAlias == null ? string.Empty : SanitizeAlias(propertyTypeAlias);
-        _variations = ContentVariation.Nothing;
-        _name = string.Empty;
+
+        if (propertyTypeAlias is not null)
+        {
+            _alias = SanitizeAlias(propertyTypeAlias);
+        }
     }
 
     /// <summary>
@@ -179,15 +141,7 @@ public class PropertyType : EntityBase, IPropertyType, IEquatable<PropertyType>
     public ValueStorageType ValueStorageType
     {
         get => _valueStorageType;
-        set
-        {
-            if (_forceValueStorageType)
-            {
-                return; // ignore changes
-            }
-
-            SetPropertyValueAndDetectChanges(value, ref _valueStorageType, nameof(ValueStorageType));
-        }
+        set => SetPropertyValueAndDetectChanges(value, ref _valueStorageType, nameof(ValueStorageType));
     }
 
     /// <inheritdoc />

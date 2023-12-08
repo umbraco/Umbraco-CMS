@@ -311,46 +311,6 @@ public class Member : ContentBase, IMember
         set => SetPropertyValueAndDetectChanges(value, ref _passwordConfig, nameof(PasswordConfiguration));
     }
 
-    // TODO: When get/setting all of these properties we MUST:
-    // * Check if we are using the umbraco membership provider, if so then we need to use the configured fields - not the explicit fields below
-    // * If any of the fields don't exist, what should we do? Currently it will throw an exception!
-
-    /// <summary>
-    ///     Gets or set the comments for the member
-    /// </summary>
-    /// <remarks>
-    ///     Alias: umbracoMemberComments
-    ///     Part of the standard properties collection.
-    /// </remarks>
-    [DataMember]
-    public string? Comments
-    {
-        get
-        {
-            Attempt<string?> a = WarnIfPropertyTypeNotFoundOnGet(Constants.Conventions.Member.Comments, nameof(Comments), default(string));
-            if (a.Success == false)
-            {
-                return a.Result;
-            }
-
-            return Properties[Constants.Conventions.Member.Comments]?.GetValue() == null
-                ? string.Empty
-                : Properties[Constants.Conventions.Member.Comments]?.GetValue()?.ToString();
-        }
-
-        set
-        {
-            if (WarnIfPropertyTypeNotFoundOnSet(
-                    Constants.Conventions.Member.Comments,
-                    nameof(Comments)) == false)
-            {
-                return;
-            }
-
-            Properties[Constants.Conventions.Member.Comments]?.SetValue(value);
-        }
-    }
-
     /// <summary>
     ///     Gets or sets a value indicating whether the Member is approved
     /// </summary>
@@ -516,61 +476,4 @@ public class Member : ContentBase, IMember
     /// <inheritdoc />
     [IgnoreDataMember]
     public bool HasAdditionalData => _additionalData != null;
-
-    private Attempt<T> WarnIfPropertyTypeNotFoundOnGet<T>(string propertyAlias, string propertyName, T defaultVal)
-    {
-        static void DoLog(string logPropertyAlias, string logPropertyName)
-        {
-            StaticApplicationLogging.Logger.LogWarning(
-                "Trying to access the '{PropertyName}' property on '{MemberType}' " +
-                "but the {PropertyAlias} property does not exist on the member type so a default value is returned. " +
-                "Ensure that you have a property type with alias:  {PropertyAlias} configured on your member type in order to use the '{PropertyName}' property on the model correctly.",
-                logPropertyName,
-                typeof(Member),
-                logPropertyAlias);
-        }
-
-        // if the property doesn't exist,
-        if (Properties.Contains(propertyAlias) == false)
-        {
-            // put a warn in the log if this entity has been persisted
-            // then return a failure
-            if (HasIdentity)
-            {
-                DoLog(propertyAlias, propertyName);
-            }
-
-            return Attempt<T>.Fail(defaultVal);
-        }
-
-        return Attempt<T>.Succeed();
-    }
-
-    private bool WarnIfPropertyTypeNotFoundOnSet(string propertyAlias, string propertyName)
-    {
-        static void DoLog(string logPropertyAlias, string logPropertyName)
-        {
-            StaticApplicationLogging.Logger.LogWarning(
-                "An attempt was made to set a value on the property '{PropertyName}' on type '{MemberType}' but the " +
-                "property type {PropertyAlias} does not exist on the member type, ensure that this property type exists so that setting this property works correctly.",
-                logPropertyName,
-                typeof(Member),
-                logPropertyAlias);
-        }
-
-        // if the property doesn't exist,
-        if (Properties.Contains(propertyAlias) == false)
-        {
-            // put a warn in the log if this entity has been persisted
-            // then return a failure
-            if (HasIdentity)
-            {
-                DoLog(propertyAlias, propertyName);
-            }
-
-            return false;
-        }
-
-        return true;
-    }
 }

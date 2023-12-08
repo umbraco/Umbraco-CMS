@@ -125,7 +125,6 @@ public class IdentityMapDefinition : IMapDefinition
         target.IsApproved = source.IsApproved;
         target.SecurityStamp = source.SecurityStamp;
         target.LockoutEnd = source.IsLockedOut ? DateTime.MaxValue.ToUniversalTime() : (DateTime?)null;
-        target.Comments = source.Comments;
         target.LastLockoutDateUtc = source.LastLockoutDate == DateTime.MinValue
             ? null
             : source.LastLockoutDate?.ToUniversalTime();

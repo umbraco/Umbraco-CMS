@@ -96,10 +96,8 @@ public class MemberTypeServiceTests : UmbracoIntegrationTest
         MemberService.Save(member);
         var initProps = member.Properties.Count;
 
-        // remove a property (NOT ONE OF THE DEFAULTS)
-        var standardProps = ConventionsHelper.GetStandardPropertyTypeStubs(ShortStringHelper);
-        memberType.RemovePropertyType(memberType.PropertyTypes.First(x => standardProps.ContainsKey(x.Alias) == false)
-            .Alias);
+        // remove a property
+        memberType.RemovePropertyType(memberType.PropertyTypes.First().Alias);
         MemberTypeService.Save(memberType);
 
         // re-load it from the db

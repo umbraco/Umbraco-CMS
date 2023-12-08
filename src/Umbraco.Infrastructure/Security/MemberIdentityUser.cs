@@ -9,14 +9,6 @@ namespace Umbraco.Cms.Core.Security;
 /// </summary>
 public class MemberIdentityUser : UmbracoIdentityUser
 {
-    // Custom comparer for enumerables
-    private static readonly DelegateEqualityComparer<IReadOnlyCollection<IReadOnlyUserGroup>> _groupsComparer = new(
-        (groups, enumerable) =>
-            groups?.Select(x => x.Alias).UnsortedSequenceEqual(enumerable?.Select(x => x.Alias)) ?? false,
-        groups => groups.GetHashCode());
-
-    private string? _comments;
-
     /// <summary>
     ///     Initializes a new instance of the <see cref="MemberIdentityUser" /> class.
     /// </summary>
@@ -27,15 +19,6 @@ public class MemberIdentityUser : UmbracoIdentityUser
 
     public MemberIdentityUser()
     {
-    }
-
-    /// <summary>
-    ///     Gets or sets the member's comments
-    /// </summary>
-    public string? Comments
-    {
-        get => _comments;
-        set => BeingDirty.SetPropertyValueAndDetectChanges(value, ref _comments, nameof(Comments));
     }
 
     // No change tracking because the persisted value is only set with the IsLockedOut flag

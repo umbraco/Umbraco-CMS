@@ -172,23 +172,6 @@ public static partial class Constants
         public static class Member
         {
             /// <summary>
-            ///     Property alias for the Comments on a Member
-            /// </summary>
-            public const string Comments = "umbracoMemberComments";
-
-            public const string CommentsLabel = "Comments";
-
-            /// <summary>
-            ///     The standard properties group alias for membership properties.
-            /// </summary>
-            public const string StandardPropertiesGroupAlias = "membership";
-
-            /// <summary>
-            ///     The standard properties group name for membership properties.
-            /// </summary>
-            public const string StandardPropertiesGroupName = "Membership";
-
-            /// <summary>
             ///     if a role starts with __umbracoRole we won't show it as it's an internal role used for public access
             /// </summary>
             public static readonly string InternalRolePrefix = "__umbracoRole";
