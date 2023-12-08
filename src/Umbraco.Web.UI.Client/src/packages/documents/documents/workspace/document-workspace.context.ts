@@ -1,6 +1,6 @@
 import { UmbDocumentRepository } from '../repository/document.repository.js';
 import { UmbDocumentTypeDetailRepository } from '../../document-types/repository/detail/document-type-detail.repository.js';
-import { UmbDocumentVariantContext } from '../variant-context/document-variant-context.js';
+import { UmbDocumentPropertyDataContext } from '../property-dataset-context/document-property-dataset-context.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
@@ -260,7 +260,7 @@ export class UmbDocumentWorkspaceContext
 	*/
 
 	public createVariantContext(host: UmbControllerHost, variantId: UmbVariantId) {
-		return new UmbDocumentVariantContext(host, this, variantId);
+		return new UmbDocumentPropertyDataContext(host, this, variantId);
 	}
 
 	public destroy(): void {
