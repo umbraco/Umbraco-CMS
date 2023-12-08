@@ -53,6 +53,7 @@ export class UmbPropertyDatasetElement extends UmbLitElement {
 	public set value(value: Array<UmbPropertyValueData>) {
 		this.#silentOnce = true;
 		this.context.setValues(value);
+		this.#silentOnce = false;
 	}
 
 	/**
@@ -75,6 +76,7 @@ export class UmbPropertyDatasetElement extends UmbLitElement {
 	public set name(value: string | undefined) {
 		this.#silentOnce = true;
 		this.context.setName(value);
+		this.#silentOnce = false;
 	}
 
 	constructor() {

@@ -44,13 +44,13 @@ export class UmbPropertyContext<ValueType = any> extends UmbBaseController {
 	private _variantDifference = new UmbStringState(undefined);
 	public readonly variantDifference = this._variantDifference.asObservable();
 
-	#variantContext?: typeof UMB_PROPERTY_DATASET_CONTEXT.TYPE;
+	#datasetContext?: typeof UMB_PROPERTY_DATASET_CONTEXT.TYPE;
 
 	constructor(host: UmbControllerHostElement) {
 		super(host);
 
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (variantContext) => {
-			this.#variantContext = variantContext;
+			this.#datasetContext = variantContext;
 			this._generateVariantDifferenceString();
 			this._observeProperty();
 		});
@@ -74,9 +74,9 @@ export class UmbPropertyContext<ValueType = any> extends UmbBaseController {
 	private _observePropertyValue?: UmbObserverController<ValueType | undefined>;
 	private async _observeProperty() {
 		const alias = this.#data.getValue().alias;
-		if (!this.#variantContext || !alias) return;
+		if (!this.#datasetContext || !alias) return;
 
-		const variantIdSubject = (await this.#variantContext.propertyVariantId?.(alias)) ?? undefined;
+		const variantIdSubject = (await this.#datasetContext.propertyVariantId?.(alias)) ?? undefined;
 		this._observePropertyVariant?.destroy();
 		if (variantIdSubject) {
 			this._observePropertyVariant = this.observe(variantIdSubject, (variantId) => {
@@ -85,7 +85,7 @@ export class UmbPropertyContext<ValueType = any> extends UmbBaseController {
 		}
 
 		// TODO: Verify if we need to optimize runtime by parsing the propertyVariantID, cause this method retrieves it again:
-		const subject = await this.#variantContext.propertyValueByAlias<ValueType>(alias);
+		const subject = await this.#datasetContext.propertyValueByAlias<ValueType>(alias);
 
 		this._observePropertyValue?.destroy();
 		if (subject) {
@@ -97,8 +97,8 @@ export class UmbPropertyContext<ValueType = any> extends UmbBaseController {
 	}
 
 	private _generateVariantDifferenceString() {
-		if (!this.#variantContext) return;
-		const contextVariantId = this.#variantContext.getVariantId?.() ?? undefined;
+		if (!this.#datasetContext) return;
+		const contextVariantId = this.#datasetContext.getVariantId?.() ?? undefined;
 		this._variantDifference.next(
 			contextVariantId ? this.#variantId.getValue()?.toDifferencesString(contextVariantId) : '',
 		);
@@ -115,9 +115,8 @@ export class UmbPropertyContext<ValueType = any> extends UmbBaseController {
 	}
 	public setValue(value: WorkspacePropertyData<ValueType>['value']) {
 		const alias = this.#data.getValue().alias;
-		if (!this.#variantContext || !alias) return;
-
-		this.#variantContext?.setPropertyValue(alias, value);
+		if (!this.#datasetContext || !alias) return;
+		this.#datasetContext?.setPropertyValue(alias, value);
 	}
 	public setConfig(config: WorkspacePropertyData<ValueType>['config'] | undefined) {
 		this.#data.update({ config });
