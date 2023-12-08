@@ -40,6 +40,8 @@ export class UmbDictionaryDetailServerDataSource
 	 */
 	async createScaffold(parentId: string | null, preset?: Partial<CreateDictionaryItemRequestModel>) {
 		const data = {
+			name: '',
+			translations: [],
 			...preset,
 			id: UmbId.new(),
 			parentId,

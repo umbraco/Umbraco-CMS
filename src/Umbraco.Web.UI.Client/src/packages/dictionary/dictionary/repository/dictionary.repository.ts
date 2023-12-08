@@ -1,6 +1,6 @@
 import { type UmbDictionaryTreeStore, UMB_DICTIONARY_TREE_STORE_CONTEXT } from '../tree/index.js';
 import { UmbDictionaryStore, UMB_DICTIONARY_STORE_CONTEXT_TOKEN } from './dictionary.store.js';
-import { UmbDictionaryDetailServerDataSource } from './sources/dictionary.detail.server.data.js';
+import { UmbDictionaryDetailServerDataSource } from './sources/dictionary-detail.server.data-source.js';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
