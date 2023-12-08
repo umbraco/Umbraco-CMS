@@ -83,6 +83,7 @@ h1 {
 		icon: 'folder',
 		type: 'stylesheet',
 		hasChildren: true,
+		content: '',
 	},
 	{
 		path: 'Folder 1/Stylesheet File 3.css',
