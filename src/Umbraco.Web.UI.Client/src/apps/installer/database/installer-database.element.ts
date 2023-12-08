@@ -168,6 +168,7 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 					name,
 					connectionString,
 					providerName: selectedDatabase.providerName,
+					trustServerCertificate: false,
 				};
 
 				const { error } = await tryExecute(
