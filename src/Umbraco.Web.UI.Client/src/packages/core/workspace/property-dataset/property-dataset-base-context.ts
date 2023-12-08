@@ -2,20 +2,21 @@ import type { UmbPropertyValueData } from '../types/property-value-data.type.js'
 import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import {
-	UMB_VARIANT_CONTEXT,
-	type UmbNameableVariantContext,
-	type UmbVariantContext,
+	UMB_PROPERTY_DATASET_CONTEXT,
+	type UmbNameablePropertyDatasetContext,
+	type UmbPropertyDatasetContext,
 } from '@umbraco-cms/backoffice/workspace';
 import { UmbArrayState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 /**
- * A basic variant context, holds a name and a a set of properties.
- * This is the base type for all variant contexts.
+ * A base property dataset context implementation.
+ * @class UmbPropertyDatasetBaseContext
+ * @extends {UmbContextBase}
  */
-export class UmbBasicVariantContext
-	extends UmbContextBase<typeof UMB_VARIANT_CONTEXT.TYPE>
-	implements UmbVariantContext, UmbNameableVariantContext
+export class UmbPropertyDatasetBaseContext
+	extends UmbContextBase<typeof UMB_PROPERTY_DATASET_CONTEXT.TYPE>
+	implements UmbPropertyDatasetContext, UmbNameablePropertyDatasetContext
 {
 	#name = new UmbStringState(undefined);
 	name = this.#name.asObservable();
@@ -44,7 +45,7 @@ export class UmbBasicVariantContext
 
 	constructor(host: UmbControllerHost) {
 		// The controller alias, is a very generic name cause we want only one of these for this controller host.
-		super(host, UMB_VARIANT_CONTEXT);
+		super(host, UMB_PROPERTY_DATASET_CONTEXT);
 	}
 
 	/**

@@ -1,7 +1,7 @@
 import { expect, fixture, oneEvent } from '@open-wc/testing';
 import type { UmbPropertyValueData } from '../types/property-value-data.type.js';
-import { UMB_VARIANT_CONTEXT } from './variant-context.token.js';
-import { UmbBasicVariantElement } from './basic-variant.element.js';
+import { UMB_PROPERTY_DATASET_CONTEXT } from './property-dataset-context.token.js';
+import { UmbPropertyDatasetElement } from './property-dataset.element.js';
 import { customElement, html, property, state, LitElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
@@ -9,7 +9,7 @@ import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
 @customElement('test-property-editor')
 export class UmbTestPropertyEditorElement extends UmbElementMixin(LitElement) {
 	//
-	#variantContext?: typeof UMB_VARIANT_CONTEXT.TYPE;
+	#variantContext?: typeof UMB_PROPERTY_DATASET_CONTEXT.TYPE;
 
 	@property()
 	public get alias() {
@@ -49,7 +49,7 @@ export class UmbTestPropertyEditorElement extends UmbElementMixin(LitElement) {
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_VARIANT_CONTEXT, async (variantContext) => {
+		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, async (variantContext) => {
 			this.#variantContext = variantContext;
 			this._observeProperty();
 		});
@@ -65,21 +65,21 @@ const dataSet: Array<UmbPropertyValueData> = [
 
 describe('UmbBasicVariantElement', () => {
 	describe('Data bindings', () => {
-		let variantElement: UmbBasicVariantElement;
+		let variantElement: UmbPropertyDatasetElement;
 		let propertyEditor: UmbTestPropertyEditorElement;
 
 		beforeEach(async () => {
 			variantElement = await fixture(
-				html`<umb-basic-variant .value=${dataSet}>
+				html`<umb-property-dataset .value=${dataSet}>
 					<test-property-editor alias="testAlias"></test-property-editor>
-				</umb-basic-variant>`,
+				</umb-property-dataset>`,
 			);
 
 			propertyEditor = variantElement.querySelector('test-property-editor') as UmbTestPropertyEditorElement;
 		});
 
 		it('basic-variant is defined with its own instance', () => {
-			expect(variantElement).to.be.instanceOf(UmbBasicVariantElement);
+			expect(variantElement).to.be.instanceOf(UmbPropertyDatasetElement);
 		});
 
 		it('property editor gets value', () => {

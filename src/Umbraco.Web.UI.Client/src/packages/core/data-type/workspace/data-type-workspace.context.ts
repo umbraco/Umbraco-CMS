@@ -4,7 +4,7 @@ import {
 	UmbInvariantableWorkspaceContextInterface,
 	UmbEditableWorkspaceContextBase,
 	UmbWorkspaceContextInterface,
-	UmbBasicVariantContext,
+	UmbPropertyDatasetBaseContext,
 } from '@umbraco-cms/backoffice/workspace';
 import {
 	appendToFrozenArray,
@@ -146,7 +146,7 @@ export class UmbDataTypeWorkspaceContext
 	}
 
 	createVariantContext(host: UmbControllerHost) {
-		const context = new UmbBasicVariantContext(host);
+		const context = new UmbPropertyDatasetBaseContext(host);
 
 		// Observe workspace name:
 		this.observe(this.name, (name) => {

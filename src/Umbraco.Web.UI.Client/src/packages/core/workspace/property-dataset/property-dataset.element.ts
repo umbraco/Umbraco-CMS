@@ -1,15 +1,20 @@
 import type { UmbPropertyValueData } from '../types/property-value-data.type.js';
-import { UmbBasicVariantContext } from './basic-variant-context.js';
+import { UmbPropertyDatasetBaseContext } from './property-dataset-base-context.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { customElement, html, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
-@customElement('umb-basic-variant')
-export class UmbBasicVariantElement extends UmbLitElement {
+/**
+ *  @element umb-property-dataset
+ *  @description - Element for hosting a property dataset. This is needed for umb-property to work.
+ *  @slot default - Slot for rendering content within.
+ */
+@customElement('umb-property-dataset')
+export class UmbPropertyDatasetElement extends UmbLitElement {
 	// A take on only firing events when the value is changed from the outside.
 	#silentOnce = true;
 
-	public readonly context: UmbBasicVariantContext;
+	public readonly context: UmbPropertyDatasetBaseContext;
 
 	/**
 	 * The value of the dataset.
@@ -29,7 +34,7 @@ export class UmbBasicVariantElement extends UmbLitElement {
 	 * ]
 	 *
 	 * html`
-	 * <umb-basic-variant .value="${dataSet}">
+	 * <umb-property-dataset .value="${dataSet}">
 	 * 	<umb-workspace-property
 	 * 		label="My label for this property"
 	 * 		description="The description to show on the property"
@@ -37,7 +42,7 @@ export class UmbBasicVariantElement extends UmbLitElement {
 	 * 		property-editor-ui-alias="Umb.PropertyEditorUi.TextBox"
 	 * 		.config=${...}>
 	 * 	</umb-workspace-property>
-	 * </umb-basic-variant>
+	 * </umb-property-dataset>
 	 * `
 	 * ```
 	 */
@@ -51,15 +56,16 @@ export class UmbBasicVariantElement extends UmbLitElement {
 	}
 
 	/**
-	 * The name of the dataset.
+	 * The name of the dataset, this name varies depending on the use-case. But this is either
+	 * @type {string}
 	 * @returns {string}
 	 * @memberof UmbBasicVariantElement
 	 * @example
 	 * ```ts
 	 * html`
-	 * <umb-basic-variant name="My variant name">
+	 * <umb-property-dataset name="My variant name">
 	 * 	...
-	 * </umb-basic-variant>
+	 * </umb-property-dataset>
 	 * `
 	 */
 	@property({ attribute: false })
@@ -81,10 +87,9 @@ export class UmbBasicVariantElement extends UmbLitElement {
 			}
 		});
 
-		this.context = new UmbBasicVariantContext(this);
+		this.context = new UmbPropertyDatasetBaseContext(this);
 		this.observe(this.context.name, () => {
 			if (!this.#silentOnce) {
-				console.log('——— name fire event!');
 				this.dispatchEvent(new UmbChangeEvent());
 			} else {
 				this.#silentOnce = false;
@@ -93,7 +98,6 @@ export class UmbBasicVariantElement extends UmbLitElement {
 		this.#silentOnce = true;
 		this.observe(this.context.values, () => {
 			if (!this.#silentOnce) {
-				console.log('——— value fire event!');
 				this.dispatchEvent(new UmbChangeEvent());
 			} else {
 				this.#silentOnce = false;
@@ -106,10 +110,10 @@ export class UmbBasicVariantElement extends UmbLitElement {
 	}
 }
 
-export default UmbBasicVariantElement;
+export default UmbPropertyDatasetElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-basic-variant': UmbBasicVariantElement;
+		'umb-property-dataset': UmbPropertyDatasetElement;
 	}
 }

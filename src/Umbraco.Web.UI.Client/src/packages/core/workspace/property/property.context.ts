@@ -1,6 +1,6 @@
 import { UmbPropertyEditorUiElement } from '../../extension-registry/interfaces/property-editor-ui-element.interface.js';
 import { type WorkspacePropertyData } from '../types/workspace-property-data.type.js';
-import { UMB_VARIANT_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
@@ -44,12 +44,12 @@ export class UmbPropertyContext<ValueType = any> extends UmbBaseController {
 	private _variantDifference = new UmbStringState(undefined);
 	public readonly variantDifference = this._variantDifference.asObservable();
 
-	#variantContext?: typeof UMB_VARIANT_CONTEXT.TYPE;
+	#variantContext?: typeof UMB_PROPERTY_DATASET_CONTEXT.TYPE;
 
 	constructor(host: UmbControllerHostElement) {
 		super(host);
 
-		this.consumeContext(UMB_VARIANT_CONTEXT, (variantContext) => {
+		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (variantContext) => {
 			this.#variantContext = variantContext;
 			this._generateVariantDifferenceString();
 			this._observeProperty();

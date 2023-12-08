@@ -2,18 +2,22 @@ import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import {
-	UMB_VARIANT_CONTEXT,
-	UmbVariantContext,
+	UMB_PROPERTY_DATASET_CONTEXT,
+	UmbPropertyDatasetContext,
 	UmbInvariantableWorkspaceContextInterface,
+	UmbNameablePropertyDatasetContext,
 } from '@umbraco-cms/backoffice/workspace';
 
-export class UmbInvariantWorkspaceVariantContext<
+/**
+ * A property dataset context that hooks directly into the workspace context.
+ */
+export class UmbInvariantWorkspacePropertyDatasetContext<
 		WorkspaceType extends UmbInvariantableWorkspaceContextInterface = UmbInvariantableWorkspaceContextInterface,
 	>
 	extends UmbBaseController
-	implements UmbVariantContext
+	implements UmbPropertyDatasetContext, UmbNameablePropertyDatasetContext
 {
-	protected _workspace: WorkspaceType;
+	#workspace: WorkspaceType;
 
 	name;
 
@@ -23,39 +27,39 @@ export class UmbInvariantWorkspaceVariantContext<
 		return UmbVariantId.CreateInvariant();
 	}
 	getType() {
-		return this._workspace.getEntityType();
+		return this.#workspace.getEntityType();
 	}
 	getUnique() {
-		return this._workspace.getEntityId();
+		return this.#workspace.getEntityId();
 	}
 	getName() {
-		return this._workspace.getName();
+		return this.#workspace.getName();
 	}
 	setName(name: string) {
-		this._workspace.setName(name);
+		this.#workspace.setName(name);
 	}
 
 	constructor(host: UmbControllerHost, workspace: WorkspaceType) {
 		// The controller alias, is a very generic name cause we want only one of these for this controller host.
 		super(host, 'variantContext');
-		this._workspace = workspace;
+		this.#workspace = workspace;
 
-		this.name = this._workspace.name;
+		this.name = this.#workspace.name;
 
-		this.provideContext(UMB_VARIANT_CONTEXT, this);
+		this.provideContext(UMB_PROPERTY_DATASET_CONTEXT, this);
 	}
 
 	/**
 	 * TODO: Write proper JSDocs here.
 	 */
 	async propertyValueByAlias<ReturnType = unknown>(propertyAlias: string) {
-		return await this._workspace.propertyValueByAlias<ReturnType>(propertyAlias);
+		return await this.#workspace.propertyValueByAlias<ReturnType>(propertyAlias);
 	}
 
 	/**
 	 * TODO: Write proper JSDocs here.
 	 */
 	async setPropertyValue(propertyAlias: string, value: unknown) {
-		return this._workspace.setPropertyValue(propertyAlias, value);
+		return this.#workspace.setPropertyValue(propertyAlias, value);
 	}
 }

@@ -1,4 +1,4 @@
-import { UmbVariantContext } from '../variant-context/index.js';
+import { UmbPropertyDatasetContext } from '../property-dataset/index.js';
 import { UMB_VARIANT_WORKSPACE_CONTEXT_TOKEN } from '../index.js';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
@@ -12,7 +12,7 @@ export class UmbWorkspaceSplitViewContext extends UmbBaseController {
 		return this.#workspaceContext;
 	}
 
-	#variantContext?: UmbVariantContext;
+	#variantContext?: UmbPropertyDatasetContext;
 
 	#index = new UmbNumberState(undefined);
 	index = this.#index.asObservable();

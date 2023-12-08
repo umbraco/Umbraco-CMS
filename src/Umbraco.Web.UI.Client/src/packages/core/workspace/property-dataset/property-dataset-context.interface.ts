@@ -2,19 +2,20 @@ import type { UmbVariantId } from '../../variant/variant-id.class.js';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 
 /**
- * A variant context, represents a set of properties.
+ * A property dataset context, represents the data of a set of properties.
  * This can take form as many, so to list a few:
- * - A specific variant of content
- * - Content that does not vary
+ * - A specific variant of content.
+ * - Content that does not vary.
  * - A block.
  * - A DataType configuration.
+ * - A property editor that hosts a set of properties.
  *
  * The base type of this holds a Name and some Properties.
  * Some might be enriches with Variant Info, like culture and segment.
  * Others might have saved publishing status.
  * Also setting the name is an additional feature.
  */
-export interface UmbVariantContext {
+export interface UmbPropertyDatasetContext {
 	getType(): string;
 	getUnique(): string | undefined;
 	getVariantId: () => UmbVariantId;
