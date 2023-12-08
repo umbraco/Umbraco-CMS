@@ -33,4 +33,9 @@ public class LogLevelCountLogViewerControllerTests : ManagementApiUserGroupTestB
     {
         ExpectedStatusCode = HttpStatusCode.Forbidden
     };
+
+    protected override UserGroupAssertionModel UnauthorizedUserGroupAssertionModel => new()
+    {
+        ExpectedStatusCode = HttpStatusCode.Unauthorized
+    };
 }

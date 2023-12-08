@@ -29,4 +29,14 @@ public class AllLogViewerControllerTests : ManagementApiUserGroupTestBase<AllLog
     {
         ExpectedStatusCode = HttpStatusCode.Forbidden
     };
+
+    protected override UserGroupAssertionModel WriterUserGroupAssertionModel => new()
+    {
+        ExpectedStatusCode = HttpStatusCode.Forbidden
+    };
+
+    protected override UserGroupAssertionModel UnauthorizedUserGroupAssertionModel => new()
+    {
+        ExpectedStatusCode = HttpStatusCode.Unauthorized
+    };
 }

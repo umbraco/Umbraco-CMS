@@ -32,4 +32,9 @@ public class AllSinkLevelLogViewerControllerTests : ManagementApiUserGroupTestBa
     {
         ExpectedStatusCode = HttpStatusCode.Forbidden
     };
+
+    protected override UserGroupAssertionModel UnauthorizedUserGroupAssertionModel => new()
+    {
+        ExpectedStatusCode = HttpStatusCode.Unauthorized
+    };
 }

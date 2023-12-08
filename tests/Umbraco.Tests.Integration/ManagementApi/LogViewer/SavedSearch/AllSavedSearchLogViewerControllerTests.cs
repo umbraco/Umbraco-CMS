@@ -32,4 +32,9 @@ public class AllSavedSearchLogViewerControllerTests : ManagementApiUserGroupTest
     {
         ExpectedStatusCode = HttpStatusCode.Forbidden
     };
+
+    protected override UserGroupAssertionModel UnauthorizedUserGroupAssertionModel => new()
+    {
+        ExpectedStatusCode = HttpStatusCode.Unauthorized
+    };
 }

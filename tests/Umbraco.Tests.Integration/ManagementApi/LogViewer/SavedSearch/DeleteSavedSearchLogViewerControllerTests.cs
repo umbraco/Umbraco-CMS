@@ -4,8 +4,7 @@ using Umbraco.Cms.Api.Management.Controllers.LogViewer.SavedSearch;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.LogViewer.SavedSearch;
 
-public class
-    DeleteSavedSearchLogViewerControllerTests : ManagementApiUserGroupTestBase<DeleteSavedSearchLogViewerController>
+public class DeleteSavedSearchLogViewerControllerTests : ManagementApiUserGroupTestBase<DeleteSavedSearchLogViewerController>
 {
     protected override Expression<Func<DeleteSavedSearchLogViewerController, object>> MethodSelector => x => x.Delete("Test");
 
@@ -32,6 +31,11 @@ public class
     protected override UserGroupAssertionModel WriterUserGroupAssertionModel => new()
     {
         ExpectedStatusCode = HttpStatusCode.Forbidden
+    };
+
+    protected override UserGroupAssertionModel UnauthorizedUserGroupAssertionModel => new()
+    {
+        ExpectedStatusCode = HttpStatusCode.Unauthorized
     };
 
     protected override async Task<HttpResponseMessage> ClientRequest() => await Client.DeleteAsync(Url);

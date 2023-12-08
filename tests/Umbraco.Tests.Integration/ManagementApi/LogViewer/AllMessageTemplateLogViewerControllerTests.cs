@@ -4,8 +4,7 @@ using Umbraco.Cms.Api.Management.Controllers.LogViewer;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.LogViewer;
 
-public class
-    AllMessageTemplateLogViewerControllerTests : ManagementApiUserGroupTestBase<AllMessageTemplateLogViewerController>
+public class AllMessageTemplateLogViewerControllerTests : ManagementApiUserGroupTestBase<AllMessageTemplateLogViewerController>
 {
     protected override Expression<Func<AllMessageTemplateLogViewerController, object>> MethodSelector => x => x.AllMessageTemplates(0, 100, null, null);
 
@@ -33,5 +32,10 @@ public class
     protected override UserGroupAssertionModel WriterUserGroupAssertionModel => new()
     {
         ExpectedStatusCode = HttpStatusCode.Forbidden
+    };
+
+    protected override UserGroupAssertionModel UnauthorizedUserGroupAssertionModel => new()
+    {
+        ExpectedStatusCode = HttpStatusCode.Unauthorized
     };
 }

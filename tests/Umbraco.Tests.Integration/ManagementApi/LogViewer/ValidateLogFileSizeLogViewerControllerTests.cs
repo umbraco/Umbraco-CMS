@@ -33,4 +33,9 @@ public class ValidateLogFileSizeLogViewerControllerTests: ManagementApiUserGroup
     {
         ExpectedStatusCode = HttpStatusCode.Forbidden
     };
+
+    protected override UserGroupAssertionModel UnauthorizedUserGroupAssertionModel => new()
+    {
+        ExpectedStatusCode = HttpStatusCode.Unauthorized
+    };
 }

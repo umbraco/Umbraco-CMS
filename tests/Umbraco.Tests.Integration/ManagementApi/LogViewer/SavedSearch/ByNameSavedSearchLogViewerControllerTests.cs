@@ -4,8 +4,7 @@ using Umbraco.Cms.Api.Management.Controllers.LogViewer.SavedSearch;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.LogViewer.SavedSearch;
 
-public class
-    ByNameSavedSearchLogViewerControllerTests : ManagementApiUserGroupTestBase<ByNameSavedSearchLogViewerController>
+public class ByNameSavedSearchLogViewerControllerTests : ManagementApiUserGroupTestBase<ByNameSavedSearchLogViewerController>
 {
     protected override Expression<Func<ByNameSavedSearchLogViewerController, object>> MethodSelector => x => x.ByName("Test");
 
@@ -32,5 +31,10 @@ public class
     protected override UserGroupAssertionModel WriterUserGroupAssertionModel => new()
     {
         ExpectedStatusCode = HttpStatusCode.Forbidden
+    };
+
+    protected override UserGroupAssertionModel UnauthorizedUserGroupAssertionModel => new()
+    {
+        ExpectedStatusCode = HttpStatusCode.Unauthorized
     };
 }
