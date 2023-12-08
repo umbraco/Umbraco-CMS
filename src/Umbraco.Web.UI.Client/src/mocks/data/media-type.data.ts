@@ -1,6 +1,10 @@
 import { UmbEntityData } from './entity.data.js';
 import { createMediaTypeTreeItem } from './utils.js';
-import { MediaTypeResponseModel, MediaTypeTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import {
+	MediaTypeItemResponseModel,
+	MediaTypeResponseModel,
+	MediaTypeTreeItemResponseModel,
+} from '@umbraco-cms/backoffice/backend-api';
 
 export const data: Array<MediaTypeResponseModel> = [
 	{
@@ -63,15 +67,13 @@ class UmbMediaTypeData extends UmbEntityData<MediaTypeResponseModel> {
 		return result;
 	}
 
-	getItems(ids: Array<string>): Array<MediaTypeTreeItemResponseModel> {
+	getItems(ids: Array<string>): Array<MediaTypeItemResponseModel> {
 		const items = this.data.filter((item) => ids.includes(item.id ?? ''));
-		return items.map((item) => item);
+		return items.map((item) => createMediaTypeItem(item));
 	}
 
 	getTreeRoot(): Array<MediaTypeTreeItemResponseModel> {
-		const rootItems = this.treeData.filter((item) => item.parentId === null);
-		const result = rootItems.map((item) => createMediaTypeTreeItem(item));
-		return result;
+		return this.treeData.filter((item) => item.parentId === null);
 	}
 
 	getTreeItemChildren(id: string): Array<MediaTypeTreeItemResponseModel> {
@@ -91,5 +93,13 @@ class UmbMediaTypeData extends UmbEntityData<MediaTypeResponseModel> {
 		return items.map((item) => item);
 	}
 }
+
+const createMediaTypeItem = (item: MediaTypeResponseModel): MediaTypeItemResponseModel => {
+	return {
+		id: item.id,
+		name: item.name,
+		icon: item.icon,
+	};
+};
 
 export const umbMediaTypeData = new UmbMediaTypeData();
