@@ -712,21 +712,19 @@ class UmbDocumentData extends UmbEntityData<DocumentResponseModel> {
 
 	// TODO: Can we do this smarter so we don't need to make this for each mock data:
 	insert(item: DocumentResponseModel) {
-		const result = super.insert(item);
-		this.treeData.push(createDocumentTreeItem(result));
-		return result;
+		super.insert(item);
+		this.treeData.push(createDocumentTreeItem(item));
 	}
 
 	update(id: string, item: DocumentResponseModel) {
-		const result = super.save(id, item);
+		super.save(id, item);
 		this.treeData = this.treeData.map((x) => {
-			if (x.id === result.id) {
-				return createDocumentTreeItem(result);
+			if (x.id === id) {
+				return createDocumentTreeItem(item);
 			} else {
 				return x;
 			}
 		});
-		return result;
 	}
 
 	publish(id: string, data: PublishDocumentRequestModel) {

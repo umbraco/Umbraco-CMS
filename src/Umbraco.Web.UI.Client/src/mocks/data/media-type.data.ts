@@ -50,21 +50,19 @@ class UmbMediaTypeData extends UmbEntityData<MediaTypeResponseModel> {
 
 	// TODO: Can we do this smarter so we don't need to make this for each mock data:
 	insert(item: MediaTypeResponseModel) {
-		const result = super.insert(item);
-		this.treeData.push(createMediaTypeTreeItem(result));
-		return result;
+		super.insert(item);
+		this.treeData.push(createMediaTypeTreeItem(item));
 	}
 
 	update(id: string, item: MediaTypeResponseModel) {
-		const result = super.save(id, item);
+		super.save(id, item);
 		this.treeData = this.treeData.map((x) => {
-			if (x.id === result.id) {
-				return createMediaTypeTreeItem(result);
+			if (x.id === id) {
+				return createMediaTypeTreeItem(item);
 			} else {
 				return x;
 			}
 		});
-		return result;
 	}
 
 	getItems(ids: Array<string>): Array<MediaTypeItemResponseModel> {

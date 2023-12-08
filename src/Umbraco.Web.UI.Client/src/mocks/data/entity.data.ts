@@ -43,8 +43,6 @@ export class UmbEntityData<T extends UmbEntityBase> extends UmbData<T> {
 		}
 
 		this.data.push(item);
-
-		return item;
 	}
 
 	save(id: string, saveItem: T) {
@@ -60,8 +58,6 @@ export class UmbEntityData<T extends UmbEntityBase> extends UmbData<T> {
 			// new
 			this.data.push(saveItem);
 		}
-
-		return saveItem;
 	}
 
 	trash(ids: Array<string>) {

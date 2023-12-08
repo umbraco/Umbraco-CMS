@@ -14,11 +14,19 @@ class UmbDocumentTypeData extends UmbEntityData<UmbMockDocumentTypeModel> {
 
 	// TODO: Can we do this smarter so we don't need to make this for each mock data:
 	insert(item: DocumentTypeResponseModel) {
-		return super.insert(item);
+		const mockItem: UmbMockDocumentTypeModel = {
+			...item,
+			type: 'document-type',
+			isContainer: false,
+			hasChildren: false,
+			isFolder: false,
+		};
+
+		super.insert(mockItem);
 	}
 
 	update(id: string, item: DocumentTypeResponseModel) {
-		return super.save(id, item);
+		super.save(id, item);
 	}
 
 	getTreeRoot(): Array<DocumentTypeTreeItemResponseModel> {
