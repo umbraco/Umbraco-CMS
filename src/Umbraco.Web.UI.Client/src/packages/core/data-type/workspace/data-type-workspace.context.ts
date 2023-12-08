@@ -174,7 +174,6 @@ export class UmbDataTypeWorkspaceContext
 						this.observe(
 							await context.propertyValueByAlias(property.alias),
 							(value) => {
-								console.log('gets value back...');
 								this.setPropertyValue(property.alias, value);
 							},
 							'observeVariantPropertyOf_' + property.alias,
