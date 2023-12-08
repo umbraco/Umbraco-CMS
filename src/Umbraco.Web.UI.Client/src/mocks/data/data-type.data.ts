@@ -261,7 +261,6 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 				alias: 'enableTimezones',
 				value: true,
 			},
-			{},
 		],
 	},
 	{
