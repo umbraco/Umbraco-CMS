@@ -11,9 +11,8 @@ import {
 	UmbPickerModalValue,
 } from '@umbraco-cms/backoffice/modal';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
-import { ItemResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 
-export class UmbPickerInputContext<ItemType extends ItemResponseModelBaseModel> extends UmbBaseController {
+export class UmbPickerInputContext<ItemType> extends UmbBaseController {
 	// TODO: We are way too unsecure about the requirements for the Modal Token, as we have certain expectation for the data and value.
 	modalAlias: string | UmbModalToken<UmbPickerModalData<ItemType>, UmbPickerModalValue>;
 	repository?: UmbItemRepository<ItemType>;
@@ -43,6 +42,8 @@ export class UmbPickerInputContext<ItemType extends ItemResponseModelBaseModel> 
 	) {
 		super(host);
 		this.modalAlias = modalAlias;
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		//@ts-ignore
 		this.#getUnique = getUniqueMethod || ((entry) => entry.id || '');
 
 		this.#itemManager = new UmbRepositoryItemsManager<ItemType>(host, repositoryAlias, this.#getUnique);
