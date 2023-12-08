@@ -111,12 +111,12 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 		value[target.name] = target.checked ?? target.value; // handle boolean and text inputs
 
 		// TODO: Mark id and providerName as non-optional in schema
-		const database: DatabaseInstallResponseModel = {
+		const database = {
 			id: '0',
 			providerName: '',
 			...this._installerContext?.getData().database,
 			...value,
-		};
+		} as DatabaseInstallResponseModel;
 
 		this._setDatabase(database);
 	}
