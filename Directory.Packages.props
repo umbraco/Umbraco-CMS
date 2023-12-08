@@ -2,17 +2,14 @@
 <Project>
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-    <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
   </PropertyGroup>
-  
   <!-- Global packages (private, build-time packages for all projects) -->
   <ItemGroup>
     <GlobalPackageReference Include="Nerdbank.GitVersioning" Version="3.6.133" />
     <GlobalPackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.507" />
-    <GlobalPackageReference Include="Umbraco.Code" Version="2.0.0" />
+    <GlobalPackageReference Include="Umbraco.Code" Version="2.1.0" />
     <GlobalPackageReference Include="Umbraco.GitVersioning.Extensions" Version="0.2.0" />
   </ItemGroup>
-  
   <!-- Microsoft packages -->
   <ItemGroup>
     <PackageVersion Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.0" />
@@ -37,16 +34,14 @@
     <PackageVersion Include="Microsoft.Extensions.Options.DataAnnotations" Version="8.0.0" />
     <PackageVersion Include="System.Runtime.Caching" Version="8.0.0" />
   </ItemGroup>
-  
   <!-- Umbraco packages -->
   <ItemGroup>
     <PackageVersion Include="Umbraco.JsonSchema.Extensions" Version="0.3.0" />
     <PackageVersion Include="Umbraco.CSharpTest.Net.Collections" Version="15.0.0" />
   </ItemGroup>
-  
   <!-- Third-party packages -->
   <ItemGroup>
-    <PackageVersion Include="Asp.Versioning.Mvc" Version="7.1.0" />
+    <PackageVersion Include="Asp.Versioning.Mvc" Version="7.1.1" />
     <PackageVersion Include="Asp.Versioning.Mvc.ApiExplorer" Version="7.1.0" />
     <PackageVersion Include="Dazinator.Extensions.FileProviders" Version="2.0.0" />
     <PackageVersion Include="Examine" Version="3.1.0" />
@@ -82,15 +77,5 @@
     <PackageVersion Include="Smidge.InMemory" Version="4.3.0" />
     <PackageVersion Include="Smidge.Nuglify" Version="4.3.0" />
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="6.5.0" />
-  </ItemGroup>
-  
-  <!-- Transitive pinned versions -->
-  <ItemGroup>
-    <!-- NPoco.SqlServer brings in a vulnerable version of Azure.Identity -->
-    <PackageVersion Include="Azure.Identity" Version="1.10.4" />
-    <!-- Umbraco.Code depends on an outdated Microsoft.CodeAnalysis.CSharp.Workspaces version-->
-    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.8.0" />
-    <!-- Dazinator.Extensions.FileProviders brings in a vulnerable version of System.Net.Http -->
-    <PackageVersion Include="System.Net.Http" Version="4.3.4" />
   </ItemGroup>
 </Project>
