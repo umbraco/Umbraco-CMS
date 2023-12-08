@@ -5,11 +5,11 @@ import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import {
+	UmbBasicState,
 	UmbClassState,
 	UmbObjectState,
-	UmbStringState,
 	UmbObserverController,
-	UmbBasicState,
+	UmbStringState,
 } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextProviderController, UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
@@ -59,7 +59,7 @@ export class UmbPropertyContext<ValueType = any> extends UmbBaseController {
 			this._observeProperty();
 		});
 
-		this._providerController = new UmbContextProviderController(host, UMB_PROPERTY_CONTEXT_TOKEN, this);
+		this._providerController = new UmbContextProviderController(host, UMB_PROPERTY_CONTEXT, this);
 
 		this.observe(this.configValues, (configValues) => {
 			this.#configCollection.next(configValues ? new UmbPropertyEditorConfigCollection(configValues) : undefined);
@@ -139,4 +139,4 @@ export class UmbPropertyContext<ValueType = any> extends UmbBaseController {
 	}
 }
 
-export const UMB_PROPERTY_CONTEXT_TOKEN = new UmbContextToken<UmbPropertyContext>('UmbPropertyContext');
+export const UMB_PROPERTY_CONTEXT = new UmbContextToken<UmbPropertyContext>('UmbPropertyContext');

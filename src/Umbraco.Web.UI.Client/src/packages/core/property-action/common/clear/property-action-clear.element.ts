@@ -1,4 +1,4 @@
-import { UmbPropertyContext, UMB_PROPERTY_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/property';
+import { UmbPropertyContext, UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { UmbPropertyAction } from '../../shared/property-action/property-action.interface.js';
 import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -20,7 +20,7 @@ export class UmbPropertyActionClearElement extends UmbLitElement implements UmbP
 			this._propertyActionMenuContext = propertyActionsContext;
 		});
 		*/
-		this.consumeContext(UMB_PROPERTY_CONTEXT_TOKEN, (propertyContext: UmbPropertyContext) => {
+		this.consumeContext(UMB_PROPERTY_CONTEXT, (propertyContext: UmbPropertyContext) => {
 			this._propertyContext = propertyContext;
 		});
 	}

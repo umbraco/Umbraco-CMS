@@ -1,4 +1,4 @@
-import { UMB_PROPERTY_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/property';
+import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import { UmbTagsInputElement } from '../../components/tags-input/tags-input.element.js';
 import { html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -36,7 +36,7 @@ export class UmbPropertyEditorUITagsElement extends UmbLitElement implements Umb
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_PROPERTY_CONTEXT_TOKEN, (context) => {
+		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
 			this.observe(context.variantId, (id) => {
 				if (id && id.culture !== undefined) {
 					this._culture = id.culture;

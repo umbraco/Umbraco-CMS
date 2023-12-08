@@ -1,4 +1,4 @@
-import { UMB_PROPERTY_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/property';
+import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
@@ -49,7 +49,7 @@ export class UmbPropertyEditorUIMultiUrlPickerElement extends UmbLitElement impl
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_PROPERTY_CONTEXT_TOKEN, (context) => {
+		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
 			this.observe(context.alias, (alias) => {
 				this._alias = alias;
 			});
