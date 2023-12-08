@@ -1,6 +1,15 @@
 import { UmbVariantId } from '../../variant/variant-id.class.js';
-import { UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
-import { css, html, nothing, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { UUIInputElement, UUIInputEvent, UUIPopoverContainerElement } from '@umbraco-cms/backoffice/external/uui';
+import {
+	css,
+	html,
+	nothing,
+	customElement,
+	property,
+	state,
+	ifDefined,
+	query,
+} from '@umbraco-cms/backoffice/external/lit';
 import {
 	UmbWorkspaceSplitViewContext,
 	UMB_WORKSPACE_SPLIT_VIEW_CONTEXT,
@@ -13,6 +22,9 @@ import { DocumentVariantResponseModel, ContentStateModel } from '@umbraco-cms/ba
 
 @customElement('umb-variant-selector')
 export class UmbVariantSelectorElement extends UmbLitElement {
+	@query('#variant-selector-popover')
+	private _popoverElement?: UUIPopoverContainerElement;
+
 	@state()
 	_variants: Array<DocumentVariantResponseModel> = [];
 
@@ -155,8 +167,19 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 		return state !== ContentStateModel.PUBLISHED && !this._isVariantActive(culture!);
 	}
 
-	#onPopoverToggle(event: any) {
+	// TODO: This ignorer is just needed for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
+	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+	// @ts-ignore
+	#onPopoverToggle(event: ToggleEvent) {
 		this._variantSelectorOpen = event.newState === 'open';
+
+		if (!this._popoverElement) return;
+
+		const isOpen = event.newState === 'open';
+		if (!isOpen) return;
+
+		const host = this.getBoundingClientRect();
+		this._popoverElement.style.width = `${host.width}px`;
 	}
 
 	render() {
@@ -188,7 +211,10 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 			${
 				this._variants && this._variants.length > 0
 					? html`
-							<uui-popover-container id="variant-selector-popover" @toggle=${this.#onPopoverToggle}>
+							<uui-popover-container
+								id="variant-selector-popover"
+								@beforetoggle=${this.#onPopoverToggle}
+								placement="bottom-end">
 								<div id="variant-selector-dropdown">
 									<uui-scroll-container>
 										<ul>
@@ -239,6 +265,10 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 
 			#variant-selector-toggle {
 				white-space: nowrap;
+			}
+
+			#variant-selector-popover {
+				translate: 1px; /* Fixes tiny alignment issue caused by border */
 			}
 
 			#variant-selector-dropdown {

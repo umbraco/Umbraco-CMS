@@ -1,12 +1,7 @@
-import { UMB_COLLECTION_CONTEXT, UmbDefaultCollectionContext } from './collection-default.context.js';
+import { UMB_DEFAULT_COLLECTION_CONTEXT, UmbDefaultCollectionContext } from './collection-default.context.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
-import {
-	umbExtensionsRegistry,
-	type ManifestCollectionView,
-	UmbBackofficeManifestKind,
-} from '@umbraco-cms/backoffice/extension-registry';
+import { umbExtensionsRegistry, UmbBackofficeManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 
@@ -33,41 +28,19 @@ export class UmbCollectionDefaultElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		this.#observeCollectionViews();
-		this.consumeContext(UMB_COLLECTION_CONTEXT, (instance) => {
+		this.consumeContext(UMB_DEFAULT_COLLECTION_CONTEXT, (instance) => {
 			this.#collectionContext = instance;
-
-			this.#observeCollectionViews();
+			this.#observeCollectionRoutes();
 		});
 	}
 
-	#observeCollectionViews() {
+	#observeCollectionRoutes() {
 		if (!this.#collectionContext) return;
 
-		this.observe(this.#collectionContext.views, (views) => {
-			this.#createRoutes(views);
+		this.observe(this.#collectionContext.view.routes, (routes) => {
+			this._routes = routes;
 		}),
-			'umbCollectionViewsObserver';
-	}
-
-	#createRoutes(views: ManifestCollectionView[] | null) {
-		this._routes = [];
-
-		if (views) {
-			this._routes = views.map((view) => {
-				return {
-					path: `${view.meta.pathName}`,
-					component: () => createExtensionElement(view),
-				};
-			});
-		}
-
-		this._routes.push({
-			path: '',
-			redirectTo: views?.[0]?.meta.pathName ?? '/',
-		});
-
-		this.requestUpdate();
+			'umbCollectionRoutesObserver';
 	}
 
 	render() {
