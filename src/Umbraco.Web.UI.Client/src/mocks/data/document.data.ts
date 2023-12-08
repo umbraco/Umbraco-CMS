@@ -7,6 +7,7 @@ import {
 	DocumentItemResponseModel,
 	DocumentResponseModel,
 	DocumentTreeItemResponseModel,
+	DocumentTypeResponseModel,
 	PagedDocumentTreeItemResponseModel,
 	PagedDocumentTypeResponseModel,
 	PagedRecycleBinItemResponseModel,
@@ -14,6 +15,7 @@ import {
 	PublishedStateModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '@umbraco-cms/backoffice/document';
+import { UmbMockDocumentTypeModel } from './document-type/document-type.data.js';
 
 export const data: Array<DocumentResponseModel> = [
 	{
@@ -814,9 +816,14 @@ class UmbDocumentData extends UmbEntityData<DocumentResponseModel> {
 		const item = this.getById(id);
 		if (item?.contentTypeId) {
 			const docType = umbDocumentTypeData.getById(item.contentTypeId);
+
 			if (docType) {
-				const items = docType.allowedContentTypes ?? [];
-				const total = items?.length;
+				const allowedTypes = docType?.allowedContentTypes ?? [];
+				const mockedTypes = allowedTypes
+					.map((allowedType) => umbDocumentTypeData.getById(allowedType.id))
+					.filter((item) => item !== undefined) as Array<UmbMockDocumentTypeModel>;
+				const items = mockedTypes.map((item) => mapToDocumentType(item));
+				const total = items.length;
 				return { items, total };
 			}
 		}
@@ -852,5 +859,26 @@ class UmbDocumentData extends UmbEntityData<DocumentResponseModel> {
 			);
 	}
 }
+
+const mapToDocumentType = (item: UmbMockDocumentTypeModel): DocumentTypeResponseModel => {
+	return {
+		alias: item.alias,
+		name: item.name,
+		description: item.description,
+		icon: item.icon,
+		allowedAsRoot: item.allowedAsRoot,
+		variesByCulture: item.variesByCulture,
+		variesBySegment: item.variesBySegment,
+		isElement: item.isElement,
+		properties: item.properties,
+		containers: item.containers,
+		allowedContentTypes: item.allowedContentTypes,
+		compositions: item.compositions,
+		id: item.id,
+		allowedTemplateIds: item.allowedTemplateIds,
+		defaultTemplateId: item.defaultTemplateId,
+		cleanup: item.cleanup,
+	};
+};
 
 export const umbDocumentData = new UmbDocumentData();
