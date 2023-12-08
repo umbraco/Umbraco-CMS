@@ -5,9 +5,9 @@
 
 export type RelationTypeBaseModel = {
     name: string;
-    isBidirectional?: boolean;
+    isBidirectional: boolean;
     parentObjectType?: string | null;
     childObjectType?: string | null;
-    isDependency?: boolean;
+    isDependency: boolean;
 };
 

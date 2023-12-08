@@ -8,6 +8,6 @@ export type UpgradeSettingsResponseModel = {
     newState: string;
     newVersion: string;
     oldVersion: string;
-    readonly reportUrl?: string;
+    readonly reportUrl: string;
 };
 

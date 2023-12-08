@@ -8,6 +8,6 @@ import type { UserSettingsModel } from './UserSettingsModel';
 
 export type InstallSettingsResponseModel = {
     user: UserSettingsModel;
-    databases?: Array<DatabaseSettingsPresentationModel>;
+    databases: Array<DatabaseSettingsPresentationModel>;
 };
 

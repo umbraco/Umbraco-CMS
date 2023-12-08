@@ -7,6 +7,6 @@ import type { ItemResponseModelBaseModel } from './ItemResponseModelBaseModel';
 
 export type MediaItemResponseModel = (ItemResponseModelBaseModel & {
     icon?: string | null;
-    isTrashed?: boolean;
+    isTrashed: boolean;
 });
 

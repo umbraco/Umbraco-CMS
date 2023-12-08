@@ -4,7 +4,7 @@
 /* eslint-disable */
 
 export type RelationItemResponseModel = {
-    nodeId?: string;
+    nodeId: string;
     nodeName?: string | null;
     nodeType?: string | null;
     nodePublished?: boolean | null;
@@ -12,7 +12,7 @@ export type RelationItemResponseModel = {
     contentTypeAlias?: string | null;
     contentTypeName?: string | null;
     relationTypeName?: string | null;
-    relationTypeIsBidirectional?: boolean;
-    relationTypeIsDependency?: boolean;
+    relationTypeIsBidirectional: boolean;
+    relationTypeIsDependency: boolean;
 };
 

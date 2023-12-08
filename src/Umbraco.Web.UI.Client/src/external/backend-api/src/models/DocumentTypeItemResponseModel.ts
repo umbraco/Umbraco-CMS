@@ -6,7 +6,7 @@
 import type { ItemResponseModelBaseModel } from './ItemResponseModelBaseModel';
 
 export type DocumentTypeItemResponseModel = (ItemResponseModelBaseModel & {
-    isElement?: boolean;
+    isElement: boolean;
     icon?: string | null;
 });
 

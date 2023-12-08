@@ -8,6 +8,6 @@ import type { OperatorModel } from './OperatorModel';
 export type TemplateQueryExecuteFilterPresentationModel = {
     propertyAlias: string;
     constraintValue: string;
-    operator?: OperatorModel;
+    operator: OperatorModel;
 };
 

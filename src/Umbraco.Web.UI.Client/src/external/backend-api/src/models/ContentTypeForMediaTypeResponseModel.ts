@@ -13,14 +13,14 @@ export type ContentTypeForMediaTypeResponseModel = {
     name: string;
     description?: string | null;
     icon: string;
-    allowedAsRoot?: boolean;
-    variesByCulture?: boolean;
-    variesBySegment?: boolean;
-    isElement?: boolean;
+    allowedAsRoot: boolean;
+    variesByCulture: boolean;
+    variesBySegment: boolean;
+    isElement: boolean;
     properties: Array<MediaTypePropertyTypeResponseModel>;
-    containers?: Array<MediaTypePropertyTypeContainerResponseModel>;
-    allowedContentTypes?: Array<ContentTypeSortModel>;
-    compositions?: Array<ContentTypeCompositionModel>;
-    id?: string;
+    containers: Array<MediaTypePropertyTypeContainerResponseModel>;
+    allowedContentTypes: Array<ContentTypeSortModel>;
+    compositions: Array<ContentTypeCompositionModel>;
+    id: string;
 };
 

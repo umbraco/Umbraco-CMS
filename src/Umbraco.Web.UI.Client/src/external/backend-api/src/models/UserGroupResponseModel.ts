@@ -6,6 +6,6 @@
 import type { UserGroupBaseModel } from './UserGroupBaseModel';
 
 export type UserGroupResponseModel = (UserGroupBaseModel & {
-    id?: string;
+    id: string;
 });
 

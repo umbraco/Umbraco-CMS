@@ -9,6 +9,6 @@ export type DataTypeModelBaseModel = {
     name: string;
     propertyEditorAlias: string;
     propertyEditorUiAlias?: string | null;
-    values?: Array<DataTypePropertyPresentationModel>;
+    values: Array<DataTypePropertyPresentationModel>;
 };
 

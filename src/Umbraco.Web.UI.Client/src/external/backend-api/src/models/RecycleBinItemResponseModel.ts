@@ -4,12 +4,12 @@
 /* eslint-disable */
 
 export type RecycleBinItemResponseModel = {
-    id?: string;
+    id: string;
     name: string;
     type: string;
     icon: string;
-    hasChildren?: boolean;
-    isContainer?: boolean;
+    hasChildren: boolean;
+    isContainer: boolean;
     parentId?: string | null;
 };
 

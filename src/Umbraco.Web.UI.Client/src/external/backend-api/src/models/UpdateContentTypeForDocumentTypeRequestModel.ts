@@ -13,13 +13,13 @@ export type UpdateContentTypeForDocumentTypeRequestModel = {
     name: string;
     description?: string | null;
     icon: string;
-    allowedAsRoot?: boolean;
-    variesByCulture?: boolean;
-    variesBySegment?: boolean;
-    isElement?: boolean;
+    allowedAsRoot: boolean;
+    variesByCulture: boolean;
+    variesBySegment: boolean;
+    isElement: boolean;
     properties: Array<UpdateDocumentTypePropertyTypeRequestModel>;
-    containers?: Array<UpdateDocumentTypePropertyTypeContainerRequestModel>;
-    allowedContentTypes?: Array<ContentTypeSortModel>;
-    compositions?: Array<ContentTypeCompositionModel>;
+    containers: Array<UpdateDocumentTypePropertyTypeContainerRequestModel>;
+    allowedContentTypes: Array<ContentTypeSortModel>;
+    compositions: Array<ContentTypeCompositionModel>;
 };
 

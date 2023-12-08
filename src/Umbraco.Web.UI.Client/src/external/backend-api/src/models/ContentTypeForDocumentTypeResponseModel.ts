@@ -13,14 +13,14 @@ export type ContentTypeForDocumentTypeResponseModel = {
     name: string;
     description?: string | null;
     icon: string;
-    allowedAsRoot?: boolean;
-    variesByCulture?: boolean;
-    variesBySegment?: boolean;
-    isElement?: boolean;
+    allowedAsRoot: boolean;
+    variesByCulture: boolean;
+    variesBySegment: boolean;
+    isElement: boolean;
     properties: Array<DocumentTypePropertyTypeResponseModel>;
-    containers?: Array<DocumentTypePropertyTypeContainerResponseModel>;
-    allowedContentTypes?: Array<ContentTypeSortModel>;
-    compositions?: Array<ContentTypeCompositionModel>;
-    id?: string;
+    containers: Array<DocumentTypePropertyTypeContainerResponseModel>;
+    allowedContentTypes: Array<ContentTypeSortModel>;
+    compositions: Array<ContentTypeCompositionModel>;
+    id: string;
 };
 

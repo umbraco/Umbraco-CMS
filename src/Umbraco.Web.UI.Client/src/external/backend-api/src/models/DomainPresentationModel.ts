@@ -4,7 +4,7 @@
 /* eslint-disable */
 
 export type DomainPresentationModel = {
-    domainName?: string;
-    isoCode?: string;
+    domainName: string;
+    isoCode: string;
 };
 

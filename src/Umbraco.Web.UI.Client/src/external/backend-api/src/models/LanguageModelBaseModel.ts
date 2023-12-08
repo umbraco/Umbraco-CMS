@@ -5,8 +5,8 @@
 
 export type LanguageModelBaseModel = {
     name: string;
-    isDefault?: boolean;
-    isMandatory?: boolean;
+    isDefault: boolean;
+    isMandatory: boolean;
     fallbackIsoCode?: string | null;
 };
 
