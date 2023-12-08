@@ -32,6 +32,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				dataTypeId: 'dt-richTextEditor',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 0,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -51,6 +52,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				dataTypeId: 'dt-colorPicker',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 1,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -70,6 +72,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				dataTypeId: 'dt-contentPicker',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 2,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -89,6 +92,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				dataTypeId: 'dt-eyeDropper',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 3,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -108,6 +112,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				dataTypeId: 'dt-multiUrlPicker',
 				variesByCulture: true,
 				variesBySegment: false,
+				sortOrder: 4,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -127,6 +132,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				dataTypeId: 'dt-multiNodeTreePicker',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 5,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -146,6 +152,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				dataTypeId: 'dt-datePicker',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 6,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -165,6 +172,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				dataTypeId: 'dt-datePicker-time',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 7,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -184,6 +192,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				dataTypeId: 'dt-email',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 9,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -203,6 +212,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				dataTypeId: 'dt-textBox',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 10,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -222,6 +232,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				dataTypeId: 'dt-dropdown',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 11,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -241,6 +252,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				dataTypeId: 'dt-textArea',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 12,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -260,6 +272,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				dataTypeId: 'dt-slider',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 13,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -279,6 +292,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				dataTypeId: 'dt-toggle',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 14,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -298,6 +312,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				dataTypeId: 'dt-tags',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 15,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -317,6 +332,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				dataTypeId: 'dt-markdownEditor',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 16,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -336,6 +352,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				dataTypeId: 'dt-radioButtonList',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 17,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -355,6 +372,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				dataTypeId: 'dt-checkboxList',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 18,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -374,6 +392,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				dataTypeId: 'dt-blockList',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 19,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -393,6 +412,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				dataTypeId: 'dt-mediaPicker',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 20,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -412,6 +432,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				dataTypeId: 'dt-imageCropper',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 21,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -431,6 +452,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				dataTypeId: 'dt-uploadField',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 22,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -450,6 +472,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				dataTypeId: 'dt-blockGrid',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 23,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -469,6 +492,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				dataTypeId: 'dt-iconPicker',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 24,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -488,6 +512,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				dataTypeId: 'dt-label',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 25,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -507,6 +532,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				dataTypeId: 'dt-integer',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 26,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -526,6 +552,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				dataTypeId: 'dt-decimal',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 27,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -545,6 +572,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				dataTypeId: 'dt-memberPicker',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 29,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -564,6 +592,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				dataTypeId: 'dt-memberGroupPicker',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 30,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -583,6 +612,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				dataTypeId: 'dt-userPicker',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 31,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -637,6 +667,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				dataTypeId: 'dt-multiNodeTreePicker',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 0,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -692,6 +723,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				dataTypeId: '0cc0eba1-9960-42c9-bf9b-60e150b429ae',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 0,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -711,6 +743,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				dataTypeId: '0cc0eba1-9960-42c9-bf9b-60e150b429ae',
 				variesByCulture: true,
 				variesBySegment: false,
+				sortOrder: 1,
 				validation: {
 					mandatory: false,
 					mandatoryMessage: null,
@@ -730,6 +763,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				dataTypeId: '0cc0eba1-9960-42c9-bf9b-60e150b429ae',
 				variesByCulture: true,
 				variesBySegment: false,
+				sortOrder: 2,
 				validation: {
 					mandatory: false,
 					mandatoryMessage: null,
@@ -749,6 +783,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				dataTypeId: '0cc0eba1-9960-42c9-bf9b-60e150b429ae',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 3,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -768,6 +803,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				dataTypeId: 'dt-blockGrid',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 4,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -857,6 +893,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				dataTypeId: '0cc0eba1-9960-42c9-bf9b-60e150b429ae',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 0,
 				validation: {
 					mandatory: false,
 					mandatoryMessage: null,
@@ -911,6 +948,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				dataTypeId: '0cc0eba1-9960-42c9-bf9b-60e150b429ae',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 0,
 				validation: {
 					mandatory: false,
 					mandatoryMessage: null,
@@ -969,6 +1007,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				dataTypeId: '0cc0eba1-9960-42c9-bf9b-60e150b429ae',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 0,
 				validation: {
 					mandatory: false,
 					mandatoryMessage: null,
@@ -1026,6 +1065,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				dataTypeId: '0cc0eba1-9960-42c9-bf9b-60e150b429ae',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 0,
 				validation: {
 					mandatory: false,
 					mandatoryMessage: null,
@@ -1045,6 +1085,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				dataTypeId: '0cc0eba1-9960-42c9-bf9b-60e150b429ae',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 1,
 				validation: {
 					mandatory: false,
 					mandatoryMessage: null,
