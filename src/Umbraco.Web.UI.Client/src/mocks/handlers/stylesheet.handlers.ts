@@ -1,8 +1,9 @@
 const { rest } = window.MockServiceWorker;
 import { umbStylesheetData } from '../data/stylesheet.data.js';
 import {
+	CreatePathFolderRequestModel,
+	CreateStylesheetRequestModel,
 	CreateTextFileViewModelBaseModel,
-	ExtractRichTextStylesheetRulesRequestModel,
 	InterpolateRichTextStylesheetRequestModel,
 	UpdateStylesheetRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
@@ -80,7 +81,7 @@ const detailHandlers = [
 
 const rulesHandlers = [
 	rest.post(umbracoPath('/stylesheet/rich-text/extract-rules'), async (req, res, ctx) => {
-		const requestBody = req.json() as ExtractRichTextStylesheetRulesRequestModel;
+		const requestBody = (await req.json()) as CreateStylesheetRequestModel;
 		if (!requestBody) return res(ctx.status(400, 'no body found'));
 		const response = await umbStylesheetData.extractRules({ requestBody });
 		return res(ctx.status(200), ctx.json(response));
@@ -113,12 +114,12 @@ const folderHandlers = [
 		const response = umbStylesheetData.getFolder(path);
 		return res(ctx.status(200), ctx.json(response));
 	}),
-	rest.post(umbracoPath('/stylesheet/folder'), (req, res, ctx) => {
-		const requestBody = req.json() as CreateTextFileViewModelBaseModel;
+
+	rest.post(umbracoPath('/stylesheet/folder'), async (req, res, ctx) => {
+		const requestBody = (await req.json()) as CreatePathFolderRequestModel;
 		if (!requestBody) return res(ctx.status(400, 'no body found'));
-		const response = umbStylesheetData.insertFolder(requestBody);
-		return res(ctx.status(200), ctx.json(response));
 	}),
+
 	rest.delete(umbracoPath('/stylesheet/folder'), (req, res, ctx) => {
 		const path = req.url.searchParams.get('path');
 		if (!path) return res(ctx.status(400));
