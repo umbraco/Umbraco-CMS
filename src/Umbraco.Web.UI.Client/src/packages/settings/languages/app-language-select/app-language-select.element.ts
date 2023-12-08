@@ -90,7 +90,7 @@ export class UmbAppLanguageSelectElement extends UmbLitElement {
 	}
 
 	#renderContent() {
-		return html` <uui-popover-container id="dropdown-popover" @toggle=${this.#onPopoverToggle}>
+		return html` <uui-popover-container id="dropdown-popover" @beforetoggle=${this.#onPopoverToggle}>
 			<umb-popover-layout>
 				${repeat(
 					this._languages,

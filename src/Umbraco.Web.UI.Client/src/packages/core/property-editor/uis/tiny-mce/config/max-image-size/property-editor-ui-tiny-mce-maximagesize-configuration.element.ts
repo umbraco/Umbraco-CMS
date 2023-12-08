@@ -15,7 +15,7 @@ export class UmbPropertyEditorUITinyMceMaxImageSizeConfigurationElement
 	value: number = 0;
 
 	render() {
-		return html`<uui-input type="number" placeholder="Max size" .value=${this.value}></uui-input>`;
+		return html`<uui-input label="Max size" type="number" placeholder="Max size" .value=${this.value}></uui-input>`;
 	}
 
 	static styles = [UmbTextStyles];

@@ -691,6 +691,7 @@ export class UmbSorterController<T> implements UmbController {
 		if (movingItemIndex !== -1 && movingItemIndex <= movingItemIndex) {
 			newIndex--;
 		}
+
 		if (nextEl) {
 			// We had a reference element, we want to get the index of it.
 			// This is might a problem if a item is being moved forward? (was also like this in the AngularJS version...)
