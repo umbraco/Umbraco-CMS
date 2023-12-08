@@ -49,10 +49,7 @@
 
     @Html.Raw(await RuntimeMinifier.RenderCssHereAsync(BackOfficeWebAssets.UmbracoNonOptimizedPackageCssBundleName))
     @Html.Raw(await RuntimeMinifier.RenderCssHereAsync(BackOfficeWebAssets.UmbracoCssBundleName))
-
-    <link rel="stylesheet" href="~/umbraco/login/style.css" asp-append-version="true"/>
-    <script type="module" src="~/umbraco/login/external.js" asp-append-version="true"></script>
-    <script type="module" src="~/umbraco/login/index.js" asp-append-version="true"></script>
+    <link rel="stylesheet" href="~/umbraco/lib/umbraco-ui/uui-css/dist/uui-css.css" asp-append-version="true"/>
     <style>
       body {
         margin: 0;
@@ -111,6 +108,9 @@
         }
     </umb-auth>
 </umb-backoffice-icon-registry>
+
+<script src="~/umbraco/lib/umbraco-ui/uui/dist/uui.min.js" asp-append-version="true"></script>
+<script src="~/umbraco/login/login.iife.js" asp-append-version="true"></script>
 
 @if (isDebug)
 {
