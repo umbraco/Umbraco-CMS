@@ -21,6 +21,7 @@ export class UmbTemplateTreeRepository
 			name: 'Templates',
 			icon: 'icon-folder',
 			hasChildren: true,
+			isContainer: false,
 		};
 
 		return { data };

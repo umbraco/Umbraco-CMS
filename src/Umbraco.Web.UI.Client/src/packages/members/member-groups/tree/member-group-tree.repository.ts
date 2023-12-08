@@ -21,6 +21,7 @@ export class UmbMemberGroupTreeRepository
 			name: 'Member Groups',
 			icon: 'icon-folder',
 			hasChildren: true,
+			isContainer: false,
 		};
 
 		return { data };

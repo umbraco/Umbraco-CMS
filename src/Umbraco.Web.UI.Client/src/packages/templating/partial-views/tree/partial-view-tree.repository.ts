@@ -23,6 +23,7 @@ export class UmbPartialViewTreeRepository
 			name: 'Partial Views',
 			icon: 'icon-folder',
 			hasChildren: true,
+			isContainer: false,
 		};
 
 		return { data };

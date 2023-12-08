@@ -21,6 +21,7 @@ export class UmbDictionaryTreeRepository
 			name: 'Dictionary',
 			icon: 'icon-folder',
 			hasChildren: true,
+			isContainer: false,
 		};
 
 		return { data };

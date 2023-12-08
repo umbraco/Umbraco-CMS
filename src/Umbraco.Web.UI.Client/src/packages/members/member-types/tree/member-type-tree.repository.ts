@@ -21,6 +21,7 @@ export class UmbMemberTypeTreeRepository
 			name: 'Member Types',
 			icon: 'icon-folder',
 			hasChildren: true,
+			isContainer: false,
 		};
 
 		return { data };

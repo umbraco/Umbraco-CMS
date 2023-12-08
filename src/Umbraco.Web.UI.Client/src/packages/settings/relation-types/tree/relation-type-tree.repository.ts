@@ -21,6 +21,7 @@ export class UmbRelationTypeTreeRepository
 			name: 'Relation Types',
 			icon: 'icon-folder',
 			hasChildren: true,
+			isContainer: false,
 		};
 
 		return { data };

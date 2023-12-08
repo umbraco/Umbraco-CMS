@@ -21,6 +21,7 @@ export class UmbDocumentRecycleBinTreeRepository
 			name: 'Recycle Bin',
 			icon: 'icon-trash',
 			hasChildren: true,
+			isContainer: false,
 		};
 
 		return { data };

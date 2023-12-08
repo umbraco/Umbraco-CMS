@@ -21,6 +21,7 @@ export class UmbMediaTreeRepository
 			name: 'Medias',
 			icon: 'icon-folder',
 			hasChildren: true,
+			isContainer: false,
 		};
 
 		return { data };

@@ -23,6 +23,7 @@ export class UmbScriptTreeRepository
 			name: 'Scripts',
 			icon: 'icon-folder',
 			hasChildren: true,
+			isContainer: false,
 		};
 
 		return { data };
