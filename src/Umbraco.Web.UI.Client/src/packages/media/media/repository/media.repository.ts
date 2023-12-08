@@ -3,7 +3,7 @@ import { UMB_MEDIA_TREE_STORE_CONTEXT, type UmbMediaTreeStore } from '../tree/in
 import { UMB_MEDIA_STORE_CONTEXT, UmbMediaStore } from './media.store.js';
 import { UmbMediaDetailServerDataSource } from './sources/media-detail.server.data-source.js';
 import { UmbMediaItemServerDataSource } from './sources/media-item.server.data-source.js';
-import { UmbMediaItemStore } from './media-item.store.js';
+import { UMB_MEDIA_ITEM_STORE_CONTEXT, UmbMediaItemStore } from './media-item.store.js';
 import { type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import { CreateMediaRequestModel, UpdateMediaRequestModel } from '@umbraco-cms/backoffice/backend-api';
@@ -43,7 +43,7 @@ export class UmbMediaRepository
 				this.#store = instance;
 			}).asPromise(),
 
-			this.consumeContext(UMB_MEDIA_TREE_STORE_CONTEXT, (instance) => {
+			this.consumeContext(UMB_MEDIA_ITEM_STORE_CONTEXT, (instance) => {
 				this.#itemStore = instance;
 			}).asPromise(),
 
