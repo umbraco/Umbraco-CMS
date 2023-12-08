@@ -8,6 +8,7 @@ export type UmbMockDocumentTypeModel = DocumentTypeResponseModel & DocumentTypeT
 
 export const data: Array<UmbMockDocumentTypeModel> = [
 	{
+		type: 'document-type',
 		allowedTemplateIds: [],
 		defaultTemplateId: null,
 		id: 'all-property-editors-document-type-id',
@@ -22,6 +23,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		hasChildren: false,
 		isContainer: false,
 		parentId: null,
+		isFolder: false,
 		properties: [
 			{
 				id: '1',
@@ -657,6 +659,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		hasChildren: false,
 		isContainer: false,
 		parentId: null,
+		isFolder: false,
 		properties: [
 			{
 				id: '6',
@@ -713,6 +716,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		hasChildren: false,
 		isContainer: false,
 		parentId: null,
+		isFolder: false,
 		properties: [
 			{
 				id: '5b4ca208-134e-4865-b423-06e5e97adf3c',
@@ -883,6 +887,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		hasChildren: false,
 		isContainer: false,
 		parentId: null,
+		isFolder: false,
 		properties: [
 			{
 				id: '5e5f7456-c751-4846-9f2b-47965cc96ec6',
@@ -938,6 +943,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		hasChildren: false,
 		isContainer: false,
 		parentId: null,
+		isFolder: false,
 		properties: [
 			{
 				id: 'b92de6ac-1a22-4a45-a481-b6cae1cccbbf',
@@ -997,6 +1003,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		hasChildren: false,
 		isContainer: false,
 		parentId: null,
+		isFolder: false,
 		properties: [
 			{
 				id: '1680d4d2-cda8-4ac2-affd-a69fc10382b1',
@@ -1055,6 +1062,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		hasChildren: false,
 		isContainer: false,
 		parentId: null,
+		isFolder: false,
 		properties: [
 			{
 				id: '82d4b050-b128-42fe-ac8e-d5586e533592',
