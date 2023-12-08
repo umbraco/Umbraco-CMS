@@ -1,5 +1,5 @@
-import { clamp } from './mathUtils.js';
 import { UmbImageCropperFocalPoint } from './index.js';
+import { clamp } from '@umbraco-cms/backoffice/utils';
 import {
 	LitElement,
 	PropertyValueMap,
