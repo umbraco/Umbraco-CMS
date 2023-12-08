@@ -1,11 +1,6 @@
 import { UmbEntityData } from './entity.data.js';
-import { createFolderTreeItem, createMediaTypeTreeItem } from './utils.js';
-import {
-	FolderTreeItemResponseModel,
-	MediaTypeResponseModel,
-	MediaTypeTreeItemResponseModel,
-	PagedMediaTreeItemResponseModel,
-} from '@umbraco-cms/backoffice/backend-api';
+import { createMediaTypeTreeItem } from './utils.js';
+import { MediaTypeResponseModel, MediaTypeTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 export const data: Array<MediaTypeResponseModel> = [
 	{
@@ -16,6 +11,12 @@ export const data: Array<MediaTypeResponseModel> = [
 		icon: 'icon-bug',
 		properties: [],
 		containers: [],
+		allowedAsRoot: false,
+		variesByCulture: false,
+		variesBySegment: false,
+		isElement: false,
+		allowedContentTypes: [],
+		compositions: [],
 	},
 ];
 
@@ -28,6 +29,7 @@ export const treeData: Array<MediaTypeTreeItemResponseModel> = [
 		hasChildren: false,
 		isContainer: false,
 		parentId: null,
+		isFolder: false,
 	},
 ];
 
