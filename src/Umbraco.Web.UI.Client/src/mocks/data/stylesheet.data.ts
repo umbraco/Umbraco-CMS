@@ -168,7 +168,7 @@ class UmbStylesheetData extends UmbData<StylesheetDBItem> {
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		//@ts-ignore
 		// eslint-disable-next-line no-unsafe-optional-chaining
-		const rules = [...item.content?.matchAll(regex)].map((match) => match.groups);
+		const rules = [...item.content?.matchAll(regex)].map((match) => match.groups) as Array<RichTextRuleModel>;
 		return { rules };
 	}
 
