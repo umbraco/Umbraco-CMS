@@ -6,7 +6,7 @@ import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
 import {
 	CreateDictionaryItemRequestModel,
-	DictionaryOverviewResponseModel,
+	DictionaryItemResponseModel,
 	UpdateDictionaryItemRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
@@ -18,9 +18,9 @@ export class UmbDictionaryRepository
 	implements
 		UmbDetailRepository<
 			CreateDictionaryItemRequestModel,
-			any,
+			string,
 			UpdateDictionaryItemRequestModel,
-			DictionaryOverviewResponseModel
+			DictionaryItemResponseModel
 		>,
 		UmbApi
 {
@@ -80,6 +80,7 @@ export class UmbDictionaryRepository
 		if (data) {
 			this.#detailStore?.append(data);
 		}
+
 		return { data, error };
 	}
 
