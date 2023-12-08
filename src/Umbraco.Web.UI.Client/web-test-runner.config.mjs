@@ -16,6 +16,10 @@ export default {
 	rootDir: '.',
 	files: ['./src/**/*.test.ts'],
 	nodeResolve: { exportConditions: mode === 'dev' ? ['development'] : [], preferBuiltins: false, browser: true },
+	browsers: [playwrightLauncher({ product: 'chromium' }), playwrightLauncher({ product: 'webkit' })],
+	coverageConfig: {
+		reporters: ['lcovonly', 'text-summary'],
+	},
 	plugins: [
 		esbuildPlugin({ ts: true, tsconfig: './tsconfig.json', target: 'auto', json: true }),
 		importMapsPlugin({
@@ -124,10 +128,6 @@ export default {
 			include: ['node_modules/**', 'src/external/**'],
 		}),
 	],
-	browsers: [playwrightLauncher({ product: 'chromium' }), playwrightLauncher({ product: 'webkit' })],
-	coverageConfig: {
-		reporters: ['lcovonly', 'text-summary'],
-	},
 	testRunnerHtml: (testFramework, devMode) =>
 		`<html lang="en-us">
 			<head>
