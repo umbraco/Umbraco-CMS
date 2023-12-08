@@ -9,6 +9,6 @@ export * from './workspace-footer/index.js';
 export * from './workspace-is-new-redirect-controller/index.js';
 export * from './workspace-modal/index.js';
 export * from './property-layout/property-layout.element.js';
-export * from './property/index.js';
+export * from '../property/property/index.js';
 export * from './workspace-split-view-manager.class.js';
 export * from './workspace-split-view/index.js';
