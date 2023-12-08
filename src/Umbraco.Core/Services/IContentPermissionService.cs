@@ -1,5 +1,6 @@
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services.AuthorizationStatus;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -16,7 +17,7 @@ public interface IContentPermissionService
     /// <param name="permissionToCheck">The permission to authorize.</param>
     /// <returns>A task resolving into a <see cref="ContentAuthorizationStatus"/>.</returns>
     Task<ContentAuthorizationStatus> AuthorizeAccessAsync(IUser user, Guid contentKey, char permissionToCheck)
-        => AuthorizeAccessAsync(user, new[] { contentKey }, new HashSet<char> { permissionToCheck });
+        => AuthorizeAccessAsync(user, contentKey.Yield(), new HashSet<char> { permissionToCheck });
 
     /// <summary>
     ///     Authorize that a user has access to content items.
@@ -26,6 +27,16 @@ public interface IContentPermissionService
     /// <param name="permissionsToCheck">The collection of permissions to authorize.</param>
     /// <returns>A task resolving into a <see cref="ContentAuthorizationStatus"/>.</returns>
     Task<ContentAuthorizationStatus> AuthorizeAccessAsync(IUser user, IEnumerable<Guid> contentKeys, ISet<char> permissionsToCheck);
+
+    /// <summary>
+    ///     Authorize that a user has access to the descendant items of a content item.
+    /// </summary>
+    /// <param name="user"><see cref="IUser" /> to authorize.</param>
+    /// <param name="parentKey">The identifier of the parent content item to check its descendants for access.</param>
+    /// <param name="permissionToCheck">The permission to authorize.</param>
+    /// <returns>A task resolving into a <see cref="ContentAuthorizationStatus"/>.</returns>
+    Task<ContentAuthorizationStatus> AuthorizeDescendantsAccessAsync(IUser user, Guid parentKey, char permissionToCheck)
+        => AuthorizeDescendantsAccessAsync(user, parentKey, new HashSet<char> { permissionToCheck });
 
     /// <summary>
     ///     Authorize that a user has access to the descendant items of a content item.

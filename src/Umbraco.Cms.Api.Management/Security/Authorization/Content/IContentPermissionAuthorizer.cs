@@ -1,4 +1,5 @@
 using System.Security.Principal;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Security.Authorization.Content;
 
@@ -15,7 +16,7 @@ public interface IContentPermissionAuthorizer
     /// <param name="permissionToCheck">The permission to authorize.</param>
     /// <returns>Returns <c>true</c> if authorization is successful, otherwise <c>false</c>.</returns>
     Task<bool> IsAuthorizedAsync(IPrincipal currentUser, Guid contentKey, char permissionToCheck)
-        => IsAuthorizedAsync(currentUser, new[] { contentKey }, new HashSet<char> { permissionToCheck });
+        => IsAuthorizedAsync(currentUser, contentKey.Yield(), new HashSet<char> { permissionToCheck });
 
     /// <summary>
     ///     Authorizes whether the current user has access to the specified content item(s).
@@ -25,6 +26,16 @@ public interface IContentPermissionAuthorizer
     /// <param name="permissionsToCheck">The collection of permissions to authorize.</param>
     /// <returns>Returns <c>true</c> if authorization is successful, otherwise <c>false</c>.</returns>
     Task<bool> IsAuthorizedAsync(IPrincipal currentUser, IEnumerable<Guid> contentKeys, ISet<char> permissionsToCheck);
+
+    /// <summary>
+    ///     Authorizes whether the current user has access to the descendants of the specified content item.
+    /// </summary>
+    /// <param name="currentUser">The current user's principal.</param>
+    /// <param name="parentKey">The key of the parent content item.</param>
+    /// <param name="permissionToCheck">The permission to authorize.</param>
+    /// <returns>Returns <c>true</c> if authorization is successful, otherwise <c>false</c>.</returns>
+    Task<bool> IsAuthorizedWithDescendantsAsync(IPrincipal currentUser, Guid parentKey, char permissionToCheck)
+        => IsAuthorizedWithDescendantsAsync(currentUser, parentKey, new HashSet<char> { permissionToCheck });
 
     /// <summary>
     ///     Authorizes whether the current user has access to the descendants of the specified content item.
