@@ -78,4 +78,11 @@
     <PackageVersion Include="Smidge.Nuglify" Version="4.3.0" />
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="6.5.0" />
   </ItemGroup>
+  <!-- Transitive pinned versions -->
+  <ItemGroup>
+    <!-- Both Microsoft.EntityFrameworkCore.SqlServer and NPoco.SqlServer bring in a vulnerable version of Azure.Identity -->
+    <PackageVersion Include="Azure.Identity" Version="1.10.4" />
+    <!-- Dazinator.Extensions.FileProviders brings in a vulnerable version of System.Net.Http -->
+    <PackageVersion Include="System.Net.Http" Version="4.3.4" />
+  </ItemGroup>
 </Project>
