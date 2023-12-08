@@ -1,4 +1,4 @@
-export * from '../property/property-dataset/index.js';
+export * from './workspace-property-dataset/index.js';
 export * from './workspace-action-menu/index.js';
 export * from './workspace-action/index.js';
 export type { WorkspaceAliasConditionConfig } from './workspace-alias.condition.js';

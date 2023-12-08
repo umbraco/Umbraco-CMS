@@ -1,11 +1,11 @@
-import type { UmbPropertyValueData } from '../../workspace/types/property-value-data.type.js';
-import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import {
 	UMB_PROPERTY_DATASET_CONTEXT,
 	type UmbNameablePropertyDatasetContext,
 	type UmbPropertyDatasetContext,
-} from '@umbraco-cms/backoffice/workspace';
+} from '@umbraco-cms/backoffice/property';
+import type { UmbPropertyValueData } from '../types/property-value-data.type.js';
+import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbArrayState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 

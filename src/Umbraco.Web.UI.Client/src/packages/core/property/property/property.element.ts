@@ -27,7 +27,7 @@ export class UmbPropertyElement extends UmbLitElement {
 	 */
 	@property({ type: String })
 	public set label(label: string) {
-		this._propertyContext.setLabel(label);
+		this.#propertyContext.setLabel(label);
 	}
 
 	/**
@@ -38,7 +38,7 @@ export class UmbPropertyElement extends UmbLitElement {
 	 */
 	@property({ type: String })
 	public set description(description: string) {
-		this._propertyContext.setDescription(description);
+		this.#propertyContext.setDescription(description);
 	}
 
 	/**
@@ -50,7 +50,7 @@ export class UmbPropertyElement extends UmbLitElement {
 	 */
 	@property({ type: String })
 	public set alias(alias: string) {
-		this._propertyContext.setAlias(alias);
+		this.#propertyContext.setAlias(alias);
 	}
 
 	/**
@@ -77,7 +77,7 @@ export class UmbPropertyElement extends UmbLitElement {
 	 */
 	@property({ type: Array, attribute: false })
 	public set config(value: UmbPropertyEditorConfig | undefined) {
-		this._propertyContext.setConfig(value);
+		this.#propertyContext.setConfig(value);
 	}
 
 	@state()
@@ -98,24 +98,24 @@ export class UmbPropertyElement extends UmbLitElement {
 	@state()
 	private _description?: string;
 
-	private _propertyContext = new UmbPropertyContext(this);
+	#propertyContext = new UmbPropertyContext(this);
 
-	private _valueObserver?: UmbObserverController<unknown>;
-	private _configObserver?: UmbObserverController<UmbPropertyEditorConfigCollection | undefined>;
+	#valueObserver?: UmbObserverController<unknown>;
+	#configObserver?: UmbObserverController<UmbPropertyEditorConfigCollection | undefined>;
 
 	constructor() {
 		super();
 
-		this.observe(this._propertyContext.alias, (alias) => {
+		this.observe(this.#propertyContext.alias, (alias) => {
 			this._alias = alias;
 		});
-		this.observe(this._propertyContext.label, (label) => {
+		this.observe(this.#propertyContext.label, (label) => {
 			this._label = label;
 		});
-		this.observe(this._propertyContext.description, (description) => {
+		this.observe(this.#propertyContext.description, (description) => {
 			this._description = description;
 		});
-		this.observe(this._propertyContext.variantDifference, (variantDifference) => {
+		this.observe(this.#propertyContext.variantDifference, (variantDifference) => {
 			this._variantDifference = variantDifference;
 		});
 	}
@@ -124,7 +124,7 @@ export class UmbPropertyElement extends UmbLitElement {
 		const target = e.composedPath()[0] as any;
 
 		//this.value = target.value; // Sets value in context.
-		this._propertyContext.setValue(target.value);
+		this.#propertyContext.setValue(target.value);
 		e.stopPropagation();
 	};
 
@@ -139,7 +139,7 @@ export class UmbPropertyElement extends UmbLitElement {
 	}
 
 	private async _gotEditorUI(manifest?: ManifestPropertyEditorUi | null) {
-		this._propertyContext.setEditor(undefined);
+		this.#propertyContext.setEditor(undefined);
 
 		if (!manifest) {
 			// TODO: if propertyEditorUiAlias didn't exist in store, we should do some nice fail UI.
@@ -152,26 +152,26 @@ export class UmbPropertyElement extends UmbLitElement {
 			const oldElement = this._element;
 
 			// cleanup:
-			this._valueObserver?.destroy();
-			this._configObserver?.destroy();
+			this.#valueObserver?.destroy();
+			this.#configObserver?.destroy();
 			oldElement?.removeEventListener('property-value-change', this._onPropertyEditorChange as any as EventListener);
 
 			this._element = el as ManifestPropertyEditorUi['ELEMENT_TYPE'];
 
-			this._propertyContext.setEditor(this._element);
+			this.#propertyContext.setEditor(this._element);
 
 			if (this._element) {
 				// TODO: Could this be changed to change event? (or additionally support change?)
 				this._element.addEventListener('property-value-change', this._onPropertyEditorChange as any as EventListener);
 
 				// No need for a controller alias, as the clean is handled via the observer prop:
-				this._valueObserver = this.observe(this._propertyContext.value, (value) => {
+				this.#valueObserver = this.observe(this.#propertyContext.value, (value) => {
 					this._value = value;
 					if (this._element) {
 						this._element.value = value;
 					}
 				});
-				this._configObserver = this.observe(this._propertyContext.config, (config) => {
+				this.#configObserver = this.observe(this.#propertyContext.config, (config) => {
 					if (this._element && config) {
 						this._element.config = config;
 					}

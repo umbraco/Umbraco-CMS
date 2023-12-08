@@ -1,12 +1,12 @@
-import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
-import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import {
 	UMB_PROPERTY_DATASET_CONTEXT,
 	UmbPropertyDatasetContext,
-	UmbInvariantableWorkspaceContextInterface,
 	UmbNameablePropertyDatasetContext,
-} from '@umbraco-cms/backoffice/workspace';
+} from '@umbraco-cms/backoffice/property';
+import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { UmbInvariantableWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
 
 /**
  * A property dataset context that hooks directly into the workspace context.

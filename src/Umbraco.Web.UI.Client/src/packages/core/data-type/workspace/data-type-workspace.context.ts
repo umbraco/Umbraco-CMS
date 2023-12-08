@@ -1,10 +1,10 @@
+import { UmbPropertyDatasetBaseContext } from '@umbraco-cms/backoffice/property';
 import { UmbDataTypeDetailRepository } from '../repository/detail/data-type-detail.repository.js';
 import type { UmbDataTypeDetailModel } from '../types.js';
 import {
 	UmbInvariantableWorkspaceContextInterface,
 	UmbEditableWorkspaceContextBase,
 	UmbWorkspaceContextInterface,
-	UmbPropertyDatasetBaseContext,
 } from '@umbraco-cms/backoffice/workspace';
 import {
 	appendToFrozenArray,
@@ -146,6 +146,7 @@ export class UmbDataTypeWorkspaceContext
 	}
 
 	createPropertyDatasetContext(host: UmbControllerHost) {
+		// TODO: Could use the Workspace version, to spare the energy of mapping values:
 		const context = new UmbPropertyDatasetBaseContext(host);
 
 		// Observe workspace name:

@@ -1,3 +1,4 @@
+import { UMB_PROPERTY_DATASET_CONTEXT, isNameablePropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import { UmbVariantId } from '../../variant/variant-id.class.js';
 import { UUIInputElement, UUIInputEvent, UUIPopoverContainerElement } from '@umbraco-cms/backoffice/external/uui';
 import {
@@ -13,9 +14,7 @@ import {
 import {
 	UmbWorkspaceSplitViewContext,
 	UMB_WORKSPACE_SPLIT_VIEW_CONTEXT,
-	UMB_PROPERTY_DATASET_CONTEXT,
 	ActiveVariant,
-	isNameablePropertyDatasetContext,
 } from '@umbraco-cms/backoffice/workspace';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { DocumentVariantResponseModel, ContentStateModel } from '@umbraco-cms/backoffice/backend-api';

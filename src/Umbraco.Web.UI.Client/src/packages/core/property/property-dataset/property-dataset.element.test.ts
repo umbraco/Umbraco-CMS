@@ -1,5 +1,5 @@
 import { expect, fixture, oneEvent } from '@open-wc/testing';
-import type { UmbPropertyValueData } from '../../workspace/types/property-value-data.type.js';
+import type { UmbPropertyValueData } from '../types/property-value-data.type.js';
 import { UMB_PROPERTY_DATASET_CONTEXT } from './property-dataset-context.token.js';
 import { UmbPropertyDatasetElement } from './property-dataset.element.js';
 import { customElement, html, property, state, LitElement } from '@umbraco-cms/backoffice/external/lit';
