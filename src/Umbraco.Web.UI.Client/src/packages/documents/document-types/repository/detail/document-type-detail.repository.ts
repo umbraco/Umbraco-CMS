@@ -125,10 +125,7 @@ export class UmbDocumentTypeDetailRepository
 		const { error } = await this.#detailDataSource.update(id, item);
 
 		if (!error) {
-			// TODO: we currently don't use the detail store for anything.
-			// Consider to look up the data before fetching from the server
-			// Consider notify a workspace if a template is updated in the store while someone is editing it.
-			this.#detailStore?.append(item);
+			this.#detailStore?.updateItem(id, item);
 			this.#treeStore?.updateItem(id, item);
 
 			const notification = { data: { message: `Document Type saved` } };
