@@ -20,16 +20,21 @@ export class UmbDocumentRecycleBinTreeServerDataSource extends UmbTreeServerData
 	 */
 	constructor(host: UmbControllerHost) {
 		super(host, {
+			getRootItems,
 			getChildrenOf,
 			mapper,
 		});
 	}
 }
 
+// eslint-disable-next-line local-rules/no-direct-api-import
+const getRootItems = () => DocumentResource.getRecycleBinDocumentRoot({});
+
 const getChildrenOf = (parentUnique: string | null) => {
 	if (parentUnique === null) {
-		return DocumentResource.getRecycleBinDocumentRoot({});
+		return getRootItems();
 	} else {
+		// eslint-disable-next-line local-rules/no-direct-api-import
 		return DocumentResource.getRecycleBinDocumentChildren({
 			parentId: parentUnique,
 		});
@@ -38,11 +43,11 @@ const getChildrenOf = (parentUnique: string | null) => {
 
 const mapper = (item: RecycleBinItemResponseModel): UmbDocumentRecycleBinTreeItemModel => {
 	return {
-		id: item.id!,
-		parentId: item.parentId!,
-		name: item.name!,
+		id: item.id,
+		parentId: item.parentId || null,
+		name: item.name,
 		type: 'document-recycle-bin',
-		hasChildren: item.hasChildren!,
-		isContainer: item.isContainer!,
+		hasChildren: item.hasChildren,
+		isContainer: item.isContainer,
 	};
 };

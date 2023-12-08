@@ -7,5 +7,6 @@ export interface UmbTreeDataSourceConstructor<TreeItemType extends UmbTreeItemMo
 }
 
 export interface UmbTreeDataSource<TreeItemType extends UmbTreeItemModelBase> {
+	getRootItems(): Promise<DataSourceResponse<UmbPagedData<TreeItemType>>>;
 	getChildrenOf(parentUnique: string | null): Promise<DataSourceResponse<UmbPagedData<TreeItemType>>>;
 }

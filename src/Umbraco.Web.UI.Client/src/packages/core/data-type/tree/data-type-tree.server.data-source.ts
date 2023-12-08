@@ -20,16 +20,19 @@ export class UmbDataTypeTreeServerDataSource extends UmbTreeServerDataSourceBase
 	 */
 	constructor(host: UmbControllerHost) {
 		super(host, {
+			getRootItems,
 			getChildrenOf,
 			mapper,
 		});
 	}
 }
 
+// eslint-disable-next-line local-rules/no-direct-api-import
+const getRootItems = () => DataTypeResource.getTreeDataTypeRoot({});
+
 const getChildrenOf = (parentUnique: string | null) => {
 	if (parentUnique === null) {
-		// eslint-disable-next-line local-rules/no-direct-api-import
-		return DataTypeResource.getTreeDataTypeRoot({});
+		return getRootItems();
 	} else {
 		// eslint-disable-next-line local-rules/no-direct-api-import
 		return DataTypeResource.getTreeDataTypeChildren({
@@ -40,12 +43,12 @@ const getChildrenOf = (parentUnique: string | null) => {
 
 const mapper = (item: DataTypeTreeItemResponseModel): UmbDataTypeTreeItemModel => {
 	return {
-		unique: item.id!,
+		unique: item.id,
 		parentUnique: item.parentId || null,
-		name: item.name!,
+		name: item.name,
 		type: item.isFolder ? 'data-type-folder' : 'data-type',
-		isFolder: item.isFolder!,
-		isContainer: item.isContainer!,
-		hasChildren: item.hasChildren!,
+		isFolder: item.isFolder,
+		isContainer: item.isContainer,
+		hasChildren: item.hasChildren,
 	};
 };

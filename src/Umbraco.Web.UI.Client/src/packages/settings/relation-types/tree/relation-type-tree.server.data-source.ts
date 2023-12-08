@@ -20,15 +20,19 @@ export class UmbRelationTypeTreeServerDataSource extends UmbTreeServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
 		super(host, {
+			getRootItems,
 			getChildrenOf,
 			mapper,
 		});
 	}
 }
 
+// eslint-disable-next-line local-rules/no-direct-api-import
+const getRootItems = () => RelationTypeResource.getTreeRelationTypeRoot({});
+
 const getChildrenOf = (parentUnique: string | null) => {
 	if (parentUnique === null) {
-		return RelationTypeResource.getTreeRelationTypeRoot({});
+		return getRootItems();
 	} else {
 		throw new Error('Not supported for the relation type tree');
 	}
@@ -36,11 +40,11 @@ const getChildrenOf = (parentUnique: string | null) => {
 
 const mapper = (item: EntityTreeItemResponseModel): UmbRelationTypeTreeItemModel => {
 	return {
-		id: item.id!,
-		parentId: item.parentId!,
-		name: item.name!,
+		id: item.id,
+		parentId: item.parentId || null,
+		name: item.name,
 		type: 'relation-type',
-		hasChildren: item.hasChildren!,
-		isContainer: item.isContainer!,
+		hasChildren: item.hasChildren,
+		isContainer: item.isContainer,
 	};
 };

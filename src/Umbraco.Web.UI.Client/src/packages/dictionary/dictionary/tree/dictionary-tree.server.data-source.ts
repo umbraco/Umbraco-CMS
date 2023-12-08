@@ -20,16 +20,19 @@ export class UmbDictionaryTreeServerDataSource extends UmbTreeServerDataSourceBa
 	 */
 	constructor(host: UmbControllerHost) {
 		super(host, {
+			getRootItems,
 			getChildrenOf,
 			mapper,
 		});
 	}
 }
 
+// eslint-disable-next-line local-rules/no-direct-api-import
+const getRootItems = () => DictionaryResource.getTreeDictionaryRoot({});
+
 const getChildrenOf = (parentUnique: string | null) => {
 	if (parentUnique === null) {
-		// eslint-disable-next-line local-rules/no-direct-api-import
-		return DictionaryResource.getTreeDictionaryRoot({});
+		return getRootItems();
 	} else {
 		// eslint-disable-next-line local-rules/no-direct-api-import
 		return DictionaryResource.getTreeDictionaryChildren({
@@ -40,10 +43,11 @@ const getChildrenOf = (parentUnique: string | null) => {
 
 const mapper = (item: EntityTreeItemResponseModel): UmbDictionaryTreeItemModel => {
 	return {
-		id: item.id!,
+		id: item.id,
 		parentId: item.parentId || null,
-		name: item.name!,
+		name: item.name,
 		type: 'dictionary-item',
-		hasChildren: item.hasChildren!,
+		hasChildren: item.hasChildren,
+		isContainer: item.isContainer,
 	};
 };

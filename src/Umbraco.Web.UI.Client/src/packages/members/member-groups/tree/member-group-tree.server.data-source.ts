@@ -20,23 +20,31 @@ export class UmbMemberGroupTreeServerDataSource extends UmbTreeServerDataSourceB
 	 */
 	constructor(host: UmbControllerHost) {
 		super(host, {
+			getRootItems,
 			getChildrenOf,
 			mapper,
 		});
 	}
 }
 
-const getChildrenOf = () => {
-	return MemberGroupResource.getTreeMemberGroupRoot({});
+// eslint-disable-next-line local-rules/no-direct-api-import
+const getRootItems = () => MemberGroupResource.getTreeMemberGroupRoot({});
+
+const getChildrenOf = (parentUnique: string | null) => {
+	if (parentUnique === null) {
+		return getRootItems();
+	} else {
+		throw new Error('Not supported for the member group tree');
+	}
 };
 
 const mapper = (item: EntityTreeItemResponseModel): UmbMemberGroupTreeItemModel => {
 	return {
-		id: item.id!,
+		id: item.id,
 		parentId: item.parentId || null,
-		name: item.name!,
+		name: item.name,
 		type: 'member-group',
-		isContainer: item.isContainer!,
-		hasChildren: item.hasChildren!,
+		isContainer: item.isContainer,
+		hasChildren: item.hasChildren,
 	};
 };

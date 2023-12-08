@@ -20,16 +20,19 @@ export class UmbDocumentTreeServerDataSource extends UmbTreeServerDataSourceBase
 	 */
 	constructor(host: UmbControllerHost) {
 		super(host, {
+			getRootItems,
 			getChildrenOf,
 			mapper,
 		});
 	}
 }
 
+// eslint-disable-next-line local-rules/no-direct-api-import
+const getRootItems = () => DocumentResource.getTreeDocumentRoot({});
+
 const getChildrenOf = (parentUnique: string | null) => {
 	if (parentUnique === null) {
-		// eslint-disable-next-line local-rules/no-direct-api-import
-		return DocumentResource.getTreeDocumentRoot({});
+		return getRootItems();
 	} else {
 		// eslint-disable-next-line local-rules/no-direct-api-import
 		return DocumentResource.getTreeDocumentChildren({
@@ -40,22 +43,22 @@ const getChildrenOf = (parentUnique: string | null) => {
 
 const mapper = (item: DocumentTreeItemResponseModel): UmbDocumentTreeItemModel => {
 	return {
-		id: item.id!,
+		id: item.id,
 		parentId: item.parentId || null,
-		name: item.name!,
+		name: item.name,
 		type: 'document',
-		isContainer: item.isContainer!,
-		hasChildren: item.hasChildren!,
-		isProtected: item.isProtected!,
-		isPublished: item.isPublished!,
-		isEdited: item.isEdited!,
-		contentTypeId: item.contentTypeId!,
+		isContainer: item.isContainer,
+		hasChildren: item.hasChildren,
+		isProtected: item.isProtected,
+		isPublished: item.isPublished,
+		isEdited: item.isEdited,
+		contentTypeId: item.contentTypeId,
 		variants:
 			item.variants?.map((variant) => ({
 				name: variant.name!,
 				culture: variant.culture!,
 				state: variant.state!,
 			})) || [],
-		icon: item.icon!,
+		icon: item.icon,
 	};
 };

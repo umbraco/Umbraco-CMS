@@ -20,11 +20,14 @@ export class UmbMemberTreeServerDataSource extends UmbTreeServerDataSourceBase<
 	 */
 	constructor(host: UmbControllerHost) {
 		super(host, {
+			getRootItems,
 			getChildrenOf,
 			mapper,
 		});
 	}
 }
+
+const getRootItems = (): any => alert('not implemented');
 
 const getChildrenOf = (parentUnique: string | null): any => {
 	alert('not implemented');
@@ -32,11 +35,11 @@ const getChildrenOf = (parentUnique: string | null): any => {
 
 const mapper = (item: EntityTreeItemResponseModel): UmbMemberTreeItemModel => {
 	return {
-		id: item.id!,
-		parentId: item.parentId!,
-		name: item.name!,
+		id: item.id,
+		parentId: item.parentId || null,
+		name: item.name,
 		type: 'member',
-		hasChildren: item.hasChildren!,
-		isContainer: item.isContainer!,
+		hasChildren: item.hasChildren,
+		isContainer: item.isContainer,
 	};
 };

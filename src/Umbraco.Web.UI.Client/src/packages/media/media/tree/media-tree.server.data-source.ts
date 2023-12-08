@@ -20,16 +20,20 @@ export class UmbMediaTreeServerDataSource extends UmbTreeServerDataSourceBase<
 	 */
 	constructor(host: UmbControllerHost) {
 		super(host, {
+			getRootItems,
 			getChildrenOf,
 			mapper,
 		});
 	}
 }
 
+const getRootItems = () => MediaResource.getTreeMediaRoot({});
+
 const getChildrenOf = (parentUnique: string | null) => {
 	if (parentUnique === null) {
-		return MediaResource.getTreeMediaRoot({});
+		return getRootItems();
 	} else {
+		// eslint-disable-next-line local-rules/no-direct-api-import
 		return MediaResource.getTreeMediaChildren({
 			parentId: parentUnique,
 		});
@@ -38,13 +42,13 @@ const getChildrenOf = (parentUnique: string | null) => {
 
 const mapper = (item: MediaTreeItemResponseModel): UmbMediaTreeItemModel => {
 	return {
-		id: item.id!,
-		parentId: item.parentId!,
-		name: item.name!,
+		id: item.id,
+		parentId: item.parentId || null,
+		name: item.name,
 		type: 'media',
-		hasChildren: item.hasChildren!,
-		isContainer: item.isContainer!,
-		noAccess: item.noAccess!,
-		isTrashed: item.isTrashed!,
+		hasChildren: item.hasChildren,
+		isContainer: item.isContainer,
+		noAccess: item.noAccess,
+		isTrashed: item.isTrashed,
 	};
 };

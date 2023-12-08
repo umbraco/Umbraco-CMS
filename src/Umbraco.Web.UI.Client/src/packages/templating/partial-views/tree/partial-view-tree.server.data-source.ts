@@ -20,16 +20,21 @@ export class UmbPartialViewTreeServerDataSource extends UmbTreeServerDataSourceB
 	 */
 	constructor(host: UmbControllerHost) {
 		super(host, {
+			getRootItems,
 			getChildrenOf,
 			mapper,
 		});
 	}
 }
 
+// eslint-disable-next-line local-rules/no-direct-api-import
+const getRootItems = () => PartialViewResource.getTreePartialViewRoot({});
+
 const getChildrenOf = (parentUnique: string | null) => {
 	if (parentUnique === null) {
-		return PartialViewResource.getTreePartialViewRoot({});
+		return getRootItems();
 	} else {
+		// eslint-disable-next-line local-rules/no-direct-api-import
 		return PartialViewResource.getTreePartialViewChildren({
 			path: parentUnique,
 		});
@@ -38,11 +43,11 @@ const getChildrenOf = (parentUnique: string | null) => {
 
 const mapper = (item: FileSystemTreeItemPresentationModel): UmbPartialViewTreeItemModel => {
 	return {
-		path: item.path!,
-		name: item.name!,
+		path: item.path,
+		name: item.name,
 		type: 'partial-view',
-		isFolder: item.isFolder!,
-		hasChildren: item.hasChildren!,
+		isFolder: item.isFolder,
+		hasChildren: item.hasChildren,
 		isContainer: false,
 	};
 };

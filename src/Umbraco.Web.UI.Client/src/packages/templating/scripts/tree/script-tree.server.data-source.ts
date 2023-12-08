@@ -20,16 +20,21 @@ export class UmbScriptTreeServerDataSource extends UmbTreeServerDataSourceBase<
 	 */
 	constructor(host: UmbControllerHost) {
 		super(host, {
+			getRootItems,
 			getChildrenOf,
 			mapper,
 		});
 	}
 }
 
+// eslint-disable-next-line local-rules/no-direct-api-import
+const getRootItems = () => ScriptResource.getTreeScriptRoot({});
+
 const getChildrenOf = (parentUnique: string | null) => {
 	if (parentUnique === null) {
-		return ScriptResource.getTreeScriptRoot({});
+		return getRootItems();
 	} else {
+		// eslint-disable-next-line local-rules/no-direct-api-import
 		return ScriptResource.getTreeScriptChildren({
 			path: parentUnique,
 		});
@@ -38,11 +43,11 @@ const getChildrenOf = (parentUnique: string | null) => {
 
 const mapper = (item: FileSystemTreeItemPresentationModel): UmbScriptTreeItemModel => {
 	return {
-		path: item.path!,
-		name: item.name!,
+		path: item.path,
+		name: item.name,
 		type: 'script',
-		isFolder: item.isFolder!,
-		hasChildren: item.hasChildren!,
+		isFolder: item.isFolder,
+		hasChildren: item.hasChildren,
 		isContainer: false,
 	};
 };

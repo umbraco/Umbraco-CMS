@@ -9,6 +9,7 @@ export interface UmbTreeServerDataSourceBaseArgs<
 	ServerTreeItemType extends TreeItemPresentationModel,
 	ClientTreeItemType extends UmbTreeItemModelBase,
 > {
+	getRootItems: () => CancelablePromise<UmbPagedData<ServerTreeItemType>>;
 	getChildrenOf: (parentUnique: string | null) => CancelablePromise<UmbPagedData<ServerTreeItemType>>;
 	mapper: (item: ServerTreeItemType) => ClientTreeItemType;
 }
@@ -25,6 +26,7 @@ export abstract class UmbTreeServerDataSourceBase<
 > implements UmbTreeDataSource<ClientTreeItemType>
 {
 	#host: UmbControllerHost;
+	#getRootItems: () => CancelablePromise<UmbPagedData<ServerTreeItemType>>;
 	#getChildrenOf: (parentUnique: string | null) => CancelablePromise<UmbPagedData<ServerTreeItemType>>;
 	#mapper: (item: ServerTreeItemType) => ClientTreeItemType;
 
@@ -35,8 +37,25 @@ export abstract class UmbTreeServerDataSourceBase<
 	 */
 	constructor(host: UmbControllerHost, args: UmbTreeServerDataSourceBaseArgs<ServerTreeItemType, ClientTreeItemType>) {
 		this.#host = host;
+		this.#getRootItems = args.getRootItems;
 		this.#getChildrenOf = args.getChildrenOf;
 		this.#mapper = args.mapper;
+	}
+
+	/**
+	 * Fetches the root items for the tree from the server
+	 * @return {*}
+	 * @memberof UmbTreeServerDataSourceBase
+	 */
+	async getRootItems() {
+		const { data, error } = await tryExecuteAndNotify(this.#host, this.#getRootItems());
+
+		if (data) {
+			const items = data?.items.map((item) => this.#mapper(item));
+			return { data: { total: data.total, items } };
+		}
+
+		return { error };
 	}
 
 	/**

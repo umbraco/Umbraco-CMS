@@ -20,16 +20,21 @@ export class UmbStylesheetTreeServerDataSource extends UmbTreeServerDataSourceBa
 	 */
 	constructor(host: UmbControllerHost) {
 		super(host, {
+			getRootItems,
 			getChildrenOf,
 			mapper,
 		});
 	}
 }
 
+// eslint-disable-next-line local-rules/no-direct-api-import
+const getRootItems = () => StylesheetResource.getTreeStylesheetRoot({});
+
 const getChildrenOf = (parentUnique: string | null) => {
 	if (parentUnique === null) {
-		return StylesheetResource.getTreeStylesheetRoot({});
+		return getRootItems();
 	} else {
+		// eslint-disable-next-line local-rules/no-direct-api-import
 		return StylesheetResource.getTreeStylesheetChildren({
 			path: parentUnique,
 		});
@@ -38,11 +43,11 @@ const getChildrenOf = (parentUnique: string | null) => {
 
 const mapper = (item: FileSystemTreeItemPresentationModel): UmbStylesheetTreeItemModel => {
 	return {
-		path: item.path!,
-		name: item.name!,
+		path: item.path,
+		name: item.name,
 		type: 'stylesheet',
-		isFolder: item.isFolder!,
-		hasChildren: item.hasChildren!,
+		isFolder: item.isFolder,
+		hasChildren: item.hasChildren,
 		isContainer: false,
 	};
 };
