@@ -68,6 +68,8 @@ export const createMediaTypeTreeItem = (item: MediaTypeResponseModel): MediaType
 	return {
 		...createEntityTreeItem(item),
 		type: 'media-type',
+		isFolder: false,
+		icon: item.icon,
 	};
 };
 
