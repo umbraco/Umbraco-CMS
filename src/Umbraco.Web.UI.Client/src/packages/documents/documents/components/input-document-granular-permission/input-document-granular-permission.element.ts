@@ -11,6 +11,7 @@ import type { DocumentItemResponseModel } from '@umbraco-cms/backoffice/backend-
 import { UmbDocumentRepository } from '@umbraco-cms/backoffice/document';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-input-document-granular-permission')
 export class UmbInputDocumentGranularPermissionElement extends FormControlMixin(UmbLitElement) {
@@ -27,7 +28,7 @@ export class UmbInputDocumentGranularPermissionElement extends FormControlMixin(
 	@property()
 	public set value(idsString: string) {
 		if (idsString !== this._value) {
-			this.selectedIds = idsString !== '' ? idsString.split(/[ ,]+/) : [];
+			this.selectedIds = splitStringToArray(idsString);
 		}
 	}
 
