@@ -14,8 +14,8 @@ export const handlers = [
 	rest.delete(umbracoPath(`${UMB_SLUG}/:id`), (req, res, ctx) => {
 		const id = req.params.id as string;
 		if (!id) return;
-		const document = umbDocumentTypeData.getById(id);
-		return res(ctx.status(200), ctx.json(document));
+		umbDocumentTypeData.delete([id]);
+		return res(ctx.status(200));
 	}),
 
 	rest.put(umbracoPath(`${UMB_SLUG}/:id`), async (req, res, ctx) => {
@@ -23,8 +23,8 @@ export const handlers = [
 		if (!id) return;
 		const data = await req.json();
 		if (!data) return;
-		const saved = umbDocumentTypeData.save(id, data);
-		return res(ctx.status(200), ctx.json(saved));
+		umbDocumentTypeData.save(id, data);
+		return res(ctx.status(200));
 	}),
 
 	rest.post(umbracoPath(`${UMB_SLUG}`), async (req, res, ctx) => {
