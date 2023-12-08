@@ -39,7 +39,7 @@ public class MoveMediaController : MediaControllerBase
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,
-            MediaPermissionResource.WithKeys(moveDocumentRequestModel.TargetId),
+            MediaPermissionResource.WithKeys(new[] { moveDocumentRequestModel.TargetId, id }),
             AuthorizationPolicies.MediaPermissionByResource);
 
         if (!authorizationResult.Succeeded)

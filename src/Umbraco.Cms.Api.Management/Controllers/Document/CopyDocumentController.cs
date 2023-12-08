@@ -40,7 +40,7 @@ public class CopyDocumentController : DocumentControllerBase
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,
-            ContentPermissionResource.WithKeys(ActionCopy.ActionLetter, copyDocumentRequestModel.TargetId),
+            ContentPermissionResource.WithKeys(ActionCopy.ActionLetter, new[] { copyDocumentRequestModel.TargetId, id }),
             AuthorizationPolicies.ContentPermissionByResource);
 
         if (!authorizationResult.Succeeded)
