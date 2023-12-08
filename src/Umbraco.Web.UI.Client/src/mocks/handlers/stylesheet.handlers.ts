@@ -118,6 +118,7 @@ const folderHandlers = [
 	rest.post(umbracoPath('/stylesheet/folder'), async (req, res, ctx) => {
 		const requestBody = (await req.json()) as CreatePathFolderRequestModel;
 		if (!requestBody) return res(ctx.status(400, 'no body found'));
+		return res(ctx.status(200));
 	}),
 
 	rest.delete(umbracoPath('/stylesheet/folder'), (req, res, ctx) => {
