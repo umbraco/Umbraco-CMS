@@ -192,6 +192,7 @@ const createMediaItem = (item: UmbMediaDetailModel): MediaItemResponseModel => {
 		id: item.id,
 		name: item.name,
 		icon: item.icon,
+		isTrashed: false,
 	};
 };
 

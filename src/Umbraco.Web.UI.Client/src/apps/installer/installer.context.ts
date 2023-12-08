@@ -18,7 +18,7 @@ import { UmbObjectState, UmbNumberState } from '@umbraco-cms/backoffice/observab
 export class UmbInstallerContext {
 	private _data = new UmbObjectState<InstallVResponseModel>({
 		user: { name: '', email: '', password: '', subscribeToNewsletter: false },
-		database: { id: '', providerName: '' },
+		database: { id: '', providerName: '', useIntegratedAuthentication: false, trustServerCertificate: false },
 		telemetryLevel: TelemetryLevelModel.BASIC,
 	});
 	public readonly data = this._data.asObservable();
