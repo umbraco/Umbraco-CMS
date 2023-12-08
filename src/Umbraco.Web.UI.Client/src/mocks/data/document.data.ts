@@ -692,8 +692,9 @@ export const treeData: Array<DocumentTreeItemResponseModel> = [
 const createDocumentItem = (item: DocumentResponseModel): DocumentItemResponseModel => {
 	return {
 		id: item.id,
-		name: item.variants?.[0].name, // Hack: TODO: we need to get all variants as part of the document item model
+		name: item.variants?.[0].name, // Hack: TODO: we need to get all variants as part of the document
 		contentTypeId: item.contentTypeId,
+		isTrashed: item.isTrashed,
 	};
 };
 
