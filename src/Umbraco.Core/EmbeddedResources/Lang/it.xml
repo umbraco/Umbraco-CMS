@@ -163,6 +163,12 @@
     <key alias="submitChanges">Invia</key>
     <key alias="submitChangesAndClose">Invia e chiudi</key>
   </area>
+  <area alias="auditTrailsMedia">
+    <key alias="delete">Media eliminato</key>
+    <key alias="move">Media spostato</key>
+    <key alias="copy">Media copiato</key>
+    <key alias="save">Media salvato</key>
+  </area>
   <area alias="auditTrails">
     <key alias="atViewingFor">Visualizzazione per</key>
     <key alias="delete">Contenuto eliminato</key>
@@ -1068,13 +1074,13 @@ Per gestire il tuo sito web, è sufficiente aprire il backoffice di Umbraco e in
     <key alias="renewSession">Riconnetti adesso per salvare il tuo lavoro</key>
   </area>
   <area alias="login">
-    <key alias="greeting0"><![CDATA[Buona Domenica!]]></key>
-    <key alias="greeting1"><![CDATA[Buon Lunedì!]]></key>
-    <key alias="greeting2"><![CDATA[Buon Martedì!]]></key>
-    <key alias="greeting3"><![CDATA[Buon Mercoledì!]]></key>
-    <key alias="greeting4"><![CDATA[Buon Giovedì!]]></key>
-    <key alias="greeting5"><![CDATA[Buon Venerdì!]]></key>
-    <key alias="greeting6"><![CDATA[Buon Sabato!]]></key>
+    <key alias="greeting0">Benvenuto</key>
+    <key alias="greeting1">Benvenuto</key>
+    <key alias="greeting2">Benvenuto</key>
+    <key alias="greeting3">Benvenuto</key>
+    <key alias="greeting4">Benvenuto</key>
+    <key alias="greeting5">Benvenuto</key>
+    <key alias="greeting6">Benvenuto</key>
     <key alias="instruction">Fai il login qui sotto</key>
     <key alias="signInWith">Fai il login con</key>
     <key alias="timeout">Sessione scaduta</key>

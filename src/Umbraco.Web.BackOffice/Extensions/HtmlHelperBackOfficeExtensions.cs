@@ -44,6 +44,7 @@ public static class HtmlHelperBackOfficeExtensions
     /// <param name="externalLogins"></param>
     /// <param name="externalLoginErrors"></param>
     /// <returns></returns>
+    [Obsolete("This is deprecated and will be removed in V15")]
     public static async Task<IHtmlContent> AngularValueExternalLoginInfoScriptAsync(this IHtmlHelper html,
         IBackOfficeExternalLoginProviders externalLogins,
         BackOfficeExternalLoginProviderErrors externalLoginErrors)
@@ -56,7 +57,17 @@ public static class HtmlHelperBackOfficeExtensions
             {
                 authType = p.ExternalLoginProvider.AuthenticationType,
                 caption = p.AuthenticationScheme.DisplayName,
-                properties = p.ExternalLoginProvider.Options
+                options = new
+                {
+                    allowManualLinking = p.ExternalLoginProvider.Options.AutoLinkOptions.AllowManualLinking,
+                    buttonStyle = p.ExternalLoginProvider.Options.ButtonStyle,
+                    buttonLook = p.ExternalLoginProvider.Options.ButtonLook.ToString().ToLowerInvariant(),
+                    buttonColor = p.ExternalLoginProvider.Options.ButtonColor.ToString().ToLowerInvariant(),
+                    customBackOfficeView = p.ExternalLoginProvider.Options.CustomBackOfficeView,
+                    denyLocalLogin = p.ExternalLoginProvider.Options.DenyLocalLogin,
+                    icon = p.ExternalLoginProvider.Options.Icon,
+                },
+                properties = p.ExternalLoginProvider.Options,
             })
             .ToArray();
 
@@ -95,6 +106,7 @@ public static class HtmlHelperBackOfficeExtensions
     /// <param name="html"></param>
     /// <param name="val"></param>
     /// <returns></returns>
+    [Obsolete("This is deprecated and will be removed in V15")]
     public static IHtmlContent AngularValueResetPasswordCodeInfoScript(this IHtmlHelper html, object? val)
     {
         var sb = new StringBuilder();

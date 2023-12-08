@@ -2,6 +2,7 @@ using Umbraco.Cms.Api.Delivery.Indexing.Selectors;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
@@ -36,8 +37,23 @@ internal sealed class ApiContentQueryService : IApiContentQueryService
         _requestPreviewService = requestPreviewService;
     }
 
+    [Obsolete($"Use the {nameof(ExecuteQuery)} method that accepts {nameof(ProtectedAccess)}. Will be removed in V14.")]
+    public Attempt<PagedModel<Guid>, ApiContentQueryOperationStatus> ExecuteQuery(
+        string? fetch,
+        IEnumerable<string> filters,
+        IEnumerable<string> sorts,
+        int skip,
+        int take)
+        => ExecuteQuery(fetch, filters, sorts, ProtectedAccess.None, skip, take);
+
     /// <inheritdoc/>
-    public Attempt<PagedModel<Guid>, ApiContentQueryOperationStatus> ExecuteQuery(string? fetch, IEnumerable<string> filters, IEnumerable<string> sorts, int skip, int take)
+    public Attempt<PagedModel<Guid>, ApiContentQueryOperationStatus> ExecuteQuery(
+        string? fetch,
+        IEnumerable<string> filters,
+        IEnumerable<string> sorts,
+        ProtectedAccess protectedAccess,
+        int skip,
+        int take)
     {
         var emptyResult = new PagedModel<Guid>();
 
@@ -77,7 +93,7 @@ internal sealed class ApiContentQueryService : IApiContentQueryService
         var culture = _variationContextAccessor.VariationContext?.Culture ?? string.Empty;
         var isPreview = _requestPreviewService.IsPreview();
 
-        PagedModel<Guid> result = _apiContentQueryProvider.ExecuteQuery(selectorOption, filterOptions, sortOptions, culture, isPreview, skip, take);
+        PagedModel<Guid> result = _apiContentQueryProvider.ExecuteQuery(selectorOption, filterOptions, sortOptions, culture, protectedAccess, isPreview, skip, take);
         return Attempt.SucceedWithStatus(ApiContentQueryOperationStatus.Success, result);
     }
 

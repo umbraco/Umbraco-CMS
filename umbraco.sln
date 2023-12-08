@@ -9,6 +9,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{B5BD12C1
 		tests\.editorconfig = tests\.editorconfig
 		tests\codeanalysis.ruleset = tests\codeanalysis.ruleset
 		tests\Directory.Build.props = tests\Directory.Build.props
+		tests\Directory.Packages.props = tests\Directory.Packages.props
 	EndProjectSection
 EndProject
 Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Umbraco.Web.UI.Client", "http://localhost:3961", "{3819A550-DCEC-4153-91B4-8BA9F7F0B9B4}"
@@ -30,6 +31,29 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Umbraco.Web.UI.Client", "ht
 		Release.AspNetCompiler.FixedNames = "false"
 		Release.AspNetCompiler.Debug = "False"
 		SlnRelativePath = "src\Umbraco.Web.UI.Client\"
+		DefaultWebSiteLanguage = "Visual C#"
+		StartServerOnDebug = "false"
+	EndProjectSection
+EndProject
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Umbraco.Web.UI.Login", "http://localhost:3962", "{A5A4D377-A873-4469-AB5F-24B32BC0E55A}"
+	ProjectSection(WebsiteProperties) = preProject
+		UseIISExpress = "true"
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.8"
+		Debug.AspNetCompiler.VirtualPath = "/localhost_3962"
+		Debug.AspNetCompiler.PhysicalPath = "src\Umbraco.Web.UI.Login\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_3962\"
+		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/localhost_3962"
+		Release.AspNetCompiler.PhysicalPath = "src\Umbraco.Web.UI.Login\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_3962\"
+		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
+		Release.AspNetCompiler.Debug = "False"
+		SlnRelativePath = "src\Umbraco.Web.UI.Login\"
 		DefaultWebSiteLanguage = "Visual C#"
 		StartServerOnDebug = "false"
 	EndProjectSection
@@ -105,9 +129,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.gitignore = .gitignore
 		.globalconfig = .globalconfig
 		Directory.Build.props = Directory.Build.props
+		Directory.Packages.props = Directory.Packages.props
+		global.json = global.json
 		icon.png = icon.png
 		LICENSE.md = LICENSE.md
 		umbraco.sln.DotSettings = umbraco.sln.DotSettings
+		nuget.config = nuget.config
 		version.json = version.json
 	EndProjectSection
 EndProject
@@ -151,11 +178,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Cms.Api.Common", "s
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Cms.Imaging.ImageSharp", "src\Umbraco.Cms.Imaging.ImageSharp\Umbraco.Cms.Imaging.ImageSharp.csproj", "{35E3DA10-5549-41DE-B7ED-CC29355BA9FD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Cms.Persistence.EFCore", "src\Umbraco.Cms.Persistence.EFCore\Umbraco.Cms.Persistence.EFCore.csproj", "{9046F56E-4AC3-4603-A6A3-3ACCF632997E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Cms.Persistence.EFCore", "src\Umbraco.Cms.Persistence.EFCore\Umbraco.Cms.Persistence.EFCore.csproj", "{9046F56E-4AC3-4603-A6A3-3ACCF632997E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Cms.Persistence.EFCore.Sqlite", "src\Umbraco.Cms.Persistence.EFCore.Sqlite\Umbraco.Cms.Persistence.EFCore.Sqlite.csproj", "{8B4771F0-8EC2-4761-BBCE-DDE073DB3B7A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Cms.Persistence.EFCore.Sqlite", "src\Umbraco.Cms.Persistence.EFCore.Sqlite\Umbraco.Cms.Persistence.EFCore.Sqlite.csproj", "{8B4771F0-8EC2-4761-BBCE-DDE073DB3B7A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Cms.Persistence.EFCore.SqlServer", "src\Umbraco.Cms.Persistence.EFCore.SqlServer\Umbraco.Cms.Persistence.EFCore.SqlServer.csproj", "{9276C3F0-0DC9-46C9-BF32-9EE79D92AE02}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Cms.Persistence.EFCore.SqlServer", "src\Umbraco.Cms.Persistence.EFCore.SqlServer\Umbraco.Cms.Persistence.EFCore.SqlServer.csproj", "{9276C3F0-0DC9-46C9-BF32-9EE79D92AE02}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -173,6 +200,9 @@ Global
 		{3819A550-DCEC-4153-91B4-8BA9F7F0B9B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3819A550-DCEC-4153-91B4-8BA9F7F0B9B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3819A550-DCEC-4153-91B4-8BA9F7F0B9B4}.SkipTests|Any CPU.ActiveCfg = Debug|Any CPU
+		{A5A4D377-A873-4469-AB5F-24B32BC0E55A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A5A4D377-A873-4469-AB5F-24B32BC0E55A}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{A5A4D377-A873-4469-AB5F-24B32BC0E55A}.SkipTests|Any CPU.ActiveCfg = Debug|Any CPU
 		{9E4C8A12-FBE0-4673-8CE2-DF99D5D57817}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9E4C8A12-FBE0-4673-8CE2-DF99D5D57817}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9E4C8A12-FBE0-4673-8CE2-DF99D5D57817}.SkipTests|Any CPU.ActiveCfg = Debug|Any CPU
@@ -303,18 +333,18 @@ Global
 		{D48B5D6B-82FF-4235-986C-CDE646F41DEC}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D48B5D6B-82FF-4235-986C-CDE646F41DEC}.SkipTests|Any CPU.ActiveCfg = Debug|Any CPU
 		{D48B5D6B-82FF-4235-986C-CDE646F41DEC}.SkipTests|Any CPU.Build.0 = Debug|Any CPU
-		{9046F56E-4AC3-4603-A6A3-3ACCF632997E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9046F56E-4AC3-4603-A6A3-3ACCF632997E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9046F56E-4AC3-4603-A6A3-3ACCF632997E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9046F56E-4AC3-4603-A6A3-3ACCF632997E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9046F56E-4AC3-4603-A6A3-3ACCF632997E}.SkipTests|Any CPU.ActiveCfg = Debug|Any CPU
-		{9046F56E-4AC3-4603-A6A3-3ACCF632997E}.SkipTests|Any CPU.Build.0 = Debug|Any CPU
 		{35E3DA10-5549-41DE-B7ED-CC29355BA9FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{35E3DA10-5549-41DE-B7ED-CC29355BA9FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{35E3DA10-5549-41DE-B7ED-CC29355BA9FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{35E3DA10-5549-41DE-B7ED-CC29355BA9FD}.Release|Any CPU.Build.0 = Release|Any CPU
 		{35E3DA10-5549-41DE-B7ED-CC29355BA9FD}.SkipTests|Any CPU.ActiveCfg = Debug|Any CPU
 		{35E3DA10-5549-41DE-B7ED-CC29355BA9FD}.SkipTests|Any CPU.Build.0 = Debug|Any CPU
+		{9046F56E-4AC3-4603-A6A3-3ACCF632997E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9046F56E-4AC3-4603-A6A3-3ACCF632997E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9046F56E-4AC3-4603-A6A3-3ACCF632997E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9046F56E-4AC3-4603-A6A3-3ACCF632997E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9046F56E-4AC3-4603-A6A3-3ACCF632997E}.SkipTests|Any CPU.ActiveCfg = Debug|Any CPU
+		{9046F56E-4AC3-4603-A6A3-3ACCF632997E}.SkipTests|Any CPU.Build.0 = Debug|Any CPU
 		{8B4771F0-8EC2-4761-BBCE-DDE073DB3B7A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8B4771F0-8EC2-4761-BBCE-DDE073DB3B7A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8B4771F0-8EC2-4761-BBCE-DDE073DB3B7A}.Release|Any CPU.ActiveCfg = Release|Any CPU

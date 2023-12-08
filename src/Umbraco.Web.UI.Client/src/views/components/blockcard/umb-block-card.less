@@ -104,6 +104,7 @@ umb-block-card {
             font-size: 14px;
             color: @ui-action-type;
             margin: 0 16px -1px;
+            word-wrap: break-word;
         }
         .__subname {
             color: @gray-4;
@@ -127,7 +128,12 @@ umb-block-card {
         right: 10px;
         opacity: 0;
         transition: opacity 120ms;
-        margin-right: 10px;
+        display: flex;
+        gap: 5px;
+
+        > div {
+            position: relative;
+        }
 
         .__action {
             display: inline-flex;
@@ -137,7 +143,7 @@ umb-block-card {
             width: 28px;
             height: 28px;
             background-color: white;
-            color:@ui-action-type;
+            color: @ui-action-type;
 
             &:hover {
                 color: @ui-action-type-hover;

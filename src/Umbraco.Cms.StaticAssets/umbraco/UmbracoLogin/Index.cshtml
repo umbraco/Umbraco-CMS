@@ -1,0 +1,120 @@
+@using System.Globalization
+@using Microsoft.AspNetCore.Routing
+@using Microsoft.Extensions.Options;
+@using Umbraco.Cms.Core
+@using Umbraco.Cms.Core.Configuration.Models
+@using Umbraco.Cms.Core.Hosting
+@using Umbraco.Cms.Core.Logging
+@using Umbraco.Cms.Core.Mail
+@using Umbraco.Cms.Core.WebAssets
+@using Umbraco.Cms.Infrastructure.WebAssets
+@using Umbraco.Cms.Web.BackOffice.Controllers
+@using Umbraco.Cms.Web.BackOffice.Security
+@using Umbraco.Extensions
+@inject IOptions<ContentSettings> ContentSettings
+@inject IOptions<SecuritySettings> SecuritySettings
+@inject IEmailSender EmailSender
+@inject IHostingEnvironment HostingEnvironment
+@inject IOptions<GlobalSettings> GlobalSettings
+@inject IRuntimeMinifier RuntimeMinifier
+@inject IProfilerHtml ProfilerHtml
+@inject IBackOfficeExternalLoginProviders ExternalLogins
+@inject LinkGenerator LinkGenerator
+@{
+    bool.TryParse(Context.Request.Query["umbDebug"], out var isDebug);
+    var backOfficePath = GlobalSettings.Value.GetBackOfficePath(HostingEnvironment);
+    var loginLogoImage = ContentSettings.Value.LoginLogoImage;
+    var loginLogoImageAlternative = ContentSettings.Value.LoginLogoImageAlternative;
+    var loginBackgroundImage = ContentSettings.Value.LoginBackgroundImage;
+    var usernameIsEmail = SecuritySettings.Value.UsernameIsEmail;
+    var allowUserInvite = EmailSender.CanSendRequiredEmail();
+    var allowPasswordReset = SecuritySettings.Value.AllowPasswordReset && EmailSender.CanSendRequiredEmail();
+    var disableLocalLogin = ExternalLogins.HasDenyLocalLogin();
+    var externalLoginsUrl = LinkGenerator.GetPathByAction(nameof(BackOfficeController.ExternalLogin), ControllerExtensions.GetControllerName<BackOfficeController>(), new { area = Constants.Web.Mvc.BackOfficeArea });
+    var externalLoginProviders = await ExternalLogins.GetBackOfficeProvidersAsync();
+}
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+<!DOCTYPE html>
+<html lang="@CultureInfo.CurrentCulture.Name.ToLowerInvariant()">
+<head>
+    <meta charset="UTF-8"/>
+    <base href="@backOfficePath.EnsureEndsWith('/')"/>
+    <link rel="icon" type="image/svg+xml" href="~/umbraco/login/favicon.svg"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="robots" content="noindex, nofollow"/>
+    <meta name="pinterest" content="nopin"/>
+    <title>Umbraco</title>
+
+    @Html.Raw(await RuntimeMinifier.RenderCssHereAsync(BackOfficeWebAssets.UmbracoNonOptimizedPackageCssBundleName))
+    @Html.Raw(await RuntimeMinifier.RenderCssHereAsync(BackOfficeWebAssets.UmbracoCssBundleName))
+
+    <link rel="stylesheet" href="~/umbraco/login/style.css" asp-append-version="true"/>
+    <script type="module" src="~/umbraco/login/external.js" asp-append-version="true"></script>
+    <script type="module" src="~/umbraco/login/index.js" asp-append-version="true"></script>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f4;
+      }
+    </style>
+</head>
+
+<body class="uui-font uui-text" style="margin: 0; padding: 0; overflow: hidden">
+<noscript>
+    <style>
+        #noscript-container {
+            display: flex;
+            flex-wrap: wrap;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            padding: 0 20px;
+            text-align: center;
+        }
+    </style>
+    <div id="noscript-container">
+        <h1 class="uui-h3" style="display: inline-flex; align-items: center; gap: 10px">
+            <img aria-hidden="true" alt="logo" src="~/umbraco/assets/img/application/logo.svg" style="width: 30px" />
+            <span>Umbraco</span>
+        </h1>
+        <p>For full functionality of Umbraco CMS it is necessary to enable JavaScript.</p>
+        <p>Here are the <a href="https://www.enable-javascript.com/" target="_blank" rel="noopener" style="text-decoration: underline;">instructions how to enable JavaScript in your web browser</a>.</p>
+    </div>
+</noscript>
+
+<umb-backoffice-icon-registry>
+    <umb-auth
+        return-url="@backOfficePath"
+        logo-image="@loginLogoImage"
+        logo-image-alternative="@loginLogoImageAlternative"
+        background-image="@loginBackgroundImage"
+        username-is-email="@usernameIsEmail"
+        allow-user-invite="@allowUserInvite"
+        allow-password-reset="@allowPasswordReset"
+        disable-local-login="@disableLocalLogin">
+        @foreach (var provider in externalLoginProviders)
+        {
+            <umb-external-login-provider
+                slot="external"
+                display-name="@provider.AuthenticationScheme.DisplayName"
+                provider-name="@provider.ExternalLoginProvider.AuthenticationType"
+                icon="@provider.ExternalLoginProvider.Options.Icon"
+                external-login-url="@externalLoginsUrl"
+                button-look="@provider.ExternalLoginProvider.Options.ButtonLook.ToString().ToLowerInvariant()"
+                button-color="@provider.ExternalLoginProvider.Options.ButtonColor.ToString().ToLowerInvariant()"
+                custom-view="@provider.ExternalLoginProvider.Options.CustomBackOfficeView">
+            </umb-external-login-provider>
+        }
+    </umb-auth>
+</umb-backoffice-icon-registry>
+
+@if (isDebug)
+{
+    @Html.Raw(ProfilerHtml.Render())
+}
+</body>
+</html>

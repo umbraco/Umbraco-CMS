@@ -73,7 +73,7 @@ public class UmbTwoFactorLoginController : SurfaceController
         MemberIdentityUser? user = await _memberSignInManager.GetTwoFactorAuthenticationUserAsync();
         if (user == null!)
         {
-            _logger.LogWarning("PostVerify2FACode :: No verified member found, returning 404");
+            _logger.LogWarning("Verify2FACode :: No verified member found, returning 404");
             return NotFound();
         }
 

@@ -9,6 +9,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Implementations;
 using Umbraco.Cms.Tests.Integration.Testing;
@@ -572,6 +573,7 @@ public class ShadowFileSystemTests : UmbracoIntegrationTest
     }
 
     [Test]
+    [LongRunning]
     public void ShadowScopeCompleteWithDirectoryConflict()
     {
         var path = HostingEnvironment.MapPathContentRoot("FileSysTests");

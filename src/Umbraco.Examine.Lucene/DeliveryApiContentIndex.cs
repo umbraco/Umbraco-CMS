@@ -1,8 +1,11 @@
 using Examine;
 using Examine.Lucene;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DeliveryApi;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
@@ -11,16 +14,30 @@ namespace Umbraco.Cms.Infrastructure.Examine;
 
 public class DeliveryApiContentIndex : UmbracoExamineIndex
 {
+    private readonly IDeliveryApiCompositeIdHandler _deliveryApiCompositeIdHandler;
     private readonly ILogger<DeliveryApiContentIndex> _logger;
 
+    [Obsolete("Use the constructor that takes an IDeliveryApiCompositeIdHandler instead, scheduled for removal in v15")]
     public DeliveryApiContentIndex(
         ILoggerFactory loggerFactory,
         string name,
         IOptionsMonitor<LuceneDirectoryIndexOptions> indexOptions,
         IHostingEnvironment hostingEnvironment,
         IRuntimeState runtimeState)
+        : this(loggerFactory, name, indexOptions, hostingEnvironment, runtimeState, StaticServiceProvider.Instance.GetRequiredService<IDeliveryApiCompositeIdHandler>())
+    {
+    }
+
+    public DeliveryApiContentIndex(
+        ILoggerFactory loggerFactory,
+        string name,
+        IOptionsMonitor<LuceneDirectoryIndexOptions> indexOptions,
+        IHostingEnvironment hostingEnvironment,
+        IRuntimeState runtimeState,
+        IDeliveryApiCompositeIdHandler deliveryApiCompositeIdHandler)
         : base(loggerFactory, name, indexOptions, hostingEnvironment, runtimeState)
     {
+        _deliveryApiCompositeIdHandler = deliveryApiCompositeIdHandler;
         PublishedValuesOnly = false;
         EnableDefaultEventHandler = false;
 
@@ -108,18 +125,8 @@ public class DeliveryApiContentIndex : UmbracoExamineIndex
 
     private (string? ContentId, string? Culture) ParseItemId(string id)
     {
-        if (int.TryParse(id, out _))
-        {
-            return (id, null);
-        }
-
-        var parts = id.Split(Constants.CharArrays.VerticalTab);
-        if (parts.Length == 2 && int.TryParse(parts[0], out _))
-        {
-            return (parts[0], parts[1]);
-        }
-
-        return (null, null);
+        DeliveryApiIndexCompositeIdModel compositeIdModel = _deliveryApiCompositeIdHandler.Decompose(id);
+        return (compositeIdModel.Id.ToString() ?? id, compositeIdModel.Culture);
     }
 
     protected override void OnTransformingIndexValues(IndexingItemEventArgs e)

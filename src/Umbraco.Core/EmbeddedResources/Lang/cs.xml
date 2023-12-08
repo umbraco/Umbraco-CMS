@@ -151,6 +151,12 @@
     <key alias="confirmActionConfirm">Potvrdit</key>
     <key alias="morePublishingOptions">Další možnosti publikování</key>
   </area>
+  <area alias="auditTrailsMedia">
+    <key alias="delete">Média smazán</key>
+    <key alias="move">Média přesunut</key>
+    <key alias="copy">Média zkopírován</key>
+    <key alias="save">Média uložen</key>
+  </area>
   <area alias="auditTrails">
     <key alias="atViewingFor">Zobrazení pro</key>
     <key alias="delete">Obsah smazán</key>
@@ -865,13 +871,13 @@
     <key alias="renewSession">Obnovte nyní pro uložení práce</key>
   </area>
   <area alias="login">
-    <key alias="greeting0">Šťastnou super neděli</key>
-    <key alias="greeting1">Šťastné šílené pondělí</key>
-    <key alias="greeting2">Šťastné husté úterý</key>
-    <key alias="greeting3">Šťastnou překrásnou středu</key>
-    <key alias="greeting4">Šťastný bouřlivý čtvrtek</key>
-    <key alias="greeting5">Šťastný bláznivý pátek</key>
-    <key alias="greeting6">Šťastnou kočkobotu</key>
+    <key alias="greeting0">Vítejte</key>
+    <key alias="greeting1">Vítejte</key>
+    <key alias="greeting2">Vítejte</key>
+    <key alias="greeting3">Vítejte</key>
+    <key alias="greeting4">Vítejte</key>
+    <key alias="greeting5">Vítejte</key>
+    <key alias="greeting6">Vítejte</key>
     <key alias="instruction">přihlašte se níže</key>
     <key alias="signInWith">Přihlásit se pomocí</key>
     <key alias="timeout">Relace vypršela</key>

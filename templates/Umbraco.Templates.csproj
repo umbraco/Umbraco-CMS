@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <Title>Umbraco CMS - Templates</Title>
-    <Description>Coontains templates for Umbraco CMS.</Description>
+    <Description>Contains templates for Umbraco CMS, as well as the templates for creating new packages for the Umbraco CMS.</Description>
     <PackageType>Template</PackageType>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <IncludeSymbols>false</IncludeSymbols>
@@ -17,10 +17,6 @@
     <Content Include="UmbracoProject\**" Exclude="bin;obj" />
     <Content Include="..\src\Umbraco.Web.UI\Program.cs">
       <Link>UmbracoProject\Program.cs</Link>
-      <PackagePath>UmbracoProject</PackagePath>
-    </Content>
-    <Content Include="..\src\Umbraco.Web.UI\Startup.cs">
-      <Link>UmbracoProject\Startup.cs</Link>
       <PackagePath>UmbracoProject</PackagePath>
     </Content>
     <Content Include="..\src\Umbraco.Web.UI\Views\Partials\blocklist\**">
@@ -47,9 +43,12 @@
 
   <!-- Update template.json files with the default UmbracoVersion value set to the current build version -->
   <ItemGroup>
-    <PackageReference Include="Umbraco.JsonSchema.Extensions" Version="0.3.0" PrivateAssets="all" />
+    <PackageReference Include="Umbraco.JsonSchema.Extensions" PrivateAssets="all" />
   </ItemGroup>
-  <Target Name="GetUpdatedTemplateJsonPackageFiles" BeforeTargets="GenerateNuspec" AfterTargets="GetBuildVersion;GetUmbracoBuildVersion">
+  <ItemGroup>
+    <Content Update="**\.template.config\template.json" Pack="false" />
+  </ItemGroup>
+  <Target Name="GetUpdatedTemplateJsonPackageFiles" BeforeTargets="GenerateNuspec" AfterTargets="GetUmbracoBuildVersion">
     <ItemGroup>
       <_TemplateJsonFiles Include="**\.template.config\template.json" Exclude="bin\**;obj\**" />
       <_TemplateJsonFiles>
@@ -59,9 +58,8 @@
     <Copy SourceFiles="@(_TemplateJsonFiles)" DestinationFiles="%(DestinationFile)" />
     <JsonPathUpdateValue JsonFile="%(_TemplateJsonFiles.DestinationFile)" Path="$.symbols.UmbracoVersion.defaultValue" Value="&quot;$(PackageVersion)&quot;" />
     <ItemGroup>
-      <_PackageFiles Remove="@(_TemplateJsonFiles)" />
       <_PackageFiles Include="%(_TemplateJsonFiles.DestinationFile)">
-        <PackagePath>%(RelativeDir)</PackagePath>
+        <PackagePath>%(_TemplateJsonFiles.RelativeDir)</PackagePath>
       </_PackageFiles>
     </ItemGroup>
   </Target>

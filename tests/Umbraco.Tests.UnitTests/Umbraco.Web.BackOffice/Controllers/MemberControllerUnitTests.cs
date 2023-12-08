@@ -1,5 +1,4 @@
 using System.Data;
-using AngleSharp.Common;
 using AutoFixture.NUnit3;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -794,8 +793,8 @@ public class MemberControllerUnitTests
         for (var index = 0; index < resultValue.Properties.Count(); index++)
         {
             Assert.AreNotSame(
-                memberDisplay.Properties.GetItemByIndex(index),
-                resultValue.Properties.GetItemByIndex(index));
+                memberDisplay.Properties.ElementAt(index),
+                resultValue.Properties.ElementAt(index));
 
             // Assert.AreEqual(memberDisplay.Properties.GetItemByIndex(index), resultValue.Properties.GetItemByIndex(index));
         }

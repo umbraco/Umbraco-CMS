@@ -158,6 +158,12 @@
     <key alias="morePublishingOptions">Više opcija za objavljivanje</key>
     <key alias="submitChanges">Pošalji</key>
   </area>
+  <area alias="auditTrailsMedia">
+    <key alias="delete">Mediji je izbrisan</key>
+    <key alias="move">Mediji premješten</key>
+    <key alias="copy">Mediji kopiran</key>
+    <key alias="save">Mediji spremljen</key>
+  </area>
   <area alias="auditTrails">
     <key alias="atViewingFor">Pregled za</key>
     <key alias="delete">Sadržaj je izbrisan</key>
@@ -1045,13 +1051,13 @@ Da upravljate svojom web lokacijom, jednostavno otvorite Umbraco backoffice i po
     <key alias="renewSession">Obnovite sada da sačuvate svoj rad</key>
   </area>
   <area alias="login">
-    <key alias="greeting0">Sretna super nedelja</key>
-    <key alias="greeting1">Sretan divan ponedeljak</key>
-    <key alias="greeting2">Sretan specifičan utorak</key>
-    <key alias="greeting3">Sretna divna srijeda</key>
-    <key alias="greeting4">Sretan gromoglasan četvrtak</key>
-    <key alias="greeting5">Sretan zanimljiv petak</key>
-    <key alias="greeting6">Sretna opuštena subota</key>
+    <key alias="greeting0">Dobrodošli</key>
+    <key alias="greeting1">Dobrodošli</key>
+    <key alias="greeting2">Dobrodošli</key>
+    <key alias="greeting3">Dobrodošli</key>
+    <key alias="greeting4">Dobrodošli</key>
+    <key alias="greeting5">Dobrodošli</key>
+    <key alias="greeting6">Dobrodošli</key>
     <key alias="instruction">Prijavite se ispod</key>
     <key alias="signInWith">Prijavite se sa</key>
     <key alias="timeout">Isteklo je vrijeme sesije</key>
@@ -2653,7 +2659,7 @@ Da upravljate svojom web lokacijom, jednostavno otvorite Umbraco backoffice i po
     </key>
     <key alias="learningBaseDescription">
       <![CDATA[
-        <p>Želite savladati Umbraco? Provedite nekoliko minuta učeći neke najbolje prakse gledajući jedan od ovih videozapisa o korištenju Umbraco-a <a href="https://www.youtube.com/c/UmbracoLearningBase" target="_blank" rel="noopener"> Umbraco Learning Base Youtube kanal</a>. Ovdje možete pronaći gomilu video materijala koji pokriva mnoge aspekte Umbraco-a.</p>
+        <p>Želite savladati Umbraco? Provedite nekoliko minuta učeći neke najbolje prakse gledajući jedan od ovih videozapisa o korištenju Umbraco-a <a class="btn-link -underline" href="https://www.youtube.com/c/UmbracoLearningBase" target="_blank" rel="noopener"> Umbraco Learning Base Youtube kanal</a>. Ovdje možete pronaći gomilu video materijala koji pokriva mnoge aspekte Umbraco-a.</p>
       ]]>
     </key>
     <key alias="getStarted">Za početak</key>

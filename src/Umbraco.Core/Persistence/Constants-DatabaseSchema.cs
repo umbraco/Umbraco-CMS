@@ -86,6 +86,12 @@ public static partial class Constants
             public const string LogViewerQuery = TableNamePrefix + "LogViewerQuery";
 
             public const string CreatedPackageSchema = TableNamePrefix + "CreatedPackageSchema";
+            public const string Webhook = TableNamePrefix + "Webhook";
+            public const string Webhook2ContentTypeKeys = Webhook + "2ContentTypeKeys";
+            public const string Webhook2Events = Webhook + "2Events";
+            public const string Webhook2Headers = Webhook + "2Headers";
+            public const string WebhookLog = Webhook + "Log";
+            public const string WebhookRequest = Webhook + "Request";
         }
     }
 }

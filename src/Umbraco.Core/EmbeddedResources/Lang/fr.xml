@@ -34,6 +34,7 @@
     <key alias="restore" version="7.3.0">Récupérer</key>
     <key alias="chooseWhereToCopy">Choisissez où copier</key>
     <key alias="chooseWhereToMove">Choisissez où déplacer</key>
+    <key alias="chooseWhereToImport">Choisissez où importer</key>
     <key alias="toInTheTreeStructureBelow">dans l'arborescence ci-dessous</key>
     <key alias="wasMovedTo">a été déplacé vers</key>
     <key alias="wasCopiedTo">a été copié vers</key>
@@ -149,6 +150,12 @@
     <key alias="confirmActionCancel">Annuler</key>
     <key alias="confirmActionConfirm">Confirmer</key>
     <key alias="morePublishingOptions">Options de publication supplémentaires</key>
+  </area>
+  <area alias="auditTrailsMedia">
+    <key alias="delete">Media supprimé</key>
+    <key alias="move">Media déplacé</key>
+    <key alias="copy">Media copié</key>
+    <key alias="save">Media sauvegardé</key>
   </area>
   <area alias="auditTrails">
     <key alias="atViewingFor">Aperçu pour</key>
@@ -470,7 +477,14 @@
     <key alias="variantdeletewarning">Ceci supprimera le noeud et toutes ses langues. Si vous souhaitez supprimer une langue spécifique, vous devriez plutôt supprimer la publication du noeud dans cette langue-là.</key>
   </area>
   <area alias="dictionary">
-    <key alias="noItems">Il n'y a pas d'éléments dans le dictionnaire.</key>
+    <key alias="importDictionaryItemHelp">
+      Pour importer un élément de dictionnaire, trouvez le fichier ".udt" sur votre ordinateur en cliquant sur le bouton "Importer" (une confirmation vous sera demandée dans l'écran suivant)
+    </key>
+    <key alias="itemDoesNotExists">L'élément de dictionnaire n'existe pas.</key>
+    <key alias="parentDoesNotExists">L'élément parent n'existe pas.</key>
+    <key alias="noItems">Il n'y a pas d'élément dans le dictionnaire.</key>
+    <key alias="noItemsInFile">Il n'y a pas d'élément de dictionnaire dans ce fichier.</key>
+    <key alias="createNew">Créer un élément de dictionnaire</key>
   </area>
   <area alias="dictionaryItem">
     <key alias="description"><![CDATA[
@@ -684,6 +698,7 @@
     <key alias="pleasewait">Un moment s'il vous plaît...</key>
     <key alias="previous">Précédent</key>
     <key alias="properties">Propriétés</key>
+    <key alias="readMore">En savoir plus</key>
     <key alias="rebuild">Reconstruire</key>
     <key alias="reciept">Email de réception des données de formulaire</key>
     <key alias="recycleBin">Corbeille</key>
@@ -703,6 +718,7 @@
     <key alias="noItemsInList">Aucun élément n'a été ajouté</key>
     <key alias="server">Serveur</key>
     <key alias="settings">Paramètres</key>
+    <key alias="shared">Partagé</key>
     <key alias="show">Montrer</key>
     <key alias="showPageOnSend">Afficher la page à l'envoi</key>
     <key alias="size">Taille</key>
@@ -886,13 +902,13 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="renewSession">Renouvellez votre session maintenant pour sauvegarder votre travail</key>
   </area>
   <area alias="login">
-    <key alias="greeting0">Joyeux dimanche détonnant</key>
-    <key alias="greeting1">Joyeux lundi lumineux</key>
-    <key alias="greeting2">Joyeux mardi magique</key>
-    <key alias="greeting3">Joyeux mercredi merveilleux</key>
-    <key alias="greeting4">Joyeux jeudi</key>
-    <key alias="greeting5">Joyeux vendredi</key>
-    <key alias="greeting6">Joyeux chamedi</key>
+    <key alias="greeting0">Bienvenue</key>
+    <key alias="greeting1">Bienvenue</key>
+    <key alias="greeting2">Bienvenue</key>
+    <key alias="greeting3">Bienvenue</key>
+    <key alias="greeting4">Bienvenue</key>
+    <key alias="greeting5">Bienvenue</key>
+    <key alias="greeting6">Bienvenue</key>
     <key alias="instruction">Connectez-vous ci-dessous</key>
     <key alias="signInWith">Identifiez-vous avec</key>
     <key alias="timeout">La session a expiré</key>
@@ -1257,6 +1273,10 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="rollbackTo">Revenir à</key>
     <key alias="selectVersion">Choisissez une version</key>
     <key alias="view">Voir</key>
+    <key alias="pagination"><![CDATA[Afficher les versions %0% à %1% des %2% versions]]></key>
+    <key alias="versions">Versions</key>
+    <key alias="currentDraftVersion">Version de travail</key>
+    <key alias="currentPublishedVersion">Version publiée</key>
   </area>
   <area alias="scripts">
     <key alias="editscript">Editer le fichier de script</key>
@@ -1382,6 +1402,9 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="contentCultureValidationError">La validation a échoué pour la langue '%0%'</key>
     <key alias="documentTypeExportedSuccess">Le Type de Document a été exporté dans le fichier</key>
     <key alias="documentTypeExportedError">Une erreur est survenue durant l'export du type de document</key>
+    <key alias="dictionaryItemExportedSuccess">Les éléments de dictionnaire ont été exportés vers le fichier</key>
+    <key alias="dictionaryItemExportedError">Une erreur est survenue lors de l'export des éléments de dictionnaire.</key>
+    <key alias="dictionaryItemImported">Les éléments de dictionnaire suivants ont été importés!</key>
     <key alias="scheduleErrReleaseDate1">La date de publication ne peut pas être dans le passé</key>
     <key alias="scheduleErrReleaseDate2">Impossible de planifier la publication du document car la langue obligatoire '%0%' n'est pas publiée</key>
     <key alias="scheduleErrReleaseDate3">Impossible de planifier la publication du document car la langue obligatoire '%0%' a une date de publication postérieure à celle d'une langue non obligatoire</key>
@@ -1578,6 +1601,20 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="elementDescription">Un Type d'Elément est destiné à être utilisé par exemple dans Nested Content, et pas dans l'arborescence.</key>
     <key alias="elementDoesNotSupport">Ceci n'est pas d'application pour un Type d'Elément</key>
     <key alias="propertyHasChanges">Vous avez apporté des modifications à cette propriété. Etes-vous certain.e de vouloir les annuler?</key>
+    <key alias="historyCleanupHeading">Nettoyer l'historique</key>
+    <key alias="historyCleanupDescription">Autoriser le remplacement des paramètres globaux de nettoyage de l'historique.</key>
+    <key alias="historyCleanupKeepAllVersionsNewerThanDays">Garder toutes les versions plus récentes que jours</key>
+    <key alias="historyCleanupKeepLatestVersionPerDayForDays">Garder la dernière version quotidienne pendant jours</key>
+    <key alias="historyCleanupPreventCleanup">Empêcher le nettoyage</key>
+    <key alias="historyCleanupEnableCleanup">Activer le nettoyage</key>
+    <key alias="historyCleanupGloballyDisabled"><![CDATA[<strong>REMARQUE!</strong> Le nettoyage de l'historique des versions de contenu est désactvé globalement. Ces paramètres ne prendront pas effet avant qu'il ne soit activé.]]></key>
+  </area>
+ <area alias="webhooks">
+    <key alias="addWebhook">Créer un webhook</key>
+    <key alias="addWebhookHeader">Ajouter un header au webhook</key>
+    <key alias="logs">Logs</key>
+    <key alias="addDocumentType">Ajouter un Type de Document</key>
+    <key alias="addMediaType">Ajouter un Type de Media</key>
   </area>
   <area alias="languages">
     <key alias="addLanguage">Ajouter une langue</key>
@@ -1709,6 +1746,7 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="settingsGroup">Configuration</key>
     <key alias="templatingGroup">Modélisation</key>
     <key alias="thirdPartyGroup">Parties Tierces</key>
+    <key alias="webhooks">Webhooks</key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">Nouvelle mise à jour disponible</key>
@@ -2086,6 +2124,9 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="newPartialViewMacro">Macro de Partial View</key>
     <key alias="newMember">Membre</key>
     <key alias="searchContentTree">Chercher dans l'arborescence de contenu</key>
+    <key alias="maxAmount">Quantité maximum</key>
+    <key alias="expandChildItems">Afficher les éléments enfant pour</key>
+    <key alias="openContextNode">Ouvrir le noeud de contexte pour</key>
   </area>
   <area alias="references">
     <key alias="tabName">Références</key>

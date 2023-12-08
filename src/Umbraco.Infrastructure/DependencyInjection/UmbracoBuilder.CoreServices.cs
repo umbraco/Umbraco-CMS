@@ -38,6 +38,7 @@ using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Core.Trees;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Core.Webhooks;
 using Umbraco.Cms.Infrastructure.DeliveryApi;
 using Umbraco.Cms.Infrastructure.DistributedLocking;
 using Umbraco.Cms.Infrastructure.Examine;
@@ -51,6 +52,7 @@ using Umbraco.Cms.Infrastructure.Migrations.PostMigrations;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0.DataTypes;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
+using Umbraco.Cms.Infrastructure.Routing;
 using Umbraco.Cms.Infrastructure.Runtime;
 using Umbraco.Cms.Infrastructure.Runtime.RuntimeModeValidators;
 using Umbraco.Cms.Infrastructure.Scoping;
@@ -76,8 +78,8 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IDistributedLockingMechanismFactory, DefaultDistributedLockingMechanismFactory>();
         builder.Services.AddSingleton<IUmbracoDatabaseFactory, UmbracoDatabaseFactory>();
         builder.Services.AddSingleton(factory => factory.GetRequiredService<IUmbracoDatabaseFactory>().SqlContext);
-        builder.NPocoMappers()?.Add<NullableDateMapper>();
-        builder.PackageMigrationPlans()?.Add(() => builder.TypeLoader.GetPackageMigrationPlans());
+        builder.NPocoMappers().Add<NullableDateMapper>();
+        builder.PackageMigrationPlans().Add(builder.TypeLoader.GetPackageMigrationPlans());
 
         builder.Services.AddSingleton<IRuntimeState, RuntimeState>();
         builder.Services.AddSingleton<IRuntime, CoreRuntime>();
@@ -105,7 +107,7 @@ public static partial class UmbracoBuilderExtensions
         // register persistence mappers - required by database factory so needs to be done here
         // means the only place the collection can be modified is in a runtime - afterwards it
         // has been frozen and it is too late
-        builder.Mappers()?.AddCoreMappers();
+        builder.Mappers().AddCoreMappers();
 
         // register the scope provider
         builder.Services.AddSingleton<ScopeProvider>(sp => ActivatorUtilities.CreateInstance<ScopeProvider>(sp, sp.GetRequiredService<IAmbientScopeStack>())); // implements IScopeProvider, IScopeAccessor
@@ -160,6 +162,9 @@ public static partial class UmbracoBuilderExtensions
 
         builder.Services.AddSingleton<RichTextEditorPastedImages>();
         builder.Services.AddSingleton<BlockEditorConverter>();
+        builder.Services.AddSingleton<BlockListPropertyValueConstructorCache>();
+        builder.Services.AddSingleton<BlockGridPropertyValueConstructorCache>();
+        builder.Services.AddSingleton<RichTextBlockPropertyValueConstructorCache>();
 
         // both TinyMceValueConverter (in Core) and RteMacroRenderingValueConverter (in Web) will be
         // discovered when CoreBootManager configures the converters. We will remove the basic one defined
@@ -215,6 +220,9 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<ICronTabParser, NCronTabParser>();
 
         builder.Services.AddTransient<INodeCountService, NodeCountService>();
+
+        builder.Services.AddSingleton<IRedirectTracker, RedirectTracker>();
+
         builder.AddInstaller();
 
         // Services required to run background jobs (with out the handler)
@@ -225,6 +233,7 @@ public static partial class UmbracoBuilderExtensions
         builder.AddPropertyIndexValueFactories();
 
         builder.AddDeliveryApiCoreServices();
+        builder.Services.AddTransient<IWebhookFiringService, WebhookFiringService>();
 
         return builder;
     }
@@ -234,6 +243,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IBlockValuePropertyIndexValueFactory, BlockValuePropertyIndexValueFactory>();
         builder.Services.AddSingleton<INestedContentPropertyIndexValueFactory, NestedContentPropertyIndexValueFactory>();
         builder.Services.AddSingleton<ITagPropertyIndexValueFactory, TagPropertyIndexValueFactory>();
+        builder.Services.AddSingleton<IRichTextPropertyIndexValueFactory, RichTextPropertyIndexValueFactory>();
 
         return builder;
     }
@@ -360,7 +370,9 @@ public static partial class UmbracoBuilderExtensions
             .AddNotificationHandler<ContentDeletedNotification, ImageCropperPropertyEditor>()
             .AddNotificationHandler<MediaDeletedNotification, ImageCropperPropertyEditor>()
             .AddNotificationHandler<MediaSavingNotification, ImageCropperPropertyEditor>()
-            .AddNotificationHandler<MemberDeletedNotification, ImageCropperPropertyEditor>();
+            .AddNotificationHandler<MemberDeletedNotification, ImageCropperPropertyEditor>()
+            .AddNotificationHandler<ContentTypeCacheRefresherNotification, ConstructorCacheClearNotificationHandler>()
+            .AddNotificationHandler<DataTypeCacheRefresherNotification, ConstructorCacheClearNotificationHandler>();
 
         // add notification handlers for redirect tracking
         builder
@@ -432,6 +444,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IRequestRoutingService, NoopRequestRoutingService>();
         builder.Services.AddSingleton<IRequestRedirectService, NoopRequestRedirectService>();
         builder.Services.AddSingleton<IRequestPreviewService, NoopRequestPreviewService>();
+        builder.Services.AddSingleton<IRequestMemberAccessService, NoopRequestMemberAccessService>();
         builder.Services.AddSingleton<IApiAccessService, NoopApiAccessService>();
         builder.Services.AddSingleton<IApiContentQueryService, NoopApiContentQueryService>();
         builder.Services.AddSingleton<IApiMediaQueryService, NoopApiMediaQueryService>();

@@ -2,12 +2,10 @@
   <PropertyGroup>
     <Title>Umbraco CMS - Persistence - Entity Framework Core - SQL Server migrations</Title>
     <Description>Adds support for Entity Framework Core SQL Server migrations to Umbraco CMS.</Description>
-    <!-- TODO: Enable when final version is shipped (because there's currently no previous version) -->
-    <EnablePackageValidation>false</EnablePackageValidation>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.7" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
   </ItemGroup>
 
   <ItemGroup>

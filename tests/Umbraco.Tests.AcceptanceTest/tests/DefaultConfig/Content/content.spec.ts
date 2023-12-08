@@ -25,7 +25,6 @@ test.describe('Content tests', () => {
   const defaultContentAlias = "alias";
   const homeNodeName = "Home";
   const aliasText = "text";
-
   async function createSimpleMacro(name, umbracoApi: ApiHelpers){
     const insertMacro = new PartialViewMacroBuilder()
       .withName(name)
@@ -275,7 +274,7 @@ test.describe('Content tests', () => {
     await umbracoUi.clickElement(umbracoUi.getTreeItem(ConstantHelper.sections.content, [initialNodeName]));
 
     const header = await page.locator('#headerName')
-    // Sadly playwright doesn't have a clear method for inputs :( 
+    // Sadly playwright doesn't have a clear method for inputs :(
     // so we have to triple click to select all, and then hit backspace...
     await header.click({ clickCount: 3 })
     await page.keyboard.press('Backspace');
@@ -381,12 +380,9 @@ test.describe('Content tests', () => {
 
     // Clean up (content is automatically deleted when document types are gone)
     await umbracoApi.documentTypes.ensureNameNotExists(rootDocTypeName);
-  });  
+  });
 
   test('Preview draft', async ({ page, umbracoApi, umbracoUi }) => {
-
-    
-
     await umbracoApi.content.deleteAllContent();
     await umbracoApi.documentTypes.ensureNameNotExists(rootDocTypeName);
 
@@ -415,13 +411,13 @@ test.describe('Content tests', () => {
     await umbracoUi.clickElement(umbracoUi.getTreeItem(ConstantHelper.sections.content, [homeNodeName]));
 
     // Assert
-    await expect(page.locator('[alias="preview"]')).toBeVisible();
-    await page.locator('[alias="preview"]').click();
+    await expect(page.locator('[data-element="button-preview"]')).toBeVisible();
+    await page.locator('[data-element="button-preview"]').click();
     await umbracoUi.isSuccessNotificationVisible();
 
     // Clean up (content is automatically deleted when document types are gone)
     await umbracoApi.documentTypes.ensureNameNotExists(rootDocTypeName);
-  });  
+  });
 
   test('Publish draft', async ({ page, umbracoApi, umbracoUi }) => {
 
@@ -547,8 +543,7 @@ test.describe('Content tests', () => {
     // Save and publish
     await umbracoUi.clickElement(umbracoUi.getButtonByLabelKey(ConstantHelper.buttons.saveAndPublish));
     // Added additional time because it could fail on pipeline because it's not saving fast enough
-    await umbracoUi.isSuccessNotificationVisible({timeout:20000});
-    
+    await umbracoUi.isSuccessNotificationVisible();
     // Assert
     const expectedContent = '<p>Acceptance test</p>'
     await expect(await umbracoApi.content.verifyRenderedContent('/contentpickercontent', expectedContent, true)).toBeTruthy();
@@ -628,7 +623,7 @@ test.describe('Content tests', () => {
     await umbracoUi.isSuccessNotificationVisible();
 
     // Ensure that the view gets rendered correctly
-    const expected = `<p> </p><h1>Acceptance test</h1><p> </p>`;
+    const expected = `<p>&nbsp;</p><h1>Acceptancetest</h1><p>&nbsp;</p>`;
     await expect(await umbracoApi.content.verifyRenderedContent('/', expected, true)).toBeTruthy();
 
     // Cleanup
@@ -742,4 +737,3 @@ test.describe('Content tests', () => {
     await umbracoApi.partialViews.ensureMacroFileNameNotExists(macroFileName);
   });
 });
-

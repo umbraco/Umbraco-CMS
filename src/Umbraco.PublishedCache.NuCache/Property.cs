@@ -25,6 +25,7 @@ internal class Property : PublishedPropertyBase
     // the invariant-neutral source and inter values
     private readonly object? _sourceValue;
     private readonly ContentVariation _variations;
+    private bool _sourceValueIsInvariant;
 
     // the variant and non-variant object values
     private CacheValues? _cacheValues;
@@ -86,7 +87,10 @@ internal class Property : PublishedPropertyBase
         _isPreviewing = content.IsPreviewing;
         _isMember = content.ContentType.ItemType == PublishedItemType.Member;
         _publishedSnapshotAccessor = publishedSnapshotAccessor;
-        _variations = propertyType.Variations;
+        // this variable is used for contextualizing the variation level when calculating property values.
+        // it must be set to the union of variance (the combination of content type and property type variance).
+        _variations = propertyType.Variations | content.ContentType.Variations;
+        _sourceValueIsInvariant = propertyType.Variations is ContentVariation.Nothing;
     }
 
     // clone for previewing as draft a published content that is published and has no draft
@@ -102,6 +106,7 @@ internal class Property : PublishedPropertyBase
         _isMember = origin._isMember;
         _publishedSnapshotAccessor = origin._publishedSnapshotAccessor;
         _variations = origin._variations;
+        _sourceValueIsInvariant = origin._sourceValueIsInvariant;
     }
 
     // used to cache the CacheValues of this property
@@ -150,7 +155,7 @@ internal class Property : PublishedPropertyBase
     {
         _content.VariationContextAccessor.ContextualizeVariation(_variations, _content.Id, ref culture, ref segment);
 
-        if (culture == string.Empty && segment == string.Empty)
+        if (_sourceValueIsInvariant || (culture == string.Empty && segment == string.Empty))
         {
             return _sourceValue;
         }
@@ -318,7 +323,7 @@ internal class Property : PublishedPropertyBase
         object? value;
         lock (_locko)
         {
-            CacheValue cacheValues = GetCacheValues(PropertyType.DeliveryApiCacheLevel).For(culture, segment);
+            CacheValue cacheValues = GetCacheValues(expanding ? PropertyType.DeliveryApiCacheLevelForExpansion : PropertyType.DeliveryApiCacheLevel).For(culture, segment);
 
             // initial reference cache level always is .Content
             const PropertyCacheLevel initialCacheLevel = PropertyCacheLevel.Element;

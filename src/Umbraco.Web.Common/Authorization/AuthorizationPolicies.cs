@@ -50,6 +50,7 @@ public static class AuthorizationPolicies
     public const string TreeAccessDataTypes = nameof(TreeAccessDataTypes);
     public const string TreeAccessPackages = nameof(TreeAccessPackages);
     public const string TreeAccessLogs = nameof(TreeAccessLogs);
+    public const string TreeAccessWebhooks = nameof(TreeAccessWebhooks);
     public const string TreeAccessTemplates = nameof(TreeAccessTemplates);
     public const string TreeAccessDictionary = nameof(TreeAccessDictionary);
     public const string TreeAccessRelationTypes = nameof(TreeAccessRelationTypes);
