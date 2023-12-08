@@ -77,8 +77,10 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 			this._preConfiguredDatabase = this._databases.find((x) => x.isConfigured);
 			if (this._preConfiguredDatabase) {
 				this._setDatabase({
-					id: this._preConfiguredDatabase.id!,
-					providerName: this._preConfiguredDatabase.providerName!,
+					id: this._preConfiguredDatabase.id,
+					providerName: this._preConfiguredDatabase.providerName,
+					useIntegratedAuthentication: false,
+					trustServerCertificate: false,
 				});
 			} else {
 				this._options = this._databases
