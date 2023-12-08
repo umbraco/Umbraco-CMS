@@ -3,10 +3,8 @@ using Microsoft.AspNetCore.Authorization;
 namespace Umbraco.Cms.Api.Management.Security.Authorization.Content;
 
 /// <summary>
-///     Authorization requirement for the <see cref="ContentPermissionHandler" />
-///     and <see cref="ContentBranchPermissionHandler" />.
+///     Authorization requirement for the <see cref="ContentPermissionHandler" />.
 /// </summary>
-// TODO: ContentBranchPermissionHandler might need its own requirement and policy, once we have publishing functionality in place.
 public class ContentPermissionRequirement : IAuthorizationRequirement
 {
 }
