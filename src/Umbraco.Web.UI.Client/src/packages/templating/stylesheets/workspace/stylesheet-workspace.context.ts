@@ -112,13 +112,10 @@ export class UmbStylesheetWorkspaceContext
 	}
 
 	async sendContentGetRules() {
-		if (!this.getData()?.content) return;
+		const content = this.getData()?.content;
+		if (!content) throw Error('No content');
 
-		const requestBody = {
-			content: this.getData()?.content,
-		};
-
-		const { data } = await this.repository.extractStylesheetRules(requestBody);
+		const { data } = await this.repository.extractStylesheetRules({ content });
 		this.setRules(data?.rules ?? []);
 	}
 
