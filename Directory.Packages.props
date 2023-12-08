@@ -78,11 +78,15 @@
     <PackageVersion Include="Smidge.Nuglify" Version="4.3.0" />
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="6.5.0" />
   </ItemGroup>
-  <!-- Transitive pinned versions -->
+  <!-- Transitive pinned versions (only required because our direct dependencies have vulnerable versions of transitive dependencies) -->
   <ItemGroup>
     <!-- Both Microsoft.EntityFrameworkCore.SqlServer and NPoco.SqlServer bring in a vulnerable version of Azure.Identity -->
     <PackageVersion Include="Azure.Identity" Version="1.10.4" />
     <!-- Dazinator.Extensions.FileProviders brings in a vulnerable version of System.Net.Http -->
     <PackageVersion Include="System.Net.Http" Version="4.3.4" />
+    <!-- Examine brings in a vulnerable version of System.Security.Cryptography.Xml -->
+    <PackageVersion Include="System.Security.Cryptography.Xml" Version="8.0.0" />
+    <!-- Both Dazinator.Extensions.FileProviders and MiniProfiler.AspNetCore.Mvc bring in a vulnerable version of System.Text.RegularExpressions -->
+    <PackageVersion Include="System.Text.RegularExpressions" Version="4.3.1" />
   </ItemGroup>
 </Project>
