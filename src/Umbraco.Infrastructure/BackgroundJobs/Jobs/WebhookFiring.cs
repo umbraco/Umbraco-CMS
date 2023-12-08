@@ -1,4 +1,4 @@
-﻿using System.Net.Mime;
+using System.Net.Mime;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -101,8 +101,8 @@ public class WebhookFiring : IRecurringBackgroundJob
         try
         {
             // Add headers
-            request.Headers.Add("Umb-Webhook-Event", eventName);
-            request.Headers.Add("Umb-Webhook-RetryCount", retryCount.ToString());
+            request.Headers.Add(Constants.WebhookEvents.HeaderNames.EventName, eventName);
+            request.Headers.Add(Constants.WebhookEvents.HeaderNames.RetryCount, retryCount.ToString());
 
             foreach (KeyValuePair<string, string> header in webhook.Headers)
             {
