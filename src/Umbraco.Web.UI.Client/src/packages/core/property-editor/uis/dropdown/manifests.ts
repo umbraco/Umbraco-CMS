@@ -7,7 +7,7 @@ export const manifest: ManifestPropertyEditorUi = {
 	js: () => import('./property-editor-ui-dropdown.element.js'),
 	meta: {
 		label: 'Dropdown',
-		propertyEditorSchemaAlias: 'Umbraco.Dropdown',
+		propertyEditorSchemaAlias: 'Umbraco.DropDown.Flexible',
 		icon: 'icon-time',
 		group: 'pickers',
 		settings: {
