@@ -1,4 +1,5 @@
 using System.Security.Principal;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Security.Authorization.User;
 
@@ -14,7 +15,7 @@ public interface IUserPermissionAuthorizer
     /// <param name="userKey">The key of the user to check for.</param>
     /// <returns>Returns <c>true</c> if authorization is successful, otherwise <c>false</c>.</returns>
     Task<bool> IsAuthorizedAsync(IPrincipal currentUser, Guid userKey)
-        => IsAuthorizedAsync(currentUser, new[] { userKey });
+        => IsAuthorizedAsync(currentUser, userKey.Yield());
 
     /// <summary>
     ///     Authorizes whether the current user has access to the specified user account(s).

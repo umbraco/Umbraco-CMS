@@ -1,5 +1,6 @@
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services.AuthorizationStatus;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -15,7 +16,7 @@ public interface IUserPermissionService
     /// <param name="userKey">The identifier of the user account to check for access.</param>
     /// <returns>A task resolving into a <see cref="UserAuthorizationStatus"/>.</returns>
     Task<UserAuthorizationStatus> AuthorizeAccessAsync(IUser user, Guid userKey)
-        => AuthorizeAccessAsync(user, new[] { userKey });
+        => AuthorizeAccessAsync(user, userKey.Yield());
 
     /// <summary>
     ///     Authorize that a user has access to user accounts.

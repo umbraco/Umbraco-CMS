@@ -1,5 +1,6 @@
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services.AuthorizationStatus;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -15,7 +16,7 @@ public interface IMediaPermissionService
     /// <param name="mediaKey">The identifier of the media item to check for access.</param>
     /// <returns>A task resolving into a <see cref="MediaAuthorizationStatus"/>.</returns>
     Task<MediaAuthorizationStatus> AuthorizeAccessAsync(IUser user, Guid mediaKey)
-        => AuthorizeAccessAsync(user, new[] { mediaKey });
+        => AuthorizeAccessAsync(user, mediaKey.Yield());
 
     /// <summary>
     ///     Authorize that a user has access to media items.
