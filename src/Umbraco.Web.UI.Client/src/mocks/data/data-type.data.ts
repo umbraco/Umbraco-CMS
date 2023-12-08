@@ -1,6 +1,7 @@
 import { UmbEntityTreeData } from './entity-tree.data.js';
 import { UmbEntityData } from './entity.data.js';
 import { createFolderTreeItem } from './utils.js';
+import { UmbId } from '@umbraco-cms/backoffice/id';
 import type {
 	FolderTreeItemResponseModel,
 	DataTypeResponseModel,
@@ -745,13 +746,15 @@ class UmbDataTypeData extends UmbEntityData<DataTypeResponseModel | FolderTreeIt
 		return items.map((item) => createDataTypeItem(item));
 	}
 
-	createFolder(folder: CreateFolderRequestModel & { id: string | undefined }) {
+	createFolder(folder: CreateFolderRequestModel) {
 		const newFolder: FolderTreeItemResponseModel = {
+			type: 'data-type-folder',
 			name: folder.name,
-			id: folder.id,
+			id: folder.id ? folder.id : UmbId.new(),
 			parentId: folder.parentId,
 			isFolder: true,
 			isContainer: false,
+			hasChildren: false,
 		};
 
 		this.data.push(newFolder);
