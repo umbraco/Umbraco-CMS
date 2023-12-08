@@ -88,6 +88,7 @@ export const searchResultMockData: SearchResultResponseModel[] = [
 	{
 		id: '1',
 		score: 1,
+		fieldCount: 25,
 		fields: [
 			{ name: '__Icon', values: ['icon-document'] },
 			{ name: '__IndexType', values: ['content'] },
@@ -119,6 +120,7 @@ export const searchResultMockData: SearchResultResponseModel[] = [
 	{
 		id: '2',
 		score: 0.9,
+		fieldCount: 25,
 		fields: [
 			{ name: '__Icon', values: ['icon-document'] },
 			{ name: '__IndexType', values: ['content'] },
