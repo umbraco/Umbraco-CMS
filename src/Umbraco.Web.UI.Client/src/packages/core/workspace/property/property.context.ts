@@ -14,7 +14,7 @@ import {
 import { UmbContextProviderController, UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
-export class UmbWorkspacePropertyContext<ValueType = any> extends UmbBaseController {
+export class UmbPropertyContext<ValueType = any> extends UmbBaseController {
 	private _providerController: UmbContextProviderController;
 
 	#data = new UmbObjectState<WorkspacePropertyData<ValueType>>({});
@@ -59,7 +59,7 @@ export class UmbWorkspacePropertyContext<ValueType = any> extends UmbBaseControl
 			this._observeProperty();
 		});
 
-		this._providerController = new UmbContextProviderController(host, UMB_WORKSPACE_PROPERTY_CONTEXT_TOKEN, this);
+		this._providerController = new UmbContextProviderController(host, UMB_PROPERTY_CONTEXT_TOKEN, this);
 
 		this.observe(this.configValues, (configValues) => {
 			this.#configCollection.next(configValues ? new UmbPropertyEditorConfigCollection(configValues) : undefined);
@@ -139,6 +139,4 @@ export class UmbWorkspacePropertyContext<ValueType = any> extends UmbBaseControl
 	}
 }
 
-export const UMB_WORKSPACE_PROPERTY_CONTEXT_TOKEN = new UmbContextToken<UmbWorkspacePropertyContext>(
-	'UmbWorkspacePropertyContext',
-);
+export const UMB_PROPERTY_CONTEXT_TOKEN = new UmbContextToken<UmbPropertyContext>('UmbPropertyContext');

@@ -1,4 +1,4 @@
-import { UMB_WORKSPACE_PROPERTY_CONTEXT_TOKEN } from '../../../workspace/workspace-property/workspace-property.context.js';
+import { UMB_PROPERTY_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/workspace';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
@@ -33,7 +33,7 @@ export class UmbPropertyEditorUIBlockGridElement extends UmbLitElement implement
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_WORKSPACE_PROPERTY_CONTEXT_TOKEN, (context) => {
+		this.consumeContext(UMB_PROPERTY_CONTEXT_TOKEN, (context) => {
 			this.observe(context?.variantId, (propertyVariantId) => {
 				this._variantId = propertyVariantId;
 				this.setupRoutes();

@@ -2,7 +2,7 @@ import { html, customElement, property, state } from '@umbraco-cms/backoffice/ex
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 import { UmbInputMultiUrlElement } from '@umbraco-cms/backoffice/components';
-import { UMB_WORKSPACE_PROPERTY_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/workspace';
+import { UMB_PROPERTY_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/workspace';
 import { UmbLinkPickerLink } from '@umbraco-cms/backoffice/modal';
 import { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -49,7 +49,7 @@ export class UmbPropertyEditorUIMultiUrlPickerElement extends UmbLitElement impl
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_WORKSPACE_PROPERTY_CONTEXT_TOKEN, (context) => {
+		this.consumeContext(UMB_PROPERTY_CONTEXT_TOKEN, (context) => {
 			this.observe(context.alias, (alias) => {
 				this._alias = alias;
 			});

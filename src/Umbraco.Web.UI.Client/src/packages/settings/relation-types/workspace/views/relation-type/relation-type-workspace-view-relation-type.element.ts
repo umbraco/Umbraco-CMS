@@ -53,7 +53,7 @@ export class UmbRelationTypeWorkspaceViewRelationTypeElement extends UmbLitEleme
 	render() {
 		return html`
 			<uui-box>
-				<umb-workspace-property-layout label="Direction">
+				<umb-property-layout label="Direction">
 					<uui-radio-group
 						value=${ifDefined(this._relationType?.isBidirectional)}
 						@change=${this.#handleDirectionChange}
@@ -61,15 +61,15 @@ export class UmbRelationTypeWorkspaceViewRelationTypeElement extends UmbLitEleme
 						<uui-radio label="Parent to child" value="false"></uui-radio>
 						<uui-radio label="Bidirectional" value="true"></uui-radio>
 					</uui-radio-group>
-				</umb-workspace-property-layout>
-				<umb-workspace-property-layout label="Parent">${this.#renderParentProperty()}</umb-workspace-property-layout>
-				<umb-workspace-property-layout label="Child"> ${this.#renderChildProperty()} </umb-workspace-property-layout>
-				<umb-workspace-property-layout label="Is dependency">
+				</umb-property-layout>
+				<umb-property-layout label="Parent">${this.#renderParentProperty()}</umb-property-layout>
+				<umb-property-layout label="Child"> ${this.#renderChildProperty()} </umb-property-layout>
+				<umb-property-layout label="Is dependency">
 					<uui-toggle
 						slot="editor"
 						@change=${this.#handleIsDependencyChange}
 						.checked=${this._relationType?.isDependency ?? false}></uui-toggle>
-				</umb-workspace-property-layout>
+				</umb-property-layout>
 			</uui-box>
 		`;
 	}

@@ -1,5 +1,5 @@
 import { type UmbPropertyEditorConfig } from '../../property-editor/index.js';
-import { UmbWorkspacePropertyContext } from './workspace-property.context.js';
+import { UmbPropertyContext } from './property.context.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
@@ -10,8 +10,9 @@ import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/prope
 
 /**
  *  @element umb-workspace-property
- *  @description - Component for displaying a entity property. The Element will render a Property Editor based on the Property Editor UI alias passed to the element.
- *  The element will also render all Property Actions related to the Property Editor.
+ *  @description Component for displaying a property with editor from extension registry.
+ *	The Element will render a Property Editor based on the Property Editor UI alias passed to the element.
+ *  This will also render all Property Actions related to the Property Editor UI Alias.
  */
 
 @customElement('umb-workspace-property')
@@ -95,7 +96,7 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 	@state()
 	private _description?: string;
 
-	private _propertyContext = new UmbWorkspacePropertyContext(this);
+	private _propertyContext = new UmbPropertyContext(this);
 
 	private _valueObserver?: UmbObserverController<unknown>;
 	private _configObserver?: UmbObserverController<UmbPropertyEditorConfigCollection | undefined>;
@@ -181,7 +182,7 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<umb-workspace-property-layout
+			<umb-property-layout
 				id="layout"
 				alias="${ifDefined(this._alias)}"
 				label="${ifDefined(this._label)}"
@@ -191,15 +192,15 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 					? html`<uui-tag look="secondary" slot="description">${this._variantDifference}</uui-tag>`
 					: ''}
 				<div slot="editor">${this._element}</div>
-			</umb-workspace-property-layout>
+			</umb-property-layout>
 		`;
 	}
 
 	private _renderPropertyActionMenu() {
 		return html`${this._propertyEditorUiAlias
 			? html`<umb-property-action-menu
-					slot="property-action-menu"
-					id="property-action-menu"
+					slot="action-menu"
+					id="action-menu"
 					.propertyEditorUiAlias=${this._propertyEditorUiAlias}
 					.value=${this._value}></umb-property-action-menu>`
 			: ''}`;
@@ -216,13 +217,13 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 				color: var(--uui-color-text-alt);
 			}
 
-			#property-action-menu {
+			#action-menu {
 				opacity: 0;
 			}
 
-			#layout:focus-within #property-action-menu,
-			#layout:hover #property-action-menu,
-			#property-action-menu[open] {
+			#layout:focus-within #action-menu,
+			#layout:hover #action-menu,
+			#action-menu[open] {
 				opacity: 1;
 			}
 
