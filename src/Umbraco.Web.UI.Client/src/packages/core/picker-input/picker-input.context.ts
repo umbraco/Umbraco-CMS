@@ -12,7 +12,7 @@ import {
 } from '@umbraco-cms/backoffice/modal';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 
-export class UmbPickerInputContext<ItemType> extends UmbBaseController {
+export class UmbPickerInputContext<ItemType extends { name: string }> extends UmbBaseController {
 	// TODO: We are way too unsecure about the requirements for the Modal Token, as we have certain expectation for the data and value.
 	modalAlias: string | UmbModalToken<UmbPickerModalData<ItemType>, UmbPickerModalValue>;
 	repository?: UmbItemRepository<ItemType>;
