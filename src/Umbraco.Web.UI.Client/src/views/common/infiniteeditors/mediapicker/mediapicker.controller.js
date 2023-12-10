@@ -577,7 +577,7 @@ angular.module("umbraco")
                     item.image = mediaHelper.resolveFileFromEntity(item, false);
                 }
                 if (item.metaData.UpdateDate !== null) {
-                    item.updateDate = item.metaData.UpdateDate;
+                    item.updateDate = item.metaData.UpdateDate.slice(0,-1);
                 }
             }
 
