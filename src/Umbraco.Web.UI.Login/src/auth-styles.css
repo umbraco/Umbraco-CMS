@@ -1,0 +1,36 @@
+#umb-login-form umb-login-input {
+  width: 100%;
+  height: var(--input-height);
+  box-sizing: border-box;
+  display: block;
+  border: 1px solid var(--uui-color-border);
+  border-radius: var(--uui-border-radius);
+  outline: none;
+  background-color: var(--uui-color-surface);
+}
+
+#umb-login-form umb-login-input input {
+  width: 100%;
+  height: 100%;
+  display: block;
+  box-sizing: border-box;
+  border: none;
+  outline: none;
+  background: none;
+  padding: var(--uui-size-1, 3px) var(--uui-size-space-4, 9px);
+  font-size: inherit;
+}
+
+#umb-login-form uui-form-layout-item {
+  margin-top: var(--uui-size-space-4);
+  margin-bottom: var(--uui-size-space-4);
+}
+
+#umb-login-form umb-login-input:focus-within {
+  border-color: var(--uui-input-border-color-focus, var(--uui-color-border-emphasis, #a1a1a1));
+  outline: calc(2px * var(--uui-show-focus-outline, 1)) solid var(--uui-color-focus);
+}
+
+#umb-login-form umb-login-input:hover:not(:focus-within) {
+  border-color: var(--uui-input-border-color-hover, var(--uui-color-border-standalone, #c2c2c2));
+}

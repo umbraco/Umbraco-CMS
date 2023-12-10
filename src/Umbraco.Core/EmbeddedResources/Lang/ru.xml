@@ -806,13 +806,13 @@
   </area>
   <area alias="login">
     <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">umbraco.com</a></p>]]></key>
-    <key alias="greeting0">Сегодня же выходной!</key>
-    <key alias="greeting1">Понедельник — день тяжелый...</key>
-    <key alias="greeting2">Вот уже вторник...</key>
-    <key alias="greeting3">Берегите окружающую среду</key>
-    <key alias="greeting4">Рыбный день</key>
-    <key alias="greeting5">Слава Богу, сегодня пятница!</key>
-    <key alias="greeting6">Понедельник начинается в субботу</key>
+    <key alias="greeting0">Добро пожаловать</key>
+    <key alias="greeting1">Добро пожаловать</key>
+    <key alias="greeting2">Добро пожаловать</key>
+    <key alias="greeting3">Добро пожаловать</key>
+    <key alias="greeting4">Добро пожаловать</key>
+    <key alias="greeting5">Добро пожаловать</key>
+    <key alias="greeting6">Добро пожаловать</key>
     <key alias="instruction">Укажите имя пользователя и пароль</key>
     <key alias="timeout">Время сессии истекло</key>
     <key alias="forgottenPassword">Забыли пароль?</key>

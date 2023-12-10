@@ -3,6 +3,7 @@ using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Umbraco.Cms.Api.Delivery.Configuration;
 using Umbraco.Cms.Api.Delivery.Controllers;
+using Umbraco.Cms.Api.Delivery.Controllers.Content;
 
 namespace Umbraco.Cms.Api.Delivery.Filters;
 
@@ -14,7 +15,9 @@ internal sealed class SwaggerContentDocumentationFilter : SwaggerDocumentationFi
     {
         operation.Parameters ??= new List<OpenApiParameter>();
 
-        AddExpand(operation);
+        AddExpand(operation, context);
+
+        AddFields(operation, context);
 
         operation.Parameters.Add(new OpenApiParameter
         {
@@ -110,12 +113,20 @@ internal sealed class SwaggerContentDocumentationFilter : SwaggerDocumentationFi
         {
             { "Default filter", new OpenApiExample { Value = new OpenApiString(string.Empty) } },
             {
-                "Filter by content type",
+                "Filter by content type (equals)",
                 new OpenApiExample { Value = new OpenApiArray { new OpenApiString("contentType:alias1") } }
             },
             {
-                "Filter by name",
+                "Filter by name (contains)",
                 new OpenApiExample { Value = new OpenApiArray { new OpenApiString("name:nodeName") } }
+            },
+            {
+                "Filter by creation date (less than)",
+                new OpenApiExample { Value = new OpenApiArray { new OpenApiString("createDate<2024-01-01") } }
+            },
+            {
+                "Filter by update date (greater than or equal)",
+                new OpenApiExample { Value = new OpenApiArray { new OpenApiString("updateDate>:2023-01-01") } }
             }
         };
 

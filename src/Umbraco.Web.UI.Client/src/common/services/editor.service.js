@@ -912,6 +912,11 @@ When building a custom infinite editor view you can use the same components as a
       open(editor);
     }
 
+    function eventPicker(editor) {
+      editor.view = "views/common/infiniteeditors/eventpicker/eventpicker.html";
+      if (!editor.size) editor.size = "small";
+      open(editor);
+    }
     /**
      * @ngdoc method
      * @name umbraco.services.editorService#sectionPicker
@@ -1246,7 +1251,8 @@ When building a custom infinite editor view you can use the same components as a
       macroPicker: macroPicker,
       memberGroupPicker: memberGroupPicker,
       memberPicker: memberPicker,
-      mediaCropDetails
+      mediaCropDetails,
+      eventPicker : eventPicker
     };
 
     return service;

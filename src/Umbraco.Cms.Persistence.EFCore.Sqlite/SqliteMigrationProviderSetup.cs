@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Persistence.EFCore.Migrations;
 
 namespace Umbraco.Cms.Persistence.EFCore.Sqlite;

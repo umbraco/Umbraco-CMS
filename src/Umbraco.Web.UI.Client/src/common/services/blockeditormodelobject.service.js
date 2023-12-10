@@ -31,7 +31,8 @@
                 for (var p = 0; p < tab.properties.length; p++) {
                     var prop = tab.properties[p];
 
-                    prop.value = dataModel[prop.alias];
+                    if (typeof (dataModel[prop.alias]) !== 'undefined')
+                        prop.value = dataModel[prop.alias];
                 }
             }
 
@@ -300,7 +301,7 @@
             this.value.settingsData = this.value.settingsData || [];
 
             this.propertyEditorAlias = propertyEditorAlias;
-            this.blockConfigurations = blockConfigurations;
+            this.blockConfigurations = blockConfigurations ?? [];
 
             this.blockConfigurations.forEach(blockConfiguration => {
                 if (blockConfiguration.view != null && blockConfiguration.view !== "") {
@@ -396,22 +397,23 @@
                 // removing duplicates.
                 scaffoldKeys = scaffoldKeys.filter((value, index, self) => self.indexOf(value) === index);
 
-                // get current node (for page context)
-                var currentPage = editorState.getCurrent();
-                var currentPageId = currentPage ? (currentPage.id > 0 ? currentPage.id : currentPage.parentId) : null || -20;
+                if(scaffoldKeys.length > 0) {
+                  var currentPage = editorState.getCurrent();
+                  var currentPageId = currentPage ? (currentPage.id > 0 ? currentPage.id : currentPage.parentId) : null || -20;
 
-                tasks.push(contentResource.getScaffoldByKeys(currentPageId, scaffoldKeys).then(scaffolds => {
-                    Object.values(scaffolds).forEach(scaffold => {
-                        // self.scaffolds might not exists anymore, this happens if this instance has been destroyed before the load is complete.
-                        if (self.scaffolds) {
-                            self.scaffolds.push(formatScaffoldData(scaffold));
-                        }
-                    });
-                }).catch(
-                    () => {
-                        // Do nothing if we get an error.
-                    }
-                ));
+                  tasks.push(contentResource.getScaffoldByKeys(currentPageId, scaffoldKeys).then(scaffolds => {
+                      Object.values(scaffolds).forEach(scaffold => {
+                          // self.scaffolds might not exists anymore, this happens if this instance has been destroyed before the load is complete.
+                          if (self.scaffolds) {
+                              self.scaffolds.push(formatScaffoldData(scaffold));
+                          }
+                      });
+                  }).catch(
+                      () => {
+                          // Do nothing if we get an error.
+                      }
+                  ));
+                }
 
                 return $q.all(tasks);
             },
@@ -529,17 +531,20 @@
                 }
 
                 var dataModel = getDataByUdi(contentUdi, this.value.contentData);
-
-                if (dataModel === null) {
-                    console.error("Couldn't find content data of UDI:", contentUdi, "layoutEntry:", layoutEntry)
-                    return null;
-                }
-
-                var blockConfiguration = this.getBlockConfiguration(dataModel.contentTypeKey);
+                var blockConfiguration = null;
                 var contentScaffold = null;
 
+                if (dataModel === null) {
+                  console.error("Couldn't find content data of UDI:", contentUdi, "layoutEntry:", layoutEntry)
+                  //return null;
+                } else {
+                  blockConfiguration = this.getBlockConfiguration(dataModel.contentTypeKey);
+                }
+
                 if (blockConfiguration === null) {
+                  if(dataModel) {
                     console.warn("The block of " + contentUdi + " is not being initialized because its contentTypeKey('" + dataModel.contentTypeKey + "') is not allowed for this PropertyEditor");
+                  }
                 } else {
                     contentScaffold = this.getScaffoldFromKey(blockConfiguration.contentElementTypeKey);
                     if (contentScaffold === null) {
@@ -645,7 +650,7 @@
                 };
                 // first time instant update of label.
               blockObject.label = blockObject.content?.contentTypeName || "";
-                blockObject.index = 0; 
+                blockObject.index = 0;
 
                 if (blockObject.config.label && blockObject.config.label !== "" && blockObject.config.unsupported !== true) {
 
