@@ -49,5 +49,6 @@ const mapper = (item: MediaTypeTreeItemResponseModel): UmbMediaTypeTreeItemModel
 		entityType: 'media-type',
 		hasChildren: item.hasChildren,
 		isContainer: item.isContainer,
+		isFolder: item.isFolder,
 	};
 };

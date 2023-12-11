@@ -22,7 +22,7 @@ export class UmbDocumentRecycleBinTreeRepository
 			icon: 'icon-trash',
 			hasChildren: true,
 			isContainer: false,
-			isFolder: false,
+			isFolder: true,
 		};
 
 		return { data };

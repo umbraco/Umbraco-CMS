@@ -16,6 +16,7 @@ export class UmbStylesheetTreeRepository extends UmbTreeRepositoryBase<any, any>
 			icon: 'icon-folder',
 			hasChildren: true,
 			isContainer: false,
+			isFolder: true,
 		};
 
 		return { data };

@@ -165,7 +165,7 @@ export const createTreeItem = (item: ItemType): UmbEntityTreeItemModel => {
 
 	// TODO: needs parentID, this is missing in the current model. Should be good when updated to a createModel.
 	return {
-		type: 'media-type',
+		entityType: 'media-type',
 		parentId: null,
 		name: item.name,
 		id: item.id,

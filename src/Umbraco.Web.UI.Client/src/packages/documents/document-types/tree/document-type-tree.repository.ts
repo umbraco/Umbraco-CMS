@@ -22,7 +22,7 @@ export class UmbDocumentTypeTreeRepository
 			icon: 'icon-folder',
 			hasChildren: true,
 			isContainer: false,
-			isFolder: false,
+			isFolder: true,
 		};
 
 		return { data };
