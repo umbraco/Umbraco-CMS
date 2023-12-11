@@ -32,6 +32,25 @@ public static class WebhookEventCollectionBuilderCmsExtensions
     }
 
     /// <summary>
+    /// Removes the default webhook events.
+    /// </summary>
+    /// <param name="builder">The builder.</param>
+    /// <returns>
+    /// The builder.
+    /// </returns>
+    public static WebhookEventCollectionBuilderCms RemoveDefault(this WebhookEventCollectionBuilderCms builder)
+    {
+        builder.Builder
+            .Remove<ContentDeletedWebhookEvent>()
+            .Remove<ContentPublishedWebhookEvent>()
+            .Remove<ContentUnpublishedWebhookEvent>()
+            .Remove<MediaDeletedWebhookEvent>()
+            .Remove<MediaSavedWebhookEvent>();
+
+        return builder;
+    }
+
+    /// <summary>
     /// Adds all available content (including blueprint and version) webhook events.
     /// </summary>
     /// <param name="builder">The builder.</param>
