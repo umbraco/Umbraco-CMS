@@ -1,5 +1,5 @@
 import { UmbRelationTypeWorkspaceContext } from './relation-type-workspace.context.js';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UmbRouterSlotInitEvent, UmbRoute } from '@umbraco-cms/backoffice/router';
@@ -32,7 +32,7 @@ export class UmbRelationTypeWorkspaceElement extends UmbLitElement {
 				new UmbWorkspaceIsNewRedirectController(
 					this,
 					this.#workspaceContext,
-					this.shadowRoot!.querySelector('umb-router-slot')!
+					this.shadowRoot!.querySelector('umb-router-slot')!,
 				);
 			},
 		},

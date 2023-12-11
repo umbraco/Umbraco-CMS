@@ -179,38 +179,44 @@ export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 
 	private _insertLink() {
 		const selection = this.#editor?.getSelections()[0];
-		if (!selection) return;
+		if (!selection || !this._modalContext) return;
 
 		const selectedValue = this.#editor?.getValueInRange(selection);
 
 		this._focusEditor(); // Focus before opening modal
-		const modalContext = this._modalContext?.open(UMB_LINK_PICKER_MODAL, {
-			index: null,
-			link: { name: selectedValue },
-			config: { overlaySize: this.overlaySize },
+		const modalContext = this._modalContext.open(UMB_LINK_PICKER_MODAL, {
+			data: {
+				index: null,
+				config: { overlaySize: this.overlaySize },
+			},
+			value: {
+				link: { name: selectedValue },
+			},
 		});
 
 		modalContext
 			?.onSubmit()
-			.then((data) => {
+			.then((value) => {
+				if (!value) return;
+
 				const name = this.localize.term('general_name');
 				const url = this.localize.term('general_url');
 
 				this.#editor?.monacoEditor?.executeEdits('', [
-					{ range: selection, text: `[${data.link.name || name}](${data.link.url || url})` },
+					{ range: selection, text: `[${value.link.name || name}](${value.link.url || url})` },
 				]);
 
-				if (!data.link.name) {
+				if (!value.link.name) {
 					this.#editor?.select({
 						startColumn: selection.startColumn + 1,
 						endColumn: selection.startColumn + 1 + name.length,
 						endLineNumber: selection.startLineNumber,
 						startLineNumber: selection.startLineNumber,
 					});
-				} else if (!data.link.url) {
+				} else if (!value.link.url) {
 					this.#editor?.select({
-						startColumn: selection.startColumn + 3 + data.link.name.length,
-						endColumn: selection.startColumn + 3 + data.link.name.length + url.length,
+						startColumn: selection.startColumn + 3 + value.link.name.length,
+						endColumn: selection.startColumn + 3 + value.link.name.length + url.length,
 						endLineNumber: selection.startLineNumber,
 						startLineNumber: selection.startLineNumber,
 					});
@@ -227,12 +233,13 @@ export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 		const alt = this.#editor?.getValueInRange(selection) || 'alt text';
 
 		this._focusEditor(); // Focus before opening modal, otherwise cannot regain focus back after modal
-		const modalContext = this._modalContext?.open(UMB_MEDIA_TREE_PICKER_MODAL, {});
+		const modalContext = this._modalContext?.open(UMB_MEDIA_TREE_PICKER_MODAL);
 
 		modalContext
 			?.onSubmit()
-			.then((data) => {
-				const imgUrl = data.selection[0];
+			.then((value) => {
+				if (!value) return;
+				const imgUrl = value.selection[0];
 				this.#editor?.monacoEditor?.executeEdits('', [
 					//TODO: Get the correct media URL
 					{

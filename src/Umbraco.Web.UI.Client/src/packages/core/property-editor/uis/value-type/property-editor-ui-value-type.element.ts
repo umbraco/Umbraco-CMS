@@ -1,6 +1,6 @@
-import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
-import type { UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
+import { html, customElement, property, state, query } from '@umbraco-cms/backoffice/external/lit';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import type { UUISelectElement, UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
@@ -20,12 +20,16 @@ export class UmbPropertyEditorUIValueTypeElement extends UmbLitElement implement
 		this._value = value;
 
 		const selected = this._options.filter((option) => {
+			if (this.selectEl && option.value === this.value) this.selectEl.value = this.value;
 			return (option.selected = option.value === this.value);
 		});
 		if (selected.length === 0) {
 			this._options[0].selected = true;
 		}
 	}
+
+	@query('uui-select')
+	selectEl?: UUISelectElement;
 
 	@state()
 	private _options: Array<Option> = [

@@ -1782,8 +1782,8 @@ export default {
 		inviteAnotherUser: 'Invite another user',
 		inviteUserHelp:
 			'Invite new users to give them access to Umbraco. An invite email will be sent to the\n      user with information on how to log in to Umbraco. Invites last for 72 hours.\n    ',
-		language: 'Language',
-		languageHelp: 'Set the language you will see in menus and dialogs',
+		language: 'UI Culture',
+		languageHelp: 'Set the culture you will see in menus and dialogs',
 		lastLockoutDate: 'Last lockout date',
 		lastLogin: 'Last login',
 		lastPasswordChangeDate: 'Password last changed',

@@ -12,6 +12,8 @@ export const UMB_EXPORT_DICTIONARY_MODAL = new UmbModalToken<
 	UmbExportDictionaryModalData,
 	UmbExportDictionaryModalValue
 >('Umb.Modal.ExportDictionary', {
-	type: 'sidebar',
-	size: 'small',
+	modal: {
+		type: 'sidebar',
+		size: 'small',
+	},
 });

@@ -16,7 +16,7 @@ export const handlers = [
 			ctx.status(200),
 			ctx.json<TelemetryResponseModel>({
 				telemetryLevel,
-			})
+			}),
 		);
 	}),
 
@@ -31,7 +31,7 @@ export const handlers = [
 					{ telemetryLevel: TelemetryLevelModel.BASIC },
 					{ telemetryLevel: TelemetryLevelModel.DETAILED },
 				],
-			})
+			}),
 		);
 	}),
 
@@ -41,7 +41,7 @@ export const handlers = [
 			telemetryLevel = newLevel;
 			return res(
 				// Respond with a 200 status code
-				ctx.status(200)
+				ctx.status(200),
 			);
 		} else {
 			return res(ctx.status(400));

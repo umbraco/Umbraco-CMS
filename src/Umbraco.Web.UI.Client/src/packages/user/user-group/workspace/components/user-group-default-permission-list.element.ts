@@ -25,15 +25,19 @@ export class UmbUserGroupDefaultPermissionListElement extends UmbLitElement {
 			this.observe(
 				this.#userGroupWorkspaceContext.data,
 				(userGroup) => (this._userGroupDefaultPermissions = userGroup?.permissions),
-				'umbUserGroupPermissionsObserver'
+				'umbUserGroupPermissionsObserver',
 			);
 		});
 	}
 
 	#observeUserPermissions() {
-		this.observe(umbExtensionsRegistry.extensionsOfType('userPermission'), (userPermissionManifests) => {
-			this._entityTypes = [...new Set(userPermissionManifests.map((manifest) => manifest.meta.entityType))];
-		}, 'umbUserPermissionsObserver');
+		this.observe(
+			umbExtensionsRegistry.extensionsOfType('userPermission'),
+			(userPermissionManifests) => {
+				this._entityTypes = [...new Set(userPermissionManifests.map((manifest) => manifest.meta.entityType))];
+			},
+			'umbUserPermissionsObserver',
+		);
 	}
 
 	#onSelectedUserPermission(event: UmbSelectionChangeEvent) {

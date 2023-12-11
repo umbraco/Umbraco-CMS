@@ -8,8 +8,8 @@ export const handlers = [
 			// Respond with a 200 status code
 			ctx.status(200),
 			ctx.json<string>(
-				'Database cache is ok. ContentStore contains 1 item and has 1 generation and 0 snapshot. MediaStore contains 5 items and has 1 generation and 0 snapshot.'
-			)
+				'Database cache is ok. ContentStore contains 1 item and has 1 generation and 0 snapshot. MediaStore contains 5 items and has 1 generation and 0 snapshot.',
+			),
 		);
 	}),
 
@@ -18,7 +18,7 @@ export const handlers = [
 
 		return res(
 			// Respond with a 200 status code
-			ctx.status(200)
+			ctx.status(200),
 		);
 	}),
 
@@ -27,14 +27,14 @@ export const handlers = [
 
 		return res(
 			// Respond with a 200 status code
-			ctx.status(200)
+			ctx.status(200),
 		);
 	}),
 
 	rest.post(umbracoPath('/published-cache/collect'), (_req, res, ctx) => {
 		return res(
 			// Respond with a 200 status code
-			ctx.status(200)
+			ctx.status(200),
 		);
 	}),
 ];

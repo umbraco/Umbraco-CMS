@@ -31,7 +31,7 @@ const Template: Story = () => {
     				height: 100%;">
 						<uui-icon style="font-size: 30px; margin-bottom: 9px;" name="${icon.name}"></uui-icon
 						><small>${icon.name}</small>
-					</div>`
+					</div>`,
 			)}
 		</div>
 	`;

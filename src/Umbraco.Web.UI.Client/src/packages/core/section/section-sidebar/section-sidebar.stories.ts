@@ -10,6 +10,7 @@ export default {
 	id: 'umb-section-sidebar',
 } as Meta;
 
-export const AAAOverview: Story<UmbSectionSidebarElement> = () =>
-	html` <umb-section-sidebar>Section Sidebar Area</umb-section-sidebar> `;
+export const AAAOverview: Story<UmbSectionSidebarElement> = () => html`
+	<umb-section-sidebar>Section Sidebar Area</umb-section-sidebar>
+`;
 AAAOverview.storyName = 'Overview';

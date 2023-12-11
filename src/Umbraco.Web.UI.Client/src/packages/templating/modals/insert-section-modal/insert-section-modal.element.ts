@@ -11,8 +11,10 @@ import type { UmbInsertSectionCheckboxElement } from './insert-section-input.ele
 export const UMB_MODAL_TEMPLATING_INSERT_SECTION_MODAL = new UmbModalToken<object, UmbInsertSectionModalModalValue>(
 	UMB_MODAL_TEMPLATING_INSERT_SECTION_SIDEBAR_ALIAS,
 	{
-		type: 'sidebar',
-		size: 'small',
+		modal: {
+			type: 'sidebar',
+			size: 'small',
+		},
 	},
 );
 
@@ -64,7 +66,10 @@ export default class UmbTemplatingInsertSectionModalElement extends UmbModalBase
 
 	#submit() {
 		const value = this.selectedCheckbox?.snippet;
-		if (this.selectedCheckbox?.validate()) this.modalContext?.submit({ value: value ?? '' });
+		if (this.selectedCheckbox?.validate()) {
+			this.value = { value: value ?? '' };
+			this.modalContext?.submit();
+		}
 	}
 
 	render() {

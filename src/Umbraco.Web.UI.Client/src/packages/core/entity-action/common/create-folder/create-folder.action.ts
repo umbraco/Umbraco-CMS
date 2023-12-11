@@ -23,8 +23,10 @@ export class UmbCreateFolderEntityAction<T extends UmbFolderRepository> extends 
 		if (!this.repository || !this.#modalContext) return;
 
 		const modalContext = this.#modalContext.open(UMB_FOLDER_MODAL, {
-			repositoryAlias: this.repositoryAlias,
-			parentUnique: this.unique ?? null,
+			data: {
+				repositoryAlias: this.repositoryAlias,
+				parentUnique: this.unique ?? null,
+			},
 		});
 
 		await modalContext.onSubmit();

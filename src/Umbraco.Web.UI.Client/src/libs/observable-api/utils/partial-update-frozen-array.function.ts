@@ -13,7 +13,7 @@
 export function partialUpdateFrozenArray<T>(
 	data: T[],
 	partialEntry: Partial<T>,
-	findMethod: (entry: T) => boolean
+	findMethod: (entry: T) => boolean,
 ): T[] {
 	const unFrozenDataSet = [...data];
 	const indexToReplace = unFrozenDataSet.findIndex((x) => findMethod(x));

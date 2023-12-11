@@ -1,5 +1,5 @@
 import { UmbLogViewerWorkspaceContext, UMB_APP_LOG_VIEWER_CONTEXT_TOKEN } from '../../../logviewer.context.js';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import {
 	css,
 	html,
@@ -95,18 +95,18 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 			label: 'Search Umbraco Source',
 			title: 'Search within Umbraco source code on Github',
 			href: () =>
-				`https://github.com/umbraco/Umbraco-CMS/search?q=${
-					this.properties.find((property) => property.name === 'SourceContext')?.value
-				}`,
+				`https://github.com/umbraco/Umbraco-CMS/search?q=${this.properties.find(
+					(property) => property.name === 'SourceContext',
+				)?.value}`,
 			icon: 'https://github.githubassets.com/favicon.ico',
 		},
 		{
 			label: 'Search Umbraco Issues',
 			title: 'Search Umbraco Issues on Github',
 			href: () =>
-				`https://github.com/umbraco/Umbraco-CMS/issues?q=${
-					this.properties.find((property) => property.name === 'SourceContext')?.value
-				}`,
+				`https://github.com/umbraco/Umbraco-CMS/issues?q=${this.properties.find(
+					(property) => property.name === 'SourceContext',
+				)?.value}`,
 			icon: 'https://github.githubassets.com/favicon.ico',
 		},
 	];
@@ -175,28 +175,24 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 										  </uui-button>`
 										: ''}
 								</div>
-							</li>`
+							</li>`,
 					)}
 				</ul>
-				<umb-button-with-dropdown look="secondary" placement="bottom-start" id="search-button" label="Search">
-					<uui-icon name="icon-search"></uui-icon>Search
-					<ul id="search-menu" slot="dropdown">
-						${this._searchMenuData.map(
-							(menuItem) => html`
-								<li>
-									<uui-menu-item
-										class="search-item"
-										href="${menuItem.href()}"
-										target="_blank"
-										label="${menuItem.label}"
-										title="${menuItem.title}">
-										<img slot="icon" src="${menuItem.icon}" width="16" height="16" alt="" />
-									</uui-menu-item>
-								</li>
-							`
-						)}
-					</ul>
-				</umb-button-with-dropdown>
+				<umb-dropdown look="secondary" placement="bottom-start" id="search-button" label="Search">
+					<span slot="label"><uui-icon name="icon-search"></uui-icon> Search</span>
+					${this._searchMenuData.map(
+						(menuItem) => html`
+							<uui-menu-item
+								class="search-item"
+								href="${menuItem.href()}"
+								target="_blank"
+								label="${menuItem.label}"
+								title="${menuItem.title}">
+								<img slot="icon" src="${menuItem.icon}" width="16" height="16" alt="" />
+							</uui-menu-item>
+						`,
+					)}
+				</umb-dropdown>
 			</details>
 		`;
 	}
@@ -253,7 +249,12 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 				border-left: 4px solid #d42054;
 				color: #303033;
 				display: block;
-				font-family: Lato, Helvetica Neue, Helvetica, Arial, sans-serif;
+				font-family:
+					Lato,
+					Helvetica Neue,
+					Helvetica,
+					Arial,
+					sans-serif;
 				line-height: 20px;
 				overflow-x: auto;
 				padding: 9.5px;
@@ -274,6 +275,10 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 			#level,
 			#machine {
 				flex: 1 0 14ch;
+			}
+
+			uui-menu-item {
+				--uui-menu-item-flat-structure: 1;
 			}
 
 			#message {
@@ -297,19 +302,6 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 
 			.property-value {
 				flex: 3 0 20ch;
-			}
-
-			#search-menu {
-				margin: 0;
-				padding: 0;
-				margin-top: var(--uui-size-space-3);
-				background-color: var(--uui-color-surface);
-				box-shadow: var(--uui-shadow-depth-3);
-				max-width: 25%;
-			}
-
-			#search-menu > li {
-				padding: 0;
 			}
 
 			.search-item {

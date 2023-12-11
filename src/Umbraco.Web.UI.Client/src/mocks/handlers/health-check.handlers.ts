@@ -22,7 +22,7 @@ export const handlers = [
 		return res(
 			// Respond with a 200 status code
 			ctx.status(200),
-			ctx.json<PagedHealthCheckGroupResponseModel>({ total: 9999, items: healthGroupsWithoutResult })
+			ctx.json<PagedHealthCheckGroupResponseModel>({ total: 9999, items: healthGroupsWithoutResult }),
 		);
 	}),
 
@@ -74,7 +74,7 @@ export const handlers = [
 			// Respond with a 200 status code
 			ctx.delay(1000),
 			ctx.status(200),
-			ctx.json<HealthCheckResultResponseModel>(result)
+			ctx.json<HealthCheckResultResponseModel>(result),
 		);
 	}),
 ];

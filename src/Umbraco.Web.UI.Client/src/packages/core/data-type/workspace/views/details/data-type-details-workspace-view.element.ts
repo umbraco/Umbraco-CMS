@@ -71,11 +71,14 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement im
 
 	private _openPropertyEditorUIPicker() {
 		const modalContext = this._modalContext?.open(UMB_PROPERTY_EDITOR_UI_PICKER_MODAL, {
-			selection: this._propertyEditorUiAlias ? [this._propertyEditorUiAlias] : [],
+			value: {
+				selection: this._propertyEditorUiAlias ? [this._propertyEditorUiAlias] : [],
+			},
 		});
 
-		modalContext?.onSubmit().then(({ selection }) => {
-			this._workspaceContext?.setPropertyEditorUiAlias(selection[0]);
+		modalContext?.onSubmit().then((value) => {
+			console.log('got', value);
+			this._workspaceContext?.setPropertyEditorUiAlias(value?.selection[0]);
 		});
 	}
 

@@ -5,38 +5,48 @@ export interface IRouterSlot<D = any, P = any> extends HTMLElement {
 	readonly params: Params | null;
 	readonly match: IRouteMatch<D> | null;
 	routes: IRoute<D>[];
-	add: ((routes: IRoute<D>[], navigate?: boolean) => void);
-	clear: (() => void);
-	render: (() => Promise<void>);
-	constructAbsolutePath: ((path: PathFragment) => string);
+	add: (routes: IRoute<D>[], navigate?: boolean) => void;
+	clear: () => void;
+	render: () => Promise<void>;
+	constructAbsolutePath: (path: PathFragment) => string;
 	parent: IRouterSlot<P> | null | undefined;
-	queryParentRouterSlot: (() => IRouterSlot<P> | null);
+	queryParentRouterSlot: () => IRouterSlot<P> | null;
 }
 
 export type IRoutingInfo<D = any, P = any> = {
-	slot: IRouterSlot<D, P>,
-	match: IRouteMatch<D>
+	slot: IRouterSlot<D, P>;
+	match: IRouteMatch<D>;
 };
 
-export type CustomResolver<D = any, P = any> = ((info: IRoutingInfo<D>) => boolean | void | Promise<boolean> | Promise<void>);
-export type Guard<D = any, P = any> = ((info: IRoutingInfo<D, P>) => boolean | Promise<boolean>);
-export type Cancel = (() => boolean);
+export type CustomResolver<D = any, P = any> = (
+	info: IRoutingInfo<D>,
+) => boolean | void | Promise<boolean> | Promise<void>;
+export type Guard<D = any, P = any> = (info: IRoutingInfo<D, P>) => boolean | Promise<boolean>;
+export type Cancel = () => boolean;
 
 export type PageComponent = HTMLElement | undefined;
-export type ModuleResolver = Promise<{default: any; /*PageComponent*/}>;
-export type Class<T extends PageComponent = PageComponent> = {new (...args: any[]): T;};
-export type Component = Class | ModuleResolver | PageComponent | (() => Class) | (() => PromiseLike<Class>) | (() => PageComponent) | (() => PromiseLike<PageComponent>) | (() => ModuleResolver) | (() => PromiseLike<ModuleResolver>);
-export type Setup<D = any> = ((component: PageComponent, info: IRoutingInfo<D>) => void);
+export type ModuleResolver = Promise<{ default: any /*PageComponent*/ }>;
+export type Class<T extends PageComponent = PageComponent> = { new (...args: any[]): T };
+export type Component =
+	| Class
+	| ModuleResolver
+	| PageComponent
+	| (() => Class)
+	| (() => PromiseLike<Class>)
+	| (() => PageComponent)
+	| (() => PromiseLike<PageComponent>)
+	| (() => ModuleResolver)
+	| (() => PromiseLike<ModuleResolver>);
+export type Setup<D = any> = (component: PageComponent, info: IRoutingInfo<D>) => void;
 
-export type RouterTree<D = any, P = any> = {slot: IRouterSlot<D, P>} & {child?: RouterTree} | null | undefined;
-export type PathMatch = "prefix" | "suffix" | "full" | "fuzzy";
+export type RouterTree<D = any, P = any> = ({ slot: IRouterSlot<D, P> } & { child?: RouterTree }) | null | undefined;
+export type PathMatch = 'prefix' | 'suffix' | 'full' | 'fuzzy';
 
 /**
  * The base route interface.
  * D = the data type of the data
  */
 export interface IRouteBase<D = any> {
-
 	// The path for the route fragment
 	path: PathFragment;
 
@@ -58,7 +68,6 @@ export interface IRouteBase<D = any> {
  * Route type used for redirection.
  */
 export interface IRedirectRoute<D = any> extends IRouteBase<D> {
-
 	// The paths the route should redirect to. Can either be relative or absolute.
 	redirectTo: string;
 
@@ -70,7 +79,6 @@ export interface IRedirectRoute<D = any> extends IRouteBase<D> {
  * Route type used to resolve and stamp components.
  */
 export interface IComponentRoute<D = any> extends IRouteBase<D> {
-
 	// The component loader (should return a module with a default export)
 	component: Component | PromiseLike<Component>;
 
@@ -82,7 +90,6 @@ export interface IComponentRoute<D = any> extends IRouteBase<D> {
  * Route type used to take control of how the route should resolve.
  */
 export interface IResolverRoute<D = any> extends IRouteBase<D> {
-
 	// A custom resolver that handles the route change
 	resolve: CustomResolver;
 }
@@ -90,13 +97,13 @@ export interface IResolverRoute<D = any> extends IRouteBase<D> {
 export type IRoute<D = any> = IRedirectRoute<D> | IComponentRoute<D> | IResolverRoute<D>;
 export type PathFragment = string;
 export type IPathFragments = {
-	consumed: PathFragment,
-	rest: PathFragment
-}
+	consumed: PathFragment;
+	rest: PathFragment;
+};
 
 export interface IRouteMatch<D = any> {
 	route: IRoute<D>;
-	params: Params,
+	params: Params;
 	fragments: IPathFragments;
 	match: RegExpMatchArray;
 }
@@ -104,57 +111,56 @@ export interface IRouteMatch<D = any> {
 export type PushStateEvent = CustomEvent<null>;
 export type ReplaceStateEvent = CustomEvent<null>;
 export type ChangeStateEvent = CustomEvent<null>;
-export type WillChangeStateEvent = CustomEvent<{ url?: string | null, eventName: GlobalRouterEvent}>;
+export type WillChangeStateEvent = CustomEvent<{ url?: string | null; eventName: GlobalRouterEvent }>;
 export type NavigationStartEvent<D = any> = CustomEvent<IRoutingInfo<D>>;
 export type NavigationSuccessEvent<D = any> = CustomEvent<IRoutingInfo<D>>;
 export type NavigationCancelEvent<D = any> = CustomEvent<IRoutingInfo<D>>;
 export type NavigationErrorEvent<D = any> = CustomEvent<IRoutingInfo<D>>;
 export type NavigationEndEvent<D = any> = CustomEvent<IRoutingInfo<D>>;
 
-export type Params = {[key: string]: string};
-export type Query = {[key: string]: string};
+export type Params = { [key: string]: string };
+export type Query = { [key: string]: string };
 
-export type EventListenerSubscription = (() => void);
+export type EventListenerSubscription = () => void;
 
 /**
  * RouterSlot related events.
  */
-export type RouterSlotEvent = "changestate";
+export type RouterSlotEvent = 'changestate';
 
 /**
  * History related events.
  */
 export type GlobalRouterEvent =
-
-// An event triggered when a new state is added to the history.
-	"pushstate"
+	// An event triggered when a new state is added to the history.
+	| 'pushstate'
 
 	// An event triggered when the current state is replaced in the history.
-	| "replacestate"
+	| 'replacestate'
 
 	// An event triggered when a state in the history is popped from the history.
-	| "popstate"
+	| 'popstate'
 
 	// An event triggered when the state changes (eg. pop, push and replace)
-	| "changestate"
+	| 'changestate'
 
 	// A cancellable event triggered before the history state changes.
-	| "willchangestate"
+	| 'willchangestate'
 
 	// An event triggered when navigation starts.
-	| "navigationstart"
+	| 'navigationstart'
 
 	// An event triggered when navigation is canceled. This is due to a route guard returning false during navigation.
-	| "navigationcancel"
+	| 'navigationcancel'
 
 	// An event triggered when navigation fails due to an unexpected error.
-	| "navigationerror"
+	| 'navigationerror'
 
 	// An event triggered when navigation successfully completes.
-	| "navigationsuccess"
+	| 'navigationsuccess'
 
 	// An event triggered when navigation ends.
-	| "navigationend";
+	| 'navigationend';
 
 export interface ISlashOptions {
 	start: boolean;
@@ -164,15 +170,15 @@ export interface ISlashOptions {
 /* Extend the global event handlers map with the router related events */
 declare global {
 	interface GlobalEventHandlersEventMap {
-		"pushstate": PushStateEvent,
-		"replacestate": ReplaceStateEvent,
-		"popstate": PopStateEvent,
-		"changestate": ChangeStateEvent,
-		"navigationstart": NavigationStartEvent,
-		"navigationend": NavigationEndEvent,
-		"navigationsuccess": NavigationSuccessEvent,
-		"navigationcancel": NavigationCancelEvent,
-		"navigationerror": NavigationErrorEvent,
-		"willchangestate": WillChangeStateEvent
+		pushstate: PushStateEvent;
+		replacestate: ReplaceStateEvent;
+		popstate: PopStateEvent;
+		changestate: ChangeStateEvent;
+		navigationstart: NavigationStartEvent;
+		navigationend: NavigationEndEvent;
+		navigationsuccess: NavigationSuccessEvent;
+		navigationcancel: NavigationCancelEvent;
+		navigationerror: NavigationErrorEvent;
+		willchangestate: WillChangeStateEvent;
 	}
 }

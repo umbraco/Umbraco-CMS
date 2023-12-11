@@ -92,7 +92,7 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 				if (documentTypeId === undefined) return false;
 				const propertyData = this.property;
 				if (propertyData === undefined) return false;
-				return { propertyData, documentTypeId };
+				return { data: { documentTypeId }, value: propertyData };
 			})
 			.onSubmit((result) => {
 				this._partialUpdate(result);
@@ -104,7 +104,7 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
 			.addAdditionalPath('document-type')
 			.onSetup(() => {
-				return { entityType: 'document-type', preset: {} };
+				return { data: { entityType: 'document-type', preset: {} } };
 			})
 			.observeRouteBuilder((routeBuilder) => {
 				this._editDocumentTypePath = routeBuilder({});
@@ -138,7 +138,7 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 		e.stopImmediatePropagation();
 		if (!this.property || !this.property.id) return;
 
-		const Message: UmbConfirmModalData = {
+		const modalData: UmbConfirmModalData = {
 			headline: `${this.localize.term('actions_delete')} property`,
 			content: html`<umb-localize key="contentTypeEditor_confirmDeletePropertyMessage" .args=${[
 				this.property.name || this.property.id,
@@ -150,7 +150,7 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 			color: 'danger',
 		};
 
-		const modalHandler = this._modalManagerContext?.open(UMB_CONFIRM_MODAL, Message);
+		const modalHandler = this._modalManagerContext?.open(UMB_CONFIRM_MODAL, { data: modalData });
 
 		modalHandler
 			?.onSubmit()

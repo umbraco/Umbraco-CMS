@@ -186,7 +186,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 	}
 
 	#requestRemoveTab(tab: PropertyTypeContainerModelBaseModel | undefined) {
-		const Message: UmbConfirmModalData = {
+		const modalData: UmbConfirmModalData = {
 			headline: 'Delete tab',
 			content: html`<umb-localize key="contentTypeEditor_confirmDeleteTabMessage" .args=${[tab?.name ?? tab?.id]}>
 					Are you sure you want to delete the tab <strong>${tab?.name ?? tab?.id}</strong>
@@ -202,7 +202,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 
 		// TODO: If this tab is composed of other tabs, then notify that it will only delete the local tab.
 
-		const modalHandler = this._modalManagerContext?.open(UMB_CONFIRM_MODAL, Message);
+		const modalHandler = this._modalManagerContext?.open(UMB_CONFIRM_MODAL, { data: modalData });
 
 		modalHandler?.onSubmit().then(() => {
 			this.#remove(tab?.id);

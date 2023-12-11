@@ -193,8 +193,10 @@ export default class UmbTinyMceMacroPickerPlugin extends UmbTinyMcePluginBase {
 	// TODO => depends on macro picker, which doesn't exist, just showing a generic modal for now
 	async #showMacroPicker(dialogData: DialogData) {
 		const modalHandler = this.#modalContext?.open(UMB_CONFIRM_MODAL, {
-			headline: 'Macro picker',
-			content: 'Yet to be implemented',
+			data: {
+				headline: 'Macro picker',
+				content: 'Yet to be implemented',
+			},
 		});
 
 		if (!modalHandler) return;

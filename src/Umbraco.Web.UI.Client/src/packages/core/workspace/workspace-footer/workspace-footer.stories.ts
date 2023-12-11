@@ -11,8 +11,9 @@ export default {
 	id: 'umb-workspace-footer',
 } as Meta;
 
-export const AAAOverview: Story<UmbWorkspaceFooterLayoutElement> = () => html` <umb-workspace-footer>
-	<div><uui-button color="" look="placeholder">Footer slot</uui-button></div>
-	<div slot="actions"><uui-button color="" look="placeholder">Actions slot</uui-button></div>
-</umb-workspace-footer>`;
+export const AAAOverview: Story<UmbWorkspaceFooterLayoutElement> = () =>
+	html` <umb-workspace-footer>
+		<div><uui-button color="" look="placeholder">Footer slot</uui-button></div>
+		<div slot="actions"><uui-button color="" look="placeholder">Actions slot</uui-button></div>
+	</umb-workspace-footer>`;
 AAAOverview.storyName = 'Overview';

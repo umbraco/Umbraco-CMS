@@ -123,10 +123,8 @@ export class UmbDataTypeWorkspaceContext
 	}
 
 	private _mergeConfigProperties() {
-		console.log('schema properties', this._propertyEditorSchemaConfigProperties);
-		console.log('ui properties', this._propertyEditorUISettingsProperties);
-
 		if (this._propertyEditorSchemaConfigProperties && this._propertyEditorUISettingsProperties) {
+			// TODO: Consider the ability to to omit a schema config if a UI config has same alias. Otherwise we should make an error when this case happens.
 			this.#properties.next([
 				...this._propertyEditorSchemaConfigProperties,
 				...this._propertyEditorUISettingsProperties,
@@ -203,8 +201,6 @@ export class UmbDataTypeWorkspaceContext
 	async propertyValueByAlias<ReturnType = unknown>(propertyAlias: string) {
 		await this.#getDataPromise;
 
-		// TODO: Merge map..
-
 		return combineLatest([
 			this.#data.asObservablePart((data) => data?.values?.find((x) => x.alias === propertyAlias)?.value as ReturnType),
 			this.#defaults.asObservablePart(
@@ -215,7 +211,6 @@ export class UmbDataTypeWorkspaceContext
 				return value ?? defaultValue;
 			}),
 		);
-		//return this.#data.asObservablePart((data) => data?.values?.find((x) => x.alias === propertyAlias)?.value ?? this.getPropertyDefaultValue(propertyAlias) as ReturnType);
 	}
 
 	getPropertyValue<ReturnType = unknown>(propertyAlias: string) {

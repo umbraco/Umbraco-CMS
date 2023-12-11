@@ -17,7 +17,7 @@ export class UmbDocumentBlueprintStore extends UmbStoreBase {
 			UMB_DOCUMENT_BLUEPRINT_STORE_CONTEXT_TOKEN.toString(),
 			// TODO: use the right type:
 
-			new UmbArrayState<DocumentBlueprintDetails>([], (x) => x.id)
+			new UmbArrayState<DocumentBlueprintDetails>([], (x) => x.id),
 		);
 	}
 
@@ -97,5 +97,5 @@ export class UmbDocumentBlueprintStore extends UmbStoreBase {
 }
 
 export const UMB_DOCUMENT_BLUEPRINT_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbDocumentBlueprintStore>(
-	'UmbDocumentBlueprintStore'
+	'UmbDocumentBlueprintStore',
 );

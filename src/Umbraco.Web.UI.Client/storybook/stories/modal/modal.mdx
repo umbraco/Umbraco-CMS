@@ -129,12 +129,12 @@ descripe the addional features of the route Registration:
 				index = null;
 			}
 
-			return {
+			return { data: {
 				index: index,
 				itemData: {
 					name: data?.name
 				},
-			};
+			}};
 		})
 		.onSubmit((submitData) => {
 			if (!submitData) return;
@@ -189,10 +189,10 @@ class MyElement extends UmbElementMixin(LitElement) {
 
 	#onClick() {
 		const data = {'data goes here'};
-		const options {'options go here'};
-		const modalContext = this.#modalManagerContext?.open(MY_MODAL_TOKEN), data, options);
+		const value = {'initial value go here'};
+		const modalContext = this.#modalManagerContext?.open(MY_MODAL_TOKEN), {data: data, value: value});
 
-		modalContext?.onSubmit().then((data) => {
+		modalContext?.onSubmit().then((value) => {
 			// if modal submitted, then data is supplied here.
 		});
 	}
@@ -229,13 +229,15 @@ interface MyModalData = {
 }
 
 interface MyModalValue = {
-	myReturnData: string;
+	myData: string;
 }
 
-const MY_MODAL_TOKEN = new ModalToken<MyModalData, MyModalValue>('My.Modal', {
-	type: 'sidebar',
-	size: 'small'
-});
+const MY_MODAL_TOKEN = new ModalToken<MyModalData, MyModalValue>('My.Modal',
+	config: {
+		type: 'sidebar',
+		size: 'small'
+	}
+);
 ```
 
 The Modal element
@@ -255,9 +257,9 @@ class MyDialog extends UmbElementMixin(LitElement) {
 	}
 
 	private _handleSubmit() {
-		/* Optional data of any type can be applied to the submit method to pass it
-		   to the modal parent through the onSubmit promise. */
-		this.modalContext?.submit({ myReturnData: 'hello world' });
+		/* Value is set on modal context. and then parsed on to the consumer of the submit promise. */
+		this.modalContext?.setValue({ myData: 'hello world' });
+		this.modalContext?.submit();
 	}
 
 	render() {

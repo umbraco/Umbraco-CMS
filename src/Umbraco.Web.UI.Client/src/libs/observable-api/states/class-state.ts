@@ -1,4 +1,4 @@
-import { UmbBasicState } from "./basic-state.js";
+import { UmbBasicState } from './basic-state.js';
 
 export interface UmbClassStateData {
 	equal(otherClass: this | undefined): boolean;

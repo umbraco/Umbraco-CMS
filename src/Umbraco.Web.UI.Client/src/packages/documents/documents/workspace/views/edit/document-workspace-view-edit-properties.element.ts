@@ -1,6 +1,6 @@
 import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../document-workspace.context.js';
 import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbContentTypePropertyStructureHelper, PropertyContainerTypes } from '@umbraco-cms/backoffice/content-type';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { PropertyTypeModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
@@ -42,7 +42,10 @@ export class UmbDocumentWorkspaceViewEditPropertiesElement extends UmbLitElement
 		return repeat(
 			this._propertyStructure,
 			(property) => property.alias,
-			(property) => html`<umb-property-type-based-property class="property" .property=${property}></umb-property-type-based-property> `
+			(property) =>
+				html`<umb-property-type-based-property
+					class="property"
+					.property=${property}></umb-property-type-based-property> `,
 		);
 	}
 

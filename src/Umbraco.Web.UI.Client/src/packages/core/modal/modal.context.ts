@@ -6,36 +6,22 @@ import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
-/**
- * Type which omits the real submit method, and replaces it with a submit method which accepts an optional argument depending on the generic type.
- */
-export type UmbModalContext<ModalData extends object = object, ModalValue = any> = Omit<
-	UmbModalContextClass<ModalData, ModalValue>,
-	'submit'
-> &
-	OptionalSubmitArgumentIfUndefined<ModalValue>;
-
-// If Type is undefined we don't accept an argument,
-// If type is unknown, we accept an option argument.
-// If type is anything else, we require an argument of that type.
-type OptionalSubmitArgumentIfUndefined<T> = T extends undefined
-	? {
-			submit: () => void;
-	  }
-	: T extends unknown
-	? {
-			submit: (arg?: T) => void;
-	  }
-	: {
-			submit: (arg: T) => void;
-	  };
-
 export interface UmbModalRejectReason {
 	type: string;
 }
 
+export type UmbModalContextClassArgs<
+	ModalAliasType extends string | UmbModalToken,
+	ModalAliasTypeAsToken extends UmbModalToken = ModalAliasType extends UmbModalToken ? ModalAliasType : UmbModalToken,
+> = {
+	router?: IRouterSlot | null;
+	data?: ModalAliasTypeAsToken['DATA'];
+	value?: ModalAliasTypeAsToken['VALUE'];
+	modal?: UmbModalConfig;
+};
+
 // TODO: consider splitting this into two separate handlers
-export class UmbModalContextClass<ModalPreset extends object = object, ModalValue = unknown> extends EventTarget {
+export class UmbModalContext<ModalPreset extends object = object, ModalValue = any> extends EventTarget {
 	#submitPromise: Promise<ModalValue>;
 	#submitResolver?: (value: ModalValue) => void;
 	#submitRejecter?: (reason?: UmbModalRejectReason) => void;
@@ -47,30 +33,34 @@ export class UmbModalContextClass<ModalPreset extends object = object, ModalValu
 	public readonly router: IRouterSlot | null = null;
 	public readonly alias: string | UmbModalToken<ModalPreset, ModalValue>;
 
-	#value = new UmbObjectState<ModalValue | undefined>(undefined);
-	public readonly value = this.#value.asObservable();
+	#value;
+	public readonly value;
 
 	constructor(
-		router: IRouterSlot | null,
 		modalAlias: string | UmbModalToken<ModalPreset, ModalValue>,
-		data?: ModalPreset,
-		config?: UmbModalConfig,
+		args: UmbModalContextClassArgs<UmbModalToken>,
 	) {
 		super();
-		this.key = config?.key || UmbId.new();
-		this.router = router;
+		this.key = args.modal?.key || UmbId.new();
+		this.router = args.router ?? null;
 		this.alias = modalAlias;
 
 		if (this.alias instanceof UmbModalToken) {
-			this.type = this.alias.getDefaultConfig()?.type || this.type;
-			this.size = this.alias.getDefaultConfig()?.size || this.size;
+			this.type = this.alias.getDefaultModal()?.type || this.type;
+			this.size = this.alias.getDefaultModal()?.size || this.size;
 		}
 
-		this.type = config?.type || this.type;
-		this.size = config?.size || this.size;
+		this.type = args.modal?.type || this.type;
+		this.size = args.modal?.size || this.size;
 
 		const defaultData = this.alias instanceof UmbModalToken ? this.alias.getDefaultData() : undefined;
-		this.data = Object.freeze({ ...defaultData, ...data } as ModalPreset);
+		this.data = Object.freeze({ ...defaultData, ...args.data } as ModalPreset);
+
+		const initValue =
+			args.value ?? (this.alias instanceof UmbModalToken ? (this.alias as UmbModalToken).getDefaultValue() : undefined);
+
+		this.#value = new UmbObjectState(initValue) as UmbObjectState<ModalValue>;
+		this.value = this.#value.asObservable();
 
 		// TODO: Consider if its right to use Promises, or use another event based system? Would we need to be able to cancel an event, to then prevent the closing..?
 		this.#submitPromise = new Promise((resolve, reject) => {
@@ -85,8 +75,8 @@ export class UmbModalContextClass<ModalPreset extends object = object, ModalValu
 	 * @public
 	 * @memberof UmbModalContext
 	 */
-	private submit(value?: ModalValue) {
-		this.#submitResolver?.(value as ModalValue);
+	public submit() {
+		this.#submitResolver?.(this.getValue());
 	}
 
 	/**
@@ -100,15 +90,17 @@ export class UmbModalContextClass<ModalPreset extends object = object, ModalValu
 
 	/**
 	 * Gives a Promise which will be resolved when this modal is submitted.
+	 * @returns {Promise<ModalValue>}
 	 * @public
 	 * @memberof UmbModalContext
 	 */
-	public onSubmit(): Promise<ModalValue> {
+	public onSubmit() {
 		return this.#submitPromise;
 	}
 
 	/**
 	 * Gives the current value of this modal.
+	 * @returns {ModalValue}
 	 * @public
 	 * @memberof UmbModalContext
 	 */

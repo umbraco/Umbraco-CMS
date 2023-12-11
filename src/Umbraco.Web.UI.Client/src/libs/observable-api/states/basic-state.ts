@@ -6,13 +6,11 @@ import { BehaviorSubject } from '@umbraco-cms/backoffice/external/rxjs';
  * @description - State ensures the data is unique, not updating any Observes unless there is an actual change of the value using `===`.
  */
 export class UmbBasicState<T> {
-
-	protected _subject:BehaviorSubject<T>;
+	protected _subject: BehaviorSubject<T>;
 
 	constructor(initialData: T) {
 		this._subject = new BehaviorSubject(initialData);
 	}
-
 
 	/**
 	 * @method asObservable
@@ -22,7 +20,7 @@ export class UmbBasicState<T> {
 	 * const myState = new UmbArrayState('Hello world');
 	 *
 	 * this.observe(myState, (latestStateValue) => console.log("Value is: ", latestStateValue));
-   */
+	 */
 	public asObservable(): ReturnType<BehaviorSubject<T>['asObservable']> {
 		return this._subject.asObservable();
 	}
@@ -33,10 +31,10 @@ export class UmbBasicState<T> {
 	 * @example <caption>Example retrieve the current data of a state</caption>
 	 * const myState = new UmbArrayState('Hello world');
 	 * console.log("Value is: ", myState.getValue());
-   */
+	 */
 	public get value(): BehaviorSubject<T>['value'] {
 		return this._subject.value;
-	};
+	}
 
 	/**
 	 * @method getValue
@@ -45,7 +43,7 @@ export class UmbBasicState<T> {
 	 * @example <caption>Example retrieve the current data of a state</caption>
 	 * const myState = new UmbArrayState('Hello world');
 	 * console.log("Value is: ", myState.value);
-   */
+	 */
 	public getValue(): ReturnType<BehaviorSubject<T>['getValue']> {
 		return this._subject.getValue();
 	}
@@ -53,7 +51,7 @@ export class UmbBasicState<T> {
 	/**
 	 * @method destroy
 	 * @description - Destroys this state and completes all observations made to it.
-   */
+	 */
 	public destroy(): void {
 		this._subject.complete();
 	}
@@ -67,7 +65,7 @@ export class UmbBasicState<T> {
 	 * // myState.value is equal 'Good morning'.
 	 * myState.next('Goodnight')
 	 * // myState.value is equal 'Goodnight'.
-   */
+	 */
 	next(newData: T): void {
 		if (newData !== this._subject.getValue()) {
 			this._subject.next(newData);

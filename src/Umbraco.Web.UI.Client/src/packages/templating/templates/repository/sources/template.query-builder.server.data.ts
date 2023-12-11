@@ -10,6 +10,9 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 export class UmbTemplateQueryBuilderServerDataSource {
 	#host: UmbControllerHost;
 
+	// TODO: When we map the server models to our own models, we need to have a localization property.
+	// For example, the OperatorModel.NOT_EQUALS need to use the localization key "template_doesNotEqual"
+
 	/**
 	 * Creates an instance of UmbTemplateQueryBuilderServerDataSource.
 	 * @param {UmbControllerHost} host

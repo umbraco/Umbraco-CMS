@@ -28,7 +28,7 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 	private _dataTypeData?: UmbPropertyEditorConfig;
 
 	private _dataTypeDetailRepository = new UmbDataTypeDetailRepository(this);
-	private _dataTypeObserver?: UmbObserverController<UmbDataTypeDetailModel>;
+	private _dataTypeObserver?: UmbObserverController<UmbDataTypeDetailModel | undefined>;
 
 	private async _observeDataType(dataTypeUnique?: string) {
 		this._dataTypeObserver?.destroy();

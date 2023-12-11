@@ -3,8 +3,6 @@ import { ManifestElement, ManifestElementAndApi } from '../types/index.js';
 import { createExtensionElement } from './create-extension-element.function.js';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 
-
-
 @customElement('umb-extension-api-true-test-element')
 class UmbExtensionApiTrueTestElement extends HTMLElement {
 	isValidClassInstance() {
@@ -19,32 +17,25 @@ class UmbExtensionApiFalseTestElement extends HTMLElement {
 	}
 }
 
-
-
 const jsModuleWithDefaultExport = {
-	default: UmbExtensionApiTrueTestElement
+	default: UmbExtensionApiTrueTestElement,
 };
 
 const jsModuleWithElementExport = {
-	element: UmbExtensionApiTrueTestElement
+	element: UmbExtensionApiTrueTestElement,
 };
 
 const jsModuleWithDefaultAndElementExport = {
 	default: UmbExtensionApiFalseTestElement,
-	element: UmbExtensionApiTrueTestElement
+	element: UmbExtensionApiTrueTestElement,
 };
 
-
-
 describe('Extension-Api: Create Extension Element', () => {
-
-
 	it('Returns `undefined` when manifest does not have any correct properties', async () => {
-
 		const manifest: ManifestElement = {
 			type: 'my-test-type',
 			alias: 'Umb.Test.CreateManifestElement',
-			name: 'pretty name'
+			name: 'pretty name',
 		};
 
 		const api = await createExtensionElement(manifest);
@@ -52,102 +43,94 @@ describe('Extension-Api: Create Extension Element', () => {
 	});
 
 	it('Returns fallback element instance when manifest does not provide element', async () => {
-
 		const manifest: ManifestElement<UmbExtensionApiTrueTestElement> = {
 			type: 'my-test-type',
 			alias: 'Umb.Test.CreateManifestElement',
-			name: 'pretty name'
+			name: 'pretty name',
 		};
 
 		const element = await createExtensionElement(manifest, 'umb-extension-api-true-test-element');
 		expect(element).to.not.be.undefined;
-		if(element) {
+		if (element) {
 			expect(element.isValidClassInstance()).to.be.true;
 		}
 	});
 
-
 	it('Still returns fallback element instance when manifest does not provide element and manifest has api', async () => {
-
 		const manifest: ManifestElementAndApi<UmbExtensionApiTrueTestElement> = {
 			type: 'my-test-type',
 			alias: 'Umb.Test.CreateManifestElement',
 			name: 'pretty name',
-			api: class TestApi {}
+			api: class TestApi {},
 		};
 
 		const element = await createExtensionElement(manifest, 'umb-extension-api-true-test-element');
 		expect(element).to.not.be.undefined;
-		if(element) {
+		if (element) {
 			expect(element.isValidClassInstance()).to.be.true;
 		}
 	});
 
 	it('Handles when `api` property contains a class constructor', async () => {
-
 		const manifest: ManifestElement<UmbExtensionApiTrueTestElement> = {
 			type: 'my-test-type',
 			alias: 'Umb.Test.CreateManifestElement',
 			name: 'pretty name',
-			elementName: 'umb-extension-api-true-test-element'
+			elementName: 'umb-extension-api-true-test-element',
 		};
 
 		const element = await createExtensionElement(manifest);
 		expect(element).to.not.be.undefined;
-		if(element) {
+		if (element) {
 			expect(element.isValidClassInstance()).to.be.true;
 		}
 	});
 
 	it('Handles when `loader` has a default export', async () => {
-
 		const manifest: ManifestElement<UmbExtensionApiTrueTestElement> = {
 			type: 'my-test-type',
 			alias: 'Umb.Test.CreateManifestElement',
 			name: 'pretty name',
-			js: () => Promise.resolve(jsModuleWithDefaultExport)
+			js: () => Promise.resolve(jsModuleWithDefaultExport),
 		};
 
 		const element = await createExtensionElement(manifest);
 		expect(element).to.not.be.undefined;
-		if(element) {
+		if (element) {
 			expect(element.isValidClassInstance()).to.be.true;
 		}
 	});
 
 	it('Handles when `loader` has a element export', async () => {
-
 		const manifest: ManifestElement<UmbExtensionApiTrueTestElement> = {
 			type: 'my-test-type',
 			alias: 'Umb.Test.CreateManifestElement',
 			name: 'pretty name',
-			js: () => Promise.resolve(jsModuleWithElementExport)
+			js: () => Promise.resolve(jsModuleWithElementExport),
 		};
 
 		const element = await createExtensionElement(manifest);
 		expect(element).to.not.be.undefined;
-		if(element) {
+		if (element) {
 			expect(element.isValidClassInstance()).to.be.true;
 		}
 	});
 
 	it('Prioritizes api export from loader property', async () => {
-
 		const manifest: ManifestElement<UmbExtensionApiTrueTestElement> = {
 			type: 'my-test-type',
 			alias: 'Umb.Test.CreateManifestElement',
 			name: 'pretty name',
-			js: () => Promise.resolve(jsModuleWithDefaultAndElementExport)
+			js: () => Promise.resolve(jsModuleWithDefaultAndElementExport),
 		};
 
 		const element = await createExtensionElement(manifest);
 		expect(element).to.not.be.undefined;
-		if(element) {
+		if (element) {
 			expect(element.isValidClassInstance()).to.be.true;
 		}
 	});
 
 	//TODO: Test elementJs
 	//TODO: Test js
-
 });

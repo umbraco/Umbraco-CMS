@@ -6,9 +6,9 @@ describe('UmbPropertyEditorUIMemberGroupPickerElement', () => {
 	let element: UmbPropertyEditorUIMemberGroupPickerElement;
 
 	beforeEach(async () => {
-		element = await fixture(
-			html` <umb-property-editor-ui-member-group-picker></umb-property-editor-ui-member-group-picker> `
-		);
+		element = await fixture(html`
+			<umb-property-editor-ui-member-group-picker></umb-property-editor-ui-member-group-picker>
+		`);
 	});
 
 	it('is defined with its own instance', () => {

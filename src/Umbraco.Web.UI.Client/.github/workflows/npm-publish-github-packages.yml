@@ -52,7 +52,7 @@ jobs:
           registry-url: https://registry.npmjs.org/
           scope: '@umbraco-cms'
       - run: npm ci
-      - run: npm run build:for:npm
+      - run: npm run build
       - name: Calculate version
         run: |
           if [ -z "${{inputs.version}}" ]; then

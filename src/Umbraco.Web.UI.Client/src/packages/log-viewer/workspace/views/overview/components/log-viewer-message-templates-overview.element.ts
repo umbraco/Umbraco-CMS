@@ -1,5 +1,5 @@
 import { UmbLogViewerWorkspaceContext, UMB_APP_LOG_VIEWER_CONTEXT_TOKEN } from '../../../logviewer.context.js';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { PagedLogTemplateResponseModel, SavedLogSearchResponseModel } from '@umbraco-cms/backoffice/backend-api';
@@ -60,12 +60,12 @@ export class UmbLogViewerMessageTemplatesOverviewElement extends UmbLitElement {
 										<uui-table-cell>
 											<a
 												href=${`section/settings/workspace/logviewer/search/?lq=${encodeURIComponent(
-													`@MessageTemplate='${template.messageTemplate}'`
+													`@MessageTemplate='${template.messageTemplate}'`,
 												)}`}>
 												<span>${template.messageTemplate}</span> <span>${template.count}</span>
 											</a>
 										</uui-table-cell>
-									</uui-table-row>`
+									</uui-table-row>`,
 						  )
 						: ''}
 				</uui-table>

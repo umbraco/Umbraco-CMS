@@ -28,9 +28,11 @@ export default class UmbTinyMceCodeEditorPlugin extends UmbTinyMcePluginBase {
 		const modalHandler = this.#modalContext?.open<UmbCodeEditorModalData, UmbCodeEditorModalValue>(
 			UMB_CODE_EDITOR_MODAL,
 			{
-				headline: 'Edit source code',
-				content: this.editor.getContent() ?? '',
-				language: 'html',
+				data: {
+					headline: 'Edit source code',
+					content: this.editor.getContent() ?? '',
+					language: 'html',
+				},
 			},
 		);
 

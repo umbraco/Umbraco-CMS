@@ -19,7 +19,9 @@ export class UmbResendInviteToUserEntityAction extends UmbEntityActionBase<UmbEn
 		if (!this.repository || !this.#modalManager) return;
 
 		const modalContext = this.#modalManager.open(UMB_RESEND_INVITE_TO_USER_MODAL, {
-			userId: this.unique,
+			data: {
+				userId: this.unique,
+			},
 		});
 
 		await modalContext.onSubmit();

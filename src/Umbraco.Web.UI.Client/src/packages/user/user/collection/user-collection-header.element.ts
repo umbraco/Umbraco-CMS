@@ -7,7 +7,7 @@ import {
 } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UMB_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
+import { UMB_DEFAULT_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 import { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UserGroupResponseModel, UserOrderModel, UserStateModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbUserGroupCollectionRepository } from '@umbraco-cms/backoffice/user-group';
@@ -42,7 +42,7 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_COLLECTION_CONTEXT, (instance) => {
+		this.consumeContext(UMB_DEFAULT_COLLECTION_CONTEXT, (instance) => {
 			this.#collectionContext = instance as UmbUserCollectionContext;
 		});
 	}
@@ -156,7 +156,7 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 			<uui-button popovertarget="popover-user-status-filter" label="status">
 				<umb-localize key="general_status"></umb-localize>: <b>${this.#getStatusFilterLabel()}</b>
 			</uui-button>
-			<uui-popover-container id="popover-user-status-filter" popover placement="bottom">
+			<uui-popover-container id="popover-user-status-filter" placement="bottom">
 				<umb-popover-layout>
 					<div class="filter-dropdown">
 						${this._stateFilterOptions.map(
@@ -178,7 +178,7 @@ export class UmbUserCollectionHeaderElement extends UmbLitElement {
 			<uui-button popovertarget="popover-user-group-filter" label=${this.localize.term('general_groups')}>
 				<umb-localize key="general_groups"></umb-localize>: <b>${this.#getUserGroupFilterLabel()}</b>
 			</uui-button>
-			<uui-popover-container id="popover-user-group-filter" popover placement="bottom">
+			<uui-popover-container id="popover-user-group-filter" placement="bottom">
 				<umb-popover-layout>
 					<div class="filter-dropdown">
 						${repeat(

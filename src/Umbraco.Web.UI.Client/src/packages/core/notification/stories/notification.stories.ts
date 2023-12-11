@@ -9,7 +9,9 @@ export default {
 	component: 'umb-notification-layout-default',
 	decorators: [
 		(story) =>
-			html`<umb-context-provider key="UmbNotificationContext" .value=${new UmbNotificationContext()}>
+			html`<umb-context-provider
+				key="UmbNotificationContext"
+				.create=${(host: any) => new UmbNotificationContext(host)}>
 				${story()}
 			</umb-context-provider>`,
 	],

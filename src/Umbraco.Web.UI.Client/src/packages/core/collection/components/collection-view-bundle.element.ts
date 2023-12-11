@@ -1,4 +1,4 @@
-import { UMB_COLLECTION_CONTEXT, UmbDefaultCollectionContext } from '../collection-default.context.js';
+import { UMB_DEFAULT_COLLECTION_CONTEXT, UmbDefaultCollectionContext } from '../default/collection-default.context.js';
 import { ManifestCollectionView } from '../../extension-registry/models/collection-view.model.js';
 import { css, html, customElement, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -20,7 +20,7 @@ export class UmbCollectionViewBundleElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_COLLECTION_CONTEXT, (context) => {
+		this.consumeContext(UMB_DEFAULT_COLLECTION_CONTEXT, (context) => {
 			this.#collectionContext = context;
 			if (!this.#collectionContext) return;
 			this.#observeRootPathname();
@@ -31,7 +31,7 @@ export class UmbCollectionViewBundleElement extends UmbLitElement {
 
 	#observeRootPathname() {
 		this.observe(
-			this.#collectionContext!.rootPathname,
+			this.#collectionContext!.view.rootPathname,
 			(rootPathname) => {
 				this._collectionRootPathname = rootPathname;
 			},
@@ -41,7 +41,7 @@ export class UmbCollectionViewBundleElement extends UmbLitElement {
 
 	#observeCurrentView() {
 		this.observe(
-			this.#collectionContext!.currentView,
+			this.#collectionContext!.view.currentView,
 			(view) => {
 				//TODO: This is not called when the view is changed
 				this._currentView = view;
@@ -52,7 +52,7 @@ export class UmbCollectionViewBundleElement extends UmbLitElement {
 
 	#observeViews() {
 		this.observe(
-			this.#collectionContext!.views,
+			this.#collectionContext!.view.views,
 			(views) => {
 				this._views = views;
 			},
@@ -67,7 +67,7 @@ export class UmbCollectionViewBundleElement extends UmbLitElement {
 			<uui-button compact popovertarget="collection-view-bundle-popover" label="status">
 				${this.#renderItemDisplay(this._currentView)}
 			</uui-button>
-			<uui-popover-container id="collection-view-bundle-popover" popover placement="bottom">
+			<uui-popover-container id="collection-view-bundle-popover" placement="bottom">
 				<umb-popover-layout>
 					<div class="filter-dropdown">${this._views.map((view) => this.#renderItem(view))}</div>
 				</umb-popover-layout>

@@ -11,6 +11,7 @@ import type { DocumentItemResponseModel } from '@umbraco-cms/backoffice/backend-
 import { UmbDocumentRepository } from '@umbraco-cms/backoffice/document';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-input-document-granular-permission')
 export class UmbInputDocumentGranularPermissionElement extends FormControlMixin(UmbLitElement) {
@@ -27,7 +28,7 @@ export class UmbInputDocumentGranularPermissionElement extends FormControlMixin(
 	@property()
 	public set value(idsString: string) {
 		if (idsString !== this._value) {
-			this.selectedIds = idsString.split(/[ ,]+/);
+			this.selectedIds = splitStringToArray(idsString);
 		}
 	}
 
@@ -61,21 +62,26 @@ export class UmbInputDocumentGranularPermissionElement extends FormControlMixin(
 
 	#openDocumentPicker() {
 		// We send a shallow copy(good enough as its just an array of ids) of our this._selectedIds, as we don't want the modal to manipulate our data:
+		// TODO: Use value instead:
 		const modalContext = this.#modalContext?.open(UMB_DOCUMENT_PICKER_MODAL, {
-			selection: [...this._selectedIds],
+			value: {
+				selection: [...this._selectedIds],
+			},
 		});
 
-		modalContext?.onSubmit().then(({ selection }: any) => {
+		modalContext?.onSubmit().then((value) => {
 			//this.#setSelection(selection);
 		});
 	}
 
 	async #removeItem(item: DocumentItemResponseModel) {
 		const modalContext = this.#modalContext?.open(UMB_CONFIRM_MODAL, {
-			color: 'danger',
-			headline: `Remove ${item.name}?`,
-			content: 'Are you sure you want to remove this item',
-			confirmLabel: 'Remove',
+			data: {
+				color: 'danger',
+				headline: `Remove ${item.name}?`,
+				content: 'Are you sure you want to remove this item',
+				confirmLabel: 'Remove',
+			},
 		});
 
 		await modalContext?.onSubmit();
