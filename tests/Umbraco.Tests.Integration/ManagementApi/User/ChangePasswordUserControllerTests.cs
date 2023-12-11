@@ -3,16 +3,17 @@ using System.Net;
 using System.Net.Http.Json;
 using Umbraco.Cms.Api.Management.Controllers.User;
 using Umbraco.Cms.Api.Management.ViewModels.User;
+using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.User;
 
 public class ChangePasswordUserControllerTests : ManagementApiUserGroupTestBase<ChangePasswordUserController>
 {
-    protected override Expression<Func<ChangePasswordUserController, object>> MethodSelector => x => x.ChangePassword(Guid.Empty, null);
+    protected override Expression<Func<ChangePasswordUserController, object>> MethodSelector => x => x.ChangePassword(Constants.Security.SuperUserKey, null);
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.NotFound
+        ExpectedStatusCode = HttpStatusCode.BadRequest
     };
 
     protected override UserGroupAssertionModel EditorUserGroupAssertionModel => new()

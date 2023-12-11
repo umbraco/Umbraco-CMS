@@ -1,16 +1,17 @@
 ﻿using System.Linq.Expressions;
 using System.Net;
 using Umbraco.Cms.Api.Management.Controllers.User;
+using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.User;
 
 public class ByKeyUserControllerTests : ManagementApiUserGroupTestBase<ByKeyUserController>
 {
-    protected override Expression<Func<ByKeyUserController, object>> MethodSelector => x => x.ByKey(Guid.Empty);
+    protected override Expression<Func<ByKeyUserController, object>> MethodSelector => x => x.ByKey(Constants.Security.SuperUserKey);
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.NotFound
+        ExpectedStatusCode = HttpStatusCode.OK
     };
 
     protected override UserGroupAssertionModel EditorUserGroupAssertionModel => new()

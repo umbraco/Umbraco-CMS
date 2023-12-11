@@ -1,16 +1,17 @@
 ﻿using System.Linq.Expressions;
 using System.Net;
 using Umbraco.Cms.Api.Management.Controllers.User;
+using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.User;
 
 public class ClearAvatarUserControllerTests : ManagementApiUserGroupTestBase<ClearAvatarUserController>
 {
-    protected override Expression<Func<ClearAvatarUserController, object>> MethodSelector => x => x.ClearAvatar(Guid.Empty);
+    protected override Expression<Func<ClearAvatarUserController, object>> MethodSelector => x => x.ClearAvatar(Constants.Security.SuperUserKey);
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.NotFound
+        ExpectedStatusCode = HttpStatusCode.OK
     };
 
     protected override UserGroupAssertionModel EditorUserGroupAssertionModel => new()
