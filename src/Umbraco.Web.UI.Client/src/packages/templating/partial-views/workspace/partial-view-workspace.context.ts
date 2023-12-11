@@ -98,6 +98,8 @@ export class UmbPartialViewWorkspaceContext
 		};
 		if (!data) return;
 		this.setIsNew(true);
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
 		this.#data.next(newPartial);
 	}
 }

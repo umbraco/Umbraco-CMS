@@ -725,6 +725,8 @@ const createDataTypeItem = (item: DataTypeResponseModel | FolderTreeItemResponse
 };
 
 class UmbDataTypeData extends UmbEntityData<DataTypeResponseModel | FolderTreeItemResponseModel> {
+	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+	// @ts-ignore
 	#tree = new UmbEntityTreeData<FolderTreeItemResponseModel>(this);
 
 	constructor() {
