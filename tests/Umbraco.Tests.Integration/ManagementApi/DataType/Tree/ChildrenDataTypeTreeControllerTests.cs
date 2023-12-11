@@ -1,11 +1,9 @@
 using System.Linq.Expressions;
 using System.Net;
-using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Controllers.DataType.Tree;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.DataType.Tree;
 
-[TestFixture]
 public class ChildrenDataTypeTreeControllerTests : ManagementApiUserGroupTestBase<ChildrenDataTypeTreeController>
 {
     protected override Expression<Func<ChildrenDataTypeTreeController, object>> MethodSelector =>

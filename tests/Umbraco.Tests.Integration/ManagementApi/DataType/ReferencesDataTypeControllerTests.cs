@@ -1,32 +1,22 @@
 using System.Linq.Expressions;
 using System.Net;
-using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Controllers.DataType;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.DataType;
 
-[TestFixture]
-public class ReferencesDataTypeControllerTests : DataTypeTestBase<ReferencesDataTypeController>
+public class ReferencesDataTypeControllerTests : ManagementApiUserGroupTestBase<ReferencesDataTypeController>
 {
-    private Guid _dataTypeId;
-
     protected override Expression<Func<ReferencesDataTypeController, object>> MethodSelector =>
-        x => x.References(_dataTypeId);
-
-    [SetUp]
-    public void Setup()
-    {
-        _dataTypeId = CreateDataType();
-    }
+        x => x.References(Guid.NewGuid());
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.OK
+        ExpectedStatusCode = HttpStatusCode.NotFound
     };
 
     protected override UserGroupAssertionModel EditorUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.OK
+        ExpectedStatusCode = HttpStatusCode.NotFound
     };
 
     protected override UserGroupAssertionModel SensitiveDataUserGroupAssertionModel => new()
@@ -41,7 +31,7 @@ public class ReferencesDataTypeControllerTests : DataTypeTestBase<ReferencesData
 
     protected override UserGroupAssertionModel WriterUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.OK
+        ExpectedStatusCode = HttpStatusCode.NotFound
     };
 
     protected override UserGroupAssertionModel UnauthorizedUserGroupAssertionModel => new()

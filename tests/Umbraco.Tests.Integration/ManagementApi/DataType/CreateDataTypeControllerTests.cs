@@ -1,13 +1,11 @@
 using System.Linq.Expressions;
 using System.Net;
 using System.Net.Http.Json;
-using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Controllers.DataType;
 using Umbraco.Cms.Api.Management.ViewModels.DataType;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.DataType;
 
-[TestFixture]
 public class CreateDataTypeControllerTests : ManagementApiUserGroupTestBase<CreateDataTypeController>
 {
     protected override Expression<Func<CreateDataTypeController, object>> MethodSelector =>

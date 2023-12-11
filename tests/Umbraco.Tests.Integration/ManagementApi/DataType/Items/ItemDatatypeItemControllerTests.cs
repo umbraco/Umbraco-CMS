@@ -1,11 +1,9 @@
 using System.Linq.Expressions;
 using System.Net;
-using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Controllers.DataType.Items;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.DataType.Items;
 
-[TestFixture]
 public class ItemDatatypeItemControllerTests : ManagementApiUserGroupTestBase<ItemDatatypeItemController>
 {
     protected override Expression<Func<ItemDatatypeItemController, object>> MethodSelector =>

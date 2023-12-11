@@ -1,38 +1,24 @@
 using System.Linq.Expressions;
 using System.Net;
 using System.Net.Http.Json;
-using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Controllers.DataType;
 using Umbraco.Cms.Api.Management.ViewModels.DataType;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.DataType;
 
-[TestFixture]
-public class MoveDataTypeControllerTests : DataTypeTestBase<MoveDataTypeController>
+public class MoveDataTypeControllerTests : ManagementApiUserGroupTestBase<MoveDataTypeController>
 {
-    private Guid _dataTypeId;
-
-    private Guid _targetId;
-
     protected override Expression<Func<MoveDataTypeController, object>> MethodSelector =>
-        x => x.Move(_dataTypeId, null);
-
-    [SetUp]
-    public void Setup()
-    {
-        _dataTypeId = CreateDataType();
-        _targetId = CreateDataTypeFolder();
-    }
-
+        x => x.Move(Guid.NewGuid(), null);
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.OK
+        ExpectedStatusCode = HttpStatusCode.NotFound
     };
 
     protected override UserGroupAssertionModel EditorUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.OK
+        ExpectedStatusCode = HttpStatusCode.NotFound
     };
 
     protected override UserGroupAssertionModel SensitiveDataUserGroupAssertionModel => new()
@@ -47,7 +33,7 @@ public class MoveDataTypeControllerTests : DataTypeTestBase<MoveDataTypeControll
 
     protected override UserGroupAssertionModel WriterUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.OK
+        ExpectedStatusCode = HttpStatusCode.NotFound
     };
 
     protected override UserGroupAssertionModel UnauthorizedUserGroupAssertionModel => new()
@@ -57,8 +43,7 @@ public class MoveDataTypeControllerTests : DataTypeTestBase<MoveDataTypeControll
 
     protected override async Task<HttpResponseMessage> ClientRequest()
     {
-        MoveDataTypeRequestModel moveDataTypeRequestModel =
-            new() { TargetId = _targetId };
+        MoveDataTypeRequestModel moveDataTypeRequestModel = new() { TargetId = Guid.NewGuid() };
 
         return await Client.PostAsync(Url, JsonContent.Create(moveDataTypeRequestModel));
     }

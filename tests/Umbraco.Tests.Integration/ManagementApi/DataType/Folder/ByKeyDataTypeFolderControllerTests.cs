@@ -1,34 +1,22 @@
 using System.Linq.Expressions;
 using System.Net;
-using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Controllers.DataType.Folder;
-using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.DataType.Folder;
 
-[TestFixture]
 public class ByKeyDataTypeFolderControllerTests : ManagementApiUserGroupTestBase<ByKeyDataTypeFolderController>
 {
-    private readonly Guid _folderId = Guid.NewGuid();
-
-    private IDataTypeContainerService DataTypeContainerService => GetRequiredService<IDataTypeContainerService>();
-
     protected override Expression<Func<ByKeyDataTypeFolderController, object>> MethodSelector =>
-        x => x.ByKey(_folderId);
-
-    [SetUp]
-    public void Setup() =>
-        DataTypeContainerService.CreateAsync(_folderId, "FolderName", null, Constants.Security.SuperUserKey);
+        x => x.ByKey(Guid.NewGuid());
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.OK
+        ExpectedStatusCode = HttpStatusCode.NotFound
     };
 
     protected override UserGroupAssertionModel EditorUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.OK
+        ExpectedStatusCode = HttpStatusCode.NotFound
     };
 
     protected override UserGroupAssertionModel SensitiveDataUserGroupAssertionModel => new()
@@ -43,7 +31,7 @@ public class ByKeyDataTypeFolderControllerTests : ManagementApiUserGroupTestBase
 
     protected override UserGroupAssertionModel WriterUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.OK
+        ExpectedStatusCode = HttpStatusCode.NotFound
     };
 
     protected override UserGroupAssertionModel UnauthorizedUserGroupAssertionModel => new()

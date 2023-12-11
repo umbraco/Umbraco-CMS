@@ -1,37 +1,24 @@
 using System.Linq.Expressions;
 using System.Net;
 using System.Net.Http.Json;
-using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Controllers.DataType;
 using Umbraco.Cms.Api.Management.ViewModels.DataType;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.DataType;
 
-[TestFixture]
-public class CopyDataTypeControllerTests : DataTypeTestBase<CopyDataTypeController>
+public class CopyDataTypeControllerTests : ManagementApiUserGroupTestBase<CopyDataTypeController>
 {
-    private Guid _dataTypeId;
-
-    private Guid _targetId;
-
     protected override Expression<Func<CopyDataTypeController, object>> MethodSelector =>
-        x => x.Copy(_dataTypeId, null);
-
-    [SetUp]
-    public void Setup()
-    {
-        _dataTypeId = CreateDataType();
-        _targetId = CreateDataTypeFolder();
-    }
+        x => x.Copy(Guid.NewGuid(), null);
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.Created
+        ExpectedStatusCode = HttpStatusCode.NotFound
     };
 
     protected override UserGroupAssertionModel EditorUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.Created
+        ExpectedStatusCode = HttpStatusCode.NotFound
     };
 
     protected override UserGroupAssertionModel SensitiveDataUserGroupAssertionModel => new()
@@ -46,7 +33,7 @@ public class CopyDataTypeControllerTests : DataTypeTestBase<CopyDataTypeControll
 
     protected override UserGroupAssertionModel WriterUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.Created
+        ExpectedStatusCode = HttpStatusCode.NotFound
     };
 
     protected override UserGroupAssertionModel UnauthorizedUserGroupAssertionModel => new()
@@ -56,8 +43,7 @@ public class CopyDataTypeControllerTests : DataTypeTestBase<CopyDataTypeControll
 
     protected override async Task<HttpResponseMessage> ClientRequest()
     {
-        CopyDataTypeRequestModel copyDataTypeRequestModel =
-            new() { TargetId = _targetId };
+        CopyDataTypeRequestModel copyDataTypeRequestModel = new() { TargetId = Guid.NewGuid() };
 
         return await Client.PostAsync(Url, JsonContent.Create(copyDataTypeRequestModel));
     }

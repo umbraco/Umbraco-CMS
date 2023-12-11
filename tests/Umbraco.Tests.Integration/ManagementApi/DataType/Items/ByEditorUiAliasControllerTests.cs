@@ -1,11 +1,9 @@
 using System.Linq.Expressions;
 using System.Net;
-using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Controllers.DataType.Items;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.DataType.Items;
 
-[TestFixture]
 public class ByEditorUiAliasControllerTests : ManagementApiUserGroupTestBase<ByEditorUiAliasController>
 {
     protected override Expression<Func<ByEditorUiAliasController, object>> MethodSelector =>
