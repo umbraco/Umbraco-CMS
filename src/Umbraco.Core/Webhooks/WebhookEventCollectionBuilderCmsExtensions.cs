@@ -9,6 +9,15 @@ namespace Umbraco.Cms.Core.DependencyInjection;
 /// </summary>
 public static class WebhookEventCollectionBuilderCmsExtensions
 {
+    private static readonly Type[] _defaultTypes =
+    [
+        typeof(ContentDeletedWebhookEvent),
+        typeof(ContentPublishedWebhookEvent),
+        typeof(ContentUnpublishedWebhookEvent),
+        typeof(MediaDeletedWebhookEvent),
+        typeof(MediaSavedWebhookEvent),
+    ];
+
     /// <summary>
     /// Adds the default webhook events.
     /// </summary>
@@ -21,12 +30,7 @@ public static class WebhookEventCollectionBuilderCmsExtensions
     /// </remarks>
     public static WebhookEventCollectionBuilderCms AddDefault(this WebhookEventCollectionBuilderCms builder)
     {
-        builder.Builder
-            .Add<ContentDeletedWebhookEvent>()
-            .Add<ContentPublishedWebhookEvent>()
-            .Add<ContentUnpublishedWebhookEvent>()
-            .Add<MediaDeletedWebhookEvent>()
-            .Add<MediaSavedWebhookEvent>();
+        builder.Builder.Add(_defaultTypes);
 
         return builder;
     }
@@ -40,12 +44,10 @@ public static class WebhookEventCollectionBuilderCmsExtensions
     /// </returns>
     public static WebhookEventCollectionBuilderCms RemoveDefault(this WebhookEventCollectionBuilderCms builder)
     {
-        builder.Builder
-            .Remove<ContentDeletedWebhookEvent>()
-            .Remove<ContentPublishedWebhookEvent>()
-            .Remove<ContentUnpublishedWebhookEvent>()
-            .Remove<MediaDeletedWebhookEvent>()
-            .Remove<MediaSavedWebhookEvent>();
+        foreach (Type type in _defaultTypes)
+        {
+            builder.Builder.Remove(type);
+        }
 
         return builder;
     }
