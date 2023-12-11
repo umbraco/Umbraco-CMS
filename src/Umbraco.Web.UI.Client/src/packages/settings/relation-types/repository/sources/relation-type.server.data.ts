@@ -55,6 +55,8 @@ export class UmbRelationTypeServerDataSource
 	 * @memberof UmbRelationTypeServerDataSource
 	 */
 	async createScaffold(parentId: string | null) {
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
 		const data: RelationTypeResponseModel = {};
 
 		return { data };

@@ -196,6 +196,8 @@ export class UmbTemplateRepository
 		return { data, error, asObservable: () => this.#itemStore!.items(ids) };
 	}
 
+	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+	// @ts-ignore
 	async items(uniques: string[]): any {
 		throw new Error('items method is not implemented in UmbTemplateRepository');
 	}
