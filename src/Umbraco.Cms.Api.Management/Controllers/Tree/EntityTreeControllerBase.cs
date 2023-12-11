@@ -74,8 +74,7 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
     }
 
     protected virtual IEntitySlim[] GetPagedRootEntities(long pageNumber, int pageSize, out long totalItems)
-    {
-        return EntityService
+        => EntityService
             .GetPagedChildren(
                 Constants.System.Root,
                 ItemObjectType,
@@ -84,7 +83,6 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
                 out totalItems,
                 ordering: ItemOrdering)
             .ToArray();
-    }
 
     protected virtual IEntitySlim[] GetPagedChildEntities(Guid parentKey, long pageNumber, int pageSize, out long totalItems)
     {

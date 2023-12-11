@@ -83,8 +83,8 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
         if (take == 0)
         {
             return parentId is null
-                ? new PagedModel<IDictionaryItem>(await CountRootAsync(),Enumerable.Empty<IDictionaryItem>())
-                : new PagedModel<IDictionaryItem>(await CountChildrenAsync(parentId.Value),Enumerable.Empty<IDictionaryItem>());
+                ? new PagedModel<IDictionaryItem>(await CountRootAsync(), Enumerable.Empty<IDictionaryItem>())
+                : new PagedModel<IDictionaryItem>(await CountChildrenAsync(parentId.Value), Enumerable.Empty<IDictionaryItem>());
         }
 
         IDictionaryItem[] items = (parentId is null

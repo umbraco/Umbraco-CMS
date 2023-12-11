@@ -309,8 +309,8 @@ public interface IEntityService
     /// <remarks>When a new content or a media is saved with the key, it will have the reserved identifier.</remarks>
     int ReserveId(Guid key);
 
-    int CountChildren(
-        int id,
-        UmbracoObjectTypes objectType,
-        IQuery<IUmbracoEntity>? filter = null);
+    /// <summary>
+    ///     Counts the children of an entity
+    /// </summary>
+    int CountChildren(int id, UmbracoObjectTypes objectType, IQuery<IUmbracoEntity>? filter = null);
 }
