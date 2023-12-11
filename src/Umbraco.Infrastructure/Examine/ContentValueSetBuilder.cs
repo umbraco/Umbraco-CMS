@@ -10,7 +10,6 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Web.Common.DependencyInjection;
 using Umbraco.Extensions;
-using IScope = Umbraco.Cms.Infrastructure.Scoping.IScope;
 
 namespace Umbraco.Cms.Infrastructure.Examine;
 
@@ -23,12 +22,13 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
     private static readonly object[] NoValue = new[] { "n" };
     private static readonly object[] YesValue = new[] { "y" };
 
-    private readonly IScopeProvider _scopeProvider;
+    private readonly ICoreScopeProvider _scopeProvider;
 
     private readonly IShortStringHelper _shortStringHelper;
     private readonly UrlSegmentProviderCollection _urlSegmentProviders;
     private readonly IUserService _userService;
     private readonly ILocalizationService _localizationService;
+    private readonly IContentTypeService _contentTypeService;
     private readonly ILogger<ContentValueSetBuilder> _logger;
 
     public ContentValueSetBuilder(
@@ -36,9 +36,10 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
         UrlSegmentProviderCollection urlSegmentProviders,
         IUserService userService,
         IShortStringHelper shortStringHelper,
-        IScopeProvider scopeProvider,
+        ICoreScopeProvider scopeProvider,
         bool publishedValuesOnly,
         ILocalizationService localizationService,
+        IContentTypeService contentTypeService,
         ILogger<ContentValueSetBuilder> logger)
         : base(propertyEditors, publishedValuesOnly)
     {
@@ -47,12 +48,36 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
         _shortStringHelper = shortStringHelper;
         _scopeProvider = scopeProvider;
         _localizationService = localizationService;
+        _contentTypeService = contentTypeService;
         _logger = logger;
     }
 
-    [Obsolete("Use the constructor that takes an  ILogger<ContentValueSetBuilder>, scheduled for removal in v14")]
+    [Obsolete("Use non-obsolete ctor, scheduled for removal in v14")]
     public ContentValueSetBuilder(
-         PropertyEditorCollection propertyEditors,
+        PropertyEditorCollection propertyEditors,
+        UrlSegmentProviderCollection urlSegmentProviders,
+        IUserService userService,
+        IShortStringHelper shortStringHelper,
+        ICoreScopeProvider scopeProvider,
+        bool publishedValuesOnly,
+        ILocalizationService localizationService,
+        IContentTypeService contentTypeService)
+        : this(
+            propertyEditors,
+            urlSegmentProviders,
+            userService,
+            shortStringHelper,
+            scopeProvider,
+            publishedValuesOnly,
+            localizationService,
+            StaticServiceProvider.Instance.GetRequiredService<IContentTypeService>(),
+            StaticServiceProvider.Instance.GetRequiredService<ILogger<ContentValueSetBuilder>>())
+    {
+    }
+
+    [Obsolete("Use non-obsolete ctor, scheduled for removal in v14")]
+    public ContentValueSetBuilder(
+        PropertyEditorCollection propertyEditors,
         UrlSegmentProviderCollection urlSegmentProviders,
         IUserService userService,
         IShortStringHelper shortStringHelper,
@@ -67,11 +92,12 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
             scopeProvider,
             publishedValuesOnly,
             localizationService,
+            StaticServiceProvider.Instance.GetRequiredService<IContentTypeService>(),
             StaticServiceProvider.Instance.GetRequiredService<ILogger<ContentValueSetBuilder>>())
     {
     }
 
-    [Obsolete("Use the constructor that takes an ILocalizationService and  ILogger<ContentValueSetBuilder>, scheduled for removal in v14")]
+    [Obsolete("Use non-obsolete ctor, scheduled for removal in v14")]
     public ContentValueSetBuilder(
         PropertyEditorCollection propertyEditors,
         UrlSegmentProviderCollection urlSegmentProviders,
@@ -87,6 +113,7 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
             scopeProvider,
             publishedValuesOnly,
             StaticServiceProvider.Instance.GetRequiredService<ILocalizationService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IContentTypeService>(),
             StaticServiceProvider.Instance.GetRequiredService<ILogger<ContentValueSetBuilder>>())
     {
     }
@@ -99,7 +126,7 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
 
         // We can lookup all of the creator/writer names at once which can save some
         // processing below instead of one by one.
-        using (IScope scope = _scopeProvider.CreateScope())
+        using (ICoreScope scope = _scopeProvider.CreateCoreScope())
         {
             creatorIds = _userService.GetProfilesById(content.Select(x => x.CreatorId).ToArray())
                 .ToDictionary(x => x.Id, x => x);
@@ -113,6 +140,8 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
 
     private IEnumerable<ValueSet> GetValueSetsEnumerable(IContent[] content, Dictionary<int, IProfile> creatorIds, Dictionary<int, IProfile> writerIds)
     {
+        IDictionary<Guid, IContentType> contentTypeDictionary = _contentTypeService.GetAll().ToDictionary(x => x.Key);
+
         // TODO: There is a lot of boxing going on here and ultimately all values will be boxed by Lucene anyways
         // but I wonder if there's a way to reduce the boxing that we have to do or if it will matter in the end since
         // Lucene will do it no matter what? One idea was to create a `FieldValue` struct which would contain `object`, `object[]`, `ValueType` and `ValueType[]`
@@ -191,7 +220,7 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
                 {
                     try
                     {
-                        AddPropertyValue(property, null, null, values, availableCultures);
+                        AddPropertyValue(property, null, null, values, availableCultures, contentTypeDictionary);
                     }
                     catch (JsonSerializationException ex)
                     {
@@ -205,7 +234,7 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
                     {
                         try
                         {
-                            AddPropertyValue(property, culture.ToLowerInvariant(), null, values, availableCultures);
+                            AddPropertyValue(property, culture.ToLowerInvariant(), null, values, availableCultures, contentTypeDictionary);
                         }
                         catch (JsonSerializationException ex)
                         {

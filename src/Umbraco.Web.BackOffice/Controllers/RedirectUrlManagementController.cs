@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using System.Security;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -14,10 +15,12 @@ using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.Attributes;
+using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.BackOffice.Controllers;
 
+[Authorize(Policy = AuthorizationPolicies.SectionAccessContent)]
 [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
 public class RedirectUrlManagementController : UmbracoAuthorizedApiController
 {

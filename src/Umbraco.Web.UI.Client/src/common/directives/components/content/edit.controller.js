@@ -35,15 +35,18 @@
         $scope.activeApp = null;
 
         //initializes any watches
-        function startWatches(content) {
+        var watchers = [];
 
-            $scope.$watchGroup(['culture', 'segment'],
+        function startWatches(content) {
+            clearWatchers();
+
+            watchers.push($scope.$watchGroup(['culture', 'segment'],
             function (value, oldValue) {
                 createPreviewButton($scope.content, value[0], value[1]);
-            });
+            }));
 
             //watch for changes to isNew, set the page.isNew accordingly and load the breadcrumb if we can
-            $scope.$watch('isNew', function (newVal, oldVal) {
+            watchers.push($scope.$watch('isNew', function (newVal, oldVal) {
 
                 $scope.page.isNew = Object.toBoolean(newVal);
 
@@ -59,8 +62,12 @@
                             });
                     }
                 }
-            });
+            }));
+        }
 
+        function clearWatchers () {
+            watchers.forEach(w => w());
+            watchers = [];
         }
 
         //this initializes the editor with the data which will be called more than once if the data is re-loaded
@@ -109,6 +116,7 @@
             bindEvents();
 
             resetVariantFlags();
+            startWatches($scope.content);
         }
 
         function loadBreadcrumb() {
@@ -241,7 +249,6 @@
 
                     appendRuntimeData();
                     init();
-                    startWatches($scope.content);
 
                     syncTreeNode($scope.content, $scope.content.path, true);
 
@@ -265,7 +272,6 @@
 
                     appendRuntimeData();
                     init();
-                    startWatches($scope.content);
 
                     resetLastListPageNumber($scope.content);
 
@@ -346,7 +352,10 @@
                 labelKey: "buttons_saveAndPreview"
             };
 
-            const activeVariant = content.variants?.find((variant) => content.documentType?.variations === "Nothing" || variant.compositeId === compositeId);
+            let activeVariant = content.variants?.find((variant) => content.documentType?.variations === "Nothing" || variant.compositeId === compositeId);
+            /* if we can't find the active variant and there is only one variant available, we will use that.
+            this happens if we have a node that can vary by culture but there is only one language available. */
+            activeVariant = !activeVariant && content.variants.length === 1 ? content.variants[0] : activeVariant;
 
             $scope.previewSubButtons = activeVariant?.additionalPreviewUrls?.map((additionalPreviewUrl) => {
                 return {

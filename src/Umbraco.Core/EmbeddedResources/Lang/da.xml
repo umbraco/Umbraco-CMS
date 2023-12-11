@@ -477,9 +477,10 @@
     <key alias="confirmlogout">Er du sikker på at du vil forlade Umbraco?</key>
     <key alias="confirmSure">Er du sikker?</key>
     <key alias="cut">Klip</key>
-    <key alias="editdictionary">Rediger ordbogsnøgle</key>
-    <key alias="editlanguage">Rediger sprog</key>
+    <key alias="editDictionary">Rediger ordbogsnøgle</key>
+    <key alias="editLanguage">Rediger sprog</key>
     <key alias="editSelectedMedia">Rediger det valgte medie</key>
+    <key alias="editWebhook">Edit webhook</key>
     <key alias="insertAnchor">Indsæt lokalt link</key>
     <key alias="insertCharacter">Indsæt tegn</key>
     <key alias="insertgraphicheadline">Indsæt grafisk overskrift</key>
@@ -531,6 +532,7 @@
     <key alias="openInNewWindow">Åben linket i et nyt vindue eller fane</key>
     <key alias="linkToMedia">Link til medie</key>
     <key alias="selectContentStartNode">Vælg startnode for indhold</key>
+    <key alias="selectEvent">Vælg event</key>
     <key alias="selectMedia">Vælg medie</key>
     <key alias="selectMediaType">Vælg medietype</key>
     <key alias="selectIcon">Vælg ikon</key>
@@ -834,6 +836,7 @@
     <key alias="sort">Sortér</key>
     <key alias="status">Status</key>
     <key alias="submit">Indsend</key>
+    <key alias="success">Succes</key>
     <key alias="type">Type</key>
     <key alias="typeToSearch">Skriv for at søge...</key>
     <key alias="under">under</key>
@@ -1004,6 +1007,15 @@
     <key alias="welcomeIntro">
       <![CDATA[Denne guide vil bringe dig gennem konfigurationsprocessen af <strong>Umbraco %0%</strong> for en frisk installation eller for en opgradering fra version 3.0.<br/><br/>Tryk på <strong>Næste</strong> for at begynde på guiden.]]></key>
   </area>
+  <area alias="webhooks">
+    <key alias="addWebhook">Opret webhook</key>
+    <key alias="addWebhookHeader">Tilføj webhook header</key>
+    <key alias="addDocumentType">Tilføj dokument type</key>
+    <key alias="addMediaType">Tilføj medie Type</key>
+    <key alias="createHeader">Opret header</key>
+    <key alias="deliveries">Leverancer</key>
+    <key alias="noHeaders">Der er ikke tilføjet nogen webhook headers</key>
+  </area>
   <area alias="language">
     <key alias="cultureCode">Culture Code</key>
     <key alias="displayName">Culture Name</key>
@@ -1013,16 +1025,17 @@
     <key alias="renewSession">Forny for at gemme dine ændringer</key>
   </area>
   <area alias="login">
-    <key alias="greeting0">Så er det søndag!</key>
-    <key alias="greeting1">Smil, det er mandag!</key>
-    <key alias="greeting2">Hurra, det er tirsdag!</key>
-    <key alias="greeting3">Hvilken herlig onsdag!</key>
-    <key alias="greeting4">Glædelig torsdag!</key>
-    <key alias="greeting5">Endelig fredag!</key>
-    <key alias="greeting6">Glædelig lørdag</key>
+    <key alias="greeting0">Velkommen</key>
+    <key alias="greeting1">Velkommen</key>
+    <key alias="greeting2">Velkommen</key>
+    <key alias="greeting3">Velkommen</key>
+    <key alias="greeting4">Velkommen</key>
+    <key alias="greeting5">Velkommen</key>
+    <key alias="greeting6">Velkommen</key>
     <key alias="instruction">Log ind nedenfor</key>
     <key alias="signInWith">Log ind med</key>
     <key alias="timeout">Din session er udløbet</key>
+    <key alias="userFailedLogin">Ups! Vi kunne ikke logge dig ind. Tjek at dit brugernavn og adgangskode er korrekt og prøv igen.</key>
     <key alias="bottomText">
       <![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">umbraco.com</a></p> ]]></key>
     <key alias="forgottenPassword">Glemt adgangskode?</key>
@@ -1214,6 +1227,41 @@ Mange hilsner fra Umbraco robotten
     <key alias="allowedItemTypes">Du kan kun vælge følgende type(r) dokumenter: %0%</key>
     <key alias="pickedTrashedItem">Du har valgt et dokument som er slettet eller lagt i papirkurven</key>
     <key alias="pickedTrashedItems">Du har valgt dokumenter som er slettede eller lagt i papirkurven</key>
+    <key alias="specifyPickerRootTitle">Afgræns udgangspunktet</key>
+    <key alias="defineRootNode">Vælg udgangspunkt</key>
+    <key alias="defineXPathOrigin">Definer med XPath</key>
+    <key alias="defineDynamicRoot">Definer Dynamisk Udgangspunkt</key>
+  </area>
+  <area alias="dynamicRoot">
+    <key alias="configurationTitle">Dynamisk udgangspunkts forespørgsel</key>
+    <key alias="pickDynamicRootOriginTitle">Vælg begyndelsen</key>
+    <key alias="pickDynamicRootOriginDesc">Beskriv begyndelsen for dynamisk udgangspunkts forespørgselen</key>
+    <key alias="originRootTitle">Roden</key>
+    <key alias="originRootDesc">Rod noden for denne kilde</key>
+    <key alias="originParentTitle">Overliggende</key>
+    <key alias="originParentDesc">Den overliggende node af kilden i denne redigerings session</key>
+    <key alias="originCurrentTitle">Nuværende</key>
+    <key alias="originCurrentDesc">Kilde noden for denne redigerings session</key>
+    <key alias="originSiteTitle">Siden</key>
+    <key alias="originSiteDesc">Nærmeste node med et domæne</key>
+    <key alias="originByKeyTitle">Specifik Node</key>
+    <key alias="originByKeyDesc">Vælg en specifik Node</key>
+    <key alias="pickDynamicRootQueryStepTitle">Tilføj skridt til forespørgsel</key>
+    <key alias="pickDynamicRootQueryStepDesc">Specificer næste skridt i din dynamisk udgangspunkts forespørgsel</key>
+    <key alias="queryStepNearestAncestorOrSelfTitle">Nærmeste forældre eller selv</key>
+    <key alias="queryStepNearestAncestorOrSelfDesc">Forespørg the nærmeste forældre eller selv der passer på en af de givne typer</key>
+    <key alias="queryStepFurthestAncestorOrSelfTitle">Fjerneste forældre eller selv</key>
+    <key alias="queryStepFurthestAncestorOrSelfDesc">Forespørg fjerneste forældre eller selv der passer på en af de givne typer</key>
+    <key alias="queryStepNearestDescendantOrSelfTitle">Nærmeste barn eller selv</key>
+    <key alias="queryStepNearestDescendantOrSelfDesc">Forespørg nærmeste barn eller selv der passer på en af de givne typer</key>
+    <key alias="queryStepFurthestDescendantOrSelfTitle">Fjerneste barn eller selv</key>
+    <key alias="queryStepFurthestDescendantOrSelfDesc">Forespørg fjerneste barn eller selv der passer på en af de givne typer</key>
+    <key alias="queryStepCustomTitle">Brugerdefineret</key>
+    <key alias="queryStepCustomDesc">Forespørg med et skræddersyet forespørgsels skridt</key>
+    <key alias="addQueryStep">Tilføj skridt</key>
+    <key alias="queryStepTypes">der passer med typerne: </key>
+    <key alias="noValidStartNodeTitle">Intet passende indhold</key>
+    <key alias="noValidStartNodeDesc">Konfigurationen af dette felt passer ikke med noget indhold. Opret det manglende indhold eller kontakt din adminnistrator for at tilpasse Dynamisk Udgangspunkts Forespørgselen for dette felt.</key>
   </area>
   <area alias="mediaPicker">
     <key alias="deletedItem">Slettet medie</key>
@@ -1421,6 +1469,7 @@ Mange hilsner fra Umbraco robotten
     </key>
     <key alias="copySuccessMessage">Dit systems information er blevet kopieret til udklipsholderen</key>
     <key alias="cannotCopyInformation">Kunne desværre ikke kopiere dit systems information til udklipsholderen</key>
+    <key alias="webhookSaved">Webhook gemt</key>
   </area>
   <area alias="stylesheet">
     <key alias="addRule">Tilføj style</key>
@@ -1806,6 +1855,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="settingsGroup">Indstillinger</key>
     <key alias="templatingGroup">Design og layout</key>
     <key alias="thirdPartyGroup">Tredjepart</key>
+    <key alias="webhooks">Webhooks</key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">Ny opdatering er klar</key>
@@ -2278,6 +2328,8 @@ Mange hilsner fra Umbraco robotten
     <key alias="configureArea">Konfigurer område</key>
     <key alias="deleteArea">Slet område</key>
     <key alias="addColumnSpanOption">Tilføj mulighed for %0% kolonner</key>
+    <key alias="insertBlock">Indsæt Blok</key>
+    <key alias="labelInlineMode">Vis på linje med tekst</key>
   </area>
   <area alias="contentTemplatesDashboard">
     <key alias="whatHeadline">Hvad er Indholdsskabeloner?</key>

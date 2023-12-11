@@ -9,11 +9,11 @@
  * @doc https://www.tiny.cloud/docs/tinymce/6/
  */
 function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, stylesheetResource, macroResource, macroService,
-  $routeParams, umbRequestHelper, angularHelper, userService, editorService, entityResource, eventsService, localStorageService, mediaHelper, fileManager) {
+  $routeParams, umbRequestHelper, angularHelper, userService, editorService, entityResource, eventsService, localStorageService, mediaHelper, fileManager, $compile) {
 
   //These are absolutely required in order for the macros to render inline
   //we put these as extended elements because they get merged on top of the normal allowed elements by tiny mce
-  var extendedValidElements = "@[id|class|style],-div[id|dir|class|align|style],ins[datetime|cite],-ul[class|style],-li[class|style],-h1[id|dir|class|align|style],-h2[id|dir|class|align|style],-h3[id|dir|class|align|style],-h4[id|dir|class|align|style],-h5[id|dir|class|align|style],-h6[id|style|dir|class|align],span[id|class|style|lang],figure,figcaption";
+  var extendedValidElements = "@[id|class|style],umb-rte-block[!data-content-udi],-umb-rte-block-inline[!data-content-udi],-div[id|dir|class|align|style],ins[datetime|cite],-ul[class|style],-li[class|style],-h1[id|dir|class|align|style],-h2[id|dir|class|align|style],-h3[id|dir|class|align|style],-h4[id|dir|class|align|style],-h5[id|dir|class|align|style],-h6[id|style|dir|class|align],span[id|class|style|lang],figure,figcaption";
   var fallbackStyles = [
     {
       title: 'Headers', items: [
@@ -389,6 +389,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
         var config = {
           inline: modeInline,
           plugins: plugins,
+          custom_elements: 'umb-rte-block,~umb-rte-block-inline',
           valid_elements: tinyMceConfig.validElements,
           invalid_elements: tinyMceConfig.inValidElements,
           extended_valid_elements: extendedValidElements,
@@ -481,7 +482,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
           Utilities.extend(config, tinyMceConfig.customConfig);
         }
 
-        if(!config.style_formats || !config.style_formats.length){
+        if(!config.style_formats || !config.style_formats.length) {
           // if we have no style_formats at this point we'll revert to using the default ones (fallbackStyles)
           config.style_formats = fallbackStyles;
         }
@@ -669,6 +670,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
         }
       });
     },
+
     /**
      * @ngdoc method
      * @name umbraco.services.tinyMceService#insetMediaInEditor
@@ -734,6 +736,91 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             imgElm.onload = onImageLoaded;
           }
 
+        });
+
+      }
+    },
+
+
+
+    /**
+     * @ngdoc method
+     * @name umbraco.services.tinyMceService#createBlockPicker
+     * @methodOf umbraco.services.tinyMceService
+     *
+     * @description
+     * Creates the umbraco insert block tinymce plugin
+     *
+     * @param {Object} editor the TinyMCE editor instance
+     */
+    createBlockPicker: function (editor, blockEditorApi, callback) {
+
+      editor.on('preInit', function (args) {
+        editor.serializer.addRules('umb-rte-block');
+
+        /** This checks if the div is a block element*/
+        editor.serializer.addNodeFilter('umb-rte-block', function (nodes, name) {
+          for (var i = 0; i < nodes.length; i++) {
+
+            const blockEl = nodes[i];
+            /*
+            const block = blockEditorApi.getBlockByContentUdi(blockEl.attr("data-content-udi"));
+            if(block) {
+              const displayAsBlock = block.config.displayInline !== true;
+              */
+
+              /* if the block is set to display inline, checks if its wrapped in a p tag and then unwraps it (removes p tag) */
+              if (blockEl.parent && blockEl.parent.name.toUpperCase() === "P") {
+                blockEl.parent.unwrap();
+              }
+            //}
+
+          }
+        });
+      });
+
+      editor.ui.registry.addButton('umbblockpicker', {
+        icon: 'visualblocks',
+        tooltip: 'Insert Block',
+        stateSelector: 'umb-rte-block[data-content-udi], umb-rte-block-inline[data-content-udi]',
+        onAction: function () {
+
+          var blockEl = editor.selection.getNode();
+          var blockUdi;
+
+          if (blockEl.nodeName === 'UMB-RTE-BLOCK' || blockEl.nodeName === 'UMB-RTE-BLOCK-INLINE') {
+            blockUdi = blockEl.getAttribute("data-content-udi") ?? undefined;
+          }
+
+          if (callback) {
+            angularHelper.safeApply($rootScope, function () {
+              callback(blockUdi);
+            });
+          }
+        }
+      });
+    },
+
+    /**
+     * @ngdoc method
+     * @name umbraco.services.tinyMceService#insetBlockInEditor
+     * @methodOf umbraco.services.tinyMceService
+     *
+     * @description
+     * Inserts the block element in tinymce plugin
+     *
+     * @param {Object} blockUdi UDI of Block to insert
+     */
+    insertBlockInEditor: function (editor, blockContentUdi, displayInline) {
+      if (blockContentUdi) {
+        if(displayInline) {
+          editor.selection.setContent('<umb-rte-block-inline data-content-udi="'+blockContentUdi+'"><!--Umbraco-Block--></umb-rte-block-inline>');
+        } else {
+          editor.selection.setContent('<umb-rte-block data-content-udi="'+blockContentUdi+'"><!--Umbraco-Block--></umb-rte-block>');
+        }
+
+        angularHelper.safeApply($rootScope, function () {
+          editor.dispatch("Change");
         });
 
       }
@@ -1270,9 +1357,15 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
       if (!args.editor) {
         throw "args.editor is required";
       }
-      //if (!args.model.value) {
-      //    throw "args.model.value is required";
-      //}
+      if (!args.scope) {
+        args.scope = $rootScope;
+      }
+      if (args.getValue && !args.setValue) {
+         throw "args.setValue is required when getValue is set";
+      }
+      if (args.setValue && !args.getValue) {
+        throw "args.getValue is required when setValue is set";
+     }
 
       // force TinyMCE to load plugins/themes from minified files (see http://archive.tinymce.com/wiki.php/api4:property.tinymce.suffix.static)
       args.editor.suffix = ".min";
@@ -1282,15 +1375,24 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
       var unwatch = null;
 
+      const getPropertyValue = args.getValue ? args.getValue : function () {
+        return args.model.value
+      }
+      const setPropertyValue = args.setValue ? args.setValue : function (newVal) {
+        args.model.value = newVal;
+      }
+
       //Starts a watch on the model value so that we can update TinyMCE if the model changes behind the scenes or from the server
       function startWatch() {
-        unwatch = $rootScope.$watch(() => args.model.value, function (newVal, oldVal) {
+
+        unwatch = args.scope.$watch(() => getPropertyValue(), function (newVal, oldVal) {
           if (newVal !== oldVal) {
             //update the display val again if it has changed from the server;
             //uses an empty string in the editor when the value is null
             args.editor.setContent(newVal || "", { format: 'raw' });
+            initBlocks();
 
-            //we need to manually dispatch this event since it is only ever dispatchd based on loading from the DOM, this
+            // we need to manually dispatch this event since it is only ever dispatched based on loading from the DOM, this
             // is required for our plugins listening to this event to execute
             args.editor.dispatch('LoadContent', null);
           }
@@ -1306,14 +1408,17 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
       function syncContent() {
 
-        if (args.model.value === args.editor.getContent()) {
+        const content = args.editor.getContent()
+
+        if (getPropertyValue() === content) {
           return;
         }
 
         //stop watching before we update the value
         stopWatch();
         angularHelper.safeApply($rootScope, function () {
-          args.model.value = args.editor.getContent();
+
+          setPropertyValue(content);
 
           //make the form dirty manually so that the track changes works, setting our model doesn't trigger
           // the angular bits because tinymce replaces the textarea.
@@ -1328,6 +1433,55 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
         //re-watch the value
         startWatch();
+      }
+
+      function initBlocks() {
+
+        const blockEls = args.editor.contentDocument.querySelectorAll('umb-rte-block, umb-rte-block-inline');
+        for (var blockEl of blockEls) {
+          if(!blockEl._isInitializedUmbBlock) {
+            const blockContentUdi = blockEl.getAttribute('data-content-udi');
+            if(blockContentUdi && !blockEl.$block) {
+              const block = args.blockEditorApi.getBlockByContentUdi(blockContentUdi);
+              if(block) {
+                blockEl.removeAttribute('contenteditable');
+
+                if(block.config.displayInline && blockEl.nodeName.toLowerCase() === 'umb-rte-block') {
+                  // Change element name:
+                  const oldBlockEl = blockEl;
+                  blockEl = document.createElement('umb-rte-block-inline');
+                  blockEl.appendChild(document.createComment("Umbraco-Block"));
+                  blockEl.setAttribute('data-content-udi', blockContentUdi);
+                  oldBlockEl.parentNode.replaceChild(blockEl, oldBlockEl);
+                } else if(!block.config.displayInline && blockEl.nodeName.toLowerCase() === 'umb-rte-block-inline') {
+                  // Change element name:
+                  const oldBlockEl = blockEl;
+                  blockEl = document.createElement('umb-rte-block');
+                  blockEl.appendChild(document.createComment("Umbraco-Block"));
+                  blockEl.setAttribute('data-content-udi', blockContentUdi);
+                  oldBlockEl.parentNode.replaceChild(blockEl, oldBlockEl);
+                }
+
+                blockEl.$index = block.index;
+                blockEl.$block = block;
+                blockEl.$api = args.blockEditorApi;
+                blockEl.$culture = args.culture;
+                blockEl.$segment = args.segment;
+                blockEl.$parentForm = args.parentForm;
+                blockEl.$valFormManager = args.valFormManager;
+                $compile(blockEl)(args.scope);
+                blockEl.setAttribute('contenteditable', 'false');
+                //blockEl.setAttribute('draggable', 'true');
+
+              } else {
+                blockEl.removeAttribute('data-content-udi');
+                args.editor.dom.remove(blockEl);
+              }
+            } else {
+              args.editor.dom.remove(blockEl);
+            }
+          }
+        }
       }
 
       // If we can not find the insert image/media toolbar button
@@ -1413,12 +1567,15 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
           });
         }
 
+        initBlocks();
+
       });
 
       args.editor.on('init', function () {
 
-        if (args.model.value) {
-          args.editor.setContent(args.model.value);
+        const currentValue = getPropertyValue();
+        if (currentValue) {
+          args.editor.setContent(currentValue);
         }
 
         //enable browser based spell checking
@@ -1526,7 +1683,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
       //create link picker
       self.createLinkPicker(args.editor, function (currentTarget, anchorElement) {
 
-        entityResource.getAnchors(args.model.value).then(anchorValues => {
+        entityResource.getAnchors(getPropertyValue()).then(anchorValues => {
 
           const linkPicker = {
             currentTarget: currentTarget,
@@ -1581,6 +1738,21 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
           }
         };
         editorService.mediaPicker(mediaPicker);
+      });
+
+
+      //Create the insert block plugin
+      self.createBlockPicker(args.editor, args.blockEditorApi, function (currentTarget, userData, imgDomElement) {
+        args.blockEditorApi.showCreateDialog(0, false, (newBlock) => {
+          // TODO: Handle if its an array:
+          if(Utilities.isArray(newBlock)) {
+            newBlock.forEach(block => {
+              self.insertBlockInEditor(args.editor, block.layout.contentUdi, block.config.displayInline);
+            });
+          } else {
+            self.insertBlockInEditor(args.editor, newBlock.layout.contentUdi, newBlock.config.displayInline);
+          }
+        });
       });
 
       //Create the embedded plugin

@@ -188,7 +188,7 @@ internal sealed class ContentSaveValidationAttribute : TypeFilterAttribute
                     break;
                 case ContentSaveAction.Schedule:
                     permissionToCheck.Add(ActionUpdate.ActionLetter);
-                    permissionToCheck.Add(ActionToPublish.ActionLetter);
+                    permissionToCheck.Add(ActionPublish.ActionLetter);
                     contentToCheck = contentItem.PersistedContent;
                     contentIdToCheck = contentToCheck?.Id ?? default;
                     break;
@@ -277,6 +277,7 @@ internal sealed class ContentSaveValidationAttribute : TypeFilterAttribute
 
             if (!authorizationResult.Succeeded)
             {
+                actionContext.Result = new ForbidResult();
                 return false;
             }
 
