@@ -18,6 +18,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers;
 ///     Backoffice controller supporting the dashboard for language administration.
 /// </summary>
 [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
+[Authorize(Policy = AuthorizationPolicies.SectionAccessSettings)]
 public class LanguageController : UmbracoAuthorizedJsonController
 {
     private readonly ILocalizationService _localizationService;
