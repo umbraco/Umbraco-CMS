@@ -9,7 +9,6 @@ public class RootDictionaryTreeControllerTests : ManagementApiUserGroupTestBase<
     protected override Expression<Func<RootDictionaryTreeController, object>> MethodSelector =>
         x => x.Root(0, 100);
 
-
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
         ExpectedStatusCode = HttpStatusCode.OK
