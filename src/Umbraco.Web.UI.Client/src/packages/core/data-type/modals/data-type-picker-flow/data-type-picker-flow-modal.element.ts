@@ -97,6 +97,8 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 		this.observe(
 			(await this.#treeRepository.requestRootTreeItems()).asObservable(),
 			(items) => {
+				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+				// @ts-ignore
 				this.#dataTypes = items;
 				this._performFiltering();
 			},

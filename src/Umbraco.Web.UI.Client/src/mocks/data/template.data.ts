@@ -186,6 +186,8 @@ class UmbTemplateData extends UmbEntityData<UmbMockTemplateModel> {
 		super(data);
 	}
 
+	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+	// @ts-ignore
 	getById(id: string): TemplateResponseModel | undefined {
 		const item = this.data.find((item) => item.id === id);
 		return item ? createTemplate(item) : undefined;

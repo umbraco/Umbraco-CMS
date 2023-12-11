@@ -66,6 +66,8 @@ export class UmbTemplateRepository
 
 	//#region DETAILS:
 
+	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+	// @ts-ignore
 	async createScaffold(parentId: string | null) {
 		await this.#init;
 		return this.#detailDataSource.createScaffold(parentId);

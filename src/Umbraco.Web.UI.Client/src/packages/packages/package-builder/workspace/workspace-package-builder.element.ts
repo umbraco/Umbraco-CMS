@@ -25,6 +25,8 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 	entityId?: string;
 
 	@state()
+	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+	// @ts-ignore
 	private _package: PackageDefinitionResponseModel = {};
 
 	@query('#package-name-input')

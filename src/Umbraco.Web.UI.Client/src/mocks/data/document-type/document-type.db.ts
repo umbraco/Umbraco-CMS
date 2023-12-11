@@ -26,6 +26,8 @@ class UmbDocumentTypeData extends UmbEntityData<UmbMockDocumentTypeModel> {
 	}
 
 	update(id: string, item: DocumentTypeResponseModel) {
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
 		super.save(id, item);
 	}
 
@@ -58,6 +60,8 @@ class UmbDocumentTypeData extends UmbEntityData<UmbMockDocumentTypeModel> {
 }
 
 export const createDocumentTypeTreeItem = (item: DocumentTypeResponseModel): DocumentTypeTreeItemResponseModel => {
+	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+	// @ts-ignore
 	return {
 		...createEntityTreeItem(item),
 		type: 'document-type',

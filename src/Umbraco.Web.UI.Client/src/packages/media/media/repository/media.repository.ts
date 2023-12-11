@@ -74,6 +74,8 @@ export class UmbMediaRepository
 
 	// DETAILS:
 
+	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+	// @ts-ignore
 	async createScaffold(parentId: string | null) {
 		if (parentId === undefined) throw new Error('Parent id is missing');
 		await this.#init;
