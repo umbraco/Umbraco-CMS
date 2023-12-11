@@ -33,7 +33,13 @@ export class UmbBackofficeNotificationContainerElement extends UmbLitElement {
 			this._notifications = notifications;
 
 			// Close and instantly open the popover again to make sure it stays on top of all other content on the page
+			// TODO: This ignorer is just needed for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
 			this._notificationsElement?.hidePopover();
+			// TODO: This ignorer is just needed for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
 			this._notificationsElement?.showPopover();
 		});
 	}
