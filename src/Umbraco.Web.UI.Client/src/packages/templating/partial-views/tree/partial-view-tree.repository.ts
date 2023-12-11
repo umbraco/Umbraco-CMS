@@ -19,7 +19,7 @@ export class UmbPartialViewTreeRepository
 		const data = {
 			id: null,
 			path: null,
-			type: UMB_PARTIAL_VIEW_ROOT_ENTITY_TYPE,
+			entityType: UMB_PARTIAL_VIEW_ROOT_ENTITY_TYPE,
 			name: 'Partial Views',
 			icon: 'icon-folder',
 			hasChildren: true,

@@ -46,5 +46,6 @@ const mapper = (item: EntityTreeItemResponseModel): UmbMemberTypeTreeItemModel =
 		entityType: 'member-type',
 		hasChildren: item.hasChildren,
 		isContainer: item.isContainer,
+		isFolder: false,
 	};
 };

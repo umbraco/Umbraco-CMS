@@ -50,5 +50,6 @@ const mapper = (item: MediaTreeItemResponseModel): UmbMediaTreeItemModel => {
 		isContainer: item.isContainer,
 		noAccess: item.noAccess,
 		isTrashed: item.isTrashed,
+		isFolder: false,
 	};
 };

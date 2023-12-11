@@ -17,7 +17,7 @@ export class UmbRelationTypeTreeRepository
 	async requestTreeRoot() {
 		const data = {
 			id: null,
-			type: UMB_RELATION_TYPE_ROOT_ENTITY_TYPE,
+			entityType: UMB_RELATION_TYPE_ROOT_ENTITY_TYPE,
 			name: 'Relation Types',
 			icon: 'icon-folder',
 			hasChildren: true,
