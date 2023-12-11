@@ -577,7 +577,7 @@ public class EntityService : RepositoryService, IEntityService
 
             if (pageSize == 0)
             {
-                totalRecords = _entityRepository.CountByQuery(query, objectType.GetGuid(), query);
+                totalRecords = _entityRepository.CountByQuery(query, objectType.GetGuid(), filter);
                 return Enumerable.Empty<IEntitySlim>();
             }
 

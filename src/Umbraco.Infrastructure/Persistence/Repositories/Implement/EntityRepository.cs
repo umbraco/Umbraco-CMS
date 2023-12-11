@@ -37,6 +37,12 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
         sql
             .From<NodeDto>();
         sql.WhereIn<NodeDto>(x => x.NodeObjectType, new[] { objectType } );
+
+        foreach (Tuple<string, object[]> queryClause in query.GetWhereClauses())
+        {
+            sql.Where(queryClause.Item1, queryClause.Item2);
+        }
+
         if (filter is not null)
         {
             foreach (Tuple<string, object[]> filterClause in filter.GetWhereClauses())
@@ -44,6 +50,7 @@ internal class EntityRepository : RepositoryBase, IEntityRepositoryExtended
                 sql.Where(filterClause.Item1, filterClause.Item2);
             }
         }
+
         return Database.ExecuteScalar<int>(sql);
     }
 
