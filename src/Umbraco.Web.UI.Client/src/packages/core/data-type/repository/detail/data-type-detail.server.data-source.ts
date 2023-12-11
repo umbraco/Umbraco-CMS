@@ -35,7 +35,7 @@ export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataT
 	 */
 	async createScaffold(parentUnique: string | null) {
 		const data: UmbDataTypeDetailModel = {
-			type: 'data-type',
+			entityType: 'data-type',
 			unique: UmbId.new(),
 			parentUnique,
 			name: '',
@@ -64,7 +64,7 @@ export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataT
 
 		// TODO: make data mapper to prevent errors
 		const dataType = {
-			type: 'data-type',
+			entityType: 'data-type',
 			unique: data.id,
 			parentUnique: data.parentId || null,
 			name: data.name,

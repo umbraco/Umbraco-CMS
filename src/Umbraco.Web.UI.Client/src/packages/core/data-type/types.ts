@@ -1,5 +1,5 @@
 export interface UmbDataTypeDetailModel {
-	type: string;
+	entityType: string;
 	unique: string;
 	parentUnique: string | null;
 	name: string;
