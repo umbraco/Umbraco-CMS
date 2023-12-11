@@ -335,7 +335,12 @@ namespace Umbraco.Web.Editors
             {
                 throw new HttpResponseException(HttpStatusCode.BadRequest);
             }
+
             var identityUser = await SignInManager.UserManager.FindByEmailAsync(model.Email);
+
+            Random random = new Random();
+            await Task.Delay(random.Next(400, 2500)); // To randomize response time preventing user enumeration
+
             if (identityUser != null)
             {
                 var user = Services.UserService.GetByEmail(model.Email);
@@ -349,11 +354,20 @@ namespace Umbraco.Web.Editors
                         UserExtensions.GetUserCulture(identityUser.Culture, Services.TextService, GlobalSettings),
                         new[] { identityUser.UserName, callbackUrl });
 
-                    await UserManager.SendEmailAsync(identityUser.Id,
-                        Services.TextService.Localize("login", "resetPasswordEmailCopySubject",
-                            // Ensure the culture of the found user is used for the email!
-                            UserExtensions.GetUserCulture(identityUser.Culture, Services.TextService, GlobalSettings)),
-                        message);
+                    try
+                    {
+                        await UserManager.SendEmailAsync(identityUser.Id,
+                            Services.TextService.Localize("login", "resetPasswordEmailCopySubject",
+                                // Ensure the culture of the found user is used for the email!
+                                UserExtensions.GetUserCulture(identityUser.Culture, Services.TextService,
+                                    GlobalSettings)),
+                            message);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Error<AuthenticationController>(ex, "Error sending email, please check your SMTP configuration: {ErrorMessage}", ex.Message);
+                        return Request.CreateResponse(HttpStatusCode.OK);
+                    }
 
                     UserManager.RaiseForgotPasswordRequestedEvent(user.Id);
                 }
