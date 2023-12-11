@@ -71,6 +71,8 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 			PackageResource.postPackageCreated({ requestBody: this._package }),
 		);
 		if (!response.data || response.error) return;
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
 		this._package = response.data as PackageDefinitionResponseModel;
 		this.#navigateBack();
 	}

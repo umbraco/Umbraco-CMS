@@ -36,6 +36,8 @@ export class UmbMediaTypeWorkspaceContext
 	constructor(host: UmbControllerHostElement) {
 		super(host, 'Umb.Workspace.MediaType', new UmbMediaTypeDetailRepository(host));
 
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
 		this.structure = new UmbContentTypePropertyStructureManager(this.host, this.repository);
 
 		// General for content types:
