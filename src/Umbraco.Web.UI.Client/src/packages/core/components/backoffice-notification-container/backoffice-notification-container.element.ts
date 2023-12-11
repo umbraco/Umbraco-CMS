@@ -56,7 +56,6 @@ export class UmbBackofficeNotificationContainerElement extends UmbLitElement {
 		UmbTextStyles,
 		css`
 			#notifications {
-				overflow: auto;
 				top: 0;
 				left: 0;
 				right: 0;
