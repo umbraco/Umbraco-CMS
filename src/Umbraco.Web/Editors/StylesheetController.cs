@@ -3,6 +3,7 @@ using System.Linq;
 using Umbraco.Core;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
+using Umbraco.Web.WebApi.Filters;
 
 namespace Umbraco.Web.Editors
 {
@@ -10,6 +11,7 @@ namespace Umbraco.Web.Editors
     /// The API controller used for retrieving available stylesheets
     /// </summary>
     [PluginController("UmbracoApi")]
+    [UmbracoApplicationAuthorize(Core.Constants.Applications.Settings)]
     public class StylesheetController : UmbracoAuthorizedJsonController
     {
         public IEnumerable<Stylesheet> GetAll()

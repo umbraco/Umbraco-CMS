@@ -18,6 +18,7 @@ namespace Umbraco.Web.Editors
     /// </summary>
     [PluginController("UmbracoApi")]
     [PrefixlessBodyModelValidator]
+    [UmbracoApplicationAuthorize(Core.Constants.Applications.Settings)]
     public class LanguageController : UmbracoAuthorizedJsonController
     {
         /// <summary>

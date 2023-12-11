@@ -25,6 +25,8 @@ namespace Umbraco.Web.Editors
             _logger = logger;
         }
 
+        private static bool IsEnabled => Current.Configs.Settings().WebRouting.DisableRedirectUrlTracking == false;
+
         /// <summary>
         /// Returns true/false of whether redirect tracking is enabled or not
         /// </summary>
@@ -32,9 +34,8 @@ namespace Umbraco.Web.Editors
         [HttpGet]
         public IHttpActionResult GetEnableState()
         {
-            var enabled = Current.Configs.Settings().WebRouting.DisableRedirectUrlTracking == false;
             var userIsAdmin = UmbracoContext.Security.CurrentUser.IsAdmin();
-            return Ok(new { enabled, userIsAdmin });
+            return Ok(new { enabled = IsEnabled, userIsAdmin });
         }
 
         //add paging
@@ -83,6 +84,11 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public IHttpActionResult DeleteRedirectUrl(Guid id)
         {
+            if (IsEnabled is false)
+            {
+                return BadRequest("Redirect tracking is disabled.");
+            }
+
             var redirectUrlService = Services.RedirectUrlService;
             redirectUrlService.Delete(id);
             return Ok();

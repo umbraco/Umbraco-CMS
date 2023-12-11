@@ -5,9 +5,11 @@ using Umbraco.Web.Composing;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.NuCache;
 using Umbraco.Web.WebApi;
+using Umbraco.Web.WebApi.Filters;
 
 namespace Umbraco.Web.Editors
 {
+    [UmbracoApplicationAuthorize(Core.Constants.Applications.Settings)]
     public class NuCacheStatusController : UmbracoAuthorizedApiController
     {
         private readonly IPublishedSnapshotService _publishedSnapshotService;
