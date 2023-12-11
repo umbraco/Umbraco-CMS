@@ -36,7 +36,7 @@ export class UmbUserCollectionServerDataSource implements UmbCollectionDataSourc
 			return { error };
 		}
 
-		const { items, totalItems } = data;
+		const { items, total } = data;
 
 		const mappedItems: Array<UmbUserDetailModel> = items.map((item: UserResponseModel) => {
 			const userDetail: UmbUserDetailModel = {
@@ -47,6 +47,6 @@ export class UmbUserCollectionServerDataSource implements UmbCollectionDataSourc
 			return userDetail;
 		});
 
-		return { items: mappedItems, totalItems };
+		return { data: { items: mappedItems, total } };
 	}
 }
