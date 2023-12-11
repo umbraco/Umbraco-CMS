@@ -217,6 +217,15 @@ namespace Umbraco.Core.Packaging
                     Directory.CreateDirectory(IOHelper.MapPath(_mediaFolderPath));
 
                 var packPath = _mediaFolderPath.EnsureEndsWith('/') + (definition.Name + "_" + definition.Version).Replace(' ', '_') + ".zip";
+
+                var absolutePackPath = Path.GetFullPath(IOHelper.MapPath(packPath));
+                var expectedRoot = Path.GetFullPath(IOHelper.MapPath(_mediaFolderPath.EnsureEndsWith('/')));
+
+                if (absolutePackPath.StartsWith(expectedRoot) == false)
+                {
+                    throw new IOException("Invalid path due to the package name");
+                }
+
                 ZipPackage(temporaryPath, IOHelper.MapPath(packPath));
 
                 //we need to update the package path and save it
