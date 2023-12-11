@@ -11,7 +11,12 @@ angular.module('umbraco').controller("Umbraco.LoginController", function (events
       //check if there's a returnPath query string, if so redirect to it
         var locationObj = $location.search();
         if (locationObj.returnPath) {
-            path = decodeURIComponent(locationObj.returnPath);
+            // ensure that the returnPath is a valid URL under the current origin (prevents DOM-XSS among other things)
+            const returnPath = decodeURIComponent(locationObj.returnPath);
+            const url = new URL(returnPath, window.location.origin);
+            if (url.origin === window.location.origin) {
+                path = returnPath;
+            }
         }
 
         // Ensure path is not absolute
