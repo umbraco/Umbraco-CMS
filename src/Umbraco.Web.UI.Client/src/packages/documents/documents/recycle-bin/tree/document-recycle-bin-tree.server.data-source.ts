@@ -49,5 +49,6 @@ const mapper = (item: RecycleBinItemResponseModel): UmbDocumentRecycleBinTreeIte
 		entityType: 'document-recycle-bin',
 		hasChildren: item.hasChildren,
 		isContainer: item.isContainer,
+		isFolder: false,
 	};
 };

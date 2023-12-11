@@ -1,7 +1,7 @@
 import { UmbDictionaryTreeItemModel } from './types.js';
-import { UmbEntityTreeItemModel, UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
+import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { DictionaryResource } from '@umbraco-cms/backoffice/backend-api';
+import { DictionaryResource, EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 /**
  * A data source for the Dictionary tree that fetches data from the server
@@ -10,7 +10,7 @@ import { DictionaryResource } from '@umbraco-cms/backoffice/backend-api';
  * @implements {UmbTreeDataSource}
  */
 export class UmbDictionaryTreeServerDataSource extends UmbTreeServerDataSourceBase<
-	UmbEntityTreeItemModel,
+	EntityTreeItemResponseModel,
 	UmbDictionaryTreeItemModel
 > {
 	/**
@@ -41,7 +41,7 @@ const getChildrenOf = (parentUnique: string | null) => {
 	}
 };
 
-const mapper = (item: UmbEntityTreeItemModel): UmbDictionaryTreeItemModel => {
+const mapper = (item: EntityTreeItemResponseModel): UmbDictionaryTreeItemModel => {
 	return {
 		id: item.id,
 		parentId: item.parentId || null,
@@ -49,5 +49,6 @@ const mapper = (item: UmbEntityTreeItemModel): UmbDictionaryTreeItemModel => {
 		entityType: 'dictionary-item',
 		hasChildren: item.hasChildren,
 		isContainer: item.isContainer,
+		isFolder: false,
 	};
 };

@@ -8,11 +8,11 @@ import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import {
 	CreateMediaTypeRequestModel,
 	MediaTypeResponseModel,
-	FolderTreeItemResponseModel,
 	UpdateMediaTypeRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
+import { UmbEntityTreeItemModel } from '@umbraco-cms/backoffice/tree';
 
 type ItemType = MediaTypeResponseModel;
 
@@ -159,7 +159,7 @@ export class UmbMediaTypeDetailRepository
 	}
 }
 
-export const createTreeItem = (item: ItemType): FolderTreeItemResponseModel => {
+export const createTreeItem = (item: ItemType): UmbEntityTreeItemModel => {
 	if (!item) throw new Error('item is null or undefined');
 	if (!item.id) throw new Error('item.id is null or undefined');
 

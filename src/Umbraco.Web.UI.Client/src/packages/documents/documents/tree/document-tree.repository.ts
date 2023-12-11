@@ -17,11 +17,12 @@ export class UmbDocumentTreeRepository
 	async requestTreeRoot() {
 		const data = {
 			id: null,
-			type: UMB_DOCUMENT_ROOT_ENTITY_TYPE,
+			entityType: UMB_DOCUMENT_ROOT_ENTITY_TYPE,
 			name: 'Documents',
 			icon: 'icon-folder',
 			hasChildren: true,
 			isContainer: false,
+			isFolder: false,
 		};
 
 		return { data };

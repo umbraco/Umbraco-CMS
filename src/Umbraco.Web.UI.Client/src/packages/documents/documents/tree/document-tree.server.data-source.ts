@@ -60,5 +60,6 @@ const mapper = (item: DocumentTreeItemResponseModel): UmbDocumentTreeItemModel =
 				state: variant.state!,
 			})) || [],
 		icon: item.icon,
+		isFolder: false,
 	};
 };

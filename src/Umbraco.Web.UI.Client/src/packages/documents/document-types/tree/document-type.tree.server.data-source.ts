@@ -49,5 +49,6 @@ const mapper = (item: DocumentTypeTreeItemResponseModel): UmbDocumentTypeTreeIte
 		entityType: 'document-type',
 		isContainer: item.isContainer,
 		hasChildren: item.hasChildren,
+		isFolder: item.isFolder,
 	};
 };

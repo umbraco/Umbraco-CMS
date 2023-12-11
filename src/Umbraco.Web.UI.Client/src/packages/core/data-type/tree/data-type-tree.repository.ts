@@ -17,11 +17,12 @@ export class UmbDataTypeTreeRepository
 	async requestTreeRoot() {
 		const data = {
 			unique: null,
-			type: UMB_DATA_TYPE_ROOT_ENTITY_TYPE,
+			entityType: UMB_DATA_TYPE_ROOT_ENTITY_TYPE,
 			name: 'Data Types',
 			icon: 'icon-folder',
 			hasChildren: true,
 			isContainer: false,
+			isFolder: false,
 		};
 
 		return { data };

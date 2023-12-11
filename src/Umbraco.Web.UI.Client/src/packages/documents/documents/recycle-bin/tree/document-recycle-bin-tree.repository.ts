@@ -17,11 +17,12 @@ export class UmbDocumentRecycleBinTreeRepository
 	async requestTreeRoot() {
 		const data = {
 			id: null,
-			type: UMB_DOCUMENT_RECYCLE_BIN_ROOT_ENTITY_TYPE,
+			entityType: UMB_DOCUMENT_RECYCLE_BIN_ROOT_ENTITY_TYPE,
 			name: 'Recycle Bin',
 			icon: 'icon-trash',
 			hasChildren: true,
 			isContainer: false,
+			isFolder: false,
 		};
 
 		return { data };

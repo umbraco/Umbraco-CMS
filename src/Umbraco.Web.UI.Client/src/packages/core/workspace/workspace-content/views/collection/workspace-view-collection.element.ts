@@ -2,11 +2,11 @@ import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { FolderTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import type { ManifestWorkspaceViewCollection } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 
 import '../../../../collection/dashboards/dashboard-collection.element.js';
+import { UmbTreeItemModelBase } from '@umbraco-cms/backoffice/tree';
 
 @customElement('umb-workspace-view-collection')
 export class UmbWorkspaceViewCollectionElement extends UmbLitElement {
@@ -15,7 +15,7 @@ export class UmbWorkspaceViewCollectionElement extends UmbLitElement {
 	private _workspaceContext?: typeof UMB_WORKSPACE_CONTEXT.TYPE;
 
 	// TODO: add type for the collection context.
-	private _collectionContext?: UmbDefaultCollectionContext<FolderTreeItemResponseModel, any>;
+	private _collectionContext?: UmbDefaultCollectionContext<UmbTreeItemModelBase, any>;
 
 	constructor() {
 		super();
