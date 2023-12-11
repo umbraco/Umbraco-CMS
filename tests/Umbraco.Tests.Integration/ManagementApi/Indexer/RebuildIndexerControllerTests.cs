@@ -40,8 +40,5 @@ public class RebuildIndexerControllerTests : ManagementApiUserGroupTestBase<Rebu
         ExpectedStatusCode = HttpStatusCode.Unauthorized
     };
 
-    protected override async Task<HttpResponseMessage> ClientRequest()
-    {
-        return await Client.PostAsync(Url, null);
-    }
+    protected override async Task<HttpResponseMessage> ClientRequest() => await Client.PostAsync(Url, null);
 }
