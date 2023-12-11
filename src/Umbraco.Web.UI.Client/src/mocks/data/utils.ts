@@ -41,6 +41,8 @@ export const createContentTreeItem = (item: any): ContentTreeItemResponseModel =
 };
 
 export const createDocumentTreeItem = (item: DocumentResponseModel): DocumentTreeItemResponseModel => {
+	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+	// @ts-ignore
 	return {
 		...createContentTreeItem(item),
 		type: 'document',
