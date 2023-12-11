@@ -1,7 +1,7 @@
 import { type UmbUserCollectionFilterModel, type UmbUserDetailModel } from '../../types.js';
 import { UMB_USER_ENTITY_TYPE } from '../../entity.js';
 import { UmbCollectionDataSource, extendDataSourcePagedResponseData } from '@umbraco-cms/backoffice/repository';
-import { UserResource } from '@umbraco-cms/backoffice/backend-api';
+import { UserResource, UserResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -30,9 +30,23 @@ export class UmbUserCollectionServerDataSource implements UmbCollectionDataSourc
 	 * @memberof UmbUserCollectionServerDataSource
 	 */
 	async getCollection(filter: UmbUserCollectionFilterModel) {
-		const response = await tryExecuteAndNotify(this.#host, UserResource.getUserFilter(filter));
-		return extendDataSourcePagedResponseData<UmbUserDetailModel>(response, {
-			entityType: UMB_USER_ENTITY_TYPE,
+		const { data, error } = await tryExecuteAndNotify(this.#host, UserResource.getUserFilter(filter));
+
+		if (error) {
+			return { error };
+		}
+
+		const { items, totalItems } = data;
+
+		const mappedItems: Array<UmbUserDetailModel> = items.map((item: UserResponseModel) => {
+			const userDetail: UmbUserDetailModel = {
+				entityType: UMB_USER_ENTITY_TYPE,
+				...item,
+			};
+
+			return userDetail;
 		});
+
+		return { items: mappedItems, totalItems };
 	}
 }
