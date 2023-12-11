@@ -37,7 +37,7 @@ export class UmbUserSetGroupsServerDataSource implements UmbUserSetGroupDataSour
 					userIds,
 					userGroupIds,
 				},
-			})
+			}),
 		);
 	}
 }

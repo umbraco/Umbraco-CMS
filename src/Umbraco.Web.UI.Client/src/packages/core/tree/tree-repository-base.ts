@@ -15,19 +15,19 @@ export class UmbTreeRepositoryBase<
 	implements UmbTreeRepository<TreeItemType, TreeRootType>, UmbApi
 {
 	protected _init: Promise<unknown>;
-	protected _treeStore?: UmbTreeStore;
-	#treeSource: UmbTreeDataSource;
+	protected _treeStore?: UmbTreeStore<TreeItemType>;
+	#treeSource: UmbTreeDataSource<TreeItemType, TreeRootType>;
 
 	constructor(
 		host: UmbControllerHost,
-		treeSource: UmbTreeDataSourceConstructor,
+		treeSource: UmbTreeDataSourceConstructor<TreeItemType, TreeRootType>,
 		treeStoreContextAlias: string | UmbContextToken<any, any>,
 	) {
 		super(host);
 		this.#treeSource = new treeSource(this);
 
 		this._init = this.consumeContext(treeStoreContextAlias, (instance) => {
-			this._treeStore = instance as UmbTreeStore;
+			this._treeStore = instance;
 		}).asPromise();
 	}
 

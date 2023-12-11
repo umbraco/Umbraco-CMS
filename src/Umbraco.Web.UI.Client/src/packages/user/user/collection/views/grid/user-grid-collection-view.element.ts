@@ -3,7 +3,7 @@ import { UmbUserCollectionContext } from '../../user-collection.context.js';
 import { type UmbUserDetailModel } from '../../../types.js';
 import { css, html, nothing, customElement, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UMB_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
+import { UMB_DEFAULT_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UserGroupResponseModel, UserStateModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbUserGroupCollectionRepository } from '@umbraco-cms/backoffice/user-group';
@@ -26,7 +26,7 @@ export class UmbUserGridCollectionViewElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_COLLECTION_CONTEXT, (instance) => {
+		this.consumeContext(UMB_DEFAULT_COLLECTION_CONTEXT, (instance) => {
 			this.#collectionContext = instance as UmbUserCollectionContext;
 			this.observe(
 				this.#collectionContext.selection.selection,

@@ -13,9 +13,9 @@ import {
 
 @customElement('umb-image-cropper-focus-setter')
 export class UmbImageCropperFocusSetterElement extends LitElement {
-	@query('#image') imageElement!: HTMLImageElement;
-	@query('#wrapper') wrapperElement!: HTMLImageElement;
-	@query('#focal-point') focalPointElement!: HTMLImageElement;
+	@query('#image') imageElement?: HTMLImageElement;
+	@query('#wrapper') wrapperElement?: HTMLImageElement;
+	@query('#focal-point') focalPointElement?: HTMLImageElement;
 
 	@property({ type: String }) src?: string;
 	@property({ attribute: false }) focalPoint: UmbImageCropperFocalPoint = { left: 0.5, top: 0.5 };
@@ -35,7 +35,7 @@ export class UmbImageCropperFocusSetterElement extends LitElement {
 	protected updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		super.updated(_changedProperties);
 
-		if (_changedProperties.has('focalPoint')) {
+		if (_changedProperties.has('focalPoint') && this.focalPointElement) {
 			this.focalPointElement.style.left = `calc(${this.focalPoint.left * 100}% - ${this.#DOT_RADIUS}px)`;
 			this.focalPointElement.style.top = `calc(${this.focalPoint.top * 100}% - ${this.#DOT_RADIUS}px)`;
 		}
@@ -45,23 +45,28 @@ export class UmbImageCropperFocusSetterElement extends LitElement {
 		super.firstUpdated(_changedProperties);
 
 		this.style.setProperty('--dot-radius', `${this.#DOT_RADIUS}px`);
-		this.focalPointElement.style.left = `calc(${this.focalPoint.left * 100}% - ${this.#DOT_RADIUS}px)`;
-		this.focalPointElement.style.top = `calc(${this.focalPoint.top * 100}% - ${this.#DOT_RADIUS}px)`;
 
-		this.imageElement.onload = () => {
-			const imageAspectRatio = this.imageElement.naturalWidth / this.imageElement.naturalHeight;
+		if (this.focalPointElement) {
+			this.focalPointElement.style.left = `calc(${this.focalPoint.left * 100}% - ${this.#DOT_RADIUS}px)`;
+			this.focalPointElement.style.top = `calc(${this.focalPoint.top * 100}% - ${this.#DOT_RADIUS}px)`;
+		}
+		if (this.imageElement) {
+			this.imageElement.onload = () => {
+				if (!this.imageElement || !this.wrapperElement) return;
+				const imageAspectRatio = this.imageElement.naturalWidth / this.imageElement.naturalHeight;
 
-			if (imageAspectRatio > 1) {
-				this.imageElement.style.width = '100%';
-				this.wrapperElement.style.width = '100%';
-			} else {
-				this.imageElement.style.height = '100%';
-				this.wrapperElement.style.height = '100%';
-			}
+				if (imageAspectRatio > 1) {
+					this.imageElement.style.width = '100%';
+					this.wrapperElement.style.width = '100%';
+				} else {
+					this.imageElement.style.height = '100%';
+					this.wrapperElement.style.height = '100%';
+				}
 
-			this.imageElement.style.aspectRatio = `${imageAspectRatio}`;
-			this.wrapperElement.style.aspectRatio = `${imageAspectRatio}`;
-		};
+				this.imageElement.style.aspectRatio = `${imageAspectRatio}`;
+				this.wrapperElement.style.aspectRatio = `${imageAspectRatio}`;
+			};
+		}
 	}
 
 	async #addEventListeners() {
@@ -92,6 +97,7 @@ export class UmbImageCropperFocusSetterElement extends LitElement {
 
 	#onSetFocalPoint(event: MouseEvent) {
 		event.preventDefault();
+		if (!this.focalPointElement || !this.imageElement) return;
 
 		const image = this.imageElement.getBoundingClientRect();
 

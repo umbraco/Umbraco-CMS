@@ -33,7 +33,7 @@ export class UmbTemplateItemServerDataSource implements UmbItemDataSource<Templa
 			this.#host,
 			TemplateResource.getTemplateItem({
 				id: ids,
-			})
+			}),
 		);
 	}
 }

@@ -29,13 +29,14 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 	#embedResult!: OEmbedResult;
 
 	#handleConfirm() {
-		this.modalContext?.submit({
+		this.value = {
 			preview: this.#embedResult.markup,
 			originalWidth: this._model.width,
 			originalHeight: this._model.originalHeight,
 			width: this.#embedResult.width,
 			height: this.#embedResult.height,
-		});
+		};
+		this.modalContext?.submit();
 	}
 
 	#handleCancel() {

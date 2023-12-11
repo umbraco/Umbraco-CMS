@@ -13,9 +13,10 @@ export default meta;
 type Story = StoryObj<UmbBodyLayoutElement>;
 
 export const Overview: Story = {
-	render: () => html` <umb-body-layout>
-		<div slot="header"><uui-button color="" look="placeholder">Header slot</uui-button></div>
-		<uui-button color="" look="placeholder">Main slot</uui-button>
-		<div slot="footer-info"><uui-button color="" look="placeholder">Footer slot</uui-button></div>
-	</umb-body-layout>`,
+	render: () =>
+		html` <umb-body-layout>
+			<div slot="header"><uui-button color="" look="placeholder">Header slot</uui-button></div>
+			<uui-button color="" look="placeholder">Main slot</uui-button>
+			<div slot="footer-info"><uui-button color="" look="placeholder">Footer slot</uui-button></div>
+		</umb-body-layout>`,
 };

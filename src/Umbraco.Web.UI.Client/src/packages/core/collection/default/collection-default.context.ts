@@ -1,17 +1,13 @@
-import { UmbCollectionConfiguration, UmbCollectionContext } from './types.js';
+import { UmbCollectionConfiguration, UmbCollectionContext } from '../types.js';
+import { UmbCollectionViewManager } from '../collection-view.manager.js';
 import { UmbCollectionRepository } from '@umbraco-cms/backoffice/repository';
-import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { UmbArrayState, UmbNumberState, UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
-import {
-	UmbApi,
-	UmbExtensionApiInitializer,
-	UmbExtensionsManifestInitializer,
-} from '@umbraco-cms/backoffice/extension-api';
+import { UmbArrayState, UmbNumberState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbApi, UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import {
 	ManifestCollection,
-	ManifestCollectionView,
 	ManifestRepository,
 	umbExtensionsRegistry,
 } from '@umbraco-cms/backoffice/extension-registry';
@@ -20,7 +16,7 @@ import { UmbSelectionManager, UmbPaginationManager } from '@umbraco-cms/backoffi
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 export class UmbDefaultCollectionContext<ItemType = any, FilterModelType extends UmbCollectionFilterModel = any>
-	extends UmbBaseController
+	extends UmbContextBase<UmbDefaultCollectionContext>
 	implements UmbCollectionContext, UmbApi
 {
 	#manifest?: ManifestCollection;
@@ -34,15 +30,6 @@ export class UmbDefaultCollectionContext<ItemType = any, FilterModelType extends
 	#filter = new UmbObjectState<FilterModelType | object>({});
 	public readonly filter = this.#filter.asObservable();
 
-	#views = new UmbArrayState<ManifestCollectionView>([], (x) => x.alias);
-	public readonly views = this.#views.asObservable();
-
-	#currentView = new UmbObjectState<ManifestCollectionView | undefined>(undefined);
-	public readonly currentView = this.#currentView.asObservable();
-
-	#rootPathname = new UmbStringState('');
-	public readonly rootPathname = this.#rootPathname.asObservable();
-
 	repository?: UmbCollectionRepository;
 
 	#initResolver?: () => void;
@@ -54,22 +41,16 @@ export class UmbDefaultCollectionContext<ItemType = any, FilterModelType extends
 
 	public readonly pagination = new UmbPaginationManager();
 	public readonly selection = new UmbSelectionManager(this);
+	public readonly view;
 
 	constructor(host: UmbControllerHostElement, config: UmbCollectionConfiguration = { pageSize: 50 }) {
-		super(host);
+		super(host, UMB_DEFAULT_COLLECTION_CONTEXT);
 
 		// listen for page changes on the pagination manager
 		this.pagination.addEventListener(UmbChangeEvent.TYPE, this.#onPageChange);
 
-		// TODO: hack - we need to figure out how to get the "parent path" from the router
-		setTimeout(() => {
-			const currentUrl = new URL(window.location.href);
-			this.#rootPathname.next(currentUrl.pathname.substring(0, currentUrl.pathname.lastIndexOf('/')));
-		}, 100);
-
+		this.view = new UmbCollectionViewManager(this, { defaultViewAlias: config.defaultViewAlias });
 		this.#configure(config);
-
-		this.provideContext(UMB_COLLECTION_CONTEXT, this);
 	}
 
 	// TODO: find a generic way to do this
@@ -91,7 +72,6 @@ export class UmbDefaultCollectionContext<ItemType = any, FilterModelType extends
 
 		if (!this.#manifest) return;
 		this.#observeRepository(this.#manifest.meta.repositoryAlias);
-		this.#observeViews();
 	}
 
 	/**
@@ -132,28 +112,9 @@ export class UmbDefaultCollectionContext<ItemType = any, FilterModelType extends
 		this.requestCollection();
 	}
 
-	// Views
-	/**
-	 * Sets the current view.
-	 * @param {ManifestCollectionView} view
-	 * @memberof UmbCollectionContext
-	 */
-	public setCurrentView(view: ManifestCollectionView) {
-		this.#currentView.next(view);
-	}
-
-	/**
-	 * Returns the current view.
-	 * @return {ManifestCollectionView}
-	 * @memberof UmbCollectionContext
-	 */
-	public getCurrentView() {
-		return this.#currentView.getValue();
-	}
-
 	#configure(configuration: UmbCollectionConfiguration) {
 		this.selection.setMultiple(true);
-		this.pagination.setPageSize(configuration.pageSize);
+		this.pagination.setPageSize(configuration.pageSize!);
 		this.#filter.next({ ...this.#filter.getValue(), skip: 0, take: configuration.pageSize });
 	}
 
@@ -162,20 +123,6 @@ export class UmbDefaultCollectionContext<ItemType = any, FilterModelType extends
 		const skipFilter = { skip: target.getSkip() } as Partial<FilterModelType>;
 		this.setFilter(skipFilter);
 	};
-
-	#setCurrentView() {
-		const currentUrl = new URL(window.location.href);
-		const lastPathSegment = currentUrl.pathname.split('/').pop();
-		const views = this.#views.getValue();
-		const viewMatch = views.find((view) => view.meta.pathName === lastPathSegment);
-
-		/* TODO: Find a way to figure out which layout it starts with and set _currentLayout to that instead of [0]. eg. '/table'
-			For document, media and members this will come as part of a data type configuration, but in other cases "users" we should find another way.
-			This should only happen if the current layout is not set in the URL.
-		*/
-		const currentView = viewMatch || views[0];
-		this.setCurrentView(currentView);
-	}
 
 	#observeRepository(repositoryAlias: string) {
 		new UmbExtensionApiInitializer<ManifestRepository<UmbCollectionRepository>>(
@@ -189,15 +136,8 @@ export class UmbDefaultCollectionContext<ItemType = any, FilterModelType extends
 			},
 		);
 	}
-
-	#observeViews() {
-		return new UmbExtensionsManifestInitializer(this, umbExtensionsRegistry, 'collectionView', null, (views) => {
-			this.#views.next(views.map((view) => view.manifest));
-			this.#setCurrentView();
-		});
-	}
 }
 
-export const UMB_COLLECTION_CONTEXT = new UmbContextToken<UmbDefaultCollectionContext<any, any>>(
+export const UMB_DEFAULT_COLLECTION_CONTEXT = new UmbContextToken<UmbDefaultCollectionContext<any, any>>(
 	'UmbCollectionContext',
 );

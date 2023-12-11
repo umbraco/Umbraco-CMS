@@ -34,7 +34,7 @@ export class UmbHealthCheckContext {
 	async checkGroup(name: string) {
 		const { data } = await tryExecuteAndNotify(
 			this.host,
-			HealthCheckResource.postHealthCheckGroupByNameCheck({ name })
+			HealthCheckResource.postHealthCheckGroupByNameCheck({ name }),
 		);
 
 		if (data) {

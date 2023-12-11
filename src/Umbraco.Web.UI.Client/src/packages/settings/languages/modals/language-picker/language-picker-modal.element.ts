@@ -23,7 +23,7 @@ export class UmbLanguagePickerModalElement extends UmbModalBaseElement<
 	connectedCallback(): void {
 		super.connectedCallback();
 		this.#selectionManager.setMultiple(this.data?.multiple ?? false);
-		this.#selectionManager.setSelection(this.data?.selection ?? []);
+		this.#selectionManager.setSelection(this.value?.selection ?? []);
 	}
 
 	async firstUpdated() {
@@ -40,7 +40,8 @@ export class UmbLanguagePickerModalElement extends UmbModalBaseElement<
 	}
 
 	#submit() {
-		this.modalContext?.submit({ selection: this.#selectionManager.getSelection() });
+		this.value = { selection: this.#selectionManager.getSelection() };
+		this.modalContext?.submit();
 	}
 
 	#close() {

@@ -14,6 +14,6 @@ export class UmbDocumentSaveAndPublishWorkspaceAction extends UmbWorkspaceAction
 		//const document = this.workspaceContext.getData();
 		// TODO: handle errors
 		//if (!document) return;
-		this.workspaceContext.publish();
+		this.workspaceContext.saveAndPublish();
 	}
 }

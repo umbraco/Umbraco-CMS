@@ -15,7 +15,7 @@ export class UmbDictionaryStore extends UmbStoreBase {
 		super(
 			host,
 			UMB_DICTIONARY_STORE_CONTEXT_TOKEN.toString(),
-			new UmbArrayState<DictionaryItemResponseModel>([], (x) => x.id)
+			new UmbArrayState<DictionaryItemResponseModel>([], (x) => x.id),
 		);
 	}
 

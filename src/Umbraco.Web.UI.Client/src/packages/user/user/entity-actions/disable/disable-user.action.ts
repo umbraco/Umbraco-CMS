@@ -31,10 +31,12 @@ export class UmbDisableUserEntityAction extends UmbEntityActionBase<UmbDisableUs
 			const item = data[0];
 
 			const modalContext = this.#modalManager.open(UMB_CONFIRM_MODAL, {
-				headline: `Disable ${item.name}`,
-				content: 'Are you sure you want to disable this user?',
-				color: 'danger',
-				confirmLabel: 'Disable',
+				data: {
+					headline: `Disable ${item.name}`,
+					content: 'Are you sure you want to disable this user?',
+					color: 'danger',
+					confirmLabel: 'Disable',
+				},
 			});
 
 			await modalContext.onSubmit();

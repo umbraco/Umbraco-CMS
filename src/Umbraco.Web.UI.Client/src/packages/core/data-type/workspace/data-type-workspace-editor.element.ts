@@ -9,8 +9,7 @@ import { ManifestWorkspace } from '@umbraco-cms/backoffice/extension-registry';
  */
 @customElement('umb-data-type-workspace-editor')
 export class UmbDataTypeWorkspaceEditorElement extends UmbLitElement {
-
-	@property({attribute: false})
+	@property({ attribute: false })
 	manifest?: ManifestWorkspace;
 
 	@state()
@@ -43,7 +42,7 @@ export class UmbDataTypeWorkspaceEditorElement extends UmbLitElement {
 				}
 				this.removeControllerByAlias('_observeIsNew');
 			},
-			'_observeIsNew'
+			'_observeIsNew',
 		);
 	}
 

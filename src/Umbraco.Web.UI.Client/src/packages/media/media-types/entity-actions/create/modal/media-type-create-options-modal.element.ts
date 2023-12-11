@@ -30,7 +30,9 @@ export class UmbDataTypeCreateOptionsModalElement extends UmbLitElement {
 	#onClick(event: PointerEvent) {
 		event.stopPropagation();
 		const folderModalHandler = this.#modalContext?.open(UMB_FOLDER_MODAL, {
-			repositoryAlias: UMB_MEDIA_TYPE_DETAIL_REPOSITORY_ALIAS,
+			data: {
+				repositoryAlias: UMB_MEDIA_TYPE_DETAIL_REPOSITORY_ALIAS,
+			},
 		});
 		folderModalHandler?.onSubmit().then(() => this.modalContext?.submit());
 	}

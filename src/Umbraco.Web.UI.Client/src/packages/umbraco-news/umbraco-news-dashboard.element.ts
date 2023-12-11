@@ -49,6 +49,9 @@ export class UmbUmbracoNewsDashboardElement extends UmbLitElement {
 				display: block;
 				padding: var(--uui-size-layout-1);
 			}
+			p {
+				position: relative;
+			}
 		`,
 	];
 }

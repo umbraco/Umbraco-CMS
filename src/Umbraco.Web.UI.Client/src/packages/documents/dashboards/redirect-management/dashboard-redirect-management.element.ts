@@ -89,16 +89,18 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 	#onRequestDelete(data: RedirectUrlResponseModel) {
 		if (!data.id) return;
 		const modalContext = this._modalContext?.open(UMB_CONFIRM_MODAL, {
-			headline: 'Delete',
-			content: html`
-				<div style="width:300px">
-					<p>${this.localize.term('redirectUrls_redirectRemoveWarning')}</p>
-					${this.localize.term('redirectUrls_originalUrl')}: <strong>${data.originalUrl}</strong><br />
-					${this.localize.term('redirectUrls_redirectedTo')}: <strong>${data.destinationUrl}</strong>
-				</div>
-			`,
-			color: 'danger',
-			confirmLabel: 'Delete',
+			data: {
+				headline: 'Delete',
+				content: html`
+					<div style="width:300px">
+						<p>${this.localize.term('redirectUrls_redirectRemoveWarning')}</p>
+						${this.localize.term('redirectUrls_originalUrl')}: <strong>${data.originalUrl}</strong><br />
+						${this.localize.term('redirectUrls_redirectedTo')}: <strong>${data.destinationUrl}</strong>
+					</div>
+				`,
+				color: 'danger',
+				confirmLabel: 'Delete',
+			},
 		});
 
 		modalContext
@@ -136,10 +138,12 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 		}
 
 		const modalContext = this._modalContext?.open(UMB_CONFIRM_MODAL, {
-			headline: `${this.localize.term('redirectUrls_disableUrlTracker')}`,
-			content: `${this.localize.term('redirectUrls_confirmDisable')}`,
-			color: 'danger',
-			confirmLabel: 'Disable',
+			data: {
+				headline: `${this.localize.term('redirectUrls_disableUrlTracker')}`,
+				content: `${this.localize.term('redirectUrls_confirmDisable')}`,
+				color: 'danger',
+				confirmLabel: 'Disable',
+			},
 		});
 		modalContext
 			?.onSubmit()

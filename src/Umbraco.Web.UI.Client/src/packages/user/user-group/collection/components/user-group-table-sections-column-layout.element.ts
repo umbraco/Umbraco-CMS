@@ -21,9 +21,13 @@ export class UmbUserGroupTableSectionsColumnLayoutElement extends UmbLitElement 
 	}
 
 	private observeSectionNames() {
-		this.observe(umbExtensionsRegistry.extensionsOfType('section'), (sections) => {
-			this._sectionsNames = sections.filter((x) => this.value.includes(x.alias)).map((x) => x.meta.label || x.name);
-		}, 'umbUserGroupTableSectionsColumnLayoutObserver');
+		this.observe(
+			umbExtensionsRegistry.extensionsOfType('section'),
+			(sections) => {
+				this._sectionsNames = sections.filter((x) => this.value.includes(x.alias)).map((x) => x.meta.label || x.name);
+			},
+			'umbUserGroupTableSectionsColumnLayoutObserver',
+		);
 	}
 
 	render() {

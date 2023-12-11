@@ -31,9 +31,11 @@ export class UmbUnlockUserEntityAction extends UmbEntityActionBase<UmbUnlockUser
 			const item = data[0];
 
 			const modalContext = this.#modalManager.open(UMB_CONFIRM_MODAL, {
-				headline: `Unlock ${item.name}`,
-				content: 'Are you sure you want to unlock this user?',
-				confirmLabel: 'Unlock',
+				data: {
+					headline: `Unlock ${item.name}`,
+					content: 'Are you sure you want to unlock this user?',
+					confirmLabel: 'Unlock',
+				},
 			});
 
 			await modalContext.onSubmit();

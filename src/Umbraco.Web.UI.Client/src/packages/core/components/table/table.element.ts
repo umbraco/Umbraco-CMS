@@ -1,4 +1,4 @@
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import {
 	css,
 	html,
@@ -189,12 +189,13 @@ export class UmbTableElement extends LitElement {
 		return html` <uui-table-head-cell style="--uui-table-cell-padding: 0">
 			${when(
 				this.config.allowSelection,
-				() => html` <uui-checkbox
-					label="Select All"
-					style="padding: var(--uui-size-4) var(--uui-size-5);"
-					@change="${this._handleAllRowsCheckboxChange}"
-					?checked="${this.selection.length === this.items.length}">
-				</uui-checkbox>`
+				() =>
+					html` <uui-checkbox
+						label="Select All"
+						style="padding: var(--uui-size-4) var(--uui-size-5);"
+						@change="${this._handleAllRowsCheckboxChange}"
+						?checked="${this.selection.length === this.items.length}">
+					</uui-checkbox>`,
 			)}
 		</uui-table-head-cell>`;
 	}
@@ -217,12 +218,13 @@ export class UmbTableElement extends LitElement {
 			${when(!this.config.hideIcon, () => html`<uui-icon name=${ifDefined(item.icon)}></uui-icon>`)}
 			${when(
 				this.config.allowSelection,
-				() => html` <uui-checkbox
-					label="Select Row"
-					@click=${(e: PointerEvent) => e.stopPropagation()}
-					@change=${(event: Event) => this._handleRowCheckboxChange(event, item)}
-					?checked="${this._isSelected(item.id)}">
-				</uui-checkbox>`
+				() =>
+					html` <uui-checkbox
+						label="Select Row"
+						@click=${(e: PointerEvent) => e.stopPropagation()}
+						@change=${(event: Event) => this._handleRowCheckboxChange(event, item)}
+						?checked="${this._isSelected(item.id)}">
+					</uui-checkbox>`,
 			)}
 		</uui-table-cell>`;
 	}

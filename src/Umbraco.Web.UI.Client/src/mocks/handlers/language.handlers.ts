@@ -55,7 +55,7 @@ export const handlers = [
 					errors: {
 						isoCode: ['Language with same iso code already exists'],
 					},
-				})
+				}),
 			);
 		}
 	}),

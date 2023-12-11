@@ -72,10 +72,12 @@ export class UmbDashboardPublishedStatusElement extends UmbLitElement {
 	}
 	private async _onReloadCacheHandler() {
 		const modalContext = this._modalContext?.open(UMB_CONFIRM_MODAL, {
-			headline: 'Reload',
-			content: html` Trigger a in-memory and local file cache reload on all servers.`,
-			color: 'danger',
-			confirmLabel: 'Continue',
+			data: {
+				headline: 'Reload',
+				content: html` Trigger a in-memory and local file cache reload on all servers.`,
+				color: 'danger',
+				confirmLabel: 'Continue',
+			},
 		});
 		modalContext?.onSubmit().then(() => {
 			this._reloadMemoryCache();
@@ -95,10 +97,12 @@ export class UmbDashboardPublishedStatusElement extends UmbLitElement {
 
 	private async _onRebuildCacheHandler() {
 		const modalContex = this._modalContext?.open(UMB_CONFIRM_MODAL, {
-			headline: 'Rebuild',
-			content: html` Rebuild content in cmsContentNu database table. Expensive.`,
-			color: 'danger',
-			confirmLabel: 'Continue',
+			data: {
+				headline: 'Rebuild',
+				content: html` Rebuild content in cmsContentNu database table. Expensive.`,
+				color: 'danger',
+				confirmLabel: 'Continue',
+			},
 		});
 		modalContex?.onSubmit().then(() => {
 			this._rebuildDatabaseCache();
@@ -118,10 +122,12 @@ export class UmbDashboardPublishedStatusElement extends UmbLitElement {
 
 	private async _onSnapshotCacheHandler() {
 		const modalContex = this._modalContext?.open(UMB_CONFIRM_MODAL, {
-			headline: 'Snapshot',
-			content: html` Trigger a NuCache snapshots collection.`,
-			color: 'danger',
-			confirmLabel: 'Continue',
+			data: {
+				headline: 'Snapshot',
+				content: html` Trigger a NuCache snapshots collection.`,
+				color: 'danger',
+				confirmLabel: 'Continue',
+			},
 		});
 		modalContex?.onSubmit().then(() => {
 			this._cacheCollect();

@@ -12,7 +12,7 @@ export function createRoutePathBuilder(path: string) {
 					? path.replace(PARAM_IDENTIFIER, (substring: string, ...args: string[]) => {
 							return params[args[0]].toString();
 					  })
-					: path
+					: path,
 			) +
 			'/'
 		);

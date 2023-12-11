@@ -12,10 +12,12 @@ export const manifests: Array<ManifestCollectionView> = [
 			icon: 'icon-grid',
 			pathName: 'grid',
 		},
-		conditions: [{
-			alias: 'Umb.Condition.WorkspaceEntityType',
-			match: 'media',
-		}],
+		conditions: [
+			{
+				alias: 'Umb.Condition.WorkspaceEntityType',
+				match: 'media',
+			},
+		],
 	},
 	{
 		type: 'collectionView',
@@ -28,10 +30,12 @@ export const manifests: Array<ManifestCollectionView> = [
 			icon: 'icon-box',
 			pathName: 'table',
 		},
-		conditions: [{
-			alias: 'Umb.Condition.WorkspaceEntityType',
-			match: 'media',
-		}],
+		conditions: [
+			{
+				alias: 'Umb.Condition.WorkspaceEntityType',
+				match: 'media',
+			},
+		],
 	},
 	{
 		type: 'collectionView',
@@ -45,9 +49,11 @@ export const manifests: Array<ManifestCollectionView> = [
 			icon: 'icon-newspaper',
 			pathName: 'test',
 		},
-		conditions: [{
-			alias: 'Umb.Condition.WorkspaceEntityType',
-			match: 'media',
-		}],
+		conditions: [
+			{
+				alias: 'Umb.Condition.WorkspaceEntityType',
+				match: 'media',
+			},
+		],
 	},
 ];

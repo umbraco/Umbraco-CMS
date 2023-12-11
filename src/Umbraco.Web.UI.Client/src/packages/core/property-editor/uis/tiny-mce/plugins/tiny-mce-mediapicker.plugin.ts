@@ -54,11 +54,13 @@ export default class UmbTinyMceMediaPickerPlugin extends UmbTinyMcePluginBase {
 		});
 	}
 
+	/*
 	async #observeCurrentUser() {
 		if (!this.#currentUserContext) return;
 
 		this.observe(this.#currentUserContext.currentUser, (currentUser) => (this.#currentUser = currentUser));
 	}
+	*/
 
 	async #onAction() {
 		const selectedElm = this.editor.selection.getNode();
@@ -90,6 +92,8 @@ export default class UmbTinyMceMediaPickerPlugin extends UmbTinyMcePluginBase {
 	}
 
 	async #showMediaPicker(currentTarget: MediaPickerTargetData) {
+		/*
+		// TODO: I dont think we should parse this one... it should be up to the modal to get this information, and then we could parse some configs on to affect this.
 		let startNodeId;
 		let startNodeIsVirtual;
 
@@ -102,13 +106,18 @@ export default class UmbTinyMceMediaPickerPlugin extends UmbTinyMcePluginBase {
 				startNodeIsVirtual = this.#currentUser?.mediaStartNodeIds?.length !== 1;
 			}
 		}
+		*/
 
 		// TODO => startNodeId and startNodeIsVirtual do not exist on ContentTreeItemResponseModel
 		const modalHandler = this.#modalContext?.open(UMB_MEDIA_TREE_PICKER_MODAL, {
-			selection: currentTarget.udi ? [...currentTarget.udi] : [],
-			multiple: false,
-			//startNodeId,
-			//startNodeIsVirtual,
+			data: {
+				multiple: false,
+				//startNodeId,
+				//startNodeIsVirtual,
+			},
+			value: {
+				selection: currentTarget.udi ? [...currentTarget.udi] : [],
+			},
 		});
 
 		if (!modalHandler) return;

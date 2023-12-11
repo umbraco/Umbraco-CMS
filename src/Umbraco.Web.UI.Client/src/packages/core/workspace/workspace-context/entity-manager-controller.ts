@@ -14,7 +14,7 @@ import { UmbEntityDetailStore } from '@umbraco-cms/backoffice/store';
 // TODO: switch to use EntityDetailItem ? if we can have such type?
 export class UmbEntityWorkspaceManager<
 	StoreType extends UmbEntityDetailStore<EntityDetailsType>,
-	EntityDetailsType extends EntityTreeItemResponseModel = ReturnType<StoreType['getScaffold']>
+	EntityDetailsType extends EntityTreeItemResponseModel = ReturnType<StoreType['getScaffold']>,
 > {
 	private _host;
 
@@ -62,7 +62,7 @@ export class UmbEntityWorkspaceManager<
 				(content) => {
 					if (!content) return; // TODO: Handle nicely if there is no content data.
 					this.state.next(content as any);
-				}
+				},
 			);
 		}
 	}
