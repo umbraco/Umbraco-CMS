@@ -67,11 +67,11 @@ export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataT
 		// TODO: make data mapper to prevent errors
 		const dataType = {
 			type: 'data-type',
-			unique: data.id!,
-			parentUnique: data.parentId!,
-			name: data.name!,
-			propertyEditorAlias: data.propertyEditorAlias!,
-			propertyEditorUiAlias: data.propertyEditorUiAlias!,
+			unique: data.id,
+			parentUnique: data.parentId || null,
+			name: data.name,
+			propertyEditorAlias: data.propertyEditorAlias,
+			propertyEditorUiAlias: data.propertyEditorUiAlias || null,
 			values: data.values as Array<UmbDataTypePropertyModel>,
 		};
 
