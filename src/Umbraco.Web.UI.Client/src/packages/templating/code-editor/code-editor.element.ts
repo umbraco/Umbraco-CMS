@@ -99,9 +99,13 @@ export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditor
 	constructor() {
 		super();
 		this.consumeContext(UMB_THEME_CONTEXT_TOKEN, (instance) => {
-			this.observe(instance.theme, (themeAlias) => {
-				this.theme = themeAlias ? this.#translateTheme(themeAlias) : CodeEditorTheme.Light;
-			}, '_observeTheme');
+			this.observe(
+				instance.theme,
+				(themeAlias) => {
+					this.theme = themeAlias ? this.#translateTheme(themeAlias) : CodeEditorTheme.Light;
+				},
+				'_observeTheme',
+			);
 		});
 	}
 

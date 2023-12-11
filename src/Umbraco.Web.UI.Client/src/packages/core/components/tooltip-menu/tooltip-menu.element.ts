@@ -1,4 +1,4 @@
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, LitElement, nothing, repeat, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 
 export interface TooltipMenuItem {
@@ -48,7 +48,7 @@ export class UmbTooltipMenuElement extends LitElement {
 		return repeat(
 			this.items,
 			(item) => item.label,
-			(item) => this._renderItem(item)
+			(item) => this._renderItem(item),
 		);
 	}
 

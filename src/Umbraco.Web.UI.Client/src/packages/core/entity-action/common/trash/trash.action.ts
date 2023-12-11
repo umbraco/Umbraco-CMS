@@ -30,10 +30,12 @@ export class UmbTrashEntityAction<
 			const item = data[0];
 
 			const modalContext = this.#modalContext?.open(UMB_CONFIRM_MODAL, {
-				headline: `Trash ${item.name}`,
-				content: 'Are you sure you want to move this item to the recycle bin?',
-				color: 'danger',
-				confirmLabel: 'Trash',
+				data: {
+					headline: `Trash ${item.name}`,
+					content: 'Are you sure you want to move this item to the recycle bin?',
+					color: 'danger',
+					confirmLabel: 'Trash',
+				},
 			});
 
 			modalContext?.onSubmit().then(() => {

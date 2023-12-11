@@ -104,7 +104,7 @@ export const arrayFilter = (filterBy: Array<string>, value?: Array<string>): boo
 	}
 
 	return filterBy.some((filterValue: string) => value?.includes(filterValue));
-}
+};
 
 export const stringFilter = (filterBy: Array<string>, value?: string): boolean => {
 	// if a filter is not set, return all items

@@ -9,7 +9,7 @@ import {
 import { UmbFolderRepository } from '@umbraco-cms/backoffice/repository';
 
 export class UmbFolderUpdateEntityAction<
-	T extends UmbFolderRepository = UmbFolderRepository
+	T extends UmbFolderRepository = UmbFolderRepository,
 > extends UmbEntityActionBase<T> {
 	#modalContext?: UmbModalManagerContext;
 
@@ -25,8 +25,10 @@ export class UmbFolderUpdateEntityAction<
 		if (!this.repository || !this.#modalContext) return;
 
 		const modalContext = this.#modalContext.open(UMB_FOLDER_MODAL, {
-			repositoryAlias: this.repositoryAlias,
-			unique: this.unique,
+			data: {
+				repositoryAlias: this.repositoryAlias,
+				unique: this.unique,
+			},
 		});
 
 		await modalContext.onSubmit();

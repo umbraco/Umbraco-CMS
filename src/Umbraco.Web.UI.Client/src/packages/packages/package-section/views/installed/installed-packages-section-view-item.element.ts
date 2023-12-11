@@ -62,7 +62,7 @@ export class UmbInstalledPackagesSectionViewItemElement extends UmbLitElement {
 			umbExtensionsRegistry.extensionsOfType('packageView').pipe(
 				map((extensions) => {
 					return extensions.filter((extension) => extension.meta.packageName === this.#name);
-				})
+				}),
 			),
 			(manifests) => {
 				if (manifests.length === 0) {
@@ -71,17 +71,19 @@ export class UmbInstalledPackagesSectionViewItemElement extends UmbLitElement {
 				}
 				this._packageView = manifests[0];
 			},
-			'_observePackageViewExtension'
+			'_observePackageViewExtension',
 		);
 	}
 
 	async _onMigration() {
 		if (!this.name) return;
 		const modalContext = this.#modalContext?.open(UMB_CONFIRM_MODAL, {
-			color: 'positive',
-			headline: `Run migrations for ${this.name}?`,
-			content: `Do you want to start run migrations for ${this.name}`,
-			confirmLabel: 'Run migrations',
+			data: {
+				color: 'positive',
+				headline: `Run migrations for ${this.name}?`,
+				content: `Do you want to start run migrations for ${this.name}`,
+				confirmLabel: 'Run migrations',
+			},
 		});
 
 		await modalContext?.onSubmit();
@@ -89,7 +91,7 @@ export class UmbInstalledPackagesSectionViewItemElement extends UmbLitElement {
 		this._migrationButtonState = 'waiting';
 		const { error } = await tryExecuteAndNotify(
 			this,
-			PackageResource.postPackageByNameRunMigration({ name: this.name })
+			PackageResource.postPackageByNameRunMigration({ name: this.name }),
 		);
 		if (error) return;
 		this.#notificationContext?.peek('positive', { data: { message: 'Migrations completed' } });

@@ -41,10 +41,11 @@ export class UmbCreateDictionaryModalElement extends UmbModalBaseElement<
 		const formData = new FormData(form);
 		const name = formData.get('name') as string;
 
-		this.modalContext?.submit({
+		this.value = {
 			name,
 			parentId: this.data?.parentId ?? null,
-		});
+		};
+		this.modalContext?.submit();
 	}
 
 	render() {

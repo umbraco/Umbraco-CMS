@@ -102,12 +102,14 @@ export class UmbMediaTypeWorkspaceEditorElement extends UmbLitElement {
 
 	private async _handleIconClick() {
 		const modalContext = this._modalContext?.open(UMB_ICON_PICKER_MODAL, {
-			icon: this._icon,
-			color: this._iconColorAlias,
+			value: {
+				icon: this._icon,
+				color: this._iconColorAlias,
+			},
 		});
 
-		modalContext?.onSubmit().then((saved) => {
-			if (saved.icon) this.#workspaceContext?.updateProperty('icon', saved.icon);
+		modalContext?.onSubmit().then((value) => {
+			if (value.icon) this.#workspaceContext?.updateProperty('icon', value.icon);
 			// TODO: save color ALIAS as well
 		});
 	}

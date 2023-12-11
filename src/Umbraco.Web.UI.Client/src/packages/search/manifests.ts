@@ -41,6 +41,6 @@ export const manifests: Array<ManifestTypes> = [
 		type: 'modal',
 		alias: 'Umb.Modal.ExamineFieldsSettings',
 		name: 'Examine Field Settings Modal',
-		js: () => import('./examine-management-dashboard/views/modal-views/fields-settings.element.js'),
+		js: () => import('./examine-management-dashboard/views/modal-views/fields-settings-modal.element.js'),
 	},
 ];

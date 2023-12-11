@@ -1,4 +1,4 @@
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import {
 	ManifestMenu,
@@ -24,7 +24,7 @@ umbExtensionsRegistry.register(manifest);
 
 @customElement('umb-section-sidebar-menu')
 export class UmbSectionSidebarMenuElement<
-	ManifestType extends ManifestSectionSidebarAppBaseMenu = ManifestSectionSidebarAppMenuKind
+	ManifestType extends ManifestSectionSidebarAppBaseMenu = ManifestSectionSidebarAppMenuKind,
 > extends UmbLitElement {
 	@property({ type: Object, attribute: false })
 	manifest?: ManifestType;

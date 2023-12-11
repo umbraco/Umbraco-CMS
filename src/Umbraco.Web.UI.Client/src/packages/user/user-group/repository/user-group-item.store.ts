@@ -24,7 +24,7 @@ export class UmbUserGroupItemStore
 		super(
 			host,
 			UMB_USER_GROUP_ITEM_STORE_CONTEXT_TOKEN.toString(),
-			new UmbArrayState<UserGroupItemResponseModel>([], (x) => x.id)
+			new UmbArrayState<UserGroupItemResponseModel>([], (x) => x.id),
 		);
 	}
 
@@ -34,5 +34,5 @@ export class UmbUserGroupItemStore
 }
 
 export const UMB_USER_GROUP_ITEM_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbUserGroupItemStore>(
-	'UmbUserGroupItemStore'
+	'UmbUserGroupItemStore',
 );

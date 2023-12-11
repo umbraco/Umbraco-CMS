@@ -170,7 +170,6 @@ export class UmbDashboardModelsBuilderElement extends UmbLitElement {
 	];
 }
 
-
 export default UmbDashboardModelsBuilderElement;
 
 declare global {

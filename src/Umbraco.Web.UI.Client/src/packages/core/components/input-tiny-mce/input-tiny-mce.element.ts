@@ -102,7 +102,11 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 		const manifests = (await firstValueFrom(observable)) as ManifestTinyMcePlugin[];
 
 		for (const manifest of manifests) {
-			const plugin = manifest.js ? await loadManifestApi(manifest.js) : manifest.api ? await loadManifestApi(manifest.api) : undefined;
+			const plugin = manifest.js
+				? await loadManifestApi(manifest.js)
+				: manifest.api
+				? await loadManifestApi(manifest.api)
+				: undefined;
 			if (plugin) {
 				this.#plugins.push(plugin);
 			}

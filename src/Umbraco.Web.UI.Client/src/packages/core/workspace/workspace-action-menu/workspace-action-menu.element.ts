@@ -1,13 +1,10 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbActionExecutedEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 @customElement('umb-workspace-action-menu')
 export class UmbWorkspaceActionMenuElement extends UmbLitElement {
-	@state()
-	private _actionMenuIsOpen = false;
-
 	private _workspaceContext?: typeof UMB_WORKSPACE_CONTEXT.TYPE;
 
 	@state()
@@ -15,6 +12,9 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 
 	@state()
 	_entityType?: string;
+
+	@state()
+	_popoverOpen = false;
 
 	constructor() {
 		super();
@@ -31,17 +31,15 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 		this._entityType = this._workspaceContext.getEntityType();
 	}
 
-	#close() {
-		this._actionMenuIsOpen = false;
-	}
-
-	#open() {
-		this._actionMenuIsOpen = true;
-	}
-
 	#onActionExecuted(event: UmbActionExecutedEvent) {
 		event.stopPropagation();
-		this.#close();
+	}
+
+	// TODO: This ignorer is just neede for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
+	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+	// @ts-ignore
+	#onPopoverToggle(event: ToggleEvent) {
+		this._popoverOpen = event.newState === 'open';
 	}
 
 	render() {
@@ -51,42 +49,37 @@ export class UmbWorkspaceActionMenuElement extends UmbLitElement {
 	#renderActionsMenu() {
 		return this._entityId && this._entityType
 			? html`
-			<uui-popover  id="action-menu-popover" .open=${this._actionMenuIsOpen} @close=${this.#close}>
-				<uui-button slot="trigger" label="Actions" @click=${this.#open}></uui-button>
-				<div id="action-menu-dropdown" slot="popover">
-					<uui-scroll-container>
-						<umb-entity-action-list
-							@action-executed=${this.#onActionExecuted}
-							.entityType=${this._entityType}
-							.unique=${this._entityId}>
-						</umb-entity-action-list>
-					</uui-scroll-container>
-				</div>
-			</uui-popover>
-			</div>`
-			: '';
+					<uui-button popovertarget="workspace-action-menu-popover" label="Actions">
+						Actions
+						<uui-symbol-expand .open=${this._popoverOpen}></uui-symbol-expand>
+					</uui-button>
+					<uui-popover-container
+						id="workspace-action-menu-popover"
+						placement="bottom-end"
+						@toggle=${this.#onPopoverToggle}>
+						<umb-popover-layout>
+							<uui-scroll-container>
+								<umb-entity-action-list
+									@action-executed=${this.#onActionExecuted}
+									.entityType=${this._entityType}
+									.unique=${this._entityId}>
+								</umb-entity-action-list>
+							</uui-scroll-container>
+						</umb-popover-layout>
+					</uui-popover-container>
+			  `
+			: nothing;
 	}
 
 	static styles = [
 		UmbTextStyles,
 		css`
-			#action-menu-popover {
-				display: block;
-			}
-			#action-menu-dropdown {
-				overflow: hidden;
-				z-index: -1;
-				background-color: var(--uui-combobox-popover-background-color, var(--uui-color-surface));
-				border: 1px solid var(--uui-color-border);
-				border-radius: var(--uui-border-radius);
-				width: 100%;
+			:host {
 				height: 100%;
-				box-sizing: border-box;
-				box-shadow: var(--uui-shadow-depth-3);
-				width: 250px;
-				position: absolute;
-				right: 5px;
-				height: auto;
+			}
+
+			:host > uui-button {
+				height: 100%;
 			}
 		`,
 	];

@@ -1,6 +1,5 @@
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
-import { isManifestElementNameType } from '@umbraco-cms/backoffice/extension-api';
 import { ManifestTypes, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import {
@@ -36,22 +35,24 @@ export class UmbExtensionRootWorkspaceElement extends UmbLitElement {
 						}
 						// Otherwise sort by type
 						return a.type.localeCompare(b.type);
-					})
-				)
+					}),
+				),
 			),
 			(extensions) => {
 				this._extensions = extensions || undefined;
 			},
-			'_observeExtensionRegistry'
+			'_observeExtensionRegistry',
 		);
 	}
 
 	async #removeExtension(extension: ManifestTypes) {
 		const modalContext = this._modalContext?.open(UMB_CONFIRM_MODAL, {
-			headline: 'Unload extension',
-			confirmLabel: 'Unload',
-			content: html`<p>Are you sure you want to unload the extension <strong>${extension.alias}</strong>?</p>`,
-			color: 'danger',
+			data: {
+				headline: 'Unload extension',
+				confirmLabel: 'Unload',
+				content: html`<p>Are you sure you want to unload the extension <strong>${extension.alias}</strong>?</p>`,
+				color: 'danger',
+			},
 		});
 
 		await modalContext?.onSubmit();
@@ -75,9 +76,7 @@ export class UmbExtensionRootWorkspaceElement extends UmbLitElement {
 							(extension) => html`
 								<uui-table-row>
 									<uui-table-cell>${extension.type}</uui-table-cell>
-									<uui-table-cell>
-										${extension.name}
-									</uui-table-cell>
+									<uui-table-cell> ${extension.name} </uui-table-cell>
 									<uui-table-cell>${extension.alias}</uui-table-cell>
 									<uui-table-cell>${extension.weight ? extension.weight : ''} </uui-table-cell>
 									<uui-table-cell>
@@ -90,7 +89,7 @@ export class UmbExtensionRootWorkspaceElement extends UmbLitElement {
 										</uui-button>
 									</uui-table-cell>
 								</uui-table-row>
-							`
+							`,
 						)}
 					</uui-table>
 				</uui-box>

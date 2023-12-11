@@ -3,6 +3,7 @@ import { css, html, ifDefined, customElement, property, state } from '@umbraco-c
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-input-language-picker')
 export class UmbInputLanguagePickerElement extends FormControlMixin(UmbLitElement) {
@@ -65,7 +66,7 @@ export class UmbInputLanguagePickerElement extends FormControlMixin(UmbLitElemen
 	@property()
 	public set value(isoCodesString: string) {
 		// Its with full purpose we don't call super.value, as thats being handled by the observation of the context selection.
-		this.selectedIsoCodes = isoCodesString.split(/[ ,]+/);
+		this.selectedIsoCodes = splitStringToArray(isoCodesString);
 	}
 
 	@state()
@@ -79,13 +80,13 @@ export class UmbInputLanguagePickerElement extends FormControlMixin(UmbLitElemen
 		this.addValidator(
 			'rangeUnderflow',
 			() => this.minMessage,
-			() => !!this.min && this.#pickerContext.getSelection().length < this.min
+			() => !!this.min && this.#pickerContext.getSelection().length < this.min,
 		);
 
 		this.addValidator(
 			'rangeOverflow',
 			() => this.maxMessage,
-			() => !!this.max && this.#pickerContext.getSelection().length > this.max
+			() => !!this.max && this.#pickerContext.getSelection().length > this.max,
 		);
 
 		this.observe(this.#pickerContext.selection, (selection) => (super.value = selection.join(',')));

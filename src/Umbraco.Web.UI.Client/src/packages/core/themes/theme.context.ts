@@ -42,14 +42,16 @@ export class UmbThemeContext extends UmbBaseController {
 					if (themes.length > 0 && themes[0].css) {
 						const activeTheme = themes[0];
 						if (typeof activeTheme.css === 'function') {
-							const styleEl = (this.#styleElement = document.createElement('style'));
-							styleEl.setAttribute('type', 'text/css');
-							document.head.appendChild(styleEl);
+							this.#styleElement = document.createElement('style') as HTMLStyleElement;
+							// We store the current style element so we can check if it has been replaced by another theme in between.
+							const currentStyleEl = this.#styleElement;
+							currentStyleEl.setAttribute('type', 'text/css');
 
 							const result = await loadManifestPlainCss(activeTheme.css);
 							// Checking that this is still our styleElement, it has not been replaced with another theme in between.
-							if (result && styleEl === this.#styleElement) {
-								styleEl.appendChild(document.createTextNode(result));
+							if (result && currentStyleEl === this.#styleElement) {
+								currentStyleEl.appendChild(document.createTextNode(result));
+								document.head.appendChild(currentStyleEl);
 							}
 						} else if (typeof activeTheme.css === 'string') {
 							this.#styleElement = document.createElement('link');
@@ -58,16 +60,23 @@ export class UmbThemeContext extends UmbBaseController {
 							document.head.appendChild(this.#styleElement);
 						}
 					} else {
+						console.log('remove style element', this.#styleElement);
+						// We could not load a theme for this alias, so we remove the theme.
 						localStorage.removeItem(LOCAL_STORAGE_KEY);
 						this.#styleElement?.childNodes.forEach((node) => node.remove());
 						this.#styleElement?.setAttribute('href', '');
+						this.#styleElement = null;
 					}
 				},
 			);
 		} else {
+			// Super clean, we got a falsy value, so we remove the theme.
+
 			localStorage.removeItem(LOCAL_STORAGE_KEY);
+			this.#styleElement?.remove();
 			this.#styleElement?.childNodes.forEach((node) => node.remove());
 			this.#styleElement?.setAttribute('href', '');
+			this.#styleElement = null;
 		}
 	}
 }

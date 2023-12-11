@@ -1,6 +1,6 @@
 import { type UmbPropertyEditorConfig } from '../../property-editor/index.js';
 import { UmbWorkspacePropertyContext } from './workspace-property.context.js';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import { ManifestPropertyEditorUi, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -131,7 +131,7 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 			(manifest) => {
 				this._gotEditorUI(manifest);
 			},
-			'_observePropertyEditorUI'
+			'_observePropertyEditorUI',
 		);
 	}
 
@@ -144,7 +144,7 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 		}
 
 		const el = await createExtensionElement(manifest);
-		if(el) {
+		if (el) {
 			const oldValue = this._element;
 
 			oldValue?.removeEventListener('change', this._onPropertyEditorChange as any as EventListener);
@@ -167,7 +167,7 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 							this._element.value = value;
 						}
 					},
-					'_observePropertyValue'
+					'_observePropertyValue',
 				);
 				this._configObserver = this.observe(
 					this._propertyContext.config,
@@ -176,7 +176,7 @@ export class UmbWorkspacePropertyElement extends UmbLitElement {
 							this._element.config = config;
 						}
 					},
-					'_observePropertyConfig'
+					'_observePropertyConfig',
 				);
 			}
 

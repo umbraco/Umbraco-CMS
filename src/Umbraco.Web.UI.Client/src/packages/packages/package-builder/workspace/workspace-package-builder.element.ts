@@ -1,11 +1,7 @@
 import type { UmbInputDocumentElement } from '../../../documents/documents/components/input-document/input-document.element.js';
 import type { UmbInputMediaElement } from '../../../media/media/components/input-media/input-media.element.js';
 import type { UmbInputLanguagePickerElement } from '../../../settings/languages/components/input-language-picker/input-language-picker.element.js';
-import {
-	UUIBooleanInputEvent,
-	UUIInputElement,
-	UUIInputEvent,
-} from '@umbraco-cms/backoffice/external/uui';
+import { UUIBooleanInputEvent, UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import {
 	css,
 	html,
@@ -70,7 +66,7 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 		if (!this.#nameDefined()) return;
 		const response = await tryExecuteAndNotify(
 			this,
-			PackageResource.postPackageCreated({ requestBody: this._package })
+			PackageResource.postPackageCreated({ requestBody: this._package }),
 		);
 		if (!response.data || response.error) return;
 		this._package = response.data as PackageDefinitionResponseModel;
@@ -82,7 +78,7 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 		if (!this._package?.id) return;
 		const response = await tryExecuteAndNotify(
 			this,
-			PackageResource.putPackageCreatedById({ id: this._package.id, requestBody: this._package })
+			PackageResource.putPackageCreatedById({ id: this._package.id, requestBody: this._package }),
 		);
 
 		if (response.error) return;

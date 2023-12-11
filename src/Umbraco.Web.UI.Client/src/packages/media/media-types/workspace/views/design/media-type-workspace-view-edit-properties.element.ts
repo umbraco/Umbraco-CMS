@@ -118,10 +118,10 @@ export class UmbMediaTypeWorkspaceViewEditPropertiesElement extends UmbLitElemen
 				if (mediaTypeId === undefined) return false;
 				const propertyData = await this._propertyStructureHelper.createPropertyScaffold(this._containerId);
 				if (propertyData === undefined) return false;
-				return { propertyData, documentTypeId: mediaTypeId }; //TODO: Should we have a separate modal for mediaTypes?
+				return { data: { documentTypeId: mediaTypeId }, value: propertyData }; //TODO: Should we have a separate modal for mediaTypes?
 			})
-			.onSubmit((result) => {
-				this.#addProperty(result);
+			.onSubmit((value) => {
+				this.#addProperty(value);
 			})
 			.observeRouteBuilder((routeBuilder) => {
 				this._modalRouteNewProperty = routeBuilder(null);

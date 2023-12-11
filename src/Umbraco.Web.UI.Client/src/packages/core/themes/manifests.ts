@@ -17,14 +17,14 @@ export const themes: Array<ManifestTypes> = [
 		type: 'theme',
 		alias: 'umb-dark-theme',
 		name: 'Dark',
-		css: 'src/packages/settings/themes/themes/dark.theme.css',
+		css: '/umbraco/backoffice/css/dark.theme.css',
 		weight: 200,
 	},
 	{
 		type: 'theme',
 		alias: 'umb-high-contrast-theme',
 		name: 'High contrast',
-		css: 'src/packages/settings/themes/themes/high-contrast.theme.css',
+		css: '/umbraco/backoffice/css/high-contrast.theme.css',
 		weight: 100,
 	},
 ];

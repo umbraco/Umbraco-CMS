@@ -46,7 +46,7 @@ describe('UmbContextProviderController', () => {
 				expect(_instance?.prop).to.eq('value from provider');
 				done();
 				localConsumer.hostDisconnected();
-			}
+			},
 		);
 		localConsumer.hostConnected();
 	});

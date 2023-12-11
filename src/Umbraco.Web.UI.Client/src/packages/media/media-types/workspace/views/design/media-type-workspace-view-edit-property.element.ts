@@ -92,7 +92,7 @@ export class UmbMediaTypeWorkspacePropertyElement extends UmbLitElement {
 				if (mediaTypeId === undefined) return false;
 				const propertyData = this.property;
 				if (propertyData === undefined) return false;
-				return { propertyData, documentTypeId: mediaTypeId }; //TODO: Should we have a separate modal for mediaTypes?
+				return { data: { documentTypeId: mediaTypeId }, value: propertyData }; //TODO: Should we have a separate modal for mediaTypes?
 			})
 			.onSubmit((result) => {
 				this._partialUpdate(result);
@@ -104,7 +104,7 @@ export class UmbMediaTypeWorkspacePropertyElement extends UmbLitElement {
 		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
 			.addAdditionalPath('media-type')
 			.onSetup(() => {
-				return { entityType: 'media-type', preset: {} };
+				return { data: { entityType: 'media-type', preset: {} } };
 			})
 			.observeRouteBuilder((routeBuilder) => {
 				this._editMediaTypePath = routeBuilder({});
@@ -138,7 +138,7 @@ export class UmbMediaTypeWorkspacePropertyElement extends UmbLitElement {
 		e.stopImmediatePropagation();
 		if (!this.property || !this.property.id) return;
 
-		const Message: UmbConfirmModalData = {
+		const modalData: UmbConfirmModalData = {
 			headline: `${this.localize.term('actions_delete')} property`,
 			content: html`<umb-localize key="contentTypeEditor_confirmDeletePropertyMessage" .args=${[
 				this.property.name || this.property.id,
@@ -150,7 +150,7 @@ export class UmbMediaTypeWorkspacePropertyElement extends UmbLitElement {
 			color: 'danger',
 		};
 
-		const modalHandler = this._modalManagerContext?.open(UMB_CONFIRM_MODAL, Message);
+		const modalHandler = this._modalManagerContext?.open(UMB_CONFIRM_MODAL, { data: modalData });
 
 		modalHandler
 			?.onSubmit()

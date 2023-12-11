@@ -70,7 +70,7 @@ export class UmbPackagesCreatedOverviewElement extends UmbLitElement {
 				${repeat(
 					this._createdPackages,
 					(item) => item.id,
-					(item) => this.#renderPackageItem(item)
+					(item) => this.#renderPackageItem(item),
 				)}
 			</uui-ref-list>
 		</uui-box>`;
@@ -109,10 +109,12 @@ export class UmbPackagesCreatedOverviewElement extends UmbLitElement {
 	async #deletePackage(p: PackageDefinitionResponseModel) {
 		if (!p.id) return;
 		const modalContext = this._modalContext?.open(UMB_CONFIRM_MODAL, {
-			color: 'danger',
-			headline: `Remove ${p.name}?`,
-			content: 'Are you sure you want to delete this package',
-			confirmLabel: 'Delete',
+			data: {
+				color: 'danger',
+				headline: `Remove ${p.name}?`,
+				content: 'Are you sure you want to delete this package',
+				confirmLabel: 'Delete',
+			},
 		});
 
 		await modalContext?.onSubmit();

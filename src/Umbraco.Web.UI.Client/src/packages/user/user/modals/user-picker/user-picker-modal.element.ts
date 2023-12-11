@@ -18,7 +18,7 @@ export class UmbUserPickerModalElement extends UmbModalBaseElement<UmbUserPicker
 
 		// TODO: in theory this config could change during the lifetime of the modal, so we could observe it
 		this.#selectionManager.setMultiple(this.data?.multiple ?? false);
-		this.#selectionManager.setSelection(this.data?.selection ?? []);
+		this.#selectionManager.setSelection(this.value?.selection ?? []);
 	}
 
 	protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
@@ -36,7 +36,8 @@ export class UmbUserPickerModalElement extends UmbModalBaseElement<UmbUserPicker
 	}
 
 	#submit() {
-		this.modalContext?.submit({ selection: this.#selectionManager.getSelection() });
+		this.value = { selection: this.#selectionManager.getSelection() };
+		this.modalContext?.submit();
 	}
 
 	#close() {

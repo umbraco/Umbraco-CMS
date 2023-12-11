@@ -1,4 +1,4 @@
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, LitElement, customElement } from '@umbraco-cms/backoffice/external/lit';
 
 @customElement('umb-section-main')
@@ -17,6 +17,7 @@ export class UmbSectionMainElement extends LitElement {
 			:host {
 				flex: 1 1 auto;
 				height: 100%;
+				min-width: 0;
 			}
 
 			main {

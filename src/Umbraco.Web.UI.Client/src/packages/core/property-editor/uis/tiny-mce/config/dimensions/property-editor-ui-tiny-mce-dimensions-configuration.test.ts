@@ -6,11 +6,9 @@ describe('UmbPropertyEditorUITinyMceDimensionsConfigurationElement', () => {
 	let element: UmbPropertyEditorUITinyMceDimensionsConfigurationElement;
 
 	beforeEach(async () => {
-		element = await fixture(
-			html`
-				<umb-property-editor-ui-tiny-mce-dimensions-configuration></umb-property-editor-ui-tiny-mce-dimensions-configuration>
-			`
-		);
+		element = await fixture(html`
+			<umb-property-editor-ui-tiny-mce-dimensions-configuration></umb-property-editor-ui-tiny-mce-dimensions-configuration>
+		`);
 	});
 
 	it('is defined with its own instance', () => {

@@ -1,5 +1,5 @@
 import { UmbDonutSliceElement } from './donut-slice.element.js';
-import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import {
 	css,
 	html,
@@ -149,7 +149,7 @@ export class UmbDonutChartElement extends LitElement {
 					name: slice.name,
 					kind: slice.kind,
 				};
-			})
+			}),
 		);
 	}
 
@@ -258,7 +258,7 @@ export class UmbDonutChartElement extends LitElement {
 									role="listitem"
 									d="${circle.commands}"
 									transform="rotate(${circle.offset} ${this.viewBox / 2} ${this.viewBox / 2})">
-								</path>`
+								</path>`,
 					)}
 
         `;

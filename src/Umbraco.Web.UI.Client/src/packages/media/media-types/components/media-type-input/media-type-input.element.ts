@@ -3,6 +3,7 @@ import { css, html, customElement, property, state, ifDefined } from '@umbraco-c
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { MediaTypeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-media-type-input')
 export class UmbMediaTypeInputElement extends FormControlMixin(UmbLitElement) {
@@ -62,7 +63,7 @@ export class UmbMediaTypeInputElement extends FormControlMixin(UmbLitElement) {
 	@property()
 	public set value(idsString: string) {
 		// Its with full purpose we don't call super.value, as thats being handled by the observation of the context selection.
-		this.selectedIds = idsString.split(/[ ,]+/);
+		this.selectedIds = splitStringToArray(idsString);
 	}
 
 	@property()

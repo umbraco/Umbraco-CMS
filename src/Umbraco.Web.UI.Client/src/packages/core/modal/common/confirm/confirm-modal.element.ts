@@ -5,7 +5,6 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-confirm-modal')
 export class UmbConfirmModalElement extends UmbLitElement {
-
 	@property({ attribute: false })
 	modalContext?: UmbModalContext<UmbConfirmModalData, UmbConfirmModalValue>;
 
