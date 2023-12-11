@@ -45,7 +45,7 @@ const mapper = (item: FileSystemTreeItemPresentationModel): UmbScriptTreeItemMod
 	return {
 		path: item.path,
 		name: item.name,
-		type: 'script',
+		entityType: 'script',
 		isFolder: item.isFolder,
 		hasChildren: item.hasChildren,
 		isContainer: false,

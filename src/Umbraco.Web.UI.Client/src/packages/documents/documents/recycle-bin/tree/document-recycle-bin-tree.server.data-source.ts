@@ -46,7 +46,7 @@ const mapper = (item: RecycleBinItemResponseModel): UmbDocumentRecycleBinTreeIte
 		id: item.id,
 		parentId: item.parentId || null,
 		name: item.name,
-		type: 'document-recycle-bin',
+		entityType: 'document-recycle-bin',
 		hasChildren: item.hasChildren,
 		isContainer: item.isContainer,
 	};

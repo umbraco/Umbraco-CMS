@@ -45,7 +45,7 @@ const mapper = (item: FileSystemTreeItemPresentationModel): UmbPartialViewTreeIt
 	return {
 		path: item.path,
 		name: item.name,
-		type: 'partial-view',
+		entityType: 'partial-view',
 		isFolder: item.isFolder,
 		hasChildren: item.hasChildren,
 		isContainer: false,

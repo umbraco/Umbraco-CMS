@@ -1,5 +1,5 @@
 export interface UmbTreeItemModelBase {
-	type: string;
+	entityType: string;
 	name: string;
 	hasChildren: boolean;
 	isContainer: boolean;

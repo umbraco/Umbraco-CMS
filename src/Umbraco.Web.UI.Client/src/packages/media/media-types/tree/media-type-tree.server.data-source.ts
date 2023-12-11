@@ -46,7 +46,7 @@ const mapper = (item: MediaTypeTreeItemResponseModel): UmbMediaTypeTreeItemModel
 		id: item.id,
 		parentId: item.parentId || null,
 		name: item.name,
-		type: 'media-type',
+		entityType: 'media-type',
 		hasChildren: item.hasChildren,
 		isContainer: item.isContainer,
 	};

@@ -45,7 +45,7 @@ const mapper = (item: FileSystemTreeItemPresentationModel): UmbStylesheetTreeIte
 	return {
 		path: item.path,
 		name: item.name,
-		type: 'stylesheet',
+		entityType: 'stylesheet',
 		isFolder: item.isFolder,
 		hasChildren: item.hasChildren,
 		isContainer: false,

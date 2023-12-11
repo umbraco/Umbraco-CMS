@@ -72,8 +72,8 @@ export class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemModelBase>
 		if (unique === undefined) throw new Error('Could not create tree item context, unique key is missing');
 		this.unique = unique;
 
-		if (!treeItem.type) throw new Error('Could not create tree item context, tree item type is missing');
-		this.type = treeItem.type;
+		if (!treeItem.entityType) throw new Error('Could not create tree item context, tree item type is missing');
+		this.type = treeItem.entityType;
 
 		this.#hasChildren.next(treeItem.hasChildren || false);
 		this.#treeItem.next(treeItem);

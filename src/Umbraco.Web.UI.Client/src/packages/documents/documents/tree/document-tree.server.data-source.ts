@@ -46,7 +46,7 @@ const mapper = (item: DocumentTreeItemResponseModel): UmbDocumentTreeItemModel =
 		id: item.id,
 		parentId: item.parentId || null,
 		name: item.name,
-		type: 'document',
+		entityType: 'document',
 		isContainer: item.isContainer,
 		hasChildren: item.hasChildren,
 		isProtected: item.isProtected,

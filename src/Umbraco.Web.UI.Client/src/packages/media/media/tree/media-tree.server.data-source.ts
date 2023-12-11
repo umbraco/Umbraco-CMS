@@ -45,7 +45,7 @@ const mapper = (item: MediaTreeItemResponseModel): UmbMediaTreeItemModel => {
 		id: item.id,
 		parentId: item.parentId || null,
 		name: item.name,
-		type: 'media',
+		entityType: 'media',
 		hasChildren: item.hasChildren,
 		isContainer: item.isContainer,
 		noAccess: item.noAccess,

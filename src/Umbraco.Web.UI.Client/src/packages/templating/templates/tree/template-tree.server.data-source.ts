@@ -46,7 +46,7 @@ const mapper = (item: EntityTreeItemResponseModel): UmbTemplateTreeItemModel => 
 		id: item.id,
 		parentId: item.parentId || null,
 		name: item.name,
-		type: 'template',
+		entityType: 'template',
 		isContainer: item.isContainer,
 		hasChildren: item.hasChildren,
 	};

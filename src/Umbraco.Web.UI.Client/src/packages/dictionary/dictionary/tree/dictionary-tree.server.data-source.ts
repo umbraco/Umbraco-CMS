@@ -46,7 +46,7 @@ const mapper = (item: EntityTreeItemResponseModel): UmbDictionaryTreeItemModel =
 		id: item.id,
 		parentId: item.parentId || null,
 		name: item.name,
-		type: 'dictionary-item',
+		entityType: 'dictionary-item',
 		hasChildren: item.hasChildren,
 		isContainer: item.isContainer,
 	};
