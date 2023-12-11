@@ -1,25 +1,32 @@
 ﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Management.Security.Authorization.User;
 using Umbraco.Cms.Api.Management.ViewModels.User;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.User.Current;
 
 [ApiVersion("1.0")]
 public class SetAvatarCurrentUserController : CurrentUserControllerBase
 {
-    private readonly IUserService _userService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
+    private readonly IAuthorizationService _authorizationService;
+    private readonly IUserService _userService;
 
     public SetAvatarCurrentUserController(
-        IUserService userService,
-        IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+        IAuthorizationService authorizationService,
+        IUserService userService)
     {
-        _userService = userService;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
+        _authorizationService = authorizationService;
+        _userService = userService;
     }
 
     [MapToApiVersion("1.0")]
@@ -28,6 +35,16 @@ public class SetAvatarCurrentUserController : CurrentUserControllerBase
     public async Task<IActionResult> SetAvatar(SetAvatarRequestModel model)
     {
         Guid userKey = CurrentUserKey(_backOfficeSecurityAccessor);
+
+        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
+            User,
+            UserPermissionResource.WithKeys(userKey),
+            AuthorizationPolicies.AdminUserEditsRequireAdmin);
+
+        if (!authorizationResult.Succeeded)
+        {
+            return Forbidden();
+        }
 
         UserOperationStatus result = await _userService.SetAvatarAsync(userKey, model.FileId);
 

@@ -10,8 +10,8 @@ namespace Umbraco.Cms.Api.Management.Middleware;
 
 public class BackOfficeAuthorizationInitializationMiddleware : IMiddleware
 {
-    private static bool _firstBackOfficeRequest;
-    private static SemaphoreSlim _firstBackOfficeRequestLocker = new(1);
+    private bool _firstBackOfficeRequest; // this only works because this is a singleton
+    private SemaphoreSlim _firstBackOfficeRequestLocker = new(1); // this only works because this is a singleton
 
     private readonly UmbracoRequestPaths _umbracoRequestPaths;
     private readonly IServiceProvider _serviceProvider;

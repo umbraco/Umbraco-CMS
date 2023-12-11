@@ -7,17 +7,19 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.User;
 
 [ApiVersion("1.0")]
+[Authorize(Policy = "New" + AuthorizationPolicies.DenyLocalLoginIfConfigured)]
 public class CreateInitialPasswordUserController : UserControllerBase
 {
     private readonly IUserService _userService;
 
     public CreateInitialPasswordUserController(IUserService userService) => _userService = userService;
 
-    [AllowAnonymous]
+    // [AllowAnonymous] // This is handled implicitly by the NewDenyLocalLoginIfConfigured policy on the <see cref="SecurityControllerBase" />. Keep it here for now and check FIXME in <see cref="DenyLocalLoginHandler" />.
     [HttpPost("invite/create-password")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
