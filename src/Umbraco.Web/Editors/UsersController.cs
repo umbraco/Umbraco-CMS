@@ -7,6 +7,7 @@ using System.Net;
 using System.Net.Http;
 using System.Runtime.Serialization;
 using System.Security.Cryptography;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
@@ -578,7 +579,7 @@ namespace Umbraco.Web.Editors
             var emailBody = Services.TextService.Localize("user", "inviteEmailCopyFormat",
                 //Ensure the culture of the found user is used for the email!
                 UserExtensions.GetUserCulture(to.Language, Services.TextService, GlobalSettings),
-                new[] { userDisplay.Name, from, message, inviteUri.ToString(), fromEmail });
+                new[] { userDisplay.Name, from, Regex.Replace(WebUtility.HtmlEncode(message),"(\r\n|\r|\n)", "<br/>"), inviteUri.ToString(), fromEmail });
 
             await UserManager.EmailService.SendAsync(
                 //send the special UmbracoEmailMessage which configures it's own sender
