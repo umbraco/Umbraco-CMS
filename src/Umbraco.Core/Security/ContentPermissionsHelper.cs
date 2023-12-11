@@ -100,20 +100,20 @@ namespace Umbraco.Core.Security
             if (userService == null) throw new ArgumentNullException("userService");
             if (entityService == null) throw new ArgumentNullException("entityService");
 
-            bool? hasPathAccess = null;
+            bool hasPathAccess;
             entity = null;
 
             if (nodeId == Constants.System.Root)
                 hasPathAccess = user.HasContentRootAccess(entityService, appCaches);
             else if (nodeId == Constants.System.RecycleBinContent)
                 hasPathAccess = user.HasContentBinAccess(entityService, appCaches);
-
-            if (hasPathAccess.HasValue)
-                return hasPathAccess.Value ? ContentAccess.Granted : ContentAccess.Denied;
-
-            entity = entityService.Get(nodeId, UmbracoObjectTypes.Document);
-            if (entity == null) return ContentAccess.NotFound;
-            hasPathAccess = user.HasContentPathAccess(entity, entityService, appCaches);
+            else
+            {
+                entity = entityService.Get(nodeId, UmbracoObjectTypes.Document);
+                if (entity == null)
+                    return ContentAccess.NotFound;
+                hasPathAccess = user.HasContentPathAccess(entity, entityService, appCaches);
+            }
 
             if (hasPathAccess == false)
                 return ContentAccess.Denied;
@@ -121,8 +121,11 @@ namespace Umbraco.Core.Security
             if (permissionsToCheck == null || permissionsToCheck.Length == 0)
                 return ContentAccess.Granted;
 
+            // if there is no entity for this id, then just use the id as the path (i.e. -1 or -20)
+            var path = entity == null ? nodeId.ToString() : entity.Path;
+
             //get the implicit/inherited permissions for the user for this path
-            return CheckPermissionsPath(entity.Path, user, userService, permissionsToCheck)
+            return CheckPermissionsPath(path, user, userService, permissionsToCheck)
                 ? ContentAccess.Granted
                 : ContentAccess.Denied;
         }
@@ -153,20 +156,20 @@ namespace Umbraco.Core.Security
             if (contentService == null) throw new ArgumentNullException("contentService");
             if (entityService == null) throw new ArgumentNullException("entityService");
 
-            bool? hasPathAccess = null;
+            bool hasPathAccess;
             contentItem = null;
 
             if (nodeId == Constants.System.Root)
                 hasPathAccess = user.HasContentRootAccess(entityService, appCaches);
             else if (nodeId == Constants.System.RecycleBinContent)
                 hasPathAccess = user.HasContentBinAccess(entityService, appCaches);
-
-            if (hasPathAccess.HasValue)
-                return hasPathAccess.Value ? ContentAccess.Granted : ContentAccess.Denied;
-
-            contentItem = contentService.GetById(nodeId);
-            if (contentItem == null) return ContentAccess.NotFound;
-            hasPathAccess = user.HasPathAccess(contentItem, entityService, appCaches);
+            else
+            {
+                contentItem = contentService.GetById(nodeId);
+                if (contentItem == null)
+                    return ContentAccess.NotFound;
+                hasPathAccess = user.HasPathAccess(contentItem, entityService, appCaches);
+            }
 
             if (hasPathAccess == false)
                 return ContentAccess.Denied;
@@ -174,16 +177,18 @@ namespace Umbraco.Core.Security
             if (permissionsToCheck == null || permissionsToCheck.Length == 0)
                 return ContentAccess.Granted;
 
+            // if there is no content item for this id, then just use the id as the path (i.e. -1 or -20)
+            var path = contentItem == null ? nodeId.ToString() : contentItem.Path;
+
             //get the implicit/inherited permissions for the user for this path
-            return CheckPermissionsPath(contentItem.Path, user, userService, permissionsToCheck)
+            return CheckPermissionsPath(path, user, userService, permissionsToCheck)
                 ? ContentAccess.Granted
                 : ContentAccess.Denied;
         }
 
         private static bool CheckPermissionsPath(string path, IUser user, IUserService userService, params char[] permissionsToCheck)
         {
-            //get the implicit/inherited permissions for the user for this path,
-            //if there is no content item for this id, than just use the id as the path (i.e. -1 or -20)
+            //get the implicit/inherited permissions for the user for this path
             var permission = userService.GetPermissionsForPath(user, path);
 
             var allowed = true;

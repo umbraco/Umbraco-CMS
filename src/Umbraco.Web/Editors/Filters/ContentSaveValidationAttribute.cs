@@ -16,6 +16,7 @@ using Umbraco.Web.Actions;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Security;
+using Umbraco.Web.WebApi;
 
 namespace Umbraco.Web.Editors.Filters
 {
@@ -117,7 +118,7 @@ namespace Umbraco.Web.Editors.Filters
                     break;
                 case ContentSaveAction.Schedule:
                     permissionToCheck.Add(ActionUpdate.ActionLetter);
-                    permissionToCheck.Add(ActionToPublish.ActionLetter);
+                    permissionToCheck.Add(ActionPublish.ActionLetter);
                     contentToCheck = contentItem.PersistedContent;
                     contentIdToCheck = contentToCheck.Id;
                     break;
@@ -216,6 +217,9 @@ namespace Umbraco.Web.Editors.Filters
 
             if (accessResult == ContentPermissionsHelper.ContentAccess.NotFound)
                 throw new HttpResponseException(HttpStatusCode.NotFound);
+
+            if(accessResult == ContentPermissionsHelper.ContentAccess.Denied)
+                actionContext.Response = actionContext.Request.CreateUserNoAccessResponse();
 
             return accessResult == ContentPermissionsHelper.ContentAccess.Granted;
         }
