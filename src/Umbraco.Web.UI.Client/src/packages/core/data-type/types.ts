@@ -1,4 +1,4 @@
-export type UmbDataTypeDetailModel = {
+export interface UmbDataTypeDetailModel {
 	type: string;
 	unique: string;
 	parentUnique: string | null;
@@ -6,7 +6,7 @@ export type UmbDataTypeDetailModel = {
 	propertyEditorAlias: string | undefined;
 	propertyEditorUiAlias: string | null;
 	values: Array<UmbDataTypePropertyModel>;
-};
+}
 
 export interface UmbDataTypePropertyModel {
 	alias: string;
