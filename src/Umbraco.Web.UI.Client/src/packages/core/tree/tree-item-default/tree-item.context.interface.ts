@@ -4,7 +4,7 @@ import { UmbPagedData } from '@umbraco-cms/backoffice/repository';
 
 export interface UmbTreeItemContext<TreeItemType extends TreeItemPresentationModel> {
 	unique?: string | null;
-	type?: string;
+	entityType?: string;
 	treeItem: Observable<TreeItemType | undefined>;
 	hasChildren: Observable<boolean>;
 	isLoading: Observable<boolean>;

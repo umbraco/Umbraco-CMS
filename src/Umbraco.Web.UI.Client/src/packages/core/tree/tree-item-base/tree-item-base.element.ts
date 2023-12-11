@@ -136,7 +136,7 @@ export class UmbTreeItemBaseElement extends UmbLitElement {
 		return this.#treeItemContext && this._item
 			? html`<umb-entity-actions-bundle
 					slot="actions"
-					.entityType=${this.#treeItemContext.type}
+					.entityType=${this.#treeItemContext.entityType}
 					.unique=${this.#treeItemContext.unique}
 					.label=${this._item.name}>
 			  </umb-entity-actions-bundle>`

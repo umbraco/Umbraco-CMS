@@ -19,9 +19,9 @@ export class UmbFileSystemTreeItemContext extends UmbTreeItemContextBase<UmbFile
 		const treeItem = this.getTreeItem();
 		if (treeItem?.isFolder) {
 			if (treeItem.hasChildren) {
-				this.type = `${this.getTreeItem()?.entityType}-folder`;
+				this.entityType = `${this.getTreeItem()?.entityType}-folder`;
 			} else {
-				this.type = `${this.getTreeItem()?.entityType}-folder-empty`;
+				this.entityType = `${this.getTreeItem()?.entityType}-folder-empty`;
 			}
 		}
 	}

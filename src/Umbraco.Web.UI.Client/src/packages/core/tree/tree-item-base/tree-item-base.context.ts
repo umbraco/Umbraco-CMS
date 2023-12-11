@@ -19,7 +19,7 @@ export class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemModelBase>
 	implements UmbTreeItemContext<TreeItemType>
 {
 	public unique?: string | null;
-	public type?: string;
+	public entityType?: string;
 
 	#treeItem = new UmbDeepState<TreeItemType | undefined>(undefined);
 	treeItem = this.#treeItem.asObservable();
@@ -73,7 +73,7 @@ export class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemModelBase>
 		this.unique = unique;
 
 		if (!treeItem.entityType) throw new Error('Could not create tree item context, tree item type is missing');
-		this.type = treeItem.entityType;
+		this.entityType = treeItem.entityType;
 
 		this.#hasChildren.next(treeItem.hasChildren || false);
 		this.#treeItem.next(treeItem);
@@ -96,11 +96,11 @@ export class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemModelBase>
 	}
 
 	public toggleContextMenu() {
-		if (!this.getTreeItem() || !this.type || this.unique === undefined) {
+		if (!this.getTreeItem() || !this.entityType || this.unique === undefined) {
 			throw new Error('Could not request children, tree item is not set');
 		}
 
-		this.#sectionSidebarContext?.toggleContextMenu(this.type, this.unique, this.getTreeItem()?.name || '');
+		this.#sectionSidebarContext?.toggleContextMenu(this.entityType, this.unique, this.getTreeItem()?.name || '');
 	}
 
 	public select() {
@@ -170,8 +170,8 @@ export class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemModelBase>
 		this.observe(
 			this.#sectionContext.pathname,
 			(pathname) => {
-				if (!pathname || !this.type || this.unique === undefined) return;
-				const path = this.constructPath(pathname, this.type, this.unique);
+				if (!pathname || !this.entityType || this.unique === undefined) return;
+				const path = this.constructPath(pathname, this.entityType, this.unique);
 				this.#path.next(path);
 			},
 			'observeSectionPath',
@@ -182,7 +182,7 @@ export class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemModelBase>
 		this.observe(
 			umbExtensionsRegistry
 				.extensionsOfType('entityAction')
-				.pipe(map((actions) => actions.filter((action) => action.meta.entityTypes.includes(this.type!)))),
+				.pipe(map((actions) => actions.filter((action) => action.meta.entityTypes.includes(this.entityType!)))),
 			(actions) => {
 				this.#hasActions.next(actions.length > 0);
 			},
