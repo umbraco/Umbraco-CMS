@@ -1,7 +1,7 @@
 import { UmbDictionaryTreeItemModel } from './types.js';
-import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
+import { UmbEntityTreeItemModel, UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { DictionaryResource, EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { DictionaryResource } from '@umbraco-cms/backoffice/backend-api';
 
 /**
  * A data source for the Dictionary tree that fetches data from the server
@@ -10,7 +10,7 @@ import { DictionaryResource, EntityTreeItemResponseModel } from '@umbraco-cms/ba
  * @implements {UmbTreeDataSource}
  */
 export class UmbDictionaryTreeServerDataSource extends UmbTreeServerDataSourceBase<
-	EntityTreeItemResponseModel,
+	UmbEntityTreeItemModel,
 	UmbDictionaryTreeItemModel
 > {
 	/**
@@ -41,7 +41,7 @@ const getChildrenOf = (parentUnique: string | null) => {
 	}
 };
 
-const mapper = (item: EntityTreeItemResponseModel): UmbDictionaryTreeItemModel => {
+const mapper = (item: UmbEntityTreeItemModel): UmbDictionaryTreeItemModel => {
 	return {
 		id: item.id,
 		parentId: item.parentId || null,

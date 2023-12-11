@@ -8,8 +8,7 @@ import {
 	UmbModalBaseElement,
 } from '@umbraco-cms/backoffice/modal';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbTreeElement } from '@umbraco-cms/backoffice/tree';
+import { UmbEntityTreeItemModel, UmbTreeElement } from '@umbraco-cms/backoffice/tree';
 
 interface DictionaryItemPreview {
 	name: string;
@@ -46,8 +45,8 @@ export class UmbImportDictionaryModalLayout extends UmbModalBaseElement<
 		this.modalContext?.reject();
 	}
 
-	#createTreeEntitiesFromTempFile(): Array<EntityTreeItemResponseModel> {
-		const data: Array<EntityTreeItemResponseModel> = [];
+	#createTreeEntitiesFromTempFile(): Array<UmbEntityTreeItemModel> {
+		const data: Array<UmbEntityTreeItemModel> = [];
 
 		const list = this.#dictionaryPreviewItemBuilder(this.#fileNodes);
 		const scaffold = (items: Array<DictionaryItemPreview>, parentId?: string) => {
@@ -55,9 +54,9 @@ export class UmbImportDictionaryModalLayout extends UmbModalBaseElement<
 				data.push({
 					id: item.id,
 					name: item.name,
-					type: 'dictionary-item',
+					entityType: 'dictionary-item',
 					hasChildren: item.children.length ? true : false,
-					parentId: parentId,
+					parentId: parentId || null,
 					isContainer: false,
 				});
 				scaffold(item.children, item.id);

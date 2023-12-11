@@ -1,9 +1,9 @@
 import type { UmbTreeItemContext } from '../tree-item-default/index.js';
+import { UmbTreeItemModelBase } from '../types.js';
 import { UMB_TREE_ITEM_CONTEXT_TOKEN } from './tree-item-base.context.js';
 import { css, html, nothing, customElement, state, ifDefined, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-tree-item-base')
 export class UmbTreeItemBaseElement extends UmbLitElement {
@@ -11,10 +11,10 @@ export class UmbTreeItemBaseElement extends UmbLitElement {
 	private _iconAlias?: string;
 
 	@state()
-	private _item?: TreeItemPresentationModel;
+	private _item?: UmbTreeItemModelBase;
 
 	@state()
-	private _childItems?: TreeItemPresentationModel[];
+	private _childItems?: UmbTreeItemModelBase[];
 
 	@state()
 	private _href?: string;
@@ -37,7 +37,7 @@ export class UmbTreeItemBaseElement extends UmbLitElement {
 	@state()
 	private _iconSlotHasChildren = false;
 
-	#treeItemContext?: UmbTreeItemContext<TreeItemPresentationModel>;
+	#treeItemContext?: UmbTreeItemContext<UmbTreeItemModelBase>;
 
 	constructor() {
 		super();
