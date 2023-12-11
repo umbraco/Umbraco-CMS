@@ -104,12 +104,12 @@ export class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemModelBase>
 	}
 
 	public select() {
-		if (this.unique === undefined) throw new Error('Could not select, unique key is missing');
+		if (this.unique === undefined) throw new Error('Could not select. Unique is missing');
 		this.treeContext?.selection.select(this.unique);
 	}
 
 	public deselect() {
-		if (this.unique === undefined) throw new Error('Could not deselect, unique key is missing');
+		if (this.unique === undefined) throw new Error('Could not deselect. Unique is missing');
 		this.treeContext?.selection.deselect(this.unique);
 	}
 
