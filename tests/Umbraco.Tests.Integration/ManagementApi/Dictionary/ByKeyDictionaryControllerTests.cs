@@ -1,25 +1,17 @@
 using System.Linq.Expressions;
 using System.Net;
-using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Controllers.Dictionary;
-using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.Dictionary;
 
-[TestFixture]
-public class ByKeyDictionaryControllerTests : DictionaryBaseTest<ByKeyDictionaryController>
+public class ByKeyDictionaryControllerTests : ManagementApiUserGroupTestBase<ByKeyDictionaryController>
 {
-    private Guid _dictionaryId;
-
     protected override Expression<Func<ByKeyDictionaryController, object>> MethodSelector =>
-        x => x.ByKey(_dictionaryId);
-
-    [SetUp]
-    public void Setup() => _dictionaryId = CreateDictionaryItem("TestDictionaryItem");
+        x => x.ByKey(Guid.NewGuid());
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.OK
+        ExpectedStatusCode = HttpStatusCode.NotFound
     };
 
     protected override UserGroupAssertionModel EditorUserGroupAssertionModel => new()
@@ -34,7 +26,7 @@ public class ByKeyDictionaryControllerTests : DictionaryBaseTest<ByKeyDictionary
 
     protected override UserGroupAssertionModel TranslatorUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.OK
+        ExpectedStatusCode = HttpStatusCode.NotFound
     };
 
     protected override UserGroupAssertionModel WriterUserGroupAssertionModel => new()

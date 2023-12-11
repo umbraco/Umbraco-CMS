@@ -1,32 +1,19 @@
 using System.Linq.Expressions;
 using System.Net;
 using System.Net.Http.Json;
-using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Controllers.Dictionary;
 using Umbraco.Cms.Api.Management.ViewModels.Dictionary;
-using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.Dictionary;
 
-[TestFixture]
-public class MoveDictionaryControllerTests : DictionaryBaseTest<MoveDictionaryController>
+public class MoveDictionaryControllerTests : ManagementApiUserGroupTestBase<MoveDictionaryController>
 {
-    private Guid _dictionaryId;
-    private Guid _targetDictionaryId;
-
     protected override Expression<Func<MoveDictionaryController, object>> MethodSelector =>
-        x => x.Move(_dictionaryId, null);
-
-    [SetUp]
-    public void Setup()
-    {
-        _dictionaryId = CreateDictionaryItem("TestDictionaryItem");
-        _targetDictionaryId = CreateDictionaryItem("TestTargetDictionary");
-    }
+        x => x.Move(Guid.NewGuid(), null);
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.OK
+        ExpectedStatusCode = HttpStatusCode.NotFound
     };
 
     protected override UserGroupAssertionModel EditorUserGroupAssertionModel => new()
@@ -41,7 +28,7 @@ public class MoveDictionaryControllerTests : DictionaryBaseTest<MoveDictionaryCo
 
     protected override UserGroupAssertionModel TranslatorUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.OK
+        ExpectedStatusCode = HttpStatusCode.NotFound
     };
 
     protected override UserGroupAssertionModel WriterUserGroupAssertionModel => new()
@@ -57,7 +44,7 @@ public class MoveDictionaryControllerTests : DictionaryBaseTest<MoveDictionaryCo
     protected override async Task<HttpResponseMessage> ClientRequest()
     {
         MoveDictionaryRequestModel moveDictionaryRequestModel =
-            new() { TargetId = _targetDictionaryId };
+            new() { TargetId = Guid.NewGuid() };
         return await Client.PostAsync(Url, JsonContent.Create(moveDictionaryRequestModel));
     }
 }

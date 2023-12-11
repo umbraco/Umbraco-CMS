@@ -1,11 +1,9 @@
 using System.Linq.Expressions;
 using System.Net;
-using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Controllers.Dictionary;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.Dictionary;
 
-[TestFixture]
 public class AllDictionaryControllerTests : ManagementApiUserGroupTestBase<AllDictionaryController>
 {
     protected override Expression<Func<AllDictionaryController, object>> MethodSelector =>

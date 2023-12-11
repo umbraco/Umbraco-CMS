@@ -1,11 +1,9 @@
 using System.Linq.Expressions;
 using System.Net;
-using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Controllers.Dictionary.Item;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.Dictionary.Item;
 
-[TestFixture]
 public class ItemDictionaryItemControllerTests : ManagementApiUserGroupTestBase<ItemDictionaryItemController>
 {
     protected override Expression<Func<ItemDictionaryItemController, object>> MethodSelector =>

@@ -1,13 +1,11 @@
 using System.Linq.Expressions;
 using System.Net;
 using System.Net.Http.Json;
-using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Controllers.Dictionary;
 using Umbraco.Cms.Api.Management.ViewModels.Dictionary;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.Dictionary;
 
-[TestFixture]
 public class CreateDictionaryControllerTests : ManagementApiUserGroupTestBase<CreateDictionaryController>
 {
     protected override Expression<Func<CreateDictionaryController, object>> MethodSelector =>
