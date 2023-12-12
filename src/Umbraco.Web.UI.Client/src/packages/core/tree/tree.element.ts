@@ -66,6 +66,15 @@ export class UmbTreeElement extends UmbLitElement {
 		this.#treeContext.selectableFilter = newVal;
 	}
 
+	@property()
+	get filter() {
+		return this.#treeContext.filter;
+	}
+	set filter(newVal) {
+		console.log(typeof newVal);
+		this.#treeContext.filter = newVal;
+	}
+
 	@state()
 	private _items: TreeItemPresentationModel[] = [];
 
@@ -97,7 +106,16 @@ export class UmbTreeElement extends UmbLitElement {
 		if (asObservable) {
 			this.#rootItemsObserver = this.observe(asObservable(), (rootItems) => {
 				const oldValue = this._items;
-				this._items = rootItems;
+				if (this.filter) {
+					const items: Array<TreeItemPresentationModel> = [];
+					rootItems.forEach((rootItem) => {
+						const filtered = this.filter!(rootItem);
+						if (filtered) items.push(rootItem);
+					});
+					this._items = items;
+				} else {
+					this._items = rootItems;
+				}
 				this.requestUpdate('_items', oldValue);
 			});
 		}
