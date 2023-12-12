@@ -1,7 +1,7 @@
 import { expect, fixture, html } from '@open-wc/testing';
 import { UmbInputStaticFileElement } from './input-static-file.element.js';
 import { defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
-describe('UmbInputDocumentElement', () => {
+describe('UmbInputStaticFileElement', () => {
 	let element: UmbInputStaticFileElement;
 
 	beforeEach(async () => {
