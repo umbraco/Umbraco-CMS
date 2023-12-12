@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.Media;
 
+[TestFixture]
 public class MoveMediaControllerTests : ManagementApiUserGroupTestBase<MoveMediaController>
 {
     private Guid _mediaKey = Guid.Empty;
