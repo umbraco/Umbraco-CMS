@@ -13,8 +13,8 @@ export type StartNode = {
 	query?: string | null;
 };
 
-@customElement('umb-input-content-type')
-export class UmbInputContentTypeElement extends FormControlMixin(UmbLitElement) {
+@customElement('umb-input-start-node')
+export class UmbInputStartNodeElement extends FormControlMixin(UmbLitElement) {
 	protected getFormElement() {
 		return undefined;
 	}
@@ -110,10 +110,10 @@ export class UmbInputContentTypeElement extends FormControlMixin(UmbLitElement) 
 	];
 }
 
-export default UmbInputContentTypeElement;
+export default UmbInputStartNodeElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-input-content-type': UmbInputContentTypeElement;
+		'umb-input-start-node': UmbInputStartNodeElement;
 	}
 }
