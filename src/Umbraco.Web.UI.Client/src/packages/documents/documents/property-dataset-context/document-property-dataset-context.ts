@@ -34,7 +34,7 @@ export class UmbDocumentPropertyDataContext
 	// This will actually make it simpler if multiple are watching the same property.
 	// But it will also mean that we wil watch all properties and their structure, for variantID, all the time for all of the properties.
 
-	getType(): string {
+	getEntityType(): string {
 		return this.#workspace.getEntityType();
 	}
 	getUnique(): string | undefined {

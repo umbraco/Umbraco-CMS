@@ -16,7 +16,7 @@ import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
  * Also setting the name is an additional feature.
  */
 export interface UmbPropertyDatasetContext {
-	getType(): string;
+	getEntityType(): string;
 	getUnique(): string | undefined;
 	getVariantId: () => UmbVariantId;
 

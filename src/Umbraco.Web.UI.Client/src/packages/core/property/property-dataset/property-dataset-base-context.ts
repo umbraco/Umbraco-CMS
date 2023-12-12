@@ -26,7 +26,7 @@ export class UmbPropertyDatasetBaseContext
 	private _entityType!: string;
 	private _unique!: string;
 
-	getType() {
+	getEntityType() {
 		return this._entityType;
 	}
 	getUnique() {

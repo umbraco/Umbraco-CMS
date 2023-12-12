@@ -26,7 +26,7 @@ export class UmbInvariantWorkspacePropertyDatasetContext<
 	getVariantId() {
 		return UmbVariantId.CreateInvariant();
 	}
-	getType() {
+	getEntityType() {
 		return this.#workspace.getEntityType();
 	}
 	getUnique() {

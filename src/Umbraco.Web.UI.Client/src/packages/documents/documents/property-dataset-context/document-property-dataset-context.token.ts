@@ -5,7 +5,7 @@ import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 export const IsDocumentVariantContext = (
 	context: UmbPropertyDatasetContext,
-): context is UmbDocumentPropertyDataContext => context.getType() === UMB_DOCUMENT_ENTITY_TYPE;
+): context is UmbDocumentPropertyDataContext => context.getEntityType() === UMB_DOCUMENT_ENTITY_TYPE;
 
 export const UMB_DOCUMENT_VARIANT_CONTEXT = new UmbContextToken<
 	UmbPropertyDatasetContext,
