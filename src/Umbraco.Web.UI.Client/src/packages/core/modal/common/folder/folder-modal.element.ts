@@ -1,37 +1,23 @@
-import { css, html, customElement, property, query, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbFolderModalData, UmbFolderModalValue, UmbModalContext } from '@umbraco-cms/backoffice/modal';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbFolderRepository } from '@umbraco-cms/backoffice/repository';
+import { UmbFolderModalData, UmbFolderModalValue, UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
+import {
+	UmbCreateFolderModel,
+	UmbFolderModel,
+	UmbFolderRepository,
+	UmbFolderScaffoldModel,
+	UmbUpdateFolderModel,
+} from '@umbraco-cms/backoffice/repository';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
-import { FolderResponseModel, ProblemDetails } from '@umbraco-cms/backoffice/backend-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-folder-modal')
-export class UmbFolderModalElement extends UmbLitElement {
-	@property({ attribute: false })
-	modalContext?: UmbModalContext<UmbFolderModalData, UmbFolderModalValue>;
-
-	private _data?: UmbFolderModalData;
-	@property({ type: Object, attribute: false })
-	public get data() {
-		return this._data;
-	}
-	public set data(value: UmbFolderModalData | undefined) {
-		this._data = value;
-		this.#unique = value?.unique || null;
-		this.#parentUnique = value?.parentUnique || null;
-		this.#repositoryAlias = value?.repositoryAlias;
-		this.#observeRepository();
-	}
-
-	#repositoryAlias?: string;
-	#unique: string | null = null;
-	#parentUnique: string | null = null;
-	#folderRepository?: UmbFolderRepository;
+export class UmbFolderModalElement extends UmbModalBaseElement<UmbFolderModalData, UmbFolderModalValue> {
+	@state()
+	_folder?: UmbFolderModel;
 
 	@state()
-	_folder?: FolderResponseModel;
+	_folderScaffold?: UmbFolderScaffoldModel;
 
 	@state()
 	_headline?: string;
@@ -39,76 +25,96 @@ export class UmbFolderModalElement extends UmbLitElement {
 	@state()
 	_isNew = false;
 
-	#observeRepository() {
-		if (!this.#repositoryAlias) return;
+	#folderRepository?: UmbFolderRepository;
 
-		new UmbExtensionApiInitializer(this, umbExtensionsRegistry, this.#repositoryAlias, [this], (permitted, ctrl) => {
-			this.#folderRepository = permitted ? (ctrl.api as UmbFolderRepository) : undefined;
-			this.#init();
-		});
+	connectedCallback(): void {
+		super.connectedCallback();
+		this.#observeRepository();
 	}
 
-	// TODO: so I ended up building a full workspace in the end. We should look into building the real workspace folder editor
-	// and see if we can use that in this modal instead of this custom logic.
+	#observeRepository() {
+		if (!this.data?.folderRepositoryAlias) throw new Error('A folder repository alias is required');
+
+		new UmbExtensionApiInitializer(
+			this,
+			umbExtensionsRegistry,
+			this.data.folderRepositoryAlias,
+			[this],
+			(permitted, ctrl) => {
+				this.#folderRepository = permitted ? (ctrl.api as UmbFolderRepository) : undefined;
+				this.#init();
+			},
+		);
+	}
+
 	#init() {
-		if (this.#unique) {
+		if (this.data?.unique) {
 			this.#load();
 		} else {
-			this.#create();
+			this.#createScaffold();
 		}
 	}
 
-	async #create() {
-		if (!this.#folderRepository) throw new Error('Repository is required to create folder');
-		const { data } = await this.#folderRepository.createScaffold(this.#parentUnique);
-		this._folder = data;
-		this._isNew = true;
+	async #createScaffold() {
+		if (!this.#folderRepository) throw new Error('A folder repository is required to create a folder');
+		if (!this.data?.parentUnique) throw new Error('A parent unique is required to create folder');
+
+		const { data } = await this.#folderRepository.createScaffold(this.data.parentUnique);
+
+		if (data) {
+			this._folderScaffold = data;
+			this._isNew = true;
+		}
 	}
 
 	async #load() {
-		if (!this.#unique) throw new Error('Unique is required to load folder');
-		if (!this.#folderRepository) throw new Error('Repository is required to create folder');
-		const { data } = await this.#folderRepository.request(this.#unique);
-		this._folder = data;
-		this._isNew = false;
-	}
+		if (!this.#folderRepository) throw new Error('A folder repository is required to load a folder');
+		if (!this.data?.unique) throw new Error('A unique is required to load folder');
 
-	@query('#dataTypeFolderForm')
-	private _formElement?: HTMLFormElement;
+		const { data } = await this.#folderRepository.request(this.data.unique);
 
-	#onCancel() {
-		this.modalContext?.reject();
-	}
-
-	#submitForm() {
-		this._formElement?.requestSubmit();
+		if (data) {
+			this._folder = data;
+			this._isNew = false;
+		}
 	}
 
 	async #onSubmit(event: SubmitEvent) {
 		event.preventDefault();
-		if (!this._folder) throw new Error('Folder is not initialized correctly');
-		if (!this.#folderRepository) throw new Error('Repository is required to create folder');
 
-		const isValid = this._formElement?.checkValidity();
+		const form = event.target as HTMLFormElement;
+		if (!form) return;
+
+		const isValid = form.checkValidity();
 		if (!isValid) return;
 
-		let error: ProblemDetails | undefined;
-
-		const formData = new FormData(this._formElement);
-		const folderName = formData.get('name') as string;
-		this._folder = { ...this._folder, name: folderName };
+		const formData = new FormData(form);
+		const name = formData.get('name') as string;
 
 		if (this._isNew) {
-			const { error: createError } = await this.#folderRepository.create(this._folder);
-			error = createError;
+			if (!this._folderScaffold) throw new Error('A folder scaffold has not been loaded to create a folder');
+			this.#create({ ...this._folderScaffold, name });
 		} else {
-			if (!this.#unique) throw new Error('Unique is required to update folder');
-			const { error: updateError } = await this.#folderRepository.update(this.#unique, this._folder);
-			error = updateError;
+			if (!this._folder) throw new Error('A folder has not been loaded to update');
+			this.#update({ unique: this._folder.unique, name });
 		}
+	}
+
+	async #create(data: UmbCreateFolderModel) {
+		if (!this.#folderRepository) throw new Error('A folder repository is required to create a folder');
+		const { error } = await this.#folderRepository.create(data);
 
 		if (!error) {
-			this.modalContext?.submit();
+			this._submitModal();
+		}
+	}
+
+	async #update(data: UmbUpdateFolderModel) {
+		if (!this.#folderRepository) throw new Error('A folder repository is required to update a folder');
+		const { error } = await this.#folderRepository.update(data);
+
+		if (!error) {
+			this._submitModal();
 		}
 	}
 
@@ -117,7 +123,7 @@ export class UmbFolderModalElement extends UmbLitElement {
 			<umb-body-layout headline=${this._isNew ? 'Create Folder' : 'Update Folder'}>
 				<uui-box>
 					<uui-form>
-						<form id="dataTypeFolderForm" name="data" @submit="${this.#onSubmit}">
+						<form id="FolderForm" @submit="${this.#onSubmit}">
 							<uui-form-layout-item>
 								<uui-label id="nameLabel" for="name" slot="label" required>Folder name</uui-label>
 								<uui-input
@@ -133,15 +139,15 @@ export class UmbFolderModalElement extends UmbLitElement {
 					</uui-form>
 				</uui-box>
 
-				<uui-button slot="actions" id="cancel" label="Cancel" @click="${this.#onCancel}"></uui-button>
+				<uui-button slot="actions" id="cancel" label="Cancel" @click="${this._rejectModal}"></uui-button>
 				<uui-button
+					form="FolderForm"
 					type="submit"
 					slot="actions"
 					id="confirm"
 					color="positive"
 					look="primary"
-					label=${this._isNew ? 'Create Folder' : 'Update Folder'}
-					@click=${this.#submitForm}></uui-button>
+					label=${this._isNew ? 'Create Folder' : 'Update Folder'}></uui-button>
 			</umb-body-layout>
 		`;
 	}
