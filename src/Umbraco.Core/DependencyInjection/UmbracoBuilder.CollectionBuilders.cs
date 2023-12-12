@@ -8,7 +8,6 @@ using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Sections;
 using Umbraco.Cms.Core.Webhooks;
-using static Umbraco.Cms.Core.DependencyInjection.WebhookEventCollectionBuilderExtensions;
 
 namespace Umbraco.Cms.Core.DependencyInjection;
 
@@ -222,7 +221,7 @@ public static partial class UmbracoBuilderExtensions
     /// <param name="builder">The builder.</param>
     /// <param name="cmsBuilder">The CMS builder.</param>
     /// <returns>The builder.</returns>
-    public static IUmbracoBuilder ConfigureCmsWebhookEvents(this IUmbracoBuilder builder, Action<WebhookEventCollectionBuilderCms> cmsBuilder)
+    public static IUmbracoBuilder ConfigureCmsWebhookEvents(this IUmbracoBuilder builder, Action<WebhookEventCollectionBuilderExtensions.WebhookEventCollectionBuilderCms> cmsBuilder)
     {
         builder.WebhookEvents().AddCms(cmsBuilder);
         return builder;
