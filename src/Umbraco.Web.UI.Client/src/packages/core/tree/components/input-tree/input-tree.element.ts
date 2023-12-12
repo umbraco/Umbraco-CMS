@@ -3,7 +3,7 @@ import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbInputDocumentElement } from '@umbraco-cms/backoffice/document';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import { StartNode } from '@umbraco-cms/backoffice/content-type';
+import type { StartNode } from '@umbraco-cms/backoffice/components';
 
 @customElement('umb-input-tree')
 export class UmbInputTreeElement extends FormControlMixin(UmbLitElement) {
