@@ -301,7 +301,7 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
     public async Task<Attempt<IUserGroup, UserGroupOperationStatus>> UpdateAsync(
         IUserGroup userGroup,
         Guid userKey,
-        Guid[]? groupUserKeys)
+        Guid[]? groupUserKeys = null)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
