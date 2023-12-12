@@ -9,6 +9,7 @@ using Umbraco.Core.Models;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
+using Constants = Umbraco.Core.Constants;
 using Language = Umbraco.Web.Models.ContentEditing.Language;
 
 namespace Umbraco.Web.Editors
@@ -18,7 +19,7 @@ namespace Umbraco.Web.Editors
     /// </summary>
     [PluginController("UmbracoApi")]
     [PrefixlessBodyModelValidator]
-    [UmbracoApplicationAuthorize(Core.Constants.Applications.Settings)]
+
     public class LanguageController : UmbracoAuthorizedJsonController
     {
         /// <summary>
@@ -26,6 +27,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <returns></returns>
         [HttpGet]
+        [UmbracoTreeAuthorize(Constants.Trees.Languages)]
         public IDictionary<string, string> GetAllCultures()
         {
             // get cultures - new-ing instances to get proper display name,
@@ -43,6 +45,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <returns></returns>
         [HttpGet]
+        [UmbracoApplicationAuthorize(Core.Constants.Applications.Content)]
         public IEnumerable<Language> GetAllLanguages()
         {
             var allLanguages = Services.LocalizationService.GetAllLanguages();
@@ -51,6 +54,7 @@ namespace Umbraco.Web.Editors
         }
 
         [HttpGet]
+        [UmbracoTreeAuthorize(Constants.Trees.Languages)]
         public Language GetLanguage(int id)
         {
             var lang = Services.LocalizationService.GetLanguageById(id);

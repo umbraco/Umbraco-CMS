@@ -11,7 +11,8 @@ namespace Umbraco.Web.Editors
     /// The API controller used for retrieving available stylesheets
     /// </summary>
     [PluginController("UmbracoApi")]
-    [UmbracoApplicationAuthorize(Core.Constants.Applications.Settings)]
+    // This is a bit wierd, but if you have access to the content section, you can load a rich text editor, and thus need to get the rules.
+    [UmbracoApplicationAuthorize(Core.Constants.Applications.Content)]
     public class StylesheetController : UmbracoAuthorizedJsonController
     {
         public IEnumerable<Stylesheet> GetAll()
