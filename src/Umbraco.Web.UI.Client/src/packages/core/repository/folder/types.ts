@@ -1,3 +1,8 @@
+export interface UmbFolderScaffoldModel {
+	name: string;
+	parentUnique: string | null;
+}
+
 export interface UmbFolderModel {
 	unique: string;
 	parentUnique: string | null;
