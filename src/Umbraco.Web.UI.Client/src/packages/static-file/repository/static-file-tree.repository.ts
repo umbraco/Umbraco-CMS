@@ -17,6 +17,7 @@ export class UmbStaticFileTreeRepository
 	async requestTreeRoot() {
 		const data = {
 			id: null,
+			unique: null,
 			type: UMB_STATIC_FILE_ROOT_ENTITY_TYPE,
 			name: 'StaticFiles',
 			icon: 'icon-folder',
