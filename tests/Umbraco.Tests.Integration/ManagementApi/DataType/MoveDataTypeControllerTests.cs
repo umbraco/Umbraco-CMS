@@ -1,91 +1,50 @@
 using System.Linq.Expressions;
 using System.Net;
 using System.Net.Http.Json;
-using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Controllers.DataType;
 using Umbraco.Cms.Api.Management.ViewModels.DataType;
-using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.DataType;
 
-[TestFixture]
-public class MoveDataTypeControllerTests : ManagementApiTest<MoveDataTypeController>
+public class MoveDataTypeControllerTests : ManagementApiUserGroupTestBase<MoveDataTypeController>
 {
     protected override Expression<Func<MoveDataTypeController, object>> MethodSelector =>
         x => x.Move(Guid.NewGuid(), null);
 
-    private readonly List<HttpStatusCode> _authenticatedStatusCodes = new List<HttpStatusCode>
-        {
-            HttpStatusCode.OK,
-            HttpStatusCode.NotFound
-        };
-
-    [Test]
-    public virtual async Task As_Admin_I_Have_Access()
+    protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
-        var response = await SendMoveDataTypeRequestAsync("admin@umbraco.com", "1234567890", Constants.Security.AdminGroupKey);
+        ExpectedStatusCode = HttpStatusCode.NotFound
+    };
 
-        Assert.Contains(response.StatusCode, _authenticatedStatusCodes, await response.Content.ReadAsStringAsync());
-    }
-
-    [Test]
-    public virtual async Task As_Editor_I_Have_Access()
+    protected override UserGroupAssertionModel EditorUserGroupAssertionModel => new()
     {
-        var response = await SendMoveDataTypeRequestAsync("editor@umbraco.com", "1234567890", Constants.Security.EditorGroupKey);
+        ExpectedStatusCode = HttpStatusCode.NotFound
+    };
 
-        Assert.Contains(response.StatusCode, _authenticatedStatusCodes, await response.Content.ReadAsStringAsync());
-    }
-
-    [Test]
-    public virtual async Task As_Sensitive_Data_I_Have_No_Access()
+    protected override UserGroupAssertionModel SensitiveDataUserGroupAssertionModel => new()
     {
-        var response = await SendMoveDataTypeRequestAsync("sensitiveData@umbraco.com", "1234567890", Constants.Security.SensitiveDataGroupKey);
+        ExpectedStatusCode = HttpStatusCode.Forbidden,
+    };
 
-        Assert.AreEqual(HttpStatusCode.Forbidden, response.StatusCode, await response.Content.ReadAsStringAsync());
-    }
-
-    [Test]
-    public virtual async Task As_Translator_I_Have_No_Access()
+    protected override UserGroupAssertionModel TranslatorUserGroupAssertionModel => new()
     {
-        var response = await SendMoveDataTypeRequestAsync("translator@umbraco.com", "1234567890", Constants.Security.TranslatorGroupKey);
+        ExpectedStatusCode = HttpStatusCode.Forbidden
+    };
 
-        Assert.AreEqual(HttpStatusCode.Forbidden, response.StatusCode, await response.Content.ReadAsStringAsync());
-    }
-
-    [Test]
-    public virtual async Task As_Writer_I_Have_Access()
+    protected override UserGroupAssertionModel WriterUserGroupAssertionModel => new()
     {
-        var response = await SendMoveDataTypeRequestAsync("writer@umbraco.com", "1234567890", Constants.Security.WriterGroupKey);
+        ExpectedStatusCode = HttpStatusCode.NotFound
+    };
 
-        Assert.Contains(response.StatusCode, _authenticatedStatusCodes, await response.Content.ReadAsStringAsync());
-    }
-
-
-    [Test]
-    public virtual async Task Unauthorized_When_No_Token_Is_Provided()
+    protected override UserGroupAssertionModel UnauthorizedUserGroupAssertionModel => new()
     {
-        var moveDataTypeModel = GenerateMoveDataTypeRequestModel();
+        ExpectedStatusCode = HttpStatusCode.Unauthorized
+    };
 
-        var response = await Client.PostAsync(Url, JsonContent.Create(moveDataTypeModel));
-
-        Assert.AreEqual(HttpStatusCode.Unauthorized, response.StatusCode, await response.Content.ReadAsStringAsync());
-    }
-
-    private async Task<HttpResponseMessage> SendMoveDataTypeRequestAsync(string userEmail, string userPassword, Guid userGroupKey)
+    protected override async Task<HttpResponseMessage> ClientRequest()
     {
-        await AuthenticateClientAsync(Client, userEmail, userPassword, userGroupKey);
+        MoveDataTypeRequestModel moveDataTypeRequestModel = new() { TargetId = Guid.NewGuid() };
 
-        var moveDataTypeModel = GenerateMoveDataTypeRequestModel();
-
-        return await Client.PostAsync(Url, JsonContent.Create(moveDataTypeModel));
+        return await Client.PostAsync(Url, JsonContent.Create(moveDataTypeRequestModel));
     }
-
-    private MoveDataTypeRequestModel GenerateMoveDataTypeRequestModel()
-    {
-        return new MoveDataTypeRequestModel
-        {
-            TargetId = Guid.NewGuid()
-        };
-    }
-
 }

@@ -1,91 +1,64 @@
 using System.Linq.Expressions;
 using System.Net;
 using System.Net.Http.Json;
-using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Controllers.DataType;
 using Umbraco.Cms.Api.Management.ViewModels.DataType;
-using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.DataType;
 
-[TestFixture]
-public class UpdateDataTypeControllerTests : ManagementApiTest<UpdateDataTypeController>
+public class UpdateDataTypeControllerTests : ManagementApiUserGroupTestBase<UpdateDataTypeController>
 {
     protected override Expression<Func<UpdateDataTypeController, object>> MethodSelector =>
         x => x.Update(Guid.NewGuid(), null);
 
-    private readonly List<HttpStatusCode> _authenticatedStatusCodes = new List<HttpStatusCode>
-        {
-            HttpStatusCode.OK,
-            HttpStatusCode.BadRequest,
-            HttpStatusCode.NotFound
-        };
-
-    [Test]
-    public virtual async Task As_Admin_I_Have_Access()
+    protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
-        var response = await SendUpdateDataTypeRequestAsync("admin@umbraco.com", "1234567890", Constants.Security.AdminGroupKey);
+        ExpectedStatusCode = HttpStatusCode.NotFound
+    };
 
-        Assert.Contains(response.StatusCode, _authenticatedStatusCodes, await response.Content.ReadAsStringAsync());
-    }
-
-    [Test]
-    public virtual async Task As_Editor_I_Have_Access()
+    protected override UserGroupAssertionModel EditorUserGroupAssertionModel => new()
     {
-        var response = await SendUpdateDataTypeRequestAsync("editor@umbraco.com", "1234567890", Constants.Security.EditorGroupKey);
+        ExpectedStatusCode = HttpStatusCode.NotFound
+    };
 
-        Assert.Contains(response.StatusCode, _authenticatedStatusCodes, await response.Content.ReadAsStringAsync());
-    }
-
-    [Test]
-    public virtual async Task As_Sensitive_Data_I_Have_No_Access()
+    protected override UserGroupAssertionModel SensitiveDataUserGroupAssertionModel => new()
     {
-        var response = await SendUpdateDataTypeRequestAsync("sensitiveData@umbraco.com", "1234567890", Constants.Security.SensitiveDataGroupKey);
+        ExpectedStatusCode = HttpStatusCode.Forbidden,
+    };
 
-        Assert.AreEqual(HttpStatusCode.Forbidden, response.StatusCode, await response.Content.ReadAsStringAsync());
-    }
-
-    [Test]
-    public virtual async Task As_Translator_I_Have_No_Access()
+    protected override UserGroupAssertionModel TranslatorUserGroupAssertionModel => new()
     {
-        var response = await SendUpdateDataTypeRequestAsync("translator@umbraco.com", "1234567890", Constants.Security.TranslatorGroupKey);
+        ExpectedStatusCode = HttpStatusCode.Forbidden
+    };
 
-        Assert.AreEqual(HttpStatusCode.Forbidden, response.StatusCode, await response.Content.ReadAsStringAsync());
-    }
-
-    [Test]
-    public virtual async Task As_Writer_I_Have_Access()
+    protected override UserGroupAssertionModel WriterUserGroupAssertionModel => new()
     {
-        var response = await SendUpdateDataTypeRequestAsync("writer@umbraco.com", "1234567890", Constants.Security.WriterGroupKey);
+        ExpectedStatusCode = HttpStatusCode.NotFound
+    };
 
-        Assert.Contains(response.StatusCode, _authenticatedStatusCodes, await response.Content.ReadAsStringAsync());
-    }
-
-
-    [Test]
-    public virtual async Task Unauthorized_When_No_Token_Is_Provided()
+    protected override UserGroupAssertionModel UnauthorizedUserGroupAssertionModel => new()
     {
-        var updateDataTypeModel = GenerateUpdateDataTypeRequestModel();
+        ExpectedStatusCode = HttpStatusCode.Unauthorized
+    };
 
-        var response = await Client.PutAsync(Url, JsonContent.Create(updateDataTypeModel));
-
-        Assert.AreEqual(HttpStatusCode.Unauthorized, response.StatusCode, await response.Content.ReadAsStringAsync());
-    }
-
-    private async Task<HttpResponseMessage> SendUpdateDataTypeRequestAsync(string userEmail, string userPassword, Guid userGroupKey)
+    protected override async Task<HttpResponseMessage> ClientRequest()
     {
-        await AuthenticateClientAsync(Client, userEmail, userPassword, userGroupKey);
+        UpdateDataTypeRequestModel updateDataTypeRequestModel =
+            new()
+            {
+                Name = "TestNameUpdated",
+                PropertyEditorAlias = "Umbraco.Label",
+                PropertyEditorUiAlias = "Umb.PropertyEditorUi.Label",
+                Values = new List<DataTypePropertyPresentationModel>
+                {
+                    new DataTypePropertyPresentationModel
+                    {
+                        Alias = "ValueAlias",
+                        Value = "TestValue"
+                    }
+                }
+            };
 
-        var updateDataTypeModel = GenerateUpdateDataTypeRequestModel();
-
-        return await Client.PutAsync(Url, JsonContent.Create(updateDataTypeModel));
+        return await Client.PutAsync(Url, JsonContent.Create(updateDataTypeRequestModel));
     }
-
-    private UpdateDataTypeRequestModel GenerateUpdateDataTypeRequestModel()
-    {
-        return new UpdateDataTypeRequestModel
-        {
-        };
-    }
-
 }

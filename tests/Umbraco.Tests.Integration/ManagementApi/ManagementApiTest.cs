@@ -46,8 +46,6 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
 
     protected virtual string Url => GetManagementApiUrl(MethodSelector);
 
-    protected virtual List<HttpStatusCode> AuthenticatedStatusCodes { get; }
-
     protected async Task AuthenticateClientAsync(HttpClient client, string username, string password, Guid userGroupKey)
     {
         Guid userKey = Constants.Security.SuperUserKey;
@@ -141,32 +139,4 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
     {
         [JsonPropertyName("access_token")] public string AccessToken { get; set; }
     }
-
-    protected void AssertStatusCode(HttpResponseMessage response, bool isAccess)
-    {
-        if (isAccess)
-        {
-            Assert.Contains(response.StatusCode, AuthenticatedStatusCodes, response.Content.ReadAsStringAsync().Result);
-        }
-        else
-        {
-            Assert.AreEqual(HttpStatusCode.Forbidden, response.StatusCode, response.Content.ReadAsStringAsync().Result);
-        }
-    }
-
-    protected async Task<HttpResponseMessage> SendAuthenticatedRequest(string userEmail, string userPassword, Guid userGroupKey)
-    {
-        await AuthenticateClientAsync(Client, userEmail, userPassword, userGroupKey);
-
-        return await SendUnauthenticatedRequest();
-    }
-
-    protected virtual async Task<HttpResponseMessage> SendUnauthenticatedRequest() => await Client.GetAsync(Url);
-
-    protected async Task<HttpResponseMessage> AccessAsAdmin() => await SendAuthenticatedRequest("admin@umbraco.com", "1234567890", Constants.Security.AdminGroupKey);
-    protected async Task<HttpResponseMessage> AccessAsEditor() => await SendAuthenticatedRequest("editor@umbraco.com", "1234567890", Constants.Security.EditorGroupKey);
-    protected async Task<HttpResponseMessage> AccessAsSensitiveData() => await SendAuthenticatedRequest("sensitiveData@umbraco.com", "1234567890", Constants.Security.SensitiveDataGroupKey);
-    protected async Task<HttpResponseMessage> AccessAsTranslator() => await SendAuthenticatedRequest("translator@umbraco.com", "1234567890", Constants.Security.TranslatorGroupKey);
-    protected async Task<HttpResponseMessage> AccessAsWriter() => await SendAuthenticatedRequest("writer@umbraco.com", "1234567890", Constants.Security.WriterGroupKey);
-
 }
