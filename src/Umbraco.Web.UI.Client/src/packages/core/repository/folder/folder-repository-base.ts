@@ -1,5 +1,5 @@
 import { UmbRepositoryBase } from '../repository-base.js';
-import { type IUmbFolderRepository } from './folder-repository.interface.js';
+import { type UmbFolderRepository } from './folder-repository.interface.js';
 import type { UmbFolderDataSource, UmbFolderDataSourceConstructor } from './folder-data-source.interface.js';
 import { UmbCreateFolderModel, UmbFolderModel, UmbUpdateFolderModel } from './types.js';
 import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -8,7 +8,7 @@ import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 export type UmbFolderToTreeItemMapper<FolderTreeItemType> = (item: UmbFolderModel) => FolderTreeItemType;
 
-export class UmbFolderRepositoryBase extends UmbRepositoryBase implements IUmbFolderRepository {
+export abstract class UmbFolderRepositoryBase extends UmbRepositoryBase implements UmbFolderRepository {
 	protected _init: Promise<unknown>;
 	protected _treeStore?: UmbTreeStore;
 	#folderDataSource: UmbFolderDataSource;
