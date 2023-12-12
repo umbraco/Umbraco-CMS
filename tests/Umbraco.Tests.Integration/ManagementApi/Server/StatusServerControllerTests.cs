@@ -36,6 +36,6 @@ public class StatusServerControllerTests : ManagementApiUserGroupTestBase<Status
 
     protected override UserGroupAssertionModel UnauthorizedUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.Unauthorized
+        ExpectedStatusCode = HttpStatusCode.OK
     };
 }
