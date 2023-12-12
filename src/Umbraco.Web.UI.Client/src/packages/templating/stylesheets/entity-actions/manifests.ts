@@ -14,9 +14,6 @@ import {
 } from '@umbraco-cms/backoffice/entity-action';
 import { ManifestEntityAction } from '@umbraco-cms/backoffice/extension-registry';
 
-//TODO: this is temporary until we have a proper way of registering actions for folder types in a specific tree
-
-//Actions for partial view files
 const stylesheetActions: Array<ManifestEntityAction> = [
 	{
 		type: 'entityAction',
@@ -32,7 +29,6 @@ const stylesheetActions: Array<ManifestEntityAction> = [
 	},
 ];
 
-//TODO: add create folder action when the generic folder action is implemented
 //Actions for directories
 const stylesheetFolderActions: Array<ManifestEntityAction> = [
 	{
@@ -61,24 +57,24 @@ const stylesheetFolderActions: Array<ManifestEntityAction> = [
 	},
 	{
 		type: 'entityAction',
-		alias: 'Umb.EntityAction.Stylesheet.Folder.DeleteFolder',
-		name: 'Delete folder...',
+		alias: 'Umb.EntityAction.Stylesheet.Folder.Delete',
+		name: 'Delete Stylesheet folder',
 		api: UmbDeleteFolderEntityAction,
 		meta: {
 			icon: 'icon-trash',
-			label: 'Delete folder',
+			label: 'Delete folder....',
 			repositoryAlias: UMB_STYLESHEET_REPOSITORY_ALIAS,
 			entityTypes: [UMB_STYLESHEET_FOLDER_ENTITY_TYPE],
 		},
 	},
 	{
 		type: 'entityAction',
-		alias: 'Umb.EntityAction.Stylesheet.Folder.CreateFolder',
-		name: 'Create folder...',
+		alias: 'Umb.EntityAction.Stylesheet.Folder.Create',
+		name: 'Create Stylesheet folder',
 		api: UmbCreateFolderEntityAction,
 		meta: {
 			icon: 'icon-add',
-			label: 'Create folder',
+			label: 'Create folder...',
 			repositoryAlias: UMB_STYLESHEET_REPOSITORY_ALIAS,
 			entityTypes: [UMB_STYLESHEET_FOLDER_ENTITY_TYPE, UMB_STYLESHEET_ROOT_ENTITY_TYPE],
 		},
