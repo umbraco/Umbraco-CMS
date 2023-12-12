@@ -2,7 +2,7 @@ import { css, html, customElement, property, query, state } from '@umbraco-cms/b
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbFolderModalData, UmbFolderModalValue, UmbModalContext } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { IUmbFolderRepository } from '@umbraco-cms/backoffice/repository';
+import { UmbFolderRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { FolderResponseModel, ProblemDetails } from '@umbraco-cms/backoffice/backend-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -28,7 +28,7 @@ export class UmbFolderModalElement extends UmbLitElement {
 	#repositoryAlias?: string;
 	#unique: string | null = null;
 	#parentUnique: string | null = null;
-	#folderRepository?: IUmbFolderRepository;
+	#folderRepository?: UmbFolderRepository;
 
 	@state()
 	_folder?: FolderResponseModel;
@@ -43,7 +43,7 @@ export class UmbFolderModalElement extends UmbLitElement {
 		if (!this.#repositoryAlias) return;
 
 		new UmbExtensionApiInitializer(this, umbExtensionsRegistry, this.#repositoryAlias, [this], (permitted, ctrl) => {
-			this.#folderRepository = permitted ? (ctrl.api as IUmbFolderRepository) : undefined;
+			this.#folderRepository = permitted ? (ctrl.api as UmbFolderRepository) : undefined;
 			this.#init();
 		});
 	}
