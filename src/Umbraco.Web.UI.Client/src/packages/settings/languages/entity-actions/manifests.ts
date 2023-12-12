@@ -27,7 +27,7 @@ const entityActions: Array<ManifestEntityAction> = [
 			icon: 'icon-add',
 			label: 'Create',
 			repositoryAlias: UMB_LANGUAGE_REPOSITORY_ALIAS,
-			entityTypes: [UMB_LANGUAGE_ENTITY_TYPE, UMB_LANGUAGE_ROOT_ENTITY_TYPE],
+			entityTypes: [UMB_LANGUAGE_ROOT_ENTITY_TYPE],
 		},
 	},
 ];
