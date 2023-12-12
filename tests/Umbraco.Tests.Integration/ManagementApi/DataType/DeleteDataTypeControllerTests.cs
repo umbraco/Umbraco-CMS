@@ -39,8 +39,5 @@ public class DeleteDataTypeControllerTests : ManagementApiUserGroupTestBase<Dele
         ExpectedStatusCode = HttpStatusCode.Unauthorized
     };
 
-    protected override async Task<HttpResponseMessage> ClientRequest()
-    {
-        return await Client.DeleteAsync(Url);
-    }
+    protected override async Task<HttpResponseMessage> ClientRequest() => await Client.DeleteAsync(Url);
 }
