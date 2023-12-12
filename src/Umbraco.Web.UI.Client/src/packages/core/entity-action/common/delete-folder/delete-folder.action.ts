@@ -6,9 +6,9 @@ import {
 	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
 	UMB_CONFIRM_MODAL,
 } from '@umbraco-cms/backoffice/modal';
-import { IUmbFolderRepository } from '@umbraco-cms/backoffice/repository';
+import { UmbFolderRepository } from '@umbraco-cms/backoffice/repository';
 
-export class UmbDeleteFolderEntityAction<T extends IUmbFolderRepository> extends UmbEntityActionBase<T> {
+export class UmbDeleteFolderEntityAction<T extends UmbFolderRepository> extends UmbEntityActionBase<T> {
 	#modalContext?: UmbModalManagerContext;
 
 	constructor(host: UmbControllerHostElement, repositoryAlias: string, unique: string) {
