@@ -1,6 +1,5 @@
 import {
 	UMB_STYLESHEET_ENTITY_TYPE,
-	UMB_STYLESHEET_FOLDER_EMPTY_ENTITY_TYPE,
 	UMB_STYLESHEET_FOLDER_ENTITY_TYPE,
 	UMB_STYLESHEET_ROOT_ENTITY_TYPE,
 } from '../entity.js';
@@ -45,11 +44,7 @@ const stylesheetFolderActions: Array<ManifestEntityAction> = [
 			icon: 'icon-script',
 			label: 'New stylesheet file',
 			repositoryAlias: UMB_STYLESHEET_REPOSITORY_ALIAS,
-			entityTypes: [
-				UMB_STYLESHEET_FOLDER_ENTITY_TYPE,
-				UMB_STYLESHEET_FOLDER_EMPTY_ENTITY_TYPE,
-				UMB_STYLESHEET_ROOT_ENTITY_TYPE,
-			],
+			entityTypes: [UMB_STYLESHEET_FOLDER_ENTITY_TYPE, UMB_STYLESHEET_ROOT_ENTITY_TYPE],
 		},
 	},
 	{
@@ -61,39 +56,31 @@ const stylesheetFolderActions: Array<ManifestEntityAction> = [
 			icon: 'icon-script',
 			label: 'New Rich Text Editor style sheet file',
 			repositoryAlias: UMB_STYLESHEET_REPOSITORY_ALIAS,
-			entityTypes: [
-				UMB_STYLESHEET_FOLDER_ENTITY_TYPE,
-				UMB_STYLESHEET_FOLDER_EMPTY_ENTITY_TYPE,
-				UMB_STYLESHEET_ROOT_ENTITY_TYPE,
-			],
+			entityTypes: [UMB_STYLESHEET_FOLDER_ENTITY_TYPE, UMB_STYLESHEET_ROOT_ENTITY_TYPE],
 		},
 	},
 	{
 		type: 'entityAction',
 		alias: 'Umb.EntityAction.Stylesheet.Folder.DeleteFolder',
-		name: 'Remove empty folder',
+		name: 'Delete folder...',
 		api: UmbDeleteFolderEntityAction,
 		meta: {
 			icon: 'icon-trash',
-			label: 'Remove folder',
+			label: 'Delete folder',
 			repositoryAlias: UMB_STYLESHEET_REPOSITORY_ALIAS,
-			entityTypes: [UMB_STYLESHEET_FOLDER_EMPTY_ENTITY_TYPE],
+			entityTypes: [UMB_STYLESHEET_FOLDER_ENTITY_TYPE],
 		},
 	},
 	{
 		type: 'entityAction',
 		alias: 'Umb.EntityAction.Stylesheet.Folder.CreateFolder',
-		name: 'Create empty folder',
+		name: 'Create folder...',
 		api: UmbCreateFolderEntityAction,
 		meta: {
 			icon: 'icon-add',
 			label: 'Create folder',
 			repositoryAlias: UMB_STYLESHEET_REPOSITORY_ALIAS,
-			entityTypes: [
-				UMB_STYLESHEET_FOLDER_EMPTY_ENTITY_TYPE,
-				UMB_STYLESHEET_FOLDER_ENTITY_TYPE,
-				UMB_STYLESHEET_ROOT_ENTITY_TYPE,
-			],
+			entityTypes: [UMB_STYLESHEET_FOLDER_ENTITY_TYPE, UMB_STYLESHEET_ROOT_ENTITY_TYPE],
 		},
 	},
 ];
