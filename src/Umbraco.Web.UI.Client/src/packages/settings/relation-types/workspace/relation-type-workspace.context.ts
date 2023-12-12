@@ -57,7 +57,7 @@ export class UmbRelationTypeWorkspaceContext
 		if (!this.#data.value) return;
 		if (!this.#data.value.id) return;
 
-		if (this.isNew) {
+		if (this.getIsNew()) {
 			await this.repository.create(this.#data.value);
 		} else {
 			await this.repository.save(this.#data.value.id, this.#data.value);

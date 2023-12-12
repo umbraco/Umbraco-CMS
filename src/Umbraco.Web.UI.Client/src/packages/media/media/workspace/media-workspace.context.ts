@@ -69,7 +69,7 @@ export class UmbMediaWorkspaceContext
 
 	async save() {
 		if (!this.#data.value) return;
-		if (this.isNew) {
+		if (this.getIsNew()) {
 			await this.repository.create(this.#data.value);
 		} else {
 			await this.repository.save(this.#data.value.id, this.#data.value);
