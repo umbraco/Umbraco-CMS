@@ -6,9 +6,9 @@ using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Integration.TestServerTest;
 
-namespace Umbraco.Cms.Tests.Integration.NewBackoffice.DataType;
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services.DataType;
 
-public class DataTypeTests : UmbracoTestServerTestBase
+public class DataTypeServiceTests : UmbracoTestServerTestBase
 {
     private IDataTypeService DataTypeService => GetRequiredService<IDataTypeService>();
 
