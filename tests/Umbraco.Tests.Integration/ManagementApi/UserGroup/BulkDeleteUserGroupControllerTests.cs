@@ -10,7 +10,7 @@ public class BulkDeleteUserGroupControllerTests : ManagementApiUserGroupTestBase
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.NotFound
+        ExpectedStatusCode = HttpStatusCode.UnsupportedMediaType
     };
 
     protected override UserGroupAssertionModel EditorUserGroupAssertionModel => new()
