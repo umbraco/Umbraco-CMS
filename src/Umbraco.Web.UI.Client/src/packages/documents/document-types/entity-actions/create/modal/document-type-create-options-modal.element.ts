@@ -31,7 +31,7 @@ export class UmbDataTypeCreateOptionsModalElement extends UmbLitElement {
 		event.stopPropagation();
 		const folderModalHandler = this.#modalContext?.open(UMB_FOLDER_MODAL, {
 			data: {
-				repositoryAlias: DOCUMENT_TYPE_DETAIL_REPOSITORY_ALIAS,
+				folderRepositoryAlias: DOCUMENT_TYPE_DETAIL_REPOSITORY_ALIAS,
 			},
 		});
 		folderModalHandler?.onSubmit().then(() => this.modalContext?.submit());

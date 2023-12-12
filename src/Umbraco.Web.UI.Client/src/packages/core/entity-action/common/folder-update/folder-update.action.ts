@@ -26,7 +26,7 @@ export class UmbFolderUpdateEntityAction<
 
 		const modalContext = this.#modalContext.open(UMB_FOLDER_MODAL, {
 			data: {
-				repositoryAlias: this.repositoryAlias,
+				folderRepositoryAlias: this.repositoryAlias,
 				unique: this.unique,
 			},
 		});
