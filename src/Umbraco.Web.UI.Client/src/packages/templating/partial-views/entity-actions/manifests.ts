@@ -15,8 +15,6 @@ import {
 } from '@umbraco-cms/backoffice/entity-action';
 import { ManifestEntityAction } from '@umbraco-cms/backoffice/extension-registry';
 
-//TODO: this is temporary until we have a proper way of registering actions for folder types in a specific tree
-
 //Actions for partial view files
 const partialViewActions: Array<ManifestEntityAction> = [
 	{
