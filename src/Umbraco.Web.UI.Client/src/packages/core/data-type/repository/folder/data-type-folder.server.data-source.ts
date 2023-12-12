@@ -29,12 +29,23 @@ export class UmbDataTypeFolderServerDataSource implements UmbFolderDataSource {
 	 */
 	async read(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
-		return tryExecuteAndNotify(
+
+		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
 			DataTypeResource.getDataTypeFolderById({
 				id: unique,
 			}),
 		);
+
+		if (data) {
+			return {
+				unique: data.id,
+				name: data.name,
+				parentUnique: data.parentId,
+			};
+		}
+
+		return { error };
 	}
 
 	/**
@@ -46,12 +57,19 @@ export class UmbDataTypeFolderServerDataSource implements UmbFolderDataSource {
 	async create(args: UmbCreateFolderModel) {
 		if (args.parentUnique === undefined) throw new Error('Parent unique is missing');
 		if (!args.name) throw new Error('Name is missing');
-		return tryExecuteAndNotify(
+
+		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
 			DataTypeResource.postDataTypeFolder({
 				requestBody: { parentId: args.parentUnique, name: args.name },
 			}),
 		);
+
+		if (data) {
+			return this.read(data);
+		}
+
+		return { error };
 	}
 
 	/**
@@ -63,13 +81,20 @@ export class UmbDataTypeFolderServerDataSource implements UmbFolderDataSource {
 	async update(args: UmbUpdateFolderModel) {
 		if (!args.unique) throw new Error('Unique is missing');
 		if (!args.name) throw new Error('Folder name is missing');
-		return tryExecuteAndNotify(
+
+		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
 			DataTypeResource.putDataTypeFolderById({
 				id: args.unique,
 				requestBody: { name: args.name },
 			}),
 		);
+
+		if (data) {
+			return this.read(data);
+		}
+
+		return { error };
 	}
 
 	/**
