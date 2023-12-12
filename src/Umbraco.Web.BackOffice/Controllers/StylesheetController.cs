@@ -14,6 +14,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers;
 ///     The API controller used for retrieving available stylesheets
 /// </summary>
 [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
+// This is a bit wierd, but if you have access to the content section, you can load a rich text editor, and thus need to get the rules.
 [Authorize(Policy = AuthorizationPolicies.SectionAccessContent)]
 public class StylesheetController : UmbracoAuthorizedJsonController
 {
