@@ -8,7 +8,7 @@ import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
 // TODO: TREE STORE TYPE PROBLEM:
 export class UmbPartialViewTreeRepository
-	extends UmbTreeRepositoryBase<UmbPartialViewTreeItemModel, { id: null } & UmbPartialViewTreeRootModel>
+	extends UmbTreeRepositoryBase<UmbPartialViewTreeItemModel, UmbPartialViewTreeRootModel>
 	implements UmbApi
 {
 	constructor(host: UmbControllerHost) {
@@ -17,7 +17,6 @@ export class UmbPartialViewTreeRepository
 
 	async requestTreeRoot() {
 		const data = {
-			id: null,
 			path: null,
 			entityType: UMB_PARTIAL_VIEW_ROOT_ENTITY_TYPE,
 			name: 'Partial Views',
