@@ -1,10 +1,9 @@
 import { UmbEntityData } from './entity.data.js';
-import { createFolderTreeItem, createMediaTypeTreeItem } from './utils.js';
+import { createMediaTypeTreeItem } from './utils.js';
 import {
-	FolderTreeItemResponseModel,
+	MediaTypeItemResponseModel,
 	MediaTypeResponseModel,
 	MediaTypeTreeItemResponseModel,
-	PagedMediaTreeItemResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 
 export const data: Array<MediaTypeResponseModel> = [
@@ -16,6 +15,12 @@ export const data: Array<MediaTypeResponseModel> = [
 		icon: 'icon-bug',
 		properties: [],
 		containers: [],
+		allowedAsRoot: false,
+		variesByCulture: false,
+		variesBySegment: false,
+		isElement: false,
+		allowedContentTypes: [],
+		compositions: [],
 	},
 ];
 
@@ -28,6 +33,7 @@ export const treeData: Array<MediaTypeTreeItemResponseModel> = [
 		hasChildren: false,
 		isContainer: false,
 		parentId: null,
+		isFolder: false,
 	},
 ];
 
@@ -44,32 +50,28 @@ class UmbMediaTypeData extends UmbEntityData<MediaTypeResponseModel> {
 
 	// TODO: Can we do this smarter so we don't need to make this for each mock data:
 	insert(item: MediaTypeResponseModel) {
-		const result = super.insert(item);
-		this.treeData.push(createMediaTypeTreeItem(result));
-		return result;
+		super.insert(item);
+		this.treeData.push(createMediaTypeTreeItem(item));
 	}
 
 	update(id: string, item: MediaTypeResponseModel) {
-		const result = super.save(id, item);
+		super.save(id, item);
 		this.treeData = this.treeData.map((x) => {
-			if (x.id === result.id) {
-				return createMediaTypeTreeItem(result);
+			if (x.id === id) {
+				return createMediaTypeTreeItem(item);
 			} else {
 				return x;
 			}
 		});
-		return result;
 	}
 
-	getItems(ids: Array<string>): Array<MediaTypeTreeItemResponseModel> {
+	getItems(ids: Array<string>): Array<MediaTypeItemResponseModel> {
 		const items = this.data.filter((item) => ids.includes(item.id ?? ''));
-		return items.map((item) => item);
+		return items.map((item) => createMediaTypeItem(item));
 	}
 
 	getTreeRoot(): Array<MediaTypeTreeItemResponseModel> {
-		const rootItems = this.treeData.filter((item) => item.parentId === null);
-		const result = rootItems.map((item) => createMediaTypeTreeItem(item));
-		return result;
+		return this.treeData.filter((item) => item.parentId === null);
 	}
 
 	getTreeItemChildren(id: string): Array<MediaTypeTreeItemResponseModel> {
@@ -89,5 +91,13 @@ class UmbMediaTypeData extends UmbEntityData<MediaTypeResponseModel> {
 		return items.map((item) => item);
 	}
 }
+
+const createMediaTypeItem = (item: MediaTypeResponseModel): MediaTypeItemResponseModel => {
+	return {
+		id: item.id,
+		name: item.name,
+		icon: item.icon,
+	};
+};
 
 export const umbMediaTypeData = new UmbMediaTypeData();

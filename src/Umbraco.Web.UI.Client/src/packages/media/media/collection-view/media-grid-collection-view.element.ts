@@ -2,17 +2,17 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbDefaultCollectionContext, UMB_DEFAULT_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbEntityTreeItemModel } from '@umbraco-cms/backoffice/tree';
 
 @customElement('umb-media-grid-collection-view')
 export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 	@state()
-	private _mediaItems?: Array<EntityTreeItemResponseModel>;
+	private _mediaItems?: Array<UmbEntityTreeItemModel>;
 
 	@state()
 	private _selection: Array<string | null> = [];
 
-	private _collectionContext?: UmbDefaultCollectionContext<EntityTreeItemResponseModel, any>;
+	private _collectionContext?: UmbDefaultCollectionContext<UmbEntityTreeItemModel, any>;
 
 	constructor() {
 		super();
@@ -57,31 +57,31 @@ export class UmbMediaGridCollectionViewElement extends UmbLitElement {
 		});
 	}
 
-	private _handleOpenItem(mediaItem: EntityTreeItemResponseModel) {
+	private _handleOpenItem(mediaItem: UmbEntityTreeItemModel) {
 		//TODO: Fix when we have dynamic routing
 		history.pushState(null, '', 'section/media/media/edit/' + mediaItem.id);
 	}
 
-	private _handleSelect(mediaItem: EntityTreeItemResponseModel) {
+	private _handleSelect(mediaItem: UmbEntityTreeItemModel) {
 		if (mediaItem.id) {
 			this._collectionContext?.selection.select(mediaItem.id);
 		}
 	}
 
-	private _handleDeselect(mediaItem: EntityTreeItemResponseModel) {
+	private _handleDeselect(mediaItem: UmbEntityTreeItemModel) {
 		if (mediaItem.id) {
 			this._collectionContext?.selection.deselect(mediaItem.id);
 		}
 	}
 
-	private _isSelected(mediaItem: EntityTreeItemResponseModel) {
+	private _isSelected(mediaItem: UmbEntityTreeItemModel) {
 		if (mediaItem.id) {
 			return this._selection.includes(mediaItem.id);
 		}
 		return false;
 	}
 
-	private _renderMediaItem(item: EntityTreeItemResponseModel) {
+	private _renderMediaItem(item: UmbEntityTreeItemModel) {
 		const name = item.name || '';
 		//TODO: fix the file extension when media items have a file extension.
 		return html`<uui-card-media

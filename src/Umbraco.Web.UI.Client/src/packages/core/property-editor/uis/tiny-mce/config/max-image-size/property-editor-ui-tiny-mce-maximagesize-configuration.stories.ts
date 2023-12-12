@@ -4,7 +4,7 @@ import { html } from '@umbraco-cms/backoffice/external/lit';
 import './property-editor-ui-tiny-mce-maximagesize-configuration.element.js';
 import { UmbDataTypeDetailModel } from '@umbraco-cms/backoffice/data-type';
 
-const dataTypeData = umbDataTypeData.getById('dt-richTextEditor') as UmbDataTypeDetailModel;
+const dataTypeData = umbDataTypeData.getById('dt-richTextEditor') as unknown as UmbDataTypeDetailModel;
 
 export default {
 	title: 'Property Editor UIs/Tiny Mce Max Image Size Configuration',

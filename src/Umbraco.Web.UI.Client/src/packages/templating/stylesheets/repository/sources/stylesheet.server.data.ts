@@ -1,4 +1,4 @@
-import type { StylesheetDetails } from '../../index.js';
+import type { UmbStylesheetDetailModel } from '../../index.js';
 import { DataSourceResponse, UmbDataSource } from '@umbraco-cms/backoffice/repository';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import {
@@ -20,7 +20,8 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
  * @implements {UmbStylesheetServerDataSource}
  */
 export class UmbStylesheetServerDataSource
-	implements UmbDataSource<CreateStylesheetRequestModel, string, UpdateStylesheetRequestModel, StylesheetDetails>
+	implements
+		UmbDataSource<CreateStylesheetRequestModel, string, UpdateStylesheetRequestModel, UmbStylesheetDetailModel>
 {
 	#host: UmbControllerHost;
 
@@ -32,7 +33,7 @@ export class UmbStylesheetServerDataSource
 	constructor(host: UmbControllerHost) {
 		this.#host = host;
 	}
-	createScaffold(parentId: string | null): Promise<DataSourceResponse<StylesheetDetails>> {
+	createScaffold(): any {
 		throw new Error('Method not implemented.');
 	}
 
@@ -59,23 +60,27 @@ export class UmbStylesheetServerDataSource
 	/**
 	 * Creates a new Stylesheet
 	 *
-	 * @param {StylesheetDetails} data
+	 * @param {CreateStylesheetRequestModel} data
 	 * @return {*}  {Promise<DataSourceResponse<any>>}
 	 * @memberof UmbStylesheetServerDataSource
 	 */
-	create(data: StylesheetDetails): Promise<DataSourceResponse<any>> {
+	create(data: CreateStylesheetRequestModel) {
 		return tryExecuteAndNotify(this.#host, StylesheetResource.postStylesheet({ requestBody: data }));
 	}
 	/**
 	 * Updates an existing Stylesheet
 	 *
-	 * @param {string} path
-	 * @param {StylesheetDetails} data
+	 * @param {UmbStylesheetDetailModel} data
 	 * @return {*}  {Promise<DataSourceResponse<StylesheetDetails>>}
 	 * @memberof UmbStylesheetServerDataSource
 	 */
-	update(path: string, data: StylesheetDetails): Promise<DataSourceResponse<StylesheetDetails>> {
-		return tryExecuteAndNotify(this.#host, StylesheetResource.putStylesheet({ requestBody: data }));
+	update(path: string, data: UpdateStylesheetRequestModel) {
+		return tryExecuteAndNotify(
+			this.#host,
+			StylesheetResource.putStylesheet({
+				requestBody: data,
+			}),
+		);
 	}
 	/**
 	 * Deletes a Stylesheet.
@@ -84,7 +89,7 @@ export class UmbStylesheetServerDataSource
 	 * @return {*}  {Promise<DataSourceResponse>}
 	 * @memberof UmbStylesheetServerDataSource
 	 */
-	delete(path: string): Promise<DataSourceResponse> {
+	delete(path: string) {
 		return tryExecuteAndNotify(this.#host, StylesheetResource.deleteStylesheet({ path }));
 	}
 	/**

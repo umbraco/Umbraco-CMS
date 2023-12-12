@@ -1,5 +1,5 @@
 import { UmbDataTypeTreeRepository } from './data-type-tree.repository.js';
-import { UmbDataTypeTreeStore } from './data-type.tree.store.js';
+import { UmbDataTypeTreeStore } from './data-type-tree.store.js';
 import type {
 	ManifestRepository,
 	ManifestTree,

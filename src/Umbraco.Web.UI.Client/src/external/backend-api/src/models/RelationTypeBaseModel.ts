@@ -4,10 +4,10 @@
 /* eslint-disable */
 
 export type RelationTypeBaseModel = {
-    name?: string;
-    isBidirectional?: boolean;
+    name: string;
+    isBidirectional: boolean;
     parentObjectType?: string | null;
     childObjectType?: string | null;
-    isDependency?: boolean;
+    isDependency: boolean;
 };
 

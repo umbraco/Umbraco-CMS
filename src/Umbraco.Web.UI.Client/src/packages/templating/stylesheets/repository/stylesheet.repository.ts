@@ -1,7 +1,6 @@
-import { StylesheetDetails } from '../index.js';
+import { UmbStylesheetDetailModel } from '../index.js';
 import { UmbStylesheetTreeRepository } from '../tree/index.js';
 import { UmbStylesheetServerDataSource } from './sources/stylesheet.server.data.js';
-import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import { type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import {
@@ -11,14 +10,12 @@ import {
 } from '@umbraco-cms/backoffice/repository';
 import {
 	CreateStylesheetRequestModel,
-	CreateTextFileViewModelBaseModel,
 	ExtractRichTextStylesheetRulesRequestModel,
 	ExtractRichTextStylesheetRulesResponseModel,
 	InterpolateRichTextStylesheetRequestModel,
 	InterpolateRichTextStylesheetResponseModel,
 	PagedStylesheetOverviewResponseModel,
 	RichTextStylesheetRulesResponseModel,
-	TextFileResponseModelBaseModel,
 	UpdateStylesheetRequestModel,
 	UpdateTextFileViewModelBaseModel,
 } from '@umbraco-cms/backoffice/backend-api';
@@ -27,7 +24,7 @@ import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 export class UmbStylesheetRepository
 	extends UmbBaseController
 	implements
-		UmbDetailRepository<CreateStylesheetRequestModel, string, UpdateStylesheetRequestModel, StylesheetDetails>,
+		UmbDetailRepository<CreateStylesheetRequestModel, string, UpdateStylesheetRequestModel, UmbStylesheetDetailModel>,
 		UmbApi
 {
 	#dataSource;
@@ -44,30 +41,27 @@ export class UmbStylesheetRepository
 
 	//#region DETAIL:
 
-	createScaffold(
-		parentId: string | null,
-		preset?: Partial<CreateTextFileViewModelBaseModel> | undefined,
-	): Promise<DataSourceResponse<CreateTextFileViewModelBaseModel>> {
+	createScaffold(): any {
 		throw new Error('Method not implemented.');
 	}
 
-	async requestById(id: string): Promise<DataSourceResponse<TextFileResponseModelBaseModel | undefined>> {
+	async requestById(id: string) {
 		if (!id) throw new Error('id is missing');
 		return this.#dataSource.read(id);
 	}
 
-	byId(id: string): Promise<Observable<TextFileResponseModelBaseModel | undefined>> {
+	byId(id: string): any {
 		throw new Error('Method not implemented.');
 	}
 
-	async create(data: CreateTextFileViewModelBaseModel): Promise<DataSourceResponse<string>> {
+	async create(data: CreateStylesheetRequestModel) {
 		const promise = this.#dataSource.create(data);
 		await promise;
 		this.#treeRepository.requestTreeItemsOf(data.parentPath ? data.parentPath : null);
 		return promise;
 	}
 
-	save(id: string, data: UpdateTextFileViewModelBaseModel): Promise<UmbDataSourceErrorResponse> {
+	save(id: string, data: UpdateTextFileViewModelBaseModel) {
 		return this.#dataSource.update(id, data);
 	}
 

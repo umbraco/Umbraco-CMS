@@ -4,7 +4,7 @@
 /* eslint-disable */
 
 export type TextFileViewModelBaseModel = {
-    name?: string;
-    content?: string;
+    name: string;
+    content: string;
 };
 

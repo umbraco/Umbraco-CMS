@@ -14,9 +14,9 @@ import {
 	TemplateQueryResultResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 
-type TemplateDBItem = TemplateResponseModel & EntityTreeItemResponseModel;
+type UmbMockTemplateModel = TemplateResponseModel & EntityTreeItemResponseModel;
 
-const createTemplate = (dbItem: TemplateDBItem): TemplateResponseModel => {
+const createTemplate = (dbItem: UmbMockTemplateModel): TemplateResponseModel => {
 	return {
 		id: dbItem.id,
 		name: dbItem.name,
@@ -26,13 +26,13 @@ const createTemplate = (dbItem: TemplateDBItem): TemplateResponseModel => {
 	};
 };
 
-const createTemplateItem = (dbItem: TemplateDBItem): TemplateItemResponseModel => ({
+const createTemplateItem = (dbItem: UmbMockTemplateModel): TemplateItemResponseModel => ({
 	name: dbItem.name,
 	id: dbItem.id,
 	alias: dbItem.alias,
 });
 
-export const data: Array<TemplateDBItem> = [
+export const data: Array<UmbMockTemplateModel> = [
 	{
 		id: '2bf464b6-3aca-4388-b043-4eb439cc2643',
 		isContainer: false,
@@ -181,11 +181,13 @@ export const templateQuerySettings: TemplateQuerySettingsResponseModel = {
 };
 
 // Temp mocked database
-class UmbTemplateData extends UmbEntityData<TemplateDBItem> {
+class UmbTemplateData extends UmbEntityData<UmbMockTemplateModel> {
 	constructor() {
 		super(data);
 	}
 
+	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+	// @ts-ignore
 	getById(id: string): TemplateResponseModel | undefined {
 		const item = this.data.find((item) => item.id === id);
 		return item ? createTemplate(item) : undefined;
@@ -216,6 +218,9 @@ class UmbTemplateData extends UmbEntityData<TemplateDBItem> {
 	create(templateData: CreateTemplateRequestModel) {
 		const template = {
 			id: UmbId.new(),
+			type: 'template',
+			hasChildren: false,
+			isContainer: false,
 			...templateData,
 		};
 		this.data.push(template);

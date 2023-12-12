@@ -4,6 +4,6 @@
 /* eslint-disable */
 
 export type VersionResponseModel = {
-    version?: string;
+    version: string;
 };
 

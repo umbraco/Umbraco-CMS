@@ -1,7 +1,7 @@
 import { UMB_PARTIAL_VIEW_ROOT_ENTITY_TYPE } from '../entity.js';
-import { UmbPartialViewTreeServerDataSource } from './script-tree.server.data-source.js';
+import { UmbPartialViewTreeServerDataSource } from './partial-view-tree.server.data-source.js';
 import { UmbPartialViewTreeItemModel, UmbPartialViewTreeRootModel } from './types.js';
-import { UMB_PARTIAL_VIEW_TREE_STORE_CONTEXT } from './script-tree.store.js';
+import { UMB_PARTIAL_VIEW_TREE_STORE_CONTEXT } from './partial-view-tree.store.js';
 import { UmbTreeRepositoryBase } from '@umbraco-cms/backoffice/tree';
 import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
@@ -19,10 +19,12 @@ export class UmbPartialViewTreeRepository
 		const data = {
 			id: null,
 			path: null,
-			type: UMB_PARTIAL_VIEW_ROOT_ENTITY_TYPE,
+			entityType: UMB_PARTIAL_VIEW_ROOT_ENTITY_TYPE,
 			name: 'Partial Views',
 			icon: 'icon-folder',
 			hasChildren: true,
+			isContainer: false,
+			isFolder: true,
 		};
 
 		return { data };

@@ -114,7 +114,7 @@ export class UmbInputTemplateElement extends FormControlMixin(UmbLitElement) {
 		const modalContext = this._modalContext?.open(UMB_TEMPLATE_PICKER_MODAL, {
 			data: {
 				multiple: true,
-				pickableFilter: (template: TemplateResponseModel) => template.id !== null,
+				pickableFilter: (template) => template.id !== null,
 			},
 			value: {
 				selection: [...this._selectedIds],

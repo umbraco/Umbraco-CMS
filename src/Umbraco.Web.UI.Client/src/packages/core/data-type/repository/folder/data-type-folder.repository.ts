@@ -6,11 +6,11 @@ import { UmbFolderModel, UmbFolderRepositoryBase } from '@umbraco-cms/backoffice
 
 export class UmbDataTypeFolderRepository extends UmbFolderRepositoryBase {
 	constructor(host: UmbControllerHost) {
-		super(host, UmbDataTypeFolderServerDataSource, UMB_DATA_TYPE_TREE_STORE_CONTEXT, folderToDataTypeTreeItemFolder);
+		super(host, UmbDataTypeFolderServerDataSource, UMB_DATA_TYPE_TREE_STORE_CONTEXT, folderToDataTypeTreeItemMapper);
 	}
 }
 
-const folderToDataTypeTreeItemFolder = (folder: UmbFolderModel) => {
+const folderToDataTypeTreeItemMapper = (folder: UmbFolderModel) => {
 	return {
 		id: folder.unique,
 		name: folder.name,

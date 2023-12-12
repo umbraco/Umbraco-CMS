@@ -21,11 +21,7 @@ export class UmbMediaItemStore
 	 * @memberof UmbMediaItemStore
 	 */
 	constructor(host: UmbControllerHostElement) {
-		super(
-			host,
-			UMB_Media_ITEM_STORE_CONTEXT_TOKEN.toString(),
-			new UmbArrayState<MediaItemResponseModel>([], (x) => x.id),
-		);
+		super(host, UMB_MEDIA_ITEM_STORE_CONTEXT.toString(), new UmbArrayState<MediaItemResponseModel>([], (x) => x.id));
 	}
 
 	items(ids: Array<string>) {
@@ -33,4 +29,4 @@ export class UmbMediaItemStore
 	}
 }
 
-export const UMB_Media_ITEM_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbMediaItemStore>('UmbMediaItemStore');
+export const UMB_MEDIA_ITEM_STORE_CONTEXT = new UmbContextToken<UmbMediaItemStore>('UmbMediaItemStore');

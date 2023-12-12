@@ -3,10 +3,10 @@ import { UmbId } from '@umbraco-cms/backoffice/id';
 
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 import {
-	PackageMigrationStatusResponseModel,
 	PackageDefinitionResponseModel,
 	PagedPackageDefinitionResponseModel,
 	PagedPackageMigrationStatusResponseModel,
+	CreatePackageRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
 
 export const handlers = [
@@ -53,8 +53,8 @@ export const handlers = [
 
 	rest.post(umbracoPath('/package/created'), async (_req, res, ctx) => {
 		//save
-		const data: PackageMigrationStatusResponseModel = await _req.json();
-		const newPackage: PackageDefinitionResponseModel = { ...data, id: UmbId.new() };
+		const data: CreatePackageRequestModel = await _req.json();
+		const newPackage: PackageDefinitionResponseModel = { ...data, id: UmbId.new(), packagePath: '' };
 		packageArray.push(newPackage);
 		return res(ctx.status(200), ctx.json<PackageDefinitionResponseModel>(newPackage));
 	}),
@@ -96,31 +96,57 @@ export const handlers = [
 const packageArray: PackageDefinitionResponseModel[] = [
 	{
 		id: '2a0181ec-244b-4068-a1d7-2f95ed7e6da6',
-		packagePath: undefined,
+		packagePath: '',
 		name: 'My Package',
-		//contentNodeId?: string | null;
-		//contentLoadChildNodes?: boolean;
-		//mediaIds?: Array<string>;
-		//mediaLoadChildNodes?: boolean;
-		//documentTypes?: Array<string>;
-		//mediaTypes?: Array<string>;
-		//dataTypes?: Array<string>;
-		//templates?: Array<string>;
-		//partialViews?: Array<string>;
-		//stylesheets?: Array<string>;
-		//scripts?: Array<string>;
-		//languages?: Array<string>;
-		//dictionaryItems?: Array<string>;
+		contentNodeId: null,
+		contentLoadChildNodes: false,
+		mediaIds: [],
+		mediaLoadChildNodes: false,
+		documentTypes: [],
+		mediaTypes: [],
+		dataTypes: [],
+		templates: [],
+		partialViews: [],
+		stylesheets: [],
+		scripts: [],
+		languages: [],
+		dictionaryItems: [],
 	},
 	{
 		id: '2a0181ec-244b-4068-a1d7-2f95ed7e6da7',
-		packagePath: undefined,
+		packagePath: '',
 		name: 'My Second Package',
+		contentNodeId: null,
+		contentLoadChildNodes: false,
+		mediaIds: [],
+		mediaLoadChildNodes: false,
+		documentTypes: [],
+		mediaTypes: [],
+		dataTypes: [],
+		templates: [],
+		partialViews: [],
+		stylesheets: [],
+		scripts: [],
+		languages: [],
+		dictionaryItems: [],
 	},
 
 	{
 		id: '2a0181ec-244b-4068-a1d7-2f95ed7e6da8',
-		packagePath: undefined,
+		packagePath: '',
 		name: 'My Third Package',
+		contentNodeId: null,
+		contentLoadChildNodes: false,
+		mediaIds: [],
+		mediaLoadChildNodes: false,
+		documentTypes: [],
+		mediaTypes: [],
+		dataTypes: [],
+		templates: [],
+		partialViews: [],
+		stylesheets: [],
+		scripts: [],
+		languages: [],
+		dictionaryItems: [],
 	},
 ];

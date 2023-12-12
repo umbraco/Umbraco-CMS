@@ -7,6 +7,6 @@ import type { SetTourStatusRequestModel } from './SetTourStatusRequestModel';
 import type { TourStatusModel } from './TourStatusModel';
 
 export type UserTourStatusesResponseModel = {
-    tourStatuses?: Array<(TourStatusModel | SetTourStatusRequestModel)>;
+    tourStatuses: Array<(TourStatusModel | SetTourStatusRequestModel)>;
 };
 

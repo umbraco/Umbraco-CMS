@@ -6,6 +6,6 @@
 import type { EntityTreeItemResponseModel } from './EntityTreeItemResponseModel';
 
 export type FolderTreeItemResponseModel = (EntityTreeItemResponseModel & {
-    isFolder?: boolean;
+    isFolder: boolean;
 });
 

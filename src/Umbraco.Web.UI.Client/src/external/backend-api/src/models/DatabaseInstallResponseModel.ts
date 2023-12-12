@@ -10,8 +10,8 @@ export type DatabaseInstallResponseModel = {
     name?: string | null;
     username?: string | null;
     password?: string | null;
-    useIntegratedAuthentication?: boolean;
+    useIntegratedAuthentication: boolean;
     connectionString?: string | null;
-    trustServerCertificate?: boolean;
+    trustServerCertificate: boolean;
 };
 
