@@ -23,6 +23,7 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
     private readonly IUserGroupPermissionService _userGroupPermissionService;
     private readonly IEntityService _entityService;
     private readonly IUserService _userService;
+    private readonly IUserRepository _userRepository;
 
     public UserGroupService(
         ICoreScopeProvider provider,
@@ -31,13 +32,15 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
         IUserGroupRepository userGroupRepository,
         IUserGroupPermissionService userGroupPermissionService,
         IEntityService entityService,
-        IUserService userService)
+        IUserService userService,
+        IUserRepository userRepository)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _userGroupRepository = userGroupRepository;
         _userGroupPermissionService = userGroupPermissionService;
         _entityService = entityService;
         _userService = userService;
+        _userRepository = userRepository;
     }
 
     /// <inheritdoc/>
@@ -268,6 +271,7 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
 
         _userGroupRepository.AddOrUpdateGroupWithUsers(userGroup, usersToAdd.Select(x => x.Id).ToArray());
 
+        // shouldn't we publish a UserGroupSavedNotification / UserGroupWithUsersSavedNotification here?
         scope.Complete();
         return Attempt.SucceedWithStatus(UserGroupOperationStatus.Success, userGroup);
     }
@@ -296,7 +300,8 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
     /// <inheritdoc />
     public async Task<Attempt<IUserGroup, UserGroupOperationStatus>> UpdateAsync(
         IUserGroup userGroup,
-        Guid userKey)
+        Guid userKey,
+        Guid[]? groupUserKeys)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
@@ -329,10 +334,50 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
         }
 
         _userGroupRepository.Save(userGroup);
-        scope.Notifications.Publish(new UserGroupSavedNotification(userGroup, eventMessages).WithStateFrom(savingNotification));
+
+        if (groupUserKeys is not null)
+        {
+            AssignUsersToUserGroup(groupUserKeys, userGroup, eventMessages, scope);
+        }
+
 
         scope.Complete();
         return Attempt.SucceedWithStatus(UserGroupOperationStatus.Success, userGroup);
+    }
+
+    private void AssignUsersToUserGroup(Guid[] groupUserKeys, IUserGroup userGroup, EventMessages eventMessages, ICoreScope scope)
+    {
+        // update the users with the right groups
+        // we need to figure out which users have been added / removed, for audit purposes
+        var groupUserIds = _userRepository
+            .Get(ScopeProvider.CreateQuery<IUser>().Where(user => groupUserKeys.Contains(user.Key)))
+            .Select(user => user.Id)
+            .ToArray();
+        IUser[] currentGroupUsers =
+            userGroup.HasIdentity ? _userRepository.GetAllInGroup(userGroup.Id).ToArray() : Array.Empty<IUser>();
+        var currentGroupUsersIdDict = currentGroupUsers.ToDictionary(x => x.Id, x => x);
+        var existingGroupUserIds = currentGroupUsers.Select(x => x.Id).ToArray();
+        var usersToAddIds = groupUserIds.Except(existingGroupUserIds).ToArray();
+
+        IUser[] usersToAdd = usersToAddIds.Length is not 0
+            ? _userRepository.Get(ScopeProvider.CreateQuery<IUser>().Where(user => usersToAddIds.Contains(user.Id))).ToArray()
+            : Array.Empty<IUser>();
+        IUser[] usersToRemove = existingGroupUserIds.Except(groupUserIds).Select(x => currentGroupUsersIdDict[x]).Where(x => x.Id != 0).ToArray();
+
+        var userGroupWithUsers = new UserGroupWithUsers(userGroup, usersToAdd, usersToRemove);
+
+        // this is an additional notification for special auditing
+        var savingUserGroupWithUsersNotification =
+            new UserGroupWithUsersSavingNotification(userGroupWithUsers, eventMessages);
+        if (scope.Notifications.PublishCancelable(savingUserGroupWithUsersNotification))
+        {
+            scope.Complete();
+            return;
+        }
+
+        _userGroupRepository.AddOrUpdateGroupWithUsers(userGroup, groupUserIds);
+
+        scope.Notifications.Publish(new UserGroupWithUsersSavedNotification(userGroupWithUsers, eventMessages).WithStateFrom(savingUserGroupWithUsersNotification));
     }
 
     private async Task<UserGroupOperationStatus> ValidateUserGroupUpdateAsync(IUserGroup userGroup)

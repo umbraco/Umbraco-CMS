@@ -32,7 +32,7 @@ public class UpdateUserGroupController : UserGroupControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Update(Guid id, UpdateUserGroupRequestModel dataTypeRequestModel)
+    public async Task<IActionResult> Update(Guid id, UpdateUserGroupRequestModel updateUserGroupRequestModel)
     {
         IUserGroup? existingUserGroup = await _userGroupService.GetAsync(id);
 
@@ -41,14 +41,14 @@ public class UpdateUserGroupController : UserGroupControllerBase
             return UserGroupOperationStatusResult(UserGroupOperationStatus.NotFound);
         }
 
-        Attempt<IUserGroup, UserGroupOperationStatus> userGroupUpdateAttempt = await _userGroupPresentationFactory.UpdateAsync(existingUserGroup, dataTypeRequestModel);
+        Attempt<IUserGroup, UserGroupOperationStatus> userGroupUpdateAttempt = await _userGroupPresentationFactory.UpdateAsync(existingUserGroup, updateUserGroupRequestModel);
         if (userGroupUpdateAttempt.Success is false)
         {
             return UserGroupOperationStatusResult(userGroupUpdateAttempt.Status);
         }
 
         IUserGroup userGroup = userGroupUpdateAttempt.Result;
-        Attempt<IUserGroup, UserGroupOperationStatus> result = await _userGroupService.UpdateAsync(userGroup, CurrentUserKey(_backOfficeSecurityAccessor));
+        Attempt<IUserGroup, UserGroupOperationStatus> result = await _userGroupService.UpdateAsync(userGroup, CurrentUserKey(_backOfficeSecurityAccessor), updateUserGroupRequestModel.GroupUsers);
 
         return result.Success
             ? Ok()

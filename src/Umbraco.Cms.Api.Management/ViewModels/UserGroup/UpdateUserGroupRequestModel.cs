@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Cms.Api.Management.ViewModels.UserGroup;
 
-public class UpdateUserGroupRequestModel : UserGroupBase
+public class UpdateUserGroupRequestModel : UserGroupUpsertBase
 {
 
 }
