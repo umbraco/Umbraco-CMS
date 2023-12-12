@@ -8,9 +8,10 @@ import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 export type UmbFolderToTreeItemMapper<FolderTreeItemType> = (item: UmbFolderModel) => FolderTreeItemType;
 
+// TODO: add types instead of any
 export abstract class UmbFolderRepositoryBase extends UmbRepositoryBase implements UmbFolderRepository {
 	protected _init: Promise<unknown>;
-	protected _treeStore?: UmbTreeStore;
+	protected _treeStore?: UmbTreeStore<any>;
 	#folderDataSource: UmbFolderDataSource;
 	#folderToTreeItemMapper: UmbFolderToTreeItemMapper<any>;
 
@@ -25,7 +26,7 @@ export abstract class UmbFolderRepositoryBase extends UmbRepositoryBase implemen
 		this.#folderToTreeItemMapper = folderToTreeItemMapper;
 
 		this._init = this.consumeContext(treeStoreContextAlias, (instance) => {
-			this._treeStore = instance as UmbTreeStore;
+			this._treeStore = instance as UmbTreeStore<any>;
 		}).asPromise();
 	}
 
