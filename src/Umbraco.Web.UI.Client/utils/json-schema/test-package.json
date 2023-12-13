@@ -1,9 +1,10 @@
 {
-	"$schema": "../../types/umbraco-package-schema.json",
+	"$schema": "../../dist-cms/umbraco-package-schema.json",
 	"name": "My Package",
 	"version": "1.0.0",
 	"extensions": [
 		{
+			"type": "dashboard",
 			"name": "My Dashboard",
 			"alias": "myDashboard",
 
@@ -11,7 +12,6 @@
 			"elementName": "my-dashboard",
 			"js": "js/my-dashboard.js",
 
-			"type": "dashboard",
 			"meta": {
 				"label": "My Dashboard",
 				"pathname": "my-dashboard"
