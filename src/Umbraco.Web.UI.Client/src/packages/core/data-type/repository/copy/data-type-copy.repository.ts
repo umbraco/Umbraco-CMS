@@ -38,7 +38,7 @@ export class UmbCopyDataTypeRepository extends UmbRepositoryBase implements UmbC
 			if (!dataTypeCopy) throw new Error('Could not find copied data type');
 
 			// TODO: Be aware about this responsibility.
-			this.#treeStore!.append(dataTypeCopy);
+			// this.#treeStore!.append(dataTypeCopy);
 
 			const notification = { data: { message: `Data type copied` } };
 			this.#notificationContext!.peek('positive', notification);
