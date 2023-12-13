@@ -1,4 +1,4 @@
-import { UmbPropertyDatasetBaseContext } from '@umbraco-cms/backoffice/property';
+import { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import { UmbDataTypeDetailRepository } from '../repository/detail/data-type-detail.repository.js';
 import type { UmbDataTypeDetailModel } from '../types.js';
 import {
@@ -146,8 +146,8 @@ export class UmbDataTypeWorkspaceContext
 		return this._configDefaultData?.find((x) => x.alias === alias)?.value;
 	}
 
-	createPropertyDatasetContext(host: UmbControllerHost) {
-		const context = new UmbInvariantWorkspacePropertyDatasetContext(host, this);
+	createPropertyDatasetContext(host: UmbControllerHost): UmbPropertyDatasetContext {
+		return new UmbInvariantWorkspacePropertyDatasetContext(host, this);
 		/*
 		// Example of how this could have been done with the PropertyDatasetBaseContext:
 		const context = new UmbPropertyDatasetBaseContext(host);
@@ -187,8 +187,8 @@ export class UmbDataTypeWorkspaceContext
 			},
 			'observePropertyValues',
 		);
-		*/
 		return context;
+		*/
 	}
 
 	async load(unique: string) {
