@@ -4,9 +4,9 @@
 /* eslint-disable */
 
 export type TagResponseModel = {
-    id?: string;
+    id: string;
     text?: string | null;
     group?: string | null;
-    nodeCount?: number;
+    nodeCount: number;
 };
 

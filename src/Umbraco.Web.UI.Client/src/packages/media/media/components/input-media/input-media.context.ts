@@ -5,6 +5,8 @@ import { MediaItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 export class UmbMediaPickerContext extends UmbPickerInputContext<MediaItemResponseModel> {
 	constructor(host: UmbControllerHostElement) {
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
 		super(host, 'Umb.Repository.Media', UMB_MEDIA_TREE_PICKER_MODAL);
 	}
 }

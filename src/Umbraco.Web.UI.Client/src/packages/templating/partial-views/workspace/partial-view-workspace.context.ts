@@ -1,7 +1,7 @@
 import { UmbPartialViewRepository } from '../repository/partial-view.repository.js';
 import type { UmbPartialViewDetailModel } from '../types.js';
 import { UMB_PARTIAL_VIEW_ENTITY_TYPE } from '../entity.js';
-import { UmbBooleanState, UmbDeepState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import {
 	UmbSaveableWorkspaceContextInterface,
@@ -46,7 +46,7 @@ export class UmbPartialViewWorkspaceContext
 		return Promise.resolve();
 	}
 
-	#data = new UmbDeepState<UmbPartialViewDetailModel | undefined>(undefined);
+	#data = new UmbObjectState<UmbPartialViewDetailModel | undefined>(undefined);
 	readonly data = this.#data.asObservable();
 	readonly name = this.#data.asObservablePart((data) => data?.name);
 	readonly content = this.#data.asObservablePart((data) => data?.content);
@@ -74,11 +74,11 @@ export class UmbPartialViewWorkspaceContext
 	}
 
 	setName(value: string) {
-		this.#data.next({ ...this.#data.value, name: value });
+		this.#data.update({ name: value });
 	}
 
 	setContent(value: string) {
-		this.#data.next({ ...this.#data.value, content: value });
+		this.#data.update({ content: value });
 	}
 
 	async load(entityKey: string) {
@@ -98,6 +98,8 @@ export class UmbPartialViewWorkspaceContext
 		};
 		if (!data) return;
 		this.setIsNew(true);
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
 		this.#data.next(newPartial);
 	}
 }

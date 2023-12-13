@@ -4,7 +4,7 @@
 /* eslint-disable */
 
 export type ResendInviteUserRequestModel = {
-    userId?: string;
+    userId: string;
     message?: string | null;
 };
 

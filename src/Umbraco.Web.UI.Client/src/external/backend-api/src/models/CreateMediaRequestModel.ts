@@ -6,6 +6,6 @@
 import type { CreateContentForMediaRequestModel } from './CreateContentForMediaRequestModel';
 
 export type CreateMediaRequestModel = (CreateContentForMediaRequestModel & {
-    contentTypeId?: string;
+    contentTypeId: string;
 });
 

@@ -9,18 +9,18 @@ import type { MediaTypePropertyTypeContainerResponseModel } from './MediaTypePro
 import type { MediaTypePropertyTypeResponseModel } from './MediaTypePropertyTypeResponseModel';
 
 export type ContentTypeForMediaTypeResponseModel = {
-    alias?: string;
-    name?: string;
+    alias: string;
+    name: string;
     description?: string | null;
-    icon?: string;
-    allowedAsRoot?: boolean;
-    variesByCulture?: boolean;
-    variesBySegment?: boolean;
-    isElement?: boolean;
-    properties?: Array<MediaTypePropertyTypeResponseModel>;
-    containers?: Array<MediaTypePropertyTypeContainerResponseModel>;
-    allowedContentTypes?: Array<ContentTypeSortModel>;
-    compositions?: Array<ContentTypeCompositionModel>;
-    id?: string;
+    icon: string;
+    allowedAsRoot: boolean;
+    variesByCulture: boolean;
+    variesBySegment: boolean;
+    isElement: boolean;
+    properties: Array<MediaTypePropertyTypeResponseModel>;
+    containers: Array<MediaTypePropertyTypeContainerResponseModel>;
+    allowedContentTypes: Array<ContentTypeSortModel>;
+    compositions: Array<ContentTypeCompositionModel>;
+    id: string;
 };
 

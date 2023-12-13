@@ -4,7 +4,7 @@
 /* eslint-disable */
 
 export type DataTypePropertyReferenceModel = {
-    name?: string;
-    alias?: string;
+    name: string;
+    alias: string;
 };
 

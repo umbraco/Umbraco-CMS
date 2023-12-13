@@ -16,6 +16,9 @@ export const data: Array<UserGroupResponseModel> = [
 			UMB_USER_PERMISSION_DOCUMENT_CREATE,
 			UMB_USER_PERMISSION_DOCUMENT_DELETE,
 		],
+		sections: [],
+		languages: [],
+		hasAccessToAllLanguages: true,
 	},
 	{
 		id: 'user-group-editors-id',
@@ -23,6 +26,9 @@ export const data: Array<UserGroupResponseModel> = [
 		icon: 'icon-tools',
 		documentStartNodeId: 'all-property-editors-document-id',
 		permissions: [UMB_USER_PERMISSION_DOCUMENT_CREATE, UMB_USER_PERMISSION_DOCUMENT_DELETE],
+		sections: [],
+		languages: [],
+		hasAccessToAllLanguages: true,
 	},
 	{
 		id: 'user-group-sensitive-data-id',
@@ -30,6 +36,9 @@ export const data: Array<UserGroupResponseModel> = [
 		icon: 'icon-lock',
 		documentStartNodeId: 'all-property-editors-document-id',
 		permissions: [UMB_USER_PERMISSION_DOCUMENT_CREATE, UMB_USER_PERMISSION_DOCUMENT_DELETE],
+		sections: [],
+		languages: [],
+		hasAccessToAllLanguages: true,
 	},
 	{
 		id: 'user-group-translators-id',
@@ -37,6 +46,9 @@ export const data: Array<UserGroupResponseModel> = [
 		icon: 'icon-globe',
 		documentStartNodeId: 'all-property-editors-document-id',
 		permissions: [UMB_USER_PERMISSION_DOCUMENT_CREATE, UMB_USER_PERMISSION_DOCUMENT_DELETE],
+		sections: [],
+		languages: [],
+		hasAccessToAllLanguages: true,
 	},
 	{
 		id: 'user-group-writers-id',
@@ -44,5 +56,8 @@ export const data: Array<UserGroupResponseModel> = [
 		icon: 'icon-edit',
 		documentStartNodeId: 'all-property-editors-document-id',
 		permissions: [UMB_USER_PERMISSION_DOCUMENT_CREATE, UMB_USER_PERMISSION_DOCUMENT_DELETE],
+		sections: [],
+		languages: [],
+		hasAccessToAllLanguages: true,
 	},
 ];

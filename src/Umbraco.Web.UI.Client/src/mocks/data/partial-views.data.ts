@@ -19,6 +19,7 @@ export const treeData: Array<PartialViewsDataItem> = [
 		name: 'blockgrid',
 		type: 'partial-view',
 		hasChildren: true,
+		content: '',
 	},
 	{
 		id: 'blocklist',
@@ -27,6 +28,7 @@ export const treeData: Array<PartialViewsDataItem> = [
 		name: 'blocklist',
 		type: 'partial-view',
 		hasChildren: true,
+		content: '',
 	},
 	{
 		id: 'grid',
@@ -35,6 +37,7 @@ export const treeData: Array<PartialViewsDataItem> = [
 		name: 'grid',
 		type: 'partial-view',
 		hasChildren: true,
+		content: '',
 	},
 	{
 		id: 'blockgrid/area.cshtml',

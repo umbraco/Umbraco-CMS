@@ -6,7 +6,7 @@
 import type { DictionaryItemTranslationModel } from './DictionaryItemTranslationModel';
 
 export type DictionaryItemModelBaseModel = {
-    name?: string;
-    translations?: Array<DictionaryItemTranslationModel>;
+    name: string;
+    translations: Array<DictionaryItemTranslationModel>;
 };
 

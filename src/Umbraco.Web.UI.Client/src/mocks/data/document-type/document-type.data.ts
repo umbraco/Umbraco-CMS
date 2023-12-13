@@ -1,14 +1,14 @@
-import { UmbEntityData } from './entity.data.js';
-import { createDocumentTypeTreeItem } from './utils.js';
 import {
-	DocumentTypeTreeItemResponseModel,
-	DocumentTypeResponseModel,
 	ContentTypeCompositionTypeModel,
-	DocumentTypeItemResponseModel,
+	DocumentTypeResponseModel,
+	DocumentTypeTreeItemResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 
-export const data: Array<DocumentTypeResponseModel> = [
+export type UmbMockDocumentTypeModel = DocumentTypeResponseModel & DocumentTypeTreeItemResponseModel;
+
+export const data: Array<UmbMockDocumentTypeModel> = [
 	{
+		type: 'document-type',
 		allowedTemplateIds: [],
 		defaultTemplateId: null,
 		id: 'all-property-editors-document-type-id',
@@ -20,6 +20,10 @@ export const data: Array<DocumentTypeResponseModel> = [
 		variesByCulture: true,
 		variesBySegment: false,
 		isElement: false,
+		hasChildren: false,
+		isContainer: false,
+		parentId: null,
+		isFolder: false,
 		properties: [
 			{
 				id: '1',
@@ -30,6 +34,7 @@ export const data: Array<DocumentTypeResponseModel> = [
 				dataTypeId: 'dt-richTextEditor',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 0,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -49,6 +54,7 @@ export const data: Array<DocumentTypeResponseModel> = [
 				dataTypeId: 'dt-colorPicker',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 1,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -68,6 +74,7 @@ export const data: Array<DocumentTypeResponseModel> = [
 				dataTypeId: 'dt-contentPicker',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 2,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -87,6 +94,7 @@ export const data: Array<DocumentTypeResponseModel> = [
 				dataTypeId: 'dt-eyeDropper',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 3,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -106,6 +114,7 @@ export const data: Array<DocumentTypeResponseModel> = [
 				dataTypeId: 'dt-multiUrlPicker',
 				variesByCulture: true,
 				variesBySegment: false,
+				sortOrder: 4,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -125,6 +134,7 @@ export const data: Array<DocumentTypeResponseModel> = [
 				dataTypeId: 'dt-multiNodeTreePicker',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 5,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -144,6 +154,7 @@ export const data: Array<DocumentTypeResponseModel> = [
 				dataTypeId: 'dt-datePicker',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 6,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -163,6 +174,7 @@ export const data: Array<DocumentTypeResponseModel> = [
 				dataTypeId: 'dt-datePicker-time',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 7,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -182,6 +194,7 @@ export const data: Array<DocumentTypeResponseModel> = [
 				dataTypeId: 'dt-email',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 9,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -201,6 +214,7 @@ export const data: Array<DocumentTypeResponseModel> = [
 				dataTypeId: 'dt-textBox',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 10,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -220,6 +234,7 @@ export const data: Array<DocumentTypeResponseModel> = [
 				dataTypeId: 'dt-dropdown',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 11,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -239,6 +254,7 @@ export const data: Array<DocumentTypeResponseModel> = [
 				dataTypeId: 'dt-textArea',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 12,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -258,6 +274,7 @@ export const data: Array<DocumentTypeResponseModel> = [
 				dataTypeId: 'dt-slider',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 13,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -277,6 +294,7 @@ export const data: Array<DocumentTypeResponseModel> = [
 				dataTypeId: 'dt-toggle',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 14,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -296,6 +314,7 @@ export const data: Array<DocumentTypeResponseModel> = [
 				dataTypeId: 'dt-tags',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 15,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -315,6 +334,7 @@ export const data: Array<DocumentTypeResponseModel> = [
 				dataTypeId: 'dt-markdownEditor',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 16,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -334,6 +354,7 @@ export const data: Array<DocumentTypeResponseModel> = [
 				dataTypeId: 'dt-radioButtonList',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 17,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -353,6 +374,7 @@ export const data: Array<DocumentTypeResponseModel> = [
 				dataTypeId: 'dt-checkboxList',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 18,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -372,6 +394,7 @@ export const data: Array<DocumentTypeResponseModel> = [
 				dataTypeId: 'dt-blockList',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 19,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -391,6 +414,7 @@ export const data: Array<DocumentTypeResponseModel> = [
 				dataTypeId: 'dt-mediaPicker',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 20,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -410,6 +434,7 @@ export const data: Array<DocumentTypeResponseModel> = [
 				dataTypeId: 'dt-imageCropper',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 21,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -429,6 +454,7 @@ export const data: Array<DocumentTypeResponseModel> = [
 				dataTypeId: 'dt-uploadField',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 22,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -448,6 +474,7 @@ export const data: Array<DocumentTypeResponseModel> = [
 				dataTypeId: 'dt-blockGrid',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 23,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -467,6 +494,7 @@ export const data: Array<DocumentTypeResponseModel> = [
 				dataTypeId: 'dt-iconPicker',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 24,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -486,6 +514,7 @@ export const data: Array<DocumentTypeResponseModel> = [
 				dataTypeId: 'dt-label',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 25,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -505,6 +534,7 @@ export const data: Array<DocumentTypeResponseModel> = [
 				dataTypeId: 'dt-integer',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 26,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -524,6 +554,7 @@ export const data: Array<DocumentTypeResponseModel> = [
 				dataTypeId: 'dt-decimal',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 27,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -543,6 +574,7 @@ export const data: Array<DocumentTypeResponseModel> = [
 				dataTypeId: 'dt-memberPicker',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 29,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -562,6 +594,7 @@ export const data: Array<DocumentTypeResponseModel> = [
 				dataTypeId: 'dt-memberGroupPicker',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 30,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -581,6 +614,7 @@ export const data: Array<DocumentTypeResponseModel> = [
 				dataTypeId: 'dt-userPicker',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 31,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -621,6 +655,11 @@ export const data: Array<DocumentTypeResponseModel> = [
 		variesByCulture: true,
 		variesBySegment: false,
 		isElement: false,
+		type: 'document-type',
+		hasChildren: false,
+		isContainer: false,
+		parentId: null,
+		isFolder: false,
 		properties: [
 			{
 				id: '6',
@@ -631,6 +670,7 @@ export const data: Array<DocumentTypeResponseModel> = [
 				dataTypeId: 'dt-multiNodeTreePicker',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 0,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -672,6 +712,11 @@ export const data: Array<DocumentTypeResponseModel> = [
 		variesByCulture: true,
 		variesBySegment: false,
 		isElement: false,
+		type: 'document-type',
+		hasChildren: false,
+		isContainer: false,
+		parentId: null,
+		isFolder: false,
 		properties: [
 			{
 				id: '5b4ca208-134e-4865-b423-06e5e97adf3c',
@@ -682,6 +727,7 @@ export const data: Array<DocumentTypeResponseModel> = [
 				dataTypeId: '0cc0eba1-9960-42c9-bf9b-60e150b429ae',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 0,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -701,6 +747,7 @@ export const data: Array<DocumentTypeResponseModel> = [
 				dataTypeId: '0cc0eba1-9960-42c9-bf9b-60e150b429ae',
 				variesByCulture: true,
 				variesBySegment: false,
+				sortOrder: 1,
 				validation: {
 					mandatory: false,
 					mandatoryMessage: null,
@@ -720,6 +767,7 @@ export const data: Array<DocumentTypeResponseModel> = [
 				dataTypeId: '0cc0eba1-9960-42c9-bf9b-60e150b429ae',
 				variesByCulture: true,
 				variesBySegment: false,
+				sortOrder: 2,
 				validation: {
 					mandatory: false,
 					mandatoryMessage: null,
@@ -739,6 +787,7 @@ export const data: Array<DocumentTypeResponseModel> = [
 				dataTypeId: '0cc0eba1-9960-42c9-bf9b-60e150b429ae',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 3,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -758,6 +807,7 @@ export const data: Array<DocumentTypeResponseModel> = [
 				dataTypeId: 'dt-blockGrid',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 4,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -833,6 +883,11 @@ export const data: Array<DocumentTypeResponseModel> = [
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
+		type: 'document-type',
+		hasChildren: false,
+		isContainer: false,
+		parentId: null,
+		isFolder: false,
 		properties: [
 			{
 				id: '5e5f7456-c751-4846-9f2b-47965cc96ec6',
@@ -843,6 +898,7 @@ export const data: Array<DocumentTypeResponseModel> = [
 				dataTypeId: '0cc0eba1-9960-42c9-bf9b-60e150b429ae',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 0,
 				validation: {
 					mandatory: false,
 					mandatoryMessage: null,
@@ -883,6 +939,11 @@ export const data: Array<DocumentTypeResponseModel> = [
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: true,
+		type: 'document-type',
+		hasChildren: false,
+		isContainer: false,
+		parentId: null,
+		isFolder: false,
 		properties: [
 			{
 				id: 'b92de6ac-1a22-4a45-a481-b6cae1cccbbf',
@@ -893,6 +954,7 @@ export const data: Array<DocumentTypeResponseModel> = [
 				dataTypeId: '0cc0eba1-9960-42c9-bf9b-60e150b429ae',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 0,
 				validation: {
 					mandatory: false,
 					mandatoryMessage: null,
@@ -937,6 +999,11 @@ export const data: Array<DocumentTypeResponseModel> = [
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
+		type: 'document-type',
+		hasChildren: false,
+		isContainer: false,
+		parentId: null,
+		isFolder: false,
 		properties: [
 			{
 				id: '1680d4d2-cda8-4ac2-affd-a69fc10382b1',
@@ -947,6 +1014,7 @@ export const data: Array<DocumentTypeResponseModel> = [
 				dataTypeId: '0cc0eba1-9960-42c9-bf9b-60e150b429ae',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 0,
 				validation: {
 					mandatory: false,
 					mandatoryMessage: null,
@@ -990,6 +1058,11 @@ export const data: Array<DocumentTypeResponseModel> = [
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
+		type: 'document-type',
+		hasChildren: false,
+		isContainer: false,
+		parentId: null,
+		isFolder: false,
 		properties: [
 			{
 				id: '82d4b050-b128-42fe-ac8e-d5586e533592',
@@ -1000,6 +1073,7 @@ export const data: Array<DocumentTypeResponseModel> = [
 				dataTypeId: '0cc0eba1-9960-42c9-bf9b-60e150b429ae',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 0,
 				validation: {
 					mandatory: false,
 					mandatoryMessage: null,
@@ -1019,6 +1093,7 @@ export const data: Array<DocumentTypeResponseModel> = [
 				dataTypeId: '0cc0eba1-9960-42c9-bf9b-60e150b429ae',
 				variesByCulture: false,
 				variesBySegment: false,
+				sortOrder: 1,
 				validation: {
 					mandatory: false,
 					mandatoryMessage: null,
@@ -1048,139 +1123,3 @@ export const data: Array<DocumentTypeResponseModel> = [
 		},
 	},
 ];
-
-export const treeData: Array<DocumentTypeTreeItemResponseModel> = [
-	{
-		name: 'All property editors document type',
-		type: 'document-type',
-		hasChildren: false,
-		id: 'all-property-editors-document-type-id',
-		isContainer: false,
-		parentId: null,
-		icon: '',
-	},
-	{
-		name: 'Simple document type',
-		type: 'document-type',
-		hasChildren: false,
-		id: 'simple-document-type-id',
-		isContainer: false,
-		parentId: null,
-		icon: '',
-	},
-	{
-		name: 'Page Document Type',
-		type: 'document-type',
-		hasChildren: false,
-		id: '29643452-cff9-47f2-98cd-7de4b6807681',
-		isContainer: false,
-		parentId: null,
-		icon: 'icon-document',
-	},
-	{
-		name: 'Page Document Type Compositional',
-		type: 'document-type',
-		hasChildren: false,
-		id: '5035d7d9-0a63-415c-9e75-ee2cf931db92',
-		isContainer: false,
-		parentId: null,
-		icon: 'icon-document',
-	},
-	{
-		name: 'Page Document Type Inherited',
-		type: 'document-type',
-		hasChildren: false,
-		id: '8f68ba66-6fb2-4778-83b8-6ab4ca3a7c5d',
-		isContainer: false,
-		parentId: null,
-		icon: 'icon-document',
-	},
-	{
-		name: 'Simple Document Type',
-		type: 'document-type',
-		hasChildren: false,
-		id: 'simple-document-type-key',
-		isContainer: false,
-		parentId: null,
-		icon: 'icon-document',
-	},
-	{
-		name: 'Simple Document Type 2',
-		type: 'document-type',
-		hasChildren: false,
-		id: 'simple-document-type-2-key',
-		isContainer: false,
-		parentId: null,
-		icon: 'icon-document',
-	},
-];
-
-// Temp mocked database
-// TODO: all properties are optional in the server schema. I don't think this is correct.
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-class UmbDocumentTypeData extends UmbEntityData<DocumentTypeResponseModel> {
-	private treeData = treeData;
-
-	constructor() {
-		super(data);
-	}
-
-	// TODO: Can we do this smarter so we don't need to make this for each mock data:
-	insert(item: DocumentTypeResponseModel) {
-		const result = super.insert(item);
-		this.treeData.push(createDocumentTypeTreeItem(result));
-		return result;
-	}
-
-	update(id: string, item: DocumentTypeResponseModel) {
-		const result = super.save(id, item);
-		this.treeData = this.treeData.map((x) => {
-			if (x.id === result.id) {
-				return createDocumentTypeTreeItem(result);
-			} else {
-				return x;
-			}
-		});
-		return result;
-	}
-
-	getTreeRoot(): Array<DocumentTypeTreeItemResponseModel> {
-		const rootItems = this.treeData.filter((item) => item.parentId === null);
-		const result = rootItems.map((item) => createDocumentTypeTreeItem(item));
-		return result;
-	}
-
-	getTreeItemChildren(id: string): Array<DocumentTypeTreeItemResponseModel> {
-		const childItems = this.treeData.filter((item) => item.parentId === id);
-		return childItems.map((item) => item);
-	}
-
-	getTreeItem(ids: Array<string>): Array<DocumentTypeTreeItemResponseModel> {
-		const items = this.treeData.filter((item) => ids.includes(item.id ?? ''));
-		return items.map((item) => item);
-	}
-
-	getAllowedTypesOf(id: string): Array<DocumentTypeTreeItemResponseModel> {
-		const documentType = this.getById(id);
-		const allowedTypeKeys = documentType?.allowedContentTypes?.map((documentType) => documentType.id) ?? [];
-		const items = this.treeData.filter((item) => allowedTypeKeys.includes(item.id ?? ''));
-		return items.map((item) => item);
-	}
-
-	getItems(ids: Array<string>): Array<DocumentTypeItemResponseModel> {
-		const items = this.data.filter((item) => ids.includes(item.id ?? ''));
-		return items.map((item) => createDocumentTypeItem(item));
-	}
-}
-
-const createDocumentTypeItem = (item: DocumentTypeResponseModel): DocumentTypeItemResponseModel => {
-	return {
-		id: item.id,
-		name: item.name,
-		isElement: item.isElement,
-		icon: item.icon,
-	};
-};
-
-export const umbDocumentTypeData = new UmbDocumentTypeData();

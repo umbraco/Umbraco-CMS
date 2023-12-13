@@ -28,9 +28,9 @@ export const detailHandlers = [
 		const data = await req.json();
 		if (!data) return;
 
-		const saved = umbMediaTypeData.save(id, data);
+		umbMediaTypeData.save(id, data);
 
-		return res(ctx.status(200), ctx.json(saved));
+		return res(ctx.status(200));
 	}),
 
 	rest.delete<string>(umbracoPath(`${UMB_SLUG}/:id`), async (req, res, ctx) => {

@@ -93,7 +93,7 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	getData() {
-		return this.#currentData.getValue() || {};
+		return this.#currentData.getValue();
 	}
 
 	/*
@@ -103,7 +103,7 @@ export class UmbDocumentWorkspaceContext
 	*/
 
 	getEntityId() {
-		return this.getData().id;
+		return this.getData()?.id;
 	}
 
 	getEntityType() {
@@ -111,7 +111,7 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	getContentTypeId() {
-		return this.getData().contentTypeId;
+		return this.getData()?.contentTypeId;
 	}
 
 	variantById(variantId: UmbVariantId) {
@@ -202,9 +202,10 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	async save() {
+		const data = this.getData();
+		if (!data) throw new Error('Data is missing');
 		await this.#createOrSave();
-
-		this.saveComplete(this.getData());
+		this.saveComplete(data);
 	}
 
 	async delete() {
