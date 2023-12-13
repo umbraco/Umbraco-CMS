@@ -82,7 +82,9 @@ describe('UmbBasicVariantElement', () => {
 		let datasetElement: UmbPropertyDatasetElement;
 
 		beforeEach(async () => {
-			datasetElement = await fixture(html`<umb-property-dataset .value=${dataSet}> </umb-property-dataset>`);
+			datasetElement = await fixture(
+				html`<umb-property-dataset .name=${'hi'} .value=${dataSet}> </umb-property-dataset>`,
+			);
 		});
 
 		describe('properties', () => {
@@ -110,7 +112,7 @@ describe('UmbBasicVariantElement', () => {
 			propertyEditor = datasetElement.querySelector('test-property-editor') as UmbTestPropertyEditorElement;
 		});
 
-		it('is defined with its own instance', () => {
+		it('defines with its own instance', () => {
 			expect(datasetElement).to.be.instanceOf(UmbPropertyDatasetElement);
 		});
 
@@ -142,15 +144,20 @@ describe('UmbBasicVariantElement', () => {
 			expect(event.target).to.equal(datasetElement);
 		});
 
-		it('is does respond to changes triggered internally', async () => {
+		it('does respond to changes triggered internally', async () => {
 			const adapterPropertyEditor = document.createElement(
 				'test-adapter-property-editor',
 			) as UmbTestAdapterPropertyEditorElement;
+
+			// We actually do not use the alias of the adapter property editor, but we need to set this to start observing the property value:
+			adapterPropertyEditor.alias = 'testAdapterAlias';
 			datasetElement.appendChild(adapterPropertyEditor);
 
 			const listener = oneEvent(datasetElement, UmbChangeEvent.TYPE);
 
+			// The alias of the original property editor must be 'testAlias' for the adapter to set the value of it.
 			expect(propertyEditor.alias).to.eq('testAlias');
+			expect(adapterPropertyEditor.alias).to.eq('testAdapterAlias');
 			adapterPropertyEditor.setValue('testValue4');
 
 			const event = (await listener) as unknown as UmbChangeEvent;
