@@ -1,5 +1,5 @@
 import { UmbScriptTreeRepository } from '../tree/index.js';
-import { UmbScriptServerDataSource } from './sources/script-detail.server.data.js';
+import { UmbScriptServerDataSource } from './script-detail.server.data.js';
 import { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
 import {
 	CreateScriptRequestModel,
