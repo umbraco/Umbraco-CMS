@@ -7,18 +7,24 @@ import {
 	StaticFileItemResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 
-type StaticFileItem = StaticFileItemResponseModel;
+type StaticFileItem = StaticFileItemResponseModel & FileSystemTreeItemPresentationModel & { icon?: string };
 
 export const data: Array<StaticFileItem> = [
 	{
 		path: 'some-file.js',
 		name: 'some-file',
 		icon: 'icon-document',
+		type: 'static-file',
+		hasChildren: false,
+		isFolder: false,
 	},
 	{
 		path: 'another-file.js',
 		name: 'another-file',
 		icon: 'icon-document',
+		type: 'static-file',
+		hasChildren: false,
+		isFolder: false,
 	},
 ];
 
