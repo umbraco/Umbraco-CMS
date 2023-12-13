@@ -12,7 +12,7 @@ using Umbraco.Cms.Tests.Common.Builders;
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.Document;
 
 [TestFixture]
-public class MoveDocumentControllertTests : ManagementApiUserGroupTestBase<MoveDocumentController>
+public class MoveDocumentControllerTests : ManagementApiUserGroupTestBase<MoveDocumentController>
 {
     private IContentEditingService ContentEditingService => GetRequiredService<IContentEditingService>();
     private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
@@ -70,7 +70,7 @@ public class MoveDocumentControllertTests : ManagementApiUserGroupTestBase<MoveD
 
     protected override UserGroupAssertionModel WriterUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.NotFound
+        ExpectedStatusCode = HttpStatusCode.Forbidden
     };
 
     protected override UserGroupAssertionModel UnauthorizedUserGroupAssertionModel => new()
@@ -80,11 +80,8 @@ public class MoveDocumentControllertTests : ManagementApiUserGroupTestBase<MoveD
 
     protected override async Task<HttpResponseMessage> ClientRequest()
     {
-        MoveDocumentRequestModel voveDocumentRequestModel = new()
-        {
-            TargetId = _targetId,
-        };
+        MoveDocumentRequestModel moveDocumentRequestModel = new() { TargetId = _targetId, };
 
-        return await Client.PutAsync(Url, JsonContent.Create(voveDocumentRequestModel));
+        return await Client.PutAsync(Url, JsonContent.Create(moveDocumentRequestModel));
     }
 }

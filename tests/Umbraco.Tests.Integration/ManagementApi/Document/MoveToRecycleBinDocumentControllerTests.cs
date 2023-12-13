@@ -68,7 +68,7 @@ public class MoveToRecycleBinDocumentControllerTests : ManagementApiUserGroupTes
 
     protected override UserGroupAssertionModel WriterUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.OK
+        ExpectedStatusCode = HttpStatusCode.Forbidden
     };
 
     protected override UserGroupAssertionModel UnauthorizedUserGroupAssertionModel => new()
@@ -77,5 +77,4 @@ public class MoveToRecycleBinDocumentControllerTests : ManagementApiUserGroupTes
     };
 
     protected override async Task<HttpResponseMessage> ClientRequest() => await Client.PutAsync(Url, null);
-
 }

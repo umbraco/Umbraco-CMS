@@ -49,12 +49,12 @@ public class DeletePublicAccessDocumentControllerTests : ManagementApiUserGroupT
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.NotFound
+        ExpectedStatusCode = HttpStatusCode.BadRequest
     };
 
     protected override UserGroupAssertionModel EditorUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.NotFound
+        ExpectedStatusCode = HttpStatusCode.BadRequest
     };
 
     protected override UserGroupAssertionModel SensitiveDataUserGroupAssertionModel => new()
@@ -69,7 +69,7 @@ public class DeletePublicAccessDocumentControllerTests : ManagementApiUserGroupT
 
     protected override UserGroupAssertionModel WriterUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.NotFound
+        ExpectedStatusCode = HttpStatusCode.Forbidden
     };
 
     protected override UserGroupAssertionModel UnauthorizedUserGroupAssertionModel => new()
@@ -78,5 +78,4 @@ public class DeletePublicAccessDocumentControllerTests : ManagementApiUserGroupT
     };
 
     protected override async Task<HttpResponseMessage> ClientRequest() => await Client.DeleteAsync(Url);
-
 }

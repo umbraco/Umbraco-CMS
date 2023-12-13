@@ -43,13 +43,7 @@ public class CreatePublicAccessDocumentControllerTests : ManagementApiUserGroupT
 
     protected override async Task<HttpResponseMessage> ClientRequest()
     {
-        PublicAccessRequestModel publicAccessRequestModel = new()
-        {
-            MemberUserNames = null,
-            MemberGroupNames = null,
-            ErrorPageId = Guid.NewGuid(),
-            LoginPageId = Guid.NewGuid(),
-        };
+        PublicAccessRequestModel publicAccessRequestModel = new() { MemberUserNames = null, MemberGroupNames = null };
 
         return await Client.PostAsync(Url, JsonContent.Create(publicAccessRequestModel));
     }

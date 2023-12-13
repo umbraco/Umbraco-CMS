@@ -9,16 +9,16 @@ namespace Umbraco.Cms.Tests.Integration.ManagementApi.Document;
 public class UpdateDomainsControllerTests : ManagementApiUserGroupTestBase<UpdateDomainsController>
 {
     protected override Expression<Func<UpdateDomainsController, object>> MethodSelector =>
-        x => x.UpdateDomainsAsync(Guid.NewGuid(), null);
+        x => x.Update(Guid.NewGuid(), null);
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.Created
+        ExpectedStatusCode = HttpStatusCode.BadRequest
     };
 
     protected override UserGroupAssertionModel EditorUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.Created
+        ExpectedStatusCode = HttpStatusCode.BadRequest
     };
 
     protected override UserGroupAssertionModel SensitiveDataUserGroupAssertionModel => new()
@@ -33,7 +33,7 @@ public class UpdateDomainsControllerTests : ManagementApiUserGroupTestBase<Updat
 
     protected override UserGroupAssertionModel WriterUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.Created
+        ExpectedStatusCode = HttpStatusCode.BadRequest
     };
 
     protected override UserGroupAssertionModel UnauthorizedUserGroupAssertionModel => new()
@@ -43,11 +43,7 @@ public class UpdateDomainsControllerTests : ManagementApiUserGroupTestBase<Updat
 
     protected override async Task<HttpResponseMessage> ClientRequest()
     {
-        UpdateDomainsRequestModel updateDomainsRequestModel = new()
-        {
-            DefaultIsoCode = "Test",
-            Domains = null
-        };
+        UpdateDomainsRequestModel updateDomainsRequestModel = new() { DefaultIsoCode = "Test", Domains = null };
 
         return await Client.PutAsync(Url, JsonContent.Create(updateDomainsRequestModel));
     }

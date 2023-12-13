@@ -70,7 +70,7 @@ public class CopyDocumentControllerTests : ManagementApiUserGroupTestBase<CopyDo
 
     protected override UserGroupAssertionModel WriterUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.NotFound
+        ExpectedStatusCode = HttpStatusCode.Forbidden
     };
 
     protected override UserGroupAssertionModel UnauthorizedUserGroupAssertionModel => new()
@@ -82,9 +82,7 @@ public class CopyDocumentControllerTests : ManagementApiUserGroupTestBase<CopyDo
     {
         CopyDocumentRequestModel copyDocumentRequestModel = new()
         {
-            TargetId = _targetId,
-            RelateToOriginal = true,
-            IncludeDescendants = true,
+            TargetId = _targetId, RelateToOriginal = true, IncludeDescendants = true,
         };
 
         return await Client.PostAsync(Url, JsonContent.Create(copyDocumentRequestModel));
