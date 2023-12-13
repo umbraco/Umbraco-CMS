@@ -15,14 +15,14 @@ export abstract class UmbDetailRepositoryBase<DetailModelType extends { unique: 
 	constructor(
 		host: UmbControllerHost,
 		detailSource: UmbDetailDataSourceConstructor<DetailModelType>,
-		itemStoreContextAlias: string | UmbContextToken<any, any>,
+		detailStoreContextAlias: string | UmbContextToken<any, any>,
 	) {
 		super(host);
 
 		this.#detailSource = new detailSource(host);
 
 		this.#init = Promise.all([
-			this.consumeContext(itemStoreContextAlias, (instance) => {
+			this.consumeContext(detailStoreContextAlias, (instance) => {
 				this.#detailStore = instance;
 			}).asPromise(),
 
