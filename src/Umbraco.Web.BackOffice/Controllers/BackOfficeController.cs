@@ -256,9 +256,7 @@ public class BackOfficeController : UmbracoController
         return await RenderDefaultOrProcessExternalLoginAsync(
             result,
             //The default view to render when there is no external login info or errors
-            () => View(viewPath),
-            //The IActionResult to perform if external login is successful
-            () => Redirect("/"));
+            () => View(viewPath));
     }
 
     /// <summary>

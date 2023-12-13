@@ -18582,8 +18582,7 @@
           "ContentVersionPreventCleanup",
           "ContentVersionEnableCleanup"
         ],
-        "type": "integer",
-        "format": "int32"
+        "type": "string"
       },
       "ChangePasswordUserRequestModel": {
         "type": "object",
@@ -18651,8 +18650,7 @@
           "Published",
           "PublishedPendingChanges"
         ],
-        "type": "integer",
-        "format": "int32"
+        "type": "string"
       },
       "ContentTreeItemResponseModel": {
         "type": "object",
@@ -18712,8 +18710,7 @@
           "Composition",
           "Inheritance"
         ],
-        "type": "integer",
-        "format": "int32"
+        "type": "string"
       },
       "ContentTypeForDocumentTypeResponseModel": {
         "type": "object",
@@ -19872,8 +19869,7 @@
           "Ascending",
           "Descending"
         ],
-        "type": "integer",
-        "format": "int32"
+        "type": "string"
       },
       "DisableUserRequestModel": {
         "type": "object",
@@ -20501,8 +20497,7 @@
           "Unhealthy",
           "Rebuilding"
         ],
-        "type": "integer",
-        "format": "int32"
+        "type": "string"
       },
       "HelpPageResponseModel": {
         "type": "object",
@@ -20809,8 +20804,7 @@
           "Error",
           "Fatal"
         ],
-        "type": "integer",
-        "format": "int32"
+        "type": "string"
       },
       "LogMessagePropertyPresentationModel": {
         "type": "object",
@@ -21077,8 +21071,7 @@
           "SourceCodeManual",
           "SourceCodeAuto"
         ],
-        "type": "integer",
-        "format": "int32"
+        "type": "string"
       },
       "MoveDataTypeRequestModel": {
         "type": "object",
@@ -21159,8 +21152,7 @@
           "GreaterThan",
           "GreaterThanEqualTo"
         ],
-        "type": "integer",
-        "format": "int32"
+        "type": "string"
       },
       "OutOfDateStatusResponseModel": {
         "type": "object",
@@ -21177,8 +21169,7 @@
           "Current",
           "Unknown"
         ],
-        "type": "integer",
-        "format": "int32"
+        "type": "string"
       },
       "PackageDefinitionResponseModel": {
         "type": "object",
@@ -22541,8 +22532,7 @@
           "Publishing",
           "Unpublishing"
         ],
-        "type": "integer",
-        "format": "int32"
+        "type": "string"
       },
       "RecycleBinItemResponseModel": {
         "type": "object",
@@ -22579,8 +22569,7 @@
           "Enabled",
           "Disabled"
         ],
-        "type": "integer",
-        "format": "int32"
+        "type": "string"
       },
       "RedirectUrlResponseModel": {
         "type": "object",
@@ -22840,8 +22829,7 @@
           "Run",
           "BootFailed"
         ],
-        "type": "integer",
-        "format": "int32"
+        "type": "string"
       },
       "SavedLogSearchPresenationBaseModel": {
         "type": "object",
@@ -23048,8 +23036,7 @@
           "Error",
           "Info"
         ],
-        "type": "integer",
-        "format": "int32"
+        "type": "string"
       },
       "StylesheetItemResponseModel": {
         "type": "object",
@@ -23118,8 +23105,7 @@
           "Basic",
           "Detailed"
         ],
-        "type": "integer",
-        "format": "int32"
+        "type": "string"
       },
       "TelemetryRepresentationBaseModel": {
         "type": "object",
@@ -23277,8 +23263,7 @@
           "DateTime",
           "Integer"
         ],
-        "type": "integer",
-        "format": "int32"
+        "type": "string"
       },
       "TemplateQueryResultItemPresentationModel": {
         "type": "object",
@@ -24135,8 +24120,7 @@
           "IsLockedOut",
           "LastLoginDate"
         ],
-        "type": "integer",
-        "format": "int32"
+        "type": "string"
       },
       "UserPermissionModel": {
         "type": "object",
@@ -24297,8 +24281,7 @@
           "Inactive",
           "All"
         ],
-        "type": "integer",
-        "format": "int32"
+        "type": "string"
       },
       "UserTourStatusesResponseModel": {
         "type": "object",

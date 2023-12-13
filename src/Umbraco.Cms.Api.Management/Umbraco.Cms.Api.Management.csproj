@@ -21,4 +21,8 @@
   <ItemGroup>
     <EmbeddedResource Include="OpenApi.json" />
   </ItemGroup>
+
+  <ItemGroup>
+    <PackageVersion Update="JsonPatch.Net" Version="2.1.0" />
+  </ItemGroup>
 </Project>
