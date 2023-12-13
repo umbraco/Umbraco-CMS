@@ -13,12 +13,12 @@ public class SortDocumentControllerTests : ManagementApiUserGroupTestBase<SortDo
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.OK
+        ExpectedStatusCode = HttpStatusCode.BadRequest
     };
 
     protected override UserGroupAssertionModel EditorUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.OK
+        ExpectedStatusCode = HttpStatusCode.BadRequest
     };
 
     protected override UserGroupAssertionModel SensitiveDataUserGroupAssertionModel => new()
@@ -33,7 +33,7 @@ public class SortDocumentControllerTests : ManagementApiUserGroupTestBase<SortDo
 
     protected override UserGroupAssertionModel WriterUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.OK
+        ExpectedStatusCode = HttpStatusCode.BadRequest
     };
 
     protected override UserGroupAssertionModel UnauthorizedUserGroupAssertionModel => new()

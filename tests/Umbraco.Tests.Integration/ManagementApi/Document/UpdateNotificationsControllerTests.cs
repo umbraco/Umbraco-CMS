@@ -13,12 +13,12 @@ public class UpdateNotificationsControllerTests : ManagementApiUserGroupTestBase
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.Created
+        ExpectedStatusCode = HttpStatusCode.BadRequest
     };
 
     protected override UserGroupAssertionModel EditorUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.Created
+        ExpectedStatusCode = HttpStatusCode.BadRequest
     };
 
     protected override UserGroupAssertionModel SensitiveDataUserGroupAssertionModel => new()
@@ -33,7 +33,7 @@ public class UpdateNotificationsControllerTests : ManagementApiUserGroupTestBase
 
     protected override UserGroupAssertionModel WriterUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.Created
+        ExpectedStatusCode = HttpStatusCode.BadRequest
     };
 
     protected override UserGroupAssertionModel UnauthorizedUserGroupAssertionModel => new()

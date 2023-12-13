@@ -13,12 +13,12 @@ public class CreateDocumentControllerTests : ManagementApiUserGroupTestBase<Crea
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.OK
+        ExpectedStatusCode = HttpStatusCode.NotFound
     };
 
     protected override UserGroupAssertionModel EditorUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.OK
+        ExpectedStatusCode = HttpStatusCode.NotFound
     };
 
     protected override UserGroupAssertionModel SensitiveDataUserGroupAssertionModel => new()
@@ -33,7 +33,7 @@ public class CreateDocumentControllerTests : ManagementApiUserGroupTestBase<Crea
 
     protected override UserGroupAssertionModel WriterUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.OK
+        ExpectedStatusCode = HttpStatusCode.NotFound
     };
 
     protected override UserGroupAssertionModel UnauthorizedUserGroupAssertionModel => new()
@@ -46,8 +46,8 @@ public class CreateDocumentControllerTests : ManagementApiUserGroupTestBase<Crea
         CreateDocumentRequestModel createDocumentRequestModel = new()
         {
             ContentTypeId = Guid.NewGuid(),
-            TemplateId = Guid.NewGuid(),
-            Id = Guid.NewGuid(),
+            TemplateId = null,
+            Id = null,
             ParentId = null,
         };
 

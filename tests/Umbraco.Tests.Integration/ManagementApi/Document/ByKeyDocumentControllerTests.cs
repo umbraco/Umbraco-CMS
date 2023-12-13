@@ -1,13 +1,50 @@
 using System.Linq.Expressions;
 using System.Net;
+using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Controllers.Document;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Tests.Common.Builders;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.Document;
 
+[TestFixture]
 public class ByKeyDocumentControllerTests : ManagementApiUserGroupTestBase<ByKeyDocumentController>
 {
+    private IContentEditingService ContentEditingService => GetRequiredService<IContentEditingService>();
+    private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
+    private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
+    private Guid _key;
+
+    [SetUp]
+    public async Task Setup()
+    {
+        var template = TemplateBuilder.CreateTextPageTemplate();
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+
+        var contentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id);
+        contentType.AllowedAsRoot = true;
+        ContentTypeService.Save(contentType);
+
+        var createModel = new ContentCreateModel
+        {
+            ContentTypeKey = contentType.Key,
+            TemplateKey = template.Key,
+            ParentKey = Constants.System.RootKey,
+            InvariantName = "Test Create",
+            InvariantProperties = new[]
+            {
+                new PropertyValueModel { Alias = "title", Value = "The title value" },
+                new PropertyValueModel { Alias = "bodyText", Value = "The body text" }
+            }
+        };
+        var response = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
+        _key = response.Result.Key;
+    }
+
     protected override Expression<Func<ByKeyDocumentController, object>> MethodSelector =>
-        x => x.ByKey(Guid.NewGuid());
+        x => x.ByKey(_key);
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
