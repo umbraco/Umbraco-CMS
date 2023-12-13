@@ -12,35 +12,31 @@
 
   <ItemGroup>
     <PackageReference Include="Examine.Core" />
-    <PackageReference Include="HtmlAgilityPack"  />
-    <PackageReference Include="MailKit"  />
+    <PackageReference Include="HtmlAgilityPack" />
+    <PackageReference Include="MailKit" />
     <PackageReference Include="Markdown" />
-    <PackageReference Include="Microsoft.CSharp" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
     <PackageReference Include="Microsoft.Extensions.Http" />
     <PackageReference Include="Microsoft.Extensions.Identity.Stores" />
     <PackageReference Include="MiniProfiler.Shared" />
-    <PackageReference Include="ncrontab"  />
+    <PackageReference Include="ncrontab" />
     <PackageReference Include="Newtonsoft.Json" />
-    <PackageReference Include="Serilog"  />
+    <PackageReference Include="NPoco" />
     <PackageReference Include="OpenIddict.Abstractions" />
-    <PackageReference Include="NPoco.SqlServer" />
-    <PackageReference Include="Serilog.Enrichers.Process"  />
-    <PackageReference Include="Serilog.Enrichers.Thread"  />
+    <PackageReference Include="Serilog" />
+    <PackageReference Include="Serilog.Enrichers.Process" />
+    <PackageReference Include="Serilog.Enrichers.Thread" />
     <PackageReference Include="Serilog.Expressions" />
-    <PackageReference Include="Serilog.Extensions.Hosting"  />
+    <PackageReference Include="Serilog.Extensions.Hosting" />
     <PackageReference Include="Serilog.Formatting.Compact" />
     <PackageReference Include="Serilog.Formatting.Compact.Reader" />
     <PackageReference Include="Serilog.Settings.Configuration" />
     <PackageReference Include="Serilog.Sinks.Async" />
     <PackageReference Include="Serilog.Sinks.File" />
     <PackageReference Include="Serilog.Sinks.Map" />
-    <PackageReference Include="System.IO.FileSystem.AccessControl" />
-    <PackageReference Include="System.Security.Cryptography.Pkcs" />
-    <PackageReference Include="System.Threading.Tasks.Dataflow" />
-
   </ItemGroup>
 
   <ItemGroup>

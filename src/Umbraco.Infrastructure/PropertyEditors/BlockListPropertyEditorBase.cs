@@ -35,16 +35,22 @@ public abstract class BlockListPropertyEditorBase : DataEditor
 
     public override IPropertyIndexValueFactory PropertyIndexValueFactory => _blockValuePropertyIndexValueFactory;
 
-
     #region Value Editor
 
+    /// <summary>
+    /// Instantiates a new <see cref="BlockEditorDataConverter"/> for use with the block list editor property value editor.
+    /// </summary>
+    /// <returns>A new instance of <see cref="BlockListEditorDataConverter"/>.</returns>
+    protected virtual BlockEditorDataConverter<BlockListValue, BlockListLayoutItem> CreateBlockEditorDataConverter() => new BlockListEditorDataConverter();
+
     protected override IDataValueEditor CreateValueEditor() =>
-        DataValueEditorFactory.Create<BlockListEditorPropertyValueEditor>(Attribute!);
+        DataValueEditorFactory.Create<BlockListEditorPropertyValueEditor>(Attribute!, CreateBlockEditorDataConverter());
 
     internal class BlockListEditorPropertyValueEditor : BlockEditorPropertyValueEditor<BlockListValue, BlockListLayoutItem>
     {
         public BlockListEditorPropertyValueEditor(
             DataEditorAttribute attribute,
+            BlockEditorDataConverter<BlockListValue, BlockListLayoutItem> blockEditorDataConverter,
             PropertyEditorCollection propertyEditors,
             IDataTypeService dataTypeService,
             IContentTypeService contentTypeService,
@@ -56,7 +62,7 @@ public abstract class BlockListPropertyEditorBase : DataEditor
             IPropertyValidationService propertyValidationService) :
             base(attribute, propertyEditors, dataTypeService, textService, logger, shortStringHelper, jsonSerializer, ioHelper)
         {
-            BlockEditorValues = new BlockEditorValues<BlockListValue, BlockListLayoutItem>(new BlockListEditorDataConverter(jsonSerializer), contentTypeService, logger);
+            BlockEditorValues = new BlockEditorValues<BlockListValue, BlockListLayoutItem>(blockEditorDataConverter, contentTypeService, logger);
             Validators.Add(new BlockEditorValidator<BlockListValue, BlockListLayoutItem>(propertyValidationService, BlockEditorValues, contentTypeService));
             Validators.Add(new MinMaxValidator(BlockEditorValues, textService));
         }
