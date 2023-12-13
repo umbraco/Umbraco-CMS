@@ -7,6 +7,7 @@ import {
 } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { UmbId } from '@umbraco-cms/backoffice/id';
 
 /**
  * A data source for the Relation Type that fetches data from the server
@@ -55,7 +56,9 @@ export class UmbRelationTypeServerDataSource
 	 * @memberof UmbRelationTypeServerDataSource
 	 */
 	async createScaffold(parentId: string | null) {
-		const data: RelationTypeResponseModel = {};
+		const data: RelationTypeResponseModel = {
+			id: UmbId.new(),
+		};
 
 		return { data };
 	}
