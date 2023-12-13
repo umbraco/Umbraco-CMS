@@ -32,6 +32,11 @@ export class UmbSectionPickerModalElement extends UmbModalBaseElement<
 			'umbSectionsObserver';
 	}
 
+	#submit() {
+		this.value = { selection: this.#selectionManager.getSelection() };
+		this._submitModal();
+	}
+
 	render() {
 		return html`
 			<umb-body-layout headline="Select sections">
@@ -49,7 +54,7 @@ export class UmbSectionPickerModalElement extends UmbModalBaseElement<
 				</uui-box>
 				<div slot="actions">
 					<uui-button label="Close" @click=${this._rejectModal}></uui-button>
-					<uui-button label="Submit" look="primary" color="positive" @click=${this._submitModal}></uui-button>
+					<uui-button label="Submit" look="primary" color="positive" @click=${this.#submit}></uui-button>
 				</div>
 			</umb-body-layout>
 		`;
