@@ -1,3 +1,4 @@
+import { UMB_SCRIPT_ENTITY_TYPE, UMB_SCRIPT_FOLDER_ENTITY_TYPE } from '../entity.js';
 import { UmbScriptTreeItemModel } from './types.js';
 import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
 import { FileSystemTreeItemPresentationModel, ScriptResource } from '@umbraco-cms/backoffice/backend-api';
@@ -43,11 +44,17 @@ const getChildrenOf = (parentUnique: string | null) => {
 
 const mapper = (item: FileSystemTreeItemPresentationModel): UmbScriptTreeItemModel => {
 	return {
-		path: item.path,
+		unique: item.path,
+		parentUnique: getParentPathFromServerPath(item.path),
+		entityType: item.isFolder ? UMB_SCRIPT_FOLDER_ENTITY_TYPE : UMB_SCRIPT_ENTITY_TYPE,
 		name: item.name,
-		entityType: 'script',
 		isFolder: item.isFolder,
 		hasChildren: item.hasChildren,
 		isContainer: false,
 	};
+};
+
+const getParentPathFromServerPath = (serverPath: string): string | null => {
+	const parentPath = serverPath.substring(0, serverPath.lastIndexOf('/'));
+	return parentPath || null;
 };

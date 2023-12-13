@@ -11,11 +11,11 @@ export class UmbScriptWorkspaceElement extends UmbLitElement {
 	@state()
 	_routes: UmbRoute[] = [
 		{
-			path: 'create/:parentKey',
+			path: 'create/:parentUnique',
 			component: import('./script-workspace-edit.element.js'),
 			setup: async (_component: PageComponent, info: IRoutingInfo) => {
-				const parentKey = info.match.params.parentKey;
-				const decodePath = decodeURIComponent(parentKey);
+				const parentUnique = info.match.params.parentUnique;
+				const decodePath = decodeURIComponent(parentUnique);
 				this.#workspaceContext.create(decodePath === 'null' ? '' : decodePath);
 
 				new UmbWorkspaceIsNewRedirectController(
@@ -26,11 +26,11 @@ export class UmbScriptWorkspaceElement extends UmbLitElement {
 			},
 		},
 		{
-			path: 'edit/:key',
+			path: 'edit/:unique',
 			component: import('./script-workspace-edit.element.js'),
 			setup: (component: PageComponent, info: IRoutingInfo) => {
-				const key = info.match.params.key;
-				const decodePath = decodeURIComponent(key).replace('-js', '.js');
+				const unique = info.match.params.unique;
+				const decodePath = decodeURIComponent(unique).replace('-js', '.js');
 				this.#workspaceContext.load(decodePath);
 			},
 		},
