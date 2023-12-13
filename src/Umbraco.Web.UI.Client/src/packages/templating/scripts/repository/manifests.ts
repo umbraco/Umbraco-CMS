@@ -1,6 +1,6 @@
 import { UmbScriptRepository } from './script.repository.js';
 import { UmbScriptStore } from './script.store.js';
-import { manifests as folderManifests } from './folder/manifests.js';
+import { manifests as folderManifests } from '../tree/folder/manifests.js';
 import { ManifestRepository, ManifestStore } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_SCRIPT_REPOSITORY_ALIAS = 'Umb.Repository.Script';
