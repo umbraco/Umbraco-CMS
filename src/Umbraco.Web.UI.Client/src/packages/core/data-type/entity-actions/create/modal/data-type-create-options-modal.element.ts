@@ -1,10 +1,10 @@
 import { UMB_DATA_TYPE_FOLDER_REPOSITORY_ALIAS } from '../../../repository/folder/manifests.js';
 import { UmbDataTypeCreateOptionsModalData } from './index.js';
-import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import {
 	UmbModalManagerContext,
-	UMB_FOLDER_MODAL,
+	UMB_FOLDER_CREATE_MODAL,
 	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
 	UmbModalBaseElement,
 } from '@umbraco-cms/backoffice/modal';
@@ -22,7 +22,7 @@ export class UmbDataTypeCreateOptionsModalElement extends UmbModalBaseElement<Um
 
 	#onClick(event: PointerEvent) {
 		event.stopPropagation();
-		const folderModalHandler = this.#modalContext?.open(UMB_FOLDER_MODAL, {
+		const folderModalHandler = this.#modalContext?.open(UMB_FOLDER_CREATE_MODAL, {
 			data: {
 				folderRepositoryAlias: UMB_DATA_TYPE_FOLDER_REPOSITORY_ALIAS,
 			},
@@ -37,7 +37,7 @@ export class UmbDataTypeCreateOptionsModalElement extends UmbModalBaseElement<Um
 				<uui-box>
 					<!-- TODO: construct url -->
 					<uui-menu-item
-						href=${`section/settings/workspace/data-type/create/${this.data?.parentKey || null}`}
+						href=${`section/settings/workspace/data-type/create/${this.data?.parentUnique || null}`}
 						label="New Data Type..."
 						@click=${this._submitModal}>
 						<uui-icon slot="icon" name="icon-autofill"></uui-icon>

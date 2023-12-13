@@ -3,7 +3,7 @@ import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-ap
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import {
 	UmbModalManagerContext,
-	UMB_FOLDER_MODAL,
+	UMB_FOLDER_CREATE_MODAL,
 	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
 } from '@umbraco-cms/backoffice/modal';
 import { UmbFolderRepository } from '@umbraco-cms/backoffice/repository';
@@ -24,7 +24,7 @@ export class UmbFolderUpdateEntityAction<
 	async execute() {
 		if (!this.repository || !this.#modalContext) return;
 
-		const modalContext = this.#modalContext.open(UMB_FOLDER_MODAL, {
+		const modalContext = this.#modalContext.open(UMB_FOLDER_CREATE_MODAL, {
 			data: {
 				folderRepositoryAlias: this.repositoryAlias,
 				unique: this.unique,

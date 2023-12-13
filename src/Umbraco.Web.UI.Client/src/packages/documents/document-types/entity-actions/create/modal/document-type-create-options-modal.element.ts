@@ -5,7 +5,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import {
 	UmbModalManagerContext,
 	UmbModalContext,
-	UMB_FOLDER_MODAL,
+	UMB_FOLDER_CREATE_MODAL,
 	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
 } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -29,7 +29,7 @@ export class UmbDataTypeCreateOptionsModalElement extends UmbLitElement {
 
 	#onClick(event: PointerEvent) {
 		event.stopPropagation();
-		const folderModalHandler = this.#modalContext?.open(UMB_FOLDER_MODAL, {
+		const folderModalHandler = this.#modalContext?.open(UMB_FOLDER_CREATE_MODAL, {
 			data: {
 				folderRepositoryAlias: DOCUMENT_TYPE_DETAIL_REPOSITORY_ALIAS,
 			},

@@ -21,7 +21,7 @@ export class UmbCreateDataTypeEntityAction extends UmbEntityActionBase<UmbDataTy
 
 		this.#modalManagerContext?.open(UMB_DATA_TYPE_CREATE_OPTIONS_MODAL, {
 			data: {
-				parentKey: this.unique,
+				parentUnique: this.unique,
 			},
 		});
 	}
