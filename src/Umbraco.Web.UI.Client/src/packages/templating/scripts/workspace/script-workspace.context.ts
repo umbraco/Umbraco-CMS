@@ -1,5 +1,5 @@
-import { UmbScriptRepository } from '../repository/script.repository.js';
-import { UMB_SCRIPT_WORKSPACE_ALIAS } from './manifests.js';
+import { UmbScriptDetailRepository } from '../repository/script-detail.repository.js';
+import { UMB_SCRIPT_WORKSPACE_ALIAS }../repository/script-detail.repository.js
 import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbEditableWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
@@ -7,7 +7,7 @@ import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
 import { TextFileResponseModelBaseModel, UpdateScriptRequestModel } from '@umbraco-cms/backoffice/backend-api';
 
 export class UmbScriptWorkspaceContext extends UmbEditableWorkspaceContextBase<
-	UmbScriptRepository,
+	UmbScriptDetailRepository,
 	TextFileResponseModelBaseModel
 > {
 	#data = new UmbObjectState<TextFileResponseModelBaseModel | undefined>(undefined);
@@ -20,7 +20,7 @@ export class UmbScriptWorkspaceContext extends UmbEditableWorkspaceContextBase<
 	isCodeEditorReady = this.#isCodeEditorReady.asObservable();
 
 	constructor(host: UmbControllerHostElement) {
-		super(host, UMB_SCRIPT_WORKSPACE_ALIAS, new UmbScriptRepository(host));
+		super(host, UMB_SCRIPT_WORKSPACE_ALIAS, new UmbScriptDetailRepository(host));
 		this.#loadCodeEditor();
 	}
 

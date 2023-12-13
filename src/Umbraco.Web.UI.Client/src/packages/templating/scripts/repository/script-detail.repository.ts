@@ -1,5 +1,5 @@
 import { UmbScriptTreeRepository } from '../tree/index.js';
-import { UmbScriptServerDataSource } from './script-detail.server.data.js';
+import { UmbScriptDetailServerDataSource } from './script-detail.server.data.js';
 import { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
 import {
 	CreateScriptRequestModel,
@@ -10,19 +10,19 @@ import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
-export class UmbScriptRepository
+export class UmbScriptDetailRepository
 	extends UmbBaseController
 	implements
 		UmbDetailRepository<CreateScriptRequestModel, string, UpdateScriptRequestModel, ScriptResponseModel, string>,
 		UmbApi
 {
-	#detailDataSource: UmbScriptServerDataSource;
+	#detailDataSource: UmbScriptDetailServerDataSource;
 	// TODO: temp solution until it is automated
 	#treeRepository = new UmbScriptTreeRepository(this);
 
 	constructor(host: UmbControllerHost) {
 		super(host);
-		this.#detailDataSource = new UmbScriptServerDataSource(this);
+		this.#detailDataSource = new UmbScriptDetailServerDataSource(this);
 	}
 
 	//#region DETAILS

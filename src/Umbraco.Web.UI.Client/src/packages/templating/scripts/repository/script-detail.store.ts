@@ -6,15 +6,15 @@ import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api
 
 /**
  * @export
- * @class UmbScriptStore
+ * @class UmbScriptDetailStore
  * @extends {UmbStoreBase}
  * @description - Data Store for scripts
  */
-export class UmbScriptStore extends UmbStoreBase {
+export class UmbScriptDetailStore extends UmbStoreBase {
 	/**
-	 * Creates an instance of UmbScriptStore.
+	 * Creates an instance of UmbScriptDetailStore.
 	 * @param {UmbControllerHostInterface} host
-	 * @memberof UmbScriptStore
+	 * @memberof UmbScriptDetailStore
 	 */
 	constructor(host: UmbControllerHostElement) {
 		super(host, UMB_SCRIPTS_STORE_CONTEXT_TOKEN.toString(), new UmbArrayState<TemplateResponseModel>([], (x) => x.id));
@@ -23,7 +23,7 @@ export class UmbScriptStore extends UmbStoreBase {
 	/**
 	 * Append a script to the store
 	 * @param {Template} template
-	 * @memberof UmbScriptStore
+	 * @memberof UmbScriptDetailStore
 	 */
 	append(template: TemplateResponseModel) {
 		this._data.append([template]);
@@ -32,11 +32,11 @@ export class UmbScriptStore extends UmbStoreBase {
 	/**
 	 * Removes scripts in the store with the given uniques
 	 * @param {string[]} uniques
-	 * @memberof UmbScriptStore
+	 * @memberof UmbScriptDetailStore
 	 */
 	remove(uniques: string[]) {
 		this._data.remove(uniques);
 	}
 }
 
-export const UMB_SCRIPTS_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbScriptStore>('UmbScriptStore');
+export const UMB_SCRIPTS_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbScriptDetailStore>('UmbScriptDetailStore');

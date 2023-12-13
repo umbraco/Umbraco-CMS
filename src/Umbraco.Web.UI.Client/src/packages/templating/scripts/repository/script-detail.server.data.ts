@@ -10,7 +10,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { DataSourceResponse, UmbDataSource } from '@umbraco-cms/backoffice/repository';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
-export class UmbScriptServerDataSource
+export class UmbScriptDetailServerDataSource
 	implements UmbDataSource<CreateScriptRequestModel, string, UpdateScriptRequestModel, ScriptResponseModel, string>
 {
 	#host: UmbControllerHost;
