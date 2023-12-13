@@ -59,6 +59,7 @@ export abstract class UmbFolderRepositoryBase extends UmbRepositoryBase implemen
 		if (data) {
 			const folderTreeItem = this.#folderToTreeItemMapper(data);
 			this._treeStore!.appendItems([folderTreeItem]);
+			return { data };
 		}
 
 		return { error };
