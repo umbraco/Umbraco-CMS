@@ -29,9 +29,12 @@ export class UmbDataTypeCreateOptionsModalElement extends UmbLitElement {
 
 	#onClick(event: PointerEvent) {
 		event.stopPropagation();
+		if (this.data?.parentKey === undefined) throw new Error('A parent unique is required to create a folder');
+
 		const folderModalHandler = this.#modalContext?.open(UMB_FOLDER_CREATE_MODAL, {
 			data: {
 				folderRepositoryAlias: UMB_MEDIA_TYPE_DETAIL_REPOSITORY_ALIAS,
+				parentUnique: this.data?.parentKey,
 			},
 		});
 		folderModalHandler?.onSubmit().then(() => this.modalContext?.submit());
