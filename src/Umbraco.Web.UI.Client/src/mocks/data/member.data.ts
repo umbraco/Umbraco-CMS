@@ -9,11 +9,12 @@ import type {
 export const data: Array<UmbMemberDetailModel> = [
 	{
 		name: 'Member AAA',
-		type: 'member',
+		entityType: 'member',
 		hasChildren: false,
 		id: 'aaa08ccd-4179-464c-b634-6969149dd9f9',
 		isContainer: false,
 		parentId: null,
+		isFolder: false,
 	},
 ];
 

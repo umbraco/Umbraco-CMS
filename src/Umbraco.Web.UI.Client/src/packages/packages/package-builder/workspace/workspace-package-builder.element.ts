@@ -25,6 +25,8 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 	entityId?: string;
 
 	@state()
+	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+	// @ts-ignore
 	private _package: PackageDefinitionResponseModel = {};
 
 	@query('#package-name-input')
@@ -69,6 +71,8 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 			PackageResource.postPackageCreated({ requestBody: this._package }),
 		);
 		if (!response.data || response.error) return;
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
 		this._package = response.data as PackageDefinitionResponseModel;
 		this.#navigateBack();
 	}

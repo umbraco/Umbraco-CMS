@@ -2,7 +2,7 @@ import { UmbLanguagePickerContext } from './input-language-picker.context.js';
 import { css, html, ifDefined, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { LanguageItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-input-language-picker')
@@ -54,7 +54,7 @@ export class UmbInputLanguagePickerElement extends FormControlMixin(UmbLitElemen
 	maxMessage = 'This field exceeds the allowed amount of items';
 
 	@property({ type: Object, attribute: false })
-	public filter: (language: LanguageResponseModel) => boolean = () => true;
+	public filter: (language: LanguageItemResponseModel) => boolean = () => true;
 
 	public get selectedIsoCodes(): Array<string> {
 		return this.#pickerContext.getSelection();
@@ -70,7 +70,7 @@ export class UmbInputLanguagePickerElement extends FormControlMixin(UmbLitElemen
 	}
 
 	@state()
-	private _items: Array<LanguageResponseModel> = [];
+	private _items: Array<LanguageItemResponseModel> = [];
 
 	#pickerContext = new UmbLanguagePickerContext(this);
 
@@ -117,7 +117,7 @@ export class UmbInputLanguagePickerElement extends FormControlMixin(UmbLitElemen
 		`;
 	}
 
-	private _renderItem(item: LanguageResponseModel) {
+	private _renderItem(item: LanguageItemResponseModel) {
 		if (!item.isoCode) return;
 		return html`
 			<!-- TODO: add language ref element -->

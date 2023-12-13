@@ -39,6 +39,8 @@ export class UmbPartialViewDetailServerDataSource
 		parentId: string | null = null,
 		preset: string,
 	): Promise<DataSourceResponse<UmbPartialViewDetailModel>> {
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
 		return tryExecuteAndNotify(this.#host, PartialViewResource.getPartialViewSnippetByName({ name: preset }));
 	}
 	/**

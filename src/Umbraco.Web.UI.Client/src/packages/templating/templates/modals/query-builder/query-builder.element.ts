@@ -108,6 +108,8 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 			?.open(UMB_DOCUMENT_PICKER_MODAL, { data: { hideTreeRoot: true } })
 			.onSubmit()
 			.then((result) => {
+				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+				// @ts-ignore
 				this.#updateQueryRequest({ rootContentId: result.selection[0] });
 
 				if (result.selection.length > 0 && result.selection[0] === null) {
@@ -141,6 +143,8 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 
 	#setContentType(event: Event) {
 		const target = event.target as UUIComboboxListElement;
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
 		this.#updateQueryRequest({ contentTypeAlias: (target.value as string) ?? '' });
 	}
 
@@ -149,6 +153,8 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 
 		if (!this._queryRequest.sort) this.#setSortDirection();
 
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
 		this.#updateQueryRequest({
 			sort: { ...this._queryRequest.sort, propertyAlias: (target.value as string) ?? '' },
 		});
@@ -157,11 +163,15 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 	#setSortDirection() {
 		if (!this._queryRequest.sort?.direction) {
 			this.#updateQueryRequest({
+				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+				// @ts-ignore
 				sort: { ...this._queryRequest.sort, direction: this._defaultSortDirection },
 			});
 			return;
 		}
 
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
 		this.#updateQueryRequest({
 			sort: {
 				...this._queryRequest.sort,
@@ -176,6 +186,8 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 	};
 
 	#updateFilters = () => {
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
 		this.#updateQueryRequest({ filters: Array.from(this._filterElements)?.map((filter) => filter.filter) ?? [] });
 	};
 

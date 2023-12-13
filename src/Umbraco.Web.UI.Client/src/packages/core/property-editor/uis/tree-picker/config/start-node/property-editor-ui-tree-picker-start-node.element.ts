@@ -1,4 +1,4 @@
-import { StartNode, UmbInputContentTypeElement } from '@umbraco-cms/backoffice/content-type';
+import { StartNode, UmbInputStartNodeElement } from '@umbraco-cms/backoffice/components';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
@@ -17,11 +17,12 @@ export class UmbPropertyEditorUITreePickerStartNodeElement extends UmbLitElement
 	public config?: UmbPropertyEditorConfigCollection;
 
 	#onChange(event: CustomEvent) {
-		const target = event.target as UmbInputContentTypeElement;
+		const target = event.target as UmbInputStartNodeElement;
 
 		this.value = {
 			type: target.type,
 			id: target.nodeId,
+			// TODO: Please check this makes sense, Check if we want to support XPath in this version, if not then make sure we handle DynamicRoot correct.
 			query: target.dynamicPath,
 		};
 
@@ -29,9 +30,7 @@ export class UmbPropertyEditorUITreePickerStartNodeElement extends UmbLitElement
 	}
 
 	render() {
-		return html`<umb-input-content-type
-			@change="${this.#onChange}"
-			.type=${this.value?.type}></umb-input-content-type>`;
+		return html`<umb-input-start-node @change="${this.#onChange}" .type=${this.value?.type}></umb-input-start-node>`;
 	}
 
 	static styles = [UmbTextStyles];

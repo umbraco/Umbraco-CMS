@@ -11,6 +11,6 @@ export type TemplateQueryExecuteModel = {
     contentTypeAlias?: string | null;
     filters?: Array<TemplateQueryExecuteFilterPresentationModel> | null;
     sort?: TemplateQueryExecuteSortModel | null;
-    take?: number;
+    take: number;
 };
 

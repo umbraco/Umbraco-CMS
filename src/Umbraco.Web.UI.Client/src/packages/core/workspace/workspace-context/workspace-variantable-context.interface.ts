@@ -3,7 +3,7 @@ import { UmbPropertyDatasetContext } from '../../property/property-dataset/prope
 import type { UmbSaveableWorkspaceContextInterface } from './saveable-workspace-context.interface.js';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import type { VariantResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { ContentStateModel, VariantResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export interface UmbVariantableWorkspaceContextInterface<EntityType = unknown>
@@ -13,7 +13,7 @@ export interface UmbVariantableWorkspaceContextInterface<EntityType = unknown>
 	setName(name: string, variantId?: UmbVariantId): void;
 
 	// Variant:
-	variants: Observable<Array<VariantResponseModelBaseModel>>;
+	variants: Observable<Array<VariantResponseModelBaseModel & { state: ContentStateModel }>>;
 	splitView: UmbWorkspaceSplitViewManager;
 	getVariant(variantId: UmbVariantId): VariantResponseModelBaseModel | undefined;
 

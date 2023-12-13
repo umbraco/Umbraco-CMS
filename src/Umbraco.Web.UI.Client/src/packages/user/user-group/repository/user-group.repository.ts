@@ -6,7 +6,6 @@ import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import {
 	CreateUserGroupRequestModel,
 	UpdateUserGroupRequestModel,
-	UserGroupBaseModel,
 	UserGroupItemResponseModel,
 	UserGroupResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
@@ -26,7 +25,7 @@ import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 export class UmbUserGroupRepository
 	extends UmbBaseController
 	implements
-		UmbDetailRepository<CreateUserGroupRequestModel, any, UpdateUserGroupRequestModel, UserGroupResponseModel>,
+		UmbDetailRepository<CreateUserGroupRequestModel, string, UpdateUserGroupRequestModel, UserGroupResponseModel>,
 		UmbItemRepository<UserGroupItemResponseModel>,
 		UmbApi
 {
@@ -62,7 +61,9 @@ export class UmbUserGroupRepository
 		]);
 	}
 
-	createScaffold(parentId: string | null): Promise<DataSourceResponse<UserGroupBaseModel>> {
+	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+	// @ts-ignore
+	createScaffold(parentId: string | null) {
 		return this.#detailSource.createScaffold(parentId);
 	}
 

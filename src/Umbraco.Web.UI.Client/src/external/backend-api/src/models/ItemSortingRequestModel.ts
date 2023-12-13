@@ -4,7 +4,7 @@
 /* eslint-disable */
 
 export type ItemSortingRequestModel = {
-    id?: string;
-    sortOrder?: number;
+    id: string;
+    sortOrder: number;
 };
 

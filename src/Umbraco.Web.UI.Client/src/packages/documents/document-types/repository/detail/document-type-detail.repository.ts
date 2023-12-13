@@ -8,11 +8,11 @@ import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import {
 	CreateDocumentTypeRequestModel,
 	DocumentTypeResponseModel,
-	FolderTreeItemResponseModel,
 	UpdateDocumentTypeRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
+import { UmbEntityTreeItemModel } from '@umbraco-cms/backoffice/tree';
 
 type ItemType = DocumentTypeResponseModel;
 
@@ -125,10 +125,7 @@ export class UmbDocumentTypeDetailRepository
 		const { error } = await this.#detailDataSource.update(id, item);
 
 		if (!error) {
-			// TODO: we currently don't use the detail store for anything.
-			// Consider to look up the data before fetching from the server
-			// Consider notify a workspace if a template is updated in the store while someone is editing it.
-			this.#detailStore?.append(item);
+			this.#detailStore?.updateItem(id, item);
 			this.#treeStore?.updateItem(id, item);
 
 			const notification = { data: { message: `Document Type saved` } };
@@ -161,13 +158,13 @@ export class UmbDocumentTypeDetailRepository
 	}
 }
 
-export const createTreeItem = (item: ItemType): FolderTreeItemResponseModel => {
+export const createTreeItem = (item: ItemType): UmbEntityTreeItemModel => {
 	if (!item) throw new Error('item is null or undefined');
 	if (!item.id) throw new Error('item.id is null or undefined');
 
 	// TODO: needs parentID, this is missing in the current model. Should be good when updated to a createModel.
 	return {
-		type: 'document-type',
+		entityType: 'document-type',
 		parentId: null,
 		name: item.name,
 		id: item.id,

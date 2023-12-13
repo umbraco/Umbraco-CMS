@@ -6,6 +6,6 @@
 import type { ItemResponseModelBaseModel } from './ItemResponseModelBaseModel';
 
 export type TemplateItemResponseModel = (ItemResponseModelBaseModel & {
-    alias?: string;
+    alias: string;
 });
 

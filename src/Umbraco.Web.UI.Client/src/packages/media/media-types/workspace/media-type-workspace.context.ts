@@ -36,6 +36,8 @@ export class UmbMediaTypeWorkspaceContext
 	constructor(host: UmbControllerHostElement) {
 		super(host, 'Umb.Workspace.MediaType', new UmbMediaTypeDetailRepository(host));
 
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
 		this.structure = new UmbContentTypePropertyStructureManager(this.host, this.repository);
 
 		// General for content types:
@@ -58,11 +60,11 @@ export class UmbMediaTypeWorkspaceContext
 	}
 
 	getData() {
-		return this.structure.getOwnerContentType() || {};
+		return this.structure.getOwnerContentType();
 	}
 
 	getEntityId() {
-		return this.getData().id;
+		return this.getData()?.id;
 	}
 
 	getEntityType() {
@@ -99,6 +101,12 @@ export class UmbMediaTypeWorkspaceContext
 	 * Save or creates the media type, based on wether its a new one or existing.
 	 */
 	async save() {
+		const data = this.getData();
+
+		if (!data) {
+			return Promise.reject('Something went wrong, there is no data for media type you want to save...');
+		}
+
 		if (this.getIsNew()) {
 			if ((await this.structure.create()) === true) {
 				this.setIsNew(false);
@@ -107,7 +115,7 @@ export class UmbMediaTypeWorkspaceContext
 			await this.structure.save();
 		}
 
-		this.saveComplete(this.getData());
+		this.saveComplete(data);
 	}
 
 	public destroy(): void {

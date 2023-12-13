@@ -7,6 +7,6 @@ import type { ItemSortingRequestModel } from './ItemSortingRequestModel';
 
 export type SortingRequestModel = {
     parentId?: string | null;
-    sorting?: Array<ItemSortingRequestModel>;
+    sorting: Array<ItemSortingRequestModel>;
 };
 

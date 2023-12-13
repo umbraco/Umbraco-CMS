@@ -20,6 +20,7 @@ export const data: Array<ScriptsDataItem> = [
 		name: 'some-folder',
 		type: 'script',
 		hasChildren: true,
+		content: '',
 	},
 	{
 		path: 'another-folder',
@@ -27,6 +28,7 @@ export const data: Array<ScriptsDataItem> = [
 		name: 'another-folder',
 		type: 'script',
 		hasChildren: true,
+		content: '',
 	},
 	{
 		path: 'very important folder',
@@ -34,6 +36,7 @@ export const data: Array<ScriptsDataItem> = [
 		name: 'very important folder',
 		type: 'script',
 		hasChildren: true,
+		content: '',
 	},
 	{
 		path: 'some-folder/ugly script.js',
@@ -144,9 +147,8 @@ class UmbScriptsData extends UmbData<ScriptsDataItem> {
 		return items.map((item) => createFileItemResponseModelBaseModel(item));
 	}
 
-	getFolder(path: string): FileSystemTreeItemPresentationModel {
-		const items = data.filter((item) => item.isFolder && item.path === path);
-		return items as FileSystemTreeItemPresentationModel;
+	getFolder(path: string) {
+		return data.find((item) => item.isFolder && item.path === path);
 	}
 
 	postFolder(payload: CreatePathFolderRequestModel) {
@@ -156,6 +158,7 @@ class UmbScriptsData extends UmbData<ScriptsDataItem> {
 			name: payload.name,
 			type: 'script',
 			hasChildren: false,
+			content: '',
 		};
 		return this.insert(newFolder);
 	}

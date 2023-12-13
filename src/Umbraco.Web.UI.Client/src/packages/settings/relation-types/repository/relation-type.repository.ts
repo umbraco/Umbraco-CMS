@@ -117,6 +117,8 @@ export class UmbRelationTypeRepository
 			// TODO: we currently don't use the detail store for anything.
 			// Consider to look up the data before fetching from the server
 			// Consider notify a workspace if a template is updated in the store while someone is editing it.
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
 			this.#detailStore?.append(item);
 			this.#treeStore?.updateItem(id, { name: item.name });
 

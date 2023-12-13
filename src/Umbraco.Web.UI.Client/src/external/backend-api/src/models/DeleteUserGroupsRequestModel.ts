@@ -4,6 +4,6 @@
 /* eslint-disable */
 
 export type DeleteUserGroupsRequestModel = {
-    userGroupIds?: Array<string>;
+    userGroupIds: Array<string>;
 };
 
