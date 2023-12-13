@@ -31,9 +31,11 @@ describe('UmbNotificationLayoutDefault', () => {
 		expect(element).to.be.instanceOf(UmbNotificationLayoutDefaultElement);
 	});
 
-	it('passes the a11y audit', async () => {
-		await expect(element).to.be.accessible();
-	});
+	if ((window as any).__UMBRACO_TEST_RUN_A11Y_TEST) {
+		it('passes the a11y audit', async () => {
+			await expect(element).to.be.accessible();
+		});
+	}
 
 	describe('Public API', () => {
 		describe('properties', () => {

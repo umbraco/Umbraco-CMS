@@ -214,7 +214,7 @@ export class UmbMediaTypeWorkspacePropertyElement extends UmbLitElement {
 						.value=${this.property.name}
 						@input=${this.#onNameChange}></uui-input>
 					${this.renderPropertyAlias()}
-					<slot name="property-action-menu"></slot>
+					<slot name="action-menu"></slot>
 					<p>
 						<uui-textarea
 							label="description"

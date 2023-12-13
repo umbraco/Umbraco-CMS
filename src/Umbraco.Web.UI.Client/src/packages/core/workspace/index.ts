@@ -1,4 +1,4 @@
-export * from './variant-context/index.js';
+export * from './workspace-property-dataset/index.js';
 export * from './workspace-action-menu/index.js';
 export * from './workspace-action/index.js';
 export type { WorkspaceAliasConditionConfig } from './workspace-alias.condition.js';
@@ -8,7 +8,5 @@ export * from './workspace-editor/index.js';
 export * from './workspace-footer/index.js';
 export * from './workspace-is-new-redirect-controller/index.js';
 export * from './workspace-modal/index.js';
-export * from './workspace-property-layout/workspace-property-layout.element.js';
-export * from './workspace-property/index.js';
 export * from './workspace-split-view-manager.class.js';
 export * from './workspace-split-view/index.js';

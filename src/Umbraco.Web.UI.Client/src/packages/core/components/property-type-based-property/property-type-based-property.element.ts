@@ -60,12 +60,12 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 	}
 
 	render() {
-		return html`<umb-workspace-property
+		return html`<umb-property
 			alias=${ifDefined(this._property?.alias)}
 			label=${ifDefined(this._property?.name)}
 			description=${ifDefined(this._property?.description || undefined)}
 			property-editor-ui-alias=${ifDefined(this._propertyEditorUiAlias)}
-			.config=${this._dataTypeData}></umb-workspace-property>`;
+			.config=${this._dataTypeData}></umb-property>`;
 	}
 
 	static styles = [
