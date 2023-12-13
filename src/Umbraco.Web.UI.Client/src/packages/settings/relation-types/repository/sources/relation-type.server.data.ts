@@ -58,6 +58,10 @@ export class UmbRelationTypeServerDataSource
 	async createScaffold(parentId: string | null) {
 		const data: RelationTypeResponseModel = {
 			id: UmbId.new(),
+			name: '',
+			alias: '',
+			isBidirectional: false,
+			isDependency: false,
 		};
 
 		return { data };
