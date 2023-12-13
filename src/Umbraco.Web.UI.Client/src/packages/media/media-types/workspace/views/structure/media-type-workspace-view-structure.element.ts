@@ -42,7 +42,7 @@ export class UmbMediaTypeWorkspaceViewStructureElement extends UmbLitElement imp
 	render() {
 		return html`
 			<uui-box headline="Structure">
-				<umb-workspace-property-layout alias="Root" label="Allow as Root">
+				<umb-property-layout alias="Root" label="Allow as Root">
 					<div slot="description">${this.localize.term('contentTypeEditor_allowAsRootDescription')}</div>
 					<div slot="editor">
 						<uui-toggle
@@ -52,8 +52,8 @@ export class UmbMediaTypeWorkspaceViewStructureElement extends UmbLitElement imp
 								this.#workspaceContext?.updateProperty('allowedAsRoot', (e.target as UUIToggleElement).checked);
 							}}></uui-toggle>
 					</div>
-				</umb-workspace-property-layout>
-				<umb-workspace-property-layout alias="ChildNodeType" label="Allowed child node types">
+				</umb-property-layout>
+				<umb-property-layout alias="ChildNodeType" label="Allowed child node types">
 					<div slot="description">
 						Allow content of the specified types to be created underneath content of this type.
 					</div>
@@ -70,13 +70,13 @@ export class UmbMediaTypeWorkspaceViewStructureElement extends UmbLitElement imp
 							}}">
 						</umb-media-type-input>
 					</div>
-				</umb-workspace-property-layout>
+				</umb-property-layout>
 			</uui-box>
 			<uui-box headline="Presentation">
-				<umb-workspace-property-layout alias="Root" label="Collection view">
+				<umb-property-layout alias="Root" label="Collection view">
 					<div slot="description">Provides an overview of child content and hides it in the tree.</div>
 					<div slot="editor"><uui-toggle label="Display children in a Collection view"></uui-toggle></div>
-				</umb-workspace-property-layout>
+				</umb-property-layout>
 			</uui-box>
 		`;
 	}

@@ -2,14 +2,14 @@ import { css, html, LitElement, customElement, property } from '@umbraco-cms/bac
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 /**
- *  @element umb-workspace-property-layout
+ *  @element umb-property-layout
  *  @description - Element for displaying a property in an workspace.
  *  @slot editor - Slot for rendering the Property Editor
  *  @slot description - Slot for rendering things below the label.
- *  @slot property-action-menu - Slot for rendering the Property Action Menu
+ *  @slot action-menu - Slot for rendering the Property Action Menu
  */
-@customElement('umb-workspace-property-layout')
-export class UmbWorkspacePropertyLayoutElement extends LitElement {
+@customElement('umb-property-layout')
+export class UmbPropertyLayoutElement extends LitElement {
 	/**
 	 * Alias. The technical name of the property.
 	 * @type {string}
@@ -52,7 +52,7 @@ export class UmbWorkspacePropertyLayoutElement extends LitElement {
 		return html`
 			<div id="headerColumn">
 				<uui-label title=${this.alias}>${this.label}</uui-label>
-				<slot name="property-action-menu"></slot>
+				<slot name="action-menu"></slot>
 				<div id="description">${this.description}</div>
 				<slot name="description"></slot>
 			</div>
@@ -117,6 +117,6 @@ export class UmbWorkspacePropertyLayoutElement extends LitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-workspace-property-layout': UmbWorkspacePropertyLayoutElement;
+		'umb-property-layout': UmbPropertyLayoutElement;
 	}
 }

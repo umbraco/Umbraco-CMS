@@ -57,7 +57,7 @@ export class UmbDocumentTypeWorkspaceViewTemplatesElement extends UmbLitElement 
 
 	render() {
 		return html`<uui-box headline="Templates">
-			<umb-workspace-property-layout alias="Templates" label="Allowed Templates">
+			<umb-property-layout alias="Templates" label="Allowed Templates">
 				<div slot="description">Choose which templates editors are allowed to use on content of this type</div>
 				<div id="templates" slot="editor">
 					<umb-input-template
@@ -65,7 +65,7 @@ export class UmbDocumentTypeWorkspaceViewTemplatesElement extends UmbLitElement 
 						.selectedIds=${this._allowedTemplateIds}
 						@change=${this.#templateInputChange}></umb-input-template>
 				</div>
-			</umb-workspace-property-layout>
+			</umb-property-layout>
 		</uui-box>`;
 	}
 
@@ -87,10 +87,10 @@ export class UmbDocumentTypeWorkspaceViewTemplatesElement extends UmbLitElement 
 				align-items: stretch;
 			}
 
-			umb-workspace-property-layout {
+			umb-property-layout {
 				border-top: 1px solid var(--uui-color-border);
 			}
-			umb-workspace-property-layout:first-child {
+			umb-property-layout:first-child {
 				padding-top: 0;
 				border: none;
 			}

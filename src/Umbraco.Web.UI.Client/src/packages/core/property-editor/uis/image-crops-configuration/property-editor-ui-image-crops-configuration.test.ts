@@ -1,6 +1,6 @@
 import { expect, fixture, html } from '@open-wc/testing';
 import { UmbPropertyEditorUIImageCropsConfigurationElement } from './property-editor-ui-image-crops-configuration.element.js';
-import { defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
+//import { defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 
 describe('UmbPropertyEditorUIImageCropsConfigurationElement', () => {
 	let element: UmbPropertyEditorUIImageCropsConfigurationElement;
@@ -15,8 +15,10 @@ describe('UmbPropertyEditorUIImageCropsConfigurationElement', () => {
 		expect(element).to.be.instanceOf(UmbPropertyEditorUIImageCropsConfigurationElement);
 	});
 
-	it('passes the a11y audit', async () => {
-		//TODO: This test is broken. It fails at forms because of missing labels even if you have them.
-		// await expect(element).shadowDom.to.be.accessible(defaultA11yConfig);
-	});
+	if ((window as any).__UMBRACO_TEST_RUN_A11Y_TEST) {
+		it('passes the a11y audit', async () => {
+			//TODO: This test is broken. It fails at forms because of missing labels even if you have them.
+			// await expect(element).shadowDom.to.be.accessible(defaultA11yConfig);
+		});
+	}
 });

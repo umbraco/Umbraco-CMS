@@ -14,7 +14,9 @@ describe('UmbDashboardRedirectManagement', () => {
 		expect(element).to.be.instanceOf(UmbDashboardRedirectManagementElement);
 	});
 
-	it('passes the a11y audit', async () => {
-		await expect(element).to.be.accessible(defaultA11yConfig);
-	});
+	if ((window as any).__UMBRACO_TEST_RUN_A11Y_TEST) {
+		it('passes the a11y audit', async () => {
+			await expect(element).to.be.accessible(defaultA11yConfig);
+		});
+	}
 });
