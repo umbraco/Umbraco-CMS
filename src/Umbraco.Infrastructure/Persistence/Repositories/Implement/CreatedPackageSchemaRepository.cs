@@ -319,7 +319,6 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
 
             Directory.CreateDirectory(directoryName);
 
-
             // Clean existing files
             foreach (var packagePath in new[] { definition.PackagePath, finalPackagePath })
             {
