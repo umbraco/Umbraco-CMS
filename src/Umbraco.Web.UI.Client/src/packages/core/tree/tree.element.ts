@@ -105,16 +105,7 @@ export class UmbTreeElement extends UmbLitElement {
 		if (asObservable) {
 			this.#rootItemsObserver = this.observe(asObservable(), (rootItems) => {
 				const oldValue = this._items;
-				if (this.filter) {
-					const items: Array<TreeItemPresentationModel> = [];
-					rootItems.forEach((rootItem) => {
-						const filtered = this.filter!(rootItem);
-						if (filtered) items.push(rootItem);
-					});
-					this._items = items;
-				} else {
-					this._items = rootItems;
-				}
+				this._items = rootItems;
 				this.requestUpdate('_items', oldValue);
 			});
 		}
