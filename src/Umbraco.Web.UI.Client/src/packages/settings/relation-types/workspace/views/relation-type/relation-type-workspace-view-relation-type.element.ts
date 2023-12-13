@@ -75,13 +75,15 @@ export class UmbRelationTypeWorkspaceViewRelationTypeElement extends UmbLitEleme
 	}
 
 	#renderParentProperty() {
-		if (this._relationType?.id) return html`<div slot="editor">${this._relationType.parentObjectTypeName}</div>`;
+		if (!this.#workspaceContext?.getIsNew() && this._relationType)
+			return html`<div slot="editor">${this._relationType.parentObjectTypeName}</div>`;
 
 		return html`<uui-select slot="editor"></uui-select>`;
 	}
 
 	#renderChildProperty() {
-		if (this._relationType?.id) return html`<div slot="editor">${this._relationType.parentObjectTypeName}</div>`;
+		if (!this.#workspaceContext?.getIsNew() && this._relationType)
+			return html`<div slot="editor">${this._relationType.parentObjectTypeName}</div>`;
 
 		return html`<uui-select slot="editor"></uui-select>`;
 	}
