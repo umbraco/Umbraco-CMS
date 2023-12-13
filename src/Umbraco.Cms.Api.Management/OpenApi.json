@@ -19572,10 +19572,10 @@
           "name": {
             "type": "string"
           },
-          "propertyEditorAlias": {
+          "editorAlias": {
             "type": "string"
           },
-          "propertyEditorUiAlias": {
+          "editorUiAlias": {
             "type": "string",
             "nullable": true
           },
