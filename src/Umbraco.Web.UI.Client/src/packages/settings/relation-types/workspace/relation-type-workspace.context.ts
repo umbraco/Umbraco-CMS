@@ -57,11 +57,15 @@ export class UmbRelationTypeWorkspaceContext
 		if (!this.#data.value) return;
 		if (!this.#data.value.id) return;
 
+		let response = undefined;
+
 		if (this.getIsNew()) {
-			await this.repository.create(this.#data.value);
+			response = await this.repository.create(this.#data.value);
 		} else {
-			await this.repository.save(this.#data.value.id, this.#data.value);
+			response = await this.repository.save(this.#data.value.id, this.#data.value);
 		}
+
+		if (response.error) return;
 
 		// If it went well, then its not new anymore?.
 		this.setIsNew(false);
