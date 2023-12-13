@@ -115,7 +115,7 @@ export class UmbDocumentTypeInputElement extends FormControlMixin(UmbLitElement)
 		if (this.elementTypesOnly) {
 			this.#pickerContext.openPicker({
 				hideTreeRoot: true,
-				filter: (x) => x.isElement!,
+				pickableFilter: (x) => x.isElement!,
 			});
 		} else {
 			this.#pickerContext.openPicker({ hideTreeRoot: true });

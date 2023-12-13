@@ -71,7 +71,6 @@ export class UmbTreeElement extends UmbLitElement {
 		return this.#treeContext.filter;
 	}
 	set filter(newVal) {
-		console.log(typeof newVal);
 		this.#treeContext.filter = newVal;
 	}
 

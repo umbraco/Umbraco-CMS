@@ -60,6 +60,7 @@ export class UmbDocumentTypeWorkspaceViewStructureElement extends UmbLitElement 
 					<div slot="editor">
 						<!-- TODO: maybe we want to somehow display the hierarchy, but not necessary in the same way as old backoffice? -->
 						<umb-document-type-input
+							element-types-only
 							.selectedIds=${this._allowedContentTypeIDs ?? []}
 							@change="${(e: CustomEvent) => {
 								const sortedContentTypesList = (e.target as UmbDocumentTypeInputElement).selectedIds.map(
