@@ -10,9 +10,6 @@ namespace Umbraco.Cms.Tests.Integration.ManagementApi.TemporaryFile;
 [TestFixture]
 public class DeleteTemporaryFileControllerTests : ManagementApiUserGroupTestBase<DeleteTemporaryFileController>
 {
-    protected override Expression<Func<DeleteTemporaryFileController, object>> MethodSelector =>
-        x => x.Delete(_key);
-
     private ITemporaryFileService _temporaryFileService;
     private Guid _key;
 
@@ -23,6 +20,9 @@ public class DeleteTemporaryFileControllerTests : ManagementApiUserGroupTestBase
         _key = Guid.NewGuid();
         await _temporaryFileService.CreateAsync(new CreateTemporaryFileModel { Key = _key, FileName = "File.png" });
     }
+
+    protected override Expression<Func<DeleteTemporaryFileController, object>> MethodSelector =>
+        x => x.Delete(_key);
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
