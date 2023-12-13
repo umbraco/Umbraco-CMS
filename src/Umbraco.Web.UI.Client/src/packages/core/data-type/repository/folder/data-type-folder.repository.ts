@@ -13,6 +13,7 @@ export class UmbDataTypeFolderRepository extends UmbFolderRepositoryBase {
 const folderToDataTypeTreeItemMapper = (folder: UmbFolderModel) => {
 	return {
 		id: folder.unique,
+		parentId: folder.parentUnique,
 		name: folder.name,
 		type: UMB_DATA_TYPE_FOLDER_ENTITY_TYPE,
 		hasChildren: false,

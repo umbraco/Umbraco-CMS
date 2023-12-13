@@ -1,4 +1,5 @@
 export interface UmbFolderScaffoldModel {
+	unique: string;
 	name: string;
 	parentUnique: string | null;
 }
@@ -10,7 +11,7 @@ export interface UmbFolderModel {
 }
 
 export interface UmbCreateFolderModel {
-	unique?: string;
+	unique: string;
 	parentUnique: string | null;
 	name: string;
 }

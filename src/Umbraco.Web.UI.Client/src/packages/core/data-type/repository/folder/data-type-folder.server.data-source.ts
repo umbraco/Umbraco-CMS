@@ -60,15 +60,15 @@ export class UmbDataTypeFolderServerDataSource implements UmbFolderDataSource {
 		if (args.parentUnique === undefined) throw new Error('Parent unique is missing');
 		if (!args.name) throw new Error('Name is missing');
 
-		const { data, error } = await tryExecuteAndNotify(
+		const { error } = await tryExecuteAndNotify(
 			this.#host,
 			DataTypeResource.postDataTypeFolder({
 				requestBody: { parentId: args.parentUnique, name: args.name },
 			}),
 		);
 
-		if (data) {
-			return this.read(data);
+		if (!error) {
+			return this.read(args.unique);
 		}
 
 		return { error };
@@ -84,7 +84,7 @@ export class UmbDataTypeFolderServerDataSource implements UmbFolderDataSource {
 		if (!args.unique) throw new Error('Unique is missing');
 		if (!args.name) throw new Error('Folder name is missing');
 
-		const { data, error } = await tryExecuteAndNotify(
+		const { error } = await tryExecuteAndNotify(
 			this.#host,
 			DataTypeResource.putDataTypeFolderById({
 				id: args.unique,
@@ -92,8 +92,8 @@ export class UmbDataTypeFolderServerDataSource implements UmbFolderDataSource {
 			}),
 		);
 
-		if (data) {
-			return this.read(data);
+		if (!error) {
+			return this.read(args.unique);
 		}
 
 		return { error };

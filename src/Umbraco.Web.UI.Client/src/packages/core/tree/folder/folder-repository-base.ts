@@ -5,6 +5,7 @@ import { UmbCreateFolderModel, UmbFolderModel, UmbUpdateFolderModel } from './ty
 import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbTreeStore } from '@umbraco-cms/backoffice/tree';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { UmbId } from '@umbraco-cms/backoffice/id';
 
 export type UmbFolderToTreeItemMapper<FolderTreeItemType> = (item: UmbFolderModel) => FolderTreeItemType;
 
@@ -34,6 +35,7 @@ export abstract class UmbFolderRepositoryBase extends UmbRepositoryBase implemen
 		if (parentUnique === undefined) throw new Error('Parent unique is missing');
 
 		const scaffold = {
+			unique: UmbId.new(),
 			name: '',
 			parentUnique,
 		};
@@ -73,13 +75,13 @@ export abstract class UmbFolderRepositoryBase extends UmbRepositoryBase implemen
 		if (!args.name) throw new Error('Folder name is missing');
 		await this._init;
 
-		const { error } = await this.#folderDataSource.update(args);
+		const { data, error } = await this.#folderDataSource.update(args);
 
-		if (!error) {
+		if (data) {
 			this._treeStore!.updateItem(args.unique, { name: args.name });
 		}
 
-		return { error };
+		return { data, error };
 	}
 
 	/**

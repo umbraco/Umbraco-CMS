@@ -12,6 +12,6 @@ export interface UmbFolderDataSourceConstructor {
 export interface UmbFolderDataSource {
 	create(args: UmbCreateFolderModel): Promise<DataSourceResponse<UmbFolderModel>>;
 	read(unique: string): Promise<DataSourceResponse<UmbFolderModel>>;
-	update(args: UmbUpdateFolderModel): Promise<UmbDataSourceErrorResponse>;
+	update(args: UmbUpdateFolderModel): Promise<DataSourceResponse<UmbFolderModel>>;
 	delete(unique: string): Promise<UmbDataSourceErrorResponse>;
 }
