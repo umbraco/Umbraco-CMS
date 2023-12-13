@@ -10,24 +10,27 @@ import { UmbId } from '@umbraco-cms/backoffice/id';
 export type UmbFolderToTreeItemMapper<FolderTreeItemType> = (item: UmbFolderModel) => FolderTreeItemType;
 
 // TODO: add types instead of any
-export abstract class UmbFolderRepositoryBase extends UmbRepositoryBase implements UmbFolderRepository {
+export abstract class UmbFolderRepositoryBase<FolderTreeItemType>
+	extends UmbRepositoryBase
+	implements UmbFolderRepository
+{
 	protected _init: Promise<unknown>;
-	protected _treeStore?: UmbTreeStore<any>;
+	protected _treeStore?: UmbTreeStore<FolderTreeItemType>;
 	#folderDataSource: UmbFolderDataSource;
-	#folderToTreeItemMapper: UmbFolderToTreeItemMapper<any>;
+	#folderToTreeItemMapper: UmbFolderToTreeItemMapper<FolderTreeItemType>;
 
 	constructor(
 		host: UmbControllerHost,
 		folderDataSource: UmbFolderDataSourceConstructor,
 		treeStoreContextAlias: string | UmbContextToken<any>,
-		folderToTreeItemMapper: UmbFolderToTreeItemMapper<any>,
+		folderToTreeItemMapper: UmbFolderToTreeItemMapper<FolderTreeItemType>,
 	) {
 		super(host);
 		this.#folderDataSource = new folderDataSource(this);
 		this.#folderToTreeItemMapper = folderToTreeItemMapper;
 
 		this._init = this.consumeContext(treeStoreContextAlias, (instance) => {
-			this._treeStore = instance as UmbTreeStore<any>;
+			this._treeStore = instance;
 		}).asPromise();
 	}
 
@@ -58,7 +61,7 @@ export abstract class UmbFolderRepositoryBase extends UmbRepositoryBase implemen
 
 		if (data) {
 			const folderTreeItem = this.#folderToTreeItemMapper(data);
-			this._treeStore!.appendItems([folderTreeItem]);
+			this._treeStore!.append(folderTreeItem);
 			return { data };
 		}
 
