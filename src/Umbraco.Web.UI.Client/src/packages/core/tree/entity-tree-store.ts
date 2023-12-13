@@ -1,6 +1,6 @@
 import { type UmbTreeStore } from './tree-store.interface.js';
+import { UmbEntityTreeItemModel } from './types.js';
 import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
-import { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
@@ -11,11 +11,11 @@ import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api
  * @description - Entity Tree Store
  */
 export class UmbEntityTreeStore
-	extends UmbStoreBase<EntityTreeItemResponseModel>
-	implements UmbTreeStore<EntityTreeItemResponseModel>
+	extends UmbStoreBase<UmbEntityTreeItemModel>
+	implements UmbTreeStore<UmbEntityTreeItemModel>
 {
 	constructor(host: UmbControllerHostElement, storeAlias: string) {
-		super(host, storeAlias, new UmbArrayState<EntityTreeItemResponseModel>([], (x) => x.id));
+		super(host, storeAlias, new UmbArrayState<UmbEntityTreeItemModel>([], (x) => x.id));
 	}
 
 	/**

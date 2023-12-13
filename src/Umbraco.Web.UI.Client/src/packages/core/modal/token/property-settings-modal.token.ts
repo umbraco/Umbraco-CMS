@@ -15,6 +15,8 @@ export const UMB_PROPERTY_SETTINGS_MODAL = new UmbModalToken<
 		size: 'small',
 	},
 	value: {
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
 		validation: {},
 	},
 });

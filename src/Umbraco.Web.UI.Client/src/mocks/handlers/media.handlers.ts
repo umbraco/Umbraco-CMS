@@ -25,9 +25,9 @@ export const handlers = [
 		const data = await req.json();
 		if (!data) return;
 
-		const saved = umbMediaData.save(data.id, data);
+		umbMediaData.save(data.id, data);
 
-		return res(ctx.status(200), ctx.json(saved));
+		return res(ctx.status(200));
 	}),
 
 	rest.post('/umbraco/management/api/v1/media/move', async (req, res, ctx) => {

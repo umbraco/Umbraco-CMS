@@ -58,9 +58,9 @@ export const handlers = [
 		const data = await req.json();
 		if (!data) return;
 
-		const saved = umbRelationTypeData.save(id, data);
+		umbRelationTypeData.insert(data);
 
-		return res(ctx.status(200), ctx.json(saved));
+		return res(ctx.status(200));
 	}),
 
 	rest.put(umbracoPath('/relation-type/:id'), async (req, res, ctx) => {
@@ -69,8 +69,8 @@ export const handlers = [
 		const data = await req.json();
 		if (!data) return;
 
-		const saved = umbRelationTypeData.save(id, data);
+		umbRelationTypeData.save(id, data);
 
-		return res(ctx.status(200), ctx.json(saved));
+		return res(ctx.status(200));
 	}),
 ];

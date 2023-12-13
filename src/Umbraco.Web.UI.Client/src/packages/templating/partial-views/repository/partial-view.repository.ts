@@ -1,17 +1,12 @@
 import { UmbPartialViewTreeRepository } from '../tree/index.js';
 import { UmbPartialViewDetailServerDataSource } from './sources/partial-view-detail.server.data-source.js';
-import {
-	PartialViewGetFolderResponse,
-	UmbPartialViewFolderServerDataSource,
-} from './sources/partial-view-folder.server.data-source.js';
+import { UmbPartialViewFolderServerDataSource } from './sources/partial-view-folder.server.data-source.js';
 import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import {
 	CreateFolderRequestModel,
 	CreatePartialViewRequestModel,
-	FolderModelBaseModel,
-	FolderResponseModel,
 	PagedSnippetItemResponseModel,
 	PartialViewItemResponseModel,
 	PartialViewResponseModel,
@@ -26,6 +21,7 @@ import {
 	UmbFolderRepository,
 } from '@umbraco-cms/backoffice/repository';
 import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
+import { UmbId } from '@umbraco-cms/backoffice/id';
 
 export class UmbPartialViewRepository
 	extends UmbBaseController
@@ -54,39 +50,35 @@ export class UmbPartialViewRepository
 	}
 
 	//#region FOLDER
-	createFolderScaffold(
-		parentId: string | null,
-	): Promise<{ data?: FolderResponseModel | undefined; error?: ProblemDetails | undefined }> {
-		const data: FolderResponseModel = {
+	createFolderScaffold(parentId: string | null) {
+		const data = {
+			id: UmbId.new(),
 			name: '',
 			parentId,
 		};
-		return Promise.resolve({ data, error: undefined });
+		return Promise.resolve({ data });
 	}
 
-	async createFolder(
-		requestBody: CreateFolderRequestModel,
-	): Promise<{ data?: string | undefined; error?: ProblemDetails | undefined }> {
+	async createFolder(requestBody: CreateFolderRequestModel) {
 		const req = {
 			parentPath: requestBody.parentId,
 			name: requestBody.name,
 		};
+
 		const promise = this.#folderDataSource.create(req);
 		await promise;
 		this.#treeRepository.requestTreeItemsOf(requestBody.parentId ? requestBody.parentId : null);
 		return promise;
 	}
-	async requestFolder(
-		unique: string,
-	): Promise<{ data?: PartialViewGetFolderResponse | undefined; error?: ProblemDetails | undefined }> {
+
+	async requestFolder(unique: string) {
 		return this.#folderDataSource.read(unique);
 	}
-	updateFolder(
-		unique: string,
-		folder: FolderModelBaseModel,
-	): Promise<{ data?: FolderModelBaseModel | undefined; error?: ProblemDetails | undefined }> {
+
+	updateFolder(): any {
 		throw new Error('Method not implemented.');
 	}
+
 	async deleteFolder(path: string): Promise<{ error?: ProblemDetails | undefined }> {
 		const { data } = await this.requestFolder(path);
 		const promise = this.#folderDataSource.delete(path);

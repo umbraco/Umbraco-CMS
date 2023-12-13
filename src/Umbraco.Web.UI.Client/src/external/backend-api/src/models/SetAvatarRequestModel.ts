@@ -4,6 +4,6 @@
 /* eslint-disable */
 
 export type SetAvatarRequestModel = {
-    fileId?: string;
+    fileId: string;
 };
 

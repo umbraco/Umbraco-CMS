@@ -19,7 +19,12 @@ import type { UmbDataSource } from '@umbraco-cms/backoffice/repository';
  */
 export class UmbDictionaryDetailServerDataSource
 	implements
-		UmbDataSource<CreateDictionaryItemRequestModel, any, UpdateDictionaryItemRequestModel, DictionaryItemResponseModel>
+		UmbDataSource<
+			CreateDictionaryItemRequestModel,
+			string,
+			UpdateDictionaryItemRequestModel,
+			DictionaryItemResponseModel
+		>
 {
 	#host: UmbControllerHost;
 
@@ -33,13 +38,13 @@ export class UmbDictionaryDetailServerDataSource
 	 * @return {*}
 	 * @memberof UmbDictionaryDetailServerDataSource
 	 */
-	async createScaffold(parentId?: string | null, preset?: Partial<CreateDictionaryItemRequestModel>) {
+	async createScaffold(parentId: string | null, preset?: Partial<CreateDictionaryItemRequestModel>) {
 		const data = {
-			id: UmbId.new(),
-			parentId,
 			name: '',
 			translations: [],
 			...preset,
+			id: UmbId.new(),
+			parentId,
 		};
 
 		return { data };

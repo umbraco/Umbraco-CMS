@@ -57,6 +57,7 @@ export class UmbDocumentServerDataSource
 	 * @memberof UmbDocumentServerDataSource
 	 */
 	async createScaffold(documentTypeId: string, preset?: Partial<CreateDocumentRequestModel>) {
+		// TODO: make our own "scaffold" model
 		const data: DocumentResponseModel = {
 			urls: [],
 			templateId: null,
@@ -71,6 +72,8 @@ export class UmbDocumentServerDataSource
 					segment: null,
 					name: '',
 					createDate: new Date().toISOString(),
+					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+					// @ts-ignore
 					updateDate: undefined,
 				},
 			],

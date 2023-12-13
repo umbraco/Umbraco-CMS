@@ -4,6 +4,6 @@
 /* eslint-disable */
 
 export type PublishDocumentRequestModel = {
-    cultures?: Array<string>;
+    cultures: Array<string>;
 };
 
