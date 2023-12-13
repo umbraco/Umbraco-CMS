@@ -1,3 +1,6 @@
+import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbArrayState, UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 
 /**
@@ -5,12 +8,37 @@ import { UmbArrayState, UmbBooleanState } from '@umbraco-cms/backoffice/observab
  * @export
  * @class UmbSelectionManager
  */
-export class UmbSelectionManager {
+export class UmbSelectionManager extends UmbBaseController {
+	#selectable = new UmbBooleanState(false);
+	public readonly selectable = this.#selectable.asObservable();
+
 	#selection = new UmbArrayState(<Array<string | null>>[], (x) => x);
 	public readonly selection = this.#selection.asObservable();
 
 	#multiple = new UmbBooleanState(false);
 	public readonly multiple = this.#multiple.asObservable();
+
+	constructor(host: UmbControllerHost) {
+		super(host);
+	}
+
+	/**
+	 * Returns whether items can be selected.
+	 * @return {*}
+	 * @memberof UmbSelectionManager
+	 */
+	public getSelectable() {
+		return this.#selectable.getValue();
+	}
+
+	/**
+	 * Sets whether items can be selected.
+	 * @param {boolean} value
+	 * @memberof UmbSelectionManager
+	 */
+	public setSelectable(value: boolean) {
+		this.#selectable.next(value);
+	}
 
 	/**
 	 * Returns the current selection.
@@ -27,8 +55,10 @@ export class UmbSelectionManager {
 	 * @memberof UmbSelectionManager
 	 */
 	public setSelection(value: Array<string | null>) {
+		if (this.getSelectable() === false) return;
 		if (value === undefined) throw new Error('Value cannot be undefined');
-		this.#selection.next(value);
+		const newSelection = this.getMultiple() ? value : [value[0]];
+		this.#selection.next(newSelection);
 	}
 
 	/**
@@ -47,6 +77,12 @@ export class UmbSelectionManager {
 	 */
 	public setMultiple(value: boolean) {
 		this.#multiple.next(value);
+
+		/* If multiple is set to false, and the current selection is more than one, 
+		then we need to set the selection to the first item. */
+		if (value === false && this.getSelection().length > 1) {
+			this.setSelection([this.getSelection()[0]]);
+		}
 	}
 
 	/**
@@ -55,6 +91,7 @@ export class UmbSelectionManager {
 	 * @memberof UmbSelectionManager
 	 */
 	public toggleSelect(unique: string | null) {
+		if (this.getSelectable() === false) return;
 		this.isSelected(unique) ? this.deselect(unique) : this.select(unique);
 	}
 
@@ -64,8 +101,11 @@ export class UmbSelectionManager {
 	 * @memberof UmbSelectionManager
 	 */
 	public select(unique: string | null) {
+		if (this.getSelectable() === false) return;
+		if (this.isSelected(unique)) return;
 		const newSelection = this.getMultiple() ? [...this.getSelection(), unique] : [unique];
 		this.#selection.next(newSelection);
+		this.getHostElement().dispatchEvent(new UmbSelectionChangeEvent());
 	}
 
 	/**
@@ -74,8 +114,10 @@ export class UmbSelectionManager {
 	 * @memberof UmbSelectionManager
 	 */
 	public deselect(unique: string | null) {
+		if (this.getSelectable() === false) return;
 		const newSelection = this.getSelection().filter((x) => x !== unique);
 		this.#selection.next(newSelection);
+		this.getHostElement().dispatchEvent(new UmbSelectionChangeEvent());
 	}
 
 	/**
@@ -93,6 +135,7 @@ export class UmbSelectionManager {
 	 * @memberof UmbSelectionManager
 	 */
 	public clearSelection() {
+		if (this.getSelectable() === false) return;
 		this.#selection.next([]);
 	}
 }
