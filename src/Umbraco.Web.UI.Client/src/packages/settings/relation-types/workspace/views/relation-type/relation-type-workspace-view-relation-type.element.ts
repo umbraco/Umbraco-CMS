@@ -3,6 +3,7 @@ import {
 	UUIBooleanInputEvent,
 	UUIRadioGroupElement,
 	UUIRadioGroupEvent,
+	UUISelectEvent,
 	UUIToggleElement,
 } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
@@ -74,18 +75,56 @@ export class UmbRelationTypeWorkspaceViewRelationTypeElement extends UmbLitEleme
 		`;
 	}
 
+	#onParentObjectTypeChange(event: UUISelectEvent) {
+		const value = event.target.value as string;
+		this.#workspaceContext?.update('parentObjectType', value);
+	}
+	#onChildObjectTypeChange(event: UUISelectEvent) {
+		const value = event.target.value as string;
+		this.#workspaceContext?.update('childObjectType', value);
+	}
+
 	#renderParentProperty() {
 		if (!this.#workspaceContext?.getIsNew() && this._relationType)
 			return html`<div slot="editor">${this._relationType.parentObjectTypeName}</div>`;
 
-		return html`<uui-select slot="editor"></uui-select>`;
+		//TODO Get the actual list of object types
+		return html`<uui-select
+			slot="editor"
+			@change=${this.#onParentObjectTypeChange}
+			.options=${[
+				{
+					name: 'Document',
+					value: 'c66ba18e-eaf3-4cff-8a22-41b16d66a972',
+				},
+				{
+					name: 'Media',
+					value: 'b796f64c-1f99-4ffb-b886-4bf4bc011a9c',
+				},
+			]}>
+			></uui-select
+		>`;
 	}
 
 	#renderChildProperty() {
 		if (!this.#workspaceContext?.getIsNew() && this._relationType)
 			return html`<div slot="editor">${this._relationType.parentObjectTypeName}</div>`;
 
-		return html`<uui-select slot="editor"></uui-select>`;
+		//TODO Get the actual list of object types
+		return html`<uui-select
+			slot="editor"
+			@change=${this.#onChildObjectTypeChange}
+			.options=${[
+				{
+					name: 'Document',
+					value: 'c66ba18e-eaf3-4cff-8a22-41b16d66a972',
+				},
+				{
+					name: 'Media',
+					value: 'b796f64c-1f99-4ffb-b886-4bf4bc011a9c',
+				},
+			]}>
+		</uui-select>`;
 	}
 
 	static styles = [
