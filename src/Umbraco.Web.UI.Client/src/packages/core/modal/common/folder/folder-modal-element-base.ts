@@ -10,9 +10,6 @@ export abstract class UmbFolderModalElementBase<
 	FolderModalValueType extends { folder: UmbFolderModel },
 > extends UmbModalBaseElement<FolderModalDataType, FolderModalValueType> {
 	@state()
-	_headline?: string;
-
-	@state()
 	_isNew = false;
 
 	folderRepository?: UmbFolderRepository;
@@ -68,7 +65,7 @@ export abstract class UmbFolderModalElementBase<
 									id="name"
 									name="name"
 									placeholder="Enter folder name..."
-									.value="${this.value.folder.name}"
+									.value="${this.value?.folder?.name || ''}"
 									required
 									required-message="Folder name is required"></uui-input>
 							</uui-form-layout-item>

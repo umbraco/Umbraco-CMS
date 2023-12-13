@@ -38,11 +38,13 @@ export class UmbDataTypeFolderServerDataSource implements UmbFolderDataSource {
 		);
 
 		if (data) {
-			return {
+			const mappedData = {
 				unique: data.id,
 				name: data.name,
-				parentUnique: data.parentId,
+				parentUnique: data.parentId || null,
 			};
+
+			return { data: mappedData };
 		}
 
 		return { error };
