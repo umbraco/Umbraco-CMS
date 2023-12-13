@@ -392,6 +392,11 @@ internal class PublicAccessService : RepositoryService, IPublicAccessService
                 return Attempt.Fail(attempt.Status);
             }
 
+            if (attempt.Result is null)
+            {
+                return Attempt.Fail(PublicAccessOperationStatus.EntryNotFound);
+            }
+
             EventMessages evtMsgs = EventMessagesFactory.Get();
 
 
