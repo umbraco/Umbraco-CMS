@@ -1,4 +1,4 @@
-import { UmbRepositoryBase } from '../repository-base.js';
+import { UmbRepositoryBase } from '../../repository/repository-base.js';
 import { type UmbFolderRepository } from './folder-repository.interface.js';
 import type { UmbFolderDataSource, UmbFolderDataSourceConstructor } from './folder-data-source.interface.js';
 import { UmbCreateFolderModel, UmbFolderModel, UmbUpdateFolderModel } from './types.js';

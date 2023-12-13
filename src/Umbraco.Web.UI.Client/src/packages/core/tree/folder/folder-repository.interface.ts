@@ -1,4 +1,4 @@
-import { DataSourceResponse, UmbDataSourceErrorResponse } from '../data-source/index.js';
+import { DataSourceResponse, UmbDataSourceErrorResponse } from '../../repository/data-source/index.js';
 import { UmbCreateFolderModel, UmbFolderModel, UmbFolderScaffoldModel, UmbUpdateFolderModel } from './types.js';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 export interface UmbFolderRepository extends UmbApi {

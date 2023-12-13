@@ -1,5 +1,5 @@
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
-import { UmbFolderModel } from '@umbraco-cms/backoffice/repository';
+import { UmbFolderModel } from '@umbraco-cms/backoffice/tree';
 
 export interface UmbFolderCreateModalData {
 	folderRepositoryAlias: string;

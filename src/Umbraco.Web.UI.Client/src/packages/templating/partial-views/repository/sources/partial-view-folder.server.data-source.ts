@@ -1,6 +1,6 @@
 import { CreateFolderRequestModel, PartialViewResource } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbFolderDataSource } from '@umbraco-cms/backoffice/repository';
+import { UmbFolderDataSource } from '@umbraco-cms/backoffice/tree';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 export class UmbPartialViewFolderServerDataSource implements UmbFolderDataSource {

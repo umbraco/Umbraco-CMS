@@ -1,7 +1,7 @@
 import { css, html, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import { UmbFolderModel, UmbFolderRepository } from '@umbraco-cms/backoffice/repository';
+import { UmbFolderModel, UmbFolderRepository } from '@umbraco-cms/backoffice/tree';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 

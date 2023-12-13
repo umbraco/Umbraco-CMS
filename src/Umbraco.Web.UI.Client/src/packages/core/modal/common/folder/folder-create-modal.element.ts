@@ -1,7 +1,7 @@
 import { UmbFolderModalElementBase } from './folder-modal-element-base.js';
 import { customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbFolderCreateModalData, UmbFolderCreateModalValue } from '@umbraco-cms/backoffice/modal';
-import { UmbFolderScaffoldModel } from '@umbraco-cms/backoffice/repository';
+import { UmbFolderScaffoldModel } from '@umbraco-cms/backoffice/tree';
 
 @customElement('umb-folder-create-modal')
 export class UmbFolderCreateModalElement extends UmbFolderModalElementBase<

@@ -1,4 +1,7 @@
-import { DataSourceResponse, UmbDataSourceErrorResponse } from '../data-source/data-source-response.interface.js';
+import {
+	DataSourceResponse,
+	UmbDataSourceErrorResponse,
+} from '../../repository/data-source/data-source-response.interface.js';
 import { UmbCreateFolderModel, UmbFolderModel, UmbUpdateFolderModel } from './types.js';
 import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 

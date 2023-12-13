@@ -3,7 +3,7 @@ import { UMB_SCRIPT_TREE_STORE_CONTEXT } from '../../tree/index.js';
 import { UmbScriptFolderServerDataSource } from './script-folder.server.data-source.js';
 import { FileSystemTreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbFolderModel, UmbFolderRepositoryBase } from '@umbraco-cms/backoffice/repository';
+import { UmbFolderModel, UmbFolderRepositoryBase } from '@umbraco-cms/backoffice/tree';
 
 export class UmbScriptFolderRepository extends UmbFolderRepositoryBase {
 	constructor(host: UmbControllerHost) {
