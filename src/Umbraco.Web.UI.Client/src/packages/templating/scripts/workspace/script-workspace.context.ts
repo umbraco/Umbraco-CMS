@@ -1,5 +1,5 @@
-import { UmbScriptDetailRepository } from '../repository/script-detail.repository.js';
-import { UMB_SCRIPT_WORKSPACE_ALIAS }../repository/script-detail.repository.js
+import { UmbScriptDetailRepository } from '../repository/index.js';
+import { UMB_SCRIPT_WORKSPACE_ALIAS } from './manifests.js';
 import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbEditableWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
