@@ -83,7 +83,10 @@ export abstract class UmbFolderRepositoryBase<FolderTreeItemType extends UmbTree
 		const { data, error } = await this.#folderDataSource.update(args);
 
 		if (data) {
-			this._treeStore!.updateItem(args.unique, { name: args.name });
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
+			// TODO: I don't know why typescript is complaining about the name prop
+			this._treeStore!.updateItem(args.unique, { name: data.name });
 		}
 
 		return { data, error };

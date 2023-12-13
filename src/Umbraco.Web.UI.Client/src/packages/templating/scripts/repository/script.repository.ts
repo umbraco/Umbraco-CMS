@@ -17,13 +17,11 @@ export class UmbScriptRepository
 		UmbApi
 {
 	#detailDataSource: UmbScriptServerDataSource;
-
 	// TODO: temp solution until it is automated
 	#treeRepository = new UmbScriptTreeRepository(this);
 
 	constructor(host: UmbControllerHost) {
 		super(host);
-
 		this.#detailDataSource = new UmbScriptServerDataSource(this);
 	}
 
@@ -42,8 +40,9 @@ export class UmbScriptRepository
 		throw new Error('Method not implemented.');
 	}
 
-	createScaffold(parentId: string | null, preset: string) {
-		return this.#detailDataSource.createScaffold(parentId, preset);
+	createScaffold(parentUnique: string | null, preset: string) {
+		if (parentUnique === undefined) throw new Error('Parent unique is missing');
+		return this.#detailDataSource.createScaffold(parentUnique, preset);
 	}
 
 	async create(data: CreateScriptRequestModel) {

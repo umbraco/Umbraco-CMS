@@ -1,4 +1,4 @@
-import { UmbScripDetailModel } from '../types.js';
+import { UmbScriptDetailModel } from '../types.js';
 import { UmbScriptRepository } from '../repository/script.repository.js';
 import { UMB_SCRIPT_WORKSPACE_ALIAS } from './manifests.js';
 import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
@@ -9,9 +9,9 @@ import { TextFileResponseModelBaseModel, UpdateScriptRequestModel } from '@umbra
 
 export class UmbScriptWorkspaceContext extends UmbEditableWorkspaceContextBase<
 	UmbScriptRepository,
-	UmbScripDetailModel
+	UmbScriptDetailModel
 > {
-	#data = new UmbObjectState<UmbScripDetailModel | undefined>(undefined);
+	#data = new UmbObjectState<UmbScriptDetailModel | undefined>(undefined);
 	data = this.#data.asObservable();
 	name = this.#data.asObservablePart((data) => data?.name);
 	content = this.#data.asObservablePart((data) => data?.content);
@@ -46,15 +46,16 @@ export class UmbScriptWorkspaceContext extends UmbEditableWorkspaceContextBase<
 		this.#data.update({ content: value });
 	}
 
-	async load(entityKey: string) {
-		const { data } = await this.repository.requestByKey(entityKey);
+	async load(unique: string) {
+		const { data } = await this.repository.requestByKey(unique);
 		if (data) {
 			this.setIsNew(false);
 			this.#data.next(data);
 		}
 	}
 
-	async create(parentKey: string) {
+	async create(parentUnique: string | null) {
+		const { data } = await this.repository.createScaffold(parentUnique);
 		const newScript: TextFileResponseModelBaseModel = {
 			name: '',
 			path: parentKey,

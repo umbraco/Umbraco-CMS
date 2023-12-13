@@ -16,8 +16,7 @@ export class UmbScriptTreeRepository
 	}
 
 	async requestTreeRoot() {
-		const data = {
-			id: null,
+		const data: UmbScriptTreeRootModel = {
 			path: null,
 			entityType: UMB_SCRIPT_ROOT_ENTITY_TYPE,
 			name: 'Scripts',
