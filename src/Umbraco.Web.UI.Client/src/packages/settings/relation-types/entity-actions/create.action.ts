@@ -10,6 +10,6 @@ export class UmbCreateRelationTypeEntityAction extends UmbEntityActionBase<UmbRe
 
 	async execute() {
 		// TODO: Generate the href or retrieve it from something?
-		history.pushState(null, '', `section/settings/workspace/relation-type/create`);
+		history.pushState(null, '', `section/settings/workspace/relation-type/create/${this.unique ?? null}`);
 	}
 }
