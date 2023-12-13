@@ -124,7 +124,7 @@ public abstract class UserControllerBase : ManagementApiControllerBase
                 .WithTitle("Invalid user state")
                 .WithDetail("The target user is not in the invite state.")
                 .Build()),
-            UserOperationStatus.Forbidden => Forbid(),
+            UserOperationStatus.Forbidden => Forbidden(),
             _ => StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetailsBuilder()
                     .WithTitle("Unknown user operation status.")
                     .Build()),

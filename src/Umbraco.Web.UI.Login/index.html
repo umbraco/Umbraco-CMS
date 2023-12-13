@@ -9,6 +9,7 @@
   <meta name="robots" content="noindex, nofollow"/>
   <meta name="pinterest" content="nopin"/>
   <title>Umbraco</title>
+  <link rel="stylesheet" href="/node_modules/@umbraco-ui/uui-css/dist/uui-css.css"/>
   <script type="module">
     import {startMockServiceWorker} from './src/mocks/index.ts';
 
@@ -16,7 +17,6 @@
       await startMockServiceWorker();
     }
   </script>
-  <script type="module" src="/src/external.ts"></script>
   <script type="module" src="/src/index.ts"></script>
 </head>
 <body class="uui-font uui-text" style="margin: 0; padding: 0; overflow: hidden">

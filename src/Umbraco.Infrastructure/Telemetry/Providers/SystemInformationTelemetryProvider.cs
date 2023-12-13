@@ -14,7 +14,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Telemetry.Providers;
 
-internal class SystemInformationTelemetryProvider : IDetailedTelemetryProvider, IUserDataService
+internal class SystemInformationTelemetryProvider : IDetailedTelemetryProvider, ISystemInformationService
 {
     private readonly IHostEnvironment _hostEnvironment;
     private readonly HostingSettings _hostingSettings;
@@ -93,20 +93,22 @@ internal class SystemInformationTelemetryProvider : IDetailedTelemetryProvider, 
             new(Constants.Telemetry.CurrentServerRole, CurrentServerRole),
         };
 
-    public IEnumerable<UserData> GetUserData() =>
-        new UserData[]
+    /// <inheritdoc />
+    public IDictionary<string, string> GetSystemInformation() =>
+        new Dictionary<string, string>
         {
-            new("Server OS", ServerOs), new("Server Framework", ServerFramework),
-            new("Default Language", _localizationService.GetDefaultLanguageIsoCode()),
-            new("Umbraco Version", _version.SemanticVersion.ToSemanticStringWithoutBuild()),
-            new("Current Culture", CurrentCulture),
-            new("Current UI Culture", Thread.CurrentThread.CurrentUICulture.ToString()),
-            new("Current Webserver", CurrentWebServer),
-            new("Models Builder Mode", ModelsBuilderMode),
-            new("Runtime Mode", RuntimeMode),
-            new("Debug Mode", IsDebug.ToString()),
-            new("Database Provider", DatabaseProvider),
-            new("Current Server Role", CurrentServerRole),
+            { "Server OS", ServerOs },
+            { "Server Framework", ServerFramework },
+            { "Default Language", _localizationService.GetDefaultLanguageIsoCode() },
+            { "Umbraco Version", _version.SemanticVersion.ToSemanticStringWithoutBuild() },
+            { "Current Culture", CurrentCulture },
+            { "Current UI Culture", Thread.CurrentThread.CurrentUICulture.ToString() },
+            { "Current Webserver", CurrentWebServer },
+            { "Models Builder Mode", ModelsBuilderMode },
+            { "Runtime Mode", RuntimeMode },
+            { "Debug Mode", IsDebug.ToString() },
+            { "Database Provider", DatabaseProvider },
+            { "Current Server Role", CurrentServerRole },
         };
 
     private string GetWebServerName()

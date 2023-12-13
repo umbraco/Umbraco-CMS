@@ -8,6 +8,7 @@ using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Web.Common.DependencyInjection;
+using StaticServiceProvider = Umbraco.Cms.Core.DependencyInjection.StaticServiceProvider;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
@@ -18,33 +19,43 @@ public abstract class BlockListPropertyEditorBase : DataEditor
 {
 
     private readonly IBlockValuePropertyIndexValueFactory _blockValuePropertyIndexValueFactory;
+    private readonly IJsonSerializer _jsonSerializer;
 
-    [Obsolete("Use non-obsoleted ctor. This will be removed in Umbraco 13.")]
-    protected BlockListPropertyEditorBase(IDataValueEditorFactory dataValueEditorFactory)
-        : this(dataValueEditorFactory, StaticServiceProvider.Instance.GetRequiredService<IBlockValuePropertyIndexValueFactory>())
+
+
+    [Obsolete("Use non-obsoleted ctor. This will be removed in Umbraco 15.")]
+    protected BlockListPropertyEditorBase(IDataValueEditorFactory dataValueEditorFactory, IBlockValuePropertyIndexValueFactory blockValuePropertyIndexValueFactory)
+        : this(dataValueEditorFactory,blockValuePropertyIndexValueFactory, StaticServiceProvider.Instance.GetRequiredService<IJsonSerializer>())
     {
 
     }
 
-    protected BlockListPropertyEditorBase(IDataValueEditorFactory dataValueEditorFactory, IBlockValuePropertyIndexValueFactory blockValuePropertyIndexValueFactory)
+    protected BlockListPropertyEditorBase(IDataValueEditorFactory dataValueEditorFactory, IBlockValuePropertyIndexValueFactory blockValuePropertyIndexValueFactory, IJsonSerializer jsonSerializer)
         : base(dataValueEditorFactory)
     {
         _blockValuePropertyIndexValueFactory = blockValuePropertyIndexValueFactory;
+        _jsonSerializer = jsonSerializer;
         SupportsReadOnly = true;
     }
 
     public override IPropertyIndexValueFactory PropertyIndexValueFactory => _blockValuePropertyIndexValueFactory;
 
-
     #region Value Editor
 
+    /// <summary>
+    /// Instantiates a new <see cref="BlockEditorDataConverter"/> for use with the block list editor property value editor.
+    /// </summary>
+    /// <returns>A new instance of <see cref="BlockListEditorDataConverter"/>.</returns>
+    protected virtual BlockEditorDataConverter<BlockListValue, BlockListLayoutItem> CreateBlockEditorDataConverter() => new BlockListEditorDataConverter(_jsonSerializer);
+
     protected override IDataValueEditor CreateValueEditor() =>
-        DataValueEditorFactory.Create<BlockListEditorPropertyValueEditor>(Attribute!);
+        DataValueEditorFactory.Create<BlockListEditorPropertyValueEditor>(Attribute!, CreateBlockEditorDataConverter());
 
     internal class BlockListEditorPropertyValueEditor : BlockEditorPropertyValueEditor<BlockListValue, BlockListLayoutItem>
     {
         public BlockListEditorPropertyValueEditor(
             DataEditorAttribute attribute,
+            BlockEditorDataConverter<BlockListValue, BlockListLayoutItem> blockEditorDataConverter,
             PropertyEditorCollection propertyEditors,
             IDataTypeService dataTypeService,
             IContentTypeService contentTypeService,
@@ -56,7 +67,7 @@ public abstract class BlockListPropertyEditorBase : DataEditor
             IPropertyValidationService propertyValidationService) :
             base(attribute, propertyEditors, dataTypeService, textService, logger, shortStringHelper, jsonSerializer, ioHelper)
         {
-            BlockEditorValues = new BlockEditorValues<BlockListValue, BlockListLayoutItem>(new BlockListEditorDataConverter(jsonSerializer), contentTypeService, logger);
+            BlockEditorValues = new BlockEditorValues<BlockListValue, BlockListLayoutItem>(blockEditorDataConverter, contentTypeService, logger);
             Validators.Add(new BlockEditorValidator<BlockListValue, BlockListLayoutItem>(propertyValidationService, BlockEditorValues, contentTypeService));
             Validators.Add(new MinMaxValidator(BlockEditorValues, textService));
         }

@@ -1,5 +1,5 @@
 <div>
-    <div id="applications" ng-class="{faded:stickyNavigation}">
+    <nav role="navigation" id="applications" ng-class="{faded:stickyNavigation}" localize="aria-label" aria-label="@general_primary">
         <ul class="sections" data-element="sections">
 
             <li data-element="section-{{section.alias}}" ng-repeat="section in sections | limitTo: visibleSections" ng-class="{current: section.alias == currentSection}">
@@ -37,6 +37,6 @@
             </li>
 
         </ul>
-    </div>
+    </nav>
 
 </div>

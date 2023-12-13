@@ -10,14 +10,11 @@ namespace Umbraco.Cms.Api.Common.DependencyInjection;
 
 public static class UmbracoBuilderAuthExtensions
 {
-    private static bool _initialized;
-
     public static IUmbracoBuilder AddUmbracoOpenIddict(this IUmbracoBuilder builder)
     {
-        if (_initialized is false)
+        if (builder.Services.Any(x=>x.ImplementationType == typeof(OpenIddictCleanup)) is false)
         {
             ConfigureOpenIddict(builder);
-            _initialized = true;
         }
 
         return builder;

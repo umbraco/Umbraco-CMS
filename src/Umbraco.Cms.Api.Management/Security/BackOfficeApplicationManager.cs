@@ -42,24 +42,7 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
         }
 
         await CreateOrUpdate(
-            new OpenIddictApplicationDescriptor
-            {
-                DisplayName = "Umbraco back-office access",
-                ClientId = Constants.OAuthClientIds.BackOffice,
-                RedirectUris =
-                {
-                    CallbackUrlFor(_backOfficeHost ?? backOfficeUrl, _authorizeCallbackPathName ?? "/umbraco")
-                },
-                Type = OpenIddictConstants.ClientTypes.Public,
-                Permissions =
-                {
-                    OpenIddictConstants.Permissions.Endpoints.Authorization,
-                    OpenIddictConstants.Permissions.Endpoints.Token,
-                    OpenIddictConstants.Permissions.GrantTypes.AuthorizationCode,
-                    OpenIddictConstants.Permissions.GrantTypes.RefreshToken,
-                    OpenIddictConstants.Permissions.ResponseTypes.Code
-                }
-            },
+            BackofficeOpenIddictApplicationDescriptor(backOfficeUrl),
             cancellationToken);
 
         if (_webHostEnvironment.IsProduction())
@@ -110,6 +93,26 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
                 cancellationToken);
         }
     }
+
+    public OpenIddictApplicationDescriptor BackofficeOpenIddictApplicationDescriptor(Uri backOfficeUrl) =>
+        new()
+        {
+            DisplayName = "Umbraco back-office access",
+            ClientId = Constants.OAuthClientIds.BackOffice,
+            RedirectUris =
+            {
+                CallbackUrlFor(_backOfficeHost ?? backOfficeUrl, _authorizeCallbackPathName ?? "/umbraco")
+            },
+            Type = OpenIddictConstants.ClientTypes.Public,
+            Permissions =
+            {
+                OpenIddictConstants.Permissions.Endpoints.Authorization,
+                OpenIddictConstants.Permissions.Endpoints.Token,
+                OpenIddictConstants.Permissions.GrantTypes.AuthorizationCode,
+                OpenIddictConstants.Permissions.GrantTypes.RefreshToken,
+                OpenIddictConstants.Permissions.ResponseTypes.Code
+            }
+        };
 
     private static Uri CallbackUrlFor(Uri url, string relativePath) => new Uri( $"{url.GetLeftPart(UriPartial.Authority)}/{relativePath.TrimStart(Constants.CharArrays.ForwardSlash)}");
 }

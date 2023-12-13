@@ -1,4 +1,6 @@
-﻿using System.Text.Json.Nodes;
+﻿using System.Text;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using Json.Patch;
 using Umbraco.Cms.Api.Management.Serialization;
 using Umbraco.Cms.Api.Management.ViewModels.JsonPatch;
@@ -18,7 +20,8 @@ public class JsonPatchService : IJsonPatchService
 
         var docString = _jsonSerializer.Serialize(objectToPatch);
         JsonPatch? patch = _jsonSerializer.Deserialize<JsonPatch>(patchString);
-        var doc = JsonNode.Parse(docString);
-        return patch?.Apply(doc);
+        var reader = new Utf8JsonReader(Encoding.UTF8.GetBytes(docString));
+        var element = JsonElement.ParseValue(ref reader);
+        return patch?.Apply(element);
     }
 }

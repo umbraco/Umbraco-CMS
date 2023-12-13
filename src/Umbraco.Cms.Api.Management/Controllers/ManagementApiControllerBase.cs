@@ -1,19 +1,22 @@
 using System.Linq.Expressions;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.Attributes;
 using Umbraco.Cms.Api.Common.Filters;
 using Umbraco.Cms.Api.Management.DependencyInjection;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Features;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers;
 
 [Authorize(Policy = "New" + AuthorizationPolicies.BackOfficeAccess)]
+[Authorize(Policy = "New" + AuthorizationPolicies.UmbracoFeatureEnabled)]
 [MapToApi(ManagementApiConfiguration.ApiName)]
 [JsonOptionsName(Constants.JsonOptionsNames.BackOffice)]
-public abstract class ManagementApiControllerBase : Controller
+public abstract class ManagementApiControllerBase : Controller, IUmbracoFeature
 {
     protected CreatedAtActionResult CreatedAtAction<T>(Expression<Func<T, string>> action, Guid id)
         => CreatedAtAction(action, new { id = id });
@@ -48,4 +51,14 @@ public abstract class ManagementApiControllerBase : Controller
     {
         return backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Key ?? throw new InvalidOperationException("No backoffice user found");
     }
+
+    /// <summary>
+    ///     Creates a 403 Forbidden result.
+    /// </summary>
+    /// <remarks>
+    ///     Use this method instead of <see cref="ManagementApiControllerBase.Forbid()"/> on the controller base.
+    ///     This method ensures that a proper 403 Forbidden status code is returned to the client.
+    /// </remarks>
+    // Duplicate code copied between Management API and Delivery API.
+    protected IActionResult Forbidden() => new StatusCodeResult(StatusCodes.Status403Forbidden);
 }

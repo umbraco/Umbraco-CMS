@@ -8,9 +8,9 @@ public abstract class DataTypeModelBase
     public string Name { get; set; } = string.Empty;
 
     [Required]
-    public string PropertyEditorAlias { get; set; } = string.Empty;
+    public string EditorAlias { get; set; } = string.Empty;
 
-    public string? PropertyEditorUiAlias { get; set; }
+    public string? EditorUiAlias { get; set; }
 
     public IEnumerable<DataTypePropertyPresentationModel> Values { get; set; } = Enumerable.Empty<DataTypePropertyPresentationModel>();
 }

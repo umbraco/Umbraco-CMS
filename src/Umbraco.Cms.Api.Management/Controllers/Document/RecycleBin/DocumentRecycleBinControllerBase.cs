@@ -16,7 +16,6 @@ namespace Umbraco.Cms.Api.Management.Controllers.Document.RecycleBin;
 [ApiController]
 [VersionedApiBackOfficeRoute($"{Constants.Web.RoutePath.RecycleBin}/{Constants.UdiEntityType.Document}")]
 [RequireDocumentTreeRootAccess]
-[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Document))]
 [Authorize(Policy = "New" + AuthorizationPolicies.TreeAccessDocuments)]
 public class DocumentRecycleBinControllerBase : RecycleBinControllerBase<RecycleBinItemResponseModel>
