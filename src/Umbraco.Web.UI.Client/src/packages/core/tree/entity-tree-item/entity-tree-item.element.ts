@@ -1,8 +1,8 @@
+import { UmbEntityTreeItemModel } from '../types.js';
 import { UmbEntityTreeItemContext } from './entity-tree-item.context.js';
 import { css, html, nothing, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import {
 	UmbBackofficeManifestKind,
 	UmbTreeItemElement,
@@ -24,12 +24,12 @@ umbExtensionsRegistry.register(manifest);
 
 @customElement('umb-entity-tree-item')
 export class UmbEntityTreeItemElement extends UmbLitElement implements UmbTreeItemElement {
-	private _item?: EntityTreeItemResponseModel;
+	private _item?: UmbEntityTreeItemModel;
 	@property({ type: Object, attribute: false })
 	public get item() {
 		return this._item;
 	}
-	public set item(value: EntityTreeItemResponseModel | undefined) {
+	public set item(value: UmbEntityTreeItemModel | undefined) {
 		this._item = value;
 		this.#context.setTreeItem(value);
 	}

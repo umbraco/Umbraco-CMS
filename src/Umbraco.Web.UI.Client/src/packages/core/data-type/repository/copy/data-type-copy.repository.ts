@@ -1,4 +1,4 @@
-import { UMB_DATA_TYPE_TREE_STORE_CONTEXT, UmbDataTypeTreeStore } from '../../tree/data-type.tree.store.js';
+import { UMB_DATA_TYPE_TREE_STORE_CONTEXT, UmbDataTypeTreeStore } from '../../tree/data-type-tree.store.js';
 import { UmbDataTypeDetailRepository } from '../detail/data-type-detail.repository.js';
 import { UmbDataTypeCopyServerDataSource } from './data-type-copy.server.data-source.js';
 import { UMB_NOTIFICATION_CONTEXT_TOKEN, UmbNotificationContext } from '@umbraco-cms/backoffice/notification';

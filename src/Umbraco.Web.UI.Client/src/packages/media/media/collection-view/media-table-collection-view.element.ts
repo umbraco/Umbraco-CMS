@@ -12,12 +12,11 @@ import type {
 } from '@umbraco-cms/backoffice/components';
 import { UmbDefaultCollectionContext, UMB_DEFAULT_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-media-table-collection-view')
 export class UmbMediaTableCollectionViewElement extends UmbLitElement {
 	@state()
-	private _mediaItems?: Array<EntityTreeItemResponseModel>;
+	private _mediaItems?: Array<UmbMediaDetailModel>;
 
 	@state()
 	private _tableConfig: UmbTableConfig = {

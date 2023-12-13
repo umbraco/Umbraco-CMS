@@ -1,9 +1,9 @@
-import { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { LanguageItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbLanguagePickerModalData {
 	multiple?: boolean;
-	filter?: (language: LanguageResponseModel) => boolean;
+	filter?: (language: LanguageItemResponseModel) => boolean;
 }
 
 export interface UmbLanguagePickerModalValue {

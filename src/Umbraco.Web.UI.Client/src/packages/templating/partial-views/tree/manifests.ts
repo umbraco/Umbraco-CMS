@@ -1,6 +1,6 @@
 import { UMB_PARTIAL_VIEW_ENTITY_TYPE, UMB_PARTIAL_VIEW_ROOT_ENTITY_TYPE } from '../entity.js';
-import { UmbPartialViewTreeRepository } from './script-tree.repository.js';
-import { UmbPartialViewTreeStore } from './script-tree.store.js';
+import { UmbPartialViewTreeRepository } from './partial-view-tree.repository.js';
+import { UmbPartialViewTreeStore } from './partial-view-tree.store.js';
 import type {
 	ManifestRepository,
 	ManifestTree,

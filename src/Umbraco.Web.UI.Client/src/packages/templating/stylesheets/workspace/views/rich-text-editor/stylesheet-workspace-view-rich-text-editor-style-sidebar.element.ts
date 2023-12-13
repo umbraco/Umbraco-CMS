@@ -16,6 +16,8 @@ export default class UmbStylesheetRichTextEditorStyleModalElement extends UmbMod
 		const name = (event.target as HTMLInputElement).value;
 
 		this.updateValue({
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
 			rule: {
 				...this.value.rule,
 				name,
@@ -27,6 +29,8 @@ export default class UmbStylesheetRichTextEditorStyleModalElement extends UmbMod
 		const selector = (event.target as HTMLInputElement).value;
 
 		this.updateValue({
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
 			rule: {
 				...this.value.rule,
 				selector,
@@ -38,6 +42,8 @@ export default class UmbStylesheetRichTextEditorStyleModalElement extends UmbMod
 		const styles = (event.target as HTMLInputElement).value;
 
 		this.updateValue({
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
 			rule: {
 				...this.value.rule,
 				styles,

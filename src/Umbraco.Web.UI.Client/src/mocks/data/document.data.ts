@@ -1,4 +1,4 @@
-import { umbDocumentTypeData } from './document-type.data.js';
+import { umbDocumentTypeData } from './document-type/document-type.db.js';
 import { umbUserPermissionData } from './user-permission.data.js';
 import { UmbEntityData } from './entity.data.js';
 import { createDocumentTreeItem } from './utils.js';
@@ -7,12 +7,15 @@ import {
 	DocumentItemResponseModel,
 	DocumentResponseModel,
 	DocumentTreeItemResponseModel,
+	DocumentTypeResponseModel,
 	PagedDocumentTreeItemResponseModel,
 	PagedDocumentTypeResponseModel,
 	PagedRecycleBinItemResponseModel,
 	PublishDocumentRequestModel,
+	PublishedStateModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '@umbraco-cms/backoffice/document';
+import { UmbMockDocumentTypeModel } from './document-type/document-type.data.js';
 
 export const data: Array<DocumentResponseModel> = [
 	{
@@ -22,6 +25,7 @@ export const data: Array<DocumentResponseModel> = [
 				url: '/',
 			},
 		],
+		isTrashed: false,
 		templateId: null,
 		id: 'all-property-editors-document-id',
 		contentTypeId: 'all-property-editors-document-type-id',
@@ -359,6 +363,7 @@ export const data: Array<DocumentResponseModel> = [
 		templateId: null,
 		id: 'c05da24d-7740-447b-9cdc-bd8ce2172e38',
 		contentTypeId: '29643452-cff9-47f2-98cd-7de4b6807681',
+		isTrashed: false,
 		values: [
 			{
 				culture: null,
@@ -474,6 +479,7 @@ export const data: Array<DocumentResponseModel> = [
 		templateId: null,
 		id: 'fd56a0b5-01a0-4da2-b428-52773bfa9cc4',
 		contentTypeId: '29643452-cff9-47f2-98cd-7de4b6807681',
+		isTrashed: false,
 		values: [
 			{
 				culture: null,
@@ -546,6 +552,7 @@ export const data: Array<DocumentResponseModel> = [
 		templateId: null,
 		id: 'simple-document-id',
 		contentTypeId: 'simple-document-type-id',
+		isTrashed: false,
 		variants: [
 			{
 				state: ContentStateModel.DRAFT,
@@ -576,12 +583,25 @@ export const treeData: Array<DocumentTreeItemResponseModel> = [
 		noAccess: false,
 		isTrashed: false,
 		id: 'all-property-editors-document-id',
+		contentTypeId: 'all-property-editors-document-type-id',
 		isContainer: false,
 		parentId: null,
 		name: 'All property editors',
 		type: 'document',
 		icon: 'document',
 		hasChildren: false,
+		variants: [
+			{
+				name: 'All property editors',
+				culture: 'en-us',
+				state: PublishedStateModel.PUBLISHED,
+			},
+			{
+				name: 'All property editors',
+				culture: 'da-dk',
+				state: PublishedStateModel.PUBLISHED,
+			},
+		],
 	},
 	{
 		isProtected: false,
@@ -590,12 +610,40 @@ export const treeData: Array<DocumentTreeItemResponseModel> = [
 		noAccess: false,
 		isTrashed: false,
 		id: 'c05da24d-7740-447b-9cdc-bd8ce2172e38',
+		contentTypeId: '29643452-cff9-47f2-98cd-7de4b6807681',
 		isContainer: false,
 		parentId: null,
 		name: 'Article in english',
 		type: 'document',
 		icon: 'document',
 		hasChildren: true,
+		variants: [
+			{
+				state: PublishedStateModel.PUBLISHED,
+				culture: 'en-us',
+				name: 'Article in english',
+			},
+			{
+				state: PublishedStateModel.PUBLISHED,
+				culture: 'da-dk',
+				name: 'Artikel på Dansk',
+			},
+			{
+				state: PublishedStateModel.PUBLISHED,
+				culture: 'no-no',
+				name: 'Artikel på Norsk',
+			},
+			{
+				state: PublishedStateModel.PUBLISHED,
+				culture: 'es-es',
+				name: 'Articulo en ingles',
+			},
+			{
+				state: PublishedStateModel.PUBLISHED,
+				culture: 'pl-pl',
+				name: 'Artykuł w języku polskim',
+			},
+		],
 	},
 	{
 		isProtected: false,
@@ -604,26 +652,20 @@ export const treeData: Array<DocumentTreeItemResponseModel> = [
 		noAccess: false,
 		isTrashed: false,
 		id: 'fd56a0b5-01a0-4da2-b428-52773bfa9cc4',
+		contentTypeId: '29643452-cff9-47f2-98cd-7de4b6807681',
 		isContainer: false,
 		parentId: 'c05da24d-7740-447b-9cdc-bd8ce2172e38',
 		name: 'Blog post B',
 		type: 'document',
 		icon: 'document',
 		hasChildren: false,
-	},
-	{
-		name: 'Document 5',
-		type: 'document',
-		icon: 'document',
-		hasChildren: false,
-		id: 'f6n7a5b2-e7c1-463a-956bc-6ck5b9bdf447',
-		isContainer: false,
-		parentId: 'cdd30288-2d1c-41b4-89a9-61647b4a10d5',
-		noAccess: false,
-		isProtected: false,
-		isPublished: false,
-		isEdited: false,
-		isTrashed: false,
+		variants: [
+			{
+				state: PublishedStateModel.UNPUBLISHED,
+				culture: 'en-us',
+				name: 'Blog post B',
+			},
+		],
 	},
 	{
 		name: 'Simple',
@@ -631,6 +673,7 @@ export const treeData: Array<DocumentTreeItemResponseModel> = [
 		icon: 'document',
 		hasChildren: false,
 		id: 'simple-document-id',
+		contentTypeId: 'simple-document-type-id',
 		isContainer: false,
 		parentId: null,
 		noAccess: false,
@@ -638,28 +681,22 @@ export const treeData: Array<DocumentTreeItemResponseModel> = [
 		isPublished: false,
 		isEdited: false,
 		isTrashed: false,
-	},
-	{
-		name: 'Trashed',
-		type: 'document',
-		icon: 'document',
-		hasChildren: false,
-		id: 'trashed-document-id',
-		isContainer: false,
-		parentId: null,
-		noAccess: false,
-		isProtected: false,
-		isPublished: false,
-		isEdited: false,
-		isTrashed: true,
+		variants: [
+			{
+				state: PublishedStateModel.UNPUBLISHED,
+				culture: 'en-us',
+				name: 'Simple Document',
+			},
+		],
 	},
 ];
 
 const createDocumentItem = (item: DocumentResponseModel): DocumentItemResponseModel => {
 	return {
 		id: item.id,
-		name: item.variants?.[0].name, // Hack: TODO: we need to get all variants as part of the document item model
+		name: item.variants?.[0].name, // Hack: TODO: we need to get all variants as part of the document
 		contentTypeId: item.contentTypeId,
+		isTrashed: item.isTrashed,
 	};
 };
 
@@ -677,21 +714,19 @@ class UmbDocumentData extends UmbEntityData<DocumentResponseModel> {
 
 	// TODO: Can we do this smarter so we don't need to make this for each mock data:
 	insert(item: DocumentResponseModel) {
-		const result = super.insert(item);
-		this.treeData.push(createDocumentTreeItem(result));
-		return result;
+		super.insert(item);
+		this.treeData.push(createDocumentTreeItem(item));
 	}
 
 	update(id: string, item: DocumentResponseModel) {
-		const result = super.save(id, item);
+		super.save(id, item);
 		this.treeData = this.treeData.map((x) => {
-			if (x.id === result.id) {
-				return createDocumentTreeItem(result);
+			if (x.id === id) {
+				return createDocumentTreeItem(item);
 			} else {
 				return x;
 			}
 		});
-		return result;
 	}
 
 	publish(id: string, data: PublishDocumentRequestModel) {
@@ -781,9 +816,14 @@ class UmbDocumentData extends UmbEntityData<DocumentResponseModel> {
 		const item = this.getById(id);
 		if (item?.contentTypeId) {
 			const docType = umbDocumentTypeData.getById(item.contentTypeId);
+
 			if (docType) {
-				const items = docType.allowedContentTypes ?? [];
-				const total = items?.length;
+				const allowedTypes = docType?.allowedContentTypes ?? [];
+				const mockedTypes = allowedTypes
+					.map((allowedType) => umbDocumentTypeData.getById(allowedType.id))
+					.filter((item) => item !== undefined) as Array<UmbMockDocumentTypeModel>;
+				const items = mockedTypes.map((item) => mapToDocumentType(item));
+				const total = items.length;
 				return { items, total };
 			}
 		}
@@ -819,5 +859,26 @@ class UmbDocumentData extends UmbEntityData<DocumentResponseModel> {
 			);
 	}
 }
+
+const mapToDocumentType = (item: UmbMockDocumentTypeModel): DocumentTypeResponseModel => {
+	return {
+		alias: item.alias,
+		name: item.name,
+		description: item.description,
+		icon: item.icon,
+		allowedAsRoot: item.allowedAsRoot,
+		variesByCulture: item.variesByCulture,
+		variesBySegment: item.variesBySegment,
+		isElement: item.isElement,
+		properties: item.properties,
+		containers: item.containers,
+		allowedContentTypes: item.allowedContentTypes,
+		compositions: item.compositions,
+		id: item.id,
+		allowedTemplateIds: item.allowedTemplateIds,
+		defaultTemplateId: item.defaultTemplateId,
+		cleanup: item.cleanup,
+	};
+};
 
 export const umbDocumentData = new UmbDocumentData();

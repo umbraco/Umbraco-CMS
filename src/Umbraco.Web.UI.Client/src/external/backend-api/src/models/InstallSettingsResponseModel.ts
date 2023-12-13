@@ -7,7 +7,7 @@ import type { DatabaseSettingsPresentationModel } from './DatabaseSettingsPresen
 import type { UserSettingsModel } from './UserSettingsModel';
 
 export type InstallSettingsResponseModel = {
-    user?: UserSettingsModel;
-    databases?: Array<DatabaseSettingsPresentationModel>;
+    user: UserSettingsModel;
+    databases: Array<DatabaseSettingsPresentationModel>;
 };
 

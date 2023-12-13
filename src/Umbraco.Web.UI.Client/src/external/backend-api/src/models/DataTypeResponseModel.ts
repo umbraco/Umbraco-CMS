@@ -6,7 +6,7 @@
 import type { DataTypeModelBaseModel } from './DataTypeModelBaseModel';
 
 export type DataTypeResponseModel = (DataTypeModelBaseModel & {
-    id?: string;
+    id: string;
     parentId?: string | null;
 });
 

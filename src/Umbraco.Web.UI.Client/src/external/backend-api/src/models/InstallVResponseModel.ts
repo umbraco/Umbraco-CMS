@@ -10,6 +10,6 @@ import type { UserInstallResponseModel } from './UserInstallResponseModel';
 export type InstallVResponseModel = {
     user: UserInstallResponseModel;
     database: DatabaseInstallResponseModel;
-    telemetryLevel?: TelemetryLevelModel;
+    telemetryLevel: TelemetryLevelModel;
 };
 

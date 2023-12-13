@@ -4,8 +4,8 @@
 /* eslint-disable */
 
 export type TreeItemPresentationModel = {
-    name?: string;
-    type?: string;
-    hasChildren?: boolean;
+    name: string;
+    type: string;
+    hasChildren: boolean;
 };
 

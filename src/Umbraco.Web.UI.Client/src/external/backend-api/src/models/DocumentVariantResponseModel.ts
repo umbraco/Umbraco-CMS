@@ -7,7 +7,7 @@ import type { ContentStateModel } from './ContentStateModel';
 import type { VariantResponseModelBaseModel } from './VariantResponseModelBaseModel';
 
 export type DocumentVariantResponseModel = (VariantResponseModelBaseModel & {
-    state?: ContentStateModel;
+    state: ContentStateModel;
     publishDate?: string | null;
 });
 

@@ -5,6 +5,7 @@ import {
 	ModelsBuilderResponseModel,
 	ModelsModeModel,
 	OutOfDateStatusResponseModel,
+	OutOfDateTypeModel,
 } from '@umbraco-cms/backoffice/backend-api';
 
 export const handlers = [
@@ -26,7 +27,9 @@ export const handlers = [
 		return res(
 			// Respond with a 200 status code
 			ctx.status(200),
-			ctx.json<OutOfDateStatusResponseModel>({}),
+			ctx.json<OutOfDateStatusResponseModel>({
+				status: OutOfDateTypeModel.CURRENT,
+			}),
 		);
 	}),
 ];

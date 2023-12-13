@@ -6,6 +6,6 @@
 import type { TelemetryLevelModel } from './TelemetryLevelModel';
 
 export type TelemetryRepresentationBaseModel = {
-    telemetryLevel?: TelemetryLevelModel;
+    telemetryLevel: TelemetryLevelModel;
 };
 
