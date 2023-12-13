@@ -27,8 +27,6 @@ export * from './template-modal.token.js';
 export * from './template-picker-modal.token.js';
 export * from './user-group-picker-modal.token.js';
 export * from './user-picker-modal.token.js';
-export * from './folder-create-modal.token.js';
-export * from './folder-update-modal.token.js';
 export * from './partial-view-picker-modal.token.js';
 export * from './dictionary-item-picker-modal.token.js';
 export * from './data-type-picker-modal.token.js';

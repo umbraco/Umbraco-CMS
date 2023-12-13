@@ -3,11 +3,11 @@ import { UmbDataTypeCreateOptionsModalData } from './index.js';
 import { html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import {
-	UmbModalManagerContext,
-	UMB_FOLDER_CREATE_MODAL,
-	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
+	type UmbModalManagerContext,
 	UmbModalBaseElement,
+	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
 } from '@umbraco-cms/backoffice/modal';
+import { UMB_FOLDER_CREATE_MODAL } from '@umbraco-cms/backoffice/tree';
 
 @customElement('umb-data-type-create-options-modal')
 export class UmbDataTypeCreateOptionsModalElement extends UmbModalBaseElement<UmbDataTypeCreateOptionsModalData> {
