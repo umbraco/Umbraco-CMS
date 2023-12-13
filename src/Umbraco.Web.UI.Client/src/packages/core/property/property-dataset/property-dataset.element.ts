@@ -11,8 +11,8 @@ import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
  */
 @customElement('umb-property-dataset')
 export class UmbPropertyDatasetElement extends UmbLitElement {
-	// A take on only firing events when the value is changed from the outside.
-	#silentOnce = true;
+	// Determine wether state change should fire an event when the value is changed.
+	#allowChangeEvent = false;
 
 	public readonly context: UmbPropertyDatasetBaseContext;
 
@@ -51,9 +51,10 @@ export class UmbPropertyDatasetElement extends UmbLitElement {
 		return this.context.getValues();
 	}
 	public set value(value: Array<UmbPropertyValueData>) {
-		this.#silentOnce = true;
+		this.#allowChangeEvent = false;
 		this.context.setValues(value);
-		this.#silentOnce = false;
+		// Above might not trigger a observer callback (if no change), so set the allow change event to true:
+		this.#allowChangeEvent = true;
 	}
 
 	/**
@@ -74,9 +75,10 @@ export class UmbPropertyDatasetElement extends UmbLitElement {
 		return this.context.getName();
 	}
 	public set name(value: string | undefined) {
-		this.#silentOnce = true;
+		this.#allowChangeEvent = false;
 		this.context.setName(value);
-		this.#silentOnce = false;
+		// Above might not trigger a observer callback (if no change), so set the allow change event to true:
+		this.#allowChangeEvent = true;
 	}
 
 	constructor() {
@@ -90,22 +92,22 @@ export class UmbPropertyDatasetElement extends UmbLitElement {
 		});
 
 		this.context = new UmbPropertyDatasetBaseContext(this);
-		this.observe(this.context.name, () => {
-			if (!this.#silentOnce) {
-				this.dispatchEvent(new UmbChangeEvent());
-			} else {
-				this.#silentOnce = false;
-			}
-		});
-		this.#silentOnce = true;
-		this.observe(this.context.values, () => {
-			if (!this.#silentOnce) {
-				this.dispatchEvent(new UmbChangeEvent());
-			} else {
-				this.#silentOnce = false;
-			}
-		});
+		// prevent the first change event from firing:
+		this.#allowChangeEvent = false;
+		this.observe(this.context.name, this.#observerCallback);
+		// prevent the first change event from firing:
+		this.#allowChangeEvent = false;
+		this.observe(this.context.values, this.#observerCallback);
 	}
+
+	#observerCallback = () => {
+		if (this.#allowChangeEvent) {
+			this.dispatchEvent(new UmbChangeEvent());
+		} else {
+			// Set allow change event to true.
+			this.#allowChangeEvent = true;
+		}
+	};
 
 	render() {
 		return html`<slot></slot>`;
