@@ -162,6 +162,10 @@ public class ContentControllerBase : ManagementApiControllerBase
                 .WithTitle("Ambiguous Rule")
                 .WithDetail("The specified rule is ambiguous, because both member groups and member names were given.")
                 .Build()),
+            PublicAccessOperationStatus.EntryNotFound => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Entry not found")
+                .WithDetail("The specified entry was not found.")
+                .Build()),
             _ => StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetailsBuilder()
                 .WithTitle("Unknown content operation status.")
                 .Build()),
