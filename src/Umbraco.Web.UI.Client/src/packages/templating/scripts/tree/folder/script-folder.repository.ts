@@ -12,12 +12,13 @@ export class UmbScriptFolderRepository extends UmbFolderRepositoryBase<UmbScript
 
 const folderToScriptTreeItemFolder = (folder: UmbFolderModel) => {
 	const treeItem: UmbScriptTreeItemModel = {
-		path: folder.unique, // TODO: change to unique when mapping is done
+		unique: folder.unique,
+		parentUnique: folder.parentUnique,
 		name: folder.name,
 		entityType: UMB_SCRIPT_FOLDER_ENTITY_TYPE,
+		isFolder: true,
 		isContainer: false,
 		hasChildren: false,
-		isFolder: true,
 	};
 
 	return treeItem;

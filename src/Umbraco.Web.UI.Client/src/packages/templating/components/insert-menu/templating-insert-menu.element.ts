@@ -1,5 +1,5 @@
 import { UMB_MODAL_TEMPLATING_INSERT_CHOOSE_TYPE_SIDEBAR_ALIAS } from '../../modals/manifests.js';
-import { getInsertDictionarySnippet, getInsertPartialSnippet } from '../../utils.js';
+import { getInsertDictionarySnippet, getInsertPartialSnippet } from '../../utils/index.js';
 import { UmbChooseInsertTypeModalValue, CodeSnippetType } from '../../modals/insert-choose-type-sidebar.element.js';
 import { UmbDictionaryRepository } from '@umbraco-cms/backoffice/dictionary';
 import { customElement, property, css, html } from '@umbraco-cms/backoffice/external/lit';

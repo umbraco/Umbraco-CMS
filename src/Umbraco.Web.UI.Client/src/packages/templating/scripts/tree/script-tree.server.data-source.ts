@@ -3,6 +3,7 @@ import { UmbScriptTreeItemModel } from './types.js';
 import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
 import { FileSystemTreeItemPresentationModel, ScriptResource } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { getParentPathFromServerPath } from '../../utils/index.js';
 
 /**
  * A data source for the Script tree that fetches data from the server
@@ -52,9 +53,4 @@ const mapper = (item: FileSystemTreeItemPresentationModel): UmbScriptTreeItemMod
 		hasChildren: item.hasChildren,
 		isContainer: false,
 	};
-};
-
-const getParentPathFromServerPath = (serverPath: string): string | null => {
-	const parentPath = serverPath.substring(0, serverPath.lastIndexOf('/'));
-	return parentPath || null;
 };

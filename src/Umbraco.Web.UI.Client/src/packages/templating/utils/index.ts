@@ -49,3 +49,5 @@ export const getUmbracoFieldSnippet = (field: string, defaultValue: string | nul
 
 	return value;
 };
+
+export * from './parent-path-from-server-path.function.js';

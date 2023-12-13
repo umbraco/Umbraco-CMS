@@ -1,5 +1,6 @@
 import { UmbScriptDetailModel } from '../types.js';
 import { UMB_SCRIPT_ENTITY_TYPE } from '../entity.js';
+import { getParentPathFromServerPath } from '../../utils/parent-path-from-server-path.function.js';
 import {
 	CreateScriptRequestModel,
 	ScriptResource,
@@ -21,6 +22,7 @@ export class UmbScriptDetailServerDataSource implements UmbDetailDataSource<UmbS
 			entityType: UMB_SCRIPT_ENTITY_TYPE,
 			unique: '',
 			parentUnique,
+			path: '',
 			name: '',
 			content: '',
 		};
@@ -32,12 +34,9 @@ export class UmbScriptDetailServerDataSource implements UmbDetailDataSource<UmbS
 		if (!script) throw new Error('Data is missing');
 		if (!script.unique) throw new Error('Unique is missing');
 
-		// TODO: get parent path from parent unique
-		const parentPath = script.parentUnique;
-
 		// TODO: make data mapper to prevent errors
 		const requestBody: CreateScriptRequestModel = {
-			parentPath,
+			parentPath: script.parentUnique,
 			name: script.name,
 			content: script.content,
 		};
@@ -60,9 +59,7 @@ export class UmbScriptDetailServerDataSource implements UmbDetailDataSource<UmbS
 	async read(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		// TODO: unique to path
-
-		const { data, error } = await tryExecuteAndNotify(this.#host, ScriptResource.getScript({ path }));
+		const { data, error } = await tryExecuteAndNotify(this.#host, ScriptResource.getScript({ path: unique }));
 
 		if (error || !data) {
 			return { error };
@@ -72,7 +69,8 @@ export class UmbScriptDetailServerDataSource implements UmbDetailDataSource<UmbS
 		const script: UmbScriptDetailModel = {
 			entityType: UMB_SCRIPT_ENTITY_TYPE,
 			unique: data.path,
-			parentUnique,
+			parentUnique: getParentPathFromServerPath(data.path),
+			path: data.path,
 			name: data.name,
 			content: data.content,
 		};
@@ -85,7 +83,7 @@ export class UmbScriptDetailServerDataSource implements UmbDetailDataSource<UmbS
 
 		// TODO: make data mapper to prevent errors
 		const requestBody: UpdateTextFileViewModelBaseModel = {
-			existingPath,
+			existingPath: data.unique,
 			name: data.name,
 			content: data.content,
 		};
@@ -111,7 +109,7 @@ export class UmbScriptDetailServerDataSource implements UmbDetailDataSource<UmbS
 		return tryExecuteAndNotify(
 			this.#host,
 			ScriptResource.deleteScript({
-				path,
+				path: unique,
 			}),
 		);
 	}
