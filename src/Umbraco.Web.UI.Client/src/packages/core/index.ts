@@ -11,6 +11,7 @@ import { manifests as themeManifests } from './themes/manifests.js';
 import { manifests as conditionManifests } from './extension-registry/conditions/manifests.js';
 import { manifests as cultureManifests } from './culture/manifests.js';
 import { manifests as dataTypeManifests } from './data-type/manifests.js';
+import { manifests as treeManifests } from './tree/manifests.js';
 
 import { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
 import { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
@@ -56,6 +57,7 @@ const manifests: Array<ManifestTypes | UmbBackofficeManifestKind> = [
 	...themeManifests,
 	...cultureManifests,
 	...dataTypeManifests,
+	...treeManifests,
 ];
 
 export const onInit: UmbEntryPointOnInit = (host, extensionRegistry) => {
