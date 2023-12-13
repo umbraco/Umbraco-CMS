@@ -12,16 +12,16 @@ namespace Umbraco.Cms.Tests.Integration.ManagementApi.Document;
 public class DomainsControllerTests : ManagementApiUserGroupTestBase<DomainsController>
 {
     protected override Expression<Func<DomainsController, object>> MethodSelector =>
-        x => x.DomainsAsync(Guid.Empty);
+        x => x.Domains(Guid.NewGuid());
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.Created
+        ExpectedStatusCode = HttpStatusCode.OK
     };
 
     protected override UserGroupAssertionModel EditorUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.Created
+        ExpectedStatusCode = HttpStatusCode.OK
     };
 
     protected override UserGroupAssertionModel SensitiveDataUserGroupAssertionModel => new()
@@ -36,7 +36,7 @@ public class DomainsControllerTests : ManagementApiUserGroupTestBase<DomainsCont
 
     protected override UserGroupAssertionModel WriterUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.Created
+        ExpectedStatusCode = HttpStatusCode.OK
     };
 
     protected override UserGroupAssertionModel UnauthorizedUserGroupAssertionModel => new()
