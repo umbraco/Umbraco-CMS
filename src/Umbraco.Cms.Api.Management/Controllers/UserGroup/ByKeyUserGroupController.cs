@@ -1,23 +1,30 @@
 ﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Factories;
+using Umbraco.Cms.Api.Management.Security.Authorization.UserGroup;
 using Umbraco.Cms.Api.Management.ViewModels.UserGroup;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.UserGroup;
 
 [ApiVersion("1.0")]
 public class ByKeyUserGroupController : UserGroupControllerBase
 {
+    private readonly IAuthorizationService _authorizationService;
     private readonly IUserGroupService _userGroupService;
     private readonly IUserGroupPresentationFactory _userGroupPresentationFactory;
 
     public ByKeyUserGroupController(
+        IAuthorizationService authorizationService,
         IUserGroupService userGroupService,
         IUserGroupPresentationFactory userGroupPresentationFactory)
     {
+        _authorizationService = authorizationService;
         _userGroupService = userGroupService;
         _userGroupPresentationFactory = userGroupPresentationFactory;
     }
@@ -28,6 +35,16 @@ public class ByKeyUserGroupController : UserGroupControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ByKey(Guid id)
     {
+        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
+            User,
+            UserGroupPermissionResource.WithKeys(id),
+            AuthorizationPolicies.UserBelongsToUserGroupInRequest);
+
+        if (!authorizationResult.Succeeded)
+        {
+            return Forbidden();
+        }
+
         IUserGroup? userGroup = await _userGroupService.GetAsync(id);
 
         if (userGroup is null)

@@ -70,11 +70,13 @@ public class ContentPermissions
             formattedPath.Contains(string.Concat(",", x.ToString(CultureInfo.InvariantCulture), ",")));
     }
 
+    [Obsolete($"Please use {nameof(IContentPermissionService)} instead, scheduled for removal in V15.")]
     public ContentAccess CheckPermissions(
         IContent content,
         IUser user,
         char permissionToCheck) => CheckPermissions(content, user, new[] { permissionToCheck });
 
+    [Obsolete($"Please use {nameof(IContentPermissionService)} instead, scheduled for removal in V15.")]
     public ContentAccess CheckPermissions(
         IContent? content,
         IUser? user,
@@ -108,11 +110,13 @@ public class ContentPermissions
             : ContentAccess.Denied;
     }
 
+    [Obsolete($"Please use {nameof(IContentPermissionService)} instead, scheduled for removal in V15.")]
     public ContentAccess CheckPermissions(
         IUmbracoEntity entity,
         IUser? user,
         char permissionToCheck) => CheckPermissions(entity, user, new[] { permissionToCheck });
 
+    [Obsolete($"Please use {nameof(IContentPermissionService)} instead, scheduled for removal in V15.")]
     public ContentAccess CheckPermissions(
         IUmbracoEntity entity,
         IUser? user,
@@ -154,6 +158,7 @@ public class ContentPermissions
     /// <param name="entity">The <see cref="IUmbracoEntity" /> item resolved if one was found for the id</param>
     /// <param name="permissionsToCheck"></param>
     /// <returns></returns>
+    [Obsolete($"Please use {nameof(IContentPermissionService)} instead, scheduled for removal in V15.")]
     public ContentAccess CheckPermissions(
         int nodeId,
         IUser user,
@@ -199,7 +204,7 @@ public class ContentPermissions
         }
 
         // get the implicit/inherited permissions for the user for this path
-        // if there is no entity for this id, than just use the id as the path (i.e. -1 or -20)
+        // if there is no entity for this id, then just use the id as the path (i.e. -1 or -20)
         return CheckPermissionsPath(entity?.Path ?? nodeId.ToString(), user, permissionsToCheck)
             ? ContentAccess.Granted
             : ContentAccess.Denied;
@@ -213,6 +218,7 @@ public class ContentPermissions
     /// <param name="contentItem">The <see cref="IContent" /> item resolved if one was found for the id</param>
     /// <param name="permissionsToCheck"></param>
     /// <returns></returns>
+    [Obsolete($"Please use {nameof(IContentPermissionService)} instead, scheduled for removal in V15.")]
     public ContentAccess CheckPermissions(
         int nodeId,
         IUser? user,
@@ -258,12 +264,13 @@ public class ContentPermissions
         }
 
         // get the implicit/inherited permissions for the user for this path
-        // if there is no content item for this id, than just use the id as the path (i.e. -1 or -20)
+        // if there is no content item for this id, then just use the id as the path (i.e. -1 or -20)
         return CheckPermissionsPath(contentItem?.Path ?? nodeId.ToString(), user, permissionsToCheck)
             ? ContentAccess.Granted
             : ContentAccess.Denied;
     }
 
+    [Obsolete($"Please use {nameof(IContentPermissionService)} instead, scheduled for removal in V15.")]
     private bool CheckPermissionsPath(string? path, IUser user, IReadOnlyList<char>? permissionsToCheck = null)
     {
         if (permissionsToCheck == null)

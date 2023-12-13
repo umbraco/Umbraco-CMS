@@ -62,6 +62,31 @@ public static class ClaimsIdentityExtensions
     }
 
     /// <summary>
+    ///     Returns the user key from the <see cref="IIdentity" /> of the claim type "sub".
+    /// </summary>
+    /// <param name="identity"></param>
+    /// <returns>
+    ///     The string value of the user id if found otherwise null.
+    /// </returns>
+    public static Guid? GetUserKey(this IIdentity identity)
+    {
+        if (identity is null)
+        {
+            throw new ArgumentNullException(nameof(identity));
+        }
+
+        string? userKey = null;
+        if (identity is ClaimsIdentity claimsIdentity)
+        {
+            userKey = claimsIdentity.FindFirstValue("sub");
+        }
+
+        return Guid.TryParse(userKey, out Guid result)
+            ? result
+            : null;
+    }
+
+    /// <summary>
     ///     Returns the user name from the <see cref="IIdentity" /> of either the claim type <see cref="ClaimTypes.Name" /> or
     ///     "preferred_username"
     /// </summary>

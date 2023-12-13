@@ -28,7 +28,7 @@ public class UserGroupControllerBase : ManagementApiControllerBase
                 .Build()),
             UserGroupOperationStatus.MissingUser => Unauthorized(new ProblemDetailsBuilder()
                 .WithTitle("Missing user")
-                .WithDetail("A performing user was not found when attempting to create the user group.")
+                .WithDetail("A performing user was not found when attempting the operation.")
                 .Build()),
             UserGroupOperationStatus.IsSystemUserGroup => BadRequest(new ProblemDetailsBuilder()
                 .WithTitle("System user group")
