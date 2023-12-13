@@ -1,10 +1,6 @@
 import { UmbFolderModalElementBase } from './folder-modal-element-base.js';
 import { customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import {
-	UmbFolderScaffoldModel,
-	UmbFolderCreateModalData,
-	UmbFolderCreateModalValue,
-} from '@umbraco-cms/backoffice/tree';
+import { UmbFolderCreateModalData, UmbFolderCreateModalValue, UmbFolderModel } from '@umbraco-cms/backoffice/tree';
 
 @customElement('umb-folder-create-modal')
 export class UmbFolderCreateModalElement extends UmbFolderModalElementBase<
@@ -12,7 +8,7 @@ export class UmbFolderCreateModalElement extends UmbFolderModalElementBase<
 	UmbFolderCreateModalValue
 > {
 	@state()
-	_folderScaffold?: UmbFolderScaffoldModel;
+	_folderScaffold?: UmbFolderModel;
 
 	constructor() {
 		super();
