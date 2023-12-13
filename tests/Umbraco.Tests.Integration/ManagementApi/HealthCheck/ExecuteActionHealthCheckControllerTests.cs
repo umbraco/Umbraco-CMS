@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using System.Net;
 using System.Net.Http.Json;
 using Umbraco.Cms.Api.Management.Controllers.HealthCheck;
@@ -6,8 +6,7 @@ using Umbraco.Cms.Api.Management.ViewModels.HealthCheck;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.HealthCheck;
 
-public class
-    ExecuteActionHealthCheckControllerTests : ManagementApiUserGroupTestBase<ExecuteActionHealthCheckController>
+public class ExecuteActionHealthCheckControllerTests : ManagementApiUserGroupTestBase<ExecuteActionHealthCheckController>
 {
     protected override Expression<Func<ExecuteActionHealthCheckController, object>> MethodSelector =>
         x => x.ExecuteAction(null);
