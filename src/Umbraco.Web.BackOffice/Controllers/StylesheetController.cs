@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers;
 ///     The API controller used for retrieving available stylesheets
 /// </summary>
 [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
-[Authorize(Policy = AuthorizationPolicies.SectionAccessSettings)]
+[Authorize(Policy = AuthorizationPolicies.SectionAccessContent)]
 public class StylesheetController : UmbracoAuthorizedJsonController
 {
     private readonly IFileService _fileService;
