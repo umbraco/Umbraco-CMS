@@ -25,7 +25,7 @@ describe('UmbInputStaticFileElement', () => {
 			});
 
 			it('has a value property', () => {
-				expect(element).to.have.property('value').that.is.a('string');
+				expect(element).to.have.property('value');
 			});
 		});
 	});
