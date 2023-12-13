@@ -22,9 +22,12 @@ export class UmbDataTypeCreateOptionsModalElement extends UmbModalBaseElement<Um
 
 	#onClick(event: PointerEvent) {
 		event.stopPropagation();
+		if (this.data?.parentUnique === undefined) throw new Error('A parent unique is required to create a folder');
+
 		const folderModalHandler = this.#modalContext?.open(UMB_FOLDER_CREATE_MODAL, {
 			data: {
 				folderRepositoryAlias: UMB_DATA_TYPE_FOLDER_REPOSITORY_ALIAS,
+				parentUnique: this.data.parentUnique,
 			},
 		});
 
