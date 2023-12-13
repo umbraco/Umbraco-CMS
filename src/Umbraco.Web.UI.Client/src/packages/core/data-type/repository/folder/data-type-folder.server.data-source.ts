@@ -60,10 +60,16 @@ export class UmbDataTypeFolderServerDataSource implements UmbFolderDataSource {
 		if (args.parentUnique === undefined) throw new Error('Parent unique is missing');
 		if (!args.name) throw new Error('Name is missing');
 
+		const requestBody = {
+			id: args.unique,
+			parentId: args.parentUnique,
+			name: args.name,
+		};
+
 		const { error } = await tryExecuteAndNotify(
 			this.#host,
 			DataTypeResource.postDataTypeFolder({
-				requestBody: { parentId: args.parentUnique, name: args.name },
+				requestBody,
 			}),
 		);
 
