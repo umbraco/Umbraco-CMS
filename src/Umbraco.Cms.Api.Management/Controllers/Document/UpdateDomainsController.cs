@@ -26,7 +26,7 @@ public class UpdateDomainsController : DocumentControllerBase
 
     [MapToApiVersion("1.0")]
     [HttpPut("{id:guid}/domains")]
-    public async Task<IActionResult> UpdateDomainsAsync(Guid id, UpdateDomainsRequestModel updateModel)
+    public async Task<IActionResult> Update(Guid id, UpdateDomainsRequestModel updateModel)
     {
         DomainsUpdateModel domainsUpdateModel = _umbracoMapper.Map<DomainsUpdateModel>(updateModel)!;
 
