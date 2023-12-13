@@ -1,3 +1,4 @@
+import { UMB_STATIC_FILE_ENTITY_TYPE } from '../entity.js';
 import { UmbStaticFileTreeItemModel } from './types.js';
 import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
 import { StaticFileResource, type FileSystemTreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
@@ -43,12 +44,9 @@ const getChildrenOf = (parentUnique: string | null) => {
 
 const mapper = (item: FileSystemTreeItemPresentationModel): UmbStaticFileTreeItemModel => {
 	return {
-		id: item.path,
-		// TODO: Yeah, this is not right:..
-		parentId: '',
 		path: item.path,
 		name: item.name,
-		entityType: 'stylesheet',
+		entityType: UMB_STATIC_FILE_ENTITY_TYPE,
 		isFolder: item.isFolder,
 		hasChildren: item.hasChildren,
 		isContainer: false,

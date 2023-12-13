@@ -31,7 +31,6 @@ export * from './property-editor-ui-picker-modal.token.js';
 export * from './property-settings-modal.token.js';
 export * from './search-modal.token.js';
 export * from './section-picker-modal.token.js';
-export * from './static-file-picker-modal.token.js';
 export * from './template-modal.token.js';
 export * from './template-picker-modal.token.js';
 export * from './user-group-picker-modal.token.js';
