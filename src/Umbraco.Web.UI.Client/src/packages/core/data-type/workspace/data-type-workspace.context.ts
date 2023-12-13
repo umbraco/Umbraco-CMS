@@ -5,6 +5,7 @@ import {
 	UmbInvariantableWorkspaceContextInterface,
 	UmbEditableWorkspaceContextBase,
 	UmbWorkspaceContextInterface,
+	UmbInvariantWorkspacePropertyDatasetContext,
 } from '@umbraco-cms/backoffice/workspace';
 import {
 	appendToFrozenArray,
@@ -146,7 +147,9 @@ export class UmbDataTypeWorkspaceContext
 	}
 
 	createPropertyDatasetContext(host: UmbControllerHost) {
-		// TODO: Could use the Workspace version, to spare the energy of mapping values:
+		const context = new UmbInvariantWorkspacePropertyDatasetContext(host, this);
+		/*
+		// Example of how this could have been done with the PropertyDatasetBaseContext:
 		const context = new UmbPropertyDatasetBaseContext(host);
 
 		// Observe workspace name:
@@ -184,6 +187,7 @@ export class UmbDataTypeWorkspaceContext
 			},
 			'observePropertyValues',
 		);
+		*/
 		return context;
 	}
 
