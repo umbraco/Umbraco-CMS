@@ -3,8 +3,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Security.Authorization.Content;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Extensions;
 
@@ -38,8 +40,8 @@ public class DeletePublicAccessDocumentController : DocumentControllerBase
             return Forbidden();
         }
 
-        await _publicAccessService.DeleteAsync(id);
+        Attempt<PublicAccessOperationStatus> attempt = await _publicAccessService.DeleteAsync(id);
 
-        return Ok();
+        return attempt.Success ? Ok() : PublicAccessOperationStatusResult(attempt.Result);
     }
 }
