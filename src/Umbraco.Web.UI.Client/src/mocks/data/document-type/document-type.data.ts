@@ -625,6 +625,26 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 					labelOnTop: false,
 				},
 			},
+			{
+				id: '33',
+				containerId: 'all-properties-group-key',
+				alias: 'staticFilePicker',
+				name: 'Static File Picker',
+				description: '',
+				dataTypeId: 'dt-staticFilePicker',
+				variesByCulture: false,
+				variesBySegment: false,
+				sortOrder: 32,
+				validation: {
+					mandatory: true,
+					mandatoryMessage: null,
+					regEx: null,
+					regExMessage: null,
+				},
+				appearance: {
+					labelOnTop: false,
+				},
+			},
 		],
 		containers: [
 			{

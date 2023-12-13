@@ -88,6 +88,7 @@
 			"@umbraco-cms/backoffice/logviewer": ["src/packages/log-viewer/index.ts"],
 			"@umbraco-cms/backoffice/relation-type": ["./src/packages/settings/relation-types/index.ts"],
 			"@umbraco-cms/backoffice/tags": ["./src/packages/tags/index.ts"],
+			"@umbraco-cms/backoffice/static-file": ["./src/packages/static-file/index.ts"],
 
 			"@umbraco-cms/backoffice/dictionary": ["./src/packages/dictionary/dictionary/index.ts"],
 
@@ -126,7 +127,14 @@
 			"@umbraco-cms/internal/test-utils": ["utils/test-utils.ts"]
 		}
 	},
-	"include": ["src/**/*.ts", "apps/**/*.ts", "e2e/**/*.ts", "index.ts", "storybook/stories/**/*.ts", "examples/**/*.ts", ],
+	"include": [
+		"src/**/*.ts",
+		"apps/**/*.ts",
+		"e2e/**/*.ts",
+		"index.ts",
+		"storybook/stories/**/*.ts",
+		"examples/**/*.ts"
+	],
 	"references": [
 		{
 			"path": "./tsconfig.node.json"

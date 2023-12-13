@@ -1,3 +1,4 @@
+import { UMB_STATIC_FILE_TREE_ALIAS } from '@umbraco-cms/backoffice/static-file';
 import { StaticFileItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbModalToken, UmbPickerModalValue, UmbTreePickerModalData } from '@umbraco-cms/backoffice/modal';
 
@@ -13,6 +14,6 @@ export const UMB_STATIC_FILE_PICKER_MODAL = new UmbModalToken<
 		size: 'small',
 	},
 	data: {
-		treeAlias: 'Umb.Tree.StaticFile',
+		treeAlias: UMB_STATIC_FILE_TREE_ALIAS,
 	},
 });

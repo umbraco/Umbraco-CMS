@@ -53,17 +53,18 @@ export class UmbInputStaticFileElement extends FormControlMixin(UmbLitElement) {
 	@property({ type: String, attribute: 'min-message' })
 	maxMessage = 'This field exceeds the allowed amount of files';
 
-	public get selectedIds(): Array<string> {
+	public get selectedPaths(): Array<string> {
 		return this.#pickerContext.getSelection();
 	}
-	public set selectedIds(ids: Array<string>) {
-		this.#pickerContext.setSelection(ids);
+	public set selectedPaths(paths: Array<string>) {
+		this.#pickerContext.setSelection(paths);
 	}
 
 	@property()
-	public set value(idsString: string) {
+	// get value is handled by super class.
+	public set value(pathsString: string) {
 		// Its with full purpose we don't call super.value, as thats being handled by the observation of the context selection.
-		this.selectedIds = splitStringToArray(idsString);
+		this.selectedPaths = splitStringToArray(pathsString);
 	}
 
 	@state()
@@ -110,7 +111,7 @@ export class UmbInputStaticFileElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	#renderAddButton() {
-		if (this.max > 0 && this.selectedIds.length >= this.max) return;
+		if (this.max > 0 && this.selectedPaths.length >= this.max) return;
 		return html`<uui-button
 			id="add-button"
 			look="placeholder"

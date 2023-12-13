@@ -103,6 +103,7 @@ export default {
 						'@umbraco-cms/backoffice/logviewer': './src/packages/settings/logviewer/index.ts',
 						'@umbraco-cms/backoffice/relation-type': './src/packages/settings/relation-types/index.ts',
 						'@umbraco-cms/backoffice/tags': './src/packages/tags/index.ts',
+						'@umbraco-cms/backoffice/static-file': './src/packages/static-file/index.ts',
 						'@umbraco-cms/backoffice/partial-view': './src/packages/templating/partial-views/index.ts',
 						'@umbraco-cms/backoffice/stylesheet': './src/packages/templating/stylesheets/index.ts',
 						'@umbraco-cms/backoffice/template': './src/packages/templating/templates/index.ts',
