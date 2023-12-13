@@ -4,8 +4,12 @@ import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_NOTIFICATION_CONTEXT_TOKEN, UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbDetailStore } from '@umbraco-cms/backoffice/store';
+import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
-export abstract class UmbDetailRepositoryBase<DetailModelType extends { unique: string }> extends UmbRepositoryBase {
+export abstract class UmbDetailRepositoryBase<DetailModelType extends { unique: string }>
+	extends UmbRepositoryBase
+	implements UmbApi
+{
 	#init: Promise<unknown>;
 
 	#detailStore?: UmbDetailStore<DetailModelType>;

@@ -1,75 +1,118 @@
+import { UmbScriptDetailModel } from '../types.js';
+import { UMB_SCRIPT_ENTITY_TYPE } from '../entity.js';
 import {
 	CreateScriptRequestModel,
-	CreateTextFileViewModelBaseModel,
-	ScriptItemResponseModel,
 	ScriptResource,
-	ScriptResponseModel,
-	UpdateScriptRequestModel,
+	UpdateTextFileViewModelBaseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { DataSourceResponse, UmbDataSource } from '@umbraco-cms/backoffice/repository';
+import { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
-export class UmbScriptDetailServerDataSource
-	implements UmbDataSource<CreateScriptRequestModel, string, UpdateScriptRequestModel, ScriptResponseModel, string>
-{
+export class UmbScriptDetailServerDataSource implements UmbDetailDataSource<UmbScriptDetailModel> {
 	#host: UmbControllerHost;
 
 	constructor(host: UmbControllerHost) {
 		this.#host = host;
 	}
-	createScaffold(
-		parentId: string | null,
-		preset?: string | Partial<CreateTextFileViewModelBaseModel> | undefined,
-	): Promise<DataSourceResponse<CreateTextFileViewModelBaseModel>> {
-		throw new Error('Method not implemented.');
+
+	async createScaffold(parentUnique: string | null) {
+		const data: UmbScriptDetailModel = {
+			entityType: UMB_SCRIPT_ENTITY_TYPE,
+			unique: '',
+			parentUnique,
+			name: '',
+			content: '',
+		};
+
+		return { data };
 	}
 
-	/**
-	 * Fetches a script with the given path from the server
-	 * @param {string} path
-	 * @return {*}
-	 * @memberof UmbScriptDetailServerDataSource
-	 */
-	read(path: string): Promise<DataSourceResponse<ScriptResponseModel>> {
-		if (!path) throw new Error('Path is missing');
-		return tryExecuteAndNotify(this.#host, ScriptResource.getScript({ path }));
-	}
-	/**
-	 * Creates a new script
-	 *
-	 * @param {CreateScriptRequestModel} requestBody
-	 * @return {*}  {Promise<DataSourceResponse<string>>}
-	 * @memberof UmbScriptDetailServerDataSource
-	 */
-	create(requestBody: CreateScriptRequestModel): Promise<DataSourceResponse<string>> {
-		return tryExecuteAndNotify(this.#host, ScriptResource.postScript({ requestBody }));
+	async create(script: UmbScriptDetailModel) {
+		if (!script) throw new Error('Data is missing');
+		if (!script.unique) throw new Error('Unique is missing');
+
+		// TODO: get parent path from parent unique
+		const parentPath = script.parentUnique;
+
+		// TODO: make data mapper to prevent errors
+		const requestBody: CreateScriptRequestModel = {
+			parentPath,
+			name: script.name,
+			content: script.content,
+		};
+
+		const { error: createError } = await tryExecuteAndNotify(
+			this.#host,
+			ScriptResource.postScript({
+				requestBody,
+			}),
+		);
+
+		if (createError) {
+			return { error: createError };
+		}
+
+		// We have to fetch the data again. The server can have modified the data after creation
+		return this.read(script.unique);
 	}
 
-	//TODO the parameters here are bit ugly, since unique is already in the request body parameter, but it has to be done to marry the UmbDataSource interface an backend API together... maybe come up with some nicer solution
-	/**
-	 * Updates a script
-	 *
-	 * @param {string} [unique='']
-	 * @param {UpdateScriptRequestModel} requestBody
-	 * @return {*}  {Promise<DataSourceResponse<any>>}
-	 * @memberof UmbScriptDetailServerDataSource
-	 */
-	update(unique = '', requestBody: UpdateScriptRequestModel): Promise<DataSourceResponse<any>> {
-		return tryExecuteAndNotify(this.#host, ScriptResource.putScript({ requestBody }));
-	}
-	/**
-	 * Deletes a script
-	 *
-	 * @param {string} path
-	 * @return {*}  {Promise<DataSourceResponse>}
-	 * @memberof UmbScriptDetailServerDataSource
-	 */
-	delete(path: string): Promise<DataSourceResponse> {
-		return tryExecuteAndNotify(this.#host, ScriptResource.deleteScript({ path }));
+	async read(unique: string) {
+		if (!unique) throw new Error('Unique is missing');
+
+		// TODO: unique to path
+
+		const { data, error } = await tryExecuteAndNotify(this.#host, ScriptResource.getScript({ path }));
+
+		if (error || !data) {
+			return { error };
+		}
+
+		// TODO: make data mapper to prevent errors
+		const script: UmbScriptDetailModel = {
+			entityType: UMB_SCRIPT_ENTITY_TYPE,
+			unique: data.path,
+			parentUnique,
+			name: data.name,
+			content: data.content,
+		};
+
+		return { data: script };
 	}
 
-	getItems(keys: Array<string>): Promise<DataSourceResponse<ScriptItemResponseModel[]>> {
-		return tryExecuteAndNotify(this.#host, ScriptResource.getScriptItem({ path: keys }));
+	async update(data: UmbScriptDetailModel) {
+		if (!data.unique) throw new Error('Unique is missing');
+
+		// TODO: make data mapper to prevent errors
+		const requestBody: UpdateTextFileViewModelBaseModel = {
+			existingPath,
+			name: data.name,
+			content: data.content,
+		};
+
+		const { error } = await tryExecuteAndNotify(
+			this.#host,
+			ScriptResource.putScript({
+				requestBody,
+			}),
+		);
+
+		if (error) {
+			return { error };
+		}
+
+		// We have to fetch the data type again. The server can have modified the data after update
+		return this.read(data.unique);
+	}
+
+	async delete(unique: string) {
+		if (!unique) throw new Error('Unique is missing');
+
+		return tryExecuteAndNotify(
+			this.#host,
+			ScriptResource.deleteScript({
+				path,
+			}),
+		);
 	}
 }
