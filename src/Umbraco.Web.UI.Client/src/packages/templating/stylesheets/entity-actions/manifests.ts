@@ -7,11 +7,8 @@ import {
 import { UMB_STYLESHEET_REPOSITORY_ALIAS } from '../repository/index.js';
 import { UmbCreateRTFStylesheetAction } from './create/create-rtf.action.js';
 import { UmbCreateStylesheetAction } from './create/create.action.js';
-import {
-	UmbCreateFolderEntityAction,
-	UmbDeleteEntityAction,
-	UmbDeleteFolderEntityAction,
-} from '@umbraco-cms/backoffice/entity-action';
+import { UmbDeleteEntityAction } from '@umbraco-cms/backoffice/entity-action';
+import { UmbCreateFolderEntityAction, UmbDeleteFolderEntityAction } from '@umbraco-cms/backoffice/tree';
 import { ManifestEntityAction } from '@umbraco-cms/backoffice/extension-registry';
 
 const stylesheetActions: Array<ManifestEntityAction> = [

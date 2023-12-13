@@ -4,12 +4,8 @@ import { UMB_DATA_TYPE_DETAIL_REPOSITORY_ALIAS } from '../repository/detail/inde
 import { manifests as createManifests } from './create/manifests.js';
 import { manifests as moveManifests } from './move/manifests.js';
 import { manifests as copyManifests } from './copy/manifests.js';
-
-import {
-	UmbDeleteEntityAction,
-	UmbDeleteFolderEntityAction,
-	UmbFolderUpdateEntityAction,
-} from '@umbraco-cms/backoffice/entity-action';
+import { UmbDeleteEntityAction } from '@umbraco-cms/backoffice/entity-action';
+import { UmbDeleteFolderEntityAction, UmbFolderUpdateEntityAction } from '@umbraco-cms/backoffice/tree';
 import { ManifestEntityAction } from '@umbraco-cms/backoffice/extension-registry';
 
 const entityActions: Array<ManifestEntityAction> = [

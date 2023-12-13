@@ -7,11 +7,8 @@ import { UMB_PARTIAL_VIEW_REPOSITORY_ALIAS } from '../repository/index.js';
 
 import { UmbCreateFromSnippetPartialViewAction } from './create/create-from-snippet.action.js';
 import { UmbCreateEmptyPartialViewAction } from './create/create-empty.action.js';
-import {
-	UmbCreateFolderEntityAction,
-	UmbDeleteEntityAction,
-	UmbDeleteFolderEntityAction,
-} from '@umbraco-cms/backoffice/entity-action';
+import { UmbDeleteEntityAction } from '@umbraco-cms/backoffice/entity-action';
+import { UmbCreateFolderEntityAction, UmbDeleteFolderEntityAction } from '@umbraco-cms/backoffice/tree';
 import { ManifestEntityAction } from '@umbraco-cms/backoffice/extension-registry';
 
 //Actions for partial view files

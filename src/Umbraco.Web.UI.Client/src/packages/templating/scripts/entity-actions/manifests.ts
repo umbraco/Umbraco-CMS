@@ -1,11 +1,8 @@
 import { UMB_SCRIPT_REPOSITORY_ALIAS } from '../repository/index.js';
 import { UMB_SCRIPT_ENTITY_TYPE, UMB_SCRIPT_FOLDER_ENTITY_TYPE, UMB_SCRIPT_ROOT_ENTITY_TYPE } from '../entity.js';
 import { UmbCreateScriptAction } from './create/create-empty.action.js';
-import {
-	UmbCreateFolderEntityAction,
-	UmbDeleteEntityAction,
-	UmbDeleteFolderEntityAction,
-} from '@umbraco-cms/backoffice/entity-action';
+import { UmbDeleteEntityAction } from '@umbraco-cms/backoffice/entity-action';
+import { UmbCreateFolderEntityAction, UmbDeleteFolderEntityAction } from '@umbraco-cms/backoffice/tree';
 import { ManifestEntityAction } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_DELETE_SCRIPT_ENTITY_ACTION_ALIAS = 'Umb.EntityAction.Script.Delete';
