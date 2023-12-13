@@ -1,8 +1,6 @@
 using System.Linq.Expressions;
 using System.Net;
-using System.Net.Http.Json;
 using Umbraco.Cms.Api.Management.Controllers.Script;
-using Umbraco.Cms.Api.Management.ViewModels.Script;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.Script;
 
