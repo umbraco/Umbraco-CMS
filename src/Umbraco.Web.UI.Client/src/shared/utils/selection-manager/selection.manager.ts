@@ -105,7 +105,7 @@ export class UmbSelectionManager extends UmbBaseController {
 		if (this.isSelected(unique)) return;
 		const newSelection = this.getMultiple() ? [...this.getSelection(), unique] : [unique];
 		this.#selection.next(newSelection);
-		this._host.getHostElement().dispatchEvent(new UmbSelectionChangeEvent());
+		this.getHostElement().dispatchEvent(new UmbSelectionChangeEvent());
 	}
 
 	/**
@@ -117,7 +117,7 @@ export class UmbSelectionManager extends UmbBaseController {
 		if (this.getSelectable() === false) return;
 		const newSelection = this.getSelection().filter((x) => x !== unique);
 		this.#selection.next(newSelection);
-		this._host.getHostElement().dispatchEvent(new UmbSelectionChangeEvent());
+		this.getHostElement().dispatchEvent(new UmbSelectionChangeEvent());
 	}
 
 	/**
