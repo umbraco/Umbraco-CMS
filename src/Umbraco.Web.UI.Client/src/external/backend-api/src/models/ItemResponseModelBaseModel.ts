@@ -4,7 +4,7 @@
 /* eslint-disable */
 
 export type ItemResponseModelBaseModel = {
-    name?: string;
-    id?: string;
+    name: string;
+    id: string;
 };
 

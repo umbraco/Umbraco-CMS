@@ -4,8 +4,8 @@
 /* eslint-disable */
 
 export type RichTextRuleModel = {
-    name?: string;
-    selector?: string;
-    styles?: string;
+    name: string;
+    selector: string;
+    styles: string;
 };
 

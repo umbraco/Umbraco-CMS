@@ -4,7 +4,7 @@
 /* eslint-disable */
 
 export type VerifyResetPasswordTokenRequestModel = {
-    userId?: string;
-    resetCode?: string;
+    userId: string;
+    resetCode: string;
 };
 

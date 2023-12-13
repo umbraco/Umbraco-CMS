@@ -4,6 +4,6 @@
 /* eslint-disable */
 
 export type InterpolateRichTextStylesheetResponseModel = {
-    content?: string;
+    content: string;
 };
 

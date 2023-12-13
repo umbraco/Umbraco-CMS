@@ -4,7 +4,7 @@
 /* eslint-disable */
 
 export type StylesheetOverviewResponseModel = {
-    name?: string;
-    path?: string;
+    name: string;
+    path: string;
 };
 

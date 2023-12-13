@@ -68,7 +68,7 @@ export class UmbRelationTypeWorkspaceContext
 	}
 
 	update<K extends keyof RelationTypeBaseModel>(id: K, value: RelationTypeBaseModel[K]) {
-		this.#data.next({ ...this.#data.value, [id]: value });
+		this.#data.update({ [id]: value });
 	}
 
 	async delete(id: string) {

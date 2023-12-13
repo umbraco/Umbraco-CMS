@@ -4,7 +4,7 @@
 /* eslint-disable */
 
 export type UserDataModel = {
-    name?: string;
-    data?: string;
+    name: string;
+    data: string;
 };
 

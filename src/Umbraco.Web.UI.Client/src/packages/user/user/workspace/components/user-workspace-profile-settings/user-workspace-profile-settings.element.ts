@@ -39,20 +39,20 @@ export class UmbUserWorkspaceProfileSettingsElement extends UmbLitElement {
 
 	#renderEmailProperty() {
 		return html`
-			<umb-workspace-property-layout label="${this.localize.term('general_email')}">
+			<umb-property-layout label="${this.localize.term('general_email')}">
 				<uui-input
 					slot="editor"
 					name="email"
 					label="${this.localize.term('general_email')}"
 					readonly
 					value=${ifDefined(this._user?.email)}></uui-input>
-			</umb-workspace-property-layout>
+			</umb-property-layout>
 		`;
 	}
 
 	#renderUILanguageProperty() {
 		return html`
-			<umb-workspace-property-layout
+			<umb-property-layout
 				label="${this.localize.term('user_language')}"
 				description=${this.localize.term('user_languageHelp')}>
 				<umb-ui-culture-input
@@ -61,7 +61,7 @@ export class UmbUserWorkspaceProfileSettingsElement extends UmbLitElement {
 					@change="${this.#onLanguageChange}"
 					name="language"
 					label="${this.localize.term('user_language')}"></umb-ui-culture-input>
-			</umb-workspace-property-layout>
+			</umb-property-layout>
 		`;
 	}
 

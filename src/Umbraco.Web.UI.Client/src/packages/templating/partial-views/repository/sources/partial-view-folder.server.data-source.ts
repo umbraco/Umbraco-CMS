@@ -1,15 +1,7 @@
-import {
-	CreateFolderRequestModel,
-	FolderModelBaseModel,
-	FolderResponseModel,
-	PartialViewResource,
-} from '@umbraco-cms/backoffice/backend-api';
+import { CreateFolderRequestModel, PartialViewResource } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { DataSourceResponse, UmbFolderDataSource } from '@umbraco-cms/backoffice/repository';
+import { UmbFolderDataSource } from '@umbraco-cms/backoffice/repository';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-
-//! this is of any type in the backend-api
-export type PartialViewGetFolderResponse = { path: string; parentPath: string; name: string };
 
 export class UmbPartialViewFolderServerDataSource implements UmbFolderDataSource {
 	#host: UmbControllerHost;
@@ -17,19 +9,24 @@ export class UmbPartialViewFolderServerDataSource implements UmbFolderDataSource
 	constructor(host: UmbControllerHost) {
 		this.#host = host;
 	}
-	createScaffold(parentId: string | null): Promise<DataSourceResponse<FolderResponseModel>> {
+
+	createScaffold(): any {
 		throw new Error('Method not implemented.');
 	}
-	read(unique: string): Promise<DataSourceResponse<PartialViewGetFolderResponse>> {
+
+	read(unique: string) {
 		return tryExecuteAndNotify(this.#host, PartialViewResource.getPartialViewFolder({ path: unique }));
 	}
-	create(requestBody: CreateFolderRequestModel): Promise<DataSourceResponse<string>> {
+
+	create(requestBody: CreateFolderRequestModel) {
 		return tryExecuteAndNotify(this.#host, PartialViewResource.postPartialViewFolder({ requestBody }));
 	}
-	update(unique: string, data: CreateFolderRequestModel): Promise<DataSourceResponse<FolderModelBaseModel>> {
+
+	update(): any {
 		throw new Error('Method not implemented.');
 	}
-	delete(path: string): Promise<DataSourceResponse<unknown>> {
+
+	delete(path: string) {
 		return tryExecuteAndNotify(this.#host, PartialViewResource.deletePartialViewFolder({ path }));
 	}
 }

@@ -155,7 +155,7 @@ export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepositor
 		return this.#contentTypes.getValue().find((y) => y.id === this.#ownerContentTypeId);
 	}
 
-	updateOwnerContentType(entry: T) {
+	updateOwnerContentType(entry: Partial<T>) {
 		this.#contentTypes.updateOne(this.#ownerContentTypeId, entry);
 	}
 

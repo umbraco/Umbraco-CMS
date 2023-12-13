@@ -1,6 +1,6 @@
+import { UmbPropertyContext, UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { UmbPropertyAction } from '../../shared/property-action/property-action.interface.js';
 import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import { UmbWorkspacePropertyContext, UMB_WORKSPACE_PROPERTY_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/workspace';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-property-action-clear')
@@ -10,7 +10,7 @@ export class UmbPropertyActionClearElement extends UmbLitElement implements UmbP
 
 	// THESE OUT COMMENTED CODE IS USED FOR THE EXAMPLE BELOW, TODO: Should be transferred to some documentation.
 	//private _propertyActionMenuContext?: UmbPropertyActionMenuContext;
-	private _propertyContext?: UmbWorkspacePropertyContext;
+	private _propertyContext?: UmbPropertyContext;
 
 	constructor() {
 		super();
@@ -20,7 +20,7 @@ export class UmbPropertyActionClearElement extends UmbLitElement implements UmbP
 			this._propertyActionMenuContext = propertyActionsContext;
 		});
 		*/
-		this.consumeContext(UMB_WORKSPACE_PROPERTY_CONTEXT_TOKEN, (propertyContext: UmbWorkspacePropertyContext) => {
+		this.consumeContext(UMB_PROPERTY_CONTEXT, (propertyContext: UmbPropertyContext) => {
 			this._propertyContext = propertyContext;
 		});
 	}

@@ -1,10 +1,5 @@
 import { UMB_SCRIPT_REPOSITORY_ALIAS } from '../repository/index.js';
-import {
-	UMB_SCRIPT_ENTITY_TYPE,
-	UMB_SCRIPT_FOLDER_ENTITY_TYPE,
-	UMB_SCRIPT_ROOT_ENTITY_TYPE,
-	UMB_SCRIPT_FOLDER_EMPTY_ENTITY_TYPE,
-} from '../entity.js';
+import { UMB_SCRIPT_ENTITY_TYPE, UMB_SCRIPT_FOLDER_ENTITY_TYPE, UMB_SCRIPT_ROOT_ENTITY_TYPE } from '../entity.js';
 import { UmbCreateScriptAction } from './create/create-empty.action.js';
 import {
 	UmbCreateFolderEntityAction,
@@ -43,31 +38,31 @@ const scriptFolderActions: Array<ManifestEntityAction> = [
 			icon: 'icon-article',
 			label: 'New empty script',
 			repositoryAlias: UMB_SCRIPT_REPOSITORY_ALIAS,
-			entityTypes: [UMB_SCRIPT_FOLDER_ENTITY_TYPE, UMB_SCRIPT_FOLDER_EMPTY_ENTITY_TYPE, UMB_SCRIPT_ROOT_ENTITY_TYPE],
+			entityTypes: [UMB_SCRIPT_FOLDER_ENTITY_TYPE, UMB_SCRIPT_ROOT_ENTITY_TYPE],
 		},
 	},
 	{
 		type: 'entityAction',
 		alias: UMB_DELETE_SCRIPT_FOLDER_ENTITY_ACTION_ALIAS,
-		name: 'Remove empty folder',
+		name: 'Delete Script folder',
 		api: UmbDeleteFolderEntityAction,
 		meta: {
 			icon: 'icon-trash',
-			label: 'Remove folder',
+			label: 'Delete folder...',
 			repositoryAlias: UMB_SCRIPT_REPOSITORY_ALIAS,
-			entityTypes: [UMB_SCRIPT_FOLDER_EMPTY_ENTITY_TYPE],
+			entityTypes: [UMB_SCRIPT_FOLDER_ENTITY_TYPE],
 		},
 	},
 	{
 		type: 'entityAction',
 		alias: UMB_CREATE_SCRIPT_FOLDER_ENTITY_ACTION_ALIAS,
-		name: 'Create empty folder',
+		name: 'Create Script folder',
 		api: UmbCreateFolderEntityAction,
 		meta: {
 			icon: 'icon-add',
-			label: 'Create folder',
+			label: 'Create folder...',
 			repositoryAlias: UMB_SCRIPT_REPOSITORY_ALIAS,
-			entityTypes: [UMB_SCRIPT_FOLDER_EMPTY_ENTITY_TYPE, UMB_SCRIPT_FOLDER_ENTITY_TYPE, UMB_SCRIPT_ROOT_ENTITY_TYPE],
+			entityTypes: [UMB_SCRIPT_FOLDER_ENTITY_TYPE, UMB_SCRIPT_ROOT_ENTITY_TYPE],
 		},
 	},
 ];

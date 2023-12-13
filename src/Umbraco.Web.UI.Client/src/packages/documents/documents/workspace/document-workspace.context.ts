@@ -1,6 +1,6 @@
 import { UmbDocumentRepository } from '../repository/document.repository.js';
 import { UmbDocumentTypeDetailRepository } from '../../document-types/repository/detail/document-type-detail.repository.js';
-import { UmbDocumentVariantContext } from '../variant-context/document-variant-context.js';
+import { UmbDocumentPropertyDataContext } from '../property-dataset-context/document-property-dataset-context.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
@@ -93,7 +93,7 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	getData() {
-		return this.#currentData.getValue() || {};
+		return this.#currentData.getValue();
 	}
 
 	/*
@@ -103,7 +103,7 @@ export class UmbDocumentWorkspaceContext
 	*/
 
 	getEntityId() {
-		return this.getData().id;
+		return this.getData()?.id;
 	}
 
 	getEntityType() {
@@ -111,7 +111,7 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	getContentTypeId() {
-		return this.getData().contentTypeId;
+		return this.getData()?.contentTypeId;
 	}
 
 	variantById(variantId: UmbVariantId) {
@@ -202,9 +202,10 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	async save() {
+		const data = this.getData();
+		if (!data) throw new Error('Data is missing');
 		await this.#createOrSave();
-
-		this.saveComplete(this.getData());
+		this.saveComplete(data);
 	}
 
 	async delete() {
@@ -259,8 +260,8 @@ export class UmbDocumentWorkspaceContext
 	}
 	*/
 
-	public createVariantContext(host: UmbControllerHost, variantId: UmbVariantId) {
-		return new UmbDocumentVariantContext(host, this, variantId);
+	public createPropertyDatasetContext(host: UmbControllerHost, variantId: UmbVariantId) {
+		return new UmbDocumentPropertyDataContext(host, this, variantId);
 	}
 
 	public destroy(): void {

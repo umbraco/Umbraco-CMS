@@ -52,6 +52,7 @@ export const manifestDevelopmentHandler = rest.get(umbracoPath('/package/manifes
 				],
 			},
 			{
+				name: 'Package with an entry point',
 				extensions: [
 					{
 						type: 'entryPoint',

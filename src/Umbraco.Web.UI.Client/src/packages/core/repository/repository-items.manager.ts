@@ -2,10 +2,9 @@ import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { type ManifestRepository, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { type ItemResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 
-export class UmbRepositoryItemsManager<ItemType extends ItemResponseModelBaseModel> {
+export class UmbRepositoryItemsManager<ItemType> {
 	host: UmbControllerHost;
 	repository?: UmbItemRepository<ItemType>;
 	#getUnique: (entry: ItemType) => string | undefined;
@@ -33,6 +32,8 @@ export class UmbRepositoryItemsManager<ItemType extends ItemResponseModelBaseMod
 		getUniqueMethod?: (entry: ItemType) => string | undefined,
 	) {
 		this.host = host;
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		//@ts-ignore
 		this.#getUnique = getUniqueMethod || ((entry) => entry.id || '');
 
 		this.#init = new UmbExtensionApiInitializer<ManifestRepository<UmbItemRepository<ItemType>>>(

@@ -1,7 +1,7 @@
 import { UmbScripDetailModel } from '../types.js';
 import { UmbScriptRepository } from '../repository/script.repository.js';
 import { UMB_SCRIPT_WORKSPACE_ALIAS } from './manifests.js';
-import { UmbBooleanState, UmbDeepState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbEditableWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
 import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
@@ -11,7 +11,7 @@ export class UmbScriptWorkspaceContext extends UmbEditableWorkspaceContextBase<
 	UmbScriptRepository,
 	UmbScripDetailModel
 > {
-	#data = new UmbDeepState<UmbScripDetailModel | undefined>(undefined);
+	#data = new UmbObjectState<UmbScripDetailModel | undefined>(undefined);
 	data = this.#data.asObservable();
 	name = this.#data.asObservablePart((data) => data?.name);
 	content = this.#data.asObservablePart((data) => data?.content);
@@ -39,11 +39,11 @@ export class UmbScriptWorkspaceContext extends UmbEditableWorkspaceContextBase<
 	}
 
 	setName(value: string) {
-		this.#data.next({ ...this.#data.value, name: value });
+		this.#data.update({ name: value });
 	}
 
 	setContent(value: string) {
-		this.#data.next({ ...this.#data.value, content: value });
+		this.#data.update({ content: value });
 	}
 
 	async load(entityKey: string) {
