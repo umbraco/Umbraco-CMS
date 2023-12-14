@@ -4,14 +4,14 @@ using Umbraco.Cms.Api.Management.Controllers.Stylesheet;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.Stylesheet;
 
-public class GetRichTextRulesByPathTests : ManagementApiUserGroupTestBase<GetRichTextRulesByPath>
+public class GetRichTextRulesByPathControllerTests : ManagementApiUserGroupTestBase<GetRichTextRulesByPathController>
 {
-    protected override Expression<Func<GetRichTextRulesByPath, object>> MethodSelector =>
+    protected override Expression<Func<GetRichTextRulesByPathController, object>> MethodSelector =>
         x => x.GetByPath("TestRuleName");
 
     protected override UserGroupAssertionModel AdminUserGroupAssertionModel => new()
     {
-        ExpectedStatusCode = HttpStatusCode.OK
+        ExpectedStatusCode = HttpStatusCode.NotFound
     };
 
     protected override UserGroupAssertionModel EditorUserGroupAssertionModel => new()
