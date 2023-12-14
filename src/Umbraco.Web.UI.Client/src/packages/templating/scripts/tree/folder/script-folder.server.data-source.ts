@@ -96,10 +96,13 @@ export class UmbScriptFolderServerDataSource implements UmbFolderDataSource {
 	 */
 	async delete(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
+
+		const path = this.#serverPathUniqueSerializer.toServerPath(unique);
+
 		return tryExecuteAndNotify(
 			this.#host,
 			ScriptResource.deleteScriptFolder({
-				path: unique,
+				path,
 			}),
 		);
 	}
