@@ -1,6 +1,6 @@
 import { UmbScriptDetailModel } from '../types.js';
 import { UMB_SCRIPT_ENTITY_TYPE } from '../entity.js';
-import { UmbServerPathUniqueSerializer } from '../../utils/index.js';
+import { UmbServerPathUniqueSerializer, appendFileExtensionIfNeeded } from '../../utils/index.js';
 import {
 	CreateScriptRequestModel,
 	ScriptResource,
@@ -41,7 +41,7 @@ export class UmbScriptDetailServerDataSource implements UmbDetailDataSource<UmbS
 		// TODO: make data mapper to prevent errors
 		const requestBody: CreateScriptRequestModel = {
 			parentPath,
-			name: script.name,
+			name: appendFileExtensionIfNeeded(script.name, '.js'),
 			content: script.content,
 		};
 
@@ -58,7 +58,7 @@ export class UmbScriptDetailServerDataSource implements UmbDetailDataSource<UmbS
 
 		// We have to fetch the data again. The server can have modified the data after creation
 		// TODO: revisit when location header is added
-		const createdScriptUnique = this.#serverPathUniqueSerializer.toUnique(parentPath + '/' + script.name);
+		const createdScriptUnique = this.#serverPathUniqueSerializer.toUnique(parentPath + '/' + requestBody.name);
 		return this.read(createdScriptUnique);
 	}
 
