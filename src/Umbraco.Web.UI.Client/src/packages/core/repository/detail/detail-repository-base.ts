@@ -74,7 +74,6 @@ export abstract class UmbDetailRepositoryBase<DetailModelType extends { unique: 
 	 */
 	async create(data: DetailModelType) {
 		if (!data) throw new Error('Data is missing');
-		if (!data.unique) throw new Error('Unique is missing');
 		await this.#init;
 
 		const { data: createdData, error } = await this.#detailSource.create(data);
