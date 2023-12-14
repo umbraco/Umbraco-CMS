@@ -13,13 +13,13 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Api.Management.Controllers.User;
 
 [ApiVersion("1.0")]
-public class BulkDeleteUsersController : UserControllerBase
+public class BulkDeleteUserController : UserControllerBase
 {
     private readonly IAuthorizationService _authorizationService;
     private readonly IUserService _userService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
-    public BulkDeleteUsersController(
+    public BulkDeleteUserController(
         IAuthorizationService authorizationService,
         IUserService userService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
