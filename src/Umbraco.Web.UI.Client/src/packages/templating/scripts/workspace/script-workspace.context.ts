@@ -69,8 +69,7 @@ export class UmbScriptWorkspaceContext extends UmbEditableWorkspaceContextBase<
 	}
 
 	async save() {
-		if (!this.#data.value) return;
-		if (!this.#data.value.unique) return;
+		if (!this.#data.value) throw new Error('Data is missing');
 
 		if (this.getIsNew()) {
 			await this.repository.create(this.#data.value);
