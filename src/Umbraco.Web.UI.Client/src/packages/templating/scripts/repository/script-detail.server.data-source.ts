@@ -1,6 +1,6 @@
 import { UmbScriptDetailModel } from '../types.js';
 import { UMB_SCRIPT_ENTITY_TYPE } from '../entity.js';
-import { UmbServerPathUniqueSerializer } from '../../utils/server-path-unique-serializer.js';
+import { UmbServerPathUniqueSerializer } from '../../utils/index.js';
 import {
 	CreateScriptRequestModel,
 	ScriptResource,
