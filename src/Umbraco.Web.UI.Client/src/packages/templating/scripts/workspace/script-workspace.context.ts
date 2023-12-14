@@ -53,7 +53,7 @@ export class UmbScriptWorkspaceContext extends UmbEditableWorkspaceContextBase<
 		}
 	}
 
-	async create(parentUnique: string) {
+	async create(parentUnique: string | null) {
 		const { data } = await this.repository.createScaffold(parentUnique);
 
 		if (data) {
