@@ -78,9 +78,7 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
                 userKey = user.Key;
             }
 
-
             var token = await userManager.GeneratePasswordResetTokenAsync(user);
-
 
             var changePasswordAttempt = await userService.ChangePasswordAsync(userKey,
                 new ChangeUserPasswordModel
