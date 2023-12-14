@@ -18,7 +18,7 @@ test.describe('Log Viewer tests', () => {
     // Assert
     // Checks if there is a log with the telemetry level to minimal
     await page.waitForTimeout(1000);
-    await expect(await page.getByRole('group').first()).toContainText('Telemetry level set to "' + telemetryLevel + '"');
+    await expect(page.getByRole('group').first()).toContainText('Telemetry level set to "' + telemetryLevel + '"');
 
     // Clean
     await umbracoApi.telemetry.setLevel(startTelemetryLevel);
@@ -33,7 +33,7 @@ test.describe('Log Viewer tests', () => {
     await page.goto(umbracoApi.baseUrl + '/umbraco');
     await umbracoUi.goToSettingsTreeItem('Log Viewer');
     await page.getByRole('tab', {name: 'Search'}).click({force: true});
-    await page.getByRole('button', {name: 'Select log levels'}).click();
+    await page.getByLabel('Select log levels').click({force: true});
     await page.locator('.log-level-menu-item').getByText('Information').click();
 
     // Assert
@@ -112,7 +112,7 @@ test.describe('Log Viewer tests', () => {
     await page.goto(umbracoApi.baseUrl + '/umbraco');
     await umbracoUi.goToSettingsTreeItem('Log Viewer');
     await page.getByRole('tab', {name: 'Search'}).click({force: true});
-    await page.getByLabel('Saved searches').click();
+    await page.getByLabel('Saved searches').click({force: true});
     await page.locator('li').filter({hasText: searchName + ' ' + search}).getByLabel('Remove saved search').click({force: true});
 
     // Assert
