@@ -3,21 +3,12 @@ import type { UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
 import { UUITextStyles, UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { Subject, debounceTime } from '@umbraco-cms/backoffice/external/rxjs';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 
 @customElement('umb-script-workspace-editor')
 export class UmbScriptWorkspaceEditorElement extends UmbLitElement {
-	#name: string | undefined = '';
 	@state()
-	private get _name() {
-		return this.#name;
-	}
-
-	private set _name(value) {
-		this.#name = value?.replace('.js', '');
-		this.requestUpdate();
-	}
+	private _name?: string = '';
 
 	@state()
 	private _content?: string | null = '';
@@ -29,8 +20,6 @@ export class UmbScriptWorkspaceEditorElement extends UmbLitElement {
 	private _ready?: boolean = false;
 
 	#scriptsWorkspaceContext?: UmbScriptWorkspaceContext;
-
-	private inputQuery$ = new Subject<string>();
 
 	constructor() {
 		super();
@@ -53,17 +42,13 @@ export class UmbScriptWorkspaceEditorElement extends UmbLitElement {
 			this.observe(this.#scriptsWorkspaceContext.isCodeEditorReady, (isReady) => {
 				this._ready = isReady;
 			});
-
-			this.inputQuery$.pipe(debounceTime(250)).subscribe((nameInputValue: string) => {
-				this.#scriptsWorkspaceContext?.setName(`${nameInputValue}.js`);
-			});
 		});
 	}
 
 	#onNameInput(event: Event) {
 		const target = event.target as UUIInputElement;
 		const value = target.value as string;
-		this.inputQuery$.next(value);
+		this.#scriptsWorkspaceContext?.setName(value);
 	}
 
 	#onCodeEditorInput(event: Event) {
@@ -87,8 +72,8 @@ export class UmbScriptWorkspaceEditorElement extends UmbLitElement {
 					placeholder="Enter name..."
 					.value=${this._name}
 					@input=${this.#onNameInput}
-					label="template name"></uui-input>
-				<small>Scripts/${this._path}</small>
+					label="Script name"></uui-input>
+				<small>/scripts/${this._path}</small>
 			</div>
 			<uui-box>
 				<!-- the div below in the header is to make the box display nicely with code editor -->
