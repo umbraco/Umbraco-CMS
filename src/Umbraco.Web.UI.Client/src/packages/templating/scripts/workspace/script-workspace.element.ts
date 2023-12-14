@@ -12,7 +12,7 @@ export class UmbScriptWorkspaceElement extends UmbLitElement {
 	_routes: UmbRoute[] = [
 		{
 			path: 'create/:parentUnique',
-			component: import('./script-workspace-edit.element.js'),
+			component: import('./script-workspace-editor.element.js'),
 			setup: async (_component: PageComponent, info: IRoutingInfo) => {
 				const parentUnique = info.match.params.parentUnique;
 				this.#workspaceContext.create(parentUnique);
