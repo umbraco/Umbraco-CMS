@@ -36,7 +36,8 @@ export class UmbScriptWorkspaceEditElement extends UmbLitElement {
 		super();
 
 		this.consumeContext(UMB_WORKSPACE_CONTEXT, (workspaceContext) => {
-			this.#scriptsWorkspaceContext = workspaceContext as UmbScriptWorkspaceContext;
+			this.#scriptsWorkspaceContext = workspaceContext;
+
 			this.observe(this.#scriptsWorkspaceContext.name, (name) => {
 				this._name = name;
 			});
