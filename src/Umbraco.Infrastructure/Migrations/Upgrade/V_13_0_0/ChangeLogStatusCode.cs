@@ -99,7 +99,5 @@ public class ChangeLogStatusCode : MigrationBase
         [SpecialDbType(SpecialDbTypes.NVARCHARMAX)]
         [NullSetting(NullSetting = NullSettings.NotNull)]
         public string ResponseBody { get; set; } = string.Empty;
-
-        [Column(Name = "exceptionOccured")] public bool ExceptionOccured { get; set; }
     }
 }
