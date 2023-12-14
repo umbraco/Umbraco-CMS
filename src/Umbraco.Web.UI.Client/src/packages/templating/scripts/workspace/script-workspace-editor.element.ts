@@ -6,8 +6,8 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { Subject, debounceTime } from '@umbraco-cms/backoffice/external/rxjs';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 
-@customElement('umb-script-workspace-edit')
-export class UmbScriptWorkspaceEditElement extends UmbLitElement {
+@customElement('umb-script-workspace-editor')
+export class UmbScriptWorkspaceEditorElement extends UmbLitElement {
 	#name: string | undefined = '';
 	@state()
 	private get _name() {
@@ -36,7 +36,7 @@ export class UmbScriptWorkspaceEditElement extends UmbLitElement {
 		super();
 
 		this.consumeContext(UMB_WORKSPACE_CONTEXT, (workspaceContext) => {
-			this.#scriptsWorkspaceContext = workspaceContext;
+			this.#scriptsWorkspaceContext = workspaceContext as UmbScriptWorkspaceContext;
 
 			this.observe(this.#scriptsWorkspaceContext.name, (name) => {
 				this._name = name;
@@ -139,10 +139,10 @@ export class UmbScriptWorkspaceEditElement extends UmbLitElement {
 	];
 }
 
-export default UmbScriptWorkspaceEditElement;
+export default UmbScriptWorkspaceEditorElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-script-workspace-edit': UmbScriptWorkspaceEditElement;
+		'umb-script-workspace-editor': UmbScriptWorkspaceEditorElement;
 	}
 }
