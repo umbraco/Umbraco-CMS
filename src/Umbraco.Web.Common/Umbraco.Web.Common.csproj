@@ -20,6 +20,10 @@
     <PackageReference Include="Serilog.AspNetCore" />
     <PackageReference Include="Smidge.InMemory" />
     <PackageReference Include="Smidge.Nuglify" />
+    <!-- Take top-level depedendency on System.Net.Http, because Dazinator.Extensions.FileProviders depends on a vulnerable version -->
+    <PackageReference Include="System.Net.Http" />
+    <!-- Take top-level depedendency on System.Text.RegularExpressions, because both Dazinator.Extensions.FileProviders and MiniProfiler.AspNetCore.Mvc depend on a vulnerable version -->
+    <PackageReference Include="System.Text.RegularExpressions" />
   </ItemGroup>
 
   <ItemGroup>

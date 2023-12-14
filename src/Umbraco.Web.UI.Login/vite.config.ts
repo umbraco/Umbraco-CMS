@@ -4,14 +4,16 @@ import { defineConfig } from 'vite';
 export default defineConfig({
 	build: {
 		lib: {
-			entry: ['src/index.ts', 'src/external.ts'],
-			formats: ['es'],
+			entry: 'src/index.ts',
+      formats: ['iife'],
+      name: 'umblogin',
+      fileName: 'login'
 		},
     rollupOptions: {
+      external: [/^@umbraco/],
       output: {
-        manualChunks: {
-          'uui': ['@umbraco-ui/uui'],
-          'vendor': ['lit', 'rxjs'],
+        globals: {
+          '@umbraco-ui/uui': 'uui',
         },
       }
     },

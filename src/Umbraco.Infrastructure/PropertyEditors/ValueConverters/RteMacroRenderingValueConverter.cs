@@ -46,6 +46,7 @@ public class RteMacroRenderingValueConverter : SimpleTinyMceValueConverter, IDel
     private readonly IJsonSerializer _jsonSerializer;
     private readonly ILogger<RteMacroRenderingValueConverter> _logger;
     private readonly IApiElementBuilder _apiElementBuilder;
+    private readonly RichTextBlockPropertyValueConstructorCache _constructorCache;
     private DeliveryApiSettings _deliveryApiSettings;
 
     [Obsolete("Please use the constructor that takes all arguments. Will be removed in V14.")]
@@ -79,6 +80,7 @@ public class RteMacroRenderingValueConverter : SimpleTinyMceValueConverter, IDel
             StaticServiceProvider.Instance.GetRequiredService<BlockEditorConverter>(),
             StaticServiceProvider.Instance.GetRequiredService<IJsonSerializer>(),
             StaticServiceProvider.Instance.GetRequiredService<IApiElementBuilder>(),
+            StaticServiceProvider.Instance.GetRequiredService<RichTextBlockPropertyValueConstructorCache>(),
             StaticServiceProvider.Instance.GetRequiredService<ILogger<RteMacroRenderingValueConverter>>(),
             deliveryApiSettingsMonitor
         )
@@ -89,7 +91,7 @@ public class RteMacroRenderingValueConverter : SimpleTinyMceValueConverter, IDel
         HtmlLocalLinkParser linkParser, HtmlUrlParser urlParser, HtmlImageSourceParser imageSourceParser,
         IApiRichTextElementParser apiRichTextElementParser, IApiRichTextMarkupParser apiRichTextMarkupParser,
         IPartialViewBlockEngine partialViewBlockEngine, BlockEditorConverter blockEditorConverter, IJsonSerializer jsonSerializer,
-        IApiElementBuilder apiElementBuilder, ILogger<RteMacroRenderingValueConverter> logger,
+        IApiElementBuilder apiElementBuilder, RichTextBlockPropertyValueConstructorCache constructorCache, ILogger<RteMacroRenderingValueConverter> logger,
         IOptionsMonitor<DeliveryApiSettings> deliveryApiSettingsMonitor)
     {
         _umbracoContextAccessor = umbracoContextAccessor;
@@ -103,6 +105,7 @@ public class RteMacroRenderingValueConverter : SimpleTinyMceValueConverter, IDel
         _blockEditorConverter = blockEditorConverter;
         _jsonSerializer = jsonSerializer;
         _apiElementBuilder = apiElementBuilder;
+        _constructorCache = constructorCache;
         _logger = logger;
         _deliveryApiSettings = deliveryApiSettingsMonitor.CurrentValue;
         deliveryApiSettingsMonitor.OnChange(settings => _deliveryApiSettings = settings);
@@ -267,7 +270,7 @@ public class RteMacroRenderingValueConverter : SimpleTinyMceValueConverter, IDel
             return null;
         }
 
-        var creator = new RichTextBlockPropertyValueCreator(_blockEditorConverter);
+        var creator = new RichTextBlockPropertyValueCreator(_blockEditorConverter, _constructorCache);
         return creator.CreateBlockModel(referenceCacheLevel, blocks, preview, configuration.Blocks);
     }
 

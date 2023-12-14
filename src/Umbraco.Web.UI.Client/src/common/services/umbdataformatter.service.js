@@ -295,13 +295,13 @@
                             saveModel.memberGroups = _.keys(_.pick(prop.value, value => value === true));
                             break;
                         case '_umb_approved':
-                            saveModel.isApproved = prop.value;
+                            saveModel.isApproved = prop.value == true;
                             break;
                         case '_umb_lockedOut':
-                            saveModel.isLockedOut = prop.value;
+                            saveModel.isLockedOut = prop.value == true;
                             break;
                         case '_umb_twoFactorEnabled':
-                            saveModel.isTwoFactorEnabled = prop.value;
+                            saveModel.isTwoFactorEnabled = prop.value == true;
                             break;
                     }
                   }

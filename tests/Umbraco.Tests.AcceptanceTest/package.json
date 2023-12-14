@@ -17,7 +17,7 @@
     "prompt": "^1.2.0",
     "tslib": "^2.4.0",
     "typescript": "^4.8.3",
-    "wait-on": "^6.0.1"
+    "wait-on": "^7.2.0"
   },
   "dependencies": {
     "@umbraco/json-models-builders": "^1.0.6",
