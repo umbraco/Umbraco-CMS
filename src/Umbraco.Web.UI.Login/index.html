@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <base href="/"/>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="robots" content="noindex, nofollow"/>
+  <meta name="pinterest" content="nopin"/>
+  <title>Umbraco</title>
+  <script type="module">
+    import {startMockServiceWorker} from './src/mocks/index.ts';
+
+    if (import.meta.env.DEV) {
+      await startMockServiceWorker();
+    }
+  </script>
+  <script type="module" src="/src/external.ts"></script>
+  <script type="module" src="/src/index.ts"></script>
+</head>
+<body class="uui-font uui-text" style="margin: 0; padding: 0; overflow: hidden">
+  <noscript>
+    <style>
+      #noscript-container {
+        display: flex;
+        flex-wrap: wrap;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        padding: 0 20px;
+        text-align: center;
+      }
+    </style>
+    <div id="noscript-container">
+      <h1 class="uui-h3" style="display: inline-flex; align-items: center; gap: 10px">
+        <img aria-hidden="true" alt="logo" src="/favicon.svg" style="width: 30px" />
+        <span>Umbraco</span>
+      </h1>
+      <p>For full functionality of Umbraco CMS it is necessary to enable JavaScript.</p>
+      <p>Here are the <a href="https://www.enable-javascript.com/" target="_blank" rel="noopener" style="text-decoration: underline;">instructions how to enable JavaScript in your web browser</a>.</p>
+    </div>
+  </noscript>
+  <umb-backoffice-icon-registry>
+    <umb-auth
+      logo-image="/logo_dark.svg"
+      logo-image-alternative="/logo_dark.svg"
+      background-image="/login.jpg"
+      username-is-email="true"
+      allow-password-reset
+      allow-user-invite>
+      <umb-external-login-provider
+        slot="external"
+        display-name="Google"
+        provider-name="Umbraco.Google"
+        icon="icon-google-fill"
+        external-logins-url="https://google.com"></umb-external-login-provider>
+      <umb-external-login-provider
+        slot="external"
+        display-name="Azure ID"
+        provider-name="Umbraco.Azure"
+        icon="lock"
+        external-logins-url="https://microsoft.com"></umb-external-login-provider>
+      <umb-external-login-provider
+        slot="external"
+        display-name="My provider"
+        provider-name="MyCustomScheme"
+        custom-view="/src/mocks/customViews/my-custom-view.js"></umb-external-login-provider>
+    </umb-auth>
+  </umb-backoffice-icon-registry>
+</body>
+</html>

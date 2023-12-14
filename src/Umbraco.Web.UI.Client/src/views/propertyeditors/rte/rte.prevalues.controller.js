@@ -29,11 +29,11 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.RteController",
 
         tinyMceService.configuration().then(config => {
           $scope.tinyMceConfig = config;
-            
+
             // extend commands with properties for font-icon and if it is a custom command
             $scope.tinyMceConfig.commands = _.map($scope.tinyMceConfig.commands, obj => {
                 const icon = getIcon(obj.alias);
-                
+
                 const objCmd = Utilities.extend(obj, {
                     fontIcon: icon.name,
                     isCustom: icon.isCustom,
@@ -63,7 +63,7 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.RteController",
                     }
                 });
             });
-            
+
         });
 
         stylesheetResource.getAll().then(stylesheets => {
@@ -193,6 +193,10 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.RteController",
                     break;
                 case "umbmediapicker":
                     icon.name = "icon-picture";
+                    icon.isCustom = true;
+                    break;
+                case "umbblockpicker":
+                    icon.name = "icon-document";
                     icon.isCustom = true;
                     break;
                 case "umbmacro":

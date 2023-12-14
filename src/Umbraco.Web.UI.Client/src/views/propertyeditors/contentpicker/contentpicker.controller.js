@@ -98,6 +98,7 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
         minNumber: 0,
         startNode: {
             query: "",
+            dynamicRoot: null,
             type: "content",
             id: $scope.model.config.startNodeId ? $scope.model.config.startNodeId : -1 // get start node for simple Content Picker
         }
@@ -125,7 +126,7 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
         if ($scope.model.validation && $scope.model.validation.mandatory && !$scope.model.config.minNumber) {
             $scope.model.config.minNumber = 1;
         }
-        
+
         if ($scope.model.config.multiPicker === true && $scope.umbProperty) {
             var propertyActions = [
                 removeAllEntriesAction
@@ -165,7 +166,7 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
         : $scope.model.config.startNode.type === "media"
             ? "Media"
             : "Document";
-    
+
     $scope.allowOpenButton = false;
     $scope.allowEditButton = entityType === "Document" && !$scope.readonly;
     $scope.allowRemove = !$scope.readonly;
@@ -255,12 +256,49 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
             dialogOptions.startNodeId = ($scope.model.config.idType === "udi" ? ent.udi : ent.id).toString();
         });
     }
+    else if ($scope.model.config.startNode.dynamicRoot) {
+
+        entityResource.getDynamicRoot(
+          JSON.stringify($scope.model.config.startNode.dynamicRoot),
+            editorState.current.id,
+            editorState.current.parentId,
+            $scope.model.culture,
+            $scope.model.segment
+        ).then(function (ent) {
+          if(ent) {
+            dialogOptions.startNodeId = ($scope.model.config.idType === "udi" ? ent.udi : ent.id).toString();
+          } else {
+            console.error("The Dynamic Root query did not find any valid results");
+            $scope.invalidStartNode = true;
+          }
+        });
+    }
+
     else {
         dialogOptions.startNodeId = $scope.model.config.startNode.id;
     }
 
     //dialog
     $scope.openCurrentPicker = function () {
+        if($scope.invalidStartNode) {
+
+          localizationService.localizeMany(["dynamicRoot_noValidStartNodeTitle", "dynamicRoot_noValidStartNodeDesc"]).then(function (data) {
+            overlayService.open({
+              title: data[0],
+              content: data[1],
+              hideSubmitButton: true,
+              close: () => {
+                  overlayService.close();
+              },
+              submit: () => {
+                  // close the confirmation
+                  overlayService.close();
+              }
+            });
+          });
+          return;
+        }
+
         $scope.currentPicker = dialogOptions;
 
         $scope.currentPicker.submit = function (model) {
@@ -351,7 +389,7 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
                 var node = entityType === "Member" ? model.memberNode :
                            entityType === "Media" ? model.mediaNode :
                                                     model.contentNode;
-                
+
                 // update the node
                 item.name = node.name;
 
@@ -556,7 +594,7 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
     }
 
     function init() {
-        
+
         userService.getCurrentUser().then(function (user) {
             switch (entityType) {
                 case "Document":

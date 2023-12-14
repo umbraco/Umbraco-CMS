@@ -45,9 +45,13 @@ parameters:
     displayName: TestFilter used for release type builds on non Windows agents
     type: string
     default: ' '
+  - name: isNightly
+    displayName: 'Is nightly build (used for MyGet feed)'
+    type: boolean
+    default: false
 
 variables:
-  nodeVersion: 18.16.x
+  nodeVersion: 20.10.x
   solution: umbraco.sln
   buildConfiguration: Release
   UMBRACO__CMS__GLOBAL__ID: 00000000-0000-0000-0000-000000000042
@@ -71,6 +75,7 @@ stages:
         steps:
           - task: NodeTool@0
             displayName: Use Node.js $(nodeVersion)
+            retryCountOnTaskFailure: 3
             inputs:
               versionSpec: $(nodeVersion)
           - task: Cache@2
@@ -83,13 +88,27 @@ stages:
               path: $(npm_config_cache)
           - script: npm ci --no-fund --no-audit --prefer-offline
             workingDirectory:  src/Umbraco.Web.UI.Client
-            displayName: Run npm ci
+            displayName: Run npm ci (Backoffice)
           - task: gulp@0
-            displayName: Run gulp build
+            displayName: Run gulp build (Backoffice)
             inputs:
               gulpFile: src/Umbraco.Web.UI.Client/gulpfile.js
               targets: coreBuild
               workingDirectory: src/Umbraco.Web.UI.Client
+          - task: npm@1
+            displayName: Run npm ci (Login)
+            inputs:
+              command: custom
+              workingDir: src/Umbraco.Web.UI.Login
+              verbose: false
+              customCommand: ci
+          - task: npm@1
+            displayName: Run npm build (Login)
+            inputs:
+              command: custom
+              workingDir: src/Umbraco.Web.UI.Login
+              verbose: false
+              customCommand: run build
           - task: UseDotNet@2
             displayName: Use .NET SDK from global.json
             inputs:
@@ -130,6 +149,11 @@ stages:
         pool:
           vmImage: 'windows-latest'
         steps:
+          - task: UseDotNet@2
+            displayName: Use .NET $(dotnetVersion)
+            inputs:
+              version: $(dotnetVersion)
+              includePreviewVersions: $(dotnetIncludePreviewVersions)
           - task: PowerShell@2
             displayName: Install DocFX
             inputs:
@@ -177,6 +201,7 @@ stages:
         steps:
           - task: NodeTool@0
             displayName: Use Node.js 10.15.x
+            retryCountOnTaskFailure: 3
             inputs:
               versionSpec: 10.15.x # Won't work with higher versions
           - script: |
@@ -414,6 +439,7 @@ stages:
 
           - task: NodeTool@0
             displayName: Use Node.js $(nodeVersion)
+            retryCountOnTaskFailure: 3
             inputs:
               versionSpec: $(nodeVersion)
 
@@ -659,7 +685,10 @@ stages:
               command: 'push'
               packagesToPush: $(Build.ArtifactStagingDirectory)/**/*.nupkg
               nuGetFeedType: 'external'
-              publishFeedCredentials: 'MyGet - Pre-releases'
+              ${{ if eq(parameters.isNightly, true) }}:
+                publishFeedCredentials: 'MyGet - Umbraco Nightly'
+              ${{ else }}:
+                publishFeedCredentials: 'MyGet - Pre-releases'
   - stage: Deploy_NuGet
     displayName: NuGet release
     dependsOn:

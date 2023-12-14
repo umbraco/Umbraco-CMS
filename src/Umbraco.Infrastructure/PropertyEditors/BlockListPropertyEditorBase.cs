@@ -35,16 +35,22 @@ public abstract class BlockListPropertyEditorBase : DataEditor
 
     public override IPropertyIndexValueFactory PropertyIndexValueFactory => _blockValuePropertyIndexValueFactory;
 
-
     #region Value Editor
 
+    /// <summary>
+    /// Instantiates a new <see cref="BlockEditorDataConverter"/> for use with the block list editor property value editor.
+    /// </summary>
+    /// <returns>A new instance of <see cref="BlockListEditorDataConverter"/>.</returns>
+    protected virtual BlockEditorDataConverter CreateBlockEditorDataConverter() => new BlockListEditorDataConverter();
+
     protected override IDataValueEditor CreateValueEditor() =>
-        DataValueEditorFactory.Create<BlockListEditorPropertyValueEditor>(Attribute!);
+        DataValueEditorFactory.Create<BlockListEditorPropertyValueEditor>(Attribute!, CreateBlockEditorDataConverter());
 
     internal class BlockListEditorPropertyValueEditor : BlockEditorPropertyValueEditor
     {
         public BlockListEditorPropertyValueEditor(
             DataEditorAttribute attribute,
+            BlockEditorDataConverter blockEditorDataConverter,
             PropertyEditorCollection propertyEditors,
             IDataTypeService dataTypeService,
             IContentTypeService contentTypeService,
@@ -56,7 +62,7 @@ public abstract class BlockListPropertyEditorBase : DataEditor
             IPropertyValidationService propertyValidationService) :
             base(attribute, propertyEditors, dataTypeService, textService, logger, shortStringHelper, jsonSerializer, ioHelper)
         {
-            BlockEditorValues = new BlockEditorValues(new BlockListEditorDataConverter(), contentTypeService, logger);
+            BlockEditorValues = new BlockEditorValues(blockEditorDataConverter, contentTypeService, logger);
             Validators.Add(new BlockEditorValidator(propertyValidationService, BlockEditorValues, contentTypeService));
             Validators.Add(new MinMaxValidator(BlockEditorValues, textService));
         }

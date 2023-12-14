@@ -19,10 +19,6 @@
       <Link>UmbracoProject\Program.cs</Link>
       <PackagePath>UmbracoProject</PackagePath>
     </Content>
-    <Content Include="..\src\Umbraco.Web.UI\Startup.cs">
-      <Link>UmbracoProject\Startup.cs</Link>
-      <PackagePath>UmbracoProject</PackagePath>
-    </Content>
     <Content Include="..\src\Umbraco.Web.UI\Views\Partials\blocklist\**">
       <Link>UmbracoProject\Views\Partials\blocklist\%(RecursiveDir)%(Filename)%(Extension)</Link>
       <PackagePath>UmbracoProject\Views\Partials\blocklist</PackagePath>
@@ -47,7 +43,7 @@
 
   <!-- Update template.json files with the default UmbracoVersion value set to the current build version -->
   <ItemGroup>
-    <PackageReference Include="Umbraco.JsonSchema.Extensions" Version="0.3.0" PrivateAssets="all" />
+    <PackageReference Include="Umbraco.JsonSchema.Extensions" PrivateAssets="all" />
   </ItemGroup>
   <ItemGroup>
     <Content Update="**\.template.config\template.json" Pack="false" />

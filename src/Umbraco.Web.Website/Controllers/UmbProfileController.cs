@@ -112,6 +112,7 @@ public class UmbProfileController : SurfaceController
         IdentityResult saveResult = await _memberManager.UpdateAsync(currentMember);
         if (!saveResult.Succeeded)
         {
+            scope.Complete();
             return saveResult;
         }
 
