@@ -36,7 +36,9 @@ export class UmbServerPathUniqueSerializer {
 	 * @return {*}  {(string | null)}
 	 * @memberof UmbServerPathSerializer
 	 */
-	toServerPath(serverPathUnique: string): string {
+	toServerPath(serverPathUnique: string | null): string {
+		if (serverPathUnique === undefined) throw new Error('Server path unique is missing');
+		if (serverPathUnique === null) return '';
 		const decoded = decodeURIComponent(serverPathUnique);
 		return decoded.replace(this.#magicDot, '.');
 	}
