@@ -17,7 +17,6 @@ export * from './embedded-media-modal.token.js';
 export * from './entity-user-permission-settings-modal.token.js';
 export * from './examine-fields-settings-modal.token.js';
 export * from './export-dictionary-modal.token.js';
-export * from './folder-modal.token.js';
 export * from './icon-picker-modal.token.js';
 export * from './import-dictionary-modal.token.js';
 export * from './language-picker-modal.token.js';
