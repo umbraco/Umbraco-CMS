@@ -1,4 +1,4 @@
-import { UMB_SCRIPT_REPOSITORY_ALIAS } from '../repository/index.js';
+import { UMB_SCRIPT_DETAIL_REPOSITORY_ALIAS } from '../repository/index.js';
 import { UMB_SCRIPT_ENTITY_TYPE, UMB_SCRIPT_FOLDER_ENTITY_TYPE, UMB_SCRIPT_ROOT_ENTITY_TYPE } from '../entity.js';
 import { UmbCreateScriptAction } from './create/create-empty.action.js';
 import { UmbDeleteEntityAction } from '@umbraco-cms/backoffice/entity-action';
@@ -16,7 +16,7 @@ const scriptViewActions: Array<ManifestEntityAction> = [
 		meta: {
 			icon: 'icon-trash',
 			label: 'Delete',
-			repositoryAlias: UMB_SCRIPT_REPOSITORY_ALIAS,
+			repositoryAlias: UMB_SCRIPT_DETAIL_REPOSITORY_ALIAS,
 			entityTypes: [UMB_SCRIPT_ENTITY_TYPE],
 		},
 	},
@@ -31,7 +31,7 @@ const scriptFolderActions: Array<ManifestEntityAction> = [
 		meta: {
 			icon: 'icon-article',
 			label: 'New empty script',
-			repositoryAlias: UMB_SCRIPT_REPOSITORY_ALIAS,
+			repositoryAlias: UMB_SCRIPT_DETAIL_REPOSITORY_ALIAS,
 			entityTypes: [UMB_SCRIPT_FOLDER_ENTITY_TYPE, UMB_SCRIPT_ROOT_ENTITY_TYPE],
 		},
 	},
