@@ -1,10 +1,10 @@
 import { UmbRelationTypeWorkspaceContext } from './relation-type-workspace.context.js';
+import { UmbRelationTypeWorkspaceEditorElement } from './relation-type-workspace-editor.element.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UmbRouterSlotInitEvent, UmbRoute } from '@umbraco-cms/backoffice/router';
 
-import './relation-type-workspace-editor.element.js';
 import { UmbWorkspaceIsNewRedirectController } from '@umbraco-cms/backoffice/workspace';
 
 /**
@@ -14,17 +14,17 @@ import { UmbWorkspaceIsNewRedirectController } from '@umbraco-cms/backoffice/wor
 @customElement('umb-relation-type-workspace')
 export class UmbRelationTypeWorkspaceElement extends UmbLitElement {
 	#workspaceContext = new UmbRelationTypeWorkspaceContext(this);
+	#createElement = () => new UmbRelationTypeWorkspaceEditorElement();
 
 	#routerPath? = '';
 
-	#element = document.createElement('umb-relation-type-workspace-editor');
 	#key = '';
 
 	@state()
 	_routes: UmbRoute[] = [
 		{
 			path: 'create/:parentId',
-			component: () => this.#element,
+			component: this.#createElement,
 			setup: (_component, info) => {
 				const parentId = info.match.params.parentId;
 				this.#workspaceContext.createScaffold(parentId);
@@ -38,7 +38,7 @@ export class UmbRelationTypeWorkspaceElement extends UmbLitElement {
 		},
 		{
 			path: 'edit/:id',
-			component: () => this.#element,
+			component: this.#createElement,
 			setup: (_component, info) => {
 				const id = info.match.params.id;
 				this.#workspaceContext.load(id);

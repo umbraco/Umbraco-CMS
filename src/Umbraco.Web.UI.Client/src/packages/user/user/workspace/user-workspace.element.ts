@@ -8,13 +8,13 @@ import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 @customElement('umb-user-workspace')
 export class UmbUserWorkspaceElement extends UmbLitElement {
 	#workspaceContext = new UmbUserWorkspaceContext(this);
-	#element = new UmbUserWorkspaceEditorElement();
+	#createElement = () => new UmbUserWorkspaceEditorElement();
 
 	@state()
 	_routes: UmbRoute[] = [
 		{
 			path: ':id',
-			component: () => this.#element,
+			component: this.#createElement,
 			setup: (component, info) => {
 				const id = info.match.params.id;
 				this.#workspaceContext.load(id);
