@@ -1,5 +1,5 @@
 import { expect, fixture, html } from '@open-wc/testing';
-import { UmbPropertyEditorUIBlockListBlockConfigurationElement } from './property-editor-ui-block-list-block-configuration.element.js';
+import { UmbPropertyEditorUIBlockListBlockConfigurationElement } from './property-editor-ui-block-list-type-configuration.element.js';
 import { defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 
 describe('UmbPropertyEditorUIBlockListBlockConfigurationElement', () => {
@@ -7,7 +7,7 @@ describe('UmbPropertyEditorUIBlockListBlockConfigurationElement', () => {
 
 	beforeEach(async () => {
 		element = await fixture(html`
-			<umb-property-editor-ui-block-list-block-configuration></umb-property-editor-ui-block-list-block-configuration>
+			<umb-property-editor-ui-block-list-type-configuration></umb-property-editor-ui-block-list-type-configuration>
 		`);
 	});
 

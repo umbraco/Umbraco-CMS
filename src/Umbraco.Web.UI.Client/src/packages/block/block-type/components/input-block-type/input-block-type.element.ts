@@ -1,10 +1,11 @@
 import { UmbBlockTypeBase } from '../../types.js';
 import { UmbBlockTypeInputContext } from './input-block-type.context.js';
-import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-input-block-type')
 export class UmbInputBlockTypeElement<BlockType extends UmbBlockTypeBase = UmbBlockTypeBase> extends UmbLitElement {
+	//
 	@property({ type: Array, attribute: false })
 	public get value() {
 		return this._items;
@@ -21,7 +22,11 @@ export class UmbInputBlockTypeElement<BlockType extends UmbBlockTypeBase = UmbBl
 	constructor() {
 		super();
 
-		this.observe(this.#context.types, (selectedItems) => (this._items = selectedItems));
+		this.observe(this.#context.types, (types) => {
+			const oldTypes = this._items;
+			this._items = types;
+			this.requestUpdate('_items', oldTypes);
+		});
 	}
 
 	protected getFormElement() {
@@ -29,11 +34,13 @@ export class UmbInputBlockTypeElement<BlockType extends UmbBlockTypeBase = UmbBl
 	}
 
 	render() {
-		return html` ${this._items?.map((item) => this.#renderItem(item))} ${this.#renderButton()} `;
+		return html`
+			${this._items ? repeat(this._items, (item) => item.contentElementTypeKey, this.#renderItem) : ''}
+			${this.#renderButton()}
+		`;
 	}
 
 	#renderButton() {
-		if (this._items.length > 0) return;
 		return html`
 			<uui-button id="add-button" look="placeholder" @click=${() => this.#context.create()} label="open">
 				<uui-icon name="icon-add"></uui-icon>

@@ -91,6 +91,7 @@
 			"@umbraco-cms/backoffice/tags": ["./src/packages/tags/index.ts"],
 
 			"@umbraco-cms/backoffice/dictionary": ["./src/packages/dictionary/dictionary/index.ts"],
+			"@umbraco-cms/backoffice/block": ["./src/packages/block/index.ts"],
 
 			// DOCUMENT MANAGEMENT
 			"@umbraco-cms/backoffice/document": ["./src/packages/documents/documents/index.ts"],
