@@ -15,8 +15,7 @@ export class UmbScriptWorkspaceElement extends UmbLitElement {
 			component: import('./script-workspace-edit.element.js'),
 			setup: async (_component: PageComponent, info: IRoutingInfo) => {
 				const parentUnique = info.match.params.parentUnique;
-				const decodePath = decodeURIComponent(parentUnique);
-				this.#workspaceContext.create(decodePath === 'null' ? '' : decodePath);
+				this.#workspaceContext.create(parentUnique);
 
 				new UmbWorkspaceIsNewRedirectController(
 					this,
@@ -30,8 +29,7 @@ export class UmbScriptWorkspaceElement extends UmbLitElement {
 			component: import('./script-workspace-edit.element.js'),
 			setup: (component: PageComponent, info: IRoutingInfo) => {
 				const unique = info.match.params.unique;
-				const decodePath = decodeURIComponent(unique).replace('-js', '.js');
-				this.#workspaceContext.load(decodePath);
+				this.#workspaceContext.load(unique);
 			},
 		},
 	];

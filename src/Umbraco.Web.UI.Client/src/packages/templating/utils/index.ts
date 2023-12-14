@@ -51,3 +51,4 @@ export const getUmbracoFieldSnippet = (field: string, defaultValue: string | nul
 };
 
 export * from './parent-path-from-server-path.function.js';
+export * from './server-path-unique-serializer.js';

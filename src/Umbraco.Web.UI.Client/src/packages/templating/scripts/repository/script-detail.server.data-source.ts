@@ -1,6 +1,6 @@
 import { UmbScriptDetailModel } from '../types.js';
 import { UMB_SCRIPT_ENTITY_TYPE } from '../entity.js';
-import { getParentPathFromServerPath } from '../../utils/parent-path-from-server-path.function.js';
+import { UmbServerPathUniqueSerializer } from '../../utils/server-path-unique-serializer.js';
 import {
 	CreateScriptRequestModel,
 	ScriptResource,
@@ -12,6 +12,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 export class UmbScriptDetailServerDataSource implements UmbDetailDataSource<UmbScriptDetailModel> {
 	#host: UmbControllerHost;
+	#serverPathUniqueSerializer = new UmbServerPathUniqueSerializer();
 
 	constructor(host: UmbControllerHost) {
 		this.#host = host;
@@ -20,8 +21,8 @@ export class UmbScriptDetailServerDataSource implements UmbDetailDataSource<UmbS
 	async createScaffold(parentUnique: string | null) {
 		const data: UmbScriptDetailModel = {
 			entityType: UMB_SCRIPT_ENTITY_TYPE,
-			unique: '',
 			parentUnique,
+			unique: '',
 			path: '',
 			name: '',
 			content: '',
@@ -59,7 +60,9 @@ export class UmbScriptDetailServerDataSource implements UmbDetailDataSource<UmbS
 	async read(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		const { data, error } = await tryExecuteAndNotify(this.#host, ScriptResource.getScript({ path: unique }));
+		const serverPath = this.#serverPathUniqueSerializer.toServerPath(unique);
+
+		const { data, error } = await tryExecuteAndNotify(this.#host, ScriptResource.getScript({ path: serverPath }));
 
 		if (error || !data) {
 			return { error };
@@ -68,8 +71,8 @@ export class UmbScriptDetailServerDataSource implements UmbDetailDataSource<UmbS
 		// TODO: make data mapper to prevent errors
 		const script: UmbScriptDetailModel = {
 			entityType: UMB_SCRIPT_ENTITY_TYPE,
-			unique: data.path,
-			parentUnique: getParentPathFromServerPath(data.path),
+			unique: this.#serverPathUniqueSerializer.toUnique(data.path),
+			parentUnique: this.#serverPathUniqueSerializer.toParentUnique(data.path),
 			path: data.path,
 			name: data.name,
 			content: data.content,
@@ -83,7 +86,7 @@ export class UmbScriptDetailServerDataSource implements UmbDetailDataSource<UmbS
 
 		// TODO: make data mapper to prevent errors
 		const requestBody: UpdateTextFileViewModelBaseModel = {
-			existingPath: data.unique,
+			existingPath: this.#serverPathUniqueSerializer.toServerPath(data.unique),
 			name: data.name,
 			content: data.content,
 		};
@@ -109,7 +112,7 @@ export class UmbScriptDetailServerDataSource implements UmbDetailDataSource<UmbS
 		return tryExecuteAndNotify(
 			this.#host,
 			ScriptResource.deleteScript({
-				path: unique,
+				path: this.#serverPathUniqueSerializer.toServerPath(unique),
 			}),
 		);
 	}
