@@ -9,13 +9,13 @@ import { UmbWorkspaceIsNewRedirectController } from '@umbraco-cms/backoffice/wor
 @customElement('umb-dictionary-workspace')
 export class UmbWorkspaceDictionaryElement extends UmbLitElement {
 	#workspaceContext = new UmbDictionaryWorkspaceContext(this);
-	#element = new UmbDictionaryWorkspaceEditorElement();
+	#createElement = () => new UmbDictionaryWorkspaceEditorElement();
 
 	@state()
 	_routes: UmbRoute[] = [
 		{
 			path: 'edit/:id',
-			component: () => this.#element,
+			component: this.#createElement,
 			setup: (_component, info) => {
 				const id = info.match.params.id;
 				this.#workspaceContext.load(id);
@@ -23,7 +23,7 @@ export class UmbWorkspaceDictionaryElement extends UmbLitElement {
 		},
 		{
 			path: 'create/:parentId',
-			component: () => this.#element,
+			component: this.#createElement,
 			setup: async (_component, info) => {
 				const parentId = info.match.params.parentId === 'null' ? null : info.match.params.parentId;
 				await this.#workspaceContext.create(parentId);
