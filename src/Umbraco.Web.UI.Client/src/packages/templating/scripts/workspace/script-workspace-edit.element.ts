@@ -29,22 +29,12 @@ export class UmbScriptWorkspaceEditElement extends UmbLitElement {
 	@state()
 	private _ready?: boolean = false;
 
-	@query('umb-code-editor')
-	private _codeEditor?: UmbCodeEditorElement;
-
 	#scriptsWorkspaceContext?: UmbScriptWorkspaceContext;
-	private _modalContext?: UmbModalManagerContext;
-
-	#isNew = false;
 
 	private inputQuery$ = new Subject<string>();
 
 	constructor() {
 		super();
-
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
-			this._modalContext = instance;
-		});
 
 		this.consumeContext(UMB_WORKSPACE_CONTEXT, (workspaceContext) => {
 			this.#scriptsWorkspaceContext = workspaceContext as UmbScriptWorkspaceContext;
@@ -58,10 +48,6 @@ export class UmbScriptWorkspaceEditElement extends UmbLitElement {
 
 			this.observe(this.#scriptsWorkspaceContext.path, (path) => {
 				this._path = path?.replace(/\\/g, '/');
-			});
-
-			this.observe(this.#scriptsWorkspaceContext.isNew, (isNew) => {
-				this.#isNew = !!isNew;
 			});
 
 			this.observe(this.#scriptsWorkspaceContext.isCodeEditorReady, (isReady) => {
