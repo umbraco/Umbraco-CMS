@@ -44,7 +44,6 @@ public class LanguageController : UmbracoAuthorizedJsonController
     /// </summary>
     /// <returns></returns>
     [HttpGet]
-    [Authorize(Policy = AuthorizationPolicies.SectionAccessContent)]
     public IEnumerable<Language>? GetAllLanguages()
     {
         IEnumerable<ILanguage> allLanguages = _localizationService.GetAllLanguages();
