@@ -10,8 +10,8 @@ export class UmbScriptFolderRepository extends UmbFolderRepositoryBase<UmbScript
 	}
 }
 
-const folderToScriptTreeItemFolder = (folder: UmbFolderModel) => {
-	const treeItem: UmbScriptTreeItemModel = {
+const folderToScriptTreeItemFolder = (folder: UmbFolderModel): UmbScriptTreeItemModel => {
+	return {
 		unique: folder.unique,
 		parentUnique: folder.parentUnique,
 		name: folder.name,
@@ -20,6 +20,4 @@ const folderToScriptTreeItemFolder = (folder: UmbFolderModel) => {
 		isContainer: false,
 		hasChildren: false,
 	};
-
-	return treeItem;
 };
