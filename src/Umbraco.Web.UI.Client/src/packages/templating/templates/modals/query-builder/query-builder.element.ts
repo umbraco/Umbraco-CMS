@@ -202,7 +202,7 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 		const properties = localizePropertyType(this._queryBuilderSettings?.properties);
 		const sort = localizeSort(this._queryRequest.sort);
 		return html`
-			<umb-body-layout headline="Query builder">
+			<umb-body-layout headline=${this.localize.term('template_queryBuilder')}>
 				<div id="main">
 					<uui-box>
 						<div class="row">
@@ -271,8 +271,15 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 				</div>
 
 				<div slot="actions">
-					<uui-button @click=${this.#close} look="secondary" label="Close">Close</uui-button>
-					<uui-button @click=${this.#submit} look="primary" color="positive" label="Submit">Submit</uui-button>
+					<uui-button
+						@click=${this.#close}
+						look="secondary"
+						label=${this.localize.term('buttons_confirmActionCancel')}></uui-button>
+					<uui-button
+						@click=${this.#submit}
+						look="primary"
+						color="positive"
+						label=${this.localize.term('buttons_submitChanges')}></uui-button>
 				</div>
 			</umb-body-layout>
 		`;
