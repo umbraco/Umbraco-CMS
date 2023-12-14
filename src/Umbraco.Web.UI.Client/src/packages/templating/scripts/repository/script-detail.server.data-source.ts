@@ -33,28 +33,33 @@ export class UmbScriptDetailServerDataSource implements UmbDetailDataSource<UmbS
 
 	async create(script: UmbScriptDetailModel) {
 		if (!script) throw new Error('Data is missing');
-		if (!script.unique) throw new Error('Unique is missing');
+		if (!script.parentUnique) throw new Error('Parent Unique is missing');
+		if (!script.name) throw new Error('Name is missing');
+
+		const parentPath = this.#serverPathUniqueSerializer.toServerPath(script.parentUnique);
 
 		// TODO: make data mapper to prevent errors
 		const requestBody: CreateScriptRequestModel = {
-			parentPath: script.parentUnique,
+			parentPath,
 			name: script.name,
 			content: script.content,
 		};
 
-		const { error: createError } = await tryExecuteAndNotify(
+		const { error } = await tryExecuteAndNotify(
 			this.#host,
 			ScriptResource.postScript({
 				requestBody,
 			}),
 		);
 
-		if (createError) {
-			return { error: createError };
+		if (error) {
+			return { error };
 		}
 
 		// We have to fetch the data again. The server can have modified the data after creation
-		return this.read(script.unique);
+		// TODO: revisit when location header is added
+		const createdScriptUnique = this.#serverPathUniqueSerializer.toUnique(parentPath + '/' + script.name);
+		return this.read(createdScriptUnique);
 	}
 
 	async read(unique: string) {
