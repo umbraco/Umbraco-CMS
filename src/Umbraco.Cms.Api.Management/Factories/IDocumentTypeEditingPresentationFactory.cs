@@ -11,8 +11,6 @@ public interface IDocumentTypeEditingPresentationFactory
 
     ContentTypeUpdateModel MapUpdateModel(UpdateDocumentTypeRequestModel requestModel);
 
-    IEnumerable<AvailableContentTypeCompositionResponseModel> CreateCompositionModels(
-        IEnumerable<ContentTypeAvailableCompositionsResult> compositionResults,
-        IEnumerable<string> persistedCompositionAliases,
-        IEnumerable<string> ancestorCompositionAliases);
+    // TODO: move to ContentTypeEditingPresentationFactory when the implementation has the correct <Type>s
+    IEnumerable<AvailableDocumentTypeCompositionResponseModel> CreateCompositionModels(IEnumerable<ContentTypeAvailableCompositionsResult> compositionResults);
 }

@@ -23,8 +23,8 @@ public class AvailableCompositionController : DocumentTypeControllerBase
 
     [HttpPost("available-compositions")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(IEnumerable<AvailableContentTypeCompositionResponseModel>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> AvailableCompositions(ContentTypeCompositionRequestModel compositionModel)
+    [ProducesResponseType(typeof(IEnumerable<AvailableDocumentTypeCompositionResponseModel>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> AvailableCompositions(DocumentTypeCompositionRequestModel compositionModel)
     {
         var contentType = await _contentTypeService.GetAsync(compositionModel.Id); // NB: different for media/member (media/member service)
 
@@ -40,11 +40,7 @@ public class AvailableCompositionController : DocumentTypeControllerBase
             compositionModel.CurrentPropertyAliases.ToArray(),
             compositionModel.IsElement);
 
-        IContentTypeComposition[] persistedCompositions = contentType?.ContentTypeComposition.ToArray() ?? Array.Empty<IContentTypeComposition>();
-        var persistedCompositionAliases = persistedCompositions.Select(x => x.Alias).ToArray();
-        IEnumerable<string> ancestorCompositionAliases = availableCompositions.Ancestors.Select(x => x.Alias);
-
-        var responseModels = _presentationFactory.CreateCompositionModels(availableCompositions.Results, persistedCompositionAliases, ancestorCompositionAliases);
+        var responseModels = _presentationFactory.CreateCompositionModels(availableCompositions.Results);
 
         return Ok(responseModels);
     }

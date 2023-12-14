@@ -56,11 +56,8 @@ internal sealed class DocumentTypeEditingPresentationFactory : ContentTypeEditin
         return updateModel;
     }
 
-    public IEnumerable<AvailableContentTypeCompositionResponseModel> CreateCompositionModels(
-        IEnumerable<ContentTypeAvailableCompositionsResult> compositionResults,
-        IEnumerable<string> currentCompositionAliases,
-        IEnumerable<string> persistedCompositionAliases)
-        => compositionResults.Select(x => CreateCompositionModel(x, currentCompositionAliases, persistedCompositionAliases));
+    public IEnumerable<AvailableDocumentTypeCompositionResponseModel> CreateCompositionModels(IEnumerable<ContentTypeAvailableCompositionsResult> compositionResults)
+        => compositionResults.Select(CreateCompositionModel);
 
     private void MapCleanup(ContentTypeModelBase model, ContentTypeCleanupViewModel cleanup)
         => model.Cleanup = new ContentTypeCleanup
@@ -70,14 +67,10 @@ internal sealed class DocumentTypeEditingPresentationFactory : ContentTypeEditin
             KeepLatestVersionPerDayForDays = cleanup.KeepLatestVersionPerDayForDays
         };
 
-    private AvailableContentTypeCompositionResponseModel CreateCompositionModel(
-        ContentTypeAvailableCompositionsResult compositionResult,
-        IEnumerable<string> persistedCompositionAliases,
-        IEnumerable<string> ancestorCompositionAliases)
+    private AvailableDocumentTypeCompositionResponseModel CreateCompositionModel(ContentTypeAvailableCompositionsResult compositionResult)
     {
         IContentTypeComposition composition = compositionResult.Composition;
         IEnumerable<string>? folders = null;
-        bool isAllowed;
 
         if (composition is IContentType contentType)
         {
@@ -85,24 +78,13 @@ internal sealed class DocumentTypeEditingPresentationFactory : ContentTypeEditin
             folders = containers.Select(c => c.Name).WhereNotNull();
         }
 
-        // We need to ensure that the item is allowed if it is already selected
-        // but do not allow it if it is any of the ancestors
-        if (persistedCompositionAliases.Contains(composition.Alias) && ancestorCompositionAliases.Contains(composition.Alias) is false)
-        {
-            isAllowed = true;
-        }
-        else
-        {
-            isAllowed = compositionResult.Allowed;
-        }
-
-        return new AvailableContentTypeCompositionResponseModel
+        return new AvailableDocumentTypeCompositionResponseModel
         {
             Id = composition.Key,
             Name = composition.Name ?? string.Empty,
             Icon = composition.Icon ?? string.Empty,
             FolderPath = folders ?? Array.Empty<string>(),
-            IsAllowed = isAllowed
+            IsCompatible = compositionResult.Allowed
         };
     }
 }
