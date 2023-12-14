@@ -1,3 +1,4 @@
+import { UmbServerPathUniqueSerializer } from '../../../utils/index.js';
 import { UmbCreateFolderModel, UmbFolderDataSource, UmbUpdateFolderModel } from '@umbraco-cms/backoffice/tree';
 import { ScriptResource } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -11,6 +12,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
  */
 export class UmbScriptFolderServerDataSource implements UmbFolderDataSource {
 	#host: UmbControllerHost;
+	#serverPathUniqueSerializer = new UmbServerPathUniqueSerializer();
 
 	/**
 	 * Creates an instance of UmbScriptFolderServerDataSource.
@@ -29,12 +31,27 @@ export class UmbScriptFolderServerDataSource implements UmbFolderDataSource {
 	 */
 	async read(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
-		return tryExecuteAndNotify(
+
+		const path = this.#serverPathUniqueSerializer.toServerPath(unique);
+
+		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
 			ScriptResource.getScriptFolder({
-				path: unique,
+				path,
 			}),
 		);
+
+		if (data) {
+			const mappedData = {
+				unique: data.id,
+				name: data.name,
+				parentUnique: data.parentId || null,
+			};
+
+			return { data: mappedData };
+		}
+
+		return { error };
 	}
 
 	/**
@@ -47,40 +64,28 @@ export class UmbScriptFolderServerDataSource implements UmbFolderDataSource {
 		if (args.parentUnique === undefined) throw new Error('Parent unique is missing');
 		if (!args.name) throw new Error('Name is missing');
 
-		const { data, error } = await tryExecuteAndNotify(
+		const parentPath = new UmbServerPathUniqueSerializer().toServerPath(args.parentUnique);
+
+		const requestBody = {
+			parentPath,
+			name: args.name,
+		};
+
+		const { error } = await tryExecuteAndNotify(
 			this.#host,
 			ScriptResource.postScriptFolder({
-				requestBody: { parentPath: args.parentUnique, name: args.name },
+				requestBody,
 			}),
 		);
 
-		if (data) {
-			const folderData = { unique: data.path, parentUnique: data.parentPath || null, name: data.name };
-			return { data: folderData };
+		if (!error) {
+			/* TODO: investigate why we don't get the location header as part of data, 
+			so we don't have to construct the path ourselves */
+			const newPath = `${parentPath}/${args.name}`;
+			return this.read(newPath);
 		}
 
 		return { error };
-	}
-
-	/**
-	 * Updates a Script folder on the server
-	 * @param {UmbUpdateFolderModel} args
-	 * @return {UmbDataSourceErrorResponse}
-	 * @memberof UmbScriptFolderServerDataSource
-	 */
-	async update(args: UmbUpdateFolderModel): Promise<any> {
-		throw new Error('Not implemented. Missing server endpoint');
-		/*
-		if (!args.unique) throw new Error('Unique is missing');
-		if (!args.name) throw new Error('Folder name is missing');
-		return tryExecuteAndNotify(
-			this.#host,
-			ScriptResource.putScriptFolder({
-				id: args.unique,
-				requestBody: { name: args.name },
-			}),
-		);
-		*/
 	}
 
 	/**
@@ -97,5 +102,9 @@ export class UmbScriptFolderServerDataSource implements UmbFolderDataSource {
 				path: unique,
 			}),
 		);
+	}
+
+	async update(args: UmbUpdateFolderModel): Promise<any> {
+		throw new Error('Updating is not supported');
 	}
 }
