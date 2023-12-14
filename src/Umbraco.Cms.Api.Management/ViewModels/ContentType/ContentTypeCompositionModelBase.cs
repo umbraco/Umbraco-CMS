@@ -1,4 +1,4 @@
-namespace Umbraco.Cms.Api.Management.ViewModels.DocumentType.Composition;
+namespace Umbraco.Cms.Api.Management.ViewModels.ContentType;
 
 public class ContentTypeCompositionModelBase
 {
