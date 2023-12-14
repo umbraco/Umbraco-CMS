@@ -33,7 +33,7 @@ export class UmbScriptDetailServerDataSource implements UmbDetailDataSource<UmbS
 
 	async create(script: UmbScriptDetailModel) {
 		if (!script) throw new Error('Data is missing');
-		if (!script.parentUnique) throw new Error('Parent Unique is missing');
+		if (!script.parentUnique === undefined) throw new Error('Parent Unique is missing');
 		if (!script.name) throw new Error('Name is missing');
 
 		const parentPath = this.#serverPathUniqueSerializer.toServerPath(script.parentUnique);
