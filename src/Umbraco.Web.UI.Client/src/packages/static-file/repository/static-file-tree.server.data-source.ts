@@ -1,17 +1,18 @@
-import { UmbStylesheetTreeItemModel } from './types.js';
-import { FileSystemTreeItemPresentationModel, StylesheetResource } from '@umbraco-cms/backoffice/backend-api';
-import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UMB_STATIC_FILE_ENTITY_TYPE } from '../entity.js';
+import { UmbStaticFileTreeItemModel } from './types.js';
 import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
+import { StaticFileResource, type FileSystemTreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
- * A data source for the Stylesheet tree that fetches data from the server
+ * A data source for the Static File tree that fetches data from the server
  * @export
- * @class UmbStylesheetTreeServerDataSource
+ * @class UmbStaticFileTreeServerDataSource
  * @implements {UmbTreeServerDataSourceBase}
  */
-export class UmbStylesheetTreeServerDataSource extends UmbTreeServerDataSourceBase<
+export class UmbStaticFileTreeServerDataSource extends UmbTreeServerDataSourceBase<
 	FileSystemTreeItemPresentationModel,
-	UmbStylesheetTreeItemModel
+	UmbStaticFileTreeItemModel
 > {
 	/**
 	 * Creates an instance of UmbStylesheetTreeServerDataSource.
@@ -28,24 +29,24 @@ export class UmbStylesheetTreeServerDataSource extends UmbTreeServerDataSourceBa
 }
 
 // eslint-disable-next-line local-rules/no-direct-api-import
-const getRootItems = () => StylesheetResource.getTreeStylesheetRoot({});
+const getRootItems = () => StaticFileResource.getTreeStaticFileRoot({});
 
 const getChildrenOf = (parentUnique: string | null) => {
 	if (parentUnique === null) {
 		return getRootItems();
 	} else {
 		// eslint-disable-next-line local-rules/no-direct-api-import
-		return StylesheetResource.getTreeStylesheetChildren({
+		return StaticFileResource.getTreeStaticFileChildren({
 			path: parentUnique,
 		});
 	}
 };
 
-const mapper = (item: FileSystemTreeItemPresentationModel): UmbStylesheetTreeItemModel => {
+const mapper = (item: FileSystemTreeItemPresentationModel): UmbStaticFileTreeItemModel => {
 	return {
 		path: item.path,
 		name: item.name,
-		entityType: 'stylesheet',
+		entityType: UMB_STATIC_FILE_ENTITY_TYPE,
 		isFolder: item.isFolder,
 		hasChildren: item.hasChildren,
 		isContainer: false,

@@ -1,11 +1,12 @@
-import type { UmbInputDocumentElement } from '../../components/input-document/input-document.element.js';
+import { UmbInputStaticFileElement } from '../../components/index.js';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import '../../components/input-static-file/index.js';
 
-@customElement('umb-property-editor-ui-document-picker')
-export class UmbPropertyEditorUIContentPickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
+@customElement('umb-property-editor-ui-static-file-picker')
+export class UmbPropertyEditorUIStaticFilePickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	private _value: Array<string> = [];
 
 	@property({ type: Array })
@@ -30,28 +31,28 @@ export class UmbPropertyEditorUIContentPickerElement extends UmbLitElement imple
 	private _limitMax?: number;
 
 	private _onChange(event: CustomEvent) {
-		this.value = (event.target as UmbInputDocumentElement).selectedIds;
+		this.value = (event.target as UmbInputStaticFileElement).selectedPaths;
 		this.dispatchEvent(new CustomEvent('property-value-change'));
 	}
 
 	// TODO: Implement mandatory?
 	render() {
 		return html`
-			<umb-input-document
+			<umb-input-static-file
 				@change=${this._onChange}
 				.selectedIds=${this._value}
 				.min=${this._limitMin ?? 0}
 				.max=${this._limitMax ?? Infinity}
-				>Add</umb-input-document
+				>Add</umb-input-static-file
 			>
 		`;
 	}
 }
 
-export default UmbPropertyEditorUIContentPickerElement;
+export default UmbPropertyEditorUIStaticFilePickerElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-property-editor-ui-document-picker': UmbPropertyEditorUIContentPickerElement;
+		'umb-property-editor-ui-static-file-picker': UmbPropertyEditorUIStaticFilePickerElement;
 	}
 }

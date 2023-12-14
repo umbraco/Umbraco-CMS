@@ -1,4 +1,4 @@
-import { expect, fixture, html } from '@open-wc/testing';
+//import { expect, fixture, html } from '@open-wc/testing';
 //TODO: Test has been commented out while we figure out how to setup import maps for the test environment
 // import { UmbPickerLayoutSectionElement } from './picker-layout-section.element.js';
 // import { defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
@@ -13,7 +13,9 @@ import { expect, fixture, html } from '@open-wc/testing';
 // 		expect(element).to.be.instanceOf(UmbPickerLayoutSectionElement);
 // 	});
 
-// 	it('passes the a11y audit', async () => {
-// 		await expect(element).shadowDom.to.be.accessible(defaultA11yConfig);
-// 	});
+//	if ((window as any).__UMBRACO_TEST_RUN_A11Y_TEST) {
+// 		it('passes the a11y audit', async () => {
+// 			await expect(element).shadowDom.to.be.accessible(defaultA11yConfig);
+// 		});
+// 	}
 // });

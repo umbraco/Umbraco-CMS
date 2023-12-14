@@ -1,5 +1,4 @@
 import { UmbData } from './data.js';
-import { UmbEntityData } from './entity.data.js';
 import { createFileItemResponseModelBaseModel, createFileSystemTreeItem, createTextFileItem } from './utils.js';
 import {
 	CreatePathFolderRequestModel,
@@ -53,7 +52,7 @@ export const data: Array<ScriptsDataItem> = [
 			}
 			return result;
 		 }
-		 
+
 		 console.log(makeid(5));`,
 	},
 	{
@@ -80,7 +79,7 @@ export const data: Array<ScriptsDataItem> = [
 		content: `var my_arr = [4, '', 0, 10, 7, '', false, 10];
 
 		my_arr = my_arr.filter(Boolean);
-		
+
 		console.log(my_arr);`,
 	},
 	{
@@ -93,7 +92,7 @@ export const data: Array<ScriptsDataItem> = [
 		const date = new Date(date_str);
 		const full_day_name = date.toLocaleDateString('default', { weekday: 'long' });
 		// -> to get full day name e.g. Tuesday
-		
+
 		const short_day_name = date.toLocaleDateString('default', { weekday: 'short' });
 		console.log(short_day_name);
 		// -> TO get the short day name e.g. Tue`,
@@ -110,10 +109,10 @@ export const data: Array<ScriptsDataItem> = [
 			"department": "IT",
 			"project": "Inventory Manager"
 		};
-		
+
 		// Remove a property
 		delete employee["project"];
-		
+
 		console.log(employee);`,
 	},
 ];
