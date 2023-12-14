@@ -1,7 +1,7 @@
 import { expect } from '@open-wc/testing';
 import { UmbServerPathUniqueSerializer } from './server-path-unique-serializer.js';
 
-describe('UmbPaginationManager', () => {
+describe('UmbServerPathUniqueSerializer', () => {
 	let serializer: UmbServerPathUniqueSerializer;
 	const serverPath = 'Folder A/Folder AA/some-Filename-WithCasing_underscore.js';
 
