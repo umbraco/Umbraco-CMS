@@ -100,7 +100,7 @@ export class UmbScriptWorkspaceEditElement extends UmbLitElement {
 					  </div>`}
 			</uui-box>
 			<div slot="footer-info">
-				<!-- TODO: Shortcuts Modal? -->
+				<!-- TODO: Shortcuts Modal? 
 				<uui-button label="Show keyboard shortcuts">
 					Keyboard Shortcuts
 					<uui-keyboard-shortcut>
@@ -111,6 +111,7 @@ export class UmbScriptWorkspaceEditElement extends UmbLitElement {
 						<uui-key>k</uui-key>
 					</uui-keyboard-shortcut>
 				</uui-button>
+				-->
 			</div>
 		</umb-workspace-editor>`;
 	}
