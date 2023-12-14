@@ -1,6 +1,6 @@
 namespace Umbraco.Cms.Api.Management.ViewModels.DocumentType.Composition;
 
-public class ContentTypeCompositionRequestModel
+public class DocumentTypeCompositionRequestModel
 {
     /// <summary>
     ///     Gets or sets the content type key.
