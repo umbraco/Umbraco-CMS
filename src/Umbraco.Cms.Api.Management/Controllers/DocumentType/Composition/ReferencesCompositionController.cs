@@ -23,19 +23,19 @@ public class ReferencesCompositionController : DocumentTypeControllerBase
 
     [HttpGet("{id:guid}/composition-references")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(IEnumerable<ContentTypeCompositionResponseModel>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IEnumerable<DocumentTypeCompositionResponseModel>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> CompositionReferences(Guid id)
     {
-        var contentType = await _contentTypeService.GetAsync(id); // NB: different for media/member (media/member service)
+        var contentType = await _contentTypeService.GetAsync(id);
 
         if (contentType is null)
         {
             return OperationStatusResult(ContentTypeOperationStatus.NotFound);
         }
 
-        IEnumerable<IContentType> composedOf = _contentTypeService.GetComposedOf(contentType.Id); // NB: different for media/member (media/member service)
-        List<ContentTypeCompositionResponseModel> responseModels = _umbracoMapper.MapEnumerable<IContentType, ContentTypeCompositionResponseModel>(composedOf);
+        IEnumerable<IContentType> composedOf = _contentTypeService.GetComposedOf(contentType.Id);
+        List<DocumentTypeCompositionResponseModel> responseModels = _umbracoMapper.MapEnumerable<IContentType, DocumentTypeCompositionResponseModel>(composedOf);
 
         return Ok(responseModels);
     }
