@@ -79,9 +79,9 @@ export const createFileSystemTreeItem = (item: any): FileSystemTreeItemPresentat
 	return {
 		name: item.name,
 		type: item.type,
-		hasChildren: item.hasChildren,
+		hasChildren: item.hasChildren ?? false,
 		path: item.path,
-		isFolder: item.isFolder,
+		isFolder: item.isFolder ?? false,
 	};
 };
 

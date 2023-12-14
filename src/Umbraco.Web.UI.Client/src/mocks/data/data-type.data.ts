@@ -715,6 +715,15 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 		propertyEditorUiAlias: 'Umb.PropertyEditorUi.MemberGroupPicker',
 		values: [],
 	},
+	{
+		type: 'data-type',
+		name: 'Static File Picker',
+		id: 'dt-staticFilePicker',
+		parentId: null,
+		propertyEditorAlias: 'Umbraco.Label',
+		propertyEditorUiAlias: 'Umb.PropertyEditorUi.StaticFilePicker',
+		values: [],
+	},
 ];
 
 const createDataTypeItem = (item: DataTypeResponseModel | FolderTreeItemResponseModel): DataTypeItemResponseModel => {

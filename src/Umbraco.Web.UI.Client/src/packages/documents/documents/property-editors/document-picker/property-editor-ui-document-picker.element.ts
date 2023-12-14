@@ -20,8 +20,8 @@ export class UmbPropertyEditorUIContentPickerElement extends UmbLitElement imple
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		const validationLimit = config?.find((x) => x.alias === 'validationLimit');
 
-		this._limitMin = (validationLimit?.value as any).min;
-		this._limitMax = (validationLimit?.value as any).max;
+		this._limitMin = (validationLimit?.value as any)?.min;
+		this._limitMax = (validationLimit?.value as any)?.max;
 	}
 
 	@state()
@@ -40,8 +40,8 @@ export class UmbPropertyEditorUIContentPickerElement extends UmbLitElement imple
 			<umb-input-document
 				@change=${this._onChange}
 				.selectedIds=${this._value}
-				.min=${this._limitMin}
-				.max=${this._limitMax}
+				.min=${this._limitMin ?? 0}
+				.max=${this._limitMax ?? Infinity}
 				>Add</umb-input-document
 			>
 		`;

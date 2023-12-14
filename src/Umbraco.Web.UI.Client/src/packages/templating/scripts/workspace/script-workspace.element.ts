@@ -1,4 +1,5 @@
 import { UmbScriptWorkspaceContext } from './script-workspace.context.js';
+import { UmbScriptWorkspaceEditElement } from './script-workspace-edit.element.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -8,11 +9,13 @@ import { UmbWorkspaceIsNewRedirectController } from '@umbraco-cms/backoffice/wor
 @customElement('umb-script-workspace')
 export class UmbScriptWorkspaceElement extends UmbLitElement {
 	#workspaceContext = new UmbScriptWorkspaceContext(this);
+	#createElement = () => new UmbScriptWorkspaceEditElement();
+
 	@state()
 	_routes: UmbRoute[] = [
 		{
 			path: 'create/:parentUnique',
-			component: import('./script-workspace-editor.element.js'),
+			component: this.#createElement,
 			setup: async (_component: PageComponent, info: IRoutingInfo) => {
 				const parentUnique = info.match.params.parentUnique;
 				this.#workspaceContext.create(parentUnique);
@@ -26,7 +29,7 @@ export class UmbScriptWorkspaceElement extends UmbLitElement {
 		},
 		{
 			path: 'edit/:unique',
-			component: import('./script-workspace-edit.element.js'),
+			component: this.#createElement,
 			setup: (component: PageComponent, info: IRoutingInfo) => {
 				const unique = info.match.params.unique;
 				this.#workspaceContext.load(unique);
