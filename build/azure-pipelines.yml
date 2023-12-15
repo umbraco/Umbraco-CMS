@@ -546,14 +546,21 @@ stages:
               artifact: 'Acceptance Tests - $(Agent.JobName) - Attempt #$(System.JobAttempt)'
 
       - job:
-        displayName: E2E Tests (SQL Server) Windows
+        displayName: E2E Tests (SQL Server)
         condition: or(eq(stageDependencies.Build.A.outputs['build.NBGV_PublicRelease'], 'True'), ${{parameters.sqlServerAcceptanceTests}})
         variables:
           # Connection string
           CONNECTIONSTRINGS__UMBRACODBDSN: Data Source=(localdb)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Umbraco.mdf;Integrated Security=True
           CONNECTIONSTRINGS__UMBRACODBDSN_PROVIDERNAME: Microsoft.Data.SqlClient
+        strategy:
+          matrix:
+            Linux:
+              vmImage: 'ubuntu-latest'
+              CONNECTIONSTRINGS__UMBRACODBDSN: 'Server=(local);User Id=sa;Password=$(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD);TrustServerCertificate=true'
+            Windows:
+              vmImage: 'windows-latest'
         pool:
-          vmImage: 'windows-latest'
+          vmImage: $(vmImage)
         steps:
           # Setup test environment
           - task: DownloadPipelineArtifact@2
@@ -598,23 +605,37 @@ stages:
               $cmsVersion = "$(Build.BuildNumber)" -replace "\+",".g"
               dotnet new nugetconfig
               dotnet nuget add source ./nupkg --name Local
-              dotnet new --install Umbraco.Templates::$cmsVersion
+              dotnet new install Umbraco.Templates::$cmsVersion
               dotnet new umbraco --name UmbracoProject --version $cmsVersion --exclude-gitignore --no-restore --no-update-check
+              dotnet add UmbracoProject reference $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest.UmbracoProject
               dotnet restore UmbracoProject
               dotnet build UmbracoProject --configuration $(buildConfiguration) --no-restore
               dotnet dev-certs https
             displayName: Build application
             workingDirectory: $(Agent.BuildDirectory)/app
 
-          # Start SQL Server LocalDB
+          # Start SQL Server
+          - powershell: docker run --name mssql -d -p 1433:1433 -e ACCEPT_EULA=Y -e SA_PASSWORD=$(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD) -e MSSQL_PID=Developer mcr.microsoft.com/mssql/server:2022-latest
+            displayName: Start SQL Server Docker image (Linux)
+            condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
+
           - pwsh: SqlLocalDB start MSSQLLocalDB
-            displayName: Start SQL Server LocalDB
+            displayName: Start SQL Server LocalDB (Windows)
+            condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))
 
           # Run application
+          - bash: |
+              nohup dotnet run --project UmbracoProject --configuration $(buildConfiguration) --no-build --no-launch-profile > $(Build.ArtifactStagingDirectory)/playwright.log 2>&1 &
+              echo "##vso[task.setvariable variable=AcceptanceTestProcessId]$!"
+            displayName: Run application (Linux)
+            condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
+            workingDirectory: $(Agent.BuildDirectory)/app
+
           - pwsh: |
               $process = Start-Process dotnet "run --project UmbracoProject --configuration $(buildConfiguration) --no-build --no-launch-profile 2>&1" -PassThru -NoNewWindow -RedirectStandardOutput $(Build.ArtifactStagingDirectory)/playwright.log
               Write-Host "##vso[task.setvariable variable=AcceptanceTestProcessId]$($process.Id)"
-            displayName: Run application
+            displayName: Run application (Windows)
+            condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))
             workingDirectory: $(Agent.BuildDirectory)/app
 
           # Wait for application to start responding to requests
@@ -638,18 +659,27 @@ stages:
               AgentOs: $(Agent.OS)
 
           # Stop application
+          - bash: kill -15 $(AcceptanceTestProcessId)
+            displayName: Stop application (Linux)
+            condition: and(succeeded(), ne(variables.AcceptanceTestProcessId, ''), eq(variables['Agent.OS'], 'Linux'))
+
           - pwsh: Stop-Process -Id $(AcceptanceTestProcessId)
-            displayName: Stop application
+            displayName: Stop application (Windows)
             condition: and(succeeded(), ne(variables.AcceptanceTestProcessId, ''), eq(variables['Agent.OS'], 'Windows_NT'))
 
-          # Stop SQL Server LocalDB
+          # Stop SQL Server
+          - pwsh: docker stop mssql
+            displayName: Stop SQL Server Docker image (Linux)
+            condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
+
           - pwsh: SqlLocalDB stop MSSQLLocalDB
-            displayName: Stop SQL Server LocalDB
+            displayName: Stop SQL Server LocalDB (Windows)
+            condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))
 
           # Copy artifacts
           - pwsh: |
               if (Test-Path tests/Umbraco.Tests.AcceptanceTest/results/*) {
-                Copy-Item tests/Umbraco.Tests.AcceptanceTest/results $(Build.ArtifactStagingDirectory)
+                Copy-Item tests/Umbraco.Tests.AcceptanceTest/results $(Build.ArtifactStagingDirectory) -Recurse
               }
             displayName: Copy Playwright results
             condition: succeededOrFailed()
