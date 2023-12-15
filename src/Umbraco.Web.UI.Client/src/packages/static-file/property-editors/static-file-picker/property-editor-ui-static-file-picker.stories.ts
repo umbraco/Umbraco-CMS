@@ -2,7 +2,7 @@ import { Meta, Story } from '@storybook/web-components';
 import type { UmbPropertyEditorUIStaticFilePickerElement } from './property-editor-ui-static-file-picker.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
-import './property-editor-ui-document-picker.element.js';
+import './property-editor-ui-static-file-picker.element.js';
 
 export default {
 	title: 'Property Editor UIs/Static File Picker',
