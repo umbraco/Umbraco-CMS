@@ -19,7 +19,6 @@ import type { SetAvatarRequestModel } from '../models/SetAvatarRequestModel';
 import type { UnlockUsersRequestModel } from '../models/UnlockUsersRequestModel';
 import type { UpdateUserGroupsOnUserRequestModel } from '../models/UpdateUserGroupsOnUserRequestModel';
 import type { UpdateUserRequestModel } from '../models/UpdateUserRequestModel';
-import type { UserDataResponseModel } from '../models/UserDataResponseModel';
 import type { UserItemResponseModel } from '../models/UserItemResponseModel';
 import type { UserOrderModel } from '../models/UserOrderModel';
 import type { UserPermissionsResponseModel } from '../models/UserPermissionsResponseModel';
@@ -49,6 +48,7 @@ export class UserResource {
             mediaType: 'application/json',
             errors: {
                 400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }
@@ -69,6 +69,8 @@ export class UserResource {
             mediaType: 'application/json',
             errors: {
                 400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
             },
         });
     }
@@ -91,6 +93,9 @@ export class UserResource {
                 'skip': skip,
                 'take': take,
             },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -110,6 +115,8 @@ export class UserResource {
                 'id': id,
             },
             errors: {
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
                 404: `Not Found`,
             },
         });
@@ -129,6 +136,10 @@ export class UserResource {
             url: '/umbraco/management/api/v1/user/{id}',
             path: {
                 'id': id,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
             },
         });
     }
@@ -152,6 +163,9 @@ export class UserResource {
             },
             body: requestBody,
             mediaType: 'application/json',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -169,6 +183,10 @@ export class UserResource {
             url: '/umbraco/management/api/v1/user/avatar/{id}',
             path: {
                 'id': id,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
             },
         });
     }
@@ -194,6 +212,8 @@ export class UserResource {
             mediaType: 'application/json',
             errors: {
                 400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
             },
         });
     }
@@ -217,6 +237,9 @@ export class UserResource {
             },
             body: requestBody,
             mediaType: 'application/json',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -228,6 +251,10 @@ export class UserResource {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/user/current',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
+            },
         });
     }
 
@@ -245,6 +272,10 @@ export class UserResource {
             url: '/umbraco/management/api/v1/user/current/avatar',
             body: requestBody,
             mediaType: 'application/json',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
+            },
         });
     }
 
@@ -262,17 +293,9 @@ export class UserResource {
             url: '/umbraco/management/api/v1/user/current/change-password',
             body: requestBody,
             mediaType: 'application/json',
-        });
-    }
-
-    /**
-     * @returns any Success
-     * @throws ApiError
-     */
-    public static getUserCurrentData(): CancelablePromise<UserDataResponseModel> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/umbraco/management/api/v1/user/current/data',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -284,6 +307,9 @@ export class UserResource {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/user/current/logins',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -301,6 +327,9 @@ export class UserResource {
             url: '/umbraco/management/api/v1/user/current/permissions',
             query: {
                 'id': id,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }
@@ -320,6 +349,9 @@ export class UserResource {
             query: {
                 'id': id,
             },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -337,6 +369,9 @@ export class UserResource {
             url: '/umbraco/management/api/v1/user/current/permissions/media',
             query: {
                 'id': id,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }
@@ -357,6 +392,8 @@ export class UserResource {
             mediaType: 'application/json',
             errors: {
                 400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
             },
         });
     }
@@ -377,6 +414,8 @@ export class UserResource {
             mediaType: 'application/json',
             errors: {
                 400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
             },
         });
     }
@@ -414,6 +453,9 @@ export class UserResource {
                 'userStates': userStates,
                 'filter': filter,
             },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -432,6 +474,9 @@ export class UserResource {
             body: requestBody,
             mediaType: 'application/json',
             responseHeader: 'Location',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -450,6 +495,7 @@ export class UserResource {
             body: requestBody,
             mediaType: 'application/json',
             errors: {
+                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
         });
@@ -471,6 +517,7 @@ export class UserResource {
             mediaType: 'application/json',
             errors: {
                 400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }
@@ -490,6 +537,7 @@ export class UserResource {
             body: requestBody,
             mediaType: 'application/json',
             errors: {
+                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
         });
@@ -510,6 +558,9 @@ export class UserResource {
             query: {
                 'id': id,
             },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -527,6 +578,10 @@ export class UserResource {
             url: '/umbraco/management/api/v1/user/set-user-groups',
             body: requestBody,
             mediaType: 'application/json',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
+            },
         });
     }
 
@@ -546,6 +601,8 @@ export class UserResource {
             mediaType: 'application/json',
             errors: {
                 400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
             },
         });
     }
