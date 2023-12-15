@@ -1,4 +1,5 @@
 **/*
 !tests/Umbraco.Tests.AcceptanceTest.UmbracoProject/bin/**
+!tests/Umbraco.Tests.AcceptanceTest.UmbracoProject/obj/**
 !tests/Umbraco.Tests.Integration/bin/**
 !tests/Umbraco.Tests.UnitTests/bin/**
