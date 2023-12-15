@@ -86,7 +86,7 @@ export abstract class UmbDetailRepositoryBase<DetailModelType extends { unique: 
 			this.#notificationContext!.peek('positive', notification);
 		}
 
-		return { error };
+		return { data: createdData, error };
 	}
 
 	/**

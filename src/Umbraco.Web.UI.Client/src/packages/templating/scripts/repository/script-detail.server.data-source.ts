@@ -89,9 +89,11 @@ export class UmbScriptDetailServerDataSource implements UmbDetailDataSource<UmbS
 	async update(data: UmbScriptDetailModel) {
 		if (!data.unique) throw new Error('Unique is missing');
 
+		const existingPath = this.#serverPathUniqueSerializer.toServerPath(data.unique);
+
 		// TODO: make data mapper to prevent errors
 		const requestBody: UpdateTextFileViewModelBaseModel = {
-			existingPath: this.#serverPathUniqueSerializer.toServerPath(data.unique),
+			existingPath,
 			name: data.name,
 			content: data.content,
 		};
@@ -107,17 +109,23 @@ export class UmbScriptDetailServerDataSource implements UmbDetailDataSource<UmbS
 			return { error };
 		}
 
+		// TODO: should we get this as part of the PUT response?
+		const parentPath = this.#serverPathUniqueSerializer.toServerPath(data.parentUnique);
+		const newFilePath = parentPath + '/' + requestBody.name;
+		const newPathUnique = this.#serverPathUniqueSerializer.toUnique(newFilePath);
 		// We have to fetch the data type again. The server can have modified the data after update
-		return this.read(data.unique);
+		return this.read(newPathUnique);
 	}
 
 	async delete(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
+		const path = this.#serverPathUniqueSerializer.toServerPath(unique);
+
 		return tryExecuteAndNotify(
 			this.#host,
 			ScriptResource.deleteScript({
-				path: this.#serverPathUniqueSerializer.toServerPath(unique),
+				path,
 			}),
 		);
 	}
