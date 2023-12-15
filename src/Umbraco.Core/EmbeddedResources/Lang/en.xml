@@ -1504,6 +1504,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="queryStepTypes">That matches types: </key>
     <key alias="noValidStartNodeTitle">No matching content</key>
     <key alias="noValidStartNodeDesc">The configuration of this property does not match any content. Create the missing content or contact your administrator to adjust the Dynamic Root settings for this property.</key>
+    <key alias="cancelAndClearQuery">Cancel and clear query</key>
   </area>
   <area alias="mediaPicker">
     <key alias="deletedItem">Deleted item</key>
