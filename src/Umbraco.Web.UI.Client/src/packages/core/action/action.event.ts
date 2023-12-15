@@ -5,8 +5,8 @@ export class UmbControllerEvent extends Event {
 }
 
 export interface UmbActionEventArgs {
-	entityType: string;
 	unique: string;
+	parentUnique: string | null; // TODO: remove this when we have endpoints to support mapping a new item without reloading the parent tree item
 }
 
 export class UmbActionEvent extends UmbControllerEvent {
@@ -17,11 +17,11 @@ export class UmbActionEvent extends UmbControllerEvent {
 		this.#args = args;
 	}
 
-	getEntityType(): string {
-		return this.#args.entityType;
+	getUnique(): string {
+		return this.#args.unique;
 	}
 
-	getUnique(): string {
+	getParentUnique(): string {
 		return this.#args.unique;
 	}
 }
