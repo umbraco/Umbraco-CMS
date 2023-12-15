@@ -439,6 +439,12 @@ stages:
               artifact: nupkg
               path: $(Agent.BuildDirectory)/app/nupkg
 
+          - task: DownloadPipelineArtifact@2
+            displayName: Download build artifacts
+            inputs:
+              artifact: build_output
+              path: $(Build.SourcesDirectory)
+
           - task: NodeTool@0
             displayName: Use Node.js $(nodeVersion)
             retryCountOnTaskFailure: 3
@@ -568,6 +574,12 @@ stages:
             inputs:
               artifact: nupkg
               path: $(Agent.BuildDirectory)/app/nupkg
+
+          - task: DownloadPipelineArtifact@2
+            displayName: Download build artifacts
+            inputs:
+              artifact: build_output
+              path: $(Build.SourcesDirectory)
 
           - task: NodeTool@0
             displayName: Use Node.js $(nodeVersion)
