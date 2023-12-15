@@ -66,6 +66,14 @@ export class UmbTreeElement extends UmbLitElement {
 		this.#treeContext.selectableFilter = newVal;
 	}
 
+	@property()
+	get filter() {
+		return this.#treeContext.filter;
+	}
+	set filter(newVal) {
+		this.#treeContext.filter = newVal;
+	}
+
 	@state()
 	private _items: UmbTreeItemModelBase[] = [];
 
