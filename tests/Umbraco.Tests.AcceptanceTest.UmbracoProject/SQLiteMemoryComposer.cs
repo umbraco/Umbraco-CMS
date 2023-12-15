@@ -4,7 +4,12 @@ using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Extensions;
 
-internal sealed class SQLiteMemoryComposer : IComposer
+namespace Umbraco.Tests.AcceptanceTest.UmbracoProject;
+
+/// <summary>
+/// Ensures a SQLite in-memory database is persisted for the whole application duration.
+/// </summary>
+public sealed class SQLiteMemoryComposer : IComposer
 {
     public void Compose(IUmbracoBuilder builder)
     {

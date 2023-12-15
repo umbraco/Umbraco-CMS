@@ -8,7 +8,12 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Extensions;
 
-internal sealed class SqlServerDelayedDurabilityComposer : IComposer
+namespace Umbraco.Tests.AcceptanceTest.UmbracoProject;
+
+/// <summary>
+/// Disable waiting on log IO to finish when commiting a transaction (we can tolerate some data loss) on SQL Server.
+/// </summary>
+public sealed class SqlServerDelayedDurabilityComposer : IComposer
 {
     public void Compose(IUmbracoBuilder builder)
     {
