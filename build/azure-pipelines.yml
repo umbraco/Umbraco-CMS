@@ -532,7 +532,7 @@ stages:
           # Copy artifacts
           - pwsh: |
               if (Test-Path tests/Umbraco.Tests.AcceptanceTest/results/*) {
-                Copy-Item tests/Umbraco.Tests.AcceptanceTest/results $(Build.ArtifactStagingDirectory)
+                Copy-Item tests/Umbraco.Tests.AcceptanceTest/results $(Build.ArtifactStagingDirectory) -Recurse
               }
             displayName: Copy Playwright results
             condition: succeededOrFailed()
