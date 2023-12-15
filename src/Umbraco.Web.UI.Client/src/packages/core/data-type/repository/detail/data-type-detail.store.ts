@@ -2,6 +2,7 @@ import { UmbDataTypeDetailModel } from '../../types.js';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbDetailStoreBase } from '@umbraco-cms/backoffice/store';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UMB_ACTION_EVENT_CONTEXT, type UmbActionEventContext } from '@umbraco-cms/backoffice/action';
 
 /**
  * @export
@@ -10,6 +11,8 @@ import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api
  * @description - Data Store for Data Type Details
  */
 export class UmbDataTypeDetailStore extends UmbDetailStoreBase<UmbDataTypeDetailModel> {
+	#actionEventContext?: UmbActionEventContext;
+
 	/**
 	 * Creates an instance of UmbDataTypeDetailStore.
 	 * @param {UmbControllerHostElement} host
@@ -17,6 +20,23 @@ export class UmbDataTypeDetailStore extends UmbDetailStoreBase<UmbDataTypeDetail
 	 */
 	constructor(host: UmbControllerHostElement) {
 		super(host, UMB_DATA_TYPE_DETAIL_STORE_CONTEXT.toString());
+
+		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (context) => {
+			this.#actionEventContext = context;
+			this.#listen();
+		});
+	}
+
+	#listen() {
+		this.#actionEventContext!.addEventListener('save-success', (event) => {
+			console.log('event', event);
+			debugger;
+		});
+
+		this.#actionEventContext!.addEventListener('save-error', (event) => {
+			console.log('event', event);
+			debugger;
+		});
 	}
 
 	withPropertyEditorUiAlias(propertyEditorUiAlias: string) {
