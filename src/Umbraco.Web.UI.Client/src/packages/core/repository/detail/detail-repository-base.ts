@@ -7,7 +7,9 @@ import { UmbDetailStore } from '@umbraco-cms/backoffice/store';
 import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import { UMB_ACTION_EVENT_CONTEXT, UmbActionEvent, type UmbActionEventContext } from '@umbraco-cms/backoffice/action';
 
-export abstract class UmbDetailRepositoryBase<DetailModelType extends { unique: string; entityType: string }>
+export abstract class UmbDetailRepositoryBase<
+		DetailModelType extends { unique: string; entityType: string; parentUnique: string | null },
+	>
 	extends UmbRepositoryBase
 	implements UmbApi
 {
@@ -82,7 +84,7 @@ export abstract class UmbDetailRepositoryBase<DetailModelType extends { unique: 
 		if (!data) throw new Error('Data is missing');
 		await this.#init;
 
-		const eventData = { entityType: data.entityType, unique: data.unique };
+		const eventData = { unique: data.unique, parentUnique: data.parentUnique };
 		this.#actionEventContext?.dispatchEvent(new UmbActionEvent('create-request', eventData));
 
 		const { data: createdData, error } = await this.#detailSource.create(data);
@@ -115,7 +117,7 @@ export abstract class UmbDetailRepositoryBase<DetailModelType extends { unique: 
 		if (!data.unique) throw new Error('Unique is missing');
 		await this.#init;
 
-		const eventData = { entityType: data.entityType, unique: data.unique };
+		const eventData = { unique: data.unique, parentUnique: data.parentUnique };
 		this.#actionEventContext?.dispatchEvent(new UmbActionEvent('save-request', eventData));
 
 		const { data: updatedData, error } = await this.#detailSource.update(data);
@@ -147,6 +149,9 @@ export abstract class UmbDetailRepositoryBase<DetailModelType extends { unique: 
 		if (!unique) throw new Error('Unique is missing');
 		await this.#init;
 
+		const eventData = { unique, parentUnique: null };
+		this.#actionEventContext?.dispatchEvent(new UmbActionEvent('delete-request', eventData));
+
 		const { error } = await this.#detailSource.delete(unique);
 
 		if (!error) {
@@ -155,6 +160,12 @@ export abstract class UmbDetailRepositoryBase<DetailModelType extends { unique: 
 			// TODO: how do we handle generic notifications? Is this the correct place to do it?
 			const notification = { data: { message: `Deleted` } };
 			this.#notificationContext!.peek('positive', notification);
+
+			this.#actionEventContext?.dispatchEvent(new UmbActionEvent('delete-success', eventData));
+		}
+
+		if (error) {
+			this.#actionEventContext?.dispatchEvent(new UmbActionEvent('delete-error', eventData));
 		}
 
 		return { error };
