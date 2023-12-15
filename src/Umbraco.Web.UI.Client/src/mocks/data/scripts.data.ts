@@ -115,6 +115,14 @@ export const data: Array<ScriptsDataItem> = [
 
 		console.log(employee);`,
 	},
+	{
+		path: 'very important folder/file-with-dash.js',
+		isFolder: false,
+		name: 'file-with-dash.js',
+		type: 'script',
+		hasChildren: false,
+		content: `alert('hello file with dash');`,
+	},
 ];
 
 class UmbScriptsData extends UmbData<ScriptsDataItem> {
