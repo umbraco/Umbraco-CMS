@@ -16,6 +16,7 @@ import { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
 import { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UmbExtensionsApiInitializer, type UmbEntryPointOnInit } from '@umbraco-cms/backoffice/extension-api';
 import type { ManifestTypes, UmbBackofficeManifestKind } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbActionEventContext } from './action/action-event.context.js';
 
 export * from './collection/index.js';
 export * from './localization/index.js';
@@ -74,4 +75,5 @@ export const onInit: UmbEntryPointOnInit = (host, extensionRegistry) => {
 
 	new UmbNotificationContext(host);
 	new UmbModalManagerContext(host);
+	new UmbActionEventContext(host);
 };
