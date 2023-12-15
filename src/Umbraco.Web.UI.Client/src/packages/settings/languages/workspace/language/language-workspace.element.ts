@@ -1,4 +1,5 @@
 import { UmbLanguageWorkspaceContext } from './language-workspace.context.js';
+import { UmbLanguageWorkspaceEditorElement } from './language-workspace-editor.element.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
@@ -8,25 +9,13 @@ import { UmbWorkspaceIsNewRedirectController } from '@umbraco-cms/backoffice/wor
 @customElement('umb-language-workspace')
 export class UmbLanguageWorkspaceElement extends UmbLitElement {
 	#languageWorkspaceContext = new UmbLanguageWorkspaceContext(this);
-
-	/**
-	 * Workspace editor element, lazy loaded but shared across several user flows.
-	 */
-	#editorElement?: HTMLElement;
-
-	#getComponentElement = async () => {
-		if (this.#editorElement) {
-			return this.#editorElement;
-		}
-		this.#editorElement = new (await import('./language-workspace-editor.element.js')).default();
-		return this.#editorElement;
-	};
+	#createElement = () => new UmbLanguageWorkspaceEditorElement();
 
 	@state()
 	_routes: UmbRoute[] = [
 		{
 			path: 'edit/:isoCode',
-			component: this.#getComponentElement,
+			component: this.#createElement,
 			setup: (_component, info) => {
 				this.removeControllerByAlias('_observeIsNew');
 				this.#languageWorkspaceContext.load(info.match.params.isoCode);
@@ -34,7 +23,7 @@ export class UmbLanguageWorkspaceElement extends UmbLitElement {
 		},
 		{
 			path: 'create',
-			component: this.#getComponentElement,
+			component: this.#createElement,
 			setup: async () => {
 				this.#languageWorkspaceContext.create();
 

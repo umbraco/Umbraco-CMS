@@ -9,13 +9,13 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 export class UmbMemberTypeWorkspaceElement extends UmbLitElement {
 	public readonly workspaceAlias = 'Umb.Workspace.MemberType';
 	#workspaceContext = new UmbMemberTypeWorkspaceContext(this);
-	#element = new UmbMemberTypeWorkspaceEditorElement();
+	#createElement = () => new UmbMemberTypeWorkspaceEditorElement();
 
 	@state()
 	_routes: UmbRoute[] = [
 		{
 			path: 'edit/:id',
-			component: () => this.#element,
+			component: this.#createElement,
 			setup: (_component, info) => {
 				const id = info.match.params.id;
 				this.#workspaceContext.load(id);

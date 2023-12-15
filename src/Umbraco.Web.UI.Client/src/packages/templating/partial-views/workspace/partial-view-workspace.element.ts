@@ -1,10 +1,10 @@
 import { UmbPartialViewWorkspaceContext } from './partial-view-workspace.context.js';
+import { UmbPartialViewWorkspaceEditElement } from './partial-view-workspace-edit.element.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbRoute, IRoutingInfo, PageComponent } from '@umbraco-cms/backoffice/router';
 
-import './partial-view-workspace-edit.element.js';
 import '../../components/insert-menu/templating-insert-menu.element.js';
 
 import { UmbWorkspaceIsNewRedirectController } from '@umbraco-cms/backoffice/workspace';
@@ -13,13 +13,13 @@ import { UmbWorkspaceIsNewRedirectController } from '@umbraco-cms/backoffice/wor
 export class UmbPartialViewWorkspaceElement extends UmbLitElement {
 	#partialViewWorkspaceContext = new UmbPartialViewWorkspaceContext(this);
 
-	#element = document.createElement('umb-partial-view-workspace-edit');
+	#createElement = () => new UmbPartialViewWorkspaceEditElement();
 
 	@state()
 	_routes: UmbRoute[] = [
 		{
 			path: 'create/:parentKey/:snippetName',
-			component: () => this.#element,
+			component: this.#createElement,
 			setup: async (component: PageComponent, info: IRoutingInfo) => {
 				const parentKey = info.match.params.parentKey;
 				const decodePath = decodeURIComponent(parentKey);
@@ -35,7 +35,7 @@ export class UmbPartialViewWorkspaceElement extends UmbLitElement {
 		},
 		{
 			path: 'edit/:key',
-			component: () => this.#element,
+			component: this.#createElement,
 			setup: (component: PageComponent, info: IRoutingInfo) => {
 				const key = info.match.params.key;
 				const decodePath = decodeURIComponent(key).replace('-cshtml', '.cshtml');
