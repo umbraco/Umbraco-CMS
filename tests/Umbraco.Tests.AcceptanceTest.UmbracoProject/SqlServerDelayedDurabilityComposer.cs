@@ -8,7 +8,7 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Extensions;
 
-namespace Umbraco.Tests.AcceptanceTest.UmbracoProject;
+namespace UmbracoProject;
 
 /// <summary>
 /// Disable waiting on log IO to finish when commiting a transaction (we can tolerate some data loss) on SQL Server.

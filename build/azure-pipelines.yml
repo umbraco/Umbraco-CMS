@@ -439,12 +439,6 @@ stages:
               artifact: nupkg
               path: $(Agent.BuildDirectory)/app/nupkg
 
-          - task: DownloadPipelineArtifact@2
-            displayName: Download build artifacts
-            inputs:
-              artifact: build_output
-              path: $(Build.SourcesDirectory)
-
           - task: NodeTool@0
             displayName: Use Node.js $(nodeVersion)
             retryCountOnTaskFailure: 3
@@ -485,8 +479,8 @@ stages:
               dotnet new install Umbraco.Templates::$cmsVersion
               dotnet new umbraco --name UmbracoProject --version $cmsVersion --exclude-gitignore --no-restore --no-update-check
               dotnet restore UmbracoProject
-              dotnet add UmbracoProject reference $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest.UmbracoProject
-              dotnet build UmbracoProject --configuration $(buildConfiguration) --no-restore --property:BuildProjectReferences=false
+              cp $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest.UmbracoProject/*.cs UmbracoProject
+              dotnet build UmbracoProject --configuration $(buildConfiguration) --no-restore
               dotnet dev-certs https
             displayName: Build application
             workingDirectory: $(Agent.BuildDirectory)/app
@@ -575,12 +569,6 @@ stages:
               artifact: nupkg
               path: $(Agent.BuildDirectory)/app/nupkg
 
-          - task: DownloadPipelineArtifact@2
-            displayName: Download build artifacts
-            inputs:
-              artifact: build_output
-              path: $(Build.SourcesDirectory)
-
           - task: NodeTool@0
             displayName: Use Node.js $(nodeVersion)
             inputs:
@@ -620,8 +608,8 @@ stages:
               dotnet new install Umbraco.Templates::$cmsVersion
               dotnet new umbraco --name UmbracoProject --version $cmsVersion --exclude-gitignore --no-restore --no-update-check
               dotnet restore UmbracoProject
-              dotnet add UmbracoProject reference $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest.UmbracoProject
-              dotnet build UmbracoProject --configuration $(buildConfiguration) --no-restore --property:BuildProjectReferences=false
+              cp $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest.UmbracoProject/*.cs UmbracoProject
+              dotnet build UmbracoProject --configuration $(buildConfiguration) --no-restore
               dotnet dev-certs https
             displayName: Build application
             workingDirectory: $(Agent.BuildDirectory)/app

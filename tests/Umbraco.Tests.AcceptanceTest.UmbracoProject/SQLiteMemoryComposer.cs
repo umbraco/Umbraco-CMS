@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Extensions;
 
-namespace Umbraco.Tests.AcceptanceTest.UmbracoProject;
+namespace UmbracoProject;
 
 /// <summary>
 /// Ensures a SQLite in-memory database is persisted for the whole application duration.
