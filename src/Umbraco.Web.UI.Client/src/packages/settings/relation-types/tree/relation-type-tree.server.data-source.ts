@@ -1,7 +1,7 @@
-import type { UmbTreeDataSource } from '@umbraco-cms/backoffice/tree';
+import { UmbRelationTypeTreeItemModel } from './types.js';
 import { EntityTreeItemResponseModel, RelationTypeResource } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
 
 /**
  * A data source for the Relation Type tree that fetches data from the server
@@ -9,45 +9,43 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
  * @class UmbRelationTypeTreeServerDataSource
  * @implements {UmbTreeDataSource}
  */
-export class UmbRelationTypeTreeServerDataSource implements UmbTreeDataSource<EntityTreeItemResponseModel> {
-	#host: UmbControllerHost;
-
+export class UmbRelationTypeTreeServerDataSource extends UmbTreeServerDataSourceBase<
+	EntityTreeItemResponseModel,
+	UmbRelationTypeTreeItemModel
+> {
 	/**
 	 * Creates an instance of UmbRelationTypeTreeServerDataSource.
 	 * @param {UmbControllerHost} host
 	 * @memberof UmbRelationTypeTreeServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
-		this.#host = host;
-	}
-
-	/**
-	 * Fetches the root items for the tree from the server
-	 * @return {*}
-	 * @memberof UmbRelationTypeTreeServerDataSource
-	 */
-	async getRootItems() {
-		return tryExecuteAndNotify(this.#host, RelationTypeResource.getTreeRelationTypeRoot({}));
-	}
-
-	/**
-	 * Fetches the children of a given parent id from the server
-	 * @param {(string)} parentId
-	 * @return {*}
-	 * @memberof UmbRelationTypeTreeServerDataSource
-	 */
-	async getChildrenOf(parentId: string | null): Promise<any> {
-		/* TODO: should we make getRootItems() internal
-		so it only is a server concern that there are two endpoints? */
-		if (parentId === null) {
-			return this.getRootItems();
-		} else {
-			throw new Error('Not supported for the relation type tree');
-		}
-	}
-
-	// TODO: remove when interface is cleaned up
-	async getItems(unique: Array<string>): Promise<any> {
-		throw new Error('Dot not use this method. Use the item source instead');
+		super(host, {
+			getRootItems,
+			getChildrenOf,
+			mapper,
+		});
 	}
 }
+
+// eslint-disable-next-line local-rules/no-direct-api-import
+const getRootItems = () => RelationTypeResource.getTreeRelationTypeRoot({});
+
+const getChildrenOf = (parentUnique: string | null) => {
+	if (parentUnique === null) {
+		return getRootItems();
+	} else {
+		throw new Error('Not supported for the relation type tree');
+	}
+};
+
+const mapper = (item: EntityTreeItemResponseModel): UmbRelationTypeTreeItemModel => {
+	return {
+		id: item.id,
+		parentId: item.parentId || null,
+		name: item.name,
+		entityType: 'relation-type',
+		hasChildren: item.hasChildren,
+		isContainer: item.isContainer,
+		isFolder: false,
+	};
+};

@@ -1,6 +1,6 @@
 import { UmbTreeContextBase } from './tree.context.js';
+import { UmbTreeItemModelBase } from './types.js';
 import { html, nothing, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
-import { TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
@@ -19,27 +19,27 @@ export class UmbTreeElement extends UmbLitElement {
 
 	@property({ type: Boolean, reflect: true })
 	get selectable() {
-		return this.#treeContext.getSelectable();
+		return this.#treeContext.selection.getSelectable();
 	}
 	set selectable(newVal) {
-		this.#treeContext.setSelectable(newVal);
+		this.#treeContext.selection.setSelectable(newVal);
 	}
 
 	@property({ type: Array })
 	get selection() {
-		return this.#treeContext.getSelection();
+		return this.#treeContext.selection.getSelection();
 	}
 	set selection(newVal) {
 		if (!Array.isArray(newVal)) return;
-		this.#treeContext?.setSelection(newVal);
+		this.#treeContext?.selection.setSelection(newVal);
 	}
 
 	@property({ type: Boolean, reflect: true })
 	get multiple() {
-		return this.#treeContext.getMultiple();
+		return this.#treeContext.selection.getMultiple();
 	}
 	set multiple(newVal) {
-		this.#treeContext.setMultiple(newVal);
+		this.#treeContext.selection.setMultiple(newVal);
 	}
 
 	// TODO: what is the best name for this functionality?
@@ -67,14 +67,14 @@ export class UmbTreeElement extends UmbLitElement {
 	}
 
 	@state()
-	private _items: TreeItemPresentationModel[] = [];
+	private _items: UmbTreeItemModelBase[] = [];
 
 	@state()
-	private _treeRoot?: TreeItemPresentationModel;
+	private _treeRoot?: UmbTreeItemModelBase;
 
-	#treeContext = new UmbTreeContextBase<TreeItemPresentationModel>(this);
+	#treeContext = new UmbTreeContextBase<UmbTreeItemModelBase>(this);
 
-	#rootItemsObserver?: UmbObserverController<Array<TreeItemPresentationModel>>;
+	#rootItemsObserver?: UmbObserverController<Array<UmbTreeItemModelBase>>;
 
 	constructor() {
 		super();

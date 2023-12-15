@@ -4,7 +4,7 @@ import { umbDataTypeData } from '../../../../../../../mocks/data/data-type.data.
 import { html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbDataTypeDetailModel } from '@umbraco-cms/backoffice/data-type';
 
-const dataTypeData = umbDataTypeData.getById('dt-richTextEditor') as UmbDataTypeDetailModel;
+const dataTypeData = umbDataTypeData.getById('dt-richTextEditor') as unknown as UmbDataTypeDetailModel;
 
 export default {
 	title: 'Property Editor UIs/Tiny Mce Dimensions Configuration',

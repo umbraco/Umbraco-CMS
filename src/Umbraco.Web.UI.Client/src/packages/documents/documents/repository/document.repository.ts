@@ -1,6 +1,6 @@
+import { UmbDocumentTreeStore, UMB_DOCUMENT_TREE_STORE_CONTEXT } from '../tree/document-tree.store.js';
 import { UmbDocumentServerDataSource } from './sources/document.server.data.js';
 import { UmbDocumentStore, UMB_DOCUMENT_STORE_CONTEXT_TOKEN } from './document.store.js';
-import { UmbDocumentTreeStore, UMB_DOCUMENT_TREE_STORE_CONTEXT_TOKEN } from './document.tree.store.js';
 import { UMB_DOCUMENT_ITEM_STORE_CONTEXT_TOKEN, type UmbDocumentItemStore } from './document-item.store.js';
 import { UmbDocumentItemServerDataSource } from './sources/document-item.server.data.js';
 import type { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
@@ -41,7 +41,7 @@ export class UmbDocumentRepository
 		this.#itemSource = new UmbDocumentItemServerDataSource(this);
 
 		this.#init = Promise.all([
-			this.consumeContext(UMB_DOCUMENT_TREE_STORE_CONTEXT_TOKEN, (instance) => {
+			this.consumeContext(UMB_DOCUMENT_TREE_STORE_CONTEXT, (instance) => {
 				this.#treeStore = instance;
 			}).asPromise(),
 

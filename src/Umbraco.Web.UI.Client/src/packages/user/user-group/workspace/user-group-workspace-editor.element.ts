@@ -103,15 +103,15 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 		return html`
 			<uui-box>
 				<div slot="headline"><umb-localize key="user_assignAccess"></umb-localize></div>
-				<umb-workspace-property-layout
+				<umb-property-layout
 					label=${this.localize.term('main_sections')}
 					description=${this.localize.term('user_sectionsHelp')}>
 					<umb-input-section
 						slot="editor"
 						.value=${this._userGroup.sections ?? []}
 						@change=${this.#onSectionsChange}></umb-input-section>
-				</umb-workspace-property-layout>
-				<umb-workspace-property-layout
+				</umb-property-layout>
+				<umb-property-layout
 					label=${this.localize.term('defaultdialogs_selectContentStartNode')}
 					description=${this.localize.term('user_startnodehelp')}>
 					<umb-input-document
@@ -119,8 +119,8 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 						max="1"
 						.selectedIds=${this._userGroup.documentStartNodeId ? [this._userGroup.documentStartNodeId] : []}
 						@change=${this.#onDocumentStartNodeChange}></umb-input-document>
-				</umb-workspace-property-layout>
-				<umb-workspace-property-layout
+				</umb-property-layout>
+				<umb-property-layout
 					label=${this.localize.term('defaultdialogs_selectMediaStartNode')}
 					description=${this.localize.term('user_mediastartnodehelp')}>
 					<umb-input-media
@@ -128,7 +128,7 @@ export class UmbUserGroupWorkspaceEditorElement extends UmbLitElement {
 						max="1"
 						.selectedIds=${this._userGroup.mediaStartNodeId ? [this._userGroup.mediaStartNodeId] : []}
 						@change=${this.#onMediaStartNodeChange}></umb-input-media>
-				</umb-workspace-property-layout>
+				</umb-property-layout>
 			</uui-box>
 
 			<uui-box>

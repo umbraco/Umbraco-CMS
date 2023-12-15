@@ -7,8 +7,8 @@ import type { TemplateQueryOperatorModel } from './TemplateQueryOperatorModel';
 import type { TemplateQueryPropertyPresentationModel } from './TemplateQueryPropertyPresentationModel';
 
 export type TemplateQuerySettingsResponseModel = {
-    contentTypeAliases?: Array<string>;
-    properties?: Array<TemplateQueryPropertyPresentationModel>;
-    operators?: Array<TemplateQueryOperatorModel>;
+    contentTypeAliases: Array<string>;
+    properties: Array<TemplateQueryPropertyPresentationModel>;
+    operators: Array<TemplateQueryOperatorModel>;
 };
 

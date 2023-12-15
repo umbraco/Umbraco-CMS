@@ -4,7 +4,7 @@
 /* eslint-disable */
 
 export type CreateUserResponseModel = {
-    userId?: string;
+    userId: string;
     initialPassword?: string | null;
 };
 

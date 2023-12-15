@@ -1,27 +1,18 @@
 import { UmbScriptTreeRepository } from '../tree/index.js';
 import { UmbScriptServerDataSource } from './sources/script-detail.server.data.js';
-import { ScriptGetFolderResponse, UmbScriptFolderServerDataSource } from './sources/script-folder.server.data.js';
-import {
-	DataSourceResponse,
-	UmbDataSourceErrorResponse,
-	UmbDetailRepository,
-	UmbFolderRepository,
-} from '@umbraco-cms/backoffice/repository';
+import { UmbScriptFolderServerDataSource } from './sources/script-folder.server.data.js';
+import { UmbDetailRepository, UmbFolderRepository } from '@umbraco-cms/backoffice/repository';
 import {
 	CreateFolderRequestModel,
 	CreateScriptRequestModel,
-	FileItemResponseModelBaseModel,
-	FolderModelBaseModel,
 	FolderResponseModel,
-	ProblemDetails,
 	ScriptResponseModel,
-	TextFileResponseModelBaseModel,
 	UpdateScriptRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
+import { UmbId } from '@umbraco-cms/backoffice/id';
 
 export class UmbScriptRepository
 	extends UmbBaseController
@@ -44,18 +35,16 @@ export class UmbScriptRepository
 	}
 
 	//#region FOLDER
-	createFolderScaffold(
-		parentId: string | null,
-	): Promise<{ data?: FolderResponseModel | undefined; error?: ProblemDetails | undefined }> {
+	createFolderScaffold(parentId: string | null) {
 		const data: FolderResponseModel = {
+			id: UmbId.new(),
 			name: '',
 			parentId,
 		};
 		return Promise.resolve({ data, error: undefined });
 	}
-	async createFolder(
-		requestBody: CreateFolderRequestModel,
-	): Promise<{ data?: string | undefined; error?: ProblemDetails | undefined }> {
+
+	async createFolder(requestBody: CreateFolderRequestModel) {
 		const req = {
 			parentPath: requestBody.parentId,
 			name: requestBody.name,
@@ -65,18 +54,16 @@ export class UmbScriptRepository
 		this.#treeRepository.requestTreeItemsOf(requestBody.parentId ? requestBody.parentId : null);
 		return promise;
 	}
-	async requestFolder(
-		unique: string,
-	): Promise<{ data?: ScriptGetFolderResponse | undefined; error?: ProblemDetails | undefined }> {
+
+	async requestFolder(unique: string) {
 		return this.#folderDataSource.read(unique);
 	}
-	updateFolder(
-		unique: string,
-		folder: FolderModelBaseModel,
-	): Promise<{ data?: FolderModelBaseModel | undefined; error?: ProblemDetails | undefined }> {
+
+	updateFolder(): any {
 		throw new Error('Method not implemented.');
 	}
-	async deleteFolder(path: string): Promise<{ error?: ProblemDetails | undefined }> {
+
+	async deleteFolder(path: string) {
 		const { data } = await this.requestFolder(path);
 		const promise = this.#folderDataSource.delete(path);
 		await promise;
@@ -92,33 +79,37 @@ export class UmbScriptRepository
 		return { data, error };
 	}
 
-	requestById(id: string): Promise<DataSourceResponse<any>> {
-		throw new Error('Method not implemented.');
-	}
-	byId(id: string): Promise<Observable<any>> {
+	requestById(): any {
 		throw new Error('Method not implemented.');
 	}
 
-	createScaffold(parentId: string | null, preset: string): Promise<DataSourceResponse<TextFileResponseModelBaseModel>> {
+	byId(): any {
+		throw new Error('Method not implemented.');
+	}
+
+	createScaffold(parentId: string | null, preset: string) {
 		return this.#detailDataSource.createScaffold(parentId, preset);
 	}
-	async create(data: CreateScriptRequestModel): Promise<DataSourceResponse<any>> {
+
+	async create(data: CreateScriptRequestModel) {
 		const promise = this.#detailDataSource.create(data);
 		await promise;
 		this.#treeRepository.requestTreeItemsOf(data.parentPath ? data.parentPath : null);
 		return promise;
 	}
-	save(id: string, requestBody: UpdateScriptRequestModel): Promise<UmbDataSourceErrorResponse> {
+
+	save(id: string, requestBody: UpdateScriptRequestModel) {
 		return this.#detailDataSource.update(id, requestBody);
 	}
-	async delete(id: string): Promise<UmbDataSourceErrorResponse> {
+
+	async delete(id: string) {
 		const promise = this.#detailDataSource.delete(id);
 		const parentPath = id.substring(0, id.lastIndexOf('/'));
 		this.#treeRepository.requestTreeItemsOf(parentPath ? parentPath : null);
 		return promise;
 	}
 
-	requestItems(keys: Array<string>): Promise<DataSourceResponse<FileItemResponseModelBaseModel[]>> {
+	requestItems(keys: Array<string>) {
 		return this.#detailDataSource.getItems(keys);
 	}
 

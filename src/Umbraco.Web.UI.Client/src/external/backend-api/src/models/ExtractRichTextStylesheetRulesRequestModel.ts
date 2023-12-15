@@ -4,6 +4,6 @@
 /* eslint-disable */
 
 export type ExtractRichTextStylesheetRulesRequestModel = {
-    content?: string;
+    content: string;
 };
 

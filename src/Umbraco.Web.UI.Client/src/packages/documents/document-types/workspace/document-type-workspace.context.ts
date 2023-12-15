@@ -77,11 +77,11 @@ export class UmbDocumentTypeWorkspaceContext
 	}
 
 	getData() {
-		return this.structure.getOwnerContentType() || {};
+		return this.structure.getOwnerContentType();
 	}
 
 	getEntityId() {
-		return this.getData().id;
+		return this.getData()?.id;
 	}
 
 	getEntityType() {
@@ -154,6 +154,9 @@ export class UmbDocumentTypeWorkspaceContext
 	 * Save or creates the document type, based on wether its a new one or existing.
 	 */
 	async save() {
+		const data = this.getData();
+		if (data === undefined) throw new Error('Cannot save, no data');
+
 		if (this.getIsNew()) {
 			if ((await this.structure.create()) === true) {
 				this.setIsNew(false);
@@ -162,7 +165,7 @@ export class UmbDocumentTypeWorkspaceContext
 			await this.structure.save();
 		}
 
-		this.saveComplete(this.getData());
+		this.saveComplete(data);
 	}
 
 	public destroy(): void {

@@ -1,7 +1,7 @@
-import type { UmbTreeDataSource } from '@umbraco-cms/backoffice/tree';
+import { UmbDocumentRecycleBinTreeItemModel } from './types.js';
 import { DocumentResource, RecycleBinItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
 
 /**
  * A data source for the Document Recycle Bin tree that fetches data from the server
@@ -9,52 +9,46 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
  * @class UmbDocumentRecycleBinTreeServerDataSource
  * @implements {UmbTreeDataSource}
  */
-export class UmbDocumentRecycleBinTreeServerDataSource implements UmbTreeDataSource<RecycleBinItemResponseModel> {
-	#host: UmbControllerHost;
-
+export class UmbDocumentRecycleBinTreeServerDataSource extends UmbTreeServerDataSourceBase<
+	RecycleBinItemResponseModel,
+	UmbDocumentRecycleBinTreeItemModel
+> {
 	/**
 	 * Creates an instance of UmbDocumentRecycleBinTreeServerDataSource.
 	 * @param {UmbControllerHost} host
 	 * @memberof UmbDocumentRecycleBinTreeServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
-		this.#host = host;
-	}
-
-	/**
-	 * Fetches the root items for the tree from the server
-	 * @return {*}
-	 * @memberof UmbDocumentRecycleBinTreeServerDataSource
-	 */
-	async getRootItems() {
-		return tryExecuteAndNotify(this.#host, DocumentResource.getRecycleBinDocumentRoot({}));
-	}
-
-	/**
-	 * Fetches the children of a given parent id from the server
-	 * @param {(string)} parentId
-	 * @return {*}
-	 * @memberof UmbDocumentRecycleBinTreeServerDataSource
-	 */
-	async getChildrenOf(parentId: string | null) {
-		if (parentId === undefined) throw new Error('Parent id is missing');
-
-		/* TODO: should we make getRootItems() internal
-		so it only is a server concern that there are two endpoints? */
-		if (parentId === null) {
-			return this.getRootItems();
-		} else {
-			return tryExecuteAndNotify(
-				this.#host,
-				DocumentResource.getRecycleBinDocumentChildren({
-					parentId,
-				}),
-			);
-		}
-	}
-
-	// TODO: remove when interface is cleaned up
-	async getItems(unique: Array<string>): Promise<any> {
-		throw new Error('Dot not use this method. Use the item source instead');
+		super(host, {
+			getRootItems,
+			getChildrenOf,
+			mapper,
+		});
 	}
 }
+
+// eslint-disable-next-line local-rules/no-direct-api-import
+const getRootItems = () => DocumentResource.getRecycleBinDocumentRoot({});
+
+const getChildrenOf = (parentUnique: string | null) => {
+	if (parentUnique === null) {
+		return getRootItems();
+	} else {
+		// eslint-disable-next-line local-rules/no-direct-api-import
+		return DocumentResource.getRecycleBinDocumentChildren({
+			parentId: parentUnique,
+		});
+	}
+};
+
+const mapper = (item: RecycleBinItemResponseModel): UmbDocumentRecycleBinTreeItemModel => {
+	return {
+		id: item.id,
+		parentId: item.parentId || null,
+		name: item.name,
+		entityType: 'document-recycle-bin',
+		hasChildren: item.hasChildren,
+		isContainer: item.isContainer,
+		isFolder: false,
+	};
+};

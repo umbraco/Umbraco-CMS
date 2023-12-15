@@ -1,5 +1,5 @@
 import { UmbStylesheetRepository } from '../repository/stylesheet.repository.js';
-import type { StylesheetDetails } from '../index.js';
+import type { UmbStylesheetDetailModel } from '../index.js';
 import {
 	type UmbSaveableWorkspaceContextInterface,
 	UmbEditableWorkspaceContextBase,
@@ -13,10 +13,10 @@ import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 export type RichTextRuleModelSortable = RichTextRuleModel & { sortOrder?: number };
 
 export class UmbStylesheetWorkspaceContext
-	extends UmbEditableWorkspaceContextBase<UmbStylesheetRepository, StylesheetDetails>
-	implements UmbSaveableWorkspaceContextInterface<StylesheetDetails | undefined>
+	extends UmbEditableWorkspaceContextBase<UmbStylesheetRepository, UmbStylesheetDetailModel>
+	implements UmbSaveableWorkspaceContextInterface<UmbStylesheetDetailModel | undefined>
 {
-	#data = new UmbObjectState<StylesheetDetails | undefined>(undefined);
+	#data = new UmbObjectState<UmbStylesheetDetailModel | undefined>(undefined);
 	#rules = new UmbArrayState<RichTextRuleModelSortable>([], (rule) => rule.name);
 	readonly data = this.#data.asObservable();
 	readonly rules = this.#rules.asObservable();
@@ -74,11 +74,11 @@ export class UmbStylesheetWorkspaceContext
 	}
 
 	setName(value: string) {
-		this.#data.next({ ...this.#data.value, name: value });
+		this.#data.update({ name: value });
 	}
 
 	setContent(value: string) {
-		this.#data.next({ ...this.#data.value, content: value });
+		this.#data.update({ content: value });
 	}
 
 	async load(path: string) {
@@ -112,13 +112,10 @@ export class UmbStylesheetWorkspaceContext
 	}
 
 	async sendContentGetRules() {
-		if (!this.getData()?.content) return;
+		const content = this.getData()?.content;
+		if (!content) throw Error('No content');
 
-		const requestBody = {
-			content: this.getData()?.content,
-		};
-
-		const { data } = await this.repository.extractStylesheetRules(requestBody);
+		const { data } = await this.repository.extractStylesheetRules({ content });
 		this.setRules(data?.rules ?? []);
 	}
 

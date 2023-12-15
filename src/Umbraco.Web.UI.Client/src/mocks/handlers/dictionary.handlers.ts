@@ -102,9 +102,9 @@ export const handlers = [
 		if (!id) return;
 
 		const dataToSave = JSON.parse(data[0].value);
-		const saved = umbDictionaryData.save(dataToSave.id, dataToSave);
+		umbDictionaryData.save(dataToSave.id, dataToSave);
 
-		return res(ctx.status(200), ctx.json(saved));
+		return res(ctx.status(200));
 	}),
 
 	rest.put(umbracoPath('/dictionary/:id'), async (req, res, ctx) => {
@@ -114,9 +114,9 @@ export const handlers = [
 		const id = req.params.id as string;
 		if (!id) return;
 
-		const saved = umbDictionaryData.save(id, data);
+		umbDictionaryData.save(id, data);
 
-		return res(ctx.status(200), ctx.json(saved));
+		return res(ctx.status(200));
 	}),
 
 	rest.get(umbracoPath('/tree/dictionary/root'), (req, res, ctx) => {

@@ -23,4 +23,4 @@ export class UmbAppContext extends UmbBaseController {
 	}
 }
 
-export const UMB_APP_CONTEXT = new UmbContextToken<UmbAppContext>('UMB_APP');
+export const UMB_APP_CONTEXT = new UmbContextToken<UmbAppContext>('UmbAppContext');

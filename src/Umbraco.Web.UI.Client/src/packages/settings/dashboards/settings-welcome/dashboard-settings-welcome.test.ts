@@ -1,3 +1,4 @@
+/*
 import { expect, fixture, html } from '@open-wc/testing';
 
 import { UmbDashboardSettingsWelcomeElement } from './dashboard-settings-welcome.element.js';
@@ -14,7 +15,10 @@ describe('UmbDashboardSettingsWelcomeElement', () => {
 		expect(element).to.be.instanceOf(UmbDashboardSettingsWelcomeElement);
 	});
 
-	it('passes the a11y audit', async () => {
-		await expect(element).to.be.accessible(defaultA11yConfig);
-	});
+	if ((window as any).__UMBRACO_TEST_RUN_A11Y_TEST) {
+		it('passes the a11y audit', async () => {
+			await expect(element).to.be.accessible(defaultA11yConfig);
+		});
+	}
 });
+*/

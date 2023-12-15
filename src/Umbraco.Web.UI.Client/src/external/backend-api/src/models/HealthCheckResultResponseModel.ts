@@ -7,8 +7,8 @@ import type { HealthCheckActionRequestModel } from './HealthCheckActionRequestMo
 import type { StatusResultTypeModel } from './StatusResultTypeModel';
 
 export type HealthCheckResultResponseModel = {
-    message?: string;
-    resultType?: StatusResultTypeModel;
+    message: string;
+    resultType: StatusResultTypeModel;
     actions?: Array<HealthCheckActionRequestModel> | null;
     readMoreLink?: string | null;
 };

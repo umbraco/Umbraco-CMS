@@ -4,8 +4,8 @@
 /* eslint-disable */
 
 export type TextFileUpdateModel = {
-    name?: string;
-    content?: string;
-    existingPath?: string;
+    name: string;
+    content: string;
+    existingPath: string;
 };
 

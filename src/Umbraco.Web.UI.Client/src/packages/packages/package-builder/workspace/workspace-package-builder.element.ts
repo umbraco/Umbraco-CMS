@@ -25,6 +25,8 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 	entityId?: string;
 
 	@state()
+	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+	// @ts-ignore
 	private _package: PackageDefinitionResponseModel = {};
 
 	@query('#package-name-input')
@@ -69,6 +71,8 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 			PackageResource.postPackageCreated({ requestBody: this._package }),
 		);
 		if (!response.data || response.error) return;
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
 		this._package = response.data as PackageDefinitionResponseModel;
 		this.#navigateBack();
 	}
@@ -132,49 +136,35 @@ export class UmbWorkspacePackageBuilderElement extends UmbLitElement {
 	}
 
 	#renderEditors() {
-		return html`<umb-workspace-property-layout label="Content" description="">
+		return html`<umb-property-layout label="Content" description="">
 				${this.#renderContentSection()}
-			</umb-workspace-property-layout>
+			</umb-property-layout>
 
-			<umb-workspace-property-layout label="Media" description=""
-				>${this.#renderMediaSection()}
-			</umb-workspace-property-layout>
+			<umb-property-layout label="Media" description="">${this.#renderMediaSection()} </umb-property-layout>
 
-			<umb-workspace-property-layout label="Document Types" description="">
+			<umb-property-layout label="Document Types" description="">
 				${this.#renderDocumentTypeSection()}
-			</umb-workspace-property-layout>
+			</umb-property-layout>
 
-			<umb-workspace-property-layout label="Media Types" description="">
-				${this.#renderMediaTypeSection()}
-			</umb-workspace-property-layout>
+			<umb-property-layout label="Media Types" description=""> ${this.#renderMediaTypeSection()} </umb-property-layout>
 
-			<umb-workspace-property-layout label="Languages" description="">
-				${this.#renderLanguageSection()}
-			</umb-workspace-property-layout>
+			<umb-property-layout label="Languages" description=""> ${this.#renderLanguageSection()} </umb-property-layout>
 
-			<umb-workspace-property-layout label="Dictionary" description="">
-				${this.#renderDictionarySection()}
-			</umb-workspace-property-layout>
+			<umb-property-layout label="Dictionary" description=""> ${this.#renderDictionarySection()} </umb-property-layout>
 
-			<umb-workspace-property-layout label="Data Types" description="">
-				${this.#renderDataTypeSection()}
-			</umb-workspace-property-layout>
+			<umb-property-layout label="Data Types" description=""> ${this.#renderDataTypeSection()} </umb-property-layout>
 
-			<umb-workspace-property-layout label="Templates" description="">
-				${this.#renderTemplateSection()}
-			</umb-workspace-property-layout>
+			<umb-property-layout label="Templates" description=""> ${this.#renderTemplateSection()} </umb-property-layout>
 
-			<umb-workspace-property-layout label="Stylesheets" description="">
+			<umb-property-layout label="Stylesheets" description="">
 				${this.#renderStylesheetsSection()}
-			</umb-workspace-property-layout>
+			</umb-property-layout>
 
-			<umb-workspace-property-layout label="Scripts" description="">
-				${this.#renderScriptsSection()}
-			</umb-workspace-property-layout>
+			<umb-property-layout label="Scripts" description=""> ${this.#renderScriptsSection()} </umb-property-layout>
 
-			<umb-workspace-property-layout label="Partial Views" description="">
+			<umb-property-layout label="Partial Views" description="">
 				${this.#renderPartialViewSection()}
-			</umb-workspace-property-layout>`;
+			</umb-property-layout>`;
 	}
 
 	#renderContentSection() {

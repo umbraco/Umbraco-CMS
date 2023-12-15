@@ -5,7 +5,7 @@ import {
 	UmbCreateDocumentModalValue,
 	UmbModalBaseElement,
 } from '@umbraco-cms/backoffice/modal';
-import { DocumentTypeTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { DocumentTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbDocumentRepository } from '@umbraco-cms/backoffice/document';
 
 @customElement('umb-create-document-modal')
@@ -16,7 +16,7 @@ export class UmbCreateDocumentModalElement extends UmbModalBaseElement<
 	#documentRepository = new UmbDocumentRepository(this);
 
 	@state()
-	private _allowedDocumentTypes: DocumentTypeTreeItemResponseModel[] = [];
+	private _allowedDocumentTypes: DocumentTypeResponseModel[] = [];
 
 	@state()
 	private _headline: string = 'Create';

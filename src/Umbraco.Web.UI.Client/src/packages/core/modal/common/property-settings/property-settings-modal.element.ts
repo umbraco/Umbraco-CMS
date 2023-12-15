@@ -8,6 +8,7 @@ import {
 } from '@umbraco-cms/backoffice/modal';
 import { generateAlias } from '@umbraco-cms/backoffice/utils';
 import { UMB_DOCUMENT_TYPE_DETAIL_STORE_CONTEXT } from '@umbraco-cms/backoffice/document-type';
+import { DocumentTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 // TODO: Could base take a token to get its types?.
 // TODO: Missing a workspace context... unless this should not be a workspace any way.
 @customElement('umb-property-settings-modal')
@@ -44,7 +45,7 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 	@state() private _aliasLocked = true;
 
 	@state()
-	protected _ownerDocumentType?: UmbPropertySettingsModalValue;
+	protected _ownerDocumentType?: DocumentTypeResponseModel;
 
 	protected _originalPropertyData!: UmbPropertySettingsModalValue;
 
@@ -53,8 +54,10 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 
 		// TODO: This is actually not good enough, we need to be able to get to the DOCUMENT_WORKSPACE_CONTEXT, so we can have a look at the draft/runtime version of the document. Otherwise 'Vary by culture' is first updated when saved.
 		this.consumeContext(UMB_DOCUMENT_TYPE_DETAIL_STORE_CONTEXT, (instance) => {
+			if (!this.data?.documentTypeId) return;
+
 			this.observe(
-				instance.byId(this.data?.documentTypeId),
+				instance.byId(this.data.documentTypeId),
 				(documentType) => {
 					this._ownerDocumentType = documentType;
 					this.requestUpdate('_ownerDocumentType');

@@ -19,7 +19,7 @@ export class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemModelBase>
 	implements UmbTreeItemContext<TreeItemType>
 {
 	public unique?: string | null;
-	public type?: string;
+	public entityType?: string;
 
 	#treeItem = new UmbDeepState<TreeItemType | undefined>(undefined);
 	treeItem = this.#treeItem.asObservable();
@@ -72,8 +72,8 @@ export class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemModelBase>
 		if (unique === undefined) throw new Error('Could not create tree item context, unique key is missing');
 		this.unique = unique;
 
-		if (!treeItem.type) throw new Error('Could not create tree item context, tree item type is missing');
-		this.type = treeItem.type;
+		if (!treeItem.entityType) throw new Error('Could not create tree item context, tree item type is missing');
+		this.entityType = treeItem.entityType;
 
 		this.#hasChildren.next(treeItem.hasChildren || false);
 		this.#treeItem.next(treeItem);
@@ -96,21 +96,21 @@ export class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemModelBase>
 	}
 
 	public toggleContextMenu() {
-		if (!this.getTreeItem() || !this.type || this.unique === undefined) {
+		if (!this.getTreeItem() || !this.entityType || this.unique === undefined) {
 			throw new Error('Could not request children, tree item is not set');
 		}
 
-		this.#sectionSidebarContext?.toggleContextMenu(this.type, this.unique, this.getTreeItem()?.name || '');
+		this.#sectionSidebarContext?.toggleContextMenu(this.entityType, this.unique, this.getTreeItem()?.name || '');
 	}
 
 	public select() {
-		if (this.unique === undefined) throw new Error('Could not select, unique key is missing');
-		this.treeContext?.select(this.unique);
+		if (this.unique === undefined) throw new Error('Could not select. Unique is missing');
+		this.treeContext?.selection.select(this.unique);
 	}
 
 	public deselect() {
-		if (this.unique === undefined) throw new Error('Could not deselect, unique key is missing');
-		this.treeContext?.deselect(this.unique);
+		if (this.unique === undefined) throw new Error('Could not deselect. Unique is missing');
+		this.treeContext?.selection.deselect(this.unique);
 	}
 
 	#consumeContexts() {
@@ -138,7 +138,7 @@ export class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemModelBase>
 	#observeIsSelectable() {
 		if (!this.treeContext) return;
 		this.observe(
-			this.treeContext.selectable,
+			this.treeContext.selection.selectable,
 			(value) => {
 				this.#isSelectableContext.next(value);
 
@@ -156,7 +156,7 @@ export class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemModelBase>
 		if (!this.treeContext || !this.unique) return;
 
 		this.observe(
-			this.treeContext.selection.pipe(map((selection) => selection.includes(this.unique!))),
+			this.treeContext.selection.selection.pipe(map((selection) => selection.includes(this.unique!))),
 			(isSelected) => {
 				this.#isSelected.next(isSelected);
 			},
@@ -170,8 +170,8 @@ export class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemModelBase>
 		this.observe(
 			this.#sectionContext.pathname,
 			(pathname) => {
-				if (!pathname || !this.type || this.unique === undefined) return;
-				const path = this.constructPath(pathname, this.type, this.unique);
+				if (!pathname || !this.entityType || this.unique === undefined) return;
+				const path = this.constructPath(pathname, this.entityType, this.unique);
 				this.#path.next(path);
 			},
 			'observeSectionPath',
@@ -182,7 +182,7 @@ export class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemModelBase>
 		this.observe(
 			umbExtensionsRegistry
 				.extensionsOfType('entityAction')
-				.pipe(map((actions) => actions.filter((action) => action.meta.entityTypes.includes(this.type!)))),
+				.pipe(map((actions) => actions.filter((action) => action.meta.entityTypes.includes(this.entityType!)))),
 			(actions) => {
 				this.#hasActions.next(actions.length > 0);
 			},

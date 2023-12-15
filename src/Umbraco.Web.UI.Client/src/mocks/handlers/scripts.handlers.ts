@@ -2,7 +2,7 @@ const { rest } = window.MockServiceWorker;
 import { RestHandler, MockedRequest, DefaultBodyType } from 'msw';
 import { umbScriptsData } from '../data/scripts.data.js';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
-import { CreatePathFolderRequestModel, CreateTextFileViewModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
+import { CreateScriptRequestModel, UpdateScriptRequestModel } from '@umbraco-cms/backoffice/backend-api';
 
 const treeHandlers = [
 	rest.get(umbracoPath('/tree/script/root'), (req, res, ctx) => {
@@ -43,7 +43,7 @@ const detailHandlers: RestHandler<MockedRequest<DefaultBodyType>>[] = [
 	}),
 
 	rest.post(umbracoPath('/script'), async (req, res, ctx) => {
-		const requestBody = (await req.json()) as CreateTextFileViewModelBaseModel;
+		const requestBody = (await req.json()) as CreateScriptRequestModel;
 		if (!requestBody) return res(ctx.status(400, 'no body found'));
 		const response = umbScriptsData.insertScript(requestBody);
 		return res(ctx.status(200), ctx.json(response));
@@ -55,10 +55,10 @@ const detailHandlers: RestHandler<MockedRequest<DefaultBodyType>>[] = [
 		const response = umbScriptsData.delete([path]);
 		return res(ctx.status(200), ctx.json(response));
 	}),
+
 	rest.put(umbracoPath('/script'), async (req, res, ctx) => {
-		const requestBody = (await req.json()) as CreateTextFileViewModelBaseModel;
+		const requestBody = (await req.json()) as UpdateScriptRequestModel;
 		if (!requestBody) return res(ctx.status(400, 'no body found'));
-		const response = umbScriptsData.updateData(requestBody);
 		return res(ctx.status(200));
 	}),
 ];
@@ -70,11 +70,13 @@ const folderHandlers: RestHandler<MockedRequest<DefaultBodyType>>[] = [
 		const response = umbScriptsData.getFolder(path);
 		return res(ctx.status(200), ctx.json(response));
 	}),
+
 	rest.post(umbracoPath('script/folder'), (req, res, ctx) => {
-		const requestBody = req.json() as CreatePathFolderRequestModel;
+		const requestBody = req.json();
 		if (!requestBody) return res(ctx.status(400, 'no body found'));
 		return res(ctx.status(200));
 	}),
+
 	rest.delete(umbracoPath('script/folder'), (req, res, ctx) => {
 		const path = decodeURIComponent(req.url.searchParams.get('path') ?? '').replace('-js', '.js');
 		if (!path) return res(ctx.status(400));

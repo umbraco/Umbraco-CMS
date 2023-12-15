@@ -38,8 +38,11 @@ describe('UmbControllerHostTestElement', () => {
 		expect(element).to.be.instanceOf(UmbControllerHostProviderElement);
 	});
 
-	it('provides the context', () => {
+	it('provides the context', async () => {
+		await Promise.resolve();
 		// Potentially we need to wait a bit here, cause the value might not be set already? as of the context consumption...
+		expect(consumer).to.be.instanceOf(UmbTestControllerHostInitializerConsumerElement);
+		expect(consumer.value).to.not.be.null;
 		expect(consumer.value).to.equal(contextValue);
 	});
 });

@@ -7,8 +7,8 @@ import type { ContentTypeCleanupModel } from './ContentTypeCleanupModel';
 import type { CreateContentTypeForDocumentTypeRequestModel } from './CreateContentTypeForDocumentTypeRequestModel';
 
 export type CreateDocumentTypeRequestModel = (CreateContentTypeForDocumentTypeRequestModel & {
-    allowedTemplateIds?: Array<string>;
+    allowedTemplateIds: Array<string>;
     defaultTemplateId?: string | null;
-    cleanup?: ContentTypeCleanupModel;
+    cleanup: ContentTypeCleanupModel;
 });
 

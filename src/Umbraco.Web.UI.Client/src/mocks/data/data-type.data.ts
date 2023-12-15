@@ -1,6 +1,7 @@
 import { UmbEntityTreeData } from './entity-tree.data.js';
 import { UmbEntityData } from './entity.data.js';
 import { createFolderTreeItem } from './utils.js';
+import { UmbId } from '@umbraco-cms/backoffice/id';
 import type {
 	FolderTreeItemResponseModel,
 	DataTypeResponseModel,
@@ -16,6 +17,8 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 		id: 'dt-folder1',
 		parentId: null,
 		isFolder: true,
+		hasChildren: false,
+		isContainer: false,
 	},
 	{
 		type: 'data-type',
@@ -24,6 +27,7 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 		parentId: null,
 		isFolder: true,
 		hasChildren: true,
+		isContainer: false,
 	},
 	{
 		type: 'data-type',
@@ -258,7 +262,6 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 				alias: 'enableTimezones',
 				value: true,
 			},
-			{},
 		],
 	},
 	{
@@ -712,6 +715,15 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 		propertyEditorUiAlias: 'Umb.PropertyEditorUi.MemberGroupPicker',
 		values: [],
 	},
+	{
+		type: 'data-type',
+		name: 'Static File Picker',
+		id: 'dt-staticFilePicker',
+		parentId: null,
+		propertyEditorAlias: 'Umbraco.Label',
+		propertyEditorUiAlias: 'Umb.PropertyEditorUi.StaticFilePicker',
+		values: [],
+	},
 ];
 
 const createDataTypeItem = (item: DataTypeResponseModel | FolderTreeItemResponseModel): DataTypeItemResponseModel => {
@@ -722,6 +734,8 @@ const createDataTypeItem = (item: DataTypeResponseModel | FolderTreeItemResponse
 };
 
 class UmbDataTypeData extends UmbEntityData<DataTypeResponseModel | FolderTreeItemResponseModel> {
+	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+	// @ts-ignore
 	#tree = new UmbEntityTreeData<FolderTreeItemResponseModel>(this);
 
 	constructor() {
@@ -743,13 +757,15 @@ class UmbDataTypeData extends UmbEntityData<DataTypeResponseModel | FolderTreeIt
 		return items.map((item) => createDataTypeItem(item));
 	}
 
-	createFolder(folder: CreateFolderRequestModel & { id: string | undefined }) {
+	createFolder(folder: CreateFolderRequestModel) {
 		const newFolder: FolderTreeItemResponseModel = {
+			type: 'data-type-folder',
 			name: folder.name,
-			id: folder.id,
+			id: folder.id ? folder.id : UmbId.new(),
 			parentId: folder.parentId,
 			isFolder: true,
 			isContainer: false,
+			hasChildren: false,
 		};
 
 		this.data.push(newFolder);

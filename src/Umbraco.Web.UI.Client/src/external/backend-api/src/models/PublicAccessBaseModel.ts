@@ -4,7 +4,7 @@
 /* eslint-disable */
 
 export type PublicAccessBaseModel = {
-    loginPageId?: string;
-    errorPageId?: string;
+    loginPageId: string;
+    errorPageId: string;
 };
 
