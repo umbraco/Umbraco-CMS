@@ -133,8 +133,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		global.json = global.json
 		icon.png = icon.png
 		LICENSE.md = LICENSE.md
-		umbraco.sln.DotSettings = umbraco.sln.DotSettings
 		nuget.config = nuget.config
+		umbraco.sln.DotSettings = umbraco.sln.DotSettings
 		version.json = version.json
 	EndProjectSection
 EndProject
@@ -184,6 +184,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Cms.Persistence.EFCore.Sqlite", "src\Umbraco.Cms.Persistence.EFCore.Sqlite\Umbraco.Cms.Persistence.EFCore.Sqlite.csproj", "{8B4771F0-8EC2-4761-BBCE-DDE073DB3B7A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbraco.Cms.Persistence.EFCore.SqlServer", "src\Umbraco.Cms.Persistence.EFCore.SqlServer\Umbraco.Cms.Persistence.EFCore.SqlServer.csproj", "{9276C3F0-0DC9-46C9-BF32-9EE79D92AE02}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Tests.AcceptanceTest.UmbracoProject", "tests\Umbraco.Tests.AcceptanceTest.UmbracoProject\Umbraco.Tests.AcceptanceTest.UmbracoProject.csproj", "{A13FF0A0-69FA-468A-9F79-565401D5C341}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -358,6 +360,12 @@ Global
 		{9276C3F0-0DC9-46C9-BF32-9EE79D92AE02}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9276C3F0-0DC9-46C9-BF32-9EE79D92AE02}.SkipTests|Any CPU.ActiveCfg = Debug|Any CPU
 		{9276C3F0-0DC9-46C9-BF32-9EE79D92AE02}.SkipTests|Any CPU.Build.0 = Debug|Any CPU
+		{A13FF0A0-69FA-468A-9F79-565401D5C341}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A13FF0A0-69FA-468A-9F79-565401D5C341}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A13FF0A0-69FA-468A-9F79-565401D5C341}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A13FF0A0-69FA-468A-9F79-565401D5C341}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A13FF0A0-69FA-468A-9F79-565401D5C341}.SkipTests|Any CPU.ActiveCfg = Debug|Any CPU
+		{A13FF0A0-69FA-468A-9F79-565401D5C341}.SkipTests|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -376,6 +384,7 @@ Global
 		{2B47AD9F-FFF1-448A-88F1-D4F568811738} = {F2BF84D9-0A14-40AF-A0F3-B9BBBBC16A44}
 		{25AECCB5-B187-4406-844B-91B8FF0FCB37} = {2B47AD9F-FFF1-448A-88F1-D4F568811738}
 		{EA628ABD-624E-4AF3-B548-6710D4D66531} = {2B47AD9F-FFF1-448A-88F1-D4F568811738}
+		{A13FF0A0-69FA-468A-9F79-565401D5C341} = {B5BD12C1-A454-435E-8A46-FF4A364C0382}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7A0F2E34-D2AF-4DAB-86A0-7D7764B3D0EC}
