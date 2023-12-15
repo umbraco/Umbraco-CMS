@@ -5,8 +5,9 @@ import { UMB_NOTIFICATION_CONTEXT_TOKEN, UmbNotificationContext } from '@umbraco
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbDetailStore } from '@umbraco-cms/backoffice/store';
 import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
+import { UMB_ACTION_EVENT_CONTEXT, UmbActionEvent, type UmbActionEventContext } from '@umbraco-cms/backoffice/action';
 
-export abstract class UmbDetailRepositoryBase<DetailModelType extends { unique: string }>
+export abstract class UmbDetailRepositoryBase<DetailModelType extends { unique: string; entityType: string }>
 	extends UmbRepositoryBase
 	implements UmbApi
 {
@@ -15,6 +16,7 @@ export abstract class UmbDetailRepositoryBase<DetailModelType extends { unique: 
 	#detailStore?: UmbDetailStore<DetailModelType>;
 	#detailSource: UmbDetailDataSource<DetailModelType>;
 	#notificationContext?: UmbNotificationContext;
+	#actionEventContext?: UmbActionEventContext;
 
 	constructor(
 		host: UmbControllerHost,
@@ -32,6 +34,10 @@ export abstract class UmbDetailRepositoryBase<DetailModelType extends { unique: 
 
 			this.consumeContext(UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
 				this.#notificationContext = instance;
+			}).asPromise(),
+
+			this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (instance) => {
+				this.#actionEventContext = instance;
 			}).asPromise(),
 		]);
 	}
@@ -76,6 +82,9 @@ export abstract class UmbDetailRepositoryBase<DetailModelType extends { unique: 
 		if (!data) throw new Error('Data is missing');
 		await this.#init;
 
+		const eventData = { entityType: data.entityType, unique: data.unique };
+		this.#actionEventContext?.dispatchEvent(new UmbActionEvent('create-request', eventData));
+
 		const { data: createdData, error } = await this.#detailSource.create(data);
 
 		if (createdData) {
@@ -84,6 +93,12 @@ export abstract class UmbDetailRepositoryBase<DetailModelType extends { unique: 
 			// TODO: how do we handle generic notifications? Is this the correct place to do it?
 			const notification = { data: { message: `Created` } };
 			this.#notificationContext!.peek('positive', notification);
+
+			this.#actionEventContext?.dispatchEvent(new UmbActionEvent('create-success', eventData));
+		}
+
+		if (error) {
+			this.#actionEventContext?.dispatchEvent(new UmbActionEvent('create-error', eventData));
 		}
 
 		return { data: createdData, error };
@@ -100,6 +115,9 @@ export abstract class UmbDetailRepositoryBase<DetailModelType extends { unique: 
 		if (!data.unique) throw new Error('Unique is missing');
 		await this.#init;
 
+		const eventData = { entityType: data.entityType, unique: data.unique };
+		this.#actionEventContext?.dispatchEvent(new UmbActionEvent('save-request', eventData));
+
 		const { data: updatedData, error } = await this.#detailSource.update(data);
 
 		if (updatedData) {
@@ -108,6 +126,12 @@ export abstract class UmbDetailRepositoryBase<DetailModelType extends { unique: 
 			// TODO: how do we handle generic notifications? Is this the correct place to do it?
 			const notification = { data: { message: `Saved` } };
 			this.#notificationContext!.peek('positive', notification);
+
+			this.#actionEventContext?.dispatchEvent(new UmbActionEvent('save-success', eventData));
+		}
+
+		if (error) {
+			this.#actionEventContext?.dispatchEvent(new UmbActionEvent('save-error', eventData));
 		}
 
 		return { data, error };

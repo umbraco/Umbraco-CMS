@@ -32,6 +32,9 @@ export class PartialViewResource {
             query: {
                 'path': path,
             },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -50,6 +53,9 @@ export class PartialViewResource {
             body: requestBody,
             mediaType: 'application/json',
             responseHeader: 'Location',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -68,6 +74,9 @@ export class PartialViewResource {
             query: {
                 'path': path,
             },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -85,6 +94,9 @@ export class PartialViewResource {
             url: '/umbraco/management/api/v1/partial-view',
             body: requestBody,
             mediaType: 'application/json',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -103,6 +115,9 @@ export class PartialViewResource {
             query: {
                 'path': path,
             },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -120,6 +135,9 @@ export class PartialViewResource {
             url: '/umbraco/management/api/v1/partial-view/folder',
             body: requestBody,
             mediaType: 'application/json',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -138,6 +156,9 @@ export class PartialViewResource {
             query: {
                 'path': path,
             },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -155,6 +176,9 @@ export class PartialViewResource {
             url: '/umbraco/management/api/v1/partial-view/item',
             query: {
                 'id': id,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }
@@ -177,6 +201,9 @@ export class PartialViewResource {
                 'skip': skip,
                 'take': take,
             },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -196,6 +223,7 @@ export class PartialViewResource {
                 'name': name,
             },
             errors: {
+                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
         });
@@ -222,6 +250,9 @@ export class PartialViewResource {
                 'skip': skip,
                 'take': take,
             },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -242,6 +273,9 @@ export class PartialViewResource {
             query: {
                 'skip': skip,
                 'take': take,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }

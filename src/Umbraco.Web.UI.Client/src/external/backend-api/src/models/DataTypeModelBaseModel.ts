@@ -7,8 +7,8 @@ import type { DataTypePropertyPresentationModel } from './DataTypePropertyPresen
 
 export type DataTypeModelBaseModel = {
     name: string;
-    propertyEditorAlias: string;
-    propertyEditorUiAlias?: string | null;
+    editorAlias: string;
+    editorUiAlias?: string | null;
     values: Array<DataTypePropertyPresentationModel>;
 };
 

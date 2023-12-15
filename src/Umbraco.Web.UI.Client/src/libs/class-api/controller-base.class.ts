@@ -6,4 +6,4 @@ import { UmbClassMixin } from './index.js';
  * This enables controllers to be added to the life cycle of this element.
  *
  */
-export abstract class UmbBaseController extends UmbClassMixin(class {}) implements UmbController {}
+export abstract class UmbBaseController extends UmbClassMixin(EventTarget) implements UmbController {}

@@ -145,6 +145,7 @@ ${currentContent}`;
 			} else {
 				this.#treeRepository.requestRootTreeItems();
 			}
+			this.setIsNew(false);
 			return;
 		}
 

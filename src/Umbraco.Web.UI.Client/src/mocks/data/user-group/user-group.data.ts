@@ -19,6 +19,9 @@ export const data: Array<UserGroupResponseModel> = [
 		sections: [],
 		languages: [],
 		hasAccessToAllLanguages: true,
+		documentRootAccess: true,
+		mediaRootAccess: true,
+		isSystemGroup: true,
 	},
 	{
 		id: 'user-group-editors-id',
@@ -29,6 +32,9 @@ export const data: Array<UserGroupResponseModel> = [
 		sections: [],
 		languages: [],
 		hasAccessToAllLanguages: true,
+		documentRootAccess: true,
+		mediaRootAccess: true,
+		isSystemGroup: true,
 	},
 	{
 		id: 'user-group-sensitive-data-id',
@@ -39,6 +45,9 @@ export const data: Array<UserGroupResponseModel> = [
 		sections: [],
 		languages: [],
 		hasAccessToAllLanguages: true,
+		documentRootAccess: true,
+		mediaRootAccess: true,
+		isSystemGroup: true,
 	},
 	{
 		id: 'user-group-translators-id',
@@ -49,6 +58,9 @@ export const data: Array<UserGroupResponseModel> = [
 		sections: [],
 		languages: [],
 		hasAccessToAllLanguages: true,
+		documentRootAccess: true,
+		mediaRootAccess: true,
+		isSystemGroup: true,
 	},
 	{
 		id: 'user-group-writers-id',
@@ -59,5 +71,8 @@ export const data: Array<UserGroupResponseModel> = [
 		sections: [],
 		languages: [],
 		hasAccessToAllLanguages: true,
+		documentRootAccess: true,
+		mediaRootAccess: true,
+		isSystemGroup: false,
 	},
 ];

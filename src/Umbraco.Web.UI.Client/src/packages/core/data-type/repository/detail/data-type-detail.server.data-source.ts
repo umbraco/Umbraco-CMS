@@ -36,7 +36,7 @@ export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataT
 	 */
 	async createScaffold(parentUnique: string | null) {
 		const data: UmbDataTypeDetailModel = {
-			entityType: 'data-type',
+			entityType: UMB_DATA_TYPE_ENTITY_TYPE,
 			unique: UmbId.new(),
 			parentUnique,
 			name: '',
@@ -69,8 +69,8 @@ export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataT
 			unique: data.id,
 			parentUnique: data.parentId || null,
 			name: data.name,
-			propertyEditorAlias: data.propertyEditorAlias,
-			propertyEditorUiAlias: data.propertyEditorUiAlias || null,
+			propertyEditorAlias: data.editorAlias,
+			propertyEditorUiAlias: data.editorUiAlias || null,
 			values: data.values as Array<UmbDataTypePropertyModel>,
 		};
 
@@ -93,8 +93,8 @@ export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataT
 			id: dataType.unique,
 			parentId: dataType.parentUnique,
 			name: dataType.name,
-			propertyEditorAlias: dataType.propertyEditorAlias,
-			propertyEditorUiAlias: dataType.propertyEditorUiAlias,
+			editorAlias: dataType.propertyEditorAlias,
+			editorUiAlias: dataType.propertyEditorUiAlias,
 			values: dataType.values,
 		};
 
@@ -126,8 +126,8 @@ export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataT
 		// TODO: make data mapper to prevent errors
 		const requestBody: DataTypeModelBaseModel = {
 			name: data.name,
-			propertyEditorAlias: data.propertyEditorAlias,
-			propertyEditorUiAlias: data.propertyEditorUiAlias,
+			editorAlias: data.propertyEditorAlias,
+			editorUiAlias: data.propertyEditorUiAlias,
 			values: data.values,
 		};
 
