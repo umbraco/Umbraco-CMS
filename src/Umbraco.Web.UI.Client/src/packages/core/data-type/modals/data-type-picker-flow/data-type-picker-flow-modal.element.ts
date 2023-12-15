@@ -76,7 +76,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 		this._createDataTypeModal = new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
 			.addAdditionalPath(':uiAlias')
 			.onSetup((params) => {
-				return { data: { entityType: 'data-type', preset: { propertyEditorUiAlias: params.uiAlias } } };
+				return { data: { entityType: 'data-type', preset: { editorUiAlias: params.uiAlias } } };
 			})
 			.onSubmit((value) => {
 				this._select(value?.unique);

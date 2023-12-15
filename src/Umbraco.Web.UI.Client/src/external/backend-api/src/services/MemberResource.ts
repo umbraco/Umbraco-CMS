@@ -25,6 +25,9 @@ export class MemberResource {
             query: {
                 'id': id,
             },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 

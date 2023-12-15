@@ -20,6 +20,7 @@ export class ModelsBuilderResource {
             method: 'POST',
             url: '/umbraco/management/api/v1/models-builder/build',
             errors: {
+                401: `The resource is protected and requires an authentication token`,
                 428: `Client Error`,
             },
         });
@@ -33,6 +34,9 @@ export class ModelsBuilderResource {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/models-builder/dashboard',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -44,6 +48,9 @@ export class ModelsBuilderResource {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/models-builder/status',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 

@@ -30,6 +30,8 @@ export class UserGroupResource {
             body: requestBody,
             mediaType: 'application/json',
             errors: {
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
                 404: `Not Found`,
             },
         });
@@ -52,6 +54,7 @@ export class UserGroupResource {
             responseHeader: 'Location',
             errors: {
                 400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }
@@ -74,6 +77,9 @@ export class UserGroupResource {
                 'skip': skip,
                 'take': take,
             },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -93,6 +99,8 @@ export class UserGroupResource {
                 'id': id,
             },
             errors: {
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
                 404: `Not Found`,
             },
         });
@@ -114,6 +122,8 @@ export class UserGroupResource {
                 'id': id,
             },
             errors: {
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
                 404: `Not Found`,
             },
         });
@@ -139,6 +149,7 @@ export class UserGroupResource {
             body: requestBody,
             mediaType: 'application/json',
             errors: {
+                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
         });
@@ -158,6 +169,9 @@ export class UserGroupResource {
             url: '/umbraco/management/api/v1/user-group/item',
             query: {
                 'id': id,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }

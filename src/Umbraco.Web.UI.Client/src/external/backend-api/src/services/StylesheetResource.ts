@@ -36,6 +36,9 @@ export class StylesheetResource {
             query: {
                 'path': path,
             },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -54,6 +57,9 @@ export class StylesheetResource {
             body: requestBody,
             mediaType: 'application/json',
             responseHeader: 'Location',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -72,6 +78,9 @@ export class StylesheetResource {
             query: {
                 'path': path,
             },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -89,6 +98,9 @@ export class StylesheetResource {
             url: '/umbraco/management/api/v1/stylesheet',
             body: requestBody,
             mediaType: 'application/json',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -110,6 +122,9 @@ export class StylesheetResource {
                 'skip': skip,
                 'take': take,
             },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -128,6 +143,9 @@ export class StylesheetResource {
             query: {
                 'path': path,
             },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -145,6 +163,9 @@ export class StylesheetResource {
             url: '/umbraco/management/api/v1/stylesheet/folder',
             body: requestBody,
             mediaType: 'application/json',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -162,6 +183,9 @@ export class StylesheetResource {
             url: '/umbraco/management/api/v1/stylesheet/folder',
             query: {
                 'path': path,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }
@@ -181,6 +205,9 @@ export class StylesheetResource {
             query: {
                 'path': path,
             },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -198,6 +225,9 @@ export class StylesheetResource {
             url: '/umbraco/management/api/v1/stylesheet/rich-text/extract-rules',
             body: requestBody,
             mediaType: 'application/json',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -215,6 +245,9 @@ export class StylesheetResource {
             url: '/umbraco/management/api/v1/stylesheet/rich-text/interpolate-rules',
             body: requestBody,
             mediaType: 'application/json',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -232,6 +265,9 @@ export class StylesheetResource {
             url: '/umbraco/management/api/v1/stylesheet/rich-text/rules',
             query: {
                 'path': path,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }
@@ -257,6 +293,9 @@ export class StylesheetResource {
                 'skip': skip,
                 'take': take,
             },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -277,6 +316,9 @@ export class StylesheetResource {
             query: {
                 'skip': skip,
                 'take': take,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }

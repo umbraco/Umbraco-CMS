@@ -26,6 +26,9 @@ export class MemberGroupResource {
             query: {
                 'id': id,
             },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -46,6 +49,9 @@ export class MemberGroupResource {
             query: {
                 'skip': skip,
                 'take': take,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }

@@ -240,6 +240,8 @@ export type { ScriptUpdateModel } from './models/ScriptUpdateModel';
 export type { ScriptViewModelBaseModel } from './models/ScriptViewModelBaseModel';
 export type { SearcherResponseModel } from './models/SearcherResponseModel';
 export type { SearchResultResponseModel } from './models/SearchResultResponseModel';
+export type { ServerInformationItemResponseModel } from './models/ServerInformationItemResponseModel';
+export type { ServerInformationResponseModel } from './models/ServerInformationResponseModel';
 export type { ServerStatusResponseModel } from './models/ServerStatusResponseModel';
 export type { SetAvatarRequestModel } from './models/SetAvatarRequestModel';
 export type { SetTourStatusRequestModel } from './models/SetTourStatusRequestModel';
@@ -306,8 +308,6 @@ export type { UpdateUserGroupRequestModel } from './models/UpdateUserGroupReques
 export type { UpdateUserGroupsOnUserRequestModel } from './models/UpdateUserGroupsOnUserRequestModel';
 export type { UpdateUserRequestModel } from './models/UpdateUserRequestModel';
 export type { UpgradeSettingsResponseModel } from './models/UpgradeSettingsResponseModel';
-export type { UserDataModel } from './models/UserDataModel';
-export type { UserDataResponseModel } from './models/UserDataResponseModel';
 export type { UserGroupBaseModel } from './models/UserGroupBaseModel';
 export type { UserGroupItemResponseModel } from './models/UserGroupItemResponseModel';
 export type { UserGroupResponseModel } from './models/UserGroupResponseModel';
