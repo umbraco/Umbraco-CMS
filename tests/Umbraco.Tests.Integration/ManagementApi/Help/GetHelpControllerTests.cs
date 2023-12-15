@@ -6,7 +6,6 @@ using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.Help;
 
-[TestFixture]
 public class GetHelpControllerTests : ManagementApiUserGroupTestBase<GetHelpController>
 {
     protected override Expression<Func<GetHelpController, object>> MethodSelector =>

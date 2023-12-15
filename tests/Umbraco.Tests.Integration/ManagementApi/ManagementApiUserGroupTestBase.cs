@@ -7,8 +7,12 @@ using Umbraco.Cms.Core;
 namespace Umbraco.Cms.Tests.Integration.ManagementApi;
 
 [TestFixture]
-public class ManagementApiUserGroupTestBase<T> : ManagementApiTest<T> where T : ManagementApiControllerBase
+public abstract class ManagementApiUserGroupTestBase<T> : ManagementApiTest<T>
+    where T : ManagementApiControllerBase
 {
+    protected const string UserEmail = "test@umbraco.com";
+    protected const string UserPassword = "1234567890";
+
     protected override Expression<Func<T, object>> MethodSelector { get; }
 
     protected virtual UserGroupAssertionModel AdminUserGroupAssertionModel => new()
@@ -40,9 +44,6 @@ public class ManagementApiUserGroupTestBase<T> : ManagementApiTest<T> where T : 
     {
         ExpectedStatusCode = HttpStatusCode.Unauthorized
     };
-
-    protected const string UserEmail = "test@umbraco.com";
-    protected const string UserPassword = "1234567890";
 
     // Admin
     [Test]
