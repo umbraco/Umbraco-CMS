@@ -19,6 +19,7 @@ export class UpgradeResource {
             method: 'POST',
             url: '/umbraco/management/api/v1/upgrade/authorize',
             errors: {
+                401: `The resource is protected and requires an authentication token`,
                 428: `Client Error`,
                 500: `Server Error`,
             },
@@ -34,6 +35,7 @@ export class UpgradeResource {
             method: 'GET',
             url: '/umbraco/management/api/v1/upgrade/settings',
             errors: {
+                401: `The resource is protected and requires an authentication token`,
                 428: `Client Error`,
             },
         });

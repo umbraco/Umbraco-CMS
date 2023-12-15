@@ -36,6 +36,9 @@ export class LogViewerResource {
                 'skip': skip,
                 'take': take,
             },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -59,6 +62,7 @@ export class LogViewerResource {
             },
             errors: {
                 400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }
@@ -96,6 +100,9 @@ export class LogViewerResource {
                 'startDate': startDate,
                 'endDate': endDate,
             },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -125,6 +132,7 @@ export class LogViewerResource {
             },
             errors: {
                 400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }
@@ -147,6 +155,9 @@ export class LogViewerResource {
                 'skip': skip,
                 'take': take,
             },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -167,6 +178,7 @@ export class LogViewerResource {
             responseHeader: 'Location',
             errors: {
                 400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }
@@ -187,6 +199,7 @@ export class LogViewerResource {
                 'name': name,
             },
             errors: {
+                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
         });
@@ -208,6 +221,7 @@ export class LogViewerResource {
                 'name': name,
             },
             errors: {
+                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
         });
@@ -233,6 +247,7 @@ export class LogViewerResource {
             },
             errors: {
                 400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }

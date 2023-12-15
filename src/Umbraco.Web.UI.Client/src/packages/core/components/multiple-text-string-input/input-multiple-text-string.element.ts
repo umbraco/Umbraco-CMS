@@ -3,6 +3,7 @@ import { css, html, nothing, repeat, customElement, property, state } from '@umb
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbInputEvent, UmbChangeEvent, UmbDeleteEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbSorterConfig, UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 
 export type MultipleTextStringValue = Array<MultipleTextStringValueItem>;
 
@@ -10,11 +11,43 @@ export interface MultipleTextStringValueItem {
 	value: string;
 }
 
+const SORTER_CONFIG: UmbSorterConfig<MultipleTextStringValueItem> = {
+	compareElementToModel: (element: HTMLElement, model: MultipleTextStringValueItem) => {
+		return element.getAttribute('data-sort-entry-id') === model.value;
+	},
+	querySelectModelToElement: (container: HTMLElement, modelEntry: MultipleTextStringValueItem) => {
+		return container.querySelector('data-sort-entry-id=[' + modelEntry.value + ']');
+	},
+	identifier: 'Umb.SorterIdentifier.ColorEditor',
+	itemSelector: 'umb-input-multiple-text-string-item',
+	containerSelector: '#sorter-wrapper',
+};
+
 /**
  * @element umb-input-multiple-text-string
  */
 @customElement('umb-input-multiple-text-string')
 export class UmbInputMultipleTextStringElement extends FormControlMixin(UmbLitElement) {
+	#prevalueSorter = new UmbSorterController(this, {
+		...SORTER_CONFIG,
+
+		performItemInsert: (args) => {
+			const frozenArray = [...this.items];
+			const indexToMove = frozenArray.findIndex((x) => x.value === args.item.value);
+
+			frozenArray.splice(indexToMove, 1);
+			frozenArray.splice(args.newIndex, 0, args.item);
+			this.items = frozenArray;
+
+			this.dispatchEvent(new UmbChangeEvent());
+
+			return true;
+		},
+		performItemRemove: (args) => {
+			return true;
+		},
+	});
+
 	/**
 	 * This is a minimum amount of selected items in this input.
 	 * @type {number}
@@ -106,6 +139,7 @@ export class UmbInputMultipleTextStringElement extends FormControlMixin(UmbLitEl
 		// TODO: when we have a way to overwrite the missing value validator we can remove this
 		this.value = items?.length > 0 ? 'some value' : '';
 		this._items = items ?? [];
+		this.#prevalueSorter.setModel(this.items);
 	}
 
 	// TODO: Some inputs might not have a value that is either FormDataEntryValue or FormData.
@@ -156,7 +190,8 @@ export class UmbInputMultipleTextStringElement extends FormControlMixin(UmbLitEl
 	}
 
 	render() {
-		return html` ${this.#renderItems()} ${this.#renderAddButton()} `;
+		return html`<div id="sorter-wrapper">${this.#renderItems()}</div>
+			${this.#renderAddButton()} `;
 	}
 
 	#renderItems() {
@@ -168,6 +203,7 @@ export class UmbInputMultipleTextStringElement extends FormControlMixin(UmbLitEl
 					html` <umb-input-multiple-text-string-item
 						value=${item.value}
 						name="item-${index}"
+						data-sort-entry-id=${item.value}
 						@input=${(event: UmbInputEvent) => this.#onInput(event, index)}
 						@delete="${(event: UmbDeleteEvent) => this.#deleteItem(event, index)}"
 						?disabled=${this.disabled}
@@ -196,6 +232,18 @@ export class UmbInputMultipleTextStringElement extends FormControlMixin(UmbLitEl
 		css`
 			#action {
 				display: block;
+			}
+
+			.--umb-sorter-placeholder {
+				position: relative;
+				visibility: hidden;
+			}
+			.--umb-sorter-placeholder::after {
+				content: '';
+				position: absolute;
+				inset: 0px;
+				border-radius: var(--uui-border-radius);
+				border: 1px dashed var(--uui-color-divider-emphasis);
 			}
 		`,
 	];
