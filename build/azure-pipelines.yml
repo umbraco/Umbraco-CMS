@@ -478,9 +478,9 @@ stages:
               dotnet nuget add source ./nupkg --name Local
               dotnet new install Umbraco.Templates::$cmsVersion
               dotnet new umbraco --name UmbracoProject --version $cmsVersion --exclude-gitignore --no-restore --no-update-check
-              dotnet add UmbracoProject reference $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest.UmbracoProject
               dotnet restore UmbracoProject
-              dotnet build UmbracoProject --configuration $(buildConfiguration) --no-restore
+              dotnet add UmbracoProject reference $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest.UmbracoProject
+              dotnet build UmbracoProject --configuration $(buildConfiguration) --no-restore --property:BuildProjectReferences=false
               dotnet dev-certs https
             displayName: Build application
             workingDirectory: $(Agent.BuildDirectory)/app
@@ -607,9 +607,9 @@ stages:
               dotnet nuget add source ./nupkg --name Local
               dotnet new install Umbraco.Templates::$cmsVersion
               dotnet new umbraco --name UmbracoProject --version $cmsVersion --exclude-gitignore --no-restore --no-update-check
-              dotnet add UmbracoProject reference $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest.UmbracoProject
               dotnet restore UmbracoProject
-              dotnet build UmbracoProject --configuration $(buildConfiguration) --no-restore
+              dotnet add UmbracoProject reference $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest.UmbracoProject
+              dotnet build UmbracoProject --configuration $(buildConfiguration) --no-restore --property:BuildProjectReferences=false
               dotnet dev-certs https
             displayName: Build application
             workingDirectory: $(Agent.BuildDirectory)/app
