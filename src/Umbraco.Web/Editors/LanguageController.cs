@@ -45,7 +45,6 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        [UmbracoApplicationAuthorize(Core.Constants.Applications.Content)]
         public IEnumerable<Language> GetAllLanguages()
         {
             var allLanguages = Services.LocalizationService.GetAllLanguages();
