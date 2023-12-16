@@ -1,23 +1,28 @@
 {
 	"compilerOptions": {
 		"module": "esnext",
-		"target": "esnext",
+		"target": "ES2020",
 		"lib": ["es2020", "dom", "dom.iterable"],
-		"noEmit": true,
 		"outDir": "./types",
-		"strict": true,
-		"noImplicitReturns": true,
-		"noFallthroughCasesInSwitch": true,
-		"moduleResolution": "node",
-		"isolatedModules": true,
 		"allowSyntheticDefaultImports": true,
 		"experimentalDecorators": true,
 		"forceConsistentCasingInFileNames": true,
 		"useDefineForClassFields": false,
-		"skipLibCheck": true,
-		"resolveJsonModule": true,
 		"baseUrl": ".",
 		"incremental": true,
+
+		/* Bundler mode */
+		"moduleResolution": "bundler",
+		"allowImportingTsExtensions": true,
+		"resolveJsonModule": true,
+		"isolatedModules": true,
+		"noEmit": true,
+
+		/* Linting */
+		"strict": true,
+		"noFallthroughCasesInSwitch": true,
+		"noImplicitReturns": true,
+
 		"paths": {
 			// TODO: can we combine these of multiple tsconfigs so each package can hold their own?
 			// APPS
