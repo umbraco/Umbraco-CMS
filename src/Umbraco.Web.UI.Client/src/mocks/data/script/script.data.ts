@@ -1,16 +1,6 @@
-import { UmbData } from './data.js';
-import { UmbMockFileSystemFolderManager } from './file-system/file-system-folder-manager.js';
-import { UmbMockFileSystemTreeManager } from './file-system/file-system-tree-manager.js';
-import { createFileItemResponseModelBaseModel, createTextFileItem } from './utils.js';
-import {
-	CreateTextFileViewModelBaseModel,
-	FileSystemTreeItemPresentationModel,
-	ScriptItemResponseModel,
-	ScriptResponseModel,
-	UpdateScriptRequestModel,
-} from '@umbraco-cms/backoffice/backend-api';
+import { FileSystemTreeItemPresentationModel, ScriptResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
-type UmbMockScriptModel = ScriptResponseModel & FileSystemTreeItemPresentationModel;
+export type UmbMockScriptModel = ScriptResponseModel & FileSystemTreeItemPresentationModel;
 
 export const data: Array<UmbMockScriptModel> = [
 	{
@@ -124,57 +114,3 @@ export const data: Array<UmbMockScriptModel> = [
 		content: `alert('hello file with dash');`,
 	},
 ];
-
-class UmbScriptsData extends UmbData<UmbMockScriptModel> {
-	tree = new UmbMockFileSystemTreeManager<UmbMockScriptModel>(this);
-	folder = new UmbMockFileSystemFolderManager<UmbMockScriptModel>(this);
-
-	constructor() {
-		super(data);
-	}
-
-	getItem(paths: Array<string>): Array<ScriptItemResponseModel> {
-		const items = this.data.filter((item) => paths.includes(item.path ?? ''));
-		return items.map((item) => createFileItemResponseModelBaseModel(item));
-	}
-
-	create(item: CreateTextFileViewModelBaseModel) {
-		const newItem: UmbMockScriptModel = {
-			name: item.name,
-			content: item.content,
-			//parentPath: item.parentPath,
-			path: `${item.parentPath}` ? `${item.parentPath}/${item.name}}` : item.name,
-			isFolder: false,
-			hasChildren: false,
-			type: 'script',
-		};
-
-		this.data.push(newItem);
-	}
-
-	read(path: string): ScriptResponseModel | undefined {
-		const item = this.data.find((item) => item.path === path);
-		return createTextFileItem(item);
-	}
-
-	update(updateItem: UpdateScriptRequestModel) {
-		const itemIndex = this.data.findIndex((item) => item.path === updateItem.existingPath);
-		const item = this.data[itemIndex];
-		if (!item) throw new Error('Item not found');
-
-		const updatedItem = {
-			path: item,
-		};
-
-		this.data[itemIndex] = newItem;
-	}
-
-	delete(paths: Array<string>) {
-		this.data = this.data.filter((item) => {
-			if (!item.path) throw new Error('Item has no path');
-			return paths.indexOf(item.path) === -1;
-		});
-	}
-}
-
-export const umbScriptsData = new UmbScriptsData();
