@@ -554,7 +554,7 @@ export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	renderPreview(markdown: string) {
-		const markdownAsHtml = marked.parse(markdown);
+		const markdownAsHtml = marked.parse(markdown) as string;
 		const sanitizedHtml = markdownAsHtml ? DOMPurify.sanitize(markdownAsHtml) : '';
 		return html`<uui-scroll-container id="preview"> ${unsafeHTML(sanitizedHtml)} </uui-scroll-container>`;
 	}

@@ -3,7 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type UserDataModel = {
+export type ServerInformationItemResponseModel = {
     name: string;
     data: string;
 };

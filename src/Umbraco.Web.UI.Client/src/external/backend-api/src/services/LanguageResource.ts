@@ -32,6 +32,9 @@ export class LanguageResource {
                 'skip': skip,
                 'take': take,
             },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -52,6 +55,7 @@ export class LanguageResource {
             responseHeader: 'Location',
             errors: {
                 400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
         });
@@ -73,6 +77,7 @@ export class LanguageResource {
                 'isoCode': isoCode,
             },
             errors: {
+                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
         });
@@ -95,6 +100,7 @@ export class LanguageResource {
             },
             errors: {
                 400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
         });
@@ -121,6 +127,7 @@ export class LanguageResource {
             mediaType: 'application/json',
             errors: {
                 400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
         });
@@ -140,6 +147,9 @@ export class LanguageResource {
             url: '/umbraco/management/api/v1/language/item',
             query: {
                 'isoCode': isoCode,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }

@@ -78,7 +78,7 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 
 			this.inputQuery$.pipe(debounceTime(250)).subscribe((nameInputValue) => {
 				this.#templateWorkspaceContext?.setName(nameInputValue);
-				if (this.#isNew && !this._alias) this.#templateWorkspaceContext?.setAlias(camelCase(nameInputValue));
+				if (this.#isNew) this.#templateWorkspaceContext?.setAlias(camelCase(nameInputValue));
 			});
 		});
 	}
@@ -90,6 +90,7 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	#onAliasInput(event: Event) {
+		event.stopPropagation();
 		const target = event.target as UUIInputElement;
 		const value = target.value as string;
 		this.#templateWorkspaceContext?.setAlias(value);
@@ -188,7 +189,7 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 				.value=${this._name}
 				@input=${this.#onNameInput}
 				label="template name">
-				<uui-input-lock slot="append" value=${ifDefined(this._alias!)} @change=${this.#onAliasInput}></uui-input-lock>
+				<uui-input-lock slot="append" value=${ifDefined(this._alias!)} @input=${this.#onAliasInput}></uui-input-lock>
 			</uui-input>
 
 			<uui-box>
