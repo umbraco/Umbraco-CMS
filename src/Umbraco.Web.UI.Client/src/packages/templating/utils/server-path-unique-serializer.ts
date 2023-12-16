@@ -9,9 +9,8 @@ export class UmbServerPathUniqueSerializer {
 	 * @return {*}  {(string | null)}
 	 * @memberof UmbServerPathSerializer
 	 */
-	toUnique(serverPath: string): string | null {
-		if (!serverPath) return null;
-		const urlSafeServerPath = serverPath.replace('.', this.#magicDot);
+	toUnique(serverPath: string): string {
+		const urlSafeServerPath = serverPath?.replace('.', this.#magicDot);
 		return encodeURIComponent(urlSafeServerPath);
 	}
 
