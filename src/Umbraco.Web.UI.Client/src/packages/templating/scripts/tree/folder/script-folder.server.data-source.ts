@@ -81,7 +81,7 @@ export class UmbScriptFolderServerDataSource implements UmbFolderDataSource {
 		if (!error) {
 			/* TODO: investigate why we don't get the location header as part of data, 
 			so we don't have to construct the path ourselves */
-			const newPath = `${parentPath}/${args.name}`;
+			const newPath = parentPath ? `${parentPath}/${args.name}` : args.name;
 			return this.read(newPath);
 		}
 
