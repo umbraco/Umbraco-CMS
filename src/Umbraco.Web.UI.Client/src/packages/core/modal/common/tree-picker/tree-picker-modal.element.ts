@@ -46,6 +46,7 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 						@selection-change=${this.#onSelectionChange}
 						.selection=${this._selection}
 						selectable
+						.filter=${this.data?.filter}
 						.selectableFilter=${this.data?.pickableFilter}
 						?multiple=${this._multiple}></umb-tree>
 				</uui-box>
