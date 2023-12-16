@@ -1,6 +1,10 @@
-import { FileSystemTreeItemPresentationModel, ScriptResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import {
+	FileSystemTreeItemPresentationModel,
+	ScriptItemResponseModel,
+	ScriptResponseModel,
+} from '@umbraco-cms/backoffice/backend-api';
 
-export type UmbMockScriptModel = ScriptResponseModel & FileSystemTreeItemPresentationModel;
+export type UmbMockScriptModel = ScriptResponseModel & FileSystemTreeItemPresentationModel & ScriptItemResponseModel;
 
 export const data: Array<UmbMockScriptModel> = [
 	{
@@ -9,6 +13,7 @@ export const data: Array<UmbMockScriptModel> = [
 		name: 'some-folder',
 		type: 'script',
 		hasChildren: true,
+		icon: 'icon-script',
 		content: '',
 	},
 	{
@@ -17,6 +22,7 @@ export const data: Array<UmbMockScriptModel> = [
 		name: 'another-folder',
 		type: 'script',
 		hasChildren: true,
+		icon: 'icon-script',
 		content: '',
 	},
 	{
@@ -25,6 +31,7 @@ export const data: Array<UmbMockScriptModel> = [
 		name: 'very important folder',
 		type: 'script',
 		hasChildren: true,
+		icon: 'icon-script',
 		content: '',
 	},
 	{
@@ -33,6 +40,7 @@ export const data: Array<UmbMockScriptModel> = [
 		name: 'ugly script.js',
 		type: 'script',
 		hasChildren: false,
+		icon: 'icon-script',
 		content: `function makeid(length) {
 			var result           = '';
 			var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -51,6 +59,7 @@ export const data: Array<UmbMockScriptModel> = [
 		name: 'nice script.js',
 		type: 'script',
 		hasChildren: false,
+		icon: 'icon-script',
 		content: `var items = {
 			"item_1": "1",
 			"item_2": "2",
@@ -66,6 +75,7 @@ export const data: Array<UmbMockScriptModel> = [
 		name: 'only bugs.js',
 		type: 'script',
 		hasChildren: false,
+		icon: 'icon-script',
 		content: `var my_arr = [4, '', 0, 10, 7, '', false, 10];
 
 		my_arr = my_arr.filter(Boolean);
@@ -78,6 +88,7 @@ export const data: Array<UmbMockScriptModel> = [
 		name: 'no bugs at all.js',
 		type: 'script',
 		hasChildren: false,
+		icon: 'icon-script',
 		content: `const date_str = "07/20/2021";
 		const date = new Date(date_str);
 		const full_day_name = date.toLocaleDateString('default', { weekday: 'long' });
@@ -93,6 +104,7 @@ export const data: Array<UmbMockScriptModel> = [
 		name: 'nope.js',
 		type: 'script',
 		hasChildren: false,
+		icon: 'icon-script',
 		content: `// Define an object
 		const employee = {
 			"name": "John Deo",
@@ -111,6 +123,7 @@ export const data: Array<UmbMockScriptModel> = [
 		name: 'file-with-dash.js',
 		type: 'script',
 		hasChildren: false,
+		icon: 'icon-script',
 		content: `alert('hello file with dash');`,
 	},
 ];

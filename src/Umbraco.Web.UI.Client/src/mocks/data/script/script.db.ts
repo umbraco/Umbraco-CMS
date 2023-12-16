@@ -1,26 +1,22 @@
 import { UmbData } from '../data.js';
-import { UmbMockFileSystemFolderManager } from '../file-system/file-system-folder-manager.js';
-import { UmbMockFileSystemTreeManager } from '../file-system/file-system-tree-manager.js';
-import { createFileItemResponseModelBaseModel, createTextFileItem } from '../utils.js';
+import { UmbMockFileSystemFolderManager } from '../file-system/file-system-folder.manager.js';
+import { UmbMockFileSystemItemManager } from '../file-system/file-system-item.manager.js';
+import { UmbMockFileSystemTreeManager } from '../file-system/file-system-tree.manager.js';
+import { createTextFileItem } from '../utils.js';
 import { UmbMockScriptModel, data as scriptData } from './script.data.js';
 import {
 	CreateTextFileViewModelBaseModel,
-	ScriptItemResponseModel,
 	ScriptResponseModel,
 	UpdateScriptRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
 
-class UmbScriptsData extends UmbData<UmbMockScriptModel> {
+class UmbScriptMockDB extends UmbData<UmbMockScriptModel> {
 	tree = new UmbMockFileSystemTreeManager<UmbMockScriptModel>(this);
 	folder = new UmbMockFileSystemFolderManager<UmbMockScriptModel>(this);
+	item = new UmbMockFileSystemItemManager<UmbMockScriptModel>(this);
 
-	constructor(data) {
+	constructor(data: Array<UmbMockScriptModel>) {
 		super(data);
-	}
-
-	getItem(paths: Array<string>): Array<ScriptItemResponseModel> {
-		const items = this.data.filter((item) => paths.includes(item.path ?? ''));
-		return items.map((item) => createFileItemResponseModelBaseModel(item));
 	}
 
 	create(item: CreateTextFileViewModelBaseModel) {
@@ -62,4 +58,4 @@ class UmbScriptsData extends UmbData<UmbMockScriptModel> {
 	}
 }
 
-export const umbScriptsData = new UmbScriptsData(scriptData);
+export const umbScriptMockDb = new UmbScriptMockDB(scriptData);

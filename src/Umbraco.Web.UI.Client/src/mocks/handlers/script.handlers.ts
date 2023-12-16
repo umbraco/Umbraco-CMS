@@ -1,89 +1,97 @@
 const { rest } = window.MockServiceWorker;
 import { RestHandler, MockedRequest, DefaultBodyType } from 'msw';
-import { umbScriptsData } from '../data/script/script.db.js';
+import { umbScriptMockDb } from '../data/script/script.db.js';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
-import { CreateScriptRequestModel, UpdateScriptRequestModel } from '@umbraco-cms/backoffice/backend-api';
+import {
+	CreatePathFolderRequestModel,
+	CreateScriptRequestModel,
+	UpdateScriptRequestModel,
+} from '@umbraco-cms/backoffice/backend-api';
 
 const treeHandlers = [
 	rest.get(umbracoPath('/tree/script/root'), (req, res, ctx) => {
-		const response = umbScriptsData.getTreeRoot();
+		const response = umbScriptMockDb.tree.getRoot();
+		debugger;
 		return res(ctx.status(200), ctx.json(response));
 	}),
 
 	rest.get(umbracoPath('/tree/script/children'), (req, res, ctx) => {
 		const path = req.url.searchParams.get('path');
-		if (!path) return;
-
-		const response = umbScriptsData.getTreeItemChildren(path);
+		debugger;
+		if (!path) return res(ctx.status(400));
+		const response = umbScriptMockDb.tree.getChildrenOf(path);
 		return res(ctx.status(200), ctx.json(response));
-	}),
-
-	rest.get(umbracoPath('/tree/script/item'), (req, res, ctx) => {
-		const paths = req.url.searchParams.getAll('paths');
-		if (!paths) return;
-
-		const items = umbScriptsData.getTreeItem(paths);
-		return res(ctx.status(200), ctx.json(items));
 	}),
 ];
 
 const detailHandlers: RestHandler<MockedRequest<DefaultBodyType>>[] = [
 	rest.get(umbracoPath('/script'), (req, res, ctx) => {
-		const path = decodeURIComponent(req.url.searchParams.get('path') ?? '').replace('-js', '.js');
+		const path = req.url.searchParams.get('path');
+		debugger;
 		if (!path) return res(ctx.status(400));
-		const response = umbScriptsData.getScript(path);
-		return res(ctx.status(200), ctx.json(response));
-	}),
-
-	rest.get(umbracoPath('/script/item'), (req, res, ctx) => {
-		const path = decodeURIComponent(req.url.searchParams.get('path') ?? '').replace('-js', '.js');
-		if (!path) return res(ctx.status(400, 'no body found'));
-		const response = umbScriptsData.getItem([path]);
+		const response = umbScriptMockDb.read(path);
 		return res(ctx.status(200), ctx.json(response));
 	}),
 
 	rest.post(umbracoPath('/script'), async (req, res, ctx) => {
 		const requestBody = (await req.json()) as CreateScriptRequestModel;
+		debugger;
 		if (!requestBody) return res(ctx.status(400, 'no body found'));
-		umbScriptsData.insert(requestBody);
+		umbScriptMockDb.create(requestBody);
 		return res(ctx.status(200));
 	}),
 
 	rest.delete(umbracoPath('/script'), (req, res, ctx) => {
 		const path = req.url.searchParams.get('path');
+		debugger;
 		if (!path) return res(ctx.status(400));
-		umbScriptsData.delete([path]);
+		umbScriptMockDb.delete([path]);
 		return res(ctx.status(200));
 	}),
 
 	rest.put(umbracoPath('/script'), async (req, res, ctx) => {
 		const requestBody = (await req.json()) as UpdateScriptRequestModel;
+		debugger;
 		if (!requestBody) return res(ctx.status(400, 'no body found'));
-		umbScriptsData.updateData(requestBody);
+		umbScriptMockDb.update(requestBody);
 		return res(ctx.status(200));
+	}),
+];
+
+const itemHandlers: RestHandler<MockedRequest<DefaultBodyType>>[] = [
+	rest.get(umbracoPath('/script/item'), (req, res, ctx) => {
+		const paths = req.url.searchParams.getAll('paths');
+		debugger;
+		if (!paths) return res(ctx.status(400, 'no body found'));
+		const response = umbScriptMockDb.getItems(paths);
+		return res(ctx.status(200), ctx.json(response));
 	}),
 ];
 
 const folderHandlers: RestHandler<MockedRequest<DefaultBodyType>>[] = [
 	rest.get(umbracoPath('script/folder'), (req, res, ctx) => {
-		const path = decodeURIComponent(req.url.searchParams.get('path') ?? '').replace('-js', '.js');
+		const path = req.url.searchParams.get('path');
+		debugger;
 		if (!path) return res(ctx.status(400));
-		const response = umbScriptsData.getFolder(path);
+		const response = umbScriptMockDb.folder.read(path);
 		return res(ctx.status(200), ctx.json(response));
 	}),
 
-	rest.post(umbracoPath('script/folder'), (req, res, ctx) => {
-		const requestBody = req.json();
+	rest.post(umbracoPath('script/folder'), async (req, res, ctx) => {
+		const requestBody = (await req.json()) as CreatePathFolderRequestModel;
+		debugger;
 		if (!requestBody) return res(ctx.status(400, 'no body found'));
+		umbScriptMockDb.folder.create(requestBody);
 		return res(ctx.status(200));
 	}),
 
 	rest.delete(umbracoPath('script/folder'), (req, res, ctx) => {
-		const path = decodeURIComponent(req.url.searchParams.get('path') ?? '').replace('-js', '.js');
+		const path = req.url.searchParams.get('path');
+		debugger;
 		if (!path) return res(ctx.status(400));
-		umbScriptsData.deleteFolder(path);
+		umbScriptMockDb.folder.delete(path);
 		return res(ctx.status(200));
 	}),
 ];
 
-export const handlers = [...treeHandlers, ...detailHandlers, ...folderHandlers];
+export const handlers = [...treeHandlers, ...detailHandlers, ...itemHandlers, ...folderHandlers];
