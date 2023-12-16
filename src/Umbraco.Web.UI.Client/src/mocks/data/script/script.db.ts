@@ -23,7 +23,7 @@ class UmbScriptMockDB extends UmbData<UmbMockScriptModel> {
 		const newItem: UmbMockScriptModel = {
 			name: item.name,
 			content: item.content,
-			//parentPath: item.parentPath,
+			parentPath: item.parentPath,
 			path: `${item.parentPath}` ? `${item.parentPath}/${item.name}}` : item.name,
 			isFolder: false,
 			hasChildren: false,
