@@ -10,6 +10,7 @@
 		"useDefineForClassFields": false,
 		"baseUrl": ".",
 		"incremental": true,
+		"skipLibCheck": true,
 
 		/* Bundler mode */
 		"moduleResolution": "bundler",
