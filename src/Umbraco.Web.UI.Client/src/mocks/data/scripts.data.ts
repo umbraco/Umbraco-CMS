@@ -1,18 +1,18 @@
 import { UmbData } from './data.js';
-import { createFileItemResponseModelBaseModel, createFileSystemTreeItem, createTextFileItem } from './utils.js';
+import { UmbMockFileSystemFolderManager } from './file-system/file-system-folder-manager.js';
+import { UmbMockFileSystemTreeManager } from './file-system/file-system-tree-manager.js';
+import { createFileItemResponseModelBaseModel, createTextFileItem } from './utils.js';
 import {
-	CreatePathFolderRequestModel,
 	CreateTextFileViewModelBaseModel,
 	FileSystemTreeItemPresentationModel,
-	PagedFileSystemTreeItemPresentationModel,
 	ScriptItemResponseModel,
 	ScriptResponseModel,
 	UpdateScriptRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
 
-type ScriptsDataItem = ScriptResponseModel & FileSystemTreeItemPresentationModel;
+type UmbMockScriptModel = ScriptResponseModel & FileSystemTreeItemPresentationModel;
 
-export const data: Array<ScriptsDataItem> = [
+export const data: Array<UmbMockScriptModel> = [
 	{
 		path: 'some-folder',
 		isFolder: true,
@@ -125,28 +125,12 @@ export const data: Array<ScriptsDataItem> = [
 	},
 ];
 
-class UmbScriptsData extends UmbData<ScriptsDataItem> {
+class UmbScriptsData extends UmbData<UmbMockScriptModel> {
+	tree = new UmbMockFileSystemTreeManager<UmbMockScriptModel>(this);
+	folder = new UmbMockFileSystemFolderManager<UmbMockScriptModel>(this);
+
 	constructor() {
 		super(data);
-	}
-
-	getTreeRoot(): PagedFileSystemTreeItemPresentationModel {
-		const items = this.data.filter((item) => item.path?.includes('/') === false);
-		const treeItems = items.map((item) => createFileSystemTreeItem(item));
-		const total = items.length;
-		return { items: treeItems, total };
-	}
-
-	getTreeItemChildren(parentPath: string): PagedFileSystemTreeItemPresentationModel {
-		const items = this.data.filter((item) => item.path?.startsWith(parentPath));
-		const treeItems = items.map((item) => createFileSystemTreeItem(item));
-		const total = items.length;
-		return { items: treeItems, total };
-	}
-
-	getTreeItem(paths: Array<string>): Array<FileSystemTreeItemPresentationModel> {
-		const items = this.data.filter((item) => paths.includes(item.path ?? ''));
-		return items.map((item) => createFileSystemTreeItem(item));
 	}
 
 	getItem(paths: Array<string>): Array<ScriptItemResponseModel> {
@@ -154,94 +138,42 @@ class UmbScriptsData extends UmbData<ScriptsDataItem> {
 		return items.map((item) => createFileItemResponseModelBaseModel(item));
 	}
 
-	getFolder(path: string) {
-		return data.find((item) => item.isFolder && item.path === path);
-	}
-
-	postFolder(payload: CreatePathFolderRequestModel) {
-		const newFolder = {
-			path: `${payload.parentPath ?? ''}/${payload.name}`,
-			isFolder: true,
-			name: payload.name,
-			type: 'script',
-			hasChildren: false,
-			content: '',
-		};
-		return this.insert(newFolder);
-	}
-
-	deleteFolder(path: string) {
-		return this.delete([path]);
-	}
-
-	getScript(path: string): ScriptResponseModel | undefined {
-		return createTextFileItem(this.data.find((item) => item.path === path));
-	}
-
-	insertScript(item: CreateTextFileViewModelBaseModel) {
-		const newItem: ScriptsDataItem = {
-			...item,
-			path: `${item.parentPath}/${item.name}.js}`,
+	create(item: CreateTextFileViewModelBaseModel) {
+		const newItem: UmbMockScriptModel = {
+			name: item.name,
+			content: item.content,
+			//parentPath: item.parentPath,
+			path: `${item.parentPath}` ? `${item.parentPath}/${item.name}}` : item.name,
 			isFolder: false,
 			hasChildren: false,
 			type: 'script',
 		};
 
-		this.insert(newItem);
-		return newItem;
+		this.data.push(newItem);
 	}
 
-	insert(item: ScriptsDataItem) {
-		const exits = this.data.find((i) => i.path === item.path);
-
-		if (exits) {
-			throw new Error(`Item with path ${item.path} already exists`);
-		}
-
-		this.data.push(item);
-
-		return item;
+	read(path: string): ScriptResponseModel | undefined {
+		const item = this.data.find((item) => item.path === path);
+		return createTextFileItem(item);
 	}
 
-	updateData(updateItem: UpdateScriptRequestModel) {
+	update(updateItem: UpdateScriptRequestModel) {
 		const itemIndex = this.data.findIndex((item) => item.path === updateItem.existingPath);
 		const item = this.data[itemIndex];
-		if (!item) return;
+		if (!item) throw new Error('Item not found');
 
-		// TODO: revisit this code, seems like something we can solve smarter/type safer now:
-		const itemKeys = Object.keys(item);
-		const newItem = { ...item };
+		const updatedItem = {
+			path: item,
+		};
 
-		for (const [key] of Object.entries(updateItem)) {
-			if (itemKeys.indexOf(key) !== -1) {
-				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-				// @ts-ignore
-				newItem[key] = updateItem[key];
-			}
-		}
-		// Specific to fileSystem, we need to update path based on name:
-		const dirName = updateItem.existingPath?.substring(0, updateItem.existingPath.lastIndexOf('/'));
-		newItem.path = `${dirName}${dirName ? '/' : ''}${updateItem.name}`;
-
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-ignore
 		this.data[itemIndex] = newItem;
 	}
 
 	delete(paths: Array<string>) {
-		const pathsOfItemsToDelete = this.data
-			.filter((item) => {
-				if (!item.path) throw new Error('Item has no path');
-				return paths.includes(item.path);
-			})
-			.map((item) => item.path);
-
 		this.data = this.data.filter((item) => {
 			if (!item.path) throw new Error('Item has no path');
 			return paths.indexOf(item.path) === -1;
 		});
-
-		return pathsOfItemsToDelete;
 	}
 }
 
