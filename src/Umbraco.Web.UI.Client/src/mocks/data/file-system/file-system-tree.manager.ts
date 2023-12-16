@@ -13,14 +13,14 @@ export class UmbMockFileSystemTreeManager<T extends FileSystemTreeItemPresentati
 	}
 
 	getRoot(): PagedFileSystemTreeItemPresentationModel {
-		const items = this.#db.getData().filter((item) => item.path?.includes('/') === false);
+		const items = this.#db.getData().filter((item) => item.path.includes('/') === false);
 		const treeItems = items.map((item) => createFileSystemTreeItem(item));
 		const total = items.length;
 		return { items: treeItems, total };
 	}
 
 	getChildrenOf(parentPath: string): PagedFileSystemTreeItemPresentationModel {
-		const items = this.#db.getData().filter((item) => item.path?.startsWith(parentPath));
+		const items = this.#db.getData().filter((item) => item.path.includes('/') && item.path.startsWith(parentPath));
 		const treeItems = items.map((item) => createFileSystemTreeItem(item));
 		const total = items.length;
 		return { items: treeItems, total };
