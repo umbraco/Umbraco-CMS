@@ -10,7 +10,8 @@ export class UmbMockFileSystemFolderManager<T extends PathFolderModelBaseModel> 
 
 	create(request: CreatePathFolderRequestModel) {
 		const newFolder = {
-			path: `${request.parentPath ?? ''}/${request.name}`,
+			path: request.parentPath ? `${request.parentPath ?? ''}/${request.name}` : request.name,
+			parenPath: request.parentPath,
 			name: request.name,
 			hasChildren: false,
 			isFolder: true,
