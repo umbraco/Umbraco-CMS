@@ -1,6 +1,6 @@
 const { rest } = window.MockServiceWorker;
 import { RestHandler, MockedRequest, DefaultBodyType } from 'msw';
-import { umbScriptsData } from '../data/scripts.data.js';
+import { umbScriptsData } from '../data/script/script.db.js';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 import { CreateScriptRequestModel, UpdateScriptRequestModel } from '@umbraco-cms/backoffice/backend-api';
 
@@ -45,20 +45,21 @@ const detailHandlers: RestHandler<MockedRequest<DefaultBodyType>>[] = [
 	rest.post(umbracoPath('/script'), async (req, res, ctx) => {
 		const requestBody = (await req.json()) as CreateScriptRequestModel;
 		if (!requestBody) return res(ctx.status(400, 'no body found'));
-		const response = umbScriptsData.insertScript(requestBody);
-		return res(ctx.status(200), ctx.json(response));
+		umbScriptsData.insert(requestBody);
+		return res(ctx.status(200));
 	}),
 
 	rest.delete(umbracoPath('/script'), (req, res, ctx) => {
 		const path = req.url.searchParams.get('path');
 		if (!path) return res(ctx.status(400));
-		const response = umbScriptsData.delete([path]);
-		return res(ctx.status(200), ctx.json(response));
+		umbScriptsData.delete([path]);
+		return res(ctx.status(200));
 	}),
 
 	rest.put(umbracoPath('/script'), async (req, res, ctx) => {
 		const requestBody = (await req.json()) as UpdateScriptRequestModel;
 		if (!requestBody) return res(ctx.status(400, 'no body found'));
+		umbScriptsData.updateData(requestBody);
 		return res(ctx.status(200));
 	}),
 ];
@@ -80,8 +81,8 @@ const folderHandlers: RestHandler<MockedRequest<DefaultBodyType>>[] = [
 	rest.delete(umbracoPath('script/folder'), (req, res, ctx) => {
 		const path = decodeURIComponent(req.url.searchParams.get('path') ?? '').replace('-js', '.js');
 		if (!path) return res(ctx.status(400));
-		const response = umbScriptsData.deleteFolder(path);
-		return res(ctx.status(200), ctx.json(response));
+		umbScriptsData.deleteFolder(path);
+		return res(ctx.status(200));
 	}),
 ];
 
