@@ -1,10 +1,10 @@
 import { UmbFileSystemMockDbBase } from './file-system-base.js';
 import { CreatePathFolderRequestModel, PathFolderModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 
-export class UmbMockFileSystemFolderManager<T extends PathFolderModelBaseModel> {
-	#db: UmbFileSystemMockDbBase<T>;
+export class UmbMockFileSystemFolderManager<MockItemType extends { path: string }> {
+	#db: UmbFileSystemMockDbBase<MockItemType>;
 
-	constructor(db: UmbFileSystemMockDbBase<T>) {
+	constructor(db: UmbFileSystemMockDbBase<MockItemType>) {
 		this.#db = db;
 	}
 
@@ -24,7 +24,7 @@ export class UmbMockFileSystemFolderManager<T extends PathFolderModelBaseModel> 
 		const dbItem = this.#db.read(path);
 		const isFolder = dbItem?.isFolder ?? false;
 		if (!isFolder) return undefined;
-		return fileSystemFolderMapper<T>(dbItem);
+		return fileSystemFolderMapper<MockItemType>(dbItem);
 	}
 
 	delete(path: string) {
