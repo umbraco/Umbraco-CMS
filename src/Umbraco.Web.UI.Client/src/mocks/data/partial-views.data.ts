@@ -1,5 +1,5 @@
 import { UmbEntityData } from './entity.data.js';
-import { createFileSystemTreeItem, createTextFileItem } from './utils.js';
+import { createFileSystemTreeItem, textFileItemMapper } from './utils.js';
 import {
 	CreateTextFileViewModelBaseModel,
 	FileSystemTreeItemPresentationModel,
@@ -359,7 +359,7 @@ class UmbPartialViewsData extends UmbEntityData<PartialViewResponseModel> {
 	}
 
 	getPartialView(path: string): PartialViewResponseModel | undefined {
-		return createTextFileItem(this.data.find((item) => item.path === path));
+		return textFileItemMapper(this.data.find((item) => item.path === path));
 	}
 
 	insertPartialView(item: CreateTextFileViewModelBaseModel) {
