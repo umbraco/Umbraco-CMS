@@ -1,8 +1,4 @@
-export class UmbControllerEvent extends Event {
-	public constructor(type: string) {
-		super(type, { bubbles: false, composed: false, cancelable: false });
-	}
-}
+import { UmbControllerEvent } from '@umbraco-cms/backoffice/controller-api';
 
 export interface UmbActionEventArgs {
 	unique: string;
@@ -21,6 +17,7 @@ export class UmbActionEvent extends UmbControllerEvent {
 		return this.#args.unique;
 	}
 
+	// TODO: this can be removed when the server supports reloading a tree item without reloading the parent
 	getParentUnique(): string | null {
 		return this.#args.parentUnique;
 	}
