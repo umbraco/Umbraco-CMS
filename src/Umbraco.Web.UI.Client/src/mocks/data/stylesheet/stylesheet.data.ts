@@ -1,8 +1,8 @@
 import { FileSystemTreeItemPresentationModel, StylesheetResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
-export type StylesheetDBItem = StylesheetResponseModel & FileSystemTreeItemPresentationModel & { icon?: string };
+export type UmbMockStylesheetModel = StylesheetResponseModel & FileSystemTreeItemPresentationModel & { icon?: string };
 
-export const data: Array<StylesheetDBItem> = [
+export const data: Array<UmbMockStylesheetModel> = [
 	{
 		path: 'Stylesheet File 1.css',
 		icon: 'style',

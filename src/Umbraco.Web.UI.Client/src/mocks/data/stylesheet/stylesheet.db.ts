@@ -1,6 +1,6 @@
 import { UmbData } from '../data.js';
 import { createFileSystemTreeItem, createFileItemResponseModelBaseModel, textFileItemMapper } from '../utils.js';
-import { StylesheetDBItem, data } from './stylesheet.data.js';
+import { UmbMockStylesheetModel, data } from './stylesheet.data.js';
 import {
 	CreateTextFileViewModelBaseModel,
 	ExtractRichTextStylesheetRulesRequestModel,
@@ -21,8 +21,8 @@ import {
 // TODO: all properties are optional in the server schema. I don't think this is correct.
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-class UmbStylesheetData extends UmbData<StylesheetDBItem> {
-	constructor(data: Array<StylesheetDBItem>) {
+class UmbStylesheetData extends UmbData<UmbMockStylesheetModel> {
+	constructor(data: Array<UmbMockStylesheetModel>) {
 		super(data);
 	}
 
@@ -61,7 +61,7 @@ class UmbStylesheetData extends UmbData<StylesheetDBItem> {
 		};
 	}
 
-	getFolder(path: string): StylesheetDBItem | undefined {
+	getFolder(path: string): UmbMockStylesheetModel | undefined {
 		return this.data.find((item) => item.path === path && item.isFolder === true);
 	}
 
@@ -119,7 +119,7 @@ ${rule.selector} {
 	}
 
 	insertFolder(item: CreateTextFileViewModelBaseModel) {
-		const newItem: StylesheetDBItem = {
+		const newItem: UmbMockStylesheetModel = {
 			...item,
 			path: `${item.parentPath}/${item.name}`,
 			isFolder: true,
@@ -134,7 +134,7 @@ ${rule.selector} {
 
 	insertStyleSheet(item: CreateTextFileViewModelBaseModel) {
 		const parentPath = item.parentPath ? `${item.parentPath}/` : '';
-		const newItem: StylesheetDBItem = {
+		const newItem: UmbMockStylesheetModel = {
 			...item,
 			path: `${parentPath}${item.name}`,
 			isFolder: false,
@@ -147,7 +147,7 @@ ${rule.selector} {
 		return newItem;
 	}
 
-	insert(item: StylesheetDBItem) {
+	insert(item: UmbMockStylesheetModel) {
 		const exits = this.data.find((i) => i.path === item.path);
 
 		if (exits) {
