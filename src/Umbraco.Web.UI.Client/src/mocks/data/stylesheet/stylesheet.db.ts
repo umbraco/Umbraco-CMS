@@ -1,48 +1,23 @@
-import { UmbData } from '../data.js';
-import { createFileSystemTreeItem, createFileItemResponseModelBaseModel, textFileItemMapper } from '../utils.js';
+import { UmbFileSystemMockDbBase } from '../file-system/file-system-base.js';
+import { UmbMockFileSystemTreeManager } from '../file-system/file-system-tree.manager.js';
+import { createFileItemResponseModelBaseModel, textFileItemMapper } from '../utils.js';
 import { UmbMockStylesheetModel, data } from './stylesheet.data.js';
 import {
 	CreateTextFileViewModelBaseModel,
 	ExtractRichTextStylesheetRulesRequestModel,
 	ExtractRichTextStylesheetRulesResponseModel,
-	FileSystemTreeItemPresentationModel,
 	InterpolateRichTextStylesheetRequestModel,
-	PagedFileSystemTreeItemPresentationModel,
 	PagedStylesheetOverviewResponseModel,
 	StylesheetItemResponseModel,
 	StylesheetResponseModel,
 	UpdateStylesheetRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
 
-//prettier-ignore
-// eslint-disable-next-line no-useless-escape
+class UmbStylesheetData extends UmbFileSystemMockDbBase<UmbMockStylesheetModel> {
+	tree = new UmbMockFileSystemTreeManager<UmbMockStylesheetModel>(this);
 
-// Temp mocked database
-// TODO: all properties are optional in the server schema. I don't think this is correct.
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-class UmbStylesheetData extends UmbData<UmbMockStylesheetModel> {
 	constructor(data: Array<UmbMockStylesheetModel>) {
 		super(data);
-	}
-
-	getTreeRoot(): PagedFileSystemTreeItemPresentationModel {
-		const items = this.data.filter((item) => item.path?.includes('/') === false);
-		const treeItems = items.map((item) => createFileSystemTreeItem(item));
-		const total = items.length;
-		return { items: treeItems, total };
-	}
-
-	getTreeItemChildren(parentPath: string): PagedFileSystemTreeItemPresentationModel {
-		const items = this.data.filter((item) => item.path?.startsWith(parentPath + '/'));
-		const treeItems = items.map((item) => createFileSystemTreeItem(item));
-		const total = items.length;
-		return { items: treeItems, total };
-	}
-
-	getTreeItem(paths: Array<string>): Array<FileSystemTreeItemPresentationModel> {
-		const items = this.data.filter((item) => paths.includes(item.path ?? ''));
-		return items.map((item) => createFileSystemTreeItem(item));
 	}
 
 	getItems(paths: Array<string>): Array<StylesheetItemResponseModel> {
