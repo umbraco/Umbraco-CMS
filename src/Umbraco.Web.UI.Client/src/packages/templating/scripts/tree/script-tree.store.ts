@@ -52,7 +52,11 @@ export class UmbScriptTreeStore extends UmbUniqueTreeStore {
 		// only reload the parent if the item is already in the store
 		const eventUnique = event.getUnique();
 		const storeItem = this.getItems([eventUnique])?.[0];
+
+		/* we need to remove the store because the unique (path) can have changed.
+		and it will therefore not update the correct item but append a new. */
 		if (storeItem) {
+			this.removeItem(eventUnique);
 			this.#treeRepository.requestTreeItemsOf(storeItem.parentUnique);
 		}
 	};
