@@ -44,7 +44,7 @@ export class UmbScriptFolderServerDataSource implements UmbFolderDataSource {
 		if (data) {
 			const mappedData = {
 				unique: this.#serverPathUniqueSerializer.toUnique(data.path),
-				parentUnique: this.#serverPathUniqueSerializer.toUnique(data.parentPath),
+				parentUnique: this.#serverPathUniqueSerializer.toParentUnique(data.path),
 				name: data.name,
 			};
 

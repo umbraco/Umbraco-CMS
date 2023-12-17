@@ -46,7 +46,6 @@ const detailHandlers: RestHandler<MockedRequest<DefaultBodyType>>[] = [
 
 	rest.put(umbracoPath('/script'), async (req, res, ctx) => {
 		const requestBody = (await req.json()) as UpdateScriptRequestModel;
-		debugger;
 		if (!requestBody) return res(ctx.status(400, 'no body found'));
 		umbScriptMockDb.file.update(requestBody);
 		return res(ctx.status(200));
@@ -56,7 +55,6 @@ const detailHandlers: RestHandler<MockedRequest<DefaultBodyType>>[] = [
 const itemHandlers: RestHandler<MockedRequest<DefaultBodyType>>[] = [
 	rest.get(umbracoPath('/script/item'), (req, res, ctx) => {
 		const paths = req.url.searchParams.getAll('paths');
-		debugger;
 		if (!paths) return res(ctx.status(400, 'no body found'));
 		const response = umbScriptMockDb.getItems(paths);
 		return res(ctx.status(200), ctx.json(response));

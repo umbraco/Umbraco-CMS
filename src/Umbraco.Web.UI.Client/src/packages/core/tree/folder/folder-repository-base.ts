@@ -6,6 +6,7 @@ import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbTreeItemModelBase, UmbTreeStore } from '@umbraco-cms/backoffice/tree';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbId } from '@umbraco-cms/backoffice/id';
+import { UMB_NOTIFICATION_CONTEXT_TOKEN, UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
 
 export type UmbFolderToTreeItemMapper<FolderTreeItemType extends UmbTreeItemModelBase> = (
 	item: UmbFolderModel,
@@ -19,6 +20,7 @@ export abstract class UmbFolderRepositoryBase<FolderTreeItemType extends UmbTree
 	protected _treeStore?: UmbTreeStore<FolderTreeItemType>;
 	#folderDataSource: UmbFolderDataSource;
 	#folderToTreeItemMapper: UmbFolderToTreeItemMapper<FolderTreeItemType>;
+	#notificationContext?: UmbNotificationContext;
 
 	constructor(
 		host: UmbControllerHost,
@@ -30,9 +32,15 @@ export abstract class UmbFolderRepositoryBase<FolderTreeItemType extends UmbTree
 		this.#folderDataSource = new folderDataSource(this);
 		this.#folderToTreeItemMapper = folderToTreeItemMapper;
 
-		this._init = this.consumeContext(treeStoreContextAlias, (instance) => {
-			this._treeStore = instance;
-		}).asPromise();
+		this._init = Promise.all([
+			this.consumeContext(treeStoreContextAlias, (instance) => {
+				this._treeStore = instance;
+			}).asPromise(),
+
+			this.consumeContext(UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
+				this.#notificationContext = instance;
+			}).asPromise(),
+		]);
 	}
 
 	async createScaffold(parentUnique: string | null) {
@@ -63,10 +71,26 @@ export abstract class UmbFolderRepositoryBase<FolderTreeItemType extends UmbTree
 		if (data) {
 			const folderTreeItem = this.#folderToTreeItemMapper(data);
 			this._treeStore!.append(folderTreeItem);
+
+			const notification = { data: { message: `Folder created` } };
+			this.#notificationContext!.peek('positive', notification);
+
 			return { data };
 		}
 
 		return { error };
+	}
+
+	/**
+	 * Request a folder
+	 * @param {string} unique
+	 * @return {*}
+	 * @memberof UmbFolderRepositoryBase
+	 */
+	async request(unique: string) {
+		if (!unique) throw new Error('Unique is missing');
+		await this._init;
+		return await this.#folderDataSource.read(unique);
 	}
 
 	/**
@@ -87,6 +111,9 @@ export abstract class UmbFolderRepositoryBase<FolderTreeItemType extends UmbTree
 			// @ts-ignore
 			// TODO: I don't know why typescript is complaining about the name prop
 			this._treeStore!.updateItem(args.unique, { name: data.name });
+
+			const notification = { data: { message: `Folder updated` } };
+			this.#notificationContext!.peek('positive', notification);
 		}
 
 		return { data, error };
@@ -106,20 +133,11 @@ export abstract class UmbFolderRepositoryBase<FolderTreeItemType extends UmbTree
 
 		if (!error) {
 			this._treeStore!.removeItem(unique);
+
+			const notification = { data: { message: `Folder deleted` } };
+			this.#notificationContext!.peek('positive', notification);
 		}
 
 		return { error };
-	}
-
-	/**
-	 * Request a folder
-	 * @param {string} unique
-	 * @return {*}
-	 * @memberof UmbFolderRepositoryBase
-	 */
-	async request(unique: string) {
-		if (!unique) throw new Error('Unique is missing');
-		await this._init;
-		return await this.#folderDataSource.read(unique);
 	}
 }
