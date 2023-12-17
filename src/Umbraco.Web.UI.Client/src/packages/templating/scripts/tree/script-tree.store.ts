@@ -36,6 +36,12 @@ export class UmbScriptTreeStore extends UmbUniqueTreeStore {
 		this.#actionEventContext?.addEventListener('delete-success', this.#onDeleted);
 	}
 
+	#stopListening() {
+		this.#actionEventContext?.removeEventListener('create-success', this.#onCreated);
+		this.#actionEventContext?.removeEventListener('save-success', this.#onSaved);
+		this.#actionEventContext?.removeEventListener('delete-success', this.#onDeleted);
+	}
+
 	#onCreated = (event: UmbActionEvent) => {
 		// the item doesn't exist yet, so we reload the parent
 		const eventParentUnique = event.getParentUnique();
@@ -56,9 +62,7 @@ export class UmbScriptTreeStore extends UmbUniqueTreeStore {
 	};
 
 	onDestroy() {
-		this.#actionEventContext?.removeEventListener('create-success', this.#onCreated);
-		this.#actionEventContext?.removeEventListener('save-success', this.#onSaved);
-		this.#actionEventContext?.removeEventListener('delete-success', this.#onDeleted);
+		this.#stopListening();
 	}
 }
 
