@@ -21,7 +21,7 @@ export class UmbActionEvent extends UmbControllerEvent {
 		return this.#args.unique;
 	}
 
-	getParentUnique(): string {
-		return this.#args.unique;
+	getParentUnique(): string | null {
+		return this.#args.parentUnique;
 	}
 }
