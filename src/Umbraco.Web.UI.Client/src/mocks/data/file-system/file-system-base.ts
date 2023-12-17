@@ -1,11 +1,11 @@
 import { UmbData } from '../data.js';
 
-export abstract class UmbFileSystemMockDbBase<T extends { path: string }> extends UmbData<T> {
-	constructor(data: Array<T>) {
+export abstract class UmbFileSystemMockDbBase<MockItemType extends { path: string }> extends UmbData<MockItemType> {
+	constructor(data: Array<MockItemType>) {
 		super(data);
 	}
 
-	create(item: T) {
+	create(item: MockItemType) {
 		this.data.push(item);
 	}
 
@@ -13,7 +13,7 @@ export abstract class UmbFileSystemMockDbBase<T extends { path: string }> extend
 		return this.data.find((item) => item.path === path);
 	}
 
-	update(existingPath: string, updatedItem: T) {
+	update(existingPath: string, updatedItem: MockItemType) {
 		const itemIndex = this.data.findIndex((item) => item.path === existingPath);
 		this.data[itemIndex] = updatedItem;
 	}
