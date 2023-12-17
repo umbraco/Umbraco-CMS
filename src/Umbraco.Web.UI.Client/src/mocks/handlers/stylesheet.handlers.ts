@@ -1,5 +1,5 @@
 const { rest } = window.MockServiceWorker;
-import { umbStylesheetData } from '../data/stylesheet/stylesheet.data.js';
+import { umbStylesheetData } from '../data/stylesheet/stylesheet.db.js';
 import {
 	CreatePathFolderRequestModel,
 	CreateStylesheetRequestModel,
