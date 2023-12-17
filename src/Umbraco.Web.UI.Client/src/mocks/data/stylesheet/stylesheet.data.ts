@@ -1,5 +1,5 @@
-import { UmbData } from './data.js';
-import { createFileSystemTreeItem, createFileItemResponseModelBaseModel, textFileItemMapper } from './utils.js';
+import { UmbData } from '../data.js';
+import { createFileSystemTreeItem, createFileItemResponseModelBaseModel, textFileItemMapper } from '../utils.js';
 import {
 	CreateTextFileViewModelBaseModel,
 	ExtractRichTextStylesheetRulesRequestModel,
