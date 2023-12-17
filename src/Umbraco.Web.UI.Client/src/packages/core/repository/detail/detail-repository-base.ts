@@ -84,8 +84,8 @@ export abstract class UmbDetailRepositoryBase<
 		if (!data) throw new Error('Data is missing');
 		await this.#init;
 
-		const eventData = { unique: data.unique, parentUnique: data.parentUnique };
-		this.#actionEventContext?.dispatchEvent(new UmbActionEvent('create-request', eventData));
+		const requestEventData = { unique: data.unique, parentUnique: data.parentUnique };
+		this.#actionEventContext?.dispatchEvent(new UmbActionEvent('create-request', requestEventData));
 
 		const { data: createdData, error } = await this.#detailSource.create(data);
 
@@ -96,11 +96,12 @@ export abstract class UmbDetailRepositoryBase<
 			const notification = { data: { message: `Created` } };
 			this.#notificationContext!.peek('positive', notification);
 
-			this.#actionEventContext?.dispatchEvent(new UmbActionEvent('create-success', eventData));
+			const successEventData = { unique: createdData.unique, parentUnique: createdData.parentUnique };
+			this.#actionEventContext?.dispatchEvent(new UmbActionEvent('create-success', successEventData));
 		}
 
 		if (error) {
-			this.#actionEventContext?.dispatchEvent(new UmbActionEvent('create-error', eventData));
+			this.#actionEventContext?.dispatchEvent(new UmbActionEvent('create-error', requestEventData));
 		}
 
 		return { data: createdData, error };
