@@ -2061,7 +2061,7 @@ public class ContentController : ContentControllerBase
         var languageCount = _allLangs.Value.Count();
 
         // If there is no culture specified or the cultures specified are equal to the total amount of languages, publish the content in all cultures.
-        if (model.Cultures == null || !model.Cultures.Any() || model.Cultures.Length == languageCount)
+        if (model.Cultures == null || !model.Cultures.Any())
         {
             return PostPublishById(model.Id);
         }
@@ -2322,7 +2322,7 @@ public class ContentController : ContentControllerBase
         }
 
         var languageCount = _allLangs.Value.Count();
-        if (model.Cultures?.Length == 0 || model.Cultures?.Length == languageCount)
+        if (model.Cultures?.Length == 0)
         {
             //this means that the entire content item will be unpublished
             PublishResult unpublishResult = _contentService.Unpublish(foundContent, userId: _backofficeSecurityAccessor.BackOfficeSecurity?.GetUserId().Result ?? -1);
@@ -2786,6 +2786,7 @@ public class ContentController : ContentControllerBase
                 case PublishResultType.FailedPublishIsTrashed:
                 case PublishResultType.FailedPublishContentInvalid:
                 case PublishResultType.FailedPublishMandatoryCultureMissing:
+                case PublishResultType.FailedPublishNothingToPublish:
                     //the rest that we are looking for each belong in their own group
                     return x.Result;
                 default:
@@ -2927,6 +2928,11 @@ public class ContentController : ContentControllerBase
                     display.AddWarningNotification(
                         _localizedTextService.Localize(null, "publish"),
                         "publish/contentPublishedFailedByCulture");
+                    break;
+                case PublishResultType.FailedPublishNothingToPublish:
+                    display.AddWarningNotification(
+                         _localizedTextService.Localize(null, "publish"),
+                        $"Nothing to publish for some languages. Ensure selected languages have a page created.");
                     break;
                 default:
                     throw new IndexOutOfRangeException($"PublishedResultType \"{status.Key}\" was not expected.");
