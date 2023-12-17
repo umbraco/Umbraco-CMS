@@ -13,9 +13,9 @@ export abstract class UmbFileSystemMockDbBase<T extends { path: string }> extend
 		return this.data.find((item) => item.path === path);
 	}
 
-	update(updateItem: T) {
-		const itemIndex = this.data.findIndex((item) => item.path === updateItem.path);
-		this.data[itemIndex] = updateItem;
+	update(existingPath: string, updatedItem: T) {
+		const itemIndex = this.data.findIndex((item) => item.path === existingPath);
+		this.data[itemIndex] = updatedItem;
 	}
 
 	delete(path: string) {

@@ -4,7 +4,7 @@ import { UmbMockFileSystemItemManager } from '../file-system/file-system-item.ma
 import { UmbMockFileSystemTreeManager } from '../file-system/file-system-tree.manager.js';
 import { UmbMockFileSystemDetailManager } from '../file-system/file-system-detail.manager.js';
 import { UmbMockScriptModel, data as scriptData } from './script.data.js';
-import { CreateTextFileViewModelBaseModel, ScriptResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { CreateScriptRequestModel, ScriptResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 class UmbScriptMockDB extends UmbFileSystemMockDbBase<UmbMockScriptModel> {
 	tree = new UmbMockFileSystemTreeManager<UmbMockScriptModel>(this);
@@ -21,7 +21,7 @@ class UmbScriptMockDB extends UmbFileSystemMockDbBase<UmbMockScriptModel> {
 		});
 	}
 
-	#createScriptMockItem = (item: CreateTextFileViewModelBaseModel): UmbMockScriptModel => {
+	#createScriptMockItem = (item: CreateScriptRequestModel): UmbMockScriptModel => {
 		return {
 			name: item.name,
 			content: item.content,

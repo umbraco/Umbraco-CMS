@@ -1,5 +1,10 @@
 import { UmbFileSystemMockDbBase } from './file-system-base.js';
-import { CreateTextFileViewModelBaseModel, ScriptResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { getParentPathFromServerPath } from './util/index.js';
+import {
+	CreateTextFileViewModelBaseModel,
+	ScriptResponseModel,
+	UpdateTextFileViewModelBaseModel,
+} from '@umbraco-cms/backoffice/backend-api';
 
 export interface UmbMockFileSystemDetailManagerArgs<MockItemType extends ScriptResponseModel> {
 	createMapper: (item: CreateTextFileViewModelBaseModel) => MockItemType;
@@ -28,6 +33,22 @@ export class UmbMockFileSystemDetailManager<MockItemType extends ScriptResponseM
 		// @ts-ignore
 		const mappedItem = this.#args.readMapper(item);
 		return mappedItem;
+	}
+
+	update(item: UpdateTextFileViewModelBaseModel) {
+		const mockItem = this.#db.read(item.existingPath);
+
+		const parentPath = getParentPathFromServerPath(item.existingPath);
+		const newPath = parentPath ? parentPath + '/' + item.name : item.name;
+
+		const updatedMockItem = {
+			...mockItem,
+			name: item.name,
+			content: item.content,
+			path: newPath,
+		} as MockItemType;
+
+		this.#db.update(item.existingPath, updatedMockItem);
 	}
 
 	delete(path: string) {
