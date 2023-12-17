@@ -85,7 +85,7 @@ export abstract class UmbDetailRepositoryBase<
 		await this.#init;
 
 		const requestEventData = { unique: data.unique, parentUnique: data.parentUnique };
-		this.#actionEventContext?.dispatchEvent(new UmbActionEvent('create-request', requestEventData));
+		this.#actionEventContext?.dispatchEvent(new UmbActionEvent('detail-create-request', requestEventData));
 
 		const { data: createdData, error } = await this.#detailSource.create(data);
 
@@ -97,11 +97,11 @@ export abstract class UmbDetailRepositoryBase<
 			this.#notificationContext!.peek('positive', notification);
 
 			const successEventData = { unique: createdData.unique, parentUnique: createdData.parentUnique };
-			this.#actionEventContext?.dispatchEvent(new UmbActionEvent('create-success', successEventData));
+			this.#actionEventContext?.dispatchEvent(new UmbActionEvent('detail-create-success', successEventData));
 		}
 
 		if (error) {
-			this.#actionEventContext?.dispatchEvent(new UmbActionEvent('create-error', requestEventData));
+			this.#actionEventContext?.dispatchEvent(new UmbActionEvent('detail-create-error', requestEventData));
 		}
 
 		return { data: createdData, error };
@@ -119,7 +119,7 @@ export abstract class UmbDetailRepositoryBase<
 		await this.#init;
 
 		const eventData = { unique: data.unique, parentUnique: data.parentUnique };
-		this.#actionEventContext?.dispatchEvent(new UmbActionEvent('save-request', eventData));
+		this.#actionEventContext?.dispatchEvent(new UmbActionEvent('detail-save-request', eventData));
 
 		const { data: updatedData, error } = await this.#detailSource.update(data);
 
@@ -130,11 +130,11 @@ export abstract class UmbDetailRepositoryBase<
 			const notification = { data: { message: `Saved` } };
 			this.#notificationContext!.peek('positive', notification);
 
-			this.#actionEventContext?.dispatchEvent(new UmbActionEvent('save-success', eventData));
+			this.#actionEventContext?.dispatchEvent(new UmbActionEvent('detail-save-success', eventData));
 		}
 
 		if (error) {
-			this.#actionEventContext?.dispatchEvent(new UmbActionEvent('save-error', eventData));
+			this.#actionEventContext?.dispatchEvent(new UmbActionEvent('detail-save-error', eventData));
 		}
 
 		return { data, error };
@@ -151,7 +151,7 @@ export abstract class UmbDetailRepositoryBase<
 		await this.#init;
 
 		const eventData = { unique, parentUnique: null };
-		this.#actionEventContext?.dispatchEvent(new UmbActionEvent('delete-request', eventData));
+		this.#actionEventContext?.dispatchEvent(new UmbActionEvent('detail-delete-request', eventData));
 
 		const { error } = await this.#detailSource.delete(unique);
 
@@ -162,11 +162,11 @@ export abstract class UmbDetailRepositoryBase<
 			const notification = { data: { message: `Deleted` } };
 			this.#notificationContext!.peek('positive', notification);
 
-			this.#actionEventContext?.dispatchEvent(new UmbActionEvent('delete-success', eventData));
+			this.#actionEventContext?.dispatchEvent(new UmbActionEvent('detail-delete-success', eventData));
 		}
 
 		if (error) {
-			this.#actionEventContext?.dispatchEvent(new UmbActionEvent('delete-error', eventData));
+			this.#actionEventContext?.dispatchEvent(new UmbActionEvent('detail-delete-error', eventData));
 		}
 
 		return { error };

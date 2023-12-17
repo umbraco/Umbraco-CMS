@@ -31,15 +31,16 @@ export class UmbScriptTreeStore extends UmbUniqueTreeStore {
 	}
 
 	#listen() {
-		this.#actionEventContext?.addEventListener('create-success', this.#onCreated);
-		this.#actionEventContext?.addEventListener('save-success', this.#onSaved);
-		this.#actionEventContext?.addEventListener('delete-success', this.#onDeleted);
+		// TODO: add event class to remove the magic strings
+		this.#actionEventContext?.addEventListener('detail-create-success', this.#onCreated);
+		this.#actionEventContext?.addEventListener('detail-save-success', this.#onSaved);
+		this.#actionEventContext?.addEventListener('detail-delete-success', this.#onDeleted);
 	}
 
 	#stopListening() {
-		this.#actionEventContext?.removeEventListener('create-success', this.#onCreated);
-		this.#actionEventContext?.removeEventListener('save-success', this.#onSaved);
-		this.#actionEventContext?.removeEventListener('delete-success', this.#onDeleted);
+		this.#actionEventContext?.removeEventListener('detail-create-success', this.#onCreated);
+		this.#actionEventContext?.removeEventListener('detail-save-success', this.#onSaved);
+		this.#actionEventContext?.removeEventListener('detail-delete-success', this.#onDeleted);
 	}
 
 	#onCreated = (event: UmbActionEvent) => {
