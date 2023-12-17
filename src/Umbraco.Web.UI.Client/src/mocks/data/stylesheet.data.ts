@@ -1,5 +1,5 @@
 import { UmbData } from './data.js';
-import { createFileSystemTreeItem, createFileItemResponseModelBaseModel, createTextFileItem } from './utils.js';
+import { createFileSystemTreeItem, createFileItemResponseModelBaseModel, textFileItemMapper } from './utils.js';
 import {
 	CreateTextFileViewModelBaseModel,
 	ExtractRichTextStylesheetRulesRequestModel,
@@ -146,12 +146,12 @@ class UmbStylesheetData extends UmbData<StylesheetDBItem> {
 	}
 
 	getStylesheet(path: string): StylesheetResponseModel | undefined {
-		return createTextFileItem(this.data.find((item) => item.path === path));
+		return textFileItemMapper(this.data.find((item) => item.path === path));
 	}
 
 	getAllStylesheets(): PagedStylesheetOverviewResponseModel {
 		return {
-			items: this.data.map((item) => createTextFileItem(item)),
+			items: this.data.map((item) => textFileItemMapper(item)),
 			total: this.data.map((item) => !item.isFolder).length,
 		};
 	}
