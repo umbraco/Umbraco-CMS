@@ -85,7 +85,7 @@ export const createFileSystemTreeItem = (item: any): FileSystemTreeItemPresentat
 	};
 };
 
-export const createTextFileItem = (item: any): TextFileResponseModelBaseModel => ({
+export const textFileItemMapper = (item: any): TextFileResponseModelBaseModel => ({
 	path: item.path,
 	name: item.name,
 	content: item.content,
