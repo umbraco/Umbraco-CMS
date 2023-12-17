@@ -58,7 +58,9 @@ export class UmbScriptDetailServerDataSource implements UmbDetailDataSource<UmbS
 
 		// We have to fetch the data again. The server can have modified the data after creation
 		// TODO: revisit when location header is added
-		const createdScriptUnique = this.#serverPathUniqueSerializer.toUnique(parentPath + '/' + requestBody.name);
+		const createdScriptPath = parentPath ? parentPath + '/' + requestBody.name : requestBody.name;
+		const createdScriptUnique = this.#serverPathUniqueSerializer.toUnique(createdScriptPath);
+
 		return this.read(createdScriptUnique);
 	}
 
