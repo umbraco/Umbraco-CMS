@@ -34,8 +34,8 @@ const SORTER_CONFIG: UmbSorterConfig<RichTextRuleModel> = {
 	containerSelector: '#rules-container',
 };
 
-@customElement('umb-stylesheet-workspace-view-rich-text-editor')
-export class UmbStylesheetWorkspaceViewRichTextEditorElement extends UmbLitElement {
+@customElement('umb-stylesheet-rich-text-rule-workspace-view')
+export class UmbStylesheetRichTextRuleWorkspaceViewElement extends UmbLitElement {
 	@state()
 	_rules: RichTextRuleModelSortable[] = [];
 
@@ -140,10 +140,10 @@ export class UmbStylesheetWorkspaceViewRichTextEditorElement extends UmbLitEleme
 	];
 }
 
-export default UmbStylesheetWorkspaceViewRichTextEditorElement;
+export default UmbStylesheetRichTextRuleWorkspaceViewElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-stylesheet-workspace-view-rich-text-editor': UmbStylesheetWorkspaceViewRichTextEditorElement;
+		'umb-stylesheet-workspace-view-rich-text-editor': UmbStylesheetRichTextRuleWorkspaceViewElement;
 	}
 }
