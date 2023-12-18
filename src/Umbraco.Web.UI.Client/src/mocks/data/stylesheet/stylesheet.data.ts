@@ -1,11 +1,10 @@
 import { FileSystemTreeItemPresentationModel, StylesheetResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
-export type UmbMockStylesheetModel = StylesheetResponseModel & FileSystemTreeItemPresentationModel & { icon?: string };
+export type UmbMockStylesheetModel = StylesheetResponseModel & FileSystemTreeItemPresentationModel;
 
 export const data: Array<UmbMockStylesheetModel> = [
 	{
 		path: 'Stylesheet File 1.css',
-		icon: 'style',
 		isFolder: false,
 		name: 'Stylesheet File 1.css',
 		type: 'stylesheet',
@@ -35,7 +34,6 @@ h1 {
 	{
 		path: 'Stylesheet File 2.css',
 		isFolder: false,
-		icon: 'style',
 		name: 'Stylesheet File 2.css',
 		type: 'stylesheet',
 		hasChildren: false,
@@ -64,7 +62,6 @@ h1 {
 		path: 'Folder 1',
 		name: 'Folder 1',
 		isFolder: true,
-		icon: 'folder',
 		type: 'stylesheet',
 		hasChildren: true,
 		content: '',
