@@ -6,8 +6,8 @@
 import type { ConsentLevelPresentationModel } from './ConsentLevelPresentationModel';
 
 export type UserSettingsModel = {
-    minCharLength?: number;
-    minNonAlphaNumericLength?: number;
-    consentLevels?: Array<ConsentLevelPresentationModel>;
+    minCharLength: number;
+    minNonAlphaNumericLength: number;
+    consentLevels: Array<ConsentLevelPresentationModel>;
 };
 

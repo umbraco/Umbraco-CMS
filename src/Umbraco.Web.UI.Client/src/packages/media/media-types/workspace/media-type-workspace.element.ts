@@ -9,13 +9,13 @@ import { UmbWorkspaceIsNewRedirectController } from '@umbraco-cms/backoffice/wor
 @customElement('umb-media-type-workspace')
 export class UmbMediaTypeWorkspaceElement extends UmbLitElement {
 	#workspaceContext = new UmbMediaTypeWorkspaceContext(this);
-	#element = new UmbMediaTypeWorkspaceEditorElement();
+	#createElement = () => new UmbMediaTypeWorkspaceEditorElement();
 
 	@state()
 	_routes: UmbRoute[] = [
 		{
 			path: 'create/:parentId',
-			component: import('./media-type-workspace-editor.element.js'),
+			component: this.#createElement,
 			setup: (_component, info) => {
 				const parentId = info.match.params.parentId === 'null' ? null : info.match.params.parentId;
 				this.#workspaceContext.create(parentId);
@@ -29,7 +29,7 @@ export class UmbMediaTypeWorkspaceElement extends UmbLitElement {
 		},
 		{
 			path: 'edit/:id',
-			component: () => this.#element,
+			component: this.#createElement,
 			setup: (_component, info) => {
 				const id = info.match.params.id;
 				this.#workspaceContext.load(id);

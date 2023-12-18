@@ -15,13 +15,16 @@ import type { UmbCollectionFilterModel } from '@umbraco-cms/backoffice/collectio
 import { UmbSelectionManager, UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
-export class UmbDefaultCollectionContext<ItemType = any, FilterModelType extends UmbCollectionFilterModel = any>
+export class UmbDefaultCollectionContext<
+		CollectionItemType = any,
+		FilterModelType extends UmbCollectionFilterModel = any,
+	>
 	extends UmbContextBase<UmbDefaultCollectionContext>
 	implements UmbCollectionContext, UmbApi
 {
 	#manifest?: ManifestCollection;
 
-	#items = new UmbArrayState<ItemType>([], (x) => x);
+	#items = new UmbArrayState<CollectionItemType>([], (x) => x);
 	public readonly items = this.#items.asObservable();
 
 	#totalItems = new UmbNumberState(0);
@@ -40,7 +43,7 @@ export class UmbDefaultCollectionContext<ItemType = any, FilterModelType extends
 	});
 
 	public readonly pagination = new UmbPaginationManager();
-	public readonly selection = new UmbSelectionManager();
+	public readonly selection = new UmbSelectionManager(this);
 	public readonly view;
 
 	constructor(host: UmbControllerHostElement, config: UmbCollectionConfiguration = { pageSize: 50 }) {

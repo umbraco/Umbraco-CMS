@@ -69,9 +69,13 @@ export class UmbMediaWorkspaceContext
 
 	async save() {
 		if (!this.#data.value) return;
-		if (this.getIsNew()) {
+		if (this.isNew) {
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
 			await this.repository.create(this.#data.value);
 		} else {
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
 			await this.repository.save(this.#data.value.id, this.#data.value);
 		}
 		// If it went well, then its not new anymore?.

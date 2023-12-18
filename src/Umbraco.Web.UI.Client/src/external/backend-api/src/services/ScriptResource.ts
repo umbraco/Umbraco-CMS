@@ -30,6 +30,9 @@ export class ScriptResource {
             query: {
                 'path': path,
             },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -48,6 +51,9 @@ export class ScriptResource {
             body: requestBody,
             mediaType: 'application/json',
             responseHeader: 'Location',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -66,6 +72,9 @@ export class ScriptResource {
             query: {
                 'path': path,
             },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -83,6 +92,9 @@ export class ScriptResource {
             url: '/umbraco/management/api/v1/script',
             body: requestBody,
             mediaType: 'application/json',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -101,6 +113,9 @@ export class ScriptResource {
             query: {
                 'path': path,
             },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -118,6 +133,9 @@ export class ScriptResource {
             url: '/umbraco/management/api/v1/script/folder',
             body: requestBody,
             mediaType: 'application/json',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -136,6 +154,9 @@ export class ScriptResource {
             query: {
                 'path': path,
             },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -153,6 +174,9 @@ export class ScriptResource {
             url: '/umbraco/management/api/v1/script/item',
             query: {
                 'path': path,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }
@@ -178,6 +202,9 @@ export class ScriptResource {
                 'skip': skip,
                 'take': take,
             },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -198,6 +225,9 @@ export class ScriptResource {
             query: {
                 'skip': skip,
                 'take': take,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }

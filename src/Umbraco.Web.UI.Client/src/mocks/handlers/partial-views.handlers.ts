@@ -2,7 +2,6 @@ const { rest } = window.MockServiceWorker;
 import { RestHandler, MockedRequest, DefaultBodyType } from 'msw';
 import { umbPartialViewsData, umbPartialViewsTreeData } from '../data/partial-views.data.js';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
-import { CreateTextFileViewModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 
 const treeHandlers = [
 	rest.get(umbracoPath('/tree/partial-view/root'), (req, res, ctx) => {
@@ -35,8 +34,8 @@ const detailHandlers: RestHandler<MockedRequest<DefaultBodyType>>[] = [
 		return res(ctx.status(200), ctx.json(response));
 	}),
 
-	rest.post(umbracoPath('/partial-view'), (req, res, ctx) => {
-		const requestBody = req.json() as CreateTextFileViewModelBaseModel;
+	rest.post(umbracoPath('/partial-view'), async (req, res, ctx) => {
+		const requestBody = await req.json();
 		if (!requestBody) return res(ctx.status(400, 'no body found'));
 		const response = umbPartialViewsData.insertPartialView(requestBody);
 		return res(ctx.status(200), ctx.json(response));
@@ -49,8 +48,8 @@ const detailHandlers: RestHandler<MockedRequest<DefaultBodyType>>[] = [
 		return res(ctx.status(200));
 	}),
 
-	rest.put(umbracoPath('/partial-view'), (req, res, ctx) => {
-		const requestBody = req.json() as CreateTextFileViewModelBaseModel;
+	rest.put(umbracoPath('/partial-view'), async (req, res, ctx) => {
+		const requestBody = await req.json();
 		if (!requestBody) return res(ctx.status(400, 'no body found'));
 		umbPartialViewsData.updateData(requestBody);
 		return res(ctx.status(200));

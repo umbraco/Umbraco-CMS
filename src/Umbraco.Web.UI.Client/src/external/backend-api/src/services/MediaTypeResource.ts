@@ -34,6 +34,7 @@ export class MediaTypeResource {
             responseHeader: 'Location',
             errors: {
                 400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
         });
@@ -55,6 +56,7 @@ export class MediaTypeResource {
                 'id': id,
             },
             errors: {
+                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
         });
@@ -76,6 +78,7 @@ export class MediaTypeResource {
                 'id': id,
             },
             errors: {
+                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
         });
@@ -102,6 +105,7 @@ export class MediaTypeResource {
             mediaType: 'application/json',
             errors: {
                 400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
         });
@@ -124,6 +128,7 @@ export class MediaTypeResource {
             responseHeader: 'Location',
             errors: {
                 400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
         });
@@ -145,6 +150,7 @@ export class MediaTypeResource {
                 'id': id,
             },
             errors: {
+                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
         });
@@ -167,6 +173,7 @@ export class MediaTypeResource {
             },
             errors: {
                 400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
         });
@@ -193,6 +200,7 @@ export class MediaTypeResource {
             mediaType: 'application/json',
             errors: {
                 400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
         });
@@ -212,6 +220,9 @@ export class MediaTypeResource {
             url: '/umbraco/management/api/v1/media-type/item',
             query: {
                 'id': id,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }
@@ -240,6 +251,9 @@ export class MediaTypeResource {
                 'take': take,
                 'foldersOnly': foldersOnly,
             },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -263,6 +277,9 @@ export class MediaTypeResource {
                 'skip': skip,
                 'take': take,
                 'foldersOnly': foldersOnly,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }

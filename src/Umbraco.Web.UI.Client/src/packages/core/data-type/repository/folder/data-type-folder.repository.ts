@@ -1,5 +1,5 @@
 import { createFolderTreeItem } from '../utils.js';
-import { UMB_DATA_TYPE_TREE_STORE_CONTEXT, UmbDataTypeTreeStore } from '../../tree/data-type.tree.store.js';
+import { UMB_DATA_TYPE_TREE_STORE_CONTEXT, UmbDataTypeTreeStore } from '../../tree/data-type-tree.store.js';
 import { UmbDataTypeFolderServerDataSource } from './data-type-folder.server.data.js';
 import {
 	type UmbFolderRepository,

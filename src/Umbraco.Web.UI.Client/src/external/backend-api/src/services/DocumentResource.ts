@@ -43,6 +43,8 @@ export class DocumentResource {
             mediaType: 'application/json',
             responseHeader: 'Location',
             errors: {
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
                 404: `Not Found`,
             },
         });
@@ -64,6 +66,8 @@ export class DocumentResource {
                 'id': id,
             },
             errors: {
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
                 404: `Not Found`,
             },
         });
@@ -89,6 +93,8 @@ export class DocumentResource {
             body: requestBody,
             mediaType: 'application/json',
             errors: {
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
                 404: `Not Found`,
             },
         });
@@ -115,6 +121,8 @@ export class DocumentResource {
             mediaType: 'application/json',
             responseHeader: 'Location',
             errors: {
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
                 404: `Not Found`,
             },
         });
@@ -136,6 +144,7 @@ export class DocumentResource {
                 'id': id,
             },
             errors: {
+                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
         });
@@ -160,6 +169,9 @@ export class DocumentResource {
             },
             body: requestBody,
             mediaType: 'application/json',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -183,6 +195,8 @@ export class DocumentResource {
             body: requestBody,
             mediaType: 'application/json',
             errors: {
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
                 404: `Not Found`,
             },
         });
@@ -205,6 +219,8 @@ export class DocumentResource {
             },
             errors: {
                 400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
                 404: `Not Found`,
             },
         });
@@ -226,6 +242,8 @@ export class DocumentResource {
                 'id': id,
             },
             errors: {
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
                 404: `Not Found`,
             },
         });
@@ -251,6 +269,7 @@ export class DocumentResource {
             body: requestBody,
             mediaType: 'application/json',
             errors: {
+                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
         });
@@ -277,6 +296,8 @@ export class DocumentResource {
             mediaType: 'application/json',
             responseHeader: 'Location',
             errors: {
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
                 404: `Not Found`,
             },
         });
@@ -298,6 +319,8 @@ export class DocumentResource {
                 'id': id,
             },
             errors: {
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
                 404: `Not Found`,
             },
         });
@@ -319,6 +342,8 @@ export class DocumentResource {
                 'id': id,
             },
             errors: {
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
                 404: `Not Found`,
             },
         });
@@ -344,99 +369,8 @@ export class DocumentResource {
             body: requestBody,
             mediaType: 'application/json',
             errors: {
-                404: `Not Found`,
-            },
-        });
-    }
-
-    /**
-     * @returns string Created
-     * @throws ApiError
-     */
-    public static postDocumentByIdPublicAccess1({
-        id,
-        requestBody,
-    }: {
-        id: string,
-        requestBody?: PublicAccessRequestModel,
-    }): CancelablePromise<string> {
-        return __request(OpenAPI, {
-            method: 'POST',
-            url: '/umbraco/management/api/v2/document/{id}/public-access',
-            path: {
-                'id': id,
-            },
-            body: requestBody,
-            mediaType: 'application/json',
-            responseHeader: 'Location',
-            errors: {
-                404: `Not Found`,
-            },
-        });
-    }
-
-    /**
-     * @returns any Success
-     * @throws ApiError
-     */
-    public static deleteDocumentByIdPublicAccess1({
-        id,
-    }: {
-        id: string,
-    }): CancelablePromise<any> {
-        return __request(OpenAPI, {
-            method: 'DELETE',
-            url: '/umbraco/management/api/v2/document/{id}/public-access',
-            path: {
-                'id': id,
-            },
-            errors: {
-                404: `Not Found`,
-            },
-        });
-    }
-
-    /**
-     * @returns void
-     * @throws ApiError
-     */
-    public static getDocumentByIdPublicAccess1({
-        id,
-    }: {
-        id: string,
-    }): CancelablePromise<void> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/umbraco/management/api/v2/document/{id}/public-access',
-            path: {
-                'id': id,
-            },
-            errors: {
-                404: `Not Found`,
-            },
-        });
-    }
-
-    /**
-     * @returns any Success
-     * @throws ApiError
-     */
-    public static putDocumentByIdPublicAccess1({
-        id,
-        requestBody,
-    }: {
-        id: string,
-        requestBody?: PublicAccessRequestModel,
-    }): CancelablePromise<any> {
-        return __request(OpenAPI, {
-            method: 'PUT',
-            url: '/umbraco/management/api/v2/document/{id}/public-access',
-            path: {
-                'id': id,
-            },
-            body: requestBody,
-            mediaType: 'application/json',
-            errors: {
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
                 404: `Not Found`,
             },
         });
@@ -463,32 +397,8 @@ export class DocumentResource {
             mediaType: 'application/json',
             errors: {
                 400: `Bad Request`,
-                404: `Not Found`,
-            },
-        });
-    }
-
-    /**
-     * @returns any Success
-     * @throws ApiError
-     */
-    public static putDocumentByIdPublish1({
-        id,
-        requestBody,
-    }: {
-        id: string,
-        requestBody?: (PublishDocumentRequestModel | PublishDocumentWithDescendantsRequestModel),
-    }): CancelablePromise<any> {
-        return __request(OpenAPI, {
-            method: 'PUT',
-            url: '/umbraco/management/api/v2/document/{id}/publish',
-            path: {
-                'id': id,
-            },
-            body: requestBody,
-            mediaType: 'application/json',
-            errors: {
-                400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
                 404: `Not Found`,
             },
         });
@@ -515,32 +425,8 @@ export class DocumentResource {
             mediaType: 'application/json',
             errors: {
                 400: `Bad Request`,
-                404: `Not Found`,
-            },
-        });
-    }
-
-    /**
-     * @returns any Success
-     * @throws ApiError
-     */
-    public static putDocumentByIdPublishWithDescendants1({
-        id,
-        requestBody,
-    }: {
-        id: string,
-        requestBody?: PublishDocumentWithDescendantsRequestModel,
-    }): CancelablePromise<any> {
-        return __request(OpenAPI, {
-            method: 'PUT',
-            url: '/umbraco/management/api/v2/document/{id}/publish-with-descendants',
-            path: {
-                'id': id,
-            },
-            body: requestBody,
-            mediaType: 'application/json',
-            errors: {
-                400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
                 404: `Not Found`,
             },
         });
@@ -567,32 +453,8 @@ export class DocumentResource {
             mediaType: 'application/json',
             errors: {
                 400: `Bad Request`,
-                404: `Not Found`,
-            },
-        });
-    }
-
-    /**
-     * @returns any Success
-     * @throws ApiError
-     */
-    public static putDocumentByIdUnpublish1({
-        id,
-        requestBody,
-    }: {
-        id: string,
-        requestBody?: UnpublishDocumentRequestModel,
-    }): CancelablePromise<any> {
-        return __request(OpenAPI, {
-            method: 'PUT',
-            url: '/umbraco/management/api/v2/document/{id}/unpublish',
-            path: {
-                'id': id,
-            },
-            body: requestBody,
-            mediaType: 'application/json',
-            errors: {
-                400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
                 404: `Not Found`,
             },
         });
@@ -620,33 +482,7 @@ export class DocumentResource {
                 'take': take,
             },
             errors: {
-                404: `Not Found`,
-            },
-        });
-    }
-
-    /**
-     * @returns PagedDocumentTypeResponseModel Success
-     * @throws ApiError
-     */
-    public static getDocumentAllowedDocumentTypes1({
-        parentId,
-        skip,
-        take = 100,
-    }: {
-        parentId?: string,
-        skip?: number,
-        take?: number,
-    }): CancelablePromise<PagedDocumentTypeResponseModel> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/umbraco/management/api/v2/document/allowed-document-types',
-            query: {
-                'parentId': parentId,
-                'skip': skip,
-                'take': take,
-            },
-            errors: {
+                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
         });
@@ -673,6 +509,9 @@ export class DocumentResource {
                 'dataTypeId': dataTypeId,
                 'culture': culture,
             },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -692,6 +531,8 @@ export class DocumentResource {
             mediaType: 'application/json',
             errors: {
                 400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
                 404: `Not Found`,
             },
         });
@@ -719,7 +560,7 @@ export class DocumentResource {
                 'take': take,
             },
             errors: {
-                401: `Unauthorized`,
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }
@@ -743,7 +584,7 @@ export class DocumentResource {
                 'take': take,
             },
             errors: {
-                401: `Unauthorized`,
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }
@@ -775,6 +616,9 @@ export class DocumentResource {
                 'dataTypeId': dataTypeId,
                 'culture': culture,
             },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -801,6 +645,9 @@ export class DocumentResource {
                 'take': take,
                 'dataTypeId': dataTypeId,
                 'culture': culture,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }

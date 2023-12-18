@@ -17,10 +17,12 @@ export class UmbDictionaryTreeRepository
 	async requestTreeRoot() {
 		const data = {
 			id: null,
-			type: UMB_DICTIONARY_ROOT_ENTITY_TYPE,
+			entityType: UMB_DICTIONARY_ROOT_ENTITY_TYPE,
 			name: 'Dictionary',
 			icon: 'icon-folder',
 			hasChildren: true,
+			isContainer: false,
+			isFolder: true,
 		};
 
 		return { data };

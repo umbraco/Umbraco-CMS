@@ -35,7 +35,7 @@ export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataT
 	 */
 	async createScaffold(parentUnique: string | null) {
 		const data: UmbDataTypeDetailModel = {
-			type: 'data-type',
+			entityType: 'data-type',
 			unique: UmbId.new(),
 			parentUnique,
 			name: '',
@@ -62,16 +62,14 @@ export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataT
 			return { error };
 		}
 
-		// map to client model
-		// TODO: investigate why all server fields are optional
 		// TODO: make data mapper to prevent errors
-		const dataType = {
-			type: 'data-type',
-			unique: data.id!,
-			parentUnique: data.parentId!,
-			name: data.name!,
-			propertyEditorAlias: data.propertyEditorAlias!,
-			propertyEditorUiAlias: data.propertyEditorUiAlias!,
+		const dataType: UmbDataTypeDetailModel = {
+			entityType: 'data-type',
+			unique: data.id,
+			parentUnique: data.parentId || null,
+			name: data.name,
+			propertyEditorAlias: data.editorAlias,
+			propertyEditorUiAlias: data.editorUiAlias || null,
 			values: data.values as Array<UmbDataTypePropertyModel>,
 		};
 
@@ -87,15 +85,15 @@ export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataT
 	async create(dataType: UmbDataTypeDetailModel) {
 		if (!dataType) throw new Error('Data Type is missing');
 		if (!dataType.unique) throw new Error('Data Type unique is missing');
+		if (!dataType.propertyEditorAlias) throw new Error('Property Editor Alias is missing');
 
-		// map to server model
 		// TODO: make data mapper to prevent errors
 		const requestBody: CreateDataTypeRequestModel = {
 			id: dataType.unique,
 			parentId: dataType.parentUnique,
 			name: dataType.name,
-			propertyEditorAlias: dataType.propertyEditorAlias,
-			propertyEditorUiAlias: dataType.propertyEditorUiAlias,
+			editorAlias: dataType.propertyEditorAlias,
+			editorUiAlias: dataType.propertyEditorUiAlias,
 			values: dataType.values,
 		};
 
@@ -122,12 +120,13 @@ export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataT
 	 */
 	async update(data: UmbDataTypeDetailModel) {
 		if (!data.unique) throw new Error('Unique is missing');
+		if (!data.propertyEditorAlias) throw new Error('Property Editor Alias is missing');
 
 		// TODO: make data mapper to prevent errors
 		const requestBody: DataTypeModelBaseModel = {
 			name: data.name,
-			propertyEditorAlias: data.propertyEditorAlias,
-			propertyEditorUiAlias: data.propertyEditorUiAlias,
+			editorAlias: data.propertyEditorAlias,
+			editorUiAlias: data.propertyEditorUiAlias,
 			values: data.values,
 		};
 

@@ -1,10 +1,11 @@
+import { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import { UmbDataTypeDetailRepository } from '../repository/detail/data-type-detail.repository.js';
-import { UmbDataTypeVariantContext } from '../variant-context/data-type-variant-context.js';
 import type { UmbDataTypeDetailModel } from '../types.js';
 import {
 	UmbInvariantableWorkspaceContextInterface,
 	UmbEditableWorkspaceContextBase,
 	UmbWorkspaceContextInterface,
+	UmbInvariantWorkspacePropertyDatasetContext,
 } from '@umbraco-cms/backoffice/workspace';
 import {
 	appendToFrozenArray,
@@ -26,7 +27,6 @@ export class UmbDataTypeWorkspaceContext
 	extends UmbEditableWorkspaceContextBase<UmbDataTypeDetailRepository, UmbDataTypeDetailModel>
 	implements UmbInvariantableWorkspaceContextInterface<UmbDataTypeDetailModel | undefined>
 {
-	// TODO: revisit. temp solution because the create and response models are different.
 	#data = new UmbObjectState<UmbDataTypeDetailModel | undefined>(undefined);
 	readonly data = this.#data.asObservable();
 	#getDataPromise?: Promise<any>;
@@ -146,8 +146,49 @@ export class UmbDataTypeWorkspaceContext
 		return this._configDefaultData?.find((x) => x.alias === alias)?.value;
 	}
 
-	createVariantContext(host: UmbControllerHost): UmbDataTypeVariantContext {
-		return new UmbDataTypeVariantContext(host, this);
+	createPropertyDatasetContext(host: UmbControllerHost): UmbPropertyDatasetContext {
+		return new UmbInvariantWorkspacePropertyDatasetContext(host, this);
+		/*
+		// Example of how this could have been done with the PropertyDatasetBaseContext:
+		const context = new UmbPropertyDatasetBaseContext(host);
+
+		// Observe workspace name:
+		this.observe(this.name, (name) => {
+			context.setName(name ?? '');
+		});
+		// Observe the variant name:
+		this.observe(context.name, (name) => {
+			this.setName(name);
+		});
+
+		this.observe(
+			this.properties,
+			(properties) => {
+				if (properties) {
+					properties.forEach(async (property) => {
+						// Observe value of workspace:
+						this.observe(
+							await this.propertyValueByAlias(property.alias),
+							(value) => {
+								context.setPropertyValue(property.alias, value);
+							},
+							'observeWorkspacePropertyOf_' + property.alias,
+						);
+						// Observe value of variant:
+						this.observe(
+							await context.propertyValueByAlias(property.alias),
+							(value) => {
+								this.setPropertyValue(property.alias, value);
+							},
+							'observeVariantPropertyOf_' + property.alias,
+						);
+					});
+				}
+			},
+			'observePropertyValues',
+		);
+		return context;
+		*/
 	}
 
 	async load(unique: string) {
@@ -187,7 +228,7 @@ export class UmbDataTypeWorkspaceContext
 	getName() {
 		return this.#data.getValue()?.name;
 	}
-	setName(name: string) {
+	setName(name: string | undefined) {
 		this.#data.update({ name });
 	}
 

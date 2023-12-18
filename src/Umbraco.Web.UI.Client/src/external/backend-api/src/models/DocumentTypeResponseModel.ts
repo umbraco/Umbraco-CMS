@@ -7,8 +7,8 @@ import type { ContentTypeCleanupModel } from './ContentTypeCleanupModel';
 import type { ContentTypeForDocumentTypeResponseModel } from './ContentTypeForDocumentTypeResponseModel';
 
 export type DocumentTypeResponseModel = (ContentTypeForDocumentTypeResponseModel & {
-    allowedTemplateIds?: Array<string>;
+    allowedTemplateIds: Array<string>;
     defaultTemplateId?: string | null;
-    cleanup?: ContentTypeCleanupModel;
+    cleanup: ContentTypeCleanupModel;
 });
 

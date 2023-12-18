@@ -1,6 +1,6 @@
 import { type UmbTreeStore } from './tree-store.interface.js';
+import { UmbFileSystemTreeItemModel } from './types.js';
 import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
-import { FileSystemTreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
@@ -11,11 +11,11 @@ import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api
  * @description - File System Tree Store
  */
 export class UmbFileSystemTreeStore
-	extends UmbStoreBase<FileSystemTreeItemPresentationModel>
-	implements UmbTreeStore<FileSystemTreeItemPresentationModel>
+	extends UmbStoreBase<UmbFileSystemTreeItemModel>
+	implements UmbTreeStore<UmbFileSystemTreeItemModel>
 {
 	constructor(host: UmbControllerHostElement, storeAlias: string) {
-		super(host, storeAlias, new UmbArrayState<FileSystemTreeItemPresentationModel>([], (x) => x.path));
+		super(host, storeAlias, new UmbArrayState<UmbFileSystemTreeItemModel>([], (x) => x.path));
 	}
 
 	/**

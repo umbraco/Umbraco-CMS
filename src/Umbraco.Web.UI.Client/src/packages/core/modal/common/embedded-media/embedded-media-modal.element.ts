@@ -164,7 +164,7 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 		return html`
 			<umb-body-layout headline="Embed">
 				<uui-box>
-					<umb-workspace-property-layout label="URL" orientation="vertical">
+					<umb-property-layout label="URL" orientation="vertical">
 						<div slot="editor">
 							<uui-input .value=${this._model.url} type="text" @change=${this.#onUrlChange} required="true">
 								<uui-button
@@ -176,12 +176,12 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 									label="Retrieve"></uui-button>
 							</uui-input>
 						</div>
-					</umb-workspace-property-layout>
+					</umb-property-layout>
 
 					${when(
 						this.#embedResult?.oEmbedStatus === OEmbedStatus.Success || this._model.a11yInfo,
 						() =>
-							html` <umb-workspace-property-layout label="Preview" orientation="vertical">
+							html` <umb-property-layout label="Preview" orientation="vertical">
 								<div slot="editor">
 									${when(this.#loading, () => html`<uui-loader-circle></uui-loader-circle>`)}
 									${when(this.#embedResult?.markup, () => html`${unsafeHTML(this.#embedResult.markup)}`)}
@@ -191,34 +191,34 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 										() => html` <p class="sr-only" role="alert">${this._model.a11yInfo}</p>`,
 									)}
 								</div>
-							</umb-workspace-property-layout>`,
+							</umb-property-layout>`,
 					)}
 
-					<umb-workspace-property-layout label="Width" orientation="vertical">
+					<umb-property-layout label="Width" orientation="vertical">
 						<uui-input
 							slot="editor"
 							.value=${this._model.width}
 							type="number"
 							?disabled=${this.#dimensionControlsDisabled()}
 							@change=${this.#onWidthChange}></uui-input>
-					</umb-workspace-property-layout>
+					</umb-property-layout>
 
-					<umb-workspace-property-layout label="Height" orientation="vertical">
+					<umb-property-layout label="Height" orientation="vertical">
 						<uui-input
 							slot="editor"
 							.value=${this._model.height}
 							type="number"
 							?disabled=${this.#dimensionControlsDisabled()}
 							@change=${this.#onHeightChange}></uui-input>
-					</umb-workspace-property-layout>
+					</umb-property-layout>
 
-					<umb-workspace-property-layout label="Constrain" orientation="vertical">
+					<umb-property-layout label="Constrain" orientation="vertical">
 						<uui-toggle
 							slot="editor"
 							@change=${this.#onConstrainChange}
 							?disabled=${this.#dimensionControlsDisabled()}
 							.checked=${this._model.constrain}></uui-toggle>
-					</umb-workspace-property-layout>
+					</umb-property-layout>
 				</uui-box>
 
 				<uui-button slot="actions" id="cancel" label="Cancel" @click=${this.#handleCancel}>Cancel</uui-button>
@@ -257,11 +257,11 @@ export class UmbEmbeddedMediaModalElement extends UmbModalBaseElement<
 				width: 1px;
 			}
 
-			umb-workspace-property-layout:first-child {
+			umb-property-layout:first-child {
 				padding-top: 0;
 			}
 
-			umb-workspace-property-layout:last-child {
+			umb-property-layout:last-child {
 				padding-bottom: 0;
 			}
 

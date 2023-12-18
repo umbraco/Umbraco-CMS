@@ -4,13 +4,15 @@
 /* eslint-disable */
 
 export type UserGroupBaseModel = {
-    name?: string;
+    name: string;
     icon?: string | null;
-    sections?: Array<string>;
-    languages?: Array<string>;
-    hasAccessToAllLanguages?: boolean;
+    sections: Array<string>;
+    languages: Array<string>;
+    hasAccessToAllLanguages: boolean;
     documentStartNodeId?: string | null;
+    documentRootAccess: boolean;
     mediaStartNodeId?: string | null;
-    permissions?: Array<string>;
+    mediaRootAccess: boolean;
+    permissions: Array<string>;
 };
 

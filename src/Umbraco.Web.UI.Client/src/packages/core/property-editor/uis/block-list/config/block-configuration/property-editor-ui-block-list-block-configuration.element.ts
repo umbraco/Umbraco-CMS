@@ -19,7 +19,7 @@ export class UmbPropertyEditorUIBlockListBlockConfigurationElement
 	public config?: UmbPropertyEditorConfigCollection;
 
 	render() {
-		return html`<div>umb-property-editor-ui-block-list-block-configuration</div>`;
+		return html` <div>umb-property-editor-ui-block-list-block-configuration</div> `;
 	}
 
 	static styles = [UmbTextStyles];

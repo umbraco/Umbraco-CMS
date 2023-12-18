@@ -7,6 +7,6 @@ import type { FolderModelBaseModel } from './FolderModelBaseModel';
 
 export type PathFolderResponseModel = (FolderModelBaseModel & {
     parentPath?: string | null;
-    readonly path?: string;
+    readonly path: string;
 });
 

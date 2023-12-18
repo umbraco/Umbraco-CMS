@@ -9,13 +9,13 @@ import { UmbWorkspaceIsNewRedirectController } from '@umbraco-cms/backoffice/wor
 @customElement('umb-user-group-workspace')
 export class UmbUserGroupWorkspaceElement extends UmbLitElement {
 	#workspaceContext = new UmbUserGroupWorkspaceContext(this);
-	#element = new UmbUserGroupWorkspaceEditorElement();
+	#createElement = () => new UmbUserGroupWorkspaceEditorElement();
 
 	@state()
 	_routes: UmbRoute[] = [
 		{
 			path: 'create',
-			component: () => this.#element,
+			component: this.#createElement,
 			setup: (component, info) => {
 				this.#workspaceContext.create();
 
@@ -28,7 +28,7 @@ export class UmbUserGroupWorkspaceElement extends UmbLitElement {
 		},
 		{
 			path: 'edit/:id',
-			component: () => this.#element,
+			component: this.#createElement,
 			setup: (component, info) => {
 				const id = info.match.params.id;
 				this.#workspaceContext.load(id);

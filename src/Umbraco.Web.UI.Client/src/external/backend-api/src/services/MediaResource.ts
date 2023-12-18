@@ -34,6 +34,8 @@ export class MediaResource {
             mediaType: 'application/json',
             responseHeader: 'Location',
             errors: {
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
                 404: `Not Found`,
             },
         });
@@ -55,6 +57,8 @@ export class MediaResource {
                 'id': id,
             },
             errors: {
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
                 404: `Not Found`,
             },
         });
@@ -80,6 +84,8 @@ export class MediaResource {
             body: requestBody,
             mediaType: 'application/json',
             errors: {
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
                 404: `Not Found`,
             },
         });
@@ -105,6 +111,8 @@ export class MediaResource {
             body: requestBody,
             mediaType: 'application/json',
             errors: {
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
                 404: `Not Found`,
             },
         });
@@ -127,6 +135,8 @@ export class MediaResource {
             },
             errors: {
                 400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
                 404: `Not Found`,
             },
         });
@@ -150,6 +160,9 @@ export class MediaResource {
                 'id': id,
                 'dataTypeId': dataTypeId,
             },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -169,6 +182,8 @@ export class MediaResource {
             mediaType: 'application/json',
             errors: {
                 400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
                 404: `Not Found`,
             },
         });
@@ -196,7 +211,7 @@ export class MediaResource {
                 'take': take,
             },
             errors: {
-                401: `Unauthorized`,
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }
@@ -220,7 +235,7 @@ export class MediaResource {
                 'take': take,
             },
             errors: {
-                401: `Unauthorized`,
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }
@@ -249,6 +264,9 @@ export class MediaResource {
                 'take': take,
                 'dataTypeId': dataTypeId,
             },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -269,6 +287,9 @@ export class MediaResource {
             query: {
                 'id': id,
                 'dataTypeId': dataTypeId,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }
@@ -293,6 +314,9 @@ export class MediaResource {
                 'skip': skip,
                 'take': take,
                 'dataTypeId': dataTypeId,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }

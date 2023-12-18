@@ -1,5 +1,4 @@
 import { UmbData } from './data.js';
-import { UmbEntityData } from './entity.data.js';
 import { createFileItemResponseModelBaseModel, createFileSystemTreeItem, createTextFileItem } from './utils.js';
 import {
 	CreatePathFolderRequestModel,
@@ -20,6 +19,7 @@ export const data: Array<ScriptsDataItem> = [
 		name: 'some-folder',
 		type: 'script',
 		hasChildren: true,
+		content: '',
 	},
 	{
 		path: 'another-folder',
@@ -27,6 +27,7 @@ export const data: Array<ScriptsDataItem> = [
 		name: 'another-folder',
 		type: 'script',
 		hasChildren: true,
+		content: '',
 	},
 	{
 		path: 'very important folder',
@@ -34,6 +35,7 @@ export const data: Array<ScriptsDataItem> = [
 		name: 'very important folder',
 		type: 'script',
 		hasChildren: true,
+		content: '',
 	},
 	{
 		path: 'some-folder/ugly script.js',
@@ -50,7 +52,7 @@ export const data: Array<ScriptsDataItem> = [
 			}
 			return result;
 		 }
-		 
+
 		 console.log(makeid(5));`,
 	},
 	{
@@ -77,7 +79,7 @@ export const data: Array<ScriptsDataItem> = [
 		content: `var my_arr = [4, '', 0, 10, 7, '', false, 10];
 
 		my_arr = my_arr.filter(Boolean);
-		
+
 		console.log(my_arr);`,
 	},
 	{
@@ -90,7 +92,7 @@ export const data: Array<ScriptsDataItem> = [
 		const date = new Date(date_str);
 		const full_day_name = date.toLocaleDateString('default', { weekday: 'long' });
 		// -> to get full day name e.g. Tuesday
-		
+
 		const short_day_name = date.toLocaleDateString('default', { weekday: 'short' });
 		console.log(short_day_name);
 		// -> TO get the short day name e.g. Tue`,
@@ -107,10 +109,10 @@ export const data: Array<ScriptsDataItem> = [
 			"department": "IT",
 			"project": "Inventory Manager"
 		};
-		
+
 		// Remove a property
 		delete employee["project"];
-		
+
 		console.log(employee);`,
 	},
 ];
@@ -144,9 +146,8 @@ class UmbScriptsData extends UmbData<ScriptsDataItem> {
 		return items.map((item) => createFileItemResponseModelBaseModel(item));
 	}
 
-	getFolder(path: string): FileSystemTreeItemPresentationModel {
-		const items = data.filter((item) => item.isFolder && item.path === path);
-		return items as FileSystemTreeItemPresentationModel;
+	getFolder(path: string) {
+		return data.find((item) => item.isFolder && item.path === path);
 	}
 
 	postFolder(payload: CreatePathFolderRequestModel) {
@@ -156,6 +157,7 @@ class UmbScriptsData extends UmbData<ScriptsDataItem> {
 			name: payload.name,
 			type: 'script',
 			hasChildren: false,
+			content: '',
 		};
 		return this.insert(newFolder);
 	}

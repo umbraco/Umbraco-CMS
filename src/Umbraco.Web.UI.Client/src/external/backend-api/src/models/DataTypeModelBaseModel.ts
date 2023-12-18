@@ -6,9 +6,9 @@
 import type { DataTypePropertyPresentationModel } from './DataTypePropertyPresentationModel';
 
 export type DataTypeModelBaseModel = {
-    name?: string;
-    propertyEditorAlias?: string;
-    propertyEditorUiAlias?: string | null;
-    values?: Array<DataTypePropertyPresentationModel>;
+    name: string;
+    editorAlias: string;
+    editorUiAlias?: string | null;
+    values: Array<DataTypePropertyPresentationModel>;
 };
 

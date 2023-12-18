@@ -1,5 +1,14 @@
+import { localizeOperators, localizePropertyType } from './utils.js';
 import { type UUIComboboxListElement } from '@umbraco-cms/backoffice/external/uui';
-import { PropertyValueMap, css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import {
+	PropertyValueMap,
+	css,
+	html,
+	customElement,
+	property,
+	state,
+	ifDefined,
+} from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import {
 	OperatorModel,
@@ -42,6 +51,8 @@ export class UmbQueryBuilderFilterElement extends UmbLitElement {
 	};
 
 	#resetOperator() {
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
 		this.filter = { ...this.filter, operator: undefined };
 	}
 
@@ -71,20 +82,23 @@ export class UmbQueryBuilderFilterElement extends UmbLitElement {
 	}
 
 	private _renderOperatorsDropdown() {
-		return html`<umb-dropdown look="outline" id="operator-dropdown" label="choose operator">
+		if (!this.settings?.operators) return;
+		const operators = localizeOperators(this.settings?.operators, this.currentPropertyType);
+
+		return html`<umb-dropdown look="outline" id="operator-dropdown" label="Choose operator">
 			<span slot="label">${this.filter?.operator ?? ''}</span>
 			<uui-combobox-list @change=${this.#setOperator} class="options-list">
-				${this.settings?.operators
+				${operators
 					?.filter((operator) =>
 						this.currentPropertyType ? operator.applicableTypes?.includes(this.currentPropertyType) : true,
 					)
 					.map(
 						(operator) =>
-							html`<uui-combobox-list-option .value=${(operator.operator as string) ?? ''}
-								>${operator.operator}</uui-combobox-list-option
-							>`,
-					)}</uui-combobox-list
-			>
+							html`<uui-combobox-list-option .value=${(operator.operator as string) ?? ''}>
+								<umb-localize .key=${operator.localizeKey!}> ${operator.operator} </umb-localize>
+							</uui-combobox-list-option>`,
+					)}
+			</uui-combobox-list>
 		</umb-dropdown>`;
 	}
 
@@ -102,26 +116,35 @@ export class UmbQueryBuilderFilterElement extends UmbLitElement {
 	}
 
 	render() {
+		const properties = localizePropertyType(this.settings?.properties);
 		return html`
 			<span>${this.unremovable ? this.localize.term('template_where') : this.localize.term('template_and')}</span>
 			<umb-dropdown look="outline" id="property-alias-dropdown" label="Property alias">
 				<span slot="label">${this.filter?.propertyAlias ?? ''}</span>
 				<uui-combobox-list @change=${this.#setPropertyAlias} class="options-list">
-					${this.settings?.properties?.map(
+					${properties?.map(
 						(property) =>
-							html`<uui-combobox-list-option tabindex="0" .value=${property.alias ?? ''}
-								>${property.alias}</uui-combobox-list-option
-							>`,
+							html`<uui-combobox-list-option tabindex="0" .value=${property.alias ?? ''}>
+								<umb-localize key=${ifDefined(property.localizeKey)}> ${property.alias}</umb-localize>
+							</uui-combobox-list-option>`,
 					)}
 				</uui-combobox-list></umb-dropdown
 			>
 			${this.filter?.propertyAlias ? this._renderOperatorsDropdown() : ''}
 			${this.filter?.operator ? this._renderConstraintValueInput() : ''}
 			<uui-button-group>
-				<uui-button title="Add filter" label="Add filter" compact @click=${this.#addFilter}>
+				<uui-button
+					title=${this.localize.term('general_add')}
+					label=${this.localize.term('general_add')}
+					compact
+					@click=${this.#addFilter}>
 					<uui-icon name="icon-add"></uui-icon>
 				</uui-button>
-				<uui-button title="Remove filter" label="Remove filter" compact @click=${this.#removeOrReset}>
+				<uui-button
+					title=${this.localize.term('general_remove')}
+					label=${this.localize.term('general_remove')}
+					compact
+					@click=${this.#removeOrReset}>
 					<uui-icon name="delete"></uui-icon>
 				</uui-button>
 			</uui-button-group>

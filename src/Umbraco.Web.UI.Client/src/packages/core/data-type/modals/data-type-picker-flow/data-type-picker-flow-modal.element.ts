@@ -12,7 +12,7 @@ import {
 	UmbModalRouteRegistrationController,
 } from '@umbraco-cms/backoffice/modal';
 import { ManifestPropertyEditorUi, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import type { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbEntityTreeItemModel } from '@umbraco-cms/backoffice/tree';
 
 interface GroupedItems<T> {
 	[key: string]: Array<T>;
@@ -28,7 +28,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 	}
 
 	@state()
-	private _groupedDataTypes?: GroupedItems<EntityTreeItemResponseModel>;
+	private _groupedDataTypes?: GroupedItems<UmbEntityTreeItemModel>;
 
 	@state()
 	private _groupedPropertyEditorUIs: GroupedItems<ManifestPropertyEditorUi> = {};
@@ -42,7 +42,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 	private _createDataTypeModal: UmbModalRouteRegistrationController;
 
 	#treeRepository;
-	#dataTypes: Array<EntityTreeItemResponseModel> = [];
+	#dataTypes: Array<UmbEntityTreeItemModel> = [];
 	#propertyEditorUIs: Array<ManifestPropertyEditorUi> = [];
 	#currentFilterQuery = '';
 
@@ -76,7 +76,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 		this._createDataTypeModal = new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
 			.addAdditionalPath(':uiAlias')
 			.onSetup((params) => {
-				return { data: { entityType: 'data-type', preset: { propertyEditorUiAlias: params.uiAlias } } };
+				return { data: { entityType: 'data-type', preset: { editorUiAlias: params.uiAlias } } };
 			})
 			.onSubmit((value) => {
 				this._select(value?.unique);
@@ -97,6 +97,8 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 		this.observe(
 			(await this.#treeRepository.requestRootTreeItems()).asObservable(),
 			(items) => {
+				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+				// @ts-ignore
 				this.#dataTypes = items;
 				this._performFiltering();
 			},
@@ -113,7 +115,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 		});
 	}
 
-	private _handleDataTypeClick(dataType: EntityTreeItemResponseModel) {
+	private _handleDataTypeClick(dataType: UmbEntityTreeItemModel) {
 		if (dataType.id) {
 			this._select(dataType.id);
 			this._submitModal();
@@ -265,7 +267,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 		</ul>`;
 	}
 
-	private _renderGroupDataTypes(dataTypes: Array<EntityTreeItemResponseModel>) {
+	private _renderGroupDataTypes(dataTypes: Array<UmbEntityTreeItemModel>) {
 		return html` <ul id="item-grid">
 			${repeat(
 				dataTypes,

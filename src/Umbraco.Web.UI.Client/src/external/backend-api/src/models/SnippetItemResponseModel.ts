@@ -4,6 +4,6 @@
 /* eslint-disable */
 
 export type SnippetItemResponseModel = {
-    name?: string;
+    name: string;
 };
 

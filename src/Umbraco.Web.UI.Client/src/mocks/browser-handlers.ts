@@ -27,6 +27,7 @@ import { handlers as redirectManagementHandlers } from './handlers/redirect-mana
 import { handlers as logViewerHandlers } from './handlers/log-viewer.handlers.js';
 import { handlers as packageHandlers } from './handlers/package.handlers.js';
 import { handlers as rteEmbedHandlers } from './handlers/rte-embed.handlers.js';
+import { handlers as staticFileHandlers } from './handlers/static-file.handlers.js';
 import { handlers as stylesheetHandlers } from './handlers/stylesheet.handlers.js';
 import { handlers as partialViewsHandlers } from './handlers/partial-views.handlers.js';
 import { handlers as tagHandlers } from './handlers/tag-handlers.js';
@@ -35,38 +36,39 @@ import { handlers as scriptHandlers } from './handlers/scripts.handlers.js';
 
 const handlers = [
 	serverHandlers.serverVersionHandler,
-	...installHandlers,
-	...upgradeHandlers,
-	...userHandlers,
-	...documentHandlers,
-	...mediaHandlers,
+	...configHandlers,
+	...cultureHandlers,
 	...dataTypeHandlers,
-	...relationTypeHandlers,
+	...dictionaryHandlers,
+	...documentHandlers,
 	...documentTypeHandlers,
-	...telemetryHandlers,
-	...publishedStatusHandlers,
-	...userGroupsHandlers,
+	...examineManagementHandlers,
+	...healthCheckHandlers,
+	...installHandlers,
+	...languageHandlers,
+	...logViewerHandlers,
+	...mediaHandlers,
 	...mediaTypeHandlers,
 	...memberGroupHandlers,
 	...memberHandlers,
 	...memberTypeHandlers,
-	...examineManagementHandlers,
 	...modelsBuilderHandlers,
-	...healthCheckHandlers,
-	...profilingHandlers,
-	...dictionaryHandlers,
-	...templateHandlers,
-	...languageHandlers,
-	...cultureHandlers,
-	...redirectManagementHandlers,
-	...logViewerHandlers,
 	...packageHandlers,
-	...rteEmbedHandlers,
-	...stylesheetHandlers,
 	...partialViewsHandlers,
-	...tagHandlers,
-	...configHandlers,
+	...profilingHandlers,
+	...publishedStatusHandlers,
+	...redirectManagementHandlers,
+	...relationTypeHandlers,
+	...rteEmbedHandlers,
 	...scriptHandlers,
+	...staticFileHandlers,
+	...stylesheetHandlers,
+	...tagHandlers,
+	...telemetryHandlers,
+	...templateHandlers,
+	...upgradeHandlers,
+	...userGroupsHandlers,
+	...userHandlers,
 ];
 
 switch (import.meta.env.VITE_UMBRACO_INSTALL_STATUS) {

@@ -1,6 +1,6 @@
 import { StylesheetResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
-export type StylesheetDetails = StylesheetResponseModel;
+export interface UmbStylesheetDetailModel extends StylesheetResponseModel {}
 
 export * from './repository/index.js';
 export { UmbStylesheetTreeRepository } from './tree/index.js';

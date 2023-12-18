@@ -2,11 +2,11 @@ import { type UmbTreeElement } from '../../../tree/tree.element.js';
 import { html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbTreePickerModalData, UmbPickerModalValue, UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import { TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
+import { UmbTreeItemModelBase } from '@umbraco-cms/backoffice/tree';
 
 @customElement('umb-tree-picker-modal')
-export class UmbTreePickerModalElement<TreeItemType extends TreeItemPresentationModel> extends UmbModalBaseElement<
+export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase> extends UmbModalBaseElement<
 	UmbTreePickerModalData<TreeItemType>,
 	UmbPickerModalValue
 > {
@@ -46,6 +46,7 @@ export class UmbTreePickerModalElement<TreeItemType extends TreeItemPresentation
 						@selection-change=${this.#onSelectionChange}
 						.selection=${this._selection}
 						selectable
+						.filter=${this.data?.filter}
 						.selectableFilter=${this.data?.pickableFilter}
 						?multiple=${this._multiple}></umb-tree>
 				</uui-box>
@@ -64,6 +65,6 @@ export default UmbTreePickerModalElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-tree-picker-modal': UmbTreePickerModalElement<TreeItemPresentationModel>;
+		'umb-tree-picker-modal': UmbTreePickerModalElement<UmbTreeItemModelBase>;
 	}
 }

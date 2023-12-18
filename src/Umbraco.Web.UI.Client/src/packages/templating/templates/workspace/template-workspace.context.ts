@@ -5,7 +5,7 @@ import {
 	UmbSaveableWorkspaceContextInterface,
 	UmbEditableWorkspaceContextBase,
 } from '@umbraco-cms/backoffice/workspace';
-import { UmbBooleanState, UmbDeepState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { TemplateItemResponseModel, TemplateResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
@@ -14,7 +14,7 @@ export class UmbTemplateWorkspaceContext
 	extends UmbEditableWorkspaceContextBase<UmbTemplateRepository, TemplateResponseModel>
 	implements UmbSaveableWorkspaceContextInterface
 {
-	#data = new UmbDeepState<TemplateResponseModel | undefined>(undefined);
+	#data = new UmbObjectState<TemplateResponseModel | undefined>(undefined);
 	data = this.#data.asObservable();
 	#masterTemplate = new UmbObjectState<TemplateItemResponseModel | null>(null);
 	masterTemplate = this.#masterTemplate.asObservable();
@@ -57,15 +57,15 @@ export class UmbTemplateWorkspaceContext
 	}
 
 	setName(value: string) {
-		this.#data.next({ ...this.#data.value, name: value });
+		this.#data.update({ name: value });
 	}
 
 	setAlias(value: string) {
-		this.#data.next({ ...this.#data.value, alias: value });
+		this.#data.update({ alias: value });
 	}
 
 	setContent(value: string) {
-		this.#data.next({ ...this.#data.value, content: value });
+		this.#data.update({ content: value });
 	}
 
 	getLayoutBlockRegexPattern() {
@@ -145,6 +145,7 @@ ${currentContent}`;
 			} else {
 				this.#treeRepository.requestRootTreeItems();
 			}
+			this.setIsNew(false);
 			return;
 		}
 
