@@ -557,7 +557,7 @@ stages:
             Linux:
               vmImage: 'ubuntu-latest'
               SA_PASSWORD: $(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
-              CONNECTIONSTRINGS__UMBRACODBDSN: 'Server=localhost,1433;User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=True;Encrypt=False'
+              CONNECTIONSTRINGS__UMBRACODBDSN: 'Server=(local);Database=Umbraco;User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=True'
             Windows:
               vmImage: 'windows-latest'
         pool:
