@@ -1,3 +1,4 @@
+
 {
   "openapi": "3.0.1",
   "info": {
@@ -19450,7 +19451,7 @@
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/UserGroupBaseModel"
+            "$ref": "#/components/schemas/UserGroupUpsertBaseModel"
           }
         ],
         "additionalProperties": false
@@ -23921,7 +23922,7 @@
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/UserGroupBaseModel"
+            "$ref": "#/components/schemas/UserGroupUpsertBaseModel"
           }
         ],
         "additionalProperties": false
@@ -24080,6 +24081,25 @@
           },
           "isSystemGroup": {
             "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "UserGroupUpsertBaseModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/UserGroupBaseModel"
+          }
+        ],
+        "properties": {
+          "groupUsers": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "nullable": true
           }
         },
         "additionalProperties": false
