@@ -91,11 +91,11 @@ public class TemplateService : RepositoryService, ITemplateService
 
     /// <inheritdoc />
     public async Task<Attempt<ITemplate, TemplateOperationStatus>> CreateAsync(
-        Guid? templateKey,
         string name,
         string alias,
         string? content,
-        Guid userKey)
+        Guid userKey,
+        Guid? templateKey = null)
         => await CreateAsync(new Template(_shortStringHelper, name, alias) { Content = content, Key = templateKey ?? Guid.NewGuid() }, userKey);
 
     /// <inheritdoc />

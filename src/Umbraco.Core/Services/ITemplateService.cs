@@ -89,7 +89,7 @@ public interface ITemplateService : IService
     /// <param name="content">View content for the new template</param>
     /// <param name="userKey">Key of the user performing the Create.</param>
     /// <returns></returns>
-    Task<Attempt<ITemplate, TemplateOperationStatus>> CreateAsync(Guid? templateKey, string name, string alias, string? content, Guid userKey);
+    Task<Attempt<ITemplate, TemplateOperationStatus>> CreateAsync(string name, string alias, string? content, Guid userKey, Guid? templateKey = null);
 
     /// <summary>
     ///     Creates a new template

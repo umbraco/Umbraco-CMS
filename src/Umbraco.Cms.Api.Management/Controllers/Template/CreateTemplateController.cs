@@ -32,11 +32,11 @@ public class CreateTemplateController : TemplateControllerBase
     public async Task<IActionResult> Create(CreateTemplateRequestModel requestModel)
     {
         Attempt<ITemplate, TemplateOperationStatus> result = await _templateService.CreateAsync(
-            requestModel.Key,
             requestModel.Name,
             requestModel.Alias,
             requestModel.Content,
-            CurrentUserKey(_backOfficeSecurityAccessor));
+            CurrentUserKey(_backOfficeSecurityAccessor),
+            requestModel.Key);
 
         return result.Success
             ? CreatedAtAction<ByKeyTemplateController>(controller => nameof(controller.ByKey), result.Result.Key)

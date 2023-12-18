@@ -212,7 +212,7 @@ public class TemplateController : BackOfficeNotificationsController
             // we need to pass the template name as alias to keep the template file casing consistent with templates created with content
             // - see comment in FileService.CreateTemplateForContentType for additional details
             Attempt<ITemplate, TemplateOperationStatus> result =
-                _templateService.CreateAsync(null, display.Name!, display.Name!, display.Content, Constants.Security.SuperUserKey).GetAwaiter().GetResult();
+                _templateService.CreateAsync(display.Name!, display.Name!, display.Content, Constants.Security.SuperUserKey).GetAwaiter().GetResult();
             if (result.Success == false)
             {
                 return NotFound();
