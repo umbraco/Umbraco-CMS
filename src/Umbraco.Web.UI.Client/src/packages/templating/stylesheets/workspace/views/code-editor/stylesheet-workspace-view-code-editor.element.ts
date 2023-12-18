@@ -4,8 +4,8 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
-@customElement('umb-stylesheet-workspace-view-code-editor')
-export class UmbStylesheetWorkspaceViewCodeEditorElement extends UmbLitElement {
+@customElement('umb-stylesheet-code-editor-workspace-view')
+export class UmbStylesheetCodeEditorWorkspaceViewElement extends UmbLitElement {
 	@state()
 	private _content?: string | null = '';
 
@@ -93,10 +93,10 @@ export class UmbStylesheetWorkspaceViewCodeEditorElement extends UmbLitElement {
 	];
 }
 
-export default UmbStylesheetWorkspaceViewCodeEditorElement;
+export default UmbStylesheetCodeEditorWorkspaceViewElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-stylesheet-workspace-view-code-editor': UmbStylesheetWorkspaceViewCodeEditorElement;
+		'umb-stylesheet-code-editor-workspace-view': UmbStylesheetCodeEditorWorkspaceViewElement;
 	}
 }
