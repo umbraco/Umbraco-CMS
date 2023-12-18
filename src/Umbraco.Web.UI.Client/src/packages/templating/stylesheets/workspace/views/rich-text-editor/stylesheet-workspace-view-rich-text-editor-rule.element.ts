@@ -1,5 +1,5 @@
 import { UMB_STYLESHEET_WORKSPACE_CONTEXT, UmbStylesheetWorkspaceContext } from '../../stylesheet-workspace.context.js';
-import { UMB_MODAL_TEMPLATING_STYLESHEET_RTF_STYLE_SIDEBAR_MODAL } from './stylesheet-workspace-view-rich-text-editor.element.js';
+import { UMB_MODAL_TEMPLATING_STYLESHEET_RTF_STYLE_SIDEBAR_MODAL } from './stylesheet-rich-text-rule-workspace-view.element.js';
 import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { RichTextRuleModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';

@@ -41,7 +41,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.Stylesheet.RichTextEditor',
 		name: 'Stylesheet Workspace Rich Text Editor View',
-		js: () => import('./views/rich-text-editor/stylesheet-workspace-view-rich-text-editor.element.js'),
+		js: () => import('./views/rich-text-editor/stylesheet-rich-text-rule-workspace-view.element.js'),
 		weight: 800,
 		meta: {
 			label: 'Rich Text Editor',
