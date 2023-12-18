@@ -5,7 +5,7 @@ import { UMB_STYLESHEET_DETAIL_STORE_CONTEXT } from './stylesheet-detail.store.j
 import { type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbDetailRepositoryBase } from '@umbraco-cms/backoffice/repository';
 
-export class UmbStylesheetRepository extends UmbDetailRepositoryBase<UmbStylesheetDetailModel> {
+export class UmbStylesheetDetailRepository extends UmbDetailRepositoryBase<UmbStylesheetDetailModel> {
 	#dataSource;
 
 	// TODO: temp solution until it is automated

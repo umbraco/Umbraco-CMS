@@ -1,7 +1,7 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbStylesheetRepository } from '@umbraco-cms/backoffice/stylesheet';
+import { UmbStylesheetDetailRepository } from '@umbraco-cms/backoffice/stylesheet';
 import { StylesheetOverviewResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
@@ -27,7 +27,7 @@ export class UmbPropertyEditorUITinyMceStylesheetsConfigurationElement
 
 	constructor() {
 		super();
-		this.#repository = new UmbStylesheetRepository(this);
+		this.#repository = new UmbStylesheetDetailRepository(this);
 
 		this.#getAllStylesheets();
 	}

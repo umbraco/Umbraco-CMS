@@ -1,4 +1,4 @@
-import { UmbStylesheetRepository } from './stylesheet-detail.repository.js';
+import { UmbStylesheetDetailRepository } from './stylesheet-detail.repository.js';
 import { manifests as itemManifests } from './item/manifests.js';
 import { ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -8,7 +8,7 @@ const repository: ManifestRepository = {
 	type: 'repository',
 	alias: UMB_STYLESHEET_REPOSITORY_ALIAS,
 	name: 'Stylesheet Repository',
-	api: UmbStylesheetRepository,
+	api: UmbStylesheetDetailRepository,
 };
 
 export const manifests = [repository, ...itemManifests];

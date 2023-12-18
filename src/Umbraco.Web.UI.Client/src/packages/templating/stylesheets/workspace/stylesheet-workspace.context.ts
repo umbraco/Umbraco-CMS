@@ -1,4 +1,4 @@
-import { UmbStylesheetRepository } from '../repository/stylesheet-detail.repository.js';
+import { UmbStylesheetDetailRepository } from '../repository/stylesheet-detail.repository.js';
 import type { UmbStylesheetDetailModel } from '../types.js';
 import {
 	type UmbSaveableWorkspaceContextInterface,
@@ -13,7 +13,7 @@ import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 export type RichTextRuleModelSortable = RichTextRuleModel & { sortOrder?: number };
 
 export class UmbStylesheetWorkspaceContext
-	extends UmbEditableWorkspaceContextBase<UmbStylesheetRepository, UmbStylesheetDetailModel>
+	extends UmbEditableWorkspaceContextBase<UmbStylesheetDetailRepository, UmbStylesheetDetailModel>
 	implements UmbSaveableWorkspaceContextInterface<UmbStylesheetDetailModel | undefined>
 {
 	#data = new UmbObjectState<UmbStylesheetDetailModel | undefined>(undefined);
