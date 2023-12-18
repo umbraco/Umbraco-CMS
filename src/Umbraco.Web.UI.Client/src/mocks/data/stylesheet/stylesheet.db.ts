@@ -1,24 +1,31 @@
 import { UmbFileSystemMockDbBase } from '../file-system/file-system-base.js';
+import { UmbMockFileSystemDetailManager } from '../file-system/file-system-detail.manager.js';
 import { UmbMockFileSystemItemManager } from '../file-system/file-system-item.manager.js';
 import { UmbMockFileSystemTreeManager } from '../file-system/file-system-tree.manager.js';
 import { textFileItemMapper } from '../utils.js';
 import { UmbMockStylesheetModel, data } from './stylesheet.data.js';
 import {
+	CreateStylesheetRequestModel,
 	CreateTextFileViewModelBaseModel,
 	ExtractRichTextStylesheetRulesRequestModel,
 	ExtractRichTextStylesheetRulesResponseModel,
 	InterpolateRichTextStylesheetRequestModel,
 	PagedStylesheetOverviewResponseModel,
 	StylesheetResponseModel,
-	UpdateStylesheetRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
 
 class UmbStylesheetData extends UmbFileSystemMockDbBase<UmbMockStylesheetModel> {
 	tree = new UmbMockFileSystemTreeManager<UmbMockStylesheetModel>(this);
 	item = new UmbMockFileSystemItemManager<UmbMockStylesheetModel>(this);
+	file;
 
 	constructor(data: Array<UmbMockStylesheetModel>) {
 		super(data);
+
+		this.file = new UmbMockFileSystemDetailManager<UmbMockStylesheetModel>(this, {
+			createMapper: this.#createStylesheetMockItem,
+			readMapper: this.#readStylesheetResponseMapper,
+		});
 	}
 
 	getStylesheet(path: string): StylesheetResponseModel | undefined {
@@ -102,72 +109,24 @@ ${rule.selector} {
 		return newItem;
 	}
 
-	insertStyleSheet(item: CreateTextFileViewModelBaseModel) {
-		const parentPath = item.parentPath ? `${item.parentPath}/` : '';
-		const newItem: UmbMockStylesheetModel = {
-			...item,
-			path: `${parentPath}${item.name}`,
+	#createStylesheetMockItem = (item: CreateStylesheetRequestModel): UmbMockStylesheetModel => {
+		return {
+			name: item.name,
+			content: item.content,
+			path: `${item.parentPath}` ? `${item.parentPath}/${item.name}` : item.name,
 			isFolder: false,
 			hasChildren: false,
 			type: 'stylesheet',
 		};
+	};
 
-		this.insert(newItem);
-		return newItem;
-	}
-
-	insert(item: UmbMockStylesheetModel) {
-		const exits = this.data.find((i) => i.path === item.path);
-
-		if (exits) {
-			throw new Error(`Item with path ${item.path} already exists`);
-		}
-
-		this.data.push(item);
-
-		return item;
-	}
-
-	updateData(updateItem: UpdateStylesheetRequestModel) {
-		const itemIndex = this.data.findIndex((item) => item.path === updateItem.existingPath);
-		const item = this.data[itemIndex];
-		if (!item) return;
-
-		// TODO: revisit this code, seems like something we can solve smarter/type safer now:
-		const itemKeys = Object.keys(item);
-		const newItem = { ...item };
-
-		for (const [key] of Object.entries(updateItem)) {
-			if (itemKeys.indexOf(key) !== -1) {
-				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-				// @ts-ignore
-				newItem[key] = updateItem[key];
-			}
-		}
-		// Specific to fileSystem, we need to update path based on name:
-		const dirName = updateItem.existingPath?.substring(0, updateItem.existingPath.lastIndexOf('/'));
-		newItem.path = `${dirName}${dirName ? '/' : ''}${updateItem.name}`;
-
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-ignore
-		this.data[itemIndex] = newItem;
-	}
-
-	delete(paths: Array<string>) {
-		const deletedPaths = this.data
-			.filter((item) => {
-				if (!item.path) throw new Error('Item has no path');
-				paths.includes(item.path);
-			})
-			.map((item) => item.path);
-
-		this.data = this.data.filter((item) => {
-			if (!item.path) throw new Error('Item has no path');
-			paths.indexOf(item.path) === -1;
-		});
-
-		return deletedPaths;
-	}
+	#readStylesheetResponseMapper = (item: UmbMockStylesheetModel): StylesheetResponseModel => {
+		return {
+			path: item.path,
+			name: item.name,
+			content: item.content,
+		};
+	};
 }
 
 export const umbStylesheetData = new UmbStylesheetData(data);
