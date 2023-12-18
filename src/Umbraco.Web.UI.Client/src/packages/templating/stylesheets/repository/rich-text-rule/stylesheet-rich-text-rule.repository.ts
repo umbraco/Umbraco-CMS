@@ -15,8 +15,8 @@ export class UmbStylesheetRichTextRuleRepository extends UmbRepositoryBase {
 		this.#dataSource = new UmbStylesheetRichTextRuleServerDataSource(host);
 	}
 
-	requestStylesheetRules(path: string) {
-		return this.#dataSource.getStylesheetRichTextRules(path);
+	requestStylesheetRules(unique: string) {
+		return this.#dataSource.getStylesheetRichTextRules(unique);
 	}
 
 	/**

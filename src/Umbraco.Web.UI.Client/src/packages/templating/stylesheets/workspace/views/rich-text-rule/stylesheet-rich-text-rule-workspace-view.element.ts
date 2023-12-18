@@ -1,5 +1,6 @@
 import { RichTextRuleModelSortable, UmbStylesheetWorkspaceContext } from '../../stylesheet-workspace.context.js';
 import { UMB_MODAL_TEMPLATING_STYLESHEET_RTF_STYLE_SIDEBAR } from '../../manifests.js';
+import { UmbStylesheetRichTextRuleRepository } from '../../../repository/rich-text-rule/index.js';
 import { StylesheetRichTextEditorStyleModalValue } from './stylesheet-workspace-view-rich-text-editor-style-sidebar.element.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -42,6 +43,8 @@ export class UmbStylesheetRichTextRuleWorkspaceViewElement extends UmbLitElement
 	#context?: UmbStylesheetWorkspaceContext;
 	private _modalContext?: UmbModalManagerContext;
 
+	#stylesheetRichTextRuleRepository = new UmbStylesheetRichTextRuleRepository(this);
+
 	#sorter = new UmbSorterController(this, {
 		...SORTER_CONFIG,
 		performItemInsert: ({ item, newIndex }) => {
@@ -58,16 +61,22 @@ export class UmbStylesheetRichTextRuleWorkspaceViewElement extends UmbLitElement
 
 		this.consumeContext(UMB_WORKSPACE_CONTEXT, (workspaceContext) => {
 			this.#context = workspaceContext as UmbStylesheetWorkspaceContext;
-
-			this.observe(this.#context.rules, (rules) => {
-				this._rules = rules;
-				this.#sorter.setModel(this._rules);
-			});
+			const unique = this.#context?.getEntityId();
+			this.#setRules(unique);
 		});
 
 		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
 			this._modalContext = instance;
 		});
+	}
+
+	async #setRules(unique: string) {
+		const { data } = await this.#stylesheetRichTextRuleRepository.requestStylesheetRules(unique);
+
+		if (data) {
+			this._rules = data.rules ?? [];
+			this.#sorter.setModel(this._rules);
+		}
 	}
 
 	openModal = (rule: RichTextRuleModelSortable | null = null) => {

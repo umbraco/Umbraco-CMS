@@ -1,3 +1,4 @@
+import { UmbServerPathUniqueSerializer } from '../../../utils/index.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import {
 	ExtractRichTextStylesheetRulesRequestModel,
@@ -13,6 +14,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
  */
 export class UmbStylesheetRichTextRuleServerDataSource {
 	#host: UmbControllerHost;
+	#serverPathUniqueSerializer = new UmbServerPathUniqueSerializer();
 
 	/**
 	 * Creates an instance of UmbStylesheetRichTextRuleServerDataSource.
@@ -26,11 +28,12 @@ export class UmbStylesheetRichTextRuleServerDataSource {
 	/**
 	 * Get's the rich text rules for a stylesheet
 	 *
-	 * @param {string} path
+	 * @param {string} unique
 	 * @return {*}
 	 * @memberof UmbStylesheetRichTextRuleServerDataSource
 	 */
-	getStylesheetRichTextRules(path: string) {
+	getStylesheetRichTextRules(unique: string) {
+		const path = this.#serverPathUniqueSerializer.toServerPath(unique);
 		return tryExecuteAndNotify(this.#host, StylesheetResource.getStylesheetRichTextRules({ path }));
 	}
 

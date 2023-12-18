@@ -77,27 +77,6 @@ export class UmbStylesheetWorkspaceContext
 			this.setIsNew(false);
 			this.#data.next(data);
 		}
-
-		/*
-		const [{ data }, rules] = await Promise.all([
-			this.repository.requestById(path),
-			this.repository.getStylesheetRules(path),
-		]);
-
-		if (data) {
-			this.setIsNew(false);
-			this.#data.update(data);
-		} else {
-			this.#data.update(undefined);
-		}
-
-		if (rules.data) {
-			const x = rules.data.rules?.map((r, i) => ({ ...r, sortOrder: i })) ?? [];
-			this.#rules.next(x);
-		} else {
-			this.#rules.next([]);
-		}
-		*/
 	}
 
 	async create(parentUnique: string | null) {
