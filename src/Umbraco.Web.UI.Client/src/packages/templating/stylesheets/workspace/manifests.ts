@@ -23,7 +23,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.Stylesheet.CodeEditor',
 		name: 'Stylesheet Workspace Code Editor View',
-		js: () => import('./views/code-editor/stylesheet-workspace-view-code-editor.element.js'),
+		js: () => import('./views/code-editor/stylesheet-code-editor-workspace-view.element.js'),
 		weight: 700,
 		meta: {
 			label: 'Code',
