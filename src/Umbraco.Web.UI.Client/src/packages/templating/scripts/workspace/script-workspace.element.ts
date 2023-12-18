@@ -16,7 +16,7 @@ export class UmbScriptWorkspaceElement extends UmbLitElement {
 		{
 			path: 'create/:parentUnique',
 			component: this.#createElement,
-			setup: async (_component: PageComponent, info: IRoutingInfo) => {
+			setup: async (component: PageComponent, info: IRoutingInfo) => {
 				const parentUnique = info.match.params.parentUnique === 'null' ? null : info.match.params.parentUnique;
 				this.#workspaceContext.create(parentUnique);
 
