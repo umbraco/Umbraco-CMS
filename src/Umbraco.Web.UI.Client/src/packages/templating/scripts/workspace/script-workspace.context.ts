@@ -5,19 +5,20 @@ import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observa
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbEditableWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
 import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
+import { UMB_SCRIPT_ENTITY_TYPE } from '../entity.js';
 
 export class UmbScriptWorkspaceContext extends UmbEditableWorkspaceContextBase<
 	UmbScriptDetailRepository,
 	UmbScriptDetailModel
 > {
 	#data = new UmbObjectState<UmbScriptDetailModel | undefined>(undefined);
-	data = this.#data.asObservable();
-	name = this.#data.asObservablePart((data) => data?.name);
-	content = this.#data.asObservablePart((data) => data?.content);
-	path = this.#data.asObservablePart((data) => data?.path);
+	readonly data = this.#data.asObservable();
+	readonly name = this.#data.asObservablePart((data) => data?.name);
+	readonly content = this.#data.asObservablePart((data) => data?.content);
+	readonly path = this.#data.asObservablePart((data) => data?.path);
 
 	#isCodeEditorReady = new UmbBooleanState(false);
-	isCodeEditorReady = this.#isCodeEditorReady.asObservable();
+	readonly isCodeEditorReady = this.#isCodeEditorReady.asObservable();
 
 	constructor(host: UmbControllerHostElement) {
 		super(host, UMB_SCRIPT_WORKSPACE_ALIAS, new UmbScriptDetailRepository(host));
@@ -31,6 +32,18 @@ export class UmbScriptWorkspaceContext extends UmbEditableWorkspaceContextBase<
 		} catch (error) {
 			console.error(error);
 		}
+	}
+
+	getEntityType(): string {
+		const data = this.getData();
+		if (!data) throw new Error('Data is missing');
+		return data.entityType;
+	}
+
+	getEntityId() {
+		const data = this.getData();
+		if (!data) throw new Error('Data is missing');
+		return data.unique;
 	}
 
 	getData() {
@@ -62,12 +75,6 @@ export class UmbScriptWorkspaceContext extends UmbEditableWorkspaceContextBase<
 		}
 	}
 
-	getEntityId() {
-		const data = this.getData();
-		if (!data) throw new Error('Data is missing');
-		return data.unique;
-	}
-
 	async save() {
 		if (!this.#data.value) throw new Error('Data is missing');
 
@@ -89,11 +96,5 @@ export class UmbScriptWorkspaceContext extends UmbEditableWorkspaceContextBase<
 
 	destroy(): void {
 		throw new Error('Method not implemented.');
-	}
-
-	getEntityType(): string {
-		const data = this.getData();
-		if (!data) throw new Error('Data is missing');
-		return data.entityType;
 	}
 }

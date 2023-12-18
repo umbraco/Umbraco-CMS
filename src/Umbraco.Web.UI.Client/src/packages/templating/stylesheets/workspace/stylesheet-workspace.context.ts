@@ -1,5 +1,7 @@
 import { UmbStylesheetDetailRepository } from '../repository/stylesheet-detail.repository.js';
 import type { UmbStylesheetDetailModel } from '../types.js';
+import { UMB_STYLESHEET_ENTITY_TYPE } from '../entity.js';
+import { UMB_STYLESHEET_WORKSPACE_ALIAS } from './manifests.js';
 import {
 	type UmbSaveableWorkspaceContextInterface,
 	UmbEditableWorkspaceContextBase,
@@ -7,7 +9,7 @@ import {
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState, UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
-import type { RichTextRuleModel, UpdateStylesheetRequestModel } from '@umbraco-cms/backoffice/backend-api';
+import type { RichTextRuleModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 export type RichTextRuleModelSortable = RichTextRuleModel & { sortOrder?: number };
@@ -17,18 +19,20 @@ export class UmbStylesheetWorkspaceContext
 	implements UmbSaveableWorkspaceContextInterface<UmbStylesheetDetailModel | undefined>
 {
 	#data = new UmbObjectState<UmbStylesheetDetailModel | undefined>(undefined);
-	#rules = new UmbArrayState<RichTextRuleModelSortable>([], (rule) => rule.name);
 	readonly data = this.#data.asObservable();
-	readonly rules = this.#rules.asObservable();
 	readonly name = this.#data.asObservablePart((data) => data?.name);
 	readonly content = this.#data.asObservablePart((data) => data?.content);
 	readonly path = this.#data.asObservablePart((data) => data?.path);
+
+	#rules = new UmbArrayState<RichTextRuleModelSortable>([], (rule) => rule.name);
+	readonly rules = this.#rules.asObservable();
 
 	#isCodeEditorReady = new UmbBooleanState(false);
 	readonly isCodeEditorReady = this.#isCodeEditorReady.asObservable();
 
 	constructor(host: UmbControllerHostElement) {
-		super(host, 'Umb.Workspace.StyleSheet', new UmbStylesheetRepository(host));
+		super(host, UMB_STYLESHEET_WORKSPACE_ALIAS, new UmbStylesheetDetailRepository(host));
+		// TODO: sort close to the server
 		this.#rules.sortBy((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
 		this.#loadCodeEditor();
 	}
@@ -43,34 +47,19 @@ export class UmbStylesheetWorkspaceContext
 	}
 
 	getEntityType(): string {
-		return 'stylesheet';
+		const data = this.getData();
+		if (!data) throw new Error('Data is missing');
+		return data.entityType;
 	}
 
 	getEntityId() {
-		const path = this.getData()?.path?.replace(/\//g, '%2F');
-		const name = this.getData()?.name;
-
-		// Note: %2F is a slash (/)
-		return path && name ? `${path}%2F${name}` : name || '';
+		const data = this.getData();
+		if (!data) throw new Error('Data is missing');
+		return data.unique;
 	}
 
 	getData() {
 		return this.#data.getValue();
-	}
-
-	getRules() {
-		return this.#rules.getValue();
-	}
-
-	updateRule(unique: string, rule: RichTextRuleModelSortable) {
-		this.#rules.updateOne(unique, rule);
-		this.sendRulesGetContent();
-	}
-
-	setRules(rules: RichTextRuleModelSortable[]) {
-		const newRules = rules.map((r, i) => ({ ...r, sortOrder: i }));
-		this.#rules.next(newRules);
-		this.sendRulesGetContent();
 	}
 
 	setName(value: string) {
@@ -81,7 +70,15 @@ export class UmbStylesheetWorkspaceContext
 		this.#data.update({ content: value });
 	}
 
-	async load(path: string) {
+	async load(unique: string) {
+		const { data } = await this.repository.requestByUnique(unique);
+
+		if (data) {
+			this.setIsNew(false);
+			this.#data.next(data);
+		}
+
+		/*
 		const [{ data }, rules] = await Promise.all([
 			this.repository.requestById(path),
 			this.repository.getStylesheetRules(path),
@@ -100,8 +97,38 @@ export class UmbStylesheetWorkspaceContext
 		} else {
 			this.#rules.next([]);
 		}
+		*/
 	}
 
+	async create(parentUnique: string | null) {
+		const { data } = await this.repository.createScaffold(parentUnique);
+
+		if (data) {
+			this.setIsNew(true);
+			this.#data.next(data);
+		}
+	}
+
+	public async save() {
+		if (!this.#data.value) throw new Error('Data is missing');
+
+		let newData = undefined;
+
+		if (this.getIsNew()) {
+			const { data } = await this.repository.create(this.#data.value);
+			newData = data;
+		} else {
+			const { data } = await this.repository.save(this.#data.value);
+			newData = data;
+		}
+
+		if (newData) {
+			this.#data.next(newData);
+			this.saveComplete(newData);
+		}
+	}
+
+	/*
 	async sendRulesGetContent() {
 		const requestBody = {
 			content: this.getData()?.content,
@@ -130,51 +157,21 @@ export class UmbStylesheetWorkspaceContext
 		return true;
 	}
 
-	public async save() {
-		const stylesheet = this.getData();
-
-		if (!stylesheet) {
-			return Promise.reject('Something went wrong, there is no data for partial view you want to save...');
-		}
-
-		if (this.getIsNew()) {
-			const createRequestBody = {
-				name: stylesheet.name,
-				content: stylesheet.content,
-				parentPath: stylesheet.path ?? '',
-			};
-
-			const { error } = await this.repository.create(createRequestBody);
-			if (!error) {
-				this.setIsNew(false);
-			}
-			return Promise.resolve();
-		} else {
-			if (!stylesheet.path) return Promise.reject('There is no path');
-			const updateRequestBody: UpdateStylesheetRequestModel = {
-				name: stylesheet.name,
-				existingPath: stylesheet.path,
-				content: stylesheet.content,
-			};
-
-			const { error } = await this.repository.save(stylesheet.path, updateRequestBody);
-			if (!error) {
-				//TODO Update the URL to the new name
-			}
-			return Promise.resolve();
-		}
+	getRules() {
+		return this.#rules.getValue();
 	}
 
-	async create(parentKey: string | null) {
-		const newStylesheet = {
-			name: '',
-			path: parentKey ?? '',
-			content: '',
-		};
-
-		this.#data.next(newStylesheet);
-		this.setIsNew(true);
+	updateRule(unique: string, rule: RichTextRuleModelSortable) {
+		this.#rules.updateOne(unique, rule);
+		this.sendRulesGetContent();
 	}
+
+	setRules(rules: RichTextRuleModelSortable[]) {
+		const newRules = rules.map((r, i) => ({ ...r, sortOrder: i }));
+		this.#rules.next(newRules);
+		this.sendRulesGetContent();
+	}
+	*/
 
 	public destroy(): void {
 		this.#data.destroy();
@@ -187,5 +184,5 @@ export const UMB_STYLESHEET_WORKSPACE_CONTEXT = new UmbContextToken<
 >(
 	'UmbWorkspaceContext',
 	undefined,
-	(context): context is UmbStylesheetWorkspaceContext => context.getEntityType?.() === 'stylesheet',
+	(context): context is UmbStylesheetWorkspaceContext => context.getEntityType?.() === UMB_STYLESHEET_ENTITY_TYPE,
 );
