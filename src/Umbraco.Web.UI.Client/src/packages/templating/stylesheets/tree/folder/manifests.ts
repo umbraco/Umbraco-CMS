@@ -1,4 +1,5 @@
 import { UMB_STYLESHEET_FOLDER_ENTITY_TYPE, UMB_STYLESHEET_ROOT_ENTITY_TYPE } from '../../entity.js';
+import { UmbStylesheetFolderRepository } from './stylesheet-folder.repository.js';
 import { UmbCreateFolderEntityAction, UmbDeleteFolderEntityAction } from '@umbraco-cms/backoffice/tree';
 import type { ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
 
