@@ -98,25 +98,25 @@ const rulesHandlers = [
 ];
 
 const folderHandlers = [
-	rest.get(umbracoPath('/v1/stylesheet/all'), (req, res, ctx) => {
+	rest.get(umbracoPath('/stylesheet/folder'), (req, res, ctx) => {
 		const path = req.url.searchParams.get('path');
-		if (!path) return;
-
-		const response = umbStylesheetData.getFolder(path);
+		if (!path) return res(ctx.status(400));
+		const response = umbStylesheetData.folder.read(path);
 		return res(ctx.status(200), ctx.json(response));
 	}),
 
 	rest.post(umbracoPath('/stylesheet/folder'), async (req, res, ctx) => {
 		const requestBody = (await req.json()) as CreatePathFolderRequestModel;
 		if (!requestBody) return res(ctx.status(400, 'no body found'));
+		umbStylesheetData.folder.create(requestBody);
 		return res(ctx.status(200));
 	}),
 
 	rest.delete(umbracoPath('/stylesheet/folder'), (req, res, ctx) => {
 		const path = req.url.searchParams.get('path');
 		if (!path) return res(ctx.status(400));
-		const response = umbStylesheetData.delete([path]);
-		return res(ctx.status(200), ctx.json(response));
+		umbStylesheetData.folder.delete(path);
+		return res(ctx.status(200));
 	}),
 ];
 
