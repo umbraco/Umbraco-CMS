@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
@@ -9,6 +10,7 @@ using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.PreMigration;
 
@@ -32,6 +34,8 @@ public class DataTypeSplitDataCollector : INotificationHandler<UmbracoApplicatio
     private readonly IJsonSerializer _jsonSerializer;
     private readonly ILogger<DataTypeSplitDataCollector> _logger;
     private readonly ICoreScopeProvider _coreScopeProvider;
+    private readonly IRuntimeState _runtimeState;
+    private readonly IServerRoleAccessor _serverRoleAccessor;
 
     public DataTypeSplitDataCollector(
         DataEditorCollection dataEditors,
@@ -40,7 +44,9 @@ public class DataTypeSplitDataCollector : INotificationHandler<UmbracoApplicatio
         IKeyValueService keyValueService,
         IJsonSerializer jsonSerializer,
         ILogger<DataTypeSplitDataCollector> logger,
-        ICoreScopeProvider coreScopeProvider)
+        ICoreScopeProvider coreScopeProvider,
+        IRuntimeState runtimeState,
+        IServerRoleAccessor serverRoleAccessor)
     {
         _dataEditors = dataEditors;
         _manifestParser = manifestParser;
@@ -49,15 +55,29 @@ public class DataTypeSplitDataCollector : INotificationHandler<UmbracoApplicatio
         _jsonSerializer = jsonSerializer;
         _logger = logger;
         _coreScopeProvider = coreScopeProvider;
+        _runtimeState = runtimeState;
+        _serverRoleAccessor = serverRoleAccessor;
     }
 
     public void Handle(UmbracoApplicationStartedNotification notification)
     {
+        // only run this if the application is actually running and not in an install/upgrade state
+        if (_runtimeState.Level != RuntimeLevel.Run)
+        {
+            return;
+        }
+
+        // do not run on load balanced subscribers
+        if (_serverRoleAccessor.CurrentServerRole == ServerRole.Subscriber)
+        {
+            return;
+        }
+
         var manifestEditorsData = _manifestParser.CombinedManifest.PropertyEditors
             .Select(pe => new EditorAliasSplitData(pe.Alias){EditorUiAlias = pe.Alias, EditorAlias = EditorAliasFromValueEditorValueType(pe.GetValueEditor().ValueType)})
             .ToDictionary(data => data.OriginalEditorAlias);
 
-        _logger.LogInformation("Found {count} custom PropertyEditor(s) configured trough manifest files",manifestEditorsData.Count);
+        _logger.LogDebug("Found {count} custom PropertyEditor(s) configured trough manifest files",manifestEditorsData.Count);
 
         var fromCodeEditorsData = _dataEditors
             .Where(de =>
@@ -68,7 +88,7 @@ public class DataTypeSplitDataCollector : INotificationHandler<UmbracoApplicatio
             .Select(de => new EditorAliasSplitData(de.Alias) { EditorAlias = de.Alias })
             .ToDictionary(data => data.OriginalEditorAlias);
 
-        _logger.LogInformation("Found {count} custom PropertyEditor(s) configured trough code",fromCodeEditorsData.Count);
+        _logger.LogDebug("Found {count} custom PropertyEditor(s) configured trough code",fromCodeEditorsData.Count);
 
         var combinedEditorsData = new Dictionary<string, EditorAliasSplitData>(manifestEditorsData);
         foreach (KeyValuePair<string,EditorAliasSplitData> pair in fromCodeEditorsData)
@@ -78,7 +98,7 @@ public class DataTypeSplitDataCollector : INotificationHandler<UmbracoApplicatio
 
         if (combinedEditorsData.Any() == false)
         {
-            _logger.LogInformation("No custom PropertyEditors found, skipping collection datatype migration data.");
+            _logger.LogDebug("No custom PropertyEditors found, skipping collection datatype migration data.");
             return;
         }
 
@@ -95,7 +115,7 @@ public class DataTypeSplitDataCollector : INotificationHandler<UmbracoApplicatio
             EditorUiAlias = combinedEditorsData[dt.EditorAlias].EditorUiAlias
         }).ToArray();
 
-        _logger.LogInformation("Collected migration data for {count} DataType(s) that use custom PropertyEditors",migrationData.Length);
+        _logger.LogDebug("Collected migration data for {count} DataType(s) that use custom PropertyEditors",migrationData.Length);
 
         _keyValueService.SetValue("migrateDataEditorSplitCollectionData",_jsonSerializer.Serialize(migrationData));
     }
