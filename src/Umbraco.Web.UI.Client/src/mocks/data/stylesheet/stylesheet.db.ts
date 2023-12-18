@@ -1,6 +1,7 @@
 import { UmbFileSystemMockDbBase } from '../file-system/file-system-base.js';
+import { UmbMockFileSystemItemManager } from '../file-system/file-system-item.manager.js';
 import { UmbMockFileSystemTreeManager } from '../file-system/file-system-tree.manager.js';
-import { createFileItemResponseModelBaseModel, textFileItemMapper } from '../utils.js';
+import { textFileItemMapper } from '../utils.js';
 import { UmbMockStylesheetModel, data } from './stylesheet.data.js';
 import {
 	CreateTextFileViewModelBaseModel,
@@ -8,21 +9,16 @@ import {
 	ExtractRichTextStylesheetRulesResponseModel,
 	InterpolateRichTextStylesheetRequestModel,
 	PagedStylesheetOverviewResponseModel,
-	StylesheetItemResponseModel,
 	StylesheetResponseModel,
 	UpdateStylesheetRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
 
 class UmbStylesheetData extends UmbFileSystemMockDbBase<UmbMockStylesheetModel> {
 	tree = new UmbMockFileSystemTreeManager<UmbMockStylesheetModel>(this);
+	item = new UmbMockFileSystemItemManager<UmbMockStylesheetModel>(this);
 
 	constructor(data: Array<UmbMockStylesheetModel>) {
 		super(data);
-	}
-
-	getItems(paths: Array<string>): Array<StylesheetItemResponseModel> {
-		const items = this.data.filter((item) => paths.includes(item.path ?? ''));
-		return items.map((item) => createFileItemResponseModelBaseModel(item));
 	}
 
 	getStylesheet(path: string): StylesheetResponseModel | undefined {
@@ -100,7 +96,6 @@ ${rule.selector} {
 			isFolder: true,
 			hasChildren: false,
 			type: 'stylesheet',
-			icon: 'folder',
 		};
 
 		this.insert(newItem);
@@ -115,7 +110,6 @@ ${rule.selector} {
 			isFolder: false,
 			hasChildren: false,
 			type: 'stylesheet',
-			icon: 'style',
 		};
 
 		this.insert(newItem);
