@@ -437,7 +437,7 @@ public class FileService : RepositoryService, IFileService
         }
 
         Guid currentUserKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult();
-        Attempt<ITemplate, TemplateOperationStatus> result = _templateService.CreateAsync(name, alias, content, currentUserKey).GetAwaiter().GetResult();
+        Attempt<ITemplate, TemplateOperationStatus> result = _templateService.CreateAsync(null, name, alias, content, currentUserKey).GetAwaiter().GetResult();
         return result.Result;
     }
 

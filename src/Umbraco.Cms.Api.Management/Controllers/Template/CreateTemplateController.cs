@@ -32,6 +32,7 @@ public class CreateTemplateController : TemplateControllerBase
     public async Task<IActionResult> Create(CreateTemplateRequestModel requestModel)
     {
         Attempt<ITemplate, TemplateOperationStatus> result = await _templateService.CreateAsync(
+            requestModel.Key,
             requestModel.Name,
             requestModel.Alias,
             requestModel.Content,
