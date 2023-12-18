@@ -62,7 +62,7 @@ export abstract class UmbDetailRepositoryBase<
 	 * @memberof UmbDetailRepositoryBase
 	 */
 	async requestByUnique(unique: string) {
-		if (!unique) throw new Error('Key is missing');
+		if (!unique) throw new Error('Unique is missing');
 		await this.#init;
 
 		const { data, error } = await this.#detailSource.read(unique);
