@@ -1,5 +1,5 @@
-import { UmbStylesheetRepository } from '../repository/stylesheet.repository.js';
-import type { UmbStylesheetDetailModel } from '../index.js';
+import { UmbStylesheetRepository } from '../repository/stylesheet-detail.repository.js';
+import type { UmbStylesheetDetailModel } from '../types.js';
 import {
 	type UmbSaveableWorkspaceContextInterface,
 	UmbEditableWorkspaceContextBase,

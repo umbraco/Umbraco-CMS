@@ -1,4 +1,4 @@
-import { UmbStylesheetRepository } from './stylesheet.repository.js';
+import { UmbStylesheetRepository } from './stylesheet-detail.repository.js';
 import { manifests as itemManifests } from './item/manifests.js';
 import { ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
 
