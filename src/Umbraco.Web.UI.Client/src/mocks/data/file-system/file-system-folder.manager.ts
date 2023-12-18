@@ -17,8 +17,6 @@ export class UmbMockFileSystemFolderManager<
 			name: request.name,
 			hasChildren: false,
 			isFolder: true,
-			type: 'script-folder',
-			icon: 'icon-script',
 			content: '',
 		};
 
