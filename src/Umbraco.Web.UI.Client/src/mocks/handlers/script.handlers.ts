@@ -56,7 +56,7 @@ const itemHandlers: RestHandler<MockedRequest<DefaultBodyType>>[] = [
 	rest.get(umbracoPath('/script/item'), (req, res, ctx) => {
 		const paths = req.url.searchParams.getAll('paths');
 		if (!paths) return res(ctx.status(400, 'no body found'));
-		const response = umbScriptMockDb.getItems(paths);
+		const response = umbScriptMockDb.item.getItems(paths);
 		return res(ctx.status(200), ctx.json(response));
 	}),
 ];

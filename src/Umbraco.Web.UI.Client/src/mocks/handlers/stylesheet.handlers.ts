@@ -53,19 +53,17 @@ const detailHandlers = [
 		return res(ctx.status(200));
 	}),
 
-	rest.get(umbracoPath('/v1/stylesheet/all'), (req, res, ctx) => {
+	rest.get(umbracoPath('/stylesheet/all'), (req, res, ctx) => {
 		const path = req.url.searchParams.get('path');
 		if (!path) return;
-
 		const response = umbStylesheetData.getAllStylesheets();
 		return res(ctx.status(200), ctx.json(response));
 	}),
 
-	rest.get(umbracoPath('/v1/stylesheet/item'), (req, res, ctx) => {
-		const paths = req.url.searchParams.getAll('path');
-		if (!paths) return;
-
-		const items = umbStylesheetData.getItems(paths);
+	rest.get(umbracoPath('/stylesheet/item'), (req, res, ctx) => {
+		const paths = req.url.searchParams.getAll('paths');
+		if (!paths) return res(ctx.status(400, 'no body found'));
+		const items = umbStylesheetData.item.getItems(paths);
 		return res(ctx.status(200), ctx.json(items));
 	}),
 ];
