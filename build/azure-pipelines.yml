@@ -263,7 +263,7 @@ stages:
             displayName: Run dotnet test
             inputs:
               command: test
-              projects: 'tests/*.Tests.UnitTests/*.Tests.UnitTests.csproj'
+              projects: 'tests/Umbraco.Tests.UnitTests/Umbraco.Tests.UnitTests.csproj'
               arguments: '--configuration $(buildConfiguration) --no-build'
               testRunTitle: Unit Tests - $(Agent.OS)
 
@@ -301,7 +301,7 @@ stages:
             condition: eq(variables['Agent.OS'],'Windows_NT')
             inputs:
               command: test
-              projects: 'tests/*.Tests.Integration/*.Tests.Integration.csproj'
+              projects: 'tests/Umbraco.Tests.Integration/Umbraco.Tests.Integration.csproj'
               testRunTitle: Integration Tests SQLite - $(Agent.OS)
               ${{ if or(variables.releaseTestFilter, parameters.forceReleaseTestFilter) }}:
                 arguments: '--configuration $(buildConfiguration) --no-build ${{parameters.integrationReleaseTestFilter}}'
@@ -315,7 +315,7 @@ stages:
             condition: ne(variables['Agent.OS'],'Windows_NT')
             inputs:
               command: test
-              projects: 'tests/*.Tests.Integration/*.Tests.Integration.csproj'
+              projects: 'tests/Umbraco.Tests.Integration/Umbraco.Tests.Integration.csproj'
               testRunTitle: Integration Tests SQLite - $(Agent.OS)
               ${{ if or(variables.releaseTestFilter, parameters.forceReleaseTestFilter) }}:
                 arguments: '--configuration $(buildConfiguration) --no-build ${{parameters.nonWindowsIntegrationReleaseTestFilter}}'
@@ -365,7 +365,7 @@ stages:
             condition: eq(variables['Agent.OS'],'Windows_NT')
             inputs:
               command: test
-              projects: 'tests/*.Tests.Integration/*.Tests.Integration.csproj'
+              projects: 'tests/Umbraco.Tests.Integration/Umbraco.Tests.Integration.csproj'
               testRunTitle: Integration Tests SQL Server - $(Agent.OS)
               ${{ if or(variables.releaseTestFilter, parameters.forceReleaseTestFilter) }}:
                 arguments: '--configuration $(buildConfiguration) --no-build ${{parameters.integrationReleaseTestFilter}}'
@@ -380,7 +380,7 @@ stages:
             condition: ne(variables['Agent.OS'],'Windows_NT')
             inputs:
               command: test
-              projects: 'tests/*.Tests.Integration/*.Tests.Integration.csproj'
+              projects: 'tests/Umbraco.Tests.Integration/Umbraco.Tests.Integration.csproj'
               testRunTitle: Integration Tests SQL Server - $(Agent.OS)
               ${{ if or(variables.releaseTestFilter, parameters.forceReleaseTestFilter) }}:
                 arguments: '--configuration $(buildConfiguration) --no-build ${{parameters.nonWindowsIntegrationReleaseTestFilter}}'
@@ -468,7 +468,7 @@ stages:
               path: $(npm_config_cache)
 
           - script: npm ci --no-fund --no-audit --prefer-offline
-            workingDirectory: $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/
+            workingDirectory: $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest
             displayName: Restore NPM packages
 
           # Build application
@@ -556,7 +556,7 @@ stages:
           matrix:
             Linux:
               vmImage: 'ubuntu-latest'
-              CONNECTIONSTRINGS__UMBRACODBDSN: 'Server=localhost,1433;User Id=sa;Password=$(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD);TrustServerCertificate=True'
+              CONNECTIONSTRINGS__UMBRACODBDSN: 'Server=(local);User Id=sa;Password=$(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD);TrustServerCertificate=True;Encrypt=False'
             Windows:
               vmImage: 'windows-latest'
         pool:
@@ -597,7 +597,7 @@ stages:
               path: $(npm_config_cache)
 
           - script: npm ci --no-fund --no-audit --prefer-offline
-            workingDirectory: $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/
+            workingDirectory: $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest
             displayName: Restore NPM packages
 
           # Build application
