@@ -556,7 +556,7 @@ stages:
           matrix:
             Linux:
               vmImage: 'ubuntu-latest'
-              CONNECTIONSTRINGS__UMBRACODBDSN: 'Server=(local);User Id=sa;Password=$(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD);TrustServerCertificate=true'
+              CONNECTIONSTRINGS__UMBRACODBDSN: 'Server=(local);User Id=sa;Password=$(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD);Integrated Security=False;TrustServerCertificate=True'
             Windows:
               vmImage: 'windows-latest'
         pool:
