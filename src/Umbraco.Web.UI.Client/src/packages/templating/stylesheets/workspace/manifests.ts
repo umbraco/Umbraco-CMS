@@ -41,7 +41,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.Stylesheet.RichTextEditor',
 		name: 'Stylesheet Workspace Rich Text Editor View',
-		js: () => import('./views/rich-text-editor/stylesheet-rich-text-rule-workspace-view.element.js'),
+		js: () => import('./views/rich-text-rule/stylesheet-rich-text-rule-workspace-view.element.js'),
 		weight: 800,
 		meta: {
 			label: 'Rich Text Editor',
@@ -84,7 +84,7 @@ const modals: Array<ManifestModal> = [
 		type: 'modal',
 		alias: UMB_MODAL_TEMPLATING_STYLESHEET_RTF_STYLE_SIDEBAR,
 		name: 'Rich text editor style modal',
-		js: () => import('./views/rich-text-editor/stylesheet-workspace-view-rich-text-editor-style-sidebar.element.js'),
+		js: () => import('./views/rich-text-rule/stylesheet-workspace-view-rich-text-editor-style-sidebar.element.js'),
 	},
 ];
 
