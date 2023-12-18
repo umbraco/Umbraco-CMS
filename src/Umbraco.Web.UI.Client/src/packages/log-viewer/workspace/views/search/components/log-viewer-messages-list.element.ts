@@ -88,11 +88,11 @@ export class UmbLogViewerMessagesListElement extends UmbLitElement {
 							.exception=${log.exception ?? ''}
 							.messageTemplate=${log.messageTemplate ?? ''}></umb-log-viewer-message>`,
 			  )}`
-			: html`<umb-empty-state size="small"
-					><span id="empty">
+			: html`<umb-empty-state size="small">
+					<span id="empty">
 						<uui-icon name="icon-search"></uui-icon>Sorry, we cannot find what you are looking for.
-					</span></umb-empty-state
-			  >`}`;
+					</span>
+			  </umb-empty-state>`}`;
 	}
 
 	render() {
