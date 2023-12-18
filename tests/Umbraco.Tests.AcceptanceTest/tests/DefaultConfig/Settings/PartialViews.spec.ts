@@ -15,7 +15,7 @@ test.describe('Partial Views tests', () => {
     await umbracoApi.partialView.ensureNameNotExists(partialViewName);
 
     // Act
-    await umbracoUi.partialView.openActionsMenuAtRoot();
+    await umbracoUi.partialView.clickActionsMenuAtRoot();
     await umbracoUi.partialView.clickNewEmptyPartialViewButton();
     await umbracoUi.partialView.enterPartialViewName(partialViewName);
     // TODO: Remove this timeout when frontend validation is implemented
@@ -37,7 +37,7 @@ test.describe('Partial Views tests', () => {
     const expectedTemplateContent = '@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage\r\n@using Umbraco.Cms.Core.Routing\r\n@using Umbraco.Extensions\r\n\n@inject IPublishedUrlProvider PublishedUrlProvider\r\n@*\r\n    This snippet makes a breadcrumb of parents using an unordered HTML list.\r\n\r\n    How it works:\r\n    - It uses the Ancestors() method to get all parents and then generates links so the visitor can go back\r\n    - Finally it outputs the name of the current page (without a link)\r\n*@\r\n\r\n@{ var selection = Model.Ancestors().ToArray(); }\r\n\r\n@if (selection?.Length > 0)\r\n{\r\n    <ul class=\"breadcrumb\">\r\n        @* For each page in the ancestors collection which have been ordered by Level (so we start with the highest top node first) *@\r\n        @foreach (var item in selection.OrderBy(x => x.Level))\r\n        {\r\n            <li><a href=\"@item.Url(PublishedUrlProvider)\">@item.Name</a> <span class=\"divider\">/</span></li>\r\n        }\r\n\r\n        @* Display the current page as the last item in the list *@\r\n        <li class=\"active\">@Model.Name</li>\r\n    </ul>\r\n}';
 
     // Act
-    await umbracoUi.partialView.openActionsMenuAtRoot();
+    await umbracoUi.partialView.clickActionsMenuAtRoot();
     await umbracoUi.partialView.clickNewPartialViewFromSnippetButton();
     await umbracoUi.partialView.clickBreadcrumbButton();
     await umbracoUi.partialView.enterPartialViewName(partialViewName);
@@ -65,7 +65,7 @@ test.describe('Partial Views tests', () => {
     await umbracoApi.partialView.create(partialViewFileName, "@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage\r\n", "/");
 
     //Act
-    await umbracoUi.partialView.openPartialViewFileAtRoot(partialViewFileName);
+    await umbracoUi.partialView.openPartialViewAtRoot(partialViewFileName);
     await umbracoUi.partialView.enterPartialViewName(updatedPartialViewName);
     // TODO: Remove this timeout when frontend validation is implemented
     await umbracoUi.waitForTimeout(1000);
@@ -93,7 +93,7 @@ test.describe('Partial Views tests', () => {
     await umbracoApi.partialView.create(partialViewFileName, "@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage\r\n", "/");
 
     //Act
-    await umbracoUi.partialView.openPartialViewFileAtRoot(partialViewFileName);
+    await umbracoUi.partialView.openPartialViewAtRoot(partialViewFileName);
     await umbracoUi.partialView.enterPartialViewContent(updatedPartialViewContent);
     // TODO: Remove this timeout when frontend validation is implemented
     await umbracoUi.waitForTimeout(1000);
@@ -130,8 +130,8 @@ test.describe('Partial Views tests', () => {
     await umbracoApi.partialView.create(partialViewFileName, "@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage\r\n", "/");
 
     // Act
-    await umbracoUi.partialView.openPartialViewFileAtRoot(partialViewFileName);
-    await umbracoUi.partialView.addQueryBuilderIntoPartialView();
+    await umbracoUi.partialView.openPartialViewAtRoot(partialViewFileName);
+    await umbracoUi.partialView.addQueryBuilderIntoPartialViewWithCreateDateOption();
     await umbracoUi.partialView.clickSaveButton();
 
     // Assert
@@ -156,7 +156,7 @@ test.describe('Partial Views tests', () => {
     const partialViewContent = '@Umbraco.GetDictionaryValue("' + dictionaryName + '")@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage\r\n';
 
     // Act
-    await umbracoUi.partialView.openPartialViewFileAtRoot(partialViewFileName);
+    await umbracoUi.partialView.openPartialViewAtRoot(partialViewFileName);
     await umbracoUi.partialView.insertDictionaryItem(dictionaryName);
     await umbracoUi.partialView.clickSaveButton();
 
@@ -176,8 +176,8 @@ test.describe('Partial Views tests', () => {
 
     //Act
     await umbracoUi.partialView.clickRootFolderCaretButton();
-    await umbracoUi.partialView.openPartialViewFileAtRoot(partialViewFileName);
-    await umbracoUi.partialView.deletePartialViewFile();
+    await umbracoUi.partialView.openPartialViewAtRoot(partialViewFileName);
+    await umbracoUi.partialView.deletePartialView();
 
     // Assert
     expect(await umbracoApi.partialView.doesExist(partialViewFileName)).toBeFalsy();
@@ -192,7 +192,7 @@ test.describe('Partial Views tests', () => {
     await umbracoApi.partialView.ensureNameNotExists(folderName);
 
     // Act
-    await umbracoUi.partialView.openActionsMenuAtRoot();
+    await umbracoUi.partialView.clickActionsMenuAtRoot();
     await umbracoUi.partialView.createNewFolder(folderName);
 
     // Assert

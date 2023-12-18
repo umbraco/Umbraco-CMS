@@ -18,7 +18,7 @@ test.describe('Stylesheets tests', () => {
     await umbracoApi.stylesheet.ensureNameNotExists(styleSheetFileName);
 
     //Act
-    await umbracoUi.stylesheet.openActionsMenuAtRoot();
+    await umbracoUi.stylesheet.clickActionsMenuAtRoot();
     await umbracoUi.stylesheet.clickNewStylesheetFileButton();
     await umbracoUi.stylesheet.enterStylesheetName(styleSheetName);
     // TODO: Remove this timeout when frontend validation is implemented
@@ -39,7 +39,7 @@ test.describe('Stylesheets tests', () => {
     await umbracoApi.stylesheet.ensureNameNotExists(styleSheetFileName);
 
     //Act
-    await umbracoUi.stylesheet.openActionsMenuAtRoot();
+    await umbracoUi.stylesheet.clickActionsMenuAtRoot();
     await umbracoUi.stylesheet.clickNewRTEStylesheetFileButton();
     await umbracoUi.stylesheet.enterStylesheetName(styleSheetName);
     await umbracoUi.stylesheet.addNewRule(ruleName, 'h1', 'color:red');
@@ -82,7 +82,7 @@ test.describe('Stylesheets tests', () => {
 
     //Act
     await umbracoUi.stylesheet.clickRootFolderCaretButton();
-    await umbracoUi.stylesheet.openActionsMenuForName(styleSheetFileName);
+    await umbracoUi.stylesheet.clickActionsMenuForStylesheet(styleSheetFileName);
     await umbracoUi.stylesheet.deleteStylesheetFile();
 
     // Assert
@@ -96,7 +96,7 @@ test.describe('Stylesheets tests', () => {
     await umbracoApi.stylesheet.ensureNameNotExists(styleFolderName);
 
     // Act
-    await umbracoUi.stylesheet.openActionsMenuAtRoot();
+    await umbracoUi.stylesheet.clickActionsMenuAtRoot();
     await umbracoUi.stylesheet.createNewFolder(styleFolderName);
 
     // Assert
@@ -115,7 +115,7 @@ test.describe('Stylesheets tests', () => {
 
     // Act
     await umbracoUi.stylesheet.clickRootFolderCaretButton();
-    await umbracoUi.stylesheet.openActionsMenuForName(styleFolderName);
+    await umbracoUi.stylesheet.clickActionsMenuForStylesheet(styleFolderName);
     await umbracoUi.stylesheet.deleteFolder();
 
     // Assert
@@ -133,7 +133,7 @@ test.describe('Stylesheets tests', () => {
 
     // Act
     await umbracoUi.stylesheet.clickRootFolderCaretButton();
-    await umbracoUi.stylesheet.openActionsMenuForName(styleFolderName);
+    await umbracoUi.stylesheet.clickActionsMenuForStylesheet(styleFolderName);
     await umbracoUi.stylesheet.createNewFolder(childFolderName);
 
     //Assert
@@ -159,7 +159,7 @@ test.describe('Stylesheets tests', () => {
     // Act
     await umbracoUi.stylesheet.clickRootFolderCaretButton();
     await umbracoUi.stylesheet.clickCaretButtonForName(styleFolderName);
-    await umbracoUi.stylesheet.openActionsMenuForName(childFolderName);
+    await umbracoUi.stylesheet.clickActionsMenuForStylesheet(childFolderName);
     await umbracoUi.stylesheet.createNewFolder(childOfChildFolderName);
 
     //Assert

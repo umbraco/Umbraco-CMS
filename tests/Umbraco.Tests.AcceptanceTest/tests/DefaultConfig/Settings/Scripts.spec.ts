@@ -16,7 +16,7 @@ test.describe('Script tests', () => {
     await umbracoApi.script.ensureNameNotExists(scriptPath);
 
     // Act
-    await umbracoUi.script.openActionsMenuAtRoot();
+    await umbracoUi.script.clickActionsMenuAtRoot();
     await umbracoUi.script.clickNewScriptButton();
     await umbracoUi.script.enterScriptName(scriptName);
     // TODO: Remove this timeout when frontend validation is implemented
@@ -39,7 +39,7 @@ test.describe('Script tests', () => {
     const updatedScriptContent = 'const test = {\r\n    script = \u0022Test\u0022,\r\n    extension = \u0022.js\u0022,\r\n    scriptPath: function() {\r\n        return this.script \u002B this.extension;\r\n    }\r\n};\r\n';
 
     // Act
-    await umbracoUi.script.openScriptFileAtRoot(scriptPath);
+    await umbracoUi.script.openScriptAtRoot(scriptPath);
     await umbracoUi.script.enterScriptContent(updatedScriptContent);
     await umbracoUi.waitForTimeout(1000);
     await umbracoUi.script.clickSaveButton();
@@ -61,8 +61,8 @@ test.describe('Script tests', () => {
 
     // Act
     await umbracoUi.script.clickRootFolderCaretButton();
-    await umbracoUi.script.openActionsMenuForName(scriptPath);
-    await umbracoUi.script.deleteScriptFile();
+    await umbracoUi.script.clickActionsMenuForScript(scriptPath);
+    await umbracoUi.script.deleteScript();
 
     // Assert
     // TODO: Uncomment when the notification is visible
@@ -76,7 +76,7 @@ test.describe('Script tests', () => {
     await umbracoApi.script.ensureNameNotExists(scriptFolderName);
 
     // Act
-    await umbracoUi.script.openActionsMenuAtRoot();
+    await umbracoUi.script.clickActionsMenuAtRoot();
     await umbracoUi.script.createNewFolder(scriptFolderName);
 
     // Assert
@@ -95,7 +95,7 @@ test.describe('Script tests', () => {
 
     // Act
     await umbracoUi.script.clickRootFolderCaretButton();
-    await umbracoUi.script.openActionsMenuForName(scriptFolderName);
+    await umbracoUi.script.clickActionsMenuForScript(scriptFolderName);
     await umbracoUi.script.deleteFolder();
 
     // Assert
@@ -119,7 +119,7 @@ test.describe('Script tests', () => {
 
     // Act
     await umbracoUi.script.clickRootFolderCaretButton();
-    await umbracoUi.script.openActionsMenuForName(scriptFolderName);
+    await umbracoUi.script.clickActionsMenuForScript(scriptFolderName);
     await umbracoUi.script.clickNewScriptButton();
     await umbracoUi.script.enterScriptName(scriptName);
     await umbracoUi.script.enterScriptContent(scriptContent);
@@ -148,7 +148,7 @@ test.describe('Script tests', () => {
 
     // Act
     await umbracoUi.script.clickRootFolderCaretButton();
-    await umbracoUi.script.openActionsMenuForName(scriptFolderName);
+    await umbracoUi.script.clickActionsMenuForScript(scriptFolderName);
     await umbracoUi.script.createNewFolder(childFolderName);
 
     // Assert
@@ -173,7 +173,7 @@ test.describe('Script tests', () => {
 
     // Act
     await umbracoUi.script.clickRootFolderCaretButton();
-    await umbracoUi.script.openActionsMenuForName(scriptFolderName);
+    await umbracoUi.script.clickActionsMenuForScript(scriptFolderName);
     await umbracoUi.script.createNewFolder(childFolderName);
 
     // Assert
@@ -198,7 +198,7 @@ test.describe('Script tests', () => {
 
     // Act
     await umbracoUi.script.clickRootFolderCaretButton();
-    await umbracoUi.script.openActionsMenuForName(scriptFolderName);
+    await umbracoUi.script.clickActionsMenuForScript(scriptFolderName);
     await umbracoUi.script.clickNewScriptButton();
     await umbracoUi.script.enterScriptName(scriptName);
     await page.waitForTimeout(1000);

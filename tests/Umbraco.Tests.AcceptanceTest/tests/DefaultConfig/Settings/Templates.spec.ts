@@ -12,7 +12,7 @@ test.describe('Template tests', () => {
 
   test('can create a template', async ({umbracoApi, umbracoUi}) => {
     // Act
-    await umbracoUi.template.openActionsMenuAtRoot();
+    await umbracoUi.template.clickActionsMenuAtRoot();
     await umbracoUi.template.clickNewTemplateButton();
     await umbracoUi.template.enterTemplateName(templateName);
     // TODO: Remove this timeout when frontend validation is implemented
@@ -61,8 +61,8 @@ test.describe('Template tests', () => {
 
     // Act
     await umbracoUi.template.clickRootFolderCaretButton();
-    await umbracoUi.template.openActionsMenuForName(templateName);
-    await umbracoUi.template.deleteTemplateFile();
+    await umbracoUi.template.clickActionsMenuForTemplate(templateName);
+    await umbracoUi.template.deleteTemplate();
 
     // Assert
     await umbracoUi.isSuccessNotificationVisible();
