@@ -97,32 +97,37 @@ export class UmbLogViewerMessagesListElement extends UmbLitElement {
 
 	render() {
 		// TODO: the table should scroll instead of the whole main div
-		return html`
-			<div id="header" slot="header">
-				<div id="timestamp">
-					Timestamp
-					<uui-button compact @click=${this.#sortLogs} label="Sort logs">
-						<uui-symbol-sort
-							?descending=${this._sortingDirection === DirectionModel.DESCENDING}
-							active></uui-symbol-sort>
-					</uui-button>
+		return html`<uui-box>
+				<div id="header" slot="header">
+					<div id="timestamp">
+						Timestamp
+						<uui-button compact @click=${this.#sortLogs} label="Sort logs">
+							<uui-symbol-sort
+								?descending=${this._sortingDirection === DirectionModel.DESCENDING}
+								active></uui-symbol-sort>
+						</uui-button>
+					</div>
+					<div id="level">Level</div>
+					<div id="machine">Machine name</div>
+					<div id="message">Message</div>
 				</div>
-				<div id="level">Level</div>
-				<div id="machine">Machine name</div>
-				<div id="message">Message</div>
-			</div>
-			<div id="main">
-				${this._isLoading
-					? html`<umb-empty-state size="small"
-							><span id="empty"> <uui-loader-circle></uui-loader-circle>Loading log messages... </span></umb-empty-state
-					  >`
-					: html`${this.#renderLogs()}${this._renderPagination()}`}
-			</div>
-		`;
+				<div id="main">
+					${this._isLoading
+						? html`<umb-empty-state size="small">
+								<span id="empty"> <uui-loader-circle></uui-loader-circle>Loading log messages... </span>
+						  </umb-empty-state>`
+						: html`${this.#renderLogs()}`}
+				</div>
+			</uui-box>
+			${this._renderPagination()} `;
 	}
 
 	static styles = [
 		css`
+			uui-box {
+				--uui-box-default-padding: 0;
+			}
+
 			:host {
 				height: 100%;
 				display: flex;
@@ -168,6 +173,7 @@ export class UmbLogViewerMessagesListElement extends UmbLitElement {
 			}
 
 			#pagination {
+				display: block;
 				margin: var(--uui-size-space-5, 18px) 0;
 			}
 		`,

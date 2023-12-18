@@ -52,7 +52,7 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 					<uui-box id="errors" headline="Number of Errors">
 						<uui-button
 							label="Show error logs"
-							href=${`section/settings/workspace/logviewer/search/?lq=${encodeURIComponent(
+							href=${`section/settings/workspace/logviewer/view/search/?lq=${encodeURIComponent(
 								`@Level='Fatal' or @Level='Error' or Has(@Exception)`,
 							)}`}>
 							<h2 id="error-count">${this._errorCount}</h2></uui-button
