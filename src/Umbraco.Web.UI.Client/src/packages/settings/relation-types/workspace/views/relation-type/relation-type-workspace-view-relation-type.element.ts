@@ -88,43 +88,18 @@ export class UmbRelationTypeWorkspaceViewRelationTypeElement extends UmbLitEleme
 		if (!this.#workspaceContext?.getIsNew() && this._relationType)
 			return html`<div slot="editor">${this._relationType.parentObjectTypeName}</div>`;
 
-		//TODO Get the actual list of object types
-		return html`<uui-select
-			slot="editor"
-			@change=${this.#onParentObjectTypeChange}
-			.options=${[
-				{
-					name: 'Document',
-					value: 'c66ba18e-eaf3-4cff-8a22-41b16d66a972',
-				},
-				{
-					name: 'Media',
-					value: 'b796f64c-1f99-4ffb-b886-4bf4bc011a9c',
-				},
-			]}>
-			></uui-select
-		>`;
+		return html`
+			<umb-input-object-type @change=${this.#onParentObjectTypeChange} slot="editor"></umb-input-object-type>
+		`;
 	}
 
 	#renderChildProperty() {
 		if (!this.#workspaceContext?.getIsNew() && this._relationType)
-			return html`<div slot="editor">${this._relationType.parentObjectTypeName}</div>`;
+			return html`<div slot="editor">${this._relationType.childObjectTypeName}</div>`;
 
-		//TODO Get the actual list of object types
-		return html`<uui-select
-			slot="editor"
-			@change=${this.#onChildObjectTypeChange}
-			.options=${[
-				{
-					name: 'Document',
-					value: 'c66ba18e-eaf3-4cff-8a22-41b16d66a972',
-				},
-				{
-					name: 'Media',
-					value: 'b796f64c-1f99-4ffb-b886-4bf4bc011a9c',
-				},
-			]}>
-		</uui-select>`;
+		return html`
+			<umb-input-object-type @change=${this.#onChildObjectTypeChange} slot="editor"></umb-input-object-type>
+		`;
 	}
 
 	static styles = [
