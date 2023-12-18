@@ -3,6 +3,7 @@ import {
 	UMB_STYLESHEET_FOLDER_ENTITY_TYPE,
 	UMB_STYLESHEET_ROOT_ENTITY_TYPE,
 } from '../entity.js';
+import { manifests as folderManifests } from './folder/manifests.js';
 import { UmbStylesheetTreeRepository } from './stylesheet-tree.repository.js';
 import { UmbStylesheetTreeStore } from './stylesheet-tree.store.js';
 import type {
@@ -50,4 +51,4 @@ const treeItem: ManifestTreeItem = {
 	},
 };
 
-export const manifests = [treeRepository, treeStore, tree, treeItem];
+export const manifests = [treeRepository, treeStore, tree, treeItem, ...folderManifests];
