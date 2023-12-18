@@ -30,11 +30,6 @@ export class UmbStylesheetCodeEditorWorkspaceViewElement extends UmbLitElement {
 		});
 	}
 
-	disconnectedCallback(): void {
-		super.disconnectedCallback();
-		this.#stylesheetWorkspaceContext?.sendContentGetRules();
-	}
-
 	#onCodeEditorInput(event: Event) {
 		const target = event.target as UmbCodeEditorElement;
 		const value = target.code as string;

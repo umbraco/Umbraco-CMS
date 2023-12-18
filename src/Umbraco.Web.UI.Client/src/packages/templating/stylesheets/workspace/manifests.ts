@@ -1,5 +1,4 @@
 import type {
-	ManifestModal,
 	ManifestWorkspace,
 	ManifestWorkspaceAction,
 	ManifestWorkspaceView,
@@ -76,16 +75,4 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 	},
 ];
 
-export const UMB_MODAL_TEMPLATING_STYLESHEET_RTF_STYLE_SIDEBAR =
-	'Umb.Modal.Templating.Stylesheet.RichTextEditorStyle.Sidebar';
-
-const modals: Array<ManifestModal> = [
-	{
-		type: 'modal',
-		alias: UMB_MODAL_TEMPLATING_STYLESHEET_RTF_STYLE_SIDEBAR,
-		name: 'Rich text editor style modal',
-		js: () => import('./views/rich-text-rule/stylesheet-workspace-view-rich-text-editor-style-sidebar.element.js'),
-	},
-];
-
-export const manifests = [workspace, ...workspaceViews, ...workspaceActions, ...modals];
+export const manifests = [workspace, ...workspaceViews, ...workspaceActions];

@@ -8,3 +8,10 @@ export interface UmbStylesheetDetailModel {
 	name: string;
 	content: string;
 }
+
+export interface UmbSortableStylesheetRule {
+	name: string;
+	selector: string;
+	styles: string;
+	sortOrder: number;
+}

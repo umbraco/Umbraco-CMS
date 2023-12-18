@@ -4,6 +4,7 @@ import { manifests as treeManifests } from './tree/manifests.js';
 import { manifests as workspaceManifests } from './workspace/manifests.js';
 import { manifests as entityActionManifests } from './entity-actions/manifests.js';
 import { manifests as collectionManifests } from './collection/manifests.js';
+import { manifests as componentManifests } from './components/manifests.js';
 
 export const manifests = [
 	...repositoryManifests,
@@ -12,4 +13,5 @@ export const manifests = [
 	...workspaceManifests,
 	...entityActionManifests,
 	...collectionManifests,
+	...componentManifests,
 ];

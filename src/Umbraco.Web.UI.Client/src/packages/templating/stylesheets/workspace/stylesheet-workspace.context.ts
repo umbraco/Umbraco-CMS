@@ -7,12 +7,9 @@ import {
 	UmbEditableWorkspaceContextBase,
 } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UmbArrayState, UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
-import type { RichTextRuleModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-
-export type RichTextRuleModelSortable = RichTextRuleModel & { sortOrder?: number };
 
 export class UmbStylesheetWorkspaceContext
 	extends UmbEditableWorkspaceContextBase<UmbStylesheetDetailRepository, UmbStylesheetDetailModel>
@@ -24,16 +21,11 @@ export class UmbStylesheetWorkspaceContext
 	readonly content = this.#data.asObservablePart((data) => data?.content);
 	readonly path = this.#data.asObservablePart((data) => data?.path);
 
-	#rules = new UmbArrayState<RichTextRuleModelSortable>([], (rule) => rule.name);
-	readonly rules = this.#rules.asObservable();
-
 	#isCodeEditorReady = new UmbBooleanState(false);
 	readonly isCodeEditorReady = this.#isCodeEditorReady.asObservable();
 
 	constructor(host: UmbControllerHostElement) {
 		super(host, UMB_STYLESHEET_WORKSPACE_ALIAS, new UmbStylesheetDetailRepository(host));
-		// TODO: sort close to the server
-		this.#rules.sortBy((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
 		this.#loadCodeEditor();
 	}
 
@@ -125,29 +117,12 @@ export class UmbStylesheetWorkspaceContext
 		this.setRules(data?.rules ?? []);
 	}
 
-	findNewSortOrder(rule: RichTextRuleModel, newIndex: number) {
-		const rules = [...this.getRules()].sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
-		const oldIndex = rules.findIndex((r) => r.name === rule.name);
-
-		if (oldIndex === -1) return false;
-		rules.splice(oldIndex, 1);
-		rules.splice(newIndex, 0, rule);
-		this.setRules(rules.map((r, i) => ({ ...r, sortOrder: i })));
-		return true;
-	}
-
 	getRules() {
 		return this.#rules.getValue();
 	}
 
 	updateRule(unique: string, rule: RichTextRuleModelSortable) {
 		this.#rules.updateOne(unique, rule);
-		this.sendRulesGetContent();
-	}
-
-	setRules(rules: RichTextRuleModelSortable[]) {
-		const newRules = rules.map((r, i) => ({ ...r, sortOrder: i }));
-		this.#rules.next(newRules);
 		this.sendRulesGetContent();
 	}
 	*/
