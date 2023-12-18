@@ -556,7 +556,8 @@ stages:
           matrix:
             Linux:
               vmImage: 'ubuntu-latest'
-              CONNECTIONSTRINGS__UMBRACODBDSN: 'Server=(local);User Id=sa;Password=$(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD);TrustServerCertificate=True;Encrypt=False'
+              SA_PASSWORD: $(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD)
+              CONNECTIONSTRINGS__UMBRACODBDSN: 'Server=localhost,1433;User Id=sa;Password=$(SA_PASSWORD);TrustServerCertificate=True;Encrypt=False'
             Windows:
               vmImage: 'windows-latest'
         pool:
@@ -615,7 +616,7 @@ stages:
             workingDirectory: $(Agent.BuildDirectory)/app
 
           # Start SQL Server
-          - powershell: docker run --name mssql -d -p 1433:1433 -e ACCEPT_EULA=Y -e SA_PASSWORD=$(UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD) -e MSSQL_PID=Developer mcr.microsoft.com/mssql/server:2022-latest
+          - powershell: docker run --name mssql -d -p 1433:1433 -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=$(SA_PASSWORD)" mcr.microsoft.com/mssql/server:2022-latest
             displayName: Start SQL Server Docker image (Linux)
             condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
 
