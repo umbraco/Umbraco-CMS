@@ -300,11 +300,59 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
     /// <inheritdoc />
     public async Task<Attempt<IUserGroup, UserGroupOperationStatus>> UpdateAsync(
         IUserGroup userGroup,
-        Guid userKey,
-        Guid[]? groupUserKeys = null)
+        Guid userKey)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        EventMessages eventMessages = EventMessagesFactory.Get();
 
+        Attempt<IUserGroup, UserGroupOperationStatus>? performUpdateResult = await ValidateAndPerformUpdateActionAsync(userGroup, userKey,eventMessages, scope);
+        if (performUpdateResult != null)
+        {
+            // something went wrong, return the attempt
+            return performUpdateResult.Value;
+        }
+
+        // everything went ok, close scope and return success
+        scope.Complete();
+        return Attempt.SucceedWithStatus(UserGroupOperationStatus.Success, userGroup);
+    }
+
+    /// <summary>
+    /// Updates the UserGroup and assigns the explicit list of users as its members
+    /// </summary>
+    /// <param name="updateModel">the update model</param>
+    /// <param name="userKey">the user performing the action</param>
+    /// <returns></returns>
+    public async Task<Attempt<IUserGroup, UserGroupOperationStatus>> UpdateAsync(
+        UserGroupUpdateModel updateModel,
+        Guid userKey)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        EventMessages eventMessages = EventMessagesFactory.Get();
+
+        Attempt<IUserGroup, UserGroupOperationStatus>? performUpdateResult = await ValidateAndPerformUpdateActionAsync(updateModel.UserGroup, userKey,eventMessages, scope);
+        if (performUpdateResult != null)
+        {
+            // something went wrong, return the attempt
+            return performUpdateResult.Value;
+        }
+
+        if (updateModel.GroupUserKeys != null)
+        {
+            AssignUsersToUserGroup(updateModel.GroupUserKeys, updateModel.UserGroup,eventMessages, scope);
+        }
+
+        // everything went ok, close scope and return success
+        scope.Complete();
+        return Attempt.SucceedWithStatus(UserGroupOperationStatus.Success, updateModel.UserGroup);
+    }
+
+    private async Task<Attempt<IUserGroup, UserGroupOperationStatus>?> ValidateAndPerformUpdateActionAsync(
+        IUserGroup userGroup,
+        Guid userKey,
+        EventMessages eventMessages,
+        ICoreScope scope)
+    {
         IUser? performingUser = await _userService.GetAsync(userKey);
         if (performingUser is null)
         {
@@ -325,7 +373,6 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
             return Attempt.FailWithStatus(operationStatus, userGroup);
         }
 
-        EventMessages eventMessages = EventMessagesFactory.Get();
         var savingNotification = new UserGroupSavingNotification(userGroup, eventMessages);
         if (await scope.Notifications.PublishCancelableAsync(savingNotification))
         {
@@ -335,14 +382,7 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
 
         _userGroupRepository.Save(userGroup);
 
-        if (groupUserKeys is not null)
-        {
-            AssignUsersToUserGroup(groupUserKeys, userGroup, eventMessages, scope);
-        }
-
-
-        scope.Complete();
-        return Attempt.SucceedWithStatus(UserGroupOperationStatus.Success, userGroup);
+        return null;
     }
 
     private void AssignUsersToUserGroup(Guid[] groupUserKeys, IUserGroup userGroup, EventMessages eventMessages, ICoreScope scope)

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.UserGroup;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
@@ -41,14 +42,17 @@ public class UpdateUserGroupController : UserGroupControllerBase
             return UserGroupOperationStatusResult(UserGroupOperationStatus.NotFound);
         }
 
-        Attempt<IUserGroup, UserGroupOperationStatus> userGroupUpdateAttempt = await _userGroupPresentationFactory.UpdateAsync(existingUserGroup, updateUserGroupRequestModel);
+        Attempt<IUserGroup, UserGroupOperationStatus> userGroupUpdateAttempt =
+            await _userGroupPresentationFactory.UpdateAsync(existingUserGroup, updateUserGroupRequestModel);
         if (userGroupUpdateAttempt.Success is false)
         {
             return UserGroupOperationStatusResult(userGroupUpdateAttempt.Status);
         }
 
         IUserGroup userGroup = userGroupUpdateAttempt.Result;
-        Attempt<IUserGroup, UserGroupOperationStatus> result = await _userGroupService.UpdateAsync(userGroup, CurrentUserKey(_backOfficeSecurityAccessor), updateUserGroupRequestModel.GroupUsers);
+        Attempt<IUserGroup, UserGroupOperationStatus> result = await _userGroupService.UpdateAsync(
+                new UserGroupUpdateModel(userGroup, updateUserGroupRequestModel.GroupUsers),
+                CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Success
             ? Ok()

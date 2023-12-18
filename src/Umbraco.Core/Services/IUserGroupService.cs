@@ -77,8 +77,7 @@ public interface IUserGroupService
     /// <param name="userGroup">The user group to update.</param>
     /// <param name="userKey">The ID of the user responsible for updating the group.</param>
     /// <returns>An attempt indicating if the operation was a success as well as a more detailed <see cref="UserGroupOperationStatus"/>.</returns>
-    /// <param name="groupUserKeys">The exact list of users that should be part of this group. If null, no changes will be made to the assignments.</param>
-    Task<Attempt<IUserGroup, UserGroupOperationStatus>> UpdateAsync(IUserGroup userGroup, Guid userKey, Guid[]? groupUserKeys = null);
+    Task<Attempt<IUserGroup, UserGroupOperationStatus>> UpdateAsync(IUserGroup userGroup, Guid userKey);
 
     /// <summary>
     ///     Deletes a UserGroup
@@ -96,4 +95,14 @@ public interface IUserGroupService
     /// <param name="userKeys">The user whose groups we want to alter.</param>
     /// <returns>An attempt indicating if the operation was a success as well as a more detailed <see cref="UserGroupOperationStatus"/>.</returns>
     Task UpdateUserGroupsOnUsers(ISet<Guid> userGroupKeys, ISet<Guid> userKeys);
+
+    /// <summary>
+    /// Updates the UserGroup and assigns the explicit list of users as its members
+    /// </summary>
+    /// <param name="updateModel">the update model</param>
+    /// <param name="userKey">the user performing the action</param>
+    /// <returns></returns>
+    Task<Attempt<IUserGroup, UserGroupOperationStatus>> UpdateAsync(
+        UserGroupUpdateModel updateModel,
+        Guid userKey);
 }
