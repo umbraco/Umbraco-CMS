@@ -278,6 +278,7 @@ internal sealed class ContentSaveValidationAttribute : TypeFilterAttribute
 
             if (!authorizationResult.Succeeded)
             {
+                // THIS LINE MAKES US FORBIDDEN, WHICH MAKES SENSE
                 actionContext.Result = new ForbidResult();
                 return false;
             }

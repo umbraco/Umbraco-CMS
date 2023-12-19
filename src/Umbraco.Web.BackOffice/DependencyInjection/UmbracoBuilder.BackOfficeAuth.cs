@@ -104,6 +104,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IAuthorizationHandler, MediaPermissionsResourceHandler>();
         builder.Services.AddSingleton<IAuthorizationHandler, MediaPermissionsQueryStringHandler>();
         builder.Services.AddSingleton<IAuthorizationHandler, DenyLocalLoginHandler>();
+        builder.Services.AddSingleton<IAuthorizationHandler, ContentBlueprintHandler>();
 
         builder.Services.AddAuthorization(o => CreatePolicies(o, backOfficeAuthenticationScheme));
     }
@@ -235,6 +236,12 @@ public static partial class UmbracoBuilderExtensions
             policy.AuthenticationSchemes.Add(backOfficeAuthenticationScheme);
             policy.Requirements.Add(new SectionRequirement(
                 Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Members));
+        });
+
+        options.AddPolicy(AuthorizationPolicies.TreeAccessContentBlueprint, policy =>
+        {
+            policy.AuthenticationSchemes.Add(backOfficeAuthenticationScheme);
+            policy.Requirements.Add(new ContentBlueprintRequirement());
         });
 
         options.AddPolicy(AuthorizationPolicies.SectionAccessMedia, policy =>

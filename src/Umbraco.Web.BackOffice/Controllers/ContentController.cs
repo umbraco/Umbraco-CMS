@@ -822,9 +822,10 @@ public class ContentController : ContentControllerBase
     ///     Saves content
     /// </summary>
     [FileUploadCleanupFilter]
-    [ContentSaveValidation]
-    public async Task<ActionResult<ContentItemDisplay<ContentVariantDisplay>?>?> PostSaveBlueprint(
-        [ModelBinder(typeof(BlueprintItemBinder))] ContentItemSave contentItem)
+    // We have to use a Tree authorization policy here, as "ContentBlueprints"
+    // is a tree in the backoffice.
+    [Authorize(Policy = AuthorizationPolicies.TreeAccessContentBlueprint)]
+    public async Task<ActionResult<ContentItemDisplay<ContentVariantDisplay>?>?> PostSaveBlueprint([ModelBinder(typeof(BlueprintItemBinder))] ContentItemSave contentItem)
     {
         ActionResult<ContentItemDisplay<ContentVariantDisplay>?> contentItemDisplay = await PostSaveInternal(
             contentItem,
