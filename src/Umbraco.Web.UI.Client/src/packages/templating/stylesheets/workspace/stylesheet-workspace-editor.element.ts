@@ -3,29 +3,19 @@ import { UUIInputElement, UUIInputEvent, UUITextStyles } from '@umbraco-cms/back
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { Subject, debounceTime } from '@umbraco-cms/backoffice/external/rxjs';
 
 @customElement('umb-stylesheet-workspace-editor')
 export class UmbStylesheetWorkspaceEditorElement extends UmbLitElement {
-	#workspaceContext?: UmbStylesheetWorkspaceContext;
-
-	#name: string | undefined = '';
-	@state()
-	private get _name() {
-		return this.#name;
-	}
-	private set _name(value) {
-		this.#name = value?.replace('.css', '');
-		this.requestUpdate();
-	}
-
 	@state()
 	private _isNew?: boolean = false;
 
 	@state()
 	private _path?: string;
 
-	private inputQuery$ = new Subject<string>();
+	@state()
+	private _name?: string;
+
+	#workspaceContext?: UmbStylesheetWorkspaceContext;
 
 	constructor() {
 		super();
@@ -33,11 +23,9 @@ export class UmbStylesheetWorkspaceEditorElement extends UmbLitElement {
 		this.consumeContext(UMB_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance as UmbStylesheetWorkspaceContext;
 
-			this.#observeNameAndPath();
+			this.observe(this.#workspaceContext.path, (path) => (this._path = path), '_observeStylesheetPath');
 
-			this.inputQuery$.pipe(debounceTime(250)).subscribe((nameInputValue: string) => {
-				this.#workspaceContext?.setName(`${nameInputValue}.css`);
-			});
+			this.observe(this.#workspaceContext.name, (name) => (this._name = name), '_observeStylesheetName');
 
 			this.observe(this.#workspaceContext.isNew, (isNew) => {
 				this._isNew = isNew;
@@ -45,16 +33,10 @@ export class UmbStylesheetWorkspaceEditorElement extends UmbLitElement {
 		});
 	}
 
-	#observeNameAndPath() {
-		if (!this.#workspaceContext) return;
-		this.observe(this.#workspaceContext.path, (path) => (this._path = path), '_observeStylesheetPath');
-		this.observe(this.#workspaceContext.name, (name) => (this._name = name), '_observeStylesheetName');
-	}
-
 	#onNameChange(event: UUIInputEvent) {
 		const target = event.target as UUIInputElement;
 		const value = target.value as string;
-		this.inputQuery$.next(value);
+		this.#workspaceContext?.setName(value);
 	}
 
 	render() {
@@ -63,7 +45,7 @@ export class UmbStylesheetWorkspaceEditorElement extends UmbLitElement {
 				<div id="header" slot="header">
 					<uui-input
 						placeholder="Enter stylesheet name..."
-						label="stylesheet name"
+						label="Stylesheet name"
 						id="name"
 						.value=${this._name}
 						@input="${this.#onNameChange}"
