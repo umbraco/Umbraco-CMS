@@ -1,3 +1,4 @@
+import { UmbStylesheetRule } from '../types.js';
 import { RichTextRuleModel } from '@umbraco-cms/backoffice/backend-api';
 
 export class UmbStylesheetRuleManager {
@@ -9,7 +10,7 @@ export class UmbStylesheetRuleManager {
 	 * @return {*}
 	 * @memberof UmbStylesheetRuleManager
 	 */
-	extractRules(stylesheetContent: string) {
+	extractRules(stylesheetContent: string): Array<UmbStylesheetRule> {
 		const regex = this.#umbRuleRegex;
 		if (!stylesheetContent) throw Error('No Stylesheet content');
 		return [...stylesheetContent.matchAll(regex)].map((match) => match.groups);
@@ -22,7 +23,7 @@ export class UmbStylesheetRuleManager {
 	 * @return {*}
 	 * @memberof UmbStylesheetRuleManager
 	 */
-	insertRules(stylesheetContent: string, rules: Array<RichTextRuleModel>) {
+	insertRules(stylesheetContent: string, rules: Array<RichTextRuleModel>): string {
 		const regex = this.#umbRuleRegex;
 		if (!stylesheetContent) throw Error('No Stylesheet content');
 		if (!stylesheetContent && !rules) return '';
