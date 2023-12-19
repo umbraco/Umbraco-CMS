@@ -1540,6 +1540,12 @@
     <key alias="changePassword">Змінити пароль</key>
     <key alias="changePasswordDescription">Ви можете змінити свій пароль для доступу до адміністративної панелі Umbraco, заповнивши нижченаведені поля та натиснувши кнопку 'Змінити пароль'</key>
     <key alias="changePhoto">Змінити аватар</key>
+    <key alias="newPassword">Новий пароль</key>
+    <key alias="newPasswordFormatLengthTip">Щонайменше %0% символ(ів)!</key>
+    <key alias="newPasswordFormatNonAlphaTip">Там має бути принаймні %0% спеціальних символів.</key>
+    <key alias="newPasswordFormatDigitTip">Там має бути принаймні %0% цифр(и).</key>
+    <key alias="newPasswordFormatUppercaseTip">Там має бути принаймні %0% символів у верхньому регістрі.</key>
+    <key alias="newPasswordFormatLowercaseTip">Там має бути принаймні %0% малих символів.</key>
     <key alias="confirmNewPassword">Підтвердження нового пароля</key>
     <key alias="contentChannel">Канал вмісту</key>
     <key alias="createAnotherUser">Створити ще одного користувача</key>

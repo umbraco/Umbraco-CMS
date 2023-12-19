@@ -1006,6 +1006,12 @@
     <key alias="createDate">Användare skapad</key>
     <key alias="changePassword">Ändra lösenord</key>
     <key alias="changePhoto">Ändra bild</key>
+    <key alias="newPassword">Nytt lösenord</key>
+    <key alias="newPasswordFormatLengthTip">Minst %0% tecken kvar!</key>
+    <key alias="newPasswordFormatNonAlphaTip">Det bör finnas minst %0% specialtecken där.</key>
+    <key alias="newPasswordFormatDigitTip">Det bör finnas minst %0% siffra(r) där.</key>
+    <key alias="newPasswordFormatUppercaseTip">Det bör finnas minst %0% versaler där.</key>
+    <key alias="newPasswordFormatLowercaseTip">Det bör finnas minst %0% gemener däri.</key>
     <key alias="confirmNewPassword">Bekräfta det nya lösenordet</key>
     <key alias="changePasswordDescription">Du kan byta ditt lösenord för Umbraco backoffice genom att fylla i nedanstående formulär och klicka på knappen "Ändra lösenord".</key>
     <key alias="contentChannel">Innehållskanal</key>

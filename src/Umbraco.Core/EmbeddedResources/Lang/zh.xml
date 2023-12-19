@@ -1069,6 +1069,11 @@
     <key alias="categoryField">分类字段</key>
     <key alias="changePassword">更改密码</key>
     <key alias="newPassword">更改密码</key>
+    <key alias="newPasswordFormatLengthTip">最少 %0% 个字符！</key>
+    <key alias="newPasswordFormatNonAlphaTip">其中至少应有 %0% 的特殊字符。</key>
+    <key alias="newPasswordFormatDigitTip">其中至少应有 %0% 的数字。</key>
+    <key alias="newPasswordFormatUppercaseTip">其中至少应有 %0% 大写字符。</key>
+    <key alias="newPasswordFormatLowercaseTip">其中至少应有 %0% 小写字符。</key>
     <key alias="confirmNewPassword">确认新密码</key>
     <key alias="changePasswordDescription">要改变密码，请在框中输入新密码，然后单击“更改密码”。</key>
     <key alias="contentChannel">内容频道</key>

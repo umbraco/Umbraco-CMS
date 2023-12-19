@@ -1253,6 +1253,11 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
     <key alias="categoryField">Pole kategorii</key>
     <key alias="changePassword">Zmień hasło!</key>
     <key alias="newPassword">Nowe hasło</key>
+    <key alias="newPasswordFormatLengthTip">Minimalnie %0% znaków do końca!</key>
+    <key alias="newPasswordFormatNonAlphaTip">Powinno tam znajdować się co najmniej %0% znaków specjalnych.</key>
+    <key alias="newPasswordFormatDigitTip">Powinno tam znajdować się co najmniej %0% cyfr.</key>
+    <key alias="newPasswordFormatUppercaseTip">Powinno się tam znajdować co najmniej %0% wielkich liter.</key>
+    <key alias="newPasswordFormatLowercaseTip">Powinno się tam znajdować co najmniej %0% małych liter.</key>
     <key alias="confirmNewPassword">Potwierdź nowe hasło</key>
     <key alias="changePasswordDescription">Możesz zmienić swoje hasło w Umbraco backoffice przez wypełnienie formularza poniżej i kliknięcie przycisku "Zmień hasło"</key>
     <key alias="contentChannel">Kanał zawartości</key>

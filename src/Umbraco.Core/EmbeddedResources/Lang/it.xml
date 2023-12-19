@@ -2126,6 +2126,9 @@ Per gestire il tuo sito web, è sufficiente aprire il backoffice di Umbraco e in
     <key alias="newPassword">Nuova password</key>
     <key alias="newPasswordFormatLengthTip">Minimo %0% caratteri!</key>
     <key alias="newPasswordFormatNonAlphaTip">Dovrebbero esserci almeno %0% caratteri speciali qui.</key>
+    <key alias="newPasswordFormatDigitTip">Ci dovrebbero essere almeno %0% cifre.</key>
+    <key alias="newPasswordFormatUppercaseTip">Ci dovrebbero essere almeno %0% caratteri maiuscoli.</key>
+    <key alias="newPasswordFormatLowercaseTip">Ci dovrebbero essere almeno %0% caratteri minuscoli.</key>
     <key alias="noLockouts"><![CDATA[non è stato bloccato]]></key>
     <key alias="noPasswordChange"><![CDATA[La password non è stata modificata]]></key>
     <key alias="confirmNewPassword">Conferma la nuova password</key>

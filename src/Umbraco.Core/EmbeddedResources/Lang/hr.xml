@@ -2009,6 +2009,9 @@ Da bi upravljali svojom web lokacijom, jednostavno otvorite Umbraco backoffice i
     <key alias="newPassword">Nova lozinka</key>
     <key alias="newPasswordFormatLengthTip">Najmanje %0% znakova!</key>
     <key alias="newPasswordFormatNonAlphaTip">Trebalo bi biti najmanje %0% specijalnih znakova.</key>
+    <key alias="newPasswordFormatDigitTip">Tamo bi trebalo biti najmanje %0% znamenki.</key>
+    <key alias="newPasswordFormatUppercaseTip">Tamo bi trebalo biti najmanje %0% velikih slova.</key>
+    <key alias="newPasswordFormatLowercaseTip">Tu bi trebalo biti najmanje %0% malih slova.</key>
     <key alias="noLockouts">nije zaključan</key>
     <key alias="noPasswordChange">Lozinka nije promijenjena</key>
     <key alias="confirmNewPassword">Potvrdite novu lozinku</key>

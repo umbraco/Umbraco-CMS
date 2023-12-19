@@ -1758,6 +1758,9 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="newPassword">Nouveau mot de passe</key>
     <key alias="newPasswordFormatLengthTip">Plus que %0% caractère(s) minimum!</key>
     <key alias="newPasswordFormatNonAlphaTip">Il devrait y avoir au moins %0% caractère(s) spéciaux.</key>
+    <key alias="newPasswordFormatDigitTip">Il devrait y avoir au moins %0% de chiffre(s).</key>
+    <key alias="newPasswordFormatUppercaseTip">Il doit y avoir au moins %0% de caractères majuscules.</key>
+    <key alias="newPasswordFormatLowercaseTip">Il doit contenir au moins %0 % de caractères minuscules.</key>
     <key alias="noLockouts">n'a pas été bloqué</key>
     <key alias="noPasswordChange">Le mot de passe n'a pas été modifié</key>
     <key alias="confirmNewPassword">Confirmez votre nouveau mot de passe</key>
@@ -1775,7 +1778,7 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="groupsHelp">Ajouter des groupes pour donner les accès et permissions</key>
     <key alias="inviteAnotherUser">Inviter un autre utilisateur</key>
     <key alias="inviteUserHelp">Inviter de nouveaux utilisateurs pour leur donner accès à Umbraco. Un email d'invitation sera envoyé à chaque utilisateur avec des informations concernant la connexion à Umbraco. Les invitations sont valables pendant 72 heures.</key>
-    <key alias="language">Langue</key>
+    <key alias="language">Langue</
     <key alias="languageHelp">Spécifiez la langue dans laquelle vous souhaitez voir les menus et dialogues</key>
     <key alias="lastLockoutDate">Date du dernier bloquage</key>
     <key alias="lastLogin">Dernière connexion</key>
@@ -1798,7 +1801,7 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="passwordCurrent">Mot de passe actuel</key>
     <key alias="passwordInvalid">Mot de passe actuel invalide</key>
     <key alias="passwordIsDifferent">Il y a une différence entre le nouveau mot de passe et le mot de passe confirmé. Veuillez réessayer.</key>
-    <key alias="passwordMismatch">Le mot de passe confirmé ne correspond pas au nouveau mot de passe saisi!</key>
+    <key alias="passwordMismatkey>ch">Le mot de passe confirmé ne correspond pas au nouveau mot de passe saisi!</key>
     <key alias="permissionReplaceChildren">Remplacer les permissions sur les noeuds enfants</key>
     <key alias="permissionSelectedPages">Vous êtes en train de modifiez les permissions pour les pages :</key>
     <key alias="permissionSelectPages">Choisissez les pages dont les permissions doivent être modifiées</key>

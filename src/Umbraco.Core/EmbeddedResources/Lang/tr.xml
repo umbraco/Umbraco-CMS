@@ -1828,6 +1828,11 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="changePassword">Şifrenizi değiştirin</key>
     <key alias="changePhoto">Fotoğrafı değiştir</key>
     <key alias="newPassword">Yeni şifre</key>
+    <key alias="newPasswordFormatLengthTip">Minimum %0% karakter kaldı!</key>
+    <key alias="newPasswordFormatNonAlphaTip">Orada en az %0% özel karakter bulunmalıdır.</key>
+    <key alias="newPasswordFormatDigitTip">Orada en az %0% rakam bulunmalıdır.</key>
+    <key alias="newPasswordFormatUppercaseTip">Burada en az %0% büyük harf karakterler bulunmalıdır.</key>
+    <key alias="newPasswordFormatLowercaseTip">Burada en az %0% küçük harf karakterleri bulunmalıdır.</key>
     <key alias="noLockouts">kilitlenmedi</key>
     <key alias="noPasswordChange">Şifre değiştirilmedi</key>
     <key alias="confirmNewPassword">Yeni şifreyi onaylayın</key>

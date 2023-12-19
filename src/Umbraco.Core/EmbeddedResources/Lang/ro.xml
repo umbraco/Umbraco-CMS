@@ -54,4 +54,12 @@
     <key alias="templatingGroup">Modelare</key>
     <key alias="thirdPartyGroup">Terț</key>
   </area>
+  <area alias="user">
+    <key alias="newPassword">Parolă nouă</key>
+    <key alias="newPasswordFormatLengthTip">Minimum %0% caractere(e) de parcurs!</key>
+    <key alias="newPasswordFormatNonAlphaTip">Ar trebui să existe cel puțin %0% caractere speciale acolo.</key>
+    <key alias="newPasswordFormatDigitTip">Ar trebui să existe cel puțin %0% cifre acolo.</key>
+    <key alias="newPasswordFormatUppercaseTip">Ar trebui să existe cel puțin %0% caractere majuscule acolo.</key>
+    <key alias="newPasswordFormatLowercaseTip">Ar trebui să existe cel puțin %0% caractere mici acolo.</key>
+  </area>
 </language>

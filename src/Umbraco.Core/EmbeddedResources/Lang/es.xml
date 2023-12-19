@@ -1325,6 +1325,11 @@
     <key alias="changePassword">Cambiar contraseña</key>
     <key alias="changePhoto">Cambiar foto</key>
     <key alias="newPassword">Nueva contraseña</key>
+    <key alias="newPasswordFormatLengthTip">¡Mínimo %0% caracteres restantes!</key>
+    <key alias="newPasswordFormatNonAlphaTip">Debe haber al menos %0% caracteres especiales allí.</key>
+    <key alias="newPasswordFormatDigitTip">Debe haber al menos %0% dígito(s) allí.</key>
+    <key alias="newPasswordFormatUppercaseTip">Debe haber al menos %0% caracteres en mayúsculas.</key>
+    <key alias="newPasswordFormatLowercaseTip">Debe haber al menos %0% caracteres en minúscula.</key>
     <key alias="noLockouts">no ha sido bloqueado</key>
     <key alias="noPasswordChange">La contraseña no se ha cambiado</key>
     <key alias="confirmNewPassword">Confirma nueva contraseña</key>

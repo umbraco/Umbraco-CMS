@@ -875,6 +875,11 @@ Vennlig hilsen Umbraco roboten
     <key alias="categoryField">Kategorifelt</key>
     <key alias="changePassword">Bytt passord</key>
     <key alias="newPassword">Nytt passord</key>
+    <key alias="newPasswordFormatLengthTip">Minimum %0% tegn igjen!</key>
+    <key alias="newPasswordFormatNonAlphaTip">Det bør være minst %0% spesialtegn der.</key>
+    <key alias="newPasswordFormatDigitTip">Det bør være minst %0% siffer der.</key>
+    <key alias="newPasswordFormatUppercaseTip">Det bør være minst %0% store bokstaver der.</key>
+    <key alias="newPasswordFormatLowercaseTip">Det bør være minst %0% små bokstaver der.</key>
     <key alias="confirmNewPassword">Bekreft nytt passord</key>
     <key alias="changePasswordDescription">Du kan endre passordet til Umbraco ved å fylle ut skjemaet under og klikke "Bytt passord" knappen.</key>
     <key alias="contentChannel">Innholdskanal</key>

@@ -1054,6 +1054,11 @@
     <key alias="categoryField">分類欄位</key>
     <key alias="changePassword">更改密碼</key>
     <key alias="newPassword">更改密碼</key>
+    <key alias="newPasswordFormatLengthTip">最少 %0% 字元!</key>
+    <key alias="newPasswordFormatNonAlphaTip">其中至少應有 %0% 的特殊字元。</key>
+    <key alias="newPasswordFormatDigitTip">其中至少應有 %0% 的數字。</key>
+    <key alias="newPasswordFormatUppercaseTip">其中至少應有 %0% 大寫字元。</key>
+    <key alias="newPasswordFormatLowercaseTip">其中至少應有 %0% 小寫字元。</key>
     <key alias="confirmNewPassword">確認新密碼</key>
     <key alias="changePasswordDescription">要改變密碼，請在框中輸入新密碼，然後按一下“更改密碼”。</key>
     <key alias="contentChannel">內容頻道</key>

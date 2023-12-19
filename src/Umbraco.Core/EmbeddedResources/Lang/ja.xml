@@ -1026,6 +1026,11 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="categoryField">フィールドのカテゴリー</key>
     <key alias="changePassword">パスワードの変更</key>
     <key alias="newPassword">新パスワード</key>
+    <key alias="newPasswordFormatLengthTip">あと残り %0% 文字!</key>
+    <key alias="newPasswordFormatNonAlphaTip">少なくとも %0% の特殊文字が含まれている必要があります。</key>
+    <key alias="newPasswordFormatDigitTip">少なくとも %0% の数字が含まれている必要があります。</key>
+    <key alias="newPasswordFormatUppercaseTip">少なくとも %0% の大文字が含まれている必要があります。</key>
+    <key alias="newPasswordFormatLowercaseTip">少なくとも %0% の小文字が含まれている必要があります。</key>
     <key alias="confirmNewPassword">新パスワードの確認</key>
     <key alias="changePasswordDescription">Umbracoの管理画面にアクセスするためのパスワードを変更するには、以下のフォームに新しいパスワード入力して「パスワードの変更」ボタンをクリックしてください。</key>
     <key alias="contentChannel">コンテントチャンネル</key>

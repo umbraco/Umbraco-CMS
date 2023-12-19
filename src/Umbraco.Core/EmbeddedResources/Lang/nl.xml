@@ -1868,6 +1868,10 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="changePhoto">Wijzig je foto</key>
     <key alias="newPassword">Wijzig je wachtwoord</key>
     <key alias="newPasswordFormatLengthTip">Nog minimaal %0% teken(s) te gaan!</key>
+    <key alias="newPasswordFormatNonAlphaTip">Er moeten minstens %0% speciale tekens in staan.</key>
+    <key alias="newPasswordFormatDigitTip">Er moeten minstens %0% cijfers in zitten.</key>
+    <key alias="newPasswordFormatUppercaseTip">Er moeten minstens %0% hoofdletters in staan.</key>
+    <key alias="newPasswordFormatLowercaseTip">Er moeten minstens %0% kleine letters in staan.</key>
     <key alias="noLockouts">is niet gedeblokkeerd</key>
     <key alias="noPasswordChange">Het wachtwoord is niet gewijzigd</key>
     <key alias="confirmNewPassword">Bevestig nieuw wachtwoord</key>

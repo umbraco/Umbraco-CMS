@@ -792,6 +792,12 @@ Você pode publicar esta página e todas suas sub-páginas ao selecionar <em>pub
   <area alias="user">
     <key alias="administrators">Administrador</key>
     <key alias="categoryField">Campo de Categoria</key>
+    <key alias="newPassword">Nova senha</key>
+    <key alias="newPasswordFormatLengthTip">Mínimo de %0% caracteres restantes!</key>
+    <key alias="newPasswordFormatNonAlphaTip">Deve haver pelo menos %0% de caracteres especiais.</key>
+    <key alias="newPasswordFormatDigitTip">Deve haver pelo menos %0% dígito(s) ali.</key>
+    <key alias="newPasswordFormatUppercaseTip">Deve haver pelo menos %0% caracteres maiúsculos.</key>
+    <key alias="newPasswordFormatLowercaseTip">Deve haver pelo menos %0% caracteres minúsculos.</key>
     <key alias="changePassword">Alterar Sua Senha</key>
     <key alias="changePasswordDescription">você pode alterar sua senha para acessar a área administrativa do Umbraco preenchendo o formulário abaixo e clicando no botão 'Alterar Senha'</key>
     <key alias="contentChannel">Canal de Conteúdo</key>

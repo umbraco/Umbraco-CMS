@@ -1990,6 +1990,9 @@
     <key alias="newPassword">Neues Kennwort</key>
     <key alias="newPasswordFormatLengthTip">Noch %0% Zeichen benötigt!</key>
     <key alias="newPasswordFormatNonAlphaTip">Es sollten mindestens %0% Sonderzeichen verwendet werden.</key>
+    <key alias="newPasswordFormatDigitTip">Es sollten mindestens %0% Ziffer(n) darin sein.</key>
+    <key alias="newPasswordFormatUppercaseTip">Es sollten mindestens %0% Großbuchstaben darin enthalten sein.</key>
+    <key alias="newPasswordFormatLowercaseTip">Es sollten mindestens %0% Kleinbuchstaben darin enthalten sein.</key>
     <key alias="noLockouts">wurde nicht ausgeschlossen</key>
     <key alias="noPasswordChange">Das Kennwort wurde nicht geändert</key>
     <key alias="confirmNewPassword">Neues Kennwort (Bestätigung)</key>

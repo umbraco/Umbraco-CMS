@@ -2030,6 +2030,9 @@ Er mwyn gweinyddu eich gwefan, agorwch swyddfa gefn Umbraco a dechreuwch ychwang
     <key alias="newPassword">Cyfrinair newydd</key>
     <key alias="newPasswordFormatLengthTip">O leiaf %0% nod(au) i fynd!</key>
     <key alias="newPasswordFormatNonAlphaTip">Dylai fod o leiaf %0% nod(au) arbennig yno.</key>
+    <key alias="newPasswordFormatDigitTip">Dylai fod o leiaf %0% o ddigid(iau) i mewn yno.</key>
+    <key alias="newPasswordFormatUppercaseTip">Dylai fod o leiaf %0% o nodau priflythrennau yno.</key>
+    <key alias="newPasswordFormatLowercaseTip">Dylai fod o leiaf %0% o nodau llythrennau bach yno.</key>
     <key alias="noLockouts">ddim wedi cloi allan</key>
     <key alias="noPasswordChange">Nid yw'r cyfrinair wedi'i newid</key>
     <key alias="confirmNewPassword">Cadarnhau cyfrinair newydd</key>

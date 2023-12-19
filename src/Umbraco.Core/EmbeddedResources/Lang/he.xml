@@ -817,6 +817,12 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
   <area alias="user">
     <key alias="administrators">מנהל ראשי</key>
     <key alias="categoryField">שדה קטגוריה</key>
+    <key alias="newPassword">סיסמה חדשה</key>
+    <key alias="newPasswordFormatLengthTip">מינימום %0% תווים לסיום!</key>
+    <key alias="newPasswordFormatNonAlphaTip">צריכים להיות שם לפחות %0% תווים מיוחדים.</key>
+    <key alias="newPasswordFormatDigitTip">צריכה להיות שם לפחות %0% ספרות.</key>
+    <key alias="newPasswordFormatUppercaseTip">צריכים להיות שם לפחות %0% תווים רישיות.</key>
+    <key alias="newPasswordFormatLowercaseTip">צריכים להיות שם לפחות %0% תווים קטנים.</key>
     <key alias="changePassword">שנה את הסיסמה שלך</key>
     <key alias="changePasswordDescription">בעמוד זה ניתן לשנות את הסיסמה שלך ולאחר מכן ללחוץ על הכפתור 'שנה סיסמה'	 למטה</key>
     <key alias="contentChannel">ערוץ תוכן</key>

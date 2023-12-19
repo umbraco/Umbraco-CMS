@@ -1824,6 +1824,9 @@ Mange hilsner fra Umbraco robotten
     <key alias="newPassword">Nyt kodeord</key>
     <key alias="newPasswordFormatLengthTip">Minium %0% karakterer tilbage!</key>
     <key alias="newPasswordFormatNonAlphaTip">Der skal som minium være %0% specielle karakterer.</key>
+    <key alias="newPasswordFormatDigitTip">Der skal være mindst %0% ciffer derinde.</key>
+    <key alias="newPasswordFormatUppercaseTip">Der skal være mindst %0% store bogstaver deri.</key>
+    <key alias="newPasswordFormatLowercaseTip">Der skal være mindst %0% små bogstaver deri.</key>
     <key alias="noLockouts">er ikke blevet låst ude</key>
     <key alias="noPasswordChange">Kodeordet er ikke blevet ændret</key>
     <key alias="confirmNewPassword">Gentag dit nye kodeord</key>

@@ -1693,6 +1693,11 @@
     <key alias="changePassword">Změnit heslo</key>
     <key alias="changePhoto">Změnit fotku</key>
     <key alias="newPassword">Změnit heslo</key>
+    <key alias="newPasswordFormatLengthTip">Minimální počet znaků: %0%!</key>
+    <key alias="newPasswordFormatNonAlphaTip">Mělo by tam být alespoň %0% speciálních znaků.</key>
+    <key alias="newPasswordFormatDigitTip">Mělo by tam být alespoň %0% číslic.</key>
+    <key alias="newPasswordFormatUppercaseTip">Mělo by tam být alespoň %0% velkých písmen.</key>
+    <key alias="newPasswordFormatLowercaseTip">Mělo by tam být alespoň %0% malých písmen.</key>
     <key alias="noLockouts">nebyl uzamčen</key>
     <key alias="noPasswordChange">Heslo nebylo změněno</key>
     <key alias="confirmNewPassword">Potvrdit heslo</key>
