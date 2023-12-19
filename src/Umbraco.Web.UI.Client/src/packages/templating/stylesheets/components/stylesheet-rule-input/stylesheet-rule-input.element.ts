@@ -52,25 +52,7 @@ export class UmbStylesheetRuleInputElement extends FormControlMixin(UmbLitElemen
 		return true;
 	}
 
-	setRules(rules: UmbSortableStylesheetRule[]) {
-		/*
-		const newRules = rules.map((r, i) => ({ ...r, sortOrder: i }));
-		this.#rules.next(newRules);
-		this.sendRulesGetContent();
-		*/
-	}
-
-	#onChange(event: UUIComboboxEvent) {
-		event.stopPropagation();
-		const target = event.target as UUIComboboxElement;
-
-		if (typeof target?.value === 'string') {
-			this.value = target.value;
-			this.dispatchEvent(new UmbChangeEvent());
-		}
-	}
-
-	addRule = (rule: UmbSortableStylesheetRule | null = null) => {
+	#openRuleSettings = (rule: UmbSortableStylesheetRule | null = null) => {
 		if (!this.#modalManager) throw new Error('Modal context not found');
 		const modalContext = this.#modalManager.open(UMB_STYLESHEET_RULE_SETTINGS_MODAL, {
 			value: {
@@ -79,18 +61,15 @@ export class UmbStylesheetRuleInputElement extends FormControlMixin(UmbLitElemen
 		});
 
 		modalContext?.onSubmit().then((value) => {
-			console.log(value);
-			/*
-			if (result.rule) {
-				console.log(result.rule);
-				//this.#context?.setRules([...this._rules, { ...result.rule, sortOrder: this._rules.length }]);
-			}
-			*/
+			const newRule: UmbSortableStylesheetRule = { ...value.rule, sortOrder: this.rules.length };
+			this.rules = [...this.rules, newRule];
+			this.dispatchEvent(new UmbChangeEvent());
 		});
 	};
 
-	removeRule = (rule: UmbSortableStylesheetRule) => {
-		//const rules = this._rules?.filter((r) => r.name !== rule.name);
+	#removeRule = (rule: UmbSortableStylesheetRule) => {
+		this.rules = this.rules.filter((r) => r.name !== rule.name);
+		this.dispatchEvent(new UmbChangeEvent());
 	};
 
 	render() {
@@ -103,11 +82,15 @@ export class UmbStylesheetRuleInputElement extends FormControlMixin(UmbLitElemen
 						<umb-stylesheet-rule-ref
 							name=${rule.name}
 							detail=${rule.selector}
-							data-umb-rule-name="${ifDefined(rule?.name)}"></umb-stylesheet-rule-ref>
+							data-umb-rule-name="${ifDefined(rule?.name)}">
+							<uui-action-bar slot="actions">
+								<uui-button @click=${() => this.#removeRule(rule)} label="Remove ${rule.name}">Remove</uui-button>
+							</uui-action-bar>
+						</umb-stylesheet-rule-ref>
 					`,
 				)}
 			</uui-ref-list>
-			<uui-button label="Add rule" look="placeholder" @click=${() => this.addRule(null)}>Add</uui-button>
+			<uui-button label="Add rule" look="placeholder" @click=${() => this.#openRuleSettings(null)}>Add</uui-button>
 		`;
 	}
 

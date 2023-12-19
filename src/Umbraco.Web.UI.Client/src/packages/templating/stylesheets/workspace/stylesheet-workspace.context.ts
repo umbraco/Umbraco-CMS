@@ -99,34 +99,6 @@ export class UmbStylesheetWorkspaceContext
 		}
 	}
 
-	/*
-	async sendRulesGetContent() {
-		const requestBody = {
-			content: this.getData()?.content,
-			rules: this.getRules(),
-		};
-		const { data } = await this.repository.interpolateStylesheetRules(requestBody);
-		this.setContent(data?.content ?? '');
-	}
-
-	async sendContentGetRules() {
-		const content = this.getData()?.content;
-		if (!content) throw Error('No content');
-
-		const { data } = await this.repository.extractStylesheetRules({ content });
-		this.setRules(data?.rules ?? []);
-	}
-
-	getRules() {
-		return this.#rules.getValue();
-	}
-
-	updateRule(unique: string, rule: RichTextRuleModelSortable) {
-		this.#rules.updateOne(unique, rule);
-		this.sendRulesGetContent();
-	}
-	*/
-
 	public destroy(): void {
 		this.#data.destroy();
 	}

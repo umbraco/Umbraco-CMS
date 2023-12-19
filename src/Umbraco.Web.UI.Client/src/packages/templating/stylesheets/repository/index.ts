@@ -1,4 +1,3 @@
-export * from './rich-text-rule/index.js';
 export * from './item/index.js';
 
 export * from './stylesheet-detail.repository.js';

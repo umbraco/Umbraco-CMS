@@ -1,10 +1,12 @@
 import { UmbStylesheetWorkspaceContext } from '../../stylesheet-workspace.context.js';
-import { UmbStylesheetRichTextRuleRepository } from '../../../repository/index.js';
 import { UmbSortableStylesheetRule } from '../../../types.js';
+import { UmbStylesheetRuleInputElement } from '../../../components/index.js';
+import { UmbStylesheetRuleManager } from '../../../utils/index.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 @customElement('umb-stylesheet-rich-text-rule-workspace-view')
 export class UmbStylesheetRichTextRuleWorkspaceViewElement extends UmbLitElement {
@@ -12,24 +14,36 @@ export class UmbStylesheetRichTextRuleWorkspaceViewElement extends UmbLitElement
 	_rules: UmbSortableStylesheetRule[] = [];
 
 	#context?: UmbStylesheetWorkspaceContext;
-
-	#stylesheetRichTextRuleRepository = new UmbStylesheetRichTextRuleRepository(this);
+	#stylesheetRuleManager = new UmbStylesheetRuleManager();
+	#stylesheetContent = '';
 
 	constructor() {
 		super();
 
 		this.consumeContext(UMB_WORKSPACE_CONTEXT, (workspaceContext) => {
 			this.#context = workspaceContext as UmbStylesheetWorkspaceContext;
-			const unique = this.#context?.getEntityId();
-			this.#setRules(unique);
+			this.#observeContent();
 		});
 	}
 
-	async #setRules(unique: string) {
-		const { data } = await this.#stylesheetRichTextRuleRepository.requestStylesheetRules(unique);
+	#observeContent() {
+		if (!this.#context?.content) return;
+		this.observe(
+			this.#context.content,
+			(content) => {
+				this.#stylesheetContent = content;
+				this.#extractRules(content);
+			},
+			'umbStylesheetContentObserver',
+		);
+	}
 
-		if (data) {
-			this._rules = data.rules ?? [];
+	#extractRules(content: string | undefined) {
+		if (content) {
+			const rules = this.#stylesheetRuleManager.extractRules(content);
+			this._rules = [...rules];
+		} else {
+			this._rules = [];
 		}
 	}
 
@@ -37,9 +51,8 @@ export class UmbStylesheetRichTextRuleWorkspaceViewElement extends UmbLitElement
 		event.stopPropagation();
 		const target = event.target as UmbStylesheetRuleInputElement;
 		const rules = target.rules;
-		console.log(rules);
-		console.log(event);
-		debugger;
+		const newContent = this.#stylesheetRuleManager.insertRules(this.#stylesheetContent, rules);
+		this.#context?.setContent(newContent);
 	}
 
 	render() {
