@@ -309,6 +309,7 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
         if (performUpdateResult != null)
         {
             // something went wrong, return the attempt
+            scope.Complete();
             return performUpdateResult.Value;
         }
 
@@ -334,6 +335,7 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
         if (performUpdateResult != null)
         {
             // something went wrong, return the attempt
+            scope.Complete();
             return performUpdateResult.Value;
         }
 
@@ -376,7 +378,6 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
         var savingNotification = new UserGroupSavingNotification(userGroup, eventMessages);
         if (await scope.Notifications.PublishCancelableAsync(savingNotification))
         {
-            scope.Complete();
             return Attempt.FailWithStatus(UserGroupOperationStatus.CancelledByNotification, userGroup);
         }
 
