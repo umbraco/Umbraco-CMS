@@ -1,25 +1,23 @@
 ﻿using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Preview;
 
 
 public class EnterPreviewController : PreviewControllerBase
 {
-    private readonly ICookieManager _cookieManager;
+    private readonly IPreviewService _previewService;
 
-    public EnterPreviewController(ICookieManager cookieManager) => _cookieManager = cookieManager;
+    public EnterPreviewController(IPreviewService previewService) => _previewService = previewService;
 
     [HttpPost]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public IActionResult Enter()
     {
-        _cookieManager.SetCookieValue(Constants.Web.PreviewCookieName, "preview");
-
+        _previewService.EnterPreview();
         return Ok();
     }
 }
