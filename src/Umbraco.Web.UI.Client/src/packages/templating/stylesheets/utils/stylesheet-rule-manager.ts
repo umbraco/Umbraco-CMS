@@ -25,7 +25,7 @@ export class UmbStylesheetRuleManager {
 	insertRules(stylesheetContent: string, rules: Array<RichTextRuleModel>) {
 		const regex = this.#umbRuleRegex;
 		if (!stylesheetContent) throw Error('No Stylesheet content');
-		if (!stylesheetContent && !rules) return { content: '' };
+		if (!stylesheetContent && !rules) return '';
 
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		//@ts-ignore
