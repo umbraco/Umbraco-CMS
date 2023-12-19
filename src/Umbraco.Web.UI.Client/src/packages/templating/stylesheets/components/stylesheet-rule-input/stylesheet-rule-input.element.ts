@@ -54,17 +54,31 @@ export class UmbStylesheetRuleInputElement extends FormControlMixin(UmbLitElemen
 
 	#openRuleSettings = (rule: UmbStylesheetRule | null = null) => {
 		if (!this.#modalManager) throw new Error('Modal context not found');
+
+		const value = {
+			rule: rule ? { name: rule.name, selector: rule.selector, styles: rule.styles } : null,
+		};
+
 		const modalContext = this.#modalManager.open(UMB_STYLESHEET_RULE_SETTINGS_MODAL, {
-			value: {
-				rule,
-			},
+			value,
 		});
 
-		modalContext?.onSubmit().then((value) => {
-			const newRule: UmbStylesheetRule = { ...value.rule };
-			this.rules = [...this.rules, newRule];
-			this.dispatchEvent(new UmbChangeEvent());
-		});
+		return modalContext?.onSubmit();
+	};
+
+	#appendRule = async () => {
+		const { rule: newRule } = await this.#openRuleSettings(null);
+		if (!newRule) return;
+		this.rules = [...this.rules, newRule];
+		this.dispatchEvent(new UmbChangeEvent());
+	};
+
+	#editRule = async (rule: UmbStylesheetRule, index: number) => {
+		const { rule: updatedRule } = await this.#openRuleSettings(rule);
+		if (!updatedRule) return;
+		this.rules[index] = updatedRule;
+		this.dispatchEvent(new UmbChangeEvent());
+		this.requestUpdate();
 	};
 
 	#removeRule = (rule: UmbStylesheetRule) => {
@@ -78,20 +92,20 @@ export class UmbStylesheetRuleInputElement extends FormControlMixin(UmbLitElemen
 				${repeat(
 					this.rules,
 					(rule, index) => rule.name + index,
-					(rule) => html`
+					(rule, index) => html`
 						<umb-stylesheet-rule-ref
 							name=${rule.name}
 							detail=${rule.selector}
 							data-umb-rule-name="${ifDefined(rule?.name)}">
 							<uui-action-bar slot="actions">
-								<uui-button @click=${() => this.#openRuleSettings(rule)} label="Edit ${rule.name}">Edit</uui-button>
+								<uui-button @click=${() => this.#editRule(rule, index)} label="Edit ${rule.name}">Edit</uui-button>
 								<uui-button @click=${() => this.#removeRule(rule)} label="Remove ${rule.name}">Remove</uui-button>
 							</uui-action-bar>
 						</umb-stylesheet-rule-ref>
 					`,
 				)}
 			</uui-ref-list>
-			<uui-button label="Add rule" look="placeholder" @click=${() => this.#openRuleSettings(null)}>Add</uui-button>
+			<uui-button label="Add rule" look="placeholder" @click=${() => this.#appendRule()}>Add</uui-button>
 		`;
 	}
 
