@@ -31,7 +31,7 @@ export class UmbStylesheetRichTextRuleWorkspaceViewElement extends UmbLitElement
 		this.observe(
 			this.#context.content,
 			(content) => {
-				this.#stylesheetContent = content;
+				this.#stylesheetContent = content || '';
 				this.#extractRules(content);
 			},
 			'umbStylesheetContentObserver',
