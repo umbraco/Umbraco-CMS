@@ -68,20 +68,6 @@ export class UmbStylesheetWorkspaceEditorElement extends UmbLitElement {
 					</uui-input>
 					<small>/css/${this._path}</small>
 				</div>
-
-				<div slot="footer-info">
-					<!-- TODO: Shortcuts Modal? -->
-					<uui-button label="Show keyboard shortcuts">
-						Keyboard Shortcuts
-						<uui-keyboard-shortcut>
-							<uui-key>ALT</uui-key>
-							+
-							<uui-key>shift</uui-key>
-							+
-							<uui-key>k</uui-key>
-						</uui-keyboard-shortcut>
-					</uui-button>
-				</div>
 			</umb-workspace-editor>
 		`;
 	}
