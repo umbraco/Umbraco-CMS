@@ -1,9 +1,9 @@
-import { UmbSortableStylesheetRule } from '../../types.js';
+import { UmbStylesheetRule } from '../../types.js';
 import { UMB_STYLESHEET_RULE_SETTINGS_MODAL_ALIAS } from './manifests.js';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbStylesheetRuleSettingsModalValue {
-	rule: UmbSortableStylesheetRule | null;
+	rule: UmbStylesheetRule | null;
 }
 
 export const UMB_STYLESHEET_RULE_SETTINGS_MODAL = new UmbModalToken<never, UmbStylesheetRuleSettingsModalValue>(

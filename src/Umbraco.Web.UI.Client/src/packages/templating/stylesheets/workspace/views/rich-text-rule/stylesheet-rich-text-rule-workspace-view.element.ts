@@ -1,5 +1,5 @@
 import { UmbStylesheetWorkspaceContext } from '../../stylesheet-workspace.context.js';
-import { UmbSortableStylesheetRule } from '../../../types.js';
+import { UmbStylesheetRule } from '../../../types.js';
 import { UmbStylesheetRuleInputElement } from '../../../components/index.js';
 import { UmbStylesheetRuleManager } from '../../../utils/index.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -11,7 +11,7 @@ import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 @customElement('umb-stylesheet-rich-text-rule-workspace-view')
 export class UmbStylesheetRichTextRuleWorkspaceViewElement extends UmbLitElement {
 	@state()
-	_rules: UmbSortableStylesheetRule[] = [];
+	_rules: UmbStylesheetRule[] = [];
 
 	#context?: UmbStylesheetWorkspaceContext;
 	#stylesheetRuleManager = new UmbStylesheetRuleManager();

@@ -1,8 +1,8 @@
-import { UmbSortableStylesheetRule } from '../../types.js';
+import { UmbStylesheetRule } from '../../types.js';
 import { UMB_STYLESHEET_RULE_SETTINGS_MODAL } from './stylesheet-rule-settings-modal.token.js';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { css, html, customElement, ifDefined, repeat, property } from '@umbraco-cms/backoffice/external/lit';
-import { FormControlMixin, UUIComboboxElement, UUIComboboxEvent } from '@umbraco-cms/backoffice/external/uui';
+import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UMB_MODAL_MANAGER_CONTEXT_TOKEN, UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UmbSorterConfig, UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -10,7 +10,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 @customElement('umb-stylesheet-rule-input')
 export class UmbStylesheetRuleInputElement extends FormControlMixin(UmbLitElement) {
 	@property({ type: Array, attribute: false })
-	rules: UmbSortableStylesheetRule[] = [];
+	rules: UmbStylesheetRule[] = [];
 
 	#modalManager: UmbModalManagerContext | undefined;
 
@@ -41,7 +41,7 @@ export class UmbStylesheetRuleInputElement extends FormControlMixin(UmbLitElemen
 		return undefined;
 	}
 
-	#findNewSortOrder(rule: UmbSortableStylesheetRule, newIndex: number) {
+	#findNewSortOrder(rule: UmbStylesheetRule, newIndex: number) {
 		const rules = [...this.getRules()].sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
 		const oldIndex = rules.findIndex((r) => r.name === rule.name);
 
@@ -52,7 +52,7 @@ export class UmbStylesheetRuleInputElement extends FormControlMixin(UmbLitElemen
 		return true;
 	}
 
-	#openRuleSettings = (rule: UmbSortableStylesheetRule | null = null) => {
+	#openRuleSettings = (rule: UmbStylesheetRule | null = null) => {
 		if (!this.#modalManager) throw new Error('Modal context not found');
 		const modalContext = this.#modalManager.open(UMB_STYLESHEET_RULE_SETTINGS_MODAL, {
 			value: {
@@ -61,13 +61,13 @@ export class UmbStylesheetRuleInputElement extends FormControlMixin(UmbLitElemen
 		});
 
 		modalContext?.onSubmit().then((value) => {
-			const newRule: UmbSortableStylesheetRule = { ...value.rule, sortOrder: this.rules.length };
+			const newRule: UmbStylesheetRule = { ...value.rule };
 			this.rules = [...this.rules, newRule];
 			this.dispatchEvent(new UmbChangeEvent());
 		});
 	};
 
-	#removeRule = (rule: UmbSortableStylesheetRule) => {
+	#removeRule = (rule: UmbStylesheetRule) => {
 		this.rules = this.rules.filter((r) => r.name !== rule.name);
 		this.dispatchEvent(new UmbChangeEvent());
 	};
@@ -77,13 +77,14 @@ export class UmbStylesheetRuleInputElement extends FormControlMixin(UmbLitElemen
 			<uui-ref-list>
 				${repeat(
 					this.rules,
-					(rule) => rule.name + rule.sortOrder,
+					(rule, index) => rule.name + index,
 					(rule) => html`
 						<umb-stylesheet-rule-ref
 							name=${rule.name}
 							detail=${rule.selector}
 							data-umb-rule-name="${ifDefined(rule?.name)}">
 							<uui-action-bar slot="actions">
+								<uui-button @click=${() => this.#openRuleSettings(rule)} label="Edit ${rule.name}">Edit</uui-button>
 								<uui-button @click=${() => this.#removeRule(rule)} label="Remove ${rule.name}">Remove</uui-button>
 							</uui-action-bar>
 						</umb-stylesheet-rule-ref>
@@ -115,11 +116,11 @@ declare global {
 	}
 }
 
-const SORTER_CONFIG: UmbSorterConfig<UmbSortableStylesheetRule> = {
-	compareElementToModel: (element: HTMLElement, model: UmbSortableStylesheetRule) => {
+const SORTER_CONFIG: UmbSorterConfig<UmbStylesheetRule> = {
+	compareElementToModel: (element: HTMLElement, model: UmbStylesheetRule) => {
 		return element.getAttribute('data-umb-rule-name') === model.name;
 	},
-	querySelectModelToElement: (container: HTMLElement, modelEntry: UmbSortableStylesheetRule) => {
+	querySelectModelToElement: (container: HTMLElement, modelEntry: UmbStylesheetRule) => {
 		return container.querySelector('data-umb-rule-name[' + modelEntry.name + ']');
 	},
 	identifier: 'stylesheet-rules-sorter',
