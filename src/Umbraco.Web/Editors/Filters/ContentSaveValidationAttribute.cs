@@ -32,11 +32,12 @@ namespace Umbraco.Web.Editors.Filters
         private readonly IUserService _userService;
         private readonly IEntityService _entityService;
         private readonly AppCaches _appCaches;
+        private readonly bool _skipUserAccessValidation;
 
-        public ContentSaveValidationAttribute(): this(Current.Logger, Current.UmbracoContextAccessor, Current.Services.TextService, Current.Services.ContentService, Current.Services.UserService, Current.Services.EntityService, Current.AppCaches)
+        public ContentSaveValidationAttribute(bool skipUserAccessValidation = false): this(Current.Logger, Current.UmbracoContextAccessor, Current.Services.TextService, Current.Services.ContentService, Current.Services.UserService, Current.Services.EntityService, Current.AppCaches, skipUserAccessValidation)
         { }
 
-        public ContentSaveValidationAttribute(ILogger logger, IUmbracoContextAccessor umbracoContextAccessor, ILocalizedTextService textService, IContentService contentService, IUserService userService, IEntityService entityService, AppCaches appCaches)
+        public ContentSaveValidationAttribute(ILogger logger, IUmbracoContextAccessor umbracoContextAccessor, ILocalizedTextService textService, IContentService contentService, IUserService userService, IEntityService entityService, AppCaches appCaches, bool skipUserAccessValidation)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
@@ -45,6 +46,7 @@ namespace Umbraco.Web.Editors.Filters
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
             _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
             _appCaches = appCaches;
+            _skipUserAccessValidation = skipUserAccessValidation;
         }
 
         public override void OnActionExecuting(HttpActionContext actionContext)
@@ -54,8 +56,8 @@ namespace Umbraco.Web.Editors.Filters
 
             if (!ValidateAtLeastOneVariantIsBeingSaved(model, actionContext)) return;
             if (!contentItemValidator.ValidateExistingContent(model, actionContext)) return;
-            if (!ValidateUserAccess(model, actionContext, _umbracoContextAccessor.UmbracoContext.Security)) return;
-            
+            if (!_skipUserAccessValidation && !ValidateUserAccess(model, actionContext, _umbracoContextAccessor.UmbracoContext.Security)) return;
+
             //validate for each variant that is being updated
             foreach (var variant in model.Variants.Where(x => x.Save))
             {
@@ -88,7 +90,7 @@ namespace Umbraco.Web.Editors.Filters
         /// <param name="contentItem"></param>
         /// <param name="webSecurity"></param>
         private bool ValidateUserAccess(ContentItemSave contentItem, HttpActionContext actionContext, WebSecurity webSecurity)
-        {  
+        {
 
             //We now need to validate that the user is allowed to be doing what they are doing.
             //Based on the action we need to check different permissions.
@@ -172,7 +174,7 @@ namespace Umbraco.Web.Editors.Filters
                     }
                     break;
                 case ContentSaveAction.ScheduleNew:
-                    
+
                     permissionToCheck.Add(ActionNew.ActionLetter);
                     permissionToCheck.Add(ActionUpdate.ActionLetter);
                     permissionToCheck.Add(ActionPublish.ActionLetter);
