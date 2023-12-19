@@ -36,8 +36,8 @@ export class UmbStylesheetRuleManager {
 				?.map(
 					(rule) => `
 /**umb_name:${rule.name}*/ 
-	${rule.selector} { 
-		${rule.styles} 
+${rule.selector} { 
+	${rule.styles} 
 }
 `,
 				)
