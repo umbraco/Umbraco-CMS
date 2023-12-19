@@ -7,6 +7,8 @@ import {
 } from '@umbraco-cms/backoffice/modal';
 import { UMB_CURRENT_USER_CONTEXT, UmbCurrentUser } from '@umbraco-cms/backoffice/current-user';
 import { RawEditorOptions } from '@umbraco-cms/backoffice/external/tinymce';
+import { UmbTemporaryFileRepository } from '@umbraco-cms/backoffice/temporary-file';
+import { UmbId } from '@umbraco-cms/backoffice/id';
 
 interface MediaPickerTargetData {
 	altText?: string;
@@ -30,11 +32,13 @@ export default class UmbTinyMceMediaPickerPlugin extends UmbTinyMcePluginBase {
 	#currentUser?: UmbCurrentUser;
 	#modalContext?: UmbModalManagerContext;
 	#currentUserContext?: typeof UMB_CURRENT_USER_CONTEXT.TYPE;
+	#temporaryFileRepository;
 
 	constructor(args: TinyMcePluginArguments) {
 		super(args);
 
 		this.#mediaHelper = new UmbMediaHelper();
+		this.#temporaryFileRepository = new UmbTemporaryFileRepository(args.host);
 
 		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (modalContext) => {
 			this.#modalContext = modalContext;
@@ -63,7 +67,7 @@ export default class UmbTinyMceMediaPickerPlugin extends UmbTinyMcePluginBase {
 		if (toolbar?.includes('umbmediapicker')) {
 			this.editor.options.set('paste_data_images', true);
 			this.editor.options.set('automatic_uploads', true);
-			this.editor.options.set('images_upload_handler', uploadImageHandler);
+			this.editor.options.set('images_upload_handler', this.#uploadImageHandler);
 		}
 	}
 
@@ -198,49 +202,33 @@ export default class UmbTinyMceMediaPickerPlugin extends UmbTinyMcePluginBase {
 			}
 		});
 	}
+
+	#uploadImageHandler: RawEditorOptions['images_upload_handler'] = (blobInfo, progress) => {
+		return new Promise((resolve, reject) => {
+			// Fetch does not support progress, so we need to fake it.
+			progress(0);
+
+			const id = UmbId.new();
+			const blobUri = blobInfo.blobUri();
+			const fileBlob = blobInfo.blob();
+			const file = new File([fileBlob], blobInfo.filename(), { type: fileBlob.type });
+
+			progress(50);
+
+			this.#temporaryFileRepository
+				.upload(id, file)
+				.then((response) => {
+					if (response.error) {
+						reject(response.error);
+					} else {
+						// Put temp location into localstorage (used to update the img with data-tmpimg later on)
+						sessionStorage.setItem(`tinymce__${blobUri}`, id);
+
+						resolve(blobUri);
+					}
+				})
+				.catch(reject)
+				.finally(() => progress(100));
+		});
+	};
 }
-
-const uploadImageHandler: RawEditorOptions['images_upload_handler'] = (blobInfo, progress) => {
-	return new Promise((resolve, reject) => {
-		const xhr = new XMLHttpRequest();
-		// FIXME: This must use the new TemporaryFileResource
-		xhr.open('POST', window.Umbraco?.Sys.ServerVariables.umbracoUrls.tinyMceApiBaseUrl + 'UploadImage');
-
-		xhr.onloadstart = () =>
-			document.dispatchEvent(new CustomEvent('rte.file.uploading', { composed: true, bubbles: true }));
-
-		xhr.onloadend = () =>
-			document.dispatchEvent(new CustomEvent('rte.file.uploaded', { composed: true, bubbles: true }));
-
-		xhr.upload.onprogress = (e) => progress((e.loaded / e.total) * 100);
-
-		xhr.onerror = () => reject('Image upload failed due to a XHR Transport error. Code: ' + xhr.status);
-
-		xhr.onload = () => {
-			if (xhr.status < 200 || xhr.status >= 300) {
-				reject('HTTP Error: ' + xhr.status);
-				return;
-			}
-
-			const json = JSON.parse(xhr.responseText);
-
-			if (!json || typeof json.tmpLocation !== 'string') {
-				reject('Invalid JSON: ' + xhr.responseText);
-				return;
-			}
-
-			// Put temp location into localstorage (used to update the img with data-tmpimg later on)
-			localStorage.set(`tinymce__${blobInfo.blobUri()}`, json.tmpLocation);
-
-			// We set the img src url to be the same as we started
-			// The Blob URI is stored in TinyMce's cache
-			// so the img still shows in the editor
-			resolve(blobInfo.blobUri());
-		};
-
-		const formData = new FormData();
-		formData.append('file', blobInfo.blob(), blobInfo.filename());
-
-		xhr.send(formData);
-	});
-};
