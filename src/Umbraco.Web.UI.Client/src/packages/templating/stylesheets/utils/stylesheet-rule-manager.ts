@@ -13,7 +13,14 @@ export class UmbStylesheetRuleManager {
 	extractRules(stylesheetContent: string): Array<UmbStylesheetRule> {
 		const regex = this.#umbRuleRegex;
 		if (!stylesheetContent) throw Error('No Stylesheet content');
-		return [...stylesheetContent.matchAll(regex)].map((match) => match.groups);
+		return [...stylesheetContent.matchAll(regex)].map((match) => {
+			const rule: UmbStylesheetRule = {
+				name: match.groups?.name || '',
+				selector: match.groups?.selector || '',
+				styles: match.groups?.styles || '',
+			};
+			return rule;
+		});
 	}
 
 	/**
