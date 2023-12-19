@@ -7,9 +7,6 @@ import { textFileItemMapper } from '../utils.js';
 import { UmbMockStylesheetModel, data } from './stylesheet.data.js';
 import {
 	CreateStylesheetRequestModel,
-	ExtractRichTextStylesheetRulesRequestModel,
-	ExtractRichTextStylesheetRulesResponseModel,
-	InterpolateRichTextStylesheetRequestModel,
 	PagedStylesheetOverviewResponseModel,
 	StylesheetResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
@@ -38,59 +35,6 @@ class UmbStylesheetData extends UmbFileSystemMockDbBase<UmbMockStylesheetModel> 
 			items: this.data.map((item) => textFileItemMapper(item)),
 			total: this.data.map((item) => !item.isFolder).length,
 		};
-	}
-
-	getRules(path: string): ExtractRichTextStylesheetRulesResponseModel {
-		const regex = /\*\*\s*umb_name:\s*(?<name>[^*\r\n]*?)\s*\*\/\s*(?<selector>[^,{]*?)\s*{\s*(?<styles>.*?)\s*}/gis;
-		const item = this.data.find((item) => item.path === path);
-		if (!item) throw Error('item not found');
-
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		//@ts-ignore
-		// eslint-disable-next-line no-unsafe-optional-chaining
-		const rules = [...item.content?.matchAll(regex)].map((match) => match.groups) as Array<RichTextRuleModel>;
-		return { rules };
-	}
-
-	async extractRules({ requestBody }: { requestBody?: ExtractRichTextStylesheetRulesRequestModel }) {
-		const regex = /\*\*\s*umb_name:\s*(?<name>[^*\r\n]*?)\s*\*\/\s*(?<selector>[^,{]*?)\s*{\s*(?<styles>.*?)\s*}/gis;
-
-		if (!requestBody) {
-			throw Error('No request body');
-		}
-		const { content } = await requestBody;
-		if (!content) return { rules: [] };
-		const rules = [...content.matchAll(regex)].map((match) => match.groups);
-		return { rules };
-	}
-
-	interpolateRules({ requestBody }: { requestBody?: InterpolateRichTextStylesheetRequestModel }) {
-		const regex = /\/\*\*\s*umb_name:\s*(?<name>[^*\r\n]*?)\s*\*\/\s*(?<selector>[^,{]*?)\s*{\s*(?<styles>.*?)\s*}/gis;
-		if (!requestBody) {
-			throw Error('No request body');
-		}
-		const { content, rules } = requestBody;
-		if (!content && !rules) return { content: '' };
-
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		//@ts-ignore
-		const cleanedContent = content?.replaceAll(regex, '');
-
-		const newContent = `${cleanedContent.replace(/[\r\n]+$/, '')}
-
-${rules
-	?.map(
-		(rule) =>
-			`/**umb_name:${rule.name}*/
-${rule.selector} {
-	${rule.styles}
-}
-
-`,
-	)
-	.join('')}`;
-
-		return { content: newContent };
 	}
 
 	#createStylesheetMockItem = (item: CreateStylesheetRequestModel): UmbMockStylesheetModel => {
