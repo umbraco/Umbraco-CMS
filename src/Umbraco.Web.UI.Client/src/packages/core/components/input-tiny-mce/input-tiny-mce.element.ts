@@ -1,15 +1,10 @@
-import { defaultExtendedValidElements, defaultFallbackConfig, defaultStyleFormats } from './input-tiny-mce.defaults.js';
-import { pastePreProcessHandler, uploadImageHandler } from './input-tiny-mce.handlers.js';
+import { defaultFallbackConfig } from './input-tiny-mce.defaults.js';
+import { pastePreProcessHandler } from './input-tiny-mce.handlers.js';
 import { availableLanguages } from './input-tiny-mce.languages.js';
 import { uriAttributeSanitizer } from './input-tiny-mce.sanitizer.js';
 import { umbMeta } from '@umbraco-cms/backoffice/meta';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
-import {
-	type Editor,
-	type EditorEvent,
-	type RawEditorOptions,
-	renderEditor,
-} from '@umbraco-cms/backoffice/external/tinymce';
+import { type Editor, type RawEditorOptions, renderEditor } from '@umbraco-cms/backoffice/external/tinymce';
 import { UMB_CURRENT_USER_CONTEXT, UmbCurrentUser } from '@umbraco-cms/backoffice/current-user';
 import { TinyMcePluginArguments, UmbTinyMcePluginBase } from '@umbraco-cms/backoffice/components';
 import { loadManifestApi } from '@umbraco-cms/backoffice/extension-api';
@@ -158,23 +153,47 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	async #setTinyConfig() {
-		// create an object by merging the configuration onto the fallback config
-		// TODO: Seems like a too tight coupling between DataTypeConfigCollection and TinyMceConfig, I would love it begin more explicit what we take from DataTypeConfigCollection and parse on, but I understand that this gives some flexibility. Is this flexibility on purpose?
-		const configurationOptions: Record<string, any> = {
-			...defaultFallbackConfig,
-			...(this.configuration ? this.configuration?.toObject() : {}),
-		};
+		const dimensions = this.configuration?.getValueByAlias<{ width?: number; height?: number }>('dimensions');
 
 		// Map the stylesheets with server url
-		const stylesheets = configurationOptions.stylesheets.map(
-			(stylesheetPath: string) => `${this.#serverUrl}/css/${stylesheetPath.replace(/\\/g, '/')}`,
-		);
-		const styleFormats = await this.getFormatStyles(configurationOptions.stylesheets);
+		const stylesheets =
+			this.configuration
+				?.getValueByAlias<string[]>('stylesheets')
+				?.map((stylesheetPath: string) => `${this.#serverUrl}/css/${stylesheetPath.replace(/\\/g, '/')}`) ?? [];
+		const styleFormats = await this.getFormatStyles(stylesheets);
+
+		// create an object by merging the configuration onto the fallback config
+		const configurationOptions: RawEditorOptions = {
+			...defaultFallbackConfig,
+			height: dimensions?.height,
+			width: dimensions?.width,
+			content_css: stylesheets,
+			style_formats: styleFormats,
+		};
 
 		// no auto resize when a fixed height is set
-		if (!configurationOptions.dimensions?.height) {
-			configurationOptions.plugins ??= [];
-			configurationOptions.plugins.splice(configurationOptions.plugins.indexOf('autoresize'), 1);
+		if (!configurationOptions.height) {
+			if (Array.isArray(configurationOptions.plugins) && configurationOptions.plugins.includes('autoresize')) {
+				configurationOptions.plugins.splice(configurationOptions.plugins.indexOf('autoresize'), 1);
+			}
+		}
+
+		// set the configured toolbar if any
+		const toolbar = this.configuration?.getValueByAlias<string[]>('toolbar');
+		if (toolbar) {
+			configurationOptions.toolbar = toolbar.join(' ');
+		}
+
+		// set the configured inline mode
+		const mode = this.configuration?.getValueByAlias<string>('mode');
+		if (mode?.toLocaleLowerCase() === 'inline') {
+			configurationOptions.inline = true;
+		}
+
+		// set the maximum image size
+		const maxImageSize = this.configuration?.getValueByAlias<number>('maxImageSize');
+		if (maxImageSize !== undefined) {
+			configurationOptions.maxImageSize = maxImageSize;
 		}
 
 		// set the default values that will not be modified via configuration
@@ -193,35 +212,11 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 			statusbar: false,
 			setup: (editor) => this.#editorSetup(editor),
 			target: this._editorElement,
-		};
+			paste_data_images: false,
 
-		// extend with configuration values
-		this._tinyConfig = {
-			...this._tinyConfig,
-			content_css: stylesheets,
-			style_formats: styleFormats || defaultStyleFormats,
-			extended_valid_elements: defaultExtendedValidElements,
-			height: configurationOptions.height ?? 500,
-			invalid_elements: configurationOptions.invalidElements,
-			plugins: configurationOptions.plugins.map((x: any) => x.name),
-			toolbar: configurationOptions.toolbar.join(' '),
-			valid_elements: configurationOptions.validElements,
-			width: configurationOptions.width,
+			// Extend with configuration options
+			...configurationOptions,
 		};
-
-		// Need to check if we are allowed to UPLOAD images
-		// This is done by checking if the insert image toolbar button is available
-		if (this.#isMediaPickerEnabled()) {
-			this._tinyConfig = {
-				...this._tinyConfig,
-				// Update the TinyMCE Config object to allow pasting
-				images_upload_handler: uploadImageHandler,
-				automatic_uploads: false,
-				images_replace_blob_uris: false,
-				// This allows images to be pasted in & stored as Base64 until they get uploaded to server
-				paste_data_images: true,
-			};
-		}
 
 		this.#setLanguage();
 
@@ -282,7 +277,6 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 		editor.on('Change', () => this.#onChange(editor.getContent()));
 		editor.on('Dirty', () => this.#onChange(editor.getContent()));
 		editor.on('Keyup', () => this.#onChange(editor.getContent()));
-		editor.on('SetContent', () => this.#mediaHelper.uploadBlobImages(editor));
 
 		editor.on('focus', () => this.dispatchEvent(new CustomEvent('umb-rte-focus', { composed: true, bubbles: true })));
 
@@ -297,22 +291,6 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 		});
 
 		editor.on('init', () => editor.setContent(this.value?.toString() ?? ''));
-
-		// If we can not find the insert image/media toolbar button
-		// Then we need to add an event listener to the editor
-		// That will update native browser drag & drop events
-		// To update the icon to show you can NOT drop something into the editor
-		if (this._tinyConfig.toolbar && !this.#isMediaPickerEnabled()) {
-			// Wire up the event listener
-			editor.on('dragstart dragend dragover draggesture dragdrop drop drag', (e: EditorEvent<InputEvent>) => {
-				e.preventDefault();
-				if (e.dataTransfer) {
-					e.dataTransfer.effectAllowed = 'none';
-					e.dataTransfer.dropEffect = 'none';
-				}
-				e.stopPropagation();
-			});
-		}
 	}
 
 	#onInit(editor: Editor) {
@@ -326,21 +304,9 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 		this.dispatchEvent(new CustomEvent('change'));
 	}
 
-	#isMediaPickerEnabled() {
-		const toolbar = this._tinyConfig.toolbar;
-		if (Array.isArray(toolbar) && (toolbar as string[]).includes('umbmediapicker')) {
-			return true;
-		} else if (typeof toolbar === 'string' && toolbar.includes('umbmediapicker')) {
-			return true;
-		}
-
-		return false;
-	}
-
 	/**
 	 * Nothing rendered by default - TinyMCE initialisation creates
 	 * a target div and binds the RTE to that element
-	 * @returns
 	 */
 	render() {
 		return html`<div id="editor"></div>`;
