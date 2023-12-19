@@ -1,7 +1,7 @@
 //used for the media picker dialog
 angular.module("umbraco")
     .controller("Umbraco.Editors.MediaPickerController",
-        function ($scope, $timeout, mediaResource, entityResource, userService, mediaHelper, mediaTypeHelper, eventsService, treeService, localStorageService, localizationService, editorService, umbSessionStorage, notificationsService, clipboardService) {
+        function ($scope, $timeout, mediaResource, entityResource, userService, mediaHelper, mediaTypeHelper, eventsService, treeService, localStorageService, localizationService, dateHelper, editorService, umbSessionStorage, notificationsService, clipboardService) {
 
             var vm = this;
 
@@ -575,9 +575,12 @@ angular.module("umbraco")
                 if (item.metaData.MediaPath !== null) {
                     item.thumbnail = mediaHelper.resolveFileFromEntity(item, true);
                     item.image = mediaHelper.resolveFileFromEntity(item, false);
-                }
-                if (item.metaData.UpdateDate !== null) {
-                    item.updateDate = item.metaData.UpdateDate.slice(0,-1);
+              }
+              if (item.metaData.UpdateDate !== null) {
+                userService.getCurrentUser().then(currentUser => {
+                  item.updateDate = dateHelper.getLocalDate(item.metaData.UpdateDate, currentUser.locale, "LLL");
+                });
+               
                 }
             }
 
