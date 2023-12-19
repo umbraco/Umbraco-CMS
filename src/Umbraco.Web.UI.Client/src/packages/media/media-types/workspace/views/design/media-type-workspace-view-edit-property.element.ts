@@ -305,6 +305,11 @@ export class UmbMediaTypeWorkspacePropertyElement extends UmbLitElement {
 								<span>${this.localize.term('contentTypeEditor_displaySettingsLabelOnTop')}</span>
 						  </uui-tag>`
 						: nothing}
+					${this.property.validation.mandatory === true
+						? html`<uui-tag look="default">
+								<span>* ${this.localize.term('general_mandatory')}</span>
+						  </uui-tag>`
+						: nothing}
 			  </div>`
 			: nothing;
 	}

@@ -126,6 +126,10 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 		this.updateValue({ alias: this._aliasLocked ? this._originalPropertyData.alias : alias });
 	}
 
+	#onDescriptionChange(event: UUIInputEvent) {
+		this.updateValue({ description: event.target.value.toString() });
+	}
+
 	#onDataTypeIdChange(event: UUIInputEvent) {
 		const dataTypeId = event.target.value.toString();
 		this.updateValue({ dataTypeId });
@@ -244,6 +248,7 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 									<uui-textarea
 										id="description-input"
 										name="description"
+										@input=${this.#onDescriptionChange}
 										placeholder="Enter description..."
 										.value=${this.value.description}></uui-textarea>
 								</div>
