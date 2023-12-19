@@ -1,3 +1,4 @@
+import { manifest as filter } from './config/filter/manifests.js';
 import { manifest as startNode } from './config/start-node/manifests.js';
 import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -22,8 +23,8 @@ const manifest: ManifestPropertyEditorUi = {
 				{
 					alias: 'filter',
 					label: 'Allow items of type',
-					description: '',
-					propertyEditorUiAlias: 'Umb.PropertyEditorUi.TreePicker',
+					description: 'Select the applicable types',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.TreePicker.Filter',
 				},
 				{
 					alias: 'showOpenButton',
@@ -36,6 +37,6 @@ const manifest: ManifestPropertyEditorUi = {
 	},
 };
 
-const config: Array<ManifestPropertyEditorUi> = [startNode];
+const config: Array<ManifestPropertyEditorUi> = [filter, startNode];
 
 export const manifests = [manifest, ...config];
