@@ -21,7 +21,7 @@ class UmbStylesheetData extends UmbFileSystemMockDbBase<UmbMockStylesheetModel> 
 		super(data);
 
 		this.file = new UmbMockFileSystemDetailManager<UmbMockStylesheetModel>(this, {
-			createMapper: this.#createStylesheetMockItem,
+			createMapper: this.#createStylesheetMockItemMapper,
 			readMapper: this.#readStylesheetResponseMapper,
 		});
 	}
@@ -37,7 +37,7 @@ class UmbStylesheetData extends UmbFileSystemMockDbBase<UmbMockStylesheetModel> 
 		};
 	}
 
-	#createStylesheetMockItem = (item: CreateStylesheetRequestModel): UmbMockStylesheetModel => {
+	#createStylesheetMockItemMapper = (item: CreateStylesheetRequestModel): UmbMockStylesheetModel => {
 		return {
 			name: item.name,
 			content: item.content,
