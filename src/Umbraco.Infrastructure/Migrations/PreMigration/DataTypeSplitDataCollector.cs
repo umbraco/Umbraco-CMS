@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Manifest;
@@ -17,6 +18,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.PreMigration;
 // we use a composer here so its easier to clean this up when we no longer need it.
 // same for additional classes in the same file, nice and self contained
 // should only be used to migrate from v13 to v14
+// ⚠️ FIXME: PLEASE DELETE THIS IN V14! ⚠️
 public class DataTypeSplitDataCollectorComposer : IComposer
 {
     public void Compose(IUmbracoBuilder builder)
@@ -36,6 +38,7 @@ public class DataTypeSplitDataCollector : INotificationHandler<UmbracoApplicatio
     private readonly ICoreScopeProvider _coreScopeProvider;
     private readonly IRuntimeState _runtimeState;
     private readonly IServerRoleAccessor _serverRoleAccessor;
+    private readonly IUmbracoVersion _umbracoVersion;
 
     public DataTypeSplitDataCollector(
         DataEditorCollection dataEditors,
@@ -46,7 +49,8 @@ public class DataTypeSplitDataCollector : INotificationHandler<UmbracoApplicatio
         ILogger<DataTypeSplitDataCollector> logger,
         ICoreScopeProvider coreScopeProvider,
         IRuntimeState runtimeState,
-        IServerRoleAccessor serverRoleAccessor)
+        IServerRoleAccessor serverRoleAccessor,
+        IUmbracoVersion umbracoVersion)
     {
         _dataEditors = dataEditors;
         _manifestParser = manifestParser;
@@ -57,10 +61,17 @@ public class DataTypeSplitDataCollector : INotificationHandler<UmbracoApplicatio
         _coreScopeProvider = coreScopeProvider;
         _runtimeState = runtimeState;
         _serverRoleAccessor = serverRoleAccessor;
+        _umbracoVersion = umbracoVersion;
     }
 
     public void Handle(UmbracoApplicationStartedNotification notification)
     {
+        // should only be used to collect data in v13
+        if (_umbracoVersion.Version.Major is not 13)
+        {
+            return;
+        }
+
         // only run this if the application is actually running and not in an install/upgrade state
         if (_runtimeState.Level != RuntimeLevel.Run)
         {
