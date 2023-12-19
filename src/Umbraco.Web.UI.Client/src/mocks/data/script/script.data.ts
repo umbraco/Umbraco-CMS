@@ -4,43 +4,45 @@ import {
 	ScriptResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 
-export type UmbMockScriptModel = ScriptResponseModel & FileSystemTreeItemPresentationModel & ScriptItemResponseModel;
+export type UmbMockScriptModelHack = ScriptResponseModel &
+	FileSystemTreeItemPresentationModel &
+	ScriptItemResponseModel;
+
+export interface UmbMockScriptModel extends Omit<UmbMockScriptModelHack, 'type' | 'icon'> {
+	parentPath: string | null;
+}
 
 export const data: Array<UmbMockScriptModel> = [
 	{
-		path: 'some-folder',
-		isFolder: true,
 		name: 'some-folder',
-		type: 'script',
+		path: 'some-folder',
+		parentPath: null,
+		isFolder: true,
 		hasChildren: true,
-		icon: 'icon-script',
 		content: '',
 	},
 	{
-		path: 'another-folder',
-		isFolder: true,
 		name: 'another-folder',
-		type: 'script',
-		hasChildren: true,
-		icon: 'icon-script',
-		content: '',
-	},
-	{
-		path: 'very important folder',
+		path: 'another-folder',
+		parentPath: null,
 		isFolder: true,
-		name: 'very important folder',
-		type: 'script',
 		hasChildren: true,
-		icon: 'icon-script',
 		content: '',
 	},
 	{
-		path: 'some-folder/ugly script.js',
-		isFolder: false,
+		name: 'very important folder',
+		path: 'very important folder',
+		parentPath: null,
+		isFolder: true,
+		hasChildren: true,
+		content: '',
+	},
+	{
 		name: 'ugly script.js',
-		type: 'script',
+		path: 'some-folder/ugly script.js',
+		parentPath: 'some-folder',
+		isFolder: false,
 		hasChildren: false,
-		icon: 'icon-script',
 		content: `function makeid(length) {
 			var result           = '';
 			var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -54,12 +56,11 @@ export const data: Array<UmbMockScriptModel> = [
 		 console.log(makeid(5));`,
 	},
 	{
-		path: 'some-folder/nice script.js',
-		isFolder: false,
 		name: 'nice script.js',
-		type: 'script',
+		path: 'some-folder/nice script.js',
+		parentPath: 'some-folder',
+		isFolder: false,
 		hasChildren: false,
-		icon: 'icon-script',
 		content: `var items = {
 			"item_1": "1",
 			"item_2": "2",
@@ -70,12 +71,11 @@ export const data: Array<UmbMockScriptModel> = [
 		}`,
 	},
 	{
-		path: 'another-folder/only bugs.js',
-		isFolder: false,
 		name: 'only bugs.js',
-		type: 'script',
+		path: 'another-folder/only bugs.js',
+		parentPath: 'another-folder',
+		isFolder: false,
 		hasChildren: false,
-		icon: 'icon-script',
 		content: `var my_arr = [4, '', 0, 10, 7, '', false, 10];
 
 		my_arr = my_arr.filter(Boolean);
@@ -83,12 +83,11 @@ export const data: Array<UmbMockScriptModel> = [
 		console.log(my_arr);`,
 	},
 	{
-		path: 'very important folder/no bugs at all.js',
-		isFolder: false,
 		name: 'no bugs at all.js',
-		type: 'script',
+		path: 'very important folder/no bugs at all.js',
+		parentPath: 'very important folder',
+		isFolder: false,
 		hasChildren: false,
-		icon: 'icon-script',
 		content: `const date_str = "07/20/2021";
 		const date = new Date(date_str);
 		const full_day_name = date.toLocaleDateString('default', { weekday: 'long' });
@@ -99,12 +98,11 @@ export const data: Array<UmbMockScriptModel> = [
 		// -> TO get the short day name e.g. Tue`,
 	},
 	{
-		path: 'very important folder/nope.js',
-		isFolder: false,
 		name: 'nope.js',
-		type: 'script',
+		path: 'very important folder/nope.js',
+		parentPath: 'very important folder',
+		isFolder: false,
 		hasChildren: false,
-		icon: 'icon-script',
 		content: `// Define an object
 		const employee = {
 			"name": "John Deo",
@@ -118,12 +116,11 @@ export const data: Array<UmbMockScriptModel> = [
 		console.log(employee);`,
 	},
 	{
-		path: 'very important folder/file-with-dash.js',
-		isFolder: false,
 		name: 'file-with-dash.js',
-		type: 'script',
+		path: 'very important folder/file-with-dash.js',
+		parentPath: 'very important folder',
+		isFolder: false,
 		hasChildren: false,
-		icon: 'icon-script',
 		content: `alert('hello file with dash');`,
 	},
 ];
