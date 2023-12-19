@@ -1,60 +1,83 @@
 const { rest } = window.MockServiceWorker;
 import { RestHandler, MockedRequest, DefaultBodyType } from 'msw';
-import { umbPartialViewsData, umbPartialViewsTreeData } from '../data/partial-views.data.js';
+import { umbPartialViewMockDB } from '../data/partial-view/partial-view.db.js';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
+import { CreatePartialViewRequestModel, UpdatePartialViewRequestModel } from '@umbraco-cms/backoffice/backend-api';
 
 const treeHandlers = [
 	rest.get(umbracoPath('/tree/partial-view/root'), (req, res, ctx) => {
-		const response = umbPartialViewsTreeData.getTreeRoot();
+		const response = umbPartialViewMockDB.tree.getRoot();
 		return res(ctx.status(200), ctx.json(response));
 	}),
 
 	rest.get(umbracoPath('/tree/partial-view/children'), (req, res, ctx) => {
 		const path = req.url.searchParams.get('path');
-		if (!path) return;
-
-		const response = umbPartialViewsTreeData.getTreeItemChildren(path);
+		if (!path) return res(ctx.status(400));
+		const response = umbPartialViewMockDB.tree.getChildrenOf(path);
 		return res(ctx.status(200), ctx.json(response));
-	}),
-
-	rest.get(umbracoPath('/tree/partial-view/item'), (req, res, ctx) => {
-		const paths = req.url.searchParams.getAll('paths');
-		if (!paths) return;
-
-		const items = umbPartialViewsTreeData.getTreeItem(paths);
-		return res(ctx.status(200), ctx.json(items));
 	}),
 ];
 
 const detailHandlers: RestHandler<MockedRequest<DefaultBodyType>>[] = [
-	rest.get(umbracoPath('/partial-view'), (req, res, ctx) => {
-		const path = decodeURIComponent(req.url.searchParams.get('path') ?? '').replace('-cshtml', '.cshtml');
-		if (!path) return res(ctx.status(400));
-		const response = umbPartialViewsData.getPartialView(path);
-		return res(ctx.status(200), ctx.json(response));
-	}),
-
-	rest.post(umbracoPath('/partial-view'), async (req, res, ctx) => {
-		const requestBody = await req.json();
-		if (!requestBody) return res(ctx.status(400, 'no body found'));
-		const response = umbPartialViewsData.insertPartialView(requestBody);
-		return res(ctx.status(200), ctx.json(response));
-	}),
-
-	rest.delete(umbracoPath('/partial-view'), (req, res, ctx) => {
+	rest.get(umbracoPath('/script'), (req, res, ctx) => {
 		const path = req.url.searchParams.get('path');
 		if (!path) return res(ctx.status(400));
-		umbPartialViewsData.delete([path]);
+		const response = umbPartialViewMockDB.file.read(path);
+		return res(ctx.status(200), ctx.json(response));
+	}),
+
+	rest.post(umbracoPath('/script'), async (req, res, ctx) => {
+		const requestBody = (await req.json()) as CreatePartialViewRequestModel;
+		if (!requestBody) return res(ctx.status(400, 'no body found'));
+		umbPartialViewMockDB.file.create(requestBody);
 		return res(ctx.status(200));
 	}),
 
-	rest.put(umbracoPath('/partial-view'), async (req, res, ctx) => {
-		const requestBody = await req.json();
+	rest.delete(umbracoPath('/script'), (req, res, ctx) => {
+		const path = req.url.searchParams.get('path');
+		if (!path) return res(ctx.status(400));
+		umbPartialViewMockDB.file.delete(path);
+		return res(ctx.status(200));
+	}),
+
+	rest.put(umbracoPath('/script'), async (req, res, ctx) => {
+		const requestBody = (await req.json()) as UpdatePartialViewRequestModel;
 		if (!requestBody) return res(ctx.status(400, 'no body found'));
-		umbPartialViewsData.updateData(requestBody);
+		umbPartialViewMockDB.file.update(requestBody);
 		return res(ctx.status(200));
 	}),
 ];
-const folderHandlers: RestHandler<MockedRequest<DefaultBodyType>>[] = [];
+
+const itemHandlers: RestHandler<MockedRequest<DefaultBodyType>>[] = [
+	rest.get(umbracoPath('/script/item'), (req, res, ctx) => {
+		const paths = req.url.searchParams.getAll('paths');
+		if (!paths) return res(ctx.status(400, 'no body found'));
+		const response = umbPartialViewMockDB.item.getItems(paths);
+		return res(ctx.status(200), ctx.json(response));
+	}),
+];
+
+const folderHandlers: RestHandler<MockedRequest<DefaultBodyType>>[] = [
+	rest.get(umbracoPath('/script/folder'), (req, res, ctx) => {
+		const path = req.url.searchParams.get('path');
+		if (!path) return res(ctx.status(400));
+		const response = umbPartialViewMockDB.folder.read(path);
+		return res(ctx.status(200), ctx.json(response));
+	}),
+
+	rest.post(umbracoPath('/script/folder'), async (req, res, ctx) => {
+		const requestBody = (await req.json()) as CreatePartialViewRequestModel;
+		if (!requestBody) return res(ctx.status(400, 'no body found'));
+		umbPartialViewMockDB.folder.create(requestBody);
+		return res(ctx.status(200));
+	}),
+
+	rest.delete(umbracoPath('/script/folder'), (req, res, ctx) => {
+		const path = req.url.searchParams.get('path');
+		if (!path) return res(ctx.status(400));
+		umbPartialViewMockDB.folder.delete(path);
+		return res(ctx.status(200));
+	}),
+];
 
 export const handlers = [...treeHandlers, ...detailHandlers, ...folderHandlers];
