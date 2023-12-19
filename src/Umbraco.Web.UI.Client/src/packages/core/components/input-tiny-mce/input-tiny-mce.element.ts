@@ -1,3 +1,4 @@
+import { umbMeta } from '@umbraco-cms/backoffice/meta';
 import { defaultExtendedValidElements, defaultFallbackConfig, defaultStyleFormats } from './input-tiny-mce.defaults.js';
 import { pastePreProcessHandler, uploadImageHandler } from './input-tiny-mce.handlers.js';
 import { availableLanguages } from './input-tiny-mce.languages.js';
@@ -117,17 +118,6 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 		const rules: any[] = [];
 
 		stylesheetPath.forEach((path) => {
-			//TODO => Legacy path?
-			/**
-			 * if (val.indexOf(Umbraco.Sys.ServerVariables.umbracoSettings.cssPath + "/") === 0) {
-				// current format (full path to stylesheet)
-				stylesheets.push(val);
-			  }
-			  else {
-				// legacy format (stylesheet name only) - must prefix with stylesheet folder and postfix with ".css"
-				stylesheets.push(Umbraco.Sys.ServerVariables.umbracoSettings.cssPath + "/" + val + ".css");
-			  }
-			 */
 			this.#stylesheetRepository?.getStylesheetRules(path).then(({ data }) => {
 				data?.rules?.forEach((rule) => {
 					const r: {
@@ -193,7 +183,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 			autoresize_bottom_margin: 10,
 			body_class: 'umb-rte',
 			//see https://www.tiny.cloud/docs/tinymce/6/editor-important-options/#cache_suffix
-			cache_suffix: '?umb__rnd=' + window.Umbraco?.Sys.ServerVariables.application.cacheBuster, // TODO: Cache buster
+			cache_suffix: `?umb__rnd=${umbMeta.packageVersion}`,
 			contextMenu: false,
 			inline_boundaries_selector: 'a[href],code,.mce-annotation,.umb-embed-holder,.umb-macro-holder',
 			menubar: false,
