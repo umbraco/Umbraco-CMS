@@ -67,6 +67,7 @@
 			"@umbraco-cms/backoffice/localization": ["src/packages/core/localization"],
 			"@umbraco-cms/backoffice/macro": ["src/packages/core/macro"],
 			"@umbraco-cms/backoffice/menu": ["src/packages/core/menu"],
+			"@umbraco-cms/backoffice/meta": ["src/packages/core/meta"],
 			"@umbraco-cms/backoffice/modal": ["src/packages/core/modal"],
 			"@umbraco-cms/backoffice/notification": ["src/packages/core/notification"],
 			"@umbraco-cms/backoffice/picker-input": ["src/packages/core/picker-input"],
