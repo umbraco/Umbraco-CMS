@@ -80,4 +80,4 @@ const folderHandlers: RestHandler<MockedRequest<DefaultBodyType>>[] = [
 	}),
 ];
 
-export const handlers = [...treeHandlers, ...detailHandlers, ...folderHandlers];
+export const handlers = [...treeHandlers, ...detailHandlers, ...itemHandlers, ...folderHandlers];
