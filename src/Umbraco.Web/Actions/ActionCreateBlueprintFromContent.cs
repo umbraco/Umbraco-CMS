@@ -6,7 +6,8 @@ namespace Umbraco.Web.Actions
 {
     public class ActionCreateBlueprintFromContent : IAction
     {
-        public char Letter => 'ï';
+        public const char ActionLetter = 'ï';
+        public char Letter => ActionLetter;
         public bool ShowInNotifier => false;
         public bool CanBePermissionAssigned => true;
         public string Icon => "blueprint";
