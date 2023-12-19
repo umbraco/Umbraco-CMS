@@ -14,11 +14,13 @@ export class UmbStylesheetWorkspaceEditorElement extends UmbLitElement {
 	private get _name() {
 		return this.#name;
 	}
-
 	private set _name(value) {
 		this.#name = value?.replace('.css', '');
 		this.requestUpdate();
 	}
+
+	@state()
+	private _isNew?: boolean = false;
 
 	@state()
 	private _path?: string;
@@ -35,6 +37,10 @@ export class UmbStylesheetWorkspaceEditorElement extends UmbLitElement {
 
 			this.inputQuery$.pipe(debounceTime(250)).subscribe((nameInputValue: string) => {
 				this.#workspaceContext?.setName(`${nameInputValue}.css`);
+			});
+
+			this.observe(this.#workspaceContext.isNew, (isNew) => {
+				this._isNew = isNew;
 			});
 		});
 	}
@@ -64,7 +70,8 @@ export class UmbStylesheetWorkspaceEditorElement extends UmbLitElement {
 						label="stylesheet name"
 						id="name"
 						.value=${this._name}
-						@input="${this.#onNameChange}">
+						@input="${this.#onNameChange}"
+						?readonly=${this._isNew === false}>
 					</uui-input>
 					<small>/css/${this._path}</small>
 				</div>

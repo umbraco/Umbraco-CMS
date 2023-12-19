@@ -19,6 +19,9 @@ export class UmbScriptWorkspaceEditorElement extends UmbLitElement {
 	@state()
 	private _ready?: boolean = false;
 
+	@state()
+	private _isNew?: boolean = false;
+
 	#scriptsWorkspaceContext?: UmbScriptWorkspaceContext;
 
 	constructor() {
@@ -41,6 +44,10 @@ export class UmbScriptWorkspaceEditorElement extends UmbLitElement {
 
 			this.observe(this.#scriptsWorkspaceContext.isCodeEditorReady, (isReady) => {
 				this._ready = isReady;
+			});
+
+			this.observe(this.#scriptsWorkspaceContext.isNew, (isNew) => {
+				this._isNew = isNew;
 			});
 		});
 	}
@@ -72,7 +79,8 @@ export class UmbScriptWorkspaceEditorElement extends UmbLitElement {
 					placeholder="Enter name..."
 					.value=${this._name}
 					@input=${this.#onNameInput}
-					label="Script name"></uui-input>
+					label="Script name"
+					?readonly=${this._isNew === false}></uui-input>
 				<small>/scripts/${this._path}</small>
 			</div>
 			<uui-box>
