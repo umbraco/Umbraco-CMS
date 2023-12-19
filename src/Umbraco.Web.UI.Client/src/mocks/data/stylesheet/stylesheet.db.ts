@@ -26,10 +26,6 @@ class UmbStylesheetData extends UmbFileSystemMockDbBase<UmbMockStylesheetModel> 
 		});
 	}
 
-	getStylesheet(path: string): StylesheetResponseModel | undefined {
-		return textFileItemMapper(this.data.find((item) => item.path === path));
-	}
-
 	getAllStylesheets(): PagedStylesheetOverviewResponseModel {
 		return {
 			items: this.data.map((item) => textFileItemMapper(item)),
