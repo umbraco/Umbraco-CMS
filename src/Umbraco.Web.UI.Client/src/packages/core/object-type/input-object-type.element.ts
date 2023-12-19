@@ -1,7 +1,7 @@
-import { html, customElement, property, query, state, nothing } from '@umbraco-cms/backoffice/external/lit';
-import { FormControlMixin, UUISelectElement, UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
+import { UmbObjectTypeRepository } from './object-type.repository.js';
+import { html, customElement, property, query, state } from '@umbraco-cms/backoffice/external/lit';
+import { FormControlMixin, UUISelectElement } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbObjectTypeRepository } from './object-type.repository';
 
 @customElement('umb-input-object-type')
 export class UmbInputObjectTypeElement extends FormControlMixin(UmbLitElement) {
