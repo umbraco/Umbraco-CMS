@@ -47,11 +47,7 @@ export class UmbStylesheetWorkspaceEditorElement extends UmbLitElement {
 
 	#observeNameAndPath() {
 		if (!this.#workspaceContext) return;
-		this.observe(
-			this.#workspaceContext.path,
-			(path) => (this._path = path?.replace(/\\/g, '/')),
-			'_observeStylesheetPath',
-		);
+		this.observe(this.#workspaceContext.path, (path) => (this._path = path), '_observeStylesheetPath');
 		this.observe(this.#workspaceContext.name, (name) => (this._name = name), '_observeStylesheetName');
 	}
 
