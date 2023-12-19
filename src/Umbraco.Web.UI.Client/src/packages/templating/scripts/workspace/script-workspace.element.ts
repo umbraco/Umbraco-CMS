@@ -18,7 +18,7 @@ export class UmbScriptWorkspaceElement extends UmbLitElement {
 			component: this.#createElement,
 			setup: async (component: PageComponent, info: IRoutingInfo) => {
 				const parentUnique = info.match.params.parentUnique === 'null' ? null : info.match.params.parentUnique;
-				this.#workspaceContext.create(parentUnique);
+				await this.#workspaceContext.create(parentUnique);
 
 				new UmbWorkspaceIsNewRedirectController(
 					this,
