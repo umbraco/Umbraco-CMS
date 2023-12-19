@@ -1,8 +1,8 @@
-import { umbMeta } from '@umbraco-cms/backoffice/meta';
 import { defaultExtendedValidElements, defaultFallbackConfig, defaultStyleFormats } from './input-tiny-mce.defaults.js';
 import { pastePreProcessHandler, uploadImageHandler } from './input-tiny-mce.handlers.js';
 import { availableLanguages } from './input-tiny-mce.languages.js';
 import { uriAttributeSanitizer } from './input-tiny-mce.sanitizer.js';
+import { umbMeta } from '@umbraco-cms/backoffice/meta';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import {
 	type Editor,
@@ -12,7 +12,7 @@ import {
 } from '@umbraco-cms/backoffice/external/tinymce';
 import { UMB_CURRENT_USER_CONTEXT, UmbCurrentUser } from '@umbraco-cms/backoffice/current-user';
 import { TinyMcePluginArguments, UmbTinyMcePluginBase } from '@umbraco-cms/backoffice/components';
-import { ClassConstructor, hasDefaultExport, loadManifestApi } from '@umbraco-cms/backoffice/extension-api';
+import { loadManifestApi } from '@umbraco-cms/backoffice/extension-api';
 import { ManifestTinyMcePlugin, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import {
 	PropertyValueMap,
@@ -30,7 +30,6 @@ import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/prope
 import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
 import { UmbStylesheetRepository } from '@umbraco-cms/backoffice/stylesheet';
 
-// TODO => integrate macro picker, update stylesheet fetch when backend CLI exists (ref tinymce.service.js in existing backoffice)
 @customElement('umb-input-tiny-mce')
 export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 	@property({ attribute: false })
