@@ -1,7 +1,9 @@
+import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 import { UmbBlockTypeBase } from '../../types.js';
-import { UmbBlockTypeInputContext } from './input-block-type.context.js';
 import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import { appendToFrozenArray } from '@umbraco-cms/backoffice/observable-api';
 
 @customElement('umb-input-block-type')
 export class UmbInputBlockTypeElement<BlockType extends UmbBlockTypeBase = UmbBlockTypeBase> extends UmbLitElement {
@@ -12,7 +14,7 @@ export class UmbInputBlockTypeElement<BlockType extends UmbBlockTypeBase = UmbBl
 		return this._items;
 	}
 	public set value(items) {
-		this._items = items;
+		this._items = items ?? [];
 	}
 
 	@state()
@@ -21,16 +23,38 @@ export class UmbInputBlockTypeElement<BlockType extends UmbBlockTypeBase = UmbBl
 	@state()
 	private _workspacePath?: string;
 
-	#context = new UmbBlockTypeInputContext<BlockType>(this, (workspacePath) => (this._workspacePath = workspacePath));
+	#blockTypeWorkspaceModalRegistration;
 
 	constructor() {
 		super();
 
-		this.observe(this.#context.types, (types) => {
-			const oldTypes = this._items;
-			this._items = types;
-			this.requestUpdate('_items', oldTypes);
-		});
+		this.#blockTypeWorkspaceModalRegistration = new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
+			.addAdditionalPath('block-type')
+			.onSetup(() => {
+				return { data: { entityType: 'block-type', preset: {} } };
+			})
+			// Set to any, to overwrite TS, as the Modal Token does not know about the type of the data. (We could make a Modal Token specific for this type, or a way to cast it more properly, but I skipped this for now.)
+			.onSubmit((value: any) => {
+				console.log('got', value);
+				this._items = appendToFrozenArray(this._items, value, (x) => x.contentElementTypeKey);
+			})
+			.observeRouteBuilder((routeBuilder) => {
+				const newpath = routeBuilder({});
+				console.log('_workspacePath', newpath);
+				this._workspacePath = newpath;
+			});
+	}
+
+	create() {
+		//TODO: make flow of picking a element type first, and then:
+		this.#blockTypeWorkspaceModalRegistration.open({}, 'create/element-type-key');
+		// TODO: Move to on submit:
+		this.getHostElement().dispatchEvent(new UmbChangeEvent());
+	}
+
+	requestRemoveItem(contentTypeKey: string) {
+		alert('request remove ' + contentTypeKey);
+		this.getHostElement().dispatchEvent(new UmbChangeEvent());
 	}
 
 	protected getFormElement() {
@@ -46,27 +70,27 @@ export class UmbInputBlockTypeElement<BlockType extends UmbBlockTypeBase = UmbBl
 
 	#renderButton() {
 		return html`
-			<uui-button id="add-button" look="placeholder" @click=${() => this.#context.create()} label="open">
+			<uui-button id="add-button" look="placeholder" @click=${() => this.create()} label="open">
 				<uui-icon name="icon-add"></uui-icon>
 				Add
 			</uui-button>
 		`;
 	}
 
-	#renderItem(item: BlockType) {
+	#renderItem = (item: BlockType) => {
 		return html`
 			<uui-card-block-type href="${this._workspacePath}/edit/${item.contentElementTypeKey}">
 				<uui-action-bar slot="actions">
 					<uui-button label="Copy media">
 						<uui-icon name="icon-documents"></uui-icon>
 					</uui-button>
-					<uui-button @click=${() => this.#context.requestRemoveItem(item.contentElementTypeKey)} label="Remove block">
+					<uui-button @click=${() => this.requestRemoveItem(item.contentElementTypeKey)} label="Remove block">
 						<uui-icon name="icon-trash"></uui-icon>
 					</uui-button>
 				</uui-action-bar>
 			</uui-card-block-type>
 		`;
-	}
+	};
 
 	static styles = [
 		css`

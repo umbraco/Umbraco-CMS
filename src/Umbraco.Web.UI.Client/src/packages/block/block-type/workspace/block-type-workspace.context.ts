@@ -87,12 +87,13 @@ export default class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlock
 	async setPropertyValue(alias: string, value: unknown) {
 		const currentData = this.#data.value;
 		if (currentData) {
-			this.#data.update({ ...currentData, contentElementTypeKey: value });
+			this.#data.update({ ...currentData, [alias]: value });
 		}
 	}
 
 	async save() {
 		if (!this.#data.value) return;
+
 		this.saveComplete(this.#data.value);
 	}
 
