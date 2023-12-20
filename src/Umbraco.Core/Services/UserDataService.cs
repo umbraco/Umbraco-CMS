@@ -23,7 +23,7 @@ public class UserDataService : IUserDataService
 
     [Obsolete($"Use {nameof(ISystemInformationService)} instead. Will be removed in V16.")]
     public IEnumerable<UserData> GetUserData() =>
-        _systemInformationService.GetSystemInformation().Select(kvp => new UserData(kvp.Key, kvp.Value)).ToArray();
+        _systemInformationService.GetTroubleshootingInformation().Select(kvp => new UserData(kvp.Key, kvp.Value)).ToArray();
 
     public bool IsRunningInProcessIIS()
     {

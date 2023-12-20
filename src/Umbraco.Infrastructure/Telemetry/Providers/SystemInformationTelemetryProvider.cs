@@ -94,7 +94,7 @@ internal class SystemInformationTelemetryProvider : IDetailedTelemetryProvider, 
         };
 
     /// <inheritdoc />
-    public IDictionary<string, string> GetSystemInformation() =>
+    public IDictionary<string, string> GetTroubleshootingInformation() =>
         new Dictionary<string, string>
         {
             { "Server OS", ServerOs },
