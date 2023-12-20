@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Cms.Api.Management.ViewModels.Server;
 
-public class ServerInformationItemResponseModel
+public class ServerTroubleshootingItemResponseModel
 {
     public required string Name { get; set; }
 
