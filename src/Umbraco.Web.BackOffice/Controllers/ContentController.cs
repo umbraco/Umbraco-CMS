@@ -826,6 +826,7 @@ public class ContentController : ContentControllerBase
     /// <param name="contentId">The content id to copy</param>
     /// <param name="name">The name of the blueprint</param>
     /// <returns></returns>
+    [Authorize(Policy = AuthorizationPolicies.ContentPermissionCreateBlueprintFromId)]
     [HttpPost]
     public ActionResult<SimpleNotificationModel> CreateBlueprintFromContent(
         [FromQuery] int contentId,
@@ -881,8 +882,9 @@ public class ContentController : ContentControllerBase
     /// <summary>
     ///     Saves content
     /// </summary>
+    [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
     [FileUploadCleanupFilter]
-    [ContentSaveValidation]
+    [ContentSaveValidation(skipUserAccessValidation:true)] // skip user access validation because we "only" require Settings access to create new blueprints from scratch
     public async Task<ActionResult<ContentItemDisplay<ContentVariantDisplay>?>?> PostSaveBlueprint(
         [ModelBinder(typeof(BlueprintItemBinder))] ContentItemSave contentItem)
     {
@@ -2077,6 +2079,7 @@ public class ContentController : ContentControllerBase
         return Ok();
     }
 
+    [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
     [HttpDelete]
     [HttpPost]
     public IActionResult DeleteBlueprint(int id)
