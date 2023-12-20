@@ -95,4 +95,7 @@ public interface IUserGroupService
     /// <param name="userKeys">The user whose groups we want to alter.</param>
     /// <returns>An attempt indicating if the operation was a success as well as a more detailed <see cref="UserGroupOperationStatus"/>.</returns>
     Task UpdateUserGroupsOnUsers(ISet<Guid> userGroupKeys, ISet<Guid> userKeys);
+
+    Task<UserGroupOperationStatus> AddUsersToUserGroup(UsersToUserGroupManipulationModel addUsersModel, Guid performingUserKey);
+    Task<UserGroupOperationStatus> RemoveUsersFromUserGroup(UsersToUserGroupManipulationModel removeUsersModel, Guid performingUserKey);
 }
