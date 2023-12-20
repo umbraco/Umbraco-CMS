@@ -11,11 +11,5 @@ public class PreviewService : IPreviewService
     public void EnterPreview() => _cookieManager.SetCookieValue(Constants.Web.PreviewCookieName, "preview");
 
 
-    public void ExitPreview()
-    {
-        _cookieManager.ExpireCookie(Constants.Web.PreviewCookieName);
-
-        // Expire Client-side cookie that determines whether the user has accepted to be in Preview Mode when visiting the website.
-        _cookieManager.ExpireCookie(Constants.Web.AcceptPreviewCookieName);
-    }
+    public void EndPreview() => _cookieManager.ExpireCookie(Constants.Web.PreviewCookieName);
 }

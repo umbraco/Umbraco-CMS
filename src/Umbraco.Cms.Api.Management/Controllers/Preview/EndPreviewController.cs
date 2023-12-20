@@ -1,9 +1,7 @@
 ﻿using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Web;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Preview;
 
@@ -16,9 +14,9 @@ public class EndPreviewController : PreviewControllerBase
     [HttpDelete]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public IActionResult Enter()
+    public IActionResult End()
     {
-        _previewService.ExitPreview();
+        _previewService.EndPreview();
         return Ok();
     }
 }

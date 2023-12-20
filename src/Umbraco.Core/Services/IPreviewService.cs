@@ -10,5 +10,5 @@ public interface IPreviewService
     /// <summary>
     /// Exits preview mode for a given user that calls this
     /// </summary>
-    void ExitPreview();
+    void EndPreview();
 }
