@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.ViewModels.Server;
-using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Server;
@@ -11,21 +10,28 @@ namespace Umbraco.Cms.Api.Management.Controllers.Server;
 public class TroubleshootingServerController : ServerControllerBase
 {
     private readonly ISystemInformationService _systemInformationService;
-    private readonly IUmbracoMapper _mapper;
 
+<<<<<<<< HEAD:src/Umbraco.Cms.Api.Management/Controllers/Server/InformationServerController.cs
+    public InformationServerController(ISystemInformationService systemInformationService)
+========
     public TroubleshootingServerController(ISystemInformationService systemInformationService, IUmbracoMapper mapper)
+>>>>>>>> origin/v14/feature/server-information:src/Umbraco.Cms.Api.Management/Controllers/Server/TroubleshootingServerController.cs
     {
         _systemInformationService = systemInformationService;
-        _mapper = mapper;
     }
 
     [HttpGet("troubleshooting")]
     [MapToApiVersion("1.0")]
+<<<<<<<< HEAD:src/Umbraco.Cms.Api.Management/Controllers/Server/InformationServerController.cs
     [ProducesResponseType(typeof(ServerTroubleshootingResponseModel), StatusCodes.Status200OK)]
+    public Task<IActionResult> Information() => Task.FromResult<IActionResult>(Ok(_systemInformationService.GetServerInformation()));
+========
+    [ProducesResponseType(typeof(ServerInformationResponseModel), StatusCodes.Status200OK)]
     public Task<IActionResult> GetTroubleshooting()
     {
-        ServerTroubleshootingResponseModel responseModel = _mapper.Map<ServerTroubleshootingResponseModel>(_systemInformationService.GetTroubleshootingInformation())!;
+        ServerInformationResponseModel responseModel = _mapper.Map<ServerInformationResponseModel>(_systemInformationService.GetTroubleshootingInformation())!;
 
         return Task.FromResult<IActionResult>(Ok(responseModel));
     }
+>>>>>>>> origin/v14/feature/server-information:src/Umbraco.Cms.Api.Management/Controllers/Server/TroubleshootingServerController.cs
 }
