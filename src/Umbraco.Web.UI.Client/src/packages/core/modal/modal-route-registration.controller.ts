@@ -9,6 +9,7 @@ export class UmbModalRouteRegistrationController<D extends object = object, R = 
 	implements UmbController
 {
 	//
+	#host;
 	#init;
 
 	#additionalPath?: string;
@@ -20,6 +21,9 @@ export class UmbModalRouteRegistrationController<D extends object = object, R = 
 	public get controllerAlias() {
 		return undefined;
 	}
+	protected getControllerHostElement() {
+		return this.#host.getHostElement();
+	}
 
 	/**
 	 * Creates an instance of UmbModalRouteRegistrationController.
@@ -29,6 +33,7 @@ export class UmbModalRouteRegistrationController<D extends object = object, R = 
 	 */
 	constructor(host: UmbControllerHost, alias: UmbModalToken<D, R> | string) {
 		super(alias, null);
+		this.#host = host;
 
 		this.#init = new UmbContextConsumerController(host, UMB_ROUTE_CONTEXT_TOKEN, (_routeContext) => {
 			this.#routeContext = _routeContext;

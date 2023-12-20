@@ -8,7 +8,12 @@ import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { UUIDialogElement, UUIModalDialogElement, UUIModalSidebarElement } from '@umbraco-cms/backoffice/external/uui';
 import { UmbRouterSlotElement } from '@umbraco-cms/backoffice/router';
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
-import { UmbContextProvider } from '@umbraco-cms/backoffice/context-api';
+import {
+	UMB_CONTENT_REQUEST_EVENT_TYPE,
+	UmbContextProvider,
+	UmbContextRequestEvent,
+	UmbContextRequestEventImplementation,
+} from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-modal')
 export class UmbModalElement extends UmbLitElement {
@@ -38,6 +43,20 @@ export class UmbModalElement extends UmbLitElement {
 		if (!this.#modalContext) return;
 
 		this.element = this.#createContainerElement();
+		if (this.#modalContext.originTarget) {
+			this.element.addEventListener(UMB_CONTENT_REQUEST_EVENT_TYPE, ((event: UmbContextRequestEvent) => {
+				if (!this.#modalContext) return;
+				if (this.#modalContext.originTarget) {
+					event.stopPropagation();
+					const clonedEvent = new UmbContextRequestEventImplementation(
+						event.contextAlias,
+						event.apiAlias,
+						event.callback,
+					);
+					this.#modalContext.originTarget.dispatchEvent(clonedEvent);
+				}
+			}) as EventListener);
+		}
 
 		this.#modalContext.onSubmit().then(
 			() => {

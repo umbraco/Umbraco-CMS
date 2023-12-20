@@ -18,10 +18,12 @@ export type UmbModalContextClassArgs<
 	data?: ModalAliasTypeAsToken['DATA'];
 	value?: ModalAliasTypeAsToken['VALUE'];
 	modal?: UmbModalConfig;
+	originTarget?: EventTarget;
 };
 
 // TODO: consider splitting this into two separate handlers
 export class UmbModalContext<ModalPreset extends object = object, ModalValue = any> extends EventTarget {
+	//
 	#submitPromise: Promise<ModalValue>;
 	#submitResolver?: (value: ModalValue) => void;
 	#submitRejecter?: (reason?: UmbModalRejectReason) => void;
@@ -31,6 +33,7 @@ export class UmbModalContext<ModalPreset extends object = object, ModalValue = a
 	public readonly type: UmbModalType = 'dialog';
 	public readonly size: UUIModalSidebarSize = 'small';
 	public readonly router: IRouterSlot | null = null;
+	public readonly originTarget?: EventTarget;
 	public readonly alias: string | UmbModalToken<ModalPreset, ModalValue>;
 
 	#value;
@@ -43,6 +46,7 @@ export class UmbModalContext<ModalPreset extends object = object, ModalValue = a
 		super();
 		this.key = args.modal?.key || UmbId.new();
 		this.router = args.router ?? null;
+		this.originTarget = args.originTarget;
 		this.alias = modalAlias;
 
 		if (this.alias instanceof UmbModalToken) {

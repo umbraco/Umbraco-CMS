@@ -34,9 +34,16 @@ export class UmbModalRouteRegistration<UmbModalTokenData extends object = object
 	#onSubmitCallback?: (data: UmbModalTokenValue) => void;
 	#onRejectCallback?: () => void;
 
-	#modalManagerContext: UmbModalContext<UmbModalTokenData, UmbModalTokenValue> | undefined;
+	#modalContext: UmbModalContext<UmbModalTokenData, UmbModalTokenValue> | undefined;
 	#routeBuilder?: UmbModalRouteBuilder;
 	#urlBuilderCallback: ((urlBuilder: UmbModalRouteBuilder) => void) | undefined;
+
+	/**
+	 * Should returns the host element of the modal, but this simple registration is not capable of that. So it has to be overwritten by a more specific implementation.
+	 */
+	protected getControllerHostElement(): EventTarget | undefined {
+		return undefined;
+	}
 
 	// Notice i removed the key in the transferring to this class.
 	constructor(modalAlias: UmbModalToken<UmbModalTokenData, UmbModalTokenValue> | string, path: string | null = null) {
@@ -69,7 +76,7 @@ export class UmbModalRouteRegistration<UmbModalTokenData extends object = object
 	 * Returns true if the modal is currently active.
 	 */
 	public get active() {
-		return !!this.#modalManagerContext;
+		return !!this.#modalContext;
 	}
 
 	public open(params: { [key: string]: string | number }, prepend?: string) {
@@ -82,7 +89,7 @@ export class UmbModalRouteRegistration<UmbModalTokenData extends object = object
 	 * Returns the modal handler if the modal is currently active. Otherwise its undefined.
 	 */
 	public get modalContext() {
-		return this.#modalManagerContext;
+		return this.#modalContext;
 	}
 
 	public observeRouteBuilder(callback: (urlBuilder: UmbModalRouteBuilder) => void) {
@@ -116,11 +123,11 @@ export class UmbModalRouteRegistration<UmbModalTokenData extends object = object
 
 	#onSubmit = (data: UmbModalTokenValue) => {
 		this.#onSubmitCallback?.(data);
-		this.#modalManagerContext = undefined;
+		this.#modalContext = undefined;
 	};
 	#onReject = () => {
 		this.#onRejectCallback?.();
-		this.#modalManagerContext = undefined;
+		this.#modalContext = undefined;
 	};
 
 	async routeSetup(router: IRouterSlot, modalManagerContext: UmbModalManagerContext, params: Params) {
@@ -133,12 +140,13 @@ export class UmbModalRouteRegistration<UmbModalTokenData extends object = object
 				modal: {},
 				...modalData,
 				router,
+				originTarget: this.getControllerHostElement(),
 			};
 			args.modal.key = this.#key;
 
-			this.#modalManagerContext = modalManagerContext.open(this.#modalAlias, args);
-			this.#modalManagerContext.onSubmit().then(this.#onSubmit, this.#onReject);
-			return this.#modalManagerContext;
+			this.#modalContext = modalManagerContext.open(this.#modalAlias, args);
+			this.#modalContext.onSubmit().then(this.#onSubmit, this.#onReject);
+			return this.#modalContext;
 		}
 		return null;
 	}

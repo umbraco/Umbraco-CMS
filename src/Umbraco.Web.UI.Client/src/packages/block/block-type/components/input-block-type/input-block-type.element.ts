@@ -33,14 +33,8 @@ export class UmbInputBlockTypeElement<BlockType extends UmbBlockTypeBase = UmbBl
 			.onSetup(() => {
 				return { data: { entityType: 'block-type', preset: {} } };
 			})
-			// Set to any, to overwrite TS, as the Modal Token does not know about the type of the data. (We could make a Modal Token specific for this type, or a way to cast it more properly, but I skipped this for now.)
-			.onSubmit((value: any) => {
-				console.log('got', value);
-				this._items = appendToFrozenArray(this._items, value, (x) => x.contentElementTypeKey);
-			})
 			.observeRouteBuilder((routeBuilder) => {
 				const newpath = routeBuilder({});
-				console.log('_workspacePath', newpath);
 				this._workspacePath = newpath;
 			});
 	}

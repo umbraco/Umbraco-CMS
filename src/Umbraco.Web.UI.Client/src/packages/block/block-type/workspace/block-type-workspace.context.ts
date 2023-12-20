@@ -1,12 +1,12 @@
 import type { UmbBlockTypeBase } from '../types.js';
-import { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
+import { UMB_PROPERTY_CONTEXT, UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import {
 	UmbInvariantableWorkspaceContextInterface,
 	UmbEditableWorkspaceContextBase,
 	UmbWorkspaceContextInterface,
 	UmbInvariantWorkspacePropertyDatasetContext,
 } from '@umbraco-cms/backoffice/workspace';
-import { UmbArrayState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState, UmbObjectState, appendToFrozenArray } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerHost, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { PropertyEditorConfigProperty } from '@umbraco-cms/backoffice/extension-registry';
@@ -36,22 +36,19 @@ export default class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlock
 
 	async load(unique: string) {
 		// TODO: Get data, this requires the ability to proxy to the property editor.
-		/*
-		if (data) {
-			this.setIsNew(false);
-			this.#data.update(data);
-		}
-		*/
+		console.log('load', unique);
+		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
+			this.observe(context.value, (value) => {
+				console.log('Got value from prop', value);
+			});
+		});
 	}
 
 	async create(contentElementTypeId: string) {
-		console.log('Contenxt Create', contentElementTypeId);
-		let data: BlockTypeData = {
+		const data: BlockTypeData = {
 			contentElementTypeKey: contentElementTypeId,
 		} as BlockTypeData;
-		if (this.modalContext) {
-			data = { ...data, ...this.modalContext.data.preset };
-		}
+
 		this.setIsNew(true);
 		this.#data.next(data);
 		return { data };
@@ -93,6 +90,15 @@ export default class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlock
 
 	async save() {
 		if (!this.#data.value) return;
+
+		console.log('Save!', this.#data.getValue());
+
+		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
+			// TODO: We should most likely consume already, in this way I avoid having the reset this consumption.
+			context.setValue(
+				appendToFrozenArray(context.getValue() ?? [], this.#data.getValue(), (x) => x?.contentElementTypeKey),
+			);
+		});
 
 		this.saveComplete(this.#data.value);
 	}

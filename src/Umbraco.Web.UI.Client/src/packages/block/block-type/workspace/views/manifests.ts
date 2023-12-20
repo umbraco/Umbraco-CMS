@@ -5,11 +5,11 @@ import type { ManifestWorkspaceAction, ManifestWorkspaceView } from '@umbraco-cm
 const workspaceActions: Array<ManifestWorkspaceAction> = [
 	{
 		type: 'workspaceAction',
-		alias: 'Umb.WorkspaceAction.DataType.Save',
-		name: 'Save Data Type Workspace Action',
+		alias: 'Umb.WorkspaceAction.BlockType.Save',
+		name: 'Save Block Type Workspace Action',
 		api: UmbSaveWorkspaceAction,
 		meta: {
-			label: 'Save',
+			label: 'Submit',
 			look: 'primary',
 			color: 'positive',
 		},
