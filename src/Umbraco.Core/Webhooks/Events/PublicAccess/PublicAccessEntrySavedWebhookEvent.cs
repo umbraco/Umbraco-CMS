@@ -18,7 +18,7 @@ public class PublicAccessEntrySavedWebhookEvent : WebhookEventBase<PublicAccessE
     {
     }
 
-    public override string Alias => "publicAccessEntrySaved";
+    public override string Alias => Constants.WebhookEvents.Aliases.PublicAccessEntrySaved;
 
     public override object? ConvertNotificationToRequestPayload(PublicAccessEntrySavedNotification notification)
         => notification.SavedEntities;

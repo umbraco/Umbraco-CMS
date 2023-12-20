@@ -23,7 +23,7 @@ public class MediaEmptiedRecycleBinWebhookEvent : WebhookEventContentBase<MediaE
     {
     }
 
-    public override string Alias => "mediaEmptiedRecycleBin";
+    public override string Alias => Constants.WebhookEvents.Aliases.MediaEmptiedRecycleBin;
 
     protected override IEnumerable<IMedia> GetEntitiesFromNotification(MediaEmptiedRecycleBinNotification notification) => notification.DeletedEntities;
 

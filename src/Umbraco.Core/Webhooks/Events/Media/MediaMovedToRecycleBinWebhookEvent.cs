@@ -23,7 +23,7 @@ public class MediaMovedToRecycleBinWebhookEvent : WebhookEventContentBase<MediaM
     {
     }
 
-    public override string Alias => "mediaMovedToRecycleBin";
+    public override string Alias => Constants.WebhookEvents.Aliases.MediaMovedToRecycleBin;
 
     protected override IEnumerable<IMedia> GetEntitiesFromNotification(MediaMovedToRecycleBinNotification notification) => notification.MoveInfoCollection.Select(x => x.Entity);
 

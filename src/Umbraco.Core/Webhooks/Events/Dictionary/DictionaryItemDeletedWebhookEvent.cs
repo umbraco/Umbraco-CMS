@@ -18,7 +18,7 @@ public class DictionaryItemDeletedWebhookEvent : WebhookEventBase<DictionaryItem
     {
     }
 
-    public override string Alias => "dictionaryItemDeleted";
+    public override string Alias => Constants.WebhookEvents.Aliases.DictionaryItemDeleted;
 
     public override object? ConvertNotificationToRequestPayload(DictionaryItemDeletedNotification notification)
         => notification.DeletedEntities;
