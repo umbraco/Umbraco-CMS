@@ -6,6 +6,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 @customElement('umb-input-block-type')
 export class UmbInputBlockTypeElement<BlockType extends UmbBlockTypeBase = UmbBlockTypeBase> extends UmbLitElement {
 	//
+
 	@property({ type: Array, attribute: false })
 	public get value() {
 		return this._items;
@@ -17,7 +18,10 @@ export class UmbInputBlockTypeElement<BlockType extends UmbBlockTypeBase = UmbBl
 	@state()
 	private _items: Array<BlockType> = [];
 
-	#context = new UmbBlockTypeInputContext<BlockType>(this);
+	@state()
+	private _workspacePath?: string;
+
+	#context = new UmbBlockTypeInputContext<BlockType>(this, (workspacePath) => (this._workspacePath = workspacePath));
 
 	constructor() {
 		super();
@@ -51,7 +55,7 @@ export class UmbInputBlockTypeElement<BlockType extends UmbBlockTypeBase = UmbBl
 
 	#renderItem(item: BlockType) {
 		return html`
-			<uui-card-block-type>
+			<uui-card-block-type href="${this._workspacePath}/edit/${item.contentElementTypeKey}">
 				<uui-action-bar slot="actions">
 					<uui-button label="Copy media">
 						<uui-icon name="icon-documents"></uui-icon>

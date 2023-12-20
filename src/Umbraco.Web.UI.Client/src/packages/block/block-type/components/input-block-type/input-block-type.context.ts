@@ -11,13 +11,16 @@ export class UmbBlockTypeInputContext<BlockType extends UmbBlockTypeBase = UmbBl
 
 	#blockTypeWorkspaceModalRegistration;
 
-	constructor(host: UmbControllerHostElement) {
+	constructor(host: UmbControllerHostElement, onWorkspaceRoutePathChanged: (routePath: string) => void) {
 		super(host, 'blockTypeInput');
 
 		this.#blockTypeWorkspaceModalRegistration = new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
 			.addAdditionalPath('block-type')
 			.onSetup(() => {
 				return { data: { entityType: 'block-type', preset: {} } };
+			})
+			.observeRouteBuilder((routeBuilder) => {
+				onWorkspaceRoutePathChanged(routeBuilder({}));
 			});
 	}
 
