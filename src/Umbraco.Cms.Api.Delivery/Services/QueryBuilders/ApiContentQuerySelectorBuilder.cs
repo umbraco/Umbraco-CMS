@@ -1,6 +1,4 @@
 using Examine;
-using Examine.Lucene.Providers;
-using Examine.Lucene.Search;
 using Examine.Search;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DeliveryApi;
@@ -30,9 +28,6 @@ internal sealed class ApiContentQuerySelectorBuilder
 
     public IBooleanOperation Build(SelectorOption selectorOption, IIndex index, string culture, ProtectedAccess protectedAccess, bool preview)
     {
-        // Needed for enabling leading wildcards searches
-        BaseLuceneSearcher searcher = index.Searcher as BaseLuceneSearcher ?? throw new InvalidOperationException($"Index searcher must be of type {nameof(BaseLuceneSearcher)}.");
-
         IQuery query = _queryFactory.CreateApiContentQuery(index);
 
         IBooleanOperation selectorOperation = selectorOption.Values.Length == 1
