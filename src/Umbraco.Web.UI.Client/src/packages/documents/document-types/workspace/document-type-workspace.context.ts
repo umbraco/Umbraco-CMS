@@ -16,7 +16,7 @@ import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 type EntityType = DocumentTypeResponseModel;
 export class UmbDocumentTypeWorkspaceContext
 	extends UmbEditableWorkspaceContextBase<UmbDocumentTypeDetailRepository, EntityType>
-	implements UmbSaveableWorkspaceContextInterface<EntityType | undefined>
+	implements UmbSaveableWorkspaceContextInterface
 {
 	// Draft is located in structure manager
 

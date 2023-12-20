@@ -1,6 +1,6 @@
-import { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import { UmbDataTypeDetailRepository } from '../repository/detail/data-type-detail.repository.js';
 import type { UmbDataTypeDetailModel } from '../types.js';
+import { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import {
 	UmbInvariantableWorkspaceContextInterface,
 	UmbEditableWorkspaceContextBase,
@@ -15,7 +15,7 @@ import {
 } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerHost, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { Observable, combineLatest, map } from '@umbraco-cms/backoffice/external/rxjs';
+import { combineLatest, map } from '@umbraco-cms/backoffice/external/rxjs';
 import {
 	PropertyEditorConfigDefaultData,
 	PropertyEditorConfigProperty,
@@ -25,7 +25,7 @@ import { UMB_PROPERTY_EDITOR_SCHEMA_ALIAS_DEFAULT } from '@umbraco-cms/backoffic
 
 export class UmbDataTypeWorkspaceContext
 	extends UmbEditableWorkspaceContextBase<UmbDataTypeDetailRepository, UmbDataTypeDetailModel>
-	implements UmbInvariantableWorkspaceContextInterface<UmbDataTypeDetailModel | undefined>
+	implements UmbInvariantableWorkspaceContextInterface
 {
 	#data = new UmbObjectState<UmbDataTypeDetailModel | undefined>(undefined);
 	readonly data = this.#data.asObservable();
@@ -37,8 +37,8 @@ export class UmbDataTypeWorkspaceContext
 	readonly propertyEditorUiAlias = this.#data.asObservablePart((data) => data?.propertyEditorUiAlias);
 	readonly propertyEditorSchemaAlias = this.#data.asObservablePart((data) => data?.propertyEditorAlias);
 
-	#properties = new UmbObjectState<Array<PropertyEditorConfigProperty> | undefined>(undefined);
-	readonly properties: Observable<Array<PropertyEditorConfigProperty> | undefined> = this.#properties.asObservable();
+	#properties = new UmbArrayState<PropertyEditorConfigProperty>([], (x) => x.alias);
+	readonly properties = this.#properties.asObservable();
 
 	private _propertyEditorSchemaConfigDefaultData: Array<PropertyEditorConfigDefaultData> = [];
 	private _propertyEditorUISettingsDefaultData: Array<PropertyEditorConfigDefaultData> = [];

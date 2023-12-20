@@ -11,7 +11,7 @@ import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 export class UmbMemberWorkspaceContext
 	extends UmbEditableWorkspaceContextBase<UmbMemberDetailRepository, UmbMemberDetailModel>
-	implements UmbSaveableWorkspaceContextInterface<UmbMemberDetailModel | undefined>
+	implements UmbSaveableWorkspaceContextInterface
 {
 	constructor(host: UmbControllerHostElement) {
 		super(host, UMB_MEMBER_WORKSPACE_ALIAS, new UmbMemberDetailRepository(host));

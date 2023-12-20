@@ -24,9 +24,7 @@ import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 type EntityType = DocumentResponseModel;
 export class UmbDocumentWorkspaceContext
 	extends UmbEditableWorkspaceContextBase<UmbDocumentRepository, EntityType>
-	implements
-		UmbVariantableWorkspaceContextInterface<EntityType | undefined>,
-		UmbPublishableWorkspaceContextInterface<EntityType | undefined>
+	implements UmbVariantableWorkspaceContextInterface, UmbPublishableWorkspaceContextInterface
 {
 	/**
 	 * The document is the current stored version of the document.

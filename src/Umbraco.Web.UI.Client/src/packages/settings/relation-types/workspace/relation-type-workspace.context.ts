@@ -10,7 +10,7 @@ import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 export class UmbRelationTypeWorkspaceContext
 	extends UmbEditableWorkspaceContextBase<UmbRelationTypeRepository, RelationTypeResponseModel>
-	implements UmbSaveableWorkspaceContextInterface<RelationTypeResponseModel | undefined>
+	implements UmbSaveableWorkspaceContextInterface
 {
 	#data = new UmbObjectState<RelationTypeResponseModel | undefined>(undefined);
 	readonly data = this.#data.asObservable();
