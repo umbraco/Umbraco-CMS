@@ -21,12 +21,11 @@ export class UmbPropertyEditorUIBlockListBlockConfigurationElement
 	public config?: UmbPropertyEditorConfigCollection;
 
 	render() {
-		return html`Hey
-			<umb-input-block-type
-				.value=${this.value}
-				@change=${(e: Event) => {
-					this.value = (e.target as UmbInputBlockTypeElement).value;
-				}}></umb-input-block-type>`;
+		return html`<umb-input-block-type
+			.value=${this.value}
+			@change=${(e: Event) => {
+				this.value = (e.target as UmbInputBlockTypeElement).value;
+			}}></umb-input-block-type>`;
 	}
 
 	static styles = [UmbTextStyles];
