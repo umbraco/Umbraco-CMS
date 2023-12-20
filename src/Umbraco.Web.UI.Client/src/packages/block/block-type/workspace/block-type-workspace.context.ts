@@ -11,7 +11,7 @@ import { UmbControllerHost, UmbControllerHostElement } from '@umbraco-cms/backof
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { PropertyEditorConfigProperty } from '@umbraco-cms/backoffice/extension-registry';
 
-export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeBase = UmbBlockTypeBase>
+export default class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeBase = UmbBlockTypeBase>
 	extends UmbEditableWorkspaceContextBase<never, BlockTypeData>
 	implements UmbInvariantableWorkspaceContextInterface
 {
@@ -45,6 +45,7 @@ export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeBase
 	}
 
 	async create(contentElementTypeId: string) {
+		console.log('Contenxt Create', contentElementTypeId);
 		let data: BlockTypeData = {
 			contentElementTypeKey: contentElementTypeId,
 		} as BlockTypeData;

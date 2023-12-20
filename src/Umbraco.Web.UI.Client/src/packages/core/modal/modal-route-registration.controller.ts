@@ -1,15 +1,14 @@
-// TODO: Be aware here we import a class from src!
 import { UmbModalRouteRegistration } from './modal-route-registration.js';
 import { UmbModalToken } from './token/index.js';
 import { UMB_ROUTE_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/router';
-import type { UmbControllerHostElement, UmbController } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbController, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 
 export class UmbModalRouteRegistrationController<D extends object = object, R = any>
 	extends UmbModalRouteRegistration<D, R>
 	implements UmbController
 {
-	//#host: UmbControllerHostInterface;
+	//
 	#init;
 
 	#additionalPath?: string;
@@ -28,7 +27,7 @@ export class UmbModalRouteRegistrationController<D extends object = object, R = 
 	 * @param {UmbModalToken} alias - The alias of the modal, this is used to identify the modal.
 	 * @memberof UmbModalRouteRegistrationController
 	 */
-	constructor(host: UmbControllerHostElement, alias: UmbModalToken<D, R> | string) {
+	constructor(host: UmbControllerHost, alias: UmbModalToken<D, R> | string) {
 		super(alias, null);
 
 		this.#init = new UmbContextConsumerController(host, UMB_ROUTE_CONTEXT_TOKEN, (_routeContext) => {
