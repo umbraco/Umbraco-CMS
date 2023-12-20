@@ -657,6 +657,7 @@ namespace Umbraco.Web.Editors
         /// <param name="contentId">The content id to copy</param>
         /// <param name="name">The name of the blueprint</param>
         /// <returns></returns>
+        [EnsureUserPermissionForContent("contentId", ActionCreateBlueprintFromContent.ActionLetter)]
         [HttpPost]
         public SimpleNotificationModel CreateBlueprintFromContent([FromUri] int contentId, [FromUri] string name)
         {
@@ -696,8 +697,9 @@ namespace Umbraco.Web.Editors
         /// Saves content
         /// </summary>
         /// <returns></returns>
+        [UmbracoTreeAuthorize(Constants.Trees.DocumentTypes)]
         [FileUploadCleanupFilter]
-        [ContentSaveValidation]
+        [ContentSaveValidation(skipUserAccessValidation:true)] // skip user access validation because we "only" require Settings access to create new blueprints from scratch
         public ContentItemDisplay PostSaveBlueprint([ModelBinder(typeof(BlueprintItemBinder))] ContentItemSave contentItem)
         {
             var contentItemDisplay = PostSaveInternal(contentItem,
@@ -1586,6 +1588,7 @@ namespace Umbraco.Web.Editors
 
         }
 
+        [UmbracoTreeAuthorize(Constants.Trees.DocumentTypes)]
         [HttpDelete]
         [HttpPost]
         public HttpResponseMessage DeleteBlueprint(int id)
