@@ -1,4 +1,5 @@
 import { type UmbMediaWorkspaceContext } from './media-workspace.context.js';
+import { UmbMediaWorkspaceEditorElement } from './media-workspace-editor.element.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
@@ -10,6 +11,7 @@ import { UmbWorkspaceIsNewRedirectController } from '@umbraco-cms/backoffice/wor
 @customElement('umb-media-workspace')
 export class UmbMediaWorkspaceElement extends UmbLitElement {
 	#workspaceContext?: UmbMediaWorkspaceContext;
+	#createElement = () => new UmbMediaWorkspaceEditorElement();
 
 	@state()
 	_routes: UmbRoute[] = [];
@@ -28,7 +30,7 @@ export class UmbMediaWorkspaceElement extends UmbLitElement {
 		this._routes = [
 			{
 				path: 'create/:parentId', //  /:mediaTypeKey
-				component: import('./media-workspace-editor.element.js'),
+				component: this.#createElement,
 				setup: async (_component, info) => {
 					// TODO: Remember the perspective of permissions here, we need to check if the user has access to create a document of this type under this parent?
 					const parentId = info.match.params.parentId === 'null' ? null : info.match.params.parentId;
@@ -44,7 +46,7 @@ export class UmbMediaWorkspaceElement extends UmbLitElement {
 			},
 			{
 				path: 'edit/:id',
-				component: import('./media-workspace-editor.element.js'),
+				component: this.#createElement,
 				setup: (_component, info) => {
 					const id = info.match.params.id;
 					this.#workspaceContext!.load(id);

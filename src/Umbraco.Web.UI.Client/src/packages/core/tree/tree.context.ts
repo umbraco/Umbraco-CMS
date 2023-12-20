@@ -30,6 +30,8 @@ export class UmbTreeContextBase<TreeItemType extends UmbTreeItemModelBase>
 	public repository?: UmbTreeRepository<TreeItemType>;
 	public selectableFilter?: (item: TreeItemType) => boolean = () => true;
 
+	public filter?: (item: TreeItemType) => boolean = () => true;
+
 	public readonly selection = new UmbSelectionManager(this._host);
 
 	#treeAlias?: string;

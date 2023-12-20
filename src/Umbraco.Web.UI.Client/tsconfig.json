@@ -89,6 +89,7 @@
 			"@umbraco-cms/backoffice/logviewer": ["src/packages/log-viewer/index.ts"],
 			"@umbraco-cms/backoffice/relation-type": ["./src/packages/settings/relation-types/index.ts"],
 			"@umbraco-cms/backoffice/tags": ["./src/packages/tags/index.ts"],
+			"@umbraco-cms/backoffice/static-file": ["./src/packages/static-file/index.ts"],
 
 			"@umbraco-cms/backoffice/dictionary": ["./src/packages/dictionary/dictionary/index.ts"],
 			"@umbraco-cms/backoffice/block": ["./src/packages/block/index.ts"],

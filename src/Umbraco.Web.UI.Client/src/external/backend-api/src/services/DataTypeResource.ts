@@ -37,6 +37,7 @@ export class DataTypeResource {
             responseHeader: 'Location',
             errors: {
                 400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
         });
@@ -58,6 +59,7 @@ export class DataTypeResource {
                 'id': id,
             },
             errors: {
+                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
         });
@@ -80,6 +82,7 @@ export class DataTypeResource {
             },
             errors: {
                 400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
         });
@@ -106,6 +109,7 @@ export class DataTypeResource {
             mediaType: 'application/json',
             errors: {
                 400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
         });
@@ -132,6 +136,7 @@ export class DataTypeResource {
             mediaType: 'application/json',
             responseHeader: 'Location',
             errors: {
+                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
         });
@@ -153,6 +158,7 @@ export class DataTypeResource {
                 'id': id,
             },
             errors: {
+                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
         });
@@ -178,6 +184,7 @@ export class DataTypeResource {
             body: requestBody,
             mediaType: 'application/json',
             errors: {
+                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
         });
@@ -199,6 +206,7 @@ export class DataTypeResource {
                 'id': id,
             },
             errors: {
+                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
         });
@@ -221,6 +229,7 @@ export class DataTypeResource {
             responseHeader: 'Location',
             errors: {
                 400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
         });
@@ -242,6 +251,7 @@ export class DataTypeResource {
                 'id': id,
             },
             errors: {
+                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
         });
@@ -264,6 +274,7 @@ export class DataTypeResource {
             },
             errors: {
                 400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
         });
@@ -290,6 +301,7 @@ export class DataTypeResource {
             mediaType: 'application/json',
             errors: {
                 400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
         });
@@ -310,6 +322,9 @@ export class DataTypeResource {
             query: {
                 'id': id,
             },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -327,6 +342,9 @@ export class DataTypeResource {
             url: '/umbraco/management/api/v1/data-type/item/{alias}',
             path: {
                 'alias': alias,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }
@@ -355,6 +373,9 @@ export class DataTypeResource {
                 'take': take,
                 'foldersOnly': foldersOnly,
             },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -378,6 +399,9 @@ export class DataTypeResource {
                 'skip': skip,
                 'take': take,
                 'foldersOnly': foldersOnly,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }

@@ -2,6 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { ServerInformationResponseModel } from '../models/ServerInformationResponseModel';
 import type { ServerStatusResponseModel } from '../models/ServerStatusResponseModel';
 import type { VersionResponseModel } from '../models/VersionResponseModel';
 
@@ -10,6 +11,20 @@ import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
 
 export class ServerResource {
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getServerInformation(): CancelablePromise<ServerInformationResponseModel> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/server/information',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
+        });
+    }
 
     /**
      * @returns any Success
@@ -35,6 +50,7 @@ export class ServerResource {
             url: '/umbraco/management/api/v1/server/version',
             errors: {
                 400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }

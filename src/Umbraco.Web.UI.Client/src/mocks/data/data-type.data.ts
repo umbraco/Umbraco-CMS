@@ -34,8 +34,8 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 		id: '0cc0eba1-9960-42c9-bf9b-60e150b429ae',
 		parentId: null,
 		name: 'Textstring',
-		propertyEditorAlias: 'Umbraco.TextBox',
-		propertyEditorUiAlias: 'Umb.PropertyEditorUi.TextBox',
+		editorAlias: 'Umbraco.TextBox',
+		editorUiAlias: 'Umb.PropertyEditorUi.TextBox',
 		values: [],
 	},
 	{
@@ -43,8 +43,8 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 		name: 'Text',
 		id: 'dt-textBox',
 		parentId: null,
-		propertyEditorAlias: 'Umbraco.TextBox',
-		propertyEditorUiAlias: 'Umb.PropertyEditorUi.TextBox',
+		editorAlias: 'Umbraco.TextBox',
+		editorUiAlias: 'Umb.PropertyEditorUi.TextBox',
 		values: [
 			{
 				alias: 'maxChars',
@@ -57,8 +57,8 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 		name: 'Text Area',
 		id: 'dt-textArea',
 		parentId: null,
-		propertyEditorAlias: 'Umbraco.TextArea',
-		propertyEditorUiAlias: 'Umb.PropertyEditorUi.TextArea',
+		editorAlias: 'Umbraco.TextArea',
+		editorUiAlias: 'Umb.PropertyEditorUi.TextArea',
 		values: [],
 	},
 	{
@@ -66,8 +66,8 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 		name: 'My JS Property Editor',
 		id: 'dt-custom',
 		parentId: null,
-		propertyEditorAlias: 'Umbraco.Label',
-		propertyEditorUiAlias: 'My.PropertyEditorUI.Custom',
+		editorAlias: 'Umbraco.Label',
+		editorUiAlias: 'My.PropertyEditorUI.Custom',
 		values: [],
 	},
 	{
@@ -75,8 +75,8 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 		name: 'Color Picker',
 		id: 'dt-colorPicker',
 		parentId: null,
-		propertyEditorAlias: 'Umbraco.ColorPicker',
-		propertyEditorUiAlias: 'Umb.PropertyEditorUi.ColorPicker',
+		editorAlias: 'Umbraco.ColorPicker',
+		editorUiAlias: 'Umb.PropertyEditorUi.ColorPicker',
 		values: [
 			{
 				alias: 'useLabel',
@@ -130,8 +130,8 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 		name: 'Content Picker',
 		id: 'dt-contentPicker',
 		parentId: null,
-		propertyEditorAlias: 'Umbraco.ContentPicker',
-		propertyEditorUiAlias: 'Umb.PropertyEditorUi.DocumentPicker',
+		editorAlias: 'Umbraco.ContentPicker',
+		editorUiAlias: 'Umb.PropertyEditorUi.DocumentPicker',
 		values: [
 			{
 				alias: 'validationLimit',
@@ -144,8 +144,8 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 		name: 'Eye Dropper',
 		id: 'dt-eyeDropper',
 		parentId: null,
-		propertyEditorAlias: 'Umbraco.ColorPicker.EyeDropper',
-		propertyEditorUiAlias: 'Umb.PropertyEditorUi.EyeDropper',
+		editorAlias: 'Umbraco.ColorPicker.EyeDropper',
+		editorUiAlias: 'Umb.PropertyEditorUi.EyeDropper',
 		values: [
 			{
 				//showPalette
@@ -180,8 +180,8 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 		name: 'Multi URL Picker',
 		id: 'dt-multiUrlPicker',
 		parentId: null,
-		propertyEditorAlias: 'Umbraco.MultiUrlPicker',
-		propertyEditorUiAlias: 'Umb.PropertyEditorUi.MultiUrlPicker',
+		editorAlias: 'Umbraco.MultiUrlPicker',
+		editorUiAlias: 'Umb.PropertyEditorUi.MultiUrlPicker',
 		values: [
 			{
 				alias: 'overlaySize',
@@ -210,8 +210,8 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 		name: 'Multi Node Tree Picker',
 		id: 'dt-multiNodeTreePicker',
 		parentId: null,
-		propertyEditorAlias: 'Umbraco.MultiNodeTreePicker',
-		propertyEditorUiAlias: 'Umb.PropertyEditorUi.TreePicker',
+		editorAlias: 'Umbraco.MultiNodeTreePicker',
+		editorUiAlias: 'Umb.PropertyEditorUi.TreePicker',
 		values: [
 			{
 				alias: 'startNode',
@@ -247,8 +247,8 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 		name: 'Date Picker',
 		id: 'dt-datePicker',
 		parentId: null,
-		propertyEditorAlias: 'Umbraco.DateTime',
-		propertyEditorUiAlias: 'Umb.PropertyEditorUi.DatePicker',
+		editorAlias: 'Umbraco.DateTime',
+		editorUiAlias: 'Umb.PropertyEditorUi.DatePicker',
 		values: [
 			{
 				alias: 'format',
@@ -269,7 +269,7 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 		name: 'Date Picker With Time',
 		id: 'dt-datePicker-time',
 		parentId: null,
-		propertyEditorAlias: 'Umbraco.DateTime',
+		editorAlias: 'Umbraco.DateTime',
 		values: [
 			{
 				alias: 'format',
@@ -286,8 +286,8 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 		name: 'Time',
 		id: 'dt-time',
 		parentId: null,
-		propertyEditorAlias: 'Umbraco.DateTime',
-		propertyEditorUiAlias: 'Umb.PropertyEditorUi.DatePicker',
+		editorAlias: 'Umbraco.DateTime',
+		editorUiAlias: 'Umb.PropertyEditorUi.DatePicker',
 		values: [
 			{
 				alias: 'format',
@@ -304,8 +304,8 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 		name: 'Email',
 		id: 'dt-email',
 		parentId: null,
-		propertyEditorAlias: 'Umbraco.EmailAddress',
-		propertyEditorUiAlias: 'Umb.PropertyEditorUi.Email',
+		editorAlias: 'Umbraco.EmailAddress',
+		editorUiAlias: 'Umb.PropertyEditorUi.Email',
 		values: [
 			{
 				alias: 'inputMode',
@@ -318,8 +318,8 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 		name: 'Multiple Text String',
 		id: 'dt-multipleTextString',
 		parentId: null,
-		propertyEditorAlias: 'Umbraco.MultipleTextString',
-		propertyEditorUiAlias: 'Umb.PropertyEditorUi.MultipleTextString',
+		editorAlias: 'Umbraco.MultipleTextString',
+		editorUiAlias: 'Umb.PropertyEditorUi.MultipleTextString',
 		values: [
 			{
 				alias: 'minNumber',
@@ -336,8 +336,8 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 		name: 'Dropdown',
 		id: 'dt-dropdown',
 		parentId: null,
-		propertyEditorAlias: 'Umbraco.DropDown.Flexible',
-		propertyEditorUiAlias: 'Umb.PropertyEditorUi.Dropdown',
+		editorAlias: 'Umbraco.DropDown.Flexible',
+		editorUiAlias: 'Umb.PropertyEditorUi.Dropdown',
 		values: [
 			{
 				alias: 'multiple',
@@ -358,8 +358,8 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 		name: 'Slider',
 		id: 'dt-slider',
 		parentId: null,
-		propertyEditorAlias: 'Umbraco.Slider',
-		propertyEditorUiAlias: 'Umb.PropertyEditorUi.Slider',
+		editorAlias: 'Umbraco.Slider',
+		editorUiAlias: 'Umb.PropertyEditorUi.Slider',
 		values: [
 			{
 				alias: 'enableRange',
@@ -392,8 +392,8 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 		name: 'Toggle',
 		id: 'dt-toggle',
 		parentId: null,
-		propertyEditorAlias: 'Umbraco.TrueFalse',
-		propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
+		editorAlias: 'Umbraco.TrueFalse',
+		editorUiAlias: 'Umb.PropertyEditorUi.Toggle',
 		values: [
 			{
 				alias: 'default',
@@ -418,8 +418,8 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 		name: 'Tags',
 		id: 'dt-tags',
 		parentId: null,
-		propertyEditorAlias: 'Umbraco.Tags',
-		propertyEditorUiAlias: 'Umb.PropertyEditorUi.Tags',
+		editorAlias: 'Umbraco.Tags',
+		editorUiAlias: 'Umb.PropertyEditorUi.Tags',
 		values: [
 			{
 				alias: 'group',
@@ -436,8 +436,8 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 		name: 'Markdown Editor',
 		id: 'dt-markdownEditor',
 		parentId: null,
-		propertyEditorAlias: 'Umbraco.MarkdownEditor',
-		propertyEditorUiAlias: 'Umb.PropertyEditorUi.MarkdownEditor',
+		editorAlias: 'Umbraco.MarkdownEditor',
+		editorUiAlias: 'Umb.PropertyEditorUi.MarkdownEditor',
 		values: [],
 	},
 	{
@@ -445,8 +445,8 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 		name: 'Radio Button List',
 		id: 'dt-radioButtonList',
 		parentId: null,
-		propertyEditorAlias: 'Umbraco.RadioButtonList',
-		propertyEditorUiAlias: 'Umb.PropertyEditorUi.RadioButtonList',
+		editorAlias: 'Umbraco.RadioButtonList',
+		editorUiAlias: 'Umb.PropertyEditorUi.RadioButtonList',
 		values: [
 			{
 				alias: 'items',
@@ -463,8 +463,8 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 		name: 'Checkbox List',
 		id: 'dt-checkboxList',
 		parentId: null,
-		propertyEditorAlias: 'Umbraco.CheckboxList',
-		propertyEditorUiAlias: 'Umb.PropertyEditorUi.CheckboxList',
+		editorAlias: 'Umbraco.CheckboxList',
+		editorUiAlias: 'Umb.PropertyEditorUi.CheckboxList',
 		values: [
 			{
 				alias: 'items',
@@ -481,8 +481,8 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 		name: 'Block List',
 		id: 'dt-blockList',
 		parentId: null,
-		propertyEditorAlias: 'Umbraco.BlockList',
-		propertyEditorUiAlias: 'Umb.PropertyEditorUi.BlockList',
+		editorAlias: 'Umbraco.BlockList',
+		editorUiAlias: 'Umb.PropertyEditorUi.BlockList',
 		values: [],
 	},
 	{
@@ -490,8 +490,8 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 		name: 'Media Picker',
 		id: 'dt-mediaPicker',
 		parentId: null,
-		propertyEditorAlias: 'Umbraco.MediaPicker3',
-		propertyEditorUiAlias: 'Umb.PropertyEditorUi.MediaPicker',
+		editorAlias: 'Umbraco.MediaPicker3',
+		editorUiAlias: 'Umb.PropertyEditorUi.MediaPicker',
 		values: [],
 	},
 	{
@@ -499,8 +499,8 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 		name: 'Image Cropper',
 		id: 'dt-imageCropper',
 		parentId: null,
-		propertyEditorAlias: 'Umbraco.ImageCropper',
-		propertyEditorUiAlias: 'Umb.PropertyEditorUi.ImageCropper',
+		editorAlias: 'Umbraco.ImageCropper',
+		editorUiAlias: 'Umb.PropertyEditorUi.ImageCropper',
 		values: [
 			{
 				alias: 'crops',
@@ -529,8 +529,8 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 		name: 'Upload Field',
 		id: 'dt-uploadField',
 		parentId: null,
-		propertyEditorAlias: 'Umbraco.UploadField',
-		propertyEditorUiAlias: 'Umb.PropertyEditorUi.UploadField',
+		editorAlias: 'Umbraco.UploadField',
+		editorUiAlias: 'Umb.PropertyEditorUi.UploadField',
 		values: [
 			{
 				alias: 'fileExtensions',
@@ -547,8 +547,8 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 		name: 'Block Grid',
 		id: 'dt-blockGrid',
 		parentId: null,
-		propertyEditorAlias: 'Umbraco.BlockGrid',
-		propertyEditorUiAlias: 'Umb.PropertyEditorUi.BlockGrid',
+		editorAlias: 'Umbraco.BlockGrid',
+		editorUiAlias: 'Umb.PropertyEditorUi.BlockGrid',
 		values: [],
 	},
 	{
@@ -556,8 +556,8 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 		name: 'Collection View',
 		id: 'dt-collectionView',
 		parentId: null,
-		propertyEditorAlias: 'Umbraco.ListView',
-		propertyEditorUiAlias: 'Umb.PropertyEditorUi.CollectionView',
+		editorAlias: 'Umbraco.ListView',
+		editorUiAlias: 'Umb.PropertyEditorUi.CollectionView',
 		values: [],
 	},
 	{
@@ -565,8 +565,8 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 		name: 'Icon Picker',
 		id: 'dt-iconPicker',
 		parentId: null,
-		propertyEditorAlias: 'Umbraco.IconPicker',
-		propertyEditorUiAlias: 'Umb.PropertyEditorUi.IconPicker',
+		editorAlias: 'Umbraco.IconPicker',
+		editorUiAlias: 'Umb.PropertyEditorUi.IconPicker',
 		values: [],
 	},
 	{
@@ -574,8 +574,8 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 		name: 'Rich Text Editor',
 		id: 'dt-richTextEditor',
 		parentId: null,
-		propertyEditorAlias: 'Umbraco.RichText',
-		propertyEditorUiAlias: 'Umb.PropertyEditorUi.TinyMCE',
+		editorAlias: 'Umbraco.RichText',
+		editorUiAlias: 'Umb.PropertyEditorUi.TinyMCE',
 		values: [
 			{
 				alias: 'hideLabel',
@@ -652,8 +652,8 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 		name: 'Label',
 		id: 'dt-label',
 		parentId: null,
-		propertyEditorAlias: 'Umbraco.Label',
-		propertyEditorUiAlias: 'Umb.PropertyEditorUi.Label',
+		editorAlias: 'Umbraco.Label',
+		editorUiAlias: 'Umb.PropertyEditorUi.Label',
 		values: [],
 	},
 	{
@@ -661,8 +661,8 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 		name: 'Integer',
 		id: 'dt-integer',
 		parentId: null,
-		propertyEditorAlias: 'Umbraco.Integer',
-		propertyEditorUiAlias: 'Umb.PropertyEditorUi.Integer',
+		editorAlias: 'Umbraco.Integer',
+		editorUiAlias: 'Umb.PropertyEditorUi.Integer',
 		values: [],
 	},
 	{
@@ -670,8 +670,8 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 		name: 'Decimal',
 		id: 'dt-decimal',
 		parentId: null,
-		propertyEditorAlias: 'Umbraco.Decimal',
-		propertyEditorUiAlias: 'Umb.PropertyEditorUi.Decimal',
+		editorAlias: 'Umbraco.Decimal',
+		editorUiAlias: 'Umb.PropertyEditorUi.Decimal',
 		values: [
 			{
 				alias: 'step',
@@ -684,8 +684,8 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 		name: 'User Picker',
 		id: 'dt-userPicker',
 		parentId: null,
-		propertyEditorAlias: 'Umbraco.UserPicker',
-		propertyEditorUiAlias: 'Umb.PropertyEditorUi.UserPicker',
+		editorAlias: 'Umbraco.UserPicker',
+		editorUiAlias: 'Umb.PropertyEditorUi.UserPicker',
 		values: [],
 	},
 	{
@@ -693,8 +693,8 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 		name: 'Member Picker',
 		id: 'dt-memberPicker',
 		parentId: null,
-		propertyEditorAlias: 'Umbraco.MemberPicker',
-		propertyEditorUiAlias: 'Umb.PropertyEditorUi.MemberPicker',
+		editorAlias: 'Umbraco.MemberPicker',
+		editorUiAlias: 'Umb.PropertyEditorUi.MemberPicker',
 		values: [],
 	},
 	{
@@ -702,8 +702,8 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 		name: 'Member Group Picker',
 		id: 'dt-memberGroupPicker',
 		parentId: null,
-		propertyEditorAlias: 'Umbraco.MemberGroupPicker',
-		propertyEditorUiAlias: 'Umb.PropertyEditorUi.MemberGroupPicker',
+		editorAlias: 'Umbraco.MemberGroupPicker',
+		editorUiAlias: 'Umb.PropertyEditorUi.MemberGroupPicker',
 		values: [],
 	},
 	{
@@ -711,8 +711,17 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 		name: 'Data Type in folder',
 		id: 'dt-data-type-in-folder',
 		parentId: 'dt-folder2',
-		propertyEditorAlias: 'Umbraco.MemberGroupPicker',
-		propertyEditorUiAlias: 'Umb.PropertyEditorUi.MemberGroupPicker',
+		editorAlias: 'Umbraco.MemberGroupPicker',
+		editorUiAlias: 'Umb.PropertyEditorUi.MemberGroupPicker',
+		values: [],
+	},
+	{
+		type: 'data-type',
+		name: 'Static File Picker',
+		id: 'dt-staticFilePicker',
+		parentId: null,
+		editorAlias: 'Umbraco.Label',
+		editorUiAlias: 'Umb.PropertyEditorUi.StaticFilePicker',
 		values: [],
 	},
 ];

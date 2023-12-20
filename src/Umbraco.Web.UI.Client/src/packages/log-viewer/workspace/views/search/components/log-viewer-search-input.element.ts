@@ -10,6 +10,7 @@ import {
 	UmbModalManagerContext,
 	UmbModalContext,
 	UmbModalToken,
+	UMB_CONFIRM_MODAL,
 } from '@umbraco-cms/backoffice/modal';
 
 import './log-viewer-search-input-modal.element.js';
@@ -130,7 +131,19 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 	}
 
 	#removeSearch(name: string) {
-		this.#logViewerContext?.removeSearch({ name });
+		const modalContext = this._modalContext?.open(UMB_CONFIRM_MODAL, {
+			data: {
+				headline: this.localize.term('logViewer_deleteSavedSearch'),
+				content: `${this.localize.term('defaultdialogs_confirmdelete')} ${name}?`,
+				color: 'danger',
+				confirmLabel: 'Delete',
+			},
+		});
+
+		modalContext?.onSubmit().then(() => {
+			this.#logViewerContext?.removeSearch({ name });
+			//this.dispatchEvent(new UmbDeleteEvent());
+		});
 	}
 
 	#openSaveSearchDialog() {
@@ -168,8 +181,8 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 								><uui-icon name="icon-delete"></uui-icon
 							></uui-button>`
 					: html``}
-				<umb-dropdown id="search-dropdown" slot="append" label="Saved searches">
-					<span slot="label">Saved searches</span>
+				<umb-dropdown id="search-dropdown" slot="append" label=${this.localize.term('logViewer_savedSearches')}>
+					<span slot="label"><umb-localize key="logViewer_savedSearches">Saved searches</umb-localize></span>
 					<uui-scroll-container id="saved-searches-container" role="list">
 						${this._savedSearches.map(
 							(search) =>

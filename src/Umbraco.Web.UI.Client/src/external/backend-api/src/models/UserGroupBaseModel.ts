@@ -10,7 +10,9 @@ export type UserGroupBaseModel = {
     languages: Array<string>;
     hasAccessToAllLanguages: boolean;
     documentStartNodeId?: string | null;
+    documentRootAccess: boolean;
     mediaStartNodeId?: string | null;
+    mediaRootAccess: boolean;
     permissions: Array<string>;
 };
 
