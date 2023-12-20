@@ -134,17 +134,12 @@ export class UmbLogViewerWorkspaceContext extends UmbBaseController implements U
 		}
 		this.setLogLevelsFilter(validLogLevels);
 
-		const dateRange: Partial<LogViewerDateRange> = {};
+		const dateRange: LogViewerDateRange = this.getDateRange() as LogViewerDateRange;
 
-		if (searchQuery.startDate) {
-			dateRange.startDate = searchQuery.startDate;
-		}
-
-		if (searchQuery.endDate) {
-			dateRange.endDate = searchQuery.endDate;
-		}
-
-		this.setDateRange(dateRange);
+		this.setDateRange({
+			startDate: searchQuery.startDate || dateRange.startDate,
+			endDate: searchQuery.endDate || dateRange.endDate,
+		});
 
 		this.setCurrentPage(searchQuery.page ? Number(searchQuery.page) : 1);
 
@@ -167,6 +162,10 @@ export class UmbLogViewerWorkspaceContext extends UmbBaseController implements U
 		this.validateLogSize();
 		this.getLogCount();
 		this.getMessageTemplates(0, 10);
+	}
+
+	getDateRange() {
+		return this.#dateRange.getValue();
 	}
 
 	async getSavedSearches() {
