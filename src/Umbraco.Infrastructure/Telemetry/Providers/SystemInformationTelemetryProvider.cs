@@ -111,6 +111,15 @@ internal class SystemInformationTelemetryProvider : IDetailedTelemetryProvider, 
             { "Current Server Role", CurrentServerRole },
         };
 
+    public IDictionary<string, object> GetServerInformation() =>
+    new Dictionary<string, object>
+    {
+        { "version", _version.SemanticVersion.ToSemanticString() },
+        { "assemblyVersion", _version.SemanticVersion.ToSemanticStringWithoutBuild() },
+        { "serverTimeOffset", 60 },
+        { "runtimeMode", RuntimeMode },
+    };
+
     private string GetWebServerName()
     {
         var processName = Path.GetFileNameWithoutExtension(Process.GetCurrentProcess().ProcessName);
