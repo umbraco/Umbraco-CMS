@@ -46,11 +46,16 @@ export class UmbInputBlockTypeElement<BlockType extends UmbBlockTypeBase = UmbBl
 	create() {
 		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, async (modalManager) => {
 			if (modalManager) {
+				// TODO: Make as mode for the Picker Modal, so the click to select immediately submits the modal(And in that mode we do not want to see a Submit button).
 				const modalContext = modalManager.open(UMB_DOCUMENT_TYPE_PICKER_MODAL, {
 					data: {
 						hideTreeRoot: true,
 						multiple: false,
-						pickableFilter: (x) => x.isElement,
+						pickableFilter: (docType) =>
+							// Only pick elements:
+							docType.isElement &&
+							// Prevent picking the an already used element type:
+							this._items.find((x) => x.contentElementTypeKey === docType.id) === undefined,
 					},
 				});
 
