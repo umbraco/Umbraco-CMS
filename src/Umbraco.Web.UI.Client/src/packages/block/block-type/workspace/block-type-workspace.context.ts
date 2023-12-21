@@ -11,7 +11,7 @@ import { UmbControllerHost, UmbControllerHostElement } from '@umbraco-cms/backof
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { PropertyEditorConfigProperty } from '@umbraco-cms/backoffice/extension-registry';
 
-export default class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeBase = UmbBlockTypeBase>
+export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeBase = UmbBlockTypeBase>
 	extends UmbEditableWorkspaceContextBase<never, BlockTypeData>
 	implements UmbInvariantableWorkspaceContextInterface
 {
@@ -111,6 +111,8 @@ export default class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlock
 		this.#data.destroy();
 	}
 }
+
+export default UmbBlockTypeWorkspaceContext;
 
 export const UMB_BLOCK_TYPE_WORKSPACE_CONTEXT = new UmbContextToken<
 	UmbWorkspaceContextInterface,
