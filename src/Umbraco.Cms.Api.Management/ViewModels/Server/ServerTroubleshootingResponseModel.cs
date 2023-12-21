@@ -1,6 +1,5 @@
 ﻿namespace Umbraco.Cms.Api.Management.ViewModels.Server;
 
-public class ServerTroubleshootingResponseModel
+public class ServerTroubleshootingResponseModel : ServerConfigurationBaseModel
 {
-    public required IEnumerable<ServerTroubleshootingItemResponseModel> Items { get; set; }
 }

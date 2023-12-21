@@ -2,5 +2,5 @@
 
 public class ServerConfigurationBaseModel
 {
-    public IDictionary<string, object> Items { get; set; } = new Dictionary<string, object>();
+    public IEnumerable<ServerConfigurationItemResponseModel> Items { get; set; } = Enumerable.Empty<ServerConfigurationItemResponseModel>();
 }

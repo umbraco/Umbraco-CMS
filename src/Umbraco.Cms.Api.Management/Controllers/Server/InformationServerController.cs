@@ -1,6 +1,8 @@
 ﻿using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Management.ViewModels.Server;
+using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Server;
@@ -9,14 +11,21 @@ namespace Umbraco.Cms.Api.Management.Controllers.Server;
 public class InformationServerController : ServerControllerBase
 {
     private readonly ISystemInformationService _systemInformationService;
+    private readonly IUmbracoMapper _umbracoMapper;
 
-    public InformationServerController(ISystemInformationService systemInformationService)
+    public InformationServerController(ISystemInformationService systemInformationService, IUmbracoMapper umbracoMapper)
     {
         _systemInformationService = systemInformationService;
+        _umbracoMapper = umbracoMapper;
     }
 
     [HttpGet("information")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(Dictionary<string, object>), StatusCodes.Status200OK)]
-    public Task<IActionResult> Information() => Task.FromResult<IActionResult>(Ok(_systemInformationService.GetServerInformation()));
+    public Task<IActionResult> Information()
+    {
+        ServerInformationResponseModel responseModel = _umbracoMapper.Map<ServerInformationResponseModel>(_systemInformationService.GetServerInformation())!;
+
+        return Task.FromResult<IActionResult>(Ok(responseModel));
+    }
 }
