@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Webhooks;
 using Umbraco.Cms.Web.Common.Models;
@@ -17,6 +17,7 @@ public class WebhookMapDefinition : IMapDefinition
     // Umbraco.Code.MapAll -CreateDate -DeleteDate -Id -Key -UpdateDate
     private void Map(WebhookViewModel source, IWebhook target, MapperContext context)
     {
+        target.Id = source.Id;
         target.ContentTypeKeys = source.ContentTypeKeys;
         target.Events = source.Events.Select(x => x.Alias).ToArray();
         target.Url = source.Url;
