@@ -1,4 +1,5 @@
-﻿using Umbraco.Cms.Api.Management.ViewModels.User;
+﻿using Umbraco.Cms.Api.Management.Routing;
+using Umbraco.Cms.Api.Management.ViewModels.User;
 using Umbraco.Cms.Api.Management.ViewModels.User.Current;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.IO;
@@ -17,19 +18,22 @@ public class UserPresentationFactory : IUserPresentationFactory
     private readonly MediaFileManager _mediaFileManager;
     private readonly IImageUrlGenerator _imageUrlGenerator;
     private readonly IUserGroupPresentationFactory _userGroupPresentationFactory;
+    private readonly IAbsoluteUrlBuilder _absoluteUrlBuilder;
 
     public UserPresentationFactory(
         IEntityService entityService,
         AppCaches appCaches,
         MediaFileManager mediaFileManager,
         IImageUrlGenerator imageUrlGenerator,
-        IUserGroupPresentationFactory userGroupPresentationFactory)
+        IUserGroupPresentationFactory userGroupPresentationFactory,
+        IAbsoluteUrlBuilder absoluteUrlBuilder)
     {
         _entityService = entityService;
         _appCaches = appCaches;
         _mediaFileManager = mediaFileManager;
         _imageUrlGenerator = imageUrlGenerator;
         _userGroupPresentationFactory = userGroupPresentationFactory;
+        _absoluteUrlBuilder = absoluteUrlBuilder;
     }
 
     public UserResponseModel CreateResponseModel(IUser user)
@@ -39,7 +43,8 @@ public class UserPresentationFactory : IUserPresentationFactory
             Id = user.Key,
             Email = user.Email,
             Name = user.Name ?? string.Empty,
-            AvatarUrls = user.GetUserAvatarUrls(_appCaches.RuntimeCache, _mediaFileManager, _imageUrlGenerator),
+            AvatarUrls = user.GetUserAvatarUrls(_appCaches.RuntimeCache, _mediaFileManager, _imageUrlGenerator)
+                .Select(url => _absoluteUrlBuilder.ToAbsoluteUrl(url).ToString()),
             UserName = user.Username,
             LanguageIsoCode = user.Language,
             CreateDate = user.CreateDate,
