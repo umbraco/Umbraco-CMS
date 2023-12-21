@@ -13531,29 +13531,20 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ServerInformationResponseModel"
-                    }
-                  ]
+                  "type": "object",
+                  "additionalProperties": { }
                 }
               },
               "text/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ServerInformationResponseModel"
-                    }
-                  ]
+                  "type": "object",
+                  "additionalProperties": { }
                 }
               },
               "text/plain": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ServerInformationResponseModel"
-                    }
-                  ]
+                  "type": "object",
+                  "additionalProperties": { }
                 }
               }
             }
@@ -13629,6 +13620,56 @@
             }
           }
         }
+      }
+    },
+    "/umbraco/management/api/v1/server/troubleshooting": {
+      "get": {
+        "tags": [
+          "Server"
+        ],
+        "operationId": "GetServerTroubleshooting",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ServerTroubleshootingResponseModel"
+                    }
+                  ]
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ServerTroubleshootingResponseModel"
+                    }
+                  ]
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ServerTroubleshootingResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
       }
     },
     "/umbraco/management/api/v1/server/version": {
@@ -23782,7 +23823,19 @@
         },
         "additionalProperties": false
       },
-      "ServerInformationItemResponseModel": {
+      "ServerStatusResponseModel": {
+        "required": [
+          "serverStatus"
+        ],
+        "type": "object",
+        "properties": {
+          "serverStatus": {
+            "$ref": "#/components/schemas/RuntimeLevelModel"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ServerTroubleshootingItemResponseModel": {
         "required": [
           "data",
           "name"
@@ -23798,7 +23851,7 @@
         },
         "additionalProperties": false
       },
-      "ServerInformationResponseModel": {
+      "ServerTroubleshootingResponseModel": {
         "required": [
           "items"
         ],
@@ -23809,22 +23862,10 @@
             "items": {
               "oneOf": [
                 {
-                  "$ref": "#/components/schemas/ServerInformationItemResponseModel"
+                  "$ref": "#/components/schemas/ServerTroubleshootingItemResponseModel"
                 }
               ]
             }
-          }
-        },
-        "additionalProperties": false
-      },
-      "ServerStatusResponseModel": {
-        "required": [
-          "serverStatus"
-        ],
-        "type": "object",
-        "properties": {
-          "serverStatus": {
-            "$ref": "#/components/schemas/RuntimeLevelModel"
           }
         },
         "additionalProperties": false
