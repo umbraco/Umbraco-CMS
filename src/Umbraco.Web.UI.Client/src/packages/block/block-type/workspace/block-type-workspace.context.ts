@@ -26,7 +26,7 @@ export default class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlock
 	readonly properties = this.#properties.asObservable();
 
 	constructor(host: UmbControllerHostElement) {
-		// TODO: We dont need a repo here, so maybe we should not require this of the UmbEditableWorkspaceContextBase
+		// TODO: We don't need a repo here, so maybe we should not require this of the UmbEditableWorkspaceContextBase
 		super(host, 'Umb.Workspace.BlockType', undefined as never);
 	}
 
@@ -35,11 +35,17 @@ export default class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlock
 	}
 
 	async load(unique: string) {
-		// TODO: Get data, this requires the ability to proxy to the property editor.
-		console.log('load', unique);
 		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
 			this.observe(context.value, (value) => {
-				console.log('Got value from prop', value);
+				if (value) {
+					const blockTypeData = value.find((x: UmbBlockTypeBase) => x.contentElementTypeKey === unique);
+					if (blockTypeData) {
+						this.#data.next(blockTypeData);
+						return;
+					}
+				}
+				// Fallback to undefined:
+				this.#data.next(undefined);
 			});
 		});
 	}
@@ -90,8 +96,6 @@ export default class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlock
 
 	async save() {
 		if (!this.#data.value) return;
-
-		console.log('Save!', this.#data.getValue());
 
 		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
 			// TODO: We should most likely consume already, in this way I avoid having the reset this consumption.

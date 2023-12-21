@@ -1,3 +1,4 @@
+import type { UmbBlockTypeBase, UmbInputBlockTypeElement } from '../../../../../block-type/index.js';
 import { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
@@ -12,14 +13,18 @@ export class UmbPropertyEditorUIBlockGridBlockConfigurationElement
 	extends UmbLitElement
 	implements UmbPropertyEditorUiElement
 {
-	@property()
-	value = '';
+	@property({ attribute: false })
+	value: UmbBlockTypeBase[] = [];
 
 	@property({ type: Object, attribute: false })
 	public config?: UmbPropertyEditorConfigCollection;
 
 	render() {
-		return html`<div>umb-property-editor-ui-block-grid-block-configuration</div>`;
+		return html`<umb-input-block-type
+			.value=${this.value}
+			@change=${(e: Event) => {
+				this.value = (e.target as UmbInputBlockTypeElement).value;
+			}}></umb-input-block-type>`;
 	}
 
 	static styles = [UmbTextStyles];
