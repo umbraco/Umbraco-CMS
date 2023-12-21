@@ -1,12 +1,12 @@
-import { UmbDocumentTypePickerContext } from './document-type-input.context.js';
+import { UmbDocumentTypePickerContext } from './input-document-type.context.js';
 import { css, html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { DocumentTypeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 
-@customElement('umb-document-type-input')
-export class UmbDocumentTypeInputElement extends FormControlMixin(UmbLitElement) {
+@customElement('umb-input-document-type')
+export class UmbInputDocumentTypeElement extends FormControlMixin(UmbLitElement) {
 	/**
 	 * Selects the element types only
 	 * @type {boolean}
@@ -153,10 +153,10 @@ export class UmbDocumentTypeInputElement extends FormControlMixin(UmbLitElement)
 	];
 }
 
-export default UmbDocumentTypeInputElement;
+export default UmbInputDocumentTypeElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-document-type-input': UmbDocumentTypeInputElement;
+		'umb-input-document-type': UmbInputDocumentTypeElement;
 	}
 }
