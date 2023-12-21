@@ -1,5 +1,7 @@
-import type { DocumentItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS } from '@umbraco-cms/backoffice/document-type';
+import {
+	DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS,
+	type UmbDocumentTypeTreeItemModel,
+} from '@umbraco-cms/backoffice/document-type';
 import { UmbDeleteEvent } from '@umbraco-cms/backoffice/event';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UMB_CONFIRM_MODAL, UMB_MODAL_MANAGER_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
@@ -10,7 +12,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 export class UmbBlockTypeCardElement extends UmbLitElement {
 	//
 	// TODO: Look at ways to avoid using backend models for this implementation, could we get it from the Repository, eventually we need to invent a Repository Token.
-	#itemManager = new UmbRepositoryItemsManager<DocumentItemResponseModel>(
+	#itemManager = new UmbRepositoryItemsManager<UmbDocumentTypeTreeItemModel>(
 		this,
 		DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS,
 		(x) => x.id,
@@ -69,7 +71,7 @@ export class UmbBlockTypeCardElement extends UmbLitElement {
 
 	render() {
 		return html`
-			<uui-card-block-type href="${this.workspacePath}/edit/${this.key}">
+			<uui-card-block-type href="${this.workspacePath}/edit/${this.key}" .name=${this._name ?? ''}>
 				<uui-icon name=${this._icon ?? ''}></uui-icon>
 				<uui-action-bar slot="actions">
 					<uui-button @click=${this.#onRequestDelete} label="Remove block">

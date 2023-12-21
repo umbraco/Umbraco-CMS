@@ -111,11 +111,12 @@ export class UmbInputBlockTypeElement<BlockType extends UmbBlockTypeBase = UmbBl
 				display: grid;
 				gap: var(--uui-size-space-3);
 				grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+				grid-template-rows: repeat(auto-fill, minmax(160px, 1fr));
 			}
 
 			#add-button {
 				text-align: center;
-				height: 160px;
+				height: 100%;
 			}
 
 			uui-icon {
