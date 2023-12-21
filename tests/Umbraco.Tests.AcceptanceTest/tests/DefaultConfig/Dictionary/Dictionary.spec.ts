@@ -40,7 +40,7 @@ test.describe('Dictionary tests', () => {
     await umbracoUi.goToSection(ConstantHelper.sections.dictionary);
 
     //Act
-    await umbracoUi.dictionary.openActionsMenuForName(dictionaryName);
+    await umbracoUi.dictionary.clickActionsMenuForDictionary(dictionaryName);
     await umbracoUi.dictionary.deleteDictionary();
 
     // Assert
@@ -56,7 +56,7 @@ test.describe('Dictionary tests', () => {
     await umbracoUi.goToSection(ConstantHelper.sections.dictionary);
 
     //Act
-    await umbracoUi.dictionary.openActionsMenuForName(parentDictionaryName);
+    await umbracoUi.dictionary.clickActionsMenuForDictionary(parentDictionaryName);
     await umbracoUi.dictionary.clickCreateMenu();
     await umbracoUi.dictionary.enterDictionaryName(dictionaryName);
     await umbracoUi.dictionary.clickSaveButton();
@@ -75,7 +75,7 @@ test.describe('Dictionary tests', () => {
     await umbracoUi.goToSection(ConstantHelper.sections.dictionary);
 
     //Act
-    await umbracoUi.dictionary.openActionsMenuForName(dictionaryName);
+    await umbracoUi.dictionary.clickActionsMenuForDictionary(dictionaryName);
     await umbracoUi.dictionary.clickExportMenu();
     await umbracoUi.dictionary.exportDictionary(false);
 
@@ -93,7 +93,7 @@ test.describe('Dictionary tests', () => {
     await umbracoUi.goToSection(ConstantHelper.sections.dictionary);
 
     //Act
-    await umbracoUi.dictionary.openActionsMenuForName(dictionaryName);
+    await umbracoUi.dictionary.clickActionsMenuForDictionary(dictionaryName);
     await umbracoUi.dictionary.clickExportMenu();
     await umbracoUi.dictionary.exportDictionary(true);
 
@@ -110,7 +110,7 @@ test.describe('Dictionary tests', () => {
     await umbracoUi.goToSection(ConstantHelper.sections.dictionary);
 
     //Act
-    await umbracoUi.dictionary.openActionsMenuForName(dictionaryName);
+    await umbracoUi.dictionary.clickActionsMenuForDictionary(dictionaryName);
     await umbracoUi.dictionary.clickImportMenu();
     await umbracoUi.dictionary.importDictionary(udtFilePath);   
 
@@ -130,7 +130,7 @@ test.describe('Dictionary tests', () => {
     await umbracoUi.goToSection(ConstantHelper.sections.dictionary);
 
     //Act
-    await umbracoUi.dictionary.openActionsMenuForName(dictionaryName);
+    await umbracoUi.dictionary.clickActionsMenuForDictionary(dictionaryName);
     await umbracoUi.dictionary.clickImportMenu();
     await umbracoUi.dictionary.importDictionary(udtFilePath);   
 
@@ -149,7 +149,7 @@ test.describe('Dictionary tests', () => {
     await umbracoUi.dictionary.enterSearchKeywordAndPressEnter(dictionaryName);
 
     // Assert
-    expect (await umbracoUi.dictionary.isDictionaryListHasText(dictionaryName)).toBeTruthy();
+    expect (await umbracoUi.dictionary.doesDictionaryListHaveText(dictionaryName)).toBeTruthy();
   });
 
   test('can search a dictionary item in list when have no results', async ({umbracoApi, umbracoUi}) => {
@@ -163,6 +163,6 @@ test.describe('Dictionary tests', () => {
     await umbracoUi.dictionary.enterSearchKeywordAndPressEnter('xyz');
 
     // Assert
-    await expect(umbracoUi.dictionary.isEmptySearchResultMessageDisplay(emptySearchResultMessage)).toBeTruthy();    
+    await expect(umbracoUi.dictionary.isSearchResultMessageDisplayEmpty(emptySearchResultMessage)).toBeTruthy();    
   });
 });
