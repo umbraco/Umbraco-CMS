@@ -375,8 +375,7 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
     }
 
     /// <summary>
-    /// Checks whether the performingUser has the rights to manipulate the usergroup to user link,
-    /// whether all users that are part of the manipulation exist,
+    /// Checks whether all users that are part of the manipulation exist,
     /// performs the manipulation,
     /// saves the users
     /// </summary>
@@ -393,15 +392,6 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
         if (existingUserGroup is null)
         {
             return UserGroupOperationStatus.NotFound;
-        }
-
-        UserGroupAuthorizationStatus isAuthorized =
-            await _userGroupPermissionService.AuthorizeUpdateAsync(performingUser, existingUserGroup);
-        if (isAuthorized != UserGroupAuthorizationStatus.Success)
-        {
-            // Convert from UserGroupAuthorizationStatus to UserGroupOperationStatus
-            var operationStatus = isAuthorized.ToUserGroupOperationStatus();
-            return operationStatus;
         }
 
         IUser[] users = (await _userService.GetAsync(assignModel.UserKeys)).ToArray();
