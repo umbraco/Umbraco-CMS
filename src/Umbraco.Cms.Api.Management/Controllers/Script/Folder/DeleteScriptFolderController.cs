@@ -17,5 +17,7 @@ public class DeleteScriptFolderController : ScriptFolderControllerBase
     [HttpDelete]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public Task<IActionResult> Delete(string path) => DeleteAsync(path);
 }
