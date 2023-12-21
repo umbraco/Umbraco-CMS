@@ -15,11 +15,11 @@ export class UmbBlockTypeListWorkspaceViewSettingsElement extends UmbLitElement 
 				<umb-property
 					label="Custom view"
 					alias="view"
-					property-editor-ui-alias="Umb.PropertyEditorUi.StaticFile"></umb-property>
+					property-editor-ui-alias="Umb.PropertyEditorUi.StaticFilePicker"></umb-property>
 				<umb-property
 					label="Custom stylesheet"
 					alias="stylesheet"
-					property-editor-ui-alias="Umb.PropertyEditorUi.StaticFile"></umb-property>
+					property-editor-ui-alias="Umb.PropertyEditorUi.StaticFilePicker"></umb-property>
 				<umb-property
 					label="Overlay size"
 					alias="editorSize"
@@ -69,7 +69,7 @@ export class UmbBlockTypeListWorkspaceViewSettingsElement extends UmbLitElement 
 				<umb-property
 					label="Custom stylesheet"
 					alias="stylesheet"
-					property-editor-ui-alias="Umb.PropertyEditorUi.StaticFile"></umb-property>
+					property-editor-ui-alias="Umb.PropertyEditorUi.StaticFilePicker"></umb-property>
 			</uui-box>
 		`;
 	}
