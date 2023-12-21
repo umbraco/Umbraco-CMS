@@ -7,9 +7,9 @@ public class UsersToUserGroupManipulationModel
     public Guid UserGroupKey { get; init; }
     public Guid[] UserKeys { get; init; }
 
-    public UsersToUserGroupManipulationModel(Guid userGroup, Guid[] userKeys)
+    public UsersToUserGroupManipulationModel(Guid userGroupKey, Guid[] userKeys)
     {
-        UserGroupKey = userGroup;
+        UserGroupKey = userGroupKey;
         UserKeys = userKeys;
     }
 }
