@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "@umbraco/json-models-builders": "^1.0.6",
-    "@umbraco/playwright-testhelpers": "^2.0.0-beta.8",
+    "@umbraco/playwright-testhelpers": "^2.0.0-beta.9",
     "camelize": "^1.0.0",
     "dotenv": "^16.3.1",
     "faker": "^4.1.0",
