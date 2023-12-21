@@ -3,7 +3,7 @@ using Umbraco.Cms.Core.Mapping;
 
 namespace Umbraco.Cms.Api.Management.Mapping.Server;
 
-public class ServerInformationMapDefinition : IMapDefinition
+public class ServerConfigurationMapDefinition : IMapDefinition
 {
     public void DefineMaps(IUmbracoMapper mapper)
     {
