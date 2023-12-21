@@ -408,7 +408,7 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
 
         if (users.Length != assignModel.UserKeys.Length)
         {
-            return UserGroupOperationStatus.NotFound;
+            return UserGroupOperationStatus.UserNotFound;
         }
 
         manipulation(users, existingUserGroup);
