@@ -1,12 +1,23 @@
 import { UMB_BLOCK_TYPE_WORKSPACE_CONTEXT } from './block-type-workspace.context.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { customElement, css, html } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, css, html, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbRepositoryItemsManager } from '@umbraco-cms/backoffice/repository';
+import { DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS, UmbDocumentTypeItemModel } from '@umbraco-cms/backoffice/document-type';
 
 @customElement('umb-block-type-workspace-editor')
 export class UmbBlockTypeWorkspaceEditorElement extends UmbLitElement {
 	//
+	#itemManager = new UmbRepositoryItemsManager<UmbDocumentTypeItemModel>(
+		this,
+		DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS,
+		(x) => x.id,
+	);
+
 	#workspaceContext?: typeof UMB_BLOCK_TYPE_WORKSPACE_CONTEXT.TYPE;
+
+	@state()
+	_name?: string;
 
 	constructor() {
 		super();
@@ -14,14 +25,28 @@ export class UmbBlockTypeWorkspaceEditorElement extends UmbLitElement {
 		this.consumeContext(UMB_BLOCK_TYPE_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
 			this.#workspaceContext?.createPropertyDatasetContext(this);
+			this.observe(
+				this.#workspaceContext.data,
+				(data) => {
+					if (data) {
+						this.#itemManager.setUniques([data.contentElementTypeKey]);
+					}
+				},
+				'observeWorkspaceContextData',
+			);
+		});
+
+		this.observe(this.#itemManager.items, (items) => {
+			const item = items[0];
+			if (item) {
+				this._name = item.name;
+			}
 		});
 	}
 
 	render() {
 		return html`
-			<umb-workspace-editor
-				alias="Umb.Workspace.DataType"
-				headline="Block Type (TODO: maybe insert name of Content Type here? or Label?)">
+			<umb-workspace-editor alias="Umb.Workspace.DataType" headline="Configuration of '${this._name}'">
 			</umb-workspace-editor>
 		`;
 	}

@@ -1,6 +1,6 @@
 import {
 	DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS,
-	type UmbDocumentTypeTreeItemModel,
+	type UmbDocumentTypeItemModel,
 } from '@umbraco-cms/backoffice/document-type';
 import { UmbDeleteEvent } from '@umbraco-cms/backoffice/event';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
@@ -11,8 +11,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 @customElement('umb-block-type-card')
 export class UmbBlockTypeCardElement extends UmbLitElement {
 	//
-	// TODO: Look at ways to avoid using backend models for this implementation, could we get it from the Repository, eventually we need to invent a Repository Token.
-	#itemManager = new UmbRepositoryItemsManager<UmbDocumentTypeTreeItemModel>(
+	#itemManager = new UmbRepositoryItemsManager<UmbDocumentTypeItemModel>(
 		this,
 		DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS,
 		(x) => x.id,
