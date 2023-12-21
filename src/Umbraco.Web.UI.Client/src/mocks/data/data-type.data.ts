@@ -483,7 +483,17 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 		parentId: null,
 		editorAlias: 'Umbraco.BlockList',
 		editorUiAlias: 'Umb.PropertyEditorUi.BlockList',
-		values: [],
+		values: [
+			{
+				alias: 'blocks',
+				value: [
+					{
+						label: 'Mocked Block Type for Block List',
+						contentElementTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
+					},
+				],
+			},
+		],
 	},
 	{
 		type: 'data-type',
