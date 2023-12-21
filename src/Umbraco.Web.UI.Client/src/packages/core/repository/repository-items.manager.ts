@@ -3,9 +3,10 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { type ManifestRepository, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
+import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 
-export class UmbRepositoryItemsManager<ItemType> {
-	host: UmbControllerHost;
+export class UmbRepositoryItemsManager<ItemType> extends UmbBaseController {
+	//
 	repository?: UmbItemRepository<ItemType>;
 	#getUnique: (entry: ItemType) => string | undefined;
 
@@ -22,8 +23,6 @@ export class UmbRepositoryItemsManager<ItemType> {
 	#items = new UmbArrayState<ItemType>([], (x) => this.#getUnique(x));
 	items = this.#items.asObservable();
 
-	itemsObserver?: UmbObserverController<ItemType[]>;
-
 	/* TODO: find a better way to have a getUniqueMethod. If we want to support trees/items of different types,
 	then it need to be bound to the type and can't be a generic method we pass in. */
 	constructor(
@@ -31,16 +30,16 @@ export class UmbRepositoryItemsManager<ItemType> {
 		repositoryAlias: string,
 		getUniqueMethod?: (entry: ItemType) => string | undefined,
 	) {
-		this.host = host;
+		super(host);
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		//@ts-ignore
 		this.#getUnique = getUniqueMethod || ((entry) => entry.id || '');
 
 		this.#init = new UmbExtensionApiInitializer<ManifestRepository<UmbItemRepository<ItemType>>>(
-			host,
+			this,
 			umbExtensionsRegistry,
 			repositoryAlias,
-			[host],
+			[this],
 			(permitted, repository) => {
 				this.repository = permitted ? repository.api : undefined;
 			},
@@ -70,7 +69,6 @@ export class UmbRepositoryItemsManager<ItemType> {
 	async #requestItems() {
 		await this.#init;
 		if (!this.repository) throw new Error('Repository is not initialized');
-		if (this.itemsObserver) this.itemsObserver.destroy();
 
 		// TODO: Test if its just some items that is gone now, if so then just filter them out. (maybe use code from #removeItem)
 		// This is where this.#getUnique comes in play. Unless that can come from the repository, but that collides with the idea of having a multi-type repository. If that happens.
@@ -78,7 +76,7 @@ export class UmbRepositoryItemsManager<ItemType> {
 		const { asObservable } = await this.repository.requestItems(this.getUniques());
 
 		if (asObservable) {
-			this.itemsObserver = new UmbObserverController(this.host, asObservable(), (data) => this.#items.next(data));
+			this.observe(asObservable(), (data) => this.#items.next(data), '_observeRequestedItems');
 		}
 	}
 
