@@ -7,7 +7,7 @@ test.describe('Template tests', () => {
   test.beforeEach(async ({umbracoUi, umbracoApi}) => {
     await umbracoApi.template.ensureNameNotExists(templateName);
     await umbracoUi.goToBackOffice();
-    await umbracoUi.goToSection(ConstantHelper.sections.settings);
+    await umbracoUi.uiBaseLocators.goToSection(ConstantHelper.sections.settings);
   });
 
   test('can create a template', async ({umbracoApi, umbracoUi}) => {
@@ -40,7 +40,7 @@ test.describe('Template tests', () => {
     await umbracoApi.template.create(templateName, templateAlias, '');
 
     // Act
-    await umbracoUi.goToTemplate(templateName)
+    await umbracoUi.template.goToTemplate(templateName)
     await umbracoUi.template.enterTemplateContent(updatedTemplateContent);
     await umbracoUi.template.clickSaveButton();
 
@@ -79,7 +79,7 @@ test.describe('Template tests', () => {
     await umbracoApi.template.create(childTemplateName, childTemplateAlias, '');
 
     // Act
-    await umbracoUi.goToTemplate(childTemplateName);
+    await umbracoUi.template.goToTemplate(childTemplateName);
     await page.getByLabel('Change Master template').click();
     await page.locator('umb-tree-picker-modal').locator('#caret-button').click();
     await page.getByRole('button', {name: templateName}).click();
@@ -99,7 +99,7 @@ test.describe('Template tests', () => {
     await umbracoApi.template.ensureNameNotExists(childTemplateName);
   });
 
-  test('can use query builder for a template', async ({umbracoApi, umbracoUi}) => {
+  test('can use query builder for a template', async ({umbracoApi, page, umbracoUi}) => {
     // Arrange
     const templateAlias = AliasHelper.toAlias(templateName);
     await umbracoApi.template.create(templateName, templateAlias, '');
@@ -125,9 +125,8 @@ test.describe('Template tests', () => {
       '}';
 
     // Act
-    await umbracoUi.goToTemplate(templateName);
-    await umbracoUi.template.orderQueryBuilderByCreateDate();
-    await umbracoUi.template.clickSubmitButton();
+    await umbracoUi.template.goToTemplate(templateName);
+    await umbracoUi.uiBaseLocators.addQueryBuilderWithCreateDateOption();
     await umbracoUi.template.clickSaveButton();
 
     // Assert
@@ -150,7 +149,7 @@ test.describe('Template tests', () => {
       '}';
 
     // Act
-    await umbracoUi.goToTemplate(templateName);
+    await umbracoUi.template.goToTemplate(templateName);
     await umbracoUi.template.clickSectionsButton();
     await umbracoUi.template.clickSubmitButton();
     await umbracoUi.template.clickSaveButton();
@@ -178,7 +177,7 @@ test.describe('Template tests', () => {
       '}';
 
     // Act
-    await umbracoUi.goToTemplate(templateName);
+    await umbracoUi.template.goToTemplate(templateName);
     await umbracoUi.template.insertDictionaryByName(dictionaryName);
     await page.getByLabel('Save').click();
 

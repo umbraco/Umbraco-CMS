@@ -8,7 +8,7 @@ test.describe('Script tests', () => {
 
   test.beforeEach(async ({umbracoUi}) => {
     await umbracoUi.goToBackOffice();
-    await umbracoUi.goToSection(ConstantHelper.sections.settings);
+    await umbracoUi.uiBaseLocators.goToSection(ConstantHelper.sections.settings);
   });
 
   test('can create a empty script', async ({umbracoApi, umbracoUi}) => {
@@ -77,7 +77,7 @@ test.describe('Script tests', () => {
 
     // Act
     await umbracoUi.script.clickActionsMenuAtRoot();
-    await umbracoUi.script.createNewFolder(scriptFolderName);
+    await umbracoUi.script.createFolder(scriptFolderName);
 
     // Assert
     // TODO: Uncomment when the notification is visible
@@ -103,9 +103,9 @@ test.describe('Script tests', () => {
     // await umbracoUi.isSuccessNotificationVisible();
     // TODO: Use the reload function for scripts when it is implemented
     await page.reload();
-    await umbracoUi.goToSection(ConstantHelper.sections.settings);
+    await umbracoUi.uiBaseLocators.goToSection(ConstantHelper.sections.settings);
     // await page.locator('umb-tree-item', {hasText: 'Scripts'}).locator('#caret-button').click();
-    expect(umbracoUi.isTreeItemVisible(scriptFolderName)).not.toBeTruthy();
+    expect(umbracoUi.uiBaseLocators.isTreeItemVisible(scriptFolderName)).not.toBeTruthy();
 
     // await expect(page.locator('umb-tree-item').locator('[label="' + scriptFolderName + '"] ')).not.toBeVisible();
     expect(await umbracoApi.script.doesFolderExist(scriptFolderName)).toBeFalsy();
@@ -149,7 +149,7 @@ test.describe('Script tests', () => {
     // Act
     await umbracoUi.script.clickRootFolderCaretButton();
     await umbracoUi.script.clickActionsMenuForScript(scriptFolderName);
-    await umbracoUi.script.createNewFolder(childFolderName);
+    await umbracoUi.script.createFolder(childFolderName);
 
     // Assert
     // TODO: Uncomment when the notification is visible
@@ -174,7 +174,7 @@ test.describe('Script tests', () => {
     // Act
     await umbracoUi.script.clickRootFolderCaretButton();
     await umbracoUi.script.clickActionsMenuForScript(scriptFolderName);
-    await umbracoUi.script.createNewFolder(childFolderName);
+    await umbracoUi.script.createFolder(childFolderName);
 
     // Assert
     // TODO: Uncomment when the notification is visible

@@ -1,4 +1,4 @@
-import {test} from '@umbraco/playwright-testhelpers';
+import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
 test.describe('Telemetry tests', () => {
@@ -17,6 +17,7 @@ test.describe('Telemetry tests', () => {
     await page.goto(umbracoApi.baseUrl + '/umbraco');
 
     // Selects minimal as the telemetry level
+    await umbracoUi.uiBaseLocators.goToSection(ConstantHelper.sections.settings);
     await page.getByRole('tab', { name: 'Settings' }).click();
     await page.getByRole('tab', {name: 'Telemetry Data'}).click();
     await page.locator('[name="telemetryLevel"] >> input[id=input]').fill('1');
@@ -26,6 +27,6 @@ test.describe('Telemetry tests', () => {
     await page.reload();
     await expect(page.locator('[name="telemetryLevel"] >> input[id=input]')).toHaveValue('1');
     // API
-    expect(await umbracoApi.telemetry.getLevel() == "Minimal").toBeTruthy();
+    expect(await umbracoApi.telemetry.getLevel() == expectedLevel).toBeTruthy();
   });
 });

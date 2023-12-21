@@ -7,7 +7,7 @@ test.describe('Partial Views tests', () => {
 
   test.beforeEach(async ({umbracoUi}) => {
     await umbracoUi.goToBackOffice();
-    await umbracoUi.goToSection(ConstantHelper.sections.settings);
+    await umbracoUi.uiBaseLocators.goToSection(ConstantHelper.sections.settings);
   });
 
   test('can create an empty partial view', async ({umbracoApi, umbracoUi}) => {
@@ -157,7 +157,7 @@ test.describe('Partial Views tests', () => {
 
     // Act
     await umbracoUi.partialView.openPartialViewAtRoot(partialViewFileName);
-    await umbracoUi.partialView.insertDictionaryItem(dictionaryName);
+    await umbracoUi.uiBaseLocators.insertDictionaryByName(dictionaryName);
     await umbracoUi.partialView.clickSaveButton();
 
     // Assert
@@ -193,7 +193,7 @@ test.describe('Partial Views tests', () => {
 
     // Act
     await umbracoUi.partialView.clickActionsMenuAtRoot();
-    await umbracoUi.partialView.createNewFolder(folderName);
+    await umbracoUi.partialView.createFolder(folderName);
 
     // Assert
     expect(await umbracoApi.partialView.doesFolderExist(folderName)).toBeTruthy();
@@ -204,7 +204,7 @@ test.describe('Partial Views tests', () => {
     await umbracoApi.partialView.ensureNameNotExists(folderName);
   });
 
-  test.skip('can place a partial view into folder', async ({page, umbracoApi}) => {
+  test.skip('can place a partial view into folder', async ({umbracoApi}) => {
     // TODO: implement this later as the frontend is missing now
   });
 

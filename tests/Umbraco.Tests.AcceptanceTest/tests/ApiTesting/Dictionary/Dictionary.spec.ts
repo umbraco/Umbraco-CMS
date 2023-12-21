@@ -74,6 +74,6 @@ test.describe('Dictionary tests', () => {
 
     // Assert
     // Checks if the parent dictionary contains the child dictionary
-    await expect(parentDictionaryChildren.items[0].name).toEqual(dictionaryName);
+    await expect(parentDictionaryChildren[0].name).toEqual(dictionaryName);
   });
 });
