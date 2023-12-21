@@ -1,7 +1,6 @@
 ﻿using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Api.Management.ViewModels.Server;
 using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Server;
@@ -18,6 +17,6 @@ public class InformationServerController : ServerControllerBase
 
     [HttpGet("information")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(ServerTroubleshootingResponseModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Dictionary<string, object>), StatusCodes.Status200OK)]
     public Task<IActionResult> Information() => Task.FromResult<IActionResult>(Ok(_systemInformationService.GetServerInformation()));
 }
