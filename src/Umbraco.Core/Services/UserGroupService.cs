@@ -340,11 +340,11 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
         return Attempt.SucceedWithStatus(UserGroupOperationStatus.Success, userGroup);
     }
 
-    public async Task<UserGroupOperationStatus> AddUsersToUserGroup(UsersToUserGroupManipulationModel addUsersModel, Guid performingUserKey)
+    public async Task<UserGroupOperationStatus> AddUsersToUserGroupAsync(UsersToUserGroupManipulationModel addUsersModel, Guid performingUserKey)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
-        UserGroupOperationStatus result = await SafelyManipulateUsersBasedOnGroup(addUsersModel, performingUserKey, (users, group) =>
+        UserGroupOperationStatus result = await SafelyManipulateUsersBasedOnGroupAsync(addUsersModel, performingUserKey, (users, group) =>
         {
             IReadOnlyUserGroup readOnlyGroup = group.ToReadOnlyGroup();
 
@@ -358,11 +358,11 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
         return result;
     }
 
-    public async Task<UserGroupOperationStatus> RemoveUsersFromUserGroup(UsersToUserGroupManipulationModel removeUsersModel, Guid performingUserKey)
+    public async Task<UserGroupOperationStatus> RemoveUsersFromUserGroupAsync(UsersToUserGroupManipulationModel removeUsersModel, Guid performingUserKey)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
-        UserGroupOperationStatus result = await SafelyManipulateUsersBasedOnGroup(removeUsersModel, performingUserKey, (users, group) =>
+        UserGroupOperationStatus result = await SafelyManipulateUsersBasedOnGroupAsync(removeUsersModel, performingUserKey, (users, group) =>
         {
             foreach (IUser user in users)
             {
@@ -380,7 +380,7 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
     /// performs the manipulation,
     /// saves the users
     /// </summary>
-    private async Task<UserGroupOperationStatus> SafelyManipulateUsersBasedOnGroup(UsersToUserGroupManipulationModel assignModel, Guid performingUserKey, Action<IUser[], IUserGroup> manipulation)
+    private async Task<UserGroupOperationStatus> SafelyManipulateUsersBasedOnGroupAsync(UsersToUserGroupManipulationModel assignModel, Guid performingUserKey, Action<IUser[], IUserGroup> manipulation)
     {
         IUser? performingUser = await _userService.GetAsync(performingUserKey);
         if (performingUser is null)
@@ -388,8 +388,15 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
             return UserGroupOperationStatus.MissingUser;
         }
 
+        IUserGroup? existingUserGroup = await GetAsync(assignModel.UserGroupKey);
+
+        if (existingUserGroup is null)
+        {
+            return UserGroupOperationStatus.NotFound;
+        }
+
         UserGroupAuthorizationStatus isAuthorized =
-            await _userGroupPermissionService.AuthorizeUpdateAsync(performingUser, assignModel.UserGroup);
+            await _userGroupPermissionService.AuthorizeUpdateAsync(performingUser, existingUserGroup);
         if (isAuthorized != UserGroupAuthorizationStatus.Success)
         {
             // Convert from UserGroupAuthorizationStatus to UserGroupOperationStatus
@@ -404,7 +411,7 @@ internal sealed class UserGroupService : RepositoryService, IUserGroupService
             return UserGroupOperationStatus.NotFound;
         }
 
-        manipulation(users, assignModel.UserGroup);
+        manipulation(users, existingUserGroup);
 
         _userService.Save(users);
 

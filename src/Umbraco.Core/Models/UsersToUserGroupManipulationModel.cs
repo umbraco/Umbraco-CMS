@@ -4,12 +4,12 @@ namespace Umbraco.Cms.Core.Models;
 
 public class UsersToUserGroupManipulationModel
 {
-    public IUserGroup UserGroup { get; init; }
+    public Guid UserGroupKey { get; init; }
     public Guid[] UserKeys { get; init; }
 
-    public UsersToUserGroupManipulationModel(IUserGroup userGroup, Guid[] userKeys)
+    public UsersToUserGroupManipulationModel(Guid userGroup, Guid[] userKeys)
     {
-        UserGroup = userGroup;
+        UserGroupKey = userGroup;
         UserKeys = userKeys;
     }
 }

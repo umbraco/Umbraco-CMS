@@ -32,15 +32,8 @@ public class AddUsersToUserGroupController : UserGroupControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Update(Guid id, Guid[] userIds)
     {
-        IUserGroup? existingUserGroup = await _userGroupService.GetAsync(id);
-
-        if (existingUserGroup is null)
-        {
-            return UserGroupOperationStatusResult(UserGroupOperationStatus.NotFound);
-        }
-
-        UserGroupOperationStatus result = await _userGroupService.AddUsersToUserGroup(
-            new UsersToUserGroupManipulationModel(existingUserGroup, userIds), CurrentUserKey(_backOfficeSecurityAccessor));
+        UserGroupOperationStatus result = await _userGroupService.AddUsersToUserGroupAsync(
+            new UsersToUserGroupManipulationModel(id, userIds), CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result == UserGroupOperationStatus.Success
             ? Ok()
