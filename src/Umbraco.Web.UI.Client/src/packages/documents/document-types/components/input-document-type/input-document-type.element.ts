@@ -8,7 +8,7 @@ import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 @customElement('umb-input-document-type')
 export class UmbInputDocumentTypeElement extends FormControlMixin(UmbLitElement) {
 	/**
-	 * Selects the element types only
+	 * Limits to only select Element Types
 	 * @type {boolean}
 	 * @attr
 	 * @default false
@@ -65,8 +65,9 @@ export class UmbInputDocumentTypeElement extends FormControlMixin(UmbLitElement)
 	public get selectedIds(): Array<string> {
 		return this.#pickerContext.getSelection();
 	}
-	public set selectedIds(ids: Array<string>) {
-		this.#pickerContext.setSelection(ids);
+	public set selectedIds(ids: Array<string> | undefined) {
+		console.log('selectedIds', ids);
+		this.#pickerContext.setSelection(ids ?? []);
 	}
 
 	@property()

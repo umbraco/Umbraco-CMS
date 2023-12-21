@@ -6,15 +6,14 @@ import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/
 
 @customElement('umb-property-editor-ui-document-type-picker')
 export class UmbPropertyEditorUIDocumentTypePickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
-	private _value: Array<string> = [];
-
 	@property({ type: Array })
-	public get value(): Array<string> {
+	public get value(): Array<string> | string | undefined {
 		return this._value;
 	}
-	public set value(value: Array<string>) {
-		this._value = value || [];
+	public set value(value: Array<string> | string | undefined) {
+		this._value = value ?? [];
 	}
+	private _value?: Array<string> | string;
 
 	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
@@ -23,7 +22,9 @@ export class UmbPropertyEditorUIDocumentTypePickerElement extends UmbLitElement 
 			this._limitMin = validationLimit?.min;
 			this._limitMax = validationLimit?.max;
 
-			this._onlyElementTypes = config.getValueByAlias('onlyPickElementTypes');
+			// We have the need in Block Editors, to just pick a single ID not as an array. So for that we use the multiPicker config, which can be set to true if you wanted to be able to pick multiple.
+			this._multiPicker = config.getValueByAlias('multiPicker') ?? false;
+			this._onlyElementTypes = config.getValueByAlias('onlyPickElementTypes') ?? false;
 		}
 	}
 
@@ -32,25 +33,30 @@ export class UmbPropertyEditorUIDocumentTypePickerElement extends UmbLitElement 
 	@state()
 	private _limitMax?: number;
 	@state()
+	private _multiPicker?: boolean;
+	@state()
 	private _onlyElementTypes?: boolean;
 
 	private _onChange(event: CustomEvent) {
-		this.value = (event.target as UmbInputDocumentTypeElement).selectedIds;
+		const selectedIds = (event.target as UmbInputDocumentTypeElement).selectedIds;
+		this.value = this._multiPicker ? selectedIds : selectedIds[0];
 		this.dispatchEvent(new CustomEvent('property-value-change'));
 	}
 
 	// TODO: Implement mandatory?
 	render() {
-		return html`
-			<umb-input-document-type
-				@change=${this._onChange}
-				.selectedIds=${this._value}
-				.min=${this._limitMin ?? 0}
-				.max=${this._limitMax ?? Infinity}
-				.element-types-only=${this._onlyElementTypes}
-				>Add</umb-input-document-type
-			>
-		`;
+		return this._multiPicker !== undefined
+			? html`
+					<umb-input-document-type
+						@change=${this._onChange}
+						.selectedIds=${this._multiPicker ? (this._value as Array<string>) ?? [] : [this._value as string]}
+						.min=${this._limitMin ?? 0}
+						.max=${this._limitMax ?? Infinity}
+						.element-types-only=${this._onlyElementTypes}
+						>Add</umb-input-document-type
+					>
+			  `
+			: '';
 	}
 }
 

@@ -26,11 +26,17 @@ export class UmbBlockTypeListWorkspaceViewSettingsElement extends UmbLitElement 
 					property-editor-ui-alias="Umb.PropertyEditorUi.OverlaySize"></umb-property>
 			</uui-box>
 			<uui-box headline="Data models">
+				<!-- TODO: implement readonly mode for umb-property -->
 				<umb-property
 					label="Content Model"
 					alias="contentElementTypeKey"
 					property-editor-ui-alias="Umb.PropertyEditorUi.DocumentTypePicker"
+					readonly
 					.config=${[
+						{
+							alias: 'validationLimit',
+							value: { min: 0, max: 1 },
+						},
 						{
 							alias: 'onlyPickElementTypes',
 							value: true,
@@ -41,6 +47,10 @@ export class UmbBlockTypeListWorkspaceViewSettingsElement extends UmbLitElement 
 					alias="settingsElementTypeKey"
 					property-editor-ui-alias="Umb.PropertyEditorUi.DocumentTypePicker"
 					.config=${[
+						{
+							alias: 'validationLimit',
+							value: { min: 0, max: 1 },
+						},
 						{
 							alias: 'onlyPickElementTypes',
 							value: true,
