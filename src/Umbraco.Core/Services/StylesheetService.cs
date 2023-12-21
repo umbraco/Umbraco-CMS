@@ -8,179 +8,68 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
 
-public class StylesheetService : FileServiceBase<IStylesheetRepository, IStylesheet>, IStylesheetService
+public class StylesheetService : FileServiceOperationBase<IStylesheetRepository, IStylesheet, StylesheetOperationStatus>, IStylesheetService
 {
-    private readonly ILogger<StylesheetService> _logger;
-    private readonly IUserIdKeyResolver _userIdKeyResolver;
-    private readonly IAuditRepository _auditRepository;
-
-    protected override string[] AllowedFileExtensions { get; } = { ".css" };
-
     public StylesheetService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
         IEventMessagesFactory eventMessagesFactory,
-        IStylesheetRepository stylesheetRepository,
+        IStylesheetRepository repository,
         ILogger<StylesheetService> logger,
         IUserIdKeyResolver userIdKeyResolver,
         IAuditRepository auditRepository)
-        : base(provider, loggerFactory, eventMessagesFactory, stylesheetRepository)
+        : base(provider, loggerFactory, eventMessagesFactory, repository, logger, userIdKeyResolver, auditRepository)
     {
-        _logger = logger;
-        _userIdKeyResolver = userIdKeyResolver;
-        _auditRepository = auditRepository;
     }
 
-    /// <inheritdoc />
-    public async Task<StylesheetOperationStatus> DeleteAsync(string path, Guid userKey)
-    {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+    protected override string[] AllowedFileExtensions { get; } = { ".css" };
 
-        IStylesheet? stylesheet = Repository.Get(path);
-        if (stylesheet is null)
-        {
-            return StylesheetOperationStatus.NotFound;
-        }
+    protected override StylesheetOperationStatus Success => StylesheetOperationStatus.Success;
 
-        EventMessages eventMessages = EventMessagesFactory.Get();
-        var deletingNotification = new StylesheetDeletingNotification(stylesheet, eventMessages);
-        if (await scope.Notifications.PublishCancelableAsync(deletingNotification))
-        {
-            return StylesheetOperationStatus.CancelledByNotification;
-        }
+    protected override StylesheetOperationStatus NotFound => StylesheetOperationStatus.NotFound;
 
-        Repository.Delete(stylesheet);
+    protected override StylesheetOperationStatus CancelledByNotification => StylesheetOperationStatus.CancelledByNotification;
 
-        scope.Notifications.Publish(new StylesheetDeletedNotification(stylesheet, eventMessages).WithStateFrom(deletingNotification));
-        await AuditAsync(AuditType.Delete, userKey);
+    protected override StylesheetOperationStatus PathTooLong => StylesheetOperationStatus.PathTooLong;
 
-        scope.Complete();
-        return StylesheetOperationStatus.Success;
-    }
+    protected override StylesheetOperationStatus AlreadyExists => StylesheetOperationStatus.AlreadyExists;
+
+    protected override StylesheetOperationStatus ParentNotFound => StylesheetOperationStatus.ParentNotFound;
+
+    protected override StylesheetOperationStatus InvalidName => StylesheetOperationStatus.InvalidName;
+
+    protected override StylesheetOperationStatus InvalidFileExtension => StylesheetOperationStatus.InvalidFileExtension;
+
+    protected override string EntityType => "Stylesheet";
+
+    protected override StylesheetSavingNotification SavingNotification(IStylesheet target, EventMessages messages)
+        => new(target, messages);
+
+    protected override StylesheetSavedNotification SavedNotification(IStylesheet target, EventMessages messages)
+        => new(target, messages);
+
+    protected override StylesheetDeletingNotification DeletingNotification(IStylesheet target, EventMessages messages)
+        => new(target, messages);
+
+    protected override StylesheetDeletedNotification DeletedNotification(IStylesheet target, EventMessages messages)
+        => new(target, messages);
+
+    protected override IStylesheet CreateEntity(string path, string? content)
+        => new Stylesheet(path) { Content = content };
 
     /// <inheritdoc />
     public async Task<Attempt<IStylesheet?, StylesheetOperationStatus>> CreateAsync(StylesheetCreateModel createModel, Guid userKey)
-    {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
-
-        try
-        {
-            StylesheetOperationStatus validationResult = ValidateCreate(createModel);
-            if (validationResult is not StylesheetOperationStatus.Success)
-            {
-                return Attempt.FailWithStatus<IStylesheet?, StylesheetOperationStatus>(validationResult, null);
-            }
-        }
-        catch (PathTooLongException exception)
-        {
-            _logger.LogError(exception, "The stylesheet path was too long");
-            return Attempt.FailWithStatus<IStylesheet?, StylesheetOperationStatus>(StylesheetOperationStatus.PathTooLong, null);
-        }
-
-        var stylesheet = new Stylesheet(createModel.FilePath) { Content = createModel.Content };
-
-        EventMessages eventMessages = EventMessagesFactory.Get();
-        var savingNotification = new StylesheetSavingNotification(stylesheet, eventMessages);
-        if (await scope.Notifications.PublishCancelableAsync(savingNotification))
-        {
-            return Attempt.FailWithStatus<IStylesheet?, StylesheetOperationStatus>(StylesheetOperationStatus.CancelledByNotification, null);
-        }
-
-        Repository.Save(stylesheet);
-
-        scope.Notifications.Publish(new StylesheetSavedNotification(stylesheet, eventMessages).WithStateFrom(savingNotification));
-        await AuditAsync(AuditType.Save, userKey);
-
-        scope.Complete();
-        return Attempt.SucceedWithStatus<IStylesheet?, StylesheetOperationStatus>(StylesheetOperationStatus.Success, stylesheet);
-    }
-
-    private StylesheetOperationStatus ValidateCreate(StylesheetCreateModel createModel)
-    {
-        if (Repository.Exists(createModel.FilePath))
-        {
-            return StylesheetOperationStatus.AlreadyExists;
-        }
-
-        if (string.IsNullOrWhiteSpace(createModel.ParentPath) is false
-            && Repository.FolderExists(createModel.ParentPath) is false)
-        {
-            return StylesheetOperationStatus.ParentNotFound;
-        }
-
-        if (HasValidFileName(createModel.Name) is false)
-        {
-            return StylesheetOperationStatus.InvalidName;
-        }
-
-        if (HasValidFileExtension(createModel.FilePath) is false)
-        {
-            return StylesheetOperationStatus.InvalidFileExtension;
-        }
-
-        return StylesheetOperationStatus.Success;
-    }
+        => await HandleCreateAsync(createModel.Name, createModel.ParentPath, createModel.Content, userKey);
 
     /// <inheritdoc />
-    public async Task<Attempt<IStylesheet?, StylesheetOperationStatus>> UpdateAsync(StylesheetUpdateModel updateModel, Guid userKey)
-    {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+    public async Task<Attempt<IStylesheet?, StylesheetOperationStatus>> UpdateAsync(string path, StylesheetUpdateModel updateModel, Guid userKey)
+        => await HandleUpdateAsync(path, updateModel.Content, userKey);
 
-        IStylesheet? stylesheet = Repository.Get(updateModel.ExistingPath);
+    /// <inheritdoc />
+    public async Task<StylesheetOperationStatus> DeleteAsync(string path, Guid userKey)
+        => await HandleDeleteAsync(path, userKey);
 
-        if (stylesheet is null)
-        {
-            return Attempt.FailWithStatus<IStylesheet?, StylesheetOperationStatus>(StylesheetOperationStatus.NotFound, null);
-        }
-
-        StylesheetOperationStatus validationResult = ValidateUpdate(updateModel);
-        if (validationResult is not StylesheetOperationStatus.Success)
-        {
-            return Attempt.FailWithStatus<IStylesheet?, StylesheetOperationStatus>(validationResult, null);
-        }
-
-        stylesheet.Content = updateModel.Content;
-        if (stylesheet.Name != updateModel.Name)
-        {
-            // Name has been updated, so we need to update the path as well
-            var newPath = stylesheet.Path.Replace(stylesheet.Name!, updateModel.Name);
-            stylesheet.Path = newPath;
-        }
-
-        EventMessages eventMessages = EventMessagesFactory.Get();
-        var savingNotification = new StylesheetSavingNotification(stylesheet, eventMessages);
-        if (await scope.Notifications.PublishCancelableAsync(savingNotification))
-        {
-            return Attempt.FailWithStatus<IStylesheet?, StylesheetOperationStatus>(StylesheetOperationStatus.CancelledByNotification, null);
-        }
-
-        Repository.Save(stylesheet);
-
-        scope.Notifications.Publish(new StylesheetSavedNotification(stylesheet, eventMessages).WithStateFrom(savingNotification));
-        await AuditAsync(AuditType.Save, userKey);
-
-        scope.Complete();
-        return Attempt.SucceedWithStatus<IStylesheet?, StylesheetOperationStatus>(StylesheetOperationStatus.Success, stylesheet);
-    }
-
-    private StylesheetOperationStatus ValidateUpdate(StylesheetUpdateModel updateModel)
-    {
-        if (HasValidFileExtension(updateModel.Name) is false)
-        {
-            return StylesheetOperationStatus.InvalidFileExtension;
-        }
-
-        if (HasValidFileName(updateModel.Name) is false)
-        {
-            return StylesheetOperationStatus.InvalidName;
-        }
-
-        return StylesheetOperationStatus.Success;
-    }
-
-    private async Task AuditAsync(AuditType type, Guid userKey)
-    {
-        var userId = await _userIdKeyResolver.GetAsync(userKey);
-        _auditRepository.Save(new AuditItem(-1, type, userId, "Stylesheet"));
-    }
+    /// <inheritdoc />
+    public async Task<Attempt<IStylesheet?, StylesheetOperationStatus>> RenameAsync(string path, StylesheetRenameModel renameModel, Guid userKey)
+        => await HandleRenameAsync(path, renameModel.Name, userKey);
 }

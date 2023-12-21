@@ -1,8 +1,8 @@
-﻿namespace Umbraco.Cms.Api.Management.ViewModels.Stylesheet;
+﻿using Umbraco.Cms.Api.Management.ViewModels.FileSystem;
 
-public class StylesheetOverviewResponseModel
+namespace Umbraco.Cms.Api.Management.ViewModels.Stylesheet;
+
+public class StylesheetOverviewResponseModel : FileSystemItemViewModelBase
 {
     public required string Name { get; set; }
-
-    public required string Path { get; set; }
 }

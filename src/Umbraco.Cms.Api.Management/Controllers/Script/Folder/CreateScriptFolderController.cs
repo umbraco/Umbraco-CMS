@@ -1,11 +1,12 @@
 ﻿using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Api.Management.ViewModels.Folder;
+using Umbraco.Cms.Api.Management.Extensions;
+using Umbraco.Cms.Api.Management.ViewModels.Script.Folder;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
-using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Models.FileSystem;
+using Umbraco.Cms.Core.Services.FileSystem;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Script.Folder;
@@ -13,21 +14,28 @@ namespace Umbraco.Cms.Api.Management.Controllers.Script.Folder;
 [ApiVersion("1.0")]
 public class CreateScriptFolderController : ScriptFolderControllerBase
 {
-    public CreateScriptFolderController(IUmbracoMapper mapper, IScriptFolderService scriptFolderService)
-        : base(mapper, scriptFolderService)
+    private readonly IScriptFolderService _scriptFolderService;
+    private readonly IUmbracoMapper _mapper;
+
+    public CreateScriptFolderController(IScriptFolderService scriptFolderService, IUmbracoMapper mapper)
     {
+        _scriptFolderService = scriptFolderService;
+        _mapper = mapper;
     }
+
 
     [HttpPost]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Create(CreatePathFolderRequestModel model)
+    public async Task<IActionResult> Create(CreateScriptFolderRequestModel requestModel)
     {
-        Attempt<PathContainer?, ScriptFolderOperationStatus> result = await CreateAsync(model);
+        ScriptFolderCreateModel createModel = _mapper.Map<ScriptFolderCreateModel>(requestModel)!;
+        Attempt<ScriptFolderModel?, ScriptFolderOperationStatus> result = await _scriptFolderService.CreateAsync(createModel);
+
         return result.Success
-            ? CreatedAtAction<ByPathScriptFolderController>(controller => nameof(controller.ByPath), new { path = result.Result!.Path })
+            ? CreatedAtAction<ByPathScriptFolderController>(controller => nameof(controller.ByPath), new { path = result.Result!.Path.SystemPathToVirtualPath() })
             : OperationStatusResult(result.Status);
     }
 }

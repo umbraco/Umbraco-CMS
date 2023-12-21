@@ -25,7 +25,7 @@ public class GetAllController : PartialViewControllerBase
         var pageViewModel = new PagedViewModel<SnippetItemResponseModel>
         {
             Total = snippets.Total,
-            Items = snippets.Items.Select(x => new SnippetItemResponseModel(x)),
+            Items = snippets.Items.Select(name => new SnippetItemResponseModel { Name = name }),
         };
 
         return Ok(pageViewModel);

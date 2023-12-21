@@ -8,9 +8,11 @@ namespace Umbraco.Cms.Api.Management.Factories;
 
 public interface IFileItemPresentationModelFactory
 {
-    IEnumerable<PartialViewItemResponseModel> CreatePartialViewResponseModels(IEnumerable<string> path, IFileSystem fileSystem);
+    IEnumerable<PartialViewItemResponseModel> CreatePartialViewItemResponseModels(IEnumerable<string> path);
 
-    IEnumerable<ScriptItemResponseModel> CreateScriptItemResponseModels(IEnumerable<string> paths, IFileSystem fileSystem);
-    IEnumerable<StaticFileItemResponseModel> CreateStaticFileItemResponseModels(IEnumerable<string> paths, IFileSystem fileSystem);
-    IEnumerable<StylesheetItemResponseModel> CreateStylesheetItemResponseModels(IEnumerable<string> paths, IFileSystem fileSystem);
+    IEnumerable<ScriptItemResponseModel> CreateScriptItemResponseModels(IEnumerable<string> paths);
+
+    IEnumerable<StaticFileItemResponseModel> CreateStaticFileItemResponseModels(IEnumerable<string> paths);
+
+    IEnumerable<StylesheetItemResponseModel> CreateStylesheetItemResponseModels(IEnumerable<string> paths);
 }

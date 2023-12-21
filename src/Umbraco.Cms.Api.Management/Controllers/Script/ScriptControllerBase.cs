@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Script;
 [VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.Script}")]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Script))]
 [Authorize(Policy = "New" + AuthorizationPolicies.TreeAccessScripts)]
-public class ScriptControllerBase : ManagementApiControllerBase
+public class ScriptControllerBase : FileSystemManagementControllerBase
 {
     protected IActionResult ScriptOperationStatusResult(ScriptOperationStatus status) =>
         status switch

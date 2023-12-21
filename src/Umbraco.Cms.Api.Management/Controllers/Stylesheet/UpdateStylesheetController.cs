@@ -1,6 +1,7 @@
 ﻿using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Management.Extensions;
 using Umbraco.Cms.Api.Management.ViewModels.Stylesheet;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
@@ -28,14 +29,16 @@ public class UpdateStylesheetController : StylesheetControllerBase
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
-    [HttpPut]
+    [HttpPut("{path}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> Update(UpdateStylesheetRequestModel requestModel)
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Update(string path, UpdateStylesheetRequestModel requestModel)
     {
+        path = DecodePath(path).VirtualPathToSystemPath();
         StylesheetUpdateModel updateModel = _umbracoMapper.Map<StylesheetUpdateModel>(requestModel)!;
 
-        Attempt<IStylesheet?, StylesheetOperationStatus> updateAttempt = await _stylesheetService.UpdateAsync(updateModel, CurrentUserKey(_backOfficeSecurityAccessor));
+        Attempt<IStylesheet?, StylesheetOperationStatus> updateAttempt = await _stylesheetService.UpdateAsync(path, updateModel, CurrentUserKey(_backOfficeSecurityAccessor));
 
         return updateAttempt.Success
             ? Ok()

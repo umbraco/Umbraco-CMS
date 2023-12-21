@@ -41,8 +41,18 @@ public interface IPartialViewService : IBasicFileService<IPartialView>
     /// <summary>
     /// Updates an existing partial view.
     /// </summary>
+    /// <param name="path">The path of the partial view to update.</param>
     /// <param name="updateModel">A <see cref="PartialViewUpdateModel"/> with the changes.</param>
     /// <param name="userKey">The key of the user performing the operation.</param>
     /// <returns>An attempt indicating if the operation was a success as well as a more detailed <see cref="PartialViewOperationStatus"/>.</returns>
-    Task<Attempt<IPartialView?, PartialViewOperationStatus>> UpdateAsync(PartialViewUpdateModel updateModel, Guid userKey);
+    Task<Attempt<IPartialView?, PartialViewOperationStatus>> UpdateAsync(string path, PartialViewUpdateModel updateModel, Guid userKey);
+
+    /// <summary>
+    /// Renames a partial view.
+    /// </summary>
+    /// <param name="path">The path of the partial view to rename.</param>
+    /// <param name="renameModel">A <see cref="PartialViewRenameModel"/> with the changes.</param>
+    /// <param name="userKey">The key of the user performing the operation.</param>
+    /// <returns>An attempt indicating if the operation was a success as well as a more detailed <see cref="PartialViewOperationStatus"/>.</returns>
+    Task<Attempt<IPartialView?, PartialViewOperationStatus>> RenameAsync(string path, PartialViewRenameModel renameModel, Guid userKey);
 }

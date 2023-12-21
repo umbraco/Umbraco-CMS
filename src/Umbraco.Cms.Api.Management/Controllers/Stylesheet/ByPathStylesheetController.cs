@@ -1,6 +1,7 @@
 ﻿using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Management.Extensions;
 using Umbraco.Cms.Api.Management.ViewModels.Stylesheet;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
@@ -22,20 +23,17 @@ public class ByPathStylesheetController : StylesheetControllerBase
         _umbracoMapper = umbracoMapper;
     }
 
-    [HttpGet]
+    [HttpGet("{path}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(StylesheetResponseModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ByPath(string path)
     {
+        path = DecodePath(path).VirtualPathToSystemPath();
         IStylesheet? stylesheet = await _stylesheetService.GetAsync(path);
 
-        if (stylesheet is null)
-        {
-            return StylesheetNotFound();
-        }
-
-        StylesheetResponseModel? viewModel = _umbracoMapper.Map<StylesheetResponseModel>(stylesheet);
-
-        return Ok(viewModel);
+        return stylesheet is not null
+            ? Ok(_umbracoMapper.Map<StylesheetResponseModel>(stylesheet))
+            : StylesheetNotFound();
     }
 }

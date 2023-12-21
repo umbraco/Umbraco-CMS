@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.PartialView;
 [VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.PartialView}")]
 [ApiExplorerSettings(GroupName = "Partial View")]
 [Authorize(Policy = "New" + AuthorizationPolicies.TreeAccessPartialViews)]
-public class PartialViewControllerBase : ManagementApiControllerBase
+public class PartialViewControllerBase : FileSystemManagementControllerBase
 {
     protected IActionResult PartialViewOperationStatusResult(PartialViewOperationStatus status) =>
         status switch

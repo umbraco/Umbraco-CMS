@@ -37,6 +37,7 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.ContentTypeEditing;
 using Umbraco.Cms.Core.DynamicRoot;
+using Umbraco.Cms.Core.Services.FileSystem;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Core.Telemetry;
 using Umbraco.Cms.Core.Templates;
@@ -320,7 +321,6 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IScriptService, ScriptService>();
             Services.AddUnique<IStylesheetService, StylesheetService>();
             Services.AddUnique<IStylesheetFolderService, StylesheetFolderService>();
-            Services.AddUnique<IRichTextStylesheetService, RichTextStylesheetService>();
             Services.AddUnique<IPartialViewService, PartialViewService>();
             Services.AddUnique<IScriptFolderService, ScriptFolderService>();
             Services.AddUnique<IPartialViewFolderService, PartialViewFolderService>();

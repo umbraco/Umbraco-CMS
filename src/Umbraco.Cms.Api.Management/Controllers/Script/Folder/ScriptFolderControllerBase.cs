@@ -4,9 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Mapping;
-using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Web.Common.Authorization;
 
@@ -16,28 +13,9 @@ namespace Umbraco.Cms.Api.Management.Controllers.Script.Folder;
 [VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.Script}/folder")]
 [ApiExplorerSettings(GroupName = "Script")]
 [Authorize(Policy = "New" + AuthorizationPolicies.TreeAccessScripts)]
-public class ScriptFolderControllerBase : PathFolderManagementControllerBase<ScriptFolderOperationStatus>
+public class ScriptFolderControllerBase : FileSystemManagementControllerBase
 {
-    private readonly IScriptFolderService _scriptFolderService;
-
-    public ScriptFolderControllerBase(
-        IUmbracoMapper mapper,
-        IScriptFolderService scriptFolderService)
-        : base(mapper)
-    {
-        _scriptFolderService = scriptFolderService;
-    }
-
-    protected override Task<PathContainer?> GetContainerAsync(string path)
-        => _scriptFolderService.GetAsync(path);
-
-    protected override Task<Attempt<PathContainer?, ScriptFolderOperationStatus>> CreateContainerAsync(PathContainer container)
-        => _scriptFolderService.CreateAsync(container);
-
-    protected override Task<Attempt<ScriptFolderOperationStatus>> DeleteContainerAsync(string path) =>
-        _scriptFolderService.DeleteAsync(path);
-
-    protected override IActionResult OperationStatusResult(ScriptFolderOperationStatus status) =>
+    protected IActionResult OperationStatusResult(ScriptFolderOperationStatus status) =>
         status switch
         {
             ScriptFolderOperationStatus.AlreadyExists => BadRequest(new ProblemDetailsBuilder()

@@ -48,7 +48,6 @@ public static class UmbracoBuilderExtensions
                 .AddTours()
                 .AddPackages()
                 .AddEntities()
-                .AddPathFolders()
                 .AddScripts()
                 .AddPartialViews()
                 .AddStylesheets()

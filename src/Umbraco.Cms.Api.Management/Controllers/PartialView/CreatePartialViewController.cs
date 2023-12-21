@@ -1,6 +1,7 @@
 ﻿using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Management.Extensions;
 using Umbraco.Cms.Api.Management.ViewModels.PartialView;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
@@ -14,31 +15,31 @@ namespace Umbraco.Cms.Api.Management.Controllers.PartialView;
 [ApiVersion("1.0")]
 public class CreatePartialViewController : PartialViewControllerBase
 {
-    private readonly IUmbracoMapper _umbracoMapper;
     private readonly IPartialViewService _partialViewService;
+    private readonly IUmbracoMapper _umbracoMapper;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
     public CreatePartialViewController(
-        IUmbracoMapper umbracoMapper,
         IPartialViewService partialViewService,
+        IUmbracoMapper umbracoMapper,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
     {
-        _umbracoMapper = umbracoMapper;
         _partialViewService = partialViewService;
+        _umbracoMapper = umbracoMapper;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
     [HttpPost]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status201Created)]
-    public async Task<IActionResult> Create(CreatePartialViewRequestModel createRequestModel)
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> Create(CreatePartialViewRequestModel requestModel)
     {
-        PartialViewCreateModel createModel = _umbracoMapper.Map<PartialViewCreateModel>(createRequestModel)!;
-
+        PartialViewCreateModel createModel = _umbracoMapper.Map<PartialViewCreateModel>(requestModel)!;
         Attempt<IPartialView?, PartialViewOperationStatus> createAttempt = await _partialViewService.CreateAsync(createModel, CurrentUserKey(_backOfficeSecurityAccessor));
 
         return createAttempt.Success
-            ? CreatedAtAction<ByPathPartialViewController>(controller => nameof(controller.ByPath), new { path = createAttempt.Result!.Path })
+            ? CreatedAtAction<ByPathPartialViewController>(controller => nameof(controller.ByPath), new { path = createAttempt.Result!.Path.SystemPathToVirtualPath() })
             : PartialViewOperationStatusResult(createAttempt.Status);
     }
 }

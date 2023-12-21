@@ -1,11 +1,12 @@
 ﻿using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Api.Management.ViewModels.Folder;
+using Umbraco.Cms.Api.Management.Extensions;
+using Umbraco.Cms.Api.Management.ViewModels.Stylesheet.Folder;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
-using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Models.FileSystem;
+using Umbraco.Cms.Core.Services.FileSystem;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Stylesheet.Folder;
@@ -13,9 +14,13 @@ namespace Umbraco.Cms.Api.Management.Controllers.Stylesheet.Folder;
 [ApiVersion("1.0")]
 public class CreateStylesheetFolderController : StylesheetFolderControllerBase
 {
-    public CreateStylesheetFolderController(IUmbracoMapper mapper, IStylesheetFolderService stylesheetFolderService)
-        : base(mapper, stylesheetFolderService)
+    private readonly IStylesheetFolderService _stylesheetFolderService;
+    private readonly IUmbracoMapper _mapper;
+
+    public CreateStylesheetFolderController(IStylesheetFolderService stylesheetFolderService, IUmbracoMapper mapper)
     {
+        _stylesheetFolderService = stylesheetFolderService;
+        _mapper = mapper;
     }
 
 
@@ -24,11 +29,13 @@ public class CreateStylesheetFolderController : StylesheetFolderControllerBase
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Create(CreatePathFolderRequestModel model)
+    public async Task<IActionResult> Create(CreateStylesheetFolderRequestModel requestModel)
     {
-        Attempt<PathContainer?, StylesheetFolderOperationStatus> result = await CreateAsync(model);
+        StylesheetFolderCreateModel createModel = _mapper.Map<StylesheetFolderCreateModel>(requestModel)!;
+        Attempt<StylesheetFolderModel?, StylesheetFolderOperationStatus> result = await _stylesheetFolderService.CreateAsync(createModel);
+
         return result.Success
-            ? CreatedAtAction<ByPathStylesheetFolderController>(controller => nameof(controller.ByPath), new { path = result.Result!.Path })
+            ? CreatedAtAction<ByPathStylesheetFolderController>(controller => nameof(controller.ByPath), new { path = result.Result!.Path.SystemPathToVirtualPath() })
             : OperationStatusResult(result.Status);
     }
 }

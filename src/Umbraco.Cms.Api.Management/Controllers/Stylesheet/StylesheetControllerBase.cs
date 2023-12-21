@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Stylesheet;
 [VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.Stylesheet}")]
 [ApiExplorerSettings(GroupName = "Stylesheet")]
 [Authorize(Policy = "New" + AuthorizationPolicies.TreeAccessStylesheets)]
-public class StylesheetControllerBase : ManagementApiControllerBase
+public class StylesheetControllerBase : FileSystemManagementControllerBase
 {
     protected IActionResult StylesheetOperationStatusResult(StylesheetOperationStatus status) =>
         status switch

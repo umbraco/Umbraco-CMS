@@ -1,6 +1,7 @@
 ﻿using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Management.Extensions;
 using Umbraco.Cms.Api.Management.ViewModels.Script;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
@@ -15,26 +16,29 @@ namespace Umbraco.Cms.Api.Management.Controllers.Script;
 public class UpdateScriptController : ScriptControllerBase
 {
     private readonly IScriptService _scriptService;
-    private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly IUmbracoMapper _umbracoMapper;
+    private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
     public UpdateScriptController(
         IScriptService scriptService,
-        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-        IUmbracoMapper umbracoMapper)
+        IUmbracoMapper umbracoMapper,
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
     {
         _scriptService = scriptService;
-        _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
         _umbracoMapper = umbracoMapper;
+        _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
-    [HttpPut]
+    [HttpPut("{path}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> Update(UpdateScriptRequestModel updateViewModel)
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Update(string path, UpdateScriptRequestModel requestModel)
     {
-        ScriptUpdateModel? updateModel = _umbracoMapper.Map<ScriptUpdateModel>(updateViewModel);
-        Attempt<IScript?, ScriptOperationStatus> updateAttempt = await _scriptService.UpdateAsync(updateModel!, CurrentUserKey(_backOfficeSecurityAccessor));
+        path = DecodePath(path).VirtualPathToSystemPath();
+        ScriptUpdateModel updateModel = _umbracoMapper.Map<ScriptUpdateModel>(requestModel)!;
+
+        Attempt<IScript?, ScriptOperationStatus> updateAttempt = await _scriptService.UpdateAsync(path, updateModel, CurrentUserKey(_backOfficeSecurityAccessor));
 
         return updateAttempt.Success
             ? Ok()

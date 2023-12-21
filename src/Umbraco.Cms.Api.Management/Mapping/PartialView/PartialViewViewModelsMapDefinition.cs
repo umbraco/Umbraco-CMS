@@ -1,8 +1,14 @@
-﻿using Umbraco.Cms.Api.Management.ViewModels.PartialView;
+﻿using Microsoft.IdentityModel.Tokens;
+using Umbraco.Cms.Api.Management.Extensions;
+using Umbraco.Cms.Api.Management.ViewModels.PartialView;
+using Umbraco.Cms.Api.Management.ViewModels.PartialView.Folder;
 using Umbraco.Cms.Api.Management.ViewModels.PartialView.Snippets;
+using Umbraco.Cms.Api.Management.ViewModels.FileSystem;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.FileSystem;
 using Umbraco.Cms.Core.Snippets;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Mapping.PartialView;
 
@@ -10,18 +16,15 @@ public class PartialViewViewModelsMapDefinition : IMapDefinition
 {
     public void DefineMaps(IUmbracoMapper mapper)
     {
-        mapper.Define<PartialViewSnippet, PartialViewSnippetResponseModel>((_, _) => new PartialViewSnippetResponseModel { Name = string.Empty, Content = string.Empty }, Map);
         mapper.Define<IPartialView, PartialViewResponseModel>((_, _) => new PartialViewResponseModel { Name = string.Empty, Path = string.Empty, Content = string.Empty }, Map);
         mapper.Define<CreatePartialViewRequestModel, PartialViewCreateModel>((_, _) => new PartialViewCreateModel { Name = string.Empty }, Map);
-        mapper.Define<UpdatePartialViewRequestModel, PartialViewUpdateModel>((_, _) => new PartialViewUpdateModel { Content = string.Empty, ExistingPath = string.Empty, Name = string.Empty }, Map);
-    }
+        mapper.Define<UpdatePartialViewRequestModel, PartialViewUpdateModel>((_, _) => new PartialViewUpdateModel { Content = string.Empty }, Map);
+        mapper.Define<RenamePartialViewRequestModel, PartialViewRenameModel>((_, _) => new PartialViewRenameModel { Name = string.Empty }, Map);
 
-    // Umbraco.Code.MapAll
-    private void Map(UpdatePartialViewRequestModel source, PartialViewUpdateModel target, MapperContext context)
-    {
-        target.Name = source.Name;
-        target.Content = source.Content;
-        target.ExistingPath = source.ExistingPath;
+        mapper.Define<PartialViewSnippet, PartialViewSnippetResponseModel>((_, _) => new PartialViewSnippetResponseModel { Name = string.Empty, Content = string.Empty }, Map);
+
+        mapper.Define<PartialViewFolderModel, PartialViewFolderResponseModel>((_, _) => new PartialViewFolderResponseModel { Name = string.Empty, Path = string.Empty }, Map);
+        mapper.Define<CreatePartialViewFolderRequestModel, PartialViewFolderCreateModel>((_, _) => new PartialViewFolderCreateModel { Name = string.Empty }, Map);
     }
 
     // Umbraco.Code.MapAll
@@ -29,7 +32,14 @@ public class PartialViewViewModelsMapDefinition : IMapDefinition
     {
         target.Name = source.Name ?? string.Empty;
         target.Content = source.Content ?? string.Empty;
-        target.Path = source.Path;
+        target.Path = source.Path.SystemPathToVirtualPath();
+        var parentPath = source.Path.ParentPath();
+        target.Parent = parentPath.IsNullOrWhiteSpace()
+            ? null
+            : new FileSystemFolderModel
+            {
+                Path = parentPath.SystemPathToVirtualPath()
+            };
     }
 
     // Umbraco.Code.MapAll
@@ -37,13 +47,41 @@ public class PartialViewViewModelsMapDefinition : IMapDefinition
     {
         target.Name = source.Name;
         target.Content = source.Content;
-        target.ParentPath = source.ParentPath;
+        target.ParentPath = source.ParentPath?.VirtualPathToSystemPath();
     }
+
+    // Umbraco.Code.MapAll
+    private void Map(UpdatePartialViewRequestModel source, PartialViewUpdateModel target, MapperContext context)
+        => target.Content = source.Content;
+
+    // Umbraco.Code.MapAll
+    private void Map(RenamePartialViewRequestModel source, PartialViewRenameModel target, MapperContext context)
+        => target.Name = source.Name;
 
     // Umbraco.Code.MapAll
     private void Map(PartialViewSnippet source, PartialViewSnippetResponseModel target, MapperContext context)
     {
         target.Name = source.Name;
         target.Content = source.Content;
+    }
+
+    // Umbraco.Code.MapAll
+    private void Map(PartialViewFolderModel source, PartialViewFolderResponseModel target, MapperContext context)
+    {
+        target.Path = source.Path.SystemPathToVirtualPath();
+        target.Name = source.Name;
+        target.Parent = source.ParentPath.IsNullOrEmpty()
+            ? null
+            : new FileSystemFolderModel
+            {
+                Path = source.ParentPath!.SystemPathToVirtualPath()
+            };
+    }
+
+    // Umbraco.Code.MapAll
+    private void Map(CreatePartialViewFolderRequestModel source, PartialViewFolderCreateModel target, MapperContext context)
+    {
+        target.Name = source.Name;
+        target.ParentPath = source.ParentPath?.VirtualPathToSystemPath();
     }
 }

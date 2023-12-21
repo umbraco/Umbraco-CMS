@@ -1,8 +1,8 @@
-﻿using Umbraco.Cms.Api.Management.ViewModels.TextFiles;
+﻿using Umbraco.Cms.Api.Management.ViewModels.FileSystem;
 
 namespace Umbraco.Cms.Api.Management.ViewModels.Script;
 
-public class CreateScriptRequestModel : CreateTextFileViewModelBase
+public class CreateScriptRequestModel : FileSystemFileCreateRequestModelBase
 {
 
 }

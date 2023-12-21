@@ -2,6 +2,8 @@
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Api.Management.Services.Paging;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
+using Umbraco.Cms.Api.Management.Extensions;
+using Umbraco.Cms.Api.Management.ViewModels.FileSystem;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Extensions;
 
@@ -28,6 +30,7 @@ public abstract class FileSystemTreeControllerBase : ManagementApiControllerBase
 
     protected async Task<ActionResult<PagedViewModel<FileSystemTreeItemPresentationModel>>> GetChildren(string path, int skip, int take)
     {
+        path = path.VirtualPathToSystemPath();
         if (PaginationService.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize, out ProblemDetails? error) == false)
         {
             return BadRequest(error);
@@ -39,21 +42,6 @@ public abstract class FileSystemTreeControllerBase : ManagementApiControllerBase
         return await Task.FromResult(Ok(result));
     }
 
-    protected async Task<ActionResult<IEnumerable<FileSystemTreeItemPresentationModel>>> GetItems(string[] paths)
-    {
-        FileSystemTreeItemPresentationModel[] viewModels = paths
-            .Where(FileSystem.FileExists)
-            .Select(path =>
-            {
-                var fileName = GetFileName(path);
-                return fileName.IsNullOrWhiteSpace()
-                    ? null
-                    : MapViewModel(path, fileName, false);
-            }).WhereNotNull().ToArray();
-
-        return await Task.FromResult(Ok(viewModels));
-    }
-
     protected virtual string[] GetDirectories(string path) => FileSystem
         .GetDirectories(path)
         .OrderBy(directory => directory)
@@ -63,8 +51,6 @@ public abstract class FileSystemTreeControllerBase : ManagementApiControllerBase
         .GetFiles(path)
         .OrderBy(file => file)
         .ToArray();
-
-    protected virtual string GetFileName(string path) => FileSystem.GetFileName(path);
 
     protected virtual bool DirectoryHasChildren(string path)
         => FileSystem.GetFiles(path).Any() || FileSystem.GetDirectories(path).Any();
@@ -95,12 +81,18 @@ public abstract class FileSystemTreeControllerBase : ManagementApiControllerBase
         => new() { Total = totalItems, Items = viewModels };
 
     private FileSystemTreeItemPresentationModel MapViewModel(string path, string name, bool isFolder)
-        => new()
+    {
+        var parentPath = path.ParentPath();
+        return new FileSystemTreeItemPresentationModel
         {
-            Path = path,
+            Path = path.SystemPathToVirtualPath(),
             Name = name,
             HasChildren = isFolder && DirectoryHasChildren(path),
             Type = ItemType(path),
-            IsFolder = isFolder
+            IsFolder = isFolder,
+            Parent = parentPath.IsNullOrWhiteSpace()
+                ? null
+                : new FileSystemFolderModel { Path = parentPath.SystemPathToVirtualPath() }
         };
+    }
 }

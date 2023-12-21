@@ -1,7 +1,7 @@
-﻿using Umbraco.Cms.Api.Management.ViewModels.Item;
+﻿using Umbraco.Cms.Api.Management.ViewModels.FileSystem;
 
 namespace Umbraco.Cms.Api.Management.ViewModels.StaticFile.Item;
 
-public class StaticFileItemResponseModel : FileItemResponseModelBase
+public class StaticFileItemResponseModel : FileSystemResponseModelBase
 {
 }

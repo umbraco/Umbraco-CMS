@@ -1,6 +1,7 @@
 ﻿using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Management.Extensions;
 using Umbraco.Cms.Api.Management.ViewModels.Stylesheet;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
@@ -31,14 +32,14 @@ public class CreateStylesheetController : StylesheetControllerBase
     [HttpPost]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Create(CreateStylesheetRequestModel requestModel)
     {
         StylesheetCreateModel createModel = _umbracoMapper.Map<StylesheetCreateModel>(requestModel)!;
         Attempt<IStylesheet?, StylesheetOperationStatus> createAttempt = await _stylesheetService.CreateAsync(createModel, CurrentUserKey(_backOfficeSecurityAccessor));
 
         return createAttempt.Success
-            ? CreatedAtAction<ByPathStylesheetController>(controller => nameof(controller.ByPath), new { path = createAttempt.Result!.Path })
+            ? CreatedAtAction<ByPathStylesheetController>(controller => nameof(controller.ByPath), new { path = createAttempt.Result!.Path.SystemPathToVirtualPath() })
             : StylesheetOperationStatusResult(createAttempt.Status);
     }
-
 }

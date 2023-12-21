@@ -1,6 +1,7 @@
 ﻿using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Management.Extensions;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -21,11 +22,13 @@ public class DeleteStylesheetController : StylesheetControllerBase
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
-    [HttpDelete]
+    [HttpDelete("{path}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(string path)
     {
+        path = DecodePath(path).VirtualPathToSystemPath();
         StylesheetOperationStatus operationStatus = await _stylesheetService.DeleteAsync(path, CurrentUserKey(_backOfficeSecurityAccessor));
 
         return operationStatus is StylesheetOperationStatus.Success

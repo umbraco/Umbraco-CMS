@@ -1,6 +1,7 @@
 ﻿using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Management.Extensions;
 using Umbraco.Cms.Api.Management.ViewModels.Script;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
@@ -15,32 +16,30 @@ namespace Umbraco.Cms.Api.Management.Controllers.Script;
 public class CreateScriptController : ScriptControllerBase
 {
     private readonly IScriptService _scriptService;
-    private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly IUmbracoMapper _umbracoMapper;
+    private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
     public CreateScriptController(
         IScriptService scriptService,
-        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-        IUmbracoMapper umbracoMapper)
+        IUmbracoMapper umbracoMapper,
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
     {
         _scriptService = scriptService;
-        _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
         _umbracoMapper = umbracoMapper;
+        _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
     [HttpPost]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Create(CreateScriptRequestModel requestModel)
     {
-        Guid currentUserKey = CurrentUserKey(_backOfficeSecurityAccessor);
-
         ScriptCreateModel createModel = _umbracoMapper.Map<ScriptCreateModel>(requestModel)!;
-
-        Attempt<IScript?, ScriptOperationStatus> createAttempt = await _scriptService.CreateAsync(createModel, currentUserKey);
+        Attempt<IScript?, ScriptOperationStatus> createAttempt = await _scriptService.CreateAsync(createModel, CurrentUserKey(_backOfficeSecurityAccessor));
 
         return createAttempt.Success
-            ? CreatedAtAction<ByPathScriptController>(controller => nameof(controller.ByPath), new { path = createAttempt.Result!.Path })
+            ? CreatedAtAction<ByPathScriptController>(controller => nameof(controller.ByPath), new { path = createAttempt.Result!.Path.SystemPathToVirtualPath() })
             : ScriptOperationStatusResult(createAttempt.Status);
     }
 }

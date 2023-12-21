@@ -4,9 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Mapping;
-using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Web.Common.Authorization;
 
@@ -16,27 +13,9 @@ namespace Umbraco.Cms.Api.Management.Controllers.Stylesheet.Folder;
 [VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.Stylesheet}/folder")]
 [ApiExplorerSettings(GroupName = "Stylesheet")]
 [Authorize(Policy = "New" + AuthorizationPolicies.TreeAccessStylesheets)]
-public class StylesheetFolderControllerBase : PathFolderManagementControllerBase<StylesheetFolderOperationStatus>
+public class StylesheetFolderControllerBase : FileSystemManagementControllerBase
 {
-    private readonly IStylesheetFolderService _stylesheetFolderService;
-
-    public StylesheetFolderControllerBase(
-        IUmbracoMapper mapper,
-        IStylesheetFolderService stylesheetFolderService)
-        : base(mapper)
-    {
-        _stylesheetFolderService = stylesheetFolderService;
-    }
-
-    protected override Task<PathContainer?> GetContainerAsync(string path) => _stylesheetFolderService.GetAsync(path);
-
-    protected override Task<Attempt<PathContainer?, StylesheetFolderOperationStatus>> CreateContainerAsync(PathContainer container)
-        => _stylesheetFolderService.CreateAsync(container);
-
-    protected override Task<Attempt<StylesheetFolderOperationStatus>> DeleteContainerAsync(string path)
-        => _stylesheetFolderService.DeleteAsync(path);
-
-    protected override IActionResult OperationStatusResult(StylesheetFolderOperationStatus status) =>
+    protected IActionResult OperationStatusResult(StylesheetFolderOperationStatus status) =>
         status switch
         {
             StylesheetFolderOperationStatus.AlreadyExists => BadRequest(new ProblemDetailsBuilder()
