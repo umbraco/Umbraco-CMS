@@ -18,16 +18,21 @@ export class UmbPropertyEditorUIDocumentTypePickerElement extends UmbLitElement 
 
 	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
-		const validationLimit = config?.find((x) => x.alias === 'validationLimit');
+		if (config) {
+			const validationLimit = config.getValueByAlias<any>('validationLimit');
+			this._limitMin = validationLimit?.min;
+			this._limitMax = validationLimit?.max;
 
-		this._limitMin = (validationLimit?.value as any)?.min;
-		this._limitMax = (validationLimit?.value as any)?.max;
+			this._onlyElementTypes = config.getValueByAlias('onlyPickElementTypes');
+		}
 	}
 
 	@state()
 	private _limitMin?: number;
 	@state()
 	private _limitMax?: number;
+	@state()
+	private _onlyElementTypes?: boolean;
 
 	private _onChange(event: CustomEvent) {
 		this.value = (event.target as UmbInputDocumentTypeElement).selectedIds;
@@ -42,6 +47,7 @@ export class UmbPropertyEditorUIDocumentTypePickerElement extends UmbLitElement 
 				.selectedIds=${this._value}
 				.min=${this._limitMin ?? 0}
 				.max=${this._limitMax ?? Infinity}
+				.element-types-only=${this._onlyElementTypes}
 				>Add</umb-input-document-type
 			>
 		`;

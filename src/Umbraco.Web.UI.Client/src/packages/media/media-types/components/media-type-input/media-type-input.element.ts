@@ -66,14 +66,6 @@ export class UmbMediaTypeInputElement extends FormControlMixin(UmbLitElement) {
 		this.selectedIds = splitStringToArray(idsString);
 	}
 
-	@property()
-	get pickableFilter() {
-		return this.#pickerContext.pickableFilter;
-	}
-	set pickableFilter(newVal) {
-		this.#pickerContext.pickableFilter = newVal;
-	}
-
 	@state()
 	private _items?: Array<MediaTypeItemResponseModel>;
 

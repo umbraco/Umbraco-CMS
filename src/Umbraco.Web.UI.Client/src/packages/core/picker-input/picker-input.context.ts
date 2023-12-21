@@ -19,8 +19,6 @@ export class UmbPickerInputContext<ItemType extends { name: string }> extends Um
 
 	public modalManager?: UmbModalManagerContext;
 
-	public pickableFilter?: (item: ItemType) => boolean = () => true;
-
 	#init: Promise<unknown>;
 
 	#itemManager;
@@ -74,7 +72,6 @@ export class UmbPickerInputContext<ItemType extends { name: string }> extends Um
 		const modalContext = this.modalManager.open(this.modalAlias, {
 			data: {
 				multiple: this.max === 1 ? false : true,
-				pickableFilter: this.pickableFilter,
 				...pickerData,
 			},
 			value: {

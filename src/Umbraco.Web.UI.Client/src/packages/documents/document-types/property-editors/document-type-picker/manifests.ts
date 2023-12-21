@@ -17,6 +17,12 @@ export const manifest: ManifestPropertyEditorUi = {
 					description: 'Opens the node in a dialog',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
 				},
+				{
+					alias: 'onlyPickElementTypes',
+					label: 'Only Element Types',
+					description: 'Limit to only pick Element Types',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
+				},
 			],
 		},
 	},

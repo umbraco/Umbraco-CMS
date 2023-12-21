@@ -29,11 +29,23 @@ export class UmbBlockTypeListWorkspaceViewSettingsElement extends UmbLitElement 
 				<umb-property
 					label="Content Model"
 					alias="contentElementTypeKey"
-					property-editor-ui-alias="Umb.PropertyEditorUi.ElementTypePicker"></umb-property>
+					property-editor-ui-alias="Umb.PropertyEditorUi.DocumentTypePicker"
+					.config=${[
+						{
+							alias: 'onlyPickElementTypes',
+							value: true,
+						},
+					]}></umb-property>
 				<umb-property
 					label="Settings Model"
 					alias="settingsElementTypeKey"
-					property-editor-ui-alias="Umb.PropertyEditorUi.ElementTypePicker"></umb-property>
+					property-editor-ui-alias="Umb.PropertyEditorUi.DocumentTypePicker"
+					.config=${[
+						{
+							alias: 'onlyPickElementTypes',
+							value: true,
+						},
+					]}></umb-property>
 			</uui-box>
 			<uui-box headline="Catalogue appearance">
 				<umb-property
