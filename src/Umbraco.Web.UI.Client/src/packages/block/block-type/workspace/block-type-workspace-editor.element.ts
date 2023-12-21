@@ -2,6 +2,7 @@ import { UMB_BLOCK_TYPE_WORKSPACE_CONTEXT } from './block-type-workspace.context
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { customElement, css, html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+
 @customElement('umb-block-type-workspace-editor')
 export class UmbBlockTypeWorkspaceEditorElement extends UmbLitElement {
 	//

@@ -1,4 +1,9 @@
-import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
+import {
+	UMB_DOCUMENT_TYPE_PICKER_MODAL,
+	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
+	UMB_WORKSPACE_MODAL,
+	UmbModalRouteRegistrationController,
+} from '@umbraco-cms/backoffice/modal';
 import { UmbBlockTypeBase } from '../../types.js';
 import '../block-type-card/index.js';
 import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
@@ -39,8 +44,24 @@ export class UmbInputBlockTypeElement<BlockType extends UmbBlockTypeBase = UmbBl
 	}
 
 	create() {
-		//TODO: make flow of picking a element type first, and then:
-		this.#blockTypeWorkspaceModalRegistration.open({}, 'create/element-type-key');
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, async (modalManager) => {
+			if (modalManager) {
+				const modalContext = modalManager.open(UMB_DOCUMENT_TYPE_PICKER_MODAL, {
+					data: {
+						hideTreeRoot: true,
+						multiple: false,
+						pickableFilter: (x) => x.isElement,
+					},
+				});
+
+				const modalValue = await modalContext?.onSubmit();
+				const selectedElementType = modalValue.selection[0];
+				if (selectedElementType) {
+					this.#blockTypeWorkspaceModalRegistration.open({}, 'create/' + selectedElementType);
+				}
+			}
+		});
+
 		// No need to fire a change event, as all changes are made directly to the property, via context api.
 	}
 
