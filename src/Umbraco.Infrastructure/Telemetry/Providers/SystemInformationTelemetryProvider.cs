@@ -116,7 +116,7 @@ internal class SystemInformationTelemetryProvider : IDetailedTelemetryProvider, 
     {
         { "version", _version.SemanticVersion.ToSemanticString() },
         { "assemblyVersion", _version.SemanticVersion.ToSemanticStringWithoutBuild() },
-        { "serverTimeOffset", 60 },
+        { "serverTimeOffset", Convert.ToInt32(DateTimeOffset.Now.Offset.TotalMinutes) },
         { "runtimeMode", RuntimeMode },
     };
 
