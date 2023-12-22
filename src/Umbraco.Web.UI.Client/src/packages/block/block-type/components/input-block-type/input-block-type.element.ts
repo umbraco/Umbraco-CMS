@@ -1,10 +1,10 @@
+import { UmbBlockTypeBase } from '../../types.js';
 import {
 	UMB_DOCUMENT_TYPE_PICKER_MODAL,
 	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
 	UMB_WORKSPACE_MODAL,
 	UmbModalRouteRegistrationController,
 } from '@umbraco-cms/backoffice/modal';
-import { UmbBlockTypeBase } from '../../types.js';
 import '../block-type-card/index.js';
 import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -21,26 +21,42 @@ export class UmbInputBlockTypeElement<BlockType extends UmbBlockTypeBase = UmbBl
 		this._items = items ?? [];
 	}
 
+	@property({ type: String, attribute: 'entity-type' })
+	public get entityType() {
+		return this.#entityType;
+	}
+	public set entityType(entityType) {
+		this.#entityType = entityType;
+
+		this.#blockTypeWorkspaceModalRegistration?.destroy();
+
+		if (entityType) {
+			this.#blockTypeWorkspaceModalRegistration = new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
+				.addAdditionalPath(entityType)
+				.onSetup(() => {
+					return { data: { entityType: entityType, preset: {} } };
+				})
+				.observeRouteBuilder((routeBuilder) => {
+					const newpath = routeBuilder({});
+					this._workspacePath = newpath;
+				});
+		}
+	}
+	#entityType?: string;
+
 	@state()
 	private _items: Array<BlockType> = [];
 
 	@state()
 	private _workspacePath?: string;
 
-	#blockTypeWorkspaceModalRegistration;
+	#blockTypeWorkspaceModalRegistration?: UmbModalRouteRegistrationController<
+		typeof UMB_WORKSPACE_MODAL.DATA,
+		typeof UMB_WORKSPACE_MODAL.VALUE
+	>;
 
 	constructor() {
 		super();
-
-		this.#blockTypeWorkspaceModalRegistration = new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
-			.addAdditionalPath('block-type')
-			.onSetup(() => {
-				return { data: { entityType: 'block-type', preset: {} } };
-			})
-			.observeRouteBuilder((routeBuilder) => {
-				const newpath = routeBuilder({});
-				this._workspacePath = newpath;
-			});
 	}
 
 	create() {
@@ -62,7 +78,7 @@ export class UmbInputBlockTypeElement<BlockType extends UmbBlockTypeBase = UmbBl
 				const modalValue = await modalContext?.onSubmit();
 				const selectedElementType = modalValue.selection[0];
 				if (selectedElementType) {
-					this.#blockTypeWorkspaceModalRegistration.open({}, 'create/' + selectedElementType);
+					this.#blockTypeWorkspaceModalRegistration?.open({}, 'create/' + selectedElementType);
 				}
 			}
 		});

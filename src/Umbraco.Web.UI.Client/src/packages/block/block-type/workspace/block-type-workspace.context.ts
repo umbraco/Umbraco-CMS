@@ -9,12 +9,13 @@ import {
 import { UmbArrayState, UmbObjectState, appendToFrozenArray } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerHost, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { PropertyEditorConfigProperty } from '@umbraco-cms/backoffice/extension-registry';
+import { ManifestWorkspace, PropertyEditorConfigProperty } from '@umbraco-cms/backoffice/extension-registry';
 
 export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeBase = UmbBlockTypeBase>
 	extends UmbEditableWorkspaceContextBase<never, BlockTypeData>
 	implements UmbInvariantableWorkspaceContextInterface
 {
+	#entityType: string;
 	#data = new UmbObjectState<BlockTypeData | undefined>(undefined);
 	readonly data = this.#data.asObservable();
 
@@ -25,9 +26,10 @@ export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeBase
 	#properties = new UmbArrayState<PropertyEditorConfigProperty>([], (x) => x.alias);
 	readonly properties = this.#properties.asObservable();
 
-	constructor(host: UmbControllerHostElement) {
+	constructor(host: UmbControllerHostElement, workspaceArgs: { manifest: ManifestWorkspace }) {
 		// TODO: We don't need a repo here, so maybe we should not require this of the UmbEditableWorkspaceContextBase
-		super(host, 'Umb.Workspace.BlockType', undefined as never);
+		super(host, workspaceArgs.manifest.alias, undefined as never);
+		this.#entityType = workspaceArgs.manifest.meta?.entityType;
 	}
 
 	createPropertyDatasetContext(host: UmbControllerHost): UmbPropertyDatasetContext {
@@ -69,7 +71,7 @@ export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeBase
 	}
 
 	getEntityType() {
-		return 'data-type';
+		return this.#entityType;
 	}
 
 	getName() {

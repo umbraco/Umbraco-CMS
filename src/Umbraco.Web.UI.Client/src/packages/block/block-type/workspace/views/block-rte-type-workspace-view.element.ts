@@ -3,11 +3,12 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
 
-@customElement('umb-block-type-list-workspace-view-settings')
-export class UmbBlockTypeListWorkspaceViewSettingsElement extends UmbLitElement implements UmbWorkspaceViewElement {
+@customElement('umb-block-rte-type-workspace-view-settings')
+export class UmbBlockRteTypeWorkspaceViewSettingsElement extends UmbLitElement implements UmbWorkspaceViewElement {
 	render() {
 		return html`
 			<uui-box headline="Editor Appearance">
+				<h5>FOR RTE</h5>
 				<umb-property
 					label="Label"
 					alias="label"
@@ -85,24 +86,14 @@ export class UmbBlockTypeListWorkspaceViewSettingsElement extends UmbLitElement 
 			uui-box {
 				margin-top: var(--uui-size-layout-1);
 			}
-
-			uui-label,
-			umb-property-editor-ui-number {
-				display: block;
-			}
-
-			// TODO: is this necessary?
-			uui-toggle {
-				display: flex;
-			}
 		`,
 	];
 }
 
-export default UmbBlockTypeListWorkspaceViewSettingsElement;
+export default UmbBlockRteTypeWorkspaceViewSettingsElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-block-type-list-workspace-view-settings': UmbBlockTypeListWorkspaceViewSettingsElement;
+		'umb-block-rte-type-workspace-view-settings': UmbBlockRteTypeWorkspaceViewSettingsElement;
 	}
 }

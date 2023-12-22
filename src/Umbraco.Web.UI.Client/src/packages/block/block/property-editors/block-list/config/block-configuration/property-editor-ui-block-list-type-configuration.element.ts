@@ -22,6 +22,7 @@ export class UmbPropertyEditorUIBlockListBlockConfigurationElement
 
 	render() {
 		return html`<umb-input-block-type
+			entity-type="block-list-type"
 			.value=${this.value}
 			@change=${(e: Event) => {
 				this.value = (e.target as UmbInputBlockTypeElement).value;

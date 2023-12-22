@@ -12,14 +12,20 @@ import { ManifestWorkspace, umbExtensionsRegistry } from '@umbraco-cms/backoffic
 @customElement('umb-block-type-workspace')
 export class UmbBlockTypeWorkspaceElement extends UmbLitElement {
 	//
+	#manifest?: ManifestWorkspace;
 	#workspaceContext?: UmbBlockTypeWorkspaceContext;
-	#editorElement = () => new UmbBlockTypeWorkspaceEditorElement();
+	#editorElement = () => {
+		const element = new UmbBlockTypeWorkspaceEditorElement();
+		element.workspaceAlias = this.#manifest!.alias;
+		return element;
+	};
 
 	@state()
 	_routes: UmbRoute[] = [];
 
 	public set manifest(manifest: ManifestWorkspace) {
-		createExtensionApi(manifest, [this]).then((context) => {
+		this.#manifest = manifest;
+		createExtensionApi(manifest, [this, { manifest: manifest }]).then((context) => {
 			if (context) {
 				this.#gotWorkspaceContext(context);
 			}

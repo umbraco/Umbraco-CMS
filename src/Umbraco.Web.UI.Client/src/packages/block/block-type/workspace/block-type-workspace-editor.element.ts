@@ -1,6 +1,6 @@
 import { UMB_BLOCK_TYPE_WORKSPACE_CONTEXT } from './block-type-workspace.context.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { customElement, css, html, state } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, css, html, state, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbRepositoryItemsManager } from '@umbraco-cms/backoffice/repository';
 import { DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS, UmbDocumentTypeItemModel } from '@umbraco-cms/backoffice/document-type';
@@ -18,6 +18,9 @@ export class UmbBlockTypeWorkspaceEditorElement extends UmbLitElement {
 
 	@state()
 	_name?: string;
+
+	@property({ type: String, attribute: false })
+	workspaceAlias?: string;
 
 	constructor() {
 		super();
@@ -45,10 +48,12 @@ export class UmbBlockTypeWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	render() {
-		return html`
-			<umb-workspace-editor alias="Umb.Workspace.DataType" headline="Configuration of '${this._name}'">
-			</umb-workspace-editor>
-		`;
+		return this.workspaceAlias
+			? html`
+					<umb-workspace-editor alias=${this.workspaceAlias} headline="Configuration of '${this._name}'">
+					</umb-workspace-editor>
+			  `
+			: '';
 	}
 
 	static styles = [
