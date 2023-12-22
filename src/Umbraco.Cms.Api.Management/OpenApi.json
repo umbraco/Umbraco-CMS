@@ -17045,6 +17045,9 @@
           },
           "401": {
             "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user do not have access to this resource"
           }
         },
         "security": [
@@ -17126,6 +17129,9 @@
           },
           "401": {
             "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user do not have access to this resource"
           }
         },
         "security": [
@@ -23987,6 +23993,48 @@
         },
         "additionalProperties": false
       },
+      "ServerConfigurationBaseModel": {
+        "required": [
+          "items"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ServerConfigurationItemResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "ServerConfigurationItemResponseModel": {
+        "required": [
+          "data",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "data": { }
+        },
+        "additionalProperties": false
+      },
+      "ServerInformationResponseModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ServerConfigurationBaseModel"
+          }
+        ],
+        "additionalProperties": false
+      },
       "ServerStatusResponseModel": {
         "required": [
           "serverStatus"
@@ -23999,39 +24047,13 @@
         },
         "additionalProperties": false
       },
-      "ServerTroubleshootingItemResponseModel": {
-        "required": [
-          "data",
-          "name"
-        ],
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "data": {
-            "type": "string"
-          }
-        },
-        "additionalProperties": false
-      },
       "ServerTroubleshootingResponseModel": {
-        "required": [
-          "items"
-        ],
         "type": "object",
-        "properties": {
-          "items": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/ServerTroubleshootingItemResponseModel"
-                }
-              ]
-            }
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ServerConfigurationBaseModel"
           }
-        },
+        ],
         "additionalProperties": false
       },
       "SetAvatarRequestModel": {
