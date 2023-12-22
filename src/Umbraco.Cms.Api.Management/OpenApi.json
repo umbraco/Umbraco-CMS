@@ -13531,20 +13531,29 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "additionalProperties": { }
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ServerInformationResponseModel"
+                    }
+                  ]
                 }
               },
               "text/json": {
                 "schema": {
-                  "type": "object",
-                  "additionalProperties": { }
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ServerInformationResponseModel"
+                    }
+                  ]
                 }
               },
               "text/plain": {
                 "schema": {
-                  "type": "object",
-                  "additionalProperties": { }
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ServerInformationResponseModel"
+                    }
+                  ]
                 }
               }
             }
@@ -16892,6 +16901,176 @@
           },
           "401": {
             "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/user-group/{id}/users": {
+      "delete": {
+        "tags": [
+          "User Group"
+        ],
+        "operationId": "DeleteUserGroupByIdUsers",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "text/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user do not have access to this resource"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "User Group"
+        ],
+        "operationId": "PostUserGroupByIdUsers",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "text/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user do not have access to this resource"
           }
         },
         "security": [
@@ -23635,6 +23814,14 @@
         ],
         "type": "string"
       },
+      "RuntimeModeModel": {
+        "enum": [
+          "BackofficeDevelopment",
+          "Development",
+          "Production"
+        ],
+        "type": "string"
+      },
       "SavedLogSearchPresenationBaseModel": {
         "required": [
           "name",
@@ -23782,17 +23969,34 @@
           "name": {
             "type": "string"
           },
-          "data": { }
+          "data": {
+            "type": "string"
+          }
         },
         "additionalProperties": false
       },
       "ServerInformationResponseModel": {
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/ServerConfigurationBaseModel"
-          }
+        "required": [
+          "assemblyVersion",
+          "baseUtcOffset",
+          "runtimeMode",
+          "version"
         ],
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "string"
+          },
+          "assemblyVersion": {
+            "type": "string"
+          },
+          "baseUtcOffset": {
+            "type": "string"
+          },
+          "runtimeMode": {
+            "$ref": "#/components/schemas/RuntimeModeModel"
+          }
+        },
         "additionalProperties": false
       },
       "ServerStatusResponseModel": {

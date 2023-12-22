@@ -4,5 +4,5 @@ public class ServerConfigurationItemResponseModel
 {
     public required string Name { get; set; }
 
-    public required object Data { get; set; }
+    public required string Data { get; set; }
 }

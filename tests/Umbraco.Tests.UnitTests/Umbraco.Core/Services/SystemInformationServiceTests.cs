@@ -131,7 +131,7 @@ public class SystemInformationServiceTests
         Assert.AreEqual(isDebug.ToString(), actual.Value);
     }
 
-    private ISystemInformationService CreateSystemInformationService(
+    private ISystemTroubleshootingInformationService CreateSystemInformationService(
         string culture = "",
         ModelsMode modelsMode = ModelsMode.InMemoryAuto,
         bool isDebug = true,
@@ -142,7 +142,7 @@ public class SystemInformationServiceTests
         var databaseMock = new Mock<IUmbracoDatabase>();
         databaseMock.Setup(x => x.DatabaseType.GetProviderName()).Returns("SQL");
 
-        return new SystemInformationTelemetryProvider(
+        return new SystemTroubleshootingInformationTelemetryProvider(
             _umbracoVersion,
             localizationService,
             Mock.Of<IOptionsMonitor<ModelsBuilderSettings>>(x => x.CurrentValue == new ModelsBuilderSettings { ModelsMode = modelsMode }),

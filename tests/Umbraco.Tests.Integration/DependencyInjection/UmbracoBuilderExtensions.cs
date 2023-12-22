@@ -46,7 +46,7 @@ public static class UmbracoBuilderExtensions
         builder.Services.AddUnique(Mock.Of<IUmbracoBootPermissionChecker>());
         builder.Services.AddUnique(testHelper.MainDom);
 
-        builder.Services.AddUnique<ExamineIndexRebuilder, TestBackgroundIndexRebuilder>();
+        builder.Services.AddUnique<IIndexRebuilder, TestBackgroundIndexRebuilder>();
         builder.Services.AddUnique(factory => Mock.Of<IRuntimeMinifier>());
 
         // we don't want persisted nucache files in tests

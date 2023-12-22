@@ -5,6 +5,7 @@ public enum UserGroupOperationStatus
 {
     Success,
     NotFound,
+    UserNotFound,
     AlreadyExists,
     DuplicateAlias,
     MissingUser,
