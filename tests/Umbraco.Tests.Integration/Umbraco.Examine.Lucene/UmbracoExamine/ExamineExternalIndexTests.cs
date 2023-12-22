@@ -22,7 +22,6 @@ using Umbraco.Cms.Web.BackOffice.Security;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine;
 
-[Ignore("Need rework after save and publish have been splitted")]
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
 public class ExamineExternalIndexTests : ExamineBaseTest
@@ -74,8 +73,13 @@ public class ExamineExternalIndexTests : ExamineBaseTest
     }
 
     private IEnumerable<ISearchResult> ExamineExternalIndexSearch(string query, int pageSize = 20, int pageIndex = 0) =>
-        ExamineExternalIndexSearcher.Search(query, UmbracoEntityTypes.Document,
-            pageSize, pageIndex, out _, ignoreUserStartNodes: true);
+        ExamineExternalIndexSearcher.Search(
+            query,
+            UmbracoEntityTypes.Document,
+            pageSize,
+            pageIndex,
+            out _,
+            ignoreUserStartNodes: true);
 
     private async Task SetupUserIdentity(string userId)
     {
@@ -100,8 +104,15 @@ public class ExamineExternalIndexTests : ExamineBaseTest
             .WithName(ContentName)
             .WithContentType(contentType)
             .Build();
-        await ExecuteAndWaitForIndexing(() => ContentService.SaveAndPublish(content), Constants.UmbracoIndexes.ExternalIndexName);
+        await ExecuteAndWaitForIndexing(
+            () =>
+        {
+            ContentService.Save(content);
+            return ContentService.Publish(content, Array.Empty<string>());
+        },
+            Constants.UmbracoIndexes.ExternalIndexName);
 
+        // TODO: Why does this fail now?
         // Act
         IEnumerable<ISearchResult> actual = ExamineExternalIndexSearch(ContentName);
 
