@@ -28,9 +28,7 @@ public class ExamineExternalIndexSearcherTest : IExamineExternalIndexSearcherTes
     private readonly IEntityService _entityService;
     private readonly IExamineManager _examineManager;
     private readonly ILocalizationService _languageService;
-    private readonly IPublishedUrlProvider _publishedUrlProvider;
     private readonly IUmbracoTreeSearcherFields _treeSearcherFields;
-    private readonly IUmbracoMapper _umbracoMapper;
 
     public ExamineExternalIndexSearcherTest(
         IExamineManager examineManager,
@@ -38,9 +36,7 @@ public class ExamineExternalIndexSearcherTest : IExamineExternalIndexSearcherTes
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
         IEntityService entityService,
         IUmbracoTreeSearcherFields treeSearcherFields,
-        AppCaches appCaches,
-        IUmbracoMapper umbracoMapper,
-        IPublishedUrlProvider publishedUrlProvider)
+        AppCaches appCaches)
     {
         _examineManager = examineManager;
         _languageService = languageService;
@@ -48,8 +44,6 @@ public class ExamineExternalIndexSearcherTest : IExamineExternalIndexSearcherTes
         _entityService = entityService;
         _treeSearcherFields = treeSearcherFields;
         _appCaches = appCaches;
-        _umbracoMapper = umbracoMapper;
-        _publishedUrlProvider = publishedUrlProvider;
     }
 
     public IEnumerable<ISearchResult> Search(
