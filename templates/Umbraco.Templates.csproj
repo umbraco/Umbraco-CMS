@@ -50,7 +50,6 @@
   <ItemGroup>
     <PackageReference Include="Umbraco.JsonSchema.Extensions" Version="0.3.0" PrivateAssets="all" />
   </ItemGroup>
-  <Target Name="GetUpdatedTemplateJsonPackageFiles" BeforeTargets="GenerateNuspec" AfterTargets="GetBuildVersion;GetUmbracoBuildVersion">
   <ItemGroup>
     <Content Update="**\.template.config\template.json" Pack="false" />
   </ItemGroup>
@@ -64,13 +63,9 @@
     <Copy SourceFiles="@(_TemplateJsonFiles)" DestinationFiles="%(DestinationFile)" />
     <JsonPathUpdateValue JsonFile="%(_TemplateJsonFiles.DestinationFile)" Path="$.symbols.UmbracoVersion.defaultValue" Value="&quot;$(PackageVersion)&quot;" />
     <ItemGroup>
-      <_PackageFiles Remove="@(_TemplateJsonFiles)" />
-      <_PackageFiles Include="%(_TemplateJsonFiles.DestinationFile)">
-        <PackagePath>%(RelativeDir)</PackagePath>
       <_PackageFiles Include="%(_TemplateJsonFiles.DestinationFile)">
         <PackagePath>%(_TemplateJsonFiles.RelativeDir)</PackagePath>
       </_PackageFiles>
     </ItemGroup>
   </Target>
 </Project>
-
