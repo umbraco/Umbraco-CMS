@@ -24,7 +24,6 @@ using Umbraco.Cms.Web.BackOffice.Security;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine;
 
-[Ignore("Need rework after save and publish have been splitted")]
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
 public class BackOfficeExamineSearcherTests : ExamineBaseTest
@@ -53,6 +52,8 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
     private ILocalizationService LocalizationService => GetRequiredService<ILocalizationService>();
+
+    private ILanguageService LanguageService => GetRequiredService<ILanguageService>();
 
     private ContentService ContentService => (ContentService)GetRequiredService<IContentService>();
 
@@ -90,7 +91,8 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
         var contentType = new ContentTypeBuilder()
             .WithId(0)
             .Build();
-        await ExecuteAndWaitForIndexing(() => ContentTypeService.Save(contentType), Constants.UmbracoIndexes.InternalIndexName);
+        // TODO: Why does this no longer cause the index to be updated?
+        await ContentTypeService.SaveAsync(contentType, Constants.Security.SuperUserKey);
 
         var content = new ContentBuilder()
             .WithId(0)
@@ -98,7 +100,13 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
             .WithContentType(contentType)
             .Build();
 
-        var createdContent = await ExecuteAndWaitForIndexing(() => ContentService.SaveAndPublish(content), Constants.UmbracoIndexes.InternalIndexName);
+        var createdContent = await ExecuteAndWaitForIndexing(
+            () =>
+        {
+            ContentService.Save(content);
+            return ContentService.Publish(content, Array.Empty<string>());
+        },
+            Constants.UmbracoIndexes.InternalIndexName);
 
         return createdContent;
     }
@@ -111,7 +119,7 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
         var langDa = new LanguageBuilder()
             .WithCultureInfo(dkIso)
             .Build();
-        LocalizationService.Save(langDa);
+        await LanguageService.CreateAsync(langDa, Constants.Security.SuperUserKey);
 
         var contentType = new ContentTypeBuilder()
             .WithId(0)
