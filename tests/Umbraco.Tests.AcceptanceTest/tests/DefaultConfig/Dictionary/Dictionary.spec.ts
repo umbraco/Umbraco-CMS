@@ -18,7 +18,7 @@ test.describe('Dictionary tests', () => {
   test('can create a dictionary item', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.dictionary.ensureNameNotExists(dictionaryName);
-    await umbracoUi.goToSection(ConstantHelper.sections.dictionary);
+    await umbracoUi.dictionary.goToSection(ConstantHelper.sections.dictionary);
 
     //Act
     await umbracoUi.dictionary.clickCreateDictionaryItemButton();
@@ -27,7 +27,7 @@ test.describe('Dictionary tests', () => {
 
     // Assert
     expect(await umbracoApi.dictionary.doesNameExist(dictionaryName)).toBeTruthy();
-    await umbracoUi.isSuccessNotificationVisible();
+    await umbracoUi.dictionary.isSuccessNotificationVisible();
     // TODO: when frontend is ready, verify the new dictionary item displays in tree and in list
     // await umbracoUi.goToSection(ConstantHelper.sections.dictionary);
     // expect(await umbracoUi.dictionary.isDictionaryListHasText(dictionaryName)).toBeTruthy();
@@ -37,7 +37,7 @@ test.describe('Dictionary tests', () => {
     // Arrange
     await umbracoApi.dictionary.ensureNameNotExists(dictionaryName);
     await umbracoApi.dictionary.create(dictionaryName);
-    await umbracoUi.goToSection(ConstantHelper.sections.dictionary);
+    await umbracoUi.dictionary.goToSection(ConstantHelper.sections.dictionary);
 
     //Act
     await umbracoUi.dictionary.clickActionsMenuForDictionary(dictionaryName);
@@ -53,7 +53,7 @@ test.describe('Dictionary tests', () => {
     let parentDictionaryId;
     await umbracoApi.dictionary.ensureNameNotExists(parentDictionaryName);
     parentDictionaryId = await umbracoApi.dictionary.create(parentDictionaryName);
-    await umbracoUi.goToSection(ConstantHelper.sections.dictionary);
+    await umbracoUi.dictionary.goToSection(ConstantHelper.sections.dictionary);
 
     //Act
     await umbracoUi.dictionary.clickActionsMenuForDictionary(parentDictionaryName);
@@ -72,7 +72,7 @@ test.describe('Dictionary tests', () => {
     // Arrange
     await umbracoApi.dictionary.ensureNameNotExists(dictionaryName);
     await umbracoApi.dictionary.create(dictionaryName);
-    await umbracoUi.goToSection(ConstantHelper.sections.dictionary);
+    await umbracoUi.dictionary.goToSection(ConstantHelper.sections.dictionary);
 
     //Act
     await umbracoUi.dictionary.clickActionsMenuForDictionary(dictionaryName);
@@ -90,7 +90,7 @@ test.describe('Dictionary tests', () => {
     await umbracoApi.dictionary.ensureNameNotExists(parentDictionaryName);
     parentDictionaryId = await umbracoApi.dictionary.create(parentDictionaryName);
     await umbracoApi.dictionary.create(dictionaryName, [], parentDictionaryId);
-    await umbracoUi.goToSection(ConstantHelper.sections.dictionary);
+    await umbracoUi.dictionary.goToSection(ConstantHelper.sections.dictionary);
 
     //Act
     await umbracoUi.dictionary.clickActionsMenuForDictionary(dictionaryName);
@@ -107,7 +107,7 @@ test.describe('Dictionary tests', () => {
     const udtFilePath = './fixtures/dictionary/TestSingleDictionary.udt';
     await umbracoApi.dictionary.ensureNameNotExists(dictionaryName);
     await umbracoApi.dictionary.create(dictionaryName);
-    await umbracoUi.goToSection(ConstantHelper.sections.dictionary);
+    await umbracoUi.dictionary.goToSection(ConstantHelper.sections.dictionary);
 
     //Act
     await umbracoUi.dictionary.clickActionsMenuForDictionary(dictionaryName);
@@ -127,7 +127,7 @@ test.describe('Dictionary tests', () => {
     await umbracoApi.dictionary.ensureNameNotExists(parentDictionaryName);
     parentDictionaryId = await umbracoApi.dictionary.create(parentDictionaryName);
     await umbracoApi.dictionary.create(dictionaryName, [], parentDictionaryId);
-    await umbracoUi.goToSection(ConstantHelper.sections.dictionary);
+    await umbracoUi.dictionary.goToSection(ConstantHelper.sections.dictionary);
 
     //Act
     await umbracoUi.dictionary.clickActionsMenuForDictionary(dictionaryName);
@@ -143,7 +143,7 @@ test.describe('Dictionary tests', () => {
     // Arrange
     await umbracoApi.dictionary.ensureNameNotExists(dictionaryName);
     await umbracoApi.dictionary.create(dictionaryName);
-    await umbracoUi.goToSection(ConstantHelper.sections.dictionary);
+    await umbracoUi.dictionary.goToSection(ConstantHelper.sections.dictionary);
 
     //Act
     await umbracoUi.dictionary.enterSearchKeywordAndPressEnter(dictionaryName);
@@ -157,7 +157,7 @@ test.describe('Dictionary tests', () => {
     const emptySearchResultMessage = 'No Dictionary items to choose from';
     await umbracoApi.dictionary.ensureNameNotExists(dictionaryName);
     await umbracoApi.dictionary.create(dictionaryName);
-    await umbracoUi.goToSection(ConstantHelper.sections.dictionary);
+    await umbracoUi.dictionary.goToSection(ConstantHelper.sections.dictionary);
 
     //Act
     await umbracoUi.dictionary.enterSearchKeywordAndPressEnter('xyz');
