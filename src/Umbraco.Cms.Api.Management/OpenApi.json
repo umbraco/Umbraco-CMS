@@ -13672,76 +13672,6 @@
         ]
       }
     },
-    "/umbraco/management/api/v1/server/version": {
-      "get": {
-        "tags": [
-          "Server"
-        ],
-        "operationId": "GetServerVersion",
-        "responses": {
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/VersionResponseModel"
-                    }
-                  ]
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/VersionResponseModel"
-                    }
-                  ]
-                }
-              },
-              "text/plain": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/VersionResponseModel"
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "The resource is protected and requires an authentication token"
-          }
-        },
-        "security": [
-          {
-            "Backoffice User": [ ]
-          }
-        ]
-      }
-    },
     "/umbraco/management/api/v1/static-file/item": {
       "get": {
         "tags": [
@@ -23823,6 +23753,48 @@
         },
         "additionalProperties": false
       },
+      "ServerConfigurationBaseModel": {
+        "required": [
+          "items"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ServerConfigurationItemResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "ServerConfigurationItemResponseModel": {
+        "required": [
+          "data",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "data": { }
+        },
+        "additionalProperties": false
+      },
+      "ServerInformationResponseModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ServerConfigurationBaseModel"
+          }
+        ],
+        "additionalProperties": false
+      },
       "ServerStatusResponseModel": {
         "required": [
           "serverStatus"
@@ -23835,39 +23807,13 @@
         },
         "additionalProperties": false
       },
-      "ServerTroubleshootingItemResponseModel": {
-        "required": [
-          "data",
-          "name"
-        ],
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "data": {
-            "type": "string"
-          }
-        },
-        "additionalProperties": false
-      },
       "ServerTroubleshootingResponseModel": {
-        "required": [
-          "items"
-        ],
         "type": "object",
-        "properties": {
-          "items": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/ServerTroubleshootingItemResponseModel"
-                }
-              ]
-            }
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ServerConfigurationBaseModel"
           }
-        },
+        ],
         "additionalProperties": false
       },
       "SetAvatarRequestModel": {
@@ -25548,19 +25494,6 @@
             "format": "uuid"
           },
           "resetCode": {
-            "minLength": 1,
-            "type": "string"
-          }
-        },
-        "additionalProperties": false
-      },
-      "VersionResponseModel": {
-        "required": [
-          "version"
-        ],
-        "type": "object",
-        "properties": {
-          "version": {
             "minLength": 1,
             "type": "string"
           }
