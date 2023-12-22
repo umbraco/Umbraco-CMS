@@ -15,7 +15,7 @@ using Umbraco.Cms.Infrastructure.Telemetry.Providers;
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Telemetry;
 
 [TestFixture]
-public class SystemInformationTelemetryProviderTests
+public class SystemTroubleshootingInformationTelemetryProviderTests
 {
     [Test]
     [TestCase(ModelsMode.Nothing)]
@@ -92,7 +92,7 @@ public class SystemInformationTelemetryProviderTests
         Assert.AreEqual(environment, actual.Data);
     }
 
-    private SystemInformationTelemetryProvider CreateProvider(
+    private SystemTroubleshootingInformationTelemetryProvider CreateProvider(
         ModelsMode modelsMode = ModelsMode.InMemoryAuto,
         bool isDebug = true,
         string environment = "",
@@ -104,7 +104,7 @@ public class SystemInformationTelemetryProviderTests
         var databaseMock = new Mock<IUmbracoDatabase>();
         databaseMock.Setup(x => x.DatabaseType.GetProviderName()).Returns("SQL");
 
-        return new SystemInformationTelemetryProvider(
+        return new SystemTroubleshootingInformationTelemetryProvider(
             Mock.Of<IUmbracoVersion>(),
             Mock.Of<ILocalizationService>(),
             Mock.Of<IOptionsMonitor<ModelsBuilderSettings>>(x => x.CurrentValue == new ModelsBuilderSettings { ModelsMode = modelsMode }),
