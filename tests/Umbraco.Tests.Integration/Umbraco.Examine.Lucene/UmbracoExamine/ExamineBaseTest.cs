@@ -148,8 +148,8 @@ public abstract class ExamineBaseTest : UmbracoIntegrationTest
 
         // Perform the action, and wait for the handle to be freed, meaning the index is done populating.
         var result = indexUpdatingAction();
+        // TODO: Add timeout so we don't stall completely
         await indexingHandle.WaitOneAsync();
-
         return result;
     }
 
