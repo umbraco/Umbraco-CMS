@@ -76,8 +76,13 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
     }
 
     private IEnumerable<ISearchResult> BackOfficeExamineSearch(string query, int pageSize = 20, int pageIndex = 0) =>
-        BackOfficeExamineSearcher.Search(query, UmbracoEntityTypes.Document,
-            pageSize, pageIndex, out _, ignoreUserStartNodes: true);
+        BackOfficeExamineSearcher.Search(
+            query,
+            UmbracoEntityTypes.Document,
+            pageSize,
+            pageIndex,
+            out _,
+            ignoreUserStartNodes: true);
 
     private async Task SetupUserIdentity(string userId)
     {
