@@ -51,8 +51,6 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
 
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
-    private ILocalizationService LocalizationService => GetRequiredService<ILocalizationService>();
-
     private ILanguageService LanguageService => GetRequiredService<ILanguageService>();
 
     private ContentService ContentService => (ContentService)GetRequiredService<IContentService>();
@@ -251,14 +249,26 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
             .WithName(contentName)
             .WithContentType(contentType)
             .Build();
-        await ExecuteAndWaitForIndexing(() => ContentService.SaveAndPublish(firstContent), Constants.UmbracoIndexes.InternalIndexName);
+        await ExecuteAndWaitForIndexing(
+            () =>
+        {
+            ContentService.Save(firstContent);
+            return ContentService.Publish(firstContent, Array.Empty<string>());
+        },
+            Constants.UmbracoIndexes.InternalIndexName);
 
         var secondContent = new ContentBuilder()
             .WithId(0)
             .WithName(secondContentName)
             .WithContentType(contentType)
             .Build();
-        await ExecuteAndWaitForIndexing(() => ContentService.SaveAndPublish(secondContent), Constants.UmbracoIndexes.InternalIndexName);
+        await ExecuteAndWaitForIndexing(
+            () =>
+        {
+            ContentService.Save(secondContent);
+            return ContentService.Publish(secondContent, Array.Empty<string>());
+        },
+            Constants.UmbracoIndexes.InternalIndexName);
 
         string query = contentName;
 
@@ -292,14 +302,26 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
             .WithName(contentName)
             .WithContentType(contentType)
             .Build();
-        await ExecuteAndWaitForIndexing(() => ContentService.SaveAndPublish(content), Constants.UmbracoIndexes.InternalIndexName);
+        await ExecuteAndWaitForIndexing(
+            () =>
+        {
+            ContentService.Save(content);
+            return ContentService.Publish(content, Array.Empty<string>());
+        },
+            Constants.UmbracoIndexes.InternalIndexName);
 
         var childContent = new ContentBuilder()
             .WithName(childContentName)
             .WithContentType(contentType)
             .WithParentId(content.Id)
             .Build();
-        await ExecuteAndWaitForIndexing(() => ContentService.SaveAndPublish(childContent), Constants.UmbracoIndexes.InternalIndexName);
+        await ExecuteAndWaitForIndexing(
+            () =>
+        {
+            ContentService.Save(childContent);
+            return ContentService.Publish(childContent, Array.Empty<string>());
+        },
+            Constants.UmbracoIndexes.InternalIndexName);
 
         string parentQuery = content.Id.ToString();
 
@@ -337,21 +359,39 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
             .WithName(contentName)
             .WithContentType(contentType)
             .Build();
-        await ExecuteAndWaitForIndexing(() => ContentService.SaveAndPublish(content), Constants.UmbracoIndexes.InternalIndexName);
+        await ExecuteAndWaitForIndexing(
+            () =>
+        {
+            ContentService.Save(content);
+            return ContentService.Publish(content, Array.Empty<string>());
+        },
+            Constants.UmbracoIndexes.InternalIndexName);
 
         var childContent = new ContentBuilder()
             .WithName(childContentName)
             .WithContentType(contentType)
             .WithParentId(content.Id)
             .Build();
-        await ExecuteAndWaitForIndexing(() => ContentService.SaveAndPublish(childContent), Constants.UmbracoIndexes.InternalIndexName);
+        await ExecuteAndWaitForIndexing(
+            () =>
+        {
+            ContentService.Save(childContent);
+            return ContentService.Publish(childContent, Array.Empty<string>());
+        },
+            Constants.UmbracoIndexes.InternalIndexName);
 
         var childChildContent = new ContentBuilder()
             .WithName(childChildContentName)
             .WithContentType(contentType)
             .WithParentId(childContent.Id)
             .Build();
-        await ExecuteAndWaitForIndexing(() => ContentService.SaveAndPublish(childChildContent), Constants.UmbracoIndexes.InternalIndexName);
+        await ExecuteAndWaitForIndexing(
+            () =>
+        {
+            ContentService.Save(childChildContent);
+            return ContentService.Publish(childChildContent, Array.Empty<string>());
+        },
+            Constants.UmbracoIndexes.InternalIndexName);
 
         string parentQuery = content.Id.ToString();
         string childQuery = childContent.Id.ToString();
@@ -407,7 +447,7 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
         var langDa = new LanguageBuilder()
             .WithCultureInfo(dkIso)
             .Build();
-        LocalizationService.Save(langDa);
+        await LanguageService.CreateAsync(langDa, Constants.Security.SuperUserKey);
 
         var contentType = new ContentTypeBuilder()
             .WithId(0)
@@ -421,7 +461,13 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
             .WithCultureName(dkIso, danishNodeName)
             .WithContentType(contentType)
             .Build();
-        PublishResult createdContent = await ExecuteAndWaitForIndexing(() => ContentService.SaveAndPublish(content), Constants.UmbracoIndexes.InternalIndexName);
+        PublishResult createdContent = await ExecuteAndWaitForIndexing(
+            () =>
+        {
+            ContentService.Save(content);
+            return ContentService.Publish(content, Array.Empty<string>());
+        },
+            Constants.UmbracoIndexes.InternalIndexName);
 
         string query = createdContent.Content.Id.ToString();
 
@@ -531,7 +577,13 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
             .WithName(contentName)
             .WithContentType(contentType)
             .Build();
-        await ExecuteAndWaitForIndexing(() => ContentService.SaveAndPublish(contentNode), Constants.UmbracoIndexes.InternalIndexName);
+        await ExecuteAndWaitForIndexing(
+            () =>
+        {
+            ContentService.Save(contentNode);
+            return ContentService.Publish(contentNode, Array.Empty<string>());
+        },
+            Constants.UmbracoIndexes.InternalIndexName);
 
         string query = contentName;
 
@@ -595,7 +647,13 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
             .WithContentType(contentType)
             .WithPropertyValues(new { testBox = "TestValue" })
             .Build();
-        await ExecuteAndWaitForIndexing(() => ContentService.SaveAndPublish(contentNode), Constants.UmbracoIndexes.InternalIndexName);
+        await ExecuteAndWaitForIndexing(
+            () =>
+        {
+            ContentService.Save(contentNode);
+            return ContentService.Publish(contentNode, Array.Empty<string>());
+        },
+            Constants.UmbracoIndexes.InternalIndexName);
 
         string query = contentName;
 
