@@ -97,6 +97,9 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
             .WithId(0)
             .Build();
         // TODO: Why does this no longer cause the index to be updated?
+        await ExecuteAndWaitForIndexing(
+            () => ContentTypeService.Save(contentType),
+            Constants.UmbracoIndexes.InternalIndexName);
         await ContentTypeService.SaveAsync(contentType, Constants.Security.SuperUserKey);
 
         var content = new ContentBuilder()
@@ -130,7 +133,9 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
             .WithId(0)
             .WithContentVariation(ContentVariation.Culture)
             .Build();
-        await ExecuteAndWaitForIndexing(() => ContentTypeService.Save(contentType), Constants.UmbracoIndexes.InternalIndexName);
+        await ExecuteAndWaitForIndexing(
+            () => ContentTypeService.Save(contentType),
+            Constants.UmbracoIndexes.InternalIndexName);
 
         var content = new ContentBuilder()
             .WithId(0)
@@ -138,7 +143,13 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
             .WithCultureName(dkIso, danishNodeName)
             .WithContentType(contentType)
             .Build();
-        var createdContent = await ExecuteAndWaitForIndexing(() => ContentService.SaveAndPublish(content), Constants.UmbracoIndexes.InternalIndexName);
+        var createdContent = await ExecuteAndWaitForIndexing(
+            () =>
+        {
+            ContentService.Save(content);
+            return ContentService.Publish(content, Array.Empty<string>());
+        },
+            Constants.UmbracoIndexes.InternalIndexName);
 
         return createdContent;
     }
