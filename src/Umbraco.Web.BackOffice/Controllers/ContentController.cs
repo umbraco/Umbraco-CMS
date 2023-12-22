@@ -835,7 +835,6 @@ public class ContentController : ContentControllerBase
     ///     Saves content
     /// </summary>
     [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
-    [FileUploadCleanupFilter]
     [ContentSaveValidation(skipUserAccessValidation:true)] // skip user access validation because we "only" require Settings access to create new blueprints from scratch
     public async Task<ActionResult<ContentItemDisplay<ContentVariantDisplay>?>?> PostSaveBlueprint(
         [ModelBinder(typeof(BlueprintItemBinder))] ContentItemSave contentItem)
