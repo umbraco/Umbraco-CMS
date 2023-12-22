@@ -5536,6 +5536,134 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/dynamic-root/determine-roots-from-query": {
+      "post": {
+        "tags": [
+          "Dynamic Root"
+        ],
+        "operationId": "PostDynamicRootDetermineRootsFromQuery",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/DynamicRootRequestModel"
+                  }
+                ]
+              }
+            },
+            "text/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/DynamicRootRequestModel"
+                  }
+                ]
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/DynamicRootRequestModel"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/DynamicRootResponseModel"
+                    }
+                  ]
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/DynamicRootResponseModel"
+                    }
+                  ]
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/DynamicRootResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/dynamic-root/steps": {
+      "get": {
+        "tags": [
+          "Dynamic Root"
+        ],
+        "operationId": "GetDynamicRootSteps",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/health-check-group": {
       "get": {
         "tags": [
@@ -17144,6 +17272,9 @@
           },
           "401": {
             "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user do not have access to this resource"
           }
         },
         "security": [
@@ -17254,6 +17385,9 @@
           },
           "401": {
             "description": "The resource is protected and requires an authentication token"
+          },
+          "403": {
+            "description": "The authenticated user do not have access to this resource"
           }
         },
         "security": [
@@ -20864,6 +20998,136 @@
             "$ref": "#/components/schemas/DomainsPresentationModelBaseModel"
           }
         ],
+        "additionalProperties": false
+      },
+      "DynamicRootContextRequestModel": {
+        "required": [
+          "culture",
+          "parentId",
+          "segment"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "parentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "culture": {
+            "type": "string"
+          },
+          "segment": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "DynamicRootQueryOriginRequestModel": {
+        "required": [
+          "alias"
+        ],
+        "type": "object",
+        "properties": {
+          "alias": {
+            "type": "string"
+          },
+          "key": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "DynamicRootQueryRequestModel": {
+        "required": [
+          "origin",
+          "querySteps"
+        ],
+        "type": "object",
+        "properties": {
+          "origin": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/DynamicRootQueryOriginRequestModel"
+              }
+            ]
+          },
+          "querySteps": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DynamicRootQueryStepRequestModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "DynamicRootQueryStepRequestModel": {
+        "required": [
+          "alias",
+          "anyOfDocTypeKeys"
+        ],
+        "type": "object",
+        "properties": {
+          "alias": {
+            "type": "string"
+          },
+          "anyOfDocTypeKeys": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "DynamicRootRequestModel": {
+        "required": [
+          "context",
+          "query"
+        ],
+        "type": "object",
+        "properties": {
+          "context": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/DynamicRootContextRequestModel"
+              }
+            ]
+          },
+          "query": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/DynamicRootQueryRequestModel"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
+      "DynamicRootResponseModel": {
+        "required": [
+          "roots"
+        ],
+        "type": "object",
+        "properties": {
+          "roots": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
         "additionalProperties": false
       },
       "EnableUserRequestModel": {
