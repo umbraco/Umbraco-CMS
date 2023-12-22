@@ -21,7 +21,7 @@ public class InformationServerController : ServerControllerBase
 
     [HttpGet("information")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(Dictionary<string, object>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ServerInformationResponseModel), StatusCodes.Status200OK)]
     public Task<IActionResult> Information()
     {
         ServerInformationResponseModel responseModel = _umbracoMapper.Map<ServerInformationResponseModel>(_systemInformationService.GetServerInformation())!;

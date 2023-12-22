@@ -13531,20 +13531,29 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "additionalProperties": { }
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ServerInformationResponseModel"
+                    }
+                  ]
                 }
               },
               "text/json": {
                 "schema": {
-                  "type": "object",
-                  "additionalProperties": { }
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ServerInformationResponseModel"
+                    }
+                  ]
                 }
               },
               "text/plain": {
                 "schema": {
-                  "type": "object",
-                  "additionalProperties": { }
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ServerInformationResponseModel"
+                    }
+                  ]
                 }
               }
             }
