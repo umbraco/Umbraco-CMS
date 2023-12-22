@@ -3,11 +3,11 @@ import {expect} from "@playwright/test";
 
 test.describe('Telemetry tests', () => {
 
-  test.beforeEach(async ({page, umbracoApi}, testInfo) => {
+  test.beforeEach(async ({umbracoApi}, testInfo) => {
     await umbracoApi.telemetry.setLevel("Basic");
   });
 
-  test.afterEach(async ({page, umbracoApi}, testInfo) => {
+  test.afterEach(async ({umbracoApi}, testInfo) => {
     await umbracoApi.telemetry.setLevel("Basic");
   });
 
@@ -17,7 +17,8 @@ test.describe('Telemetry tests', () => {
     await page.goto(umbracoApi.baseUrl + '/umbraco');
 
     // Selects minimal as the telemetry level
-    await umbracoUi.uiBaseLocators.goToSection(ConstantHelper.sections.settings);
+    // TODO: USE THE TELEMETRY UIHELPER WHEN IT IS IMPLEMENTED, NOT THE TEMPLATE
+    await umbracoUi.template.goToSection(ConstantHelper.sections.settings);
     await page.getByRole('tab', { name: 'Settings' }).click();
     await page.getByRole('tab', {name: 'Telemetry Data'}).click();
     await page.locator('[name="telemetryLevel"] >> input[id=input]').fill('1');

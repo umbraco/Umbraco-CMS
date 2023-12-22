@@ -7,7 +7,7 @@ test.describe('Partial Views tests', () => {
 
   test.beforeEach(async ({umbracoUi}) => {
     await umbracoUi.goToBackOffice();
-    await umbracoUi.uiBaseLocators.goToSection(ConstantHelper.sections.settings);
+    await umbracoUi.partialView.goToSection(ConstantHelper.sections.settings);
   });
 
   test('can create an empty partial view', async ({umbracoApi, umbracoUi}) => {
@@ -131,7 +131,7 @@ test.describe('Partial Views tests', () => {
 
     // Act
     await umbracoUi.partialView.openPartialViewAtRoot(partialViewFileName);
-    await umbracoUi.partialView.addQueryBuilderIntoPartialViewWithCreateDateOption();
+    await umbracoUi.partialView.addQueryBuilderWithCreateDateOption();
     await umbracoUi.partialView.clickSaveButton();
 
     // Assert
@@ -157,7 +157,7 @@ test.describe('Partial Views tests', () => {
 
     // Act
     await umbracoUi.partialView.openPartialViewAtRoot(partialViewFileName);
-    await umbracoUi.uiBaseLocators.insertDictionaryByName(dictionaryName);
+    await umbracoUi.partialView.insertDictionaryByName(dictionaryName);
     await umbracoUi.partialView.clickSaveButton();
 
     // Assert

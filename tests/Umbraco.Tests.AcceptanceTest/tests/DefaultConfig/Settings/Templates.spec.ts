@@ -7,7 +7,7 @@ test.describe('Template tests', () => {
   test.beforeEach(async ({umbracoUi, umbracoApi}) => {
     await umbracoApi.template.ensureNameNotExists(templateName);
     await umbracoUi.goToBackOffice();
-    await umbracoUi.uiBaseLocators.goToSection(ConstantHelper.sections.settings);
+    await umbracoUi.template.goToSection(ConstantHelper.sections.settings);
   });
 
   test('can create a template', async ({umbracoApi, umbracoUi}) => {
@@ -20,7 +20,7 @@ test.describe('Template tests', () => {
     await umbracoUi.template.clickSaveButton();
 
     // Assert
-    await umbracoUi.isSuccessNotificationVisible();
+    await umbracoUi.template.isSuccessNotificationVisible();
     expect(await umbracoApi.template.doesNameExist(templateName)).toBeTruthy();
 
     // Clean
@@ -45,7 +45,7 @@ test.describe('Template tests', () => {
     await umbracoUi.template.clickSaveButton();
 
     // Assert
-    await umbracoUi.isSuccessNotificationVisible();
+    await umbracoUi.template.isSuccessNotificationVisible();
     // Checks if the template was updated
     const updatedTemplate = await umbracoApi.template.getByName(templateName);
     expect(updatedTemplate.content).toBe(updatedTemplateContent);
@@ -65,7 +65,7 @@ test.describe('Template tests', () => {
     await umbracoUi.template.deleteTemplate();
 
     // Assert
-    await umbracoUi.isSuccessNotificationVisible();
+    await umbracoUi.template.isSuccessNotificationVisible();
     expect(await umbracoApi.template.doesNameExist(templateName)).toBeFalsy();
   });
 
@@ -87,7 +87,7 @@ test.describe('Template tests', () => {
     await page.getByLabel('Save').click();
 
     // Assert
-    await umbracoUi.isSuccessNotificationVisible();
+    await umbracoUi.template.isSuccessNotificationVisible();
     await expect(page.locator('[label="Change Master template"]', {hasText: 'Master template: ' + templateName})).toBeVisible();
     // Checks if the childTemplate has the masterTemplate set
     const childTemplate = await umbracoApi.template.getByName(childTemplateName);
@@ -99,7 +99,7 @@ test.describe('Template tests', () => {
     await umbracoApi.template.ensureNameNotExists(childTemplateName);
   });
 
-  test('can use query builder for a template', async ({umbracoApi, page, umbracoUi}) => {
+  test('can use query builder for a template', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const templateAlias = AliasHelper.toAlias(templateName);
     await umbracoApi.template.create(templateName, templateAlias, '');
@@ -126,11 +126,11 @@ test.describe('Template tests', () => {
 
     // Act
     await umbracoUi.template.goToTemplate(templateName);
-    await umbracoUi.uiBaseLocators.addQueryBuilderWithCreateDateOption();
+    await umbracoUi.template.addQueryBuilderWithCreateDateOption();
     await umbracoUi.template.clickSaveButton();
 
     // Assert
-    await umbracoUi.isSuccessNotificationVisible();
+    await umbracoUi.template.isSuccessNotificationVisible();
     const templateData = await umbracoApi.template.getByName(templateName);
     expect(templateData.content).toBe(expectedTemplateContent);
 
@@ -155,7 +155,7 @@ test.describe('Template tests', () => {
     await umbracoUi.template.clickSaveButton();
 
     // Assert
-    await umbracoUi.isSuccessNotificationVisible();
+    await umbracoUi.template.isSuccessNotificationVisible();
     const templateData = await umbracoApi.template.getByName(templateName);
     expect(templateData.content).toBe(templateContent);
 
@@ -182,7 +182,7 @@ test.describe('Template tests', () => {
     await page.getByLabel('Save').click();
 
     // Assert
-    await umbracoUi.isSuccessNotificationVisible();
+    await umbracoUi.template.isSuccessNotificationVisible();
     const templateData = await umbracoApi.template.getByName(templateName);
     expect(templateData.content).toBe(templateContent);
 

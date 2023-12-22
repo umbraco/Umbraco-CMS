@@ -8,7 +8,7 @@ test.describe('Script tests', () => {
 
   test.beforeEach(async ({umbracoUi}) => {
     await umbracoUi.goToBackOffice();
-    await umbracoUi.uiBaseLocators.goToSection(ConstantHelper.sections.settings);
+    await umbracoUi.script.goToSection(ConstantHelper.sections.settings);
   });
 
   test('can create a empty script', async ({umbracoApi, umbracoUi}) => {
@@ -32,7 +32,7 @@ test.describe('Script tests', () => {
     await umbracoApi.script.ensureNameNotExists(scriptPath);
   });
 
-  test('can update a script', async ({page, umbracoApi, umbracoUi}) => {
+  test('can update a script', async ({ umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.script.ensureNameNotExists(scriptPath);
     await umbracoApi.script.create(scriptPath, 'test');
@@ -54,7 +54,7 @@ test.describe('Script tests', () => {
     await umbracoApi.script.ensureNameNotExists(scriptPath);
   });
 
-  test('can delete a script', async ({page, umbracoApi, umbracoUi}) => {
+  test('can delete a script', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.script.ensureNameNotExists(scriptPath);
     await umbracoApi.script.create(scriptPath, '');
@@ -71,7 +71,7 @@ test.describe('Script tests', () => {
   });
 
   // Folder
-  test.skip('can create a folder', async ({page, umbracoApi, umbracoUi}) => {
+  test.skip('can create a folder', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.script.ensureNameNotExists(scriptFolderName);
 
@@ -89,7 +89,7 @@ test.describe('Script tests', () => {
     await umbracoApi.script.ensureNameNotExists(scriptPath);
   });
 
-  test.skip('can delete a folder', async ({page, umbracoApi, umbracoUi}) => {
+  test.skip('can delete a folder', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.script.createFolder(scriptFolderName);
 
@@ -102,16 +102,16 @@ test.describe('Script tests', () => {
     // TODO: Uncomment when the notification is visible
     // await umbracoUi.isSuccessNotificationVisible();
     // TODO: Use the reload function for scripts when it is implemented
-    await page.reload();
-    await umbracoUi.uiBaseLocators.goToSection(ConstantHelper.sections.settings);
+    await umbracoUi.reloadPage();
+    await umbracoUi.script.goToSection(ConstantHelper.sections.settings);
     // await page.locator('umb-tree-item', {hasText: 'Scripts'}).locator('#caret-button').click();
-    expect(umbracoUi.uiBaseLocators.isTreeItemVisible(scriptFolderName)).not.toBeTruthy();
+    expect(umbracoUi.script.isTreeItemVisible(scriptFolderName)).not.toBeTruthy();
 
     // await expect(page.locator('umb-tree-item').locator('[label="' + scriptFolderName + '"] ')).not.toBeVisible();
     expect(await umbracoApi.script.doesFolderExist(scriptFolderName)).toBeFalsy();
   });
 
-  test.skip('can create a script in a folder', async ({page, umbracoApi, umbracoUi}) => {
+  test.skip('can create a script in a folder', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.script.ensureNameNotExists(scriptFolderName);
     await umbracoApi.script.createFolder(scriptFolderName);
@@ -123,7 +123,7 @@ test.describe('Script tests', () => {
     await umbracoUi.script.clickNewScriptButton();
     await umbracoUi.script.enterScriptName(scriptName);
     await umbracoUi.script.enterScriptContent(scriptContent);
-    await page.waitForTimeout(1000);
+    await umbracoUi.waitForTimeout(1000);
     await umbracoUi.script.clickSaveButton();
 
     // Assert
@@ -140,7 +140,7 @@ test.describe('Script tests', () => {
     await umbracoApi.script.ensureNameNotExists(scriptFolderName);
   });
 
-  test.skip('can create a folder in a folder', async ({page, umbracoApi, umbracoUi}) => {
+  test.skip('can create a folder in a folder', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.script.ensureNameNotExists(scriptFolderName);
     await umbracoApi.script.createFolder(scriptFolderName);
@@ -163,7 +163,7 @@ test.describe('Script tests', () => {
     await umbracoApi.script.ensureNameNotExists(scriptFolderName);
   });
 
-  test.skip('can create a folder in a folder in a folder', async ({page, umbracoApi, umbracoUi}) => {
+  test.skip('can create a folder in a folder in a folder', async ({ umbracoApi, umbracoUi}) => {
     // Arrange
     const childFolderName = 'ChildFolderName';
     const childOfChildFolderName = 'ChildOfChildFolderName';
@@ -189,7 +189,7 @@ test.describe('Script tests', () => {
   });
 
   // TODO: Remove skip from this test when the frontend is able to create a script in a folder in a folder. Currently the script is created in the first folder.
-  test.skip('can create a script in a folder in a folder', async ({page, umbracoApi, umbracoUi}) => {
+  test.skip('can create a script in a folder in a folder', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const childFolderName = 'ChildFolderName';
     await umbracoApi.script.ensureNameNotExists(scriptFolderName);
@@ -201,11 +201,11 @@ test.describe('Script tests', () => {
     await umbracoUi.script.clickActionsMenuForScript(scriptFolderName);
     await umbracoUi.script.clickNewScriptButton();
     await umbracoUi.script.enterScriptName(scriptName);
-    await page.waitForTimeout(1000);
+    await umbracoUi.waitForTimeout(1000);
     await umbracoUi.script.clickSaveButton();
 
     // TODO: Remove this timeout when frontend validation is implemented
-    await page.waitForTimeout(1000);
+    await umbracoUi.waitForTimeout(1000);
     await umbracoUi.template.clickSaveButton();
 
     // Assert

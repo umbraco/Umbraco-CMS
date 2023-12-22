@@ -12,6 +12,7 @@ setup('authenticate', async ({page}) => {
 
   // Assert
   await expect(page.locator('uui-tab-group').locator('[label="Settings"]')).toBeVisible({timeout: 10000});
-  await umbracoUi.uiBaseLocators.goToSection(ConstantHelper.sections.settings);
+  // TODO: USE THE auth.setup UIHELPER WHEN IT IS IMPLEMENTED, NOT THE TEMPLATE
+  await umbracoUi.template.goToSection(ConstantHelper.sections.settings);
   await page.context().storageState({path: STORAGE_STATE});
 });

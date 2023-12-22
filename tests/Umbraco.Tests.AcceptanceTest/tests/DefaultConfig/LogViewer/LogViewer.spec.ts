@@ -1,4 +1,4 @@
-﻿import {test} from '@umbraco/playwright-testhelpers';
+﻿import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
 test.describe('Log Viewer tests', () => {
@@ -11,7 +11,8 @@ test.describe('Log Viewer tests', () => {
 
     // Act
     await page.goto(umbracoApi.baseUrl + '/umbraco');
-    await umbracoUi.goToSettingsTreeItem('Log Viewer');
+    // TODO: USE THE LOGVIEWER UIHELPER WHEN IT IS IMPLEMENTED, NOT THE TEMPLATE
+    await umbracoUi.template.goToSettingsTreeItem('Log Viewer');
     await page.getByRole('tab', {name: 'Search'}).click({force: true});
     await page.getByPlaceholder('Search logs...').fill(telemetryLevel);
 
@@ -31,7 +32,8 @@ test.describe('Log Viewer tests', () => {
 
     // Act
     await page.goto(umbracoApi.baseUrl + '/umbraco');
-    await umbracoUi.goToSettingsTreeItem('Log Viewer');
+    // TODO: USE THE LOGVIEWER UIHELPER WHEN IT IS IMPLEMENTED, NOT THE TEMPLATE
+    await umbracoUi.template.goToSettingsTreeItem('Log Viewer');
     await page.getByRole('tab', {name: 'Search'}).click({force: true});
     await page.getByLabel('Select log levels').click({force: true});
     await page.locator('.log-level-menu-item').getByText('Information').click();
@@ -51,7 +53,8 @@ test.describe('Log Viewer tests', () => {
 
     // Act
     await page.goto(umbracoApi.baseUrl + '/umbraco');
-    await umbracoUi.goToSettingsTreeItem('Log Viewer');
+    // TODO: USE THE LOGVIEWER UIHELPER WHEN IT IS IMPLEMENTED, NOT THE TEMPLATE
+    await umbracoUi.template.goToSettingsTreeItem('Log Viewer');
     await page.getByRole('tab', {name: 'Search'}).click({force: true});
     await page.getByPlaceholder('Search logs...').fill(search);
     await page.getByLabel("Save search").click({force: true});
@@ -80,7 +83,8 @@ test.describe('Log Viewer tests', () => {
 
     // Act
     await page.goto(umbracoApi.baseUrl + '/umbraco');
-    await umbracoUi.goToSettingsTreeItem('Log Viewer');
+    // TODO: USE THE LOGVIEWER UIHELPER WHEN IT IS IMPLEMENTED, NOT THE TEMPLATE
+    await umbracoUi.template.goToSettingsTreeItem('Log Viewer');
     await page.getByRole('tab', {name: 'Search'}).click({force: true});
     await page.getByPlaceholder('Search logs...').fill(search);
     // Checks if the complex search works before saving it.
@@ -110,7 +114,8 @@ test.describe('Log Viewer tests', () => {
 
     // Act
     await page.goto(umbracoApi.baseUrl + '/umbraco');
-    await umbracoUi.goToSettingsTreeItem('Log Viewer');
+    // TODO: USE THE LOGVIEWER UIHELPER WHEN IT IS IMPLEMENTED, NOT THE TEMPLATE
+    await umbracoUi.template.goToSettingsTreeItem('Log Viewer');
     await page.getByRole('tab', {name: 'Search'}).click({force: true});
     await page.getByLabel('Saved searches').click({force: true});
     await page.locator('li').filter({hasText: searchName + ' ' + search}).getByLabel('Remove saved search').click({force: true});
@@ -128,7 +133,8 @@ test.describe('Log Viewer tests', () => {
 
     // Act
     await page.goto(umbracoApi.baseUrl + '/umbraco');
-    await umbracoUi.goToSettingsTreeItem('Log Viewer');
+    // TODO: USE THE LOGVIEWER UIHELPER WHEN IT IS IMPLEMENTED, NOT THE TEMPLATE
+    await umbracoUi.template.goToSettingsTreeItem('Log Viewer');
     await page.getByRole('tab', {name: 'Search'}).click({force: true});
     await page.getByPlaceholder('Search logs...').fill(search);
     await page.getByRole('group').locator('#message').first().click();
@@ -153,7 +159,8 @@ test.describe('Log Viewer tests', () => {
 
     //Act
     await page.goto(umbracoApi.baseUrl + '/umbraco');
-    await umbracoUi.goToSettingsTreeItem('Log Viewer');
+    // TODO: USE THE LOGVIEWER UIHELPER WHEN IT IS IMPLEMENTED, NOT THE TEMPLATE
+    await umbracoUi.template.goToSettingsTreeItem('Log Viewer');
     await page.getByRole('tab', {name: 'Search'}).click({force: true});
     // Sorts logs by timestamp
     await page.getByLabel('Sort logs').click();
@@ -174,7 +181,8 @@ test.describe('Log Viewer tests', () => {
 
     // Act
     await page.goto(umbracoApi.baseUrl + '/umbraco');
-    await umbracoUi.goToSettingsTreeItem('Log Viewer');
+    // TODO: USE THE LOGVIEWER UIHELPER WHEN IT IS IMPLEMENTED, NOT THE TEMPLATE
+    await umbracoUi.template.goToSettingsTreeItem('Log Viewer');
     await page.getByRole('tab', {name: 'Search'}).click({force: true});
     await page.getByLabel('Go to page 2', {exact: true}).click();
 
@@ -194,7 +202,8 @@ test.describe('Log Viewer tests', () => {
 
     // Act
     await page.goto(umbracoApi.baseUrl + '/umbraco');
-    await umbracoUi.goToSettingsTreeItem('Log Viewer');
+    // TODO: USE THE LOGVIEWER UIHELPER WHEN IT IS IMPLEMENTED, NOT THE TEMPLATE
+    await umbracoUi.template.goToSettingsTreeItem('Log Viewer');
     await page.locator('#saved-searches').getByLabel(searchName).click();
 
     // Assert

@@ -10,7 +10,7 @@ test.describe('Stylesheets tests', () => {
 
   test.beforeEach(async ({umbracoUi}) => {
     await umbracoUi.goToBackOffice();
-    await umbracoUi.uiBaseLocators.goToSection(ConstantHelper.sections.settings);
+    await umbracoUi.stylesheet.goToSection(ConstantHelper.sections.settings);
   });
 
   test('can create a stylesheet file', async ({umbracoApi, umbracoUi}) => {
