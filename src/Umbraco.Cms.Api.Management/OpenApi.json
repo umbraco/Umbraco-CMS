@@ -23884,6 +23884,14 @@
         ],
         "type": "string"
       },
+      "RuntimeModeModel": {
+        "enum": [
+          "BackofficeDevelopment",
+          "Development",
+          "Production"
+        ],
+        "type": "string"
+      },
       "SavedLogSearchPresenationBaseModel": {
         "required": [
           "name",
@@ -24031,17 +24039,34 @@
           "name": {
             "type": "string"
           },
-          "data": { }
+          "data": {
+            "type": "string"
+          }
         },
         "additionalProperties": false
       },
       "ServerInformationResponseModel": {
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/ServerConfigurationBaseModel"
-          }
+        "required": [
+          "assemblyVersion",
+          "baseUtcOffset",
+          "runtimeMode",
+          "version"
         ],
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "string"
+          },
+          "assemblyVersion": {
+            "type": "string"
+          },
+          "baseUtcOffset": {
+            "type": "string"
+          },
+          "runtimeMode": {
+            "$ref": "#/components/schemas/RuntimeModeModel"
+          }
+        },
         "additionalProperties": false
       },
       "ServerStatusResponseModel": {

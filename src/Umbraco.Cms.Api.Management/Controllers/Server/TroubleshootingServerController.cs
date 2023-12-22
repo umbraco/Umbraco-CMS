@@ -10,12 +10,12 @@ namespace Umbraco.Cms.Api.Management.Controllers.Server;
 [ApiVersion("1.0")]
 public class TroubleshootingServerController : ServerControllerBase
 {
-    private readonly ISystemInformationService _systemInformationService;
+    private readonly ISystemTroubleshootingInformationService _systemTroubleshootingInformationService;
     private readonly IUmbracoMapper _mapper;
 
-    public TroubleshootingServerController(ISystemInformationService systemInformationService, IUmbracoMapper mapper)
+    public TroubleshootingServerController(ISystemTroubleshootingInformationService systemTroubleshootingInformationService, IUmbracoMapper mapper)
     {
-        _systemInformationService = systemInformationService;
+        _systemTroubleshootingInformationService = systemTroubleshootingInformationService;
         _mapper = mapper;
     }
 
@@ -24,7 +24,7 @@ public class TroubleshootingServerController : ServerControllerBase
     [ProducesResponseType(typeof(ServerTroubleshootingResponseModel), StatusCodes.Status200OK)]
     public Task<IActionResult> GetTroubleshooting()
     {
-        ServerTroubleshootingResponseModel responseModel = _mapper.Map<ServerTroubleshootingResponseModel>(_systemInformationService.GetTroubleshootingInformation())!;
+        ServerTroubleshootingResponseModel responseModel = _mapper.Map<ServerTroubleshootingResponseModel>(_systemTroubleshootingInformationService.GetTroubleshootingInformation())!;
 
         return Task.FromResult<IActionResult>(Ok(responseModel));
     }
