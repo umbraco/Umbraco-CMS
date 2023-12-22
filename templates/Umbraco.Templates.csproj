@@ -41,11 +41,11 @@
     </Content>
   </ItemGroup>
 
+
   <!-- Update template.json files with the default UmbracoVersion value set to the current build version -->
   <ItemGroup>
     <PackageReference Include="Umbraco.JsonSchema.Extensions" PrivateAssets="all" />
   </ItemGroup>
-  <Target Name="GetUpdatedTemplateJsonPackageFiles" BeforeTargets="GenerateNuspec" AfterTargets="GetBuildVersion;GetUmbracoBuildVersion">
   <ItemGroup>
     <Content Update="**\.template.config\template.json" Pack="false" />
   </ItemGroup>
@@ -60,11 +60,8 @@
     <JsonPathUpdateValue JsonFile="%(_TemplateJsonFiles.DestinationFile)" Path="$.symbols.UmbracoVersion.defaultValue" Value="&quot;$(PackageVersion)&quot;" />
     <ItemGroup>
       <_PackageFiles Include="%(_TemplateJsonFiles.DestinationFile)">
-        <PackagePath>%(RelativeDir)</PackagePath>
-      <_PackageFiles Include="%(_TemplateJsonFiles.DestinationFile)">
         <PackagePath>%(_TemplateJsonFiles.RelativeDir)</PackagePath>
       </_PackageFiles>
     </ItemGroup>
   </Target>
 </Project>
-
