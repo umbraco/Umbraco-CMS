@@ -2,51 +2,53 @@
 import {expect} from "@playwright/test";
 
 test.describe('Template tests', () => {
-  let templateId = "";
+  let templateId;
   const templateName = 'TemplateTester';
   const templateAlias = AliasHelper.toAlias(templateName);
 
-  test.beforeEach(async ({page, umbracoApi}) => {
+  test.beforeEach(async ({umbracoApi}) => {
     await umbracoApi.template.ensureNameNotExists(templateName);
   });
 
-  test.afterEach(async ({page, umbracoApi}) => {
-    await umbracoApi.template.delete(templateId);
+  test.afterEach(async ({umbracoApi}) => {
+    await umbracoApi.template.ensureNameNotExists(templateName);
   })
 
-  test('can create a template', async ({page, umbracoApi, umbracoUi}) => {
+  test('can create a template', async ({umbracoApi}) => {
+    // Act
     templateId = await umbracoApi.template.create(templateName, templateAlias, 'Template Stuff');
 
     // Assert
-    await expect(umbracoApi.template.doesExist(templateId)).toBeTruthy();
+    expect(umbracoApi.template.doesExist(templateId)).toBeTruthy();
   });
 
-  test('can update a template', async ({page, umbracoApi, umbracoUi}) => {
+  test('can update a template', async ({umbracoApi}) => {
+    // Arrange
     const newTemplateAlias = 'betterAlias';
-
     templateId = await umbracoApi.template.create(templateName, templateAlias, 'Template Stuff');
-
     const templateData = await umbracoApi.template.get(templateId);
 
+    // Act
     // Updates the template
     templateData.alias = newTemplateAlias;
     await umbracoApi.template.update(templateId, templateData);
 
     // Assert
-    await expect(umbracoApi.template.doesExist(templateId)).toBeTruthy();
+    expect(umbracoApi.template.doesExist(templateId)).toBeTruthy();
     // Checks if the template alias was updated
     const updatedTemplate = await umbracoApi.template.get(templateId);
-    await expect(updatedTemplate.alias).toEqual(newTemplateAlias);
+    expect(updatedTemplate.alias).toEqual(newTemplateAlias);
   });
 
-  test('can delete template', async ({page, umbracoApi, umbracoUi}) => {
+  test('can delete template', async ({umbracoApi}) => {
+    // Arrange
     templateId = await umbracoApi.template.create(templateName, templateAlias, 'More Template Stuff');
+    expect(umbracoApi.template.doesExist(templateId)).toBeTruthy();
 
-    await expect(umbracoApi.template.doesExist(templateId)).toBeTruthy();
-
+    // Act
     await umbracoApi.template.delete(templateId);
 
     // Assert
-    await expect(await umbracoApi.template.doesExist(templateId)).toBeFalsy();
+    expect(await umbracoApi.template.doesExist(templateId)).toBeFalsy();
   });
 });
