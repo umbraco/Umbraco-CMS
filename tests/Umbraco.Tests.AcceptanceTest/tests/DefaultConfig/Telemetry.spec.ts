@@ -13,7 +13,7 @@ test.describe('Telemetry tests', () => {
     await umbracoApi.telemetry.setLevel("Basic");
   });
 
-  test('can change telemetry level', async ({page, umbracoApi, umbracoUi}) => {
+  test('can change telemetry level', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const expectedLevel = "Minimal";
     const levelValue = "1";

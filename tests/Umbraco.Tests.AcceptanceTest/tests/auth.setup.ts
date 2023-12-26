@@ -1,4 +1,4 @@
-﻿import {test as setup, expect} from '@playwright/test';
+﻿import {test as setup} from '@playwright/test';
 import {STORAGE_STATE} from '../playwright.config';
 import {ConstantHelper, UiHelpers} from "@umbraco/playwright-testhelpers";
 
