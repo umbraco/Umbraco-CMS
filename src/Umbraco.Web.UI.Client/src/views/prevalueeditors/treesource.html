@@ -1,6 +1,6 @@
 <div ng-controller="Umbraco.PrevalueEditors.TreeSourceController as vm" class="umb-property-editor umb-contentpicker">
 
-	<select ng-model="model.value.type" class="umb-property-editor" ng-change="clear()">
+	<select ng-model="model.value.type" class="umb-property-editor" ng-change="vm.clear()">
 		<option value="content">Content</option>
 		<option value="media">Media</option>
 		<option value="member">Members</option>
@@ -17,8 +17,8 @@
 		  description="node.path"
 		  allow-remove="true"
 		  allow-edit="true"
-		  on-remove="clear()"
-		  on-edit="openContentPicker()">
+		  on-remove="vm.clear()"
+		  on-edit="vm.openContentPicker()">
 	</umb-node-preview>
 
     <div ng-if="!node && model.value.type === 'content'" class="mt2">
@@ -26,19 +26,19 @@
           <button
             type="button"
             class="umb-node-preview-add"
-            ng-click="openContentPicker()">
+            ng-click="vm.openContentPicker()">
             <localize key="contentPicker_defineRootNode">Pick root node</localize>
           </button>
           <button
             type="button"
             class="umb-node-preview-add"
-            ng-click="chooseXPath()">
+            ng-click="vm.chooseXPath()">
             <localize key="contentPicker_defineXPathOrigin">Specify root via XPath</localize>
           </button>
           <button
             type="button"
             class="umb-node-preview-add"
-            ng-click="chooseDynamicStartNode()">
+            ng-click="vm.chooseDynamicStartNode()">
             <localize key="contentPicker_defineDynamicRoot">Specify a Dynamic Root</localize>
           </button>
         </div>
@@ -86,7 +86,7 @@
                 </li>
                 <li>
                     <umb-icon icon="icon-delete" class="icon red"></umb-icon>
-                    <button type="button" class="btn-link" ng-click="clearXPath()">Cancel and clear query</button>
+                    <button type="button" class="btn-link" ng-click="vm.clearXPath()">Cancel and clear query</button>
                 </li>
             </ul>
         </div>
@@ -114,7 +114,7 @@
         </div>
 
         <!-- List of query steps -->
-        <div ui-sortable="sortableOptionsForQuerySteps" ng-model="vm.querySteps" ng-if="vm.querySteps">
+        <div ui-sortable="vm.sortableOptionsForQuerySteps" ng-model="vm.querySteps" ng-if="vm.querySteps">
           <umb-node-preview
               ng-repeat="queryStep in vm.querySteps"
               single
@@ -124,7 +124,7 @@
               description="queryStep.description"
               allow-edit="false"
               allow-remove="true"
-              on-remove="removeQueryStep(queryStep)">
+              on-remove="vm.removeQueryStep(queryStep)">
           </umb-node-preview>
         </div>
 
@@ -171,7 +171,7 @@
         <ul class="unstyled list-icons mt3">
           <li>
             <umb-icon icon="icon-delete" class="icon red"></umb-icon>
-            <button type="button" class="btn-link" ng-click="clearDynamicStartNode()">Cancel and clear query</button>
+            <button type="button" class="btn-link" ng-click="vm.clearDynamicStartNode()">Cancel and clear query</button>
           </li>
         </ul>
       </div>

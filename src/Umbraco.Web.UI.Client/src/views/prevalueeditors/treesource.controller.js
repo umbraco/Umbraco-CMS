@@ -7,7 +7,25 @@ angular.module('umbraco')
 
     const vm = this;
 
+    vm.clear = clear;
+    vm.clearXPath = clearXPath;
+    vm.clearDynamicStartNode = clearDynamicStartNode;
+    vm.chooseDynamicStartNode = chooseDynamicStartNode;
+    vm.chooseXPath = chooseXPath;
+    vm.openContentPicker = openContentPicker;
+    vm.removeQueryStep = removeQueryStep;
+
     vm.querySteps = [];
+
+    vm.sortableOptionsForQuerySteps = {
+      axis: "y",
+      containment: "parent",
+      distance: 10,
+      opacity: 0.7,
+      tolerance: "pointer",
+      scroll: true,
+      zIndex: 6000
+    };
 
     $scope.showXPath = false;
 
@@ -26,16 +44,23 @@ angular.module('umbraco')
     }
 
     if ($scope.model.value.dynamicRoot && $scope.model.value.dynamicRoot.querySteps) {
-      vm.querySteps = $scope.model.value.dynamicRoot.querySteps.map(x => {
-        getDataForQueryStep(x).then(data => {
-          return data;
-        });
+
+      const promises = [];
+
+      $scope.model.value.dynamicRoot.querySteps.forEach(x => {
+        promises.push(getDataForQueryStep(x));
+      });
+
+      $q.all(promises).then(data => {
+        console.log("promise data", data);
+        vm.querySteps = data;
+        console.log("vm.querySteps", vm.querySteps);
       });
     }
     
 
-    if ($scope.model.value.id && $scope.model.value.type !== "member"){
-      entityResource.getById($scope.model.value.id, entityType()).then(function(item){
+    if ($scope.model.value.id && $scope.model.value.type !== "member") {
+      entityResource.getById($scope.model.value.id, entityType()).then(item => {
           populate(item);
       });
     } else {
@@ -46,7 +71,7 @@ angular.module('umbraco')
 
     function entityType() {
       var ent = "Document";
-      if($scope.model.value.type === "media"){
+      if ($scope.model.value.type === "media"){
           ent = "Media";
       }
       else if ($scope.model.value.type === "member") {
@@ -55,8 +80,8 @@ angular.module('umbraco')
       return ent;
     }
 
-		$scope.openContentPicker = function() {
-			var treePicker = {
+    function openContentPicker() {
+			const treePicker = {
         idType: $scope.model.config.idType,
 				section: $scope.model.value.type,
 				treeAlias: $scope.model.value.type,
@@ -69,40 +94,42 @@ angular.module('umbraco')
 				close: function() {
 					editorService.close();
 				}
-			};
-			editorService.treePicker(treePicker);
-		};
+      };
 
-		$scope.chooseXPath = function() {
+			editorService.treePicker(treePicker);
+		}
+
+    function chooseXPath() {
 			$scope.showXPath = true;
       $scope.model.value.dynamicRoot = null;
-    };
+    }
 
-		$scope.chooseDynamicStartNode = function() {
+    function chooseDynamicStartNode() {
 			$scope.showXPath = false;
       $scope.model.value.dynamicRoot = {
         originAlias: "Parent",
         querySteps: []
       };
-		};
+		}
 
-		$scope.clearXPath = function() {
+    function clearXPath() {
       $scope.model.value.query = null;
 			$scope.showXPath = false;
-    };
+    }
 
-		$scope.clearDynamicStartNode = function() {
+    function clearDynamicStartNode() {
       $scope.model.value.dynamicRoot = null;
-			$scope.showDynamicStartNode = false;
-		};
+      $scope.showDynamicStartNode = false;
+      vm.querySteps = [];
+		}
 
-		$scope.clear = function() {
+    function clear() {
 			$scope.model.value.id = null;
       $scope.node = null;
       $scope.model.value.query = null;
       $scope.model.value.dynamicRoot = null;
       treeSourceChanged();
-		};
+		}
 
     function treeSourceChanged() {
       eventsService.emit("treeSourceChanged", { value: $scope.model.value.type });
@@ -123,7 +150,7 @@ angular.module('umbraco')
     });
 
 		function populate(item) {
-			$scope.clear();
+			clear();
 			item.icon = iconHelper.convertFromLegacyIcon(item.icon);
 			$scope.node = item;
       $scope.node.path = "";
@@ -215,6 +242,7 @@ angular.module('umbraco')
         }
 
         const obj = {
+          alias: queryStep.alias,
           name: values[0],
           description: description,
           icon: icon
@@ -227,20 +255,12 @@ angular.module('umbraco')
       return deferred.promise;
     }
 
-    $scope.sortableOptionsForQuerySteps = {
-      axis: "y",
-      containment: "parent",
-      distance: 10,
-      opacity: 0.7,
-      tolerance: "pointer",
-      scroll: true,
-      zIndex: 6000
-    };
-
-    $scope.removeQueryStep = function (queryStep) {
-      var index = $scope.model.value.dynamicRoot.querySteps.indexOf(queryStep);
+    function removeQueryStep(queryStep) {
+      console.log("removeQueryStep", queryStep);
+      const index = $scope.model.value.dynamicRoot.querySteps.indexOf(queryStep.alias);
       if (index !== -1) {
         $scope.model.value.dynamicRoot.querySteps.splice(index, 1);
+        vm.querySteps.splice(index, 1);
       }
     };
 
@@ -269,9 +289,10 @@ angular.module('umbraco')
         size: "small",
 				multiPicker: false,
 				submit: function(model) {
-          if(!$scope.model.value.dynamicRoot.querySteps) {
+          if (!$scope.model.value.dynamicRoot.querySteps) {
             $scope.model.value.dynamicRoot.querySteps = [];
           }
+
           $scope.model.value.dynamicRoot.querySteps.push(model.value);
 
           const promises = [
