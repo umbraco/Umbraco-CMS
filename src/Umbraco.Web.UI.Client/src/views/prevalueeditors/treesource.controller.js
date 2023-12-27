@@ -3,7 +3,11 @@
 angular.module('umbraco')
 .controller("Umbraco.PrevalueEditors.TreeSourceController",
 
-	function($scope, $timeout, entityResource, iconHelper, editorService, eventsService){
+  function ($scope, $timeout, $q, entityResource, iconHelper, editorService, eventsService, localizationService) {
+
+    const vm = this;
+
+    vm.querySteps = [];
 
     $scope.showXPath = false;
 
@@ -21,7 +25,16 @@ angular.module('umbraco')
       };
     }
 
-    if($scope.model.value.id && $scope.model.value.type !== "member"){
+    if ($scope.model.value.dynamicRoot && $scope.model.value.dynamicRoot.querySteps) {
+      vm.querySteps = $scope.model.value.dynamicRoot.querySteps.map(x => {
+        getDataForQueryStep(x).then(data => {
+          return data;
+        });
+      });
+    }
+    
+
+    if ($scope.model.value.id && $scope.model.value.type !== "member"){
       entityResource.getById($scope.model.value.id, entityType()).then(function(item){
           populate(item);
       });
@@ -63,7 +76,8 @@ angular.module('umbraco')
 		$scope.chooseXPath = function() {
 			$scope.showXPath = true;
       $scope.model.value.dynamicRoot = null;
-		};
+    };
+
 		$scope.chooseDynamicStartNode = function() {
 			$scope.showXPath = false;
       $scope.model.value.dynamicRoot = {
@@ -75,7 +89,8 @@ angular.module('umbraco')
 		$scope.clearXPath = function() {
       $scope.model.value.query = null;
 			$scope.showXPath = false;
-		};
+    };
+
 		$scope.clearDynamicStartNode = function() {
       $scope.model.value.dynamicRoot = null;
 			$scope.showDynamicStartNode = false;
@@ -122,9 +137,11 @@ angular.module('umbraco')
     // Dynamic Root specific:
 
     $scope.dynamicRootOriginIcon = null;
+
     $scope.$watch("model.value.dynamicRoot.originAlias", function (newVal, oldVal) {
       $scope.dynamicRootOriginIcon = getIconForOriginAlias(newVal);
-    })
+    });
+
     function getIconForOriginAlias(originAlias) {
       switch (originAlias) {
         case "Root":
@@ -139,9 +156,11 @@ angular.module('umbraco')
           return "icon-wand";
       }
     }
-    $scope.getIconForQueryStepAlias = getIconForQueryStepAlias;
-    function getIconForQueryStepAlias(originAlias) {
-      switch (originAlias) {
+
+    $scope.getIconForQueryStep = getIconForQueryStep;
+
+    function getIconForQueryStep(queryStep) {
+      switch (queryStep.alias) {
         case "NearestAncestorOrSelf":
           return "icon-chevron-up";
         case "FurthestAncestorOrSelf":
@@ -152,6 +171,60 @@ angular.module('umbraco')
           return "icon-chevron-down";
       }
       return "icon-lab";
+    }
+
+    function getNameKeyForQueryStep(queryStep) {
+
+      let key = queryStep.alias;
+
+      switch (queryStep.alias) {
+        case "NearestAncestorOrSelf":
+        case "FurthestAncestorOrSelf":
+        case "NearestDescendantOrSelf":
+        case "FurthestDescendantOrSelf":
+          key = `dynamicRoot_queryStep${queryStep.alias}Title`;
+      }
+
+      return key;
+    }
+
+    function getDescriptionForQueryStep(queryStep) {
+      if (!queryStep.anyOfDocTypeKeys || queryStep.anyOfDocTypeKeys.length === 0)
+        return null;
+
+      return queryStep.anyOfDocTypeKeys.join(", ");
+    }
+
+    function getDataForQueryStep(queryStep) {
+      const deferred = $q.defer();
+
+      const icon = getIconForQueryStep(queryStep);
+      let nameKey = getNameKeyForQueryStep(queryStep);
+
+      const keys = [
+        nameKey,
+        "dynamicRoot_queryStepTypes"
+      ];
+
+      localizationService.localizeMany(keys).then(values => {
+
+        let description = null;
+
+        if (queryStep.anyOfDocTypeKeys && queryStep.anyOfDocTypeKeys.length > 0) {
+          description = (values[1] || "of type: ") + queryStep.anyOfDocTypeKeys.join(", ")
+        }
+
+        const obj = {
+          name: values[0],
+          description: description,
+          icon: icon
+        };
+
+        deferred.resolve(obj);
+
+      });
+
+      return deferred.promise;
     }
 
     $scope.sortableOptionsForQuerySteps = {
@@ -166,20 +239,20 @@ angular.module('umbraco')
 
     $scope.removeQueryStep = function (queryStep) {
       var index = $scope.model.value.dynamicRoot.querySteps.indexOf(queryStep);
-      if(index !== -1) {
+      if (index !== -1) {
         $scope.model.value.dynamicRoot.querySteps.splice(index, 1);
       }
-    }
+    };
 
     $scope.openDynamicRootOriginPicker = function() {
-			var originPicker = {
+			const originPicker = {
         view: "views/common/infiniteeditors/pickdynamicrootorigin/pickdynamicrootorigin.html",
         contentType: $scope.model.value.type,
         size: "small",
         value: {...$scope.model.value.dynamicRoot},
 				multiPicker: false,
 				submit: function(model) {
-					$scope.model.value.dynamicRoot = model.value;
+          $scope.model.value.dynamicRoot = model.value;
 					editorService.close();
 				},
 				close: function() {
@@ -190,7 +263,7 @@ angular.module('umbraco')
 		};
 
     $scope.appendDynamicQueryStep = function() {
-			var queryStepPicker = {
+      const queryStepPicker = {
         view: "views/common/infiniteeditors/pickdynamicrootquerystep/pickdynamicrootquerystep.html",
         contentType: $scope.model.value.type,
         size: "small",
@@ -200,6 +273,21 @@ angular.module('umbraco')
             $scope.model.value.dynamicRoot.querySteps = [];
           }
           $scope.model.value.dynamicRoot.querySteps.push(model.value);
+
+          const promises = [
+            getDataForQueryStep(model.value)
+          ];
+
+          //$scope.model.value.dynamicRoot.querySteps.forEach(x => {
+          //  promises.push(getDataForQueryStep(x));
+          //});
+
+          $q.all(promises).then(data => {
+            console.log("promise data", data);
+            vm.querySteps.push(data[0]);
+            console.log("vm.querySteps", vm.querySteps);
+          });
+
 					editorService.close();
 				},
 				close: function() {
