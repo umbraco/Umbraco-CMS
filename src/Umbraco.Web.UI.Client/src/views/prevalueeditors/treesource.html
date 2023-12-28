@@ -22,7 +22,7 @@
 	</umb-node-preview>
 
     <div ng-if="!node && model.value.type === 'content'" class="mt2">
-        <div ng-hide="(showXPath || model.value.query) || (showDynamicStartNode || model.value.dynamicRoot)" class="flex">
+        <div ng-hide="(vm.showXPath || model.value.query) || (showDynamicStartNode || model.value.dynamicRoot)" class="flex">
           <button
             type="button"
             class="umb-node-preview-add"
@@ -43,7 +43,7 @@
           </button>
         </div>
 
-        <div ng-if="showXPath || model.value.query">
+        <div ng-if="vm.showXPath || model.value.query">
 
           <h5><localize key="contentPicker_configurationXPathTitle">XPath Query</localize></h5>
 

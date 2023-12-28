@@ -29,7 +29,7 @@ angular.module('umbraco')
       zIndex: 6000
     };
 
-    $scope.showXPath = false;
+    vm.showXPath = false;
 
     if (!$scope.model) {
         $scope.model = {};
@@ -54,12 +54,9 @@ angular.module('umbraco')
       });
 
       $q.all(promises).then(data => {
-        console.log("promise data", data);
         vm.querySteps = data;
-        console.log("vm.querySteps", vm.querySteps);
       });
     }
-    
 
     if ($scope.model.value.id && $scope.model.value.type !== "member") {
       entityResource.getById($scope.model.value.id, entityType()).then(item => {
@@ -102,12 +99,12 @@ angular.module('umbraco')
 		}
 
     function chooseXPath() {
-			$scope.showXPath = true;
+			vm.showXPath = true;
       $scope.model.value.dynamicRoot = null;
     }
 
     function chooseDynamicStartNode() {
-			$scope.showXPath = false;
+			vm.showXPath = false;
       $scope.model.value.dynamicRoot = {
         originAlias: "Parent",
         querySteps: []
@@ -115,8 +112,8 @@ angular.module('umbraco')
 		}
 
     function clearXPath() {
+      vm.showXPath = false;
       $scope.model.value.query = null;
-			$scope.showXPath = false;
     }
 
     function clearDynamicStartNode() {
@@ -139,7 +136,7 @@ angular.module('umbraco')
 
 		//we always need to ensure we dont submit anything broken
     var unsubscribe = $scope.$on("formSubmitting", function (ev, args) {
-      if($scope.model.value.type === "member") {
+      if ($scope.model.value.type === "member") {
         $scope.model.value.id = null;
         $scope.model.value.query = "";
         $scope.model.value.dynamicRoot = null;
