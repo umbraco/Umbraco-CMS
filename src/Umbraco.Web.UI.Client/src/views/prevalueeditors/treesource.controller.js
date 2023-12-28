@@ -128,7 +128,8 @@ angular.module('umbraco')
       vm.querySteps = [];
       vm.sortableModel = [];
       $scope.model.value.dynamicRoot = null;
-		}
+      setSortingState(vm.querySteps);
+    }
 
     function clear() {
 			$scope.model.value.id = null;
@@ -186,10 +187,7 @@ angular.module('umbraco')
         icon: icon
       };
 
-      console.log("querySteps", newVal.querySteps.length);
-
-      vm.sortableOptionsForQuerySteps.disabled = newVal.querySteps.length === 1;
-      console.log("sortableOptionsForQuerySteps", vm.sortableOptionsForQuerySteps);
+      setSortingState(newVal.querySteps);
 
       if (originKey) {
         const lookupId = udiService.build($scope.model.value.type === 'content' ? 'document' : $scope.model.value.type, originKey);
@@ -229,6 +227,7 @@ angular.module('umbraco')
 
       $q.all(promises).then(data => {
         vm.querySteps = data;
+        setSortingState(vm.querySteps);
       });
     }
 
@@ -314,8 +313,18 @@ angular.module('umbraco')
         $scope.model.value.dynamicRoot.querySteps.splice(index, 1);
         vm.sortableModel = $scope.model.value.dynamicRoot.querySteps;
         vm.querySteps.splice(index, 1);
+        setSortingState(vm.querySteps);
       }
-    };
+    }
+
+    function setSortingState(items) {
+      // disable sorting if the list only consist of one item
+      if (items.length <= 1 || $scope.readonly) {
+        vm.sortableOptionsForQuerySteps.disabled = true;
+      } else {
+        vm.sortableOptionsForQuerySteps.disabled = false;
+      }
+    }
 
     function openDynamicRootOriginPicker() {
 			const originPicker = {
@@ -356,6 +365,7 @@ angular.module('umbraco')
 
           $q.all(promises).then(data => {
             vm.querySteps.push(data[0]);
+            setSortingState(vm.querySteps);
           });
 
 					editorService.close();
