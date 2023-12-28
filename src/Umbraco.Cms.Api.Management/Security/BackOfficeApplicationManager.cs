@@ -104,6 +104,12 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
                 CallbackUrlFor(_backOfficeHost ?? backOfficeUrl, _authorizeCallbackPathName ?? "/umbraco")
             },
             Type = OpenIddictConstants.ClientTypes.Public,
+            PostLogoutRedirectUris =
+            {
+                CallbackUrlFor(_backOfficeHost ?? backOfficeUrl, _authorizeCallbackPathName ?? "/umbraco/login"),
+                // FIXME: remove when we no longer use Umbraco.Web.UI project
+                CallbackUrlFor(_backOfficeHost ?? backOfficeUrl, _authorizeCallbackPathName ?? "/umbraco")
+            },
             Permissions =
             {
                 OpenIddictConstants.Permissions.Endpoints.Authorization,
