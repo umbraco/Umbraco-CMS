@@ -85,9 +85,11 @@
 @param {boolean} allowRemove (<code>binding</code>): Show/Hide the remove button.
 @param {boolean} allowOpen (<code>binding</code>): Show/Hide the open button.
 @param {boolean} allowEdit (<code>binding</code>): Show/Hide the edit button (Added in version 7.7.0).
+@param {boolean} allowChange (<code>binding</code>): Show/Hide the change button (Added in version 10.1.0).
 @param {function} onRemove (<code>expression</code>): Callback function when the remove button is clicked.
 @param {function} onOpen (<code>expression</code>): Callback function when the open button is clicked.
 @param {function} onEdit (<code>expression</code>): Callback function when the edit button is clicked (Added in version 7.7.0).
+@param {function} onChange (<code>expression</code>): Callback function when the change button is clicked (Added in version 10.1.0).
 @param {string} openUrl (<code>binding</code>): Fallback URL for <code>onOpen</code> (Added in version 7.12.0).
 @param {string} editUrl (<code>binding</code>): Fallback URL for <code>onEdit</code> (Added in version 7.12.0).
 @param {string} removeUrl (<code>binding</code>): Fallback URL for <code>onRemove</code> (Added in version 7.12.0).
