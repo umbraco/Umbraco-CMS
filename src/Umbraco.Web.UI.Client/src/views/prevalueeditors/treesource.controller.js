@@ -13,6 +13,8 @@ angular.module('umbraco')
     vm.chooseDynamicStartNode = chooseDynamicStartNode;
     vm.chooseXPath = chooseXPath;
     vm.openContentPicker = openContentPicker;
+    vm.openDynamicRootOriginPicker = openDynamicRootOriginPicker;
+    vm.appendDynamicQueryStep = appendDynamicQueryStep;
     vm.removeQueryStep = removeQueryStep;
 
     vm.querySteps = [];
@@ -257,6 +259,8 @@ angular.module('umbraco')
 
     function removeQueryStep(queryStep) {
       console.log("removeQueryStep", queryStep);
+      console.log("querySteps", $scope.model.value.dynamicRoot.querySteps);
+
       const index = $scope.model.value.dynamicRoot.querySteps.indexOf(queryStep.alias);
       if (index !== -1) {
         $scope.model.value.dynamicRoot.querySteps.splice(index, 1);
@@ -264,7 +268,7 @@ angular.module('umbraco')
       }
     };
 
-    $scope.openDynamicRootOriginPicker = function() {
+    function openDynamicRootOriginPicker() {
 			const originPicker = {
         view: "views/common/infiniteeditors/pickdynamicrootorigin/pickdynamicrootorigin.html",
         contentType: $scope.model.value.type,
@@ -280,9 +284,9 @@ angular.module('umbraco')
 				}
 			};
 			editorService.open(originPicker);
-		};
+		}
 
-    $scope.appendDynamicQueryStep = function() {
+    function appendDynamicQueryStep() {
       const queryStepPicker = {
         view: "views/common/infiniteeditors/pickdynamicrootquerystep/pickdynamicrootquerystep.html",
         contentType: $scope.model.value.type,
@@ -299,14 +303,8 @@ angular.module('umbraco')
             getDataForQueryStep(model.value)
           ];
 
-          //$scope.model.value.dynamicRoot.querySteps.forEach(x => {
-          //  promises.push(getDataForQueryStep(x));
-          //});
-
           $q.all(promises).then(data => {
-            console.log("promise data", data);
             vm.querySteps.push(data[0]);
-            console.log("vm.querySteps", vm.querySteps);
           });
 
 					editorService.close();
@@ -316,5 +314,6 @@ angular.module('umbraco')
 				}
 			};
 			editorService.open(queryStepPicker);
-		};
+    }
+
 });
