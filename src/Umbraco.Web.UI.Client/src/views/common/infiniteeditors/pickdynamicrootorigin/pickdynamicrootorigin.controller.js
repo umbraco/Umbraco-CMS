@@ -3,45 +3,58 @@
 
     function PickDynamicRootOriginController($scope, localizationService, editorService, udiParser) {
 
-        var vm = this;
+        const vm = this;
+
+        vm.chooseRoot = chooseRoot;
+        vm.chooseParent = chooseParent;
+        vm.chooseCurrent = chooseCurrent;
+        vm.chooseSite = chooseSite;
+        vm.chooseByKey = chooseByKey;
+
+        vm.submit = submit;
+        vm.close = close;
 
         function onInit() {
 
-            if(!$scope.model.title) {
-                localizationService.localize("dynamicRoot_pickDynamicRootOriginTitle").then(function(value){
+            if (!$scope.model.title) {
+                localizationService.localize("dynamicRoot_pickDynamicRootOriginTitle").then(value => {
                     $scope.model.title = value;
                 });
             }
-            if(!$scope.model.subtitle) {
-                localizationService.localize("dynamicRoot_pickDynamicRootOriginDesc").then(function(value){
+            if (!$scope.model.subtitle) {
+                localizationService.localize("dynamicRoot_pickDynamicRootOriginDesc").then(value => {
                     $scope.model.subtitle = value;
                 });
             }
 
         }
 
-        vm.chooseRoot = function() {
+        function chooseRoot() {
           $scope.model.value.originAlias = "Root";
           $scope.model.value.originKey = null;
           vm.submit($scope.model);
         }
-        vm.chooseParent = function() {
+
+        function chooseParent() {
           $scope.model.value.originAlias = "Parent";
           $scope.model.value.originKey = null;
           vm.submit($scope.model);
         }
-        vm.chooseCurrent = function() {
+
+        function chooseCurrent() {
           $scope.model.value.originAlias = "Current";
           $scope.model.value.originKey = null;
           vm.submit($scope.model);
         }
-        vm.chooseSite = function() {
+
+        function chooseSite() {
           $scope.model.value.originAlias = "Site";
           $scope.model.value.originKey = null;
           vm.submit($scope.model);
         }
-        vm.chooseByKey = function() {
-          var treePicker = {
+
+        function chooseByKey() {
+          const dialog = {
             idType: "udi",
             section: $scope.model.contentType,
             treeAlias: $scope.model.contentType,
@@ -57,19 +70,18 @@
               editorService.close();
             }
           };
-          editorService.treePicker(treePicker);
-        }
 
-        vm.submit = submit;
+          editorService.treePicker(dialog);
+        }
+        
         function submit(model) {
           if ($scope.model.submit) {
               $scope.model.submit(model);
           }
         }
-
-        vm.close = close;
+        
         function close() {
-            if($scope.model.close) {
+            if ($scope.model.close) {
                 $scope.model.close();
             }
         }
