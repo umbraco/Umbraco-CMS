@@ -3,7 +3,7 @@
 angular.module('umbraco')
 .controller("Umbraco.PrevalueEditors.TreeSourceController",
 
-  function ($scope, $filter, $timeout, $q, entityResource, iconHelper, editorService, eventsService, localizationService, udiService) {
+  function ($scope, $filter, $timeout, $q, entityResource, angularHelper, iconHelper, editorService, eventsService, localizationService, udiService, udiParser) {
 
     const vm = this;
 
@@ -27,7 +27,10 @@ angular.module('umbraco')
       opacity: 0.7,
       tolerance: "pointer",
       scroll: true,
-      zIndex: 6000
+      zIndex: 6000,
+      update: function () {
+        setDirty();
+      }
     };
 
     vm.showDynamicStartNode = false;
@@ -79,6 +82,13 @@ angular.module('umbraco')
           ent = "Member";
       }
       return ent;
+    }
+
+    function setDirty() {
+      const currentForm = angularHelper.getCurrentForm($scope);
+      if (currentForm) {
+        currentForm.$setDirty();
+      }
     }
 
     function openContentPicker() {
@@ -164,16 +174,38 @@ angular.module('umbraco')
     // Dynamic Root specific
     $scope.$watch("model.value.dynamicRoot", function (newVal, oldVal) {
 
-      console.log("watch dynamicRoot", newVal);
-
       const alias = newVal ? newVal.originAlias : null;
+      const originKey = newVal ? newVal.originKey : null;
 
-      console.log("watch dynamicRoot originAlias", alias);
+      if (!alias) {
+        vm.dynamicRootOrigin = null;
+        return;
+      }
 
       const icon = getIconForOriginAlias(alias);
       const key = `dynamicRoot_origin${alias}Title`;
 
-      vm.dynamicRootOrigin.icon = icon;
+      vm.dynamicRootOrigin = {
+        alias: alias,
+        icon: icon
+      };
+
+      vm.sortableOptionsForQuerySteps.disabled = newVal.querySteps.length === 1;
+
+      if (originKey) {
+        const lookupId = udiService.build($scope.model.value.type === 'content' ? 'document' : $scope.model.value.type, originKey);
+
+        vm.dynamicRootOrigin.description = "Loading...";
+        //vm.dynamicRootOrigin.description = $filter('ncNodeName')(lookupId);
+
+        const udi = udiParser.parse(lookupId);
+        if (udi) {
+          entityResource.getById(udi.value, udi.entityType).then(ent => {
+            vm.dynamicRootOrigin.description = ent.name;
+          })
+        }
+
+      }
 
       localizationService.localize(key).then(data => {
         vm.dynamicRootOrigin.name = data;
@@ -279,13 +311,6 @@ angular.module('umbraco')
 				multiPicker: false,
 				submit: function(model) {
           $scope.model.value.dynamicRoot = model.value;
-
-          if ($scope.model.value.dynamicRoot.originKey) {
-            const udi = udiService.build($scope.model.value.type === 'content' ? 'document' : model.value.type, $scope.model.value.dynamicRoot.originKey);
-            console.log("dynamicRoot origin udi", udi);
-            vm.dynamicRootOrigin.description = $filter('ncNodeName')(udi);
-          }
-
 					editorService.close();
 				},
 				close: function() {
