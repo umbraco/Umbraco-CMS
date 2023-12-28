@@ -22,7 +22,7 @@
 	</umb-node-preview>
 
     <div ng-if="!node && model.value.type === 'content'" class="mt2">
-        <div ng-hide="(vm.showXPath || model.value.query) || (showDynamicStartNode || model.value.dynamicRoot)" class="flex">
+        <div ng-hide="(vm.showXPath || model.value.query) || (vm.showDynamicStartNode || model.value.dynamicRoot)" class="flex">
           <button
             type="button"
             class="umb-node-preview-add"
@@ -90,7 +90,7 @@
                 </li>
             </ul>
         </div>
-      <div ng-if="showDynamicStartNode || model.value.dynamicRoot">
+      <div ng-if="vm.showDynamicStartNode || model.value.dynamicRoot">
 
         <h5><localize key="dynamicRoot_configurationTitle">Dynamic Root Query</localize></h5>
 

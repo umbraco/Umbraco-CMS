@@ -29,6 +29,7 @@ angular.module('umbraco')
       zIndex: 6000
     };
 
+    vm.showDynamicStartNode = false;
     vm.showXPath = false;
 
     if (!$scope.model) {
@@ -117,9 +118,9 @@ angular.module('umbraco')
     }
 
     function clearDynamicStartNode() {
-      $scope.model.value.dynamicRoot = null;
-      $scope.showDynamicStartNode = false;
+      vm.showDynamicStartNode = false;
       vm.querySteps = [];
+      $scope.model.value.dynamicRoot = null;
 		}
 
     function clear() {
