@@ -262,7 +262,7 @@ angular.module('umbraco')
 
     function getNameKeyForQueryStep(queryStep) {
 
-      let key = queryStep.alias;
+      let key = "";
 
       switch (queryStep.alias) {
         case "NearestAncestorOrSelf":
@@ -288,6 +288,7 @@ angular.module('umbraco')
 
       localizationService.localizeMany(keys).then(values => {
 
+        const name = values[0] === "[]" ? queryStep.alias : values[0];
         let description = null;
 
         if (queryStep.anyOfDocTypeKeys && queryStep.anyOfDocTypeKeys.length > 0) {
@@ -296,7 +297,7 @@ angular.module('umbraco')
 
         const obj = {
           alias: queryStep.alias,
-          name: values[0],
+          name: name,
           description: description,
           icon: icon
         };
