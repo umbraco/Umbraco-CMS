@@ -54,10 +54,8 @@
         }
 
         function chooseByKey() {
-          const dialog = {
+          const editor = {
             idType: "udi",
-            section: $scope.model.contentType,
-            treeAlias: $scope.model.contentType,
             multiPicker: false,
             submit: function(model) {
               var item = model.selection[0];
@@ -71,7 +69,16 @@
             }
           };
 
-          editorService.treePicker(dialog);
+          switch ($scope.model.contentType) {
+            case "content":
+              editor.entityType = "documentType";
+              break;
+            case "media":
+              editor.entityType = "mediaType";
+              break;
+          }
+
+          editorService.contentTypePicker(editor);
         }
         
         function submit(model) {

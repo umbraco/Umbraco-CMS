@@ -48,12 +48,14 @@
 
           switch ($scope.model.contentType) {
             case "content":
-              editorService.contentTypePicker(editor);
+              editor.entityType = "documentType";
               break;
             case "media":
-              editorService.mediaTypePicker(editor);
+              editor.entityType = "mediaType";
               break;
           }
+
+          editorService.contentTypePicker(editor);
         }
 
         function chooseCustom() {
