@@ -186,9 +186,10 @@ angular.module('umbraco')
         icon: icon
       };
 
-      console.log("querySteps", newVal.querySteps);
+      console.log("querySteps", newVal.querySteps.length);
 
       vm.sortableOptionsForQuerySteps.disabled = newVal.querySteps.length === 1;
+      console.log("sortableOptionsForQuerySteps", vm.sortableOptionsForQuerySteps);
 
       if (originKey) {
         const lookupId = udiService.build($scope.model.value.type === 'content' ? 'document' : $scope.model.value.type, originKey);
@@ -212,9 +213,6 @@ angular.module('umbraco')
     });
 
     $scope.$watchCollection("vm.sortableModel", function (newVal, oldVal) {
-      console.log("sortableModel newVal", newVal);
-      console.log("sortableModel oldVal", oldVal);
-      console.log("sortableModel not equal", newVal !== oldVal);
       if (newVal !== oldVal) {
         $scope.model.value.dynamicRoot.querySteps = newVal;
 
@@ -311,12 +309,7 @@ angular.module('umbraco')
       return deferred.promise;
     }
 
-    function removeQueryStep(queryStep) {
-      console.log("removeQueryStep", queryStep);
-      console.log("querySteps", $scope.model.value.dynamicRoot.querySteps);
-
-      const index = $scope.model.value.dynamicRoot.querySteps.findIndex(x => x.alias == queryStep.alias);
-      console.log("index", index);
+    function removeQueryStep(queryStep, index) {
       if (index !== -1) {
         $scope.model.value.dynamicRoot.querySteps.splice(index, 1);
         vm.sortableModel = $scope.model.value.dynamicRoot.querySteps;

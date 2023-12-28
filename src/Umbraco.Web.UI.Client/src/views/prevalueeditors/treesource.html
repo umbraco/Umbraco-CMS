@@ -108,7 +108,7 @@
         <!-- List of query steps -->
         <div ui-sortable="vm.sortableOptionsForQuerySteps" ng-model="vm.sortableModel" ng-if="vm.querySteps">
           <umb-node-preview
-              ng-repeat="queryStep in vm.querySteps"
+              ng-repeat="queryStep in vm.querySteps track by $id(queryStep)"
               single
               class="mt1"
               icon="queryStep.icon"
@@ -116,7 +116,7 @@
               description="queryStep.description"
               allow-edit="false"
               allow-remove="true"
-              on-remove="vm.removeQueryStep(queryStep)">
+              on-remove="vm.removeQueryStep(queryStep, $index)">
           </umb-node-preview>
         </div>
 
