@@ -19,6 +19,7 @@ angular.module('umbraco')
 
     vm.dynamicRootOrigin = null;
     vm.querySteps = [];
+    vm.sortableModel = [];
 
     vm.sortableOptionsForQuerySteps = {
       axis: "y",
@@ -28,7 +29,7 @@ angular.module('umbraco')
       tolerance: "pointer",
       scroll: true,
       zIndex: 6000,
-      update: function () {
+      update: function (e, ui) {
         setDirty();
       }
     };
@@ -52,15 +53,9 @@ angular.module('umbraco')
 
     if ($scope.model.value.dynamicRoot && $scope.model.value.dynamicRoot.querySteps) {
 
-      const promises = [];
+      vm.sortableModel = $scope.model.value.dynamicRoot.querySteps;
 
-      $scope.model.value.dynamicRoot.querySteps.forEach(x => {
-        promises.push(getDataForQueryStep(x));
-      });
-
-      $q.all(promises).then(data => {
-        vm.querySteps = data;
-      });
+      syncRenderModel();
     }
 
     if ($scope.model.value.id && $scope.model.value.type !== "member") {
@@ -131,6 +126,7 @@ angular.module('umbraco')
     function clearDynamicStartNode() {
       vm.showDynamicStartNode = false;
       vm.querySteps = [];
+      vm.sortableModel = [];
       $scope.model.value.dynamicRoot = null;
 		}
 
@@ -190,6 +186,8 @@ angular.module('umbraco')
         icon: icon
       };
 
+      console.log("querySteps", newVal.querySteps);
+
       vm.sortableOptionsForQuerySteps.disabled = newVal.querySteps.length === 1;
 
       if (originKey) {
@@ -212,6 +210,29 @@ angular.module('umbraco')
       });
 
     });
+
+    $scope.$watchCollection("vm.sortableModel", function (newVal, oldVal) {
+      console.log("sortableModel newVal", newVal);
+      console.log("sortableModel oldVal", oldVal);
+      console.log("sortableModel not equal", newVal !== oldVal);
+      if (newVal !== oldVal) {
+        $scope.model.value.dynamicRoot.querySteps = newVal;
+
+        syncRenderModel();
+      }
+    });
+
+    function syncRenderModel() {
+      const promises = [];
+
+      $scope.model.value.dynamicRoot.querySteps.forEach(x => {
+        promises.push(getDataForQueryStep(x));
+      });
+
+      $q.all(promises).then(data => {
+        vm.querySteps = data;
+      });
+    }
 
     function getIconForOriginAlias(originAlias) {
       switch (originAlias) {
@@ -273,7 +294,7 @@ angular.module('umbraco')
         let description = null;
 
         if (queryStep.anyOfDocTypeKeys && queryStep.anyOfDocTypeKeys.length > 0) {
-          description = (values[1] || "of type: ") + queryStep.anyOfDocTypeKeys.join(", ")
+          description = (values[1] || "That matches types: ") + queryStep.anyOfDocTypeKeys.join(", ")
         }
 
         const obj = {
@@ -298,6 +319,7 @@ angular.module('umbraco')
       console.log("index", index);
       if (index !== -1) {
         $scope.model.value.dynamicRoot.querySteps.splice(index, 1);
+        vm.sortableModel = $scope.model.value.dynamicRoot.querySteps;
         vm.querySteps.splice(index, 1);
       }
     };
@@ -332,6 +354,8 @@ angular.module('umbraco')
           }
 
           $scope.model.value.dynamicRoot.querySteps.push(model.value);
+
+          vm.sortableModel = $scope.model.value.dynamicRoot.querySteps;
 
           const promises = [
             getDataForQueryStep(model.value)

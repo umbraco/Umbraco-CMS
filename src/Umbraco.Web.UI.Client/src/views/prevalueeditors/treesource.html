@@ -106,7 +106,7 @@
         </umb-node-preview>
 
         <!-- List of query steps -->
-        <div ui-sortable="vm.sortableOptionsForQuerySteps" ng-model="vm.querySteps" ng-if="vm.querySteps">
+        <div ui-sortable="vm.sortableOptionsForQuerySteps" ng-model="vm.sortableModel" ng-if="vm.querySteps">
           <umb-node-preview
               ng-repeat="queryStep in vm.querySteps"
               single
