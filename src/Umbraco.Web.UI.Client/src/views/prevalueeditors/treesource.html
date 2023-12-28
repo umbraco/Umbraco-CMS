@@ -95,13 +95,23 @@
         <h5><localize key="dynamicRoot_configurationTitle">Dynamic Root Query</localize></h5>
 
         <!-- Origin -->
-        <div class="umb-node-preview" single>
+        <umb-node-preview
+            single
+            icon="vm.dynamicRootOrigin.icon"
+            name="vm.dynamicRootOrigin.name"
+            description="vm.dynamicRootOrigin.description"
+            allow-edit="true"
+            allow-remove="false"
+            on-edit="vm.openDynamicRootOriginPicker()">
+        </umb-node-preview>
+
+        <!--<div class="umb-node-preview" single>
           <div class="flex">
             <umb-icon class="umb-node-preview__icon" icon="{{dynamicRootOriginIcon}}"></umb-icon>
             <div class="umb-node-preview__content">
-              <div class="umb-node-preview__name">
+              <div class="umb-node-preview__name">-->
                 <!-- ng-repeat is used here to enforce re-rendering when originAlias is changed: -->
-                <localize ng-repeat="originAlias in [model.value.dynamicRoot.originAlias]" key="dynamicRoot_origin{{model.value.dynamicRoot.originAlias}}Title"></localize>
+                <!--<localize ng-repeat="originAlias in [model.value.dynamicRoot.originAlias]" key="dynamicRoot_origin{{model.value.dynamicRoot.originAlias}}Title"></localize>
               </div>
               <div class="umb-node-preview__description" ng-if="model.value.dynamicRoot.originKey">
                 {{ ("umb://" + (model.value.type === 'content' ? 'document' : model.value.type) + "/" + model.value.dynamicRoot.originKey | ncNodeName)}}
@@ -111,7 +121,7 @@
           <div class="umb-node-preview__actions">
             <button type="button" class="umb-node-preview__action" ng-click="vm.openDynamicRootOriginPicker()"><localize key="general_change">Change</localize></button>
           </div>
-        </div>
+        </div>-->
 
         <!-- List of query steps -->
         <div ui-sortable="vm.sortableOptionsForQuerySteps" ng-model="vm.querySteps" ng-if="vm.querySteps">
