@@ -10,7 +10,7 @@ public class ServerConfigurationMapDefinition : IMapDefinition
     public void DefineMaps(IUmbracoMapper mapper)
     {
         mapper.Define<IDictionary<string, string>, ServerTroubleshootingResponseModel>((_, _) => new ServerTroubleshootingResponseModel { Items = Array.Empty<ServerConfigurationItemResponseModel>() }, Map);
-        mapper.Define<ServerInformation, ServerInformationResponseModel>((_, _) => new ServerInformationResponseModel() , Map);
+        mapper.Define<ServerInformation, ServerInformationResponseModel>((_, _) => new ServerInformationResponseModel(), Map);
     }
 
     // Umbraco.Code.MapAll
