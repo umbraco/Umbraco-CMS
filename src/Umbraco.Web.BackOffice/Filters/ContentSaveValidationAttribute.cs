@@ -20,9 +20,12 @@ namespace Umbraco.Cms.Web.BackOffice.Filters;
 /// </summary>
 internal sealed class ContentSaveValidationAttribute : TypeFilterAttribute
 {
-    public ContentSaveValidationAttribute() : base(typeof(ContentSaveValidationFilter)) =>
+    public ContentSaveValidationAttribute(bool skipUserAccessValidation = false)
+        : base(typeof(ContentSaveValidationFilter))
+    {
         Order = -3000; // More important than ModelStateInvalidFilter.FilterOrder
-
+        Arguments = new object[] { skipUserAccessValidation };
+    }
 
     private sealed class ContentSaveValidationFilter : IAsyncActionFilter
     {
@@ -32,6 +35,7 @@ internal sealed class ContentSaveValidationAttribute : TypeFilterAttribute
         private readonly ILocalizationService _localizationService;
         private readonly ILoggerFactory _loggerFactory;
         private readonly IPropertyValidationService _propertyValidationService;
+        private readonly bool _skipUserAccessValidation;
 
 
         public ContentSaveValidationFilter(
@@ -40,7 +44,8 @@ internal sealed class ContentSaveValidationAttribute : TypeFilterAttribute
             IPropertyValidationService propertyValidationService,
             IAuthorizationService authorizationService,
             IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-            ILocalizationService localizationService)
+            ILocalizationService localizationService,
+            bool skipUserAccessValidation)
         {
             _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
             _contentService = contentService ?? throw new ArgumentNullException(nameof(contentService));
@@ -49,6 +54,7 @@ internal sealed class ContentSaveValidationAttribute : TypeFilterAttribute
             _authorizationService = authorizationService;
             _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
             _localizationService = localizationService;
+            _skipUserAccessValidation = skipUserAccessValidation;
         }
 
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
@@ -88,7 +94,7 @@ internal sealed class ContentSaveValidationAttribute : TypeFilterAttribute
                 return;
             }
 
-            if (!await ValidateUserAccessAsync(model, context))
+            if (_skipUserAccessValidation is false && await ValidateUserAccessAsync(model, context) is false)
             {
                 return;
             }

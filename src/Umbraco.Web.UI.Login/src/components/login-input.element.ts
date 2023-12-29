@@ -10,7 +10,6 @@ import { customElement } from 'lit/decorators.js';
  */
 @customElement('umb-login-input')
 export class UmbLoginInputElement extends UUIInputElement {
-
   /**
    * Remove the id attribute from the inner input element to avoid duplicate ids.
    *
@@ -18,8 +17,15 @@ export class UmbLoginInputElement extends UUIInputElement {
    * @protected
    */
   protected firstUpdated() {
-    const innerInput = this.querySelector('input')
+    const innerInput = this.querySelector('input');
     innerInput?.removeAttribute('id');
+
+    innerInput?.addEventListener('mousedown', () => {
+      this.style.setProperty('--uui-show-focus-outline', '0');
+    });
+    innerInput?.addEventListener('blur', () => {
+      this.style.setProperty('--uui-show-focus-outline', '');
+    });
   }
 
   /**

@@ -21,7 +21,8 @@ public class InviteUserController : UserControllerBase
 
     public InviteUserController(
         IUserService userService,
-        IUserPresentationFactory userPresentationFactory, IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
+        IUserPresentationFactory userPresentationFactory,
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
     {
         _userService = userService;
         _userPresentationFactory = userPresentationFactory;

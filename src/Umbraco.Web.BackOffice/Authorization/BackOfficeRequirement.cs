@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 namespace Umbraco.Cms.Web.BackOffice.Authorization;
 
 /// <summary>
-///     Authorization requirement for the <see cref="BackOfficeRequirement" />
+///     Authorization requirement for the <see cref="BackOfficeHandler" />.
 /// </summary>
 public class BackOfficeRequirement : IAuthorizationRequirement
 {

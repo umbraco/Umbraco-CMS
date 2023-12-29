@@ -1,7 +1,7 @@
 (function () {
   "use strict";
 
-  function WebhookController($q, $timeout, $location, $routeParams, webhooksResource, navigationService, notificationsService, editorService, overlayService, contentTypeResource, mediaTypeResource, memberTypeResource) {
+  function WebhookController($q, $timeout, $location, $routeParams, webhooksResource, navigationService, notificationsService, overlayService, contentTypeResource, mediaTypeResource, memberTypeResource) {
 
     const vm = this;
 

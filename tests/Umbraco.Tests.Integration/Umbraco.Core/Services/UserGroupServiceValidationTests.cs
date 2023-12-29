@@ -168,4 +168,41 @@ public class UserGroupServiceValidationTests : UmbracoIntegrationTest
         var updatedGroup = updateResult.Result;
         Assert.AreEqual(updateName, updatedGroup.Name);
     }
+
+    // these keys are not defined as "const" in Constants.Security but as "static readonly", so we have to hardcode
+    // them here ("static readonly" can't be used as testcase inputs as they are not constants)
+    [TestCase("E5E7F6C8-7F9C-4B5B-8D5D-9E1E5A4F7E4D", "admin")]
+    [TestCase("8C6AD70F-D307-4E4A-AF58-72C2E4E9439D", "sensitiveData")]
+    [TestCase("F2012E4C-D232-4BD1-8EAE-4384032D97D8", "translator")]
+    public async Task Cannot_Delete_System_UserGroups(string userGroupKeyAsString, string expectedGroupAlias)
+    {
+        // since we can't use the constants as input, let's make sure we don't get false positives by double checking the group alias
+        var key = Guid.Parse(userGroupKeyAsString);
+        var userGroup = await UserGroupService.GetAsync(key);
+        Assert.IsNotNull(userGroup);
+        Assert.AreEqual(expectedGroupAlias, userGroup.Alias);
+
+        var result = await UserGroupService.DeleteAsync(key);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(UserGroupOperationStatus.IsSystemUserGroup, result.Result);
+    }
+
+    // these keys are not defined as "const" in Constants.Security but as "static readonly", so we have to hardcode
+    // them here ("static readonly" can't be used as testcase inputs as they are not constants)
+    [TestCase("44DC260E-B4D4-4DD9-9081-EEC5598F1641", "editor")]
+    [TestCase("9FC2A16F-528C-46D6-A014-75BF4EC2480C", "writer")]
+    public async Task Can_Delete_Non_System_UserGroups(string userGroupKeyAsString, string expectedGroupAlias)
+    {
+        // since we can't use the constants as input, let's make sure we don't get false positives by double checking the group alias
+        var key = Guid.Parse(userGroupKeyAsString);
+        var userGroup = await UserGroupService.GetAsync(key);
+        Assert.IsNotNull(userGroup);
+        Assert.AreEqual(expectedGroupAlias, userGroup.Alias);
+
+        var result = await UserGroupService.DeleteAsync(key);
+
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(UserGroupOperationStatus.Success, result.Result);
+    }
 }

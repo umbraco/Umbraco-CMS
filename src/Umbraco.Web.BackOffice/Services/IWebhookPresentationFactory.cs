@@ -6,5 +6,5 @@ namespace Umbraco.Cms.Web.BackOffice.Services;
 [Obsolete("Will be moved to a new namespace in V14")]
 public interface IWebhookPresentationFactory
 {
-    WebhookViewModel Create(Webhook webhook);
+    WebhookViewModel Create(IWebhook webhook);
 }

@@ -20,8 +20,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.BackOffice.Controllers;
 
-[Authorize(Policy = AuthorizationPolicies.SectionAccessSettings)]
+[Authorize(Policy = AuthorizationPolicies.SectionAccessContent)]
 [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
+[Authorize(Policy = AuthorizationPolicies.SectionAccessContent)]
 public class RedirectUrlManagementController : UmbracoAuthorizedApiController
 {
     private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
@@ -48,6 +49,8 @@ public class RedirectUrlManagementController : UmbracoAuthorizedApiController
         _configManipulator = configManipulator ?? throw new ArgumentNullException(nameof(configManipulator));
     }
 
+    private bool IsEnabled => _webRoutingSettings.CurrentValue.DisableRedirectUrlTracking == false;
+
     /// <summary>
     ///     Returns true/false of whether redirect tracking is enabled or not
     /// </summary>
@@ -55,9 +58,8 @@ public class RedirectUrlManagementController : UmbracoAuthorizedApiController
     [HttpGet]
     public IActionResult GetEnableState()
     {
-        var enabled = _webRoutingSettings.CurrentValue.DisableRedirectUrlTracking == false;
         var userIsAdmin = _backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.IsAdmin() ?? false;
-        return Ok(new { enabled, userIsAdmin });
+        return Ok(new { enabled = IsEnabled, userIsAdmin });
     }
 
     //add paging
@@ -107,6 +109,11 @@ public class RedirectUrlManagementController : UmbracoAuthorizedApiController
     [HttpPost]
     public IActionResult DeleteRedirectUrl(Guid id)
     {
+        if (IsEnabled is false)
+        {
+            return BadRequest("Redirect URL tracking is disabled, and therefore no URLs can be deleted.");
+        }
+
         _redirectUrlService.Delete(id);
         return Ok();
     }

@@ -568,13 +568,13 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="renewSession">作業を保存して今すぐ更新</key>
   </area>
   <area alias="login">
-    <key alias="greeting0">ハッピー スーパー日曜日</key>
-    <key alias="greeting1">ハッピー マニアック月曜日</key>
-    <key alias="greeting2">ハッピー最高の火曜日</key>
-    <key alias="greeting3">ハッピー ワンダフル水曜日</key>
-    <key alias="greeting4">ハッピー サンダー木曜日</key>
-    <key alias="greeting5">ハッピー ファンキー金曜日</key>
-    <key alias="greeting6">ハッピー土曜日</key>
+    <key alias="greeting0">ようこそ</key>
+    <key alias="greeting1">ようこそ</key>
+    <key alias="greeting2">ようこそ</key>
+    <key alias="greeting3">ようこそ</key>
+    <key alias="greeting4">ようこそ</key>
+    <key alias="greeting5">ようこそ</key>
+    <key alias="greeting6">ようこそ</key>
     <key alias="instruction">ウェブサイトにログインします。</key>
     <key alias="timeout">セッションタイムアウトしました。</key>
     <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">umbraco.org</a></p> ]]></key>
