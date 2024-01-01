@@ -30,6 +30,13 @@ public interface IWebhookService
     Task<IWebhook?> GetAsync(Guid key);
 
     /// <summary>
+    ///     Gets all webhooks with the given keys.
+    /// </summary>
+    /// <returns>An enumerable list of <see cref="IWebhook" /> objects.</returns>
+    Task<IEnumerable<IWebhook?>> GetMultipleAsync(IEnumerable<Guid> keys)
+        => throw new NotImplementedException();
+
+    /// <summary>
     ///     Gets all webhooks.
     /// </summary>
     Task<PagedModel<IWebhook>> GetAllAsync(int skip, int take);

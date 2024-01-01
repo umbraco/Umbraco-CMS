@@ -7,7 +7,6 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
-using Umbraco.Cms.Core.Webhooks;
 using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Webhook;
@@ -32,7 +31,7 @@ public class DeleteWebhookController : WebhookControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> Delete(Guid id)
     {
-        Attempt<Core.Models.Webhook?, WebhookOperationStatus> result = await _webhookService.DeleteAsync(id); //, CurrentUserKey(_backOfficeSecurityAccessor));
+        Attempt<IWebhook?, WebhookOperationStatus> result = await _webhookService.DeleteAsync(id); //, CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Success
             ? Ok()

@@ -41,7 +41,7 @@ public class CreateWebhookController : WebhookControllerBase
     {
         Core.Models.Webhook created = _umbracoMapper.Map<Core.Models.Webhook>(createWebhookRequestModel)!;
 
-        Attempt<Core.Models.Webhook, WebhookOperationStatus> result = await _webhookService.CreateAsync(created)); //, CurrentUserKey(_backOfficeSecurityAccessor));
+        Attempt<IWebhook, WebhookOperationStatus> result = await _webhookService.CreateAsync(created); //, CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Success
             ? CreatedAtAction<ByKeyWebhookController>(controller => nameof(controller.ByKey), result.Result!.Key)

@@ -39,15 +39,15 @@ public class UpdateWebhookController : WebhookControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> Update(Guid id, UpdateWebhookRequestModel updateWebhookRequestModel)
     {
-        Core.Models.Webhook? current = await _webhookService.GetAsync(id);
+        IWebhook? current = await _webhookService.GetAsync(id);
         if (current is null)
         {
             return WebhookNotFound();
         }
 
-        Core.Models.Webhook updated = _umbracoMapper.Map(updateWebhookRequestModel, current);
+        IWebhook updated = _umbracoMapper.Map(updateWebhookRequestModel, current);
 
-        Attempt<Core.Models.Webhook, WebhookOperationStatus> result = await _webhookService.UpdateAsync(updated); //, CurrentUserKey(_backOfficeSecurityAccessor));
+        Attempt<IWebhook, WebhookOperationStatus> result = await _webhookService.UpdateAsync(updated); //, CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Success
             ? Ok()
