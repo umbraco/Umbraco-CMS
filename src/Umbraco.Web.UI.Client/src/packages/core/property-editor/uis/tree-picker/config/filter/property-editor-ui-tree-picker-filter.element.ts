@@ -3,12 +3,18 @@ import { UmbDocumentTypeInputElement } from '../../../../../../documents/documen
 import { UmbMediaTypeInputElement } from '../../../../../../media/media-types/components/media-type-input/media-type-input.element.js';
 import { StartNode } from '@umbraco-cms/backoffice/components';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
-import { customElement, html, property } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-property-editor-ui-tree-picker-filter')
 export class UmbPropertyEditorUITreePickerFilterElement extends UmbLitElement implements UmbPropertyEditorUiElement {
+	@property({ type: Array })
+	value?: string[];
+
+	@state()
+	private sourceType: string = 'content';
+
 	constructor() {
 		super();
 
@@ -26,11 +32,7 @@ export class UmbPropertyEditorUITreePickerFilterElement extends UmbLitElement im
 		});
 	}
 
-	@property({ type: Array })
-	value?: string[];
 
-	@property({ attribute: false })
-	sourceType: string = 'content';
 
 	#onChange(event: CustomEvent) {
 		switch (this.sourceType) {
