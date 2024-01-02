@@ -1,6 +1,8 @@
-﻿using Umbraco.Cms.Api.Management.ViewModels.User;
+﻿using Microsoft.Extensions.Options;
+using Umbraco.Cms.Api.Management.ViewModels.User;
 using Umbraco.Cms.Api.Management.ViewModels.User.Current;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
@@ -17,19 +19,25 @@ public class UserPresentationFactory : IUserPresentationFactory
     private readonly MediaFileManager _mediaFileManager;
     private readonly IImageUrlGenerator _imageUrlGenerator;
     private readonly IUserGroupPresentationFactory _userGroupPresentationFactory;
+    private readonly SecuritySettings _securitySettings;
+    private readonly UserPasswordConfigurationSettings _userPasswordConfigurationSettings;
 
     public UserPresentationFactory(
         IEntityService entityService,
         AppCaches appCaches,
         MediaFileManager mediaFileManager,
         IImageUrlGenerator imageUrlGenerator,
-        IUserGroupPresentationFactory userGroupPresentationFactory)
+        IUserGroupPresentationFactory userGroupPresentationFactory,
+        IOptionsSnapshot<UserPasswordConfigurationSettings> userPasswordConfigurationSettings,
+        IOptionsSnapshot<SecuritySettings> securitySettings)
     {
         _entityService = entityService;
         _appCaches = appCaches;
         _mediaFileManager = mediaFileManager;
         _imageUrlGenerator = imageUrlGenerator;
         _userGroupPresentationFactory = userGroupPresentationFactory;
+        _securitySettings = securitySettings.Value;
+        _userPasswordConfigurationSettings = userPasswordConfigurationSettings.Value;
     }
 
     public UserResponseModel CreateResponseModel(IUser user)
@@ -93,6 +101,22 @@ public class UserPresentationFactory : IUserPresentationFactory
         };
 
         return await Task.FromResult(inviteModel);
+    }
+
+    public async Task<CurrenUserConfigurationResponseModel> CreateCurrentUserConfigurationModelAsync()
+    {
+        var model = new CurrenUserConfigurationResponseModel
+        {
+            KeepUserLoggedIn = _securitySettings.KeepUserLoggedIn,
+            UserNameIsEmail = _securitySettings.UsernameIsEmail,
+            MinimumPasswordLength = _userPasswordConfigurationSettings.RequiredLength,
+            MinimumPasswordNonAlphaNum = _userPasswordConfigurationSettings.RequireNonLetterOrDigit ? 1 : 0,
+            RequireDigit = _userPasswordConfigurationSettings.RequireDigit,
+            RequireLowercase = _userPasswordConfigurationSettings.RequireLowercase,
+            RequireUppercase = _userPasswordConfigurationSettings.RequireUppercase,
+        };
+
+        return await Task.FromResult(model);
     }
 
     public async Task<UserUpdateModel> CreateUpdateModelAsync(Guid existingUserKey, UpdateUserRequestModel updateModel)
