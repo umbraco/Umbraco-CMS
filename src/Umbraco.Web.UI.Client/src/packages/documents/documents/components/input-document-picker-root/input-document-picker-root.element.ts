@@ -1,17 +1,17 @@
 import { UmbDocumentPickerContext } from '../input-document/input-document.context.js';
-import { css, html, customElement, property, state, ifDefined, repeat } from '@umbraco-cms/backoffice/external/lit';
-import { FormControlMixin, UUIButtonElement } from '@umbraco-cms/backoffice/external/uui';
+import { html, customElement, property, state, ifDefined, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { DocumentItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-input-document-picker-root')
 export class UmbInputDocumentPickerRootElement extends FormControlMixin(UmbLitElement) {
 	public get nodeId(): string | null | undefined {
-		return this.#pickerContext.getSelection()[0];
+		return this.#documentPickerContext.getSelection()[0];
 	}
 	public set nodeId(id: string | null | undefined) {
 		const selection = id ? [id] : [];
-		this.#pickerContext.setSelection(selection);
+		this.#documentPickerContext.setSelection(selection);
 	}
 
 	@property()
@@ -22,28 +22,26 @@ export class UmbInputDocumentPickerRootElement extends FormControlMixin(UmbLitEl
 	@state()
 	private _items?: Array<DocumentItemResponseModel>;
 
-	#pickerContext = new UmbDocumentPickerContext(this);
+	#documentPickerContext = new UmbDocumentPickerContext(this);
+
+	// TODO: DynamicRoot - once feature implemented, wire up context and picker UI. [LK]
+	#dynamicRootPickerContext = {
+		openPicker: () => {
+			throw new Error('DynamicRoot picker has not been implemented yet.');
+		},
+	};
 
 	constructor() {
 		super();
 
-		this.#pickerContext.max = 1;
+		this.#documentPickerContext.max = 1;
 
-		this.observe(this.#pickerContext.selection, (selection) => (super.value = selection.join(',')));
-		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems));
+		this.observe(this.#documentPickerContext.selection, (selection) => (super.value = selection.join(',')));
+		this.observe(this.#documentPickerContext.selectedItems, (selectedItems) => (this._items = selectedItems));
 	}
 
 	protected getFormElement() {
 		return undefined;
-	}
-
-	// TODO: Wire up the DynamicRoot picker feature. [LK]
-	private _openDynamicRootPicker(e: Event) {
-		console.log('openDynamicRootPicker', e);
-		const btn = e.target as UUIButtonElement;
-		btn.color = 'warning';
-		btn.label = 'TODO!';
-		btn.look = 'primary';
 	}
 
 	render() {
@@ -68,11 +66,11 @@ export class UmbInputDocumentPickerRootElement extends FormControlMixin(UmbLitEl
 		return html` <uui-button-group>
 			<uui-button
 				look="placeholder"
-				@click=${() => this.#pickerContext.openPicker()}
+				@click=${() => this.#documentPickerContext.openPicker()}
 				label=${this.localize.term('contentPicker_defineRootNode')}></uui-button>
 			<uui-button
 				look="placeholder"
-				@click=${this._openDynamicRootPicker}
+				@click=${() => this.#dynamicRootPickerContext.openPicker()}
 				label=${this.localize.term('contentPicker_defineDynamicRoot')}></uui-button>
 		</uui-button-group>`;
 	}
@@ -83,11 +81,11 @@ export class UmbInputDocumentPickerRootElement extends FormControlMixin(UmbLitEl
 			<uui-ref-node name=${ifDefined(item.name)} detail=${ifDefined(item.id)}>
 				<!-- TODO: implement is trashed <uui-tag size="s" slot="tag" color="danger">Trashed</uui-tag> -->
 				<uui-action-bar slot="actions">
-					<uui-button @click=${() => this.#pickerContext.openPicker()} label="Edit document ${item.name}"
+					<uui-button @click=${() => this.#documentPickerContext.openPicker()} label="Edit document ${item.name}"
 						>Edit</uui-button
 					>
 					<uui-button
-						@click=${() => this.#pickerContext.requestRemoveItem(item.id!)}
+						@click=${() => this.#documentPickerContext.requestRemoveItem(item.id!)}
 						label="Remove document ${item.name}"
 						>Remove</uui-button
 					>
@@ -95,8 +93,6 @@ export class UmbInputDocumentPickerRootElement extends FormControlMixin(UmbLitEl
 			</uui-ref-node>
 		`;
 	}
-
-	static styles = [css``];
 }
 
 export default UmbInputDocumentPickerRootElement;
