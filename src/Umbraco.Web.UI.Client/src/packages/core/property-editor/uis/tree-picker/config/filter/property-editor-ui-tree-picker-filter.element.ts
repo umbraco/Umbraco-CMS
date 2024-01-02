@@ -1,5 +1,6 @@
 import { UmbDocumentTypeInputElement } from '@umbraco-cms/backoffice/document-type';
 import { UmbMediaTypeInputElement } from '@umbraco-cms/backoffice/media-type';
+//import { UmbMemberTypeInputElement } from '@umbraco-cms/backoffice/member-type';
 import type { StartNode } from '@umbraco-cms/backoffice/components';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
@@ -60,6 +61,10 @@ export class UmbPropertyEditorUITreePickerFilterElement extends UmbLitElement im
 			case 'media':
 				this.value = (<UmbMediaTypeInputElement>event.target).selectedIds;
 				break;
+			// TODO: Uncomment once the `<umb-member-type-input>` element is in place. [LK]
+			// case 'member':
+			// 	this.value = (<UmbMemberTypeInputElement>event.target).selectedIds;
+			// 	break;
 			default:
 				break;
 		}
