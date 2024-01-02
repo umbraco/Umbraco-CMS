@@ -24,6 +24,10 @@ export class UmbRelationTypeWorkspaceContext
 	async load(id: string) {
 		const { data } = await this.repository.requestById(id);
 
+		const { data: relations } = await this.repository.requestRelationsById(id);
+
+		debugger;
+
 		if (data) {
 			this.setIsNew(false);
 			this.#data.update(data);

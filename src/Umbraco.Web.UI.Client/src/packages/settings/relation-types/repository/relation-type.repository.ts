@@ -59,6 +59,21 @@ export class UmbRelationTypeRepository
 		return this.#detailDataSource.createScaffold(parentId);
 	}
 
+	async requestRelationsById(id: string) {
+		await this.#init;
+
+		// TODO: should we show a notification if the id is missing?
+		// Investigate what is best for Acceptance testing, cause in that perspective a thrown error might be the best choice?
+		if (!id) {
+			throw new Error('Id is missing');
+		}
+
+		const { data, error } = await this.#detailDataSource.readRelations(id);
+		debugger;
+
+		return { data, error };
+	}
+
 	async requestById(id: string) {
 		await this.#init;
 

@@ -4,6 +4,7 @@ import {
 	RelationTypeResponseModel,
 	CreateRelationTypeRequestModel,
 	UpdateRelationTypeRequestModel,
+	RelationResource,
 } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
@@ -44,6 +45,25 @@ export class UmbRelationTypeServerDataSource
 		return tryExecuteAndNotify(
 			this.#host,
 			RelationTypeResource.getRelationTypeById({
+				id,
+			}),
+		);
+	}
+
+	/**
+	 * Fetches a Relation Type with the given id from the server
+	 * @param {string} id
+	 * @return {*}
+	 * @memberof UmbRelationTypeServerDataSource
+	 */
+	async readRelations(id: string) {
+		if (!id) {
+			throw new Error('Id is missing');
+		}
+
+		return tryExecuteAndNotify(
+			this.#host,
+			RelationResource.getRelationTypeById({
 				id,
 			}),
 		);
