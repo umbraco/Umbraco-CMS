@@ -11,14 +11,13 @@ export const manifest: ManifestPropertyEditorSchema = {
 				{
 					alias: 'blocks',
 					label: 'Blocks',
-					description:
-						'Define Blocks based on Element Types. Use Groups to help organise their selection. Example Groups: Layout and Content',
-					propertyEditorUiAlias: 'Umb.PropertyEditorUi.BlockGrid.BlockConfiguration',
+					description: 'Define Blocks based on Element Types.',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.BlockGridTypeConfiguration',
 				},
 				{
 					alias: 'blockGroups',
 					label: 'Block Groups',
-					propertyEditorUiAlias: 'Umb.PropertyEditorUi.BlockGrid.GroupConfiguration',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.BlockTypeGroupConfiguration',
 				},
 				{
 					alias: 'validationLimit',
