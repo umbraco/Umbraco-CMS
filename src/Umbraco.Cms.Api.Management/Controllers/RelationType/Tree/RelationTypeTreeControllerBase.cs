@@ -25,7 +25,7 @@ public class RelationTypeTreeControllerBase : EntityTreeControllerBase<EntityTre
 
     protected override UmbracoObjectTypes ItemObjectType => UmbracoObjectTypes.RelationType;
 
-    protected EntityTreeItemResponseModel[] MapTreeItemViewModels(Guid? parentKey, IRelationType[] relationTypes)
+    protected IEnumerable<EntityTreeItemResponseModel> MapTreeItemViewModels(Guid? parentKey, IEnumerable<IRelationType> relationTypes)
         => relationTypes.Select(relationType => new EntityTreeItemResponseModel
         {
             Name = relationType.Name!,
@@ -34,5 +34,5 @@ public class RelationTypeTreeControllerBase : EntityTreeControllerBase<EntityTre
             HasChildren = false,
             IsContainer = false,
             ParentId = parentKey
-        }).ToArray();
+        });
 }
