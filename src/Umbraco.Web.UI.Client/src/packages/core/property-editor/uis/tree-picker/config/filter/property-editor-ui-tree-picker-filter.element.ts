@@ -1,38 +1,56 @@
-import { UMB_DATA_TYPE_WORKSPACE_CONTEXT } from '../../../../../data-type/workspace/data-type-workspace.context.js';
 import { UmbDocumentTypeInputElement } from '../../../../../../documents/document-types/components/document-type-input/document-type-input.element.js';
 import { UmbMediaTypeInputElement } from '../../../../../../media/media-types/components/media-type-input/media-type-input.element.js';
-import { StartNode } from '@umbraco-cms/backoffice/components';
+import type { StartNode } from '@umbraco-cms/backoffice/components';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 
 @customElement('umb-property-editor-ui-tree-picker-filter')
 export class UmbPropertyEditorUITreePickerFilterElement extends UmbLitElement implements UmbPropertyEditorUiElement {
+	#datasetContext?: typeof UMB_PROPERTY_DATASET_CONTEXT.TYPE;
+
 	@property({ type: Array })
 	value?: string[];
 
 	@state()
 	private sourceType: string = 'content';
 
+	#initialized: boolean = false;
+
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_DATA_TYPE_WORKSPACE_CONTEXT, (instance) => {
-			const workspace = instance;
-			this.observe(workspace.data, (data) => {
-				const property = data?.values.find((setting) => setting.alias === 'startNode');
-				if (property) {
-					const startNode = property.value as StartNode;
-					if (startNode.type) {
-						this.sourceType = startNode.type;
-					}
-				}
-			});
+		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, (datasetContext) => {
+			this.#datasetContext = datasetContext;
+			this._observeProperty();
 		});
 	}
 
+	private async _observeProperty() {
+		if (!this.#datasetContext) return;
+		this.observe(
+			await this.#datasetContext.propertyValueByAlias('startNode'),
+			(value) => {
+				const startNode = value as StartNode;
+				if (startNode.type) {
+					// If we had a sourceType before, we can see this as a change and not the initial value,
+					// so let's reset the value, so we don't carry over content-types to the new source type.
+					if (this.#initialized && this.sourceType !== startNode.type) {
+						this.value = [];
+					}
 
+					this.sourceType = startNode.type;
+
+					if (!this.#initialized) {
+						this.#initialized = true;
+					}
+				}
+			},
+			'observeValue',
+		);
+	}
 
 	#onChange(event: CustomEvent) {
 		switch (this.sourceType) {
