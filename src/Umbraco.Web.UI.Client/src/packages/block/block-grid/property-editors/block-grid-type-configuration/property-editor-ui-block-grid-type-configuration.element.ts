@@ -1,4 +1,5 @@
 import type { UmbBlockTypeBase, UmbInputBlockTypeElement } from '../../../block-type/index.js';
+import '../../../block-type/components/input-block-type/index.js';
 import { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';

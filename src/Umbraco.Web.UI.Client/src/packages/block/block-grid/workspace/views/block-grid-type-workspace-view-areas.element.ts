@@ -3,10 +3,11 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
 
-@customElement('umb-block-grid-type-workspace-view-settings')
-export class UmbBlockTypeListWorkspaceViewSettingsElement extends UmbLitElement implements UmbWorkspaceViewElement {
+@customElement('umb-block-grid-type-workspace-view-areas')
+export class UmbBlockTypeGridWorkspaceViewAreasElement extends UmbLitElement implements UmbWorkspaceViewElement {
 	render() {
 		return html`
+			<h5>GRID BLOCK AREAS View</h5>
 			<uui-box headline="Editor Appearance">
 				<umb-property
 					label="Label"
@@ -99,10 +100,10 @@ export class UmbBlockTypeListWorkspaceViewSettingsElement extends UmbLitElement 
 	];
 }
 
-export default UmbBlockTypeListWorkspaceViewSettingsElement;
+export default UmbBlockTypeGridWorkspaceViewAreasElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-block-grid-type-workspace-view-settings': UmbBlockTypeListWorkspaceViewSettingsElement;
+		'umb-block-grid-type-workspace-view-areas': UmbBlockTypeGridWorkspaceViewAreasElement;
 	}
 }
