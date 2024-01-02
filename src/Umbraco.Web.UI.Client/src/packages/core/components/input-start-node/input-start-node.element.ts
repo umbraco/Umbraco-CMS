@@ -1,4 +1,4 @@
-import { UmbInputDocumentSourceElement } from '@umbraco-cms/backoffice/document';
+import { UmbInputDocumentPickerRootElement } from '@umbraco-cms/backoffice/document';
 import { html, customElement, property, css, state } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin, UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -79,7 +79,7 @@ export class UmbInputStartNodeElement extends FormControlMixin(UmbLitElement) {
 		//console.log('onIdChange', event.target);
 		switch (this.type) {
 			case 'content':
-				this.nodeId = (<UmbInputDocumentSourceElement>event.target).nodeId;
+				this.nodeId = (<UmbInputDocumentPickerRootElement>event.target).nodeId;
 				break;
 			case 'media':
 				this.nodeId = (<UmbInputMediaElement>event.target).selectedIds.join('');
@@ -112,9 +112,9 @@ export class UmbInputStartNodeElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	#renderTypeContent() {
-		return html`<umb-input-document-source
+		return html`<umb-input-document-picker-root
 			@change=${this.#onIdChange}
-			.nodeId=${this.nodeId}></umb-input-document-source>`;
+			.nodeId=${this.nodeId}></umb-input-document-picker-root>`;
 	}
 
 	#renderTypeMedia() {

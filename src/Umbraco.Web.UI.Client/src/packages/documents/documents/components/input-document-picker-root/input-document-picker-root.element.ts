@@ -4,8 +4,8 @@ import { FormControlMixin, UUIButtonElement } from '@umbraco-cms/backoffice/exte
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { DocumentItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
-@customElement('umb-input-document-source')
-export class UmbInputDocumentSourceElement extends FormControlMixin(UmbLitElement) {
+@customElement('umb-input-document-picker-root')
+export class UmbInputDocumentPickerRootElement extends FormControlMixin(UmbLitElement) {
 	public get nodeId(): string | null | undefined {
 		return this.#pickerContext.getSelection()[0];
 	}
@@ -99,10 +99,10 @@ export class UmbInputDocumentSourceElement extends FormControlMixin(UmbLitElemen
 	static styles = [css``];
 }
 
-export default UmbInputDocumentSourceElement;
+export default UmbInputDocumentPickerRootElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-input-document-source': UmbInputDocumentSourceElement;
+		'umb-input-document-picker-root': UmbInputDocumentPickerRootElement;
 	}
 }
