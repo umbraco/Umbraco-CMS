@@ -9,11 +9,36 @@ import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/
  */
 @customElement('umb-property-editor-ui-block-list')
 export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implements UmbPropertyEditorUiElement {
-	@property()
-	value = '';
+	private _value: Array<string> = [];
+
+	@property({ type: Array })
+	public get value(): Array<string> {
+		return this._value;
+	}
+	public set value(value: Array<string>) {
+		this._value = value || [];
+	}
 
 	@property({ attribute: false })
-	public config?: UmbPropertyEditorConfigCollection;
+	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
+		const validationLimit = config['validationLimit'];
+
+		this._limitMin = (validationLimit?.value as any)?.min;
+		this._limitMax = (validationLimit?.value as any)?.max;
+
+		//config.blocks
+		//config.useSingleBlockMode
+		//config.useLiveEditing
+		//config.useInlineEditingAsDefault
+		this._maxPropertyWidth = config.maxPropertyWidth;
+	}
+
+	@state()
+	private _limitMin?: number;
+	@state()
+	private _limitMax?: number;
+	@state()
+	private _maxPropertyWidth?: string;
 
 	render() {
 		return html`<div>umb-property-editor-ui-block-list</div>`;
