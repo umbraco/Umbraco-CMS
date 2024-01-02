@@ -309,9 +309,15 @@ public class CreatedPackageSchemaRepository : ICreatedPackagesRepository
                 _hostingEnvironment.MapPathContentRoot(Path.Combine(
                     _createdPackagesFolderPath,
                     definition.Name.Replace(' ', '_')));
-            Directory.CreateDirectory(directoryName);
 
-            var finalPackagePath = Path.Combine(directoryName, fileName);
+            var expectedRoot = Path.GetFullPath(_hostingEnvironment.MapPathContentRoot(_createdPackagesFolderPath));
+            var finalPackagePath = Path.GetFullPath(Path.Combine(directoryName, fileName));
+            if (finalPackagePath.StartsWith(expectedRoot) == false)
+            {
+                throw new IOException("Invalid path due to the package name");
+            }
+
+            Directory.CreateDirectory(directoryName);
 
             // Clean existing files
             foreach (var packagePath in new[] { definition.PackagePath, finalPackagePath })

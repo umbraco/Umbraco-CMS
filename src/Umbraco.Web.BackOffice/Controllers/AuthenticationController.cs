@@ -470,6 +470,9 @@ public class AuthenticationController : UmbracoApiControllerBase
         }
 
         BackOfficeIdentityUser? identityUser = await _userManager.FindByEmailAsync(model.Email);
+
+        await Task.Delay(RandomNumberGenerator.GetInt32(400, 2500)); // To randomize response time preventing user enumeration
+
         if (identityUser != null)
         {
             IUser? user = _userService.GetByEmail(model.Email);
@@ -490,13 +493,19 @@ public class AuthenticationController : UmbracoApiControllerBase
 
                 var mailMessage = new EmailMessage(from, user.Email, subject, message, true);
 
-                await _emailSender.SendAsync(mailMessage, Constants.Web.EmailTypes.PasswordReset, true);
+                try
+                {
+                    await _emailSender.SendAsync(mailMessage, Constants.Web.EmailTypes.PasswordReset, true);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error sending email, please check your SMTP configuration: {ErrorMessage}", ex.Message);
+                    return Ok();
+                }
 
                 _userManager.NotifyForgotPasswordRequested(User, user.Id.ToString());
             }
         }
-
-        await Task.Delay(RandomNumberGenerator.GetInt32(400, 2500));
 
         return Ok();
     }
@@ -592,7 +601,7 @@ public class AuthenticationController : UmbracoApiControllerBase
             await _signInManager.TwoFactorSignInAsync(model.Provider, model.Code, model.IsPersistent, model.RememberClient);
         if (result.Succeeded)
         {
-            return GetUserDetail(_userService.GetByUsername(user.UserName));
+            return Ok(GetUserDetail(_userService.GetByUsername(user.UserName)));
         }
 
         if (result.IsLockedOut)

@@ -398,9 +398,9 @@ When building a custom infinite editor view you can use the same components as a
      * @returns {object} editor object
      */
     function contentTypePicker(editor) {
-      
+
       if (!editor.entityType) editor.entityType = "documentType";
-      
+
       switch (editor.entityType) {
         case "documentType":
           documentTypePicker(editor);

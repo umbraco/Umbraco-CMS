@@ -41,6 +41,7 @@
     </Content>
   </ItemGroup>
 
+
   <!-- Update template.json files with the default UmbracoVersion value set to the current build version -->
   <ItemGroup>
     <PackageReference Include="Umbraco.JsonSchema.Extensions" PrivateAssets="all" />

@@ -1,13 +1,16 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Web.Common.Attributes;
+using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.BackOffice.Controllers;
 
 [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
+[Authorize(Policy = AuthorizationPolicies.SectionAccessSettings)]
 public class PublishedSnapshotCacheStatusController : UmbracoAuthorizedApiController
 {
     private readonly DistributedCache _distributedCache;
