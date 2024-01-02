@@ -24,8 +24,6 @@ public class TemporaryFileConfigurationPresentationFactory : ITemporaryFileConfi
             ImageFileTypes = _imageUrlGenerator.SupportedImageFileTypes.ToArray(),
             DisallowedUploadedFilesExtensions = _contentSettings.DisallowedUploadedFileExtensions,
             AllowedUploadedFileExtensions = _contentSettings.AllowedUploadedFileExtensions,
-            MaxFileSize = GetMaxRequestLength(),
+            MaxFileSize = _runtimeSettings.MaxRequestLength,
         };
-
-    private string GetMaxRequestLength() => _runtimeSettings.MaxRequestLength.HasValue ? _runtimeSettings.MaxRequestLength.Value.ToString() : string.Empty;
 }
