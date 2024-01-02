@@ -559,7 +559,17 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 		parentId: null,
 		editorAlias: 'Umbraco.BlockGrid',
 		editorUiAlias: 'Umb.PropertyEditorUi.BlockGrid',
-		values: [],
+		values: [
+			{
+				alias: 'blocks',
+				value: [
+					{
+						label: 'Mocked Block Type for Block Grid',
+						contentElementTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
+					},
+				],
+			},
+		],
 	},
 	{
 		type: 'data-type',
