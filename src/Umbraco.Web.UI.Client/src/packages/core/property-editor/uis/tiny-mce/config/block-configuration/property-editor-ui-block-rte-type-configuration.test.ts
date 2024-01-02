@@ -7,7 +7,7 @@ describe('UmbPropertyEditorUIBlockListBlockConfigurationElement', () => {
 
 	beforeEach(async () => {
 		element = await fixture(html`
-			<umb-property-editor-ui-block-list-type-configuration></umb-property-editor-ui-block-list-type-configuration>
+			<umb-property-editor-ui-block-rte-type-configuration></umb-property-editor-ui-block-rte-type-configuration>
 		`);
 	});
 
