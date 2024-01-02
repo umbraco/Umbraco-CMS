@@ -1,6 +1,8 @@
-﻿using Umbraco.Cms.Api.Management.ViewModels.User;
+﻿using Microsoft.Extensions.Options;
+using Umbraco.Cms.Api.Management.ViewModels.User;
 using Umbraco.Cms.Api.Management.ViewModels.User.Current;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Mail;
 using Umbraco.Cms.Core.Media;
@@ -20,6 +22,8 @@ public class UserPresentationFactory : IUserPresentationFactory
     private readonly IUserGroupPresentationFactory _userGroupPresentationFactory;
     private readonly IEmailSender _emailSender;
     private readonly IPasswordConfigurationPresentationFactory _passwordConfigurationPresentationFactory;
+    private readonly SecuritySettings _securitySettings;
+    private readonly UserPasswordConfigurationSettings _userPasswordConfigurationSettings;
 
     public UserPresentationFactory(
         IEntityService entityService,
@@ -29,6 +33,9 @@ public class UserPresentationFactory : IUserPresentationFactory
         IUserGroupPresentationFactory userGroupPresentationFactory,
         IEmailSender emailSender,
         IPasswordConfigurationPresentationFactory passwordConfigurationPresentationFactory)
+        IUserGroupPresentationFactory userGroupPresentationFactory,
+        IOptionsSnapshot<UserPasswordConfigurationSettings> userPasswordConfigurationSettings,
+        IOptionsSnapshot<SecuritySettings> securitySettings)
     {
         _entityService = entityService;
         _appCaches = appCaches;
@@ -37,6 +44,8 @@ public class UserPresentationFactory : IUserPresentationFactory
         _userGroupPresentationFactory = userGroupPresentationFactory;
         _emailSender = emailSender;
         _passwordConfigurationPresentationFactory = passwordConfigurationPresentationFactory;
+        _securitySettings = securitySettings.Value;
+        _userPasswordConfigurationSettings = userPasswordConfigurationSettings.Value;
     }
 
     public UserResponseModel CreateResponseModel(IUser user)
@@ -100,6 +109,22 @@ public class UserPresentationFactory : IUserPresentationFactory
         };
 
         return await Task.FromResult(inviteModel);
+    }
+
+    public async Task<CurrenUserConfigurationResponseModel> CreateCurrentUserConfigurationModelAsync()
+    {
+        var model = new CurrenUserConfigurationResponseModel
+        {
+            KeepUserLoggedIn = _securitySettings.KeepUserLoggedIn,
+            UserNameIsEmail = _securitySettings.UsernameIsEmail,
+            MinimumPasswordLength = _userPasswordConfigurationSettings.RequiredLength,
+            MinimumPasswordNonAlphaNum = _userPasswordConfigurationSettings.RequireNonLetterOrDigit ? 1 : 0,
+            RequireDigit = _userPasswordConfigurationSettings.RequireDigit,
+            RequireLowercase = _userPasswordConfigurationSettings.RequireLowercase,
+            RequireUppercase = _userPasswordConfigurationSettings.RequireUppercase,
+        };
+
+        return await Task.FromResult(model);
     }
 
     public Task<UserConfigurationResponseModel> CreateUserConfigurationModelAsync() =>
