@@ -1,5 +1,5 @@
 <div>
-    <div class="umb-app-header">
+    <header role="banner" class="umb-app-header">
 
         <button type="button" class="umb-app-header__skip-button" ng-click="skipToMenu()"><localize key="general_skipToMenu">Go to menu</localize></button>
         <button type="button" class="umb-app-header__skip-button" ng-click="skipToContent()"><localize key="general_skipToContent">Go to content</localize></button>
@@ -41,7 +41,7 @@
                 ng-focus="keepLogoModal()"
                 ng-blur="hideLogoModal()"
                 ng-if="logoModal.show">
-                <img src="assets/img/application/umbraco_logo_large_blue.svg"
+                <img src="assets/img/application/logo.svg"
                      alt="Umbraco — The Friendly CMS"
                      width="120"
                      draggable="false" />
@@ -122,12 +122,11 @@
                             color="secondary"
                             name="{{user.name}}"
                             img-src="{{avatar[0].value}}"
-                            img-srcset="{{avatar[1].value}} 2x, {{avatar[2].value}} 3x"
                         >
                         </umb-avatar>
                     </button>
                 </li>
             </ul>
         </div>
-    </div>
+    </header>
 </div>

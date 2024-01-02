@@ -29,7 +29,8 @@ public class BlockListPropertyValueConverterTests : BlockPropertyValueConverterT
             new BlockEditorConverter(publishedSnapshotAccessor, publishedModelFactory),
             Mock.Of<IContentTypeService>(),
             new ApiElementBuilder(Mock.Of<IOutputExpansionStrategyAccessor>()),
-            new SystemTextJsonSerializer());
+            new SystemTextJsonSerializer(),
+            new BlockListPropertyValueConstructorCache());
         return editor;
     }
 

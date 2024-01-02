@@ -7,10 +7,11 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
 internal class RichTextBlockPropertyValueCreator : BlockPropertyValueCreatorBase<RichTextBlockModel, RichTextBlockItem, RichTextBlockLayoutItem, RichTextConfiguration.RichTextBlockConfiguration, RichTextBlockValue>
 {
-    public RichTextBlockPropertyValueCreator(BlockEditorConverter blockEditorConverter)
+    private readonly RichTextBlockPropertyValueConstructorCache _constructorCache;
+
+    public RichTextBlockPropertyValueCreator(BlockEditorConverter blockEditorConverter, RichTextBlockPropertyValueConstructorCache constructorCache)
         : base(blockEditorConverter)
-    {
-    }
+        => _constructorCache = constructorCache;
 
     public RichTextBlockModel CreateBlockModel(PropertyCacheLevel referenceCacheLevel, RichTextBlockValue blockValue, bool preview, RichTextConfiguration.RichTextBlockConfiguration[] blockConfigurations)
     {
@@ -25,11 +26,12 @@ internal class RichTextBlockPropertyValueCreator : BlockPropertyValueCreatorBase
 
     protected override BlockEditorDataConverter<RichTextBlockValue, RichTextBlockLayoutItem> CreateBlockEditorDataConverter() => new RichTextEditorBlockDataConverter();
 
-    protected override BlockItemActivator<RichTextBlockItem> CreateBlockItemActivator() => new RichTextBlockItemActivator(BlockEditorConverter);
+    protected override BlockItemActivator<RichTextBlockItem> CreateBlockItemActivator() => new RichTextBlockItemActivator(BlockEditorConverter, _constructorCache);
 
     private class RichTextBlockItemActivator : BlockItemActivator<RichTextBlockItem>
     {
-        public RichTextBlockItemActivator(BlockEditorConverter blockConverter) : base(blockConverter)
+        public RichTextBlockItemActivator(BlockEditorConverter blockConverter, RichTextBlockPropertyValueConstructorCache constructorCache)
+            : base(blockConverter, constructorCache)
         {
         }
 

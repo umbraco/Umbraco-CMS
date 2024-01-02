@@ -7,15 +7,15 @@ public class UserInstallResponseModel
 {
     [Required]
     [StringLength(255)]
-    public string Name { get; set; } = null!;
+    public string Name { get; set; } = string.Empty;
 
     [Required]
     [EmailAddress]
-    public string Email { get; set; } = null!;
+    public string Email { get; set; } = string.Empty;
 
     [Required]
     [PasswordPropertyText]
-    public string Password { get; set; } = null!;
+    public string Password { get; set; } = string.Empty;
 
     public bool SubscribeToNewsletter { get; }
 }

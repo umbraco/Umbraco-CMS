@@ -17,9 +17,7 @@
     "tagName": "release-{version}"
   },
   "cloudBuild": {
-    "setAllVariables": true,
-    "buildNumber": {
-      "enabled": true
-    }
+    "setVersionVariables": true,
+    "setAllVariables": true
   }
 }

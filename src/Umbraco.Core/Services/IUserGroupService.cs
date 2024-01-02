@@ -1,6 +1,6 @@
-﻿using Umbraco.Cms.Core.Models.Membership;
+﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services.OperationStatus;
-using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -85,7 +85,8 @@ public interface IUserGroupService
     /// <param name="userGroupKeys">The keys of the user groups to delete.</param>
     /// <returns>An attempt indicating if the operation was a success as well as a more detailed <see cref="UserGroupOperationStatus"/>.</returns>
     Task<Attempt<UserGroupOperationStatus>> DeleteAsync(ISet<Guid> userGroupKeys);
-    Task<Attempt<UserGroupOperationStatus>> DeleteAsync(Guid userGroupKey) => DeleteAsync(new HashSet<Guid>(){userGroupKey});
+
+    Task<Attempt<UserGroupOperationStatus>> DeleteAsync(Guid userGroupKey) => DeleteAsync(new HashSet<Guid> { userGroupKey });
 
     /// <summary>
     /// Updates the users to have the groups specified.
@@ -94,4 +95,7 @@ public interface IUserGroupService
     /// <param name="userKeys">The user whose groups we want to alter.</param>
     /// <returns>An attempt indicating if the operation was a success as well as a more detailed <see cref="UserGroupOperationStatus"/>.</returns>
     Task UpdateUserGroupsOnUsers(ISet<Guid> userGroupKeys, ISet<Guid> userKeys);
+
+    Task<UserGroupOperationStatus> AddUsersToUserGroupAsync(UsersToUserGroupManipulationModel addUsersModel, Guid performingUserKey);
+    Task<UserGroupOperationStatus> RemoveUsersFromUserGroupAsync(UsersToUserGroupManipulationModel removeUsersModel, Guid performingUserKey);
 }

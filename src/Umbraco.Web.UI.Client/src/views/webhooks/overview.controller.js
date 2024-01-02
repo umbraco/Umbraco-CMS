@@ -23,7 +23,7 @@
 
     function loadNavigation() {
 
-      const labelKeys = ["treeHeaders_webhooks", "webhooks_logs"];
+      const labelKeys = ["treeHeaders_webhooks", "webhooks_deliveries"];
 
       localizationService.localizeMany(labelKeys).then(data => {
         vm.page.labels.webhooks = data[0];

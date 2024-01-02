@@ -11,6 +11,7 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.User.Current;
 
+[ApiVersion("1.0")]
 public class GetMediaPermissionsCurrentUserController : CurrentUserControllerBase
 {
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;

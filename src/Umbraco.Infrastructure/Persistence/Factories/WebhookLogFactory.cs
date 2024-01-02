@@ -21,6 +21,7 @@ internal static class WebhookLogFactory
             RequestHeaders = log.RequestHeaders,
             ResponseHeaders = log.ResponseHeaders,
             WebhookKey = log.WebhookKey,
+            ExceptionOccured = log.ExceptionOccured,
         };
 
     public static WebhookLog DtoToEntity(WebhookLogDto dto) =>
@@ -38,5 +39,6 @@ internal static class WebhookLogFactory
             RequestHeaders = dto.RequestHeaders,
             ResponseHeaders = dto.ResponseHeaders,
             WebhookKey = dto.WebhookKey,
+            ExceptionOccured = dto.ExceptionOccured,
         };
 }

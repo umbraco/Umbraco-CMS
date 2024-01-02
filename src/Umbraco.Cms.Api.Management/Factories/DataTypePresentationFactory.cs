@@ -32,7 +32,7 @@ public class DataTypePresentationFactory : IDataTypePresentationFactory
     /// <inheritdoc />
     public async Task<Attempt<IDataType, DataTypeOperationStatus>> CreateAsync(CreateDataTypeRequestModel requestModel)
     {
-        if (!_propertyEditorCollection.TryGet(requestModel.PropertyEditorAlias, out IDataEditor? editor))
+        if (!_propertyEditorCollection.TryGet(requestModel.EditorAlias, out IDataEditor? editor))
         {
             return Attempt.FailWithStatus<IDataType, DataTypeOperationStatus>(DataTypeOperationStatus.PropertyEditorNotFound, new DataType(new VoidEditor(_dataValueEditorFactory), _configurationEditorJsonSerializer));
         }
@@ -47,7 +47,7 @@ public class DataTypePresentationFactory : IDataTypePresentationFactory
         var dataType = new DataType(editor, _configurationEditorJsonSerializer)
         {
             Name = requestModel.Name,
-            EditorUiAlias = requestModel.PropertyEditorUiAlias,
+            EditorUiAlias = requestModel.EditorUiAlias,
             DatabaseType = GetEditorValueStorageType(editor),
             ConfigurationData = MapConfigurationData(requestModel, editor),
             ParentId = parentAttempt.Result,
@@ -86,7 +86,7 @@ public class DataTypePresentationFactory : IDataTypePresentationFactory
 
     public Task<Attempt<IDataType, DataTypeOperationStatus>> CreateAsync(UpdateDataTypeRequestModel requestModel, IDataType current)
     {
-        if (!_propertyEditorCollection.TryGet(requestModel.PropertyEditorAlias, out IDataEditor? editor))
+        if (!_propertyEditorCollection.TryGet(requestModel.EditorAlias, out IDataEditor? editor))
         {
             return Task.FromResult(Attempt.FailWithStatus<IDataType, DataTypeOperationStatus>(DataTypeOperationStatus.PropertyEditorNotFound, new DataType(new VoidEditor(_dataValueEditorFactory), _configurationEditorJsonSerializer) ));
         }
@@ -95,7 +95,7 @@ public class DataTypePresentationFactory : IDataTypePresentationFactory
 
         dataType.Name = requestModel.Name;
         dataType.Editor = editor;
-        dataType.EditorUiAlias = requestModel.PropertyEditorUiAlias;
+        dataType.EditorUiAlias = requestModel.EditorUiAlias;
         dataType.DatabaseType = GetEditorValueStorageType(editor);
         dataType.ConfigurationData = MapConfigurationData(requestModel, editor);
 

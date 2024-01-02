@@ -778,6 +778,7 @@ public class ContentController : ContentControllerBase
     /// <param name="contentId">The content id to copy</param>
     /// <param name="name">The name of the blueprint</param>
     /// <returns></returns>
+    [Authorize(Policy = AuthorizationPolicies.ContentPermissionCreateBlueprintFromId)]
     [HttpPost]
     public ActionResult<SimpleNotificationModel> CreateBlueprintFromContent(
         [FromQuery] int contentId,
@@ -833,7 +834,8 @@ public class ContentController : ContentControllerBase
     /// <summary>
     ///     Saves content
     /// </summary>
-    [ContentSaveValidation]
+    [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
+    [ContentSaveValidation(skipUserAccessValidation:true)] // skip user access validation because we "only" require Settings access to create new blueprints from scratch
     public async Task<ActionResult<ContentItemDisplay<ContentVariantDisplay>?>?> PostSaveBlueprint(
         [ModelBinder(typeof(BlueprintItemBinder))] ContentItemSave contentItem)
     {
@@ -1993,6 +1995,7 @@ public class ContentController : ContentControllerBase
         return Ok();
     }
 
+    [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
     [HttpDelete]
     [HttpPost]
     public IActionResult DeleteBlueprint(int id)
@@ -2317,8 +2320,10 @@ public class ContentController : ContentControllerBase
         }
 
         // Validate permissions on node
-        EntityPermission? permission = _userService.GetPermissions(_backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser, node.Path);
-        if (permission?.AssignedPermissions.Contains(ActionAssignDomain.ActionLetter.ToString(), StringComparer.Ordinal) == false)
+        var permissions = _userService.GetAllPermissions(_backofficeSecurityAccessor.BackOfficeSecurity?.CurrentUser, node.Path);
+
+        if (permissions.Any(x =>
+                x.AssignedPermissions.Contains(ActionAssignDomain.ActionLetter.ToString(), StringComparer.Ordinal) && x.EntityId == node.Id) == false)
         {
             HttpContext.SetReasonPhrase("Permission Denied.");
             return BadRequest("You do not have permission to assign domains on that node.");

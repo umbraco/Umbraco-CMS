@@ -29,7 +29,8 @@ internal static class BackOfficeCorsPolicyBuilderExtensions
 
         builder.Services.AddCors(options =>
         {
-            options.AddPolicy(name: policyName,
+            options.AddPolicy(
+                name: policyName,
                 policy =>
                 {
                     policy
@@ -42,9 +43,9 @@ internal static class BackOfficeCorsPolicyBuilderExtensions
 
         builder.Services.Configure<UmbracoPipelineOptions>(options =>
         {
-            options.AddFilter(new UmbracoPipelineFilter("UmbracoManagementApiCustomHostCorsPolicy")
+            options.PipelineFilters.Insert(0, new UmbracoPipelineFilter("UmbracoManagementApiCustomHostCorsPolicy")
             {
-                PostRouting = app => app.UseCors(policyName)
+                PrePipeline = app => app.UseCors(policyName),
             });
         });
 

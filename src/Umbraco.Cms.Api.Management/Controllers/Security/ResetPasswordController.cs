@@ -19,7 +19,7 @@ public class ResetPasswordController : SecurityControllerBase
 
     [HttpPost("forgot-password")]
     [MapToApiVersion("1.0")]
-    [AllowAnonymous]
+    [AllowAnonymous] // This is handled implicitly by the NewDenyLocalLoginIfConfigured policy on the <see cref="SecurityControllerBase" />. Keep it here for now and check FIXME in <see cref="DenyLocalLoginHandler" />.
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [UserPasswordEnsureMinimumResponseTime]
@@ -29,7 +29,7 @@ public class ResetPasswordController : SecurityControllerBase
 
         // If this feature is switched off in configuration, the UI will be amended to not make the request to reset password available.
         // So this is just a server-side secondary check.
-        // No matter what other status it will just return Ok, so you can't use this endpoint to determine whether the email exists in the system.
+        // Regardless of other status values, it will just return Ok, so you can't use this endpoint to determine whether the email exists in the system.
         return result.Result == UserOperationStatus.CannotPasswordReset
             ? BadRequest()
             : Ok();

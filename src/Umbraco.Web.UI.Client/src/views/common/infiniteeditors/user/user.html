@@ -36,7 +36,17 @@
             <div class="flex flex-column flx-gap-sm">
               <div ng-repeat="login in vm.externalLoginProviders">
 
-                <umb-custom-view ng-if="login.customView" custom-view="{{ ::login.customView }}"></umb-custom-view>
+                <umb-custom-view
+                  ng-if="login.customView"
+                  ng-attr-custom-view="{{ ::login.customView }}"
+                  ng-attr-args='{{"{" +
+                  "\"providerName\": \"" + login.authType + "\"," +
+                  "\"displayName\": \"" + login.caption + "\"," +
+                  "\"externalLoginUrl\": \"" + vm.externalLinkLoginFormAction + "\"," +
+                  "\"userViewState\": \"loggedIn\"" +
+                  "}"
+                  | safe_html }}'>
+                </umb-custom-view>
 
                 <div ng-if="!login.customView">
                   <form action="{{ ::vm.externalLinkLoginFormAction }}" id="oauthloginform-{{ ::login.authType }}" method="POST"
@@ -99,7 +109,7 @@
       <div class="umb-control-group" ng-if="vm.dashboard.length > 0">
         <div ng-repeat="tab in vm.dashboard">
           <h5 ng-if="tab.label">{{tab.label}}</h5>
-          <div ng-repeat="property in tab.options">
+          <div ng-repeat="property in tab.properties">
             <div ng-include="property.view"></div>
           </div>
         </div>

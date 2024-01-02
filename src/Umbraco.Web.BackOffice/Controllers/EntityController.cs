@@ -69,6 +69,7 @@ public class EntityController : UmbracoAuthorizedJsonController
 
     private readonly AppCaches _appCaches;
     private readonly IDynamicRootService _dynamicRootService;
+    private readonly IVariationContextAccessor _variationContextAccessor;
     private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
     private readonly IContentService _contentService;
     private readonly IContentTypeService _contentTypeService;
@@ -111,7 +112,8 @@ public class EntityController : UmbracoAuthorizedJsonController
         IUserService userService,
         ILocalizationService localizationService,
         AppCaches appCaches,
-        IDynamicRootService dynamicRootService)
+        IDynamicRootService dynamicRootService,
+        IVariationContextAccessor variationContextAccessor)
     {
         _treeService = treeService ?? throw new ArgumentNullException(nameof(treeService));
         _treeSearcher = treeSearcher ?? throw new ArgumentNullException(nameof(treeSearcher));
@@ -139,6 +141,7 @@ public class EntityController : UmbracoAuthorizedJsonController
         _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
         _appCaches = appCaches ?? throw new ArgumentNullException(nameof(appCaches));
         _dynamicRootService = dynamicRootService;
+        _variationContextAccessor = variationContextAccessor;
     }
 
     [Obsolete("Use non-obsolete ctor. This will be removed in Umbraco 14.")]
@@ -183,7 +186,8 @@ public class EntityController : UmbracoAuthorizedJsonController
         userService,
         localizationService,
         appCaches,
-        StaticServiceProvider.Instance.GetRequiredService<IDynamicRootService>())
+        StaticServiceProvider.Instance.GetRequiredService<IDynamicRootService>(),
+        StaticServiceProvider.Instance.GetRequiredService<IVariationContextAccessor>())
     {
 
     }
@@ -587,6 +591,8 @@ public class EntityController : UmbracoAuthorizedJsonController
         public DynamicRoot Query { get; set; } = null!;
 
         public int CurrentId { get; set; }
+        public string? CurrentCulture { get; set; }
+        public string? CurrentSegment { get; set; }
 
         public int ParentId { get; set; }
     }
@@ -617,6 +623,8 @@ public class EntityController : UmbracoAuthorizedJsonController
                 AnyOfDocTypeKeys = x.AnyOfDocTypeKeys
             })
         };
+
+        _variationContextAccessor.VariationContext = new VariationContext(model.CurrentCulture, model.CurrentSegment);
         var startNodes = (await _dynamicRootService.GetDynamicRootsAsync(startNodeSelector)).ToArray();
 
         Guid? first = startNodes.Any() ? startNodes.First() : null;
