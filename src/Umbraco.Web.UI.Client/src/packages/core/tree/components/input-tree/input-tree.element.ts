@@ -2,6 +2,8 @@ import { css, html, customElement, property } from '@umbraco-cms/backoffice/exte
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbInputDocumentElement } from '@umbraco-cms/backoffice/document';
+import { UmbInputMediaElement } from '@umbraco-cms/backoffice/media';
+//import { UmbInputMemberElement } from '@umbraco-cms/backoffice/member';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbTreePickerSource } from '@umbraco-cms/backoffice/components';
 
@@ -64,7 +66,20 @@ export class UmbInputTreeElement extends FormControlMixin(UmbLitElement) {
 	selectedIds: Array<string> = [];
 
 	#onChange(event: CustomEvent) {
-		this.value = (event.target as UmbInputDocumentElement).selectedIds.join(',');
+		switch (this._type) {
+			case 'content':
+				this.value = (event.target as UmbInputDocumentElement).selectedIds.join(',');
+				break;
+			case 'media':
+				this.value = (event.target as UmbInputMediaElement).selectedIds.join(',');
+				break;
+			// case 'member':
+			// 	this.value = (event.target as UmbInputMemberElement).selectedIds.join(',');
+			// 	break;
+			default:
+				break;
+		}
+
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
@@ -75,38 +90,49 @@ export class UmbInputTreeElement extends FormControlMixin(UmbLitElement) {
 	render() {
 		switch (this._type) {
 			case 'content':
-				return html`<umb-input-document
-					.selectedIds=${this.selectedIds}
-					.startNodeId=${this.startNodeId}
-					.filter=${this.filter}
-					.min=${this.min}
-					.max=${this.max}
-					?showOpenButton=${this.showOpenButton}
-					?ignoreUserStartNodes=${this.ignoreUserStartNodes}
-					@change=${this.#onChange}></umb-input-document>`;
+				return this.#renderContentPicker();
 			case 'media':
-				return html`<umb-input-media
-					.selectedIds=${this.selectedIds}
-					.startNodeId=${this.startNodeId}
-					.filter=${this.filter}
-					.min=${this.min}
-					.max=${this.max}
-					?showOpenButton=${this.showOpenButton}
-					?ignoreUserStartNodes=${this.ignoreUserStartNodes}
-					@change=${this.#onChange}></umb-input-media>`;
+				return this.#renderMediaPicker();
 			case 'member':
-				return html`<umb-input-member
-					.selectedIds=${this.selectedIds}
-					.filter=${this.filter}
-					.min=${this.min}
-					.max=${this.max}
-					?showOpenButton=${this.showOpenButton}
-					?ignoreUserStartNodes=${this.ignoreUserStartNodes}
-					@change=${this.#onChange}>
-				</umb-input-member>`;
+				return this.#renderMemberPicker();
 			default:
-				return html`Type could not be found`;
+				return html`<p>Type could not be found.</p>`;
 		}
+	}
+
+	#renderContentPicker() {
+		return html`<umb-input-document
+			.selectedIds=${this.selectedIds}
+			.startNodeId=${this.startNodeId}
+			.filter=${this.filter}
+			.min=${this.min}
+			.max=${this.max}
+			?showOpenButton=${this.showOpenButton}
+			?ignoreUserStartNodes=${this.ignoreUserStartNodes}
+			@change=${this.#onChange}></umb-input-document>`;
+	}
+
+	#renderMediaPicker() {
+		return html`<umb-input-media
+			.selectedIds=${this.selectedIds}
+			.startNodeId=${this.startNodeId}
+			.filter=${this.filter}
+			.min=${this.min}
+			.max=${this.max}
+			?showOpenButton=${this.showOpenButton}
+			?ignoreUserStartNodes=${this.ignoreUserStartNodes}
+			@change=${this.#onChange}></umb-input-media>`;
+	}
+
+	#renderMemberPicker() {
+		return html`<umb-input-member
+			.selectedIds=${this.selectedIds}
+			.filter=${this.filter}
+			.min=${this.min}
+			.max=${this.max}
+			?showOpenButton=${this.showOpenButton}
+			?ignoreUserStartNodes=${this.ignoreUserStartNodes}
+			@change=${this.#onChange}></umb-input-member>`;
 	}
 
 	static styles = [

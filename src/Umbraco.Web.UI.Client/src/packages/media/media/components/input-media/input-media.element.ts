@@ -90,18 +90,33 @@ export class UmbInputMediaElement extends FormControlMixin(UmbLitElement) {
 		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems));
 	}
 
+	protected _openPicker() {
+		this.#pickerContext.openPicker({
+			hideTreeRoot: true,
+		});
+	}
+
 	protected getFormElement() {
 		return undefined;
 	}
 
 	render() {
-		return html` ${this._items?.map((item) => this.#renderItem(item))} ${this.#renderButton()} `;
+		return html` ${this.#renderItems()} ${this.#renderButton()} `;
+	}
+
+	#renderItems() {
+		// TODO: Add sorting. [LK]
+		return html` ${this._items?.map((item) => this.#renderItem(item))} `;
 	}
 
 	#renderButton() {
 		if (this._items && this.max && this._items.length >= this.max) return;
 		return html`
-			<uui-button id="add-button" look="placeholder" @click=${() => this.#pickerContext.openPicker()} label=${this.localize.term('general_choose')}>
+			<uui-button
+				id="add-button"
+				look="placeholder"
+				@click=${this._openPicker}
+				label=${this.localize.term('general_choose')}>
 				<uui-icon name="icon-add"></uui-icon>
 				${this.localize.term('general_choose')}
 			</uui-button>
