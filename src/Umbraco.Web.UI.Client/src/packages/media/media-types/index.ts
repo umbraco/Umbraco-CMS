@@ -12,3 +12,5 @@ export {
 	UMB_MEDIA_TYPE_ENTITY_TYPE,
 	UMB_MEDIA_TYPE_FOLDER_ENTITY_TYPE,
 } from './entity.js';
+
+export * from './components/index.js';

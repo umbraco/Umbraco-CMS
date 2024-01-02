@@ -1,5 +1,5 @@
-import { UmbDocumentTypeInputElement } from '../../../../../../documents/document-types/components/document-type-input/document-type-input.element.js';
-import { UmbMediaTypeInputElement } from '../../../../../../media/media-types/components/media-type-input/media-type-input.element.js';
+import { UmbDocumentTypeInputElement } from '@umbraco-cms/backoffice/document-type';
+import { UmbMediaTypeInputElement } from '@umbraco-cms/backoffice/media-type';
 import type { StartNode } from '@umbraco-cms/backoffice/components';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
