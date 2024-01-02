@@ -16,7 +16,7 @@ export const manifest: ManifestPropertyEditorSchema = {
 				},
 				{
 					alias: 'blockGroups',
-					label: 'Block Groups',
+					label: '',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.BlockTypeGroupConfiguration',
 				},
 				{
@@ -34,7 +34,7 @@ export const manifest: ManifestPropertyEditorSchema = {
 					alias: 'layoutStylesheet',
 					label: 'Layout Stylesheet',
 					description: 'Override default stylesheet for backoffice layout.',
-					propertyEditorUiAlias: 'Umb.PropertyEditorUi.BlockGrid.StylesheetPicker',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.BlockGridLayoutStylesheet',
 				},
 			],
 			defaultData: [
