@@ -21,8 +21,6 @@ public class PartialViewViewModelsMapDefinition : IMapDefinition
         mapper.Define<UpdatePartialViewRequestModel, PartialViewUpdateModel>((_, _) => new PartialViewUpdateModel { Content = string.Empty }, Map);
         mapper.Define<RenamePartialViewRequestModel, PartialViewRenameModel>((_, _) => new PartialViewRenameModel { Name = string.Empty }, Map);
 
-        mapper.Define<PartialViewSnippet, PartialViewSnippetResponseModel>((_, _) => new PartialViewSnippetResponseModel { Name = string.Empty, Content = string.Empty }, Map);
-
         mapper.Define<PartialViewFolderModel, PartialViewFolderResponseModel>((_, _) => new PartialViewFolderResponseModel { Name = string.Empty, Path = string.Empty }, Map);
         mapper.Define<CreatePartialViewFolderRequestModel, PartialViewFolderCreateModel>((_, _) => new PartialViewFolderCreateModel { Name = string.Empty }, Map);
     }
@@ -57,13 +55,6 @@ public class PartialViewViewModelsMapDefinition : IMapDefinition
     // Umbraco.Code.MapAll
     private void Map(RenamePartialViewRequestModel source, PartialViewRenameModel target, MapperContext context)
         => target.Name = source.Name;
-
-    // Umbraco.Code.MapAll
-    private void Map(PartialViewSnippet source, PartialViewSnippetResponseModel target, MapperContext context)
-    {
-        target.Name = source.Name;
-        target.Content = source.Content;
-    }
 
     // Umbraco.Code.MapAll
     private void Map(PartialViewFolderModel source, PartialViewFolderResponseModel target, MapperContext context)
