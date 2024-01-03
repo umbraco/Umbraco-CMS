@@ -22,8 +22,15 @@ export class UmbBlockContext<
 	#setting = new UmbObjectState<UmbBlockDataType | undefined>(undefined);
 	public readonly setting = this.#setting.asObservable();
 
-	constructor(host: UmbControllerHost) {
+	// Public properties:
+	public readonly contentUdi: string;
+
+	constructor(host: UmbControllerHost, contentUdi) {
 		super(host, UMB_BLOCK_CONTEXT);
+		this.contentUdi = contentUdi;
+
+		// Consume block manager?
+		// observe data.
 	}
 }
 
