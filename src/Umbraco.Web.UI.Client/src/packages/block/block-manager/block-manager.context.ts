@@ -38,7 +38,7 @@ export class UmbBlockManagerContext<
 	}
 
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_BLOCK_MANAGER_CONTEXT_TOKEN);
+		super(host, UMB_BLOCK_MANAGER_CONTEXT);
 	}
 
 	blockTypeOf(contentElementTypeKey: string) {
@@ -57,6 +57,6 @@ export class UmbBlockManagerContext<
 	}
 }
 
-export const UMB_BLOCK_MANAGER_CONTEXT_TOKEN = new UmbContextToken<UmbBlockManagerContext, UmbBlockManagerContext>(
+export const UMB_BLOCK_MANAGER_CONTEXT = new UmbContextToken<UmbBlockManagerContext, UmbBlockManagerContext>(
 	'UmbBlockManagerContext',
 );
