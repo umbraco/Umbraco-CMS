@@ -25,7 +25,7 @@ export class UmbBlockContext<
 	// Public properties:
 	public readonly contentUdi: string;
 
-	constructor(host: UmbControllerHost, contentUdi) {
+	constructor(host: UmbControllerHost, contentUdi: string) {
 		super(host, UMB_BLOCK_CONTEXT);
 		this.contentUdi = contentUdi;
 
