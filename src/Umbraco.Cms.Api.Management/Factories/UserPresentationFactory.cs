@@ -1,7 +1,10 @@
-﻿using Umbraco.Cms.Api.Management.ViewModels.User;
+﻿using Microsoft.Extensions.Options;
+using Umbraco.Cms.Api.Management.ViewModels.User;
 using Umbraco.Cms.Api.Management.ViewModels.User.Current;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Mail;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
@@ -17,19 +20,25 @@ public class UserPresentationFactory : IUserPresentationFactory
     private readonly MediaFileManager _mediaFileManager;
     private readonly IImageUrlGenerator _imageUrlGenerator;
     private readonly IUserGroupPresentationFactory _userGroupPresentationFactory;
+    private readonly IEmailSender _emailSender;
+    private readonly UserPasswordConfigurationSettings _userPasswordConfigurationSettings;
 
     public UserPresentationFactory(
         IEntityService entityService,
         AppCaches appCaches,
         MediaFileManager mediaFileManager,
         IImageUrlGenerator imageUrlGenerator,
-        IUserGroupPresentationFactory userGroupPresentationFactory)
+        IUserGroupPresentationFactory userGroupPresentationFactory,
+        IOptionsSnapshot<UserPasswordConfigurationSettings> userPasswordConfigurationSettings,
+        IEmailSender emailSender)
     {
         _entityService = entityService;
         _appCaches = appCaches;
         _mediaFileManager = mediaFileManager;
         _imageUrlGenerator = imageUrlGenerator;
         _userGroupPresentationFactory = userGroupPresentationFactory;
+        _emailSender = emailSender;
+        _userPasswordConfigurationSettings = userPasswordConfigurationSettings.Value;
     }
 
     public UserResponseModel CreateResponseModel(IUser user)
@@ -94,6 +103,17 @@ public class UserPresentationFactory : IUserPresentationFactory
 
         return await Task.FromResult(inviteModel);
     }
+
+    public Task<UserConfigurationResponseModel> CreateUserConfigurationModelAsync() =>
+        Task.FromResult(new UserConfigurationResponseModel
+        {
+            ShowUserInvite = _emailSender.CanSendRequiredEmail(),
+            MinimumPasswordLength = _userPasswordConfigurationSettings.RequiredLength,
+            MinimumPasswordNonAlphaNum = _userPasswordConfigurationSettings.RequireNonLetterOrDigit,
+            RequireDigit = _userPasswordConfigurationSettings.RequireDigit,
+            RequireLowercase = _userPasswordConfigurationSettings.RequireLowercase,
+            RequireUppercase = _userPasswordConfigurationSettings.RequireUppercase,
+        });
 
     public async Task<UserUpdateModel> CreateUpdateModelAsync(Guid existingUserKey, UpdateUserRequestModel updateModel)
     {
