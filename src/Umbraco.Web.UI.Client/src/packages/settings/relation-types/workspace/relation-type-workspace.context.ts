@@ -24,10 +24,6 @@ export class UmbRelationTypeWorkspaceContext
 	async load(id: string) {
 		const { data } = await this.repository.requestById(id);
 
-		const { data: relations } = await this.repository.requestRelationsById(id);
-
-		debugger;
-
 		if (data) {
 			this.setIsNew(false);
 			this.#data.update(data);
@@ -39,6 +35,11 @@ export class UmbRelationTypeWorkspaceContext
 		if (!data) return;
 		this.setIsNew(true);
 		this.#data.next(data);
+	}
+
+	async getRelations() {
+		//TODO: How do we test this?
+		return await this.repository.requestRelationsById(this.getEntityId());
 	}
 
 	getData() {

@@ -69,7 +69,6 @@ export class UmbRelationTypeRepository
 		}
 
 		const { data, error } = await this.#detailDataSource.readRelations(id);
-		debugger;
 
 		return { data, error };
 	}
