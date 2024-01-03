@@ -19,12 +19,12 @@ export class UmbPropertyEditorUIIconPickerElement extends UmbLitElement implemen
 	@property()
 	public set value(v: string) {
 		this._value = v ?? '';
-		const parts = v.split(' ');
+		const parts = this._value.split(' ');
 		if (parts.length === 2) {
 			this._icon = parts[0];
 			this._color = parts[1].replace('color-', '');
 		} else {
-			this._icon = v;
+			this._icon = this._value;
 			this._color = '';
 		}
 	}
