@@ -1087,10 +1087,20 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             var trackedRelations = new List<UmbracoEntityReference>();
             trackedRelations.AddRange(_dataValueReferenceFactories.GetAllReferences(entity.Properties, PropertyEditors));
 
-            var relationTypeAliases = GetAutomaticRelationTypesAliases(entity.Properties, PropertyEditors).ToArray();
+            var relationTypeAliases = GetAutomaticRelationTypesAliases(entity.Properties, PropertyEditors).ToList();
+
+            // At this point we potentially have a problem (see for example: https://github.com/umbraco/Umbraco.Forms.Issues/issues/1129).
+            // If we have a custom relation type (i.e. not document or media) and use of this within a block grid/list property editor,
+            // we'll get an error when saving the relations.
+            // It happens because the block grid doesn't expose the automatic relation type aliases for all of it's nested properties, and
+            // as such relationTypeAliases does not contain the custom relation type alias.
+            // Auto-relations of that type are then then not deleted, and we get duplicate error on insert.
+            // To resolve we can look at the relations we are going to be saving, and if they include any relation type aliases we haven't
+            // already identified, we'll add them in, so they will also be removed along with the other auto-relations.
+            relationTypeAliases.AddRange(trackedRelations.Select(x => x.RelationTypeAlias).Distinct().Except(relationTypeAliases));
 
             // First delete all auto-relations for this entity
-            RelationRepository.DeleteByParent(entity.Id, relationTypeAliases);
+            RelationRepository.DeleteByParent(entity.Id, relationTypeAliases.ToArray());
 
             if (trackedRelations.Count == 0)
             {
