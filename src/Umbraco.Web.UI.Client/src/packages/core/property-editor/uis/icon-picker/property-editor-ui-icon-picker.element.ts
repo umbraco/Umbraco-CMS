@@ -41,7 +41,7 @@ export class UmbPropertyEditorUIIconPickerElement extends UmbLitElement implemen
 
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
-		console.log('config', config);
+		//console.log('config', config);
 	}
 
 	private _modalContext?: UmbModalManagerContext;
