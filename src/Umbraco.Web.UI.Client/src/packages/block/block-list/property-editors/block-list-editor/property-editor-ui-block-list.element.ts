@@ -25,6 +25,8 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 		this._value = buildUpValue as UmbBlockValueType;
 
 		this.#context.setLayouts(this._value.layout[UMB_BLOCK_LIST_PROPERTY_EDITOR_ALIAS]);
+		this.#context.setContents(buildUpValue.contentData);
+		this.#context.setSettings(buildUpValue.settingsData);
 	}
 
 	@property({ attribute: false })
