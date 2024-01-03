@@ -24,10 +24,14 @@ export interface UmbBlockListValueModel extends UmbBlockValueType<UmbBlockListLa
  */
 @customElement('umb-property-editor-ui-block-list')
 export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implements UmbPropertyEditorUiElement {
-	private _value?: UmbBlockListValueModel;
+	private _value: UmbBlockListValueModel = {
+		layout: {},
+		contentData: [],
+		settingsData: [],
+	};
 
 	@property({ attribute: false })
-	public get value(): UmbBlockListValueModel | undefined {
+	public get value(): UmbBlockListValueModel {
 		return this._value;
 	}
 	public set value(value: UmbBlockListValueModel | undefined) {
@@ -70,6 +74,29 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 
 	@state()
 	_layouts: Array<UmbBlockLayoutBaseModel> = [];
+
+	constructor() {
+		super();
+		// TODO: Prevent initial notification from these observes:
+		this.observe(this.#context.layouts, (layouts) => {
+			this._value.layout[UMB_BLOCK_LIST_PROPERTY_EDITOR_ALIAS] = layouts;
+			// Notify that the value has changed.
+			console.log(this._value);
+
+			// TODO: idea: consider inserting an await here, so other changes could appear first? Maybe some mechanism to only fire change event onces?
+			this._layouts = layouts;
+		});
+		this.observe(this.#context.contents, (contents) => {
+			this._value.contentData = contents;
+			// Notify that the value has changed.
+			console.log(this._value);
+		});
+		this.observe(this.#context.settings, (settings) => {
+			this._value.settingsData = settings;
+			// Notify that the value has changed.
+			console.log(this._value);
+		});
+	}
 
 	#openBlockCatalogue() {
 		// Open modal.
