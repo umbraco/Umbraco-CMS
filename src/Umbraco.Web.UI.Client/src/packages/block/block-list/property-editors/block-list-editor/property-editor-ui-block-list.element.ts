@@ -1,5 +1,5 @@
 import { UMB_BLOCK_LIST_PROPERTY_EDITOR_ALIAS } from './manifests.js';
-import { html, customElement, property, state, styleMap, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, state, styleMap, repeat, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -10,7 +10,7 @@ import {
 	UmbBlockTypeBase,
 	type UmbBlockValueType,
 } from '@umbraco-cms/backoffice/block';
-import './block-list-block.js';
+import '../../components/block-list-block/index.js';
 import { buildUdi } from '@umbraco-cms/backoffice/utils';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { NumberRangeValueType } from '@umbraco-cms/backoffice/models';
@@ -81,7 +81,7 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 		this.observe(this.#context.layouts, (layouts) => {
 			this._value.layout[UMB_BLOCK_LIST_PROPERTY_EDITOR_ALIAS] = layouts;
 			// Notify that the value has changed.
-			console.log(this._value);
+			//console.log('layout changed', this._value);
 
 			// TODO: idea: consider inserting an await here, so other changes could appear first? Maybe some mechanism to only fire change event onces?
 			this._layouts = layouts;
@@ -89,12 +89,12 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 		this.observe(this.#context.contents, (contents) => {
 			this._value.contentData = contents;
 			// Notify that the value has changed.
-			console.log(this._value);
+			//console.log('content changed', this._value);
 		});
 		this.observe(this.#context.settings, (settings) => {
 			this._value.settingsData = settings;
 			// Notify that the value has changed.
-			console.log(this._value);
+			//console.log('settings changed', this._value);
 		});
 	}
 
@@ -104,8 +104,6 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 		// TEMP Hack:
 
 		const contentElementTypeKey = this.#context.getBlockTypes()[0]!.contentElementTypeKey;
-
-		console.log('about to create', contentElementTypeKey);
 
 		const contentUdi = buildUdi('element', UmbId.new());
 		const settingsUdi = buildUdi('element', UmbId.new());
@@ -125,14 +123,24 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 				this._layouts,
 				(x) => x.contentUdi,
 				(layoutEntry) =>
-					html`<umb-property-editor-ui-block-list-block .layout=${layoutEntry}>
-					</umb-property-editor-ui-block-list-block>`,
+					html` <uui-button-inline-create></uui-button-inline-create>
+						<umb-property-editor-ui-block-list-block .layout=${layoutEntry}>
+						</umb-property-editor-ui-block-list-block>`,
 			)}
 			<uui-button id="add-button" look="placeholder" @click=${this.#openBlockCatalogue} label="open">Add</uui-button>
 		</div>`;
 	}
 
-	static styles = [UmbTextStyles];
+	static styles = [
+		UmbTextStyles,
+		css`
+			> div {
+				display: flex;
+				flex-direction: column;
+				align-items: stretch;
+			}
+		`,
+	];
 }
 
 export default UmbPropertyEditorUIBlockListElement;

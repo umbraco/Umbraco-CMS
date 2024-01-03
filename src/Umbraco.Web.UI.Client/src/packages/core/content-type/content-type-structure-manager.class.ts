@@ -22,6 +22,7 @@ export type PropertyContainerTypes = 'Group' | 'Tab';
 type T = DocumentTypeResponseModel;
 
 // TODO: get this type from the repository, or use some generic type.
+// TODO: Make this a controller on its own:
 export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepository<T> = UmbDetailRepository<T>> {
 	#host: UmbControllerHostElement;
 	#init!: Promise<unknown>;
@@ -120,7 +121,7 @@ export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepositor
 		return { data };
 	}
 
-	public async _observeContentType(data: T) {
+	private async _observeContentType(data: T) {
 		if (!data.id) return;
 
 		// Load inherited and composed types:
