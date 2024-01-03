@@ -106,14 +106,7 @@ export class UmbInputLanguagePickerElement extends FormControlMixin(UmbLitElemen
 	render() {
 		return html`
 			<uui-ref-list> ${this._items.map((item) => this.#renderItem(item))} </uui-ref-list>
-			<uui-button
-				id="add-button"
-				look="placeholder"
-				@click=${this.#openPicker}
-				label="open"
-				?disabled="${this._items.length === this.max}"
-				>Add</uui-button
-			>
+			<uui-button id="add-button" look="placeholder" @click=${this.#openPicker} label="open">Add</uui-button>
 		`;
 	}
 

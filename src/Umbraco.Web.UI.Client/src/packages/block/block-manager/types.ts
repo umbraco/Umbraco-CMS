@@ -8,8 +8,8 @@ export interface UmbBlockDataType {
 	contentTypeKey: string;
 }
 
-export interface UmbBlockValueType {
-	layout: { [key: string]: Array<UmbBlockLayoutBaseModel> };
+export interface UmbBlockValueType<BlockLayoutType extends UmbBlockLayoutBaseModel> {
+	layout: { [key: string]: Array<BlockLayoutType> | undefined };
 	contentData: Array<UmbBlockDataType>;
 	settingsData: Array<UmbBlockDataType>;
 }

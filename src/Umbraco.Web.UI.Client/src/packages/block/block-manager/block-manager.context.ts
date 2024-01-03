@@ -25,6 +25,9 @@ export class UmbBlockManagerContext<
 	setBlockTypes(blockTypes: Array<BlockType>) {
 		this.#blockTypes.next(blockTypes);
 	}
+	getBlockTypes() {
+		return this.#blockTypes.value;
+	}
 
 	setLayouts(layouts: Array<BlockLayoutType>) {
 		this.#layouts.next(layouts);
@@ -54,6 +57,38 @@ export class UmbBlockManagerContext<
 	}
 	settingsOf(udi: string) {
 		return this.#settings.asObservablePart((source) => source.find((x) => x.udi === udi));
+	}
+
+	createBlock(layoutEntry: BlockLayoutType, contentElementTypeKey: string) {
+		// Find block type.
+		const blockType = this.#blockTypes.value.find((x) => x.contentElementTypeKey === contentElementTypeKey);
+		if (!blockType) {
+			throw new Error(`Cannot create block, missing block type for ${contentElementTypeKey}`);
+		}
+
+		this.#layouts.appendOne(layoutEntry);
+
+		// Create content entry:
+		if (layoutEntry.contentUdi) {
+			this.#contents.appendOne({
+				contentTypeKey: contentElementTypeKey,
+				udi: layoutEntry.contentUdi,
+			});
+		} else {
+			throw new Error('Cannot create block, missing contentUdi');
+		}
+
+		//Create settings entry:
+		if (blockType.settingsElementTypeKey) {
+			if (layoutEntry.settingsUdi) {
+				this.#contents.appendOne({
+					contentTypeKey: blockType.settingsElementTypeKey,
+					udi: layoutEntry.settingsUdi,
+				});
+			} else {
+				throw new Error('Cannot create block, missing settingsUdi');
+			}
+		}
 	}
 }
 
