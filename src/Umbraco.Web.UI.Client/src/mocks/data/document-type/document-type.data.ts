@@ -394,7 +394,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				dataTypeId: 'dt-blockList',
 				variesByCulture: false,
 				variesBySegment: false,
-				sortOrder: 19,
+				sortOrder: -2,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -474,7 +474,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				dataTypeId: 'dt-blockGrid',
 				variesByCulture: false,
 				variesBySegment: false,
-				sortOrder: 23,
+				sortOrder: -1,
 				validation: {
 					mandatory: true,
 					mandatoryMessage: null,
@@ -488,7 +488,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			{
 				id: '23',
 				containerId: 'all-properties-group-key',
-				alias: 'blockGrid',
+				alias: 'iconPicker',
 				name: 'Icon Picker',
 				description: '',
 				dataTypeId: 'dt-iconPicker',
