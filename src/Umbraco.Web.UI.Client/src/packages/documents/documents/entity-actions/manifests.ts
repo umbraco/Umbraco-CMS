@@ -1,13 +1,13 @@
 import { UMB_DOCUMENT_REPOSITORY_ALIAS } from '../repository/manifests.js';
 import { UMB_DOCUMENT_ENTITY_TYPE, UMB_DOCUMENT_ROOT_ENTITY_TYPE } from '../entity.js';
 import { UmbPublishDocumentEntityAction } from './publish.action.js';
-import { UmbDocumentCultureAndHostnamesEntityAction } from './culture-and-hostnames.action.js';
 import { UmbCreateDocumentBlueprintEntityAction } from './create-blueprint.action.js';
 import { UmbDocumentPublicAccessEntityAction } from './public-access.action.js';
 import { UmbUnpublishDocumentEntityAction } from './unpublish.action.js';
 import { UmbRollbackDocumentEntityAction } from './rollback.action.js';
 import { manifests as createManifests } from './create/manifests.js';
 import { manifests as permissionManifests } from './permissions/manifests.js';
+import { manifests as cultureAndHostnamesManifests } from './culture-and-hostnames/manifests.js';
 import {
 	UmbCopyEntityAction,
 	UmbMoveEntityAction,
@@ -18,6 +18,7 @@ import { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 const entityActions: Array<ManifestTypes> = [
 	...createManifests,
 	...permissionManifests,
+	...cultureAndHostnamesManifests,
 	{
 		type: 'entityAction',
 		alias: 'Umb.EntityAction.Document.CreateBlueprint',
@@ -70,6 +71,7 @@ const entityActions: Array<ManifestTypes> = [
 			entityTypes: [UMB_DOCUMENT_ROOT_ENTITY_TYPE, UMB_DOCUMENT_ENTITY_TYPE],
 		},
 	},
+	/*
 	{
 		type: 'entityAction',
 		alias: 'Umb.EntityAction.Document.CultureAndHostnames',
@@ -83,6 +85,7 @@ const entityActions: Array<ManifestTypes> = [
 			entityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
 		},
 	},
+	*/
 	{
 		type: 'entityAction',
 		alias: 'Umb.EntityAction.Document.PublicAccess',
