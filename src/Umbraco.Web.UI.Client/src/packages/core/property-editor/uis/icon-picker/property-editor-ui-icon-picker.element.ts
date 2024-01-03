@@ -15,10 +15,10 @@ import { extractUmbColorVariable } from '@umbraco-cms/backoffice/resources';
  */
 @customElement('umb-property-editor-ui-icon-picker')
 export class UmbPropertyEditorUIIconPickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
-	private _value = '';
+	//
 	@property()
 	public set value(v: string) {
-		this._value = v;
+		this._value = v ?? '';
 		const parts = v.split(' ');
 		if (parts.length === 2) {
 			this._icon = parts[0];
@@ -31,6 +31,7 @@ export class UmbPropertyEditorUIIconPickerElement extends UmbLitElement implemen
 	public get value() {
 		return this._value;
 	}
+	private _value = '';
 
 	@state()
 	private _icon = '';
