@@ -30,7 +30,6 @@ public abstract class FileSystemTreeControllerBase : ManagementApiControllerBase
 
     protected async Task<ActionResult<PagedViewModel<FileSystemTreeItemPresentationModel>>> GetChildren(string path, int skip, int take)
     {
-        path = path.VirtualPathToSystemPath();
         if (PaginationService.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize, out ProblemDetails? error) == false)
         {
             return BadRequest(error);
@@ -57,6 +56,7 @@ public abstract class FileSystemTreeControllerBase : ManagementApiControllerBase
 
     private FileSystemTreeItemPresentationModel[] GetPathViewModels(string path, long pageNumber, int pageSize, out long totalItems)
     {
+        path = path.VirtualPathToSystemPath();
         var allItems = GetDirectories(path)
             .Select(directory => new { Path = directory, IsFolder = true })
             .Union(GetFiles(path).Select(file => new { Path = file, IsFolder = false }))
@@ -82,7 +82,7 @@ public abstract class FileSystemTreeControllerBase : ManagementApiControllerBase
 
     private FileSystemTreeItemPresentationModel MapViewModel(string path, string name, bool isFolder)
     {
-        var parentPath = path.ParentPath();
+        var parentPath = Path.GetDirectoryName(path);
         return new FileSystemTreeItemPresentationModel
         {
             Path = path.SystemPathToVirtualPath(),

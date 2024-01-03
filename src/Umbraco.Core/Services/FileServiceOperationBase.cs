@@ -157,7 +157,7 @@ public abstract class FileServiceOperationBase<TRepository, TEntity, TOperationS
             return Attempt.FailWithStatus<TEntity?, TOperationStatus>(NotFound, default);
         }
 
-        var newPath = GetNewPath(path, newName);
+        var newPath = ReplaceFileName(path, newName);
 
         try
         {
@@ -244,12 +244,10 @@ public abstract class FileServiceOperationBase<TRepository, TEntity, TOperationS
         _auditRepository.Save(new AuditItem(-1, type, userId, EntityType));
     }
 
-    // TODO: move the following somewhere filesystem related (ideally not using Path.X)
-
-    protected string GetFilePath(string? parentPath, string fileName)
+    private string GetFilePath(string? parentPath, string fileName)
         => Path.Join(parentPath, fileName);
 
-    private string GetNewPath(string path, string newName)
+    private string ReplaceFileName(string path, string newName)
         => Path.Join(GetDirectoryPath(path), newName);
 
     private string GetDirectoryPath(string path)

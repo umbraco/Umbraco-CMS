@@ -129,14 +129,12 @@ internal abstract class FolderServiceOperationBase<TRepository, TFolderModel, TO
         return Success;
     }
 
-    // TODO: move the following somewhere filesystem related (ideally not using Path.X)
-
-    protected string GetFolderPath(string folderName, string? parentPath)
+    private string GetFolderPath(string folderName, string? parentPath)
         => Path.Join(parentPath, folderName);
 
-    protected string GetFolderName(string path)
+    private string GetFolderName(string path)
         => Path.GetFileName(path);
 
-    protected string? GetParentFolderPath(string path)
+    private string? GetParentFolderPath(string path)
         => Path.GetDirectoryName(path);
 }

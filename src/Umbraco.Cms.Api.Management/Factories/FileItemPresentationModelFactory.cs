@@ -50,7 +50,7 @@ public class FileItemPresentationModelFactory : IFileItemPresentationModelFactor
             ? paths.Where(path => fileSystem.DirectoryExists(path) || fileSystem.FileExists(path)).Select(path =>
                 {
                     var fileName = fileSystem.GetFileName(path);
-                    var parentPath = path.ParentPath();
+                    var parentPath = Path.GetDirectoryName(path);
                     FileSystemFolderModel? parent = parentPath.IsNullOrWhiteSpace()
                         ? null
                         : new FileSystemFolderModel { Path = parentPath.SystemPathToVirtualPath() };

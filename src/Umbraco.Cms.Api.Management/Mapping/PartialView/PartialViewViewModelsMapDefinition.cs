@@ -31,7 +31,7 @@ public class PartialViewViewModelsMapDefinition : IMapDefinition
         target.Name = source.Name ?? string.Empty;
         target.Content = source.Content ?? string.Empty;
         target.Path = source.Path.SystemPathToVirtualPath();
-        var parentPath = source.Path.ParentPath();
+        var parentPath = Path.GetDirectoryName(source.Path);
         target.Parent = parentPath.IsNullOrWhiteSpace()
             ? null
             : new FileSystemFolderModel
