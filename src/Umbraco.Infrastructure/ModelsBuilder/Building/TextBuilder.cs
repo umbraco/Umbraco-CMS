@@ -1,5 +1,6 @@
 using System.Text;
 using System.Text.RegularExpressions;
+using Microsoft.Extensions.Primitives;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 
@@ -297,6 +298,14 @@ public class TextBuilder : Builder
         sb.Append(
             "\t\t\t=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(publishedSnapshotAccessor), selector);\n");
         sb.Append("#pragma warning restore 0109\n\n");
+        sb.Append("#nullable enable\n");
+        sb.AppendFormat("\t\tpublic bool HasValue(IPublishedSnapshotAccessor publishedSnapshotAccessor, Expression<Func<{0}, string>> selector, string? culture = null, string? segment = null, Fallback fallback = default) \n", type.ClrName);
+        sb.Append("\t\t{\n");
+        sb.Append("\t\t\t\tvar propertyType = GetModelPropertyType(publishedSnapshotAccessor, selector);\n");
+        sb.Append("\t\t\t\treturn propertyType!=null ? this.HasValue(propertyType.Alias,culture,segment,fallback) : false;\n");
+        sb.Append("\t\t}\n");
+        sb.Append("#nullable disable\n\n");
+
         sb.Append("\t\tprivate IPublishedValueFallback _publishedValueFallback;");
 
         // write the ctor
