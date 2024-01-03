@@ -59,7 +59,7 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 		//config.useSingleBlockMode
 		//config.useLiveEditing
 		//config.useInlineEditingAsDefault
-		this._inlineStyles.width = config.getValueByAlias<string>('maxPropertyWidth');
+		this.style.maxWidth = config.getValueByAlias<string>('maxPropertyWidth') ?? '';
 	}
 
 	@state()
@@ -68,9 +68,6 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 	private _limitMax?: number;
 
 	#context = new UmbBlockManagerContext(this);
-
-	@state()
-	_inlineStyles: { [key: string]: string | undefined } = { width: undefined };
 
 	@state()
 	_layouts: Array<UmbBlockLayoutBaseModel> = [];
@@ -118,8 +115,7 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 	}
 
 	render() {
-		return html`<div style=${styleMap(this._inlineStyles)}>
-			${repeat(
+		return html` ${repeat(
 				this._layouts,
 				(x) => x.contentUdi,
 				(layoutEntry) =>
@@ -127,8 +123,7 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 						<umb-property-editor-ui-block-list-block .layout=${layoutEntry}>
 						</umb-property-editor-ui-block-list-block>`,
 			)}
-			<uui-button id="add-button" look="placeholder" @click=${this.#openBlockCatalogue} label="open">Add</uui-button>
-		</div>`;
+			<uui-button id="add-button" look="placeholder" @click=${this.#openBlockCatalogue} label="open">Add</uui-button>`;
 	}
 
 	static styles = [

@@ -4,6 +4,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { type UmbBlockLayoutBaseModel } from '@umbraco-cms/backoffice/block';
 import '../ref-list-block/index.js';
 import { UmbBlockContext } from '@umbraco-cms/backoffice/block';
+import { UMB_CONFIRM_MODAL, UMB_MODAL_MANAGER_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
 
 /**
  * @element umb-property-editor-ui-block-list-block
@@ -34,6 +35,21 @@ export class UmbPropertyEditorUIBlockListBlockElement extends UmbLitElement impl
 		});
 	}
 
+	#requestDelete() {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, async (modalManager) => {
+			const modalContext = modalManager.open(UMB_CONFIRM_MODAL, {
+				data: {
+					headline: `Delete ${this._label}`,
+					content: 'Are you sure you want to delete this block?',
+					confirmLabel: 'Delete',
+					color: 'danger',
+				},
+			});
+			await modalContext.onSubmit();
+			this.#context.delete();
+		});
+	}
+
 	#renderRefBlock() {
 		return html`<umb-ref-list-block .name=${this._label}> </umb-ref-list-block>`;
 	}
@@ -46,7 +62,7 @@ export class UmbPropertyEditorUIBlockListBlockElement extends UmbLitElement impl
 		return html`
 			${this.#renderRefBlock()}
 			<uui-action-bar>
-				<uui-button label="remove" compact>
+				<uui-button label="delete" compact @click=${this.#requestDelete}>
 					<uui-icon name="icon-remove"></uui-icon>
 				</uui-button>
 			</uui-action-bar>

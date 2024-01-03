@@ -154,6 +154,15 @@ export class UmbBlockContext<
 			'observeBlockTypeContentElementTypeName',
 		);
 	}
+
+	// Public methods:
+
+	public delete() {
+		if (!this.#manager) return;
+		const contentUdi = this.#layout.value?.contentUdi;
+		if (!contentUdi) return;
+		this.#manager.deleteBlock(contentUdi);
+	}
 }
 
 export const UMB_BLOCK_CONTEXT = new UmbContextToken<UmbBlockContext, UmbBlockContext>('UmbBlockContext');

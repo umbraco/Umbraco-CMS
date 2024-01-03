@@ -129,6 +129,18 @@ export class UmbBlockManagerContext<
 			}
 		}
 	}
+
+	deleteBlock(contentUdi: string) {
+		const layout = this.#layouts.value.find((x) => x.contentUdi === contentUdi);
+		if (!layout) return;
+
+		if (layout.settingsUdi) {
+			this.#settings.removeOne(layout.settingsUdi);
+		}
+
+		this.#layouts.removeOne(contentUdi);
+		this.#contents.removeOne(contentUdi);
+	}
 }
 
 export const UMB_BLOCK_MANAGER_CONTEXT = new UmbContextToken<UmbBlockManagerContext, UmbBlockManagerContext>(
