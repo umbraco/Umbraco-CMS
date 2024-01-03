@@ -1,5 +1,5 @@
 import { UmbDocumentTypePickerContext } from './input-document-type.context.js';
-import { css, html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, state, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { DocumentTypeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
@@ -116,10 +116,16 @@ export class UmbInputDocumentTypeElement extends FormControlMixin(UmbLitElement)
 	}
 
 	render() {
-		return html`
-			<uui-ref-list>${this._items?.map((item) => this._renderItem(item))}</uui-ref-list>
-			<uui-button id="add-button" look="placeholder" @click=${this.#openPicker} label="open">Add</uui-button>
-		`;
+		return html` <uui-ref-list>${this._items?.map((item) => this._renderItem(item))}</uui-ref-list>
+			${this.#renderAddButton()}`;
+	}
+
+	#renderAddButton() {
+		//TODO: Why does it show length 1 (initially only) when array is empty?
+		//if (this.max > 0 && this.selectedIds.length >= this.max) return nothing;
+		return html`<uui-button id="add-button" look="placeholder" @click=${this.#openPicker} label="open">
+			Add
+		</uui-button>`;
 	}
 
 	private _renderItem(item: DocumentTypeItemResponseModel) {
