@@ -1,12 +1,15 @@
 ﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.User.Current;
+using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.User.Current;
 
 [ApiVersion("1.0")]
+[Authorize(Policy = "New" + AuthorizationPolicies.BackOfficeAccess)]
 public class ConfigurationCurrentUserController : CurrentUserControllerBase
 {
     private readonly IUserPresentationFactory _userPresentationFactory;
