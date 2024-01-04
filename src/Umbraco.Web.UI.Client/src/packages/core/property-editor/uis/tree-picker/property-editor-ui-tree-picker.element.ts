@@ -45,8 +45,10 @@ export class UmbPropertyEditorUITreePickerElement extends UmbLitElement implemen
 			this.startNodeId = startNode.id;
 		}
 
-		this.min = config?.getValueByAlias('minNumber') || 0;
-		this.max = config?.getValueByAlias('maxNumber') || 0;
+		// TODO: The value from `config.getValueByAlias('maxNumber')` could be a `string`, can't be cast as a `number`. [LK]
+		// This causes issues when the `max` value is compared against other numbers, e.g. `max === 1` would be false.
+		this.min = Number(config?.getValueByAlias('minNumber')) || 0;
+		this.max = Number(config?.getValueByAlias('maxNumber')) || 0;
 
 		this.filter = config?.getValueByAlias('filter');
 		this.showOpenButton = config?.getValueByAlias('showOpenButton');
