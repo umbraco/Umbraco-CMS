@@ -13,6 +13,7 @@ import {
 } from '@umbraco-cms/backoffice/modal';
 import { generateAlias } from '@umbraco-cms/backoffice/utils';
 import { DocumentTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 // TODO: Could base take a token to get its types?.
 @customElement('umb-property-settings-modal')
 export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
@@ -61,11 +62,12 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 		super.connectedCallback();
 
 		this.consumeContext(UMB_DOCUMENT_TYPE_WORKSPACE_CONTEXT, (instance) => {
+			console.log('GOT UMB_DOCUMENT_TYPE_WORKSPACE_CONTEXT', instance);
 			if (!this.data?.documentTypeId) return;
 
 			this.observe(instance.variesByCulture, (variesByCulture) => (this._documentVariesByCulture = variesByCulture));
 			this.observe(instance.variesBySegment, (variesBySegment) => (this._documentVariesBySegment = variesBySegment));
-		});
+		}).skipOrigin();
 
 		this._originalPropertyData = this.value;
 

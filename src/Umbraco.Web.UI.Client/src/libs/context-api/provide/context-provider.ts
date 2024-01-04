@@ -14,7 +14,7 @@ import {
  * @class UmbContextProvider
  */
 export class UmbContextProvider<BaseType = unknown, ResultType extends BaseType = BaseType> {
-	protected hostElement: EventTarget;
+	protected eventTarget: EventTarget;
 
 	protected _contextAlias: string;
 	protected _apiAlias: string;
@@ -41,14 +41,14 @@ export class UmbContextProvider<BaseType = unknown, ResultType extends BaseType 
 		contextIdentifier: string | UmbContextToken<BaseType, ResultType>,
 		instance: ResultType,
 	) {
-		this.hostElement = hostElement;
+		this.eventTarget = hostElement;
 
 		const idSplit = contextIdentifier.toString().split('#');
 		this._contextAlias = idSplit[0];
 		this._apiAlias = idSplit[1] ?? 'default';
 		this.#instance = instance;
 
-		this.hostElement.addEventListener(UMB_CONTENT_REQUEST_EVENT_TYPE, this.#handleContextRequest);
+		this.eventTarget.addEventListener(UMB_CONTENT_REQUEST_EVENT_TYPE, this.#handleContextRequest);
 	}
 
 	/**
@@ -74,10 +74,10 @@ export class UmbContextProvider<BaseType = unknown, ResultType extends BaseType 
 	 */
 	public hostConnected() {
 		//this.hostElement.addEventListener(UMB_CONTENT_REQUEST_EVENT_TYPE, this.#handleContextRequest);
-		this.hostElement.dispatchEvent(new UmbContextProvideEventImplementation(this._contextAlias));
+		this.eventTarget.dispatchEvent(new UmbContextProvideEventImplementation(this._contextAlias));
 
 		// Listen to our debug event 'umb:debug-contexts'
-		this.hostElement.addEventListener(UMB_DEBUG_CONTEXT_EVENT_TYPE, this._handleDebugContextRequest);
+		this.eventTarget.addEventListener(UMB_DEBUG_CONTEXT_EVENT_TYPE, this._handleDebugContextRequest);
 	}
 
 	/**
@@ -89,7 +89,7 @@ export class UmbContextProvider<BaseType = unknown, ResultType extends BaseType 
 		//window.dispatchEvent(new UmbContextUnprovidedEventImplementation(this._contextAlias, this.#instance));
 
 		// Stop listen to our debug event 'umb:debug-contexts'
-		this.hostElement.removeEventListener(UMB_DEBUG_CONTEXT_EVENT_TYPE, this._handleDebugContextRequest);
+		this.eventTarget.removeEventListener(UMB_DEBUG_CONTEXT_EVENT_TYPE, this._handleDebugContextRequest);
 	}
 
 	private _handleDebugContextRequest = (event: any) => {

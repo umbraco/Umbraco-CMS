@@ -27,7 +27,7 @@ export class UmbModalRouteRegistrationController<D extends object = object, R = 
 
 	/**
 	 * Creates an instance of UmbModalRouteRegistrationController.
-	 * @param {EventTarget} host - The host element of the modal, this is used to identify the modal.
+	 * @param {UmbControllerHost} host - The host element of the modal, this determine the ownership of the modal and the origin of it.
 	 * @param {UmbModalToken} alias - The alias of the modal, this is used to identify the modal.
 	 * @memberof UmbModalRouteRegistrationController
 	 */

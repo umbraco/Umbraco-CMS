@@ -18,7 +18,7 @@ export type UmbModalContextClassArgs<
 	data?: ModalAliasTypeAsToken['DATA'];
 	value?: ModalAliasTypeAsToken['VALUE'];
 	modal?: UmbModalConfig;
-	originTarget?: EventTarget;
+	originTarget?: Element;
 };
 
 // TODO: consider splitting this into two separate handlers
@@ -33,7 +33,7 @@ export class UmbModalContext<ModalPreset extends object = object, ModalValue = a
 	public readonly type: UmbModalType = 'dialog';
 	public readonly size: UUIModalSidebarSize = 'small';
 	public readonly router: IRouterSlot | null = null;
-	public readonly originTarget?: EventTarget;
+	public readonly originTarget?: Element;
 	public readonly alias: string | UmbModalToken<ModalPreset, ModalValue>;
 
 	#value;

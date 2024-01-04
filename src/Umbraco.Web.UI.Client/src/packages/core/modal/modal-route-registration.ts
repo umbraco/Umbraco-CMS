@@ -41,7 +41,7 @@ export class UmbModalRouteRegistration<UmbModalTokenData extends object = object
 	/**
 	 * Should returns the host element of the modal, but this simple registration is not capable of that. So it has to be overwritten by a more specific implementation.
 	 */
-	protected getControllerHostElement(): EventTarget | undefined {
+	protected getControllerHostElement(): Element | undefined {
 		return undefined;
 	}
 
