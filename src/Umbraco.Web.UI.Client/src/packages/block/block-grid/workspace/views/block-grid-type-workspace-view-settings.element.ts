@@ -1,10 +1,7 @@
-import { UmbBlockTypeBase } from '@umbraco-cms/backoffice/block';
-import { UmbBlockTypeWorkspaceContext } from '../../../block-type/workspace/block-type-workspace.context.js';
-import { css, html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
-import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 
 @customElement('umb-block-grid-type-workspace-view')
 export class UmbBlockTypeGridWorkspaceViewSettingsElement extends UmbLitElement implements UmbWorkspaceViewElement {
@@ -12,47 +9,6 @@ export class UmbBlockTypeGridWorkspaceViewSettingsElement extends UmbLitElement 
 
 	@state()
 	private _showSizeOptions = true;
-
-	@state()
-	private _backgroundColor?: string;
-
-	@state()
-	private _contentElementTypeKey?: string;
-
-	@state()
-	private _editorSize?: string;
-
-	@state()
-	private _iconColor?: string;
-
-	@state()
-	private _label?: string;
-
-	@state()
-	private _settingsElementTypeKey?: string;
-
-	@state()
-	private _stylesheet?: string;
-
-	@state()
-	private _view?: string;
-
-	constructor() {
-		super();
-		this.consumeContext(UMB_WORKSPACE_CONTEXT, (instance) => {
-			const workspace = instance as UmbBlockTypeWorkspaceContext;
-			this.observe(workspace.data, (data) => {
-				this._backgroundColor = data?.backgroundColor;
-				this._contentElementTypeKey = data?.contentElementTypeKey;
-				this._editorSize = data?.editorSize;
-				this._iconColor = data?.iconColor;
-				this._label = data?.label;
-				this._settingsElementTypeKey = data?.settingsElementTypeKey;
-				this._stylesheet = data?.stylesheet;
-				this._view = data?.view;
-			});
-		});
-	}
 
 	render() {
 		return html`
