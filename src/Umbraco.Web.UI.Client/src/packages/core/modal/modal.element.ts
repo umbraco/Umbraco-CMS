@@ -44,16 +44,23 @@ export class UmbModalElement extends UmbLitElement {
 
 		this.element = this.#createContainerElement();
 		if (this.#modalContext.originTarget) {
+			// The following code is the context api proxy.
+			// It re-dispatches the context api request event to the origin target of this modal, in other words the element that initiated the modal.
 			this.element.addEventListener(UMB_CONTENT_REQUEST_EVENT_TYPE, ((event: UmbContextRequestEvent) => {
 				if (!this.#modalContext) return;
 				if (this.#modalContext.originTarget) {
-					event.stopPropagation();
-					const clonedEvent = new UmbContextRequestEventImplementation(
-						event.contextAlias,
-						event.apiAlias,
-						event.callback,
-					);
-					this.#modalContext.originTarget.dispatchEvent(clonedEvent);
+					// Note for this hack (The if-sentence):
+					// We do not currently have a good enough control to ensure that the proxy is last, meaning if another context is provided at this element, it might respond after the proxy event has been dispatched.
+					// To avoid such this hack just prevents proxying the event if its a request for the Modal Context.
+					if (event.apiAlias !== UMB_MODAL_CONTEXT_TOKEN.contextAlias) {
+						event.stopPropagation();
+						const clonedEvent = new UmbContextRequestEventImplementation(
+							event.contextAlias,
+							event.apiAlias,
+							event.callback,
+						);
+						this.#modalContext.originTarget.dispatchEvent(clonedEvent);
+					}
 				}
 			}) as EventListener);
 		}
