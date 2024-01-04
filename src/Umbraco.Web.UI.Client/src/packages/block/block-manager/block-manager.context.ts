@@ -4,12 +4,23 @@ import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbDocumentTypeDetailRepository } from '@umbraco-cms/backoffice/document-type';
+import { DocumentTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { getKeyFromUdi } from '@umbraco-cms/backoffice/utils';
+
+// TODO: We are using backend model here, I think we should get our own model:
+type ElementTypeModel = DocumentTypeResponseModel;
 
 export class UmbBlockManagerContext<
 	BlockType extends UmbBlockTypeBase = UmbBlockTypeBase,
 	BlockLayoutType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel,
 > extends UmbContextBase<UmbBlockManagerContext> {
 	//
+	#contentTypeRepository = new UmbDocumentTypeDetailRepository(this);
+
+	#contentTypes = new UmbArrayState(<Array<ElementTypeModel>>[], (x) => x.id);
+	public readonly contentTypes = this.#contentTypes.asObservable();
+
 	#blockTypes = new UmbArrayState(<Array<BlockType>>[], (x) => x.contentElementTypeKey);
 	public readonly blockTypes = this.#blockTypes.asObservable();
 
@@ -44,9 +55,37 @@ export class UmbBlockManagerContext<
 		super(host, UMB_BLOCK_MANAGER_CONTEXT);
 	}
 
-	blockTypeOf(contentElementTypeKey: string) {
+	async ensureContentType(id?: string) {
+		if (!id) return;
+		if (this.#contentTypes.getValue().find((x) => x.id === id)) return;
+		const contentType = await this.#loadContentType(id);
+		return contentType;
+	}
+
+	async #loadContentType(id?: string) {
+		if (!id) return {};
+
+		const { data } = await this.#contentTypeRepository.requestById(id);
+		if (!data) return {};
+
+		// We could have used the global store of Document Types, but to ensure we first react ones the latest is loaded then we have our own local store:
+		// TODO: Revisit if this is right to do. Notice this can potentially be proxied to the global store.
+		this.#contentTypes.appendOne(data);
+
+		return data;
+	}
+
+	contentTypeOf(contentTypeUdi: string) {
+		const contentTypeId = getKeyFromUdi(contentTypeUdi);
+		return this.#contentTypes.asObservablePart((source) => source.find((x) => x.id === contentTypeId));
+	}
+	contentTypeNameOf(contentTypeUdi: string) {
+		const contentTypeId = getKeyFromUdi(contentTypeUdi);
+		return this.#contentTypes.asObservablePart((source) => source.find((x) => x.id === contentTypeId)?.name);
+	}
+	blockTypeOf(contentTypeKey: string) {
 		return this.#blockTypes.asObservablePart((source) =>
-			source.find((x) => x.contentElementTypeKey === contentElementTypeKey),
+			source.find((x) => x.contentElementTypeKey === contentTypeKey),
 		);
 	}
 	layoutOf(contentUdi: string) {
@@ -89,6 +128,18 @@ export class UmbBlockManagerContext<
 				throw new Error('Cannot create block, missing settingsUdi');
 			}
 		}
+	}
+
+	deleteBlock(contentUdi: string) {
+		const layout = this.#layouts.value.find((x) => x.contentUdi === contentUdi);
+		if (!layout) return;
+
+		if (layout.settingsUdi) {
+			this.#settings.removeOne(layout.settingsUdi);
+		}
+
+		this.#layouts.removeOne(contentUdi);
+		this.#contents.removeOne(contentUdi);
 	}
 }
 
