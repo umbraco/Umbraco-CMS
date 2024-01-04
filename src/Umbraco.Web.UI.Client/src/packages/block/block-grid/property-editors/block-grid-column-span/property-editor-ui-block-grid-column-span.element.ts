@@ -20,11 +20,9 @@ export class UmbPropertyEditorUIBlockGridColumnSpanElement extends UmbLitElement
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {}
 
 	private _onChange(event: CustomEvent) {
-		//this.value = (event.target as UmbInputStaticFileElement).selectedPaths;
 		this.dispatchEvent(new CustomEvent('property-value-change'));
 	}
 
-	// TODO: Implement mandatory?
 	render() {
 		return html`Column span TODO `;
 	}

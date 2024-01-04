@@ -41,7 +41,7 @@ export class UmbBlockTypeGridWorkspaceViewAdvancedElement extends UmbLitElement 
 				<umb-property
 					label="Thumbnail"
 					alias="thumbnail"
-					property-editor-ui-alias="Umb.PropertyEditorUi.MediaPicker"></umb-property>
+					property-editor-ui-alias="Umb.PropertyEditorUi.StaticFilePicker"></umb-property>
 			</uui-box>
 		`;
 	}
@@ -56,16 +56,6 @@ export class UmbBlockTypeGridWorkspaceViewAdvancedElement extends UmbLitElement 
 			}
 			uui-box {
 				margin-top: var(--uui-size-layout-1);
-			}
-
-			uui-label,
-			umb-property-editor-ui-number {
-				display: block;
-			}
-
-			// TODO: is this necessary?
-			uui-toggle {
-				display: flex;
 			}
 		`,
 	];
