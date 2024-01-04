@@ -133,7 +133,6 @@ export class UmbBlockTypeGridWorkspaceViewSettingsElement extends UmbLitElement 
 				padding-bottom: var(--uui-size-layout-1); // To enforce some distance to the bottom of the scroll-container.
 			}
 			uui-box {
-				margin-top: var(--uui-size-layout-1);
 				flex: 1;
 				min-width: 600px;
 			}
