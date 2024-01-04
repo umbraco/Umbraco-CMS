@@ -1,4 +1,7 @@
-import { UmbPropertyTypeWorkspaceContext } from './property-settings-modal.context.js';
+import {
+	UMB_PROPERTY_TYPE_WORKSPACE_ALIAS,
+	UmbPropertyTypeWorkspaceContext,
+} from './property-settings-modal.context.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UUIBooleanInputEvent, UUIInputEvent, UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
 import { PropertyValueMap, css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
@@ -223,7 +226,7 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 		return html`
 			<uui-form>
 				<form @submit="${this.#onSubmit}">
-					<umb-workspace-editor alias="Umb.Workspace.PropertyType" headline="Property settings">
+					<umb-workspace-editor alias=${UMB_PROPERTY_TYPE_WORKSPACE_ALIAS} headline="Property settings">
 						<div id="content">
 							<uui-box>
 								<div class="container">
