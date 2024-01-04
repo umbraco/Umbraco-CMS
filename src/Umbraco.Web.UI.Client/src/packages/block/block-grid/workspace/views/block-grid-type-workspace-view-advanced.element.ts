@@ -50,12 +50,17 @@ export class UmbBlockTypeGridWorkspaceViewAdvancedElement extends UmbLitElement 
 		UmbTextStyles,
 		css`
 			:host {
-				display: block;
+				display: flex;
+				flex-wrap: wrap;
+				justify-content: space-between;
+				gap: var(--uui-size-layout-1);
 				margin: var(--uui-size-layout-1);
 				padding-bottom: var(--uui-size-layout-1); // To enforce some distance to the bottom of the scroll-container.
 			}
 			uui-box {
 				margin-top: var(--uui-size-layout-1);
+				flex: 1;
+				min-width: 600px;
 			}
 		`,
 	];

@@ -2,6 +2,8 @@ import { css, html, customElement, state } from '@umbraco-cms/backoffice/externa
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
+import { UmbInputNumberRangeElement } from '@umbraco-cms/backoffice/components';
 
 @customElement('umb-block-grid-type-workspace-view')
 export class UmbBlockTypeGridWorkspaceViewSettingsElement extends UmbLitElement implements UmbWorkspaceViewElement {
@@ -9,6 +11,51 @@ export class UmbBlockTypeGridWorkspaceViewSettingsElement extends UmbLitElement 
 
 	@state()
 	private _showSizeOptions = false;
+
+	@state()
+	private _rowMinSpan?: number;
+
+	@state()
+	private _rowMaxSpan?: number;
+
+	#datasetContext?: typeof UMB_PROPERTY_DATASET_CONTEXT.TYPE;
+
+	#onRowSpanChange(e: CustomEvent) {
+		this.#datasetContext?.setPropertyValue('rowMinSpan', (e.target as UmbInputNumberRangeElement).minValue);
+		this.#datasetContext?.setPropertyValue('rowMaxSpan', (e.target as UmbInputNumberRangeElement).maxValue);
+	}
+
+	constructor() {
+		super();
+		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, async (context) => {
+			this.#datasetContext = context;
+			// TODO set showSizeOption to true when rowMinSpan or rowMaxSpan is set
+			this.observe(
+				await context.propertyValueByAlias('columnSpanOptions'),
+				(value) => {
+					if (Array.isArray(value) && value.length > 0) {
+						this._showSizeOptions = true;
+					}
+					this.removeControllerByAlias('_observeColumnSpanOptions');
+				},
+				'_observeColumnSpanOptions',
+			);
+			this.observe(
+				await context.propertyValueByAlias<number | undefined>('rowMinSpan'),
+				(value) => {
+					this._rowMinSpan = value;
+				},
+				'_observeRowMinSpan',
+			);
+			this.observe(
+				await context.propertyValueByAlias<number | undefined>('rowMaxSpan'),
+				(value) => {
+					this._rowMaxSpan = value;
+				},
+				'_observeRowMaxSpan',
+			);
+		});
+	}
 
 	render() {
 		return html`
@@ -56,10 +103,14 @@ export class UmbBlockTypeGridWorkspaceViewSettingsElement extends UmbLitElement 
 					label=${this.localize.term('blockEditor_allowedBlockColumns')}
 					alias="columnSpanOptions"
 					property-editor-ui-alias="Umb.PropertyEditorUi.BlockGridColumnSpan"></umb-property>
-				<umb-property
-					label=${this.localize.term('blockEditor_allowedBlockRows')}
-					alias="availableRows"
-					property-editor-ui-alias="Umb.PropertyEditorUi.NumberRange"></umb-property>`;
+
+				<umb-property-layout label=${this.localize.term('blockEditor_allowedBlockRows')}>
+					<umb-input-number-range
+						slot="editor"
+						.minValue=${this._rowMinSpan}
+						.maxValue=${this._rowMaxSpan}
+						@change=${this.#onRowSpanChange}></umb-input-number-range>
+				</umb-property-layout> `;
 		} else {
 			return html`<div id="showOptions">
 				<uui-button
@@ -74,13 +125,17 @@ export class UmbBlockTypeGridWorkspaceViewSettingsElement extends UmbLitElement 
 		UmbTextStyles,
 		css`
 			:host {
-				display: block;
+				display: flex;
+				flex-wrap: wrap;
+				justify-content: space-between;
+				gap: var(--uui-size-layout-1);
 				margin: var(--uui-size-layout-1);
 				padding-bottom: var(--uui-size-layout-1); // To enforce some distance to the bottom of the scroll-container.
 			}
-
 			uui-box {
 				margin-top: var(--uui-size-layout-1);
+				flex: 1;
+				min-width: 600px;
 			}
 
 			#showOptions {
