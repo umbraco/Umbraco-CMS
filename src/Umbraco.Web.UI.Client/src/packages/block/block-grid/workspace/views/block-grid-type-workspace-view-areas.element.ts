@@ -24,16 +24,11 @@ export class UmbBlockTypeGridWorkspaceViewAreasElement extends UmbLitElement imp
 		UmbTextStyles,
 		css`
 			:host {
-				display: flex;
-				flex-wrap: wrap;
-				justify-content: space-between;
+				display: grid;
+				grid-template-columns: repeat(auto-fill, minmax(600px, 1fr));
 				gap: var(--uui-size-layout-1);
 				margin: var(--uui-size-layout-1);
 				padding-bottom: var(--uui-size-layout-1); // To enforce some distance to the bottom of the scroll-container.
-			}
-			uui-box {
-				flex: 1;
-				min-width: 600px;
 			}
 		`,
 	];
