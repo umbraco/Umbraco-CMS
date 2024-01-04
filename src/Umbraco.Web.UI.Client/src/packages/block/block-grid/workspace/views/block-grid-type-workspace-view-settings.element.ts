@@ -60,14 +60,12 @@ export class UmbBlockTypeGridWorkspaceViewSettingsElement extends UmbLitElement 
 				<umb-property
 					label=${this.localize.term('general_label')}
 					alias="label"
-					.value=${this._label}
 					property-editor-ui-alias="Umb.PropertyEditorUi.TextBox"
 					.config=${[this.#labelOnTopSetting]}></umb-property>
 				<umb-property
 					label=${this.localize.term('blockEditor_labelContentElementType')}
 					read-only
 					alias="contentElementTypeKey"
-					.value=${[this._contentElementTypeKey]}
 					property-editor-ui-alias="Umb.PropertyEditorUi.DocumentTypePicker"
 					.config=${[
 						{ alias: 'onlyPickElementTypes', value: true },
@@ -76,7 +74,6 @@ export class UmbBlockTypeGridWorkspaceViewSettingsElement extends UmbLitElement 
 				<umb-property
 					label=${this.localize.term('blockEditor_labelSettingsElementType')}
 					alias="settingsElementTypeKey"
-					.value=${[this._settingsElementTypeKey]}
 					property-editor-ui-alias="Umb.PropertyEditorUi.DocumentTypePicker"
 					.config=${[
 						{ alias: 'onlyPickElementTypes', value: true },

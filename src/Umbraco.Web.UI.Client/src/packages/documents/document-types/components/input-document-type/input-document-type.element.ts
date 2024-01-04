@@ -66,7 +66,6 @@ export class UmbInputDocumentTypeElement extends FormControlMixin(UmbLitElement)
 		return this.#pickerContext.getSelection();
 	}
 	public set selectedIds(ids: Array<string> | undefined) {
-		console.log('selectedIds', ids);
 		this.#pickerContext.setSelection(ids ?? []);
 	}
 
@@ -121,8 +120,7 @@ export class UmbInputDocumentTypeElement extends FormControlMixin(UmbLitElement)
 	}
 
 	#renderAddButton() {
-		//TODO: Why does it show length 1 (initially only) when array is empty?
-		//if (this.max > 0 && this.selectedIds.length >= this.max) return nothing;
+		if (this.max === 1 && this.selectedIds.length === 1) return nothing;
 		return html`<uui-button id="add-button" look="placeholder" @click=${this.#openPicker} label="open">
 			Add
 		</uui-button>`;
