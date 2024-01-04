@@ -7,12 +7,9 @@ import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
  * This is a very simplified workspace context, just to serve one for the imitated property type workspace. (As its not a real workspace)
  */
 export class UmbPropertyTypeWorkspaceContext extends UmbBaseController implements UmbWorkspaceContextInterface {
-	#id: string;
-
-	constructor(host: UmbControllerHostElement, id: string) {
+	constructor(host: UmbControllerHostElement) {
 		// TODO: We don't need a repo here, so maybe we should not require this of the UmbEditableWorkspaceContextBase
 		super(host, 'UmbWorkspaceContext');
-		this.#id = id;
 	}
 
 	get workspaceAlias() {
@@ -20,7 +17,7 @@ export class UmbPropertyTypeWorkspaceContext extends UmbBaseController implement
 	}
 
 	getEntityId() {
-		return this.#id;
+		return undefined;
 	}
 
 	getEntityType() {

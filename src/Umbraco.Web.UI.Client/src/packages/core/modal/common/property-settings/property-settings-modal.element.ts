@@ -49,6 +49,8 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 
 	protected _originalPropertyData!: UmbPropertySettingsModalValue;
 
+	#context = new UmbPropertyTypeWorkspaceContext(this);
+
 	connectedCallback(): void {
 		super.connectedCallback();
 
@@ -68,7 +70,6 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 		});
 
 		this._originalPropertyData = this.value;
-		new UmbPropertyTypeWorkspaceContext(this, this.value.id);
 
 		const regEx = this.value.validation?.regEx ?? null;
 		if (regEx) {
