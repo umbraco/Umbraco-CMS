@@ -23,7 +23,7 @@ test.describe('Telemetry tests', () => {
     // Assert
     // UI
     await umbracoUi.reloadPage();
-    await umbracoUi.telemetryData.doesTelemetryDataLevelHasValue(levelValue)
+    await umbracoUi.telemetryData.doesTelemetryDataLevelHaveValue(levelValue)
     // API
     expect(await umbracoApi.telemetry.getLevel() == expectedLevel).toBeTruthy();
   });
