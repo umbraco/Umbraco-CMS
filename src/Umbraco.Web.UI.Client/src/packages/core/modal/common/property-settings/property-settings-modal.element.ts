@@ -1,3 +1,4 @@
+import { UmbPropertyTypeWorkspaceContext } from './property-settings-modal.context.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UUIBooleanInputEvent, UUIInputEvent, UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
 import { PropertyValueMap, css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
@@ -10,7 +11,6 @@ import { generateAlias } from '@umbraco-cms/backoffice/utils';
 import { UMB_DOCUMENT_TYPE_DETAIL_STORE_CONTEXT } from '@umbraco-cms/backoffice/document-type';
 import { DocumentTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 // TODO: Could base take a token to get its types?.
-// TODO: Missing a workspace context... unless this should not be a workspace any way.
 @customElement('umb-property-settings-modal')
 export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 	UmbPropertySettingsModalData,
@@ -52,7 +52,8 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 	connectedCallback(): void {
 		super.connectedCallback();
 
-		// TODO: This is actually not good enough, we need to be able to get to the DOCUMENT_WORKSPACE_CONTEXT, so we can have a look at the draft/runtime version of the document. Otherwise 'Vary by culture' is first updated when saved.
+		// NEXT THING TO LOOK AT:
+		// TODO: This is actually not good enough, we need to be able to get to the DOCUMENT_TYPE_WORKSPACE_CONTEXT, so we can have a look at the draft/runtime version of the document. Otherwise 'Vary by culture' is first updated when saved.
 		this.consumeContext(UMB_DOCUMENT_TYPE_DETAIL_STORE_CONTEXT, (instance) => {
 			if (!this.data?.documentTypeId) return;
 
@@ -67,6 +68,7 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 		});
 
 		this._originalPropertyData = this.value;
+		new UmbPropertyTypeWorkspaceContext(this, this.value.id);
 
 		const regEx = this.value.validation?.regEx ?? null;
 		if (regEx) {
@@ -213,14 +215,14 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 		});
 	}
 
-	// TODO: This would conceptually be a Property Editor Workspace, should be changed at one point in the future.
+	// TODO: This would conceptually be a Property Type Workspace, should be changed at one point in the future.
 	// For now this is hacky made available by giving the element an fixed alias.
 	// This would allow for workspace views and workspace actions.
 	render() {
 		return html`
 			<uui-form>
 				<form @submit="${this.#onSubmit}">
-					<umb-workspace-editor alias="Umb.Workspace.PropertyEditor" headline="Property settings">
+					<umb-workspace-editor alias="Umb.Workspace.PropertyType" headline="Property settings">
 						<div id="content">
 							<uui-box>
 								<div class="container">
