@@ -2,6 +2,7 @@ import {
 	UMB_PROPERTY_TYPE_WORKSPACE_ALIAS,
 	UmbPropertyTypeWorkspaceContext,
 } from './property-settings-modal.context.js';
+import { UMB_DOCUMENT_TYPE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/document-type';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UUIBooleanInputEvent, UUIInputEvent, UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
 import { PropertyValueMap, css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
@@ -11,7 +12,6 @@ import {
 	UmbModalBaseElement,
 } from '@umbraco-cms/backoffice/modal';
 import { generateAlias } from '@umbraco-cms/backoffice/utils';
-import { UMB_DOCUMENT_TYPE_DETAIL_STORE_CONTEXT } from '@umbraco-cms/backoffice/document-type';
 import { DocumentTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 // TODO: Could base take a token to get its types?.
 @customElement('umb-property-settings-modal')
@@ -47,29 +47,24 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 
 	@state() private _aliasLocked = true;
 
-	@state()
-	protected _ownerDocumentType?: DocumentTypeResponseModel;
-
 	protected _originalPropertyData!: UmbPropertySettingsModalValue;
 
 	#context = new UmbPropertyTypeWorkspaceContext(this);
 
+	@state()
+	private _documentVariesByCulture?: boolean;
+
+	@state()
+	private _documentVariesBySegment?: boolean;
+
 	connectedCallback(): void {
 		super.connectedCallback();
 
-		// NEXT THING TO LOOK AT:
-		// TODO: This is actually not good enough, we need to be able to get to the DOCUMENT_TYPE_WORKSPACE_CONTEXT, so we can have a look at the draft/runtime version of the document. Otherwise 'Vary by culture' is first updated when saved.
-		this.consumeContext(UMB_DOCUMENT_TYPE_DETAIL_STORE_CONTEXT, (instance) => {
+		this.consumeContext(UMB_DOCUMENT_TYPE_WORKSPACE_CONTEXT, (instance) => {
 			if (!this.data?.documentTypeId) return;
 
-			this.observe(
-				instance.byId(this.data.documentTypeId),
-				(documentType) => {
-					this._ownerDocumentType = documentType;
-					this.requestUpdate('_ownerDocumentType');
-				},
-				'_observeDocumentType',
-			);
+			this.observe(instance.variesByCulture, (variesByCulture) => (this._documentVariesByCulture = variesByCulture));
+			this.observe(instance.variesBySegment, (variesBySegment) => (this._documentVariesBySegment = variesBySegment));
 		});
 
 		this._originalPropertyData = this.value;
@@ -357,10 +352,10 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 	}
 
 	#renderVariationControls() {
-		return this._ownerDocumentType?.variesByCulture || this._ownerDocumentType?.variesBySegment
+		return this._documentVariesByCulture || this._documentVariesBySegment
 			? html` <div class="container">
 						<b>Variation</b>
-						${this._ownerDocumentType?.variesByCulture ? this.#renderVaryByCulture() : ''}
+						${this._documentVariesByCulture ? this.#renderVaryByCulture() : ''}
 					</div>
 					<hr />`
 			: '';
