@@ -57,7 +57,7 @@ export class UmbSelectionManager extends UmbBaseController {
 	public setSelection(value: Array<string | null>) {
 		if (this.getSelectable() === false) return;
 		if (value === undefined) throw new Error('Value cannot be undefined');
-		const newSelection = this.getMultiple() ? value : value.length > 0 ? [value[0]] : value;
+		const newSelection = this.getMultiple() ? value : value.slice(0, 1);
 		this.#selection.next(newSelection);
 	}
 
