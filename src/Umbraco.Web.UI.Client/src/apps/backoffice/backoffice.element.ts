@@ -15,6 +15,7 @@ const CORE_PACKAGES = [
 	import('../../packages/core/umbraco-package.js'),
 	import('../../packages/settings/umbraco-package.js'),
 	import('../../packages/documents/umbraco-package.js'),
+	import('../../packages/relations/umbraco-package.js'),
 	import('../../packages/media/umbraco-package.js'),
 	import('../../packages/members/umbraco-package.js'),
 	import('../../packages/dictionary/umbraco-package.js'),
