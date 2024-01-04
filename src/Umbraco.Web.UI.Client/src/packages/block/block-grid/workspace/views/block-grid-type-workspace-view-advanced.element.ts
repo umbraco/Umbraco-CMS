@@ -7,12 +7,7 @@ import { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-regis
 export class UmbBlockTypeGridWorkspaceViewAdvancedElement extends UmbLitElement implements UmbWorkspaceViewElement {
 	render() {
 		return html`
-			<h5>GRID BLOCK ADVANCED View</h5>
-			<uui-box headline="Editor Appearance">
-				<umb-property
-					label="Label"
-					alias="label"
-					property-editor-ui-alias="Umb.PropertyEditorUi.TextBox"></umb-property>
+			<uui-box headline="Advanced">
 				<umb-property
 					label="Custom view"
 					alias="view"
@@ -25,38 +20,14 @@ export class UmbBlockTypeGridWorkspaceViewAdvancedElement extends UmbLitElement 
 					label="Overlay size"
 					alias="editorSize"
 					property-editor-ui-alias="Umb.PropertyEditorUi.OverlaySize"></umb-property>
-			</uui-box>
-			<uui-box headline="Data models">
-				<!-- TODO: implement readonly mode for umb-property -->
 				<umb-property
-					label="Content Model"
-					alias="contentElementTypeKey"
-					property-editor-ui-alias="Umb.PropertyEditorUi.DocumentTypePicker"
-					readonly
-					.config=${[
-						{
-							alias: 'validationLimit',
-							value: { min: 0, max: 1 },
-						},
-						{
-							alias: 'onlyPickElementTypes',
-							value: true,
-						},
-					]}></umb-property>
+					label="Inline editing"
+					alias="inlineEditing"
+					property-editor-ui-alias="Umb.PropertyEditorUi.Toggle"></umb-property>
 				<umb-property
-					label="Settings Model"
-					alias="settingsElementTypeKey"
-					property-editor-ui-alias="Umb.PropertyEditorUi.DocumentTypePicker"
-					.config=${[
-						{
-							alias: 'validationLimit',
-							value: { min: 0, max: 1 },
-						},
-						{
-							alias: 'onlyPickElementTypes',
-							value: true,
-						},
-					]}></umb-property>
+					label="Hide content editor"
+					alias="hideContentEditor"
+					property-editor-ui-alias="Umb.PropertyEditorUi.Toggle"></umb-property>
 			</uui-box>
 			<uui-box headline="Catalogue appearance">
 				<umb-property
@@ -68,8 +39,8 @@ export class UmbBlockTypeGridWorkspaceViewAdvancedElement extends UmbLitElement 
 					alias="iconColor"
 					property-editor-ui-alias="Umb.PropertyEditorUi.TextBox"></umb-property>
 				<umb-property
-					label="Custom stylesheet"
-					alias="stylesheet"
+					label="Thumbnail"
+					alias="thumbnail"
 					property-editor-ui-alias="Umb.PropertyEditorUi.StaticFilePicker"></umb-property>
 			</uui-box>
 		`;
@@ -85,16 +56,6 @@ export class UmbBlockTypeGridWorkspaceViewAdvancedElement extends UmbLitElement 
 			}
 			uui-box {
 				margin-top: var(--uui-size-layout-1);
-			}
-
-			uui-label,
-			umb-property-editor-ui-number {
-				display: block;
-			}
-
-			// TODO: is this necessary?
-			uui-toggle {
-				display: flex;
 			}
 		`,
 	];

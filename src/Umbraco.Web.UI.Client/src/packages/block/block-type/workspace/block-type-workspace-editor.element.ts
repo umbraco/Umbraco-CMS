@@ -50,7 +50,9 @@ export class UmbBlockTypeWorkspaceEditorElement extends UmbLitElement {
 	render() {
 		return this.workspaceAlias
 			? html`
-					<umb-workspace-editor alias=${this.workspaceAlias} headline="Configuration of '${this._name}'">
+					<umb-workspace-editor
+						alias=${this.workspaceAlias}
+						headline=${this.localize.term('blockEditor_blockConfigurationOverlayTitle', [this._name])}>
 					</umb-workspace-editor>
 			  `
 			: '';
