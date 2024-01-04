@@ -15,6 +15,9 @@ export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeBase
 	extends UmbEditableWorkspaceContextBase<never, BlockTypeData>
 	implements UmbInvariantableWorkspaceContextInterface
 {
+	// Just for context token safety:
+	public readonly IS_BLOCK_TYPE_WORKSPACE_CONTEXT = true;
+
 	#entityType: string;
 	#data = new UmbObjectState<BlockTypeData | undefined>(undefined);
 	readonly data = this.#data.asObservable();
@@ -122,5 +125,5 @@ export const UMB_BLOCK_TYPE_WORKSPACE_CONTEXT = new UmbContextToken<
 >(
 	'UmbWorkspaceContext',
 	undefined,
-	(context): context is UmbBlockTypeWorkspaceContext => context.getEntityType?.() === 'data-type',
+	(context): context is UmbBlockTypeWorkspaceContext => (context as any).IS_BLOCK_TYPE_WORKSPACE_CONTEXT,
 );

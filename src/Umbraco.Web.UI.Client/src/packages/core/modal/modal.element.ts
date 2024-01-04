@@ -52,8 +52,8 @@ export class UmbModalElement extends UmbLitElement {
 					// Note for this hack (The if-sentence):
 					// We do not currently have a good enough control to ensure that the proxy is last, meaning if another context is provided at this element, it might respond after the proxy event has been dispatched.
 					// To avoid such this hack just prevents proxying the event if its a request for the Modal Context.
-					if (event.apiAlias !== UMB_MODAL_CONTEXT_TOKEN.contextAlias) {
-						event.stopPropagation();
+					if (event.contextAlias !== UMB_MODAL_CONTEXT_TOKEN.contextAlias) {
+						event.stopImmediatePropagation();
 						const clonedEvent = new UmbContextRequestEventImplementation(
 							event.contextAlias,
 							event.apiAlias,
