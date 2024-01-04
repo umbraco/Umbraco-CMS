@@ -7,70 +7,15 @@ import { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-regis
 export class UmbBlockTypeGridWorkspaceViewAreasElement extends UmbLitElement implements UmbWorkspaceViewElement {
 	render() {
 		return html`
-			<h5>GRID BLOCK AREAS View</h5>
-			<uui-box headline="Editor Appearance">
+			<uui-box headline="Areas">
 				<umb-property
-					label="Label"
-					alias="label"
-					property-editor-ui-alias="Umb.PropertyEditorUi.TextBox"></umb-property>
+					label=${this.localize.term('blockEditor_areasLayoutColumns')}
+					alias="areasLayoutColumns"
+					property-editor-ui-alias="Umb.PropertyEditorUi.Number"></umb-property>
 				<umb-property
-					label="Custom view"
-					alias="view"
-					property-editor-ui-alias="Umb.PropertyEditorUi.StaticFilePicker"></umb-property>
-				<umb-property
-					label="Custom stylesheet"
-					alias="stylesheet"
-					property-editor-ui-alias="Umb.PropertyEditorUi.StaticFilePicker"></umb-property>
-				<umb-property
-					label="Overlay size"
-					alias="editorSize"
-					property-editor-ui-alias="Umb.PropertyEditorUi.OverlaySize"></umb-property>
-			</uui-box>
-			<uui-box headline="Data models">
-				<!-- TODO: implement readonly mode for umb-property -->
-				<umb-property
-					label="Content Model"
-					alias="contentElementTypeKey"
-					property-editor-ui-alias="Umb.PropertyEditorUi.DocumentTypePicker"
-					readonly
-					.config=${[
-						{
-							alias: 'validationLimit',
-							value: { min: 0, max: 1 },
-						},
-						{
-							alias: 'onlyPickElementTypes',
-							value: true,
-						},
-					]}></umb-property>
-				<umb-property
-					label="Settings Model"
-					alias="settingsElementTypeKey"
-					property-editor-ui-alias="Umb.PropertyEditorUi.DocumentTypePicker"
-					.config=${[
-						{
-							alias: 'validationLimit',
-							value: { min: 0, max: 1 },
-						},
-						{
-							alias: 'onlyPickElementTypes',
-							value: true,
-						},
-					]}></umb-property>
-			</uui-box>
-			<uui-box headline="Catalogue appearance">
-				<umb-property
-					label="Background color"
-					alias="backgroundColor"
-					property-editor-ui-alias="Umb.PropertyEditorUi.TextBox"></umb-property>
-				<umb-property
-					label="Icon color"
-					alias="iconColor"
-					property-editor-ui-alias="Umb.PropertyEditorUi.TextBox"></umb-property>
-				<umb-property
-					label="Custom stylesheet"
-					alias="stylesheet"
-					property-editor-ui-alias="Umb.PropertyEditorUi.StaticFilePicker"></umb-property>
+					label=${this.localize.term('blockEditor_areasConfigurations')}
+					alias="areas"
+					property-editor-ui-alias="Umb.PropertyEditorUi.BlockGridAreas"></umb-property>
 			</uui-box>
 		`;
 	}
@@ -85,16 +30,6 @@ export class UmbBlockTypeGridWorkspaceViewAreasElement extends UmbLitElement imp
 			}
 			uui-box {
 				margin-top: var(--uui-size-layout-1);
-			}
-
-			uui-label,
-			umb-property-editor-ui-number {
-				display: block;
-			}
-
-			// TODO: is this necessary?
-			uui-toggle {
-				display: flex;
 			}
 		`,
 	];

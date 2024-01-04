@@ -11,7 +11,7 @@ export class UmbPropertyEditorUIDocumentTypePickerElement extends UmbLitElement 
 		return this._value;
 	}
 	public set value(value: Array<string> | string | undefined) {
-		this._value = value ?? [];
+		this._value = value;
 	}
 	private _value?: Array<string> | string;
 
@@ -49,7 +49,11 @@ export class UmbPropertyEditorUIDocumentTypePickerElement extends UmbLitElement 
 			? html`
 					<umb-input-document-type
 						@change=${this._onChange}
-						.selectedIds=${this._multiPicker ? (this._value as Array<string>) ?? [] : [this._value as string]}
+						.selectedIds=${this._multiPicker
+							? (this._value as Array<string>) ?? []
+							: this._value
+							? [this._value as string]
+							: []}
 						.min=${this._limitMin ?? 0}
 						.max=${this._limitMax ?? Infinity}
 						.element-types-only=${this._onlyElementTypes}
