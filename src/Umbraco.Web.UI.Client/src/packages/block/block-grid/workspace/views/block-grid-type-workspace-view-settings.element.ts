@@ -11,7 +11,7 @@ export class UmbBlockTypeGridWorkspaceViewSettingsElement extends UmbLitElement 
 	#labelOnTopSetting = { alias: 'labelOnTop', value: true };
 
 	@state()
-	private _showSizeOptions = true;
+	private _showSizeOptions = false;
 
 	@state()
 	private _backgroundColor?: string;

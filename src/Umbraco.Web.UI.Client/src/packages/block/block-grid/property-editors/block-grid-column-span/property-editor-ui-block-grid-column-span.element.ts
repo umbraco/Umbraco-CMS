@@ -16,19 +16,12 @@ export class UmbPropertyEditorUIBlockGridColumnSpanElement extends UmbLitElement
 	@state()
 	private _maxColumns = 12;
 
-	@queryAll('div')
-	private _divs!: Array<HTMLElement>;
-
 	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		const maxColumns = config?.getValueByAlias('gridColumns');
 		if (typeof maxColumns === 'number') {
 			this._maxColumns = maxColumns;
 		}
-	}
-
-	private _onChange(event: CustomEvent) {
-		this.dispatchEvent(new CustomEvent('property-value-change'));
 	}
 
 	#pickColumn(index: number) {
@@ -40,6 +33,8 @@ export class UmbPropertyEditorUIBlockGridColumnSpanElement extends UmbLitElement
 		} else {
 			this.value = [...value, { columnSpan: index }];
 		}
+
+		this.dispatchEvent(new CustomEvent('property-value-change'));
 	}
 
 	render() {
