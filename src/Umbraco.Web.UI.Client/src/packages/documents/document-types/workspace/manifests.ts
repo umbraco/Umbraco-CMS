@@ -5,6 +5,8 @@ import type {
 	ManifestWorkspaceView,
 } from '@umbraco-cms/backoffice/extension-registry';
 
+export const UMB_DOCUMENT_TYPE_WORKSPACE_ALIAS = 'Umb.Workspace.DocumentType';
+
 const workspace: ManifestWorkspace = {
 	type: 'workspace',
 	alias: 'Umb.Workspace.DocumentType',
@@ -30,7 +32,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		conditions: [
 			{
 				alias: 'Umb.Condition.WorkspaceAlias',
-				match: workspace.alias,
+				match: UMB_DOCUMENT_TYPE_WORKSPACE_ALIAS,
 			},
 		],
 	},
@@ -48,7 +50,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		conditions: [
 			{
 				alias: 'Umb.Condition.WorkspaceAlias',
-				match: workspace.alias,
+				match: UMB_DOCUMENT_TYPE_WORKSPACE_ALIAS,
 			},
 		],
 	},
@@ -66,7 +68,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		conditions: [
 			{
 				alias: 'Umb.Condition.WorkspaceAlias',
-				match: workspace.alias,
+				match: UMB_DOCUMENT_TYPE_WORKSPACE_ALIAS,
 			},
 		],
 	},
@@ -84,7 +86,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		conditions: [
 			{
 				alias: 'Umb.Condition.WorkspaceAlias',
-				match: workspace.alias,
+				match: UMB_DOCUMENT_TYPE_WORKSPACE_ALIAS,
 			},
 		],
 	},
@@ -104,7 +106,7 @@ const workspaceActions: Array<ManifestWorkspaceAction> = [
 		conditions: [
 			{
 				alias: 'Umb.Condition.WorkspaceAlias',
-				match: workspace.alias,
+				match: UMB_DOCUMENT_TYPE_WORKSPACE_ALIAS,
 			},
 		],
 	},
