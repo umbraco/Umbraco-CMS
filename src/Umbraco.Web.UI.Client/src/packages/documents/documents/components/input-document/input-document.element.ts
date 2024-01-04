@@ -73,6 +73,10 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 
 	constructor() {
 		super();
+	}
+
+	connectedCallback() {
+		super.connectedCallback();
 
 		this.addValidator(
 			'rangeUnderflow',
