@@ -10,6 +10,51 @@ export class UmbBlockTypeGridWorkspaceViewSettingsElement extends UmbLitElement 
 	@state()
 	private _showSizeOptions = false;
 
+	@state()
+	private _rowMinSpan?: number;
+
+	@state()
+	private _rowMaxSpan?: number;
+
+	#datasetContext?: typeof UMB_PROPERTY_DATASET_CONTEXT.TYPE;
+
+	#onRowSpanChange(e: CustomEvent) {
+		this.#datasetContext?.setPropertyValue('rowMinSpan', (e.target as UmbInputNumberRangeElement).minValue);
+		this.#datasetContext?.setPropertyValue('rowMaxSpan', (e.target as UmbInputNumberRangeElement).maxValue);
+	}
+
+	constructor() {
+		super();
+		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, async (context) => {
+			this.#datasetContext = context;
+			// TODO set showSizeOption to true when rowMinSpan or rowMaxSpan is set
+			this.observe(
+				await context.propertyValueByAlias('columnSpanOptions'),
+				(value) => {
+					if (Array.isArray(value) && value.length > 0) {
+						this._showSizeOptions = true;
+					}
+					this.removeControllerByAlias('_observeColumnSpanOptions');
+				},
+				'_observeColumnSpanOptions',
+			);
+			this.observe(
+				await context.propertyValueByAlias<number | undefined>('rowMinSpan'),
+				(value) => {
+					this._rowMinSpan = value;
+				},
+				'_observeRowMinSpan',
+			);
+			this.observe(
+				await context.propertyValueByAlias<number | undefined>('rowMaxSpan'),
+				(value) => {
+					this._rowMaxSpan = value;
+				},
+				'_observeRowMaxSpan',
+			);
+		});
+	}
+
 	render() {
 		return html`
 			<uui-box headline=${this.localize.term('general_general')}>
@@ -56,10 +101,13 @@ export class UmbBlockTypeGridWorkspaceViewSettingsElement extends UmbLitElement 
 					label=${this.localize.term('blockEditor_allowedBlockColumns')}
 					alias="columnSpanOptions"
 					property-editor-ui-alias="Umb.PropertyEditorUi.BlockGridColumnSpan"></umb-property>
-				<umb-property
-					label=${this.localize.term('blockEditor_allowedBlockRows')}
-					alias="availableRows"
-					property-editor-ui-alias="Umb.PropertyEditorUi.NumberRange"></umb-property>`;
+				<umb-property-layout label=${this.localize.term('blockEditor_allowedBlockRows')}>
+					<umb-input-number-range
+						slot="editor"
+						.minValue=${this._rowMinSpan}
+						.maxValue=${this._rowMaxSpan}
+						@change=${this.#onRowSpanChange}></umb-input-number-range>
+				</umb-property-layout>`;
 		} else {
 			return html`<div id="showOptions">
 				<uui-button
