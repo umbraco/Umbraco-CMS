@@ -226,7 +226,6 @@ describe('UmbContextConsumer', () => {
 			});
 		});
 
-		/*
 		it('context api of same context alias will prevent request from propagating', (done) => {
 			const provider = new UmbContextProvider(document.body, testContextAlias, new UmbTestContextConsumerClass());
 			provider.hostConnected();
@@ -256,6 +255,34 @@ describe('UmbContextConsumer', () => {
 				localConsumer.hostDisconnected();
 				provider.hostDisconnected();
 			});
+		});
+
+		/*
+		it('context api of same context alias will not prevent request from propagating when set to XXXX', (done) => {
+			const provider = new UmbContextProvider(document.body, testContextAlias, new UmbTestContextConsumerClass());
+			provider.hostConnected();
+
+			const element = document.createElement('div');
+			document.body.appendChild(element);
+
+			const alternativeProvider = new UmbContextProvider(
+				element,
+				testContextAlias,
+				new UmbTestAlternativeContextConsumerClass(),
+			);
+			alternativeProvider.hostConnected();
+
+			const localConsumer = new UmbContextConsumer(
+				element,
+				new UmbContextToken(testContextAlias, undefined, discriminator),
+				(_instance) => {
+					expect(_instance.prop).to.eq('value from provider');
+					done();
+					localConsumer.hostDisconnected();
+					provider.hostDisconnected();
+				},
+			);
+			localConsumer.hostConnected();
 		});
 		*/
 	});
