@@ -31,6 +31,7 @@ export class UmbBlockGridTypeWorkspaceViewSettingsElement extends UmbLitElement 
 
 	constructor() {
 		super();
+
 		this.consumeContext(UMB_DATA_TYPE_WORKSPACE_CONTEXT, async (context) => {
 			this.observe(
 				await context.propertyValueByAlias<undefined | string>('gridColumns'),
@@ -40,6 +41,7 @@ export class UmbBlockGridTypeWorkspaceViewSettingsElement extends UmbLitElement 
 				'observeGridColumns',
 			);
 		}).exactMatch();
+
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, async (context) => {
 			this.#datasetContext = context;
 			// TODO set showSizeOption to true when rowMinSpan or rowMaxSpan is set
