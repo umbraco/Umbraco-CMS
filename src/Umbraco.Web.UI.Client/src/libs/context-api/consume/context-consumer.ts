@@ -59,10 +59,10 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 	/**
 	 * @public
 	 * @memberof UmbContextConsumer
-	 * @description Continue for an exact match of both context alias, api alias and discriminator.
+	 * @description Pass beyond any context aliases that matches this.
 	 * The default behavior is to stop at first Context Alias match, this is to avoid receiving unforeseen descending contexts.
 	 */
-	public exactMatch() {
+	public passContextAliasMatches() {
 		this.#stopAtContextMatch = false;
 	}
 

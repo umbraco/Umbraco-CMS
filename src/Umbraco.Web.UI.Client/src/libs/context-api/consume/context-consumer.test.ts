@@ -281,7 +281,7 @@ describe('UmbContextConsumer', () => {
 					provider.hostDisconnected();
 				},
 			);
-			localConsumer.exactMatch();
+			localConsumer.passContextAliasMatches();
 			localConsumer.hostConnected();
 		});
 	});

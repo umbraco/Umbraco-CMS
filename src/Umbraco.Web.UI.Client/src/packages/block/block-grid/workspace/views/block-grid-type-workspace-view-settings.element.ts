@@ -35,7 +35,7 @@ export class UmbBlockGridTypeWorkspaceViewSettingsElement extends UmbLitElement 
 				},
 				'observeGridColumns',
 			);
-		}).exactMatch();
+		}).passContextAliasMatches();
 
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, async (context) => {
 			this.#datasetContext = context;
