@@ -12,6 +12,7 @@ export interface UmbContextRequestEvent<ResultType = unknown> extends Event {
 	readonly apiAlias: string;
 	readonly callback: (context: ResultType) => boolean;
 	readonly stopAtContextMatch: boolean;
+	clone(): UmbContextRequestEvent<ResultType>;
 }
 
 /**
