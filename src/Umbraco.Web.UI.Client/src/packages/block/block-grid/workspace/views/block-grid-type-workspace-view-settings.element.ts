@@ -84,6 +84,7 @@ export class UmbBlockGridTypeWorkspaceViewSettingsElement extends UmbLitElement 
 					alias="label"
 					property-editor-ui-alias="Umb.PropertyEditorUi.TextBox"
 					.config=${[this.#labelOnTopSetting]}></umb-property>
+
 				<umb-property
 					label=${this.localize.term('blockEditor_labelContentElementType')}
 					read-only
@@ -93,6 +94,7 @@ export class UmbBlockGridTypeWorkspaceViewSettingsElement extends UmbLitElement 
 						{ alias: 'onlyPickElementTypes', value: true },
 						{ alias: 'validationLimit', value: { min: 0, max: 1 } },
 					]}></umb-property>
+
 				<umb-property
 					label=${this.localize.term('blockEditor_labelSettingsElementType')}
 					alias="settingsElementTypeKey"
@@ -107,6 +109,7 @@ export class UmbBlockGridTypeWorkspaceViewSettingsElement extends UmbLitElement 
 					label=${this.localize.term('blockEditor_allowBlockInRoot')}
 					alias="allowInRoot"
 					property-editor-ui-alias="Umb.PropertyEditorUi.Toggle"></umb-property>
+
 				<umb-property
 					label=${this.localize.term('blockEditor_allowBlockInAreas')}
 					alias="allowInAreas"
@@ -118,7 +121,8 @@ export class UmbBlockGridTypeWorkspaceViewSettingsElement extends UmbLitElement 
 
 	#renderSizeOptions() {
 		if (this._showSizeOptions) {
-			return html`<umb-property
+			return html`
+				<umb-property
 					label=${this.localize.term('blockEditor_allowedBlockColumns')}
 					alias="columnSpanOptions"
 					property-editor-ui-alias="Umb.PropertyEditorUi.BlockGridColumnSpan"
@@ -129,13 +133,15 @@ export class UmbBlockGridTypeWorkspaceViewSettingsElement extends UmbLitElement 
 							value: this._dataTypeGridColumns,
 						},
 					]}></umb-property>
+
 				<umb-property-layout label=${this.localize.term('blockEditor_allowedBlockRows')}>
 					<umb-input-number-range
 						slot="editor"
 						.minValue=${this._rowMinSpan}
 						.maxValue=${this._rowMaxSpan}
 						@change=${this.#onRowSpanChange}></umb-input-number-range>
-				</umb-property-layout>`;
+				</umb-property-layout>
+			`;
 		} else {
 			return html`<div id="showOptions">
 				<uui-button
