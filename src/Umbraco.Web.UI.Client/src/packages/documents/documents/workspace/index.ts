@@ -1,1 +1,1 @@
-export * from './document-workspace.context.js';
+export * from './document-workspace.context-token.js';
