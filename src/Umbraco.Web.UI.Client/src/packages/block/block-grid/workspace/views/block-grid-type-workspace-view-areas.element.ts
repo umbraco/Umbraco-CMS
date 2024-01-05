@@ -4,7 +4,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-block-grid-type-workspace-view-areas')
-export class UmbBlockTypeGridWorkspaceViewAreasElement extends UmbLitElement implements UmbWorkspaceViewElement {
+export class UmbBlockGridTypeWorkspaceViewAreasElement extends UmbLitElement implements UmbWorkspaceViewElement {
 	render() {
 		return html`
 			<uui-box headline="Areas">
@@ -34,10 +34,10 @@ export class UmbBlockTypeGridWorkspaceViewAreasElement extends UmbLitElement imp
 	];
 }
 
-export default UmbBlockTypeGridWorkspaceViewAreasElement;
+export default UmbBlockGridTypeWorkspaceViewAreasElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-block-grid-type-workspace-view-areas': UmbBlockTypeGridWorkspaceViewAreasElement;
+		'umb-block-grid-type-workspace-view-areas': UmbBlockGridTypeWorkspaceViewAreasElement;
 	}
 }

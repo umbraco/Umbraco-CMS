@@ -4,7 +4,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-block-list-type-workspace-view-settings')
-export class UmbBlockTypeListWorkspaceViewSettingsElement extends UmbLitElement implements UmbWorkspaceViewElement {
+export class UmbBlockListTypeWorkspaceViewSettingsElement extends UmbLitElement implements UmbWorkspaceViewElement {
 	render() {
 		return html`
 			<uui-box headline="Editor Appearance">
@@ -99,10 +99,10 @@ export class UmbBlockTypeListWorkspaceViewSettingsElement extends UmbLitElement 
 	];
 }
 
-export default UmbBlockTypeListWorkspaceViewSettingsElement;
+export default UmbBlockListTypeWorkspaceViewSettingsElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-block-list-type-workspace-view-settings': UmbBlockTypeListWorkspaceViewSettingsElement;
+		'umb-block-list-type-workspace-view-settings': UmbBlockListTypeWorkspaceViewSettingsElement;
 	}
 }

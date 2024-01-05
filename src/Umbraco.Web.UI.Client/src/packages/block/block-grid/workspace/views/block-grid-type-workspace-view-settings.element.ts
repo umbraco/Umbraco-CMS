@@ -7,7 +7,7 @@ import { UmbInputNumberRangeElement } from '@umbraco-cms/backoffice/components';
 import { UMB_DATA_TYPE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/data-type';
 
 @customElement('umb-block-grid-type-workspace-view')
-export class UmbBlockTypeGridWorkspaceViewSettingsElement extends UmbLitElement implements UmbWorkspaceViewElement {
+export class UmbBlockGridTypeWorkspaceViewSettingsElement extends UmbLitElement implements UmbWorkspaceViewElement {
 	#labelOnTopSetting = { alias: 'labelOnTop', value: true };
 
 	@state()
@@ -162,10 +162,10 @@ export class UmbBlockTypeGridWorkspaceViewSettingsElement extends UmbLitElement 
 	];
 }
 
-export default UmbBlockTypeGridWorkspaceViewSettingsElement;
+export default UmbBlockGridTypeWorkspaceViewSettingsElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-block-grid-type-workspace-view-settings': UmbBlockTypeGridWorkspaceViewSettingsElement;
+		'umb-block-grid-type-workspace-view-settings': UmbBlockGridTypeWorkspaceViewSettingsElement;
 	}
 }

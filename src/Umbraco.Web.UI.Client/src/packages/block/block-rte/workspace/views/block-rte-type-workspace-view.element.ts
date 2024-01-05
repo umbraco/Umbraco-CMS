@@ -4,7 +4,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-block-rte-type-workspace-view-settings')
-export class UmbBlockTypeRteWorkspaceViewSettingsElement extends UmbLitElement implements UmbWorkspaceViewElement {
+export class UmbBlockRteTypeWorkspaceViewSettingsElement extends UmbLitElement implements UmbWorkspaceViewElement {
 	render() {
 		return html`
 			<h5>for RTE blocks</h5>
@@ -100,10 +100,10 @@ export class UmbBlockTypeRteWorkspaceViewSettingsElement extends UmbLitElement i
 	];
 }
 
-export default UmbBlockTypeRteWorkspaceViewSettingsElement;
+export default UmbBlockRteTypeWorkspaceViewSettingsElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-block-rte-type-workspace-view-settings': UmbBlockTypeRteWorkspaceViewSettingsElement;
+		'umb-block-rte-type-workspace-view-settings': UmbBlockRteTypeWorkspaceViewSettingsElement;
 	}
 }

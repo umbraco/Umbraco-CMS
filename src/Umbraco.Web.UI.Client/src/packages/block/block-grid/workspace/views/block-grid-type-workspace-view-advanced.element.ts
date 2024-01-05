@@ -4,7 +4,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-block-grid-type-workspace-view-advanced')
-export class UmbBlockTypeGridWorkspaceViewAdvancedElement extends UmbLitElement implements UmbWorkspaceViewElement {
+export class UmbBlockGridTypeWorkspaceViewAdvancedElement extends UmbLitElement implements UmbWorkspaceViewElement {
 	render() {
 		return html`
 			<uui-box headline="Advanced">
@@ -60,10 +60,10 @@ export class UmbBlockTypeGridWorkspaceViewAdvancedElement extends UmbLitElement 
 	];
 }
 
-export default UmbBlockTypeGridWorkspaceViewAdvancedElement;
+export default UmbBlockGridTypeWorkspaceViewAdvancedElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-block-grid-type-workspace-view-advanced': UmbBlockTypeGridWorkspaceViewAdvancedElement;
+		'umb-block-grid-type-workspace-view-advanced': UmbBlockGridTypeWorkspaceViewAdvancedElement;
 	}
 }
