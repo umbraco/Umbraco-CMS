@@ -12,7 +12,6 @@ import {
 	UMB_CONTENT_REQUEST_EVENT_TYPE,
 	UmbContextProvider,
 	UmbContextRequestEvent,
-	UmbContextRequestEventImplementation,
 } from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-modal')
@@ -54,12 +53,7 @@ export class UmbModalElement extends UmbLitElement {
 					// To avoid such this hack just prevents proxying the event if its a request for the Modal Context.
 					if (event.contextAlias !== UMB_MODAL_CONTEXT_TOKEN.contextAlias) {
 						event.stopImmediatePropagation();
-						const clonedEvent = new UmbContextRequestEventImplementation(
-							event.contextAlias,
-							event.apiAlias,
-							event.callback,
-						);
-						this.#modalContext.originTarget.dispatchEvent(clonedEvent);
+						this.#modalContext.originTarget.dispatchEvent(event.clone());
 					}
 				}
 			}) as EventListener);

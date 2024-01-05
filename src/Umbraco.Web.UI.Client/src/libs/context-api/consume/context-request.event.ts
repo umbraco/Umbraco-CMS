@@ -11,6 +11,7 @@ export interface UmbContextRequestEvent<ResultType = unknown> extends Event {
 	readonly contextAlias: string;
 	readonly apiAlias: string;
 	readonly callback: (context: ResultType) => boolean;
+	clone(): UmbContextRequestEvent<ResultType>;
 }
 
 /**
@@ -29,6 +30,10 @@ export class UmbContextRequestEventImplementation<ResultType = unknown>
 		public readonly callback: (context: ResultType) => boolean,
 	) {
 		super(UMB_CONTENT_REQUEST_EVENT_TYPE, { bubbles: true, composed: true, cancelable: true });
+	}
+
+	clone() {
+		return new UmbContextRequestEventImplementation(this.contextAlias, this.apiAlias, this.callback);
 	}
 }
 
