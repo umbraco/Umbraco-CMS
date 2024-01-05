@@ -1,4 +1,4 @@
-import { html, customElement, property, css, state } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, css, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
@@ -14,13 +14,13 @@ export class UmbPropertyEditorUIBlockGridColumnSpanElement extends UmbLitElement
 	value: Array<BlockGridColumn> = [];
 
 	@state()
-	private _maxColumns = 12;
+	private _columnsArray = Array.from(Array(12).keys());
 
 	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
-		const maxColumns = config?.getValueByAlias('gridColumns');
+		const maxColumns = config?.getValueByAlias('maxColumns');
 		if (typeof maxColumns === 'number') {
-			this._maxColumns = maxColumns;
+			this._columnsArray = Array.from(Array(maxColumns).keys());
 		}
 	}
 
@@ -38,21 +38,25 @@ export class UmbPropertyEditorUIBlockGridColumnSpanElement extends UmbLitElement
 	}
 
 	render() {
-		const template = Array.from({ length: this._maxColumns }, (_, index) => {
-			const number = index + 1;
-			let classes = 'default';
+		const template = repeat(
+			this._columnsArray,
+			(index) => index,
+			(index) => {
+				const number = index + 1;
+				let classes = 'default';
 
-			if (this.value && this.value.length > 0) {
-				const applied = this.value.find((column) => column.columnSpan >= index);
-				const picked = this.value.find((column) => column.columnSpan === index);
-				classes = picked ? 'picked applied' : applied ? 'applied' : 'default';
-			}
+				if (this.value && this.value.length > 0) {
+					const applied = this.value.find((column) => column.columnSpan >= index);
+					const picked = this.value.find((column) => column.columnSpan === index);
+					classes = picked ? 'picked applied' : applied ? 'applied' : 'default';
+				}
 
-			return html`<div class="${classes}" data-index=${index}>
-				<span>${number}</span>
-				<button type="button" aria-label=${number} @click=${() => this.#pickColumn(index)}></button>
-			</div>`;
-		});
+				return html`<div class="${classes}" data-index=${index}>
+					<span>${number}</span>
+					<button type="button" aria-label=${number} @click=${() => this.#pickColumn(index)}></button>
+				</div>`;
+			},
+		);
 
 		return html`<div id="wrapper">${template}</div>`;
 	}

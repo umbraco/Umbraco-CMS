@@ -4,6 +4,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import { UmbInputNumberRangeElement } from '@umbraco-cms/backoffice/components';
+import { UMB_DATA_TYPE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/data-type';
 
 @customElement('umb-block-grid-type-workspace-view')
 export class UmbBlockTypeGridWorkspaceViewSettingsElement extends UmbLitElement implements UmbWorkspaceViewElement {
@@ -18,6 +19,9 @@ export class UmbBlockTypeGridWorkspaceViewSettingsElement extends UmbLitElement 
 	@state()
 	private _rowMaxSpan?: number;
 
+	@state()
+	private _dataTypeGridColumns?: number;
+
 	#datasetContext?: typeof UMB_PROPERTY_DATASET_CONTEXT.TYPE;
 
 	#onRowSpanChange(e: CustomEvent) {
@@ -27,6 +31,15 @@ export class UmbBlockTypeGridWorkspaceViewSettingsElement extends UmbLitElement 
 
 	constructor() {
 		super();
+		this.consumeContext(UMB_DATA_TYPE_WORKSPACE_CONTEXT, async (context) => {
+			this.observe(
+				await context.propertyValueByAlias<undefined | string>('gridColumns'),
+				(value) => {
+					this._dataTypeGridColumns = value ? parseInt(value, 10) : undefined;
+				},
+				'observeGridColumns',
+			);
+		}).exactMatch();
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, async (context) => {
 			this.#datasetContext = context;
 			// TODO set showSizeOption to true when rowMinSpan or rowMaxSpan is set
@@ -38,21 +51,21 @@ export class UmbBlockTypeGridWorkspaceViewSettingsElement extends UmbLitElement 
 					}
 					this.removeControllerByAlias('_observeColumnSpanOptions');
 				},
-				'_observeColumnSpanOptions',
+				'observeColumnSpanOptions',
 			);
 			this.observe(
 				await context.propertyValueByAlias<number | undefined>('rowMinSpan'),
 				(value) => {
 					this._rowMinSpan = value;
 				},
-				'_observeRowMinSpan',
+				'observeRowMinSpan',
 			);
 			this.observe(
 				await context.propertyValueByAlias<number | undefined>('rowMaxSpan'),
 				(value) => {
 					this._rowMaxSpan = value;
 				},
-				'_observeRowMaxSpan',
+				'observeRowMaxSpan',
 			);
 		});
 	}
@@ -102,7 +115,14 @@ export class UmbBlockTypeGridWorkspaceViewSettingsElement extends UmbLitElement 
 			return html`<umb-property
 					label=${this.localize.term('blockEditor_allowedBlockColumns')}
 					alias="columnSpanOptions"
-					property-editor-ui-alias="Umb.PropertyEditorUi.BlockGridColumnSpan"></umb-property>
+					property-editor-ui-alias="Umb.PropertyEditorUi.BlockGridColumnSpan"
+					data-test-attr="${this._dataTypeGridColumns + ' '}"
+					.config=${[
+						{
+							alias: 'maxColumns',
+							value: this._dataTypeGridColumns,
+						},
+					]}></umb-property>
 				<umb-property-layout label=${this.localize.term('blockEditor_allowedBlockRows')}>
 					<umb-input-number-range
 						slot="editor"
