@@ -1,27 +1,15 @@
-import { css, html, nothing, repeat, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
+import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-interface HistoryNode {
-	userId?: number;
-	userAvatars?: [];
-	userName?: string;
-	timestamp?: string;
-	comment?: string;
-	entityType?: string;
-	logType?: HistoryLogType;
-	nodeId?: string;
-	parameters?: string;
-}
-
-type HistoryLogType = 'Publish' | 'Save' | 'Unpublish' | 'ContentVersionEnableCleanup' | 'ContentVersionPreventCleanup';
+import './history/document-info-history-workspace-view.element.js';
 
 @customElement('umb-document-info-workspace-view')
 export class UmbDocumentInfoWorkspaceViewElement extends UmbLitElement {
-	@state()
-	private _historyList: HistoryNode[] = [
+	/** Dont delete, need for mock data */
+	/*@state()
+	private _historyList: [] = [
 		{
 			userId: -1,
 			userAvatars: [],
@@ -79,13 +67,7 @@ export class UmbDocumentInfoWorkspaceViewElement extends UmbLitElement {
 			nodeId: '1058',
 			parameters: undefined,
 		},
-	];
-
-	@state()
-	private _total?: number;
-
-	@state()
-	private _currentPage = 1;
+	];*/
 
 	@state()
 	private _nodeName = '';
@@ -94,7 +76,6 @@ export class UmbDocumentInfoWorkspaceViewElement extends UmbLitElement {
 	private _documentTypeId = '';
 
 	private _workspaceContext?: typeof UMB_WORKSPACE_CONTEXT.TYPE;
-	private itemsPerPage = 10;
 
 	@state()
 	private _editDocumentTypePath = '';
@@ -130,27 +111,14 @@ export class UmbDocumentInfoWorkspaceViewElement extends UmbLitElement {
 		*/
 	}
 
-	#onPageChange(event: UUIPaginationEvent) {
-		if (this._currentPage === event.target.current) return;
-		this._currentPage = event.target.current;
-		//TODO: Run endpoint to get next history parts
-	}
-
 	render() {
 		return html`<div class="container">
 				<uui-box headline=${this.localize.term('general_links')} style="--uui-box-default-padding: 0;">
 					${this.#renderLinksSection()}
 				</uui-box>
-				<uui-box headline=${this.localize.term('general_history')}>
-					<umb-history-list>
-						${repeat(
-							this._historyList,
-							(item) => item.timestamp,
-							(item) => this.#renderHistory(item),
-						)}
-					</umb-history-list>
-					${this.#renderHistoryPagination()}
-				</uui-box>
+
+				<umb-document-info-history-workspace-view
+					.documentUnique=${this._documentTypeId}></umb-document-info-history-workspace-view>
 			</div>
 			<div class="container">
 				<uui-box headline="General" id="general-section">${this.#renderGeneralSection()}</uui-box>
@@ -158,7 +126,6 @@ export class UmbDocumentInfoWorkspaceViewElement extends UmbLitElement {
 	}
 
 	#renderLinksSection() {
-		//repeat
 		return html`<div id="link-section">
 			<a href="http://google.com" target="_blank" class="link-item with-href">
 				<span class="link-language">da-DK</span>
@@ -175,102 +142,32 @@ export class UmbDocumentInfoWorkspaceViewElement extends UmbLitElement {
 		return html`
 			<div class="general-item">
 				<strong>${this.localize.term('content_publishStatus')}</strong>
-				<span
-					><uui-tag color="positive" look="primary" label=${this.localize.term('content_published')}
-						><umb-localize key="content_published"></umb-localize></uui-tag
-				></span>
+				<span>
+					<uui-tag color="positive" look="primary" label=${this.localize.term('content_published')}>
+						<umb-localize key="content_published"></umb-localize>
+					</uui-tag>
+				</span>
 			</div>
 			<div class="general-item">
 				<strong><umb-localize key="content_createDate"></umb-localize></strong>
-				<span><umb-localize-date date="${new Date()}"></umb-localize-date></span>
+				<span><umb-localize-date .date="${new Date()}"></umb-localize-date></span>
 			</div>
 			<div class="general-item">
 				<strong><umb-localize key="content_documentType"></umb-localize></strong>
 				<uui-button
+					look="secondary"
 					href=${this._editDocumentTypePath + 'edit/' + this._documentTypeId}
 					label=${this.localize.term('general_edit')}></uui-button>
 			</div>
 			<div class="general-item">
 				<strong><umb-localize key="template_template"></umb-localize></strong>
-				<span>IMPLEMENT template picker?</span>
+				<uui-button look="secondary" label="Template picker TODO"></uui-button>
 			</div>
 			<div class="general-item">
 				<strong><umb-localize key="template_id"></umb-localize></strong>
-				<span>...</span>
+				<span>${this._documentTypeId}</span>
 			</div>
 		`;
-	}
-
-	#renderHistory(history: HistoryNode) {
-		return html` <umb-history-item .name="${history.userName}" .detail="${this.localize.date(history.timestamp!)}">
-			<span class="log-type"
-				>${this.#renderTag(history.logType)} ${this.#renderTagDescription(history.logType, history)}</span
-			>
-			<uui-button label=${this.localize.term('actions_rollback')} look="secondary" slot="actions">
-				<uui-icon name="icon-undo"></uui-icon>
-				<umb-localize key="actions_rollback"></umb-localize>
-			</uui-button>
-		</umb-history-item>`;
-	}
-
-	#renderHistoryPagination() {
-		if (!this._total) return nothing;
-
-		const totalPages = Math.ceil(this._total / this.itemsPerPage);
-
-		if (totalPages <= 1) return nothing;
-
-		return html`<div class="pagination">
-			<uui-pagination .total=${totalPages} @change="${this.#onPageChange}"></uui-pagination>
-		</div>`;
-	}
-
-	#renderTag(type?: HistoryLogType) {
-		switch (type) {
-			case 'Publish':
-				return html`<uui-tag look="primary" color="positive" label=${this.localize.term('content_publish')}
-					><umb-localize key="content_publish"></umb-localize
-				></uui-tag>`;
-			case 'Unpublish':
-				return html`<uui-tag look="primary" color="warning" label=${this.localize.term('content_unpublish')}
-					><umb-localize key="content_unpublish"></umb-localize
-				></uui-tag>`;
-			case 'Save':
-				return html`<uui-tag look="primary" label=${this.localize.term('auditTrails_smallSave')}
-					><umb-localize key="auditTrails_smallSave"></umb-localize
-				></uui-tag>`;
-			case 'ContentVersionEnableCleanup':
-				return html`<uui-tag
-					look="secondary"
-					label=${this.localize.term('contentTypeEditor_historyCleanupEnableCleanup')}
-					><umb-localize key="contentTypeEditor_historyCleanupEnableCleanup"></umb-localize
-				></uui-tag>`;
-			case 'ContentVersionPreventCleanup':
-				return html`<uui-tag
-					look="secondary"
-					label=${this.localize.term('contentTypeEditor_historyCleanupPreventCleanup')}
-					><umb-localize key="contentTypeEditor_historyCleanupPreventCleanup"></umb-localize
-				></uui-tag>`;
-			default:
-				return 'Could not detect log type';
-		}
-	}
-
-	#renderTagDescription(type?: HistoryLogType, params?: HistoryNode) {
-		switch (type) {
-			case 'Publish':
-				return this.localize.term('auditTrails_publish');
-			case 'Unpublish':
-				return this.localize.term('auditTrails_unpublish');
-			case 'Save':
-				return this.localize.term('auditTrails_save');
-			case 'ContentVersionEnableCleanup':
-				return this.localize.term('auditTrails_contentversionenablecleanup', [params?.nodeId]);
-			case 'ContentVersionPreventCleanup':
-				return this.localize.term('auditTrails_contentversionpreventcleanup', [params?.nodeId]);
-			default:
-				return 'Could not detect log type';
-		}
 	}
 
 	static styles = [
@@ -341,25 +238,6 @@ export class UmbDocumentInfoWorkspaceViewElement extends UmbLitElement {
 
 			.link-item.with-href:hover {
 				background: var(--uui-color-divider);
-			}
-
-			//History section
-
-			uui-tag uui-icon {
-				margin-right: var(--uui-size-space-1);
-			}
-
-			.log-type {
-				display: flex;
-				gap: var(--uui-size-space-2);
-			}
-			uui-pagination {
-				display: inline-block;
-			}
-			.pagination {
-				display: flex;
-				justify-content: center;
-				margin-top: var(--uui-size-space-4);
 			}
 		`,
 	];

@@ -43,11 +43,11 @@ export class UmbHistoryItemElement extends UmbLitElement {
 				gap: calc(2 * var(--uui-size-space-5));
 				align-items: center;
 			}
+
 			.slots-wrapper {
 				display: flex;
 				justify-content: space-between;
 				align-items: center;
-				flex: 1;
 			}
 
 			slot[name='actions'] {

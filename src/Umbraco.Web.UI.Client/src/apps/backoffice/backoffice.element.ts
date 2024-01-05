@@ -12,6 +12,7 @@ import './components/index.js';
 
 // TODO: temp solution to load core packages
 const CORE_PACKAGES = [
+	import('../../packages/audit-log/umbraco-package.js'),
 	import('../../packages/core/umbraco-package.js'),
 	import('../../packages/settings/umbraco-package.js'),
 	import('../../packages/documents/umbraco-package.js'),
