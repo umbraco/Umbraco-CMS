@@ -24,6 +24,10 @@ describe('UmbContextRequestEvent', () => {
 		expect(event.callback).to.eq(contextRequestCallback);
 	});
 
+	it('has stopAtContextMatch, which defaults to true', () => {
+		expect(event.stopAtContextMatch).to.eq(true);
+	});
+
 	it('bubbles', () => {
 		expect(event.bubbles).to.be.true;
 	});

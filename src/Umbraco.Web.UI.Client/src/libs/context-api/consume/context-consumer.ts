@@ -13,6 +13,7 @@ import { UmbContextRequestEventImplementation, UmbContextCallback } from './cont
  */
 export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType = BaseType> {
 	#skipOrigin?: boolean;
+	#stopAtContextMatch = true;
 	#callback?: UmbContextCallback<ResultType>;
 	#promise?: Promise<ResultType>;
 	#promiseResolver?: (instance: ResultType) => void;
@@ -53,6 +54,16 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 	 */
 	public skipOrigin() {
 		this.#skipOrigin = true;
+	}
+
+	/**
+	 * @public
+	 * @memberof UmbContextConsumer
+	 * @description Continue for an exact match of both context alias, api alias and discriminator.
+	 * The default behavior is to stop at first Context Alias match, this is to avoid receiving unforeseen descending contexts.
+	 */
+	public exactMatch() {
+		this.#stopAtContextMatch = false;
 	}
 
 	protected _onResponse = (instance: BaseType): boolean => {
@@ -101,7 +112,12 @@ export class UmbContextConsumer<BaseType = unknown, ResultType extends BaseType 
 	 * @description Request the context from the host element.
 	 */
 	public request() {
-		const event = new UmbContextRequestEventImplementation(this.#contextAlias, this.#apiAlias, this._onResponse);
+		const event = new UmbContextRequestEventImplementation(
+			this.#contextAlias,
+			this.#apiAlias,
+			this._onResponse,
+			this.#stopAtContextMatch,
+		);
 		(this.#skipOrigin ? this.element.parentNode : this.element)?.dispatchEvent(event);
 	}
 

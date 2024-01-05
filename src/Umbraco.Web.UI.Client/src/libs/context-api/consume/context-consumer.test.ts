@@ -164,12 +164,14 @@ describe('UmbContextConsumer', () => {
 			return typeof (instance as any).notExistingProp === 'string';
 		}
 
-		it('discriminator determines the instance type', async () => {
+		it('discriminator determines the instance type', (done) => {
 			const localConsumer = new UmbContextConsumer(
 				document.body,
 				new UmbContextToken(testContextAlias, undefined, discriminator),
 				(instance: A) => {
-					console.log(instance);
+					expect(instance.prop).to.eq('value from provider');
+					done();
+					localConsumer.destroy();
 				},
 			);
 			localConsumer.hostConnected();
@@ -178,8 +180,6 @@ describe('UmbContextConsumer', () => {
 			type TestType = Exclude<typeof localConsumer.instance, undefined> extends A ? true : never;
 			const test: TestType = true;
 			expect(test).to.be.true;
-
-			localConsumer.destroy();
 		});
 
 		it('approving discriminator still fires callback', (done) => {
@@ -257,8 +257,7 @@ describe('UmbContextConsumer', () => {
 			});
 		});
 
-		/*
-		it('context api of same context alias will not prevent request from propagating when set to XXXX', (done) => {
+		it('context api of same context alias will NOT prevent request from propagating when set to exactMatch', (done) => {
 			const provider = new UmbContextProvider(document.body, testContextAlias, new UmbTestContextConsumerClass());
 			provider.hostConnected();
 
@@ -282,8 +281,8 @@ describe('UmbContextConsumer', () => {
 					provider.hostDisconnected();
 				},
 			);
+			localConsumer.exactMatch();
 			localConsumer.hostConnected();
 		});
-		*/
 	});
 });

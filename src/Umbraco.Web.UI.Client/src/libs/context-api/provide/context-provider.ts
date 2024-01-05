@@ -59,8 +59,10 @@ export class UmbContextProvider<BaseType = unknown, ResultType extends BaseType 
 	#handleContextRequest = ((event: UmbContextRequestEvent) => {
 		if (event.contextAlias !== this.#contextAlias) return;
 
-		// Since the alias matches, we will stop it from bubbling further up. But we still allow it to ask the other Contexts of the element. Hence not calling `event.stopImmediatePropagation();`
-		event.stopPropagation();
+		if (event.stopAtContextMatch) {
+			// Since the alias matches, we will stop it from bubbling further up. But we still allow it to ask the other Contexts of the element. Hence not calling `event.stopImmediatePropagation();`
+			event.stopPropagation();
+		}
 
 		// First and importantly, check that the apiAlias matches and then call the callback. If that returns true then we can stop the event completely.
 		if (this.#apiAlias === event.apiAlias && event.callback(this.#instance)) {
