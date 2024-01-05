@@ -4,7 +4,6 @@ import { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import {
 	UmbInvariantableWorkspaceContextInterface,
 	UmbEditableWorkspaceContextBase,
-	UmbWorkspaceContextInterface,
 	UmbInvariantWorkspacePropertyDatasetContext,
 } from '@umbraco-cms/backoffice/workspace';
 import {
@@ -14,7 +13,6 @@ import {
 	UmbStringState,
 } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerHost, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { combineLatest, map } from '@umbraco-cms/backoffice/external/rxjs';
 import {
 	PropertyEditorConfigDefaultData,
@@ -295,12 +293,3 @@ export class UmbDataTypeWorkspaceContext
 		this.#data.destroy();
 	}
 }
-
-export const UMB_DATA_TYPE_WORKSPACE_CONTEXT = new UmbContextToken<
-	UmbWorkspaceContextInterface,
-	UmbDataTypeWorkspaceContext
->(
-	'UmbWorkspaceContext',
-	undefined,
-	(context): context is UmbDataTypeWorkspaceContext => context.getEntityType?.() === 'data-type',
-);
