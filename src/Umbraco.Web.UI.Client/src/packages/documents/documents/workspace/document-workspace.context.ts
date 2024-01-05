@@ -5,7 +5,6 @@ import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
 import {
-	UmbSaveableWorkspaceContextInterface,
 	UmbEditableWorkspaceContextBase,
 	UmbWorkspaceSplitViewManager,
 	UmbVariantableWorkspaceContextInterface,
@@ -19,7 +18,6 @@ import {
 	UmbObserverController,
 } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerHost, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 type EntityType = DocumentResponseModel;
 export class UmbDocumentWorkspaceContext
