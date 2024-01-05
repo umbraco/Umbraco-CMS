@@ -56,7 +56,7 @@ export class UmbPropertyEditorUIDocumentTypePickerElement extends UmbLitElement 
 							: []}
 						.min=${this._limitMin ?? 0}
 						.max=${this._limitMax ?? Infinity}
-						.element-types-only=${this._onlyElementTypes}
+						.elementTypesOnly=${this._onlyElementTypes ?? false}
 						>Add</umb-input-document-type
 					>
 			  `
