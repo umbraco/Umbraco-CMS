@@ -2,6 +2,8 @@ import { css, html, customElement, state } from '@umbraco-cms/backoffice/externa
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
+import { UmbInputNumberRangeElement } from '@umbraco-cms/backoffice/components';
 
 @customElement('umb-block-grid-type-workspace-view')
 export class UmbBlockTypeGridWorkspaceViewSettingsElement extends UmbLitElement implements UmbWorkspaceViewElement {
@@ -122,13 +124,11 @@ export class UmbBlockTypeGridWorkspaceViewSettingsElement extends UmbLitElement 
 		UmbTextStyles,
 		css`
 			:host {
-				display: block;
+				display: grid;
+				grid-template-columns: repeat(auto-fill, minmax(600px, 1fr));
+				gap: var(--uui-size-layout-1);
 				margin: var(--uui-size-layout-1);
 				padding-bottom: var(--uui-size-layout-1); // To enforce some distance to the bottom of the scroll-container.
-			}
-
-			uui-box {
-				margin-top: var(--uui-size-layout-1);
 			}
 
 			#showOptions {

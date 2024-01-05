@@ -34,7 +34,7 @@ export class UmbInputBlockTypeElement<BlockType extends UmbBlockTypeBase = UmbBl
 			this.#blockTypeWorkspaceModalRegistration = new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
 				.addAdditionalPath(entityType)
 				.onSetup(() => {
-					return { data: { entityType: entityType, preset: {} } };
+					return { data: { entityType: entityType, preset: {} }, modal: { size: 'large' } };
 				})
 				.observeRouteBuilder((routeBuilder) => {
 					const newpath = routeBuilder({});

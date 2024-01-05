@@ -13,7 +13,7 @@ export class UmbInputDocumentTypeElement extends FormControlMixin(UmbLitElement)
 	 * @attr
 	 * @default false
 	 */
-	@property({ type: Boolean, attribute: 'element-types-only' })
+	@property({ type: Boolean })
 	elementTypesOnly: boolean = false;
 
 	/**
