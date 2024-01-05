@@ -38,4 +38,24 @@ export class UmbRelationServerDataSource {
 			}),
 		);
 	}
+
+	/**
+	 * Fetches relations by the given id from the server
+	 * @param {string} childId
+	 * @return {*}
+	 * @memberof UmbRelationServerDataSource
+	 */
+	async readChildRelations(childId: string, relationTypeAlias?: string) {
+		if (!childId) {
+			throw new Error('Id is missing');
+		}
+
+		return tryExecuteAndNotify(
+			this.#host,
+			RelationResource.getRelationChildRelationByChildId({
+				childId,
+				relationTypeAlias,
+			}),
+		);
+	}
 }

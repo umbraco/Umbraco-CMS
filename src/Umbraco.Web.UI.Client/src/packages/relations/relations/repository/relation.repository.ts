@@ -36,4 +36,18 @@ export class UmbRelationRepository extends UmbBaseController implements UmbApi {
 
 		return { data, error };
 	}
+
+	async requestChildRelationById(childId: string, relationTypeAlias?: string) {
+		await this.#init;
+
+		// TODO: should we show a notification if the id is missing?
+		// Investigate what is best for Acceptance testing, cause in that perspective a thrown error might be the best choice?
+		if (!childId) {
+			throw new Error('Id is missing');
+		}
+
+		const { data, error } = await this.#detailDataSource.readChildRelations(childId, relationTypeAlias);
+
+		return { data, error };
+	}
 }
