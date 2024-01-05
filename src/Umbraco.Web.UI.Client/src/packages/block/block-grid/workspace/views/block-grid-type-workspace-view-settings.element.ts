@@ -24,11 +24,6 @@ export class UmbBlockGridTypeWorkspaceViewSettingsElement extends UmbLitElement 
 
 	#datasetContext?: typeof UMB_PROPERTY_DATASET_CONTEXT.TYPE;
 
-	#onRowSpanChange(e: CustomEvent) {
-		this.#datasetContext?.setPropertyValue('rowMinSpan', (e.target as UmbInputNumberRangeElement).minValue);
-		this.#datasetContext?.setPropertyValue('rowMaxSpan', (e.target as UmbInputNumberRangeElement).maxValue);
-	}
-
 	constructor() {
 		super();
 
@@ -74,6 +69,11 @@ export class UmbBlockGridTypeWorkspaceViewSettingsElement extends UmbLitElement 
 				'observeRowMaxSpan',
 			);
 		});
+	}
+
+	#onRowSpanChange(e: CustomEvent) {
+		this.#datasetContext?.setPropertyValue('rowMinSpan', (e.target as UmbInputNumberRangeElement).minValue);
+		this.#datasetContext?.setPropertyValue('rowMaxSpan', (e.target as UmbInputNumberRangeElement).maxValue);
 	}
 
 	render() {
