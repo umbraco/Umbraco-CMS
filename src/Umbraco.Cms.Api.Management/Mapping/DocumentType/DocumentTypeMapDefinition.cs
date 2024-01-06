@@ -10,10 +10,13 @@ namespace Umbraco.Cms.Api.Management.Mapping.DocumentType;
 public class DocumentTypeMapDefinition : ContentTypeMapDefinition<IContentType, DocumentTypePropertyTypeResponseModel, DocumentTypePropertyTypeContainerResponseModel>, IMapDefinition
 {
     public void DefineMaps(IUmbracoMapper mapper)
-        => mapper.Define<IContentType, DocumentTypeResponseModel>((_, _) => new DocumentTypeResponseModel(), Map);
+    {
+        mapper.Define<IContentType, DocumentTypeResponseModel>((_, _) => new DocumentTypeResponseModel(), Map);
+        mapper.Define<IContentType, DocumentTypeReferenceResponseModel>((_, _) => new DocumentTypeReferenceResponseModel(), Map);
+        mapper.Define<ISimpleContentType, DocumentTypeReferenceResponseModel>((_, _) => new DocumentTypeReferenceResponseModel(), Map);
+    }
 
-    // TODO: ParentId
-    // Umbraco.Code.MapAll -ParentId
+    // Umbraco.Code.MapAll
     private void Map(IContentType source, DocumentTypeResponseModel target, MapperContext context)
     {
         target.Id = source.Key;
@@ -46,5 +49,21 @@ public class DocumentTypeMapDefinition : ContentTypeMapDefinition<IContentType, 
                 KeepLatestVersionPerDayForDays = source.HistoryCleanup.KeepLatestVersionPerDayForDays
             };
         }
+    }
+
+    // Umbraco.Code.MapAll
+    private void Map(IContentType source, DocumentTypeReferenceResponseModel target, MapperContext context)
+    {
+        target.Id = source.Key;
+        target.Icon = source.Icon ?? string.Empty;
+        target.HasListView = source.IsContainer;
+    }
+
+    // Umbraco.Code.MapAll
+    private void Map(ISimpleContentType source, DocumentTypeReferenceResponseModel target, MapperContext context)
+    {
+        target.Id = source.Key;
+        target.Icon = source.Icon ?? string.Empty;
+        target.HasListView = source.IsContainer;
     }
 }

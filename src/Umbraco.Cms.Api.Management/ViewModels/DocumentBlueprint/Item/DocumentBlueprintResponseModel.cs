@@ -2,6 +2,6 @@
 
 namespace Umbraco.Cms.Api.Management.ViewModels.DocumentBlueprint.Item;
 
-public class DocumentBlueprintResponseModel : ItemResponseModelBase
+public class DocumentBlueprintResponseModel : NamedItemResponseModelBase
 {
 }

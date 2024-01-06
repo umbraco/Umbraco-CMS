@@ -2,6 +2,6 @@
 
 namespace Umbraco.Cms.Api.Management.ViewModels.User.Item;
 
-public class UserItemResponseModel : ItemResponseModelBase
+public class UserItemResponseModel : NamedItemResponseModelBase
 {
 }

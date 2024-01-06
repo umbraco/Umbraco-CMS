@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Api.Management.Controllers.Tree;
+using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.Services.Entities;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Api.Management.ViewModels.Media.Item;
@@ -22,17 +23,20 @@ public class MediaTreeControllerBase : UserStartNodeTreeControllerBase<MediaTree
 {
     private readonly AppCaches _appCaches;
     private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
+    private readonly IMediaPresentationModelFactory _mediaPresentationModelFactory;
 
     public MediaTreeControllerBase(
         IEntityService entityService,
         IUserStartNodeEntitiesService userStartNodeEntitiesService,
         IDataTypeService dataTypeService,
         AppCaches appCaches,
-        IBackOfficeSecurityAccessor backofficeSecurityAccessor)
+        IBackOfficeSecurityAccessor backofficeSecurityAccessor,
+        IMediaPresentationModelFactory mediaPresentationModelFactory)
         : base(entityService, userStartNodeEntitiesService, dataTypeService)
     {
         _appCaches = appCaches;
         _backofficeSecurityAccessor = backofficeSecurityAccessor;
+        _mediaPresentationModelFactory = mediaPresentationModelFactory;
     }
 
     protected override UmbracoObjectTypes ItemObjectType => UmbracoObjectTypes.Media;
@@ -45,7 +49,7 @@ public class MediaTreeControllerBase : UserStartNodeTreeControllerBase<MediaTree
 
         if (entity is IMediaEntitySlim mediaEntitySlim)
         {
-            responseModel.Icon = mediaEntitySlim.ContentTypeIcon ?? responseModel.Icon;
+            responseModel.MediaType = _mediaPresentationModelFactory.CreateMediaTypeReferenceResponseModel(mediaEntitySlim);
             responseModel.IsTrashed = entity.Trashed;
             responseModel.Id = entity.Key;
         }

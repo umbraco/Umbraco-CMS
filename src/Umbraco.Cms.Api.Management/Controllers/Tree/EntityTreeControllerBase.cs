@@ -115,12 +115,15 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
     {
         var viewModel = new TItem
         {
-            Name = entity.Name!,
             Id = entity.Key,
             Type = _itemUdiType,
             HasChildren = entity.HasChildren,
-            IsContainer = entity.IsContainer,
-            ParentId = parentKey
+            Parent = parentKey.HasValue
+                ? new EntityTreeItemReferenceResponseModel
+                {
+                    Id = parentKey.Value
+                }
+                : null
         };
 
         return viewModel;

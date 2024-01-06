@@ -1,5 +1,7 @@
 ﻿using Umbraco.Cms.Api.Common.Attributes;
 using Umbraco.Cms.Api.Management.ViewModels.Content;
+using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
+using Umbraco.Cms.Api.Management.ViewModels.Template;
 
 namespace Umbraco.Cms.Api.Management.ViewModels.Document;
 
@@ -8,7 +10,9 @@ public class DocumentResponseModel : ContentResponseModelBase<DocumentValueModel
 {
     public IEnumerable<ContentUrlInfo> Urls { get; set; } = Enumerable.Empty<ContentUrlInfo>();
 
-    public Guid? TemplateId { get; set; }
+    public TemplateReferenceResponseModel? Template { get; set; }
 
     public bool IsTrashed { get; set; }
+
+    public DocumentTypeReferenceResponseModel DocumentType { get; set; } = new();
 }

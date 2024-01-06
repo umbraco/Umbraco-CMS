@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
+using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.Services.Entities;
 using Umbraco.Cms.Api.Management.ViewModels.Media.Item;
 using Umbraco.Cms.Core.Cache;
@@ -18,8 +19,9 @@ public class RootMediaTreeController : MediaTreeControllerBase
         IUserStartNodeEntitiesService userStartNodeEntitiesService,
         IDataTypeService dataTypeService,
         AppCaches appCaches,
-        IBackOfficeSecurityAccessor backofficeSecurityAccessor)
-        : base(entityService, userStartNodeEntitiesService, dataTypeService, appCaches, backofficeSecurityAccessor)
+        IBackOfficeSecurityAccessor backofficeSecurityAccessor,
+        IMediaPresentationModelFactory mediaPresentationModelFactory)
+        : base(entityService, userStartNodeEntitiesService, dataTypeService, appCaches, backofficeSecurityAccessor, mediaPresentationModelFactory)
     {
     }
 

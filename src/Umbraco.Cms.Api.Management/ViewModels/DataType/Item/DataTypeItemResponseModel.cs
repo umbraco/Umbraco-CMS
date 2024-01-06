@@ -2,7 +2,7 @@
 
 namespace Umbraco.Cms.Api.Management.ViewModels.DataType.Item;
 
-public class DataTypeItemResponseModel : ItemResponseModelBase
+public class DataTypeItemResponseModel : NamedItemResponseModelBase
 {
     public string? EditorUiAlias { get; set; }
 }

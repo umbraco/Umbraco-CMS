@@ -2,7 +2,7 @@
 
 namespace Umbraco.Cms.Api.Management.ViewModels.Member.Item;
 
-public class MemberItemResponseModel : ItemResponseModelBase
+public class MemberItemResponseModel : NamedItemResponseModelBase
 {
     public string? Icon { get; set; }
 }

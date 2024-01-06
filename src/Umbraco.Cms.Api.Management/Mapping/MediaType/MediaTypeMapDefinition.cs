@@ -9,10 +9,13 @@ namespace Umbraco.Cms.Api.Management.Mapping.MediaType;
 public class MediaTypeMapDefinition : ContentTypeMapDefinition<IMediaType, MediaTypePropertyTypeResponseModel, MediaTypePropertyTypeContainerResponseModel>, IMapDefinition
 {
     public void DefineMaps(IUmbracoMapper mapper)
-        => mapper.Define<IMediaType, MediaTypeResponseModel>((_, _) => new MediaTypeResponseModel(), Map);
+    {
+        mapper.Define<IMediaType, MediaTypeResponseModel>((_, _) => new MediaTypeResponseModel(), Map);
+        mapper.Define<IMediaType, MediaTypeReferenceResponseModel>((_, _) => new MediaTypeReferenceResponseModel(), Map);
+        mapper.Define<ISimpleContentType, MediaTypeReferenceResponseModel>((_, _) => new MediaTypeReferenceResponseModel(), Map);
+    }
 
-    // Todo: ParentId
-    // Umbraco.Code.MapAll -ParentId
+    // Umbraco.Code.MapAll
     private void Map(IMediaType source, MediaTypeResponseModel target, MapperContext context)
     {
         target.Id = source.Key;
@@ -28,5 +31,21 @@ public class MediaTypeMapDefinition : ContentTypeMapDefinition<IMediaType, Media
         target.Properties = MapPropertyTypes(source);
         target.AllowedContentTypes = MapAllowedContentTypes(source);
         target.Compositions = MapCompositions(source, source.ContentTypeComposition);
+    }
+
+    // Umbraco.Code.MapAll
+    private void Map(IMediaType source, MediaTypeReferenceResponseModel target, MapperContext context)
+    {
+        target.Id = source.Key;
+        target.Icon = source.Icon ?? string.Empty;
+        target.HasListView = source.IsContainer;
+    }
+
+    // Umbraco.Code.MapAll
+    private void Map(ISimpleContentType source, MediaTypeReferenceResponseModel target, MapperContext context)
+    {
+        target.Id = source.Key;
+        target.Icon = source.Icon ?? string.Empty;
+        target.HasListView = source.IsContainer;
     }
 }
