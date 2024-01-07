@@ -10,7 +10,8 @@ import { handlers as telemetryHandlers } from './handlers/telemetry.handlers.js'
 import { handlers as userGroupsHandlers } from './handlers/user-group/index.js';
 import { handlers as examineManagementHandlers } from './handlers/examine-management.handlers.js';
 import { handlers as modelsBuilderHandlers } from './handlers/modelsbuilder.handlers.js';
-import { handlers as relationHandlers } from './handlers/relations/index.js';
+import { relationHandlers, relationTypeHandlers } from './handlers/relations/index.js';
+import { handlers as objectTypeHandlers } from './handlers/object-type/index.js';
 import { handlers as healthCheckHandlers } from './handlers/health-check.handlers.js';
 import { handlers as profilingHandlers } from './handlers/performance-profiling.handlers.js';
 import { handlers as documentHandlers } from './handlers/document/index.js';
@@ -59,6 +60,8 @@ const handlers = [
 	...publishedStatusHandlers,
 	...redirectManagementHandlers,
 	...relationHandlers,
+	...objectTypeHandlers,
+	...relationTypeHandlers,
 	...rteEmbedHandlers,
 	...scriptHandlers,
 	...staticFileHandlers,
