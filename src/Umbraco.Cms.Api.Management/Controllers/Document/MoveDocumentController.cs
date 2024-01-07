@@ -40,7 +40,7 @@ public class MoveDocumentController : DocumentControllerBase
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,
-            ContentPermissionResource.WithKeys(ActionMove.ActionLetter, new[] { moveDocumentRequestModel.TargetId, id }),
+            ContentPermissionResource.WithKeys(ActionMove.ActionLetter, new[] { moveDocumentRequestModel.Target?.Id, id }),
             AuthorizationPolicies.ContentPermissionByResource);
 
         if (!authorizationResult.Succeeded)
@@ -50,7 +50,7 @@ public class MoveDocumentController : DocumentControllerBase
 
         Attempt<IContent?, ContentEditingOperationStatus> result = await _contentEditingService.MoveAsync(
             id,
-            moveDocumentRequestModel.TargetId,
+            moveDocumentRequestModel.Target?.Id,
             CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Success

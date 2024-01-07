@@ -39,7 +39,7 @@ public class MoveMediaController : MediaControllerBase
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,
-            MediaPermissionResource.WithKeys(new[] { moveDocumentRequestModel.TargetId, id }),
+            MediaPermissionResource.WithKeys(new[] { moveDocumentRequestModel.Target?.Id, id }),
             AuthorizationPolicies.MediaPermissionByResource);
 
         if (!authorizationResult.Succeeded)
@@ -49,7 +49,7 @@ public class MoveMediaController : MediaControllerBase
 
         Attempt<IMedia?, ContentEditingOperationStatus> result = await _mediaEditingService.MoveAsync(
             id,
-            moveDocumentRequestModel.TargetId,
+            moveDocumentRequestModel.Target?.Id,
             CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Success

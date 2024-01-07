@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Api.Management.Controllers.Tree;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Api.Management.Routing;
+using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Dictionary.Tree;
@@ -39,7 +40,7 @@ public class DictionaryTreeControllerBase : NamedEntityTreeControllerBase<NamedE
                 Type = Constants.UdiEntityType.DictionaryItem,
                 HasChildren = hasChildren,
                 Parent = parentKey.HasValue
-                    ? new EntityTreeItemReferenceResponseModel
+                    ? new ReferenceByIdModel
                     {
                         Id = parentKey.Value
                     }

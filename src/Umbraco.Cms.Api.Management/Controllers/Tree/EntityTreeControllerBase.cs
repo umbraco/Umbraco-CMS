@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.Services.Paging;
+using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
@@ -119,7 +120,7 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
             Type = _itemUdiType,
             HasChildren = entity.HasChildren,
             Parent = parentKey.HasValue
-                ? new EntityTreeItemReferenceResponseModel
+                ? new ReferenceByIdModel
                 {
                     Id = parentKey.Value
                 }

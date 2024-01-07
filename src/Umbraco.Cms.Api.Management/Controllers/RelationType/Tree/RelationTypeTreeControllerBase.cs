@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Api.Management.Controllers.Tree;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Api.Management.Routing;
+using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.RelationType.Tree;
@@ -33,7 +34,7 @@ public class RelationTypeTreeControllerBase : NamedEntityTreeControllerBase<Name
             Type = Constants.UdiEntityType.RelationType,
             HasChildren = false,
             Parent = parentKey.HasValue
-                ? new EntityTreeItemReferenceResponseModel
+                ? new ReferenceByIdModel
                 {
                     Id = parentKey.Value
                 }

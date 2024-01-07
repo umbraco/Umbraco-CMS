@@ -6,5 +6,5 @@ namespace Umbraco.Cms.Api.Management.ViewModels.Media;
 [ShortGenericSchemaName<MediaValueModel, MediaVariantRequestModel>("CreateContentForMediaRequestModel")]
 public class CreateMediaRequestModel : CreateContentRequestModelBase<MediaValueModel, MediaVariantRequestModel>
 {
-    public Guid ContentTypeId { get; set; }
+    public required ReferenceByIdModel MediaType { get; set; }
 }

@@ -4,5 +4,5 @@ public class EntityTreeItemResponseModel : TreeItemPresentationModel
 {
     public Guid Id { get; set; }
 
-    public EntityTreeItemReferenceResponseModel? Parent { get; set; }
+    public ReferenceByIdModel? Parent { get; set; }
 }

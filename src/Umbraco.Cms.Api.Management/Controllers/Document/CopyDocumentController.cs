@@ -40,7 +40,7 @@ public class CopyDocumentController : DocumentControllerBase
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,
-            ContentPermissionResource.WithKeys(ActionCopy.ActionLetter, new[] { copyDocumentRequestModel.TargetId, id }),
+            ContentPermissionResource.WithKeys(ActionCopy.ActionLetter, new[] { copyDocumentRequestModel.Target?.Id, id }),
             AuthorizationPolicies.ContentPermissionByResource);
 
         if (!authorizationResult.Succeeded)
@@ -50,7 +50,7 @@ public class CopyDocumentController : DocumentControllerBase
 
         Attempt<IContent?, ContentEditingOperationStatus> result = await _contentEditingService.CopyAsync(
             id,
-            copyDocumentRequestModel.TargetId,
+            copyDocumentRequestModel.Target?.Id,
             copyDocumentRequestModel.RelateToOriginal,
             copyDocumentRequestModel.IncludeDescendants,
             CurrentUserKey(_backOfficeSecurityAccessor));

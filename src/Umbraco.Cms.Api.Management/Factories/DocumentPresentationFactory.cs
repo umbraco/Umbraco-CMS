@@ -1,10 +1,10 @@
 ﻿using Umbraco.Cms.Api.Management.Mapping.Content;
+using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.Content;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Item;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentBlueprint.Item;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
-using Umbraco.Cms.Api.Management.ViewModels.Template;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
@@ -48,7 +48,7 @@ internal sealed class DocumentPresentationFactory
             : null;
 
         responseModel.Template = templateKey.HasValue
-            ? new TemplateReferenceResponseModel { Id = templateKey.Value }
+            ? new ReferenceByIdModel { Id = templateKey.Value }
             : null;
 
         return responseModel;
