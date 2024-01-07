@@ -49,9 +49,11 @@ public class MediaTreeControllerBase : UserStartNodeTreeControllerBase<MediaTree
 
         if (entity is IMediaEntitySlim mediaEntitySlim)
         {
-            responseModel.MediaType = _mediaPresentationModelFactory.CreateMediaTypeReferenceResponseModel(mediaEntitySlim);
             responseModel.IsTrashed = entity.Trashed;
             responseModel.Id = entity.Key;
+
+            responseModel.Variants = _mediaPresentationModelFactory.CreateVariantsItemResponseModels(mediaEntitySlim);
+            responseModel.MediaType = _mediaPresentationModelFactory.CreateMediaTypeReferenceResponseModel(mediaEntitySlim);
         }
 
         return responseModel;

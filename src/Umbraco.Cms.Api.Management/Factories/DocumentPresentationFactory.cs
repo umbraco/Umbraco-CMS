@@ -13,7 +13,8 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
-public class DocumentPresentationFactory : IDocumentPresentationFactory
+internal sealed class DocumentPresentationFactory
+    : ContentPresentationFactoryBase<IContentType, IContentTypeService>, IDocumentPresentationFactory
 {
     private readonly IUmbracoMapper _umbracoMapper;
     private readonly IContentUrlFactory _contentUrlFactory;
@@ -27,6 +28,7 @@ public class DocumentPresentationFactory : IDocumentPresentationFactory
         IFileService fileService,
         IContentTypeService contentTypeService,
         IPublicAccessService publicAccessService)
+        : base(contentTypeService, umbracoMapper)
     {
         _umbracoMapper = umbracoMapper;
         _contentUrlFactory = contentUrlFactory;
@@ -110,14 +112,5 @@ public class DocumentPresentationFactory : IDocumentPresentationFactory
     }
 
     public DocumentTypeReferenceResponseModel CreateDocumentTypeReferenceResponseModel(IDocumentEntitySlim entity)
-    {
-        // This sucks, since it'll cost an extra DB call.
-        // but currently there's no really good way to get the content type key from an IDocumentEntitySlim.
-        // We have the same issue for media.
-        // FIXME: to fix this, add content type key and "IsContainer" to IDocumentEntitySlim, and use those here instead of fetching the entire content type.
-        IContentType? contentType = _contentTypeService.Get(entity.ContentTypeAlias);
-        return contentType is not null
-            ? _umbracoMapper.Map<DocumentTypeReferenceResponseModel>(contentType)!
-            : new DocumentTypeReferenceResponseModel();
-    }
+        => CreateContentTypeReferenceResponseModel<DocumentTypeReferenceResponseModel>(entity);
 }

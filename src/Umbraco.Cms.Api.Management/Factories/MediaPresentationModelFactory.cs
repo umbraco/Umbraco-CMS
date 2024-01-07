@@ -13,7 +13,8 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
-public class MediaPresentationModelFactory : IMediaPresentationModelFactory
+internal sealed class MediaPresentationModelFactory
+    : ContentPresentationFactoryBase<IMediaType, IMediaTypeService>, IMediaPresentationModelFactory
 {
     private readonly IUmbracoMapper _umbracoMapper;
     private readonly ContentSettings _contentSettings;
@@ -25,6 +26,7 @@ public class MediaPresentationModelFactory : IMediaPresentationModelFactory
         IOptions<ContentSettings> contentSettings,
         MediaUrlGeneratorCollection mediaUrlGenerators,
         IMediaTypeService mediaTypeService)
+        : base(mediaTypeService, umbracoMapper)
     {
         _umbracoMapper = umbracoMapper;
         _contentSettings = contentSettings.Value;
@@ -63,14 +65,22 @@ public class MediaPresentationModelFactory : IMediaPresentationModelFactory
             responseModel.MediaType = _umbracoMapper.Map<MediaTypeReferenceResponseModel>(mediaType)!;
         }
 
+        responseModel.Variants = CreateVariantsItemResponseModels(entity);
+
         return responseModel;
     }
 
+    public IEnumerable<VariantItemResponseModel> CreateVariantsItemResponseModels(IMediaEntitySlim entity)
+        => new[]
+        {
+            new VariantItemResponseModel
+            {
+                Name = entity.Name ?? string.Empty,
+                State = ContentState.Published,
+                Culture = null
+            }
+        };
+
     public MediaTypeReferenceResponseModel CreateMediaTypeReferenceResponseModel(IMediaEntitySlim entity)
-    {
-        IMediaType? mediaType = _mediaTypeService.Get(entity.ContentTypeAlias);
-        return mediaType is not null
-            ? _umbracoMapper.Map<MediaTypeReferenceResponseModel>(mediaType)!
-            : new MediaTypeReferenceResponseModel();
-    }
+        => CreateContentTypeReferenceResponseModel<MediaTypeReferenceResponseModel>(entity);
 }
