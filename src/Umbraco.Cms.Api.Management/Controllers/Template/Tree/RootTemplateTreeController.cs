@@ -17,7 +17,7 @@ public class RootTemplateTreeController : TemplateTreeControllerBase
 
     [HttpGet("root")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(PagedViewModel<EntityTreeItemResponseModel>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PagedViewModel<EntityTreeItemResponseModel>>> Root(int skip = 0, int take = 100)
+    [ProducesResponseType(typeof(PagedViewModel<NamedEntityTreeItemResponseModel>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<PagedViewModel<NamedEntityTreeItemResponseModel>>> Root(int skip = 0, int take = 100)
         => await GetRoot(skip, take);
 }

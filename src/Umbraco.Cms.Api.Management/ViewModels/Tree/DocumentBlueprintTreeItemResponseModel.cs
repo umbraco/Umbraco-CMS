@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Cms.Api.Management.ViewModels.Tree;
 
-public class DocumentBlueprintTreeItemResponseModel : EntityTreeItemResponseModel
+public class DocumentBlueprintTreeItemResponseModel : NamedEntityTreeItemResponseModel
 {
     public Guid DocumentTypeId { get; set; }
 

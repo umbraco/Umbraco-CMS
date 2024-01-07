@@ -6,7 +6,7 @@ using Umbraco.Cms.Api.Management.ViewModels.Tree;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Tree;
 
-public abstract class FolderTreeControllerBase<TItem> : EntityTreeControllerBase<TItem>
+public abstract class FolderTreeControllerBase<TItem> : NamedEntityTreeControllerBase<TItem>
     where TItem : FolderTreeItemResponseModel, new()
 {
     private readonly Guid _folderObjectTypeId;
