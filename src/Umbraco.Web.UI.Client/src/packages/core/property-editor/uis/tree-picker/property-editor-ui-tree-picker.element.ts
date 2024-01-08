@@ -57,6 +57,7 @@ export class UmbPropertyEditorUITreePickerElement extends UmbLitElement implemen
 
 	#onChange(e: CustomEvent) {
 		this.value = (e.target as UmbInputTreeElement).value as string;
+		// TODO: Unable to save MNTP value, as the management API is expecting UDI, not GUIDs. [LK]
 		this.dispatchEvent(new CustomEvent('property-value-change'));
 	}
 
