@@ -5,7 +5,5 @@
 
 import type { FileSystemItemViewModelBaseModel } from './FileSystemItemViewModelBaseModel';
 
-export type StylesheetOverviewResponseModel = (FileSystemItemViewModelBaseModel & {
-    name: string;
-});
+export type FileSystemFolderModel = FileSystemItemViewModelBaseModel;
 

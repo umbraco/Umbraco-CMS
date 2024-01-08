@@ -37,11 +37,11 @@ export class StaticFileResource {
      * @throws ApiError
      */
     public static getTreeStaticFileChildren({
-        path,
+        parentPath,
         skip,
         take = 100,
     }: {
-        path?: string,
+        parentPath?: string,
         skip?: number,
         take?: number,
     }): CancelablePromise<PagedFileSystemTreeItemPresentationModel> {
@@ -49,7 +49,7 @@ export class StaticFileResource {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/static-file/children',
             query: {
-                'path': path,
+                'parentPath': parentPath,
                 'skip': skip,
                 'take': take,
             },

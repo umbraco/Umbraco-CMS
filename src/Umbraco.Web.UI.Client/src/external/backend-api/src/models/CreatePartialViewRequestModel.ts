@@ -3,7 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { CreateTextFileViewModelBaseModel } from './CreateTextFileViewModelBaseModel';
+import type { FileSystemFileCreateRequestModelBaseModel } from './FileSystemFileCreateRequestModelBaseModel';
 
-export type CreatePartialViewRequestModel = CreateTextFileViewModelBaseModel;
+export type CreatePartialViewRequestModel = FileSystemFileCreateRequestModelBaseModel;
 

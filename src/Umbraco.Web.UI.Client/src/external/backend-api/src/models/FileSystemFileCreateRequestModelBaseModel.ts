@@ -3,7 +3,9 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type ExtractRichTextStylesheetRulesRequestModel = {
+export type FileSystemFileCreateRequestModelBaseModel = {
+    name: string;
+    parentPath?: string | null;
     content: string;
 };
 

@@ -3,7 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type SnippetItemResponseModel = {
+export type FileSystemRenameRequestModelBaseModel = {
     name: string;
 };
 

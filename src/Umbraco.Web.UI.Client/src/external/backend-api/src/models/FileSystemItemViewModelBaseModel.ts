@@ -3,8 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type ServerInformationItemResponseModel = {
-    name: string;
-    data: string;
+export type FileSystemItemViewModelBaseModel = {
+    path: string;
 };
 

@@ -5,5 +5,5 @@
 
 import type { FileSystemResponseModelBaseModel } from './FileSystemResponseModelBaseModel';
 
-export type StylesheetItemResponseModel = FileSystemResponseModelBaseModel;
+export type ScriptFolderResponseModel = FileSystemResponseModelBaseModel;
 

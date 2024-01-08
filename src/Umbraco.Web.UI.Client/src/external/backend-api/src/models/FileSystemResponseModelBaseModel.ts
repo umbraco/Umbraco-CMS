@@ -4,11 +4,10 @@
 /* eslint-disable */
 
 import type { FileSystemFolderModel } from './FileSystemFolderModel';
-import type { TreeItemPresentationModel } from './TreeItemPresentationModel';
 
-export type FileSystemTreeItemPresentationModel = (TreeItemPresentationModel & {
+export type FileSystemResponseModelBaseModel = {
     path: string;
+    name: string;
     parent?: FileSystemFolderModel | null;
-    isFolder: boolean;
-});
+};
 

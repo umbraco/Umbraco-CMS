@@ -3,7 +3,8 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { TextFileUpdateModel } from './TextFileUpdateModel';
-
-export type StylesheetUpdateModel = TextFileUpdateModel;
+export type ServerConfigurationItemResponseModel = {
+    name: string;
+    data: string;
+};
 

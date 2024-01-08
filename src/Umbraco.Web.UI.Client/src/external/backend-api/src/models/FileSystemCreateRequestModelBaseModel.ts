@@ -3,8 +3,8 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type TextFileViewModelBaseModel = {
+export type FileSystemCreateRequestModelBaseModel = {
     name: string;
-    content: string;
+    parentPath?: string | null;
 };
 

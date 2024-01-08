@@ -3,8 +3,9 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type PartialViewSnippetResponseModel = {
-    name: string;
+import type { PartialViewSnippetItemResponseModel } from './PartialViewSnippetItemResponseModel';
+
+export type PartialViewSnippetResponseModel = (PartialViewSnippetItemResponseModel & {
     content: string;
-};
+});
 
