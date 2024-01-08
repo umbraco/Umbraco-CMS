@@ -1,6 +1,9 @@
 import { UmbData } from '../data.js';
+import { FileSystemResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 
-export abstract class UmbFileSystemMockDbBase<MockItemType extends { path: string }> extends UmbData<MockItemType> {
+export abstract class UmbFileSystemMockDbBase<
+	MockItemType extends FileSystemResponseModelBaseModel,
+> extends UmbData<MockItemType> {
 	constructor(data: Array<MockItemType>) {
 		super(data);
 	}

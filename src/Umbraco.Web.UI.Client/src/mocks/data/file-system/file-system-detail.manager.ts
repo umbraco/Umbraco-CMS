@@ -1,17 +1,16 @@
 import { UmbFileSystemMockDbBase } from './file-system-base.js';
-import { getParentPathFromServerPath } from './util/index.js';
 import {
-	CreateTextFileViewModelBaseModel,
-	ScriptResponseModel,
-	UpdateTextFileViewModelBaseModel,
+	FileSystemFileCreateRequestModelBaseModel,
+	FileSystemFileUpdateRequestModelBaseModel,
+	FileSystemResponseModelBaseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 
-export interface UmbMockFileSystemDetailManagerArgs<MockItemType extends ScriptResponseModel> {
-	createMapper: (item: CreateTextFileViewModelBaseModel, path: string) => MockItemType;
-	readMapper: (item: MockItemType) => ScriptResponseModel;
+export interface UmbMockFileSystemDetailManagerArgs<MockItemType extends FileSystemResponseModelBaseModel> {
+	createMapper: (item: FileSystemFileCreateRequestModelBaseModel, path: string) => MockItemType;
+	readMapper: (item: MockItemType) => FileSystemResponseModelBaseModel;
 }
 
-export class UmbMockFileSystemDetailManager<MockItemType extends ScriptResponseModel> {
+export class UmbMockFileSystemDetailManager<MockItemType extends FileSystemResponseModelBaseModel> {
 	#db: UmbFileSystemMockDbBase<MockItemType>;
 	#args: UmbMockFileSystemDetailManagerArgs<MockItemType>;
 
@@ -20,7 +19,7 @@ export class UmbMockFileSystemDetailManager<MockItemType extends ScriptResponseM
 		this.#args = args;
 	}
 
-	create(item: CreateTextFileViewModelBaseModel) {
+	create(item: FileSystemFileCreateRequestModelBaseModel) {
 		const path = item.parentPath ? item.parentPath + '/' + item.name : item.name;
 		const mockItem = this.#args.createMapper(item, path);
 		// create mock item in mock db
@@ -28,7 +27,7 @@ export class UmbMockFileSystemDetailManager<MockItemType extends ScriptResponseM
 		return path;
 	}
 
-	read(path: string): ScriptResponseModel | undefined {
+	read(path: string): FileSystemResponseModelBaseModel | undefined {
 		const item = this.#db.read(path);
 		// map mock item to response model
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -37,13 +36,13 @@ export class UmbMockFileSystemDetailManager<MockItemType extends ScriptResponseM
 		return mappedItem;
 	}
 
-	update(path: string, item: UpdateTextFileViewModelBaseModel) {
+	update(path: string, item: FileSystemFileUpdateRequestModelBaseModel) {
 		const mockItem = this.#db.read(path);
 
 		const updatedMockItem = {
 			...mockItem,
 			content: item.content,
-		} as MockItemType;
+		} as unknown as MockItemType;
 
 		this.#db.update(path, updatedMockItem);
 	}
