@@ -33,7 +33,7 @@ export class UmbDocumentInfoHistoryWorkspaceViewElement extends UmbLitElement {
 	}
 
 	async #getLogs() {
-		this._items = undefined;
+		this._items = undefined; // Reset items to show loader
 		if (!this.documentUnique) return;
 
 		/*const { data } = await this.#logRepository.getAuditLogByUnique({
@@ -50,6 +50,7 @@ export class UmbDocumentInfoHistoryWorkspaceViewElement extends UmbLitElement {
 
 		//TODO: I think there is an issue with the API (backend). Hacking for now.
 		// Uncomment previous code and delete the following when issue fixed.
+		// This should also make it load significantly faster, can consider removing the loader
 
 		const { data } = await this.#logRepository.getAuditLogByUnique({
 			id: '',
@@ -71,12 +72,6 @@ export class UmbDocumentInfoHistoryWorkspaceViewElement extends UmbLitElement {
 		);
 	}
 
-	#localizeTimestamp(timestamp: string) {
-		//TODO In what format should we show the timestamps.. Server based? Localized? Other?
-		//What about user's current culture? (American vs European date format) based on their user setting or windows setting?
-		return new Date(timestamp).toLocaleString();
-	}
-
 	#onPageChange(event: UUIPaginationEvent) {
 		if (this._currentPage === event.target.current) return;
 		this._currentPage = event.target.current;
@@ -86,9 +81,8 @@ export class UmbDocumentInfoHistoryWorkspaceViewElement extends UmbLitElement {
 
 	render() {
 		return html`<uui-box headline=${this.localize.term('general_history')}>
-			${this._items ? this.#renderHistory() : html`<uui-loader-circle></uui-loader-circle> `}
-			${this.#renderHistoryPagination()}
-		</uui-box>`;
+				${this._items ? this.#renderHistory() : html`<uui-loader-circle></uui-loader-circle> `} </uui-box
+			>${this.#renderHistoryPagination()}`;
 	}
 
 	#renderHistory() {
@@ -100,7 +94,7 @@ export class UmbDocumentInfoHistoryWorkspaceViewElement extends UmbLitElement {
 						(item) => item.timestamp,
 						(item) => {
 							const { text, style } = HistoricTagAndDescription(item.logType);
-							return html`<umb-history-item name="TODO Username" detail=${this.#localizeTimestamp(item.timestamp)}>
+							return html`<umb-history-item name="TODO Username" detail=${new Date(item.timestamp).toLocaleString()}>
 								<span class="log-type">
 									<uui-tag look=${style.look} color=${style.color}> ${this.localize.term(text.label)} </uui-tag>
 									${this.localize.term(text.desc, item.parameters)}
@@ -115,7 +109,7 @@ export class UmbDocumentInfoHistoryWorkspaceViewElement extends UmbLitElement {
 				</umb-history-list>
 			`;
 		} else {
-			return html`No items found`;
+			return html`${this.localize.term('content_noItemsToShow')}`;
 		}
 	}
 
