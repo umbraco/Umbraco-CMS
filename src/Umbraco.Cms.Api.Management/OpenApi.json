@@ -10972,8 +10972,18 @@
           }
         },
         "responses": {
-          "200": {
-            "description": "Success"
+          "201": {
+            "description": "Created",
+            "headers": {
+              "Location": {
+                "description": "Location of the newly created resource",
+                "schema": {
+                  "type": "string",
+                  "description": "Location of the newly created resource",
+                  "format": "uri"
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request",
@@ -13181,8 +13191,18 @@
           }
         },
         "responses": {
-          "200": {
-            "description": "Success"
+          "201": {
+            "description": "Created",
+            "headers": {
+              "Location": {
+                "description": "Location of the newly created resource",
+                "schema": {
+                  "type": "string",
+                  "description": "Location of the newly created resource",
+                  "format": "uri"
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request",
@@ -14943,8 +14963,18 @@
           }
         },
         "responses": {
-          "200": {
-            "description": "Success"
+          "201": {
+            "description": "Created",
+            "headers": {
+              "Location": {
+                "description": "Location of the newly created resource",
+                "schema": {
+                  "type": "string",
+                  "description": "Location of the newly created resource",
+                  "format": "uri"
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request",
@@ -21689,8 +21719,12 @@
           "name": {
             "type": "string"
           },
-          "parentPath": {
-            "type": "string",
+          "parent": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/FileSystemFolderModel"
+              }
+            ],
             "nullable": true
           }
         },
@@ -21706,8 +21740,12 @@
           "name": {
             "type": "string"
           },
-          "parentPath": {
-            "type": "string",
+          "parent": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/FileSystemFolderModel"
+              }
+            ],
             "nullable": true
           },
           "content": {
@@ -21763,6 +21801,34 @@
             "$ref": "#/components/schemas/FileSystemItemViewModelBaseModel"
           }
         ],
+        "additionalProperties": false
+      },
+      "FileSystemItemResponseModelBaseModel": {
+        "required": [
+          "isFolder",
+          "name",
+          "path"
+        ],
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "parent": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/FileSystemFolderModel"
+              }
+            ],
+            "nullable": true
+          },
+          "isFolder": {
+            "type": "boolean"
+          }
+        },
         "additionalProperties": false
       },
       "FileSystemItemViewModelBaseModel": {
@@ -23904,7 +23970,7 @@
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/FileSystemResponseModelBaseModel"
+            "$ref": "#/components/schemas/FileSystemItemResponseModelBaseModel"
           }
         ],
         "additionalProperties": false
@@ -24664,7 +24730,7 @@
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/FileSystemResponseModelBaseModel"
+            "$ref": "#/components/schemas/FileSystemItemResponseModelBaseModel"
           }
         ],
         "additionalProperties": false
@@ -24868,7 +24934,7 @@
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/FileSystemResponseModelBaseModel"
+            "$ref": "#/components/schemas/FileSystemItemResponseModelBaseModel"
           }
         ],
         "additionalProperties": false
@@ -24895,7 +24961,7 @@
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/FileSystemResponseModelBaseModel"
+            "$ref": "#/components/schemas/FileSystemItemResponseModelBaseModel"
           }
         ],
         "additionalProperties": false
