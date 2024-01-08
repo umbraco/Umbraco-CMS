@@ -32,7 +32,7 @@ import { handlers as stylesheetHandlers } from './handlers/stylesheet/index.js';
 import { handlers as partialViewsHandlers } from './handlers/partial-views.handlers.js';
 import { handlers as tagHandlers } from './handlers/tag-handlers.js';
 import { handlers as configHandlers } from './handlers/config.handlers.js';
-import { handlers as scriptHandlers } from './handlers/script.handlers.js';
+import { handlers as scriptHandlers } from './handlers/script/index.js';
 
 const handlers = [
 	serverHandlers.serverVersionHandler,
