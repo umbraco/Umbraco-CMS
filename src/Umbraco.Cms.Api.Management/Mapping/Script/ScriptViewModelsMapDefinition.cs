@@ -43,7 +43,7 @@ public class ScriptViewModelsMapDefinition : IMapDefinition
     {
         target.Name = source.Name;
         target.Content = source.Content;
-        target.ParentPath = source.ParentPath?.VirtualPathToSystemPath();
+        target.ParentPath = source.Parent?.Path.VirtualPathToSystemPath();
     }
 
     // Umbraco.Code.MapAll
@@ -71,6 +71,6 @@ public class ScriptViewModelsMapDefinition : IMapDefinition
     private void Map(CreateScriptFolderRequestModel source, ScriptFolderCreateModel target, MapperContext context)
     {
         target.Name = source.Name;
-        target.ParentPath = source.ParentPath?.VirtualPathToSystemPath();
+        target.ParentPath = source.Parent?.Path.VirtualPathToSystemPath();
     }
 }

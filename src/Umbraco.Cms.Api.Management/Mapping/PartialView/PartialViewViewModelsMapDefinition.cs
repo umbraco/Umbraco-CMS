@@ -2,12 +2,10 @@
 using Umbraco.Cms.Api.Management.Extensions;
 using Umbraco.Cms.Api.Management.ViewModels.PartialView;
 using Umbraco.Cms.Api.Management.ViewModels.PartialView.Folder;
-using Umbraco.Cms.Api.Management.ViewModels.PartialView.Snippets;
 using Umbraco.Cms.Api.Management.ViewModels.FileSystem;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.FileSystem;
-using Umbraco.Cms.Core.Snippets;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Mapping.PartialView;
@@ -45,7 +43,7 @@ public class PartialViewViewModelsMapDefinition : IMapDefinition
     {
         target.Name = source.Name;
         target.Content = source.Content;
-        target.ParentPath = source.ParentPath?.VirtualPathToSystemPath();
+        target.ParentPath = source.Parent?.Path.VirtualPathToSystemPath();
     }
 
     // Umbraco.Code.MapAll
@@ -73,6 +71,6 @@ public class PartialViewViewModelsMapDefinition : IMapDefinition
     private void Map(CreatePartialViewFolderRequestModel source, PartialViewFolderCreateModel target, MapperContext context)
     {
         target.Name = source.Name;
-        target.ParentPath = source.ParentPath?.VirtualPathToSystemPath();
+        target.ParentPath = source.Parent?.Path.VirtualPathToSystemPath();
     }
 }

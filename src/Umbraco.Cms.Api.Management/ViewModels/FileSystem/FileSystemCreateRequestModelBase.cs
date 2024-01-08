@@ -4,5 +4,5 @@ public abstract class FileSystemCreateRequestModelBase
 {
     public required string Name { get; set; }
 
-    public string? ParentPath { get; set; }
+    public FileSystemFolderModel? Parent { get; set; }
 }
