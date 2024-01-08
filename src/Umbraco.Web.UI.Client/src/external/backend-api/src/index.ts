@@ -99,6 +99,7 @@ export type { FileSystemFileCreateRequestModelBaseModel } from './models/FileSys
 export type { FileSystemFileResponseModelBaseModel } from './models/FileSystemFileResponseModelBaseModel';
 export type { FileSystemFileUpdateRequestModelBaseModel } from './models/FileSystemFileUpdateRequestModelBaseModel';
 export type { FileSystemFolderModel } from './models/FileSystemFolderModel';
+export type { FileSystemItemResponseModelBaseModel } from './models/FileSystemItemResponseModelBaseModel';
 export type { FileSystemItemViewModelBaseModel } from './models/FileSystemItemViewModelBaseModel';
 export type { FileSystemRenameRequestModelBaseModel } from './models/FileSystemRenameRequestModelBaseModel';
 export type { FileSystemResponseModelBaseModel } from './models/FileSystemResponseModelBaseModel';

@@ -113,7 +113,7 @@ export class ScriptResource {
     }
 
     /**
-     * @returns any Success
+     * @returns string Created
      * @throws ApiError
      */
     public static putScriptByPathRename({
@@ -122,7 +122,7 @@ export class ScriptResource {
     }: {
         path: string,
         requestBody?: RenameScriptRequestModel,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/script/{path}/rename',
@@ -131,6 +131,7 @@ export class ScriptResource {
             },
             body: requestBody,
             mediaType: 'application/json',
+            responseHeader: 'Location',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,

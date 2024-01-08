@@ -5,9 +5,10 @@
 
 import type { FileSystemFolderModel } from './FileSystemFolderModel';
 
-export type FileSystemFileCreateRequestModelBaseModel = {
+export type FileSystemItemResponseModelBaseModel = {
+    path: string;
     name: string;
     parent?: FileSystemFolderModel | null;
-    content: string;
+    isFolder: boolean;
 };
 

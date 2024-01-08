@@ -114,7 +114,7 @@ export class StylesheetResource {
     }
 
     /**
-     * @returns any Success
+     * @returns string Created
      * @throws ApiError
      */
     public static putStylesheetByPathRename({
@@ -123,7 +123,7 @@ export class StylesheetResource {
     }: {
         path: string,
         requestBody?: RenameStylesheetRequestModel,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/stylesheet/{path}/rename',
@@ -132,6 +132,7 @@ export class StylesheetResource {
             },
             body: requestBody,
             mediaType: 'application/json',
+            responseHeader: 'Location',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
