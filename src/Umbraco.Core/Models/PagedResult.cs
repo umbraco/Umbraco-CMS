@@ -5,6 +5,7 @@ namespace Umbraco.Cms.Core.Models;
 /// <summary>
 ///     Represents a paged result for a model collection
 /// </summary>
+[Obsolete ("Superseded by PagedModel for service layer and below OR PagedViewModel in apis. Expected to be removed when skip/take pattern has been fully implemented v14+")]
 [DataContract(Name = "pagedCollection", Namespace = "")]
 public abstract class PagedResult
 {
