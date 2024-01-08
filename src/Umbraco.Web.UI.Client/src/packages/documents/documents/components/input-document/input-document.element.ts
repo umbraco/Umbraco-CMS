@@ -60,6 +60,18 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 		this.#pickerContext.setSelection(ids);
 	}
 
+	@property({ type: String })
+	startNodeId?: string;
+
+	@property({ type: String })
+	filter?: string;
+
+	@property({ type: Boolean })
+	showOpenButton?: boolean;
+
+	@property({ type: Boolean })
+	ignoreUserStartNodes?: boolean;
+
 	@property()
 	public set value(idsString: string) {
 		// Its with full purpose we don't call super.value, as thats being handled by the observation of the context selection.
@@ -95,9 +107,16 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	protected _openPicker() {
+		// TODO: Configure the content picker, with `startNodeId`, `filter` and `ignoreUserStartNodes` [LK]
+		console.log("_openPicker", [this.startNodeId, this.filter, this.ignoreUserStartNodes]);
 		this.#pickerContext.openPicker({
 			hideTreeRoot: true,
 		});
+	}
+
+	protected _openItem(item: DocumentItemResponseModel) {
+		// TODO: Implement the Content editing infinity editor. [LK]
+		console.log('TODO: _openItem', item);
 	}
 
 	protected getFormElement() {
@@ -105,10 +124,7 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	render() {
-		return html`
-			${this.#renderItems()}
-			${this.#renderAddButton()}
-		`;
+		return html` ${this.#renderItems()} ${this.#renderAddButton()} `;
 	}
 
 	#renderItems() {
@@ -136,8 +152,9 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 		if (!item.id) return;
 		return html`
 			<uui-ref-node name=${ifDefined(item.name)} detail=${ifDefined(item.id)}>
-				<!-- TODO: implement is trashed <uui-tag size="s" slot="tag" color="danger">Trashed</uui-tag> -->
+				${this._renderIsTrashed(item)}
 				<uui-action-bar slot="actions">
+					${this._renderOpenButton(item)}
 					<uui-button
 						@click=${() => this.#pickerContext.requestRemoveItem(item.id!)}
 						label="Remove document ${item.name}"
@@ -146,6 +163,18 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 				</uui-action-bar>
 			</uui-ref-node>
 		`;
+	}
+
+	private _renderIsTrashed(item: DocumentItemResponseModel) {
+		if (!item.isTrashed) return;
+		return html`<uui-tag size="s" slot="tag" color="danger">Trashed</uui-tag>`;
+	}
+
+	private _renderOpenButton(item: DocumentItemResponseModel) {
+		if (!this.showOpenButton) return;
+		return html`<uui-button @click=${() => this._openItem(item)} label="Open document ${item.name}"
+			>${this.localize.term('general_open')}</uui-button
+		>`;
 	}
 
 	static styles = [
