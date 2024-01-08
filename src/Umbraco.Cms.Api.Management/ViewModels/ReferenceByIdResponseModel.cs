@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Cms.Api.Management.ViewModels;
 
-public class ReferenceByIdModel
+public abstract class ReferenceByIdResponseModel
 {
     public Guid Id { get; set; }
 }

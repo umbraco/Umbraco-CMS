@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Cms.Api.Management.ViewModels.ContentType;
 
-public abstract class ContentTypeReferenceResponseModelBase : ReferenceByIdModel
+public abstract class ContentTypeReferenceResponseModelBase : ReferenceByIdResponseModel
 {
     public string Icon { get; set; } = string.Empty;
 

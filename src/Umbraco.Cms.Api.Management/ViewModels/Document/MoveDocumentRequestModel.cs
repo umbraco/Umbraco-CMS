@@ -2,5 +2,5 @@
 
 public class MoveDocumentRequestModel
 {
-    public ReferenceByIdModel? Target { get; set; }
+    public ReferenceByIdRequestModel? Target { get; set; }
 }

@@ -120,7 +120,7 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
             Type = _itemUdiType,
             HasChildren = entity.HasChildren,
             Parent = parentKey.HasValue
-                ? new ReferenceByIdModel
+                ? new ReferenceByIdRequestModel
                 {
                     Id = parentKey.Value
                 }

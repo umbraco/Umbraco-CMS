@@ -34,7 +34,7 @@ public class RelationTypeTreeControllerBase : NamedEntityTreeControllerBase<Name
             Type = Constants.UdiEntityType.RelationType,
             HasChildren = false,
             Parent = parentKey.HasValue
-                ? new ReferenceByIdModel
+                ? new ReferenceByIdRequestModel
                 {
                     Id = parentKey.Value
                 }
