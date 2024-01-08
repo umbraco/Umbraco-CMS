@@ -1,4 +1,4 @@
-import { UmbPartialViewRepository } from '../repository/partial-view.repository.js';
+import { UmbPartialViewDetailRepository } from '../repository/partial-view-detail.repository.js';
 import type { UmbPartialViewDetailModel } from '../types.js';
 import { UMB_PARTIAL_VIEW_ENTITY_TYPE } from '../entity.js';
 import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
@@ -11,7 +11,7 @@ import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 export class UmbPartialViewWorkspaceContext
-	extends UmbEditableWorkspaceContextBase<UmbPartialViewRepository, UmbPartialViewDetailModel>
+	extends UmbEditableWorkspaceContextBase<UmbPartialViewDetailRepository, UmbPartialViewDetailModel>
 	implements UmbSaveableWorkspaceContextInterface
 {
 	#data = new UmbObjectState<UmbPartialViewDetailModel | undefined>(undefined);
@@ -24,7 +24,7 @@ export class UmbPartialViewWorkspaceContext
 	readonly isCodeEditorReady = this.#isCodeEditorReady.asObservable();
 
 	constructor(host: UmbControllerHostElement) {
-		super(host, 'Umb.Workspace.PartialView', new UmbPartialViewRepository(host));
+		super(host, 'Umb.Workspace.PartialView', new UmbPartialViewDetailRepository(host));
 		this.#loadCodeEditor();
 	}
 
@@ -70,7 +70,7 @@ export class UmbPartialViewWorkspaceContext
 	}
 
 	async create(parentUnique: string | null, snippetName = 'Empty') {
-		const { data } = await this.repository.createScaffold(parentUnique, snippetName);
+		const { data } = await this.repository.createScaffold(parentUnique);
 
 		if (data) {
 			this.setIsNew(true);
