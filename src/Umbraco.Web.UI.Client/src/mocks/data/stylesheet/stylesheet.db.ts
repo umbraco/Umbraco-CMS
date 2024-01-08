@@ -5,25 +5,16 @@ import { UmbMockFileSystemItemManager } from '../file-system/file-system-item.ma
 import { UmbMockFileSystemTreeManager } from '../file-system/file-system-tree.manager.js';
 import { textFileItemMapper } from '../utils.js';
 import { UmbMockStylesheetModel, data } from './stylesheet.data.js';
-import {
-	CreateStylesheetRequestModel,
-	PagedStylesheetOverviewResponseModel,
-	StylesheetResponseModel,
-} from '@umbraco-cms/backoffice/backend-api';
+import { PagedStylesheetOverviewResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 class UmbStylesheetData extends UmbFileSystemMockDbBase<UmbMockStylesheetModel> {
 	tree = new UmbMockFileSystemTreeManager<UmbMockStylesheetModel>(this);
 	item = new UmbMockFileSystemItemManager<UmbMockStylesheetModel>(this);
 	folder = new UmbMockFileSystemFolderManager<UmbMockStylesheetModel>(this);
-	file;
+	file = new UmbMockFileSystemDetailManager<UmbMockStylesheetModel>(this);
 
 	constructor(data: Array<UmbMockStylesheetModel>) {
 		super(data);
-
-		this.file = new UmbMockFileSystemDetailManager<UmbMockStylesheetModel>(this, {
-			createMapper: this.#createStylesheetMockItemMapper,
-			readMapper: this.#readStylesheetResponseMapper,
-		});
 	}
 
 	getAllStylesheets(): PagedStylesheetOverviewResponseModel {
@@ -32,25 +23,6 @@ class UmbStylesheetData extends UmbFileSystemMockDbBase<UmbMockStylesheetModel> 
 			total: this.data.map((item) => !item.isFolder).length,
 		};
 	}
-
-	#createStylesheetMockItemMapper = (item: CreateStylesheetRequestModel, path: string): UmbMockStylesheetModel => {
-		return {
-			name: item.name,
-			content: item.content,
-			path: path,
-			parentPath: item.parentPath || null,
-			isFolder: false,
-			hasChildren: false,
-		};
-	};
-
-	#readStylesheetResponseMapper = (item: UmbMockStylesheetModel): StylesheetResponseModel => {
-		return {
-			path: item.path,
-			name: item.name,
-			content: item.content,
-		};
-	};
 }
 
 export const umbStylesheetData = new UmbStylesheetData(data);

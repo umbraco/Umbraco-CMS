@@ -4,41 +4,16 @@ import { UmbMockFileSystemItemManager } from '../file-system/file-system-item.ma
 import { UmbMockFileSystemTreeManager } from '../file-system/file-system-tree.manager.js';
 import { UmbMockFileSystemDetailManager } from '../file-system/file-system-detail.manager.js';
 import { UmbMockPartialViewModel, data } from './partial-view.data.js';
-import { CreatePartialViewRequestModel, PartialViewResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 class UmbPartialViewMockDB extends UmbFileSystemMockDbBase<UmbMockPartialViewModel> {
 	tree = new UmbMockFileSystemTreeManager<UmbMockPartialViewModel>(this);
 	folder = new UmbMockFileSystemFolderManager<UmbMockPartialViewModel>(this);
 	item = new UmbMockFileSystemItemManager<UmbMockPartialViewModel>(this);
-	file;
+	file = new UmbMockFileSystemDetailManager<UmbMockPartialViewModel>(this);
 
 	constructor(data: Array<UmbMockPartialViewModel>) {
 		super(data);
-
-		this.file = new UmbMockFileSystemDetailManager<UmbMockPartialViewModel>(this, {
-			createMapper: this.#createPartialViewMockItemMapper,
-			readMapper: this.#readPartialResponseMapper,
-		});
 	}
-
-	#createPartialViewMockItemMapper = (item: CreatePartialViewRequestModel, path: string): UmbMockPartialViewModel => {
-		return {
-			name: item.name,
-			content: item.content,
-			path: path,
-			parentPath: item.parentPath || null,
-			isFolder: false,
-			hasChildren: false,
-		};
-	};
-
-	#readPartialResponseMapper = (item: UmbMockPartialViewModel): PartialViewResponseModel => {
-		return {
-			path: item.path,
-			name: item.name,
-			content: item.content,
-		};
-	};
 }
 
 export const umbPartialViewMockDB = new UmbPartialViewMockDB(data);

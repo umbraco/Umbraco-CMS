@@ -1,27 +1,21 @@
 import { UmbFileSystemMockDbBase } from './file-system-base.js';
 import {
 	FileSystemFileCreateRequestModelBaseModel,
+	FileSystemFileResponseModelBaseModel,
 	FileSystemFileUpdateRequestModelBaseModel,
 	FileSystemResponseModelBaseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 
-export interface UmbMockFileSystemDetailManagerArgs<MockItemType extends FileSystemResponseModelBaseModel> {
-	createMapper: (item: FileSystemFileCreateRequestModelBaseModel, path: string) => MockItemType;
-	readMapper: (item: MockItemType) => FileSystemResponseModelBaseModel;
-}
-
-export class UmbMockFileSystemDetailManager<MockItemType extends FileSystemResponseModelBaseModel> {
+export class UmbMockFileSystemDetailManager<MockItemType extends FileSystemFileResponseModelBaseModel> {
 	#db: UmbFileSystemMockDbBase<MockItemType>;
-	#args: UmbMockFileSystemDetailManagerArgs<MockItemType>;
 
-	constructor(db: UmbFileSystemMockDbBase<MockItemType>, args: UmbMockFileSystemDetailManagerArgs<MockItemType>) {
+	constructor(db: UmbFileSystemMockDbBase<MockItemType>) {
 		this.#db = db;
-		this.#args = args;
 	}
 
 	create(item: FileSystemFileCreateRequestModelBaseModel) {
 		const path = item.parentPath ? item.parentPath + '/' + item.name : item.name;
-		const mockItem = this.#args.createMapper(item, path);
+		const mockItem = this.#defaultCreateMockItemMapper(path, item);
 		// create mock item in mock db
 		this.#db.create(mockItem);
 		return path;
@@ -32,7 +26,7 @@ export class UmbMockFileSystemDetailManager<MockItemType extends FileSystemRespo
 		// map mock item to response model
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
-		const mappedItem = this.#args.readMapper(item);
+		const mappedItem = this.#defaultReadResponseMapper(item);
 		return mappedItem;
 	}
 
@@ -68,4 +62,23 @@ export class UmbMockFileSystemDetailManager<MockItemType extends FileSystemRespo
 		this.#db.update(item.existingPath, updatedMockItem);
 	}
 	*/
+
+	#defaultCreateMockItemMapper = (path: string, item: FileSystemFileCreateRequestModelBaseModel): MockItemType => {
+		return {
+			name: item.name,
+			content: item.content,
+			path: path,
+			parentPath: item.parentPath || null,
+			isFolder: false,
+			hasChildren: false,
+		} as unknown as MockItemType;
+	};
+
+	#defaultReadResponseMapper = (item: MockItemType): FileSystemFileResponseModelBaseModel => {
+		return {
+			path: item.path,
+			name: item.name,
+			content: item.content,
+		};
+	};
 }
