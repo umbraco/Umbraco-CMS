@@ -67,7 +67,9 @@ export class UmbPartialViewFolderServerDataSource implements UmbFolderDataSource
 		const parentPath = new UmbServerPathUniqueSerializer().toServerPath(args.parentUnique);
 
 		const requestBody: CreatePartialViewFolderRequestModel = {
-			parentPath,
+			parent: {
+				path: parentPath,
+			},
 			name: args.name,
 		};
 

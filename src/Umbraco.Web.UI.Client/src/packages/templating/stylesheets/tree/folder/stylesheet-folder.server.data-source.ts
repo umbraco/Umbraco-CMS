@@ -67,7 +67,9 @@ export class UmbStylesheetFolderServerDataSource implements UmbFolderDataSource 
 		const parentPath = new UmbServerPathUniqueSerializer().toServerPath(args.parentUnique);
 
 		const requestBody: CreateStylesheetFolderRequestModel = {
-			parentPath,
+			parent: {
+				path: parentPath,
+			},
 			name: args.name,
 		};
 

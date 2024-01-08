@@ -40,7 +40,9 @@ export class UmbPartialViewDetailServerDataSource implements UmbDetailDataSource
 
 		// TODO: make data mapper to prevent errors
 		const requestBody: CreatePartialViewRequestModel = {
-			parentPath,
+			parent: {
+				path: parentPath,
+			},
 			name: appendFileExtensionIfNeeded(partialView.name, '.cshtml'),
 			content: partialView.content,
 		};

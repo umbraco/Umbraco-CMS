@@ -40,7 +40,9 @@ export class UmbStylesheetDetailServerDataSource implements UmbDetailDataSource<
 
 		// TODO: make data mapper to prevent errors
 		const requestBody: CreateStylesheetRequestModel = {
-			parentPath,
+			parent: {
+				path: parentPath,
+			},
 			name: appendFileExtensionIfNeeded(stylesheet.name, '.css'),
 			content: stylesheet.content,
 		};

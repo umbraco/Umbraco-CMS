@@ -40,7 +40,9 @@ export class UmbScriptDetailServerDataSource implements UmbDetailDataSource<UmbS
 
 		// TODO: make data mapper to prevent errors
 		const requestBody: CreateScriptRequestModel = {
-			parentPath,
+			parent: {
+				path: parentPath,
+			},
 			name: appendFileExtensionIfNeeded(script.name, '.js'),
 			content: script.content,
 		};

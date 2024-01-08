@@ -67,7 +67,9 @@ export class UmbScriptFolderServerDataSource implements UmbFolderDataSource {
 		const parentPath = new UmbServerPathUniqueSerializer().toServerPath(args.parentUnique);
 
 		const requestBody: CreateScriptFolderRequestModel = {
-			parentPath,
+			parent: {
+				path: parentPath,
+			},
 			name: args.name,
 		};
 

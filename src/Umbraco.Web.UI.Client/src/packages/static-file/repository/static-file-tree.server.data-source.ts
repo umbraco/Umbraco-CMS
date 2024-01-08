@@ -37,7 +37,7 @@ const getChildrenOf = (parentUnique: string | null) => {
 	} else {
 		// eslint-disable-next-line local-rules/no-direct-api-import
 		return StaticFileResource.getTreeStaticFileChildren({
-			path: parentUnique,
+			parentPath: parentUnique,
 		});
 	}
 };
