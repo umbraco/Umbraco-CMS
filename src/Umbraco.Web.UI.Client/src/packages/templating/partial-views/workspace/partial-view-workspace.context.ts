@@ -8,44 +8,12 @@ import {
 	UmbEditableWorkspaceContextBase,
 } from '@umbraco-cms/backoffice/workspace';
 import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
-import type { UpdatePartialViewRequestModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 export class UmbPartialViewWorkspaceContext
 	extends UmbEditableWorkspaceContextBase<UmbPartialViewRepository, UmbPartialViewDetailModel>
 	implements UmbSaveableWorkspaceContextInterface
 {
-	getEntityId(): string | undefined {
-		return this.getData()?.path;
-	}
-	getEntityType(): string {
-		return UMB_PARTIAL_VIEW_ENTITY_TYPE;
-	}
-	save(): Promise<void> {
-		const partialView = this.getData();
-
-		if (!partialView)
-			return Promise.reject('Something went wrong, there is no data for partial view you want to save...');
-		if (this.getIsNew()) {
-			const createRequestBody = {
-				name: partialView.name,
-				content: partialView.content,
-				parentPath: partialView.path + '/',
-			};
-
-			this.repository.create(createRequestBody);
-			return Promise.resolve();
-		}
-		if (!partialView.path) return Promise.reject('There is no path');
-		const updateRequestBody: UpdatePartialViewRequestModel = {
-			name: partialView.name,
-			existingPath: partialView.path,
-			content: partialView.content,
-		};
-		this.repository.save(partialView.path, updateRequestBody);
-		return Promise.resolve();
-	}
-
 	#data = new UmbObjectState<UmbPartialViewDetailModel | undefined>(undefined);
 	readonly data = this.#data.asObservable();
 	readonly name = this.#data.asObservablePart((data) => data?.name);
@@ -69,6 +37,18 @@ export class UmbPartialViewWorkspaceContext
 		}
 	}
 
+	getEntityId() {
+		const data = this.getData();
+		if (!data) throw new Error('Data is missing');
+		return data.unique;
+	}
+
+	getEntityType(): string {
+		const data = this.getData();
+		if (!data) throw new Error('Data is missing');
+		return data.entityType;
+	}
+
 	getData() {
 		return this.#data.getValue();
 	}
@@ -81,26 +61,44 @@ export class UmbPartialViewWorkspaceContext
 		this.#data.update({ content: value });
 	}
 
-	async load(entityKey: string) {
-		const { data } = await this.repository.requestByKey(entityKey);
+	async load(unique: string) {
+		const { data } = await this.repository.requestByUnique(unique);
 		if (data) {
 			this.setIsNew(false);
 			this.#data.next(data);
 		}
 	}
 
-	async create(parentKey: string | null, name = 'Empty') {
-		const { data } = await this.repository.createScaffold(parentKey, name);
-		const newPartial = {
-			...data,
-			name: '',
-			path: parentKey ?? '',
-		};
-		if (!data) return;
-		this.setIsNew(true);
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-ignore
-		this.#data.next(newPartial);
+	async create(parentUnique: string | null, snippetName = 'Empty') {
+		const { data } = await this.repository.createScaffold(parentUnique, snippetName);
+
+		if (data) {
+			this.setIsNew(true);
+			this.#data.next(data);
+		}
+	}
+
+	public async save() {
+		if (!this.#data.value) throw new Error('Data is missing');
+
+		let newData = undefined;
+
+		if (this.getIsNew()) {
+			const { data } = await this.repository.create(this.#data.value);
+			newData = data;
+		} else {
+			const { data } = await this.repository.save(this.#data.value);
+			newData = data;
+		}
+
+		if (newData) {
+			this.#data.next(newData);
+			this.saveComplete(newData);
+		}
+	}
+
+	public destroy(): void {
+		this.#data.destroy();
 	}
 }
 

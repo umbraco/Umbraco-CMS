@@ -4,42 +4,39 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbRoute, IRoutingInfo, PageComponent } from '@umbraco-cms/backoffice/router';
+import { UmbWorkspaceIsNewRedirectController } from '@umbraco-cms/backoffice/workspace';
 
 import '../../components/insert-menu/templating-insert-menu.element.js';
 
-import { UmbWorkspaceIsNewRedirectController } from '@umbraco-cms/backoffice/workspace';
-
 @customElement('umb-partial-view-workspace')
 export class UmbPartialViewWorkspaceElement extends UmbLitElement {
-	#partialViewWorkspaceContext = new UmbPartialViewWorkspaceContext(this);
+	#workspaceContext = new UmbPartialViewWorkspaceContext(this);
 
 	#createElement = () => new UmbPartialViewWorkspaceEditElement();
 
 	@state()
 	_routes: UmbRoute[] = [
 		{
-			path: 'create/:parentKey/:snippetName',
+			path: 'create/:parentUnique/:snippetName',
 			component: this.#createElement,
 			setup: async (component: PageComponent, info: IRoutingInfo) => {
-				const parentKey = info.match.params.parentKey;
-				const decodePath = decodeURIComponent(parentKey);
+				const parentUnique = info.match.params.parentUnique === 'null' ? null : info.match.params.parentUnique;
 				const snippetName = info.match.params.snippetName;
-				this.#partialViewWorkspaceContext.create(decodePath === 'null' ? null : parentKey, snippetName);
+				await this.#workspaceContext.create(parentUnique, snippetName);
 
 				new UmbWorkspaceIsNewRedirectController(
 					this,
-					this.#partialViewWorkspaceContext,
+					this.#workspaceContext,
 					this.shadowRoot!.querySelector('umb-router-slot')!,
 				);
 			},
 		},
 		{
-			path: 'edit/:key',
+			path: 'edit/:unique',
 			component: this.#createElement,
 			setup: (component: PageComponent, info: IRoutingInfo) => {
-				const key = info.match.params.key;
-				const decodePath = decodeURIComponent(key).replace('-cshtml', '.cshtml');
-				this.#partialViewWorkspaceContext.load(decodePath);
+				const unique = info.match.params.unique;
+				this.#workspaceContext.load(unique);
 			},
 		},
 	];
