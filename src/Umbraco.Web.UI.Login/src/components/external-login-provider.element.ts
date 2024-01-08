@@ -203,7 +203,7 @@ export class UmbExternalLoginProviderElement extends LitElement {
       }
 
       #defaultView uui-icon {
-        color: #00000080;
+				opacity: 0.85;
         padding-right: 2px;
       }
 
