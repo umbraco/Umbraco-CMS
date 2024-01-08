@@ -3,7 +3,6 @@ import { umbStylesheetData } from '../data/stylesheet/stylesheet.db.js';
 import {
 	CreatePathFolderRequestModel,
 	CreateStylesheetRequestModel,
-	InterpolateRichTextStylesheetRequestModel,
 	UpdateStylesheetRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
@@ -75,33 +74,6 @@ const collectionHandlers = [
 	}),
 ];
 
-const rulesHandlers = [
-	rest.post(umbracoPath('/stylesheet/rich-text/extract-rules'), async (req, res, ctx) => {
-		const requestBody = (await req.json()) as CreateStylesheetRequestModel;
-		if (!requestBody) return res(ctx.status(400, 'no body found'));
-		const response = await umbStylesheetData.extractRules({ requestBody });
-		return res(ctx.status(200), ctx.json(response));
-	}),
-
-	rest.post(umbracoPath('/stylesheet/rich-text/interpolate-rules'), async (req, res, ctx) => {
-		const requestBody = (await req.json()) as InterpolateRichTextStylesheetRequestModel;
-		if (!requestBody) return res(ctx.status(400, 'no body found'));
-		const response = umbStylesheetData.interpolateRules({ requestBody });
-		return res(ctx.status(200), ctx.json(response));
-	}),
-
-	rest.get(umbracoPath('/stylesheet/rich-text/rules'), (req, res, ctx) => {
-		const path = req.url.searchParams.get('path');
-		if (!path) return res(ctx.status(400));
-		try {
-			const response = umbStylesheetData.getRules(path);
-			return res(ctx.status(200), ctx.json(response));
-		} catch (e) {
-			return res(ctx.status(404));
-		}
-	}),
-];
-
 const folderHandlers = [
 	rest.get(umbracoPath('/stylesheet/folder'), (req, res, ctx) => {
 		const path = req.url.searchParams.get('path');
@@ -125,11 +97,4 @@ const folderHandlers = [
 	}),
 ];
 
-export const handlers = [
-	...treeHandlers,
-	...detailHandlers,
-	...itemHandlers,
-	...collectionHandlers,
-	...folderHandlers,
-	...rulesHandlers,
-];
+export const handlers = [...treeHandlers, ...detailHandlers, ...itemHandlers, ...collectionHandlers, ...folderHandlers];
