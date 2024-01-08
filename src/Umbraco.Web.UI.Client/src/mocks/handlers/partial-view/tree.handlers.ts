@@ -10,9 +10,9 @@ export const treeHandlers = [
 	}),
 
 	rest.get(umbracoPath(`/tree${UMB_SLUG}/children`), (req, res, ctx) => {
-		const path = req.url.searchParams.get('path');
-		if (!path) return res(ctx.status(400));
-		const response = umbPartialViewMockDB.tree.getChildrenOf(path);
+		const parentPath = req.url.searchParams.get('parentPath');
+		if (!parentPath) return res(ctx.status(400));
+		const response = umbPartialViewMockDB.tree.getChildrenOf(parentPath);
 		return res(ctx.status(200), ctx.json(response));
 	}),
 ];
