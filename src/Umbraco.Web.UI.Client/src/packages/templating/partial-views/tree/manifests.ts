@@ -1,6 +1,7 @@
 import { UMB_PARTIAL_VIEW_ENTITY_TYPE, UMB_PARTIAL_VIEW_ROOT_ENTITY_TYPE } from '../entity.js';
 import { UmbPartialViewTreeRepository } from './partial-view-tree.repository.js';
 import { UmbPartialViewTreeStore } from './partial-view-tree.store.js';
+import { manifests as folderManifests } from './folder/manifests.js';
 import type {
 	ManifestRepository,
 	ManifestTree,
@@ -45,4 +46,4 @@ const treeItem: ManifestTreeItem = {
 	},
 };
 
-export const manifests = [treeRepository, treeStore, tree, treeItem];
+export const manifests = [treeRepository, treeStore, tree, treeItem, ...folderManifests];
