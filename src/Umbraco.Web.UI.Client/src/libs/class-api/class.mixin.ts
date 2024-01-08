@@ -20,7 +20,8 @@ type UmbClassMixinConstructor = new (
 	controllerAlias?: UmbControllerAlias,
 ) => UmbClassMixinDeclaration;
 
-declare class UmbClassMixinDeclaration implements UmbClassMixinInterface {
+// TODO: we need the interface from EventTarget to be part of the controller base. As a temp solution the UmbClassMixinDeclaration extends EventTarget.
+declare class UmbClassMixinDeclaration extends EventTarget implements UmbClassMixinInterface {
 	_host: UmbControllerHost;
 	observe<T>(
 		source: Observable<T>,
