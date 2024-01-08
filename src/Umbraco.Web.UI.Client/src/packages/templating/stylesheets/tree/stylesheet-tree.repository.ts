@@ -14,7 +14,7 @@ export class UmbStylesheetTreeRepository extends UmbTreeRepositoryBase<
 	}
 
 	async requestTreeRoot() {
-		const data = {
+		const data: UmbStylesheetTreeRootModel = {
 			unique: null,
 			entityType: UMB_STYLESHEET_ROOT_ENTITY_TYPE,
 			name: 'Stylesheets',

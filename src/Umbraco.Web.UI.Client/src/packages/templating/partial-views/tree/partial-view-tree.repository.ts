@@ -16,8 +16,8 @@ export class UmbPartialViewTreeRepository
 	}
 
 	async requestTreeRoot() {
-		const data = {
-			path: null,
+		const data: UmbPartialViewTreeRootModel = {
+			unique: null,
 			entityType: UMB_PARTIAL_VIEW_ROOT_ENTITY_TYPE,
 			name: 'Partial Views',
 			icon: 'icon-folder',
