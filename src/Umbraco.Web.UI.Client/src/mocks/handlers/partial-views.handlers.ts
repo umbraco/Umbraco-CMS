@@ -31,7 +31,7 @@ const detailHandlers: RestHandler<MockedRequest<DefaultBodyType>>[] = [
 		if (!requestBody) return res(ctx.status(400, 'no body found'));
 		const path = umbPartialViewMockDB.file.create(requestBody);
 		return res(
-			ctx.status(200),
+			ctx.status(201),
 			ctx.set({
 				Location: path,
 			}),

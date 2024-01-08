@@ -36,7 +36,7 @@ export class UmbStylesheetFolderServerDataSource implements UmbFolderDataSource 
 
 		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
-			StylesheetResource.getStylesheetFolder({
+			StylesheetResource.getStylesheetFolderByPath({
 				path,
 			}),
 		);
@@ -44,7 +44,7 @@ export class UmbStylesheetFolderServerDataSource implements UmbFolderDataSource 
 		if (data) {
 			const mappedData = {
 				unique: this.#serverPathUniqueSerializer.toUnique(data.path),
-				parentUnique: this.#serverPathUniqueSerializer.toParentUnique(data.path),
+				parentUnique: data.parent ? this.#serverPathUniqueSerializer.toUnique(data.parent.path) : null,
 				name: data.name,
 			};
 
@@ -71,17 +71,15 @@ export class UmbStylesheetFolderServerDataSource implements UmbFolderDataSource 
 			name: args.name,
 		};
 
-		const { error } = await tryExecuteAndNotify(
+		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
 			StylesheetResource.postStylesheetFolder({
 				requestBody,
 			}),
 		);
 
-		if (!error) {
-			/* TODO: investigate why we don't get the location header as part of data, 
-			so we don't have to construct the path ourselves */
-			const newPath = parentPath ? `${parentPath}/${args.name}` : args.name;
+		if (data) {
+			const newPath = this.#serverPathUniqueSerializer.toUnique(data);
 			return this.read(newPath);
 		}
 
@@ -101,7 +99,7 @@ export class UmbStylesheetFolderServerDataSource implements UmbFolderDataSource 
 
 		return tryExecuteAndNotify(
 			this.#host,
-			StylesheetResource.deleteStylesheetFolder({
+			StylesheetResource.deleteStylesheetFolderByPath({
 				path,
 			}),
 		);

@@ -1,8 +1,11 @@
 import { UmbFileSystemMockDbBase } from './file-system-base.js';
-import { CreatePathFolderRequestModel, PathFolderModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
+import {
+	FileSystemCreateRequestModelBaseModel,
+	FileSystemResponseModelBaseModel,
+} from '@umbraco-cms/backoffice/backend-api';
 
 export class UmbMockFileSystemFolderManager<
-	MockItemType extends PathFolderModelBaseModel & { path: string; isFolder: boolean },
+	MockItemType extends FileSystemResponseModelBaseModel & { isFolder: boolean },
 > {
 	#db: UmbFileSystemMockDbBase<MockItemType>;
 
@@ -10,17 +13,21 @@ export class UmbMockFileSystemFolderManager<
 		this.#db = db;
 	}
 
-	create(request: CreatePathFolderRequestModel) {
-		const newFolder: MockItemType = {
-			path: request.parentPath ? `${request.parentPath}/${request.name}` : request.name,
-			parenPath: request.parentPath || null,
+	create(request: FileSystemCreateRequestModelBaseModel) {
+		const path = request.parentPath ? `${request.parentPath}/${request.name}` : request.name;
+
+		const newFolder = {
+			path,
+			parent: request.parentPath ? { path: request.parentPath } : null,
 			name: request.name,
 			hasChildren: false,
 			isFolder: true,
 			content: '',
-		};
+		} as unknown as MockItemType;
 
 		this.#db.create(newFolder);
+
+		return path;
 	}
 
 	read(path: string) {
@@ -39,10 +46,11 @@ export class UmbMockFileSystemFolderManager<
 		}
 	}
 
-	#defaultReadMapper = (item: MockItemType): PathFolderModelBaseModel & { path: string } => {
+	#defaultReadMapper = (item: MockItemType): FileSystemResponseModelBaseModel => {
 		return {
-			name: item.name,
 			path: item.path,
+			name: item.name,
+			parent: item.parent,
 		};
 	};
 }
