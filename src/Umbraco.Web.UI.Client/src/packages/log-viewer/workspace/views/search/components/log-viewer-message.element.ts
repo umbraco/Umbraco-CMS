@@ -170,7 +170,9 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 												look="secondary"
 												label="Find logs with ${property.name}"
 												title="Find logs with ${property.name}"
-												href=${`section/settings/workspace/logviewer/search/?${this._findLogsWithProperty(property)}`}>
+												href=${`section/settings/workspace/logviewer/view/search/?${this._findLogsWithProperty(
+													property,
+												)}`}>
 												<uui-icon name="icon-search"></uui-icon>
 										  </uui-button>`
 										: ''}
