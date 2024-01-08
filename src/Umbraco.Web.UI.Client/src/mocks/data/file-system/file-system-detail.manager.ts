@@ -7,7 +7,7 @@ import {
 } from '@umbraco-cms/backoffice/backend-api';
 
 export interface UmbMockFileSystemDetailManagerArgs<MockItemType extends ScriptResponseModel> {
-	createMapper: (item: CreateTextFileViewModelBaseModel) => MockItemType;
+	createMapper: (item: CreateTextFileViewModelBaseModel, path: string) => MockItemType;
 	readMapper: (item: MockItemType) => ScriptResponseModel;
 }
 
@@ -21,9 +21,11 @@ export class UmbMockFileSystemDetailManager<MockItemType extends ScriptResponseM
 	}
 
 	create(item: CreateTextFileViewModelBaseModel) {
-		const mockItem = this.#args.createMapper(item);
+		const path = item.parentPath ? item.parentPath + '/' + item.name : item.name;
+		const mockItem = this.#args.createMapper(item, path);
 		// create mock item in mock db
 		this.#db.create(mockItem);
+		return path;
 	}
 
 	read(path: string): ScriptResponseModel | undefined {
