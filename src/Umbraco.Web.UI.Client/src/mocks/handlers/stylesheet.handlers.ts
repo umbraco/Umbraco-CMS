@@ -33,8 +33,13 @@ const detailHandlers = [
 	rest.post(umbracoPath('/stylesheet'), async (req, res, ctx) => {
 		const requestBody = (await req.json()) as CreateStylesheetRequestModel;
 		if (!requestBody) return res(ctx.status(400, 'no body found'));
-		umbStylesheetData.file.create(requestBody);
-		return res(ctx.status(200));
+		const path = umbStylesheetData.file.create(requestBody);
+		return res(
+			ctx.status(200),
+			ctx.set({
+				Location: path,
+			}),
+		);
 	}),
 
 	rest.delete(umbracoPath('/stylesheet'), (req, res, ctx) => {

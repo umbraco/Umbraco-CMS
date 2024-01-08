@@ -33,8 +33,13 @@ const detailHandlers: RestHandler<MockedRequest<DefaultBodyType>>[] = [
 	rest.post(umbracoPath('/script'), async (req, res, ctx) => {
 		const requestBody = (await req.json()) as CreateScriptRequestModel;
 		if (!requestBody) return res(ctx.status(400, 'no body found'));
-		umbScriptMockDb.file.create(requestBody);
-		return res(ctx.status(200));
+		const path = umbScriptMockDb.file.create(requestBody);
+		return res(
+			ctx.status(200),
+			ctx.set({
+				Location: path,
+			}),
+		);
 	}),
 
 	rest.delete(umbracoPath('/script'), (req, res, ctx) => {
