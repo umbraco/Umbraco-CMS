@@ -4,7 +4,7 @@ import { UmbServerPathUniqueSerializer, appendFileExtensionIfNeeded } from '../.
 import {
 	CreateStylesheetRequestModel,
 	StylesheetResource,
-	UpdateTextFileViewModelBaseModel,
+	UpdateStylesheetRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
@@ -67,22 +67,18 @@ export class UmbStylesheetDetailServerDataSource implements UmbDetailDataSource<
 	async read(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		const serverPath = this.#serverPathUniqueSerializer.toServerPath(unique);
+		const path = this.#serverPathUniqueSerializer.toServerPath(unique);
 
-		const { data, error } = await tryExecuteAndNotify(
-			this.#host,
-			StylesheetResource.getStylesheet({ path: serverPath }),
-		);
+		const { data, error } = await tryExecuteAndNotify(this.#host, StylesheetResource.getStylesheetByPath({ path }));
 
 		if (error || !data) {
 			return { error };
 		}
 
-		// TODO: make data mapper to prevent errors
 		const stylesheet: UmbStylesheetDetailModel = {
 			entityType: UMB_STYLESHEET_ENTITY_TYPE,
 			unique: this.#serverPathUniqueSerializer.toUnique(data.path),
-			parentUnique: this.#serverPathUniqueSerializer.toParentUnique(data.path),
+			parentUnique: data.parent ? this.#serverPathUniqueSerializer.toUnique(data.parent.path) : null,
 			path: data.path,
 			name: data.name,
 			content: data.content,
@@ -94,18 +90,16 @@ export class UmbStylesheetDetailServerDataSource implements UmbDetailDataSource<
 	async update(data: UmbStylesheetDetailModel) {
 		if (!data.unique) throw new Error('Unique is missing');
 
-		const existingPath = this.#serverPathUniqueSerializer.toServerPath(data.unique);
+		const path = this.#serverPathUniqueSerializer.toServerPath(data.unique);
 
-		// TODO: make data mapper to prevent errors
-		const requestBody: UpdateTextFileViewModelBaseModel = {
-			existingPath,
-			name: data.name,
+		const requestBody: UpdateStylesheetRequestModel = {
 			content: data.content,
 		};
 
 		const { error } = await tryExecuteAndNotify(
 			this.#host,
-			StylesheetResource.putStylesheet({
+			StylesheetResource.putStylesheetByPath({
+				path,
 				requestBody,
 			}),
 		);
@@ -114,12 +108,7 @@ export class UmbStylesheetDetailServerDataSource implements UmbDetailDataSource<
 			return { error };
 		}
 
-		// TODO: should we get this as part of the PUT response?
-		const parentPath = this.#serverPathUniqueSerializer.toServerPath(data.parentUnique);
-		const newFilePath = parentPath + '/' + requestBody.name;
-		const newPathUnique = this.#serverPathUniqueSerializer.toUnique(newFilePath);
-		// We have to fetch the data type again. The server can have modified the data after update
-		return this.read(newPathUnique);
+		return this.read(data.unique);
 	}
 
 	async delete(unique: string) {
@@ -129,7 +118,7 @@ export class UmbStylesheetDetailServerDataSource implements UmbDetailDataSource<
 
 		return tryExecuteAndNotify(
 			this.#host,
-			StylesheetResource.deleteStylesheet({
+			StylesheetResource.deleteStylesheetByPath({
 				path,
 			}),
 		);
