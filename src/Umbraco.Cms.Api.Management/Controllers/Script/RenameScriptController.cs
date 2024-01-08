@@ -28,7 +28,7 @@ public class RenameScriptController : ScriptControllerBase
 
     [HttpPut("{path}/rename")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Rename(string path, RenameScriptRequestModel requestModel)
@@ -39,7 +39,7 @@ public class RenameScriptController : ScriptControllerBase
         Attempt<IScript?, ScriptOperationStatus> renameAttempt = await _scriptService.RenameAsync(path, renameModel, CurrentUserKey(_backOfficeSecurityAccessor));
 
         return renameAttempt.Success
-            ? Ok()
+            ? CreatedAtAction<ByPathScriptController>(controller => nameof(controller.ByPath), new { path = renameAttempt.Result!.Path.SystemPathToVirtualPath() })
             : ScriptOperationStatusResult(renameAttempt.Status);
     }
 }

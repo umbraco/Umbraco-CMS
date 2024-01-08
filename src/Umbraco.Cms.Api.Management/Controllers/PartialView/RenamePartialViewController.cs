@@ -28,7 +28,7 @@ public class RenamePartialViewController : PartialViewControllerBase
 
     [HttpPut("{path}/rename")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Rename(string path, RenamePartialViewRequestModel requestModel)
@@ -39,7 +39,7 @@ public class RenamePartialViewController : PartialViewControllerBase
         Attempt<IPartialView?, PartialViewOperationStatus> renameAttempt = await _partialViewService.RenameAsync(path, renameModel, CurrentUserKey(_backOfficeSecurityAccessor));
 
         return renameAttempt.Success
-            ? Ok()
+            ? CreatedAtAction<ByPathPartialViewController>(controller => nameof(controller.ByPath), new { path = renameAttempt.Result!.Path.SystemPathToVirtualPath() })
             : PartialViewOperationStatusResult(renameAttempt.Status);
     }
 }
