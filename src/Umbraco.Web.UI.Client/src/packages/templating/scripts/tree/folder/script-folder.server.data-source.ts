@@ -1,6 +1,6 @@
 import { UmbServerPathUniqueSerializer } from '../../../utils/index.js';
 import { UmbCreateFolderModel, UmbFolderDataSource, UmbUpdateFolderModel } from '@umbraco-cms/backoffice/tree';
-import { ScriptResource } from '@umbraco-cms/backoffice/backend-api';
+import { CreateScriptFolderRequestModel, ScriptResource } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -66,7 +66,7 @@ export class UmbScriptFolderServerDataSource implements UmbFolderDataSource {
 
 		const parentPath = new UmbServerPathUniqueSerializer().toServerPath(args.parentUnique);
 
-		const requestBody = {
+		const requestBody: CreateScriptFolderRequestModel = {
 			parentPath,
 			name: args.name,
 		};
