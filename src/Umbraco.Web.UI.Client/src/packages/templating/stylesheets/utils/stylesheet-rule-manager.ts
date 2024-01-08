@@ -1,5 +1,4 @@
 import { UmbStylesheetRule } from '../types.js';
-import { RichTextRuleModel } from '@umbraco-cms/backoffice/backend-api';
 
 export class UmbStylesheetRuleManager {
 	#umbRuleRegex = /\/\*\*\s*umb_name:\s*(?<name>[^*\r\n]*?)\s*\*\/\s*(?<selector>[^,{]*?)\s*{\s*(?<styles>.*?)\s*}/gis;
@@ -30,7 +29,7 @@ export class UmbStylesheetRuleManager {
 	 * @return {*}
 	 * @memberof UmbStylesheetRuleManager
 	 */
-	insertRules(stylesheetContent: string, rules: Array<RichTextRuleModel>): string {
+	insertRules(stylesheetContent: string, rules: Array<any>): string {
 		const regex = this.#umbRuleRegex;
 		if (!stylesheetContent) throw Error('No Stylesheet content');
 		if (!stylesheetContent && !rules) return '';
