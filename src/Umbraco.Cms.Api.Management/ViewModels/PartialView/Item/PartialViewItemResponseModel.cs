@@ -2,6 +2,6 @@
 
 namespace Umbraco.Cms.Api.Management.ViewModels.PartialView.Item;
 
-public class PartialViewItemResponseModel : FileSystemResponseModelBase
+public class PartialViewItemResponseModel : FileSystemItemResponseModelBase
 {
 }

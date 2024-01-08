@@ -2,6 +2,6 @@
 
 namespace Umbraco.Cms.Api.Management.ViewModels.Stylesheet.Item;
 
-public class StylesheetItemResponseModel : FileSystemResponseModelBase
+public class StylesheetItemResponseModel : FileSystemItemResponseModelBase
 {
 }

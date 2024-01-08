@@ -2,6 +2,6 @@
 
 namespace Umbraco.Cms.Api.Management.ViewModels.StaticFile.Item;
 
-public class StaticFileItemResponseModel : FileSystemResponseModelBase
+public class StaticFileItemResponseModel : FileSystemItemResponseModelBase
 {
 }
