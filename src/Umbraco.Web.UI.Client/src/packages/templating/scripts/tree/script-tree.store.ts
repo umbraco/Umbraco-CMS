@@ -32,15 +32,15 @@ export class UmbScriptTreeStore extends UmbUniqueTreeStore {
 
 	#listen() {
 		// TODO: add event class to remove the magic strings
-		this.#actionEventContext?.addEventListener('detail-create-success', this.#onCreated);
-		this.#actionEventContext?.addEventListener('detail-save-success', this.#onSaved);
-		this.#actionEventContext?.addEventListener('detail-delete-success', this.#onDeleted);
+		this.#actionEventContext?.addEventListener('detail-create-success', this.#onCreated as EventListener);
+		this.#actionEventContext?.addEventListener('detail-save-success', this.#onSaved as EventListener);
+		this.#actionEventContext?.addEventListener('detail-delete-success', this.#onDeleted as EventListener);
 	}
 
 	#stopListening() {
-		this.#actionEventContext?.removeEventListener('detail-create-success', this.#onCreated);
-		this.#actionEventContext?.removeEventListener('detail-save-success', this.#onSaved);
-		this.#actionEventContext?.removeEventListener('detail-delete-success', this.#onDeleted);
+		this.#actionEventContext?.removeEventListener('detail-create-success', this.#onCreated as EventListener);
+		this.#actionEventContext?.removeEventListener('detail-save-success', this.#onSaved as EventListener);
+		this.#actionEventContext?.removeEventListener('detail-delete-success', this.#onDeleted as EventListener);
 	}
 
 	#onCreated = (event: UmbActionEvent) => {
