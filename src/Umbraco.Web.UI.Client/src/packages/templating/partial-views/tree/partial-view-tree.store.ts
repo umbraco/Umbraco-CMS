@@ -1,6 +1,6 @@
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UmbFileSystemTreeStore } from '@umbraco-cms/backoffice/tree';
+import { UmbUniqueTreeStore } from '@umbraco-cms/backoffice/tree';
 
 /**
  * @export
@@ -8,7 +8,7 @@ import { UmbFileSystemTreeStore } from '@umbraco-cms/backoffice/tree';
  * @extends {UmbStoreBase}
  * @description - Tree Data Store for PartialView
  */
-export class UmbPartialViewTreeStore extends UmbFileSystemTreeStore {
+export class UmbPartialViewTreeStore extends UmbUniqueTreeStore {
 	/**
 	 * Creates an instance of UmbPartialViewTreeStore.
 	 * @param {UmbControllerHostElement} host
