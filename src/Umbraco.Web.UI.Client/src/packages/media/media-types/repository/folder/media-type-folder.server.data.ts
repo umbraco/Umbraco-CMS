@@ -1,5 +1,5 @@
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import { UmbFolderDataSource } from '@umbraco-cms/backoffice/repository';
+import { UmbFolderDataSource } from '@umbraco-cms/backoffice/tree';
 import {
 	MediaTypeResource,
 	FolderResponseModel,

@@ -1,13 +1,9 @@
-import { RichTextRuleModelSortable } from '../../workspace/stylesheet-workspace.context.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-stylesheet-rule-settings-modal')
-export default class UmbStylesheetRuleSettingsModalElement extends UmbModalBaseElement<
-	never,
-	StylesheetRichTextEditorStyleModalValue
-> {
+export default class UmbStylesheetRuleSettingsModalElement extends UmbModalBaseElement<never, any> {
 	#updateName(event: Event) {
 		const name = (event.target as HTMLInputElement).value;
 

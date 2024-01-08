@@ -1,3 +1,4 @@
+import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 
 export interface UmbStore<T> extends UmbContextBase<T> {

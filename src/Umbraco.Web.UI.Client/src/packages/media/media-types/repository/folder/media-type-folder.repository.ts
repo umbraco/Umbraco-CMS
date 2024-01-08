@@ -1,11 +1,8 @@
 import { createFolderTreeItem } from '../utils.js';
 import { UMB_MEDIA_TYPE_TREE_STORE_CONTEXT, UmbMediaTypeTreeStore } from '../../tree/media-type-tree.store.js';
 import { UmbMediaTypeFolderServerDataSource } from './media-type-folder.server.data.js';
-import {
-	type UmbFolderRepository,
-	type UmbFolderDataSource,
-	UmbRepositoryBase,
-} from '@umbraco-cms/backoffice/repository';
+import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
+import { type UmbFolderRepository, type UmbFolderDataSource } from '@umbraco-cms/backoffice/tree';
 import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { CreateFolderRequestModel, FolderModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UMB_NOTIFICATION_CONTEXT_TOKEN, UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
