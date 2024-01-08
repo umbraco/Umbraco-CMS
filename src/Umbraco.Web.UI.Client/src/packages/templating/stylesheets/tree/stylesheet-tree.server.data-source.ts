@@ -40,7 +40,7 @@ const getChildrenOf = (parentUnique: string | null) => {
 	} else {
 		// eslint-disable-next-line local-rules/no-direct-api-import
 		return StylesheetResource.getTreeStylesheetChildren({
-			path: serializer.toServerPath(parentUnique),
+			parentPath: serializer.toServerPath(parentUnique),
 		});
 	}
 };
@@ -50,7 +50,7 @@ const mapper = (item: FileSystemTreeItemPresentationModel): UmbStylesheetTreeIte
 
 	return {
 		unique: serializer.toUnique(item.path),
-		parentUnique: serializer.toParentUnique(item.path),
+		parentUnique: item.parent ? serializer.toUnique(item.parent?.path) : null,
 		entityType: item.isFolder ? UMB_STYLESHEET_FOLDER_ENTITY_TYPE : UMB_STYLESHEET_ENTITY_TYPE,
 		name: item.name,
 		isFolder: item.isFolder,
