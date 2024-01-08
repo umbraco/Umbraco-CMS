@@ -21,22 +21,22 @@ class UmbScriptMockDB extends UmbFileSystemMockDbBase<UmbMockScriptModel> {
 		});
 	}
 
-	#createScriptMockItem = (item: CreateScriptRequestModel): UmbMockScriptModel => {
+	#createScriptMockItem = (item: CreateScriptRequestModel, path: string): UmbMockScriptModel => {
 		return {
 			name: item.name,
 			content: item.content,
-			path: `${item.parentPath}` ? `${item.parentPath}/${item.name}` : item.name,
+			path: path,
+			parentPath: item.parentPath || null,
 			isFolder: false,
 			hasChildren: false,
-			type: 'script',
-			icon: '',
 		};
 	};
 
 	#readScriptResponseMapper = (item: UmbMockScriptModel): ScriptResponseModel => {
 		return {
-			path: item.path,
 			name: item.name,
+			path: item.path,
+			parentPath: item.parentPath,  
 			content: item.content,
 		};
 	};

@@ -1,13 +1,23 @@
-import { FileSystemTreeItemPresentationModel, StylesheetResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import {
+	FileSystemTreeItemPresentationModel,
+	StylesheetItemResponseModel,
+	StylesheetResponseModel,
+} from '@umbraco-cms/backoffice/backend-api';
 
-export type UmbMockStylesheetModel = StylesheetResponseModel & FileSystemTreeItemPresentationModel;
+export type UmbMockStylesheetModelHack = StylesheetResponseModel &
+	FileSystemTreeItemPresentationModel &
+	StylesheetItemResponseModel;
+
+export interface UmbMockStylesheetModel extends Omit<UmbMockStylesheetModelHack, 'type' | 'icon'> {
+	parentPath: string | null;
+}
 
 export const data: Array<UmbMockStylesheetModel> = [
 	{
-		path: 'Stylesheet File 1.css',
-		isFolder: false,
 		name: 'Stylesheet File 1.css',
-		type: 'stylesheet',
+		path: 'Stylesheet File 1.css',
+		parentPath: null,
+		isFolder: false,
 		hasChildren: false,
 		content: `
 		/** Stylesheet 1 */
@@ -32,10 +42,10 @@ h1 {
 }`,
 	},
 	{
-		path: 'Stylesheet File 2.css',
-		isFolder: false,
 		name: 'Stylesheet File 2.css',
-		type: 'stylesheet',
+		path: 'Stylesheet File 2.css',
+		parentPath: null,
+		isFolder: false,
 		hasChildren: false,
 		content: `
 		/** Stylesheet 2 */
@@ -59,17 +69,17 @@ h1 {
 }`,
 	},
 	{
-		path: 'Folder 1',
 		name: 'Folder 1',
+		path: 'Folder 1',
+		parentPath: null,
 		isFolder: true,
-		type: 'stylesheet',
 		hasChildren: true,
 		content: '',
 	},
 	{
-		path: 'Folder 1/Stylesheet File 3.css',
 		name: 'Stylesheet File 3.css',
-		type: 'stylesheet',
+		path: 'Folder 1/Stylesheet File 3.css',
+		parentPath: 'Folder 1',
 		hasChildren: false,
 		isFolder: false,
 		content: `h1 {

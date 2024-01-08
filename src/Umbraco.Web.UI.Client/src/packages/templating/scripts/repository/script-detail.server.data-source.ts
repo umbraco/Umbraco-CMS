@@ -45,23 +45,19 @@ export class UmbScriptDetailServerDataSource implements UmbDetailDataSource<UmbS
 			content: script.content,
 		};
 
-		const { error } = await tryExecuteAndNotify(
+		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
 			ScriptResource.postScript({
 				requestBody,
 			}),
 		);
 
-		if (error) {
-			return { error };
+		if (data) {
+			const createdScriptUnique = this.#serverPathUniqueSerializer.toUnique(data);
+			return this.read(createdScriptUnique);
 		}
 
-		// We have to fetch the data again. The server can have modified the data after creation
-		// TODO: revisit when location header is added
-		const createdScriptPath = parentPath ? parentPath + '/' + requestBody.name : requestBody.name;
-		const createdScriptUnique = this.#serverPathUniqueSerializer.toUnique(createdScriptPath);
-
-		return this.read(createdScriptUnique);
+		return { error };
 	}
 
 	async read(unique: string) {

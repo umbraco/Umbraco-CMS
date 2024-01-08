@@ -33,14 +33,14 @@ class UmbStylesheetData extends UmbFileSystemMockDbBase<UmbMockStylesheetModel> 
 		};
 	}
 
-	#createStylesheetMockItemMapper = (item: CreateStylesheetRequestModel): UmbMockStylesheetModel => {
+	#createStylesheetMockItemMapper = (item: CreateStylesheetRequestModel, path: string): UmbMockStylesheetModel => {
 		return {
 			name: item.name,
 			content: item.content,
-			path: `${item.parentPath}` ? `${item.parentPath}/${item.name}` : item.name,
+			path: path,
+			parentPath: item.parentPath || null,
 			isFolder: false,
 			hasChildren: false,
-			type: 'stylesheet',
 		};
 	};
 

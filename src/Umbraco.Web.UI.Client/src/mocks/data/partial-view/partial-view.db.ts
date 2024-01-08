@@ -21,12 +21,12 @@ class UmbPartialViewMockDB extends UmbFileSystemMockDbBase<UmbMockPartialViewMod
 		});
 	}
 
-	#createPartialViewMockItemMapper = (item: CreatePartialViewRequestModel): UmbMockPartialViewModel => {
+	#createPartialViewMockItemMapper = (item: CreatePartialViewRequestModel, path: string): UmbMockPartialViewModel => {
 		return {
 			name: item.name,
 			content: item.content,
-			path: item.path,
-			parentPath: item.parentPath,
+			path: path,
+			parentPath: item.parentPath || null,
 			isFolder: false,
 			hasChildren: false,
 		};
