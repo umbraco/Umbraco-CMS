@@ -115,10 +115,12 @@ export const data: Array<UmbMockPartialViewModel> = [
 export const snippets: Array<PartialViewSnippetResponseModel> = [
 	{
 		name: 'Empty',
+		fileName: 'Empty',
 		content: '@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage',
 	},
 	{
 		name: 'Breadcrumb',
+		fileName: 'Breadcrumb',
 		content: `@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
 		@using Umbraco.Cms.Core.Routing
 		@using Umbraco.Extensions
@@ -150,6 +152,7 @@ export const snippets: Array<PartialViewSnippetResponseModel> = [
 	},
 	{
 		name: 'EditProfile',
+		fileName: 'EditProfile',
 		content: `@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
 
 		@using Umbraco.Cms.Core.Services
@@ -282,26 +285,32 @@ export const snippets: Array<PartialViewSnippetResponseModel> = [
 	},
 	{
 		name: 'Login',
+		fileName: 'Login',
 		content: 'login',
 	},
 	{
-		name: 'LoginStatus',
+		name: 'Login Status',
+		fileName: 'LoginStatus',
 		content: 'loginStatus',
 	},
 	{
-		name: 'MultinodeTree-picker',
+		name: 'Multinode Tree-picker',
+		fileName: 'MultinodeTree-picker',
 		content: 'MultinodeTree-picker',
 	},
 	{
 		name: 'Navigation',
+		fileName: 'Navigation',
 		content: 'Navigation',
 	},
 	{
-		name: 'RegisterMember',
+		name: 'Register Member',
+		fileName: 'RegisterMember',
 		content: 'RegisterMember',
 	},
 	{
-		name: 'SiteMap',
+		name: 'Site Map',
+		fileName: 'SiteMap',
 		content: 'SiteMap',
 	},
 ];
