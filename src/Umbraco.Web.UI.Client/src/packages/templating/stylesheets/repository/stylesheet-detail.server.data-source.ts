@@ -10,7 +10,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
-export class UmbStylesheetDetailServerDataSource implements UmbDetailDataSource<UmbScriptDetailModel> {
+export class UmbStylesheetDetailServerDataSource implements UmbDetailDataSource<UmbStylesheetDetailModel> {
 	#host: UmbControllerHost;
 	#serverPathUniqueSerializer = new UmbServerPathUniqueSerializer();
 

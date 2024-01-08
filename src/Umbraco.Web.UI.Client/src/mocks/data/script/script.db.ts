@@ -36,7 +36,7 @@ class UmbScriptMockDB extends UmbFileSystemMockDbBase<UmbMockScriptModel> {
 		return {
 			name: item.name,
 			path: item.path,
-			parentPath: item.parentPath,  
+			parentPath: item.parentPath,
 			content: item.content,
 		};
 	};

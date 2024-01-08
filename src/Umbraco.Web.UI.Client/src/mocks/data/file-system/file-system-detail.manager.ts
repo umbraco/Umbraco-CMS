@@ -37,8 +37,24 @@ export class UmbMockFileSystemDetailManager<MockItemType extends ScriptResponseM
 		return mappedItem;
 	}
 
-	update(item: UpdateTextFileViewModelBaseModel) {
-		const mockItem = this.#db.read(item.existingPath);
+	update(path: string, item: UpdateTextFileViewModelBaseModel) {
+		const mockItem = this.#db.read(path);
+
+		const updatedMockItem = {
+			...mockItem,
+			content: item.content,
+		} as MockItemType;
+
+		this.#db.update(path, updatedMockItem);
+	}
+
+	delete(path: string) {
+		this.#db.delete(path);
+	}
+
+	/* TODO: implement as rename
+	update(path, item: UpdateTextFileViewModelBaseModel) {
+		const mockItem = this.#db.read(path);
 
 		const parentPath = getParentPathFromServerPath(item.existingPath);
 		const newPath = parentPath ? parentPath + '/' + item.name : item.name;
@@ -52,8 +68,5 @@ export class UmbMockFileSystemDetailManager<MockItemType extends ScriptResponseM
 
 		this.#db.update(item.existingPath, updatedMockItem);
 	}
-
-	delete(path: string) {
-		this.#db.delete(path);
-	}
+	*/
 }

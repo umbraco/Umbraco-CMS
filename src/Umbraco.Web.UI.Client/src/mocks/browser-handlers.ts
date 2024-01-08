@@ -28,7 +28,7 @@ import { handlers as logViewerHandlers } from './handlers/log-viewer.handlers.js
 import { handlers as packageHandlers } from './handlers/package.handlers.js';
 import { handlers as rteEmbedHandlers } from './handlers/rte-embed.handlers.js';
 import { handlers as staticFileHandlers } from './handlers/static-file.handlers.js';
-import { handlers as stylesheetHandlers } from './handlers/stylesheet.handlers.js';
+import { handlers as stylesheetHandlers } from './handlers/stylesheet/index.js';
 import { handlers as partialViewsHandlers } from './handlers/partial-views.handlers.js';
 import { handlers as tagHandlers } from './handlers/tag-handlers.js';
 import { handlers as configHandlers } from './handlers/config.handlers.js';
