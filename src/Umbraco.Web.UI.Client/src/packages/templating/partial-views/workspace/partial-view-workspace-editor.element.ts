@@ -7,20 +7,11 @@ import { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_MODAL_MANAGER_CONTEXT_TOKEN, UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
-import { Subject, debounceTime } from '@umbraco-cms/backoffice/external/rxjs';
 
 @customElement('umb-partial-view-workspace-editor')
 export class UmbPartialViewWorkspaceEditorElement extends UmbLitElement {
-	#name: string | undefined = '';
 	@state()
-	private get _name() {
-		return this.#name;
-	}
-
-	private set _name(value) {
-		this.#name = value?.replace('.cshtml', '');
-		this.requestUpdate();
-	}
+	private _name?: string = '';
 
 	@state()
 	private _content?: string | null = '';
@@ -29,15 +20,13 @@ export class UmbPartialViewWorkspaceEditorElement extends UmbLitElement {
 	private _path?: string | null = '';
 
 	@state()
-	private _ready?: boolean = false;
+	private _ready: boolean = false;
 
 	@query('umb-code-editor')
 	private _codeEditor?: UmbCodeEditorElement;
 
-	#partialViewWorkspaceContext?: typeof UMB_PARTIAL_VIEW_WORKSPACE_CONTEXT.TYPE;
+	#workspaceContext?: typeof UMB_PARTIAL_VIEW_WORKSPACE_CONTEXT.TYPE;
 	private _modalContext?: UmbModalManagerContext;
-
-	private inputQuery$ = new Subject<string>();
 
 	constructor() {
 		super();
@@ -47,25 +36,21 @@ export class UmbPartialViewWorkspaceEditorElement extends UmbLitElement {
 		});
 
 		this.consumeContext(UMB_PARTIAL_VIEW_WORKSPACE_CONTEXT, (workspaceContext) => {
-			this.#partialViewWorkspaceContext = workspaceContext;
-			this.observe(this.#partialViewWorkspaceContext.name, (name) => {
+			this.#workspaceContext = workspaceContext;
+			this.observe(this.#workspaceContext.name, (name) => {
 				this._name = name;
 			});
 
-			this.observe(this.#partialViewWorkspaceContext.content, (content) => {
+			this.observe(this.#workspaceContext.content, (content) => {
 				this._content = content;
 			});
 
-			this.observe(this.#partialViewWorkspaceContext.path, (path) => {
+			this.observe(this.#workspaceContext.path, (path) => {
 				this._path = path;
 			});
 
-			this.observe(this.#partialViewWorkspaceContext.isCodeEditorReady, (isReady) => {
+			this.observe(this.#workspaceContext.isCodeEditorReady, (isReady) => {
 				this._ready = isReady;
-			});
-
-			this.inputQuery$.pipe(debounceTime(250)).subscribe((nameInputValue: string) => {
-				this.#partialViewWorkspaceContext?.setName(`${nameInputValue}.cshtml`);
 			});
 		});
 	}
@@ -73,13 +58,13 @@ export class UmbPartialViewWorkspaceEditorElement extends UmbLitElement {
 	#onNameInput(event: Event) {
 		const target = event.target as UUIInputElement;
 		const value = target.value as string;
-		this.inputQuery$.next(value);
+		this.#workspaceContext?.setName(value);
 	}
 
 	#onCodeEditorInput(event: Event) {
 		const target = event.target as UmbCodeEditorElement;
 		const value = target.code as string;
-		this.#partialViewWorkspaceContext?.setContent(value);
+		this.#workspaceContext?.setContent(value);
 	}
 
 	#insertSnippet(event: Event) {
@@ -105,7 +90,7 @@ export class UmbPartialViewWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	render() {
-		return html`<umb-workspace-editor alias="Umb.Workspace.Template">
+		return html`<umb-workspace-editor alias="Umb.Workspace.PartialView">
 			<div id="workspace-header" slot="header">
 				<uui-input
 					placeholder="Enter name..."
