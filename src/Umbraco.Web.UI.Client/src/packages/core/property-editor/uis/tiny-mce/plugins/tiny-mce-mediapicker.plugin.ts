@@ -225,6 +225,8 @@ export default class UmbTinyMceMediaPickerPlugin extends UmbTinyMcePluginBase {
 
 			progress(50);
 
+			document.dispatchEvent(new CustomEvent('rte.file.uploading', { composed: true, bubbles: true }));
+
 			this.#temporaryFileRepository
 				.upload(id, file)
 				.then((response) => {
@@ -239,7 +241,10 @@ export default class UmbTinyMceMediaPickerPlugin extends UmbTinyMcePluginBase {
 					resolve(blobUri);
 				})
 				.catch(reject)
-				.finally(() => progress(100));
+				.finally(() => {
+					progress(100);
+					document.dispatchEvent(new CustomEvent('rte.file.uploaded', { composed: true, bubbles: true }));
+				});
 		});
 	};
 }
