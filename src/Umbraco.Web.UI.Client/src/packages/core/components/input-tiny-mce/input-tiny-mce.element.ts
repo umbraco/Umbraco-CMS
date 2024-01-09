@@ -272,6 +272,22 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 			this.#onChange(editor.getContent());
 		});
 
+		editor.on('SetContent', (e) => {
+			/**
+			 * Prevent injecting arbitrary JavaScript execution in on-attributes.
+			 *
+			 * TODO: This used to be toggleable through server variables with window.Umbraco?.Sys.ServerVariables.umbracoSettings.sanitizeTinyMce
+			 */
+			const allNodes = Array.from(editor.dom.doc.getElementsByTagName('*'));
+			allNodes.forEach((node) => {
+				for (let i = 0; i < node.attributes.length; i++) {
+					if (node.attributes[i].name.startsWith('on')) {
+						node.removeAttribute(node.attributes[i].name);
+					}
+				}
+			});
+		});
+
 		editor.on('init', () => editor.setContent(this.value?.toString() ?? ''));
 	}
 
