@@ -15,7 +15,7 @@ public DefaultUrlAssembler(UriUtility uriUtility) => _uriUtility = uriUtility;
             throw new ArgumentException($"{nameof(path)} cannot be null or whitespace", nameof(path));
         }
 
-        // the stored path is absolute so we just return it as is
+        // the path is absolute so we just return it as is
         if (Uri.IsWellFormedUriString(path, UriKind.Absolute))
         {
             return new Uri(path);
@@ -23,18 +23,14 @@ public DefaultUrlAssembler(UriUtility uriUtility) => _uriUtility = uriUtility;
 
         Uri uri;
 
-        if (current == null)
-        {
-            mode = UrlMode.Relative; // best we can do
-        }
-
         switch (mode)
         {
             case UrlMode.Absolute:
-                uri = new Uri(current?.GetLeftPart(UriPartial.Authority) + path);
+                uri = new Uri(current.GetLeftPart(UriPartial.Authority) + path);
                 break;
             case UrlMode.Relative:
             case UrlMode.Auto:
+            case UrlMode.Default:
                 uri = new Uri(path, UriKind.Relative);
                 break;
             default:
