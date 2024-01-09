@@ -8,15 +8,13 @@ export type UmbMockStylesheetModelHack = StylesheetResponseModel &
 	FileSystemTreeItemPresentationModel &
 	StylesheetItemResponseModel;
 
-export interface UmbMockStylesheetModel extends Omit<UmbMockStylesheetModelHack, 'type' | 'icon'> {
-	parentPath: string | null;
-}
+export interface UmbMockStylesheetModel extends Omit<UmbMockStylesheetModelHack, 'type' | 'icon'> {}
 
 export const data: Array<UmbMockStylesheetModel> = [
 	{
 		name: 'Stylesheet File 1.css',
-		path: 'Stylesheet File 1.css',
-		parentPath: null,
+		path: '/Stylesheet File 1.css',
+		parent: null,
 		isFolder: false,
 		hasChildren: false,
 		content: `
@@ -43,8 +41,8 @@ h1 {
 	},
 	{
 		name: 'Stylesheet File 2.css',
-		path: 'Stylesheet File 2.css',
-		parentPath: null,
+		path: '/Stylesheet File 2.css',
+		parent: null,
 		isFolder: false,
 		hasChildren: false,
 		content: `
@@ -70,16 +68,18 @@ h1 {
 	},
 	{
 		name: 'Folder 1',
-		path: 'Folder 1',
-		parentPath: null,
+		path: '/Folder 1',
+		parent: null,
 		isFolder: true,
 		hasChildren: true,
 		content: '',
 	},
 	{
 		name: 'Stylesheet File 3.css',
-		path: 'Folder 1/Stylesheet File 3.css',
-		parentPath: 'Folder 1',
+		path: '/Folder 1/Stylesheet File 3.css',
+		parent: {
+			path: '/Folder 1',
+		},
 		hasChildren: false,
 		isFolder: false,
 		content: `h1 {

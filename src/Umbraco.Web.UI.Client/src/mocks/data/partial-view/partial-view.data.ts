@@ -9,39 +9,39 @@ export type UmbMockPartialViewModelHack = PartialViewResponseModel &
 	FileSystemTreeItemPresentationModel &
 	PartialViewItemResponseModel;
 
-export interface UmbMockPartialViewModel extends Omit<UmbMockPartialViewModelHack, 'type' | 'icon'> {
-	parentPath: string | null;
-}
+export interface UmbMockPartialViewModel extends Omit<UmbMockPartialViewModelHack, 'type' | 'icon'> {}
 
 export const data: Array<UmbMockPartialViewModel> = [
 	{
 		name: 'blockgrid',
-		path: 'blockgrid',
-		parentPath: null,
+		path: '/blockgrid',
+		parent: null,
 		isFolder: true,
 		hasChildren: true,
 		content: '',
 	},
 	{
 		name: 'blocklist',
-		path: 'blocklist',
-		parentPath: null,
+		path: '/blocklist',
+		parent: null,
 		isFolder: true,
 		hasChildren: true,
 		content: '',
 	},
 	{
 		name: 'grid',
-		path: 'grid',
-		parentPath: null,
+		path: '/grid',
+		parent: null,
 		isFolder: true,
 		hasChildren: true,
 		content: '',
 	},
 	{
 		name: 'area.cshtml',
-		path: 'blockgrid/area.cshtml',
-		parentPath: 'blockgrid',
+		path: '/blockgrid/area.cshtml',
+		parent: {
+			path: '/blockgrid',
+		},
 		isFolder: false,
 		hasChildren: false,
 		content: `@using Umbraco.Extensions
@@ -58,16 +58,20 @@ export const data: Array<UmbMockPartialViewModel> = [
 	},
 	{
 		name: 'items.cshtml',
-		path: 'blockgrid/items.cshtml',
-		parentPath: 'blockgrid',
+		path: '/blockgrid/items.cshtml',
+		parent: {
+			path: '/blockgrid',
+		},
 		isFolder: false,
 		hasChildren: false,
 		content: '@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage',
 	},
 	{
 		name: 'default.cshtml',
-		path: 'blocklist/default.cshtml',
-		parentPath: 'blocklist',
+		path: '/blocklist/default.cshtml',
+		parent: {
+			path: '/blocklist',
+		},
 		isFolder: false,
 		hasChildren: false,
 		content: `@using Umbraco.Extensions
@@ -85,8 +89,10 @@ export const data: Array<UmbMockPartialViewModel> = [
 	},
 	{
 		name: 'embed.cshtml',
-		path: 'grid/embed.cshtm',
-		parentPath: 'grid',
+		path: '/grid/embed.cshtm',
+		parent: {
+			path: '/grid',
+		},
 		isFolder: false,
 		hasChildren: false,
 		content: `@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<dynamic>
@@ -104,8 +110,10 @@ export const data: Array<UmbMockPartialViewModel> = [
 	},
 	{
 		name: 'default.cshtml',
-		path: 'grid/default.cshtml',
-		parentPath: 'grid',
+		path: '/grid/default.cshtml',
+		parent: {
+			path: '/grid',
+		},
 		isFolder: false,
 		hasChildren: false,
 		content: '@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage',

@@ -8,39 +8,39 @@ export type UmbMockScriptModelHack = ScriptResponseModel &
 	FileSystemTreeItemPresentationModel &
 	ScriptItemResponseModel;
 
-export interface UmbMockScriptModel extends Omit<UmbMockScriptModelHack, 'type' | 'icon'> {
-	parentPath: string | null;
-}
+export interface UmbMockScriptModel extends Omit<UmbMockScriptModelHack, 'type' | 'icon'> {}
 
 export const data: Array<UmbMockScriptModel> = [
 	{
 		name: 'some-folder',
-		path: 'some-folder',
-		parentPath: null,
+		path: '/some-folder',
+		parent: null,
 		isFolder: true,
 		hasChildren: true,
 		content: '',
 	},
 	{
 		name: 'another-folder',
-		path: 'another-folder',
-		parentPath: null,
+		path: '/another-folder',
+		parent: null,
 		isFolder: true,
 		hasChildren: true,
 		content: '',
 	},
 	{
 		name: 'very important folder',
-		path: 'very important folder',
-		parentPath: null,
+		path: '/very important folder',
+		parent: null,
 		isFolder: true,
 		hasChildren: true,
 		content: '',
 	},
 	{
 		name: 'ugly script.js',
-		path: 'some-folder/ugly script.js',
-		parentPath: 'some-folder',
+		path: '/some-folder/ugly script.js',
+		parent: {
+			path: '/some-folder',
+		},
 		isFolder: false,
 		hasChildren: false,
 		content: `function makeid(length) {
@@ -57,8 +57,10 @@ export const data: Array<UmbMockScriptModel> = [
 	},
 	{
 		name: 'nice script.js',
-		path: 'some-folder/nice script.js',
-		parentPath: 'some-folder',
+		path: '/some-folder/nice script.js',
+		parent: {
+			path: '/some-folder',
+		},
 		isFolder: false,
 		hasChildren: false,
 		content: `var items = {
@@ -72,8 +74,10 @@ export const data: Array<UmbMockScriptModel> = [
 	},
 	{
 		name: 'only bugs.js',
-		path: 'another-folder/only bugs.js',
-		parentPath: 'another-folder',
+		path: '/another-folder/only bugs.js',
+		parent: {
+			path: '/another-folder',
+		},
 		isFolder: false,
 		hasChildren: false,
 		content: `var my_arr = [4, '', 0, 10, 7, '', false, 10];
@@ -84,8 +88,10 @@ export const data: Array<UmbMockScriptModel> = [
 	},
 	{
 		name: 'no bugs at all.js',
-		path: 'very important folder/no bugs at all.js',
-		parentPath: 'very important folder',
+		path: '/very important folder/no bugs at all.js',
+		parent: {
+			path: '/very important folder',
+		},
 		isFolder: false,
 		hasChildren: false,
 		content: `const date_str = "07/20/2021";
@@ -99,8 +105,10 @@ export const data: Array<UmbMockScriptModel> = [
 	},
 	{
 		name: 'nope.js',
-		path: 'very important folder/nope.js',
-		parentPath: 'very important folder',
+		path: '/very important folder/nope.js',
+		parent: {
+			path: '/very important folder',
+		},
 		isFolder: false,
 		hasChildren: false,
 		content: `// Define an object
@@ -117,8 +125,10 @@ export const data: Array<UmbMockScriptModel> = [
 	},
 	{
 		name: 'file-with-dash.js',
-		path: 'very important folder/file-with-dash.js',
-		parentPath: 'very important folder',
+		path: '/very important folder/file-with-dash.js',
+		parent: {
+			path: '/very important folder',
+		},
 		isFolder: false,
 		hasChildren: false,
 		content: `alert('hello file with dash');`,
