@@ -53,8 +53,9 @@ export class UmbScriptDetailServerDataSource implements UmbDetailDataSource<UmbS
 		);
 
 		if (data) {
-			const createdScriptUnique = this.#serverPathUniqueSerializer.toUnique(data);
-			return this.read(createdScriptUnique);
+			const newPath = decodeURIComponent(data);
+			const newPathUnique = this.#serverPathUniqueSerializer.toUnique(newPath);
+			return this.read(newPathUnique);
 		}
 
 		return { error };

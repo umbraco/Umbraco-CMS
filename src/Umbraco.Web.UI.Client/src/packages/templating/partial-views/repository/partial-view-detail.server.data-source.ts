@@ -45,23 +45,20 @@ export class UmbPartialViewDetailServerDataSource implements UmbDetailDataSource
 			content: partialView.content,
 		};
 
-		const { error } = await tryExecuteAndNotify(
+		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
 			PartialViewResource.postPartialView({
 				requestBody,
 			}),
 		);
 
-		if (error) {
-			return { error };
+		if (data) {
+			const newPath = decodeURIComponent(data);
+			const newPathUnique = this.#serverPathUniqueSerializer.toUnique(newPath);
+			return this.read(newPathUnique);
 		}
 
-		// We have to fetch the data again. The server can have modified the data after creation
-		// TODO: revisit when location header is added
-		const createdPartialViewPath = parentPath ? parentPath + '/' + requestBody.name : requestBody.name;
-		const createdPartialViewUnique = this.#serverPathUniqueSerializer.toUnique(createdPartialViewPath);
-
-		return this.read(createdPartialViewUnique);
+		return { error };
 	}
 
 	async read(unique: string) {
