@@ -9,8 +9,8 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_MODAL_MANAGER_CONTEXT_TOKEN, UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { Subject, debounceTime } from '@umbraco-cms/backoffice/external/rxjs';
 
-@customElement('umb-partial-view-workspace-edit')
-export class UmbPartialViewWorkspaceEditElement extends UmbLitElement {
+@customElement('umb-partial-view-workspace-editor')
+export class UmbPartialViewWorkspaceEditorElement extends UmbLitElement {
 	#name: string | undefined = '';
 	@state()
 	private get _name() {
@@ -112,7 +112,7 @@ export class UmbPartialViewWorkspaceEditElement extends UmbLitElement {
 					.value=${this._name}
 					@input=${this.#onNameInput}
 					label="template name"></uui-input>
-				<small>Views/Partials/${this._path}</small>
+				<small>Views/Partials${this._path}</small>
 			</div>
 			<uui-box>
 				<div slot="header" id="code-editor-menu-container">
@@ -197,10 +197,10 @@ export class UmbPartialViewWorkspaceEditElement extends UmbLitElement {
 	];
 }
 
-export default UmbPartialViewWorkspaceEditElement;
+export default UmbPartialViewWorkspaceEditorElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-partial-view-workspace-edit': UmbPartialViewWorkspaceEditElement;
+		'umb-partial-view-workspace-editor': UmbPartialViewWorkspaceEditorElement;
 	}
 }

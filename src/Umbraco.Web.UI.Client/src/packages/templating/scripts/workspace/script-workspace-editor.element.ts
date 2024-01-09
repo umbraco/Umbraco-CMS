@@ -81,7 +81,7 @@ export class UmbScriptWorkspaceEditorElement extends UmbLitElement {
 					@input=${this.#onNameInput}
 					label="Script name"
 					?readonly=${this._isNew === false}></uui-input>
-				<small>/scripts/${this._path}</small>
+				<small>/scripts${this._path}</small>
 			</div>
 			<uui-box>
 				<!-- the div below in the header is to make the box display nicely with code editor -->

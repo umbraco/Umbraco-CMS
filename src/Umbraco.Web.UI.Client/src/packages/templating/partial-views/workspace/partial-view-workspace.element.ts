@@ -1,5 +1,5 @@
 import { UmbPartialViewWorkspaceContext } from './partial-view-workspace.context.js';
-import { UmbPartialViewWorkspaceEditElement } from './partial-view-workspace-edit.element.js';
+import { UmbPartialViewWorkspaceEditorElement } from './partial-view-workspace-editor.element.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -12,7 +12,7 @@ import '../../components/insert-menu/templating-insert-menu.element.js';
 export class UmbPartialViewWorkspaceElement extends UmbLitElement {
 	#workspaceContext = new UmbPartialViewWorkspaceContext(this);
 
-	#createElement = () => new UmbPartialViewWorkspaceEditElement();
+	#createElement = () => new UmbPartialViewWorkspaceEditorElement();
 
 	@state()
 	_routes: UmbRoute[] = [

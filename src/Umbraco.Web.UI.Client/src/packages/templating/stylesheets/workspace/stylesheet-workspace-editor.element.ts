@@ -51,7 +51,7 @@ export class UmbStylesheetWorkspaceEditorElement extends UmbLitElement {
 						@input="${this.#onNameChange}"
 						?readonly=${this._isNew === false}>
 					</uui-input>
-					<small>/css/${this._path}</small>
+					<small>/css${this._path}</small>
 				</div>
 			</umb-workspace-editor>
 		`;
