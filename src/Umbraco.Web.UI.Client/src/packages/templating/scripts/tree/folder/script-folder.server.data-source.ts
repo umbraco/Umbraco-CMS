@@ -33,11 +33,12 @@ export class UmbScriptFolderServerDataSource implements UmbFolderDataSource {
 		if (!unique) throw new Error('Unique is missing');
 
 		const path = this.#serverPathUniqueSerializer.toServerPath(unique);
+		if (!path) throw new Error('Cannot read script folder without a path');
 
 		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
 			ScriptResource.getScriptFolderByPath({
-				path,
+				path: encodeURIComponent(path),
 			}),
 		);
 
@@ -67,9 +68,7 @@ export class UmbScriptFolderServerDataSource implements UmbFolderDataSource {
 		const parentPath = new UmbServerPathUniqueSerializer().toServerPath(args.parentUnique);
 
 		const requestBody: CreateScriptFolderRequestModel = {
-			parent: {
-				path: parentPath,
-			},
+			parent: parentPath ? { path: parentPath } : null,
 			name: args.name,
 		};
 
@@ -81,8 +80,9 @@ export class UmbScriptFolderServerDataSource implements UmbFolderDataSource {
 		);
 
 		if (data) {
-			const newPath = this.#serverPathUniqueSerializer.toUnique(data);
-			return this.read(newPath);
+			const newPath = decodeURIComponent(data);
+			const newPathUnique = this.#serverPathUniqueSerializer.toUnique(newPath);
+			return this.read(newPathUnique);
 		}
 
 		return { error };
@@ -98,11 +98,12 @@ export class UmbScriptFolderServerDataSource implements UmbFolderDataSource {
 		if (!unique) throw new Error('Unique is missing');
 
 		const path = this.#serverPathUniqueSerializer.toServerPath(unique);
+		if (!path) throw new Error('Cannot delete script folder without a path');
 
 		return tryExecuteAndNotify(
 			this.#host,
 			ScriptResource.deleteScriptFolderByPath({
-				path,
+				path: encodeURIComponent(path),
 			}),
 		);
 	}
