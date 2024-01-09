@@ -13,9 +13,12 @@ export class UmbMockFileSystemDetailManager<MockItemType extends FileSystemFileR
 		this.#db = db;
 	}
 
-	create(item: FileSystemFileCreateRequestModelBaseModel) {
-		const path = item.parentPath ? item.parentPath + '/' + item.name : item.name;
-		const mockItem = this.#defaultCreateMockItemMapper(path, item);
+	create(request: FileSystemFileCreateRequestModelBaseModel) {
+		let path = request.parent ? `${request.parent.path}/${request.name}` : request.name;
+		// ensure dash prefix if its not there
+		path = path.startsWith('/') ? path : `/${path}`;
+
+		const mockItem = this.#defaultCreateMockItemMapper(path, request);
 		// create mock item in mock db
 		this.#db.create(mockItem);
 		return path;
@@ -23,9 +26,7 @@ export class UmbMockFileSystemDetailManager<MockItemType extends FileSystemFileR
 
 	read(path: string): FileSystemResponseModelBaseModel | undefined {
 		const item = this.#db.read(path);
-		// map mock item to response model
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-ignore
+		if (!item) throw new Error('Item not found');
 		const mappedItem = this.#defaultReadResponseMapper(item);
 		return mappedItem;
 	}
@@ -63,12 +64,12 @@ export class UmbMockFileSystemDetailManager<MockItemType extends FileSystemFileR
 	}
 	*/
 
-	#defaultCreateMockItemMapper = (path: string, item: FileSystemFileCreateRequestModelBaseModel): MockItemType => {
+	#defaultCreateMockItemMapper = (path: string, request: FileSystemFileCreateRequestModelBaseModel): MockItemType => {
 		return {
-			name: item.name,
-			content: item.content,
+			name: request.name,
+			content: request.content,
 			path: path,
-			parentPath: item.parentPath || null,
+			parent: request.parent || null,
 			isFolder: false,
 			hasChildren: false,
 		} as unknown as MockItemType;
@@ -77,6 +78,7 @@ export class UmbMockFileSystemDetailManager<MockItemType extends FileSystemFileR
 	#defaultReadResponseMapper = (item: MockItemType): FileSystemFileResponseModelBaseModel => {
 		return {
 			path: item.path,
+			parent: item.parent,
 			name: item.name,
 			content: item.content,
 		};
