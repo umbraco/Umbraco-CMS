@@ -22,6 +22,9 @@ export class UmbPartialViewWorkspaceEditorElement extends UmbLitElement {
 	@state()
 	private _ready: boolean = false;
 
+	@state()
+	private _isNew?: boolean = false;
+
 	@query('umb-code-editor')
 	private _codeEditor?: UmbCodeEditorElement;
 
@@ -51,6 +54,10 @@ export class UmbPartialViewWorkspaceEditorElement extends UmbLitElement {
 
 			this.observe(this.#workspaceContext.isCodeEditorReady, (isReady) => {
 				this._ready = isReady;
+			});
+
+			this.observe(this.#workspaceContext.isNew, (isNew) => {
+				this._isNew = isNew;
 			});
 		});
 	}
@@ -96,7 +103,8 @@ export class UmbPartialViewWorkspaceEditorElement extends UmbLitElement {
 					placeholder="Enter name..."
 					.value=${this._name}
 					@input=${this.#onNameInput}
-					label="template name"></uui-input>
+					label="Partial view name"
+					?readonly=${this._isNew === false}></uui-input>
 				<small>Views/Partials${this._path}</small>
 			</div>
 			<uui-box>
