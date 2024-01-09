@@ -2,7 +2,8 @@ const { rest } = window.MockServiceWorker;
 import {
 	RuntimeLevelModel,
 	ServerStatusResponseModel,
-	VersionResponseModel,
+	ServerInformationResponseModel,
+	RuntimeModeModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
@@ -40,8 +41,11 @@ export const serverVersionHandler = rest.get(umbracoPath('/server/version'), (_r
 	return res(
 		// Respond with a 200 status code
 		ctx.status(200),
-		ctx.json<VersionResponseModel>({
+		ctx.json<ServerInformationResponseModel>({
 			version: '13.0.0',
+			assemblyVersion: '',
+			baseUtcOffset: '',
+			runtimeMode: RuntimeModeModel.BACKOFFICE_DEVELOPMENT,
 		}),
 	);
 });
