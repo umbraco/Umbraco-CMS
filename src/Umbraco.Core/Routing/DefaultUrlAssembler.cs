@@ -6,10 +6,7 @@ public class DefaultUrlAssembler : IUrlAssembler
 {
     private readonly UriUtility _uriUtility;
 
-    public DefaultUrlAssembler(UriUtility uriUtility)
-    {
-        _uriUtility = uriUtility;
-    }
+public DefaultUrlAssembler(UriUtility uriUtility) => _uriUtility = uriUtility;
 
     public Uri AssembleUrl(string path, Uri current, UrlMode mode)
     {
