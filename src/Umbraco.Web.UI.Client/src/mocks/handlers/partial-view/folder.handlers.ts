@@ -28,7 +28,7 @@ export const folderHandlers = [
 	rest.delete(umbracoPath(`${UMB_SLUG}/folder/:path`), (req, res, ctx) => {
 		const path = req.params.path as string;
 		if (!path) return res(ctx.status(400));
-		umbPartialViewMockDB.folder.delete(path);
+		umbPartialViewMockDB.folder.delete(decodeURIComponent(path));
 		return res(ctx.status(200));
 	}),
 ];

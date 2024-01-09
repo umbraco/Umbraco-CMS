@@ -103,7 +103,7 @@ export class UmbPartialViewFolderServerDataSource implements UmbFolderDataSource
 		return tryExecuteAndNotify(
 			this.#host,
 			PartialViewResource.deletePartialViewFolderByPath({
-				path,
+				path: encodeURIComponent(path),
 			}),
 		);
 	}
