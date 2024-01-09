@@ -7,6 +7,12 @@ import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import './tree-item-default/tree-item.element.js';
 import './tree-item-base/tree-item-base.element.js';
 
+export type UmbTreeSelectionConfiguration = {
+	multiple?: boolean;
+	selectable?: boolean;
+	selection?: Array<string | null>;
+};
+
 @customElement('umb-tree')
 export class UmbTreeElement extends UmbLitElement {
 	@property({ type: String, reflect: true })
@@ -17,29 +23,21 @@ export class UmbTreeElement extends UmbLitElement {
 		this.#treeContext.setTreeAlias(newVal);
 	}
 
-	@property({ type: Boolean, reflect: true })
-	get selectable() {
-		return this.#treeContext.selection.getSelectable();
-	}
-	set selectable(newVal) {
-		this.#treeContext.selection.setSelectable(newVal);
-	}
+	private _selectionConfiguration: UmbTreeSelectionConfiguration = {
+		multiple: false,
+		selectable: true,
+		selection: [],
+	};
 
-	@property({ type: Array })
-	get selection() {
-		return this.#treeContext.selection.getSelection();
+	@property({ type: Object })
+	get selectionConfiguration(): UmbTreeSelectionConfiguration {
+		return this._selectionConfiguration;
 	}
-	set selection(newVal) {
-		if (!Array.isArray(newVal)) return;
-		this.#treeContext?.selection.setSelection(newVal);
-	}
-
-	@property({ type: Boolean, reflect: true })
-	get multiple() {
-		return this.#treeContext.selection.getMultiple();
-	}
-	set multiple(newVal) {
-		this.#treeContext.selection.setMultiple(newVal);
+	set selectionConfiguration(config: UmbTreeSelectionConfiguration) {
+		this._selectionConfiguration = config;
+		this.#treeContext.selection.setMultiple(config.multiple ?? false);
+		this.#treeContext.selection.setSelectable(config.selectable ?? true);
+		this.#treeContext.selection.setSelection(config.selection ?? []);
 	}
 
 	// TODO: what is the best name for this functionality?
@@ -109,6 +107,10 @@ export class UmbTreeElement extends UmbLitElement {
 				this.requestUpdate('_items', oldValue);
 			});
 		}
+	}
+
+	getSelection() {
+		return this.#treeContext.selection.getSelection();
 	}
 
 	render() {
