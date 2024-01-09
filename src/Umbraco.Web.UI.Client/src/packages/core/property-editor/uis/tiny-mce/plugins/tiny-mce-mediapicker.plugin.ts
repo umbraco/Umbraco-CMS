@@ -55,12 +55,8 @@ export default class UmbTinyMceMediaPickerPlugin extends UmbTinyMcePluginBase {
 			icon: 'image',
 			tooltip: 'Media Picker',
 			onAction: () => this.#onAction(),
-			onSetup: (api) => {
-				const changed = this.editor.selection.selectorChangedWithUnbind('img[data-udi]', (state) =>
-					api.setActive(state),
-				);
-				return () => changed;
-			},
+			onSetup: (api) => () =>
+				this.editor.selection.selectorChangedWithUnbind('img[data-udi]', (state) => api.setActive(state)),
 		});
 
 		// Register global options for the editor
@@ -77,7 +73,6 @@ export default class UmbTinyMceMediaPickerPlugin extends UmbTinyMcePluginBase {
 			// Listen for SetContent to update images
 			this.editor.on('SetContent', async (e) => {
 				const content = e.content;
-				console.log('🚀 ~ UmbTinyMceMediaPickerPlugin ~ this.editor.on ~ content:', content);
 
 				// Upload BLOB images (dragged/pasted ones)
 				// find src attribute where value starts with `blob:`
