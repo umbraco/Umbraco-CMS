@@ -14,11 +14,13 @@ export class UmbMockFileSystemFolderManager<
 	}
 
 	create(request: FileSystemCreateRequestModelBaseModel) {
-		const path = request.parentPath ? `${request.parentPath}/${request.name}` : request.name;
+		let path = request.parent ? `${request.parent.path}/${request.name}` : request.name;
+		// ensure dash prefix if its not there
+		path = path.startsWith('/') ? path : `/${path}`;
 
 		const newFolder = {
 			path,
-			parent: request.parentPath ? { path: request.parentPath } : null,
+			parent: request.parent ? { path: request.parent.path } : null,
 			name: request.name,
 			hasChildren: false,
 			isFolder: true,

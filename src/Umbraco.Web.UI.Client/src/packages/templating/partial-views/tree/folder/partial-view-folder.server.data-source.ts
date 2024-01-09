@@ -33,11 +33,12 @@ export class UmbPartialViewFolderServerDataSource implements UmbFolderDataSource
 		if (!unique) throw new Error('Unique is missing');
 
 		const path = this.#serverPathUniqueSerializer.toServerPath(unique);
+		if (!path) throw new Error('Cannot read partial view folder without a path');
 
 		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
 			PartialViewResource.getPartialViewFolderByPath({
-				path,
+				path: encodeURIComponent(path),
 			}),
 		);
 
@@ -67,9 +68,7 @@ export class UmbPartialViewFolderServerDataSource implements UmbFolderDataSource
 		const parentPath = new UmbServerPathUniqueSerializer().toServerPath(args.parentUnique);
 
 		const requestBody: CreatePartialViewFolderRequestModel = {
-			parent: {
-				path: parentPath,
-			},
+			parent: parentPath ? { path: parentPath } : null,
 			name: args.name,
 		};
 
@@ -81,8 +80,9 @@ export class UmbPartialViewFolderServerDataSource implements UmbFolderDataSource
 		);
 
 		if (data) {
-			const newPath = this.#serverPathUniqueSerializer.toUnique(data);
-			return this.read(newPath);
+			const newPath = decodeURIComponent(data);
+			const newPathUnique = this.#serverPathUniqueSerializer.toUnique(newPath);
+			return this.read(newPathUnique);
 		}
 
 		return { error };
@@ -98,6 +98,7 @@ export class UmbPartialViewFolderServerDataSource implements UmbFolderDataSource
 		if (!unique) throw new Error('Unique is missing');
 
 		const path = this.#serverPathUniqueSerializer.toServerPath(unique);
+		if (!path) throw new Error('Cannot delete partial view folder without a path');
 
 		return tryExecuteAndNotify(
 			this.#host,

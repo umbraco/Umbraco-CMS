@@ -13,7 +13,7 @@ export const folderHandlers = [
 		return res(
 			ctx.status(201),
 			ctx.set({
-				Location: path,
+				Location: encodeURIComponent(path),
 			}),
 		);
 	}),
@@ -21,7 +21,7 @@ export const folderHandlers = [
 	rest.get(umbracoPath(`${UMB_SLUG}/folder/:path`), (req, res, ctx) => {
 		const path = req.params.path as string;
 		if (!path) return res(ctx.status(400));
-		const response = umbPartialViewMockDB.folder.read(path);
+		const response = umbPartialViewMockDB.folder.read(decodeURIComponent(path));
 		return res(ctx.status(200), ctx.json(response));
 	}),
 
