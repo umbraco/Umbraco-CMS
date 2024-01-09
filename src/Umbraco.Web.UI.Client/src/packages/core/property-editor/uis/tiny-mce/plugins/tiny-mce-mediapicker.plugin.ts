@@ -209,7 +209,6 @@ export default class UmbTinyMceMediaPickerPlugin extends UmbTinyMcePluginBase {
 			progress(0);
 
 			const id = UmbId.new();
-			const blobUri = blobInfo.blobUri();
 			const fileBlob = blobInfo.blob();
 			const file = new File([fileBlob], blobInfo.filename(), { type: fileBlob.type });
 
@@ -220,12 +219,13 @@ export default class UmbTinyMceMediaPickerPlugin extends UmbTinyMcePluginBase {
 				.then((response) => {
 					if (response.error) {
 						reject(response.error);
-					} else {
-						// Put temp location into localstorage (used to update the img with data-tmpimg later on)
-						sessionStorage.setItem(`tinymce__${blobUri}`, id);
-
-						resolve(blobUri);
+						return;
 					}
+
+					// Put temp location into localstorage (used to update the img with data-tmpimg later on)
+					const blobUri = window.URL.createObjectURL(fileBlob);
+					sessionStorage.setItem(`tinymce__${blobUri}`, id);
+					resolve(blobUri);
 				})
 				.catch(reject)
 				.finally(() => progress(100));
