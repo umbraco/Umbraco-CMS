@@ -12,7 +12,7 @@ export const detailHandlers = [
 		return res(
 			ctx.status(201),
 			ctx.set({
-				Location: path,
+				Location: encodeURIComponent(path),
 			}),
 		);
 	}),
@@ -20,14 +20,14 @@ export const detailHandlers = [
 	rest.get(umbracoPath(`${UMB_SLUG}/:path`), (req, res, ctx) => {
 		const path = req.params.path as string;
 		if (!path) return res(ctx.status(400));
-		const response = umbStylesheetData.file.read(path);
+		const response = umbStylesheetData.file.read(decodeURIComponent(path));
 		return res(ctx.status(200), ctx.json(response));
 	}),
 
 	rest.delete(umbracoPath(`${UMB_SLUG}/:path`), (req, res, ctx) => {
 		const path = req.params.path as string;
 		if (!path) return res(ctx.status(400));
-		umbStylesheetData.file.delete(path);
+		umbStylesheetData.file.delete(decodeURIComponent(path));
 		return res(ctx.status(200));
 	}),
 
@@ -36,7 +36,7 @@ export const detailHandlers = [
 		if (!path) return res(ctx.status(400));
 		const requestBody = (await req.json()) as UpdateStylesheetRequestModel;
 		if (!requestBody) return res(ctx.status(400, 'no body found'));
-		umbStylesheetData.file.update(path, requestBody);
+		umbStylesheetData.file.update(decodeURIComponent(path), requestBody);
 		return res(ctx.status(200));
 	}),
 ];

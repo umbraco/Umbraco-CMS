@@ -40,9 +40,7 @@ export class UmbScriptDetailServerDataSource implements UmbDetailDataSource<UmbS
 
 		// TODO: make data mapper to prevent errors
 		const requestBody: CreateScriptRequestModel = {
-			parent: {
-				path: parentPath,
-			},
+			parent: parentPath ? { path: parentPath } : null,
 			name: appendFileExtensionIfNeeded(script.name, '.js'),
 			content: script.content,
 		};
@@ -66,8 +64,12 @@ export class UmbScriptDetailServerDataSource implements UmbDetailDataSource<UmbS
 		if (!unique) throw new Error('Unique is missing');
 
 		const path = this.#serverPathUniqueSerializer.toServerPath(unique);
+		if (!path) throw new Error('Path is missing');
 
-		const { data, error } = await tryExecuteAndNotify(this.#host, ScriptResource.getScriptByPath({ path }));
+		const { data, error } = await tryExecuteAndNotify(
+			this.#host,
+			ScriptResource.getScriptByPath({ path: encodeURIComponent(path) }),
+		);
 
 		if (error || !data) {
 			return { error };
@@ -89,6 +91,7 @@ export class UmbScriptDetailServerDataSource implements UmbDetailDataSource<UmbS
 		if (!data.unique) throw new Error('Unique is missing');
 
 		const path = this.#serverPathUniqueSerializer.toServerPath(data.unique);
+		if (!path) throw new Error('Path is missing');
 
 		const requestBody: UpdateScriptRequestModel = {
 			content: data.content,
@@ -97,7 +100,7 @@ export class UmbScriptDetailServerDataSource implements UmbDetailDataSource<UmbS
 		const { error } = await tryExecuteAndNotify(
 			this.#host,
 			ScriptResource.putScriptByPath({
-				path,
+				path: encodeURIComponent(path),
 				requestBody,
 			}),
 		);
@@ -113,11 +116,12 @@ export class UmbScriptDetailServerDataSource implements UmbDetailDataSource<UmbS
 		if (!unique) throw new Error('Unique is missing');
 
 		const path = this.#serverPathUniqueSerializer.toServerPath(unique);
+		if (!path) throw new Error('Path is missing');
 
 		return tryExecuteAndNotify(
 			this.#host,
 			ScriptResource.deleteScriptByPath({
-				path,
+				path: encodeURIComponent(path),
 			}),
 		);
 	}

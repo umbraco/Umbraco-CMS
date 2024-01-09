@@ -40,9 +40,7 @@ export class UmbPartialViewDetailServerDataSource implements UmbDetailDataSource
 
 		// TODO: make data mapper to prevent errors
 		const requestBody: CreatePartialViewRequestModel = {
-			parent: {
-				path: parentPath,
-			},
+			parent: parentPath ? { path: parentPath } : null,
 			name: appendFileExtensionIfNeeded(partialView.name, '.cshtml'),
 			content: partialView.content,
 		};
@@ -70,8 +68,12 @@ export class UmbPartialViewDetailServerDataSource implements UmbDetailDataSource
 		if (!unique) throw new Error('Unique is missing');
 
 		const path = this.#serverPathUniqueSerializer.toServerPath(unique);
+		if (!path) throw new Error('Path is missing');
 
-		const { data, error } = await tryExecuteAndNotify(this.#host, PartialViewResource.getPartialViewByPath({ path }));
+		const { data, error } = await tryExecuteAndNotify(
+			this.#host,
+			PartialViewResource.getPartialViewByPath({ path: encodeURIComponent(path) }),
+		);
 
 		if (error || !data) {
 			return { error };
@@ -93,6 +95,7 @@ export class UmbPartialViewDetailServerDataSource implements UmbDetailDataSource
 		if (!data.unique) throw new Error('Unique is missing');
 
 		const path = this.#serverPathUniqueSerializer.toServerPath(data.unique);
+		if (!path) throw new Error('Path is missing');
 
 		const requestBody: UpdatePartialViewRequestModel = {
 			content: data.content,
@@ -101,7 +104,7 @@ export class UmbPartialViewDetailServerDataSource implements UmbDetailDataSource
 		const { error } = await tryExecuteAndNotify(
 			this.#host,
 			PartialViewResource.putPartialViewByPath({
-				path,
+				path: encodeURIComponent(path),
 				requestBody,
 			}),
 		);
@@ -117,11 +120,12 @@ export class UmbPartialViewDetailServerDataSource implements UmbDetailDataSource
 		if (!unique) throw new Error('Unique is missing');
 
 		const path = this.#serverPathUniqueSerializer.toServerPath(unique);
+		if (!path) throw new Error('Path is missing');
 
 		return tryExecuteAndNotify(
 			this.#host,
 			PartialViewResource.deletePartialViewByPath({
-				path,
+				path: encodeURIComponent(path),
 			}),
 		);
 	}

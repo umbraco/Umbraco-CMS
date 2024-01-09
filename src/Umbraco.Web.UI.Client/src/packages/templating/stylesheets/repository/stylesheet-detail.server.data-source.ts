@@ -40,9 +40,7 @@ export class UmbStylesheetDetailServerDataSource implements UmbDetailDataSource<
 
 		// TODO: make data mapper to prevent errors
 		const requestBody: CreateStylesheetRequestModel = {
-			parent: {
-				path: parentPath,
-			},
+			parent: parentPath ? { path: parentPath } : null,
 			name: appendFileExtensionIfNeeded(stylesheet.name, '.css'),
 			content: stylesheet.content,
 		};
@@ -70,8 +68,12 @@ export class UmbStylesheetDetailServerDataSource implements UmbDetailDataSource<
 		if (!unique) throw new Error('Unique is missing');
 
 		const path = this.#serverPathUniqueSerializer.toServerPath(unique);
+		if (!path) throw new Error('Path is missing');
 
-		const { data, error } = await tryExecuteAndNotify(this.#host, StylesheetResource.getStylesheetByPath({ path }));
+		const { data, error } = await tryExecuteAndNotify(
+			this.#host,
+			StylesheetResource.getStylesheetByPath({ path: encodeURIComponent(path) }),
+		);
 
 		if (error || !data) {
 			return { error };
@@ -93,6 +95,7 @@ export class UmbStylesheetDetailServerDataSource implements UmbDetailDataSource<
 		if (!data.unique) throw new Error('Unique is missing');
 
 		const path = this.#serverPathUniqueSerializer.toServerPath(data.unique);
+		if (!path) throw new Error('Path is missing');
 
 		const requestBody: UpdateStylesheetRequestModel = {
 			content: data.content,
@@ -101,7 +104,7 @@ export class UmbStylesheetDetailServerDataSource implements UmbDetailDataSource<
 		const { error } = await tryExecuteAndNotify(
 			this.#host,
 			StylesheetResource.putStylesheetByPath({
-				path,
+				path: encodeURIComponent(path),
 				requestBody,
 			}),
 		);
@@ -117,11 +120,12 @@ export class UmbStylesheetDetailServerDataSource implements UmbDetailDataSource<
 		if (!unique) throw new Error('Unique is missing');
 
 		const path = this.#serverPathUniqueSerializer.toServerPath(unique);
+		if (!path) throw new Error('Path is missing');
 
 		return tryExecuteAndNotify(
 			this.#host,
 			StylesheetResource.deleteStylesheetByPath({
-				path,
+				path: encodeURIComponent(path),
 			}),
 		);
 	}
