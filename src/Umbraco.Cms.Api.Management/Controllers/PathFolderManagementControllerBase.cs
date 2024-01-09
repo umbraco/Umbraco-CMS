@@ -30,18 +30,11 @@ public abstract class PathFolderManagementControllerBase<TStatus> : ManagementAp
         return Ok(viewModel);
     }
 
-    protected async Task<IActionResult> CreateAsync(CreatePathFolderRequestModel requestModel)
+    protected async Task<Attempt<PathContainer?, TStatus>> CreateAsync(CreatePathFolderRequestModel requestModel)
     {
         PathContainer folderModel = Mapper.Map<PathContainer>(requestModel)!;
 
-        Attempt<PathContainer?, TStatus> attempt = await CreateContainerAsync(folderModel);
-        if (attempt.Success is false)
-        {
-            return OperationStatusResult(attempt.Status);
-        }
-
-        PathFolderResponseModel? viewModel = Mapper.Map<PathFolderResponseModel>(attempt.Result);
-        return Ok(viewModel);
+        return await CreateContainerAsync(folderModel);
     }
 
     protected async Task<IActionResult> DeleteAsync(string path)

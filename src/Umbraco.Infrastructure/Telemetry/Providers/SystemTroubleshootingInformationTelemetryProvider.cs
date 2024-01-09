@@ -14,7 +14,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Telemetry.Providers;
 
-internal class SystemInformationTelemetryProvider : IDetailedTelemetryProvider, ISystemInformationService
+internal class SystemTroubleshootingInformationTelemetryProvider : IDetailedTelemetryProvider, ISystemTroubleshootingInformationService
 {
     private readonly IHostEnvironment _hostEnvironment;
     private readonly HostingSettings _hostingSettings;
@@ -26,7 +26,7 @@ internal class SystemInformationTelemetryProvider : IDetailedTelemetryProvider, 
     private readonly RuntimeSettings _runtimeSettings;
 
     [Obsolete($"Use the constructor that does not take an IOptionsMonitor<GlobalSettings> parameter, scheduled for removal in V12")]
-    public SystemInformationTelemetryProvider(
+    public SystemTroubleshootingInformationTelemetryProvider(
         IUmbracoVersion version,
         ILocalizationService localizationService,
         IOptionsMonitor<ModelsBuilderSettings> modelsBuilderSettings,
@@ -40,7 +40,7 @@ internal class SystemInformationTelemetryProvider : IDetailedTelemetryProvider, 
     {
     }
 
-    public SystemInformationTelemetryProvider(
+    public SystemTroubleshootingInformationTelemetryProvider(
         IUmbracoVersion version,
         ILocalizationService localizationService,
         IOptionsMonitor<ModelsBuilderSettings> modelsBuilderSettings,
@@ -94,7 +94,7 @@ internal class SystemInformationTelemetryProvider : IDetailedTelemetryProvider, 
         };
 
     /// <inheritdoc />
-    public IDictionary<string, string> GetSystemInformation() =>
+    public IDictionary<string, string> GetTroubleshootingInformation() =>
         new Dictionary<string, string>
         {
             { "Server OS", ServerOs },

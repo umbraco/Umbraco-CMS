@@ -30,7 +30,7 @@ public class SystemInformationServiceTests
     public void GetCorrectDefaultLanguageTest(string culture)
     {
         var userDataService = CreateSystemInformationService(culture);
-        var defaultLanguage = userDataService.GetSystemInformation().FirstOrDefault(x => x.Key == "Default Language");
+        var defaultLanguage = userDataService.GetTroubleshootingInformation().FirstOrDefault(x => x.Key == "Default Language");
         Assert.Multiple(() =>
         {
             Assert.IsNotNull(defaultLanguage);
@@ -47,7 +47,7 @@ public class SystemInformationServiceTests
     {
         Thread.CurrentThread.CurrentCulture = new CultureInfo(culture);
         var userDataService = CreateSystemInformationService(culture);
-        var currentCulture = userDataService.GetSystemInformation().FirstOrDefault(x => x.Key == "Current Culture");
+        var currentCulture = userDataService.GetTroubleshootingInformation().FirstOrDefault(x => x.Key == "Current Culture");
         Assert.Multiple(() =>
         {
             Assert.IsNotNull(currentCulture);
@@ -64,7 +64,7 @@ public class SystemInformationServiceTests
     {
         Thread.CurrentThread.CurrentUICulture = new CultureInfo(culture);
         var userDataService = CreateSystemInformationService(culture);
-        var currentCulture = userDataService.GetSystemInformation().FirstOrDefault(x => x.Key == "Current UI Culture");
+        var currentCulture = userDataService.GetTroubleshootingInformation().FirstOrDefault(x => x.Key == "Current UI Culture");
         Assert.Multiple(() =>
         {
             Assert.IsNotNull(currentCulture);
@@ -80,7 +80,7 @@ public class SystemInformationServiceTests
     public void RunTimeInformationNotNullTest(string culture)
     {
         var userDataService = CreateSystemInformationService(culture);
-        var userData = userDataService.GetSystemInformation().ToList();
+        var userData = userDataService.GetTroubleshootingInformation().ToList();
         Assert.Multiple(() =>
         {
             Assert.IsNotNull(userData.Select(x => x.Key == "Server OS"));
@@ -97,7 +97,7 @@ public class SystemInformationServiceTests
     public void ReportsModelsModeCorrectly(ModelsMode modelsMode)
     {
         var userDataService = CreateSystemInformationService(modelsMode: modelsMode);
-        var userData = userDataService.GetSystemInformation().ToArray();
+        var userData = userDataService.GetTroubleshootingInformation().ToArray();
 
         var actual = userData.FirstOrDefault(x => x.Key == "Models Builder Mode");
         Assert.IsNotNull(actual.Value);
@@ -111,7 +111,7 @@ public class SystemInformationServiceTests
     public void ReportsRuntimeModeCorrectly(RuntimeMode runtimeMode)
     {
         var userDataService = CreateSystemInformationService(runtimeMode: runtimeMode);
-        var userData = userDataService.GetSystemInformation().ToArray();
+        var userData = userDataService.GetTroubleshootingInformation().ToArray();
 
         var actual = userData.FirstOrDefault(x => x.Key == "Runtime Mode");
         Assert.IsNotNull(actual.Value);
@@ -124,14 +124,14 @@ public class SystemInformationServiceTests
     public void ReportsDebugModeCorrectly(bool isDebug)
     {
         var userDataService = CreateSystemInformationService(isDebug: isDebug);
-        var userData = userDataService.GetSystemInformation().ToArray();
+        var userData = userDataService.GetTroubleshootingInformation().ToArray();
 
         var actual = userData.FirstOrDefault(x => x.Key == "Debug Mode");
         Assert.IsNotNull(actual.Value);
         Assert.AreEqual(isDebug.ToString(), actual.Value);
     }
 
-    private ISystemInformationService CreateSystemInformationService(
+    private ISystemTroubleshootingInformationService CreateSystemInformationService(
         string culture = "",
         ModelsMode modelsMode = ModelsMode.InMemoryAuto,
         bool isDebug = true,
@@ -142,7 +142,7 @@ public class SystemInformationServiceTests
         var databaseMock = new Mock<IUmbracoDatabase>();
         databaseMock.Setup(x => x.DatabaseType.GetProviderName()).Returns("SQL");
 
-        return new SystemInformationTelemetryProvider(
+        return new SystemTroubleshootingInformationTelemetryProvider(
             _umbracoVersion,
             localizationService,
             Mock.Of<IOptionsMonitor<ModelsBuilderSettings>>(x => x.CurrentValue == new ModelsBuilderSettings { ModelsMode = modelsMode }),

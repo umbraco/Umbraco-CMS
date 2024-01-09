@@ -10,21 +10,21 @@ namespace Umbraco.Cms.Api.Management.Controllers.Server;
 [ApiVersion("1.0")]
 public class InformationServerController : ServerControllerBase
 {
-    private readonly ISystemInformationService _systemInformationService;
-    private readonly IUmbracoMapper _mapper;
+    private readonly IServerInformationService _serverInformationService;
+    private readonly IUmbracoMapper _umbracoMapper;
 
-    public InformationServerController(ISystemInformationService systemInformationService, IUmbracoMapper mapper)
+    public InformationServerController(IServerInformationService serverInformationService, IUmbracoMapper umbracoMapper)
     {
-        _systemInformationService = systemInformationService;
-        _mapper = mapper;
+        _serverInformationService = serverInformationService;
+        _umbracoMapper = umbracoMapper;
     }
 
     [HttpGet("information")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ServerInformationResponseModel), StatusCodes.Status200OK)]
-    public Task<IActionResult> GetServerInformation()
+    public Task<IActionResult> Information()
     {
-        ServerInformationResponseModel responseModel = _mapper.Map<ServerInformationResponseModel>(_systemInformationService.GetSystemInformation())!;
+        ServerInformationResponseModel responseModel = _umbracoMapper.Map<ServerInformationResponseModel>(_serverInformationService.GetServerInformation())!;
 
         return Task.FromResult<IActionResult>(Ok(responseModel));
     }

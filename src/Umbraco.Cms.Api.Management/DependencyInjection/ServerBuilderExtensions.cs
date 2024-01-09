@@ -9,7 +9,7 @@ internal static class ServerBuilderExtensions
     internal static IUmbracoBuilder AddServer(this IUmbracoBuilder builder)
     {
         builder.WithCollectionBuilder<MapDefinitionCollectionBuilder>()
-            .Add<ServerInformationMapDefinition>();
+            .Add<ServerConfigurationMapDefinition>();
 
         return builder;
     }
