@@ -44,9 +44,7 @@ export class UmbPartialViewWorkspaceContext
 	}
 
 	getEntityType(): string {
-		const data = this.getData();
-		if (!data) throw new Error('Data is missing');
-		return data.entityType;
+		return UMB_PARTIAL_VIEW_ENTITY_TYPE;
 	}
 
 	getData() {

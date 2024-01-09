@@ -35,9 +35,7 @@ export class UmbScriptWorkspaceContext extends UmbEditableWorkspaceContextBase<
 	}
 
 	getEntityType(): string {
-		const data = this.getData();
-		if (!data) throw new Error('Data is missing');
-		return data.entityType;
+		return UMB_SCRIPT_ENTITY_TYPE;
 	}
 
 	getEntityId() {

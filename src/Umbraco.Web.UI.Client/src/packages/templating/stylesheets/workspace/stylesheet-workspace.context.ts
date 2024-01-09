@@ -39,9 +39,7 @@ export class UmbStylesheetWorkspaceContext
 	}
 
 	getEntityType(): string {
-		const data = this.getData();
-		if (!data) throw new Error('Data is missing');
-		return data.entityType;
+		return UMB_STYLESHEET_ENTITY_TYPE;
 	}
 
 	getEntityId() {
