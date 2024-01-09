@@ -4,6 +4,11 @@ import { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-re
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
+type RichTextEditorValue = {
+	blocks: object;
+	markup: string;
+};
+
 /**
  * @element umb-property-editor-ui-tiny-mce
  */
@@ -11,8 +16,11 @@ import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/prope
 export class UmbPropertyEditorUITinyMceElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	#configuration?: UmbPropertyEditorConfigCollection;
 
-	@property({ type: String })
-	value = '';
+	@property({ type: Object })
+	value: RichTextEditorValue = {
+		blocks: {},
+		markup: '',
+	};
 
 	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
@@ -20,7 +28,10 @@ export class UmbPropertyEditorUITinyMceElement extends UmbLitElement implements 
 	}
 
 	#onChange(event: InputEvent) {
-		this.value = (event.target as HTMLInputElement).value;
+		this.value = {
+			blocks: {},
+			markup: (event.target as HTMLInputElement).value,
+		};
 		this.dispatchEvent(new CustomEvent('property-value-change'));
 	}
 
@@ -28,7 +39,7 @@ export class UmbPropertyEditorUITinyMceElement extends UmbLitElement implements 
 		return html`<umb-input-tiny-mce
 			@change=${this.#onChange}
 			.configuration=${this.#configuration}
-			.value=${this.value}></umb-input-tiny-mce>`;
+			.value=${this.value.markup}></umb-input-tiny-mce>`;
 	}
 
 	static styles = [UmbTextStyles];
