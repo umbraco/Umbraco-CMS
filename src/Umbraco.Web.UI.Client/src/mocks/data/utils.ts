@@ -5,8 +5,8 @@ import type {
 	FolderTreeItemResponseModel,
 	FileSystemTreeItemPresentationModel,
 	DocumentResponseModel,
-	TextFileResponseModelBaseModel,
-	FileItemResponseModelBaseModel,
+	FileSystemFileResponseModelBaseModel,
+	FileSystemItemResponseModelBaseModel,
 	MediaTypeResponseModel,
 	MediaTypeTreeItemResponseModel,
 	MediaTreeItemResponseModel,
@@ -86,16 +86,18 @@ export const createFileSystemTreeItem = (item: any): FileSystemTreeItemPresentat
 	};
 };
 
-export const textFileItemMapper = (item: any): TextFileResponseModelBaseModel => ({
+export const textFileItemMapper = (item: any): FileSystemFileResponseModelBaseModel => ({
 	path: item.path,
 	name: item.name,
+	parent: item.parent,
 	content: item.content,
 });
 
-export const createFileItemResponseModelBaseModel = (item: any): FileItemResponseModelBaseModel => ({
+export const createFileItemResponseModelBaseModel = (item: any): FileSystemItemResponseModelBaseModel => ({
 	path: item.path,
 	name: item.name,
-	icon: item.icon,
+	parent: item.parent,
+	isFolder: item.isFolder,
 });
 
 export const arrayFilter = (filterBy: Array<string>, value?: Array<string>): boolean => {
