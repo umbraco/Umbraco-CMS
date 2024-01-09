@@ -5,7 +5,7 @@ import {
 	PagedFileSystemTreeItemPresentationModel,
 } from '@umbraco-cms/backoffice/backend-api';
 
-export class UmbMockFileSystemTreeManager<T extends FileSystemTreeItemPresentationModel> {
+export class UmbMockFileSystemTreeManager<T extends Omit<FileSystemTreeItemPresentationModel, 'type' | 'icon'>> {
 	#db: UmbData<T>;
 
 	constructor(mockDb: UmbData<T>) {
@@ -24,9 +24,5 @@ export class UmbMockFileSystemTreeManager<T extends FileSystemTreeItemPresentati
 		const treeItems = items.map((item) => createFileSystemTreeItem(item));
 		const total = items.length;
 		return { items: treeItems, total };
-	}
-
-	getItem(path: string): FileSystemTreeItemPresentationModel | undefined {
-		return this.#db.getData().find((item) => item.path === path);
 	}
 }
