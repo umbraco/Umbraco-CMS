@@ -8,7 +8,6 @@ namespace Umbraco.Cms.Api.Management.Controllers.Preview;
 [ApiController]
 [VersionedApiBackOfficeRoute("preview")]
 [ApiExplorerSettings(GroupName = "Preview")]
-[Authorize(Policy = "New" + AuthorizationPolicies.BackOfficeAccess)]
 public class PreviewControllerBase : ManagementApiControllerBase
 {
 }

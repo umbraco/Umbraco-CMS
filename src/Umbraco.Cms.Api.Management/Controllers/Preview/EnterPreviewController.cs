@@ -5,7 +5,7 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Preview;
 
-
+[ApiVersion("1.0")]
 public class EnterPreviewController : PreviewControllerBase
 {
     private readonly IPreviewService _previewService;
