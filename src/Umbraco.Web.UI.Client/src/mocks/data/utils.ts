@@ -81,6 +81,7 @@ export const createFileSystemTreeItem = (item: any): FileSystemTreeItemPresentat
 		type: item.type,
 		hasChildren: item.hasChildren ?? false,
 		path: item.path,
+		parent: item.parent ?? null,
 		isFolder: item.isFolder ?? false,
 	};
 };
