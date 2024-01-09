@@ -8,8 +8,8 @@ export class UmbLanguageCreateEntityAction extends UmbEntityActionBase<UmbLangua
 		super(host, repositoryAlias, unique);
 	}
 
-	// TODO: Generate the href or retrieve it from something?
-	async getHref() {
-		return 'section/settings/workspace/language/create';
+	async execute() {
+		// TODO: Generate the href or retrieve it from something?
+		history.pushState(null, '', `section/settings/workspace/language/create`);
 	}
 }

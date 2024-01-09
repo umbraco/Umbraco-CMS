@@ -135,6 +135,7 @@ Ensure all property editors are properly localized.
 - [ ] Toggle
 - [ ] Tree Picker
 	- [ ] StartNode
+	- [x] DynamicRoot
 - [ ] Upload Field
 - [ ] User Picker
 - [ ] Value Type

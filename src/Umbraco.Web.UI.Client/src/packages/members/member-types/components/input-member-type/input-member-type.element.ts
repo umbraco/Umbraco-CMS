@@ -1,12 +1,12 @@
-import { UmbDocumentPickerContext } from './input-document.context.js';
+import { UmbMemberTypePickerContext } from './input-member-type.context.js';
 import { css, html, customElement, property, state, ifDefined, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { DocumentItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { MemberTypeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 
-@customElement('umb-input-document')
-export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
+@customElement('umb-input-member-type')
+export class UmbMemberTypeInputElement extends FormControlMixin(UmbLitElement) {
 	/**
 	 * This is a minimum amount of selected items in this input.
 	 * @type {number}
@@ -66,13 +66,25 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 		this.selectedIds = splitStringToArray(idsString);
 	}
 
-	@state()
-	private _items?: Array<DocumentItemResponseModel>;
+	@property()
+	get pickableFilter() {
+		return this.#pickerContext.pickableFilter;
+	}
+	set pickableFilter(newVal) {
+		this.#pickerContext.pickableFilter = newVal;
+	}
 
-	#pickerContext = new UmbDocumentPickerContext(this);
+	@state()
+	private _items?: Array<MemberTypeItemResponseModel>;
+
+	#pickerContext = new UmbMemberTypePickerContext(this);
 
 	constructor() {
 		super();
+	}
+
+	connectedCallback() {
+		super.connectedCallback();
 
 		this.addValidator(
 			'rangeUnderflow',
@@ -90,47 +102,62 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems));
 	}
 
+	protected _openPicker() {
+		this.#pickerContext.openPicker({
+			hideTreeRoot: true,
+		});
+	}
+
 	protected getFormElement() {
 		return undefined;
 	}
 
 	render() {
 		return html`
-			${this._items
-				? html` <uui-ref-list
-						>${repeat(
-							this._items,
-							(item) => item.id,
-							(item) => this._renderItem(item),
-						)}
-				  </uui-ref-list>`
-				: ''}
+			${this.#renderItems()}
 			${this.#renderAddButton()}
+		`;
+	}
+
+	#renderItems() {
+		if (!this._items) return;
+		// TODO: Add sorting. [LK]
+		return html`
+			<uui-ref-list
+				>${repeat(
+					this._items,
+					(item) => item.id,
+					(item) => this._renderItem(item),
+				)}</uui-ref-list
+			>
 		`;
 	}
 
 	#renderAddButton() {
 		if (this.max > 0 && this.selectedIds.length >= this.max) return;
-		return html`<uui-button
-			id="add-button"
-			look="placeholder"
-			@click=${() => this.#pickerContext.openPicker()}
-			label=${this.localize.term('general_choose')}></uui-button>`;
+		return html`
+			<uui-button
+				id="add-button"
+				look="placeholder"
+				@click=${this._openPicker}
+				label="${this.localize.term('general_choose')}"
+				>${this.localize.term('general_choose')}</uui-button
+			>
+		`;
 	}
 
-	private _renderItem(item: DocumentItemResponseModel) {
+	private _renderItem(item: MemberTypeItemResponseModel) {
 		if (!item.id) return;
 		return html`
-			<uui-ref-node name=${ifDefined(item.name)} detail=${ifDefined(item.id)}>
-				<!-- TODO: implement is trashed <uui-tag size="s" slot="tag" color="danger">Trashed</uui-tag> -->
+			<uui-ref-node-document-type name=${ifDefined(item.name)}>
 				<uui-action-bar slot="actions">
 					<uui-button
 						@click=${() => this.#pickerContext.requestRemoveItem(item.id!)}
-						label="Remove document ${item.name}"
+						label="Remove Member Type ${item.name}"
 						>${this.localize.term('general_remove')}</uui-button
 					>
 				</uui-action-bar>
-			</uui-ref-node>
+			</uui-ref-node-document-type>
 		`;
 	}
 
@@ -143,10 +170,10 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 	];
 }
 
-export default UmbInputDocumentElement;
+export default UmbMemberTypeInputElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-input-document': UmbInputDocumentElement;
+		'umb-input-member-type': UmbMemberTypeInputElement;
 	}
 }

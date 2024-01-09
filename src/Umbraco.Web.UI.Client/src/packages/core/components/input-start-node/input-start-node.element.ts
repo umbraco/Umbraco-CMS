@@ -1,16 +1,26 @@
-import { UmbInputDocumentElement } from '@umbraco-cms/backoffice/document';
+import { UmbInputDocumentPickerRootElement } from '@umbraco-cms/backoffice/document';
 import { html, customElement, property, css, state } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin, UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbInputMediaElement } from '@umbraco-cms/backoffice/media';
-import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+//import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 export type ContentType = 'content' | 'member' | 'media';
+
+export type DynamicRootQueryStepType = {
+	alias: string;
+	anyOfDocTypeKeys: Array<string>;
+};
+
+export type DynamicRootType = {
+	originAlias: string;
+	querySteps?: Array<DynamicRootQueryStepType> | null;
+};
 
 export type StartNode = {
 	type?: ContentType;
 	id?: string | null;
-	query?: string | null;
+	dynamicRoot?: DynamicRootType | null;
 };
 
 @customElement('umb-input-start-node')
@@ -20,14 +30,21 @@ export class UmbInputStartNodeElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	private _type: StartNode['type'] = 'content';
+
 	@property()
 	public set type(value: StartNode['type']) {
+		if (value === undefined) {
+			value = this._type;
+		}
+
 		const oldValue = this._type;
 
 		this._options = this._options.map((option) =>
 			option.value === value ? { ...option, selected: true } : { ...option, selected: false },
 		);
+
 		this._type = value;
+
 		this.requestUpdate('type', oldValue);
 	}
 	public get type(): StartNode['type'] {
@@ -35,30 +52,43 @@ export class UmbInputStartNodeElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	@property({ attribute: 'node-id' })
-	nodeId = '';
+	nodeId?: string | null;
 
-	@property({ attribute: 'dynamic-path' })
-	dynamicPath = '';
+	@property({ attribute: false })
+	dynamicRoot?: DynamicRootType | null;
 
 	@state()
 	_options: Array<Option> = [
 		{ value: 'content', name: 'Content' },
-		{ value: 'member', name: 'Members' },
 		{ value: 'media', name: 'Media' },
+		{ value: 'member', name: 'Members' },
 	];
 
 	#onTypeChange(event: UUISelectEvent) {
+		//console.log('onTypeChange');
+
 		this.type = event.target.value as StartNode['type'];
 
-		// Clear others
 		this.nodeId = '';
-		this.dynamicPath = '';
-		this.dispatchEvent(new UmbChangeEvent());
+
+		// TODO: Appears that the event gets bubbled up. Will need to review. [LK]
+		//this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	#onIdChange(event: CustomEvent) {
-		this.nodeId = (event.target as UmbInputDocumentElement | UmbInputMediaElement).selectedIds.join('');
-		this.dispatchEvent(new CustomEvent('change'));
+		//console.log('onIdChange', event.target);
+		switch (this.type) {
+			case 'content':
+				this.nodeId = (<UmbInputDocumentPickerRootElement>event.target).nodeId;
+				break;
+			case 'media':
+				this.nodeId = (<UmbInputMediaElement>event.target).selectedIds.join('');
+				break;
+			default:
+				break;
+		}
+
+		this.dispatchEvent(new CustomEvent(event.type));
 	}
 
 	render() {
@@ -82,21 +112,21 @@ export class UmbInputStartNodeElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	#renderTypeContent() {
-		const nodeId = this.nodeId ? [this.nodeId] : [];
-		//TODO: Dynamic paths
-		return html` <umb-input-document @change=${this.#onIdChange} .selectedIds=${nodeId} max="1"></umb-input-document> `;
+		return html`<umb-input-document-picker-root
+			@change=${this.#onIdChange}
+			.nodeId=${this.nodeId}></umb-input-document-picker-root>`;
 	}
 
 	#renderTypeMedia() {
 		const nodeId = this.nodeId ? [this.nodeId] : [];
 		//TODO => MediaTypes
-		return html` <umb-input-media @change=${this.#onIdChange} .selectedIds=${nodeId} max="1"></umb-input-media> `;
+		return html`<umb-input-media @change=${this.#onIdChange} .selectedIds=${nodeId} max="1"></umb-input-media>`;
 	}
 
 	#renderTypeMember() {
 		const nodeId = this.nodeId ? [this.nodeId] : [];
 		//TODO => Members
-		return html` <umb-input-member @change=${this.#onIdChange} .selectedIds=${nodeId} max="1"></umb-input-member> `;
+		return html`<umb-input-member @change=${this.#onIdChange} .selectedIds=${nodeId} max="1"></umb-input-member>`;
 	}
 
 	static styles = [

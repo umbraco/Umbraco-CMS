@@ -22,15 +22,17 @@ export class UmbPropertyEditorUITreePickerStartNodeElement extends UmbLitElement
 		this.value = {
 			type: target.type,
 			id: target.nodeId,
-			// TODO: Please check this makes sense, Check if we want to support XPath in this version, if not then make sure we handle DynamicRoot correct.
-			query: target.dynamicPath,
+			dynamicRoot: target.dynamicRoot,
 		};
 
 		this.dispatchEvent(new CustomEvent('property-value-change'));
 	}
 
 	render() {
-		return html`<umb-input-start-node @change="${this.#onChange}" .type=${this.value?.type}></umb-input-start-node>`;
+		return html`<umb-input-start-node
+			@change=${this.#onChange}
+			.type=${this.value?.type}
+			.nodeId=${this.value?.id}></umb-input-start-node>`;
 	}
 
 	static styles = [UmbTextStyles];
