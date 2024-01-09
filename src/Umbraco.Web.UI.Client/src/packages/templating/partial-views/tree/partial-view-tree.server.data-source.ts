@@ -33,12 +33,14 @@ export class UmbPartialViewTreeServerDataSource extends UmbTreeServerDataSourceB
 const getRootItems = () => PartialViewResource.getTreePartialViewRoot({});
 
 const getChildrenOf = (parentUnique: string | null) => {
+	const serializer = new UmbServerPathUniqueSerializer();
+
 	if (parentUnique === null) {
 		return getRootItems();
 	} else {
 		// eslint-disable-next-line local-rules/no-direct-api-import
 		return PartialViewResource.getTreePartialViewChildren({
-			parentPath: parentUnique,
+			parentPath: serializer.toServerPath(parentUnique),
 		});
 	}
 };
