@@ -1,23 +1,28 @@
 import { AuditTypeModel } from '@umbraco-cms/backoffice/backend-api';
 
-interface HistoricStyleMap {
+interface HistoryStyleMap {
 	look: 'default' | 'primary' | 'secondary' | 'outline' | 'placeholder';
 	color: 'default' | 'danger' | 'warning' | 'positive';
 }
 
-interface HistoricText {
+interface HistoryLocalizeKeys {
 	label: string;
 	desc: string;
 }
 
-interface HistoricData {
-	style: HistoricStyleMap;
-	text: HistoricText;
+interface HistoryData {
+	style: HistoryStyleMap;
+	text: HistoryLocalizeKeys;
 }
 
 // Return label, color, look, desc
 
-export function HistoricTagAndDescription(type: AuditTypeModel): HistoricData {
+/**
+ * @description Helper function to get look and color for uui-tag and localization keys for the label and description.
+ * @param type AuditTypeModel
+ * @returns {HistoricData}
+ */
+export function HistoryTagStyleAndText(type: AuditTypeModel): HistoryData {
 	switch (type) {
 		case AuditTypeModel.SAVE:
 			return {

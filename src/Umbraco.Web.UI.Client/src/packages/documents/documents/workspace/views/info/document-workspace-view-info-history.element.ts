@@ -1,13 +1,13 @@
-import { HistoricTagAndDescription } from './history-utils.js';
+import { UmbAuditLogRepository } from '@umbraco-cms/backoffice/audit-log';
+import { HistoryTagStyleAndText } from './utils.js';
 import { css, html, customElement, state, property, nothing, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbAuditLogRepository } from '@umbraco-cms/backoffice/audit-log';
 import { AuditLogBaseModel, DirectionModel } from '@umbraco-cms/backoffice/backend-api';
 
-@customElement('umb-document-info-history-workspace-view')
-export class UmbDocumentInfoHistoryWorkspaceViewElement extends UmbLitElement {
+@customElement('umb-document-workspace-view-info-history')
+export class UmbDocumentWorkspaceViewInfoHistoryElement extends UmbLitElement {
 	#logRepository: UmbAuditLogRepository;
 	#itemsPerPage = 10;
 
@@ -48,9 +48,9 @@ export class UmbDocumentInfoHistoryWorkspaceViewElement extends UmbLitElement {
 		this._items = data.items;
 		*/
 
-		//TODO: I think there is an issue with the API (backend). Hacking for now.
+		//TODO: I think there is an issue with the API (backend) - error with ID. Hacking for now.
 		// Uncomment previous code and delete the following when issue fixed.
-		// This should also make it load significantly faster, can consider removing the loader
+		// This should also make it load significantly faster
 
 		const { data } = await this.#logRepository.getAuditLogByUnique({
 			id: '',
@@ -81,8 +81,9 @@ export class UmbDocumentInfoHistoryWorkspaceViewElement extends UmbLitElement {
 
 	render() {
 		return html`<uui-box headline=${this.localize.term('general_history')}>
-				${this._items ? this.#renderHistory() : html`<uui-loader-circle></uui-loader-circle> `} </uui-box
-			>${this.#renderHistoryPagination()}`;
+				${this._items ? this.#renderHistory() : html`<uui-loader-circle></uui-loader-circle> `}
+			</uui-box>
+			${this.#renderHistoryPagination()}`;
 	}
 
 	#renderHistory() {
@@ -93,7 +94,7 @@ export class UmbDocumentInfoHistoryWorkspaceViewElement extends UmbLitElement {
 						this._items,
 						(item) => item.timestamp,
 						(item) => {
-							const { text, style } = HistoricTagAndDescription(item.logType);
+							const { text, style } = HistoryTagStyleAndText(item.logType);
 							return html`<umb-history-item name="TODO Username" detail=${new Date(item.timestamp).toLocaleString()}>
 								<span class="log-type">
 									<uui-tag look=${style.look} color=${style.color}> ${this.localize.term(text.label)} </uui-tag>
@@ -138,7 +139,6 @@ export class UmbDocumentInfoHistoryWorkspaceViewElement extends UmbLitElement {
 
 			.log-type {
 				flex-grow: 1;
-				display: flex;
 				gap: var(--uui-size-space-2);
 			}
 
@@ -155,10 +155,10 @@ export class UmbDocumentInfoHistoryWorkspaceViewElement extends UmbLitElement {
 	];
 }
 
-export default UmbDocumentInfoHistoryWorkspaceViewElement;
+export default UmbDocumentWorkspaceViewInfoHistoryElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-document-info-history-workspace-view': UmbDocumentInfoHistoryWorkspaceViewElement;
+		'umb-document-workspace-view-info-history': UmbDocumentWorkspaceViewInfoHistoryElement;
 	}
 }

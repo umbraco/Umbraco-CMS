@@ -1,7 +1,7 @@
-import './document-info-workspace-view.element.js';
+import './document-workspace-view-info.element.js';
 
 import { Meta, Story } from '@storybook/web-components';
-import type { UmbDocumentInfoWorkspaceViewElement } from './document-info-workspace-view.element.js';
+import type { UmbDocumentWorkspaceViewInfoElement } from './document-workspace-view-info.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 // import { data } from '../../../../../../core/mocks/data/document.data.js';
@@ -9,8 +9,8 @@ import { html } from '@umbraco-cms/backoffice/external/lit';
 
 export default {
 	title: 'Workspaces/Documents/Views/Info',
-	component: 'umb-document-info-workspace-view',
-	id: 'umb-document-info-workspace-view',
+	component: 'umb-document-workspace-view-info',
+	id: 'umb-document-workspace-view-info',
 	decorators: [
 		(story) => {
 			return html`TODO: make use of mocked workspace context??`;
@@ -21,6 +21,6 @@ export default {
 	],
 } as Meta;
 
-export const AAAOverview: Story<UmbDocumentInfoWorkspaceViewElement> = () =>
-	html` <umb-document-info-workspace-view></umb-document-info-workspace-view>`;
+export const AAAOverview: Story<UmbDocumentWorkspaceViewInfoElement> = () =>
+	html` <umb-document-workspace-view-info></umb-document-workspace-view-info>`;
 AAAOverview.storyName = 'Overview';

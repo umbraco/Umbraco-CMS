@@ -3,10 +3,11 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import './history/document-info-history-workspace-view.element.js';
+import './document-workspace-view-info-history.element.js';
+import './document-workspace-view-info-reference.element.js';
 
-@customElement('umb-document-info-workspace-view')
-export class UmbDocumentInfoWorkspaceViewElement extends UmbLitElement {
+@customElement('umb-document-workspace-view-info')
+export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 	/** Dont delete, need for mock data */
 	/*@state()
 	private _historyList: [] = [
@@ -117,8 +118,10 @@ export class UmbDocumentInfoWorkspaceViewElement extends UmbLitElement {
 					${this.#renderLinksSection()}
 				</uui-box>
 
-				<umb-document-info-history-workspace-view
-					.documentUnique=${this._documentTypeId}></umb-document-info-history-workspace-view>
+				<umb-document-workspace-view-info-reference></umb-document-workspace-view-info-reference>
+
+				<umb-document-workspace-view-info-history
+					.documentUnique=${this._documentTypeId}></umb-document-workspace-view-info-history>
 			</div>
 			<div class="container">
 				<uui-box headline="General" id="general-section">${this.#renderGeneralSection()}</uui-box>
@@ -243,10 +246,10 @@ export class UmbDocumentInfoWorkspaceViewElement extends UmbLitElement {
 	];
 }
 
-export default UmbDocumentInfoWorkspaceViewElement;
+export default UmbDocumentWorkspaceViewInfoElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-document-info-workspace-view': UmbDocumentInfoWorkspaceViewElement;
+		'umb-document-workspace-view-info': UmbDocumentWorkspaceViewInfoElement;
 	}
 }
