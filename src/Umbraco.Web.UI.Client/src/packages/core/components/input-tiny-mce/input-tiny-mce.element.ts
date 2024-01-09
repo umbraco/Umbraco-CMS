@@ -5,7 +5,6 @@ import { uriAttributeSanitizer } from './input-tiny-mce.sanitizer.js';
 import { umbMeta } from '@umbraco-cms/backoffice/meta';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { type Editor, type RawEditorOptions, renderEditor } from '@umbraco-cms/backoffice/external/tinymce';
-import { UMB_CURRENT_USER_CONTEXT, UmbCurrentUser } from '@umbraco-cms/backoffice/current-user';
 import { TinyMcePluginArguments, UmbTinyMcePluginBase } from '@umbraco-cms/backoffice/components';
 import { loadManifestApi } from '@umbraco-cms/backoffice/extension-api';
 import { ManifestTinyMcePlugin, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -24,6 +23,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
 import { UmbStylesheetRepository } from '@umbraco-cms/backoffice/stylesheet';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 @customElement('umb-input-tiny-mce')
 export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
@@ -34,8 +34,6 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 	private _tinyConfig: RawEditorOptions = {};
 
 	#mediaHelper = new UmbMediaHelper();
-	#currentUser?: UmbCurrentUser;
-	#currentUserContext?: typeof UMB_CURRENT_USER_CONTEXT.TYPE;
 	#plugins: Array<new (args: TinyMcePluginArguments) => UmbTinyMcePluginBase> = [];
 	#editorRef?: Editor | null = null;
 	#stylesheetRepository?: UmbStylesheetRepository;
@@ -56,19 +54,6 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 		});
 
 		this.#stylesheetRepository = new UmbStylesheetRepository(this);
-
-		// TODO => this breaks tests, removing for now will ignore user language
-		// and fall back to tinymce default language
-		// this.consumeContext(UMB_AUTH, (instance) => {
-		// 	this.#auth = instance;
-		// 	this.#observeCurrentUser();
-		// });
-	}
-
-	async #observeCurrentUser() {
-		if (!this.#currentUserContext) return;
-
-		this.observe(this.#currentUserContext.currentUser, (currentUser) => (this.#currentUser = currentUser));
 	}
 
 	protected async firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): Promise<void> {
@@ -231,7 +216,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 	/**
 	 * Sets the language to use for TinyMCE */
 	#setLanguage() {
-		const localeId = this.#currentUser?.languageIsoCode;
+		const localeId = this.localize.lang();
 		//try matching the language using full locale format
 		let languageMatch = availableLanguages.find((x) => localeId?.localeCompare(x) === 0);
 
@@ -297,8 +282,8 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	#onChange(value: string) {
-		super.value = value;
-		this.dispatchEvent(new CustomEvent('change'));
+		this.value = value;
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	/**
