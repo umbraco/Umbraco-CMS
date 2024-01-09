@@ -8,12 +8,34 @@ import {
 
 export const handlers = [
 	rest.get(umbracoPath('/audit-log'), (_req, res, ctx) => {
-		return res(ctx.status(200), ctx.json<PagedAuditLogWithUsernameResponseModel>({ total: 0, items: [] }));
+		PagedAuditLog = {
+			total: logs.length,
+			items: logs,
+		};
+		return res(ctx.status(200), ctx.json<PagedAuditLogWithUsernameResponseModel>(PagedAuditLog));
 	}),
 	rest.get(umbracoPath('/audit-log/:id'), (_req, res, ctx) => {
-		return res(ctx.status(200), ctx.json<PagedAuditLogResponseModel>({ total: 0, items: [] }));
+		const id = _req.params.id as string;
+		if (!id) return;
+
+		const foundLogs = logs.filter((log) => log.entityId === id);
+		PagedAuditLog = {
+			total: foundLogs.length,
+			items: foundLogs,
+		};
+
+		return res(ctx.status(200), ctx.json<PagedAuditLogResponseModel>(PagedAuditLog));
 	}),
 	rest.get(umbracoPath('/audit-log/type/:logType'), (_req, res, ctx) => {
-		return res(ctx.status(200), ctx.json<PagedAuditLogResponseModel>({ total: 0, items: [] }));
+		const logType = _req.params.logType as string;
+		if (!logType) return;
+
+		const foundLogs = logs.filter((log) => log.entityType === logType);
+		PagedAuditLog = {
+			total: foundLogs.length,
+			items: foundLogs,
+		};
+
+		return res(ctx.status(200), ctx.json<PagedAuditLogResponseModel>(PagedAuditLog));
 	}),
 ];

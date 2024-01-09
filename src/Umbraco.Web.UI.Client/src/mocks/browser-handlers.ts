@@ -1,3 +1,4 @@
+import { handlers as auditLogHandlers } from './handlers/audit-log.handlers.js';
 import { handlers as dataTypeHandlers } from './handlers/data-type/index.js';
 import { handlers as relationTypeHandlers } from './handlers/relation-type.handlers.js';
 import { handlers as documentTypeHandlers } from './handlers/document-type/index.js';
@@ -37,6 +38,7 @@ import { handlers as scriptHandlers } from './handlers/scripts.handlers.js';
 
 const handlers = [
 	serverHandlers.serverVersionHandler,
+	...auditLogHandlers,
 	...configHandlers,
 	...cultureHandlers,
 	...dataTypeHandlers,
