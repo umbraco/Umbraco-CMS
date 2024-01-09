@@ -1,4 +1,4 @@
-import { UmbBackofficeContext, UMB_BACKOFFICE_CONTEXT_TOKEN } from './backoffice.context.js';
+import { UmbBackofficeContext } from './backoffice.context.js';
 import { UmbServerExtensionRegistrator } from './server-extension-registrator.controller.js';
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
