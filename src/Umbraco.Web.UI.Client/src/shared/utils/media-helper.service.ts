@@ -6,10 +6,7 @@ import type { Editor, EditorEvent } from '@umbraco-cms/backoffice/external/tinym
 
 export class UmbMediaHelper {
 	/**
-	 *
-	 * @param editor
-	 * @param imageDomElement
-	 * @param imgUrl
+	 * Sizes an image in the editor
 	 */
 	async sizeImageInEditor(editor: Editor, imageDomElement: HTMLElement, imgUrl?: string) {
 		const size = editor.dom.getSize(imageDomElement);
@@ -36,11 +33,7 @@ export class UmbMediaHelper {
 	}
 
 	/**
-	 *
-	 * @param maxSize
-	 * @param width
-	 * @param height
-	 * @returns
+	 * Scales an image to the max size
 	 */
 	scaleToMaxSize(maxSize: number, width: number, height: number) {
 		const retval = { width, height };
@@ -73,10 +66,7 @@ export class UmbMediaHelper {
 	}
 
 	/**
-	 *
-	 * @param imagePath
-	 * @param options
-	 * @returns
+	 * Returns the URL of the processed image
 	 */
 	async getProcessedImageUrl(imagePath: string, options: any) {
 		if (!options) {
@@ -91,8 +81,7 @@ export class UmbMediaHelper {
 	}
 
 	/**
-	 *
-	 * @param editor
+	 * Uploads blob images to the server
 	 */
 	async uploadBlobImages(editor: Editor, newContent?: string) {
 		const content = newContent ?? editor.getContent();
@@ -150,9 +139,7 @@ export class UmbMediaHelper {
 	}
 
 	/**
-	 *
-	 * @param e
-	 * @returns
+	 * Handles the resize event
 	 */
 	async onResize(
 		e: EditorEvent<{
