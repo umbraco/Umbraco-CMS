@@ -39,7 +39,7 @@ export class UmbScriptWorkspaceEditorElement extends UmbLitElement {
 			});
 
 			this.observe(this.#scriptsWorkspaceContext.path, (path) => {
-				this._path = path?.replace(/\\/g, '/');
+				this._path = path;
 			});
 
 			this.observe(this.#scriptsWorkspaceContext.isCodeEditorReady, (isReady) => {
