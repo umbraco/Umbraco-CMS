@@ -1,3 +1,4 @@
+export * from './block-catalogue-modal.token.js';
 export * from './change-password-modal.token.js';
 export * from './code-editor-modal.token.js';
 export * from './confirm-modal.token.js';

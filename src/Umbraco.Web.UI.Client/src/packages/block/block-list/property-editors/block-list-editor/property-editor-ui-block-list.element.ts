@@ -14,6 +14,12 @@ import '../../components/block-list-block/index.js';
 import { buildUdi } from '@umbraco-cms/backoffice/utils';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { NumberRangeValueType } from '@umbraco-cms/backoffice/models';
+import {
+	UMB_BLOCK_CATALOGUE_MODAL,
+	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
+	UmbModalManagerContext,
+} from '@umbraco-cms/backoffice/modal';
+import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/document';
 
 export interface UmbBlockListLayoutModel extends UmbBlockLayoutBaseModel {}
 
@@ -72,8 +78,15 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 	@state()
 	_layouts: Array<UmbBlockLayoutBaseModel> = [];
 
+	#modalContext?: UmbModalManagerContext;
+
 	constructor() {
 		super();
+
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
+			this.#modalContext = instance;
+		});
+
 		// TODO: Prevent initial notification from these observes:
 		this.observe(this.#context.layouts, (layouts) => {
 			this._value.layout[UMB_BLOCK_LIST_PROPERTY_EDITOR_ALIAS] = layouts;
@@ -95,11 +108,21 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 		});
 	}
 
-	#openBlockCatalogue() {
+	async #openBlockCatalogue() {
 		// Open modal.
 
-		// TEMP Hack:
+		const contentElementTypeKey = this.#context.getBlockTypes()[0]!.contentElementTypeKey;
 
+		const modalContext = this.#modalContext?.open(UMB_BLOCK_CATALOGUE_MODAL, {
+			data: { unique: 'dt-blockList' },
+		});
+
+		const data = await modalContext?.onSubmit();
+		console.log('submitted', data);
+		if (!data) return;
+
+		// TEMP Hack:
+		/*
 		const contentElementTypeKey = this.#context.getBlockTypes()[0]!.contentElementTypeKey;
 
 		const contentUdi = buildUdi('element', UmbId.new());
@@ -112,6 +135,7 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 			},
 			contentElementTypeKey,
 		);
+		*/
 	}
 
 	render() {

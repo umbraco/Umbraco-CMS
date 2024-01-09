@@ -3,6 +3,12 @@ import type { ManifestModal } from '@umbraco-cms/backoffice/extension-registry';
 const modals: Array<ManifestModal> = [
 	{
 		type: 'modal',
+		alias: 'Umb.Modal.BlockCatalogue',
+		name: 'Block Catalogue Modal',
+		js: () => import('./block-catalogue/block-catalogue-modal.element.js'),
+	},
+	{
+		type: 'modal',
 		alias: 'Umb.Modal.Confirm',
 		name: 'Confirm Modal',
 		js: () => import('./confirm/confirm-modal.element.js'),
