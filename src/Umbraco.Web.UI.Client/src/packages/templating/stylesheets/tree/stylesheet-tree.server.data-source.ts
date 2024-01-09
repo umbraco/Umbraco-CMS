@@ -33,14 +33,14 @@ export class UmbStylesheetTreeServerDataSource extends UmbTreeServerDataSourceBa
 const getRootItems = () => StylesheetResource.getTreeStylesheetRoot({});
 
 const getChildrenOf = (parentUnique: string | null) => {
-	const serializer = new UmbServerPathUniqueSerializer();
+	const parentPath = new UmbServerPathUniqueSerializer().toServerPath(parentUnique);
 
-	if (parentUnique === null) {
+	if (parentPath === null) {
 		return getRootItems();
 	} else {
 		// eslint-disable-next-line local-rules/no-direct-api-import
 		return StylesheetResource.getTreeStylesheetChildren({
-			parentPath: serializer.toServerPath(parentUnique),
+			parentPath,
 		});
 	}
 };

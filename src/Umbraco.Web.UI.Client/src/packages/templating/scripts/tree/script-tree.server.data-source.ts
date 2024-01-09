@@ -33,14 +33,14 @@ export class UmbScriptTreeServerDataSource extends UmbTreeServerDataSourceBase<
 const getRootItems = () => ScriptResource.getTreeScriptRoot({});
 
 const getChildrenOf = (parentUnique: string | null) => {
-	const serializer = new UmbServerPathUniqueSerializer();
+	const parentPath = new UmbServerPathUniqueSerializer().toServerPath(parentUnique);
 
-	if (parentUnique === null) {
+	if (parentPath === null) {
 		return getRootItems();
 	} else {
 		// eslint-disable-next-line local-rules/no-direct-api-import
 		return ScriptResource.getTreeScriptChildren({
-			parentPath: serializer.toServerPath(parentUnique),
+			parentPath,
 		});
 	}
 };
