@@ -3,10 +3,12 @@ import { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { RelationItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbDocumentTrackedReferenceRepository } from '@umbraco-cms/backoffice/document';
 
 @customElement('umb-document-workspace-view-info-reference')
 export class UmbDocumentWorkspaceViewInfoReferenceElement extends UmbLitElement {
 	#itemsPerPage = 10;
+	#trackedReferenceRepository;
 
 	@state()
 	private _currentPage = 1;
@@ -32,6 +34,19 @@ export class UmbDocumentWorkspaceViewInfoReferenceElement extends UmbLitElement 
 
 	constructor() {
 		super();
+		this.#trackedReferenceRepository = new UmbDocumentTrackedReferenceRepository(this);
+
+		this.#getReferences();
+	}
+
+	async #getReferences() {
+		const { data } = await this.#trackedReferenceRepository.requestTrackedReference(
+			'3f23cc76-a645-4032-82b3-c16458e97215',
+		);
+		if (!data) return;
+
+		this._total = data.total;
+		this._items = data.items;
 	}
 
 	#onPageChange(event: UUIPaginationEvent) {
