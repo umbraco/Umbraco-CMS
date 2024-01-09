@@ -118,7 +118,8 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 					${this.#renderLinksSection()}
 				</uui-box>
 
-				<umb-document-workspace-view-info-reference></umb-document-workspace-view-info-reference>
+				<umb-document-workspace-view-info-reference
+					.documentUnique=${this._documentTypeId}></umb-document-workspace-view-info-reference>
 
 				<umb-document-workspace-view-info-history
 					.documentUnique=${this._documentTypeId}></umb-document-workspace-view-info-history>

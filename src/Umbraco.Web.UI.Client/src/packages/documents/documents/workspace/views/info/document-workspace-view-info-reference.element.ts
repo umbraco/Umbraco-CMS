@@ -1,4 +1,4 @@
-import { css, html, customElement, state, nothing, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, nothing, repeat, property } from '@umbraco-cms/backoffice/external/lit';
 import { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -10,6 +10,9 @@ export class UmbDocumentWorkspaceViewInfoReferenceElement extends UmbLitElement 
 	#itemsPerPage = 10;
 	#trackedReferenceRepository;
 
+	@property()
+	documentUnique = '';
+
 	@state()
 	private _currentPage = 1;
 
@@ -17,31 +20,22 @@ export class UmbDocumentWorkspaceViewInfoReferenceElement extends UmbLitElement 
 	private _total = 0;
 
 	@state()
-	private _items?: Array<RelationItemResponseModel> = [
-		{
-			nodeId: '3f23cc76-a645-4032-82b3-c16458e97215',
-			nodeName: 'hey',
-			nodeType: 'document',
-			nodePublished: true,
-			contentTypeIcon: 'icon-document',
-			contentTypeAlias: 'blockListTest',
-			contentTypeName: 'Block List Test',
-			relationTypeName: 'Related Document',
-			relationTypeIsBidirectional: false,
-			relationTypeIsDependency: true,
-		},
-	];
+	private _items?: Array<RelationItemResponseModel> = [];
 
 	constructor() {
 		super();
 		this.#trackedReferenceRepository = new UmbDocumentTrackedReferenceRepository(this);
+	}
 
+	protected firstUpdated(): void {
 		this.#getReferences();
 	}
 
 	async #getReferences() {
 		const { data } = await this.#trackedReferenceRepository.requestTrackedReference(
-			'3f23cc76-a645-4032-82b3-c16458e97215',
+			this.documentUnique,
+			this._currentPage - 1 * this.#itemsPerPage,
+			this.#itemsPerPage,
 		);
 		if (!data) return;
 
@@ -52,6 +46,8 @@ export class UmbDocumentWorkspaceViewInfoReferenceElement extends UmbLitElement 
 	#onPageChange(event: UUIPaginationEvent) {
 		if (this._currentPage === event.target.current) return;
 		this._currentPage = event.target.current;
+
+		this.#getReferences();
 	}
 
 	render() {

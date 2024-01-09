@@ -21,6 +21,7 @@ import { handlers as memberGroupHandlers } from './handlers/member-group.handler
 import { handlers as memberHandlers } from './handlers/member.handlers.js';
 import { handlers as memberTypeHandlers } from './handlers/member-type.handlers.js';
 import { handlers as templateHandlers } from './handlers/template.handlers.js';
+import { handlers as trackedReferenceHandlers } from './handlers/tracked-reference.handlers.js';
 import { handlers as languageHandlers } from './handlers/language.handlers.js';
 import { handlers as cultureHandlers } from './handlers/culture.handlers.js';
 import { handlers as redirectManagementHandlers } from './handlers/redirect-management.handlers.js';
@@ -66,6 +67,7 @@ const handlers = [
 	...tagHandlers,
 	...telemetryHandlers,
 	...templateHandlers,
+	...trackedReferenceHandlers,
 	...upgradeHandlers,
 	...userGroupsHandlers,
 	...userHandlers,
