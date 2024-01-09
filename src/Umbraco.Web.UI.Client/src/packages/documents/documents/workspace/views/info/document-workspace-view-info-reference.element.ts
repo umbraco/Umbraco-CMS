@@ -1,4 +1,4 @@
-import { css, html, customElement, state, property, nothing, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, nothing, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -17,8 +17,8 @@ export class UmbDocumentWorkspaceViewInfoReferenceElement extends UmbLitElement 
 	@state()
 	private _items?: Array<RelationItemResponseModel> = [
 		{
-			nodeId: 'ferewrEW-ewrwerer-ewrwrq',
-			nodeName: 'sadasdf',
+			nodeId: '3f23cc76-a645-4032-82b3-c16458e97215',
+			nodeName: 'hey',
 			nodeType: 'document',
 			nodePublished: true,
 			contentTypeIcon: 'icon-document',
