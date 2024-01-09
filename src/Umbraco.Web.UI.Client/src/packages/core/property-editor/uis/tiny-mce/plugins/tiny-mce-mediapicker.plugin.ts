@@ -51,11 +51,16 @@ export default class UmbTinyMceMediaPickerPlugin extends UmbTinyMcePluginBase {
 		// 	this.#observeCurrentUser();
 		// });
 
-		this.editor.ui.registry.addButton('umbmediapicker', {
+		this.editor.ui.registry.addToggleButton('umbmediapicker', {
 			icon: 'image',
 			tooltip: 'Media Picker',
-			//stateSelector: 'img[data-udi]', TODO => Investigate where stateselector has gone, or if it is still needed
 			onAction: () => this.#onAction(),
+			onSetup: (api) => {
+				const changed = this.editor.selection.selectorChangedWithUnbind('img[data-udi]', (state) =>
+					api.setActive(state),
+				);
+				return () => changed;
+			},
 		});
 
 		// Register global options for the editor
