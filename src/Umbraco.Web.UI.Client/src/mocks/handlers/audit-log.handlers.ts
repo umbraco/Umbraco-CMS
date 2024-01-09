@@ -8,7 +8,7 @@ import {
 
 export const handlers = [
 	rest.get(umbracoPath('/audit-log'), (_req, res, ctx) => {
-		PagedAuditLog = {
+		const PagedAuditLog = {
 			total: logs.length,
 			items: logs,
 		};
@@ -19,7 +19,7 @@ export const handlers = [
 		if (!id) return;
 
 		const foundLogs = logs.filter((log) => log.entityId === id);
-		PagedAuditLog = {
+		const PagedAuditLog = {
 			total: foundLogs.length,
 			items: foundLogs,
 		};
@@ -31,7 +31,7 @@ export const handlers = [
 		if (!logType) return;
 
 		const foundLogs = logs.filter((log) => log.entityType === logType);
-		PagedAuditLog = {
+		const PagedAuditLog = {
 			total: foundLogs.length,
 			items: foundLogs,
 		};

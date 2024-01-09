@@ -76,6 +76,9 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 	@state()
 	private _documentTypeId = '';
 
+	@state()
+	private _documentUnique = '';
+
 	private _workspaceContext?: typeof UMB_WORKSPACE_CONTEXT.TYPE;
 
 	@state()
@@ -105,6 +108,10 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 		this._nodeName = 'TBD, with variants this is not as simple.';
 		this._documentTypeId = (this._workspaceContext as any).getContentTypeId();
 
+		this.observe(this._workspaceContext.unique, (unique) => {
+			this._documentUnique = unique;
+		});
+
 		/*
 		this.observe(this._workspaceContext.name, (name) => {
 			this._nodeName = name || '';
@@ -119,10 +126,10 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 				</uui-box>
 
 				<umb-document-workspace-view-info-reference
-					.documentUnique=${this._documentTypeId}></umb-document-workspace-view-info-reference>
+					.documentUnique=${this._documentUnique}></umb-document-workspace-view-info-reference>
 
 				<umb-document-workspace-view-info-history
-					.documentUnique=${this._documentTypeId}></umb-document-workspace-view-info-history>
+					.documentUnique=${this._documentUnique}></umb-document-workspace-view-info-history>
 			</div>
 			<div class="container">
 				<uui-box headline="General" id="general-section">${this.#renderGeneralSection()}</uui-box>
