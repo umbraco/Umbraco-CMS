@@ -252,9 +252,6 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 	#editorSetup(editor: Editor) {
 		editor.suffix = '.min';
 
-		// register custom option maxImageSize
-		editor.options.register('maxImageSize', { processor: 'number', default: defaultFallbackConfig.maxImageSize });
-
 		// instantiate plugins - these are already loaded in this.#loadPlugins
 		// to ensure they are available before setting up the editor.
 		// Plugins require a reference to the current editor as a param, so can not
