@@ -69,6 +69,8 @@ export default class UmbTinyMceMediaPickerPlugin extends UmbTinyMcePluginBase {
 			this.editor.options.set('paste_data_images', true);
 			this.editor.options.set('automatic_uploads', false);
 			this.editor.options.set('images_upload_handler', this.#uploadImageHandler);
+			// This allows images to be pasted in & stored as Base64 until they get uploaded to server
+			this.editor.options.set('images_replace_blob_uris', true);
 
 			// Listen for SetContent to update images
 			this.editor.on('SetContent', async (e) => {
