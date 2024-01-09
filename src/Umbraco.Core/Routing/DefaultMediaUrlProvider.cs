@@ -23,10 +23,8 @@ public class DefaultMediaUrlProvider : IMediaUrlProvider
 
     [Obsolete("Use the constructor that has the IUrlAssembler instead. Scheduled to be removed in v15")]
     public DefaultMediaUrlProvider(MediaUrlGeneratorCollection mediaPathGenerators, UriUtility uriUtility)
+        : this(mediaPathGenerators, uriUtility, StaticServiceProvider.Instance.GetRequiredService<IUrlAssembler>())
     {
-        _mediaPathGenerators = mediaPathGenerators ?? throw new ArgumentNullException(nameof(mediaPathGenerators));
-        _uriUtility = uriUtility;
-        _urlAssembler = StaticServiceProvider.Instance.GetRequiredService<IUrlAssembler>();
     }
 
     /// <inheritdoc />
