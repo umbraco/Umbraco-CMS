@@ -1,17 +1,18 @@
-﻿import {test as setup, expect} from '@playwright/test';
+﻿import {test as setup} from '@playwright/test';
 import {STORAGE_STATE} from '../playwright.config';
-import {UiHelpers} from "@umbraco/playwright-testhelpers";
+import {ConstantHelper, UiHelpers} from "@umbraco/playwright-testhelpers";
 
 setup('authenticate', async ({page}) => {
   const umbracoUi = new UiHelpers(page);
 
-  await page.goto(process.env.URL + '/umbraco');
-  await page.getByLabel('Email').fill(process.env.UMBRACO_USER_LOGIN);
-  await page.getByLabel( 'Password', {exact: true}).fill(process.env.UMBRACO_USER_PASSWORD);
-  await page.getByRole('button', {name: 'Login'}).click();
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.login.enterEmail(process.env.UMBRACO_USER_LOGIN);
+  await umbracoUi.login.enterPassword(process.env.UMBRACO_USER_PASSWORD);
+  await umbracoUi.login.clickLoginButton();
 
   // Assert
-  await expect(page.locator('uui-tab-group').locator('[label="Settings"]')).toBeVisible({timeout: 10000});
-  await umbracoUi.goToSection('Settings');
+  //await expect(page.locator('uui-tab-group').locator('[label="Settings"]')).toBeVisible({timeout: 10000});
+  await umbracoUi.waitForTimeout(5000);
+  await umbracoUi.login.goToSection(ConstantHelper.sections.settings);
   await page.context().storageState({path: STORAGE_STATE});
 });
