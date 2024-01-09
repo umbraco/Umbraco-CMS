@@ -66,8 +66,67 @@ export default class UmbTinyMceMediaPickerPlugin extends UmbTinyMcePluginBase {
 		const toolbar = this.configuration?.getValueByAlias<string[]>('toolbar');
 		if (toolbar?.includes('umbmediapicker')) {
 			this.editor.options.set('paste_data_images', true);
-			this.editor.options.set('automatic_uploads', true);
+			this.editor.options.set('automatic_uploads', false);
 			this.editor.options.set('images_upload_handler', this.#uploadImageHandler);
+
+			// Listen for SetContent to update images
+			this.editor.on('SetContent', async (e) => {
+				const content = e.content;
+				console.log('🚀 ~ UmbTinyMceMediaPickerPlugin ~ this.editor.on ~ content:', content);
+
+				// Upload BLOB images (dragged/pasted ones)
+				// find src attribute where value starts with `blob:`
+				// search is case-insensitive and allows single or double quotes
+				if (content.search(/src=["']blob:.*?["']/gi) !== -1) {
+					const data = await this.editor.uploadImages();
+
+					// Once all images have been uploaded
+					for (const item of data) {
+						// Skip items that failed upload
+						if (item.status === false) {
+							return;
+						}
+
+						// Select img element
+						const img = item.element;
+
+						// Get img src
+						const imgSrc = img.getAttribute('src');
+						const tmpLocation = sessionStorage.getItem(`tinymce__${imgSrc}`);
+
+						// Select the img & add new attr which we can search for
+						// When its being persisted in RTE property editor
+						// To create a media item & delete this tmp one etc
+						this.editor.dom.setAttrib(img, 'data-tmpimg', tmpLocation);
+
+						// Resize the image to the max size configured
+						// NOTE: no imagesrc passed into func as the src is blob://...
+						// We will append ImageResizing Querystrings on perist to DB with node save
+						this.#mediaHelper.sizeImageInEditor(args.editor, img);
+					}
+
+					// Get all img where src starts with blob: AND does NOT have a data=tmpimg attribute
+					// This is most likely seen as a duplicate image that has already been uploaded
+					// editor.uploadImages() does not give us any indiciation that the image been uploaded already
+					const blobImageWithNoTmpImgAttribute = args.editor.dom.select("img[src^='blob:']:not([data-tmpimg])");
+
+					//For each of these selected items
+					blobImageWithNoTmpImgAttribute.forEach((imageElement) => {
+						const blobSrcUri = args.editor.dom.getAttrib(imageElement, 'src');
+
+						// Find the same image uploaded (Should be in LocalStorage)
+						// May already exist in the editor as duplicate image
+						// OR added to the RTE, deleted & re-added again
+						// So lets fetch the tempurl out of localstorage for that blob URI item
+						const tmpLocation = sessionStorage.getItem(`tinymce__${blobSrcUri}`);
+
+						if (tmpLocation) {
+							this.#mediaHelper.sizeImageInEditor(this.editor, imageElement);
+							args.editor.dom.setAttrib(imageElement, 'data-tmpimg', tmpLocation);
+						}
+					});
+				}
+			});
 		}
 	}
 
