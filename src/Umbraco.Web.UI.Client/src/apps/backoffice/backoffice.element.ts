@@ -1,4 +1,4 @@
-import { UmbBackofficeContext, UMB_BACKOFFICE_CONTEXT_TOKEN } from './backoffice.context.js';
+import { UmbBackofficeContext } from './backoffice.context.js';
 import { UmbServerExtensionRegistrator } from './server-extension-registrator.controller.js';
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -15,6 +15,7 @@ const CORE_PACKAGES = [
 	import('../../packages/core/umbraco-package.js'),
 	import('../../packages/settings/umbraco-package.js'),
 	import('../../packages/documents/umbraco-package.js'),
+	import('../../packages/relations/umbraco-package.js'),
 	import('../../packages/media/umbraco-package.js'),
 	import('../../packages/members/umbraco-package.js'),
 	import('../../packages/dictionary/umbraco-package.js'),
