@@ -43,6 +43,7 @@
       var vm = this;
 
       vm.readonly = false;
+      vm.noBlocksMode = false;
       vm.tinyMceEditor = null;
 
       $attrs.$observe('readonly', (value) => {
@@ -102,57 +103,68 @@
               var found = angularHelper.traverseScopeChain($scope, s => s && s.vm && s.vm.constructor.name === "umbVariantContentController");
               vm.umbVariantContent = found ? found.vm : null;
               if (!vm.umbVariantContent) {
-                  throw "Could not find umbVariantContent in the $scope chain";
+                //Could not find umbVariantContent in the $scope chain, lets go into no blocks mode:
+                vm.noBlocksMode = true;
+                vm.blocksLoading = false;
+                this.updateLoading();
               }
           }
+
+          const config = vm.model.config || {};
 
           // set the onValueChanged callback, this will tell us if the block list model changed on the server
           // once the data is submitted. If so we need to re-initialize
           vm.model.onValueChanged = onServerValueChanged;
-          liveEditing = vm.model.config.useLiveEditing;
+          liveEditing = config.useLiveEditing;
 
           vm.listWrapperStyles = {};
 
-          if (vm.model.config.maxPropertyWidth) {
-              vm.listWrapperStyles['max-width'] = vm.model.config.maxPropertyWidth;
+          if (config.maxPropertyWidth) {
+              vm.listWrapperStyles['max-width'] = config.maxPropertyWidth;
           }
 
-          // We need to ensure that the property model value is an object, this is needed for modelObject to recive a reference and keep that updated.
+          // We need to ensure that the property model value is an object, this is needed for modelObject to receive a reference and keep that updated.
           ensurePropertyValue(vm.model.value);
 
-          var scopeOfExistence = $scope;
-          if (vm.umbVariantContentEditors && vm.umbVariantContentEditors.getScope) {
-              scopeOfExistence = vm.umbVariantContentEditors.getScope();
-          } else if(vm.umbElementEditorContent && vm.umbElementEditorContent.getScope) {
-              scopeOfExistence = vm.umbElementEditorContent.getScope();
+          const assetPromises = [];
+
+          if(vm.noBlocksMode !== true) {
+
+            var scopeOfExistence = $scope;
+            if (vm.umbVariantContentEditors && vm.umbVariantContentEditors.getScope) {
+                scopeOfExistence = vm.umbVariantContentEditors.getScope();
+            } else if(vm.umbElementEditorContent && vm.umbElementEditorContent.getScope) {
+                scopeOfExistence = vm.umbElementEditorContent.getScope();
+            }
+
+            /*
+            copyAllBlocksAction = {
+                labelKey: "clipboard_labelForCopyAllEntries",
+                labelTokens: [vm.model.label],
+                icon: "icon-documents",
+                method: requestCopyAllBlocks,
+                isDisabled: true,
+                useLegacyIcon: false
+            };
+
+            deleteAllBlocksAction = {
+                labelKey: "clipboard_labelForRemoveAllEntries",
+                labelTokens: [],
+                icon: "icon-trash",
+                method: requestDeleteAllBlocks,
+                isDisabled: true,
+                useLegacyIcon: false
+            };
+
+            var propertyActions = [copyAllBlocksAction, deleteAllBlocksAction];
+            */
+
+            // Create Model Object, to manage our data for this Block Editor.
+            modelObject = blockEditorService.createModelObject(vm.model.value.blocks, vm.model.editor, config.blocks, scopeOfExistence, $scope);
+            const blockModelObjectLoading = modelObject.load();
+            assetPromises.push(blockModelObjectLoading)
+            blockModelObjectLoading.then(onLoaded);
           }
-
-          /*
-          copyAllBlocksAction = {
-              labelKey: "clipboard_labelForCopyAllEntries",
-              labelTokens: [vm.model.label],
-              icon: "icon-documents",
-              method: requestCopyAllBlocks,
-              isDisabled: true,
-              useLegacyIcon: false
-          };
-
-          deleteAllBlocksAction = {
-              labelKey: "clipboard_labelForRemoveAllEntries",
-              labelTokens: [],
-              icon: "icon-trash",
-              method: requestDeleteAllBlocks,
-              isDisabled: true,
-              useLegacyIcon: false
-          };
-
-          var propertyActions = [copyAllBlocksAction, deleteAllBlocksAction];
-          */
-
-          // Create Model Object, to manage our data for this Block Editor.
-          modelObject = blockEditorService.createModelObject(vm.model.value.blocks, vm.model.editor, vm.model.config.blocks, scopeOfExistence, $scope);
-          const blockModelObjectLoading = modelObject.load()
-          blockModelObjectLoading.then(onLoaded);
 
 
           // ******************** //
@@ -165,19 +177,18 @@
           // we have this mini content editor panel that can be launched with MNTP.
           vm.textAreaHtmlId = vm.model.alias + "_" + String.CreateGuid();
 
-          var editorConfig = vm.model.config ? vm.model.config.editor : null;
+          var editorConfig = config.editor ?? null;
           if (!editorConfig || Utilities.isString(editorConfig)) {
               editorConfig = tinyMceService.defaultPrevalues();
           }
+
 
           var width = editorConfig.dimensions ? parseInt(editorConfig.dimensions.width, 10) || null : null;
           var height = editorConfig.dimensions ? parseInt(editorConfig.dimensions.height, 10) || null : null;
 
           vm.containerWidth = "auto";
           vm.containerHeight = "auto";
-          vm.containerOverflow = "inherit";
-
-          const assetPromises = [blockModelObjectLoading];
+          vm.containerOverflow = "inherit"
 
           //queue file loading
           tinyMceAssets.forEach(function (tinyJsAsset) {
@@ -256,7 +267,7 @@
                       },
                       culture: vm.umbProperty?.culture ?? null,
                       segment: vm.umbProperty?.segment ?? null,
-                      blockEditorApi: vm.blockEditorApi,
+                      blockEditorApi: vm.noBlocksMode ? undefined : vm.blockEditorApi,
                       parentForm: vm.propertyForm,
                       valFormManager: vm.valFormManager,
                       currentFormInput: $scope.rteForm.modelValue
@@ -346,7 +357,9 @@
 
           ensurePropertyValue(newVal);
 
-          modelObject.update(vm.model.value.blocks, $scope);
+          if(modelObject) {
+            modelObject.update(vm.model.value.blocks, $scope);
+          }
           onLoaded();
       }
 
