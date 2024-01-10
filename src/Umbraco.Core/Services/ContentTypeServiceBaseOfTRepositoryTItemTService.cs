@@ -754,6 +754,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
 
     #region Copy
 
+    [Obsolete("Please use CopyAsync. Will be removed in V15.")]
     public TItem Copy(TItem original, string alias, string name, int parentId = -1)
     {
         TItem? parent = null;
@@ -768,6 +769,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         return Copy(original, alias, name, parent);
     }
 
+    [Obsolete("Please use CopyAsync. Will be removed in V15.")]
     public TItem Copy(TItem original, string alias, string name, TItem? parent)
     {
         if (original == null)
@@ -822,6 +824,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         return clone;
     }
 
+    [Obsolete("Please use CopyAsync. Will be removed in V16.")]
     public Attempt<OperationResult<MoveOperationStatusType, TItem>?> Copy(TItem copying, int containerId)
     {
         EventMessages eventMessages = EventMessagesFactory.Get();
@@ -894,10 +897,47 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         return OperationResult.Attempt.Succeed(MoveOperationStatusType.Success, eventMessages, copy);
     }
 
+    public async Task<Attempt<TItem, ContentTypeStructureOperationStatus>> CopyAsync(TItem toCopy, Guid? containerKey)
+    {
+        var containerId = GetContainerOrRootId(containerKey);
+
+        if (containerId is null)
+        {
+            return Attempt.FailWithStatus(ContentTypeStructureOperationStatus.ContainerNotFound, toCopy);
+        }
+
+        // using obsolete method for version control while it still exists
+        Attempt<OperationResult<MoveOperationStatusType, TItem>?> result = Copy(toCopy, containerId.Value);
+
+        return MapStatusTypeToAttempt(toCopy, result.Result?.Result);
+    }
+
+    private int? GetContainerOrRootId(Guid? containerKey)
+    {
+        if (containerKey is null)
+        {
+            return Constants.System.Root;
+        }
+
+        EntityContainer? container = GetContainer(containerKey.Value);
+        return container?.Id;
+    }
+
+    private Attempt<TItem, ContentTypeStructureOperationStatus> MapStatusTypeToAttempt(TItem item, MoveOperationStatusType? resultStatus) =>
+        resultStatus switch
+        {
+            MoveOperationStatusType.Success => Attempt.SucceedWithStatus(ContentTypeStructureOperationStatus.Success, item),
+            MoveOperationStatusType.FailedParentNotFound => Attempt.FailWithStatus(ContentTypeStructureOperationStatus.ContainerNotFound, item),
+            MoveOperationStatusType.FailedCancelledByEvent => Attempt.FailWithStatus(ContentTypeStructureOperationStatus.CancelledByNotification, item),
+            MoveOperationStatusType.FailedNotAllowedByPath => Attempt.FailWithStatus(ContentTypeStructureOperationStatus.NotAllowedByPath, item),
+            _ => throw new NotImplementedException($"{nameof(ContentTypeStructureOperationStatus)} does not map to a corresponding {nameof(MoveOperationStatusType)}")
+        };
+
     #endregion
 
     #region Move
 
+    [Obsolete("Please use MoveAsync. Will be removed in V16.")]
     public Attempt<OperationResult<MoveOperationStatusType>?> Move(TItem moving, int containerId)
     {
         EventMessages eventMessages = EventMessagesFactory.Get();
@@ -948,6 +988,21 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         }
 
         return OperationResult.Attempt.Succeed(MoveOperationStatusType.Success, eventMessages);
+    }
+
+    public async Task<Attempt<TItem, ContentTypeStructureOperationStatus>> MoveAsync(TItem toMove, Guid? containerKey)
+    {
+        var containerId = GetContainerOrRootId(containerKey);
+
+        if (containerId is null)
+        {
+            return Attempt.FailWithStatus(ContentTypeStructureOperationStatus.ContainerNotFound, toMove);
+        }
+
+        // using obsolete method for version control while it still exists
+        Attempt<OperationResult<MoveOperationStatusType>?> result = Move(toMove, containerId.Value);
+
+        return MapStatusTypeToAttempt(toMove, result.Result?.Result);
     }
 
     #endregion
