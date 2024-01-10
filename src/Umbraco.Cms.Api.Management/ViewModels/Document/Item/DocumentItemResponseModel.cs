@@ -4,7 +4,6 @@ using Umbraco.Cms.Api.Management.ViewModels.Item;
 
 namespace Umbraco.Cms.Api.Management.ViewModels.Document.Item;
 
-// TODO: this model should probably contain URLs
 public class DocumentItemResponseModel : ItemResponseModelBase
 {
     public bool IsTrashed { get; set; }
