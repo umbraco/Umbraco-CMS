@@ -94,11 +94,9 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
         var contentType = new ContentTypeBuilder()
             .WithId(0)
             .Build();
-        // TODO: Why does this no longer cause the index to be updated?
         await ExecuteAndWaitForIndexing(
             () => ContentTypeService.Save(contentType),
             Constants.UmbracoIndexes.InternalIndexName);
-        await ContentTypeService.SaveAsync(contentType, Constants.Security.SuperUserKey);
 
         var content = new ContentBuilder()
             .WithId(0)
@@ -109,8 +107,11 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
         var createdContent = await ExecuteAndWaitForIndexing(
             () =>
         {
+            using var scope = ScopeProvider.CreateScope();
             ContentService.Save(content);
-            return ContentService.Publish(content, Array.Empty<string>());
+            var result = ContentService.Publish(content, Array.Empty<string>());
+            scope.Complete();
+            return result;
         },
             Constants.UmbracoIndexes.InternalIndexName);
 
@@ -143,10 +144,13 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
             .Build();
         var createdContent = await ExecuteAndWaitForIndexing(
             () =>
-        {
-            ContentService.Save(content);
-            return ContentService.Publish(content, Array.Empty<string>());
-        },
+            {
+                using var scope = ScopeProvider.CreateScope();
+                ContentService.Save(content);
+                var result = ContentService.Publish(content, Array.Empty<string>());
+                scope.Complete();
+                return result;
+            },
             Constants.UmbracoIndexes.InternalIndexName);
 
         return createdContent;
@@ -252,8 +256,11 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
         await ExecuteAndWaitForIndexing(
             () =>
         {
+            using var scope = ScopeProvider.CreateCoreScope();
             ContentService.Save(firstContent);
-            return ContentService.Publish(firstContent, Array.Empty<string>());
+            var result = ContentService.Publish(firstContent, Array.Empty<string>());
+            scope.Complete();
+            return result;
         },
             Constants.UmbracoIndexes.InternalIndexName);
 
@@ -265,8 +272,11 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
         await ExecuteAndWaitForIndexing(
             () =>
         {
+            using var scope = ScopeProvider.CreateCoreScope();
             ContentService.Save(secondContent);
-            return ContentService.Publish(secondContent, Array.Empty<string>());
+            var content = ContentService.Publish(secondContent, Array.Empty<string>());
+            scope.Complete();
+            return content;
         },
             Constants.UmbracoIndexes.InternalIndexName);
 
@@ -304,10 +314,13 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
             .Build();
         await ExecuteAndWaitForIndexing(
             () =>
-        {
-            ContentService.Save(content);
-            return ContentService.Publish(content, Array.Empty<string>());
-        },
+            {
+                using var scope = ScopeProvider.CreateCoreScope();
+                ContentService.Save(content);
+                var result = ContentService.Publish(content, Array.Empty<string>());
+                scope.Complete();
+                return result;
+            },
             Constants.UmbracoIndexes.InternalIndexName);
 
         var childContent = new ContentBuilder()
@@ -317,10 +330,13 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
             .Build();
         await ExecuteAndWaitForIndexing(
             () =>
-        {
-            ContentService.Save(childContent);
-            return ContentService.Publish(childContent, Array.Empty<string>());
-        },
+            {
+                using var scope = ScopeProvider.CreateCoreScope();
+                ContentService.Save(childContent);
+                var result = ContentService.Publish(childContent, Array.Empty<string>());
+                scope.Complete();
+                return result;
+            },
             Constants.UmbracoIndexes.InternalIndexName);
 
         string parentQuery = content.Id.ToString();
@@ -361,10 +377,13 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
             .Build();
         await ExecuteAndWaitForIndexing(
             () =>
-        {
-            ContentService.Save(content);
-            return ContentService.Publish(content, Array.Empty<string>());
-        },
+            {
+                using var scope = ScopeProvider.CreateCoreScope();
+                ContentService.Save(content);
+                var result = ContentService.Publish(content, Array.Empty<string>());
+                scope.Complete();
+                return result;
+            },
             Constants.UmbracoIndexes.InternalIndexName);
 
         var childContent = new ContentBuilder()
@@ -374,10 +393,13 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
             .Build();
         await ExecuteAndWaitForIndexing(
             () =>
-        {
-            ContentService.Save(childContent);
-            return ContentService.Publish(childContent, Array.Empty<string>());
-        },
+            {
+                using var scope = ScopeProvider.CreateCoreScope();
+                ContentService.Save(childContent);
+                var result = ContentService.Publish(childContent, Array.Empty<string>());
+                scope.Complete();
+                return result;
+            },
             Constants.UmbracoIndexes.InternalIndexName);
 
         var childChildContent = new ContentBuilder()
@@ -388,8 +410,11 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
         await ExecuteAndWaitForIndexing(
             () =>
         {
+            using var scope = ScopeProvider.CreateCoreScope();
             ContentService.Save(childChildContent);
-            return ContentService.Publish(childChildContent, Array.Empty<string>());
+            var result = ContentService.Publish(childChildContent, Array.Empty<string>());
+            scope.Complete();
+            return result;
         },
             Constants.UmbracoIndexes.InternalIndexName);
 
@@ -463,10 +488,13 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
             .Build();
         PublishResult createdContent = await ExecuteAndWaitForIndexing(
             () =>
-        {
-            ContentService.Save(content);
-            return ContentService.Publish(content, Array.Empty<string>());
-        },
+            {
+                using var scope = ScopeProvider.CreateCoreScope();
+                ContentService.Save(content);
+                var result = ContentService.Publish(content, Array.Empty<string>());
+                scope.Complete();
+                return result;
+            },
             Constants.UmbracoIndexes.InternalIndexName);
 
         string query = createdContent.Content.Id.ToString();
@@ -579,10 +607,13 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
             .Build();
         await ExecuteAndWaitForIndexing(
             () =>
-        {
-            ContentService.Save(contentNode);
-            return ContentService.Publish(contentNode, Array.Empty<string>());
-        },
+            {
+                using var scope = ScopeProvider.CreateCoreScope();
+                ContentService.Save(contentNode);
+                var result = ContentService.Publish(contentNode, Array.Empty<string>());
+                scope.Complete();
+                return result;
+            },
             Constants.UmbracoIndexes.InternalIndexName);
 
         string query = contentName;
@@ -639,7 +670,7 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
             .WithAlias("testBox")
             .Done()
             .Build();
-        ContentTypeService.Save(contentType);
+        await ExecuteAndWaitForIndexing(() => ContentTypeService.Save(contentType), Constants.UmbracoIndexes.InternalIndexName);
 
         var contentNode = new ContentBuilder()
             .WithId(0)
@@ -649,10 +680,13 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
             .Build();
         await ExecuteAndWaitForIndexing(
             () =>
-        {
-            ContentService.Save(contentNode);
-            return ContentService.Publish(contentNode, Array.Empty<string>());
-        },
+            {
+                using var scope = ScopeProvider.CreateCoreScope();
+                ContentService.Save(contentNode);
+                var result = ContentService.Publish(contentNode, Array.Empty<string>());
+                scope.Complete();
+                return result;
+            },
             Constants.UmbracoIndexes.InternalIndexName);
 
         string query = contentName;
