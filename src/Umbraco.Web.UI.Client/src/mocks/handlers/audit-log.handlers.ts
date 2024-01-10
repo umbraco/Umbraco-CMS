@@ -1,4 +1,4 @@
-import { logs } from '../data/audit-log.data.js';
+import { logs, logsWithUser } from '../data/audit-log.data.js';
 const { rest } = window.MockServiceWorker;
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 import {
@@ -9,8 +9,8 @@ import {
 export const handlers = [
 	rest.get(umbracoPath('/audit-log'), (_req, res, ctx) => {
 		const PagedAuditLog = {
-			total: logs.length,
-			items: logs,
+			total: logsWithUser.length,
+			items: logsWithUser,
 		};
 		return res(ctx.status(200), ctx.json<PagedAuditLogWithUsernameResponseModel>(PagedAuditLog));
 	}),
