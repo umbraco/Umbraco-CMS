@@ -60,31 +60,7 @@ export class UmbPartialViewCreateFromSnippetModalElement extends UmbModalBaseEle
 		`;
 	}
 
-	static styles = [
-		UmbTextStyles,
-		css`
-			:host {
-				display: block;
-				color: var(--uui-color-text);
-				--umb-header-layout-height: 70px;
-			}
-			#main {
-				box-sizing: border-box;
-				height: calc(
-					100dvh - var(--umb-header-layout-height) - var(--umb-footer-layout-height) - 2 * var(--uui-size-layout-1)
-				);
-			}
-
-			#main uui-button {
-				width: 100%;
-			}
-
-			h3,
-			p {
-				text-align: left;
-			}
-		`,
-	];
+	static styles = [UmbTextStyles, css``];
 }
 
 export default UmbPartialViewCreateFromSnippetModalElement;
