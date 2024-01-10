@@ -387,8 +387,10 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
         //create a baseline Config to extend upon
         var config = {
+          cloudApiKey: tinyMceConfig.cloudApiKey,
+          promotion: false,
           inline: modeInline,
-          plugins: plugins,
+          plugins: [...new Set(plugins)],
           custom_elements: 'umb-rte-block,~umb-rte-block-inline',
           valid_elements: tinyMceConfig.validElements,
           invalid_elements: tinyMceConfig.inValidElements,
@@ -1184,7 +1186,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
           if (currentTarget.url.indexOf("localLink:") > 0) {
             // if the current link has an anchor, it needs to be considered when getting the udi/id
             // if an anchor exists, reduce the substring max by its length plus two to offset the removed prefix and trailing curly brace
-            var linkId = currentTarget.url.substring(currentTarget.url.indexOf(":") + 1, currentTarget.url.lastIndexOf("}"));
+            var linkId = currentTarget.url.substring(currentTarget.url.indexOf(":") + 1, currentTarget.url.indexOf("}"));
 
             //we need to check if this is an INT or a UDI
             var parsedIntId = parseInt(linkId, 10);
