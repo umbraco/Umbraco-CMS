@@ -639,6 +639,141 @@ public class TagRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
+    public void Can_Get_No_Tags_For_Content_Witch_Are_UnPublished()
+    {
+        var provider = ScopeProvider;
+        using (ScopeProvider.CreateScope())
+        {
+            var template = TemplateBuilder.CreateTextPageTemplate();
+            FileService.SaveTemplate(template);
+
+            var contentType = ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
+            ContentTypeRepository.Save(contentType);
+
+            var content1 = ContentBuilder.CreateSimpleContent(contentType);
+            content1.PublishCulture(CultureImpact.Invariant);
+            content1.PublishedState = PublishedState.Publishing;
+            DocumentRepository.Save(content1);
+
+            var content2 = ContentBuilder.CreateSimpleContent(contentType);
+            content2.PublishCulture(CultureImpact.Invariant);
+            content2.PublishedState = PublishedState.Unpublishing;
+            DocumentRepository.Save(content2);
+
+            var repository = CreateRepository(provider);
+            Tag[] tags =
+            {
+                new Tag {Text = "tag1", Group = "test"},
+                new Tag {Text = "tag2", Group = "test1"},
+                new Tag {Text = "tag3", Group = "test"}
+            };
+
+            repository.Assign(
+                content1.Id,
+                contentType.PropertyTypes.First().Id,
+                tags,
+                false);
+
+            repository.Assign(
+                content2.Id,
+                contentType.PropertyTypes.First().Id,
+                tags,
+                false);
+
+            var result1 = repository.GetTagsForEntityType(TaggableObjectTypes.Content).ToArray();
+
+            Assert.AreEqual(3, result1.Length);
+            Assert.AreEqual(1, result1.Single(x => x.Text == "tag1").NodeCount);
+        }
+    }
+
+    [Test]
+    public void Can_Get_Tags_For_Entity_Type_With_Trashed_Entity()
+    {
+        var provider = ScopeProvider;
+        using (ScopeProvider.CreateScope())
+        {
+            var template = TemplateBuilder.CreateTextPageTemplate();
+            FileService.SaveTemplate(template);
+
+            var contentType = ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
+            ContentTypeRepository.Save(contentType);
+
+            var content1 = ContentBuilder.CreateSimpleContent(contentType);
+            content1.PublishCulture(CultureImpact.Invariant);
+            content1.PublishedState = PublishedState.Publishing;
+            DocumentRepository.Save(content1);
+
+            var content2 = ContentBuilder.CreateSimpleContent(contentType);
+            content2.PublishCulture(CultureImpact.Invariant);
+            content2.PublishedState = PublishedState.Publishing;
+            content2.Trashed = true;
+            DocumentRepository.Save(content2);
+
+            var mediaType = MediaTypeBuilder.CreateImageMediaType("image2");
+            MediaTypeRepository.Save(mediaType);
+
+            var media1 = MediaBuilder.CreateMediaImage(mediaType, -1);
+            MediaRepository.Save(media1);
+
+            var media2 = MediaBuilder.CreateMediaImage(mediaType, -1);
+            media2.Trashed = true;
+            MediaRepository.Save(media2);
+
+            var repository = CreateRepository(provider);
+            Tag[] tags =
+            {
+                new Tag {Text = "tag1", Group = "test"},
+                new Tag {Text = "tag2", Group = "test1"},
+                new Tag {Text = "tag3", Group = "test"}
+            };
+
+            Tag[] tags2 =
+{
+                new Tag {Text = "tag4", Group = "test"},
+                new Tag {Text = "tag5", Group = "test1"},
+                new Tag {Text = "tag6", Group = "test"}
+            };
+
+            repository.Assign(
+                content1.Id,
+                contentType.PropertyTypes.First().Id,
+                tags,
+                false);
+
+            repository.Assign(
+                content2.Id,
+                contentType.PropertyTypes.First().Id,
+                tags2,
+                false);
+
+            repository.Assign(
+                media1.Id,
+                contentType.PropertyTypes.First().Id,
+                tags,
+                false);
+
+            repository.Assign(
+                media2.Id,
+                contentType.PropertyTypes.First().Id,
+                tags2,
+                false);
+
+            var result1 = repository.GetTagsForEntityType(TaggableObjectTypes.Content).ToArray();
+            var result2 = repository.GetTagsForEntityType(TaggableObjectTypes.Media).ToArray();
+            var result3 = repository.GetTagsForEntityType(TaggableObjectTypes.All).ToArray();
+
+            Assert.AreEqual(3, result1.Length);
+            Assert.AreEqual(3, result2.Length);
+            Assert.AreEqual(6, result3.Length);
+
+            Assert.AreEqual(1, result1.Single(x => x.Text == "tag1").NodeCount);
+            Assert.AreEqual(2, result3.Single(x => x.Text == "tag1").NodeCount);
+            Assert.AreEqual(2, result3.Single(x => x.Text == "tag4").NodeCount);
+        }
+    }
+
+    [Test]
     public void Can_Get_Tags_For_Entity_Type()
     {
         var provider = ScopeProvider;
@@ -654,6 +789,8 @@ public class TagRepositoryTest : UmbracoIntegrationTest
             ContentTypeRepository.Save(contentType);
 
             var content1 = ContentBuilder.CreateSimpleContent(contentType);
+            content1.PublishCulture(CultureImpact.Invariant);
+            content1.PublishedState = PublishedState.Publishing;
             DocumentRepository.Save(content1);
 
             var mediaType = MediaTypeBuilder.CreateImageMediaType("image2");

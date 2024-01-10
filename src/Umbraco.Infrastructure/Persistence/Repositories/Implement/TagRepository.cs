@@ -392,13 +392,20 @@ WHERE r.tagId IS NULL";
     {
         Sql<ISqlContext> sql = GetTagsSql(culture, true);
 
+        if (objectType == TaggableObjectTypes.Content)
+        {
+            sql = sql
+                .InnerJoin<ContentVersionDto>().On<ContentVersionDto, NodeDto>((node, cv) => node.NodeId == cv.NodeId)
+                .InnerJoin<DocumentVersionDto>().On<DocumentVersionDto, ContentVersionDto>((dv, cv) => cv.Id == dv.Id && dv.Published);
+        }
+
         AddTagsSqlWhere(sql, culture);
 
         if (objectType != TaggableObjectTypes.All)
         {
             Guid nodeObjectType = GetNodeObjectType(objectType);
             sql = sql
-                .Where<NodeDto>(dto => dto.NodeObjectType == nodeObjectType);
+                .Where<NodeDto>(dto => dto.NodeObjectType == nodeObjectType && !dto.Trashed);
         }
 
         if (group.IsNullOrWhiteSpace() == false)
