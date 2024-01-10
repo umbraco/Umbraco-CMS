@@ -1,5 +1,5 @@
 import { manifest as filter } from './config/filter/manifests.js';
-import { manifest as startNode } from './config/start-node/manifests.js';
+import { manifest as sourcePicker } from './config/source-picker/manifests.js';
 import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension-registry';
 
 const manifest: ManifestPropertyEditorUi = {
@@ -18,7 +18,7 @@ const manifest: ManifestPropertyEditorUi = {
 					alias: 'startNode',
 					label: 'Node type',
 					description: '',
-					propertyEditorUiAlias: 'Umb.PropertyEditorUi.TreePicker.StartNode',
+					propertyEditorUiAlias: sourcePicker.alias,
 				},
 				{
 					alias: 'filter',
@@ -37,6 +37,6 @@ const manifest: ManifestPropertyEditorUi = {
 	},
 };
 
-const config: Array<ManifestPropertyEditorUi> = [filter, startNode];
+const config: Array<ManifestPropertyEditorUi> = [sourcePicker, filter];
 
 export const manifests = [manifest, ...config];

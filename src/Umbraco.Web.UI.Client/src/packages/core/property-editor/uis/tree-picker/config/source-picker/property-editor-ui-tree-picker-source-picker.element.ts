@@ -6,10 +6,10 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 /**
- * @element umb-property-editor-ui-tree-picker-start-node
+ * @element umb-property-editor-ui-tree-picker-source-picker
  */
-@customElement('umb-property-editor-ui-tree-picker-start-node')
-export class UmbPropertyEditorUITreePickerStartNodeElement extends UmbLitElement implements UmbPropertyEditorUiElement {
+@customElement('umb-property-editor-ui-tree-picker-source-picker')
+export class UmbPropertyEditorUITreePickerSourcePickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	@property({ type: Object })
 	value?: StartNode;
 
@@ -38,10 +38,10 @@ export class UmbPropertyEditorUITreePickerStartNodeElement extends UmbLitElement
 	static styles = [UmbTextStyles];
 }
 
-export default UmbPropertyEditorUITreePickerStartNodeElement;
+export default UmbPropertyEditorUITreePickerSourcePickerElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-property-editor-ui-tree-picker-start-node': UmbPropertyEditorUITreePickerStartNodeElement;
+		'umb-property-editor-ui-tree-picker-source-picker': UmbPropertyEditorUITreePickerSourcePickerElement;
 	}
 }
