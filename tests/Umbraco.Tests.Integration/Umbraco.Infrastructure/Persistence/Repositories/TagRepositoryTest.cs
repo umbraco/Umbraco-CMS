@@ -848,6 +848,7 @@ public class TagRepositoryTest : UmbracoIntegrationTest
             ContentTypeRepository.Save(contentType);
 
             var content1 = ContentBuilder.CreateSimpleContent(contentType);
+            content1.PublishedState = PublishedState.Publishing;
             DocumentRepository.Save(content1);
 
             var mediaType = MediaTypeBuilder.CreateImageMediaType("image2");
