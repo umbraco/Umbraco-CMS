@@ -1,4 +1,6 @@
-﻿using Umbraco.Cms.Core.Models.PublishedContent;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
 
 namespace Umbraco.Cms.Core.Routing;
@@ -10,11 +12,19 @@ public class DefaultMediaUrlProvider : IMediaUrlProvider
 {
     private readonly MediaUrlGeneratorCollection _mediaPathGenerators;
     private readonly UriUtility _uriUtility;
+    private readonly IUrlAssembler _urlAssembler;
 
-    public DefaultMediaUrlProvider(MediaUrlGeneratorCollection mediaPathGenerators, UriUtility uriUtility)
+    public DefaultMediaUrlProvider(MediaUrlGeneratorCollection mediaPathGenerators, UriUtility uriUtility, IUrlAssembler urlAssembler)
     {
         _mediaPathGenerators = mediaPathGenerators ?? throw new ArgumentNullException(nameof(mediaPathGenerators));
         _uriUtility = uriUtility;
+        _urlAssembler = urlAssembler;
+    }
+
+    [Obsolete("Use the constructor that has the IUrlAssembler instead. Scheduled to be removed in v15")]
+    public DefaultMediaUrlProvider(MediaUrlGeneratorCollection mediaPathGenerators, UriUtility uriUtility)
+        : this(mediaPathGenerators, uriUtility, StaticServiceProvider.Instance.GetRequiredService<IUrlAssembler>())
+    {
     }
 
     /// <inheritdoc />
@@ -38,46 +48,10 @@ public class DefaultMediaUrlProvider : IMediaUrlProvider
 
         if (_mediaPathGenerators.TryGetMediaPath(propType?.EditorAlias, value, out var path))
         {
-            Uri url = AssembleUrl(path!, current, mode);
+            Uri url = _urlAssembler.AssembleUrl(path!, current, mode);
             return UrlInfo.Url(url.ToString(), culture);
         }
 
         return null;
-    }
-
-    private Uri AssembleUrl(string path, Uri current, UrlMode mode)
-    {
-        if (string.IsNullOrWhiteSpace(path))
-        {
-            throw new ArgumentException($"{nameof(path)} cannot be null or whitespace", nameof(path));
-        }
-
-        // the stored path is absolute so we just return it as is
-        if (Uri.IsWellFormedUriString(path, UriKind.Absolute))
-        {
-            return new Uri(path);
-        }
-
-        Uri uri;
-
-        if (current == null)
-        {
-            mode = UrlMode.Relative; // best we can do
-        }
-
-        switch (mode)
-        {
-            case UrlMode.Absolute:
-                uri = new Uri(current?.GetLeftPart(UriPartial.Authority) + path);
-                break;
-            case UrlMode.Relative:
-            case UrlMode.Auto:
-                uri = new Uri(path, UriKind.Relative);
-                break;
-            default:
-                throw new ArgumentOutOfRangeException(nameof(mode));
-        }
-
-        return _uriUtility.MediaUriFromUmbraco(uri);
     }
 }
