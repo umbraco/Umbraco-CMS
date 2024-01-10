@@ -921,9 +921,15 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
       }
 
       /** Adds the button instance */
-      editor.ui.registry.addButton('umbmacro', {
+      editor.ui.registry.addToggleButton('umbmacro', {
         icon: 'preferences',
         tooltip: 'Insert macro',
+        onSetup: function (api) {
+          const changed = editor.selection.selectorChangedWithUnbind('div.umb-macro-holder', (state) =>
+            api.setActive(state)
+          );
+          return () => changed.unbind();
+        },
 
         /** The insert macro button click event handler */
         onAction: function () {
