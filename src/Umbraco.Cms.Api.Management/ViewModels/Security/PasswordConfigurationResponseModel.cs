@@ -4,7 +4,7 @@ public class PasswordConfigurationResponseModel
 {
     public int MinimumPasswordLength { get; set; }
 
-    public bool MinimumPasswordNonAlphaNum { get; set; }
+    public bool RequireNonLetterOrDigit { get; set; }
 
     public bool RequireDigit { get; set; }
 

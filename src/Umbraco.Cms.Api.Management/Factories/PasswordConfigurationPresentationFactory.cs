@@ -14,7 +14,7 @@ public class PasswordConfigurationPresentationFactory : IPasswordConfigurationPr
         new()
         {
             MinimumPasswordLength = _userPasswordConfigurationSettings.RequiredLength,
-            MinimumPasswordNonAlphaNum = _userPasswordConfigurationSettings.RequireNonLetterOrDigit,
+            RequireNonLetterOrDigit = _userPasswordConfigurationSettings.RequireNonLetterOrDigit,
             RequireDigit = _userPasswordConfigurationSettings.RequireDigit,
             RequireLowercase = _userPasswordConfigurationSettings.RequireLowercase,
             RequireUppercase = _userPasswordConfigurationSettings.RequireUppercase,
