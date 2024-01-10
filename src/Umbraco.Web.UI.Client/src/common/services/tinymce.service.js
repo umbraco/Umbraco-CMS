@@ -1439,6 +1439,10 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
       function initBlocks() {
 
+        if(!args.blockEditorApi) {
+          return;
+        }
+
         const blockEls = args.editor.contentDocument.querySelectorAll('umb-rte-block, umb-rte-block-inline');
         for (var blockEl of blockEls) {
           if(!blockEl._isInitializedUmbBlock) {
