@@ -1,6 +1,6 @@
 import { UmbDocumentTypeInputElement } from '@umbraco-cms/backoffice/document-type';
 import { UmbMediaTypeInputElement } from '@umbraco-cms/backoffice/media-type';
-//import { UmbMemberTypeInputElement } from '@umbraco-cms/backoffice/member-type';
+import { UmbMemberTypeInputElement } from '@umbraco-cms/backoffice/member-type';
 import type { StartNode } from '@umbraco-cms/backoffice/components';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
@@ -64,10 +64,9 @@ export class UmbPropertyEditorUITreePickerSourceTypePickerElement extends UmbLit
 			case 'media':
 				this.value = (<UmbMediaTypeInputElement>event.target).selectedIds;
 				break;
-			// TODO: Uncomment once the `<umb-member-type-input>` element is in place. [LK]
-			// case 'member':
-			// 	this.value = (<UmbMemberTypeInputElement>event.target).selectedIds;
-			// 	break;
+			case 'member':
+				this.value = (<UmbMemberTypeInputElement>event.target).selectedIds;
+				break;
 			default:
 				break;
 		}
@@ -88,7 +87,6 @@ export class UmbPropertyEditorUITreePickerSourceTypePickerElement extends UmbLit
 			case 'member':
 				return this.#renderTypeMember();
 			default:
-				// TODO: Could we make this message to be friendlier? [LK]
 				return 'No source type found';
 		}
 	}
@@ -106,9 +104,9 @@ export class UmbPropertyEditorUITreePickerSourceTypePickerElement extends UmbLit
 	}
 
 	#renderTypeMember() {
-		return html`<umb-member-type-input
+		return html`<umb-input-member-type
 			@change=${this.#onChange}
-			.selectedIds=${this.value || []}></umb-member-type-input>`;
+			.selectedIds=${this.value || []}></umb-input-member-type>`;
 	}
 
 	static styles = [UmbTextStyles];
