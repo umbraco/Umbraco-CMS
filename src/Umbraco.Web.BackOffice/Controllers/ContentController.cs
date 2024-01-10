@@ -628,7 +628,7 @@ public class ContentController : ContentControllerBase
         using (ICoreScope scope = _scopeProvider.CreateCoreScope())
         {
             IContent? blueprint = _contentService.GetBlueprintById(blueprintId);
-            if (blueprint == null)
+            if (blueprint is null)
             {
                 return NotFound();
             }
