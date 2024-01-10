@@ -16,11 +16,11 @@ export type UmbTreeSelectionConfiguration = {
 @customElement('umb-tree')
 export class UmbTreeElement extends UmbLitElement {
 	@property({ type: String, reflect: true })
-	get alias() {
-		return this.#treeContext.getTreeAlias();
-	}
 	set alias(newVal) {
 		this.#treeContext.setTreeAlias(newVal);
+	}
+	get alias() {
+		return this.#treeContext.getTreeAlias();
 	}
 
 	private _selectionConfiguration: UmbTreeSelectionConfiguration = {
@@ -30,22 +30,19 @@ export class UmbTreeElement extends UmbLitElement {
 	};
 
 	@property({ type: Object })
-	get selectionConfiguration(): UmbTreeSelectionConfiguration {
-		return this._selectionConfiguration;
-	}
 	set selectionConfiguration(config: UmbTreeSelectionConfiguration) {
 		this._selectionConfiguration = config;
 		this.#treeContext.selection.setMultiple(config.multiple ?? false);
 		this.#treeContext.selection.setSelectable(config.selectable ?? true);
 		this.#treeContext.selection.setSelection(config.selection ?? []);
 	}
+	get selectionConfiguration(): UmbTreeSelectionConfiguration {
+		return this._selectionConfiguration;
+	}
 
 	// TODO: what is the best name for this functionality?
 	private _hideTreeRoot = false;
 	@property({ type: Boolean, attribute: 'hide-tree-root' })
-	get hideTreeRoot() {
-		return this._hideTreeRoot;
-	}
 	set hideTreeRoot(newVal: boolean) {
 		const oldVal = this._hideTreeRoot;
 		this._hideTreeRoot = newVal;
@@ -55,21 +52,24 @@ export class UmbTreeElement extends UmbLitElement {
 
 		this.requestUpdate('hideTreeRoot', oldVal);
 	}
+	get hideTreeRoot() {
+		return this._hideTreeRoot;
+	}
 
 	@property()
-	get selectableFilter() {
-		return this.#treeContext.selectableFilter;
-	}
 	set selectableFilter(newVal) {
 		this.#treeContext.selectableFilter = newVal;
 	}
+	get selectableFilter() {
+		return this.#treeContext.selectableFilter;
+	}
 
 	@property()
-	get filter() {
-		return this.#treeContext.filter;
-	}
 	set filter(newVal) {
 		this.#treeContext.filter = newVal;
+	}
+	get filter() {
+		return this.#treeContext.filter;
 	}
 
 	@state()
