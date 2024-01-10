@@ -5,8 +5,8 @@ namespace Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
 
 public class TemporaryFileCleanupJob : IRecurringBackgroundJob
 {
-    public TimeSpan Period { get => TimeSpan.FromSeconds(5); }
-    public TimeSpan Delay { get => TimeSpan.FromSeconds(5); }
+    public TimeSpan Period { get => TimeSpan.FromMinutes(5); }
+    public TimeSpan Delay { get => TimeSpan.FromMinutes(5); }
 
     // No-op event as the period never changes on this job
     public event EventHandler PeriodChanged { add { } remove { } }
