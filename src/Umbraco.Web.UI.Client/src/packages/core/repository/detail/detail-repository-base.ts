@@ -50,7 +50,7 @@ export abstract class UmbDetailRepositoryBase<
 	 * @return {*}
 	 * @memberof UmbDetailRepositoryBase
 	 */
-	async createScaffold(parentUnique: string | null, preset?: Partial<DetailType>) {
+	async createScaffold(parentUnique: string | null, preset?: Partial<DetailModelType>) {
 		if (parentUnique === undefined) throw new Error('Parent unique is missing');
 		return this.#detailSource.createScaffold(parentUnique, preset);
 	}
