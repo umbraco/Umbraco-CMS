@@ -5283,17 +5283,17 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedRecycleBinItemResponseModel"
+                  "$ref": "#/components/schemas/PagedDocumentRecycleBinItemResponseModel"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedRecycleBinItemResponseModel"
+                  "$ref": "#/components/schemas/PagedDocumentRecycleBinItemResponseModel"
                 }
               },
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedRecycleBinItemResponseModel"
+                  "$ref": "#/components/schemas/PagedDocumentRecycleBinItemResponseModel"
                 }
               }
             }
@@ -5341,17 +5341,17 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedRecycleBinItemResponseModel"
+                  "$ref": "#/components/schemas/PagedDocumentRecycleBinItemResponseModel"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedRecycleBinItemResponseModel"
+                  "$ref": "#/components/schemas/PagedDocumentRecycleBinItemResponseModel"
                 }
               },
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedRecycleBinItemResponseModel"
+                  "$ref": "#/components/schemas/PagedDocumentRecycleBinItemResponseModel"
                 }
               }
             }
@@ -9068,17 +9068,17 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedRecycleBinItemResponseModel"
+                  "$ref": "#/components/schemas/PagedMediaRecycleBinItemResponseModel"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedRecycleBinItemResponseModel"
+                  "$ref": "#/components/schemas/PagedMediaRecycleBinItemResponseModel"
                 }
               },
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedRecycleBinItemResponseModel"
+                  "$ref": "#/components/schemas/PagedMediaRecycleBinItemResponseModel"
                 }
               }
             }
@@ -9126,17 +9126,17 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedRecycleBinItemResponseModel"
+                  "$ref": "#/components/schemas/PagedMediaRecycleBinItemResponseModel"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedRecycleBinItemResponseModel"
+                  "$ref": "#/components/schemas/PagedMediaRecycleBinItemResponseModel"
                 }
               },
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/PagedRecycleBinItemResponseModel"
+                  "$ref": "#/components/schemas/PagedMediaRecycleBinItemResponseModel"
                 }
               }
             }
@@ -20594,6 +20594,38 @@
         },
         "additionalProperties": false
       },
+      "DocumentRecycleBinItemResponseModel": {
+        "required": [
+          "documentType",
+          "variants"
+        ],
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/RecycleBinItemResponseModelBaseModel"
+          }
+        ],
+        "properties": {
+          "documentType": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/DocumentTypeReferenceResponseModel"
+              }
+            ]
+          },
+          "variants": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/VariantItemResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
       "DocumentResponseModel": {
         "required": [
           "documentType",
@@ -21429,6 +21461,15 @@
         },
         "additionalProperties": false
       },
+      "ItemReferenceByIdResponseModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ReferenceByIdResponseModel"
+          }
+        ],
+        "additionalProperties": false
+      },
       "ItemResponseModelBaseModel": {
         "required": [
           "id"
@@ -21705,6 +21746,38 @@
           "isTrashed": {
             "type": "boolean"
           },
+          "mediaType": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/MediaTypeReferenceResponseModel"
+              }
+            ]
+          },
+          "variants": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/VariantItemResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "MediaRecycleBinItemResponseModel": {
+        "required": [
+          "mediaType",
+          "variants"
+        ],
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/RecycleBinItemResponseModelBaseModel"
+          }
+        ],
+        "properties": {
           "mediaType": {
             "oneOf": [
               {
@@ -22382,6 +22455,30 @@
         },
         "additionalProperties": false
       },
+      "PagedDocumentRecycleBinItemResponseModel": {
+        "required": [
+          "items",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DocumentRecycleBinItemResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
       "PagedDocumentTreeItemResponseModel": {
         "required": [
           "items",
@@ -22646,6 +22743,30 @@
         },
         "additionalProperties": false
       },
+      "PagedMediaRecycleBinItemResponseModel": {
+        "required": [
+          "items",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/MediaRecycleBinItemResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
       "PagedMediaTreeItemResponseModel": {
         "required": [
           "items",
@@ -22820,30 +22941,6 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/ProblemDetails"
-            }
-          }
-        },
-        "additionalProperties": false
-      },
-      "PagedRecycleBinItemResponseModel": {
-        "required": [
-          "items",
-          "total"
-        ],
-        "type": "object",
-        "properties": {
-          "total": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "items": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/RecycleBinItemResponseModel"
-                }
-              ]
             }
           }
         },
@@ -23512,13 +23609,10 @@
         },
         "additionalProperties": false
       },
-      "RecycleBinItemResponseModel": {
+      "RecycleBinItemResponseModelBaseModel": {
         "required": [
           "hasChildren",
-          "icon",
           "id",
-          "isContainer",
-          "name",
           "type"
         ],
         "type": "object",
@@ -23527,27 +23621,19 @@
             "type": "string",
             "format": "uuid"
           },
-          "name": {
-            "minLength": 1,
-            "type": "string"
-          },
           "type": {
-            "minLength": 1,
-            "type": "string"
-          },
-          "icon": {
             "minLength": 1,
             "type": "string"
           },
           "hasChildren": {
             "type": "boolean"
           },
-          "isContainer": {
-            "type": "boolean"
-          },
-          "parentId": {
-            "type": "string",
-            "format": "uuid",
+          "parent": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ItemReferenceByIdResponseModel"
+              }
+            ],
             "nullable": true
           }
         },
@@ -23612,6 +23698,19 @@
         "additionalProperties": false
       },
       "ReferenceByIdRequestModel": {
+        "required": [
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ReferenceByIdResponseModel": {
         "required": [
           "id"
         ],

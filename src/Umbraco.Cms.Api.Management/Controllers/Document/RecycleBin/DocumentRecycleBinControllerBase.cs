@@ -1,14 +1,14 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Api.Management.Controllers.RecycleBin;
+using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.Filters;
-using Umbraco.Cms.Api.Management.ViewModels.RecycleBin;
 using Umbraco.Cms.Api.Management.Routing;
+using Umbraco.Cms.Api.Management.ViewModels.Document.RecycleBin;
 using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Document.RecycleBin;
@@ -18,24 +18,26 @@ namespace Umbraco.Cms.Api.Management.Controllers.Document.RecycleBin;
 [RequireDocumentTreeRootAccess]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Document))]
 [Authorize(Policy = "New" + AuthorizationPolicies.TreeAccessDocuments)]
-public class DocumentRecycleBinControllerBase : RecycleBinControllerBase<RecycleBinItemResponseModel>
+public class DocumentRecycleBinControllerBase : RecycleBinControllerBase<DocumentRecycleBinItemResponseModel>
 {
-    public DocumentRecycleBinControllerBase(IEntityService entityService)
+    private readonly IDocumentPresentationFactory _documentPresentationFactory;
+
+    public DocumentRecycleBinControllerBase(IEntityService entityService, IDocumentPresentationFactory documentPresentationFactory)
         : base(entityService)
-    {
-    }
+        => _documentPresentationFactory = documentPresentationFactory;
 
     protected override UmbracoObjectTypes ItemObjectType => UmbracoObjectTypes.Document;
 
     protected override int RecycleBinRootId => Constants.System.RecycleBinContent;
 
-    protected override RecycleBinItemResponseModel MapRecycleBinViewModel(Guid? parentId, IEntitySlim entity)
+    protected override DocumentRecycleBinItemResponseModel MapRecycleBinViewModel(Guid? parentId, IEntitySlim entity)
     {
-        RecycleBinItemResponseModel responseModel = base.MapRecycleBinViewModel(parentId, entity);
+        DocumentRecycleBinItemResponseModel responseModel = base.MapRecycleBinViewModel(parentId, entity);
 
         if (entity is IDocumentEntitySlim documentEntitySlim)
         {
-            responseModel.Icon = documentEntitySlim.ContentTypeIcon ?? responseModel.Icon;
+            responseModel.Variants = _documentPresentationFactory.CreateVariantsItemResponseModels(documentEntitySlim);
+            responseModel.DocumentType = _documentPresentationFactory.CreateDocumentTypeReferenceResponseModel(documentEntitySlim);
         }
 
         return responseModel;

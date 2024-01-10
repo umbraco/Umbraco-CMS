@@ -4,12 +4,13 @@ using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Api.Management.Services.Paging;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
+using Umbraco.Cms.Api.Management.ViewModels.Item;
 using Umbraco.Cms.Api.Management.ViewModels.RecycleBin;
 
 namespace Umbraco.Cms.Api.Management.Controllers.RecycleBin;
 
 public abstract class RecycleBinControllerBase<TItem> : ManagementApiControllerBase
-    where TItem : RecycleBinItemResponseModel, new()
+    where TItem : RecycleBinItemResponseModelBase, new()
 {
     private readonly IEntityService _entityService;
     private readonly string _itemUdiType;
@@ -65,13 +66,15 @@ public abstract class RecycleBinControllerBase<TItem> : ManagementApiControllerB
 
         var viewModel = new TItem
         {
-            Icon = _itemUdiType,
-            Name = entity.Name!,
             Id = entity.Key,
             Type = _itemUdiType,
             HasChildren = entity.HasChildren,
-            IsContainer = entity.IsContainer,
-            ParentId = parentKey
+            Parent = parentKey.HasValue
+                ? new ItemReferenceByIdResponseModel
+                {
+                    Id = parentKey.Value
+                }
+                : null
         };
 
         return viewModel;
