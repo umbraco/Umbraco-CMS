@@ -3,7 +3,12 @@ import { UmbMockFileSystemFolderManager } from '../file-system/file-system-folde
 import { UmbMockFileSystemItemManager } from '../file-system/file-system-item.manager.js';
 import { UmbMockFileSystemTreeManager } from '../file-system/file-system-tree.manager.js';
 import { UmbMockFileSystemDetailManager } from '../file-system/file-system-detail.manager.js';
-import { UmbMockPartialViewModel, data } from './partial-view.data.js';
+import { UmbMockPartialViewModel, data, snippets } from './partial-view.data.js';
+import {
+	PagedPartialViewSnippetItemResponseModel,
+	PartialViewSnippetItemResponseModel,
+	PartialViewSnippetResponseModel,
+} from '@umbraco-cms/backoffice/backend-api';
 
 class UmbPartialViewMockDB extends UmbFileSystemMockDbBase<UmbMockPartialViewModel> {
 	tree = new UmbMockFileSystemTreeManager<UmbMockPartialViewModel>(this);
@@ -14,6 +19,25 @@ class UmbPartialViewMockDB extends UmbFileSystemMockDbBase<UmbMockPartialViewMod
 	constructor(data: Array<UmbMockPartialViewModel>) {
 		super(data);
 	}
+
+	getSnippets(): PagedPartialViewSnippetItemResponseModel {
+		const snippetItems = snippets.map((item) => createSnippetItem(item));
+		const total = snippetItems.length;
+		return { items: snippetItems, total };
+	}
+
+	getSnippet(fileName: string): PartialViewSnippetResponseModel | undefined {
+		const snippet = snippets.find((item) => item.fileName === fileName);
+		debugger;
+		return snippet;
+	}
 }
+
+const createSnippetItem = (item: PartialViewSnippetResponseModel): PartialViewSnippetItemResponseModel => {
+	return {
+		name: item.name,
+		fileName: item.fileName,
+	};
+};
 
 export const umbPartialViewMockDB = new UmbPartialViewMockDB(data);
