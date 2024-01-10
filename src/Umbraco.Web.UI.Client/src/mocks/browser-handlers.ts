@@ -1,5 +1,4 @@
 import { handlers as dataTypeHandlers } from './handlers/data-type/index.js';
-import { handlers as relationTypeHandlers } from './handlers/relation-type.handlers.js';
 import { handlers as documentTypeHandlers } from './handlers/document-type/index.js';
 import { handlers as installHandlers } from './handlers/install.handlers.js';
 import * as manifestsHandlers from './handlers/manifests.handlers.js';
@@ -11,6 +10,8 @@ import { handlers as telemetryHandlers } from './handlers/telemetry.handlers.js'
 import { handlers as userGroupsHandlers } from './handlers/user-group/index.js';
 import { handlers as examineManagementHandlers } from './handlers/examine-management.handlers.js';
 import { handlers as modelsBuilderHandlers } from './handlers/modelsbuilder.handlers.js';
+import { relationHandlers, relationTypeHandlers } from './handlers/relations/index.js';
+import { handlers as objectTypeHandlers } from './handlers/object-type/index.js';
 import { handlers as healthCheckHandlers } from './handlers/health-check.handlers.js';
 import { handlers as profilingHandlers } from './handlers/performance-profiling.handlers.js';
 import { handlers as documentHandlers } from './handlers/document/index.js';
@@ -58,6 +59,8 @@ const handlers = [
 	...profilingHandlers,
 	...publishedStatusHandlers,
 	...redirectManagementHandlers,
+	...relationHandlers,
+	...objectTypeHandlers,
 	...relationTypeHandlers,
 	...rteEmbedHandlers,
 	...scriptHandlers,

@@ -57,7 +57,7 @@ export class UmbSelectionManager extends UmbBaseController {
 	public setSelection(value: Array<string | null>) {
 		if (this.getSelectable() === false) return;
 		if (value === undefined) throw new Error('Value cannot be undefined');
-		const newSelection = this.getMultiple() ? value : [value[0]];
+		const newSelection = this.getMultiple() ? value : value.slice(0, 1);
 		this.#selection.next(newSelection);
 	}
 
@@ -78,7 +78,7 @@ export class UmbSelectionManager extends UmbBaseController {
 	public setMultiple(value: boolean) {
 		this.#multiple.next(value);
 
-		/* If multiple is set to false, and the current selection is more than one, 
+		/* If multiple is set to false, and the current selection is more than one,
 		then we need to set the selection to the first item. */
 		if (value === false && this.getSelection().length > 1) {
 			this.setSelection([this.getSelection()[0]]);
