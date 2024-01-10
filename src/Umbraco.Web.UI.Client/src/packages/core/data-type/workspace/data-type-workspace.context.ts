@@ -1,6 +1,6 @@
-import { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import { UmbDataTypeDetailRepository } from '../repository/detail/data-type-detail.repository.js';
 import type { UmbDataTypeDetailModel } from '../types.js';
+import { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import {
 	UmbInvariantableWorkspaceContextInterface,
 	UmbEditableWorkspaceContextBase,
