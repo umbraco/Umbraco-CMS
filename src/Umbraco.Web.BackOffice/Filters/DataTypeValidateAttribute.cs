@@ -43,14 +43,6 @@ internal sealed class DataTypeValidateAttribute : TypeFilterAttribute
         public void OnActionExecuting(ActionExecutingContext context)
         {
             var dataType = (DataTypeSave?)context.ActionArguments["dataType"];
-            if (dataType is not null)
-            {
-                dataType.Name = dataType.Name?.CleanForXss('[', ']', '(', ')', ':');
-                dataType.Alias = dataType.Alias == null
-                    ? dataType.Name!
-                    : dataType.Alias.CleanForXss('[', ']', '(', ')', ':');
-            }
-
             // get the property editor, ensuring that it exits
             if (!_propertyEditorCollection.TryGet(dataType?.EditorAlias, out IDataEditor? propertyEditor))
             {
