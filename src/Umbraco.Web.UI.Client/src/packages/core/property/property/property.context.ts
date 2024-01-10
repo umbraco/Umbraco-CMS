@@ -1,6 +1,6 @@
-import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import { UmbPropertyEditorUiElement } from '../../extension-registry/interfaces/property-editor-ui-element.interface.js';
 import { type WorkspacePropertyData } from '../../workspace/types/workspace-property-data.type.js';
+import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
