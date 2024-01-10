@@ -9,6 +9,8 @@ import {
 } from '@umbraco-cms/backoffice/workspace';
 import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { PartialViewResource } from '@umbraco-cms/backoffice/backend-api';
 
 export class UmbPartialViewWorkspaceContext
 	extends UmbEditableWorkspaceContextBase<UmbPartialViewDetailRepository, UmbPartialViewDetailModel>
@@ -68,7 +70,10 @@ export class UmbPartialViewWorkspaceContext
 	}
 
 	async create(parentUnique: string | null, snippetName = 'Empty') {
-		const { data } = await this.repository.createScaffold(parentUnique);
+		const { data: snippet } = await this.#getSnippet(snippetName);
+		const snippetContent = snippet?.content ?? '';
+
+		const { data } = await this.repository.createScaffold(parentUnique, { content: snippetContent });
 
 		if (data) {
 			this.setIsNew(true);
@@ -97,6 +102,15 @@ export class UmbPartialViewWorkspaceContext
 
 	public destroy(): void {
 		this.#data.destroy();
+	}
+
+	#getSnippet(snippetFileName: string) {
+		return tryExecuteAndNotify(
+			this,
+			PartialViewResource.getPartialViewSnippetByFileName({
+				fileName: snippetFileName,
+			}),
+		);
 	}
 }
 

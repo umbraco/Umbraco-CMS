@@ -10,10 +10,9 @@ export const snippetHandlers = [
 	}),
 
 	rest.get(umbracoPath(`${UMB_SLUG}/snippet/:fileName`), (req, res, ctx) => {
-		debugger;
-		const fileName = req.params.path as string;
+		const fileName = req.params.fileName as string;
 		if (!fileName) return res(ctx.status(400));
-		const response = umbPartialViewMockDB.file.read(fileName);
+		const response = umbPartialViewMockDB.getSnippet(fileName);
 		return res(ctx.status(200), ctx.json(response));
 	}),
 ];

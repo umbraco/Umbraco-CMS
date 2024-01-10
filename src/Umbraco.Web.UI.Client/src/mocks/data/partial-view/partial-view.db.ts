@@ -27,9 +27,7 @@ class UmbPartialViewMockDB extends UmbFileSystemMockDbBase<UmbMockPartialViewMod
 	}
 
 	getSnippet(fileName: string): PartialViewSnippetResponseModel | undefined {
-		const snippet = snippets.find((item) => item.fileName === fileName);
-		debugger;
-		return snippet;
+		return snippets.find((item) => item.fileName === fileName);
 	}
 }
 

@@ -18,7 +18,7 @@ export class UmbPartialViewDetailServerDataSource implements UmbDetailDataSource
 		this.#host = host;
 	}
 
-	async createScaffold(parentUnique: string | null) {
+	async createScaffold(parentUnique: string | null, preset?: Partial<UmbPartialViewDetailModel>) {
 		const data: UmbPartialViewDetailModel = {
 			entityType: UMB_PARTIAL_VIEW_ENTITY_TYPE,
 			parentUnique,
@@ -26,6 +26,7 @@ export class UmbPartialViewDetailServerDataSource implements UmbDetailDataSource
 			path: '',
 			name: '',
 			content: '',
+			...preset,
 		};
 
 		return { data };
