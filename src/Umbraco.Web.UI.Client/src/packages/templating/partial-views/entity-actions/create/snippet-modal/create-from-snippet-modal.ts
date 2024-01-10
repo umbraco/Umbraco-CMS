@@ -41,21 +41,15 @@ export class UmbPartialViewCreateFromSnippetModalElement extends UmbModalBaseEle
 	render() {
 		return html`
 			<umb-body-layout headline="Create Partial View from snippet">
-				<div id="main">
-					<uui-box>
-						${this._snippets.map(
-							(snippet) =>
-								html`<uui-menu-item label="${snippet.name}" href=${snippet.path} @click=${
-									this.#onNavigate
-								}></uui-menu-item>
-									<uui-icon name="icon-article" slot="icon"></uui-icon
-								></uui-menu-item>`,
-						)}
-					</uui-box>
-				</div>
-				<div slot="actions">
-					<uui-button @click=${this._rejectModal} look="secondary">Close</uui-button>
-				</div>
+				<uui-box>
+					${this._snippets.map(
+						(snippet) =>
+							html` <uui-menu-item label="${snippet.name}" href=${snippet.path} @click=${this.#onNavigate}>
+								<uui-icon name="icon-article" slot="icon"></uui-icon
+							></uui-menu-item>`,
+					)}
+				</uui-box>
+				<uui-button slot="actions" @click=${this._rejectModal} look="secondary">Close</uui-button>
 			</umb-body-layout>
 		`;
 	}
