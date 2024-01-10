@@ -26,7 +26,7 @@
 @param {string} value Set the value of the radiobutton.
 @param {string} name Set the name of the radiobutton.
 @param {string} text Set the text for the radiobutton label.
-@param {string} labelKey Set a dictinary/localization string for the checkbox label.
+@param {string} labelKey Set a dictionary/localization string for the checkbox label.
 @param {string} serverValidationField Set the <code>val-server-field</code> of the radiobutton.
 @param {boolean} disabled Set the radiobutton to be disabled.
 @param {boolean} required Set the radiobutton to be required.
