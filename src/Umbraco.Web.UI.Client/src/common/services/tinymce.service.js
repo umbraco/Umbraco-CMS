@@ -548,7 +548,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
         tooltip: 'Embed',
         onSetup: function (api) {
           const changed = editor.selection.selectorChangedWithUnbind('div[data-embed-url]', (state) =>
-            api.setActive(state),
+            api.setActive(state)
           );
           return () => changed.unbind();
         },
@@ -802,7 +802,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
         tooltip: 'Insert Block',
         onSetup: function (api) {
           const changed = editor.selection.selectorChangedWithUnbind('umb-rte-block[data-content-udi], umb-rte-block-inline[data-content-udi]', (state) =>
-            api.setActive(state),
+            api.setActive(state)
           );
           return () => changed.unbind();
         },
@@ -1235,7 +1235,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
         onAction: createLinkList(showDialog),
         onSetup: function (api) {
           const changed = editor.selection.selectorChangedWithUnbind('a[href]', (state) =>
-            api.setActive(state),
+            api.setActive(state)
           );
           return () => changed.unbind();
         }
@@ -1249,7 +1249,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
         },
         onSetup: function (api) {
           const changed = editor.selection.selectorChangedWithUnbind('a[href]', (state) =>
-            api.setActive(state),
+            api.setActive(state)
           );
           return () => changed.unbind();
         }
@@ -1265,7 +1265,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
         onAction: createLinkList(showDialog),
         onSetup: function (api) {
           const changed = editor.selection.selectorChangedWithUnbind('a[href]', (state) =>
-            api.setActive(state),
+            api.setActive(state)
           );
           return () => changed.unbind();
         },
