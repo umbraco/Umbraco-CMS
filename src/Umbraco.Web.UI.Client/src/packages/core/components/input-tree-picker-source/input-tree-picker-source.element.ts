@@ -23,8 +23,8 @@ export type StartNode = {
 	dynamicRoot?: DynamicRootType | null;
 };
 
-@customElement('umb-input-start-node')
-export class UmbInputStartNodeElement extends FormControlMixin(UmbLitElement) {
+@customElement('umb-input-tree-picker-source')
+export class UmbInputTreePickerSourceElement extends FormControlMixin(UmbLitElement) {
 	protected getFormElement() {
 		return undefined;
 	}
@@ -140,10 +140,10 @@ export class UmbInputStartNodeElement extends FormControlMixin(UmbLitElement) {
 	];
 }
 
-export default UmbInputStartNodeElement;
+export default UmbInputTreePickerSourceElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-input-start-node': UmbInputStartNodeElement;
+		'umb-input-tree-picker-source': UmbInputTreePickerSourceElement;
 	}
 }

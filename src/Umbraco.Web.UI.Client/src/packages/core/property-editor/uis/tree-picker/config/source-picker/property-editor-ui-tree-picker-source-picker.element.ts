@@ -1,4 +1,4 @@
-import { StartNode, UmbInputStartNodeElement } from '@umbraco-cms/backoffice/components';
+import { StartNode, UmbInputTreePickerSourceElement } from '@umbraco-cms/backoffice/components';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
@@ -17,7 +17,7 @@ export class UmbPropertyEditorUITreePickerSourcePickerElement extends UmbLitElem
 	public config?: UmbPropertyEditorConfigCollection;
 
 	#onChange(event: CustomEvent) {
-		const target = event.target as UmbInputStartNodeElement;
+		const target = event.target as UmbInputTreePickerSourceElement;
 
 		this.value = {
 			type: target.type,
@@ -29,10 +29,10 @@ export class UmbPropertyEditorUITreePickerSourcePickerElement extends UmbLitElem
 	}
 
 	render() {
-		return html`<umb-input-start-node
+		return html`<umb-input-tree-picker-source
 			@change=${this.#onChange}
 			.type=${this.value?.type}
-			.nodeId=${this.value?.id}></umb-input-start-node>`;
+			.nodeId=${this.value?.id}></umb-input-tree-picker-source>`;
 	}
 
 	static styles = [UmbTextStyles];
