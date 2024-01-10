@@ -3,7 +3,7 @@ import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbInputDocumentElement } from '@umbraco-cms/backoffice/document';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import type { StartNode } from '@umbraco-cms/backoffice/components';
+import type { UmbTreePickerSource } from '@umbraco-cms/backoffice/components';
 
 @customElement('umb-input-tree')
 export class UmbInputTreeElement extends FormControlMixin(UmbLitElement) {
@@ -11,16 +11,16 @@ export class UmbInputTreeElement extends FormControlMixin(UmbLitElement) {
 		return undefined;
 	}
 
-	private _type: StartNode['type'] = undefined;
+	private _type: UmbTreePickerSource['type'] = undefined;
 	@property()
-	public set type(newType: StartNode['type']) {
+	public set type(newType: UmbTreePickerSource['type']) {
 		const oldType = this._type;
 		if (newType?.toLowerCase() !== this._type) {
-			this._type = newType?.toLowerCase() as StartNode['type'];
+			this._type = newType?.toLowerCase() as UmbTreePickerSource['type'];
 			this.requestUpdate('type', oldType);
 		}
 	}
-	public get type(): StartNode['type'] {
+	public get type(): UmbTreePickerSource['type'] {
 		return this._type;
 	}
 

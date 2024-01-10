@@ -1,4 +1,4 @@
-import { StartNode, UmbInputTreePickerSourceElement } from '@umbraco-cms/backoffice/components';
+import { type UmbTreePickerSource, UmbInputTreePickerSourceElement } from '@umbraco-cms/backoffice/components';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
@@ -11,7 +11,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 @customElement('umb-property-editor-ui-tree-picker-source-picker')
 export class UmbPropertyEditorUITreePickerSourcePickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	@property({ type: Object })
-	value?: StartNode;
+	value?: UmbTreePickerSource;
 
 	@property({ type: Object, attribute: false })
 	public config?: UmbPropertyEditorConfigCollection;
