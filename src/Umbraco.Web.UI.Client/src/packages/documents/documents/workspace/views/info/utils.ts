@@ -67,3 +67,12 @@ export function HistoryTagStyleAndText(type: AuditTypeModel): HistoryData {
 			};
 	}
 }
+
+export const TimeOptions: Intl.DateTimeFormatOptions = {
+	year: 'numeric',
+	month: 'long',
+	day: 'numeric',
+	hour: 'numeric',
+	minute: 'numeric',
+	second: 'numeric',
+};

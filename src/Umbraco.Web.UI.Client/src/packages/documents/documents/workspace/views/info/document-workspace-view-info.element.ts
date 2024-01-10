@@ -1,3 +1,4 @@
+import { TimeOptions } from './utils.js';
 import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
@@ -7,6 +8,7 @@ import './document-workspace-view-info-history.element.js';
 import './document-workspace-view-info-reference.element.js';
 import { UmbDocumentWorkspaceContext } from '@umbraco-cms/backoffice/document';
 import { ContentUrlInfoModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbCurrentUserContext } from '@umbraco-cms/backoffice/current-user';
 
 @customElement('umb-document-workspace-view-info')
 export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
@@ -26,6 +28,9 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 
 	@state()
 	private _urls?: Array<ContentUrlInfoModel>;
+
+	@state()
+	private _createDate = 'Unknown';
 
 	constructor() {
 		super();
@@ -60,8 +65,9 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 			this._documentUnique = unique!;
 		});
 
-		const something = (this._workspaceContext as UmbDocumentWorkspaceContext).getData();
-		console.log(something);
+		this.observe((this._workspaceContext as UmbDocumentWorkspaceContext).variants, (variants) => {
+			this._createDate = Array.isArray(variants) ? variants[0].createDate : 'Unknown';
+		});
 	}
 
 	render() {
@@ -116,7 +122,9 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 			</div>
 			<div class="general-item">
 				<strong><umb-localize key="content_createDate"></umb-localize></strong>
-				<span><umb-localize-date .date="${new Date()}"></umb-localize-date></span>
+				<span>
+					<umb-localize-date .date=${this._createDate} .options=${TimeOptions}></umb-localize-date>
+				</span>
 			</div>
 			<div class="general-item">
 				<strong><umb-localize key="content_documentType"></umb-localize></strong>

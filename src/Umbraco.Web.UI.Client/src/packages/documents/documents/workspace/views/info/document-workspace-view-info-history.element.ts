@@ -1,4 +1,4 @@
-import { HistoryTagStyleAndText } from './utils.js';
+import { HistoryTagStyleAndText, TimeOptions } from './utils.js';
 import { UmbAuditLogRepository } from '@umbraco-cms/backoffice/audit-log';
 import {
 	css,
@@ -24,7 +24,6 @@ import { UmbCurrentUserContext } from '@umbraco-cms/backoffice/current-user';
 export class UmbDocumentWorkspaceViewInfoHistoryElement extends UmbLitElement {
 	#logRepository: UmbAuditLogRepository;
 	#itemsPerPage = 10;
-	#userIsoCode = 'en-US';
 
 	@property()
 	documentUnique = '';
@@ -41,10 +40,6 @@ export class UmbDocumentWorkspaceViewInfoHistoryElement extends UmbLitElement {
 	constructor() {
 		super();
 		this.#logRepository = new UmbAuditLogRepository(this);
-		const context = new UmbCurrentUserContext(this);
-		this.observe(context.languageIsoCode, (IsoCode) => {
-			this.#userIsoCode = IsoCode;
-		});
 	}
 
 	protected firstUpdated(): void {
@@ -110,7 +105,7 @@ export class UmbDocumentWorkspaceViewInfoHistoryElement extends UmbLitElement {
 				<umb-history-list>
 					${repeat(
 						this._items,
-						(item) => item.timestamp + this.#userIsoCode,
+						(item) => item.timestamp,
 						(item) => {
 							const { text, style } = HistoryTagStyleAndText(item.logType);
 							return html`<umb-history-item
@@ -118,14 +113,7 @@ export class UmbDocumentWorkspaceViewInfoHistoryElement extends UmbLitElement {
 								src=${ifDefined(
 									Array.isArray(item.userAvatars) ? item.userAvatars[item.userAvatars.length - 1] : undefined,
 								)}
-								detail=${new Date(item.timestamp).toLocaleString(this.#userIsoCode, {
-									year: 'numeric',
-									month: 'long',
-									day: 'numeric',
-									hour: 'numeric',
-									minute: 'numeric',
-									second: 'numeric',
-								})}>
+								detail=${this.localize.date(item.timestamp, TimeOptions)}>
 								<span class="log-type">
 									<uui-tag look=${style.look} color=${style.color}> ${this.localize.term(text.label)} </uui-tag>
 									${this.localize.term(text.desc, item.parameters)}
