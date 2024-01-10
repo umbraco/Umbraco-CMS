@@ -1743,19 +1743,21 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
       });
 
 
-      //Create the insert block plugin
-      self.createBlockPicker(args.editor, args.blockEditorApi, function (currentTarget, userData, imgDomElement) {
-        args.blockEditorApi.showCreateDialog(0, false, (newBlock) => {
-          // TODO: Handle if its an array:
-          if(Utilities.isArray(newBlock)) {
-            newBlock.forEach(block => {
-              self.insertBlockInEditor(args.editor, block.layout.contentUdi, block.config.displayInline);
-            });
-          } else {
-            self.insertBlockInEditor(args.editor, newBlock.layout.contentUdi, newBlock.config.displayInline);
-          }
+      if(args.blockEditorApi) {
+        //Create the insert block plugin
+        self.createBlockPicker(args.editor, args.blockEditorApi, function (currentTarget, userData, imgDomElement) {
+          args.blockEditorApi.showCreateDialog(0, false, (newBlock) => {
+            // TODO: Handle if its an array:
+            if(Utilities.isArray(newBlock)) {
+              newBlock.forEach(block => {
+                self.insertBlockInEditor(args.editor, block.layout.contentUdi, block.config.displayInline);
+              });
+            } else {
+              self.insertBlockInEditor(args.editor, newBlock.layout.contentUdi, newBlock.config.displayInline);
+            }
+          });
         });
-      });
+      }
 
       //Create the embedded plugin
       self.createInsertEmbeddedMedia(args.editor, function (activeElement, modify) {
