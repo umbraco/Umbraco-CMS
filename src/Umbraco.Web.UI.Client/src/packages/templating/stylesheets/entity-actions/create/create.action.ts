@@ -1,17 +1,27 @@
+import { UMB_STYLESHEET_CREATE_OPTIONS_MODAL } from './options-modal/index.js';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbModalManagerContext, UMB_MODAL_MANAGER_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
 
-export class UmbCreateStylesheetAction<T extends { copy(): Promise<void> }> extends UmbEntityActionBase<T> {
+export class UmbStylesheetCreateOptionsEntityAction extends UmbEntityActionBase<never> {
+	#modalManagerContext?: UmbModalManagerContext;
+
 	constructor(host: UmbControllerHostElement, repositoryAlias: string, unique: string) {
 		super(host, repositoryAlias, unique);
+
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
+			this.#modalManagerContext = instance;
+		});
 	}
 
 	async execute() {
-		if (this.unique !== null) {
-			// Note: %2F is a slash (/)
-			this.unique = this.unique.replace(/\//g, '%2F');
-		}
+		if (!this.#modalManagerContext) throw new Error('Modal manager context is not available');
+		if (!this.repository) throw new Error('Repository is not available');
 
-		history.pushState(null, '', `section/settings/workspace/stylesheet/create/${this.unique ?? 'null'}/view/code`);
+		this.#modalManagerContext?.open(UMB_STYLESHEET_CREATE_OPTIONS_MODAL, {
+			data: {
+				parentUnique: this.unique,
+			},
+		});
 	}
 }

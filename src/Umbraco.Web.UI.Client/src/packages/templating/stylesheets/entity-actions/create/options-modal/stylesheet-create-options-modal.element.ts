@@ -1,6 +1,5 @@
-import { UMB_PARTIAL_VIEW_FOLDER_REPOSITORY_ALIAS } from '../../../tree/folder/index.js';
-import { UMB_PARTIAL_VIEW_FROM_SNIPPET_MODAL } from '../snippet-modal/create-from-snippet-modal.token.js';
-import { UmbPartialViewCreateOptionsModalData } from './index.js';
+import { UMB_STYLESHEET_FOLDER_REPOSITORY_ALIAS } from '../../../tree/folder/index.js';
+import { UmbStylesheetCreateOptionsModalData } from './index.js';
 import { html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import {
@@ -10,9 +9,9 @@ import {
 } from '@umbraco-cms/backoffice/modal';
 import { UmbCreateFolderEntityAction } from '@umbraco-cms/backoffice/tree';
 
-@customElement('umb-partial-view-create-options-modal')
-export class UmbPartialViewCreateOptionsModalElement extends UmbModalBaseElement<
-	UmbPartialViewCreateOptionsModalData,
+@customElement('umb-stylesheet-create-options-modal')
+export class UmbStylesheetCreateOptionsModalElement extends UmbModalBaseElement<
+	UmbStylesheetCreateOptionsModalData,
 	string
 > {
 	#modalManager?: UmbModalManagerContext;
@@ -33,7 +32,7 @@ export class UmbPartialViewCreateOptionsModalElement extends UmbModalBaseElement
 
 		this.#createFolderAction = new UmbCreateFolderEntityAction(
 			this,
-			UMB_PARTIAL_VIEW_FOLDER_REPOSITORY_ALIAS,
+			UMB_STYLESHEET_FOLDER_REPOSITORY_ALIAS,
 			this.data.parentUnique,
 		);
 	}
@@ -49,19 +48,6 @@ export class UmbPartialViewCreateOptionsModalElement extends UmbModalBaseElement
 		}
 	}
 
-	async #onCreateFromSnippetClick(event: PointerEvent) {
-		event.stopPropagation();
-		if (this.data?.parentUnique === undefined) throw new Error('A parent unique is required to create a folder');
-
-		const modalContext = this.#modalManager?.open(UMB_PARTIAL_VIEW_FROM_SNIPPET_MODAL, {
-			data: {
-				parentUnique: this.data.parentUnique,
-			},
-		});
-
-		modalContext?.onSubmit().then(() => this._submitModal());
-	}
-
 	// close the modal when navigating to data type
 	#onNavigate() {
 		this._submitModal();
@@ -69,17 +55,22 @@ export class UmbPartialViewCreateOptionsModalElement extends UmbModalBaseElement
 
 	render() {
 		return html`
-			<umb-body-layout headline="Create Partial View">
+			<umb-body-layout headline="Create Stylesheet">
 				<uui-box>
 					<!-- TODO: construct url -->
 					<uui-menu-item
-						href=${`section/settings/workspace/partial-view/create/${this.data?.parentUnique || 'null'}/Empty`}
-						label="New empty partial view"
+						href=${`section/settings/workspace/stylesheet/create/${this.data?.parentUnique || 'null'}/view/code`}
+						label="New Stylesheet"
 						@click=${this.#onNavigate}>
 						<uui-icon slot="icon" name="icon-article"></uui-icon>}
 					</uui-menu-item>
 
-					<uui-menu-item @click=${this.#onCreateFromSnippetClick} label="New partial view from snippet...">
+					<uui-menu-item
+						href=${`section/settings/workspace/stylesheet/create/${
+							this.data?.parentUnique || 'null'
+						}/view/rich-text-editor`}
+						label="New Rich Text Editor Stylesheet"
+						@click=${this.#onNavigate}>
 						<uui-icon slot="icon" name="icon-article"></uui-icon>}
 					</uui-menu-item>
 
@@ -96,10 +87,10 @@ export class UmbPartialViewCreateOptionsModalElement extends UmbModalBaseElement
 	static styles = [UmbTextStyles];
 }
 
-export default UmbPartialViewCreateOptionsModalElement;
+export default UmbStylesheetCreateOptionsModalElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-partial-view-create-options-modal': UmbPartialViewCreateOptionsModalElement;
+		'umb-stylesheet-create-options-modal': UmbStylesheetCreateOptionsModalElement;
 	}
 }
