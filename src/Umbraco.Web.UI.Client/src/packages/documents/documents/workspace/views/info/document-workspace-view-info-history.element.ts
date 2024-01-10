@@ -1,15 +1,30 @@
-import { UmbAuditLogRepository } from '@umbraco-cms/backoffice/audit-log';
 import { HistoryTagStyleAndText } from './utils.js';
-import { css, html, customElement, state, property, nothing, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { UmbAuditLogRepository } from '@umbraco-cms/backoffice/audit-log';
+import {
+	css,
+	html,
+	customElement,
+	state,
+	property,
+	nothing,
+	repeat,
+	ifDefined,
+} from '@umbraco-cms/backoffice/external/lit';
 import { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { AuditLogBaseModel, DirectionModel } from '@umbraco-cms/backoffice/backend-api';
+import {
+	AuditLogBaseModel,
+	AuditLogWithUsernameResponseModel,
+	DirectionModel,
+} from '@umbraco-cms/backoffice/backend-api';
+import { UmbCurrentUserContext } from '@umbraco-cms/backoffice/current-user';
 
 @customElement('umb-document-workspace-view-info-history')
 export class UmbDocumentWorkspaceViewInfoHistoryElement extends UmbLitElement {
 	#logRepository: UmbAuditLogRepository;
 	#itemsPerPage = 10;
+	#userIsoCode = 'en-US';
 
 	@property()
 	documentUnique = '';
@@ -18,7 +33,7 @@ export class UmbDocumentWorkspaceViewInfoHistoryElement extends UmbLitElement {
 	private _total?: number;
 
 	@state()
-	private _items?: Array<AuditLogBaseModel>;
+	private _items?: Array<AuditLogWithUsernameResponseModel>;
 
 	@state()
 	private _currentPage = 1;
@@ -26,6 +41,10 @@ export class UmbDocumentWorkspaceViewInfoHistoryElement extends UmbLitElement {
 	constructor() {
 		super();
 		this.#logRepository = new UmbAuditLogRepository(this);
+		const context = new UmbCurrentUserContext(this);
+		this.observe(context.languageIsoCode, (IsoCode) => {
+			this.#userIsoCode = IsoCode;
+		});
 	}
 
 	protected firstUpdated(): void {
@@ -52,8 +71,7 @@ export class UmbDocumentWorkspaceViewInfoHistoryElement extends UmbLitElement {
 		// Uncomment previous code and delete the following when issue fixed.
 		// This should also make it load significantly faster
 
-		const { data } = await this.#logRepository.getAuditLogByUnique({
-			id: '',
+		const { data } = await this.#logRepository.getLog({
 			orderDirection: DirectionModel.DESCENDING,
 			skip: 0,
 			take: 99999,
@@ -92,10 +110,22 @@ export class UmbDocumentWorkspaceViewInfoHistoryElement extends UmbLitElement {
 				<umb-history-list>
 					${repeat(
 						this._items,
-						(item) => item.timestamp,
+						(item) => item.timestamp + this.#userIsoCode,
 						(item) => {
 							const { text, style } = HistoryTagStyleAndText(item.logType);
-							return html`<umb-history-item name="TODO Username" detail=${new Date(item.timestamp).toLocaleString()}>
+							return html`<umb-history-item
+								.name=${item.userName ?? 'Unknown'}
+								src=${ifDefined(
+									Array.isArray(item.userAvatars) ? item.userAvatars[item.userAvatars.length - 1] : undefined,
+								)}
+								detail=${new Date(item.timestamp).toLocaleString(this.#userIsoCode, {
+									year: 'numeric',
+									month: 'long',
+									day: 'numeric',
+									hour: 'numeric',
+									minute: 'numeric',
+									second: 'numeric',
+								})}>
 								<span class="log-type">
 									<uui-tag look=${style.look} color=${style.color}> ${this.localize.term(text.label)} </uui-tag>
 									${this.localize.term(text.desc, item.parameters)}

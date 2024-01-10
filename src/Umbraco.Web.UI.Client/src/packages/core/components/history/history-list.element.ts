@@ -14,7 +14,7 @@ export class UmbHistoryListElement extends UmbLitElement {
 			:host {
 				display: grid;
 				grid-template-columns: auto 1fr auto;
-				align-items: start;
+				align-items: center;
 				--avatar-size: calc(2em + 4px);
 				gap: var(--uui-size-6);
 				position: relative;

@@ -1,4 +1,5 @@
-import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
+import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
+import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
@@ -13,10 +14,22 @@ export class UmbHistoryItemElement extends UmbLitElement {
 	@property({ type: String })
 	detail?: string;
 
+	@state()
+	private _serverUrl?: string;
+
+	constructor() {
+		super();
+		this.consumeContext(UMB_APP_CONTEXT, (instance) => {
+			this._serverUrl = instance.getServerUrl();
+		});
+	}
+
 	render() {
 		return html`
 			<div class="user-info">
-				<uui-avatar .name="${this.name ?? 'Unknown'}" ?src="${this.src}"></uui-avatar>
+				<uui-avatar
+					.name="${this.name ?? 'Unknown'}"
+					.imgSrc="${this.src ? this._serverUrl + this.src : ''}"></uui-avatar>
 				<div>
 					<span class="name">${this.name}</span>
 					<span class="detail">${this.detail}</span>

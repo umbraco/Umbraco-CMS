@@ -1,75 +1,15 @@
-import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import './document-workspace-view-info-history.element.js';
 import './document-workspace-view-info-reference.element.js';
+import { UmbDocumentWorkspaceContext } from '@umbraco-cms/backoffice/document';
+import { ContentUrlInfoModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-document-workspace-view-info')
 export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
-	/** Dont delete, need for mock data */
-	/*@state()
-	private _historyList: [] = [
-		{
-			userId: -1,
-			userAvatars: [],
-			userName: 'Lone Iversen',
-			timestamp: 'December 5, 2022 2:59 PM',
-			comment: undefined,
-			entityType: 'Document',
-			logType: 'Save',
-			nodeId: '1058',
-			parameters: undefined,
-		},
-		{
-			userId: -1,
-			userAvatars: [],
-			userName: 'Lone Iversen',
-			timestamp: 'December 5, 2022 2:59 PM',
-			comment: undefined,
-			entityType: 'Document',
-			logType: 'Unpublish',
-			nodeId: '1058',
-			parameters: undefined,
-		},
-		{
-			userId: -1,
-			userAvatars: [],
-			userName: 'Lone Iversen',
-			timestamp: 'December 5, 2022 2:59 PM',
-			comment: undefined,
-			entityType: 'Document',
-			logType: 'Publish',
-			nodeId: '1058',
-			parameters: undefined,
-		},
-
-		{
-			userId: -1,
-			userAvatars: [],
-			userName: 'Lone Iversen',
-			timestamp: 'December 5, 2022 2:59 PM',
-			comment: undefined,
-			entityType: 'Document',
-			logType: 'Save',
-			nodeId: '1058',
-			parameters: undefined,
-		},
-
-		{
-			userId: -1,
-			userAvatars: [],
-			userName: 'Lone Iversen',
-			timestamp: 'December 5, 2022 2:59 PM',
-			comment: undefined,
-			entityType: 'Document',
-			logType: 'Save',
-			nodeId: '1058',
-			parameters: undefined,
-		},
-	];*/
-
 	@state()
 	private _nodeName = '';
 
@@ -83,6 +23,9 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 
 	@state()
 	private _editDocumentTypePath = '';
+
+	@state()
+	private _urls?: Array<ContentUrlInfoModel>;
 
 	constructor() {
 		super();
@@ -106,23 +49,25 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 		if (!this._workspaceContext) return;
 
 		this._nodeName = 'TBD, with variants this is not as simple.';
-		this._documentTypeId = (this._workspaceContext as any).getContentTypeId();
 
-		this.observe(this._workspaceContext.unique, (unique) => {
-			this._documentUnique = unique;
+		this._documentTypeId = (this._workspaceContext as UmbDocumentWorkspaceContext).getContentTypeId()!;
+
+		this.observe((this._workspaceContext as UmbDocumentWorkspaceContext).urls, (urls) => {
+			this._urls = urls;
 		});
 
-		/*
-		this.observe(this._workspaceContext.name, (name) => {
-			this._nodeName = name || '';
+		this.observe((this._workspaceContext as UmbDocumentWorkspaceContext).unique, (unique) => {
+			this._documentUnique = unique!;
 		});
-		*/
+
+		const something = (this._workspaceContext as UmbDocumentWorkspaceContext).getData();
+		console.log(something);
 	}
 
 	render() {
 		return html`<div class="container">
 				<uui-box headline=${this.localize.term('general_links')} style="--uui-box-default-padding: 0;">
-					${this.#renderLinksSection()}
+					<div id="link-section">${this.#renderLinksSection()}</div>
 				</uui-box>
 
 				<umb-document-workspace-view-info-reference
@@ -137,16 +82,26 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 	}
 
 	#renderLinksSection() {
-		return html`<div id="link-section">
-			<a href="http://google.com" target="_blank" class="link-item with-href">
-				<span class="link-language">da-DK</span>
-				<span class="link-content"> <uui-icon name="icon-out"></uui-icon>google.com </span>
-			</a>
-			<div class="link-item">
+		if (this._urls && this._urls.length) {
+			return html`
+				${repeat(
+					this._urls,
+					(url) => url.culture,
+					(url) => html`
+						<a href=${url.url} target="_blank" class="link-item with-href">
+							<span class="link-language">${url.culture}</span>
+							<span class="link-content"> ${url.url}</span>
+							<uui-icon name="icon-out"></uui-icon>
+						</a>
+					`,
+				)}
+			`;
+		} else {
+			return html`<div class="link-item">
 				<span class="link-language">en-EN</span>
 				<span class="link-content italic"><umb-localize key="content_parentNotPublishedAnomaly"></umb-localize></span>
-			</div>
-		</div>`;
+			</div>`;
+		}
 	}
 
 	#renderGeneralSection() {
@@ -225,7 +180,8 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 			.link-item {
 				padding: var(--uui-size-space-4) var(--uui-size-space-6);
 				display: grid;
-				grid-template-columns: 75px 1fr;
+				grid-template-columns: auto 1fr auto;
+				gap: var(--uui-size-6);
 				color: inherit;
 				text-decoration: none;
 			}

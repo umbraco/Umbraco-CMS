@@ -4,6 +4,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { RelationItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbDocumentTrackedReferenceRepository } from '@umbraco-cms/backoffice/document';
+import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-document-workspace-view-info-reference')
 export class UmbDocumentWorkspaceViewInfoReferenceElement extends UmbLitElement {
@@ -12,6 +13,9 @@ export class UmbDocumentWorkspaceViewInfoReferenceElement extends UmbLitElement 
 
 	@property()
 	documentUnique = '';
+
+	@state()
+	private _editDocumentPath = '';
 
 	@state()
 	private _currentPage = 1;
@@ -25,6 +29,15 @@ export class UmbDocumentWorkspaceViewInfoReferenceElement extends UmbLitElement 
 	constructor() {
 		super();
 		this.#trackedReferenceRepository = new UmbDocumentTrackedReferenceRepository(this);
+
+		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
+			.addAdditionalPath('document')
+			.onSetup(() => {
+				return { data: { entityType: 'document', preset: {} } };
+			})
+			.observeRouteBuilder((routeBuilder) => {
+				this._editDocumentPath = routeBuilder({});
+			});
 	}
 
 	protected firstUpdated(): void {
@@ -74,7 +87,11 @@ export class UmbDocumentWorkspaceViewInfoReferenceElement extends UmbLitElement 
 									<uui-table-cell>
 										<uui-icon style=" vertical-align: middle;" name="icon-document"></uui-icon>
 									</uui-table-cell>
-									<uui-table-cell class="link-cell">${item.nodeName}</uui-table-cell>
+									<uui-table-cell class="link-cell">
+										<uui-button label="Edit" href=${`${this._editDocumentPath}edit/${item.nodeId}`}>
+											${item.nodeName}
+										</uui-button>
+									</uui-table-cell>
 									<uui-table-cell>
 										${item.nodePublished
 											? this.localize.term('content_published')
