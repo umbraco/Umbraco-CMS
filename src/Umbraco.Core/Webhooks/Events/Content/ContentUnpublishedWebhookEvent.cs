@@ -23,7 +23,7 @@ public class ContentUnpublishedWebhookEvent : WebhookEventContentBase<ContentUnp
     {
     }
 
-    public override string Alias => Constants.WebhookEvents.Aliases.ContentDelete;
+    public override string Alias => Constants.WebhookEvents.Aliases.ContentUnpublish;
 
     protected override IEnumerable<IContent> GetEntitiesFromNotification(ContentUnpublishedNotification notification) => notification.UnpublishedEntities;
 

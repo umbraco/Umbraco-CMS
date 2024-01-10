@@ -37,10 +37,6 @@
     <title ng-bind="$root.locationTitle">Umbraco</title>
 
     @Html.Raw(await runtimeMinifier.RenderCssHereAsync(BackOfficeWebAssets.UmbracoInitCssBundleName))
-
-    <link rel="stylesheet" href="~/umbraco/login/style.css" asp-append-version="true" />
-    <script type="module" src="~/umbraco/login/external.js" asp-append-version="true"></script>
-    <script type="module" src="~/umbraco/login/index.js" asp-append-version="true"></script>
 </head>
 <body ng-class="{'touch':touchDevice, 'emptySection':emptySection, 'umb-drawer-is-visible':drawer.show, 'umb-tour-is-visible': tour.show, 'tabbing-active':tabbingActive}" ng-controller="Umbraco.MainController" id="umbracoMainPageBody">
     <noscript>
