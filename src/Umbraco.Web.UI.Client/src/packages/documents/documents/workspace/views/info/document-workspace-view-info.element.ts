@@ -89,6 +89,7 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 	}
 
 	#renderLinksSection() {
+		/** TODO Make sure link section is completed */
 		if (this._urls && this._urls.length) {
 			return html`
 				${repeat(
