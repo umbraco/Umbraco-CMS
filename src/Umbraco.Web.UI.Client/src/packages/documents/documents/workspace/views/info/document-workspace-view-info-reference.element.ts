@@ -72,11 +72,13 @@ export class UmbDocumentWorkspaceViewInfoReferenceElement extends UmbLitElement 
 					<uui-table>
 						<uui-table-head>
 							<uui-table-head-cell></uui-table-head-cell>
-							<uui-table-head-cell>Name</uui-table-head-cell>
-							<uui-table-head-cell>Status</uui-table-head-cell>
-							<uui-table-head-cell>Type Name</uui-table-head-cell>
-							<uui-table-head-cell>Type</uui-table-head-cell>
-							<uui-table-head-cell>Relation</uui-table-head-cell>
+							<uui-table-head-cell><umb-localize key="general_name">Name</umb-localize></uui-table-head-cell>
+							<uui-table-head-cell><umb-localize key="general_status">Status</umb-localize></uui-table-head-cell>
+							<uui-table-head-cell><umb-localize key="general_typeName">Type Name</umb-localize></uui-table-head-cell>
+							<uui-table-head-cell><umb-localize key="general_type">Type</umb-localize></uui-table-head-cell>
+							<uui-table-head-cell>
+								<umb-localize key="relationType_relation">Relation</umb-localize>
+							</uui-table-head-cell>
 						</uui-table-head>
 
 						${repeat(
