@@ -65,6 +65,7 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 			this._documentUnique = unique!;
 		});
 
+		/** TODO: Doubt this is the right way to get the create date... */
 		this.observe((this._workspaceContext as UmbDocumentWorkspaceContext).variants, (variants) => {
 			this._createDate = Array.isArray(variants) ? variants[0].createDate : 'Unknown';
 		});
