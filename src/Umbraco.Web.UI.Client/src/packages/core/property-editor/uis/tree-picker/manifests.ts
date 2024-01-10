@@ -1,5 +1,5 @@
-import { manifest as filter } from './config/filter/manifests.js';
 import { manifest as sourcePicker } from './config/source-picker/manifests.js';
+import { manifest as sourceTypePicker } from './config/source-type-picker/manifests.js';
 import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension-registry';
 
 const manifest: ManifestPropertyEditorUi = {
@@ -24,7 +24,7 @@ const manifest: ManifestPropertyEditorUi = {
 					alias: 'filter',
 					label: 'Allow items of type',
 					description: 'Select the applicable types',
-					propertyEditorUiAlias: 'Umb.PropertyEditorUi.TreePicker.Filter',
+					propertyEditorUiAlias: sourceTypePicker.alias,
 				},
 				{
 					alias: 'showOpenButton',
@@ -37,6 +37,6 @@ const manifest: ManifestPropertyEditorUi = {
 	},
 };
 
-const config: Array<ManifestPropertyEditorUi> = [sourcePicker, filter];
+const config: Array<ManifestPropertyEditorUi> = [sourcePicker, sourceTypePicker];
 
 export const manifests = [manifest, ...config];

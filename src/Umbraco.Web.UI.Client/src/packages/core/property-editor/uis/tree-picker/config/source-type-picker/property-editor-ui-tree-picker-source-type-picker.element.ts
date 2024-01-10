@@ -8,8 +8,11 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 
-@customElement('umb-property-editor-ui-tree-picker-filter')
-export class UmbPropertyEditorUITreePickerFilterElement extends UmbLitElement implements UmbPropertyEditorUiElement {
+/**
+ * @element umb-property-editor-ui-tree-picker-source-type-picker
+ */
+@customElement('umb-property-editor-ui-tree-picker-source-type-picker')
+export class UmbPropertyEditorUITreePickerSourceTypePickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	#datasetContext?: typeof UMB_PROPERTY_DATASET_CONTEXT.TYPE;
 
 	@property({ type: Array })
@@ -111,10 +114,10 @@ export class UmbPropertyEditorUITreePickerFilterElement extends UmbLitElement im
 	static styles = [UmbTextStyles];
 }
 
-export default UmbPropertyEditorUITreePickerFilterElement;
+export default UmbPropertyEditorUITreePickerSourceTypePickerElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-property-editor-ui-tree-picker-filter': UmbPropertyEditorUITreePickerFilterElement;
+		'umb-property-editor-ui-tree-picker-source-type-picker': UmbPropertyEditorUITreePickerSourceTypePickerElement;
 	}
 }
