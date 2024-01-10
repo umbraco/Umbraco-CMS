@@ -55,8 +55,12 @@ export default class UmbTinyMceMediaPickerPlugin extends UmbTinyMcePluginBase {
 			icon: 'image',
 			tooltip: 'Media Picker',
 			onAction: () => this.#onAction(),
-			onSetup: (api) => () =>
-				this.editor.selection.selectorChangedWithUnbind('img[data-udi]', (state) => api.setActive(state)),
+			onSetup: (api) => {
+				const changed = this.editor.selection.selectorChangedWithUnbind('img[data-udi]', (state) =>
+					api.setActive(state),
+				);
+				return () => changed.unbind();
+			},
 		});
 
 		// Register global options for the editor
