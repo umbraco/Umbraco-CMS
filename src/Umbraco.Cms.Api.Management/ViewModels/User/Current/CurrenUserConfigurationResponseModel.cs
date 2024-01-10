@@ -1,4 +1,6 @@
-﻿namespace Umbraco.Cms.Api.Management.ViewModels.User.Current;
+﻿using Umbraco.Cms.Api.Management.ViewModels.Security;
+
+namespace Umbraco.Cms.Api.Management.ViewModels.User.Current;
 
 public class CurrenUserConfigurationResponseModel
 {
@@ -6,14 +8,6 @@ public class CurrenUserConfigurationResponseModel
 
     public bool UserNameIsEmail { get; set; }
 
-    public int MinimumPasswordLength { get; set; }
-
-    public int MinimumPasswordNonAlphaNum { get; set; }
-
-    public bool RequireDigit { get; set; }
-
-    public bool RequireLowercase { get; set; }
-
-    public bool RequireUppercase { get; set; }
+    public PasswordConfigurationResponseModel PasswordConfiguration { get; set; } = null!;
 
 }

@@ -23,7 +23,6 @@ public class UserPresentationFactory : IUserPresentationFactory
     private readonly IEmailSender _emailSender;
     private readonly IPasswordConfigurationPresentationFactory _passwordConfigurationPresentationFactory;
     private readonly SecuritySettings _securitySettings;
-    private readonly UserPasswordConfigurationSettings _userPasswordConfigurationSettings;
 
     public UserPresentationFactory(
         IEntityService entityService,
@@ -32,9 +31,7 @@ public class UserPresentationFactory : IUserPresentationFactory
         IImageUrlGenerator imageUrlGenerator,
         IUserGroupPresentationFactory userGroupPresentationFactory,
         IEmailSender emailSender,
-        IPasswordConfigurationPresentationFactory passwordConfigurationPresentationFactory)
-        IUserGroupPresentationFactory userGroupPresentationFactory,
-        IOptionsSnapshot<UserPasswordConfigurationSettings> userPasswordConfigurationSettings,
+        IPasswordConfigurationPresentationFactory passwordConfigurationPresentationFactory,
         IOptionsSnapshot<SecuritySettings> securitySettings)
     {
         _entityService = entityService;
@@ -45,7 +42,6 @@ public class UserPresentationFactory : IUserPresentationFactory
         _emailSender = emailSender;
         _passwordConfigurationPresentationFactory = passwordConfigurationPresentationFactory;
         _securitySettings = securitySettings.Value;
-        _userPasswordConfigurationSettings = userPasswordConfigurationSettings.Value;
     }
 
     public UserResponseModel CreateResponseModel(IUser user)
@@ -117,11 +113,7 @@ public class UserPresentationFactory : IUserPresentationFactory
         {
             KeepUserLoggedIn = _securitySettings.KeepUserLoggedIn,
             UserNameIsEmail = _securitySettings.UsernameIsEmail,
-            MinimumPasswordLength = _userPasswordConfigurationSettings.RequiredLength,
-            MinimumPasswordNonAlphaNum = _userPasswordConfigurationSettings.RequireNonLetterOrDigit ? 1 : 0,
-            RequireDigit = _userPasswordConfigurationSettings.RequireDigit,
-            RequireLowercase = _userPasswordConfigurationSettings.RequireLowercase,
-            RequireUppercase = _userPasswordConfigurationSettings.RequireUppercase,
+            PasswordConfiguration = _passwordConfigurationPresentationFactory.CreatePasswordConfigurationResponseModel(),
         };
 
         return await Task.FromResult(model);
