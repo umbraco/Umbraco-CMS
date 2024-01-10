@@ -89,13 +89,6 @@ internal sealed class ContentTypeEditingService : ContentTypeEditingServiceBase<
     private async Task SaveAsync(IContentType contentType, Guid userKey)
         => await _contentTypeService.SaveAsync(contentType, userKey);
 
-    protected override Guid[] GetAvailableCompositionKeys(IContentTypeComposition? source, IContentTypeComposition[] allContentTypes, bool isElement)
-        => _contentTypeService.GetAvailableCompositeContentTypes(source, allContentTypes, isElement: isElement)
-            .Results
-            .Where(x => x.Allowed)
-            .Select(x => x.Composition.Key)
-            .ToArray();
-
     protected override IContentType CreateContentType(IShortStringHelper shortStringHelper, int parentId)
         => new ContentType(shortStringHelper, parentId);
 

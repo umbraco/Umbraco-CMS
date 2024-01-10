@@ -33,8 +33,6 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         _shortStringHelper = shortStringHelper;
     }
 
-    protected abstract Guid[] GetAvailableCompositionKeys(IContentTypeComposition? source, IContentTypeComposition[] allContentTypes, bool isElement);
-
     protected abstract TContentType CreateContentType(IShortStringHelper shortStringHelper, int parentId);
 
     protected abstract bool SupportsPublishing { get; }
@@ -287,7 +285,11 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         Guid[] compositionKeys = KeysForCompositionTypes(model, CompositionType.Composition);
 
         // verify that all compositions keys are allowed
-        Guid[] allowedCompositionKeys = GetAvailableCompositionKeys(contentType, allContentTypeCompositions, model.IsElement);
+        Guid[] allowedCompositionKeys = _contentTypeService.GetAvailableCompositeContentTypes(contentType, allContentTypeCompositions, isElement: model.IsElement)
+            .Results
+            .Where(x => x.Allowed)
+            .Select(x => x.Composition.Key)
+            .ToArray();
         if (allowedCompositionKeys.ContainsAll(compositionKeys) is false)
         {
             return ContentTypeOperationStatus.InvalidComposition;
