@@ -115,7 +115,6 @@ export class UmbInputTreeElement extends FormControlMixin(UmbLitElement) {
 	#renderMediaPicker() {
 		return html`<umb-input-media
 			.selectedIds=${this.selectedIds}
-			.startNodeId=${this.startNodeId}
 			.filter=${this.filter}
 			.min=${this.min}
 			.max=${this.max}
