@@ -6,8 +6,8 @@ import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/
 
 @customElement('umb-property-editor-ui-number')
 export class UmbPropertyEditorUINumberElement extends UmbLitElement implements UmbPropertyEditorUiElement {
-	@property()
-	value = '';
+	@property({ type: Number })
+	value: undefined | number = undefined;
 
 	@state()
 	private _max?: number;
@@ -26,7 +26,7 @@ export class UmbPropertyEditorUINumberElement extends UmbLitElement implements U
 	}
 
 	private onInput(e: InputEvent) {
-		this.value = (e.target as HTMLInputElement).value;
+		this.value = Number((e.target as HTMLInputElement).value);
 		this.dispatchEvent(new CustomEvent('property-value-change'));
 	}
 

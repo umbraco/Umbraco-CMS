@@ -157,10 +157,12 @@ describe('UmbContextConsumer', () => {
 		type A = { prop: string };
 
 		function discriminator(instance: unknown): instance is A {
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			return typeof (instance as any).prop === 'string';
 		}
 
 		function badDiscriminator(instance: unknown): instance is A {
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			return typeof (instance as any).notExistingProp === 'string';
 		}
 

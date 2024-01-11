@@ -2,7 +2,7 @@ import type { ManifestPropertyEditorSchema } from '@umbraco-cms/backoffice/exten
 
 export const manifest: ManifestPropertyEditorSchema = {
 	type: 'propertyEditorSchema',
-	name: 'Decimal',
+	name: 'Integer',
 	alias: 'Umbraco.Integer',
 	meta: {
 		defaultPropertyEditorUiAlias: 'Umb.PropertyEditorUi.Integer',

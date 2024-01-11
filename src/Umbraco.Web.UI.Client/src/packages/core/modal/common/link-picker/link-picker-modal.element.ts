@@ -1,4 +1,4 @@
-import { UmbTreeElement } from '../../../tree/tree.element.js';
+import { UmbTreeElement, type UmbTreeSelectionConfiguration } from '@umbraco-cms/backoffice/tree';
 import { css, html, nothing, customElement, query, state, styleMap } from '@umbraco-cms/backoffice/external/lit';
 import { UUIBooleanInputEvent, UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import {
@@ -13,6 +13,13 @@ import { UMB_DOCUMENT_TREE_ALIAS } from '@umbraco-cms/backoffice/document';
 
 @customElement('umb-link-picker-modal')
 export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPickerModalData, UmbLinkPickerModalValue> {
+		@state()
+	private _selectionConfiguration: UmbTreeSelectionConfiguration = {
+		multiple: false,
+		selectable: true,
+		selection: [],
+	};
+
 	@state()
 	_selectedKey?: string;
 
@@ -51,6 +58,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 			this.observe(this.modalContext.value, (value) => {
 				(this._link as any) = value.link;
 				this._selectedKey = this._link?.udi ? getKeyFromUdi(this._link.udi) : undefined;
+				this._selectionConfiguration.selection = this._selectedKey ? [this._selectedKey] : [];
 			});
 		}
 		this._layout = this.data?.config;
@@ -76,11 +84,13 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 		//TODO: Update icon, published, trashed
 		e.stopPropagation();
 		const element = e.target as UmbTreeElement;
-		const selectedKey = element.selection[element.selection.length - 1];
+		const selection = element.getSelection();
+		const selectedKey = selection[selection.length - 1];
 
 		if (!selectedKey) {
 			this.#partialUpdateLink({ udi: '', url: undefined });
 			this._selectedKey = undefined;
+			this._selectionConfiguration.selection = [];
 			this.requestUpdate();
 			return;
 		}
@@ -88,6 +98,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 		const udi = buildUdi(entityType, selectedKey);
 
 		this._selectedKey = selectedKey;
+		this._selectionConfiguration.selection = [this._selectedKey];
 		this.#partialUpdateLink({ udi: udi, url: udi });
 		this.requestUpdate();
 	}
@@ -177,11 +188,9 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 					label=${this.localize.term('placeholders_search')}></uui-input>
 				<umb-tree
 					?hide-tree-root=${true}
-					?multiple=${false}
 					alias=${UMB_DOCUMENT_TREE_ALIAS}
 					@selection-change=${(event: CustomEvent) => this.#handleSelectionChange(event, 'document')}
-					.selection=${[this._selectedKey ?? '']}
-					selectable></umb-tree>
+					.selectionConfiguration=${this._selectionConfiguration}></umb-tree>
 			</div>
 			<hr />
 			<uui-symbol-expand
@@ -192,11 +201,9 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 			<div style="${styleMap({ display: !this.mediaExpanded ? 'block' : 'none' })}">
 				<umb-tree
 					?hide-tree-root=${true}
-					?multiple=${false}
 					alias="Umb.Tree.Media"
 					@selection-change=${(event: CustomEvent) => this.#handleSelectionChange(event, 'media')}
-					.selection=${[this._selectedKey ?? '']}
-					selectable></umb-tree>
+					.selectionConfiguration=${this._selectionConfiguration}></umb-tree>
 			</div>
 		`;
 	}

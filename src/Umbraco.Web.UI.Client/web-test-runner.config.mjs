@@ -91,8 +91,9 @@ export default {
 						'@umbraco-cms/backoffice/repository': './src/packages/core/repository/index.ts',
 						'@umbraco-cms/backoffice/temporary-file': './src/packages/core/temporary-file/index.ts',
 
-						'@umbraco-cms/backoffice/dictionary': './src/packages/dictionary/dictionary/index.ts',
 						'@umbraco-cms/backoffice/block': './src/packages/block/index.ts',
+						'@umbraco-cms/backoffice/audit-log': './src/packages/core/audit-log/index.ts',
+						'@umbraco-cms/backoffice/dictionary': './src/packages/dictionary/dictionary/index.ts',
 
 						'@umbraco-cms/backoffice/document': './src/packages/documents/documents/index.ts',
 						'@umbraco-cms/backoffice/document-blueprint': './src/packages/documents/document-blueprints/index.ts',
@@ -107,7 +108,8 @@ export default {
 						'@umbraco-cms/backoffice/data-type': './src/packages/core/data-type/index.ts',
 						'@umbraco-cms/backoffice/language': './src/packages/settings/languages/index.ts',
 						'@umbraco-cms/backoffice/logviewer': './src/packages/settings/logviewer/index.ts',
-						'@umbraco-cms/backoffice/relation-type': './src/packages/settings/relation-types/index.ts',
+						'@umbraco-cms/backoffice/relation-type': './src/packages/relations/relation-types/index.ts',
+						'@umbraco-cms/backoffice/relation': './src/packages/relations/relations/index.ts',
 						'@umbraco-cms/backoffice/tags': './src/packages/tags/index.ts',
 						'@umbraco-cms/backoffice/static-file': './src/packages/static-file/index.ts',
 						'@umbraco-cms/backoffice/partial-view': './src/packages/templating/partial-views/index.ts',
