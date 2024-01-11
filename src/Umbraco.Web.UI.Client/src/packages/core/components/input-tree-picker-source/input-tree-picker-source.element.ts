@@ -2,7 +2,7 @@ import { UmbInputDocumentPickerRootElement } from '@umbraco-cms/backoffice/docum
 import { html, customElement, property, css, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin, UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-//import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 export type UmbTreePickerSource = {
 	type?: UmbTreePickerSourceType;
@@ -64,18 +64,16 @@ export class UmbInputTreePickerSourceElement extends FormControlMixin(UmbLitElem
 	];
 
 	#onTypeChange(event: UUISelectEvent) {
-		//console.log('onTypeChange');
+		event.stopPropagation();
 
 		this.type = event.target.value as UmbTreePickerSource['type'];
 
 		this.nodeId = '';
 
-		// TODO: Appears that the event gets bubbled up. Will need to review. [LK]
-		//this.dispatchEvent(new UmbChangeEvent());
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	#onIdChange(event: CustomEvent) {
-		//console.log('onIdChange', event.target);
 		switch (this.type) {
 			case 'content':
 				this.nodeId = (<UmbInputDocumentPickerRootElement>event.target).nodeId;
