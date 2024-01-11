@@ -17,7 +17,7 @@ public class MediaCache : PublishedCacheBase, IPublishedMediaCache, INavigableDa
     #region Constructors
 
     public MediaCache(bool previewDefault, ContentStore.Snapshot snapshot, IVariationContextAccessor variationContextAccessor)
-        : base(previewDefault)
+        : base(variationContextAccessor, previewDefault)
     {
         _snapshot = snapshot;
         _variationContextAccessor = variationContextAccessor;
