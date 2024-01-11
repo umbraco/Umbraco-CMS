@@ -63,10 +63,10 @@ export class UmbPropertyEditorUITreePickerSourceTypePickerElement
 	#onChange(event: CustomEvent) {
 		switch (this.sourceType) {
 			case 'content':
-				this.value = (<UmbInputDocumentTypeElement>event.target).selectedIds;
+				this.#setValue((<UmbInputDocumentTypeElement>event.target).selectedIds);
 				break;
 			case 'media':
-				this.value = (<UmbInputMediaTypeElement>event.target).selectedIds;
+				this.#setValue((<UmbInputMediaTypeElement>event.target).selectedIds);
 				break;
 			case 'member':
 				this.#setValue((<UmbInputMemberTypeElement>event.target).selectedIds);
@@ -94,7 +94,7 @@ export class UmbPropertyEditorUITreePickerSourceTypePickerElement
 			case 'member':
 				return this.#renderTypeMember();
 			default:
-				return 'No source type found';
+				return html`<p>No source type found</p>`;
 		}
 	}
 
