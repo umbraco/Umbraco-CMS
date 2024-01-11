@@ -33,6 +33,9 @@ export class UmbPropertyEditorUIBlockListBlockElement extends UmbLitElement impl
 		this.observe(this.#context.label, (label) => {
 			this._label = label;
 		});
+		this.observe(this.#context.layout, (layout) => {
+			console.log('layout', layout);
+		});
 	}
 
 	#requestDelete() {
@@ -81,8 +84,9 @@ export class UmbPropertyEditorUIBlockListBlockElement extends UmbLitElement impl
 			}
 			uui-action-bar {
 				position: absolute;
-				top: 0;
-				right: 0;
+				top: 50%;
+				transform: translateY(-50%);
+				right: var(--uui-size-2);
 			}
 		`,
 	];

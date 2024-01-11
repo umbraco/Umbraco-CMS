@@ -490,6 +490,7 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 					{
 						label: 'Mocked Block Type for Block List',
 						contentElementTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
+						icon: 'icon-server-alt',
 					},
 					{
 						label: 'Mocked Coffee Block',

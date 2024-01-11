@@ -112,34 +112,29 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 	}
 
 	async #openBlockCatalogue(view?: UmbBlockCatalogueView) {
-		// Open modal.
-
-		//const contentElementTypeKey = this.#context.getBlockTypes()[0]!.contentElementTypeKey;
-
+		//Open modal
 		const modalContext = this.#modalContext?.open(UMB_BLOCK_CATALOGUE_MODAL, {
-			data: { unique: 'dt-blockList', blocks: this._blocks ?? [], view },
+			data: { blocks: this._blocks ?? [], view },
 		});
 
 		const data = await modalContext?.onSubmit();
+
+		/**TODO: Insert next modal for data */
 		console.log('submitted', data);
 
 		if (!data) return;
 
-		// TEMP Hack:
-		/*
-		const contentElementTypeKey = this.#context.getBlockTypes()[0]!.contentElementTypeKey;
+		const block = this._blocks?.find((x) => x.contentElementTypeKey === data.key);
 
-		const contentUdi = buildUdi('element', UmbId.new());
-		const settingsUdi = buildUdi('element', UmbId.new());
+		if (!block?.contentElementTypeKey) return;
 
 		this.#context.createBlock(
 			{
-				contentUdi,
-				settingsUdi,
+				contentUdi: buildUdi('element', UmbId.new()),
+				settingsUdi: buildUdi('element', UmbId.new()),
 			},
-			contentElementTypeKey,
+			block.contentElementTypeKey,
 		);
-		*/
 	}
 
 	render() {

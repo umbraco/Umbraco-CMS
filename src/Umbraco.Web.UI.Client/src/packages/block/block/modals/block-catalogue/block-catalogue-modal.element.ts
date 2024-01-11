@@ -30,20 +30,11 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 		this.view = this.data.view ?? 'createEmpty';
 		this._blocks = this.data.blocks ?? [];
 		this._blockGroups = this.data.blockGroups ?? [];
-
-		if (this.modalContext) {
-			this.observe(this.modalContext.value, (value) => {
-				//
-			});
-		}
-
-		this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, (context) => {
-			console.log(context);
-		});
 	}
 
-	#partialUpdateBlock(linkObject: any) {
-		//this.modalContext?.updateValue({ link: { ...this._link, ...linkObject } });
+	#onClickBlock(contentElementTypeKey: string) {
+		this.modalContext?.updateValue({ key: contentElementTypeKey });
+		this.modalContext?.submit();
 	}
 
 	render() {
@@ -87,7 +78,8 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 								<uui-card-block-type
 									name=${ifDefined(block.label)}
 									background=${ifDefined(block.backgroundColor)}
-									style="color: ${block.iconColor}">
+									style="color: ${block.iconColor}"
+									@open=${() => this.#onClickBlock(block.contentElementTypeKey)}>
 									<uui-icon .name=${block.icon ?? ''}></uui-icon>
 								</uui-card-block-type>
 							`,
