@@ -17,7 +17,7 @@ export class UmbPropertyEditorUITinyMceElement extends UmbLitElement implements 
 	#configuration?: UmbPropertyEditorConfigCollection;
 
 	@property({ type: Object })
-	value: RichTextEditorValue = {
+	value?: RichTextEditorValue = {
 		blocks: {},
 		markup: '',
 	};
@@ -39,7 +39,7 @@ export class UmbPropertyEditorUITinyMceElement extends UmbLitElement implements 
 		return html`<umb-input-tiny-mce
 			@change=${this.#onChange}
 			.configuration=${this.#configuration}
-			.value=${this.value.markup}></umb-input-tiny-mce>`;
+			.value=${this.value?.markup ?? ''}></umb-input-tiny-mce>`;
 	}
 
 	static styles = [UmbTextStyles];
