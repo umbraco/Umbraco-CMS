@@ -1,3 +1,4 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
@@ -11,20 +12,20 @@ namespace Umbraco.Cms.Api.Delivery.Handlers;
 
 internal sealed class InitializeMemberApplicationNotificationHandler : INotificationAsyncHandler<UmbracoApplicationStartingNotification>
 {
-    private readonly IMemberApplicationManager _memberApplicationManager;
     private readonly IRuntimeState _runtimeState;
     private readonly ILogger<InitializeMemberApplicationNotificationHandler> _logger;
     private readonly DeliveryApiSettings _deliveryApiSettings;
+    private readonly IServiceScopeFactory _serviceScopeFactory;
 
     public InitializeMemberApplicationNotificationHandler(
-        IMemberApplicationManager memberApplicationManager,
         IRuntimeState runtimeState,
         IOptions<DeliveryApiSettings> deliveryApiSettings,
-        ILogger<InitializeMemberApplicationNotificationHandler> logger)
+        ILogger<InitializeMemberApplicationNotificationHandler> logger,
+        IServiceScopeFactory serviceScopeFactory)
     {
-        _memberApplicationManager = memberApplicationManager;
         _runtimeState = runtimeState;
         _logger = logger;
+        _serviceScopeFactory = serviceScopeFactory;
         _deliveryApiSettings = deliveryApiSettings.Value;
     }
 
@@ -35,26 +36,31 @@ internal sealed class InitializeMemberApplicationNotificationHandler : INotifica
             return;
         }
 
+        // we cannot inject the IMemberApplicationManager because it ultimately takes a dependency on the DbContext ... and during
+        // install that is not allowed (no connection string means no DbContext)
+        using IServiceScope scope = _serviceScopeFactory.CreateScope();
+        IMemberApplicationManager memberApplicationManager = scope.ServiceProvider.GetRequiredService<IMemberApplicationManager>();
+
         if (_deliveryApiSettings.MemberAuthorization?.AuthorizationCodeFlow?.Enabled is not true)
         {
-            await _memberApplicationManager.DeleteMemberApplicationAsync(cancellationToken);
+            await memberApplicationManager.DeleteMemberApplicationAsync(cancellationToken);
             return;
         }
 
         if (ValidateRedirectUrls(_deliveryApiSettings.MemberAuthorization.AuthorizationCodeFlow.LoginRedirectUrls) is false)
         {
-            await _memberApplicationManager.DeleteMemberApplicationAsync(cancellationToken);
+            await memberApplicationManager.DeleteMemberApplicationAsync(cancellationToken);
             return;
         }
 
         if (_deliveryApiSettings.MemberAuthorization.AuthorizationCodeFlow.LogoutRedirectUrls.Any()
             && ValidateRedirectUrls(_deliveryApiSettings.MemberAuthorization.AuthorizationCodeFlow.LogoutRedirectUrls) is false)
         {
-            await _memberApplicationManager.DeleteMemberApplicationAsync(cancellationToken);
+            await memberApplicationManager.DeleteMemberApplicationAsync(cancellationToken);
             return;
         }
 
-        await _memberApplicationManager.EnsureMemberApplicationAsync(
+        await memberApplicationManager.EnsureMemberApplicationAsync(
             _deliveryApiSettings.MemberAuthorization.AuthorizationCodeFlow.LoginRedirectUrls,
             _deliveryApiSettings.MemberAuthorization.AuthorizationCodeFlow.LogoutRedirectUrls,
             cancellationToken);

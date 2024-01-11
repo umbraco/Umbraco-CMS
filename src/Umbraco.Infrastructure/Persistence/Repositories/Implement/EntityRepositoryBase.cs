@@ -181,7 +181,7 @@ public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IRead
     /// <summary>
     ///     Returns an integer with the count of entities found with the passed in query
     /// </summary>
-    public int Count(IQuery<TEntity> query)
+    public int Count(IQuery<TEntity>? query)
         => PerformCount(query);
 
     /// <summary>
@@ -221,9 +221,14 @@ public abstract class EntityRepositoryBase<TId, TEntity> : RepositoryBase, IRead
         return count == 1;
     }
 
-    protected virtual int PerformCount(IQuery<TEntity> query)
+    protected virtual int PerformCount(IQuery<TEntity>? query)
     {
         Sql<ISqlContext> sqlClause = GetBaseQuery(true);
+        if (query is null)
+        {
+            return Database.ExecuteScalar<int>(sqlClause);
+        }
+
         var translator = new SqlTranslator<TEntity>(sqlClause, query);
         Sql<ISqlContext> sql = translator.Translate();
 

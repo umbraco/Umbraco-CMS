@@ -1,10 +1,13 @@
-﻿namespace Umbraco.Cms.Api.Management.ViewModels.RelationType;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Umbraco.Cms.Api.Management.ViewModels.RelationType;
 
 public class RelationTypeBaseModel
 {
     /// <summary>
     ///     Gets or sets the name of the model.
     /// </summary>
+    [Required]
     public string Name { get; set; } = string.Empty;
 
     /// <summary>

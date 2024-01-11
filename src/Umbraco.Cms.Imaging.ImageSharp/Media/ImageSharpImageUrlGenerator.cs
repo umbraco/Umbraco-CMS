@@ -130,11 +130,7 @@ public sealed class ImageSharpImageUrlGenerator : IImageUrlGenerator
         {
             var uri = QueryHelpers.AddQueryString(options.ImageUrl, queryString);
 
-            // It's important that we call the async version here.
-            // This is because if we call the synchronous version, we ImageSharp will start a new Task ever single time.
-            // This becomes a huge problem if the site is under load, and will result in massive spikes in response time.
-            // See https://github.com/SixLabors/ImageSharp.Web/blob/main/src/ImageSharp.Web/AsyncHelper.cs#L24
-            var token = _requestAuthorizationUtilities.ComputeHMACAsync(uri, CommandHandling.Sanitize).GetAwaiter().GetResult();
+            var token = _requestAuthorizationUtilities.ComputeHMAC(uri, CommandHandling.Sanitize);
             if (string.IsNullOrEmpty(token) is false)
             {
                 queryString.Add(RequestAuthorizationUtilities.TokenCommand, token);

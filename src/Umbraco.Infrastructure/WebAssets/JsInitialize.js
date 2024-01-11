@@ -35,6 +35,10 @@
     'lib/umbraco/NamespaceManager.js',
     'lib/umbraco/LegacySpeechBubble.js',
 
+    'lib/umbraco-ui/uui/dist/uui.min.js',
+
+    'login/login.iife.js',
+
     'js/utilities.min.js',
 
     'js/app.min.js',

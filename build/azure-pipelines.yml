@@ -183,7 +183,7 @@ stages:
             inputs:
               targetType: inline
               script: |
-                dotnet tool install -g docfx --version 2.72.1
+                choco install docfx --version=2.59.4 -y
                 if ($lastexitcode -ne 0){
                     throw ("Error installing DocFX")
                 }
@@ -512,6 +512,7 @@ stages:
 #            displayName: Use .NET $(dotnetVersion)
 #            inputs:
 #              version: $(dotnetVersion)
+#              performMultiLevelLookup: true
 #              includePreviewVersions: $(dotnetIncludePreviewVersions)
 #          - pwsh: |
 #              $sha = 'g$(Build.SourceVersion)'.substring(0, 8)

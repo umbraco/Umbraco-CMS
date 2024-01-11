@@ -18,8 +18,9 @@
             </div>
         </umb-block-card>
 
-        <button type="button" id="{{model.alias}}" class="btn-reset __add-button" ng-click="vm.openAddDialog($event)">
-            <localize key="general_add">Add</localize>
-        </button>
+        <uui-button id="{{model.alias}}" look="{{model.value.length === 0 ? 'primary' : 'placeholder'}}" color="primary" ng-click="vm.openAddDialog($event)">
+          <localize key="blockEditor_addBlockType">Add Block</localize>
+        </uui-button>
+
     </div>
 </div>

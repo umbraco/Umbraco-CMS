@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Options;
+using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Api.Management.ViewModels.Content;
 using Umbraco.Cms.Api.Management.ViewModels.Media;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -14,12 +15,18 @@ public class MediaPresentationModelFactory : IMediaPresentationModelFactory
     private readonly IUmbracoMapper _umbracoMapper;
     private readonly ContentSettings _contentSettings;
     private readonly MediaUrlGeneratorCollection _mediaUrlGenerators;
+    private readonly IAbsoluteUrlBuilder _absoluteUrlBuilder;
 
-    public MediaPresentationModelFactory(IUmbracoMapper umbracoMapper, IOptions<ContentSettings> contentSettings, MediaUrlGeneratorCollection mediaUrlGenerators)
+    public MediaPresentationModelFactory(
+        IUmbracoMapper umbracoMapper,
+        IOptions<ContentSettings> contentSettings,
+        MediaUrlGeneratorCollection mediaUrlGenerators,
+        IAbsoluteUrlBuilder absoluteUrlBuilder)
     {
         _umbracoMapper = umbracoMapper;
         _contentSettings = contentSettings.Value;
         _mediaUrlGenerators = mediaUrlGenerators;
+        _absoluteUrlBuilder = absoluteUrlBuilder;
     }
 
     public Task<MediaResponseModel> CreateResponseModelAsync(IMedia media)
@@ -32,7 +39,7 @@ public class MediaPresentationModelFactory : IMediaPresentationModelFactory
             .Select(mediaUrl => new ContentUrlInfo
             {
                 Culture = null,
-                Url = mediaUrl
+                Url = _absoluteUrlBuilder.ToAbsoluteUrl(mediaUrl).ToString(),
             })
             .ToArray();
 

@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
@@ -34,9 +35,10 @@ public class DataValueEditorReuseTests
 
         _dataValueEditorFactoryMock
             .Setup(m =>
-                m.Create<BlockListPropertyEditorBase.BlockListEditorPropertyValueEditor>(It.IsAny<DataEditorAttribute>()))
+                m.Create<BlockListPropertyEditorBase.BlockListEditorPropertyValueEditor>(It.IsAny<DataEditorAttribute>(), It.IsAny<BlockEditorDataConverter<BlockListValue, BlockListLayoutItem>>()))
             .Returns(() => new BlockListPropertyEditorBase.BlockListEditorPropertyValueEditor(
                 new DataEditorAttribute("a", "b", "c"),
+                new BlockListEditorDataConverter(Mock.Of<IJsonSerializer>()),
                 _propertyEditorCollection,
                 Mock.Of<IDataTypeService>(),
                 Mock.Of<IContentTypeService>(),
@@ -96,7 +98,8 @@ public class DataValueEditorReuseTests
             new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>)),
             Mock.Of<IIOHelper>(),
             Mock.Of<IEditorConfigurationParser>(),
-            Mock.Of<IBlockValuePropertyIndexValueFactory>());
+            Mock.Of<IBlockValuePropertyIndexValueFactory>(),
+            Mock.Of<IJsonSerializer>());
 
         // block list is *not* set to reuse its data value editor
         var dataValueEditor1 = blockListPropertyEditor.GetValueEditor();
@@ -105,7 +108,7 @@ public class DataValueEditorReuseTests
         Assert.NotNull(dataValueEditor2);
         Assert.AreNotSame(dataValueEditor1, dataValueEditor2);
         _dataValueEditorFactoryMock.Verify(
-            m => m.Create<BlockListPropertyEditorBase.BlockListEditorPropertyValueEditor>(It.IsAny<DataEditorAttribute>()),
+            m => m.Create<BlockListPropertyEditorBase.BlockListEditorPropertyValueEditor>(It.IsAny<DataEditorAttribute>(), It.IsAny<BlockEditorDataConverter<BlockListValue, BlockListLayoutItem>>()),
             Times.Exactly(2));
     }
 
@@ -117,7 +120,8 @@ public class DataValueEditorReuseTests
             new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>)),
             Mock.Of<IIOHelper>(),
             Mock.Of<IEditorConfigurationParser>(),
-            Mock.Of<IBlockValuePropertyIndexValueFactory>());
+            Mock.Of<IBlockValuePropertyIndexValueFactory>(),
+            Mock.Of<IJsonSerializer>());
 
         // no matter what, a property editor should never reuse its data value editor when created *with* configuration
         var dataValueEditor1 = blockListPropertyEditor.GetValueEditor("config");
@@ -128,7 +132,7 @@ public class DataValueEditorReuseTests
         Assert.AreEqual("config", ((DataValueEditor)dataValueEditor2).ConfigurationObject);
         Assert.AreNotSame(dataValueEditor1, dataValueEditor2);
         _dataValueEditorFactoryMock.Verify(
-            m => m.Create<BlockListPropertyEditorBase.BlockListEditorPropertyValueEditor>(It.IsAny<DataEditorAttribute>()),
+            m => m.Create<BlockListPropertyEditorBase.BlockListEditorPropertyValueEditor>(It.IsAny<DataEditorAttribute>(), It.IsAny<BlockEditorDataConverter<BlockListValue, BlockListLayoutItem>>()),
             Times.Exactly(2));
     }
 }
