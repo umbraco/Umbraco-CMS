@@ -20,23 +20,15 @@ test.describe('Telemetry tests', () => {
     await umbracoUi.telemetryData.clickTelemetryDataTab();
     await umbracoUi.telemetryData.changeTelemetryDataLevelValue(levelValue);
     await umbracoUi.telemetryData.clickSaveButton();
-
-    // Waits until the Telemetry level is saved
-    await Promise.all([
-      page.waitForResponse(resp => (umbracoApi.baseUrl + '/umbraco/management/api/v1/telemetry/level') && resp.status() === 200),
-      await umbracoUi.telemetryData.clickSaveButton()
-    ]);
+    await umbracoUi.telemetryData.clickSaveButton();
 
     // Assert
     // UI
-    // Waits until the page is reloaded and for the network response for the Telemetry level
-    await Promise.all([
-      page.waitForResponse(resp => (umbracoApi.baseUrl + '/umbraco/management/api/v1/telemetry/level') && resp.status() === 200),
-      await umbracoUi.reloadPage()
+    await umbracoUi.reloadPage();
 
-    ]);
+    await expect(page.locator('[name="telemetryLevel"] >> input[id=input]')).toHaveValue(levelValue, {timeout: 20000});
+    // await umbracoUi.telemetryData.doesTelemetryDataLevelHaveValue(levelValue);
 
-    await umbracoUi.telemetryData.doesTelemetryDataLevelHaveValue(levelValue);
     // API
     expect(await umbracoApi.telemetry.getLevel() == expectedLevel).toBeTruthy();
   });
