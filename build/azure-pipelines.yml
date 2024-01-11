@@ -587,7 +587,7 @@ stages:
     dependsOn:
       - Unit
       - Integration
-      # - E2E # TODO: Enable when stable.
+      # - E2E
     condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.myGetDeploy}}))
     jobs:
       - job:
