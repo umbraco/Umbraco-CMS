@@ -148,11 +148,14 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 				<uui-button
 					id="add-button"
 					look="placeholder"
-					label="open"
+					label=${this.localize.term('content_createEmpty')}
 					@click=${() => this.#openBlockCatalogue('createEmpty')}
-					>Add</uui-button
+					>${this.localize.term('content_createEmpty')}</uui-button
 				>
-				<uui-button label="clipboard" @click=${() => this.#openBlockCatalogue('clipboard')}>
+				<uui-button
+					label=${this.localize.term('content_createFromClipboard')}
+					look="placeholder"
+					@click=${() => this.#openBlockCatalogue('clipboard')}>
 					<uui-icon name="icon-paste-in"></uui-icon>
 				</uui-button>
 			</uui-button-group>`;
@@ -165,6 +168,11 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 				display: flex;
 				flex-direction: column;
 				align-items: stretch;
+			}
+
+			uui-button-group {
+				display: grid;
+				grid-template-columns: 1fr auto;
 			}
 		`,
 	];
