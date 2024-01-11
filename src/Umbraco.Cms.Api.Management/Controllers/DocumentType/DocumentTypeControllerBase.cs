@@ -92,6 +92,10 @@ public abstract class DocumentTypeControllerBase : ManagementApiControllerBase
             ContentTypeStructureOperationStatus.NotAllowedByPath => new BadRequestObjectResult(new ProblemDetailsBuilder()
                 .WithTitle("Not allowed by path")
                 .WithDetail($"The {type} type operation cannot be performed due to not allowed path (i.e. a child of itself)")),
+            ContentTypeStructureOperationStatus.NotFound => new NotFoundObjectResult(new ProblemDetailsBuilder()
+                .WithTitle("Not Found")
+                .WithDetail($"The specified {type} type was not found")
+                .Build()),
             _ => new ObjectResult("Unknown content type structure operation status") { StatusCode = StatusCodes.Status500InternalServerError }
         };
 }

@@ -5,5 +5,6 @@ public enum ContentTypeStructureOperationStatus
     Success,
     CancelledByNotification,
     ContainerNotFound,
-    NotAllowedByPath
+    NotAllowedByPath,
+    NotFound
 }
