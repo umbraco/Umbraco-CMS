@@ -1,5 +1,5 @@
 import { UMB_BLOCK_LIST_PROPERTY_EDITOR_ALIAS } from './manifests.js';
-import { html, customElement, property, state, styleMap, repeat, css } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, state, repeat, css, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -140,11 +140,11 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 	render() {
 		return html` ${repeat(
 				this._layouts,
-				(x) => x.contentUdi,
-				(layoutEntry) =>
-					html` <uui-button-inline-create></uui-button-inline-create>
-						<umb-property-editor-ui-block-list-block .layout=${layoutEntry}>
-						</umb-property-editor-ui-block-list-block>`,
+				(x, index) => x.contentUdi + index,
+				(layoutEntry, index) => html`
+					<umb-property-editor-ui-block-list-block .layout=${layoutEntry}> </umb-property-editor-ui-block-list-block>
+					${index !== this._layouts.length - 1 ? html`<uui-button-inline-create></uui-button-inline-create>` : nothing}
+				`,
 			)}
 			<uui-button-group>
 				<uui-button
@@ -165,7 +165,12 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 
 	static styles = [
 		UmbTextStyles,
+
 		css`
+			:host {
+				display: grid;
+				gap: 1px;
+			}
 			> div {
 				display: flex;
 				flex-direction: column;
@@ -173,6 +178,7 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 			}
 
 			uui-button-group {
+				padding-top: 2px;
 				display: grid;
 				grid-template-columns: 1fr auto;
 			}
