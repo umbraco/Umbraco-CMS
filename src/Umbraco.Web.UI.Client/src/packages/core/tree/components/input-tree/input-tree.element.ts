@@ -3,7 +3,7 @@ import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbInputDocumentElement } from '@umbraco-cms/backoffice/document';
 import { UmbInputMediaElement } from '@umbraco-cms/backoffice/media';
-//import { UmbInputMemberElement } from '@umbraco-cms/backoffice/member';
+import { UmbInputMemberElement } from '@umbraco-cms/backoffice/member';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbTreePickerSource } from '@umbraco-cms/backoffice/components';
 
@@ -73,9 +73,9 @@ export class UmbInputTreeElement extends FormControlMixin(UmbLitElement) {
 			case 'media':
 				this.value = (event.target as UmbInputMediaElement).selectedIds.join(',');
 				break;
-			// case 'member':
-			// 	this.value = (event.target as UmbInputMemberElement).selectedIds.join(',');
-			// 	break;
+			case 'member':
+			 	this.value = (event.target as UmbInputMemberElement).selectedIds.join(',');
+			 	break;
 			default:
 				break;
 		}
