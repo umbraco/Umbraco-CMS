@@ -29,6 +29,7 @@ export * from './extension-registry/index.js';
 export * from './id/index.js';
 export * from './macro/index.js';
 export * from './menu/index.js';
+export * from './meta/index.js';
 export * from './modal/index.js';
 export * from './notification/index.js';
 export * from './picker-input/index.js';
@@ -42,6 +43,7 @@ export * from './variant/index.js';
 export * from './workspace/index.js';
 export * from './culture/index.js';
 export * from './temporary-file/index.js';
+export * from './object-type/index.js';
 
 const manifests: Array<ManifestTypes | UmbBackofficeManifestKind> = [
 	...conditionManifests,

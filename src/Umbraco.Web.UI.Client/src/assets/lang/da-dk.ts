@@ -1151,6 +1151,8 @@ export default {
 	},
 	contentPicker: {
 		allowedItemTypes: 'Du kan kun vælge følgende type(r) dokumenter: %0%',
+		defineDynamicRoot: 'Definer Dynamisk Udgangspunkt',
+		defineRootNode: 'Vælg udgangspunkt',
 		pickedTrashedItem: 'Du har valgt et dokument som er slettet eller lagt i papirkurven',
 		pickedTrashedItems: 'Du har valgt dokumenter som er slettede eller lagt i papirkurven',
 	},
