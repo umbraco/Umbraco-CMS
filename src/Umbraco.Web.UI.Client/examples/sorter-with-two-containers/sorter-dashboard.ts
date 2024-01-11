@@ -17,6 +17,7 @@ const SORTER_CONFIG: UmbSorterConfig<ModelEntryType> = {
 	identifier: 'string-that-identifies-all-example-sorters',
 	itemSelector: '.sorter-item',
 	containerSelector: '.sorter-container',
+	placeholderClass: 'sorter-placeholder',
 };
 
 @customElement('example-sorter-dashboard')
@@ -100,6 +101,9 @@ export class ExampleSorterDashboard extends UmbElementMixin(LitElement) {
 				border: 1px solid var(--uui-color-border);
 				border-radius: var(--uui-border-radius);
 				margin-bottom: 3px;
+			}
+			.sorter-placeholder {
+				opacity: 0.2;
 			}
 		`,
 	];

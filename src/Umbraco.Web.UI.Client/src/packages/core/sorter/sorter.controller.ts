@@ -114,7 +114,7 @@ export type UmbSorterConfig<T> = Omit<
  * @implements {UmbControllerInterface}
  * @description This controller can make user able to sort items.
  */
-export class UmbSorterController<T> implements UmbController {
+export class UmbSorterController<T extends object> implements UmbController {
 	#host;
 	#config: INTERNAL_UmbSorterConfig<T>;
 	#observer;
@@ -123,7 +123,8 @@ export class UmbSorterController<T> implements UmbController {
 	#rqaId?: number;
 
 	#containerElement!: HTMLElement;
-	#currentContainerCtrl = this;
+
+	#currentContainerCtrl: UmbSorterController<T> = this;
 	#currentContainerElement: Element | null = null;
 	#useContainerShadowRoot?: boolean;
 
@@ -133,6 +134,7 @@ export class UmbSorterController<T> implements UmbController {
 	#currentDragRect?: DOMRect;
 	#currentItem?: T | null;
 
+	#currentIndex?: number;
 	#dragX = 0;
 	#dragY = 0;
 
@@ -284,6 +286,9 @@ export class UmbSorterController<T> implements UmbController {
 			return;
 		}
 
+		// Get the current index of the item:
+		this.#currentIndex = this.#model.indexOf(this.#currentItem);
+
 		this.#currentElement.style.transform = 'translateZ(0)'; // Solves problem with FireFox and ShadowDom in the drag-image.
 
 		if (this.#config.dataTransferResolver) {
@@ -320,36 +325,6 @@ export class UmbSorterController<T> implements UmbController {
 
 		this.#stopAutoScroll();
 		this.removeAllowIndication();
-
-		if ((await this.#currentContainerCtrl.sync(this.#currentElement, this)) === false) {
-			// Sync could not succeed, might be because item is not allowed here.
-
-			this.#currentContainerCtrl = this;
-			if (this.#config.onContainerChange) {
-				this.#config.onContainerChange({
-					item: this.#currentItem,
-					element: this.#currentElement,
-					//ownerVM: this.#currentContainerVM.ownerVM,
-				});
-			}
-
-			/*
-			TODO: Lets somehow reset, without moving elements [NL]
-			// Lets move the Element back to where it came from:
-			const movingItemIndex = this.#model.indexOf(this.#currentItem);
-			if (movingItemIndex < this.#model.length - 1) {
-				const afterItem = this.#model[movingItemIndex + 1];
-				const afterEl = this.#config.querySelectModelToElement(this.#containerElement, afterItem);
-				if (afterEl) {
-					this.#containerElement.insertBefore(this.#currentElement, afterEl);
-				} else {
-					this.#containerElement.appendChild(this.#currentElement);
-				}
-			} else {
-				this.#containerElement.appendChild(this.#currentElement);
-			}
-			*/
-		}
 
 		if (this.#config.onEnd) {
 			this.#config.onEnd({ item: this.#currentItem, element: this.#currentElement });
@@ -395,23 +370,27 @@ export class UmbSorterController<T> implements UmbController {
 			const insideCurrentRect = isWithinRect(this.#dragX, this.#dragY, this.#currentDragRect);
 			if (!insideCurrentRect) {
 				if (this.#rqaId === undefined) {
-					this.#rqaId = requestAnimationFrame(this.#moveCurrentElement);
+					this.#rqaId = requestAnimationFrame(this.#updateDragMove);
 				}
 			}
 		}
 	};
 
-	#moveCurrentElement = () => {
+	#updateDragMove = () => {
 		this.#rqaId = undefined;
 		if (!this.#currentElement || !this.#currentContainerElement || !this.#currentItem) {
 			return;
 		}
+
+		console.log('this.#currentElement', this.#currentElement);
 
 		const currentElementRect = this.#currentElement.getBoundingClientRect();
 		const insideCurrentRect = isWithinRect(this.#dragX, this.#dragY, currentElementRect);
 		if (insideCurrentRect) {
 			return;
 		}
+
+		let toBeCurrentContainerCtrl: UmbSorterController<T> | undefined = undefined;
 
 		// If we have a boundarySelector, try it. If we didn't get anything fall back to currentContainerElement:
 		const currentBoundaryElement =
@@ -438,7 +417,7 @@ export class UmbSorterController<T> implements UmbController {
 					const parentContainerCtrl = (parentContainer as any)['__umbBlockGridSorterController']();
 					if (parentContainerCtrl.unique === this.controllerAlias) {
 						this.#currentContainerElement = parentContainer as Element;
-						this.#currentContainerCtrl = parentContainerCtrl;
+						toBeCurrentContainerCtrl = parentContainerCtrl;
 						if (this.#config.onContainerChange) {
 							this.#config.onContainerChange({
 								item: this.#currentItem,
@@ -527,7 +506,7 @@ export class UmbSorterController<T> implements UmbController {
 						const subCtrl = (subLayoutEl as any)['__umbBlockGridSorterController']();
 						if (subCtrl.unique === this.controllerAlias) {
 							this.#currentContainerElement = subLayoutEl as HTMLElement;
-							this.#currentContainerCtrl = subCtrl;
+							toBeCurrentContainerCtrl = subCtrl;
 							if (this.#config.onContainerChange) {
 								this.#config.onContainerChange({
 									item: this.#currentItem,
@@ -535,7 +514,7 @@ export class UmbSorterController<T> implements UmbController {
 									//ownerVM: this.#currentContainerVM.ownerVM,
 								});
 							}
-							this.#moveCurrentElement();
+							this.#updateDragMove();
 							return;
 						}
 					}
@@ -543,7 +522,9 @@ export class UmbSorterController<T> implements UmbController {
 			}
 
 			// Indication if drop is good:
-			if (this.updateAllowIndication(this.#currentContainerCtrl, this.#currentItem) === false) {
+			if (
+				this.updateAllowIndication(toBeCurrentContainerCtrl ?? this.#currentContainerCtrl, this.#currentItem) === false
+			) {
 				return;
 			}
 
@@ -590,81 +571,41 @@ export class UmbSorterController<T> implements UmbController {
 			}
 
 			const foundElIndex = orderedContainerElements.indexOf(foundEl);
-			const placeAt = placeAfter ? foundElIndex + 1 : foundElIndex;
-
-			this.#move(orderedContainerElements, placeAt);
+			const newIndex = placeAfter ? foundElIndex + 1 : foundElIndex;
+			this.#moveElementTo(toBeCurrentContainerCtrl, newIndex);
 
 			return;
 		}
 		// We skipped the above part cause we are above or below container:
 
 		// Indication if drop is good:
-		if (this.updateAllowIndication(this.#currentContainerCtrl, this.#currentItem) === false) {
+		if (
+			this.updateAllowIndication(toBeCurrentContainerCtrl ?? this.#currentContainerCtrl, this.#currentItem) === false
+		) {
 			return;
 		}
 
 		if (this.#dragY < currentContainerRect.top) {
-			this.#move(orderedContainerElements, 0);
+			this.#moveElementTo(toBeCurrentContainerCtrl, 0);
 		} else if (this.#dragY > currentContainerRect.bottom) {
-			this.#move(orderedContainerElements, -1);
+			this.#moveElementTo(toBeCurrentContainerCtrl, -1);
 		}
 	};
 
-	#move(orderedContainerElements: Array<Element>, newElIndex: number) {
-		if (!this.#currentElement || !this.#currentItem || !this.#currentContainerElement) return;
-
-		newElIndex = newElIndex === -1 ? orderedContainerElements.length : newElIndex;
-
-		const containerElement = this.#useContainerShadowRoot
-			? this.#currentContainerElement.shadowRoot ?? this.#currentContainerElement
-			: this.#currentContainerElement;
-
-		const localMove = this.#currentContainerElement === this.#containerElement;
-		let commentBefore;
-		let commentAfter;
-		if (localMove) {
-			commentBefore = this.#currentElement.previousSibling;
-			// nodeType 8 is a comment.
-			while (commentBefore && commentBefore.nodeType !== 8) {
-				commentBefore = commentBefore.previousSibling;
-			}
-			commentAfter = this.#currentElement.nextSibling;
-			// nodeType 8 is a comment.
-			while (commentAfter && commentAfter.nodeType !== 8) {
-				commentAfter = commentAfter.nextSibling;
-			}
-		} else {
-			console.log('THIS IS NOT A LOCAL MOVE, THIS CASE HAS TO BE HANDLED:');
-			// TODO: We need to figure out what to do about non-local moves. [NL]
+	async #moveElementTo(containerCtrl: UmbSorterController<T> | undefined, newIndex: number) {
+		if (!this.#currentElement) {
+			return;
 		}
 
-		const placeBeforeElement = orderedContainerElements[newElIndex];
-		if (placeBeforeElement) {
-			// We do not need to move this, if the element to be placed before is it self.
-			if (placeBeforeElement !== this.#currentElement) {
-				containerElement.insertBefore(this.#currentElement, placeBeforeElement);
-				if (commentBefore) {
-					containerElement.insertBefore(commentBefore, this.#currentElement);
-				}
-				if (commentAfter) {
-					containerElement.insertBefore(commentAfter, this.#currentElement.nextSibling);
-				}
-			}
-		} else {
-			if (commentBefore) {
-				containerElement.appendChild(commentBefore);
-			}
-			containerElement.appendChild(this.#currentElement);
-			if (commentAfter) {
-				containerElement.appendChild(commentAfter);
-			}
-		}
+		containerCtrl ??= this as UmbSorterController<T>;
 
-		this.#config.onChange?.({
-			element: this.#currentElement,
-			item: this.#currentItem,
-			//ownerVM: this.#currentContainerVM.ownerVM
-		});
+		// If same container and same index, do nothing:
+		if (this.#currentContainerCtrl === containerCtrl && this.#currentIndex === newIndex) return;
+
+		if (await containerCtrl.updateModel(newIndex, this.#currentElement, this.#currentContainerCtrl)) {
+			this.#currentContainerCtrl = containerCtrl;
+			this.#currentIndex = newIndex;
+		}
 	}
 
 	/** Management methods: */
@@ -678,26 +619,27 @@ export class UmbSorterController<T> implements UmbController {
 
 	public async removeItem(item: T) {
 		if (!item) {
-			return null;
+			return false;
 		}
 
 		if (this.#config.performItemRemove) {
-			return await this.#config.performItemRemove({ item });
+			return (await this.#config.performItemRemove({ item })) ?? false;
 		} else {
 			const oldIndex = this.#model.indexOf(item);
 			if (oldIndex !== -1) {
-				return this.#model.splice(oldIndex, 1)[0];
+				this.#model.splice(oldIndex, 1);
+				return true;
 			}
 		}
-		return null;
+		return false;
 	}
 
 	hasOtherItemsThan(item: T) {
 		return this.#model.filter((x) => x !== item).length > 0;
 	}
 
-	public async sync(element: HTMLElement, fromController: UmbSorterController<T>) {
-		const movingItem = fromController.getItemOfElement(element);
+	public async updateModel(newIndex: number, element: HTMLElement, fromCtrl: UmbSorterController<T>) {
+		const movingItem = fromCtrl.getItemOfElement(element);
 		if (!movingItem) {
 			console.error('Could not find item of sync item');
 			return false;
@@ -705,37 +647,16 @@ export class UmbSorterController<T> implements UmbController {
 		if (this.notifyRequestDrop({ item: movingItem }) === false) {
 			return false;
 		}
-		if (fromController.removeItem(movingItem) === null) {
+		if ((await fromCtrl.removeItem(movingItem)) !== true) {
 			console.error('Sync could not remove item');
 			return false;
 		}
 
-		/** Find next element, to then find the index of that element in items-data, to use as a safe reference to where the item will go in our items-data.
-		 * This enables the container to contain various other elements and as well having these elements change while sorting is occurring.
-		 */
-
-		// find next valid element (This assumes the next element in DOM is presented in items-data, aka. only moving one item between each sync)
-		let nextEl: Element | null = null;
-		let loopEl: Element | null = element;
-		while ((loopEl = loopEl?.nextElementSibling)) {
-			if (loopEl.matches && loopEl.matches(this.#config.itemSelector)) {
-				nextEl = loopEl;
-				break;
-			}
-		}
-
-		let newIndex = this.#model.length;
-
-		const movingItemIndex = this.#model.indexOf(movingItem);
+		const localMove = fromCtrl === this;
+		const movingItemIndex = localMove ? this.#model.indexOf(movingItem) : -1;
 
 		if (movingItemIndex !== -1 && movingItemIndex <= movingItemIndex) {
 			newIndex--;
-		}
-
-		if (nextEl) {
-			// We had a reference element, we want to get the index of it.
-			// This is might a problem if a item is being moved forward? (was also like this in the AngularJS version...)
-			newIndex = this.#model.findIndex((entry) => this.#config.compareElementToModel(nextEl! as HTMLElement, entry));
 		}
 
 		if (this.#config.performItemInsert) {
@@ -747,9 +668,9 @@ export class UmbSorterController<T> implements UmbController {
 			this.#model.splice(newIndex, 0, movingItem);
 		}
 
-		const eventData = { item: movingItem, fromController: fromController, toController: this };
-		if (fromController !== this) {
-			fromController.notifySync(eventData);
+		const eventData = { item: movingItem, fromController: fromCtrl, toController: this };
+		if (fromCtrl !== this) {
+			fromCtrl.notifySync(eventData);
 		}
 		this.notifySync(eventData);
 
