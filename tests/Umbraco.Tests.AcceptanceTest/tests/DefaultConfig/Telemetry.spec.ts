@@ -13,7 +13,7 @@ test.describe('Telemetry tests', () => {
     await umbracoApi.telemetry.setLevel("Basic");
   });
 
-  test('can change telemetry level', async ({umbracoApi, umbracoUi}) => {
+  test('can change telemetry level', async ({page, umbracoApi, umbracoUi}) => {
     // Arrange
     const expectedLevel = "Minimal";
     const levelValue = "1";
@@ -22,8 +22,13 @@ test.describe('Telemetry tests', () => {
     await umbracoUi.telemetryData.clickSaveButton();
     // Assert
     // UI
-    await umbracoUi.reloadPage();
-    await umbracoUi.telemetryData.doesTelemetryDataLevelHaveValue(levelValue)
+    await Promise.all([
+      page.waitForResponse(resp => (umbracoApi.baseUrl + '/umbraco/management/api/v1/telemetry/level') && resp.status() === 200),
+      await umbracoUi.reloadPage()
+
+    ]);
+
+    await umbracoUi.telemetryData.doesTelemetryDataLevelHaveValue(levelValue);
     // API
     expect(await umbracoApi.telemetry.getLevel() == expectedLevel).toBeTruthy();
   });
