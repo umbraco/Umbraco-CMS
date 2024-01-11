@@ -78,6 +78,7 @@ export class ExampleSorterDashboard extends UmbElementMixin(LitElement) {
 						(item) =>
 							html`<div class="sorter-item" data-name=${item.name}>
 								${item.name} <button @click=${() => this.removeItem(item)}>Delete</button>
+								<!-- make something that visually takes some time to display, like a large image.-->
 							</div>`,
 					)}
 				</div>
