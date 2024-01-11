@@ -5,7 +5,6 @@ test.describe('Date Picker and Date Picker with time tests', () => {
   let dataTypeDefaultData = null;
   let dataTypeData = null;
 
-
   test.beforeEach(async ({umbracoUi}) => {
     await umbracoUi.goToBackOffice();
     await umbracoUi.dataType.goToSettingsTreeItem('Data Types');
