@@ -35,10 +35,24 @@ internal class ContentPropertyDisplayMapper : ContentPropertyBasicMapper<Content
     public override void Map(IProperty originalProp, ContentPropertyDisplay dest, MapperContext context)
     {
         base.Map(originalProp, dest, context);
+        object? config = null;
+        if (originalProp.PropertyType is not null)
+        {
+            if (!context.Items.ContainsKey($"DataType-{originalProp.PropertyType.DataTypeId}"))
+            {
+                // get the configuration from the property type
+                var item = DataTypeService.GetDataType(originalProp.PropertyType.DataTypeId);
+                config = item?.Configuration;
+                context.Items[$"DataType-{originalProp.PropertyType.DataTypeId}"] = item;
+            }
+            else
+            {
+                // get the configuration from the context
+                config = (context.Items[$"DataType-{originalProp.PropertyType.DataTypeId}"] as IDataType)
+                    ?.Configuration;
+            }
+        }
 
-        var config = originalProp.PropertyType is null
-            ? null
-            : DataTypeService.GetDataType(originalProp.PropertyType.DataTypeId)?.Configuration;
 
         // TODO: IDataValueEditor configuration - general issue
         // GetValueEditor() returns a non-configured IDataValueEditor

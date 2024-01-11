@@ -68,6 +68,8 @@ internal abstract class BlockValuePropertyValueEditorBase : DataValueEditor, IDa
     protected IEnumerable<ITag> GetBlockValueTags(BlockValue blockValue, int? languageId)
     {
         var result = new List<ITag>();
+        IDictionary<int, IDataType?> dataTypes = new Dictionary<int, IDataType?>();
+
         // loop through all content and settings data
         foreach (BlockItemData row in blockValue.ContentData.Concat(blockValue.SettingsData))
         {
@@ -81,7 +83,17 @@ internal abstract class BlockValuePropertyValueEditorBase : DataValueEditor, IDa
                     continue;
                 }
 
-                object? configuration = _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeKey)?.Configuration;
+                IDataType? dataType = null;
+                if (dataTypes.ContainsKey(prop.Value.PropertyType.DataTypeId))
+                {
+                    dataType = dataTypes[prop.Value.PropertyType.DataTypeId];
+                }
+                else
+                {
+                    dataType = _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeId);
+                    dataTypes.Add(prop.Value.PropertyType.DataTypeId, dataType);
+                }
+                var configuration = dataType?.Configuration;
 
                 result.AddRange(tagsProvider.GetTags(prop.Value.Value, configuration, languageId));
             }
@@ -105,7 +117,7 @@ internal abstract class BlockValuePropertyValueEditorBase : DataValueEditor, IDa
     private void MapBlockItemDataToEditor(IProperty property, List<BlockItemData> items)
     {
         var valEditors = new Dictionary<int, IDataValueEditor>();
-
+        IDictionary<int, IDataType?> dataTypes = new Dictionary<int, IDataType?>();
         foreach (BlockItemData row in items)
         {
             foreach (KeyValuePair<string, BlockItemData.BlockPropertyValue> prop in row.PropertyValues)
@@ -126,7 +138,17 @@ internal abstract class BlockValuePropertyValueEditorBase : DataValueEditor, IDa
                     continue;
                 }
 
-                IDataType? dataType = _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeId);
+                IDataType? dataType = null;
+                if (dataTypes.ContainsKey(prop.Value.PropertyType.DataTypeId))
+                {
+                    dataType = dataTypes[prop.Value.PropertyType.DataTypeId];
+                }
+                else
+                {
+                    dataType = _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeId);
+                    dataTypes.Add(prop.Value.PropertyType.DataTypeId, dataType);
+                }
+
                 if (dataType == null)
                 {
                     // deal with weird situations by ignoring them (no comment)
@@ -157,12 +179,24 @@ internal abstract class BlockValuePropertyValueEditorBase : DataValueEditor, IDa
 
     private void MapBlockItemDataFromEditor(List<BlockItemData> items)
     {
+        IDictionary<int, IDataType?> dataTypes = new Dictionary<int, IDataType?>();
+
         foreach (BlockItemData row in items)
         {
             foreach (KeyValuePair<string, BlockItemData.BlockPropertyValue> prop in row.PropertyValues)
             {
                 // Fetch the property types prevalue
-                var propConfiguration = _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeId)?.Configuration;
+                IDataType? dataType = null;
+                if (dataTypes.ContainsKey(prop.Value.PropertyType.DataTypeId))
+                {
+                    dataType = dataTypes[prop.Value.PropertyType.DataTypeId];
+                }
+                else
+                {
+                    dataType = _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeId);
+                    dataTypes.Add(prop.Value.PropertyType.DataTypeId, dataType);
+                }
+                var propConfiguration = dataType?.Configuration;
 
                 // Lookup the property editor
                 IDataEditor? propEditor = _propertyEditors[prop.Value.PropertyType.PropertyEditorAlias];
