@@ -20,8 +20,16 @@ test.describe('Telemetry tests', () => {
     await umbracoUi.telemetryData.clickTelemetryDataTab();
     await umbracoUi.telemetryData.changeTelemetryDataLevelValue(levelValue);
     await umbracoUi.telemetryData.clickSaveButton();
+
+    // Waits until the Telemetry level is saved
+    await Promise.all([
+      page.waitForResponse(resp => (umbracoApi.baseUrl + '/umbraco/management/api/v1/telemetry/level') && resp.status() === 200),
+      await umbracoUi.telemetryData.clickSaveButton()
+    ]);
+
     // Assert
     // UI
+    // Waits until the page is reloaded and for the network response for the Telemetry level
     await Promise.all([
       page.waitForResponse(resp => (umbracoApi.baseUrl + '/umbraco/management/api/v1/telemetry/level') && resp.status() === 200),
       await umbracoUi.reloadPage()
