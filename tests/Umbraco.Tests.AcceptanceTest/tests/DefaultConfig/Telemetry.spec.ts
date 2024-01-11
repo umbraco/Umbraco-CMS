@@ -20,12 +20,10 @@ test.describe('Telemetry tests', () => {
     await umbracoUi.telemetryData.clickTelemetryDataTab();
     await umbracoUi.telemetryData.changeTelemetryDataLevelValue(levelValue);
     await umbracoUi.telemetryData.clickSaveButton();
-    await umbracoUi.telemetryData.clickSaveButton();
 
     // Assert
     // UI
     await umbracoUi.reloadPage();
-
     await expect(page.locator('[name="telemetryLevel"] >> input[id=input]')).toHaveValue(levelValue, {timeout: 20000});
     // await umbracoUi.telemetryData.doesTelemetryDataLevelHaveValue(levelValue);
 
