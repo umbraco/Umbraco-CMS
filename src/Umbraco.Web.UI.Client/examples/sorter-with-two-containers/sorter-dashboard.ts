@@ -44,12 +44,14 @@ export class ExampleSorterDashboard extends UmbElementMixin(LitElement) {
 		...SORTER_CONFIG,
 		performItemInsert: ({ item, newIndex }) => {
 			this._items.splice(newIndex, 0, item);
+			console.log('inserted', item.name, 'at', newIndex, '	', this._items.map((x) => x.name).join(', '));
 			this.requestUpdate('_items');
 			return true;
 		},
 		performItemRemove: ({ item }) => {
 			const indexToMove = this._items.findIndex((x) => x.name === item.name);
 			this._items.splice(indexToMove, 1);
+			console.log('removed', item.name, 'at', indexToMove, '	', this._items.map((x) => x.name).join(', '));
 			this.requestUpdate('_items');
 			return true;
 		},
