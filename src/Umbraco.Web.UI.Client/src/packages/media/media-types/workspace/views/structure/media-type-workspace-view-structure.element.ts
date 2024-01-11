@@ -1,5 +1,5 @@
 import { UmbMediaTypeWorkspaceContext } from '../../media-type-workspace.context.js';
-import type { UmbMediaTypeInputElement } from '../../../components/media-type-input/media-type-input.element.js';
+import type { UmbInputMediaTypeElement } from '../../../components/input-media-type/input-media-type.element.js';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UUIToggleElement } from '@umbraco-cms/backoffice/external/uui';
@@ -59,16 +59,16 @@ export class UmbMediaTypeWorkspaceViewStructureElement extends UmbLitElement imp
 					</div>
 					<div slot="editor">
 						<!-- TODO: maybe we want to somehow display the hierarchy, but not necessary in the same way as old backoffice? -->
-						<umb-media-type-input
+						<umb-input-media-type
 							.selectedIds=${this._allowedContentTypeIDs ?? []}
 							@change="${(e: CustomEvent) => {
-								const sortedContentTypesList = (e.target as UmbMediaTypeInputElement).selectedIds.map((id, index) => ({
+								const sortedContentTypesList = (e.target as UmbInputMediaTypeElement).selectedIds.map((id, index) => ({
 									id: id,
 									sortOrder: index,
 								}));
 								this.#workspaceContext?.updateProperty('allowedContentTypes', sortedContentTypesList);
 							}}">
-						</umb-media-type-input>
+						</umb-input-media-type>
 					</div>
 				</umb-property-layout>
 			</uui-box>

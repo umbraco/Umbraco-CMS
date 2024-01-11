@@ -1,12 +1,12 @@
-import { UmbMediaTypePickerContext } from './media-type-input.context.js';
+import { UmbMediaTypePickerContext } from './input-media-type.context.js';
 import { css, html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { MediaTypeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 
-@customElement('umb-media-type-input')
-export class UmbMediaTypeInputElement extends FormControlMixin(UmbLitElement) {
+@customElement('umb-input-media-type')
+export class UmbInputMediaTypeElement extends FormControlMixin(UmbLitElement) {
 	/**
 	 * This is a minimum amount of selected items in this input.
 	 * @type {number}
@@ -138,10 +138,10 @@ export class UmbMediaTypeInputElement extends FormControlMixin(UmbLitElement) {
 	];
 }
 
-export default UmbMediaTypeInputElement;
+export default UmbInputMediaTypeElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-media-type-input': UmbMediaTypeInputElement;
+		'umb-input-media-type': UmbInputMediaTypeElement;
 	}
 }
