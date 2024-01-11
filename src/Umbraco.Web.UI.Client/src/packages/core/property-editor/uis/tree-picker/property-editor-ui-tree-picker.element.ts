@@ -1,8 +1,7 @@
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { StartNode } from '@umbraco-cms/backoffice/components';
-import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import { type UmbPropertyEditorConfigCollection, UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbInputTreeElement } from '@umbraco-cms/backoffice/tree';
 import type { UmbTreePickerSource } from '@umbraco-cms/backoffice/components';
@@ -45,8 +44,6 @@ export class UmbPropertyEditorUITreePickerElement extends UmbLitElement implemen
 			this.startNodeId = startNode.id;
 		}
 
-		// TODO: The value from `config.getValueByAlias('maxNumber')` could be a `string`, can't be cast as a `number`. [LK]
-		// This causes issues when the `max` value is compared against other numbers, e.g. `max === 1` would be false.
 		this.min = Number(config?.getValueByAlias('minNumber')) || 0;
 		this.max = Number(config?.getValueByAlias('maxNumber')) || 0;
 
@@ -57,8 +54,7 @@ export class UmbPropertyEditorUITreePickerElement extends UmbLitElement implemen
 
 	#onChange(e: CustomEvent) {
 		this.value = (e.target as UmbInputTreeElement).value as string;
-		// TODO: Unable to save MNTP value, as the management API is expecting UDI, not GUIDs. [LK]
-		this.dispatchEvent(new CustomEvent('property-value-change'));
+		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
 	render() {
