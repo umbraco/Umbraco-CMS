@@ -2,8 +2,8 @@
 import {expect} from "@playwright/test";
 
 test.describe('Label tests', () => {
-  let dataTypeDefaultData;
-  let dataTypeData;
+  let dataTypeDefaultData = null;
+  let dataTypeData = null;
 
 
   test.beforeEach(async ({umbracoUi}) => {
@@ -12,7 +12,9 @@ test.describe('Label tests', () => {
   });
 
   test.afterEach(async ({umbracoApi}) => {
-    await umbracoApi.dataType.update(dataTypeDefaultData.id, dataTypeDefaultData);   
+    if (dataTypeDefaultData !== null) {
+      await umbracoApi.dataType.update(dataTypeDefaultData.id, dataTypeDefaultData); 
+    }    
   });
 
   const labelTypes = ['Label (bigint)', 'Label (datetime)', 'Label (decimal)', 'Label (integer)', 'Label (string)', 'Label (time)'];

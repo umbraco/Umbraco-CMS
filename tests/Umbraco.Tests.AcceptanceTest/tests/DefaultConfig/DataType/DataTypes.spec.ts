@@ -66,10 +66,11 @@ test.describe('Data Types basic functionalities tests', () => {
   });
 
   test('can change Property Editor in a data type', async ({umbracoApi, umbracoUi}) => {
+    // Arrange
     const editorName = 'Text Area';
     const editorAlias = 'Umbraco.TextArea';
     const editorUiAlias = 'Umb.PropertyEditorUi.TextArea';
-    // Arrange
+    
     await umbracoApi.dataType.ensureNameNotExists(dataTypeName);
     await umbracoApi.dataType.create(dataTypeName, propertyEditorAlias, []);
     expect(await umbracoApi.dataType.doesNameExist(dataTypeName)).toBeTruthy();
