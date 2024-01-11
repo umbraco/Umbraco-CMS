@@ -94,7 +94,7 @@ export class ExampleSorterDashboard extends UmbElementMixin(LitElement) {
 				display: flex;
 				align-items: center;
 				justify-content: space-between;
-				padding: var(--uui-size-layout-0);
+				padding: var(--uui-size-layout-1);
 				border: 1px solid var(--uui-color-border);
 				border-radius: var(--uui-border-radius);
 				margin-bottom: 3px;
