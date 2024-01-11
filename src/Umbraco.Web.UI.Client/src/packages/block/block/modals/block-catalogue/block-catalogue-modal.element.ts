@@ -2,10 +2,11 @@ import {
 	UmbBlockCatalogueModalData,
 	UmbBlockCatalogueModalValue,
 	UmbBlockCatalogueView,
-	UmbBlockTypeBase,
+	UmbBlockTypeWithGroupKey,
 } from '@umbraco-cms/backoffice/block';
 import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/document';
-import { css, html, customElement, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, repeat, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { groupBy } from '@umbraco-cms/backoffice/external/lodash';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-block-catalogue-modal')
@@ -14,21 +15,7 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 	UmbBlockCatalogueModalValue
 > {
 	@state()
-	private _blocks: Array<UmbBlockTypeBase> = [
-		{
-			contentElementTypeKey: 'block-catalogue-currency',
-			backgroundColor: '#FFD700',
-			iconColor: 'black',
-			icon: 'icon-coins',
-			label: 'Currency',
-		},
-		{
-			contentElementTypeKey: 'block-catalogue-niels-cup-of-coffee',
-			backgroundColor: '#964B00',
-			iconColor: '#FFFDD0',
-			icon: 'icon-coffee',
-			label: "Niels' Cup of Coffee",
-		},
+	private _blocks: Array<UmbBlockTypeWithGroupKey> = [
 		{
 			contentElementTypeKey: 'block-catalogue-performance',
 			label: 'Performance',
@@ -43,6 +30,30 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 			contentElementTypeKey: 'block-catalogue-servers',
 			label: 'Servers',
 			icon: 'icon-stacked-disks',
+		},
+		{
+			contentElementTypeKey: 'block-catalogue-currency',
+			backgroundColor: '#FFD700',
+			iconColor: 'black',
+			icon: 'icon-coins',
+			label: 'Currency',
+			groupKey: 'block-catalogue-demo-blocks-group',
+		},
+		{
+			contentElementTypeKey: 'block-catalogue-niels-cup-of-coffee',
+			backgroundColor: '#964B00',
+			iconColor: '#FFFDD0',
+			icon: 'icon-coffee',
+			label: "Niels' Cup of Coffee",
+			groupKey: 'block-catalogue-demo-blocks-group',
+		},
+	];
+
+	@state()
+	private _blockGroups: Array<{ key: string; name: string }> = [
+		{
+			key: 'block-catalogue-demo-blocks-group',
+			name: 'Demo Blocks',
 		},
 	];
 
@@ -74,9 +85,7 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 		return html`
 			<umb-body-layout headline="${this.localize.term('blockEditor_addBlock')}">
 				${this.#renderViews()}
-				<uui-box>
-					<div>${this.view === 'clipboard' ? this.#renderClipboard() : this.#renderCreateEmpty()}</div>
-				</uui-box>
+				<uui-box> ${this.view === 'clipboard' ? this.#renderClipboard() : this.#renderCreateEmpty()} </uui-box>
 				<div slot="actions">
 					<uui-button label=${this.localize.term('general_close')} @click=${this._rejectModal}></uui-button>
 					<uui-button
@@ -94,17 +103,34 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 	}
 
 	#renderCreateEmpty() {
-		return repeat(
-			this._blocks,
-			(block) => block.label,
-			(block) =>
-				html` <uui-card-block-type
-					name=${ifDefined(block.label)}
-					background=${ifDefined(block.backgroundColor)}
-					style="color: ${block.iconColor}">
-					<uui-icon .name=${block.icon ?? ''}></uui-icon>
-				</uui-card-block-type>`,
-		);
+		const blockArrays = groupBy(this._blocks, 'groupKey');
+
+		const mappedGroupsAndBlocks = Object.entries(blockArrays).map(([key, value]) => {
+			const group = this._blockGroups.find((group) => group.key === key);
+			return { name: group?.name, blocks: value };
+		});
+
+		return html`
+			${mappedGroupsAndBlocks.map(
+				(group) => html`
+					${group.name ? html`<h2>${group.name}</h2>` : nothing}
+					<div class="blockGroup">
+						${repeat(
+							group.blocks,
+							(block) => block.contentElementTypeKey,
+							(block) => html`
+								<uui-card-block-type
+									name=${ifDefined(block.label)}
+									background=${ifDefined(block.backgroundColor)}
+									style="color: ${block.iconColor}">
+									<uui-icon .name=${block.icon ?? ''}></uui-icon>
+								</uui-card-block-type>
+							`,
+						)}
+					</div>
+				`,
+			)}
+		`;
 	}
 
 	#renderViews() {
@@ -127,7 +153,7 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 
 	static styles = [
 		css`
-			uui-box div {
+			uui-box .blockGroup {
 				display: grid;
 				gap: 1rem;
 				grid-template-columns: repeat(auto-fill, minmax(min(150px, 100%), 1fr));

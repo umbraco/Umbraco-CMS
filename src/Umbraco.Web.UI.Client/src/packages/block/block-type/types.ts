@@ -9,5 +9,9 @@ export interface UmbBlockTypeBase {
 	iconColor?: string;
 	backgroundColor?: string;
 	editorSize?: UUIModalSidebarSize;
-	icon?: string;
+	icon?: string; // remove later
+}
+
+export interface UmbBlockTypeWithGroupKey extends UmbBlockTypeBase {
+	groupKey?: null | string;
 }
