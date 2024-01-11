@@ -123,8 +123,9 @@ export class UmbSorterController<T> implements UmbController {
 	#rqaId?: number;
 
 	#containerElement!: HTMLElement;
-	#currentContainerVM = this;
+	#currentContainerCtrl = this;
 	#currentContainerElement: Element | null = null;
+	#useContainerShadowRoot?: boolean;
 
 	#scrollElement?: Element | null;
 	#currentElement?: HTMLElement;
@@ -135,7 +136,7 @@ export class UmbSorterController<T> implements UmbController {
 	#dragX = 0;
 	#dragY = 0;
 
-	private _lastIndicationContainerVM: UmbSorterController<T> | null = null;
+	#lastIndicationContainerCtrl: UmbSorterController<T> | null = null;
 
 	public get controllerAlias() {
 		return this.#config.identifier;
@@ -185,6 +186,8 @@ export class UmbSorterController<T> implements UmbController {
 				? this.#host.shadowRoot!.querySelector(this.#config.containerSelector)
 				: this.#host) ?? this.#host;
 
+		this.#useContainerShadowRoot = this.#containerElement === this.#host;
+
 		if (this.#currentContainerElement === this.#containerElement) {
 			this.#currentContainerElement = containerEl;
 		}
@@ -198,7 +201,10 @@ export class UmbSorterController<T> implements UmbController {
 		// TODO: Clean up??
 		this.#observer.disconnect();
 
-		const containerElement = this.#containerElement.shadowRoot ?? this.#containerElement;
+		// Only look at the shadowRoot if the containerElement is host.
+		const containerElement = this.#useContainerShadowRoot
+			? this.#containerElement.shadowRoot ?? this.#containerElement
+			: this.#containerElement;
 		containerElement.querySelectorAll(this.#config.itemSelector).forEach((child) => {
 			if (child.matches && child.matches(this.#config.itemSelector)) {
 				this.setupItem(child as HTMLElement);
@@ -226,7 +232,7 @@ export class UmbSorterController<T> implements UmbController {
 
 		if (!this.#config.disabledItemSelector || !element.matches(this.#config.disabledItemSelector)) {
 			element.draggable = true;
-			element.addEventListener('dragstart', this.handleDragStart);
+			element.addEventListener('dragstart', this.#handleDragStart);
 		}
 	}
 
@@ -235,12 +241,12 @@ export class UmbSorterController<T> implements UmbController {
 			destroyIgnorerElements(element, this.#config.ignorerSelector);
 		}
 
-		element.removeEventListener('dragstart', this.handleDragStart);
+		element.removeEventListener('dragstart', this.#handleDragStart);
 	}
 
-	handleDragStart = (event: DragEvent) => {
+	#handleDragStart = (event: DragEvent) => {
 		if (this.#currentElement) {
-			this.handleDragEnd();
+			this.#handleDragEnd();
 		}
 
 		event.stopPropagation();
@@ -285,11 +291,11 @@ export class UmbSorterController<T> implements UmbController {
 		}
 
 		if (this.#config.onStart) {
-			this.#config.onStart({ item: this.#currentItem!, element: this.#currentElement });
+			this.#config.onStart({ item: this.#currentItem, element: this.#currentElement });
 		}
 
-		window.addEventListener('dragover', this.handleDragMove);
-		window.addEventListener('dragend', this.handleDragEnd);
+		window.addEventListener('dragover', this.#handleDragMove);
+		window.addEventListener('dragend', this.#handleDragEnd);
 
 		// We must wait one frame before changing the look of the block.
 		this.#rqaId = requestAnimationFrame(() => {
@@ -302,23 +308,23 @@ export class UmbSorterController<T> implements UmbController {
 		});
 	};
 
-	handleDragEnd = async () => {
+	#handleDragEnd = async () => {
 		if (!this.#currentElement || !this.#currentItem) {
 			return;
 		}
 
-		window.removeEventListener('dragover', this.handleDragMove);
-		window.removeEventListener('dragend', this.handleDragEnd);
+		window.removeEventListener('dragover', this.#handleDragMove);
+		window.removeEventListener('dragend', this.#handleDragEnd);
 		this.#currentElement.style.transform = '';
 		this.#currentElement.classList.remove(this.#config.placeholderClass);
 
-		this.stopAutoScroll();
+		this.#stopAutoScroll();
 		this.removeAllowIndication();
 
-		if ((await this.#currentContainerVM.sync(this.#currentElement, this)) === false) {
+		if ((await this.#currentContainerCtrl.sync(this.#currentElement, this)) === false) {
 			// Sync could not succeed, might be because item is not allowed here.
 
-			this.#currentContainerVM = this;
+			this.#currentContainerCtrl = this;
 			if (this.#config.onContainerChange) {
 				this.#config.onContainerChange({
 					item: this.#currentItem,
@@ -327,6 +333,8 @@ export class UmbSorterController<T> implements UmbController {
 				});
 			}
 
+			/*
+			TODO: Lets somehow reset, without moving elements [NL]
 			// Lets move the Element back to where it came from:
 			const movingItemIndex = this.#model.indexOf(this.#currentItem);
 			if (movingItemIndex < this.#model.length - 1) {
@@ -340,6 +348,7 @@ export class UmbSorterController<T> implements UmbController {
 			} else {
 				this.#containerElement.appendChild(this.#currentElement);
 			}
+			*/
 		}
 
 		if (this.#config.onEnd) {
@@ -348,12 +357,12 @@ export class UmbSorterController<T> implements UmbController {
 
 		if (this.#rqaId) {
 			cancelAnimationFrame(this.#rqaId);
+			this.#rqaId = undefined;
 		}
 
 		this.#currentContainerElement = this.#containerElement;
-		this.#currentContainerVM = this;
+		this.#currentContainerCtrl = this;
 
-		this.#rqaId = undefined;
 		this.#currentItem = undefined;
 		this.#currentElement = undefined;
 		this.#currentDragElement = undefined;
@@ -362,7 +371,7 @@ export class UmbSorterController<T> implements UmbController {
 		this.#dragY = 0;
 	};
 
-	handleDragMove = (event: DragEvent) => {
+	#handleDragMove = (event: DragEvent) => {
 		if (!this.#currentElement) {
 			return;
 		}
@@ -386,13 +395,13 @@ export class UmbSorterController<T> implements UmbController {
 			const insideCurrentRect = isWithinRect(this.#dragX, this.#dragY, this.#currentDragRect);
 			if (!insideCurrentRect) {
 				if (this.#rqaId === undefined) {
-					this.#rqaId = requestAnimationFrame(this.moveCurrentElement);
+					this.#rqaId = requestAnimationFrame(this.#moveCurrentElement);
 				}
 			}
 		}
 	};
 
-	moveCurrentElement = () => {
+	#moveCurrentElement = () => {
 		this.#rqaId = undefined;
 		if (!this.#currentElement || !this.#currentContainerElement || !this.#currentItem) {
 			return;
@@ -404,7 +413,7 @@ export class UmbSorterController<T> implements UmbController {
 			return;
 		}
 
-		// If we have a boundarySelector, try it, if we didn't get anything fall back to currentContainerElement.
+		// If we have a boundarySelector, try it. If we didn't get anything fall back to currentContainerElement:
 		const currentBoundaryElement =
 			(this.#config.boundarySelector
 				? this.#currentContainerElement.closest(this.#config.boundarySelector)
@@ -412,24 +421,24 @@ export class UmbSorterController<T> implements UmbController {
 
 		const currentBoundaryRect = currentBoundaryElement.getBoundingClientRect();
 
-		const currentContainerHasItems = this.#currentContainerVM.hasOtherItemsThan(this.#currentItem!);
+		const currentContainerHasItems = this.#currentContainerCtrl.hasOtherItemsThan(this.#currentItem);
 
 		// if empty we will be move likely to accept an item (add 20px to the bounding box)
-		// If we have items we must be 10 within the container to accept the move.
+		// If we have items we must be 10px within the container to accept the move.
 		const offsetEdge = currentContainerHasItems ? -10 : 20;
 		if (!isWithinRect(this.#dragX, this.#dragY, currentBoundaryRect, offsetEdge)) {
 			// we are outside the current container boundary, so lets see if there is a parent we can move.
 			const parentNode = this.#currentContainerElement.parentNode;
-			if (parentNode) {
+			if (parentNode && this.#config.containerSelector) {
 				// TODO: support multiple parent shadowDOMs?
-				const parentContainer = this.#config.containerSelector
-					? (parentNode as HTMLElement).closest(this.#config.containerSelector)
-					: null;
+				const parentContainer = (parentNode as ShadowRoot).host
+					? (parentNode as ShadowRoot).host.closest(this.#config.containerSelector)
+					: (parentNode as HTMLElement).closest(this.#config.containerSelector);
 				if (parentContainer) {
-					const parentContainerVM = (parentContainer as any)['__umbBlockGridSorterController']();
-					if (parentContainerVM.unique === this.controllerAlias) {
+					const parentContainerCtrl = (parentContainer as any)['__umbBlockGridSorterController']();
+					if (parentContainerCtrl.unique === this.controllerAlias) {
 						this.#currentContainerElement = parentContainer as Element;
-						this.#currentContainerVM = parentContainerVM;
+						this.#currentContainerCtrl = parentContainerCtrl;
 						if (this.#config.onContainerChange) {
 							this.#config.onContainerChange({
 								item: this.#currentItem,
@@ -442,12 +451,12 @@ export class UmbSorterController<T> implements UmbController {
 			}
 		}
 
+		const containerElement = this.#useContainerShadowRoot
+			? this.#currentContainerElement.shadowRoot ?? this.#currentContainerElement
+			: this.#currentContainerElement;
+
 		// We want to retrieve the children of the container, every time to ensure we got the right order and index
-		const orderedContainerElements = Array.from(
-			this.#currentContainerElement.shadowRoot
-				? this.#currentContainerElement.shadowRoot.querySelectorAll(this.#config.itemSelector)
-				: this.#currentContainerElement.querySelectorAll(this.#config.itemSelector),
-		);
+		const orderedContainerElements = Array.from(containerElement.querySelectorAll(this.#config.itemSelector));
 
 		const currentContainerRect = this.#currentContainerElement.getBoundingClientRect();
 
@@ -515,10 +524,10 @@ export class UmbSorterController<T> implements UmbController {
 					// gather elements on the same row.
 					const subOffsetEdge = subContainerHasItems ? -10 : 20;
 					if (isWithinRect(this.#dragX, this.#dragY, subBoundaryRect, subOffsetEdge)) {
-						const subVm = (subLayoutEl as any)['__umbBlockGridSorterController']();
-						if (subVm.unique === this.controllerAlias) {
+						const subCtrl = (subLayoutEl as any)['__umbBlockGridSorterController']();
+						if (subCtrl.unique === this.controllerAlias) {
 							this.#currentContainerElement = subLayoutEl as HTMLElement;
-							this.#currentContainerVM = subVm;
+							this.#currentContainerCtrl = subCtrl;
 							if (this.#config.onContainerChange) {
 								this.#config.onContainerChange({
 									item: this.#currentItem,
@@ -526,7 +535,7 @@ export class UmbSorterController<T> implements UmbController {
 									//ownerVM: this.#currentContainerVM.ownerVM,
 								});
 							}
-							this.moveCurrentElement();
+							this.#moveCurrentElement();
 							return;
 						}
 					}
@@ -534,7 +543,7 @@ export class UmbSorterController<T> implements UmbController {
 			}
 
 			// Indication if drop is good:
-			if (this.updateAllowIndication(this.#currentContainerVM, this.#currentItem) === false) {
+			if (this.updateAllowIndication(this.#currentContainerCtrl, this.#currentItem) === false) {
 				return;
 			}
 
@@ -583,48 +592,79 @@ export class UmbSorterController<T> implements UmbController {
 			const foundElIndex = orderedContainerElements.indexOf(foundEl);
 			const placeAt = placeAfter ? foundElIndex + 1 : foundElIndex;
 
-			this.move(orderedContainerElements, placeAt);
+			this.#move(orderedContainerElements, placeAt);
 
 			return;
 		}
 		// We skipped the above part cause we are above or below container:
 
 		// Indication if drop is good:
-		if (this.updateAllowIndication(this.#currentContainerVM, this.#currentItem) === false) {
+		if (this.updateAllowIndication(this.#currentContainerCtrl, this.#currentItem) === false) {
 			return;
 		}
 
 		if (this.#dragY < currentContainerRect.top) {
-			this.move(orderedContainerElements, 0);
+			this.#move(orderedContainerElements, 0);
 		} else if (this.#dragY > currentContainerRect.bottom) {
-			this.move(orderedContainerElements, -1);
+			this.#move(orderedContainerElements, -1);
 		}
 	};
 
-	move(orderedContainerElements: Array<Element>, newElIndex: number) {
+	#move(orderedContainerElements: Array<Element>, newElIndex: number) {
 		if (!this.#currentElement || !this.#currentItem || !this.#currentContainerElement) return;
 
 		newElIndex = newElIndex === -1 ? orderedContainerElements.length : newElIndex;
 
-		const containerElement = this.#currentContainerElement.shadowRoot ?? this.#currentContainerElement;
+		const containerElement = this.#useContainerShadowRoot
+			? this.#currentContainerElement.shadowRoot ?? this.#currentContainerElement
+			: this.#currentContainerElement;
+
+		const localMove = this.#currentContainerElement === this.#containerElement;
+		let commentBefore;
+		let commentAfter;
+		if (localMove) {
+			commentBefore = this.#currentElement.previousSibling;
+			// nodeType 8 is a comment.
+			while (commentBefore && commentBefore.nodeType !== 8) {
+				commentBefore = commentBefore.previousSibling;
+			}
+			commentAfter = this.#currentElement.nextSibling;
+			// nodeType 8 is a comment.
+			while (commentAfter && commentAfter.nodeType !== 8) {
+				commentAfter = commentAfter.nextSibling;
+			}
+		} else {
+			console.log('THIS IS NOT A LOCAL MOVE, THIS CASE HAS TO BE HANDLED:');
+			// TODO: We need to figure out what to do about non-local moves. [NL]
+		}
 
 		const placeBeforeElement = orderedContainerElements[newElIndex];
 		if (placeBeforeElement) {
 			// We do not need to move this, if the element to be placed before is it self.
 			if (placeBeforeElement !== this.#currentElement) {
 				containerElement.insertBefore(this.#currentElement, placeBeforeElement);
+				if (commentBefore) {
+					containerElement.insertBefore(commentBefore, this.#currentElement);
+				}
+				if (commentAfter) {
+					containerElement.insertBefore(commentAfter, this.#currentElement.nextSibling);
+				}
 			}
 		} else {
+			if (commentBefore) {
+				containerElement.appendChild(commentBefore);
+			}
 			containerElement.appendChild(this.#currentElement);
+			if (commentAfter) {
+				containerElement.appendChild(commentAfter);
+			}
 		}
 
-		if (this.#config.onChange) {
-			this.#config.onChange({
-				element: this.#currentElement,
-				item: this.#currentItem,
-				//ownerVM: this.#currentContainerVM.ownerVM
-			});
-		}
+		this.#config.onChange?.({
+			element: this.#currentElement,
+			item: this.#currentItem,
+			//ownerVM: this.#currentContainerVM.ownerVM
+		});
 	}
 
 	/** Management methods: */
@@ -656,8 +696,8 @@ export class UmbSorterController<T> implements UmbController {
 		return this.#model.filter((x) => x !== item).length > 0;
 	}
 
-	public async sync(element: HTMLElement, fromVm: UmbSorterController<T>) {
-		const movingItem = fromVm.getItemOfElement(element);
+	public async sync(element: HTMLElement, fromController: UmbSorterController<T>) {
+		const movingItem = fromController.getItemOfElement(element);
 		if (!movingItem) {
 			console.error('Could not find item of sync item');
 			return false;
@@ -665,7 +705,7 @@ export class UmbSorterController<T> implements UmbController {
 		if (this.notifyRequestDrop({ item: movingItem }) === false) {
 			return false;
 		}
-		if (fromVm.removeItem(movingItem) === null) {
+		if (fromController.removeItem(movingItem) === null) {
 			console.error('Sync could not remove item');
 			return false;
 		}
@@ -707,36 +747,36 @@ export class UmbSorterController<T> implements UmbController {
 			this.#model.splice(newIndex, 0, movingItem);
 		}
 
-		const eventData = { item: movingItem, fromController: fromVm, toController: this };
-		if (fromVm !== this) {
-			fromVm.notifySync(eventData);
+		const eventData = { item: movingItem, fromController: fromController, toController: this };
+		if (fromController !== this) {
+			fromController.notifySync(eventData);
 		}
 		this.notifySync(eventData);
 
 		return true;
 	}
 
-	updateAllowIndication(contextVM: UmbSorterController<T>, item: T) {
+	updateAllowIndication(controller: UmbSorterController<T>, item: T) {
 		// Remove old indication:
-		if (this._lastIndicationContainerVM !== null && this._lastIndicationContainerVM !== contextVM) {
-			this._lastIndicationContainerVM.notifyAllowed();
+		if (this.#lastIndicationContainerCtrl !== null && this.#lastIndicationContainerCtrl !== controller) {
+			this.#lastIndicationContainerCtrl.notifyAllowed();
 		}
-		this._lastIndicationContainerVM = contextVM;
+		this.#lastIndicationContainerCtrl = controller;
 
-		if (contextVM.notifyRequestDrop({ item: item }) === true) {
-			contextVM.notifyAllowed();
+		if (controller.notifyRequestDrop({ item: item }) === true) {
+			controller.notifyAllowed();
 			return true;
 		}
 
-		contextVM.notifyDisallowed(); // This block is not accepted to we will indicate that its not allowed.
+		controller.notifyDisallowed(); // This block is not accepted to we will indicate that its not allowed.
 		return false;
 	}
 	removeAllowIndication() {
 		// Remove old indication:
-		if (this._lastIndicationContainerVM !== null) {
-			this._lastIndicationContainerVM.notifyAllowed();
+		if (this.#lastIndicationContainerCtrl !== null) {
+			this.#lastIndicationContainerCtrl.notifyAllowed();
 		}
-		this._lastIndicationContainerVM = null;
+		this.#lastIndicationContainerCtrl = null;
 	}
 
 	// TODO: Move auto scroll into its own class?
@@ -786,15 +826,15 @@ export class UmbSorterController<T> implements UmbController {
 					? -1
 					: 0;
 
-			this.#autoScrollRAF = requestAnimationFrame(this._performAutoScroll);
+			this.#autoScrollRAF = requestAnimationFrame(this.#performAutoScroll);
 		}
 	}
-	private _performAutoScroll = () => {
+	#performAutoScroll = () => {
 		this.#autoScrollEl!.scrollLeft += this.autoScrollX * autoScrollSpeed;
 		this.#autoScrollEl!.scrollTop += this.autoScrollY * autoScrollSpeed;
-		this.#autoScrollRAF = requestAnimationFrame(this._performAutoScroll);
+		this.#autoScrollRAF = requestAnimationFrame(this.#performAutoScroll);
 	};
-	private stopAutoScroll() {
+	#stopAutoScroll() {
 		cancelAnimationFrame(this.#autoScrollRAF!);
 		this.#autoScrollRAF = null;
 	}
@@ -824,10 +864,10 @@ export class UmbSorterController<T> implements UmbController {
 	destroy() {
 		// Do something when host element is destroyed.
 		if (this.#currentElement) {
-			this.handleDragEnd();
+			this.#handleDragEnd();
 		}
 
-		this._lastIndicationContainerVM = null;
+		this.#lastIndicationContainerCtrl = null;
 
 		// TODO: Clean up items??
 		this.#observer.disconnect();
