@@ -7,12 +7,16 @@ import { customElement, html, property, state } from '@umbraco-cms/backoffice/ex
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
+import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 
 /**
  * @element umb-property-editor-ui-tree-picker-source-type-picker
  */
 @customElement('umb-property-editor-ui-tree-picker-source-type-picker')
-export class UmbPropertyEditorUITreePickerSourceTypePickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
+export class UmbPropertyEditorUITreePickerSourceTypePickerElement
+	extends UmbLitElement
+	implements UmbPropertyEditorUiElement
+{
 	#datasetContext?: typeof UMB_PROPERTY_DATASET_CONTEXT.TYPE;
 
 	@property({ type: Array })
@@ -42,7 +46,7 @@ export class UmbPropertyEditorUITreePickerSourceTypePickerElement extends UmbLit
 					// If we had a sourceType before, we can see this as a change and not the initial value,
 					// so let's reset the value, so we don't carry over content-types to the new source type.
 					if (this.#initialized && this.sourceType !== startNode.type) {
-						this.value = [];
+						this.#setValue([]);
 					}
 
 					this.sourceType = startNode.type;
@@ -65,13 +69,16 @@ export class UmbPropertyEditorUITreePickerSourceTypePickerElement extends UmbLit
 				this.value = (<UmbInputMediaTypeElement>event.target).selectedIds;
 				break;
 			case 'member':
-				this.value = (<UmbMemberTypeInputElement>event.target).selectedIds;
+				this.#setValue((<UmbMemberTypeInputElement>event.target).selectedIds);
 				break;
 			default:
 				break;
 		}
+	}
 
-		this.dispatchEvent(new CustomEvent('property-value-change'));
+	#setValue(value: string[]) {
+		this.value = value;
+		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
 	render() {
