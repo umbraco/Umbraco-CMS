@@ -115,7 +115,7 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 			id="add-button"
 			look="placeholder"
 			@click=${() => this.#pickerContext.openPicker()}
-			label=${this.localize.term('general_add')}></uui-button>`;
+			label=${this.localize.term('general_choose')}></uui-button>`;
 	}
 
 	private _renderItem(item: DocumentItemResponseModel) {
@@ -127,7 +127,7 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 					<uui-button
 						@click=${() => this.#pickerContext.requestRemoveItem(item.id!)}
 						label="Remove document ${item.name}"
-						>Remove</uui-button
+						>${this.localize.term('general_remove')}</uui-button
 					>
 				</uui-action-bar>
 			</uui-ref-node>

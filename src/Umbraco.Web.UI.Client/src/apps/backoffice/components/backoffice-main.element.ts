@@ -76,7 +76,7 @@ export class UmbBackofficeMainElement extends UmbLitElement {
 
 	private _onRouteChange = async (event: UmbRouterSlotChangeEvent) => {
 		const currentPath = event.target.localActiveViewPath || '';
-		const section = this._sections.find((s) => this._routePrefix + (s.manifest as any).meta.pathname === currentPath);
+		const section = this._sections.find((s) => this._routePrefix + s.manifest?.meta.pathname === currentPath);
 		if (!section) return;
 		await section.asPromise();
 		if (section.manifest) {

@@ -4,7 +4,7 @@ import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extensi
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbInputTreeElement } from '@umbraco-cms/backoffice/tree';
-import type { StartNode } from '@umbraco-cms/backoffice/components';
+import type { UmbTreePickerSource } from '@umbraco-cms/backoffice/components';
 
 /**
  * @element umb-property-editor-ui-tree-picker
@@ -16,7 +16,7 @@ export class UmbPropertyEditorUITreePickerElement extends UmbLitElement implemen
 	value = '';
 
 	@state()
-	type?: StartNode['type'];
+	type?: UmbTreePickerSource['type'];
 
 	@state()
 	startNodeId?: string | null;
@@ -38,7 +38,7 @@ export class UmbPropertyEditorUITreePickerElement extends UmbLitElement implemen
 
 	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
-		const startNode: StartNode | undefined = config?.getValueByAlias('startNode');
+		const startNode: UmbTreePickerSource | undefined = config?.getValueByAlias('startNode');
 		if (startNode) {
 			this.type = startNode.type;
 			this.startNodeId = startNode.id;

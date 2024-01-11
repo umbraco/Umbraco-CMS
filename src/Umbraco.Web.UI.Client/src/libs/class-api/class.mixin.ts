@@ -119,7 +119,7 @@ export const UmbClassMixin = <T extends ClassConstructor>(superClass: T) => {
 		public destroy() {
 			if (this._host) {
 				this._host.removeController(this);
-				this._host = undefined as any;
+				this._host = undefined as never;
 			}
 			super.destroy();
 		}
