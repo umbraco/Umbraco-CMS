@@ -2,8 +2,8 @@
 import {expect} from "@playwright/test";
 
 test.describe('Approved Color tests', () => {
-  let dataTypeDefaultData;
-  let dataTypeData;
+  let dataTypeDefaultData = null;
+  let dataTypeData = null;
   const dataTypeName = 'Approved Color';
   const colorValue = '#ffffff';
   const colorLabel = 'TestColor';
@@ -18,7 +18,9 @@ test.describe('Approved Color tests', () => {
   });
 
   test.afterEach(async ({umbracoApi}) => {
-    await umbracoApi.dataType.update(dataTypeDefaultData.id, dataTypeDefaultData);   
+    if (dataTypeDefaultData !== null) {
+      await umbracoApi.dataType.update(dataTypeDefaultData.id, dataTypeDefaultData);   
+    }   
   });
 
   test('can include label', async ({umbracoApi, umbracoUi}) => {  
