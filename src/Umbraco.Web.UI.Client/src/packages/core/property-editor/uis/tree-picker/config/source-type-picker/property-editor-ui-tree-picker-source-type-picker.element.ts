@@ -59,7 +59,7 @@ export class UmbPropertyEditorUITreePickerSourceTypePickerElement extends UmbLit
 	#onChange(event: CustomEvent) {
 		switch (this.sourceType) {
 			case 'content':
-				this.value = (<UmbDocumentTypeInputElement>event.target).selectedIds;
+				this.value = (<UmbInputDocumentTypeElement>event.target).selectedIds;
 				break;
 			case 'media':
 				this.value = (<UmbInputMediaTypeElement>event.target).selectedIds;
@@ -92,9 +92,9 @@ export class UmbPropertyEditorUITreePickerSourceTypePickerElement extends UmbLit
 	}
 
 	#renderTypeContent() {
-		return html`<umb-document-type-input
+		return html`<umb-input-document-type
 			@change=${this.#onChange}
-			.selectedIds=${this.value || []}></umb-document-type-input>`;
+			.selectedIds=${this.value || []}></umb-input-document-type>`;
 	}
 
 	#renderTypeMedia() {

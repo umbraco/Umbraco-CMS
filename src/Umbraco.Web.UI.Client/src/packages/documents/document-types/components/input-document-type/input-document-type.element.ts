@@ -1,12 +1,13 @@
-import { UmbDocumentTypePickerContext } from './document-type-input.context.js';
+import { UmbDocumentTypePickerContext } from './input-document-type.context.js';
 import { css, html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { DocumentTypeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
+import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 
-@customElement('umb-document-type-input')
-export class UmbDocumentTypeInputElement extends FormControlMixin(UmbLitElement) {
+@customElement('umb-input-document-type')
+export class UmbInputDocumentTypeElement extends FormControlMixin(UmbLitElement) {
 	/**
 	 * Selects the element types only
 	 * @type {boolean}
@@ -86,10 +87,22 @@ export class UmbDocumentTypeInputElement extends FormControlMixin(UmbLitElement)
 	@state()
 	private _items?: Array<DocumentTypeItemResponseModel>;
 
+	@state()
+	private _editDocumentTypePath = '';
+
 	#pickerContext = new UmbDocumentTypePickerContext(this);
 
 	constructor() {
 		super();
+
+		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
+			.addAdditionalPath('document-type')
+			.onSetup(() => {
+				return { data: { entityType: 'document-type', preset: {} } };
+			})
+			.observeRouteBuilder((routeBuilder) => {
+				this._editDocumentTypePath = routeBuilder({});
+			});
 
 		this.addValidator(
 			'rangeUnderflow',
@@ -135,10 +148,17 @@ export class UmbDocumentTypeInputElement extends FormControlMixin(UmbLitElement)
 			<uui-ref-node-document-type name=${ifDefined(item.name)}>
 				<uui-action-bar slot="actions">
 					<uui-button
+						compact
+						href=${this._editDocumentTypePath + 'edit/' + item.id}
+						label=${this.localize.term('general_edit') + ` ${item.name}`}>
+						<uui-icon name="icon-edit"></uui-icon>
+					</uui-button>
+					<uui-button
+						compact
 						@click=${() => this.#pickerContext.requestRemoveItem(item.id!)}
-						label="Remove Document Type ${item.name}"
-						>Remove</uui-button
-					>
+						label="Edit Document Type ${item.name}">
+						<uui-icon name="icon-trash"></uui-icon>
+					</uui-button>
 				</uui-action-bar>
 			</uui-ref-node-document-type>
 		`;
@@ -153,10 +173,10 @@ export class UmbDocumentTypeInputElement extends FormControlMixin(UmbLitElement)
 	];
 }
 
-export default UmbDocumentTypeInputElement;
+export default UmbInputDocumentTypeElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-document-type-input': UmbDocumentTypeInputElement;
+		'umb-input-document-type': UmbInputDocumentTypeElement;
 	}
 }
