@@ -101,9 +101,9 @@ export class UmbInputMediaElement extends FormControlMixin(UmbLitElement) {
 	#renderButton() {
 		if (this._items && this.max && this._items.length >= this.max) return;
 		return html`
-			<uui-button id="add-button" look="placeholder" @click=${() => this.#pickerContext.openPicker()} label="open">
+			<uui-button id="add-button" look="placeholder" @click=${() => this.#pickerContext.openPicker()} label=${this.localize.term('general_choose')}>
 				<uui-icon name="icon-add"></uui-icon>
-				Add
+				${this.localize.term('general_choose')}
 			</uui-button>
 		`;
 	}

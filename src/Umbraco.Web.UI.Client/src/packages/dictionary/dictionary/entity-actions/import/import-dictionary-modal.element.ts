@@ -8,7 +8,7 @@ import {
 	UmbModalBaseElement,
 } from '@umbraco-cms/backoffice/modal';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import { UmbEntityTreeItemModel, UmbTreeElement } from '@umbraco-cms/backoffice/tree';
+import { UmbEntityTreeItemModel, UmbTreeElement, type UmbTreeSelectionConfiguration } from '@umbraco-cms/backoffice/tree';
 
 interface DictionaryItemPreview {
 	name: string;
@@ -21,6 +21,13 @@ export class UmbImportDictionaryModalLayout extends UmbModalBaseElement<
 	UmbImportDictionaryModalData,
 	UmbImportDictionaryModalValue
 > {
+	@state()
+	private _selectionConfiguration: UmbTreeSelectionConfiguration = {
+		multiple: false,
+		selectable: true,
+		selection: [],
+	};
+
 	@state()
 	private _parentId?: string;
 
@@ -93,6 +100,7 @@ export class UmbImportDictionaryModalLayout extends UmbModalBaseElement<
 	connectedCallback(): void {
 		super.connectedCallback();
 		this._parentId = this.data?.unique ?? undefined;
+		this._selectionConfiguration.selection = this._parentId ? [this._parentId] : [];
 	}
 
 	#dictionaryPreviewBuilder(htmlString: string) {
@@ -139,7 +147,7 @@ export class UmbImportDictionaryModalLayout extends UmbModalBaseElement<
 	}
 
 	#onParentChange() {
-		this._parentId = this._treeElement?.selection[0] ?? undefined;
+		this._parentId = this._treeElement?.getSelection()[0] ?? undefined;
 	}
 
 	async #onFileInput() {
@@ -189,11 +197,9 @@ export class UmbImportDictionaryModalLayout extends UmbModalBaseElement<
 
 					<umb-tree
 						?hide-tree-root=${true}
-						?multiple=${false}
 						alias=${UMB_DICTIONARY_TREE_ALIAS}
 						@selection-change=${this.#onParentChange}
-						.selection=${[this._parentId ?? '']}
-						selectable></umb-tree>
+						.selectionConfiguration=${this._selectionConfiguration}></umb-tree>
 				</div>
 
 				${this.#renderNavigate()}
