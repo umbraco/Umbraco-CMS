@@ -1,4 +1,4 @@
-import { UmbDocumentTypeInputElement } from '@umbraco-cms/backoffice/document-type';
+import { UmbInputDocumentTypeElement } from '@umbraco-cms/backoffice/document-type';
 import { UmbInputMediaTypeElement } from '@umbraco-cms/backoffice/media-type';
 import { UmbMemberTypeInputElement } from '@umbraco-cms/backoffice/member-type';
 import type { UmbTreePickerSource } from '@umbraco-cms/backoffice/components';
