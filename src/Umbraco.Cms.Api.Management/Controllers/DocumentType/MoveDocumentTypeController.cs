@@ -17,7 +17,7 @@ public class MoveDocumentTypeController : DocumentTypeControllerBase
     public MoveDocumentTypeController(IContentTypeService contentTypeService)
         => _contentTypeService = contentTypeService;
 
-    [HttpPost("{id:guid}/move")]
+    [HttpPut("{id:guid}/move")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]

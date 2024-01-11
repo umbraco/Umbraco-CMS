@@ -17,7 +17,7 @@ public class MoveMediaTypeController : MediaTypeControllerBase
     public MoveMediaTypeController(IMediaTypeService mediaTypeService)
         => _mediaTypeService = mediaTypeService;
 
-    [HttpPost("{id:guid}/move")]
+    [HttpPut("{id:guid}/move")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]

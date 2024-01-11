@@ -3100,11 +3100,11 @@
       }
     },
     "/umbraco/management/api/v1/document-type/{id}/move": {
-      "post": {
+      "put": {
         "tags": [
           "Document Type"
         ],
-        "operationId": "PostDocumentTypeByIdMove",
+        "operationId": "PutDocumentTypeByIdMove",
         "parameters": [
           {
             "name": "id",
@@ -8238,11 +8238,11 @@
       }
     },
     "/umbraco/management/api/v1/media-type/{id}/move": {
-      "post": {
+      "put": {
         "tags": [
           "Media Type"
         ],
-        "operationId": "PostMediaTypeByIdMove",
+        "operationId": "PutMediaTypeByIdMove",
         "parameters": [
           {
             "name": "id",
