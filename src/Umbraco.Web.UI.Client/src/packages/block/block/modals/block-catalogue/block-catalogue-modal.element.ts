@@ -40,8 +40,7 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 	render() {
 		return html`
 			<umb-body-layout headline="${this.localize.term('blockEditor_addBlock')}">
-				${this.#renderViews()}
-				<uui-box> ${this.view === 'clipboard' ? this.#renderClipboard() : this.#renderCreateEmpty()} </uui-box>
+				${this.#renderViews()} ${this.view === 'clipboard' ? this.#renderClipboard() : this.#renderCreateEmpty()}
 				<div slot="actions">
 					<uui-button label=${this.localize.term('general_close')} @click=${this._rejectModal}></uui-button>
 					<uui-button
@@ -110,7 +109,7 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 
 	static styles = [
 		css`
-			uui-box .blockGroup {
+			.blockGroup {
 				display: grid;
 				gap: 1rem;
 				grid-template-columns: repeat(auto-fill, minmax(min(150px, 100%), 1fr));

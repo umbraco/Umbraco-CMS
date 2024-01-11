@@ -18,7 +18,7 @@ export const UMB_BLOCK_CATALOGUE_MODAL = new UmbModalToken<UmbBlockCatalogueModa
 	{
 		modal: {
 			type: 'sidebar',
-			size: 'medium',
+			size: 'small',
 		},
 	},
 );
