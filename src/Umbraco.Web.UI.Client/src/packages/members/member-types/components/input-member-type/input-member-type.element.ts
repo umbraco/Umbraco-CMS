@@ -94,26 +94,22 @@ export class UmbInputMemberTypeElement extends FormControlMixin(UmbLitElement) {
 		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems));
 	}
 
-	protected _openPicker() {
+	protected getFormElement() {
+		return undefined;
+	}
+
+	#openPicker() {
 		this.#pickerContext.openPicker({
 			hideTreeRoot: true,
 		});
 	}
 
-	protected getFormElement() {
-		return undefined;
-	}
-
 	render() {
-		return html`
-			${this.#renderItems()}
-			${this.#renderAddButton()}
-		`;
+		return html` ${this.#renderItems()} ${this.#renderAddButton()} `;
 	}
 
 	#renderItems() {
 		if (!this._items) return;
-		// TODO: Add sorting. [LK]
 		return html`
 			<uui-ref-list
 				>${repeat(
@@ -131,7 +127,7 @@ export class UmbInputMemberTypeElement extends FormControlMixin(UmbLitElement) {
 			<uui-button
 				id="add-button"
 				look="placeholder"
-				@click=${this._openPicker}
+				@click=${this.#openPicker}
 				label="${this.localize.term('general_choose')}"
 				>${this.localize.term('general_choose')}</uui-button
 			>
