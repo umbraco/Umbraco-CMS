@@ -2,6 +2,7 @@ using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.ViewModels.MediaType;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -23,16 +24,10 @@ public class CopyMediaTypeController : MediaTypeControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Copy(Guid id, CopyMediaTypeRequestModel copyMediaTypeRequestModel)
     {
-        IMediaType? source = await _mediaTypeService.GetAsync(id);
-        if (source is null)
-        {
-            return OperationStatusResult(ContentTypeOperationStatus.NotFound);
-        }
-
-        var result = await _mediaTypeService.CopyAsync(source, copyMediaTypeRequestModel.TargetId);
+        Attempt<IMediaType?, ContentTypeStructureOperationStatus> result = await _mediaTypeService.CopyAsync(id, copyMediaTypeRequestModel.TargetId);
 
         return result.Success
-            ? CreatedAtAction<ByKeyMediaTypeController>(controller => nameof(controller.ByKey), result.Result.Key)
+            ? CreatedAtAction<ByKeyMediaTypeController>(controller => nameof(controller.ByKey), result.Result!.Key)
             : StructureOperationStatusResult(result.Status);
     }
 }

@@ -24,13 +24,7 @@ public class MoveMediaTypeController : MediaTypeControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Move(Guid id, MoveMediaTypeRequestModel moveMediaTypeRequestModel)
     {
-        IMediaType? source = await _mediaTypeService.GetAsync(id);
-        if (source is null)
-        {
-            return OperationStatusResult(ContentTypeOperationStatus.NotFound);
-        }
-
-        Attempt<IMediaType, ContentTypeStructureOperationStatus> result = await _mediaTypeService.MoveAsync(source, moveMediaTypeRequestModel.TargetId);
+        Attempt<IMediaType?, ContentTypeStructureOperationStatus> result = await _mediaTypeService.MoveAsync(id, moveMediaTypeRequestModel.TargetId);
 
         return result.Success
             ? Ok()
