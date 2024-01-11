@@ -2,5 +2,5 @@
 
 public class SecurityConfigurationResponseModel
 {
-    public PasswordConfigurationResponseModel PasswordConfiguration { get; set; } = null!;
+    public required PasswordConfigurationResponseModel PasswordConfiguration { get; set; }
 }

@@ -6,8 +6,7 @@ public class CurrenUserConfigurationResponseModel
 {
     public bool KeepUserLoggedIn { get; set; }
 
-    public bool UserNameIsEmail { get; set; }
+    public bool UsernameIsEmail { get; set; }
 
-    public PasswordConfigurationResponseModel PasswordConfiguration { get; set; } = null!;
-
+    public required PasswordConfigurationResponseModel PasswordConfiguration { get; set; }
 }

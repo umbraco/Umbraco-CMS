@@ -4,7 +4,7 @@ namespace Umbraco.Cms.Api.Management.ViewModels.User;
 
 public class UserConfigurationResponseModel
 {
-    public bool ShowUserInvite { get; set; }
+    public bool CanInviteUsers { get; set; }
 
-    public PasswordConfigurationResponseModel PasswordConfiguration { get; set; } = null!;
+    public required PasswordConfigurationResponseModel PasswordConfiguration { get; set; }
 }

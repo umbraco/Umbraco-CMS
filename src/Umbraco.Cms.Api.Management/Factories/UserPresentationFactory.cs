@@ -117,7 +117,7 @@ public class UserPresentationFactory : IUserPresentationFactory
         var model = new CurrenUserConfigurationResponseModel
         {
             KeepUserLoggedIn = _securitySettings.KeepUserLoggedIn,
-            UserNameIsEmail = _securitySettings.UsernameIsEmail,
+            UsernameIsEmail = _securitySettings.UsernameIsEmail,
             PasswordConfiguration = _passwordConfigurationPresentationFactory.CreatePasswordConfigurationResponseModel(),
         };
 
@@ -127,7 +127,7 @@ public class UserPresentationFactory : IUserPresentationFactory
     public Task<UserConfigurationResponseModel> CreateUserConfigurationModelAsync() =>
         Task.FromResult(new UserConfigurationResponseModel
         {
-            ShowUserInvite = _emailSender.CanSendRequiredEmail(),
+            CanInviteUsers = _emailSender.CanSendRequiredEmail(),
             PasswordConfiguration = _passwordConfigurationPresentationFactory.CreatePasswordConfigurationResponseModel(),
         });
 

@@ -15,7 +15,8 @@ public class ConfigurationSecurityController : SecurityControllerBase
 {
     private readonly IPasswordConfigurationPresentationFactory _passwordConfigurationPresentationFactory;
 
-    public ConfigurationSecurityController(IPasswordConfigurationPresentationFactory passwordConfigurationPresentationFactory) => _passwordConfigurationPresentationFactory = passwordConfigurationPresentationFactory;
+    public ConfigurationSecurityController(IPasswordConfigurationPresentationFactory passwordConfigurationPresentationFactory)
+        => _passwordConfigurationPresentationFactory = passwordConfigurationPresentationFactory;
 
     [HttpGet("configuration")]
     [MapToApiVersion("1.0")]
