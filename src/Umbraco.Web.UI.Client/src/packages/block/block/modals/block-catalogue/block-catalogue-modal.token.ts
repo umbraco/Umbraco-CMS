@@ -1,10 +1,11 @@
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbBlockCatalogueModalData {
-	//Which unique should be sent? Document, Document Type or Data Type?
 	unique: string;
-	view?: 'clipboard' | 'createEmpty';
+	view?: UmbBlockCatalogueView;
 }
+
+export type UmbBlockCatalogueView = 'clipboard' | 'createEmpty';
 
 export interface UmbBlockCatalogueModalValue {
 	content: string;
@@ -15,7 +16,7 @@ export const UMB_BLOCK_CATALOGUE_MODAL = new UmbModalToken<UmbBlockCatalogueModa
 	{
 		modal: {
 			type: 'sidebar',
-			size: 'small',
+			size: 'medium',
 		},
 	},
 );

@@ -5,6 +5,8 @@ import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extensi
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import {
+	UMB_BLOCK_CATALOGUE_MODAL,
+	UmbBlockCatalogueView,
 	UmbBlockLayoutBaseModel,
 	UmbBlockManagerContext,
 	UmbBlockTypeBase,
@@ -14,12 +16,7 @@ import '../../components/block-list-block/index.js';
 import { buildUdi } from '@umbraco-cms/backoffice/utils';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { NumberRangeValueType } from '@umbraco-cms/backoffice/models';
-import {
-	UMB_BLOCK_CATALOGUE_MODAL,
-	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
-	UmbModalManagerContext,
-} from '@umbraco-cms/backoffice/modal';
-import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/document';
+import { UMB_MODAL_MANAGER_CONTEXT_TOKEN, UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbBlockListLayoutModel extends UmbBlockLayoutBaseModel {}
 
@@ -108,13 +105,13 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 		});
 	}
 
-	async #openBlockCatalogue() {
+	async #openBlockCatalogue(view?: UmbBlockCatalogueView) {
 		// Open modal.
 
 		const contentElementTypeKey = this.#context.getBlockTypes()[0]!.contentElementTypeKey;
 
 		const modalContext = this.#modalContext?.open(UMB_BLOCK_CATALOGUE_MODAL, {
-			data: { unique: 'dt-blockList' },
+			data: { unique: 'dt-blockList', view },
 		});
 
 		const data = await modalContext?.onSubmit();
@@ -147,7 +144,18 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 						<umb-property-editor-ui-block-list-block .layout=${layoutEntry}>
 						</umb-property-editor-ui-block-list-block>`,
 			)}
-			<uui-button id="add-button" look="placeholder" @click=${this.#openBlockCatalogue} label="open">Add</uui-button>`;
+			<uui-button-group>
+				<uui-button
+					id="add-button"
+					look="placeholder"
+					label="open"
+					@click=${() => this.#openBlockCatalogue('createEmpty')}
+					>Add</uui-button
+				>
+				<uui-button label="clipboard" @click=${() => this.#openBlockCatalogue('clipboard')}>
+					<uui-icon name="icon-paste-in"></uui-icon>
+				</uui-button>
+			</uui-button-group>`;
 	}
 
 	static styles = [

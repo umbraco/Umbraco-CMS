@@ -9,4 +9,5 @@ export interface UmbBlockTypeBase {
 	iconColor?: string;
 	backgroundColor?: string;
 	editorSize?: UUIModalSidebarSize;
+	icon?: string;
 }
