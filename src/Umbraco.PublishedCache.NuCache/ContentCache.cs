@@ -36,7 +36,7 @@ public class ContentCache : PublishedCacheBase, IPublishedContentCache, INavigab
         IDomainCache domainCache,
         IOptions<GlobalSettings> globalSettings,
         IVariationContextAccessor variationContextAccessor)
-        : base(previewDefault)
+        : base(variationContextAccessor, previewDefault)
     {
         _snapshot = snapshot;
         _snapshotCache = snapshotCache;
