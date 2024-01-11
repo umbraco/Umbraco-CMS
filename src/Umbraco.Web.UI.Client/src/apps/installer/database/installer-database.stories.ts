@@ -1,10 +1,10 @@
 import './installer-database.element.js';
 
-import { html } from '@umbraco-cms/backoffice/external/lit';
 import { Meta, Story } from '@storybook/web-components';
 
-import type { UmbInstallerDatabaseElement } from './installer-database.element.js';
 import { installerContextProvider } from '../shared/utils.story-helpers.js';
+import type { UmbInstallerDatabaseElement } from './installer-database.element.js';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 
 export default {
 	title: 'Apps/Installer/Steps',

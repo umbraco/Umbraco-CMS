@@ -73,6 +73,7 @@ export default {
 						'@umbraco-cms/backoffice/localization': './src/packages/core/localization/index.ts',
 						'@umbraco-cms/backoffice/macro': './src/packages/core/macro/index.ts',
 						'@umbraco-cms/backoffice/menu': './src/packages/core/menu/index.ts',
+						'@umbraco-cms/backoffice/meta': './src/packages/core/meta/index.ts',
 						'@umbraco-cms/backoffice/modal': './src/packages/core/modal/index.ts',
 						'@umbraco-cms/backoffice/notification': './src/packages/core/notification/index.ts',
 						'@umbraco-cms/backoffice/picker-input': './src/packages/core/picker-input/index.ts',
@@ -90,6 +91,7 @@ export default {
 						'@umbraco-cms/backoffice/event': './src/packages/core/event/index.ts',
 						'@umbraco-cms/backoffice/repository': './src/packages/core/repository/index.ts',
 						'@umbraco-cms/backoffice/temporary-file': './src/packages/core/temporary-file/index.ts',
+						'@umbraco-cms/backoffice/audit-log': './src/packages/core/audit-log/index.ts',
 
 						'@umbraco-cms/backoffice/dictionary': './src/packages/dictionary/dictionary/index.ts',
 

@@ -1,9 +1,9 @@
+import type { UmbDocumentWorkspaceContext } from '../workspace/index.js';
 import {
 	UMB_PROPERTY_DATASET_CONTEXT,
 	UmbNameablePropertyDatasetContext,
 	UmbPropertyDatasetContext,
 } from '@umbraco-cms/backoffice/property';
-import type { UmbDocumentWorkspaceContext } from '../workspace/index.js';
 import { DocumentVariantResponseModel, PropertyTypeModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';

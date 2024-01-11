@@ -5,34 +5,34 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbInputMediaElement } from '@umbraco-cms/backoffice/media';
 //import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
-export type ContentType = 'content' | 'member' | 'media';
+export type UmbTreePickerSource = {
+	type?: UmbTreePickerSourceType;
+	id?: string | null;
+	dynamicRoot?: UmbTreePickerDynamicRoot | null;
+};
 
-export type DynamicRootQueryStepType = {
+export type UmbTreePickerSourceType = 'content' | 'member' | 'media';
+
+export type UmbTreePickerDynamicRoot = {
+	originAlias: string;
+	querySteps?: Array<UmbTreePickerDynamicRootQueryStep> | null;
+};
+
+export type UmbTreePickerDynamicRootQueryStep = {
 	alias: string;
 	anyOfDocTypeKeys: Array<string>;
 };
 
-export type DynamicRootType = {
-	originAlias: string;
-	querySteps?: Array<DynamicRootQueryStepType> | null;
-};
-
-export type StartNode = {
-	type?: ContentType;
-	id?: string | null;
-	dynamicRoot?: DynamicRootType | null;
-};
-
-@customElement('umb-input-start-node')
-export class UmbInputStartNodeElement extends FormControlMixin(UmbLitElement) {
+@customElement('umb-input-tree-picker-source')
+export class UmbInputTreePickerSourceElement extends FormControlMixin(UmbLitElement) {
 	protected getFormElement() {
 		return undefined;
 	}
 
-	private _type: StartNode['type'] = 'content';
+	private _type: UmbTreePickerSource['type'] = 'content';
 
 	@property()
-	public set type(value: StartNode['type']) {
+	public set type(value: UmbTreePickerSource['type']) {
 		if (value === undefined) {
 			value = this._type;
 		}
@@ -47,7 +47,7 @@ export class UmbInputStartNodeElement extends FormControlMixin(UmbLitElement) {
 
 		this.requestUpdate('type', oldValue);
 	}
-	public get type(): StartNode['type'] {
+	public get type(): UmbTreePickerSource['type'] {
 		return this._type;
 	}
 
@@ -55,7 +55,7 @@ export class UmbInputStartNodeElement extends FormControlMixin(UmbLitElement) {
 	nodeId?: string | null;
 
 	@property({ attribute: false })
-	dynamicRoot?: DynamicRootType | null;
+	dynamicRoot?: UmbTreePickerDynamicRoot | null;
 
 	@state()
 	_options: Array<Option> = [
@@ -67,7 +67,7 @@ export class UmbInputStartNodeElement extends FormControlMixin(UmbLitElement) {
 	#onTypeChange(event: UUISelectEvent) {
 		//console.log('onTypeChange');
 
-		this.type = event.target.value as StartNode['type'];
+		this.type = event.target.value as UmbTreePickerSource['type'];
 
 		this.nodeId = '';
 
@@ -140,10 +140,10 @@ export class UmbInputStartNodeElement extends FormControlMixin(UmbLitElement) {
 	];
 }
 
-export default UmbInputStartNodeElement;
+export default UmbInputTreePickerSourceElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-input-start-node': UmbInputStartNodeElement;
+		'umb-input-tree-picker-source': UmbInputTreePickerSourceElement;
 	}
 }
