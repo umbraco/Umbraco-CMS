@@ -1,5 +1,5 @@
 import { UmbInputDocumentTypeElement } from '@umbraco-cms/backoffice/document-type';
-import { UmbMediaTypeInputElement } from '@umbraco-cms/backoffice/media-type';
+import { UmbInputMediaTypeElement } from '@umbraco-cms/backoffice/media-type';
 import { UmbMemberTypeInputElement } from '@umbraco-cms/backoffice/member-type';
 import type { UmbTreePickerSource } from '@umbraco-cms/backoffice/components';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
@@ -62,7 +62,7 @@ export class UmbPropertyEditorUITreePickerSourceTypePickerElement extends UmbLit
 				this.value = (<UmbInputDocumentTypeElement>event.target).selectedIds;
 				break;
 			case 'media':
-				this.value = (<UmbMediaTypeInputElement>event.target).selectedIds;
+				this.value = (<UmbInputMediaTypeElement>event.target).selectedIds;
 				break;
 			case 'member':
 				this.value = (<UmbMemberTypeInputElement>event.target).selectedIds;
@@ -98,9 +98,9 @@ export class UmbPropertyEditorUITreePickerSourceTypePickerElement extends UmbLit
 	}
 
 	#renderTypeMedia() {
-		return html`<umb-media-type-input
+		return html`<umb-input-media-type
 			@change=${this.#onChange}
-			.selectedIds=${this.value || []}></umb-media-type-input>`;
+			.selectedIds=${this.value || []}></umb-input-media-type>`;
 	}
 
 	#renderTypeMember() {
