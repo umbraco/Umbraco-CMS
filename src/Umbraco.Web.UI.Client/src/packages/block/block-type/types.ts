@@ -12,6 +12,11 @@ export interface UmbBlockTypeBase {
 	icon?: string; // remove later
 }
 
+export interface UmbBlockTypeGroup {
+	name?: string | null;
+	key: string;
+}
+
 export interface UmbBlockTypeWithGroupKey extends UmbBlockTypeBase {
-	groupKey?: null | string;
+	groupKey?: string | null;
 }

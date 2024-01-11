@@ -15,47 +15,10 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 	UmbBlockCatalogueModalValue
 > {
 	@state()
-	private _blocks: Array<UmbBlockTypeWithGroupKey> = [
-		{
-			contentElementTypeKey: 'block-catalogue-performance',
-			label: 'Performance',
-			icon: 'icon-dashboard',
-		},
-		{
-			contentElementTypeKey: 'block-catalogue-weather',
-			label: 'Weather',
-			icon: 'icon-snow',
-		},
-		{
-			contentElementTypeKey: 'block-catalogue-servers',
-			label: 'Servers',
-			icon: 'icon-stacked-disks',
-		},
-		{
-			contentElementTypeKey: 'block-catalogue-currency',
-			backgroundColor: '#FFD700',
-			iconColor: 'black',
-			icon: 'icon-coins',
-			label: 'Currency',
-			groupKey: 'block-catalogue-demo-blocks-group',
-		},
-		{
-			contentElementTypeKey: 'block-catalogue-niels-cup-of-coffee',
-			backgroundColor: '#964B00',
-			iconColor: '#FFFDD0',
-			icon: 'icon-coffee',
-			label: "Niels' Cup of Coffee",
-			groupKey: 'block-catalogue-demo-blocks-group',
-		},
-	];
+	private _blocks: Array<UmbBlockTypeWithGroupKey> = [];
 
 	@state()
-	private _blockGroups: Array<{ key: string; name: string }> = [
-		{
-			key: 'block-catalogue-demo-blocks-group',
-			name: 'Demo Blocks',
-		},
-	];
+	private _blockGroups: Array<{ key: string; name: string }> = [];
 
 	@state()
 	view?: UmbBlockCatalogueView;
@@ -65,6 +28,8 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 		if (!this.data) return;
 
 		this.view = this.data.view ?? 'createEmpty';
+		this._blocks = this.data.blocks ?? [];
+		this._blockGroups = this.data.blockGroups ?? [];
 
 		if (this.modalContext) {
 			this.observe(this.modalContext.value, (value) => {

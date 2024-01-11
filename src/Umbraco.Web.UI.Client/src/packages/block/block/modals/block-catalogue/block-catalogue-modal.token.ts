@@ -1,7 +1,10 @@
+import { UmbBlockTypeBase } from '@umbraco-cms/backoffice/block';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbBlockCatalogueModalData {
 	unique: string;
+	blocks: Array<UmbBlockTypeBase>;
+	blockGroups?: Array<{ name: string; key: string }>;
 	view?: UmbBlockCatalogueView;
 }
 

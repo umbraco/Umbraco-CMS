@@ -70,6 +70,9 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 	@state()
 	private _limitMax?: number;
 
+	@state()
+	private _blocks?: Array<UmbBlockTypeBase>;
+
 	#context = new UmbBlockManagerContext(this);
 
 	@state()
@@ -103,19 +106,23 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 			// Notify that the value has changed.
 			//console.log('settings changed', this._value);
 		});
+		this.observe(this.#context.blockTypes, (blockTypes) => {
+			this._blocks = blockTypes;
+		});
 	}
 
 	async #openBlockCatalogue(view?: UmbBlockCatalogueView) {
 		// Open modal.
 
-		const contentElementTypeKey = this.#context.getBlockTypes()[0]!.contentElementTypeKey;
+		//const contentElementTypeKey = this.#context.getBlockTypes()[0]!.contentElementTypeKey;
 
 		const modalContext = this.#modalContext?.open(UMB_BLOCK_CATALOGUE_MODAL, {
-			data: { unique: 'dt-blockList', view },
+			data: { unique: 'dt-blockList', blocks: this._blocks ?? [], view },
 		});
 
 		const data = await modalContext?.onSubmit();
 		console.log('submitted', data);
+
 		if (!data) return;
 
 		// TEMP Hack:
@@ -149,9 +156,9 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 					id="add-button"
 					look="placeholder"
 					label=${this.localize.term('content_createEmpty')}
-					@click=${() => this.#openBlockCatalogue('createEmpty')}
-					>${this.localize.term('content_createEmpty')}</uui-button
-				>
+					@click=${() => this.#openBlockCatalogue('createEmpty')}>
+					${this.localize.term('content_createEmpty')}
+				</uui-button>
 				<uui-button
 					label=${this.localize.term('content_createFromClipboard')}
 					look="placeholder"
