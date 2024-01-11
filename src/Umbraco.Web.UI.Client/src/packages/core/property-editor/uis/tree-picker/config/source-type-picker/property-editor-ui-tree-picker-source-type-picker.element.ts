@@ -1,6 +1,6 @@
 import { UmbInputDocumentTypeElement } from '@umbraco-cms/backoffice/document-type';
 import { UmbInputMediaTypeElement } from '@umbraco-cms/backoffice/media-type';
-import { UmbMemberTypeInputElement } from '@umbraco-cms/backoffice/member-type';
+import { UmbInputMemberTypeElement } from '@umbraco-cms/backoffice/member-type';
 import type { UmbTreePickerSource } from '@umbraco-cms/backoffice/components';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
@@ -69,7 +69,7 @@ export class UmbPropertyEditorUITreePickerSourceTypePickerElement
 				this.value = (<UmbInputMediaTypeElement>event.target).selectedIds;
 				break;
 			case 'member':
-				this.#setValue((<UmbMemberTypeInputElement>event.target).selectedIds);
+				this.#setValue((<UmbInputMemberTypeElement>event.target).selectedIds);
 				break;
 			default:
 				break;

@@ -6,7 +6,7 @@ import type { MemberTypeItemResponseModel } from '@umbraco-cms/backoffice/backen
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-input-member-type')
-export class UmbMemberTypeInputElement extends FormControlMixin(UmbLitElement) {
+export class UmbInputMemberTypeElement extends FormControlMixin(UmbLitElement) {
 	/**
 	 * This is a minimum amount of selected items in this input.
 	 * @type {number}
@@ -162,10 +162,10 @@ export class UmbMemberTypeInputElement extends FormControlMixin(UmbLitElement) {
 	];
 }
 
-export default UmbMemberTypeInputElement;
+export default UmbInputMemberTypeElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-input-member-type': UmbMemberTypeInputElement;
+		'umb-input-member-type': UmbInputMemberTypeElement;
 	}
 }
