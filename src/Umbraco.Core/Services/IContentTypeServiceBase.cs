@@ -136,7 +136,7 @@ public interface IContentTypeBaseService<TItem> : IContentTypeBaseService, IServ
     [Obsolete("Please use CopyAsync. Will be removed in V15.")]
     TItem Copy(TItem original, string alias, string name, TItem parent);
 
-    Task<Attempt<TItem, ContentTypeStructureOperationStatus>> CopyAsync(TItem toCopy, Guid? containerKey);
+    Task<Attempt<TItem?, ContentTypeStructureOperationStatus>> CopyAsync(Guid key, Guid? containerKey);
 
-    Task<Attempt<TItem, ContentTypeStructureOperationStatus>> MoveAsync(TItem toMove, Guid? containerKey);
+    Task<Attempt<TItem?, ContentTypeStructureOperationStatus>> MoveAsync(Guid key, Guid? containerKey);
 }

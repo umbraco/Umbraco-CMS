@@ -897,19 +897,25 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         return OperationResult.Attempt.Succeed(MoveOperationStatusType.Success, eventMessages, copy);
     }
 
-    public async Task<Attempt<TItem, ContentTypeStructureOperationStatus>> CopyAsync(TItem toCopy, Guid? containerKey)
+    public async Task<Attempt<TItem?, ContentTypeStructureOperationStatus>> CopyAsync(Guid key, Guid? containerKey)
     {
+        TItem? toCopy = await GetAsync(key);
+        if (toCopy is null)
+        {
+            return Attempt.FailWithStatus(ContentTypeStructureOperationStatus.NotFound, toCopy);
+        }
+
         var containerId = GetContainerOrRootId(containerKey);
 
         if (containerId is null)
         {
-            return Attempt.FailWithStatus(ContentTypeStructureOperationStatus.ContainerNotFound, toCopy);
+            return Attempt.FailWithStatus<TItem?, ContentTypeStructureOperationStatus>(ContentTypeStructureOperationStatus.ContainerNotFound, toCopy);
         }
 
         // using obsolete method for version control while it still exists
         Attempt<OperationResult<MoveOperationStatusType, TItem>?> result = Copy(toCopy, containerId.Value);
 
-        return MapStatusTypeToAttempt(toCopy, result.Result?.Result);
+        return MapStatusTypeToAttempt(result.Result?.Entity, result.Result?.Result);
     }
 
     private int? GetContainerOrRootId(Guid? containerKey)
@@ -923,7 +929,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         return container?.Id;
     }
 
-    private Attempt<TItem, ContentTypeStructureOperationStatus> MapStatusTypeToAttempt(TItem item, MoveOperationStatusType? resultStatus) =>
+    private Attempt<TItem?, ContentTypeStructureOperationStatus> MapStatusTypeToAttempt(TItem? item, MoveOperationStatusType? resultStatus) =>
         resultStatus switch
         {
             MoveOperationStatusType.Success => Attempt.SucceedWithStatus(ContentTypeStructureOperationStatus.Success, item),
@@ -990,13 +996,19 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         return OperationResult.Attempt.Succeed(MoveOperationStatusType.Success, eventMessages);
     }
 
-    public async Task<Attempt<TItem, ContentTypeStructureOperationStatus>> MoveAsync(TItem toMove, Guid? containerKey)
+    public async Task<Attempt<TItem?, ContentTypeStructureOperationStatus>> MoveAsync(Guid key, Guid? containerKey)
     {
+        TItem? toMove = await GetAsync(key);
+        if (toMove is null)
+        {
+            return Attempt.FailWithStatus(ContentTypeStructureOperationStatus.NotFound, toMove);
+        }
+
         var containerId = GetContainerOrRootId(containerKey);
 
         if (containerId is null)
         {
-            return Attempt.FailWithStatus(ContentTypeStructureOperationStatus.ContainerNotFound, toMove);
+            return Attempt.FailWithStatus<TItem?, ContentTypeStructureOperationStatus>(ContentTypeStructureOperationStatus.ContainerNotFound, toMove);
         }
 
         // using obsolete method for version control while it still exists
