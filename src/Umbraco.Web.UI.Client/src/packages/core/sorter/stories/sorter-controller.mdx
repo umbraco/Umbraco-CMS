@@ -176,11 +176,13 @@ export class MyElement extends UmbElementMixin(LitElement) {
 	#sorter = new UmbSorterController(this, {
 		...SORTER_CONFIG,
 		performItemInsert: ({ item, newIndex }) => {
-			console.log(item, newIndex);
-			// Perform some logic here to calculate the new sortOrder & save it.
+			// Insert logic that updates the model, so the item gets the new index in the model.
 			return true;
 		},
-		performItemRemove: () => true,
+		performItemRemove: () => {
+			// Insert logic that updates the model, so the item gets removed from the model.
+			return true;
+		},
 	});
 }
 ```
