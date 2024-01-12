@@ -1,8 +1,7 @@
 import {ConstantHelper, test} from "@umbraco/playwright-testhelpers";
 import {expect} from "@playwright/test";
 
-//TODO: replace test.skip with test.describe, when the script is fixed. Currently the script root folder is not being created correctly which errors out one of our test..
-test.skip('Script tests', () => {
+test.describe('Script tests', () => {
   const scriptName = 'TestScript';
   const scriptPath = scriptName + '.js';
   const scriptFolderName = 'TestScriptFolder';
