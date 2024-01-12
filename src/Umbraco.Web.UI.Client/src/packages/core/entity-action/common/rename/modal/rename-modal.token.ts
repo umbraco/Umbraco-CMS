@@ -6,9 +6,7 @@ export interface UmbRenameModalData {
 	unique: string;
 }
 
-export interface UmbRenameModalValue {
-	newName: string;
-}
+export interface UmbRenameModalValue {}
 
 export const UMB_RENAME_MODAL = new UmbModalToken<UmbRenameModalData, UmbRenameModalValue>(UMB_RENAME_MODAL_ALIAS, {
 	modal: {

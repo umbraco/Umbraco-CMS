@@ -1,14 +1,10 @@
 import { UMB_RENAME_MODAL } from './modal/rename-modal.token.js';
+import { type UmbRenameRepository } from './types.js';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbModalManagerContext, UMB_MODAL_MANAGER_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
-import { DataSourceResponse } from '@umbraco-cms/backoffice/repository';
 
-export interface UmbRenameRepository {
-	rename(unique: string, name: string): Promise<DataSourceResponse<string>>;
-}
-
-export class UmbRenameEntityAction extends UmbEntityActionBase<UmbRenameRepository> {
+export class UmbRenameEntityAction extends UmbEntityActionBase<UmbRenameRepository<unknown>> {
 	#modalManagerContext?: UmbModalManagerContext;
 
 	constructor(host: UmbControllerHostElement, repositoryAlias: string, unique: string) {
@@ -30,9 +26,6 @@ export class UmbRenameEntityAction extends UmbEntityActionBase<UmbRenameReposito
 			},
 		});
 
-		modalContext.onSubmit().then((value) => {
-			debugger;
-			console.log(value);
-		});
+		await modalContext.onSubmit();
 	}
 }

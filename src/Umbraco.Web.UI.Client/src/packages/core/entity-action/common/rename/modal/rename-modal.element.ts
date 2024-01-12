@@ -1,4 +1,4 @@
-import { UmbRenameRepository } from '../rename.action.js';
+import { UmbRenameRepository } from '../types.js';
 import { UmbRenameModalData, UmbRenameModalValue } from './rename-modal.token.js';
 import { html, customElement, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -8,7 +8,7 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registr
 
 @customElement('umb-rename-modal')
 export class UmbRenameModalElement extends UmbModalBaseElement<UmbRenameModalData, UmbRenameModalValue> {
-	#renameRepository?: UmbRenameRepository;
+	#renameRepository?: UmbRenameRepository<any>;
 
 	connectedCallback(): void {
 		super.connectedCallback();
@@ -24,7 +24,7 @@ export class UmbRenameModalElement extends UmbModalBaseElement<UmbRenameModalDat
 			this.data.renameRepositoryAlias,
 			[this],
 			(permitted, ctrl) => {
-				this.#renameRepository = permitted ? (ctrl.api as UmbRenameRepository) : undefined;
+				this.#renameRepository = permitted ? (ctrl.api as UmbRenameRepository<any>) : undefined;
 			},
 		);
 	}
@@ -43,11 +43,12 @@ export class UmbRenameModalElement extends UmbModalBaseElement<UmbRenameModalDat
 		const formData = new FormData(form);
 		const name = formData.get('name') as string;
 
-		const { data } = await this.#renameRepository.rename(this.data?.unique, name);
+		const { data } = await this.#renameRepository.rename(this.data.unique, name);
 
 		if (data) {
-			this.updateValue({ newName: data });
 			this._submitModal();
+		} else {
+			this._rejectModal();
 		}
 	}
 
