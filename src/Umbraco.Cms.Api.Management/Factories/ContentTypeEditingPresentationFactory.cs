@@ -10,7 +10,7 @@ internal abstract class ContentTypeEditingPresentationFactory
 {
     private readonly IContentTypeService _contentTypeService;
 
-    protected ContentTypeEditingPresentationFactory(IContentTypeService contentTypeService)
+    protected ContentTypeEditingPresentationFactory(IContentTypeService contentTypeService) // TODO: inject generic IContentTypeBaseService<IContentType> instead
         => _contentTypeService = contentTypeService;
 
     protected TContentTypeEditingModel MapContentTypeEditingModel<
@@ -43,6 +43,30 @@ internal abstract class ContentTypeEditingPresentationFactory
         };
 
         return editingModel;
+    }
+
+    protected T MapCompositionModel<T>(ContentTypeAvailableCompositionsResult compositionResult)
+        where T : ContentTypeViewModels.AvailableContentTypeCompositionResponseModelBase, new()
+    {
+        IContentTypeComposition composition = compositionResult.Composition;
+        IEnumerable<string>? folders = null;
+
+        if (composition is IContentType contentType)
+        {
+            var containers = _contentTypeService.GetContainers(contentType); // NB: different for media/member (media/member service)
+            folders = containers.Select(c => c.Name).WhereNotNull();
+        }
+
+        T compositionModel = new()
+        {
+            Id = composition.Key,
+            Name = composition.Name ?? string.Empty,
+            Icon = composition.Icon ?? string.Empty,
+            FolderPath = folders ?? Array.Empty<string>(),
+            IsCompatible = compositionResult.Allowed
+        };
+
+        return compositionModel;
     }
 
     private ContentTypeSort[] MapAllowedContentTypes(IEnumerable<ContentTypeViewModels.ContentTypeSort> allowedContentTypes)
