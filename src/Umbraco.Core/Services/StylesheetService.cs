@@ -102,8 +102,8 @@ public class StylesheetService : FileServiceBase<IStylesheetRepository, IStylesh
             return StylesheetOperationStatus.AlreadyExists;
         }
 
-        if (string.IsNullOrWhiteSpace(createModel.ParentPath) is false
-            && Repository.FolderExists(createModel.ParentPath) is false)
+        if (IsRootPath(createModel.ParentPath) is false
+            && Repository.FolderExists(createModel.ParentPath!) is false)
         {
             return StylesheetOperationStatus.ParentNotFound;
         }
