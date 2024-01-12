@@ -23,7 +23,7 @@ public class DocumentTypeCompositionRequestModel
     ///     Any content types containing those aliases will be filtered out along with any content types
     ///     that have matching property types that are included in the specified ones.
     /// </remarks>
-    public IEnumerable<Guid> CompositeIds { get; set; } = Array.Empty<Guid>();
+    public IEnumerable<Guid> CurrentCompositeIds { get; set; } = Array.Empty<Guid>();
 
     /// <summary>
     ///     Gets or sets a value indicating whether the content type is currently marked as an element type.
