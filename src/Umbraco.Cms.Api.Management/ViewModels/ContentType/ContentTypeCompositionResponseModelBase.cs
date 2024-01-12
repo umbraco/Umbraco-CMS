@@ -1,6 +1,6 @@
 namespace Umbraco.Cms.Api.Management.ViewModels.ContentType;
 
-public class ContentTypeCompositionModelBase
+public abstract class ContentTypeCompositionResponseModelBase
 {
     public Guid Id { get; set; }
 

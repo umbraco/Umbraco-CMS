@@ -2,10 +2,6 @@ using Umbraco.Cms.Api.Management.ViewModels.ContentType;
 
 namespace Umbraco.Cms.Api.Management.ViewModels.DocumentType.Composition;
 
-public class AvailableDocumentTypeCompositionResponseModel : ContentTypeCompositionModelBase
+public class AvailableDocumentTypeCompositionResponseModel : AvailableContentTypeCompositionResponseModelBase
 {
-    /// <remarks>Empty when located at root.</remarks>
-    public IEnumerable<string> FolderPath { get; set; } = Array.Empty<string>();
-
-    public bool IsCompatible { get; set; }
 }
