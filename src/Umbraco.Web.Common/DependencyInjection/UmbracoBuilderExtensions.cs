@@ -46,7 +46,6 @@ using Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
 using Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs.ServerRegistration;
 using Umbraco.Cms.Infrastructure.DependencyInjection;
 using Umbraco.Cms.Infrastructure.HostedServices;
-using Umbraco.Cms.Infrastructure.HostedServices.ServerRegistration;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
@@ -182,31 +181,6 @@ public static partial class UmbracoBuilderExtensions
     }
 
     /// <summary>
-    ///     Add Umbraco hosted services
-    /// </summary>
-    [Obsolete("Use AddRecurringBackgroundJobs instead")]
-    public static IUmbracoBuilder AddHostedServices(this IUmbracoBuilder builder)
-    {
-        builder.Services.AddHostedService<QueuedHostedService>();
-        builder.Services.AddHostedService<HealthCheckNotifier>();
-        builder.Services.AddHostedService<KeepAlive>();
-        builder.Services.AddHostedService<LogScrubber>();
-        builder.Services.AddHostedService<ContentVersionCleanup>();
-        builder.Services.AddHostedService<TemporaryFileCleanup>();
-        builder.Services.AddHostedService<ScheduledPublishing>();
-        builder.Services.AddHostedService<TempFileCleanup>();
-        builder.Services.AddHostedService<InstructionProcessTask>();
-        builder.Services.AddHostedService<TouchServerTask>();
-        builder.Services.AddHostedService(provider =>
-            new ReportSiteTask(
-                provider.GetRequiredService<ILogger<ReportSiteTask>>(),
-                provider.GetRequiredService<ITelemetryService>()));
-
-
-        return builder;
-    }
-
-    /// <summary>
     ///     Add Umbraco recurring background jobs
     /// </summary>
     public static IUmbracoBuilder AddRecurringBackgroundJobs(this IUmbracoBuilder builder)
@@ -218,19 +192,17 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddRecurringBackgroundJob<ContentVersionCleanupJob>();
         builder.Services.AddRecurringBackgroundJob<ScheduledPublishingJob>();
         builder.Services.AddRecurringBackgroundJob<TempFileCleanupJob>();
+        builder.Services.AddRecurringBackgroundJob<TemporaryFileCleanupJob>();
         builder.Services.AddRecurringBackgroundJob<InstructionProcessJob>();
         builder.Services.AddRecurringBackgroundJob<TouchServerJob>();
         builder.Services.AddRecurringBackgroundJob<WebhookFiring>();
         builder.Services.AddRecurringBackgroundJob<WebhookLoggingCleanup>();
-        builder.Services.AddRecurringBackgroundJob(provider =>
-            new ReportSiteJob(
-                provider.GetRequiredService<ILogger<ReportSiteJob>>(),
-                provider.GetRequiredService<ITelemetryService>()));
+        builder.Services.AddRecurringBackgroundJob<ReportSiteJob>();
 
 
-        builder.Services.AddHostedService<QueuedHostedService>();
         builder.Services.AddSingleton(RecurringBackgroundJobHostedService.CreateHostedServiceFactory);
         builder.Services.AddHostedService<RecurringBackgroundJobHostedServiceRunner>();
+        builder.Services.AddHostedService<QueuedHostedService>();
 
         return builder;
     }
