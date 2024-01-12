@@ -13,7 +13,7 @@ import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 export class UmbStylesheetWorkspaceContext
 	extends UmbEditableWorkspaceContextBase<UmbStylesheetDetailRepository, UmbStylesheetDetailModel>
-	implements UmbSaveableWorkspaceContextInterface<UmbStylesheetDetailModel | undefined>
+	implements UmbSaveableWorkspaceContextInterface
 {
 	#data = new UmbObjectState<UmbStylesheetDetailModel | undefined>(undefined);
 	readonly data = this.#data.asObservable();
