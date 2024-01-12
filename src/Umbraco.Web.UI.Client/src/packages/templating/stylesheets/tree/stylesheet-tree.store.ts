@@ -1,8 +1,11 @@
-import { UmbStylesheetTreeRepository } from './stylesheet-tree.repository.js';
+import { UmbStylesheetDetailModel } from '../types.js';
+import { UMB_STYLESHEET_DETAIL_STORE_CONTEXT } from '../repository/index.js';
+import { UMB_STYLESHEET_ENTITY_TYPE } from '../entity.js';
+import { UmbStylesheetTreeItemModel } from './types.js';
 import { UmbUniqueTreeStore } from '@umbraco-cms/backoffice/tree';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UMB_ACTION_EVENT_CONTEXT, UmbActionEvent, UmbActionEventContext } from '@umbraco-cms/backoffice/action';
+import { UmbStoreConnector } from '@umbraco-cms/backoffice/store';
 
 /**
  * @export
@@ -11,9 +14,6 @@ import { UMB_ACTION_EVENT_CONTEXT, UmbActionEvent, UmbActionEventContext } from 
  * @description - Tree Data Store for Stylesheets
  */
 export class UmbStylesheetTreeStore extends UmbUniqueTreeStore {
-	#actionEventContext?: UmbActionEventContext;
-	#treeRepository: UmbStylesheetTreeRepository;
-
 	/**
 	 * Creates an instance of UmbStylesheetTreeStore.
 	 * @param {UmbControllerHostElement} host
@@ -22,53 +22,36 @@ export class UmbStylesheetTreeStore extends UmbUniqueTreeStore {
 	constructor(host: UmbControllerHostElement) {
 		super(host, UMB_STYLESHEET_TREE_STORE_CONTEXT.toString());
 
-		this.#treeRepository = new UmbStylesheetTreeRepository(host);
-
-		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (instance) => {
-			this.#actionEventContext = instance;
-			this.#listen();
-		});
+		new UmbStoreConnector<UmbStylesheetTreeItemModel, UmbStylesheetDetailModel>(
+			host,
+			this,
+			UMB_STYLESHEET_DETAIL_STORE_CONTEXT,
+			(item) => this.#createTreeItemMapper(item),
+			(item) => this.#updateTreeItemMapper(item),
+		);
 	}
 
-	#listen() {
-		// TODO: add event class to remove the magic strings
-		this.#actionEventContext?.addEventListener('detail-create-success', this.#onCreated as EventListener);
-		this.#actionEventContext?.addEventListener('detail-save-success', this.#onSaved as EventListener);
-		this.#actionEventContext?.addEventListener('detail-delete-success', this.#onDeleted as EventListener);
-	}
+	// TODO: revisit this when we have decided on detail model sizes
+	#createTreeItemMapper = (item: UmbStylesheetDetailModel) => {
+		const treeItem: UmbStylesheetTreeItemModel = {
+			unique: item.unique,
+			parentUnique: item.parentUnique,
+			entityType: UMB_STYLESHEET_ENTITY_TYPE,
+			name: item.name,
+			hasChildren: false,
+			isContainer: false,
+			isFolder: false,
+		};
 
-	#stopListening() {
-		this.#actionEventContext?.removeEventListener('detail-create-success', this.#onCreated as EventListener);
-		this.#actionEventContext?.removeEventListener('detail-save-success', this.#onSaved as EventListener);
-		this.#actionEventContext?.removeEventListener('detail-delete-success', this.#onDeleted as EventListener);
-	}
-
-	#onCreated = (event: UmbActionEvent) => {
-		// the item doesn't exist yet, so we reload the parent
-		const eventParentUnique = event.getParentUnique();
-		this.#treeRepository.requestTreeItemsOf(eventParentUnique);
+		return treeItem;
 	};
 
-	#onSaved = (event: UmbActionEvent) => {
-		// only reload the parent if the item is already in the store
-		const eventUnique = event.getUnique();
-		const storeItem = this.getItems([eventUnique])?.[0];
-
-		/* we need to remove the store because the unique (path) can have changed.
-		and it will therefore not update the correct item but append a new. */
-		if (storeItem) {
-			this.removeItem(eventUnique);
-			this.#treeRepository.requestTreeItemsOf(storeItem.parentUnique);
-		}
+	// TODO: revisit this when we have decided on detail model sizes
+	#updateTreeItemMapper = (item: UmbStylesheetDetailModel) => {
+		return {
+			name: item.name,
+		};
 	};
-
-	#onDeleted = (event: UmbActionEvent) => {
-		this.removeItem(event.getUnique());
-	};
-
-	onDestroy() {
-		this.#stopListening();
-	}
 }
 
 export const UMB_STYLESHEET_TREE_STORE_CONTEXT = new UmbContextToken<UmbStylesheetTreeStore>('UmbStylesheetTreeStore');
