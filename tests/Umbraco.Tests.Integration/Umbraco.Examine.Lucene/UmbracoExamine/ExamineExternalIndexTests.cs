@@ -8,6 +8,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Notifications;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
@@ -22,7 +23,6 @@ using Umbraco.Cms.Web.BackOffice.Security;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine;
 
-[Ignore("Need rework after save and publish have been splitted")]
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
 public class ExamineExternalIndexTests : ExamineBaseTest
@@ -60,6 +60,8 @@ public class ExamineExternalIndexTests : ExamineBaseTest
 
     private IBackOfficeSignInManager BackOfficeSignInManager => GetRequiredService<IBackOfficeSignInManager>();
 
+    private ICoreScopeProvider CoreScopeProvider => GetRequiredService<ICoreScopeProvider>();
+
     protected override void CustomTestSetup(IUmbracoBuilder builder)
     {
         builder.Services.AddUnique<IExamineExternalIndexSearcherTest, ExamineExternalIndexSearcherTest>();
@@ -74,8 +76,13 @@ public class ExamineExternalIndexTests : ExamineBaseTest
     }
 
     private IEnumerable<ISearchResult> ExamineExternalIndexSearch(string query, int pageSize = 20, int pageIndex = 0) =>
-        ExamineExternalIndexSearcher.Search(query, UmbracoEntityTypes.Document,
-            pageSize, pageIndex, out _, ignoreUserStartNodes: true);
+        ExamineExternalIndexSearcher.Search(
+            query,
+            UmbracoEntityTypes.Document,
+            pageSize,
+            pageIndex,
+            out _,
+            ignoreUserStartNodes: true);
 
     private async Task SetupUserIdentity(string userId)
     {
@@ -100,7 +107,16 @@ public class ExamineExternalIndexTests : ExamineBaseTest
             .WithName(ContentName)
             .WithContentType(contentType)
             .Build();
-        await ExecuteAndWaitForIndexing(() => ContentService.SaveAndPublish(content), Constants.UmbracoIndexes.ExternalIndexName);
+        await ExecuteAndWaitForIndexing(
+            () =>
+        {
+            using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
+            ContentService.Save(content);
+            var published = ContentService.Publish(content, Array.Empty<string>());
+            scope.Complete();
+            return published;
+        },
+            Constants.UmbracoIndexes.ExternalIndexName);
 
         // Act
         IEnumerable<ISearchResult> actual = ExamineExternalIndexSearch(ContentName);
@@ -127,7 +143,15 @@ public class ExamineExternalIndexTests : ExamineBaseTest
             .WithName(ContentName)
             .WithContentType(contentType)
             .Build();
-        await ExecuteAndWaitForIndexing(() => ContentService.Save(content), Constants.UmbracoIndexes.ExternalIndexName);
+        await ExecuteAndWaitForIndexing(
+            () =>
+        {
+            using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
+            var result = ContentService.Save(content);
+            scope.Complete();
+            return result;
+        },
+            Constants.UmbracoIndexes.ExternalIndexName);
 
         // Act
         IEnumerable<ISearchResult> actual = ExamineExternalIndexSearch(ContentName);
