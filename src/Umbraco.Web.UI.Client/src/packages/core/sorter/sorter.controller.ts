@@ -212,7 +212,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 			: this.#containerElement;
 		containerElement.querySelectorAll(this.#config.itemSelector).forEach((child) => {
 			if (child.matches && child.matches(this.#config.itemSelector)) {
-				this.setupItem(child as HTMLElement);
+				this.setupItem(child as ElementType);
 			}
 		});
 		this.#observer.observe(containerElement, {
@@ -230,7 +230,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		}
 	}
 
-	setupItem(element: HTMLElement) {
+	setupItem(element: ElementType) {
 		if (this.#config.ignorerSelector) {
 			setupIgnorerElements(element, this.#config.ignorerSelector);
 		}
@@ -238,6 +238,13 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		if (!this.#config.disabledItemSelector || !element.matches(this.#config.disabledItemSelector)) {
 			element.draggable = true;
 			element.addEventListener('dragstart', this.#handleDragStart);
+		}
+
+		// If we have a currentItem and the element matches, we should set the currentElement to this element.
+		if (this.#currentItem && this.#config.compareElementToModel(element, this.#currentItem)) {
+			console.log('got new current element', element);
+			this.#currentElement = element;
+			this.#setupPlaceholderStyle();
 		}
 	}
 
@@ -249,7 +256,27 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		element.removeEventListener('dragstart', this.#handleDragStart);
 	}
 
+	#setupPlaceholderStyle() {
+		if (this.#config.placeholderClass) {
+			this.#currentElement?.classList.add(this.#config.placeholderClass);
+		}
+		if (this.#config.placeholderAttr) {
+			this.#currentElement?.setAttribute(this.#config.placeholderAttr, '');
+		}
+	}
+	#removePlaceholderStyle() {
+		console.log('remove placeholder style', this.#currentElement);
+		if (this.#config.placeholderClass) {
+			this.#currentElement?.classList.remove(this.#config.placeholderClass);
+		}
+		if (this.#config.placeholderAttr) {
+			this.#currentElement?.removeAttribute(this.#config.placeholderAttr);
+		}
+	}
+
 	#handleDragStart = (event: DragEvent) => {
+		console.log('#drag start!');
+
 		if (this.#currentElement) {
 			this.#handleDragEnd();
 		}
@@ -302,26 +329,23 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 			this.#config.onStart({ item: this.#currentItem, element: this.#currentElement });
 		}
 
+		console.log('add eventlisteners to window');
 		window.addEventListener('dragover', this.#handleDragMove);
 		window.addEventListener('dragend', this.#handleDragEnd);
 
 		// We must wait one frame before changing the look of the block.
 		this.#rqaId = requestAnimationFrame(() => {
-			// It should be okay to use the same rqaId, as the move does not or is okay not to happen on first frame/drag-move.
+			// It should be okay to use the same rqaId, as the move does not, or is okay not, to happen on first frame/drag-move.
 			this.#rqaId = undefined;
 			if (this.#currentElement) {
 				this.#currentElement.style.transform = '';
-				if (this.#config.placeholderClass) {
-					this.#currentElement.classList.add(this.#config.placeholderClass);
-				}
-				if (this.#config.placeholderAttr) {
-					this.#currentElement.setAttribute(this.#config.placeholderAttr, '');
-				}
+				this.#setupPlaceholderStyle();
 			}
 		});
 	};
 
 	#handleDragEnd = async () => {
+		console.log('#drag end!');
 		if (!this.#currentElement || !this.#currentItem) {
 			return;
 		}
@@ -329,12 +353,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		window.removeEventListener('dragover', this.#handleDragMove);
 		window.removeEventListener('dragend', this.#handleDragEnd);
 		this.#currentElement.style.transform = '';
-		if (this.#config.placeholderClass) {
-			this.#currentElement.classList.remove(this.#config.placeholderClass);
-		}
-		if (this.#config.placeholderAttr) {
-			this.#currentElement.removeAttribute(this.#config.placeholderAttr);
-		}
+		this.#removePlaceholderStyle();
 
 		this.#stopAutoScroll();
 		this.removeAllowIndication();

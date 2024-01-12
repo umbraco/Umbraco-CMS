@@ -1,5 +1,5 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, customElement, LitElement, repeat, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, LitElement, repeat, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
 import { UmbSorterConfig, UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 

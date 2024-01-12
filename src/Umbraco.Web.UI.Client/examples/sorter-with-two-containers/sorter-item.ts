@@ -14,7 +14,7 @@ export class ExampleSorterItem extends UmbElementMixin(LitElement) {
 	render() {
 		return html`
 			${this.name}
-			<img src="https://picsum.photos/seed/${this.name}/500/500" style="width:250px;" />
+			<img src="https://picsum.photos/seed/${this.name}/400/400" style="width:120px;" />
 			<slot></slot>
 		`;
 	}
