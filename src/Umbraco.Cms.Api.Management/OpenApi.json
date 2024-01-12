@@ -810,11 +810,11 @@
       }
     },
     "/umbraco/management/api/v1/data-type/{id}/move": {
-      "post": {
+      "put": {
         "tags": [
           "Data Type"
         ],
-        "operationId": "PostDataTypeByIdMove",
+        "operationId": "PutDataTypeByIdMove",
         "parameters": [
           {
             "name": "id",
@@ -2120,11 +2120,11 @@
       }
     },
     "/umbraco/management/api/v1/dictionary/{id}/move": {
-      "post": {
+      "put": {
         "tags": [
           "Dictionary"
         ],
-        "operationId": "PostDictionaryByIdMove",
+        "operationId": "PutDictionaryByIdMove",
         "parameters": [
           {
             "name": "id",
