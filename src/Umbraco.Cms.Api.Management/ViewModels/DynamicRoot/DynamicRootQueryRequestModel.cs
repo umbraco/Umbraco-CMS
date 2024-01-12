@@ -4,5 +4,5 @@ public class DynamicRootQueryRequestModel
 {
     public required DynamicRootQueryOriginRequestModel Origin { get; set; }
 
-    public required IEnumerable<DynamicRootQueryStepRequestModel> QuerySteps { get; set; }
+    public required IEnumerable<DynamicRootQueryStepRequestModel> Steps { get; set; }
 }
