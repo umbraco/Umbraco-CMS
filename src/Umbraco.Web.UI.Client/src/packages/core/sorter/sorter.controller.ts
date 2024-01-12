@@ -129,7 +129,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 	#currentElement?: ElementType;
 	#currentDragElement?: Element;
 	#currentDragRect?: DOMRect;
-	#currentItem?: T | null;
+	#currentItem?: T;
 
 	#currentIndex?: number;
 	#dragX = 0;
@@ -152,8 +152,6 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 
 		this.#config = config as INTERNAL_UmbSorterConfig<T, ElementType>;
 		host.addController(this);
-
-		//this.#currentContainerElement = host;
 
 		this.#observer = new MutationObserver((mutations) => {
 			mutations.forEach((mutation) => {
@@ -189,7 +187,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 
 		this.#useContainerShadowRoot = this.#containerElement === this.#host;
 
-		if (this.#currentContainerElement === this.#containerElement) {
+		if (!this.#currentContainerElement || this.#currentContainerElement === this.#containerElement) {
 			this.#currentContainerElement = containerEl;
 		}
 		this.#containerElement = containerEl as HTMLElement;
@@ -434,9 +432,11 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		// If we have items we must be 10px within the container to accept the move.
 		const offsetEdge = currentContainerHasItems ? -10 : 20;
 		if (!isWithinRect(this.#dragX, this.#dragY, currentBoundaryRect, offsetEdge)) {
-			// we are outside the current container boundary, so lets see if there is a parent we can move.
+			// we are outside the current container boundary, so lets see if there is a parent we can move to.
+
 			const parentNode = this.#currentContainerElement.parentNode;
 			if (parentNode && this.#config.containerSelector) {
+				let foundParentContainer = false;
 				// TODO: support multiple parent shadowDOMs?
 				const parentContainer = (parentNode as ShadowRoot).host
 					? (parentNode as ShadowRoot).host.closest(this.#config.containerSelector)
@@ -444,6 +444,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 				if (parentContainer) {
 					const parentContainerCtrl = (parentContainer as any)['__umbBlockGridSorterController']();
 					if (parentContainerCtrl.unique === this.controllerAlias) {
+						foundParentContainer = true;
 						this.#currentContainerElement = parentContainer as Element;
 						toBeCurrentContainerCtrl = parentContainerCtrl;
 						if (this.#config.onContainerChange) {
@@ -455,6 +456,13 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 						}
 					}
 				}
+
+				// Okay we did not find a parent container, so lets see if can go sideways:
+				/*
+				if (!foundParentContainer) {
+
+				}
+				*/
 			}
 		}
 
@@ -640,7 +648,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 
 	public getItemOfElement(element: ElementType) {
 		if (!element) {
-			return null;
+			return undefined;
 		}
 		return this.#model.find((entry: T) => this.#config.compareElementToModel(element, entry));
 	}
