@@ -16,4 +16,7 @@ public abstract class MediaTypeControllerBase : ManagementApiControllerBase
 {
     protected IActionResult OperationStatusResult(ContentTypeOperationStatus status)
         => DocumentTypeControllerBase.ContentTypeOperationStatusResult(status, "media");
+
+    protected IActionResult StructureOperationStatusResult(ContentTypeStructureOperationStatus status)
+        => DocumentTypeControllerBase.ContentTypeStructureOperationStatusResult(status, "media");
 }
