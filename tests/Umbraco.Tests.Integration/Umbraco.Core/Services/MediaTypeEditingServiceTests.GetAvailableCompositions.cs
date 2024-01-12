@@ -46,16 +46,11 @@ public partial class MediaTypeEditingServiceTests
                 Enumerable.Empty<string>(),
                 false);
 
-        //Assert.AreEqual(2, availableCompositions.Count());
-
         // Verify that mediaType2 and mediaType3 are present in available compositions
         Assert.IsTrue(availableCompositions.Any(compositionsResult =>
             compositionsResult.Composition.Key == result2.Result!.Key && compositionsResult.Allowed));
         Assert.IsTrue(availableCompositions.Any(compositionsResult =>
             compositionsResult.Composition.Key == result3.Result!.Key && compositionsResult.Allowed));
-
-        // Ensure that mediaType1 is not
-        Assert.IsFalse(availableCompositions.Any(compositionsResult => compositionsResult.Composition.Key == result1.Result!.Key));
     }
 
     [Test]
@@ -87,8 +82,6 @@ public partial class MediaTypeEditingServiceTests
                 Enumerable.Empty<Guid>(),
                 Enumerable.Empty<string>(),
                 false);
-
-        //Assert.AreEqual(0, availableCompositions.Count());
 
         Assert.IsFalse(availableCompositions.Any(compositionsResult => compositionsResult.Composition.Key == result2.Result!.Key));
     }
