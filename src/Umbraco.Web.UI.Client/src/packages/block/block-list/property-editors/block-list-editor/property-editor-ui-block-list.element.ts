@@ -140,11 +140,11 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 	render() {
 		return html` ${repeat(
 				this._layouts,
-				(x, index) => x.contentUdi + index,
-				(layoutEntry, index) => html`
-					<umb-property-editor-ui-block-list-block .layout=${layoutEntry}> </umb-property-editor-ui-block-list-block>
-					${index !== this._layouts.length - 1 ? html`<uui-button-inline-create></uui-button-inline-create>` : nothing}
-				`,
+				(x) => x.contentUdi,
+				(layoutEntry) =>
+					html`<uui-button-inline-create></uui-button-inline-create>
+						<umb-property-editor-ui-block-list-block .layout=${layoutEntry}>
+						</umb-property-editor-ui-block-list-block> `,
 			)}
 			<uui-button-group>
 				<uui-button
@@ -178,7 +178,7 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 			}
 
 			uui-button-group {
-				padding-top: 2px;
+				padding-top: 1px;
 				display: grid;
 				grid-template-columns: 1fr auto;
 			}
