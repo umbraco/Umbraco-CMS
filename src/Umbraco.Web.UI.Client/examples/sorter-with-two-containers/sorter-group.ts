@@ -38,28 +38,34 @@ export class ExampleSorterGroup extends UmbElementMixin(LitElement) {
 		...SORTER_CONFIG,
 		performItemInsert: ({ item, newIndex }) => {
 			const oldValue = this._items;
-			this.items = [...this._items];
-			this.items.splice(newIndex, 0, item);
 			//console.log('inserted', item.name, 'at', newIndex, '	', this._items.map((x) => x.name).join(', '));
-			this.requestUpdate('items', oldValue);
+			const newItems = [...this._items];
+			newItems.splice(newIndex, 0, item);
+			this.items = newItems;
+			this.requestUpdate('_items', oldValue);
 			return true;
 		},
 		performItemRemove: ({ item }) => {
 			const oldValue = this._items;
-			const indexToMove = this._items.findIndex((x) => x.name === item.name);
-			this._items = [...this._items];
-			this._items.splice(indexToMove, 1);
 			//console.log('removed', item.name, 'at', indexToMove, '	', this._items.map((x) => x.name).join(', '));
-			this.requestUpdate('items', oldValue);
+			const indexToMove = this._items.findIndex((x) => x.name === item.name);
+			const newItems = [...this._items];
+			newItems.splice(indexToMove, 1);
+			this.items = newItems;
+			this.requestUpdate('_items', oldValue);
 			return true;
 		},
-		performItemMove: ({ item, newIndex }) => {
+		performItemMove: ({ item, newIndex, oldIndex }) => {
 			const oldValue = this._items;
-			const indexToMove = this._items.findIndex((x) => x.name === item.name);
-			this._items = [...this._items];
-			this._items.splice(indexToMove, 1);
-			this._items.splice(newIndex, 0, item);
-			this.requestUpdate('items', oldValue);
+			//console.log('move', item.name, 'from', oldIndex, 'to', newIndex, '	', this._items.map((x) => x.name).join(', '));
+			const newItems = [...this._items];
+			newItems.splice(oldIndex, 1);
+			if (oldIndex <= newIndex) {
+				newIndex--;
+			}
+			newItems.splice(newIndex, 0, item);
+			this.items = newItems;
+			this.requestUpdate('_items', oldValue);
 			return true;
 		},
 	});
@@ -69,8 +75,7 @@ export class ExampleSorterGroup extends UmbElementMixin(LitElement) {
 	}
 
 	removeItem = (item: ModelEntryType) => {
-		this._items = this._items.filter((r) => r.name !== item.name);
-		this.#sorter.setModel(this._items);
+		this.items = this._items.filter((r) => r.name !== item.name);
 	};
 
 	render() {

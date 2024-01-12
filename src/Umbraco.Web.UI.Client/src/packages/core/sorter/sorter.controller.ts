@@ -243,8 +243,10 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 
 		// If we have a currentItem and the element matches, we should set the currentElement to this element.
 		if (this.#currentItem && this.#config.compareElementToModel(element, this.#currentItem)) {
-			console.log('got new current element', this.#currentElement === element, element);
-			this.#setCurrentElement(element);
+			if (this.#currentElement !== element) {
+				console.log('THIS ACTUALLY HAPPENED... NOTICE THIS!');
+				this.#setCurrentElement(element);
+			}
 		}
 	}
 
@@ -664,6 +666,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 			const oldIndex = this.#model.indexOf(item);
 			if (oldIndex !== -1) {
 				this.#model.splice(oldIndex, 1);
+				this.#config.modelChangedCallback?.(this.#model);
 				return true;
 			}
 		}
@@ -686,24 +689,26 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 
 		const localMove = fromCtrl === this;
 
-		const movingItemIndex = localMove ? this.#model.indexOf(movingItem) : -1;
-
-		if (movingItemIndex !== -1 && newIndex >= movingItemIndex) {
-			newIndex--;
-		}
-
 		if (localMove) {
 			// Local move:
 
+			// TODO: Maybe this should be replaceable/configurable:
+			const oldIndex = this.#model.indexOf(movingItem);
+
 			if (this.#config.performItemMove) {
-				const result = await this.#config.performItemMove({ item: movingItem, newIndex });
+				const result = await this.#config.performItemMove({ item: movingItem, newIndex, oldIndex });
 				if (result === false) {
 					return false;
 				}
 			} else {
 				throw new Error('performItemMove must be configured, until default fallback method is made.');
-				//this.#model.splice(movingItemIndex, 1)
-				//this.#model.splice(newIndex, 0, movingItem);
+				this.#model.splice(oldIndex, 1);
+				if (oldIndex <= newIndex) {
+					newIndex--;
+				}
+				this.#model.splice(newIndex, 0, movingItem);
+
+				this.#config.modelChangedCallback?.(this.#model);
 			}
 		} else {
 			// Not a local move:
@@ -720,6 +725,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 				}
 			} else {
 				this.#model.splice(newIndex, 0, movingItem);
+				this.#config.modelChangedCallback?.(this.#model);
 			}
 		}
 
