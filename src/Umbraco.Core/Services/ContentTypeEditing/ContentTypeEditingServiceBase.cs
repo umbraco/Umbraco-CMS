@@ -41,6 +41,29 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
 
     protected abstract UmbracoObjectTypes ContainerObjectType { get; }
 
+    protected async Task<IEnumerable<ContentTypeAvailableCompositionsResult>> FindAvailableCompositionsAsync(
+        Guid key,
+        IEnumerable<Guid> currentCompositeKeys,
+        IEnumerable<string> currentPropertyAliases,
+        bool isElement)
+    {
+        var contentType = await _concreteContentTypeService.GetAsync(key);
+        IContentTypeComposition[] allContentTypes = _concreteContentTypeService.GetAll().ToArray();
+
+        var currentCompositionAliases = currentCompositeKeys.Any()
+            ? allContentTypes.Where(ct => currentCompositeKeys.Contains(ct.Key)).Select(ct => ct.Alias).ToArray()
+            : Array.Empty<string>();
+
+        ContentTypeAvailableCompositionsResults availableCompositions = _contentTypeService.GetAvailableCompositeContentTypes(
+            contentType,
+            allContentTypes,
+            currentCompositionAliases,
+            currentPropertyAliases.ToArray(),
+            isElement);
+
+        return availableCompositions.Results;
+    }
+
     protected async Task<Attempt<TContentType?, ContentTypeOperationStatus>> ValidateAndMapForCreationAsync(ContentTypeEditingModelBase<TPropertyTypeModel, TPropertyTypeContainer> model, Guid? key, Guid? containerKey)
     {
         SanitizeModelAliases(model);
@@ -290,6 +313,7 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
             .Where(x => x.Allowed)
             .Select(x => x.Composition.Key)
             .ToArray();
+
         if (allowedCompositionKeys.ContainsAll(compositionKeys) is false)
         {
             return ContentTypeOperationStatus.InvalidComposition;
