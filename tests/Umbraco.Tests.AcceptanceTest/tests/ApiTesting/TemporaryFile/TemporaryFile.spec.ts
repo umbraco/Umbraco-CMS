@@ -8,29 +8,31 @@ test.describe('Temporary File tests', () => {
   const mimeType = 'image/png';
   const filePath = './fixtures/mediaLibrary/Umbraco.png';
 
-  test.beforeEach(async ({page, umbracoApi}) => {
+  test.beforeEach(async ({umbracoApi}) => {
     await umbracoApi.temporaryFile.delete(temporaryFileId);
   });
 
-  test.afterEach(async ({page, umbracoApi}) => {
+  test.afterEach(async ({umbracoApi}) => {
     await umbracoApi.temporaryFile.delete(temporaryFileId);
   });
 
-  test('can create temporary file', async ({page, umbracoApi, umbracoUi}) => {
+  test('can create temporary file', async ({umbracoApi}) => {
+    // Act
     await umbracoApi.temporaryFile.create(temporaryFileId, fileName, mimeType, filePath);
 
     // Assert
-    await expect(await umbracoApi.temporaryFile.exists(temporaryFileId)).toBeTruthy();
+    expect(await umbracoApi.temporaryFile.exists(temporaryFileId)).toBeTruthy();
   });
 
-  test('can delete temporary file', async ({page, umbracoApi, umbracoUi}) => {
+  test('can delete temporary file', async ({umbracoApi}) => {
+    // Arrange
     await umbracoApi.temporaryFile.create(temporaryFileId, fileName, mimeType, filePath);
+    expect(await umbracoApi.temporaryFile.get(temporaryFileId)).toBeTruthy();
 
-    await expect(await umbracoApi.temporaryFile.get(temporaryFileId)).toBeTruthy();
-
+    // Act
     await umbracoApi.temporaryFile.delete(temporaryFileId);
 
     // Assert
-    await expect(await umbracoApi.temporaryFile.exists(temporaryFileId)).toBeFalsy();
+    expect(await umbracoApi.temporaryFile.exists(temporaryFileId)).toBeFalsy();
   });
 });

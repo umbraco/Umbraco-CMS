@@ -5,45 +5,49 @@ test.describe('User Group Tests', () => {
   let userGroupId = "";
   const userGroupName = "UserGroupTest";
 
-  test.beforeEach(async ({page, umbracoApi}) => {
+  test.beforeEach(async ({umbracoApi}) => {
     await umbracoApi.userGroup.ensureNameNotExists(userGroupName);
   });
 
-  test.afterEach(async ({page, umbracoApi}) => {
+  test.afterEach(async ({umbracoApi}) => {
     await umbracoApi.userGroup.delete(userGroupId);
   });
 
-  test('can create a user group', async ({page, umbracoApi, umbracoUi}) => {
+  test('can create a user group', async ({umbracoApi}) => {
+    // Arrange
     const sections = ["Umb.Section.Content",
       "Umb.Section.Forms",
       "Umb.Section.Media"];
 
+      // Act
     userGroupId = await umbracoApi.userGroup.create(userGroupName, true, sections);
 
     // Assert
-    await expect(umbracoApi.userGroup.exist(userGroupId)).toBeTruthy();
+    expect(umbracoApi.userGroup.exist(userGroupId)).toBeTruthy();
   });
 
-  test('can update a user group', async ({page, umbracoApi, umbracoUi}) => {
+  test('can update a user group', async ({umbracoApi}) => {
+    // Arrange
     userGroupId = await umbracoApi.userGroup.create('UserGroupNameTest', true);
-
     const userGroupData = await umbracoApi.userGroup.get(userGroupId);
-
-    // Updates name of the user group
     userGroupData.name = userGroupName;
+
+    // Act
     await umbracoApi.userGroup.update(userGroupId, userGroupData);
 
     // Assert
     const updatedUserGroupData = await umbracoApi.userGroup.get(userGroupId);
-    await expect(updatedUserGroupData.name).toEqual(userGroupName);
+    expect(updatedUserGroupData.name).toEqual(userGroupName);
   });
 
-  test('can delete a user group', async ({page, umbracoApi, umbracoUi}) => {
+  test('can delete a user group', async ({umbracoApi}) => {
+    // Arrange
     userGroupId = await umbracoApi.userGroup.create(userGroupName, true);
 
+    // Act
     await umbracoApi.userGroup.delete(userGroupId);
 
     // Assert
-    await expect(await umbracoApi.userGroup.exist(userGroupId)).toBeFalsy();
+    expect(await umbracoApi.userGroup.exist(userGroupId)).toBeFalsy();
   });
 });
