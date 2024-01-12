@@ -3,8 +3,8 @@ export interface UmbDataTypeDetailModel {
 	unique: string;
 	parentUnique: string | null;
 	name: string;
-	propertyEditorAlias: string | undefined;
-	propertyEditorUiAlias: string | null;
+	editorAlias: string | undefined;
+	editorUiAlias: string | null;
 	values: Array<UmbDataTypePropertyModel>;
 }
 
