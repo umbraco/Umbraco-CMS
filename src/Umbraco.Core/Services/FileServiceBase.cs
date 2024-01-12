@@ -39,6 +39,15 @@ public abstract class FileServiceBase<TRepository, TEntity> : RepositoryService,
         return true;
     }
 
+    /// <summary>
+    /// Checks if a path is considered a root path.
+    /// </summary>
+    /// <param name="path">The path to check.</param>
+    /// <returns>True if the path is considered a root path.</returns>
+    protected virtual bool IsRootPath(string? path)
+    // We use "/" here instead of path separator because it's the virtual path used by backoffice, and not an actual FS path.
+        => string.IsNullOrWhiteSpace(path) || path == "/";
+
     /// <inheritdoc />
     public Task<TEntity?> GetAsync(string path)
     {
