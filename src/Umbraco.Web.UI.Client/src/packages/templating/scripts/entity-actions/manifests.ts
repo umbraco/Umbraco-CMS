@@ -1,6 +1,7 @@
 import { UMB_SCRIPT_DETAIL_REPOSITORY_ALIAS } from '../repository/index.js';
 import { UMB_SCRIPT_ENTITY_TYPE } from '../entity.js';
 import { manifests as createManifests } from './create/manifests.js';
+import { manifests as renameManifests } from './rename/manifests.js';
 import { UmbDeleteEntityAction } from '@umbraco-cms/backoffice/entity-action';
 import { ManifestEntityAction } from '@umbraco-cms/backoffice/extension-registry';
 
@@ -21,4 +22,4 @@ const scriptViewActions: Array<ManifestEntityAction> = [
 	},
 ];
 
-export const manifests = [...scriptViewActions, ...createManifests];
+export const manifests = [...scriptViewActions, ...createManifests, ...renameManifests];
