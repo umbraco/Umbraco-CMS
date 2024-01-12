@@ -147,7 +147,9 @@ export class UmbSorterController<T extends object> implements UmbController {
 
 		// Set defaults:
 		config.ignorerSelector ??= 'a, img, iframe';
-		config.placeholderAttr ??= 'drag-placeholder';
+		if (!config.placeholderClass && !config.placeholderAttr) {
+			config.placeholderAttr = 'drag-placeholder';
+		}
 
 		this.#config = config as INTERNAL_UmbSorterConfig<T>;
 		host.addController(this);

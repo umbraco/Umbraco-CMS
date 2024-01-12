@@ -74,7 +74,7 @@ export class ExampleSorterGroup extends UmbElementMixin(LitElement) {
 			<div class="sorter-container">
 				${repeat(
 					this._items,
-					(item) => item.name,
+					(item) => item,
 					(item) =>
 						html`<example-sorter-item name=${item.name}>
 							<button @click=${() => this.removeItem(item)}>Delete</button>

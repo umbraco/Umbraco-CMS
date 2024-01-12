@@ -14,6 +14,7 @@ export class ExampleSorterItem extends UmbElementMixin(LitElement) {
 	render() {
 		return html`
 			${this.name}
+			<img src="https://picsum.photos/seed/${this.name}/5000/5000" style="width:250px;" />
 			<slot></slot>
 		`;
 	}
@@ -30,7 +31,7 @@ export class ExampleSorterItem extends UmbElementMixin(LitElement) {
 				border-radius: var(--uui-border-radius);
 				margin-bottom: 3px;
 			}
-			:host[drag-placeholder] {
+			:host([drag-placeholder]) {
 				opacity: 0.2;
 			}
 		`,
