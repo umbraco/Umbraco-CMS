@@ -37,16 +37,18 @@ export class ExampleSorterGroup extends UmbElementMixin(LitElement) {
 	#sorter = new UmbSorterController<ModelEntryType, ExampleSorterItem>(this, {
 		...SORTER_CONFIG,
 		performItemInsert: ({ item, newIndex }) => {
+			const oldValue = [...this._items];
 			this._items.splice(newIndex, 0, item);
 			//console.log('inserted', item.name, 'at', newIndex, '	', this._items.map((x) => x.name).join(', '));
-			this.requestUpdate('_items');
+			this.requestUpdate('items', oldValue);
 			return true;
 		},
 		performItemRemove: ({ item }) => {
+			const oldValue = [...this._items];
 			const indexToMove = this._items.findIndex((x) => x.name === item.name);
 			this._items.splice(indexToMove, 1);
 			//console.log('removed', item.name, 'at', indexToMove, '	', this._items.map((x) => x.name).join(', '));
-			this.requestUpdate('_items');
+			this.requestUpdate('items', oldValue);
 			return true;
 		},
 	});
@@ -64,8 +66,8 @@ export class ExampleSorterGroup extends UmbElementMixin(LitElement) {
 		return html`
 			<div class="sorter-container">
 				${repeat(
-					this._items,
-					(item, index) => item.name + '_ ' + index,
+					this.items,
+					(item) => item.name,
 					(item) =>
 						html`<example-sorter-item name=${item.name}>
 							<button @click=${() => this.removeItem(item)}>Delete</button>

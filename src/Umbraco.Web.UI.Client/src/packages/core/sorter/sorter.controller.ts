@@ -163,12 +163,12 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 			mutations.forEach((mutation) => {
 				mutation.addedNodes.forEach((addedNode) => {
 					if ((addedNode as HTMLElement).matches && (addedNode as HTMLElement).matches(this.#config.itemSelector)) {
-						this.setupItem(addedNode as HTMLElement);
+						this.setupItem(addedNode as ElementType);
 					}
 				});
 				mutation.removedNodes.forEach((removedNode) => {
 					if ((removedNode as HTMLElement).matches && (removedNode as HTMLElement).matches(this.#config.itemSelector)) {
-						this.destroyItem(removedNode as HTMLElement);
+						this.destroyItem(removedNode as ElementType);
 					}
 				});
 			});
@@ -242,9 +242,8 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 
 		// If we have a currentItem and the element matches, we should set the currentElement to this element.
 		if (this.#currentItem && this.#config.compareElementToModel(element, this.#currentItem)) {
-			console.log('got new current element', element);
-			this.#currentElement = element;
-			this.#setupPlaceholderStyle();
+			console.log('got new current element', this.#currentElement === element, element);
+			this.#setCurrentElement(element);
 		}
 	}
 
@@ -274,26 +273,8 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		}
 	}
 
-	#handleDragStart = (event: DragEvent) => {
-		console.log('#drag start!');
-
-		if (this.#currentElement) {
-			this.#handleDragEnd();
-		}
-
-		event.stopPropagation();
-		if (event.dataTransfer) {
-			event.dataTransfer.effectAllowed = 'move'; // copyMove when we enhance the drag with clipboard data.
-			event.dataTransfer.dropEffect = 'none'; // visual feedback when dropped.
-		}
-
-		if (!this.#scrollElement) {
-			this.#scrollElement = getParentScrollElement(this.#containerElement, true);
-		}
-
-		const element = (event.target as HTMLElement).closest(this.#config.itemSelector);
-
-		if (!element) return;
+	#setCurrentElement(element: ElementType) {
+		this.#currentElement = element;
 
 		this.#currentDragElement = this.#config.draggableSelector
 			? element.querySelector(this.#config.draggableSelector) ?? undefined
@@ -308,9 +289,33 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 			return;
 		}
 
-		this.#currentElement = element as ElementType;
-		this.#currentDragRect = this.#currentDragElement.getBoundingClientRect();
-		this.#currentItem = this.getItemOfElement(this.#currentElement);
+		this.#setupPlaceholderStyle();
+	}
+
+	#handleDragStart = (event: DragEvent) => {
+		const element = (event.target as HTMLElement).closest(this.#config.itemSelector);
+		if (!element) return;
+
+		console.log('#drag start!');
+
+		if (this.#currentElement && this.#currentElement !== element) {
+			console.log('#drag start, calls END!!!!!');
+			this.#handleDragEnd();
+		}
+
+		event.stopPropagation();
+		if (event.dataTransfer) {
+			event.dataTransfer.effectAllowed = 'move'; // copyMove when we enhance the drag with clipboard data.
+			event.dataTransfer.dropEffect = 'none'; // visual feedback when dropped.
+		}
+
+		if (!this.#scrollElement) {
+			this.#scrollElement = getParentScrollElement(this.#containerElement, true);
+		}
+
+		this.#setCurrentElement(element as ElementType);
+		this.#currentDragRect = this.#currentDragElement?.getBoundingClientRect();
+		this.#currentItem = this.getItemOfElement(this.#currentElement!);
 		if (!this.#currentItem) {
 			console.error('Could not find item related to this element.');
 			return;
@@ -319,17 +324,16 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		// Get the current index of the item:
 		this.#currentIndex = this.#model.indexOf(this.#currentItem);
 
-		this.#currentElement.style.transform = 'translateZ(0)'; // Solves problem with FireFox and ShadowDom in the drag-image.
+		this.#currentElement!.style.transform = 'translateZ(0)'; // Solves problem with FireFox and ShadowDom in the drag-image.
 
 		if (this.#config.dataTransferResolver) {
 			this.#config.dataTransferResolver(event.dataTransfer, this.#currentItem);
 		}
 
 		if (this.#config.onStart) {
-			this.#config.onStart({ item: this.#currentItem, element: this.#currentElement });
+			this.#config.onStart({ item: this.#currentItem, element: this.#currentElement! });
 		}
 
-		console.log('add eventlisteners to window');
 		window.addEventListener('dragover', this.#handleDragMove);
 		window.addEventListener('dragend', this.#handleDragEnd);
 
@@ -346,12 +350,13 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 
 	#handleDragEnd = async () => {
 		console.log('#drag end!');
+		window.removeEventListener('dragover', this.#handleDragMove);
+		window.removeEventListener('dragend', this.#handleDragEnd);
+
 		if (!this.#currentElement || !this.#currentItem) {
 			return;
 		}
 
-		window.removeEventListener('dragover', this.#handleDragMove);
-		window.removeEventListener('dragend', this.#handleDragEnd);
 		this.#currentElement.style.transform = '';
 		this.#removePlaceholderStyle();
 
