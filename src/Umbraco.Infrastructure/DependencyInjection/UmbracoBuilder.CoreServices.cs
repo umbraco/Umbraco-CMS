@@ -23,6 +23,7 @@ using Umbraco.Cms.Core.Mail;
 using Umbraco.Cms.Core.Manifest;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Migrations;
+using Umbraco.Cms.Core.Models.Context;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Packaging;
@@ -162,6 +163,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IPublishedSnapshotAccessor, UmbracoContextPublishedSnapshotAccessor>();
 
         builder.Services.AddSingleton<IVariationContextAccessor, HybridVariationContextAccessor>();
+        builder.Services.AddSingleton<IBackOfficeVariationContextAccessor, HttpContextBackOfficeVariationContextAccessor>();
 
         // Config manipulator
         builder.Services.AddSingleton<IConfigManipulator, JsonConfigManipulator>();

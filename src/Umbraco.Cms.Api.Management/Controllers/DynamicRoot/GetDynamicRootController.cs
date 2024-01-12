@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.ViewModels.DynamicRoot;
 using Umbraco.Cms.Core.DynamicRoot;
 using Umbraco.Cms.Core.Mapping;
-using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Models.Context;
 using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DynamicRoot;
@@ -16,9 +16,9 @@ public class GetRootsController : DynamicRootControllerBase
 {
     private readonly IDynamicRootService _dynamicRootService;
     private readonly IUmbracoMapper _umbracoMapper;
-    private readonly IVariationContextAccessor _variationContextAccessor;
+    private readonly IBackOfficeVariationContextAccessor _variationContextAccessor;
 
-    public GetRootsController(IDynamicRootService dynamicRootService, IUmbracoMapper umbracoMapper, IVariationContextAccessor variationContextAccessor)
+    public GetRootsController(IDynamicRootService dynamicRootService, IUmbracoMapper umbracoMapper, IBackOfficeVariationContextAccessor variationContextAccessor)
     {
         _dynamicRootService = dynamicRootService;
         _umbracoMapper = umbracoMapper;
@@ -28,10 +28,9 @@ public class GetRootsController : DynamicRootControllerBase
     [HttpPost("determine-roots-from-query")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(DynamicRootResponseModel), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetRoots([FromBody]DynamicRootRequestModel model)
+    public async Task<IActionResult> GetRoots(DynamicRootRequestModel model)
     {
-        //TODO For management API, can we figure out a better way to set the variation context
-        _variationContextAccessor.VariationContext = new VariationContext(model.Context.Culture, model.Context.Segment);
+        _variationContextAccessor.VariationContext = new BackOfficeVariationContext(model.Context.Culture, model.Context.Segment);
 
         DynamicRootNodeQuery dynamicRootNodeQuery = _umbracoMapper.Map<DynamicRootNodeQuery>(model)!;
 
