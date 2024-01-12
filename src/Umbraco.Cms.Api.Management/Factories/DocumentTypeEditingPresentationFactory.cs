@@ -3,7 +3,6 @@ using Umbraco.Cms.Api.Management.ViewModels.DocumentType.Composition;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Extensions;
 using ContentTypeCleanupViewModel = Umbraco.Cms.Api.Management.ViewModels.ContentType.ContentTypeCleanup;
 
 namespace Umbraco.Cms.Api.Management.Factories;
@@ -56,8 +55,8 @@ internal sealed class DocumentTypeEditingPresentationFactory : ContentTypeEditin
         return updateModel;
     }
 
-    public IEnumerable<AvailableDocumentTypeCompositionResponseModel> CreateCompositionModels(IEnumerable<ContentTypeAvailableCompositionsResult> compositionResults)
-        => compositionResults.Select(CreateCompositionModel);
+    public IEnumerable<AvailableDocumentTypeCompositionResponseModel> MapCompositionModels(IEnumerable<ContentTypeAvailableCompositionsResult> compositionResults)
+        => compositionResults.Select(MapCompositionModel<AvailableDocumentTypeCompositionResponseModel>);
 
     private void MapCleanup(ContentTypeModelBase model, ContentTypeCleanupViewModel cleanup)
         => model.Cleanup = new ContentTypeCleanup
@@ -66,25 +65,4 @@ internal sealed class DocumentTypeEditingPresentationFactory : ContentTypeEditin
             KeepAllVersionsNewerThanDays = cleanup.KeepAllVersionsNewerThanDays,
             KeepLatestVersionPerDayForDays = cleanup.KeepLatestVersionPerDayForDays
         };
-
-    private AvailableDocumentTypeCompositionResponseModel CreateCompositionModel(ContentTypeAvailableCompositionsResult compositionResult)
-    {
-        IContentTypeComposition composition = compositionResult.Composition;
-        IEnumerable<string>? folders = null;
-
-        if (composition is IContentType contentType)
-        {
-            var containers = _contentTypeService.GetContainers(contentType); // NB: different for media/member (media/member service)
-            folders = containers.Select(c => c.Name).WhereNotNull();
-        }
-
-        return new AvailableDocumentTypeCompositionResponseModel
-        {
-            Id = composition.Key,
-            Name = composition.Name ?? string.Empty,
-            Icon = composition.Icon ?? string.Empty,
-            FolderPath = folders ?? Array.Empty<string>(),
-            IsCompatible = compositionResult.Allowed
-        };
-    }
 }

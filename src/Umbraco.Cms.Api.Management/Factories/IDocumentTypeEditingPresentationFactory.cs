@@ -11,6 +11,5 @@ public interface IDocumentTypeEditingPresentationFactory
 
     ContentTypeUpdateModel MapUpdateModel(UpdateDocumentTypeRequestModel requestModel);
 
-    // TODO: move to ContentTypeEditingPresentationFactory when the implementation has the correct <Type>s
-    IEnumerable<AvailableDocumentTypeCompositionResponseModel> CreateCompositionModels(IEnumerable<ContentTypeAvailableCompositionsResult> compositionResults);
+    IEnumerable<AvailableDocumentTypeCompositionResponseModel> MapCompositionModels(IEnumerable<ContentTypeAvailableCompositionsResult> compositionResults);
 }

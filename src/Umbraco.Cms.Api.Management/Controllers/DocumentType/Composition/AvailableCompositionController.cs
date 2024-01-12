@@ -31,7 +31,7 @@ public class AvailableCompositionController : DocumentTypeControllerBase
             compositionModel.CurrentPropertyAliases,
             compositionModel.IsElement);
 
-        var responseModels = _presentationFactory.CreateCompositionModels(availableCompositions);
+        IEnumerable<AvailableDocumentTypeCompositionResponseModel> responseModels = _presentationFactory.MapCompositionModels(availableCompositions);
 
         return Ok(responseModels);
     }
