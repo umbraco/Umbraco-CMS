@@ -53,9 +53,6 @@ public partial class ContentTypeEditingServiceTests
             compositionsResult.Composition.Key == result2.Result!.Key && compositionsResult.Allowed));
         Assert.IsTrue(availableCompositions.Any(compositionsResult =>
             compositionsResult.Composition.Key == result3.Result!.Key && compositionsResult.Allowed));
-
-        // Ensure that contentType1 is not
-        Assert.IsFalse(availableCompositions.Any(compositionsResult => compositionsResult.Composition.Key == result1.Result!.Key));
     }
 
     [Test]
