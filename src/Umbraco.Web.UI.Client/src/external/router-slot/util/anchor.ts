@@ -3,7 +3,12 @@
  * that has a relative HREF, uses the history API instead.
  */
 export function ensureAnchorHistory() {
+	const isWindows = navigator.platform.toUpperCase().indexOf('WIN') !== -1;
+
 	window.addEventListener('click', (e: MouseEvent) => {
+		// If we try to open link in a new tab, then we want to skip skip:
+		if ((isWindows && e.ctrlKey) || (!isWindows && e.metaKey)) return;
+
 		// Find the target by using the composed path to get the element through the shadow boundaries.
 		const $anchor = (('composedPath' in e) as any)
 			? e.composedPath().find(($elem) => $elem instanceof HTMLAnchorElement)
