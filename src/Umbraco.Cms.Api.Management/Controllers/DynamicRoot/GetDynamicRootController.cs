@@ -25,7 +25,7 @@ public class GetRootsController : DynamicRootControllerBase
         _variationContextAccessor = variationContextAccessor;
     }
 
-    [HttpPost("determine-roots-from-query")]
+    [HttpPost("query")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(DynamicRootResponseModel), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetRoots(DynamicRootRequestModel model)
