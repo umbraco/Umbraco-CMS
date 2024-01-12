@@ -63,6 +63,13 @@ internal sealed class ContentTypeEditingService : ContentTypeEditingServiceBase<
         return Attempt.SucceedWithStatus<IContentType?, ContentTypeOperationStatus>(ContentTypeOperationStatus.Success, contentType);
     }
 
+    public async Task<IEnumerable<ContentTypeAvailableCompositionsResult>> GetAvailableCompositionsAsync(
+        Guid key,
+        IEnumerable<Guid> currentCompositeKeys,
+        IEnumerable<string> currentPropertyAliases,
+        bool isElement) =>
+        await FindAvailableCompositionsAsync(key, currentCompositeKeys, currentPropertyAliases, isElement);
+
     // update content type history clean-up
     private void UpdateHistoryCleanup(IContentType contentType, ContentTypeModelBase model)
     {
