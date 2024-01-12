@@ -98,6 +98,7 @@ type INTERNAL_UmbSorterConfig<T, ElementType extends HTMLElement> = {
 		placeholderIsInThisRow: boolean;
 		horizontalPlaceAfter: boolean;
 	}) => void;
+	performItemMove?: (argument: { item: T; newIndex: number }) => Promise<boolean> | boolean;
 	performItemInsert?: (argument: { item: T; newIndex: number }) => Promise<boolean> | boolean;
 	performItemRemove?: (argument: { item: T }) => Promise<boolean> | boolean;
 };
@@ -682,29 +683,48 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		if (this.notifyRequestDrop({ item: movingItem }) === false) {
 			return false;
 		}
-		if ((await fromCtrl.removeItem(movingItem)) !== true) {
-			console.error('Sync could not remove item');
-			return false;
-		}
 
 		const localMove = fromCtrl === this;
+
 		const movingItemIndex = localMove ? this.#model.indexOf(movingItem) : -1;
 
-		if (movingItemIndex !== -1 && movingItemIndex <= movingItemIndex) {
+		if (movingItemIndex !== -1 && newIndex >= movingItemIndex) {
 			newIndex--;
 		}
 
-		if (this.#config.performItemInsert) {
-			const result = await this.#config.performItemInsert({ item: movingItem, newIndex });
-			if (result === false) {
-				return false;
+		if (localMove) {
+			// Local move:
+
+			if (this.#config.performItemMove) {
+				const result = await this.#config.performItemMove({ item: movingItem, newIndex });
+				if (result === false) {
+					return false;
+				}
+			} else {
+				throw new Error('performItemMove must be configured, until default fallback method is made.');
+				//this.#model.splice(movingItemIndex, 1)
+				//this.#model.splice(newIndex, 0, movingItem);
 			}
 		} else {
-			this.#model.splice(newIndex, 0, movingItem);
+			// Not a local move:
+
+			if ((await fromCtrl.removeItem(movingItem)) !== true) {
+				console.error('Sync could not remove item');
+				return false;
+			}
+
+			if (this.#config.performItemInsert) {
+				const result = await this.#config.performItemInsert({ item: movingItem, newIndex });
+				if (result === false) {
+					return false;
+				}
+			} else {
+				this.#model.splice(newIndex, 0, movingItem);
+			}
 		}
 
 		const eventData = { item: movingItem, fromController: fromCtrl, toController: this };
-		if (fromCtrl !== this) {
+		if (!localMove) {
 			fromCtrl.notifySync(eventData);
 		}
 		this.notifySync(eventData);
