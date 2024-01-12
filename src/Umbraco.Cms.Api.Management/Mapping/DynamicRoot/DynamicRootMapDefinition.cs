@@ -24,7 +24,7 @@ public class DynamicRootMapDefinition : IMapDefinition
         target.QuerySteps = source.Query.QuerySteps.Select(x => new DynamicRootQueryStep()
         {
             Alias = x.Alias,
-            AnyOfDocTypeKeys = x.AnyOfDocTypeKeys
+            AnyOfDocTypeKeys = x.DocumentTypeIds
         });
     }
 }
