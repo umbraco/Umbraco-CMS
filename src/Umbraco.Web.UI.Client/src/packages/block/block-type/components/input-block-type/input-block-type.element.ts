@@ -31,6 +31,7 @@ export class UmbInputBlockTypeElement<BlockType extends UmbBlockTypeBase = UmbBl
 		this.#blockTypeWorkspaceModalRegistration?.destroy();
 
 		if (entityType) {
+			// TODO: Make specific modal token that requires data.
 			this.#blockTypeWorkspaceModalRegistration = new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
 				.addAdditionalPath(entityType)
 				.onSetup(() => {
