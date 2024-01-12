@@ -6,7 +6,7 @@ public class DynamicRootContextRequestModel
 
     public required Guid ParentId { get; set; }
 
-    public required string Culture { get; set; }
+    public string? Culture { get; set; }
 
-    public required string Segment { get; set; }
+    public string? Segment { get; set; }
 }
