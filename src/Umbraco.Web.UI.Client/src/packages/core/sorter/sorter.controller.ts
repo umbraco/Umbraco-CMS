@@ -436,7 +436,6 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 
 			const parentNode = this.#currentContainerElement.parentNode;
 			if (parentNode && this.#config.containerSelector) {
-				let foundParentContainer = false;
 				// TODO: support multiple parent shadowDOMs?
 				const parentContainer = (parentNode as ShadowRoot).host
 					? (parentNode as ShadowRoot).host.closest(this.#config.containerSelector)
@@ -444,7 +443,6 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 				if (parentContainer) {
 					const parentContainerCtrl = (parentContainer as any)['__umbBlockGridSorterController']();
 					if (parentContainerCtrl.unique === this.controllerAlias) {
-						foundParentContainer = true;
 						this.#currentContainerElement = parentContainer as Element;
 						toBeCurrentContainerCtrl = parentContainerCtrl;
 						if (this.#config.onContainerChange) {
@@ -456,13 +454,6 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 						}
 					}
 				}
-
-				// Okay we did not find a parent container, so lets see if can go sideways:
-				/*
-				if (!foundParentContainer) {
-
-				}
-				*/
 			}
 		}
 
