@@ -14,7 +14,7 @@ export type RichTextRuleModelSortable = RichTextRuleModel & { sortOrder?: number
 
 export class UmbStylesheetWorkspaceContext
 	extends UmbEditableWorkspaceContextBase<UmbStylesheetRepository, UmbStylesheetDetailModel>
-	implements UmbSaveableWorkspaceContextInterface<UmbStylesheetDetailModel | undefined>
+	implements UmbSaveableWorkspaceContextInterface
 {
 	#data = new UmbObjectState<UmbStylesheetDetailModel | undefined>(undefined);
 	#rules = new UmbArrayState<RichTextRuleModelSortable>([], (rule) => rule.name);

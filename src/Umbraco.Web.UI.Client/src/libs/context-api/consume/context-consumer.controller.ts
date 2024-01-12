@@ -25,7 +25,7 @@ export class UmbContextConsumerController<BaseType = unknown, ResultType extends
 	}
 
 	public destroy() {
-		super.destroy();
 		this.#host.removeController(this);
+		super.destroy();
 	}
 }

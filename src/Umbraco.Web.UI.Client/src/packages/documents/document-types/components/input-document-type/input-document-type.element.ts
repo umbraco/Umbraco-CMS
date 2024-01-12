@@ -1,5 +1,5 @@
 import { UmbDocumentTypePickerContext } from './input-document-type.context.js';
-import { css, html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, state, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { DocumentTypeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
@@ -9,12 +9,12 @@ import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbra
 @customElement('umb-input-document-type')
 export class UmbInputDocumentTypeElement extends FormControlMixin(UmbLitElement) {
 	/**
-	 * Selects the element types only
+	 * Limits to only select Element Types
 	 * @type {boolean}
 	 * @attr
 	 * @default false
 	 */
-	@property({ type: Boolean, attribute: 'element-types-only' })
+	@property({ type: Boolean })
 	elementTypesOnly: boolean = false;
 
 	/**
@@ -66,22 +66,14 @@ export class UmbInputDocumentTypeElement extends FormControlMixin(UmbLitElement)
 	public get selectedIds(): Array<string> {
 		return this.#pickerContext.getSelection();
 	}
-	public set selectedIds(ids: Array<string>) {
-		this.#pickerContext.setSelection(ids);
+	public set selectedIds(ids: Array<string> | undefined) {
+		this.#pickerContext.setSelection(ids ?? []);
 	}
 
 	@property()
 	public set value(idsString: string) {
 		// Its with full purpose we don't call super.value, as thats being handled by the observation of the context selection.
 		this.selectedIds = splitStringToArray(idsString);
-	}
-
-	@property()
-	get pickableFilter() {
-		return this.#pickerContext.pickableFilter;
-	}
-	set pickableFilter(newVal) {
-		this.#pickerContext.pickableFilter = newVal;
 	}
 
 	@state()
@@ -128,7 +120,7 @@ export class UmbInputDocumentTypeElement extends FormControlMixin(UmbLitElement)
 		if (this.elementTypesOnly) {
 			this.#pickerContext.openPicker({
 				hideTreeRoot: true,
-				pickableFilter: (x) => x.isElement!,
+				pickableFilter: (x) => x.isElement,
 			});
 		} else {
 			this.#pickerContext.openPicker({ hideTreeRoot: true });
@@ -136,10 +128,15 @@ export class UmbInputDocumentTypeElement extends FormControlMixin(UmbLitElement)
 	}
 
 	render() {
-		return html`
-			<uui-ref-list>${this._items?.map((item) => this._renderItem(item))}</uui-ref-list>
-			<uui-button id="add-button" look="placeholder" @click=${this.#openPicker} label="open">Add</uui-button>
-		`;
+		return html` <uui-ref-list>${this._items?.map((item) => this._renderItem(item))}</uui-ref-list>
+			${this.#renderAddButton()}`;
+	}
+
+	#renderAddButton() {
+		if (this.max === 1 && this.selectedIds.length === 1) return nothing;
+		return html`<uui-button id="add-button" look="placeholder" @click=${this.#openPicker} label="open">
+			Add
+		</uui-button>`;
 	}
 
 	private _renderItem(item: DocumentTypeItemResponseModel) {

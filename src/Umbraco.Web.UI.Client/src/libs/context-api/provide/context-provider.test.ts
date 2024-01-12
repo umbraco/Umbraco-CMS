@@ -22,12 +22,6 @@ describe('UmbContextProvider', () => {
 	});
 
 	describe('Public API', () => {
-		describe('properties', () => {
-			it('has a hostElement property', () => {
-				expect(provider).to.have.property('hostElement');
-			});
-		});
-
 		describe('methods', () => {
 			it('has an attach method', () => {
 				expect(provider).to.have.property('hostConnected').that.is.a('function');

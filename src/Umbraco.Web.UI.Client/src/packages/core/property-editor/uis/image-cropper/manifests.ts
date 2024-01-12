@@ -7,7 +7,7 @@ export const manifest: ManifestPropertyEditorUi = {
 	js: () => import('./property-editor-ui-image-cropper.element.js'),
 	meta: {
 		label: 'Image Cropper',
-		icon: 'icon-colorpicker',
+		icon: 'icon-crop',
 		group: 'pickers',
 		propertyEditorSchemaAlias: 'Umbraco.ImageCropper',
 	},

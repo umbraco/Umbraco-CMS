@@ -91,8 +91,9 @@ export default {
 						'@umbraco-cms/backoffice/event': './src/packages/core/event/index.ts',
 						'@umbraco-cms/backoffice/repository': './src/packages/core/repository/index.ts',
 						'@umbraco-cms/backoffice/temporary-file': './src/packages/core/temporary-file/index.ts',
-						'@umbraco-cms/backoffice/audit-log': './src/packages/core/audit-log/index.ts',
 
+						'@umbraco-cms/backoffice/block': './src/packages/block/index.ts',
+						'@umbraco-cms/backoffice/audit-log': './src/packages/core/audit-log/index.ts',
 						'@umbraco-cms/backoffice/dictionary': './src/packages/dictionary/dictionary/index.ts',
 
 						'@umbraco-cms/backoffice/document': './src/packages/documents/documents/index.ts',

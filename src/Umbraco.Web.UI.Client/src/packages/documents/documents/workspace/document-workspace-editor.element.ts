@@ -1,5 +1,5 @@
 import { UmbDocumentWorkspaceSplitViewElement } from './document-workspace-split-view.element.js';
-import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from './document-workspace.context.js';
+import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from './document-workspace.context-token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { customElement, state, css, html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';

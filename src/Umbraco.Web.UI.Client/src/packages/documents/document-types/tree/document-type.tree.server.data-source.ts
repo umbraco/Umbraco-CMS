@@ -50,5 +50,7 @@ const mapper = (item: DocumentTypeTreeItemResponseModel): UmbDocumentTypeTreeIte
 		isContainer: item.isContainer,
 		hasChildren: item.hasChildren,
 		isFolder: item.isFolder,
+		icon: item.icon,
+		isElement: item.isElement,
 	};
 };

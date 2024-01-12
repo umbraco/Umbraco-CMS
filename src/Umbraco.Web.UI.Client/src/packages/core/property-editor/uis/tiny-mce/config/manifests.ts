@@ -1,6 +1,8 @@
+import { manifest as blockRteTypeManifest } from './block-configuration/manifests.js';
 import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/extension-registry';
 
 const configurationManifests: Array<ManifestPropertyEditorUi> = [
+	blockRteTypeManifest,
 	{
 		type: 'propertyEditorUi',
 		alias: 'Umb.PropertyEditorUI.TinyMCE.ToolbarConfiguration',
