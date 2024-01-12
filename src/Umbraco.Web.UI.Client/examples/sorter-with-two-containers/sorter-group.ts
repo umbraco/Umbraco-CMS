@@ -1,20 +1,21 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, customElement, LitElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, LitElement, repeat, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
 import { UmbSorterConfig, UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 
 import './sorter-item.js';
+import ExampleSorterItem from './sorter-item.js';
 
-type ModelEntryType = {
+export type ModelEntryType = {
 	name: string;
 };
 
-const SORTER_CONFIG: UmbSorterConfig<ModelEntryType> = {
-	compareElementToModel: (element: HTMLElement, model: ModelEntryType) => {
-		return element.getAttribute('name') === model.name;
+const SORTER_CONFIG: UmbSorterConfig<ModelEntryType, ExampleSorterItem> = {
+	compareElementToModel: (element, model) => {
+		return element.name === model.name;
 	},
-	querySelectModelToElement: (container: HTMLElement, modelEntry: ModelEntryType) => {
-		return container.querySelector('name[' + modelEntry.name + ']');
+	querySelectModelToElement: (container, modelEntry) => {
+		return container.querySelector("example-sorter-item[name='" + modelEntry.name + "']");
 	},
 	identifier: 'string-that-identifies-all-example-sorters',
 	itemSelector: 'example-sorter-item',
@@ -23,37 +24,28 @@ const SORTER_CONFIG: UmbSorterConfig<ModelEntryType> = {
 
 @customElement('example-sorter-group')
 export class ExampleSorterGroup extends UmbElementMixin(LitElement) {
-	@state()
-	_items: ModelEntryType[] = [
-		{
-			name: 'Apple',
-		},
-		{
-			name: 'Banana',
-		},
-		{
-			name: 'Pear',
-		},
-		{
-			name: 'Pineapple',
-		},
-		{
-			name: 'Lemon',
-		},
-	];
+	@property({ type: Array, attribute: false })
+	public get items(): ModelEntryType[] {
+		return this._items;
+	}
+	public set items(value: ModelEntryType[]) {
+		this._items = value;
+		this.#sorter.setModel(this._items);
+	}
+	private _items: ModelEntryType[] = [];
 
-	#sorter = new UmbSorterController(this, {
+	#sorter = new UmbSorterController<ModelEntryType, ExampleSorterItem>(this, {
 		...SORTER_CONFIG,
 		performItemInsert: ({ item, newIndex }) => {
 			this._items.splice(newIndex, 0, item);
-			console.log('inserted', item.name, 'at', newIndex, '	', this._items.map((x) => x.name).join(', '));
+			//console.log('inserted', item.name, 'at', newIndex, '	', this._items.map((x) => x.name).join(', '));
 			this.requestUpdate('_items');
 			return true;
 		},
 		performItemRemove: ({ item }) => {
 			const indexToMove = this._items.findIndex((x) => x.name === item.name);
 			this._items.splice(indexToMove, 1);
-			console.log('removed', item.name, 'at', indexToMove, '	', this._items.map((x) => x.name).join(', '));
+			//console.log('removed', item.name, 'at', indexToMove, '	', this._items.map((x) => x.name).join(', '));
 			this.requestUpdate('_items');
 			return true;
 		},
@@ -61,7 +53,6 @@ export class ExampleSorterGroup extends UmbElementMixin(LitElement) {
 
 	constructor() {
 		super();
-		this.#sorter.setModel(this._items);
 	}
 
 	removeItem = (item: ModelEntryType) => {
@@ -74,7 +65,7 @@ export class ExampleSorterGroup extends UmbElementMixin(LitElement) {
 			<div class="sorter-container">
 				${repeat(
 					this._items,
-					(item) => item,
+					(item, index) => item.name + '_ ' + index,
 					(item) =>
 						html`<example-sorter-item name=${item.name}>
 							<button @click=${() => this.removeItem(item)}>Delete</button>
@@ -89,6 +80,7 @@ export class ExampleSorterGroup extends UmbElementMixin(LitElement) {
 		css`
 			:host {
 				display: block;
+				width: 100%;
 			}
 
 			.sorter-placeholder {

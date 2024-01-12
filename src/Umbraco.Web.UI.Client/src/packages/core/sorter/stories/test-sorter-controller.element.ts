@@ -12,6 +12,7 @@ const SORTER_CONFIG: UmbSorterConfig<SortEntryType> = {
 		return element.getAttribute('data-sort-entry-id') === model.id;
 	},
 	querySelectModelToElement: (container: HTMLElement, modelEntry: SortEntryType) => {
+		// TODO: This selector does not make sense:
 		return container.querySelector('data-sort-entry-id=[' + modelEntry.id + ']');
 	},
 	identifier: 'test-sorter',

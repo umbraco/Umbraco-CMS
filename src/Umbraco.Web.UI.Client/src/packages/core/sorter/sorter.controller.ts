@@ -61,9 +61,9 @@ function destroyPreventEvent(element: Element) {
 	element.removeAttribute('draggable');
 }
 
-type INTERNAL_UmbSorterConfig<T> = {
-	compareElementToModel: (el: HTMLElement, modelEntry: T) => boolean;
-	querySelectModelToElement: (container: HTMLElement, modelEntry: T) => HTMLElement | null;
+type INTERNAL_UmbSorterConfig<T, ElementType extends HTMLElement> = {
+	compareElementToModel: (el: ElementType, modelEntry: T) => boolean;
+	querySelectModelToElement: (container: HTMLElement, modelEntry: T) => ElementType | null;
 	identifier: string;
 	itemSelector: string;
 	disabledItemSelector?: string;
@@ -74,14 +74,14 @@ type INTERNAL_UmbSorterConfig<T> = {
 	draggableSelector?: string;
 	boundarySelector?: string;
 	dataTransferResolver?: (dataTransfer: DataTransfer | null, currentItem: T) => void;
-	onStart?: (argument: { item: T; element: HTMLElement }) => void;
-	onChange?: (argument: { item: T; element: HTMLElement }) => void;
-	onContainerChange?: (argument: { item: T; element: HTMLElement }) => void;
-	onEnd?: (argument: { item: T; element: HTMLElement }) => void;
+	onStart?: (argument: { item: T; element: ElementType }) => void;
+	onChange?: (argument: { item: T; element: ElementType }) => void;
+	onContainerChange?: (argument: { item: T; element: ElementType }) => void;
+	onEnd?: (argument: { item: T; element: ElementType }) => void;
 	onSync?: (argument: {
 		item: T;
-		fromController: UmbSorterController<T>;
-		toController: UmbSorterController<T>;
+		fromController: UmbSorterController<T, ElementType>;
+		toController: UmbSorterController<T, ElementType>;
 	}) => void;
 	itemHasNestedContainersResolver?: (element: HTMLElement) => boolean;
 	onDisallowed?: () => void;
@@ -91,9 +91,9 @@ type INTERNAL_UmbSorterConfig<T> = {
 		containerElement: Element;
 		containerRect: DOMRect;
 		item: T;
-		element: HTMLElement;
+		element: ElementType;
 		elementRect: DOMRect;
-		relatedElement: HTMLElement;
+		relatedElement: ElementType;
 		relatedRect: DOMRect;
 		placeholderIsInThisRow: boolean;
 		horizontalPlaceAfter: boolean;
@@ -103,8 +103,11 @@ type INTERNAL_UmbSorterConfig<T> = {
 };
 
 // External type with some properties optional, as they have defaults:
-export type UmbSorterConfig<T> = Omit<INTERNAL_UmbSorterConfig<T>, 'ignorerSelector' | 'containerSelector'> &
-	Partial<Pick<INTERNAL_UmbSorterConfig<T>, 'ignorerSelector' | 'containerSelector'>>;
+export type UmbSorterConfig<T, ElementType extends HTMLElement = HTMLElement> = Omit<
+	INTERNAL_UmbSorterConfig<T, ElementType>,
+	'ignorerSelector' | 'containerSelector'
+> &
+	Partial<Pick<INTERNAL_UmbSorterConfig<T, ElementType>, 'ignorerSelector' | 'containerSelector'>>;
 
 /**
  * @export
@@ -112,9 +115,9 @@ export type UmbSorterConfig<T> = Omit<INTERNAL_UmbSorterConfig<T>, 'ignorerSelec
  * @implements {UmbControllerInterface}
  * @description This controller can make user able to sort items.
  */
-export class UmbSorterController<T extends object> implements UmbController {
+export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElement> implements UmbController {
 	#host;
-	#config: INTERNAL_UmbSorterConfig<T>;
+	#config: INTERNAL_UmbSorterConfig<T, ElementType>;
 	#observer;
 
 	#model: Array<T> = [];
@@ -122,12 +125,12 @@ export class UmbSorterController<T extends object> implements UmbController {
 
 	#containerElement!: HTMLElement;
 
-	#currentContainerCtrl: UmbSorterController<T> = this;
+	#currentContainerCtrl: UmbSorterController<T, ElementType> = this;
 	#currentContainerElement: Element | null = null;
 	#useContainerShadowRoot?: boolean;
 
 	#scrollElement?: Element | null;
-	#currentElement?: HTMLElement;
+	#currentElement?: ElementType;
 	#currentDragElement?: Element;
 	#currentDragRect?: DOMRect;
 	#currentItem?: T | null;
@@ -136,13 +139,13 @@ export class UmbSorterController<T extends object> implements UmbController {
 	#dragX = 0;
 	#dragY = 0;
 
-	#lastIndicationContainerCtrl: UmbSorterController<T> | null = null;
+	#lastIndicationContainerCtrl: UmbSorterController<T, ElementType> | null = null;
 
 	public get controllerAlias() {
 		return this.#config.identifier;
 	}
 
-	constructor(host: UmbControllerHostElement, config: UmbSorterConfig<T>) {
+	constructor(host: UmbControllerHostElement, config: UmbSorterConfig<T, ElementType>) {
 		this.#host = host;
 
 		// Set defaults:
@@ -151,7 +154,7 @@ export class UmbSorterController<T extends object> implements UmbController {
 			config.placeholderAttr = 'drag-placeholder';
 		}
 
-		this.#config = config as INTERNAL_UmbSorterConfig<T>;
+		this.#config = config as INTERNAL_UmbSorterConfig<T, ElementType>;
 		host.addController(this);
 
 		//this.#currentContainerElement = host;
@@ -278,7 +281,7 @@ export class UmbSorterController<T extends object> implements UmbController {
 			return;
 		}
 
-		this.#currentElement = element as HTMLElement;
+		this.#currentElement = element as ElementType;
 		this.#currentDragRect = this.#currentDragElement.getBoundingClientRect();
 		this.#currentItem = this.getItemOfElement(this.#currentElement);
 		if (!this.#currentItem) {
@@ -392,15 +395,13 @@ export class UmbSorterController<T extends object> implements UmbController {
 			return;
 		}
 
-		console.log('this.#currentElement', this.#currentElement);
-
 		const currentElementRect = this.#currentElement.getBoundingClientRect();
 		const insideCurrentRect = isWithinRect(this.#dragX, this.#dragY, currentElementRect);
 		if (insideCurrentRect) {
 			return;
 		}
 
-		let toBeCurrentContainerCtrl: UmbSorterController<T> | undefined = undefined;
+		let toBeCurrentContainerCtrl: UmbSorterController<T, ElementType> | undefined = undefined;
 
 		// If we have a boundarySelector, try it. If we didn't get anything fall back to currentContainerElement:
 		const currentBoundaryElement =
@@ -602,17 +603,17 @@ export class UmbSorterController<T extends object> implements UmbController {
 		}
 	};
 
-	async #moveElementTo(containerCtrl: UmbSorterController<T> | undefined, newIndex: number) {
+	async #moveElementTo(containerCtrl: UmbSorterController<T, ElementType> | undefined, newIndex: number) {
 		if (!this.#currentElement) {
 			return;
 		}
 
-		containerCtrl ??= this as UmbSorterController<T>;
+		containerCtrl ??= this as UmbSorterController<T, ElementType>;
 
 		// If same container and same index, do nothing:
 		if (this.#currentContainerCtrl === containerCtrl && this.#currentIndex === newIndex) return;
 
-		if (await containerCtrl.updateModel(newIndex, this.#currentElement, this.#currentContainerCtrl)) {
+		if (await containerCtrl.moveItemInModel(newIndex, this.#currentElement, this.#currentContainerCtrl)) {
 			this.#currentContainerCtrl = containerCtrl;
 			this.#currentIndex = newIndex;
 		}
@@ -620,7 +621,7 @@ export class UmbSorterController<T extends object> implements UmbController {
 
 	/** Management methods: */
 
-	public getItemOfElement(element: HTMLElement) {
+	public getItemOfElement(element: ElementType) {
 		if (!element) {
 			return null;
 		}
@@ -648,7 +649,7 @@ export class UmbSorterController<T extends object> implements UmbController {
 		return this.#model.filter((x) => x !== item).length > 0;
 	}
 
-	public async updateModel(newIndex: number, element: HTMLElement, fromCtrl: UmbSorterController<T>) {
+	public async moveItemInModel(newIndex: number, element: ElementType, fromCtrl: UmbSorterController<T, ElementType>) {
 		const movingItem = fromCtrl.getItemOfElement(element);
 		if (!movingItem) {
 			console.error('Could not find item of sync item');
@@ -687,7 +688,7 @@ export class UmbSorterController<T extends object> implements UmbController {
 		return true;
 	}
 
-	updateAllowIndication(controller: UmbSorterController<T>, item: T) {
+	updateAllowIndication(controller: UmbSorterController<T, ElementType>, item: T) {
 		// Remove old indication:
 		if (this.#lastIndicationContainerCtrl !== null && this.#lastIndicationContainerCtrl !== controller) {
 			this.#lastIndicationContainerCtrl.notifyAllowed();
