@@ -14,7 +14,7 @@ import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 
 export class UmbUserWorkspaceContext
 	extends UmbEditableWorkspaceContextBase<UmbUserDetailRepository, UmbUserDetailModel>
-	implements UmbSaveableWorkspaceContextInterface<UmbUserDetailModel | undefined>
+	implements UmbSaveableWorkspaceContextInterface
 {
 	#currentUserContext?: typeof UMB_CURRENT_USER_CONTEXT.TYPE;
 

@@ -42,9 +42,7 @@ export class UmbPropertyEditorUIStaticFilePickerElement extends UmbLitElement im
 				@change=${this._onChange}
 				.selectedIds=${this._value}
 				.min=${this._limitMin ?? 0}
-				.max=${this._limitMax ?? Infinity}
-				>Add</umb-input-static-file
-			>
+				.max=${this._limitMax ?? Infinity}></umb-input-static-file>
 		`;
 	}
 }

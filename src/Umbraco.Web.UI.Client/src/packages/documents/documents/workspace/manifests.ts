@@ -44,7 +44,7 @@ const workspaceViews: Array<ManifestWorkspaceView> = [
 		type: 'workspaceView',
 		alias: 'Umb.WorkspaceView.Document.Info',
 		name: 'Document Workspace Info View',
-		js: () => import('./views/info/document-info-workspace-view.element.js'),
+		js: () => import('./views/info/document-workspace-view-info.element.js'),
 		weight: 100,
 		meta: {
 			label: 'Info',

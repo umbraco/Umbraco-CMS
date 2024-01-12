@@ -12,12 +12,14 @@ import './components/index.js';
 
 // TODO: temp solution to load core packages
 const CORE_PACKAGES = [
+	import('../../packages/audit-log/umbraco-package.js'),
 	import('../../packages/core/umbraco-package.js'),
 	import('../../packages/settings/umbraco-package.js'),
 	import('../../packages/documents/umbraco-package.js'),
 	import('../../packages/relations/umbraco-package.js'),
 	import('../../packages/media/umbraco-package.js'),
 	import('../../packages/members/umbraco-package.js'),
+	import('../../packages/block/umbraco-package.js'),
 	import('../../packages/dictionary/umbraco-package.js'),
 	import('../../packages/user/umbraco-package.js'),
 	import('../../packages/packages/umbraco-package.js'),

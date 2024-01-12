@@ -178,20 +178,16 @@ export class UmbInputTemplateElement extends FormControlMixin(UmbLitElement) {
 
 	static styles = [
 		css`
-			#add-button {
-				width: 100%;
-			}
 			:host {
-				box-sizing: border-box;
-				display: flex;
-				gap: var(--uui-size-space-4);
-				flex-wrap: wrap;
+				display: grid;
+				gap: var(--uui-size-space-3);
+				grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+				grid-template-rows: repeat(auto-fill, minmax(160px, 1fr));
 			}
 
-			:host > * {
-				max-width: 180px;
-				min-width: 180px;
-				min-height: 150px;
+			#add-button {
+				text-align: center;
+				height: 100%;
 			}
 		`,
 	];

@@ -13,7 +13,7 @@ import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 type EntityType = MediaTypeResponseModel;
 export class UmbMediaTypeWorkspaceContext
 	extends UmbEditableWorkspaceContextBase<UmbMediaTypeDetailRepository, EntityType>
-	implements UmbSaveableWorkspaceContextInterface<EntityType | undefined>
+	implements UmbSaveableWorkspaceContextInterface
 {
 	// Draft is located in structure manager
 

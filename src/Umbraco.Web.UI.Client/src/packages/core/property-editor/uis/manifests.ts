@@ -14,13 +14,11 @@ import { manifest as toggle } from './toggle/manifests.js';
 import { manifest as markdownEditor } from './markdown-editor/manifests.js';
 import { manifest as radioButtonList } from './radio-button-list/manifests.js';
 import { manifest as checkboxList } from './checkbox-list/manifests.js';
-import { manifests as blockList } from './block-list/manifests.js';
 import { manifest as numberRange } from './number-range/manifests.js';
 import { manifest as mediaPicker } from './media-picker/manifests.js';
 import { manifest as imageCropsConfiguration } from './image-crops-configuration/manifests.js';
 import { manifest as imageCropper } from './image-cropper/manifests.js';
 import { manifest as uploadField } from './upload-field/manifests.js';
-import { manifests as blockGrid } from './block-grid/manifests.js';
 import { manifest as orderDirection } from './order-direction/manifests.js';
 import { manifests as collectionView } from './collection-view/manifests.js';
 import { manifests as tinyMCE } from './tiny-mce/manifests.js';
@@ -63,8 +61,6 @@ export const manifests: Array<ManifestPropertyEditorUi> = [
 	...numbers,
 	...textBoxes,
 	...treePicker,
-	...blockList,
-	...blockGrid,
 	...collectionView,
 	...tinyMCE,
 	{

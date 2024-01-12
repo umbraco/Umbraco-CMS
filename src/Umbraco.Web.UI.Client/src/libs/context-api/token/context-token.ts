@@ -27,7 +27,7 @@ export class UmbContextToken<BaseType = unknown, ResultType extends BaseType = B
 	 * @param discriminator   A discriminator that will be used to discriminate the API — testing if the API lives up to a certain requirement. If the API does not meet the requirement then the consumer will not receive this API.
 	 */
 	constructor(
-		protected contextAlias: string,
+		public readonly contextAlias: string,
 		protected apiAlias: string = 'default',
 		discriminator?: UmbContextDiscriminator<BaseType, ResultType>,
 	) {

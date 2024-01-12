@@ -1,29 +1,31 @@
 import { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import {
+import type {
 	DocumentTypePropertyTypeResponseModel,
 	PropertyTypeContainerModelBaseModel,
 	PropertyTypeModelBaseModel,
 	DocumentTypeResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
-import { UmbControllerHostElement, UmbController } from '@umbraco-cms/backoffice/controller-api';
+import { type UmbControllerHost, type UmbController } from '@umbraco-cms/backoffice/controller-api';
 import {
 	UmbArrayState,
-	UmbObserverController,
 	MappingFunction,
 	partialUpdateFrozenArray,
 	appendToFrozenArray,
 	filterFrozenArray,
 } from '@umbraco-cms/backoffice/observable-api';
 import { incrementString } from '@umbraco-cms/backoffice/utils';
+import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 
 export type PropertyContainerTypes = 'Group' | 'Tab';
 
 type T = DocumentTypeResponseModel;
 
 // TODO: get this type from the repository, or use some generic type.
-export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepository<T> = UmbDetailRepository<T>> {
-	#host: UmbControllerHostElement;
+// TODO: Make this a controller on its own:
+export class UmbContentTypePropertyStructureManager<
+	R extends UmbDetailRepository<T> = UmbDetailRepository<T>,
+> extends UmbBaseController {
 	#init!: Promise<unknown>;
 
 	#contentTypeRepository: R;
@@ -39,16 +41,16 @@ export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepositor
 	#containers: UmbArrayState<PropertyTypeContainerModelBaseModel> =
 		new UmbArrayState<PropertyTypeContainerModelBaseModel>([], (x) => x.id);
 
-	constructor(host: UmbControllerHostElement, typeRepository: R) {
-		this.#host = host;
+	constructor(host: UmbControllerHost, typeRepository: R) {
+		super(host);
 		this.#contentTypeRepository = typeRepository;
 
-		new UmbObserverController(host, this.contentTypes, (contentTypes) => {
+		this.observe(this.contentTypes, (contentTypes) => {
 			contentTypes.forEach((contentType) => {
 				this._loadContentTypeCompositions(contentType);
 			});
 		});
-		new UmbObserverController(host, this._contentTypeContainers, (contentTypeContainers) => {
+		this.observe(this._contentTypeContainers, (contentTypeContainers) => {
 			this.#containers.next(contentTypeContainers);
 		});
 	}
@@ -120,14 +122,14 @@ export class UmbContentTypePropertyStructureManager<R extends UmbDetailRepositor
 		return { data };
 	}
 
-	public async _observeContentType(data: T) {
+	private async _observeContentType(data: T) {
 		if (!data.id) return;
 
 		// Load inherited and composed types:
 		this._loadContentTypeCompositions(data);
 
 		this.#contentTypeObservers.push(
-			new UmbObserverController(this.#host, await this.#contentTypeRepository.byId(data.id), (docType) => {
+			this.observe(await this.#contentTypeRepository.byId(data.id), (docType) => {
 				if (docType) {
 					// TODO: Handle if there was changes made to the owner document type in this context.
 					/*

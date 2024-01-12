@@ -11,7 +11,7 @@ import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 export class UmbUserGroupWorkspaceContext
 	extends UmbEditableWorkspaceContextBase<UmbUserGroupRepository, UserGroupResponseModel>
-	implements UmbSaveableWorkspaceContextInterface<UserGroupResponseModel | undefined>
+	implements UmbSaveableWorkspaceContextInterface
 {
 	#data = new UmbObjectState<UserGroupResponseModel | undefined>(undefined);
 	data = this.#data.asObservable();

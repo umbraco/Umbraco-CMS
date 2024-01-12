@@ -1,4 +1,4 @@
-import { UMB_WORKSPACE_CONTEXT } from './workspace-context/index.js';
+import { UMB_WORKSPACE_CONTEXT, type UmbWorkspaceContextInterface } from './workspace-context/index.js';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import {
 	ManifestCondition,
@@ -16,10 +16,25 @@ export class UmbWorkspaceAliasCondition extends UmbBaseController implements Umb
 		super(args.host);
 		this.config = args.config;
 		this.#onChange = args.onChange;
-		this.consumeContext(UMB_WORKSPACE_CONTEXT, (context) => {
-			this.permitted = context.workspaceAlias === this.config.match;
-			this.#onChange();
-		});
+
+		let permissionCheck: ((context: UmbWorkspaceContextInterface) => boolean) | undefined = undefined;
+		if (this.config.match) {
+			permissionCheck = (context: UmbWorkspaceContextInterface) => context.workspaceAlias === this.config.match;
+		} else if (this.config.oneOf) {
+			permissionCheck = (context: UmbWorkspaceContextInterface) =>
+				this.config.oneOf!.indexOf(context.workspaceAlias) !== -1;
+		}
+
+		if (permissionCheck !== undefined) {
+			this.consumeContext(UMB_WORKSPACE_CONTEXT, (context) => {
+				this.permitted = permissionCheck!(context);
+				this.#onChange();
+			});
+		} else {
+			throw new Error(
+				'Condition `Umb.Condition.WorkspaceAlias` could not be initialized properly. Either "match" or "oneOf" must be defined',
+			);
+		}
 	}
 }
 
@@ -30,7 +45,14 @@ export type WorkspaceAliasConditionConfig = UmbConditionConfigBase<'Umb.Conditio
 	 * @example
 	 * "Umb.Workspace.Document"
 	 */
-	match: string;
+	match?: string;
+	/**
+	 * Define one or more workspaces that this extension should be available in
+	 *
+	 * @example
+	 * ["Umb.Workspace.Document", "Umb.Workspace.Media"]
+	 */
+	oneOf?: Array<string>;
 };
 
 export const manifest: ManifestCondition = {

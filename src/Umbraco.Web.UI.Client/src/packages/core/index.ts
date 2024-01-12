@@ -17,6 +17,7 @@ export * from './extension-registry/index.js';
 export * from './id/index.js';
 export * from './macro/index.js';
 export * from './menu/index.js';
+export * from './meta/index.js';
 export * from './modal/index.js';
 export * from './notification/index.js';
 export * from './picker-input/index.js';

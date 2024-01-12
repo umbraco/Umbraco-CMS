@@ -113,10 +113,22 @@ export class UmbPropertyContext<ValueType = any> extends UmbBaseController {
 	public setDescription(description: WorkspacePropertyData<ValueType>['description']) {
 		this.#data.update({ description });
 	}
+	/**
+	 * Set the value of this property.
+	 * @param value {ValueType} the whole value to be set
+	 */
 	public setValue(value: WorkspacePropertyData<ValueType>['value']) {
 		const alias = this.#data.getValue().alias;
 		if (!this.#datasetContext || !alias) return;
 		this.#datasetContext?.setPropertyValue(alias, value);
+	}
+	/**
+	 * Gets the current value of this property.
+	 * Notice this is not reactive, you should us the `value` observable for that.
+	 * @returns {ValueType}
+	 */
+	public getValue(): WorkspacePropertyData<ValueType>['value'] {
+		return this.#data.getValue().value;
 	}
 	public setConfig(config: WorkspacePropertyData<ValueType>['config'] | undefined) {
 		this.#data.update({ config });

@@ -32,8 +32,8 @@ export class UmbBackofficeModalContainerElement extends UmbLitElement {
 		this.observe(this._modalManager.modals, (modals) => this.#createModalElements(modals));
 	}
 
-	/** We cannot render the umb-modal element directly in the uui-modal-container because it wont get reconised by UUI.
-	 * We therefore have a helper class which creates the uui-modal element and returns it. */
+	/** We cannot render the umb-modal element directly in the uui-modal-container because it wont get recognized by UUI.
+	 *  We therefore have a helper class which creates the uui-modal element and returns it. */
 	#createModalElements(modals: Array<UmbModalContext>) {
 		this._modals = modals;
 

@@ -10,13 +10,12 @@ import type {
 	DocumentTypeResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 
 type EntityType = DocumentTypeResponseModel;
 export class UmbDocumentTypeWorkspaceContext
 	extends UmbEditableWorkspaceContextBase<UmbDocumentTypeDetailRepository, EntityType>
-	implements UmbSaveableWorkspaceContextInterface<EntityType | undefined>
+	implements UmbSaveableWorkspaceContextInterface
 {
 	// Draft is located in structure manager
 
@@ -173,12 +172,3 @@ export class UmbDocumentTypeWorkspaceContext
 		super.destroy();
 	}
 }
-
-export const UMB_DOCUMENT_TYPE_WORKSPACE_CONTEXT = new UmbContextToken<
-	UmbSaveableWorkspaceContextInterface,
-	UmbDocumentTypeWorkspaceContext
->(
-	'UmbWorkspaceContext',
-	undefined,
-	(context): context is UmbDocumentTypeWorkspaceContext => context.getEntityType?.() === 'document-type',
-);
