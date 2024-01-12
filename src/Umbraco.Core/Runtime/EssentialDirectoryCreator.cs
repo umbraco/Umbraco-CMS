@@ -26,8 +26,6 @@ public class EssentialDirectoryCreator : INotificationHandler<UmbracoApplication
         // every other component can then initialize safely
         _ioHelper.EnsurePathExists(_hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.Data));
         _ioHelper.EnsurePathExists(_hostingEnvironment.MapPathWebRoot(_globalSettings.UmbracoMediaPhysicalRootPath));
-        _ioHelper.EnsurePathExists(_hostingEnvironment.MapPathWebRoot("css"));
-        _ioHelper.EnsurePathExists(_hostingEnvironment.MapPathWebRoot("scripts"));
         _ioHelper.EnsurePathExists(_hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.MvcViews));
         _ioHelper.EnsurePathExists(_hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.PartialViews));
         _ioHelper.EnsurePathExists(_hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.MacroPartials));
