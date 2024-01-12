@@ -24,6 +24,7 @@ public class ReferencesCompositionController : DocumentTypeControllerBase
     [HttpGet("{id:guid}/composition-references")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<DocumentTypeCompositionResponseModel>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> CompositionReferences(Guid id)
     {
