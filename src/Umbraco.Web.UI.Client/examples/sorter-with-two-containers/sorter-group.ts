@@ -70,7 +70,7 @@ export class ExampleSorterGroup extends UmbElementMixin(LitElement) {
 		},*/
 		onChange: ({ model }) => {
 			const oldValue = this._items;
-			this.items = model;
+			this._items = model;
 			this.requestUpdate('_items', oldValue);
 		},
 	});
