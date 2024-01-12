@@ -46,23 +46,20 @@ export class UmbMockFileSystemDetailManager<MockItemType extends FileSystemFileR
 		this.#db.delete(path);
 	}
 
-	/* TODO: implement as rename
-	update(path, item: UpdateTextFileViewModelBaseModel) {
-		const mockItem = this.#db.read(path);
+	rename(path: string, name: string) {
+		const currentMockItem = this.#db.read(path);
+		if (!currentMockItem) throw new Error('Item not found');
 
-		const parentPath = getParentPathFromServerPath(item.existingPath);
-		const newPath = parentPath ? parentPath + '/' + item.name : item.name;
+		const createRequest: FileSystemFileCreateRequestModelBaseModel = {
+			name,
+			parent: currentMockItem.parent,
+			content: currentMockItem.content,
+		};
 
-		const updatedMockItem = {
-			...mockItem,
-			name: item.name,
-			content: item.content,
-			path: newPath,
-		} as MockItemType;
-
-		this.#db.update(item.existingPath, updatedMockItem);
+		this.delete(path);
+		const newPath = this.create(createRequest);
+		return newPath;
 	}
-	*/
 
 	#defaultCreateMockItemMapper = (path: string, request: FileSystemFileCreateRequestModelBaseModel): MockItemType => {
 		return {
