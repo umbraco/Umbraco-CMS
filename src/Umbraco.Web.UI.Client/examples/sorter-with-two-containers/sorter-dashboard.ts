@@ -41,6 +41,7 @@ export class ExampleSorterDashboard extends UmbElementMixin(LitElement) {
 			<uui-box class="uui-text">
 				<div class="outer-wrapper">
 					<example-sorter-group .items=${this.groupOneItems}></example-sorter-group>
+					<example-sorter-group .items=${this.groupTwoItems}></example-sorter-group>
 				</div>
 			</uui-box>
 		`;
