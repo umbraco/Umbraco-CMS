@@ -1,10 +1,11 @@
 import { UMB_BLOCK_LIST_PROPERTY_EDITOR_ALIAS } from './manifests.js';
-import { html, customElement, property, state, styleMap, repeat, css } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, state, repeat, css, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import {
+	UMB_BLOCK_CATALOGUE_MODAL,
 	UmbBlockLayoutBaseModel,
 	UmbBlockManagerContext,
 	UmbBlockTypeBase,
@@ -14,6 +15,7 @@ import '../../components/block-list-block/index.js';
 import { buildUdi } from '@umbraco-cms/backoffice/utils';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { NumberRangeValueType } from '@umbraco-cms/backoffice/models';
+import { UMB_MODAL_MANAGER_CONTEXT_TOKEN, UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbBlockListLayoutModel extends UmbBlockLayoutBaseModel {}
 
@@ -67,13 +69,23 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 	@state()
 	private _limitMax?: number;
 
+	@state()
+	private _blocks?: Array<UmbBlockTypeBase>;
+
 	#context = new UmbBlockManagerContext(this);
 
 	@state()
 	_layouts: Array<UmbBlockLayoutBaseModel> = [];
 
+	#modalContext?: UmbModalManagerContext;
+
 	constructor() {
 		super();
+
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
+			this.#modalContext = instance;
+		});
+
 		// TODO: Prevent initial notification from these observes:
 		this.observe(this.#context.layouts, (layouts) => {
 			this._value.layout[UMB_BLOCK_LIST_PROPERTY_EDITOR_ALIAS] = layouts;
@@ -93,24 +105,34 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 			// Notify that the value has changed.
 			//console.log('settings changed', this._value);
 		});
+		this.observe(this.#context.blockTypes, (blockTypes) => {
+			this._blocks = blockTypes;
+		});
 	}
 
-	#openBlockCatalogue() {
-		// Open modal.
+	async #openBlockCatalogue(openClipboard: boolean = false) {
+		//Open modal
+		const modalContext = this.#modalContext?.open(UMB_BLOCK_CATALOGUE_MODAL, {
+			data: { blocks: this._blocks ?? [], openClipboard },
+		});
 
-		// TEMP Hack:
+		const data = await modalContext?.onSubmit();
 
-		const contentElementTypeKey = this.#context.getBlockTypes()[0]!.contentElementTypeKey;
+		/**TODO: Insert next modal for data */
+		console.log('submitted', data);
 
-		const contentUdi = buildUdi('element', UmbId.new());
-		const settingsUdi = buildUdi('element', UmbId.new());
+		if (!data) return;
+
+		const block = this._blocks?.find((x) => x.contentElementTypeKey === data.key);
+
+		if (!block?.contentElementTypeKey) return;
 
 		this.#context.createBlock(
 			{
-				contentUdi,
-				settingsUdi,
+				contentUdi: buildUdi('element', UmbId.new()),
+				settingsUdi: buildUdi('element', UmbId.new()),
 			},
-			contentElementTypeKey,
+			block.contentElementTypeKey,
 		);
 	}
 
@@ -119,20 +141,45 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 				this._layouts,
 				(x) => x.contentUdi,
 				(layoutEntry) =>
-					html` <uui-button-inline-create></uui-button-inline-create>
+					html`<uui-button-inline-create></uui-button-inline-create>
 						<umb-property-editor-ui-block-list-block .layout=${layoutEntry}>
-						</umb-property-editor-ui-block-list-block>`,
+						</umb-property-editor-ui-block-list-block> `,
 			)}
-			<uui-button id="add-button" look="placeholder" @click=${this.#openBlockCatalogue} label="open">Add</uui-button>`;
+			<uui-button-group>
+				<uui-button
+					id="add-button"
+					look="placeholder"
+					label=${this.localize.term('content_createEmpty')}
+					@click=${() => this.#openBlockCatalogue()}>
+					${this.localize.term('content_createEmpty')}
+				</uui-button>
+				<uui-button
+					label=${this.localize.term('content_createFromClipboard')}
+					look="placeholder"
+					@click=${() => this.#openBlockCatalogue(true)}>
+					<uui-icon name="icon-paste-in"></uui-icon>
+				</uui-button>
+			</uui-button-group>`;
 	}
 
 	static styles = [
 		UmbTextStyles,
+
 		css`
+			:host {
+				display: grid;
+				gap: 1px;
+			}
 			> div {
 				display: flex;
 				flex-direction: column;
 				align-items: stretch;
+			}
+
+			uui-button-group {
+				padding-top: 1px;
+				display: grid;
+				grid-template-columns: 1fr auto;
 			}
 		`,
 	];

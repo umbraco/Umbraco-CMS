@@ -1,3 +1,4 @@
+export * from './block/index.js';
 export * from './block-grid/index.js';
 export * from './block-list/index.js';
 export * from './block-manager/index.js';

@@ -490,6 +490,41 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 					{
 						label: 'Mocked Block Type for Block List',
 						contentElementTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
+						icon: 'icon-server-alt',
+					},
+					{
+						label: 'Mocked Coffee Block',
+						contentElementTypeKey: 'coffee-umbraco-demo-block-id',
+						iconColor: '#FFFDD0',
+						backgroundColor: '#633f32',
+						editorSize: 'medium',
+						icon: 'icon-coffee',
+					},
+
+					{
+						label: 'Headline',
+						contentElementTypeKey: 'headline-umbraco-demo-block-id',
+						backgroundColor: 'gold',
+						editorSize: 'medium',
+						icon: 'icon-edit',
+					},
+					{
+						label: 'Image',
+						contentElementTypeKey: 'image-umbraco-demo-block-id',
+						editorSize: 'medium',
+						icon: 'icon-picture',
+					},
+					{
+						label: 'Rich Text',
+						contentElementTypeKey: 'rich-text-umbraco-demo-block-id',
+						editorSize: 'medium',
+						icon: 'icon-diploma',
+					},
+					{
+						label: 'Two Column Layout',
+						contentElementTypeKey: 'two-column-layout-umbraco-demo-block-id',
+						editorSize: 'medium',
+						icon: 'icon-book-alt',
 					},
 				],
 			},
@@ -561,11 +596,54 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 		editorUiAlias: 'Umb.PropertyEditorUi.BlockGrid',
 		values: [
 			{
+				alias: 'blockGroups',
+				value: [{ key: 'demo-block-group-id', name: 'Demo Blocks' }],
+			},
+			{
 				alias: 'blocks',
 				value: [
 					{
 						label: 'Mocked Block Type for Block Grid',
 						contentElementTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
+					},
+					{
+						label: 'Mocked Coffee Block',
+						contentElementTypeKey: 'coffee-umbraco-demo-block-id',
+						iconColor: '#FFFDD0',
+						backgroundColor: '#633f32',
+						editorSize: 'medium',
+						icon: 'icon-coffee',
+					},
+
+					{
+						label: 'Headline',
+						contentElementTypeKey: 'headline-umbraco-demo-block-id',
+						backgroundColor: 'gold',
+						editorSize: 'medium',
+						icon: 'icon-edit',
+						groupKey: 'demo-block-group-id',
+					},
+					{
+						label: 'Image',
+						contentElementTypeKey: 'image-umbraco-demo-block-id',
+						editorSize: 'medium',
+						icon: 'icon-picture',
+
+						groupKey: 'demo-block-group-id',
+					},
+					{
+						label: 'Rich Text',
+						contentElementTypeKey: 'rich-text-umbraco-demo-block-id',
+						editorSize: 'medium',
+						icon: 'icon-diploma',
+						groupKey: 'demo-block-group-id',
+					},
+					{
+						label: 'Two Column Layout',
+						contentElementTypeKey: 'two-column-layout-umbraco-demo-block-id',
+						editorSize: 'medium',
+						icon: 'icon-book-alt',
+						groupKey: 'demo-block-group-id',
 					},
 				],
 			},
