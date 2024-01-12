@@ -9,4 +9,10 @@ public interface IMediaTypeEditingService
     Task<Attempt<IMediaType?, ContentTypeOperationStatus>> CreateAsync(MediaTypeCreateModel model, Guid userKey);
 
     Task<Attempt<IMediaType?, ContentTypeOperationStatus>> UpdateAsync(IMediaType mediaType, MediaTypeUpdateModel model, Guid userKey);
+
+    Task<IEnumerable<ContentTypeAvailableCompositionsResult>> GetAvailableCompositionsAsync(
+        Guid key,
+        IEnumerable<Guid> currentCompositeKeys,
+        IEnumerable<string> currentPropertyAliases,
+        bool isElement);
 }
