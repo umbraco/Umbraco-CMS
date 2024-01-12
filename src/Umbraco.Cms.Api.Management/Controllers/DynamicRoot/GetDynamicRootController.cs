@@ -16,13 +16,13 @@ public class GetRootsController : DynamicRootControllerBase
 {
     private readonly IDynamicRootService _dynamicRootService;
     private readonly IUmbracoMapper _umbracoMapper;
-    private readonly IBackOfficeVariationContextAccessor _variationContextAccessor;
+    private readonly IBackOfficeVariationContextAccessor _backOfficeVariationContextAccessor;
 
-    public GetRootsController(IDynamicRootService dynamicRootService, IUmbracoMapper umbracoMapper, IBackOfficeVariationContextAccessor variationContextAccessor)
+    public GetRootsController(IDynamicRootService dynamicRootService, IUmbracoMapper umbracoMapper, IBackOfficeVariationContextAccessor backOfficeVariationContextAccessor)
     {
         _dynamicRootService = dynamicRootService;
         _umbracoMapper = umbracoMapper;
-        _variationContextAccessor = variationContextAccessor;
+        _backOfficeVariationContextAccessor = backOfficeVariationContextAccessor;
     }
 
     [HttpPost("query")]
@@ -30,7 +30,7 @@ public class GetRootsController : DynamicRootControllerBase
     [ProducesResponseType(typeof(DynamicRootResponseModel), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetRoots(DynamicRootRequestModel model)
     {
-        _variationContextAccessor.VariationContext = new BackOfficeVariationContext(model.Context.Culture, model.Context.Segment);
+        _backOfficeVariationContextAccessor.VariationContext = new BackOfficeVariationContext(model.Context.Culture, model.Context.Segment);
 
         DynamicRootNodeQuery dynamicRootNodeQuery = _umbracoMapper.Map<DynamicRootNodeQuery>(model)!;
 
