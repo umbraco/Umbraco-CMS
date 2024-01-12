@@ -10,7 +10,7 @@ import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 export class UmbDictionaryWorkspaceContext
 	extends UmbEditableWorkspaceContextBase<UmbDictionaryRepository, DictionaryItemResponseModel>
-	implements UmbSaveableWorkspaceContextInterface<DictionaryItemResponseModel | undefined>
+	implements UmbSaveableWorkspaceContextInterface
 {
 	#data = new UmbObjectState<DictionaryItemResponseModel | undefined>(undefined);
 	readonly data = this.#data.asObservable();

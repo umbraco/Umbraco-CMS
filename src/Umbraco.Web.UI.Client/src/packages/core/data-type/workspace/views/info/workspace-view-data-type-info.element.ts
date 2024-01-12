@@ -1,4 +1,4 @@
-import { UMB_DATA_TYPE_WORKSPACE_CONTEXT } from '../../data-type-workspace.context.js';
+import { UMB_DATA_TYPE_WORKSPACE_CONTEXT } from '../../data-type-workspace.context-token.js';
 import { UmbDataTypeDetailModel } from '../../../types.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';

@@ -1,6 +1,7 @@
 import { CreateDataTypeRequestModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
+// TODO: Change model:
 export interface UmbWorkspaceData {
 	entityType: string;
 	preset: Partial<CreateDataTypeRequestModel>;

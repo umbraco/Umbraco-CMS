@@ -14,3 +14,8 @@ export interface ServertimeOffset {
 	 */
 	offset: number;
 }
+
+export interface NumberRangeValueType {
+	min?: number;
+	max?: number;
+}

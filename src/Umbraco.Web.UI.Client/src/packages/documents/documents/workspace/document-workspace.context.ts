@@ -5,7 +5,6 @@ import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
 import {
-	UmbSaveableWorkspaceContextInterface,
 	UmbEditableWorkspaceContextBase,
 	UmbWorkspaceSplitViewManager,
 	UmbVariantableWorkspaceContextInterface,
@@ -19,14 +18,11 @@ import {
 	UmbObserverController,
 } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerHost, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 type EntityType = DocumentResponseModel;
 export class UmbDocumentWorkspaceContext
 	extends UmbEditableWorkspaceContextBase<UmbDocumentRepository, EntityType>
-	implements
-		UmbVariantableWorkspaceContextInterface<EntityType | undefined>,
-		UmbPublishableWorkspaceContextInterface<EntityType | undefined>
+	implements UmbVariantableWorkspaceContextInterface, UmbPublishableWorkspaceContextInterface
 {
 	/**
 	 * The document is the current stored version of the document.
@@ -272,12 +268,3 @@ export class UmbDocumentWorkspaceContext
 }
 
 export default UmbDocumentWorkspaceContext;
-
-export const UMB_DOCUMENT_WORKSPACE_CONTEXT = new UmbContextToken<
-	UmbSaveableWorkspaceContextInterface,
-	UmbDocumentWorkspaceContext
->(
-	'UmbWorkspaceContext',
-	undefined,
-	(context): context is UmbDocumentWorkspaceContext => context.getEntityType?.() === UMB_DOCUMENT_ENTITY_TYPE,
-);

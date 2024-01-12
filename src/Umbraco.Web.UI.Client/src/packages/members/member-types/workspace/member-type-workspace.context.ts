@@ -12,7 +12,7 @@ type EntityType = any;
 
 export class UmbMemberTypeWorkspaceContext
 	extends UmbEditableWorkspaceContextBase<UmbMemberTypeRepository, EntityType>
-	implements UmbSaveableWorkspaceContextInterface<EntityType | undefined>
+	implements UmbSaveableWorkspaceContextInterface
 {
 	#data = new UmbObjectState<EntityType | undefined>(undefined);
 	name = this.#data.asObservablePart((data) => data?.name);

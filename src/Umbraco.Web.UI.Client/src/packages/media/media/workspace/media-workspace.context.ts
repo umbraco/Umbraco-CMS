@@ -12,7 +12,7 @@ import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 type EntityType = UmbMediaDetailModel;
 export class UmbMediaWorkspaceContext
 	extends UmbEditableWorkspaceContextBase<UmbMediaRepository, EntityType>
-	implements UmbSaveableWorkspaceContextInterface<EntityType | undefined>, UmbApi
+	implements UmbSaveableWorkspaceContextInterface, UmbApi
 {
 	#data = new UmbObjectState<EntityType | undefined>(undefined);
 	data = this.#data.asObservable();
