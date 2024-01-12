@@ -4,10 +4,8 @@ import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 export interface UmbBlockCatalogueModalData {
 	blocks: Array<UmbBlockTypeBase>;
 	blockGroups?: Array<{ name: string; key: string }>;
-	view?: UmbBlockCatalogueView;
+	openClipboard?: boolean;
 }
-
-export type UmbBlockCatalogueView = 'clipboard' | 'createEmpty';
 
 export interface UmbBlockCatalogueModalValue {
 	key: string;

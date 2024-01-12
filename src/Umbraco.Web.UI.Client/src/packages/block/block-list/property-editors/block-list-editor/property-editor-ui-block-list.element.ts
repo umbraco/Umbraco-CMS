@@ -6,7 +6,6 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import {
 	UMB_BLOCK_CATALOGUE_MODAL,
-	UmbBlockCatalogueView,
 	UmbBlockLayoutBaseModel,
 	UmbBlockManagerContext,
 	UmbBlockTypeBase,
@@ -111,10 +110,10 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 		});
 	}
 
-	async #openBlockCatalogue(view?: UmbBlockCatalogueView) {
+	async #openBlockCatalogue(openClipboard: boolean = false) {
 		//Open modal
 		const modalContext = this.#modalContext?.open(UMB_BLOCK_CATALOGUE_MODAL, {
-			data: { blocks: this._blocks ?? [], view },
+			data: { blocks: this._blocks ?? [], openClipboard },
 		});
 
 		const data = await modalContext?.onSubmit();
@@ -151,13 +150,13 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 					id="add-button"
 					look="placeholder"
 					label=${this.localize.term('content_createEmpty')}
-					@click=${() => this.#openBlockCatalogue('createEmpty')}>
+					@click=${() => this.#openBlockCatalogue()}>
 					${this.localize.term('content_createEmpty')}
 				</uui-button>
 				<uui-button
 					label=${this.localize.term('content_createFromClipboard')}
 					look="placeholder"
-					@click=${() => this.#openBlockCatalogue('clipboard')}>
+					@click=${() => this.#openBlockCatalogue(true)}>
 					<uui-icon name="icon-paste-in"></uui-icon>
 				</uui-button>
 			</uui-button-group>`;

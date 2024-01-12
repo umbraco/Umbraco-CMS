@@ -1,7 +1,6 @@
 import {
 	UmbBlockCatalogueModalData,
 	UmbBlockCatalogueModalValue,
-	UmbBlockCatalogueView,
 	UmbBlockTypeWithGroupKey,
 } from '@umbraco-cms/backoffice/block';
 import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/document';
@@ -21,13 +20,13 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 	private _blockGroups: Array<{ key: string; name: string }> = [];
 
 	@state()
-	view?: UmbBlockCatalogueView;
+	openClipboard?: boolean;
 
 	connectedCallback() {
 		super.connectedCallback();
 		if (!this.data) return;
 
-		this.view = this.data.view ?? 'createEmpty';
+		this.openClipboard = this.data.openClipboard ?? false;
 		this._blocks = this.data.blocks ?? [];
 		this._blockGroups = this.data.blockGroups ?? [];
 	}
@@ -40,7 +39,7 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 	render() {
 		return html`
 			<umb-body-layout headline="${this.localize.term('blockEditor_addBlock')}">
-				${this.#renderViews()} ${this.view === 'clipboard' ? this.#renderClipboard() : this.#renderCreateEmpty()}
+				${this.#renderViews()} ${this.openClipboard ? this.#renderClipboard() : this.#renderCreateEmpty()}
 				<div slot="actions">
 					<uui-button label=${this.localize.term('general_close')} @click=${this._rejectModal}></uui-button>
 					<uui-button
@@ -92,14 +91,11 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 	#renderViews() {
 		return html`
 			<uui-tab-group slot="navigation">
-				<uui-tab
-					label="Create Empty"
-					?active=${this.view === 'createEmpty'}
-					@click=${() => (this.view = 'createEmpty')}>
+				<uui-tab label="Create Empty" ?active=${!this.openClipboard} @click=${() => (this.openClipboard = false)}>
 					Create Empty
 					<uui-icon slot="icon" name="icon-add"></uui-icon>
 				</uui-tab>
-				<uui-tab label="Clipboard" ?active=${this.view === 'clipboard'} @click=${() => (this.view = 'clipboard')}>
+				<uui-tab label="Clipboard" ?active=${this.openClipboard} @click=${() => (this.openClipboard = true)}>
 					Clipboard
 					<uui-icon slot="icon" name="icon-paste-in"></uui-icon>
 				</uui-tab>
