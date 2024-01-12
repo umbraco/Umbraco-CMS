@@ -75,7 +75,7 @@ type INTERNAL_UmbSorterConfig<T, ElementType extends HTMLElement> = {
 	boundarySelector?: string;
 	dataTransferResolver?: (dataTransfer: DataTransfer | null, currentItem: T) => void;
 	onStart?: (argument: { item: T; element: ElementType }) => void;
-	onChange?: (argument: { item: T; element: ElementType; model: Array<T> }) => void;
+	onChange?: (argument: { item: T; model: Array<T> }) => void;
 	onContainerChange?: (argument: { item: T; element: ElementType }) => void;
 	onEnd?: (argument: { item: T; element: ElementType }) => void;
 	itemHasNestedContainersResolver?: (element: HTMLElement) => boolean;
@@ -93,7 +93,7 @@ type INTERNAL_UmbSorterConfig<T, ElementType extends HTMLElement> = {
 		placeholderIsInThisRow: boolean;
 		horizontalPlaceAfter: boolean;
 	}) => void;
-	performItemMove?: (argument: { item: T; newIndex: number }) => Promise<boolean> | boolean;
+	performItemMove?: (argument: { item: T; newIndex: number; oldIndex: number }) => Promise<boolean> | boolean;
 	performItemInsert?: (argument: { item: T; newIndex: number }) => Promise<boolean> | boolean;
 	performItemRemove?: (argument: { item: T }) => Promise<boolean> | boolean;
 };
@@ -262,7 +262,6 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		}
 	}
 	#removePlaceholderStyle() {
-		console.log('remove placeholder style', this.#currentElement);
 		if (this.#config.placeholderClass) {
 			this.#currentElement?.classList.remove(this.#config.placeholderClass);
 		}
@@ -294,10 +293,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		const element = (event.target as HTMLElement).closest(this.#config.itemSelector);
 		if (!element) return;
 
-		console.log('#drag start!');
-
 		if (this.#currentElement && this.#currentElement !== element) {
-			console.log('#drag start, calls END!!!!!');
 			this.#handleDragEnd();
 		}
 
@@ -347,7 +343,6 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 	};
 
 	#handleDragEnd = async () => {
-		console.log('#drag end!');
 		window.removeEventListener('dragover', this.#handleDragMove);
 		window.removeEventListener('dragend', this.#handleDragEnd);
 
@@ -663,24 +658,24 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 				const newModel = [...this.#model];
 				newModel.splice(oldIndex, 1);
 				this.#model = newModel;
-				this.#config.onChange?.(newModel);
+				this.#config.onChange?.({ model: newModel, item });
 				return true;
 			}
 		}
 		return false;
 	}
 
-	hasOtherItemsThan(item: T) {
+	public hasOtherItemsThan(item: T) {
 		return this.#model.filter((x) => x !== item).length > 0;
 	}
 
 	public async moveItemInModel(newIndex: number, element: ElementType, fromCtrl: UmbSorterController<T, ElementType>) {
-		const movingItem = fromCtrl.getItemOfElement(element);
-		if (!movingItem) {
+		const item = fromCtrl.getItemOfElement(element);
+		if (!item) {
 			console.error('Could not find item of sync item');
 			return false;
 		}
-		if (this.notifyRequestDrop({ item: movingItem }) === false) {
+		if (this.notifyRequestDrop({ item }) === false) {
 			return false;
 		}
 
@@ -690,10 +685,10 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 			// Local move:
 
 			// TODO: Maybe this should be replaceable/configurable:
-			const oldIndex = this.#model.indexOf(movingItem);
+			const oldIndex = this.#model.indexOf(item);
 
 			if (this.#config.performItemMove) {
-				const result = await this.#config.performItemMove({ item: movingItem, newIndex, oldIndex });
+				const result = await this.#config.performItemMove({ item, newIndex, oldIndex });
 				if (result === false) {
 					return false;
 				}
@@ -703,28 +698,28 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 				if (oldIndex <= newIndex) {
 					newIndex--;
 				}
-				newModel.splice(newIndex, 0, movingItem);
+				newModel.splice(newIndex, 0, item);
 				this.#model = newModel;
-				this.#config.onChange?.(newModel);
+				this.#config.onChange?.({ model: newModel, item });
 			}
 		} else {
 			// Not a local move:
 
-			if ((await fromCtrl.removeItem(movingItem)) !== true) {
+			if ((await fromCtrl.removeItem(item)) !== true) {
 				console.error('Sync could not remove item');
 				return false;
 			}
 
 			if (this.#config.performItemInsert) {
-				const result = await this.#config.performItemInsert({ item: movingItem, newIndex });
+				const result = await this.#config.performItemInsert({ item, newIndex });
 				if (result === false) {
 					return false;
 				}
 			} else {
 				const newModel = [...this.#model];
-				newModel.splice(newIndex, 0, movingItem);
+				newModel.splice(newIndex, 0, item);
 				this.#model = newModel;
-				this.#config.onChange?.(newModel);
+				this.#config.onChange?.({ model: newModel, item });
 			}
 		}
 

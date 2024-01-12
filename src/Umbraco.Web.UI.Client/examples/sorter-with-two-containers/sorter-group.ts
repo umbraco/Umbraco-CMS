@@ -68,9 +68,9 @@ export class ExampleSorterGroup extends UmbElementMixin(LitElement) {
 			this.requestUpdate('_items', oldValue);
 			return true;
 		},*/
-		onChange: (newModel) => {
+		onChange: ({ model }) => {
 			const oldValue = this._items;
-			this.items = newModel;
+			this.items = model;
 			this.requestUpdate('_items', oldValue);
 		},
 	});
