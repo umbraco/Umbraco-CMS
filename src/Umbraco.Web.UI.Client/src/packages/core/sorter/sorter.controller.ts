@@ -69,7 +69,8 @@ type INTERNAL_UmbSorterConfig<T> = {
 	disabledItemSelector?: string;
 	containerSelector: string;
 	ignorerSelector: string;
-	placeholderClass: string;
+	placeholderClass?: string;
+	placeholderAttr?: string;
 	draggableSelector?: string;
 	boundarySelector?: string;
 	dataTransferResolver?: (dataTransfer: DataTransfer | null, currentItem: T) => void;
@@ -102,11 +103,8 @@ type INTERNAL_UmbSorterConfig<T> = {
 };
 
 // External type with some properties optional, as they have defaults:
-export type UmbSorterConfig<T> = Omit<
-	INTERNAL_UmbSorterConfig<T>,
-	'placeholderClass' | 'ignorerSelector' | 'containerSelector'
-> &
-	Partial<Pick<INTERNAL_UmbSorterConfig<T>, 'placeholderClass' | 'ignorerSelector' | 'containerSelector'>>;
+export type UmbSorterConfig<T> = Omit<INTERNAL_UmbSorterConfig<T>, 'ignorerSelector' | 'containerSelector'> &
+	Partial<Pick<INTERNAL_UmbSorterConfig<T>, 'ignorerSelector' | 'containerSelector'>>;
 
 /**
  * @export
@@ -149,7 +147,7 @@ export class UmbSorterController<T extends object> implements UmbController {
 
 		// Set defaults:
 		config.ignorerSelector ??= 'a, img, iframe';
-		config.placeholderClass ??= '--umb-sorter-placeholder';
+		config.placeholderAttr ??= 'drag-placeholder';
 
 		this.#config = config as INTERNAL_UmbSorterConfig<T>;
 		host.addController(this);
@@ -308,7 +306,12 @@ export class UmbSorterController<T extends object> implements UmbController {
 			this.#rqaId = undefined;
 			if (this.#currentElement) {
 				this.#currentElement.style.transform = '';
-				this.#currentElement.classList.add(this.#config.placeholderClass);
+				if (this.#config.placeholderClass) {
+					this.#currentElement.classList.add(this.#config.placeholderClass);
+				}
+				if (this.#config.placeholderAttr) {
+					this.#currentElement.setAttribute(this.#config.placeholderAttr, '');
+				}
 			}
 		});
 	};
@@ -321,7 +324,12 @@ export class UmbSorterController<T extends object> implements UmbController {
 		window.removeEventListener('dragover', this.#handleDragMove);
 		window.removeEventListener('dragend', this.#handleDragEnd);
 		this.#currentElement.style.transform = '';
-		this.#currentElement.classList.remove(this.#config.placeholderClass);
+		if (this.#config.placeholderClass) {
+			this.#currentElement.classList.remove(this.#config.placeholderClass);
+		}
+		if (this.#config.placeholderAttr) {
+			this.#currentElement.removeAttribute(this.#config.placeholderAttr);
+		}
 
 		this.#stopAutoScroll();
 		this.removeAllowIndication();
