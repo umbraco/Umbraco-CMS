@@ -38,7 +38,6 @@ export interface MetaEntityAction {
 	 *   "Umb.Repository.Documents"
 	 * ]
 	 */
-	// TODO: Could we find the repository based on entityTypes?
 	repositoryAlias: string;
 
 	/**
