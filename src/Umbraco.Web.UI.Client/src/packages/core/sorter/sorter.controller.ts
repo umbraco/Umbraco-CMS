@@ -75,14 +75,9 @@ type INTERNAL_UmbSorterConfig<T, ElementType extends HTMLElement> = {
 	boundarySelector?: string;
 	dataTransferResolver?: (dataTransfer: DataTransfer | null, currentItem: T) => void;
 	onStart?: (argument: { item: T; element: ElementType }) => void;
-	onChange?: (argument: { item: T; element: ElementType }) => void;
+	onChange?: (argument: { item: T; element: ElementType; model: Array<T> }) => void;
 	onContainerChange?: (argument: { item: T; element: ElementType }) => void;
 	onEnd?: (argument: { item: T; element: ElementType }) => void;
-	onSync?: (argument: {
-		item: T;
-		fromController: UmbSorterController<T, ElementType>;
-		toController: UmbSorterController<T, ElementType>;
-	}) => void;
 	itemHasNestedContainersResolver?: (element: HTMLElement) => boolean;
 	onDisallowed?: () => void;
 	onAllowed?: () => void;
@@ -665,8 +660,10 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		} else {
 			const oldIndex = this.#model.indexOf(item);
 			if (oldIndex !== -1) {
-				this.#model.splice(oldIndex, 1);
-				this.#config.modelChangedCallback?.(this.#model);
+				const newModel = [...this.#model];
+				newModel.splice(oldIndex, 1);
+				this.#model = newModel;
+				this.#config.onChange?.(newModel);
 				return true;
 			}
 		}
@@ -701,14 +698,14 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 					return false;
 				}
 			} else {
-				throw new Error('performItemMove must be configured, until default fallback method is made.');
-				this.#model.splice(oldIndex, 1);
+				const newModel = [...this.#model];
+				newModel.splice(oldIndex, 1);
 				if (oldIndex <= newIndex) {
 					newIndex--;
 				}
-				this.#model.splice(newIndex, 0, movingItem);
-
-				this.#config.modelChangedCallback?.(this.#model);
+				newModel.splice(newIndex, 0, movingItem);
+				this.#model = newModel;
+				this.#config.onChange?.(newModel);
 			}
 		} else {
 			// Not a local move:
@@ -724,16 +721,12 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 					return false;
 				}
 			} else {
-				this.#model.splice(newIndex, 0, movingItem);
-				this.#config.modelChangedCallback?.(this.#model);
+				const newModel = [...this.#model];
+				newModel.splice(newIndex, 0, movingItem);
+				this.#model = newModel;
+				this.#config.onChange?.(newModel);
 			}
 		}
-
-		const eventData = { item: movingItem, fromController: fromCtrl, toController: this };
-		if (!localMove) {
-			fromCtrl.notifySync(eventData);
-		}
-		this.notifySync(eventData);
 
 		return true;
 	}
@@ -821,11 +814,6 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		this.#autoScrollRAF = null;
 	}
 
-	public notifySync(data: any) {
-		if (this.#config.onSync) {
-			this.#config.onSync(data);
-		}
-	}
 	public notifyDisallowed() {
 		if (this.#config.onDisallowed) {
 			this.#config.onDisallowed();

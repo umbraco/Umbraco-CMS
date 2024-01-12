@@ -36,7 +36,7 @@ export class ExampleSorterGroup extends UmbElementMixin(LitElement) {
 
 	#sorter = new UmbSorterController<ModelEntryType, ExampleSorterItem>(this, {
 		...SORTER_CONFIG,
-		performItemInsert: ({ item, newIndex }) => {
+		/*performItemInsert: ({ item, newIndex }) => {
 			const oldValue = this._items;
 			//console.log('inserted', item.name, 'at', newIndex, '	', this._items.map((x) => x.name).join(', '));
 			const newItems = [...this._items];
@@ -67,12 +67,13 @@ export class ExampleSorterGroup extends UmbElementMixin(LitElement) {
 			this.items = newItems;
 			this.requestUpdate('_items', oldValue);
 			return true;
+		},*/
+		onChange: (newModel) => {
+			const oldValue = this._items;
+			this.items = newModel;
+			this.requestUpdate('_items', oldValue);
 		},
 	});
-
-	constructor() {
-		super();
-	}
 
 	removeItem = (item: ModelEntryType) => {
 		this.items = this._items.filter((r) => r.name !== item.name);
