@@ -5752,12 +5752,12 @@
         ]
       }
     },
-    "/umbraco/management/api/v1/dynamic-root/determine-roots-from-query": {
+    "/umbraco/management/api/v1/dynamic-root/query": {
       "post": {
         "tags": [
           "Dynamic Root"
         ],
-        "operationId": "PostDynamicRootDetermineRootsFromQuery",
+        "operationId": "PostDynamicRootQuery",
         "requestBody": {
           "content": {
             "application/json": {
@@ -13814,6 +13814,56 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/security/configuration": {
+      "get": {
+        "tags": [
+          "Security"
+        ],
+        "operationId": "GetSecurityConfiguration",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/SecurityConfigurationResponseModel"
+                    }
+                  ]
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/SecurityConfigurationResponseModel"
+                    }
+                  ]
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/SecurityConfigurationResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/security/forgot-password": {
       "post": {
         "tags": [
@@ -18423,6 +18473,56 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/user/configuration": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "operationId": "GetUserConfiguration",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/UserConfigurationResponseModel"
+                    }
+                  ]
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/UserConfigurationResponseModel"
+                    }
+                  ]
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/UserConfigurationResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/user/current": {
       "get": {
         "tags": [
@@ -18571,6 +18671,56 @@
         "responses": {
           "200": {
             "description": "Success"
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/user/current/configuration": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "operationId": "GetUserCurrentConfiguration",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/CurrenUserConfigurationResponseModel"
+                    }
+                  ]
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/CurrenUserConfigurationResponseModel"
+                    }
+                  ]
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/CurrenUserConfigurationResponseModel"
+                    }
+                  ]
+                }
+              }
+            }
           },
           "401": {
             "description": "The resource is protected and requires an authentication token"
@@ -20751,6 +20901,30 @@
         },
         "additionalProperties": false
       },
+      "CurrenUserConfigurationResponseModel": {
+        "required": [
+          "keepUserLoggedIn",
+          "passwordConfiguration",
+          "usernameIsEmail"
+        ],
+        "type": "object",
+        "properties": {
+          "keepUserLoggedIn": {
+            "type": "boolean"
+          },
+          "usernameIsEmail": {
+            "type": "boolean"
+          },
+          "passwordConfiguration": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/PasswordConfigurationResponseModel"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
       "CurrentUserResponseModel": {
         "required": [
           "avatarUrls",
@@ -21568,9 +21742,7 @@
       },
       "DynamicRootContextRequestModel": {
         "required": [
-          "culture",
-          "parentId",
-          "segment"
+          "parentId"
         ],
         "type": "object",
         "properties": {
@@ -21584,10 +21756,12 @@
             "format": "uuid"
           },
           "culture": {
-            "type": "string"
+            "type": "string",
+            "nullable": true
           },
           "segment": {
-            "type": "string"
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -21612,7 +21786,7 @@
       "DynamicRootQueryRequestModel": {
         "required": [
           "origin",
-          "querySteps"
+          "steps"
         ],
         "type": "object",
         "properties": {
@@ -21623,7 +21797,7 @@
               }
             ]
           },
-          "querySteps": {
+          "steps": {
             "type": "array",
             "items": {
               "oneOf": [
@@ -21639,14 +21813,14 @@
       "DynamicRootQueryStepRequestModel": {
         "required": [
           "alias",
-          "anyOfDocTypeKeys"
+          "documentTypeIds"
         ],
         "type": "object",
         "properties": {
           "alias": {
             "type": "string"
           },
-          "anyOfDocTypeKeys": {
+          "documentTypeIds": {
             "type": "array",
             "items": {
               "type": "string",
@@ -23965,6 +24139,35 @@
         ],
         "additionalProperties": false
       },
+      "PasswordConfigurationResponseModel": {
+        "required": [
+          "minimumPasswordLength",
+          "requireDigit",
+          "requireLowercase",
+          "requireNonLetterOrDigit",
+          "requireUppercase"
+        ],
+        "type": "object",
+        "properties": {
+          "minimumPasswordLength": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "requireNonLetterOrDigit": {
+            "type": "boolean"
+          },
+          "requireDigit": {
+            "type": "boolean"
+          },
+          "requireLowercase": {
+            "type": "boolean"
+          },
+          "requireUppercase": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
       "PathFolderModelBaseModel": {
         "type": "object",
         "allOf": [
@@ -24788,6 +24991,22 @@
           "name": {
             "minLength": 1,
             "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "SecurityConfigurationResponseModel": {
+        "required": [
+          "passwordConfiguration"
+        ],
+        "type": "object",
+        "properties": {
+          "passwordConfiguration": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/PasswordConfigurationResponseModel"
+              }
+            ]
           }
         },
         "additionalProperties": false
@@ -26070,6 +26289,26 @@
           "reportUrl": {
             "type": "string",
             "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "UserConfigurationResponseModel": {
+        "required": [
+          "canInviteUsers",
+          "passwordConfiguration"
+        ],
+        "type": "object",
+        "properties": {
+          "canInviteUsers": {
+            "type": "boolean"
+          },
+          "passwordConfiguration": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/PasswordConfigurationResponseModel"
+              }
+            ]
           }
         },
         "additionalProperties": false
