@@ -69,6 +69,7 @@ export default {
 						'@umbraco-cms/backoffice/entity-action': './src/packages/core/entity-action/index.ts',
 						'@umbraco-cms/backoffice/entity-bulk-action': './src/packages/core/entity-bulk-action/index.ts',
 						'@umbraco-cms/backoffice/extension-registry': './src/packages/core/extension-registry/index.ts',
+						'@umbraco-cms/backoffice/file-system': './src/packages/core/file-system/index.ts',
 						'@umbraco-cms/backoffice/id': './src/packages/core/id/index.ts',
 						'@umbraco-cms/backoffice/localization': './src/packages/core/localization/index.ts',
 						'@umbraco-cms/backoffice/macro': './src/packages/core/macro/index.ts',

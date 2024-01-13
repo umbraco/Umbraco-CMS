@@ -69,6 +69,7 @@
 			"@umbraco-cms/backoffice/entity-action": ["src/packages/core/entity-action"],
 			"@umbraco-cms/backoffice/entity-bulk-action": ["src/packages/core/entity-bulk-action"],
 			"@umbraco-cms/backoffice/extension-registry": ["src/packages/core/extension-registry"],
+			"@umbraco-cms/backoffice/file-system": ["src/packages/core/file-system"],
 			"@umbraco-cms/backoffice/id": ["src/packages/core/id"],
 			"@umbraco-cms/backoffice/localization": ["src/packages/core/localization"],
 			"@umbraco-cms/backoffice/macro": ["src/packages/core/macro"],
