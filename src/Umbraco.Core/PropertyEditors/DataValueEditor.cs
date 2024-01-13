@@ -248,9 +248,9 @@ public class DataValueEditor : IDataValueEditor
     [Obsolete("Use ToEditor(IProperty property, string? culture, string? segment, MapperContext context); instead")]
     public virtual object? ToEditor(IProperty property, string? culture = null, string? segment = null)
     {
-        return ToEditor(property, culture, segment, null);
+        return ToEditor(property,null, culture, segment);
     }
-    public virtual object? ToEditor(IProperty property, string? culture = null, string? segment = null, MapperContext? mapperContext = null)
+    public virtual object? ToEditor(IProperty property, MapperContext? mapperContext, string? culture = null, string? segment = null)
     {
         var value = property.GetValue(culture, segment);
         if (value == null)

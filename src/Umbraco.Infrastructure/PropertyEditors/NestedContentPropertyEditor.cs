@@ -261,64 +261,7 @@ public class NestedContentPropertyEditor : DataEditor
         /// <returns></returns>
         public override object ToEditor(IProperty property, string? culture = null, string? segment = null)
         {
-            var val = property.GetValue(culture, segment);
-            var valEditors = new Dictionary<int, IDataValueEditor>();
-
-            IReadOnlyList<NestedContentValues.NestedContentRowValue> rows = _nestedContentValues.GetPropertyValues(val);
-
-            if (rows.Count == 0)
-            {
-                return string.Empty;
-            }
-
-            foreach (NestedContentValues.NestedContentRowValue row in rows.ToList())
-            {
-                foreach (KeyValuePair<string, NestedContentValues.NestedContentPropertyValue> prop in row.PropertyValues
-                             .ToList())
-                {
-                    try
-                    {
-                        // create a temp property with the value
-                        // - force it to be culture invariant as NC can't handle culture variant element properties
-                        prop.Value.PropertyType.Variations = ContentVariation.Nothing;
-                        var tempProp = new Property(prop.Value.PropertyType);
-
-                        tempProp.SetValue(prop.Value.Value);
-
-                        // convert that temp property, and store the converted value
-                        IDataEditor? propEditor = _propertyEditors[prop.Value.PropertyType.PropertyEditorAlias];
-                        if (propEditor == null)
-                        {
-                            // update the raw value since this is what will get serialized out
-                            row.RawPropertyValues[prop.Key] = tempProp.GetValue()?.ToString();
-                            continue;
-                        }
-
-                        var dataTypeId = prop.Value.PropertyType.DataTypeId;
-                        if (!valEditors.TryGetValue(dataTypeId, out IDataValueEditor? valEditor))
-                        {
-                            var tempConfig = _dataTypeService.GetDataType(dataTypeId)?.Configuration;
-                            valEditor = propEditor.GetValueEditor(tempConfig);
-
-                            valEditors.Add(dataTypeId, valEditor);
-                        }
-
-                        var convValue = valEditor.ToEditor(tempProp);
-
-                        // update the raw value since this is what will get serialized out
-                        row.RawPropertyValues[prop.Key] = convValue == null ? null : JToken.FromObject(convValue);
-                    }
-                    catch (InvalidOperationException ex)
-                    {
-                        // deal with weird situations by ignoring them (no comment)
-                        row.RawPropertyValues.Remove(prop.Key);
-                        _logger.LogWarning(ex, "ToEditor removed property value {PropertyKey} in row {RowId} for property type {PropertyTypeAlias}", prop.Key, row.Id, property.PropertyType.Alias);
-                    }
-                }
-            }
-
-            // return the object, there's a native json converter for this so it will serialize correctly
-            return rows;
+            return ToEditor(property, null, culture, segment);
         }
 /// <summary>
         ///     Ensure that sub-editor values are translated through their ToEditor methods
@@ -327,7 +270,7 @@ public class NestedContentPropertyEditor : DataEditor
         /// <param name="culture"></param>
         /// <param name="segment"></param>
         /// <returns></returns>
-        public override object ToEditor(IProperty property, string? culture = null, string? segment = null, MapperContext? mapperContext = null)
+        public override object ToEditor(IProperty property, MapperContext? mapperContext, string? culture = null, string? segment = null)
         {
             var val = property.GetValue(culture, segment);
             var valEditors = new Dictionary<int, IDataValueEditor>();

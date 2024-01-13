@@ -296,20 +296,7 @@ public class RichTextPropertyEditor : DataEditor
         /// <param name="segment"></param>
         public override object? ToEditor(IProperty property, string? culture = null, string? segment = null)
         {
-            var value = property.GetValue(culture, segment);
-            if (TryParseEditorValue(value, out RichTextEditorValue? richTextEditorValue) is false)
-            {
-                return null;
-            }
-
-            var propertyValueWithMediaResolved = _imageSourceParser.EnsureImageSources(richTextEditorValue.Markup);
-            var parsed = MacroTagParser.FormatRichTextPersistedDataForEditor(
-                propertyValueWithMediaResolved,
-                new Dictionary<string, string>());
-            richTextEditorValue.Markup = parsed;
-
-            // return json convertable object
-            return CleanAndMapBlocks(richTextEditorValue, blockValue => MapBlockValueToEditor(property, blockValue));
+            return ToEditor(property, null, culture, segment);
         }
         /// <summary>
         ///     Format the data for the editor
@@ -317,7 +304,7 @@ public class RichTextPropertyEditor : DataEditor
         /// <param name="property"></param>
         /// <param name="culture"></param>
         /// <param name="segment"></param>
-        public override object? ToEditor(IProperty property, string? culture = null, string? segment = null, MapperContext? mapperContext = null)
+        public override object? ToEditor(IProperty property, MapperContext? mapperContext, string? culture = null, string? segment = null)
         {
             var value = property.GetValue(culture, segment);
             if (TryParseEditorValue(value, out RichTextEditorValue? richTextEditorValue) is false)

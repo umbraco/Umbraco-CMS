@@ -77,28 +77,7 @@ internal abstract class BlockEditorPropertyValueEditor : BlockValuePropertyValue
     /// <returns></returns>
     public override object ToEditor(IProperty property, string? culture = null, string? segment = null)
     {
-        var val = property.GetValue(culture, segment);
-
-        BlockEditorData? blockEditorData;
-        try
-        {
-            blockEditorData = BlockEditorValues.DeserializeAndClean(val);
-        }
-        catch (JsonSerializationException)
-        {
-            // if this occurs it means the data is invalid, shouldn't happen but has happened if we change the data format.
-            return string.Empty;
-        }
-
-        if (blockEditorData == null)
-        {
-            return string.Empty;
-        }
-
-        MapBlockValueToEditor(property, blockEditorData.BlockValue);
-
-        // return json convertable object
-        return blockEditorData.BlockValue;
+      return ToEditor(property, null,culture, segment);
     }
     // note: there is NO variant support here
 
@@ -109,7 +88,7 @@ internal abstract class BlockEditorPropertyValueEditor : BlockValuePropertyValue
     /// <param name="culture"></param>
     /// <param name="segment"></param>
     /// <returns></returns>
-    public override object ToEditor(IProperty property, string? culture = null, string? segment = null, MapperContext? context = null)
+    public override object ToEditor(IProperty property, MapperContext? context, string? culture = null, string? segment = null)
     {
         var val = property.GetValue(culture, segment);
 
