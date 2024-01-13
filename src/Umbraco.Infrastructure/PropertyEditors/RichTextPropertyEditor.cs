@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
@@ -310,7 +311,29 @@ public class RichTextPropertyEditor : DataEditor
             // return json convertable object
             return CleanAndMapBlocks(richTextEditorValue, blockValue => MapBlockValueToEditor(property, blockValue));
         }
+        /// <summary>
+        ///     Format the data for the editor
+        /// </summary>
+        /// <param name="property"></param>
+        /// <param name="culture"></param>
+        /// <param name="segment"></param>
+        public override object? ToEditor(IProperty property, string? culture = null, string? segment = null, MapperContext? mapperContext = null)
+        {
+            var value = property.GetValue(culture, segment);
+            if (TryParseEditorValue(value, out RichTextEditorValue? richTextEditorValue) is false)
+            {
+                return null;
+            }
 
+            var propertyValueWithMediaResolved = _imageSourceParser.EnsureImageSources(richTextEditorValue.Markup);
+            var parsed = MacroTagParser.FormatRichTextPersistedDataForEditor(
+                propertyValueWithMediaResolved,
+                new Dictionary<string, string>());
+            richTextEditorValue.Markup = parsed;
+
+            // return json convertable object
+            return CleanAndMapBlocks(richTextEditorValue, blockValue => MapBlockValueToEditor(property, blockValue,mapperContext));
+        }
         /// <summary>
         ///     Format the data for persistence
         /// </summary>

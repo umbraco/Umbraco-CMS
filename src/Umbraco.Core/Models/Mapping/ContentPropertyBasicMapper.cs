@@ -91,6 +91,6 @@ internal class ContentPropertyBasicMapper<TDestination>
         dest.Segment = segment;
 
         // if no 'IncludeProperties' were specified or this property is set to be included - we will map the value and return.
-        dest.Value = editor.GetValueEditor().ToEditor(property, culture, segment);
+        dest.Value = editor.GetValueEditor().ToEditor(property, culture, segment,context);
     }
 }

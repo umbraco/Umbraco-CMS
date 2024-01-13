@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.Editors;
@@ -108,16 +109,15 @@ internal abstract class BlockValuePropertyValueEditorBase : DataValueEditor, IDa
         MapBlockItemDataFromEditor(blockValue.SettingsData);
     }
 
-    protected void MapBlockValueToEditor(IProperty property, BlockValue blockValue)
+    protected void MapBlockValueToEditor(IProperty property, BlockValue blockValue, MapperContext? mapperContext = null)
     {
-        MapBlockItemDataToEditor(property, blockValue.ContentData);
-        MapBlockItemDataToEditor(property, blockValue.SettingsData);
+        MapBlockItemDataToEditor(property, blockValue.ContentData,mapperContext);
+        MapBlockItemDataToEditor(property, blockValue.SettingsData,mapperContext);
     }
 
-    private void MapBlockItemDataToEditor(IProperty property, List<BlockItemData> items)
+    private void MapBlockItemDataToEditor(IProperty property, List<BlockItemData> items, MapperContext? mapperContext = null)
     {
         var valEditors = new Dictionary<int, IDataValueEditor>();
-        IDictionary<int, IDataType?> dataTypes = new Dictionary<int, IDataType?>();
         foreach (BlockItemData row in items)
         {
             foreach (KeyValuePair<string, BlockItemData.BlockPropertyValue> prop in row.PropertyValues)
@@ -139,14 +139,18 @@ internal abstract class BlockValuePropertyValueEditorBase : DataValueEditor, IDa
                 }
 
                 IDataType? dataType = null;
-                if (dataTypes.ContainsKey(prop.Value.PropertyType.DataTypeId))
+                if (mapperContext != null && mapperContext.Items.ContainsKey($"DataType-{prop.Value.PropertyType.DataTypeId}"))
                 {
-                    dataType = dataTypes[prop.Value.PropertyType.DataTypeId];
+                    dataType = (mapperContext.Items[$"DataType-{prop.Value.PropertyType.DataTypeId}"] as IDataType);
+                }
+                else if(mapperContext!= null)
+                {
+                    dataType = _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeId);
+                    mapperContext.Items.Add($"DataType-{prop.Value.PropertyType.DataTypeId}", dataType);
                 }
                 else
                 {
                     dataType = _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeId);
-                    dataTypes.Add(prop.Value.PropertyType.DataTypeId, dataType);
                 }
 
                 if (dataType == null)
@@ -169,7 +173,7 @@ internal abstract class BlockValuePropertyValueEditorBase : DataValueEditor, IDa
                     valEditors.Add(dataType.Id, valEditor);
                 }
 
-                var convValue = valEditor.ToEditor(tempProp);
+                var convValue = valEditor.ToEditor(tempProp, null, null, mapperContext);
 
                 // update the raw value since this is what will get serialized out
                 row.RawPropertyValues[prop.Key] = convValue;

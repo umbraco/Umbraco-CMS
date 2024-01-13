@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Xml.Linq;
+using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.PropertyEditors;
 
@@ -63,7 +64,18 @@ public interface IDataValueEditor
     /// <summary>
     ///     Converts a property value to a value for the editor.
     /// </summary>
+    [Obsolete("Use ToEditor(IProperty property, string? culture, string? segment, MapperContext context); instead")]
     object? ToEditor(IProperty property, string? culture = null, string? segment = null);
+
+    /// <summary>
+    ///     Converts a property value to a value for the editor.
+    /// </summary>
+    object? ToEditor(IProperty property, string? culture, string? segment, MapperContext? mapperContext)
+    {
+         //todo: remove this when we remove the old ToEditor method
+            return ToEditor(property, culture, segment);
+    }
+
 
     // TODO: / deal with this when unplugging the xml cache
     // why property vs propertyType? services should be injected! etc...

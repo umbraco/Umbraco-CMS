@@ -4,6 +4,7 @@
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.Editors;
@@ -95,6 +96,40 @@ internal abstract class BlockEditorPropertyValueEditor : BlockValuePropertyValue
         }
 
         MapBlockValueToEditor(property, blockEditorData.BlockValue);
+
+        // return json convertable object
+        return blockEditorData.BlockValue;
+    }
+    // note: there is NO variant support here
+
+    /// <summary>
+    ///     Ensure that sub-editor values are translated through their ToEditor methods
+    /// </summary>
+    /// <param name="property"></param>
+    /// <param name="culture"></param>
+    /// <param name="segment"></param>
+    /// <returns></returns>
+    public override object ToEditor(IProperty property, string? culture = null, string? segment = null, MapperContext? context = null)
+    {
+        var val = property.GetValue(culture, segment);
+
+        BlockEditorData? blockEditorData;
+        try
+        {
+            blockEditorData = BlockEditorValues.DeserializeAndClean(val);
+        }
+        catch (JsonSerializationException)
+        {
+            // if this occurs it means the data is invalid, shouldn't happen but has happened if we change the data format.
+            return string.Empty;
+        }
+
+        if (blockEditorData == null)
+        {
+            return string.Empty;
+        }
+
+        MapBlockValueToEditor(property, blockEditorData.BlockValue,context);
 
         // return json convertable object
         return blockEditorData.BlockValue;
