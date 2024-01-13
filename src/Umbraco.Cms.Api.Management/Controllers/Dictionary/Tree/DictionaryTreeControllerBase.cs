@@ -27,11 +27,11 @@ public class DictionaryTreeControllerBase : EntityTreeControllerBase<EntityTreeI
 
     protected IDictionaryItemService DictionaryItemService { get; }
 
-    protected async Task<EntityTreeItemResponseModel[]> MapTreeItemViewModels(Guid? parentKey, IDictionaryItem[] dictionaryItems)
+    protected async Task<IEnumerable<EntityTreeItemResponseModel>> MapTreeItemViewModels(Guid? parentKey, IEnumerable<IDictionaryItem> dictionaryItems)
     {
         async Task<EntityTreeItemResponseModel> CreateEntityTreeItemViewModelAsync(IDictionaryItem dictionaryItem)
         {
-            var hasChildren = (await DictionaryItemService.GetChildrenAsync(dictionaryItem.Key)).Any();
+            var hasChildren = await DictionaryItemService.CountChildrenAsync(dictionaryItem.Key) > 0;
             return new EntityTreeItemResponseModel
             {
                 Name = dictionaryItem.ItemKey,
@@ -43,25 +43,6 @@ public class DictionaryTreeControllerBase : EntityTreeControllerBase<EntityTreeI
             };
         }
 
-        var items = new List<EntityTreeItemResponseModel>(dictionaryItems.Length);
-        foreach (IDictionaryItem dictionaryItem in dictionaryItems)
-        {
-            items.Add(await CreateEntityTreeItemViewModelAsync(dictionaryItem));
-        }
-
-        return items.ToArray();
-    }
-
-    // language service does not (yet) allow pagination of dictionary items, we have to do it in memory for now
-    protected IDictionaryItem[] PaginatedDictionaryItems(long pageNumber, int pageSize, IEnumerable<IDictionaryItem> allDictionaryItems, out long totalItems)
-    {
-        IDictionaryItem[] allDictionaryItemsAsArray = allDictionaryItems.ToArray();
-
-        totalItems = allDictionaryItemsAsArray.Length;
-        return allDictionaryItemsAsArray
-            .OrderBy(item => item.ItemKey)
-            .Skip((int)pageNumber * pageSize)
-            .Take(pageSize)
-            .ToArray();
+        return await Task.WhenAll(dictionaryItems.Select(CreateEntityTreeItemViewModelAsync));
     }
 }
