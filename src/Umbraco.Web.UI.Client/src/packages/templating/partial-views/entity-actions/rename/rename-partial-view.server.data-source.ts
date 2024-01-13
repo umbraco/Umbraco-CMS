@@ -10,7 +10,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 export class UmbRenamePartialViewServerDataSource {
 	#host: UmbControllerHost;
 	#detailDataSource: UmbPartialViewDetailServerDataSource;
-	#serverPathUniqueSerializer = new UmbServerFilePathUniqueSerializer();
+	#serverFilePathUniqueSerializer = new UmbServerFilePathUniqueSerializer();
 
 	constructor(host: UmbControllerHost) {
 		this.#host = host;
@@ -28,7 +28,7 @@ export class UmbRenamePartialViewServerDataSource {
 		if (!unique) throw new Error('Unique is missing');
 		if (!name) throw new Error('Name is missing');
 
-		const path = this.#serverPathUniqueSerializer.toServerPath(unique);
+		const path = this.#serverFilePathUniqueSerializer.toServerPath(unique);
 		if (!path) throw new Error('Path is missing');
 
 		const requestBody: RenameStylesheetRequestModel = {
@@ -45,7 +45,7 @@ export class UmbRenamePartialViewServerDataSource {
 
 		if (data) {
 			const newPath = decodeURIComponent(data);
-			const newPathUnique = this.#serverPathUniqueSerializer.toUnique(newPath);
+			const newPathUnique = this.#serverFilePathUniqueSerializer.toUnique(newPath);
 			return this.#detailDataSource.read(newPathUnique);
 		}
 

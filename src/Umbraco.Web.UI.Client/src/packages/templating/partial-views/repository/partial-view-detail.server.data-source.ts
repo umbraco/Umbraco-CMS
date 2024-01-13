@@ -15,7 +15,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 export class UmbPartialViewDetailServerDataSource implements UmbDetailDataSource<UmbPartialViewDetailModel> {
 	#host: UmbControllerHost;
-	#serverPathUniqueSerializer = new UmbServerFilePathUniqueSerializer();
+	#serverFilePathUniqueSerializer = new UmbServerFilePathUniqueSerializer();
 
 	constructor(host: UmbControllerHost) {
 		this.#host = host;
@@ -40,7 +40,7 @@ export class UmbPartialViewDetailServerDataSource implements UmbDetailDataSource
 		if (!partialView.parentUnique === undefined) throw new Error('Parent Unique is missing');
 		if (!partialView.name) throw new Error('Name is missing');
 
-		const parentPath = this.#serverPathUniqueSerializer.toServerPath(partialView.parentUnique);
+		const parentPath = this.#serverFilePathUniqueSerializer.toServerPath(partialView.parentUnique);
 
 		// TODO: make data mapper to prevent errors
 		const requestBody: CreatePartialViewRequestModel = {
@@ -58,7 +58,7 @@ export class UmbPartialViewDetailServerDataSource implements UmbDetailDataSource
 
 		if (data) {
 			const newPath = decodeURIComponent(data);
-			const newPathUnique = this.#serverPathUniqueSerializer.toUnique(newPath);
+			const newPathUnique = this.#serverFilePathUniqueSerializer.toUnique(newPath);
 			return this.read(newPathUnique);
 		}
 
@@ -68,7 +68,7 @@ export class UmbPartialViewDetailServerDataSource implements UmbDetailDataSource
 	async read(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		const path = this.#serverPathUniqueSerializer.toServerPath(unique);
+		const path = this.#serverFilePathUniqueSerializer.toServerPath(unique);
 		if (!path) throw new Error('Path is missing');
 
 		const { data, error } = await tryExecuteAndNotify(
@@ -82,8 +82,8 @@ export class UmbPartialViewDetailServerDataSource implements UmbDetailDataSource
 
 		const partialView: UmbPartialViewDetailModel = {
 			entityType: UMB_PARTIAL_VIEW_ENTITY_TYPE,
-			unique: this.#serverPathUniqueSerializer.toUnique(data.path),
-			parentUnique: data.parent ? this.#serverPathUniqueSerializer.toUnique(data.parent.path) : null,
+			unique: this.#serverFilePathUniqueSerializer.toUnique(data.path),
+			parentUnique: data.parent ? this.#serverFilePathUniqueSerializer.toUnique(data.parent.path) : null,
 			path: data.path,
 			name: data.name,
 			content: data.content,
@@ -95,7 +95,7 @@ export class UmbPartialViewDetailServerDataSource implements UmbDetailDataSource
 	async update(data: UmbPartialViewDetailModel) {
 		if (!data.unique) throw new Error('Unique is missing');
 
-		const path = this.#serverPathUniqueSerializer.toServerPath(data.unique);
+		const path = this.#serverFilePathUniqueSerializer.toServerPath(data.unique);
 		if (!path) throw new Error('Path is missing');
 
 		const requestBody: UpdatePartialViewRequestModel = {
@@ -120,7 +120,7 @@ export class UmbPartialViewDetailServerDataSource implements UmbDetailDataSource
 	async delete(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		const path = this.#serverPathUniqueSerializer.toServerPath(unique);
+		const path = this.#serverFilePathUniqueSerializer.toServerPath(unique);
 		if (!path) throw new Error('Path is missing');
 
 		return tryExecuteAndNotify(

@@ -12,7 +12,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
  */
 export class UmbStylesheetFolderServerDataSource implements UmbFolderDataSource {
 	#host: UmbControllerHost;
-	#serverPathUniqueSerializer = new UmbServerFilePathUniqueSerializer();
+	#serverFilePathUniqueSerializer = new UmbServerFilePathUniqueSerializer();
 
 	/**
 	 * Creates an instance of UmbStylesheetFolderServerDataSource.
@@ -32,7 +32,7 @@ export class UmbStylesheetFolderServerDataSource implements UmbFolderDataSource 
 	async read(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		const path = this.#serverPathUniqueSerializer.toServerPath(unique);
+		const path = this.#serverFilePathUniqueSerializer.toServerPath(unique);
 		if (!path) throw new Error('Cannot read stylesheet folder without a path');
 
 		const { data, error } = await tryExecuteAndNotify(
@@ -44,8 +44,8 @@ export class UmbStylesheetFolderServerDataSource implements UmbFolderDataSource 
 
 		if (data) {
 			const mappedData = {
-				unique: this.#serverPathUniqueSerializer.toUnique(data.path),
-				parentUnique: data.parent ? this.#serverPathUniqueSerializer.toUnique(data.parent.path) : null,
+				unique: this.#serverFilePathUniqueSerializer.toUnique(data.path),
+				parentUnique: data.parent ? this.#serverFilePathUniqueSerializer.toUnique(data.parent.path) : null,
 				name: data.name,
 			};
 
@@ -81,7 +81,7 @@ export class UmbStylesheetFolderServerDataSource implements UmbFolderDataSource 
 
 		if (data) {
 			const newPath = decodeURIComponent(data);
-			const newPathUnique = this.#serverPathUniqueSerializer.toUnique(newPath);
+			const newPathUnique = this.#serverFilePathUniqueSerializer.toUnique(newPath);
 			return this.read(newPathUnique);
 		}
 
@@ -97,7 +97,7 @@ export class UmbStylesheetFolderServerDataSource implements UmbFolderDataSource 
 	async delete(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		const path = this.#serverPathUniqueSerializer.toServerPath(unique);
+		const path = this.#serverFilePathUniqueSerializer.toServerPath(unique);
 		if (!path) throw new Error('Cannot delete stylesheet folder without a path');
 
 		return tryExecuteAndNotify(
