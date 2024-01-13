@@ -1,9 +1,9 @@
+import { UmbServerPathUniqueSerializer } from '@umbraco-cms/backoffice/file-system';
 import { UMB_STATIC_FILE_ENTITY_TYPE, UMB_STATIC_FILE_FOLDER_ENTITY_TYPE } from '../entity.js';
 import { UmbStaticFileTreeItemModel } from './types.js';
 import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
 import { StaticFileResource, type FileSystemTreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbServerPathUniqueSerializer } from 'src/packages/templating/utils/server-path-unique-serializer.js';
 
 /**
  * A data source for the Static File tree that fetches data from the server
