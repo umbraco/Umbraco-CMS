@@ -1,27 +1,27 @@
-export class UmbServerPathUniqueSerializer {
+export class UmbServerFilePathUniqueSerializer {
 	#magicDot = '%dot%';
 
 	/**
-	 * Converts a server path to a unique URL friendly string that can be used in the client
-	 * @param {string} serverPath
+	 * Converts a server file path to a unique URL friendly string that can be used in the client
+	 * @param {string} serverFilePath
 	 * @return {*}  {(string | null)}
-	 * @memberof UmbServerPathSerializer
+	 * @memberof UmbServerFilePathSerializer
 	 */
-	toUnique(serverPath: string): string {
-		const urlSafeServerPath = serverPath?.replace('.', this.#magicDot);
-		return encodeURIComponent(urlSafeServerPath);
+	toUnique(serverFilePath: string): string {
+		const urlSafeServerFilePath = serverFilePath?.replace('.', this.#magicDot);
+		return encodeURIComponent(urlSafeServerFilePath);
 	}
 
 	/**
 	 * Converts a unique URL friendly string to a server path
-	 * @param {string} serverPathUnique
+	 * @param {string} serverFilePathUnique
 	 * @return {*}  {(string | null)}
-	 * @memberof UmbServerPathSerializer
+	 * @memberof UmbServerFilePathSerializer
 	 */
-	toServerPath(serverPathUnique: string | null): string | null {
-		if (serverPathUnique === undefined) throw new Error('Server path unique is missing');
-		if (serverPathUnique === null) return null;
-		const decoded = decodeURIComponent(serverPathUnique);
+	toServerPath(serverFilePathUnique: string | null): string | null {
+		if (serverFilePathUnique === undefined) throw new Error('Server file path unique is missing');
+		if (serverFilePathUnique === null) return null;
+		const decoded = decodeURIComponent(serverFilePathUnique);
 		return decoded.replace(this.#magicDot, '.');
 	}
 }

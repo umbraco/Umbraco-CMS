@@ -1,4 +1,4 @@
-import { UmbServerPathUniqueSerializer } from '@umbraco-cms/backoffice/server-file-system';
+import { UmbServerFilePathUniqueSerializer } from '@umbraco-cms/backoffice/server-file-system';
 import { UMB_STYLESHEET_ENTITY_TYPE, UMB_STYLESHEET_FOLDER_ENTITY_TYPE } from '../entity.js';
 import { UmbStylesheetTreeItemModel } from './types.js';
 import { FileSystemTreeItemPresentationModel, StylesheetResource } from '@umbraco-cms/backoffice/backend-api';
@@ -33,7 +33,7 @@ export class UmbStylesheetTreeServerDataSource extends UmbTreeServerDataSourceBa
 const getRootItems = () => StylesheetResource.getTreeStylesheetRoot({});
 
 const getChildrenOf = (parentUnique: string | null) => {
-	const parentPath = new UmbServerPathUniqueSerializer().toServerPath(parentUnique);
+	const parentPath = new UmbServerFilePathUniqueSerializer().toServerPath(parentUnique);
 
 	if (parentPath === null) {
 		return getRootItems();
@@ -46,7 +46,7 @@ const getChildrenOf = (parentUnique: string | null) => {
 };
 
 const mapper = (item: FileSystemTreeItemPresentationModel): UmbStylesheetTreeItemModel => {
-	const serializer = new UmbServerPathUniqueSerializer();
+	const serializer = new UmbServerFilePathUniqueSerializer();
 
 	return {
 		unique: serializer.toUnique(item.path),

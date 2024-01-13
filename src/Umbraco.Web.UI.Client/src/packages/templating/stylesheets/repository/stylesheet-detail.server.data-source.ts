@@ -1,4 +1,7 @@
-import { UmbServerPathUniqueSerializer, appendFileExtensionIfNeeded } from '@umbraco-cms/backoffice/server-file-system';
+import {
+	UmbServerFilePathUniqueSerializer,
+	appendFileExtensionIfNeeded,
+} from '@umbraco-cms/backoffice/server-file-system';
 import { UmbStylesheetDetailModel } from '../types.js';
 import { UMB_STYLESHEET_ENTITY_TYPE } from '../entity.js';
 import {
@@ -12,7 +15,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 export class UmbStylesheetDetailServerDataSource implements UmbDetailDataSource<UmbStylesheetDetailModel> {
 	#host: UmbControllerHost;
-	#serverPathUniqueSerializer = new UmbServerPathUniqueSerializer();
+	#serverPathUniqueSerializer = new UmbServerFilePathUniqueSerializer();
 
 	constructor(host: UmbControllerHost) {
 		this.#host = host;

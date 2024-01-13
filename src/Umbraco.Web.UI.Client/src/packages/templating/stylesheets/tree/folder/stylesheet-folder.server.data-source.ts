@@ -1,4 +1,4 @@
-import { UmbServerPathUniqueSerializer } from '@umbraco-cms/backoffice/server-file-system';
+import { UmbServerFilePathUniqueSerializer } from '@umbraco-cms/backoffice/server-file-system';
 import { UmbCreateFolderModel, UmbFolderDataSource, UmbUpdateFolderModel } from '@umbraco-cms/backoffice/tree';
 import { CreateStylesheetFolderRequestModel, StylesheetResource } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -12,7 +12,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
  */
 export class UmbStylesheetFolderServerDataSource implements UmbFolderDataSource {
 	#host: UmbControllerHost;
-	#serverPathUniqueSerializer = new UmbServerPathUniqueSerializer();
+	#serverPathUniqueSerializer = new UmbServerFilePathUniqueSerializer();
 
 	/**
 	 * Creates an instance of UmbStylesheetFolderServerDataSource.
@@ -65,7 +65,7 @@ export class UmbStylesheetFolderServerDataSource implements UmbFolderDataSource 
 		if (args.parentUnique === undefined) throw new Error('Parent unique is missing');
 		if (!args.name) throw new Error('Name is missing');
 
-		const parentPath = new UmbServerPathUniqueSerializer().toServerPath(args.parentUnique);
+		const parentPath = new UmbServerFilePathUniqueSerializer().toServerPath(args.parentUnique);
 
 		const requestBody: CreateStylesheetFolderRequestModel = {
 			parent: parentPath ? { path: parentPath } : null,

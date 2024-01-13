@@ -1,4 +1,7 @@
-import { UmbServerPathUniqueSerializer, appendFileExtensionIfNeeded } from '@umbraco-cms/backoffice/server-file-system';
+import {
+	UmbServerFilePathUniqueSerializer,
+	appendFileExtensionIfNeeded,
+} from '@umbraco-cms/backoffice/server-file-system';
 import { UmbScriptDetailServerDataSource } from '../../repository/script-detail.server.data-source.js';
 import { RenameStylesheetRequestModel, ScriptResource } from '@umbraco-cms/backoffice/backend-api';
 import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -7,7 +10,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 export class UmbRenameScriptServerDataSource {
 	#host: UmbControllerHost;
 	#detailDataSource: UmbScriptDetailServerDataSource;
-	#serverPathUniqueSerializer = new UmbServerPathUniqueSerializer();
+	#serverPathUniqueSerializer = new UmbServerFilePathUniqueSerializer();
 
 	constructor(host: UmbControllerHost) {
 		this.#host = host;

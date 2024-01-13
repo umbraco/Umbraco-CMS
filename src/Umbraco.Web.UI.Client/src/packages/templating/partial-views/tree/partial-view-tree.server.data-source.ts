@@ -1,4 +1,4 @@
-import { UmbServerPathUniqueSerializer } from '@umbraco-cms/backoffice/server-file-system';
+import { UmbServerFilePathUniqueSerializer } from '@umbraco-cms/backoffice/server-file-system';
 import { UMB_PARTIAL_VIEW_ENTITY_TYPE, UMB_PARTIAL_VIEW_FOLDER_ENTITY_TYPE } from '../entity.js';
 import { UmbPartialViewTreeItemModel } from './types.js';
 import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
@@ -33,7 +33,7 @@ export class UmbPartialViewTreeServerDataSource extends UmbTreeServerDataSourceB
 const getRootItems = () => PartialViewResource.getTreePartialViewRoot({});
 
 const getChildrenOf = (parentUnique: string | null) => {
-	const parentPath = new UmbServerPathUniqueSerializer().toServerPath(parentUnique);
+	const parentPath = new UmbServerFilePathUniqueSerializer().toServerPath(parentUnique);
 
 	if (parentPath === null) {
 		return getRootItems();
@@ -46,7 +46,7 @@ const getChildrenOf = (parentUnique: string | null) => {
 };
 
 const mapper = (item: FileSystemTreeItemPresentationModel): UmbPartialViewTreeItemModel => {
-	const serializer = new UmbServerPathUniqueSerializer();
+	const serializer = new UmbServerFilePathUniqueSerializer();
 
 	return {
 		unique: serializer.toUnique(item.path),
