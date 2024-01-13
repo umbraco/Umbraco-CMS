@@ -4,6 +4,7 @@ using System.Runtime.Serialization;
 using System.Xml.Linq;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.PropertyEditors.Validators;
@@ -217,7 +218,12 @@ public class DataValueEditor : IDataValueEditor
     ///     The object returned will automatically be serialized into JSON notation. For most property editors
     ///     the value returned is probably just a string, but in some cases a JSON structure will be returned.
     /// </remarks>
+    [Obsolete("Use ToEditor(IProperty property, string? culture, string? segment, MapperContext context); instead")]
     public virtual object? ToEditor(IProperty property, string? culture = null, string? segment = null)
+    {
+        return ToEditor(property, culture, segment, null);
+    }
+    public virtual object? ToEditor(IProperty property, string? culture = null, string? segment = null, MapperContext? mapperContext = null)
     {
         var value = property.GetValue(culture, segment);
         if (value == null)
@@ -271,7 +277,6 @@ public class DataValueEditor : IDataValueEditor
                 throw new ArgumentOutOfRangeException("ValueType was out of range.");
         }
     }
-
     // TODO: the methods below should be replaced by proper property value convert ToXPath usage!
 
     /// <summary>
