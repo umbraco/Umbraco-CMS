@@ -173,7 +173,7 @@ internal abstract class BlockValuePropertyValueEditorBase : DataValueEditor, IDa
                     valEditors.Add(dataType.Id, valEditor);
                 }
 
-                var convValue = valEditor.ToEditor(tempProp, null, null, mapperContext);
+                var convValue = valEditor.ToEditor(tempProp, mapperContext,null, null);
 
                 // update the raw value since this is what will get serialized out
                 row.RawPropertyValues[prop.Key] = convValue;

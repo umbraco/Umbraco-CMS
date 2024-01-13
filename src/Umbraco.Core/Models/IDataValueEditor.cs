@@ -78,7 +78,7 @@ public interface IDataValueEditor
     /// <summary>
     ///     Converts a property value to a value for the editor.
     /// </summary>
-    object? ToEditor(IProperty property, string? culture, string? segment, MapperContext? mapperContext)
+    object? ToEditor(IProperty property, MapperContext? mapperContext, string? culture, string? segment)
     {
          //todo: remove this when we remove the old ToEditor method
             return ToEditor(property, culture, segment);
