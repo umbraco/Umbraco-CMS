@@ -38,7 +38,7 @@ public class OpenIddictCleanupJob : IRecurringBackgroundJob
         try
         {
             IOpenIddictTokenManager tokenManager = scope.ServiceProvider.GetService<IOpenIddictTokenManager>()
-                                                   ?? throw new ConfigurationErrorsException($"Could not retrieve an {nameof(IOpenIddictTokenManager)} service from the current scope");
+                                                   ?? throw new InvalidOperationException($"Could not retrieve an {nameof(IOpenIddictTokenManager)} service from the current scope");
             await tokenManager.PruneAsync(threshold);
         }
         catch (Exception exception)
@@ -49,7 +49,7 @@ public class OpenIddictCleanupJob : IRecurringBackgroundJob
         try
         {
             IOpenIddictAuthorizationManager authorizationManager = scope.ServiceProvider.GetService<IOpenIddictAuthorizationManager>()
-                                                                   ?? throw new ConfigurationErrorsException($"Could not retrieve an {nameof(IOpenIddictAuthorizationManager)} service from the current scope");
+                                                                   ?? throw new InvalidOperationException($"Could not retrieve an {nameof(IOpenIddictAuthorizationManager)} service from the current scope");
             await authorizationManager.PruneAsync(threshold);
         }
         catch (Exception exception)

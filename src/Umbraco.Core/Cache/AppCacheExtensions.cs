@@ -65,15 +65,14 @@ public static class AppCacheExtensions
         string cacheKey,
         Func<Task<T?>> getCacheItemAsync,
         TimeSpan? timeout,
-        bool isSliding = false,
-        string[]? dependentFiles = null)
+        bool isSliding = false)
     {
         var result = provider.Get(cacheKey);
 
         if (result == null)
         {
             result = await getCacheItemAsync();
-            provider.Insert(cacheKey, () => result, timeout, isSliding, dependentFiles);
+            provider.Insert(cacheKey, () => result, timeout, isSliding);
         }
 
         return result == null ? default : result.TryConvertTo<T>().Result;
@@ -84,10 +83,9 @@ public static class AppCacheExtensions
         string cacheKey,
         Func<Task<T>> getCacheItemAsync,
         TimeSpan? timeout = null,
-        bool isSliding = false,
-        string[]? dependentFiles = null)
+        bool isSliding = false)
     {
         T value = await getCacheItemAsync();
-        provider.Insert(cacheKey, () => value, timeout, isSliding, dependentFiles);
+        provider.Insert(cacheKey, () => value, timeout, isSliding);
     }
 }
