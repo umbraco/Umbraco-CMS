@@ -1,4 +1,8 @@
-import { UMB_STATIC_FILE_ENTITY_TYPE, UMB_STATIC_FILE_ROOT_ENTITY_TYPE } from '../entity.js';
+import {
+	UMB_STATIC_FILE_ENTITY_TYPE,
+	UMB_STATIC_FILE_FOLDER_ENTITY_TYPE,
+	UMB_STATIC_FILE_ROOT_ENTITY_TYPE,
+} from '../entity.js';
 import { UmbStaticFileTreeRepository } from '../tree/static-file-tree.repository.js';
 import { UmbStaticFileTreeStore } from '../tree/static-file-tree.store.js';
 import type {
@@ -38,11 +42,11 @@ const tree: ManifestTree = {
 
 const treeItem: ManifestTreeItem = {
 	type: 'treeItem',
-	kind: 'fileSystem',
+	kind: 'unique',
 	alias: UMB_STATIC_FILE_TREE_ITEM_ALIAS,
 	name: 'Static File Tree Item',
 	meta: {
-		entityTypes: [UMB_STATIC_FILE_ENTITY_TYPE, UMB_STATIC_FILE_ROOT_ENTITY_TYPE],
+		entityTypes: [UMB_STATIC_FILE_ENTITY_TYPE, UMB_STATIC_FILE_ROOT_ENTITY_TYPE, UMB_STATIC_FILE_FOLDER_ENTITY_TYPE],
 	},
 };
 

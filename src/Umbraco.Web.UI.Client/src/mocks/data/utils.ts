@@ -75,13 +75,12 @@ export const createMediaTypeTreeItem = (item: MediaTypeResponseModel): MediaType
 	};
 };
 
-export const createFileSystemTreeItem = (item: any): FileSystemTreeItemPresentationModel => {
+export const createFileSystemTreeItem = (item: any): Omit<FileSystemTreeItemPresentationModel, 'type'> => {
 	return {
-		name: item.name,
-		type: item.type,
-		hasChildren: item.hasChildren ?? false,
 		path: item.path,
 		parent: item.parent ?? null,
+		name: item.name,
+		hasChildren: item.hasChildren ?? false,
 		isFolder: item.isFolder ?? false,
 	};
 };

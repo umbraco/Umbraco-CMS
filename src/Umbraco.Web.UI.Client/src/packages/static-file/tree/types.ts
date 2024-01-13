@@ -1,4 +1,10 @@
-import type { UmbFileSystemTreeItemModel, UmbFileSystemTreeRootModel } from '@umbraco-cms/backoffice/tree';
+import { UmbStaticFileEntityType, UmbStaticFileFolderEntityType, UmbStaticFileRootEntityType } from '../entity.js';
+import type { UmbUniqueTreeItemModel, UmbUniqueTreeRootModel } from '@umbraco-cms/backoffice/tree';
 
-export interface UmbStaticFileTreeItemModel extends UmbFileSystemTreeItemModel {}
-export interface UmbStaticFileTreeRootModel extends UmbFileSystemTreeRootModel {}
+export interface UmbStaticFileTreeItemModel extends UmbUniqueTreeItemModel {
+	entityType: UmbStaticFileEntityType | UmbStaticFileFolderEntityType;
+}
+
+export interface UmbStaticFileTreeRootModel extends UmbUniqueTreeRootModel {
+	entityType: UmbStaticFileRootEntityType;
+}

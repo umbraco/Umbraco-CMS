@@ -1,8 +1,9 @@
-import { UMB_STATIC_FILE_ENTITY_TYPE } from '../entity.js';
+import { UMB_STATIC_FILE_ENTITY_TYPE, UMB_STATIC_FILE_FOLDER_ENTITY_TYPE } from '../entity.js';
 import { UmbStaticFileTreeItemModel } from './types.js';
 import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
 import { StaticFileResource, type FileSystemTreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UmbServerPathUniqueSerializer } from 'src/packages/templating/utils/server-path-unique-serializer.js';
 
 /**
  * A data source for the Static File tree that fetches data from the server
@@ -32,21 +33,26 @@ export class UmbStaticFileTreeServerDataSource extends UmbTreeServerDataSourceBa
 const getRootItems = () => StaticFileResource.getTreeStaticFileRoot({});
 
 const getChildrenOf = (parentUnique: string | null) => {
-	if (parentUnique === null) {
+	const parentPath = new UmbServerPathUniqueSerializer().toServerPath(parentUnique);
+
+	if (parentPath === null) {
 		return getRootItems();
 	} else {
 		// eslint-disable-next-line local-rules/no-direct-api-import
 		return StaticFileResource.getTreeStaticFileChildren({
-			parentPath: parentUnique,
+			parentPath,
 		});
 	}
 };
 
 const mapper = (item: FileSystemTreeItemPresentationModel): UmbStaticFileTreeItemModel => {
+	const serializer = new UmbServerPathUniqueSerializer();
+
 	return {
-		path: item.path,
+		unique: serializer.toUnique(item.path),
+		parentUnique: item.parent ? serializer.toUnique(item.parent.path) : null,
+		entityType: item.isFolder ? UMB_STATIC_FILE_FOLDER_ENTITY_TYPE : UMB_STATIC_FILE_ENTITY_TYPE,
 		name: item.name,
-		entityType: UMB_STATIC_FILE_ENTITY_TYPE,
 		isFolder: item.isFolder,
 		hasChildren: item.hasChildren,
 		isContainer: false,
