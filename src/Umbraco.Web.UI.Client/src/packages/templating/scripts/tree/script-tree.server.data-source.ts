@@ -1,5 +1,5 @@
+import { UmbServerPathUniqueSerializer } from '@umbraco-cms/backoffice/file-system';
 import { UMB_SCRIPT_ENTITY_TYPE, UMB_SCRIPT_FOLDER_ENTITY_TYPE } from '../entity.js';
-import { UmbServerPathUniqueSerializer } from '../../utils/index.js';
 import { UmbScriptTreeItemModel } from './types.js';
 import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
 import { FileSystemTreeItemPresentationModel, ScriptResource } from '@umbraco-cms/backoffice/backend-api';

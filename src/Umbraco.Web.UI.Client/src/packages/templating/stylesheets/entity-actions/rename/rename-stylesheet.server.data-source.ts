@@ -1,4 +1,4 @@
-import { UmbServerPathUniqueSerializer, appendFileExtensionIfNeeded } from '../../../utils/index.js';
+import { UmbServerPathUniqueSerializer, appendFileExtensionIfNeeded } from '@umbraco-cms/backoffice/file-system';
 import { UmbStylesheetDetailServerDataSource } from '../../repository/stylesheet-detail.server.data-source.js';
 import { RenameStylesheetRequestModel, StylesheetResource } from '@umbraco-cms/backoffice/backend-api';
 import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';

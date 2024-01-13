@@ -1,6 +1,6 @@
+import { UmbServerPathUniqueSerializer, appendFileExtensionIfNeeded } from '@umbraco-cms/backoffice/file-system';
 import { UmbStylesheetDetailModel } from '../types.js';
 import { UMB_STYLESHEET_ENTITY_TYPE } from '../entity.js';
-import { UmbServerPathUniqueSerializer, appendFileExtensionIfNeeded } from '../../utils/index.js';
 import {
 	CreateStylesheetRequestModel,
 	StylesheetResource,
