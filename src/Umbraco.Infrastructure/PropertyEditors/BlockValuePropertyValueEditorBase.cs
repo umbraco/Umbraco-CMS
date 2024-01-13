@@ -103,10 +103,10 @@ internal abstract class BlockValuePropertyValueEditorBase : DataValueEditor, IDa
         return result;
     }
 
-    protected void MapBlockValueFromEditor(BlockValue blockValue)
+    protected void MapBlockValueFromEditor(BlockValue blockValue, Dictionary<int, IDataType?>? dataTypes)
     {
-        MapBlockItemDataFromEditor(blockValue.ContentData);
-        MapBlockItemDataFromEditor(blockValue.SettingsData);
+        MapBlockItemDataFromEditor(blockValue.ContentData,dataTypes);
+        MapBlockItemDataFromEditor(blockValue.SettingsData,dataTypes);
     }
 
     protected void MapBlockValueToEditor(IProperty property, BlockValue blockValue, MapperContext? mapperContext = null)
@@ -181,24 +181,26 @@ internal abstract class BlockValuePropertyValueEditorBase : DataValueEditor, IDa
         }
     }
 
-    private void MapBlockItemDataFromEditor(List<BlockItemData> items)
+    private void MapBlockItemDataFromEditor(List<BlockItemData> items, Dictionary<int, IDataType?>? dataTypes)
     {
-        IDictionary<int, IDataType?> dataTypes = new Dictionary<int, IDataType?>();
-
         foreach (BlockItemData row in items)
         {
             foreach (KeyValuePair<string, BlockItemData.BlockPropertyValue> prop in row.PropertyValues)
             {
                 // Fetch the property types prevalue
                 IDataType? dataType = null;
-                if (dataTypes.ContainsKey(prop.Value.PropertyType.DataTypeId))
+                if (dataTypes?.ContainsKey(prop.Value.PropertyType.DataTypeId) == true)
                 {
                     dataType = dataTypes[prop.Value.PropertyType.DataTypeId];
+                }
+                else if (dataTypes != null)
+                {
+                    dataType = _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeId);
+                    dataTypes.Add(prop.Value.PropertyType.DataTypeId, dataType);
                 }
                 else
                 {
                     dataType = _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeId);
-                    dataTypes.Add(prop.Value.PropertyType.DataTypeId, dataType);
                 }
                 var propConfiguration = dataType?.Configuration;
 

@@ -164,7 +164,41 @@ internal abstract class BlockEditorPropertyValueEditor : BlockValuePropertyValue
             return string.Empty;
         }
 
-        MapBlockValueFromEditor(blockEditorData.BlockValue);
+        MapBlockValueFromEditor(blockEditorData.BlockValue, null);
+
+        // return json
+        return JsonConvert.SerializeObject(blockEditorData.BlockValue, Formatting.None);
+    }
+    /// <summary>
+    ///     Ensure that sub-editor values are translated through their FromEditor methods
+    /// </summary>
+    /// <param name="editorValue"></param>
+    /// <param name="currentValue"></param>
+    /// <returns></returns>
+    public override object? FromEditor(ContentPropertyData editorValue, object? currentValue,Dictionary<int,IDataType?>? dataTypes)
+    {
+        if (editorValue.Value == null || string.IsNullOrWhiteSpace(editorValue.Value.ToString()))
+        {
+            return null;
+        }
+
+        BlockEditorData? blockEditorData;
+        try
+        {
+            blockEditorData = BlockEditorValues.DeserializeAndClean(editorValue.Value);
+        }
+        catch (JsonSerializationException)
+        {
+            // if this occurs it means the data is invalid, shouldn't happen but has happened if we change the data format.
+            return string.Empty;
+        }
+
+        if (blockEditorData == null || blockEditorData.BlockValue.ContentData.Count == 0)
+        {
+            return string.Empty;
+        }
+
+        MapBlockValueFromEditor(blockEditorData.BlockValue,dataTypes);
 
         // return json
         return JsonConvert.SerializeObject(blockEditorData.BlockValue, Formatting.None);

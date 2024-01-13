@@ -97,7 +97,7 @@ public abstract class ContentControllerBase : BackOfficeNotificationsController
         {
             return;
         }
-
+        var dictionary = new Dictionary<int, IDataType?>();
         // map the property values
         foreach (ContentPropertyDto propertyDto in dto.Properties)
         {
@@ -140,7 +140,7 @@ public abstract class ContentControllerBase : BackOfficeNotificationsController
             };
 
             // let the editor convert the value that was received, deal with files, etc
-            var value = valueEditor.FromEditor(data, getPropertyValue(contentItem, property));
+            var value = valueEditor.FromEditor(data, getPropertyValue(contentItem, property),dictionary);
 
             // set the value - tags are special
             TagsPropertyEditorAttribute? tagAttribute = propertyDto.PropertyEditor.GetTagAttribute();

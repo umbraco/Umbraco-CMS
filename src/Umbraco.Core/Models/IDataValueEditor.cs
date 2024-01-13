@@ -60,6 +60,14 @@ public interface IDataValueEditor
     ///     Converts a value posted by the editor to a property value.
     /// </summary>
     object? FromEditor(ContentPropertyData editorValue, object? currentValue);
+    /// <summary>
+    ///     Converts a value posted by the editor to a property value.
+    /// </summary>
+    object? FromEditor(ContentPropertyData editorValue, object? getPropertyValue,
+        Dictionary<int, IDataType?>? dictionary)
+    {
+        return FromEditor(editorValue, getPropertyValue);
+    }
 
     /// <summary>
     ///     Converts a property value to a value for the editor.
@@ -97,4 +105,6 @@ public interface IDataValueEditor
     XNode ConvertDbToXml(IPropertyType propertyType, object value);
 
     string ConvertDbToString(IPropertyType propertyType, object? value);
+
+
 }
