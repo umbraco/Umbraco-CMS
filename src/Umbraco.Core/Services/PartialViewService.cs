@@ -62,37 +62,25 @@ public class PartialViewService : FileServiceOperationBase<IPartialViewRepositor
         => new PartialView(PartialViewType.PartialView, path) { Content = content };
 
     /// <inheritdoc />
-    public async Task<PagedModel<string>> GetSnippetNamesAsync(int skip, int take)
+    public async Task<PagedModel<PartialViewSnippetSlim>> GetSnippetsAsync(int skip, int take)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
-
-        string[] names = _snippetCollection.GetNames().ToArray();
-        var total = names.Length;
-
-        IEnumerable<string> snippets = names
-            .Skip(skip)
-            .Take(take);
-
-        return await Task.FromResult(new PagedModel<string>(total, snippets));
+        var result = new PagedModel<PartialViewSnippetSlim>(
+            _snippetCollection.Count,
+            _snippetCollection
+                .Skip(skip)
+                .Take(take)
+                .Select(snippet => new PartialViewSnippetSlim(snippet.Id, snippet.Name))
+                .ToArray());
+        return await Task.FromResult(result);
     }
 
     /// <inheritdoc />
-    public async Task<PartialViewSnippet?> GetSnippetByNameAsync(string name)
+    public async Task<PartialViewSnippet?> GetSnippetAsync(string id)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
-
-        // A bit weird but the "Name" of the snippet is the file name and extensions
-        // However when getting the content it's just the name without the extension
-        var fileName = name + ".cshtml";
-        if (_snippetCollection.Any(x => x.Name == fileName) is false)
-        {
-            return await Task.FromResult<PartialViewSnippet?>(null);
-        }
-
-        var content = _snippetCollection.GetContentFromName(name);
-        var snippet = new PartialViewSnippet(name, content);
-
-        return await Task.FromResult<PartialViewSnippet?>(snippet);
+        PartialViewSnippet? snippet = _snippetCollection.FirstOrDefault(s => s.Id == id);
+        return await Task.FromResult(snippet);
     }
 
     /// <inheritdoc />

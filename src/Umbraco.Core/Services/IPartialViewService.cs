@@ -1,12 +1,12 @@
 ﻿using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Cms.Core.Snippets;
 using PartialViewSnippet = Umbraco.Cms.Core.Snippets.PartialViewSnippet;
 
 namespace Umbraco.Cms.Core.Services;
 
 public interface IPartialViewService : IBasicFileService<IPartialView>
 {
-
     /// <summary>
     /// Deletes a partial view.
     /// </summary>
@@ -16,19 +16,19 @@ public interface IPartialViewService : IBasicFileService<IPartialView>
     Task<PartialViewOperationStatus> DeleteAsync(string path, Guid userKey);
 
     /// <summary>
-    /// Gets the name of all the available partial view snippets.
+    /// Gets all the available partial view snippets.
     /// </summary>
     /// <param name="skip">Amount to skip.</param>
     /// <param name="take">Amount to take.</param>
     /// <returns></returns>
-    Task<PagedModel<string>> GetSnippetNamesAsync(int skip, int take);
+    Task<PagedModel<PartialViewSnippetSlim>> GetSnippetsAsync(int skip, int take);
 
     /// <summary>
-    /// Gets a partial view snippet by name, returns null if not found.
+    /// Gets a partial view snippet by ID, returns null if not found.
     /// </summary>
-    /// <param name="name">The name of the snippet to get.</param>
+    /// <param name="id">The name of the snippet to get.</param>
     /// <returns>The partial view snippet, null if not found.</returns>
-    Task<PartialViewSnippet?> GetSnippetByNameAsync(string name);
+    Task<PartialViewSnippet?> GetSnippetAsync(string id);
 
     /// <summary>
     /// Creates a new partial view.

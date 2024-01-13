@@ -11417,15 +11417,15 @@
         ]
       }
     },
-    "/umbraco/management/api/v1/partial-view/snippet/{fileName}": {
+    "/umbraco/management/api/v1/partial-view/snippet/{id}": {
       "get": {
         "tags": [
           "Partial View"
         ],
-        "operationId": "GetPartialViewSnippetByFileName",
+        "operationId": "GetPartialViewSnippetById",
         "parameters": [
           {
-            "name": "fileName",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
@@ -23986,15 +23986,15 @@
       },
       "PartialViewSnippetItemResponseModel": {
         "required": [
-          "fileName",
+          "id",
           "name"
         ],
         "type": "object",
         "properties": {
-          "name": {
+          "id": {
             "type": "string"
           },
-          "fileName": {
+          "name": {
             "type": "string"
           }
         },

@@ -2,5 +2,5 @@
 
 public class PartialViewSnippetResponseModel : PartialViewSnippetItemResponseModel
 {
-    public required string Content { get; init; }
+    public required string Content { get; set; }
 }

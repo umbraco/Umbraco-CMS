@@ -45,8 +45,6 @@ public class CodeFileController : BackOfficeNotificationsController
     private readonly ILocalizedTextService _localizedTextService;
     private readonly IShortStringHelper _shortStringHelper;
     private readonly IUmbracoMapper _umbracoMapper;
-    private readonly PartialViewSnippetCollection _partialViewSnippetCollection;
-    private readonly PartialViewMacroSnippetCollection _partialViewMacroSnippetCollection;
 
     [ActivatorUtilitiesConstructor]
     public CodeFileController(
@@ -57,9 +55,7 @@ public class CodeFileController : BackOfficeNotificationsController
         ILocalizedTextService localizedTextService,
         IUmbracoMapper umbracoMapper,
         IShortStringHelper shortStringHelper,
-        IOptionsSnapshot<GlobalSettings> globalSettings,
-        PartialViewSnippetCollection partialViewSnippetCollection,
-        PartialViewMacroSnippetCollection partialViewMacroSnippetCollection)
+        IOptionsSnapshot<GlobalSettings> globalSettings)
     {
         _hostingEnvironment = hostingEnvironment;
         _fileSystems = fileSystems;
@@ -69,31 +65,6 @@ public class CodeFileController : BackOfficeNotificationsController
         _umbracoMapper = umbracoMapper;
         _shortStringHelper = shortStringHelper;
         _globalSettings = globalSettings.Value;
-        _partialViewSnippetCollection = partialViewSnippetCollection;
-        _partialViewMacroSnippetCollection = partialViewMacroSnippetCollection;
-    }
-
-    [Obsolete("Use ctor will all params. Scheduled for removal in V12.")]
-    public CodeFileController(
-        IHostingEnvironment hostingEnvironment,
-        FileSystems fileSystems,
-        IFileService fileService,
-        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-        ILocalizedTextService localizedTextService,
-        IUmbracoMapper umbracoMapper,
-        IShortStringHelper shortStringHelper,
-        IOptionsSnapshot<GlobalSettings> globalSettings) : this(
-        hostingEnvironment,
-        fileSystems,
-        fileService,
-        backOfficeSecurityAccessor,
-        localizedTextService,
-        umbracoMapper,
-        shortStringHelper,
-        globalSettings,
-        StaticServiceProvider.Instance.GetRequiredService<PartialViewSnippetCollection>(),
-        StaticServiceProvider.Instance.GetRequiredService<PartialViewMacroSnippetCollection>())
-    {
     }
 
     /// <summary>
@@ -335,10 +306,10 @@ public class CodeFileController : BackOfficeNotificationsController
         switch (type)
         {
             case Constants.Trees.PartialViews:
-                snippets = _partialViewSnippetCollection.GetNames();
+                throw new NotImplementedException("Partial views snippets have been rewritten for V14 - no longer supported in the old back-office.");
                 break;
             case Constants.Trees.PartialViewMacros:
-                snippets = _partialViewMacroSnippetCollection.GetNames();
+                throw new NotSupportedException("Macros are not part of V14 :)");
                 break;
             default:
                 return NotFound();
@@ -376,31 +347,9 @@ public class CodeFileController : BackOfficeNotificationsController
         switch (type)
         {
             case Constants.Trees.PartialViews:
-                codeFileDisplay =
-                    _umbracoMapper.Map<IPartialView, CodeFileDisplay>(new PartialView(PartialViewType.PartialView, string.Empty));
-                if (codeFileDisplay is not null)
-                {
-                    codeFileDisplay.VirtualPath = Constants.SystemDirectories.PartialViews;
-                    if (snippetName.IsNullOrWhiteSpace() == false)
-                    {
-                            codeFileDisplay.Content = _partialViewSnippetCollection.GetContentFromName(snippetName!);
-                    }
-                }
-
-                break;
+                throw new NotImplementedException("Partial views snippets have been rewritten for V14 - no longer supported in the old back-office.");
             case Constants.Trees.PartialViewMacros:
-                codeFileDisplay =
-                    _umbracoMapper.Map<IPartialView, CodeFileDisplay>(new PartialView(PartialViewType.PartialViewMacro, string.Empty));
-                if (codeFileDisplay is not null)
-                {
-                    codeFileDisplay.VirtualPath = Constants.SystemDirectories.MacroPartials;
-                    if (snippetName.IsNullOrWhiteSpace() == false)
-                    {
-                        codeFileDisplay.Content = _partialViewMacroSnippetCollection.GetContentFromName(snippetName!);
-                    }
-                }
-
-                break;
+                throw new NotSupportedException("Macros are not part of V14 :)");
             case Constants.Trees.Scripts:
                 codeFileDisplay = _umbracoMapper.Map<Script, CodeFileDisplay>(new Script(string.Empty));
                 if (codeFileDisplay is not null)

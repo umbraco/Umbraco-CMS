@@ -2,7 +2,7 @@
 
 public class PartialViewSnippetItemResponseModel
 {
-    public required string Name { get; init; }
+    public required string Id { get; set; }
 
-    public required string FileName { get; init; }
+    public required string Name { get; set; }
 }

@@ -110,7 +110,6 @@ public static partial class UmbracoBuilderExtensions
             .Add<SettingsDashboard>()
             .Add(builder.TypeLoader.GetTypes<IDashboard>());
         builder.PartialViewSnippets();
-        builder.PartialViewMacroSnippets();
         builder.DataValueReferenceFactories();
         builder.PropertyValueConverters().Append(builder.TypeLoader.GetTypes<IPropertyValueConverter>());
         builder.UrlSegmentProviders().Append<DefaultUrlSegmentProvider>();
@@ -244,13 +243,6 @@ public static partial class UmbracoBuilderExtensions
     /// <param name="builder">The builder.</param>
     public static PartialViewSnippetCollectionBuilder PartialViewSnippets(this IUmbracoBuilder builder)
         => builder.WithCollectionBuilder<PartialViewSnippetCollectionBuilder>();
-
-    /// <summary>
-    /// Gets the partial view macro snippets collection builder.
-    /// </summary>
-    /// <param name="builder">The builder.</param>
-    public static PartialViewMacroSnippetCollectionBuilder PartialViewMacroSnippets(this IUmbracoBuilder builder)
-        => builder.WithCollectionBuilder<PartialViewMacroSnippetCollectionBuilder>();
 
     /// <summary>
     /// Gets the cache refreshers collection builder.
