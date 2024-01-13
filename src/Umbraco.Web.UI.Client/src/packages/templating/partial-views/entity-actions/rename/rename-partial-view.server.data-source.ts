@@ -1,4 +1,4 @@
-import { UmbServerPathUniqueSerializer, appendFileExtensionIfNeeded } from '@umbraco-cms/backoffice/file-system';
+import { UmbServerPathUniqueSerializer, appendFileExtensionIfNeeded } from '@umbraco-cms/backoffice/server-file-system';
 import { UmbPartialViewDetailServerDataSource } from '../../repository/partial-view-detail.server.data-source.js';
 import { RenameStylesheetRequestModel, PartialViewResource } from '@umbraco-cms/backoffice/backend-api';
 import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';

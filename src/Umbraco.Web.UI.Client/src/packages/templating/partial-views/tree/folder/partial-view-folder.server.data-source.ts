@@ -1,4 +1,4 @@
-import { UmbServerPathUniqueSerializer } from '@umbraco-cms/backoffice/file-system';
+import { UmbServerPathUniqueSerializer } from '@umbraco-cms/backoffice/server-file-system';
 import { UmbCreateFolderModel, UmbFolderDataSource, UmbUpdateFolderModel } from '@umbraco-cms/backoffice/tree';
 import { CreatePartialViewFolderRequestModel, PartialViewResource } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';

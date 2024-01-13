@@ -1,4 +1,4 @@
-import { UmbServerPathUniqueSerializer } from '@umbraco-cms/backoffice/file-system';
+import { UmbServerPathUniqueSerializer } from '@umbraco-cms/backoffice/server-file-system';
 import { UMB_PARTIAL_VIEW_ENTITY_TYPE, UMB_PARTIAL_VIEW_FOLDER_ENTITY_TYPE } from '../entity.js';
 import { UmbPartialViewTreeItemModel } from './types.js';
 import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';

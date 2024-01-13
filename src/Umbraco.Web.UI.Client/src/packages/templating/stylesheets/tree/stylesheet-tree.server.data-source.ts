@@ -1,4 +1,4 @@
-import { UmbServerPathUniqueSerializer } from '@umbraco-cms/backoffice/file-system';
+import { UmbServerPathUniqueSerializer } from '@umbraco-cms/backoffice/server-file-system';
 import { UMB_STYLESHEET_ENTITY_TYPE, UMB_STYLESHEET_FOLDER_ENTITY_TYPE } from '../entity.js';
 import { UmbStylesheetTreeItemModel } from './types.js';
 import { FileSystemTreeItemPresentationModel, StylesheetResource } from '@umbraco-cms/backoffice/backend-api';
