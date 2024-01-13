@@ -72,7 +72,7 @@ public interface IDataValueEditor
     /// <summary>
     ///     Converts a property value to a value for the editor.
     /// </summary>
-    [Obsolete("Use ToEditor(IProperty property, MapperContext? context, string? culture, string? segment) instead", true)]
+    [Obsolete("Use ToEditor(IProperty property, string? culture, string? segment, MapperContext context); instead")]
     object? ToEditor(IProperty property, string? culture = null, string? segment = null);
 
     /// <summary>
