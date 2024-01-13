@@ -160,7 +160,13 @@ public class TagsPropertyEditor : DataEditor
         public override IValueRequiredValidator RequiredValidator => new RequiredJsonValueValidator();
 
         /// <inheritdoc />
+        [Obsolete("Use FromEditor(ContentPropertyData editorValue, object? currentValue, Dictionary<int,IDataType?>? dataTypes) instead")]
         public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
+        {
+            return FromEditor(editorValue, currentValue, null);
+        }
+        /// <inheritdoc />
+        public override object? FromEditor(ContentPropertyData editorValue, object? currentValue, Dictionary<int,IDataType?>? dataTypes)
         {
             var value = editorValue.Value?.ToString();
 
@@ -200,7 +206,6 @@ public class TagsPropertyEditor : DataEditor
 
             return null;
         }
-
         /// <summary>
         ///     Custom validator to validate a required value against an empty json value.
         /// </summary>

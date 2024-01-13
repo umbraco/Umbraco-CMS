@@ -4,12 +4,14 @@
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
+using File = System.IO.File;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
@@ -61,9 +63,37 @@ internal class FileUploadPropertyValueEditor : DataValueEditor
     ///         folders would NOT work, etc.
     ///     </para>
     /// </remarks>
+    [Obsolete("Use FromEditor(ContentPropertyData editorValue, object? currentValue, Dictionary<int,IDataType?>? dataTypes) instead")]
     public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
     {
-        var currentPath = currentValue as string;
+        return FromEditor(editorValue, currentValue, null);
+    }
+    /// <summary>
+    ///     Converts the value received from the editor into the value can be stored in the database.
+    /// </summary>
+    /// <param name="editorValue">The value received from the editor.</param>
+    /// <param name="currentValue">The current value of the property</param>
+    /// <param name="dataTypes">Dictionary of already retrieved datatypes</param>
+    /// <returns>The converted value.</returns>
+    /// <remarks>
+    ///     <para>The <paramref name="currentValue" /> is used to re-use the folder, if possible.</para>
+    ///     <para>
+    ///         The <paramref name="editorValue" /> is value passed in from the editor. We normally don't care what
+    ///         the editorValue.Value is set to because we are more interested in the files collection associated with it,
+    ///         however we do care about the value if we are clearing files. By default the editorValue.Value will just
+    ///         be set to the name of the file - but again, we just ignore this and deal with the file collection in
+    ///         editorValue.AdditionalData.ContainsKey("files")
+    ///     </para>
+    ///     <para>
+    ///         We only process ONE file. We understand that the current value may contain more than one file,
+    ///         and that more than one file may be uploaded, so we take care of them all, but we only store ONE file.
+    ///         Other places (FileUploadPropertyEditor...) do NOT deal with multiple files, and our logic for reusing
+    ///         folders would NOT work, etc.
+    ///     </para>
+    /// </remarks>
+    public override object? FromEditor(ContentPropertyData editorValue, object? currentValue, Dictionary<int,IDataType?>? dataTypes)
+    {
+         var currentPath = currentValue as string;
         if (!currentPath.IsNullOrWhiteSpace())
         {
             currentPath = _mediaFileManager.FileSystem.GetRelativePath(currentPath!);

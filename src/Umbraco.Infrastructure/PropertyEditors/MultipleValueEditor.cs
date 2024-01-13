@@ -76,7 +76,19 @@ public class MultipleValueEditor : DataValueEditor
     /// <param name="editorValue"></param>
     /// <param name="currentValue"></param>
     /// <returns></returns>
+    [Obsolete("Use FromEditor(ContentPropertyData editorValue, object? currentValue, Dictionary<int,IDataType?>? dataTypes) instead")]
     public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
+    {
+        return FromEditor(editorValue, currentValue, null);
+    }
+    /// <summary>
+    ///     When multiple values are selected a json array will be posted back so we need to format for storage in
+    ///     the database which is a comma separated string value
+    /// </summary>
+    /// <param name="editorValue"></param>
+    /// <param name="currentValue"></param>
+    /// <returns></returns>
+    public override object? FromEditor(ContentPropertyData editorValue, object? currentValue, Dictionary<int,IDataType?>? dataTypes)
     {
         if (editorValue.Value is not JArray json || json.HasValues == false)
         {

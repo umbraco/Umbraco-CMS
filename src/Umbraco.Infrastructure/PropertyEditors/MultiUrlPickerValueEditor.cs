@@ -209,8 +209,13 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference
     {
       return ToEditor(property, null, culture, segment);
     }
-
+    [Obsolete("Use FromEditor(ContentPropertyData editorValue, object? currentValue, Dictionary<int, IDataType?>? dataTypes) instead")]
     public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
+    {
+        return FromEditor(editorValue, currentValue, null);
+    }
+
+    public override object? FromEditor(ContentPropertyData editorValue, object? currentValue, Dictionary<int, IDataType?>? dataTypes)
     {
         var value = editorValue.Value?.ToString();
 

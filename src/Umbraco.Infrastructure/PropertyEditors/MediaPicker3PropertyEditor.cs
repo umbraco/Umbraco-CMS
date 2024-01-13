@@ -143,7 +143,12 @@ public class MediaPicker3PropertyEditor : DataEditor
 
             return dtos;
         }
+        [Obsolete("Use FromEditor(IProperty property, MapperContext? context, string? culture, string? segment) instead", true)]
         public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
+        {
+            return FromEditor(editorValue, currentValue, null);
+        }
+        public override object? FromEditor(ContentPropertyData editorValue, object? currentValue, Dictionary<int,IDataType?>? dataTypes)
         {
             if (editorValue.Value is JArray dtos)
             {
@@ -163,7 +168,6 @@ public class MediaPicker3PropertyEditor : DataEditor
 
             return base.FromEditor(editorValue, currentValue);
         }
-
         internal static IEnumerable<MediaWithCropsDto> Deserialize(IJsonSerializer jsonSerializer, object? value)
         {
             var rawJson = value is string str ? str : value?.ToString();

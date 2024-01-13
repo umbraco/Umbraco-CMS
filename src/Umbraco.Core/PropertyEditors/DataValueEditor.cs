@@ -193,17 +193,10 @@ public class DataValueEditor : IDataValueEditor
     ///     If overridden then the object returned must match the type supplied in the ValueType, otherwise persisting the
     ///     value to the DB will fail when it tries to validate the value type.
     /// </remarks>
+    [Obsolete("Use FromEditor(ContentPropertyData editorValue, object? currentValue, Dictionary<int,IDataType?>? dataTypes) instead")]
     public virtual object? FromEditor(ContentPropertyData editorValue, object? currentValue)
     {
-        Attempt<object?> result = TryConvertValueToCrlType(editorValue.Value);
-        if (result.Success == false)
-        {
-            StaticApplicationLogging.Logger.LogWarning(
-                "The value {EditorValue} cannot be converted to the type {StorageTypeValue}", editorValue.Value, ValueTypes.ToStorageType(ValueType));
-            return null;
-        }
-
-        return result.Result;
+       return FromEditor(editorValue, currentValue,null);
     }
     /// <summary>
     ///     A method to deserialize the string value that has been saved in the content editor to an object to be stored in the
@@ -215,6 +208,7 @@ public class DataValueEditor : IDataValueEditor
     ///     useful for how the value then get's deserialized again to be re-persisted. In most cases it will probably not be
     ///     used.
     /// </param>
+    /// <param name="dataTypes">List of already retrieved datatypes</param>
     /// <returns>The value that gets persisted to the database.</returns>
     /// <remarks>
     ///     By default this will attempt to automatically convert the string value to the value type supplied by ValueType.

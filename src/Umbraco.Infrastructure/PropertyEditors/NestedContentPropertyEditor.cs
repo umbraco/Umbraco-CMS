@@ -353,48 +353,7 @@ public class NestedContentPropertyEditor : DataEditor
         /// <returns></returns>
         public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
         {
-            if (editorValue.Value == null || string.IsNullOrWhiteSpace(editorValue.Value.ToString()))
-            {
-                return null;
-            }
-
-            IReadOnlyList<NestedContentValues.NestedContentRowValue> rows =
-                _nestedContentValues.GetPropertyValues(editorValue.Value);
-
-            if (rows.Count == 0)
-            {
-                return null;
-            }
-
-            foreach (NestedContentValues.NestedContentRowValue row in rows.ToList())
-            {
-                foreach (KeyValuePair<string, NestedContentValues.NestedContentPropertyValue> prop in row.PropertyValues
-                             .ToList())
-                {
-                    // Fetch the property types prevalue
-                    var propConfiguration =
-                        _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeId)?.Configuration;
-
-                    // Lookup the property editor
-                    IDataEditor? propEditor = _propertyEditors[prop.Value.PropertyType.PropertyEditorAlias];
-                    if (propEditor == null)
-                    {
-                        continue;
-                    }
-
-                    // Create a fake content property data object
-                    var contentPropData = new ContentPropertyData(prop.Value.Value, propConfiguration);
-
-                    // Get the property editor to do it's conversion
-                    var newValue = propEditor.GetValueEditor().FromEditor(contentPropData, prop.Value.Value);
-
-                    // update the raw value since this is what will get serialized out
-                    row.RawPropertyValues[prop.Key] = newValue == null ? null : JToken.FromObject(newValue);
-                }
-            }
-
-            // return json
-            return JsonConvert.SerializeObject(rows, Formatting.None);
+           return FromEditor(editorValue,currentValue,  null);
         }
  /// <summary>
         ///     Ensure that sub-editor values are translated through their FromEditor methods

@@ -102,6 +102,20 @@ public class MultipleTextStringPropertyEditor : DataEditor
         /// </remarks>
         public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
         {
+            return FromEditor(editorValue, currentValue, null);
+        }
+        /// <summary>
+        ///     The value passed in from the editor will be an array of simple objects so we'll need to parse them to get the
+        ///     string
+        /// </summary>
+        /// <param name="editorValue"></param>
+        /// <param name="currentValue"></param>
+        /// <returns></returns>
+        /// <remarks>
+        ///     We will also check the pre-values here, if there are more items than what is allowed we'll just trim the end
+        /// </remarks>
+        public override object? FromEditor(ContentPropertyData editorValue, object? currentValue, Dictionary<int,IDataType?>? dataTypes)
+        {
             if (editorValue.Value is not JArray asArray || asArray.HasValues == false)
             {
                 return null;
@@ -128,7 +142,6 @@ public class MultipleTextStringPropertyEditor : DataEditor
 
             return string.Join(NewLine, array);
         }
-
         /// <summary>
         ///     We are actually passing back an array of simple objects instead of an array of strings because in angular a
         ///     primitive (string) value

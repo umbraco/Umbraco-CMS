@@ -328,39 +328,10 @@ public class RichTextPropertyEditor : DataEditor
         /// <param name="editorValue"></param>
         /// <param name="currentValue"></param>
         /// <returns></returns>
+        [Obsolete("Use FromEditor(ContentPropertyData editorValue, object? currentValue, Dictionary<int,IDataType?>? dataTypes) instead")]
         public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
         {
-            if (TryParseEditorValue(editorValue.Value, out RichTextEditorValue? richTextEditorValue) is false)
-            {
-                return null;
-            }
-
-            var userId = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Id ??
-                         Constants.Security.SuperUserId;
-
-            var config = editorValue.DataTypeConfiguration as RichTextConfiguration;
-            GuidUdi? mediaParent = config?.MediaParentId;
-            Guid mediaParentId = mediaParent == null ? Guid.Empty : mediaParent.Guid;
-
-            if (string.IsNullOrWhiteSpace(richTextEditorValue.Markup))
-            {
-                return null;
-            }
-
-            var parseAndSaveBase64Images = _pastedImages.FindAndPersistEmbeddedImages(
-                richTextEditorValue.Markup, mediaParentId, userId);
-            var parseAndSavedTempImages =
-                _pastedImages.FindAndPersistPastedTempImages(parseAndSaveBase64Images, mediaParentId, userId);
-            var editorValueWithMediaUrlsRemoved = _imageSourceParser.RemoveImageSources(parseAndSavedTempImages);
-            var parsed = MacroTagParser.FormatRichTextContentForPersistence(editorValueWithMediaUrlsRemoved);
-            var sanitized = _htmlSanitizer.Sanitize(parsed);
-
-            richTextEditorValue.Markup = sanitized.NullOrWhiteSpaceAsNull() ?? string.Empty;
-
-            RichTextEditorValue cleanedUpRichTextEditorValue = CleanAndMapBlocks(richTextEditorValue, blockValue => MapBlockValueFromEditor(blockValue, null));
-
-            // return json
-            return RichTextPropertyEditorHelper.SerializeRichTextEditorValue(cleanedUpRichTextEditorValue, _jsonSerializer);
+           return FromEditor(editorValue, currentValue, null);
         }
 
         /// <summary>
