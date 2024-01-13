@@ -65,7 +65,7 @@ export class UmbScriptFolderServerDataSource implements UmbFolderDataSource {
 		if (args.parentUnique === undefined) throw new Error('Parent unique is missing');
 		if (!args.name) throw new Error('Name is missing');
 
-		const parentPath = new UmbServerPathUniqueSerializer().toServerPath(args.parentUnique);
+		const parentPath = new UmbServerFilePathUniqueSerializer().toServerPath(args.parentUnique);
 
 		const requestBody: CreateScriptFolderRequestModel = {
 			parent: parentPath ? { path: parentPath } : null,
