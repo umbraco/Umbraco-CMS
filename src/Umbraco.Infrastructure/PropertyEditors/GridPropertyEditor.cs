@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
@@ -245,7 +246,12 @@ namespace Umbraco.Cms.Core.PropertyEditors
             /// <param name="culture"></param>
             /// <param name="segment"></param>
             /// <returns></returns>
+            [Obsolete("Use ToEditor(IProperty property, MapperContext? context, string? culture, string? segment) instead")]
             public override object? ToEditor(IProperty property, string? culture = null, string? segment = null)
+            {
+                return ToEditor(property, null, culture, segment);
+            }
+            public override object? ToEditor(IProperty property, MapperContext? mapperContext, string? culture = null, string? segment = null)
             {
                 var val = property.GetValue(culture, segment)?.ToString();
                 if (val.IsNullOrWhiteSpace())

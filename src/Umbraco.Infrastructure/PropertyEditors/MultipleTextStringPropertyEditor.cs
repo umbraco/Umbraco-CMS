@@ -7,6 +7,7 @@ using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.PropertyEditors.Validators;
@@ -140,12 +141,29 @@ public class MultipleTextStringPropertyEditor : DataEditor
         /// <remarks>
         ///     The legacy property editor saved this data as new line delimited! strange but we have to maintain that.
         /// </remarks>
+        [Obsolete("Use ToEditor(IProperty property, MapperContext? context, string? culture, string? segment) instead")]
         public override object ToEditor(IProperty property, string? culture = null, string? segment = null)
+        {
+           return ToEditor(property, null,culture, segment);
+        }
+        /// <summary>
+        ///     We are actually passing back an array of simple objects instead of an array of strings because in angular a
+        ///     primitive (string) value
+        ///     cannot have 2 way binding, so to get around that each item in the array needs to be an object with a string.
+        /// </summary>
+        /// <param name="property"></param>
+        /// <param name="culture"></param>
+        /// <param name="segment"></param>
+        /// <returns></returns>
+        /// <remarks>
+        ///     The legacy property editor saved this data as new line delimited! strange but we have to maintain that.
+        /// </remarks>
+        public override object ToEditor(IProperty property, MapperContext? mapperContext, string? culture = null, string? segment = null)
         {
             var val = property.GetValue(culture, segment);
 
             return val?.ToString()?.Split(NewLineDelimiters, StringSplitOptions.None).Select(x => JObject.FromObject(new { value = x }))
-                ?? Array.Empty<JObject>();
+                   ?? Array.Empty<JObject>();
         }
     }
 

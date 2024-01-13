@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
@@ -106,11 +107,30 @@ public class MediaPicker3PropertyEditor : DataEditor
 
         public override object ToEditor(IProperty property, string? culture = null, string? segment = null)
         {
+          return ToEditor(property, null, culture, segment);
+        }
+        public override object ToEditor(IProperty property, MapperContext? mapperContext, string? culture = null, string? segment = null)
+        {
             var value = property.GetValue(culture, segment);
 
             var dtos = Deserialize(_jsonSerializer, value).ToList();
 
-            IDataType? dataType = _dataTypeService.GetDataType(property.PropertyType.DataTypeId);
+
+            IDataType? dataType = null;
+            if (mapperContext != null && mapperContext.Items.ContainsKey($"DataType-{property.PropertyType.DataTypeId}"))
+            {
+                dataType = (mapperContext.Items[$"DataType-{property.PropertyType.DataTypeId}"] as IDataType);
+            }
+            else if(mapperContext!= null)
+            {
+                dataType = _dataTypeService.GetDataType(property.PropertyType.DataTypeId);
+                mapperContext.Items.Add($"DataType-{property.PropertyType.DataTypeId}", dataType);
+            }
+            else
+            {
+                dataType = _dataTypeService.GetDataType(property.PropertyType.DataTypeId);
+            }
+
             if (dataType?.Configuration != null)
             {
                 MediaPicker3Configuration? configuration = dataType.ConfigurationAs<MediaPicker3Configuration>();
@@ -123,7 +143,6 @@ public class MediaPicker3PropertyEditor : DataEditor
 
             return dtos;
         }
-
         public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
         {
             if (editorValue.Value is JArray dtos)

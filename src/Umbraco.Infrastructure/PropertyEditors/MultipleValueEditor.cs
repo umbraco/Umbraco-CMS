@@ -4,6 +4,7 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.Serialization;
@@ -37,7 +38,26 @@ public class MultipleValueEditor : DataValueEditor
     /// <param name="culture"></param>
     /// <param name="segment"></param>
     /// <returns></returns>
+    [Obsolete("Use ToEditor(IProperty property, MapperContext? context, string? culture, string? segment) instead")]
     public override object ToEditor(IProperty property, string? culture = null, string? segment = null)
+    {
+        var json = base.ToEditor(property, culture, segment)?.ToString();
+        string[]? result = null;
+        if (json is not null)
+        {
+            result = JsonConvert.DeserializeObject<string[]>(json);
+        }
+
+        return result ?? Array.Empty<string>();
+    }
+    /// <summary>
+    ///     Override so that we can return an array to the editor for multi-select values
+    /// </summary>
+    /// <param name="property"></param>
+    /// <param name="culture"></param>
+    /// <param name="segment"></param>
+    /// <returns></returns>
+    public override object ToEditor(IProperty property, MapperContext? mapperContext, string? culture = null, string? segment = null)
     {
         var json = base.ToEditor(property, culture, segment)?.ToString();
         string[]? result = null;

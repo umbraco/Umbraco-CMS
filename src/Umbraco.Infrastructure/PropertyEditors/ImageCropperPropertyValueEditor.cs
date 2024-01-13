@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
@@ -55,7 +56,16 @@ internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core v
     ///     This is called to merge in the prevalue crops with the value that is saved - similar to the property value
     ///     converter for the front-end
     /// </summary>
+    [Obsolete("Use ToEditor(IProperty property, MapperContext? context, string? culture, string? segment) instead")]
     public override object? ToEditor(IProperty property, string? culture = null, string? segment = null)
+    {
+        return ToEditor(property, null, culture, segment);
+    }
+    /// <summary>
+    ///     This is called to merge in the prevalue crops with the value that is saved - similar to the property value
+    ///     converter for the front-end
+    /// </summary>
+    public override object? ToEditor(IProperty property, MapperContext? mapperContext, string? culture = null, string? segment = null)
     {
         var val = property.GetValue(culture, segment);
         if (val == null)
@@ -72,8 +82,20 @@ internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core v
         {
             value = new ImageCropperValue { Src = val.ToString() };
         }
-
-        IDataType? dataType = _dataTypeService.GetDataType(property.PropertyType.DataTypeId);
+        IDataType? dataType = null;
+        if (mapperContext != null && mapperContext.Items.ContainsKey($"DataType-{property.PropertyType.DataTypeId}"))
+        {
+            dataType = (mapperContext.Items[$"DataType-{property.PropertyType.DataTypeId}"] as IDataType);
+        }
+        else if(mapperContext!= null)
+        {
+            dataType = _dataTypeService.GetDataType(property.PropertyType.DataTypeId);
+            mapperContext.Items.Add($"DataType-{property.PropertyType.DataTypeId}", dataType);
+        }
+        else
+        {
+            dataType = _dataTypeService.GetDataType(property.PropertyType.DataTypeId);
+        }
         if (dataType?.Configuration != null)
         {
             value?.ApplyConfiguration(dataType.ConfigurationAs<ImageCropperConfiguration>());

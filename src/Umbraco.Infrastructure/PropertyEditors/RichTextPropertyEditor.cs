@@ -294,6 +294,7 @@ public class RichTextPropertyEditor : DataEditor
         /// <param name="property"></param>
         /// <param name="culture"></param>
         /// <param name="segment"></param>
+        [Obsolete("Use ToEditor(IProperty property, MapperContext? context, string? culture, string? segment) instead")]
         public override object? ToEditor(IProperty property, string? culture = null, string? segment = null)
         {
             return ToEditor(property, null, culture, segment);
