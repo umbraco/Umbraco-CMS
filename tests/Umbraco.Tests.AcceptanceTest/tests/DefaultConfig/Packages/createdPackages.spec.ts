@@ -1,5 +1,6 @@
-import {ConstantHelper, test} from "@umbraco/playwright-testhelpers";
+import {AliasHelper, ConstantHelper, test} from "@umbraco/playwright-testhelpers";
 import {expect} from "@playwright/test";
+import {DocumentTypeBuilder, DocumentBuilder} from "@umbraco/json-models-builders";
 
 test.describe('Created packages tests', () => {
 
@@ -24,14 +25,54 @@ test.describe('Created packages tests', () => {
 
     // Assert
     await expect(page.getByRole('button', {name: 'TestPackage'})).toBeVisible();
-    await page.pause();
 
     // Clean
     await umbracoApi.package.ensureNameNotExists(packageName);
   });
 
   test('can create a package with content', async ({page, umbracoApi, umbracoUi}) => {
+    // Arrange
+    const documentTypeName = 'TestDocumentType';
+    const documentTypeAlias = AliasHelper.toAlias(documentTypeName);
+    const documentName = 'TestDocument';
+    console.log(await umbracoApi.documentType.ensureNameNotExists(documentTypeName));
+    await umbracoApi.package.createEmptyPackage(packageName);
+    const documentType = new DocumentTypeBuilder()
+      .withName(documentTypeName)
+      .withAlias(documentTypeAlias)
+      .withAllowedAsRoot(true)
+      .build();
+    const documentTypeId = await umbracoApi.documentType.create(documentType);
 
+    const document = new DocumentBuilder()
+      .withContentTypeId(documentTypeId)
+      .addVariant()
+      .withName(documentName)
+      .done()
+      .build();
+    const documentId = await umbracoApi.document.create(document);
+
+    // Act
+    await page.getByRole("tab", {name: 'Created'}).click({force: true});
+    await page.getByRole('button', {name: packageName}).click();
+    await page.getByLabel('Add').click();
+    await page.locator('#caret-button').click();
+    await page.getByLabel(documentName).click();
+    await page.getByLabel('Submit').click();
+    await page.getByLabel('Save changes to package').click();
+
+    // Assert
+    const packageData = await umbracoApi.package.getByName(packageName);
+    expect(packageData.contentNodeId == documentId).toBeTruthy();
+
+    await page.getByRole('button', {name: packageName}).click();
+    await expect(page.getByRole('button', {name: documentName + ' ' + documentId})).toBeVisible();
+
+    await page.pause();
+
+    // Clean
+    await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
+    await umbracoApi.package.ensureNameNotExists(packageName);
   });
 
   test('can create a package with media', async ({page, umbracoApi, umbracoUi}) => {
@@ -54,7 +95,7 @@ test.describe('Created packages tests', () => {
     await page.getByRole("tab", {name: 'Created'}).click({force: true});
 
 
-await page.pause();
+    await page.pause();
 
     await umbracoApi.language.delete(languageId);
 
