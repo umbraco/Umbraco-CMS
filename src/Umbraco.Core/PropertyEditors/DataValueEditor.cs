@@ -239,7 +239,7 @@ public class DataValueEditor : IDataValueEditor
     ///     The object returned will automatically be serialized into JSON notation. For most property editors
     ///     the value returned is probably just a string, but in some cases a JSON structure will be returned.
     /// </remarks>
-    [Obsolete("Use ToEditor(IProperty property, string? culture, string? segment, MapperContext context); instead")]
+    [Obsolete("Use ToEditor(IProperty property, MapperContext context, string? culture, string? segment); instead")]
     public virtual object? ToEditor(IProperty property, string? culture = null, string? segment = null)
     {
         return ToEditor(property,null, culture, segment);

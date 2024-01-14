@@ -78,7 +78,7 @@ internal abstract class BlockEditorPropertyValueEditor : BlockValuePropertyValue
     [Obsolete("Use ToEditor(IProperty property, MapperContext? context, string? culture, string? segment) instead")]
     public override object ToEditor(IProperty property, string? culture = null, string? segment = null)
     {
-      return ToEditor(property, null,culture, segment);
+      return this.ToEditor(property, null,culture, segment);
     }
     // note: there is NO variant support here
 

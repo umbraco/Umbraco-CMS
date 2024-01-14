@@ -107,7 +107,7 @@ public class MediaPicker3PropertyEditor : DataEditor
 
         public override object ToEditor(IProperty property, string? culture = null, string? segment = null)
         {
-          return ToEditor(property, null, culture, segment);
+          return  this.ToEditor(property, null, culture, segment);
         }
         public override object ToEditor(IProperty property, MapperContext? mapperContext, string? culture = null, string? segment = null)
         {

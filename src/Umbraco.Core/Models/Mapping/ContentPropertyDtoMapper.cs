@@ -26,7 +26,15 @@ internal class ContentPropertyDtoMapper : ContentPropertyBasicMapper<ContentProp
         dest.ValidationRegExpMessage = property.PropertyType.ValidationRegExpMessage;
         dest.Description = property.PropertyType.Description;
         dest.Label = property.PropertyType.Name;
-        dest.DataType = DataTypeService.GetDataType(property.PropertyType.DataTypeId);
+        if(context.Items.ContainsKey("DataType-" + property.PropertyType.DataTypeId))
+        {
+            dest.DataType = (context.Items["DataType-" + property.PropertyType.DataTypeId] as IDataType);
+        }
+        else
+        {
+            dest.DataType = DataTypeService.GetDataType(property.PropertyType.DataTypeId);
+            context.Items["DataType-" + property.PropertyType.DataTypeId] = dest.DataType;
+        }
         dest.LabelOnTop = property.PropertyType.LabelOnTop;
     }
 }

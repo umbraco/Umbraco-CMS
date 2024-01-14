@@ -41,14 +41,7 @@ public class MultipleValueEditor : DataValueEditor
     [Obsolete("Use ToEditor(IProperty property, MapperContext? context, string? culture, string? segment) instead")]
     public override object ToEditor(IProperty property, string? culture = null, string? segment = null)
     {
-        var json = base.ToEditor(property, culture, segment)?.ToString();
-        string[]? result = null;
-        if (json is not null)
-        {
-            result = JsonConvert.DeserializeObject<string[]>(json);
-        }
-
-        return result ?? Array.Empty<string>();
+        return ToEditor(property, null, culture, segment);
     }
     /// <summary>
     ///     Override so that we can return an array to the editor for multi-select values
@@ -59,7 +52,7 @@ public class MultipleValueEditor : DataValueEditor
     /// <returns></returns>
     public override object ToEditor(IProperty property, MapperContext? mapperContext, string? culture = null, string? segment = null)
     {
-        var json = base.ToEditor(property, culture, segment)?.ToString();
+        var json = base.ToEditor(property,null, culture, segment)?.ToString();
         string[]? result = null;
         if (json is not null)
         {
@@ -79,7 +72,7 @@ public class MultipleValueEditor : DataValueEditor
     [Obsolete("Use FromEditor(ContentPropertyData editorValue, object? currentValue, Dictionary<int,IDataType?>? dataTypes) instead")]
     public override object? FromEditor(ContentPropertyData editorValue, object? currentValue)
     {
-        return FromEditor(editorValue, currentValue, null);
+        return this.FromEditor(editorValue, currentValue, null);
     }
     /// <summary>
     ///     When multiple values are selected a json array will be posted back so we need to format for storage in
