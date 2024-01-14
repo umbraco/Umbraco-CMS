@@ -40,7 +40,7 @@ public class DictionaryTreeControllerBase : NamedEntityTreeControllerBase<NamedE
                 Type = Constants.UdiEntityType.DictionaryItem,
                 HasChildren = hasChildren,
                 Parent = parentKey.HasValue
-                    ? new ReferenceByIdRequestModel
+                    ? new ReferenceByIdModel
                     {
                         Id = parentKey.Value
                     }

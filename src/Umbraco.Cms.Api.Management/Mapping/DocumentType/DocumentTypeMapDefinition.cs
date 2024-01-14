@@ -1,4 +1,5 @@
 ﻿using Umbraco.Cms.Api.Management.Mapping.ContentType;
+using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.ContentType;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
 using Umbraco.Cms.Core.Mapping;
@@ -35,10 +36,12 @@ public class DocumentTypeMapDefinition : ContentTypeMapDefinition<IContentType, 
 
         if (source.AllowedTemplates != null)
         {
-            target.AllowedTemplateIds = source.AllowedTemplates.Select(template => template.Key);
+            target.AllowedTemplates = source.AllowedTemplates.Select(template => new ReferenceByIdModel(template.Key));
         }
 
-        target.DefaultTemplateId = source.DefaultTemplate?.Key;
+        target.DefaultTemplate = source.DefaultTemplate is not null
+            ? new ReferenceByIdModel(source.DefaultTemplate.Key)
+            : null;
 
         if (source.HistoryCleanup != null)
         {

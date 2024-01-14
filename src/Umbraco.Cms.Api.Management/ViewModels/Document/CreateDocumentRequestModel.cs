@@ -6,7 +6,7 @@ namespace Umbraco.Cms.Api.Management.ViewModels.Document;
 [ShortGenericSchemaName<DocumentValueModel, DocumentVariantRequestModel>("CreateContentForDocumentRequestModel")]
 public class CreateDocumentRequestModel : CreateContentRequestModelBase<DocumentValueModel, DocumentVariantRequestModel>
 {
-    public required ReferenceByIdRequestModel DocumentType { get; set; }
+    public required ReferenceByIdModel DocumentType { get; set; }
 
-    public required ReferenceByIdRequestModel? Template { get; set; }
+    public required ReferenceByIdModel? Template { get; set; }
 }

@@ -6,7 +6,7 @@ public abstract class PropertyTypeModelBase
 {
     public Guid Id { get; set; }
 
-    public Guid? ContainerId { get; set; }
+    public ReferenceByIdModel? Container { get; set; }
 
     public int SortOrder { get; set; }
 
@@ -18,7 +18,7 @@ public abstract class PropertyTypeModelBase
 
     public string? Description { get; set; }
 
-    public Guid DataTypeId { get; set; }
+    public ReferenceByIdModel DataType { get; set; } = new();
 
     public bool VariesByCulture { get; set; }
 

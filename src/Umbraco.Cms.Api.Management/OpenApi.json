@@ -19072,13 +19072,16 @@
       "ContentTypeCompositionModel": {
         "required": [
           "compositionType",
-          "id"
+          "contentType"
         ],
         "type": "object",
         "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
+          "contentType": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ]
           },
           "compositionType": {
             "$ref": "#/components/schemas/ContentTypeCompositionTypeModel"
@@ -19300,14 +19303,17 @@
       },
       "ContentTypeSortModel": {
         "required": [
-          "id",
+          "contentType",
           "sortOrder"
         ],
         "type": "object",
         "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
+          "contentType": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ]
           },
           "sortOrder": {
             "type": "integer",
@@ -19353,7 +19359,7 @@
           "target": {
             "oneOf": [
               {
-                "$ref": "#/components/schemas/ReferenceByIdRequestModel"
+                "$ref": "#/components/schemas/ReferenceByIdModel"
               }
             ],
             "nullable": true
@@ -19402,7 +19408,7 @@
           "parent": {
             "oneOf": [
               {
-                "$ref": "#/components/schemas/ReferenceByIdRequestModel"
+                "$ref": "#/components/schemas/ReferenceByIdModel"
               }
             ],
             "nullable": true
@@ -19445,7 +19451,7 @@
           "parent": {
             "oneOf": [
               {
-                "$ref": "#/components/schemas/ReferenceByIdRequestModel"
+                "$ref": "#/components/schemas/ReferenceByIdModel"
               }
             ],
             "nullable": true
@@ -19542,9 +19548,12 @@
             "format": "uuid",
             "nullable": true
           },
-          "containerId": {
-            "type": "string",
-            "format": "uuid",
+          "folder": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ],
             "nullable": true
           }
         },
@@ -19639,9 +19648,12 @@
             "format": "uuid",
             "nullable": true
           },
-          "containerId": {
-            "type": "string",
-            "format": "uuid",
+          "folder": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ],
             "nullable": true
           }
         },
@@ -19703,14 +19715,14 @@
           "documentType": {
             "oneOf": [
               {
-                "$ref": "#/components/schemas/ReferenceByIdRequestModel"
+                "$ref": "#/components/schemas/ReferenceByIdModel"
               }
             ]
           },
           "template": {
             "oneOf": [
               {
-                "$ref": "#/components/schemas/ReferenceByIdRequestModel"
+                "$ref": "#/components/schemas/ReferenceByIdModel"
               }
             ],
             "nullable": true
@@ -19738,7 +19750,7 @@
       },
       "CreateDocumentTypeRequestModel": {
         "required": [
-          "allowedTemplateIds",
+          "allowedTemplates",
           "cleanup"
         ],
         "type": "object",
@@ -19748,16 +19760,22 @@
           }
         ],
         "properties": {
-          "allowedTemplateIds": {
+          "allowedTemplates": {
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
             }
           },
-          "defaultTemplateId": {
-            "type": "string",
-            "format": "uuid",
+          "defaultTemplate": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ],
             "nullable": true
           },
           "cleanup": {
@@ -19840,7 +19858,7 @@
           "mediaType": {
             "oneOf": [
               {
-                "$ref": "#/components/schemas/ReferenceByIdRequestModel"
+                "$ref": "#/components/schemas/ReferenceByIdModel"
               }
             ]
           }
@@ -20652,7 +20670,7 @@
           "template": {
             "oneOf": [
               {
-                "$ref": "#/components/schemas/ReferenceByIdRequestModel"
+                "$ref": "#/components/schemas/ReferenceByIdModel"
               }
             ],
             "nullable": true
@@ -20756,7 +20774,7 @@
       },
       "DocumentTypeResponseModel": {
         "required": [
-          "allowedTemplateIds",
+          "allowedTemplates",
           "cleanup"
         ],
         "type": "object",
@@ -20766,16 +20784,22 @@
           }
         ],
         "properties": {
-          "allowedTemplateIds": {
+          "allowedTemplates": {
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
             }
           },
-          "defaultTemplateId": {
-            "type": "string",
-            "format": "uuid",
+          "defaultTemplate": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ],
             "nullable": true
           },
           "cleanup": {
@@ -20932,7 +20956,7 @@
           "parent": {
             "oneOf": [
               {
-                "$ref": "#/components/schemas/ReferenceByIdRequestModel"
+                "$ref": "#/components/schemas/ReferenceByIdModel"
               }
             ],
             "nullable": true
@@ -21462,12 +21486,16 @@
         "additionalProperties": false
       },
       "ItemReferenceByIdResponseModel": {
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/ReferenceByIdResponseModel"
-          }
+        "required": [
+          "id"
         ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
         "additionalProperties": false
       },
       "ItemResponseModelBaseModel": {
@@ -22037,7 +22065,7 @@
           "target": {
             "oneOf": [
               {
-                "$ref": "#/components/schemas/ReferenceByIdRequestModel"
+                "$ref": "#/components/schemas/ReferenceByIdModel"
               }
             ],
             "nullable": true
@@ -22051,7 +22079,7 @@
           "target": {
             "oneOf": [
               {
-                "$ref": "#/components/schemas/ReferenceByIdRequestModel"
+                "$ref": "#/components/schemas/ReferenceByIdModel"
               }
             ],
             "nullable": true
@@ -23387,9 +23415,12 @@
             "type": "string",
             "format": "uuid"
           },
-          "parentId": {
-            "type": "string",
-            "format": "uuid",
+          "parent": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ],
             "nullable": true
           },
           "name": {
@@ -23411,7 +23442,7 @@
         "required": [
           "alias",
           "appearance",
-          "dataTypeId",
+          "dataType",
           "id",
           "name",
           "sortOrder",
@@ -23425,9 +23456,12 @@
             "type": "string",
             "format": "uuid"
           },
-          "containerId": {
-            "type": "string",
-            "format": "uuid",
+          "container": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ],
             "nullable": true
           },
           "sortOrder": {
@@ -23446,9 +23480,12 @@
             "type": "string",
             "nullable": true
           },
-          "dataTypeId": {
-            "type": "string",
-            "format": "uuid"
+          "dataType": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ]
           },
           "variesByCulture": {
             "type": "boolean"
@@ -23697,20 +23734,7 @@
         },
         "additionalProperties": false
       },
-      "ReferenceByIdRequestModel": {
-        "required": [
-          "id"
-        ],
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          }
-        },
-        "additionalProperties": false
-      },
-      "ReferenceByIdResponseModel": {
+      "ReferenceByIdModel": {
         "required": [
           "id"
         ],
@@ -25086,7 +25110,7 @@
           "template": {
             "oneOf": [
               {
-                "$ref": "#/components/schemas/ReferenceByIdRequestModel"
+                "$ref": "#/components/schemas/ReferenceByIdModel"
               }
             ],
             "nullable": true
@@ -25114,7 +25138,7 @@
       },
       "UpdateDocumentTypeRequestModel": {
         "required": [
-          "allowedTemplateIds",
+          "allowedTemplates",
           "cleanup"
         ],
         "type": "object",
@@ -25124,16 +25148,22 @@
           }
         ],
         "properties": {
-          "allowedTemplateIds": {
+          "allowedTemplates": {
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReferenceByIdModel"
+                }
+              ]
             }
           },
-          "defaultTemplateId": {
-            "type": "string",
-            "format": "uuid",
+          "defaultTemplate": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ],
             "nullable": true
           },
           "cleanup": {

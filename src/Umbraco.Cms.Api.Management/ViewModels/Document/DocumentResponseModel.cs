@@ -9,7 +9,7 @@ public class DocumentResponseModel : ContentResponseModelBase<DocumentValueModel
 {
     public IEnumerable<ContentUrlInfo> Urls { get; set; } = Enumerable.Empty<ContentUrlInfo>();
 
-    public ReferenceByIdRequestModel? Template { get; set; }
+    public ReferenceByIdModel? Template { get; set; }
 
     public bool IsTrashed { get; set; }
 

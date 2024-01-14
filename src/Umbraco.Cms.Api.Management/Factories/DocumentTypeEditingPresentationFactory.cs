@@ -25,9 +25,9 @@ internal sealed class DocumentTypeEditingPresentationFactory : ContentTypeEditin
         MapCleanup(createModel, requestModel.Cleanup);
 
         createModel.Key = requestModel.Id;
-        createModel.ContainerKey = requestModel.ContainerId;
-        createModel.AllowedTemplateKeys = requestModel.AllowedTemplateIds;
-        createModel.DefaultTemplateKey = requestModel.DefaultTemplateId;
+        createModel.ContainerKey = requestModel.Folder?.Id;
+        createModel.AllowedTemplateKeys = requestModel.AllowedTemplates.Select(reference => reference.Id).ToArray();
+        createModel.DefaultTemplateKey = requestModel.DefaultTemplate?.Id;
 
         return createModel;
     }
@@ -44,8 +44,8 @@ internal sealed class DocumentTypeEditingPresentationFactory : ContentTypeEditin
 
         MapCleanup(updateModel, requestModel.Cleanup);
 
-        updateModel.AllowedTemplateKeys = requestModel.AllowedTemplateIds;
-        updateModel.DefaultTemplateKey = requestModel.DefaultTemplateId;
+        updateModel.AllowedTemplateKeys = requestModel.AllowedTemplates.Select(reference => reference.Id).ToArray();
+        updateModel.DefaultTemplateKey = requestModel.DefaultTemplate?.Id;
 
         return updateModel;
     }

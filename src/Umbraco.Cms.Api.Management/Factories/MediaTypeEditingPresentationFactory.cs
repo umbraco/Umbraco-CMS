@@ -22,7 +22,7 @@ internal sealed class MediaTypeEditingPresentationFactory : ContentTypeEditingPr
         >(requestModel);
 
         createModel.Key = requestModel.Id;
-        createModel.ParentKey = requestModel.ContainerId;
+        createModel.ParentKey = requestModel.Folder?.Id;
 
         return createModel;
     }

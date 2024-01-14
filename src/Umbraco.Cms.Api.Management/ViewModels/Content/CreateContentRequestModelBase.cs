@@ -7,5 +7,5 @@ public abstract class CreateContentRequestModelBase<TValueModel, TVariantModel>
 {
     public Guid? Id { get; set; }
 
-    public ReferenceByIdRequestModel? Parent { get; set; }
+    public ReferenceByIdModel? Parent { get; set; }
 }

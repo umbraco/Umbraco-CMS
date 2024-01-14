@@ -7,9 +7,9 @@ namespace Umbraco.Cms.Api.Management.ViewModels.DocumentType;
 public class CreateDocumentTypeRequestModel
     : CreateContentTypeRequestModelBase<CreateDocumentTypePropertyTypeRequestModel, CreateDocumentTypePropertyTypeContainerRequestModel>
 {
-    public IEnumerable<Guid> AllowedTemplateIds { get; set; } = Enumerable.Empty<Guid>();
+    public IEnumerable<ReferenceByIdModel> AllowedTemplates { get; set; } = Enumerable.Empty<ReferenceByIdModel>();
 
-    public Guid? DefaultTemplateId { get; set; }
+    public ReferenceByIdModel? DefaultTemplate { get; set; }
 
     public ContentTypeCleanup Cleanup { get; set; } = new();
 }

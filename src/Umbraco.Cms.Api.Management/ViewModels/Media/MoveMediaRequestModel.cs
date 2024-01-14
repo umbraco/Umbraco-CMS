@@ -2,5 +2,5 @@
 
 public class MoveMediaRequestModel
 {
-    public ReferenceByIdRequestModel? Target { get; set; }
+    public ReferenceByIdModel? Target { get; set; }
 }

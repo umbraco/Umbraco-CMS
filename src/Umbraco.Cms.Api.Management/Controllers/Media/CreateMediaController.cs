@@ -46,7 +46,6 @@ public class CreateMediaController : MediaControllerBase
             User,
             MediaPermissionResource.WithKeys(createRequestModel.Parent?.Id),
             AuthorizationPolicies.MediaPermissionByResource);
-        ;
 
         if (!authorizationResult.Succeeded)
         {

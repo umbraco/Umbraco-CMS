@@ -2,7 +2,7 @@
 
 public class CopyDocumentRequestModel
 {
-    public ReferenceByIdRequestModel? Target { get; set; }
+    public ReferenceByIdModel? Target { get; set; }
 
     public bool RelateToOriginal { get; set; }
 

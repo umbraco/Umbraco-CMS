@@ -48,7 +48,7 @@ internal sealed class DocumentPresentationFactory
             : null;
 
         responseModel.Template = templateKey.HasValue
-            ? new ReferenceByIdRequestModel { Id = templateKey.Value }
+            ? new ReferenceByIdModel { Id = templateKey.Value }
             : null;
 
         return responseModel;

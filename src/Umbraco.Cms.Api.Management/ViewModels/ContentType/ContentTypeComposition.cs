@@ -2,7 +2,7 @@
 
 public class ContentTypeComposition
 {
-    public required Guid Id { get; init; }
+    public required ReferenceByIdModel ContentType { get; init; }
 
     public required ContentTypeCompositionType CompositionType { get; init; }
 }

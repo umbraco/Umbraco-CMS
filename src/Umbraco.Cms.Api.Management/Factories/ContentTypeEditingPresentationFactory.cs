@@ -50,7 +50,7 @@ internal abstract class ContentTypeEditingPresentationFactory
         // need to fetch the content type aliases to construct the corresponding ContentTypeSort entities
         ContentTypeViewModels.ContentTypeSort[] allowedContentTypesArray = allowedContentTypes as ContentTypeViewModels.ContentTypeSort[]
                                                                            ?? allowedContentTypes.ToArray();
-        Guid[] contentTypeKeys = allowedContentTypesArray.Select(a => a.Id).ToArray();
+        Guid[] contentTypeKeys = allowedContentTypesArray.Select(a => a.ContentType.Id).ToArray();
         IDictionary<Guid, string> contentTypeAliasesByKey = _contentTypeService
             .GetAll()
             .Where(c => contentTypeKeys.Contains(c.Key))
@@ -58,8 +58,8 @@ internal abstract class ContentTypeEditingPresentationFactory
 
         return allowedContentTypesArray
             .Select(a =>
-                contentTypeAliasesByKey.TryGetValue(a.Id, out var alias)
-                    ? new ContentTypeSort(a.Id, a.SortOrder, alias)
+                contentTypeAliasesByKey.TryGetValue(a.ContentType.Id, out var alias)
+                    ? new ContentTypeSort(a.ContentType.Id, a.SortOrder, alias)
                     : null)
             .WhereNotNull()
             .ToArray();
@@ -85,9 +85,9 @@ internal abstract class ContentTypeEditingPresentationFactory
             VariesBySegment = property.VariesBySegment,
             VariesByCulture = property.VariesByCulture,
             Key = property.Id,
-            ContainerKey = property.ContainerId,
+            ContainerKey = property.Container?.Id,
             SortOrder = property.SortOrder,
-            DataTypeKey = property.DataTypeId,
+            DataTypeKey = property.DataType.Id,
         }).ToArray();
 
     private TPropertyTypeContainerEditingModel[] MapContainers<TPropertyTypeContainerEditingModel>(
@@ -99,13 +99,13 @@ internal abstract class ContentTypeEditingPresentationFactory
             Key = container.Id,
             SortOrder = container.SortOrder,
             Name = container.Name,
-            ParentKey = container.ParentId,
+            ParentKey = container.Parent?.Id,
         }).ToArray();
 
     private ContentTypeEditingModels.Composition[] MapCompositions(IEnumerable<ContentTypeViewModels.ContentTypeComposition> compositions)
         => compositions.Select(composition => new ContentTypeEditingModels.Composition
         {
-            Key = composition.Id,
+            Key = composition.ContentType.Id,
             CompositionType = composition.CompositionType == ContentTypeViewModels.ContentTypeCompositionType.Inheritance
                 ? ContentTypeEditingModels.CompositionType.Inheritance
                 : ContentTypeEditingModels.CompositionType.Composition
