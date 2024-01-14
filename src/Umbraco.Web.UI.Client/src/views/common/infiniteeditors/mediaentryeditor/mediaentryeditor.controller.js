@@ -62,7 +62,7 @@ angular.module("umbraco")
 
                 entityResource.getById(vm.mediaEntry.mediaKey, "Media").then(function (mediaEntity) {
                     vm.media = mediaEntity;
-                    vm.imageSrc = mediaHelper.resolveFileFromEntity(mediaEntity, true);
+                    vm.imageSrc = mediaHelper.resolveFileFromEntity(mediaEntity, false);
                     vm.fileSrc = mediaHelper.resolveFileFromEntity(mediaEntity, false);
                     vm.fileExtension = mediaHelper.getFileExtension(vm.fileSrc);
                     vm.loading = false;
@@ -122,13 +122,13 @@ angular.module("umbraco")
             }
 
             function focalPointChanged(left, top) {
-                //update the model focalpoint value
+                // update the model focalpoint value
                 vm.mediaEntry.focalPoint = {
                     left: left,
                     top: top
                 };
 
-                //set form to dirty to track changes
+                // set form to dirty to track changes
                 setDirty();
             }
             
