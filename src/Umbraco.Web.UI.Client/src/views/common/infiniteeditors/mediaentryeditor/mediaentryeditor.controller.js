@@ -103,7 +103,6 @@ angular.module("umbraco")
                 // un-select crop:
                 vm.currentCrop = null;
 
-                //
                 updateMedia();
             }
             
