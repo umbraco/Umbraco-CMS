@@ -78,7 +78,10 @@ public interface IDataValueEditor
     /// <summary>
     ///     Converts a property value to a value for the editor.
     /// </summary>
-    object? ToEditor(IProperty property, MapperContext? mapperContext, string? culture, string? segment);
+    object? ToEditor(IProperty property, MapperContext? mapperContext, string? culture, string? segment)
+    {
+        return ToEditor(property, culture, segment);
+    }
 
     // TODO: / deal with this when unplugging the xml cache
     // why property vs propertyType? services should be injected! etc...
