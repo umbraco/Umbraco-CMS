@@ -5,7 +5,6 @@ import { UMB_NOTIFICATION_CONTEXT_TOKEN, UmbNotificationContext } from '@umbraco
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbDetailStore } from '@umbraco-cms/backoffice/store';
 import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
-import { UMB_ACTION_EVENT_CONTEXT, UmbActionEvent, type UmbActionEventContext } from '@umbraco-cms/backoffice/action';
 
 export abstract class UmbDetailRepositoryBase<
 		DetailModelType extends { unique: string; entityType: string; parentUnique: string | null },
@@ -18,7 +17,6 @@ export abstract class UmbDetailRepositoryBase<
 	#detailStore?: UmbDetailStore<DetailModelType>;
 	#detailSource: UmbDetailDataSource<DetailModelType>;
 	#notificationContext?: UmbNotificationContext;
-	#actionEventContext?: UmbActionEventContext;
 
 	constructor(
 		host: UmbControllerHost,
