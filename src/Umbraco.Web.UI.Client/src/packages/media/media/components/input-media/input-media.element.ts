@@ -1,8 +1,8 @@
 import { UmbMediaPickerContext } from './input-media.context.js';
-import { css, html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, state, ifDefined, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { MediaItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { MediaItemResponseModel, MediaTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-input-media')
@@ -60,8 +60,8 @@ export class UmbInputMediaElement extends FormControlMixin(UmbLitElement) {
 		this.#pickerContext.setSelection(ids);
 	}
 
-	@property({ type: String })
-	filter?: string;
+	@property({ type: Array })
+	filter?: string[] | undefined;
 
 	@property({ type: Boolean })
 	showOpenButton?: boolean;
@@ -103,21 +103,32 @@ export class UmbInputMediaElement extends FormControlMixin(UmbLitElement) {
 		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems));
 	}
 
-	protected _openPicker() {
+	protected getFormElement() {
+		return undefined;
+	}
+
+	#pickableFilter: (item: MediaItemResponseModel) => boolean = (item) => {
+		/* TODO: Media item doesn't have the content/media-type ID available to query.
+			 Commenting out until the Management API model is updated. [LK]
+		*/
+		// if (this.filter && this.filter.length > 0) {
+		// 	return this.filter.includes(item.contentTypeId);
+		// }
+		return true;
+	};
+
+	#openPicker() {
 		// TODO: Configure the media picker, with `filter` and `ignoreUserStartNodes` [LK]
-		console.log('_openPicker', [this.filter, this.ignoreUserStartNodes]);
+		console.log('#openPicker', [this.filter, this.ignoreUserStartNodes]);
 		this.#pickerContext.openPicker({
 			hideTreeRoot: true,
+			pickableFilter: this.#pickableFilter,
 		});
 	}
 
-	protected _openItem(item: MediaItemResponseModel) {
-		// TODO: Implement the Content editing infinity editor. [LK]
+	#openItem(item: MediaItemResponseModel) {
+		// TODO: Implement the Media editing infinity editor. [LK]
 		console.log('TODO: _openItem', item);
-	}
-
-	protected getFormElement() {
-		return undefined;
 	}
 
 	render() {
@@ -127,7 +138,13 @@ export class UmbInputMediaElement extends FormControlMixin(UmbLitElement) {
 	#renderItems() {
 		if (!this._items) return;
 		// TODO: Add sorting. [LK]
-		return html` ${this._items?.map((item) => this.#renderItem(item))} `;
+		return html`
+			${repeat(
+				this._items,
+				(item) => item.id,
+				(item) => this.#renderItem(item),
+			)}
+		`;
 	}
 
 	#renderButton() {
@@ -136,7 +153,7 @@ export class UmbInputMediaElement extends FormControlMixin(UmbLitElement) {
 			<uui-button
 				id="add-button"
 				look="placeholder"
-				@click=${this._openPicker}
+				@click=${this.#openPicker}
 				label=${this.localize.term('general_choose')}>
 				<uui-icon name="icon-add"></uui-icon>
 				${this.localize.term('general_choose')}
