@@ -95,6 +95,9 @@ export class UmbInputMemberElement extends FormControlMixin(UmbLitElement) {
 		// this.observe(this.#pickerContext.selection, (selection) => (super.value = selection.join(',')));
 		// this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems));
 	}
+	protected getFormElement() {
+		return undefined;
+	}
 
 	#pickableFilter: (item: MemberItemResponseModel) => boolean = (item) => {
 		// TODO: Uncomment, once `UmbMemberPickerContext` has been implemented. [LK]
@@ -105,28 +108,21 @@ export class UmbInputMemberElement extends FormControlMixin(UmbLitElement) {
 		return true;
 	};
 
-	protected _openPicker() {
-		console.log("member.openPicker");
+	#openPicker() {
+		console.log('member.openPicker');
 		// this.#pickerContext.openPicker({
 		// 	hideTreeRoot: true,
 		//	pickableFilter: this.#pickableFilter,
 		// });
 	}
 
-	protected _requestRemoveItem(item: MemberItemResponseModel){
-		console.log("member.requestRemoveItem", item);
+	#requestRemoveItem(item: MemberItemResponseModel) {
+		console.log('member.requestRemoveItem', item);
 		//this.#pickerContext.requestRemoveItem(item.id!);
 	}
 
-	protected getFormElement() {
-		return undefined;
-	}
-
 	render() {
-		return html`
-			${this.#renderItems()}
-			${this.#renderAddButton()}
-		`;
+		return html` ${this.#renderItems()} ${this.#renderAddButton()} `;
 	}
 
 	#renderItems() {
@@ -136,7 +132,7 @@ export class UmbInputMemberElement extends FormControlMixin(UmbLitElement) {
 			>${repeat(
 				this._items,
 				(item) => item.id,
-				(item) => this._renderItem(item),
+				(item) => this.#renderItem(item),
 			)}
 		</uui-ref-list>`;
 	}
@@ -146,24 +142,28 @@ export class UmbInputMemberElement extends FormControlMixin(UmbLitElement) {
 		return html`<uui-button
 			id="add-button"
 			look="placeholder"
-			@click=${this._openPicker}
-			label=${this.localize.term('general_add')}></uui-button>`;
+			@click=${this.#openPicker}
+			label=${this.localize.term('general_choose')}></uui-button>`;
 	}
 
-	private _renderItem(item: MemberItemResponseModel) {
+	#renderItem(item: MemberItemResponseModel) {
 		if (!item.id) return;
 		return html`
 			<uui-ref-node name=${ifDefined(item.name)} detail=${ifDefined(item.id)}>
-				<!-- TODO: implement is deleted <uui-tag size="s" slot="tag" color="danger">Deleted</uui-tag> -->
+				${this.#renderIsTrashed(item)}
 				<uui-action-bar slot="actions">
-					<uui-button
-						@click=${() => this._requestRemoveItem(item)}
-						label="Remove member ${item.name}"
+					<uui-button @click=${() => this.#requestRemoveItem(item)} label="Remove member ${item.name}"
 						>Remove</uui-button
 					>
 				</uui-action-bar>
 			</uui-ref-node>
 		`;
+	}
+
+	#renderIsTrashed(item: MemberItemResponseModel) {
+		// TODO: Uncomment, once the Management API model support deleted members. [LK]
+		//if (!item.isTrashed) return;
+		//return html`<uui-tag size="s" slot="tag" color="danger">Trashed</uui-tag>`;
 	}
 
 	static styles = [

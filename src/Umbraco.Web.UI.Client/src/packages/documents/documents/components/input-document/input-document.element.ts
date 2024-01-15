@@ -142,7 +142,7 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 			>${repeat(
 				this._items,
 				(item) => item.id,
-				(item) => this._renderItem(item),
+				(item) => this.#renderItem(item),
 			)}
 		</uui-ref-list>`;
 	}
@@ -156,13 +156,13 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 			label=${this.localize.term('general_choose')}></uui-button>`;
 	}
 
-	private _renderItem(item: DocumentItemResponseModel) {
+	#renderItem(item: DocumentItemResponseModel) {
 		if (!item.id) return;
 		return html`
 			<uui-ref-node name=${ifDefined(item.name)} detail=${ifDefined(item.id)}>
-				${this._renderIsTrashed(item)}
+				${this.#renderIsTrashed(item)}
 				<uui-action-bar slot="actions">
-					${this._renderOpenButton(item)}
+					${this.#renderOpenButton(item)}
 					<uui-button
 						@click=${() => this.#pickerContext.requestRemoveItem(item.id!)}
 						label="Remove document ${item.name}"
@@ -173,12 +173,12 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 		`;
 	}
 
-	private _renderIsTrashed(item: DocumentItemResponseModel) {
+	#renderIsTrashed(item: DocumentItemResponseModel) {
 		if (!item.isTrashed) return;
 		return html`<uui-tag size="s" slot="tag" color="danger">Trashed</uui-tag>`;
 	}
 
-	private _renderOpenButton(item: DocumentItemResponseModel) {
+	#renderOpenButton(item: DocumentItemResponseModel) {
 		if (!this.showOpenButton) return;
 		return html`<uui-button @click=${() => this.#openItem(item)} label="Open document ${item.name}"
 			>${this.localize.term('general_open')}</uui-button

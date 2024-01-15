@@ -132,7 +132,7 @@ export class UmbInputMediaElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	render() {
-		return html` ${this.#renderItems()} ${this.#renderButton()} `;
+		return html` ${this.#renderItems()} ${this.#renderAddButton()} `;
 	}
 
 	#renderItems() {
@@ -147,7 +147,7 @@ export class UmbInputMediaElement extends FormControlMixin(UmbLitElement) {
 		`;
 	}
 
-	#renderButton() {
+	#renderAddButton() {
 		if (this._items && this.max && this._items.length >= this.max) return;
 		return html`
 			<uui-button
@@ -169,7 +169,7 @@ export class UmbInputMediaElement extends FormControlMixin(UmbLitElement) {
 				name=${ifDefined(item.name === null ? undefined : item.name)}
 				detail=${ifDefined(item.id)}
 				file-ext="jpg">
-				${this._renderIsTrashed(item)}
+				${this.#renderIsTrashed(item)}
 				<uui-action-bar slot="actions">
 					<uui-button label="Copy media">
 						<uui-icon name="icon-documents"></uui-icon>
@@ -182,7 +182,7 @@ export class UmbInputMediaElement extends FormControlMixin(UmbLitElement) {
 		`;
 	}
 
-	private _renderIsTrashed(item: MediaItemResponseModel) {
+	#renderIsTrashed(item: MediaItemResponseModel) {
 		if (!item.isTrashed) return;
 		return html`<uui-tag size="s" slot="tag" color="danger">Trashed</uui-tag>`;
 	}
