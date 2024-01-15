@@ -1,5 +1,14 @@
 import { UmbDocumentTypePickerContext } from './input-document-type.context.js';
-import { css, html, customElement, property, state, ifDefined, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
+import {
+	css,
+	html,
+	customElement,
+	property,
+	state,
+	ifDefined,
+	repeat,
+	nothing,
+} from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { DocumentTypeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
@@ -139,7 +148,7 @@ export class UmbInputDocumentTypeElement extends FormControlMixin(UmbLitElement)
 
 	#renderItems() {
 		if (!this._items) return nothing;
-		if (this.max === 1 && this.selectedIds.length === 1) return nothing;
+		return html`
 			<uui-ref-list
 				>${repeat(
 					this._items,
