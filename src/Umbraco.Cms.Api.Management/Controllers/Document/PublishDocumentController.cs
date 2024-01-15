@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Security.Authorization.Content;
+using Umbraco.Cms.Api.Management.Security.Authorization.UserGroup;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Actions;
@@ -40,7 +41,7 @@ public class PublishDocumentController : DocumentControllerBase
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,
-            ContentPermissionResource.WithKeys(ActionPublish.ActionLetter, id),
+            ContentPermissionResource.WithKeys(ActionPublish.ActionLetter, id, requestModel.Cultures),
             AuthorizationPolicies.ContentPermissionByResource);
 
         if (!authorizationResult.Succeeded)

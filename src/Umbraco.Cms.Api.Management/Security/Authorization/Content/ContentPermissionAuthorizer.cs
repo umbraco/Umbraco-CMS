@@ -62,4 +62,11 @@ internal sealed class ContentPermissionAuthorizer : IContentPermissionAuthorizer
 
         return result == ContentAuthorizationStatus.Success;
     }
+
+    public async Task<bool> IsAuthorizedForCultures(IPrincipal currentUser, ISet<string> culturesToCheck)
+    {
+        IUser user = _authorizationHelper.GetUmbracoUser(currentUser);
+        ContentAuthorizationStatus result = await _contentPermissionService.AuthorizeCultureAccessAsync(user, culturesToCheck);
+        return result == ContentAuthorizationStatus.Success;
+    }
 }

@@ -80,4 +80,12 @@ public interface IContentPermissionService
     /// <param name="permissionsToCheck">The collection of permissions to authorize.</param>
     /// <returns>A task resolving into a <see cref="ContentAuthorizationStatus"/>.</returns>
     Task<ContentAuthorizationStatus> AuthorizeBinAccessAsync(IUser user, ISet<char> permissionsToCheck);
+
+    /// <summary>
+    ///     Authorize that a user has access to specific cultures
+    /// </summary>
+    /// <param name="user"><see cref="IUser" /> to authorize.</param>
+    /// <param name="culturesToCheck">The collection of cultures to authorize.</param>
+    /// <returns>A task resolving into a <see cref="ContentAuthorizationStatus"/>.</returns>
+    Task<ContentAuthorizationStatus> AuthorizeCultureAccessAsync(IUser user, ISet<string> culturesToCheck);
 }

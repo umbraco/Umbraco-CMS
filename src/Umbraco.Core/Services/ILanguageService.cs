@@ -55,4 +55,12 @@ public interface ILanguageService
     /// <param name="isoCode">The ISO code of the <see cref="ILanguage" /> to delete</param>
     /// <param name="userKey">Key of the user deleting the language</param>
     Task<Attempt<ILanguage?, LanguageOperationStatus>> DeleteAsync(string isoCode, Guid userKey);
+
+
+    /// <summary>
+    /// Retrieves the isoCodes of configured languages by their Ids
+    /// </summary>
+    /// <param name="ids">The ids of the configured <see cref="ILanguage" />s</param>
+    /// <returns>The ISO codes of the <see cref="ILanguage" />s</returns>
+    string[] GetIsoCodesByIds(ICollection<int> ids);
 }

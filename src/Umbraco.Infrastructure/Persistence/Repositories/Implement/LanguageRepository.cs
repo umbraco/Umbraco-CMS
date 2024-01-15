@@ -92,6 +92,38 @@ internal class LanguageRepository : EntityRepositoryBase<int, ILanguage>, ILangu
         return null;
     }
 
+    // multi implementation of GetIsoCodeById
+    public string[] GetIsoCodesByIds(ICollection<int> ids, bool throwOnNotFound = true)
+    {
+        var isoCodes = new string[ids.Count];
+
+        if (ids.Any() == false)
+        {
+            return isoCodes;
+        }
+
+        EnsureCacheIsPopulated();
+
+        // yes, we want to lock _codeIdMap
+        lock (_codeIdMap)
+        {
+            for (var i = 0; i < ids.Count; i++)
+            {
+                var id = ids.ElementAt(i);
+                if (_idCodeMap.TryGetValue(id, out var isoCode))
+                {
+                    isoCodes[i] = isoCode;
+                }
+                else if (throwOnNotFound)
+                {
+                    throw new ArgumentException($"Id {id} does not correspond to an existing language.", nameof(id));
+                }
+            }
+        }
+
+        return isoCodes;
+    }
+
     public string GetDefaultIsoCode() => GetDefault().IsoCode;
 
     public int? GetDefaultId() => GetDefault().Id;
