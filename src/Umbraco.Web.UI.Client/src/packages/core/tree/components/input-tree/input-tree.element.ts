@@ -38,7 +38,7 @@ export class UmbInputTreeElement extends FormControlMixin(UmbLitElement) {
 	private _filter: Array<string> = [];
 	@property()
 	public set filter(value: string) {
-		this._filter = value.split(',');
+		this._filter = value ? value.split(',') : [];
 	}
 	public get filter(): string {
 		return this._filter.join(',');
@@ -104,7 +104,7 @@ export class UmbInputTreeElement extends FormControlMixin(UmbLitElement) {
 		return html`<umb-input-document
 			.selectedIds=${this.selectedIds}
 			.startNodeId=${this.startNodeId}
-			.filter=${this.filter}
+			.filter=${this._filter}
 			.min=${this.min}
 			.max=${this.max}
 			?showOpenButton=${this.showOpenButton}

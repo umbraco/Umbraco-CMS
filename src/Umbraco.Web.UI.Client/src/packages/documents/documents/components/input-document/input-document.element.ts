@@ -2,7 +2,7 @@ import { UmbDocumentPickerContext } from './input-document.context.js';
 import { css, html, customElement, property, state, ifDefined, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { DocumentItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { DocumentItemResponseModel, DocumentTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-input-document')
@@ -63,8 +63,8 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 	@property({ type: String })
 	startNodeId?: string;
 
-	@property({ type: String })
-	filter?: string;
+	@property({ type: Array })
+	filter?: string[] | undefined;
 
 	@property({ type: Boolean })
 	showOpenButton?: boolean;
@@ -106,21 +106,29 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems));
 	}
 
-	protected _openPicker() {
-		// TODO: Configure the content picker, with `startNodeId`, `filter` and `ignoreUserStartNodes` [LK]
-		console.log("_openPicker", [this.startNodeId, this.filter, this.ignoreUserStartNodes]);
+	protected getFormElement() {
+		return undefined;
+	}
+
+	#pickableFilter: (item: DocumentTreeItemResponseModel) => boolean = (item) => {
+		if (this.filter && this.filter.length > 0) {
+			return this.filter.includes(item.contentTypeId);
+		}
+		return true;
+	}
+
+	#openPicker() {
+		// TODO: Configure the content picker, with `startNodeId` and `ignoreUserStartNodes` [LK]
+		console.log('_openPicker', [this.startNodeId, this.ignoreUserStartNodes]);
 		this.#pickerContext.openPicker({
 			hideTreeRoot: true,
+			pickableFilter: this.#pickableFilter,
 		});
 	}
 
-	protected _openItem(item: DocumentItemResponseModel) {
+	#openItem(item: DocumentItemResponseModel) {
 		// TODO: Implement the Content editing infinity editor. [LK]
 		console.log('TODO: _openItem', item);
-	}
-
-	protected getFormElement() {
-		return undefined;
 	}
 
 	render() {
@@ -144,7 +152,7 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 		return html`<uui-button
 			id="add-button"
 			look="placeholder"
-			@click=${this._openPicker}
+			@click=${this.#openPicker}
 			label=${this.localize.term('general_choose')}></uui-button>`;
 	}
 
@@ -172,7 +180,7 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 
 	private _renderOpenButton(item: DocumentItemResponseModel) {
 		if (!this.showOpenButton) return;
-		return html`<uui-button @click=${() => this._openItem(item)} label="Open document ${item.name}"
+		return html`<uui-button @click=${() => this.#openItem(item)} label="Open document ${item.name}"
 			>${this.localize.term('general_open')}</uui-button
 		>`;
 	}
