@@ -14,10 +14,12 @@ export class UmbInputMemberElement extends FormControlMixin(UmbLitElement) {
 	 */
 	@property({ type: Number })
 	public get min(): number {
+		// TODO: Uncomment, once `UmbMemberPickerContext` has been implemented. [LK]
 		//return this.#pickerContext.min;
 		return 0;
 	}
 	public set min(value: number) {
+		// TODO: Uncomment, once `UmbMemberPickerContext` has been implemented. [LK]
 		//this.#pickerContext.min = value;
 	}
 
@@ -38,10 +40,12 @@ export class UmbInputMemberElement extends FormControlMixin(UmbLitElement) {
 	 */
 	@property({ type: Number })
 	public get max(): number {
+		// TODO: Uncomment, once `UmbMemberPickerContext` has been implemented. [LK]
 		//return this.#pickerContext.max;
 		return Infinity;
 	}
 	public set max(value: number) {
+		// TODO: Uncomment, once `UmbMemberPickerContext` has been implemented. [LK]
 		//this.#pickerContext.max = value;
 	}
 
@@ -55,10 +59,12 @@ export class UmbInputMemberElement extends FormControlMixin(UmbLitElement) {
 	maxMessage = 'This field exceeds the allowed amount of items';
 
 	public get selectedIds(): Array<string> {
+		// TODO: Uncomment, once `UmbMemberPickerContext` has been implemented. [LK]
 		//return this.#pickerContext.getSelection();
 		return [];
 	}
 	public set selectedIds(ids: Array<string>) {
+		// TODO: Uncomment, once `UmbMemberPickerContext` has been implemented. [LK]
 		//this.#pickerContext.setSelection(ids);
 	}
 
@@ -80,6 +86,7 @@ export class UmbInputMemberElement extends FormControlMixin(UmbLitElement) {
 	constructor() {
 		super();
 
+		// TODO: Uncomment, once `UmbMemberPickerContext` has been implemented. [LK]
 		// this.addValidator(
 		// 	'rangeUnderflow',
 		// 	() => this.minMessage,
@@ -109,6 +116,7 @@ export class UmbInputMemberElement extends FormControlMixin(UmbLitElement) {
 	};
 
 	#openPicker() {
+		// TODO: Uncomment, once `UmbMemberPickerContext` has been implemented. [LK]
 		console.log('member.openPicker');
 		// this.#pickerContext.openPicker({
 		// 	hideTreeRoot: true,
@@ -117,6 +125,7 @@ export class UmbInputMemberElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	#requestRemoveItem(item: MemberItemResponseModel) {
+		// TODO: Uncomment, once `UmbMemberPickerContext` has been implemented. [LK]
 		console.log('member.requestRemoveItem', item);
 		//this.#pickerContext.requestRemoveItem(item.id!);
 	}
