@@ -25,9 +25,6 @@ namespace Umbraco.Cms.Core.Configuration
             _logger = logger;
         }
 
-        [Obsolete]
-        public string UmbracoConnectionPath { get; } = UmbracoConnectionStringPath;
-
         public void RemoveConnectionString()
         {
             // Remove keys from JSON
