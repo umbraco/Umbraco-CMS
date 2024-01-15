@@ -42,12 +42,12 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
     protected abstract UmbracoObjectTypes ContainerObjectType { get; }
 
     protected async Task<IEnumerable<ContentTypeAvailableCompositionsResult>> FindAvailableCompositionsAsync(
-        Guid key,
+        Guid? key,
         IEnumerable<Guid> currentCompositeKeys,
         IEnumerable<string> currentPropertyAliases,
         bool isElement)
     {
-        var contentType = await _concreteContentTypeService.GetAsync(key);
+        var contentType = key.HasValue ? await _concreteContentTypeService.GetAsync(key.Value) : null;
         IContentTypeComposition[] allContentTypes = _concreteContentTypeService.GetAll().ToArray();
 
         var currentCompositionAliases = currentCompositeKeys.Any()

@@ -43,7 +43,7 @@ internal sealed class MediaTypeEditingService : ContentTypeEditingServiceBase<IM
     }
 
     public async Task<IEnumerable<ContentTypeAvailableCompositionsResult>> GetAvailableCompositionsAsync(
-        Guid key,
+        Guid? key,
         IEnumerable<Guid> currentCompositeKeys,
         IEnumerable<string> currentPropertyAliases,
         bool isElement) =>
