@@ -10,7 +10,7 @@ import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
  * @description - Data Store for File system items
  */
 
-export class UmbFileSystemItemStore<T extends { path: string }> extends UmbStoreBase<T> implements UmbItemStore<T> {
+export class UmbFileSystemItemStore<T extends { path: string }> extends UmbStoreBase<T> {
 	constructor(host: UmbControllerHost, storeAlias: string) {
 		super(host, storeAlias, new UmbArrayState<T>([], (x) => x.path));
 	}
