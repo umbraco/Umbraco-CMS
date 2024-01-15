@@ -12,8 +12,7 @@ const SORTER_CONFIG: UmbSorterConfig<SortEntryType> = {
 		return element.getAttribute('data-sort-entry-id') === model.id;
 	},
 	querySelectModelToElement: (container: HTMLElement, modelEntry: SortEntryType) => {
-		// TODO: This selector does not make sense:
-		return container.querySelector('data-sort-entry-id=[' + modelEntry.id + ']');
+		return container.querySelector('[data-sort-entry-id=' + modelEntry.id + ']');
 	},
 	identifier: 'test-sorter',
 	itemSelector: 'li',
@@ -41,12 +40,20 @@ export default class UmbTestSorterControllerElement extends UmbLitElement {
 	@state()
 	private vertical = true;
 
+	@state()
+	private _items: Array<SortEntryType> = [...model];
+
 	constructor() {
 		super();
 		this.sorter = new UmbSorterController(this, {
 			...SORTER_CONFIG,
 			resolveVerticalDirection: () => {
 				this.vertical ? true : false;
+			},
+			onChange: ({ model }) => {
+				const oldValue = this._items;
+				this._items = model;
+				this.requestUpdate('_items', oldValue);
 			},
 		});
 		this.sorter.setModel(model);
@@ -62,7 +69,7 @@ export default class UmbTestSorterControllerElement extends UmbLitElement {
 				Horizontal/Vertical
 			</uui-button>
 			<ul class="${this.vertical ? 'vertical' : 'horizontal'}">
-				${model.map(
+				${this._items.map(
 					(entry) =>
 						html`<li class="item" data-sort-entry-id="${entry.id}">
 							<span><uui-icon name="icon-wand"></uui-icon>${entry.value}</span>
