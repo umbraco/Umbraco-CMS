@@ -47,7 +47,6 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 			variesByCulture: false,
 			variesBySegment: false,
 			isElement: false,
-			containerId: null,
 			properties: [],
 			containers: [],
 			allowedContentTypes: [],
@@ -76,7 +75,7 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 		const mediaType: UmbMediaTypeDetailModel = {
 			entityType: UMB_MEDIA_TYPE_ENTITY_TYPE,
 			unique: data.id,
-			parentUnique: data.containerId,
+			parentUnique: null, // TODO: map to parent/folder id
 			name: data.name,
 			alias: data.alias,
 			description: data.description || null,
@@ -85,7 +84,6 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 			variesByCulture: data.variesByCulture,
 			variesBySegment: data.variesBySegment,
 			isElement: data.isElement,
-			containerId: data.containerId,
 			properties: data.properties,
 			containers: data.containers,
 			allowedContentTypes: data.allowedContentTypes,

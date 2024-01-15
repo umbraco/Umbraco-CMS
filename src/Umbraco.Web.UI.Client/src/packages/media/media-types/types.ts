@@ -18,7 +18,6 @@ export interface UmbMediaTypeDetailModel {
 	variesByCulture: boolean;
 	variesBySegment: boolean;
 	isElement: boolean;
-	containerId: string | null;
 	// TODO: investigate if we need our own model for these
 	properties: Array<MediaTypePropertyTypeResponseModel>;
 	containers: Array<MediaTypePropertyTypeContainerResponseModel>;
