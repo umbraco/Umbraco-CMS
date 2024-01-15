@@ -28,6 +28,7 @@ export class UmbDocumentTypeWorkspaceViewEditTabElement extends UmbLitElement {
 
 	config: UmbSorterConfig<PropertyTypeContainerModelBaseModel> = {
 		...SORTER_CONFIG,
+		// TODO: Missing handlers to work properly: performItemMove and performItemRemove
 		performItemInsert: async (args) => {
 			if (!this._groups) return false;
 			const oldIndex = this._groups.findIndex((group) => group.id! === args.item.id);

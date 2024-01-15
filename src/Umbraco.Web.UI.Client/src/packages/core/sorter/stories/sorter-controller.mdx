@@ -51,20 +51,20 @@ The configuration has a lot of optional options, but the required ones are:
 - itemSelector
 - containerSelector
 
-It can be set up as following:
+It can be set up as follows:
 
 ```typescript
 import { UmbSorterConfig, UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 
-type MySortEntryType = {...}
-const awesomeModel: Array<MySortEntryType> = [...]
+type MySortEntryType = {...};
+const awesomeModel: Array<MySortEntryType> = [...];
 
 const MY_SORTER_CONFIG: UmbSorterConfig<MySortEntryType> = {
 	compareElementToModel: (element: HTMLElement, model: MySortEntryType) => {
 		return element.getAttribute('data-sort-entry-id') === model.id;
 	},
 	querySelectModelToElement: (container: HTMLElement, modelEntry: MySortEntryType) => {
-		return container.querySelector('data-sort-entry-id=[' + modelEntry.id + ']');
+		return container.querySelector('[data-sort-entry-id=' + modelEntry.id + ']');
 	},
 	identifier: 'test-sorter',
 	itemSelector: 'li',
@@ -101,7 +101,13 @@ const MY_SORTER_CONFIG: UmbSorterConfig<MySortEntryType> = {...}
 
 
 export class MyElement extends UmbElementMixin(LitElement) {
-	#sorter = new UmbSorterController(this, MY_SORTER_CONFIG);
+	#sorter = new UmbSorterController(this, {...MY_SORTER_CONFIG,
+		onChange: ({ model }) => {
+			const oldValue = this.awesomeModel;
+			this.awesomeModel = model;
+			this.requestUpdate('awesomeModel', oldValue);
+		},
+	});
 
 	constructor() {
 		this.#sorter.setModel(awesomeModel);
@@ -176,11 +182,13 @@ export class MyElement extends UmbElementMixin(LitElement) {
 	#sorter = new UmbSorterController(this, {
 		...SORTER_CONFIG,
 		performItemInsert: ({ item, newIndex }) => {
-			console.log(item, newIndex);
-			// Perform some logic here to calculate the new sortOrder & save it.
+			// Insert logic that updates the model, so the item gets the new index in the model.
 			return true;
 		},
-		performItemRemove: () => true,
+		performItemRemove: () => {
+			// Insert logic that updates the model, so the item gets removed from the model.
+			return true;
+		},
 	});
 }
 ```

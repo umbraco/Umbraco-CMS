@@ -38,6 +38,7 @@ export class UmbMediaTypeWorkspaceViewEditElement extends UmbLitElement implemen
 
 	config: UmbSorterConfig<PropertyTypeContainerModelBaseModel> = {
 		...SORTER_CONFIG,
+		// TODO: Missing handlers for these: performItemRemove, performItemMove
 		performItemInsert: async (args) => {
 			if (!this._tabs) return false;
 			const oldIndex = this._tabs.findIndex((tab) => tab.id! === args.item.id);

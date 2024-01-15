@@ -16,7 +16,7 @@ const SORTER_CONFIG: UmbSorterConfig<MultipleTextStringValueItem> = {
 		return element.getAttribute('data-sort-entry-id') === model.value;
 	},
 	querySelectModelToElement: (container: HTMLElement, modelEntry: MultipleTextStringValueItem) => {
-		return container.querySelector('data-sort-entry-id=[' + modelEntry.value + ']');
+		return container.querySelector('[data-sort-entry-id=' + modelEntry.value + ']');
 	},
 	identifier: 'Umb.SorterIdentifier.ColorEditor',
 	itemSelector: 'umb-input-multiple-text-string-item',
@@ -30,21 +30,10 @@ const SORTER_CONFIG: UmbSorterConfig<MultipleTextStringValueItem> = {
 export class UmbInputMultipleTextStringElement extends FormControlMixin(UmbLitElement) {
 	#prevalueSorter = new UmbSorterController(this, {
 		...SORTER_CONFIG,
-
-		performItemInsert: (args) => {
-			const frozenArray = [...this.items];
-			const indexToMove = frozenArray.findIndex((x) => x.value === args.item.value);
-
-			frozenArray.splice(indexToMove, 1);
-			frozenArray.splice(args.newIndex, 0, args.item);
-			this.items = frozenArray;
-
-			this.dispatchEvent(new UmbChangeEvent());
-
-			return true;
-		},
-		performItemRemove: (args) => {
-			return true;
+		onChange: ({ model }) => {
+			const oldValue = this._items;
+			this._items = model;
+			this.requestUpdate('_items', oldValue);
 		},
 	});
 
