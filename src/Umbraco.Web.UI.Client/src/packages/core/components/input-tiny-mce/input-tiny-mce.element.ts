@@ -2,7 +2,6 @@ import { defaultFallbackConfig } from './input-tiny-mce.defaults.js';
 import { pastePreProcessHandler } from './input-tiny-mce.handlers.js';
 import { availableLanguages } from './input-tiny-mce.languages.js';
 import { uriAttributeSanitizer } from './input-tiny-mce.sanitizer.js';
-import { umbMeta } from '@umbraco-cms/backoffice/meta';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { type Editor, type RawEditorOptions, renderEditor } from '@umbraco-cms/backoffice/external/tinymce';
 import { TinyMcePluginArguments, UmbTinyMcePluginBase } from '@umbraco-cms/backoffice/components';
@@ -185,8 +184,6 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 		this._tinyConfig = {
 			autoresize_bottom_margin: 10,
 			body_class: 'umb-rte',
-			//see https://www.tiny.cloud/docs/tinymce/6/editor-important-options/#cache_suffix
-			cache_suffix: `?umb__rnd=${umbMeta.clientVersion}`,
 			contextMenu: false,
 			inline_boundaries_selector: 'a[href],code,.mce-annotation,.umb-embed-holder,.umb-macro-holder',
 			menubar: false,
