@@ -1,12 +1,13 @@
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.Json;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
+using JsonSerializer = Newtonsoft.Json.JsonSerializer;
 
 namespace Umbraco.Cms.Core.Configuration
 {
@@ -14,10 +15,12 @@ namespace Umbraco.Cms.Core.Configuration
     {
         private const string UmbracoConnectionStringPath = $"ConnectionStrings:{Cms.Core.Constants.System.UmbracoConnectionName}";
         private const string UmbracoConnectionStringProviderNamePath = UmbracoConnectionStringPath + ConnectionStrings.ProviderNamePostfix;
+        private const string ConnectionStringObjectName = "ConnectionStrings";
 
         private readonly IConfiguration _configuration;
         private readonly ILogger<JsonConfigManipulator> _logger;
         private readonly object _locker = new object();
+        private readonly SemaphoreSlim _lock = new(1, 1);
 
         public JsonConfigManipulator(IConfiguration configuration, ILogger<JsonConfigManipulator> logger)
         {
@@ -41,6 +44,37 @@ namespace Umbraco.Cms.Core.Configuration
             RemoveJsonKey(json, UmbracoConnectionStringProviderNamePath);
 
             SaveJson(provider, json);
+        }
+
+        public async Task RemoveConnectionStringAsync()
+        {
+            JsonConfigurationProvider? provider = GetJsonConfigurationProvider(UmbracoConnectionStringPath);
+
+            JsonNode? jsonNode = await GetJsonNodeAsync(provider);
+
+            if (jsonNode is null)
+            {
+                _logger.LogWarning("Failed to remove connection string from JSON configuration");
+                return;
+            }
+            // TODO: Finish me
+        }
+
+        public async Task SaveConnectionStringAsync(string connectionString, string? providerName)
+        {
+            JsonConfigurationProvider? provider = GetJsonConfigurationProvider();
+
+            JsonNode? jsonNode = await GetJsonNodeAsync(provider);
+
+            if (jsonNode is null)
+            {
+                _logger.LogWarning("Failed to save connection string in JSON configuration.");
+                return;
+            }
+
+            JsonObject connectionItem = CreateConnectionItem(connectionString, providerName);
+            jsonNode[ConnectionStringObjectName] = connectionItem;
+            await SaveJsonAsync(provider, jsonNode);
         }
 
         public void SaveConnectionString(string connectionString, string? providerName)
@@ -204,6 +238,22 @@ namespace Umbraco.Cms.Core.Configuration
             return writer.Token;
         }
 
+        private JsonObject CreateConnectionItem(string connectionString, string? providerName)
+        {
+            var connectionObject = new JsonObject
+            {
+                [Constants.System.UmbracoConnectionName] = connectionString,
+            };
+
+            if (string.IsNullOrEmpty(providerName))
+            {
+                return connectionObject;
+            }
+
+            connectionObject[Constants.System.UmbracoConnectionName + ConnectionStrings.ProviderNamePostfix] = providerName;
+            return connectionObject;
+        }
+
         private static void RemoveJsonKey(JObject? json, string key)
         {
             JToken? token = json;
@@ -247,6 +297,33 @@ namespace Umbraco.Cms.Core.Configuration
             }
         }
 
+        private async Task SaveJsonAsync(JsonConfigurationProvider? provider, JsonNode jsonNode)
+        {
+            if (provider is null)
+            {
+                return;
+            }
+
+            if (provider.Source.FileProvider is not PhysicalFileProvider physicalFileProvider)
+            {
+                return;
+            }
+
+            await _lock.WaitAsync();
+
+            try
+            {
+                var jsonFilePath = Path.Combine(physicalFileProvider.Root, provider.Source.Path!);
+                await using var jsonStream = new FileStream(jsonFilePath, FileMode.Create);
+                await using var writer = new Utf8JsonWriter(jsonStream, new JsonWriterOptions { Indented = true });
+                jsonNode.WriteTo(writer);
+            }
+            finally
+            {
+                _lock.Release();
+            }
+        }
+
         private JObject? GetJson(JsonConfigurationProvider? provider)
         {
             if (provider is null)
@@ -275,6 +352,37 @@ namespace Umbraco.Cms.Core.Configuration
                     _logger.LogWarning(exception, "JSON configuration could not be read: {path}", jsonFilePath);
                     return null;
                 }
+            }
+        }
+
+        private async Task<JsonNode?> GetJsonNodeAsync(JsonConfigurationProvider? provider)
+        {
+            if (provider is null)
+            {
+                return null;
+            }
+
+            await _lock.WaitAsync();
+            if (provider.Source.FileProvider is not PhysicalFileProvider physicalFileProvider)
+            {
+                return null;
+            }
+
+            var jsonFilePath = Path.Combine(physicalFileProvider.Root, provider.Source.Path!);
+
+            try
+            {
+                using var streamReader = new StreamReader(jsonFilePath);
+                return await JsonNode.ParseAsync(streamReader.BaseStream);
+            }
+            catch (IOException exception)
+            {
+                _logger.LogWarning(exception, "JSON configuration could not be read: {Path}", jsonFilePath);
+                return null;
+            }
+            finally
+            {
+                _lock.Release();
             }
         }
 
