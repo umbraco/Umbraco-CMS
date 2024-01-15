@@ -62,6 +62,9 @@ export class UmbInputMemberElement extends FormControlMixin(UmbLitElement) {
 		//this.#pickerContext.setSelection(ids);
 	}
 
+	@property({ type: Array })
+	filter?: string[] | undefined;
+
 	@property()
 	public set value(idsString: string) {
 		// Its with full purpose we don't call super.value, as thats being handled by the observation of the context selection.
@@ -93,10 +96,20 @@ export class UmbInputMemberElement extends FormControlMixin(UmbLitElement) {
 		// this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems));
 	}
 
+	#pickableFilter: (item: MemberItemResponseModel) => boolean = (item) => {
+		// TODO: Uncomment, once `UmbMemberPickerContext` has been implemented. [LK]
+		console.log('member.pickableFilter', item);
+		// 	if (this.filter && this.filter.length > 0) {
+		// 		return this.filter.includes(item.contentTypeId);
+		// 	}
+		return true;
+	};
+
 	protected _openPicker() {
 		console.log("member.openPicker");
 		// this.#pickerContext.openPicker({
 		// 	hideTreeRoot: true,
+		//	pickableFilter: this.#pickableFilter,
 		// });
 	}
 

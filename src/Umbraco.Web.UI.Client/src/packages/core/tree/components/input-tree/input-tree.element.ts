@@ -126,7 +126,7 @@ export class UmbInputTreeElement extends FormControlMixin(UmbLitElement) {
 	#renderMemberPicker() {
 		return html`<umb-input-member
 			.selectedIds=${this.selectedIds}
-			.filter=${this.filter}
+			.filter=${this._filter}
 			.min=${this.min}
 			.max=${this.max}
 			?showOpenButton=${this.showOpenButton}
