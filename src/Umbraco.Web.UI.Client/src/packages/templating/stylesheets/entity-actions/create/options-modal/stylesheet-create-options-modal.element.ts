@@ -33,6 +33,9 @@ export class UmbStylesheetCreateOptionsModalElement extends UmbModalBaseElement<
 		this.#createFolderAction = new UmbCreateFolderEntityAction(
 			this,
 			UMB_STYLESHEET_FOLDER_REPOSITORY_ALIAS,
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
+			// TODO: allow null for entity actions. Some actions can be executed on the root item
 			this.data.parentUnique,
 		);
 	}
