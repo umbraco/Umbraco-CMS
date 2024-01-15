@@ -15,8 +15,8 @@ export class UmbMediaTypeTreeRepository
 	}
 
 	async requestTreeRoot() {
-		const data = {
-			id: null,
+		const data: UmbMediaTypeTreeRootModel = {
+			unique: null,
 			entityType: UMB_MEDIA_TYPE_ROOT_ENTITY_TYPE,
 			name: 'Media Types',
 			icon: 'icon-folder',
