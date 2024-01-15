@@ -1,13 +1,15 @@
 ﻿using Umbraco.Cms.Api.Management.ViewModels.MediaType;
+using Umbraco.Cms.Api.Management.ViewModels.MediaType.Composition;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
 using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
-internal sealed class MediaTypeEditingPresentationFactory : ContentTypeEditingPresentationFactory, IMediaTypeEditingPresentationFactory
+internal sealed class MediaTypeEditingPresentationFactory : ContentTypeEditingPresentationFactory<IMediaType>, IMediaTypeEditingPresentationFactory
 {
-    public MediaTypeEditingPresentationFactory(IContentTypeService contentTypeService)
-        : base(contentTypeService)
+    public MediaTypeEditingPresentationFactory(IMediaTypeService mediaTypeService)
+        : base(mediaTypeService)
     {
     }
 
@@ -35,4 +37,7 @@ internal sealed class MediaTypeEditingPresentationFactory : ContentTypeEditingPr
             UpdateMediaTypePropertyTypeRequestModel,
             UpdateMediaTypePropertyTypeContainerRequestModel
         >(requestModel);
+
+    public IEnumerable<AvailableMediaTypeCompositionResponseModel> MapCompositionModels(IEnumerable<ContentTypeAvailableCompositionsResult> compositionResults)
+        => compositionResults.Select(MapCompositionModel<AvailableMediaTypeCompositionResponseModel>);
 }

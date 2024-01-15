@@ -6,11 +6,12 @@ using ContentTypeViewModels = Umbraco.Cms.Api.Management.ViewModels.ContentType;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
-internal abstract class ContentTypeEditingPresentationFactory
+internal abstract class ContentTypeEditingPresentationFactory<TContentType>
+    where TContentType : IContentTypeComposition
 {
-    private readonly IContentTypeService _contentTypeService;
+    private readonly IContentTypeBaseService<TContentType> _contentTypeService;
 
-    protected ContentTypeEditingPresentationFactory(IContentTypeService contentTypeService) // TODO: inject generic IContentTypeBaseService<IContentType> instead
+    protected ContentTypeEditingPresentationFactory(IContentTypeBaseService<TContentType> contentTypeService)
         => _contentTypeService = contentTypeService;
 
     protected TContentTypeEditingModel MapContentTypeEditingModel<
@@ -51,9 +52,9 @@ internal abstract class ContentTypeEditingPresentationFactory
         IContentTypeComposition composition = compositionResult.Composition;
         IEnumerable<string>? folders = null;
 
-        if (composition is IContentType contentType)
+        if (composition is TContentType contentType)
         {
-            var containers = _contentTypeService.GetContainers(contentType); // NB: different for media/member (media/member service)
+            var containers = _contentTypeService.GetContainers(contentType);
             folders = containers.Select(c => c.Name).WhereNotNull();
         }
 
