@@ -45,7 +45,12 @@ public class CreateDocumentController : DocumentControllerBase
     {
         AuthorizationResult authorizationResult  = await _authorizationService.AuthorizeResourceAsync(
             User,
-            ContentPermissionResource.WithKeys(ActionNew.ActionLetter, requestModel.ParentId),
+            ContentPermissionResource.WithKeys(
+                ActionNew.ActionLetter,
+                requestModel.ParentId,
+                requestModel.Variants
+                    .Where(v => v.Culture != null)
+                    .Select(v => v.Culture!)),
             AuthorizationPolicies.ContentPermissionByResource);
 
         if (!authorizationResult.Succeeded)

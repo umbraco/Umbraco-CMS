@@ -45,7 +45,12 @@ public class UpdateDocumentController : DocumentControllerBase
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,
-            ContentPermissionResource.WithKeys(ActionUpdate.ActionLetter, id),
+            ContentPermissionResource.WithKeys(
+                ActionUpdate.ActionLetter,
+                id,
+                requestModel.Variants
+                    .Where(v => v.Culture != null)
+                    .Select(v => v.Culture!)),
             AuthorizationPolicies.ContentPermissionByResource);
 
         if (!authorizationResult.Succeeded)

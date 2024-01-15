@@ -19,6 +19,18 @@ public class ContentPermissionResource : IPermissionResource
             : WithKeys(permissionToCheck, contentKey.Value.Yield());
 
     /// <summary>
+    ///     Creates a <see cref="ContentPermissionResource" /> with the specified permission and content key or root.
+    /// </summary>
+    /// <param name="permissionToCheck">The permission to check for.</param>
+    /// <param name="contentKey">The key of the content or null if root.</param>
+    /// <param name="cultures">The cultures to validate</param>
+    /// <returns>An instance of <see cref="ContentPermissionResource" />.</returns>
+    public static ContentPermissionResource WithKeys(char permissionToCheck, Guid? contentKey, IEnumerable<string> cultures) =>
+        contentKey is null
+            ? Root(permissionToCheck, cultures)
+            : WithKeys(permissionToCheck, contentKey.Value.Yield(), cultures);
+
+    /// <summary>
     ///     Creates a <see cref="ContentPermissionResource" /> with the specified permission and content keys.
     /// </summary>
     /// <param name="permissionToCheck">The permission to check for.</param>
@@ -92,12 +104,32 @@ public class ContentPermissionResource : IPermissionResource
         new ContentPermissionResource(Enumerable.Empty<Guid>(), new HashSet<char> { permissionToCheck }, true, false, null, null);
 
     /// <summary>
+    ///     Creates a <see cref="ContentPermissionResource" /> with the specified permission and the root.
+    /// </summary>
+    /// <param name="permissionToCheck">The permission to check for.</param>
+    /// <param name="cultures">The cultures to validate</param>
+    /// <returns>An instance of <see cref="ContentPermissionResource" />.</returns>
+    public static ContentPermissionResource Root(char permissionToCheck, IEnumerable<string> cultures) =>
+        new ContentPermissionResource(Enumerable.Empty<Guid>(), new HashSet<char> { permissionToCheck }, true, false, null, new HashSet<string>(cultures));
+
+    /// <summary>
     ///     Creates a <see cref="ContentPermissionResource" /> with the specified permissions and the root.
     /// </summary>
     /// <param name="permissionsToCheck">The permissions to check for.</param>
     /// <returns>An instance of <see cref="ContentPermissionResource" />.</returns>
     public static ContentPermissionResource Root(ISet<char> permissionsToCheck) =>
         new ContentPermissionResource(Enumerable.Empty<Guid>(), permissionsToCheck, true, false, null, null);
+
+    /// <summary>
+    ///     Creates a <see cref="ContentPermissionResource" /> with the specified permissions and the root.
+    /// </summary>
+    /// <param name="permissionsToCheck">The permissions to check for.</param>
+    /// <param name="cultures">The cultures to validate</param>
+    /// <returns>An instance of <see cref="ContentPermissionResource" />.</returns>
+    public static ContentPermissionResource Root(ISet<char> permissionsToCheck, IEnumerable<string> cultures) =>
+        new ContentPermissionResource(Enumerable.Empty<Guid>(), permissionsToCheck, true, false, null, new HashSet<string>(cultures));
+
+
 
     /// <summary>
     ///     Creates a <see cref="ContentPermissionResource" /> with the specified permissions and the recycle bin.
