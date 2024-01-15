@@ -171,7 +171,22 @@ export const data: Array<DocumentResponseModel> = [
 				alias: 'blockList',
 				culture: null,
 				segment: null,
-				value: null,
+				value: {
+					layout: {
+						'Umbraco.BlockList': [
+							{
+								contentUdi: '1234',
+							},
+						],
+					},
+					contentData: [
+						{
+							udi: '1234',
+							contentTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
+						},
+					],
+					settingsData: [],
+				},
 			},
 			{
 				alias: 'mediaPicker',

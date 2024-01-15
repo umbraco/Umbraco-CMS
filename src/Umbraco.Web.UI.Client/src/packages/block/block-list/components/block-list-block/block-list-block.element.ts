@@ -84,8 +84,7 @@ export class UmbPropertyEditorUIBlockListBlockElement extends UmbLitElement impl
 			}
 			uui-action-bar {
 				position: absolute;
-				top: 50%;
-				transform: translateY(-50%);
+				top: var(--uui-size-2);
 				right: var(--uui-size-2);
 			}
 		`,
