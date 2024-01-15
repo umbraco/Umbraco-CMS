@@ -12,11 +12,11 @@ export class UmbRefListBlockElement extends UUIRefNodeElement {
 		this.setAttribute('border', '');
 	}
 
-	styles = [
+	static styles = [
 		...UUIRefNodeElement.styles,
 		css`
 			:host {
-				min-height: 80px;
+				min-height: var(--uui-size-16);
 			}
 		`,
 	];

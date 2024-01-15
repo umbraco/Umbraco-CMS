@@ -43,7 +43,7 @@ export class UmbPropertyEditorUIBlockListBlockElement extends UmbLitElement impl
 			const modalContext = modalManager.open(UMB_CONFIRM_MODAL, {
 				data: {
 					headline: `Delete ${this._label}`,
-					content: 'Are you sure you want to delete this block?',
+					content: 'Are you sure you want to delete this [INSERT BLOCK TYPE NAME]?',
 					confirmLabel: 'Delete',
 					color: 'danger',
 				},
