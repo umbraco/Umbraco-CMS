@@ -1,4 +1,3 @@
-import { umbMeta } from '@umbraco-cms/backoffice/meta';
 import { defaultFallbackConfig } from './input-tiny-mce.defaults.js';
 import { pastePreProcessHandler } from './input-tiny-mce.handlers.js';
 import { availableLanguages } from './input-tiny-mce.languages.js';
