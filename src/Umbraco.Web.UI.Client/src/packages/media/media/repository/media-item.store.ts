@@ -11,10 +11,7 @@ import { MediaItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
  * @description - Data Store for Media items
  */
 
-export class UmbMediaItemStore
-	extends UmbStoreBase<MediaItemResponseModel>
-	implements UmbItemStore<MediaItemResponseModel>
-{
+export class UmbMediaItemStore extends UmbStoreBase<MediaItemResponseModel> {
 	/**
 	 * Creates an instance of UmbMediaItemStore.
 	 * @param {UmbControllerHostElement} host

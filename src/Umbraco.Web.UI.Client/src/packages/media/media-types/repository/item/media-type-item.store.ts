@@ -11,10 +11,7 @@ import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
  * @description - Data Store for Media Type items
  */
 
-export class UmbMediaTypeItemStore
-	extends UmbStoreBase<MediaTypeItemResponseModel>
-	implements UmbItemStore<MediaTypeItemResponseModel>
-{
+export class UmbMediaTypeItemStore extends UmbStoreBase<MediaTypeItemResponseModel> {
 	/**
 	 * Creates an instance of UmbMediaTypeItemStore.
 	 * @param {UmbControllerHostElement} host
