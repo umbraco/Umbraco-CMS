@@ -1,9 +1,10 @@
 import { UmbStylesheetWorkspaceContext } from './stylesheet-workspace.context.js';
-import { UUIInputElement, UUIInputEvent, UUITextStyles } from '@umbraco-cms/backoffice/external/uui';
+import { UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { Subject, debounceTime } from '@umbraco-cms/backoffice/external/rxjs';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 @customElement('umb-stylesheet-workspace-editor')
 export class UmbStylesheetWorkspaceEditorElement extends UmbLitElement {
@@ -87,7 +88,7 @@ export class UmbStylesheetWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	static styles = [
-		UUITextStyles,
+		UmbTextStyles,
 		css`
 			:host {
 				display: block;
