@@ -11,10 +11,8 @@ import type { UserGroupItemResponseModel } from '@umbraco-cms/backoffice/backend
  * @description - Data Store for user group items
  */
 
-export class UmbUserGroupItemStore
-	extends UmbStoreBase<UserGroupItemResponseModel>
-	implements UmbItemStore<UserGroupItemResponseModel>
-{
+// TODO: add UmbItemStoreInterface when changed to uniques
+export class UmbUserGroupItemStore extends UmbStoreBase<UserGroupItemResponseModel> {
 	/**
 	 * Creates an instance of UmbUserGroupItemStore.
 	 * @param {UmbControllerHostElement} host

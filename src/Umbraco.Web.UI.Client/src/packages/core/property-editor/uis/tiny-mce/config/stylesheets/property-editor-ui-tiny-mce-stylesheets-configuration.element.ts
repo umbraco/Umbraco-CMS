@@ -1,9 +1,10 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbStylesheetDetailRepository } from '@umbraco-cms/backoffice/stylesheet';
-import { StylesheetOverviewResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import {
+	UmbPropertyEditorConfigCollection,
+	UmbPropertyValueChangeEvent,
+} from '@umbraco-cms/backoffice/property-editor';
 import { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 
 /**
@@ -20,30 +21,8 @@ export class UmbPropertyEditorUITinyMceStylesheetsConfigurationElement
 	@property({ type: Object, attribute: false })
 	public config?: UmbPropertyEditorConfigCollection;
 
-	@state()
-	stylesheetList: Array<StylesheetOverviewResponseModel & Partial<{ selected: boolean }>> = [];
-
-	#repository;
-
-	constructor() {
-		super();
-		this.#repository = new UmbStylesheetDetailRepository(this);
-
-		this.#getAllStylesheets();
-	}
-	async #getAllStylesheets() {
-		const { data } = await this.#repository.getAll();
-		if (!data) return;
-
-		const styles = data.items;
-
-		this.stylesheetList = styles.map((stylesheet) => ({
-			...stylesheet,
-			selected: this.value?.some((path) => path === stylesheet.path),
-		}));
-	}
-
 	#onChange(event: CustomEvent) {
+		debugger;
 		const checkbox = event.target as HTMLInputElement;
 
 		if (checkbox.checked) {
@@ -56,36 +35,14 @@ export class UmbPropertyEditorUITinyMceStylesheetsConfigurationElement
 			this.value = this.value.filter((v) => v !== checkbox.value);
 		}
 
-		this.dispatchEvent(new CustomEvent('property-value-change'));
+		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
 	render() {
-		return html`<ul>
-			${this.stylesheetList.map(
-				(stylesheet) =>
-					html`<li>
-						<uui-checkbox
-							.label=${stylesheet.name}
-							.value=${stylesheet.path ?? ''}
-							@change=${this.#onChange}
-							?checked=${stylesheet.selected}>
-							${stylesheet.name}
-						</uui-checkbox>
-					</li>`,
-			)}
-		</ul>`;
+		return html`<umb-stylesheet-input></umb-stylesheet-input>`;
 	}
 
-	static styles = [
-		UmbTextStyles,
-		css`
-			ul {
-				list-style: none;
-				padding: 0;
-				margin: 0;
-			}
-		`,
-	];
+	static styles = [UmbTextStyles, css``];
 }
 
 export default UmbPropertyEditorUITinyMceStylesheetsConfigurationElement;

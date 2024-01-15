@@ -11,10 +11,8 @@ import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
  * @description - Data Store for user items
  */
 
-export class UmbUserItemStore
-	extends UmbStoreBase<UserItemResponseModel>
-	implements UmbItemStore<UserItemResponseModel>
-{
+// TODO: add UmbItemStoreInterface when changed to uniques
+export class UmbUserItemStore extends UmbStoreBase<UserItemResponseModel> {
 	/**
 	 * Creates an instance of UmbUserItemStore.
 	 * @param {UmbControllerHostElement} host

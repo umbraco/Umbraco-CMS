@@ -1,3 +1,4 @@
+import { UmbServerFilePathUniqueSerializer } from '@umbraco-cms/backoffice/server-file-system';
 import { UmbStylesheetCollectionFilterModel, UmbStylesheetCollectionItemModel } from '../types.js';
 import type { UmbCollectionDataSource } from '@umbraco-cms/backoffice/repository';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -14,6 +15,7 @@ export class UmbStylesheetCollectionServerDataSource
 	implements UmbCollectionDataSource<UmbStylesheetCollectionItemModel>
 {
 	#host: UmbControllerHost;
+	#serverFilePathUniqueSerializer = new UmbServerFilePathUniqueSerializer();
 
 	/**
 	 * Creates an instance of UmbStylesheetCollectionServerDataSource.
@@ -24,7 +26,26 @@ export class UmbStylesheetCollectionServerDataSource
 		this.#host = host;
 	}
 
-	getCollection(filter: UmbStylesheetCollectionFilterModel) {
-		return tryExecuteAndNotify(this.#host, StylesheetResource.getStylesheetAll(filter));
+	/**
+	 * Gets the stylesheet collection items from the server
+	 * @param {UmbStylesheetCollectionFilterModel} filter
+	 * @return {*}
+	 * @memberof UmbStylesheetCollectionServerDataSource
+	 */
+	async getCollection(filter: UmbStylesheetCollectionFilterModel) {
+		const { data, error } = await tryExecuteAndNotify(this.#host, StylesheetResource.getStylesheetOverview(filter));
+
+		if (data) {
+			const items: Array<UmbStylesheetCollectionItemModel> = data.items.map((item) => {
+				return {
+					name: item.name,
+					unique: this.#serverFilePathUniqueSerializer.toUnique(item.path),
+				};
+			});
+
+			return { data: { items, total: data.total } };
+		}
+
+		return { error };
 	}
 }

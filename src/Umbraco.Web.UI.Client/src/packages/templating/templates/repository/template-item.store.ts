@@ -11,10 +11,7 @@ import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
  * @description - Data Store for Template items
  */
 
-export class UmbTemplateItemStore
-	extends UmbStoreBase<TemplateItemResponseModel>
-	implements UmbItemStore<TemplateItemResponseModel>
-{
+export class UmbTemplateItemStore extends UmbStoreBase<TemplateItemResponseModel> {
 	/**
 	 * Creates an instance of UmbTemplateItemStore.
 	 * @param {UmbControllerHostElement} host

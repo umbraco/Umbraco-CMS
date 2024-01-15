@@ -1,4 +1,4 @@
-import { UmbStylesheetEntityType } from './entity.js';
+import { UmbStylesheetEntityType, UmbStylesheetFolderEntityType } from './entity.js';
 
 export interface UmbStylesheetDetailModel {
 	entityType: UmbStylesheetEntityType;
@@ -7,6 +7,14 @@ export interface UmbStylesheetDetailModel {
 	path: string;
 	name: string;
 	content: string;
+}
+
+export interface UmbStylesheetItemModel {
+	entityType: UmbStylesheetEntityType | UmbStylesheetFolderEntityType;
+	unique: string;
+	parentUnique: string | null;
+	name: string;
+	isFolder: boolean;
 }
 
 export interface UmbStylesheetRule {

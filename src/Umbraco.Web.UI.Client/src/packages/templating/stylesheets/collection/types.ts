@@ -12,5 +12,5 @@ export interface UmbStylesheetCollectionFilterModel {
 
 export interface UmbStylesheetCollectionItemModel {
 	name: string;
-	path: string;
+	unique: string;
 }
