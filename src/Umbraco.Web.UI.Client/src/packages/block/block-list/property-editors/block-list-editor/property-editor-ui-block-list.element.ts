@@ -38,7 +38,7 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 		return this._value;
 	}
 	public set value(value: UmbBlockListValueModel | undefined) {
-		const buildUpValue: Partial<UmbBlockListValueModel> = { ...value } ?? {};
+		const buildUpValue: Partial<UmbBlockListValueModel> = value ? { ...value } : {};
 		buildUpValue.layout ??= {};
 		buildUpValue.contentData ??= [];
 		buildUpValue.settingsData ??= [];
