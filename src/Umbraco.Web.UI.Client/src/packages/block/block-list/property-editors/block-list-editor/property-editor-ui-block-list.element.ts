@@ -16,6 +16,7 @@ import { buildUdi } from '@umbraco-cms/backoffice/utils';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { NumberRangeValueType } from '@umbraco-cms/backoffice/models';
 import { UMB_MODAL_MANAGER_CONTEXT_TOKEN, UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 export interface UmbBlockListLayoutModel extends UmbBlockLayoutBaseModel {}
 
@@ -37,7 +38,7 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 		return this._value;
 	}
 	public set value(value: UmbBlockListValueModel | undefined) {
-		const buildUpValue: Partial<UmbBlockListValueModel> = value ?? {};
+		const buildUpValue: Partial<UmbBlockListValueModel> = { ...value } ?? {};
 		buildUpValue.layout ??= {};
 		buildUpValue.contentData ??= [];
 		buildUpValue.settingsData ??= [];
@@ -88,22 +89,25 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 
 		// TODO: Prevent initial notification from these observes:
 		this.observe(this.#context.layouts, (layouts) => {
-			this._value.layout[UMB_BLOCK_LIST_PROPERTY_EDITOR_ALIAS] = layouts;
+			this._value = { ...this._value, layout: { [UMB_BLOCK_LIST_PROPERTY_EDITOR_ALIAS]: layouts } };
 			// Notify that the value has changed.
 			//console.log('layout changed', this._value);
 
 			// TODO: idea: consider inserting an await here, so other changes could appear first? Maybe some mechanism to only fire change event onces?
 			this._layouts = layouts;
+			this.dispatchEvent(new UmbChangeEvent());
 		});
 		this.observe(this.#context.contents, (contents) => {
-			this._value.contentData = contents;
+			this._value = { ...this._value, contentData: contents };
 			// Notify that the value has changed.
 			//console.log('content changed', this._value);
+			this.dispatchEvent(new UmbChangeEvent());
 		});
 		this.observe(this.#context.settings, (settings) => {
-			this._value.settingsData = settings;
+			this._value = { ...this._value, settingsData: settings };
 			// Notify that the value has changed.
 			//console.log('settings changed', this._value);
+			this.dispatchEvent(new UmbChangeEvent());
 		});
 		this.observe(this.#context.blockTypes, (blockTypes) => {
 			this._blocks = blockTypes;
