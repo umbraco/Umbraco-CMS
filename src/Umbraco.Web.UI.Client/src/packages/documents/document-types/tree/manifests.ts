@@ -1,3 +1,4 @@
+import { UMB_DOCUMENT_TYPE_ENTITY_TYPE, UMB_DOCUMENT_TYPE_ROOT_ENTITY_TYPE } from '../entity.js';
 import { UmbDocumentTypeTreeRepository } from './document-type-tree.repository.js';
 import { UmbDocumentTypeTreeStore } from './document-type.tree.store.js';
 import type {
@@ -36,11 +37,11 @@ const tree: ManifestTree = {
 
 const treeItem: ManifestTreeItem = {
 	type: 'treeItem',
-	kind: 'entity',
+	kind: 'unique',
 	alias: 'Umb.TreeItem.DocumentType',
 	name: 'Document Type Tree Item',
 	meta: {
-		entityTypes: ['document-type-root', 'document-type'],
+		entityTypes: [UMB_DOCUMENT_TYPE_ROOT_ENTITY_TYPE, UMB_DOCUMENT_TYPE_ENTITY_TYPE],
 	},
 };
 
