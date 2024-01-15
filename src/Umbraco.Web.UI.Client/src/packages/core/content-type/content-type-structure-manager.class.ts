@@ -1,10 +1,10 @@
+import { UmbContentTypeModel } from './types.js';
 import { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type {
 	DocumentTypePropertyTypeResponseModel,
 	PropertyTypeContainerModelBaseModel,
 	PropertyTypeModelBaseModel,
-	DocumentTypeResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { type UmbControllerHost, type UmbController } from '@umbraco-cms/backoffice/controller-api';
 import {
@@ -19,20 +19,16 @@ import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 
 export type PropertyContainerTypes = 'Group' | 'Tab';
 
-type T = DocumentTypeResponseModel;
-
 // TODO: get this type from the repository, or use some generic type.
 // TODO: Make this a controller on its own:
-export class UmbContentTypePropertyStructureManager<
-	R extends UmbDetailRepository<T> = UmbDetailRepository<T>,
-> extends UmbBaseController {
+export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeModel> extends UmbBaseController {
 	#init!: Promise<unknown>;
 
-	#contentTypeRepository: R;
+	#contentTypeRepository: UmbDetailRepository<T>;
 
 	#ownerContentTypeId?: string;
 	#contentTypeObservers = new Array<UmbController>();
-	#contentTypes = new UmbArrayState<T>([], (x) => x.id);
+	#contentTypes = new UmbArrayState<T>([], (x) => x.unique);
 	readonly contentTypes = this.#contentTypes.asObservable();
 	private readonly _contentTypeContainers = this.#contentTypes.asObservablePart((x) =>
 		x.flatMap((x) => x.containers ?? []),
@@ -41,7 +37,7 @@ export class UmbContentTypePropertyStructureManager<
 	#containers: UmbArrayState<PropertyTypeContainerModelBaseModel> =
 		new UmbArrayState<PropertyTypeContainerModelBaseModel>([], (x) => x.id);
 
-	constructor(host: UmbControllerHost, typeRepository: R) {
+	constructor(host: UmbControllerHost, typeRepository: UmbDetailRepository<T>) {
 		super(host);
 		this.#contentTypeRepository = typeRepository;
 
@@ -78,7 +74,7 @@ export class UmbContentTypePropertyStructureManager<
 		const { data } = await this.#contentTypeRepository.createScaffold(parentId);
 		if (!data) return {};
 
-		this.#ownerContentTypeId = data.id;
+		this.#ownerContentTypeId = data.unique;
 
 		this.#init = this._observeContentType(data);
 		await this.#init;
@@ -87,35 +83,35 @@ export class UmbContentTypePropertyStructureManager<
 
 	public async save() {
 		const contentType = this.getOwnerContentType();
-		if (!contentType || !contentType.id) return false;
+		if (!contentType || !contentType.unique) return false;
 
-		await this.#contentTypeRepository.save(contentType.id, contentType);
+		await this.#contentTypeRepository.save(contentType);
 
 		return true;
 	}
 
 	public async create() {
 		const contentType = this.getOwnerContentType();
-		if (!contentType || !contentType.id) return false;
+		if (!contentType || !contentType.unique) return false;
 
 		const { data } = await this.#contentTypeRepository.create(contentType);
 		if (!data) return false;
 
-		await this.loadType(data.id);
+		await this.loadType(data.unique);
 
 		return true;
 	}
 
-	private async _ensureType(id?: string) {
-		if (!id) return;
-		if (this.#contentTypes.getValue().find((x) => x.id === id)) return;
-		await this._loadType(id);
+	private async _ensureType(unique?: string) {
+		if (!unique) return;
+		if (this.#contentTypes.getValue().find((x) => x.unique === unique)) return;
+		await this._loadType(unique);
 	}
 
-	private async _loadType(id?: string) {
-		if (!id) return {};
+	private async _loadType(unique?: string) {
+		if (!unique) return {};
 
-		const { data } = await this.#contentTypeRepository.requestById(id);
+		const { data } = await this.#contentTypeRepository.requestByUnique(unique);
 		if (!data) return {};
 
 		await this._observeContentType(data);
@@ -123,13 +119,13 @@ export class UmbContentTypePropertyStructureManager<
 	}
 
 	private async _observeContentType(data: T) {
-		if (!data.id) return;
+		if (!data.unique) return;
 
 		// Load inherited and composed types:
 		this._loadContentTypeCompositions(data);
 
 		this.#contentTypeObservers.push(
-			this.observe(await this.#contentTypeRepository.byId(data.id), (docType) => {
+			this.observe(await this.#contentTypeRepository.byUnique(data.unique), (docType) => {
 				if (docType) {
 					// TODO: Handle if there was changes made to the owner document type in this context.
 					/*
@@ -150,11 +146,11 @@ export class UmbContentTypePropertyStructureManager<
 	/** Public methods for consuming structure: */
 
 	ownerContentType() {
-		return this.#contentTypes.asObservablePart((x) => x.find((y) => y.id === this.#ownerContentTypeId));
+		return this.#contentTypes.asObservablePart((x) => x.find((y) => y.unique === this.#ownerContentTypeId));
 	}
 
 	getOwnerContentType() {
-		return this.#contentTypes.getValue().find((y) => y.id === this.#ownerContentTypeId);
+		return this.#contentTypes.getValue().find((y) => y.unique === this.#ownerContentTypeId);
 	}
 
 	updateOwnerContentType(entry: Partial<T>) {
@@ -164,13 +160,13 @@ export class UmbContentTypePropertyStructureManager<
 	// We could move the actions to another class?
 
 	async createContainer(
-		contentTypeId: string | null,
+		contentTypeUnique: string | null,
 		parentId: string | null = null,
 		type: PropertyContainerTypes = 'Group',
 		sortOrder?: number,
 	) {
 		await this.#init;
-		contentTypeId = contentTypeId ?? this.#ownerContentTypeId!;
+		contentTypeUnique = contentTypeUnique ?? this.#ownerContentTypeId!;
 
 		const container: PropertyTypeContainerModelBaseModel = {
 			id: UmbId.new(),
@@ -180,10 +176,12 @@ export class UmbContentTypePropertyStructureManager<
 			sortOrder: sortOrder ?? 0,
 		};
 
-		const containers = [...(this.#contentTypes.getValue().find((x) => x.id === contentTypeId)?.containers ?? [])];
+		const containers = [
+			...(this.#contentTypes.getValue().find((x) => x.unique === contentTypeUnique)?.containers ?? []),
+		];
 		containers.push(container);
 
-		this.#contentTypes.updateOne(contentTypeId, { containers });
+		this.#contentTypes.updateOne(contentTypeUnique, { containers });
 
 		return container;
 	}
@@ -192,7 +190,7 @@ export class UmbContentTypePropertyStructureManager<
 		await this.#init;
 		contentTypeId = contentTypeId ?? this.#ownerContentTypeId!;
 
-		const frozenContainers = this.#contentTypes.getValue().find((x) => x.id === contentTypeId)?.containers ?? [];
+		const frozenContainers = this.#contentTypes.getValue().find((x) => x.unique === contentTypeId)?.containers ?? [];
 
 		const containers = appendToFrozenArray(frozenContainers, container, (x) => x.id === container.id);
 
@@ -226,7 +224,7 @@ export class UmbContentTypePropertyStructureManager<
 		await this.#init;
 		contentTypeId = contentTypeId ?? this.#ownerContentTypeId!;
 
-		const frozenContainers = this.#contentTypes.getValue().find((x) => x.id === contentTypeId)?.containers ?? [];
+		const frozenContainers = this.#contentTypes.getValue().find((x) => x.unique === contentTypeId)?.containers ?? [];
 
 		const containers = partialUpdateFrozenArray(frozenContainers, partialUpdate, (x) => x.id === containerId);
 
@@ -237,7 +235,7 @@ export class UmbContentTypePropertyStructureManager<
 		await this.#init;
 		contentTypeId = contentTypeId ?? this.#ownerContentTypeId!;
 
-		const frozenContainers = this.#contentTypes.getValue().find((x) => x.id === contentTypeId)?.containers ?? [];
+		const frozenContainers = this.#contentTypes.getValue().find((x) => x.unique === contentTypeId)?.containers ?? [];
 		const containers = frozenContainers.filter((x) => x.id !== containerId);
 
 		this.#contentTypes.updateOne(contentTypeId, { containers });
@@ -274,7 +272,7 @@ export class UmbContentTypePropertyStructureManager<
 
 		const property: PropertyTypeModelBaseModel = this.createPropertyScaffold(containerId, sortOrder);
 
-		const properties = [...(this.#contentTypes.getValue().find((x) => x.id === contentTypeId)?.properties ?? [])];
+		const properties = [...(this.#contentTypes.getValue().find((x) => x.unique === contentTypeId)?.properties ?? [])];
 		properties.push(property);
 
 		this.#contentTypes.updateOne(contentTypeId, { properties });
@@ -286,7 +284,7 @@ export class UmbContentTypePropertyStructureManager<
 		await this.#init;
 		contentTypeId = contentTypeId ?? this.#ownerContentTypeId!;
 
-		const frozenProperties = this.#contentTypes.getValue().find((x) => x.id === contentTypeId)?.properties ?? [];
+		const frozenProperties = this.#contentTypes.getValue().find((x) => x.unique === contentTypeId)?.properties ?? [];
 
 		const properties = appendToFrozenArray(frozenProperties, property, (x) => x.id === property.id);
 
@@ -297,7 +295,7 @@ export class UmbContentTypePropertyStructureManager<
 		await this.#init;
 		contentTypeId = contentTypeId ?? this.#ownerContentTypeId!;
 
-		const frozenProperties = this.#contentTypes.getValue().find((x) => x.id === contentTypeId)?.properties ?? [];
+		const frozenProperties = this.#contentTypes.getValue().find((x) => x.unique === contentTypeId)?.properties ?? [];
 
 		const properties = filterFrozenArray(frozenProperties, (x) => x.id !== propertyId);
 
@@ -312,7 +310,7 @@ export class UmbContentTypePropertyStructureManager<
 		await this.#init;
 		contentTypeId = contentTypeId ?? this.#ownerContentTypeId!;
 
-		const frozenProperties = this.#contentTypes.getValue().find((x) => x.id === contentTypeId)?.properties ?? [];
+		const frozenProperties = this.#contentTypes.getValue().find((x) => x.unique === contentTypeId)?.properties ?? [];
 
 		const properties = partialUpdateFrozenArray(frozenProperties, partialUpdate, (x) => x.id === propertyId);
 
@@ -369,7 +367,7 @@ export class UmbContentTypePropertyStructureManager<
 
 	ownerContentTypeObservablePart<PartResult>(mappingFunction: MappingFunction<T, PartResult>) {
 		return this.#contentTypes.asObservablePart((docTypes) => {
-			const docType = docTypes.find((x) => x.id === this.#ownerContentTypeId);
+			const docType = docTypes.find((x) => x.unique === this.#ownerContentTypeId);
 			return docType ? mappingFunction(docType) : undefined;
 		});
 	}

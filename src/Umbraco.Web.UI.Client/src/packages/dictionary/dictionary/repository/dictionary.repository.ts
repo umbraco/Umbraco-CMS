@@ -3,27 +3,15 @@ import { UmbDictionaryStore, UMB_DICTIONARY_STORE_CONTEXT_TOKEN } from './dictio
 import { UmbDictionaryDetailServerDataSource } from './sources/dictionary-detail.server.data-source.js';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
-import { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
 import {
 	CreateDictionaryItemRequestModel,
-	DictionaryItemResponseModel,
 	UpdateDictionaryItemRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import { UmbTemporaryFileRepository } from '@umbraco-cms/backoffice/temporary-file';
 
-export class UmbDictionaryRepository
-	extends UmbBaseController
-	implements
-		UmbDetailRepository<
-			CreateDictionaryItemRequestModel,
-			string,
-			UpdateDictionaryItemRequestModel,
-			DictionaryItemResponseModel
-		>,
-		UmbApi
-{
+export class UmbDictionaryRepository extends UmbBaseController implements UmbApi {
 	#init!: Promise<unknown>;
 
 	#treeStore?: UmbDictionaryTreeStore;

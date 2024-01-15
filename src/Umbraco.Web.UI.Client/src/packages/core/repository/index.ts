@@ -1,5 +1,5 @@
 export * from './data-source/index.js';
-export * from './detail-repository.interface.js';
+export * from './detail/detail-repository.interface.js';
 export * from './collection-repository.interface.js';
 export * from './move-repository.interface.js';
 export * from './copy-repository.interface.js';

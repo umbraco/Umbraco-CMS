@@ -1,5 +1,6 @@
 import { UmbRepositoryBase } from '../repository-base.js';
 import { UmbDetailDataSource, UmbDetailDataSourceConstructor } from './detail-data-source.interface.js';
+import { UmbDetailRepository } from './detail-repository.interface.js';
 import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_NOTIFICATION_CONTEXT_TOKEN, UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
@@ -10,7 +11,7 @@ export abstract class UmbDetailRepositoryBase<
 		DetailModelType extends { unique: string; entityType: string; parentUnique: string | null },
 	>
 	extends UmbRepositoryBase
-	implements UmbApi
+	implements UmbDetailRepository<DetailModelType>, UmbApi
 {
 	#init: Promise<unknown>;
 

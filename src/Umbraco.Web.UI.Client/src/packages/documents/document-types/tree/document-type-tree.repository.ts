@@ -1,4 +1,4 @@
-import { UMB_DOCUMENT_TYPE_ROOT_ENTITY_TYPE } from '../index.js';
+import { UMB_DOCUMENT_TYPE_ROOT_ENTITY_TYPE } from '../entity.js';
 import { UmbDocumentTypeTreeServerDataSource } from './document-type.tree.server.data-source.js';
 import { UMB_DOCUMENT_TYPE_TREE_STORE_CONTEXT } from './document-type.tree.store.js';
 import { UmbDocumentTypeTreeItemModel, UmbDocumentTypeTreeRootModel } from './types.js';

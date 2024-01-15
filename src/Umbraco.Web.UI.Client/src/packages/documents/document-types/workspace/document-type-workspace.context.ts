@@ -1,18 +1,15 @@
 import { UmbDocumentTypeDetailRepository } from '../repository/detail/document-type-detail.repository.js';
+import { UmbDocumentTypeDetailModel } from '../types.js';
 import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
 import {
 	UmbEditableWorkspaceContextBase,
 	UmbSaveableWorkspaceContextInterface,
 } from '@umbraco-cms/backoffice/workspace';
-import type {
-	ContentTypeCompositionModel,
-	ContentTypeSortModel,
-	DocumentTypeResponseModel,
-} from '@umbraco-cms/backoffice/backend-api';
+import type { ContentTypeCompositionModel, ContentTypeSortModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 
-type EntityType = DocumentTypeResponseModel;
+type EntityType = UmbDocumentTypeDetailModel;
 export class UmbDocumentTypeWorkspaceContext
 	extends UmbEditableWorkspaceContextBase<UmbDocumentTypeDetailRepository, EntityType>
 	implements UmbSaveableWorkspaceContextInterface
@@ -46,7 +43,7 @@ export class UmbDocumentTypeWorkspaceContext
 	constructor(host: UmbControllerHostElement) {
 		super(host, 'Umb.Workspace.DocumentType', new UmbDocumentTypeDetailRepository(host));
 
-		this.structure = new UmbContentTypePropertyStructureManager(this.host, this.repository);
+		this.structure = new UmbContentTypePropertyStructureManager<UmbDocumentTypeDetailModel>(this.host, this.repository);
 
 		// General for content types:
 		this.data = this.structure.ownerContentType;
@@ -80,7 +77,7 @@ export class UmbDocumentTypeWorkspaceContext
 	}
 
 	getEntityId() {
-		return this.getData()?.id;
+		return this.getData()?.unique;
 	}
 
 	getEntityType() {
