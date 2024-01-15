@@ -31,9 +31,9 @@ namespace Umbraco.Cms.Core.Configuration
         public void RemoveConnectionString()
         {
             // Remove keys from JSON
-            var provider = GetJsonConfigurationProvider(UmbracoConnectionStringPath);
+            JsonConfigurationProvider? provider = GetJsonConfigurationProvider(UmbracoConnectionStringPath);
 
-            var json = GetJson(provider);
+            JObject? json = GetJson(provider);
             if (json is null)
             {
                 _logger.LogWarning("Failed to remove connection string from JSON configuration.");
@@ -49,7 +49,7 @@ namespace Umbraco.Cms.Core.Configuration
         public void SaveConnectionString(string connectionString, string? providerName)
         {
             // Save keys to JSON
-            var provider = GetJsonConfigurationProvider();
+            JsonConfigurationProvider? provider = GetJsonConfigurationProvider();
 
             var json = GetJson(provider);
             if (json is null)
@@ -285,7 +285,7 @@ namespace Umbraco.Cms.Core.Configuration
         {
             if (_configuration is IConfigurationRoot configurationRoot)
             {
-                foreach (var provider in configurationRoot.Providers)
+                foreach (IConfigurationProvider provider in configurationRoot.Providers)
                 {
                     if (provider is JsonConfigurationProvider jsonConfigurationProvider &&
                         (requiredKey is null || provider.TryGet(requiredKey, out _)))
