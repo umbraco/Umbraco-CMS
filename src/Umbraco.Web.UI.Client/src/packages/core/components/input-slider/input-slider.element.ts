@@ -28,7 +28,7 @@ export class UmbInputSliderElement extends FormControlMixin(UmbLitElement) {
 
 	#onChange(e: UUISliderEvent) {
 		e.stopPropagation();
-		super.value = e.target.value;
+		this.value = e.target.value;
 		this.dispatchEvent(new CustomEvent('change', { bubbles: true, composed: true }));
 	}
 
