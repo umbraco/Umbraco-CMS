@@ -153,7 +153,7 @@ export class UmbInputDocumentTypeElement extends FormControlMixin(UmbLitElement)
 				>${repeat(
 					this._items,
 					(item) => item.id,
-					(item) => this._renderItem(item),
+					(item) => this.#renderItem(item),
 				)}</uui-ref-list
 			>
 		`;
@@ -172,10 +172,11 @@ export class UmbInputDocumentTypeElement extends FormControlMixin(UmbLitElement)
 		`;
 	}
 
-	private _renderItem(item: DocumentTypeItemResponseModel) {
+	#renderItem(item: DocumentTypeItemResponseModel) {
 		if (!item.id) return;
 		return html`
 			<uui-ref-node-document-type name=${ifDefined(item.name)}>
+				${this.#renderIcon(item)}
 				<uui-action-bar slot="actions">
 					<uui-button
 						compact
@@ -192,6 +193,11 @@ export class UmbInputDocumentTypeElement extends FormControlMixin(UmbLitElement)
 				</uui-action-bar>
 			</uui-ref-node-document-type>
 		`;
+	}
+
+	#renderIcon(item: DocumentTypeItemResponseModel) {
+		if (!item.icon) return;
+		return html`<uui-icon slot="icon" name=${item.icon}></uui-icon>`;
 	}
 
 	static styles = [
