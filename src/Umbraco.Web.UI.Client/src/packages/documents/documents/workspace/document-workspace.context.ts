@@ -17,7 +17,7 @@ import {
 	UmbObjectState,
 	UmbObserverController,
 } from '@umbraco-cms/backoffice/observable-api';
-import { UmbControllerHost, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 type EntityType = DocumentResponseModel;
 export class UmbDocumentWorkspaceContext
@@ -50,15 +50,12 @@ export class UmbDocumentWorkspaceContext
 	readonly structure;
 	readonly splitView;
 
-	constructor(host: UmbControllerHostElement) {
+	constructor(host: UmbControllerHost) {
 		// TODO: Get Workspace Alias via Manifest.
 		super(host, 'Umb.Workspace.Document', new UmbDocumentRepository(host));
 
-		this.structure = new UmbContentTypePropertyStructureManager(
-			this.host,
-			new UmbDocumentTypeDetailRepository(this.host),
-		);
-		this.splitView = new UmbWorkspaceSplitViewManager(this.host);
+		this.structure = new UmbContentTypePropertyStructureManager(this, new UmbDocumentTypeDetailRepository(this));
+		this.splitView = new UmbWorkspaceSplitViewManager();
 
 		new UmbObserverController(this.host, this.documentTypeKey, (id) => this.structure.loadType(id));
 
