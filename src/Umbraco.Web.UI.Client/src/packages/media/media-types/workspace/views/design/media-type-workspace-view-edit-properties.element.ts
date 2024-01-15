@@ -18,7 +18,7 @@ const SORTER_CONFIG: UmbSorterConfig<MediaTypePropertyTypeResponseModel> = {
 		return element.getAttribute('data-umb-property-id') === model.id;
 	},
 	querySelectModelToElement: (container: HTMLElement, modelEntry: MediaTypePropertyTypeResponseModel) => {
-		return container.querySelector('data-umb-property-id=[' + modelEntry.id + ']');
+		return container.querySelector('[data-umb-property-id=' + modelEntry.id + ']');
 	},
 	identifier: 'content-type-property-sorter',
 	itemSelector: '[data-umb-property-id]',
@@ -44,6 +44,19 @@ export class UmbMediaTypeWorkspaceViewEditPropertiesElement extends UmbLitElemen
 		},
 		performItemRemove: (args) => {
 			return this._propertyStructureHelper.removeProperty(args.item.id!);
+		},
+		performItemMove: (args) => {
+			this._propertyStructureHelper.removeProperty(args.item.id!);
+			let sortOrder = 0;
+			if (this._propertyStructure.length > 0) {
+				if (args.newIndex === 0) {
+					sortOrder = (this._propertyStructure[0].sortOrder ?? 0) - 1;
+				} else {
+					sortOrder =
+						(this._propertyStructure[Math.min(args.newIndex, this._propertyStructure.length - 1)].sortOrder ?? 0) + 1;
+				}
+			}
+			return this._propertyStructureHelper.insertProperty(args.item, sortOrder);
 		},
 	});
 

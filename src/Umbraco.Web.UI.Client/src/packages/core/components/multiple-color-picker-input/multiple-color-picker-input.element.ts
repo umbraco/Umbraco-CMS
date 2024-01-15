@@ -21,7 +21,7 @@ const SORTER_CONFIG: UmbSorterConfig<UmbSwatchDetails> = {
 		return element.getAttribute('data-sort-entry-id') === model.value;
 	},
 	querySelectModelToElement: (container: HTMLElement, modelEntry: UmbSwatchDetails) => {
-		return container.querySelector('data-sort-entry-id=[' + modelEntry.value + ']');
+		return container.querySelector('[data-sort-entry-id=' + modelEntry.value + ']');
 	},
 	identifier: 'Umb.SorterIdentifier.ColorEditor',
 	itemSelector: 'umb-multiple-color-picker-item-input',
@@ -35,21 +35,10 @@ const SORTER_CONFIG: UmbSorterConfig<UmbSwatchDetails> = {
 export class UmbMultipleColorPickerInputElement extends FormControlMixin(UmbLitElement) {
 	#sorter = new UmbSorterController(this, {
 		...SORTER_CONFIG,
-
-		performItemInsert: (args) => {
-			const frozenArray = [...this.items];
-			const indexToMove = frozenArray.findIndex((x) => x.value === args.item.value);
-
-			frozenArray.splice(indexToMove, 1);
-			frozenArray.splice(args.newIndex, 0, args.item);
-			this.items = frozenArray;
-
-			this.dispatchEvent(new UmbChangeEvent());
-
-			return true;
-		},
-		performItemRemove: (args) => {
-			return true;
+		onChange: ({ model }) => {
+			const oldValue = this._items;
+			this._items = model;
+			this.requestUpdate('_items', oldValue);
 		},
 	});
 
@@ -150,7 +139,7 @@ export class UmbMultipleColorPickerInputElement extends FormControlMixin(UmbLitE
 	}
 
 	#onAdd() {
-		this._items = [...this._items, { value: '', label: '' }];
+		this.items = [...this._items, { value: '', label: '' }];
 		this.pristine = false;
 		this.dispatchEvent(new UmbChangeEvent());
 		this.#focusNewItem();
@@ -180,7 +169,7 @@ export class UmbMultipleColorPickerInputElement extends FormControlMixin(UmbLitE
 
 	#deleteItem(event: UmbDeleteEvent, itemIndex: number) {
 		event.stopPropagation();
-		this._items = this._items.filter((item, index) => index !== itemIndex);
+		this.items = this._items.filter((item, index) => index !== itemIndex);
 		this.pristine = false;
 		this.dispatchEvent(new UmbChangeEvent());
 	}
