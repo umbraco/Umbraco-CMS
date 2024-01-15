@@ -1,8 +1,8 @@
+import { umbMeta } from '@umbraco-cms/backoffice/meta';
 import { defaultFallbackConfig } from './input-tiny-mce.defaults.js';
 import { pastePreProcessHandler } from './input-tiny-mce.handlers.js';
 import { availableLanguages } from './input-tiny-mce.languages.js';
 import { uriAttributeSanitizer } from './input-tiny-mce.sanitizer.js';
-import { umbMeta } from '@umbraco-cms/backoffice/meta';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { type Editor, type RawEditorOptions, renderEditor } from '@umbraco-cms/backoffice/external/tinymce';
 import { TinyMcePluginArguments, UmbTinyMcePluginBase } from '@umbraco-cms/backoffice/components';
@@ -22,7 +22,7 @@ import { UmbMediaHelper } from '@umbraco-cms/backoffice/utils';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
-import { UmbStylesheetDetailRepository } from '@umbraco-cms/backoffice/stylesheet';
+import { UmbStylesheetDetailRepository, UmbStylesheetRuleManager } from '@umbraco-cms/backoffice/stylesheet';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 @customElement('umb-input-tiny-mce')
@@ -38,6 +38,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 	#editorRef?: Editor | null = null;
 	#stylesheetRepository?: UmbStylesheetDetailRepository;
 	#serverUrl?: string;
+	#umbStylesheetRuleManager = new UmbStylesheetRuleManager();
 
 	protected getFormElement() {
 		return this._editorElement?.querySelector('iframe') ?? undefined;
@@ -93,12 +94,15 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 		}
 	}
 
-	async getFormatStyles(stylesheetPath: Array<string>) {
+	async getFormatStyles(stylesheetPaths: Array<string>) {
 		const rules: any[] = [];
 
-		stylesheetPath.forEach((path) => {
-			this.#stylesheetRepository?.getStylesheetRules(path).then(({ data }) => {
-				data?.rules?.forEach((rule) => {
+		stylesheetPaths.forEach((path) => {
+			this.#stylesheetRepository?.requestByUnique(path).then(({ data }) => {
+				if (!data) return;
+				const rulesFromContent = this.#umbStylesheetRuleManager.extractRules(data.content);
+
+				rulesFromContent.forEach((rule) => {
 					const r: {
 						title?: string;
 						inline?: string;
@@ -140,12 +144,14 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 	async #setTinyConfig() {
 		const dimensions = this.configuration?.getValueByAlias<{ width?: number; height?: number }>('dimensions');
 
+		const stylesheetPaths = this.configuration?.getValueByAlias<string[]>('stylesheets') ?? [];
+		const styleFormats = await this.getFormatStyles(stylesheetPaths);
+
 		// Map the stylesheets with server url
 		const stylesheets =
-			this.configuration
-				?.getValueByAlias<string[]>('stylesheets')
-				?.map((stylesheetPath: string) => `${this.#serverUrl}/css/${stylesheetPath.replace(/\\/g, '/')}`) ?? [];
-		const styleFormats = await this.getFormatStyles(stylesheets);
+			stylesheetPaths?.map(
+				(stylesheetPath: string) => `${this.#serverUrl}/css/${stylesheetPath.replace(/\\/g, '/')}`,
+			) ?? [];
 
 		// create an object by merging the configuration onto the fallback config
 		const configurationOptions: RawEditorOptions = {
