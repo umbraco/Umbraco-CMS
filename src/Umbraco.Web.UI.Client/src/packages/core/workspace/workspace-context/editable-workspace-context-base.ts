@@ -1,5 +1,5 @@
 import { UmbSaveableWorkspaceContextInterface } from './saveable-workspace-context.interface.js';
-import { type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
@@ -9,7 +9,7 @@ export abstract class UmbEditableWorkspaceContextBase<RepositoryType, WorkspaceD
 	extends UmbBaseController
 	implements UmbSaveableWorkspaceContextInterface
 {
-	public readonly host: UmbControllerHostElement;
+	public readonly host: UmbControllerHost;
 	public readonly workspaceAlias: string;
 	// TODO: I think we should get rid of the repository from this one.
 	public readonly repository: RepositoryType;
@@ -20,7 +20,7 @@ export abstract class UmbEditableWorkspaceContextBase<RepositoryType, WorkspaceD
 	#isNew = new UmbBooleanState(undefined);
 	isNew = this.#isNew.asObservable();
 
-	constructor(host: UmbControllerHostElement, workspaceAlias: string, repository: RepositoryType) {
+	constructor(host: UmbControllerHost, workspaceAlias: string, repository: RepositoryType) {
 		super(host);
 		this.host = host;
 		this.workspaceAlias = workspaceAlias;
