@@ -54,7 +54,8 @@ public static class UmbracoBuilderExtensions
                 .AddStylesheets()
                 .AddServer()
                 .AddCorsPolicy()
-                .AddBackOfficeAuthentication();
+                .AddBackOfficeAuthentication()
+                .AddPasswordConfiguration();
 
             services
                 .ConfigureOptions<ConfigureApiBehaviorOptions>()

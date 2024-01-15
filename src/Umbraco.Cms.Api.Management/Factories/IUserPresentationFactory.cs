@@ -18,4 +18,8 @@ public interface IUserPresentationFactory
     Task<CurrentUserResponseModel> CreateCurrentUserResponseModelAsync(IUser user);
 
     Task<UserResendInviteModel> CreateResendInviteModelAsync(ResendInviteUserRequestModel requestModel);
+
+    Task<UserConfigurationResponseModel> CreateUserConfigurationModelAsync();
+
+    Task<CurrenUserConfigurationResponseModel> CreateCurrentUserConfigurationModelAsync();
 }
