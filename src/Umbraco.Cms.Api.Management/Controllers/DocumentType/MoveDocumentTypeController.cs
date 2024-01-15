@@ -24,7 +24,7 @@ public class MoveDocumentTypeController : DocumentTypeControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Move(Guid id, MoveDocumentTypeRequestModel moveDocumentTypeRequestModel)
     {
-        Attempt<IContentType?, ContentTypeStructureOperationStatus> result = await _contentTypeService.MoveAsync(id, moveDocumentTypeRequestModel.TargetId);
+        Attempt<IContentType?, ContentTypeStructureOperationStatus> result = await _contentTypeService.MoveAsync(id, moveDocumentTypeRequestModel.Target?.Id);
 
         return result.Success
             ? Ok()

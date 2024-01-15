@@ -24,7 +24,7 @@ public class CopyMediaTypeController : MediaTypeControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Copy(Guid id, CopyMediaTypeRequestModel copyMediaTypeRequestModel)
     {
-        Attempt<IMediaType?, ContentTypeStructureOperationStatus> result = await _mediaTypeService.CopyAsync(id, copyMediaTypeRequestModel.TargetId);
+        Attempt<IMediaType?, ContentTypeStructureOperationStatus> result = await _mediaTypeService.CopyAsync(id, copyMediaTypeRequestModel.Target?.Id);
 
         return result.Success
             ? CreatedAtAction<ByKeyMediaTypeController>(controller => nameof(controller.ByKey), result.Result!.Key)

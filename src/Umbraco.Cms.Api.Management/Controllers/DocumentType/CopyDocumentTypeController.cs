@@ -24,7 +24,7 @@ public class CopyDocumentTypeController : DocumentTypeControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Copy(Guid id, CopyDocumentTypeRequestModel copyDocumentTypeRequestModel)
     {
-        Attempt<IContentType?, ContentTypeStructureOperationStatus> result = await _contentTypeService.CopyAsync(id, copyDocumentTypeRequestModel.TargetId);
+        Attempt<IContentType?, ContentTypeStructureOperationStatus> result = await _contentTypeService.CopyAsync(id, copyDocumentTypeRequestModel.Target?.Id);
 
         return result.Success
             ? CreatedAtAction<ByKeyDocumentTypeController>(controller => nameof(controller.ByKey), result.Result!.Key)
