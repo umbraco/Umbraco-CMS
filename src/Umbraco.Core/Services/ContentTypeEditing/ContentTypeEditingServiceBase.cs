@@ -45,7 +45,7 @@ internal abstract class ContentTypeEditingServiceBase<TContentType, TContentType
         Guid? key,
         IEnumerable<Guid> currentCompositeKeys,
         IEnumerable<string> currentPropertyAliases,
-        bool isElement)
+        bool isElement = false)
     {
         var contentType = key.HasValue ? await _concreteContentTypeService.GetAsync(key.Value) : null;
         IContentTypeComposition[] allContentTypes = _concreteContentTypeService.GetAll().ToArray();

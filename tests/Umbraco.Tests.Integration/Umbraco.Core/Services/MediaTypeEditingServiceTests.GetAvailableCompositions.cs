@@ -43,8 +43,7 @@ public partial class MediaTypeEditingServiceTests
             await MediaTypeEditingService.GetAvailableCompositionsAsync(
                 result1.Result!.Key,
                 Enumerable.Empty<Guid>(),
-                Enumerable.Empty<string>(),
-                false);
+                Enumerable.Empty<string>());
 
         // Verify that mediaType2 and mediaType3 are present in available compositions
         Assert.IsTrue(availableCompositions.Any(compositionsResult =>
@@ -80,8 +79,7 @@ public partial class MediaTypeEditingServiceTests
             await MediaTypeEditingService.GetAvailableCompositionsAsync(
                 result1.Result!.Key,
                 Enumerable.Empty<Guid>(),
-                Enumerable.Empty<string>(),
-                false);
+                Enumerable.Empty<string>());
 
         Assert.IsFalse(availableCompositions.Any(compositionsResult => compositionsResult.Composition.Key == result2.Result!.Key));
     }

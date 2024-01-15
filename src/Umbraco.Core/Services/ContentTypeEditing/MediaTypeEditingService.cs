@@ -45,9 +45,8 @@ internal sealed class MediaTypeEditingService : ContentTypeEditingServiceBase<IM
     public async Task<IEnumerable<ContentTypeAvailableCompositionsResult>> GetAvailableCompositionsAsync(
         Guid? key,
         IEnumerable<Guid> currentCompositeKeys,
-        IEnumerable<string> currentPropertyAliases,
-        bool isElement) =>
-        await FindAvailableCompositionsAsync(key, currentCompositeKeys, currentPropertyAliases, isElement);
+        IEnumerable<string> currentPropertyAliases) =>
+        await FindAvailableCompositionsAsync(key, currentCompositeKeys, currentPropertyAliases);
 
     protected override IMediaType CreateContentType(IShortStringHelper shortStringHelper, int parentId)
         => new MediaType(shortStringHelper, parentId);

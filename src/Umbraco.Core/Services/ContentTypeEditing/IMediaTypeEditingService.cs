@@ -11,8 +11,7 @@ public interface IMediaTypeEditingService
     Task<Attempt<IMediaType?, ContentTypeOperationStatus>> UpdateAsync(IMediaType mediaType, MediaTypeUpdateModel model, Guid userKey);
 
     Task<IEnumerable<ContentTypeAvailableCompositionsResult>> GetAvailableCompositionsAsync(
-        Guid key,
+        Guid? key,
         IEnumerable<Guid> currentCompositeKeys,
-        IEnumerable<string> currentPropertyAliases,
-        bool isElement);
+        IEnumerable<string> currentPropertyAliases);
 }
