@@ -61,7 +61,9 @@ describe('Extension-Api: Create Extension Element', () => {
 			type: 'my-test-type',
 			alias: 'Umb.Test.CreateManifestElement',
 			name: 'pretty name',
-			api: class TestApi {},
+			api: class TestApi {
+				destroy() {}
+			},
 		};
 
 		const element = await createExtensionElement(manifest, 'umb-extension-api-true-test-element');
