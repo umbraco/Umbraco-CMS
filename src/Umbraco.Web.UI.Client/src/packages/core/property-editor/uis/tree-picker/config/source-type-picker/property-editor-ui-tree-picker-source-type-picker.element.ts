@@ -19,8 +19,17 @@ export class UmbPropertyEditorUITreePickerSourceTypePickerElement
 {
 	#datasetContext?: typeof UMB_PROPERTY_DATASET_CONTEXT.TYPE;
 
-	@property({ type: Array })
-	value?: string[];
+	@property()
+	public set value(value: string) {
+		if (value) {
+			this.#selectedIds = value.split(',');
+		} else {
+			this.#selectedIds = [];
+		}
+	}
+	public get value(): string {
+		return this.#selectedIds.join(',');
+	}
 
 	@state()
 	private sourceType: string = 'content';
@@ -76,8 +85,10 @@ export class UmbPropertyEditorUITreePickerSourceTypePickerElement
 		}
 	}
 
+	#selectedIds: Array<string> = [];
+
 	#setValue(value: string[]) {
-		this.value = value;
+		this.value = value.join(',');
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
@@ -101,19 +112,19 @@ export class UmbPropertyEditorUITreePickerSourceTypePickerElement
 	#renderTypeContent() {
 		return html`<umb-input-document-type
 			@change=${this.#onChange}
-			.selectedIds=${this.value || []}></umb-input-document-type>`;
+			.selectedIds=${this.#selectedIds}></umb-input-document-type>`;
 	}
 
 	#renderTypeMedia() {
 		return html`<umb-input-media-type
 			@change=${this.#onChange}
-			.selectedIds=${this.value || []}></umb-input-media-type>`;
+			.selectedIds=${this.#selectedIds}></umb-input-media-type>`;
 	}
 
 	#renderTypeMember() {
 		return html`<umb-input-member-type
 			@change=${this.#onChange}
-			.selectedIds=${this.value || []}></umb-input-member-type>`;
+			.selectedIds=${this.#selectedIds}></umb-input-member-type>`;
 	}
 
 	static styles = [UmbTextStyles];
