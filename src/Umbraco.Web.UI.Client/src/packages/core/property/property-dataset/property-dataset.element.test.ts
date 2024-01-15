@@ -133,7 +133,7 @@ describe('UmbBasicVariantElement', () => {
 		});
 
 		it('fires change event', async () => {
-			const listener = oneEvent(datasetElement, UmbChangeEvent.TYPE);
+			const listener = oneEvent(datasetElement, UmbChangeEvent.TYPE, false);
 
 			expect(propertyEditor.alias).to.eq('testAlias');
 			propertyEditor.setValue('testValue3');
@@ -153,7 +153,7 @@ describe('UmbBasicVariantElement', () => {
 			adapterPropertyEditor.alias = 'testAdapterAlias';
 			datasetElement.appendChild(adapterPropertyEditor);
 
-			const listener = oneEvent(datasetElement, UmbChangeEvent.TYPE);
+			const listener = oneEvent(datasetElement, UmbChangeEvent.TYPE, false);
 
 			// The alias of the original property editor must be 'testAlias' for the adapter to set the value of it.
 			expect(propertyEditor.alias).to.eq('testAlias');

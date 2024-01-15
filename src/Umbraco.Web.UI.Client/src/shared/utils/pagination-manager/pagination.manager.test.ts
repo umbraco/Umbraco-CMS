@@ -141,7 +141,7 @@ describe('UmbPaginationManager', () => {
 		});
 
 		it('dispatches a change event', async () => {
-			const listener = oneEvent(manager, UmbChangeEvent.TYPE);
+			const listener = oneEvent(manager, UmbChangeEvent.TYPE, false);
 			manager.setCurrentPageNumber(2);
 			const event = (await listener) as unknown as UmbChangeEvent;
 			const target = event.target as UmbPaginationManager;
