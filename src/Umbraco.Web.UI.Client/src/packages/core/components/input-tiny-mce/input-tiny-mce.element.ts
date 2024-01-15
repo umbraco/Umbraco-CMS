@@ -193,8 +193,6 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 		this._tinyConfig = {
 			autoresize_bottom_margin: 10,
 			body_class: 'umb-rte',
-			//see https://www.tiny.cloud/docs/tinymce/6/editor-important-options/#cache_suffix
-			cache_suffix: `?umb__rnd=${umbMeta.clientVersion}`,
 			contextMenu: false,
 			inline_boundaries_selector: 'a[href],code,.mce-annotation,.umb-embed-holder,.umb-macro-holder',
 			menubar: false,

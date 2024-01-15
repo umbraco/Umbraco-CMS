@@ -6,7 +6,7 @@ import type { MemberTypeItemResponseModel } from '@umbraco-cms/backoffice/backen
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-input-member-type')
-export class UmbMemberTypeInputElement extends FormControlMixin(UmbLitElement) {
+export class UmbInputMemberTypeElement extends FormControlMixin(UmbLitElement) {
 	/**
 	 * This is a minimum amount of selected items in this input.
 	 * @type {number}
@@ -94,32 +94,28 @@ export class UmbMemberTypeInputElement extends FormControlMixin(UmbLitElement) {
 		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems));
 	}
 
-	protected _openPicker() {
+	protected getFormElement() {
+		return undefined;
+	}
+
+	#openPicker() {
 		this.#pickerContext.openPicker({
 			hideTreeRoot: true,
 		});
 	}
 
-	protected getFormElement() {
-		return undefined;
-	}
-
 	render() {
-		return html`
-			${this.#renderItems()}
-			${this.#renderAddButton()}
-		`;
+		return html` ${this.#renderItems()} ${this.#renderAddButton()} `;
 	}
 
 	#renderItems() {
 		if (!this._items) return;
-		// TODO: Add sorting. [LK]
 		return html`
 			<uui-ref-list
 				>${repeat(
 					this._items,
 					(item) => item.id,
-					(item) => this._renderItem(item),
+					(item) => this.#renderItem(item),
 				)}</uui-ref-list
 			>
 		`;
@@ -131,17 +127,18 @@ export class UmbMemberTypeInputElement extends FormControlMixin(UmbLitElement) {
 			<uui-button
 				id="add-button"
 				look="placeholder"
-				@click=${this._openPicker}
+				@click=${this.#openPicker}
 				label="${this.localize.term('general_choose')}"
 				>${this.localize.term('general_choose')}</uui-button
 			>
 		`;
 	}
 
-	private _renderItem(item: MemberTypeItemResponseModel) {
+	#renderItem(item: MemberTypeItemResponseModel) {
 		if (!item.id) return;
 		return html`
 			<uui-ref-node-document-type name=${ifDefined(item.name)}>
+			${this.#renderIcon(item)}
 				<uui-action-bar slot="actions">
 					<uui-button
 						@click=${() => this.#pickerContext.requestRemoveItem(item.id!)}
@@ -153,6 +150,11 @@ export class UmbMemberTypeInputElement extends FormControlMixin(UmbLitElement) {
 		`;
 	}
 
+	#renderIcon(item: MemberTypeItemResponseModel) {
+		if (!item.icon) return;
+		return html`<uui-icon slot="icon" name=${item.icon}></uui-icon>`;
+	}
+
 	static styles = [
 		css`
 			#add-button {
@@ -162,10 +164,10 @@ export class UmbMemberTypeInputElement extends FormControlMixin(UmbLitElement) {
 	];
 }
 
-export default UmbMemberTypeInputElement;
+export default UmbInputMemberTypeElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-input-member-type': UmbMemberTypeInputElement;
+		'umb-input-member-type': UmbInputMemberTypeElement;
 	}
 }

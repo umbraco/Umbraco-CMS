@@ -1,18 +1,22 @@
 import { UmbInputDocumentTypeElement } from '@umbraco-cms/backoffice/document-type';
 import { UmbInputMediaTypeElement } from '@umbraco-cms/backoffice/media-type';
-import { UmbMemberTypeInputElement } from '@umbraco-cms/backoffice/member-type';
+import { UmbInputMemberTypeElement } from '@umbraco-cms/backoffice/member-type';
 import type { UmbTreePickerSource } from '@umbraco-cms/backoffice/components';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
+import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 
 /**
  * @element umb-property-editor-ui-tree-picker-source-type-picker
  */
 @customElement('umb-property-editor-ui-tree-picker-source-type-picker')
-export class UmbPropertyEditorUITreePickerSourceTypePickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
+export class UmbPropertyEditorUITreePickerSourceTypePickerElement
+	extends UmbLitElement
+	implements UmbPropertyEditorUiElement
+{
 	#datasetContext?: typeof UMB_PROPERTY_DATASET_CONTEXT.TYPE;
 
 	@property({ type: Array })
@@ -42,7 +46,7 @@ export class UmbPropertyEditorUITreePickerSourceTypePickerElement extends UmbLit
 					// If we had a sourceType before, we can see this as a change and not the initial value,
 					// so let's reset the value, so we don't carry over content-types to the new source type.
 					if (this.#initialized && this.sourceType !== startNode.type) {
-						this.value = [];
+						this.#setValue([]);
 					}
 
 					this.sourceType = startNode.type;
@@ -59,19 +63,22 @@ export class UmbPropertyEditorUITreePickerSourceTypePickerElement extends UmbLit
 	#onChange(event: CustomEvent) {
 		switch (this.sourceType) {
 			case 'content':
-				this.value = (<UmbInputDocumentTypeElement>event.target).selectedIds;
+				this.#setValue((<UmbInputDocumentTypeElement>event.target).selectedIds);
 				break;
 			case 'media':
-				this.value = (<UmbInputMediaTypeElement>event.target).selectedIds;
+				this.#setValue((<UmbInputMediaTypeElement>event.target).selectedIds);
 				break;
 			case 'member':
-				this.value = (<UmbMemberTypeInputElement>event.target).selectedIds;
+				this.#setValue((<UmbInputMemberTypeElement>event.target).selectedIds);
 				break;
 			default:
 				break;
 		}
+	}
 
-		this.dispatchEvent(new CustomEvent('property-value-change'));
+	#setValue(value: string[]) {
+		this.value = value;
+		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
 	render() {
@@ -87,7 +94,7 @@ export class UmbPropertyEditorUITreePickerSourceTypePickerElement extends UmbLit
 			case 'member':
 				return this.#renderTypeMember();
 			default:
-				return 'No source type found';
+				return html`<p>No source type found</p>`;
 		}
 	}
 

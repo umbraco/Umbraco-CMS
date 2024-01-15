@@ -60,6 +60,15 @@ export class UmbInputMediaElement extends FormControlMixin(UmbLitElement) {
 		this.#pickerContext.setSelection(ids);
 	}
 
+	@property({ type: String })
+	filter?: string;
+
+	@property({ type: Boolean })
+	showOpenButton?: boolean;
+
+	@property({ type: Boolean })
+	ignoreUserStartNodes?: boolean;
+
 	@property()
 	public set value(idsString: string) {
 		// Its with full purpose we don't call super.value, as thats being handled by the observation of the context selection.
@@ -73,6 +82,10 @@ export class UmbInputMediaElement extends FormControlMixin(UmbLitElement) {
 
 	constructor() {
 		super();
+	}
+
+	connectedCallback() {
+		super.connectedCallback();
 
 		this.addValidator(
 			'rangeUnderflow',
@@ -90,18 +103,41 @@ export class UmbInputMediaElement extends FormControlMixin(UmbLitElement) {
 		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems));
 	}
 
+	protected _openPicker() {
+		// TODO: Configure the media picker, with `filter` and `ignoreUserStartNodes` [LK]
+		console.log('_openPicker', [this.filter, this.ignoreUserStartNodes]);
+		this.#pickerContext.openPicker({
+			hideTreeRoot: true,
+		});
+	}
+
+	protected _openItem(item: MediaItemResponseModel) {
+		// TODO: Implement the Content editing infinity editor. [LK]
+		console.log('TODO: _openItem', item);
+	}
+
 	protected getFormElement() {
 		return undefined;
 	}
 
 	render() {
-		return html` ${this._items?.map((item) => this.#renderItem(item))} ${this.#renderButton()} `;
+		return html` ${this.#renderItems()} ${this.#renderButton()} `;
+	}
+
+	#renderItems() {
+		if (!this._items) return;
+		// TODO: Add sorting. [LK]
+		return html` ${this._items?.map((item) => this.#renderItem(item))} `;
 	}
 
 	#renderButton() {
 		if (this._items && this.max && this._items.length >= this.max) return;
 		return html`
-			<uui-button id="add-button" look="placeholder" @click=${() => this.#pickerContext.openPicker()} label=${this.localize.term('general_choose')}>
+			<uui-button
+				id="add-button"
+				look="placeholder"
+				@click=${this._openPicker}
+				label=${this.localize.term('general_choose')}>
 				<uui-icon name="icon-add"></uui-icon>
 				${this.localize.term('general_choose')}
 			</uui-button>
@@ -109,12 +145,14 @@ export class UmbInputMediaElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	#renderItem(item: MediaItemResponseModel) {
+		// TODO: `file-ext` value has been hardcoded here. Find out if API model has value for it. [LK]
+		// TODO: How to handle the `showOpenButton` option? [LK]
 		return html`
 			<uui-card-media
 				name=${ifDefined(item.name === null ? undefined : item.name)}
 				detail=${ifDefined(item.id)}
 				file-ext="jpg">
-				<!-- <uui-tag size="s" slot="tag" color="danger">Trashed</uui-tag> -->
+				${this._renderIsTrashed(item)}
 				<uui-action-bar slot="actions">
 					<uui-button label="Copy media">
 						<uui-icon name="icon-documents"></uui-icon>
@@ -125,6 +163,11 @@ export class UmbInputMediaElement extends FormControlMixin(UmbLitElement) {
 				</uui-action-bar>
 			</uui-card-media>
 		`;
+	}
+
+	private _renderIsTrashed(item: MediaItemResponseModel) {
+		if (!item.isTrashed) return;
+		return html`<uui-tag size="s" slot="tag" color="danger">Trashed</uui-tag>`;
 	}
 
 	static styles = [

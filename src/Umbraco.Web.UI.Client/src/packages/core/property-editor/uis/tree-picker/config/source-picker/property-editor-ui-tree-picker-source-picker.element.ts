@@ -1,7 +1,7 @@
 import { type UmbTreePickerSource, UmbInputTreePickerSourceElement } from '@umbraco-cms/backoffice/components';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import { type UmbPropertyEditorConfigCollection, UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
@@ -25,7 +25,7 @@ export class UmbPropertyEditorUITreePickerSourcePickerElement extends UmbLitElem
 			dynamicRoot: target.dynamicRoot,
 		};
 
-		this.dispatchEvent(new CustomEvent('property-value-change'));
+		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
 	render() {

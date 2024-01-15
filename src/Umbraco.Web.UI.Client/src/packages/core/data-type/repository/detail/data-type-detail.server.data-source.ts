@@ -40,8 +40,8 @@ export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataT
 			unique: UmbId.new(),
 			parentUnique,
 			name: '',
-			propertyEditorAlias: undefined,
-			propertyEditorUiAlias: null,
+			editorAlias: undefined,
+			editorUiAlias: null,
 			values: [],
 		};
 
@@ -69,8 +69,8 @@ export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataT
 			unique: data.id,
 			parentUnique: data.parentId || null,
 			name: data.name,
-			propertyEditorAlias: data.editorAlias,
-			propertyEditorUiAlias: data.editorUiAlias || null,
+			editorAlias: data.editorAlias,
+			editorUiAlias: data.editorUiAlias || null,
 			values: data.values as Array<UmbDataTypePropertyModel>,
 		};
 
@@ -86,15 +86,15 @@ export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataT
 	async create(dataType: UmbDataTypeDetailModel) {
 		if (!dataType) throw new Error('Data Type is missing');
 		if (!dataType.unique) throw new Error('Data Type unique is missing');
-		if (!dataType.propertyEditorAlias) throw new Error('Property Editor Alias is missing');
+		if (!dataType.editorAlias) throw new Error('Property Editor Alias is missing');
 
 		// TODO: make data mapper to prevent errors
 		const requestBody: CreateDataTypeRequestModel = {
 			id: dataType.unique,
 			parentId: dataType.parentUnique,
 			name: dataType.name,
-			editorAlias: dataType.propertyEditorAlias,
-			editorUiAlias: dataType.propertyEditorUiAlias,
+			editorAlias: dataType.editorAlias,
+			editorUiAlias: dataType.editorUiAlias,
 			values: dataType.values,
 		};
 
@@ -121,13 +121,13 @@ export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataT
 	 */
 	async update(data: UmbDataTypeDetailModel) {
 		if (!data.unique) throw new Error('Unique is missing');
-		if (!data.propertyEditorAlias) throw new Error('Property Editor Alias is missing');
+		if (!data.editorAlias) throw new Error('Property Editor Alias is missing');
 
 		// TODO: make data mapper to prevent errors
 		const requestBody: DataTypeModelBaseModel = {
 			name: data.name,
-			editorAlias: data.propertyEditorAlias,
-			editorUiAlias: data.propertyEditorUiAlias,
+			editorAlias: data.editorAlias,
+			editorUiAlias: data.editorUiAlias,
 			values: data.values,
 		};
 
