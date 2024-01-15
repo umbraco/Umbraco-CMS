@@ -27,7 +27,7 @@ export class UmbMediaTreeServerDataSource extends UmbTreeServerDataSourceBase<
 	}
 }
 
-const getRootItems = () => MediaResource.getTreeMediaRoot({});
+const getRootItems = () => tryExecuteAndNotify(this, MediaResource.getTreeMediaRoot({}));
 
 const getChildrenOf = (parentUnique: string | null) => {
 	if (parentUnique === null) {
