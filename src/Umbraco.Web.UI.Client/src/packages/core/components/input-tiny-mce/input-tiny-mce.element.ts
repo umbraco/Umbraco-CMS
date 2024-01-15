@@ -36,7 +36,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 	#mediaHelper = new UmbMediaHelper();
 	#plugins: Array<new (args: TinyMcePluginArguments) => UmbTinyMcePluginBase> = [];
 	#editorRef?: Editor | null = null;
-	#stylesheetRepository?: UmbStylesheetDetailRepository;
+	#stylesheetRepository: UmbStylesheetDetailRepository;
 	#serverUrl?: string;
 	#umbStylesheetRuleManager = new UmbStylesheetRuleManager();
 
@@ -95,50 +95,52 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	async getFormatStyles(stylesheetPaths: Array<string>) {
-		const rules: any[] = [];
+		if (!stylesheetPaths) return [];
+		const formatStyles: any[] = [];
 
-		stylesheetPaths.forEach((path) => {
-			this.#stylesheetRepository?.requestByUnique(path).then(({ data }) => {
-				if (!data) return;
-				const rulesFromContent = this.#umbStylesheetRuleManager.extractRules(data.content);
+		const promises = stylesheetPaths.map((path) => this.#stylesheetRepository?.requestByUnique(path));
+		const stylesheetResponses = await Promise.all(promises);
 
-				rulesFromContent.forEach((rule) => {
-					const r: {
-						title?: string;
-						inline?: string;
-						classes?: string;
-						attributes?: Record<string, string>;
-						block?: string;
-					} = {
-						title: rule.name,
-					};
+		stylesheetResponses.forEach(({ data }) => {
+			if (!data) return;
+			const rulesFromContent = this.#umbStylesheetRuleManager.extractRules(data.content);
 
-					if (!rule.selector) return;
+			rulesFromContent.forEach((rule) => {
+				const r: {
+					title?: string;
+					inline?: string;
+					classes?: string;
+					attributes?: Record<string, string>;
+					block?: string;
+				} = {
+					title: rule.name,
+				};
 
-					if (rule.selector.startsWith('.')) {
-						r.inline = 'span';
-						r.classes = rule.selector.substring(1);
-					} else if (rule.selector.startsWith('#')) {
-						r.inline = 'span';
-						r.attributes = { id: rule.selector.substring(1) };
-					} else if (rule.selector.includes('.')) {
-						const [block, ...classes] = rule.selector.split('.');
-						r.block = block;
-						r.classes = classes.join(' ').replace(/\./g, ' ');
-					} else if (rule.selector.includes('#')) {
-						const [block, id] = rule.selector.split('#');
-						r.block = block;
-						r.classes = id;
-					} else {
-						r.block = rule.selector;
-					}
+				if (!rule.selector) return;
 
-					rules.push(r);
-				});
+				if (rule.selector.startsWith('.')) {
+					r.inline = 'span';
+					r.classes = rule.selector.substring(1);
+				} else if (rule.selector.startsWith('#')) {
+					r.inline = 'span';
+					r.attributes = { id: rule.selector.substring(1) };
+				} else if (rule.selector.includes('.')) {
+					const [block, ...classes] = rule.selector.split('.');
+					r.block = block;
+					r.classes = classes.join(' ').replace(/\./g, ' ');
+				} else if (rule.selector.includes('#')) {
+					const [block, id] = rule.selector.split('#');
+					r.block = block;
+					r.classes = id;
+				} else {
+					r.block = rule.selector;
+				}
+
+				formatStyles.push(r);
 			});
 		});
 
-		return rules;
+		return formatStyles;
 	}
 
 	async #setTinyConfig() {
