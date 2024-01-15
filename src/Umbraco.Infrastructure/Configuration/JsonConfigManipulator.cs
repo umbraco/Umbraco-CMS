@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Core.Configuration
 {
     public class JsonConfigManipulator : IConfigManipulator
     {
-        private const string UmbracoConnectionStringPath = $"ConnectionStrings:{Cms.Core.Constants.System.UmbracoConnectionName}";
+        private const string UmbracoConnectionStringPath = $"ConnectionStrings:{Constants.System.UmbracoConnectionName}";
         private const string UmbracoConnectionStringProviderNamePath = UmbracoConnectionStringPath + ConnectionStrings.ProviderNamePostfix;
         private const string ConnectionStringObjectName = "ConnectionStrings";
 
@@ -68,7 +68,7 @@ namespace Umbraco.Cms.Core.Configuration
 
             if (jsonNode is null)
             {
-                _logger.LogWarning("Failed to save connection string in JSON configuration.");
+                _logger.LogWarning("Failed to save connection string in JSON configuration");
                 return;
             }
 
@@ -78,25 +78,7 @@ namespace Umbraco.Cms.Core.Configuration
         }
 
         public void SaveConnectionString(string connectionString, string? providerName)
-        {
-            // Save keys to JSON
-            JsonConfigurationProvider? provider = GetJsonConfigurationProvider();
-
-            var json = GetJson(provider);
-            if (json is null)
-            {
-                _logger.LogWarning("Failed to save connection string in JSON configuration.");
-                return;
-            }
-
-            var item = GetConnectionItem(connectionString, providerName);
-            if (item is not null)
-            {
-                json.Merge(item, new JsonMergeSettings());
-            }
-
-            SaveJson(provider, json);
-        }
+            => SaveConnectionStringAsync(connectionString, providerName).GetAwaiter().GetResult();
 
         public void SaveConfigValue(string key, object value)
         {
@@ -216,28 +198,6 @@ namespace Umbraco.Cms.Core.Configuration
             return writer.Token;
         }
 
-        private JToken? GetConnectionItem(string connectionString, string? providerName)
-        {
-            JTokenWriter writer = new JTokenWriter();
-
-            writer.WriteStartObject();
-            writer.WritePropertyName("ConnectionStrings");
-            writer.WriteStartObject();
-            writer.WritePropertyName(Constants.System.UmbracoConnectionName);
-            writer.WriteValue(connectionString);
-
-            if (!string.IsNullOrEmpty(providerName))
-            {
-                writer.WritePropertyName(Constants.System.UmbracoConnectionName + ConnectionStrings.ProviderNamePostfix);
-                writer.WriteValue(providerName);
-            }
-
-            writer.WriteEndObject();
-            writer.WriteEndObject();
-
-            return writer.Token;
-        }
-
         private JsonObject CreateConnectionItem(string connectionString, string? providerName)
         {
             var connectionObject = new JsonObject
@@ -314,8 +274,8 @@ namespace Umbraco.Cms.Core.Configuration
             try
             {
                 var jsonFilePath = Path.Combine(physicalFileProvider.Root, provider.Source.Path!);
-                await using var jsonStream = new FileStream(jsonFilePath, FileMode.Create);
-                await using var writer = new Utf8JsonWriter(jsonStream, new JsonWriterOptions { Indented = true });
+                await using var jsonConfigStream = new FileStream(jsonFilePath, FileMode.Create);
+                await using var writer = new Utf8JsonWriter(jsonConfigStream, new JsonWriterOptions { Indented = true });
                 jsonNode.WriteTo(writer);
             }
             finally
