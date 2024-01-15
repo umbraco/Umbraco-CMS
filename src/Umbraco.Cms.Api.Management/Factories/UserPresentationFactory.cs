@@ -1,7 +1,11 @@
-﻿using Umbraco.Cms.Api.Management.ViewModels.User;
+using Umbraco.Cms.Api.Management.Routing;
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Api.Management.ViewModels.User;
 using Umbraco.Cms.Api.Management.ViewModels.User.Current;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Mail;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
@@ -17,19 +21,31 @@ public class UserPresentationFactory : IUserPresentationFactory
     private readonly MediaFileManager _mediaFileManager;
     private readonly IImageUrlGenerator _imageUrlGenerator;
     private readonly IUserGroupPresentationFactory _userGroupPresentationFactory;
+    private readonly IAbsoluteUrlBuilder _absoluteUrlBuilder;
+    private readonly IEmailSender _emailSender;
+    private readonly IPasswordConfigurationPresentationFactory _passwordConfigurationPresentationFactory;
+    private readonly SecuritySettings _securitySettings;
 
     public UserPresentationFactory(
         IEntityService entityService,
         AppCaches appCaches,
         MediaFileManager mediaFileManager,
         IImageUrlGenerator imageUrlGenerator,
-        IUserGroupPresentationFactory userGroupPresentationFactory)
+        IUserGroupPresentationFactory userGroupPresentationFactory,
+        IAbsoluteUrlBuilder absoluteUrlBuilder,
+        IEmailSender emailSender,
+        IPasswordConfigurationPresentationFactory passwordConfigurationPresentationFactory,
+        IOptionsSnapshot<SecuritySettings> securitySettings)
     {
         _entityService = entityService;
         _appCaches = appCaches;
         _mediaFileManager = mediaFileManager;
         _imageUrlGenerator = imageUrlGenerator;
         _userGroupPresentationFactory = userGroupPresentationFactory;
+        _emailSender = emailSender;
+        _passwordConfigurationPresentationFactory = passwordConfigurationPresentationFactory;
+        _securitySettings = securitySettings.Value;
+        _absoluteUrlBuilder = absoluteUrlBuilder;
     }
 
     public UserResponseModel CreateResponseModel(IUser user)
@@ -39,7 +55,8 @@ public class UserPresentationFactory : IUserPresentationFactory
             Id = user.Key,
             Email = user.Email,
             Name = user.Name ?? string.Empty,
-            AvatarUrls = user.GetUserAvatarUrls(_appCaches.RuntimeCache, _mediaFileManager, _imageUrlGenerator),
+            AvatarUrls = user.GetUserAvatarUrls(_appCaches.RuntimeCache, _mediaFileManager, _imageUrlGenerator)
+                .Select(url => _absoluteUrlBuilder.ToAbsoluteUrl(url).ToString()),
             UserName = user.Username,
             LanguageIsoCode = user.Language,
             CreateDate = user.CreateDate,
@@ -94,6 +111,25 @@ public class UserPresentationFactory : IUserPresentationFactory
 
         return await Task.FromResult(inviteModel);
     }
+
+    public async Task<CurrenUserConfigurationResponseModel> CreateCurrentUserConfigurationModelAsync()
+    {
+        var model = new CurrenUserConfigurationResponseModel
+        {
+            KeepUserLoggedIn = _securitySettings.KeepUserLoggedIn,
+            UsernameIsEmail = _securitySettings.UsernameIsEmail,
+            PasswordConfiguration = _passwordConfigurationPresentationFactory.CreatePasswordConfigurationResponseModel(),
+        };
+
+        return await Task.FromResult(model);
+    }
+
+    public Task<UserConfigurationResponseModel> CreateUserConfigurationModelAsync() =>
+        Task.FromResult(new UserConfigurationResponseModel
+        {
+            CanInviteUsers = _emailSender.CanSendRequiredEmail(),
+            PasswordConfiguration = _passwordConfigurationPresentationFactory.CreatePasswordConfigurationResponseModel(),
+        });
 
     public async Task<UserUpdateModel> CreateUpdateModelAsync(Guid existingUserKey, UpdateUserRequestModel updateModel)
     {

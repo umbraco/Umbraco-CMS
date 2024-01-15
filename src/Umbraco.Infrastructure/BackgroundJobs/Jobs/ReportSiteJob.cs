@@ -1,13 +1,6 @@
 using System.Text;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
-using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Configuration;
-using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
-using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Core.Telemetry;
 using Umbraco.Cms.Core.Telemetry.Models;
@@ -28,14 +21,17 @@ public class ReportSiteJob : IRecurringBackgroundJob
     private static HttpClient _httpClient = new();
     private readonly ILogger<ReportSiteJob> _logger;
     private readonly ITelemetryService _telemetryService;
-    
+    private readonly IJsonSerializer _jsonSerializer;
+
 
     public ReportSiteJob(
         ILogger<ReportSiteJob> logger,
-        ITelemetryService telemetryService)
+        ITelemetryService telemetryService,
+        IJsonSerializer jsonSerializer)
     {
         _logger = logger;
         _telemetryService = telemetryService;
+        _jsonSerializer = jsonSerializer;
         _httpClient = new HttpClient();
     }
 
@@ -70,7 +66,7 @@ public class ReportSiteJob : IRecurringBackgroundJob
 
             using (var request = new HttpRequestMessage(HttpMethod.Post, "installs/"))
             {
-                request.Content = new StringContent(JsonConvert.SerializeObject(telemetryReportData), Encoding.UTF8,
+                request.Content = new StringContent(_jsonSerializer.Serialize(telemetryReportData), Encoding.UTF8,
                     "application/json");
 
                 // Make a HTTP Post to telemetry service
