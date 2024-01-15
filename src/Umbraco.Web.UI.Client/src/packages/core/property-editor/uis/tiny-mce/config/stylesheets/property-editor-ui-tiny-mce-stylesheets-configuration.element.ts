@@ -1,3 +1,4 @@
+import { UmbServerFilePathUniqueSerializer } from '@umbraco-cms/backoffice/server-file-system';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, customElement, html, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -6,6 +7,7 @@ import {
 	UmbPropertyValueChangeEvent,
 } from '@umbraco-cms/backoffice/property-editor';
 import { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbStylesheetInputElement } from '@umbraco-cms/backoffice/stylesheet';
 
 /**
  * @element umb-property-editor-ui-tiny-mce-stylesheets-configuration
@@ -15,31 +17,30 @@ export class UmbPropertyEditorUITinyMceStylesheetsConfigurationElement
 	extends UmbLitElement
 	implements UmbPropertyEditorUiElement
 {
+	private _value: Array<string> = [];
 	@property({ type: Array })
-	value: string[] = [];
+	public get value(): Array<string> {
+		if (!this._value) return [];
+		return this._value.map((unique) => this.#serverFilePathUniqueSerializer.toServerPath(unique)) as string[];
+	}
+	public set value(value: Array<string>) {
+		if (!value) return;
+		this._value = value.map((unique) => this.#serverFilePathUniqueSerializer.toUnique(unique));
+	}
 
 	@property({ type: Object, attribute: false })
 	public config?: UmbPropertyEditorConfigCollection;
 
+	#serverFilePathUniqueSerializer = new UmbServerFilePathUniqueSerializer();
+
 	#onChange(event: CustomEvent) {
-		debugger;
-		const checkbox = event.target as HTMLInputElement;
-
-		if (checkbox.checked) {
-			if (this.value) {
-				this.value = [...this.value, checkbox.value];
-			} else {
-				this.value = [checkbox.value];
-			}
-		} else {
-			this.value = this.value.filter((v) => v !== checkbox.value);
-		}
-
+		const target = event.target as UmbStylesheetInputElement;
+		this._value = target.selectedIds;
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
 	render() {
-		return html`<umb-stylesheet-input></umb-stylesheet-input>`;
+		return html`<umb-stylesheet-input @change=${this.#onChange} .selectedIds=${this._value}></umb-stylesheet-input>`;
 	}
 
 	static styles = [UmbTextStyles, css``];
