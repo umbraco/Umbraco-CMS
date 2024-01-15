@@ -1,5 +1,5 @@
 const { rest } = window.MockServiceWorker;
-import { umbStylesheetData } from '../../data/stylesheet/stylesheet.db.js';
+import { umbStylesheetMockDb } from '../../data/stylesheet/stylesheet.db.js';
 import { UMB_SLUG } from './slug.js';
 import { CreateStylesheetFolderRequestModel } from '@umbraco-cms/backoffice/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
@@ -9,7 +9,7 @@ export const folderHandlers = [
 		const requestBody = (await req.json()) as CreateStylesheetFolderRequestModel;
 		if (!requestBody) return res(ctx.status(400, 'no body found'));
 
-		const path = umbStylesheetData.folder.create(requestBody);
+		const path = umbStylesheetMockDb.folder.create(requestBody);
 
 		return res(
 			ctx.status(201),
@@ -22,14 +22,14 @@ export const folderHandlers = [
 	rest.get(umbracoPath(`${UMB_SLUG}/folder/:path`), (req, res, ctx) => {
 		const path = req.params.path as string;
 		if (!path) return res(ctx.status(400));
-		const response = umbStylesheetData.folder.read(decodeURIComponent(path));
+		const response = umbStylesheetMockDb.folder.read(decodeURIComponent(path));
 		return res(ctx.status(200), ctx.json(response));
 	}),
 
 	rest.delete(umbracoPath(`${UMB_SLUG}/folder/:path`), (req, res, ctx) => {
 		const path = req.params.path as string;
 		if (!path) return res(ctx.status(400));
-		umbStylesheetData.folder.delete(decodeURIComponent(path));
+		umbStylesheetMockDb.folder.delete(decodeURIComponent(path));
 		return res(ctx.status(200));
 	}),
 ];

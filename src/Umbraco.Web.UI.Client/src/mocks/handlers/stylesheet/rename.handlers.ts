@@ -1,5 +1,5 @@
 const { rest } = window.MockServiceWorker;
-import { umbStylesheetData } from '../../data/stylesheet/stylesheet.db.js';
+import { umbStylesheetMockDb } from '../../data/stylesheet/stylesheet.db.js';
 import { UMB_SLUG } from './slug.js';
 import { RenameStylesheetRequestModel } from '@umbraco-cms/backoffice/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
@@ -12,7 +12,7 @@ export const renameHandlers = [
 		const requestBody = (await req.json()) as RenameStylesheetRequestModel;
 		if (!requestBody) return res(ctx.status(400, 'no body found'));
 
-		const newPath = umbStylesheetData.file.rename(decodeURIComponent(path), requestBody.name);
+		const newPath = umbStylesheetMockDb.file.rename(decodeURIComponent(path), requestBody.name);
 
 		return res(
 			ctx.status(201),
