@@ -31,8 +31,14 @@ public class DocumentTypeMapDefinition : ContentTypeMapDefinition<IContentType, 
         target.IsElement = source.IsElement;
         target.Containers = MapPropertyTypeContainers(source);
         target.Properties = MapPropertyTypes(source);
-        target.AllowedContentTypes = MapAllowedContentTypes(source);
-        target.Compositions = MapCompositions(source, source.ContentTypeComposition);
+        target.AllowedDocumentTypes = source.AllowedContentTypes?.Select(ct =>
+                new DocumentTypeSort { DocumentType = new ReferenceByIdModel(ct.Key), SortOrder = ct.SortOrder })
+            .ToArray() ?? Enumerable.Empty<DocumentTypeSort>();
+        target.Compositions = source.ContentTypeComposition.Select(contentTypeComposition => new DocumentTypeComposition
+        {
+            DocumentType = new ReferenceByIdModel(contentTypeComposition.Key),
+            CompositionType = CalculateCompositionType(source, contentTypeComposition)
+        }).ToArray();
 
         if (source.AllowedTemplates != null)
         {

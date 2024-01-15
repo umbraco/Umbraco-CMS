@@ -3,7 +3,6 @@ using Umbraco.Cms.Api.Management.ViewModels.ContentType;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Extensions;
-using ContentTypeSort = Umbraco.Cms.Api.Management.ViewModels.ContentType.ContentTypeSort;
 
 namespace Umbraco.Cms.Api.Management.Mapping.ContentType;
 
@@ -79,20 +78,8 @@ public abstract class ContentTypeMapDefinition<TContentType, TPropertyTypeModel,
             .ToArray();
     }
 
-    protected IEnumerable<ContentTypeSort> MapAllowedContentTypes(TContentType source)
-        => source.AllowedContentTypes?.Select(contentTypeSort => new ContentTypeSort
-           {
-               ContentType = new ReferenceByIdModel(contentTypeSort.Key),
-               SortOrder = contentTypeSort.SortOrder
-           }).ToArray()
-           ?? Array.Empty<ContentTypeSort>();
-
-    protected IEnumerable<ContentTypeComposition> MapCompositions(TContentType source, IEnumerable<IContentTypeComposition> contentTypeComposition)
-        => contentTypeComposition.Select(contentType => new ContentTypeComposition
-        {
-            ContentType = new ReferenceByIdModel(contentType.Key),
-            CompositionType = contentType.Id == source.ParentId
-                ? ContentTypeCompositionType.Inheritance
-                : ContentTypeCompositionType.Composition
-        }).ToArray();
+    protected static CompositionType CalculateCompositionType(TContentType source, IContentTypeComposition contentTypeComposition)
+        => contentTypeComposition.Id == source.ParentId
+            ? CompositionType.Inheritance
+            : CompositionType.Composition;
 }

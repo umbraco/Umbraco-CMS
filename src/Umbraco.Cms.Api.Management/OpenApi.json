@@ -18960,6 +18960,13 @@
         },
         "additionalProperties": false
       },
+      "CompositionTypeModel": {
+        "enum": [
+          "Composition",
+          "Inheritance"
+        ],
+        "type": "string"
+      },
       "ConsentLevelPresentationModel": {
         "required": [
           "description",
@@ -19069,39 +19076,10 @@
         },
         "additionalProperties": false
       },
-      "ContentTypeCompositionModel": {
-        "required": [
-          "compositionType",
-          "contentType"
-        ],
-        "type": "object",
-        "properties": {
-          "contentType": {
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/ReferenceByIdModel"
-              }
-            ]
-          },
-          "compositionType": {
-            "$ref": "#/components/schemas/ContentTypeCompositionTypeModel"
-          }
-        },
-        "additionalProperties": false
-      },
-      "ContentTypeCompositionTypeModel": {
-        "enum": [
-          "Composition",
-          "Inheritance"
-        ],
-        "type": "string"
-      },
       "ContentTypeForDocumentTypeResponseModel": {
         "required": [
           "alias",
           "allowedAsRoot",
-          "allowedContentTypes",
-          "compositions",
           "containers",
           "icon",
           "id",
@@ -19161,26 +19139,6 @@
               ]
             }
           },
-          "allowedContentTypes": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/ContentTypeSortModel"
-                }
-              ]
-            }
-          },
-          "compositions": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/ContentTypeCompositionModel"
-                }
-              ]
-            }
-          },
           "id": {
             "type": "string",
             "format": "uuid"
@@ -19192,8 +19150,6 @@
         "required": [
           "alias",
           "allowedAsRoot",
-          "allowedContentTypes",
-          "compositions",
           "containers",
           "icon",
           "id",
@@ -19253,26 +19209,6 @@
               ]
             }
           },
-          "allowedContentTypes": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/ContentTypeSortModel"
-                }
-              ]
-            }
-          },
-          "compositions": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/ContentTypeCompositionModel"
-                }
-              ]
-            }
-          },
           "id": {
             "type": "string",
             "format": "uuid"
@@ -19297,27 +19233,6 @@
           },
           "hasListView": {
             "type": "boolean"
-          }
-        },
-        "additionalProperties": false
-      },
-      "ContentTypeSortModel": {
-        "required": [
-          "contentType",
-          "sortOrder"
-        ],
-        "type": "object",
-        "properties": {
-          "contentType": {
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/ReferenceByIdModel"
-              }
-            ]
-          },
-          "sortOrder": {
-            "type": "integer",
-            "format": "int32"
           }
         },
         "additionalProperties": false
@@ -19463,8 +19378,6 @@
         "required": [
           "alias",
           "allowedAsRoot",
-          "allowedContentTypes",
-          "compositions",
           "containers",
           "icon",
           "isElement",
@@ -19523,26 +19436,6 @@
               ]
             }
           },
-          "allowedContentTypes": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/ContentTypeSortModel"
-                }
-              ]
-            }
-          },
-          "compositions": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/ContentTypeCompositionModel"
-                }
-              ]
-            }
-          },
           "id": {
             "type": "string",
             "format": "uuid",
@@ -19563,8 +19456,6 @@
         "required": [
           "alias",
           "allowedAsRoot",
-          "allowedContentTypes",
-          "compositions",
           "containers",
           "icon",
           "isElement",
@@ -19619,26 +19510,6 @@
               "oneOf": [
                 {
                   "$ref": "#/components/schemas/CreateMediaTypePropertyTypeContainerRequestModel"
-                }
-              ]
-            }
-          },
-          "allowedContentTypes": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/ContentTypeSortModel"
-                }
-              ]
-            }
-          },
-          "compositions": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/ContentTypeCompositionModel"
                 }
               ]
             }
@@ -19750,8 +19621,10 @@
       },
       "CreateDocumentTypeRequestModel": {
         "required": [
+          "allowedDocumentTypes",
           "allowedTemplates",
-          "cleanup"
+          "cleanup",
+          "compositions"
         ],
         "type": "object",
         "allOf": [
@@ -19784,6 +19657,26 @@
                 "$ref": "#/components/schemas/ContentTypeCleanupModel"
               }
             ]
+          },
+          "allowedDocumentTypes": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DocumentTypeSortModel"
+                }
+              ]
+            }
+          },
+          "compositions": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DocumentTypeCompositionModel"
+                }
+              ]
+            }
           }
         },
         "additionalProperties": false
@@ -19884,12 +19777,38 @@
         "additionalProperties": false
       },
       "CreateMediaTypeRequestModel": {
+        "required": [
+          "allowedMediaTypes",
+          "compositions"
+        ],
         "type": "object",
         "allOf": [
           {
             "$ref": "#/components/schemas/CreateContentTypeForMediaTypeRequestModel"
           }
         ],
+        "properties": {
+          "allowedMediaTypes": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/MediaTypeSortModel"
+                }
+              ]
+            }
+          },
+          "compositions": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/MediaTypeCompositionModel"
+                }
+              ]
+            }
+          }
+        },
         "additionalProperties": false
       },
       "CreatePackageRequestModel": {
@@ -20724,6 +20643,26 @@
         },
         "additionalProperties": false
       },
+      "DocumentTypeCompositionModel": {
+        "required": [
+          "compositionType",
+          "documentType"
+        ],
+        "type": "object",
+        "properties": {
+          "documentType": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ]
+          },
+          "compositionType": {
+            "$ref": "#/components/schemas/CompositionTypeModel"
+          }
+        },
+        "additionalProperties": false
+      },
       "DocumentTypeItemResponseModel": {
         "required": [
           "isElement"
@@ -20774,8 +20713,10 @@
       },
       "DocumentTypeResponseModel": {
         "required": [
+          "allowedDocumentTypes",
           "allowedTemplates",
-          "cleanup"
+          "cleanup",
+          "compositions"
         ],
         "type": "object",
         "allOf": [
@@ -20808,6 +20749,47 @@
                 "$ref": "#/components/schemas/ContentTypeCleanupModel"
               }
             ]
+          },
+          "allowedDocumentTypes": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DocumentTypeSortModel"
+                }
+              ]
+            }
+          },
+          "compositions": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DocumentTypeCompositionModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "DocumentTypeSortModel": {
+        "required": [
+          "documentType",
+          "sortOrder"
+        ],
+        "type": "object",
+        "properties": {
+          "documentType": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ]
+          },
+          "sortOrder": {
+            "type": "integer",
+            "format": "int32"
           }
         },
         "additionalProperties": false
@@ -21858,6 +21840,26 @@
         },
         "additionalProperties": false
       },
+      "MediaTypeCompositionModel": {
+        "required": [
+          "compositionType",
+          "mediaType"
+        ],
+        "type": "object",
+        "properties": {
+          "mediaType": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ]
+          },
+          "compositionType": {
+            "$ref": "#/components/schemas/CompositionTypeModel"
+          }
+        },
+        "additionalProperties": false
+      },
       "MediaTypeItemResponseModel": {
         "type": "object",
         "allOf": [
@@ -21901,12 +21903,59 @@
         "additionalProperties": false
       },
       "MediaTypeResponseModel": {
+        "required": [
+          "allowedMediaTypes",
+          "compositions"
+        ],
         "type": "object",
         "allOf": [
           {
             "$ref": "#/components/schemas/ContentTypeForMediaTypeResponseModel"
           }
         ],
+        "properties": {
+          "allowedMediaTypes": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/MediaTypeSortModel"
+                }
+              ]
+            }
+          },
+          "compositions": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/MediaTypeCompositionModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "MediaTypeSortModel": {
+        "required": [
+          "mediaType",
+          "sortOrder"
+        ],
+        "type": "object",
+        "properties": {
+          "mediaType": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ]
+          },
+          "sortOrder": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
         "additionalProperties": false
       },
       "MediaTypeTreeItemResponseModel": {
@@ -24896,8 +24945,6 @@
         "required": [
           "alias",
           "allowedAsRoot",
-          "allowedContentTypes",
-          "compositions",
           "containers",
           "icon",
           "isElement",
@@ -24955,26 +25002,6 @@
                 }
               ]
             }
-          },
-          "allowedContentTypes": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/ContentTypeSortModel"
-                }
-              ]
-            }
-          },
-          "compositions": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/ContentTypeCompositionModel"
-                }
-              ]
-            }
           }
         },
         "additionalProperties": false
@@ -24983,8 +25010,6 @@
         "required": [
           "alias",
           "allowedAsRoot",
-          "allowedContentTypes",
-          "compositions",
           "containers",
           "icon",
           "isElement",
@@ -25039,26 +25064,6 @@
               "oneOf": [
                 {
                   "$ref": "#/components/schemas/UpdateMediaTypePropertyTypeContainerRequestModel"
-                }
-              ]
-            }
-          },
-          "allowedContentTypes": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/ContentTypeSortModel"
-                }
-              ]
-            }
-          },
-          "compositions": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/ContentTypeCompositionModel"
                 }
               ]
             }
@@ -25138,8 +25143,10 @@
       },
       "UpdateDocumentTypeRequestModel": {
         "required": [
+          "allowedDocumentTypes",
           "allowedTemplates",
-          "cleanup"
+          "cleanup",
+          "compositions"
         ],
         "type": "object",
         "allOf": [
@@ -25172,6 +25179,26 @@
                 "$ref": "#/components/schemas/ContentTypeCleanupModel"
               }
             ]
+          },
+          "allowedDocumentTypes": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DocumentTypeSortModel"
+                }
+              ]
+            }
+          },
+          "compositions": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DocumentTypeCompositionModel"
+                }
+              ]
+            }
           }
         },
         "additionalProperties": false
@@ -25231,12 +25258,38 @@
         "additionalProperties": false
       },
       "UpdateMediaTypeRequestModel": {
+        "required": [
+          "allowedMediaTypes",
+          "compositions"
+        ],
         "type": "object",
         "allOf": [
           {
             "$ref": "#/components/schemas/UpdateContentTypeForMediaTypeRequestModel"
           }
         ],
+        "properties": {
+          "allowedMediaTypes": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/MediaTypeSortModel"
+                }
+              ]
+            }
+          },
+          "compositions": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/MediaTypeCompositionModel"
+                }
+              ]
+            }
+          }
+        },
         "additionalProperties": false
       },
       "UpdatePackageRequestModel": {

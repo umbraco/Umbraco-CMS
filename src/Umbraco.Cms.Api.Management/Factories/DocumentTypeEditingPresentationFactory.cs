@@ -1,4 +1,5 @@
 ﻿using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
 using Umbraco.Cms.Core.Services;
 using ContentTypeCleanupViewModel = Umbraco.Cms.Api.Management.ViewModels.ContentType.ContentTypeCleanup;
@@ -28,6 +29,8 @@ internal sealed class DocumentTypeEditingPresentationFactory : ContentTypeEditin
         createModel.ContainerKey = requestModel.Folder?.Id;
         createModel.AllowedTemplateKeys = requestModel.AllowedTemplates.Select(reference => reference.Id).ToArray();
         createModel.DefaultTemplateKey = requestModel.DefaultTemplate?.Id;
+        createModel.AllowedContentTypes = MapAllowedContentTypes(requestModel.AllowedDocumentTypes);
+        createModel.Compositions = MapCompositions(requestModel.Compositions);
 
         return createModel;
     }
@@ -46,6 +49,8 @@ internal sealed class DocumentTypeEditingPresentationFactory : ContentTypeEditin
 
         updateModel.AllowedTemplateKeys = requestModel.AllowedTemplates.Select(reference => reference.Id).ToArray();
         updateModel.DefaultTemplateKey = requestModel.DefaultTemplate?.Id;
+        updateModel.AllowedContentTypes = MapAllowedContentTypes(requestModel.AllowedDocumentTypes);
+        updateModel.Compositions = MapCompositions(requestModel.Compositions);
 
         return updateModel;
     }
@@ -57,4 +62,14 @@ internal sealed class DocumentTypeEditingPresentationFactory : ContentTypeEditin
             KeepAllVersionsNewerThanDays = cleanup.KeepAllVersionsNewerThanDays,
             KeepLatestVersionPerDayForDays = cleanup.KeepLatestVersionPerDayForDays
         };
+
+    private IEnumerable<ContentTypeSort> MapAllowedContentTypes(IEnumerable<DocumentTypeSort> allowedDocumentTypes)
+        => MapAllowedContentTypes(allowedDocumentTypes
+            .DistinctBy(t => t.DocumentType.Id)
+            .ToDictionary(t => t.DocumentType.Id, t => t.SortOrder));
+
+    private IEnumerable<Composition> MapCompositions(IEnumerable<DocumentTypeComposition> documentTypeCompositions)
+        => MapCompositions(documentTypeCompositions
+            .DistinctBy(c => c.DocumentType.Id)
+            .ToDictionary(c => c.DocumentType.Id, c => c.CompositionType));
 }

@@ -29,8 +29,4 @@ public abstract class ContentTypeModelBase<TPropertyType, TPropertyTypeContainer
     public IEnumerable<TPropertyType> Properties { get; set; } = Enumerable.Empty<TPropertyType>();
 
     public IEnumerable<TPropertyTypeContainer> Containers { get; set; } = Enumerable.Empty<TPropertyTypeContainer>();
-
-    public IEnumerable<ContentTypeSort> AllowedContentTypes { get; set; } = Enumerable.Empty<ContentTypeSort>();
-
-    public IEnumerable<ContentTypeComposition> Compositions { get; set; } = Enumerable.Empty<ContentTypeComposition>();
 }
