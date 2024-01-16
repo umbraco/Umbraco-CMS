@@ -4,6 +4,11 @@ using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
+/// <summary>
+///     These tests are enough to test that we are not mixing content and media types when looking for compositions,
+///     even though those share a base implementation.
+///     For a more detailed test suite on compositions, check <see cref="ContentTypeEditingServiceTests" />.
+/// </summary>
 public partial class MediaTypeEditingServiceTests
 {
     [Test]
