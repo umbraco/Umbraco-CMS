@@ -31,4 +31,22 @@ export const manifests: Array<ManifestTypes> = [
 			entityType: 'block',
 		},
 	},
+	{
+		type: 'workspaceView',
+		alias: 'Umb.WorkspaceView.Block.Content',
+		name: 'Block Workspace Content View',
+		js: () => import('./views/edit/block-workspace-view-edit.element.js'),
+		weight: 1000,
+		meta: {
+			label: 'Content',
+			pathname: 'content',
+			icon: 'icon-document',
+		},
+		conditions: [
+			{
+				alias: 'Umb.Condition.WorkspaceAlias',
+				match: UMB_BLOCK_WORKSPACE_ALIAS,
+			},
+		],
+	},
 ];
