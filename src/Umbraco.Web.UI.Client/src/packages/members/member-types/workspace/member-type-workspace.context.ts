@@ -14,6 +14,7 @@ export class UmbMemberTypeWorkspaceContext
 	extends UmbEditableWorkspaceContextBase<EntityType>
 	implements UmbSaveableWorkspaceContextInterface
 {
+	//
 	public readonly repository: UmbMemberTypeRepository = new UmbMemberTypeRepository(this);
 
 	#data = new UmbObjectState<EntityType | undefined>(undefined);

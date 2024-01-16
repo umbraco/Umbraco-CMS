@@ -24,6 +24,7 @@ export class UmbDocumentWorkspaceContext
 	extends UmbEditableWorkspaceContextBase<EntityType>
 	implements UmbVariantableWorkspaceContextInterface, UmbPublishableWorkspaceContextInterface
 {
+	//
 	public readonly repository: UmbDocumentRepository = new UmbDocumentRepository(this);
 	/**
 	 * The document is the current state/draft version of the document.

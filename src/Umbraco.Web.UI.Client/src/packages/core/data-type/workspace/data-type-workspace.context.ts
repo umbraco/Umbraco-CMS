@@ -25,7 +25,9 @@ export class UmbDataTypeWorkspaceContext
 	extends UmbEditableWorkspaceContextBase<UmbDataTypeDetailModel>
 	implements UmbInvariantableWorkspaceContextInterface
 {
+	//
 	public readonly repository: UmbDataTypeDetailRepository = new UmbDataTypeDetailRepository(this);
+
 	#data = new UmbObjectState<UmbDataTypeDetailModel | undefined>(undefined);
 	readonly data = this.#data.asObservable();
 	#getDataPromise?: Promise<any>;

@@ -14,7 +14,9 @@ export class UmbMediaWorkspaceContext
 	extends UmbEditableWorkspaceContextBase<EntityType>
 	implements UmbSaveableWorkspaceContextInterface, UmbApi
 {
+	//
 	public readonly repository: UmbMediaRepository = new UmbMediaRepository(this);
+
 	#data = new UmbObjectState<EntityType | undefined>(undefined);
 	data = this.#data.asObservable();
 	name = this.#data.asObservablePart((data) => data?.name);
