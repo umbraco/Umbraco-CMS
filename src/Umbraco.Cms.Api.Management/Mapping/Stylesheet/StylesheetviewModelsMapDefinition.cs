@@ -18,7 +18,6 @@ public class StylesheetViewModelsMapDefinition : IMapDefinition
         mapper.Define<CreateStylesheetRequestModel, StylesheetCreateModel>((_, _) => new StylesheetCreateModel { Name = string.Empty }, Map);
         mapper.Define<UpdateStylesheetRequestModel, StylesheetUpdateModel>((_, _) => new StylesheetUpdateModel { Content = string.Empty }, Map);
         mapper.Define<RenameStylesheetRequestModel, StylesheetRenameModel>((_, _) => new StylesheetRenameModel { Name = string.Empty }, Map);
-        mapper.Define<IStylesheet, StylesheetOverviewResponseModel>((_, _) => new StylesheetOverviewResponseModel{ Name = string.Empty, Path = string.Empty }, Map);
 
         mapper.Define<StylesheetFolderModel, StylesheetFolderResponseModel>((_, _) => new StylesheetFolderResponseModel { Name = string.Empty, Path = string.Empty }, Map);
         mapper.Define<CreateStylesheetFolderRequestModel, StylesheetFolderCreateModel>((_, _) => new StylesheetFolderCreateModel { Name = string.Empty }, Map);
@@ -54,13 +53,6 @@ public class StylesheetViewModelsMapDefinition : IMapDefinition
     // Umbraco.Code.MapAll
     private void Map(RenameStylesheetRequestModel source, StylesheetRenameModel target, MapperContext context)
         => target.Name = source.Name;
-
-    // Umbraco.Code.MapAll
-    private void Map(IStylesheet source, StylesheetOverviewResponseModel target, MapperContext context)
-    {
-        target.Name = source.Alias;
-        target.Path = source.Path.SystemPathToVirtualPath();
-    }
 
     // Umbraco.Code.MapAll
     private void Map(StylesheetFolderModel source, StylesheetFolderResponseModel target, MapperContext context)

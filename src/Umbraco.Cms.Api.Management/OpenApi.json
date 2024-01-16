@@ -15872,64 +15872,6 @@
         ]
       }
     },
-    "/umbraco/management/api/v1/stylesheet/overview": {
-      "get": {
-        "tags": [
-          "Stylesheet"
-        ],
-        "operationId": "GetStylesheetOverview",
-        "parameters": [
-          {
-            "name": "skip",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 0
-            }
-          },
-          {
-            "name": "take",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 100
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PagedStylesheetOverviewResponseModel"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PagedStylesheetOverviewResponseModel"
-                }
-              },
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/PagedStylesheetOverviewResponseModel"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "The resource is protected and requires an authentication token"
-          }
-        },
-        "security": [
-          {
-            "Backoffice User": [ ]
-          }
-        ]
-      }
-    },
     "/umbraco/management/api/v1/tree/stylesheet/children": {
       "get": {
         "tags": [
@@ -24548,30 +24490,6 @@
         },
         "additionalProperties": false
       },
-      "PagedStylesheetOverviewResponseModel": {
-        "required": [
-          "items",
-          "total"
-        ],
-        "type": "object",
-        "properties": {
-          "total": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "items": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "$ref": "#/components/schemas/StylesheetOverviewResponseModel"
-                }
-              ]
-            }
-          }
-        },
-        "additionalProperties": false
-      },
       "PagedTagResponseModel": {
         "required": [
           "items",
@@ -25720,23 +25638,6 @@
             "$ref": "#/components/schemas/FileSystemItemResponseModelBaseModel"
           }
         ],
-        "additionalProperties": false
-      },
-      "StylesheetOverviewResponseModel": {
-        "required": [
-          "name"
-        ],
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/FileSystemItemViewModelBaseModel"
-          }
-        ],
-        "properties": {
-          "name": {
-            "type": "string"
-          }
-        },
         "additionalProperties": false
       },
       "StylesheetResponseModel": {
