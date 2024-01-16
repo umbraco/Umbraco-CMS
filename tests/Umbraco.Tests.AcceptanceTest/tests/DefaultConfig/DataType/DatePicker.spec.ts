@@ -1,24 +1,26 @@
-﻿import {test} from '@umbraco/playwright-testhelpers';
-import {expect} from "@playwright/test";
+﻿import { test } from "@umbraco/playwright-testhelpers";
+import { expect } from "@playwright/test";
 
-test.describe('Date Picker and Date Picker with time tests', () => {
-  let dataTypeDefaultData = null;
-  let dataTypeData = null;
+const datePickerTypes = ["Date Picker", "Date Picker with time"];
+for (const datePickerType of datePickerTypes) {
+  test.describe(`${datePickerType} tests`, () => {
+    let dataTypeDefaultData = null;
+    let dataTypeData = null;
 
-  test.beforeEach(async ({umbracoUi}) => {
-    await umbracoUi.goToBackOffice();
-    await umbracoUi.dataType.goToSettingsTreeItem('Data Types');
-  });
+    test.beforeEach(async ({ umbracoUi, umbracoApi }) => {
+      await umbracoUi.goToBackOffice();
+      await umbracoUi.dataType.goToSettingsTreeItem("Data Types");
+      dataTypeDefaultData = await umbracoApi.dataType.getByName(datePickerType);
+      await umbracoUi.dataType.goToDataType(datePickerType);
+    });
 
-  test.afterEach(async ({umbracoApi}) => {
-    if (dataTypeDefaultData !== null) {
-      await umbracoApi.dataType.update(dataTypeDefaultData.id, dataTypeDefaultData); 
-    }   
-  });
+    test.afterEach(async ({ umbracoApi }) => {
+      if (dataTypeDefaultData !== null) {
+        await umbracoApi.dataType.update(dataTypeDefaultData.id,dataTypeDefaultData);
+      }
+    });
 
-  const datePickerTypes = ['Date Picker', 'Date Picker with time'];
-  for (const datePickerType of datePickerTypes) {
-    test(`can update offset time in ${datePickerType}`, async ({umbracoApi, umbracoUi}) => {
+    test(`can update offset time`, async ({ umbracoApi, umbracoUi }) => {
       // Arrange
       const expectedDataTypeValues =
         datePickerType === "Date Picker"
@@ -30,7 +32,7 @@ test.describe('Date Picker and Date Picker with time tests', () => {
               {
                 alias: "offsetTime",
                 value: true,
-              }
+              },
             ]
           : [
               {
@@ -38,8 +40,6 @@ test.describe('Date Picker and Date Picker with time tests', () => {
                 value: true,
               },
             ];
-      dataTypeDefaultData = await umbracoApi.dataType.getByName(datePickerType);
-      await umbracoUi.dataType.goToDataType(datePickerType);
 
       // Act
       await umbracoUi.dataType.clickOffsetTimeSlider();
@@ -51,18 +51,16 @@ test.describe('Date Picker and Date Picker with time tests', () => {
       expect(dataTypeData.values).toEqual(expectedDataTypeValues);
     });
 
-    test(`can update date format in ${datePickerType}`, async ({umbracoApi, umbracoUi}) => {  
+    test(`can update date format`, async ({ umbracoApi, umbracoUi }) => {
       // Arrange
-      const dateFormatValue = (datePickerType === 'Date Picker') ? 'DD-MM-YYYY' : 'DD-MM-YYYY hh:mm:ss';
-      const expectedDataTypeValues =  [
+      const dateFormatValue =
+        datePickerType === "Date Picker" ? "DD-MM-YYYY" : "DD-MM-YYYY hh:mm:ss";
+      const expectedDataTypeValues = [
         {
-          "alias": "format",
-          "value": dateFormatValue
-        }
+          alias: "format",
+          value: dateFormatValue,
+        },
       ];
-      
-      dataTypeDefaultData = await umbracoApi.dataType.getByName(datePickerType);
-      await umbracoUi.dataType.goToDataType(datePickerType);
 
       // Act
       await umbracoUi.dataType.enterDateFormatValue(dateFormatValue);
@@ -73,5 +71,5 @@ test.describe('Date Picker and Date Picker with time tests', () => {
       dataTypeData = await umbracoApi.dataType.getByName(datePickerType);
       expect(dataTypeData.values).toEqual(expectedDataTypeValues);
     });
-  }
-});
+  });
+}
