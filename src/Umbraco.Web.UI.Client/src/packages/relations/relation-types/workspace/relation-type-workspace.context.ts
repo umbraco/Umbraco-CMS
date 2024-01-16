@@ -5,20 +5,23 @@ import {
 } from '@umbraco-cms/backoffice/workspace';
 import type { RelationTypeBaseModel, RelationTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 export class UmbRelationTypeWorkspaceContext
-	extends UmbEditableWorkspaceContextBase<UmbRelationTypeRepository, RelationTypeResponseModel>
+	extends UmbEditableWorkspaceContextBase<RelationTypeResponseModel>
 	implements UmbSaveableWorkspaceContextInterface
 {
+	//
+	public readonly repository: UmbRelationTypeRepository = new UmbRelationTypeRepository(this);
+
 	#data = new UmbObjectState<RelationTypeResponseModel | undefined>(undefined);
 	readonly data = this.#data.asObservable();
 	readonly name = this.#data.asObservablePart((data) => data?.name);
 	readonly id = this.#data.asObservablePart((data) => data?.id);
 
-	constructor(host: UmbControllerHostElement) {
-		super(host, 'Umb.Workspace.RelationType', new UmbRelationTypeRepository(host));
+	constructor(host: UmbControllerHost) {
+		super(host, 'Umb.Workspace.RelationType');
 	}
 
 	async load(id: string) {

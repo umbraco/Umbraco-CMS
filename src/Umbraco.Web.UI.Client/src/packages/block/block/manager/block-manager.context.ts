@@ -1,11 +1,12 @@
-import type { UmbBlockTypeBase } from '../block-type/types.js';
-import type { UmbBlockLayoutBaseModel, UmbBlockDataType } from './types.js';
+import type { UmbBlockLayoutBaseModel, UmbBlockDataType } from '..//types.js';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbDocumentTypeDetailModel, UmbDocumentTypeDetailRepository } from '@umbraco-cms/backoffice/document-type';
 import { getKeyFromUdi } from '@umbraco-cms/backoffice/utils';
+import { UmbBlockTypeBase } from '@umbraco-cms/backoffice/block';
+import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 
 // TODO: We are using backend model here, I think we should get our own model:
 type ElementTypeModel = UmbDocumentTypeDetailModel;
@@ -16,6 +17,9 @@ export class UmbBlockManagerContext<
 > extends UmbContextBase<UmbBlockManagerContext> {
 	//
 	#contentTypeRepository = new UmbDocumentTypeDetailRepository(this);
+
+	#workspacePath = new UmbStringState(undefined);
+	workspacePath = this.#workspacePath.asObservable();
 
 	#contentTypes = new UmbArrayState(<Array<ElementTypeModel>>[], (x) => x.unique);
 	public readonly contentTypes = this.#contentTypes.asObservable();
@@ -52,6 +56,18 @@ export class UmbBlockManagerContext<
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_BLOCK_MANAGER_CONTEXT);
+
+		// TODO: Make specific modal token that requires data.
+		// IDEA: Make a Workspace registration controller that can be used to register a workspace, which does both edit and create?.
+		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
+			.addAdditionalPath('block')
+			.onSetup(() => {
+				return { data: { entityType: 'block', preset: {} }, modal: { size: 'medium' } };
+			})
+			.observeRouteBuilder((routeBuilder) => {
+				const newPath = routeBuilder({});
+				this.#workspacePath.next(newPath);
+			});
 	}
 
 	async ensureContentType(unique?: string) {
@@ -87,6 +103,7 @@ export class UmbBlockManagerContext<
 			source.find((x) => x.contentElementTypeKey === contentTypeKey),
 		);
 	}
+
 	layoutOf(contentUdi: string) {
 		return this.#layouts.asObservablePart((source) => source.find((x) => x.contentUdi === contentUdi));
 	}
@@ -95,6 +112,16 @@ export class UmbBlockManagerContext<
 	}
 	settingsOf(udi: string) {
 		return this.#settings.asObservablePart((source) => source.find((x) => x.udi === udi));
+	}
+
+	setOneLayout(layoutData: BlockLayoutType) {
+		return this.#layouts.appendOne(layoutData);
+	}
+	setOneContent(contentData: UmbBlockDataType) {
+		this.#contents.appendOne(contentData);
+	}
+	setOneSettings(settingsData: UmbBlockDataType) {
+		this.#settings.appendOne(settingsData);
 	}
 
 	createBlock(layoutEntry: BlockLayoutType, contentElementTypeKey: string) {

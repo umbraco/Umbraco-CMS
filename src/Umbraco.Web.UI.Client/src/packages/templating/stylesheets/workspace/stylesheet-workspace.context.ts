@@ -12,9 +12,11 @@ import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 export class UmbStylesheetWorkspaceContext
-	extends UmbEditableWorkspaceContextBase<UmbStylesheetDetailRepository, UmbStylesheetDetailModel>
+	extends UmbEditableWorkspaceContextBase<UmbStylesheetDetailModel>
 	implements UmbSaveableWorkspaceContextInterface
 {
+	public readonly repository = new UmbStylesheetDetailRepository(this);
+
 	#data = new UmbObjectState<UmbStylesheetDetailModel | undefined>(undefined);
 	readonly data = this.#data.asObservable();
 	readonly name = this.#data.asObservablePart((data) => data?.name);
@@ -25,7 +27,7 @@ export class UmbStylesheetWorkspaceContext
 	readonly isCodeEditorReady = this.#isCodeEditorReady.asObservable();
 
 	constructor(host: UmbControllerHostElement) {
-		super(host, UMB_STYLESHEET_WORKSPACE_ALIAS, new UmbStylesheetDetailRepository(host));
+		super(host, UMB_STYLESHEET_WORKSPACE_ALIAS);
 		this.#loadCodeEditor();
 	}
 

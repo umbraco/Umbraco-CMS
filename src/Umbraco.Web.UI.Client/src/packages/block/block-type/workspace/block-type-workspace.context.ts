@@ -12,7 +12,7 @@ import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { ManifestWorkspace, PropertyEditorConfigProperty } from '@umbraco-cms/backoffice/extension-registry';
 
 export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeBase = UmbBlockTypeBase>
-	extends UmbEditableWorkspaceContextBase<never, BlockTypeData>
+	extends UmbEditableWorkspaceContextBase<BlockTypeData>
 	implements UmbInvariantableWorkspaceContextInterface
 {
 	// Just for context token safety:
@@ -31,7 +31,7 @@ export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeBase
 
 	constructor(host: UmbControllerHostElement, workspaceArgs: { manifest: ManifestWorkspace }) {
 		// TODO: We don't need a repo here, so maybe we should not require this of the UmbEditableWorkspaceContextBase
-		super(host, workspaceArgs.manifest.alias, undefined as never);
+		super(host, workspaceArgs.manifest.alias);
 		this.#entityType = workspaceArgs.manifest.meta?.entityType;
 	}
 

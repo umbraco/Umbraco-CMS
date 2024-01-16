@@ -7,13 +7,16 @@ import {
 } from '@umbraco-cms/backoffice/workspace';
 import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { TemplateItemResponseModel, TemplateResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 export class UmbTemplateWorkspaceContext
-	extends UmbEditableWorkspaceContextBase<UmbTemplateRepository, TemplateResponseModel>
+	extends UmbEditableWorkspaceContextBase<TemplateResponseModel>
 	implements UmbSaveableWorkspaceContextInterface
 {
+	//
+	public readonly repository: UmbTemplateRepository = new UmbTemplateRepository(this);
+
 	#data = new UmbObjectState<TemplateResponseModel | undefined>(undefined);
 	data = this.#data.asObservable();
 	#masterTemplate = new UmbObjectState<TemplateItemResponseModel | null>(null);
@@ -28,10 +31,10 @@ export class UmbTemplateWorkspaceContext
 	isCodeEditorReady = this.#isCodeEditorReady.asObservable();
 
 	// TODO: temp solution until we have automatic tree updates
-	#treeRepository = new UmbTemplateTreeRepository(this.host);
+	#treeRepository = new UmbTemplateTreeRepository(this);
 
-	constructor(host: UmbControllerHostElement) {
-		super(host, 'Umb.Workspace.Template', new UmbTemplateRepository(host));
+	constructor(host: UmbControllerHost) {
+		super(host, 'Umb.Workspace.Template');
 		this.#loadCodeEditor();
 	}
 

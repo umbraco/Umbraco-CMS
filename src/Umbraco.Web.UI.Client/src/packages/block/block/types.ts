@@ -6,6 +6,7 @@ export interface UmbBlockLayoutBaseModel {
 export interface UmbBlockDataType {
 	udi: string;
 	contentTypeKey: string;
+	[key: string]: unknown;
 }
 
 export interface UmbBlockValueType<BlockLayoutType extends UmbBlockLayoutBaseModel> {

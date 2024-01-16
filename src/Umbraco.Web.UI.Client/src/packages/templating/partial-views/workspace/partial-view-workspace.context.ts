@@ -2,7 +2,7 @@ import { UmbPartialViewDetailRepository } from '../repository/partial-view-detai
 import type { UmbPartialViewDetailModel } from '../types.js';
 import { UMB_PARTIAL_VIEW_ENTITY_TYPE } from '../entity.js';
 import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import {
 	UmbSaveableWorkspaceContextInterface,
 	UmbEditableWorkspaceContextBase,
@@ -13,9 +13,11 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { PartialViewResource } from '@umbraco-cms/backoffice/backend-api';
 
 export class UmbPartialViewWorkspaceContext
-	extends UmbEditableWorkspaceContextBase<UmbPartialViewDetailRepository, UmbPartialViewDetailModel>
+	extends UmbEditableWorkspaceContextBase<UmbPartialViewDetailModel>
 	implements UmbSaveableWorkspaceContextInterface
 {
+	public readonly repository = new UmbPartialViewDetailRepository(this);
+
 	#data = new UmbObjectState<UmbPartialViewDetailModel | undefined>(undefined);
 	readonly data = this.#data.asObservable();
 	readonly name = this.#data.asObservablePart((data) => data?.name);
@@ -25,8 +27,8 @@ export class UmbPartialViewWorkspaceContext
 	#isCodeEditorReady = new UmbBooleanState(false);
 	readonly isCodeEditorReady = this.#isCodeEditorReady.asObservable();
 
-	constructor(host: UmbControllerHostElement) {
-		super(host, 'Umb.Workspace.PartialView', new UmbPartialViewDetailRepository(host));
+	constructor(host: UmbControllerHost) {
+		super(host, 'Umb.Workspace.PartialView');
 		this.#loadCodeEditor();
 	}
 

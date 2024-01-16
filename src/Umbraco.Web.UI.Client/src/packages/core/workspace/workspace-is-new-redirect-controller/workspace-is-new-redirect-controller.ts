@@ -16,7 +16,7 @@ import { ensurePathEndsWithSlash } from '@umbraco-cms/backoffice/utils';
 export class UmbWorkspaceIsNewRedirectController extends UmbBaseController {
 	constructor(
 		host: UmbControllerHost,
-		workspaceContext: UmbEditableWorkspaceContextBase<unknown, unknown>,
+		workspaceContext: UmbEditableWorkspaceContextBase<unknown>,
 		router: UmbRouterSlotElement,
 	) {
 		super(host, 'isNewRedirectController');

@@ -6,15 +6,18 @@ import {
 	type UmbSaveableWorkspaceContextInterface,
 	UmbEditableWorkspaceContextBase,
 } from '@umbraco-cms/backoffice/workspace';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 export class UmbMemberWorkspaceContext
-	extends UmbEditableWorkspaceContextBase<UmbMemberDetailRepository, UmbMemberDetailModel>
+	extends UmbEditableWorkspaceContextBase<UmbMemberDetailModel>
 	implements UmbSaveableWorkspaceContextInterface
 {
-	constructor(host: UmbControllerHostElement) {
-		super(host, UMB_MEMBER_WORKSPACE_ALIAS, new UmbMemberDetailRepository(host));
+	//
+	public readonly repository: UmbMemberDetailRepository = new UmbMemberDetailRepository(this);
+
+	constructor(host: UmbControllerHost) {
+		super(host, UMB_MEMBER_WORKSPACE_ALIAS);
 	}
 
 	getEntityType(): string {

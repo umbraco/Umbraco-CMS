@@ -1,16 +1,15 @@
 import { UmbScriptDetailRepository } from '../repository/index.js';
 import { UmbScriptDetailModel } from '../types.js';
+import { UMB_SCRIPT_ENTITY_TYPE } from '../entity.js';
 import { UMB_SCRIPT_WORKSPACE_ALIAS } from './manifests.js';
 import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbEditableWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
 import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
-import { UMB_SCRIPT_ENTITY_TYPE } from '../entity.js';
 
-export class UmbScriptWorkspaceContext extends UmbEditableWorkspaceContextBase<
-	UmbScriptDetailRepository,
-	UmbScriptDetailModel
-> {
+export class UmbScriptWorkspaceContext extends UmbEditableWorkspaceContextBase<UmbScriptDetailModel> {
+	public readonly repository = new UmbScriptDetailRepository(this);
+
 	#data = new UmbObjectState<UmbScriptDetailModel | undefined>(undefined);
 	readonly data = this.#data.asObservable();
 	readonly name = this.#data.asObservablePart((data) => data?.name);
@@ -20,8 +19,8 @@ export class UmbScriptWorkspaceContext extends UmbEditableWorkspaceContextBase<
 	#isCodeEditorReady = new UmbBooleanState(false);
 	readonly isCodeEditorReady = this.#isCodeEditorReady.asObservable();
 
-	constructor(host: UmbControllerHostElement) {
-		super(host, UMB_SCRIPT_WORKSPACE_ALIAS, new UmbScriptDetailRepository(host));
+	constructor(host: UmbControllerHost) {
+		super(host, UMB_SCRIPT_WORKSPACE_ALIAS);
 		this.#loadCodeEditor();
 	}
 

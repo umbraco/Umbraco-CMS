@@ -6,15 +6,17 @@ import {
 	UmbEditableWorkspaceContextBase,
 } from '@umbraco-cms/backoffice/workspace';
 import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 
 type EntityType = UmbMediaTypeDetailModel;
 export class UmbMediaTypeWorkspaceContext
-	extends UmbEditableWorkspaceContextBase<UmbMediaTypeDetailRepository, EntityType>
+	extends UmbEditableWorkspaceContextBase<EntityType>
 	implements UmbSaveableWorkspaceContextInterface
 {
+	//
+	public readonly repository: UmbMediaTypeDetailRepository = new UmbMediaTypeDetailRepository(this);
 	// Draft is located in structure manager
 
 	// General for content types:
@@ -33,8 +35,8 @@ export class UmbMediaTypeWorkspaceContext
 	#isSorting = new UmbBooleanState(undefined);
 	isSorting = this.#isSorting.asObservable();
 
-	constructor(host: UmbControllerHostElement) {
-		super(host, 'Umb.Workspace.MediaType', new UmbMediaTypeDetailRepository(host));
+	constructor(host: UmbControllerHost) {
+		super(host, 'Umb.Workspace.MediaType');
 
 		this.structure = new UmbContentTypePropertyStructureManager<UmbMediaTypeDetailModel>(this.host, this.repository);
 

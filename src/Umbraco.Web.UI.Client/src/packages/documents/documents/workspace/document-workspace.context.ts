@@ -17,20 +17,15 @@ import {
 	UmbObjectState,
 	UmbObserverController,
 } from '@umbraco-cms/backoffice/observable-api';
-import { UmbControllerHost, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 type EntityType = DocumentResponseModel;
 export class UmbDocumentWorkspaceContext
-	extends UmbEditableWorkspaceContextBase<UmbDocumentRepository, EntityType>
+	extends UmbEditableWorkspaceContextBase<EntityType>
 	implements UmbVariantableWorkspaceContextInterface, UmbPublishableWorkspaceContextInterface
 {
-	/**
-	 * The document is the current stored version of the document.
-	 * For now lets not share this publicly as it can become confusing.
-	 * TODO: This concept is to be able to compare if there is changes since the saved one.
-	 */
-	//#persistedData = new UmbObjectState<EntityType | undefined>(undefined);
-
+	//
+	public readonly repository: UmbDocumentRepository = new UmbDocumentRepository(this);
 	/**
 	 * The document is the current state/draft version of the document.
 	 */
@@ -41,26 +36,20 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	readonly unique = this.#currentData.asObservablePart((data) => data?.id);
-	readonly documentTypeKey = this.#currentData.asObservablePart((data) => data?.contentTypeId);
+	readonly contentTypeId = this.#currentData.asObservablePart((data) => data?.contentTypeId);
 
 	readonly variants = this.#currentData.asObservablePart((data) => data?.variants || []);
 	readonly urls = this.#currentData.asObservablePart((data) => data?.urls || []);
 	readonly templateId = this.#currentData.asObservablePart((data) => data?.templateId || null);
 
-	readonly structure;
-	readonly splitView;
+	readonly structure = new UmbContentTypePropertyStructureManager(this, new UmbDocumentTypeDetailRepository(this));
+	readonly splitView = new UmbWorkspaceSplitViewManager();
 
-	constructor(host: UmbControllerHostElement) {
+	constructor(host: UmbControllerHost) {
 		// TODO: Get Workspace Alias via Manifest.
-		super(host, 'Umb.Workspace.Document', new UmbDocumentRepository(host));
+		super(host, 'Umb.Workspace.Document');
 
-		this.structure = new UmbContentTypePropertyStructureManager(
-			this.host,
-			new UmbDocumentTypeDetailRepository(this.host),
-		);
-		this.splitView = new UmbWorkspaceSplitViewManager(this.host);
-
-		new UmbObserverController(this.host, this.documentTypeKey, (id) => this.structure.loadType(id));
+		this.observe(this.contentTypeId, (id) => this.structure.loadType(id));
 
 		/*
 		TODO: Make something to ensure all variants are present in data? Seems like a good idea?.
