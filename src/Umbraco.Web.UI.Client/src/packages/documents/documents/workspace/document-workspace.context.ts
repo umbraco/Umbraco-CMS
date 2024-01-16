@@ -41,7 +41,7 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	readonly unique = this.#currentData.asObservablePart((data) => data?.id);
-	readonly documentTypeKey = this.#currentData.asObservablePart((data) => data?.contentTypeId);
+	readonly contentTypeId = this.#currentData.asObservablePart((data) => data?.contentTypeId);
 
 	readonly variants = this.#currentData.asObservablePart((data) => data?.variants || []);
 	readonly urls = this.#currentData.asObservablePart((data) => data?.urls || []);
@@ -57,7 +57,7 @@ export class UmbDocumentWorkspaceContext
 		this.structure = new UmbContentTypePropertyStructureManager(this, new UmbDocumentTypeDetailRepository(this));
 		this.splitView = new UmbWorkspaceSplitViewManager();
 
-		new UmbObserverController(this.host, this.documentTypeKey, (id) => this.structure.loadType(id));
+		new UmbObserverController(this.host, this.contentTypeId, (id) => this.structure.loadType(id));
 
 		/*
 		TODO: Make something to ensure all variants are present in data? Seems like a good idea?.

@@ -1,12 +1,11 @@
 import type { UmbBlockLayoutBaseModel, UmbBlockDataType } from '../types.js';
-import { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
+import { UmbBlockElementManager } from './block-element-manager.js';
 import {
-	UmbInvariantableWorkspaceContextInterface,
 	UmbEditableWorkspaceContextBase,
+	UmbSaveableWorkspaceContextInterface,
 	UmbWorkspaceContextInterface,
-	UmbInvariantWorkspacePropertyDatasetContext,
 } from '@umbraco-cms/backoffice/workspace';
-import { UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbBooleanState, UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { ManifestWorkspace } from '@umbraco-cms/backoffice/extension-registry';
@@ -14,22 +13,32 @@ import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UMB_BLOCK_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/block';
 
 export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel>
-	extends UmbEditableWorkspaceContextBase<never, LayoutDataType>
-	implements UmbInvariantableWorkspaceContextInterface
+	extends UmbEditableWorkspaceContextBase<UmbBlockWorkspaceContext>
+	implements UmbSaveableWorkspaceContextInterface
 {
 	// Just for context token safety:
 	public readonly IS_BLOCK_WORKSPACE_CONTEXT = true;
+	//
+	readonly workspaceAlias: string = 'Umb.Workspace.Block';
 
 	#entityType: string;
+
+	#isNew = new UmbBooleanState<boolean | undefined>(undefined);
+	readonly isNew = this.#isNew.asObservable();
 
 	#layout = new UmbObjectState<LayoutDataType | undefined>(undefined);
 	readonly layout = this.#layout.asObservable();
 
-	#content = new UmbObjectState<UmbBlockDataType | undefined>(undefined);
-	readonly content = this.#content.asObservable();
+	// Consider not storing this here:
+	//#content = new UmbObjectState<UmbBlockDataType | undefined>(undefined);
+	//readonly content = this.#content.asObservable();
 
-	#settings = new UmbObjectState<UmbBlockDataType | undefined>(undefined);
-	readonly settings = this.#settings.asObservable();
+	// Consider not storing this here:
+	//#settings = new UmbObjectState<UmbBlockDataType | undefined>(undefined);
+	//readonly settings = this.#settings.asObservable();
+
+	readonly content = new UmbBlockElementManager(this);
+	readonly settings = new UmbBlockElementManager(this);
 
 	// TODO: Get the name of the contentElementType..
 	#label = new UmbStringState<string | undefined>(undefined);
@@ -38,12 +47,8 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 
 	constructor(host: UmbControllerHost, workspaceArgs: { manifest: ManifestWorkspace }) {
 		// TODO: We don't need a repo here, so maybe we should not require this of the UmbEditableWorkspaceContextBase
-		super(host, workspaceArgs.manifest.alias, undefined as never);
+		super(host, UMB_BLOCK_WORKSPACE_CONTEXT);
 		this.#entityType = workspaceArgs.manifest.meta?.entityType;
-	}
-
-	createPropertyDatasetContext(host: UmbControllerHost): UmbPropertyDatasetContext {
-		return new UmbInvariantWorkspacePropertyDatasetContext(host, this);
 	}
 
 	async load(unique: string) {
@@ -64,6 +69,8 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	}
 
 	async create(contentElementTypeId: string) {
+		//
+		// TODO: Condense this into some kind of create method?
 		const key = UmbId.new();
 		const contentUdi = `umb://block/${key}`;
 		const layout: UmbBlockLayoutBaseModel = {
@@ -73,9 +80,19 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 			udi: contentUdi,
 			contentTypeKey: contentElementTypeId,
 		};
+		this.content.setData(content);
+
+		// TODO: If we have Settings dedicated to this block type, we initiate them here:
 
 		this.setIsNew(true);
 		this.#layout.next(layout as LayoutDataType);
+	}
+
+	getIsNew() {
+		return this.#isNew.value;
+	}
+	setIsNew(value: boolean): void {
+		this.#isNew.next(value);
 	}
 
 	getData() {
@@ -93,17 +110,18 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	getName() {
 		return 'block name content element type here...';
 	}
-	setName(name: string | undefined) {
-		alert('You cannot set a name of a block-type.');
+
+	// NOTICE currently the property methods are for layout, but this could be seen as wrong, we might need to dedicate a data manager for the layout as well.
+
+	async propertyValueByAlias<propertyAliasType extends keyof LayoutDataType>(propertyAlias: propertyAliasType) {
+		return this.#layout.asObservablePart(
+			(layout) => layout?.[propertyAlias as keyof LayoutDataType] as LayoutDataType[propertyAliasType],
+		);
 	}
 
-	async propertyValueByAlias<ReturnType = unknown>(propertyAlias: string) {
-		return this.#layout.asObservablePart((data) => data?.[propertyAlias as keyof BlockTypeData] as ReturnType);
-	}
-
-	getPropertyValue<ReturnType = unknown>(propertyAlias: string) {
+	getPropertyValue<propertyAliasType extends keyof LayoutDataType>(propertyAlias: propertyAliasType) {
 		// TODO: Should be using Content, then we need a toggle or another method for getting settings.
-		return this.#layout.getValue()?.[propertyAlias as keyof BlockTypeData] as ReturnType;
+		return this.#layout.getValue()?.[propertyAlias as keyof LayoutDataType] as LayoutDataType[propertyAliasType];
 	}
 
 	async setPropertyValue(alias: string, value: unknown) {

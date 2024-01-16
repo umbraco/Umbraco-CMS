@@ -11,6 +11,12 @@ export abstract class UmbEditableWorkspaceContextBase<RepositoryType, WorkspaceD
 {
 	public readonly host: UmbControllerHost;
 	public readonly workspaceAlias: string;
+	/*
+	 *
+	 * HER SKAL DU FORTSÆTTE I MORGEN, Det vil kræve ændringer i mange workspace contexts.
+	 *
+	 */
+	// TODO: Get rid of the repository, as it prevents flexibility needed for Blocks and other workspaces that like to borrow the features of EditableWorkspace but not using one repository.
 	// TODO: I think we should get rid of the repository from this one.
 	public readonly repository: RepositoryType;
 
