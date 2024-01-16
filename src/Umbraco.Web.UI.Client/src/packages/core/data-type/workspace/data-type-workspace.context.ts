@@ -35,8 +35,8 @@ export class UmbDataTypeWorkspaceContext
 	readonly name = this.#data.asObservablePart((data) => data?.name);
 	readonly unique = this.#data.asObservablePart((data) => data?.unique);
 
-	readonly propertyEditorUiAlias = this.#data.asObservablePart((data) => data?.propertyEditorUiAlias);
-	readonly propertyEditorSchemaAlias = this.#data.asObservablePart((data) => data?.propertyEditorAlias);
+	readonly propertyEditorUiAlias = this.#data.asObservablePart((data) => data?.editorUiAlias);
+	readonly propertyEditorSchemaAlias = this.#data.asObservablePart((data) => data?.editorAlias);
 
 	#properties = new UmbArrayState<PropertyEditorConfigProperty>([], (x) => x.alias);
 	readonly properties = this.#properties.asObservable();
@@ -234,10 +234,10 @@ export class UmbDataTypeWorkspaceContext
 	}
 
 	setPropertyEditorSchemaAlias(alias?: string) {
-		this.#data.update({ propertyEditorAlias: alias });
+		this.#data.update({ editorAlias: alias });
 	}
 	setPropertyEditorUiAlias(alias?: string) {
-		this.#data.update({ propertyEditorUiAlias: alias });
+		this.#data.update({ editorUiAlias: alias });
 	}
 
 	async propertyValueByAlias<ReturnType = unknown>(propertyAlias: string) {
