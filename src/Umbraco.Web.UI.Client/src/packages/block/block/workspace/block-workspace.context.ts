@@ -19,12 +19,11 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	// Just for context token safety:
 	public readonly IS_BLOCK_WORKSPACE_CONTEXT = true;
 	//
-	readonly workspaceAlias: string = 'Umb.Workspace.Block';
+	readonly workspaceAlias;
 
 	#blockManager?: typeof UMB_BLOCK_MANAGER_CONTEXT.TYPE;
 
 	#entityType: string;
-	#contentUdi: string;
 
 	#isNew = new UmbBooleanState<boolean | undefined>(undefined);
 	readonly isNew = this.#isNew.asObservable();
@@ -46,10 +45,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		// TODO: We don't need a repo here, so maybe we should not require this of the UmbEditableWorkspaceContextBase
 		super(host, 'Umb.Workspace.Block');
 		this.#entityType = workspaceArgs.manifest.meta?.entityType;
-
-		this.observe(this.contentUdi, (contentUdi) => {
-			this.#contentUdi = contentUdi ?? '';
-		});
+		this.workspaceAlias = workspaceArgs.manifest.alias;
 	}
 
 	async load(unique: string) {
@@ -155,11 +151,11 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	}
 
 	async save() {
-		if (!this.#layout.value || !this.#blockManager) return;
-
-		// TODO: Save the block type, but only in non-live-editing mode.
 		const layoutData = this.#layout.value;
-		this.#blockManager.setOneLayout(this.#layout.value);
+		if (!layoutData || !this.#blockManager) return;
+
+		// TODO: Save the block, but only in non-live-editing mode.
+		this.#blockManager.setOneLayout(layoutData);
 
 		const contentData = this.content.getData();
 		if (contentData) {
@@ -170,7 +166,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 			this.#blockManager.setOneSettings(settingsData);
 		}
 
-		this.saveComplete(this.#layout.value);
+		this.saveComplete(layoutData);
 	}
 
 	public destroy(): void {
