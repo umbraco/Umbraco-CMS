@@ -5,21 +5,22 @@ import {
 	UmbEditableWorkspaceContextBase,
 } from '@umbraco-cms/backoffice/workspace';
 import { appendToFrozenArray, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
 type EntityType = UmbMediaDetailModel;
 export class UmbMediaWorkspaceContext
-	extends UmbEditableWorkspaceContextBase<UmbMediaRepository, EntityType>
+	extends UmbEditableWorkspaceContextBase<EntityType>
 	implements UmbSaveableWorkspaceContextInterface, UmbApi
 {
+	public readonly repository: UmbMediaRepository = new UmbMediaRepository(this);
 	#data = new UmbObjectState<EntityType | undefined>(undefined);
 	data = this.#data.asObservable();
 	name = this.#data.asObservablePart((data) => data?.name);
 
-	constructor(host: UmbControllerHostElement) {
-		super(host, 'Umb.Workspace.Media', new UmbMediaRepository(host));
+	constructor(host: UmbControllerHost) {
+		super(host, 'Umb.Workspace.Media');
 	}
 
 	getData() {

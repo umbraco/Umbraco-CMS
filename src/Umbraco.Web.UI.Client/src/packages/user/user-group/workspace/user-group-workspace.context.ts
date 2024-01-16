@@ -6,13 +6,16 @@ import {
 } from '@umbraco-cms/backoffice/workspace';
 import type { UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbArrayState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 export class UmbUserGroupWorkspaceContext
-	extends UmbEditableWorkspaceContextBase<UmbUserGroupRepository, UserGroupResponseModel>
+	extends UmbEditableWorkspaceContextBase<UserGroupResponseModel>
 	implements UmbSaveableWorkspaceContextInterface
 {
+	//
+	public readonly repository: UmbUserGroupRepository = new UmbUserGroupRepository(this);
+
 	#data = new UmbObjectState<UserGroupResponseModel | undefined>(undefined);
 	data = this.#data.asObservable();
 
@@ -21,8 +24,8 @@ export class UmbUserGroupWorkspaceContext
 
 	#userRepository: UmbUserRepository;
 
-	constructor(host: UmbControllerHostElement) {
-		super(host, 'Umb.Workspace.UserGroup', new UmbUserGroupRepository(host));
+	constructor(host: UmbControllerHost) {
+		super(host, 'Umb.Workspace.UserGroup');
 
 		this.#userRepository = new UmbUserRepository(host);
 	}

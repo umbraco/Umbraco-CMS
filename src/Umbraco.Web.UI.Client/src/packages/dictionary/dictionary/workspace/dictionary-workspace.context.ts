@@ -3,23 +3,24 @@ import {
 	type UmbSaveableWorkspaceContextInterface,
 	UmbEditableWorkspaceContextBase,
 } from '@umbraco-cms/backoffice/workspace';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { DictionaryItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 export class UmbDictionaryWorkspaceContext
-	extends UmbEditableWorkspaceContextBase<UmbDictionaryRepository, DictionaryItemResponseModel>
+	extends UmbEditableWorkspaceContextBase<DictionaryItemResponseModel>
 	implements UmbSaveableWorkspaceContextInterface
 {
+	public readonly repository: UmbDictionaryRepository = new UmbDictionaryRepository(this);
 	#data = new UmbObjectState<DictionaryItemResponseModel | undefined>(undefined);
 	readonly data = this.#data.asObservable();
 
 	readonly name = this.#data.asObservablePart((data) => data?.name);
 	readonly dictionary = this.#data.asObservablePart((data) => data);
 
-	constructor(host: UmbControllerHostElement) {
-		super(host, 'Umb.Workspace.Dictionary', new UmbDictionaryRepository(host));
+	constructor(host: UmbControllerHost) {
+		super(host, 'Umb.Workspace.Dictionary');
 	}
 
 	getData() {

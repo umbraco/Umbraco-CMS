@@ -21,9 +21,10 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 type EntityType = DocumentResponseModel;
 export class UmbDocumentWorkspaceContext
-	extends UmbEditableWorkspaceContextBase<UmbDocumentRepository, EntityType>
+	extends UmbEditableWorkspaceContextBase<EntityType>
 	implements UmbVariantableWorkspaceContextInterface, UmbPublishableWorkspaceContextInterface
 {
+	public readonly repository: UmbDocumentRepository = new UmbDocumentRepository(this);
 	/**
 	 * The document is the current state/draft version of the document.
 	 */
@@ -45,7 +46,7 @@ export class UmbDocumentWorkspaceContext
 
 	constructor(host: UmbControllerHost) {
 		// TODO: Get Workspace Alias via Manifest.
-		super(host, 'Umb.Workspace.Document', new UmbDocumentRepository(host));
+		super(host, 'Umb.Workspace.Document');
 
 		this.structure = new UmbContentTypePropertyStructureManager(this, new UmbDocumentTypeDetailRepository(this));
 		this.splitView = new UmbWorkspaceSplitViewManager();

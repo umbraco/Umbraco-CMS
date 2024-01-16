@@ -12,7 +12,7 @@ import {
 	UmbObjectState,
 	UmbStringState,
 } from '@umbraco-cms/backoffice/observable-api';
-import { UmbControllerHost, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { combineLatest, map } from '@umbraco-cms/backoffice/external/rxjs';
 import {
 	PropertyEditorConfigDefaultData,
@@ -22,9 +22,10 @@ import {
 import { UMB_PROPERTY_EDITOR_SCHEMA_ALIAS_DEFAULT } from '@umbraco-cms/backoffice/property-editor';
 
 export class UmbDataTypeWorkspaceContext
-	extends UmbEditableWorkspaceContextBase<UmbDataTypeDetailRepository, UmbDataTypeDetailModel>
+	extends UmbEditableWorkspaceContextBase<UmbDataTypeDetailModel>
 	implements UmbInvariantableWorkspaceContextInterface
 {
+	public readonly repository: UmbDataTypeDetailRepository = new UmbDataTypeDetailRepository(this);
 	#data = new UmbObjectState<UmbDataTypeDetailModel | undefined>(undefined);
 	readonly data = this.#data.asObservable();
 	#getDataPromise?: Promise<any>;
@@ -59,8 +60,8 @@ export class UmbDataTypeWorkspaceContext
 	#propertyEditorUiName = new UmbStringState<string | null>(null);
 	readonly propertyEditorUiName = this.#propertyEditorUiName.asObservable();
 
-	constructor(host: UmbControllerHostElement) {
-		super(host, 'Umb.Workspace.DataType', new UmbDataTypeDetailRepository(host));
+	constructor(host: UmbControllerHost) {
+		super(host, 'Umb.Workspace.DataType');
 		this.#observePropertyEditorUIAlias();
 	}
 
