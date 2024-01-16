@@ -3,7 +3,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using OpenIddict.Abstractions;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Models.Configuration;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Security;
 
@@ -19,7 +19,7 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
     public BackOfficeApplicationManager(
         IOpenIddictApplicationManager applicationManager,
         IWebHostEnvironment webHostEnvironment,
-        IOptions<NewBackOfficeSettings> securitySettings,
+        IOptions<SecuritySettings> securitySettings,
         IRuntimeState runtimeState)
         : base(applicationManager)
     {

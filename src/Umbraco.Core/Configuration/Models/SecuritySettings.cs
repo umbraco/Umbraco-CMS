@@ -116,4 +116,14 @@ public class SecuritySettings
     /// </summary>
     [DefaultValue(StaticAllowConcurrentLogins)]
     public bool AllowConcurrentLogins { get; set; } = StaticAllowConcurrentLogins;
+
+    /// <summary>
+    ///     Gets or sets a value of the backoffice host URI.
+    /// </summary>
+    public Uri? BackOfficeHost { get; set; }
+
+    /// <summary>
+    ///     Gets or sets a value indicating whether to allow concurrent logins.
+    /// </summary>
+    public string? AuthorizeCallbackPathName { get; set; }
 }
