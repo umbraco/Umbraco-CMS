@@ -78,7 +78,6 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 
 		this.#init = this._observeContentType(data);
 		await this.#init;
-		debugger;
 		return { data };
 	}
 
