@@ -126,8 +126,8 @@ export class UmbDocumentTypeWorkspaceContext
 		this.structure.updateOwnerContentType({ defaultTemplateId });
 	}
 
-	async create(parentId: string | null) {
-		const { data } = await this.structure.createScaffold(parentId);
+	async create(parentUnique: string | null) {
+		const { data } = await this.structure.createScaffold(parentUnique);
 		if (!data) return undefined;
 
 		this.setIsNew(true);
@@ -136,8 +136,8 @@ export class UmbDocumentTypeWorkspaceContext
 		return { data } || undefined;
 	}
 
-	async load(entityId: string) {
-		const { data } = await this.structure.loadType(entityId);
+	async load(unique: string) {
+		const { data } = await this.structure.loadType(unique);
 		if (!data) return undefined;
 
 		this.setIsNew(false);
