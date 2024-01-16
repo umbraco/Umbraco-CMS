@@ -42,15 +42,12 @@ export class UmbDocumentWorkspaceContext
 	readonly urls = this.#currentData.asObservablePart((data) => data?.urls || []);
 	readonly templateId = this.#currentData.asObservablePart((data) => data?.templateId || null);
 
-	readonly structure;
-	readonly splitView;
+	readonly structure = new UmbContentTypePropertyStructureManager(this, new UmbDocumentTypeDetailRepository(this));
+	readonly splitView = new UmbWorkspaceSplitViewManager();
 
 	constructor(host: UmbControllerHost) {
 		// TODO: Get Workspace Alias via Manifest.
 		super(host, 'Umb.Workspace.Document');
-
-		this.structure = new UmbContentTypePropertyStructureManager(this, new UmbDocumentTypeDetailRepository(this));
-		this.splitView = new UmbWorkspaceSplitViewManager();
 
 		new UmbObserverController(this.host, this.contentTypeId, (id) => this.structure.loadType(id));
 

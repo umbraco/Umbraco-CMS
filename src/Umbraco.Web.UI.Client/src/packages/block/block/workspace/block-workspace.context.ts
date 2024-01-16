@@ -28,16 +28,10 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 
 	#layout = new UmbObjectState<LayoutDataType | undefined>(undefined);
 	readonly layout = this.#layout.asObservable();
-
-	// Consider not storing this here:
-	//#content = new UmbObjectState<UmbBlockDataType | undefined>(undefined);
-	//readonly content = this.#content.asObservable();
-
-	// Consider not storing this here:
-	//#settings = new UmbObjectState<UmbBlockDataType | undefined>(undefined);
-	//readonly settings = this.#settings.asObservable();
+	readonly contentUdi = this.#layout.asObservablePart((x) => x?.contentUdi);
 
 	readonly content = new UmbBlockElementManager(this);
+
 	readonly settings = new UmbBlockElementManager(this);
 
 	// TODO: Get the name of the contentElementType..
@@ -56,6 +50,8 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 			this.observe(
 				context.layoutOf(unique),
 				(layoutData) => {
+					this.#layout.next(layoutData as LayoutDataType);
+
 					//
 					// Content:
 					const contentUdi = layoutData?.contentUdi;
