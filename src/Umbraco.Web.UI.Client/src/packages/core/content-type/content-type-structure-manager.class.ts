@@ -195,6 +195,9 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 		const containers = appendToFrozenArray(frozenContainers, container, (x) => x.id === container.id);
 
 		console.log(frozenContainers, containers);
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
+		// TODO: fix TS partial complaint
 		this.#contentTypes.updateOne(contentTypeId, { containers });
 	}
 
@@ -228,6 +231,9 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 
 		const containers = partialUpdateFrozenArray(frozenContainers, partialUpdate, (x) => x.id === containerId);
 
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
+		// TODO: fix TS partial complaint
 		this.#contentTypes.updateOne(contentTypeId, { containers });
 	}
 
@@ -238,6 +244,9 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 		const frozenContainers = this.#contentTypes.getValue().find((x) => x.unique === contentTypeId)?.containers ?? [];
 		const containers = frozenContainers.filter((x) => x.id !== containerId);
 
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
+		// TODO: fix TS partial complaint
 		this.#contentTypes.updateOne(contentTypeId, { containers });
 	}
 
@@ -275,6 +284,9 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 		const properties = [...(this.#contentTypes.getValue().find((x) => x.unique === contentTypeId)?.properties ?? [])];
 		properties.push(property);
 
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
+		// TODO: fix TS partial complaint
 		this.#contentTypes.updateOne(contentTypeId, { properties });
 
 		return property;
@@ -288,6 +300,9 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 
 		const properties = appendToFrozenArray(frozenProperties, property, (x) => x.id === property.id);
 
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
+		// TODO: fix TS partial complaint
 		this.#contentTypes.updateOne(contentTypeId, { properties });
 	}
 
@@ -299,6 +314,9 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 
 		const properties = filterFrozenArray(frozenProperties, (x) => x.id !== propertyId);
 
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
+		// TODO: fix TS partial complaint
 		this.#contentTypes.updateOne(contentTypeId, { properties });
 	}
 
@@ -314,6 +332,9 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 
 		const properties = partialUpdateFrozenArray(frozenProperties, partialUpdate, (x) => x.id === propertyId);
 
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
+		// TODO: fix TS partial complaint
 		this.#contentTypes.updateOne(contentTypeId, { properties });
 	}
 
