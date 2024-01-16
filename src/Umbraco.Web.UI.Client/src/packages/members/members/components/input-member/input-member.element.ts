@@ -3,6 +3,7 @@ import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { MemberItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
+import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-input-member')
 export class UmbInputMemberElement extends FormControlMixin(UmbLitElement) {
@@ -62,11 +63,17 @@ export class UmbInputMemberElement extends FormControlMixin(UmbLitElement) {
 		//this.#pickerContext.setSelection(ids);
 	}
 
+	@property({ type: Boolean })
+	showOpenButton?: boolean;
+
 	@property()
 	public set value(idsString: string) {
 		// Its with full purpose we don't call super.value, as thats being handled by the observation of the context selection.
 		this.selectedIds = splitStringToArray(idsString);
 	}
+
+	@state()
+	private _editMemberPath = '';
 
 	@state()
 	private _items?: Array<MemberItemResponseModel>;
@@ -77,6 +84,14 @@ export class UmbInputMemberElement extends FormControlMixin(UmbLitElement) {
 	constructor() {
 		super();
 
+		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
+			.addAdditionalPath('member')
+			.onSetup(() => {
+				return { data: { entityType: 'member', preset: {} } };
+			})
+			.observeRouteBuilder((routeBuilder) => {
+				this._editMemberPath = routeBuilder({});
+			});
 		// this.addValidator(
 		// 	'rangeUnderflow',
 		// 	() => this.minMessage,
@@ -110,10 +125,7 @@ export class UmbInputMemberElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	render() {
-		return html`
-			${this.#renderItems()}
-			${this.#renderAddButton()}
-		`;
+		return html` ${this.#renderItems()} ${this.#renderAddButton()} `;
 	}
 
 	#renderItems() {
@@ -143,13 +155,26 @@ export class UmbInputMemberElement extends FormControlMixin(UmbLitElement) {
 			<uui-ref-node name=${ifDefined(item.name)} detail=${ifDefined(item.id)}>
 				<!-- TODO: implement is deleted <uui-tag size="s" slot="tag" color="danger">Deleted</uui-tag> -->
 				<uui-action-bar slot="actions">
+					${this.#renderOpenButton(item)}
 					<uui-button
 						@click=${() => this._requestRemoveItem(item)}
-						label="Remove member ${item.name}"
-						>Remove</uui-button
-					>
+						label="Remove member ${item.name}">
+						Remove
+					</uui-button>
 				</uui-action-bar>
 			</uui-ref-node>
+		`;
+	}
+
+	#renderOpenButton(item: MemberItemResponseModel) {
+		if (!this.showOpenButton) return;
+		return html`
+			<uui-button
+				compact
+				href="${this._editMemberPath}edit/${item.id}"
+				label=${this.localize.term('general_edit') + ` ${item.name}`}>
+				<uui-icon name="icon-edit"></uui-icon>
+			</uui-button>
 		`;
 	}
 
