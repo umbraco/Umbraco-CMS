@@ -1,6 +1,6 @@
-import type { UmbBlockTypeBase } from '../block-type/types.js';
-import type { UmbBlockLayoutBaseModel, UmbBlockDataType } from './types.js';
-import { UMB_BLOCK_MANAGER_CONTEXT, type UmbBlockManagerContext } from './block-manager.context.js';
+import type { UmbBlockTypeBase } from '../../block-type/types.js';
+import type { UmbBlockLayoutBaseModel, UmbBlockDataType } from '../types.js';
+import { UMB_BLOCK_MANAGER_CONTEXT, type UmbBlockManagerContext } from '../manager/index.js';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -18,6 +18,9 @@ export class UmbBlockContext<
 
 	#label = new UmbStringState('');
 	public readonly label = this.#label.asObservable();
+
+	#workspacePath = new UmbStringState(undefined);
+	public readonly workspacePath = this.#workspacePath.asObservable();
 
 	#blockType = new UmbObjectState<BlockType | undefined>(undefined);
 	public readonly blockType = this.#blockType.asObservable();
@@ -51,6 +54,13 @@ export class UmbBlockContext<
 		// Consume block manager:
 		this.consumeContext(UMB_BLOCK_MANAGER_CONTEXT, (manager) => {
 			this.#manager = manager;
+			this.observe(
+				manager.workspacePath,
+				(workspacePath) => {
+					this.#workspacePath.next(workspacePath);
+				},
+				'observeWorkspacePath',
+			);
 			this.#observeBlockType();
 			this.#observeData();
 		});

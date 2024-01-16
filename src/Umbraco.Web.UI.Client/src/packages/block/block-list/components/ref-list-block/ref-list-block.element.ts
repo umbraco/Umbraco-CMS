@@ -1,4 +1,4 @@
-import { customElement } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UUIRefNodeElement } from '@umbraco-cms/backoffice/external/uui';
 
 /**
@@ -11,6 +11,15 @@ export class UmbRefListBlockElement extends UUIRefNodeElement {
 		super.connectedCallback();
 		this.setAttribute('border', '');
 	}
+
+	static styles = [
+		...UUIRefNodeElement.styles,
+		css`
+			:host {
+				min-height: var(--uui-size-16);
+			}
+		`,
+	];
 }
 
 export default UmbRefListBlockElement;

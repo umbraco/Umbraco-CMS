@@ -4,7 +4,7 @@ import {
 	type UmbSaveableWorkspaceContextInterface,
 	UmbEditableWorkspaceContextBase,
 } from '@umbraco-cms/backoffice/workspace';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState, UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
 import type { RichTextRuleModel, UpdateStylesheetRequestModel } from '@umbraco-cms/backoffice/backend-api';
@@ -13,9 +13,12 @@ import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 export type RichTextRuleModelSortable = RichTextRuleModel & { sortOrder?: number };
 
 export class UmbStylesheetWorkspaceContext
-	extends UmbEditableWorkspaceContextBase<UmbStylesheetRepository, UmbStylesheetDetailModel>
+	extends UmbEditableWorkspaceContextBase<UmbStylesheetDetailModel>
 	implements UmbSaveableWorkspaceContextInterface
 {
+	//
+	public readonly repository: UmbStylesheetRepository = new UmbStylesheetRepository(this);
+
 	#data = new UmbObjectState<UmbStylesheetDetailModel | undefined>(undefined);
 	#rules = new UmbArrayState<RichTextRuleModelSortable>([], (rule) => rule.name);
 	readonly data = this.#data.asObservable();
@@ -27,8 +30,8 @@ export class UmbStylesheetWorkspaceContext
 	#isCodeEditorReady = new UmbBooleanState(false);
 	readonly isCodeEditorReady = this.#isCodeEditorReady.asObservable();
 
-	constructor(host: UmbControllerHostElement) {
-		super(host, 'Umb.Workspace.StyleSheet', new UmbStylesheetRepository(host));
+	constructor(host: UmbControllerHost) {
+		super(host, 'Umb.Workspace.StyleSheet');
 		this.#rules.sortBy((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
 		this.#loadCodeEditor();
 	}

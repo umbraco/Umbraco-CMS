@@ -1,5 +1,4 @@
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 
 export type ActiveVariant = {
@@ -14,14 +13,8 @@ export type ActiveVariant = {
  * @description - Class managing the split view state for a workspace context.
  */
 export class UmbWorkspaceSplitViewManager {
-	#host: UmbControllerHostElement;
-
 	#activeVariantsInfo = new UmbArrayState<ActiveVariant>([], (x) => x.index);
 	public readonly activeVariantsInfo = this.#activeVariantsInfo.asObservable();
-
-	constructor(host: UmbControllerHostElement) {
-		this.#host = host;
-	}
 
 	private _routeBase?: string;
 	public getWorkspaceRoute(): string | undefined {

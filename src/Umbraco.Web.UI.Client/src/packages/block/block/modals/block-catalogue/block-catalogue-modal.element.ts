@@ -3,7 +3,6 @@ import {
 	UmbBlockCatalogueModalValue,
 	UmbBlockTypeWithGroupKey,
 } from '@umbraco-cms/backoffice/block';
-import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/document';
 import { css, html, customElement, state, repeat, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { groupBy } from '@umbraco-cms/backoffice/external/lodash';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';

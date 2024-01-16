@@ -3,7 +3,7 @@ import { UmbStylesheetTreeRepository } from '../tree/index.js';
 import { UmbStylesheetServerDataSource } from './sources/stylesheet.server.data.js';
 import { UmbStylesheetFolderServerDataSource } from './sources/stylesheet.folder.server.data.js';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
-import { type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import {
 	DataSourceResponse,
 	UmbDataSourceErrorResponse,
@@ -40,7 +40,7 @@ export class UmbStylesheetRepository
 	// TODO: temp solution until it is automated
 	#treeRepository = new UmbStylesheetTreeRepository(this);
 
-	constructor(host: UmbControllerHostElement) {
+	constructor(host: UmbControllerHost) {
 		super(host);
 
 		// TODO: figure out how spin up get the correct data source
