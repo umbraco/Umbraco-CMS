@@ -123,12 +123,12 @@ export const data: Array<UmbMockPartialViewModel> = [
 export const snippets: Array<PartialViewSnippetResponseModel> = [
 	{
 		name: 'Empty',
-		fileName: 'Empty',
+		id: '37f8786b-0b9b-466f-97b6-e736126fc545',
 		content: '@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage',
 	},
 	{
 		name: 'Breadcrumb',
-		fileName: 'Breadcrumb',
+		id: '4ed59952-d0aa-4583-9c3d-9f6b7068dcea',
 		content: `@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
 		@using Umbraco.Cms.Core.Routing
 		@using Umbraco.Extensions
@@ -160,7 +160,7 @@ export const snippets: Array<PartialViewSnippetResponseModel> = [
 	},
 	{
 		name: 'EditProfile',
-		fileName: 'EditProfile',
+		id: 'a3a41f2d-0891-49f6-b2a1-d75e342fe14e',
 		content: `@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
 
 		@using Umbraco.Cms.Core.Services
@@ -293,32 +293,32 @@ export const snippets: Array<PartialViewSnippetResponseModel> = [
 	},
 	{
 		name: 'Login',
-		fileName: 'Login',
+		id: 'd5a4f7fb-ca4f-4452-9071-0795db207103',
 		content: 'login',
 	},
 	{
 		name: 'Login Status',
-		fileName: 'LoginStatus',
+		id: '5d0683c8-50b4-4f54-817f-60992ca2a92a',
 		content: 'loginStatus',
 	},
 	{
 		name: 'Multinode Tree-picker',
-		fileName: 'MultinodeTree-picker',
+		id: 'c9e264c6-6281-4c94-a7cb-de2fb7c81c04',
 		content: 'MultinodeTree-picker',
 	},
 	{
 		name: 'Navigation',
-		fileName: 'Navigation',
+		id: '1b836d87-969b-4f58-807e-c959a1175c65',
 		content: 'Navigation',
 	},
 	{
 		name: 'Register Member',
-		fileName: 'RegisterMember',
+		id: '2f49f869-e382-4e7b-baa4-9da5cfbb134b',
 		content: 'RegisterMember',
 	},
 	{
 		name: 'Site Map',
-		fileName: 'SiteMap',
+		id: 'e4a8577a-abf6-4bb1-a942-2a99b10558b4',
 		content: 'SiteMap',
 	},
 ];
