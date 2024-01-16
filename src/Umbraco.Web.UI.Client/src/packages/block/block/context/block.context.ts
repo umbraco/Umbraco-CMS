@@ -19,6 +19,9 @@ export class UmbBlockContext<
 	#label = new UmbStringState('');
 	public readonly label = this.#label.asObservable();
 
+	#workspacePath = new UmbStringState(undefined);
+	public readonly workspacePath = this.#workspacePath.asObservable();
+
 	#blockType = new UmbObjectState<BlockType | undefined>(undefined);
 	public readonly blockType = this.#blockType.asObservable();
 	public readonly blockTypeContentElementTypeKey = this.#blockType.asObservablePart((x) => x?.contentElementTypeKey);
@@ -51,6 +54,13 @@ export class UmbBlockContext<
 		// Consume block manager:
 		this.consumeContext(UMB_BLOCK_MANAGER_CONTEXT, (manager) => {
 			this.#manager = manager;
+			this.observe(
+				manager.workspacePath,
+				(workspacePath) => {
+					this.#workspacePath.next(workspacePath);
+				},
+				'observeWorkspacePath',
+			);
 			this.#observeBlockType();
 			this.#observeData();
 		});

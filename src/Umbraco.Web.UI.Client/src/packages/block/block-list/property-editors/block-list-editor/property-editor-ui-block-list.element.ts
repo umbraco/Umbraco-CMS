@@ -15,7 +15,12 @@ import '../../components/block-list-block/index.js';
 import { buildUdi } from '@umbraco-cms/backoffice/utils';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { NumberRangeValueType } from '@umbraco-cms/backoffice/models';
-import { UMB_MODAL_MANAGER_CONTEXT_TOKEN, UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
+import {
+	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
+	UMB_WORKSPACE_MODAL,
+	UmbModalManagerContext,
+	UmbModalRouteRegistrationController,
+} from '@umbraco-cms/backoffice/modal';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 export interface UmbBlockListLayoutModel extends UmbBlockLayoutBaseModel {}
@@ -77,6 +82,9 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 
 	@state()
 	_layouts: Array<UmbBlockLayoutBaseModel> = [];
+
+	@state()
+	_workspacePath?: string;
 
 	#modalContext?: UmbModalManagerContext;
 

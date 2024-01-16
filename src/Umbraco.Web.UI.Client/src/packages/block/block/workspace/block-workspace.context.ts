@@ -21,13 +21,17 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	//
 	readonly workspaceAlias: string = 'Umb.Workspace.Block';
 
+	#blockManager?: typeof UMB_BLOCK_MANAGER_CONTEXT.TYPE;
+
 	#entityType: string;
+	#contentUdi: string;
 
 	#isNew = new UmbBooleanState<boolean | undefined>(undefined);
 	readonly isNew = this.#isNew.asObservable();
 
 	#layout = new UmbObjectState<LayoutDataType | undefined>(undefined);
 	readonly layout = this.#layout.asObservable();
+	//readonly unique = this.#layout.asObservablePart((x) => x?.contentUdi);
 	readonly contentUdi = this.#layout.asObservablePart((x) => x?.contentUdi);
 
 	readonly content = new UmbBlockElementManager(this);
@@ -37,16 +41,21 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	// TODO: Get the name of the contentElementType..
 	#label = new UmbStringState<string | undefined>(undefined);
 	readonly name = this.#label.asObservable();
-	readonly unique = this.#layout.asObservablePart((data) => data?.contentUdi);
 
 	constructor(host: UmbControllerHost, workspaceArgs: { manifest: ManifestWorkspace }) {
 		// TODO: We don't need a repo here, so maybe we should not require this of the UmbEditableWorkspaceContextBase
 		super(host, 'Umb.Workspace.Block');
 		this.#entityType = workspaceArgs.manifest.meta?.entityType;
+
+		this.observe(this.contentUdi, (contentUdi) => {
+			this.#contentUdi = contentUdi ?? '';
+		});
 	}
 
 	async load(unique: string) {
 		this.consumeContext(UMB_BLOCK_MANAGER_CONTEXT, (context) => {
+			this.#blockManager = context;
+
 			this.observe(
 				context.layoutOf(unique),
 				(layoutData) => {
@@ -146,9 +155,20 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	}
 
 	async save() {
-		if (!this.#layout.value) return;
+		if (!this.#layout.value || !this.#blockManager) return;
 
 		// TODO: Save the block type, but only in non-live-editing mode.
+		const layoutData = this.#layout.value;
+		this.#blockManager.setOneLayout(this.#layout.value);
+
+		const contentData = this.content.getData();
+		if (contentData) {
+			this.#blockManager.setOneContent(contentData);
+		}
+		const settingsData = this.settings.getData();
+		if (settingsData) {
+			this.#blockManager.setOneSettings(settingsData);
+		}
 
 		this.saveComplete(this.#layout.value);
 	}

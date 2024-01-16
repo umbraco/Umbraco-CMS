@@ -183,6 +183,7 @@ export const data: Array<DocumentResponseModel> = [
 						{
 							udi: '1234',
 							contentTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
+							elementProperty: 'Hello world',
 						},
 					],
 					settingsData: [],
