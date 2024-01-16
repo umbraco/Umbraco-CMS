@@ -28,7 +28,7 @@ export class UmbBlockElementManager extends UmbBaseController {
 		new UmbObserverController(this, this.contentTypeId, (id) => this.structure.loadType(id));
 	}
 
-	setData(data: UmbBlockDataType) {
+	setData(data: UmbBlockDataType | undefined) {
 		this.#data.next(data);
 		this.#getDataResolver();
 	}

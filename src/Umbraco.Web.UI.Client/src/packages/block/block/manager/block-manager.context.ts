@@ -88,6 +88,7 @@ export class UmbBlockManagerContext<
 			source.find((x) => x.contentElementTypeKey === contentTypeKey),
 		);
 	}
+
 	layoutOf(contentUdi: string) {
 		return this.#layouts.asObservablePart((source) => source.find((x) => x.contentUdi === contentUdi));
 	}
@@ -96,6 +97,16 @@ export class UmbBlockManagerContext<
 	}
 	settingsOf(udi: string) {
 		return this.#settings.asObservablePart((source) => source.find((x) => x.udi === udi));
+	}
+
+	updateLayout(contentUdi: string, layoutData: Partial<BlockLayoutType>) {
+		return this.#layouts.updateOne(contentUdi, layoutData);
+	}
+	updateContent(udi: string, contentData: Partial<UmbBlockDataType>) {
+		return this.#contents.updateOne(udi, contentData);
+	}
+	updateSettings(udi: string, settingsData: Partial<UmbBlockDataType>) {
+		return this.#settings.updateOne(udi, settingsData);
 	}
 
 	createBlock(layoutEntry: BlockLayoutType, contentElementTypeKey: string) {

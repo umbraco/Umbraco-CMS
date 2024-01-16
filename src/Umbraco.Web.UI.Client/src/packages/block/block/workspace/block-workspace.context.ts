@@ -13,7 +13,7 @@ import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UMB_BLOCK_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/block';
 
 export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel>
-	extends UmbEditableWorkspaceContextBase<UmbBlockWorkspaceContext>
+	extends UmbEditableWorkspaceContextBase<UmbBlockWorkspaceContext<LayoutDataType>>
 	implements UmbSaveableWorkspaceContextInterface
 {
 	// Just for context token safety:
@@ -47,24 +47,42 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 
 	constructor(host: UmbControllerHost, workspaceArgs: { manifest: ManifestWorkspace }) {
 		// TODO: We don't need a repo here, so maybe we should not require this of the UmbEditableWorkspaceContextBase
-		super(host, UMB_BLOCK_WORKSPACE_CONTEXT);
+		super(host, 'Umb.Workspace.Block');
 		this.#entityType = workspaceArgs.manifest.meta?.entityType;
 	}
 
 	async load(unique: string) {
 		this.consumeContext(UMB_BLOCK_MANAGER_CONTEXT, (context) => {
-			this.observe(context.value, (value) => {
-				/*if (value) {
-					const blockTypeData = value.find((x: UmbBlockTypeBase) => x.contentElementTypeKey === unique);
-					if (blockTypeData) {
-						this.#layout.next(blockTypeData);
-						return;
+			this.observe(
+				context.layoutOf(unique),
+				(layoutData) => {
+					//
+					// Content:
+					const contentUdi = layoutData?.contentUdi;
+					if (contentUdi) {
+						this.observe(
+							context.contentOf(contentUdi),
+							(contentData) => {
+								this.content.setData(contentData);
+							},
+							'observeContent',
+						);
 					}
-				}
-				// Fallback to undefined:
-				this.#layout.next(undefined);
-				*/
-			});
+
+					// Settings:
+					const settingsUdi = layoutData?.settingsUdi;
+					if (settingsUdi) {
+						this.observe(
+							context.contentOf(settingsUdi),
+							(settingsData) => {
+								this.content.setData(settingsData);
+							},
+							'observeSettings',
+						);
+					}
+				},
+				'observeLayout',
+			);
 		});
 	}
 
