@@ -81,4 +81,18 @@ export class TemporaryFileResource {
         });
     }
 
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getTemporaryfileConfiguration(): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/temporaryfile/configuration',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
+        });
+    }
+
 }

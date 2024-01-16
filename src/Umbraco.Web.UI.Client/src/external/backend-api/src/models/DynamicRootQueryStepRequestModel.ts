@@ -3,8 +3,8 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type PartialViewSnippetItemResponseModel = {
-    id: string;
-    name: string;
+export type DynamicRootQueryStepRequestModel = {
+    alias: string;
+    documentTypeIds: Array<string>;
 };
 

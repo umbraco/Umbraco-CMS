@@ -7,6 +7,7 @@ import type { CreateInitialPasswordUserRequestModel } from '../models/CreateInit
 import type { CreateUserRequestModel } from '../models/CreateUserRequestModel';
 import type { CreateUserResponseModel } from '../models/CreateUserResponseModel';
 import type { CurrentUserResponseModel } from '../models/CurrentUserResponseModel';
+import type { CurrenUserConfigurationResponseModel } from '../models/CurrenUserConfigurationResponseModel';
 import type { DeleteUsersRequestModel } from '../models/DeleteUsersRequestModel';
 import type { DirectionModel } from '../models/DirectionModel';
 import type { DisableUserRequestModel } from '../models/DisableUserRequestModel';
@@ -19,6 +20,7 @@ import type { SetAvatarRequestModel } from '../models/SetAvatarRequestModel';
 import type { UnlockUsersRequestModel } from '../models/UnlockUsersRequestModel';
 import type { UpdateUserGroupsOnUserRequestModel } from '../models/UpdateUserGroupsOnUserRequestModel';
 import type { UpdateUserRequestModel } from '../models/UpdateUserRequestModel';
+import type { UserConfigurationResponseModel } from '../models/UserConfigurationResponseModel';
 import type { UserItemResponseModel } from '../models/UserItemResponseModel';
 import type { UserOrderModel } from '../models/UserOrderModel';
 import type { UserPermissionsResponseModel } from '../models/UserPermissionsResponseModel';
@@ -247,6 +249,20 @@ export class UserResource {
      * @returns any Success
      * @throws ApiError
      */
+    public static getUserConfiguration(): CancelablePromise<UserConfigurationResponseModel> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/user/configuration',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
     public static getUserCurrent(): CancelablePromise<CurrentUserResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
@@ -293,6 +309,20 @@ export class UserResource {
             url: '/umbraco/management/api/v1/user/current/change-password',
             body: requestBody,
             mediaType: 'application/json',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getUserCurrentConfiguration(): CancelablePromise<CurrenUserConfigurationResponseModel> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/user/current/configuration',
             errors: {
                 401: `The resource is protected and requires an authentication token`,
             },

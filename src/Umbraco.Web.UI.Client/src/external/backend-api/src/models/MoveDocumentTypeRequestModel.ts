@@ -3,8 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type PartialViewSnippetItemResponseModel = {
-    id: string;
-    name: string;
+export type MoveDocumentTypeRequestModel = {
+    targetId?: string | null;
 };
 

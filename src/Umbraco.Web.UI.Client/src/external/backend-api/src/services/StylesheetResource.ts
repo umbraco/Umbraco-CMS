@@ -5,7 +5,6 @@
 import type { CreateStylesheetFolderRequestModel } from '../models/CreateStylesheetFolderRequestModel';
 import type { CreateStylesheetRequestModel } from '../models/CreateStylesheetRequestModel';
 import type { PagedFileSystemTreeItemPresentationModel } from '../models/PagedFileSystemTreeItemPresentationModel';
-import type { PagedStylesheetOverviewResponseModel } from '../models/PagedStylesheetOverviewResponseModel';
 import type { RenameStylesheetRequestModel } from '../models/RenameStylesheetRequestModel';
 import type { StylesheetFolderResponseModel } from '../models/StylesheetFolderResponseModel';
 import type { StylesheetItemResponseModel } from '../models/StylesheetItemResponseModel';
@@ -223,30 +222,6 @@ export class StylesheetResource {
             url: '/umbraco/management/api/v1/stylesheet/item',
             query: {
                 'path': path,
-            },
-            errors: {
-                401: `The resource is protected and requires an authentication token`,
-            },
-        });
-    }
-
-    /**
-     * @returns PagedStylesheetOverviewResponseModel Success
-     * @throws ApiError
-     */
-    public static getStylesheetOverview({
-        skip,
-        take = 100,
-    }: {
-        skip?: number,
-        take?: number,
-    }): CancelablePromise<PagedStylesheetOverviewResponseModel> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/umbraco/management/api/v1/stylesheet/overview',
-            query: {
-                'skip': skip,
-                'take': take,
             },
             errors: {
                 401: `The resource is protected and requires an authentication token`,

@@ -259,16 +259,16 @@ export class PartialViewResource {
      * @returns any Success
      * @throws ApiError
      */
-    public static getPartialViewSnippetByFileName({
-        fileName,
+    public static getPartialViewSnippetById({
+        id,
     }: {
-        fileName: string,
+        id: string,
     }): CancelablePromise<PartialViewSnippetResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/umbraco/management/api/v1/partial-view/snippet/{fileName}',
+            url: '/umbraco/management/api/v1/partial-view/snippet/{id}',
             path: {
-                'fileName': fileName,
+                'id': id,
             },
             errors: {
                 401: `The resource is protected and requires an authentication token`,

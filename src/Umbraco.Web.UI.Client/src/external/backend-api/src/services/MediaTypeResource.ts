@@ -2,11 +2,13 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { CopyMediaTypeRequestModel } from '../models/CopyMediaTypeRequestModel';
 import type { CreateFolderRequestModel } from '../models/CreateFolderRequestModel';
 import type { CreateMediaTypeRequestModel } from '../models/CreateMediaTypeRequestModel';
 import type { FolderResponseModel } from '../models/FolderResponseModel';
 import type { MediaTypeItemResponseModel } from '../models/MediaTypeItemResponseModel';
 import type { MediaTypeResponseModel } from '../models/MediaTypeResponseModel';
+import type { MoveMediaTypeRequestModel } from '../models/MoveMediaTypeRequestModel';
 import type { PagedMediaTypeTreeItemResponseModel } from '../models/PagedMediaTypeTreeItemResponseModel';
 import type { UpdateFolderResponseModel } from '../models/UpdateFolderResponseModel';
 import type { UpdateMediaTypeRequestModel } from '../models/UpdateMediaTypeRequestModel';
@@ -98,6 +100,61 @@ export class MediaTypeResource {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/media-type/{id}',
+            path: {
+                'id': id,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
+                404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns string Created
+     * @throws ApiError
+     */
+    public static postMediaTypeByIdCopy({
+        id,
+        requestBody,
+    }: {
+        id: string,
+        requestBody?: CopyMediaTypeRequestModel,
+    }): CancelablePromise<string> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/umbraco/management/api/v1/media-type/{id}/copy',
+            path: {
+                'id': id,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
+            responseHeader: 'Location',
+            errors: {
+                400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
+                404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static putMediaTypeByIdMove({
+        id,
+        requestBody,
+    }: {
+        id: string,
+        requestBody?: MoveMediaTypeRequestModel,
+    }): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'PUT',
+            url: '/umbraco/management/api/v1/media-type/{id}/move',
             path: {
                 'id': id,
             },

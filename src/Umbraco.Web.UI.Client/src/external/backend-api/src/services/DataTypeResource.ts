@@ -168,7 +168,7 @@ export class DataTypeResource {
      * @returns any Success
      * @throws ApiError
      */
-    public static postDataTypeByIdMove({
+    public static putDataTypeByIdMove({
         id,
         requestBody,
     }: {
@@ -176,7 +176,7 @@ export class DataTypeResource {
         requestBody?: MoveDataTypeRequestModel,
     }): CancelablePromise<any> {
         return __request(OpenAPI, {
-            method: 'POST',
+            method: 'PUT',
             url: '/umbraco/management/api/v1/data-type/{id}/move',
             path: {
                 'id': id,

@@ -4,6 +4,7 @@
 /* eslint-disable */
 import type { ResetPasswordRequestModel } from '../models/ResetPasswordRequestModel';
 import type { ResetPasswordTokenRequestModel } from '../models/ResetPasswordTokenRequestModel';
+import type { SecurityConfigurationResponseModel } from '../models/SecurityConfigurationResponseModel';
 import type { VerifyResetPasswordTokenRequestModel } from '../models/VerifyResetPasswordTokenRequestModel';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
@@ -11,6 +12,20 @@ import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
 
 export class SecurityResource {
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getSecurityConfiguration(): CancelablePromise<SecurityConfigurationResponseModel> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/security/configuration',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
+        });
+    }
 
     /**
      * @returns any Success

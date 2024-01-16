@@ -168,7 +168,7 @@ export class DictionaryResource {
      * @returns any Success
      * @throws ApiError
      */
-    public static postDictionaryByIdMove({
+    public static putDictionaryByIdMove({
         id,
         requestBody,
     }: {
@@ -176,7 +176,7 @@ export class DictionaryResource {
         requestBody?: MoveDictionaryRequestModel,
     }): CancelablePromise<any> {
         return __request(OpenAPI, {
-            method: 'POST',
+            method: 'PUT',
             url: '/umbraco/management/api/v1/dictionary/{id}/move',
             path: {
                 'id': id,
