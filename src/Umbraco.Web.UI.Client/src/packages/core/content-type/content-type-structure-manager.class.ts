@@ -181,6 +181,9 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 		];
 		containers.push(container);
 
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
+		// TODO: fix TS partial complaint
 		this.#contentTypes.updateOne(contentTypeUnique, { containers });
 
 		return container;
