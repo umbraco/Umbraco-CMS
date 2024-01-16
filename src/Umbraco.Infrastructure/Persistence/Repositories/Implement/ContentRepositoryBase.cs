@@ -1087,7 +1087,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             ISet<UmbracoEntityReference> references = _dataValueReferenceFactories.GetAllReferences(entity.Properties, PropertyEditors);
 
             // First delete all auto-relations for this entity
-            ISet<string> automaticRelationTypeAliases = _dataValueReferenceFactories.GetAutomaticRelationTypesAliases(entity.Properties, PropertyEditors);
+            ISet<string> automaticRelationTypeAliases = _dataValueReferenceFactories.GetAllAutomaticRelationTypesAliases(PropertyEditors);
             RelationRepository.DeleteByParent(entity.Id, automaticRelationTypeAliases.ToArray());
 
             if (references.Count == 0)
