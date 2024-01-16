@@ -2,6 +2,7 @@ import {
 	PropertyContainerTypes,
 	UmbContentTypePropertyStructureManager,
 } from './content-type-structure-manager.class.js';
+import { UmbContentTypeModel } from './types.js';
 import { PropertyTypeContainerModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState, UmbBooleanState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
@@ -11,7 +12,7 @@ export class UmbContentTypeContainerStructureHelper {
 	#init;
 	#initResolver?: (value: unknown) => void;
 
-	#structure?: UmbContentTypePropertyStructureManager;
+	#structure?: UmbContentTypePropertyStructureManager<UmbContentTypeModel>;
 
 	private _ownerType?: PropertyContainerTypes = 'Tab';
 	private _childType?: PropertyContainerTypes = 'Group';
