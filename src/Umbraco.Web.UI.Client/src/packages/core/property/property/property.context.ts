@@ -96,7 +96,6 @@ export class UmbPropertyContext<ValueType = any> extends UmbBaseController {
 		this._observePropertyValue?.destroy();
 		if (subject) {
 			this._observePropertyValue = this.observe(subject, (value) => {
-				// Note: Do not try to compare new / old value, as it can of any type. We trust the UmbObjectState in doing such.
 				this.#value.next(value);
 			});
 		}

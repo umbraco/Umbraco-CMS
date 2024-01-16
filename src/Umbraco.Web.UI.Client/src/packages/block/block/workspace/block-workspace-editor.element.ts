@@ -1,19 +1,11 @@
 import { UMB_BLOCK_WORKSPACE_CONTEXT } from './block-workspace.context.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { customElement, css, html, state, property } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, css, html, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbRepositoryItemsManager } from '@umbraco-cms/backoffice/repository';
-import { DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS, UmbDocumentTypeItemModel } from '@umbraco-cms/backoffice/document-type';
 
 @customElement('umb-block-workspace-editor')
 export class UmbBlockWorkspaceEditorElement extends UmbLitElement {
 	//
-	#itemManager = new UmbRepositoryItemsManager<UmbDocumentTypeItemModel>(
-		this,
-		DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS,
-		(x) => x.id,
-	);
-
 	#workspaceContext?: typeof UMB_BLOCK_WORKSPACE_CONTEXT.TYPE;
 
 	@property({ type: String, attribute: false })
