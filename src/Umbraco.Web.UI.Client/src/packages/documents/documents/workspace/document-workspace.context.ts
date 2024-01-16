@@ -25,13 +25,6 @@ export class UmbDocumentWorkspaceContext
 	implements UmbVariantableWorkspaceContextInterface, UmbPublishableWorkspaceContextInterface
 {
 	/**
-	 * The document is the current stored version of the document.
-	 * For now lets not share this publicly as it can become confusing.
-	 * TODO: This concept is to be able to compare if there is changes since the saved one.
-	 */
-	//#persistedData = new UmbObjectState<EntityType | undefined>(undefined);
-
-	/**
 	 * The document is the current state/draft version of the document.
 	 */
 	#currentData = new UmbObjectState<EntityType | undefined>(undefined);
