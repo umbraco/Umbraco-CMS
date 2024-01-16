@@ -49,7 +49,7 @@ export class UmbDocumentWorkspaceContext
 		// TODO: Get Workspace Alias via Manifest.
 		super(host, 'Umb.Workspace.Document');
 
-		new UmbObserverController(this.host, this.contentTypeId, (id) => this.structure.loadType(id));
+		this.observe(this.contentTypeId, (id) => this.structure.loadType(id));
 
 		/*
 		TODO: Make something to ensure all variants are present in data? Seems like a good idea?.

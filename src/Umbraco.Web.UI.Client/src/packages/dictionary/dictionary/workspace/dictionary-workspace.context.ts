@@ -13,7 +13,7 @@ export class UmbDictionaryWorkspaceContext
 	implements UmbSaveableWorkspaceContextInterface
 {
 	//
-	public readonly repository: UmbDictionaryRepository = new UmbDictionaryRepository(this);
+	public readonly repository = new UmbDictionaryRepository(this);
 
 	#data = new UmbObjectState<DictionaryItemResponseModel | undefined>(undefined);
 	readonly data = this.#data.asObservable();

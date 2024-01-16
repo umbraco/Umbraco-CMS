@@ -40,7 +40,7 @@ export class UmbDocumentTypeWorkspaceContext
 	readonly defaultTemplateId;
 	readonly cleanup;
 
-	readonly structure = new UmbContentTypePropertyStructureManager(this.host, this.repository);
+	readonly structure = new UmbContentTypePropertyStructureManager(this, this.repository);
 
 	#isSorting = new UmbBooleanState(undefined);
 	isSorting = this.#isSorting.asObservable();

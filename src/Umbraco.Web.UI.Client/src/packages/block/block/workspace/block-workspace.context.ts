@@ -13,7 +13,7 @@ import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UMB_BLOCK_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/block';
 
 export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel>
-	extends UmbEditableWorkspaceContextBase<UmbBlockWorkspaceContext<LayoutDataType>>
+	extends UmbEditableWorkspaceContextBase<LayoutDataType>
 	implements UmbSaveableWorkspaceContextInterface
 {
 	// Just for context token safety:

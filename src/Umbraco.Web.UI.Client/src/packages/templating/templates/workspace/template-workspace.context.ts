@@ -31,7 +31,7 @@ export class UmbTemplateWorkspaceContext
 	isCodeEditorReady = this.#isCodeEditorReady.asObservable();
 
 	// TODO: temp solution until we have automatic tree updates
-	#treeRepository = new UmbTemplateTreeRepository(this.host);
+	#treeRepository = new UmbTemplateTreeRepository(this);
 
 	constructor(host: UmbControllerHost) {
 		super(host, 'Umb.Workspace.Template');

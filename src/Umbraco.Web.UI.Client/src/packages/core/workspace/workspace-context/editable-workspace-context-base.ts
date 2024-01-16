@@ -9,7 +9,6 @@ export abstract class UmbEditableWorkspaceContextBase<WorkspaceData>
 	extends UmbBaseController
 	implements UmbSaveableWorkspaceContextInterface
 {
-	public readonly host: UmbControllerHost;
 	public readonly workspaceAlias: string;
 
 	// TODO: We could make a base type for workspace modal data, and use this here: As well as a base for the result, to make sure we always include the unique (instead of the object type)
@@ -20,7 +19,6 @@ export abstract class UmbEditableWorkspaceContextBase<WorkspaceData>
 
 	constructor(host: UmbControllerHost, workspaceAlias: string) {
 		super(host);
-		this.host = host;
 		this.workspaceAlias = workspaceAlias;
 		this.provideContext(UMB_WORKSPACE_CONTEXT, this);
 		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (context) => {
