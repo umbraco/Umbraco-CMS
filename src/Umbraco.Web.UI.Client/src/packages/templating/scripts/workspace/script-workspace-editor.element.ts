@@ -1,9 +1,10 @@
 import { UmbScriptWorkspaceContext } from './script-workspace.context.js';
 import type { UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
-import { UUITextStyles, UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 @customElement('umb-script-workspace-editor')
 export class UmbScriptWorkspaceEditorElement extends UmbLitElement {
@@ -96,7 +97,7 @@ export class UmbScriptWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	static styles = [
-		UUITextStyles,
+		UmbTextStyles,
 		css`
 			:host {
 				display: block;
