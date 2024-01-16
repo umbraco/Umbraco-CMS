@@ -38,7 +38,7 @@ export class UmbMediaTypeWorkspaceContext
 	constructor(host: UmbControllerHost) {
 		super(host, 'Umb.Workspace.MediaType');
 
-		this.structure = new UmbContentTypePropertyStructureManager<UmbMediaTypeDetailModel>(this.host, this.repository);
+		this.structure = new UmbContentTypePropertyStructureManager<UmbMediaTypeDetailModel>(host, this.repository);
 
 		// General for content types:
 		this.data = this.structure.ownerContentType;
