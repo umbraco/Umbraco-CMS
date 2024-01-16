@@ -532,7 +532,7 @@ public class UsersController : BackOfficeNotificationsController
         {
             // first validate the username if we're showing it
             ActionResult<IUser?> userResult = CheckUniqueUsername(userSave.Username,
-                u => u.LastLoginDate != default || u.EmailConfirmedDate.HasValue);
+                u => u.UserState != UserState.Invited);
             if (userResult.Result is not null)
             {
                 return userResult.Result;
@@ -540,7 +540,7 @@ public class UsersController : BackOfficeNotificationsController
         }
 
         IUser? user = CheckUniqueEmail(userSave.Email,
-            u => u.LastLoginDate != default || u.EmailConfirmedDate.HasValue);
+            u => u.UserState != UserState.Invited);
 
         if (ModelState.IsValid == false)
         {

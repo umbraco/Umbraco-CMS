@@ -28,7 +28,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     Icon = "icon-thumbnail-list",
     ValueEditorIsReusable = false,
     IsDeprecated = true)]
-[Obsolete("Nested content is obsolete, will be removed in V13")]
+[Obsolete("Nested content is obsolete, will be removed in Umbraco 14")]
 public class NestedContentPropertyEditor : DataEditor
 {
     public const string ContentTypeAliasPropertyKey = "ncContentTypeAlias";
@@ -36,7 +36,7 @@ public class NestedContentPropertyEditor : DataEditor
     private readonly IIOHelper _ioHelper;
     private readonly INestedContentPropertyIndexValueFactory _nestedContentPropertyIndexValueFactory;
 
-    [Obsolete("Use non-obsoleted ctor. This will be removed in Umbraco 12.")]
+    [Obsolete("Use non-obsoleted ctor. This will be removed in Umbraco 14.")]
     public NestedContentPropertyEditor(
         IDataValueEditorFactory dataValueEditorFactory,
         IIOHelper ioHelper)
@@ -44,7 +44,7 @@ public class NestedContentPropertyEditor : DataEditor
     {
     }
 
-    [Obsolete("Use non-obsoleted ctor. This will be removed in Umbraco 13.")]
+    [Obsolete("Use non-obsoleted ctor. This will be removed in Umbraco 14.")]
     public NestedContentPropertyEditor(
         IDataValueEditorFactory dataValueEditorFactory,
         IIOHelper ioHelper,

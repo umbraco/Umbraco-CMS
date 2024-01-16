@@ -1,9 +1,9 @@
+using System.Configuration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Persistence.EFCore.Migrations;
@@ -56,10 +56,14 @@ public class UmbracoDbContext : DbContext
         {
             ILogger<UmbracoDbContext> logger = StaticServiceProvider.Instance.GetRequiredService<ILogger<UmbracoDbContext>>();
             logger.LogCritical("No connection string was found, cannot setup Umbraco EF Core context");
+
+            // we're throwing an exception here to make it abundantly clear that one should never utilize (or have a
+            // dependency on) the DbContext before the connection string has been initialized by the installer.
+            throw new ConfigurationErrorsException("No connection string was found, cannot setup Umbraco EF Core context");
         }
 
         IEnumerable<IMigrationProviderSetup> migrationProviders = StaticServiceProvider.Instance.GetServices<IMigrationProviderSetup>();
-        IMigrationProviderSetup? migrationProvider = migrationProviders.FirstOrDefault(x => x.ProviderName == connectionStrings.ProviderName);
+        IMigrationProviderSetup? migrationProvider = migrationProviders.FirstOrDefault(x => x.ProviderName.CompareProviderNames(connectionStrings.ProviderName));
 
         if (migrationProvider == null && connectionStrings.ProviderName != null)
         {
@@ -77,7 +81,7 @@ public class UmbracoDbContext : DbContext
 
         foreach (IMutableEntityType entity in modelBuilder.Model.GetEntityTypes())
         {
-            entity.SetTableName(Constants.DatabaseSchema.TableNamePrefix + entity.GetTableName());
+            entity.SetTableName(Core.Constants.DatabaseSchema.TableNamePrefix + entity.GetTableName());
         }
     }
 }

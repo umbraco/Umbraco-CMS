@@ -14,6 +14,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 /// </summary>
 public interface ISqlSyntaxProvider
 {
+    string Length { get; }
+
+    string Substring { get; }
+
     string ProviderName { get; }
 
     string CreateTable { get; }

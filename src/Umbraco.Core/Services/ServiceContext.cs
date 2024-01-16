@@ -32,6 +32,7 @@ public class ServiceContext
     private readonly Lazy<IServerRegistrationService>? _serverRegistrationService;
     private readonly Lazy<ITagService>? _tagService;
     private readonly Lazy<IUserService>? _userService;
+    private readonly Lazy<IWebhookService>? _webhookService;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="ServiceContext" /> class with lazy services.
@@ -63,7 +64,8 @@ public class ServiceContext
         Lazy<IRedirectUrlService>? redirectUrlService,
         Lazy<IConsentService>? consentService,
         Lazy<IKeyValueService>? keyValueService,
-        Lazy<IContentTypeBaseServiceProvider>? contentTypeBaseServiceProvider)
+        Lazy<IContentTypeBaseServiceProvider>? contentTypeBaseServiceProvider,
+        Lazy<IWebhookService>? webhookService)
     {
         _publicAccessService = publicAccessService;
         _domainService = domainService;
@@ -92,6 +94,7 @@ public class ServiceContext
         _consentService = consentService;
         _keyValueService = keyValueService;
         _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
+        _webhookService = webhookService;
     }
 
     /// <summary>
@@ -230,6 +233,11 @@ public class ServiceContext
     public IContentTypeBaseServiceProvider? ContentTypeBaseServices => _contentTypeBaseServiceProvider?.Value;
 
     /// <summary>
+    ///     Gets the WebhookService.
+    /// </summary>
+    public IWebhookService? WebhookService => _webhookService?.Value;
+
+    /// <summary>
     ///     Creates a partial service context with only some services (for tests).
     /// </summary>
     /// <remarks>
@@ -262,7 +270,8 @@ public class ServiceContext
         IRedirectUrlService? redirectUrlService = null,
         IConsentService? consentService = null,
         IKeyValueService? keyValueService = null,
-        IContentTypeBaseServiceProvider? contentTypeBaseServiceProvider = null)
+        IContentTypeBaseServiceProvider? contentTypeBaseServiceProvider = null,
+        IWebhookService? webhookService = null)
     {
         Lazy<T>? Lazy<T>(T? service)
         {
@@ -296,6 +305,8 @@ public class ServiceContext
             Lazy(redirectUrlService),
             Lazy(consentService),
             Lazy(keyValueService),
-            Lazy(contentTypeBaseServiceProvider));
+            Lazy(contentTypeBaseServiceProvider),
+            Lazy(webhookService)
+            );
     }
 }

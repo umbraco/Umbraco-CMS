@@ -36,6 +36,19 @@ test("Check the youtube link works as expected", async ({ page, umbracoUi }) => 
 
     } else {
       await expect(page).toHaveURL(/.*UmbracoLearningBase/);
+      await page.close();
     }
+  });
+  test("Check the Our Umbraco link works as expected", async ({ page, umbracoUi }) => {
+    // Action
+    await umbracoUi.clickElement(umbracoUi.getGlobalHelp());
+    let ourUmbracoLink = await page.locator('[key="help_umbracoForum"]');
+    await ourUmbracoLink.click();
+    let ourUmbraco = page.waitForEvent("popup");
+    let ourUmbracoPopup = await ourUmbraco;
+
+    //Assert
+    await expect(ourUmbracoPopup).toHaveURL(/.*our.umbraco.com/);
+    await ourUmbracoPopup.close();
   });
 });
