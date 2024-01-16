@@ -64,7 +64,7 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 	startNodeId?: string;
 
 	@property({ type: Array })
-	filter?: string[] | undefined;
+	allowedContentTypeIds?: string[] | undefined;
 
 	@property({ type: Boolean })
 	showOpenButton?: boolean;
@@ -111,8 +111,8 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	#pickableFilter: (item: DocumentTreeItemResponseModel) => boolean = (item) => {
-		if (this.filter && this.filter.length > 0) {
-			return this.filter.includes(item.contentTypeId);
+		if (this.allowedContentTypeIds && this.allowedContentTypeIds.length > 0) {
+			return this.allowedContentTypeIds.includes(item.contentTypeId);
 		}
 		return true;
 	}

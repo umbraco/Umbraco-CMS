@@ -28,7 +28,7 @@ export class UmbPropertyEditorUITreePickerElement extends UmbLitElement implemen
 	max = 0;
 
 	@state()
-	filter?: string | null;
+	allowedContentTypeIds?: string | null;
 
 	@state()
 	showOpenButton?: boolean;
@@ -47,7 +47,7 @@ export class UmbPropertyEditorUITreePickerElement extends UmbLitElement implemen
 		this.min = Number(config?.getValueByAlias('minNumber')) || 0;
 		this.max = Number(config?.getValueByAlias('maxNumber')) || 0;
 
-		this.filter = config?.getValueByAlias('filter');
+		this.allowedContentTypeIds = config?.getValueByAlias('filter');
 		this.showOpenButton = config?.getValueByAlias('showOpenButton');
 		this.ignoreUserStartNodes = config?.getValueByAlias('ignoreUserStartNodes');
 	}
@@ -64,7 +64,7 @@ export class UmbPropertyEditorUITreePickerElement extends UmbLitElement implemen
 			.startNodeId=${this.startNodeId ?? ''}
 			.min=${this.min}
 			.max=${this.max}
-			.filter=${this.filter ?? ''}
+			.allowedContentTypeIds=${this.allowedContentTypeIds ?? ''}
 			?showOpenButton=${this.showOpenButton}
 			?ignoreUserStartNodes=${this.ignoreUserStartNodes}
 			@change=${this.#onChange}></umb-input-tree>`;

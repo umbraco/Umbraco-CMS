@@ -69,7 +69,7 @@ export class UmbInputMemberElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	@property({ type: Array })
-	filter?: string[] | undefined;
+	allowedContentTypeIds?: string[] | undefined;
 
 	@property()
 	public set value(idsString: string) {
@@ -109,8 +109,8 @@ export class UmbInputMemberElement extends FormControlMixin(UmbLitElement) {
 	#pickableFilter: (item: MemberItemResponseModel) => boolean = (item) => {
 		// TODO: Uncomment, once `UmbMemberPickerContext` has been implemented. [LK]
 		console.log('member.pickableFilter', item);
-		// 	if (this.filter && this.filter.length > 0) {
-		// 		return this.filter.includes(item.contentTypeId);
+		// 	if (this.allowedContentTypeIds && this.allowedContentTypeIds.length > 0) {
+		// 		return this.allowedContentTypeIds.includes(item.contentTypeId);
 		// 	}
 		return true;
 	};

@@ -61,7 +61,7 @@ export class UmbInputMediaElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	@property({ type: Array })
-	filter?: string[] | undefined;
+	allowedContentTypeIds?: string[] | undefined;
 
 	@property({ type: Boolean })
 	showOpenButton?: boolean;
@@ -111,15 +111,15 @@ export class UmbInputMediaElement extends FormControlMixin(UmbLitElement) {
 		/* TODO: Media item doesn't have the content/media-type ID available to query.
 			 Commenting out until the Management API model is updated. [LK]
 		*/
-		// if (this.filter && this.filter.length > 0) {
-		// 	return this.filter.includes(item.contentTypeId);
+		// if (this.allowedContentTypeIds && this.allowedContentTypeIds.length > 0) {
+		// 	return this.allowedContentTypeIds.includes(item.contentTypeId);
 		// }
 		return true;
 	};
 
 	#openPicker() {
-		// TODO: Configure the media picker, with `filter` and `ignoreUserStartNodes` [LK]
-		console.log('#openPicker', [this.filter, this.ignoreUserStartNodes]);
+		// TODO: Configure the media picker, with `allowedContentTypeIds` and `ignoreUserStartNodes` [LK]
+		console.log('#openPicker', [this.allowedContentTypeIds, this.ignoreUserStartNodes]);
 		this.#pickerContext.openPicker({
 			hideTreeRoot: true,
 			pickableFilter: this.#pickableFilter,
