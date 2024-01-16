@@ -1,15 +1,12 @@
 import { UmbMediaTypeWorkspaceContext } from '../../media-type-workspace.context.js';
 import './media-type-workspace-view-edit-property.element.js';
+import { UmbMediaTypeDetailModel } from '../../../types.js';
 import { css, html, customElement, property, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbContentTypePropertyStructureHelper, PropertyContainerTypes } from '@umbraco-cms/backoffice/content-type';
 import { UmbSorterController, UmbSorterConfig } from '@umbraco-cms/backoffice/sorter';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import {
-	MediaTypePropertyTypeResponseModel,
-	MediaTypeResponseModel,
-	PropertyTypeModelBaseModel,
-} from '@umbraco-cms/backoffice/backend-api';
+import { MediaTypePropertyTypeResponseModel, PropertyTypeModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UMB_PROPERTY_SETTINGS_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 
@@ -89,13 +86,13 @@ export class UmbMediaTypeWorkspaceViewEditPropertiesElement extends UmbLitElemen
 		this._propertyStructureHelper.setContainerType(value);
 	}
 
-	_propertyStructureHelper = new UmbContentTypePropertyStructureHelper(this);
+	_propertyStructureHelper = new UmbContentTypePropertyStructureHelper<UmbMediaTypeDetailModel>(this);
 
 	@state()
 	_propertyStructure: Array<PropertyTypeModelBaseModel> = [];
 
 	@state()
-	_ownerMediaTypes?: MediaTypeResponseModel[];
+	_ownerMediaTypes?: UmbMediaTypeDetailModel[];
 
 	@state()
 	protected _modalRouteNewProperty?: string;
@@ -127,7 +124,7 @@ export class UmbMediaTypeWorkspaceViewEditPropertiesElement extends UmbLitElemen
 			.onSetup(async () => {
 				const mediaTypeId = this._ownerMediaTypes?.find(
 					(types) => types.containers?.find((containers) => containers.id === this.containerId),
-				)?.id;
+				)?.unique;
 				if (mediaTypeId === undefined) return false;
 				const propertyData = await this._propertyStructureHelper.createPropertyScaffold(this._containerId);
 				if (propertyData === undefined) return false;
@@ -182,7 +179,7 @@ export class UmbMediaTypeWorkspaceViewEditPropertiesElement extends UmbLitElemen
 
 						return html`<media-type-workspace-view-edit-property
 							data-umb-property-id=${ifDefined(property.id)}
-							owner-media-type-id=${ifDefined(inheritedFromMedia?.id)}
+							owner-media-type-id=${ifDefined(inheritedFromMedia?.unique)}
 							owner-media-type-name=${ifDefined(inheritedFromMedia?.name)}
 							?inherited=${property.containerId !== this.containerId}
 							?sort-mode-active=${this._sortModeActive}

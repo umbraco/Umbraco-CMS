@@ -7,12 +7,12 @@ import { PropertyTypeContainerModelBaseModel } from '@umbraco-cms/backoffice/bac
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState, UmbBooleanState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
-export class UmbContentTypeContainerStructureHelper {
+export class UmbContentTypeContainerStructureHelper<T extends UmbContentTypeModel> {
 	#host: UmbControllerHostElement;
 	#init;
 	#initResolver?: (value: unknown) => void;
 
-	#structure?: UmbContentTypePropertyStructureManager<UmbContentTypeModel>;
+	#structure?: UmbContentTypePropertyStructureManager<T>;
 
 	private _ownerType?: PropertyContainerTypes = 'Tab';
 	private _childType?: PropertyContainerTypes = 'Group';
@@ -42,7 +42,7 @@ export class UmbContentTypeContainerStructureHelper {
 		this.#containers.sortBy((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
 	}
 
-	public setStructureManager(structure: UmbContentTypePropertyStructureManager) {
+	public setStructureManager(structure: UmbContentTypePropertyStructureManager<T>) {
 		this.#structure = structure;
 		this.#initResolver?.(undefined);
 		this.#initResolver = undefined;
