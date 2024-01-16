@@ -39,6 +39,7 @@ public static class UmbracoBuilderExtensions
                 .AddTags()
                 .AddTrackedReferences()
                 .AddTemporaryFiles()
+                .AddDynamicRoot()
                 .AddDataTypes()
                 .AddTemplates()
                 .AddRelationTypes()
