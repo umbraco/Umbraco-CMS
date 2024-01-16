@@ -8988,7 +8988,7 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/DocumentResponseModel"
+                      "$ref": "#/components/schemas/MediaResponseModel"
                     }
                   ]
                 }
@@ -8997,7 +8997,7 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/DocumentResponseModel"
+                      "$ref": "#/components/schemas/MediaResponseModel"
                     }
                   ]
                 }
@@ -9006,7 +9006,7 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/DocumentResponseModel"
+                      "$ref": "#/components/schemas/MediaResponseModel"
                     }
                   ]
                 }
@@ -19662,6 +19662,41 @@
         },
         "additionalProperties": false
       },
+      "ContentForMediaResponseModel": {
+        "required": [
+          "id",
+          "values",
+          "variants"
+        ],
+        "type": "object",
+        "properties": {
+          "values": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/MediaValueModel"
+                }
+              ]
+            }
+          },
+          "variants": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/MediaVariantResponseModel"
+                }
+              ]
+            }
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "additionalProperties": false
+      },
       "ContentStateModel": {
         "enum": [
           "NotCreated",
@@ -22499,6 +22534,42 @@
                 }
               ]
             }
+          }
+        },
+        "additionalProperties": false
+      },
+      "MediaResponseModel": {
+        "required": [
+          "isTrashed",
+          "mediaType",
+          "urls"
+        ],
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ContentForMediaResponseModel"
+          }
+        ],
+        "properties": {
+          "urls": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ContentUrlInfoModel"
+                }
+              ]
+            }
+          },
+          "isTrashed": {
+            "type": "boolean"
+          },
+          "mediaType": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/MediaTypeReferenceResponseModel"
+              }
+            ]
           }
         },
         "additionalProperties": false
