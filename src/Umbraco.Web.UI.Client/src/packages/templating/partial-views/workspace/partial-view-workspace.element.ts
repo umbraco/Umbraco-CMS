@@ -17,18 +17,20 @@ export class UmbPartialViewWorkspaceElement extends UmbLitElement {
 	@state()
 	_routes: UmbRoute[] = [
 		{
-			path: 'create/:parentUnique/:snippetName',
+			path: 'create/:parentUnique/snippet/:snippetId',
 			component: this.#createElement,
 			setup: async (component: PageComponent, info: IRoutingInfo) => {
 				const parentUnique = info.match.params.parentUnique === 'null' ? null : info.match.params.parentUnique;
-				const snippetName = info.match.params.snippetName;
-				await this.#workspaceContext.create(parentUnique, snippetName);
-
-				new UmbWorkspaceIsNewRedirectController(
-					this,
-					this.#workspaceContext,
-					this.shadowRoot!.querySelector('umb-router-slot')!,
-				);
+				const snippetId = info.match.params.snippetId;
+				await this.#onCreate(parentUnique, snippetId);
+			},
+		},
+		{
+			path: 'create/:parentUnique',
+			component: this.#createElement,
+			setup: async (component: PageComponent, info: IRoutingInfo) => {
+				const parentUnique = info.match.params.parentUnique === 'null' ? null : info.match.params.parentUnique;
+				await this.#onCreate(parentUnique);
 			},
 		},
 		{
@@ -40,6 +42,16 @@ export class UmbPartialViewWorkspaceElement extends UmbLitElement {
 			},
 		},
 	];
+
+	#onCreate = async (parentUnique: string | null, snippetId: string | undefined) => {
+		await this.#workspaceContext.create(parentUnique, snippetId);
+
+		new UmbWorkspaceIsNewRedirectController(
+			this,
+			this.#workspaceContext,
+			this.shadowRoot!.querySelector('umb-router-slot')!,
+		);
+	};
 
 	render() {
 		return html`<umb-router-slot .routes=${this._routes}></umb-router-slot>`;

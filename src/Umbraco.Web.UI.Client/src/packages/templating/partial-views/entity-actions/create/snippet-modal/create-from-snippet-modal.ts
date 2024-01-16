@@ -25,8 +25,8 @@ export class UmbPartialViewCreateFromSnippetModalElement extends UmbModalBaseEle
 			this._snippets = data.items.map((snippet) => {
 				return {
 					name: snippet.name,
-					path: `section/settings/workspace/partial-view/create/${this.data?.parentUnique || 'null'}/${
-						snippet.fileName
+					path: `section/settings/workspace/partial-view/create/${this.data?.parentUnique || 'null'}/snippet/${
+						snippet.id
 					}`,
 				};
 			});

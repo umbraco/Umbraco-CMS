@@ -76,7 +76,7 @@ export class UmbPartialViewCreateOptionsModalElement extends UmbModalBaseElement
 				<uui-box>
 					<!-- TODO: construct url -->
 					<uui-menu-item
-						href=${`section/settings/workspace/partial-view/create/${this.data?.parentUnique || 'null'}/Empty`}
+						href=${`section/settings/workspace/partial-view/create/${this.data?.parentUnique || 'null'}`}
 						label="New empty partial view"
 						@click=${this.#onNavigate}>
 						<uui-icon slot="icon" name="icon-article"></uui-icon>}

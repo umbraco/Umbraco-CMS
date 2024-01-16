@@ -69,9 +69,13 @@ export class UmbPartialViewWorkspaceContext
 		}
 	}
 
-	async create(parentUnique: string | null, snippetName = 'Empty') {
-		const { data: snippet } = await this.#getSnippet(snippetName);
-		const snippetContent = snippet?.content ?? '';
+	async create(parentUnique: string | null, snippetId?: string) {
+		let snippetContent = '';
+
+		if (snippetId) {
+			const { data: snippet } = await this.#getSnippet(snippetId);
+			snippetContent = snippet?.content || '';
+		}
 
 		const { data } = await this.repository.createScaffold(parentUnique, { content: snippetContent });
 
@@ -104,11 +108,11 @@ export class UmbPartialViewWorkspaceContext
 		this.#data.destroy();
 	}
 
-	#getSnippet(snippetFileName: string) {
+	#getSnippet(snippetId: string) {
 		return tryExecuteAndNotify(
 			this,
-			PartialViewResource.getPartialViewSnippetByFileName({
-				fileName: snippetFileName,
+			PartialViewResource.getPartialViewSnippetById({
+				id: snippetId,
 			}),
 		);
 	}
