@@ -30,15 +30,13 @@ export class UmbMediaTypeWorkspaceContext
 	readonly allowedContentTypes;
 	readonly compositions;
 
-	readonly structure;
+	readonly structure = new UmbContentTypePropertyStructureManager<EntityType>(this, this.repository);
 
 	#isSorting = new UmbBooleanState(undefined);
 	isSorting = this.#isSorting.asObservable();
 
 	constructor(host: UmbControllerHost) {
 		super(host, 'Umb.Workspace.MediaType');
-
-		this.structure = new UmbContentTypePropertyStructureManager<UmbMediaTypeDetailModel>(host, this.repository);
 
 		// General for content types:
 		this.data = this.structure.ownerContentType;

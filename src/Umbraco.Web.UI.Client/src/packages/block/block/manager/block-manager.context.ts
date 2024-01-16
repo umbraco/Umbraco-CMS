@@ -3,13 +3,14 @@ import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
-import { UmbDocumentTypeDetailModel, UmbDocumentTypeDetailRepository } from '@umbraco-cms/backoffice/document-type';
+import { UmbDocumentTypeDetailRepository } from '@umbraco-cms/backoffice/document-type';
 import { getKeyFromUdi } from '@umbraco-cms/backoffice/utils';
 import { UmbBlockTypeBase } from '@umbraco-cms/backoffice/block';
 import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
+import { UmbContentTypeModel } from '@umbraco-cms/backoffice/content-type';
 
 // TODO: We are using backend model here, I think we should get our own model:
-type ElementTypeModel = UmbDocumentTypeDetailModel;
+type ElementTypeModel = UmbContentTypeModel;
 
 export class UmbBlockManagerContext<
 	BlockType extends UmbBlockTypeBase = UmbBlockTypeBase,

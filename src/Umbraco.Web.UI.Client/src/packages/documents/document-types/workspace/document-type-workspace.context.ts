@@ -37,14 +37,13 @@ export class UmbDocumentTypeWorkspaceContext
 	readonly defaultTemplateId;
 	readonly cleanup;
 
-	readonly structure = new UmbContentTypePropertyStructureManager(this, this.repository);
+	readonly structure = new UmbContentTypePropertyStructureManager<EntityType>(this, this.repository);
 
 	#isSorting = new UmbBooleanState(undefined);
 	isSorting = this.#isSorting.asObservable();
 
 	constructor(host: UmbControllerHostElement) {
 		super(host, 'Umb.Workspace.DocumentType');
-		this.structure = new UmbContentTypePropertyStructureManager<UmbDocumentTypeDetailModel>(this.host, this.repository);
 
 		// General for content types:
 		this.data = this.structure.ownerContentType;

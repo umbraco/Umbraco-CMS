@@ -2,7 +2,7 @@ import { UMB_BLOCK_WORKSPACE_CONTEXT } from '../../block-workspace.context.js';
 import type { UmbBlockWorkspaceViewEditTabElement } from './block-workspace-view-edit-tab.element.js';
 import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/content-type';
+import { UmbContentTypeContainerStructureHelper, UmbContentTypeModel } from '@umbraco-cms/backoffice/content-type';
 import {
 	encodeFolderName,
 	UmbRoute,
@@ -32,7 +32,7 @@ export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements U
 
 	private _workspaceContext?: typeof UMB_BLOCK_WORKSPACE_CONTEXT.TYPE;
 
-	private _tabsStructureHelper = new UmbContentTypeContainerStructureHelper(this);
+	private _tabsStructureHelper = new UmbContentTypeContainerStructureHelper<UmbContentTypeModel>(this);
 
 	constructor() {
 		super();
