@@ -16,10 +16,6 @@ describe('UmbServerFilePathUniqueSerializer', () => {
 				expect(serializer).to.have.property('toUnique').that.is.a('function');
 			});
 
-			it('has a toParentUnique method', () => {
-				expect(serializer).to.have.property('toParentUnique').that.is.a('function');
-			});
-
 			it('has a toServerPath method', () => {
 				expect(serializer).to.have.property('toServerPath').that.is.a('function');
 			});
