@@ -4,6 +4,7 @@ import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { DocumentItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
+import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-input-document')
 export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
@@ -79,12 +80,24 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	@state()
+	private _editDocumentPath = '';
+
+	@state()
 	private _items?: Array<DocumentItemResponseModel>;
 
 	#pickerContext = new UmbDocumentPickerContext(this);
 
 	constructor() {
 		super();
+
+		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
+			.addAdditionalPath('document')
+			.onSetup(() => {
+				return { data: { entityType: 'document', preset: {} } };
+			})
+			.observeRouteBuilder((routeBuilder) => {
+				this._editDocumentPath = routeBuilder({});
+			});
 	}
 
 	connectedCallback() {
@@ -112,11 +125,6 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 		this.#pickerContext.openPicker({
 			hideTreeRoot: true,
 		});
-	}
-
-	protected _openItem(item: DocumentItemResponseModel) {
-		// TODO: Implement the Content editing infinity editor. [LK]
-		console.log('TODO: _openItem', item);
 	}
 
 	protected getFormElement() {
@@ -172,9 +180,13 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 
 	private _renderOpenButton(item: DocumentItemResponseModel) {
 		if (!this.showOpenButton) return;
-		return html`<uui-button @click=${() => this._openItem(item)} label="Open document ${item.name}"
-			>${this.localize.term('general_open')}</uui-button
-		>`;
+		return html`
+			<uui-button
+				href="${this._editDocumentPath}edit/${item.id}"
+				label="${this.localize.term('general_open')} ${item.name}">
+				${this.localize.term('general_open')}
+			</uui-button>
+		`;
 	}
 
 	static styles = [
