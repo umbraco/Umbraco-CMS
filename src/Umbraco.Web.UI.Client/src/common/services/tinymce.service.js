@@ -781,6 +781,11 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
         });
       });
 
+      // Do not add any further controls if the block editor is not available
+      if (!blockEditorApi) {
+        return;
+      }
+
       editor.ui.registry.addButton('umbblockpicker', {
         icon: 'visualblocks',
         tooltip: 'Insert Block',
@@ -1438,6 +1443,10 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
       }
 
       function initBlocks() {
+
+        if(!args.blockEditorApi) {
+          return;
+        }
 
         const blockEls = args.editor.contentDocument.querySelectorAll('umb-rte-block, umb-rte-block-inline');
         for (var blockEl of blockEls) {

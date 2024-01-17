@@ -184,161 +184,147 @@
               assetPromises.push(assetsService.loadJs(tinyJsAsset, $scope));
           });
 
-          const tinyMceConfigDeferred = $q.defer();
-
           //wait for assets to load before proceeding
-          $q.all(assetPromises).then(function () {
-
-            tinyMceService.getTinyMceEditorConfig({
-              htmlId: vm.textAreaHtmlId,
-              stylesheets: editorConfig.stylesheets,
-              toolbar: editorConfig.toolbar,
-              mode: editorConfig.mode
+          $q.all(assetPromises)
+            .then(function () {
+              return tinyMceService.getTinyMceEditorConfig({
+                htmlId: vm.textAreaHtmlId,
+                stylesheets: editorConfig.stylesheets,
+                toolbar: editorConfig.toolbar,
+                mode: editorConfig.mode
+              })
             })
-              .then(function (tinyMceConfig) {
-                // Load the plugins.min.js file from the TinyMCE Cloud if a Cloud Api Key is specified
-                if (tinyMceConfig.cloudApiKey) {
-                  return assetsService.loadJs(`https://cdn.tiny.cloud/1/${tinyMceConfig.cloudApiKey}/tinymce/${tinymce.majorVersion}.${tinymce.minorVersion}/plugins.min.js`)
-                    .then(() => tinyMceConfig);
+
+            // Handle additional assets loading depending on the configuration before initializing the editor
+            .then(function (tinyMceConfig) {
+              // Load the plugins.min.js file from the TinyMCE Cloud if a Cloud Api Key is specified
+              if (tinyMceConfig.cloudApiKey) {
+                return assetsService.loadJs(`https://cdn.tiny.cloud/1/${tinyMceConfig.cloudApiKey}/tinymce/${tinymce.majorVersion}.${tinymce.minorVersion}/plugins.min.js`)
+                  .then(() => tinyMceConfig);
+              }
+
+              return tinyMceConfig;
+            })
+
+            //wait for config to be ready after assets have loaded
+            .then(function (standardConfig) {
+
+                if (height !== null) {
+                    standardConfig.plugins.splice(standardConfig.plugins.indexOf("autoresize"), 1);
                 }
 
-                return tinyMceConfig;
-              })
-              .then(function (tinyMceConfig) {
-                tinyMceConfigDeferred.resolve(tinyMceConfig);
-              });
-          });
+                //create a baseline Config to extend upon
+                let baseLineConfigObj = {
+                    maxImageSize: editorConfig.maxImageSize,
+                    width: width,
+                    height: height
+                };
 
-          //wait for config to be ready after assets have loaded
-          tinyMceConfigDeferred.promise.then(function (standardConfig) {
+                baseLineConfigObj.setup = function (editor) {
 
-              if (height !== null) {
-                  standardConfig.plugins.splice(standardConfig.plugins.indexOf("autoresize"), 1);
-              }
+                    //set the reference
+                    vm.tinyMceEditor = editor;
 
-              //create a baseline Config to extend upon
-              var baseLineConfigObj = {
-                  maxImageSize: editorConfig.maxImageSize,
-                  width: width,
-                  height: height
-              };
-
-              baseLineConfigObj.setup = function (editor) {
-
-                  //set the reference
-                  vm.tinyMceEditor = editor;
-
-                  vm.tinyMceEditor.on('init', function (e) {
-                      $timeout(function () {
-                          vm.rteLoading = false;
-                          vm.updateLoading();
-                      });
-                  });
-                  vm.tinyMceEditor.on("focus", function () {
-                      $element[0].dispatchEvent(new CustomEvent('umb-rte-focus', {composed: true, bubbles: true}));
-                  });
-                  vm.tinyMceEditor.on("blur", function () {
-                      $element[0].dispatchEvent(new CustomEvent('umb-rte-blur', {composed: true, bubbles: true}));
-                  });
-
-                  //initialize the standard editor functionality for Umbraco
-                  tinyMceService.initializeEditor({
-                      //scope: $scope,
-                      editor: editor,
-                      toolbar: editorConfig.toolbar,
-                      model: vm.model,
-                      getValue: function () {
-                        return vm.model.value.markup;
-                      },
-                      setValue: function (newVal) {
-                        vm.model.value.markup = newVal;
-                        $scope.$evalAsync();
-                      },
-                      culture: vm.umbProperty?.culture ?? null,
-                      segment: vm.umbProperty?.segment ?? null,
-                      blockEditorApi: vm.blockEditorApi,
-                      parentForm: vm.propertyForm,
-                      valFormManager: vm.valFormManager,
-                      currentFormInput: $scope.rteForm.modelValue
-                  });
-
-              };
-
-              Utilities.extend(baseLineConfigObj, standardConfig);
-
-              // Readonly mode
-              baseLineConfigObj.toolbar = vm.readonly ? false : baseLineConfigObj.toolbar;
-              baseLineConfigObj.readonly = vm.readonly ? 1 : baseLineConfigObj.readonly;
-
-              // We need to wait for DOM to have rendered before we can find the element by ID.
-              $timeout(function () {
-                tinymce.init(baseLineConfigObj);
-              }, 50);
-
-              //listen for formSubmitting event (the result is callback used to remove the event subscription)
-              unsubscribe.push($scope.$on("formSubmitting", function () {
-                  if (vm.tinyMceEditor != null && !vm.rteLoading) {
-
-                    // Remove unused Blocks of Blocks Layout. Leaving only the Blocks that are present in Markup.
-                    var blockElements = vm.tinyMceEditor.dom.select(`umb-rte-block, umb-rte-block-inline`);
-                    const usedContentUdis = blockElements.map(blockElement => blockElement.getAttribute('data-content-udi'));
-
-                    const unusedBlocks = vm.layout.filter(x => usedContentUdis.indexOf(x.contentUdi) === -1);
-                    unusedBlocks.forEach(blockLayout => {
-                      deleteBlock(blockLayout.$block);
-                    });
-
-
-                    // Remove Angular Classes from markup:
-                    var parser = new DOMParser();
-                    var doc = parser.parseFromString(vm.model.value.markup, 'text/html');
-
-                    // Get all elements in the parsed document
-                    var elements = doc.querySelectorAll('*[class]');
-                    elements.forEach(element => {
-                      var classAttribute = element.getAttribute("class");
-                      if (classAttribute) {
-                        // Split the class attribute by spaces and remove "ng-scope" and "ng-isolate-scope"
-                        var classes = classAttribute.split(" ");
-                        var newClasses = classes.filter(function (className) {
-                          return className !== "ng-scope" && className !== "ng-isolate-scope";
+                    vm.tinyMceEditor.on('init', function (e) {
+                        $timeout(function () {
+                            vm.rteLoading = false;
+                            vm.updateLoading();
                         });
-
-                        // Update the class attribute with the remaining classes
-                        if (newClasses.length > 0) {
-                          element.setAttribute('class', newClasses.join(' '));
-                        } else {
-                          // If no remaining classes, remove the class attribute
-                          element.removeAttribute('class');
-                        }
-                      }
+                    });
+                    vm.tinyMceEditor.on("focus", function () {
+                        $element[0].dispatchEvent(new CustomEvent('umb-rte-focus', {composed: true, bubbles: true}));
+                    });
+                    vm.tinyMceEditor.on("blur", function () {
+                        $element[0].dispatchEvent(new CustomEvent('umb-rte-blur', {composed: true, bubbles: true}));
                     });
 
-                    vm.model.value.markup = doc.body.innerHTML;
+                    //initialize the standard editor functionality for Umbraco
+                    tinyMceService.initializeEditor({
+                        //scope: $scope,
+                        editor: editor,
+                        toolbar: editorConfig.toolbar,
+                        model: vm.model,
+                        getValue: function () {
+                          return vm.model.value.markup;
+                        },
+                        setValue: function (newVal) {
+                          vm.model.value.markup = newVal;
+                          $scope.$evalAsync();
+                        },
+                        culture: vm.umbProperty?.culture ?? null,
+                        segment: vm.umbProperty?.segment ?? null,
+                        blockEditorApi: vm.blockEditorApi,
+                        parentForm: vm.propertyForm,
+                        valFormManager: vm.valFormManager,
+                        currentFormInput: $scope.rteForm.modelValue
+                    });
 
-                  }
-              }));
+                };
 
-              vm.focusRTE = function () {
-                vm.tinyMceEditor.focus();
-              }
+                Utilities.extend(baseLineConfigObj, standardConfig);
 
-              // When the element is disposed we need to unsubscribe!
-              // NOTE: this is very important otherwise if this is part of a modal, the listener still exists because the dom
-              // element might still be there even after the modal has been hidden.
-              $scope.$on('$destroy', function () {
-                  if (vm.tinyMceEditor != null) {
-                    if($element) {
-                      $element[0]?.dispatchEvent(new CustomEvent('blur', {composed: true, bubbles: true}));
+                // Readonly mode
+                baseLineConfigObj.toolbar = vm.readonly ? false : baseLineConfigObj.toolbar;
+                baseLineConfigObj.readonly = vm.readonly ? 1 : baseLineConfigObj.readonly;
+
+                // We need to wait for DOM to have rendered before we can find the element by ID.
+                $timeout(function () {
+                  tinymce.init(baseLineConfigObj);
+                }, 50);
+
+                //listen for formSubmitting event (the result is callback used to remove the event subscription)
+                unsubscribe.push($scope.$on("formSubmitting", function () {
+                    if (vm.tinyMceEditor != null && !vm.rteLoading) {
+
+                      // Remove unused Blocks of Blocks Layout. Leaving only the Blocks that are present in Markup.
+                      var blockElements = vm.tinyMceEditor.dom.select(`umb-rte-block, umb-rte-block-inline`);
+                      const usedContentUdis = blockElements.map(blockElement => blockElement.getAttribute('data-content-udi'));
+
+                      const unusedBlocks = vm.layout.filter(x => usedContentUdis.indexOf(x.contentUdi) === -1);
+                      unusedBlocks.forEach(blockLayout => {
+                        deleteBlock(blockLayout.$block);
+                      });
+
+
+                      // Remove Angular Classes from markup:
+                      var parser = new DOMParser();
+                      var doc = parser.parseFromString(vm.model.value.markup, 'text/html');
+
+                      // Get all elements in the parsed document
+                      var elements = doc.querySelectorAll('*[class]');
+                      elements.forEach(element => {
+                        var classAttribute = element.getAttribute("class");
+                        if (classAttribute) {
+                          // Split the class attribute by spaces and remove "ng-scope" and "ng-isolate-scope"
+                          var classes = classAttribute.split(" ");
+                          var newClasses = classes.filter(function (className) {
+                            return className !== "ng-scope" && className !== "ng-isolate-scope";
+                          });
+
+                          // Update the class attribute with the remaining classes
+                          if (newClasses.length > 0) {
+                            element.setAttribute('class', newClasses.join(' '));
+                          } else {
+                            // If no remaining classes, remove the class attribute
+                            element.removeAttribute('class');
+                          }
+                        }
+                      });
+
+                      vm.model.value.markup = doc.body.innerHTML;
+
                     }
-                    vm.tinyMceEditor.destroy();
-                    vm.tinyMceEditor = null;
-                  }
-              });
+                }));
 
-          });
+            });
 
       };
+
+      vm.focusRTE = function () {
+        if (vm.tinyMceEditor) {
+          vm.tinyMceEditor.focus();
+        }
+      }
 
       // Called when we save the value, the server may return an updated data and our value is re-synced
       // we need to deal with that here so that our model values are all in sync so we basically re-initialize.
@@ -964,6 +950,17 @@
       $scope.$on("$destroy", function () {
           for (const subscription of unsubscribe) {
               subscription();
+          }
+
+          // When the element is disposed we need to unsubscribe!
+          // NOTE: this is very important otherwise if this is part of a modal, the listener still exists because the dom
+          // element might still be there even after the modal has been hidden.
+          if (vm.tinyMceEditor != null) {
+            if($element) {
+              $element[0]?.dispatchEvent(new CustomEvent('blur', {composed: true, bubbles: true}));
+            }
+            vm.tinyMceEditor.destroy();
+            vm.tinyMceEditor = null;
           }
       });
   }
