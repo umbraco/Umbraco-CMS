@@ -6,11 +6,12 @@ using ContentTypeViewModels = Umbraco.Cms.Api.Management.ViewModels.ContentType;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
-internal abstract class ContentTypeEditingPresentationFactory
+internal abstract class ContentTypeEditingPresentationFactory<TContentType>
+    where TContentType : IContentTypeComposition
 {
-    private readonly IContentTypeService _contentTypeService;
+    private readonly IContentTypeBaseService<TContentType> _contentTypeService;
 
-    protected ContentTypeEditingPresentationFactory(IContentTypeService contentTypeService)
+    protected ContentTypeEditingPresentationFactory(IContentTypeBaseService<TContentType> contentTypeService)
         => _contentTypeService = contentTypeService;
 
     protected TContentTypeEditingModel MapContentTypeEditingModel<
@@ -43,6 +44,30 @@ internal abstract class ContentTypeEditingPresentationFactory
         };
 
         return editingModel;
+    }
+
+    protected T MapCompositionModel<T>(ContentTypeAvailableCompositionsResult compositionResult)
+        where T : ContentTypeViewModels.AvailableContentTypeCompositionResponseModelBase, new()
+    {
+        IContentTypeComposition composition = compositionResult.Composition;
+        IEnumerable<string>? folders = null;
+
+        if (composition is TContentType contentType)
+        {
+            var containers = _contentTypeService.GetContainers(contentType);
+            folders = containers.Select(c => c.Name).WhereNotNull();
+        }
+
+        T compositionModel = new()
+        {
+            Id = composition.Key,
+            Name = composition.Name ?? string.Empty,
+            Icon = composition.Icon ?? string.Empty,
+            FolderPath = folders ?? Array.Empty<string>(),
+            IsCompatible = compositionResult.Allowed
+        };
+
+        return compositionModel;
     }
 
     private ContentTypeSort[] MapAllowedContentTypes(IEnumerable<ContentTypeViewModels.ContentTypeSort> allowedContentTypes)
