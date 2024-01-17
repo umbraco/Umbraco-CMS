@@ -115,7 +115,7 @@ export class UmbInputMemberElement extends FormControlMixin(UmbLitElement) {
 		// });
 	}
 
-	protected _requestRemoveItem(item: MemberItemResponseModel){
+	protected _requestRemoveItem(item: MemberItemResponseModel) {
 		console.log("member.requestRemoveItem", item);
 		//this.#pickerContext.requestRemoveItem(item.id!);
 	}
@@ -158,8 +158,8 @@ export class UmbInputMemberElement extends FormControlMixin(UmbLitElement) {
 					${this.#renderOpenButton(item)}
 					<uui-button
 						@click=${() => this._requestRemoveItem(item)}
-						label="${this.localize.term('general_remove')} ${item.name}"
-						>${this.localize.term('general_remove')}</uui-button
+						label="${this.localize.term('general_remove')} ${item.name}">
+						${this.localize.term('general_remove')}
 					</uui-button>
 				</uui-action-bar>
 			</uui-ref-node>
