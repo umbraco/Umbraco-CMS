@@ -13,9 +13,9 @@ namespace Umbraco.Cms.Core.Configuration
 {
     public class JsonConfigManipulator : IConfigManipulator
     {
-        private const string UmbracoConnectionStringPath = $"ConnectionStrings:{Constants.System.UmbracoConnectionName}";
-        private const string UmbracoConnectionStringProviderNamePath = UmbracoConnectionStringPath + ConnectionStrings.ProviderNamePostfix;
         private const string ConnectionStringObjectName = "ConnectionStrings";
+        private const string UmbracoConnectionStringPath = $"{ConnectionStringObjectName}:{Constants.System.UmbracoConnectionName}";
+        private const string UmbracoConnectionStringProviderNamePath = UmbracoConnectionStringPath + ConnectionStrings.ProviderNamePostfix;
 
         private readonly IConfiguration _configuration;
         private readonly ILogger<JsonConfigManipulator> _logger;
@@ -29,22 +29,7 @@ namespace Umbraco.Cms.Core.Configuration
         }
 
         public void RemoveConnectionString()
-        {
-            // Remove keys from JSON
-            JsonConfigurationProvider? provider = GetJsonConfigurationProvider(UmbracoConnectionStringPath);
-
-            JObject? json = GetJson(provider);
-            if (json is null)
-            {
-                _logger.LogWarning("Failed to remove connection string from JSON configuration.");
-                return;
-            }
-
-            RemoveJsonKey(json, UmbracoConnectionStringPath);
-            RemoveJsonKey(json, UmbracoConnectionStringProviderNamePath);
-
-            SaveJson(provider, json);
-        }
+            => RemoveConnectionStringAsync().GetAwaiter().GetResult();
 
         public async Task RemoveConnectionStringAsync()
         {
@@ -57,7 +42,11 @@ namespace Umbraco.Cms.Core.Configuration
                 _logger.LogWarning("Failed to remove connection string from JSON configuration");
                 return;
             }
-            // TODO: Finish me
+
+            RemoveJsonNode(jsonNode, UmbracoConnectionStringPath);
+            RemoveJsonNode(jsonNode, UmbracoConnectionStringProviderNamePath);
+
+            await SaveJsonAsync(provider, jsonNode);
         }
 
         public async Task SaveConnectionStringAsync(string connectionString, string? providerName)
@@ -214,15 +203,15 @@ namespace Umbraco.Cms.Core.Configuration
             return connectionObject;
         }
 
-        private static void RemoveJsonKey(JObject? json, string key)
+        private static void RemoveJsonNode(JsonNode node, string key)
         {
-            JToken? token = json;
-            foreach (var propertyName in key.Split(new[] { ':' }))
+            JsonNode? propertyNode = node;
+            foreach (var propertyName in key.Split(':'))
             {
-                token = CaseSelectPropertyValues(token, propertyName);
+                propertyNode = FindChildNode(propertyNode, propertyName);
             }
 
-            token?.Parent?.Remove();
+            propertyNode?.Parent?.AsObject().Remove(propertyNode.GetPropertyName());
         }
 
         private void SaveJson(JsonConfigurationProvider? provider, JObject? json)
@@ -385,6 +374,34 @@ namespace Umbraco.Cms.Core.Configuration
                     {
                         return property.Value;
                     }
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Finds the immediate child with the specified name, in a case insensitive manner.
+        /// </summary>
+        /// <remarks>
+        /// This is required since keys are case insensitive in IConfiguration.
+        /// But not in JsonNode.
+        /// </remarks>
+        /// <param name="node">The node to search.</param>
+        /// <param name="key">The key to search for.</param>
+        /// <returns>The found node, null if no match is found.</returns>
+        private static JsonNode? FindChildNode(JsonNode? node, string key)
+        {
+            if (node is null)
+            {
+                return node;
+            }
+
+            foreach (KeyValuePair<string, JsonNode?> property in node.AsObject())
+            {
+                if (property.Key.Equals(key, StringComparison.OrdinalIgnoreCase))
+                {
+                    return property.Value;
                 }
             }
 

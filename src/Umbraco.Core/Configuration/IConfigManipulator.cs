@@ -6,6 +6,12 @@ public interface IConfigManipulator
 
     void SaveConnectionString(string connectionString, string? providerName);
 
+    Task RemoveConnectionStringAsync()
+    {
+        RemoveConnectionString();
+        return Task.CompletedTask;
+    }
+
     Task SaveConnectionStringAsync(string connectionString, string? providerName)
     {
         SaveConnectionString(connectionString, providerName);
