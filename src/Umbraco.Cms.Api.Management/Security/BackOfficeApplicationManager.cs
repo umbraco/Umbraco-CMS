@@ -14,7 +14,7 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
     private readonly IWebHostEnvironment _webHostEnvironment;
     private readonly IRuntimeState _runtimeState;
     private readonly Uri? _backOfficeHost;
-    private readonly string? _authorizeCallbackPathName;
+    private readonly string _authorizeCallbackPathName;
 
     public BackOfficeApplicationManager(
         IOpenIddictApplicationManager applicationManager,
@@ -101,14 +101,14 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
             ClientId = Constants.OAuthClientIds.BackOffice,
             RedirectUris =
             {
-                CallbackUrlFor(_backOfficeHost ?? backOfficeUrl, _authorizeCallbackPathName ?? "/umbraco")
+                CallbackUrlFor(_backOfficeHost ?? backOfficeUrl, _authorizeCallbackPathName)
             },
             Type = OpenIddictConstants.ClientTypes.Public,
             PostLogoutRedirectUris =
             {
-                CallbackUrlFor(_backOfficeHost ?? backOfficeUrl, _authorizeCallbackPathName ?? "/umbraco/login"),
+                CallbackUrlFor(_backOfficeHost ?? backOfficeUrl, _authorizeCallbackPathName + "/login"),
                 // FIXME: remove when we no longer use Umbraco.Web.UI project
-                CallbackUrlFor(_backOfficeHost ?? backOfficeUrl, _authorizeCallbackPathName ?? "/umbraco")
+                CallbackUrlFor(_backOfficeHost ?? backOfficeUrl, _authorizeCallbackPathName)
             },
             Permissions =
             {
