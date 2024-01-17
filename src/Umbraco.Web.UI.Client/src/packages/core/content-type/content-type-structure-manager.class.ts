@@ -76,20 +76,32 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 
 		this.#ownerContentTypeUnique = data.unique;
 
-		this.#init = this._observeContentType(data);
-		await this.#init;
+		// Add the new content type to the list of content types, this holds our draft state of this scaffold.
+		this.#contentTypes.appendOne(data);
 		return { data };
 	}
 
+	/**
+	 * Save the owner content type. Notice this is for a Content Type that is already stored on the server.
+	 * @returns
+	 */
 	public async save() {
 		const contentType = this.getOwnerContentType();
 		if (!contentType || !contentType.unique) return false;
 
-		await this.#contentTypeRepository.save(contentType);
+		const { data } = await this.#contentTypeRepository.save(contentType);
+		if (!data) return false;
+
+		// Update state with latest version:
+		this.#contentTypes.updateOne(contentType.unique, data);
 
 		return true;
 	}
 
+	/**
+	 * Create the owner content type. Notice this is for a Content Type that is NOT already stored on the server.
+	 * @returns
+	 */
 	public async create() {
 		const contentType = this.getOwnerContentType();
 		if (!contentType || !contentType.unique) return false;
@@ -97,7 +109,11 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 		const { data } = await this.#contentTypeRepository.create(contentType);
 		if (!data) return false;
 
-		await this.loadType(data.unique);
+		// Update state with latest version:
+		this.#contentTypes.updateOne(contentType.unique, data);
+
+		// Start observe the new content type in the store, as we did not do that when it was a scaffold/local-version.
+		this._observeContentType(data);
 
 		return true;
 	}
@@ -125,15 +141,19 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 		this._loadContentTypeCompositions(data);
 
 		this.#contentTypeObservers.push(
-			this.observe(await this.#contentTypeRepository.byUnique(data.unique), (docType) => {
-				if (docType) {
-					// TODO: Handle if there was changes made to the owner document type in this context.
-					/*
-					possible easy solutions could be to notify user wether they want to update(Discard the changes to accept the new ones).
-					 */
-					this.#contentTypes.appendOne(docType);
-				}
-			}),
+			this.observe(
+				await this.#contentTypeRepository.byUnique(data.unique),
+				(docType) => {
+					if (docType) {
+						// TODO: Handle if there was changes made to the owner document type in this context.
+						/*
+						possible easy solutions could be to notify user wether they want to update(Discard the changes to accept the new ones).
+					 	*/
+						this.#contentTypes.appendOne(docType);
+					}
+				},
+				'observeContentType_' + data.unique,
+			),
 		);
 	}
 

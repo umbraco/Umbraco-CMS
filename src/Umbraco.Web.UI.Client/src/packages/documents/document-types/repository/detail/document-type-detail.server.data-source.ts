@@ -42,7 +42,7 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 			name: '',
 			alias: '',
 			description: '',
-			icon: '',
+			icon: 'icon-document',
 			allowedAsRoot: false,
 			variesByCulture: false,
 			variesBySegment: false,
