@@ -36,6 +36,7 @@ angular.module("umbraco.directives")
 
                 //stores a reference to the editor
                 let tinyMceEditor = null;
+                const umbPanelBody = document.querySelector(".umb-panel-body");
 
                 const assetPromises = [];
 
@@ -72,7 +73,6 @@ angular.module("umbraco.directives")
                     //create a baseline Config to extend upon
                     let baseLineConfigObj = {
                         maxImageSize: editorConfig.maxImageSize,
-                        toolbar_sticky: true,
                     };
 
                     baseLineConfigObj.setup = function (editor) {
@@ -96,6 +96,22 @@ angular.module("umbraco.directives")
                                 }
                             }, 400);
 
+                        });
+
+                        //when we leave the editor (maybe)
+                        editor.on('blur', function (e) {
+                          angularHelper.safeApply(scope, function () {
+                            unpinToolbar();
+                            umbPanelBody.removeEventListener("scroll", pinToolbar);
+                          });
+                        });
+
+                        // Focus on editor
+                        editor.on('focus', function (e) {
+                          angularHelper.safeApply(scope, function () {
+                            pinToolbar();
+                            umbPanelBody.addEventListener("scroll", pinToolbar, { passive: true });
+                          });
                         });
 
                         //initialize the standard editor functionality for Umbraco
@@ -135,6 +151,7 @@ angular.module("umbraco.directives")
                 // NOTE: this is very important otherwise if this is part of a modal, the listener still exists because the dom
                 // element might still be there even after the modal has been hidden.
                 scope.$on('$destroy', function () {
+                  umbPanelBody.removeEventListener("scroll", pinToolbar)
                   eventsService.unsubscribe(tabShownListener);
 
                   //ensure we unbind this in case the blur doesn't fire above
@@ -143,6 +160,57 @@ angular.module("umbraco.directives")
                     tinyMceEditor = null;
                   }
                 });
+
+                const pinToolbar = () => {
+                  //we can't pin the toolbar if this doesn't exist (i.e. when in distraction free mode)
+                  if (!tinyMceEditor.container) {
+                    return;
+                  }
+
+                  const tinyMce = tinyMceEditor.container;
+                  const toolbar = tinyMce.querySelector(".tox-editor-header");
+                  const toolbarHeight = toolbar.offsetHeight;
+                  const tinyMceRect = tinyMce.getBoundingClientRect();
+                  const tinyMceTop = tinyMceRect.top;
+                  const tinyMceBottom = tinyMceRect.bottom;
+                  const tinyMceWidth = tinyMceRect.width;
+
+                  const tinyMceEditArea = tinyMce.querySelector(".tox-edit-area");
+
+                  // set height of mce to 177px if it is less than 177px to
+                  // allow the content to be shown with a pinned toolbar
+                  // (only relevant when the content is less than 177px)
+                  if (tinyMce.offsetHeight < 177) {
+                    tinyMce.style.height = "177px";
+                  }
+
+                  // set padding in top of mce so the content does not "jump" up
+                  tinyMceEditArea.style.paddingTop = toolbarHeight + "px";
+
+                  if (tinyMceTop < 177 && ((177 + toolbarHeight) < tinyMceBottom)) {
+                    toolbar.style.position = "fixed";
+                    toolbar.style.top = "177px";
+                    toolbar.style.left = "auto";
+                    toolbar.style.right = "auto";
+                    toolbar.style.width = tinyMceWidth + "px";
+                  } else {
+                    toolbar.style.position = "absolute";
+                    toolbar.style.left = "";
+                    toolbar.style.right = "";
+                    toolbar.style.top = "";
+                    toolbar.style.width = tinyMceWidth + "px";
+                  }
+
+                }
+
+                const unpinToolbar = () => {
+                  const tinyMce = tinyMceEditor.container;
+                  const toolbar = tinyMce.querySelector(".tox-editor-header");
+                  const tinyMceEditArea = tinyMce.querySelector(".tox-edit-area");
+                  // reset padding in top of mce so the content does not "jump" up
+                  tinyMceEditArea.style.paddingTop = "0";
+                  toolbar.style.position = "static";
+                }
 
             }
         };
