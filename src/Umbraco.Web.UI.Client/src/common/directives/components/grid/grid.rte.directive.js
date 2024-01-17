@@ -72,7 +72,7 @@ angular.module("umbraco.directives")
 
                     //create a baseline Config to extend upon
                     let baseLineConfigObj = {
-                        maxImageSize: editorConfig.maxImageSize,
+                        maxImageSize: editorConfig.maxImageSize
                     };
 
                     baseLineConfigObj.setup = function (editor) {
