@@ -158,8 +158,8 @@ export class UmbInputMemberElement extends FormControlMixin(UmbLitElement) {
 					${this.#renderOpenButton(item)}
 					<uui-button
 						@click=${() => this._requestRemoveItem(item)}
-						label="Remove member ${item.name}">
-						Remove
+						label="${this.localize.term('general_remove')} ${item.name}"
+						>${this.localize.term('general_remove')}</uui-button
 					</uui-button>
 				</uui-action-bar>
 			</uui-ref-node>
