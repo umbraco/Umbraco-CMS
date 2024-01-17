@@ -77,7 +77,7 @@ export class UmbWorkspaceSplitViewContext extends UmbBaseController {
 		return this.#index.getValue();
 	}
 	public setSplitViewIndex(index: number) {
-		this.#index.next(index);
+		this.#index.setValue(index);
 	}
 
 	/**

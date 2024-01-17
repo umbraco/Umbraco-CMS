@@ -45,7 +45,7 @@ export class UmbBlockContext<
 	 * @returns {void}
 	 */
 	setLayout(layout: BlockLayoutType | undefined) {
-		this.#layout.next(layout);
+		this.#layout.setValue(layout);
 	}
 
 	constructor(host: UmbControllerHost) {
@@ -57,7 +57,7 @@ export class UmbBlockContext<
 			this.observe(
 				manager.workspacePath,
 				(workspacePath) => {
-					this.#workspacePath.next(workspacePath);
+					this.#workspacePath.setValue(workspacePath);
 				},
 				'observeWorkspacePath',
 			);
@@ -94,7 +94,7 @@ export class UmbBlockContext<
 		this.observe(
 			this.#manager.contentOf(contentUdi),
 			(content) => {
-				this.#content.next(content);
+				this.#content.setValue(content);
 			},
 			'observeContent',
 		);
@@ -105,7 +105,7 @@ export class UmbBlockContext<
 			this.observe(
 				this.#manager.contentOf(settingsUdi),
 				(content) => {
-					this.#settings.next(content);
+					this.#settings.setValue(content);
 				},
 				'observeSettings',
 			);
@@ -121,7 +121,7 @@ export class UmbBlockContext<
 		this.observe(
 			this.#manager.blockTypeOf(contentTypeKey),
 			(blockType) => {
-				this.#blockType.next(blockType as BlockType);
+				this.#blockType.setValue(blockType as BlockType);
 			},
 			'observeBlockType',
 		);
@@ -135,7 +135,7 @@ export class UmbBlockContext<
 		if (blockType.label) {
 			this.removeControllerByAlias('observeContentTypeName');
 			// Missing part for label syntax, as we need to store the syntax, interpretive it and then set the label: (here we are just parsing the label syntax)
-			this.#label.next(blockType.label);
+			this.#label.setValue(blockType.label);
 			return;
 		} else {
 			// TODO: Maybe this could be skipped if we had a fallback label which was set to get the content element type name?
@@ -143,7 +143,7 @@ export class UmbBlockContext<
 			this.observe(
 				this.blockTypeName,
 				(contentTypeName) => {
-					this.#label.next(contentTypeName ?? 'no name');
+					this.#label.setValue(contentTypeName ?? 'no name');
 				},
 				'observeBlockTypeName',
 			);
@@ -159,7 +159,7 @@ export class UmbBlockContext<
 		this.observe(
 			this.#manager.contentTypeNameOf(contentElementTypeKey),
 			(contentTypeName) => {
-				this.#blockTypeName.next(contentTypeName);
+				this.#blockTypeName.setValue(contentTypeName);
 			},
 			'observeBlockTypeContentElementTypeName',
 		);

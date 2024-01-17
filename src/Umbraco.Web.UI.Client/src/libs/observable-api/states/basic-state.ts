@@ -30,7 +30,7 @@ export class UmbBasicState<T> {
 	 * @description - Holds the current data of this state.
 	 * @example <caption>Example retrieve the current data of a state</caption>
 	 * const myState = new UmbArrayState('Hello world');
-	 * console.log("Value is: ", myState.getValue());
+	 * console.log("Value is: ", myState.value);
 	 */
 	public get value(): BehaviorSubject<T>['value'] {
 		return this._subject.value;
@@ -57,18 +57,23 @@ export class UmbBasicState<T> {
 	}
 
 	/**
-	 * @method next
-	 * @param {T} data - The next set of data for this state to hold.
+	 * @method setValue
+	 * @param {T} data - The next data for this state to hold.
 	 * @description - Set the data of this state, if data is different than current this will trigger observations to update.
-	 * @example <caption>Example retrieve the current data of a state</caption>
+	 * @example <caption>Example change the data of a state</caption>
 	 * const myState = new UmbArrayState('Good morning');
 	 * // myState.value is equal 'Good morning'.
-	 * myState.next('Goodnight')
+	 * myState.setValue('Goodnight')
 	 * // myState.value is equal 'Goodnight'.
 	 */
-	next(newData: T): void {
-		if (newData !== this._subject.getValue()) {
-			this._subject.next(newData);
+	setValue(data: T): void {
+		if (data !== this._subject.getValue()) {
+			this._subject.next(data);
 		}
 	}
+
+	/**
+	 * @deprecated - Use `setValue` instead.
+	 */
+	next = this.setValue;
 }

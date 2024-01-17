@@ -28,7 +28,7 @@ export class UmbMemberTypeWorkspaceContext
 		const { data } = await this.repository.requestById(entityId);
 		if (data) {
 			this.setIsNew(false);
-			this.#data.next(data);
+			this.#data.setValue(data);
 		}
 	}
 
@@ -36,7 +36,7 @@ export class UmbMemberTypeWorkspaceContext
 		const { data } = await this.repository.createScaffold();
 		if (!data) return;
 		this.setIsNew(true);
-		this.#data.next(data);
+		this.#data.setValue(data);
 	}
 
 	getData() {

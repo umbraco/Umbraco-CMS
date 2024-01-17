@@ -23,7 +23,7 @@ export class UmbPaginationManager extends EventTarget {
 	 * @memberof UmbPaginationManager
 	 */
 	public setPageSize(pageSize: number) {
-		this.#pageSize.next(pageSize);
+		this.#pageSize.setValue(pageSize);
 		this.#calculateTotalPages();
 	}
 
@@ -51,7 +51,7 @@ export class UmbPaginationManager extends EventTarget {
 	 * @memberof UmbPaginationManager
 	 */
 	public setTotalItems(totalItems: number) {
-		this.#totalItems.next(totalItems);
+		this.#totalItems.setValue(totalItems);
 		this.#calculateTotalPages();
 	}
 
@@ -87,7 +87,7 @@ export class UmbPaginationManager extends EventTarget {
 			pageNumber = this.#totalPages.getValue();
 		}
 
-		this.#currentPage.next(pageNumber);
+		this.#currentPage.setValue(pageNumber);
 		this.#calculateSkip();
 		this.dispatchEvent(new UmbChangeEvent());
 	}
@@ -107,7 +107,7 @@ export class UmbPaginationManager extends EventTarget {
 	 */
 	#calculateTotalPages() {
 		const totalPages = Math.ceil(this.#totalItems.getValue() / this.#pageSize.getValue());
-		this.#totalPages.next(totalPages);
+		this.#totalPages.setValue(totalPages);
 
 		/* If we currently are on a page higher than the total pages. We need to reset the current page to the last page.
     This can happen if we have a filter that returns less items than the current page size. */
@@ -118,6 +118,6 @@ export class UmbPaginationManager extends EventTarget {
 
 	#calculateSkip() {
 		const skip = (this.#currentPage.getValue() - 1) * this.#pageSize.getValue();
-		this.#skip.next(skip);
+		this.#skip.setValue(skip);
 	}
 }
