@@ -118,12 +118,12 @@ public class SecuritySettings
     public bool AllowConcurrentLogins { get; set; } = StaticAllowConcurrentLogins;
 
     /// <summary>
-    ///     Gets or sets a value of the backoffice host URI.
+    ///     Gets or sets a value of the back-office host URI. Use this when running the back-office client and the Management API on different hosts. Leave empty when running both on the same host.
     /// </summary>
     public Uri? BackOfficeHost { get; set; }
 
     /// <summary>
-    ///     Gets or sets a value indicating whether to allow concurrent logins.
+    ///     The path to use for authorization callback. Will be appended to the BackOfficeHost.
     /// </summary>
     public string? AuthorizeCallbackPathName { get; set; }
 }
