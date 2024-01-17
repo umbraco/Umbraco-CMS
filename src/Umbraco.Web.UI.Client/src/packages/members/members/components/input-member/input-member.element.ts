@@ -3,9 +3,27 @@ import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { MemberItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
+import { type UmbSorterConfig, UmbSorterController } from '@umbraco-cms/backoffice/sorter';
+
+const SORTER_CONFIG: UmbSorterConfig<string> = {
+	compareElementToModel: (element, model) => {
+		return element.getAttribute('detail') === model;
+	},
+	querySelectModelToElement: () => null,
+	identifier: 'Umb.SorterIdentifier.InputDocument',
+	itemSelector: 'uui-ref-node',
+	containerSelector: 'uui-ref-list',
+};
 
 @customElement('umb-input-member')
 export class UmbInputMemberElement extends FormControlMixin(UmbLitElement) {
+	#sorter = new UmbSorterController(this, {
+		...SORTER_CONFIG,
+		onChange: ({ model }) => {
+			this.selectedIds = model;
+		},
+	});
+
 	/**
 	 * This is a minimum amount of selected items in this input.
 	 * @type {number}
@@ -60,6 +78,7 @@ export class UmbInputMemberElement extends FormControlMixin(UmbLitElement) {
 	}
 	public set selectedIds(ids: Array<string>) {
 		//this.#pickerContext.setSelection(ids);
+		this.#sorter.setModel(ids);
 	}
 
 	@property()
@@ -69,7 +88,7 @@ export class UmbInputMemberElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	@state()
-	private _items?: Array<MemberItemResponseModel>;
+	private _items: Array<MemberItemResponseModel> = [];
 
 	// TODO: Create the `UmbMemberPickerContext` [LK]
 	//#pickerContext = new UmbMemberPickerContext(this);
@@ -100,7 +119,7 @@ export class UmbInputMemberElement extends FormControlMixin(UmbLitElement) {
 		// });
 	}
 
-	protected _requestRemoveItem(item: MemberItemResponseModel){
+	protected _requestRemoveItem(item: MemberItemResponseModel) {
 		console.log("member.requestRemoveItem", item);
 		//this.#pickerContext.requestRemoveItem(item.id!);
 	}
@@ -110,17 +129,13 @@ export class UmbInputMemberElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	render() {
-		return html`
-			${this.#renderItems()}
-			${this.#renderAddButton()}
-		`;
+		return html` ${this.#renderItems()} ${this.#renderAddButton()} `;
 	}
 
 	#renderItems() {
 		if (!this._items) return;
-		// TODO: Add sorting. [LK]
-		return html`<uui-ref-list
-			>${repeat(
+		return html`<uui-ref-list>
+			${repeat(
 				this._items,
 				(item) => item.id,
 				(item) => this._renderItem(item),
@@ -157,6 +172,10 @@ export class UmbInputMemberElement extends FormControlMixin(UmbLitElement) {
 		css`
 			#add-button {
 				width: 100%;
+			}
+
+			uui-ref-node[drag-placeholder] {
+				opacity: 0.2;
 			}
 		`,
 	];
