@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using Umbraco.Cms.Api.Common.Configuration;
 using Umbraco.Cms.Api.Common.DependencyInjection;
 using Umbraco.Cms.Api.Management.Configuration;
@@ -8,7 +7,6 @@ using Umbraco.Cms.Api.Management.Serialization;
 using Umbraco.Cms.Api.Management.Services;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DependencyInjection;
-using Umbraco.Cms.Core.Models.Configuration;
 using Umbraco.Cms.Web.Common.ApplicationBuilder;
 
 namespace Umbraco.Extensions;
@@ -77,11 +75,6 @@ public static class UmbracoBuilderExtensions
                     applicationBuilder => { },
                     applicationBuilder => applicationBuilder.UseEndpoints()));
             });
-
-            // FIXME: when this is moved to core, make the AddUmbracoOptions extension private again and remove core InternalsVisibleTo for Umbraco.Cms.Api.Management
-            builder.AddUmbracoOptions<NewBackOfficeSettings>();
-            // FIXME: remove this when NewBackOfficeSettings is moved to core
-            services.AddSingleton<IValidateOptions<NewBackOfficeSettings>, NewBackOfficeSettingsValidator>();
         }
 
         return builder;
