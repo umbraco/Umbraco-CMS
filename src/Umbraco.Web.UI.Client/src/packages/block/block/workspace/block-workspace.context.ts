@@ -1,10 +1,6 @@
 import type { UmbBlockLayoutBaseModel, UmbBlockDataType } from '../types.js';
 import { UmbBlockElementManager } from './block-element-manager.js';
-import {
-	UmbEditableWorkspaceContextBase,
-	UmbSaveableWorkspaceContextInterface,
-	UmbWorkspaceContextInterface,
-} from '@umbraco-cms/backoffice/workspace';
+import { UmbEditableWorkspaceContextBase, UmbWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
 import { UmbBooleanState, UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
@@ -12,10 +8,9 @@ import { ManifestWorkspace } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UMB_BLOCK_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/block';
 
-export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel>
-	extends UmbEditableWorkspaceContextBase<LayoutDataType>
-	implements UmbSaveableWorkspaceContextInterface
-{
+export class UmbBlockWorkspaceContext<
+	LayoutDataType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel,
+> extends UmbEditableWorkspaceContextBase<LayoutDataType> {
 	// Just for context token safety:
 	public readonly IS_BLOCK_WORKSPACE_CONTEXT = true;
 	//
