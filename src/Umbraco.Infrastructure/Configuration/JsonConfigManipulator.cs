@@ -49,6 +49,9 @@ namespace Umbraco.Cms.Core.Configuration
             await SaveJsonAsync(provider, jsonNode);
         }
 
+        public void SaveConnectionString(string connectionString, string? providerName)
+            => SaveConnectionStringAsync(connectionString, providerName).GetAwaiter().GetResult();
+
         public async Task SaveConnectionStringAsync(string connectionString, string? providerName)
         {
             JsonConfigurationProvider? provider = GetJsonConfigurationProvider();
@@ -66,41 +69,33 @@ namespace Umbraco.Cms.Core.Configuration
             await SaveJsonAsync(provider, jsonNode);
         }
 
-        public void SaveConnectionString(string connectionString, string? providerName)
-            => SaveConnectionStringAsync(connectionString, providerName).GetAwaiter().GetResult();
-
         public void SaveConfigValue(string key, object value)
+            => SaveConfigValueAsync(key, value).GetAwaiter().GetResult();
+
+        public async Task SaveConfigValueAsync(string itemPath, object value)
         {
-            // Save key to JSON
-            var provider = GetJsonConfigurationProvider();
+            JsonConfigurationProvider? provider = GetJsonConfigurationProvider();
+            JsonNode? node = await GetJsonNodeAsync(provider);
 
-            var json = GetJson(provider);
-            if (json is null)
+            if (node is null)
             {
-                _logger.LogWarning("Failed to save configuration key \"{Key}\" in JSON configuration.", key);
+                _logger.LogWarning("Failed to save configuration key \"{Key}\" in JSON configuration", itemPath);
                 return;
             }
 
-            JToken? token = json;
-            foreach (var propertyName in key.Split(new[] { ':' }))
+            JsonNode? propertyNode = node;
+            foreach (var propertyName in itemPath.Split(':'))
             {
-                if (token is null)
-                    break;
-                token = CaseSelectPropertyValues(token, propertyName);
+                propertyNode = FindChildNode(propertyNode, propertyName);
             }
 
-            if (token is null)
+            if (propertyNode is null)
+            {
                 return;
-
-            var writer = new JTokenWriter();
-            writer.WriteValue(value);
-
-            if (writer.Token is not null)
-            {
-                token.Replace(writer.Token);
             }
 
-            SaveJson(provider, json);
+            propertyNode.ReplaceWith(value);
+            await SaveJsonAsync(provider, node);
         }
 
         public void SaveDisableRedirectUrlTracking(bool disable)

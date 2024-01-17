@@ -6,6 +6,12 @@ public interface IConfigManipulator
 
     void SaveConnectionString(string connectionString, string? providerName);
 
+    void SaveConfigValue(string itemPath, object value);
+
+    void SaveDisableRedirectUrlTracking(bool disable);
+
+    void SetGlobalId(string id);
+
     Task RemoveConnectionStringAsync()
     {
         RemoveConnectionString();
@@ -18,9 +24,5 @@ public interface IConfigManipulator
         return Task.CompletedTask;
     }
 
-    void SaveConfigValue(string itemPath, object value);
-
-    void SaveDisableRedirectUrlTracking(bool disable);
-
-    void SetGlobalId(string id);
+    Task SaveConfigValueAsync(string itemPath, object value);
 }
