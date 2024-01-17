@@ -95,9 +95,8 @@ export class UmbBlockManagerContext<
 		const contentTypeId = getKeyFromUdi(contentTypeUdi);
 		return this.#contentTypes.asObservablePart((source) => source.find((x) => x.id === contentTypeId));
 	}
-	contentTypeNameOf(contentTypeUdi: string) {
-		const contentTypeId = getKeyFromUdi(contentTypeUdi);
-		return this.#contentTypes.asObservablePart((source) => source.find((x) => x.id === contentTypeId)?.name);
+	contentTypeNameOf(contentTypeKey: string) {
+		return this.#contentTypes.asObservablePart((source) => source.find((x) => x.id === contentTypeKey)?.name);
 	}
 	blockTypeOf(contentTypeKey: string) {
 		return this.#blockTypes.asObservablePart((source) =>

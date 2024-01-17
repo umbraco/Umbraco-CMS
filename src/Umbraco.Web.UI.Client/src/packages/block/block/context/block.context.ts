@@ -80,8 +80,8 @@ export class UmbBlockContext<
 		// Observe blockType:
 		this.observe(this.blockType, (blockType) => {
 			if (!blockType) return;
-			this.#observeBlockTypeLabel();
 			this.#observeBlockTypeContentElementName();
+			this.#observeBlockTypeLabel();
 		});
 	}
 
@@ -127,6 +127,21 @@ export class UmbBlockContext<
 		);
 	}
 
+	#observeBlockTypeContentElementName() {
+		if (!this.#manager) return;
+		const contentElementTypeKey = this.#blockType.value?.contentElementTypeKey;
+		if (!contentElementTypeKey) return;
+
+		// observe blockType:
+		this.observe(
+			this.#manager.contentTypeNameOf(contentElementTypeKey),
+			(contentTypeName) => {
+				this.#blockTypeName.next(contentTypeName);
+			},
+			'observeBlockTypeContentElementTypeName',
+		);
+	}
+
 	#observeBlockTypeLabel() {
 		if (!this.#manager) return;
 		const blockType = this.#blockType.value;
@@ -143,26 +158,12 @@ export class UmbBlockContext<
 			this.observe(
 				this.blockTypeName,
 				(contentTypeName) => {
+					// Currently the contentTypeName is used directly as the label, but later this should just be a prop for the label to use.
 					this.#label.next(contentTypeName ?? 'no name');
 				},
 				'observeBlockTypeName',
 			);
 		}
-	}
-
-	#observeBlockTypeContentElementName() {
-		if (!this.#manager) return;
-		const contentElementTypeKey = this.#blockType.value?.contentElementTypeKey;
-		if (!contentElementTypeKey) return;
-
-		// observe blockType:
-		this.observe(
-			this.#manager.contentTypeNameOf(contentElementTypeKey),
-			(contentTypeName) => {
-				this.#blockTypeName.next(contentTypeName);
-			},
-			'observeBlockTypeContentElementTypeName',
-		);
 	}
 
 	// Public methods:
