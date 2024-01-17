@@ -370,6 +370,11 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IWebhookLogService, WebhookLogService>();
             Services.AddUnique<IWebhookLogFactory, WebhookLogFactory>();
             Services.AddUnique<IWebhookRequestService, WebhookRequestService>();
+
+            //Two factor providers
+            Services.AddUnique<ITwoFactorLoginService, TwoFactorLoginService>();
+            Services.AddUnique<IUserTwoFactorLoginService, UserTwoFactorLoginService>();
+
         }
     }
 }

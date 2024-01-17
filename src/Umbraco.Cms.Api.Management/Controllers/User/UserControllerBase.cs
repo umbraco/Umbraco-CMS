@@ -129,4 +129,29 @@ public abstract class UserControllerBase : ManagementApiControllerBase
                     .WithTitle("Unknown user operation status.")
                     .Build()),
         };
+
+    protected IActionResult TwoFactorOperationStatusResult(TwoFactorOperationStatus status) =>
+        status switch
+        {
+            TwoFactorOperationStatus.Success => Ok(),
+            TwoFactorOperationStatus.ProviderNameNotFound => NotFound(new ProblemDetailsBuilder()
+                .WithTitle("Missing 2FA provider")
+                .WithDetail("The specified 2fa provider was not found.")
+                .Build()),
+            TwoFactorOperationStatus.ProviderAlreadySetup => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("2FA provider already configured")
+                .WithDetail("The current user already have the provider configured.")
+                .Build()),
+            TwoFactorOperationStatus.InvalidCode => BadRequest(new ProblemDetailsBuilder()
+                .WithTitle("Invalid code")
+                .WithDetail("The specified 2fa code was invalid in combination with the provider.")
+                .Build()),
+            TwoFactorOperationStatus.UserNotFound => NotFound(new ProblemDetailsBuilder()
+                .WithTitle("User not found")
+                .WithDetail("The specified user id was not found.")
+                .Build()),
+            _ => StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetailsBuilder()
+                .WithTitle("Unknown two factor operation status.")
+                .Build()),
+        };
 }
