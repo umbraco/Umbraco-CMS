@@ -10,7 +10,7 @@ const SORTER_CONFIG: UmbSorterConfig<string> = {
 		return element.getAttribute('detail') === model;
 	},
 	querySelectModelToElement: () => null,
-	identifier: 'Umb.SorterIdentifier.InputDocument',
+	identifier: 'Umb.SorterIdentifier.InputMember',
 	itemSelector: 'uui-ref-node',
 	containerSelector: 'uui-ref-list',
 };
