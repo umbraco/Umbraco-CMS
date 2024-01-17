@@ -2,10 +2,13 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { AvailableMediaTypeCompositionResponseModel } from '../models/AvailableMediaTypeCompositionResponseModel';
 import type { CopyMediaTypeRequestModel } from '../models/CopyMediaTypeRequestModel';
 import type { CreateFolderRequestModel } from '../models/CreateFolderRequestModel';
 import type { CreateMediaTypeRequestModel } from '../models/CreateMediaTypeRequestModel';
 import type { FolderResponseModel } from '../models/FolderResponseModel';
+import type { MediaTypeCompositionRequestModel } from '../models/MediaTypeCompositionRequestModel';
+import type { MediaTypeCompositionResponseModel } from '../models/MediaTypeCompositionResponseModel';
 import type { MediaTypeItemResponseModel } from '../models/MediaTypeItemResponseModel';
 import type { MediaTypeResponseModel } from '../models/MediaTypeResponseModel';
 import type { MoveMediaTypeRequestModel } from '../models/MoveMediaTypeRequestModel';
@@ -114,6 +117,29 @@ export class MediaTypeResource {
     }
 
     /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getMediaTypeByIdCompositionReferences({
+        id,
+    }: {
+        id: string,
+    }): CancelablePromise<Array<MediaTypeCompositionResponseModel>> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/media-type/{id}/composition-references',
+            path: {
+                'id': id,
+            },
+            errors: {
+                400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
+                404: `Not Found`,
+            },
+        });
+    }
+
+    /**
      * @returns string Created
      * @throws ApiError
      */
@@ -164,6 +190,26 @@ export class MediaTypeResource {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static postMediaTypeAvailableCompositions({
+        requestBody,
+    }: {
+        requestBody?: MediaTypeCompositionRequestModel,
+    }): CancelablePromise<Array<AvailableMediaTypeCompositionResponseModel>> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/umbraco/management/api/v1/media-type/available-compositions',
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }
