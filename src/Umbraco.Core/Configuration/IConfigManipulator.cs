@@ -25,4 +25,6 @@ public interface IConfigManipulator
     }
 
     Task SaveConfigValueAsync(string itemPath, object value);
+
+    Task SaveDisableRedirectUrlTrackingAsync(bool disable);
 }

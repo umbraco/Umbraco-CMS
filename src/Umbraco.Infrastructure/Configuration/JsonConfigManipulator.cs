@@ -98,26 +98,57 @@ namespace Umbraco.Cms.Core.Configuration
             await SaveJsonAsync(provider, node);
         }
 
-        public void SaveDisableRedirectUrlTracking(bool disable)
+        public async Task CreateOrUpdateConfigValueAsync(string itemPath, object value)
         {
-            // Save key to JSON
-            var provider = GetJsonConfigurationProvider();
+            // This is required because System.Text.Json has no merge function, and doesn't support patch
+            // this is a problem because we don't know if the key(s) exists yet, so we can't simply update it,
+            // we may have to create one ore more json objects.
 
-            var json = GetJson(provider);
-            if (json is null)
+            JsonConfigurationProvider? provider = GetJsonConfigurationProvider();
+            JsonNode? node = await GetJsonNodeAsync(provider);
+
+            if (node is null)
             {
-                _logger.LogWarning("Failed to save enabled/disabled state for redirect URL tracking in JSON configuration.");
+                _logger.LogWarning("Failed to save configuration key \"{Key}\" in JSON configuration", itemPath);
                 return;
             }
 
-            var item = GetDisableRedirectUrlItem(disable);
-            if (item is not null)
+            // First we find the inner most child that already exists.
+            var propertyNames = itemPath.Split(':');
+            JsonNode propertyNode = node;
+            var currentIndex = 0;
+            foreach (var propertyName in propertyNames)
             {
-                json.Merge(item, new JsonMergeSettings());
+                JsonNode? found = FindChildNode(propertyNode, propertyName);
+                if (found is null)
+                {
+                    break;
+                }
+
+                propertyNode = found;
+                currentIndex++;
             }
 
-            SaveJson(provider, json);
+
+            while(currentIndex < propertyNames.Length)
+            {
+                var propertyName = propertyNames[currentIndex];
+                var newNode = new JsonObject();
+                propertyNode.AsObject()[propertyName] = newNode;
+                propertyNode = newNode;
+                currentIndex++;
+            }
+
+            propertyNode.ReplaceWith(value);
+            await SaveJsonAsync(provider, node);
+
         }
+
+        public void SaveDisableRedirectUrlTracking(bool disable)
+            => SaveDisableRedirectUrlTrackingAsync(disable).GetAwaiter().GetResult();
+
+        public async Task SaveDisableRedirectUrlTrackingAsync(bool disable)
+            => await CreateOrUpdateConfigValueAsync("Umbraco:CMS:WebRouting:DisableRedirectUrlTracking", disable);
 
         public void SetGlobalId(string id)
         {
@@ -340,34 +371,6 @@ namespace Umbraco.Cms.Core.Configuration
                         (requiredKey is null || provider.TryGet(requiredKey, out _)))
                     {
                         return jsonConfigurationProvider;
-                    }
-                }
-            }
-
-            return null;
-        }
-
-        /// <summary>
-        /// Returns the property value when case insensative
-        /// </summary>
-        /// <remarks>
-        /// This method is required because keys are case insensative in IConfiguration.
-        /// JObject[..] do not support case insensative and JObject.Property(...) do not return a new JObject.
-        /// </remarks>
-        private static JToken? CaseSelectPropertyValues(JToken? token, string name)
-        {
-            if (token is JObject obj)
-            {
-                foreach (var property in obj.Properties())
-                {
-                    if (name is null)
-                    {
-                        return property.Value;
-                    }
-
-                    if (string.Equals(property.Name, name, StringComparison.OrdinalIgnoreCase))
-                    {
-                        return property.Value;
                     }
                 }
             }
