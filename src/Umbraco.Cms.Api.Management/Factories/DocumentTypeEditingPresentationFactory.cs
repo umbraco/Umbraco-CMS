@@ -1,4 +1,6 @@
 ﻿using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
+using Umbraco.Cms.Api.Management.ViewModels.DocumentType.Composition;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentTypeEditing;
 using Umbraco.Cms.Core.Services;
@@ -6,7 +8,7 @@ using ContentTypeCleanupViewModel = Umbraco.Cms.Api.Management.ViewModels.Conten
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
-internal sealed class DocumentTypeEditingPresentationFactory : ContentTypeEditingPresentationFactory, IDocumentTypeEditingPresentationFactory
+internal sealed class DocumentTypeEditingPresentationFactory : ContentTypeEditingPresentationFactory<IContentType>, IDocumentTypeEditingPresentationFactory
 {
     public DocumentTypeEditingPresentationFactory(IContentTypeService contentTypeService)
         : base(contentTypeService)
@@ -54,6 +56,9 @@ internal sealed class DocumentTypeEditingPresentationFactory : ContentTypeEditin
 
         return updateModel;
     }
+
+    public IEnumerable<AvailableDocumentTypeCompositionResponseModel> MapCompositionModels(IEnumerable<ContentTypeAvailableCompositionsResult> compositionResults)
+        => compositionResults.Select(MapCompositionModel<AvailableDocumentTypeCompositionResponseModel>);
 
     private void MapCleanup(ContentTypeModelBase model, ContentTypeCleanupViewModel cleanup)
         => model.Cleanup = new ContentTypeCleanup
