@@ -4,9 +4,27 @@ import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { DocumentItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
+import { type UmbSorterConfig, UmbSorterController } from '@umbraco-cms/backoffice/sorter';
+
+const SORTER_CONFIG: UmbSorterConfig<string> = {
+	compareElementToModel: (element, model) => {
+		return element.getAttribute('detail') === model;
+	},
+	querySelectModelToElement: () => null,
+	identifier: 'Umb.SorterIdentifier.InputDocument',
+	itemSelector: 'uui-ref-node',
+	containerSelector: 'uui-ref-list',
+};
 
 @customElement('umb-input-document')
 export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
+	#sorter = new UmbSorterController(this, {
+		...SORTER_CONFIG,
+		onChange: ({ model }) => {
+			this.selectedIds = model;
+		},
+	});
+
 	/**
 	 * This is a minimum amount of selected items in this input.
 	 * @type {number}
@@ -58,6 +76,7 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 	}
 	public set selectedIds(ids: Array<string>) {
 		this.#pickerContext.setSelection(ids);
+		this.#sorter.setModel(ids);
 	}
 
 	@property({ type: String })
@@ -79,12 +98,15 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	@state()
-	private _items?: Array<DocumentItemResponseModel>;
+	private _items: Array<DocumentItemResponseModel> = [];
 
 	#pickerContext = new UmbDocumentPickerContext(this);
 
 	constructor() {
 		super();
+
+		this.observe(this.#pickerContext.selection, (selection) => (super.value = selection.join(',')));
+		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems));
 	}
 
 	connectedCallback() {
@@ -101,9 +123,6 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 			() => this.maxMessage,
 			() => !!this.max && this.#pickerContext.getSelection().length > this.max,
 		);
-
-		this.observe(this.#pickerContext.selection, (selection) => (super.value = selection.join(',')));
-		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems));
 	}
 
 	protected _openPicker() {
@@ -129,9 +148,8 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 
 	#renderItems() {
 		if (!this._items) return;
-		// TODO: Add sorting. [LK]
-		return html`<uui-ref-list
-			>${repeat(
+		return html`<uui-ref-list>
+			${repeat(
 				this._items,
 				(item) => item.id,
 				(item) => this._renderItem(item),
@@ -152,7 +170,7 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 		if (!item.id) return;
 		return html`
 			<uui-ref-node name=${ifDefined(item.name)} detail=${ifDefined(item.id)}>
-				${this._renderIsTrashed(item)}
+				${this.#renderIcon(item)} ${this._renderIsTrashed(item)}
 				<uui-action-bar slot="actions">
 					${this._renderOpenButton(item)}
 					<uui-button
@@ -163,6 +181,11 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 				</uui-action-bar>
 			</uui-ref-node>
 		`;
+	}
+
+	#renderIcon(item: DocumentItemResponseModel) {
+		if (!item.icon) return;
+		return html`<uui-icon slot="icon" name=${item.icon}></uui-icon>`;
 	}
 
 	private _renderIsTrashed(item: DocumentItemResponseModel) {
@@ -181,6 +204,10 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 		css`
 			#add-button {
 				width: 100%;
+			}
+
+			uui-ref-node[drag-placeholder] {
+				opacity: 0.2;
 			}
 		`,
 	];
