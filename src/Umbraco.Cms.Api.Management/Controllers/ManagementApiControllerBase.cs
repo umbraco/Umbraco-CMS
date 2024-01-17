@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.Attributes;
 using Umbraco.Cms.Api.Common.Filters;
+using Umbraco.Cms.Api.Common.Mvc.ActionResults;
 using Umbraco.Cms.Api.Management.DependencyInjection;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Features;
@@ -18,10 +19,10 @@ namespace Umbraco.Cms.Api.Management.Controllers;
 [JsonOptionsName(Constants.JsonOptionsNames.BackOffice)]
 public abstract class ManagementApiControllerBase : Controller, IUmbracoFeature
 {
-    protected CreatedAtActionResult CreatedAtAction<T>(Expression<Func<T, string>> action, Guid id)
+    protected IActionResult CreatedAtAction<T>(Expression<Func<T, string>> action, Guid id)
         => CreatedAtAction(action, new { id = id });
 
-    protected CreatedAtActionResult CreatedAtAction<T>(Expression<Func<T, string>> action, object routeValues)
+    protected IActionResult CreatedAtAction<T>(Expression<Func<T, string>> action, object routeValues)
     {
         if (action.Body is not ConstantExpression constantExpression)
         {
@@ -31,10 +32,10 @@ public abstract class ManagementApiControllerBase : Controller, IUmbracoFeature
         var controllerName = ManagementApiRegexes.ControllerTypeToNameRegex().Replace(typeof(T).Name, string.Empty);
         var actionName = constantExpression.Value?.ToString() ?? throw new ArgumentException("Expression does not have a value.");
 
-        return base.CreatedAtAction(actionName, controllerName, routeValues, null);
+        return new EmptyCreatedAtActionResult(actionName, controllerName, routeValues);
     }
 
-    protected CreatedAtActionResult CreatedAtAction<T>(Expression<Func<T, string>> action, string name)
+    protected IActionResult CreatedAtAction<T>(Expression<Func<T, string>> action, string name)
     {
         if (action.Body is not ConstantExpression constantExpression)
         {
@@ -44,7 +45,7 @@ public abstract class ManagementApiControllerBase : Controller, IUmbracoFeature
         var controllerName = ManagementApiRegexes.ControllerTypeToNameRegex().Replace(typeof(T).Name, string.Empty);
         var actionName = constantExpression.Value?.ToString() ?? throw new ArgumentException("Expression does not have a value.");
 
-        return base.CreatedAtAction(actionName, controllerName, new { name = name }, null);
+        return new EmptyCreatedAtActionResult(actionName, controllerName, new { name = name });
     }
 
     protected static Guid CurrentUserKey(IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
