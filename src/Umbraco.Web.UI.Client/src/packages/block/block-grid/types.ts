@@ -11,3 +11,8 @@ export interface UmbBlockGridType extends UmbBlockTypeBase {
 	areas: Array<any>;
 	groupKey: null | string;
 }
+
+export interface BlockGridGroupConfigration {
+	name?: string;
+	key: string;
+}
