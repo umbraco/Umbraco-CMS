@@ -20,7 +20,7 @@ public class ConfigurationTemplateController : TemplateControllerBase
     {
         var responseModel = new TemplateConfigurationResponseModel
         {
-            Enabled = !_umbracoFeatures.Disabled.DisableTemplates,
+            Disabled = _umbracoFeatures.Disabled.DisableTemplates,
         };
 
         return Task.FromResult<IActionResult>(Ok(responseModel));

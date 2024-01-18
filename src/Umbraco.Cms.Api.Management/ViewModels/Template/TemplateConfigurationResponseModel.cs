@@ -2,5 +2,5 @@
 
 public class TemplateConfigurationResponseModel
 {
-    public bool Enabled { get; set; }
+    public bool Disabled { get; set; }
 }
