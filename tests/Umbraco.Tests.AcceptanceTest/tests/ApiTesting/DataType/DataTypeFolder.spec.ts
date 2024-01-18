@@ -2,8 +2,8 @@
 import {expect} from "@playwright/test";
 
 test.describe('DataTypeFolder tests', () => {
-  let dataTypeFolderId = "";
-  const dataTypeFolderName = "TestDataTypeFolder";
+  let dataTypeFolderId = '';
+  const dataTypeFolderName = 'TestDataTypeFolder';
 
   test.beforeEach(async ({umbracoApi}) => {
     await umbracoApi.dataType.ensureNameNotExists(dataTypeFolderName);

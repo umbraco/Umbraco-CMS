@@ -2,13 +2,13 @@
 import {expect} from "@playwright/test";
 
 test.describe('DataType tests', () => {
-  let dataTypeId = "";
-  let dataTypeFolderId = "";
-  let copiedDataTypeId = "";
+  let dataTypeId = '';
+  let dataTypeFolderId = '';
+  let copiedDataTypeId = '';
 
-  const dataTypeName = "TestDataType";
+  const dataTypeName = 'TestDataType';
   const folderName = 'TestDataTypeFolder';
-  const propertyEditorAlias = "Umbraco.DateTime";
+  const propertyEditorAlias = 'Umbraco.DateTime';
   const dataTypeData = [
     {
       "alias": "tester",
@@ -18,12 +18,13 @@ test.describe('DataType tests', () => {
 
   test.beforeEach(async ({umbracoApi}) => {
     await umbracoApi.dataType.ensureNameNotExists(dataTypeName);
-    await umbracoApi.dataType.ensureNameNotExists(folderName);
   });
 
   test.afterEach(async ({umbracoApi}) => {
     await umbracoApi.dataType.ensureNameNotExists(dataTypeName);
-    await umbracoApi.dataType.ensureNameNotExists(folderName);
+    if (dataTypeFolderId != '') {
+      await umbracoApi.dataType.ensureNameNotExists(folderName);
+    }
   });
 
   test('can create dataType', async ({umbracoApi}) => {
@@ -63,6 +64,7 @@ test.describe('DataType tests', () => {
 
   test('can move a dataType to a folder', async ({umbracoApi}) => {
     // Arrange
+    await umbracoApi.dataType.ensureNameNotExists(folderName);
     dataTypeId = await umbracoApi.dataType.create(dataTypeName, propertyEditorAlias, dataTypeData);
     dataTypeFolderId = await umbracoApi.dataType.createFolder(folderName);
 
@@ -77,6 +79,7 @@ test.describe('DataType tests', () => {
 
   test('can copy a dataType to a folder', async ({umbracoApi}) => {
     // Arrange
+    await umbracoApi.dataType.ensureNameNotExists(folderName);
     dataTypeId = await umbracoApi.dataType.create(dataTypeName, propertyEditorAlias, dataTypeData);
     dataTypeFolderId = await umbracoApi.dataType.createFolder(folderName);
 
