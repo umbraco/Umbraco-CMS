@@ -68,7 +68,12 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 	}
 
 	#onChangeLanguage(e: UUISelectEvent) {
-		this.value = { ...this.value, defaultIsoCode: e.target.value as string };
+		const documentIsoCode = e.target.value as string;
+		if (documentIsoCode === 'inherit') {
+			this.value = { ...this.value, defaultIsoCode: undefined };
+		} else {
+			this.value = { ...this.value, defaultIsoCode: e.target.value as string };
+		}
 	}
 
 	#addDomain(currentDomain?: boolean) {
@@ -105,23 +110,20 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 	render() {
 		return html`
 			<umb-body-layout headline=${this.localize.term('actions_assigndomain')}>
-				<uui-box>
-					<h2><umb-localize key="assignDomain_setLanguage">Culture</umb-localize></h2>
+				<uui-box headline=${this.localize.term('assignDomain_setLanguage')}>
 					<uui-label for="select">${this.localize.term('assignDomain_language')}</uui-label>
 					<uui-select
 						id="select"
 						label=${this.localize.term('assignDomain_language')}
 						@change=${this.#onChangeLanguage}
 						.options=${this._options}></uui-select>
-
-					<h2><umb-localize key="assignDomain_setDomains">Domains</umb-localize></h2>
-					<p>
-						<umb-localize key="assignDomain_domainHelpWithVariants">
-							Valid domain names are: "example.com", "www.example.com", "example.com:8080", or
-							"https://www.example.com/".<br />Furthermore also one-level paths in domains are supported, eg.
-							"example.com/en" or "/en".
-						</umb-localize>
-					</p>
+				</uui-box>
+				<uui-box headline=${this.localize.term('assignDomain_setDomains')}>
+					<umb-localize key="assignDomain_domainHelpWithVariants">
+						Valid domain names are: "example.com", "www.example.com", "example.com:8080", or
+						"https://www.example.com/".<br />Furthermore also one-level paths in domains are supported, eg.
+						"example.com/en" or "/en".
+					</umb-localize>
 					${this.#renderDomains()} ${this.#renderAddNewDomainButton()}
 				</uui-box>
 				<uui-button
@@ -189,6 +191,10 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 		css`
 			uui-button-group {
 				width: 100%;
+			}
+
+			uui-box:first-child {
+				margin-bottom: var(--uui-size-layout-1);
 			}
 
 			#dropdown {
