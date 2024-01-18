@@ -136,18 +136,21 @@ export abstract class UmbBlockManagerContext<
 		}
 
 		// Create layout entry:
-		layoutEntry.contentUdi = buildUdi('element', UmbId.new());
+		const fullLayoutEntry: BlockLayoutType = {
+			...(layoutEntry as BlockLayoutType),
+			contentUdi: buildUdi('element', UmbId.new()),
+		};
 		if (blockType.settingsElementTypeKey) {
-			layoutEntry.settingsUdi = buildUdi('element', UmbId.new());
+			fullLayoutEntry.settingsUdi = buildUdi('element', UmbId.new());
 		}
 
-		this.#layouts.appendOne(layoutEntry as BlockLayoutType);
+		this.#layouts.appendOne(fullLayoutEntry);
 
 		// Create content entry:
-		if (layoutEntry.contentUdi) {
+		if (fullLayoutEntry.contentUdi) {
 			this.#contents.appendOne({
 				contentTypeKey: contentElementTypeKey,
-				udi: layoutEntry.contentUdi,
+				udi: fullLayoutEntry.contentUdi,
 			});
 		} else {
 			throw new Error('Cannot create block, missing contentUdi');
@@ -156,10 +159,10 @@ export abstract class UmbBlockManagerContext<
 
 		//Create settings entry:
 		if (blockType.settingsElementTypeKey) {
-			if (layoutEntry.settingsUdi) {
+			if (fullLayoutEntry.settingsUdi) {
 				this.#contents.appendOne({
 					contentTypeKey: blockType.settingsElementTypeKey,
-					udi: layoutEntry.settingsUdi,
+					udi: fullLayoutEntry.settingsUdi,
 				});
 			} else {
 				throw new Error('Cannot create block, missing settingsUdi');
