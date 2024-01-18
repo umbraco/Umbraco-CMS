@@ -15,10 +15,10 @@ public class ConfigurationTemplateController : TemplateControllerBase
 
     [HttpGet("configuration")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(ConfigurationTemplateResponseModel), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(TemplateConfigurationResponseModel), StatusCodes.Status200OK)]
     public Task<IActionResult> Configuration()
     {
-        var responseModel = new ConfigurationTemplateResponseModel
+        var responseModel = new TemplateConfigurationResponseModel
         {
             Enabled = !_umbracoFeatures.Disabled.DisableTemplates,
         };
