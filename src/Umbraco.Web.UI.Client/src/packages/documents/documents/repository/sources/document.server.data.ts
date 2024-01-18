@@ -8,6 +8,8 @@ import {
 	UpdateDocumentRequestModel,
 	PublishDocumentRequestModel,
 	UnpublishDocumentRequestModel,
+	DomainPresentationModel,
+	DomainsPresentationModelBaseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
@@ -190,5 +192,20 @@ export class UmbDocumentServerDataSource
 		const hackId = id === null ? undefined : id;
 		// TODO: Notice, here we need to implement pagination.
 		return tryExecuteAndNotify(this.#host, DocumentResource.getDocumentAllowedDocumentTypes({ parentId: hackId }));
+	}
+
+	/**
+	 * Fetches the Document Domains from the given Document id
+	 * @param {string} id
+	 * @memberof UmbDocumentTypeServerDataSource
+	 */
+	async getDomains(id: string) {
+		if (!id) throw new Error('Id is missing');
+		return tryExecuteAndNotify(this.#host, DocumentResource.getDocumentByIdDomains({ id }));
+	}
+
+	async setDomains(id: string, data: DomainsPresentationModelBaseModel) {
+		if (!id) throw new Error('Id is missing');
+		return tryExecuteAndNotify(this.#host, DocumentResource.putDocumentByIdDomains({ id, requestBody: data }));
 	}
 }

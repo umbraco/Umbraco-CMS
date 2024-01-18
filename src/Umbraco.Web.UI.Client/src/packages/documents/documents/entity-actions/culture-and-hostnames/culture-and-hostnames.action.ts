@@ -32,7 +32,8 @@ export class UmbDocumentCultureAndHostnamesEntityAction extends UmbEntityActionB
 			data: { unique },
 		});
 
-		const { data } = await modalContext.onSubmit();
-		console.table(data);
+		const { defaultIsoCode, domains } = await modalContext.onSubmit();
+		console.log(defaultIsoCode);
+		console.table(domains);
 	}
 }

@@ -9,6 +9,8 @@ import {
 	DocumentResponseModel,
 	DocumentTreeItemResponseModel,
 	DocumentTypeResponseModel,
+	DomainsPresentationModelBaseModel,
+	DomainsResponseModel,
 	PagedDocumentTreeItemResponseModel,
 	PagedDocumentTypeResponseModel,
 	PagedRecycleBinItemResponseModel,
@@ -16,6 +18,16 @@ import {
 	PublishedStateModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '@umbraco-cms/backoffice/document';
+
+export const domainData: DomainsResponseModel = {
+	defaultIsoCode: 'en',
+	domains: [
+		{
+			isoCode: 'en',
+			domainName: 'google.com',
+		},
+	],
+};
 
 export const data: Array<DocumentResponseModel> = [
 	{
@@ -723,6 +735,7 @@ const createDocumentItem = (item: DocumentResponseModel): DocumentItemResponseMo
 // @ts-ignore
 class UmbDocumentData extends UmbEntityData<DocumentResponseModel> {
 	private treeData = treeData;
+	private domainData = domainData;
 
 	constructor() {
 		super(data);
@@ -873,6 +886,14 @@ class UmbDocumentData extends UmbEntityData<DocumentResponseModel> {
 				(permission: any) =>
 					permission.target.entityType === UMB_DOCUMENT_ENTITY_TYPE && permission.target.documentId === id,
 			);
+	}
+
+	// domains
+	getDomains(id: string): DomainsResponseModel {
+		return this.domainData;
+	}
+	setDomains(id: string, data: DomainsPresentationModelBaseModel) {
+		this.domainData = data;
 	}
 }
 

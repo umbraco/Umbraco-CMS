@@ -69,4 +69,20 @@ export const handlers = [
 		umbDocumentData.insert(data);
 		return res(ctx.status(200));
 	}),
+
+	rest.get(umbracoPath('/document/:id/domains'), (req, res, ctx) => {
+		const id = req.params.id as string;
+		if (!id) return;
+		const response = umbDocumentData.getDomains(id);
+		return res(ctx.status(200), ctx.json(response));
+	}),
+
+	rest.put(umbracoPath('/document/:id/domains'), async (req, res, ctx) => {
+		const id = req.params.id as string;
+		if (!id) return;
+		const data = await req.json();
+		if (!data) return;
+		umbDocumentData.setDomains(id, data);
+		return res(ctx.status(200));
+	}),
 ];

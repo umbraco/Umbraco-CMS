@@ -1,90 +1,125 @@
-import { html, customElement, state, css, query, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { UmbDocumentRepository } from '../../repository/document.repository.js';
+import { html, customElement, state, css, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import {
-	CultureAndHostnames,
 	UmbCultureAndHostnamesModalData,
 	UmbCultureAndHostnamesModalValue,
 	UmbModalBaseElement,
 } from '@umbraco-cms/backoffice/modal';
 import { UUIInputEvent, UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
+import { UmbLanguageRepository } from '@umbraco-cms/backoffice/language';
+import { DomainPresentationModel, LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-culture-and-hostnames-modal')
 export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 	UmbCultureAndHostnamesModalData,
 	UmbCultureAndHostnamesModalValue
 > {
+	#documentRepository = new UmbDocumentRepository(this);
+	#languageRepository = new UmbLanguageRepository(this);
+
 	#unique?: string | null;
+	#defaultIsoCode = '';
+	#languageModel: Array<LanguageResponseModel> = [];
 
 	@state()
-	private _cultureOptions: Array<Option> = [{ name: 'Inherit', value: 'inherit', selected: true }];
+	private _options: Array<Option> = [];
 
 	@state()
-	private _domains: Array<CultureAndHostnames> = [];
-
-	constructor() {
-		super();
-		this.#getCultureAndDomains();
-	}
-
-	async #getCultureAndDomains() {
-		// TODO get this documents culture and domains data via repository
-	}
-
-	firstUpdated() {
-		this.#unique = this.data?.unique;
-	}
-
-	connectedCallback(): void {
-		super.connectedCallback();
-		if (!this.modalContext) return;
-
-		this.observe(this.modalContext.value, (value) => {
-			if (value) this._domains = value.data;
-		});
-	}
+	private _domains: Array<DomainPresentationModel> = [];
 
 	#handleCancel() {
 		this.modalContext?.reject();
 	}
 	#handleSave() {
 		// TODO validation before submitting
+		this.#documentRepository.saveCultureAndHostnames(this.#unique!, this.value);
 		this.modalContext?.submit();
+	}
+
+	async firstUpdated() {
+		this.#unique = this.data?.unique;
+		await this.#getDomains(); // Domains before Language as it is needed to set the pre selected value for language options
+		await this.#getLanguages();
+	}
+
+	async #getDomains() {
+		if (!this.#unique) return;
+		const { data } = await this.#documentRepository.getCultureAndHostnames(this.#unique);
+
+		if (!data) return;
+		this.#defaultIsoCode = data.defaultIsoCode ?? '';
+		this._domains = data.domains.map((domain) => ({ isoCode: domain.isoCode, domainName: domain.domainName }));
+
+		this.value = { defaultIsoCode: data.defaultIsoCode, domains: this._domains };
+		return;
+	}
+
+	async #getLanguages() {
+		const { data } = await this.#languageRepository.requestLanguages();
+		if (!data) return;
+
+		this.#languageModel = data.items;
+
+		const options = data.items.map((item) => ({
+			name: item.name,
+			selected: item.isoCode === this.#defaultIsoCode,
+			value: item.isoCode,
+		}));
+		options.unshift({ value: 'inherit', name: 'Inherit', selected: this.#defaultIsoCode ? false : true });
+		this._options = options;
+
+		return;
+	}
+
+	#onChangeLanguage(e: UUISelectEvent) {
+		//save new language
+		this.value = { ...this.value, defaultIsoCode: e.target.value as string };
 	}
 
 	#addDomain(currentDomain?: boolean) {
 		if (currentDomain) {
-			this._domains = [...this._domains, { culture: 'en-us', hostname: window.location.host }];
+			this._domains = [...this._domains, { isoCode: this.#defaultIsoCode, domainName: window.location.host }];
 		} else {
-			this._domains = [...this._domains, { culture: 'en-us', hostname: '' }];
+			this._domains = [...this._domains, { isoCode: this.#defaultIsoCode, domainName: '' }];
 		}
 
-		this.value = { data: this._domains };
+		this.value = { ...this.value, domains: this._domains };
 	}
 
 	#remove(index: number) {
-		this._domains = this._domains.filter((_, i) => i !== index);
+		this._domains = this._domains.filter((d, i) => index !== i);
+
+		this.value = { ...this.value, domains: this._domains };
 	}
 
-	#changeHostname(e: UUIInputEvent, index: number) {
-		this._domains[index] = { ...this._domains[index], hostname: e.target.value as string };
+	#changeDomainName(e: UUIInputEvent, index: number) {
+		const domainName = e.target.value as string;
+		this._domains = this._domains.map((domain, i) => (index === i ? { ...domain, domainName: domainName } : domain));
+
+		this.value = { ...this.value, domains: this._domains };
 	}
 
-	#changeCulture(e: UUISelectEvent, index: number) {
-		this._domains[index] = { ...this._domains[index], culture: e.target.value as string };
+	#changeIsoCode(e: UUISelectEvent, index: number) {
+		const isoCode = e.target.value as string;
+		this._domains = this._domains.map((domain, i) => (index === i ? { ...domain, isoCode: isoCode } : domain));
+
+		this.value = { ...this.value, domains: this._domains };
 	}
 
 	render() {
 		return html`
 			<umb-body-layout headline=${this.localize.term('actions_assigndomain')}>
 				<uui-box>
-					<h2>Culture</h2>
+					<h2><umb-localize key="assignDomain_setLanguage">Culture</umb-localize></h2>
 					<uui-label for="select">${this.localize.term('assignDomain_language')}</uui-label>
 					<uui-select
 						id="select"
 						label=${this.localize.term('assignDomain_language')}
-						.options=${this._cultureOptions}></uui-select>
+						@change=${this.#onChangeLanguage}
+						.options=${this._options}></uui-select>
 
-					<h2>Domains</h2>
+					<h2><umb-localize key="assignDomain_setDomains">Domains</umb-localize></h2>
 					<p>
 						<umb-localize key="assignDomain_domainHelpWithVariants">
 							Valid domain names are: "example.com", "www.example.com", "example.com:8080", or
@@ -92,21 +127,7 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 							"example.com/en" or "/en".
 						</umb-localize>
 					</p>
-					${this.#renderDomains()}
-					<uui-button-group>
-						<uui-button
-							label=${this.localize.term('assignDomain_addNew')}
-							look="placeholder"
-							@click=${() => this.#addDomain()}></uui-button>
-						<uui-button
-							id="dropdown"
-							label=${this.localize.term('buttons_select')}
-							look="placeholder"
-							compact
-							@click=${() => this.#addDomain(true)}>
-							<uui-icon name="icon-navigation-down"></uui-icon>
-						</uui-button>
-					</uui-button-group>
+					${this.#renderDomains()} ${this.#renderAddNewDomainButton()}
 				</uui-box>
 				<uui-button
 					slot="actions"
@@ -127,21 +148,45 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 	#renderDomains() {
 		return html` ${repeat(
 			this._domains,
-			(domain, index) => domain.hostname + domain.culture + index,
-			(domain, index) =>
-				html`<uui-button-group class="domain">
+			(domain) => domain,
+			(domain, index) => {
+				const options = this.#languageModel.map((model) => ({
+					name: model.name,
+					value: model.isoCode,
+					selected: domain.isoCode ? domain.isoCode === model.isoCode : model.isDefault,
+				}));
+				return html`<uui-button-group class="domain">
 					<uui-input
 						label=${this.localize.term('assignDomain_domain')}
-						value=${domain.hostname}
-						@change=${(e: UUIInputEvent) => this.#changeHostname(e, index)}></uui-input>
+						value=${domain.domainName}
+						@change=${(e: UUIInputEvent) => this.#changeDomainName(e, index)}></uui-input>
 					<uui-select
 						label=${this.localize.term('assignDomain_language')}
-						.options=${this._cultureOptions}></uui-select>
+						.options=${options}
+						@change=${(e: UUISelectEvent) => this.#changeIsoCode(e, index)}></uui-select>
 					<uui-button look="outline" color="danger" label=${this.localize.term('assignDomain_remove')} compact>
 						<uui-icon name="icon-trash" @click=${() => this.#remove(index)}></uui-icon>
 					</uui-button>
-				</uui-button-group>`,
+				</uui-button-group>`;
+			},
 		)}`;
+	}
+
+	#renderAddNewDomainButton() {
+		return html`<uui-button-group>
+			<uui-button
+				label=${this.localize.term('assignDomain_addNew')}
+				look="placeholder"
+				@click=${() => this.#addDomain()}></uui-button>
+			<uui-button
+				id="dropdown"
+				label=${this.localize.term('buttons_select')}
+				look="placeholder"
+				compact
+				@click=${() => this.#addDomain(true)}>
+				<uui-icon name="icon-navigation-down"></uui-icon>
+			</uui-button>
+		</uui-button-group>`;
 	}
 
 	static styles = [

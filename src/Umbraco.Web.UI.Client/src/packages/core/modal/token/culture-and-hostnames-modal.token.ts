@@ -1,3 +1,4 @@
+import { DomainPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbCultureAndHostnamesModalData {
@@ -6,12 +7,8 @@ export interface UmbCultureAndHostnamesModalData {
 }
 
 export interface UmbCultureAndHostnamesModalValue {
-	data: Array<CultureAndHostnames>;
-}
-
-export interface CultureAndHostnames {
-	hostname: string;
-	culture: string;
+	defaultIsoCode?: string | null;
+	domains: Array<DomainPresentationModel>;
 }
 
 export const UMB_CULTURE_AND_HOSTNAMES_MODAL = new UmbModalToken<
