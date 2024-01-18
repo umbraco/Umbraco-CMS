@@ -88,12 +88,12 @@ export class UmbInputBlockTypeElement<
 		typeof UMB_WORKSPACE_MODAL.VALUE
 	>;
 
-	#context?: UmbPropertyDatasetContext;
+	#datasetContext?: UmbPropertyDatasetContext;
 
 	constructor() {
 		super();
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, async (instance) => {
-			this.#context = instance;
+			this.#datasetContext = instance;
 		});
 	}
 
@@ -138,11 +138,11 @@ export class UmbInputBlockTypeElement<
 		const groupName = e.target.value as string;
 		const groups = this.groups.map((group) => (group.key === key ? { ...group, name: groupName } : group));
 
-		this.#context?.setPropertyValue('blockGroups', groups);
+		this.#datasetContext?.setPropertyValue('blockGroups', groups);
 	}
 
 	#deleteGroup(key: string) {
-		this.#context?.setPropertyValue(
+		this.#datasetContext?.setPropertyValue(
 			'blockGroups',
 			this.groups.filter((group) => group.key !== key),
 		);
