@@ -34,7 +34,7 @@ export class UmbStylesheetWorkspaceContext
 	async #loadCodeEditor() {
 		try {
 			await loadCodeEditor();
-			this.#isCodeEditorReady.next(true);
+			this.#isCodeEditorReady.setValue(true);
 		} catch (error) {
 			console.error(error);
 		}
@@ -67,7 +67,7 @@ export class UmbStylesheetWorkspaceContext
 
 		if (data) {
 			this.setIsNew(false);
-			this.#data.next(data);
+			this.#data.setValue(data);
 		}
 	}
 
@@ -76,7 +76,7 @@ export class UmbStylesheetWorkspaceContext
 
 		if (data) {
 			this.setIsNew(true);
-			this.#data.next(data);
+			this.#data.setValue(data);
 		}
 	}
 
@@ -94,7 +94,7 @@ export class UmbStylesheetWorkspaceContext
 		}
 
 		if (newData) {
-			this.#data.next(newData);
+			this.#data.setValue(newData);
 			this.saveComplete(newData);
 		}
 	}

@@ -53,7 +53,7 @@ export class UmbEntityWorkspaceManager<
 
 		if (this.#isNew) {
 			const newData = this._store.getScaffold(this._entityType, this._createAtParentKey || null);
-			this.state.next(newData);
+			this.state.setValue(newData);
 		} else {
 			this._storeSubscription?.destroy();
 			this._storeSubscription = new UmbObserverController(
@@ -61,7 +61,7 @@ export class UmbEntityWorkspaceManager<
 				this._store.getByKey(this._entityId),
 				(content) => {
 					if (!content) return; // TODO: Handle nicely if there is no content data.
-					this.state.next(content as any);
+					this.state.setValue(content as any);
 				},
 			);
 		}

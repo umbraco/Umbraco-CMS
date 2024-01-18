@@ -51,11 +51,11 @@ export class UmbRepositoryItemsManager<ItemType> extends UmbBaseController {
 	}
 
 	setUniques(uniques: string[]) {
-		this.#uniques.next(uniques);
+		this.#uniques.setValue(uniques);
 		//TODO: Check if it's safe to call requestItems here.
 		// We don't have to request items if there is no uniques.
 		if (uniques.length === 0) {
-			this.#items.next([]);
+			this.#items.setValue([]);
 			return;
 		}
 
@@ -75,7 +75,7 @@ export class UmbRepositoryItemsManager<ItemType> extends UmbBaseController {
 		const { data, asObservable } = await this.repository.requestItems(this.getUniques());
 
 		if (asObservable) {
-			this.observe(asObservable(), (data) => this.#items.next(data), '_observeRequestedItems');
+			this.observe(asObservable(), (data) => this.#items.setValue(data), '_observeRequestedItems');
 		}
 	}
 

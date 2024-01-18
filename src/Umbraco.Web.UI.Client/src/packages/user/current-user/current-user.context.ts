@@ -45,7 +45,7 @@ export class UmbCurrentUserContext extends UmbBaseController {
 		// TODO: use repository
 		const { data, error } = await tryExecuteAndNotify(this._host, UserResource.getUserCurrent());
 		// TODO: add current user store
-		this.#currentUser.next(data);
+		this.#currentUser.setValue(data);
 		return { data, error };
 	}
 

@@ -213,6 +213,10 @@
 		"vite-tsconfig-paths": "^4.2.3",
 		"web-component-analyzer": "^2.0.0"
 	},
+	"overrides": {
+		"lit": "$lit",
+		"lit-html": "2.8.0"
+	},
 	"msw": {
 		"workerDirectory": "public"
 	},

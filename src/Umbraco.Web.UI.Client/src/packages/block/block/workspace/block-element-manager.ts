@@ -30,7 +30,7 @@ export class UmbBlockElementManager extends UmbBaseController {
 	}
 
 	setData(data: UmbBlockDataType | undefined) {
-		this.#data.next(data);
+		this.#data.setValue(data);
 		this.#getDataResolver();
 	}
 

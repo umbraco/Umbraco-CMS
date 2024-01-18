@@ -38,21 +38,21 @@ export class UmbBlockManagerContext<
 	public readonly settings = this.#settings.asObservable();
 
 	setBlockTypes(blockTypes: Array<BlockType>) {
-		this.#blockTypes.next(blockTypes);
+		this.#blockTypes.setValue(blockTypes);
 	}
 	getBlockTypes() {
 		return this.#blockTypes.value;
 	}
 
 	setLayouts(layouts: Array<BlockLayoutType>) {
-		this.#layouts.next(layouts);
+		this.#layouts.setValue(layouts);
 	}
 
 	setContents(contents: Array<UmbBlockDataType>) {
-		this.#contents.next(contents);
+		this.#contents.setValue(contents);
 	}
 	setSettings(settings: Array<UmbBlockDataType>) {
-		this.#settings.next(settings);
+		this.#settings.setValue(settings);
 	}
 
 	constructor(host: UmbControllerHost) {
@@ -67,7 +67,7 @@ export class UmbBlockManagerContext<
 			})
 			.observeRouteBuilder((routeBuilder) => {
 				const newPath = routeBuilder({});
-				this.#workspacePath.next(newPath);
+				this.#workspacePath.setValue(newPath);
 			});
 	}
 

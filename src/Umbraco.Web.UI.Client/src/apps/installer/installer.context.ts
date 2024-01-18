@@ -62,7 +62,7 @@ export class UmbInstallerContext {
 	 * @memberof UmbInstallerContext
 	 */
 	public nextStep(): void {
-		this._currentStep.next(this._currentStep.getValue() + 1);
+		this._currentStep.setValue(this._currentStep.getValue() + 1);
 	}
 
 	/**
@@ -71,7 +71,7 @@ export class UmbInstallerContext {
 	 * @memberof UmbInstallerContext
 	 */
 	public prevStep(): void {
-		this._currentStep.next(this._currentStep.getValue() - 1);
+		this._currentStep.setValue(this._currentStep.getValue() - 1);
 	}
 
 	/**
@@ -80,8 +80,8 @@ export class UmbInstallerContext {
 	 * @memberof UmbInstallerContext
 	 */
 	public reset(): void {
-		this._installStatus.next(null);
-		this._currentStep.next(1);
+		this._installStatus.setValue(null);
+		this._currentStep.setValue(1);
 	}
 
 	/**
@@ -91,7 +91,7 @@ export class UmbInstallerContext {
 	 * @memberof UmbInstallerContext
 	 */
 	public appendData(data: Partial<InstallVResponseModel>): void {
-		this._data.next({ ...this.getData(), ...data });
+		this._data.setValue({ ...this.getData(), ...data });
 	}
 
 	/**
@@ -111,7 +111,7 @@ export class UmbInstallerContext {
 	 * @memberof UmbInstallerContext
 	 */
 	public setInstallStatus(status: ProblemDetails | null): void {
-		this._installStatus.next(status);
+		this._installStatus.setValue(status);
 	}
 
 	/**
@@ -122,9 +122,9 @@ export class UmbInstallerContext {
 	private async _loadInstallerSettings() {
 		const { data, error } = await tryExecute(InstallResource.getInstallSettings());
 		if (data) {
-			this._settings.next(data);
+			this._settings.setValue(data);
 		} else if (error) {
-			this._installStatus.next(error);
+			this._installStatus.setValue(error);
 		}
 	}
 }

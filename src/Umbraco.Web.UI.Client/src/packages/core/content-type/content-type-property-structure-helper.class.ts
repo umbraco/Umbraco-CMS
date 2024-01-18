@@ -102,7 +102,7 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 				});
 
 				// Fire update to subscribers:
-				this.#propertyStructure.next(_propertyStructure);
+				this.#propertyStructure.setValue(_propertyStructure);
 			},
 			'_observePropertyStructureOfGroup' + groupId,
 		);

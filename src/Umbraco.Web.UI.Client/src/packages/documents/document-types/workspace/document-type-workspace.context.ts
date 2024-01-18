@@ -69,7 +69,7 @@ export class UmbDocumentTypeWorkspaceContext
 	}
 
 	setIsSorting(isSorting: boolean) {
-		this.#isSorting.next(isSorting);
+		this.#isSorting.setValue(isSorting);
 	}
 
 	getData() {

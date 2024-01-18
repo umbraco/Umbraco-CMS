@@ -47,7 +47,7 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 			});
 		});
 		this.observe(this._contentTypeContainers, (contentTypeContainers) => {
-			this.#containers.next(contentTypeContainers);
+			this.#containers.setValue(contentTypeContainers);
 		});
 	}
 
@@ -499,8 +499,8 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 	private _reset() {
 		this.#contentTypeObservers.forEach((observer) => observer.destroy());
 		this.#contentTypeObservers = [];
-		this.#contentTypes.next([]);
-		this.#containers.next([]);
+		this.#contentTypes.setValue([]);
+		this.#containers.setValue([]);
 	}
 	public destroy() {
 		this._reset();

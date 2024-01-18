@@ -34,7 +34,7 @@ export class UmbUserGroupWorkspaceContext
 		const { data } = await this.repository.createScaffold(null);
 		this.setIsNew(true);
 		// TODO: Should the data be the base model or the presentation model?
-		this.#data.next(data as unknown as UserGroupResponseModel);
+		this.#data.setValue(data as unknown as UserGroupResponseModel);
 		return { data };
 	}
 
@@ -111,7 +111,7 @@ export class UmbUserGroupWorkspaceContext
 	}
 
 	updateUserKeys(keys: Array<string>) {
-		this.#userIds.next(keys);
+		this.#userIds.setValue(keys);
 	}
 
 	/**

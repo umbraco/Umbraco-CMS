@@ -35,7 +35,7 @@ export class UmbPartialViewWorkspaceContext
 	async #loadCodeEditor() {
 		try {
 			await loadCodeEditor();
-			this.#isCodeEditorReady.next(true);
+			this.#isCodeEditorReady.setValue(true);
 		} catch (error) {
 			console.error(error);
 		}
@@ -67,7 +67,7 @@ export class UmbPartialViewWorkspaceContext
 		const { data } = await this.repository.requestByUnique(unique);
 		if (data) {
 			this.setIsNew(false);
-			this.#data.next(data);
+			this.#data.setValue(data);
 		}
 	}
 
@@ -83,7 +83,7 @@ export class UmbPartialViewWorkspaceContext
 
 		if (data) {
 			this.setIsNew(true);
-			this.#data.next(data);
+			this.#data.setValue(data);
 		}
 	}
 
@@ -101,7 +101,7 @@ export class UmbPartialViewWorkspaceContext
 		}
 
 		if (newData) {
-			this.#data.next(newData);
+			this.#data.setValue(newData);
 			this.saveComplete(newData);
 		}
 	}
