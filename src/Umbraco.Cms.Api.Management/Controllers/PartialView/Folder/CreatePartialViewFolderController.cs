@@ -35,7 +35,7 @@ public class CreatePartialViewFolderController : PartialViewFolderControllerBase
         Attempt<PartialViewFolderModel?, PartialViewFolderOperationStatus> result = await _partialViewFolderService.CreateAsync(createModel);
 
         return result.Success
-            ? CreatedAtAction<ByPathPartialViewFolderController>(controller => nameof(controller.ByPath), new { path = result.Result!.Path.SystemPathToVirtualPath() })
+            ? CreatedAtPath<ByPathPartialViewFolderController>(controller => nameof(controller.ByPath), result.Result!.Path.SystemPathToVirtualPath())
             : OperationStatusResult(result.Status);
     }
 }

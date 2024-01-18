@@ -35,7 +35,7 @@ public class CreateScriptFolderController : ScriptFolderControllerBase
         Attempt<ScriptFolderModel?, ScriptFolderOperationStatus> result = await _scriptFolderService.CreateAsync(createModel);
 
         return result.Success
-            ? CreatedAtAction<ByPathScriptFolderController>(controller => nameof(controller.ByPath), new { path = result.Result!.Path.SystemPathToVirtualPath() })
+            ? CreatedAtPath<ByPathScriptFolderController>(controller => nameof(controller.ByPath), result.Result!.Path.SystemPathToVirtualPath())
             : OperationStatusResult(result.Status);
     }
 }

@@ -40,7 +40,7 @@ public class CreateScriptController : ScriptControllerBase
         Attempt<IScript?, ScriptOperationStatus> createAttempt = await _scriptService.CreateAsync(createModel, CurrentUserKey(_backOfficeSecurityAccessor));
 
         return createAttempt.Success
-            ? CreatedAtAction<ByPathScriptController>(controller => nameof(controller.ByPath), new { path = createAttempt.Result!.Path.SystemPathToVirtualPath() })
+            ? CreatedAtPath<ByPathScriptController>(controller => nameof(controller.ByPath), createAttempt.Result!.Path.SystemPathToVirtualPath())
             : ScriptOperationStatusResult(createAttempt.Status);
     }
 }

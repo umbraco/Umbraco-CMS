@@ -39,7 +39,7 @@ public class RenameStylesheetController : StylesheetControllerBase
         Attempt<IStylesheet?, StylesheetOperationStatus> renameAttempt = await _stylesheetService.RenameAsync(path, renameModel, CurrentUserKey(_backOfficeSecurityAccessor));
 
         return renameAttempt.Success
-            ? CreatedAtAction<ByPathStylesheetController>(controller => nameof(controller.ByPath), new { path = renameAttempt.Result!.Path.SystemPathToVirtualPath() })
+            ? CreatedAtPath<ByPathStylesheetController>(controller => nameof(controller.ByPath), renameAttempt.Result!.Path.SystemPathToVirtualPath())
             : StylesheetOperationStatusResult(renameAttempt.Status);
     }
 }

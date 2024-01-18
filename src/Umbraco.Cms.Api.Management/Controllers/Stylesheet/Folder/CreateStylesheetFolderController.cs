@@ -35,7 +35,7 @@ public class CreateStylesheetFolderController : StylesheetFolderControllerBase
         Attempt<StylesheetFolderModel?, StylesheetFolderOperationStatus> result = await _stylesheetFolderService.CreateAsync(createModel);
 
         return result.Success
-            ? CreatedAtAction<ByPathStylesheetFolderController>(controller => nameof(controller.ByPath), new { path = result.Result!.Path.SystemPathToVirtualPath() })
+            ? CreatedAtPath<ByPathStylesheetFolderController>(controller => nameof(controller.ByPath), result.Result!.Path.SystemPathToVirtualPath())
             : OperationStatusResult(result.Status);
     }
 }

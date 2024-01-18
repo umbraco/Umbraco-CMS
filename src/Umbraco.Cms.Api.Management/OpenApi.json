@@ -334,6 +334,13 @@
           "201": {
             "description": "Created",
             "headers": {
+              "Umb-Generated-Resource": {
+                "description": "Identifier of the newly created resource",
+                "schema": {
+                  "type": "string",
+                  "description": "Identifier of the newly created resource"
+                }
+              },
               "Location": {
                 "description": "Location of the newly created resource",
                 "schema": {
@@ -699,6 +706,13 @@
           "201": {
             "description": "Created",
             "headers": {
+              "Umb-Generated-Resource": {
+                "description": "Identifier of the newly created resource",
+                "schema": {
+                  "type": "string",
+                  "description": "Identifier of the newly created resource"
+                }
+              },
               "Location": {
                 "description": "Location of the newly created resource",
                 "schema": {
@@ -1023,6 +1037,13 @@
           "201": {
             "description": "Created",
             "headers": {
+              "Umb-Generated-Resource": {
+                "description": "Identifier of the newly created resource",
+                "schema": {
+                  "type": "string",
+                  "description": "Identifier of the newly created resource"
+                }
+              },
               "Location": {
                 "description": "Location of the newly created resource",
                 "schema": {
@@ -1706,6 +1727,13 @@
           "201": {
             "description": "Created",
             "headers": {
+              "Umb-Generated-Resource": {
+                "description": "Identifier of the newly created resource",
+                "schema": {
+                  "type": "string",
+                  "description": "Identifier of the newly created resource"
+                }
+              },
               "Location": {
                 "description": "Location of the newly created resource",
                 "schema": {
@@ -2263,6 +2291,13 @@
           "201": {
             "description": "Created",
             "headers": {
+              "Umb-Generated-Resource": {
+                "description": "Identifier of the newly created resource",
+                "schema": {
+                  "type": "string",
+                  "description": "Identifier of the newly created resource"
+                }
+              },
               "Location": {
                 "description": "Location of the newly created resource",
                 "schema": {
@@ -2693,6 +2728,13 @@
           "201": {
             "description": "Created",
             "headers": {
+              "Umb-Generated-Resource": {
+                "description": "Identifier of the newly created resource",
+                "schema": {
+                  "type": "string",
+                  "description": "Identifier of the newly created resource"
+                }
+              },
               "Location": {
                 "description": "Location of the newly created resource",
                 "schema": {
@@ -3148,6 +3190,13 @@
           "201": {
             "description": "Created",
             "headers": {
+              "Umb-Generated-Resource": {
+                "description": "Identifier of the newly created resource",
+                "schema": {
+                  "type": "string",
+                  "description": "Identifier of the newly created resource"
+                }
+              },
               "Location": {
                 "description": "Location of the newly created resource",
                 "schema": {
@@ -3443,6 +3492,13 @@
           "201": {
             "description": "Created",
             "headers": {
+              "Umb-Generated-Resource": {
+                "description": "Identifier of the newly created resource",
+                "schema": {
+                  "type": "string",
+                  "description": "Identifier of the newly created resource"
+                }
+              },
               "Location": {
                 "description": "Location of the newly created resource",
                 "schema": {
@@ -4010,6 +4066,13 @@
           "201": {
             "description": "Created",
             "headers": {
+              "Umb-Generated-Resource": {
+                "description": "Identifier of the newly created resource",
+                "schema": {
+                  "type": "string",
+                  "description": "Identifier of the newly created resource"
+                }
+              },
               "Location": {
                 "description": "Location of the newly created resource",
                 "schema": {
@@ -4274,6 +4337,13 @@
           "201": {
             "description": "Created",
             "headers": {
+              "Umb-Generated-Resource": {
+                "description": "Identifier of the newly created resource",
+                "schema": {
+                  "type": "string",
+                  "description": "Identifier of the newly created resource"
+                }
+              },
               "Location": {
                 "description": "Location of the newly created resource",
                 "schema": {
@@ -4847,6 +4917,13 @@
           "201": {
             "description": "Created",
             "headers": {
+              "Umb-Generated-Resource": {
+                "description": "Identifier of the newly created resource",
+                "schema": {
+                  "type": "string",
+                  "description": "Identifier of the newly created resource"
+                }
+              },
               "Location": {
                 "description": "Location of the newly created resource",
                 "schema": {
@@ -7112,6 +7189,13 @@
           "201": {
             "description": "Created",
             "headers": {
+              "Umb-Generated-Resource": {
+                "description": "Identifier of the newly created resource",
+                "schema": {
+                  "type": "string",
+                  "description": "Identifier of the newly created resource"
+                }
+              },
               "Location": {
                 "description": "Location of the newly created resource",
                 "schema": {
@@ -7909,6 +7993,13 @@
           "201": {
             "description": "Created",
             "headers": {
+              "Umb-Generated-Resource": {
+                "description": "Identifier of the newly created resource",
+                "schema": {
+                  "type": "string",
+                  "description": "Identifier of the newly created resource"
+                }
+              },
               "Location": {
                 "description": "Location of the newly created resource",
                 "schema": {
@@ -8159,6 +8250,13 @@
           "201": {
             "description": "Created",
             "headers": {
+              "Umb-Generated-Resource": {
+                "description": "Identifier of the newly created resource",
+                "schema": {
+                  "type": "string",
+                  "description": "Identifier of the newly created resource"
+                }
+              },
               "Location": {
                 "description": "Location of the newly created resource",
                 "schema": {
@@ -8614,6 +8712,13 @@
           "201": {
             "description": "Created",
             "headers": {
+              "Umb-Generated-Resource": {
+                "description": "Identifier of the newly created resource",
+                "schema": {
+                  "type": "string",
+                  "description": "Identifier of the newly created resource"
+                }
+              },
               "Location": {
                 "description": "Location of the newly created resource",
                 "schema": {
@@ -8909,6 +9014,13 @@
           "201": {
             "description": "Created",
             "headers": {
+              "Umb-Generated-Resource": {
+                "description": "Identifier of the newly created resource",
+                "schema": {
+                  "type": "string",
+                  "description": "Identifier of the newly created resource"
+                }
+              },
               "Location": {
                 "description": "Location of the newly created resource",
                 "schema": {
@@ -9476,6 +9588,13 @@
           "201": {
             "description": "Created",
             "headers": {
+              "Umb-Generated-Resource": {
+                "description": "Identifier of the newly created resource",
+                "schema": {
+                  "type": "string",
+                  "description": "Identifier of the newly created resource"
+                }
+              },
               "Location": {
                 "description": "Location of the newly created resource",
                 "schema": {
@@ -11111,6 +11230,13 @@
           "201": {
             "description": "Created",
             "headers": {
+              "Umb-Generated-Resource": {
+                "description": "Identifier of the newly created resource",
+                "schema": {
+                  "type": "string",
+                  "description": "Identifier of the newly created resource"
+                }
+              },
               "Location": {
                 "description": "Location of the newly created resource",
                 "schema": {
@@ -11574,6 +11700,13 @@
           "201": {
             "description": "Created",
             "headers": {
+              "Umb-Generated-Resource": {
+                "description": "Identifier of the newly created resource",
+                "schema": {
+                  "type": "string",
+                  "description": "Identifier of the newly created resource"
+                }
+              },
               "Location": {
                 "description": "Location of the newly created resource",
                 "schema": {
@@ -11935,6 +12068,13 @@
           "201": {
             "description": "Created",
             "headers": {
+              "Umb-Generated-Resource": {
+                "description": "Identifier of the newly created resource",
+                "schema": {
+                  "type": "string",
+                  "description": "Identifier of the newly created resource"
+                }
+              },
               "Location": {
                 "description": "Location of the newly created resource",
                 "schema": {
@@ -12037,6 +12177,13 @@
           "201": {
             "description": "Created",
             "headers": {
+              "Umb-Generated-Resource": {
+                "description": "Identifier of the newly created resource",
+                "schema": {
+                  "type": "string",
+                  "description": "Identifier of the newly created resource"
+                }
+              },
               "Location": {
                 "description": "Location of the newly created resource",
                 "schema": {
@@ -13197,6 +13344,13 @@
           "201": {
             "description": "Created",
             "headers": {
+              "Umb-Generated-Resource": {
+                "description": "Identifier of the newly created resource",
+                "schema": {
+                  "type": "string",
+                  "description": "Identifier of the newly created resource"
+                }
+              },
               "Location": {
                 "description": "Location of the newly created resource",
                 "schema": {
@@ -13833,6 +13987,13 @@
           "201": {
             "description": "Created",
             "headers": {
+              "Umb-Generated-Resource": {
+                "description": "Identifier of the newly created resource",
+                "schema": {
+                  "type": "string",
+                  "description": "Identifier of the newly created resource"
+                }
+              },
               "Location": {
                 "description": "Location of the newly created resource",
                 "schema": {
@@ -14194,6 +14355,13 @@
           "201": {
             "description": "Created",
             "headers": {
+              "Umb-Generated-Resource": {
+                "description": "Identifier of the newly created resource",
+                "schema": {
+                  "type": "string",
+                  "description": "Identifier of the newly created resource"
+                }
+              },
               "Location": {
                 "description": "Location of the newly created resource",
                 "schema": {
@@ -14296,6 +14464,13 @@
           "201": {
             "description": "Created",
             "headers": {
+              "Umb-Generated-Resource": {
+                "description": "Identifier of the newly created resource",
+                "schema": {
+                  "type": "string",
+                  "description": "Identifier of the newly created resource"
+                }
+              },
               "Location": {
                 "description": "Location of the newly created resource",
                 "schema": {
@@ -15655,6 +15830,13 @@
           "201": {
             "description": "Created",
             "headers": {
+              "Umb-Generated-Resource": {
+                "description": "Identifier of the newly created resource",
+                "schema": {
+                  "type": "string",
+                  "description": "Identifier of the newly created resource"
+                }
+              },
               "Location": {
                 "description": "Location of the newly created resource",
                 "schema": {
@@ -16016,6 +16198,13 @@
           "201": {
             "description": "Created",
             "headers": {
+              "Umb-Generated-Resource": {
+                "description": "Identifier of the newly created resource",
+                "schema": {
+                  "type": "string",
+                  "description": "Identifier of the newly created resource"
+                }
+              },
               "Location": {
                 "description": "Location of the newly created resource",
                 "schema": {
@@ -16118,6 +16307,13 @@
           "201": {
             "description": "Created",
             "headers": {
+              "Umb-Generated-Resource": {
+                "description": "Identifier of the newly created resource",
+                "schema": {
+                  "type": "string",
+                  "description": "Identifier of the newly created resource"
+                }
+              },
               "Location": {
                 "description": "Location of the newly created resource",
                 "schema": {
@@ -16821,6 +17017,13 @@
           "201": {
             "description": "Created",
             "headers": {
+              "Umb-Generated-Resource": {
+                "description": "Identifier of the newly created resource",
+                "schema": {
+                  "type": "string",
+                  "description": "Identifier of the newly created resource"
+                }
+              },
               "Location": {
                 "description": "Location of the newly created resource",
                 "schema": {
@@ -17579,6 +17782,13 @@
           "201": {
             "description": "Created",
             "headers": {
+              "Umb-Generated-Resource": {
+                "description": "Identifier of the newly created resource",
+                "schema": {
+                  "type": "string",
+                  "description": "Identifier of the newly created resource"
+                }
+              },
               "Location": {
                 "description": "Location of the newly created resource",
                 "schema": {
@@ -18405,6 +18615,13 @@
           "201": {
             "description": "Created",
             "headers": {
+              "Umb-Generated-Resource": {
+                "description": "Identifier of the newly created resource",
+                "schema": {
+                  "type": "string",
+                  "description": "Identifier of the newly created resource"
+                }
+              },
               "Location": {
                 "description": "Location of the newly created resource",
                 "schema": {
@@ -20348,6 +20565,13 @@
           "201": {
             "description": "Created",
             "headers": {
+              "Umb-Generated-Resource": {
+                "description": "Identifier of the newly created resource",
+                "schema": {
+                  "type": "string",
+                  "description": "Identifier of the newly created resource"
+                }
+              },
               "Location": {
                 "description": "Location of the newly created resource",
                 "schema": {

@@ -39,7 +39,7 @@ public class RenamePartialViewController : PartialViewControllerBase
         Attempt<IPartialView?, PartialViewOperationStatus> renameAttempt = await _partialViewService.RenameAsync(path, renameModel, CurrentUserKey(_backOfficeSecurityAccessor));
 
         return renameAttempt.Success
-            ? CreatedAtAction<ByPathPartialViewController>(controller => nameof(controller.ByPath), new { path = renameAttempt.Result!.Path.SystemPathToVirtualPath() })
+            ? CreatedAtPath<ByPathPartialViewController>(controller => nameof(controller.ByPath), renameAttempt.Result!.Path.SystemPathToVirtualPath())
             : PartialViewOperationStatusResult(renameAttempt.Status);
     }
 }

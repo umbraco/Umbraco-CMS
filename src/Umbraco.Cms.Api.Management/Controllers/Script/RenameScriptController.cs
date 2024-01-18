@@ -39,7 +39,7 @@ public class RenameScriptController : ScriptControllerBase
         Attempt<IScript?, ScriptOperationStatus> renameAttempt = await _scriptService.RenameAsync(path, renameModel, CurrentUserKey(_backOfficeSecurityAccessor));
 
         return renameAttempt.Success
-            ? CreatedAtAction<ByPathScriptController>(controller => nameof(controller.ByPath), new { path = renameAttempt.Result!.Path.SystemPathToVirtualPath() })
+            ? CreatedAtPath<ByPathScriptController>(controller => nameof(controller.ByPath), renameAttempt.Result!.Path.SystemPathToVirtualPath())
             : ScriptOperationStatusResult(renameAttempt.Status);
     }
 }

@@ -34,6 +34,7 @@ internal static class BackOfficeCorsPolicyBuilderExtensions
                 {
                     policy
                         .WithOrigins(customOrigin)
+                        .WithExposedHeaders(Constants.Headers.Location, Constants.Headers.GeneratedResource)
                         .AllowAnyHeader()
                         .AllowAnyMethod()
                         .AllowCredentials();

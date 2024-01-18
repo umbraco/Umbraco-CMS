@@ -40,7 +40,7 @@ public class CreateStylesheetController : StylesheetControllerBase
         Attempt<IStylesheet?, StylesheetOperationStatus> createAttempt = await _stylesheetService.CreateAsync(createModel, CurrentUserKey(_backOfficeSecurityAccessor));
 
         return createAttempt.Success
-            ? CreatedAtAction<ByPathStylesheetController>(controller => nameof(controller.ByPath), new { path = createAttempt.Result!.Path.SystemPathToVirtualPath() })
+            ? CreatedAtPath<ByPathStylesheetController>(controller => nameof(controller.ByPath), createAttempt.Result!.Path.SystemPathToVirtualPath())
             : StylesheetOperationStatusResult(createAttempt.Status);
     }
 }
