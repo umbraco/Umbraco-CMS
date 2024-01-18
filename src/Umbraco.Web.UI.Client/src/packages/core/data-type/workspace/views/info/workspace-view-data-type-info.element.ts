@@ -41,11 +41,11 @@ export class UmbWorkspaceViewDataTypeInfoElement extends UmbLitElement implement
 					<div slot="editor">${this._dataType?.unique}</div>
 				</umb-property-layout>
 				<umb-property-layout label="Property Editor Alias">
-					<div slot="editor">${this._dataType?.propertyEditorAlias}</div>
+					<div slot="editor">${this._dataType?.editorAlias}</div>
 				</umb-property-layout>
 
 				<umb-property-layout label="Property Editor UI Alias">
-					<div slot="editor">${this._dataType?.propertyEditorUiAlias}</div>
+					<div slot="editor">${this._dataType?.editorUiAlias}</div>
 				</umb-property-layout>
 			</uui-box>
 		`;

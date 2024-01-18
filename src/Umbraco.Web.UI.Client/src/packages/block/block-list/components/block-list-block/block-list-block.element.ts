@@ -25,11 +25,23 @@ export class UmbPropertyEditorUIBlockListBlockElement extends UmbLitElement impl
 	#context = new UmbBlockContext(this);
 
 	@state()
+	_contentUdi?: string;
+
+	@state()
 	_label = '';
+
+	@state()
+	_workspacePath?: string;
 
 	constructor() {
 		super();
 
+		this.observe(this.#context.workspacePath, (workspacePath) => {
+			this._workspacePath = workspacePath;
+		});
+		this.observe(this.#context.contentUdi, (contentUdi) => {
+			this._contentUdi = contentUdi;
+		});
 		this.observe(this.#context.label, (label) => {
 			this._label = label;
 		});
@@ -43,7 +55,7 @@ export class UmbPropertyEditorUIBlockListBlockElement extends UmbLitElement impl
 			const modalContext = modalManager.open(UMB_CONFIRM_MODAL, {
 				data: {
 					headline: `Delete ${this._label}`,
-					content: 'Are you sure you want to delete this block?',
+					content: 'Are you sure you want to delete this [INSERT BLOCK TYPE NAME]?',
 					confirmLabel: 'Delete',
 					color: 'danger',
 				},
@@ -65,6 +77,11 @@ export class UmbPropertyEditorUIBlockListBlockElement extends UmbLitElement impl
 		return html`
 			${this.#renderRefBlock()}
 			<uui-action-bar>
+				${this._workspacePath
+					? html`<uui-button label="edit" compact href=${this._workspacePath + 'edit/' + this._contentUdi}>
+							<uui-icon name="icon-edit"></uui-icon>
+					  </uui-button>`
+					: ''}
 				<uui-button label="delete" compact @click=${this.#requestDelete}>
 					<uui-icon name="icon-remove"></uui-icon>
 				</uui-button>
@@ -84,8 +101,7 @@ export class UmbPropertyEditorUIBlockListBlockElement extends UmbLitElement impl
 			}
 			uui-action-bar {
 				position: absolute;
-				top: 50%;
-				transform: translateY(-50%);
+				top: var(--uui-size-2);
 				right: var(--uui-size-2);
 			}
 		`,

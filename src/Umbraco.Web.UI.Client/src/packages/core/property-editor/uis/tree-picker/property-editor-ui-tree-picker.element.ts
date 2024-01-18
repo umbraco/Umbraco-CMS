@@ -1,8 +1,8 @@
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { type UmbPropertyEditorConfigCollection, UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
+import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbInputTreeElement } from '@umbraco-cms/backoffice/tree';
 import type { UmbTreePickerSource } from '@umbraco-cms/backoffice/components';
 
@@ -44,8 +44,8 @@ export class UmbPropertyEditorUITreePickerElement extends UmbLitElement implemen
 			this.startNodeId = startNode.id;
 		}
 
-		this.min = config?.getValueByAlias('minNumber') || 0;
-		this.max = config?.getValueByAlias('maxNumber') || 0;
+		this.min = Number(config?.getValueByAlias('minNumber')) || 0;
+		this.max = Number(config?.getValueByAlias('maxNumber')) || 0;
 
 		this.filter = config?.getValueByAlias('filter');
 		this.showOpenButton = config?.getValueByAlias('showOpenButton');
@@ -54,7 +54,7 @@ export class UmbPropertyEditorUITreePickerElement extends UmbLitElement implemen
 
 	#onChange(e: CustomEvent) {
 		this.value = (e.target as UmbInputTreeElement).value as string;
-		this.dispatchEvent(new CustomEvent('property-value-change'));
+		this.dispatchEvent(new UmbPropertyValueChangeEvent());
 	}
 
 	render() {

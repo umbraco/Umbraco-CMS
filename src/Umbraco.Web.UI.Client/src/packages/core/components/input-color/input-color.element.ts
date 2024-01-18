@@ -31,7 +31,10 @@ export class UmbInputColorElement extends FormControlMixin(UmbLitElement) {
 
 	render() {
 		return html`
-			<uui-color-swatches @change="${this._onChange}" label="Color picker">${this._renderColors()} </uui-color-swatches>
+			<uui-color-swatches
+				@change="${this._onChange}"
+				label="Color picker"
+				value=${this.value ?? ''}>${this._renderColors()}</uui-color-swatches>
 		`;
 	}
 

@@ -2,15 +2,15 @@ import { UmbScripDetailModel } from '../types.js';
 import { UmbScriptRepository } from '../repository/script.repository.js';
 import { UMB_SCRIPT_WORKSPACE_ALIAS } from './manifests.js';
 import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbEditableWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
 import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
 import { TextFileResponseModelBaseModel, UpdateScriptRequestModel } from '@umbraco-cms/backoffice/backend-api';
 
-export class UmbScriptWorkspaceContext extends UmbEditableWorkspaceContextBase<
-	UmbScriptRepository,
-	UmbScripDetailModel
-> {
+export class UmbScriptWorkspaceContext extends UmbEditableWorkspaceContextBase<UmbScripDetailModel> {
+	//
+	public readonly repository: UmbScriptRepository = new UmbScriptRepository(this);
+
 	#data = new UmbObjectState<UmbScripDetailModel | undefined>(undefined);
 	data = this.#data.asObservable();
 	name = this.#data.asObservablePart((data) => data?.name);
@@ -20,15 +20,15 @@ export class UmbScriptWorkspaceContext extends UmbEditableWorkspaceContextBase<
 	#isCodeEditorReady = new UmbBooleanState(false);
 	isCodeEditorReady = this.#isCodeEditorReady.asObservable();
 
-	constructor(host: UmbControllerHostElement) {
-		super(host, UMB_SCRIPT_WORKSPACE_ALIAS, new UmbScriptRepository(host));
+	constructor(host: UmbControllerHost) {
+		super(host, UMB_SCRIPT_WORKSPACE_ALIAS);
 		this.#loadCodeEditor();
 	}
 
 	async #loadCodeEditor() {
 		try {
 			await loadCodeEditor();
-			this.#isCodeEditorReady.next(true);
+			this.#isCodeEditorReady.setValue(true);
 		} catch (error) {
 			console.error(error);
 		}
@@ -50,7 +50,7 @@ export class UmbScriptWorkspaceContext extends UmbEditableWorkspaceContextBase<
 		const { data } = await this.repository.requestByKey(entityKey);
 		if (data) {
 			this.setIsNew(false);
-			this.#data.next(data);
+			this.#data.setValue(data);
 		}
 	}
 
@@ -60,7 +60,7 @@ export class UmbScriptWorkspaceContext extends UmbEditableWorkspaceContextBase<
 			path: parentKey,
 			content: '',
 		};
-		this.#data.next(newScript);
+		this.#data.setValue(newScript);
 		this.setIsNew(true);
 	}
 

@@ -14,10 +14,12 @@ import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 
 type EntityType = DocumentTypeResponseModel;
 export class UmbDocumentTypeWorkspaceContext
-	extends UmbEditableWorkspaceContextBase<UmbDocumentTypeDetailRepository, EntityType>
+	extends UmbEditableWorkspaceContextBase<EntityType>
 	implements UmbSaveableWorkspaceContextInterface
 {
-	// Draft is located in structure manager
+	//
+	readonly repository = new UmbDocumentTypeDetailRepository(this);
+	// Data/Draft is located in structure manager
 
 	// General for content types:
 	readonly data;
@@ -38,15 +40,13 @@ export class UmbDocumentTypeWorkspaceContext
 	readonly defaultTemplateId;
 	readonly cleanup;
 
-	readonly structure;
+	readonly structure = new UmbContentTypePropertyStructureManager(this, this.repository);
 
 	#isSorting = new UmbBooleanState(undefined);
 	isSorting = this.#isSorting.asObservable();
 
 	constructor(host: UmbControllerHostElement) {
-		super(host, 'Umb.Workspace.DocumentType', new UmbDocumentTypeDetailRepository(host));
-
-		this.structure = new UmbContentTypePropertyStructureManager(this.host, this.repository);
+		super(host, 'Umb.Workspace.DocumentType');
 
 		// General for content types:
 		this.data = this.structure.ownerContentType;
@@ -72,7 +72,7 @@ export class UmbDocumentTypeWorkspaceContext
 	}
 
 	setIsSorting(isSorting: boolean) {
-		this.#isSorting.next(isSorting);
+		this.#isSorting.setValue(isSorting);
 	}
 
 	getData() {

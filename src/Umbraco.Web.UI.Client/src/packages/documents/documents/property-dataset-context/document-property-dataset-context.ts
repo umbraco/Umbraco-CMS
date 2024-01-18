@@ -60,7 +60,7 @@ export class UmbDocumentPropertyDataContext
 			this.#workspace.variantById(this.#variantId),
 			async (variantInfo) => {
 				if (!variantInfo) return;
-				this.#currentVariant.next(variantInfo);
+				this.#currentVariant.setValue(variantInfo);
 			},
 			'_observeActiveVariant',
 		);

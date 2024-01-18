@@ -47,7 +47,7 @@ export class UmbCurrentUserHistoryStore extends UmbStoreBase<UmbCurrentUserHisto
 
 		// This prevents duplicate entries in the history array.
 		if (!lastItem || lastItem.path !== historyItem.path) {
-			this._data.next([...this._data.getValue(), historyItem]);
+			this._data.setValue([...this._data.getValue(), historyItem]);
 		}
 	}
 
@@ -57,7 +57,7 @@ export class UmbCurrentUserHistoryStore extends UmbStoreBase<UmbCurrentUserHisto
 	 * @memberof UmbHistoryService
 	 */
 	public clear() {
-		this._data.next([]);
+		this._data.setValue([]);
 	}
 }
 

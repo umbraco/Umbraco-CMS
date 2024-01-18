@@ -62,7 +62,6 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 		super.connectedCallback();
 
 		this.consumeContext(UMB_DOCUMENT_TYPE_WORKSPACE_CONTEXT, (instance) => {
-			console.log('GOT UMB_DOCUMENT_TYPE_WORKSPACE_CONTEXT', instance);
 			if (!this.data?.documentTypeId) return;
 
 			this.observe(instance.variesByCulture, (variesByCulture) => (this._documentVariesByCulture = variesByCulture));

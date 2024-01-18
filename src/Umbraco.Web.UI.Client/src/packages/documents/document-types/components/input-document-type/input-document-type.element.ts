@@ -1,9 +1,19 @@
 import { UmbDocumentTypePickerContext } from './input-document-type.context.js';
-import { css, html, customElement, property, state, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
+import {
+	css,
+	html,
+	customElement,
+	property,
+	state,
+	ifDefined,
+	repeat,
+	nothing,
+} from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { DocumentTypeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
+import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-input-document-type')
 export class UmbInputDocumentTypeElement extends FormControlMixin(UmbLitElement) {
@@ -78,10 +88,26 @@ export class UmbInputDocumentTypeElement extends FormControlMixin(UmbLitElement)
 	@state()
 	private _items?: Array<DocumentTypeItemResponseModel>;
 
+	@state()
+	private _editDocumentTypePath = '';
+
 	#pickerContext = new UmbDocumentTypePickerContext(this);
 
 	constructor() {
 		super();
+
+		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
+			.addAdditionalPath('document-type')
+			.onSetup(() => {
+				return { data: { entityType: 'document-type', preset: {} } };
+			})
+			.observeRouteBuilder((routeBuilder) => {
+				this._editDocumentTypePath = routeBuilder({});
+			});
+	}
+
+	connectedCallback() {
+		super.connectedCallback();
 
 		this.addValidator(
 			'rangeUnderflow',
@@ -110,35 +136,68 @@ export class UmbInputDocumentTypeElement extends FormControlMixin(UmbLitElement)
 				pickableFilter: (x) => x.isElement,
 			});
 		} else {
-			this.#pickerContext.openPicker({ hideTreeRoot: true });
+			this.#pickerContext.openPicker({
+				hideTreeRoot: true,
+			});
 		}
 	}
 
 	render() {
-		return html` <uui-ref-list>${this._items?.map((item) => this._renderItem(item))}</uui-ref-list>
-			${this.#renderAddButton()}`;
+		return html` ${this.#renderItems()} ${this.#renderAddButton()} `;
+	}
+
+	#renderItems() {
+		if (!this._items) return nothing;
+		return html`
+			<uui-ref-list
+				>${repeat(
+					this._items,
+					(item) => item.id,
+					(item) => this.#renderItem(item),
+				)}</uui-ref-list
+			>
+		`;
 	}
 
 	#renderAddButton() {
-		if (this.max === 1 && this.selectedIds.length === 1) return nothing;
-		return html`<uui-button id="add-button" look="placeholder" @click=${this.#openPicker} label="open">
-			Add
-		</uui-button>`;
+		if (this.max > 0 && this.selectedIds.length >= this.max) return nothing;
+		return html`
+			<uui-button
+				id="add-button"
+				look="placeholder"
+				@click=${this.#openPicker}
+				label="${this.localize.term('general_choose')}"
+				>${this.localize.term('general_choose')}</uui-button
+			>
+		`;
 	}
 
-	private _renderItem(item: DocumentTypeItemResponseModel) {
+	#renderItem(item: DocumentTypeItemResponseModel) {
 		if (!item.id) return;
 		return html`
 			<uui-ref-node-document-type name=${ifDefined(item.name)}>
+				${this.#renderIcon(item)}
 				<uui-action-bar slot="actions">
 					<uui-button
+						compact
+						href=${this._editDocumentTypePath + 'edit/' + item.id}
+						label=${this.localize.term('general_edit') + ` ${item.name}`}>
+						<uui-icon name="icon-edit"></uui-icon>
+					</uui-button>
+					<uui-button
+						compact
 						@click=${() => this.#pickerContext.requestRemoveItem(item.id!)}
-						label="Remove Document Type ${item.name}"
-						>Remove</uui-button
-					>
+						label="Edit Document Type ${item.name}">
+						<uui-icon name="icon-trash"></uui-icon>
+					</uui-button>
 				</uui-action-bar>
 			</uui-ref-node-document-type>
 		`;
+	}
+
+	#renderIcon(item: DocumentTypeItemResponseModel) {
+		if (!item.icon) return;
+		return html`<uui-icon slot="icon" name=${item.icon}></uui-icon>`;
 	}
 
 	static styles = [
