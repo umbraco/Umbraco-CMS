@@ -25,12 +25,7 @@ export class UmbPropertyEditorUIBlockGridGroupConfigurationElement
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {}
 
 	#addGroup() {
-		if (Array.isArray(this.value)) {
-			this.value = [...this.value, { name: 'Unnamed group', key: UmbId.new() }];
-		} else {
-			this.value = [{ name: 'Unnamed group', key: UmbId.new() }];
-		}
-
+		this.value = [...this._value, { name: 'Unnamed group', key: UmbId.new() }];
 		this.dispatchEvent(new CustomEvent('property-value-change'));
 	}
 
