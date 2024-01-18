@@ -5,14 +5,15 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbDocumentTypeDetailRepository } from '@umbraco-cms/backoffice/document-type';
 import { DocumentTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { getKeyFromUdi } from '@umbraco-cms/backoffice/utils';
+import { buildUdi, getKeyFromUdi } from '@umbraco-cms/backoffice/utils';
 import { UmbBlockTypeBase } from '@umbraco-cms/backoffice/block';
 import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
+import { UmbId } from '@umbraco-cms/backoffice/id';
 
 // TODO: We are using backend model here, I think we should get our own model:
 type ElementTypeModel = DocumentTypeResponseModel;
 
-export class UmbBlockManagerContext<
+export abstract class UmbBlockManagerContext<
 	BlockType extends UmbBlockTypeBase = UmbBlockTypeBase,
 	BlockLayoutType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel,
 > extends UmbContextBase<UmbBlockManagerContext> {
@@ -124,14 +125,23 @@ export class UmbBlockManagerContext<
 		this.#settings.appendOne(settingsData);
 	}
 
-	createBlock(layoutEntry: BlockLayoutType, contentElementTypeKey: string) {
+	abstract createBlock(contentElementTypeKey: string): boolean;
+
+	protected _createBlockData(layoutEntry: Omit<BlockLayoutType, 'contentUdi'>, contentElementTypeKey: string) {
 		// Find block type.
 		const blockType = this.#blockTypes.value.find((x) => x.contentElementTypeKey === contentElementTypeKey);
 		if (!blockType) {
 			throw new Error(`Cannot create block, missing block type for ${contentElementTypeKey}`);
+			return false;
 		}
 
-		this.#layouts.appendOne(layoutEntry);
+		// Create layout entry:
+		layoutEntry.contentUdi = buildUdi('element', UmbId.new());
+		if (blockType.settingsElementTypeKey) {
+			layoutEntry.settingsUdi = buildUdi('element', UmbId.new());
+		}
+
+		this.#layouts.appendOne(layoutEntry as BlockLayoutType);
 
 		// Create content entry:
 		if (layoutEntry.contentUdi) {
@@ -141,6 +151,7 @@ export class UmbBlockManagerContext<
 			});
 		} else {
 			throw new Error('Cannot create block, missing contentUdi');
+			return false;
 		}
 
 		//Create settings entry:
@@ -152,8 +163,11 @@ export class UmbBlockManagerContext<
 				});
 			} else {
 				throw new Error('Cannot create block, missing settingsUdi');
+				return false;
 			}
 		}
+
+		return true;
 	}
 
 	deleteBlock(contentUdi: string) {

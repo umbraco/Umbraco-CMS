@@ -1,6 +1,6 @@
 import type { UmbBlockTypeBase } from '../../block-type/types.js';
 import type { UmbBlockLayoutBaseModel, UmbBlockDataType } from '../types.js';
-import { UMB_BLOCK_MANAGER_CONTEXT, type UmbBlockManagerContext } from '../manager/index.js';
+import { UMB_BLOCK_MANAGER_CONTEXT } from '../manager/index.js';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -11,7 +11,7 @@ export class UmbBlockContext<
 	BlockLayoutType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel,
 > extends UmbContextBase<UmbBlockContext> {
 	//
-	#manager?: UmbBlockManagerContext;
+	#manager?: typeof UMB_BLOCK_MANAGER_CONTEXT.TYPE;
 
 	#blockTypeName = new UmbStringState(undefined);
 	public readonly blockTypeName = this.#blockTypeName.asObservable();

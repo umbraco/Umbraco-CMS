@@ -7,16 +7,14 @@ import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/
 import {
 	UMB_BLOCK_CATALOGUE_MODAL,
 	UmbBlockLayoutBaseModel,
-	UmbBlockManagerContext,
 	UmbBlockTypeBase,
 	type UmbBlockValueType,
 } from '@umbraco-cms/backoffice/block';
 import '../../components/block-list-block/index.js';
-import { buildUdi } from '@umbraco-cms/backoffice/utils';
-import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { NumberRangeValueType } from '@umbraco-cms/backoffice/models';
 import { UMB_MODAL_MANAGER_CONTEXT_TOKEN, UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import { UmbBlockListManagerContext } from '../../manager/block-list-manager.context.js';
 
 export interface UmbBlockListLayoutModel extends UmbBlockLayoutBaseModel {}
 
@@ -73,7 +71,7 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 	@state()
 	private _blocks?: Array<UmbBlockTypeBase>;
 
-	#context = new UmbBlockManagerContext(this);
+	#context = new UmbBlockListManagerContext(this);
 
 	@state()
 	_layouts: Array<UmbBlockLayoutBaseModel> = [];
@@ -133,13 +131,7 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 
 		if (!block?.contentElementTypeKey) return;
 
-		this.#context.createBlock(
-			{
-				contentUdi: buildUdi('element', UmbId.new()),
-				settingsUdi: buildUdi('element', UmbId.new()),
-			},
-			block.contentElementTypeKey,
-		);
+		this.#context.createBlock(block.contentElementTypeKey);
 	}
 
 	render() {
