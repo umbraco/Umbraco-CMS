@@ -6,4 +6,3 @@
 export type UnpublishDocumentRequestModel = {
     culture?: string | null;
 };
-

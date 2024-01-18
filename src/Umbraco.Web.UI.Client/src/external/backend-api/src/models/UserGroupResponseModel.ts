@@ -6,7 +6,6 @@
 import type { UserGroupBaseModel } from './UserGroupBaseModel';
 
 export type UserGroupResponseModel = (UserGroupBaseModel & {
-    id: string;
-    isSystemGroup: boolean;
+id: string;
+isSystemGroup: boolean;
 });
-

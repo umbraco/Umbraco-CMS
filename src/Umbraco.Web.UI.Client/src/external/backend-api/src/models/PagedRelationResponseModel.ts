@@ -9,4 +9,3 @@ export type PagedRelationResponseModel = {
     total: number;
     items: Array<RelationResponseModel>;
 };
-

@@ -7,4 +7,3 @@ export type DomainPresentationModel = {
     domainName: string;
     isoCode: string;
 };
-

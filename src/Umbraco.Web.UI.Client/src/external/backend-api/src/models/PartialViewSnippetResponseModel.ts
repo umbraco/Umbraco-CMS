@@ -7,4 +7,3 @@ export type PartialViewSnippetResponseModel = {
     name: string;
     content: string;
 };
-

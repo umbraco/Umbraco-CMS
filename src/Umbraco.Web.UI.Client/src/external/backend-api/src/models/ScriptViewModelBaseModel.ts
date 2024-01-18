@@ -6,4 +6,3 @@
 import type { TextFileViewModelBaseModel } from './TextFileViewModelBaseModel';
 
 export type ScriptViewModelBaseModel = TextFileViewModelBaseModel;
-

@@ -6,4 +6,3 @@
 import type { PropertyTypeModelBaseModel } from './PropertyTypeModelBaseModel';
 
 export type MediaTypePropertyTypeResponseModel = PropertyTypeModelBaseModel;
-

@@ -22,4 +22,3 @@ export type UpdateContentTypeForDocumentTypeRequestModel = {
     allowedContentTypes: Array<ContentTypeSortModel>;
     compositions: Array<ContentTypeCompositionModel>;
 };
-

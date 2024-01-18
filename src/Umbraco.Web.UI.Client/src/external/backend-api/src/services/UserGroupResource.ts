@@ -20,10 +20,10 @@ export class UserGroupResource {
      * @throws ApiError
      */
     public static deleteUserGroup({
-        requestBody,
-    }: {
-        requestBody?: DeleteUserGroupsRequestModel,
-    }): CancelablePromise<any> {
+requestBody,
+}: {
+requestBody?: DeleteUserGroupsRequestModel,
+}): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/user-group',
@@ -42,10 +42,10 @@ export class UserGroupResource {
      * @throws ApiError
      */
     public static postUserGroup({
-        requestBody,
-    }: {
-        requestBody?: CreateUserGroupRequestModel,
-    }): CancelablePromise<string> {
+requestBody,
+}: {
+requestBody?: CreateUserGroupRequestModel,
+}): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/user-group',
@@ -64,12 +64,12 @@ export class UserGroupResource {
      * @throws ApiError
      */
     public static getUserGroup({
-        skip,
-        take = 100,
-    }: {
-        skip?: number,
-        take?: number,
-    }): CancelablePromise<PagedUserGroupResponseModel> {
+skip,
+take = 100,
+}: {
+skip?: number,
+take?: number,
+}): CancelablePromise<PagedUserGroupResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/user-group',
@@ -88,10 +88,10 @@ export class UserGroupResource {
      * @throws ApiError
      */
     public static getUserGroupById({
-        id,
-    }: {
-        id: string,
-    }): CancelablePromise<UserGroupResponseModel> {
+id,
+}: {
+id: string,
+}): CancelablePromise<UserGroupResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/user-group/{id}',
@@ -111,10 +111,10 @@ export class UserGroupResource {
      * @throws ApiError
      */
     public static deleteUserGroupById({
-        id,
-    }: {
-        id: string,
-    }): CancelablePromise<any> {
+id,
+}: {
+id: string,
+}): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/user-group/{id}',
@@ -134,12 +134,12 @@ export class UserGroupResource {
      * @throws ApiError
      */
     public static putUserGroupById({
-        id,
-        requestBody,
-    }: {
-        id: string,
-        requestBody?: UpdateUserGroupRequestModel,
-    }): CancelablePromise<any> {
+id,
+requestBody,
+}: {
+id: string,
+requestBody?: UpdateUserGroupRequestModel,
+}): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/user-group/{id}',
@@ -159,11 +159,65 @@ export class UserGroupResource {
      * @returns any Success
      * @throws ApiError
      */
+    public static deleteUserGroupByIdUsers({
+id,
+requestBody,
+}: {
+id: string,
+requestBody?: Array<string>,
+}): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/umbraco/management/api/v1/user-group/{id}/users',
+            path: {
+                'id': id,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
+                404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static postUserGroupByIdUsers({
+id,
+requestBody,
+}: {
+id: string,
+requestBody?: Array<string>,
+}): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/umbraco/management/api/v1/user-group/{id}/users',
+            path: {
+                'id': id,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
+                404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
     public static getUserGroupItem({
-        id,
-    }: {
-        id?: Array<string>,
-    }): CancelablePromise<Array<UserGroupItemResponseModel>> {
+id,
+}: {
+id?: Array<string>,
+}): CancelablePromise<Array<UserGroupItemResponseModel>> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/user-group/item',

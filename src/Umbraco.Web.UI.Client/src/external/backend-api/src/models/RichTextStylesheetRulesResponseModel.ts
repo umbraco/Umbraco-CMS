@@ -8,4 +8,3 @@ import type { RichTextRuleModel } from './RichTextRuleModel';
 export type RichTextStylesheetRulesResponseModel = {
     rules: Array<RichTextRuleModel>;
 };
-

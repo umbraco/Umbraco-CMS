@@ -6,4 +6,3 @@
 export type SnippetItemResponseModel = {
     name: string;
 };
-

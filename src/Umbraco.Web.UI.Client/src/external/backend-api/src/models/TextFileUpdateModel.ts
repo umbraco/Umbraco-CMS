@@ -8,4 +8,3 @@ export type TextFileUpdateModel = {
     content: string;
     existingPath: string;
 };
-

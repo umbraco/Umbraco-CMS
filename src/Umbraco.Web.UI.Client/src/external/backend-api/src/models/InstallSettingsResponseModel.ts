@@ -10,4 +10,3 @@ export type InstallSettingsResponseModel = {
     user: UserSettingsModel;
     databases: Array<DatabaseSettingsPresentationModel>;
 };
-

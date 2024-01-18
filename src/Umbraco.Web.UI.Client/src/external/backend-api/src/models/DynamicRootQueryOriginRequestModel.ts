@@ -3,7 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type VersionResponseModel = {
-    version: string;
+export type DynamicRootQueryOriginRequestModel = {
+    alias: string;
+    key?: string | null;
 };
-

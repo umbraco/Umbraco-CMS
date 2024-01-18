@@ -6,6 +6,5 @@
 import type { UpdateContentForDocumentRequestModel } from './UpdateContentForDocumentRequestModel';
 
 export type UpdateDocumentRequestModel = (UpdateContentForDocumentRequestModel & {
-    templateId?: string | null;
+templateId?: string | null;
 });
-
