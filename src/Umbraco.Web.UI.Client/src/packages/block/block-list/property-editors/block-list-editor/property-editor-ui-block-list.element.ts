@@ -1,3 +1,5 @@
+import { UmbBlockListManagerContext } from '../../manager/block-list-manager.context.js';
+import '../../components/block-list-block/index.js';
 import { UMB_BLOCK_LIST_PROPERTY_EDITOR_ALIAS } from './manifests.js';
 import { html, customElement, property, state, repeat, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -7,14 +9,17 @@ import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/
 import {
 	UMB_BLOCK_CATALOGUE_MODAL,
 	UmbBlockLayoutBaseModel,
-	UmbBlockTypeBase,
+	UmbBlockTypeBaseModel,
 	type UmbBlockValueType,
 } from '@umbraco-cms/backoffice/block';
-import '../../components/block-list-block/index.js';
 import type { NumberRangeValueType } from '@umbraco-cms/backoffice/models';
-import { UMB_MODAL_MANAGER_CONTEXT_TOKEN, UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
+import {
+	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
+	UmbModalManagerContext,
+	UmbModalRouteBuilder,
+	UmbModalRouteRegistrationController,
+} from '@umbraco-cms/backoffice/modal';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import { UmbBlockListManagerContext } from '../../manager/block-list-manager.context.js';
 
 export interface UmbBlockListLayoutModel extends UmbBlockLayoutBaseModel {}
 
@@ -55,7 +60,7 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 		this._limitMin = validationLimit?.min;
 		this._limitMax = validationLimit?.max;
 
-		const blocks = config.getValueByAlias<Array<UmbBlockTypeBase>>('blocks') ?? [];
+		const blocks = config.getValueByAlias<Array<UmbBlockTypeBaseModel>>('blocks') ?? [];
 		this.#context.setBlockTypes(blocks);
 		//config.useSingleBlockMode
 		//config.useLiveEditing
@@ -69,15 +74,15 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 	private _limitMax?: number;
 
 	@state()
-	private _blocks?: Array<UmbBlockTypeBase>;
-
-	#context = new UmbBlockListManagerContext(this);
+	private _blocks?: Array<UmbBlockTypeBaseModel>;
 
 	@state()
 	_layouts: Array<UmbBlockLayoutBaseModel> = [];
 
 	@state()
-	_workspacePath?: string;
+	_catalogueRouteBuilder?: UmbModalRouteBuilder;
+
+	#context = new UmbBlockListManagerContext(this);
 
 	#modalContext?: UmbModalManagerContext;
 
@@ -92,7 +97,7 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 		this.observe(this.#context.layouts, (layouts) => {
 			this._value = { ...this._value, layout: { [UMB_BLOCK_LIST_PROPERTY_EDITOR_ALIAS]: layouts } };
 			// Notify that the value has changed.
-			console.log('layout changed', this._value);
+			//console.log('layout changed', this._value);
 			// TODO: idea: consider inserting an await here, so other changes could appear first? Maybe some mechanism to only fire change event onces?
 			this._layouts = layouts;
 			this.dispatchEvent(new UmbChangeEvent());
@@ -100,18 +105,27 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 		this.observe(this.#context.contents, (contents) => {
 			this._value = { ...this._value, contentData: contents };
 			// Notify that the value has changed.
-			console.log('content changed', this._value);
+			//console.log('content changed', this._value);
 			this.dispatchEvent(new UmbChangeEvent());
 		});
 		this.observe(this.#context.settings, (settings) => {
 			this._value = { ...this._value, settingsData: settings };
 			// Notify that the value has changed.
-			console.log('settings changed', this._value);
+			//console.log('settings changed', this._value);
 			this.dispatchEvent(new UmbChangeEvent());
 		});
 		this.observe(this.#context.blockTypes, (blockTypes) => {
 			this._blocks = blockTypes;
 		});
+
+		new UmbModalRouteRegistrationController(this, UMB_BLOCK_CATALOGUE_MODAL)
+			.addAdditionalPath(':view')
+			.onSetup((routingInfo) => {
+				return { data: { blocks: this._blocks ?? [], openClipboard: routingInfo.view === 'clipboard' } };
+			})
+			.observeRouteBuilder((routeBuilder) => {
+				this._catalogueRouteBuilder = routeBuilder;
+			});
 	}
 
 	async #openBlockCatalogue(openClipboard: boolean = false) {
@@ -120,11 +134,9 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 			data: { blocks: this._blocks ?? [], openClipboard },
 		});
 
-		const data = await modalContext?.onSubmit();
+		await modalContext?.onSubmit();
 
-		/**TODO: Insert next modal for data */
-		console.log('submitted', data);
-
+		/*
 		if (!data) return;
 
 		const block = this._blocks?.find((x) => x.contentElementTypeKey === data.key);
@@ -132,6 +144,7 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 		if (!block?.contentElementTypeKey) return;
 
 		this.#context.createBlock(block.contentElementTypeKey);
+		*/
 	}
 
 	render() {
@@ -148,13 +161,13 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 					id="add-button"
 					look="placeholder"
 					label=${this.localize.term('content_createEmpty')}
-					@click=${() => this.#openBlockCatalogue()}>
+					href=${this._catalogueRouteBuilder?.({ view: 'create' }) ?? ''}>
 					${this.localize.term('content_createEmpty')}
 				</uui-button>
 				<uui-button
 					label=${this.localize.term('content_createFromClipboard')}
 					look="placeholder"
-					@click=${() => this.#openBlockCatalogue(true)}>
+					href=${this._catalogueRouteBuilder?.({ view: 'clipboard' }) ?? ''}>
 					<uui-icon name="icon-paste-in"></uui-icon>
 				</uui-button>
 			</uui-button-group>`;

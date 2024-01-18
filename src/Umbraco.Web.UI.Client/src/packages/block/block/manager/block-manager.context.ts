@@ -6,7 +6,7 @@ import { UmbArrayState, UmbStringState } from '@umbraco-cms/backoffice/observabl
 import { UmbDocumentTypeDetailRepository } from '@umbraco-cms/backoffice/document-type';
 import { DocumentTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { buildUdi, getKeyFromUdi } from '@umbraco-cms/backoffice/utils';
-import { UmbBlockTypeBase } from '@umbraco-cms/backoffice/block';
+import { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block';
 import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 
@@ -14,7 +14,7 @@ import { UmbId } from '@umbraco-cms/backoffice/id';
 type ElementTypeModel = DocumentTypeResponseModel;
 
 export abstract class UmbBlockManagerContext<
-	BlockType extends UmbBlockTypeBase = UmbBlockTypeBase,
+	BlockType extends UmbBlockTypeBaseModel = UmbBlockTypeBaseModel,
 	BlockLayoutType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel,
 > extends UmbContextBase<UmbBlockManagerContext> {
 	//
@@ -125,7 +125,7 @@ export abstract class UmbBlockManagerContext<
 		this.#settings.appendOne(settingsData);
 	}
 
-	abstract createBlock(contentElementTypeKey: string): boolean;
+	abstract createBlock(layoutEntry: Omit<BlockLayoutType, 'contentUdi'>, contentElementTypeKey: string): boolean;
 
 	protected _createBlockData(layoutEntry: Omit<BlockLayoutType, 'contentUdi'>, contentElementTypeKey: string) {
 		// Find block type.
@@ -137,9 +137,9 @@ export abstract class UmbBlockManagerContext<
 
 		// Create layout entry:
 		const fullLayoutEntry: BlockLayoutType = {
-			...(layoutEntry as BlockLayoutType),
 			contentUdi: buildUdi('element', UmbId.new()),
-		};
+			...(layoutEntry as Partial<BlockLayoutType>),
+		} as BlockLayoutType;
 		if (blockType.settingsElementTypeKey) {
 			fullLayoutEntry.settingsUdi = buildUdi('element', UmbId.new());
 		}

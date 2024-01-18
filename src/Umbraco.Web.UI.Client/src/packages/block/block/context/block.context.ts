@@ -1,4 +1,4 @@
-import type { UmbBlockTypeBase } from '../../block-type/types.js';
+import type { UmbBlockTypeBaseModel } from '../../block-type/types.js';
 import type { UmbBlockLayoutBaseModel, UmbBlockDataType } from '../types.js';
 import { UMB_BLOCK_MANAGER_CONTEXT } from '../manager/index.js';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
@@ -7,7 +7,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 
 export class UmbBlockContext<
-	BlockType extends UmbBlockTypeBase = UmbBlockTypeBase,
+	BlockType extends UmbBlockTypeBaseModel = UmbBlockTypeBaseModel,
 	BlockLayoutType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel,
 > extends UmbContextBase<UmbBlockContext> {
 	//

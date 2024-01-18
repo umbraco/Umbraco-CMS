@@ -17,6 +17,7 @@ export class UmbBlockWorkspaceContext<
 	readonly workspaceAlias;
 
 	#blockManager?: typeof UMB_BLOCK_MANAGER_CONTEXT.TYPE;
+	#retrieveBlockManager;
 
 	#entityType: string;
 
@@ -41,45 +42,51 @@ export class UmbBlockWorkspaceContext<
 		super(host, workspaceArgs.manifest.alias);
 		this.#entityType = workspaceArgs.manifest.meta?.entityType;
 		this.workspaceAlias = workspaceArgs.manifest.alias;
+
+		this.#retrieveBlockManager = this.consumeContext(UMB_BLOCK_MANAGER_CONTEXT, (context) => {
+			this.#blockManager = context;
+		}).asPromise();
 	}
 
 	async load(unique: string) {
-		this.consumeContext(UMB_BLOCK_MANAGER_CONTEXT, (context) => {
-			this.#blockManager = context;
+		await this.#retrieveBlockManager;
+		if (!this.#blockManager) {
+			throw new Error('Block manager not found');
+			return;
+		}
 
-			this.observe(
-				context.layoutOf(unique),
-				(layoutData) => {
-					this.#layout.next(layoutData as LayoutDataType);
+		this.observe(
+			this.#blockManager.layoutOf(unique),
+			(layoutData) => {
+				this.#layout.next(layoutData as LayoutDataType);
 
-					//
-					// Content:
-					const contentUdi = layoutData?.contentUdi;
-					if (contentUdi) {
-						this.observe(
-							context.contentOf(contentUdi),
-							(contentData) => {
-								this.content.setData(contentData);
-							},
-							'observeContent',
-						);
-					}
+				//
+				// Content:
+				const contentUdi = layoutData?.contentUdi;
+				if (contentUdi) {
+					this.observe(
+						this.#blockManager!.contentOf(contentUdi),
+						(contentData) => {
+							this.content.setData(contentData);
+						},
+						'observeContent',
+					);
+				}
 
-					// Settings:
-					const settingsUdi = layoutData?.settingsUdi;
-					if (settingsUdi) {
-						this.observe(
-							context.contentOf(settingsUdi),
-							(settingsData) => {
-								this.content.setData(settingsData);
-							},
-							'observeSettings',
-						);
-					}
-				},
-				'observeLayout',
-			);
-		});
+				// Settings:
+				const settingsUdi = layoutData?.settingsUdi;
+				if (settingsUdi) {
+					this.observe(
+						this.#blockManager!.contentOf(settingsUdi),
+						(settingsData) => {
+							this.content.setData(settingsData);
+						},
+						'observeSettings',
+					);
+				}
+			},
+			'observeLayout',
+		);
 	}
 
 	async create(contentElementTypeId: string) {
@@ -147,12 +154,20 @@ export class UmbBlockWorkspaceContext<
 
 	async save() {
 		const layoutData = this.#layout.value;
-		if (!layoutData || !this.#blockManager) return;
+		const contentData = this.content.getData();
+		if (!layoutData || !this.#blockManager || !contentData) return;
+
+		if (this.getIsNew() === true) {
+			const blockCreated = this.#blockManager.createBlock(layoutData, contentData.contentTypeKey);
+			if (!blockCreated) {
+				throw new Error('Block Manager could not create block');
+				return;
+			}
+		}
 
 		// TODO: Save the block, but only in non-live-editing mode.
 		this.#blockManager.setOneLayout(layoutData);
 
-		const contentData = this.content.getData();
 		if (contentData) {
 			this.#blockManager.setOneContent(contentData);
 		}
