@@ -19,12 +19,12 @@ export class UmbBackofficeContext extends UmbContextBase<UmbBackofficeContext> {
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_BACKOFFICE_CONTEXT_TOKEN);
 		new UmbExtensionsManifestInitializer(this, umbExtensionsRegistry, 'section', null, (sections) => {
-			this.#allowedSections.next([...sections]);
+			this.#allowedSections.setValue([...sections]);
 		});
 	}
 
 	public setActiveSectionAlias(alias: string) {
-		this.#activeSectionAlias.next(alias);
+		this.#activeSectionAlias.setValue(alias);
 	}
 }
 

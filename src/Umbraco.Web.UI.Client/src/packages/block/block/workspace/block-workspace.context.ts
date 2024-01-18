@@ -58,7 +58,7 @@ export class UmbBlockWorkspaceContext<
 		this.observe(
 			this.#blockManager.layoutOf(unique),
 			(layoutData) => {
-				this.#layout.next(layoutData as LayoutDataType);
+				this.#layout.setValue(layoutData as LayoutDataType);
 
 				//
 				// Content:
@@ -106,14 +106,14 @@ export class UmbBlockWorkspaceContext<
 		// TODO: If we have Settings dedicated to this block type, we initiate them here:
 
 		this.setIsNew(true);
-		this.#layout.next(layout as LayoutDataType);
+		this.#layout.setValue(layout as LayoutDataType);
 	}
 
 	getIsNew() {
 		return this.#isNew.value;
 	}
 	setIsNew(value: boolean): void {
-		this.#isNew.next(value);
+		this.#isNew.setValue(value);
 	}
 
 	getData() {

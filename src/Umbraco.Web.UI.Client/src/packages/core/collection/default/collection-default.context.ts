@@ -99,8 +99,8 @@ export class UmbDefaultCollectionContext<
 		const { data } = await this.repository.requestCollection(filter);
 
 		if (data) {
-			this.#items.next(data.items);
-			this.#totalItems.next(data.total);
+			this.#items.setValue(data.items);
+			this.#totalItems.setValue(data.total);
 			this.pagination.setTotalItems(data.total);
 		}
 	}
@@ -111,14 +111,14 @@ export class UmbDefaultCollectionContext<
 	 * @memberof UmbCollectionContext
 	 */
 	public setFilter(filter: Partial<FilterModelType>) {
-		this.#filter.next({ ...this.#filter.getValue(), ...filter });
+		this.#filter.setValue({ ...this.#filter.getValue(), ...filter });
 		this.requestCollection();
 	}
 
 	#configure(configuration: UmbCollectionConfiguration) {
 		this.selection.setMultiple(true);
 		this.pagination.setPageSize(configuration.pageSize!);
-		this.#filter.next({ ...this.#filter.getValue(), skip: 0, take: configuration.pageSize });
+		this.#filter.setValue({ ...this.#filter.getValue(), skip: 0, take: configuration.pageSize });
 	}
 
 	#onPageChange = (event: UmbChangeEvent) => {

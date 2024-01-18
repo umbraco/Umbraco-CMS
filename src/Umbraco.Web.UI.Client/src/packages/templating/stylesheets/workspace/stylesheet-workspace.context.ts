@@ -39,7 +39,7 @@ export class UmbStylesheetWorkspaceContext
 	async #loadCodeEditor() {
 		try {
 			await loadCodeEditor();
-			this.#isCodeEditorReady.next(true);
+			this.#isCodeEditorReady.setValue(true);
 		} catch (error) {
 			console.error(error);
 		}
@@ -72,7 +72,7 @@ export class UmbStylesheetWorkspaceContext
 
 	setRules(rules: RichTextRuleModelSortable[]) {
 		const newRules = rules.map((r, i) => ({ ...r, sortOrder: i }));
-		this.#rules.next(newRules);
+		this.#rules.setValue(newRules);
 		this.sendRulesGetContent();
 	}
 
@@ -99,9 +99,9 @@ export class UmbStylesheetWorkspaceContext
 
 		if (rules.data) {
 			const x = rules.data.rules?.map((r, i) => ({ ...r, sortOrder: i })) ?? [];
-			this.#rules.next(x);
+			this.#rules.setValue(x);
 		} else {
-			this.#rules.next([]);
+			this.#rules.setValue([]);
 		}
 	}
 
@@ -175,7 +175,7 @@ export class UmbStylesheetWorkspaceContext
 			content: '',
 		};
 
-		this.#data.next(newStylesheet);
+		this.#data.setValue(newStylesheet);
 		this.setIsNew(true);
 	}
 

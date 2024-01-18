@@ -16,7 +16,7 @@ export class WorkspaceContextCounter extends UmbBaseController {
 
 	// Lets expose methods to update the state:
 	increment() {
-		this.#counter.next(this.#counter.value + 1);
+		this.#counter.setValue(this.#counter.value + 1);
 	}
 }
 

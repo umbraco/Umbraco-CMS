@@ -59,14 +59,14 @@ export class UmbDictionaryWorkspaceContext
 			updatedValue?.push({ isoCode, translation });
 		}
 
-		this.#data.next({ ...this.#data.value, translations: updatedValue });
+		this.#data.setValue({ ...this.#data.value, translations: updatedValue });
 	}
 
 	async load(entityId: string) {
 		const { data } = await this.repository.requestById(entityId);
 		if (data) {
 			this.setIsNew(false);
-			this.#data.next(data);
+			this.#data.setValue(data);
 		}
 	}
 
@@ -75,7 +75,7 @@ export class UmbDictionaryWorkspaceContext
 		if (!data) return;
 		this.setIsNew(true);
 
-		this.#data.next(data as DictionaryItemResponseModel);
+		this.#data.setValue(data as DictionaryItemResponseModel);
 	}
 
 	async save() {

@@ -37,7 +37,7 @@ export class UmbRelationTypeWorkspaceContext
 		const { data } = await this.repository.createScaffold(parentId);
 		if (!data) return;
 		this.setIsNew(true);
-		this.#data.next(data);
+		this.#data.setValue(data);
 	}
 
 	async getRelations() {

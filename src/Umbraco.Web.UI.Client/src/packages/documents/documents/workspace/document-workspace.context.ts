@@ -63,7 +63,7 @@ export class UmbDocumentWorkspaceContext
 
 		this.setIsNew(false);
 		//this.#persisted.next(data);
-		this.#currentData.next(data);
+		this.#currentData.setValue(data);
 		return data || undefined;
 	}
 
@@ -73,7 +73,7 @@ export class UmbDocumentWorkspaceContext
 		if (!data) return undefined;
 
 		this.setIsNew(true);
-		this.#currentData.next(data);
+		this.#currentData.setValue(data);
 		return data || undefined;
 	}
 

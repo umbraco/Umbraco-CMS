@@ -57,7 +57,7 @@ export class UmbMediaWorkspaceContext
 		const { data } = await this.repository.requestById(entityId);
 		if (data) {
 			this.setIsNew(false);
-			this.#data.next(data);
+			this.#data.setValue(data);
 		}
 	}
 
@@ -67,7 +67,7 @@ export class UmbMediaWorkspaceContext
 		this.setIsNew(true);
 		// TODO: This is a hack to get around the fact that the data is not typed correctly.
 		// Create and response models are different. We need to look into this.
-		this.#data.next(data as unknown as UmbMediaDetailModel);
+		this.#data.setValue(data as unknown as UmbMediaDetailModel);
 	}
 
 	async save() {

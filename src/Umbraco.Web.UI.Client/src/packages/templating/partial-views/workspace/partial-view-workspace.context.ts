@@ -66,7 +66,7 @@ export class UmbPartialViewWorkspaceContext
 	async #loadCodeEditor() {
 		try {
 			await loadCodeEditor();
-			this.#isCodeEditorReady.next(true);
+			this.#isCodeEditorReady.setValue(true);
 		} catch (error) {
 			console.error(error);
 		}
@@ -88,7 +88,7 @@ export class UmbPartialViewWorkspaceContext
 		const { data } = await this.repository.requestByKey(entityKey);
 		if (data) {
 			this.setIsNew(false);
-			this.#data.next(data);
+			this.#data.setValue(data);
 		}
 	}
 
@@ -103,7 +103,7 @@ export class UmbPartialViewWorkspaceContext
 		this.setIsNew(true);
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
-		this.#data.next(newPartial);
+		this.#data.setValue(newPartial);
 	}
 }
 
