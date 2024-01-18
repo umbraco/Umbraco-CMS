@@ -3,8 +3,6 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type ServerInformationItemResponseModel = {
-    name: string;
-    data: string;
+export type MoveDocumentTypeRequestModel = {
+    targetId?: string | null;
 };
-

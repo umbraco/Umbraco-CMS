@@ -14,4 +14,3 @@ export type IndexResponseModel = {
     fieldCount: number;
     providerProperties?: Record<string, any> | null;
 };
-

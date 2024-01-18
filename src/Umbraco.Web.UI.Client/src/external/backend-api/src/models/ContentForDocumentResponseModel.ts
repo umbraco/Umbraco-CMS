@@ -12,4 +12,3 @@ export type ContentForDocumentResponseModel = {
     id: string;
     contentTypeId: string;
 };
-

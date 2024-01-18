@@ -8,4 +8,3 @@ export type TemporaryFileResponseModel = {
     availableUntil?: string | null;
     fileName: string;
 };
-

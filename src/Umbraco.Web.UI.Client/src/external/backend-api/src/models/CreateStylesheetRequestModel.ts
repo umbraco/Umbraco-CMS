@@ -6,4 +6,3 @@
 import type { CreateTextFileViewModelBaseModel } from './CreateTextFileViewModelBaseModel';
 
 export type CreateStylesheetRequestModel = CreateTextFileViewModelBaseModel;
-

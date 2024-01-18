@@ -9,4 +9,3 @@ export type PagedTelemetryResponseModel = {
     total: number;
     items: Array<TelemetryResponseModel>;
 };
-

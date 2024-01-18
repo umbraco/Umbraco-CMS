@@ -9,4 +9,3 @@ export type InterpolateRichTextStylesheetRequestModel = {
     content?: string | null;
     rules?: Array<RichTextRuleModel> | null;
 };
-

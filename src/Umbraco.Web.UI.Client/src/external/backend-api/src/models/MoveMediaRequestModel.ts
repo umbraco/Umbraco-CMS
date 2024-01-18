@@ -6,4 +6,3 @@
 export type MoveMediaRequestModel = {
     targetId?: string | null;
 };
-
