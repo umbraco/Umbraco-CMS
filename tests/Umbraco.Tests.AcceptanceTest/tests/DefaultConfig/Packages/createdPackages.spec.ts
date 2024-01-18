@@ -23,7 +23,7 @@ test.describe('Created packages tests', () => {
     await umbracoUi.package.clickSaveButton();
 
     // Assert
-    expect(await umbracoUi.package.doesPackageNameExist(packageName)).toBeVisible();
+    await umbracoUi.package.isPackageNameVisible(packageName);
   });
 
   test('can update package name', async ({umbracoApi, umbracoUi}) => {
@@ -39,7 +39,7 @@ test.describe('Created packages tests', () => {
     await umbracoUi.package.clickSaveButton();
 
     // Assert
-    expect(await umbracoUi.package.doesPackageNameExist(packageName)).toBeVisible();
+    await umbracoUi.package.isPackageNameVisible(packageName);
     expect(umbracoApi.package.doesNameExist(packageName)).toBeTruthy();
   });
 
@@ -53,11 +53,11 @@ test.describe('Created packages tests', () => {
     await umbracoUi.package.clickDeleteExactLabel();
 
     // Assert
-    expect(await umbracoUi.package.doesPackageNameExist(packageName)).not.toBeVisible();
+    await umbracoUi.package.isPackageNameVisible(packageName, false);
     expect(await umbracoApi.package.doesNameExist(packageName)).toBeFalsy();
   });
 
-  test('can create a package with content', async ({umbracoApi, umbracoUi}) => {
+  test('can create a package with content', async ({page,umbracoApi, umbracoUi}) => {
     // Arrange
     const documentTypeName = 'TestDocumentType';
     const documentName = 'TestDocument';
@@ -69,10 +69,9 @@ test.describe('Created packages tests', () => {
 
     // Act
     await umbracoUi.package.clickExistingPackageName(packageName);
-    await umbracoUi.package.clickAddContentToPackageButton()
-    await umbracoUi.package.clickCaretButton();
+    await umbracoUi.package.clickAddContentToPackageButton();
     await umbracoUi.package.clickLabelWithName(documentName);
-    await umbracoUi.package.clickSubmitButton()
+    await umbracoUi.package.clickChooseBtn();
     await umbracoUi.package.clickSaveChangesToPackageButton();
 
     // Assert
@@ -102,7 +101,7 @@ test.describe('Created packages tests', () => {
     await umbracoUi.package.clickAddMediaToPackageButton();
     await umbracoUi.package.clickCaretButton();
     await umbracoUi.package.clickLabelWithName(mediaName);
-    await umbracoUi.package.clickSubmitButton()
+    await umbracoUi.package.clickSubmitButton();
     await umbracoUi.package.clickSaveChangesToPackageButton();
 
 
@@ -130,7 +129,7 @@ test.describe('Created packages tests', () => {
     await umbracoUi.package.clickAddDocumentTypeToPackageButton();
     await umbracoUi.package.clickCaretButton();
     await umbracoUi.package.clickLabelWithName(documentTypeName);
-    await umbracoUi.package.clickSubmitButton()
+    await umbracoUi.package.clickSubmitButton();
     await umbracoUi.package.clickSaveChangesToPackageButton();
 
     // Assert
