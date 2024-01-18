@@ -797,6 +797,11 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
         });
       });
 
+      // Do not add any further controls if the block editor is not available
+      if (!blockEditorApi) {
+        return;
+      }
+
       editor.ui.registry.addToggleButton('umbblockpicker', {
         icon: 'visualblocks',
         tooltip: 'Insert Block',
