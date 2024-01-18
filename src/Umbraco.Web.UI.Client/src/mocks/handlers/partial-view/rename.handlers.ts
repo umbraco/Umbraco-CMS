@@ -13,11 +13,13 @@ export const renameHandlers = [
 		if (!requestBody) return res(ctx.status(400, 'no body found'));
 
 		const newPath = umbPartialViewMockDB.file.rename(decodeURIComponent(path), requestBody.name);
+		const encodedPath = encodeURIComponent(newPath);
 
 		return res(
 			ctx.status(201),
 			ctx.set({
-				Location: encodeURIComponent(newPath),
+				Location: req.url.href + '/' + encodedPath,
+				'Umb-Generated-Resource': encodedPath,
 			}),
 		);
 	}),

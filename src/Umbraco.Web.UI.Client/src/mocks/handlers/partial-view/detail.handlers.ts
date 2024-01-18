@@ -9,10 +9,12 @@ export const detailHandlers = [
 		const requestBody = (await req.json()) as CreateStylesheetRequestModel;
 		if (!requestBody) return res(ctx.status(400, 'no body found'));
 		const path = umbPartialViewMockDB.file.create(requestBody);
+		const encodedPath = encodeURIComponent(path);
 		return res(
 			ctx.status(201),
 			ctx.set({
-				Location: encodeURIComponent(path),
+				Location: req.url.href + '/' + encodedPath,
+				'Umb-Generated-Resource': encodedPath,
 			}),
 		);
 	}),

@@ -13,7 +13,8 @@ export const folderHandlers = [
 		return res(
 			ctx.status(201),
 			ctx.set({
-				Location: id,
+				Location: req.url.href + '/' + id,
+				'Umb-Generated-Resource': id,
 			}),
 		);
 	}),
