@@ -3,7 +3,9 @@ using Umbraco.Cms.Core.Packaging;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
-public interface IPackageDefinitionFactory
+public interface IPackagePresentationFactory
 {
     PackageDefinition CreatePackageDefinition(CreatePackageRequestModel createPackageRequestModel);
+
+    PackageConfigurationResponseModel CreateConfigurationResponseModel();
 }
