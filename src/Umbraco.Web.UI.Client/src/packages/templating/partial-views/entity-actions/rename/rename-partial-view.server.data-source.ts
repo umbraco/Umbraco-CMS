@@ -32,7 +32,7 @@ export class UmbRenamePartialViewServerDataSource {
 		if (!path) throw new Error('Path is missing');
 
 		const requestBody: RenameStylesheetRequestModel = {
-			name: appendFileExtensionIfNeeded(name, '.js'),
+			name: appendFileExtensionIfNeeded(name, '.cshtml'),
 		};
 
 		const { data, error } = await tryExecuteAndNotify(
