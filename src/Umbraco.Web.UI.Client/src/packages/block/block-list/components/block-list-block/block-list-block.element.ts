@@ -108,6 +108,10 @@ export class UmbPropertyEditorUIBlockListBlockElement extends UmbLitElement impl
 				top: var(--uui-size-2);
 				right: var(--uui-size-2);
 			}
+
+			:host([drag-placeholder]) {
+				opacity: 0.2;
+			}
 		`,
 	];
 }
