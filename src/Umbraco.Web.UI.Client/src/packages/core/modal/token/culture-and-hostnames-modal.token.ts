@@ -3,7 +3,6 @@ import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbCultureAndHostnamesModalData {
 	unique: string | null;
-	culture?: string | null;
 }
 
 export interface UmbCultureAndHostnamesModalValue {

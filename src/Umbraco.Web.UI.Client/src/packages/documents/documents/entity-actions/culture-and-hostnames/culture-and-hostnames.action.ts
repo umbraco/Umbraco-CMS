@@ -19,21 +19,14 @@ export class UmbDocumentCultureAndHostnamesEntityAction extends UmbEntityActionB
 	}
 
 	async execute() {
-		console.log(`execute for: ${this.unique}`);
-		//await this.repository?.setCultureAndHostnames();
-
 		if (!this.repository) return;
 		this._openModal(this.unique || null);
 	}
 
 	private async _openModal(unique: string | null) {
 		if (!this.#modalContext) return;
-		const modalContext = this.#modalContext.open(UMB_CULTURE_AND_HOSTNAMES_MODAL, {
+		this.#modalContext.open(UMB_CULTURE_AND_HOSTNAMES_MODAL, {
 			data: { unique },
 		});
-
-		const { defaultIsoCode, domains } = await modalContext.onSubmit();
-		console.log(defaultIsoCode);
-		console.table(domains);
 	}
 }
