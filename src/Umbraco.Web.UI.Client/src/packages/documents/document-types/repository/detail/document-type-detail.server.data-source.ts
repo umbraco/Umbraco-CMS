@@ -108,48 +108,47 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 
 	/**
 	 * Inserts a new Media Type on the server
-	 * @param {UmbDocumentTypeDetailModel} documentType
+	 * @param {UmbDocumentTypeDetailModel} model
 	 * @return {*}
 	 * @memberof UmbDocumentTypeServerDataSource
 	 */
-	async create(documentType: UmbDocumentTypeDetailModel) {
-		if (!documentType) throw new Error('Media Type is missing');
-		if (!documentType.unique) throw new Error('Media Type unique is missing');
+	async create(model: UmbDocumentTypeDetailModel) {
+		if (!model) throw new Error('Media Type is missing');
+		if (!model.unique) throw new Error('Media Type unique is missing');
 
 		// TODO: make data mapper to prevent errors
 		const requestBody: CreateDocumentTypeRequestModel = {
-			alias: documentType.alias,
-			name: documentType.name,
-			description: documentType.description,
-			icon: documentType.icon,
-			allowedAsRoot: documentType.allowedAsRoot,
-			variesByCulture: documentType.variesByCulture,
-			variesBySegment: documentType.variesBySegment,
-			isElement: documentType.isElement,
-			properties: documentType.properties,
-			containers: documentType.containers,
-			allowedContentTypes: documentType.allowedContentTypes,
-			compositions: documentType.compositions,
-			id: documentType.unique,
-			containerId: documentType.parentUnique,
-			allowedTemplateIds: documentType.allowedTemplateIds,
-			defaultTemplateId: documentType.defaultTemplateId || null,
-			cleanup: documentType.cleanup,
+			alias: model.alias,
+			name: model.name,
+			description: model.description,
+			icon: model.icon,
+			allowedAsRoot: model.allowedAsRoot,
+			variesByCulture: model.variesByCulture,
+			variesBySegment: model.variesBySegment,
+			isElement: model.isElement,
+			properties: model.properties,
+			containers: model.containers,
+			allowedContentTypes: model.allowedContentTypes,
+			compositions: model.compositions,
+			id: model.unique,
+			containerId: model.parentUnique,
+			allowedTemplateIds: model.allowedTemplateIds,
+			defaultTemplateId: model.defaultTemplateId || null,
+			cleanup: model.cleanup,
 		};
 
-		const { error: createError } = await tryExecuteAndNotify(
+		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
 			DocumentTypeResource.postDocumentType({
 				requestBody,
 			}),
 		);
 
-		if (createError) {
-			return { error: createError };
+		if (data) {
+			return this.read(data);
 		}
 
-		// We have to fetch the data type again. The server can have modified the data after creation
-		return this.read(documentType.unique);
+		return { error };
 	}
 
 	/**
@@ -158,42 +157,41 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 	 * @return {*}
 	 * @memberof UmbDocumentTypeServerDataSource
 	 */
-	async update(data: UmbDocumentTypeDetailModel) {
-		if (!data.unique) throw new Error('Unique is missing');
+	async update(model: UmbDocumentTypeDetailModel) {
+		if (!model.unique) throw new Error('Unique is missing');
 
 		// TODO: make data mapper to prevent errors
 		const requestBody: UpdateDocumentTypeRequestModel = {
-			alias: data.alias,
-			name: data.name,
-			description: data.description,
-			icon: data.icon,
-			allowedAsRoot: data.allowedAsRoot,
-			variesByCulture: data.variesByCulture,
-			variesBySegment: data.variesBySegment,
-			isElement: data.isElement,
-			properties: data.properties,
-			containers: data.containers,
-			allowedContentTypes: data.allowedContentTypes,
-			compositions: data.compositions,
-			allowedTemplateIds: data.allowedTemplateIds,
-			defaultTemplateId: data.defaultTemplateId || null,
-			cleanup: data.cleanup,
+			alias: model.alias,
+			name: model.name,
+			description: model.description,
+			icon: model.icon,
+			allowedAsRoot: model.allowedAsRoot,
+			variesByCulture: model.variesByCulture,
+			variesBySegment: model.variesBySegment,
+			isElement: model.isElement,
+			properties: model.properties,
+			containers: model.containers,
+			allowedContentTypes: model.allowedContentTypes,
+			compositions: model.compositions,
+			allowedTemplateIds: model.allowedTemplateIds,
+			defaultTemplateId: model.defaultTemplateId || null,
+			cleanup: model.cleanup,
 		};
 
-		const { error } = await tryExecuteAndNotify(
+		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
 			DocumentTypeResource.putDocumentTypeById({
-				id: data.unique,
+				id: model.unique,
 				requestBody,
 			}),
 		);
 
-		if (error) {
-			return { error };
+		if (data) {
+			return this.read(data);
 		}
 
-		// We have to fetch the data type again. The server can have modified the data after update
-		return this.read(data.unique);
+		return { error };
 	}
 
 	/**

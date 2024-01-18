@@ -35,18 +35,18 @@ export class UmbPartialViewDetailServerDataSource implements UmbDetailDataSource
 		return { data };
 	}
 
-	async create(partialView: UmbPartialViewDetailModel) {
-		if (!partialView) throw new Error('Data is missing');
-		if (!partialView.parentUnique === undefined) throw new Error('Parent Unique is missing');
-		if (!partialView.name) throw new Error('Name is missing');
+	async create(model: UmbPartialViewDetailModel) {
+		if (!model) throw new Error('Data is missing');
+		if (!model.parentUnique === undefined) throw new Error('Parent Unique is missing');
+		if (!model.name) throw new Error('Name is missing');
 
-		const parentPath = this.#serverFilePathUniqueSerializer.toServerPath(partialView.parentUnique);
+		const parentPath = this.#serverFilePathUniqueSerializer.toServerPath(model.parentUnique);
 
 		// TODO: make data mapper to prevent errors
 		const requestBody: CreatePartialViewRequestModel = {
 			parent: parentPath ? { path: parentPath } : null,
-			name: appendFileExtensionIfNeeded(partialView.name, '.cshtml'),
-			content: partialView.content,
+			name: appendFileExtensionIfNeeded(model.name, '.cshtml'),
+			content: model.content,
 		};
 
 		const { data, error } = await tryExecuteAndNotify(
@@ -92,17 +92,17 @@ export class UmbPartialViewDetailServerDataSource implements UmbDetailDataSource
 		return { data: partialView };
 	}
 
-	async update(data: UmbPartialViewDetailModel) {
-		if (!data.unique) throw new Error('Unique is missing');
+	async update(model: UmbPartialViewDetailModel) {
+		if (!model.unique) throw new Error('Unique is missing');
 
-		const path = this.#serverFilePathUniqueSerializer.toServerPath(data.unique);
+		const path = this.#serverFilePathUniqueSerializer.toServerPath(model.unique);
 		if (!path) throw new Error('Path is missing');
 
 		const requestBody: UpdatePartialViewRequestModel = {
-			content: data.content,
+			content: model.content,
 		};
 
-		const { error } = await tryExecuteAndNotify(
+		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
 			PartialViewResource.putPartialViewByPath({
 				path: encodeURIComponent(path),
@@ -110,11 +110,11 @@ export class UmbPartialViewDetailServerDataSource implements UmbDetailDataSource
 			}),
 		);
 
-		if (error) {
-			return { error };
+		if (data) {
+			return this.read(data);
 		}
 
-		return this.read(data.unique);
+		return { error };
 	}
 
 	async delete(unique: string) {

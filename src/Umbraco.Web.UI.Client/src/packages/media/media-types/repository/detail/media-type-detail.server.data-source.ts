@@ -95,45 +95,44 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 
 	/**
 	 * Inserts a new Media Type on the server
-	 * @param {UmbMediaTypeDetailModel} mediaType
+	 * @param {UmbMediaTypeDetailModel} model
 	 * @return {*}
 	 * @memberof UmbMediaTypeServerDataSource
 	 */
-	async create(mediaType: UmbMediaTypeDetailModel) {
-		if (!mediaType) throw new Error('Media Type is missing');
-		if (!mediaType.unique) throw new Error('Media Type unique is missing');
+	async create(model: UmbMediaTypeDetailModel) {
+		if (!model) throw new Error('Media Type is missing');
+		if (!model.unique) throw new Error('Media Type unique is missing');
 
 		// TODO: make data mapper to prevent errors
 		const requestBody: CreateMediaTypeRequestModel = {
-			alias: mediaType.alias,
-			name: mediaType.name,
-			description: mediaType.description,
-			icon: mediaType.icon,
-			allowedAsRoot: mediaType.allowedAsRoot,
-			variesByCulture: mediaType.variesByCulture,
-			variesBySegment: mediaType.variesBySegment,
-			isElement: mediaType.isElement,
-			properties: mediaType.properties,
-			containers: mediaType.containers,
-			allowedContentTypes: mediaType.allowedContentTypes,
-			compositions: mediaType.compositions,
-			id: mediaType.unique,
-			containerId: mediaType.parentUnique,
+			alias: model.alias,
+			name: model.name,
+			description: model.description,
+			icon: model.icon,
+			allowedAsRoot: model.allowedAsRoot,
+			variesByCulture: model.variesByCulture,
+			variesBySegment: model.variesBySegment,
+			isElement: model.isElement,
+			properties: model.properties,
+			containers: model.containers,
+			allowedContentTypes: model.allowedContentTypes,
+			compositions: model.compositions,
+			id: model.unique,
+			containerId: model.parentUnique,
 		};
 
-		const { error: createError } = await tryExecuteAndNotify(
+		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
 			MediaTypeResource.postMediaType({
 				requestBody,
 			}),
 		);
 
-		if (createError) {
-			return { error: createError };
+		if (data) {
+			return this.read(data);
 		}
 
-		// We have to fetch the data type again. The server can have modified the data after creation
-		return this.read(mediaType.unique);
+		return { error };
 	}
 
 	/**
@@ -142,39 +141,38 @@ export class UmbMediaTypeServerDataSource implements UmbDetailDataSource<UmbMedi
 	 * @return {*}
 	 * @memberof UmbMediaTypeServerDataSource
 	 */
-	async update(data: UmbMediaTypeDetailModel) {
-		if (!data.unique) throw new Error('Unique is missing');
+	async update(model: UmbMediaTypeDetailModel) {
+		if (!model.unique) throw new Error('Unique is missing');
 
 		// TODO: make data mapper to prevent errors
 		const requestBody: UpdateMediaTypeRequestModel = {
-			alias: data.alias,
-			name: data.name,
-			description: data.description,
-			icon: data.icon,
-			allowedAsRoot: data.allowedAsRoot,
-			variesByCulture: data.variesByCulture,
-			variesBySegment: data.variesBySegment,
-			isElement: data.isElement,
-			properties: data.properties,
-			containers: data.containers,
-			allowedContentTypes: data.allowedContentTypes,
-			compositions: data.compositions,
+			alias: model.alias,
+			name: model.name,
+			description: model.description,
+			icon: model.icon,
+			allowedAsRoot: model.allowedAsRoot,
+			variesByCulture: model.variesByCulture,
+			variesBySegment: model.variesBySegment,
+			isElement: model.isElement,
+			properties: model.properties,
+			containers: model.containers,
+			allowedContentTypes: model.allowedContentTypes,
+			compositions: model.compositions,
 		};
 
-		const { error } = await tryExecuteAndNotify(
+		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
 			MediaTypeResource.putMediaTypeById({
-				id: data.unique,
+				id: model.unique,
 				requestBody,
 			}),
 		);
 
-		if (error) {
-			return { error };
+		if (data) {
+			return this.read(data);
 		}
 
-		// We have to fetch the data type again. The server can have modified the data after update
-		return this.read(data.unique);
+		return { error };
 	}
 
 	/**

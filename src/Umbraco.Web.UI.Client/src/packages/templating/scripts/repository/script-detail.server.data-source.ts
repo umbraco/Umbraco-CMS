@@ -34,18 +34,18 @@ export class UmbScriptDetailServerDataSource implements UmbDetailDataSource<UmbS
 		return { data };
 	}
 
-	async create(script: UmbScriptDetailModel) {
-		if (!script) throw new Error('Data is missing');
-		if (!script.parentUnique === undefined) throw new Error('Parent Unique is missing');
-		if (!script.name) throw new Error('Name is missing');
+	async create(model: UmbScriptDetailModel) {
+		if (!model) throw new Error('Data is missing');
+		if (!model.parentUnique === undefined) throw new Error('Parent Unique is missing');
+		if (!model.name) throw new Error('Name is missing');
 
-		const parentPath = this.#serverFilePathUniqueSerializer.toServerPath(script.parentUnique);
+		const parentPath = this.#serverFilePathUniqueSerializer.toServerPath(model.parentUnique);
 
 		// TODO: make data mapper to prevent errors
 		const requestBody: CreateScriptRequestModel = {
 			parent: parentPath ? { path: parentPath } : null,
-			name: appendFileExtensionIfNeeded(script.name, '.js'),
-			content: script.content,
+			name: appendFileExtensionIfNeeded(model.name, '.js'),
+			content: model.content,
 		};
 
 		const { data, error } = await tryExecuteAndNotify(
@@ -91,17 +91,17 @@ export class UmbScriptDetailServerDataSource implements UmbDetailDataSource<UmbS
 		return { data: script };
 	}
 
-	async update(data: UmbScriptDetailModel) {
-		if (!data.unique) throw new Error('Unique is missing');
+	async update(model: UmbScriptDetailModel) {
+		if (!model.unique) throw new Error('Unique is missing');
 
-		const path = this.#serverFilePathUniqueSerializer.toServerPath(data.unique);
+		const path = this.#serverFilePathUniqueSerializer.toServerPath(model.unique);
 		if (!path) throw new Error('Path is missing');
 
 		const requestBody: UpdateScriptRequestModel = {
-			content: data.content,
+			content: model.content,
 		};
 
-		const { error } = await tryExecuteAndNotify(
+		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
 			ScriptResource.putScriptByPath({
 				path: encodeURIComponent(path),
@@ -109,11 +109,11 @@ export class UmbScriptDetailServerDataSource implements UmbDetailDataSource<UmbS
 			}),
 		);
 
-		if (error) {
-			return { error };
+		if (data) {
+			return this.read(data);
 		}
 
-		return this.read(data.unique);
+		return { error };
 	}
 
 	async delete(unique: string) {

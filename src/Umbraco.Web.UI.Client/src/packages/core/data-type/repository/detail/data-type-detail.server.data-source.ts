@@ -79,38 +79,37 @@ export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataT
 
 	/**
 	 * Inserts a new Data Type on the server
-	 * @param {UmbDataTypeDetailModel} dataType
+	 * @param {UmbDataTypeDetailModel} model
 	 * @return {*}
 	 * @memberof UmbDataTypeServerDataSource
 	 */
-	async create(dataType: UmbDataTypeDetailModel) {
-		if (!dataType) throw new Error('Data Type is missing');
-		if (!dataType.unique) throw new Error('Data Type unique is missing');
-		if (!dataType.editorAlias) throw new Error('Property Editor Alias is missing');
+	async create(model: UmbDataTypeDetailModel) {
+		if (!model) throw new Error('Data Type is missing');
+		if (!model.unique) throw new Error('Data Type unique is missing');
+		if (!model.editorAlias) throw new Error('Property Editor Alias is missing');
 
 		// TODO: make data mapper to prevent errors
 		const requestBody: CreateDataTypeRequestModel = {
-			id: dataType.unique,
-			parentId: dataType.parentUnique,
-			name: dataType.name,
-			editorAlias: dataType.editorAlias,
-			editorUiAlias: dataType.editorUiAlias,
-			values: dataType.values,
+			id: model.unique,
+			parentId: model.parentUnique,
+			name: model.name,
+			editorAlias: model.editorAlias,
+			editorUiAlias: model.editorUiAlias,
+			values: model.values,
 		};
 
-		const { error: createError } = await tryExecuteAndNotify(
+		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
 			DataTypeResource.postDataType({
 				requestBody,
 			}),
 		);
 
-		if (createError) {
-			return { error: createError };
+		if (data) {
+			return this.read(data);
 		}
 
-		// We have to fetch the data type again. The server can have modified the data after creation
-		return this.read(dataType.unique);
+		return { error };
 	}
 
 	/**
@@ -119,32 +118,31 @@ export class UmbDataTypeServerDataSource implements UmbDetailDataSource<UmbDataT
 	 * @return {*}
 	 * @memberof UmbDataTypeServerDataSource
 	 */
-	async update(data: UmbDataTypeDetailModel) {
-		if (!data.unique) throw new Error('Unique is missing');
-		if (!data.editorAlias) throw new Error('Property Editor Alias is missing');
+	async update(model: UmbDataTypeDetailModel) {
+		if (!model.unique) throw new Error('Unique is missing');
+		if (!model.editorAlias) throw new Error('Property Editor Alias is missing');
 
 		// TODO: make data mapper to prevent errors
 		const requestBody: DataTypeModelBaseModel = {
-			name: data.name,
-			editorAlias: data.editorAlias,
-			editorUiAlias: data.editorUiAlias,
-			values: data.values,
+			name: model.name,
+			editorAlias: model.editorAlias,
+			editorUiAlias: model.editorUiAlias,
+			values: model.values,
 		};
 
-		const { error } = await tryExecuteAndNotify(
+		const { data, error } = await tryExecuteAndNotify(
 			this.#host,
 			DataTypeResource.putDataTypeById({
-				id: data.unique,
+				id: model.unique,
 				requestBody,
 			}),
 		);
 
-		if (error) {
-			return { error };
+		if (data) {
+			return this.read(data);
 		}
 
-		// We have to fetch the data type again. The server can have modified the data after update
-		return this.read(data.unique);
+		return { error };
 	}
 
 	/**
