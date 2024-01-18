@@ -21,5 +21,5 @@ public class UserPermissionHandler : MustSatisfyRequirementAuthorizationHandler<
         AuthorizationHandlerContext context,
         UserPermissionRequirement requirement,
         UserPermissionResource resource) =>
-        await _userPermissionAuthorizer.IsAuthorizedAsync(context.User, resource.UserKeys);
+        await _userPermissionAuthorizer.IsDeniedAsync(context.User, resource.UserKeys) is false;
 }

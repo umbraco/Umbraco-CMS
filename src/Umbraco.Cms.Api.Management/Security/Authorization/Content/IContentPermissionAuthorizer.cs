@@ -16,7 +16,7 @@ public interface IContentPermissionAuthorizer
     /// <param name="permissionToCheck">The permission to authorize.</param>
     /// <returns>Returns <c>true</c> if authorization is successful, otherwise <c>false</c>.</returns>
     Task<bool> IsAuthorizedAsync(IPrincipal currentUser, Guid contentKey, char permissionToCheck)
-        => IsAuthorizedAsync(currentUser, contentKey.Yield(), new HashSet<char> { permissionToCheck });
+        => IsDeniedAsync(currentUser, contentKey.Yield(), new HashSet<char> { permissionToCheck });
 
     /// <summary>
     ///     Authorizes whether the current user has access to the specified content item(s).
@@ -25,7 +25,7 @@ public interface IContentPermissionAuthorizer
     /// <param name="contentKeys">The keys of the content items to check for.</param>
     /// <param name="permissionsToCheck">The collection of permissions to authorize.</param>
     /// <returns>Returns <c>true</c> if authorization is successful, otherwise <c>false</c>.</returns>
-    Task<bool> IsAuthorizedAsync(IPrincipal currentUser, IEnumerable<Guid> contentKeys, ISet<char> permissionsToCheck);
+    Task<bool> IsDeniedAsync(IPrincipal currentUser, IEnumerable<Guid> contentKeys, ISet<char> permissionsToCheck);
 
     /// <summary>
     ///     Authorizes whether the current user has access to the descendants of the specified content item.
@@ -35,7 +35,7 @@ public interface IContentPermissionAuthorizer
     /// <param name="permissionToCheck">The permission to authorize.</param>
     /// <returns>Returns <c>true</c> if authorization is successful, otherwise <c>false</c>.</returns>
     Task<bool> IsAuthorizedWithDescendantsAsync(IPrincipal currentUser, Guid parentKey, char permissionToCheck)
-        => IsAuthorizedWithDescendantsAsync(currentUser, parentKey, new HashSet<char> { permissionToCheck });
+        => IsDeniedWithDescendantsAsync(currentUser, parentKey, new HashSet<char> { permissionToCheck });
 
     /// <summary>
     ///     Authorizes whether the current user has access to the descendants of the specified content item.
@@ -44,7 +44,7 @@ public interface IContentPermissionAuthorizer
     /// <param name="parentKey">The key of the parent content item.</param>
     /// <param name="permissionsToCheck">The collection of permissions to authorize.</param>
     /// <returns>Returns <c>true</c> if authorization is successful, otherwise <c>false</c>.</returns>
-    Task<bool> IsAuthorizedWithDescendantsAsync(IPrincipal currentUser, Guid parentKey, ISet<char> permissionsToCheck);
+    Task<bool> IsDeniedWithDescendantsAsync(IPrincipal currentUser, Guid parentKey, ISet<char> permissionsToCheck);
 
     /// <summary>
     ///     Authorizes whether the current user has access to the root item.
@@ -53,7 +53,7 @@ public interface IContentPermissionAuthorizer
     /// <param name="permissionToCheck">The permission to authorize.</param>
     /// <returns>Returns <c>true</c> if authorization is successful, otherwise <c>false</c>.</returns>
     Task<bool> IsAuthorizedAtRootLevelAsync(IPrincipal currentUser, char permissionToCheck)
-        => IsAuthorizedAtRootLevelAsync(currentUser, new HashSet<char> { permissionToCheck });
+        => IsDeniedAtRootLevelAsync(currentUser, new HashSet<char> { permissionToCheck });
 
     /// <summary>
     ///     Authorizes whether the current user has access to the root item.
@@ -61,7 +61,7 @@ public interface IContentPermissionAuthorizer
     /// <param name="currentUser">The current user's principal.</param>
     /// <param name="permissionsToCheck">The collection of permissions to authorize.</param>
     /// <returns>Returns <c>true</c> if authorization is successful, otherwise <c>false</c>.</returns>
-    Task<bool> IsAuthorizedAtRootLevelAsync(IPrincipal currentUser, ISet<char> permissionsToCheck);
+    Task<bool> IsDeniedAtRootLevelAsync(IPrincipal currentUser, ISet<char> permissionsToCheck);
 
     /// <summary>
     ///     Authorizes whether the current user has access to the recycle bin item.
@@ -70,7 +70,7 @@ public interface IContentPermissionAuthorizer
     /// <param name="permissionToCheck">The permission to authorize.</param>
     /// <returns>Returns <c>true</c> if authorization is successful, otherwise <c>false</c>.</returns>
     Task<bool> IsAuthorizedAtRecycleBinLevelAsync(IPrincipal currentUser, char permissionToCheck)
-        => IsAuthorizedAtRecycleBinLevelAsync(currentUser, new HashSet<char> { permissionToCheck });
+        => IsDeniedAtRecycleBinLevelAsync(currentUser, new HashSet<char> { permissionToCheck });
 
     /// <summary>
     ///     Authorizes whether the current user has access to the recycle bin item.
@@ -78,5 +78,5 @@ public interface IContentPermissionAuthorizer
     /// <param name="currentUser">The current user's principal.</param>
     /// <param name="permissionsToCheck">The collection of permissions to authorize.</param>
     /// <returns>Returns <c>true</c> if authorization is successful, otherwise <c>false</c>.</returns>
-    Task<bool> IsAuthorizedAtRecycleBinLevelAsync(IPrincipal currentUser, ISet<char> permissionsToCheck);
+    Task<bool> IsDeniedAtRecycleBinLevelAsync(IPrincipal currentUser, ISet<char> permissionsToCheck);
 }

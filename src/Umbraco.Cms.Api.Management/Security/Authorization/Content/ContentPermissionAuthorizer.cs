@@ -18,7 +18,7 @@ internal sealed class ContentPermissionAuthorizer : IContentPermissionAuthorizer
     }
 
     /// <inheritdoc/>
-    public async Task<bool> IsAuthorizedAsync(IPrincipal currentUser, IEnumerable<Guid> contentKeys, ISet<char> permissionsToCheck)
+    public async Task<bool> IsDeniedAsync(IPrincipal currentUser, IEnumerable<Guid> contentKeys, ISet<char> permissionsToCheck)
     {
         if (!contentKeys.Any())
         {
@@ -30,36 +30,40 @@ internal sealed class ContentPermissionAuthorizer : IContentPermissionAuthorizer
 
         var result = await _contentPermissionService.AuthorizeAccessAsync(user, contentKeys, permissionsToCheck);
 
-        return result == ContentAuthorizationStatus.Success;
+        // If we do not found it, we cannot tell if you are denied
+        return result is not (ContentAuthorizationStatus.Success or ContentAuthorizationStatus.NotFound);
     }
 
     /// <inheritdoc/>
-    public async Task<bool> IsAuthorizedWithDescendantsAsync(IPrincipal currentUser, Guid parentKey, ISet<char> permissionsToCheck)
+    public async Task<bool> IsDeniedWithDescendantsAsync(IPrincipal currentUser, Guid parentKey, ISet<char> permissionsToCheck)
     {
         IUser user = _authorizationHelper.GetUmbracoUser(currentUser);
 
         var result = await _contentPermissionService.AuthorizeDescendantsAccessAsync(user, parentKey, permissionsToCheck);
 
-        return result == ContentAuthorizationStatus.Success;
+        // If we do not found it, we cannot tell if you are denied
+        return result is not (ContentAuthorizationStatus.Success or ContentAuthorizationStatus.NotFound);
     }
 
     /// <inheritdoc/>
-    public async Task<bool> IsAuthorizedAtRootLevelAsync(IPrincipal currentUser, ISet<char> permissionsToCheck)
+    public async Task<bool> IsDeniedAtRootLevelAsync(IPrincipal currentUser, ISet<char> permissionsToCheck)
     {
         IUser user = _authorizationHelper.GetUmbracoUser(currentUser);
 
         var result = await _contentPermissionService.AuthorizeRootAccessAsync(user, permissionsToCheck);
 
-        return result == ContentAuthorizationStatus.Success;
+        // If we do not found it, we cannot tell if you are denied
+        return result is not (ContentAuthorizationStatus.Success or ContentAuthorizationStatus.NotFound);
     }
 
     /// <inheritdoc/>
-    public async Task<bool> IsAuthorizedAtRecycleBinLevelAsync(IPrincipal currentUser, ISet<char> permissionsToCheck)
+    public async Task<bool> IsDeniedAtRecycleBinLevelAsync(IPrincipal currentUser, ISet<char> permissionsToCheck)
     {
         IUser user = _authorizationHelper.GetUmbracoUser(currentUser);
 
         var result = await _contentPermissionService.AuthorizeBinAccessAsync(user, permissionsToCheck);
 
-        return result == ContentAuthorizationStatus.Success;
+        // If we do not found it, we cannot tell if you are denied
+        return result is not (ContentAuthorizationStatus.Success or ContentAuthorizationStatus.NotFound);
     }
 }
