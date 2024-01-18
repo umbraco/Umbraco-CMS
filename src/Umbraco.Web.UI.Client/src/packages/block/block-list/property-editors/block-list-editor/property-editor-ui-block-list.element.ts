@@ -84,14 +84,8 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 
 	#context = new UmbBlockListManagerContext(this);
 
-	#modalContext?: UmbModalManagerContext;
-
 	constructor() {
 		super();
-
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
-			this.#modalContext = instance;
-		});
 
 		// TODO: Prevent initial notification from these observes:
 		this.observe(this.#context.layouts, (layouts) => {
@@ -126,25 +120,6 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 			.observeRouteBuilder((routeBuilder) => {
 				this._catalogueRouteBuilder = routeBuilder;
 			});
-	}
-
-	async #openBlockCatalogue(openClipboard: boolean = false) {
-		//Open modal
-		const modalContext = this.#modalContext?.open(UMB_BLOCK_CATALOGUE_MODAL, {
-			data: { blocks: this._blocks ?? [], openClipboard },
-		});
-
-		await modalContext?.onSubmit();
-
-		/*
-		if (!data) return;
-
-		const block = this._blocks?.find((x) => x.contentElementTypeKey === data.key);
-
-		if (!block?.contentElementTypeKey) return;
-
-		this.#context.createBlock(block.contentElementTypeKey);
-		*/
 	}
 
 	render() {
