@@ -99,7 +99,7 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 									name=${ifDefined(block.label)}
 									background=${ifDefined(block.backgroundColor)}
 									style="color: ${block.iconColor}"
-									href="${this._workspacePath}/create/${block.contentElementTypeKey}">
+									href="${this._workspacePath}create/${block.contentElementTypeKey}">
 									<uui-icon .name=${block.icon ?? ''}></uui-icon>
 								</uui-card-block-type>
 							`,
