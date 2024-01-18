@@ -37,7 +37,7 @@ export class UmbPropertyContext<ValueType = any> extends UmbBaseController {
 	private _editor = new UmbBasicState<UmbPropertyEditorUiElement | undefined>(undefined);
 	public readonly editor = this._editor.asObservable();
 	setEditor(editor: UmbPropertyEditorUiElement | undefined) {
-		this._editor.next(editor ?? undefined);
+		this._editor.setValue(editor ?? undefined);
 	}
 	getEditor() {
 		return this._editor.getValue();
@@ -68,7 +68,7 @@ export class UmbPropertyContext<ValueType = any> extends UmbBaseController {
 		this._providerController = new UmbContextProviderController(host, UMB_PROPERTY_CONTEXT, this);
 
 		this.observe(this.configValues, (configValues) => {
-			this.#configCollection.next(configValues ? new UmbPropertyEditorConfigCollection(configValues) : undefined);
+			this.#configCollection.setValue(configValues ? new UmbPropertyEditorConfigCollection(configValues) : undefined);
 		});
 
 		this.observe(this.variantId, () => {
@@ -86,7 +86,7 @@ export class UmbPropertyContext<ValueType = any> extends UmbBaseController {
 		this._observePropertyVariant?.destroy();
 		if (variantIdSubject) {
 			this._observePropertyVariant = this.observe(variantIdSubject, (variantId) => {
-				this.#variantId.next(variantId);
+				this.#variantId.setValue(variantId);
 			});
 		}
 
@@ -96,7 +96,7 @@ export class UmbPropertyContext<ValueType = any> extends UmbBaseController {
 		this._observePropertyValue?.destroy();
 		if (subject) {
 			this._observePropertyValue = this.observe(subject, (value) => {
-				this.#value.next(value);
+				this.#value.setValue(value);
 			});
 		}
 	}
@@ -104,19 +104,19 @@ export class UmbPropertyContext<ValueType = any> extends UmbBaseController {
 	private _generateVariantDifferenceString() {
 		if (!this.#datasetContext) return;
 		const contextVariantId = this.#datasetContext.getVariantId?.() ?? undefined;
-		this._variantDifference.next(
+		this._variantDifference.setValue(
 			contextVariantId ? this.#variantId.getValue()?.toDifferencesString(contextVariantId) : '',
 		);
 	}
 
 	public setAlias(alias: string | undefined) {
-		this.#alias.next(alias);
+		this.#alias.setValue(alias);
 	}
 	public setLabel(label: string | undefined) {
-		this.#label.next(label);
+		this.#label.setValue(label);
 	}
 	public setDescription(description: string | undefined) {
-		this.#description.next(description);
+		this.#description.setValue(description);
 	}
 	/**
 	 * Set the value of this property.
@@ -136,10 +136,10 @@ export class UmbPropertyContext<ValueType = any> extends UmbBaseController {
 		return this.#value.getValue();
 	}
 	public setConfig(config: Array<UmbPropertyEditorConfigProperty> | undefined) {
-		this.#configValues.next(config ?? []);
+		this.#configValues.setValue(config ?? []);
 	}
 	public setVariantId(variantId: UmbVariantId | undefined) {
-		this.#variantId.next(variantId);
+		this.#variantId.setValue(variantId);
 	}
 	public getVariantId() {
 		return this.#variantId.getValue();

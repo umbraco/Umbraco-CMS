@@ -96,9 +96,9 @@ export class UmbContentTypeContainerStructureHelper {
 		if (!this.#structure || !this._ownerType) return;
 
 		if (this._isRoot) {
-			this.#containers.next([]);
+			this.#containers.setValue([]);
 			// We cannot have root properties currently, therefor we set it to false:
-			this.#hasProperties.next(false);
+			this.#hasProperties.setValue(false);
 			this._observeRootContainers();
 			new UmbObserverController(
 				this.#host,
@@ -113,7 +113,7 @@ export class UmbContentTypeContainerStructureHelper {
 				this.#host,
 				this.#structure.containersByNameAndType(this._ownerName, this._ownerType),
 				(ownerALikeContainers) => {
-					this.#containers.next([]);
+					this.#containers.setValue([]);
 					this._ownerContainers = ownerALikeContainers.filter((x) => x.id === this._ownerId) || [];
 					this._ownerAlikeContainers = ownerALikeContainers || [];
 					if (this._ownerAlikeContainers.length > 0) {
@@ -134,7 +134,7 @@ export class UmbContentTypeContainerStructureHelper {
 				this.#host,
 				this.#structure!.hasPropertyStructuresOf(container.id!),
 				(hasProperties) => {
-					this.#hasProperties.next(hasProperties);
+					this.#hasProperties.setValue(hasProperties);
 				},
 				'_observeOwnerHasProperties_' + container.id,
 			);
@@ -161,7 +161,7 @@ export class UmbContentTypeContainerStructureHelper {
 			this.#host,
 			this.#structure.rootContainers(this._childType!),
 			(rootContainers) => {
-				this.#containers.next([]);
+				this.#containers.setValue([]);
 				this._insertGroupContainers(rootContainers);
 			},
 			'_observeRootContainers',

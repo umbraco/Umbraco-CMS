@@ -47,7 +47,7 @@ export class UmbRepositoryItemsManager<ItemType> extends UmbBaseController {
 
 		this.observe(this.uniques, (uniques) => {
 			if (uniques.length === 0) {
-				this.#items.next([]);
+				this.#items.setValue([]);
 				return;
 			}
 
@@ -57,7 +57,7 @@ export class UmbRepositoryItemsManager<ItemType> extends UmbBaseController {
 				uniques.length === items.length &&
 				uniques.every((unique) => items.find((item) => this.#getUnique(item) === unique))
 			) {
-				this.#items.next(this.#sortByUniques(items));
+				this.#items.setValue(this.#sortByUniques(items));
 			} else {
 				// We need to load new items, so ...
 				this.#requestItems();
@@ -70,7 +70,7 @@ export class UmbRepositoryItemsManager<ItemType> extends UmbBaseController {
 	}
 
 	setUniques(uniques: string[]) {
-		this.#uniques.next(uniques);
+		this.#uniques.setValue(uniques);
 	}
 
 	getItems() {
@@ -90,7 +90,7 @@ export class UmbRepositoryItemsManager<ItemType> extends UmbBaseController {
 			this.observe(
 				asObservable(),
 				(data) => {
-					this.#items.next(this.#sortByUniques(data));
+					this.#items.setValue(this.#sortByUniques(data));
 				},
 				'_observeRequestedItems',
 			);

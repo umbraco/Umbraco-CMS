@@ -28,7 +28,7 @@ export class UmbScriptWorkspaceContext extends UmbEditableWorkspaceContextBase<U
 	async #loadCodeEditor() {
 		try {
 			await loadCodeEditor();
-			this.#isCodeEditorReady.next(true);
+			this.#isCodeEditorReady.setValue(true);
 		} catch (error) {
 			console.error(error);
 		}
@@ -50,7 +50,7 @@ export class UmbScriptWorkspaceContext extends UmbEditableWorkspaceContextBase<U
 		const { data } = await this.repository.requestByKey(entityKey);
 		if (data) {
 			this.setIsNew(false);
-			this.#data.next(data);
+			this.#data.setValue(data);
 		}
 	}
 
@@ -60,7 +60,7 @@ export class UmbScriptWorkspaceContext extends UmbEditableWorkspaceContextBase<U
 			path: parentKey,
 			content: '',
 		};
-		this.#data.next(newScript);
+		this.#data.setValue(newScript);
 		this.setIsNew(true);
 	}
 
