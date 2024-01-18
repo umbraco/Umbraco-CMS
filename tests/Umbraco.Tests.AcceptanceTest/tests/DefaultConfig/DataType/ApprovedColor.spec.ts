@@ -1,20 +1,17 @@
 ﻿import {test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
-test.describe('Approved Color tests', () => {
+const dataTypeName = 'Approved Color';
+test.describe(`${dataTypeName} tests`, () => {
   let dataTypeDefaultData = null;
-  let dataTypeData = null;
-  const dataTypeName = 'Approved Color';
+  let dataTypeData = null;  
   const colorValue = '#ffffff';
   const colorLabel = 'TestColor';
 
   test.beforeEach(async ({umbracoUi, umbracoApi}) => {
     await umbracoUi.goToBackOffice();
     await umbracoUi.dataType.goToSettingsTreeItem('Data Types');
-    await umbracoUi.dataType.goToDataType(dataTypeName);
     dataTypeDefaultData = await umbracoApi.dataType.getByName(dataTypeName);
-    dataTypeDefaultData.values = [];
-    await umbracoApi.dataType.update(dataTypeDefaultData.id, dataTypeDefaultData);  
   });
 
   test.afterEach(async ({umbracoApi}) => {
@@ -31,6 +28,11 @@ test.describe('Approved Color tests', () => {
         "value": true
       }
     ];
+    // Remove all existing values
+    dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+    dataTypeData.values = [];
+    await umbracoApi.dataType.update(dataTypeData.id, dataTypeData); 
+    await umbracoUi.dataType.goToDataType(dataTypeName);
 
     // Act
     await umbracoUi.dataType.clickIncludeLabelsSlider();
@@ -55,6 +57,11 @@ test.describe('Approved Color tests', () => {
         ]
       }
     ];
+    // Remove all existing values
+    dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
+    dataTypeData.values = [];
+    await umbracoApi.dataType.update(dataTypeData.id, dataTypeData); 
+    await umbracoUi.dataType.goToDataType(dataTypeName);
 
     // Act
     await umbracoUi.dataType.addColor(colorValue, colorLabel);
@@ -68,7 +75,7 @@ test.describe('Approved Color tests', () => {
 
   test('can remove color', async ({umbracoApi, umbracoUi}) => {  
     // Arrange
-    const dataTypeValues = [
+    const removedDataTypeValues = [
       {
         "alias": "items",
         "value": [
@@ -79,10 +86,11 @@ test.describe('Approved Color tests', () => {
         ]
       }
     ];
+    // Remove all existing values and add a color to remove
     dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-    dataTypeData.values = dataTypeValues;
-    await umbracoApi.dataType.update(dataTypeData.id, dataTypeData);  
-    await umbracoUi.reloadPage();
+    dataTypeData.values = removedDataTypeValues;
+    await umbracoApi.dataType.update(dataTypeData.id, dataTypeData); 
+    await umbracoUi.dataType.goToDataType(dataTypeName);
 
     // Act
     await umbracoUi.dataType.removeColorByValue(colorValue);
