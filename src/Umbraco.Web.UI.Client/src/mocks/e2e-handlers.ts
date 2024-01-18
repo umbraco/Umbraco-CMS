@@ -20,7 +20,7 @@ import { handlers as trackedReferenceHandlers } from './handlers/tracked-referen
 
 export const handlers = [
 	serverHandlers.serverRunningHandler,
-	serverHandlers.serverVersionHandler,
+	serverHandlers.serverInformationHandler,
 	manifestsHandlers.manifestEmptyHandler,
 	...auditLogHandlers,
 	...installHandlers,
