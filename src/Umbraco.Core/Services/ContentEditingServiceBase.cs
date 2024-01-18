@@ -103,12 +103,16 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     }
 
     protected async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleMoveToRecycleBinAsync(Guid key, Guid userKey)
-        => await HandleDeletionAsync(key, userKey, ContentTrashStatusRequirement.MustBeNotTrashed, MoveToRecycleBin);
+        => await HandleDeletionAsync(key, userKey, ContentTrashStatusRequirement.MustNotBeTrashed, MoveToRecycleBin);
 
     protected async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleDeleteAsync(Guid key, Guid userKey, bool mustBeTrashed = true)
         => await HandleDeletionAsync(key, userKey, mustBeTrashed ? ContentTrashStatusRequirement.MustBeTrashed : ContentTrashStatusRequirement.Irrelevant, Delete);
 
-    // helper method to perform move-to-recycle-bin and delete for content as they are very much handled in the same way
+    // helper method to perform move-to-recycle-bin, delete-from-recycle-bin and delete for content as they are very much handled in the same way
+    // IContentEditingService methods hitting this (ContentTrashStatusRequirement, calledFunction):
+    // DeleteAsync (irrelevant, Delete)
+    // MoveToRecycleBinAsync (MustNotBeTrashed, MoveToRecycleBin)
+    // DeleteFromRecycleBinAsync (MustBeTrashed, Delete)
     private async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleDeletionAsync(Guid key, Guid userKey, ContentTrashStatusRequirement trashStatusRequirement, Func<TContent, int, OperationResult?> performDelete)
     {
         using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
@@ -118,8 +122,9 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
             return await Task.FromResult(Attempt.FailWithStatus(ContentEditingOperationStatus.NotFound, content));
         }
 
+        // checking the trash status is not done when it is irrelevant
         if ((trashStatusRequirement is ContentTrashStatusRequirement.MustBeTrashed && content.Trashed is false)
-            || (trashStatusRequirement is ContentTrashStatusRequirement.MustBeNotTrashed && content.Trashed is true))
+            || (trashStatusRequirement is ContentTrashStatusRequirement.MustNotBeTrashed && content.Trashed is true))
         {
             ContentEditingOperationStatus status = trashStatusRequirement is ContentTrashStatusRequirement.MustBeTrashed
                 ? ContentEditingOperationStatus.NotInTrash
@@ -472,10 +477,13 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     private static Dictionary<string, IPropertyType> GetPropertyTypesByAlias(TContentType contentType)
         => contentType.CompositionPropertyTypes.ToDictionary(pt => pt.Alias);
 
+    /// <summary>
+    /// Should never be made public, serves the purpose of a nullable bool but more readable.
+    /// </summary>
     private enum ContentTrashStatusRequirement
     {
         Irrelevant,
         MustBeTrashed,
-        MustBeNotTrashed
+        MustNotBeTrashed
     }
 }
