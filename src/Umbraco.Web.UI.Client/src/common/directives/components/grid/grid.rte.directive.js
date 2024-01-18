@@ -36,7 +36,6 @@ angular.module("umbraco.directives")
 
                 //stores a reference to the editor
                 let tinyMceEditor = null;
-                const umbPanelBody = document.querySelector(".umb-panel-body");
 
                 const assetPromises = [];
 
