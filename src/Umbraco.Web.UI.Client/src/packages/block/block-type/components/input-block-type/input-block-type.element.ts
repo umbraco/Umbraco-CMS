@@ -154,7 +154,7 @@ export class UmbInputBlockTypeElement<
 	render() {
 		return html`${repeat(
 			this._mappedGroups,
-			(group) => group.key + group.blocks,
+			(group) => group.key,
 			(group) =>
 				html` ${group.key
 						? html`<uui-input
