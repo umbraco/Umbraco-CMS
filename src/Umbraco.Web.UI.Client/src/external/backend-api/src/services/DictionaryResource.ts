@@ -55,7 +55,7 @@ export class DictionaryResource {
             url: '/umbraco/management/api/v1/dictionary',
             body: requestBody,
             mediaType: 'application/json',
-            responseHeader: 'Location',
+            responseHeader: 'Umb-Generated-Resource',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
@@ -205,7 +205,7 @@ export class DictionaryResource {
             url: '/umbraco/management/api/v1/dictionary/import',
             body: requestBody,
             mediaType: 'application/json',
-            responseHeader: 'Location',
+            responseHeader: 'Umb-Generated-Resource',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
