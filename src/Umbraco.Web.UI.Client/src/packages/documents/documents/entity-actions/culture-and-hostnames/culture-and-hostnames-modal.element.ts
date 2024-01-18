@@ -19,7 +19,6 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 	#languageRepository = new UmbLanguageRepository(this);
 
 	#unique?: string | null;
-	#defaultIsoCode = '';
 	#languageModel: Array<LanguageResponseModel> = [];
 
 	@state()
@@ -37,10 +36,9 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 		this.modalContext?.submit();
 	}
 
-	async firstUpdated() {
+	firstUpdated() {
 		this.#unique = this.data?.unique;
-		await this.#getDomains(); // Domains before Language as it is needed to set the pre selected value for language options
-		await this.#getLanguages();
+		this.#getDomains();
 	}
 
 	async #getDomains() {
@@ -48,14 +46,13 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 		const { data } = await this.#documentRepository.getCultureAndHostnames(this.#unique);
 
 		if (!data) return;
-		this.#defaultIsoCode = data.defaultIsoCode ?? '';
 		this._domains = data.domains.map((domain) => ({ isoCode: domain.isoCode, domainName: domain.domainName }));
 
 		this.value = { defaultIsoCode: data.defaultIsoCode, domains: this._domains };
-		return;
+		this.#getLanguages(data.defaultIsoCode);
 	}
 
-	async #getLanguages() {
+	async #getLanguages(defaultIsoCode?: string) {
 		const { data } = await this.#languageRepository.requestLanguages();
 		if (!data) return;
 
@@ -63,25 +60,23 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 
 		const options = data.items.map((item) => ({
 			name: item.name,
-			selected: item.isoCode === this.#defaultIsoCode,
+			selected: item.isoCode === defaultIsoCode,
 			value: item.isoCode,
 		}));
-		options.unshift({ value: 'inherit', name: 'Inherit', selected: this.#defaultIsoCode ? false : true });
+		options.unshift({ value: 'inherit', name: 'Inherit', selected: defaultIsoCode ? false : true });
 		this._options = options;
-
-		return;
 	}
 
 	#onChangeLanguage(e: UUISelectEvent) {
-		//save new language
 		this.value = { ...this.value, defaultIsoCode: e.target.value as string };
 	}
 
 	#addDomain(currentDomain?: boolean) {
+		const defaultModel = this.#languageModel.find((model) => model.isDefault);
 		if (currentDomain) {
-			this._domains = [...this._domains, { isoCode: this.#defaultIsoCode, domainName: window.location.host }];
+			this._domains = [...this._domains, { isoCode: defaultModel?.isoCode ?? '', domainName: window.location.host }];
 		} else {
-			this._domains = [...this._domains, { isoCode: this.#defaultIsoCode, domainName: '' }];
+			this._domains = [...this._domains, { isoCode: defaultModel?.isoCode ?? '', domainName: '' }];
 		}
 
 		this.value = { ...this.value, domains: this._domains };
