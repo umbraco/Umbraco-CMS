@@ -1,8 +1,9 @@
 import { UmbBlockManagerContext } from '@umbraco-cms/backoffice/block';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { UmbId } from '@umbraco-cms/backoffice/id';
-import { buildUdi } from '@umbraco-cms/backoffice/utils';
 
+/**
+ * A implementation of the Block Manager specifically for the Block List.
+ */
 export class UmbBlockListManagerContext extends UmbBlockManagerContext {
 	createBlock(contentElementTypeKey: string) {
 		return super._createBlockData({}, contentElementTypeKey);

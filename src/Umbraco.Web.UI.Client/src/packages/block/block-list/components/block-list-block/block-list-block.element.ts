@@ -5,6 +5,7 @@ import { type UmbBlockLayoutBaseModel } from '@umbraco-cms/backoffice/block';
 import '../ref-list-block/index.js';
 import { UmbBlockContext } from '@umbraco-cms/backoffice/block';
 import { UMB_CONFIRM_MODAL, UMB_MODAL_MANAGER_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
+import { encodeFilePath } from '@umbraco-cms/backoffice/utils';
 
 /**
  * @element umb-property-editor-ui-block-list-block
@@ -45,9 +46,9 @@ export class UmbPropertyEditorUIBlockListBlockElement extends UmbLitElement impl
 		this.observe(this.#context.label, (label) => {
 			this._label = label;
 		});
-		this.observe(this.#context.layout, (layout) => {
+		/*this.observe(this.#context.layout, (layout) => {
 			console.log('layout', layout);
-		});
+		});*/
 	}
 
 	#requestDelete() {
@@ -78,7 +79,10 @@ export class UmbPropertyEditorUIBlockListBlockElement extends UmbLitElement impl
 			${this.#renderRefBlock()}
 			<uui-action-bar>
 				${this._workspacePath
-					? html`<uui-button label="edit" compact href=${this._workspacePath + 'edit/' + this._contentUdi}>
+					? html`<uui-button
+							label="edit"
+							compact
+							href=${this._workspacePath + 'edit/' + encodeFilePath(this._contentUdi!)}>
 							<uui-icon name="icon-edit"></uui-icon>
 					  </uui-button>`
 					: ''}
@@ -90,7 +94,7 @@ export class UmbPropertyEditorUIBlockListBlockElement extends UmbLitElement impl
 	}
 
 	render() {
-		return this.layout ? this.#renderBlock() : '';
+		return this.layout && this._contentUdi ? this.#renderBlock() : '';
 	}
 
 	static styles = [
