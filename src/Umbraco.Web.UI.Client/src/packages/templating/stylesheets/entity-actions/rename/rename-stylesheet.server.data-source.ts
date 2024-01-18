@@ -1,8 +1,8 @@
+import { UmbStylesheetDetailServerDataSource } from '../../repository/stylesheet-detail.server.data-source.js';
 import {
 	UmbServerFilePathUniqueSerializer,
 	appendFileExtensionIfNeeded,
 } from '@umbraco-cms/backoffice/server-file-system';
-import { UmbStylesheetDetailServerDataSource } from '../../repository/stylesheet-detail.server.data-source.js';
 import { RenameStylesheetRequestModel, StylesheetResource } from '@umbraco-cms/backoffice/backend-api';
 import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
