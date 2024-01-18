@@ -17,20 +17,17 @@ public class EmptyDocumentRecycleBinController : DocumentRecycleBinControllerBas
     private readonly IAuthorizationService _authorizationService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly IContentService _contentService;
-    private readonly IUserIdKeyResolver _userIdKeyResolver;
 
     public EmptyDocumentRecycleBinController(
         IEntityService entityService,
         IAuthorizationService authorizationService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-        IContentService contentService,
-        IUserIdKeyResolver userIdKeyResolver)
+        IContentService contentService)
         : base(entityService)
     {
         _authorizationService = authorizationService;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
         _contentService = contentService;
-        _userIdKeyResolver = userIdKeyResolver;
     }
 
     [HttpDelete]
@@ -48,7 +45,7 @@ public class EmptyDocumentRecycleBinController : DocumentRecycleBinControllerBas
             return Forbidden();
         }
 
-        OperationResult result = _contentService.EmptyRecycleBin(await _userIdKeyResolver.GetAsync(CurrentUserKey(_backOfficeSecurityAccessor)));
+        OperationResult result = await _contentService.EmptyRecycleBinAsync(CurrentUserKey(_backOfficeSecurityAccessor));
         return result.Success
             ? Ok()
             : OperationStatusResult(result);
