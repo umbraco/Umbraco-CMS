@@ -1,9 +1,9 @@
+import { UmbScriptDetailModel } from '../types.js';
+import { UMB_SCRIPT_ENTITY_TYPE } from '../entity.js';
 import {
 	UmbServerFilePathUniqueSerializer,
 	appendFileExtensionIfNeeded,
 } from '@umbraco-cms/backoffice/server-file-system';
-import { UmbScriptDetailModel } from '../types.js';
-import { UMB_SCRIPT_ENTITY_TYPE } from '../entity.js';
 import {
 	CreateScriptRequestModel,
 	ScriptResource,
