@@ -12,4 +12,3 @@ export type CreateContentForDocumentRequestModel = {
     id?: string | null;
     parentId?: string | null;
 };
-

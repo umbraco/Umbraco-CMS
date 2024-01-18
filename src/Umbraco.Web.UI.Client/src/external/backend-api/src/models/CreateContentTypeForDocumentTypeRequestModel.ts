@@ -24,4 +24,3 @@ export type CreateContentTypeForDocumentTypeRequestModel = {
     id?: string | null;
     containerId?: string | null;
 };
-

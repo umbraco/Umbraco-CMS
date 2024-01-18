@@ -8,4 +8,3 @@ export type PackageManifestResponseModel = {
     version?: string | null;
     extensions: Array<any>;
 };
-

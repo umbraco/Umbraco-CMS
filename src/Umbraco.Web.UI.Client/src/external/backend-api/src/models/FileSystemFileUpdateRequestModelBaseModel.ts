@@ -6,4 +6,3 @@
 export type FileSystemFileUpdateRequestModelBaseModel = {
     content: string;
 };
-

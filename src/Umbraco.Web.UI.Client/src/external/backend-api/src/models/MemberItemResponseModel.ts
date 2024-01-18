@@ -6,6 +6,5 @@
 import type { ItemResponseModelBaseModel } from './ItemResponseModelBaseModel';
 
 export type MemberItemResponseModel = (ItemResponseModelBaseModel & {
-    icon?: string | null;
+icon?: string | null;
 });
-

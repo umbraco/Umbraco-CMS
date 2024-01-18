@@ -11,4 +11,3 @@ export type ServerInformationResponseModel = {
     baseUtcOffset: string;
     runtimeMode: RuntimeModeModel;
 };
-

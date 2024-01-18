@@ -6,4 +6,3 @@
 import type { UpdateContentForMediaRequestModel } from './UpdateContentForMediaRequestModel';
 
 export type UpdateMediaRequestModel = UpdateContentForMediaRequestModel;
-

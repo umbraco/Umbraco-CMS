@@ -38,7 +38,7 @@ import { handlers as configHandlers } from './handlers/config.handlers.js';
 import { handlers as scriptHandlers } from './handlers/script/index.js';
 
 const handlers = [
-	serverHandlers.serverVersionHandler,
+	serverHandlers.serverInformationHandler,
 	...auditLogHandlers,
 	...configHandlers,
 	...cultureHandlers,

@@ -8,4 +8,3 @@ export type ContentTypeCompositionResponseModelBaseModel = {
     name: string;
     icon: string;
 };
-

@@ -7,4 +7,3 @@ export type PublicAccessBaseModel = {
     loginPageId: string;
     errorPageId: string;
 };
-

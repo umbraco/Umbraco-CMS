@@ -7,4 +7,3 @@ export type ServerConfigurationItemResponseModel = {
     name: string;
     data: string;
 };
-
