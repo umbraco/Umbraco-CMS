@@ -1,5 +1,6 @@
 import { UmbBlockListManagerContext } from '../../manager/block-list-manager.context.js';
 import '../../components/block-list-block/index.js';
+import { type UmbPropertyEditorUIBlockListBlockElement } from '../../components/block-list-block/index.js';
 import { UMB_BLOCK_LIST_PROPERTY_EDITOR_ALIAS } from './manifests.js';
 import { html, customElement, property, state, repeat, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -15,16 +16,37 @@ import {
 import type { NumberRangeValueType } from '@umbraco-cms/backoffice/models';
 import { UmbModalRouteBuilder, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import { UmbSorterConfig, UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 
 export interface UmbBlockListLayoutModel extends UmbBlockLayoutBaseModel {}
 
 export interface UmbBlockListValueModel extends UmbBlockValueType<UmbBlockListLayoutModel> {}
+
+const SORTER_CONFIG: UmbSorterConfig<UmbBlockListLayoutModel, UmbPropertyEditorUIBlockListBlockElement> = {
+	compareElementToModel: (element, model) => {
+		return element.getAttribute('data-udi') === model.contentUdi;
+	},
+	querySelectModelToElement: (container, modelEntry) => {
+		return container.querySelector("umb-property-editor-ui-block-list-block[data-udi='" + modelEntry.contentUdi + "']");
+	},
+	identifier: 'block-list-editor',
+	itemSelector: 'umb-property-editor-ui-block-list-block',
+	//containerSelector: 'EMPTY ON PURPOSE, SO IT BECOMES THE HOST ELEMENT',
+};
 
 /**
  * @element umb-property-editor-ui-block-list
  */
 @customElement('umb-property-editor-ui-block-list')
 export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implements UmbPropertyEditorUiElement {
+	//
+	#sorter = new UmbSorterController<UmbBlockListLayoutModel, UmbPropertyEditorUIBlockListBlockElement>(this, {
+		...SORTER_CONFIG,
+		onChange: ({ model }) => {
+			this.#context.setLayouts(model);
+		},
+	});
+
 	private _value: UmbBlockListValueModel = {
 		layout: {},
 		contentData: [],
@@ -89,6 +111,7 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 			//console.log('layout changed', this._value);
 			// TODO: idea: consider inserting an await here, so other changes could appear first? Maybe some mechanism to only fire change event onces?
 			this._layouts = layouts;
+			this.#sorter.setModel(layouts);
 			this.dispatchEvent(new UmbChangeEvent());
 		});
 		this.observe(this.#context.contents, (contents) => {
@@ -123,7 +146,7 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 				(x) => x.contentUdi,
 				(layoutEntry) =>
 					html`<uui-button-inline-create></uui-button-inline-create>
-						<umb-property-editor-ui-block-list-block .layout=${layoutEntry}>
+						<umb-property-editor-ui-block-list-block data-udi=${layoutEntry.contentUdi} .layout=${layoutEntry}>
 						</umb-property-editor-ui-block-list-block> `,
 			)}
 			<uui-button-group>
