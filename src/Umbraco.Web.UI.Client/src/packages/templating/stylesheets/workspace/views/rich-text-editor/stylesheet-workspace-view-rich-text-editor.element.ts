@@ -27,7 +27,7 @@ const SORTER_CONFIG: UmbSorterConfig<RichTextRuleModel> = {
 		return element.getAttribute('data-umb-rule-name') === model.name;
 	},
 	querySelectModelToElement: (container: HTMLElement, modelEntry: RichTextRuleModel) => {
-		return container.querySelector('data-umb-rule-name[' + modelEntry.name + ']');
+		return container.querySelector('[data-umb-rule-name' + modelEntry.name + ']');
 	},
 	identifier: 'stylesheet-rules-sorter',
 	itemSelector: 'umb-stylesheet-rich-text-editor-rule',
@@ -44,12 +44,21 @@ export class UmbStylesheetWorkspaceViewRichTextEditorElement extends UmbLitEleme
 
 	#sorter = new UmbSorterController(this, {
 		...SORTER_CONFIG,
+		// TODO: Implement correctly, this code below was not correct:
+		/*
 		performItemInsert: ({ item, newIndex }) => {
 			return this.#context?.findNewSortOrder(item, newIndex) ?? false;
 		},
 		performItemRemove: () => {
 			//defined so the default does not run
 			return true;
+		},
+		*/
+		// End of todo comment.
+		onChange: ({ model }) => {
+			const oldValue = this._rules;
+			this._rules = model;
+			this.requestUpdate('_rules', oldValue);
 		},
 	});
 

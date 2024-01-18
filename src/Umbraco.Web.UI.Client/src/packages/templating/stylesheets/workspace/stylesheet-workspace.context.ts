@@ -4,7 +4,7 @@ import {
 	type UmbSaveableWorkspaceContextInterface,
 	UmbEditableWorkspaceContextBase,
 } from '@umbraco-cms/backoffice/workspace';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState, UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
 import type { RichTextRuleModel, UpdateStylesheetRequestModel } from '@umbraco-cms/backoffice/backend-api';
@@ -13,9 +13,12 @@ import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 export type RichTextRuleModelSortable = RichTextRuleModel & { sortOrder?: number };
 
 export class UmbStylesheetWorkspaceContext
-	extends UmbEditableWorkspaceContextBase<UmbStylesheetRepository, UmbStylesheetDetailModel>
-	implements UmbSaveableWorkspaceContextInterface<UmbStylesheetDetailModel | undefined>
+	extends UmbEditableWorkspaceContextBase<UmbStylesheetDetailModel>
+	implements UmbSaveableWorkspaceContextInterface
 {
+	//
+	public readonly repository: UmbStylesheetRepository = new UmbStylesheetRepository(this);
+
 	#data = new UmbObjectState<UmbStylesheetDetailModel | undefined>(undefined);
 	#rules = new UmbArrayState<RichTextRuleModelSortable>([], (rule) => rule.name);
 	readonly data = this.#data.asObservable();
@@ -27,8 +30,8 @@ export class UmbStylesheetWorkspaceContext
 	#isCodeEditorReady = new UmbBooleanState(false);
 	readonly isCodeEditorReady = this.#isCodeEditorReady.asObservable();
 
-	constructor(host: UmbControllerHostElement) {
-		super(host, 'Umb.Workspace.StyleSheet', new UmbStylesheetRepository(host));
+	constructor(host: UmbControllerHost) {
+		super(host, 'Umb.Workspace.StyleSheet');
 		this.#rules.sortBy((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
 		this.#loadCodeEditor();
 	}
@@ -36,7 +39,7 @@ export class UmbStylesheetWorkspaceContext
 	async #loadCodeEditor() {
 		try {
 			await loadCodeEditor();
-			this.#isCodeEditorReady.next(true);
+			this.#isCodeEditorReady.setValue(true);
 		} catch (error) {
 			console.error(error);
 		}
@@ -69,7 +72,7 @@ export class UmbStylesheetWorkspaceContext
 
 	setRules(rules: RichTextRuleModelSortable[]) {
 		const newRules = rules.map((r, i) => ({ ...r, sortOrder: i }));
-		this.#rules.next(newRules);
+		this.#rules.setValue(newRules);
 		this.sendRulesGetContent();
 	}
 
@@ -96,9 +99,9 @@ export class UmbStylesheetWorkspaceContext
 
 		if (rules.data) {
 			const x = rules.data.rules?.map((r, i) => ({ ...r, sortOrder: i })) ?? [];
-			this.#rules.next(x);
+			this.#rules.setValue(x);
 		} else {
-			this.#rules.next([]);
+			this.#rules.setValue([]);
 		}
 	}
 
@@ -172,7 +175,7 @@ export class UmbStylesheetWorkspaceContext
 			content: '',
 		};
 
-		this.#data.next(newStylesheet);
+		this.#data.setValue(newStylesheet);
 		this.setIsNew(true);
 	}
 

@@ -101,3 +101,14 @@ export const WithHiddenIcons: Story = {
 		},
 	},
 };
+
+export const WithHiddenIconsAndDisallowedSelections: Story = {
+	args: {
+		items: items,
+		columns: columns,
+		config: {
+			allowSelection: false,
+			hideIcon: true,
+		},
+	},
+};

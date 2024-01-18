@@ -7,13 +7,16 @@ import {
 } from '@umbraco-cms/backoffice/workspace';
 import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { TemplateItemResponseModel, TemplateResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 export class UmbTemplateWorkspaceContext
-	extends UmbEditableWorkspaceContextBase<UmbTemplateRepository, TemplateResponseModel>
+	extends UmbEditableWorkspaceContextBase<TemplateResponseModel>
 	implements UmbSaveableWorkspaceContextInterface
 {
+	//
+	public readonly repository: UmbTemplateRepository = new UmbTemplateRepository(this);
+
 	#data = new UmbObjectState<TemplateResponseModel | undefined>(undefined);
 	data = this.#data.asObservable();
 	#masterTemplate = new UmbObjectState<TemplateItemResponseModel | null>(null);
@@ -28,17 +31,17 @@ export class UmbTemplateWorkspaceContext
 	isCodeEditorReady = this.#isCodeEditorReady.asObservable();
 
 	// TODO: temp solution until we have automatic tree updates
-	#treeRepository = new UmbTemplateTreeRepository(this.host);
+	#treeRepository = new UmbTemplateTreeRepository(this);
 
-	constructor(host: UmbControllerHostElement) {
-		super(host, 'Umb.Workspace.Template', new UmbTemplateRepository(host));
+	constructor(host: UmbControllerHost) {
+		super(host, 'Umb.Workspace.Template');
 		this.#loadCodeEditor();
 	}
 
 	async #loadCodeEditor() {
 		try {
 			await loadCodeEditor();
-			this.#isCodeEditorReady.next(true);
+			this.#isCodeEditorReady.setValue(true);
 		} catch (error) {
 			console.error(error);
 		}
@@ -81,20 +84,20 @@ export class UmbTemplateWorkspaceContext
 		if (data) {
 			this.setIsNew(false);
 			this.setMasterTemplate(data.masterTemplateId ?? null);
-			this.#data.next(data);
+			this.#data.setValue(data);
 		}
 	}
 
 	async setMasterTemplate(id: string | null) {
 		if (id === null) {
-			this.#masterTemplate.next(null);
+			this.#masterTemplate.setValue(null);
 			this.#updateMasterTemplateLayoutBlock();
 			return null;
 		}
 
 		const { data } = await this.repository.requestItems([id]);
 		if (data) {
-			this.#masterTemplate.next(data[0]);
+			this.#masterTemplate.setValue(data[0]);
 			this.#updateMasterTemplateLayoutBlock();
 			return data[0];
 		}
@@ -163,7 +166,7 @@ ${currentContent}`;
 		const { data } = await this.repository.createScaffold(parentId);
 		if (!data) return;
 		this.setIsNew(true);
-		this.#data.next({ ...data, id: '', name: '', alias: '' });
+		this.#data.setValue({ ...data, id: '', name: '', alias: '' });
 		if (!parentId) return;
 		await this.setMasterTemplate(parentId);
 	}

@@ -2,7 +2,7 @@ import { UmbPartialViewTreeRepository } from '../tree/index.js';
 import { UmbPartialViewDetailServerDataSource } from './sources/partial-view-detail.server.data-source.js';
 import { UmbPartialViewFolderServerDataSource } from './sources/partial-view-folder.server.data-source.js';
 import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
-import { type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import {
 	CreateFolderRequestModel,
@@ -42,7 +42,7 @@ export class UmbPartialViewRepository
 	// TODO: temp solution until it is automated
 	#treeRepository = new UmbPartialViewTreeRepository(this);
 
-	constructor(host: UmbControllerHostElement) {
+	constructor(host: UmbControllerHost) {
 		super(host);
 
 		this.#detailDataSource = new UmbPartialViewDetailServerDataSource(this);

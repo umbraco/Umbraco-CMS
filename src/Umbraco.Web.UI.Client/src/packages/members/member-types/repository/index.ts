@@ -1,1 +1,2 @@
-export { UmbMemberTypeRepository } from './member-type.repository.js';
+export * from './member-type.repository.js';
+export * from './manifests.js';

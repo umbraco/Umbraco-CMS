@@ -1,5 +1,5 @@
-import { UMB_PROPERTY_DATASET_CONTEXT, isNameablePropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import { UmbVariantId } from '../../variant/variant-id.class.js';
+import { UMB_PROPERTY_DATASET_CONTEXT, isNameablePropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import { UUIInputElement, UUIInputEvent, UUIPopoverContainerElement } from '@umbraco-cms/backoffice/external/uui';
 import {
 	css,

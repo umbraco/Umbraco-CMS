@@ -39,12 +39,12 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 				await this._dataTypeDetailRepository.byUnique(dataTypeUnique),
 				(dataType) => {
 					this._dataTypeData = dataType?.values;
-					this._propertyEditorUiAlias = dataType?.propertyEditorUiAlias || undefined;
+					this._propertyEditorUiAlias = dataType?.editorUiAlias || undefined;
 					// If there is no UI, we will look up the Property editor model to find the default UI alias:
-					if (!this._propertyEditorUiAlias && dataType?.propertyEditorAlias) {
-						//use 'dataType.propertyEditorAlias' to look up the extension in the registry:
+					if (!this._propertyEditorUiAlias && dataType?.editorAlias) {
+						//use 'dataType.editorAlias' to look up the extension in the registry:
 						this.observe(
-							umbExtensionsRegistry.getByTypeAndAlias('propertyEditorSchema', dataType.propertyEditorAlias),
+							umbExtensionsRegistry.getByTypeAndAlias('propertyEditorSchema', dataType.editorAlias),
 							(extension) => {
 								if (!extension) return;
 								this._propertyEditorUiAlias = extension?.meta.defaultPropertyEditorUiAlias;

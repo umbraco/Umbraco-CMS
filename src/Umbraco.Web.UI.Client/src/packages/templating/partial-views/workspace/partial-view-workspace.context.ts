@@ -2,7 +2,7 @@ import { UmbPartialViewRepository } from '../repository/partial-view.repository.
 import type { UmbPartialViewDetailModel } from '../types.js';
 import { UMB_PARTIAL_VIEW_ENTITY_TYPE } from '../entity.js';
 import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import {
 	UmbSaveableWorkspaceContextInterface,
 	UmbEditableWorkspaceContextBase,
@@ -12,9 +12,12 @@ import type { UpdatePartialViewRequestModel } from '@umbraco-cms/backoffice/back
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 export class UmbPartialViewWorkspaceContext
-	extends UmbEditableWorkspaceContextBase<UmbPartialViewRepository, UmbPartialViewDetailModel>
+	extends UmbEditableWorkspaceContextBase<UmbPartialViewDetailModel>
 	implements UmbSaveableWorkspaceContextInterface
 {
+	//
+	public readonly repository: UmbPartialViewRepository = new UmbPartialViewRepository(this);
+
 	getEntityId(): string | undefined {
 		return this.getData()?.path;
 	}
@@ -55,15 +58,15 @@ export class UmbPartialViewWorkspaceContext
 	#isCodeEditorReady = new UmbBooleanState(false);
 	readonly isCodeEditorReady = this.#isCodeEditorReady.asObservable();
 
-	constructor(host: UmbControllerHostElement) {
-		super(host, 'Umb.Workspace.PartialView', new UmbPartialViewRepository(host));
+	constructor(host: UmbControllerHost) {
+		super(host, 'Umb.Workspace.PartialView');
 		this.#loadCodeEditor();
 	}
 
 	async #loadCodeEditor() {
 		try {
 			await loadCodeEditor();
-			this.#isCodeEditorReady.next(true);
+			this.#isCodeEditorReady.setValue(true);
 		} catch (error) {
 			console.error(error);
 		}
@@ -85,7 +88,7 @@ export class UmbPartialViewWorkspaceContext
 		const { data } = await this.repository.requestByKey(entityKey);
 		if (data) {
 			this.setIsNew(false);
-			this.#data.next(data);
+			this.#data.setValue(data);
 		}
 	}
 
@@ -100,7 +103,7 @@ export class UmbPartialViewWorkspaceContext
 		this.setIsNew(true);
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
-		this.#data.next(newPartial);
+		this.#data.setValue(newPartial);
 	}
 }
 

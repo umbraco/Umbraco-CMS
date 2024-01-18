@@ -1,4 +1,4 @@
-import { UMB_DATA_TYPE_WORKSPACE_CONTEXT } from '../../data-type-workspace.context.js';
+import { UMB_DATA_TYPE_WORKSPACE_CONTEXT } from '../../data-type-workspace.context-token.js';
 import { UmbDataTypeDetailModel } from '../../../types.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
@@ -41,11 +41,11 @@ export class UmbWorkspaceViewDataTypeInfoElement extends UmbLitElement implement
 					<div slot="editor">${this._dataType?.unique}</div>
 				</umb-property-layout>
 				<umb-property-layout label="Property Editor Alias">
-					<div slot="editor">${this._dataType?.propertyEditorAlias}</div>
+					<div slot="editor">${this._dataType?.editorAlias}</div>
 				</umb-property-layout>
 
 				<umb-property-layout label="Property Editor UI Alias">
-					<div slot="editor">${this._dataType?.propertyEditorUiAlias}</div>
+					<div slot="editor">${this._dataType?.editorUiAlias}</div>
 				</umb-property-layout>
 			</uui-box>
 		`;

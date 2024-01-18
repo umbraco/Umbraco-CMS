@@ -1,1 +1,3 @@
-import './media-type-input/media-type-input.element.js';
+import './input-media-type/input-media-type.element.js';
+
+export * from './input-media-type/input-media-type.element.js';

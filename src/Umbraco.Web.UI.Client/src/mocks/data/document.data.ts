@@ -2,6 +2,7 @@ import { umbDocumentTypeData } from './document-type/document-type.db.js';
 import { umbUserPermissionData } from './user-permission.data.js';
 import { UmbEntityData } from './entity.data.js';
 import { createDocumentTreeItem } from './utils.js';
+import { UmbMockDocumentTypeModel } from './document-type/document-type.data.js';
 import {
 	ContentStateModel,
 	DocumentItemResponseModel,
@@ -15,7 +16,6 @@ import {
 	PublishedStateModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '@umbraco-cms/backoffice/document';
-import { UmbMockDocumentTypeModel } from './document-type/document-type.data.js';
 
 export const data: Array<DocumentResponseModel> = [
 	{
@@ -171,7 +171,23 @@ export const data: Array<DocumentResponseModel> = [
 				alias: 'blockList',
 				culture: null,
 				segment: null,
-				value: null,
+				value: {
+					layout: {
+						'Umbraco.BlockList': [
+							{
+								contentUdi: '1234',
+							},
+						],
+					},
+					contentData: [
+						{
+							udi: '1234',
+							contentTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
+							elementProperty: 'Hello world',
+						},
+					],
+					settingsData: [],
+				},
 			},
 			{
 				alias: 'mediaPicker',

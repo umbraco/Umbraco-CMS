@@ -8,7 +8,7 @@ export class UmbMenuContext {
 	public readonly alias = this.#manifest.asObservablePart((x) => x?.alias);
 
 	public setManifest(manifest: ManifestMenu | undefined) {
-		this.#manifest.next(manifest);
+		this.#manifest.setValue(manifest);
 	}
 }
 

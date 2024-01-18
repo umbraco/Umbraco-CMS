@@ -137,7 +137,7 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 
 		modalContext?.onSubmit().then((value) => {
 			if (!value?.selection) return;
-			this.#templateWorkspaceContext?.setMasterTemplate(value.selection[0] ?? '');
+			this.#templateWorkspaceContext?.setMasterTemplate(value.selection[0] ?? null);
 		});
 	}
 

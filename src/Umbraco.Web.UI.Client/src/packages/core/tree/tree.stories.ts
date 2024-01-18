@@ -14,6 +14,5 @@ type Story = StoryObj<UmbTreeElement>;
 export const Overview: Story = {
 	args: {
 		alias: 'Umb.Tree.Document',
-		selectable: true,
 	},
 };

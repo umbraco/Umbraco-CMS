@@ -15,22 +15,23 @@ import { extractUmbColorVariable } from '@umbraco-cms/backoffice/resources';
  */
 @customElement('umb-property-editor-ui-icon-picker')
 export class UmbPropertyEditorUIIconPickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
-	private _value = '';
+	//
 	@property()
 	public set value(v: string) {
-		this._value = v;
-		const parts = v.split(' ');
+		this._value = v ?? '';
+		const parts = this._value.split(' ');
 		if (parts.length === 2) {
 			this._icon = parts[0];
 			this._color = parts[1].replace('color-', '');
 		} else {
-			this._icon = v;
+			this._icon = this._value;
 			this._color = '';
 		}
 	}
 	public get value() {
 		return this._value;
 	}
+	private _value = '';
 
 	@state()
 	private _icon = '';
@@ -40,7 +41,7 @@ export class UmbPropertyEditorUIIconPickerElement extends UmbLitElement implemen
 
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
-		console.log('config', config);
+		//console.log('config', config);
 	}
 
 	private _modalContext?: UmbModalManagerContext;

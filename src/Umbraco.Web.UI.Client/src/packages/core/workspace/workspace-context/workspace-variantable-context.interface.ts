@@ -6,8 +6,7 @@ import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { ContentStateModel, VariantResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-export interface UmbVariantableWorkspaceContextInterface<EntityType = unknown>
-	extends UmbSaveableWorkspaceContextInterface<EntityType> {
+export interface UmbVariantableWorkspaceContextInterface extends UmbSaveableWorkspaceContextInterface {
 	// Name:
 	getName(variantId?: UmbVariantId): string | undefined;
 	setName(name: string, variantId?: UmbVariantId): void;

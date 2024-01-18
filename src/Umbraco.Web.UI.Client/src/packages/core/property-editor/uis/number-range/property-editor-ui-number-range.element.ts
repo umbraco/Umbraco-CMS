@@ -4,13 +4,9 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import type { NumberRangeValueType } from '@umbraco-cms/backoffice/models';
 
 import '../../../components/input-number-range/input-number-range.element.js';
-
-type ValueType = {
-	min?: number;
-	max?: number;
-};
 
 /**
  * @element umb-property-editor-ui-number-range
@@ -18,11 +14,11 @@ type ValueType = {
 @customElement('umb-property-editor-ui-number-range')
 export class UmbPropertyEditorUINumberRangeElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	@property({ type: Object })
-	private _value: ValueType = { min: undefined, max: undefined };
+	private _value: NumberRangeValueType = { min: undefined, max: undefined };
 	public get value() {
 		return this._value;
 	}
-	public set value(value: ValueType | undefined) {
+	public set value(value: NumberRangeValueType | undefined) {
 		this._value = value || { min: undefined, max: undefined };
 		this._minValue = value?.min;
 		this._maxValue = value?.max;

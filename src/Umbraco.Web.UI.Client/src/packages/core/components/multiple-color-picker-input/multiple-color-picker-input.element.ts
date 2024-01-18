@@ -1,4 +1,3 @@
-import { UMB_DATA_TYPE_WORKSPACE_CONTEXT } from '../../data-type/workspace/data-type-workspace.context.js';
 import { UmbMultipleColorPickerItemInputElement } from './multiple-color-picker-item-input.element.js';
 import type { UmbSwatchDetails } from '@umbraco-cms/backoffice/models';
 import {
@@ -12,16 +11,17 @@ import {
 	ifDefined,
 } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
-import { UmbInputEvent, UmbChangeEvent, UmbDeleteEvent } from '@umbraco-cms/backoffice/event';
+import { type UmbInputEvent, UmbChangeEvent, type UmbDeleteEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbSorterConfig, UmbSorterController } from '@umbraco-cms/backoffice/sorter';
+import { type UmbSorterConfig, UmbSorterController } from '@umbraco-cms/backoffice/sorter';
+import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 
 const SORTER_CONFIG: UmbSorterConfig<UmbSwatchDetails> = {
 	compareElementToModel: (element: HTMLElement, model: UmbSwatchDetails) => {
 		return element.getAttribute('data-sort-entry-id') === model.value;
 	},
 	querySelectModelToElement: (container: HTMLElement, modelEntry: UmbSwatchDetails) => {
-		return container.querySelector('data-sort-entry-id=[' + modelEntry.value + ']');
+		return container.querySelector('[data-sort-entry-id=' + modelEntry.value + ']');
 	},
 	identifier: 'Umb.SorterIdentifier.ColorEditor',
 	itemSelector: 'umb-multiple-color-picker-item-input',
@@ -33,23 +33,12 @@ const SORTER_CONFIG: UmbSorterConfig<UmbSwatchDetails> = {
  */
 @customElement('umb-multiple-color-picker-input')
 export class UmbMultipleColorPickerInputElement extends FormControlMixin(UmbLitElement) {
-	#prevalueSorter = new UmbSorterController(this, {
+	#sorter = new UmbSorterController(this, {
 		...SORTER_CONFIG,
-
-		performItemInsert: (args) => {
-			const frozenArray = [...this.items];
-			const indexToMove = frozenArray.findIndex((x) => x.value === args.item.value);
-
-			frozenArray.splice(indexToMove, 1);
-			frozenArray.splice(args.newIndex, 0, args.item);
-			this.items = frozenArray;
-
-			this.dispatchEvent(new UmbChangeEvent());
-
-			return true;
-		},
-		performItemRemove: (args) => {
-			return true;
+		onChange: ({ model }) => {
+			const oldValue = this._items;
+			this._items = model;
+			this.requestUpdate('_items', oldValue);
 		},
 	});
 
@@ -113,12 +102,16 @@ export class UmbMultipleColorPickerInputElement extends FormControlMixin(UmbLitE
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_DATA_TYPE_WORKSPACE_CONTEXT, (instance) => {
+		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, async (instance) => {
 			const workspace = instance;
-			this.observe(workspace.data, (data) => {
-				const property = data?.values.find((setting) => setting.alias === 'useLabel');
-				if (property) this.showLabels = property.value as boolean;
-			});
+			this.observe(
+				await workspace.propertyValueByAlias<boolean>('useLabel'),
+				(value) => {
+					// Only set a true/false value. If value is undefined, keep the default value of True, if value is defined, set the value but remove the undefined type from the Type Union.
+					this.showLabels = value === undefined ? true : (value as Exclude<typeof value, undefined>);
+				},
+				'observeUseLabel',
+			);
 		});
 
 		this.addValidator(
@@ -142,11 +135,11 @@ export class UmbMultipleColorPickerInputElement extends FormControlMixin(UmbLitE
 	}
 	public set items(items: Array<UmbSwatchDetails>) {
 		this._items = items ?? [];
-		this.#prevalueSorter.setModel(this.items);
+		this.#sorter.setModel(this.items);
 	}
 
 	#onAdd() {
-		this._items = [...this._items, { value: '', label: '' }];
+		this.items = [...this._items, { value: '', label: '' }];
 		this.pristine = false;
 		this.dispatchEvent(new UmbChangeEvent());
 		this.#focusNewItem();
@@ -165,16 +158,18 @@ export class UmbMultipleColorPickerInputElement extends FormControlMixin(UmbLitE
 
 	async #focusNewItem() {
 		await this.updateComplete;
-		const items = this.shadowRoot?.querySelectorAll(
+		const items = this.shadowRoot?.querySelectorAll<UmbMultipleColorPickerItemInputElement>(
 			'umb-multiple-color-picker-item-input',
-		) as NodeListOf<UmbMultipleColorPickerItemInputElement>;
-		const newItem = items[items.length - 1];
-		newItem.focus();
+		);
+		if (items) {
+			const newItem = items[items.length - 1];
+			newItem.focus();
+		}
 	}
 
 	#deleteItem(event: UmbDeleteEvent, itemIndex: number) {
 		event.stopPropagation();
-		this._items = this._items.filter((item, index) => index !== itemIndex);
+		this.items = this._items.filter((item, index) => index !== itemIndex);
 		this.pristine = false;
 		this.dispatchEvent(new UmbChangeEvent());
 	}

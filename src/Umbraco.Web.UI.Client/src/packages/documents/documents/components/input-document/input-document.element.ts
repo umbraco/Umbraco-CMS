@@ -60,6 +60,18 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 		this.#pickerContext.setSelection(ids);
 	}
 
+	@property({ type: String })
+	startNodeId?: string;
+
+	@property({ type: String })
+	filter?: string;
+
+	@property({ type: Boolean })
+	showOpenButton?: boolean;
+
+	@property({ type: Boolean })
+	ignoreUserStartNodes?: boolean;
+
 	@property()
 	public set value(idsString: string) {
 		// Its with full purpose we don't call super.value, as thats being handled by the observation of the context selection.
@@ -73,6 +85,10 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 
 	constructor() {
 		super();
+	}
+
+	connectedCallback() {
+		super.connectedCallback();
 
 		this.addValidator(
 			'rangeUnderflow',
@@ -90,23 +106,37 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems));
 	}
 
+	protected _openPicker() {
+		// TODO: Configure the content picker, with `startNodeId`, `filter` and `ignoreUserStartNodes` [LK]
+		console.log("_openPicker", [this.startNodeId, this.filter, this.ignoreUserStartNodes]);
+		this.#pickerContext.openPicker({
+			hideTreeRoot: true,
+		});
+	}
+
+	protected _openItem(item: DocumentItemResponseModel) {
+		// TODO: Implement the Content editing infinity editor. [LK]
+		console.log('TODO: _openItem', item);
+	}
+
 	protected getFormElement() {
 		return undefined;
 	}
 
 	render() {
-		return html`
-			${this._items
-				? html` <uui-ref-list
-						>${repeat(
-							this._items,
-							(item) => item.id,
-							(item) => this._renderItem(item),
-						)}
-				  </uui-ref-list>`
-				: ''}
-			${this.#renderAddButton()}
-		`;
+		return html` ${this.#renderItems()} ${this.#renderAddButton()} `;
+	}
+
+	#renderItems() {
+		if (!this._items) return;
+		// TODO: Add sorting. [LK]
+		return html`<uui-ref-list
+			>${repeat(
+				this._items,
+				(item) => item.id,
+				(item) => this._renderItem(item),
+			)}
+		</uui-ref-list>`;
 	}
 
 	#renderAddButton() {
@@ -114,24 +144,37 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 		return html`<uui-button
 			id="add-button"
 			look="placeholder"
-			@click=${() => this.#pickerContext.openPicker()}
-			label=${this.localize.term('general_add')}></uui-button>`;
+			@click=${this._openPicker}
+			label=${this.localize.term('general_choose')}></uui-button>`;
 	}
 
 	private _renderItem(item: DocumentItemResponseModel) {
 		if (!item.id) return;
 		return html`
 			<uui-ref-node name=${ifDefined(item.name)} detail=${ifDefined(item.id)}>
-				<!-- TODO: implement is trashed <uui-tag size="s" slot="tag" color="danger">Trashed</uui-tag> -->
+				${this._renderIsTrashed(item)}
 				<uui-action-bar slot="actions">
+					${this._renderOpenButton(item)}
 					<uui-button
 						@click=${() => this.#pickerContext.requestRemoveItem(item.id!)}
 						label="Remove document ${item.name}"
-						>Remove</uui-button
+						>${this.localize.term('general_remove')}</uui-button
 					>
 				</uui-action-bar>
 			</uui-ref-node>
 		`;
+	}
+
+	private _renderIsTrashed(item: DocumentItemResponseModel) {
+		if (!item.isTrashed) return;
+		return html`<uui-tag size="s" slot="tag" color="danger">Trashed</uui-tag>`;
+	}
+
+	private _renderOpenButton(item: DocumentItemResponseModel) {
+		if (!this.showOpenButton) return;
+		return html`<uui-button @click=${() => this._openItem(item)} label="Open document ${item.name}"
+			>${this.localize.term('general_open')}</uui-button
+		>`;
 	}
 
 	static styles = [
