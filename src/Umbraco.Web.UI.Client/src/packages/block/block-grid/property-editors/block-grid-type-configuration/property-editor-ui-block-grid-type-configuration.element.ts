@@ -1,12 +1,12 @@
 import type { UmbBlockTypeWithGroupKey, UmbInputBlockTypeElement } from '../../../block-type/index.js';
 import '../../../block-type/components/input-block-type/index.js';
 import { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
-import { html, customElement, property, state, css } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, state, css, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_PROPERTY_DATASET_CONTEXT, UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
-import { BlockGridGroupConfigration } from '@umbraco-cms/backoffice/block';
+import { UmbBlockGridGroupType, UmbBlockGridGroupTypeConfiguration } from '@umbraco-cms/backoffice/block';
 
 /**
  * @element umb-property-editor-ui-block-grid-type-configuration
@@ -16,7 +16,7 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 	extends UmbLitElement
 	implements UmbPropertyEditorUiElement
 {
-	#context?: UmbPropertyDatasetContext;
+	#datasetContext?: UmbPropertyDatasetContext;
 
 	@property({ attribute: false })
 	value: UmbBlockTypeWithGroupKey[] = [];
@@ -25,34 +25,75 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 	public config?: UmbPropertyEditorConfigCollection;
 
 	@state()
-	private _blockGroups: Array<BlockGridGroupConfigration> = [];
+	private _blockGroups: Array<UmbBlockGridGroupType> = [];
 
-	//	@state()
-	//	private _groups: Array<{ name: string; key: string | null; blocks: UmbBlockTypeWithGroupKey[] }> = [];
+	@state()
+	private _mappedValuesAndGroups: Array<UmbBlockGridGroupTypeConfiguration> = [];
 
 	constructor() {
 		super();
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, async (instance) => {
-			this.#context = instance;
+			this.#datasetContext = instance;
 			this.#observeProperties();
 		});
 	}
 
 	async #observeProperties() {
-		if (!this.#context) return;
+		if (!this.#datasetContext) return;
 
-		this.observe(await this.#context.propertyValueByAlias('blockGroups'), (value) => {
-			this._blockGroups = value as Array<BlockGridGroupConfigration>;
+		this.observe(await this.#datasetContext.propertyValueByAlias('blockGroups'), (value) => {
+			this._blockGroups = value as Array<UmbBlockGridGroupType>;
+			this.#mapValuesToBlockGroups();
+			console.log('groups changed', value);
+		});
+		this.observe(await this.#datasetContext.propertyValueByAlias('blocks'), (value) => {
+			this.#mapValuesToBlockGroups();
+			console.log('value changed', value);
 		});
 	}
 
+	#mapValuesToBlockGroups() {
+		const valuesWithNoGroup = this.value.filter(
+			// Look for values without a group, or with a group that is non existent.
+			(value) => !value.groupKey || this._blockGroups.find((group) => group.key !== value.groupKey),
+		);
+
+		const valuesWithGroup = this._blockGroups.map((group) => {
+			return { name: group.name, key: group.key, blocks: this.value.filter((value) => value.groupKey === group.key) };
+		});
+
+		this._mappedValuesAndGroups = [{ blocks: valuesWithNoGroup }, ...valuesWithGroup];
+	}
+
+	#onChange(e: Event, groupKey?: string) {
+		const newValue = (e.target as UmbInputBlockTypeElement).value;
+		const values = this.value.filter((item) => item.groupKey !== groupKey);
+		this.value = [...values, ...newValue];
+		this.dispatchEvent(new CustomEvent('property-value-change'));
+	}
+
+	render() {
+		return html`${repeat(
+			this._mappedValuesAndGroups,
+			(group) => group.key,
+			(group) =>
+				html`<umb-input-block-type
+					entity-type="block-grid-type"
+					.groupKey=${group.key}
+					.groupName=${group.name}
+					.value=${group.blocks}
+					@change=${(e: Event) => this.#onChange(e, group.key)}></umb-input-block-type>`,
+		)}`;
+	}
+
+	/*
 	render() {
 		return html`<umb-input-block-type
 			entity-type="block-grid-type"
 			.groups=${this._blockGroups}
 			.value=${this.value}
 			@change=${(e: Event) => (this.value = (e.target as UmbInputBlockTypeElement).value)}></umb-input-block-type>`;
-	}
+	}*/
 
 	static styles = [
 		UmbTextStyles,

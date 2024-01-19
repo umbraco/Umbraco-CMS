@@ -9,23 +9,27 @@ import '../block-type-card/index.js';
 import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import { BlockGridGroupConfigration } from '@umbraco-cms/backoffice/block';
 import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UMB_PROPERTY_DATASET_CONTEXT, UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
+import { UmbBlockGridType } from '@umbraco-cms/backoffice/block';
 
 @customElement('umb-input-block-type')
 export class UmbInputBlockTypeElement<
 	BlockType extends UmbBlockTypeWithGroupKey = UmbBlockTypeBase,
 > extends UmbLitElement {
-	//
 	@property({ type: Array, attribute: false })
 	public get value() {
 		return this._items;
 	}
 	public set value(items) {
 		this._items = items ?? [];
-		this.#mapValues();
 	}
+
+	@property()
+	groupKey?: string;
+
+	@property()
+	groupName?: string;
 
 	@property({ type: String, attribute: 'entity-type' })
 	public get entityType() {
@@ -51,34 +55,8 @@ export class UmbInputBlockTypeElement<
 	}
 	#entityType?: string;
 
-	#groups: Array<BlockGridGroupConfigration> = [];
-	@property({ type: Array })
-	public get groups(): Array<BlockGridGroupConfigration> {
-		return this.#groups;
-	}
-	public set groups(groups: Array<BlockGridGroupConfigration>) {
-		this.#groups = groups ?? [];
-		this.#mapValues();
-	}
-
-	#mapValues() {
-		const valuesWithNoGroup = this.value.filter(
-			// Look for values without a group, or with a group that is non existent.
-			(value) => !value.groupKey || this.#groups.find((group) => group.key !== value.groupKey),
-		);
-
-		const valuesWithGroup = this.#groups.map((group) => {
-			return { name: group.name, key: group.key, blocks: this.value.filter((value) => value.groupKey === group.key) };
-		});
-
-		this._mappedGroups = [{ key: '', name: '', blocks: valuesWithNoGroup }, ...valuesWithGroup];
-	}
-
 	@state()
 	private _items: Array<BlockType> = [];
-
-	@state()
-	private _mappedGroups: Array<BlockGridGroupConfigration & { blocks: Array<BlockType> }> = [];
 
 	@state()
 	private _workspacePath?: string;
@@ -89,11 +67,19 @@ export class UmbInputBlockTypeElement<
 	>;
 
 	#datasetContext?: UmbPropertyDatasetContext;
+	#blockGroups: Array<UmbBlockTypeGroup> = [];
+	#filter?: any;
 
 	constructor() {
 		super();
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, async (instance) => {
 			this.#datasetContext = instance;
+			this.observe(await this.#datasetContext?.propertyValueByAlias('blockGroups'), (value) => {
+				this.#blockGroups = value as Array<UmbBlockTypeGroup>;
+			});
+			this.observe(await this.#datasetContext?.propertyValueByAlias('blocks'), (value) => {
+				this.#filter = value as Array<UmbBlockGridType>;
+			});
 		});
 	}
 
@@ -109,7 +95,7 @@ export class UmbInputBlockTypeElement<
 							// Only pick elements:
 							docType.isElement &&
 							// Prevent picking the an already used element type:
-							this._items.find((x) => x.contentElementTypeKey === docType.id) === undefined,
+							this.#filter.find((x: UmbBlockGridType) => x.contentElementTypeKey === docType.id) === undefined,
 					},
 				});
 
@@ -133,54 +119,41 @@ export class UmbInputBlockTypeElement<
 		return undefined;
 	}
 
-	#renameGroup(e: UUIInputEvent, key: string) {
-		if (!key) return;
-		const groupName = e.target.value as string;
-		const groups = this.groups.map((group) => (group.key === key ? { ...group, name: groupName } : group));
-
-		this.#datasetContext?.setPropertyValue('blockGroups', groups);
+	render() {
+		return html`${this.#renderGroupInput()}
+			<div>
+				${repeat(this.value, (block) => block.contentElementTypeKey, this.#renderItem)} ${this.#renderButton()}
+			</div>`;
 	}
 
-	#deleteGroup(key: string) {
+	#renderGroupInput() {
+		if (!this.groupKey) return;
+		return html`<uui-input auto-width label="Group" .value=${this.groupName} @change=${this.#changeGroupName}>
+			<uui-button compact slot="append" label="delete" @click=${this.#deleteGroup}>
+				<uui-icon name="icon-trash"></uui-icon>
+			</uui-button>
+		</uui-input>`;
+	}
+
+	#changeGroupName(e: UUIInputEvent) {
+		if (!this.groupKey) return;
+
+		const groupName = e.target.value as string;
 		this.#datasetContext?.setPropertyValue(
 			'blockGroups',
-			this.groups.filter((group) => group.key !== key),
+			this.#blockGroups.map((group) => ({ ...group, groupName: this.groupKey === group.key ? groupName : group.name })),
 		);
-		this.value = this.value.filter((block) => block.groupKey !== key);
-		this.dispatchEvent(new UmbChangeEvent());
-		this.#mapValues();
 	}
 
-	render() {
-		return html`${repeat(
-			this._mappedGroups,
-			(group) => group.key,
-			(group) =>
-				html` ${group.key
-						? html`<uui-input
-								auto-width
-								.value=${group.name}
-								label="Group"
-								@change=${(e: UUIInputEvent) => this.#renameGroup(e, group.key)}>
-								<uui-button compact slot="append" label="delete" @click=${() => this.#deleteGroup(group.key)}>
-									<uui-icon name="icon-trash"></uui-icon>
-								</uui-button>
-						  </uui-input>`
-						: ''}
-					<div>
-						${repeat(
-							group.blocks,
-							(block) => block.contentElementTypeKey,
-							(block) =>
-								html`<umb-block-type-card
-									.workspacePath=${this._workspacePath}
-									.key=${block.contentElementTypeKey}
-									@delete=${() => this.deleteItem(block.contentElementTypeKey)}>
-								</umb-block-type-card>`,
-						)}
-						${this.#renderButton()}
-					</div>`,
-		)}`;
+	#deleteGroup() {
+		if (!this.groupKey) return;
+		this.#datasetContext?.setPropertyValue(
+			'blockGroups',
+			this.#blockGroups.filter((group) => group.key !== this.groupKey),
+		);
+		this.value = this._items.filter((block) => block.groupKey !== this.groupKey);
+		this.dispatchEvent(new UmbChangeEvent());
+		console.log(this.value);
 	}
 
 	#renderButton() {
