@@ -13,6 +13,9 @@ namespace Umbraco.Cms.Core.Configuration
         private const string ConnectionStringObjectName = "ConnectionStrings";
         private const string UmbracoConnectionStringPath = $"{ConnectionStringObjectName}:{Constants.System.UmbracoConnectionName}";
         private const string UmbracoConnectionStringProviderNamePath = UmbracoConnectionStringPath + ConnectionStrings.ProviderNamePostfix;
+        private const string CmsObjectPath = "Umbraco:CMS";
+        private const string GlobalIdPath = $"{CmsObjectPath}:Global:Id";
+        private const string DisableRedirectUrlTrackingPath = $"{CmsObjectPath}:WebRouting:DisableRedirectUrlTracking";
 
         private readonly IConfiguration _configuration;
         private readonly ILogger<JsonConfigManipulator> _logger;
@@ -50,11 +53,22 @@ namespace Umbraco.Cms.Core.Configuration
 
         public async Task SaveConnectionStringAsync(string connectionString, string? providerName)
         {
-            await CreateOrUpdateConfigValueAsync(UmbracoConnectionStringPath, connectionString);
+            JsonConfigurationProvider? provider = GetJsonConfigurationProvider();
+            JsonNode? node = await GetJsonNodeAsync(provider);
+
+            if (node is null)
+            {
+                _logger.LogWarning("Was unable to load the configuration file to save the connection string");
+                return;
+            }
+
+            CreateOrUpdateJsonNode(node, UmbracoConnectionStringPath, connectionString);
             if (providerName is not null)
             {
-                await CreateOrUpdateConfigValueAsync(UmbracoConnectionStringProviderNamePath, providerName);
+                CreateOrUpdateJsonNode(node, UmbracoConnectionStringProviderNamePath, providerName);
             }
+
+            await SaveJsonAsync(provider, node);
         }
 
         public void SaveConfigValue(string key, object value)
@@ -90,19 +104,22 @@ namespace Umbraco.Cms.Core.Configuration
             => SaveDisableRedirectUrlTrackingAsync(disable).GetAwaiter().GetResult();
 
         public async Task SaveDisableRedirectUrlTrackingAsync(bool disable)
-            => await CreateOrUpdateConfigValueAsync("Umbraco:CMS:WebRouting:DisableRedirectUrlTracking", disable);
+            => await CreateOrUpdateConfigValueAsync(DisableRedirectUrlTrackingPath, disable);
 
         public void SetGlobalId(string id)
             => SetGlobalIdAsync(id).GetAwaiter().GetResult();
 
         public async Task SetGlobalIdAsync(string id)
-        => await CreateOrUpdateConfigValueAsync("Umbraco:CMS:Global:Id", id);
+        => await CreateOrUpdateConfigValueAsync(GlobalIdPath, id);
 
+        /// <summary>
+        /// Creates or updates a config value at the specified path.
+        /// <remarks>This causes a rewrite of the configuration file.</remarks>
+        /// </summary>
+        /// <param name="itemPath">Path to update, uses : as the separator.</param>
+        /// <param name="value">The value of the node.</param>
         private async Task CreateOrUpdateConfigValueAsync(string itemPath, object value)
         {
-            // This is required because System.Text.Json has no merge function, and doesn't support patch
-            // this is a problem because we don't know if the key(s) exists yet, so we can't simply update it,
-            // we may have to create one ore more json objects.
             JsonConfigurationProvider? provider = GetJsonConfigurationProvider();
             JsonNode? node = await GetJsonNodeAsync(provider);
 
@@ -111,6 +128,25 @@ namespace Umbraco.Cms.Core.Configuration
                 _logger.LogWarning("Failed to save configuration key \"{Key}\" in JSON configuration", itemPath);
                 return;
             }
+
+            CreateOrUpdateJsonNode(node, itemPath, value);
+            await SaveJsonAsync(provider, node);
+        }
+
+        /// <summary>
+        /// Updates or creates a json node at the specified path.
+        /// <remarks>
+        /// Will also create any missing nodes in the path.
+        /// </remarks>
+        /// </summary>
+        /// <param name="node">Node to update.</param>
+        /// <param name="itemPath">Path to update, uses : as the separator.</param>
+        /// <param name="value">The value of the node.</param>
+        private void CreateOrUpdateJsonNode(JsonNode node, string itemPath, object value)
+        {
+            // This is required because System.Text.Json has no merge function, and doesn't support patch
+            // this is a problem because we don't know if the key(s) exists yet, so we can't simply update it,
+            // we may have to create one ore more json objects.
 
             // First we find the inner most child that already exists.
             var propertyNames = itemPath.Split(':');
@@ -142,7 +178,6 @@ namespace Umbraco.Cms.Core.Configuration
             // System.Text.Json doesn't like just setting an Object as a value, so instead we first create the node,
             // and then replace the value
             propertyNode.ReplaceWith(value);
-            await SaveJsonAsync(provider, node);
         }
 
         private static void RemoveJsonNode(JsonNode node, string key)
