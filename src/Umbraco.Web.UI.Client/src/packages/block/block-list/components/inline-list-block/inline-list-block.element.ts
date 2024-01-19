@@ -7,7 +7,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 @customElement('umb-inline-list-block')
 export class UmbInlineListBlockElement extends UmbLitElement {
 	render() {
-		return 'inline mode..';
+		return 'INLINE EDITING';
 	}
 }
 
