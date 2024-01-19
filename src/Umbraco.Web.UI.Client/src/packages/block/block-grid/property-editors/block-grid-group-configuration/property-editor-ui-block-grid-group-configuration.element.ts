@@ -4,20 +4,20 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import { BlockGridGroupConfigration } from '@umbraco-cms/backoffice/block';
+import { UmbBlockGridGroupType } from '@umbraco-cms/backoffice/block';
 
 @customElement('umb-property-editor-ui-block-grid-group-configuration')
 export class UmbPropertyEditorUIBlockGridGroupConfigurationElement
 	extends UmbLitElement
 	implements UmbPropertyEditorUiElement
 {
-	private _value: Array<BlockGridGroupConfigration> = [];
+	private _value: Array<UmbBlockGridGroupType> = [];
 
 	@property({ type: Array })
-	public get value(): Array<BlockGridGroupConfigration> {
+	public get value(): Array<UmbBlockGridGroupType> {
 		return this._value;
 	}
-	public set value(value: Array<BlockGridGroupConfigration>) {
+	public set value(value: Array<UmbBlockGridGroupType>) {
 		this._value = value || [];
 	}
 
