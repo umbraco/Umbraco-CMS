@@ -238,34 +238,42 @@ export class UmbAuthFlow {
 	 * This method will sign the user out of the application.
 	 */
 	async signOut() {
-		// forget all cached token state
-		await this.#storageBackend.removeItem(TOKEN_RESPONSE_NAME);
+		const signOutPromises: Promise<unknown>[] = [];
 
+		// revoke the access token if it exists
 		if (this.#accessTokenResponse) {
-			// TODO: Enable this when the server supports it
-			// const tokenRevokeRequest = new RevokeTokenRequest({
-			// 	token: this.#accessTokenResponse.accessToken,
-			// 	client_id: this.#clientId,
-			// 	token_type_hint: 'access_token',
-			// });
+			const tokenRevokeRequest = new RevokeTokenRequest({
+				token: this.#accessTokenResponse.accessToken,
+				client_id: this.#clientId,
+				token_type_hint: 'access_token',
+			});
 
-			// await this.#tokenHandler.performRevokeTokenRequest(this.#configuration, tokenRevokeRequest);
-
-			this.#accessTokenResponse = undefined;
+			signOutPromises.push(this.#tokenHandler.performRevokeTokenRequest(this.#configuration, tokenRevokeRequest));
 		}
 
+		// revoke the refresh token if it exists
 		if (this.#refreshToken) {
-			// TODO: Enable this when the server supports it
-			// const tokenRevokeRequest = new RevokeTokenRequest({
-			// 	token: this.#refreshToken,
-			// 	client_id: this.#clientId,
-			// 	token_type_hint: 'refresh_token',
-			// });
+			const tokenRevokeRequest = new RevokeTokenRequest({
+				token: this.#refreshToken,
+				client_id: this.#clientId,
+				token_type_hint: 'refresh_token',
+			});
 
-			// await this.#tokenHandler.performRevokeTokenRequest(this.#configuration, tokenRevokeRequest);
-
-			this.#refreshToken = undefined;
+			signOutPromises.push(this.#tokenHandler.performRevokeTokenRequest(this.#configuration, tokenRevokeRequest));
 		}
+
+		// clear the internal token state
+		signOutPromises.push(this.clearTokenStorage());
+
+		// wait for all promises to settle before continuing
+		await Promise.allSettled(signOutPromises);
+
+		// clear the session on the server as well
+		// this will redirect the user to the end session endpoint of the server
+		// which will redirect the user back to the client
+		// and the client will then try and log in again (if the user is not logged in)
+		// which will redirect the user to the login page
+		location.href = `${this.#configuration.endSessionEndpoint}?post_logout_redirect_uri=${this.#redirectUri}`;
 	}
 
 	/**
