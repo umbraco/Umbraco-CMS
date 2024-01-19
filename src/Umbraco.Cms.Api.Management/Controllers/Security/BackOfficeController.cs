@@ -66,7 +66,7 @@ public class BackOfficeController : SecurityControllerBase
         if (result.IsNotAllowed)
         {
             return StatusCode(StatusCodes.Status403Forbidden, new ProblemDetailsBuilder()
-                .WithTitle("USer is not allowed")
+                .WithTitle("User is not allowed")
                 .Build());
         }
         if (result.IsLockedOut)
@@ -84,11 +84,65 @@ public class BackOfficeController : SecurityControllerBase
         return Ok();
     }
 
+    [HttpPost("verify-2fa")]
+    [MapToApiVersion("1.0")]
+    public async Task<IActionResult> Verify2FACode(Verify2FACodeModel model)
+    {
+        if (ModelState.IsValid == false)
+        {
+            return BadRequest();
+        }
+
+        BackOfficeIdentityUser? user = await _backOfficeSignInManager.GetTwoFactorAuthenticationUserAsync();
+        if (user is null)
+        {
+            return StatusCode(StatusCodes.Status401Unauthorized, new ProblemDetailsBuilder()
+                .WithTitle("No user found")
+                .Build());
+        }
+
+        IdentitySignInResult result =
+            await _backOfficeSignInManager.TwoFactorSignInAsync(model.Provider, model.Code, model.IsPersistent, model.RememberClient);
+        if (result.Succeeded)
+        {
+            return Ok();
+        }
+
+        if (result.IsLockedOut)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new ProblemDetailsBuilder()
+                .WithTitle("User is locked.")
+                .Build());
+        }
+
+        if (result.IsNotAllowed)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new ProblemDetailsBuilder()
+                .WithTitle("User is not allowed")
+                .Build());
+        }
+
+        return StatusCode(StatusCodes.Status400BadRequest, new ProblemDetailsBuilder()
+            .WithTitle("Invalid code")
+            .Build());
+    }
+
     public class LoginRequestModel
     {
         public required string Username { get; init; }
 
         public required string Password { get; init; }
+    }
+
+    public class Verify2FACodeModel
+    {
+        public required string Code { get; set; }
+
+        public required string Provider { get; set; }
+
+        public bool IsPersistent { get; set; }
+
+        public bool RememberClient { get; set; }
     }
 
     // [AllowAnonymous] // This is handled implicitly by the NewDenyLocalLoginIfConfigured policy on the <see cref="SecurityControllerBase" />. Keep it here for now and check FIXME in <see cref="DenyLocalLoginHandler" />.
