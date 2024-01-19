@@ -24,7 +24,21 @@ public interface IConfigManipulator
         return Task.CompletedTask;
     }
 
-    Task SaveConfigValueAsync(string itemPath, object value);
+    Task SaveConfigValueAsync(string itemPath, object value)
+    {
+        SaveConfigValue(itemPath, value);
+        return Task.CompletedTask;
+    }
 
-    Task SaveDisableRedirectUrlTrackingAsync(bool disable);
+    Task SaveDisableRedirectUrlTrackingAsync(bool disable)
+    {
+        SaveDisableRedirectUrlTracking(disable);
+        return Task.CompletedTask;
+    }
+
+    Task SetGlobalIdAsync(string id)
+    {
+        SetGlobalIdAsync(id);
+        return Task.CompletedTask;
+    }
 }
