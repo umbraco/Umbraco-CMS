@@ -110,7 +110,9 @@ export class UmbBlockWorkspaceViewEditNoRouterElement extends UmbLitElement impl
 				: ''}
 			${this._activeTabId !== undefined
 				? html`<umb-block-workspace-view-edit-tab
-						.ownerTabId=${this._tabsStructureHelper.isOwnerContainer(this._activeTabId) ? this._activeTabId : undefined}
+						.ownerTabId=${this._activeTabId && this._tabsStructureHelper.isOwnerContainer(this._activeTabId)
+							? this._activeTabId
+							: undefined}
 						.noTabName=${this._hasRootGroups && this._activeTabName === null}
 						.tabName=${this._activeTabName ?? undefined}>
 				  </umb-block-workspace-view-edit-tab>`
