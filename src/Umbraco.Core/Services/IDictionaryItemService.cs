@@ -1,4 +1,5 @@
 ﻿using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
@@ -98,4 +99,13 @@ public interface IDictionaryItemService
     /// <param name="parentId">Id of the new <see cref="IDictionaryItem" /> parent, null if the item should be moved to the root</param>
     /// <param name="userKey">Key of the user moving the dictionary item</param>
     Task<Attempt<IDictionaryItem, DictionaryItemOperationStatus>> MoveAsync(IDictionaryItem dictionaryItem, Guid? parentId, Guid userKey);
+
+    Task<int> CountChildrenAsync(Guid parentId);
+    Task<int> CountRootAsync();
+
+    /// <summary>
+    /// Gets the dictionary items in a paged manner.
+    /// Currently implements the paging in memory on the itenkey property because the underlying repository does not support paging yet
+    /// </summary>
+    Task<PagedModel<IDictionaryItem>> GetPagedAsync(Guid? parentId, int skip, int take);
 }

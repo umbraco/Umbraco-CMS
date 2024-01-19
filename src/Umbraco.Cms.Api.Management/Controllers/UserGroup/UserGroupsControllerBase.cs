@@ -18,6 +18,10 @@ public class UserGroupControllerBase : ManagementApiControllerBase
         status switch
         {
             UserGroupOperationStatus.NotFound => UserGroupNotFound(),
+            UserGroupOperationStatus.UserNotFound => NotFound(new ProblemDetailsBuilder()
+                .WithTitle("User key not found")
+                .WithDetail("The provided user key do not exist.")
+                .Build()),
             UserGroupOperationStatus.AlreadyExists => Conflict(new ProblemDetailsBuilder()
                 .WithTitle("User group already exists")
                 .WithDetail("The user group exists already.")

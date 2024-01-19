@@ -105,13 +105,13 @@ public class ScriptService : FileServiceBase<IScriptRepository, IScript>, IScrip
             return Task.FromResult(ScriptOperationStatus.AlreadyExists);
         }
 
-        if (string.IsNullOrWhiteSpace(createModel.ParentPath) is false &&
-            Repository.FolderExists(createModel.ParentPath) is false)
+        if (IsRootPath(createModel.ParentPath) is false &&
+            Repository.FolderExists(createModel.ParentPath!) is false)
         {
             return Task.FromResult(ScriptOperationStatus.ParentNotFound);
         }
 
-        if(HasValidFileName(createModel.Name) is false)
+        if (HasValidFileName(createModel.Name) is false)
         {
             return Task.FromResult(ScriptOperationStatus.InvalidName);
         }

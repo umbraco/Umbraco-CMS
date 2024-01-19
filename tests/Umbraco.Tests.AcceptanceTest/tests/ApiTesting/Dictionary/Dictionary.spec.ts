@@ -2,10 +2,14 @@ import {test} from '@umbraco/playwright-testhelpers';
 import {expect} from "@playwright/test";
 
 test.describe('Dictionary tests', () => {
-  let dictionaryId;
+  let dictionaryId = '';
   const dictionaryName = 'Word';
 
   test.beforeEach(async ({umbracoApi}) => {
+    await umbracoApi.dictionary.ensureNameNotExists(dictionaryName);
+  });
+
+  test.afterEach(async ({umbracoApi}) => {
     await umbracoApi.dictionary.ensureNameNotExists(dictionaryName);
   });
 
@@ -23,9 +27,6 @@ test.describe('Dictionary tests', () => {
 
     // Assert
     await expect(umbracoApi.dictionary.doesExist(dictionaryId)).toBeTruthy();
-
-    // Clean
-    await umbracoApi.dictionary.ensureNameNotExists(dictionaryName);
   });
 
   test('can update a dictionary', async ({umbracoApi}) => {
@@ -43,9 +44,6 @@ test.describe('Dictionary tests', () => {
     const newDictionary = await umbracoApi.dictionary.get(dictionaryId);
     await expect(newDictionary.name).toEqual(dictionaryName);
     await expect(umbracoApi.dictionary.doesExist(dictionaryId)).toBeTruthy();
-
-    // Clean
-    await umbracoApi.dictionary.ensureNameNotExists(dictionaryName);
   });
 
   test('can delete a dictionary', async ({umbracoApi}) => {
@@ -62,21 +60,17 @@ test.describe('Dictionary tests', () => {
 
   test('can create a dictionary item in a dictionary', async ({umbracoApi}) => {
     // Arrange
-    const parentDictionaryName = 'Book';
-    let parentDictionaryId;
-    await umbracoApi.dictionary.ensureNameNotExists(parentDictionaryName);
-    parentDictionaryId = await umbracoApi.dictionary.create(parentDictionaryName);
+    const childDictionaryName = 'Book';
+    await umbracoApi.dictionary.ensureNameNotExists(dictionaryName);
+    dictionaryId = await umbracoApi.dictionary.create(dictionaryName);
 
     // Act
-    await umbracoApi.dictionary.create(dictionaryName, [], parentDictionaryId);
+    await umbracoApi.dictionary.create(childDictionaryName, [], dictionaryId);
 
     // Assert
     // Checks if the parent dictionary contains the child dictionary
-    const dictionaryChildren = await umbracoApi.dictionary.getChildren(parentDictionaryId);
-    await expect(dictionaryChildren[0].name).toEqual(dictionaryName);
-
-    // Clean
-    await umbracoApi.dictionary.ensureNameNotExists(parentDictionaryName);
+    const dictionaryChildren = await umbracoApi.dictionary.getChildren(dictionaryId);
+    await expect(dictionaryChildren[0].name).toEqual(childDictionaryName);
   });
 
   test('can export a dictionary', async ({umbracoApi}) => {
@@ -90,9 +84,6 @@ test.describe('Dictionary tests', () => {
     // Assert
     // Checks if the .udt file is exported
     await expect(exportResponse.headers()['content-disposition']).toContain(".udt");
-
-    // Clean
-    await umbracoApi.dictionary.ensureNameNotExists(dictionaryName);
   });
 
   test('can import a dictionary', async ({umbracoApi}) => {
@@ -121,8 +112,7 @@ test.describe('Dictionary tests', () => {
     const dictionaryChildren = await umbracoApi.dictionary.getChildren(dictionaryId);
     await expect(dictionaryChildren[0].name).toEqual(importDictionaryName);
 
-    //Clean
-    await umbracoApi.dictionary.ensureNameNotExists(dictionaryName);
+    // Clean
     await umbracoApi.temporaryFile.delete(temporaryFileId);
   });
 });

@@ -5,17 +5,18 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using OpenIddict.Abstractions;
 using OpenIddict.Server.AspNetCore;
+using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Web.BackOffice.Security;
 using Umbraco.Extensions;
-using Umbraco.Cms.Api.Management.Routing;
-using SignInResult = Microsoft.AspNetCore.Mvc.SignInResult;
 using IdentitySignInResult = Microsoft.AspNetCore.Identity.SignInResult;
+using SignInResult = Microsoft.AspNetCore.Mvc.SignInResult;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Security;
 
@@ -29,17 +30,20 @@ public class BackOfficeController : SecurityControllerBase
     private readonly IBackOfficeSignInManager _backOfficeSignInManager;
     private readonly IBackOfficeUserManager _backOfficeUserManager;
     private readonly IOptions<SecuritySettings> _securitySettings;
+    private readonly ILogger<BackOfficeController> _logger;
 
     public BackOfficeController(
         IHttpContextAccessor httpContextAccessor,
         IBackOfficeSignInManager backOfficeSignInManager,
         IBackOfficeUserManager backOfficeUserManager,
-        IOptions<SecuritySettings> securitySettings)
+        IOptions<SecuritySettings> securitySettings,
+        ILogger<BackOfficeController> logger)
     {
         _httpContextAccessor = httpContextAccessor;
         _backOfficeSignInManager = backOfficeSignInManager;
         _backOfficeUserManager = backOfficeUserManager;
         _securitySettings = securitySettings;
+        _logger = logger;
     }
 
     // FIXME: this is a temporary solution to get the new backoffice auth rolling.
@@ -92,6 +96,33 @@ public class BackOfficeController : SecurityControllerBase
             : await AuthorizeExternal(request);
     }
 
+    [HttpGet("signout")]
+    [MapToApiVersion("1.0")]
+    public async Task<IActionResult> Signout()
+    {
+        var userName = await GetUserNameFromAuthCookie();
+
+        await _backOfficeSignInManager.SignOutAsync();
+
+        _logger.LogInformation("User {UserName} from IP address {RemoteIpAddress} has logged out",
+            userName ?? "UNKNOWN", HttpContext.Connection.RemoteIpAddress);
+
+        // Returning a SignOutResult will ask OpenIddict to redirect the user agent
+        // to the post_logout_redirect_uri specified by the client application.
+        return SignOut(Constants.Security.NewBackOfficeAuthenticationType, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+    }
+
+    /// <summary>
+    ///     Retrieve the user principal stored in the authentication cookie.
+    /// </summary>
+    private async Task<string?> GetUserNameFromAuthCookie()
+    {
+        AuthenticateResult cookieAuthResult = await HttpContext.AuthenticateAsync(Constants.Security.NewBackOfficeAuthenticationType);
+        return cookieAuthResult.Succeeded
+            ? cookieAuthResult.Principal?.Identity?.Name
+            : null;
+    }
+
     private async Task<IActionResult> AuthorizeInternal(OpenIddictRequest request)
     {
         // TODO: ensure we handle sign-in notifications for internal logins.
@@ -101,11 +132,7 @@ public class BackOfficeController : SecurityControllerBase
         // for future reference, notifications are already handled for the external login flow by
         // by calling BackOfficeSignInManager.ExternalLoginSignInAsync
 
-        // retrieve the user principal stored in the authentication cookie.
-        AuthenticateResult cookieAuthResult = await HttpContext.AuthenticateAsync(Constants.Security.NewBackOfficeAuthenticationType);
-        var userName = cookieAuthResult.Succeeded
-            ? cookieAuthResult.Principal?.Identity?.Name
-            : null;
+        var userName = await GetUserNameFromAuthCookie();
 
         if (userName != null)
         {

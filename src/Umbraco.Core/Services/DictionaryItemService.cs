@@ -72,9 +72,38 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
         }
     }
 
+    /// <summary>
+    /// Gets the dictionary items in a paged manner.
+    /// Currently implements the paging in memory on the itenkey property because the underlying repository does not support paging yet
+    /// </summary>
+    public async Task<PagedModel<IDictionaryItem>> GetPagedAsync(Guid? parentId, int skip, int take)
+    {
+        using ICoreScope coreScope = ScopeProvider.CreateCoreScope(autoComplete: true);
+
+        if (take == 0)
+        {
+            return parentId is null
+                ? new PagedModel<IDictionaryItem>(await CountRootAsync(), Enumerable.Empty<IDictionaryItem>())
+                : new PagedModel<IDictionaryItem>(await CountChildrenAsync(parentId.Value), Enumerable.Empty<IDictionaryItem>());
+        }
+
+        IDictionaryItem[] items = (parentId is null
+            ? await GetAtRootAsync()
+            : await GetChildrenAsync(parentId.Value)).ToArray();
+
+        return new PagedModel<IDictionaryItem>(
+            items.Length,
+            items.OrderBy(i => i.ItemKey)
+                .Skip(skip)
+                .Take(take));
+    }
+
     /// <inheritdoc />
     public async Task<IEnumerable<IDictionaryItem>> GetChildrenAsync(Guid parentId)
         => await GetByQueryAsync(Query<IDictionaryItem>().Where(x => x.ParentId == parentId));
+
+    public async Task<int> CountChildrenAsync(Guid parentId)
+        => await CountByQueryAsync(Query<IDictionaryItem>().Where(x => x.ParentId == parentId));
 
     /// <inheritdoc />
     public async Task<IEnumerable<IDictionaryItem>> GetDescendantsAsync(Guid? parentId)
@@ -89,6 +118,9 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
     /// <inheritdoc/>
     public async Task<IEnumerable<IDictionaryItem>> GetAtRootAsync()
         => await GetByQueryAsync(Query<IDictionaryItem>().Where(x => x.ParentId == null));
+
+    public async Task<int> CountRootAsync()
+        => await CountByQueryAsync(Query<IDictionaryItem>().Where(x => x.ParentId == null));
 
     /// <inheritdoc/>
     public async Task<bool> ExistsAsync(string key)
@@ -234,6 +266,15 @@ internal sealed class DictionaryItemService : RepositoryService, IDictionaryItem
             scope.Complete();
 
             return await Task.FromResult(Attempt.SucceedWithStatus(DictionaryItemOperationStatus.Success, dictionaryItem));
+        }
+    }
+
+    private async Task<int> CountByQueryAsync(IQuery<IDictionaryItem> query)
+    {
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            var items = _dictionaryRepository.Count(query);
+            return await Task.FromResult(items);
         }
     }
 

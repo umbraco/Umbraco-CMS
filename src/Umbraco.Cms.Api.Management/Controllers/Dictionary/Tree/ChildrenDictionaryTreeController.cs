@@ -27,15 +27,8 @@ public class ChildrenDictionaryTreeController : DictionaryTreeControllerBase
             return BadRequest(error);
         }
 
-        IDictionaryItem[] dictionaryItems = PaginatedDictionaryItems(
-            pageNumber,
-            pageSize,
-            await DictionaryItemService.GetChildrenAsync(parentId),
-            out var totalItems);
+        PagedModel<IDictionaryItem> paginatedItems = await DictionaryItemService.GetPagedAsync(parentId, skip, take);
 
-        EntityTreeItemResponseModel[] viewModels = await MapTreeItemViewModels(parentId, dictionaryItems);
-
-        PagedViewModel<EntityTreeItemResponseModel> result = PagedViewModel(viewModels, totalItems);
-        return await Task.FromResult(Ok(result));
+        return Ok(PagedViewModel(await MapTreeItemViewModels(parentId, paginatedItems.Items), paginatedItems.Total));
     }
 }

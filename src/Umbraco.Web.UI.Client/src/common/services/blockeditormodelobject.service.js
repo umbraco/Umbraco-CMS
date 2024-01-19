@@ -397,7 +397,6 @@
                 // removing duplicates.
                 scaffoldKeys = scaffoldKeys.filter((value, index, self) => self.indexOf(value) === index);
 
-                // get current node (for page context)
                 if(scaffoldKeys.length > 0) {
                   var currentPage = editorState.getCurrent();
                   var currentPageId = currentPage ? (currentPage.id > 0 ? currentPage.id : currentPage.parentId) : null || -20;
