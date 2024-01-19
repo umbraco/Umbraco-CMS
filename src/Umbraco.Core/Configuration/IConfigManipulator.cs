@@ -38,7 +38,7 @@ public interface IConfigManipulator
 
     Task SetGlobalIdAsync(string id)
     {
-        SetGlobalIdAsync(id);
+        SetGlobalId(id);
         return Task.CompletedTask;
     }
 }
