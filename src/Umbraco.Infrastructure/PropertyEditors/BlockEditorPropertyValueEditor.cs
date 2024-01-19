@@ -17,12 +17,14 @@ internal abstract class BlockEditorPropertyValueEditor : DataValueEditor, IDataV
 {
     private BlockEditorValues? _blockEditorValues;
     private readonly IDataTypeService _dataTypeService;
-    private readonly ILogger<BlockEditorPropertyValueEditor> _logger;
     private readonly PropertyEditorCollection _propertyEditors;
+    private readonly DataValueReferenceFactoryCollection _dataValueReferenceFactories;
+    private readonly ILogger<BlockEditorPropertyValueEditor> _logger;
 
     protected BlockEditorPropertyValueEditor(
         DataEditorAttribute attribute,
         PropertyEditorCollection propertyEditors,
+        DataValueReferenceFactoryCollection dataValueReferenceFactories,
         IDataTypeService dataTypeService,
         ILocalizedTextService textService,
         ILogger<BlockEditorPropertyValueEditor> logger,
@@ -32,6 +34,7 @@ internal abstract class BlockEditorPropertyValueEditor : DataValueEditor, IDataV
         : base(textService, shortStringHelper, jsonSerializer, ioHelper, attribute)
     {
         _propertyEditors = propertyEditors;
+        _dataValueReferenceFactories = dataValueReferenceFactories;
         _dataTypeService = dataTypeService;
         _logger = logger;
     }
@@ -42,73 +45,58 @@ internal abstract class BlockEditorPropertyValueEditor : DataValueEditor, IDataV
         set => _blockEditorValues = value;
     }
 
+    /// <inheritdoc />
     public IEnumerable<UmbracoEntityReference> GetReferences(object? value)
     {
-        var rawJson = value == null ? string.Empty : value is string str ? str : value.ToString();
-
-        var result = new List<UmbracoEntityReference>();
-        BlockEditorData? blockEditorData = BlockEditorValues.DeserializeAndClean(rawJson);
-        if (blockEditorData == null)
+        foreach (BlockItemData.BlockPropertyValue propertyValue in GetAllPropertyValues(value))
         {
-            return Enumerable.Empty<UmbracoEntityReference>();
-        }
-
-        // loop through all content and settings data
-        foreach (BlockItemData row in blockEditorData.BlockValue.ContentData.Concat(blockEditorData.BlockValue.SettingsData))
-        {
-            foreach (KeyValuePair<string, BlockItemData.BlockPropertyValue> prop in row.PropertyValues)
+            if (!_propertyEditors.TryGet(propertyValue.PropertyType.PropertyEditorAlias, out IDataEditor? dataEditor))
             {
-                IDataEditor? propEditor = _propertyEditors[prop.Value.PropertyType.PropertyEditorAlias];
+                continue;
+            }
 
-                IDataValueEditor? valueEditor = propEditor?.GetValueEditor();
-                if (!(valueEditor is IDataValueReference reference))
-                {
-                    continue;
-                }
-
-                var val = prop.Value.Value?.ToString();
-
-                IEnumerable<UmbracoEntityReference> refs = reference.GetReferences(val);
-
-                result.AddRange(refs);
+            foreach (UmbracoEntityReference reference in _dataValueReferenceFactories.GetReferences(dataEditor, propertyValue.Value))
+            {
+                yield return reference;
             }
         }
-
-        return result;
     }
 
     /// <inheritdoc />
     public IEnumerable<ITag> GetTags(object? value, object? dataTypeConfiguration, int? languageId)
     {
+        foreach (BlockItemData.BlockPropertyValue propertyValue in GetAllPropertyValues(value))
+        {
+            if (!_propertyEditors.TryGet(propertyValue.PropertyType.PropertyEditorAlias, out IDataEditor? dataEditor) ||
+                dataEditor.GetValueEditor() is not IDataValueTags dataValueTags)
+            {
+                continue;
+            }
+
+            object? configuration = _dataTypeService.GetDataType(propertyValue.PropertyType.DataTypeKey)?.Configuration;
+            foreach (ITag tag in dataValueTags.GetTags(propertyValue.Value, configuration, languageId))
+            {
+                yield return tag;
+            }
+        }
+    }
+
+    private IEnumerable<BlockItemData.BlockPropertyValue> GetAllPropertyValues(object? value)
+    {
         var rawJson = value == null ? string.Empty : value is string str ? str : value.ToString();
 
         BlockEditorData? blockEditorData = BlockEditorValues.DeserializeAndClean(rawJson);
-        if (blockEditorData == null)
+        if (blockEditorData is null)
         {
-            return Enumerable.Empty<ITag>();
+            yield break;
         }
 
-        var result = new List<ITag>();
-        // loop through all content and settings data
-        foreach (BlockItemData row in blockEditorData.BlockValue.ContentData.Concat(blockEditorData.BlockValue.SettingsData))
+        // Return all property values from the content and settings data
+        IEnumerable<BlockItemData> data = blockEditorData.BlockValue.ContentData.Concat(blockEditorData.BlockValue.SettingsData);
+        foreach (BlockItemData.BlockPropertyValue propertyValue in data.SelectMany(x => x.PropertyValues.Select(x => x.Value)))
         {
-            foreach (KeyValuePair<string, BlockItemData.BlockPropertyValue> prop in row.PropertyValues)
-            {
-                IDataEditor? propEditor = _propertyEditors[prop.Value.PropertyType.PropertyEditorAlias];
-
-                IDataValueEditor? valueEditor = propEditor?.GetValueEditor();
-                if (valueEditor is not IDataValueTags tagsProvider)
-                {
-                    continue;
-                }
-
-                object? configuration = _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeKey)?.Configuration;
-
-                result.AddRange(tagsProvider.GetTags(prop.Value.Value, configuration, languageId));
-            }
+            yield return propertyValue;
         }
-
-        return result;
     }
 
     #region Convert database // editor

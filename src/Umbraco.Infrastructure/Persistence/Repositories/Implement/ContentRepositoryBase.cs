@@ -1083,91 +1083,59 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         protected void PersistRelations(TEntity entity)
         {
             // Get all references from our core built in DataEditors/Property Editors
-            // Along with seeing if deverlopers want to collect additional references from the DataValueReferenceFactories collection
-            var trackedRelations = new List<UmbracoEntityReference>();
-            trackedRelations.AddRange(_dataValueReferenceFactories.GetAllReferences(entity.Properties, PropertyEditors));
-
-            var relationTypeAliases = GetAutomaticRelationTypesAliases(entity.Properties, PropertyEditors).ToList();
-
-            // At this point we potentially have a problem (see for example: https://github.com/umbraco/Umbraco.Forms.Issues/issues/1129).
-            // If we have a custom relation type (i.e. not document or media) and use of this within a block grid/list property editor,
-            // we'll get an error when saving the relations.
-            // It happens because the block grid doesn't expose the automatic relation type aliases for all of it's nested properties, and
-            // as such relationTypeAliases does not contain the custom relation type alias.
-            // Auto-relations of that type are then then not deleted, and we get duplicate error on insert.
-            // To resolve we can look at the relations we are going to be saving, and if they include any relation type aliases we haven't
-            // already identified, we'll add them in, so they will also be removed along with the other auto-relations.
-            relationTypeAliases.AddRange(trackedRelations.Select(x => x.RelationTypeAlias).Distinct().Except(relationTypeAliases));
+            // Along with seeing if developers want to collect additional references from the DataValueReferenceFactories collection
+            ISet<UmbracoEntityReference> references = _dataValueReferenceFactories.GetAllReferences(entity.Properties, PropertyEditors);
 
             // First delete all auto-relations for this entity
-            RelationRepository.DeleteByParent(entity.Id, relationTypeAliases.ToArray());
+            ISet<string> automaticRelationTypeAliases = _dataValueReferenceFactories.GetAllAutomaticRelationTypesAliases(PropertyEditors);
+            RelationRepository.DeleteByParent(entity.Id, automaticRelationTypeAliases.ToArray());
 
-            if (trackedRelations.Count == 0)
+            if (references.Count == 0)
             {
+                // No need to add new references/relations
                 return;
             }
 
-            trackedRelations = trackedRelations.Distinct().ToList();
-            var udiToGuids = trackedRelations.Select(x => x.Udi as GuidUdi)
-                .ToDictionary(x => (Udi)x!, x => x!.Guid);
-
-            // lookup in the DB all INT ids for the GUIDs and chuck into a dictionary
-            var keyToIds = Database.Fetch<NodeIdKey>(Sql()
-                .Select<NodeDto>(x => x.NodeId, x => x.UniqueId)
-                .From<NodeDto>()
-                .WhereIn<NodeDto>(x => x.UniqueId, udiToGuids.Values))
-                .ToDictionary(x => x.UniqueId, x => x.NodeId);
-
-            var allRelationTypes = RelationTypeRepository.GetMany(Array.Empty<int>())?
-                .ToDictionary(x => x.Alias, x => x);
-
-            IEnumerable<ReadOnlyRelation> toSave = trackedRelations.Select(rel =>
-                {
-                    if (allRelationTypes is null || !allRelationTypes.TryGetValue(rel.RelationTypeAlias, out IRelationType? relationType))
-                    {
-                        throw new InvalidOperationException($"The relation type {rel.RelationTypeAlias} does not exist");
-                    }
-
-                    if (!udiToGuids.TryGetValue(rel.Udi, out Guid guid))
-                    {
-                        return null; // This shouldn't happen!
-                    }
-
-                    if (!keyToIds.TryGetValue(guid, out var id))
-                    {
-                        return null; // This shouldn't happen!
-                    }
-
-                    return new ReadOnlyRelation(entity.Id, id, relationType.Id);
-                }).WhereNotNull();
-
-            // Save bulk relations
-            RelationRepository.SaveBulk(toSave);
-        }
-
-        private IEnumerable<string> GetAutomaticRelationTypesAliases(
-            IPropertyCollection properties,
-            PropertyEditorCollection propertyEditors)
-        {
-            var automaticRelationTypesAliases = new HashSet<string>(Constants.Conventions.RelationTypes.AutomaticRelationTypes);
-
-            foreach (IProperty property in properties)
+            // Lookup node IDs for all GUID based UDIs
+            IEnumerable<Guid> keys = references.Select(x => x.Udi).OfType<GuidUdi>().Select(x => x.Guid);
+            var keysLookup = Database.FetchByGroups<NodeIdKey, Guid>(keys, Constants.Sql.MaxParameterCount, guids =>
             {
-                if (propertyEditors.TryGet(property.PropertyType.PropertyEditorAlias, out IDataEditor? editor) is false )
-                {
-                    continue;
-                }
+                return Sql()
+                    .Select<NodeDto>(x => x.NodeId, x => x.UniqueId)
+                    .From<NodeDto>()
+                    .WhereIn<NodeDto>(x => x.UniqueId, guids);
+            }).ToDictionary(x => x.UniqueId, x => x.NodeId);
 
-                if (editor.GetValueEditor() is IDataValueReference reference)
+            // Lookup all relation type IDs
+            var relationTypeLookup = RelationTypeRepository.GetMany(Array.Empty<int>()).ToDictionary(x => x.Alias, x => x.Id);
+
+            // Get all valid relations
+            var relations = new List<ReadOnlyRelation>(references.Count);
+            foreach (UmbracoEntityReference reference in references)
+            {
+                if (!automaticRelationTypeAliases.Contains(reference.RelationTypeAlias))
                 {
-                    foreach (var alias in reference.GetAutomaticRelationTypesAliases())
-                    {
-                        automaticRelationTypesAliases.Add(alias);
-                    }
+                    // Returning a reference that doesn't use an automatic relation type is an issue that should be fixed in code
+                    Logger.LogError("The reference to {Udi} uses a relation type {RelationTypeAlias} that is not an automatic relation type.", reference.Udi, reference.RelationTypeAlias);
+                }
+                else if (!relationTypeLookup.TryGetValue(reference.RelationTypeAlias, out int relationTypeId))
+                {
+                    // A non-existent relation type could be caused by an environment issue (e.g. it was manually removed)
+                    Logger.LogWarning("The reference to {Udi} uses a relation type {RelationTypeAlias} that does not exist.", reference.Udi, reference.RelationTypeAlias);
+                }
+                else if (reference.Udi is not GuidUdi udi || !keysLookup.TryGetValue(udi.Guid, out var id))
+                {
+                    // Relations only support references to items that are stored in the NodeDto table (because of foreign key constraints)
+                    Logger.LogInformation("The reference to {Udi} can not be saved as relation, because doesn't have a node ID.", reference.Udi);
+                }
+                else
+                {
+                    relations.Add(new ReadOnlyRelation(entity.Id, id, relationTypeId));
                 }
             }
 
-            return automaticRelationTypesAliases;
+            // Save bulk relations
+            RelationRepository.SaveBulk(relations);
         }
 
         /// <summary>
