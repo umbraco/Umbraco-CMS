@@ -22,7 +22,7 @@ public class DeliveryApiJsonTypeResolver : DefaultJsonTypeInfoResolver
         }
         else if (jsonTypeInfo.Type == typeof(IRichTextElement))
         {
-            ConfigureJsonPolymorphismOptions(jsonTypeInfo, typeof(RichTextGenericElement), typeof(RichTextTextElement));
+            ConfigureJsonPolymorphismOptions(jsonTypeInfo, typeof(RichTextRootElement), typeof(RichTextGenericElement), typeof(RichTextTextElement));
         }
 
         return jsonTypeInfo;

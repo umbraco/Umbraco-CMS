@@ -1083,81 +1083,59 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         protected void PersistRelations(TEntity entity)
         {
             // Get all references from our core built in DataEditors/Property Editors
-            // Along with seeing if deverlopers want to collect additional references from the DataValueReferenceFactories collection
-            var trackedRelations = new List<UmbracoEntityReference>();
-            trackedRelations.AddRange(_dataValueReferenceFactories.GetAllReferences(entity.Properties, PropertyEditors));
-
-            var relationTypeAliases = GetAutomaticRelationTypesAliases(entity.Properties, PropertyEditors).ToArray();
+            // Along with seeing if developers want to collect additional references from the DataValueReferenceFactories collection
+            ISet<UmbracoEntityReference> references = _dataValueReferenceFactories.GetAllReferences(entity.Properties, PropertyEditors);
 
             // First delete all auto-relations for this entity
-            RelationRepository.DeleteByParent(entity.Id, relationTypeAliases);
+            ISet<string> automaticRelationTypeAliases = _dataValueReferenceFactories.GetAutomaticRelationTypesAliases(entity.Properties, PropertyEditors);
+            RelationRepository.DeleteByParent(entity.Id, automaticRelationTypeAliases.ToArray());
 
-            if (trackedRelations.Count == 0)
+            if (references.Count == 0)
             {
+                // No need to add new references/relations
                 return;
             }
 
-            trackedRelations = trackedRelations.Distinct().ToList();
-            var udiToGuids = trackedRelations.Select(x => x.Udi as GuidUdi)
-                .ToDictionary(x => (Udi)x!, x => x!.Guid);
-
-            // lookup in the DB all INT ids for the GUIDs and chuck into a dictionary
-            var keyToIds = Database.Fetch<NodeIdKey>(Sql()
-                .Select<NodeDto>(x => x.NodeId, x => x.UniqueId)
-                .From<NodeDto>()
-                .WhereIn<NodeDto>(x => x.UniqueId, udiToGuids.Values))
-                .ToDictionary(x => x.UniqueId, x => x.NodeId);
-
-            var allRelationTypes = RelationTypeRepository.GetMany(Array.Empty<int>())?
-                .ToDictionary(x => x.Alias, x => x);
-
-            IEnumerable<ReadOnlyRelation> toSave = trackedRelations.Select(rel =>
-                {
-                    if (allRelationTypes is null || !allRelationTypes.TryGetValue(rel.RelationTypeAlias, out IRelationType? relationType))
-                    {
-                        throw new InvalidOperationException($"The relation type {rel.RelationTypeAlias} does not exist");
-                    }
-
-                    if (!udiToGuids.TryGetValue(rel.Udi, out Guid guid))
-                    {
-                        return null; // This shouldn't happen!
-                    }
-
-                    if (!keyToIds.TryGetValue(guid, out var id))
-                    {
-                        return null; // This shouldn't happen!
-                    }
-
-                    return new ReadOnlyRelation(entity.Id, id, relationType.Id);
-                }).WhereNotNull();
-
-            // Save bulk relations
-            RelationRepository.SaveBulk(toSave);
-        }
-
-        private IEnumerable<string> GetAutomaticRelationTypesAliases(
-            IPropertyCollection properties,
-            PropertyEditorCollection propertyEditors)
-        {
-            var automaticRelationTypesAliases = new HashSet<string>(Constants.Conventions.RelationTypes.AutomaticRelationTypes);
-
-            foreach (IProperty property in properties)
+            // Lookup node IDs for all GUID based UDIs
+            IEnumerable<Guid> keys = references.Select(x => x.Udi).OfType<GuidUdi>().Select(x => x.Guid);
+            var keysLookup = Database.FetchByGroups<NodeIdKey, Guid>(keys, Constants.Sql.MaxParameterCount, guids =>
             {
-                if (propertyEditors.TryGet(property.PropertyType.PropertyEditorAlias, out IDataEditor? editor) is false )
-                {
-                    continue;
-                }
+                return Sql()
+                    .Select<NodeDto>(x => x.NodeId, x => x.UniqueId)
+                    .From<NodeDto>()
+                    .WhereIn<NodeDto>(x => x.UniqueId, guids);
+            }).ToDictionary(x => x.UniqueId, x => x.NodeId);
 
-                if (editor.GetValueEditor() is IDataValueReference reference)
+            // Lookup all relation type IDs
+            var relationTypeLookup = RelationTypeRepository.GetMany(Array.Empty<int>()).ToDictionary(x => x.Alias, x => x.Id);
+
+            // Get all valid relations
+            var relations = new List<ReadOnlyRelation>(references.Count);
+            foreach (UmbracoEntityReference reference in references)
+            {
+                if (!automaticRelationTypeAliases.Contains(reference.RelationTypeAlias))
                 {
-                    foreach (var alias in reference.GetAutomaticRelationTypesAliases())
-                    {
-                        automaticRelationTypesAliases.Add(alias);
-                    }
+                    // Returning a reference that doesn't use an automatic relation type is an issue that should be fixed in code
+                    Logger.LogError("The reference to {Udi} uses a relation type {RelationTypeAlias} that is not an automatic relation type.", reference.Udi, reference.RelationTypeAlias);
+                }
+                else if (!relationTypeLookup.TryGetValue(reference.RelationTypeAlias, out int relationTypeId))
+                {
+                    // A non-existent relation type could be caused by an environment issue (e.g. it was manually removed)
+                    Logger.LogWarning("The reference to {Udi} uses a relation type {RelationTypeAlias} that does not exist.", reference.Udi, reference.RelationTypeAlias);
+                }
+                else if (reference.Udi is not GuidUdi udi || !keysLookup.TryGetValue(udi.Guid, out var id))
+                {
+                    // Relations only support references to items that are stored in the NodeDto table (because of foreign key constraints)
+                    Logger.LogInformation("The reference to {Udi} can not be saved as relation, because doesn't have a node ID.", reference.Udi);
+                }
+                else
+                {
+                    relations.Add(new ReadOnlyRelation(entity.Id, id, relationTypeId));
                 }
             }
 
-            return automaticRelationTypesAliases;
+            // Save bulk relations
+            RelationRepository.SaveBulk(relations);
         }
 
         /// <summary>

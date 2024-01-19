@@ -30,7 +30,8 @@ public class RichTextPreValueController : UmbracoAuthorizedJsonController
                     new RichTextEditorCommand { Alias = x.Alias, Mode = x.Mode, Name = x.Name }),
             ValidElements = settings.ValidElements,
             InvalidElements = settings.InvalidElements,
-            CustomConfig = settings.CustomConfig
+            CustomConfig = settings.CustomConfig,
+            CloudApiKey = settings.CloudApiKey,
         };
 
         return config;

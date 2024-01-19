@@ -17,7 +17,7 @@ angular.module("umbraco.directives")
                 scope.isLoading = true;
 
                 var promises = [];
-                
+
                 //To id the html textarea we need to use the datetime ticks because we can have multiple rte's per a single property alias
                 // because now we have to support having 2x (maybe more at some stage) content editors being displayed at once. This is because
                 // we have this mini content editor panel that can be launched with MNTP.
@@ -26,8 +26,8 @@ angular.module("umbraco.directives")
                 var editorConfig = scope.configuration ? scope.configuration : null;
                 if (!editorConfig || Utilities.isString(editorConfig)) {
                     editorConfig = tinyMceService.defaultPrevalues();
-                    //for the grid by default, we don't want to include the macro toolbar
-                    editorConfig.toolbar = _.without(editorConfig, "umbmacro");
+                    //for the grid by default, we don't want to include the macro or the block-picker toolbar
+                    editorConfig.toolbar = _.without(editorConfig, "umbmacro", "umbblockpicker");
                 }
 
                 //ensure the grid's global config is being passed up to the RTE, these 2 properties need to be in this format
@@ -125,7 +125,7 @@ angular.module("umbraco.directives")
                         }
 
                     });
-                    
+
                     //when the element is disposed we need to unsubscribe!
                     // NOTE: this is very important otherwise if this is part of a modal, the listener still exists because the dom
                     // element might still be there even after the modal has been hidden.
