@@ -224,6 +224,17 @@ export class UmbAuthFlow {
 	}
 
 	/**
+	 * Forget all cached token state
+	 */
+	async clearTokenStorage() {
+		await this.#storageBackend.removeItem(TOKEN_RESPONSE_NAME);
+
+		// clear the internal state
+		this.#accessTokenResponse = undefined;
+		this.#refreshToken = undefined;
+	}
+
+	/**
 	 * This method will sign the user out of the application.
 	 */
 	async signOut() {
