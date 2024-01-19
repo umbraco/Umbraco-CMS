@@ -57,6 +57,7 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 			// Look for values without a group, or with a group that is non existent.
 			(value) => !value.groupKey || this._blockGroups.find((group) => group.key !== value.groupKey),
 		);
+		//.map((value) => ({ ...value, groupKey: undefined }));
 
 		const valuesWithGroup = this._blockGroups.map((group) => {
 			return { name: group.name, key: group.key, blocks: this.value.filter((value) => value.groupKey === group.key) };
@@ -66,9 +67,14 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 	}
 
 	#onChange(e: Event, groupKey?: string) {
-		const newValue = (e.target as UmbInputBlockTypeElement).value;
-		const values = this.value.filter((item) => item.groupKey !== groupKey);
-		this.value = [...values, ...newValue];
+		const newValues = (e.target as UmbInputBlockTypeElement).value;
+
+		// remove all values that are in the group, or have a group that does not exist in the block groups.
+		const values = this.value
+			.filter((b) => b.groupKey !== groupKey)
+			.filter((b) => this._blockGroups.find((group) => group.key === b.groupKey));
+
+		this.value = [...values, ...newValues];
 		this.dispatchEvent(new CustomEvent('property-value-change'));
 	}
 
