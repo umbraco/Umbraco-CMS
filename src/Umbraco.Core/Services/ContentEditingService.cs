@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.ContentEditing.Validation;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -45,17 +46,22 @@ internal sealed class ContentEditingService
             return result;
         }
 
+        // the create mapping might succeed, but this doesn't mean the model is valid at property level.
+        // we'll return the actual property validation status if the entire operation succeeds.
+        ContentEditingOperationStatus validationStatus = result.Status;
+        IEnumerable<PropertyValidationError> validationErrors = result.Result.ValidationErrors;
+
         IContent content = result.Result.Content!;
-        ContentEditingOperationStatus operationStatus = await UpdateTemplateAsync(content, createModel.TemplateKey);
-        if (operationStatus != ContentEditingOperationStatus.Success)
+        ContentEditingOperationStatus updateTemplateStatus = await UpdateTemplateAsync(content, createModel.TemplateKey);
+        if (updateTemplateStatus != ContentEditingOperationStatus.Success)
         {
-            return Attempt.FailWithStatus(operationStatus, new ContentCreateResult { Content = content });
+            return Attempt.FailWithStatus(updateTemplateStatus, new ContentCreateResult { Content = content });
         }
 
-        operationStatus = await Save(content, userKey);
-        return operationStatus == ContentEditingOperationStatus.Success
-            ? Attempt.SucceedWithStatus(ContentEditingOperationStatus.Success, new ContentCreateResult { Content = content })
-            : Attempt.FailWithStatus(operationStatus, new ContentCreateResult { Content = content });
+        ContentEditingOperationStatus saveStatus = await Save(content, userKey);
+        return saveStatus == ContentEditingOperationStatus.Success
+            ? Attempt.SucceedWithStatus(validationStatus, new ContentCreateResult { Content = content, ValidationErrors = validationErrors })
+            : Attempt.FailWithStatus(saveStatus, new ContentCreateResult { Content = content });
     }
 
     public async Task<Attempt<ContentUpdateResult, ContentEditingOperationStatus>> UpdateAsync(IContent content, ContentUpdateModel updateModel, Guid userKey)
@@ -66,16 +72,21 @@ internal sealed class ContentEditingService
             return Attempt.FailWithStatus(result.Status, result.Result);
         }
 
-        ContentEditingOperationStatus operationStatus = await UpdateTemplateAsync(content, updateModel.TemplateKey);
-        if (operationStatus != ContentEditingOperationStatus.Success)
+        // the update mapping might succeed, but this doesn't mean the model is valid at property level.
+        // we'll return the actual property validation status if the entire operation succeeds.
+        ContentEditingOperationStatus validationStatus = result.Status;
+        IEnumerable<PropertyValidationError> validationErrors = result.Result.ValidationErrors;
+
+        ContentEditingOperationStatus updateTemplateStatus = await UpdateTemplateAsync(content, updateModel.TemplateKey);
+        if (updateTemplateStatus != ContentEditingOperationStatus.Success)
         {
-            return Attempt.FailWithStatus(operationStatus, new ContentUpdateResult { Content = content });
+            return Attempt.FailWithStatus(updateTemplateStatus, new ContentUpdateResult { Content = content });
         }
 
-        operationStatus = await Save(content, userKey);
-        return operationStatus == ContentEditingOperationStatus.Success
-            ? Attempt.SucceedWithStatus(ContentEditingOperationStatus.Success, new ContentUpdateResult { Content = content })
-            : Attempt.FailWithStatus(operationStatus, new ContentUpdateResult { Content = content });
+        ContentEditingOperationStatus saveStatus = await Save(content, userKey);
+        return saveStatus == ContentEditingOperationStatus.Success
+            ? Attempt.SucceedWithStatus(validationStatus, new ContentUpdateResult { Content = content, ValidationErrors = validationErrors })
+            : Attempt.FailWithStatus(saveStatus, new ContentUpdateResult { Content = content });
     }
 
     public async Task<Attempt<IContent?, ContentEditingOperationStatus>> MoveToRecycleBinAsync(Guid key, Guid userKey)

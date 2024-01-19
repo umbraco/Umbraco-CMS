@@ -214,7 +214,8 @@ public partial class ContentEditingServiceTests
 
         var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
 
-        Assert.AreEqual(addValidProperties, result.Success);
+        // success is expected regardless of property level validation - the validation error status is communicated in the attempt status (see below)
+        Assert.IsTrue(result.Success);
         Assert.AreEqual(addValidProperties ? ContentEditingOperationStatus.Success : ContentEditingOperationStatus.PropertyValidationError, result.Status);
         Assert.IsNotNull(result.Result);
 

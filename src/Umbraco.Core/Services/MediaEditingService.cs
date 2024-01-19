@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.ContentEditing.Validation;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -40,12 +41,17 @@ internal sealed class MediaEditingService
             return result;
         }
 
+        // the create mapping might succeed, but this doesn't mean the model is valid at property level.
+        // we'll return the actual property validation status if the entire operation succeeds.
+        ContentEditingOperationStatus validationStatus = result.Status;
+        IEnumerable<PropertyValidationError> validationErrors = result.Result.ValidationErrors;
+
         IMedia media = result.Result.Content!;
 
         var currentUserId = await GetUserIdAsync(userKey);
         ContentEditingOperationStatus operationStatus = Save(media, currentUserId);
         return operationStatus == ContentEditingOperationStatus.Success
-            ? Attempt.SucceedWithStatus(ContentEditingOperationStatus.Success, new MediaCreateResult { Content = media })
+            ? Attempt.SucceedWithStatus(validationStatus, new MediaCreateResult { Content = media, ValidationErrors = validationErrors })
             : Attempt.FailWithStatus(operationStatus, new MediaCreateResult { Content = media });
     }
 
@@ -57,10 +63,15 @@ internal sealed class MediaEditingService
             return result;
         }
 
+        // the update mapping might succeed, but this doesn't mean the model is valid at property level.
+        // we'll return the actual property validation status if the entire operation succeeds.
+        ContentEditingOperationStatus validationStatus = result.Status;
+        IEnumerable<PropertyValidationError> validationErrors = result.Result.ValidationErrors;
+
         var currentUserId = await GetUserIdAsync(userKey);
         ContentEditingOperationStatus operationStatus = Save(media, currentUserId);
         return operationStatus == ContentEditingOperationStatus.Success
-            ? Attempt.SucceedWithStatus(ContentEditingOperationStatus.Success, new MediaUpdateResult { Content = media })
+            ? Attempt.SucceedWithStatus(validationStatus, new MediaUpdateResult { Content = media, ValidationErrors = validationErrors })
             : Attempt.FailWithStatus(operationStatus, new MediaUpdateResult { Content = media });
     }
 

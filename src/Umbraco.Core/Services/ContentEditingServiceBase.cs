@@ -82,11 +82,9 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
             return Attempt.FailWithStatus(operationStatus, new TContentCreateResult());
         }
 
+        // NOTE: property level validation errors must NOT fail the update - it must be possible to save invalid properties.
+        //       instead, the error state and validation errors will be communicated in the return value.
         Attempt<IList<PropertyValidationError>, ContentEditingOperationStatus> validationResult = await ValidatePropertiesAsync(contentCreationModelBase, contentType);
-        if (validationResult.Success is false)
-        {
-            return Attempt.FailWithStatus(validationResult.Status, new TContentCreateResult { ValidationErrors = validationResult.Result });
-        }
 
         TContent content = New(null, parent?.Id ?? Constants.System.Root, contentType);
         if (contentCreationModelBase.Key.HasValue)
@@ -97,7 +95,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         UpdateNames(contentCreationModelBase, content, contentType);
         await UpdateExistingProperties(contentCreationModelBase, content, contentType);
 
-        return Attempt.SucceedWithStatus(ContentEditingOperationStatus.Success, new TContentCreateResult { Content = content });
+        return Attempt.SucceedWithStatus(validationResult.Status, new TContentCreateResult { Content = content, ValidationErrors = validationResult.Result });
     }
 
     protected async Task<Attempt<TContentUpdateResult, ContentEditingOperationStatus>> MapUpdate<TContentUpdateResult>(TContent content, ContentEditingModelBase contentEditingModelBase)
@@ -109,17 +107,15 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
             return Attempt.FailWithStatus(operationStatus, new TContentUpdateResult { Content = content });
         }
 
+        // NOTE: property level validation errors must NOT fail the update - it must be possible to save invalid properties.
+        //       instead, the error state and validation errors will be communicated in the return value.
         Attempt<IList<PropertyValidationError>, ContentEditingOperationStatus> validationResult = await ValidatePropertiesAsync(contentEditingModelBase, contentType);
-        if (validationResult.Success is false)
-        {
-            return Attempt.FailWithStatus(validationResult.Status, new TContentUpdateResult { Content = content, ValidationErrors = validationResult.Result });
-        }
 
         UpdateNames(contentEditingModelBase, content, contentType);
         await UpdateExistingProperties(contentEditingModelBase, content, contentType);
         RemoveMissingProperties(contentEditingModelBase, content, contentType);
 
-        return Attempt.SucceedWithStatus(ContentEditingOperationStatus.Success, new TContentUpdateResult { Content = content });
+        return Attempt.SucceedWithStatus(validationResult.Status, new TContentUpdateResult { Content = content, ValidationErrors = validationResult.Result });
     }
 
     protected async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleMoveToRecycleBinAsync(Guid key, Guid userKey)
