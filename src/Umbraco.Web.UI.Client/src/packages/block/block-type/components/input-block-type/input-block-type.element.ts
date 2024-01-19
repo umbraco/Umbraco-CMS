@@ -126,6 +126,27 @@ export class UmbInputBlockTypeElement<
 			</div>`;
 	}
 
+	#renderItem = (item: BlockType) => {
+		return html`
+			<umb-block-type-card
+				.workspacePath=${this._workspacePath}
+				.key=${item.contentElementTypeKey}
+				@delete=${() => this.deleteItem(item.contentElementTypeKey)}>
+			</umb-block-type-card>
+		`;
+	};
+
+	#renderButton() {
+		return html`
+			<uui-button id="add-button" look="placeholder" @click=${() => this.create()} label="open">
+				<uui-icon name="icon-add"></uui-icon>
+				Add
+			</uui-button>
+		`;
+	}
+
+	//Group renders (if exists)
+
 	#renderGroupInput() {
 		if (!this.groupKey) return;
 		return html`<uui-input auto-width label="Group" .value=${this.groupName} @change=${this.#changeGroupName}>
@@ -153,27 +174,7 @@ export class UmbInputBlockTypeElement<
 		);
 		this.value = this._items.filter((block) => block.groupKey !== this.groupKey);
 		this.dispatchEvent(new UmbChangeEvent());
-		console.log(this.value);
 	}
-
-	#renderButton() {
-		return html`
-			<uui-button id="add-button" look="placeholder" @click=${() => this.create()} label="open">
-				<uui-icon name="icon-add"></uui-icon>
-				Add
-			</uui-button>
-		`;
-	}
-
-	#renderItem = (item: BlockType) => {
-		return html`
-			<umb-block-type-card
-				.workspacePath=${this._workspacePath}
-				.key=${item.contentElementTypeKey}
-				@delete=${() => this.deleteItem(item.contentElementTypeKey)}>
-			</umb-block-type-card>
-		`;
-	};
 
 	static styles = [
 		css`

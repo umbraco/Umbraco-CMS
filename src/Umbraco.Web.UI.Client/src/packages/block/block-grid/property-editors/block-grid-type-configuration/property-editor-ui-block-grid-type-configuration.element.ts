@@ -44,11 +44,9 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 		this.observe(await this.#datasetContext.propertyValueByAlias('blockGroups'), (value) => {
 			this._blockGroups = value as Array<UmbBlockGridGroupType>;
 			this.#mapValuesToBlockGroups();
-			console.log('groups changed', value);
 		});
-		this.observe(await this.#datasetContext.propertyValueByAlias('blocks'), (value) => {
+		this.observe(await this.#datasetContext.propertyValueByAlias('blocks'), () => {
 			this.#mapValuesToBlockGroups();
-			console.log('value changed', value);
 		});
 	}
 
@@ -57,7 +55,6 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 			// Look for values without a group, or with a group that is non existent.
 			(value) => !value.groupKey || this._blockGroups.find((group) => group.key !== value.groupKey),
 		);
-		//.map((value) => ({ ...value, groupKey: undefined }));
 
 		const valuesWithGroup = this._blockGroups.map((group) => {
 			return { name: group.name, key: group.key, blocks: this.value.filter((value) => value.groupKey === group.key) };
@@ -91,15 +88,6 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 					@change=${(e: Event) => this.#onChange(e, group.key)}></umb-input-block-type>`,
 		)}`;
 	}
-
-	/*
-	render() {
-		return html`<umb-input-block-type
-			entity-type="block-grid-type"
-			.groups=${this._blockGroups}
-			.value=${this.value}
-			@change=${(e: Event) => (this.value = (e.target as UmbInputBlockTypeElement).value)}></umb-input-block-type>`;
-	}*/
 
 	static styles = [
 		UmbTextStyles,
