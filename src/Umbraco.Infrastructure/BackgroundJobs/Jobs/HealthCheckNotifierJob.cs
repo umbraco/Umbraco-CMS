@@ -26,7 +26,7 @@ namespace Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
 /// </summary>
 public class HealthCheckNotifierJob : IRecurringBackgroundJob
 {
-    
+
 
     public TimeSpan Period { get; private set; }
     public TimeSpan Delay { get; private set; }

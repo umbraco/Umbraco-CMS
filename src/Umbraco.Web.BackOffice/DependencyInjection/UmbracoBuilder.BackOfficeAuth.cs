@@ -179,6 +179,13 @@ public static partial class UmbracoBuilderExtensions
             policy.Requirements.Add(new ContentPermissionsQueryStringRequirement(ActionDelete.ActionLetter));
         });
 
+        options.AddPolicy(AuthorizationPolicies.ContentPermissionCreateBlueprintFromId, policy =>
+        {
+            policy.AuthenticationSchemes.Add(backOfficeAuthenticationScheme);
+            policy.Requirements.Add(
+                new ContentPermissionsQueryStringRequirement(ActionCreateBlueprintFromContent.ActionLetter, "contentId"));
+        });
+
         options.AddPolicy(AuthorizationPolicies.BackOfficeAccess, policy =>
         {
             policy.AuthenticationSchemes.Add(backOfficeAuthenticationScheme);

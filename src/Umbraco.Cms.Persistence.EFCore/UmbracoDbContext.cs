@@ -1,3 +1,4 @@
+using System.Configuration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.Extensions.DependencyInjection;
@@ -55,6 +56,10 @@ public class UmbracoDbContext : DbContext
         {
             ILogger<UmbracoDbContext> logger = StaticServiceProvider.Instance.GetRequiredService<ILogger<UmbracoDbContext>>();
             logger.LogCritical("No connection string was found, cannot setup Umbraco EF Core context");
+
+            // we're throwing an exception here to make it abundantly clear that one should never utilize (or have a
+            // dependency on) the DbContext before the connection string has been initialized by the installer.
+            throw new ConfigurationErrorsException("No connection string was found, cannot setup Umbraco EF Core context");
         }
 
         IEnumerable<IMigrationProviderSetup> migrationProviders = StaticServiceProvider.Instance.GetServices<IMigrationProviderSetup>();
