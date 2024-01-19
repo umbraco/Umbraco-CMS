@@ -30,7 +30,7 @@ test.describe('Dictionary tests', () => {
     await umbracoUi.dictionary.isSuccessNotificationVisible();
     // TODO: when frontend is ready, verify the new dictionary item displays in tree and in list
     // await umbracoUi.goToSection(ConstantHelper.sections.dictionary);
-    // expect(await umbracoUi.dictionary.isDictionaryListHasText(dictionaryName)).toBeTruthy();
+    // await umbracoUi.dictionary.isDictionaryListHasText(dictionaryName);
   });
 
   test('can delete a dictionary item', async ({umbracoApi, umbracoUi}) => {
@@ -163,6 +163,6 @@ test.describe('Dictionary tests', () => {
     await umbracoUi.dictionary.enterSearchKeywordAndPressEnter('xyz');
 
     // Assert
-    await expect(umbracoUi.dictionary.isSearchResultMessageDisplayEmpty(emptySearchResultMessage)).toBeTruthy();    
+    await umbracoUi.dictionary.isSearchResultMessageDisplayEmpty(emptySearchResultMessage);    
   });
 });
