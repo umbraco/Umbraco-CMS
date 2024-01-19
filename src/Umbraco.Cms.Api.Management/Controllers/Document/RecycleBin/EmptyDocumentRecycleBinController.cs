@@ -33,9 +33,10 @@ public class EmptyDocumentRecycleBinController : DocumentRecycleBinControllerBas
     [HttpDelete]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> EmptyRecycleBin()
     {
-        AuthorizationResult authorizationResult  = await _authorizationService.AuthorizeResourceAsync(
+        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,
             ContentPermissionResource.RecycleBin(ActionDelete.ActionLetter),
             AuthorizationPolicies.ContentPermissionByResource);

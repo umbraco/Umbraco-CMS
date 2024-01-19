@@ -90,6 +90,7 @@ public abstract class RecycleBinControllerBase<TItem> : ManagementApiControllerB
                 .WithTitle("Unknown operation status.")
                 .Build()),
         };
+
     private IEntitySlim[] GetPagedRootEntities(long pageNumber, int pageSize, out long totalItems)
     {
         IEntitySlim[] rootEntities = _entityService
