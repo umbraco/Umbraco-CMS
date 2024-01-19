@@ -40,7 +40,7 @@ public class UpdateMediaController : MediaControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Update(Guid id, UpdateMediaRequestModel updateRequestModel)
+    public async Task<IActionResult> Update(Guid id, UpdateMediaRequestModel requestModel)
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,
@@ -58,11 +58,11 @@ public class UpdateMediaController : MediaControllerBase
             return MediaNotFound();
         }
 
-        MediaUpdateModel model = _mediaEditingPresentationFactory.MapUpdateModel(updateRequestModel);
-        Attempt<IMedia, ContentEditingOperationStatus> result = await _mediaEditingService.UpdateAsync(media, model, CurrentUserKey(_backOfficeSecurityAccessor));
+        MediaUpdateModel model = _mediaEditingPresentationFactory.MapUpdateModel(requestModel);
+        Attempt<MediaUpdateResult, ContentEditingOperationStatus> result = await _mediaEditingService.UpdateAsync(media, model, CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Success
             ? Ok()
-            : ContentEditingOperationStatusResult(result.Status);
+            : MediaEditingOperationStatusResult(result.Status, requestModel, result.Result.ValidationErrors);
     }
 }

@@ -2,7 +2,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Api.Management.Controllers;
+using Umbraco.Cms.Api.Management.ViewModels.Content;
+using Umbraco.Cms.Core.Models.ContentEditing.Validation;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Content;
 
@@ -58,6 +61,7 @@ public class ContentControllerBase : ManagementApiControllerBase
                 .WithTitle("Invalid sorting options")
                 .WithDetail("The supplied sorting operations were invalid. Additional details can be found in the log.")
                 .Build()),
+            ContentEditingOperationStatus.PropertyValidationError => BadRequest(PropertyValidationErrorProblemDetails()),
             ContentEditingOperationStatus.Unknown => StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetailsBuilder()
                 .WithTitle("Unknown error. Please see the log for more details.")
                 .Build()),
@@ -65,6 +69,42 @@ public class ContentControllerBase : ManagementApiControllerBase
                 .WithTitle("Unknown content operation status.")
                 .Build()),
         };
+
+    protected IActionResult ContentEditingOperationStatusResult<TContentModelBase, TValueModel, TVariantModel>(
+        ContentEditingOperationStatus status,
+        TContentModelBase requestModel,
+        IEnumerable<PropertyValidationError> validationErrors)
+        where TContentModelBase : ContentModelBase<TValueModel, TVariantModel>
+        where TValueModel : ValueModelBase
+        where TVariantModel : VariantModelBase
+    {
+        if (status is not ContentEditingOperationStatus.PropertyValidationError)
+        {
+            return ContentEditingOperationStatusResult(status);
+        }
+
+        var errors = new SortedDictionary<string, string[]>();
+        foreach (PropertyValidationError validationError in validationErrors)
+        {
+            TValueModel? requestValue = requestModel.Values.FirstOrDefault(value =>
+                value.Alias == validationError.Alias
+                && value.Culture == validationError.Culture
+                && value.Segment == validationError.Segment);
+            if (requestValue is null)
+            {
+                // TODO: throw up, log, anything goes - ThisShouldNotHappen(tm)
+                continue;
+            }
+
+            var index = requestModel.Values.IndexOf(requestValue);
+            var key = $"$.{nameof(ContentModelBase<TValueModel, TVariantModel>.Values).ToFirstLowerInvariant()}[{index}].{nameof(ValueModelBase.Value).ToFirstLowerInvariant()}{validationError.JsonPath}";
+            errors.Add(key, validationError.ErrorMessages);
+        }
+
+        ProblemDetails problemDetails = PropertyValidationErrorProblemDetails();
+        problemDetails.Extensions["errors"] = errors;
+        return BadRequest(problemDetails);
+    }
 
     protected IActionResult ContentPublishingOperationStatusResult(ContentPublishingOperationStatus status) =>
         status switch
@@ -166,4 +206,9 @@ public class ContentControllerBase : ManagementApiControllerBase
                 .WithTitle("Unknown content operation status.")
                 .Build()),
         };
+
+    private ProblemDetails PropertyValidationErrorProblemDetails() => new ProblemDetailsBuilder()
+        .WithTitle("Validation failed")
+        .WithDetail("One or more properties did not pass validation")
+        .Build();
 }

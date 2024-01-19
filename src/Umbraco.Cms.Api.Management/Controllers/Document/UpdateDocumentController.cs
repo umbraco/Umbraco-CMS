@@ -60,10 +60,10 @@ public class UpdateDocumentController : DocumentControllerBase
         }
 
         ContentUpdateModel model = _documentEditingPresentationFactory.MapUpdateModel(requestModel);
-        Attempt<IContent, ContentEditingOperationStatus> result = await _contentEditingService.UpdateAsync(content, model, CurrentUserKey(_backOfficeSecurityAccessor));
+        Attempt<ContentUpdateResult, ContentEditingOperationStatus> result = await _contentEditingService.UpdateAsync(content, model, CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Success
             ? Ok()
-            : ContentEditingOperationStatusResult(result.Status);
+            : DocumentEditingOperationStatusResult(result.Status, requestModel, result.Result.ValidationErrors);
     }
 }

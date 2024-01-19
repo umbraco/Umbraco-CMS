@@ -21,8 +21,9 @@ internal sealed class MediaEditingService
         ILogger<ContentEditingServiceBase<IMedia, IMediaType, IMediaService, IMediaTypeService>> logger,
         ICoreScopeProvider scopeProvider,
         IUserIdKeyResolver userIdKeyResolver,
-        ITreeEntitySortingService treeEntitySortingService)
-        : base(contentService, contentTypeService, propertyEditorCollection, dataTypeService, logger, scopeProvider, userIdKeyResolver, treeEntitySortingService)
+        ITreeEntitySortingService treeEntitySortingService,
+        ILanguageService languageService)
+        : base(contentService, contentTypeService, propertyEditorCollection, dataTypeService, logger, scopeProvider, userIdKeyResolver, treeEntitySortingService, languageService)
         => _logger = logger;
 
     public async Task<IMedia?> GetAsync(Guid key)
@@ -31,36 +32,36 @@ internal sealed class MediaEditingService
         return await Task.FromResult(media);
     }
 
-    public async Task<Attempt<IMedia?, ContentEditingOperationStatus>> CreateAsync(MediaCreateModel createModel, Guid userKey)
+    public async Task<Attempt<MediaCreateResult, ContentEditingOperationStatus>> CreateAsync(MediaCreateModel createModel, Guid userKey)
     {
-        Attempt<IMedia?, ContentEditingOperationStatus> result = await MapCreate(createModel);
+        Attempt<MediaCreateResult, ContentEditingOperationStatus> result = await MapCreate<MediaCreateResult>(createModel);
         if (result.Success == false)
         {
             return result;
         }
 
-        IMedia media = result.Result!;
+        IMedia media = result.Result.Content!;
 
         var currentUserId = await GetUserIdAsync(userKey);
         ContentEditingOperationStatus operationStatus = Save(media, currentUserId);
         return operationStatus == ContentEditingOperationStatus.Success
-            ? Attempt.SucceedWithStatus<IMedia?, ContentEditingOperationStatus>(ContentEditingOperationStatus.Success, media)
-            : Attempt.FailWithStatus<IMedia?, ContentEditingOperationStatus>(operationStatus, media);
+            ? Attempt.SucceedWithStatus(ContentEditingOperationStatus.Success, new MediaCreateResult { Content = media })
+            : Attempt.FailWithStatus(operationStatus, new MediaCreateResult { Content = media });
     }
 
-    public async Task<Attempt<IMedia, ContentEditingOperationStatus>> UpdateAsync(IMedia media, MediaUpdateModel updateModel, Guid userKey)
+    public async Task<Attempt<MediaUpdateResult, ContentEditingOperationStatus>> UpdateAsync(IMedia media, MediaUpdateModel updateModel, Guid userKey)
     {
-        Attempt<ContentEditingOperationStatus> result = await MapUpdate(media, updateModel);
+        Attempt<MediaUpdateResult, ContentEditingOperationStatus> result = await MapUpdate<MediaUpdateResult>(media, updateModel);
         if (result.Success == false)
         {
-            return Attempt.FailWithStatus(result.Result, media);
+            return result;
         }
 
         var currentUserId = await GetUserIdAsync(userKey);
         ContentEditingOperationStatus operationStatus = Save(media, currentUserId);
         return operationStatus == ContentEditingOperationStatus.Success
-            ? Attempt.SucceedWithStatus(ContentEditingOperationStatus.Success, media)
-            : Attempt.FailWithStatus(operationStatus, media);
+            ? Attempt.SucceedWithStatus(ContentEditingOperationStatus.Success, new MediaUpdateResult { Content = media })
+            : Attempt.FailWithStatus(operationStatus, new MediaUpdateResult { Content = media });
     }
 
     public async Task<Attempt<IMedia?, ContentEditingOperationStatus>> MoveToRecycleBinAsync(Guid key, Guid userKey)

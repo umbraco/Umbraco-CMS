@@ -40,11 +40,11 @@ public class CreateMediaController : MediaControllerBase
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Create(CreateMediaRequestModel createRequestModel)
+    public async Task<IActionResult> Create(CreateMediaRequestModel requestModel)
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,
-            MediaPermissionResource.WithKeys(createRequestModel.ParentId),
+            MediaPermissionResource.WithKeys(requestModel.ParentId),
             AuthorizationPolicies.MediaPermissionByResource);
         ;
 
@@ -53,11 +53,11 @@ public class CreateMediaController : MediaControllerBase
             return Forbidden();
         }
 
-        MediaCreateModel model = _mediaEditingPresentationFactory.MapCreateModel(createRequestModel);
-        Attempt<IMedia?, ContentEditingOperationStatus> result = await _mediaEditingService.CreateAsync(model, CurrentUserKey(_backOfficeSecurityAccessor));
+        MediaCreateModel model = _mediaEditingPresentationFactory.MapCreateModel(requestModel);
+        Attempt<MediaCreateResult, ContentEditingOperationStatus> result = await _mediaEditingService.CreateAsync(model, CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Success
-            ? CreatedAtAction<ByKeyMediaController>(controller => nameof(controller.ByKey), result.Result!.Key)
-            : ContentEditingOperationStatusResult(result.Status);
+            ? CreatedAtAction<ByKeyMediaController>(controller => nameof(controller.ByKey), result.Result.Content!.Key)
+            : MediaEditingOperationStatusResult(result.Status, requestModel, result.Result.ValidationErrors);
     }
 }

@@ -28,7 +28,7 @@ public partial class ContentEditingServiceTests
         var result = await ContentEditingService.UpdateAsync(content, updateModel, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
-        VerifyUpdate(result.Result);
+        VerifyUpdate(result.Result.Content);
 
         // re-get and re-test
         VerifyUpdate(await ContentEditingService.GetAsync(content.Key));
@@ -79,7 +79,7 @@ public partial class ContentEditingServiceTests
         var result = await ContentEditingService.UpdateAsync(content, updateModel, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
-        VerifyUpdate(result.Result);
+        VerifyUpdate(result.Result.Content);
 
         // re-get and re-test
         VerifyUpdate(await ContentEditingService.GetAsync(content.Key));
@@ -113,7 +113,7 @@ public partial class ContentEditingServiceTests
         };
 
         var result = await ContentEditingService.UpdateAsync(content, updateModel, Constants.Security.SuperUserKey);
-        VerifyUpdate(result.Result);
+        VerifyUpdate(result.Result.Content);
 
         // re-get and re-test
         VerifyUpdate(await ContentEditingService.GetAsync(content.Key));
@@ -142,7 +142,7 @@ public partial class ContentEditingServiceTests
         };
 
         var result = await ContentEditingService.UpdateAsync(content, updateModel, Constants.Security.SuperUserKey);
-        VerifyUpdate(result.Result);
+        VerifyUpdate(result.Result.Content);
 
         // re-get and re-test
         VerifyUpdate(await ContentEditingService.GetAsync(content.Key));
@@ -172,7 +172,7 @@ public partial class ContentEditingServiceTests
         var result = await ContentEditingService.UpdateAsync(content, updateModel, Constants.Security.SuperUserKey);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
-        VerifyUpdate(result.Result);
+        VerifyUpdate(result.Result.Content);
 
         // re-get and re-test
         VerifyUpdate(await ContentEditingService.GetAsync(content.Key));
@@ -184,6 +184,47 @@ public partial class ContentEditingServiceTests
             Assert.AreEqual("The updated title", updatedContent.GetValue<string>("title"));
             Assert.AreEqual(null, updatedContent.GetValue<string>("text"));
         }
+    }
+
+    [TestCase(true)]
+    [TestCase(false)]
+    public async Task Can_Update_With_Property_Validation(bool addValidProperties)
+    {
+        var content = await CreateInvariantContent();
+        var contentType = await ContentTypeService.GetAsync(content.ContentType.Key)!;
+        contentType.PropertyTypes.First(pt => pt.Alias == "title").Mandatory = true;
+        contentType.PropertyTypes.First(pt => pt.Alias == "text").ValidationRegExp = "^\\d*$";
+        await ContentTypeService.SaveAsync(contentType, Constants.Security.SuperUserKey);
+
+        var titleValue = addValidProperties ? "The title value" : null;
+        var textValue = addValidProperties ? "12345" : "This is not a number";
+
+        var updateModel = new ContentUpdateModel
+        {
+            InvariantName = content.Name,
+            InvariantProperties = new[]
+            {
+                new PropertyValueModel { Alias = "title", Value = titleValue },
+                new PropertyValueModel { Alias = "text", Value = textValue }
+            }
+        };
+
+        var result = await ContentEditingService.UpdateAsync(content, updateModel, Constants.Security.SuperUserKey);
+
+        Assert.AreEqual(addValidProperties, result.Success);
+        Assert.AreEqual(addValidProperties ? ContentEditingOperationStatus.Success : ContentEditingOperationStatus.PropertyValidationError, result.Status);
+        Assert.IsNotNull(result.Result);
+
+        if (addValidProperties is false)
+        {
+            Assert.AreEqual(2, result.Result.ValidationErrors.Count());
+            Assert.IsNotNull(result.Result.ValidationErrors.FirstOrDefault(v => v.Alias == "title" && v.ErrorMessages.Length == 1));
+            Assert.IsNotNull(result.Result.ValidationErrors.FirstOrDefault(v => v.Alias == "text" && v.ErrorMessages.Length == 1));
+        }
+
+        // NOTE: content update must be successful, even if the mandatory property is missing (publishing however should not!)
+        Assert.AreEqual(titleValue, result.Result.Content!.GetValue<string>("title"));
+        Assert.AreEqual(textValue, result.Result.Content!.GetValue<string>("text"));
     }
 
     [Test]
@@ -242,7 +283,7 @@ public partial class ContentEditingServiceTests
         var result = await ContentEditingService.UpdateAsync(content, updateModel, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentEditingOperationStatus.PropertyTypeNotFound, result.Status);
-        Assert.IsNotNull(result.Result);
+        Assert.IsNotNull(result.Result.Content);
 
         // re-get and validate
         content = await ContentEditingService.GetAsync(content.Key);

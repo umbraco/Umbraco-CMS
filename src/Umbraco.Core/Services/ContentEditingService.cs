@@ -23,8 +23,9 @@ internal sealed class ContentEditingService
         ILogger<ContentEditingService> logger,
         ICoreScopeProvider scopeProvider,
         IUserIdKeyResolver userIdKeyResolver,
-        ITreeEntitySortingService treeEntitySortingService)
-        : base(contentService, contentTypeService, propertyEditorCollection, dataTypeService, logger, scopeProvider, userIdKeyResolver, treeEntitySortingService)
+        ITreeEntitySortingService treeEntitySortingService,
+        ILanguageService languageService)
+        : base(contentService, contentTypeService, propertyEditorCollection, dataTypeService, logger, scopeProvider, userIdKeyResolver, treeEntitySortingService, languageService)
     {
         _templateService = templateService;
         _logger = logger;
@@ -36,45 +37,45 @@ internal sealed class ContentEditingService
         return await Task.FromResult(content);
     }
 
-    public async Task<Attempt<IContent?, ContentEditingOperationStatus>> CreateAsync(ContentCreateModel createModel, Guid userKey)
+    public async Task<Attempt<ContentCreateResult, ContentEditingOperationStatus>> CreateAsync(ContentCreateModel createModel, Guid userKey)
     {
-        Attempt<IContent?, ContentEditingOperationStatus> result = await MapCreate(createModel);
+        Attempt<ContentCreateResult, ContentEditingOperationStatus> result = await MapCreate<ContentCreateResult>(createModel);
         if (result.Success == false)
         {
             return result;
         }
 
-        IContent content = result.Result!;
+        IContent content = result.Result.Content!;
         ContentEditingOperationStatus operationStatus = await UpdateTemplateAsync(content, createModel.TemplateKey);
         if (operationStatus != ContentEditingOperationStatus.Success)
         {
-            return Attempt.FailWithStatus<IContent?, ContentEditingOperationStatus>(operationStatus, content);
+            return Attempt.FailWithStatus(operationStatus, new ContentCreateResult { Content = content });
         }
 
         operationStatus = await Save(content, userKey);
         return operationStatus == ContentEditingOperationStatus.Success
-            ? Attempt.SucceedWithStatus<IContent?, ContentEditingOperationStatus>(ContentEditingOperationStatus.Success, content)
-            : Attempt.FailWithStatus<IContent?, ContentEditingOperationStatus>(operationStatus, content);
+            ? Attempt.SucceedWithStatus(ContentEditingOperationStatus.Success, new ContentCreateResult { Content = content })
+            : Attempt.FailWithStatus(operationStatus, new ContentCreateResult { Content = content });
     }
 
-    public async Task<Attempt<IContent, ContentEditingOperationStatus>> UpdateAsync(IContent content, ContentUpdateModel updateModel, Guid userKey)
+    public async Task<Attempt<ContentUpdateResult, ContentEditingOperationStatus>> UpdateAsync(IContent content, ContentUpdateModel updateModel, Guid userKey)
     {
-        Attempt<ContentEditingOperationStatus> result = await MapUpdate(content, updateModel);
+        Attempt<ContentUpdateResult, ContentEditingOperationStatus> result = await MapUpdate<ContentUpdateResult>(content, updateModel);
         if (result.Success == false)
         {
-            return Attempt.FailWithStatus(result.Result, content);
+            return Attempt.FailWithStatus(result.Status, result.Result);
         }
 
         ContentEditingOperationStatus operationStatus = await UpdateTemplateAsync(content, updateModel.TemplateKey);
         if (operationStatus != ContentEditingOperationStatus.Success)
         {
-            return Attempt.FailWithStatus(operationStatus, content);
+            return Attempt.FailWithStatus(operationStatus, new ContentUpdateResult { Content = content });
         }
 
         operationStatus = await Save(content, userKey);
         return operationStatus == ContentEditingOperationStatus.Success
-            ? Attempt.SucceedWithStatus(ContentEditingOperationStatus.Success, content)
-            : Attempt.FailWithStatus(operationStatus, content);
+            ? Attempt.SucceedWithStatus(ContentEditingOperationStatus.Success, new ContentUpdateResult { Content = content })
+            : Attempt.FailWithStatus(operationStatus, new ContentUpdateResult { Content = content });
     }
 
     public async Task<Attempt<IContent?, ContentEditingOperationStatus>> MoveToRecycleBinAsync(Guid key, Guid userKey)

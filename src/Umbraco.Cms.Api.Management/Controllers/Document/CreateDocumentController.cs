@@ -7,7 +7,6 @@ using Umbraco.Cms.Api.Management.Security.Authorization.Content;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Actions;
-using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
@@ -54,10 +53,10 @@ public class CreateDocumentController : DocumentControllerBase
         }
 
         ContentCreateModel model = _documentEditingPresentationFactory.MapCreateModel(requestModel);
-        Attempt<IContent?, ContentEditingOperationStatus> result = await _contentEditingService.CreateAsync(model, CurrentUserKey(_backOfficeSecurityAccessor));
+        Attempt<ContentCreateResult, ContentEditingOperationStatus> result = await _contentEditingService.CreateAsync(model, CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Success
-            ? CreatedAtAction<ByKeyDocumentController>(controller => nameof(controller.ByKey), result.Result!.Key)
-            : ContentEditingOperationStatusResult(result.Status);
+            ? CreatedAtAction<ByKeyDocumentController>(controller => nameof(controller.ByKey), result.Result.Content!.Key)
+            : DocumentEditingOperationStatusResult(result.Status, requestModel, result.Result.ValidationErrors);
     }
 }
