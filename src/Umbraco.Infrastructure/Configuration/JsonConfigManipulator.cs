@@ -139,8 +139,8 @@ namespace Umbraco.Cms.Core.Configuration
         /// Will also create any missing nodes in the path.
         /// </remarks>
         /// </summary>
-        /// <param name="node">Node to update.</param>
-        /// <param name="itemPath">Path to update, uses : as the separator.</param>
+        /// <param name="node">Node to create or update.</param>
+        /// <param name="itemPath">Path to create or update, uses : as the separator.</param>
         /// <param name="value">The value of the node.</param>
         private void CreateOrUpdateJsonNode(JsonNode node, string itemPath, object value)
         {
