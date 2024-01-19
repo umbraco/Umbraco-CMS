@@ -29,6 +29,11 @@ export class UmbBlockWorkspaceElement extends UmbLitElement {
 		createExtensionApi(manifest, [this, { manifest: manifest }]).then((context) => {
 			if (context) {
 				this.#gotWorkspaceContext(context);
+				// TODO: We need to recreate when ID changed?
+				new UmbExtensionsApiInitializer(this, umbExtensionsRegistry, 'workspaceContext', [
+					this,
+					this.#workspaceContext,
+				]);
 			}
 		});
 	}
@@ -60,9 +65,6 @@ export class UmbBlockWorkspaceElement extends UmbLitElement {
 				},
 			},
 		];
-
-		// TODO: We need to recreate when ID changed?
-		new UmbExtensionsApiInitializer(this, umbExtensionsRegistry, 'workspaceContext', [this, this.#workspaceContext]);
 	}
 
 	render() {
