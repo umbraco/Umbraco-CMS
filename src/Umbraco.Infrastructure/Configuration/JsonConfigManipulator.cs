@@ -98,12 +98,11 @@ namespace Umbraco.Cms.Core.Configuration
             await SaveJsonAsync(provider, node);
         }
 
-        public async Task CreateOrUpdateConfigValueAsync(string itemPath, object value)
+        private async Task CreateOrUpdateConfigValueAsync(string itemPath, object value)
         {
             // This is required because System.Text.Json has no merge function, and doesn't support patch
             // this is a problem because we don't know if the key(s) exists yet, so we can't simply update it,
             // we may have to create one ore more json objects.
-
             JsonConfigurationProvider? provider = GetJsonConfigurationProvider();
             JsonNode? node = await GetJsonNodeAsync(provider);
 
@@ -116,7 +115,7 @@ namespace Umbraco.Cms.Core.Configuration
             // First we find the inner most child that already exists.
             var propertyNames = itemPath.Split(':');
             JsonNode propertyNode = node;
-            var currentIndex = 0;
+            var index = 0;
             foreach (var propertyName in propertyNames)
             {
                 JsonNode? found = FindChildNode(propertyNode, propertyName);
@@ -126,22 +125,24 @@ namespace Umbraco.Cms.Core.Configuration
                 }
 
                 propertyNode = found;
-                currentIndex++;
+                index++;
             }
 
 
-            while(currentIndex < propertyNames.Length)
+            // We can now use the index to go through the remaining keys, creating them as we go.
+            while (index < propertyNames.Length)
             {
-                var propertyName = propertyNames[currentIndex];
+                var propertyName = propertyNames[index];
                 var newNode = new JsonObject();
                 propertyNode.AsObject()[propertyName] = newNode;
                 propertyNode = newNode;
-                currentIndex++;
+                index++;
             }
 
+            // System.Text.Json doesn't like just setting an Object as a value, so instead we first create the node,
+            // and then replace the value
             propertyNode.ReplaceWith(value);
             await SaveJsonAsync(provider, node);
-
         }
 
         public void SaveDisableRedirectUrlTracking(bool disable)
@@ -184,27 +185,6 @@ namespace Umbraco.Cms.Core.Configuration
             writer.WriteStartObject();
             writer.WritePropertyName("Id");
             writer.WriteValue(id);
-            writer.WriteEndObject();
-            writer.WriteEndObject();
-            writer.WriteEndObject();
-            writer.WriteEndObject();
-
-            return writer.Token;
-        }
-
-        private JToken? GetDisableRedirectUrlItem(bool value)
-        {
-            JTokenWriter writer = new JTokenWriter();
-
-            writer.WriteStartObject();
-            writer.WritePropertyName("Umbraco");
-            writer.WriteStartObject();
-            writer.WritePropertyName("CMS");
-            writer.WriteStartObject();
-            writer.WritePropertyName("WebRouting");
-            writer.WriteStartObject();
-            writer.WritePropertyName("DisableRedirectUrlTracking");
-            writer.WriteValue(value);
             writer.WriteEndObject();
             writer.WriteEndObject();
             writer.WriteEndObject();
