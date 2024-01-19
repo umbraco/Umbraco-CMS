@@ -38,10 +38,28 @@ public static class BackOfficeAuthBuilderExtensions
     {
         builder.Services
             .AddAuthentication()
-            .AddCookie(Constants.Security.NewBackOfficeAuthenticationType, options =>
+            .AddCookie(Constants.Security.NewBackOfficeAuthenticationType, o =>
             {
-                options.LoginPath = "/umbraco/login";
-                options.Cookie.Name = Constants.Security.NewBackOfficeAuthenticationType;
+                o.LoginPath = "/umbraco/login";
+                o.Cookie.Name = Constants.Security.NewBackOfficeAuthenticationType;
+            })
+            .AddCookie(Constants.Security.NewBackOfficeExternalAuthenticationType, o =>
+            {
+                o.Cookie.Name = Constants.Security.NewBackOfficeExternalAuthenticationType;
+                o.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+            })
+
+            // Although we don't natively support this, we add it anyways so that if end-users implement the required logic
+            // they don't have to worry about manually adding this scheme or modifying the sign in manager
+            .AddCookie(Constants.Security.NewBackOfficeTwoFactorAuthenticationType, o =>
+            {
+                o.Cookie.Name = Constants.Security.NewBackOfficeTwoFactorAuthenticationType;
+                o.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+            })
+            .AddCookie(Constants.Security.NewBackOfficeTwoFactorRememberMeAuthenticationType, o =>
+            {
+                o.Cookie.Name = Constants.Security.NewBackOfficeTwoFactorRememberMeAuthenticationType;
+                o.ExpireTimeSpan = TimeSpan.FromMinutes(5);
             });
 
         return builder;

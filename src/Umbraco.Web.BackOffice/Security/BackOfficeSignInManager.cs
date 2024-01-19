@@ -99,14 +99,14 @@ public class BackOfficeSignInManager : UmbracoSignInManager<BackOfficeIdentityUs
     {
     }
 
-    protected override string AuthenticationType => Constants.Security.BackOfficeAuthenticationType;
+    protected override string AuthenticationType => Constants.Security.NewBackOfficeAuthenticationType;
 
-    protected override string ExternalAuthenticationType => Constants.Security.BackOfficeExternalAuthenticationType;
+    protected override string ExternalAuthenticationType => Constants.Security.NewBackOfficeExternalAuthenticationType;
 
-    protected override string TwoFactorAuthenticationType => Constants.Security.BackOfficeTwoFactorAuthenticationType;
+    protected override string TwoFactorAuthenticationType => Constants.Security.NewBackOfficeTwoFactorAuthenticationType;
 
     protected override string TwoFactorRememberMeAuthenticationType =>
-        Constants.Security.BackOfficeTwoFactorRememberMeAuthenticationType;
+        Constants.Security.NewBackOfficeTwoFactorRememberMeAuthenticationType;
 
     /// <summary>
     ///     Custom ExternalLoginSignInAsync overload for handling external sign in with auto-linking

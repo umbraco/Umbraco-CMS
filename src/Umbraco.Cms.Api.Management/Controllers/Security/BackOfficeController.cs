@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using OpenIddict.Abstractions;
 using OpenIddict.Server.AspNetCore;
+using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -59,10 +60,27 @@ public class BackOfficeController : SecurityControllerBase
             return Unauthorized();
         }
 
-        var claims = new List<Claim> { new(ClaimTypes.Name, model.Username) };
-        var claimsIdentity = new ClaimsIdentity(claims, Constants.Security.NewBackOfficeAuthenticationType);
-        await HttpContext.SignInAsync(Constants.Security.NewBackOfficeAuthenticationType, new ClaimsPrincipal(claimsIdentity));
+        IdentitySignInResult result = await _backOfficeSignInManager.PasswordSignInAsync(
+            model.Username, model.Password, true, true);
 
+        if (result.IsNotAllowed)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new ProblemDetailsBuilder()
+                .WithTitle("USer is not allowed")
+                .Build());
+        }
+        if (result.IsLockedOut)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new ProblemDetailsBuilder()
+                .WithTitle("User is locked.")
+                .Build());
+        }
+        if(result.RequiresTwoFactor)
+        {
+            return StatusCode(StatusCodes.Status402PaymentRequired, new ProblemDetailsBuilder()
+                .WithTitle("2FA required.")
+                .Build());
+        }
         return Ok();
     }
 
