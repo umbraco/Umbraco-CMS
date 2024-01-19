@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Umbraco.Cms.Core.PropertyEditors.Validation;
+namespace Umbraco.Cms.Web.BackOffice.PropertyEditors.Validation;
 
 /// <summary>
 ///     A collection of <see cref="ValidationResult" /> for a property type within a complex editor represented by an
