@@ -67,10 +67,10 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 		const newValues = (e.target as UmbInputBlockTypeElement).value;
 
 		// remove all values that are in the group, or have a group that does not exist in the block groups.
-		const values = this.value
-			.filter((b) => b.groupKey !== groupKey)
-			.filter((b) => this._blockGroups.find((group) => group.key === b.groupKey));
-
+		let values = this.value.filter((b) => b.groupKey !== groupKey);
+		if (!groupKey) {
+			values = values.filter((b) => this._blockGroups.find((group) => group.key === b.groupKey));
+		}
 		this.value = [...values, ...newValues];
 		this.dispatchEvent(new CustomEvent('property-value-change'));
 	}
