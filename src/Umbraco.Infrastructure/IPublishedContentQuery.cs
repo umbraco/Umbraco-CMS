@@ -146,5 +146,6 @@ public interface IPublishedContentQuery
     /// <remarks>
     ///     While enumerating results, the ambient culture is changed to be the searched culture.
     /// </remarks>
-    IEnumerable<PublishedSearchResult> Search(IQueryExecutor query, int skip, int take, out long totalRecords, string? culture);
+    IEnumerable<PublishedSearchResult> Search(IQueryExecutor query, int skip, int take, out long totalRecords, string? culture)
+        => Search(query, skip, take, out totalRecords);
 }
