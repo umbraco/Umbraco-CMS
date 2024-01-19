@@ -4,8 +4,8 @@ export interface UmbBlockTypeBaseModel {
 	contentElementTypeKey: string;
 	settingsElementTypeKey?: string;
 	label?: string;
-	view?: string;
-	stylesheet?: string;
+	view?: string; // TODO: remove/replace with custom element manifest type for block list.
+	stylesheet?: string; // TODO: remove/replace with custom element manifest type for block list.
 	iconColor?: string;
 	backgroundColor?: string;
 	editorSize?: UUIModalSidebarSize;

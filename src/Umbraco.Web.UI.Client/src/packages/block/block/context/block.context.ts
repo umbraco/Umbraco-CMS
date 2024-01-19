@@ -1,17 +1,22 @@
 import type { UmbBlockTypeBaseModel } from '../../block-type/types.js';
 import type { UmbBlockLayoutBaseModel, UmbBlockDataType } from '../types.js';
-import { UMB_BLOCK_MANAGER_CONTEXT } from '../manager/index.js';
+import { UMB_BLOCK_MANAGER_CONTEXT, type UmbBlockManagerContext } from '../manager/index.js';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
+import { encodeFilePath } from '@umbraco-cms/backoffice/utils';
 
-export class UmbBlockContext<
+export abstract class UmbBlockContext<
+	BlockManagerContextTokenType extends UmbContextToken<BlockManagerContextType, BlockManagerContextType>,
+	BlockManagerContextType extends UmbBlockManagerContext<BlockType, BlockLayoutType>,
 	BlockType extends UmbBlockTypeBaseModel = UmbBlockTypeBaseModel,
 	BlockLayoutType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel,
-> extends UmbContextBase<UmbBlockContext> {
+> extends UmbContextBase<
+	UmbBlockContext<BlockManagerContextTokenType, BlockManagerContextType, BlockType, BlockLayoutType>
+> {
 	//
-	#manager?: typeof UMB_BLOCK_MANAGER_CONTEXT.TYPE;
+	_manager?: BlockManagerContextType;
 
 	#blockTypeName = new UmbStringState(undefined);
 	public readonly blockTypeName = this.#blockTypeName.asObservable();
@@ -21,11 +26,17 @@ export class UmbBlockContext<
 
 	#workspacePath = new UmbStringState(undefined);
 	public readonly workspacePath = this.#workspacePath.asObservable();
+	public readonly workspaceEditPath = this.#workspacePath.asObservablePart(
+		(path) => path + 'edit/' + encodeFilePath(this.getContentUdi() ?? ''),
+	);
+	public readonly workspaceEditSettingsPath = this.#workspacePath.asObservablePart(
+		(path) => path + 'edit/' + encodeFilePath(this.getContentUdi() ?? '') + '/view/settings',
+	);
 
-	#blockType = new UmbObjectState<BlockType | undefined>(undefined);
-	public readonly blockType = this.#blockType.asObservable();
-	public readonly blockTypeContentElementTypeKey = this.#blockType.asObservablePart((x) => x?.contentElementTypeKey);
-	public readonly blockTypeSettingsElementTypeKey = this.#blockType.asObservablePart((x) => x?.settingsElementTypeKey);
+	_blockType = new UmbObjectState<BlockType | undefined>(undefined);
+	public readonly blockType = this._blockType.asObservable();
+	public readonly blockTypeContentElementTypeKey = this._blockType.asObservablePart((x) => x?.contentElementTypeKey);
+	public readonly blockTypeSettingsElementTypeKey = this._blockType.asObservablePart((x) => x?.settingsElementTypeKey);
 
 	#layout = new UmbObjectState<BlockLayoutType | undefined>(undefined);
 	public readonly layout = this.#layout.asObservable();
@@ -48,21 +59,13 @@ export class UmbBlockContext<
 		this.#layout.setValue(layout);
 	}
 
-	constructor(host: UmbControllerHost) {
+	constructor(host: UmbControllerHost, blockManagerContextToken: BlockManagerContextTokenType) {
 		super(host, UMB_BLOCK_CONTEXT);
 
 		// Consume block manager:
-		this.consumeContext(UMB_BLOCK_MANAGER_CONTEXT, (manager) => {
-			this.#manager = manager;
-			this.observe(
-				manager.workspacePath,
-				(workspacePath) => {
-					this.#workspacePath.setValue(workspacePath);
-				},
-				'observeWorkspacePath',
-			);
-			this.#observeBlockType();
-			this.#observeData();
+		this.consumeContext(blockManagerContextToken, (manager) => {
+			this._manager = manager;
+			this._gotManager();
 		});
 
 		// Observe UDI:
@@ -85,14 +88,34 @@ export class UmbBlockContext<
 		});
 	}
 
+	getContentUdi() {
+		return this.#layout.value?.contentUdi;
+	}
+
+	_gotManager() {
+		if (this._manager) {
+			this.observe(
+				this._manager.workspacePath,
+				(workspacePath) => {
+					this.#workspacePath.setValue(workspacePath);
+				},
+				'observeWorkspacePath',
+			);
+		} else {
+			this.removeControllerByAlias('observeWorkspacePath');
+		}
+		this.#observeBlockType();
+		this.#observeData();
+	}
+
 	#observeData() {
-		if (!this.#manager) return;
+		if (!this._manager) return;
 		const contentUdi = this.#layout.value?.contentUdi;
 		if (!contentUdi) return;
 
 		// observe content:
 		this.observe(
-			this.#manager.contentOf(contentUdi),
+			this._manager.contentOf(contentUdi),
 			(content) => {
 				this.#content.setValue(content);
 			},
@@ -103,7 +126,7 @@ export class UmbBlockContext<
 		const settingsUdi = this.#layout.value?.settingsUdi;
 		if (settingsUdi) {
 			this.observe(
-				this.#manager.contentOf(settingsUdi),
+				this._manager.contentOf(settingsUdi),
 				(content) => {
 					this.#settings.setValue(content);
 				},
@@ -113,28 +136,28 @@ export class UmbBlockContext<
 	}
 
 	#observeBlockType() {
-		if (!this.#manager) return;
+		if (!this._manager) return;
 		const contentTypeKey = this.#content.value?.contentTypeKey;
 		if (!contentTypeKey) return;
 
 		// observe blockType:
 		this.observe(
-			this.#manager.blockTypeOf(contentTypeKey),
+			this._manager.blockTypeOf(contentTypeKey),
 			(blockType) => {
-				this.#blockType.setValue(blockType as BlockType);
+				this._blockType.setValue(blockType as BlockType);
 			},
 			'observeBlockType',
 		);
 	}
 
 	#observeBlockTypeContentElementName() {
-		if (!this.#manager) return;
-		const contentElementTypeKey = this.#blockType.value?.contentElementTypeKey;
+		if (!this._manager) return;
+		const contentElementTypeKey = this._blockType.value?.contentElementTypeKey;
 		if (!contentElementTypeKey) return;
 
 		// observe blockType:
 		this.observe(
-			this.#manager.contentTypeNameOf(contentElementTypeKey),
+			this._manager.contentTypeNameOf(contentElementTypeKey),
 			(contentTypeName) => {
 				this.#blockTypeName.setValue(contentTypeName);
 			},
@@ -143,8 +166,8 @@ export class UmbBlockContext<
 	}
 
 	#observeBlockTypeLabel() {
-		if (!this.#manager) return;
-		const blockType = this.#blockType.value;
+		if (!this._manager) return;
+		const blockType = this._blockType.value;
 		if (!blockType) return;
 
 		if (blockType.label) {
@@ -168,11 +191,13 @@ export class UmbBlockContext<
 	// Public methods:
 
 	public delete() {
-		if (!this.#manager) return;
+		if (!this._manager) return;
 		const contentUdi = this.#layout.value?.contentUdi;
 		if (!contentUdi) return;
-		this.#manager.deleteBlock(contentUdi);
+		this._manager.deleteBlock(contentUdi);
 	}
 }
 
-export const UMB_BLOCK_CONTEXT = new UmbContextToken<UmbBlockContext, UmbBlockContext>('UmbBlockContext');
+export const UMB_BLOCK_CONTEXT = new UmbContextToken<
+	UmbBlockContext<typeof UMB_BLOCK_MANAGER_CONTEXT, typeof UMB_BLOCK_MANAGER_CONTEXT.TYPE>
+>('UmbBlockContext');

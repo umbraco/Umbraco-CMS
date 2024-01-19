@@ -500,7 +500,6 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 						editorSize: 'medium',
 						icon: 'icon-coffee',
 					},
-
 					{
 						label: 'Headline',
 						contentElementTypeKey: 'headline-umbraco-demo-block-id',
@@ -527,6 +526,14 @@ export const data: Array<DataTypeResponseModel | FolderTreeItemResponseModel> = 
 						icon: 'icon-book-alt',
 					},
 				],
+			},
+			{
+				alias: 'useInlineEditingAsDefault',
+				value: true,
+			},
+			{
+				alias: 'useLiveEditing',
+				value: true,
 			},
 		],
 	},

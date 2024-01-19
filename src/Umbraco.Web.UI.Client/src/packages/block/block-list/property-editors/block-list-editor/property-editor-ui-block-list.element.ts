@@ -79,6 +79,9 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 
 		const blocks = config.getValueByAlias<Array<UmbBlockTypeBaseModel>>('blocks') ?? [];
 		this.#context.setBlockTypes(blocks);
+
+		const useInlineEditingAsDefault = config.getValueByAlias<boolean>('useInlineEditingAsDefault');
+		this.#context.setInlineEditingMode(useInlineEditingAsDefault);
 		//config.useSingleBlockMode
 		//config.useLiveEditing
 		//config.useInlineEditingAsDefault
