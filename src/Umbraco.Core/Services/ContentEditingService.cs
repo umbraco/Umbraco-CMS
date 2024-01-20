@@ -25,8 +25,8 @@ internal sealed class ContentEditingService
         ICoreScopeProvider scopeProvider,
         IUserIdKeyResolver userIdKeyResolver,
         ITreeEntitySortingService treeEntitySortingService,
-        ILanguageService languageService)
-        : base(contentService, contentTypeService, propertyEditorCollection, dataTypeService, logger, scopeProvider, userIdKeyResolver, treeEntitySortingService, languageService)
+        IContentValidationService contentValidationService)
+        : base(contentService, contentTypeService, propertyEditorCollection, dataTypeService, logger, scopeProvider, userIdKeyResolver, treeEntitySortingService, contentValidationService)
     {
         _templateService = templateService;
         _logger = logger;

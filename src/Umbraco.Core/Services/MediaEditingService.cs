@@ -23,8 +23,8 @@ internal sealed class MediaEditingService
         ICoreScopeProvider scopeProvider,
         IUserIdKeyResolver userIdKeyResolver,
         ITreeEntitySortingService treeEntitySortingService,
-        ILanguageService languageService)
-        : base(contentService, contentTypeService, propertyEditorCollection, dataTypeService, logger, scopeProvider, userIdKeyResolver, treeEntitySortingService, languageService)
+        IMediaValidationService mediaValidationService)
+        : base(contentService, contentTypeService, propertyEditorCollection, dataTypeService, logger, scopeProvider, userIdKeyResolver, treeEntitySortingService, mediaValidationService)
         => _logger = logger;
 
     public async Task<IMedia?> GetAsync(Guid key)
