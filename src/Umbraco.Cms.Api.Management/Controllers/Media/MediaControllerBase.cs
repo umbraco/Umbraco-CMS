@@ -18,10 +18,11 @@ namespace Umbraco.Cms.Api.Management.Controllers.Media;
 [Authorize(Policy = "New" + AuthorizationPolicies.SectionAccessMedia)]
 public class MediaControllerBase : ContentControllerBase
 {
-    protected IActionResult MediaNotFound() => NotFound(new ProblemDetailsBuilder()
-        .WithTitle("The requested Media could not be found")
-        .Build());
-
+    protected IActionResult MediaNotFound()
+        => OperationStatusResult(ContentEditingOperationStatus.NotFound, problemDetailsBuilder
+            => NotFound(problemDetailsBuilder
+                .WithTitle("The requested Media could not be found")
+                .Build()));
     protected IActionResult MediaEditingOperationStatusResult<TContentModelBase>(
         ContentEditingOperationStatus status,
         TContentModelBase requestModel,

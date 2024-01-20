@@ -62,7 +62,7 @@ public class UpdateDocumentController : DocumentControllerBase
         ContentUpdateModel model = _documentEditingPresentationFactory.MapUpdateModel(requestModel);
         Attempt<ContentUpdateResult, ContentEditingOperationStatus> result = await _contentEditingService.UpdateAsync(content, model, CurrentUserKey(_backOfficeSecurityAccessor));
 
-        return result.Success
+        return result.Status is ContentEditingOperationStatus.Success
             ? Ok()
             : DocumentEditingOperationStatusResult(result.Status, requestModel, result.Result.ValidationErrors);
     }

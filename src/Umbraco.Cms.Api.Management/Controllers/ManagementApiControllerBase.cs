@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.Attributes;
+using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Api.Common.Filters;
 using Umbraco.Cms.Api.Common.Mvc.ActionResults;
 using Umbraco.Cms.Api.Management.DependencyInjection;
@@ -62,4 +63,8 @@ public abstract class ManagementApiControllerBase : Controller, IUmbracoFeature
     /// </remarks>
     // Duplicate code copied between Management API and Delivery API.
     protected IActionResult Forbidden() => new StatusCodeResult(StatusCodes.Status403Forbidden);
+
+    protected IActionResult OperationStatusResult<TEnum>(TEnum status, Func<ProblemDetailsBuilder, IActionResult> result)
+        where TEnum : Enum
+        => result(new ProblemDetailsBuilder().WithOperationStatus(status));
 }

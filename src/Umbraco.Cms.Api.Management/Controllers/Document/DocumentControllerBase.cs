@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Api.Management.Content;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Api.Management.ViewModels.Content;
@@ -18,9 +17,11 @@ namespace Umbraco.Cms.Api.Management.Controllers.Document;
 [Authorize(Policy = "New" + AuthorizationPolicies.TreeAccessDocuments)]
 public abstract class DocumentControllerBase : ContentControllerBase
 {
-    protected IActionResult DocumentNotFound() => NotFound(new ProblemDetailsBuilder()
-        .WithTitle("The requested Document could not be found")
-        .Build());
+    protected IActionResult DocumentNotFound()
+        => OperationStatusResult(ContentEditingOperationStatus.NotFound, problemDetailsBuilder
+            => NotFound(problemDetailsBuilder
+                .WithTitle("The requested Document could not be found")
+                .Build()));
 
     protected IActionResult DocumentEditingOperationStatusResult<TContentModelBase>(
         ContentEditingOperationStatus status,
