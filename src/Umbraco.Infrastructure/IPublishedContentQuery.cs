@@ -63,10 +63,7 @@ public interface IPublishedContentQuery
     ///     The name of the index to search (defaults to
     ///     <see cref="Constants.UmbracoIndexes.ExternalIndexName" />).
     /// </param>
-    /// <param name="loadedFields">
-    ///     This parameter is no longer used, because the results are loaded from the published snapshot
-    ///     using the single item ID field.
-    /// </param>
+    /// <param name="filterQuery">Additional filter query to be applied.</param>
     /// <returns>
     ///     The search results.
     /// </returns>
@@ -86,7 +83,7 @@ public interface IPublishedContentQuery
         out long totalRecords,
         string culture = "*",
         string indexName = Constants.UmbracoIndexes.ExternalIndexName,
-        ISet<string>? loadedFields = null);
+        Func<IBooleanOperation, IOrdering>? filterQuery = null);
 
     /// <summary>
     ///     Searches content.
@@ -131,4 +128,20 @@ public interface IPublishedContentQuery
     ///     The search results.
     /// </returns>
     IEnumerable<PublishedSearchResult> Search(IQueryExecutor query, int skip, int take, out long totalRecords);
+
+    /// <summary>
+    ///     Executes the query and converts the results to <see cref="PublishedSearchResult" />.
+    /// </summary>
+    /// <param name="query">The query.</param>
+    /// <param name="skip">The amount of results to skip.</param>
+    /// <param name="take">The amount of results to take/return.</param>
+    /// <param name="totalRecords">The total amount of records.</param>
+    /// <param name="culture">The culture (defaults to a culture insensitive search).</param>
+    /// <returns>
+    ///     The search results.
+    /// </returns>
+    /// <remarks>
+    ///     While enumerating results, the ambient culture is changed to be the searched culture.
+    /// </remarks>
+    IEnumerable<PublishedSearchResult> Search(IQueryExecutor query, int skip, int take, out long totalRecords, string? culture);
 }

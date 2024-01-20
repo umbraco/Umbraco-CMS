@@ -245,9 +245,14 @@ public class PublishedContentQuery : IPublishedContentQuery
         => Search(term, 0, 0, out _, culture, indexName);
 
     /// <inheritdoc />
-    public IEnumerable<PublishedSearchResult> Search(string term, int skip, int take, out long totalRecords,
-        string culture = "*", string indexName = Constants.UmbracoIndexes.ExternalIndexName,
-        ISet<string>? loadedFields = null)
+    public IEnumerable<PublishedSearchResult> Search(
+        string term,
+        int skip,
+        int take,
+        out long totalRecords,
+        string culture = "*",
+        string indexName = Constants.UmbracoIndexes.ExternalIndexName,
+        Func<IBooleanOperation, IOrdering>? filterQuery = null)
     {
         if (skip < 0)
         {
@@ -274,16 +279,16 @@ public class PublishedContentQuery : IPublishedContentQuery
 
         IQuery? query = umbIndex.Searcher.CreateQuery(IndexTypes.Content);
 
-        IOrdering ordering;
+        IBooleanOperation booleanQuery;
         if (culture == "*")
         {
             // Search everything
-            ordering = query.ManagedQuery(term);
+            booleanQuery = query.ManagedQuery(term);
         }
         else if (string.IsNullOrWhiteSpace(culture))
         {
             // Only search invariant
-            ordering = query
+            booleanQuery = query
                 .Field(UmbracoExamineFieldNames.VariesByCultureFieldName, "n") // Must not vary by culture
                 .And().ManagedQuery(term);
         }
@@ -293,21 +298,20 @@ public class PublishedContentQuery : IPublishedContentQuery
             var fields =
                 umbIndex.GetCultureAndInvariantFields(culture)
                     .ToArray(); // Get all index fields suffixed with the culture name supplied
-            ordering = query.ManagedQuery(term, fields);
+
+            // Filter out unpublished content for the specified culture if the content varies by culture
+            // The published__{culture} field is not populated when the content is not published in that culture
+            booleanQuery = query
+                .ManagedQuery(term, fields)
+                .Not().Group(q => q
+                    .Field(UmbracoExamineFieldNames.VariesByCultureFieldName, "y")
+                    .Not().Field($"{UmbracoExamineFieldNames.PublishedFieldName}_{culture.ToLowerInvariant()}", "y"));
         }
 
-            // Filter selected fields because results are loaded from the published snapshot based on these
-            IOrdering? queryExecutor = ordering.SelectFields(_returnedQueryFields);
+        // Apply any additional user supplied filtering
+        IOrdering ordering = filterQuery != null ? filterQuery(booleanQuery) : booleanQuery;
 
-
-        ISearchResults? results = skip == 0 && take == 0
-            ? queryExecutor.Execute()
-            : queryExecutor.Execute(QueryOptions.SkipTake(skip, take));
-
-        totalRecords = results.TotalItemCount;
-
-        return new CultureContextualSearchResults(results.ToPublishedSearchResults(_publishedSnapshot.Content),
-            _variationContextAccessor, culture);
+        return Search(ordering, skip, take, out totalRecords, culture);
     }
 
     /// <inheritdoc />
@@ -316,6 +320,10 @@ public class PublishedContentQuery : IPublishedContentQuery
 
     /// <inheritdoc />
     public IEnumerable<PublishedSearchResult> Search(IQueryExecutor query, int skip, int take, out long totalRecords)
+        => Search(query, skip, take, out totalRecords, null);
+
+    /// <inheritdoc />
+    public IEnumerable<PublishedSearchResult> Search(IQueryExecutor query, int skip, int take, out long totalRecords, string? culture)
     {
         if (skip < 0)
         {
@@ -331,8 +339,8 @@ public class PublishedContentQuery : IPublishedContentQuery
 
         if (query is IOrdering ordering)
         {
-                // Filter selected fields because results are loaded from the published snapshot based on these
-                query = ordering.SelectFields(_returnedQueryFields);
+            // Filter selected fields because results are loaded from the published snapshot based on these
+            query = ordering.SelectFields(_returnedQueryFields);
         }
 
         ISearchResults? results = skip == 0 && take == 0
@@ -341,7 +349,9 @@ public class PublishedContentQuery : IPublishedContentQuery
 
         totalRecords = results.TotalItemCount;
 
-        return results.ToPublishedSearchResults(_publishedSnapshot);
+        return culture.IsNullOrWhiteSpace()
+            ? results.ToPublishedSearchResults(_publishedSnapshot)
+            : new CultureContextualSearchResults(results.ToPublishedSearchResults(_publishedSnapshot.Content), _variationContextAccessor, culture);
     }
 
     /// <summary>
