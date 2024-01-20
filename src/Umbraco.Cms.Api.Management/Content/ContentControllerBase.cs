@@ -2,7 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Controllers;
 using Umbraco.Cms.Api.Management.ViewModels.Content;
+using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Core.Models.ContentEditing.Validation;
+using Umbraco.Cms.Core.Models.ContentPublishing;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
 
@@ -110,7 +112,10 @@ public class ContentControllerBase : ManagementApiControllerBase
                 .Build()));
     }
 
-    protected IActionResult ContentPublishingOperationStatusResult(ContentPublishingOperationStatus status)
+    protected IActionResult ContentPublishingOperationStatusResult(
+        ContentPublishingOperationStatus status,
+        IEnumerable<string>? invalidPropertyAliases = null,
+        IEnumerable<ContentPublishingBranchItemResult>? failedBranchItems = null)
         => OperationStatusResult(status, problemDetailsBuilder => status switch
         {
             ContentPublishingOperationStatus.ContentNotFound => NotFound(problemDetailsBuilder
@@ -123,6 +128,7 @@ public class ContentControllerBase : ManagementApiControllerBase
             ContentPublishingOperationStatus.ContentInvalid => BadRequest(problemDetailsBuilder
                 .WithTitle("Invalid content")
                 .WithDetail("The specified content had an invalid configuration.")
+                .WithExtension("invalidProperties", invalidPropertyAliases ?? Enumerable.Empty<string>())
                 .Build()),
             ContentPublishingOperationStatus.NothingToPublish => BadRequest(problemDetailsBuilder
                 .WithTitle("Nothing to publish")
@@ -165,6 +171,15 @@ public class ContentControllerBase : ManagementApiControllerBase
                 .WithTitle("Unsaved changes")
                 .WithDetail(
                     "Could not publish the content because it had unsaved changes. Make sure to save all changes before attempting a publish.")
+                .Build()),
+            ContentPublishingOperationStatus.FailedBranch => BadRequest(problemDetailsBuilder
+                .WithTitle("Failed branch operation")
+                .WithDetail("One or more items in the branch could not complete the operation.")
+                .WithExtension("failedBranchItems", failedBranchItems?.Select(item => new DocumentPublishBranchItemResult
+                    {
+                        Id = item.Key,
+                        OperationStatus = item.OperationStatus
+                    }) ?? Enumerable.Empty<DocumentPublishBranchItemResult>())
                 .Build()),
             ContentPublishingOperationStatus.Failed => BadRequest(problemDetailsBuilder
                 .WithTitle("Publish or unpublish failed")

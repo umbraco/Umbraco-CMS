@@ -6,6 +6,7 @@ using Umbraco.Cms.Api.Management.Security.Authorization.Content;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Actions;
+using Umbraco.Cms.Core.Models.ContentPublishing;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -48,12 +49,12 @@ public class PublishDocumentController : DocumentControllerBase
             return Forbidden();
         }
 
-        Attempt<ContentPublishingOperationStatus> attempt = await _contentPublishingService.PublishAsync(
+        Attempt<ContentPublishingResult, ContentPublishingOperationStatus> attempt = await _contentPublishingService.PublishAsync(
             id,
             requestModel.Cultures,
             CurrentUserKey(_backOfficeSecurityAccessor));
         return attempt.Success
             ? Ok()
-            : ContentPublishingOperationStatusResult(attempt.Result);
+            : ContentPublishingOperationStatusResult(attempt.Status, invalidPropertyAliases: attempt.Result.InvalidPropertyAliases);
     }
 }
