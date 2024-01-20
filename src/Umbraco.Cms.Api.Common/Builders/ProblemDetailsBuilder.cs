@@ -8,7 +8,7 @@ public class ProblemDetailsBuilder
     private string? _detail;
     private string? _type;
     private string? _operationStatus;
-    private IDictionary<string, string[]>? _propertyValidationErrors;
+    private IDictionary<string, object>? _extensions;
 
     public ProblemDetailsBuilder WithTitle(string title)
     {
@@ -36,8 +36,12 @@ public class ProblemDetailsBuilder
     }
 
     public ProblemDetailsBuilder WithPropertyValidationErrors(IDictionary<string, string[]> propertyValidationErrors)
+        => WithExtension("propertyValidationErrors", propertyValidationErrors);
+
+    public ProblemDetailsBuilder WithExtension(string key, object value)
     {
-        _propertyValidationErrors = propertyValidationErrors.Any() ? propertyValidationErrors : null;
+        _extensions ??= new Dictionary<string, object>();
+        _extensions[key] = value;
         return this;
     }
 
@@ -52,12 +56,15 @@ public class ProblemDetailsBuilder
 
         if (_operationStatus is not null)
         {
-            problemDetails.Extensions["operationstatus"] = _operationStatus;
+            problemDetails.Extensions["operationStatus"] = _operationStatus;
         }
 
-        if (_propertyValidationErrors is not null)
+        if (_extensions is not null)
         {
-            problemDetails.Extensions["errors"] = _propertyValidationErrors;
+            foreach (KeyValuePair<string, object> extension in _extensions)
+            {
+                problemDetails.Extensions[extension.Key] = extension.Value;
+            }
         }
 
         return problemDetails;
