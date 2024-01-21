@@ -57,7 +57,7 @@ test.describe('Created packages tests', () => {
     expect(await umbracoApi.package.doesNameExist(packageName)).toBeFalsy();
   });
 
-  test('can create a package with content', async ({page,umbracoApi, umbracoUi}) => {
+  test('can create a package with content', async ({page, umbracoApi, umbracoUi}) => {
     // Arrange
     const documentTypeName = 'TestDocumentType';
     const documentName = 'TestDocument';
@@ -70,8 +70,9 @@ test.describe('Created packages tests', () => {
     // Act
     await umbracoUi.package.clickExistingPackageName(packageName);
     await umbracoUi.package.clickAddContentToPackageButton();
+    await umbracoUi.package.clickCaretButton();
     await umbracoUi.package.clickLabelWithName(documentName);
-    await umbracoUi.package.clickChooseBtn();
+    await umbracoUi.package.clickSubmitButton();
     await umbracoUi.package.clickSaveChangesToPackageButton();
 
     // Assert
