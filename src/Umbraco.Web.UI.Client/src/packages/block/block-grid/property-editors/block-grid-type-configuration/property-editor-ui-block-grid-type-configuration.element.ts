@@ -52,10 +52,8 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 	}
 
 	#mapValuesToBlockGroups() {
-		const valuesWithNoGroup = this.value.filter(
-			// Look for values without a group, or with a group that is non existent.
-			(value) => !value.groupKey || this._blockGroups.find((group) => group.key !== value.groupKey),
-		);
+		// What if a block is in a group that does not exist in the block groups? Should it be removed? (Right now they will never be rendered)
+		const valuesWithNoGroup = this.value.filter((value) => !value.groupKey);
 
 		const valuesWithGroup = this._blockGroups.map((group) => {
 			return { name: group.name, key: group.key, blocks: this.value.filter((value) => value.groupKey === group.key) };
@@ -64,30 +62,13 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 		this._mappedValuesAndGroups = [{ blocks: valuesWithNoGroup }, ...valuesWithGroup];
 	}
 
-	#onChange(e: Event, groupKey?: string) {
-		const newValues = (e.target as UmbInputBlockTypeElement).value;
-
-		// remove all values that are in the group, or have a group that does not exist in the block groups.
-		let values = this.value.filter((b) => b.groupKey !== groupKey);
-		if (!groupKey) {
-			values = values.filter((b) => this._blockGroups.find((group) => group.key === b.groupKey));
-		}
-		this.value = [...values, ...newValues];
-		this.dispatchEvent(new CustomEvent('property-value-change'));
-	}
-
 	render() {
 		return html`${repeat(
 			this._mappedValuesAndGroups,
 			(group) => group.key,
 			(group) =>
 				html`${group.key ? this.#renderGroupInput(group.key, group.name) : nothing}
-					<umb-input-block-type
-						entity-type="block-grid-type"
-						.groupKey=${group.key}
-						.groupName=${group.name}
-						.value=${group.blocks}
-						@change=${(e: Event) => this.#onChange(e, group.key)}></umb-input-block-type>`,
+					<umb-input-block-type entity-type="block-grid-type" .value="${group.blocks}"></umb-input-block-type>`,
 		)}`;
 	}
 
