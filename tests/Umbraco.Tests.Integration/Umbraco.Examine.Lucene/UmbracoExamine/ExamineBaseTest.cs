@@ -20,6 +20,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine;
 [TestFixture]
 public abstract class ExamineBaseTest : UmbracoIntegrationTest
 {
+    private const int IndexingTimoutInMilliseconds = 3000;
+
     protected IndexInitializer IndexInitializer => Services.GetRequiredService<IndexInitializer>();
 
     protected IHostingEnvironment HostingEnvironment => Services.GetRequiredService<IHostingEnvironment>();
@@ -124,7 +126,8 @@ public abstract class ExamineBaseTest : UmbracoIntegrationTest
             {
                 indexUpdatingAction();
                 return null;
-            }, indexName);
+            },
+            indexName);
 
     /// <summary>
     /// Performs and action and waits for the specified index to be done indexing.
@@ -148,8 +151,7 @@ public abstract class ExamineBaseTest : UmbracoIntegrationTest
 
         // Perform the action, and wait for the handle to be freed, meaning the index is done populating.
         var result = indexUpdatingAction();
-        await indexingHandle.WaitOneAsync();
-
+        await indexingHandle.WaitOneAsync(millisecondsTimeout: IndexingTimoutInMilliseconds);
         return result;
     }
 
