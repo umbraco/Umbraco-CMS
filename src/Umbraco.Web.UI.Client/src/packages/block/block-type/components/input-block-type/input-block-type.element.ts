@@ -1,4 +1,4 @@
-import { UmbBlockTypeBase, UmbBlockTypeGroup, UmbBlockTypeWithGroupKey } from '../../types.js';
+import { UmbBlockTypeBase, UmbBlockTypeWithGroupKey } from '../../types.js';
 import {
 	UMB_DOCUMENT_TYPE_PICKER_MODAL,
 	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
@@ -9,7 +9,6 @@ import '../block-type-card/index.js';
 import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UMB_PROPERTY_DATASET_CONTEXT, UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import { UmbBlockGridType } from '@umbraco-cms/backoffice/block';
 
@@ -24,12 +23,6 @@ export class UmbInputBlockTypeElement<
 	public set value(items) {
 		this._items = items ?? [];
 	}
-
-	@property()
-	groupKey?: string;
-
-	@property()
-	groupName?: string;
 
 	@property({ type: String, attribute: 'entity-type' })
 	public get entityType() {
@@ -67,16 +60,12 @@ export class UmbInputBlockTypeElement<
 	>;
 
 	#datasetContext?: UmbPropertyDatasetContext;
-	#blockGroups: Array<UmbBlockTypeGroup> = [];
-	#filter?: any;
+	#filter: Array<UmbBlockGridType> = [];
 
 	constructor() {
 		super();
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, async (instance) => {
 			this.#datasetContext = instance;
-			this.observe(await this.#datasetContext?.propertyValueByAlias('blockGroups'), (value) => {
-				this.#blockGroups = value as Array<UmbBlockTypeGroup>;
-			});
 			this.observe(await this.#datasetContext?.propertyValueByAlias('blocks'), (value) => {
 				this.#filter = value as Array<UmbBlockGridType>;
 			});
@@ -120,10 +109,9 @@ export class UmbInputBlockTypeElement<
 	}
 
 	render() {
-		return html`${this.#renderGroupInput()}
-			<div>
-				${repeat(this.value, (block) => block.contentElementTypeKey, this.#renderItem)} ${this.#renderButton()}
-			</div>`;
+		return html` <div>
+			${repeat(this.value, (block) => block.contentElementTypeKey, this.#renderItem)} ${this.#renderButton()}
+		</div>`;
 	}
 
 	#renderItem = (item: BlockType) => {
@@ -143,37 +131,6 @@ export class UmbInputBlockTypeElement<
 				Add
 			</uui-button>
 		`;
-	}
-
-	//Group renders (if exists)
-
-	#renderGroupInput() {
-		if (!this.groupKey) return;
-		return html`<uui-input auto-width label="Group" .value=${this.groupName} @change=${this.#changeGroupName}>
-			<uui-button compact slot="append" label="delete" @click=${this.#deleteGroup}>
-				<uui-icon name="icon-trash"></uui-icon>
-			</uui-button>
-		</uui-input>`;
-	}
-
-	#changeGroupName(e: UUIInputEvent) {
-		if (!this.groupKey) return;
-
-		const groupName = e.target.value as string;
-		this.#datasetContext?.setPropertyValue(
-			'blockGroups',
-			this.#blockGroups.map((group) => ({ ...group, groupName: this.groupKey === group.key ? groupName : group.name })),
-		);
-	}
-
-	#deleteGroup() {
-		if (!this.groupKey) return;
-		this.#datasetContext?.setPropertyValue(
-			'blockGroups',
-			this.#blockGroups.filter((group) => group.key !== this.groupKey),
-		);
-		this.value = this._items.filter((block) => block.groupKey !== this.groupKey);
-		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	static styles = [

@@ -1,4 +1,4 @@
-import type { UmbBlockTypeBase, UmbBlockTypeWithGroupKey } from '../block-type/index.js';
+import type { UmbBlockTypeWithGroupKey } from '../block-type/index.js';
 
 export interface UmbBlockGridType extends UmbBlockTypeWithGroupKey {
 	columnSpanOptions: Array<number>;

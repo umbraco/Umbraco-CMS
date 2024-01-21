@@ -1,12 +1,13 @@
 import type { UmbBlockTypeWithGroupKey, UmbInputBlockTypeElement } from '../../../block-type/index.js';
 import '../../../block-type/components/input-block-type/index.js';
 import { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
-import { html, customElement, property, state, css, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, state, css, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_PROPERTY_DATASET_CONTEXT, UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import { UmbBlockGridGroupType, UmbBlockGridGroupTypeConfiguration } from '@umbraco-cms/backoffice/block';
+import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
 /**
  * @element umb-property-editor-ui-block-grid-type-configuration
@@ -80,13 +81,44 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 			this._mappedValuesAndGroups,
 			(group) => group.key,
 			(group) =>
-				html`<umb-input-block-type
-					entity-type="block-grid-type"
-					.groupKey=${group.key}
-					.groupName=${group.name}
-					.value=${group.blocks}
-					@change=${(e: Event) => this.#onChange(e, group.key)}></umb-input-block-type>`,
+				html`${group.key ? this.#renderGroupInput(group.key, group.name) : nothing}
+					<umb-input-block-type
+						entity-type="block-grid-type"
+						.groupKey=${group.key}
+						.groupName=${group.name}
+						.value=${group.blocks}
+						@change=${(e: Event) => this.#onChange(e, group.key)}></umb-input-block-type>`,
 		)}`;
+	}
+
+	#changeGroupName(e: UUIInputEvent, groupKey: string) {
+		const groupName = e.target.value as string;
+		this.#datasetContext?.setPropertyValue(
+			'blockGroups',
+			this._blockGroups.map((group) => ({ ...group, groupName: groupKey === group.key ? groupName : group.name })),
+		);
+	}
+
+	#deleteGroup(groupKey: string) {
+		this.#datasetContext?.setPropertyValue(
+			'blockGroups',
+			this._blockGroups.filter((group) => group.key !== groupKey),
+		);
+
+		// Should blocks that belonged to the removed group be deleted as well?
+		this.value = this.value.filter((block) => block.groupKey !== groupKey);
+	}
+
+	#renderGroupInput(groupKey: string, groupName?: string) {
+		return html`<uui-input
+			auto-width
+			label="Group"
+			.value=${groupName ?? ''}
+			@change=${(e: UUIInputEvent) => this.#changeGroupName(e, groupKey)}>
+			<uui-button compact slot="append" label="delete" @click=${() => this.#deleteGroup(groupKey)}>
+				<uui-icon name="icon-trash"></uui-icon>
+			</uui-button>
+		</uui-input>`;
 	}
 
 	static styles = [
