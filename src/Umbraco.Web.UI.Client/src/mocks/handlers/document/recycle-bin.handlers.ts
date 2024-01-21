@@ -1,20 +1,25 @@
 const { rest } = window.MockServiceWorker;
-import { umbDocumentData } from '../../data/document.data.js';
+import { umbDocumentMockDb } from '../../data/document/document.db.js';
+import { UMB_SLUG } from './slug.js';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
-export const handlers = [
-	rest.get(umbracoPath(`/recycle-bin/document/root`), (req, res, ctx) => {
-		const response = umbDocumentData.getRecycleBinRoot();
-
+export const recycleBinHandlers = [
+	rest.get(umbracoPath(`/recycle-bin${UMB_SLUG}/root`), (req, res, ctx) => {
+		const response = umbDocumentMockDb.recycleBin.tree.getRoot();
 		return res(ctx.status(200), ctx.json(response));
 	}),
 
-	rest.get(umbracoPath(`/recycle-bin/document/children`), (req, res, ctx) => {
+	rest.get(umbracoPath(`/recycle-bin${UMB_SLUG}/children`), (req, res, ctx) => {
 		const parentId = req.url.searchParams.get('parentId');
 		if (!parentId) return;
-
-		const response = umbDocumentData.getRecycleBinChildrenOf(parentId);
-
+		const response = umbDocumentMockDb.recycleBin.tree.getChildrenOf(parentId);
 		return res(ctx.status(200), ctx.json(response));
+	}),
+
+	rest.put(umbracoPath(`${UMB_SLUG}/:id/move-to-recycle-bin`), async (req, res, ctx) => {
+		const id = req.params.id as string;
+		if (!id) return res(ctx.status(400));
+		umbDocumentMockDb.recycleBin.trash([id]);
+		return res(ctx.status(200));
 	}),
 ];

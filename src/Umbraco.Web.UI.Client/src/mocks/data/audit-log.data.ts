@@ -1,5 +1,5 @@
 import { data as userData } from './user/user.data.js';
-import { data as documentData } from './document.data.js';
+import { data as documentData } from './document/document.data.js';
 import {
 	AuditLogResponseModel,
 	AuditLogWithUsernameResponseModel,
