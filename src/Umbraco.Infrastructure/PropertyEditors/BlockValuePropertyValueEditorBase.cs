@@ -215,7 +215,7 @@ internal abstract class BlockValuePropertyValueEditorBase : DataValueEditor, IDa
                 var contentPropData = new ContentPropertyData(prop.Value.Value, propConfiguration);
 
                 // Get the property editor to do it's conversion
-                var newValue = propEditor.GetValueEditor().FromEditor(contentPropData, prop.Value.Value);
+                var newValue = propEditor.GetValueEditor().FromEditor(contentPropData, prop.Value.Value, dataTypes);
 
                 // update the raw value since this is what will get serialized out
                 row.RawPropertyValues[prop.Key] = newValue;
