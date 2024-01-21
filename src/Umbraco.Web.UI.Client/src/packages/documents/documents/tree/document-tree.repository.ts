@@ -15,8 +15,8 @@ export class UmbDocumentTreeRepository
 	}
 
 	async requestTreeRoot() {
-		const data = {
-			id: null,
+		const data: UmbDocumentTreeRootModel = {
+			unique: null,
 			entityType: UMB_DOCUMENT_ROOT_ENTITY_TYPE,
 			name: 'Documents',
 			icon: 'icon-folder',

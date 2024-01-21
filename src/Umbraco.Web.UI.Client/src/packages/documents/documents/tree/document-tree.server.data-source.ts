@@ -1,3 +1,4 @@
+import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
 import { UmbDocumentTreeItemModel } from './types.js';
 import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
 import { DocumentResource, DocumentTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
@@ -43,22 +44,19 @@ const getChildrenOf = (parentUnique: string | null) => {
 
 const mapper = (item: DocumentTreeItemResponseModel): UmbDocumentTreeItemModel => {
 	return {
-		id: item.id,
-		parentId: item.parentId || null,
+		unique: item.id,
+		parentUnique: item.parentId ? item.parentId : null,
 		name: item.name,
-		entityType: 'document',
+		entityType: UMB_DOCUMENT_ENTITY_TYPE,
+		noAccess: item.noAccess,
+		isTrashed: item.isTrashed,
 		isContainer: item.isContainer,
 		hasChildren: item.hasChildren,
 		isProtected: item.isProtected,
 		isPublished: item.isPublished,
 		isEdited: item.isEdited,
 		contentTypeId: item.contentTypeId,
-		variants:
-			item.variants?.map((variant) => ({
-				name: variant.name!,
-				culture: variant.culture!,
-				state: variant.state!,
-			})) || [],
+		variants: item.variants,
 		icon: item.icon,
 		isFolder: false,
 	};

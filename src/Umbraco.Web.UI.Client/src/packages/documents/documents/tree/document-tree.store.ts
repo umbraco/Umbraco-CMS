@@ -1,14 +1,14 @@
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UmbEntityTreeStore } from '@umbraco-cms/backoffice/tree';
+import { UmbUniqueTreeStore } from '@umbraco-cms/backoffice/tree';
 
 /**
  * @export
  * @class UmbDocumentTreeStore
- * @extends {UmbStoreBase}
+ * @extends {UmbUniqueTreeStore}
  * @description - Tree Data Store for Document Items
  */
-export class UmbDocumentTreeStore extends UmbEntityTreeStore {
+export class UmbDocumentTreeStore extends UmbUniqueTreeStore {
 	/**
 	 * Creates an instance of UmbDocumentTreeStore.
 	 * @param {UmbControllerHostElement} host
