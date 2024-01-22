@@ -31,7 +31,6 @@ const createMockDataTypeFolderMapper = (request: CreateFolderRequestModel): UmbM
 		parentId: request.parentId,
 		isFolder: true,
 		hasChildren: false,
-		isContainer: false,
 		editorAlias: '',
 		values: [],
 	};
@@ -47,7 +46,6 @@ const createMockDataTypeMapper = (request: CreateDataTypeRequestModel): UmbMockD
 		values: request.values,
 		isFolder: false,
 		hasChildren: false,
-		isContainer: false,
 	};
 };
 
