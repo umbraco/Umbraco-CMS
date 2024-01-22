@@ -4,9 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.Builders;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Mapping;
-using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Web.Common.Authorization;
 
@@ -16,28 +13,9 @@ namespace Umbraco.Cms.Api.Management.Controllers.PartialView.Folder;
 [VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.PartialView}/folder")]
 [ApiExplorerSettings(GroupName = "Partial View")]
 [Authorize(Policy = "New" + AuthorizationPolicies.TreeAccessPartialViews)]
-public class PartialViewFolderControllerBase : PathFolderManagementControllerBase<PartialViewFolderOperationStatus>
+public class PartialViewFolderControllerBase : FileSystemManagementControllerBase
 {
-    private readonly IPartialViewFolderService _partialViewFolderService;
-
-    public PartialViewFolderControllerBase(
-        IUmbracoMapper mapper,
-        IPartialViewFolderService partialViewFolderService)
-        : base(mapper)
-    {
-        _partialViewFolderService = partialViewFolderService;
-    }
-
-    protected override Task<PathContainer?> GetContainerAsync(string path) => _partialViewFolderService.GetAsync(path);
-
-    protected override Task<Attempt<PathContainer?, PartialViewFolderOperationStatus>> CreateContainerAsync(
-        PathContainer container) =>
-        _partialViewFolderService.CreateAsync(container);
-
-    protected override Task<Attempt<PartialViewFolderOperationStatus>> DeleteContainerAsync(string path) =>
-        _partialViewFolderService.DeleteAsync(path);
-
-    protected override IActionResult OperationStatusResult(PartialViewFolderOperationStatus status) =>
+    protected IActionResult OperationStatusResult(PartialViewFolderOperationStatus status) =>
         status switch
         {
             PartialViewFolderOperationStatus.AlreadyExists => BadRequest(new ProblemDetailsBuilder()
