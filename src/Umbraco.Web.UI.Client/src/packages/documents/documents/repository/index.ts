@@ -1,2 +1,2 @@
-export { UmbDocumentRepository } from './document.repository.js';
-export { UMB_DOCUMENT_REPOSITORY_ALIAS } from './manifests.js';
+export { UmbDocumentDetailRepository, UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS } from './detail/index.js';
+export { UmbDocumentItemRepository, UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS } from './item/index.js';

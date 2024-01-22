@@ -1,11 +1,5 @@
-import { UmbId } from '@umbraco-cms/backoffice/id';
-import type { UmbDataSource } from '@umbraco-cms/backoffice/repository';
 import {
 	DocumentResource,
-	DocumentResponseModel,
-	ContentStateModel,
-	CreateDocumentRequestModel,
-	UpdateDocumentRequestModel,
 	PublishDocumentRequestModel,
 	UnpublishDocumentRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
@@ -19,9 +13,7 @@ import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
  * @class UmbDocumentServerDataSource
  * @implements {RepositoryDetailDataSource}
  */
-export class UmbDocumentServerDataSource
-	implements UmbDataSource<CreateDocumentRequestModel, any, UpdateDocumentRequestModel, DocumentResponseModel>
-{
+export class UmbDocumentServerDataSource {
 	#host: UmbControllerHost;
 
 	/**
@@ -31,93 +23,6 @@ export class UmbDocumentServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
 		this.#host = host;
-	}
-
-	/**
-	 * Fetches a Document with the given id from the server
-	 * @param {string} id
-	 * @memberof UmbDocumentServerDataSource
-	 */
-	async read(id: string) {
-		if (!id) throw new Error('Id is missing');
-
-		return tryExecuteAndNotify(
-			this.#host,
-			DocumentResource.getDocumentById({
-				id,
-			}),
-		);
-	}
-
-	/**
-	 * Creates a new Document scaffold
-	 * @param {string} documentTypeId
-	 * @param {Partial<CreateDocumentRequestModel>} [preset]
-	 * @return {*}
-	 * @memberof UmbDocumentServerDataSource
-	 */
-	async createScaffold(documentTypeId: string, preset?: Partial<CreateDocumentRequestModel>) {
-		// TODO: make our own "scaffold" model
-		const data: DocumentResponseModel = {
-			urls: [],
-			templateId: null,
-			parentId: null,
-			contentTypeId: documentTypeId,
-			values: [],
-			variants: [
-				{
-					state: ContentStateModel.DRAFT,
-					publishDate: null,
-					culture: null,
-					segment: null,
-					name: '',
-					createDate: new Date().toISOString(),
-					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-					// @ts-ignore
-					updateDate: undefined,
-				},
-			],
-			...preset,
-			id: UmbId.new(),
-		};
-
-		return { data };
-	}
-
-	/**
-	 * Inserts a new Document on the server
-	 * @param {Document} document
-	 * @memberof UmbDocumentServerDataSource
-	 */
-	async create(document: CreateDocumentRequestModel) {
-		if (!document.id) throw new Error('Id is missing');
-		return tryExecuteAndNotify(this.#host, DocumentResource.postDocument({ requestBody: document }));
-	}
-
-	/**
-	 * Updates a Document on the server
-	 * @param {string} id
-	 * @param {UpdateDocumentRequestModel} document
-	 * @return {*}
-	 * @memberof UmbDocumentServerDataSource
-	 */
-	async update(id: string, document: UpdateDocumentRequestModel) {
-		if (!id) throw new Error('Id is missing');
-
-		/* TODO: look into why typescript doesn't complain about getting another model than UpdateDocumentRequestModel
-		Maybe we should simplify the sources, and always send the biggest model.
-		Then it is up to the data source to format the data correctly before passing it to wherever */
-		const requestBody: UpdateDocumentRequestModel = {
-			templateId: document.templateId,
-			values: document.values,
-			variants: document.variants?.map((variant) => ({
-				culture: variant.culture,
-				segment: variant.segment,
-				name: variant.name,
-			})),
-		};
-
-		return tryExecuteAndNotify(this.#host, DocumentResource.putDocumentById({ id, requestBody }));
 	}
 
 	/**
@@ -167,16 +72,6 @@ export class UmbDocumentServerDataSource
 		if (!id) throw new Error('Document ID is missing');
 		// TODO: if we get a trash endpoint, we should use that instead.
 		return tryExecuteAndNotify(this.#host, DocumentResource.putDocumentByIdMoveToRecycleBin({ id }));
-	}
-
-	/**
-	 * Deletes a Document on the server
-	 * @param {string} id
-	 * @memberof UmbDocumentServerDataSource
-	 */
-	async delete(id: string) {
-		if (!id) throw new Error('Document ID is missing');
-		return this.trash(id);
 	}
 
 	/**

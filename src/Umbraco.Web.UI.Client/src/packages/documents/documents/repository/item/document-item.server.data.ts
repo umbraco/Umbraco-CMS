@@ -7,7 +7,7 @@ import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
  * A data source for Document items that fetches data from the server
  * @export
  * @class UmbDocumentItemServerDataSource
- * @implements {DocumentItemDataSource}
+ * @implements {DocumentTreeDataSource}
  */
 export class UmbDocumentItemServerDataSource implements UmbItemDataSource<DocumentItemResponseModel> {
 	#host: UmbControllerHost;
@@ -24,6 +24,7 @@ export class UmbDocumentItemServerDataSource implements UmbItemDataSource<Docume
 	/**
 	 * Fetches the items for the given ids from the server
 	 * @param {Array<string>} ids
+	 * @return {*}
 	 * @memberof UmbDocumentItemServerDataSource
 	 */
 	async getItems(ids: Array<string>) {
