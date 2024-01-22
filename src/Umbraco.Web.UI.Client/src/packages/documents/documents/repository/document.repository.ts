@@ -283,7 +283,7 @@ export class UmbDocumentRepository extends UmbBaseController implements UmbApi {
 		if (!data) throw new Error('Data is missing');
 		await this.#init;
 
-		const { error } = await this.#detailDataSource.setDomains(id, data);
+		const { error } = await this.#detailDataSource.updateDomains(id, data);
 		if (!error) {
 			const notification = { data: { message: `Cultures and hostnames saved` } };
 			this.#notificationContext?.peek('positive', notification);

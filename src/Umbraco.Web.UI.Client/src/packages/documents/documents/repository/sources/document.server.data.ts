@@ -8,7 +8,6 @@ import {
 	UpdateDocumentRequestModel,
 	PublishDocumentRequestModel,
 	UnpublishDocumentRequestModel,
-	DomainPresentationModel,
 	DomainsPresentationModelBaseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -204,7 +203,13 @@ export class UmbDocumentServerDataSource
 		return tryExecuteAndNotify(this.#host, DocumentResource.getDocumentByIdDomains({ id }));
 	}
 
-	async setDomains(id: string, data: DomainsPresentationModelBaseModel) {
+	/**
+	 * Updates the Document Domains for the given Document id
+	 * @param {string} id
+	 * @param {DomainsPresentationModelBaseModel} data
+	 * @memberof UmbDocumentTypeServerDataSource
+	 */
+	async updateDomains(id: string, data: DomainsPresentationModelBaseModel) {
 		if (!id) throw new Error('Id is missing');
 		return tryExecuteAndNotify(this.#host, DocumentResource.putDocumentByIdDomains({ id, requestBody: data }));
 	}
