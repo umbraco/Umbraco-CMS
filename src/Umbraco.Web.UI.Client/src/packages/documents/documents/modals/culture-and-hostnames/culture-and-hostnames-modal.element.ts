@@ -79,6 +79,9 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 	#addDomain(currentDomain?: boolean) {
 		const defaultModel = this.#languageModel.find((model) => model.isDefault);
 		if (currentDomain) {
+			// TODO: This ignorer is just needed for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
 			this.popoverContainerElement?.hidePopover();
 			this._domains = [...this._domains, { isoCode: defaultModel?.isoCode ?? '', domainName: window.location.host }];
 		} else {
