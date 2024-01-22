@@ -25,7 +25,7 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 	private _domains: Array<DomainPresentationModel> = [];
 
 	@query('#more-options')
-	private _moreOptions?: UUIPopoverContainerElement;
+	popoverContainerElement?: UUIPopoverContainerElement;
 
 	#handleCancel() {
 		this.modalContext?.reject();
@@ -79,7 +79,7 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 	#addDomain(currentDomain?: boolean) {
 		const defaultModel = this.#languageModel.find((model) => model.isDefault);
 		if (currentDomain) {
-			this._moreOptions?.hidePopover();
+			this.popoverContainerElement?.hidePopover();
 			this._domains = [...this._domains, { isoCode: defaultModel?.isoCode ?? '', domainName: window.location.host }];
 		} else {
 			this._domains = [...this._domains, { isoCode: defaultModel?.isoCode ?? '', domainName: '' }];
