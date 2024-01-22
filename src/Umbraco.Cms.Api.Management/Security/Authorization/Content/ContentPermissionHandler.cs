@@ -22,28 +22,36 @@ public class ContentPermissionHandler : MustSatisfyRequirementAuthorizationHandl
         ContentPermissionRequirement requirement,
         ContentPermissionResource resource)
     {
-        var result = true;
-
-        if (resource.CheckRoot)
+        if (resource.CheckRoot
+            && await _contentPermissionAuthorizer.IsAuthorizedAtRootLevelAsync(context.User, resource.PermissionsToCheck) is false)
         {
-            result &= await _contentPermissionAuthorizer.IsAuthorizedAtRootLevelAsync(context.User, resource.PermissionsToCheck);
+            return false;
         }
 
-        if (resource.CheckRecycleBin)
+        if (resource.CheckRecycleBin
+            && await _contentPermissionAuthorizer.IsAuthorizedAtRecycleBinLevelAsync(context.User, resource.PermissionsToCheck) is false)
         {
-            result &= await _contentPermissionAuthorizer.IsAuthorizedAtRecycleBinLevelAsync(context.User, resource.PermissionsToCheck);
+            return false;
         }
 
-        if (resource.ParentKeyForBranch is not null)
+        if (resource.ParentKeyForBranch is not null
+            && await _contentPermissionAuthorizer.IsAuthorizedWithDescendantsAsync(context.User, resource.ParentKeyForBranch.Value, resource.PermissionsToCheck) is false)
         {
-            result &= await _contentPermissionAuthorizer.IsAuthorizedWithDescendantsAsync(context.User, resource.ParentKeyForBranch.Value, resource.PermissionsToCheck);
+            return false;
         }
 
-        if (resource.ContentKeys.Any())
+        if (resource.ContentKeys.Any()
+            && await _contentPermissionAuthorizer.IsAuthorizedAsync(context.User, resource.ContentKeys, resource.PermissionsToCheck) is false)
         {
-            result &= await _contentPermissionAuthorizer.IsAuthorizedAsync(context.User, resource.ContentKeys, resource.PermissionsToCheck);
+            return false;
+        }
+        
+        if (resource.CulturesToCheck is not null
+            && await _contentPermissionAuthorizer.IsAuthorizedForCultures(context.User, resource.CulturesToCheck) is false)
+        {
+            return false;
         }
 
-        return result;
+        return true;
     }
 }

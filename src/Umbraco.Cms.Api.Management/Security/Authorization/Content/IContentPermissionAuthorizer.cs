@@ -79,4 +79,6 @@ public interface IContentPermissionAuthorizer
     /// <param name="permissionsToCheck">The collection of permissions to authorize.</param>
     /// <returns>Returns <c>true</c> if authorization is successful, otherwise <c>false</c>.</returns>
     Task<bool> IsAuthorizedAtRecycleBinLevelAsync(IPrincipal currentUser, ISet<char> permissionsToCheck);
+
+    Task<bool> IsAuthorizedForCultures(IPrincipal currentUser, ISet<string> culturesToCheck);
 }
