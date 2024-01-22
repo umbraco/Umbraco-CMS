@@ -57,6 +57,7 @@ test.describe('Created packages tests', () => {
     expect(await umbracoApi.package.doesNameExist(packageName)).toBeFalsy();
   });
 
+  // TODO: Update the locators for the choose button. If it is updated or not
   test('can create a package with content', async ({page, umbracoApi, umbracoUi}) => {
     // Arrange
     const documentTypeName = 'TestDocumentType';
@@ -69,10 +70,12 @@ test.describe('Created packages tests', () => {
 
     // Act
     await umbracoUi.package.clickExistingPackageName(packageName);
-    await umbracoUi.package.clickAddContentToPackageButton();
-    await umbracoUi.package.clickCaretButton();
+    // The frontend has updated the button name to "Choose" of "Add". But they are a bit unsure if they want to change it to select instead.
+    // So for the moment I have used the page instead of our UiHelper. Because it is easier to change the locator.
+    // await umbracoUi.package.clickAddContentToPackageButton();
+    await page.locator('[label="Content"] >> [label="Choose"]').click();
     await umbracoUi.package.clickLabelWithName(documentName);
-    await umbracoUi.package.clickSubmitButton();
+    await umbracoUi.package.clickChooseBtn();
     await umbracoUi.package.clickSaveChangesToPackageButton();
 
     // Assert
