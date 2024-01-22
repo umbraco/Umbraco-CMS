@@ -9,6 +9,7 @@ import { UmbDocumentTypeDetailRepository } from '@umbraco-cms/backoffice/documen
 export class UmbBlockElementManager extends UmbBaseController {
 	//
 	#data = new UmbObjectState<UmbBlockDataType | undefined>(undefined);
+	readonly data = this.#data.asObservable();
 	#getDataPromise = new Promise<void>((resolve) => {
 		this.#getDataResolver = resolve;
 	});

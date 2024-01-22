@@ -6,6 +6,7 @@ import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { ManifestWorkspace } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UMB_BLOCK_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/block';
+import { buildUdi } from '@umbraco-cms/backoffice/utils';
 
 export class UmbBlockWorkspaceContext<
 	LayoutDataType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel,
@@ -76,9 +77,9 @@ export class UmbBlockWorkspaceContext<
 				const settingsUdi = layoutData?.settingsUdi;
 				if (settingsUdi) {
 					this.observe(
-						this.#blockManager!.contentOf(settingsUdi),
+						this.#blockManager!.settingsOf(settingsUdi),
 						(settingsData) => {
-							this.content.setData(settingsData);
+							this.settings.setData(settingsData);
 						},
 						'observeSettings',
 					);
@@ -86,13 +87,28 @@ export class UmbBlockWorkspaceContext<
 			},
 			'observeLayout',
 		);
+
+		/*
+		if ( liveEditingMode) {
+			this.observe(this.layout, (layoutData) => {
+				if(layoutData) {
+					this.#blockManager?.setOneLayout(layoutData);
+				}
+			});
+			this.observe(this.content.data, (contentData) => {
+				if(contentData) {
+					this.#blockManager?.setOneContent(contentData);
+				}
+			});
+		}
+		*/
 	}
 
 	async create(contentElementTypeId: string) {
 		//
 		// TODO: Condense this into some kind of create method?
 		const key = UmbId.new();
-		const contentUdi = `umb://block/${key}`;
+		const contentUdi = buildUdi('block', key);
 		const layout: UmbBlockLayoutBaseModel = {
 			contentUdi: contentUdi,
 		};
