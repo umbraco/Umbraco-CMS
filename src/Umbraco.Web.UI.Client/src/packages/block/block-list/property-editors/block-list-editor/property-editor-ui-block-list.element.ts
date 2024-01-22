@@ -86,6 +86,8 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 		//config.useLiveEditing
 		//config.useInlineEditingAsDefault
 		this.style.maxWidth = config.getValueByAlias<string>('maxPropertyWidth') ?? '';
+
+		this.#context.setEditorConfiguration(config);
 	}
 
 	@state()

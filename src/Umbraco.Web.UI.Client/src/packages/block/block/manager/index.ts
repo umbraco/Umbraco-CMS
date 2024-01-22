@@ -1,1 +1,1 @@
-export * from './block-manager.context.js';
+export * from './block-manager.context-token.js';

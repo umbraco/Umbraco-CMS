@@ -1,14 +1,18 @@
-import type { UmbBlockLayoutBaseModel, UmbBlockDataType } from '..//types.js';
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import type { UmbBlockLayoutBaseModel, UmbBlockDataType } from '../types.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbArrayState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbArrayState, UmbClassState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbDocumentTypeDetailRepository } from '@umbraco-cms/backoffice/document-type';
 import { buildUdi, getKeyFromUdi } from '@umbraco-cms/backoffice/utils';
-import { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block';
-import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
+import {
+	UMB_BLOCK_MANAGER_CONTEXT,
+	UMB_BLOCK_WORKSPACE_MODAL,
+	UmbBlockTypeBaseModel,
+} from '@umbraco-cms/backoffice/block';
+import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 import { UmbContentTypeModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbId } from '@umbraco-cms/backoffice/id';
+import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
 // TODO: We are using backend model here, I think we should get our own model:
 type ElementTypeModel = UmbContentTypeModel;
@@ -29,6 +33,9 @@ export abstract class UmbBlockManagerContext<
 	#blockTypes = new UmbArrayState(<Array<BlockType>>[], (x) => x.contentElementTypeKey);
 	public readonly blockTypes = this.#blockTypes.asObservable();
 
+	#editorConfiguration = new UmbClassState<UmbPropertyEditorConfigCollection | undefined>(undefined);
+	public readonly editorConfiguration = this.#editorConfiguration.asObservable();
+
 	#layouts = new UmbArrayState(<Array<BlockLayoutType>>[], (x) => x.contentUdi);
 	public readonly layouts = this.#layouts.asObservable();
 
@@ -37,6 +44,10 @@ export abstract class UmbBlockManagerContext<
 
 	#settings = new UmbArrayState(<Array<UmbBlockDataType>>[], (x) => x.udi);
 	public readonly settings = this.#settings.asObservable();
+
+	setEditorConfiguration(configs: UmbPropertyEditorConfigCollection) {
+		this.#editorConfiguration.setValue(configs);
+	}
 
 	setBlockTypes(blockTypes: Array<BlockType>) {
 		this.#blockTypes.setValue(blockTypes);
@@ -59,9 +70,8 @@ export abstract class UmbBlockManagerContext<
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_BLOCK_MANAGER_CONTEXT);
 
-		// TODO: Make specific modal token that requires data.
 		// IDEA: Make a Workspace registration controller that can be used to register a workspace, which does both edit and create?.
-		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
+		new UmbModalRouteRegistrationController(this, UMB_BLOCK_WORKSPACE_MODAL)
 			.addAdditionalPath('block')
 			.onSetup(() => {
 				return { data: { entityType: 'block', preset: {} }, modal: { size: 'medium' } };
@@ -185,7 +195,3 @@ export abstract class UmbBlockManagerContext<
 		this.#contents.removeOne(contentUdi);
 	}
 }
-
-export const UMB_BLOCK_MANAGER_CONTEXT = new UmbContextToken<UmbBlockManagerContext, UmbBlockManagerContext>(
-	'UmbBlockManagerContext',
-);

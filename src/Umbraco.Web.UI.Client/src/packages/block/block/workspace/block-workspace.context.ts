@@ -7,6 +7,7 @@ import { ManifestWorkspace } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UMB_BLOCK_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/block';
 import { buildUdi } from '@umbraco-cms/backoffice/utils';
+import { UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
 
 export class UmbBlockWorkspaceContext<
 	LayoutDataType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel,
@@ -18,11 +19,14 @@ export class UmbBlockWorkspaceContext<
 
 	#blockManager?: typeof UMB_BLOCK_MANAGER_CONTEXT.TYPE;
 	#retrieveBlockManager;
+	#editorConfigPromise?: Promise<unknown>;
 
 	#entityType: string;
 
 	#isNew = new UmbBooleanState<boolean | undefined>(undefined);
 	readonly isNew = this.#isNew.asObservable();
+
+	#liveEditingMode?: boolean;
 
 	#layout = new UmbObjectState<LayoutDataType | undefined>(undefined);
 	readonly layout = this.#layout.asObservable();
@@ -43,13 +47,25 @@ export class UmbBlockWorkspaceContext<
 		this.#entityType = workspaceArgs.manifest.meta?.entityType;
 		this.workspaceAlias = workspaceArgs.manifest.alias;
 
+		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (context) => {
+			context.onSubmit().catch(this.#modalRejected);
+		});
+
 		this.#retrieveBlockManager = this.consumeContext(UMB_BLOCK_MANAGER_CONTEXT, (context) => {
 			this.#blockManager = context;
+			this.#editorConfigPromise = this.observe(context.editorConfiguration, (editorConfigs) => {
+				if (editorConfigs) {
+					const value = editorConfigs.getValueByAlias<boolean>('useLiveEditing');
+					this.#liveEditingMode = value;
+				}
+			}).asPromise();
+			// TODO: Observe or just get the LiveEditing setting?
 		}).asPromise();
 	}
 
 	async load(unique: string) {
 		await this.#retrieveBlockManager;
+		await this.#editorConfigPromise;
 		if (!this.#blockManager) {
 			throw new Error('Block manager not found');
 			return;
@@ -60,7 +76,6 @@ export class UmbBlockWorkspaceContext<
 			(layoutData) => {
 				this.#layout.setValue(layoutData as LayoutDataType);
 
-				//
 				// Content:
 				const contentUdi = layoutData?.contentUdi;
 				if (contentUdi) {
@@ -88,20 +103,9 @@ export class UmbBlockWorkspaceContext<
 			'observeLayout',
 		);
 
-		/*
-		if ( liveEditingMode) {
-			this.observe(this.layout, (layoutData) => {
-				if(layoutData) {
-					this.#blockManager?.setOneLayout(layoutData);
-				}
-			});
-			this.observe(this.content.data, (contentData) => {
-				if(contentData) {
-					this.#blockManager?.setOneContent(contentData);
-				}
-			});
+		if (this.#liveEditingMode) {
+			this.#establishLiveSync();
 		}
-		*/
 	}
 
 	async create(contentElementTypeId: string) {
@@ -122,6 +126,28 @@ export class UmbBlockWorkspaceContext<
 
 		this.setIsNew(true);
 		this.#layout.setValue(layout as LayoutDataType);
+
+		if (this.#liveEditingMode) {
+			this.#establishLiveSync();
+		}
+	}
+
+	#establishLiveSync() {
+		this.observe(this.layout, (layoutData) => {
+			if (layoutData) {
+				this.#blockManager?.setOneLayout(layoutData);
+			}
+		});
+		this.observe(this.content.data, (contentData) => {
+			if (contentData) {
+				this.#blockManager?.setOneContent(contentData);
+			}
+		});
+		this.observe(this.settings.data, (settingsData) => {
+			if (settingsData) {
+				this.#blockManager?.setOneSettings(settingsData);
+			}
+		});
 	}
 
 	getIsNew() {
@@ -180,19 +206,35 @@ export class UmbBlockWorkspaceContext<
 			}
 		}
 
-		// TODO: Save the block, but only in non-live-editing mode.
-		this.#blockManager.setOneLayout(layoutData);
+		if (!this.#liveEditingMode) {
+			// TODO: Save the block, but only in non-live-editing mode.
+			this.#blockManager.setOneLayout(layoutData);
 
-		if (contentData) {
-			this.#blockManager.setOneContent(contentData);
-		}
-		const settingsData = this.settings.getData();
-		if (settingsData) {
-			this.#blockManager.setOneSettings(settingsData);
+			if (contentData) {
+				this.#blockManager.setOneContent(contentData);
+			}
+			const settingsData = this.settings.getData();
+			if (settingsData) {
+				this.#blockManager.setOneSettings(settingsData);
+			}
 		}
 
 		this.saveComplete(layoutData);
 	}
+
+	#modalRejected = () => {
+		if (this.#liveEditingMode) {
+			// Revert
+			// Did it exist before?
+			if (this.getIsNew() === true) {
+				// Remove the block?
+				const contentUdi = this.#layout.value?.contentUdi;
+				if (contentUdi) {
+					this.#blockManager?.deleteBlock(contentUdi);
+				}
+			}
+		}
+	};
 
 	public destroy(): void {
 		this.#layout.destroy();
