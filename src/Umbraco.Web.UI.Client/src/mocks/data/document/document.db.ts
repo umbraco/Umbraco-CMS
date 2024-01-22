@@ -60,67 +60,70 @@ export class UmbDocumentMockDB extends UmbEntityMockDbBase<UmbMockDocumentModel>
 }
 
 const treeItemMapper = (model: UmbMockDocumentModel): Omit<DocumentTreeItemResponseModel, 'type'> => {
-	const documentType = umbDocumentTypeMockDb.read(model.contentTypeId);
-	if (!documentType) throw new Error(`Document type with id ${model.contentTypeId} not found`);
+	const documentType = umbDocumentTypeMockDb.read(model.documentType.id);
+	if (!documentType) throw new Error(`Document type with id ${model.documentType.id} not found`);
 
 	return {
-		id: model.id,
-		parentId: model.parentId,
-		contentTypeId: model.contentTypeId,
-		variants: model.variants,
-		icon: documentType.icon,
-		isContainer: documentType.isContainer,
-		name: model.variants?.[0]?.name,
+		documentType: {
+			hasListView: model.documentType.hasListView,
+			icon: model.documentType.icon,
+			id: model.documentType.id,
+		},
 		hasChildren: model.hasChildren,
-		noAccess: model.noAccess,
+		id: model.id,
 		isProtected: model.isProtected,
-		isPublished: model.isProtected,
-		isEdited: model.isEdited,
 		isTrashed: model.isTrashed,
+		noAccess: model.noAccess,
+		parent: model.parent,
+		variants: model.variants,
 	};
 };
 
 const createMockDocumentMapper = (request: CreateDocumentRequestModel): UmbMockDocumentModel => {
-	const documentType = umbDocumentTypeMockDb.read(request.contentTypeId);
-	if (!documentType) throw new Error(`Document type with id ${request.contentTypeId} not found`);
+	const documentType = umbDocumentTypeMockDb.read(request.documentType.id);
+	if (!documentType) throw new Error(`Document type with id ${request.documentType.id} not found`);
 
 	return {
-		id: request.id ? request.id : UmbId.new(),
-		parentId: request.parentId,
-		contentTypeId: request.contentTypeId,
-		variants: request.variants,
-		values: request.values,
-		name: request.variants?.[0]?.name,
-		icon: documentType.icon,
-		isContainer: documentType.isContainer,
+		documentType: {
+			id: documentType.id,
+			icon: documentType.icon,
+			hasListView: documentType.hasListView,
+		},
 		hasChildren: false,
-		noAccess: false,
+		id: request.id ? request.id : UmbId.new(),
 		isProtected: false,
-		isPublished: false,
-		isEdited: false,
 		isTrashed: false,
+		noAccess: false,
+		parent: request.parent,
+		values: request.values,
+		variants: request.variants,
+		urls: [],
 	};
 };
 
 const detailResponseMapper = (model: UmbMockDocumentModel): DocumentResponseModel => {
 	return {
+		documentType: model.documentType,
+		id: model.id,
+		isTrashed: model.isTrashed,
+		template: model.template,
+		urls: model.urls,
 		values: model.values,
 		variants: model.variants,
-		id: model.id,
-		contentTypeId: model.contentTypeId,
-		urls: model.urls,
-		templateId: model.templateId,
-		isTrashed: model.isTrashed,
 	};
 };
 
 const itemMapper = (model: UmbMockDocumentModel): DocumentItemResponseModel => {
 	return {
-		name: model.name,
+		documentType: {
+			hasListView: model.documentType.hasListView,
+			icon: model.documentType.icon,
+			id: model.documentType.id,
+		},
 		id: model.id,
-		icon: model.icon,
-		contentTypeId: model.contentTypeId,
+		isProtected: model.isProtected,
 		isTrashed: model.isTrashed,
+		variants: model.variants,
 	};
 };
 
