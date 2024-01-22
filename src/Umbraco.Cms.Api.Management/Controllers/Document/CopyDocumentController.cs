@@ -56,7 +56,7 @@ public class CopyDocumentController : DocumentControllerBase
             CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Success
-            ? CreatedAtAction<ByKeyDocumentController>(controller => nameof(controller.ByKey), result.Result!.Key)
+            ? CreatedAtId<ByKeyDocumentController>(controller => nameof(controller.ByKey), result.Result!.Key)
             : ContentEditingOperationStatusResult(result.Status);
     }
 }

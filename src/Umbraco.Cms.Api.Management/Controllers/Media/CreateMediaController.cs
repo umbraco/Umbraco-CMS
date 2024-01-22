@@ -56,7 +56,7 @@ public class CreateMediaController : MediaControllerBase
         Attempt<IMedia?, ContentEditingOperationStatus> result = await _mediaEditingService.CreateAsync(model, CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Success
-            ? CreatedAtAction<ByKeyMediaController>(controller => nameof(controller.ByKey), result.Result!.Key)
+            ? CreatedAtId<ByKeyMediaController>(controller => nameof(controller.ByKey), result.Result!.Key)
             : ContentEditingOperationStatusResult(result.Status);
     }
 }
