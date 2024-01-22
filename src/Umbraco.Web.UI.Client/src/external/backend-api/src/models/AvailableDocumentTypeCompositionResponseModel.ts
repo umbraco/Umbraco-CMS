@@ -6,3 +6,4 @@
 import type { AvailableContentTypeCompositionResponseModelBaseModel } from './AvailableContentTypeCompositionResponseModelBaseModel';
 
 export type AvailableDocumentTypeCompositionResponseModel = AvailableContentTypeCompositionResponseModelBaseModel;
+

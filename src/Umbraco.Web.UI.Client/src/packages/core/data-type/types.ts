@@ -1,5 +1,7 @@
+import { UmbDataTypeEntityType } from './entity.js';
+
 export interface UmbDataTypeDetailModel {
-	entityType: string;
+	entityType: UmbDataTypeEntityType;
 	unique: string;
 	parentUnique: string | null;
 	name: string;

@@ -6,3 +6,4 @@
 import type { ContentTypeCompositionResponseModelBaseModel } from './ContentTypeCompositionResponseModelBaseModel';
 
 export type MediaTypeCompositionResponseModel = ContentTypeCompositionResponseModelBaseModel;
+

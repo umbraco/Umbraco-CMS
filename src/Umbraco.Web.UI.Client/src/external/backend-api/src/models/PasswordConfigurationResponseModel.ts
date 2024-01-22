@@ -10,3 +10,4 @@ export type PasswordConfigurationResponseModel = {
     requireLowercase: boolean;
     requireUppercase: boolean;
 };
+

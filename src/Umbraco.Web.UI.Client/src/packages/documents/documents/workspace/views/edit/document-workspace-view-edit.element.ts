@@ -32,7 +32,7 @@ export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement implement
 
 	private _workspaceContext?: typeof UMB_DOCUMENT_WORKSPACE_CONTEXT.TYPE;
 
-	private _tabsStructureHelper = new UmbContentTypeContainerStructureHelper(this);
+	private _tabsStructureHelper = new UmbContentTypeContainerStructureHelper<any>(this);
 
 	constructor() {
 		super();

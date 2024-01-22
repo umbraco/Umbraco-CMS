@@ -6,3 +6,4 @@
 export type MoveDocumentTypeRequestModel = {
     targetId?: string | null;
 };
+

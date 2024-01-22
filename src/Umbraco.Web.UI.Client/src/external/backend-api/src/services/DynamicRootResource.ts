@@ -16,10 +16,10 @@ export class DynamicRootResource {
      * @throws ApiError
      */
     public static postDynamicRootQuery({
-requestBody,
-}: {
-requestBody?: DynamicRootRequestModel,
-}): CancelablePromise<DynamicRootResponseModel> {
+        requestBody,
+    }: {
+        requestBody?: DynamicRootRequestModel,
+    }): CancelablePromise<DynamicRootResponseModel> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/dynamic-root/query',

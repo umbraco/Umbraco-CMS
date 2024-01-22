@@ -3,6 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { TextFileResponseModelBaseModel } from './TextFileResponseModelBaseModel';
+import type { FileSystemFileResponseModelBaseModel } from './FileSystemFileResponseModelBaseModel';
 
-export type PartialViewResponseModel = TextFileResponseModelBaseModel;
+export type PartialViewResponseModel = FileSystemFileResponseModelBaseModel;
+

@@ -503,7 +503,7 @@ requestBody?: InviteUserRequestModel,
             url: '/umbraco/management/api/v1/user/invite',
             body: requestBody,
             mediaType: 'application/json',
-            responseHeader: 'Location',
+            responseHeader: 'Umb-Generated-Resource',
             errors: {
                 401: `The resource is protected and requires an authentication token`,
             },

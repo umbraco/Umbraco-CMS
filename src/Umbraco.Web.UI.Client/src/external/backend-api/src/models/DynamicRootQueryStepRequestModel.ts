@@ -7,3 +7,4 @@ export type DynamicRootQueryStepRequestModel = {
     alias: string;
     documentTypeIds: Array<string>;
 };
+
