@@ -1,8 +1,4 @@
-import {
-	UMB_DATA_TYPE_ENTITY_TYPE,
-	UMB_DATA_TYPE_FOLDER_ENTITY_TYPE,
-	UMB_DATA_TYPE_ROOT_ENTITY_TYPE,
-} from '../../entity.js';
+import { UMB_DATA_TYPE_FOLDER_ENTITY_TYPE, UMB_DATA_TYPE_ROOT_ENTITY_TYPE } from '../../entity.js';
 import { UMB_DATA_TYPE_DETAIL_REPOSITORY_ALIAS } from '../../repository/detail/manifests.js';
 import { UmbCreateDataTypeEntityAction } from './create.action.js';
 import { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';

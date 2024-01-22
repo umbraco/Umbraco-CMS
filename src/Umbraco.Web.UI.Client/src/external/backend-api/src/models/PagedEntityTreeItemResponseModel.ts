@@ -17,4 +17,3 @@ export type PagedEntityTreeItemResponseModel = {
     total: number;
     items: Array<(EntityTreeItemResponseModel | ContentTreeItemResponseModel | DataTypeTreeItemResponseModel | DocumentBlueprintTreeItemResponseModel | DocumentTreeItemResponseModel | DocumentTypeTreeItemResponseModel | FolderTreeItemResponseModel | MediaTreeItemResponseModel | MediaTypeTreeItemResponseModel)>;
 };
-

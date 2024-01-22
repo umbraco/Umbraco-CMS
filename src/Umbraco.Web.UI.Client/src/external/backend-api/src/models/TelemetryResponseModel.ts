@@ -6,4 +6,3 @@
 import type { TelemetryRepresentationBaseModel } from './TelemetryRepresentationBaseModel';
 
 export type TelemetryResponseModel = TelemetryRepresentationBaseModel;
-

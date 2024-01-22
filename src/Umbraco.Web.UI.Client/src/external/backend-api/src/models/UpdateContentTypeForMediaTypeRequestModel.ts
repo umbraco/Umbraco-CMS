@@ -22,4 +22,3 @@ export type UpdateContentTypeForMediaTypeRequestModel = {
     allowedContentTypes: Array<ContentTypeSortModel>;
     compositions: Array<ContentTypeCompositionModel>;
 };
-

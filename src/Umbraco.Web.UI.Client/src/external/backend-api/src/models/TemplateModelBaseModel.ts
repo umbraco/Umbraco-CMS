@@ -8,4 +8,3 @@ export type TemplateModelBaseModel = {
     alias: string;
     content?: string | null;
 };
-

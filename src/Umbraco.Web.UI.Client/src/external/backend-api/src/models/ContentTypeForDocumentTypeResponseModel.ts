@@ -23,4 +23,3 @@ export type ContentTypeForDocumentTypeResponseModel = {
     compositions: Array<ContentTypeCompositionModel>;
     id: string;
 };
-

@@ -7,6 +7,5 @@ import type { HealthCheckGroupPresentationBaseModel } from './HealthCheckGroupPr
 import type { HealthCheckModel } from './HealthCheckModel';
 
 export type HealthCheckGroupPresentationModel = (HealthCheckGroupPresentationBaseModel & {
-    checks: Array<HealthCheckModel>;
+checks: Array<HealthCheckModel>;
 });
-

@@ -6,4 +6,3 @@
 import type { HealthCheckGroupPresentationBaseModel } from './HealthCheckGroupPresentationBaseModel';
 
 export type HealthCheckGroupResponseModel = HealthCheckGroupPresentationBaseModel;
-

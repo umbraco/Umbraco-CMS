@@ -7,4 +7,3 @@ export type ContentTypeSortModel = {
     id: string;
     sortOrder: number;
 };
-

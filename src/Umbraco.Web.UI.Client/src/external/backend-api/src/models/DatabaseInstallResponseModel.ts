@@ -14,4 +14,3 @@ export type DatabaseInstallResponseModel = {
     connectionString?: string | null;
     trustServerCertificate: boolean;
 };
-

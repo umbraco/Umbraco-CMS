@@ -7,4 +7,3 @@ export type VerifyResetPasswordTokenRequestModel = {
     userId: string;
     resetCode: string;
 };
-

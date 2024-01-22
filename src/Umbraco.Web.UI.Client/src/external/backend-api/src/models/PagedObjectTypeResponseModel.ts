@@ -9,4 +9,3 @@ export type PagedObjectTypeResponseModel = {
     total: number;
     items: Array<ObjectTypeResponseModel>;
 };
-

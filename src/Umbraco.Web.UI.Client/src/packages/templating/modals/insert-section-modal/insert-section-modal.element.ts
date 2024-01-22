@@ -1,5 +1,5 @@
 import { UMB_MODAL_TEMPLATING_INSERT_SECTION_SIDEBAR_ALIAS } from '../manifests.js';
-import { getAddSectionSnippet, getRenderBodySnippet, getRenderSectionSnippet } from '../../utils.js';
+import { getAddSectionSnippet, getRenderBodySnippet, getRenderSectionSnippet } from '../../utils/index.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, queryAll, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalToken, UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';

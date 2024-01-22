@@ -9,4 +9,3 @@ export type PagedDocumentBlueprintTreeItemResponseModel = {
     total: number;
     items: Array<DocumentBlueprintTreeItemResponseModel>;
 };
-

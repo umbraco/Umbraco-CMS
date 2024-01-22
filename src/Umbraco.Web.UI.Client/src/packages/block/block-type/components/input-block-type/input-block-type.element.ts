@@ -74,7 +74,7 @@ export class UmbInputBlockTypeElement<
 							// Only pick elements:
 							docType.isElement &&
 							// Prevent picking the an already used element type:
-							this._items.find((x) => x.contentElementTypeKey === docType.id) === undefined,
+							this._items.find((x) => x.contentElementTypeKey === docType.unique) === undefined,
 					},
 				});
 

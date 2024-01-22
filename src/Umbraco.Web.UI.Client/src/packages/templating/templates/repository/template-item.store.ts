@@ -1,35 +1,23 @@
 import { TemplateItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UmbItemStore, UmbStoreBase } from '@umbraco-cms/backoffice/store';
-import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbEntityItemStore } from '@umbraco-cms/backoffice/store';
 
 /**
  * @export
  * @class UmbTemplateItemStore
- * @extends {UmbStoreBase}
+ * @extends {UmbEntityItemStore}
  * @description - Data Store for Template items
  */
 
-export class UmbTemplateItemStore
-	extends UmbStoreBase<TemplateItemResponseModel>
-	implements UmbItemStore<TemplateItemResponseModel>
-{
+export class UmbTemplateItemStore extends UmbEntityItemStore<TemplateItemResponseModel> {
 	/**
 	 * Creates an instance of UmbTemplateItemStore.
 	 * @param {UmbControllerHostElement} host
 	 * @memberof UmbTemplateItemStore
 	 */
 	constructor(host: UmbControllerHostElement) {
-		super(
-			host,
-			UMB_TEMPLATE_ITEM_STORE_CONTEXT.toString(),
-			new UmbArrayState<TemplateItemResponseModel>([], (x) => x.id),
-		);
-	}
-
-	items(ids: Array<string>) {
-		return this._data.asObservablePart((items) => items.filter((item) => ids.includes(item.id ?? '')));
+		super(host, UMB_TEMPLATE_ITEM_STORE_CONTEXT.toString());
 	}
 }
 

@@ -9,4 +9,3 @@ export type PagedLanguageResponseModel = {
     total: number;
     items: Array<LanguageResponseModel>;
 };
-

@@ -6,4 +6,3 @@
 import type { DomainsPresentationModelBaseModel } from './DomainsPresentationModelBaseModel';
 
 export type UpdateDomainsRequestModel = DomainsPresentationModelBaseModel;
-

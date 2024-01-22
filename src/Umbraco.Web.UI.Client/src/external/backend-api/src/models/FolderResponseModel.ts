@@ -6,7 +6,6 @@
 import type { FolderModelBaseModel } from './FolderModelBaseModel';
 
 export type FolderResponseModel = (FolderModelBaseModel & {
-    id: string;
-    parentId?: string | null;
+id: string;
+parentId?: string | null;
 });
-
