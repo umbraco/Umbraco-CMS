@@ -63,6 +63,13 @@ internal sealed class ContentTypeEditingService : ContentTypeEditingServiceBase<
         return Attempt.SucceedWithStatus<IContentType?, ContentTypeOperationStatus>(ContentTypeOperationStatus.Success, contentType);
     }
 
+    public async Task<IEnumerable<ContentTypeAvailableCompositionsResult>> GetAvailableCompositionsAsync(
+        Guid? key,
+        IEnumerable<Guid> currentCompositeKeys,
+        IEnumerable<string> currentPropertyAliases,
+        bool isElement) =>
+        await FindAvailableCompositionsAsync(key, currentCompositeKeys, currentPropertyAliases, isElement);
+
     // update content type history clean-up
     private void UpdateHistoryCleanup(IContentType contentType, ContentTypeModelBase model)
     {
@@ -88,13 +95,6 @@ internal sealed class ContentTypeEditingService : ContentTypeEditingServiceBase<
 
     private async Task SaveAsync(IContentType contentType, Guid userKey)
         => await _contentTypeService.SaveAsync(contentType, userKey);
-
-    protected override Guid[] GetAvailableCompositionKeys(IContentTypeComposition? source, IContentTypeComposition[] allContentTypes, bool isElement)
-        => _contentTypeService.GetAvailableCompositeContentTypes(source, allContentTypes, isElement: isElement)
-            .Results
-            .Where(x => x.Allowed)
-            .Select(x => x.Composition.Key)
-            .ToArray();
 
     protected override IContentType CreateContentType(IShortStringHelper shortStringHelper, int parentId)
         => new ContentType(shortStringHelper, parentId);

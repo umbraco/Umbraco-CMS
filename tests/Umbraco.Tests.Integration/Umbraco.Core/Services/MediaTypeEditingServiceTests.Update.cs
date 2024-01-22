@@ -9,10 +9,10 @@ public partial class MediaTypeEditingServiceTests
     [Test]
     public async Task Can_Update_All_Basic_Settings()
     {
-        var createModel = CreateCreateModel("Test Media Type", "testMediaType");
+        var createModel = MediaTypeCreateModel("Test Media Type", "testMediaType");
         var mediaType = (await MediaTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
 
-        var updateModel = CreateUpdateModel("Test updated", "testUpdated");
+        var updateModel = MediaTypeUpdateModel("Test updated", "testUpdated");
         updateModel.Description = "This is the Test description updated";
         updateModel.Icon = "icon icon-something-updated";
         updateModel.AllowedAsRoot = false;
@@ -36,11 +36,11 @@ public partial class MediaTypeEditingServiceTests
     [Test]
     public async Task Can_Add_Allowed_Types()
     {
-        var allowedOne = (await MediaTypeEditingService.CreateAsync(CreateCreateModel("Allowed One", "allowedOne"), Constants.Security.SuperUserKey)).Result!;
-        var allowedTwo = (await MediaTypeEditingService.CreateAsync(CreateCreateModel("Allowed Two", "allowedTwo"), Constants.Security.SuperUserKey)).Result!;
-        var allowedThree = (await MediaTypeEditingService.CreateAsync(CreateCreateModel("Allowed Three", "allowedThree"), Constants.Security.SuperUserKey)).Result!;
+        var allowedOne = (await MediaTypeEditingService.CreateAsync(MediaTypeCreateModel("Allowed One", "allowedOne"), Constants.Security.SuperUserKey)).Result!;
+        var allowedTwo = (await MediaTypeEditingService.CreateAsync(MediaTypeCreateModel("Allowed Two", "allowedTwo"), Constants.Security.SuperUserKey)).Result!;
+        var allowedThree = (await MediaTypeEditingService.CreateAsync(MediaTypeCreateModel("Allowed Three", "allowedThree"), Constants.Security.SuperUserKey)).Result!;
 
-        var createModel = CreateCreateModel("Test", "test");
+        var createModel = MediaTypeCreateModel("Test", "test");
         createModel.AllowedContentTypes = new[]
         {
             new ContentTypeSort(allowedOne.Key, 10, allowedOne.Alias),
@@ -48,7 +48,7 @@ public partial class MediaTypeEditingServiceTests
         };
         var mediaType = (await MediaTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
 
-        var updateModel = CreateUpdateModel("Test", "test");
+        var updateModel = MediaTypeUpdateModel("Test", "test");
         updateModel.AllowedContentTypes = new[]
         {
             new ContentTypeSort(allowedTwo.Key, 20, allowedTwo.Alias),
@@ -72,19 +72,19 @@ public partial class MediaTypeEditingServiceTests
     [Test]
     public async Task Can_Edit_Properties()
     {
-        var createModel = CreateCreateModel("Test", "test");
-        var propertyType = CreatePropertyType("Test Property", "testProperty");
+        var createModel = MediaTypeCreateModel("Test", "test");
+        var propertyType = MediaTypePropertyTypeModel("Test Property", "testProperty");
         propertyType.Description = "The description";
         createModel.Properties = new[] { propertyType };
 
         var mediaType = (await MediaTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
         var originalPropertyTypeKey = mediaType.PropertyTypes.First().Key;
 
-        var updateModel = CreateUpdateModel("Test", "test");
-        propertyType = CreatePropertyType("Test Property Updated", "testProperty", key: originalPropertyTypeKey);
+        var updateModel = MediaTypeUpdateModel("Test", "test");
+        propertyType = MediaTypePropertyTypeModel("Test Property Updated", "testProperty", key: originalPropertyTypeKey);
         propertyType.Description = "The updated description";
         propertyType.SortOrder = 10;
-        var propertyType2 = CreatePropertyType("Test Property 2", "testProperty2");
+        var propertyType2 = MediaTypePropertyTypeModel("Test Property 2", "testProperty2");
         propertyType2.Description = "The description 2";
         propertyType2.SortOrder = 5;
         updateModel.Properties = new[] { propertyType, propertyType2 };
