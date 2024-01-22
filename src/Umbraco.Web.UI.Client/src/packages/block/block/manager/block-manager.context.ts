@@ -4,10 +4,11 @@ import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbDocumentTypeDetailRepository } from '@umbraco-cms/backoffice/document-type';
-import { getKeyFromUdi } from '@umbraco-cms/backoffice/utils';
+import { buildUdi, getKeyFromUdi } from '@umbraco-cms/backoffice/utils';
 import { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block';
 import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 import { UmbContentTypeModel } from '@umbraco-cms/backoffice/content-type';
+import { UmbId } from '@umbraco-cms/backoffice/id';
 
 // TODO: We are using backend model here, I think we should get our own model:
 type ElementTypeModel = UmbContentTypeModel;
