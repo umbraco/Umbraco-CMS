@@ -1,6 +1,6 @@
 using Umbraco.Cms.Api.Management.ViewModels.ContentType;
 
-namespace Umbraco.Cms.Api.Management.ViewModels.MediaType.Composition;
+namespace Umbraco.Cms.Api.Management.ViewModels.MediaType;
 
 public class MediaTypeCompositionRequestModel : ContentTypeCompositionRequestModelBase
 {
