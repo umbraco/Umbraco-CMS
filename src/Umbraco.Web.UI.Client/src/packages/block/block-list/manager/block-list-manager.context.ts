@@ -1,5 +1,6 @@
 import type { UmbBlockListLayoutModel, UmbBlockListTypeModel } from '../types.js';
 import { UmbBlockManagerContext } from '../../block/manager/block-manager.context.js';
+import type { UmbBlockListWorkspaceData } from '../index.js';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 
@@ -17,10 +18,12 @@ export class UmbBlockListManagerContext<
 		this.#inlineEditingMode.setValue(inlineEditingMode ?? false);
 	}
 
-	createBlock(layoutEntry: Omit<BlockLayoutType, 'contentUdi'>, contentElementTypeKey: string) {
+	_createBlock(modalData: UmbBlockListWorkspaceData, layoutEntry: BlockLayoutType, contentElementTypeKey: string) {
 		// Here is room to append some extra layout properties if needed for this type.
 
-		return super._createBlockData(layoutEntry, contentElementTypeKey);
+		this._layouts.appendOneAt(layoutEntry, modalData.originData.index ?? -1);
+
+		return true;
 	}
 }
 

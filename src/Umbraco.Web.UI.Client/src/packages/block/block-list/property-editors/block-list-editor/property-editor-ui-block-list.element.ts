@@ -136,9 +136,16 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 		});
 
 		new UmbModalRouteRegistrationController(this, UMB_BLOCK_CATALOGUE_MODAL)
-			.addAdditionalPath(':view')
+			.addAdditionalPath(':view/:index')
 			.onSetup((routingInfo) => {
-				return { data: { blocks: this._blocks ?? [], openClipboard: routingInfo.view === 'clipboard' } };
+				const index = routingInfo.index ? parseInt(routingInfo.index) : -1;
+				return {
+					data: {
+						blocks: this._blocks ?? [],
+						openClipboard: routingInfo.view === 'clipboard',
+						blockOriginData: { index: index },
+					},
+				};
 			})
 			.observeRouteBuilder((routeBuilder) => {
 				this._catalogueRouteBuilder = routeBuilder;
@@ -149,8 +156,9 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 		return html` ${repeat(
 				this._layouts,
 				(x) => x.contentUdi,
-				(layoutEntry) =>
-					html`<uui-button-inline-create></uui-button-inline-create>
+				(layoutEntry, index) =>
+					html`<uui-button-inline-create
+							href=${this._catalogueRouteBuilder?.({ view: 'create', index: index }) ?? ''}></uui-button-inline-create>
 						<umb-property-editor-ui-block-list-block data-udi=${layoutEntry.contentUdi} .layout=${layoutEntry}>
 						</umb-property-editor-ui-block-list-block> `,
 			)}
@@ -159,13 +167,13 @@ export class UmbPropertyEditorUIBlockListElement extends UmbLitElement implement
 					id="add-button"
 					look="placeholder"
 					label=${this.localize.term('content_createEmpty')}
-					href=${this._catalogueRouteBuilder?.({ view: 'create' }) ?? ''}>
+					href=${this._catalogueRouteBuilder?.({ view: 'create', index: -1 }) ?? ''}>
 					${this.localize.term('content_createEmpty')}
 				</uui-button>
 				<uui-button
 					label=${this.localize.term('content_createFromClipboard')}
 					look="placeholder"
-					href=${this._catalogueRouteBuilder?.({ view: 'clipboard' }) ?? ''}>
+					href=${this._catalogueRouteBuilder?.({ view: 'clipboard', index: -1 }) ?? ''}>
 					<uui-icon name="icon-paste-in"></uui-icon>
 				</uui-button>
 			</uui-button-group>`;

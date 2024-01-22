@@ -5,7 +5,7 @@ import { UmbBooleanState, UmbObjectState, UmbStringState } from '@umbraco-cms/ba
 import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { ManifestWorkspace } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import { UMB_BLOCK_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/block';
+import { UMB_BLOCK_MANAGER_CONTEXT, UmbBlockWorkspaceData } from '@umbraco-cms/backoffice/block';
 import { buildUdi } from '@umbraco-cms/backoffice/utils';
 import { UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
 
@@ -18,8 +18,9 @@ export class UmbBlockWorkspaceContext<
 	readonly workspaceAlias;
 
 	#blockManager?: typeof UMB_BLOCK_MANAGER_CONTEXT.TYPE;
-	#retrieveModalContext;
 	#retrieveBlockManager;
+	#modalContext?: typeof UMB_MODAL_CONTEXT_TOKEN.TYPE;
+	#retrieveModalContext;
 	#editorConfigPromise?: Promise<unknown>;
 
 	#entityType: string;
@@ -49,6 +50,7 @@ export class UmbBlockWorkspaceContext<
 		this.workspaceAlias = workspaceArgs.manifest.alias;
 
 		this.#retrieveModalContext = this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (context) => {
+			this.#modalContext = context;
 			context.onSubmit().catch(this.#modalRejected);
 		}).asPromise();
 
@@ -111,13 +113,17 @@ export class UmbBlockWorkspaceContext<
 
 	async create(contentElementTypeId: string) {
 		await this.#retrieveBlockManager;
+		await this.#retrieveModalContext;
 		if (!this.#blockManager) {
-			throw new Error('Block manager not found');
+			throw new Error('Block Manager not found');
+			return;
+		}
+		if (!this.#modalContext) {
+			throw new Error('Modal Context not found');
 			return;
 		}
 		//
 		// TODO: Condense this into some kind of create method?
-
 		const key = UmbId.new();
 		const contentUdi = buildUdi('block', key);
 		const layoutData: UmbBlockLayoutBaseModel = {
@@ -135,7 +141,11 @@ export class UmbBlockWorkspaceContext<
 		this.#layout.setValue(layoutData as LayoutDataType);
 
 		if (this.#liveEditingMode) {
-			const blockCreated = this.#blockManager.createBlock(layoutData, contentElementTypeId);
+			const blockCreated = this.#blockManager.createBlock(
+				this.#modalContext.data as UmbBlockWorkspaceData,
+				layoutData,
+				contentElementTypeId,
+			);
 			if (!blockCreated) {
 				throw new Error('Block Manager could not create block');
 				return;

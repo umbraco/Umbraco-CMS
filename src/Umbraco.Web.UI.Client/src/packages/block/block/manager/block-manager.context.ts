@@ -8,6 +8,7 @@ import {
 	UMB_BLOCK_MANAGER_CONTEXT,
 	UMB_BLOCK_WORKSPACE_MODAL,
 	UmbBlockTypeBaseModel,
+	UmbBlockWorkspaceData,
 } from '@umbraco-cms/backoffice/block';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 import { UmbContentTypeModel } from '@umbraco-cms/backoffice/content-type';
@@ -36,8 +37,8 @@ export abstract class UmbBlockManagerContext<
 	#editorConfiguration = new UmbClassState<UmbPropertyEditorConfigCollection | undefined>(undefined);
 	public readonly editorConfiguration = this.#editorConfiguration.asObservable();
 
-	#layouts = new UmbArrayState(<Array<BlockLayoutType>>[], (x) => x.contentUdi);
-	public readonly layouts = this.#layouts.asObservable();
+	protected _layouts = new UmbArrayState(<Array<BlockLayoutType>>[], (x) => x.contentUdi);
+	public readonly layouts = this._layouts.asObservable();
 
 	#contents = new UmbArrayState(<Array<UmbBlockDataType>>[], (x) => x.udi);
 	public readonly contents = this.#contents.asObservable();
@@ -57,7 +58,7 @@ export abstract class UmbBlockManagerContext<
 	}
 
 	setLayouts(layouts: Array<BlockLayoutType>) {
-		this.#layouts.setValue(layouts);
+		this._layouts.setValue(layouts);
 	}
 
 	setContents(contents: Array<UmbBlockDataType>) {
@@ -116,7 +117,7 @@ export abstract class UmbBlockManagerContext<
 	}
 
 	layoutOf(contentUdi: string) {
-		return this.#layouts.asObservablePart((source) => source.find((x) => x.contentUdi === contentUdi));
+		return this._layouts.asObservablePart((source) => source.find((x) => x.contentUdi === contentUdi));
 	}
 	contentOf(udi: string) {
 		return this.#contents.asObservablePart((source) => source.find((x) => x.udi === udi));
@@ -126,7 +127,7 @@ export abstract class UmbBlockManagerContext<
 	}
 
 	setOneLayout(layoutData: BlockLayoutType) {
-		return this.#layouts.appendOne(layoutData);
+		return this._layouts.appendOne(layoutData);
 	}
 	setOneContent(contentData: UmbBlockDataType) {
 		this.#contents.appendOne(contentData);
@@ -135,9 +136,17 @@ export abstract class UmbBlockManagerContext<
 		this.#settings.appendOne(settingsData);
 	}
 
-	abstract createBlock(layoutEntry: Omit<BlockLayoutType, 'contentUdi'>, contentElementTypeKey: string): boolean;
+	abstract _createBlock(
+		modalData: UmbBlockWorkspaceData,
+		layoutEntry: Omit<BlockLayoutType, 'contentUdi'>,
+		contentElementTypeKey: string,
+	): boolean;
 
-	protected _createBlockData(layoutEntry: Omit<BlockLayoutType, 'contentUdi'>, contentElementTypeKey: string) {
+	public createBlock(
+		modalData: UmbBlockWorkspaceData,
+		layoutEntry: Omit<BlockLayoutType, 'contentUdi'>,
+		contentElementTypeKey: string,
+	) {
 		// Find block type.
 		const blockType = this.#blockTypes.value.find((x) => x.contentElementTypeKey === contentElementTypeKey);
 		if (!blockType) {
@@ -154,7 +163,9 @@ export abstract class UmbBlockManagerContext<
 			fullLayoutEntry.settingsUdi = buildUdi('element', UmbId.new());
 		}
 
-		this.#layouts.appendOne(fullLayoutEntry);
+		if (this._createBlock(modalData, fullLayoutEntry, contentElementTypeKey) === false) {
+			return false;
+		}
 
 		// Create content entry:
 		if (fullLayoutEntry.contentUdi) {
@@ -184,14 +195,14 @@ export abstract class UmbBlockManagerContext<
 	}
 
 	deleteBlock(contentUdi: string) {
-		const layout = this.#layouts.value.find((x) => x.contentUdi === contentUdi);
+		const layout = this._layouts.value.find((x) => x.contentUdi === contentUdi);
 		if (!layout) return;
 
 		if (layout.settingsUdi) {
 			this.#settings.removeOne(layout.settingsUdi);
 		}
 
-		this.#layouts.removeOne(contentUdi);
+		this._layouts.removeOne(contentUdi);
 		this.#contents.removeOne(contentUdi);
 	}
 }
