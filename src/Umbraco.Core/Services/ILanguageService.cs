@@ -62,5 +62,5 @@ public interface ILanguageService
     /// </summary>
     /// <param name="ids">The ids of the configured <see cref="ILanguage" />s</param>
     /// <returns>The ISO codes of the <see cref="ILanguage" />s</returns>
-    string[] GetIsoCodesByIds(ICollection<int> ids);
+    Task<string[]> GetIsoCodesByIdsAsync(ICollection<int> ids);
 }

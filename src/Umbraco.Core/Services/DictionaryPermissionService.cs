@@ -22,7 +22,7 @@ public class DictionaryPermissionService : IDictionaryPermissionService
         }
 
         var allowedLanguages = user.Groups.SelectMany(g => g.AllowedLanguages).Distinct().ToArray();
-        var allowedLanguageIsoCodes = _languageService.GetIsoCodesByIds(allowedLanguages);
+        var allowedLanguageIsoCodes = await _languageService.GetIsoCodesByIdsAsync(allowedLanguages);
 
         return culturesToCheck.All(culture => allowedLanguageIsoCodes.InvariantContains(culture))
             ? DictionaryAuthorizationStatus.Success
