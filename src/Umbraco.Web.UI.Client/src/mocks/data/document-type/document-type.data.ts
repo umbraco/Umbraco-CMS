@@ -13,7 +13,7 @@ export interface UmbMockDocumentTypeModel extends Omit<UmbMockDocumentTypeModelH
 
 export const data: Array<UmbMockDocumentTypeModel> = [
 	{
-		allowedTemplateIds: [],
+		allowedTemplates: [],
 		defaultTemplateId: null,
 		id: 'all-property-editors-document-type-id',
 		alias: 'blogPost',
@@ -26,16 +26,20 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		isElement: false,
 		hasChildren: false,
 		isContainer: false,
-		parentId: null,
+		parent: null,
 		isFolder: false,
 		properties: [
 			{
 				id: '1',
-				containerId: 'all-properties-group-key',
+				container: {
+					id: 'all-properties-group-key',
+				},
 				alias: 'richTextEditor',
 				name: 'Rich Text editor',
 				description: 'Some description to test with a long description.',
-				dataTypeId: 'dt-richTextEditor',
+				dataType: {
+					id: 'dt-richTextEditor',
+				},
 				variesByCulture: false,
 				variesBySegment: false,
 				sortOrder: 0,
@@ -51,11 +55,15 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			},
 			{
 				id: '2',
-				containerId: 'all-properties-group-id',
+				container: {
+					id: 'all-properties-group-key',
+				},
 				alias: 'colorPicker',
 				name: 'Color Picker',
 				description: '',
-				dataTypeId: 'dt-colorPicker',
+				dataType: {
+					id: 'dt-colorPicker',
+				},
 				variesByCulture: false,
 				variesBySegment: false,
 				sortOrder: 1,
@@ -71,11 +79,15 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			},
 			{
 				id: '3',
-				containerId: 'all-properties-group-key',
+				container: {
+					id: 'all-properties-group-key',
+				},
 				alias: 'contentPicker',
 				name: 'Content Picker',
 				description: '',
-				dataTypeId: 'dt-contentPicker',
+				dataType: {
+					id: 'dt-contentPicker',
+				},
 				variesByCulture: false,
 				variesBySegment: false,
 				sortOrder: 2,
@@ -91,7 +103,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			},
 			{
 				id: '4',
-				containerId: 'all-properties-group-key',
+				container: { id: 'all-properties-group-key' },
 				alias: 'eyeDropper',
 				name: 'Eye Dropper',
 				description: '',
@@ -111,7 +123,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			},
 			{
 				id: '5',
-				containerId: 'all-properties-group-key',
+				container: { id: 'all-properties-group-key' },
 				alias: 'multiUrlPicker',
 				name: 'Multi URL Picker',
 				description: '',
@@ -131,7 +143,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			},
 			{
 				id: '6',
-				containerId: 'all-properties-group-key',
+				container: { id: 'all-properties-group-key' },
 				alias: 'multiNodeTreePicker',
 				name: 'Multi Node Tree Picker',
 				description: '',
@@ -151,7 +163,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			},
 			{
 				id: '7',
-				containerId: 'all-properties-group-key',
+				container: { id: 'all-properties-group-key' },
 				alias: 'datePicker',
 				name: 'Date Picker',
 				description: '',
@@ -171,7 +183,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			},
 			{
 				id: '7b',
-				containerId: 'all-properties-group-key',
+				container: { id: 'all-properties-group-key' },
 				alias: 'datePicker-b',
 				name: 'Date Picker With Time',
 				description: '',
@@ -191,7 +203,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			},
 			{
 				id: '8',
-				containerId: 'all-properties-group-key',
+				container: { id: 'all-properties-group-key' },
 				alias: 'email',
 				name: 'Email',
 				description: '',
@@ -211,7 +223,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			},
 			{
 				id: '9',
-				containerId: 'all-properties-group-key',
+				container: { id: 'all-properties-group-key' },
 				alias: 'textBox',
 				name: 'Text Box',
 				description: '',
@@ -231,7 +243,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			},
 			{
 				id: '19',
-				containerId: 'all-properties-group-key',
+				container: { id: 'all-properties-group-key' },
 				alias: 'dropdown',
 				name: 'Dropdown',
 				description: '',
@@ -251,7 +263,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			},
 			{
 				id: '11',
-				containerId: 'all-properties-group-key',
+				container: { id: 'all-properties-group-key' },
 				alias: 'textArea',
 				name: 'Text Area',
 				description: '',
@@ -271,7 +283,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			},
 			{
 				id: '12',
-				containerId: 'all-properties-group-key',
+				container: { id: 'all-properties-group-key' },
 				alias: 'slider',
 				name: 'Slider',
 				description: '',
@@ -291,7 +303,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			},
 			{
 				id: '13',
-				containerId: 'all-properties-group-key',
+				container: { id: 'all-properties-group-key' },
 				alias: 'toggle',
 				name: 'Toggle',
 				description: '',
@@ -311,7 +323,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			},
 			{
 				id: '14',
-				containerId: 'all-properties-group-key',
+				container: { id: 'all-properties-group-key' },
 				alias: 'tags',
 				name: 'Tags',
 				description: '',
@@ -331,7 +343,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			},
 			{
 				id: '15',
-				containerId: 'all-properties-group-key',
+				container: { id: 'all-properties-group-key' },
 				alias: 'markdownEditor',
 				name: 'MarkdownEditor',
 				description: '',
@@ -351,7 +363,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			},
 			{
 				id: '16',
-				containerId: 'all-properties-group-key',
+				container: { id: 'all-properties-group-key' },
 				alias: 'radioButtonList',
 				name: 'Radio Button List',
 				description: '',
@@ -371,7 +383,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			},
 			{
 				id: '17',
-				containerId: 'all-properties-group-key',
+				container: { id: 'all-properties-group-key' },
 				alias: 'checkboxList',
 				name: 'Checkbox List',
 				description: '',
@@ -391,7 +403,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			},
 			{
 				id: '18',
-				containerId: 'all-properties-group-key',
+				container: { id: 'all-properties-group-key' },
 				alias: 'blockList',
 				name: 'Block List',
 				description: '',
@@ -411,7 +423,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			},
 			{
 				id: '19',
-				containerId: 'all-properties-group-key',
+				container: { id: 'all-properties-group-key' },
 				alias: 'mediaPicker',
 				name: 'Media Picker',
 				description: '',
@@ -431,7 +443,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			},
 			{
 				id: '20',
-				containerId: 'all-properties-group-key',
+				container: { id: 'all-properties-group-key' },
 				alias: 'imageCropper',
 				name: 'Image Cropper',
 				description: '',
@@ -451,7 +463,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			},
 			{
 				id: '21',
-				containerId: 'all-properties-group-key',
+				container: { id: 'all-properties-group-key' },
 				alias: 'uploadField',
 				name: 'Upload Field',
 				description: '',
@@ -471,7 +483,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			},
 			{
 				id: '22',
-				containerId: 'all-properties-group-key',
+				container: { id: 'all-properties-group-key' },
 				alias: 'blockGrid',
 				name: 'Block Grid',
 				description: '',
@@ -491,7 +503,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			},
 			{
 				id: '23',
-				containerId: 'all-properties-group-key',
+				container: { id: 'all-properties-group-key' },
 				alias: 'iconPicker',
 				name: 'Icon Picker',
 				description: '',
@@ -511,7 +523,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			},
 			{
 				id: '27',
-				containerId: 'all-properties-group-key',
+				container: { id: 'all-properties-group-key' },
 				alias: 'label',
 				name: 'Label',
 				description: '',
@@ -531,7 +543,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			},
 			{
 				id: '28',
-				containerId: 'all-properties-group-key',
+				container: { id: 'all-properties-group-key' },
 				alias: 'integer',
 				name: 'Integer',
 				description: '',
@@ -551,7 +563,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			},
 			{
 				id: '29',
-				containerId: 'all-properties-group-key',
+				container: { id: 'all-properties-group-key' },
 				alias: 'decimal',
 				name: 'Decimal',
 				description: '',
@@ -571,7 +583,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			},
 			{
 				id: '30',
-				containerId: 'all-properties-group-key',
+				container: { id: 'all-properties-group-key' },
 				alias: 'memberPicker',
 				name: 'Member Picker',
 				description: '',
@@ -591,7 +603,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			},
 			{
 				id: '31',
-				containerId: 'all-properties-group-key',
+				container: { id: 'all-properties-group-key' },
 				alias: 'memberGroupPicker',
 				name: 'Member Group Picker',
 				description: '',
@@ -611,7 +623,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			},
 			{
 				id: '32',
-				containerId: 'all-properties-group-key',
+				container: { id: 'all-properties-group-key' },
 				alias: 'userPicker',
 				name: 'User Picker',
 				description: '',
@@ -631,7 +643,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			},
 			{
 				id: '33',
-				containerId: 'all-properties-group-key',
+				container: { id: 'all-properties-group-key' },
 				alias: 'staticFilePicker',
 				name: 'Static File Picker',
 				description: '',
@@ -653,13 +665,13 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		containers: [
 			{
 				id: 'all-properties-group-key',
-				parentId: null,
+				parent: null,
 				name: 'Content',
 				type: 'Group',
 				sortOrder: 0,
 			},
 		],
-		allowedContentTypes: [],
+		allowedDocumentTypes: [],
 		compositions: [],
 		cleanup: {
 			preventCleanup: false,
@@ -668,7 +680,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		},
 	},
 	{
-		allowedTemplateIds: [],
+		allowedTemplates: [],
 		defaultTemplateId: null,
 		id: 'simple-document-type-id',
 		alias: 'blogPost',
@@ -681,12 +693,12 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		isElement: false,
 		hasChildren: false,
 		isContainer: false,
-		parentId: null,
+		parent: null,
 		isFolder: false,
 		properties: [
 			{
 				id: '6',
-				containerId: 'all-properties-group-key',
+				container: { id: 'all-properties-group-key' },
 				alias: 'multiNodeTreePicker',
 				name: 'Multi Node Tree Picker',
 				description: '',
@@ -708,13 +720,13 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		containers: [
 			{
 				id: 'all-properties-group-key',
-				parentId: null,
+				parent: null,
 				name: 'Content',
 				type: 'Group',
 				sortOrder: 0,
 			},
 		],
-		allowedContentTypes: [],
+		allowedDocumentTypes: [],
 		compositions: [],
 		cleanup: {
 			preventCleanup: false,
@@ -724,7 +736,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 	},
 
 	{
-		allowedTemplateIds: [],
+		allowedTemplates: [],
 		defaultTemplateId: null,
 		id: '29643452-cff9-47f2-98cd-7de4b6807681',
 		alias: 'blogPost',
@@ -737,7 +749,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		isElement: false,
 		hasChildren: false,
 		isContainer: false,
-		parentId: null,
+		parent: null,
 		isFolder: false,
 		properties: [
 			{
@@ -762,11 +774,11 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			},
 			{
 				id: 'ef7096b6-7c9e-49ba-8d49-395111e65ea2',
-				containerId: '227d6ed2-e118-4494-b8f2-deb69854a56a',
+				container: { id: '227d6ed2-e118-4494-b8f2-deb69854a56a' },
 				alias: 'blogTextStringUnderMasterTab',
 				name: 'Blog text string under master tab',
 				description: null,
-				dataTypeId: '0cc0eba1-9960-42c9-bf9b-60e150b429ae',
+				dataType: { id: '0cc0eba1-9960-42c9-bf9b-60e150b429ae' },
 				variesByCulture: true,
 				variesBySegment: false,
 				sortOrder: 1,
@@ -844,14 +856,14 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		containers: [
 			{
 				id: 'c3cd2f12-b7c4-4206-8d8b-27c061589f75',
-				parentId: null,
+				parent: null,
 				name: 'Content-group',
 				type: 'Group',
 				sortOrder: 0,
 			},
 			{
 				id: '227d6ed2-e118-4494-b8f2-deb69854a56a',
-				parentId: null,
+				parent: null,
 				name: 'Master Tab',
 				type: 'Tab',
 				sortOrder: 0,
@@ -865,13 +877,13 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			},
 			{
 				id: '2c943997-b685-432d-a6c5-601d8e7a298a',
-				parentId: null,
+				parent: null,
 				name: 'Local blog tab',
 				type: 'Tab',
 				sortOrder: 1,
 			},
 		],
-		allowedContentTypes: [
+		allowedDocumentTypes: [
 			{
 				id: '29643452-cff9-47f2-98cd-7de4b6807681',
 				sortOrder: 0,
@@ -894,7 +906,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		},
 	},
 	{
-		allowedTemplateIds: ['916cfecc-3295-490c-a16d-c41fa9f72980'],
+		allowedTemplates: ['916cfecc-3295-490c-a16d-c41fa9f72980'],
 		defaultTemplateId: '916cfecc-3295-490c-a16d-c41fa9f72980',
 		id: '5035d7d9-0a63-415c-9e75-ee2cf931db92',
 		alias: 'masterPage',
@@ -907,7 +919,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		isElement: false,
 		hasChildren: false,
 		isContainer: false,
-		parentId: null,
+		parent: null,
 		isFolder: false,
 		properties: [
 			{
@@ -934,13 +946,13 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		containers: [
 			{
 				id: '6f281e5a-0242-4649-bd9e-d6bf87f92b41',
-				parentId: null,
+				parent: null,
 				name: 'Master Tab',
 				type: 'Tab',
 				sortOrder: 0,
 			},
 		],
-		allowedContentTypes: [],
+		allowedDocumentTypes: [],
 		compositions: [],
 		cleanup: {
 			preventCleanup: false,
@@ -949,7 +961,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		},
 	},
 	{
-		allowedTemplateIds: [],
+		allowedTemplates: [],
 		defaultTemplateId: null,
 		id: '8f68ba66-6fb2-4778-83b8-6ab4ca3a7c5d',
 		alias: 'baseElementType',
@@ -962,7 +974,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		isElement: true,
 		hasChildren: false,
 		isContainer: false,
-		parentId: null,
+		parent: null,
 		isFolder: false,
 		properties: [
 			{
@@ -989,13 +1001,13 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		containers: [
 			{
 				id: '1e845ca8-1e3e-4b03-be1d-0b4149ce2129',
-				parentId: null,
+				parent: null,
 				name: 'Content-group',
 				type: 'Group',
 				sortOrder: 0,
 			},
 		],
-		allowedContentTypes: [],
+		allowedDocumentTypes: [],
 		compositions: [],
 		cleanup: {
 			preventCleanup: false,
@@ -1004,7 +1016,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		},
 	},
 	{
-		allowedTemplateIds: [],
+		allowedTemplates: [],
 		defaultTemplateId: null,
 		id: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
 		alias: 'simpleElementType',
@@ -1017,7 +1029,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		isElement: true,
 		hasChildren: false,
 		isContainer: false,
-		parentId: null,
+		parent: null,
 		isFolder: false,
 		properties: [
 			{
@@ -1044,13 +1056,13 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		containers: [
 			{
 				id: '1e845ca8-1e3e-4b03-be1d-0b4149ce2120',
-				parentId: null,
+				parent: null,
 				name: 'Content-group',
 				type: 'Group',
 				sortOrder: 0,
 			},
 		],
-		allowedContentTypes: [],
+		allowedDocumentTypes: [],
 		compositions: [],
 		cleanup: {
 			preventCleanup: false,
@@ -1059,7 +1071,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		},
 	},
 	{
-		allowedTemplateIds: [
+		allowedTemplates: [
 			'2bf464b6-3aca-4388-b043-4eb439cc2643',
 			'9a84c0b3-03b4-4dd4-84ac-706740ac0f71',
 			'9a84c0b3-03b4-4dd4-84ac-706740ac0f72',
@@ -1076,7 +1088,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		isElement: false,
 		hasChildren: false,
 		isContainer: false,
-		parentId: null,
+		parent: null,
 		isFolder: false,
 		properties: [
 			{
@@ -1103,13 +1115,13 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		containers: [
 			{
 				id: '341b8521-fd43-4333-ae7a-a10cbbc6f4b0',
-				parentId: null,
+				parent: null,
 				name: 'Content',
 				type: 'Group',
 				sortOrder: 0,
 			},
 		],
-		allowedContentTypes: [
+		allowedDocumentTypes: [
 			{ id: 'simple-document-type-key', sortOrder: 0 },
 			{ id: 'simple-document-type-2-key', sortOrder: 0 },
 		],
@@ -1121,7 +1133,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		},
 	},
 	{
-		allowedTemplateIds: [],
+		allowedTemplates: [],
 		defaultTemplateId: null,
 		id: 'simple-document-type-2-key',
 		alias: 'simpleDocumentType2',
@@ -1134,7 +1146,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		isElement: false,
 		hasChildren: false,
 		isContainer: false,
-		parentId: null,
+		parent: null,
 		isFolder: false,
 		properties: [
 			{
@@ -1181,13 +1193,13 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		containers: [
 			{
 				id: 'b275052a-1868-4901-bc8c-2b35b78a9ab2',
-				parentId: null,
+				parent: null,
 				name: 'Content',
 				type: 'Group',
 				sortOrder: 0,
 			},
 		],
-		allowedContentTypes: [{ id: 'simple-document-type-key', sortOrder: 0 }],
+		allowedDocumentTypes: [{ id: 'simple-document-type-key', sortOrder: 0 }],
 		compositions: [],
 		cleanup: {
 			preventCleanup: false,
@@ -1196,7 +1208,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		},
 	},
 	{
-		allowedTemplateIds: [],
+		allowedTemplates: [],
 		defaultTemplateId: null,
 		id: 'folder-umbraco-demo-blocks-id',
 		alias: 'folderUmbracoDemoBlocks',
@@ -1209,9 +1221,9 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		isElement: false,
 		hasChildren: true,
 		isContainer: false,
-		parentId: null,
+		parent: null,
 		isFolder: true,
-		allowedContentTypes: [],
+		allowedDocumentTypes: [],
 		compositions: [],
 		cleanup: {
 			preventCleanup: false,
@@ -1222,7 +1234,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		containers: [],
 	},
 	{
-		allowedTemplateIds: [],
+		allowedTemplates: [],
 		defaultTemplateId: null,
 		id: 'coffee-umbraco-demo-block-id',
 		alias: 'coffeeUmbracoDemoBlock',
@@ -1237,7 +1249,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		isContainer: false,
 		parentId: 'folder-umbraco-demo-blocks-id',
 		isFolder: false,
-		allowedContentTypes: [],
+		allowedDocumentTypes: [],
 		compositions: [],
 		cleanup: {
 			preventCleanup: false,
@@ -1289,7 +1301,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		containers: [
 			{
 				id: 'coffee-content-group-key',
-				parentId: null,
+				parent: null,
 				name: 'Content',
 				type: 'Group',
 				sortOrder: 0,
@@ -1297,7 +1309,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		],
 	},
 	{
-		allowedTemplateIds: [],
+		allowedTemplates: [],
 		defaultTemplateId: null,
 		id: 'headline-umbraco-demo-block-id',
 		alias: 'headlineUmbracoDemoBlock',
@@ -1312,7 +1324,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		isContainer: false,
 		parentId: 'folder-umbraco-demo-blocks-id',
 		isFolder: false,
-		allowedContentTypes: [],
+		allowedDocumentTypes: [],
 		compositions: [],
 		cleanup: {
 			preventCleanup: false,
@@ -1344,7 +1356,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		containers: [
 			{
 				id: 'headline-content-group-key',
-				parentId: null,
+				parent: null,
 				name: 'Content',
 				type: 'Group',
 				sortOrder: 0,
@@ -1352,7 +1364,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		],
 	},
 	{
-		allowedTemplateIds: [],
+		allowedTemplates: [],
 		defaultTemplateId: null,
 		id: 'image-umbraco-demo-block-id',
 		alias: 'imageUmbracoDemoBlock',
@@ -1367,7 +1379,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		isContainer: false,
 		parentId: 'folder-umbraco-demo-blocks-id',
 		isFolder: false,
-		allowedContentTypes: [],
+		allowedDocumentTypes: [],
 		compositions: [],
 		cleanup: {
 			preventCleanup: false,
@@ -1399,7 +1411,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		containers: [
 			{
 				id: 'image-content-group-key',
-				parentId: null,
+				parent: null,
 				name: 'Content',
 				type: 'Group',
 				sortOrder: 0,
@@ -1407,8 +1419,8 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		],
 	},
 	{
-		allowedTemplateIds: [],
-		defaultTemplateId: null,
+		allowedTemplates: [],
+		defaultTemplate: null,
 		id: 'rich-text-umbraco-demo-block-id',
 		alias: 'richTextUmbracoDemoBlock',
 		name: 'Rich Text',
@@ -1419,10 +1431,9 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		variesBySegment: false,
 		isElement: true,
 		hasChildren: false,
-		isContainer: false,
-		parentId: 'folder-umbraco-demo-blocks-id',
+		parent: { id: 'folder-umbraco-demo-blocks-id' },
 		isFolder: false,
-		allowedContentTypes: [],
+		allowedDocumentTypes: [],
 		compositions: [],
 		cleanup: {
 			preventCleanup: false,
@@ -1432,11 +1443,11 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		properties: [
 			{
 				id: 'rich-text-id',
-				containerId: 'rich-text-content-group-key',
+				container: { id: 'rich-text-content-group-key' },
 				alias: 'richText',
 				name: 'Text',
 				description: '',
-				dataTypeId: 'dt-richTextEditor',
+				dataType: { id: 'dt-richTextEditor' },
 				variesByCulture: false,
 				variesBySegment: false,
 				sortOrder: 10,
@@ -1454,7 +1465,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		containers: [
 			{
 				id: 'rich-text-content-group-key',
-				parentId: null,
+				parent: null,
 				name: 'Content',
 				type: 'Group',
 				sortOrder: 0,
@@ -1462,8 +1473,8 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		],
 	},
 	{
-		allowedTemplateIds: [],
-		defaultTemplateId: null,
+		allowedTemplates: [],
+		defaultTemplate: null,
 		id: 'two-column-layout-umbraco-demo-block-id',
 		alias: 'twoColumnLayoutUmbracoDemoBlock',
 		name: 'Two Column Layout',
@@ -1474,10 +1485,11 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		variesBySegment: false,
 		isElement: true,
 		hasChildren: false,
-		isContainer: false,
-		parentId: 'folder-umbraco-demo-blocks-id',
+		parent: {
+			id: 'folder-umbraco-demo-blocks-id',
+		},
 		isFolder: false,
-		allowedContentTypes: [],
+		allowedDocumentTypes: [],
 		compositions: [],
 		cleanup: {
 			preventCleanup: false,
