@@ -18,6 +18,7 @@ export class UmbBlockWorkspaceContext<
 	readonly workspaceAlias;
 
 	#blockManager?: typeof UMB_BLOCK_MANAGER_CONTEXT.TYPE;
+	#retrieveModalContext;
 	#retrieveBlockManager;
 	#editorConfigPromise?: Promise<unknown>;
 
@@ -47,9 +48,9 @@ export class UmbBlockWorkspaceContext<
 		this.#entityType = workspaceArgs.manifest.meta?.entityType;
 		this.workspaceAlias = workspaceArgs.manifest.alias;
 
-		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (context) => {
+		this.#retrieveModalContext = this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (context) => {
 			context.onSubmit().catch(this.#modalRejected);
-		});
+		}).asPromise();
 
 		this.#retrieveBlockManager = this.consumeContext(UMB_BLOCK_MANAGER_CONTEXT, (context) => {
 			this.#blockManager = context;
@@ -109,25 +110,37 @@ export class UmbBlockWorkspaceContext<
 	}
 
 	async create(contentElementTypeId: string) {
+		await this.#retrieveBlockManager;
+		if (!this.#blockManager) {
+			throw new Error('Block manager not found');
+			return;
+		}
 		//
 		// TODO: Condense this into some kind of create method?
+
 		const key = UmbId.new();
 		const contentUdi = buildUdi('block', key);
-		const layout: UmbBlockLayoutBaseModel = {
+		const layoutData: UmbBlockLayoutBaseModel = {
 			contentUdi: contentUdi,
 		};
-		const content: UmbBlockDataType = {
+		const contentData: UmbBlockDataType = {
 			udi: contentUdi,
 			contentTypeKey: contentElementTypeId,
 		};
-		this.content.setData(content);
+		this.content.setData(contentData);
 
 		// TODO: If we have Settings dedicated to this block type, we initiate them here:
 
 		this.setIsNew(true);
-		this.#layout.setValue(layout as LayoutDataType);
+		this.#layout.setValue(layoutData as LayoutDataType);
 
 		if (this.#liveEditingMode) {
+			const blockCreated = this.#blockManager.createBlock(layoutData, contentElementTypeId);
+			if (!blockCreated) {
+				throw new Error('Block Manager could not create block');
+				return;
+			}
+
 			this.#establishLiveSync();
 		}
 	}
@@ -198,15 +211,15 @@ export class UmbBlockWorkspaceContext<
 		const contentData = this.content.getData();
 		if (!layoutData || !this.#blockManager || !contentData) return;
 
-		if (this.getIsNew() === true) {
-			const blockCreated = this.#blockManager.createBlock(layoutData, contentData.contentTypeKey);
-			if (!blockCreated) {
-				throw new Error('Block Manager could not create block');
-				return;
-			}
-		}
-
 		if (!this.#liveEditingMode) {
+			if (this.getIsNew() === true) {
+				const blockCreated = this.#blockManager.createBlock(layoutData, contentData.contentTypeKey);
+				if (!blockCreated) {
+					throw new Error('Block Manager could not create block');
+					return;
+				}
+			}
+
 			// TODO: Save the block, but only in non-live-editing mode.
 			this.#blockManager.setOneLayout(layoutData);
 
