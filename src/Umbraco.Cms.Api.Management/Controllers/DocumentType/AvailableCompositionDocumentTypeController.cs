@@ -2,19 +2,19 @@ using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Factories;
-using Umbraco.Cms.Api.Management.ViewModels.DocumentType.Composition;
+using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services.ContentTypeEditing;
 
-namespace Umbraco.Cms.Api.Management.Controllers.DocumentType.Composition;
+namespace Umbraco.Cms.Api.Management.Controllers.DocumentType;
 
 [ApiVersion("1.0")]
-public class AvailableCompositionController : DocumentTypeControllerBase
+public class AvailableCompositionDocumentTypeController : DocumentTypeControllerBase
 {
     private readonly IContentTypeEditingService _contentTypeEditingService;
     private readonly IDocumentTypeEditingPresentationFactory _presentationFactory;
 
-    public AvailableCompositionController(IContentTypeEditingService contentTypeEditingService, IDocumentTypeEditingPresentationFactory presentationFactory)
+    public AvailableCompositionDocumentTypeController(IContentTypeEditingService contentTypeEditingService, IDocumentTypeEditingPresentationFactory presentationFactory)
     {
         _contentTypeEditingService = contentTypeEditingService;
         _presentationFactory = presentationFactory;

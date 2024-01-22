@@ -2,19 +2,19 @@ using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Factories;
-using Umbraco.Cms.Api.Management.ViewModels.MediaType.Composition;
+using Umbraco.Cms.Api.Management.ViewModels.MediaType;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services.ContentTypeEditing;
 
-namespace Umbraco.Cms.Api.Management.Controllers.MediaType.Composition;
+namespace Umbraco.Cms.Api.Management.Controllers.MediaType;
 
 [ApiVersion("1.0")]
-public class AvailableCompositionController : MediaTypeControllerBase
+public class AvailableCompositionMediaTypeController : MediaTypeControllerBase
 {
     private readonly IMediaTypeEditingService _mediaTypeEditingService;
     private readonly IMediaTypeEditingPresentationFactory _presentationFactory;
 
-    public AvailableCompositionController(IMediaTypeEditingService mediaTypeEditingService, IMediaTypeEditingPresentationFactory presentationFactory)
+    public AvailableCompositionMediaTypeController(IMediaTypeEditingService mediaTypeEditingService, IMediaTypeEditingPresentationFactory presentationFactory)
     {
         _mediaTypeEditingService = mediaTypeEditingService;
         _presentationFactory = presentationFactory;
