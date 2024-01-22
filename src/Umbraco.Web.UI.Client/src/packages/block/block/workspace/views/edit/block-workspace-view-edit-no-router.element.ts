@@ -110,6 +110,7 @@ export class UmbBlockWorkspaceViewEditNoRouterElement extends UmbLitElement impl
 				: ''}
 			${this._activeTabId !== undefined
 				? html`<umb-block-workspace-view-edit-tab
+						.hideSingleGroup=${true}
 						.ownerTabId=${this._activeTabId && this._tabsStructureHelper.isOwnerContainer(this._activeTabId)
 							? this._activeTabId
 							: undefined}
