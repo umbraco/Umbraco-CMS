@@ -1,8 +1,8 @@
 import { UmbDocumentRepository } from '../../repository/document.repository.js';
-import { html, customElement, state, css, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, state, css, repeat, query } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import { UUIInputEvent, UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
+import { UUIInputEvent, UUIPopoverContainerElement, UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLanguageRepository } from '@umbraco-cms/backoffice/language';
 import { DomainPresentationModel, LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbCultureAndHostnamesModalData, UmbCultureAndHostnamesModalValue } from '@umbraco-cms/backoffice/document';
@@ -23,6 +23,9 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 
 	@state()
 	private _domains: Array<DomainPresentationModel> = [];
+
+	@query('#more-options')
+	private _moreOptions?: UUIPopoverContainerElement;
 
 	#handleCancel() {
 		this.modalContext?.reject();
@@ -76,6 +79,7 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 	#addDomain(currentDomain?: boolean) {
 		const defaultModel = this.#languageModel.find((model) => model.isDefault);
 		if (currentDomain) {
+			this._moreOptions?.hidePopover();
 			this._domains = [...this._domains, { isoCode: defaultModel?.isoCode ?? '', domainName: window.location.host }];
 		} else {
 			this._domains = [...this._domains, { isoCode: defaultModel?.isoCode ?? '', domainName: '' }];
@@ -177,10 +181,15 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 				label=${this.localize.term('buttons_select')}
 				look="placeholder"
 				compact
-				@click=${() => this.#addDomain(true)}>
+				popovertarget="more-options">
 				<uui-icon name="icon-navigation-down"></uui-icon>
 			</uui-button>
-		</uui-button-group>`;
+			<uui-popover-container id="more-options" placement="bottom-end">
+				<umb-popover-layout>
+					<uui-button label="add current domain" @click=${() => this.#addDomain(true)}> Add current domain </uui-button>
+				</umb-popover-layout>
+			</uui-popover-container>
+		</uui-button-group> `;
 	}
 
 	static styles = [
