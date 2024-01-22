@@ -33,7 +33,7 @@ public class CreateSavedSearchLogViewerController : SavedSearchLogViewerControll
         if (result.Success)
         {
             return CreatedAtAction<ByNameSavedSearchLogViewerController>(
-                    controller => nameof(controller.ByName), savedSearch.Name);
+                    controller => nameof(controller.ByName), new { name = savedSearch.Name }, savedSearch.Name);
         }
 
         return LogViewerOperationStatusResult(result.Status);

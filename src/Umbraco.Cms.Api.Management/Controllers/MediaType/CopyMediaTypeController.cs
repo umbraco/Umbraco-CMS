@@ -27,7 +27,7 @@ public class CopyMediaTypeController : MediaTypeControllerBase
         Attempt<IMediaType?, ContentTypeStructureOperationStatus> result = await _mediaTypeService.CopyAsync(id, copyMediaTypeRequestModel.TargetId);
 
         return result.Success
-            ? CreatedAtAction<ByKeyMediaTypeController>(controller => nameof(controller.ByKey), result.Result!.Key)
+            ? CreatedAtId<ByKeyMediaTypeController>(controller => nameof(controller.ByKey), result.Result!.Key)
             : StructureOperationStatusResult(result.Status);
     }
 }

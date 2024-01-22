@@ -42,7 +42,7 @@ public class CreateDictionaryController : DictionaryControllerBase
             await _dictionaryItemService.CreateAsync(created, CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Success
-            ? CreatedAtAction<ByKeyDictionaryController>(controller => nameof(controller.ByKey), result.Result!.Key)
+            ? CreatedAtId<ByKeyDictionaryController>(controller => nameof(controller.ByKey), result.Result!.Key)
             : DictionaryItemOperationStatusResult(result.Status);
     }
 }

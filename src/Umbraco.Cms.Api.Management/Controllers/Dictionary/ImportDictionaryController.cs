@@ -40,7 +40,7 @@ public class ImportDictionaryController : DictionaryControllerBase
 
         return result.Status switch
         {
-            DictionaryImportOperationStatus.Success => CreatedAtAction<ByKeyDictionaryController>(controller => nameof(controller.ByKey), result.Result!.Key),
+            DictionaryImportOperationStatus.Success => CreatedAtId<ByKeyDictionaryController>(controller => nameof(controller.ByKey), result.Result!.Key),
             DictionaryImportOperationStatus.ParentNotFound => NotFound(new ProblemDetailsBuilder()
                     .WithTitle("The parent dictionary item could not be found.")
                     .Build()),

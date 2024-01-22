@@ -38,7 +38,7 @@ public class CreateRelationTypeController : RelationTypeControllerBase
         Attempt<IRelationType, RelationTypeOperationStatus> result = await _relationService.CreateAsync(relationTypePersisted, CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Success
-            ? await Task.FromResult(CreatedAtAction<ByKeyRelationTypeController>(controller => nameof(controller.ByKey), relationTypePersisted.Key))
+            ? CreatedAtId<ByKeyRelationTypeController>(controller => nameof(controller.ByKey), relationTypePersisted.Key)
             : RelationTypeOperationStatusResult(result.Status);
     }
 }

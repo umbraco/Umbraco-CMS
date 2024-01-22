@@ -56,7 +56,7 @@ public class CreateDocumentController : DocumentControllerBase
         Attempt<ContentCreateResult, ContentEditingOperationStatus> result = await _contentEditingService.CreateAsync(model, CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Success
-            ? CreatedAtAction<ByKeyDocumentController>(controller => nameof(controller.ByKey), result.Result.Content!.Key)
+            ? CreatedAtId<ByKeyDocumentController>(controller => nameof(controller.ByKey), result.Result.Content!.Key)
             : DocumentEditingOperationStatusResult(result.Status, requestModel, result.Result.ValidationErrors);
     }
 }
