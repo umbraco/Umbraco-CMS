@@ -5,9 +5,12 @@ import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbItemStore } from '@umbraco-cms/backoffice/store';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
-export class UmbItemRepositoryBase<ItemType = any> extends UmbRepositoryBase implements UmbItemRepository<ItemType> {
+export class UmbItemRepositoryBase<ItemType extends { unique: string } = any>
+	extends UmbRepositoryBase
+	implements UmbItemRepository<ItemType>
+{
 	protected _init: Promise<unknown>;
-	protected _itemStore?: UmbItemStore<any>;
+	protected _itemStore?: UmbItemStore<ItemType>;
 	#itemSource: UmbItemDataSource;
 
 	constructor(
@@ -19,7 +22,7 @@ export class UmbItemRepositoryBase<ItemType = any> extends UmbRepositoryBase imp
 		this.#itemSource = new itemSource(host);
 
 		this._init = this.consumeContext(itemStoreContextAlias, (instance) => {
-			this._itemStore = instance as UmbItemStore<any>;
+			this._itemStore = instance as UmbItemStore<ItemType>;
 		}).asPromise();
 	}
 
