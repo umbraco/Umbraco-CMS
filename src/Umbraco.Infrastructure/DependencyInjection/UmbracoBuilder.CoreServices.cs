@@ -36,12 +36,10 @@ using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Services.Implement;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Core.Trees;
 using Umbraco.Cms.Core.Web;
-using Umbraco.Cms.Core.Webhooks;
 using Umbraco.Cms.Infrastructure.DeliveryApi;
 using Umbraco.Cms.Infrastructure.DistributedLocking;
 using Umbraco.Cms.Infrastructure.Examine;
@@ -53,7 +51,6 @@ using Umbraco.Cms.Infrastructure.Manifest;
 using Umbraco.Cms.Infrastructure.Migrations;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Migrations.PostMigrations;
-using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0.DataTypes;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Cms.Infrastructure.Routing;
@@ -154,8 +151,6 @@ public static partial class UmbracoBuilderExtensions
 
         builder.Services.AddSingleton<IMigrationPlanExecutor, MigrationPlanExecutor>();
         builder.Services.AddSingleton<IMigrationBuilder>(factory => new MigrationBuilder(factory));
-
-        builder.AddPreValueMigrators();
 
         builder.Services.AddSingleton<IPublishedSnapshotRebuilder, PublishedSnapshotRebuilder>();
 
@@ -327,13 +322,6 @@ public static partial class UmbracoBuilderExtensions
                         factory.GetRequiredService<IOptionsMonitor<GlobalSettings>>());
             }
         });
-
-        return builder;
-    }
-
-    private static IUmbracoBuilder AddPreValueMigrators(this IUmbracoBuilder builder)
-    {
-        builder.WithCollectionBuilder<PreValueMigratorCollectionBuilder>();
 
         return builder;
     }
