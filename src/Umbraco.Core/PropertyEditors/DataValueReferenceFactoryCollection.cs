@@ -32,15 +32,23 @@ public class DataValueReferenceFactoryCollection : BuilderCollectionBase<IDataVa
     {
         var references = new HashSet<UmbracoEntityReference>();
 
-        foreach (IProperty property in properties)
+        // Group by property editor alias to avoid duplicate lookups and optimize value parsing
+        foreach (var propertyValuesByPropertyEditorAlias in properties.GroupBy(x => x.PropertyType.PropertyEditorAlias, x => x.Values))
         {
-            if (!propertyEditors.TryGet(property.PropertyType.PropertyEditorAlias, out IDataEditor? dataEditor))
+            if (!propertyEditors.TryGet(propertyValuesByPropertyEditorAlias.Key, out IDataEditor? dataEditor))
             {
                 continue;
             }
 
-            // Only use edited value for now
-            references.UnionWith(GetReferences(dataEditor, property.Values.Select(x => x.EditedValue)));
+            // Use distinct values to avoid duplicate parsing of the same value
+            var values = new HashSet<object?>(properties.Count);
+            foreach (IPropertyValue propertyValue in propertyValuesByPropertyEditorAlias.SelectMany(x => x))
+            {
+                values.Add(propertyValue.EditedValue);
+                values.Add(propertyValue.PublishedValue);
+            }
+
+            references.UnionWith(GetReferences(dataEditor, values));
         }
 
         return references;
