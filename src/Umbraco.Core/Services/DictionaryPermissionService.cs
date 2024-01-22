@@ -21,9 +21,8 @@ public class DictionaryPermissionService : IDictionaryPermissionService
             return DictionaryAuthorizationStatus.Success;
         }
 
-        var allowedLanguageIsoCodes =
-            _languageService.GetIsoCodesByIds(user.Groups.SelectMany(g => g.AllowedLanguages)
-                .Distinct().ToArray());
+        var allowedLanguages = user.Groups.SelectMany(g => g.AllowedLanguages).Distinct().ToArray();
+        var allowedLanguageIsoCodes = _languageService.GetIsoCodesByIds(allowedLanguages);
 
         return culturesToCheck.All(culture => allowedLanguageIsoCodes.InvariantContains(culture))
             ? DictionaryAuthorizationStatus.Success

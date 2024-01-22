@@ -64,7 +64,7 @@ internal sealed class LanguageService : RepositoryService, ILanguageService
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete:true);
 
-        return _languageRepository.GetIsoCodesByIds(ids, throwOnNotFound: true) ;
+        return _languageRepository.GetIsoCodesByIds(ids, throwOnNotFound: true);
     }
 
     public async Task<IEnumerable<ILanguage>> GetMultipleAsync(IEnumerable<string> isoCodes) => (await GetAllAsync()).Where(x => isoCodes.Contains(x.IsoCode));

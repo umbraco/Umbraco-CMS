@@ -49,7 +49,7 @@ public class UpdateDocumentController : DocumentControllerBase
                 ActionUpdate.ActionLetter,
                 id,
                 requestModel.Variants
-                    .Where(v => v.Culture != null)
+                    .Where(v => v.Culture is not null)
                     .Select(v => v.Culture!)),
             AuthorizationPolicies.ContentPermissionByResource);
 

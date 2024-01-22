@@ -44,7 +44,7 @@ public class UnpublishDocumentController : DocumentControllerBase
             ContentPermissionResource.WithKeys(
                 ActionUnpublish.ActionLetter,
                 id,
-                requestModel.Culture != null ? requestModel.Culture.Yield() : Enumerable.Empty<string>()),
+                requestModel.Culture is not null ? requestModel.Culture.Yield() : Enumerable.Empty<string>()),
             AuthorizationPolicies.ContentPermissionByResource);
 
         if (!authorizationResult.Succeeded)

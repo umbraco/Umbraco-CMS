@@ -20,6 +20,6 @@ public class DictionaryPermissionAuthorizer : IDictionaryPermissionAuthorizer
     {
         IUser user = _authorizationHelper.GetUmbracoUser(currentUser);
         DictionaryAuthorizationStatus result = await _dictionaryPermissionService.AuthorizeCultureAccessAsync(user, culturesToCheck);
-        return result == DictionaryAuthorizationStatus.Success;
+        return result is DictionaryAuthorizationStatus.Success;
     }
 }

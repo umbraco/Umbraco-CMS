@@ -49,7 +49,7 @@ public class CreateDocumentController : DocumentControllerBase
                 ActionNew.ActionLetter,
                 requestModel.ParentId,
                 requestModel.Variants
-                    .Where(v => v.Culture != null)
+                    .Where(v => v.Culture is not null)
                     .Select(v => v.Culture!)),
             AuthorizationPolicies.ContentPermissionByResource);
 
