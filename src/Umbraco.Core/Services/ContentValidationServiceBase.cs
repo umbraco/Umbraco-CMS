@@ -46,7 +46,7 @@ internal abstract class ContentValidationServiceBase<TContentType>
 
         if (variantPropertyTypes.Any() is false)
         {
-            return CalculateResult();
+            return ValidationResult();
         }
 
         var cultures = (await _languageService.GetAllAsync()).Select(language => language.IsoCode).ToArray();
@@ -64,33 +64,12 @@ internal abstract class ContentValidationServiceBase<TContentType>
             }
         }
 
-        return CalculateResult();
+        return ValidationResult();
 
-        Attempt<IList<PropertyValidationError>, ContentEditingOperationStatus> CalculateResult()
-        {
-            ContentEditingOperationStatus status = validationErrors.Any()
-                ? ContentEditingOperationStatus.PropertyValidationError
-                : ContentEditingOperationStatus.Success;
-
-            if (status == ContentEditingOperationStatus.Success)
-            {
-                // verify that all mandatory properties are present
-                var mandatoryPropertyAliases = contentTypePropertyTypes.Where(pt => pt.Mandatory).Select(pt => pt.Alias).ToArray();
-                var editorModelAliases = contentEditingModelBase
-                    .InvariantProperties
-                    .Select(p => p.Alias)
-                    .Union(contentEditingModelBase.Variants.SelectMany(v => v.Properties.Select(vp => vp.Alias)))
-                    .ToArray();
-
-                status = mandatoryPropertyAliases.Except(editorModelAliases).Any()
-                    ? ContentEditingOperationStatus.PropertyValidationError
-                    : ContentEditingOperationStatus.Success;
-            }
-
-            return status == ContentEditingOperationStatus.Success
-                ? Attempt.SucceedWithStatus<IList<PropertyValidationError>, ContentEditingOperationStatus>(status, validationErrors)
-                : Attempt.FailWithStatus<IList<PropertyValidationError>, ContentEditingOperationStatus>(status, validationErrors);
-        }
+        Attempt<IList<PropertyValidationError>, ContentEditingOperationStatus> ValidationResult()
+            => validationErrors.Any() is false
+                ? Attempt.SucceedWithStatus<IList<PropertyValidationError>, ContentEditingOperationStatus>(ContentEditingOperationStatus.Success, validationErrors)
+                : Attempt.FailWithStatus<IList<PropertyValidationError>, ContentEditingOperationStatus>(ContentEditingOperationStatus.PropertyValidationError, validationErrors);
     }
 
     private IEnumerable<PropertyValidationError> ValidateProperty(ContentEditingModelBase contentEditingModelBase, IPropertyType propertyType, string? culture, string? segment)
