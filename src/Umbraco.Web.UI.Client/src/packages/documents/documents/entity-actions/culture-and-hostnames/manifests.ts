@@ -1,7 +1,7 @@
 import { UMB_DOCUMENT_REPOSITORY_ALIAS } from '../../repository/manifests.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
 import { UmbDocumentCultureAndHostnamesEntityAction } from './culture-and-hostnames.action.js';
-import { ManifestEntityAction, ManifestModal } from '@umbraco-cms/backoffice/extension-registry';
+import { ManifestEntityAction } from '@umbraco-cms/backoffice/extension-registry';
 
 const entityActions: Array<ManifestEntityAction> = [
 	{
@@ -19,13 +19,4 @@ const entityActions: Array<ManifestEntityAction> = [
 	},
 ];
 
-const modals: Array<ManifestModal> = [
-	{
-		type: 'modal',
-		alias: 'Umb.Modal.CultureAndHostnames',
-		name: 'Create Document Modal',
-		js: () => import('./culture-and-hostnames-modal.element.js'),
-	},
-];
-
-export const manifests = [...entityActions, ...modals];
+export const manifests = [...entityActions];

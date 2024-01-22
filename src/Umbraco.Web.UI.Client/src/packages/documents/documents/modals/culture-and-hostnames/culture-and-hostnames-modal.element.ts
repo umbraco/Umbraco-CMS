@@ -1,14 +1,11 @@
 import { UmbDocumentRepository } from '../../repository/document.repository.js';
 import { html, customElement, state, css, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import {
-	UmbCultureAndHostnamesModalData,
-	UmbCultureAndHostnamesModalValue,
-	UmbModalBaseElement,
-} from '@umbraco-cms/backoffice/modal';
+import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UUIInputEvent, UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLanguageRepository } from '@umbraco-cms/backoffice/language';
 import { DomainPresentationModel, LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbCultureAndHostnamesModalData, UmbCultureAndHostnamesModalValue } from '@umbraco-cms/backoffice/document';
 
 @customElement('umb-culture-and-hostnames-modal')
 export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
@@ -52,7 +49,7 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 		this.#getLanguages(data.defaultIsoCode);
 	}
 
-	async #getLanguages(defaultIsoCode?: string) {
+	async #getLanguages(defaultIsoCode?: string | null) {
 		const { data } = await this.#languageRepository.requestLanguages();
 		if (!data) return;
 
