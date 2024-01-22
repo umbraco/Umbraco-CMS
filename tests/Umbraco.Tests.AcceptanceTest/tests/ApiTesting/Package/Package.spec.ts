@@ -43,6 +43,7 @@ test.describe('Package tests', () => {
     // Arrange
     packageId = await umbracoApi.package.create(packageName);
 
+    // Act
     await umbracoApi.package.delete(packageId);
 
     // Assert
