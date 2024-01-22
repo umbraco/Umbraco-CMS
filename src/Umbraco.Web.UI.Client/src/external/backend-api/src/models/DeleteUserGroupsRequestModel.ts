@@ -6,3 +6,4 @@
 export type DeleteUserGroupsRequestModel = {
     userGroupIds: Array<string>;
 };
+

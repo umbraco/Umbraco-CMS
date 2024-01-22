@@ -3,12 +3,12 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type RecycleBinItemResponseModel = {
+import type { ItemReferenceByIdResponseModel } from './ItemReferenceByIdResponseModel';
+
+export type RecycleBinItemResponseModelBaseModel = {
     id: string;
-    name: string;
     type: string;
-    icon: string;
     hasChildren: boolean;
-    isContainer: boolean;
-    parentId?: string | null;
+    parent?: ItemReferenceByIdResponseModel | null;
 };
+

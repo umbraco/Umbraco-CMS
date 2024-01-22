@@ -3,10 +3,14 @@
 /* tslint:disable */
 /* eslint-disable */
 
+import type { DocumentTypeReferenceResponseModel } from './DocumentTypeReferenceResponseModel';
 import type { ItemResponseModelBaseModel } from './ItemResponseModelBaseModel';
+import type { VariantItemResponseModel } from './VariantItemResponseModel';
 
 export type DocumentItemResponseModel = (ItemResponseModelBaseModel & {
-icon?: string | null;
-contentTypeId: string;
-isTrashed: boolean;
+    isTrashed: boolean;
+    isProtected: boolean;
+    documentType: DocumentTypeReferenceResponseModel;
+    variants: Array<VariantItemResponseModel>;
 });
+

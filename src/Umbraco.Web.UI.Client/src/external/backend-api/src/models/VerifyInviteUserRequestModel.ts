@@ -7,3 +7,4 @@ export type VerifyInviteUserRequestModel = {
     userId: string;
     token: string;
 };
+

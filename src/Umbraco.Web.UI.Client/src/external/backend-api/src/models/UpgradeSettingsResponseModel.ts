@@ -10,3 +10,4 @@ export type UpgradeSettingsResponseModel = {
     oldVersion: string;
     readonly reportUrl: string;
 };
+

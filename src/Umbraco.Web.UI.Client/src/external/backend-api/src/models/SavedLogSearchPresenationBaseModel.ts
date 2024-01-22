@@ -7,3 +7,4 @@ export type SavedLogSearchPresenationBaseModel = {
     name: string;
     query: string;
 };
+

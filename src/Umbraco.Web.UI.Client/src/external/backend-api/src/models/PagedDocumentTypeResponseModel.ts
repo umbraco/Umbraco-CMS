@@ -9,3 +9,4 @@ export type PagedDocumentTypeResponseModel = {
     total: number;
     items: Array<DocumentTypeResponseModel>;
 };
+

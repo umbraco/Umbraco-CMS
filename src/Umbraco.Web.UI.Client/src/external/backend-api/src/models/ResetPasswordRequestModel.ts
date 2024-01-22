@@ -6,3 +6,4 @@
 export type ResetPasswordRequestModel = {
     email: string;
 };
+

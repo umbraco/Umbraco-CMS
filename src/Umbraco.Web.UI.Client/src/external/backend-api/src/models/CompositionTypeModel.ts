@@ -3,7 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type ContentTypeSortModel = {
-    id: string;
-    sortOrder: number;
-};
+export enum CompositionTypeModel {
+    COMPOSITION = 'Composition',
+    INHERITANCE = 'Inheritance',
+}

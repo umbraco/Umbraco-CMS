@@ -6,3 +6,4 @@
 export type UpdateDocumentNotificationsRequestModel = {
     subscribedActionIds: Array<string>;
 };
+

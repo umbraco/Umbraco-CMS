@@ -3,10 +3,11 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { PublishedStateModel } from './PublishedStateModel';
+import type { ContentStateModel } from './ContentStateModel';
 
-export type VariantTreeItemModel = {
+export type VariantItemResponseModel = {
     name: string;
     culture?: string | null;
-    state: PublishedStateModel;
+    state: ContentStateModel;
 };
+

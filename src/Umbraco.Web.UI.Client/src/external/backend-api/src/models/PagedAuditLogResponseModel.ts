@@ -9,3 +9,4 @@ export type PagedAuditLogResponseModel = {
     total: number;
     items: Array<AuditLogResponseModel>;
 };
+

@@ -3,7 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export enum ContentTypeCompositionTypeModel {
-    COMPOSITION = 'Composition',
-    INHERITANCE = 'Inheritance',
-}
+export type ReferenceByIdModel = {
+    id: string;
+};
+

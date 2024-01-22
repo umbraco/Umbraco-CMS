@@ -6,3 +6,4 @@
 export type TemplateScaffoldResponseModel = {
     content: string;
 };
+
