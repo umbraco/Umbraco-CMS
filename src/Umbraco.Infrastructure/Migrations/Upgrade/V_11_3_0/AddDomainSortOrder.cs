@@ -2,6 +2,7 @@ using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_11_3_0;
 
+[Obsolete("This is no longer used and will be removed in V16.")]
 public class AddDomainSortOrder : MigrationBase
 {
     public AddDomainSortOrder(IMigrationContext context)
