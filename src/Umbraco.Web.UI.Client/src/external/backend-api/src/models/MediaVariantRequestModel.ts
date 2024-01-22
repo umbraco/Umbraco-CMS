@@ -6,4 +6,3 @@
 import type { VariantModelBaseModel } from './VariantModelBaseModel';
 
 export type MediaVariantRequestModel = VariantModelBaseModel;
-

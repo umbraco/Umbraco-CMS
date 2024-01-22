@@ -29,6 +29,7 @@
 		"./entity-action": "./dist-cms/packages/core/entity-action/index.js",
 		"./entity-bulk-action": "./dist-cms/packages/core/entity-bulk-action/index.js",
 		"./extension-registry": "./dist-cms/packages/core/extension-registry/index.js",
+		"./server-file-system": "./dist-cms/packages/core/server-file-system/index.js",
 		"./id": "./dist-cms/packages/core/id/index.js",
 		"./localization": "./dist-cms/packages/core/localization/index.js",
 		"./macro": "./dist-cms/packages/core/macro/index.js",
@@ -207,7 +208,7 @@
 		"tsc-alias": "^1.8.8",
 		"typescript": "^5.3.3",
 		"typescript-json-schema": "^0.62.0",
-		"vite": "^5.0.11",
+		"vite": "^5.0.12",
 		"vite-plugin-static-copy": "^1.0.0",
 		"vite-tsconfig-paths": "^4.2.3",
 		"web-component-analyzer": "^2.0.0"

@@ -1,6 +1,6 @@
 import { UmbBlockDataType } from '../types.js';
 import { UmbBlockElementPropertyDatasetContext } from './block-element-property-dataset.context.js';
-import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
+import { UmbContentTypeModel, UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
@@ -17,7 +17,10 @@ export class UmbBlockElementManager extends UmbBaseController {
 	readonly unique = this.#data.asObservablePart((data) => data?.udi);
 	readonly contentTypeId = this.#data.asObservablePart((data) => data?.contentTypeKey);
 
-	readonly structure = new UmbContentTypePropertyStructureManager(this, new UmbDocumentTypeDetailRepository(this));
+	readonly structure = new UmbContentTypePropertyStructureManager<UmbContentTypeModel>(
+		this,
+		new UmbDocumentTypeDetailRepository(this),
+	);
 
 	constructor(host: UmbControllerHost) {
 		// TODO: Get Workspace Alias via Manifest.

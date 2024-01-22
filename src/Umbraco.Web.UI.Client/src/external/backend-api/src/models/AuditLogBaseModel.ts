@@ -14,4 +14,3 @@ export type AuditLogBaseModel = {
     comment?: string | null;
     parameters?: string | null;
 };
-

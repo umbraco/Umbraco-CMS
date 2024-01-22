@@ -6,4 +6,3 @@
 export type FolderModelBaseModel = {
     name: string;
 };
-

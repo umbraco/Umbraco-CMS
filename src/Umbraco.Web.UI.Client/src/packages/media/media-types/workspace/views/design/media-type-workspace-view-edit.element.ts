@@ -1,4 +1,5 @@
 import { UmbMediaTypeWorkspaceContext } from '../../media-type-workspace.context.js';
+import { UmbMediaTypeDetailModel } from '../../../types.js';
 import type { UmbMediaTypeWorkspaceViewEditTabElement } from './media-type-workspace-view-edit-tab.element.js';
 import { css, html, customElement, state, repeat, nothing, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
@@ -85,7 +86,7 @@ export class UmbMediaTypeWorkspaceViewEditElement extends UmbLitElement implemen
 
 	private _workspaceContext?: UmbMediaTypeWorkspaceContext;
 
-	private _tabsStructureHelper = new UmbContentTypeContainerStructureHelper(this);
+	private _tabsStructureHelper = new UmbContentTypeContainerStructureHelper<UmbMediaTypeDetailModel>(this);
 
 	private _modalManagerContext?: typeof UMB_MODAL_MANAGER_CONTEXT_TOKEN.TYPE;
 

@@ -9,4 +9,3 @@ export type PagedDocumentTypeTreeItemResponseModel = {
     total: number;
     items: Array<DocumentTypeTreeItemResponseModel>;
 };
-

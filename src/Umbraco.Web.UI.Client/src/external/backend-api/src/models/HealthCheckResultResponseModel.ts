@@ -12,4 +12,3 @@ export type HealthCheckResultResponseModel = {
     actions?: Array<HealthCheckActionRequestModel> | null;
     readMoreLink?: string | null;
 };
-

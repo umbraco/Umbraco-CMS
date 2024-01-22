@@ -3,11 +3,11 @@ import { UmbDocumentTypeCreateOptionsModalData } from './index.js';
 import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import {
-	UmbModalManagerContext,
-	UmbModalContext,
-	UMB_FOLDER_MODAL,
+	type UmbModalManagerContext,
+	type UmbModalContext,
 	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
 } from '@umbraco-cms/backoffice/modal';
+import { UMB_FOLDER_CREATE_MODAL } from '@umbraco-cms/backoffice/tree';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-document-type-create-options-modal')
@@ -29,9 +29,12 @@ export class UmbDataTypeCreateOptionsModalElement extends UmbLitElement {
 
 	#onClick(event: PointerEvent) {
 		event.stopPropagation();
-		const folderModalHandler = this.#modalContext?.open(UMB_FOLDER_MODAL, {
+		if (this.data?.parentKey === undefined) throw new Error('A parent unique is required to create a folder');
+
+		const folderModalHandler = this.#modalContext?.open(UMB_FOLDER_CREATE_MODAL, {
 			data: {
-				repositoryAlias: DOCUMENT_TYPE_DETAIL_REPOSITORY_ALIAS,
+				folderRepositoryAlias: DOCUMENT_TYPE_DETAIL_REPOSITORY_ALIAS,
+				parentUnique: this.data?.parentKey,
 			},
 		});
 		folderModalHandler?.onSubmit().then(() => this.modalContext?.submit());

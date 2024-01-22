@@ -15,7 +15,7 @@ export class UmbDataTypeTreeRepository
 	}
 
 	async requestTreeRoot() {
-		const data = {
+		const data: UmbDataTypeTreeRootModel = {
 			unique: null,
 			entityType: UMB_DATA_TYPE_ROOT_ENTITY_TYPE,
 			name: 'Data Types',

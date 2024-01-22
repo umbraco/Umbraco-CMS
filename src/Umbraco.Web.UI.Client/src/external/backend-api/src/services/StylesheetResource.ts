@@ -2,16 +2,12 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { CreatePathFolderRequestModel } from '../models/CreatePathFolderRequestModel';
+import type { CreateStylesheetFolderRequestModel } from '../models/CreateStylesheetFolderRequestModel';
 import type { CreateStylesheetRequestModel } from '../models/CreateStylesheetRequestModel';
-import type { ExtractRichTextStylesheetRulesRequestModel } from '../models/ExtractRichTextStylesheetRulesRequestModel';
-import type { ExtractRichTextStylesheetRulesResponseModel } from '../models/ExtractRichTextStylesheetRulesResponseModel';
-import type { InterpolateRichTextStylesheetRequestModel } from '../models/InterpolateRichTextStylesheetRequestModel';
-import type { InterpolateRichTextStylesheetResponseModel } from '../models/InterpolateRichTextStylesheetResponseModel';
 import type { PagedFileSystemTreeItemPresentationModel } from '../models/PagedFileSystemTreeItemPresentationModel';
-import type { PagedStylesheetOverviewResponseModel } from '../models/PagedStylesheetOverviewResponseModel';
-import type { RichTextStylesheetRulesResponseModel } from '../models/RichTextStylesheetRulesResponseModel';
-import type { ScriptItemResponseModel } from '../models/ScriptItemResponseModel';
+import type { RenameStylesheetRequestModel } from '../models/RenameStylesheetRequestModel';
+import type { StylesheetFolderResponseModel } from '../models/StylesheetFolderResponseModel';
+import type { StylesheetItemResponseModel } from '../models/StylesheetItemResponseModel';
 import type { StylesheetResponseModel } from '../models/StylesheetResponseModel';
 import type { UpdateStylesheetRequestModel } from '../models/UpdateStylesheetRequestModel';
 
@@ -20,27 +16,6 @@ import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
 
 export class StylesheetResource {
-
-    /**
-     * @returns any Success
-     * @throws ApiError
-     */
-    public static getStylesheet({
-        path,
-    }: {
-        path?: string,
-    }): CancelablePromise<StylesheetResponseModel> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/umbraco/management/api/v1/stylesheet',
-            query: {
-                'path': path,
-            },
-            errors: {
-                401: `The resource is protected and requires an authentication token`,
-            },
-        });
-    }
 
     /**
      * @returns string Created
@@ -56,9 +31,11 @@ export class StylesheetResource {
             url: '/umbraco/management/api/v1/stylesheet',
             body: requestBody,
             mediaType: 'application/json',
-            responseHeader: 'Location',
+            responseHeader: 'Umb-Generated-Resource',
             errors: {
+                400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
+                404: `Not Found`,
             },
         });
     }
@@ -67,19 +44,20 @@ export class StylesheetResource {
      * @returns any Success
      * @throws ApiError
      */
-    public static deleteStylesheet({
+    public static getStylesheetByPath({
         path,
     }: {
-        path?: string,
-    }): CancelablePromise<any> {
+        path: string,
+    }): CancelablePromise<StylesheetResponseModel> {
         return __request(OpenAPI, {
-            method: 'DELETE',
-            url: '/umbraco/management/api/v1/stylesheet',
-            query: {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/stylesheet/{path}',
+            path: {
                 'path': path,
             },
             errors: {
                 401: `The resource is protected and requires an authentication token`,
+                404: `Not Found`,
             },
         });
     }
@@ -88,83 +66,99 @@ export class StylesheetResource {
      * @returns any Success
      * @throws ApiError
      */
-    public static putStylesheet({
+    public static deleteStylesheetByPath({
+        path,
+    }: {
+        path: string,
+    }): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/umbraco/management/api/v1/stylesheet/{path}',
+            path: {
+                'path': path,
+            },
+            errors: {
+                400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
+                404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static putStylesheetByPath({
+        path,
         requestBody,
     }: {
+        path: string,
         requestBody?: UpdateStylesheetRequestModel,
     }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'PUT',
-            url: '/umbraco/management/api/v1/stylesheet',
+            url: '/umbraco/management/api/v1/stylesheet/{path}',
+            path: {
+                'path': path,
+            },
             body: requestBody,
             mediaType: 'application/json',
             errors: {
+                400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
+                404: `Not Found`,
             },
         });
     }
 
     /**
-     * @returns PagedStylesheetOverviewResponseModel Success
+     * @returns string Created
      * @throws ApiError
      */
-    public static getStylesheetAll({
-        skip,
-        take = 100,
-    }: {
-        skip?: number,
-        take?: number,
-    }): CancelablePromise<PagedStylesheetOverviewResponseModel> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/umbraco/management/api/v1/stylesheet/all',
-            query: {
-                'skip': skip,
-                'take': take,
-            },
-            errors: {
-                401: `The resource is protected and requires an authentication token`,
-            },
-        });
-    }
-
-    /**
-     * @returns any Success
-     * @throws ApiError
-     */
-    public static getStylesheetFolder({
+    public static putStylesheetByPathRename({
         path,
+        requestBody,
     }: {
-        path?: string,
-    }): CancelablePromise<any> {
+        path: string,
+        requestBody?: RenameStylesheetRequestModel,
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
-            method: 'GET',
-            url: '/umbraco/management/api/v1/stylesheet/folder',
-            query: {
+            method: 'PUT',
+            url: '/umbraco/management/api/v1/stylesheet/{path}/rename',
+            path: {
                 'path': path,
             },
+            body: requestBody,
+            mediaType: 'application/json',
+            responseHeader: 'Umb-Generated-Resource',
             errors: {
+                400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
+                404: `Not Found`,
             },
         });
     }
 
     /**
-     * @returns any Success
+     * @returns string Created
      * @throws ApiError
      */
     public static postStylesheetFolder({
         requestBody,
     }: {
-        requestBody?: CreatePathFolderRequestModel,
-    }): CancelablePromise<any> {
+        requestBody?: CreateStylesheetFolderRequestModel,
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/stylesheet/folder',
             body: requestBody,
             mediaType: 'application/json',
+            responseHeader: 'Umb-Generated-Resource',
             errors: {
+                400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
+                404: `Not Found`,
             },
         });
     }
@@ -173,19 +167,43 @@ export class StylesheetResource {
      * @returns any Success
      * @throws ApiError
      */
-    public static deleteStylesheetFolder({
+    public static getStylesheetFolderByPath({
         path,
     }: {
-        path?: string,
-    }): CancelablePromise<any> {
+        path: string,
+    }): CancelablePromise<StylesheetFolderResponseModel> {
         return __request(OpenAPI, {
-            method: 'DELETE',
-            url: '/umbraco/management/api/v1/stylesheet/folder',
-            query: {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/stylesheet/folder/{path}',
+            path: {
                 'path': path,
             },
             errors: {
                 401: `The resource is protected and requires an authentication token`,
+                404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static deleteStylesheetFolderByPath({
+        path,
+    }: {
+        path: string,
+    }): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/umbraco/management/api/v1/stylesheet/folder/{path}',
+            path: {
+                'path': path,
+            },
+            errors: {
+                400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
+                404: `Not Found`,
             },
         });
     }
@@ -198,71 +216,10 @@ export class StylesheetResource {
         path,
     }: {
         path?: Array<string>,
-    }): CancelablePromise<Array<ScriptItemResponseModel>> {
+    }): CancelablePromise<Array<StylesheetItemResponseModel>> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/stylesheet/item',
-            query: {
-                'path': path,
-            },
-            errors: {
-                401: `The resource is protected and requires an authentication token`,
-            },
-        });
-    }
-
-    /**
-     * @returns any Success
-     * @throws ApiError
-     */
-    public static postStylesheetRichTextExtractRules({
-        requestBody,
-    }: {
-        requestBody?: ExtractRichTextStylesheetRulesRequestModel,
-    }): CancelablePromise<ExtractRichTextStylesheetRulesResponseModel> {
-        return __request(OpenAPI, {
-            method: 'POST',
-            url: '/umbraco/management/api/v1/stylesheet/rich-text/extract-rules',
-            body: requestBody,
-            mediaType: 'application/json',
-            errors: {
-                401: `The resource is protected and requires an authentication token`,
-            },
-        });
-    }
-
-    /**
-     * @returns any Success
-     * @throws ApiError
-     */
-    public static postStylesheetRichTextInterpolateRules({
-        requestBody,
-    }: {
-        requestBody?: InterpolateRichTextStylesheetRequestModel,
-    }): CancelablePromise<InterpolateRichTextStylesheetResponseModel> {
-        return __request(OpenAPI, {
-            method: 'POST',
-            url: '/umbraco/management/api/v1/stylesheet/rich-text/interpolate-rules',
-            body: requestBody,
-            mediaType: 'application/json',
-            errors: {
-                401: `The resource is protected and requires an authentication token`,
-            },
-        });
-    }
-
-    /**
-     * @returns any Success
-     * @throws ApiError
-     */
-    public static getStylesheetRichTextRules({
-        path,
-    }: {
-        path?: string,
-    }): CancelablePromise<(RichTextStylesheetRulesResponseModel | ExtractRichTextStylesheetRulesResponseModel)> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/umbraco/management/api/v1/stylesheet/rich-text/rules',
             query: {
                 'path': path,
             },
@@ -277,11 +234,11 @@ export class StylesheetResource {
      * @throws ApiError
      */
     public static getTreeStylesheetChildren({
-        path,
+        parentPath,
         skip,
         take = 100,
     }: {
-        path?: string,
+        parentPath?: string,
         skip?: number,
         take?: number,
     }): CancelablePromise<PagedFileSystemTreeItemPresentationModel> {
@@ -289,7 +246,7 @@ export class StylesheetResource {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/stylesheet/children',
             query: {
-                'path': path,
+                'parentPath': parentPath,
                 'skip': skip,
                 'take': take,
             },

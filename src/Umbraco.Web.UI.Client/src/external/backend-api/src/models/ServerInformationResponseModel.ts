@@ -3,9 +3,11 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { ServerInformationItemResponseModel } from './ServerInformationItemResponseModel';
+import type { RuntimeModeModel } from './RuntimeModeModel';
 
 export type ServerInformationResponseModel = {
-    items: Array<ServerInformationItemResponseModel>;
+    version: string;
+    assemblyVersion: string;
+    baseUtcOffset: string;
+    runtimeMode: RuntimeModeModel;
 };
-
