@@ -16,9 +16,9 @@ public static class ClaimsPrincipalExtensions
 {
     private static string? _authenticationType;
     private static string AuthenticationType =>
-        _authenticationType ??= StaticServiceProvider.Instance.GetRequiredService<IOptions<BackOfficeAuthenticationTypeSettings>>()
-            .Value
-            .AuthenticationType;
+        _authenticationType ??= StaticServiceProvider.Instance?.GetService<IOptions<BackOfficeAuthenticationTypeSettings>>()?
+            .Value?
+            .AuthenticationType ?? Constants.Security.BackOfficeAuthenticationType;
 
     public static bool IsBackOfficeAuthenticationType(this ClaimsIdentity? claimsIdentity)
     {

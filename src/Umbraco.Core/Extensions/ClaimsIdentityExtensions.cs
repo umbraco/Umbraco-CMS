@@ -17,9 +17,9 @@ public static class ClaimsIdentityExtensions
 {
     private static string? _authenticationType;
     private static string AuthenticationType =>
-        _authenticationType ??= StaticServiceProvider.Instance.GetRequiredService<IOptions<BackOfficeAuthenticationTypeSettings>>()
-            .Value
-            .AuthenticationType;
+        _authenticationType ??= StaticServiceProvider.Instance?.GetService<IOptions<BackOfficeAuthenticationTypeSettings>>()?
+            .Value?
+            .AuthenticationType ?? Constants.Security.BackOfficeAuthenticationType;
 
     /// <summary>
     ///     Returns the required claim types for a back office identity
