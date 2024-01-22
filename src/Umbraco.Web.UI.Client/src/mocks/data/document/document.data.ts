@@ -5,11 +5,11 @@ import {
 	DocumentTreeItemResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 
-export type UmbMockDataTypeModelHack = DocumentResponseModel &
+export type UmbMockDocumentTypeModelHack = DocumentResponseModel &
 	DocumentTreeItemResponseModel &
 	DocumentItemResponseModel;
 
-export interface UmbMockDocumentModel extends Omit<UmbMockDataTypeModelHack, 'type'> {}
+export interface UmbMockDocumentModel extends Omit<UmbMockDocumentTypeModelHack, 'type'> {}
 
 export const data: Array<UmbMockDocumentModel> = [
 	{
@@ -19,11 +19,18 @@ export const data: Array<UmbMockDocumentModel> = [
 				url: '/',
 			},
 		],
-		isTrashed: false,
-		templateId: null,
+		template: null,
 		id: 'all-property-editors-document-id',
-		parentId: null,
-		contentTypeId: 'all-property-editors-document-type-id',
+		parent: null,
+		documentType: {
+			id: 'all-property-editors-document-type-id',
+			icon: 'icon-document',
+			hasListView: false,
+		},
+		hasChildren: false,
+		noAccess: false,
+		isProtected: false,
+		isTrashed: false,
 		values: [
 			{
 				alias: 'richTextEditor',
@@ -371,10 +378,17 @@ export const data: Array<UmbMockDocumentModel> = [
 				url: '/',
 			},
 		],
-		templateId: null,
+		template: null,
 		id: 'c05da24d-7740-447b-9cdc-bd8ce2172e38',
-		parentId: null,
-		contentTypeId: '29643452-cff9-47f2-98cd-7de4b6807681',
+		parent: null,
+		documentType: {
+			id: '29643452-cff9-47f2-98cd-7de4b6807681',
+			icon: 'icon-document',
+			hasListView: false,
+		},
+		hasChildren: false,
+		noAccess: false,
+		isProtected: false,
 		isTrashed: false,
 		values: [
 			{
@@ -488,10 +502,17 @@ export const data: Array<UmbMockDocumentModel> = [
 	},
 	{
 		urls: [],
-		templateId: null,
+		template: null,
 		id: 'fd56a0b5-01a0-4da2-b428-52773bfa9cc4',
-		parentId: null,
-		contentTypeId: '29643452-cff9-47f2-98cd-7de4b6807681',
+		parent: null,
+		documentType: {
+			id: '29643452-cff9-47f2-98cd-7de4b6807681',
+			icon: 'icon-document',
+			hasListView: false,
+		},
+		hasChildren: false,
+		noAccess: false,
+		isProtected: false,
 		isTrashed: false,
 		values: [
 			{
@@ -562,10 +583,17 @@ export const data: Array<UmbMockDocumentModel> = [
 				url: '/',
 			},
 		],
-		templateId: null,
+		template: null,
 		id: 'simple-document-id',
-		parentId: null,
-		contentTypeId: 'simple-document-type-id',
+		parent: null,
+		documentType: {
+			id: 'simple-document-type-id',
+			icon: 'icon-document',
+			hasListView: false,
+		},
+		hasChildren: false,
+		noAccess: false,
+		isProtected: false,
 		isTrashed: false,
 		variants: [
 			{
