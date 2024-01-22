@@ -22,6 +22,7 @@ namespace Umbraco.Cms.Web.BackOffice.Security;
 public class BackOfficeSignInManager : UmbracoSignInManager<BackOfficeIdentityUser>, IBackOfficeSignInManager
 {
     private readonly IEventAggregator _eventAggregator;
+    private readonly IOptions<BackOfficeAuthenticationTypeSettings> _backOfficeAuthenticationTypeSettings;
     private readonly IBackOfficeExternalLoginProviders _externalLogins;
     private readonly GlobalSettings _globalSettings;
     private readonly BackOfficeUserManager _userManager;
@@ -37,76 +38,26 @@ public class BackOfficeSignInManager : UmbracoSignInManager<BackOfficeIdentityUs
         IAuthenticationSchemeProvider schemes,
         IUserConfirmation<BackOfficeIdentityUser> confirmation,
         IEventAggregator eventAggregator,
-        IOptions<SecuritySettings> securitySettings)
+        IOptions<SecuritySettings> securitySettings,
+        IOptions<BackOfficeAuthenticationTypeSettings> backOfficeAuthenticationTypeSettings
+        )
         : base(userManager, contextAccessor, claimsFactory, optionsAccessor, logger, schemes, confirmation, securitySettings)
     {
         _userManager = userManager;
         _externalLogins = externalLogins;
         _eventAggregator = eventAggregator;
+        _backOfficeAuthenticationTypeSettings = backOfficeAuthenticationTypeSettings;
         _globalSettings = globalSettings.Value;
     }
 
-    [Obsolete("Use non-obsolete constructor. This is scheduled for removal in V14.")]
-    public BackOfficeSignInManager(
-        BackOfficeUserManager userManager,
-        IHttpContextAccessor contextAccessor,
-        IBackOfficeExternalLoginProviders externalLogins,
-        IUserClaimsPrincipalFactory<BackOfficeIdentityUser> claimsFactory,
-        IOptions<IdentityOptions> optionsAccessor,
-        IOptions<GlobalSettings> globalSettings,
-        ILogger<SignInManager<BackOfficeIdentityUser>> logger,
-        IAuthenticationSchemeProvider schemes,
-        IUserConfirmation<BackOfficeIdentityUser> confirmation,
-        IEventAggregator eventAggregator)
-        : this(
-            userManager,
-            contextAccessor,
-            externalLogins,
-            claimsFactory,
-            optionsAccessor,
-            globalSettings,
-            logger,
-            schemes,
-            confirmation,
-            eventAggregator,
-            StaticServiceProvider.Instance.GetRequiredService<IOptions<SecuritySettings>>())
-    {
-    }
 
-    [Obsolete("Use non-obsolete constructor. This is scheduled for removal in V14.")]
-    public BackOfficeSignInManager(
-        BackOfficeUserManager userManager,
-        IHttpContextAccessor contextAccessor,
-        IBackOfficeExternalLoginProviders externalLogins,
-        IUserClaimsPrincipalFactory<BackOfficeIdentityUser> claimsFactory,
-        IOptions<IdentityOptions> optionsAccessor,
-        IOptions<GlobalSettings> globalSettings,
-        ILogger<SignInManager<BackOfficeIdentityUser>> logger,
-        IAuthenticationSchemeProvider schemes,
-        IUserConfirmation<BackOfficeIdentityUser> confirmation)
-        : this(
-            userManager,
-            contextAccessor,
-            externalLogins,
-            claimsFactory,
-            optionsAccessor,
-            globalSettings,
-            logger,
-            schemes,
-            confirmation,
-            StaticServiceProvider.Instance.GetRequiredService<IEventAggregator>(),
-            StaticServiceProvider.Instance.GetRequiredService<IOptions<SecuritySettings>>())
-    {
-    }
+    protected override string AuthenticationType => _backOfficeAuthenticationTypeSettings.Value.AuthenticationType;
 
-    protected override string AuthenticationType => Constants.Security.NewBackOfficeAuthenticationType;
+    protected override string ExternalAuthenticationType => _backOfficeAuthenticationTypeSettings.Value.ExternalAuthenticationType;
 
-    protected override string ExternalAuthenticationType => Constants.Security.NewBackOfficeExternalAuthenticationType;
+    protected override string TwoFactorAuthenticationType => _backOfficeAuthenticationTypeSettings.Value.TwoFactorAuthenticationType;
 
-    protected override string TwoFactorAuthenticationType => Constants.Security.NewBackOfficeTwoFactorAuthenticationType;
-
-    protected override string TwoFactorRememberMeAuthenticationType =>
-        Constants.Security.NewBackOfficeTwoFactorRememberMeAuthenticationType;
+    protected override string TwoFactorRememberMeAuthenticationType =>_backOfficeAuthenticationTypeSettings.Value.TwoFactorRememberMeAuthenticationType;
 
     /// <summary>
     ///     Custom ExternalLoginSignInAsync overload for handling external sign in with auto-linking

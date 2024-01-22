@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Api.Management.DependencyInjection;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
@@ -70,6 +71,7 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
         builder.AddNotificationHandler<ContentCacheRefresherNotification, ContentIndexingNotificationHandler>();
         builder.AddExamineIndexes();
         builder.AddBackOfficeIdentity();
+        BackOfficeAuthBuilderExtensions.AddBackOfficeAuthentication(builder);
         builder.Services.AddHostedService<QueuedHostedService>();
     }
 
@@ -592,6 +594,7 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
     {
         // Arrange
         await SetupUserIdentity(Constants.Security.SuperUserIdAsString);
+        var x = TestHelper.GetHttpContextAccessor().HttpContext.GetCurrentIdentity();
 
         const string contentName = "TestContent";
 
