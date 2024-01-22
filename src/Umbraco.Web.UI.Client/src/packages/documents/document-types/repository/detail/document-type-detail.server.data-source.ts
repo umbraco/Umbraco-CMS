@@ -96,10 +96,10 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 			isElement: data.isElement,
 			properties: data.properties,
 			containers: data.containers,
-			allowedContentTypes: data.allowedContentTypes,
+			allowedDocumentTypes: data.allowedDocumentTypes,
 			compositions: data.compositions,
-			allowedTemplateIds: data.allowedTemplateIds,
-			defaultTemplateId: data.defaultTemplateId || null,
+			allowedTemplates: data.allowedTemplates,
+			defaultTemplate: data.defaultTemplate?.id || null,
 			cleanup: data.cleanup,
 		};
 

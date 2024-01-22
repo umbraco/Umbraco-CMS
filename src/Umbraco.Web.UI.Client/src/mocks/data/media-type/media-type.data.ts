@@ -13,7 +13,7 @@ export interface UmbMockMediaTypeModel extends Omit<UmbMockMediaTypeModelHack, '
 export const data: Array<UmbMockMediaTypeModel> = [
 	{
 		name: 'Media Type 1',
-		id: 'c5159663-eb82-43ee-bd23-e42dc5e71db6',
+		id: 'media-type-1-id',
 		parentId: null,
 		description: 'Media type 1 description',
 		alias: 'mediaType1',

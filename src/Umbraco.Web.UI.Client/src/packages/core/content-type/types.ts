@@ -1,9 +1,4 @@
-import {
-	ContentTypeCompositionModel,
-	ContentTypeSortModel,
-	MediaTypePropertyTypeContainerResponseModel,
-	MediaTypePropertyTypeResponseModel,
-} from '@umbraco-cms/backoffice/backend-api';
+import { PropertyTypeContainerModelBaseModel, PropertyTypeModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 
 export interface UmbContentTypeModel {
 	unique: string;
@@ -17,8 +12,8 @@ export interface UmbContentTypeModel {
 	variesBySegment: boolean;
 	isElement: boolean;
 	// TODO: investigate if we need our own model for these
-	properties: Array<MediaTypePropertyTypeResponseModel>;
-	containers: Array<MediaTypePropertyTypeContainerResponseModel>;
+	properties: Array<PropertyTypeModelBaseModel>;
+	containers: Array<PropertyTypeContainerModelBaseModel>;
 	allowedContentTypes: Array<ContentTypeSortModel>;
 	compositions: Array<ContentTypeCompositionModel>;
 }
