@@ -72,6 +72,11 @@ export class UmbInputDocumentPickerRootElement extends FormControlMixin(UmbLitEl
 
 	#renderButtons() {
 		if (this.nodeId) return;
+
+		// TODO: Have one button "Specify root node", which opens the Dynamic Root Picker. [LK]
+
+		// TODO: If the old root node ID value is set, then pre-populate the "Specific Node" option. [LK]
+
 		return html`<uui-button-group>
 			<uui-button
 				look="placeholder"
