@@ -1,5 +1,4 @@
 import type { UmbMediaDetailModel } from '../../packages/media/media/index.js';
-import { UmbEntityTreeData } from './entity-tree.data.js';
 import { UmbEntityData } from './entity.data.js';
 import { createMediaTreeItem } from './utils.js';
 import {
@@ -225,8 +224,6 @@ const createMediaItem = (item: UmbMediaDetailModel): MediaItemResponseModel => {
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 class UmbMediaData extends UmbEntityData<UmbMediaDetailModel> {
-	#tree = new UmbEntityTreeData<ContentTreeItemResponseModel>(this);
-
 	constructor() {
 		super(data);
 	}
@@ -256,7 +253,7 @@ class UmbMediaData extends UmbEntityData<UmbMediaDetailModel> {
 	}
 
 	move(ids: Array<string>, destinationKey: string) {
-		return this.#tree.move(ids, destinationKey);
+		alert('change to new tree managers');
 	}
 }
 
