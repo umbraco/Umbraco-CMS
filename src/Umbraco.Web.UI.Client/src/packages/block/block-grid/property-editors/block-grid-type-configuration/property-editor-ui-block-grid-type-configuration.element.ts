@@ -19,8 +19,14 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 {
 	#datasetContext?: UmbPropertyDatasetContext;
 
+	private _value: Array<UmbBlockTypeWithGroupKey> = [];
 	@property({ attribute: false })
-	value: UmbBlockTypeWithGroupKey[] = [];
+	get value() {
+		return this._value;
+	}
+	set value(value: Array<UmbBlockTypeWithGroupKey>) {
+		this._value = value ?? [];
+	}
 
 	@property({ type: Object, attribute: false })
 	public config?: UmbPropertyEditorConfigCollection;
@@ -43,7 +49,7 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 		if (!this.#datasetContext) return;
 
 		this.observe(await this.#datasetContext.propertyValueByAlias('blockGroups'), (value) => {
-			this._blockGroups = value as Array<UmbBlockGridGroupType>;
+			this._blockGroups = (value as Array<UmbBlockGridGroupType>) ?? [];
 			this.#mapValuesToBlockGroups();
 		});
 		this.observe(await this.#datasetContext.propertyValueByAlias('blocks'), () => {
@@ -53,10 +59,10 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 
 	#mapValuesToBlockGroups() {
 		// What if a block is in a group that does not exist in the block groups? Should it be removed? (Right now they will never be rendered)
-		const valuesWithNoGroup = this.value.filter((value) => !value.groupKey);
+		const valuesWithNoGroup = this._value.filter((value) => !value.groupKey);
 
 		const valuesWithGroup = this._blockGroups.map((group) => {
-			return { name: group.name, key: group.key, blocks: this.value.filter((value) => value.groupKey === group.key) };
+			return { name: group.name, key: group.key, blocks: this._value.filter((value) => value.groupKey === group.key) };
 		});
 
 		this._mappedValuesAndGroups = [{ blocks: valuesWithNoGroup }, ...valuesWithGroup];
@@ -76,7 +82,7 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 		const groupName = e.target.value as string;
 		this.#datasetContext?.setPropertyValue(
 			'blockGroups',
-			this._blockGroups.map((group) => ({ ...group, groupName: groupKey === group.key ? groupName : group.name })),
+			this._blockGroups.map((group) => (group.key === groupKey ? { ...group, name: groupName } : group)),
 		);
 	}
 
@@ -87,7 +93,7 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 		);
 
 		// Should blocks that belonged to the removed group be deleted as well?
-		this.value = this.value.filter((block) => block.groupKey !== groupKey);
+		this.value = this._value.filter((block) => block.groupKey !== groupKey);
 	}
 
 	#renderGroupInput(groupKey: string, groupName?: string) {
