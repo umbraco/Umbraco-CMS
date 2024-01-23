@@ -56,7 +56,7 @@ public abstract class FolderManagementControllerBase<TTreeEntity> : ManagementAp
             CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Success
-            ? CreatedAtAction(createdAction, result.Result!.Key)
+            ? CreatedAtId(createdAction, result.Result!.Key)
             : OperationStatusResult(result.Status);
     }
 

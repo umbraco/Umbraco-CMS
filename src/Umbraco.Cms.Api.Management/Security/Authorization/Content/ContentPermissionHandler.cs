@@ -44,6 +44,11 @@ public class ContentPermissionHandler : MustSatisfyRequirementAuthorizationHandl
             result &= await _contentPermissionAuthorizer.IsDeniedAsync(context.User, resource.ContentKeys, resource.PermissionsToCheck) is false;
         }
 
+        if (resource.CulturesToCheck is not null)
+        {
+            result &= await _contentPermissionAuthorizer.IsDeniedForCultures(context.User, resource.CulturesToCheck) is false;
+        }
+
         return result;
     }
 }

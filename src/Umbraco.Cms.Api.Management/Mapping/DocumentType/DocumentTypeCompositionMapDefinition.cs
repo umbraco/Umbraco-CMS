@@ -1,4 +1,4 @@
-using Umbraco.Cms.Api.Management.ViewModels.DocumentType.Composition;
+using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 

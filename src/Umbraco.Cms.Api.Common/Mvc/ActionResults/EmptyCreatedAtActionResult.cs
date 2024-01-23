@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Api.Common.Mvc.ActionResults;
 
@@ -10,15 +11,17 @@ namespace Umbraco.Cms.Api.Common.Mvc.ActionResults;
 /// </summary>
 public sealed class EmptyCreatedAtActionResult : ActionResult
 {
-    private readonly string? _actionName;
-    private readonly string? _controllerName;
-    private readonly object? _routeValues;
+    private readonly string _actionName;
+    private readonly string _controllerName;
+    private readonly object _routeValues;
+    private readonly string _resourceIdentifier;
 
-    public EmptyCreatedAtActionResult(string? actionName, string? controllerName, object? routeValues)
+    public EmptyCreatedAtActionResult(string actionName, string controllerName, object routeValues, string resourceIdentifier)
     {
         _actionName = actionName;
         _controllerName = controllerName;
         _routeValues = routeValues;
+        _resourceIdentifier = resourceIdentifier;
     }
 
     public override void ExecuteResult(ActionContext context)
@@ -42,5 +45,6 @@ public sealed class EmptyCreatedAtActionResult : ActionResult
 
         context.HttpContext.Response.StatusCode = StatusCodes.Status201Created;
         context.HttpContext.Response.Headers.Location = url;
+        context.HttpContext.Response.Headers[Constants.Headers.GeneratedResource] = _resourceIdentifier;
     }
 }

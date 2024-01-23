@@ -66,4 +66,11 @@ internal sealed class ContentPermissionAuthorizer : IContentPermissionAuthorizer
         // If we do not found it, we cannot tell if you are denied
         return result is not (ContentAuthorizationStatus.Success or ContentAuthorizationStatus.NotFound);
     }
+
+    public async Task<bool> IsDeniedForCultures(IPrincipal currentUser, ISet<string> culturesToCheck)
+    {
+        IUser user = _authorizationHelper.GetUmbracoUser(currentUser);
+        ContentAuthorizationStatus result = await _contentPermissionService.AuthorizeCultureAccessAsync(user, culturesToCheck);
+        return result is not (ContentAuthorizationStatus.Success or ContentAuthorizationStatus.NotFound);
+    }
 }
