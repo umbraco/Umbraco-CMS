@@ -1,4 +1,5 @@
 import { partialUpdateFrozenArray } from '../utils/partial-update-frozen-array.function.js';
+import { pushAtToUniqueArray } from '../utils/push-at-to-unique-array.function.js';
 import { pushToUniqueArray } from '../utils/push-to-unique-array.function.js';
 import { UmbDeepState } from './deep-state.js';
 
@@ -161,6 +162,33 @@ export class UmbArrayState<T> extends UmbDeepState<T[]> {
 			pushToUniqueArray(next, entry, this.getUniqueMethod);
 		} else {
 			next.push(entry);
+		}
+		this.setValue(next);
+		return this;
+	}
+
+	/**
+	 * @method appendOneAt
+	 * @param {T} entry - new data to be added in this Subject.
+	 * @param {T} index - index of where to append this data into the Subject.
+	 * @return {UmbArrayState<T>} Reference to it self.
+	 * @description - Append some new data to this Subject.
+	 * @example <caption>Example append some data.</caption>
+	 * const data = [
+	 * 	{ key: 1, value: 'foo'},
+	 * 	{ key: 3, value: 'bar'}
+	 * ];
+	 * const myState = new UmbArrayState(data);
+	 * myState.appendOneAt({ key: 2, value: 'in-between'}, 1);
+	 */
+	appendOneAt(entry: T, index: number) {
+		const next = [...this.getValue()];
+		if (this.getUniqueMethod) {
+			pushAtToUniqueArray(next, entry, this.getUniqueMethod, index);
+		} else if (index === -1 || index >= next.length) {
+			next.push(entry);
+		} else {
+			next.splice(index, 0, entry);
 		}
 		this.setValue(next);
 		return this;

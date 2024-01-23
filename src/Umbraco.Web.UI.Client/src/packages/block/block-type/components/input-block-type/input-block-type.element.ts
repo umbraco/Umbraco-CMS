@@ -1,4 +1,4 @@
-import { UmbBlockTypeBase, UmbBlockTypeWithGroupKey } from '../../types.js';
+import { UmbBlockTypeBaseModel } from '../../types.js';
 import {
 	UMB_DOCUMENT_TYPE_PICKER_MODAL,
 	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
@@ -13,8 +13,9 @@ import { UMB_PROPERTY_DATASET_CONTEXT, UmbPropertyDatasetContext } from '@umbrac
 
 @customElement('umb-input-block-type')
 export class UmbInputBlockTypeElement<
-	BlockType extends UmbBlockTypeWithGroupKey = UmbBlockTypeBase,
+	BlockType extends UmbBlockTypeBaseModel = UmbBlockTypeBaseModel,
 > extends UmbLitElement {
+	//
 	@property({ type: Array, attribute: false })
 	public get value() {
 		return this._items;
@@ -59,14 +60,14 @@ export class UmbInputBlockTypeElement<
 	>;
 
 	#datasetContext?: UmbPropertyDatasetContext;
-	#filter: Array<UmbBlockTypeBase> = [];
+	#filter: Array<UmbBlockTypeBaseModel> = [];
 
 	constructor() {
 		super();
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, async (instance) => {
 			this.#datasetContext = instance;
 			this.observe(await this.#datasetContext?.propertyValueByAlias('blocks'), (value) => {
-				this.#filter = value as Array<UmbBlockTypeBase>;
+				this.#filter = value as Array<UmbBlockTypeBaseModel>;
 			});
 		});
 	}

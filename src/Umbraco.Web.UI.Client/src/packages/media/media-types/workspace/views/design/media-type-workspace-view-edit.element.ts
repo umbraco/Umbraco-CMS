@@ -157,7 +157,7 @@ export class UmbMediaTypeWorkspaceViewEditElement extends UmbLitElement implemen
 					setup: (component) => {
 						(component as UmbMediaTypeWorkspaceViewEditTabElement).tabName = tabName;
 						(component as UmbMediaTypeWorkspaceViewEditTabElement).ownerTabId =
-							this._workspaceContext?.structure.isOwnerContainer(tab.id!) ? tab.id : undefined;
+							this._tabsStructureHelper.isOwnerContainer(tab.id!) ? tab.id : undefined;
 					},
 				});
 			});
