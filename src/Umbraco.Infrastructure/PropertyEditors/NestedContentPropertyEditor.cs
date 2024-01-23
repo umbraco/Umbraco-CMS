@@ -146,14 +146,16 @@ public class NestedContentPropertyEditor : DataEditor
         /// <inheritdoc />
         public IEnumerable<UmbracoEntityReference> GetReferences(object? value)
         {
-            foreach (NestedContentValues.NestedContentPropertyValue propertyValue in GetAllPropertyValues(value))
+            // Group by property editor alias to avoid duplicate lookups and optimize value parsing
+            foreach (var valuesByPropertyEditorAlias in GetAllPropertyValues(value).GroupBy(x => x.PropertyType.PropertyEditorAlias, x => x.Value))
             {
-                if (!_propertyEditors.TryGet(propertyValue.PropertyType.PropertyEditorAlias, out IDataEditor? dataEditor))
+                if (!_propertyEditors.TryGet(valuesByPropertyEditorAlias.Key, out IDataEditor? dataEditor))
                 {
                     continue;
                 }
 
-                foreach (UmbracoEntityReference reference in _dataValueReferenceFactories.GetReferences(dataEditor, propertyValue.Value))
+                // Use distinct values to avoid duplicate parsing of the same value
+                foreach (UmbracoEntityReference reference in _dataValueReferenceFactories.GetReferences(dataEditor, valuesByPropertyEditorAlias.Distinct()))
                 {
                     yield return reference;
                 }
