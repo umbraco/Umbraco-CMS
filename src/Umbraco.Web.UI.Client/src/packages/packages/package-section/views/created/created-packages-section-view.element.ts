@@ -17,6 +17,7 @@ export class UmbCreatedPackagesSectionViewElement extends UmbLitElement implemen
 
 	constructor() {
 		super();
+		// TODO: Do not implement all workspaces at this point. We should only implement the 'package-builder' workspace.
 		this.observe(umbExtensionsRegistry?.extensionsOfType('workspace'), (workspaceExtensions) => {
 			this._workspaces = workspaceExtensions;
 			this._createRoutes();

@@ -157,7 +157,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 					setup: (component) => {
 						(component as UmbDocumentTypeWorkspaceViewEditTabElement).tabName = tabName;
 						(component as UmbDocumentTypeWorkspaceViewEditTabElement).ownerTabId =
-							this._workspaceContext?.structure.isOwnerContainer(tab.id!) ? tab.id : undefined;
+							this._tabsStructureHelper.isOwnerContainer(tab.id!) ? tab.id : undefined;
 					},
 				});
 			});

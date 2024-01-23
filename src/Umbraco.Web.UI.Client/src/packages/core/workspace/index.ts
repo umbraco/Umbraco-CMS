@@ -1,3 +1,4 @@
+export * from './saveable-workspace.context-token.js';
 export * from './publishable-workspace.context-token.js';
 export * from './workspace-action-menu/index.js';
 export * from './workspace-action/index.js';
