@@ -8,3 +8,4 @@ import type { ServerConfigurationItemResponseModel } from './ServerConfiguration
 export type ServerConfigurationBaseModel = {
     items: Array<ServerConfigurationItemResponseModel>;
 };
+

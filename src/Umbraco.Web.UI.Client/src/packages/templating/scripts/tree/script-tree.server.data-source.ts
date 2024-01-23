@@ -1,3 +1,5 @@
+import { UmbServerFilePathUniqueSerializer } from '@umbraco-cms/backoffice/server-file-system';
+import { UMB_SCRIPT_ENTITY_TYPE, UMB_SCRIPT_FOLDER_ENTITY_TYPE } from '../entity.js';
 import { UmbScriptTreeItemModel } from './types.js';
 import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
 import { FileSystemTreeItemPresentationModel, ScriptResource } from '@umbraco-cms/backoffice/backend-api';
@@ -31,21 +33,26 @@ export class UmbScriptTreeServerDataSource extends UmbTreeServerDataSourceBase<
 const getRootItems = () => ScriptResource.getTreeScriptRoot({});
 
 const getChildrenOf = (parentUnique: string | null) => {
-	if (parentUnique === null) {
+	const parentPath = new UmbServerFilePathUniqueSerializer().toServerPath(parentUnique);
+
+	if (parentPath === null) {
 		return getRootItems();
 	} else {
 		// eslint-disable-next-line local-rules/no-direct-api-import
 		return ScriptResource.getTreeScriptChildren({
-			path: parentUnique,
+			parentPath,
 		});
 	}
 };
 
 const mapper = (item: FileSystemTreeItemPresentationModel): UmbScriptTreeItemModel => {
+	const serializer = new UmbServerFilePathUniqueSerializer();
+
 	return {
-		path: item.path,
+		unique: serializer.toUnique(item.path),
+		parentUnique: item.parent ? serializer.toUnique(item.parent.path) : null,
+		entityType: item.isFolder ? UMB_SCRIPT_FOLDER_ENTITY_TYPE : UMB_SCRIPT_ENTITY_TYPE,
 		name: item.name,
-		entityType: 'script',
 		isFolder: item.isFolder,
 		hasChildren: item.hasChildren,
 		isContainer: false,

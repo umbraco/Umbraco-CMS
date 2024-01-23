@@ -45,7 +45,7 @@ export const serverInformationHandler = rest.get(umbracoPath('/server/informatio
 			version: '14.0.0-preview004',
 			assemblyVersion: '14.0.0-preview004',
 			baseUtcOffset: '01:00:00',
-			runtimeMode: RuntimeModeModel.BACKOFFICE_DEVELOPMENT
+			runtimeMode: RuntimeModeModel.BACKOFFICE_DEVELOPMENT,
 		}),
 	);
 });

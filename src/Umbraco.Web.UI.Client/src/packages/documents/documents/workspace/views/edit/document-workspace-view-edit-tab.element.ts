@@ -41,7 +41,7 @@ export class UmbDocumentWorkspaceViewEditTabElement extends UmbLitElement {
 		this._groupStructureHelper.setOwnerId(value);
 	}
 
-	_groupStructureHelper = new UmbContentTypeContainerStructureHelper(this);
+	_groupStructureHelper = new UmbContentTypeContainerStructureHelper<any>(this);
 
 	@state()
 	_groups: Array<PropertyTypeContainerModelBaseModel> = [];

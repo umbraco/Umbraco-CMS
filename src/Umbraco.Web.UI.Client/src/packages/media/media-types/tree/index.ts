@@ -3,6 +3,7 @@ export {
 	UMB_MEDIA_TYPE_TREE_STORE_ALIAS,
 	UMB_MEDIA_TYPE_TREE_REPOSITORY_ALIAS,
 } from './manifests.js';
+export * from './folder/index.js';
 
 export { UmbMediaTypeTreeRepository } from './media-type-tree.repository.js';
 export { UMB_MEDIA_TYPE_TREE_STORE_CONTEXT } from './media-type-tree.store.js';

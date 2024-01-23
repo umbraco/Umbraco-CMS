@@ -9,3 +9,4 @@ export type UserConfigurationResponseModel = {
     canInviteUsers: boolean;
     passwordConfiguration: PasswordConfigurationResponseModel;
 };
+

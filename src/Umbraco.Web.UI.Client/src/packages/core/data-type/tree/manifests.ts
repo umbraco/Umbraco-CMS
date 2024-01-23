@@ -1,3 +1,4 @@
+import { manifests as folderManifests } from './folder/manifests.js';
 import { UmbDataTypeTreeRepository } from './data-type-tree.repository.js';
 import { UmbDataTypeTreeStore } from './data-type-tree.store.js';
 import type {
@@ -43,4 +44,4 @@ const treeItem: ManifestTreeItem = {
 	},
 };
 
-export const manifests = [treeRepository, treeStore, tree, treeItem];
+export const manifests = [treeRepository, treeStore, tree, treeItem, ...folderManifests];

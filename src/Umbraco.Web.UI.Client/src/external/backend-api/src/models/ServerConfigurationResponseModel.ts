@@ -6,3 +6,4 @@
 export type ServerConfigurationResponseModel = {
     allowPasswordReset: boolean;
 };
+

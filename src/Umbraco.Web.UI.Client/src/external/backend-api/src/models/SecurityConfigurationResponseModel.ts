@@ -8,3 +8,4 @@ import type { PasswordConfigurationResponseModel } from './PasswordConfiguration
 export type SecurityConfigurationResponseModel = {
     passwordConfiguration: PasswordConfigurationResponseModel;
 };
+

@@ -6,5 +6,6 @@
 import type { TemplateModelBaseModel } from './TemplateModelBaseModel';
 
 export type CreateTemplateRequestModel = (TemplateModelBaseModel & {
-key?: string | null;
+    key?: string | null;
 });
+

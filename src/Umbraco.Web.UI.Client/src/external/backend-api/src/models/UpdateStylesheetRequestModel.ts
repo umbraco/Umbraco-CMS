@@ -3,6 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { UpdateTextFileViewModelBaseModel } from './UpdateTextFileViewModelBaseModel';
+import type { FileSystemFileUpdateRequestModelBaseModel } from './FileSystemFileUpdateRequestModelBaseModel';
 
-export type UpdateStylesheetRequestModel = UpdateTextFileViewModelBaseModel;
+export type UpdateStylesheetRequestModel = FileSystemFileUpdateRequestModelBaseModel;
+

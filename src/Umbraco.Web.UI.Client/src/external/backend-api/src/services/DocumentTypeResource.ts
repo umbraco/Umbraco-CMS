@@ -27,16 +27,16 @@ export class DocumentTypeResource {
      * @throws ApiError
      */
     public static postDocumentType({
-requestBody,
-}: {
-requestBody?: CreateDocumentTypeRequestModel,
-}): CancelablePromise<string> {
+        requestBody,
+    }: {
+        requestBody?: CreateDocumentTypeRequestModel,
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/document-type',
             body: requestBody,
             mediaType: 'application/json',
-            responseHeader: 'Location',
+            responseHeader: 'Umb-Generated-Resource',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
@@ -50,10 +50,10 @@ requestBody?: CreateDocumentTypeRequestModel,
      * @throws ApiError
      */
     public static getDocumentTypeById({
-id,
-}: {
-id: string,
-}): CancelablePromise<DocumentTypeResponseModel> {
+        id,
+    }: {
+        id: string,
+    }): CancelablePromise<DocumentTypeResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/document-type/{id}',
@@ -72,10 +72,10 @@ id: string,
      * @throws ApiError
      */
     public static deleteDocumentTypeById({
-id,
-}: {
-id: string,
-}): CancelablePromise<any> {
+        id,
+    }: {
+        id: string,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/document-type/{id}',
@@ -94,12 +94,12 @@ id: string,
      * @throws ApiError
      */
     public static putDocumentTypeById({
-id,
-requestBody,
-}: {
-id: string,
-requestBody?: UpdateDocumentTypeRequestModel,
-}): CancelablePromise<any> {
+        id,
+        requestBody,
+    }: {
+        id: string,
+        requestBody?: UpdateDocumentTypeRequestModel,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/document-type/{id}',
@@ -121,10 +121,10 @@ requestBody?: UpdateDocumentTypeRequestModel,
      * @throws ApiError
      */
     public static getDocumentTypeByIdCompositionReferences({
-id,
-}: {
-id: string,
-}): CancelablePromise<Array<DocumentTypeCompositionResponseModel>> {
+        id,
+    }: {
+        id: string,
+    }): CancelablePromise<Array<DocumentTypeCompositionResponseModel>> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/document-type/{id}/composition-references',
@@ -144,12 +144,12 @@ id: string,
      * @throws ApiError
      */
     public static postDocumentTypeByIdCopy({
-id,
-requestBody,
-}: {
-id: string,
-requestBody?: CopyDocumentTypeRequestModel,
-}): CancelablePromise<string> {
+        id,
+        requestBody,
+    }: {
+        id: string,
+        requestBody?: CopyDocumentTypeRequestModel,
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/document-type/{id}/copy',
@@ -158,7 +158,7 @@ requestBody?: CopyDocumentTypeRequestModel,
             },
             body: requestBody,
             mediaType: 'application/json',
-            responseHeader: 'Location',
+            responseHeader: 'Umb-Generated-Resource',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
@@ -172,12 +172,12 @@ requestBody?: CopyDocumentTypeRequestModel,
      * @throws ApiError
      */
     public static putDocumentTypeByIdMove({
-id,
-requestBody,
-}: {
-id: string,
-requestBody?: MoveDocumentTypeRequestModel,
-}): CancelablePromise<any> {
+        id,
+        requestBody,
+    }: {
+        id: string,
+        requestBody?: MoveDocumentTypeRequestModel,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/document-type/{id}/move',
@@ -199,10 +199,10 @@ requestBody?: MoveDocumentTypeRequestModel,
      * @throws ApiError
      */
     public static postDocumentTypeAvailableCompositions({
-requestBody,
-}: {
-requestBody?: DocumentTypeCompositionRequestModel,
-}): CancelablePromise<Array<AvailableDocumentTypeCompositionResponseModel>> {
+        requestBody,
+    }: {
+        requestBody?: DocumentTypeCompositionRequestModel,
+    }): CancelablePromise<Array<AvailableDocumentTypeCompositionResponseModel>> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/document-type/available-compositions',
@@ -219,16 +219,16 @@ requestBody?: DocumentTypeCompositionRequestModel,
      * @throws ApiError
      */
     public static postDocumentTypeFolder({
-requestBody,
-}: {
-requestBody?: CreateFolderRequestModel,
-}): CancelablePromise<string> {
+        requestBody,
+    }: {
+        requestBody?: CreateFolderRequestModel,
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/document-type/folder',
             body: requestBody,
             mediaType: 'application/json',
-            responseHeader: 'Location',
+            responseHeader: 'Umb-Generated-Resource',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
@@ -242,10 +242,10 @@ requestBody?: CreateFolderRequestModel,
      * @throws ApiError
      */
     public static getDocumentTypeFolderById({
-id,
-}: {
-id: string,
-}): CancelablePromise<FolderResponseModel> {
+        id,
+    }: {
+        id: string,
+    }): CancelablePromise<FolderResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/document-type/folder/{id}',
@@ -264,10 +264,10 @@ id: string,
      * @throws ApiError
      */
     public static deleteDocumentTypeFolderById({
-id,
-}: {
-id: string,
-}): CancelablePromise<any> {
+        id,
+    }: {
+        id: string,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/document-type/folder/{id}',
@@ -287,12 +287,12 @@ id: string,
      * @throws ApiError
      */
     public static putDocumentTypeFolderById({
-id,
-requestBody,
-}: {
-id: string,
-requestBody?: UpdateFolderResponseModel,
-}): CancelablePromise<any> {
+        id,
+        requestBody,
+    }: {
+        id: string,
+        requestBody?: UpdateFolderResponseModel,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/document-type/folder/{id}',
@@ -314,10 +314,10 @@ requestBody?: UpdateFolderResponseModel,
      * @throws ApiError
      */
     public static getDocumentTypeItem({
-id,
-}: {
-id?: Array<string>,
-}): CancelablePromise<Array<DocumentTypeItemResponseModel>> {
+        id,
+    }: {
+        id?: Array<string>,
+    }): CancelablePromise<Array<DocumentTypeItemResponseModel>> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/document-type/item',
@@ -335,16 +335,16 @@ id?: Array<string>,
      * @throws ApiError
      */
     public static getTreeDocumentTypeChildren({
-parentId,
-skip,
-take = 100,
-foldersOnly = false,
-}: {
-parentId?: string,
-skip?: number,
-take?: number,
-foldersOnly?: boolean,
-}): CancelablePromise<PagedDocumentTypeTreeItemResponseModel> {
+        parentId,
+        skip,
+        take = 100,
+        foldersOnly = false,
+    }: {
+        parentId?: string,
+        skip?: number,
+        take?: number,
+        foldersOnly?: boolean,
+    }): CancelablePromise<PagedDocumentTypeTreeItemResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/document-type/children',
@@ -365,14 +365,14 @@ foldersOnly?: boolean,
      * @throws ApiError
      */
     public static getTreeDocumentTypeRoot({
-skip,
-take = 100,
-foldersOnly = false,
-}: {
-skip?: number,
-take?: number,
-foldersOnly?: boolean,
-}): CancelablePromise<PagedDocumentTypeTreeItemResponseModel> {
+        skip,
+        take = 100,
+        foldersOnly = false,
+    }: {
+        skip?: number,
+        take?: number,
+        foldersOnly?: boolean,
+    }): CancelablePromise<PagedDocumentTypeTreeItemResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/document-type/root',
