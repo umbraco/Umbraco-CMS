@@ -1,4 +1,4 @@
-import type { UmbBlockTypeWithGroupKey } from '../../../block-type/index.js';
+import type { UmbBlockTypeWithGroupKey, UmbInputBlockTypeElement } from '../../../block-type/index.js';
 import '../../../block-type/components/input-block-type/index.js';
 import { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { html, customElement, property, state, css, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
@@ -68,13 +68,24 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 		this._mappedValuesAndGroups = [{ blocks: valuesWithNoGroup }, ...valuesWithGroup];
 	}
 
+	#onChange(e: CustomEvent, group?: UmbBlockGridGroupTypeConfiguration) {
+		const groupValues = (e.target as UmbInputBlockTypeElement).value;
+		const newValues = groupValues.map((value) => ({ ...value, groupKey: group?.key }));
+		const filteredValues = this._value.filter((block) => block.contentElementTypeKey === group?.key);
+		this.value = [...filteredValues, ...newValues];
+		this.dispatchEvent(new CustomEvent('property-value-change'));
+	}
+
 	render() {
 		return html`${repeat(
 			this._mappedValuesAndGroups,
 			(group) => group.key,
 			(group) =>
 				html`${group.key ? this.#renderGroupInput(group.key, group.name) : nothing}
-					<umb-input-block-type entity-type="block-grid-type" .value="${group.blocks}"></umb-input-block-type>`,
+					<umb-input-block-type
+						entity-type="block-grid-type"
+						.value="${group.blocks}"
+						@change=${(e: CustomEvent) => this.#onChange(e, group)}></umb-input-block-type>`,
 		)}`;
 	}
 
