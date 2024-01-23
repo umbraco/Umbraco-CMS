@@ -67,7 +67,8 @@ export class UmbDocumentWorkspaceSplitViewElement extends UmbLitElement {
 			}
 
 			#splitViews {
-				display: flex;
+				display: grid;
+				grid-template-columns: 50% 50%;
 				width: 100%;
 				height: calc(100% - var(--umb-footer-layout-height));
 			}
