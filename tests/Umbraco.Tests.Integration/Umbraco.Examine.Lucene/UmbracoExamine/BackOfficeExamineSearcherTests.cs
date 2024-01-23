@@ -594,7 +594,6 @@ public class BackOfficeExamineSearcherTests : ExamineBaseTest
     {
         // Arrange
         await SetupUserIdentity(Constants.Security.SuperUserIdAsString);
-        var x = TestHelper.GetHttpContextAccessor().HttpContext.GetCurrentIdentity();
 
         const string contentName = "TestContent";
 
