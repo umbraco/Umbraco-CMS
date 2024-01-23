@@ -704,9 +704,10 @@ stages:
     pool:
       vmImage: 'windows-latest' # Apparently AzureFileCopy is windows only :(
     variables:
-      umbracoMajorVersion:  $[ dependencies.Build.outputs['A.build.NBGV_VersionMajor'] ]
+      umbracoMajorVersion: $[ stageDependencies.Build.A.outputs['build.NBGV_VersionMajor'] ]
     displayName: Upload API Documentation
     dependsOn:
+      - Build
       - Deploy_MyGet # Change to "Deploy_Nuget" after release of v14
     condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.uploadApiDocs}}))
     jobs:
@@ -732,6 +733,7 @@ stages:
               storage: umbracoapidocs
               ContainerName: '$web'
               BlobPrefix: v$(umbracoMajorVersion)/csharp
+              CleanTargetBeforeCopy: true
       - job:
         displayName: Upload js Docs
         steps:
@@ -754,3 +756,4 @@ stages:
               storage: umbracoapidocs
               ContainerName: '$web'
               BlobPrefix: v$(umbracoMajorVersion)/ui
+              CleanTargetBeforeCopy: true
