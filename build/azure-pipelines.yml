@@ -17,10 +17,6 @@ parameters:
     displayName: Deploy to Npm
     type: boolean
     default: false
-  - name: npmPublishTag
-    displayName: Npm publish tag
-    type: string
-    default: 'latest'
   - name: buildApiDocs
     displayName: Build API docs
     type: boolean
