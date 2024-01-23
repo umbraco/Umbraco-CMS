@@ -1,13 +1,13 @@
 import { UmbBlockWorkspaceData } from '../../index.js';
 import { UmbModalToken, UmbWorkspaceData, UmbWorkspaceValue } from '@umbraco-cms/backoffice/modal';
 
-export interface UmbBlockListWorkspaceData
+export interface UmbBlockGridWorkspaceData
 	extends UmbBlockWorkspaceData<{
 		index: number;
 		parentId: string | null;
 	}> {}
 
-export const UMB_BLOCK_GRID_WORKSPACE_MODAL = new UmbModalToken<UmbBlockListWorkspaceData, UmbWorkspaceValue>(
+export const UMB_BLOCK_GRID_WORKSPACE_MODAL = new UmbModalToken<UmbBlockGridWorkspaceData, UmbWorkspaceValue>(
 	'Umb.Modal.Workspace',
 	{
 		modal: {
