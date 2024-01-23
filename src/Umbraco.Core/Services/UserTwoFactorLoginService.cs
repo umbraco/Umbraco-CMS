@@ -1,5 +1,6 @@
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
@@ -13,8 +14,9 @@ internal class UserTwoFactorLoginService : TwoFactorLoginServiceBase, IUserTwoFa
     public UserTwoFactorLoginService(
         ITwoFactorLoginService twoFactorLoginService,
         IEnumerable<ITwoFactorProvider> twoFactorSetupGenerators,
-        IUserService userService)
-        : base(twoFactorLoginService, twoFactorSetupGenerators) =>
+        IUserService userService,
+        ICoreScopeProvider scopeProvider)
+        : base(twoFactorLoginService, twoFactorSetupGenerators, scopeProvider) =>
         _userService = userService;
 
     /// <inheritdoc cref="IUserTwoFactorLoginService.DisableAsync" />

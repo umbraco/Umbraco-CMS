@@ -1,6 +1,8 @@
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -10,11 +12,13 @@ namespace Umbraco.Cms.Core.Services;
 internal abstract class TwoFactorLoginServiceBase
 {
     private readonly ITwoFactorLoginService _twoFactorLoginService;
+    private readonly ICoreScopeProvider _scopeProvider;
     private readonly IDictionary<string, ITwoFactorProvider> _twoFactorSetupGenerators;
 
-    protected TwoFactorLoginServiceBase(ITwoFactorLoginService twoFactorLoginService, IEnumerable<ITwoFactorProvider> twoFactorSetupGenerators)
+    protected TwoFactorLoginServiceBase(ITwoFactorLoginService twoFactorLoginService, IEnumerable<ITwoFactorProvider> twoFactorSetupGenerators, ICoreScopeProvider scopeProvider)
     {
         _twoFactorLoginService = twoFactorLoginService;
+        _scopeProvider = scopeProvider;
         _twoFactorSetupGenerators = twoFactorSetupGenerators.ToDictionary(x => x.ProviderName);
     }
 
@@ -72,6 +76,13 @@ internal abstract class TwoFactorLoginServiceBase
         string secret,
         string code)
     {
+        using var scope = _scopeProvider.CreateCoreScope();
+
+        if ((await _twoFactorLoginService.GetEnabledTwoFactorProviderNamesAsync(userOrMemberKey)).Contains(providerName))
+        {
+            return Attempt.Fail(TwoFactorOperationStatus.ProviderAlreadySetup);
+        }
+
         bool valid;
         try
         {
@@ -95,8 +106,10 @@ internal abstract class TwoFactorLoginServiceBase
             ProviderName = providerName,
         };
 
+
         await _twoFactorLoginService.SaveAsync(twoFactorLogin);
 
+        scope.Complete();
         return Attempt.Succeed(TwoFactorOperationStatus.Success);
     }
 
