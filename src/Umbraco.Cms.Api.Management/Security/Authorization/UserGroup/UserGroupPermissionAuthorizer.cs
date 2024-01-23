@@ -18,18 +18,18 @@ internal sealed class UserGroupPermissionAuthorizer : IUserGroupPermissionAuthor
     }
 
     /// <inheritdoc />
-    public async Task<bool> IsAuthorizedAsync(IPrincipal currentUser, IEnumerable<Guid> userGroupKeys)
+    public async Task<bool> IsDeniedAsync(IPrincipal currentUser, IEnumerable<Guid> userGroupKeys)
     {
         if (!userGroupKeys.Any())
         {
-            // Must succeed this requirement since we cannot process it.
-            return true;
+            // We can't deny something that is not defined
+            return false;
         }
 
         IUser user = _authorizationHelper.GetUmbracoUser(currentUser);
 
-        var result = await _userGroupPermissionService.AuthorizeAccessAsync(user, userGroupKeys);
+        UserGroupAuthorizationStatus result = await _userGroupPermissionService.AuthorizeAccessAsync(user, userGroupKeys);
 
-        return result == UserGroupAuthorizationStatus.Success;
+        return result is not UserGroupAuthorizationStatus.Success;
     }
 }

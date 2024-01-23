@@ -22,36 +22,33 @@ public class ContentPermissionHandler : MustSatisfyRequirementAuthorizationHandl
         ContentPermissionRequirement requirement,
         ContentPermissionResource resource)
     {
-        if (resource.CheckRoot
-            && await _contentPermissionAuthorizer.IsAuthorizedAtRootLevelAsync(context.User, resource.PermissionsToCheck) is false)
+        var result = true;
+
+        if (resource.CheckRoot)
         {
-            return false;
+            result &= await _contentPermissionAuthorizer.IsDeniedAtRootLevelAsync(context.User, resource.PermissionsToCheck) is false;
         }
 
-        if (resource.CheckRecycleBin
-            && await _contentPermissionAuthorizer.IsAuthorizedAtRecycleBinLevelAsync(context.User, resource.PermissionsToCheck) is false)
+        if (resource.CheckRecycleBin)
         {
-            return false;
+            result &= await _contentPermissionAuthorizer.IsDeniedAtRecycleBinLevelAsync(context.User, resource.PermissionsToCheck) is false;
         }
 
-        if (resource.ParentKeyForBranch is not null
-            && await _contentPermissionAuthorizer.IsAuthorizedWithDescendantsAsync(context.User, resource.ParentKeyForBranch.Value, resource.PermissionsToCheck) is false)
+        if (resource.ParentKeyForBranch is not null)
         {
-            return false;
+            result &= await _contentPermissionAuthorizer.IsDeniedWithDescendantsAsync(context.User, resource.ParentKeyForBranch.Value, resource.PermissionsToCheck) is false;
         }
 
-        if (resource.ContentKeys.Any()
-            && await _contentPermissionAuthorizer.IsAuthorizedAsync(context.User, resource.ContentKeys, resource.PermissionsToCheck) is false)
+        if (resource.ContentKeys.Any())
         {
-            return false;
-        }
-        
-        if (resource.CulturesToCheck is not null
-            && await _contentPermissionAuthorizer.IsAuthorizedForCultures(context.User, resource.CulturesToCheck) is false)
-        {
-            return false;
+            result &= await _contentPermissionAuthorizer.IsDeniedAsync(context.User, resource.ContentKeys, resource.PermissionsToCheck) is false;
         }
 
-        return true;
+        if (resource.CulturesToCheck is not null)
+        {
+            result &= await _contentPermissionAuthorizer.IsDeniedForCultures(context.User, resource.CulturesToCheck) is false;
+        }
+
+        return result;
     }
 }
