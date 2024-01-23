@@ -11,6 +11,7 @@ import {
 	UMB_BLOCK_CATALOGUE_MODAL,
 	UmbBlockLayoutBaseModel,
 	UmbBlockTypeBaseModel,
+	UmbBlockWorkspaceData,
 	type UmbBlockValueType,
 } from '@umbraco-cms/backoffice/block';
 import type { NumberRangeValueType } from '@umbraco-cms/backoffice/models';

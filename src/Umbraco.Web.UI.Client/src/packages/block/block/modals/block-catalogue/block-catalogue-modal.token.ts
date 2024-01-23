@@ -5,7 +5,7 @@ export interface UmbBlockCatalogueModalData {
 	blocks: Array<UmbBlockTypeBaseModel>;
 	blockGroups?: Array<{ name: string; key: string }>;
 	openClipboard?: boolean;
-	blockOriginData: UmbBlockWorkspaceData;
+	blockOriginData: UmbBlockWorkspaceData['originData'];
 }
 
 export type UmbBlockCatalogueModalValue = never;

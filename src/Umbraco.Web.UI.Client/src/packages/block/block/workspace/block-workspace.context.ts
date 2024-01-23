@@ -219,11 +219,15 @@ export class UmbBlockWorkspaceContext<
 	async save() {
 		const layoutData = this.#layout.value;
 		const contentData = this.content.getData();
-		if (!layoutData || !this.#blockManager || !contentData) return;
+		if (!layoutData || !this.#blockManager || !contentData || !this.#modalContext) return;
 
 		if (!this.#liveEditingMode) {
 			if (this.getIsNew() === true) {
-				const blockCreated = this.#blockManager.createBlock(layoutData, contentData.contentTypeKey);
+				const blockCreated = this.#blockManager.createBlock(
+					this.#modalContext.data as UmbBlockWorkspaceData,
+					layoutData,
+					contentData.contentTypeKey,
+				);
 				if (!blockCreated) {
 					throw new Error('Block Manager could not create block');
 					return;
