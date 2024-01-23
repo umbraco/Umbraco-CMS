@@ -73,7 +73,9 @@ public class DataValueReferenceFactoryCollection : BuilderCollectionBase<IDataVa
     /// <returns>
     /// The references.
     /// </returns>
-    public IEnumerable<UmbracoEntityReference> GetReferences(IDataEditor dataEditor, IEnumerable<object?> values)
+    public ISet<UmbracoEntityReference> GetReferences(IDataEditor dataEditor, IEnumerable<object?> values) =>
+        GetReferencesEnumerable(dataEditor, values).ToHashSet();
+    private IEnumerable<UmbracoEntityReference> GetReferencesEnumerable(IDataEditor dataEditor, IEnumerable<object?> values)
     {
         // TODO: We will need to change this once we support tracking via variants/segments
         // for now, we are tracking values from ALL variants
@@ -133,7 +135,9 @@ public class DataValueReferenceFactoryCollection : BuilderCollectionBase<IDataVa
     /// <returns>
     /// The automatic relation types aliases.
     /// </returns>
-    public IEnumerable<string> GetAutomaticRelationTypesAliases(IDataEditor dataEditor)
+    public ISet<string> GetAutomaticRelationTypesAliases(IDataEditor dataEditor) =>
+        GetAutomaticRelationTypesAliasesEnumerable(dataEditor).ToHashSet();
+    private IEnumerable<string> GetAutomaticRelationTypesAliasesEnumerable(IDataEditor dataEditor)
     {
         if (dataEditor.GetValueEditor() is IDataValueReference dataValueReference)
         {
