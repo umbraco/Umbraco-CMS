@@ -66,28 +66,24 @@ public class BackOfficeController : SecurityControllerBase
 
         if (result.IsNotAllowed)
         {
-            return Forbid(new ProblemDetailsBuilder()
+            return StatusCode(StatusCodes.Status403Forbidden, new ProblemDetailsBuilder()
                 .WithTitle("User is not allowed")
                 .WithDetail("The operation is not allowed on the user")
-                .Build()),
+                .Build());
         }
         if (result.IsLockedOut)
         {
-            return Forbid(new ProblemDetailsBuilder()
+            return StatusCode(StatusCodes.Status403Forbidden, new ProblemDetailsBuilder()
                 .WithTitle("User is locked")
                 .WithDetail("The user is locked, and need to be unlocked before more login attempts can be executed.")
-                .Build()),
+                .Build());
         }
         if(result.RequiresTwoFactor)
         {
             return StatusCode(StatusCodes.Status402PaymentRequired, new ProblemDetailsBuilder()
-                .WithTitle("2FA required.")
-                .Build());
-
-            return StatusCode(StatusCodes.Status402PaymentRequired,(new ProblemDetailsBuilder()
                 .WithTitle("2FA Required")
                 .WithDetail("The user is protected by 2FA. Please continue the login process and verify a 2FA code.")
-                .Build()),
+                .Build());
         }
         return Ok();
     }
