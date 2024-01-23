@@ -111,8 +111,7 @@ public class ContentControllerBase : ManagementApiControllerBase
             => BadRequest(problemDetailsBuilder
                 .WithTitle("Validation failed")
                 .WithDetail("One or more properties did not pass validation")
-                .WithOperationStatus(status)
-                .WithPropertyValidationErrors(errors)
+                .WithErrors(errors)
                 .Build()));
     }
 

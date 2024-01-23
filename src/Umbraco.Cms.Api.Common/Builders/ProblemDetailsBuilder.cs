@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Common.Builders;
 
@@ -35,8 +37,8 @@ public class ProblemDetailsBuilder
         return this;
     }
 
-    public ProblemDetailsBuilder WithPropertyValidationErrors(IDictionary<string, string[]> propertyValidationErrors)
-        => WithExtension("propertyValidationErrors", propertyValidationErrors);
+    public ProblemDetailsBuilder WithErrors(IDictionary<string, string[]> errors)
+        => WithExtension(nameof(HttpValidationProblemDetails.Errors).ToFirstLowerInvariant(), errors);
 
     public ProblemDetailsBuilder WithExtension(string key, object value)
     {
