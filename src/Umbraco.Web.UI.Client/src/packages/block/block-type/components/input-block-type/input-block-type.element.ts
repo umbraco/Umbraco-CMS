@@ -101,7 +101,8 @@ export class UmbInputBlockTypeElement<
 
 	deleteItem(contentElementTypeKey: string) {
 		this.value = this._items.filter((x) => x.contentElementTypeKey !== contentElementTypeKey);
-		this.dispatchEvent(new UmbChangeEvent());
+		this.dispatchEvent(new CustomEvent('delete', { detail: { contentElementTypeKey } }));
+		//this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	protected getFormElement() {

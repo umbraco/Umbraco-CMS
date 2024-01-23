@@ -68,11 +68,18 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 		this._mappedValuesAndGroups = [{ blocks: valuesWithNoGroup }, ...valuesWithGroup];
 	}
 
+	/*
 	#onChange(e: CustomEvent, group?: UmbBlockGridGroupTypeConfiguration) {
 		const groupValues = (e.target as UmbInputBlockTypeElement).value;
 		const newValues = groupValues.map((value) => ({ ...value, groupKey: group?.key }));
 		const filteredValues = this._value.filter((block) => block.contentElementTypeKey === group?.key);
 		this.value = [...filteredValues, ...newValues];
+		this.dispatchEvent(new CustomEvent('property-value-change'));
+	}
+	*/
+
+	#deleteItem(e: CustomEvent) {
+		this.value = this._value.filter((block) => block.contentElementTypeKey !== e.detail.contentElementTypeKey);
 		this.dispatchEvent(new CustomEvent('property-value-change'));
 	}
 
@@ -85,7 +92,7 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 					<umb-input-block-type
 						entity-type="block-grid-type"
 						.value="${group.blocks}"
-						@change=${(e: CustomEvent) => this.#onChange(e, group)}></umb-input-block-type>`,
+						@delete=${this.#deleteItem}></umb-input-block-type>`,
 		)}`;
 	}
 
@@ -112,7 +119,7 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 			auto-width
 			label="Group"
 			.value=${groupName ?? ''}
-			@change=${(e: UUIInputEvent) => this.#changeGroupName(e, groupKey)}>
+			@delete=${(e: UUIInputEvent) => this.#changeGroupName(e, groupKey)}>
 			<uui-button compact slot="append" label="delete" @click=${() => this.#deleteGroup(groupKey)}>
 				<uui-icon name="icon-trash"></uui-icon>
 			</uui-button>
