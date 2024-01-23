@@ -1,4 +1,4 @@
-import { UMB_BLOCK_WORKSPACE_CONTEXT } from '../../block-workspace.context.js';
+import { UMB_BLOCK_WORKSPACE_CONTEXT } from '../../block-workspace.context-token.js';
 import type { UmbBlockWorkspaceViewEditTabElement } from './block-workspace-view-edit-tab.element.js';
 import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -80,8 +80,11 @@ export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements U
 						(component as UmbBlockWorkspaceViewEditTabElement).tabName = tabName;
 						// TODO: Consider if we can link these more simple, and not parse this on.
 						// Instead have the structure manager looking at wether one of the OwnerALikecontainers is in the owner document.
-						(component as UmbBlockWorkspaceViewEditTabElement).ownerTabId =
-							this._workspaceContext?.content.structure.isOwnerContainer(tab.id!) ? tab.id : undefined;
+						(component as UmbBlockWorkspaceViewEditTabElement).ownerTabId = this._tabsStructureHelper.isOwnerContainer(
+							tab.id!,
+						)
+							? tab.id
+							: undefined;
 					},
 				});
 			});

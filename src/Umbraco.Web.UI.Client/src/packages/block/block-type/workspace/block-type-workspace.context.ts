@@ -1,4 +1,4 @@
-import type { UmbBlockTypeBase } from '../types.js';
+import type { UmbBlockTypeBaseModel } from '../types.js';
 import { UMB_PROPERTY_CONTEXT, UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import {
 	UmbInvariantableWorkspaceContextInterface,
@@ -11,7 +11,7 @@ import { UmbControllerHost, UmbControllerHostElement } from '@umbraco-cms/backof
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { ManifestWorkspace, PropertyEditorConfigProperty } from '@umbraco-cms/backoffice/extension-registry';
 
-export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeBase = UmbBlockTypeBase>
+export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeBaseModel = UmbBlockTypeBaseModel>
 	extends UmbEditableWorkspaceContextBase<BlockTypeData>
 	implements UmbInvariantableWorkspaceContextInterface
 {
@@ -43,7 +43,7 @@ export class UmbBlockTypeWorkspaceContext<BlockTypeData extends UmbBlockTypeBase
 		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
 			this.observe(context.value, (value) => {
 				if (value) {
-					const blockTypeData = value.find((x: UmbBlockTypeBase) => x.contentElementTypeKey === unique);
+					const blockTypeData = value.find((x: UmbBlockTypeBaseModel) => x.contentElementTypeKey === unique);
 					if (blockTypeData) {
 						this.#data.setValue(blockTypeData);
 						return;
