@@ -29,7 +29,7 @@ test.describe('Language tests', () => {
     expect(await umbracoApi.language.doesExist(isoCode)).toBeTruthy();
     // verify the created language displays in the list
     await umbracoUi.language.clickLanguageRoot();
-    await umbracoUi.language.isLanguageNameVisible(languageName);
+    await umbracoUi.language.isLanguageNameVisible(languageName, true);
   });
 
   test('can update default language option', async ({umbracoApi, umbracoUi}) => {
@@ -82,7 +82,7 @@ test.describe('Language tests', () => {
     // Assert
     await umbracoUi.language.isSuccessNotificationVisible();
     expect(await umbracoApi.language.doesExist(isoCode)).toBeFalsy();
-    await umbracoUi.language.isLanguageNameNotVisible(languageName);
+    await umbracoUi.language.isLanguageNameVisible(languageName, false);
   });
 
   test('can remove fallback language', async ({umbracoApi, umbracoUi}) => {
