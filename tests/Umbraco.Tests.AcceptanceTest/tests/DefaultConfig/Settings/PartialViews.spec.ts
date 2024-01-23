@@ -4,10 +4,16 @@ import {expect} from "@playwright/test";
 test.describe('Partial Views tests', () => {
   const partialViewName = 'TestPartialView';
   const partialViewFileName = partialViewName + ".cshtml";
+  const folderName = 'TestFolder';
 
   test.beforeEach(async ({umbracoUi}) => {
     await umbracoUi.goToBackOffice();
     await umbracoUi.partialView.goToSection(ConstantHelper.sections.settings);
+  });
+
+  test.afterEach(async ({umbracoApi}) => {
+    await umbracoApi.partialView.ensureNameNotExists(partialViewFileName);
+    await umbracoApi.partialView.ensureNameNotExists(folderName);
   });
 
   test('can create an empty partial view', async ({umbracoApi, umbracoUi}) => {
@@ -25,12 +31,10 @@ test.describe('Partial Views tests', () => {
     // Assert
     expect(await umbracoApi.partialView.doesExist(partialViewFileName)).toBeTruthy();
     // TODO: when frontend is ready, verify the new partial view is displayed under the Partial Views section
-    // TODO: when frontend is ready, verify the notification displays
-
-    // Clean
-    await umbracoApi.partialView.ensureNameNotExists(partialViewFileName);
+    // TODO: when frontend is ready, verify the notification displays  
   });
 
+  // TODO: Remove .skip when the test is able to run. Currently it returns the error: "Partial view not found" when choosing snippet
   test.skip('can create a partial view from snippet', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.partialView.ensureNameNotExists(partialViewFileName);
@@ -51,34 +55,29 @@ test.describe('Partial Views tests', () => {
     expect(partialViewData.content).toBe(expectedTemplateContent);
     // TODO: when frontend is ready, verify the new partial view is displayed under the Partial Views section
     // TODO: when frontend is ready, verify the notification displays
-
-    // Clean
-    await umbracoApi.partialView.ensureNameNotExists(partialViewFileName);
   });
 
   test('can update a partial view name', async ({umbracoApi, umbracoUi}) => {
     // Arrange
-    const updatedPartialViewName = 'TestPartialViewUpdated';
-    const updatedPartialViewFileName = updatedPartialViewName + ".cshtml";
+    const wrongPartialViewName = 'WrongTestPartialView';
+    const wrongPartialViewFileName = wrongPartialViewName + ".cshtml";
 
-    await umbracoApi.partialView.ensureNameNotExists(partialViewFileName);
-    await umbracoApi.partialView.create(partialViewFileName, "@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage\r\n", "/");
+    await umbracoApi.partialView.ensureNameNotExists(wrongPartialViewName);
+    await umbracoApi.partialView.create(wrongPartialViewFileName, "@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage\r\n", "/");
+    expect(await umbracoApi.partialView.doesExist(wrongPartialViewFileName)).toBeTruthy();
 
     //Act
-    await umbracoUi.partialView.openPartialViewAtRoot(partialViewFileName);
-    await umbracoUi.partialView.enterPartialViewName(updatedPartialViewName);
+    await umbracoUi.partialView.openPartialViewAtRoot(wrongPartialViewFileName);
+    await umbracoUi.partialView.enterPartialViewName(partialViewName);
     // TODO: Remove this timeout when frontend validation is implemented
     await umbracoUi.waitForTimeout(1000);
     await umbracoUi.partialView.clickSaveButton();
 
     // Assert
-    expect(await umbracoApi.partialView.doesExist(updatedPartialViewFileName)).toBeTruthy();
+    expect(await umbracoApi.partialView.doesNameExist(partialViewFileName)).toBeTruthy();
     // TODO: when frontend is ready, verify the updated partial view name is displayed under the Partial Views section
-    expect(await umbracoApi.partialView.doesExist(partialViewFileName)).toBeFalsy();
+    expect(await umbracoApi.partialView.doesNameExist(wrongPartialViewFileName)).toBeFalsy();
     // TODO: when frontend is ready, verify the old partial view name is NOT displayed under the Partial Views section
-
-    // Clean
-    await umbracoApi.partialView.ensureNameNotExists(updatedPartialViewFileName);
   });
 
   test('can update a partial view content', async ({umbracoApi, umbracoUi}) => {
@@ -91,6 +90,7 @@ test.describe('Partial Views tests', () => {
 
     await umbracoApi.partialView.ensureNameNotExists(partialViewFileName);
     await umbracoApi.partialView.create(partialViewFileName, "@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage\r\n", "/");
+    expect(await umbracoApi.partialView.doesExist(partialViewFileName)).toBeTruthy();
 
     //Act
     await umbracoUi.partialView.openPartialViewAtRoot(partialViewFileName);
@@ -102,9 +102,6 @@ test.describe('Partial Views tests', () => {
     // Assert
     const updatedPartialView = await umbracoApi.partialView.getByName(partialViewFileName);
     expect(updatedPartialView.content).toBe(updatedPartialViewContent);
-
-    // Clean
-    await umbracoApi.partialView.ensureNameNotExists(partialViewFileName);
   });
 
   test('can use query builder for a partial view', async ({umbracoApi, umbracoUi}) => {
@@ -128,6 +125,7 @@ test.describe('Partial Views tests', () => {
 
     await umbracoApi.partialView.ensureNameNotExists(partialViewFileName);
     await umbracoApi.partialView.create(partialViewFileName, "@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage\r\n", "/");
+    expect(await umbracoApi.partialView.doesExist(partialViewFileName)).toBeTruthy();
 
     // Act
     await umbracoUi.partialView.openPartialViewAtRoot(partialViewFileName);
@@ -137,18 +135,15 @@ test.describe('Partial Views tests', () => {
     // Assert
     const updatedPartialView = await umbracoApi.partialView.getByName(partialViewFileName);
     expect(updatedPartialView.content).toBe(expectedTemplateContent);
-
-    // Clean
-    await umbracoApi.template.ensureNameNotExists(partialViewFileName);
   });
 
-  // Skip this test now as the function delete dictionary is missing
-  test.skip('can insert dictionaryItem into a partial view', async ({umbracoApi, umbracoUi}) => {
+  test('can insert dictionaryItem into a partial view', async ({umbracoApi, umbracoUi}) => {
     // Arrange
-    const dictionaryName = 'TestDictionary';
+    const dictionaryName = 'TestDictionaryPartialView';
 
     await umbracoApi.partialView.ensureNameNotExists(partialViewFileName);
     await umbracoApi.partialView.create(partialViewFileName, "@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage\r\n", "/");
+    expect(await umbracoApi.partialView.doesExist(partialViewFileName)).toBeTruthy();
 
     await umbracoApi.dictionary.ensureNameNotExists(dictionaryName);
     await umbracoApi.dictionary.create(dictionaryName);
@@ -166,29 +161,27 @@ test.describe('Partial Views tests', () => {
 
     // Clean
     await umbracoApi.dictionary.ensureNameNotExists(dictionaryName);
-    await umbracoApi.template.ensureNameNotExists(partialViewFileName);
   });
 
-  test.skip('can delete a partial view', async ({umbracoApi, umbracoUi}) => {
+  test('can delete a partial view', async ({umbracoApi, umbracoUi}) => {
     //Arrange
     await umbracoApi.partialView.ensureNameNotExists(partialViewFileName);
     await umbracoApi.partialView.create(partialViewFileName, "@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage\r\n", "/");
+    expect(await umbracoApi.partialView.doesExist(partialViewFileName)).toBeTruthy();
 
     //Act
     await umbracoUi.partialView.clickRootFolderCaretButton();
-    await umbracoUi.partialView.openPartialViewAtRoot(partialViewFileName);
+    await umbracoUi.partialView.clickActionsMenuForPartialView(partialViewFileName);
     await umbracoUi.partialView.deletePartialView();
 
     // Assert
     expect(await umbracoApi.partialView.doesExist(partialViewFileName)).toBeFalsy();
     // TODO: when frontend is ready, verify the partial view is NOT displayed under the Partial Views section
     // TODO: when frontend is ready, verify the notification displays
-
   });
 
   test('can create a folder', async ({umbracoApi, umbracoUi}) => {
     //Arrange
-    const folderName = 'TestFolder';
     await umbracoApi.partialView.ensureNameNotExists(folderName);
 
     // Act
@@ -198,14 +191,28 @@ test.describe('Partial Views tests', () => {
     // Assert
     expect(await umbracoApi.partialView.doesFolderExist(folderName)).toBeTruthy();
     // TODO: when frontend is ready, verify the new folder is  displayed under the Partial Views section
-    // TODO: when frontend is ready, verify the notification displays
+    // TODO: when frontend is ready, verify the notification display
+  });
 
-    //Clean
+  // Remove .skip when the test is able to run. Currently it returns the error: "Partial view not found" when delete folder
+  test.skip('can delete a folder', async ({umbracoApi, umbracoUi}) => {
+    //Arrange
     await umbracoApi.partialView.ensureNameNotExists(folderName);
+    await umbracoApi.partialView.createFolder(folderName);
+    expect(await umbracoApi.partialView.doesFolderExist(folderName)).toBeTruthy();
+
+    // Act
+    await umbracoUi.partialView.clickRootFolderCaretButton();
+    await umbracoUi.partialView.clickActionsMenuForPartialView(folderName);
+    await umbracoUi.partialView.deletePartialView();
+
+    // Assert
+    expect(await umbracoApi.partialView.doesFolderExist(folderName)).toBeFalsy();
+    // TODO: when frontend is ready, verify the folder is NOT displayed under the Partial Views section
+    // TODO: when frontend is ready, verify the notification display
   });
 
   test.skip('can place a partial view into folder', async ({umbracoApi}) => {
     // TODO: implement this later as the frontend is missing now
   });
-
 });
