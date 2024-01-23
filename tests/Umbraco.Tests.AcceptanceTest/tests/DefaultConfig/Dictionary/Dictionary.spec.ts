@@ -2,7 +2,6 @@
 import {expect} from "@playwright/test";
 
 test.describe('Dictionary tests', () => {
-
   const dictionaryName = 'TestDictionaryItem';
   const parentDictionaryName = 'TestParentDictionary';
   
@@ -20,7 +19,7 @@ test.describe('Dictionary tests', () => {
     await umbracoApi.dictionary.ensureNameNotExists(dictionaryName);
     await umbracoUi.dictionary.goToSection(ConstantHelper.sections.dictionary);
 
-    //Act
+    // Act
     await umbracoUi.dictionary.clickCreateDictionaryItemButton();
     await umbracoUi.dictionary.enterDictionaryName(dictionaryName);
     await umbracoUi.dictionary.clickSaveButton();
@@ -39,7 +38,7 @@ test.describe('Dictionary tests', () => {
     await umbracoApi.dictionary.create(dictionaryName);
     await umbracoUi.dictionary.goToSection(ConstantHelper.sections.dictionary);
 
-    //Act
+    // Act
     await umbracoUi.dictionary.clickActionsMenuForDictionary(dictionaryName);
     await umbracoUi.dictionary.deleteDictionary();
 
@@ -50,12 +49,11 @@ test.describe('Dictionary tests', () => {
 
   test('can create a dictionary item in a dictionary', async ({umbracoApi, umbracoUi}) => {
     // Arrange
-    let parentDictionaryId;
     await umbracoApi.dictionary.ensureNameNotExists(parentDictionaryName);
-    parentDictionaryId = await umbracoApi.dictionary.create(parentDictionaryName);
+    let parentDictionaryId = await umbracoApi.dictionary.create(parentDictionaryName);
     await umbracoUi.dictionary.goToSection(ConstantHelper.sections.dictionary);
 
-    //Act
+    // Act
     await umbracoUi.dictionary.clickActionsMenuForDictionary(parentDictionaryName);
     await umbracoUi.dictionary.clickCreateMenu();
     await umbracoUi.dictionary.enterDictionaryName(dictionaryName);
@@ -74,7 +72,7 @@ test.describe('Dictionary tests', () => {
     await umbracoApi.dictionary.create(dictionaryName);
     await umbracoUi.dictionary.goToSection(ConstantHelper.sections.dictionary);
 
-    //Act
+    // Act
     await umbracoUi.dictionary.clickActionsMenuForDictionary(dictionaryName);
     await umbracoUi.dictionary.clickExportMenu();
     await umbracoUi.dictionary.exportDictionary(false);
@@ -86,13 +84,12 @@ test.describe('Dictionary tests', () => {
   // Remove skip when export function works
   test.skip('can export a dictionary item with descendants', async ({umbracoApi, umbracoUi}) => {
     // Arrange
-    let parentDictionaryId;
     await umbracoApi.dictionary.ensureNameNotExists(parentDictionaryName);
-    parentDictionaryId = await umbracoApi.dictionary.create(parentDictionaryName);
+    let parentDictionaryId = await umbracoApi.dictionary.create(parentDictionaryName);
     await umbracoApi.dictionary.create(dictionaryName, [], parentDictionaryId);
     await umbracoUi.dictionary.goToSection(ConstantHelper.sections.dictionary);
 
-    //Act
+    // Act
     await umbracoUi.dictionary.clickActionsMenuForDictionary(dictionaryName);
     await umbracoUi.dictionary.clickExportMenu();
     await umbracoUi.dictionary.exportDictionary(true);
@@ -109,7 +106,7 @@ test.describe('Dictionary tests', () => {
     await umbracoApi.dictionary.create(dictionaryName);
     await umbracoUi.dictionary.goToSection(ConstantHelper.sections.dictionary);
 
-    //Act
+    // Act
     await umbracoUi.dictionary.clickActionsMenuForDictionary(dictionaryName);
     await umbracoUi.dictionary.clickImportMenu();
     await umbracoUi.dictionary.importDictionary(udtFilePath);   
@@ -123,13 +120,12 @@ test.describe('Dictionary tests', () => {
   test.skip('can import a dictionary item with descendants', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const udtFilePath = './fixtures/dictionary/TestDictionaryWithDescendants.udt';
-    let parentDictionaryId;
     await umbracoApi.dictionary.ensureNameNotExists(parentDictionaryName);
-    parentDictionaryId = await umbracoApi.dictionary.create(parentDictionaryName);
+    let parentDictionaryId = await umbracoApi.dictionary.create(parentDictionaryName);
     await umbracoApi.dictionary.create(dictionaryName, [], parentDictionaryId);
     await umbracoUi.dictionary.goToSection(ConstantHelper.sections.dictionary);
 
-    //Act
+    // Act
     await umbracoUi.dictionary.clickActionsMenuForDictionary(dictionaryName);
     await umbracoUi.dictionary.clickImportMenu();
     await umbracoUi.dictionary.importDictionary(udtFilePath);   
@@ -145,7 +141,7 @@ test.describe('Dictionary tests', () => {
     await umbracoApi.dictionary.create(dictionaryName);
     await umbracoUi.dictionary.goToSection(ConstantHelper.sections.dictionary);
 
-    //Act
+    // Act
     await umbracoUi.dictionary.enterSearchKeywordAndPressEnter(dictionaryName);
 
     // Assert
@@ -159,7 +155,7 @@ test.describe('Dictionary tests', () => {
     await umbracoApi.dictionary.create(dictionaryName);
     await umbracoUi.dictionary.goToSection(ConstantHelper.sections.dictionary);
 
-    //Act
+    // Act
     await umbracoUi.dictionary.enterSearchKeywordAndPressEnter('xyz');
 
     // Assert
