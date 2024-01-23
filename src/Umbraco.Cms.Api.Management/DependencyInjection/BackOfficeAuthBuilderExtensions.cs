@@ -38,28 +38,28 @@ public static class BackOfficeAuthBuilderExtensions
     {
         builder.Services
             .AddAuthentication()
-            .AddCookie(Constants.Security.NewBackOfficeAuthenticationType, o =>
+            .AddCookie(Constants.Security.NewBackOfficeAuthenticationType, options =>
             {
-                o.LoginPath = "/umbraco/login";
-                o.Cookie.Name = Constants.Security.NewBackOfficeAuthenticationType;
+                options.LoginPath = "/umbraco/login";
+                options.Cookie.Name = Constants.Security.NewBackOfficeAuthenticationType;
             })
-            .AddCookie(Constants.Security.NewBackOfficeExternalAuthenticationType, o =>
+            .AddCookie(Constants.Security.NewBackOfficeExternalAuthenticationType, options =>
             {
-                o.Cookie.Name = Constants.Security.NewBackOfficeExternalAuthenticationType;
-                o.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+                options.Cookie.Name = Constants.Security.NewBackOfficeExternalAuthenticationType;
+                options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
             })
 
             // Although we don't natively support this, we add it anyways so that if end-users implement the required logic
             // they don't have to worry about manually adding this scheme or modifying the sign in manager
-            .AddCookie(Constants.Security.NewBackOfficeTwoFactorAuthenticationType, o =>
+            .AddCookie(Constants.Security.NewBackOfficeTwoFactorAuthenticationType, options =>
             {
-                o.Cookie.Name = Constants.Security.NewBackOfficeTwoFactorAuthenticationType;
-                o.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+                options.Cookie.Name = Constants.Security.NewBackOfficeTwoFactorAuthenticationType;
+                options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
             })
-            .AddCookie(Constants.Security.NewBackOfficeTwoFactorRememberMeAuthenticationType, o =>
+            .AddCookie(Constants.Security.NewBackOfficeTwoFactorRememberMeAuthenticationType, options =>
             {
-                o.Cookie.Name = Constants.Security.NewBackOfficeTwoFactorRememberMeAuthenticationType;
-                o.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+                options.Cookie.Name = Constants.Security.NewBackOfficeTwoFactorRememberMeAuthenticationType;
+                options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
             });
 
         return builder;

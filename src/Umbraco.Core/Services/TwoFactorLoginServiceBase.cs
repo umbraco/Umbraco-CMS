@@ -27,7 +27,9 @@ internal abstract class TwoFactorLoginServiceBase
             : Attempt.Fail(TwoFactorOperationStatus.ProviderNameNotFound);
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Gets the two factor providers on a specific user.
+    /// </summary>
     public virtual async Task<Attempt<IEnumerable<UserTwoFactorProviderModel>, TwoFactorOperationStatus>> GetProviderNamesAsync(Guid userKey)
     {
         IEnumerable<string> allProviders = _twoFactorLoginService.GetAllProviderNames();

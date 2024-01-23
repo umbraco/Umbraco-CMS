@@ -27,8 +27,7 @@ public static class ClaimsPrincipalExtensions
             return false;
         }
 
-        return claimsIdentity.IsAuthenticated &&
-               (claimsIdentity.AuthenticationType == AuthenticationType);
+        return claimsIdentity.IsAuthenticated && claimsIdentity.AuthenticationType == AuthenticationType;
     }
 
     /// <summary>

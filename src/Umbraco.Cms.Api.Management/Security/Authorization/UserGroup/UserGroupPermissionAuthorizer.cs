@@ -22,7 +22,7 @@ internal sealed class UserGroupPermissionAuthorizer : IUserGroupPermissionAuthor
     {
         if (!userGroupKeys.Any())
         {
-            // We can't denied no keys.
+            // We can't deny something that is not defined
             return false;
         }
 

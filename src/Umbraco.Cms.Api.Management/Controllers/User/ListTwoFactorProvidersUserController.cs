@@ -29,6 +29,7 @@ public class ListTwoFactorProvidersUserController : UserControllerBase
     [MapToApiVersion("1.0")]
     [HttpGet("{id:guid}/2fa")]
     [ProducesResponseType(typeof(IEnumerable<UserTwoFactorProviderModel>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ListTwoFactorProviders(Guid id)
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(

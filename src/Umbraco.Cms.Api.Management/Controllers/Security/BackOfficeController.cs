@@ -18,6 +18,7 @@ using Umbraco.Cms.Web.BackOffice.Security;
 using Umbraco.Extensions;
 using IdentitySignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 using SignInResult = Microsoft.AspNetCore.Mvc.SignInResult;
+using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Security;
 
@@ -65,21 +66,28 @@ public class BackOfficeController : SecurityControllerBase
 
         if (result.IsNotAllowed)
         {
-            return StatusCode(StatusCodes.Status403Forbidden, new ProblemDetailsBuilder()
+            return Forbid(new ProblemDetailsBuilder()
                 .WithTitle("User is not allowed")
-                .Build());
+                .WithDetail("The operation is not allowed on the user")
+                .Build()),
         }
         if (result.IsLockedOut)
         {
-            return StatusCode(StatusCodes.Status403Forbidden, new ProblemDetailsBuilder()
-                .WithTitle("User is locked.")
-                .Build());
+            return Forbid(new ProblemDetailsBuilder()
+                .WithTitle("User is locked")
+                .WithDetail("The user is locked, and need to be unlocked before more login attempts can be executed.")
+                .Build()),
         }
         if(result.RequiresTwoFactor)
         {
             return StatusCode(StatusCodes.Status402PaymentRequired, new ProblemDetailsBuilder()
                 .WithTitle("2FA required.")
                 .Build());
+
+            return StatusCode(StatusCodes.Status402PaymentRequired,(new ProblemDetailsBuilder()
+                .WithTitle("2FA Required")
+                .WithDetail("The user is protected by 2FA. Please continue the login process and verify a 2FA code.")
+                .Build()),
         }
         return Ok();
     }
@@ -132,17 +140,6 @@ public class BackOfficeController : SecurityControllerBase
         public required string Username { get; init; }
 
         public required string Password { get; init; }
-    }
-
-    public class Verify2FACodeModel
-    {
-        public required string Code { get; set; }
-
-        public required string Provider { get; set; }
-
-        public bool IsPersistent { get; set; }
-
-        public bool RememberClient { get; set; }
     }
 
     // [AllowAnonymous] // This is handled implicitly by the NewDenyLocalLoginIfConfigured policy on the <see cref="SecurityControllerBase" />. Keep it here for now and check FIXME in <see cref="DenyLocalLoginHandler" />.

@@ -30,7 +30,7 @@ internal sealed class MediaPermissionAuthorizer : IMediaPermissionAuthorizer
 
         var result = await _mediaPermissionService.AuthorizeAccessAsync(user, mediaKeys);
 
-        // If we do not found it, we cannot tell if you are denied
+        // If we can't find the media item(s) then we can't determine whether you are denied access.
         return result is not (MediaAuthorizationStatus.Success or MediaAuthorizationStatus.NotFound);
     }
 
@@ -41,7 +41,7 @@ internal sealed class MediaPermissionAuthorizer : IMediaPermissionAuthorizer
 
         var result = await _mediaPermissionService.AuthorizeRootAccessAsync(user);
 
-        // If we do not found it, we cannot tell if you are denied
+        // If we can't find the media item(s) then we can't determine whether you are denied access.
         return result is not (MediaAuthorizationStatus.Success or MediaAuthorizationStatus.NotFound);
     }
 
@@ -52,7 +52,7 @@ internal sealed class MediaPermissionAuthorizer : IMediaPermissionAuthorizer
 
         var result = await _mediaPermissionService.AuthorizeBinAccessAsync(user);
 
-        // If we do not found it, we cannot tell if you are denied
+        // If we can't find the media item(s) then we can't determine whether you are denied access.
         return result is not (MediaAuthorizationStatus.Success or MediaAuthorizationStatus.NotFound);
     }
 }

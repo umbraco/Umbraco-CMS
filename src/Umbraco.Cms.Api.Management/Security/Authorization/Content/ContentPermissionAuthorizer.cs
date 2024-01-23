@@ -30,7 +30,7 @@ internal sealed class ContentPermissionAuthorizer : IContentPermissionAuthorizer
 
         var result = await _contentPermissionService.AuthorizeAccessAsync(user, contentKeys, permissionsToCheck);
 
-        // If we do not found it, we cannot tell if you are denied
+        // If we can't find the content item(s) then we can't determine whether you are denied access.
         return result is not (ContentAuthorizationStatus.Success or ContentAuthorizationStatus.NotFound);
     }
 
@@ -41,7 +41,7 @@ internal sealed class ContentPermissionAuthorizer : IContentPermissionAuthorizer
 
         var result = await _contentPermissionService.AuthorizeDescendantsAccessAsync(user, parentKey, permissionsToCheck);
 
-        // If we do not found it, we cannot tell if you are denied
+        // If we can't find the content item(s) then we can't determine whether you are denied access.
         return result is not (ContentAuthorizationStatus.Success or ContentAuthorizationStatus.NotFound);
     }
 
@@ -52,7 +52,7 @@ internal sealed class ContentPermissionAuthorizer : IContentPermissionAuthorizer
 
         var result = await _contentPermissionService.AuthorizeRootAccessAsync(user, permissionsToCheck);
 
-        // If we do not found it, we cannot tell if you are denied
+        // If we can't find the content item(s) then we can't determine whether you are denied access.
         return result is not (ContentAuthorizationStatus.Success or ContentAuthorizationStatus.NotFound);
     }
 
@@ -63,14 +63,17 @@ internal sealed class ContentPermissionAuthorizer : IContentPermissionAuthorizer
 
         var result = await _contentPermissionService.AuthorizeBinAccessAsync(user, permissionsToCheck);
 
-        // If we do not found it, we cannot tell if you are denied
+        // If we can't find the content item(s) then we can't determine whether you are denied access.
         return result is not (ContentAuthorizationStatus.Success or ContentAuthorizationStatus.NotFound);
     }
 
     public async Task<bool> IsDeniedForCultures(IPrincipal currentUser, ISet<string> culturesToCheck)
     {
         IUser user = _authorizationHelper.GetUmbracoUser(currentUser);
+
         ContentAuthorizationStatus result = await _contentPermissionService.AuthorizeCultureAccessAsync(user, culturesToCheck);
+
+        // If we can't find the content item(s) then we can't determine whether you are denied access.
         return result is not (ContentAuthorizationStatus.Success or ContentAuthorizationStatus.NotFound);
     }
 }
