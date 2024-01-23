@@ -66,6 +66,14 @@ export class UmbAuthContext extends UmbBaseController implements IUmbAuthContext
 	}
 
 	/**
+	 * Clears the token storage.
+	 * @memberof UmbAuthContext
+	 */
+	clearTokenStorage() {
+		return this.#authFlow.clearTokenStorage();
+	}
+
+	/**
 	 * Signs the user out by removing any tokens from the browser.
 	 * @return {*}  {Promise<void>}
 	 * @memberof UmbAuthContext
