@@ -114,6 +114,9 @@ public class DataValueReferenceFactoryCollection : BuilderCollectionBase<IDataVa
     /// <returns>
     /// All relation type aliases that are automatically tracked.
     /// </returns>
+    [Obsolete("Use GetAllAutomaticRelationTypesAliases. This will be removed in Umbraco 15.")]
+    public ISet<string> GetAutomaticRelationTypesAliases(PropertyEditorCollection propertyEditors) =>
+        GetAllAutomaticRelationTypesAliases(propertyEditors);
     public ISet<string> GetAllAutomaticRelationTypesAliases(PropertyEditorCollection propertyEditors)
     {
         // Always add default automatic relation types
