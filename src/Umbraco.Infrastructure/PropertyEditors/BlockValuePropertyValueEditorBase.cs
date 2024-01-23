@@ -39,6 +39,7 @@ internal abstract class BlockValuePropertyValueEditorBase : DataValueEditor, IDa
 
     protected IEnumerable<UmbracoEntityReference> GetBlockValueReferences(BlockValue blockValue)
     {
+        var result = new HashSet<UmbracoEntityReference>();
         BlockItemData.BlockPropertyValue[] propertyValues = blockValue.ContentData.Concat(blockValue.SettingsData)
             .SelectMany(x => x.PropertyValues.Values).ToArray();
         foreach (IGrouping<string, object?> valuesByPropertyEditorAlias in propertyValues.GroupBy(x => x.PropertyType.PropertyEditorAlias, x => x.Value))
@@ -54,7 +55,7 @@ internal abstract class BlockValuePropertyValueEditorBase : DataValueEditor, IDa
             {
                 foreach (UmbracoEntityReference value in districtValues.SelectMany(reference.GetReferences))
                 {
-                    yield return value;
+                    result.Add(value);
                 }
             }
 
@@ -62,10 +63,11 @@ internal abstract class BlockValuePropertyValueEditorBase : DataValueEditor, IDa
 
             foreach (UmbracoEntityReference value in references)
             {
-                yield return value;
+                result.Add(value);
             }
-
         }
+
+        return result;
     }
 
     /// <inheritdoc />
