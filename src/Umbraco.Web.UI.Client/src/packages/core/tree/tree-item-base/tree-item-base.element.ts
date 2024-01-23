@@ -104,7 +104,7 @@ export class UmbTreeItemBaseElement extends UmbLitElement {
 				.hasChildren=${this._hasChildren}
 				label="${ifDefined(this._item?.name)}"
 				href="${ifDefined(this._isSelectableContext ? undefined : this._href)}">
-				${this.#renderIcon()} ${this.#renderLabel()} ${this.#renderActions()} ${this.#renderChildItems()}
+				${this.#renderIconContainer()} ${this.#renderLabel()} ${this.#renderActions()} ${this.#renderChildItems()}
 				<slot></slot>
 			</uui-menu-item>
 		`;
@@ -114,7 +114,7 @@ export class UmbTreeItemBaseElement extends UmbLitElement {
 		return (e.target as HTMLSlotElement).assignedNodes({ flatten: true }).length > 0;
 	};
 
-	#renderIcon() {
+	#renderIconContainer() {
 		return html`
 			<slot
 				name="icon"
@@ -122,10 +122,23 @@ export class UmbTreeItemBaseElement extends UmbLitElement {
 				@slotchange=${(e: Event) => {
 					this._iconSlotHasChildren = this.#hasNodes(e);
 				}}></slot>
-			${this._iconAlias && !this._iconSlotHasChildren
-				? html` <uui-icon slot="icon" name="${this._iconAlias}"></uui-icon> `
-				: nothing}
+			${!this._iconSlotHasChildren ? this.#renderIcon() : nothing}
 		`;
+	}
+
+	#renderIcon() {
+		const icon = this._item?.icon;
+		const isFolder = this._item?.isFolder;
+
+		if (icon) {
+			return html`<uui-icon slot="icon" name="${icon}"></uui-icon>`;
+		}
+
+		if (isFolder) {
+			return html`<uui-icon slot="icon" name="icon-folder"></uui-icon>`;
+		}
+
+		return html`<uui-icon slot="icon" name="icon-circle-dotted"></uui-icon>`;
 	}
 
 	#renderLabel() {
