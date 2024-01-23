@@ -59,7 +59,6 @@ export class UmbInputBlockTypeElement<
 		typeof UMB_WORKSPACE_MODAL.VALUE
 	>;
 
-	/*
 	#datasetContext?: UmbPropertyDatasetContext;
 	#filter: Array<UmbBlockTypeBaseModel> = [];
 
@@ -72,7 +71,6 @@ export class UmbInputBlockTypeElement<
 			});
 		});
 	}
-	*/
 
 	create() {
 		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, async (modalManager) => {
@@ -86,7 +84,7 @@ export class UmbInputBlockTypeElement<
 							// Only pick elements:
 							docType.isElement &&
 							// Prevent picking the an already used element type:
-							this._items.find((x) => x.contentElementTypeKey === docType.unique) === undefined,
+							this.#filter.find((x) => x.contentElementTypeKey === docType.unique) === undefined,
 					},
 				});
 
