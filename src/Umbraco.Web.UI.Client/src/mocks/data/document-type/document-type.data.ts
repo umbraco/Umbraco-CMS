@@ -1488,7 +1488,6 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		containers: [],
 	},
 	{
-		type: 'document-type',
 		allowedTemplateIds: [],
 		defaultTemplateId: null,
 		id: 'test-block-id',
