@@ -1,52 +1,43 @@
-import { DOCUMENT_TYPE_DETAIL_REPOSITORY_ALIAS } from '../../../repository/index.js';
+import { UMB_DOCUMENT_TYPE_FOLDER_REPOSITORY_ALIAS } from '../../../tree/index.js';
 import { UmbDocumentTypeCreateOptionsModalData } from './index.js';
-import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import {
-	type UmbModalManagerContext,
-	type UmbModalContext,
-	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
-} from '@umbraco-cms/backoffice/modal';
-import { UMB_FOLDER_CREATE_MODAL } from '@umbraco-cms/backoffice/tree';
-import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
+import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
+import { UmbCreateFolderEntityAction } from '@umbraco-cms/backoffice/tree';
 
 @customElement('umb-document-type-create-options-modal')
-export class UmbDataTypeCreateOptionsModalElement extends UmbLitElement {
-	@property({ attribute: false })
-	modalContext?: UmbModalContext<UmbDocumentTypeCreateOptionsModalData>;
+export class UmbDataTypeCreateOptionsModalElement extends UmbModalBaseElement<UmbDocumentTypeCreateOptionsModalData> {
+	#createFolderAction?: UmbCreateFolderEntityAction<any>;
 
-	@property({ type: Object })
-	data?: UmbDocumentTypeCreateOptionsModalData;
+	connectedCallback(): void {
+		super.connectedCallback();
 
-	#modalContext?: UmbModalManagerContext;
+		if (this.data?.parentUnique === undefined) throw new Error('A parent unique is required to create a folder');
 
-	constructor() {
-		super();
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
-			this.#modalContext = instance;
-		});
+		this.#createFolderAction = new UmbCreateFolderEntityAction(
+			this,
+			UMB_DOCUMENT_TYPE_FOLDER_REPOSITORY_ALIAS,
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
+			// TODO: allow null for entity actions. Some actions can be executed on the root item
+			this.data.parentUnique,
+		);
 	}
 
-	#onClick(event: PointerEvent) {
+	async #onCreateFolderClick(event: PointerEvent) {
 		event.stopPropagation();
-		if (this.data?.parentKey === undefined) throw new Error('A parent unique is required to create a folder');
 
-		const folderModalHandler = this.#modalContext?.open(UMB_FOLDER_CREATE_MODAL, {
-			data: {
-				folderRepositoryAlias: DOCUMENT_TYPE_DETAIL_REPOSITORY_ALIAS,
-				parentUnique: this.data?.parentKey,
-			},
-		});
-		folderModalHandler?.onSubmit().then(() => this.modalContext?.submit());
+		try {
+			await this.#createFolderAction?.execute();
+			this._submitModal();
+		} catch (error) {
+			console.error(error);
+		}
 	}
 
 	// close the modal when navigating to data type
 	#onNavigate() {
-		this.modalContext?.submit();
-	}
-
-	#onCancel() {
-		this.modalContext?.reject();
+		this._rejectModal();
 	}
 
 	render() {
@@ -55,16 +46,16 @@ export class UmbDataTypeCreateOptionsModalElement extends UmbLitElement {
 				<uui-box>
 					<!-- TODO: construct url -->
 					<uui-menu-item
-						href=${`section/settings/workspace/document-type/create/${this.data?.parentKey || 'null'}`}
+						href=${`section/settings/workspace/document-type/create/${this.data?.parentUnique || 'null'}`}
 						label="New Document Type..."
 						@click=${this.#onNavigate}>
 						<uui-icon slot="icon" name="icon-autofill"></uui-icon>}
 					</uui-menu-item>
-					<uui-menu-item @click=${this.#onClick} label="New Folder...">
+					<uui-menu-item @click=${this.#onCreateFolderClick} label="New Folder...">
 						<uui-icon slot="icon" name="icon-folder"></uui-icon>}
 					</uui-menu-item>
 				</uui-box>
-				<uui-button slot="actions" id="cancel" label="Cancel" @click="${this.#onCancel}">Cancel</uui-button>
+				<uui-button slot="actions" id="cancel" label="Cancel" @click="${this._rejectModal}">Cancel</uui-button>
 			</umb-body-layout>
 		`;
 	}
