@@ -1,9 +1,9 @@
+import { UMB_SAVEABLE_WORKSPACE_CONTEXT } from '../saveable-workspace.context-token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_MODAL_CONTEXT_TOKEN, UmbModalContext } from '@umbraco-cms/backoffice/modal';
-import { UMB_SAVEABLE_WORKSPACE_CONTEXT, UMB_WORKSPACE_CONTEXT } from '..';
 
 /**
  * @element umb-workspace-footer
