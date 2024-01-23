@@ -26,6 +26,9 @@ test.describe('Script tests', () => {
     // Assert
     // TODO: Uncomment when the notification is visible
     // await umbracoUi.isSuccessNotificationVisible();
+
+    console.log(await umbracoApi.script.get(scriptPath));
+
     expect(await umbracoApi.script.doesNameExist(scriptPath)).toBeTruthy();
 
     // Clean

@@ -104,6 +104,7 @@ test.describe('Log Viewer tests', () => {
     await umbracoUi.logViewer.clickSearchButton();
     await umbracoUi.logViewer.clickSavedSearchesButton();
     await umbracoUi.logViewer.removeSavedSearchByName(searchName + ' ' + search);
+    await umbracoUi.logViewer.clickDeleteButton();
 
     // Assert
     // Checks if the saved search is visible in the UI
