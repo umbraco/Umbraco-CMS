@@ -10,7 +10,6 @@ import { css, html, customElement, property, state, repeat } from '@umbraco-cms/
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UMB_PROPERTY_DATASET_CONTEXT, UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
-import { UmbBlockGridType } from '@umbraco-cms/backoffice/block';
 
 @customElement('umb-input-block-type')
 export class UmbInputBlockTypeElement<
@@ -60,14 +59,14 @@ export class UmbInputBlockTypeElement<
 	>;
 
 	#datasetContext?: UmbPropertyDatasetContext;
-	#filter: Array<UmbBlockGridType> = [];
+	#filter: Array<UmbBlockTypeBase> = [];
 
 	constructor() {
 		super();
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, async (instance) => {
 			this.#datasetContext = instance;
 			this.observe(await this.#datasetContext?.propertyValueByAlias('blocks'), (value) => {
-				this.#filter = value as Array<UmbBlockGridType>;
+				this.#filter = value as Array<UmbBlockTypeBase>;
 			});
 		});
 	}
@@ -84,7 +83,7 @@ export class UmbInputBlockTypeElement<
 							// Only pick elements:
 							docType.isElement &&
 							// Prevent picking the an already used element type:
-							this.#filter.find((x: UmbBlockGridType) => x.contentElementTypeKey === docType.id) === undefined,
+							this.#filter.find((x) => x.contentElementTypeKey === docType.unique) === undefined,
 					},
 				});
 

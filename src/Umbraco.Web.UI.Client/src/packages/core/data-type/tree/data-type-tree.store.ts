@@ -32,8 +32,8 @@ export class UmbDataTypeTreeStore extends UmbUniqueTreeStore {
 
 	// TODO: revisit this when we have decided on detail model sizes
 	#createTreeItemMapper = (item: UmbDataTypeDetailModel) => {
-		return {
-			unique: item.unique!,
+		const treeItem: UmbDataTypeTreeItemModel = {
+			unique: item.unique,
 			parentUnique: item.parentUnique,
 			name: item.name,
 			entityType: item.entityType,
@@ -41,6 +41,8 @@ export class UmbDataTypeTreeStore extends UmbUniqueTreeStore {
 			isContainer: false,
 			hasChildren: false,
 		};
+
+		return treeItem;
 	};
 
 	// TODO: revisit this when we have decided on detail model sizes

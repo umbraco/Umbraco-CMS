@@ -55,7 +55,7 @@ export class DictionaryResource {
             url: '/umbraco/management/api/v1/dictionary',
             body: requestBody,
             mediaType: 'application/json',
-            responseHeader: 'Location',
+            responseHeader: 'Umb-Generated-Resource',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
@@ -168,7 +168,7 @@ export class DictionaryResource {
      * @returns any Success
      * @throws ApiError
      */
-    public static postDictionaryByIdMove({
+    public static putDictionaryByIdMove({
         id,
         requestBody,
     }: {
@@ -176,7 +176,7 @@ export class DictionaryResource {
         requestBody?: MoveDictionaryRequestModel,
     }): CancelablePromise<any> {
         return __request(OpenAPI, {
-            method: 'POST',
+            method: 'PUT',
             url: '/umbraco/management/api/v1/dictionary/{id}/move',
             path: {
                 'id': id,
@@ -205,7 +205,7 @@ export class DictionaryResource {
             url: '/umbraco/management/api/v1/dictionary/import',
             body: requestBody,
             mediaType: 'application/json',
-            responseHeader: 'Location',
+            responseHeader: 'Umb-Generated-Resource',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,

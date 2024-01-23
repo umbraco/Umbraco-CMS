@@ -1,14 +1,18 @@
 import {
 	ContentTypeCompositionTypeModel,
+	DocumentTypeItemResponseModel,
 	DocumentTypeResponseModel,
 	DocumentTypeTreeItemResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 
-export type UmbMockDocumentTypeModel = DocumentTypeResponseModel & DocumentTypeTreeItemResponseModel;
+export type UmbMockDocumentTypeModelHack = DocumentTypeResponseModel &
+	DocumentTypeTreeItemResponseModel &
+	DocumentTypeItemResponseModel;
+
+export interface UmbMockDocumentTypeModel extends Omit<UmbMockDocumentTypeModelHack, 'type'> {}
 
 export const data: Array<UmbMockDocumentTypeModel> = [
 	{
-		type: 'document-type',
 		allowedTemplateIds: [],
 		defaultTemplateId: null,
 		id: 'all-property-editors-document-type-id',
@@ -675,7 +679,6 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		variesByCulture: true,
 		variesBySegment: false,
 		isElement: false,
-		type: 'document-type',
 		hasChildren: false,
 		isContainer: false,
 		parentId: null,
@@ -732,7 +735,6 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		variesByCulture: true,
 		variesBySegment: false,
 		isElement: false,
-		type: 'document-type',
 		hasChildren: false,
 		isContainer: false,
 		parentId: null,
@@ -903,7 +905,6 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
-		type: 'document-type',
 		hasChildren: false,
 		isContainer: false,
 		parentId: null,
@@ -959,7 +960,6 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: true,
-		type: 'document-type',
 		hasChildren: false,
 		isContainer: false,
 		parentId: null,
@@ -1015,7 +1015,6 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: true,
-		type: 'document-type',
 		hasChildren: false,
 		isContainer: false,
 		parentId: null,
@@ -1075,7 +1074,6 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
-		type: 'document-type',
 		hasChildren: false,
 		isContainer: false,
 		parentId: null,
@@ -1134,7 +1132,6 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
-		type: 'document-type',
 		hasChildren: false,
 		isContainer: false,
 		parentId: null,
@@ -1199,7 +1196,6 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		},
 	},
 	{
-		type: 'document-type',
 		allowedTemplateIds: [],
 		defaultTemplateId: null,
 		id: 'folder-umbraco-demo-blocks-id',
@@ -1226,7 +1222,6 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		containers: [],
 	},
 	{
-		type: 'document-type',
 		allowedTemplateIds: [],
 		defaultTemplateId: null,
 		id: 'coffee-umbraco-demo-block-id',
@@ -1302,7 +1297,6 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		],
 	},
 	{
-		type: 'document-type',
 		allowedTemplateIds: [],
 		defaultTemplateId: null,
 		id: 'headline-umbraco-demo-block-id',
@@ -1358,7 +1352,6 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		],
 	},
 	{
-		type: 'document-type',
 		allowedTemplateIds: [],
 		defaultTemplateId: null,
 		id: 'image-umbraco-demo-block-id',
@@ -1414,7 +1407,6 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		],
 	},
 	{
-		type: 'document-type',
 		allowedTemplateIds: [],
 		defaultTemplateId: null,
 		id: 'rich-text-umbraco-demo-block-id',
@@ -1470,7 +1462,6 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		],
 	},
 	{
-		type: 'document-type',
 		allowedTemplateIds: [],
 		defaultTemplateId: null,
 		id: 'two-column-layout-umbraco-demo-block-id',

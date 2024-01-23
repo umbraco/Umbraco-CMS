@@ -6,4 +6,3 @@
 export type PublishDocumentRequestModel = {
     cultures: Array<string>;
 };
-

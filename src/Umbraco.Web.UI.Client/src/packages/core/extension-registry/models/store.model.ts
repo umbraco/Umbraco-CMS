@@ -10,6 +10,6 @@ export interface ManifestTreeStore extends ManifestApi<UmbTreeStore<any>> {
 	type: 'treeStore';
 }
 
-export interface ManifestItemStore extends ManifestApi<UmbItemStore> {
+export interface ManifestItemStore extends ManifestApi<UmbItemStore<any>> {
 	type: 'itemStore';
 }

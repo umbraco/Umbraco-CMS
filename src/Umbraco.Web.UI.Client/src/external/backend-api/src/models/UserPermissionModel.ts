@@ -7,4 +7,3 @@ export type UserPermissionModel = {
     nodeKey: string;
     permissions: Array<string>;
 };
-

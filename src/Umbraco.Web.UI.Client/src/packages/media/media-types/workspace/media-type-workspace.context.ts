@@ -1,16 +1,16 @@
 import { UmbMediaTypeDetailRepository } from '../repository/detail/media-type-detail.repository.js';
 import { UMB_MEDIA_TYPE_ENTITY_TYPE } from '../index.js';
+import { UmbMediaTypeDetailModel } from '../types.js';
 import {
 	UmbSaveableWorkspaceContextInterface,
 	UmbEditableWorkspaceContextBase,
 } from '@umbraco-cms/backoffice/workspace';
 import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
-import { type MediaTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 
-type EntityType = MediaTypeResponseModel;
+type EntityType = UmbMediaTypeDetailModel;
 export class UmbMediaTypeWorkspaceContext
 	extends UmbEditableWorkspaceContextBase<EntityType>
 	implements UmbSaveableWorkspaceContextInterface
@@ -30,17 +30,13 @@ export class UmbMediaTypeWorkspaceContext
 	readonly allowedContentTypes;
 	readonly compositions;
 
-	readonly structure;
+	readonly structure = new UmbContentTypePropertyStructureManager<EntityType>(this, this.repository);
 
 	#isSorting = new UmbBooleanState(undefined);
 	isSorting = this.#isSorting.asObservable();
 
 	constructor(host: UmbControllerHost) {
 		super(host, 'Umb.Workspace.MediaType');
-
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-ignore
-		this.structure = new UmbContentTypePropertyStructureManager(this.host, this.repository);
 
 		// General for content types:
 		this.data = this.structure.ownerContentType;
@@ -66,7 +62,7 @@ export class UmbMediaTypeWorkspaceContext
 	}
 
 	getEntityId() {
-		return this.getData()?.id;
+		return this.getData()?.unique;
 	}
 
 	getEntityType() {

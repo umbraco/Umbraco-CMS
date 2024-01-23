@@ -24,4 +24,3 @@ export type CreateContentTypeForMediaTypeRequestModel = {
     id?: string | null;
     containerId?: string | null;
 };
-

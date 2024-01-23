@@ -1,15 +1,12 @@
 import { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context.js';
 import './document-type-workspace-view-edit-property.element.js';
+import { UmbDocumentTypeDetailModel } from '../../../types.js';
 import { css, html, customElement, property, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbContentTypePropertyStructureHelper, PropertyContainerTypes } from '@umbraco-cms/backoffice/content-type';
 import { UmbSorterController, UmbSorterConfig } from '@umbraco-cms/backoffice/sorter';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import {
-	DocumentTypePropertyTypeResponseModel,
-	DocumentTypeResponseModel,
-	PropertyTypeModelBaseModel,
-} from '@umbraco-cms/backoffice/backend-api';
+import { DocumentTypePropertyTypeResponseModel, PropertyTypeModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UMB_PROPERTY_SETTINGS_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 
@@ -89,13 +86,13 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 		this._propertyStructureHelper.setContainerType(value);
 	}
 
-	_propertyStructureHelper = new UmbContentTypePropertyStructureHelper(this);
+	_propertyStructureHelper = new UmbContentTypePropertyStructureHelper<UmbDocumentTypeDetailModel>(this);
 
 	@state()
 	_propertyStructure: Array<PropertyTypeModelBaseModel> = [];
 
 	@state()
-	_ownerDocumentTypes?: DocumentTypeResponseModel[];
+	_ownerDocumentTypes?: UmbDocumentTypeDetailModel[];
 
 	@state()
 	protected _modalRouteNewProperty?: string;
@@ -129,7 +126,7 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 			.onSetup(async () => {
 				const documentTypeId = this._ownerDocumentTypes?.find(
 					(types) => types.containers?.find((containers) => containers.id === this.containerId),
-				)?.id;
+				)?.unique;
 				if (documentTypeId === undefined) return false;
 				const propertyData = await this._propertyStructureHelper.createPropertyScaffold(this._containerId);
 				if (propertyData === undefined) return false;
@@ -185,7 +182,7 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 
 						return html`<document-type-workspace-view-edit-property
 							data-umb-property-id=${ifDefined(property.id)}
-							owner-document-type-id=${ifDefined(inheritedFromDocument?.id)}
+							owner-document-type-id=${ifDefined(inheritedFromDocument?.unique)}
 							owner-document-type-name=${ifDefined(inheritedFromDocument?.name)}
 							?inherited=${property.containerId !== this.containerId}
 							?sort-mode-active=${this._sortModeActive}

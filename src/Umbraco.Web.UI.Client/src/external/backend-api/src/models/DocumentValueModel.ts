@@ -6,4 +6,3 @@
 import type { ValueModelBaseModel } from './ValueModelBaseModel';
 
 export type DocumentValueModel = ValueModelBaseModel;
-
