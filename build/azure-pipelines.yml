@@ -737,6 +737,7 @@ stages:
               storage: umbracoapidocs
               ContainerName: '$web'
               BlobPrefix: v$(umbracoMajorVersion)/csharp
+              CleanTargetBeforeCopy: true
       - job:
         displayName: Upload js Docs
         steps:
@@ -759,3 +760,4 @@ stages:
               storage: umbracoapidocs
               ContainerName: '$web'
               BlobPrefix: v$(umbracoMajorVersion)/ui
+              CleanTargetBeforeCopy: true
