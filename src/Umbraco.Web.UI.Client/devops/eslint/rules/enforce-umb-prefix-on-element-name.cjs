@@ -23,8 +23,8 @@ module.exports = {
 				if (isCustomElementDecorator) {
 					const elementName = node.arguments[0].value;
 
-					// check if the element name starts with 'umb-'
-					const isElementNameValid = elementName.startsWith('umb-');
+					// check if the element name starts with 'umb-', or 'test-', to be allow tests to have custom elements:
+					const isElementNameValid = elementName.startsWith('umb-') ?? elementName.startsWith('test-');
 
 					if (!isElementNameValid) {
 						context.report({
