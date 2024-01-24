@@ -9,6 +9,9 @@ import { UmbBooleanState, UmbDeepState, UmbStringState } from '@umbraco-cms/back
 import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { UMB_ACTION_EVENT_CONTEXT, UmbActionEventContext } from '@umbraco-cms/backoffice/action';
+import { UmbEntityActionEvent } from '@umbraco-cms/backoffice/entity-action';
+import { UmbReloadTreeItemRequestEntityActionEvent } from '@umbraco-cms/backoffice/tree';
 
 export type UmbTreeItemUniqueFunction<TreeItemType extends UmbTreeItemModelBase> = (
 	x: TreeItemType,
@@ -52,6 +55,7 @@ export class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemModelBase>
 	treeContext?: UmbTreeContextBase<TreeItemType>;
 	#sectionContext?: UmbSectionContext;
 	#sectionSidebarContext?: UmbSectionSidebarContext;
+	#actionEventContext?: UmbActionEventContext;
 	#getUniqueFunction: UmbTreeItemUniqueFunction<TreeItemType>;
 
 	constructor(host: UmbControllerHost, getUniqueFunction: UmbTreeItemUniqueFunction<TreeItemType>) {
@@ -129,6 +133,18 @@ export class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemModelBase>
 			this.#observeIsSelected();
 			this.#observeHasChildren();
 		});
+
+		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (instance) => {
+			this.#actionEventContext = instance;
+			this.#actionEventContext.removeEventListener(
+				UmbReloadTreeItemRequestEntityActionEvent.TYPE,
+				this.#onReloadRequest as EventListener,
+			);
+			this.#actionEventContext.addEventListener(
+				UmbReloadTreeItemRequestEntityActionEvent.TYPE,
+				this.#onReloadRequest as EventListener,
+			);
+		});
 	}
 
 	getTreeItem() {
@@ -205,6 +221,13 @@ export class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemModelBase>
 			this.#hasChildrenInitValueFlag = true;
 		});
 	}
+
+	#onReloadRequest = (event: UmbEntityActionEvent) => {
+		if (this.unique === undefined) return;
+		if (event.getUnique() !== this.unique) return;
+		if (event.getEntityType() !== this.entityType) return;
+		this.requestChildren();
+	};
 
 	// TODO: use router context
 	constructPath(pathname: string, entityType: string, unique: string | null) {
