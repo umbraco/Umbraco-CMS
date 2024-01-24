@@ -39,13 +39,13 @@
 				"import/no-unresolved": "off",
 				"import/order": "warn",
 				"local-rules/bad-type-import": "error",
+				"local-rules/enforce-element-suffix-on-element-class-name": "error",
+				"local-rules/enforce-umb-prefix-on-element-name": "error",
+				"local-rules/ensure-relative-import-use-js-extension": "error",
 				"local-rules/no-direct-api-import": "warn",
 				"local-rules/prefer-import-aliases": "error",
-				"local-rules/enforce-umb-prefix-on-element-name": "error",
-				"local-rules/enforce-element-suffix-on-element-class-name": "error",
-				"local-rules/umb-class-prefix": "error",
 				"local-rules/prefer-static-styles-last": "warn",
-				"local-rules/ensure-relative-import-use-js-extension": "error",
+				"local-rules/umb-class-prefix": "error",
 				"local-rules/enforce-umbraco-external-imports": [
 					"error",
 					{
@@ -60,7 +60,10 @@
 				],
 				"@typescript-eslint/no-non-null-assertion": "off",
 				"@typescript-eslint/no-explicit-any": "warn",
-				"@typescript-eslint/no-unused-vars": "warn"
+				"@typescript-eslint/no-unused-vars": "warn",
+				"@typescript-eslint/consistent-type-exports": "error",
+				"@typescript-eslint/consistent-type-imports": "error",
+				"@typescript-eslint/no-import-type-side-effects": "warn"
 			},
 			"settings": {
 				"import/parsers": {
