@@ -18,18 +18,18 @@ internal sealed class UserPermissionAuthorizer : IUserPermissionAuthorizer
     }
 
     /// <inheritdoc/>
-    public async Task<bool> IsAuthorizedAsync(IPrincipal currentUser, IEnumerable<Guid> userKeys)
+    public async Task<bool> IsDeniedAsync(IPrincipal currentUser, IEnumerable<Guid> userKeys)
     {
         if (!userKeys.Any())
         {
-            // Must succeed this requirement since we cannot process it.
-            return true;
+            // We can't denied no keys.
+            return false;
         }
 
         IUser performingUser = _authorizationHelper.GetUmbracoUser(currentUser);
 
-        var result = await _userPermissionService.AuthorizeAccessAsync(performingUser, userKeys);
+        UserAuthorizationStatus result = await _userPermissionService.AuthorizeAccessAsync(performingUser, userKeys);
 
-        return result == UserAuthorizationStatus.Success;
+        return result is not UserAuthorizationStatus.Success;
     }
 }

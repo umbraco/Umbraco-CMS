@@ -1,21 +1,21 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Api.Management.ViewModels.DocumentType.Composition;
+using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
-namespace Umbraco.Cms.Api.Management.Controllers.DocumentType.Composition;
+namespace Umbraco.Cms.Api.Management.Controllers.DocumentType;
 
 [ApiVersion("1.0")]
-public class ReferencesCompositionController : DocumentTypeControllerBase
+public class CompositionReferenceDocumentTypeController : DocumentTypeControllerBase
 {
     private readonly IContentTypeService _contentTypeService;
     private readonly IUmbracoMapper _umbracoMapper;
 
-    public ReferencesCompositionController(IContentTypeService contentTypeService, IUmbracoMapper umbracoMapper)
+    public CompositionReferenceDocumentTypeController(IContentTypeService contentTypeService, IUmbracoMapper umbracoMapper)
     {
         _contentTypeService = contentTypeService;
         _umbracoMapper = umbracoMapper;

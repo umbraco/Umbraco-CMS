@@ -41,7 +41,7 @@ public class PublishDocumentWithDescendantsController : DocumentControllerBase
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,
-            ContentPermissionResource.Branch(ActionPublish.ActionLetter, id),
+            ContentPermissionResource.Branch(ActionPublish.ActionLetter, id, requestModel.Cultures),
             AuthorizationPolicies.ContentPermissionByResource);
 
         if (!authorizationResult.Succeeded)

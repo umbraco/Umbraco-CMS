@@ -4,6 +4,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services.AuthorizationStatus;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
@@ -14,17 +15,20 @@ internal sealed class ContentPermissionService : IContentPermissionService
     private readonly IEntityService _entityService;
     private readonly IUserService _userService;
     private readonly AppCaches _appCaches;
+    private readonly ILanguageService _languageService;
 
     public ContentPermissionService(
         IContentService contentService,
         IEntityService entityService,
         IUserService userService,
-        AppCaches appCaches)
+        AppCaches appCaches,
+        ILanguageService languageService)
     {
         _contentService = contentService;
         _entityService = entityService;
         _userService = userService;
         _appCaches = appCaches;
+        _languageService = languageService;
     }
 
     /// <inheritdoc/>
@@ -128,6 +132,22 @@ internal sealed class ContentPermissionService : IContentPermissionService
         return HasPermissionAccess(user, new[] { Constants.System.RecycleBinContentString }, permissionsToCheck)
             ? ContentAuthorizationStatus.Success
             : ContentAuthorizationStatus.UnauthorizedMissingPathAccess;
+    }
+
+    /// <inheritdoc/>
+    public async Task<ContentAuthorizationStatus> AuthorizeCultureAccessAsync(IUser user, ISet<string> culturesToCheck)
+    {
+        if (user.Groups.Any(group => group.HasAccessToAllLanguages))
+        {
+            return ContentAuthorizationStatus.Success;
+        }
+
+        var allowedLanguages = user.Groups.SelectMany(g => g.AllowedLanguages).Distinct().ToArray();
+        var allowedLanguageIsoCodes = await _languageService.GetIsoCodesByIdsAsync(allowedLanguages);
+
+        return culturesToCheck.All(culture => allowedLanguageIsoCodes.InvariantContains(culture))
+            ? ContentAuthorizationStatus.Success
+            : ContentAuthorizationStatus.UnauthorizedMissingCulture;
     }
 
     /// <summary>

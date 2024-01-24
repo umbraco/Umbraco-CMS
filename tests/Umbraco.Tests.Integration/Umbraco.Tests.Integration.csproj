@@ -58,7 +58,7 @@
     <Compile Update="Umbraco.Infrastructure\Services\ContentEditingServiceTests.Copy.cs">
       <DependentUpon>ContentEditingServiceTests.cs</DependentUpon>
     </Compile>
-    <Compile Update="Umbraco.Infrastructure\Services\ContentEditingServiceTests.Delete.cs">
+    <Compile Update="Umbraco.Infrastructure\Services\ContentEditingServiceTests.DeleteFromRecycleBin.cs">
       <DependentUpon>ContentEditingServiceTests.cs</DependentUpon>
     </Compile>
     <Compile Update="Umbraco.Infrastructure\Services\ContentEditingServiceTests.Get.cs">
