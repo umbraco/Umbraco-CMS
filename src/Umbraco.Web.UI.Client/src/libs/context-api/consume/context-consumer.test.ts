@@ -12,6 +12,10 @@ class UmbTestContextConsumerClass {
 	public prop: string = 'value from provider';
 }
 
+class UmbTestAlternativeContextConsumerClass {
+	public alternativeProp: string = 'value from alternative provider';
+}
+
 describe('UmbContextConsumer', () => {
 	describe('Public API', () => {
 		let consumer: UmbContextConsumer;
@@ -153,19 +157,23 @@ describe('UmbContextConsumer', () => {
 		type A = { prop: string };
 
 		function discriminator(instance: unknown): instance is A {
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			return typeof (instance as any).prop === 'string';
 		}
 
 		function badDiscriminator(instance: unknown): instance is A {
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			return typeof (instance as any).notExistingProp === 'string';
 		}
 
-		it('discriminator determines the instance type', async () => {
+		it('discriminator determines the instance type', (done) => {
 			const localConsumer = new UmbContextConsumer(
 				document.body,
 				new UmbContextToken(testContextAlias, undefined, discriminator),
 				(instance: A) => {
-					console.log(instance);
+					expect(instance.prop).to.eq('value from provider');
+					done();
+					localConsumer.destroy();
 				},
 			);
 			localConsumer.hostConnected();
@@ -174,8 +182,6 @@ describe('UmbContextConsumer', () => {
 			type TestType = Exclude<typeof localConsumer.instance, undefined> extends A ? true : never;
 			const test: TestType = true;
 			expect(test).to.be.true;
-
-			localConsumer.destroy();
 		});
 
 		it('approving discriminator still fires callback', (done) => {
@@ -214,11 +220,71 @@ describe('UmbContextConsumer', () => {
 			);
 			localConsumer.hostConnected();
 
+			// Wait for to ensure the above request didn't succeed:
 			Promise.resolve().then(() => {
 				done();
 				localConsumer.hostDisconnected();
 				provider.hostDisconnected();
 			});
+		});
+
+		it('context api of same context alias will prevent request from propagating', (done) => {
+			const provider = new UmbContextProvider(document.body, testContextAlias, new UmbTestContextConsumerClass());
+			provider.hostConnected();
+
+			const element = document.createElement('div');
+			document.body.appendChild(element);
+
+			const alternativeProvider = new UmbContextProvider(
+				element,
+				testContextAlias,
+				new UmbTestAlternativeContextConsumerClass(),
+			);
+			alternativeProvider.hostConnected();
+
+			const localConsumer = new UmbContextConsumer(
+				element,
+				new UmbContextToken(testContextAlias, undefined, discriminator),
+				(_instance) => {
+					expect(_instance.prop).to.eq('this must not happen!');
+				},
+			);
+			localConsumer.hostConnected();
+
+			// Wait for to ensure the above request didn't succeed:
+			Promise.resolve().then(() => {
+				done();
+				localConsumer.hostDisconnected();
+				provider.hostDisconnected();
+			});
+		});
+
+		it('context api of same context alias will NOT prevent request from propagating when set to exactMatch', (done) => {
+			const provider = new UmbContextProvider(document.body, testContextAlias, new UmbTestContextConsumerClass());
+			provider.hostConnected();
+
+			const element = document.createElement('div');
+			document.body.appendChild(element);
+
+			const alternativeProvider = new UmbContextProvider(
+				element,
+				testContextAlias,
+				new UmbTestAlternativeContextConsumerClass(),
+			);
+			alternativeProvider.hostConnected();
+
+			const localConsumer = new UmbContextConsumer(
+				element,
+				new UmbContextToken(testContextAlias, undefined, discriminator),
+				(_instance) => {
+					expect(_instance.prop).to.eq('value from provider');
+					done();
+					localConsumer.hostDisconnected();
+					provider.hostDisconnected();
+				},
+			);
+			localConsumer.passContextAliasMatches();
+			localConsumer.hostConnected();
 		});
 	});
 });

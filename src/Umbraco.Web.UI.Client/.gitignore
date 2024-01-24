@@ -48,3 +48,6 @@ custom-elements.json
 # https://github.com/microsoft/vscode-custom-data
 vscode-html-custom-data.json
 public/tinymce/*
+
+# Vite runtime files
+vite.config.ts.timestamp-*.mjs

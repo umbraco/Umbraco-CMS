@@ -6,8 +6,7 @@
 import type { ItemResponseModelBaseModel } from './ItemResponseModelBaseModel';
 
 export type DocumentItemResponseModel = (ItemResponseModelBaseModel & {
-    icon?: string | null;
-    contentTypeId: string;
-    isTrashed: boolean;
+icon?: string | null;
+contentTypeId: string;
+isTrashed: boolean;
 });
-

@@ -54,10 +54,7 @@ export class UmbCurrentUserModalElement extends UmbLitElement {
 
 	private async _logout() {
 		if (!this.#authContext) return;
-		await this.#authContext.signOut();
-		let newUrl = this.#appContext ? `${this.#appContext.getBackofficePath()}/login` : '/';
-		newUrl = newUrl.replace(/\/\//g, '/');
-		location.href = newUrl;
+		this.#authContext.signOut();
 	}
 
 	render() {

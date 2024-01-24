@@ -6,4 +6,3 @@
 import type { PropertyTypeContainerModelBaseModel } from './PropertyTypeContainerModelBaseModel';
 
 export type UpdateMediaTypePropertyTypeContainerRequestModel = PropertyTypeContainerModelBaseModel;
-

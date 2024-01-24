@@ -2,16 +2,17 @@ import {
 	PropertyContainerTypes,
 	UmbContentTypePropertyStructureManager,
 } from './content-type-structure-manager.class.js';
+import { UmbContentTypeModel } from './types.js';
 import { DocumentTypePropertyTypeResponseModel, PropertyTypeModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
-export class UmbContentTypePropertyStructureHelper {
+export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel> {
 	#host: UmbControllerHostElement;
 	#init;
 	#initResolver?: (value: unknown) => void;
 
-	#structure?: UmbContentTypePropertyStructureManager;
+	#structure?: UmbContentTypePropertyStructureManager<T>;
 
 	private _containerType?: PropertyContainerTypes;
 	private _isRoot?: boolean;
@@ -33,7 +34,7 @@ export class UmbContentTypePropertyStructureHelper {
 		return this.#structure?.contentTypes;
 	}
 
-	public setStructureManager(structure: UmbContentTypePropertyStructureManager) {
+	public setStructureManager(structure: UmbContentTypePropertyStructureManager<T>) {
 		this.#structure = structure;
 		this.#initResolver?.(undefined);
 		this.#initResolver = undefined;
@@ -101,7 +102,7 @@ export class UmbContentTypePropertyStructureHelper {
 				});
 
 				// Fire update to subscribers:
-				this.#propertyStructure.next(_propertyStructure);
+				this.#propertyStructure.setValue(_propertyStructure);
 			},
 			'_observePropertyStructureOfGroup' + groupId,
 		);

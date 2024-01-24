@@ -1148,6 +1148,8 @@ export default {
 	},
 	contentPicker: {
 		allowedItemTypes: 'You can only select items of type(s): %0%',
+		defineDynamicRoot: 'Specify a Dynamic Root',
+		defineRootNode: 'Pick root node',
 		pickedTrashedItem: 'You have picked a content item currently deleted or in the recycle bin',
 		pickedTrashedItems: 'You have picked content items currently deleted or in the recycle bin',
 	},
@@ -1520,6 +1522,7 @@ export default {
 		addGroup: 'Add group',
 		inheritedFrom: 'Inherited from',
 		addProperty: 'Add property',
+		editProperty : 'Edit property',
 		requiredLabel: 'Required label',
 		enableListViewHeading: 'Enable list view',
 		enableListViewDescription:

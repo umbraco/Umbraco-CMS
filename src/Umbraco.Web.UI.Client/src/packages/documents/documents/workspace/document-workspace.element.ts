@@ -12,7 +12,7 @@ import { ManifestWorkspace, umbExtensionsRegistry } from '@umbraco-cms/backoffic
 @customElement('umb-document-workspace')
 export class UmbDocumentWorkspaceElement extends UmbLitElement {
 	#workspaceContext?: UmbDocumentWorkspaceContext;
-	#createElement = () => new UmbDocumentWorkspaceEditorElement();
+	#editorElement = () => new UmbDocumentWorkspaceEditorElement();
 
 	@state()
 	_routes: UmbRoute[] = [];
@@ -31,7 +31,7 @@ export class UmbDocumentWorkspaceElement extends UmbLitElement {
 		this._routes = [
 			{
 				path: 'create/:parentId/:documentTypeKey',
-				component: this.#createElement,
+				component: this.#editorElement,
 				setup: async (_component, info) => {
 					// TODO: Remember the perspective of permissions here, we need to check if the user has access to create a document of this type under this parent?
 					const parentId = info.match.params.parentId === 'null' ? null : info.match.params.parentId;
@@ -47,7 +47,7 @@ export class UmbDocumentWorkspaceElement extends UmbLitElement {
 			},
 			{
 				path: 'edit/:id',
-				component: this.#createElement,
+				component: this.#editorElement,
 				setup: (_component, info) => {
 					const id = info.match.params.id;
 					this.#workspaceContext!.load(id);

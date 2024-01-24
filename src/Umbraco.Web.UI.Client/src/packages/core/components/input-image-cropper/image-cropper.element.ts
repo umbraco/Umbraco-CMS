@@ -1,5 +1,5 @@
-import { clamp, calculateExtrapolatedValue, inverseLerp, lerp } from './mathUtils.js';
 import { UmbImageCropperCrop, UmbImageCropperFocalPoint } from './index.js';
+import { calculateExtrapolatedValue, clamp, inverseLerp, lerp } from '@umbraco-cms/backoffice/utils';
 import {
 	customElement,
 	property,

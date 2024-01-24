@@ -1,4 +1,5 @@
 import { UmbMediaTypeWorkspaceContext } from '../../media-type-workspace.context.js';
+import { UmbMediaTypeDetailModel } from '../../../types.js';
 import { css, html, customElement, property, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/content-type';
@@ -28,6 +29,7 @@ export class UmbMediaTypeWorkspaceViewEditTabElement extends UmbLitElement {
 
 	config: UmbSorterConfig<PropertyTypeContainerModelBaseModel> = {
 		...SORTER_CONFIG,
+		// TODO: Missing handlers to work properly: performItemMove and performItemRemove
 		performItemInsert: async (args) => {
 			if (!this._groups) return false;
 			const oldIndex = this._groups.findIndex((group) => group.id! === args.item.id);
@@ -92,7 +94,7 @@ export class UmbMediaTypeWorkspaceViewEditTabElement extends UmbLitElement {
 		this._groupStructureHelper.setIsRoot(value);
 	}
 
-	_groupStructureHelper = new UmbContentTypeContainerStructureHelper(this);
+	_groupStructureHelper = new UmbContentTypeContainerStructureHelper<UmbMediaTypeDetailModel>(this);
 
 	@state()
 	_groups: Array<PropertyTypeContainerModelBaseModel> = [];

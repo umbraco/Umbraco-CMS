@@ -1,4 +1,5 @@
 import { UmbMediaTypeWorkspaceContext } from '../../media-type-workspace.context.js';
+import { UmbMediaTypeDetailModel } from '../../../types.js';
 import type { UmbMediaTypeWorkspaceViewEditTabElement } from './media-type-workspace-view-edit-tab.element.js';
 import { css, html, customElement, state, repeat, nothing, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
@@ -38,6 +39,7 @@ export class UmbMediaTypeWorkspaceViewEditElement extends UmbLitElement implemen
 
 	config: UmbSorterConfig<PropertyTypeContainerModelBaseModel> = {
 		...SORTER_CONFIG,
+		// TODO: Missing handlers for these: performItemRemove, performItemMove
 		performItemInsert: async (args) => {
 			if (!this._tabs) return false;
 			const oldIndex = this._tabs.findIndex((tab) => tab.id! === args.item.id);
@@ -84,7 +86,7 @@ export class UmbMediaTypeWorkspaceViewEditElement extends UmbLitElement implemen
 
 	private _workspaceContext?: UmbMediaTypeWorkspaceContext;
 
-	private _tabsStructureHelper = new UmbContentTypeContainerStructureHelper(this);
+	private _tabsStructureHelper = new UmbContentTypeContainerStructureHelper<UmbMediaTypeDetailModel>(this);
 
 	private _modalManagerContext?: typeof UMB_MODAL_MANAGER_CONTEXT_TOKEN.TYPE;
 
@@ -155,7 +157,7 @@ export class UmbMediaTypeWorkspaceViewEditElement extends UmbLitElement implemen
 					setup: (component) => {
 						(component as UmbMediaTypeWorkspaceViewEditTabElement).tabName = tabName;
 						(component as UmbMediaTypeWorkspaceViewEditTabElement).ownerTabId =
-							this._workspaceContext?.structure.isOwnerContainer(tab.id!) ? tab.id : undefined;
+							this._tabsStructureHelper.isOwnerContainer(tab.id!) ? tab.id : undefined;
 					},
 				});
 			});

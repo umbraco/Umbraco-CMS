@@ -134,17 +134,12 @@ export class UmbLogViewerWorkspaceContext extends UmbBaseController implements U
 		}
 		this.setLogLevelsFilter(validLogLevels);
 
-		const dateRange: Partial<LogViewerDateRange> = {};
+		const dateRange: LogViewerDateRange = this.getDateRange() as LogViewerDateRange;
 
-		if (searchQuery.startDate) {
-			dateRange.startDate = searchQuery.startDate;
-		}
-
-		if (searchQuery.endDate) {
-			dateRange.endDate = searchQuery.endDate;
-		}
-
-		this.setDateRange(dateRange);
+		this.setDateRange({
+			startDate: searchQuery.startDate || dateRange.startDate,
+			endDate: searchQuery.endDate || dateRange.endDate,
+		});
 
 		this.setCurrentPage(searchQuery.page ? Number(searchQuery.page) : 1);
 
@@ -163,19 +158,23 @@ export class UmbLogViewerWorkspaceContext extends UmbBaseController implements U
 			return;
 		}
 
-		this.#dateRange.next({ startDate, endDate });
+		this.#dateRange.setValue({ startDate, endDate });
 		this.validateLogSize();
 		this.getLogCount();
 		this.getMessageTemplates(0, 10);
 	}
 
+	getDateRange() {
+		return this.#dateRange.getValue();
+	}
+
 	async getSavedSearches() {
 		const { data } = await this.#repository.getSavedSearches({ skip: 0, take: 100 });
 		if (data) {
-			this.#savedSearches.next(data);
+			this.#savedSearches.setValue(data);
 		} else {
 			//falback to some default searches resembling Umbraco <= 12
-			this.#savedSearches.next({
+			this.#savedSearches.setValue({
 				items: [
 					{
 						name: 'Find all logs where the Level is NOT Verbose and NOT Debug',
@@ -231,7 +230,7 @@ export class UmbLogViewerWorkspaceContext extends UmbBaseController implements U
 		const { data } = await this.#repository.getLogCount({ ...this.#dateRange.getValue() });
 
 		if (data) {
-			this.#logCount.next(data);
+			this.#logCount.setValue(data);
 		}
 	}
 
@@ -239,7 +238,7 @@ export class UmbLogViewerWorkspaceContext extends UmbBaseController implements U
 		const { data } = await this.#repository.getMessageTemplates({ skip, take, ...this.#dateRange.getValue() });
 
 		if (data) {
-			this.#messageTemplates.next(data);
+			this.#messageTemplates.setValue(data);
 		}
 	}
 
@@ -247,17 +246,17 @@ export class UmbLogViewerWorkspaceContext extends UmbBaseController implements U
 		const { data } = await this.#repository.getLogLevels({ skip, take });
 
 		if (data) {
-			this.#loggers.next(data);
+			this.#loggers.setValue(data);
 		}
 	}
 
 	async validateLogSize() {
 		const { error } = await this.#repository.getLogViewerValidateLogsSize({ ...this.#dateRange.getValue() });
 		if (error) {
-			this.#canShowLogs.next(false);
+			this.#canShowLogs.setValue(false);
 			return;
 		}
-		this.#canShowLogs.next(true);
+		this.#canShowLogs.setValue(true);
 	}
 
 	setCurrentPage(page: number) {
@@ -271,7 +270,7 @@ export class UmbLogViewerWorkspaceContext extends UmbBaseController implements U
 
 		const isPollingEnabled = this.#polling.getValue().enabled;
 
-		if (!isPollingEnabled) this.#isLoadingLogs.next(true);
+		if (!isPollingEnabled) this.#isLoadingLogs.setValue(true);
 
 		const skip = (this.currentPage - 1) * 100;
 		const take = 100;
@@ -286,18 +285,18 @@ export class UmbLogViewerWorkspaceContext extends UmbBaseController implements U
 		};
 
 		const { data } = await this.#repository.getLogs(options);
-		this.#isLoadingLogs.next(false);
+		this.#isLoadingLogs.setValue(false);
 		if (data) {
-			this.#logs.next(data);
+			this.#logs.setValue(data);
 		}
 	};
 
 	setFilterExpression(query: string) {
-		this.#filterExpression.next(query);
+		this.#filterExpression.setValue(query);
 	}
 
 	setLogLevelsFilter(logLevels: LogLevelModel[]) {
-		this.#logLevelsFilter.next(logLevels);
+		this.#logLevelsFilter.setValue(logLevels);
 	}
 
 	togglePolling() {
@@ -324,7 +323,7 @@ export class UmbLogViewerWorkspaceContext extends UmbBaseController implements U
 	toggleSortOrder() {
 		const direction = this.#sortingDirection.getValue();
 		const newDirection = direction === DirectionModel.ASCENDING ? DirectionModel.DESCENDING : DirectionModel.ASCENDING;
-		this.#sortingDirection.next(newDirection);
+		this.#sortingDirection.setValue(newDirection);
 	}
 }
 

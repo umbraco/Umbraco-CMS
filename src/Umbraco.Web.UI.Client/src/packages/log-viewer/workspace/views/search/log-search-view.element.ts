@@ -46,12 +46,9 @@ export class UmbLogViewerSearchViewElement extends UmbLitElement {
 					</div>
 				</div>
 
-				<uui-box>
-					${this._canShowLogs
-						? html`<umb-log-viewer-messages-list></umb-log-viewer-messages-list>`
-						: html`<umb-log-viewer-to-many-logs-warning
-								id="to-many-logs-warning"></umb-log-viewer-to-many-logs-warning>`}
-				</uui-box>
+				${this._canShowLogs
+					? html`<umb-log-viewer-messages-list></umb-log-viewer-messages-list>`
+					: html`<umb-log-viewer-to-many-logs-warning id="to-many-logs-warning"></umb-log-viewer-to-many-logs-warning>`}
 			</umb-body-layout>
 		`;
 	}

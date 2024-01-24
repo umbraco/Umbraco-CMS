@@ -97,7 +97,7 @@ export class UmbInputLanguagePickerElement extends FormControlMixin(UmbLitElemen
 		return undefined;
 	}
 
-	private _openPicker() {
+	#openPicker() {
 		this.#pickerContext.openPicker({
 			filter: this.filter,
 		});
@@ -105,19 +105,12 @@ export class UmbInputLanguagePickerElement extends FormControlMixin(UmbLitElemen
 
 	render() {
 		return html`
-			<uui-ref-list> ${this._items.map((item) => this._renderItem(item))} </uui-ref-list>
-			<uui-button
-				id="add-button"
-				look="placeholder"
-				@click=${this._openPicker}
-				label="open"
-				?disabled="${this._items.length === this.max}"
-				>Add</uui-button
-			>
+			<uui-ref-list> ${this._items.map((item) => this.#renderItem(item))} </uui-ref-list>
+			<uui-button id="add-button" look="placeholder" @click=${this.#openPicker} label="open">Add</uui-button>
 		`;
 	}
 
-	private _renderItem(item: LanguageItemResponseModel) {
+	#renderItem(item: LanguageItemResponseModel) {
 		if (!item.isoCode) return;
 		return html`
 			<!-- TODO: add language ref element -->

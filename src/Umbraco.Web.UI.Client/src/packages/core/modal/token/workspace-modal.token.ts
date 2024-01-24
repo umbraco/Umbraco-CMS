@@ -1,9 +1,7 @@
-import { CreateDataTypeRequestModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
-
-export interface UmbWorkspaceData {
+export interface UmbWorkspaceData<DataModelType = unknown> {
 	entityType: string;
-	preset: Partial<CreateDataTypeRequestModel>;
+	preset: Partial<DataModelType>;
 }
 
 // TODO: It would be good with a WorkspaceValueBaseType, to avoid the  hardcoded type for unique here:

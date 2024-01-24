@@ -1,7 +1,8 @@
-import { umbDocumentTypeData } from './document-type/document-type.db.js';
+import { umbDocumentTypeMockDb } from './document-type/document-type.db.js';
 import { umbUserPermissionData } from './user-permission.data.js';
 import { UmbEntityData } from './entity.data.js';
 import { createDocumentTreeItem } from './utils.js';
+import { UmbMockDocumentTypeModel } from './document-type/document-type.data.js';
 import {
 	ContentStateModel,
 	DocumentItemResponseModel,
@@ -15,7 +16,6 @@ import {
 	PublishedStateModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '@umbraco-cms/backoffice/document';
-import { UmbMockDocumentTypeModel } from './document-type/document-type.data.js';
 
 export const data: Array<DocumentResponseModel> = [
 	{
@@ -171,7 +171,23 @@ export const data: Array<DocumentResponseModel> = [
 				alias: 'blockList',
 				culture: null,
 				segment: null,
-				value: null,
+				value: {
+					layout: {
+						'Umbraco.BlockList': [
+							{
+								contentUdi: '1234',
+							},
+						],
+					},
+					contentData: [
+						{
+							udi: '1234',
+							contentTypeKey: '4f68ba66-6fb2-4778-83b8-6ab4ca3a7c5c',
+							elementProperty: 'Hello world',
+						},
+					],
+					settingsData: [],
+				},
 			},
 			{
 				alias: 'mediaPicker',
@@ -815,12 +831,12 @@ class UmbDocumentData extends UmbEntityData<DocumentResponseModel> {
 	getDocumentByIdAllowedDocumentTypes(id: string): PagedDocumentTypeResponseModel {
 		const item = this.getById(id);
 		if (item?.contentTypeId) {
-			const docType = umbDocumentTypeData.getById(item.contentTypeId);
+			const docType = umbDocumentTypeMockDb.read(item.contentTypeId);
 
 			if (docType) {
 				const allowedTypes = docType?.allowedContentTypes ?? [];
 				const mockedTypes = allowedTypes
-					.map((allowedType) => umbDocumentTypeData.getById(allowedType.id))
+					.map((allowedType) => umbDocumentTypeMockDb.read(allowedType.id))
 					.filter((item) => item !== undefined) as Array<UmbMockDocumentTypeModel>;
 				const items = mockedTypes.map((item) => mapToDocumentType(item));
 				const total = items.length;
@@ -831,7 +847,8 @@ class UmbDocumentData extends UmbEntityData<DocumentResponseModel> {
 	}
 
 	getAllowedDocumentTypesAtRoot(): PagedDocumentTypeResponseModel {
-		return umbDocumentTypeData.getAll(); //.filter((docType) => docType.allowedAsRoot);
+		const items = umbDocumentTypeMockDb.getData(); //.filter((docType) => docType.allowedAsRoot);
+		return { items, total: items.length };
 	}
 
 	getRecycleBinRoot(): PagedRecycleBinItemResponseModel {

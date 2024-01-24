@@ -1,3 +1,3 @@
 export interface UmbApi {
-	destroy?(): void;
+	destroy(): void;
 }

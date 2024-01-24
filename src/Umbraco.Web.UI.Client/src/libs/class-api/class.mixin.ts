@@ -4,12 +4,12 @@ import type { ClassConstructor } from '@umbraco-cms/backoffice/extension-api';
 import {
 	type UmbControllerHost,
 	UmbControllerHostMixin,
-	UmbController,
-	UmbControllerAlias,
+	type UmbController,
+	type UmbControllerAlias,
 } from '@umbraco-cms/backoffice/controller-api';
 import {
-	UmbContextToken,
-	UmbContextCallback,
+	type UmbContextToken,
+	type UmbContextCallback,
 	UmbContextConsumerController,
 	UmbContextProviderController,
 } from '@umbraco-cms/backoffice/context-api';
@@ -20,7 +20,8 @@ type UmbClassMixinConstructor = new (
 	controllerAlias?: UmbControllerAlias,
 ) => UmbClassMixinDeclaration;
 
-declare class UmbClassMixinDeclaration implements UmbClassMixinInterface {
+// TODO: we need the interface from EventTarget to be part of the controller base. As a temp solution the UmbClassMixinDeclaration extends EventTarget.
+declare class UmbClassMixinDeclaration extends EventTarget implements UmbClassMixinInterface {
 	_host: UmbControllerHost;
 	observe<T>(
 		source: Observable<T>,
@@ -44,7 +45,7 @@ declare class UmbClassMixinDeclaration implements UmbClassMixinInterface {
 	addController(controller: UmbController): void;
 	removeControllerByAlias(controllerAlias: UmbControllerAlias): void;
 	removeController(controller: UmbController): void;
-	getHostElement(): EventTarget;
+	getHostElement(): Element;
 
 	get controllerAlias(): UmbControllerAlias;
 	hostConnected(): void;
@@ -64,11 +65,11 @@ export const UmbClassMixin = <T extends ClassConstructor>(superClass: T) => {
 			this._host.addController(this);
 		}
 
-		getHostElement(): EventTarget {
+		getHostElement() {
 			return this._host.getHostElement();
 		}
 
-		get controllerAlias(): UmbControllerAlias {
+		get controllerAlias() {
 			return this._controllerAlias;
 		}
 
@@ -94,10 +95,7 @@ export const UmbClassMixin = <T extends ClassConstructor>(superClass: T) => {
 			BaseType = unknown,
 			ResultType extends BaseType = BaseType,
 			InstanceType extends ResultType = ResultType,
-		>(
-			contextAlias: string | UmbContextToken<BaseType, ResultType>,
-			instance: InstanceType,
-		): UmbContextProviderController {
+		>(contextAlias: string | UmbContextToken<BaseType, ResultType>, instance: InstanceType) {
 			return new UmbContextProviderController<BaseType, ResultType, InstanceType>(this, contextAlias, instance);
 		}
 
@@ -111,7 +109,7 @@ export const UmbClassMixin = <T extends ClassConstructor>(superClass: T) => {
 		consumeContext<BaseType = unknown, ResultType extends BaseType = BaseType>(
 			contextAlias: string | UmbContextToken<BaseType, ResultType>,
 			callback: UmbContextCallback<ResultType>,
-		): UmbContextConsumerController<BaseType, ResultType> {
+		) {
 			return new UmbContextConsumerController(this, contextAlias, callback);
 		}
 
@@ -122,7 +120,7 @@ export const UmbClassMixin = <T extends ClassConstructor>(superClass: T) => {
 		public destroy() {
 			if (this._host) {
 				this._host.removeController(this);
-				this._host = undefined as any;
+				this._host = undefined as never;
 			}
 			super.destroy();
 		}

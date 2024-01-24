@@ -9,4 +9,3 @@ export type PagedUserResponseModel = {
     total: number;
     items: Array<UserResponseModel>;
 };
-

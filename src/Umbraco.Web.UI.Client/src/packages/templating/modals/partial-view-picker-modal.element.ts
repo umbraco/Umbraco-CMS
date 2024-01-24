@@ -5,7 +5,7 @@ import {
 	UmbPartialViewPickerModalValue,
 	UmbModalBaseElement,
 } from '@umbraco-cms/backoffice/modal';
-import { UmbTreeElement } from '@umbraco-cms/backoffice/tree';
+import { UmbTreeElement, type UmbTreeSelectionConfiguration } from '@umbraco-cms/backoffice/tree';
 
 @customElement('umb-partial-view-picker-modal')
 export default class UmbPartialViewPickerModalElement extends UmbModalBaseElement<
@@ -13,26 +13,26 @@ export default class UmbPartialViewPickerModalElement extends UmbModalBaseElemen
 	UmbPartialViewPickerModalValue
 > {
 	@state()
-	_selection: Array<string | null> = [];
-
-	@state()
-	_multiple = false;
+	_selectionConfiguration: UmbTreeSelectionConfiguration = {
+		multiple: false,
+		selectable: true,
+		selection: [],
+	};
 
 	connectedCallback() {
 		super.connectedCallback();
-		this._selection = this.value?.selection ?? [];
-		this._multiple = this.data?.multiple ?? true;
+		this._selectionConfiguration.selection = this.value?.selection ?? [];
+		this._selectionConfiguration.multiple = this.data?.multiple ?? true;
 	}
 
 	private _handleSelectionChange(e: CustomEvent) {
 		e.stopPropagation();
 		const element = e.target as UmbTreeElement;
-		this._selection = this._multiple ? element.selection : [element.selection[element.selection.length - 1]];
+		this.value = { selection: element.getSelection() };
 		this._submit();
 	}
 
 	private _submit() {
-		this.value = { selection: this._selection };
 		this.modalContext?.submit();
 	}
 
@@ -48,8 +48,7 @@ export default class UmbPartialViewPickerModalElement extends UmbModalBaseElemen
 						<umb-tree
 							alias="Umb.Tree.PartialViews"
 							@selection-change=${this._handleSelectionChange}
-							.selection=${this._selection}
-							selectable></umb-tree>
+							.selectionConfiguration=${this._selectionConfiguration}></umb-tree>
 					</uui-box>
 				</div>
 				<div slot="actions">

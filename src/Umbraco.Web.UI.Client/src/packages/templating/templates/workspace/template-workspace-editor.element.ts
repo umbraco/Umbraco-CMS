@@ -1,7 +1,7 @@
 import type { UmbTemplatingInsertMenuElement } from '../../components/insert-menu/templating-insert-menu.element.js';
 import { UMB_MODAL_TEMPLATING_INSERT_SECTION_MODAL } from '../../modals/insert-section-modal/insert-section-modal.element.js';
 import { UMB_TEMPLATE_QUERY_BUILDER_MODAL } from '../modals/modal-tokens.js';
-import { getQuerySnippet } from '../../utils.js';
+import { getQuerySnippet } from '../../utils/index.js';
 import { UMB_TEMPLATE_WORKSPACE_CONTEXT } from './template-workspace.context.js';
 import type { UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
 import { camelCase } from '@umbraco-cms/backoffice/external/lodash';
@@ -137,7 +137,7 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 
 		modalContext?.onSubmit().then((value) => {
 			if (!value?.selection) return;
-			this.#templateWorkspaceContext?.setMasterTemplate(value.selection[0] ?? '');
+			this.#templateWorkspaceContext?.setMasterTemplate(value.selection[0] ?? null);
 		});
 	}
 

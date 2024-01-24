@@ -22,7 +22,7 @@ export class UmbTestControllerImplementation extends UmbControllerHostMixin(clas
 		this._host.addController(this);
 	}
 
-	getHostElement(): EventTarget {
+	getHostElement() {
 		// Different from class.mixin implementation is that we here have a ? to make sure the bad test can run.
 		return this._host?.getHostElement();
 	}

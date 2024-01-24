@@ -6,4 +6,3 @@
 import type { VariantResponseModelBaseModel } from './VariantResponseModelBaseModel';
 
 export type MediaVariantResponseModel = VariantResponseModelBaseModel;
-

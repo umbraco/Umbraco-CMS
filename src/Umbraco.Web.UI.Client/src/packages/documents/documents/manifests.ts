@@ -8,6 +8,7 @@ import { manifests as entityBulkActionManifests } from './entity-bulk-actions/ma
 import { manifests as propertyEditorManifests } from './property-editors/manifests.js';
 import { manifests as userPermissionManifests } from './user-permissions/manifests.js';
 import { manifests as recycleBinManifests } from './recycle-bin/manifests.js';
+import { manifests as trackedReferenceManifests } from './tracked-reference/manifests.js';
 
 export const manifests = [
 	...collectionManifests,
@@ -20,4 +21,5 @@ export const manifests = [
 	...propertyEditorManifests,
 	...userPermissionManifests,
 	...recycleBinManifests,
+	...trackedReferenceManifests,
 ];

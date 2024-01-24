@@ -1,3 +1,8 @@
+import {
+	UMB_PROPERTY_TYPE_WORKSPACE_ALIAS,
+	UmbPropertyTypeWorkspaceContext,
+} from './property-settings-modal.context.js';
+import { UMB_DOCUMENT_TYPE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/document-type';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UUIBooleanInputEvent, UUIInputEvent, UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
 import { PropertyValueMap, css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
@@ -7,10 +12,9 @@ import {
 	UmbModalBaseElement,
 } from '@umbraco-cms/backoffice/modal';
 import { generateAlias } from '@umbraco-cms/backoffice/utils';
-import { UMB_DOCUMENT_TYPE_DETAIL_STORE_CONTEXT } from '@umbraco-cms/backoffice/document-type';
 import { DocumentTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 // TODO: Could base take a token to get its types?.
-// TODO: Missing a workspace context... unless this should not be a workspace any way.
 @customElement('umb-property-settings-modal')
 export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 	UmbPropertySettingsModalData,
@@ -44,29 +48,31 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 
 	@state() private _aliasLocked = true;
 
-	@state()
-	protected _ownerDocumentType?: DocumentTypeResponseModel;
-
 	protected _originalPropertyData!: UmbPropertySettingsModalValue;
+
+	/** Indicates if the currently edited property is a new property or an existing */
+	#isNew = false;
+
+	#context = new UmbPropertyTypeWorkspaceContext(this);
+
+	@state()
+	private _documentVariesByCulture?: boolean;
+
+	@state()
+	private _documentVariesBySegment?: boolean;
 
 	connectedCallback(): void {
 		super.connectedCallback();
 
-		// TODO: This is actually not good enough, we need to be able to get to the DOCUMENT_WORKSPACE_CONTEXT, so we can have a look at the draft/runtime version of the document. Otherwise 'Vary by culture' is first updated when saved.
-		this.consumeContext(UMB_DOCUMENT_TYPE_DETAIL_STORE_CONTEXT, (instance) => {
+		this.consumeContext(UMB_DOCUMENT_TYPE_WORKSPACE_CONTEXT, (instance) => {
 			if (!this.data?.documentTypeId) return;
 
-			this.observe(
-				instance.byId(this.data.documentTypeId),
-				(documentType) => {
-					this._ownerDocumentType = documentType;
-					this.requestUpdate('_ownerDocumentType');
-				},
-				'_observeDocumentType',
-			);
-		});
+			this.observe(instance.variesByCulture, (variesByCulture) => (this._documentVariesByCulture = variesByCulture));
+			this.observe(instance.variesBySegment, (variesBySegment) => (this._documentVariesBySegment = variesBySegment));
+		}).skipOrigin();
 
 		this._originalPropertyData = this.value;
+		this.#isNew = this.value.alias === '';
 
 		const regEx = this.value.validation?.regEx ?? null;
 		if (regEx) {
@@ -124,6 +130,10 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 	#onAliasChange(event: UUIInputEvent) {
 		const alias = generateAlias(event.target.value.toString());
 		this.updateValue({ alias: this._aliasLocked ? this._originalPropertyData.alias : alias });
+	}
+
+	#onDescriptionChange(event: UUIInputEvent) {
+		this.updateValue({ description: event.target.value.toString() });
 	}
 
 	#onDataTypeIdChange(event: UUIInputEvent) {
@@ -209,14 +219,14 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 		});
 	}
 
-	// TODO: This would conceptually be a Property Editor Workspace, should be changed at one point in the future.
+	// TODO: This would conceptually be a Property Type Workspace, should be changed at one point in the future.
 	// For now this is hacky made available by giving the element an fixed alias.
 	// This would allow for workspace views and workspace actions.
 	render() {
 		return html`
 			<uui-form>
 				<form @submit="${this.#onSubmit}">
-					<umb-workspace-editor alias="Umb.Workspace.PropertyEditor" headline="Property settings">
+					<umb-workspace-editor alias=${UMB_PROPERTY_TYPE_WORKSPACE_ALIAS} headline=${this.localize.term(this.#isNew ? 'contentTypeEditor_addProperty' : 'contentTypeEditor_editProperty')}>
 						<div id="content">
 							<uui-box>
 								<div class="container">
@@ -244,6 +254,7 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 									<uui-textarea
 										id="description-input"
 										name="description"
+										@input=${this.#onDescriptionChange}
 										placeholder="Enter description..."
 										.value=${this.value.description}></uui-textarea>
 								</div>
@@ -266,7 +277,7 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 							</uui-box>
 						</div>
 						<div slot="actions">
-							<uui-button label="Submit" look="primary" color="positive" type="submit"></uui-button>
+							<uui-button label="${this.localize.term(this.#isNew ? 'general_add' : 'general_update')}" look="primary" color="positive" type="submit"></uui-button>
 						</div>
 					</umb-workspace-editor>
 				</form>
@@ -346,10 +357,10 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 	}
 
 	#renderVariationControls() {
-		return this._ownerDocumentType?.variesByCulture || this._ownerDocumentType?.variesBySegment
+		return this._documentVariesByCulture || this._documentVariesBySegment
 			? html` <div class="container">
 						<b>Variation</b>
-						${this._ownerDocumentType?.variesByCulture ? this.#renderVaryByCulture() : ''}
+						${this._documentVariesByCulture ? this.#renderVaryByCulture() : ''}
 					</div>
 					<hr />`
 			: '';

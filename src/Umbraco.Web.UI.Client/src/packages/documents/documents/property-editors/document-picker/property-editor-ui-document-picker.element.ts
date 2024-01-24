@@ -5,7 +5,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
 @customElement('umb-property-editor-ui-document-picker')
-export class UmbPropertyEditorUIContentPickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
+export class UmbPropertyEditorUIDocumentPickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	private _value: Array<string> = [];
 
 	@property({ type: Array })
@@ -48,10 +48,10 @@ export class UmbPropertyEditorUIContentPickerElement extends UmbLitElement imple
 	}
 }
 
-export default UmbPropertyEditorUIContentPickerElement;
+export default UmbPropertyEditorUIDocumentPickerElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-property-editor-ui-document-picker': UmbPropertyEditorUIContentPickerElement;
+		'umb-property-editor-ui-document-picker': UmbPropertyEditorUIDocumentPickerElement;
 	}
 }

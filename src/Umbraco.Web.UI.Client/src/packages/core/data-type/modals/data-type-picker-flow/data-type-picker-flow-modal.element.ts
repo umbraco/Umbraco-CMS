@@ -4,7 +4,6 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import {
 	UMB_DATA_TYPE_PICKER_FLOW_DATA_TYPE_PICKER_MODAL,
-	UMB_WORKSPACE_MODAL,
 	UmbDataTypePickerFlowModalData,
 	UmbDataTypePickerFlowModalValue,
 	UmbModalBaseElement,
@@ -13,6 +12,7 @@ import {
 } from '@umbraco-cms/backoffice/modal';
 import { ManifestPropertyEditorUi, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbEntityTreeItemModel } from '@umbraco-cms/backoffice/tree';
+import { UMB_DATATYPE_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/data-type';
 
 interface GroupedItems<T> {
 	[key: string]: Array<T>;
@@ -73,7 +73,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 				this.requestUpdate('_dataTypePickerModalRouteBuilder');
 			});
 
-		this._createDataTypeModal = new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
+		this._createDataTypeModal = new UmbModalRouteRegistrationController(this, UMB_DATATYPE_WORKSPACE_MODAL)
 			.addAdditionalPath(':uiAlias')
 			.onSetup((params) => {
 				return { data: { entityType: 'data-type', preset: { editorUiAlias: params.uiAlias } } };

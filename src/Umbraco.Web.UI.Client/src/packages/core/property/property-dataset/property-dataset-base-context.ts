@@ -1,9 +1,9 @@
+import type { UmbPropertyValueData } from '../types/property-value-data.type.js';
 import {
 	UMB_PROPERTY_DATASET_CONTEXT,
 	type UmbNameablePropertyDatasetContext,
 	type UmbPropertyDatasetContext,
 } from '@umbraco-cms/backoffice/property';
-import type { UmbPropertyValueData } from '../types/property-value-data.type.js';
 import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbArrayState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
@@ -36,7 +36,7 @@ export class UmbPropertyDatasetBaseContext
 		return this.#name.getValue();
 	}
 	setName(name: string | undefined) {
-		this.#name.next(name);
+		this.#name.setValue(name);
 	}
 	getVariantId() {
 		return UmbVariantId.CreateInvariant();
@@ -69,6 +69,6 @@ export class UmbPropertyDatasetBaseContext
 		return this.#values.getValue();
 	}
 	setValues(map: Array<UmbPropertyValueData>) {
-		this.#values.next(map);
+		this.#values.setValue(map);
 	}
 }

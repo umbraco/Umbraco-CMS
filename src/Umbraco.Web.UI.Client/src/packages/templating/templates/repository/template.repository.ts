@@ -4,7 +4,7 @@ import { UmbTemplateDetailServerDataSource } from './sources/template.detail.ser
 import { UMB_TEMPLATE_ITEM_STORE_CONTEXT, UmbTemplateItemStore } from './template-item.store.js';
 import { UmbTemplateItemServerDataSource } from './sources/template.item.server.data.js';
 import { UmbTemplateQueryBuilderServerDataSource } from './sources/template.query-builder.server.data.js';
-import type { UmbDetailRepository, UmbItemDataSource, UmbItemRepository } from '@umbraco-cms/backoffice/repository';
+import type { UmbItemDataSource, UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
@@ -12,17 +12,13 @@ import type {
 	CreateTemplateRequestModel,
 	TemplateItemResponseModel,
 	TemplateQueryExecuteModel,
-	TemplateResponseModel,
 	UpdateTemplateRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
 export class UmbTemplateRepository
 	extends UmbBaseController
-	implements
-		UmbDetailRepository<CreateTemplateRequestModel, string, UpdateTemplateRequestModel, TemplateResponseModel>,
-		UmbItemRepository<TemplateItemResponseModel>,
-		UmbApi
+	implements UmbItemRepository<TemplateItemResponseModel>, UmbApi
 {
 	#init;
 

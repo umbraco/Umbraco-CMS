@@ -1,23 +1,29 @@
 {
 	"compilerOptions": {
 		"module": "esnext",
-		"target": "esnext",
+		"target": "ES2020",
 		"lib": ["es2020", "dom", "dom.iterable"],
-		"noEmit": true,
 		"outDir": "./types",
-		"strict": true,
-		"noImplicitReturns": true,
-		"noFallthroughCasesInSwitch": true,
-		"moduleResolution": "node",
-		"isolatedModules": true,
 		"allowSyntheticDefaultImports": true,
 		"experimentalDecorators": true,
 		"forceConsistentCasingInFileNames": true,
 		"useDefineForClassFields": false,
-		"skipLibCheck": true,
-		"resolveJsonModule": true,
 		"baseUrl": ".",
 		"incremental": true,
+		"skipLibCheck": true,
+
+		/* Bundler mode */
+		"moduleResolution": "bundler",
+		"allowImportingTsExtensions": true,
+		"resolveJsonModule": true,
+		"isolatedModules": true,
+		"noEmit": true,
+
+		/* Linting */
+		"strict": true,
+		"noFallthroughCasesInSwitch": true,
+		"noImplicitReturns": true,
+
 		"paths": {
 			// TODO: can we combine these of multiple tsconfigs so each package can hold their own?
 			// APPS
@@ -63,6 +69,7 @@
 			"@umbraco-cms/backoffice/entity-action": ["src/packages/core/entity-action"],
 			"@umbraco-cms/backoffice/entity-bulk-action": ["src/packages/core/entity-bulk-action"],
 			"@umbraco-cms/backoffice/extension-registry": ["src/packages/core/extension-registry"],
+			"@umbraco-cms/backoffice/server-file-system": ["src/packages/core/server-file-system"],
 			"@umbraco-cms/backoffice/id": ["src/packages/core/id"],
 			"@umbraco-cms/backoffice/localization": ["src/packages/core/localization"],
 			"@umbraco-cms/backoffice/macro": ["src/packages/core/macro"],
@@ -87,10 +94,13 @@
 			"@umbraco-cms/backoffice/data-type": ["./src/packages/core/data-type/index.ts"],
 			"@umbraco-cms/backoffice/language": ["./src/packages/settings/languages/index.ts"],
 			"@umbraco-cms/backoffice/logviewer": ["src/packages/log-viewer/index.ts"],
-			"@umbraco-cms/backoffice/relation-type": ["./src/packages/settings/relation-types/index.ts"],
+			"@umbraco-cms/backoffice/relation-types": ["src/packages/relations/relation-types/index.ts"],
+			"@umbraco-cms/backoffice/relations": ["src/packages/relations/relations/index.ts"],
 			"@umbraco-cms/backoffice/tags": ["./src/packages/tags/index.ts"],
 			"@umbraco-cms/backoffice/static-file": ["./src/packages/static-file/index.ts"],
 
+			"@umbraco-cms/backoffice/block": ["./src/packages/block/index.ts"],
+			"@umbraco-cms/backoffice/audit-log": ["src/packages/audit-log/index.ts"],
 			"@umbraco-cms/backoffice/dictionary": ["./src/packages/dictionary/dictionary/index.ts"],
 
 			// DOCUMENT MANAGEMENT

@@ -3,7 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { FileItemResponseModelBaseModel } from './FileItemResponseModelBaseModel';
+import type { FileSystemItemResponseModelBaseModel } from './FileSystemItemResponseModelBaseModel';
 
-export type PartialViewItemResponseModel = FileItemResponseModelBaseModel;
+export type PartialViewItemResponseModel = FileSystemItemResponseModelBaseModel;
 

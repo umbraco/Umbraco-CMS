@@ -6,4 +6,3 @@
 export type EnableUserRequestModel = {
     userIds: Array<string>;
 };
-
