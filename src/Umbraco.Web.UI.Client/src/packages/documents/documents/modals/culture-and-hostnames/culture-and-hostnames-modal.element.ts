@@ -30,9 +30,10 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 	#handleCancel() {
 		this.modalContext?.reject();
 	}
-	#handleSave() {
-		// TODO validation before submitting
-		this.#documentRepository.saveCultureAndHostnames(this.#unique!, this.value);
+
+	async #handleSave() {
+		const { error } = await this.#documentRepository.saveCultureAndHostnames(this.#unique!, this.value);
+		if (error) return;
 		this.modalContext?.submit();
 	}
 
