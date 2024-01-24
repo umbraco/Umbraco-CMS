@@ -3,7 +3,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UMB_MODAL_CONTEXT_TOKEN, UmbModalContext } from '@umbraco-cms/backoffice/modal';
+import { UMB_MODAL_CONTEXT, UmbModalContext } from '@umbraco-cms/backoffice/modal';
 
 /**
  * @element umb-workspace-footer
@@ -31,7 +31,7 @@ export class UmbWorkspaceFooterLayoutElement extends UmbLitElement {
 		this.consumeContext(UMB_SAVEABLE_WORKSPACE_CONTEXT, (context) => {
 			this._isNew = context.getIsNew();
 		});
-		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (context) => {
+		this.consumeContext(UMB_MODAL_CONTEXT, (context) => {
 			this._modalContext = context;
 		});
 	}

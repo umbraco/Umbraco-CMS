@@ -3,7 +3,7 @@ import { css, CSSResultGroup, html, customElement, state, repeat, query } from '
 import {
 	UmbNotificationHandler,
 	UmbNotificationContext,
-	UMB_NOTIFICATION_CONTEXT_TOKEN,
+	UMB_NOTIFICATION_CONTEXT,
 } from '@umbraco-cms/backoffice/notification';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
@@ -20,7 +20,7 @@ export class UmbBackofficeNotificationContainerElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_NOTIFICATION_CONTEXT, (instance) => {
 			this._notificationContext = instance;
 			this._observeNotifications();
 		});

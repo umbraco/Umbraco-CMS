@@ -1,4 +1,4 @@
-import { UmbInstallerContext, UMB_INSTALLER_CONTEXT_TOKEN } from '../installer.context.js';
+import { UmbInstallerContext, UMB_INSTALLER_CONTEXT } from '../installer.context.js';
 import { css, CSSResultGroup, html, customElement, state, unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
 
 import {
@@ -21,7 +21,7 @@ export class UmbInstallerConsentElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_INSTALLER_CONTEXT_TOKEN, (installerContext) => {
+		this.consumeContext(UMB_INSTALLER_CONTEXT, (installerContext) => {
 			this._installerContext = installerContext;
 			this._observeInstallerSettings();
 			this._observeInstallerData();

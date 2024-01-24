@@ -5,7 +5,7 @@ import { UUIInputPasswordElement } from '@umbraco-cms/backoffice/external/uui';
 import {
 	UmbNotificationDefaultData,
 	UmbNotificationContext,
-	UMB_NOTIFICATION_CONTEXT_TOKEN,
+	UMB_NOTIFICATION_CONTEXT,
 } from '@umbraco-cms/backoffice/notification';
 import {
 	UmbCreateUserSuccessModalData,
@@ -28,7 +28,7 @@ export class UmbUserCreateSuccessModalElement extends UmbModalBaseElement<
 	connectedCallback(): void {
 		super.connectedCallback();
 
-		this.consumeContext(UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => (this.#notificationContext = instance));
+		this.consumeContext(UMB_NOTIFICATION_CONTEXT, (instance) => (this.#notificationContext = instance));
 	}
 
 	protected async firstUpdated(): Promise<void> {

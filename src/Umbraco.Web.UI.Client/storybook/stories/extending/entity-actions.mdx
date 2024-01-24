@@ -131,14 +131,14 @@ If any additional contexts are needed, these can be consumed from the host eleme
 ```ts
 import { UmbEntityActionBase } from '@umbraco-cms/entity-action';
 import { UmbContextConsumerController } from '@umbraco-cms/controller';
-import { UMB_MODAL_SERVICE_CONTEXT_TOKEN } from '@umbraco-cms/modal';
+import { UMB_MODAL_SERVICE_CONTEXT } from '@umbraco-cms/modal';
 import { MyRepository } from './my-repository';
 
 export class MyEntityAction extends UmbEntityActionBase<MyRepository> {
 	constructor(host: UmbControllerHostElement, repositoryAlias: string, unique: string) {
 		super(host, repositoryAlias, unique);
 
-		new UmbContextConsumerController(this.host, UMB_MODAL_SERVICE_CONTEXT_TOKEN, (instance) => {
+		new UmbContextConsumerController(this.host, UMB_MODAL_SERVICE_CONTEXT, (instance) => {
 			this.#modalService = instance;
 		});
 	}
@@ -184,10 +184,12 @@ const manifest = {
 		label: 'My Entity Bulk Action',
 		repositoryAlias: 'My.Repository',
 	},
-	conditions: [{
-		alias: 'Umb.Condition.CollectionAlias',
-		match: 'my-collection-alias',
-	}],
+	conditions: [
+		{
+			alias: 'Umb.Condition.CollectionAlias',
+			match: 'my-collection-alias',
+		},
+	],
 };
 
 extensionRegistry.register(manifest);

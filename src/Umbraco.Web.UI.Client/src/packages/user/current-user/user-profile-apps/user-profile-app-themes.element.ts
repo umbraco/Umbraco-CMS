@@ -1,4 +1,4 @@
-import { UmbThemeContext, UMB_THEME_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/themes';
+import { UmbThemeContext, UMB_THEME_CONTEXT } from '@umbraco-cms/backoffice/themes';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -16,7 +16,7 @@ export class UmbUserProfileAppThemesElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_THEME_CONTEXT_TOKEN, (context) => {
+		this.consumeContext(UMB_THEME_CONTEXT, (context) => {
 			this.#themeContext = context;
 			this.observe(
 				context.theme,

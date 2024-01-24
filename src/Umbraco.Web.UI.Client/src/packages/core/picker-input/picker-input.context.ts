@@ -4,7 +4,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import {
 	UMB_CONFIRM_MODAL,
-	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
+	UMB_MODAL_MANAGER_CONTEXT,
 	UmbModalManagerContext,
 	UmbModalToken,
 	UmbPickerModalData,
@@ -50,7 +50,7 @@ export class UmbPickerInputContext<ItemType extends { name: string }> extends Um
 
 		this.#init = Promise.all([
 			this.#itemManager.init,
-			this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
+			this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
 				this.modalManager = instance;
 			}).asPromise(),
 		]);

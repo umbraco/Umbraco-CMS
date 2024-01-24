@@ -1,7 +1,7 @@
 import { UmbLogMessagesServerDataSource, UmbLogSearchesServerDataSource } from './sources/log-viewer.server.data.js';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
+import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import { DirectionModel, LogLevelModel, SavedLogSearchPresenationBaseModel } from '@umbraco-cms/backoffice/backend-api';
 
 // Move to documentation / JSdoc
@@ -20,7 +20,7 @@ export class UmbLogViewerRepository {
 		this.#searchDataSource = new UmbLogSearchesServerDataSource(this.#host);
 		this.#messagesDataSource = new UmbLogMessagesServerDataSource(this.#host);
 
-		this.#init = new UmbContextConsumerController(this.#host, UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
+		this.#init = new UmbContextConsumerController(this.#host, UMB_NOTIFICATION_CONTEXT, (instance) => {
 			this.#notificationService = instance;
 		}).asPromise();
 	}

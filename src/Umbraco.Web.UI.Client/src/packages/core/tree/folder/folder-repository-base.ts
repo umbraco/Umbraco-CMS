@@ -6,7 +6,7 @@ import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbTreeItemModelBase, UmbTreeStore } from '@umbraco-cms/backoffice/tree';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import { UMB_NOTIFICATION_CONTEXT_TOKEN, UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
+import { UMB_NOTIFICATION_CONTEXT, UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
 
 export type UmbFolderToTreeItemMapper<FolderTreeItemType extends UmbTreeItemModelBase> = (
 	item: UmbFolderModel,
@@ -37,7 +37,7 @@ export abstract class UmbFolderRepositoryBase<FolderTreeItemType extends UmbTree
 				this._treeStore = instance;
 			}).asPromise(),
 
-			this.consumeContext(UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
+			this.consumeContext(UMB_NOTIFICATION_CONTEXT, (instance) => {
 				this.#notificationContext = instance;
 			}).asPromise(),
 		]);

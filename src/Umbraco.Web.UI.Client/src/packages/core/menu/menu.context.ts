@@ -12,4 +12,4 @@ export class UmbMenuContext {
 	}
 }
 
-export const UMB_MENU_CONTEXT_TOKEN = new UmbContextToken<UmbMenuContext>('UMB_MENU_CONTEXT_TOKEN');
+export const UMB_MENU_CONTEXT = new UmbContextToken<UmbMenuContext>('UMB_MENU_CONTEXT');

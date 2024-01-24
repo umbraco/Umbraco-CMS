@@ -4,7 +4,7 @@ import { UUIBooleanInputEvent, UUIInputEvent } from '@umbraco-cms/backoffice/ext
 import { extractUmbColorVariable } from '@umbraco-cms/backoffice/resources';
 import {
 	UMB_ICON_PICKER_MODAL,
-	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
+	UMB_MODAL_MANAGER_CONTEXT,
 	UmbModalManagerContext,
 } from '@umbraco-cms/backoffice/modal';
 import {
@@ -40,7 +40,7 @@ export class UmbPropertyEditorUICollectionViewLayoutConfigurationElement
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
 			this._modalContext = instance;
 		});
 	}

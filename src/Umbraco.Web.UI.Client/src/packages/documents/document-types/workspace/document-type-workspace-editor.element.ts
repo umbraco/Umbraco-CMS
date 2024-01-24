@@ -4,7 +4,7 @@ import { css, html, customElement, state, ifDefined } from '@umbraco-cms/backoff
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import {
 	UmbModalManagerContext,
-	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
+	UMB_MODAL_MANAGER_CONTEXT,
 	UMB_ICON_PICKER_MODAL,
 } from '@umbraco-cms/backoffice/modal';
 import { generateAlias } from '@umbraco-cms/backoffice/utils';
@@ -38,7 +38,7 @@ export class UmbDocumentTypeWorkspaceEditorElement extends UmbLitElement {
 			this.#observeDocumentType();
 		});
 
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
 			this._modalContext = instance;
 		});
 	}

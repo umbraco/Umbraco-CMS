@@ -5,7 +5,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { type UmbBlockLayoutBaseModel } from '@umbraco-cms/backoffice/block';
 import '../ref-list-block/index.js';
 import '../inline-list-block/index.js';
-import { UMB_CONFIRM_MODAL, UMB_MODAL_MANAGER_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
+import { UMB_CONFIRM_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 /**
  * @element umb-property-editor-ui-block-list-block
@@ -55,7 +55,7 @@ export class UmbPropertyEditorUIBlockListBlockElement extends UmbLitElement impl
 	}
 
 	#requestDelete() {
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, async (modalManager) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, async (modalManager) => {
 			const modalContext = modalManager.open(UMB_CONFIRM_MODAL, {
 				data: {
 					headline: `Delete ${this._label}`,

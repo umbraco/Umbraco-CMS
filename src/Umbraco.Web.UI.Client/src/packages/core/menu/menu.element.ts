@@ -12,7 +12,7 @@ export class UmbMenuElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		//this.provideContext(UMB_MENU_CONTEXT_TOKEN, new UmbMenuContext());
+		//this.provideContext(UMB_MENU_CONTEXT, new UmbMenuContext());
 	}
 
 	render() {

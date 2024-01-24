@@ -2,7 +2,7 @@ import { css, html, customElement, property, state, PropertyValueMap } from '@um
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import {
 	UmbModalManagerContext,
-	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
+	UMB_MODAL_MANAGER_CONTEXT,
 	UMB_CONFIRM_MODAL,
 	UMB_DOCUMENT_PICKER_MODAL,
 } from '@umbraco-cms/backoffice/modal';
@@ -41,7 +41,7 @@ export class UmbInputDocumentGranularPermissionElement extends FormControlMixin(
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => (this.#modalContext = instance));
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => (this.#modalContext = instance));
 	}
 
 	protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {

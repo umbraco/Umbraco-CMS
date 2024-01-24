@@ -8,7 +8,7 @@ import { camelCase } from '@umbraco-cms/backoffice/external/lodash';
 import { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, query, state, nothing, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import {
-	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
+	UMB_MODAL_MANAGER_CONTEXT,
 	UMB_TEMPLATE_PICKER_MODAL,
 	UmbModalManagerContext,
 } from '@umbraco-cms/backoffice/modal';
@@ -45,7 +45,7 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
 			this._modalContext = instance;
 		});
 

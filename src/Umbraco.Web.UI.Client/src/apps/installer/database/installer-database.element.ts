@@ -1,4 +1,4 @@
-import { UmbInstallerContext, UMB_INSTALLER_CONTEXT_TOKEN } from '../installer.context.js';
+import { UmbInstallerContext, UMB_INSTALLER_CONTEXT } from '../installer.context.js';
 import { UUIButtonElement } from '@umbraco-cms/backoffice/external/uui';
 import {
 	css,
@@ -46,7 +46,7 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_INSTALLER_CONTEXT_TOKEN, (installerContext) => {
+		this.consumeContext(UMB_INSTALLER_CONTEXT, (installerContext) => {
 			this._installerContext = installerContext;
 			this._observeInstallerSettings();
 			this._observeInstallerData();

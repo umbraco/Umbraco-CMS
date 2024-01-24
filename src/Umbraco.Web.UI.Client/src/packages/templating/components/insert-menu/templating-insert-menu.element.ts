@@ -6,7 +6,7 @@ import { customElement, property, css, html } from '@umbraco-cms/backoffice/exte
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import {
 	UMB_DICTIONARY_ITEM_PICKER_MODAL,
-	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
+	UMB_MODAL_MANAGER_CONTEXT,
 	UMB_PARTIAL_VIEW_PICKER_MODAL,
 	UmbDictionaryItemPickerModalValue,
 	UmbModalManagerContext,
@@ -39,7 +39,7 @@ export class UmbTemplatingInsertMenuElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
 			this._modalContext = instance;
 		});
 	}
