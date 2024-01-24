@@ -10,7 +10,7 @@ export class UmbUserPickerModalElement extends UmbModalBaseElement<UmbUserPicker
 	@state()
 	private _users: Array<UserItemResponseModel> = [];
 
-	#selectionManager = new UmbSelectionManager();
+	#selectionManager = new UmbSelectionManager(this);
 	#userCollectionRepository = new UmbUserCollectionRepository(this);
 
 	connectedCallback(): void {

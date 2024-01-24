@@ -7,11 +7,10 @@ import type { HealthStatusModel } from './HealthStatusModel';
 
 export type IndexResponseModel = {
     name: string;
-    healthStatus?: HealthStatusModel;
+    healthStatus: HealthStatusModel;
     canRebuild: boolean;
-    searcherName?: string;
+    searcherName: string;
     documentCount: number;
     fieldCount: number;
     providerProperties?: Record<string, any> | null;
 };
-

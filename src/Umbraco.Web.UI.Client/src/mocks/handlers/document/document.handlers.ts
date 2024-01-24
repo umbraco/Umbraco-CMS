@@ -50,8 +50,8 @@ export const handlers = [
 	rest.delete(umbracoPath('/document/:id'), (req, res, ctx) => {
 		const id = req.params.id as string;
 		if (!id) return;
-		const document = umbDocumentData.getById(id);
-		return res(ctx.status(200), ctx.json(document));
+		umbDocumentData.delete([id]);
+		return res(ctx.status(200));
 	}),
 
 	rest.put(umbracoPath(`/document/:id`), async (req, res, ctx) => {
@@ -59,8 +59,8 @@ export const handlers = [
 		if (!id) return;
 		const data = await req.json();
 		if (!data) return;
-		const saved = umbDocumentData.save(id, data);
-		return res(ctx.status(200), ctx.json(saved));
+		umbDocumentData.save(id, data);
+		return res(ctx.status(200));
 	}),
 
 	rest.post(umbracoPath(`/document`), async (req, res, ctx) => {

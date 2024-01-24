@@ -24,8 +24,13 @@ export class UmbDeepState<T> extends UmbBasicState<T> {
 		return createObservablePart(this._subject, mappingFunction, memoizationFunction);
 	}
 
-	next(newData: T): void {
-		const frozenData = deepFreeze(newData);
+	/**
+	 * @method setValue
+	 * @param {T} data - The next data for this state to hold.
+	 * @description - Set the data of this state, if data is different than current this will trigger observations to update.
+	 */
+	setValue(data: T): void {
+		const frozenData = deepFreeze(data);
 		// Only update data if its different than current data.
 		if (!naiveObjectComparison(frozenData, this._subject.getValue())) {
 			this._subject.next(frozenData);

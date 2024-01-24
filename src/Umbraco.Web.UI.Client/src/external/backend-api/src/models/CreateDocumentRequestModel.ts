@@ -6,7 +6,6 @@
 import type { CreateContentForDocumentRequestModel } from './CreateContentForDocumentRequestModel';
 
 export type CreateDocumentRequestModel = (CreateContentForDocumentRequestModel & {
-    contentTypeId?: string;
-    templateId?: string | null;
+contentTypeId: string;
+templateId?: string | null;
 });
-

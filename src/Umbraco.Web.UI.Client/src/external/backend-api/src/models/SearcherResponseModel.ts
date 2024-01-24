@@ -4,6 +4,5 @@
 /* eslint-disable */
 
 export type SearcherResponseModel = {
-    name?: string;
+    name: string;
 };
-

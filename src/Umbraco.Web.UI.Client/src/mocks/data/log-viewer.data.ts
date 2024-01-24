@@ -34,7 +34,7 @@ class UmbLogViewerTemplatesData extends UmbData<LogTemplateResponseModel> {
 }
 
 class UmbLogViewerMessagesData extends UmbData<LogMessageResponseModel> {
-	constructor(data: LogTemplateResponseModel[]) {
+	constructor(data: LogMessageResponseModel[]) {
 		super(data);
 	}
 

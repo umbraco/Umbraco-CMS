@@ -70,6 +70,8 @@ export class UmbLanguageRepository extends UmbBaseController implements UmbItemR
 		const { data, error } = await this.#itemDataSource.getItems(isoCodes);
 
 		if (data) {
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
 			this.#languageItemStore?.appendItems(data);
 		}
 

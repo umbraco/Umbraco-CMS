@@ -1,9 +1,9 @@
 import type { UmbTreeItemContext } from '../tree-item-default/index.js';
+import { UmbTreeItemModelBase } from '../types.js';
 import { UMB_TREE_ITEM_CONTEXT_TOKEN } from './tree-item-base.context.js';
 import { css, html, nothing, customElement, state, ifDefined, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-tree-item-base')
 export class UmbTreeItemBaseElement extends UmbLitElement {
@@ -11,10 +11,10 @@ export class UmbTreeItemBaseElement extends UmbLitElement {
 	private _iconAlias?: string;
 
 	@state()
-	private _item?: TreeItemPresentationModel;
+	private _item?: UmbTreeItemModelBase;
 
 	@state()
-	private _childItems?: TreeItemPresentationModel[];
+	private _childItems?: UmbTreeItemModelBase[];
 
 	@state()
 	private _href?: string;
@@ -37,7 +37,7 @@ export class UmbTreeItemBaseElement extends UmbLitElement {
 	@state()
 	private _iconSlotHasChildren = false;
 
-	#treeItemContext?: UmbTreeItemContext<TreeItemPresentationModel>;
+	#treeItemContext?: UmbTreeItemContext<UmbTreeItemModelBase>;
 
 	constructor() {
 		super();
@@ -104,7 +104,7 @@ export class UmbTreeItemBaseElement extends UmbLitElement {
 				.hasChildren=${this._hasChildren}
 				label="${ifDefined(this._item?.name)}"
 				href="${ifDefined(this._isSelectableContext ? undefined : this._href)}">
-				${this.#renderIcon()} ${this.#renderLabel()} ${this.#renderActions()} ${this.#renderChildItems()}
+				${this.#renderIconContainer()} ${this.#renderLabel()} ${this.#renderActions()} ${this.#renderChildItems()}
 				<slot></slot>
 			</uui-menu-item>
 		`;
@@ -114,7 +114,7 @@ export class UmbTreeItemBaseElement extends UmbLitElement {
 		return (e.target as HTMLSlotElement).assignedNodes({ flatten: true }).length > 0;
 	};
 
-	#renderIcon() {
+	#renderIconContainer() {
 		return html`
 			<slot
 				name="icon"
@@ -122,10 +122,23 @@ export class UmbTreeItemBaseElement extends UmbLitElement {
 				@slotchange=${(e: Event) => {
 					this._iconSlotHasChildren = this.#hasNodes(e);
 				}}></slot>
-			${this._iconAlias && !this._iconSlotHasChildren
-				? html` <uui-icon slot="icon" name="${this._iconAlias}"></uui-icon> `
-				: nothing}
+			${!this._iconSlotHasChildren ? this.#renderIcon() : nothing}
 		`;
+	}
+
+	#renderIcon() {
+		const icon = this._item?.icon;
+		const isFolder = this._item?.isFolder;
+
+		if (icon) {
+			return html`<uui-icon slot="icon" name="${icon}"></uui-icon>`;
+		}
+
+		if (isFolder) {
+			return html`<uui-icon slot="icon" name="icon-folder"></uui-icon>`;
+		}
+
+		return html`<uui-icon slot="icon" name="icon-circle-dotted"></uui-icon>`;
 	}
 
 	#renderLabel() {
@@ -136,7 +149,7 @@ export class UmbTreeItemBaseElement extends UmbLitElement {
 		return this.#treeItemContext && this._item
 			? html`<umb-entity-actions-bundle
 					slot="actions"
-					.entityType=${this.#treeItemContext.type}
+					.entityType=${this.#treeItemContext.entityType}
 					.unique=${this.#treeItemContext.unique}
 					.label=${this._item.name}>
 			  </umb-entity-actions-bundle>`

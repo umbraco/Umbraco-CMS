@@ -4,6 +4,7 @@
 /* eslint-disable */
 import type { ResetPasswordRequestModel } from '../models/ResetPasswordRequestModel';
 import type { ResetPasswordTokenRequestModel } from '../models/ResetPasswordTokenRequestModel';
+import type { SecurityConfigurationResponseModel } from '../models/SecurityConfigurationResponseModel';
 import type { VerifyResetPasswordTokenRequestModel } from '../models/VerifyResetPasswordTokenRequestModel';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
@@ -16,11 +17,25 @@ export class SecurityResource {
      * @returns any Success
      * @throws ApiError
      */
+    public static getSecurityConfiguration(): CancelablePromise<SecurityConfigurationResponseModel> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/security/configuration',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
     public static postSecurityForgotPassword({
-        requestBody,
-    }: {
-        requestBody?: ResetPasswordRequestModel,
-    }): CancelablePromise<any> {
+requestBody,
+}: {
+requestBody?: ResetPasswordRequestModel,
+}): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/security/forgot-password',
@@ -33,14 +48,14 @@ export class SecurityResource {
     }
 
     /**
-     * @returns void
+     * @returns void 
      * @throws ApiError
      */
     public static postSecurityForgotPasswordReset({
-        requestBody,
-    }: {
-        requestBody?: ResetPasswordTokenRequestModel,
-    }): CancelablePromise<void> {
+requestBody,
+}: {
+requestBody?: ResetPasswordTokenRequestModel,
+}): CancelablePromise<void> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/security/forgot-password/reset',
@@ -48,20 +63,21 @@ export class SecurityResource {
             mediaType: 'application/json',
             errors: {
                 400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
         });
     }
 
     /**
-     * @returns void
+     * @returns void 
      * @throws ApiError
      */
     public static postSecurityForgotPasswordVerify({
-        requestBody,
-    }: {
-        requestBody?: (VerifyResetPasswordTokenRequestModel | ResetPasswordTokenRequestModel),
-    }): CancelablePromise<void> {
+requestBody,
+}: {
+requestBody?: (VerifyResetPasswordTokenRequestModel | ResetPasswordTokenRequestModel),
+}): CancelablePromise<void> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/security/forgot-password/verify',
@@ -69,6 +85,7 @@ export class SecurityResource {
             mediaType: 'application/json',
             errors: {
                 400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
         });

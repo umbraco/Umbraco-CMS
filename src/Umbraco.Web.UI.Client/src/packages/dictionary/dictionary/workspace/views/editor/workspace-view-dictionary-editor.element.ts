@@ -39,14 +39,14 @@ export class UmbWorkspaceViewDictionaryEditorElement extends UmbLitElement {
 
 		const translation = this._dictionary?.translations?.find((x) => x.isoCode === language.isoCode);
 
-		return html` <umb-workspace-property-layout label=${language.name ?? language.isoCode}>
+		return html` <umb-property-layout label=${language.name ?? language.isoCode}>
 			<uui-textarea
 				slot="editor"
 				name=${language.isoCode}
 				label="translation"
 				@change=${this.#onTextareaChange}
 				value=${ifDefined(translation?.translation)}></uui-textarea>
-		</umb-workspace-property-layout>`;
+		</umb-property-layout>`;
 	}
 
 	#onTextareaChange(e: Event) {

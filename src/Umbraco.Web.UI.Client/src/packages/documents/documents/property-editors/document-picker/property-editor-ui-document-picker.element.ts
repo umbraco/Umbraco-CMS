@@ -5,7 +5,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 
 @customElement('umb-property-editor-ui-document-picker')
-export class UmbPropertyEditorUIContentPickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
+export class UmbPropertyEditorUIDocumentPickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	private _value: Array<string> = [];
 
 	@property({ type: Array })
@@ -20,8 +20,8 @@ export class UmbPropertyEditorUIContentPickerElement extends UmbLitElement imple
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		const validationLimit = config?.find((x) => x.alias === 'validationLimit');
 
-		this._limitMin = (validationLimit?.value as any).min;
-		this._limitMax = (validationLimit?.value as any).max;
+		this._limitMin = (validationLimit?.value as any)?.min;
+		this._limitMax = (validationLimit?.value as any)?.max;
 	}
 
 	@state()
@@ -40,18 +40,18 @@ export class UmbPropertyEditorUIContentPickerElement extends UmbLitElement imple
 			<umb-input-document
 				@change=${this._onChange}
 				.selectedIds=${this._value}
-				.min=${this._limitMin}
-				.max=${this._limitMax}
+				.min=${this._limitMin ?? 0}
+				.max=${this._limitMax ?? Infinity}
 				>Add</umb-input-document
 			>
 		`;
 	}
 }
 
-export default UmbPropertyEditorUIContentPickerElement;
+export default UmbPropertyEditorUIDocumentPickerElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-property-editor-ui-document-picker': UmbPropertyEditorUIContentPickerElement;
+		'umb-property-editor-ui-document-picker': UmbPropertyEditorUIDocumentPickerElement;
 	}
 }

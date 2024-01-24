@@ -1,74 +1,55 @@
-import type { UmbTreeDataSource } from '@umbraco-cms/backoffice/tree';
-import { MediaTypeResource } from '@umbraco-cms/backoffice/backend-api';
+import { UMB_MEDIA_TYPE_ENTITY_TYPE, UMB_MEDIA_TYPE_FOLDER_ENTITY_TYPE } from '../entity.js';
+import { UmbMediaTypeTreeItemModel } from './types.js';
+import { MediaTypeResource, MediaTypeTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
+import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
 
 /**
  * A data source for the Media Type tree that fetches data from the server
  * @export
  * @class UmbMediaTypeTreeServerDataSource
- * @implements {UmbTreeDataSource}
+ * @extends {UmbTreeServerDataSourceBase}
  */
-export class UmbMediaTypeTreeServerDataSource implements UmbTreeDataSource {
-	#host: UmbControllerHost;
-
+export class UmbMediaTypeTreeServerDataSource extends UmbTreeServerDataSourceBase<
+	MediaTypeTreeItemResponseModel,
+	UmbMediaTypeTreeItemModel
+> {
 	/**
 	 * Creates an instance of UmbMediaTypeTreeServerDataSource.
 	 * @param {UmbControllerHost} host
 	 * @memberof UmbMediaTypeTreeServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
-		this.#host = host;
-	}
-
-	/**
-	 * Fetches the root items for the tree from the server
-	 * @return {*}
-	 * @memberof UmbMediaTypeTreeServerDataSource
-	 */
-	async getRootItems() {
-		return tryExecuteAndNotify(this.#host, MediaTypeResource.getTreeMediaTypeRoot({}));
-	}
-
-	/**
-	 * Fetches the children of a given parent id from the server
-	 * @param {(string | null)} parentId
-	 * @return {*}
-	 * @memberof UmbMediaTypeTreeServerDataSource
-	 */
-	async getChildrenOf(parentId: string | null) {
-		if (parentId === undefined) throw new Error('Parent id is missing');
-
-		/* TODO: should we make getRootItems() internal
-		so it only is a server concern that there are two endpoints? */
-		if (parentId === null) {
-			return this.getRootItems();
-		} else {
-			return tryExecuteAndNotify(
-				this.#host,
-				MediaTypeResource.getTreeMediaTypeChildren({
-					parentId,
-				}),
-			);
-		}
-	}
-
-	/**
-	 * Fetches the items for the given ids from the server
-	 * @param {Array<string>} ids
-	 * @return {*}
-	 * @memberof UmbMediaTypeTreeServerDataSource
-	 */
-	async getItems(ids: Array<string>) {
-		if (ids) {
-			throw new Error('Ids are missing');
-		}
-
-		return tryExecuteAndNotify(
-			this.#host,
-			MediaTypeResource.getMediaTypeItem({
-				id: ids,
-			}),
-		);
+		super(host, {
+			getRootItems,
+			getChildrenOf,
+			mapper,
+		});
 	}
 }
+
+// eslint-disable-next-line local-rules/no-direct-api-import
+const getRootItems = () => MediaTypeResource.getTreeMediaTypeRoot({});
+
+const getChildrenOf = (parentUnique: string | null) => {
+	if (parentUnique === null) {
+		return getRootItems();
+	} else {
+		// eslint-disable-next-line local-rules/no-direct-api-import
+		return MediaTypeResource.getTreeMediaTypeChildren({
+			parentId: parentUnique,
+		});
+	}
+};
+
+const mapper = (item: MediaTypeTreeItemResponseModel): UmbMediaTypeTreeItemModel => {
+	return {
+		unique: item.id,
+		parentUnique: item.parentId || null,
+		name: item.name,
+		entityType: item.isFolder ? UMB_MEDIA_TYPE_FOLDER_ENTITY_TYPE : UMB_MEDIA_TYPE_ENTITY_TYPE,
+		hasChildren: item.hasChildren,
+		isContainer: item.isContainer,
+		isFolder: item.isFolder,
+	};
+};

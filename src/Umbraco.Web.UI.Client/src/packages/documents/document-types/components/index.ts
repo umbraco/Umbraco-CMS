@@ -1,1 +1,3 @@
-import './document-type-input/document-type-input.element.js';
+import './input-document-type/input-document-type.element.js';
+
+export * from './input-document-type/input-document-type.element.js';

@@ -9,4 +9,3 @@ export type PagedSavedLogSearchResponseModel = {
     total: number;
     items: Array<SavedLogSearchResponseModel>;
 };
-

@@ -4,7 +4,7 @@ import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 import { UmbBasicState, appendToFrozenArray } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
-import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export type UmbModalType = 'dialog' | 'sidebar';
 
@@ -42,7 +42,9 @@ export class UmbModalManagerContext extends UmbContextBase<UmbModalManagerContex
 		const modalContext = new UmbModalContext(modalAlias, args);
 
 		// Append to store:
-		this.#modals.next(appendToFrozenArray(this.#modals.value, modalContext, (entry) => entry.key === modalContext.key));
+		this.#modals.setValue(
+			appendToFrozenArray(this.#modals.value, modalContext, (entry) => entry.key === modalContext.key),
+		);
 
 		// Return to implementor:
 		return modalContext;
@@ -62,7 +64,7 @@ export class UmbModalManagerContext extends UmbContextBase<UmbModalManagerContex
 	}
 
 	public remove(key: string) {
-		this.#modals.next(this.#modals.getValue().filter((modal) => modal.key !== key));
+		this.#modals.setValue(this.#modals.getValue().filter((modal) => modal.key !== key));
 	}
 }
 

@@ -1,4 +1,5 @@
 import { UmbUserCollectionFilterModel, UmbUserDetailModel } from '../types.js';
+import { UMB_COLLECTION_VIEW_USER_GRID } from './views/index.js';
 import { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
 import { UserOrderModel, UserStateModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
@@ -8,7 +9,7 @@ export class UmbUserCollectionContext extends UmbDefaultCollectionContext<
 	UmbUserCollectionFilterModel
 > {
 	constructor(host: UmbControllerHostElement) {
-		super(host, { pageSize: 50 });
+		super(host, { pageSize: 50, defaultViewAlias: UMB_COLLECTION_VIEW_USER_GRID });
 	}
 
 	/**

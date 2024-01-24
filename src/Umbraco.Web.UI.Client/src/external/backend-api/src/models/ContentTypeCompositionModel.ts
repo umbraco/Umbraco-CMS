@@ -6,7 +6,6 @@
 import type { ContentTypeCompositionTypeModel } from './ContentTypeCompositionTypeModel';
 
 export type ContentTypeCompositionModel = {
-    id?: string;
-    compositionType?: ContentTypeCompositionTypeModel;
+    id: string;
+    compositionType: ContentTypeCompositionTypeModel;
 };
-

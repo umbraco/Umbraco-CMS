@@ -15,16 +15,16 @@ export class TrackedReferenceResource {
      * @throws ApiError
      */
     public static getTrackedReferenceById({
-        id,
-        skip,
-        take = 20,
-        filterMustBeIsDependency = false,
-    }: {
-        id: string,
-        skip?: number,
-        take?: number,
-        filterMustBeIsDependency?: boolean,
-    }): CancelablePromise<PagedRelationItemResponseModel> {
+id,
+skip,
+take = 20,
+filterMustBeIsDependency = false,
+}: {
+id: string,
+skip?: number,
+take?: number,
+filterMustBeIsDependency?: boolean,
+}): CancelablePromise<PagedRelationItemResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tracked-reference/{id}',
@@ -36,6 +36,9 @@ export class TrackedReferenceResource {
                 'take': take,
                 'filterMustBeIsDependency': filterMustBeIsDependency,
             },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -44,16 +47,16 @@ export class TrackedReferenceResource {
      * @throws ApiError
      */
     public static getTrackedReferenceDescendantsByParentId({
-        parentId,
-        skip,
-        take = 20,
-        filterMustBeIsDependency = true,
-    }: {
-        parentId: string,
-        skip?: number,
-        take?: number,
-        filterMustBeIsDependency?: boolean,
-    }): CancelablePromise<PagedRelationItemResponseModel> {
+parentId,
+skip,
+take = 20,
+filterMustBeIsDependency = true,
+}: {
+parentId: string,
+skip?: number,
+take?: number,
+filterMustBeIsDependency?: boolean,
+}): CancelablePromise<PagedRelationItemResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tracked-reference/descendants/{parentId}',
@@ -65,6 +68,9 @@ export class TrackedReferenceResource {
                 'take': take,
                 'filterMustBeIsDependency': filterMustBeIsDependency,
             },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -73,16 +79,16 @@ export class TrackedReferenceResource {
      * @throws ApiError
      */
     public static getTrackedReferenceItem({
-        id,
-        skip,
-        take = 20,
-        filterMustBeIsDependency = true,
-    }: {
-        id?: Array<string>,
-        skip?: number,
-        take?: number,
-        filterMustBeIsDependency?: boolean,
-    }): CancelablePromise<PagedRelationItemResponseModel> {
+id,
+skip,
+take = 20,
+filterMustBeIsDependency = true,
+}: {
+id?: Array<string>,
+skip?: number,
+take?: number,
+filterMustBeIsDependency?: boolean,
+}): CancelablePromise<PagedRelationItemResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tracked-reference/item',
@@ -91,6 +97,9 @@ export class TrackedReferenceResource {
                 'skip': skip,
                 'take': take,
                 'filterMustBeIsDependency': filterMustBeIsDependency,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }

@@ -3,6 +3,7 @@ import { css, html, customElement, property, state } from '@umbraco-cms/backoffi
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { DataTypeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-data-type-input')
 export class UmbDataTypeInputElement extends FormControlMixin(UmbLitElement) {
@@ -62,15 +63,7 @@ export class UmbDataTypeInputElement extends FormControlMixin(UmbLitElement) {
 	@property()
 	public set value(idsString: string) {
 		// Its with full purpose we don't call super.value, as thats being handled by the observation of the context selection.
-		this.selectedIds = idsString.split(/[ ,]+/);
-	}
-
-	@property()
-	get pickableFilter() {
-		return this.#pickerContext.pickableFilter;
-	}
-	set pickableFilter(newVal) {
-		this.#pickerContext.pickableFilter = newVal;
+		this.selectedIds = splitStringToArray(idsString);
 	}
 
 	@state()

@@ -1,8 +1,10 @@
-import { FileSystemTreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
-import type { UmbFileSystemTreeItemModel, UmbFileSystemTreeRootModel } from '@umbraco-cms/backoffice/tree';
+import { UmbScriptEntityType, UmbScriptFolderEntityType, UmbScriptRootEntityType } from '../entity.js';
+import type { UmbUniqueTreeItemModel, UmbUniqueTreeRootModel } from '@umbraco-cms/backoffice/tree';
 
-export interface UmbScriptTreeItemModel extends FileSystemTreeItemPresentationModel, UmbFileSystemTreeItemModel {}
-// TODO: TREE STORE TYPE PROBLEM:
-export interface UmbScriptTreeRootModel
-	extends Omit<Omit<FileSystemTreeItemPresentationModel, 'id'>, 'path'>,
-		UmbFileSystemTreeRootModel {}
+export interface UmbScriptTreeItemModel extends UmbUniqueTreeItemModel {
+	entityType: UmbScriptEntityType | UmbScriptFolderEntityType;
+}
+
+export interface UmbScriptTreeRootModel extends UmbUniqueTreeRootModel {
+	entityType: UmbScriptRootEntityType;
+}

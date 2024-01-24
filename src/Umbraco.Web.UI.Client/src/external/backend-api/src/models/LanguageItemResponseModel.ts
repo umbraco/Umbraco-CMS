@@ -4,7 +4,6 @@
 /* eslint-disable */
 
 export type LanguageItemResponseModel = {
-    name?: string;
-    isoCode?: string;
+    name: string;
+    isoCode: string;
 };
-

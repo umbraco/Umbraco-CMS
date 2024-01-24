@@ -1,4 +1,4 @@
-import { UmbVariantContext } from '../variant-context/index.js';
+import { UmbPropertyDatasetContext } from '../../property/property-dataset/index.js';
 import { UMB_VARIANT_WORKSPACE_CONTEXT_TOKEN } from '../index.js';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
@@ -12,7 +12,7 @@ export class UmbWorkspaceSplitViewContext extends UmbBaseController {
 		return this.#workspaceContext;
 	}
 
-	#variantContext?: UmbVariantContext;
+	#variantContext?: UmbPropertyDatasetContext;
 
 	#index = new UmbNumberState(undefined);
 	index = this.#index.asObservable();
@@ -51,7 +51,7 @@ export class UmbWorkspaceSplitViewContext extends UmbBaseController {
 
 				this.#variantContext?.destroy();
 				const variantId = UmbVariantId.Create(activeVariantInfo);
-				this.#variantContext = this.#workspaceContext?.createVariantContext(this, variantId);
+				this.#variantContext = this.#workspaceContext?.createPropertyDatasetContext(this, variantId);
 			},
 			'_observeActiveVariant',
 		);
@@ -77,7 +77,7 @@ export class UmbWorkspaceSplitViewContext extends UmbBaseController {
 		return this.#index.getValue();
 	}
 	public setSplitViewIndex(index: number) {
-		this.#index.next(index);
+		this.#index.setValue(index);
 	}
 
 	/**

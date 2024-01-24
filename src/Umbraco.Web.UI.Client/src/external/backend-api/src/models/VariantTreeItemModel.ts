@@ -6,8 +6,7 @@
 import type { PublishedStateModel } from './PublishedStateModel';
 
 export type VariantTreeItemModel = {
-    name?: string;
+    name: string;
     culture?: string | null;
-    state?: PublishedStateModel;
+    state: PublishedStateModel;
 };
-

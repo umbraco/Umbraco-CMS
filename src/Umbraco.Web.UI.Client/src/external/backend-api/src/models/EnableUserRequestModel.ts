@@ -4,6 +4,5 @@
 /* eslint-disable */
 
 export type EnableUserRequestModel = {
-    userIds?: Array<string>;
+    userIds: Array<string>;
 };
-

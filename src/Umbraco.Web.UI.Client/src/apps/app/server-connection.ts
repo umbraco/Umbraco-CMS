@@ -56,7 +56,7 @@ export class UmbServerConnection {
 			throw error;
 		}
 
-		this.#isConnected.next(true);
+		this.#isConnected.setValue(true);
 		this.#status = data?.serverStatus ?? RuntimeLevelModel.UNKNOWN;
 	}
 }

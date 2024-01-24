@@ -16,7 +16,7 @@ export class UmbSectionPickerModalElement extends UmbModalBaseElement<
 	@state()
 	private _sections: Array<ManifestSection> = [];
 
-	#selectionManager = new UmbSelectionManager();
+	#selectionManager = new UmbSelectionManager(this);
 
 	connectedCallback(): void {
 		super.connectedCallback();
@@ -33,14 +33,8 @@ export class UmbSectionPickerModalElement extends UmbModalBaseElement<
 	}
 
 	#submit() {
-		this.value = {
-			selection: this.#selectionManager.getSelection(),
-		};
-		this.modalContext?.submit();
-	}
-
-	#close() {
-		this.modalContext?.reject();
+		this.value = { selection: this.#selectionManager.getSelection() };
+		this._submitModal();
 	}
 
 	render() {
@@ -59,7 +53,7 @@ export class UmbSectionPickerModalElement extends UmbModalBaseElement<
 					)}
 				</uui-box>
 				<div slot="actions">
-					<uui-button label="Close" @click=${this.#close}></uui-button>
+					<uui-button label="Close" @click=${this._rejectModal}></uui-button>
 					<uui-button label="Submit" look="primary" color="positive" @click=${this.#submit}></uui-button>
 				</div>
 			</umb-body-layout>

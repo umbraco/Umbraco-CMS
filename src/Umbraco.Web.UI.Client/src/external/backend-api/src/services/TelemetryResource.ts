@@ -17,18 +17,21 @@ export class TelemetryResource {
      * @throws ApiError
      */
     public static getTelemetry({
-        skip,
-        take = 100,
-    }: {
-        skip?: number,
-        take?: number,
-    }): CancelablePromise<PagedTelemetryResponseModel> {
+skip,
+take = 100,
+}: {
+skip?: number,
+take?: number,
+}): CancelablePromise<PagedTelemetryResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/telemetry',
             query: {
                 'skip': skip,
                 'take': take,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }
@@ -41,6 +44,9 @@ export class TelemetryResource {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/telemetry/level',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -49,10 +55,10 @@ export class TelemetryResource {
      * @throws ApiError
      */
     public static postTelemetryLevel({
-        requestBody,
-    }: {
-        requestBody?: TelemetryRequestModel,
-    }): CancelablePromise<any> {
+requestBody,
+}: {
+requestBody?: TelemetryRequestModel,
+}): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/telemetry/level',
@@ -60,6 +66,7 @@ export class TelemetryResource {
             mediaType: 'application/json',
             errors: {
                 400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }

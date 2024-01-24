@@ -1,70 +1,60 @@
+import { UmbServerFilePathUniqueSerializer } from '@umbraco-cms/backoffice/server-file-system';
+import { UMB_STYLESHEET_ENTITY_TYPE, UMB_STYLESHEET_FOLDER_ENTITY_TYPE } from '../entity.js';
+import { UmbStylesheetTreeItemModel } from './types.js';
 import { FileSystemTreeItemPresentationModel, StylesheetResource } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import type { UmbTreeDataSource } from '@umbraco-cms/backoffice/tree';
+import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
 
 /**
  * A data source for the Stylesheet tree that fetches data from the server
  * @export
  * @class UmbStylesheetTreeServerDataSource
- * @implements {UmbTreeDataSource}
+ * @implements {UmbTreeServerDataSourceBase}
  */
-export class UmbStylesheetTreeServerDataSource implements UmbTreeDataSource<FileSystemTreeItemPresentationModel> {
-	#host: UmbControllerHost;
-
+export class UmbStylesheetTreeServerDataSource extends UmbTreeServerDataSourceBase<
+	FileSystemTreeItemPresentationModel,
+	UmbStylesheetTreeItemModel
+> {
 	/**
 	 * Creates an instance of UmbStylesheetTreeServerDataSource.
 	 * @param {UmbControllerHost} host
 	 * @memberof UmbStylesheetTreeServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
-		this.#host = host;
-	}
-
-	/**
-	 * Fetches the stylesheet tree root items from the server
-	 * @return {*}
-	 * @memberof UmbStylesheetTreeServerDataSource
-	 */
-	async getRootItems() {
-		return tryExecuteAndNotify(this.#host, StylesheetResource.getTreeStylesheetRoot({}));
-	}
-
-	/**
-	 * Fetches the children of a given stylesheet path from the server
-	 * @param {(string | null)} path
-	 * @return {*}
-	 * @memberof UmbStylesheetTreeServerDataSource
-	 */
-	async getChildrenOf(path: string | null) {
-		if (path === undefined) throw new Error('Path is missing');
-
-		/* TODO: should we make getRootItems() internal 
-		so it only is a server concern that there are two endpoints? */
-		if (path === null) {
-			return this.getRootItems();
-		} else {
-			return tryExecuteAndNotify(
-				this.#host,
-				StylesheetResource.getTreeStylesheetChildren({
-					path,
-				}),
-			);
-		}
-	}
-
-	/**
-	 * Fetches stylesheet items from the server
-	 * @param {(string | undefined)} path
-	 * @return {*}
-	 * @memberof UmbStylesheetTreeServerDataSource
-	 */
-	async getItems(path: Array<string>) {
-		return tryExecuteAndNotify(
-			this.#host,
-			StylesheetResource.getStylesheetItem({
-				path,
-			}),
-		);
+		super(host, {
+			getRootItems,
+			getChildrenOf,
+			mapper,
+		});
 	}
 }
+
+// eslint-disable-next-line local-rules/no-direct-api-import
+const getRootItems = () => StylesheetResource.getTreeStylesheetRoot({});
+
+const getChildrenOf = (parentUnique: string | null) => {
+	const parentPath = new UmbServerFilePathUniqueSerializer().toServerPath(parentUnique);
+
+	if (parentPath === null) {
+		return getRootItems();
+	} else {
+		// eslint-disable-next-line local-rules/no-direct-api-import
+		return StylesheetResource.getTreeStylesheetChildren({
+			parentPath,
+		});
+	}
+};
+
+const mapper = (item: FileSystemTreeItemPresentationModel): UmbStylesheetTreeItemModel => {
+	const serializer = new UmbServerFilePathUniqueSerializer();
+
+	return {
+		unique: serializer.toUnique(item.path),
+		parentUnique: item.parent ? serializer.toUnique(item.parent?.path) : null,
+		entityType: item.isFolder ? UMB_STYLESHEET_FOLDER_ENTITY_TYPE : UMB_STYLESHEET_ENTITY_TYPE,
+		name: item.name,
+		isFolder: item.isFolder,
+		hasChildren: item.hasChildren,
+		isContainer: false,
+	};
+};

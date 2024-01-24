@@ -4,6 +4,5 @@
 /* eslint-disable */
 
 export type FolderModelBaseModel = {
-    name?: string;
+    name: string;
 };
-

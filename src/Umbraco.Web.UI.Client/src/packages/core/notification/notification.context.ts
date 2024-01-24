@@ -47,7 +47,7 @@ export class UmbNotificationContext extends UmbContextBase<UmbNotificationContex
 		const notificationHandler = new UmbNotificationHandler(options);
 		notificationHandler.element.addEventListener('closed', () => this._handleClosed(notificationHandler));
 
-		this._notifications.next([...this._notifications.getValue(), notificationHandler]);
+		this._notifications.setValue([...this._notifications.getValue(), notificationHandler]);
 
 		return notificationHandler;
 	}
@@ -58,7 +58,7 @@ export class UmbNotificationContext extends UmbContextBase<UmbNotificationContex
 	 * @memberof UmbNotificationContext
 	 */
 	private _close(key: string) {
-		this._notifications.next(this._notifications.getValue().filter((notification) => notification.key !== key));
+		this._notifications.setValue(this._notifications.getValue().filter((notification) => notification.key !== key));
 	}
 
 	/**

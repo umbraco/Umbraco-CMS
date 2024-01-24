@@ -6,7 +6,6 @@
 import type { HealthCheckModelBaseModel } from './HealthCheckModelBaseModel';
 
 export type HealthCheckModel = (HealthCheckModelBaseModel & {
-    name?: string;
-    description?: string | null;
+name: string;
+description?: string | null;
 });
-

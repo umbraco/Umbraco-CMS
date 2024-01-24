@@ -1,5 +1,5 @@
 import { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context.js';
-import type { UmbDocumentTypeInputElement } from '../../../components/document-type-input/document-type-input.element.js';
+import type { UmbInputDocumentTypeElement } from '../../../components/input-document-type/input-document-type.element.js';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UUIToggleElement } from '@umbraco-cms/backoffice/external/uui';
@@ -42,7 +42,7 @@ export class UmbDocumentTypeWorkspaceViewStructureElement extends UmbLitElement 
 	render() {
 		return html`
 			<uui-box headline="Structure">
-				<umb-workspace-property-layout alias="Root" label="Allow as Root">
+				<umb-property-layout alias="Root" label="Allow as Root">
 					<div slot="description">${this.localize.term('contentTypeEditor_allowAsRootDescription')}</div>
 					<div slot="editor">
 						<uui-toggle
@@ -52,17 +52,18 @@ export class UmbDocumentTypeWorkspaceViewStructureElement extends UmbLitElement 
 								this.#workspaceContext?.setAllowedAsRoot((e.target as UUIToggleElement).checked);
 							}}></uui-toggle>
 					</div>
-				</umb-workspace-property-layout>
-				<umb-workspace-property-layout alias="ChildNodeType" label="Allowed child node types">
+				</umb-property-layout>
+				<umb-property-layout alias="ChildNodeType" label="Allowed child node types">
 					<div slot="description">
 						Allow content of the specified types to be created underneath content of this type.
 					</div>
 					<div slot="editor">
 						<!-- TODO: maybe we want to somehow display the hierarchy, but not necessary in the same way as old backoffice? -->
-						<umb-document-type-input
+						<umb-input-document-type
+							element-types-only
 							.selectedIds=${this._allowedContentTypeIDs ?? []}
 							@change="${(e: CustomEvent) => {
-								const sortedContentTypesList = (e.target as UmbDocumentTypeInputElement).selectedIds.map(
+								const sortedContentTypesList = (e.target as UmbInputDocumentTypeElement).selectedIds.map(
 									(id, index) => ({
 										id: id,
 										sortOrder: index,
@@ -70,15 +71,15 @@ export class UmbDocumentTypeWorkspaceViewStructureElement extends UmbLitElement 
 								);
 								this.#workspaceContext?.setAllowedContentTypes(sortedContentTypesList);
 							}}">
-						</umb-document-type-input>
+						</umb-input-document-type>
 					</div>
-				</umb-workspace-property-layout>
+				</umb-property-layout>
 			</uui-box>
 			<uui-box headline="Presentation">
-				<umb-workspace-property-layout alias="Root" label="Collection view">
+				<umb-property-layout alias="Root" label="Collection view">
 					<div slot="description">Provides an overview of child content and hides it in the tree.</div>
 					<div slot="editor"><uui-toggle label="Display children in a Collection view"></uui-toggle></div>
-				</umb-workspace-property-layout>
+				</umb-property-layout>
 			</uui-box>
 		`;
 	}

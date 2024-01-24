@@ -4,7 +4,6 @@
 /* eslint-disable */
 
 export type DictionaryItemTranslationModel = {
-    isoCode?: string;
-    translation?: string;
+    isoCode: string;
+    translation: string;
 };
-

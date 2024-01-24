@@ -1,6 +1,11 @@
-import { UMB_PARTIAL_VIEW_ENTITY_TYPE, UMB_PARTIAL_VIEW_ROOT_ENTITY_TYPE } from '../entity.js';
-import { UmbPartialViewTreeRepository } from './script-tree.repository.js';
-import { UmbPartialViewTreeStore } from './script-tree.store.js';
+import {
+	UMB_PARTIAL_VIEW_ENTITY_TYPE,
+	UMB_PARTIAL_VIEW_FOLDER_ENTITY_TYPE,
+	UMB_PARTIAL_VIEW_ROOT_ENTITY_TYPE,
+} from '../entity.js';
+import { UmbPartialViewTreeRepository } from './partial-view-tree.repository.js';
+import { UmbPartialViewTreeStore } from './partial-view-tree.store.js';
+import { manifests as folderManifests } from './folder/manifests.js';
 import type {
 	ManifestRepository,
 	ManifestTree,
@@ -37,12 +42,12 @@ const tree: ManifestTree = {
 
 const treeItem: ManifestTreeItem = {
 	type: 'treeItem',
-	kind: 'fileSystem',
+	kind: 'unique',
 	alias: 'Umb.TreeItem.PartialView',
 	name: 'Partial View Tree Item',
 	meta: {
-		entityTypes: [UMB_PARTIAL_VIEW_ROOT_ENTITY_TYPE, UMB_PARTIAL_VIEW_ENTITY_TYPE],
+		entityTypes: [UMB_PARTIAL_VIEW_ROOT_ENTITY_TYPE, UMB_PARTIAL_VIEW_ENTITY_TYPE, UMB_PARTIAL_VIEW_FOLDER_ENTITY_TYPE],
 	},
 };
 
-export const manifests = [treeRepository, treeStore, tree, treeItem];
+export const manifests = [treeRepository, treeStore, tree, treeItem, ...folderManifests];

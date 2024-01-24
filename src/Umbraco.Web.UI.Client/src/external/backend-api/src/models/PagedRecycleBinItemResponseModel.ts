@@ -9,4 +9,3 @@ export type PagedRecycleBinItemResponseModel = {
     total: number;
     items: Array<RecycleBinItemResponseModel>;
 };
-

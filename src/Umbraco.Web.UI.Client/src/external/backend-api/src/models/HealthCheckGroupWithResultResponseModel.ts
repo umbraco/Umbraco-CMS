@@ -6,6 +6,5 @@
 import type { HealthCheckWithResultPresentationModel } from './HealthCheckWithResultPresentationModel';
 
 export type HealthCheckGroupWithResultResponseModel = {
-    checks?: Array<HealthCheckWithResultPresentationModel>;
+    checks: Array<HealthCheckWithResultPresentationModel>;
 };
-

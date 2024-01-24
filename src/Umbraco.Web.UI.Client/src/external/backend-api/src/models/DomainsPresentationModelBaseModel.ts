@@ -7,6 +7,5 @@ import type { DomainPresentationModel } from './DomainPresentationModel';
 
 export type DomainsPresentationModelBaseModel = {
     defaultIsoCode?: string | null;
-    domains?: Array<DomainPresentationModel>;
+    domains: Array<DomainPresentationModel>;
 };
-

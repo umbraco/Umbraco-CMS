@@ -13,12 +13,12 @@ export class PropertyTypeResource {
      * @throws ApiError
      */
     public static getPropertyTypeIsUsed({
-        contentTypeId,
-        propertyAlias,
-    }: {
-        contentTypeId?: string,
-        propertyAlias?: string,
-    }): CancelablePromise<boolean> {
+contentTypeId,
+propertyAlias,
+}: {
+contentTypeId?: string,
+propertyAlias?: string,
+}): CancelablePromise<boolean> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/property-type/is-used',
@@ -28,6 +28,7 @@ export class PropertyTypeResource {
             },
             errors: {
                 400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }

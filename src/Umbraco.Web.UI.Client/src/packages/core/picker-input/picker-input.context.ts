@@ -10,18 +10,14 @@ import {
 	UmbPickerModalData,
 	UmbPickerModalValue,
 } from '@umbraco-cms/backoffice/modal';
-import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
-import { ItemResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 
-export class UmbPickerInputContext<ItemType extends ItemResponseModelBaseModel> extends UmbBaseController {
+export class UmbPickerInputContext<ItemType extends { name: string }> extends UmbBaseController {
 	// TODO: We are way too unsecure about the requirements for the Modal Token, as we have certain expectation for the data and value.
 	modalAlias: string | UmbModalToken<UmbPickerModalData<ItemType>, UmbPickerModalValue>;
 	repository?: UmbItemRepository<ItemType>;
 	#getUnique: (entry: ItemType) => string | undefined;
 
 	public modalManager?: UmbModalManagerContext;
-
-	public pickableFilter?: (item: ItemType) => boolean = () => true;
 
 	#init: Promise<unknown>;
 
@@ -43,16 +39,18 @@ export class UmbPickerInputContext<ItemType extends ItemResponseModelBaseModel> 
 	) {
 		super(host);
 		this.modalAlias = modalAlias;
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		//@ts-ignore
 		this.#getUnique = getUniqueMethod || ((entry) => entry.id || '');
 
-		this.#itemManager = new UmbRepositoryItemsManager<ItemType>(host, repositoryAlias, this.#getUnique);
+		this.#itemManager = new UmbRepositoryItemsManager<ItemType>(this, repositoryAlias, this.#getUnique);
 
 		this.selection = this.#itemManager.uniques;
 		this.selectedItems = this.#itemManager.items;
 
 		this.#init = Promise.all([
 			this.#itemManager.init,
-			new UmbContextConsumerController(this._host, UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
+			this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
 				this.modalManager = instance;
 			}).asPromise(),
 		]);
@@ -67,15 +65,13 @@ export class UmbPickerInputContext<ItemType extends ItemResponseModelBaseModel> 
 		this.#itemManager.setUniques(selection.filter((value) => value !== null) as Array<string>);
 	}
 
-	// TODO: If modalAlias is a ModalToken, then via TS, we should get the correct type for pickerData. Otherwise fallback to unknown.
-	openPicker(pickerData?: Partial<UmbPickerModalData<ItemType>>) {
+	async openPicker(pickerData?: Partial<UmbPickerModalData<ItemType>>) {
+		await this.#init;
 		if (!this.modalManager) throw new Error('Modal manager context is not initialized');
 
-		// TODO: Update so selection is part of value...
 		const modalContext = this.modalManager.open(this.modalAlias, {
 			data: {
 				multiple: this.max === 1 ? false : true,
-				pickableFilter: this.pickableFilter,
 				...pickerData,
 			},
 			value: {
@@ -83,14 +79,13 @@ export class UmbPickerInputContext<ItemType extends ItemResponseModelBaseModel> 
 			},
 		});
 
-		modalContext?.onSubmit().then((value) => {
-			this.setSelection(value.selection);
-			this.getHostElement().dispatchEvent(new UmbChangeEvent());
-		});
+		const modalValue = await modalContext?.onSubmit();
+		this.setSelection(modalValue.selection);
+		this.getHostElement().dispatchEvent(new UmbChangeEvent());
 	}
 
 	async requestRemoveItem(unique: string) {
-		// TODO: id won't always be available on the model, so we need to get the unique property from somewhere. Maybe the repository?
+		// TODO: ID won't always be available on the model, so we need to get the unique property from somewhere. Maybe the repository?
 		const item = this.#itemManager.getItems().find((item) => this.#getUnique(item) === unique);
 		if (!item) throw new Error('Could not find item with unique: ' + unique);
 

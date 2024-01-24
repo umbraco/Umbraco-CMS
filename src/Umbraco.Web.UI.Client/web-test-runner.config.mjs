@@ -16,6 +16,10 @@ export default {
 	rootDir: '.',
 	files: ['./src/**/*.test.ts'],
 	nodeResolve: { exportConditions: mode === 'dev' ? ['development'] : [], preferBuiltins: false, browser: true },
+	browsers: [playwrightLauncher({ product: 'chromium' }), playwrightLauncher({ product: 'webkit' })],
+	coverageConfig: {
+		reporters: ['lcovonly', 'text-summary'],
+	},
 	plugins: [
 		esbuildPlugin({ ts: true, tsconfig: './tsconfig.json', target: 'auto', json: true }),
 		importMapsPlugin({
@@ -65,6 +69,7 @@ export default {
 						'@umbraco-cms/backoffice/entity-action': './src/packages/core/entity-action/index.ts',
 						'@umbraco-cms/backoffice/entity-bulk-action': './src/packages/core/entity-bulk-action/index.ts',
 						'@umbraco-cms/backoffice/extension-registry': './src/packages/core/extension-registry/index.ts',
+						'@umbraco-cms/backoffice/server-file-system': './src/packages/core/server-file-system/index.ts',
 						'@umbraco-cms/backoffice/id': './src/packages/core/id/index.ts',
 						'@umbraco-cms/backoffice/localization': './src/packages/core/localization/index.ts',
 						'@umbraco-cms/backoffice/macro': './src/packages/core/macro/index.ts',
@@ -72,6 +77,7 @@ export default {
 						'@umbraco-cms/backoffice/modal': './src/packages/core/modal/index.ts',
 						'@umbraco-cms/backoffice/notification': './src/packages/core/notification/index.ts',
 						'@umbraco-cms/backoffice/picker-input': './src/packages/core/picker-input/index.ts',
+						'@umbraco-cms/backoffice/property': './src/packages/core/property/index.ts',
 						'@umbraco-cms/backoffice/property-action': './src/packages/core/property-action/index.ts',
 						'@umbraco-cms/backoffice/property-editor': './src/packages/core/property-editor/index.ts',
 						'@umbraco-cms/backoffice/section': './src/packages/core/section/index.ts',
@@ -86,6 +92,8 @@ export default {
 						'@umbraco-cms/backoffice/repository': './src/packages/core/repository/index.ts',
 						'@umbraco-cms/backoffice/temporary-file': './src/packages/core/temporary-file/index.ts',
 
+						'@umbraco-cms/backoffice/block': './src/packages/block/index.ts',
+						'@umbraco-cms/backoffice/audit-log': './src/packages/core/audit-log/index.ts',
 						'@umbraco-cms/backoffice/dictionary': './src/packages/dictionary/dictionary/index.ts',
 
 						'@umbraco-cms/backoffice/document': './src/packages/documents/documents/index.ts',
@@ -101,8 +109,10 @@ export default {
 						'@umbraco-cms/backoffice/data-type': './src/packages/core/data-type/index.ts',
 						'@umbraco-cms/backoffice/language': './src/packages/settings/languages/index.ts',
 						'@umbraco-cms/backoffice/logviewer': './src/packages/settings/logviewer/index.ts',
-						'@umbraco-cms/backoffice/relation-type': './src/packages/settings/relation-types/index.ts',
+						'@umbraco-cms/backoffice/relation-type': './src/packages/relations/relation-types/index.ts',
+						'@umbraco-cms/backoffice/relation': './src/packages/relations/relations/index.ts',
 						'@umbraco-cms/backoffice/tags': './src/packages/tags/index.ts',
+						'@umbraco-cms/backoffice/static-file': './src/packages/static-file/index.ts',
 						'@umbraco-cms/backoffice/partial-view': './src/packages/templating/partial-views/index.ts',
 						'@umbraco-cms/backoffice/stylesheet': './src/packages/templating/stylesheets/index.ts',
 						'@umbraco-cms/backoffice/template': './src/packages/templating/templates/index.ts',
@@ -123,11 +133,7 @@ export default {
 			include: ['node_modules/**', 'src/external/**'],
 		}),
 	],
-	browsers: [playwrightLauncher({ product: 'chromium' }), playwrightLauncher({ product: 'webkit' })],
-	coverageConfig: {
-		reporters: ['lcovonly', 'text-summary'],
-	},
-	testRunnerHtml: (testFramework) =>
+	testRunnerHtml: (testFramework, devMode) =>
 		`<html lang="en-us">
 			<head>
 				<meta charset="UTF-8" />
@@ -135,6 +141,9 @@ export default {
 				<link rel="icon" type="image/svg+xml" href="src/assets/favicon.svg" />
 				<title>Umbraco</title>
 				<base href="/" />
+				<script>
+					window.__UMBRACO_TEST_RUN_A11Y_TEST = ${(!devMode).toString()};
+				</script>
 				<script src="/node_modules/msw/lib/iife/index.js"></script>
 				<link rel="stylesheet" href="node_modules/@umbraco-ui/uui-css/dist/uui-css.css">
 				<link rel="stylesheet" href="src/css/umb-css.css">

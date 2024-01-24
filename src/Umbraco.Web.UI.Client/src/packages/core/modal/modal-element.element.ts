@@ -1,4 +1,4 @@
-import { property, state } from '@umbraco-cms/backoffice/external/lit';
+import { property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbModalContext } from '@umbraco-cms/backoffice/modal';
 import type { ManifestModal, UmbModalExtensionElement } from '@umbraco-cms/backoffice/extension-registry';
@@ -37,7 +37,7 @@ export abstract class UmbModalBaseElement<
 	}
 	#modalContext?: UmbModalContext<ModalDataType, ModalValueType> | undefined;
 
-	@property({ type: Object, attribute: false })
+	@property({ attribute: false })
 	public get data(): ModalDataType | undefined {
 		return this._data;
 	}
@@ -46,7 +46,7 @@ export abstract class UmbModalBaseElement<
 	}
 	private _data?: ModalDataType | undefined;
 
-	@state()
+	@property({ attribute: false })
 	public get value(): ModalValueType {
 		return this.#value;
 	}

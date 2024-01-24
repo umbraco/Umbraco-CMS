@@ -16,18 +16,21 @@ export class SearcherResource {
      * @throws ApiError
      */
     public static getSearcher({
-        skip,
-        take = 100,
-    }: {
-        skip?: number,
-        take?: number,
-    }): CancelablePromise<PagedSearcherResponseModel> {
+skip,
+take = 100,
+}: {
+skip?: number,
+take?: number,
+}): CancelablePromise<PagedSearcherResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/searcher',
             query: {
                 'skip': skip,
                 'take': take,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }
@@ -37,16 +40,16 @@ export class SearcherResource {
      * @throws ApiError
      */
     public static getSearcherBySearcherNameQuery({
-        searcherName,
-        term,
-        skip,
-        take = 100,
-    }: {
-        searcherName: string,
-        term?: string,
-        skip?: number,
-        take?: number,
-    }): CancelablePromise<PagedSearchResultResponseModel> {
+searcherName,
+term,
+skip,
+take = 100,
+}: {
+searcherName: string,
+term?: string,
+skip?: number,
+take?: number,
+}): CancelablePromise<PagedSearchResultResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/searcher/{searcherName}/query',
@@ -59,6 +62,7 @@ export class SearcherResource {
                 'take': take,
             },
             errors: {
+                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
         });

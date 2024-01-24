@@ -23,18 +23,21 @@ export class LogViewerResource {
      * @throws ApiError
      */
     public static getLogViewerLevel({
-        skip,
-        take = 100,
-    }: {
-        skip?: number,
-        take?: number,
-    }): CancelablePromise<PagedLoggerResponseModel> {
+skip,
+take = 100,
+}: {
+skip?: number,
+take?: number,
+}): CancelablePromise<PagedLoggerResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/log-viewer/level',
             query: {
                 'skip': skip,
                 'take': take,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }
@@ -44,12 +47,12 @@ export class LogViewerResource {
      * @throws ApiError
      */
     public static getLogViewerLevelCount({
-        startDate,
-        endDate,
-    }: {
-        startDate?: string,
-        endDate?: string,
-    }): CancelablePromise<LogLevelCountsReponseModel> {
+startDate,
+endDate,
+}: {
+startDate?: string,
+endDate?: string,
+}): CancelablePromise<LogLevelCountsReponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/log-viewer/level-count',
@@ -59,6 +62,7 @@ export class LogViewerResource {
             },
             errors: {
                 400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }
@@ -68,22 +72,22 @@ export class LogViewerResource {
      * @throws ApiError
      */
     public static getLogViewerLog({
-        skip,
-        take = 100,
-        orderDirection,
-        filterExpression,
-        logLevel,
-        startDate,
-        endDate,
-    }: {
-        skip?: number,
-        take?: number,
-        orderDirection?: DirectionModel,
-        filterExpression?: string,
-        logLevel?: Array<LogLevelModel>,
-        startDate?: string,
-        endDate?: string,
-    }): CancelablePromise<PagedLogMessageResponseModel> {
+skip,
+take = 100,
+orderDirection,
+filterExpression,
+logLevel,
+startDate,
+endDate,
+}: {
+skip?: number,
+take?: number,
+orderDirection?: DirectionModel,
+filterExpression?: string,
+logLevel?: Array<LogLevelModel>,
+startDate?: string,
+endDate?: string,
+}): CancelablePromise<PagedLogMessageResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/log-viewer/log',
@@ -96,6 +100,9 @@ export class LogViewerResource {
                 'startDate': startDate,
                 'endDate': endDate,
             },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -104,16 +111,16 @@ export class LogViewerResource {
      * @throws ApiError
      */
     public static getLogViewerMessageTemplate({
-        skip,
-        take = 100,
-        startDate,
-        endDate,
-    }: {
-        skip?: number,
-        take?: number,
-        startDate?: string,
-        endDate?: string,
-    }): CancelablePromise<PagedLogTemplateResponseModel> {
+skip,
+take = 100,
+startDate,
+endDate,
+}: {
+skip?: number,
+take?: number,
+startDate?: string,
+endDate?: string,
+}): CancelablePromise<PagedLogTemplateResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/log-viewer/message-template',
@@ -125,6 +132,7 @@ export class LogViewerResource {
             },
             errors: {
                 400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }
@@ -134,18 +142,21 @@ export class LogViewerResource {
      * @throws ApiError
      */
     public static getLogViewerSavedSearch({
-        skip,
-        take = 100,
-    }: {
-        skip?: number,
-        take?: number,
-    }): CancelablePromise<PagedSavedLogSearchResponseModel> {
+skip,
+take = 100,
+}: {
+skip?: number,
+take?: number,
+}): CancelablePromise<PagedSavedLogSearchResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/log-viewer/saved-search',
             query: {
                 'skip': skip,
                 'take': take,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }
@@ -155,18 +166,19 @@ export class LogViewerResource {
      * @throws ApiError
      */
     public static postLogViewerSavedSearch({
-        requestBody,
-    }: {
-        requestBody?: SavedLogSearchRequestModel,
-    }): CancelablePromise<string> {
+requestBody,
+}: {
+requestBody?: SavedLogSearchRequestModel,
+}): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/log-viewer/saved-search',
             body: requestBody,
             mediaType: 'application/json',
-            responseHeader: 'Location',
+            responseHeader: 'Umb-Generated-Resource',
             errors: {
                 400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }
@@ -176,10 +188,10 @@ export class LogViewerResource {
      * @throws ApiError
      */
     public static getLogViewerSavedSearchByName({
-        name,
-    }: {
-        name: string,
-    }): CancelablePromise<SavedLogSearchResponseModel> {
+name,
+}: {
+name: string,
+}): CancelablePromise<SavedLogSearchResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/log-viewer/saved-search/{name}',
@@ -187,6 +199,7 @@ export class LogViewerResource {
                 'name': name,
             },
             errors: {
+                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
         });
@@ -197,10 +210,10 @@ export class LogViewerResource {
      * @throws ApiError
      */
     public static deleteLogViewerSavedSearchByName({
-        name,
-    }: {
-        name: string,
-    }): CancelablePromise<any> {
+name,
+}: {
+name: string,
+}): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/log-viewer/saved-search/{name}',
@@ -208,6 +221,7 @@ export class LogViewerResource {
                 'name': name,
             },
             errors: {
+                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
         });
@@ -218,12 +232,12 @@ export class LogViewerResource {
      * @throws ApiError
      */
     public static getLogViewerValidateLogsSize({
-        startDate,
-        endDate,
-    }: {
-        startDate?: string,
-        endDate?: string,
-    }): CancelablePromise<any> {
+startDate,
+endDate,
+}: {
+startDate?: string,
+endDate?: string,
+}): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/log-viewer/validate-logs-size',
@@ -233,6 +247,7 @@ export class LogViewerResource {
             },
             errors: {
                 400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }

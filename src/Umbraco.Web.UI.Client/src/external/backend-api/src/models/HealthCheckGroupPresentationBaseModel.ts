@@ -4,6 +4,5 @@
 /* eslint-disable */
 
 export type HealthCheckGroupPresentationBaseModel = {
-    name?: string;
+    name: string;
 };
-

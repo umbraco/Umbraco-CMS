@@ -1,11 +1,10 @@
 import { UmbDocumentRepository } from '../repository/document.repository.js';
 import { UmbDocumentTypeDetailRepository } from '../../document-types/repository/detail/document-type-detail.repository.js';
-import { UmbDocumentVariantContext } from '../variant-context/document-variant-context.js';
+import { UmbDocumentPropertyDataContext } from '../property-dataset-context/document-property-dataset-context.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
 import {
-	UmbSaveableWorkspaceContextInterface,
 	UmbEditableWorkspaceContextBase,
 	UmbWorkspaceSplitViewManager,
 	UmbVariantableWorkspaceContextInterface,
@@ -18,23 +17,15 @@ import {
 	UmbObjectState,
 	UmbObserverController,
 } from '@umbraco-cms/backoffice/observable-api';
-import { UmbControllerHost, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 type EntityType = DocumentResponseModel;
 export class UmbDocumentWorkspaceContext
-	extends UmbEditableWorkspaceContextBase<UmbDocumentRepository, EntityType>
-	implements
-		UmbVariantableWorkspaceContextInterface<EntityType | undefined>,
-		UmbPublishableWorkspaceContextInterface<EntityType | undefined>
+	extends UmbEditableWorkspaceContextBase<EntityType>
+	implements UmbVariantableWorkspaceContextInterface, UmbPublishableWorkspaceContextInterface
 {
-	/**
-	 * The document is the current stored version of the document.
-	 * For now lets not share this publicly as it can become confusing.
-	 * TODO: This concept is to be able to compare if there is changes since the saved one.
-	 */
-	//#persistedData = new UmbObjectState<EntityType | undefined>(undefined);
-
+	//
+	public readonly repository: UmbDocumentRepository = new UmbDocumentRepository(this);
 	/**
 	 * The document is the current state/draft version of the document.
 	 */
@@ -45,26 +36,20 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	readonly unique = this.#currentData.asObservablePart((data) => data?.id);
-	readonly documentTypeKey = this.#currentData.asObservablePart((data) => data?.contentTypeId);
+	readonly contentTypeId = this.#currentData.asObservablePart((data) => data?.contentTypeId);
 
 	readonly variants = this.#currentData.asObservablePart((data) => data?.variants || []);
 	readonly urls = this.#currentData.asObservablePart((data) => data?.urls || []);
 	readonly templateId = this.#currentData.asObservablePart((data) => data?.templateId || null);
 
-	readonly structure;
-	readonly splitView;
+	readonly structure = new UmbContentTypePropertyStructureManager(this, new UmbDocumentTypeDetailRepository(this));
+	readonly splitView = new UmbWorkspaceSplitViewManager();
 
-	constructor(host: UmbControllerHostElement) {
+	constructor(host: UmbControllerHost) {
 		// TODO: Get Workspace Alias via Manifest.
-		super(host, 'Umb.Workspace.Document', new UmbDocumentRepository(host));
+		super(host, 'Umb.Workspace.Document');
 
-		this.structure = new UmbContentTypePropertyStructureManager(
-			this.host,
-			new UmbDocumentTypeDetailRepository(this.host),
-		);
-		this.splitView = new UmbWorkspaceSplitViewManager(this.host);
-
-		new UmbObserverController(this.host, this.documentTypeKey, (id) => this.structure.loadType(id));
+		this.observe(this.contentTypeId, (id) => this.structure.loadType(id));
 
 		/*
 		TODO: Make something to ensure all variants are present in data? Seems like a good idea?.
@@ -78,7 +63,7 @@ export class UmbDocumentWorkspaceContext
 
 		this.setIsNew(false);
 		//this.#persisted.next(data);
-		this.#currentData.next(data);
+		this.#currentData.setValue(data);
 		return data || undefined;
 	}
 
@@ -88,12 +73,12 @@ export class UmbDocumentWorkspaceContext
 		if (!data) return undefined;
 
 		this.setIsNew(true);
-		this.#currentData.next(data);
+		this.#currentData.setValue(data);
 		return data || undefined;
 	}
 
 	getData() {
-		return this.#currentData.getValue() || {};
+		return this.#currentData.getValue();
 	}
 
 	/*
@@ -103,7 +88,7 @@ export class UmbDocumentWorkspaceContext
 	*/
 
 	getEntityId() {
-		return this.getData().id;
+		return this.getData()?.id;
 	}
 
 	getEntityType() {
@@ -111,7 +96,7 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	getContentTypeId() {
-		return this.getData().contentTypeId;
+		return this.getData()?.contentTypeId;
 	}
 
 	variantById(variantId: UmbVariantId) {
@@ -202,9 +187,10 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	async save() {
+		const data = this.getData();
+		if (!data) throw new Error('Data is missing');
 		await this.#createOrSave();
-
-		this.saveComplete(this.getData());
+		this.saveComplete(data);
 	}
 
 	async delete() {
@@ -259,8 +245,8 @@ export class UmbDocumentWorkspaceContext
 	}
 	*/
 
-	public createVariantContext(host: UmbControllerHost, variantId: UmbVariantId) {
-		return new UmbDocumentVariantContext(host, this, variantId);
+	public createPropertyDatasetContext(host: UmbControllerHost, variantId: UmbVariantId) {
+		return new UmbDocumentPropertyDataContext(host, this, variantId);
 	}
 
 	public destroy(): void {
@@ -271,12 +257,3 @@ export class UmbDocumentWorkspaceContext
 }
 
 export default UmbDocumentWorkspaceContext;
-
-export const UMB_DOCUMENT_WORKSPACE_CONTEXT = new UmbContextToken<
-	UmbSaveableWorkspaceContextInterface,
-	UmbDocumentWorkspaceContext
->(
-	'UmbWorkspaceContext',
-	undefined,
-	(context): context is UmbDocumentWorkspaceContext => context.getEntityType?.() === UMB_DOCUMENT_ENTITY_TYPE,
-);

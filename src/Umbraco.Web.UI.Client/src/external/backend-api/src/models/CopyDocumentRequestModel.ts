@@ -5,7 +5,6 @@
 
 export type CopyDocumentRequestModel = {
     targetId?: string | null;
-    relateToOriginal?: boolean;
-    includeDescendants?: boolean;
+    relateToOriginal: boolean;
+    includeDescendants: boolean;
 };
-

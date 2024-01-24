@@ -1,4 +1,4 @@
-import { UMB_COLLECTION_CONTEXT } from './collection-default.context.js';
+import { UMB_DEFAULT_COLLECTION_CONTEXT } from './default/collection-default.context.js';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import {
 	ManifestCondition,
@@ -16,7 +16,7 @@ export class UmbCollectionAliasCondition extends UmbBaseController implements Um
 		super(args.host);
 		this.config = args.config;
 		this.#onChange = args.onChange;
-		this.consumeContext(UMB_COLLECTION_CONTEXT, (context) => {
+		this.consumeContext(UMB_DEFAULT_COLLECTION_CONTEXT, (context) => {
 			this.permitted = context.getManifest()?.alias === this.config.match;
 			this.#onChange();
 		});

@@ -17,14 +17,14 @@ export class RedirectManagementResource {
      * @throws ApiError
      */
     public static getRedirectManagement({
-        filter,
-        skip,
-        take = 100,
-    }: {
-        filter?: string,
-        skip?: number,
-        take?: number,
-    }): CancelablePromise<PagedRedirectUrlResponseModel> {
+filter,
+skip,
+take = 100,
+}: {
+filter?: string,
+skip?: number,
+take?: number,
+}): CancelablePromise<PagedRedirectUrlResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/redirect-management',
@@ -35,6 +35,7 @@ export class RedirectManagementResource {
             },
             errors: {
                 400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }
@@ -44,14 +45,14 @@ export class RedirectManagementResource {
      * @throws ApiError
      */
     public static getRedirectManagementById({
-        id,
-        skip,
-        take = 100,
-    }: {
-        id: string,
-        skip?: number,
-        take?: number,
-    }): CancelablePromise<PagedRedirectUrlResponseModel> {
+id,
+skip,
+take = 100,
+}: {
+id: string,
+skip?: number,
+take?: number,
+}): CancelablePromise<PagedRedirectUrlResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/redirect-management/{id}',
@@ -62,6 +63,9 @@ export class RedirectManagementResource {
                 'skip': skip,
                 'take': take,
             },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -70,15 +74,18 @@ export class RedirectManagementResource {
      * @throws ApiError
      */
     public static deleteRedirectManagementById({
-        id,
-    }: {
-        id: string,
-    }): CancelablePromise<any> {
+id,
+}: {
+id: string,
+}): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/redirect-management/{id}',
             path: {
                 'id': id,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }
@@ -91,6 +98,9 @@ export class RedirectManagementResource {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/redirect-management/status',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -99,15 +109,18 @@ export class RedirectManagementResource {
      * @throws ApiError
      */
     public static postRedirectManagementStatus({
-        status,
-    }: {
-        status?: RedirectStatusModel,
-    }): CancelablePromise<any> {
+status,
+}: {
+status?: RedirectStatusModel,
+}): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/redirect-management/status',
             query: {
                 'status': status,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }

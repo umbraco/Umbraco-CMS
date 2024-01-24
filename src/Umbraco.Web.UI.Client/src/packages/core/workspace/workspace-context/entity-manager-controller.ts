@@ -7,14 +7,14 @@ import {
 	UMB_NOTIFICATION_CONTEXT_TOKEN,
 } from '@umbraco-cms/backoffice/notification';
 import { UmbObjectState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
-import type { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbEntityDetailStore } from '@umbraco-cms/backoffice/store';
+import { UmbEntityTreeItemModel } from '@umbraco-cms/backoffice/tree';
 
 // Extend entityType base type?, so we are sure to have parentId?
 // TODO: switch to use EntityDetailItem ? if we can have such type?
 export class UmbEntityWorkspaceManager<
 	StoreType extends UmbEntityDetailStore<EntityDetailsType>,
-	EntityDetailsType extends EntityTreeItemResponseModel = ReturnType<StoreType['getScaffold']>,
+	EntityDetailsType extends UmbEntityTreeItemModel = ReturnType<StoreType['getScaffold']>,
 > {
 	private _host;
 
@@ -53,7 +53,7 @@ export class UmbEntityWorkspaceManager<
 
 		if (this.#isNew) {
 			const newData = this._store.getScaffold(this._entityType, this._createAtParentKey || null);
-			this.state.next(newData);
+			this.state.setValue(newData);
 		} else {
 			this._storeSubscription?.destroy();
 			this._storeSubscription = new UmbObserverController(
@@ -61,7 +61,7 @@ export class UmbEntityWorkspaceManager<
 				this._store.getByKey(this._entityId),
 				(content) => {
 					if (!content) return; // TODO: Handle nicely if there is no content data.
-					this.state.next(content as any);
+					this.state.setValue(content as any);
 				},
 			);
 		}

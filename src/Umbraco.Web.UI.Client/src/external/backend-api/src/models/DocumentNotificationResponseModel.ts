@@ -4,7 +4,6 @@
 /* eslint-disable */
 
 export type DocumentNotificationResponseModel = {
-    actionId?: string;
-    subscribed?: boolean;
+    actionId: string;
+    subscribed: boolean;
 };
-

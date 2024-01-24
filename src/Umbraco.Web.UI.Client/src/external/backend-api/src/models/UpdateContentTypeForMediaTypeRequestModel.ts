@@ -9,17 +9,16 @@ import type { UpdateMediaTypePropertyTypeContainerRequestModel } from './UpdateM
 import type { UpdateMediaTypePropertyTypeRequestModel } from './UpdateMediaTypePropertyTypeRequestModel';
 
 export type UpdateContentTypeForMediaTypeRequestModel = {
-    alias?: string;
-    name?: string;
+    alias: string;
+    name: string;
     description?: string | null;
-    icon?: string;
-    allowedAsRoot?: boolean;
-    variesByCulture?: boolean;
-    variesBySegment?: boolean;
-    isElement?: boolean;
-    properties?: Array<UpdateMediaTypePropertyTypeRequestModel>;
-    containers?: Array<UpdateMediaTypePropertyTypeContainerRequestModel>;
-    allowedContentTypes?: Array<ContentTypeSortModel>;
-    compositions?: Array<ContentTypeCompositionModel>;
+    icon: string;
+    allowedAsRoot: boolean;
+    variesByCulture: boolean;
+    variesBySegment: boolean;
+    isElement: boolean;
+    properties: Array<UpdateMediaTypePropertyTypeRequestModel>;
+    containers: Array<UpdateMediaTypePropertyTypeContainerRequestModel>;
+    allowedContentTypes: Array<ContentTypeSortModel>;
+    compositions: Array<ContentTypeCompositionModel>;
 };
-

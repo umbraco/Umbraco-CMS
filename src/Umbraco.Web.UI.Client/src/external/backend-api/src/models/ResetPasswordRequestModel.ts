@@ -4,6 +4,5 @@
 /* eslint-disable */
 
 export type ResetPasswordRequestModel = {
-    email?: string;
+    email: string;
 };
-

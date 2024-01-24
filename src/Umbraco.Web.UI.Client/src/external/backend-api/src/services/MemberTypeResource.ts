@@ -16,15 +16,18 @@ export class MemberTypeResource {
      * @throws ApiError
      */
     public static getMemberTypeItem({
-        id,
-    }: {
-        id?: Array<string>,
-    }): CancelablePromise<Array<MemberTypeItemResponseModel>> {
+id,
+}: {
+id?: Array<string>,
+}): CancelablePromise<Array<MemberTypeItemResponseModel>> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/member-type/item',
             query: {
                 'id': id,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }
@@ -34,18 +37,21 @@ export class MemberTypeResource {
      * @throws ApiError
      */
     public static getTreeMemberTypeRoot({
-        skip,
-        take = 100,
-    }: {
-        skip?: number,
-        take?: number,
-    }): CancelablePromise<PagedEntityTreeItemResponseModel> {
+skip,
+take = 100,
+}: {
+skip?: number,
+take?: number,
+}): CancelablePromise<PagedEntityTreeItemResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/member-type/root',
             query: {
                 'skip': skip,
                 'take': take,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }

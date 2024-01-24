@@ -19,6 +19,9 @@ export class ProfilingResource {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/profiling/status',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -27,15 +30,18 @@ export class ProfilingResource {
      * @throws ApiError
      */
     public static putProfilingStatus({
-        requestBody,
-    }: {
-        requestBody?: ProfilingStatusRequestModel,
-    }): CancelablePromise<any> {
+requestBody,
+}: {
+requestBody?: ProfilingStatusRequestModel,
+}): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/profiling/status',
             body: requestBody,
             mediaType: 'application/json',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 

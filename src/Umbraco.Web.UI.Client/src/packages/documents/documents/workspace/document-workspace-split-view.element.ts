@@ -1,4 +1,4 @@
-import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from './document-workspace.context.js';
+import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from './document-workspace.context-token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, nothing, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { ActiveVariant } from '@umbraco-cms/backoffice/workspace';
@@ -67,7 +67,8 @@ export class UmbDocumentWorkspaceSplitViewElement extends UmbLitElement {
 			}
 
 			#splitViews {
-				display: flex;
+				display: grid;
+				grid-template-columns: 50% 50%;
 				width: 100%;
 				height: calc(100% - var(--umb-footer-layout-height));
 			}

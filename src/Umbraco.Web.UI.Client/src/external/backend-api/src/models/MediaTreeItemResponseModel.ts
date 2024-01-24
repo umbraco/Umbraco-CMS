@@ -6,6 +6,5 @@
 import type { ContentTreeItemResponseModel } from './ContentTreeItemResponseModel';
 
 export type MediaTreeItemResponseModel = (ContentTreeItemResponseModel & {
-    icon?: string;
+icon: string;
 });
-

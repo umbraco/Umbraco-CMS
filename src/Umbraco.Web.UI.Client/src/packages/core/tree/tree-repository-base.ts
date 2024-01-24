@@ -1,26 +1,34 @@
 import { UmbTreeStore } from './tree-store.interface.js';
-import type { UmbEntityTreeItemModel, UmbEntityTreeRootModel } from './types.js';
+import type {
+	UmbEntityTreeItemModel,
+	UmbEntityTreeRootModel,
+	UmbFileSystemTreeItemModel,
+	UmbFileSystemTreeRootModel,
+	UmbUniqueTreeItemModel,
+	UmbUniqueTreeRootModel,
+} from './types.js';
 import { UmbTreeRepository } from './tree-repository.interface.js';
-import type { UmbTreeDataSource, UmbTreeDataSourceConstructor } from './tree-data-source.interface.js';
+import type { UmbTreeDataSource, UmbTreeDataSourceConstructor } from './data-source/tree-data-source.interface.js';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
-export class UmbTreeRepositoryBase<
-		TreeItemType extends UmbEntityTreeItemModel,
-		TreeRootType extends UmbEntityTreeRootModel,
+export abstract class UmbTreeRepositoryBase<
+		// TODO: remove UmbEntityTreeItemModel and UmbFileSystemTreeItemModel when we have unique in place
+		TreeItemType extends UmbUniqueTreeItemModel | UmbEntityTreeItemModel | UmbFileSystemTreeItemModel,
+		TreeRootType extends UmbUniqueTreeRootModel | UmbEntityTreeRootModel | UmbFileSystemTreeRootModel,
 	>
 	extends UmbRepositoryBase
 	implements UmbTreeRepository<TreeItemType, TreeRootType>, UmbApi
 {
 	protected _init: Promise<unknown>;
 	protected _treeStore?: UmbTreeStore<TreeItemType>;
-	#treeSource: UmbTreeDataSource<TreeItemType, TreeRootType>;
+	#treeSource: UmbTreeDataSource<TreeItemType>;
 
 	constructor(
 		host: UmbControllerHost,
-		treeSource: UmbTreeDataSourceConstructor<TreeItemType, TreeRootType>,
+		treeSource: UmbTreeDataSourceConstructor<TreeItemType>,
 		treeStoreContextAlias: string | UmbContextToken<any, any>,
 	) {
 		super(host);
@@ -36,13 +44,7 @@ export class UmbTreeRepositoryBase<
 	 * @return {*}
 	 * @memberof UmbTreeRepositoryBase
 	 */
-	async requestTreeRoot() {
-		if (!this.#treeSource.getTreeRoot?.()) {
-			return { data: undefined, error: undefined };
-		}
-
-		return this.#treeSource.getTreeRoot();
-	}
+	abstract requestTreeRoot(): Promise<{ data?: TreeRootType; error?: Error }>;
 
 	/**
 	 * Requests root items of a tree

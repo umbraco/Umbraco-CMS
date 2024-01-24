@@ -214,7 +214,7 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 						.value=${this.property.name}
 						@input=${this.#onNameChange}></uui-input>
 					${this.renderPropertyAlias()}
-					<slot name="property-action-menu"></slot>
+					<slot name="action-menu"></slot>
 					<p>
 						<uui-textarea
 							label="description"
@@ -303,6 +303,11 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 					${this.property.appearance?.labelOnTop == true
 						? html`<uui-tag look="default">
 								<span>${this.localize.term('contentTypeEditor_displaySettingsLabelOnTop')}</span>
+						  </uui-tag>`
+						: nothing}
+					${this.property.validation.mandatory === true
+						? html`<uui-tag look="default">
+								<span>* ${this.localize.term('general_mandatory')}</span>
 						  </uui-tag>`
 						: nothing}
 			  </div>`

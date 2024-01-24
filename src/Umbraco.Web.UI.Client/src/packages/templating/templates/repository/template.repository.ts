@@ -4,27 +4,21 @@ import { UmbTemplateDetailServerDataSource } from './sources/template.detail.ser
 import { UMB_TEMPLATE_ITEM_STORE_CONTEXT, UmbTemplateItemStore } from './template-item.store.js';
 import { UmbTemplateItemServerDataSource } from './sources/template.item.server.data.js';
 import { UmbTemplateQueryBuilderServerDataSource } from './sources/template.query-builder.server.data.js';
-import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
-import type { UmbDetailRepository, UmbItemDataSource, UmbItemRepository } from '@umbraco-cms/backoffice/repository';
+import type { UmbItemDataSource, UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
 import type {
 	CreateTemplateRequestModel,
-	ItemResponseModelBaseModel,
 	TemplateItemResponseModel,
 	TemplateQueryExecuteModel,
-	TemplateResponseModel,
 	UpdateTemplateRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
 export class UmbTemplateRepository
 	extends UmbBaseController
-	implements
-		UmbDetailRepository<CreateTemplateRequestModel, string, UpdateTemplateRequestModel, TemplateResponseModel>,
-		UmbItemRepository<TemplateItemResponseModel>,
-		UmbApi
+	implements UmbItemRepository<TemplateItemResponseModel>, UmbApi
 {
 	#init;
 
@@ -66,6 +60,8 @@ export class UmbTemplateRepository
 
 	//#region DETAILS:
 
+	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+	// @ts-ignore
 	async createScaffold(parentId: string | null) {
 		await this.#init;
 		return this.#detailDataSource.createScaffold(parentId);
@@ -196,7 +192,9 @@ export class UmbTemplateRepository
 		return { data, error, asObservable: () => this.#itemStore!.items(ids) };
 	}
 
-	async items(uniques: string[]): Promise<Observable<ItemResponseModelBaseModel[]>> {
+	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+	// @ts-ignore
+	async items(uniques: string[]): any {
 		throw new Error('items method is not implemented in UmbTemplateRepository');
 	}
 

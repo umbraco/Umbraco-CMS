@@ -44,11 +44,22 @@ export class UmbUserServerDataSource implements UmbUserDetailDataSource {
 	 * @memberof UmbUserServerDataSource
 	 */
 	async read(id: string) {
-		if (!id) throw new Error('Id is missing');
-		const response = await tryExecuteAndNotify(this.#host, UserResource.getUserById({ id }));
-		return extendDataSourceResponseData<UmbUserDetailModel>(response, {
-			entityType: UMB_USER_ENTITY_TYPE,
-		});
+		if (!id) throw new Error('Unique is missing');
+
+		const { data, error } = await tryExecuteAndNotify(this.#host, UserResource.getUserById({ id }));
+
+		if (error || !data) {
+			return { error };
+		}
+
+		// TODO: make data mapper to prevent errors
+		// TODO: use unique
+		const user: UmbUserDetailModel = {
+			entityType: 'user',
+			...data,
+		};
+
+		return { data: user };
 	}
 
 	/**

@@ -4,6 +4,5 @@
 /* eslint-disable */
 
 export type PropertyTypeAppearanceModel = {
-    labelOnTop?: boolean;
+    labelOnTop: boolean;
 };
-

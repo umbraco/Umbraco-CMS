@@ -11,7 +11,7 @@ import {
 	UmbTableConfig,
 	UmbTableOrderedEvent,
 } from '@umbraco-cms/backoffice/components';
-import { UMB_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
+import { UMB_DEFAULT_COLLECTION_CONTEXT } from '@umbraco-cms/backoffice/collection';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbUserGroupRepository } from '@umbraco-cms/backoffice/user-group';
 
@@ -67,7 +67,7 @@ export class UmbUserTableCollectionViewElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_COLLECTION_CONTEXT, (instance) => {
+		this.consumeContext(UMB_DEFAULT_COLLECTION_CONTEXT, (instance) => {
 			this.#collectionContext = instance as UmbUserCollectionContext;
 			this.observe(
 				this.#collectionContext.selection.selection,

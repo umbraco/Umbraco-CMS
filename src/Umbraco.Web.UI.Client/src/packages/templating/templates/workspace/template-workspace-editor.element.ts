@@ -1,7 +1,7 @@
 import type { UmbTemplatingInsertMenuElement } from '../../components/insert-menu/templating-insert-menu.element.js';
 import { UMB_MODAL_TEMPLATING_INSERT_SECTION_MODAL } from '../../modals/insert-section-modal/insert-section-modal.element.js';
 import { UMB_TEMPLATE_QUERY_BUILDER_MODAL } from '../modals/modal-tokens.js';
-import { getQuerySnippet } from '../../utils.js';
+import { getQuerySnippet } from '../../utils/index.js';
 import { UMB_TEMPLATE_WORKSPACE_CONTEXT } from './template-workspace.context.js';
 import type { UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
 import { camelCase } from '@umbraco-cms/backoffice/external/lodash';
@@ -78,7 +78,7 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 
 			this.inputQuery$.pipe(debounceTime(250)).subscribe((nameInputValue) => {
 				this.#templateWorkspaceContext?.setName(nameInputValue);
-				if (this.#isNew && !this._alias) this.#templateWorkspaceContext?.setAlias(camelCase(nameInputValue));
+				if (this.#isNew) this.#templateWorkspaceContext?.setAlias(camelCase(nameInputValue));
 			});
 		});
 	}
@@ -90,6 +90,7 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 	}
 
 	#onAliasInput(event: Event) {
+		event.stopPropagation();
 		const target = event.target as UUIInputElement;
 		const value = target.value as string;
 		this.#templateWorkspaceContext?.setAlias(value);
@@ -136,7 +137,7 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 
 		modalContext?.onSubmit().then((value) => {
 			if (!value?.selection) return;
-			this.#templateWorkspaceContext?.setMasterTemplate(value.selection[0] ?? '');
+			this.#templateWorkspaceContext?.setMasterTemplate(value.selection[0] ?? null);
 		});
 	}
 
@@ -188,7 +189,7 @@ export class UmbTemplateWorkspaceEditorElement extends UmbLitElement {
 				.value=${this._name}
 				@input=${this.#onNameInput}
 				label="template name">
-				<uui-input-lock slot="append" value=${ifDefined(this._alias!)} @change=${this.#onAliasInput}></uui-input-lock>
+				<uui-input-lock slot="append" value=${ifDefined(this._alias!)} @input=${this.#onAliasInput}></uui-input-lock>
 			</uui-input>
 
 			<uui-box>

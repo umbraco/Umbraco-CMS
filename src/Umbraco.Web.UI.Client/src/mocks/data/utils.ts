@@ -1,17 +1,17 @@
 import type {
 	ContentTreeItemResponseModel,
 	DocumentTreeItemResponseModel,
-	DocumentTypeTreeItemResponseModel,
 	EntityTreeItemResponseModel,
 	FolderTreeItemResponseModel,
-	DocumentTypeResponseModel,
 	FileSystemTreeItemPresentationModel,
 	DocumentResponseModel,
-	TextFileResponseModelBaseModel,
-	FileItemResponseModelBaseModel,
+	FileSystemFileResponseModelBaseModel,
+	FileSystemItemResponseModelBaseModel,
 	MediaTypeResponseModel,
 	MediaTypeTreeItemResponseModel,
+	MediaTreeItemResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
+import { UmbMediaDetailModel } from '@umbraco-cms/backoffice/media';
 
 export const createEntityTreeItem = (item: any): EntityTreeItemResponseModel => {
 	return {
@@ -24,15 +24,14 @@ export const createEntityTreeItem = (item: any): EntityTreeItemResponseModel => 
 	};
 };
 
-export const createFolderTreeItem = (item: any): FolderTreeItemResponseModel => {
+export const folderTreeItemMapper = (item: any): FolderTreeItemResponseModel => {
 	return {
 		...createEntityTreeItem(item),
 		isFolder: item.isFolder,
 	};
 };
 
-// TODO: remove isTrashed type extension when we have found a solution to trashed items
-export const createContentTreeItem = (item: any): ContentTreeItemResponseModel & { isTrashed: boolean } => {
+export const createContentTreeItem = (item: any): ContentTreeItemResponseModel => {
 	// TODO: There we have to adapt to variants as part of the tree model:
 	return {
 		...createEntityTreeItem(item),
@@ -41,10 +40,9 @@ export const createContentTreeItem = (item: any): ContentTreeItemResponseModel &
 	};
 };
 
-// TODO: remove isTrashed type extension when we have found a solution to trashed items
-export const createDocumentTreeItem = (
-	item: DocumentResponseModel,
-): DocumentTreeItemResponseModel & { isTrashed: boolean } => {
+export const createDocumentTreeItem = (item: DocumentResponseModel): DocumentTreeItemResponseModel => {
+	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+	// @ts-ignore
 	return {
 		...createContentTreeItem(item),
 		type: 'document',
@@ -60,11 +58,11 @@ export const createDocumentTreeItem = (
 	};
 };
 
-export const createDocumentTypeTreeItem = (item: DocumentTypeResponseModel): DocumentTypeTreeItemResponseModel => {
+export const createMediaTreeItem = (item: UmbMediaDetailModel): MediaTreeItemResponseModel => {
 	return {
-		...createEntityTreeItem(item),
-		type: 'document-type',
-		isElement: item.isElement,
+		...createContentTreeItem(item),
+		type: 'media',
+		icon: 'media', // TODO: Should get this from media type...
 	};
 };
 
@@ -72,29 +70,33 @@ export const createMediaTypeTreeItem = (item: MediaTypeResponseModel): MediaType
 	return {
 		...createEntityTreeItem(item),
 		type: 'media-type',
+		isFolder: false,
+		icon: item.icon,
 	};
 };
 
-export const createFileSystemTreeItem = (item: any): FileSystemTreeItemPresentationModel => {
+export const createFileSystemTreeItem = (item: any): Omit<FileSystemTreeItemPresentationModel, 'type'> => {
 	return {
-		name: item.name,
-		type: item.type,
-		hasChildren: item.hasChildren,
 		path: item.path,
-		isFolder: item.isFolder,
+		parent: item.parent ?? null,
+		name: item.name,
+		hasChildren: item.hasChildren ?? false,
+		isFolder: item.isFolder ?? false,
 	};
 };
 
-export const createTextFileItem = (item: any): TextFileResponseModelBaseModel => ({
+export const textFileItemMapper = (item: any): FileSystemFileResponseModelBaseModel => ({
 	path: item.path,
 	name: item.name,
+	parent: item.parent,
 	content: item.content,
 });
 
-export const createFileItemResponseModelBaseModel = (item: any): FileItemResponseModelBaseModel => ({
+export const createFileItemResponseModelBaseModel = (item: any): FileSystemItemResponseModelBaseModel => ({
 	path: item.path,
 	name: item.name,
-	icon: item.icon,
+	parent: item.parent,
+	isFolder: item.isFolder,
 });
 
 export const arrayFilter = (filterBy: Array<string>, value?: Array<string>): boolean => {

@@ -4,7 +4,6 @@
 /* eslint-disable */
 
 export type CultureReponseModel = {
-    name?: string;
-    englishName?: string;
+    name: string;
+    englishName: string;
 };
-

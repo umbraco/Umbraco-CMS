@@ -1,58 +1,55 @@
-import type { UmbTreeDataSource } from '@umbraco-cms/backoffice/tree';
-import { EntityTreeItemResponseModel, MediaResource } from '@umbraco-cms/backoffice/backend-api';
+import { UmbMediaTreeItemModel } from './types.js';
+import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
+import { MediaResource, MediaTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the Media tree that fetches data from the server
  * @export
  * @class UmbMediaTreeServerDataSource
- * @implements {UmbTreeDataSource}
+ * @extends {UmbTreeServerDataSourceBase}
  */
-export class UmbMediaTreeServerDataSource implements UmbTreeDataSource<EntityTreeItemResponseModel> {
-	#host: UmbControllerHost;
-
+export class UmbMediaTreeServerDataSource extends UmbTreeServerDataSourceBase<
+	MediaTreeItemResponseModel,
+	UmbMediaTreeItemModel
+> {
 	/**
 	 * Creates an instance of UmbMediaTreeServerDataSource.
 	 * @param {UmbControllerHost} host
 	 * @memberof UmbMediaTreeServerDataSource
 	 */
 	constructor(host: UmbControllerHost) {
-		this.#host = host;
-	}
-
-	/**
-	 * Fetches the root items for the tree from the server
-	 * @return {*}
-	 * @memberof UmbMediaTreeServerDataSource
-	 */
-	async getRootItems() {
-		return tryExecuteAndNotify(this.#host, MediaResource.getTreeMediaRoot({}));
-	}
-
-	/**
-	 * Fetches the children of a given parent id from the server
-	 * @param {(string)} parentId
-	 * @return {*}
-	 * @memberof UmbMediaTreeServerDataSource
-	 */
-	async getChildrenOf(parentId: string | null): Promise<any> {
-		/* TODO: should we make getRootItems() internal
-		so it only is a server concern that there are two endpoints? */
-		if (parentId === null) {
-			return this.getRootItems();
-		} else {
-			return tryExecuteAndNotify(
-				this.#host,
-				MediaResource.getTreeMediaChildren({
-					parentId,
-				}),
-			);
-		}
-	}
-
-	// TODO: remove when interface is cleaned up
-	async getItems(unique: Array<string>): Promise<any> {
-		throw new Error('Dot not use this method. Use the item source instead');
+		super(host, {
+			getRootItems,
+			getChildrenOf,
+			mapper,
+		});
 	}
 }
+
+const getRootItems = () => MediaResource.getTreeMediaRoot({});
+
+const getChildrenOf = (parentUnique: string | null) => {
+	if (parentUnique === null) {
+		return getRootItems();
+	} else {
+		// eslint-disable-next-line local-rules/no-direct-api-import
+		return MediaResource.getTreeMediaChildren({
+			parentId: parentUnique,
+		});
+	}
+};
+
+const mapper = (item: MediaTreeItemResponseModel): UmbMediaTreeItemModel => {
+	return {
+		id: item.id,
+		parentId: item.parentId || null,
+		name: item.name,
+		entityType: 'media',
+		hasChildren: item.hasChildren,
+		isContainer: item.isContainer,
+		noAccess: item.noAccess,
+		isTrashed: item.isTrashed,
+		isFolder: false,
+	};
+};

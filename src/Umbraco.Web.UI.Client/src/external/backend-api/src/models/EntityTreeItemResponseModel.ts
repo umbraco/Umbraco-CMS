@@ -6,8 +6,7 @@
 import type { TreeItemPresentationModel } from './TreeItemPresentationModel';
 
 export type EntityTreeItemResponseModel = (TreeItemPresentationModel & {
-    id?: string;
-    isContainer?: boolean;
-    parentId?: string | null;
+id: string;
+isContainer: boolean;
+parentId?: string | null;
 });
-

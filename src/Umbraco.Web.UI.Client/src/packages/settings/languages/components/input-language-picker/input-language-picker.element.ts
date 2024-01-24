@@ -2,7 +2,8 @@ import { UmbLanguagePickerContext } from './input-language-picker.context.js';
 import { css, html, ifDefined, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { LanguageItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-input-language-picker')
 export class UmbInputLanguagePickerElement extends FormControlMixin(UmbLitElement) {
@@ -53,7 +54,7 @@ export class UmbInputLanguagePickerElement extends FormControlMixin(UmbLitElemen
 	maxMessage = 'This field exceeds the allowed amount of items';
 
 	@property({ type: Object, attribute: false })
-	public filter: (language: LanguageResponseModel) => boolean = () => true;
+	public filter: (language: LanguageItemResponseModel) => boolean = () => true;
 
 	public get selectedIsoCodes(): Array<string> {
 		return this.#pickerContext.getSelection();
@@ -65,11 +66,11 @@ export class UmbInputLanguagePickerElement extends FormControlMixin(UmbLitElemen
 	@property()
 	public set value(isoCodesString: string) {
 		// Its with full purpose we don't call super.value, as thats being handled by the observation of the context selection.
-		this.selectedIsoCodes = isoCodesString.split(/[ ,]+/);
+		this.selectedIsoCodes = splitStringToArray(isoCodesString);
 	}
 
 	@state()
-	private _items: Array<LanguageResponseModel> = [];
+	private _items: Array<LanguageItemResponseModel> = [];
 
 	#pickerContext = new UmbLanguagePickerContext(this);
 
@@ -96,7 +97,7 @@ export class UmbInputLanguagePickerElement extends FormControlMixin(UmbLitElemen
 		return undefined;
 	}
 
-	private _openPicker() {
+	#openPicker() {
 		this.#pickerContext.openPicker({
 			filter: this.filter,
 		});
@@ -104,19 +105,12 @@ export class UmbInputLanguagePickerElement extends FormControlMixin(UmbLitElemen
 
 	render() {
 		return html`
-			<uui-ref-list> ${this._items.map((item) => this._renderItem(item))} </uui-ref-list>
-			<uui-button
-				id="add-button"
-				look="placeholder"
-				@click=${this._openPicker}
-				label="open"
-				?disabled="${this._items.length === this.max}"
-				>Add</uui-button
-			>
+			<uui-ref-list> ${this._items.map((item) => this.#renderItem(item))} </uui-ref-list>
+			<uui-button id="add-button" look="placeholder" @click=${this.#openPicker} label="open">Add</uui-button>
 		`;
 	}
 
-	private _renderItem(item: LanguageResponseModel) {
+	#renderItem(item: LanguageItemResponseModel) {
 		if (!item.isoCode) return;
 		return html`
 			<!-- TODO: add language ref element -->

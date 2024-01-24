@@ -4,7 +4,6 @@
 /* eslint-disable */
 
 export type ImportDictionaryRequestModel = {
-    temporaryFileId?: string;
+    temporaryFileId: string;
     parentId?: string | null;
 };
-

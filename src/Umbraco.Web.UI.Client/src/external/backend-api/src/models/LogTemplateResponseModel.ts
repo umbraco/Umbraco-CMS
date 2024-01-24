@@ -5,6 +5,5 @@
 
 export type LogTemplateResponseModel = {
     messageTemplate?: string | null;
-    count?: number;
+    count: number;
 };
-

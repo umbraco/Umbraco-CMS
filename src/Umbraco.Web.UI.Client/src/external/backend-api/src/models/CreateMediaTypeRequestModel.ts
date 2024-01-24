@@ -6,4 +6,3 @@
 import type { CreateContentTypeForMediaTypeRequestModel } from './CreateContentTypeForMediaTypeRequestModel';
 
 export type CreateMediaTypeRequestModel = CreateContentTypeForMediaTypeRequestModel;
-

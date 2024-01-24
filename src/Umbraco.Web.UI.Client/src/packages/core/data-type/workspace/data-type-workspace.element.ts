@@ -1,22 +1,21 @@
+import { UmbDataTypeWorkspaceEditorElement } from './data-type-workspace-editor.element.js';
 import { UmbDataTypeWorkspaceContext } from './data-type-workspace.context.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
-import './data-type-workspace-editor.element.js';
 import { UmbWorkspaceIsNewRedirectController } from '@umbraco-cms/backoffice/workspace';
 
 @customElement('umb-data-type-workspace')
 export class UmbDataTypeWorkspaceElement extends UmbLitElement {
 	#workspaceContext = new UmbDataTypeWorkspaceContext(this);
-
-	#element = document.createElement('umb-data-type-workspace-editor');
+	#createElement = () => new UmbDataTypeWorkspaceEditorElement();
 
 	private _routes: UmbRoute[] = [
 		{
 			path: 'create/:parentUnique',
-			component: () => this.#element,
+			component: this.#createElement,
 			setup: (_component, info) => {
 				const parentUnique = info.match.params.parentUnique === 'null' ? null : info.match.params.parentUnique;
 				this.#workspaceContext.create(parentUnique);
@@ -30,7 +29,7 @@ export class UmbDataTypeWorkspaceElement extends UmbLitElement {
 		},
 		{
 			path: 'edit/:unique',
-			component: () => this.#element,
+			component: this.#createElement,
 			setup: (_component, info) => {
 				const unique = info.match.params.unique;
 				this.#workspaceContext.load(unique);

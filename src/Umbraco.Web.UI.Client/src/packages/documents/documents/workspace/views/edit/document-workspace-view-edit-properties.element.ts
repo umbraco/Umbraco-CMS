@@ -1,4 +1,4 @@
-import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../document-workspace.context.js';
+import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../document-workspace.context-token.js';
 import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbContentTypePropertyStructureHelper, PropertyContainerTypes } from '@umbraco-cms/backoffice/content-type';
@@ -22,7 +22,7 @@ export class UmbDocumentWorkspaceViewEditPropertiesElement extends UmbLitElement
 		this._propertyStructureHelper.setContainerType(value);
 	}
 
-	_propertyStructureHelper = new UmbContentTypePropertyStructureHelper(this);
+	_propertyStructureHelper = new UmbContentTypePropertyStructureHelper<any>(this);
 
 	@state()
 	_propertyStructure: Array<PropertyTypeModelBaseModel> = [];

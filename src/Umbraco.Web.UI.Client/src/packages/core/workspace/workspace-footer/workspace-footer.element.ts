@@ -1,3 +1,4 @@
+import { UMB_SAVEABLE_WORKSPACE_CONTEXT } from '../saveable-workspace.context-token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 
@@ -22,14 +23,20 @@ export class UmbWorkspaceFooterLayoutElement extends UmbLitElement {
 	@state()
 	_modalContext?: UmbModalContext;
 
+	@state()
+	_isNew?: boolean;
+
 	constructor() {
 		super();
+		this.consumeContext(UMB_SAVEABLE_WORKSPACE_CONTEXT, (context) => {
+			this._isNew = context.getIsNew();
+		});
 		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (context) => {
 			this._modalContext = context;
 		});
 	}
 
-	private _onClose = () => {
+	#rejectModal = () => {
 		this._modalContext?.reject();
 	};
 
@@ -39,7 +46,10 @@ export class UmbWorkspaceFooterLayoutElement extends UmbLitElement {
 			<umb-footer-layout>
 				<slot></slot>
 				${this._modalContext
-					? html`<uui-button slot="actions" label="Close" @click=${this._onClose}></uui-button>`
+					? html`<uui-button
+							slot="actions"
+							label=${this._isNew ? 'Cancel' : 'Close'}
+							@click=${this.#rejectModal}></uui-button>`
 					: ''}
 				<slot name="actions" slot="actions"></slot>
 				<umb-extension-slot

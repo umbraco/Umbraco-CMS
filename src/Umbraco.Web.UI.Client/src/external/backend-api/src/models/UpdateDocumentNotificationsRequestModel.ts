@@ -4,6 +4,5 @@
 /* eslint-disable */
 
 export type UpdateDocumentNotificationsRequestModel = {
-    subscribedActionIds?: Array<string>;
+    subscribedActionIds: Array<string>;
 };
-

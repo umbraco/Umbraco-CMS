@@ -1,7 +1,7 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UMB_COLLECTION_CONTEXT, UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
+import { UMB_DEFAULT_COLLECTION_CONTEXT, UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
 import { UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 import '../components/user-group-table-name-column-layout.element.js';
@@ -59,7 +59,7 @@ export class UmbUserGroupCollectionTableViewElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_COLLECTION_CONTEXT, (instance) => {
+		this.consumeContext(UMB_DEFAULT_COLLECTION_CONTEXT, (instance) => {
 			this.#collectionContext = instance;
 			this.observe(
 				this.#collectionContext.selection.selection,

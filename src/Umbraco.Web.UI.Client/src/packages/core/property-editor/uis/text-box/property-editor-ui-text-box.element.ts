@@ -31,7 +31,9 @@ export class UmbPropertyEditorUITextBoxElement extends UmbLitElement implements 
 	}
 
 	private onChange(e: Event) {
-		this.value = (e.target as HTMLInputElement).value;
+		const newValue = (e.target as HTMLInputElement).value;
+		if (newValue === this.value) return;
+		this.value = newValue;
 		this.dispatchEvent(new CustomEvent('property-value-change'));
 	}
 
@@ -41,7 +43,7 @@ export class UmbPropertyEditorUITextBoxElement extends UmbLitElement implements 
 			.type=${this._type}
 			inputMode=${ifDefined(this._inputMode)}
 			maxlength=${ifDefined(this._maxChars)}
-			@change=${this.onChange}></uui-input>`;
+			@input=${this.onChange}></uui-input>`;
 	}
 
 	static styles = [

@@ -4,9 +4,8 @@
 /* eslint-disable */
 
 export type UserPresentationBaseModel = {
-    email?: string;
-    userName?: string;
-    name?: string;
-    userGroupIds?: Array<string>;
+    email: string;
+    userName: string;
+    name: string;
+    userGroupIds: Array<string>;
 };
-

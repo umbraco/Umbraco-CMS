@@ -15,18 +15,18 @@ export class HelpResource {
      * @throws ApiError
      */
     public static getHelp({
-        section,
-        tree,
-        skip,
-        take = 100,
-        baseUrl = 'https://our.umbraco.com',
-    }: {
-        section?: string,
-        tree?: string,
-        skip?: number,
-        take?: number,
-        baseUrl?: string,
-    }): CancelablePromise<PagedHelpPageResponseModel> {
+section,
+tree,
+skip,
+take = 100,
+baseUrl = 'https://our.umbraco.com',
+}: {
+section?: string,
+tree?: string,
+skip?: number,
+take?: number,
+baseUrl?: string,
+}): CancelablePromise<PagedHelpPageResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/help',
@@ -39,6 +39,7 @@ export class HelpResource {
             },
             errors: {
                 400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }

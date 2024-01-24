@@ -4,10 +4,9 @@
 /* eslint-disable */
 
 export type PropertyTypeContainerModelBaseModel = {
-    id?: string;
+    id: string;
     parentId?: string | null;
     name?: string | null;
-    type?: string;
-    sortOrder?: number;
+    type: string;
+    sortOrder: number;
 };
-

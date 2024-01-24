@@ -4,9 +4,8 @@
 /* eslint-disable */
 
 export type PropertyTypeValidationModel = {
-    mandatory?: boolean;
+    mandatory: boolean;
     mandatoryMessage?: string | null;
     regEx?: string | null;
     regExMessage?: string | null;
 };
-

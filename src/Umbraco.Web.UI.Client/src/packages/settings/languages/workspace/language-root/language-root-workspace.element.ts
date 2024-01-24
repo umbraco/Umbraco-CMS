@@ -7,6 +7,7 @@ import { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 import './components/language-root-table-delete-column-layout.element.js';
 import './components/language-root-table-name-column-layout.element.js';
+import './components/language-root-table-boolean-column-layout.element.js';
 
 @customElement('umb-language-root-workspace')
 export class UmbLanguageRootWorkspaceElement extends UmbLitElement {
@@ -29,10 +30,12 @@ export class UmbLanguageRootWorkspaceElement extends UmbLitElement {
 		{
 			name: 'Default',
 			alias: 'defaultLanguage',
+			elementName: 'umb-language-root-table-boolean-column-layout',
 		},
 		{
 			name: 'Mandatory',
 			alias: 'mandatoryLanguage',
+			elementName: 'umb-language-root-table-boolean-column-layout',
 		},
 		{
 			name: 'Fallback',

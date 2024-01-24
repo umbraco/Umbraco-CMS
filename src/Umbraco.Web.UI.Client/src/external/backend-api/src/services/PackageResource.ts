@@ -20,10 +20,10 @@ export class PackageResource {
      * @throws ApiError
      */
     public static postPackageByNameRunMigration({
-        name,
-    }: {
-        name: string,
-    }): CancelablePromise<any> {
+name,
+}: {
+name: string,
+}): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/package/{name}/run-migration',
@@ -31,6 +31,7 @@ export class PackageResource {
                 'name': name,
             },
             errors: {
+                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
                 409: `Conflict`,
             },
@@ -42,18 +43,21 @@ export class PackageResource {
      * @throws ApiError
      */
     public static getPackageCreated({
-        skip,
-        take = 100,
-    }: {
-        skip?: number,
-        take?: number,
-    }): CancelablePromise<PagedPackageDefinitionResponseModel> {
+skip,
+take = 100,
+}: {
+skip?: number,
+take?: number,
+}): CancelablePromise<PagedPackageDefinitionResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/package/created',
             query: {
                 'skip': skip,
                 'take': take,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }
@@ -63,18 +67,19 @@ export class PackageResource {
      * @throws ApiError
      */
     public static postPackageCreated({
-        requestBody,
-    }: {
-        requestBody?: CreatePackageRequestModel,
-    }): CancelablePromise<string> {
+requestBody,
+}: {
+requestBody?: CreatePackageRequestModel,
+}): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/package/created',
             body: requestBody,
             mediaType: 'application/json',
-            responseHeader: 'Location',
+            responseHeader: 'Umb-Generated-Resource',
             errors: {
                 400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
         });
@@ -85,10 +90,10 @@ export class PackageResource {
      * @throws ApiError
      */
     public static getPackageCreatedById({
-        id,
-    }: {
-        id: string,
-    }): CancelablePromise<PackageDefinitionResponseModel> {
+id,
+}: {
+id: string,
+}): CancelablePromise<PackageDefinitionResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/package/created/{id}',
@@ -96,6 +101,7 @@ export class PackageResource {
                 'id': id,
             },
             errors: {
+                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
         });
@@ -106,10 +112,10 @@ export class PackageResource {
      * @throws ApiError
      */
     public static deletePackageCreatedById({
-        id,
-    }: {
-        id: string,
-    }): CancelablePromise<any> {
+id,
+}: {
+id: string,
+}): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/package/created/{id}',
@@ -117,6 +123,7 @@ export class PackageResource {
                 'id': id,
             },
             errors: {
+                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
         });
@@ -127,12 +134,12 @@ export class PackageResource {
      * @throws ApiError
      */
     public static putPackageCreatedById({
-        id,
-        requestBody,
-    }: {
-        id: string,
-        requestBody?: UpdatePackageRequestModel,
-    }): CancelablePromise<any> {
+id,
+requestBody,
+}: {
+id: string,
+requestBody?: UpdatePackageRequestModel,
+}): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/package/created/{id}',
@@ -142,6 +149,7 @@ export class PackageResource {
             body: requestBody,
             mediaType: 'application/json',
             errors: {
+                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
         });
@@ -152,10 +160,10 @@ export class PackageResource {
      * @throws ApiError
      */
     public static getPackageCreatedByIdDownload({
-        id,
-    }: {
-        id: string,
-    }): CancelablePromise<Blob> {
+id,
+}: {
+id: string,
+}): CancelablePromise<Blob> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/package/created/{id}/download',
@@ -163,6 +171,7 @@ export class PackageResource {
                 'id': id,
             },
             errors: {
+                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
         });
@@ -176,6 +185,9 @@ export class PackageResource {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/package/manifest',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -184,18 +196,21 @@ export class PackageResource {
      * @throws ApiError
      */
     public static getPackageMigrationStatus({
-        skip,
-        take = 100,
-    }: {
-        skip?: number,
-        take?: number,
-    }): CancelablePromise<PagedPackageMigrationStatusResponseModel> {
+skip,
+take = 100,
+}: {
+skip?: number,
+take?: number,
+}): CancelablePromise<PagedPackageMigrationStatusResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/package/migration-status',
             query: {
                 'skip': skip,
                 'take': take,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }

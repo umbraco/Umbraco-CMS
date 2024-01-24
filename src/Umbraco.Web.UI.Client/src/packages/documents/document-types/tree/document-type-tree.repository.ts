@@ -1,4 +1,4 @@
-import { UMB_DOCUMENT_TYPE_ROOT_ENTITY_TYPE } from '../index.js';
+import { UMB_DOCUMENT_TYPE_ROOT_ENTITY_TYPE } from '../entity.js';
 import { UmbDocumentTypeTreeServerDataSource } from './document-type.tree.server.data-source.js';
 import { UMB_DOCUMENT_TYPE_TREE_STORE_CONTEXT } from './document-type.tree.store.js';
 import { UmbDocumentTypeTreeItemModel, UmbDocumentTypeTreeRootModel } from './types.js';
@@ -15,12 +15,14 @@ export class UmbDocumentTypeTreeRepository
 	}
 
 	async requestTreeRoot() {
-		const data = {
-			id: null,
-			type: UMB_DOCUMENT_TYPE_ROOT_ENTITY_TYPE,
+		const data: UmbDocumentTypeTreeRootModel = {
+			unique: null,
+			entityType: UMB_DOCUMENT_TYPE_ROOT_ENTITY_TYPE,
 			name: 'Document Types',
 			icon: 'icon-folder',
 			hasChildren: true,
+			isContainer: false,
+			isFolder: true,
 		};
 
 		return { data };

@@ -77,8 +77,10 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 			this._preConfiguredDatabase = this._databases.find((x) => x.isConfigured);
 			if (this._preConfiguredDatabase) {
 				this._setDatabase({
-					id: this._preConfiguredDatabase.id!,
-					providerName: this._preConfiguredDatabase.providerName!,
+					id: this._preConfiguredDatabase.id,
+					providerName: this._preConfiguredDatabase.providerName,
+					useIntegratedAuthentication: false,
+					trustServerCertificate: false,
 				});
 			} else {
 				this._options = this._databases
@@ -109,12 +111,12 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 		value[target.name] = target.checked ?? target.value; // handle boolean and text inputs
 
 		// TODO: Mark id and providerName as non-optional in schema
-		const database: DatabaseInstallResponseModel = {
+		const database = {
 			id: '0',
 			providerName: '',
 			...this._installerContext?.getData().database,
 			...value,
-		};
+		} as DatabaseInstallResponseModel;
 
 		this._setDatabase(database);
 	}
@@ -166,6 +168,7 @@ export class UmbInstallerDatabaseElement extends UmbLitElement {
 					name,
 					connectionString,
 					providerName: selectedDatabase.providerName,
+					trustServerCertificate: false,
 				};
 
 				const { error } = await tryExecute(

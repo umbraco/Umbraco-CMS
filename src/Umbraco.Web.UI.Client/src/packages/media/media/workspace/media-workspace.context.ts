@@ -5,21 +5,24 @@ import {
 	UmbEditableWorkspaceContextBase,
 } from '@umbraco-cms/backoffice/workspace';
 import { appendToFrozenArray, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
 type EntityType = UmbMediaDetailModel;
 export class UmbMediaWorkspaceContext
-	extends UmbEditableWorkspaceContextBase<UmbMediaRepository, EntityType>
-	implements UmbSaveableWorkspaceContextInterface<EntityType | undefined>, UmbApi
+	extends UmbEditableWorkspaceContextBase<EntityType>
+	implements UmbSaveableWorkspaceContextInterface, UmbApi
 {
+	//
+	public readonly repository: UmbMediaRepository = new UmbMediaRepository(this);
+
 	#data = new UmbObjectState<EntityType | undefined>(undefined);
 	data = this.#data.asObservable();
 	name = this.#data.asObservablePart((data) => data?.name);
 
-	constructor(host: UmbControllerHostElement) {
-		super(host, 'Umb.Workspace.Media', new UmbMediaRepository(host));
+	constructor(host: UmbControllerHost) {
+		super(host, 'Umb.Workspace.Media');
 	}
 
 	getData() {
@@ -54,7 +57,7 @@ export class UmbMediaWorkspaceContext
 		const { data } = await this.repository.requestById(entityId);
 		if (data) {
 			this.setIsNew(false);
-			this.#data.next(data);
+			this.#data.setValue(data);
 		}
 	}
 
@@ -64,14 +67,18 @@ export class UmbMediaWorkspaceContext
 		this.setIsNew(true);
 		// TODO: This is a hack to get around the fact that the data is not typed correctly.
 		// Create and response models are different. We need to look into this.
-		this.#data.next(data as unknown as UmbMediaDetailModel);
+		this.#data.setValue(data as unknown as UmbMediaDetailModel);
 	}
 
 	async save() {
 		if (!this.#data.value) return;
 		if (this.isNew) {
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
 			await this.repository.create(this.#data.value);
 		} else {
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
 			await this.repository.save(this.#data.value.id, this.#data.value);
 		}
 		// If it went well, then its not new anymore?.

@@ -1,18 +1,18 @@
+import { UmbDocumentTreeItemModel } from '../types.js';
 import { UmbDocumentTreeItemContext } from './document-tree-item.context.js';
 import { css, html, nothing, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { DocumentTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbTreeItemElement } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-document-tree-item')
 export class UmbDocumentTreeItemElement extends UmbLitElement implements UmbTreeItemElement {
-	private _item?: DocumentTreeItemResponseModel;
+	private _item?: UmbDocumentTreeItemModel;
 	@property({ type: Object, attribute: false })
 	public get item() {
 		return this._item;
 	}
-	public set item(value: DocumentTreeItemResponseModel | undefined) {
+	public set item(value: UmbDocumentTreeItemModel | undefined) {
 		this._item = value;
 		this.#context.setTreeItem(value);
 	}

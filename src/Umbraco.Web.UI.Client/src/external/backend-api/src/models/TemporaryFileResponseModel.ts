@@ -4,8 +4,7 @@
 /* eslint-disable */
 
 export type TemporaryFileResponseModel = {
-    id?: string;
+    id: string;
     availableUntil?: string | null;
-    fileName?: string;
+    fileName: string;
 };
-

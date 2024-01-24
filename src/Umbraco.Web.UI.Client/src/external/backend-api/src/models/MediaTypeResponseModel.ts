@@ -6,4 +6,3 @@
 import type { ContentTypeForMediaTypeResponseModel } from './ContentTypeForMediaTypeResponseModel';
 
 export type MediaTypeResponseModel = ContentTypeForMediaTypeResponseModel;
-

@@ -1,4 +1,5 @@
 import { UmbDocumentTypeWorkspaceContext } from './document-type-workspace.context.js';
+import { UmbDocumentTypeWorkspaceEditorElement } from './document-type-workspace-editor.element.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbRoute } from '@umbraco-cms/backoffice/router';
@@ -8,12 +9,13 @@ import { UmbWorkspaceIsNewRedirectController } from '@umbraco-cms/backoffice/wor
 @customElement('umb-document-type-workspace')
 export class UmbDocumentTypeWorkspaceElement extends UmbLitElement {
 	#workspaceContext = new UmbDocumentTypeWorkspaceContext(this);
+	#createElement = () => new UmbDocumentTypeWorkspaceEditorElement();
 
 	@state()
 	_routes: UmbRoute[] = [
 		{
 			path: 'create/:parentId',
-			component: import('./document-type-workspace-editor.element.js'),
+			component: this.#createElement,
 			setup: (_component, info) => {
 				const parentId = info.match.params.parentId === 'null' ? null : info.match.params.parentId;
 				this.#workspaceContext.create(parentId);
@@ -27,7 +29,7 @@ export class UmbDocumentTypeWorkspaceElement extends UmbLitElement {
 		},
 		{
 			path: 'edit/:id',
-			component: import('./document-type-workspace-editor.element.js'),
+			component: this.#createElement,
 			setup: (_component, info) => {
 				this.removeControllerByAlias('_observeIsNew');
 				const id = info.match.params.id;

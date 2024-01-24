@@ -4,7 +4,6 @@
 /* eslint-disable */
 
 export type TemplateQueryResultItemPresentationModel = {
-    icon?: string;
-    name?: string;
+    icon: string;
+    name: string;
 };
-

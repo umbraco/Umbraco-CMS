@@ -116,7 +116,7 @@ export class UmbLanguageDetailsWorkspaceViewElement extends UmbLitElement implem
 	render() {
 		return html`
 			<uui-box>
-				<umb-workspace-property-layout label="Language">
+				<umb-property-layout label="Language">
 					<div slot="editor">
 						<!-- TODO: disable already created cultures in the select -->
 						<umb-input-culture-select
@@ -129,13 +129,13 @@ export class UmbLanguageDetailsWorkspaceViewElement extends UmbLitElement implem
 							(isoCodeError) => html`<div class="validation-message">${isoCodeError}</div>`,
 						)}
 					</div>
-				</umb-workspace-property-layout>
+				</umb-property-layout>
 
-				<umb-workspace-property-layout label="ISO Code">
+				<umb-property-layout label="ISO Code">
 					<div slot="editor">${this._language?.isoCode}</div>
-				</umb-workspace-property-layout>
+				</umb-property-layout>
 
-				<umb-workspace-property-layout label="Settings">
+				<umb-property-layout label="Settings">
 					<div slot="editor">
 						<uui-toggle
 							label="Default language"
@@ -165,9 +165,9 @@ export class UmbLanguageDetailsWorkspaceViewElement extends UmbLitElement implem
 							</div>
 						</uui-toggle>
 					</div>
-				</umb-workspace-property-layout>
+				</umb-property-layout>
 
-				<umb-workspace-property-layout
+				<umb-property-layout
 					label="Fallback language"
 					description="To allow multi-lingual content to fall back to another language if not present in the requested language, select it here.">
 					<umb-input-language-picker
@@ -177,7 +177,7 @@ export class UmbLanguageDetailsWorkspaceViewElement extends UmbLitElement implem
 						@change=${this.#handleFallbackChange}
 						.filter=${(language: LanguageResponseModel) =>
 							language.isoCode !== this._language?.isoCode}></umb-input-language-picker>
-				</umb-workspace-property-layout>
+				</umb-property-layout>
 			</uui-box>
 		`;
 	}

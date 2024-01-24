@@ -9,19 +9,18 @@ import type { CreateDocumentTypePropertyTypeContainerRequestModel } from './Crea
 import type { CreateDocumentTypePropertyTypeRequestModel } from './CreateDocumentTypePropertyTypeRequestModel';
 
 export type CreateContentTypeForDocumentTypeRequestModel = {
-    alias?: string;
-    name?: string;
+    alias: string;
+    name: string;
     description?: string | null;
-    icon?: string;
-    allowedAsRoot?: boolean;
-    variesByCulture?: boolean;
-    variesBySegment?: boolean;
-    isElement?: boolean;
-    properties?: Array<CreateDocumentTypePropertyTypeRequestModel>;
-    containers?: Array<CreateDocumentTypePropertyTypeContainerRequestModel>;
-    allowedContentTypes?: Array<ContentTypeSortModel>;
-    compositions?: Array<ContentTypeCompositionModel>;
+    icon: string;
+    allowedAsRoot: boolean;
+    variesByCulture: boolean;
+    variesBySegment: boolean;
+    isElement: boolean;
+    properties: Array<CreateDocumentTypePropertyTypeRequestModel>;
+    containers: Array<CreateDocumentTypePropertyTypeContainerRequestModel>;
+    allowedContentTypes: Array<ContentTypeSortModel>;
+    compositions: Array<ContentTypeCompositionModel>;
     id?: string | null;
     containerId?: string | null;
 };
-

@@ -4,7 +4,6 @@
 /* eslint-disable */
 
 export type LogMessagePropertyPresentationModel = {
-    name?: string;
+    name: string;
     value?: string | null;
 };
-

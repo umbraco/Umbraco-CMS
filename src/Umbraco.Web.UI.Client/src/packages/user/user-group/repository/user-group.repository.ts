@@ -3,15 +3,8 @@ import { UmbUserGroupServerDataSource } from './sources/user-group.server.data-s
 import { UMB_USER_GROUP_ITEM_STORE_CONTEXT_TOKEN, UmbUserGroupItemStore } from './user-group-item.store.js';
 import { UmbUserGroupItemServerDataSource } from './sources/user-group-item.server.data-source.js';
 import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
+import { UserGroupItemResponseModel, UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import {
-	CreateUserGroupRequestModel,
-	UpdateUserGroupRequestModel,
-	UserGroupBaseModel,
-	UserGroupItemResponseModel,
-	UserGroupResponseModel,
-} from '@umbraco-cms/backoffice/backend-api';
-import {
-	UmbDetailRepository,
 	UmbItemDataSource,
 	UmbItemRepository,
 	UmbDataSourceErrorResponse,
@@ -25,10 +18,7 @@ import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 // TODO: implement
 export class UmbUserGroupRepository
 	extends UmbBaseController
-	implements
-		UmbDetailRepository<CreateUserGroupRequestModel, any, UpdateUserGroupRequestModel, UserGroupResponseModel>,
-		UmbItemRepository<UserGroupItemResponseModel>,
-		UmbApi
+	implements UmbItemRepository<UserGroupItemResponseModel>, UmbApi
 {
 	#init;
 
@@ -62,7 +52,9 @@ export class UmbUserGroupRepository
 		]);
 	}
 
-	createScaffold(parentId: string | null): Promise<DataSourceResponse<UserGroupBaseModel>> {
+	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+	// @ts-ignore
+	createScaffold(parentId: string | null) {
 		return this.#detailSource.createScaffold(parentId);
 	}
 

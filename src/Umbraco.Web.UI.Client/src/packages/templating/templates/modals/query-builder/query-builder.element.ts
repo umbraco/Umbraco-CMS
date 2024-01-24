@@ -1,7 +1,8 @@
 import { UmbTemplateRepository } from '../../repository/template.repository.js';
+import { localizePropertyType, localizeSort } from './utils.js';
 import type { UmbQueryBuilderFilterElement } from './query-builder-filter.element.js';
 import { UUIComboboxListElement } from '@umbraco-cms/backoffice/external/uui';
-import { css, html, customElement, state, query, queryAll } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, query, queryAll, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import {
 	UmbModalBaseElement,
 	UMB_DOCUMENT_PICKER_MODAL,
@@ -108,6 +109,8 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 			?.open(UMB_DOCUMENT_PICKER_MODAL, { data: { hideTreeRoot: true } })
 			.onSubmit()
 			.then((result) => {
+				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+				// @ts-ignore
 				this.#updateQueryRequest({ rootContentId: result.selection[0] });
 
 				if (result.selection.length > 0 && result.selection[0] === null) {
@@ -141,6 +144,8 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 
 	#setContentType(event: Event) {
 		const target = event.target as UUIComboboxListElement;
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
 		this.#updateQueryRequest({ contentTypeAlias: (target.value as string) ?? '' });
 	}
 
@@ -149,6 +154,8 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 
 		if (!this._queryRequest.sort) this.#setSortDirection();
 
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
 		this.#updateQueryRequest({
 			sort: { ...this._queryRequest.sort, propertyAlias: (target.value as string) ?? '' },
 		});
@@ -157,11 +164,15 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 	#setSortDirection() {
 		if (!this._queryRequest.sort?.direction) {
 			this.#updateQueryRequest({
+				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+				// @ts-ignore
 				sort: { ...this._queryRequest.sort, direction: this._defaultSortDirection },
 			});
 			return;
 		}
 
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
 		this.#updateQueryRequest({
 			sort: {
 				...this._queryRequest.sort,
@@ -176,6 +187,8 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 	};
 
 	#updateFilters = () => {
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
 		this.#updateQueryRequest({ filters: Array.from(this._filterElements)?.map((filter) => filter.filter) ?? [] });
 	};
 
@@ -186,27 +199,33 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 	};
 
 	render() {
+		const properties = localizePropertyType(this._queryBuilderSettings?.properties);
+		const sort = localizeSort(this._queryRequest.sort);
 		return html`
-			<umb-body-layout headline="Query builder">
+			<umb-body-layout headline=${this.localize.term('template_queryBuilder')}>
 				<div id="main">
 					<uui-box>
 						<div class="row">
-							I want
+							<umb-localize key="template_iWant">I want</umb-localize>
 							<umb-dropdown look="outline" id="content-type-dropdown" label="Choose content type">
-								<span slot="label">${this._queryRequest?.contentTypeAlias ?? 'all content'}</span>
+								<span slot="label">
+									${this._queryRequest?.contentTypeAlias ?? this.localize.term('template_allContent')}
+								</span>
 								<uui-combobox-list @change=${this.#setContentType} class="options-list">
 									<uui-combobox-list-option value="">all content</uui-combobox-list-option>
 									${this._queryBuilderSettings?.contentTypeAliases?.map(
 										(alias) =>
-											html`<uui-combobox-list-option .value=${alias}
-												>content of type "${alias}"</uui-combobox-list-option
-											>`,
+											html`<uui-combobox-list-option .value=${alias}>
+												<umb-localize key="template_contentOfType" .args=${[alias]}>
+													content of type "${alias}"
+												</umb-localize>
+											</uui-combobox-list-option>`,
 									)}
 								</uui-combobox-list></umb-dropdown
 							>
-							from
-							<uui-button look="outline" @click=${this.#openDocumentPicker} label="Choose root content"
-								>${this._selectedRootContentName}
+							<umb-localize key="template_from">from</umb-localize>
+							<uui-button look="outline" @click=${this.#openDocumentPicker} label="Choose root content">
+								${this._selectedRootContentName}
 							</uui-button>
 						</div>
 						<div id="filter-container">
@@ -219,38 +238,48 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 								@remove-filter=${this.#removeFilter}></umb-query-builder-filter>
 						</div>
 						<div class="row">
-							ordered by
+							<umb-localize key="template_orderBy">order by</umb-localize>
 							<umb-dropdown look="outline" id="sort-dropdown" label="Property alias">
 								<span slot="label">${this._queryRequest.sort?.propertyAlias ?? ''}</span>
 								<uui-combobox-list @change=${this.#setSortProperty} class="options-list">
-									${this._queryBuilderSettings?.properties?.map(
+									${properties?.map(
 										(property) =>
-											html`<uui-combobox-list-option .value=${property.alias ?? ''}
-												>${property.alias}</uui-combobox-list-option
-											>`,
+											html`<uui-combobox-list-option .value=${property.alias ?? ''}>
+												<umb-localize key=${ifDefined(property.localizeKey)}>${property.alias}</umb-localize>
+											</uui-combobox-list-option>`,
 									)}
-								</uui-combobox-list></umb-dropdown
-							>
+								</uui-combobox-list>
+							</umb-dropdown>
 
-							${this._queryRequest.sort?.propertyAlias
-								? html`<uui-button look="outline" @click=${this.#setSortDirection}
-										>${this._queryRequest.sort.direction ?? this._defaultSortDirection}</uui-button
-								  >`
+							${sort?.propertyAlias
+								? html`<uui-button look="outline" @click=${this.#setSortDirection}>
+										<umb-localize key=${ifDefined(sort.localizeKey)}>
+											${sort.direction ?? this._defaultSortDirection}
+										</umb-localize>
+								  </uui-button>`
 								: ''}
 						</div>
 						<div class="row">
-							<span id="results-count"
-								>${this._templateQuery?.resultCount ?? 0} items returned, in ${this._templateQuery?.executionTime ?? 0}
-								ms</span
-							>
+							<span id="results-count">
+								${this._templateQuery?.resultCount ?? 0}
+								<umb-localize key="template_itemsReturned">items returned, in</umb-localize>
+								${this._templateQuery?.executionTime ?? 0} ms
+							</span>
 						</div>
 						<umb-code-block language="C#" copy>${this._templateQuery?.queryExpression ?? ''}</umb-code-block>
 					</uui-box>
 				</div>
 
 				<div slot="actions">
-					<uui-button @click=${this.#close} look="secondary" label="Close">Close</uui-button>
-					<uui-button @click=${this.#submit} look="primary" color="positive" label="Submit">Submit</uui-button>
+					<uui-button
+						@click=${this.#close}
+						look="secondary"
+						label=${this.localize.term('buttons_confirmActionCancel')}></uui-button>
+					<uui-button
+						@click=${this.#submit}
+						look="primary"
+						color="positive"
+						label=${this.localize.term('buttons_submitChanges')}></uui-button>
 				</div>
 			</umb-body-layout>
 		`;

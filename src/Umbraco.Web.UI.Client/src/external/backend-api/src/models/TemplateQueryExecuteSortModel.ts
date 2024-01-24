@@ -4,7 +4,6 @@
 /* eslint-disable */
 
 export type TemplateQueryExecuteSortModel = {
-    propertyAlias?: string;
+    propertyAlias: string;
     direction?: string | null;
 };
-

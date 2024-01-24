@@ -7,8 +7,7 @@ import type { ContentForDocumentResponseModel } from './ContentForDocumentRespon
 import type { ContentUrlInfoModel } from './ContentUrlInfoModel';
 
 export type DocumentResponseModel = (ContentForDocumentResponseModel & {
-    urls?: Array<ContentUrlInfoModel>;
-    templateId?: string | null;
-    isTrashed?: boolean;
+urls: Array<ContentUrlInfoModel>;
+templateId?: string | null;
+isTrashed: boolean;
 });
-

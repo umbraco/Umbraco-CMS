@@ -1,37 +1,46 @@
-import { UmbScripDetailModel } from '../types.js';
-import { UmbScriptRepository } from '../repository/script.repository.js';
+import { UmbScriptDetailRepository } from '../repository/index.js';
+import { UmbScriptDetailModel } from '../types.js';
+import { UMB_SCRIPT_ENTITY_TYPE } from '../entity.js';
 import { UMB_SCRIPT_WORKSPACE_ALIAS } from './manifests.js';
-import { UmbBooleanState, UmbDeepState } from '@umbraco-cms/backoffice/observable-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
+import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbEditableWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
 import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
-import { TextFileResponseModelBaseModel, UpdateScriptRequestModel } from '@umbraco-cms/backoffice/backend-api';
 
-export class UmbScriptWorkspaceContext extends UmbEditableWorkspaceContextBase<
-	UmbScriptRepository,
-	UmbScripDetailModel
-> {
-	#data = new UmbDeepState<UmbScripDetailModel | undefined>(undefined);
-	data = this.#data.asObservable();
-	name = this.#data.asObservablePart((data) => data?.name);
-	content = this.#data.asObservablePart((data) => data?.content);
-	path = this.#data.asObservablePart((data) => data?.path);
+export class UmbScriptWorkspaceContext extends UmbEditableWorkspaceContextBase<UmbScriptDetailModel> {
+	public readonly repository = new UmbScriptDetailRepository(this);
+
+	#data = new UmbObjectState<UmbScriptDetailModel | undefined>(undefined);
+	readonly data = this.#data.asObservable();
+	readonly name = this.#data.asObservablePart((data) => data?.name);
+	readonly content = this.#data.asObservablePart((data) => data?.content);
+	readonly path = this.#data.asObservablePart((data) => data?.path);
 
 	#isCodeEditorReady = new UmbBooleanState(false);
-	isCodeEditorReady = this.#isCodeEditorReady.asObservable();
+	readonly isCodeEditorReady = this.#isCodeEditorReady.asObservable();
 
-	constructor(host: UmbControllerHostElement) {
-		super(host, UMB_SCRIPT_WORKSPACE_ALIAS, new UmbScriptRepository(host));
+	constructor(host: UmbControllerHost) {
+		super(host, UMB_SCRIPT_WORKSPACE_ALIAS);
 		this.#loadCodeEditor();
 	}
 
 	async #loadCodeEditor() {
 		try {
 			await loadCodeEditor();
-			this.#isCodeEditorReady.next(true);
+			this.#isCodeEditorReady.setValue(true);
 		} catch (error) {
 			console.error(error);
 		}
+	}
+
+	getEntityType(): string {
+		return UMB_SCRIPT_ENTITY_TYPE;
+	}
+
+	getEntityId() {
+		const data = this.getData();
+		if (!data) throw new Error('Data is missing');
+		return data.unique;
 	}
 
 	getData() {
@@ -39,76 +48,50 @@ export class UmbScriptWorkspaceContext extends UmbEditableWorkspaceContextBase<
 	}
 
 	setName(value: string) {
-		this.#data.next({ ...this.#data.value, name: value });
+		this.#data.update({ name: value });
 	}
 
 	setContent(value: string) {
-		this.#data.next({ ...this.#data.value, content: value });
+		this.#data.update({ content: value });
 	}
 
-	async load(entityKey: string) {
-		const { data } = await this.repository.requestByKey(entityKey);
+	async load(unique: string) {
+		const { data } = await this.repository.requestByUnique(unique);
 		if (data) {
 			this.setIsNew(false);
-			this.#data.next(data);
+			this.#data.setValue(data);
 		}
 	}
 
-	async create(parentKey: string) {
-		const newScript: TextFileResponseModelBaseModel = {
-			name: '',
-			path: parentKey,
-			content: '',
-		};
-		this.#data.next(newScript);
-		this.setIsNew(true);
-	}
+	async create(parentUnique: string | null) {
+		const { data } = await this.repository.createScaffold(parentUnique);
 
-	getEntityId() {
-		const path = this.getData()?.path?.replace(/\//g, '%2F');
-		const name = this.getData()?.name;
-
-		// Note: %2F is a slash (/)
-		return path && name ? `${path}%2F${name}` : name || '';
-	}
-
-	public async save() {
-		const script = this.getData();
-
-		if (!script) {
-			return Promise.reject('Something went wrong, there is no data for script you want to save...');
+		if (data) {
+			this.setIsNew(true);
+			this.#data.setValue(data);
 		}
+	}
+
+	async save() {
+		if (!this.#data.value) throw new Error('Data is missing');
+
+		let newData = undefined;
+
 		if (this.getIsNew()) {
-			const createRequestBody = {
-				name: script.name,
-				content: script.content,
-				parentPath: script.path + '/',
-			};
+			const { data } = await this.repository.create(this.#data.value);
+			newData = data;
+		} else {
+			const { data } = await this.repository.save(this.#data.value);
+			newData = data;
+		}
 
-			const { error } = await this.repository.create(createRequestBody);
-			if (!error) {
-				this.setIsNew(false);
-			}
-			return Promise.resolve();
+		if (newData) {
+			this.#data.setValue(newData);
+			this.saveComplete(newData);
 		}
-		if (!script.path) return Promise.reject('There is no path');
-		const updateRequestBody: UpdateScriptRequestModel = {
-			name: script.name,
-			existingPath: script.path,
-			content: script.content,
-		};
-		const { error } = await this.repository.save(script.path, updateRequestBody);
-		if (!error) {
-			//TODO Update the URL to the new name
-		}
-		return Promise.resolve();
 	}
 
 	destroy(): void {
-		throw new Error('Method not implemented.');
-	}
-
-	getEntityType(): string {
 		throw new Error('Method not implemented.');
 	}
 }

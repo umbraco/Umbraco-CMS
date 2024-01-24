@@ -1,7 +1,7 @@
 import type { UmbMediaDetailModel } from '../../packages/media/media/index.js';
 import { UmbEntityTreeData } from './entity-tree.data.js';
 import { UmbEntityData } from './entity.data.js';
-import { createContentTreeItem } from './utils.js';
+import { createContentTreeItem, createMediaTreeItem } from './utils.js';
 import {
 	ContentTreeItemResponseModel,
 	MediaItemResponseModel,
@@ -192,6 +192,7 @@ const createMediaItem = (item: UmbMediaDetailModel): MediaItemResponseModel => {
 		id: item.id,
 		name: item.name,
 		icon: item.icon,
+		isTrashed: false,
 	};
 };
 
@@ -213,21 +214,21 @@ class UmbMediaData extends UmbEntityData<UmbMediaDetailModel> {
 
 	getTreeRoot(): PagedMediaTreeItemResponseModel {
 		const items = this.data.filter((item) => item.parentId === null);
-		const treeItems = items.map((item) => createContentTreeItem(item));
+		const treeItems = items.map((item) => createMediaTreeItem(item));
 		const total = items.length;
 		return { items: treeItems, total };
 	}
 
 	getTreeItemChildren(id: string): PagedMediaTreeItemResponseModel {
 		const items = this.data.filter((item) => item.parentId === id);
-		const treeItems = items.map((item) => createContentTreeItem(item));
+		const treeItems = items.map((item) => createMediaTreeItem(item));
 		const total = items.length;
 		return { items: treeItems, total };
 	}
 
 	getTreeItem(ids: Array<string>): Array<ContentTreeItemResponseModel> {
 		const items = this.data.filter((item) => ids.includes(item.id));
-		return items.map((item) => createContentTreeItem(item));
+		return items.map((item) => createMediaTreeItem(item));
 	}
 
 	move(ids: Array<string>, destinationKey: string) {

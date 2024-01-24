@@ -17,6 +17,7 @@ export const healthGroups: Array<HealthCheckGroupWithResultResponseModel & { nam
 		name: 'Configuration',
 		checks: [
 			{
+				id: '1c6c0a39-d673-4794-b734-1bec45d6a363',
 				results: [
 					{
 						message: `MacroErrors are set to 'Throw' which will prevent some or all pages in your site from loading

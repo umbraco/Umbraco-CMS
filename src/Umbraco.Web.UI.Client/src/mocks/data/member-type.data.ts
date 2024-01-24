@@ -6,13 +6,14 @@ import { EntityTreeItemResponseModel, PagedEntityTreeItemResponseModel } from '@
 export const data: Array<MemberTypeDetails> = [
 	{
 		name: 'Member Type 1',
-		type: 'member-type',
+		entityType: 'member-type',
 		hasChildren: false,
 		id: 'd59be02f-1df9-4228-aa1e-01917d806cda',
 		isContainer: false,
 		parentId: null,
 		alias: 'memberType1',
 		properties: [],
+		isFolder: false,
 	},
 ];
 

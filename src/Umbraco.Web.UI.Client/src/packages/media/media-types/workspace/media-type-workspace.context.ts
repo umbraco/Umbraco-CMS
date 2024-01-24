@@ -1,20 +1,22 @@
 import { UmbMediaTypeDetailRepository } from '../repository/detail/media-type-detail.repository.js';
 import { UMB_MEDIA_TYPE_ENTITY_TYPE } from '../index.js';
+import { UmbMediaTypeDetailModel } from '../types.js';
 import {
 	UmbSaveableWorkspaceContextInterface,
 	UmbEditableWorkspaceContextBase,
 } from '@umbraco-cms/backoffice/workspace';
 import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
-import { type MediaTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 
-type EntityType = MediaTypeResponseModel;
+type EntityType = UmbMediaTypeDetailModel;
 export class UmbMediaTypeWorkspaceContext
-	extends UmbEditableWorkspaceContextBase<UmbMediaTypeDetailRepository, EntityType>
-	implements UmbSaveableWorkspaceContextInterface<EntityType | undefined>
+	extends UmbEditableWorkspaceContextBase<EntityType>
+	implements UmbSaveableWorkspaceContextInterface
 {
+	//
+	public readonly repository: UmbMediaTypeDetailRepository = new UmbMediaTypeDetailRepository(this);
 	// Draft is located in structure manager
 
 	// General for content types:
@@ -28,15 +30,13 @@ export class UmbMediaTypeWorkspaceContext
 	readonly allowedContentTypes;
 	readonly compositions;
 
-	readonly structure;
+	readonly structure = new UmbContentTypePropertyStructureManager<EntityType>(this, this.repository);
 
 	#isSorting = new UmbBooleanState(undefined);
 	isSorting = this.#isSorting.asObservable();
 
-	constructor(host: UmbControllerHostElement) {
-		super(host, 'Umb.Workspace.MediaType', new UmbMediaTypeDetailRepository(host));
-
-		this.structure = new UmbContentTypePropertyStructureManager(this.host, this.repository);
+	constructor(host: UmbControllerHost) {
+		super(host, 'Umb.Workspace.MediaType');
 
 		// General for content types:
 		this.data = this.structure.ownerContentType;
@@ -54,15 +54,15 @@ export class UmbMediaTypeWorkspaceContext
 	}
 
 	setIsSorting(isSorting: boolean) {
-		this.#isSorting.next(isSorting);
+		this.#isSorting.setValue(isSorting);
 	}
 
 	getData() {
-		return this.structure.getOwnerContentType() || {};
+		return this.structure.getOwnerContentType();
 	}
 
 	getEntityId() {
-		return this.getData().id;
+		return this.getData()?.unique;
 	}
 
 	getEntityType() {
@@ -99,6 +99,12 @@ export class UmbMediaTypeWorkspaceContext
 	 * Save or creates the media type, based on wether its a new one or existing.
 	 */
 	async save() {
+		const data = this.getData();
+
+		if (!data) {
+			return Promise.reject('Something went wrong, there is no data for media type you want to save...');
+		}
+
 		if (this.getIsNew()) {
 			if ((await this.structure.create()) === true) {
 				this.setIsNew(false);
@@ -107,7 +113,7 @@ export class UmbMediaTypeWorkspaceContext
 			await this.structure.save();
 		}
 
-		this.saveComplete(this.getData());
+		this.saveComplete(data);
 	}
 
 	public destroy(): void {

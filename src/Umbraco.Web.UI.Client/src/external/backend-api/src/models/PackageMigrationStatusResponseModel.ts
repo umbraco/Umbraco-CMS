@@ -4,7 +4,6 @@
 /* eslint-disable */
 
 export type PackageMigrationStatusResponseModel = {
-    packageName?: string;
-    hasPendingMigrations?: boolean;
+    packageName: string;
+    hasPendingMigrations: boolean;
 };
-

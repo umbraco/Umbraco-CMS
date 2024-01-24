@@ -1,11 +1,11 @@
 import { Meta } from '@storybook/web-components';
-import { umbDataTypeData } from '../../../../../../../mocks/data/data-type.data.js';
+import { umbDataTypeMockDb } from '../../../../../../../mocks/data/data-type/data-type.db.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 
 import './property-editor-ui-tiny-mce-stylesheets-configuration.element.js';
 import { UmbDataTypeDetailModel } from '@umbraco-cms/backoffice/data-type';
 
-const dataTypeData = umbDataTypeData.getById('dt-richTextEditor') as UmbDataTypeDetailModel;
+const dataTypeData = umbDataTypeMockDb.read('dt-richTextEditor') as unknown as UmbDataTypeDetailModel;
 
 export default {
 	title: 'Property Editor UIs/Tiny Mce Stylesheets Configuration',

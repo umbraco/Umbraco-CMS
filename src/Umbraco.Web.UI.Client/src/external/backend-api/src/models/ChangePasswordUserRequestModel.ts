@@ -4,7 +4,6 @@
 /* eslint-disable */
 
 export type ChangePasswordUserRequestModel = {
-    newPassword?: string;
+    newPassword: string;
     oldPassword?: string | null;
 };
-

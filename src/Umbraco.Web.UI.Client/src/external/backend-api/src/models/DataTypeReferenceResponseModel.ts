@@ -6,8 +6,7 @@
 import type { DataTypePropertyReferenceModel } from './DataTypePropertyReferenceModel';
 
 export type DataTypeReferenceResponseModel = {
-    id?: string;
-    type?: string;
-    properties?: Array<DataTypePropertyReferenceModel>;
+    id: string;
+    type: string;
+    properties: Array<DataTypePropertyReferenceModel>;
 };
-

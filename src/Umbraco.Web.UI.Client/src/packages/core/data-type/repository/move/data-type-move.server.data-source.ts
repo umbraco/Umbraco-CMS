@@ -33,7 +33,7 @@ export class UmbDataTypeMoveServerDataSource implements UmbMoveDataSource {
 
 		return tryExecuteAndNotify(
 			this.#host,
-			DataTypeResource.postDataTypeByIdMove({
+			DataTypeResource.putDataTypeByIdMove({
 				id: unique,
 				requestBody: {
 					targetId: targetUnique,

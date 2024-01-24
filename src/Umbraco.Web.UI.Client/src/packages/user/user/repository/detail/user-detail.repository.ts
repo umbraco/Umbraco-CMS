@@ -24,6 +24,9 @@ export class UmbUserDetailRepository extends UmbUserRepositoryBase implements IU
 	 * @return {*}
 	 * @memberof UmbUserRepository
 	 */
+
+	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+	// @ts-ignore
 	createScaffold(parentId: string | null) {
 		if (parentId === undefined) throw new Error('Parent id is missing');
 		return this.#detailSource.createScaffold(parentId);

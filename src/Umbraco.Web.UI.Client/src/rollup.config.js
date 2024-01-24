@@ -3,6 +3,7 @@ import commonjs from '@rollup/plugin-commonjs';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import css from 'rollup-plugin-import-css';
 import webWorkerLoader from 'rollup-plugin-web-worker-loader';
+import replace from '@rollup/plugin-replace';
 import { readdirSync, lstatSync, cpSync, copyFileSync, existsSync, unlinkSync } from 'fs';
 import * as globModule from 'tiny-glob';
 
@@ -78,7 +79,14 @@ const libraries = allowed.map((module) => {
 			commonjs(),
 			nodeResolve({ preferBuiltins: false, browser: true }),
 			webWorkerLoader({ target: 'browser', pattern: /^(.+)\?worker$/ }),
-			css(),
+			// Replace the vite specific inline query with nothing so that the import is valid
+			replace({
+				preventAssignment: true,
+				values: {
+					'?inline': '',
+				}
+			}),
+			css({ minify: true }),
 			esbuild({ minify: true, sourceMap: true }),
 		],
 	};

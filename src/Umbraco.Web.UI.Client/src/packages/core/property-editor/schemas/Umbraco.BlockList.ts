@@ -12,7 +12,7 @@ export const manifest: ManifestPropertyEditorSchema = {
 					alias: 'blocks',
 					label: 'Available Blocks',
 					description: 'Define the available blocks.',
-					propertyEditorUiAlias: 'Umb.PropertyEditorUi.BlockList.BlockConfiguration',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.BlockListTypeConfiguration',
 				},
 				{
 					alias: 'validationLimit',

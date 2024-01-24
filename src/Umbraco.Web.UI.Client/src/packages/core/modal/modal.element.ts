@@ -8,7 +8,11 @@ import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { UUIDialogElement, UUIModalDialogElement, UUIModalSidebarElement } from '@umbraco-cms/backoffice/external/uui';
 import { UmbRouterSlotElement } from '@umbraco-cms/backoffice/router';
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
-import { UmbContextProvider } from '@umbraco-cms/backoffice/context-api';
+import {
+	UMB_CONTENT_REQUEST_EVENT_TYPE,
+	UmbContextProvider,
+	UmbContextRequestEvent,
+} from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-modal')
 export class UmbModalElement extends UmbLitElement {
@@ -38,6 +42,22 @@ export class UmbModalElement extends UmbLitElement {
 		if (!this.#modalContext) return;
 
 		this.element = this.#createContainerElement();
+		if (this.#modalContext.originTarget) {
+			// The following code is the context api proxy.
+			// It re-dispatches the context api request event to the origin target of this modal, in other words the element that initiated the modal.
+			this.element.addEventListener(UMB_CONTENT_REQUEST_EVENT_TYPE, ((event: UmbContextRequestEvent) => {
+				if (!this.#modalContext) return;
+				if (this.#modalContext.originTarget) {
+					// Note for this hack (The if-sentence):
+					// We do not currently have a good enough control to ensure that the proxy is last, meaning if another context is provided at this element, it might respond after the proxy event has been dispatched.
+					// To avoid such this hack just prevents proxying the event if its a request for the Modal Context.
+					if (event.contextAlias !== UMB_MODAL_CONTEXT_TOKEN.contextAlias) {
+						event.stopImmediatePropagation();
+						this.#modalContext.originTarget.dispatchEvent(event.clone());
+					}
+				}
+			}) as EventListener);
+		}
 
 		this.#modalContext.onSubmit().then(
 			() => {

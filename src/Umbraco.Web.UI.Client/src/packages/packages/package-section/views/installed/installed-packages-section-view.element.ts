@@ -49,6 +49,8 @@ export class UmbInstalledPackagesSectionViewElement extends UmbLitElement implem
 				};
 			});
 
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
 			this._migrationPackages = [
 				...migrations.map((m) => ({
 					name: m.packageName,

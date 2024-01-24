@@ -15,16 +15,16 @@ export class RelationResource {
      * @throws ApiError
      */
     public static getRelationChildRelationByChildId({
-        childId,
-        skip,
-        take = 100,
-        relationTypeAlias = '',
-    }: {
-        childId: string,
-        skip?: number,
-        take?: number,
-        relationTypeAlias?: string,
-    }): CancelablePromise<PagedRelationResponseModel> {
+childId,
+skip,
+take = 100,
+relationTypeAlias = '',
+}: {
+childId: string,
+skip?: number,
+take?: number,
+relationTypeAlias?: string,
+}): CancelablePromise<PagedRelationResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/relation/child-relation/{childId}',
@@ -36,6 +36,9 @@ export class RelationResource {
                 'take': take,
                 'relationTypeAlias': relationTypeAlias,
             },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -44,14 +47,14 @@ export class RelationResource {
      * @throws ApiError
      */
     public static getRelationTypeById({
-        id,
-        skip,
-        take = 100,
-    }: {
-        id: string,
-        skip?: number,
-        take?: number,
-    }): CancelablePromise<PagedRelationResponseModel> {
+id,
+skip,
+take = 100,
+}: {
+id: string,
+skip?: number,
+take?: number,
+}): CancelablePromise<PagedRelationResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/relation/type/{id}',
@@ -63,6 +66,7 @@ export class RelationResource {
                 'take': take,
             },
             errors: {
+                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
         });

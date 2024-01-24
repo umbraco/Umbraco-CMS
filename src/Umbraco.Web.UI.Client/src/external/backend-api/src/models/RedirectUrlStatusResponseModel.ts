@@ -6,7 +6,6 @@
 import type { RedirectStatusModel } from './RedirectStatusModel';
 
 export type RedirectUrlStatusResponseModel = {
-    status?: RedirectStatusModel;
-    userIsAdmin?: boolean;
+    status: RedirectStatusModel;
+    userIsAdmin: boolean;
 };
-

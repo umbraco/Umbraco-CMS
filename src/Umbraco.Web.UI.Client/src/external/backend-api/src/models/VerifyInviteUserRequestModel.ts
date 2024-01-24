@@ -4,7 +4,6 @@
 /* eslint-disable */
 
 export type VerifyInviteUserRequestModel = {
-    userId?: string;
-    token?: string;
+    userId: string;
+    token: string;
 };
-

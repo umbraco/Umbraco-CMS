@@ -6,10 +6,7 @@ import type { Editor, EditorEvent } from '@umbraco-cms/backoffice/external/tinym
 
 export class UmbMediaHelper {
 	/**
-	 *
-	 * @param editor
-	 * @param imageDomElement
-	 * @param imgUrl
+	 * Sizes an image in the editor
 	 */
 	async sizeImageInEditor(editor: Editor, imageDomElement: HTMLElement, imgUrl?: string) {
 		const size = editor.dom.getSize(imageDomElement);
@@ -36,11 +33,7 @@ export class UmbMediaHelper {
 	}
 
 	/**
-	 *
-	 * @param maxSize
-	 * @param width
-	 * @param height
-	 * @returns
+	 * Scales an image to the max size
 	 */
 	scaleToMaxSize(maxSize: number, width: number, height: number) {
 		const retval = { width, height };
@@ -73,10 +66,7 @@ export class UmbMediaHelper {
 	}
 
 	/**
-	 *
-	 * @param imagePath
-	 * @param options
-	 * @returns
+	 * Returns the URL of the processed image
 	 */
 	async getProcessedImageUrl(imagePath: string, options: any) {
 		if (!options) {
@@ -91,11 +81,10 @@ export class UmbMediaHelper {
 	}
 
 	/**
-	 *
-	 * @param editor
+	 * Uploads blob images to the server
 	 */
-	async uploadBlobImages(editor: Editor) {
-		const content = editor.getContent();
+	async uploadBlobImages(editor: Editor, newContent?: string) {
+		const content = newContent ?? editor.getContent();
 
 		// Upload BLOB images (dragged/pasted ones)
 		// find src attribute where value starts with `blob:`
@@ -114,7 +103,7 @@ export class UmbMediaHelper {
 
 				// Get img src
 				const imgSrc = img.getAttribute('src');
-				const tmpLocation = localStorage.get(`tinymce__${imgSrc}`);
+				const tmpLocation = sessionStorage.getItem(`tinymce__${imgSrc}`);
 
 				// Select the img & add new attr which we can search for
 				// When its being persisted in RTE property editor
@@ -136,36 +125,21 @@ export class UmbMediaHelper {
 			blobImageWithNoTmpImgAttribute.forEach((imageElement) => {
 				const blobSrcUri = editor.dom.getAttrib(imageElement, 'src');
 
-				// Find the same image uploaded (Should be in LocalStorage)
+				// Find the same image uploaded (Should be in SessionStorage)
 				// May already exist in the editor as duplicate image
 				// OR added to the RTE, deleted & re-added again
-				// So lets fetch the tempurl out of localstorage for that blob URI item
-
-				const tmpLocation = localStorage.get(`tinymce__${blobSrcUri}`);
+				// So lets fetch the tempurl out of sessionStorage for that blob URI item
+				const tmpLocation = sessionStorage.getItem(`tinymce__${blobSrcUri}`);
 				if (tmpLocation) {
 					this.sizeImageInEditor(editor, imageElement);
 					editor.dom.setAttrib(imageElement, 'data-tmpimg', tmpLocation);
 				}
 			});
 		}
-
-		if (window.Umbraco?.Sys.ServerVariables.umbracoSettings.sanitizeTinyMce) {
-			/** prevent injecting arbitrary JavaScript execution in on-attributes. */
-			const allNodes = Array.from(editor.dom.doc.getElementsByTagName('*'));
-			allNodes.forEach((node) => {
-				for (let i = 0; i < node.attributes.length; i++) {
-					if (node.attributes[i].name.startsWith('on')) {
-						node.removeAttribute(node.attributes[i].name);
-					}
-				}
-			});
-		}
 	}
 
 	/**
-	 *
-	 * @param e
-	 * @returns
+	 * Handles the resize event
 	 */
 	async onResize(
 		e: EditorEvent<{

@@ -28,8 +28,8 @@ export class UmbRefDataTypeElement extends UmbElementMixin(UUIRefNodeElement) {
 				(dataType) => {
 					if (dataType) {
 						this.name = dataType.name ?? '';
-						this.propertyEditorUiAlias = dataType.propertyEditorUiAlias ?? '';
-						this.propertyEditorSchemaAlias = dataType.propertyEditorAlias ?? '';
+						this.propertyEditorUiAlias = dataType.editorUiAlias ?? '';
+						this.propertyEditorSchemaAlias = dataType.editorAlias ?? '';
 					}
 				},
 				'dataType',

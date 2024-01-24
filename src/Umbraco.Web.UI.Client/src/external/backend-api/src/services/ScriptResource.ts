@@ -2,9 +2,11 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { CreatePathFolderRequestModel } from '../models/CreatePathFolderRequestModel';
+import type { CreateScriptFolderRequestModel } from '../models/CreateScriptFolderRequestModel';
 import type { CreateScriptRequestModel } from '../models/CreateScriptRequestModel';
 import type { PagedFileSystemTreeItemPresentationModel } from '../models/PagedFileSystemTreeItemPresentationModel';
+import type { RenameScriptRequestModel } from '../models/RenameScriptRequestModel';
+import type { ScriptFolderResponseModel } from '../models/ScriptFolderResponseModel';
 import type { ScriptItemResponseModel } from '../models/ScriptItemResponseModel';
 import type { ScriptResponseModel } from '../models/ScriptResponseModel';
 import type { UpdateScriptRequestModel } from '../models/UpdateScriptRequestModel';
@@ -14,24 +16,6 @@ import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
 
 export class ScriptResource {
-
-    /**
-     * @returns any Success
-     * @throws ApiError
-     */
-    public static getScript({
-        path,
-    }: {
-        path?: string,
-    }): CancelablePromise<ScriptResponseModel> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/umbraco/management/api/v1/script',
-            query: {
-                'path': path,
-            },
-        });
-    }
 
     /**
      * @returns string Created
@@ -47,24 +31,11 @@ export class ScriptResource {
             url: '/umbraco/management/api/v1/script',
             body: requestBody,
             mediaType: 'application/json',
-            responseHeader: 'Location',
-        });
-    }
-
-    /**
-     * @returns any Success
-     * @throws ApiError
-     */
-    public static deleteScript({
-        path,
-    }: {
-        path?: string,
-    }): CancelablePromise<any> {
-        return __request(OpenAPI, {
-            method: 'DELETE',
-            url: '/umbraco/management/api/v1/script',
-            query: {
-                'path': path,
+            responseHeader: 'Umb-Generated-Resource',
+            errors: {
+                400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
+                404: `Not Found`,
             },
         });
     }
@@ -73,51 +44,122 @@ export class ScriptResource {
      * @returns any Success
      * @throws ApiError
      */
-    public static putScript({
+    public static getScriptByPath({
+        path,
+    }: {
+        path: string,
+    }): CancelablePromise<ScriptResponseModel> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/script/{path}',
+            path: {
+                'path': path,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+                404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static deleteScriptByPath({
+        path,
+    }: {
+        path: string,
+    }): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/umbraco/management/api/v1/script/{path}',
+            path: {
+                'path': path,
+            },
+            errors: {
+                400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
+                404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static putScriptByPath({
+        path,
         requestBody,
     }: {
+        path: string,
         requestBody?: UpdateScriptRequestModel,
     }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'PUT',
-            url: '/umbraco/management/api/v1/script',
+            url: '/umbraco/management/api/v1/script/{path}',
+            path: {
+                'path': path,
+            },
             body: requestBody,
             mediaType: 'application/json',
-        });
-    }
-
-    /**
-     * @returns any Success
-     * @throws ApiError
-     */
-    public static getScriptFolder({
-        path,
-    }: {
-        path?: string,
-    }): CancelablePromise<any> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/umbraco/management/api/v1/script/folder',
-            query: {
-                'path': path,
+            errors: {
+                400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
+                404: `Not Found`,
             },
         });
     }
 
     /**
-     * @returns any Success
+     * @returns string Created
+     * @throws ApiError
+     */
+    public static putScriptByPathRename({
+        path,
+        requestBody,
+    }: {
+        path: string,
+        requestBody?: RenameScriptRequestModel,
+    }): CancelablePromise<string> {
+        return __request(OpenAPI, {
+            method: 'PUT',
+            url: '/umbraco/management/api/v1/script/{path}/rename',
+            path: {
+                'path': path,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
+            responseHeader: 'Umb-Generated-Resource',
+            errors: {
+                400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
+                404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns string Created
      * @throws ApiError
      */
     public static postScriptFolder({
         requestBody,
     }: {
-        requestBody?: CreatePathFolderRequestModel,
-    }): CancelablePromise<any> {
+        requestBody?: CreateScriptFolderRequestModel,
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/script/folder',
             body: requestBody,
             mediaType: 'application/json',
+            responseHeader: 'Umb-Generated-Resource',
+            errors: {
+                400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
+                404: `Not Found`,
+            },
         });
     }
 
@@ -125,16 +167,43 @@ export class ScriptResource {
      * @returns any Success
      * @throws ApiError
      */
-    public static deleteScriptFolder({
+    public static getScriptFolderByPath({
         path,
     }: {
-        path?: string,
+        path: string,
+    }): CancelablePromise<ScriptFolderResponseModel> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/script/folder/{path}',
+            path: {
+                'path': path,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+                404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static deleteScriptFolderByPath({
+        path,
+    }: {
+        path: string,
     }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'DELETE',
-            url: '/umbraco/management/api/v1/script/folder',
-            query: {
+            url: '/umbraco/management/api/v1/script/folder/{path}',
+            path: {
                 'path': path,
+            },
+            errors: {
+                400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
+                404: `Not Found`,
             },
         });
     }
@@ -154,6 +223,9 @@ export class ScriptResource {
             query: {
                 'path': path,
             },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -162,11 +234,11 @@ export class ScriptResource {
      * @throws ApiError
      */
     public static getTreeScriptChildren({
-        path,
+        parentPath,
         skip,
         take = 100,
     }: {
-        path?: string,
+        parentPath?: string,
         skip?: number,
         take?: number,
     }): CancelablePromise<PagedFileSystemTreeItemPresentationModel> {
@@ -174,9 +246,12 @@ export class ScriptResource {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/script/children',
             query: {
-                'path': path,
+                'parentPath': parentPath,
                 'skip': skip,
                 'take': take,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }
@@ -198,6 +273,9 @@ export class ScriptResource {
             query: {
                 'skip': skip,
                 'take': take,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }

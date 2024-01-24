@@ -42,6 +42,7 @@ export class UmbDictionaryWorkspaceEditorElement extends UmbLitElement {
 						<uui-icon name="icon-arrow-left"></uui-icon>
 					</uui-button>
 					<uui-input
+						placeholder=${this.localize.term('placeholders_entername')}
 						.value=${this._name ?? ''}
 						@input="${this.#handleInput}"
 						label="${this.localize.term('general_dictionary')} ${this.localize.term('general_name')}"></uui-input>

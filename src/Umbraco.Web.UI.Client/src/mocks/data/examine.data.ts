@@ -23,6 +23,7 @@ export const Indexers: IndexResponseModel[] = [
 		healthStatus: HealthStatusModel.HEALTHY,
 		documentCount: 0,
 		fieldCount: 0,
+		searcherName: '',
 		providerProperties: {
 			CommitCount: 0,
 			DefaultAnalyzer: 'StandardAnalyzer',
@@ -42,6 +43,7 @@ export const Indexers: IndexResponseModel[] = [
 		healthStatus: HealthStatusModel.HEALTHY,
 		documentCount: 0,
 		fieldCount: 0,
+		searcherName: '',
 		providerProperties: {
 			CommitCount: 0,
 			DefaultAnalyzer: 'CultureInvariantWhitespaceAnalyzer',
@@ -61,6 +63,7 @@ export const Indexers: IndexResponseModel[] = [
 		healthStatus: HealthStatusModel.HEALTHY,
 		fieldCount: 0,
 		documentCount: 0,
+		searcherName: '',
 		providerProperties: {
 			CommitCount: 0,
 			DefaultAnalyzer: 'CultureInvariantWhitespaceAnalyzer',
@@ -85,6 +88,7 @@ export const searchResultMockData: SearchResultResponseModel[] = [
 	{
 		id: '1',
 		score: 1,
+		fieldCount: 25,
 		fields: [
 			{ name: '__Icon', values: ['icon-document'] },
 			{ name: '__IndexType', values: ['content'] },
@@ -116,6 +120,7 @@ export const searchResultMockData: SearchResultResponseModel[] = [
 	{
 		id: '2',
 		score: 0.9,
+		fieldCount: 25,
 		fields: [
 			{ name: '__Icon', values: ['icon-document'] },
 			{ name: '__IndexType', values: ['content'] },

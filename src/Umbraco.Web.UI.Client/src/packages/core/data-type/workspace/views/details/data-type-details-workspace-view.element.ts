@@ -1,4 +1,4 @@
-import { UMB_DATA_TYPE_WORKSPACE_CONTEXT } from '../../data-type-workspace.context.js';
+import { UMB_DATA_TYPE_WORKSPACE_CONTEXT } from '../../data-type-workspace.context-token.js';
 import { UmbDataTypeDetailModel } from '../../../types.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
@@ -91,7 +91,7 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement im
 
 	#renderPropertyEditorReference() {
 		return html`
-			<umb-workspace-property-layout label="Property Editor" description="Select a property editor">
+			<umb-property-layout label="Property Editor" description="Select a property editor">
 				${this._propertyEditorUiAlias && this._propertyEditorSchemaAlias
 					? html`
 							<!-- TODO: border is a bit weird attribute name. Maybe single or standalone would be better? -->
@@ -117,7 +117,7 @@ export class UmbDataTypeDetailsWorkspaceViewEditElement extends UmbLitElement im
 								color="default"
 								@click=${this._openPropertyEditorUIPicker}></uui-button>
 					  `}
-			</umb-workspace-property-layout>
+			</umb-property-layout>
 		`;
 	}
 

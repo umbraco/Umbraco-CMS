@@ -1,5 +1,5 @@
+import { handlers as auditLogHandlers } from './handlers/audit-log.handlers.js';
 import { handlers as dataTypeHandlers } from './handlers/data-type/index.js';
-import { handlers as relationTypeHandlers } from './handlers/relation-type.handlers.js';
 import { handlers as documentTypeHandlers } from './handlers/document-type/index.js';
 import { handlers as installHandlers } from './handlers/install.handlers.js';
 import * as manifestsHandlers from './handlers/manifests.handlers.js';
@@ -11,6 +11,8 @@ import { handlers as telemetryHandlers } from './handlers/telemetry.handlers.js'
 import { handlers as userGroupsHandlers } from './handlers/user-group/index.js';
 import { handlers as examineManagementHandlers } from './handlers/examine-management.handlers.js';
 import { handlers as modelsBuilderHandlers } from './handlers/modelsbuilder.handlers.js';
+import { relationHandlers, relationTypeHandlers } from './handlers/relations/index.js';
+import { handlers as objectTypeHandlers } from './handlers/object-type/index.js';
 import { handlers as healthCheckHandlers } from './handlers/health-check.handlers.js';
 import { handlers as profilingHandlers } from './handlers/performance-profiling.handlers.js';
 import { handlers as documentHandlers } from './handlers/document/index.js';
@@ -21,52 +23,59 @@ import { handlers as memberGroupHandlers } from './handlers/member-group.handler
 import { handlers as memberHandlers } from './handlers/member.handlers.js';
 import { handlers as memberTypeHandlers } from './handlers/member-type.handlers.js';
 import { handlers as templateHandlers } from './handlers/template.handlers.js';
+import { handlers as trackedReferenceHandlers } from './handlers/tracked-reference.handlers.js';
 import { handlers as languageHandlers } from './handlers/language.handlers.js';
 import { handlers as cultureHandlers } from './handlers/culture.handlers.js';
 import { handlers as redirectManagementHandlers } from './handlers/redirect-management.handlers.js';
 import { handlers as logViewerHandlers } from './handlers/log-viewer.handlers.js';
 import { handlers as packageHandlers } from './handlers/package.handlers.js';
 import { handlers as rteEmbedHandlers } from './handlers/rte-embed.handlers.js';
-import { handlers as stylesheetHandlers } from './handlers/stylesheet.handlers.js';
-import { handlers as partialViewsHandlers } from './handlers/partial-views.handlers.js';
+import { handlers as staticFileHandlers } from './handlers/static-file/index.js';
+import { handlers as stylesheetHandlers } from './handlers/stylesheet/index.js';
+import { handlers as partialViewHandlers } from './handlers/partial-view/index.js';
 import { handlers as tagHandlers } from './handlers/tag-handlers.js';
 import { handlers as configHandlers } from './handlers/config.handlers.js';
-import { handlers as scriptHandlers } from './handlers/scripts.handlers.js';
+import { handlers as scriptHandlers } from './handlers/script/index.js';
 
 const handlers = [
-	serverHandlers.serverVersionHandler,
-	...installHandlers,
-	...upgradeHandlers,
-	...userHandlers,
-	...documentHandlers,
-	...mediaHandlers,
+	serverHandlers.serverInformationHandler,
+	...auditLogHandlers,
+	...configHandlers,
+	...cultureHandlers,
 	...dataTypeHandlers,
-	...relationTypeHandlers,
+	...dictionaryHandlers,
+	...documentHandlers,
 	...documentTypeHandlers,
-	...telemetryHandlers,
-	...publishedStatusHandlers,
-	...userGroupsHandlers,
+	...examineManagementHandlers,
+	...healthCheckHandlers,
+	...installHandlers,
+	...languageHandlers,
+	...logViewerHandlers,
+	...mediaHandlers,
 	...mediaTypeHandlers,
 	...memberGroupHandlers,
 	...memberHandlers,
 	...memberTypeHandlers,
-	...examineManagementHandlers,
 	...modelsBuilderHandlers,
-	...healthCheckHandlers,
-	...profilingHandlers,
-	...dictionaryHandlers,
-	...templateHandlers,
-	...languageHandlers,
-	...cultureHandlers,
-	...redirectManagementHandlers,
-	...logViewerHandlers,
 	...packageHandlers,
+	...partialViewHandlers,
+	...profilingHandlers,
+	...publishedStatusHandlers,
+	...redirectManagementHandlers,
+	...relationHandlers,
+	...objectTypeHandlers,
+	...relationTypeHandlers,
 	...rteEmbedHandlers,
-	...stylesheetHandlers,
-	...partialViewsHandlers,
-	...tagHandlers,
-	...configHandlers,
 	...scriptHandlers,
+	...staticFileHandlers,
+	...stylesheetHandlers,
+	...tagHandlers,
+	...telemetryHandlers,
+	...templateHandlers,
+	...trackedReferenceHandlers,
+	...upgradeHandlers,
+	...userGroupsHandlers,
+	...userHandlers,
 ];
 
 switch (import.meta.env.VITE_UMBRACO_INSTALL_STATUS) {

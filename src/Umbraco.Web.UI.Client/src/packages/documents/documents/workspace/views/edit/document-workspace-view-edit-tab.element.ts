@@ -1,4 +1,4 @@
-import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../document-workspace.context.js';
+import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../document-workspace.context-token.js';
 import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/content-type';
@@ -41,7 +41,7 @@ export class UmbDocumentWorkspaceViewEditTabElement extends UmbLitElement {
 		this._groupStructureHelper.setOwnerId(value);
 	}
 
-	_groupStructureHelper = new UmbContentTypeContainerStructureHelper(this);
+	_groupStructureHelper = new UmbContentTypeContainerStructureHelper<any>(this);
 
 	@state()
 	_groups: Array<PropertyTypeContainerModelBaseModel> = [];

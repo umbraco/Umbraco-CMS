@@ -3,6 +3,7 @@ import {
 	TemplateResource,
 	CreateTemplateRequestModel,
 	UpdateTemplateRequestModel,
+	TemplateScaffoldResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
@@ -15,7 +16,15 @@ import type { UmbDataSource } from '@umbraco-cms/backoffice/repository';
  * @implements {TemplateDetailDataSource}
  */
 export class UmbTemplateDetailServerDataSource
-	implements UmbDataSource<CreateTemplateRequestModel, string, UpdateTemplateRequestModel, TemplateResponseModel>
+	implements
+		UmbDataSource<
+			CreateTemplateRequestModel,
+			string,
+			UpdateTemplateRequestModel,
+			TemplateResponseModel,
+			string,
+			TemplateScaffoldResponseModel
+		>
 {
 	#host: UmbControllerHost;
 

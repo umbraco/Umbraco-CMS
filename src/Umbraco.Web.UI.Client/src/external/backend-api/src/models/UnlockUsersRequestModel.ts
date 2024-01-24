@@ -4,6 +4,5 @@
 /* eslint-disable */
 
 export type UnlockUsersRequestModel = {
-    userIds?: Array<string>;
+    userIds: Array<string>;
 };
-

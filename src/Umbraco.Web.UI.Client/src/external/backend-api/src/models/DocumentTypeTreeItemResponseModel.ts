@@ -6,7 +6,6 @@
 import type { FolderTreeItemResponseModel } from './FolderTreeItemResponseModel';
 
 export type DocumentTypeTreeItemResponseModel = (FolderTreeItemResponseModel & {
-    isElement?: boolean;
-    icon?: string;
+isElement: boolean;
+icon: string;
 });
-

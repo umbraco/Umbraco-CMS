@@ -4,8 +4,7 @@
 /* eslint-disable */
 
 export type TourStatusModel = {
-    alias?: string;
-    completed?: boolean;
-    disabled?: boolean;
+    alias: string;
+    completed: boolean;
+    disabled: boolean;
 };
-

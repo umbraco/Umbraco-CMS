@@ -6,7 +6,6 @@
 import type { TelemetryLevelModel } from './TelemetryLevelModel';
 
 export type ConsentLevelPresentationModel = {
-    level?: TelemetryLevelModel;
-    description?: string;
+    level: TelemetryLevelModel;
+    description: string;
 };
-

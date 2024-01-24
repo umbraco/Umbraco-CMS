@@ -32,17 +32,19 @@ export class DocumentResource {
      * @throws ApiError
      */
     public static postDocument({
-        requestBody,
-    }: {
-        requestBody?: CreateDocumentRequestModel,
-    }): CancelablePromise<string> {
+requestBody,
+}: {
+requestBody?: CreateDocumentRequestModel,
+}): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/document',
             body: requestBody,
             mediaType: 'application/json',
-            responseHeader: 'Location',
+            responseHeader: 'Umb-Generated-Resource',
             errors: {
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
                 404: `Not Found`,
             },
         });
@@ -53,10 +55,10 @@ export class DocumentResource {
      * @throws ApiError
      */
     public static getDocumentById({
-        id,
-    }: {
-        id: string,
-    }): CancelablePromise<DocumentResponseModel> {
+id,
+}: {
+id: string,
+}): CancelablePromise<DocumentResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/document/{id}',
@@ -64,6 +66,8 @@ export class DocumentResource {
                 'id': id,
             },
             errors: {
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
                 404: `Not Found`,
             },
         });
@@ -74,12 +78,12 @@ export class DocumentResource {
      * @throws ApiError
      */
     public static putDocumentById({
-        id,
-        requestBody,
-    }: {
-        id: string,
-        requestBody?: UpdateDocumentRequestModel,
-    }): CancelablePromise<any> {
+id,
+requestBody,
+}: {
+id: string,
+requestBody?: UpdateDocumentRequestModel,
+}): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/document/{id}',
@@ -89,6 +93,8 @@ export class DocumentResource {
             body: requestBody,
             mediaType: 'application/json',
             errors: {
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
                 404: `Not Found`,
             },
         });
@@ -99,12 +105,12 @@ export class DocumentResource {
      * @throws ApiError
      */
     public static postDocumentByIdCopy({
-        id,
-        requestBody,
-    }: {
-        id: string,
-        requestBody?: CopyDocumentRequestModel,
-    }): CancelablePromise<string> {
+id,
+requestBody,
+}: {
+id: string,
+requestBody?: CopyDocumentRequestModel,
+}): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/document/{id}/copy',
@@ -113,8 +119,10 @@ export class DocumentResource {
             },
             body: requestBody,
             mediaType: 'application/json',
-            responseHeader: 'Location',
+            responseHeader: 'Umb-Generated-Resource',
             errors: {
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
                 404: `Not Found`,
             },
         });
@@ -125,10 +133,10 @@ export class DocumentResource {
      * @throws ApiError
      */
     public static getDocumentByIdDomains({
-        id,
-    }: {
-        id: string,
-    }): CancelablePromise<DomainsResponseModel> {
+id,
+}: {
+id: string,
+}): CancelablePromise<DomainsResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/document/{id}/domains',
@@ -136,6 +144,7 @@ export class DocumentResource {
                 'id': id,
             },
             errors: {
+                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
         });
@@ -146,12 +155,12 @@ export class DocumentResource {
      * @throws ApiError
      */
     public static putDocumentByIdDomains({
-        id,
-        requestBody,
-    }: {
-        id: string,
-        requestBody?: UpdateDomainsRequestModel,
-    }): CancelablePromise<any> {
+id,
+requestBody,
+}: {
+id: string,
+requestBody?: UpdateDomainsRequestModel,
+}): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/document/{id}/domains',
@@ -160,6 +169,9 @@ export class DocumentResource {
             },
             body: requestBody,
             mediaType: 'application/json',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -168,12 +180,12 @@ export class DocumentResource {
      * @throws ApiError
      */
     public static putDocumentByIdMove({
-        id,
-        requestBody,
-    }: {
-        id: string,
-        requestBody?: MoveDocumentRequestModel,
-    }): CancelablePromise<any> {
+id,
+requestBody,
+}: {
+id: string,
+requestBody?: MoveDocumentRequestModel,
+}): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/document/{id}/move',
@@ -183,6 +195,8 @@ export class DocumentResource {
             body: requestBody,
             mediaType: 'application/json',
             errors: {
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
                 404: `Not Found`,
             },
         });
@@ -193,10 +207,10 @@ export class DocumentResource {
      * @throws ApiError
      */
     public static putDocumentByIdMoveToRecycleBin({
-        id,
-    }: {
-        id: string,
-    }): CancelablePromise<any> {
+id,
+}: {
+id: string,
+}): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/document/{id}/move-to-recycle-bin',
@@ -205,6 +219,8 @@ export class DocumentResource {
             },
             errors: {
                 400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
                 404: `Not Found`,
             },
         });
@@ -215,10 +231,10 @@ export class DocumentResource {
      * @throws ApiError
      */
     public static getDocumentByIdNotifications({
-        id,
-    }: {
-        id: string,
-    }): CancelablePromise<Array<DocumentNotificationResponseModel>> {
+id,
+}: {
+id: string,
+}): CancelablePromise<Array<DocumentNotificationResponseModel>> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/document/{id}/notifications',
@@ -226,6 +242,8 @@ export class DocumentResource {
                 'id': id,
             },
             errors: {
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
                 404: `Not Found`,
             },
         });
@@ -236,12 +254,12 @@ export class DocumentResource {
      * @throws ApiError
      */
     public static putDocumentByIdNotifications({
-        id,
-        requestBody,
-    }: {
-        id: string,
-        requestBody?: UpdateDocumentNotificationsRequestModel,
-    }): CancelablePromise<any> {
+id,
+requestBody,
+}: {
+id: string,
+requestBody?: UpdateDocumentNotificationsRequestModel,
+}): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/document/{id}/notifications',
@@ -251,6 +269,7 @@ export class DocumentResource {
             body: requestBody,
             mediaType: 'application/json',
             errors: {
+                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
         });
@@ -261,12 +280,12 @@ export class DocumentResource {
      * @throws ApiError
      */
     public static postDocumentByIdPublicAccess({
-        id,
-        requestBody,
-    }: {
-        id: string,
-        requestBody?: PublicAccessRequestModel,
-    }): CancelablePromise<string> {
+id,
+requestBody,
+}: {
+id: string,
+requestBody?: PublicAccessRequestModel,
+}): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/document/{id}/public-access',
@@ -275,8 +294,10 @@ export class DocumentResource {
             },
             body: requestBody,
             mediaType: 'application/json',
-            responseHeader: 'Location',
+            responseHeader: 'Umb-Generated-Resource',
             errors: {
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
                 404: `Not Found`,
             },
         });
@@ -287,10 +308,10 @@ export class DocumentResource {
      * @throws ApiError
      */
     public static deleteDocumentByIdPublicAccess({
-        id,
-    }: {
-        id: string,
-    }): CancelablePromise<any> {
+id,
+}: {
+id: string,
+}): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/document/{id}/public-access',
@@ -298,20 +319,22 @@ export class DocumentResource {
                 'id': id,
             },
             errors: {
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
                 404: `Not Found`,
             },
         });
     }
 
     /**
-     * @returns void
+     * @returns void 
      * @throws ApiError
      */
     public static getDocumentByIdPublicAccess({
-        id,
-    }: {
-        id: string,
-    }): CancelablePromise<void> {
+id,
+}: {
+id: string,
+}): CancelablePromise<void> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/document/{id}/public-access',
@@ -319,6 +342,8 @@ export class DocumentResource {
                 'id': id,
             },
             errors: {
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
                 404: `Not Found`,
             },
         });
@@ -329,12 +354,12 @@ export class DocumentResource {
      * @throws ApiError
      */
     public static putDocumentByIdPublicAccess({
-        id,
-        requestBody,
-    }: {
-        id: string,
-        requestBody?: PublicAccessRequestModel,
-    }): CancelablePromise<any> {
+id,
+requestBody,
+}: {
+id: string,
+requestBody?: PublicAccessRequestModel,
+}): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/document/{id}/public-access',
@@ -344,99 +369,8 @@ export class DocumentResource {
             body: requestBody,
             mediaType: 'application/json',
             errors: {
-                404: `Not Found`,
-            },
-        });
-    }
-
-    /**
-     * @returns string Created
-     * @throws ApiError
-     */
-    public static postDocumentByIdPublicAccess1({
-        id,
-        requestBody,
-    }: {
-        id: string,
-        requestBody?: PublicAccessRequestModel,
-    }): CancelablePromise<string> {
-        return __request(OpenAPI, {
-            method: 'POST',
-            url: '/umbraco/management/api/v2/document/{id}/public-access',
-            path: {
-                'id': id,
-            },
-            body: requestBody,
-            mediaType: 'application/json',
-            responseHeader: 'Location',
-            errors: {
-                404: `Not Found`,
-            },
-        });
-    }
-
-    /**
-     * @returns any Success
-     * @throws ApiError
-     */
-    public static deleteDocumentByIdPublicAccess1({
-        id,
-    }: {
-        id: string,
-    }): CancelablePromise<any> {
-        return __request(OpenAPI, {
-            method: 'DELETE',
-            url: '/umbraco/management/api/v2/document/{id}/public-access',
-            path: {
-                'id': id,
-            },
-            errors: {
-                404: `Not Found`,
-            },
-        });
-    }
-
-    /**
-     * @returns void
-     * @throws ApiError
-     */
-    public static getDocumentByIdPublicAccess1({
-        id,
-    }: {
-        id: string,
-    }): CancelablePromise<void> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/umbraco/management/api/v2/document/{id}/public-access',
-            path: {
-                'id': id,
-            },
-            errors: {
-                404: `Not Found`,
-            },
-        });
-    }
-
-    /**
-     * @returns any Success
-     * @throws ApiError
-     */
-    public static putDocumentByIdPublicAccess1({
-        id,
-        requestBody,
-    }: {
-        id: string,
-        requestBody?: PublicAccessRequestModel,
-    }): CancelablePromise<any> {
-        return __request(OpenAPI, {
-            method: 'PUT',
-            url: '/umbraco/management/api/v2/document/{id}/public-access',
-            path: {
-                'id': id,
-            },
-            body: requestBody,
-            mediaType: 'application/json',
-            errors: {
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
                 404: `Not Found`,
             },
         });
@@ -447,12 +381,12 @@ export class DocumentResource {
      * @throws ApiError
      */
     public static putDocumentByIdPublish({
-        id,
-        requestBody,
-    }: {
-        id: string,
-        requestBody?: (PublishDocumentRequestModel | PublishDocumentWithDescendantsRequestModel),
-    }): CancelablePromise<any> {
+id,
+requestBody,
+}: {
+id: string,
+requestBody?: (PublishDocumentRequestModel | PublishDocumentWithDescendantsRequestModel),
+}): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/document/{id}/publish',
@@ -463,32 +397,8 @@ export class DocumentResource {
             mediaType: 'application/json',
             errors: {
                 400: `Bad Request`,
-                404: `Not Found`,
-            },
-        });
-    }
-
-    /**
-     * @returns any Success
-     * @throws ApiError
-     */
-    public static putDocumentByIdPublish1({
-        id,
-        requestBody,
-    }: {
-        id: string,
-        requestBody?: (PublishDocumentRequestModel | PublishDocumentWithDescendantsRequestModel),
-    }): CancelablePromise<any> {
-        return __request(OpenAPI, {
-            method: 'PUT',
-            url: '/umbraco/management/api/v2/document/{id}/publish',
-            path: {
-                'id': id,
-            },
-            body: requestBody,
-            mediaType: 'application/json',
-            errors: {
-                400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
                 404: `Not Found`,
             },
         });
@@ -499,12 +409,12 @@ export class DocumentResource {
      * @throws ApiError
      */
     public static putDocumentByIdPublishWithDescendants({
-        id,
-        requestBody,
-    }: {
-        id: string,
-        requestBody?: PublishDocumentWithDescendantsRequestModel,
-    }): CancelablePromise<any> {
+id,
+requestBody,
+}: {
+id: string,
+requestBody?: PublishDocumentWithDescendantsRequestModel,
+}): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/document/{id}/publish-with-descendants',
@@ -515,32 +425,8 @@ export class DocumentResource {
             mediaType: 'application/json',
             errors: {
                 400: `Bad Request`,
-                404: `Not Found`,
-            },
-        });
-    }
-
-    /**
-     * @returns any Success
-     * @throws ApiError
-     */
-    public static putDocumentByIdPublishWithDescendants1({
-        id,
-        requestBody,
-    }: {
-        id: string,
-        requestBody?: PublishDocumentWithDescendantsRequestModel,
-    }): CancelablePromise<any> {
-        return __request(OpenAPI, {
-            method: 'PUT',
-            url: '/umbraco/management/api/v2/document/{id}/publish-with-descendants',
-            path: {
-                'id': id,
-            },
-            body: requestBody,
-            mediaType: 'application/json',
-            errors: {
-                400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
                 404: `Not Found`,
             },
         });
@@ -551,12 +437,12 @@ export class DocumentResource {
      * @throws ApiError
      */
     public static putDocumentByIdUnpublish({
-        id,
-        requestBody,
-    }: {
-        id: string,
-        requestBody?: UnpublishDocumentRequestModel,
-    }): CancelablePromise<any> {
+id,
+requestBody,
+}: {
+id: string,
+requestBody?: UnpublishDocumentRequestModel,
+}): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/document/{id}/unpublish',
@@ -567,32 +453,8 @@ export class DocumentResource {
             mediaType: 'application/json',
             errors: {
                 400: `Bad Request`,
-                404: `Not Found`,
-            },
-        });
-    }
-
-    /**
-     * @returns any Success
-     * @throws ApiError
-     */
-    public static putDocumentByIdUnpublish1({
-        id,
-        requestBody,
-    }: {
-        id: string,
-        requestBody?: UnpublishDocumentRequestModel,
-    }): CancelablePromise<any> {
-        return __request(OpenAPI, {
-            method: 'PUT',
-            url: '/umbraco/management/api/v2/document/{id}/unpublish',
-            path: {
-                'id': id,
-            },
-            body: requestBody,
-            mediaType: 'application/json',
-            errors: {
-                400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
                 404: `Not Found`,
             },
         });
@@ -603,14 +465,14 @@ export class DocumentResource {
      * @throws ApiError
      */
     public static getDocumentAllowedDocumentTypes({
-        parentId,
-        skip,
-        take = 100,
-    }: {
-        parentId?: string,
-        skip?: number,
-        take?: number,
-    }): CancelablePromise<PagedDocumentTypeResponseModel> {
+parentId,
+skip,
+take = 100,
+}: {
+parentId?: string,
+skip?: number,
+take?: number,
+}): CancelablePromise<PagedDocumentTypeResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/document/allowed-document-types',
@@ -620,33 +482,7 @@ export class DocumentResource {
                 'take': take,
             },
             errors: {
-                404: `Not Found`,
-            },
-        });
-    }
-
-    /**
-     * @returns PagedDocumentTypeResponseModel Success
-     * @throws ApiError
-     */
-    public static getDocumentAllowedDocumentTypes1({
-        parentId,
-        skip,
-        take = 100,
-    }: {
-        parentId?: string,
-        skip?: number,
-        take?: number,
-    }): CancelablePromise<PagedDocumentTypeResponseModel> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/umbraco/management/api/v2/document/allowed-document-types',
-            query: {
-                'parentId': parentId,
-                'skip': skip,
-                'take': take,
-            },
-            errors: {
+                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
             },
         });
@@ -657,14 +493,14 @@ export class DocumentResource {
      * @throws ApiError
      */
     public static getDocumentItem({
-        id,
-        dataTypeId,
-        culture,
-    }: {
-        id?: Array<string>,
-        dataTypeId?: string,
-        culture?: string,
-    }): CancelablePromise<Array<DocumentItemResponseModel>> {
+id,
+dataTypeId,
+culture,
+}: {
+id?: Array<string>,
+dataTypeId?: string,
+culture?: string,
+}): CancelablePromise<Array<DocumentItemResponseModel>> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/document/item',
@@ -672,6 +508,9 @@ export class DocumentResource {
                 'id': id,
                 'dataTypeId': dataTypeId,
                 'culture': culture,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }
@@ -681,10 +520,10 @@ export class DocumentResource {
      * @throws ApiError
      */
     public static putDocumentSort({
-        requestBody,
-    }: {
-        requestBody?: SortingRequestModel,
-    }): CancelablePromise<any> {
+requestBody,
+}: {
+requestBody?: SortingRequestModel,
+}): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/document/sort',
@@ -692,6 +531,8 @@ export class DocumentResource {
             mediaType: 'application/json',
             errors: {
                 400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
+                403: `The authenticated user do not have access to this resource`,
                 404: `Not Found`,
             },
         });
@@ -702,14 +543,14 @@ export class DocumentResource {
      * @throws ApiError
      */
     public static getRecycleBinDocumentChildren({
-        parentId,
-        skip,
-        take = 100,
-    }: {
-        parentId?: string,
-        skip?: number,
-        take?: number,
-    }): CancelablePromise<PagedRecycleBinItemResponseModel> {
+parentId,
+skip,
+take = 100,
+}: {
+parentId?: string,
+skip?: number,
+take?: number,
+}): CancelablePromise<PagedRecycleBinItemResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/recycle-bin/document/children',
@@ -719,7 +560,7 @@ export class DocumentResource {
                 'take': take,
             },
             errors: {
-                401: `Unauthorized`,
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }
@@ -729,12 +570,12 @@ export class DocumentResource {
      * @throws ApiError
      */
     public static getRecycleBinDocumentRoot({
-        skip,
-        take = 100,
-    }: {
-        skip?: number,
-        take?: number,
-    }): CancelablePromise<PagedRecycleBinItemResponseModel> {
+skip,
+take = 100,
+}: {
+skip?: number,
+take?: number,
+}): CancelablePromise<PagedRecycleBinItemResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/recycle-bin/document/root',
@@ -743,7 +584,7 @@ export class DocumentResource {
                 'take': take,
             },
             errors: {
-                401: `Unauthorized`,
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }
@@ -753,18 +594,18 @@ export class DocumentResource {
      * @throws ApiError
      */
     public static getTreeDocumentChildren({
-        parentId,
-        skip,
-        take = 100,
-        dataTypeId,
-        culture,
-    }: {
-        parentId?: string,
-        skip?: number,
-        take?: number,
-        dataTypeId?: string,
-        culture?: string,
-    }): CancelablePromise<PagedDocumentTreeItemResponseModel> {
+parentId,
+skip,
+take = 100,
+dataTypeId,
+culture,
+}: {
+parentId?: string,
+skip?: number,
+take?: number,
+dataTypeId?: string,
+culture?: string,
+}): CancelablePromise<PagedDocumentTreeItemResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/document/children',
@@ -775,6 +616,9 @@ export class DocumentResource {
                 'dataTypeId': dataTypeId,
                 'culture': culture,
             },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -783,16 +627,16 @@ export class DocumentResource {
      * @throws ApiError
      */
     public static getTreeDocumentRoot({
-        skip,
-        take = 100,
-        dataTypeId,
-        culture,
-    }: {
-        skip?: number,
-        take?: number,
-        dataTypeId?: string,
-        culture?: string,
-    }): CancelablePromise<PagedDocumentTreeItemResponseModel> {
+skip,
+take = 100,
+dataTypeId,
+culture,
+}: {
+skip?: number,
+take?: number,
+dataTypeId?: string,
+culture?: string,
+}): CancelablePromise<PagedDocumentTreeItemResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/document/root',
@@ -801,6 +645,9 @@ export class DocumentResource {
                 'take': take,
                 'dataTypeId': dataTypeId,
                 'culture': culture,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }

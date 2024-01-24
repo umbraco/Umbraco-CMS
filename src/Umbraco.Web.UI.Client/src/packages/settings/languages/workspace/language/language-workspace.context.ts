@@ -9,9 +9,12 @@ import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controlle
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 export class UmbLanguageWorkspaceContext
-	extends UmbEditableWorkspaceContextBase<UmbLanguageRepository, LanguageResponseModel>
+	extends UmbEditableWorkspaceContextBase<LanguageResponseModel>
 	implements UmbSaveableWorkspaceContextInterface
 {
+	//
+	public readonly repository: UmbLanguageRepository = new UmbLanguageRepository(this);
+
 	#data = new UmbObjectState<LanguageResponseModel | undefined>(undefined);
 	readonly data = this.#data.asObservable();
 
@@ -20,7 +23,7 @@ export class UmbLanguageWorkspaceContext
 	readonly validationErrors = this.#validationErrors.asObservable();
 
 	constructor(host: UmbControllerHostElement) {
-		super(host, 'Umb.Workspace.Language', new UmbLanguageRepository(host));
+		super(host, 'Umb.Workspace.Language');
 	}
 
 	async load(isoCode: string) {
@@ -75,7 +78,7 @@ export class UmbLanguageWorkspaceContext
 	// TODO: this is a temp solution to bubble validation errors to the UI
 	setValidationErrors(errorMap: any) {
 		// TODO: I can't use the update method to set the value to undefined
-		this.#validationErrors.next(errorMap);
+		this.#validationErrors.setValue(errorMap);
 	}
 
 	async save() {

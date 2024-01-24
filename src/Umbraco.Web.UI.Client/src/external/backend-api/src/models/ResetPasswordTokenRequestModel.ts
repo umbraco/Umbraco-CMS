@@ -6,6 +6,5 @@
 import type { VerifyResetPasswordTokenRequestModel } from './VerifyResetPasswordTokenRequestModel';
 
 export type ResetPasswordTokenRequestModel = (VerifyResetPasswordTokenRequestModel & {
-    password?: string;
+password: string;
 });
-

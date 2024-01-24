@@ -1,12 +1,14 @@
-export type UmbDataTypeDetailModel = {
-	type: string;
+import { UmbDataTypeEntityType } from './entity.js';
+
+export interface UmbDataTypeDetailModel {
+	entityType: UmbDataTypeEntityType;
 	unique: string;
 	parentUnique: string | null;
 	name: string;
-	propertyEditorAlias: string | undefined;
-	propertyEditorUiAlias: string | null;
+	editorAlias: string | undefined;
+	editorUiAlias: string | null;
 	values: Array<UmbDataTypePropertyModel>;
-};
+}
 
 export interface UmbDataTypePropertyModel {
 	alias: string;

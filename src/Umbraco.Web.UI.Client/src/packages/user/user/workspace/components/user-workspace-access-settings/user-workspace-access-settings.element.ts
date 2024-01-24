@@ -43,30 +43,30 @@ export class UmbUserWorkspaceAccessSettingsElement extends UmbLitElement {
 		return html` <uui-box>
 				<div slot="headline"><umb-localize key="user_assignAccess">Assign Access</umb-localize></div>
 				<div id="assign-access">
-					<umb-workspace-property-layout
+					<umb-property-layout
 						label="${this.localize.term('general_groups')}"
 						description="${this.localize.term('user_groupsHelp')}">
 						<umb-user-group-input
 							slot="editor"
 							.selectedIds=${this._user?.userGroupIds ?? []}
 							@change=${this.#onUserGroupsChange}></umb-user-group-input>
-					</umb-workspace-property-layout>
-					<umb-workspace-property-layout
+					</umb-property-layout>
+					<umb-property-layout
 						label=${this.localize.term('user_startnodes')}
 						description=${this.localize.term('user_startnodeshelp')}>
 						<umb-input-document
 							.selectedIds=${this._user?.contentStartNodeIds ?? []}
 							@change=${this.#onDocumentStartNodeChange}
 							slot="editor"></umb-input-document>
-					</umb-workspace-property-layout>
-					<umb-workspace-property-layout
+					</umb-property-layout>
+					<umb-property-layout
 						label=${this.localize.term('user_mediastartnodes')}
 						description=${this.localize.term('user_mediastartnodeshelp')}>
 						<umb-input-media
 							.selectedIds=${this._user?.mediaStartNodeIds ?? []}
 							@change=${this.#onMediaStartNodeChange}
 							slot="editor"></umb-input-media>
-					</umb-workspace-property-layout>
+					</umb-property-layout>
 				</div>
 			</uui-box>
 

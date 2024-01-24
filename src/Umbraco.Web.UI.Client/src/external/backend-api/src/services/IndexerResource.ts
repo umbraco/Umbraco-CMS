@@ -17,18 +17,21 @@ export class IndexerResource {
      * @throws ApiError
      */
     public static getIndexer({
-        skip,
-        take = 100,
-    }: {
-        skip?: number,
-        take?: number,
-    }): CancelablePromise<PagedIndexResponseModel> {
+skip,
+take = 100,
+}: {
+skip?: number,
+take?: number,
+}): CancelablePromise<PagedIndexResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/indexer',
             query: {
                 'skip': skip,
                 'take': take,
+            },
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }
@@ -38,10 +41,10 @@ export class IndexerResource {
      * @throws ApiError
      */
     public static getIndexerByIndexName({
-        indexName,
-    }: {
-        indexName: string,
-    }): CancelablePromise<IndexResponseModel> {
+indexName,
+}: {
+indexName: string,
+}): CancelablePromise<IndexResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/indexer/{indexName}',
@@ -50,6 +53,7 @@ export class IndexerResource {
             },
             errors: {
                 400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
             },
         });
     }
@@ -59,10 +63,10 @@ export class IndexerResource {
      * @throws ApiError
      */
     public static postIndexerByIndexNameRebuild({
-        indexName,
-    }: {
-        indexName: string,
-    }): CancelablePromise<OkResult> {
+indexName,
+}: {
+indexName: string,
+}): CancelablePromise<OkResult> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/indexer/{indexName}/rebuild',
@@ -71,6 +75,7 @@ export class IndexerResource {
             },
             errors: {
                 400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
                 404: `Not Found`,
                 409: `Conflict`,
             },

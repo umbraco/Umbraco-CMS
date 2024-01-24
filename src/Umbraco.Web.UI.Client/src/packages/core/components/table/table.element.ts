@@ -155,7 +155,11 @@ export class UmbTableElement extends LitElement {
 
 	render() {
 		return html`<uui-table class="uui-text">
-			<uui-table-column style="width: 60px;"></uui-table-column>
+			<uui-table-column
+				.style=${when(
+					!(this.config.allowSelection === false && this.config.hideIcon === true),
+					() => 'width: 60px',
+				)}></uui-table-column>
 			<uui-table-head>
 				${this._renderHeaderCheckboxCell()} ${this.columns.map((column) => this._renderHeaderCell(column))}
 			</uui-table-head>

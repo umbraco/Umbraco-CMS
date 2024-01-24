@@ -4,7 +4,6 @@
 /* eslint-disable */
 
 export type UpdateUserGroupsOnUserRequestModel = {
-    userIds?: Array<string>;
-    userGroupIds?: Array<string>;
+    userIds: Array<string>;
+    userGroupIds: Array<string>;
 };
-

@@ -23,6 +23,7 @@ export class UmbLogViewerDateRangeSelectorElement extends UmbLitElement {
 	horizontal = false;
 
 	#logViewerContext?: UmbLogViewerWorkspaceContext;
+
 	constructor() {
 		super();
 		this.addEventListener('input', this.#setDates);
@@ -31,13 +32,21 @@ export class UmbLogViewerDateRangeSelectorElement extends UmbLitElement {
 			this.#observeStuff();
 		});
 	}
+	disconnectedCallback(): void {
+		super.disconnectedCallback();
+		this.removeEventListener('input', this.#setDates);
+	}
 
 	#observeStuff() {
 		if (!this.#logViewerContext) return;
-		this.observe(this.#logViewerContext.dateRange, (dateRange: LogViewerDateRange) => {
-			this._startDate = dateRange?.startDate;
-			this._endDate = dateRange?.endDate;
-		});
+		this.observe(
+			this.#logViewerContext.dateRange,
+			(dateRange: LogViewerDateRange) => {
+				this._startDate = dateRange.startDate;
+				this._endDate = dateRange.endDate;
+			},
+			'_observeDateRange',
+		);
 	}
 
 	#setDates() {
@@ -48,6 +57,7 @@ export class UmbLogViewerDateRangeSelectorElement extends UmbLitElement {
 				this._endDate = input.value;
 			}
 		});
+		this.#logViewerContext?.setDateRange({ startDate: this._startDate, endDate: this._endDate });
 
 		const query = getQuery();
 		const qs = toQueryString({
@@ -61,35 +71,32 @@ export class UmbLogViewerDateRangeSelectorElement extends UmbLitElement {
 
 	render() {
 		return html`
-        <div class="input-container">
-            <uui-label for="start-date">From:</uui-label>
-            <input
-                @click=${(e: Event) => {
-									(e.target as HTMLInputElement).showPicker();
-								}}
-
-                id="start-date"
-                type="date"
-                label="From"
-                .max=${this.#logViewerContext?.today ?? ''}
-                .value=${this._startDate}>
-            </input>
-        </div>
-        <div class="input-container">
-            <uui-label for="end-date">To: </uui-label>
-            <input
-                @click=${(e: Event) => {
-									(e.target as HTMLInputElement).showPicker();
-								}}
-                id="end-date"
-                type="date"
-                label="To"
-                .min=${this._startDate}
-                .max=${this.#logViewerContext?.today ?? ''}
-                .value=${this._endDate}>
-            </input>
-        </div>
-        `;
+			<div class="input-container">
+				<uui-label for="start-date">From:</uui-label>
+				<input
+					@click=${(e: Event) => {
+						(e.target as HTMLInputElement).showPicker();
+					}}
+					id="start-date"
+					type="date"
+					label="From"
+					.max=${this.#logViewerContext?.today ?? ''}
+					.value=${this._startDate} />
+			</div>
+			<div class="input-container">
+				<uui-label for="end-date">To: </uui-label>
+				<input
+					@click=${(e: Event) => {
+						(e.target as HTMLInputElement).showPicker();
+					}}
+					id="end-date"
+					type="date"
+					label="To"
+					.min=${this._startDate}
+					.max=${this.#logViewerContext?.today ?? ''}
+					.value=${this._endDate} />
+			</div>
+		`;
 	}
 
 	static styles = [

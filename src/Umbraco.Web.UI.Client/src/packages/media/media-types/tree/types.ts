@@ -1,10 +1,10 @@
-import type { MediaTypeTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import type { UmbEntityTreeItemModel, UmbEntityTreeRootModel } from '@umbraco-cms/backoffice/tree';
+import { UmbMediaTypeEntityType, UmbMediaTypeFolderEntityType, UmbMediaTypeRootEntityType } from '../entity.js';
+import { UmbUniqueTreeItemModel, UmbUniqueTreeRootModel } from '@umbraco-cms/backoffice/tree';
 
-export interface UmbMediaTypeTreeItemModel
-	extends Omit<MediaTypeTreeItemResponseModel, 'icon'>,
-		UmbEntityTreeItemModel {}
-// TODO: TREE STORE TYPE PROBLEM:
-export interface UmbMediaTypeTreeRootModel
-	extends Omit<Omit<MediaTypeTreeItemResponseModel, 'id'>, 'icon'>,
-		UmbEntityTreeRootModel {}
+export interface UmbMediaTypeTreeItemModel extends UmbUniqueTreeItemModel {
+	entityType: UmbMediaTypeEntityType | UmbMediaTypeFolderEntityType;
+}
+
+export interface UmbMediaTypeTreeRootModel extends UmbUniqueTreeRootModel {
+	entityType: UmbMediaTypeRootEntityType;
+}

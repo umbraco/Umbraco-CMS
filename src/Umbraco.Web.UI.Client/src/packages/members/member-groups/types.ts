@@ -1,5 +1,5 @@
-import type { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { UmbEntityTreeItemModel } from '@umbraco-cms/backoffice/tree';
 
-export interface UmbMemberGroupDetailModel extends EntityTreeItemResponseModel {
+export interface UmbMemberGroupDetailModel extends UmbEntityTreeItemModel {
 	id: string; // TODO: Remove this when the backend is fixed
 }

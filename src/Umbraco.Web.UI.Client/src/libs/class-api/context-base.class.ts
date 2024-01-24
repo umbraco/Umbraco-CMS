@@ -8,6 +8,7 @@ import { UmbBaseController } from './controller-base.class.js';
  */
 export abstract class UmbContextBase<
 	ContextType,
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	GivenContextToken extends UmbContextToken<any, ContextType> = UmbContextToken<any, ContextType>,
 > extends UmbBaseController {
 	constructor(host: UmbControllerHost, contextToken: GivenContextToken | string) {

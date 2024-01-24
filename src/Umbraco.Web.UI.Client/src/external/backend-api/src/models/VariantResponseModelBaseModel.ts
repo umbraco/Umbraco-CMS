@@ -6,8 +6,7 @@
 export type VariantResponseModelBaseModel = {
     culture?: string | null;
     segment?: string | null;
-    name?: string;
-    createDate?: string;
-    updateDate?: string;
+    name: string;
+    createDate: string;
+    updateDate: string;
 };
-

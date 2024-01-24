@@ -28,7 +28,7 @@ export class UmbUserGroupServerDataSource implements UmbUserGroupDetailDataSourc
 	}
 
 	//TODO should parentId be optional in the generic interface?
-	async createScaffold(parentId: string | null) {
+	async createScaffold(_parentId: string | null) {
 		const data: CreateUserGroupRequestModel = {
 			name: '',
 			icon: '',
@@ -36,6 +36,8 @@ export class UmbUserGroupServerDataSource implements UmbUserGroupDetailDataSourc
 			languages: [],
 			hasAccessToAllLanguages: false,
 			permissions: [],
+			documentRootAccess: false,
+			mediaRootAccess: false,
 		};
 		return { data };
 	}

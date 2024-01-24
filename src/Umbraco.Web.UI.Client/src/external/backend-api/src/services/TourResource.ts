@@ -19,6 +19,9 @@ export class TourResource {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tour',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 
@@ -27,15 +30,18 @@ export class TourResource {
      * @throws ApiError
      */
     public static postTour({
-        requestBody,
-    }: {
-        requestBody?: SetTourStatusRequestModel,
-    }): CancelablePromise<any> {
+requestBody,
+}: {
+requestBody?: SetTourStatusRequestModel,
+}): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/tour',
             body: requestBody,
             mediaType: 'application/json',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
         });
     }
 

@@ -7,7 +7,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 @customElement('umb-log-viewer-overview-view')
 export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 	@state()
-	private _errorCount = 0;
+	private _errorCount?: number;
 
 	@state()
 	private _logLevelCount: LogLevelCountsReponseModel | null = null;
@@ -30,7 +30,7 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 		if (!this.#logViewerContext) return;
 
 		this.observe(this.#logViewerContext.logCount, (logLevelCount) => {
-			this._errorCount = logLevelCount?.error ?? 0;
+			this._errorCount = logLevelCount?.error;
 		});
 	}
 
@@ -52,11 +52,13 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 					<uui-box id="errors" headline="Number of Errors">
 						<uui-button
 							label="Show error logs"
-							href=${`section/settings/workspace/logviewer/search/?lq=${encodeURIComponent(
+							href=${`section/settings/workspace/logviewer/view/search/?lq=${encodeURIComponent(
 								`@Level='Fatal' or @Level='Error' or Has(@Exception)`,
 							)}`}>
-							<h2 id="error-count">${this._errorCount}</h2></uui-button
-						>
+							<h2 id="error-count">
+								${this._errorCount === undefined ? html`<uui-loader></uui-loader>` : this._errorCount}
+							</h2>
+						</uui-button>
 					</uui-box>
 
 					<uui-box id="level" headline="Log level">
