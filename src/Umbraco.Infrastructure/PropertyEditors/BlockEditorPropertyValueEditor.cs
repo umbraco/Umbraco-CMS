@@ -21,7 +21,6 @@ internal abstract class BlockEditorPropertyValueEditor<TValue, TLayout> : BlockV
     private readonly IDataTypeService _dataTypeService;
     private readonly PropertyEditorCollection _propertyEditors;
     private readonly DataValueReferenceFactoryCollection _dataValueReferenceFactories;
-    private readonly ILogger<BlockEditorPropertyValueEditor> _logger;
 
     protected BlockEditorPropertyValueEditor(
         DataEditorAttribute attribute,
@@ -38,7 +37,7 @@ internal abstract class BlockEditorPropertyValueEditor<TValue, TLayout> : BlockV
         _propertyEditors = propertyEditors;
         _dataValueReferenceFactories = dataValueReferenceFactories;
         _dataTypeService = dataTypeService;
-        _logger = logger;
+        _jsonSerializer = jsonSerializer;
     }
 
     protected BlockEditorValues<TValue, TLayout> BlockEditorValues
@@ -77,7 +76,7 @@ internal abstract class BlockEditorPropertyValueEditor<TValue, TLayout> : BlockV
                 continue;
             }
 
-            object? configuration = _dataTypeService.GetDataType(propertyValue.PropertyType.DataTypeKey)?.Configuration;
+            object? configuration = _dataTypeService.GetDataType(propertyValue.PropertyType.DataTypeKey)?.ConfigurationObject;
             foreach (ITag tag in dataValueTags.GetTags(propertyValue.Value, configuration, languageId))
             {
                 yield return tag;
