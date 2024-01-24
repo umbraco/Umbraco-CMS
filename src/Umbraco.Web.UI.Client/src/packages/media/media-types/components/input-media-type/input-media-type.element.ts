@@ -73,10 +73,6 @@ export class UmbInputMediaTypeElement extends FormControlMixin(UmbLitElement) {
 
 	constructor() {
 		super();
-	}
-
-	connectedCallback() {
-		super.connectedCallback();
 
 		this.addValidator(
 			'rangeUnderflow',

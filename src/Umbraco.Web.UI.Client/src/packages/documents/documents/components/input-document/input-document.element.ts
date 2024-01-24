@@ -105,13 +105,6 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 	constructor() {
 		super();
 
-		this.observe(this.#pickerContext.selection, (selection) => (super.value = selection.join(',')));
-		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems));
-	}
-
-	connectedCallback() {
-		super.connectedCallback();
-
 		this.addValidator(
 			'rangeUnderflow',
 			() => this.minMessage,
@@ -123,6 +116,9 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 			() => this.maxMessage,
 			() => !!this.max && this.#pickerContext.getSelection().length > this.max,
 		);
+
+		this.observe(this.#pickerContext.selection, (selection) => (super.value = selection.join(',')));
+		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems));
 	}
 
 	protected getFormElement() {
@@ -134,7 +130,7 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 			return this.allowedContentTypeIds.includes(item.contentTypeId);
 		}
 		return true;
-	}
+	};
 
 	#openPicker() {
 		// TODO: Configure the content picker, with `startNodeId` and `ignoreUserStartNodes` [LK]

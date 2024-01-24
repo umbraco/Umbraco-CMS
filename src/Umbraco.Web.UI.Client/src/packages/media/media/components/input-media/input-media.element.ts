@@ -104,10 +104,6 @@ export class UmbInputMediaElement extends FormControlMixin(UmbLitElement) {
 
 		this.observe(this.#pickerContext.selection, (selection) => (super.value = selection.join(',')));
 		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems));
-	}
-
-	connectedCallback() {
-		super.connectedCallback();
 
 		this.addValidator(
 			'rangeUnderflow',

@@ -73,10 +73,6 @@ export class UmbInputMemberTypeElement extends FormControlMixin(UmbLitElement) {
 
 	constructor() {
 		super();
-	}
-
-	connectedCallback() {
-		super.connectedCallback();
 
 		this.addValidator(
 			'rangeUnderflow',
@@ -138,7 +134,7 @@ export class UmbInputMemberTypeElement extends FormControlMixin(UmbLitElement) {
 		if (!item.id) return;
 		return html`
 			<uui-ref-node-document-type name=${ifDefined(item.name)}>
-			${this.#renderIcon(item)}
+				${this.#renderIcon(item)}
 				<uui-action-bar slot="actions">
 					<uui-button
 						@click=${() => this.#pickerContext.requestRemoveItem(item.id!)}
