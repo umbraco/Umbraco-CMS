@@ -16,7 +16,7 @@ export const manifests: Array<ManifestEntityAction> = [
 		api: UmbReloadTreeItemChildrenEntityAction,
 		meta: {
 			icon: 'icon-refresh',
-			label: 'Reload...',
+			label: 'Reload children...',
 			repositoryAlias: UMB_DATA_TYPE_DETAIL_REPOSITORY_ALIAS,
 			entityTypes: [UMB_DATA_TYPE_ENTITY_TYPE, UMB_DATA_TYPE_ROOT_ENTITY_TYPE, UMB_DATA_TYPE_FOLDER_ENTITY_TYPE],
 		},
