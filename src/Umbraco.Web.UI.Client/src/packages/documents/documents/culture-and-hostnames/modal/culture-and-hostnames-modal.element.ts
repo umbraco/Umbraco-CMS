@@ -22,7 +22,7 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 	#languageModel: Array<LanguageResponseModel> = [];
 
 	@state()
-	private _options: Array<Option> = [];
+	private _defaultIsoCode?: string | null;
 
 	@state()
 	private _domains: Array<DomainPresentationModel> = [];
@@ -34,38 +34,29 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 
 	firstUpdated() {
 		this.#unique = this.data?.unique;
-		this.#getDomains();
+		this.#readDomains();
+		this.#requestLanguages();
 	}
 
-	async #getDomains() {
+	async #readDomains() {
 		if (!this.#unique) return;
 		const { data } = await this.#documentRepository.readCultureAndHostnames(this.#unique);
 
 		if (!data) return;
-		this._domains = data.domains.map((domain) => ({ isoCode: domain.isoCode, domainName: domain.domainName }));
-
-		this.value = { defaultIsoCode: data.defaultIsoCode, domains: this._domains };
-		this.#getLanguages(data.defaultIsoCode);
+		this._defaultIsoCode = data.defaultIsoCode;
+		this._domains = data.domains;
 	}
 
-	async #getLanguages(defaultIsoCode?: string | null) {
+	async #requestLanguages() {
 		const { data } = await this.#languageRepository.requestLanguages();
 		if (!data) return;
-
 		this.#languageModel = data.items;
-
-		const options = data.items.map((item) => ({
-			name: item.name,
-			selected: item.isoCode === defaultIsoCode,
-			value: item.isoCode,
-		}));
-		options.unshift({ value: 'inherit', name: 'Inherit', selected: defaultIsoCode ? false : true });
-		this._options = options;
 	}
 
 	// Modal
 
 	async #handleSave() {
+		this.value = { defaultIsoCode: this._defaultIsoCode, domains: this._domains };
 		const { error } = await this.#documentRepository.updateCultureAndHostnames(this.#unique!, this.value);
 		if (error) return;
 		this.modalContext?.submit();
@@ -78,17 +69,31 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 	// Events
 
 	#onChangeLanguage(e: UUISelectEvent) {
-		const documentIsoCode = e.target.value as string;
-		if (documentIsoCode === 'inherit') {
-			this.value = { ...this.value, defaultIsoCode: undefined };
+		const defaultIsoCode = e.target.value as string;
+		if (defaultIsoCode === 'inherit') {
+			this._defaultIsoCode = null;
 		} else {
-			this.value = { ...this.value, defaultIsoCode: e.target.value as string };
+			this._defaultIsoCode = defaultIsoCode;
 		}
 	}
 
-	#addDomain(currentDomain?: boolean) {
+	#onChangeDomainLanguage(e: UUISelectEvent, index: number) {
+		const isoCode = e.target.value as string;
+		this._domains = this._domains.map((domain, i) => (index === i ? { ...domain, isoCode } : domain));
+	}
+
+	#onChangeDomainHostname(e: UUIInputEvent, index: number) {
+		const domainName = e.target.value as string;
+		this._domains = this._domains.map((domain, i) => (index === i ? { ...domain, domainName } : domain));
+	}
+
+	#onRemoveDomain(index: number) {
+		this._domains = this._domains.filter((d, i) => index !== i);
+	}
+
+	#onAddDomain(useCurrentDomain?: boolean) {
 		const defaultModel = this.#languageModel.find((model) => model.isDefault);
-		if (currentDomain) {
+		if (useCurrentDomain) {
 			// TODO: This ignorer is just needed for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-ignore
@@ -97,58 +102,14 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 		} else {
 			this._domains = [...this._domains, { isoCode: defaultModel?.isoCode ?? '', domainName: '' }];
 		}
-
-		this.value = { ...this.value, domains: this._domains };
 	}
 
-	#remove(index: number) {
-		this._domains = this._domains.filter((d, i) => index !== i);
-
-		this.value = { ...this.value, domains: this._domains };
-	}
-
-	#changeDomainName(e: UUIInputEvent, index: number) {
-		const domainName = e.target.value as string;
-		this._domains = this._domains.map((domain, i) => (index === i ? { ...domain, domainName: domainName } : domain));
-
-		this.value = { ...this.value, domains: this._domains };
-	}
-
-	#changeIsoCode(e: UUISelectEvent, index: number) {
-		const isoCode = e.target.value as string;
-		this._domains = this._domains.map((domain, i) => (index === i ? { ...domain, isoCode: isoCode } : domain));
-
-		this.value = { ...this.value, domains: this._domains };
-	}
-
-	// Render
+	// Renders
 
 	render() {
 		return html`
 			<umb-body-layout headline=${this.localize.term('actions_assigndomain')}>
-				<uui-box headline=${this.localize.term('assignDomain_setLanguage')}>
-					<uui-label for="select">${this.localize.term('assignDomain_language')}</uui-label>
-					<uui-combobox
-						id="select"
-						label=${this.localize.term('assignDomain_language')}
-						.value=${this._options.find((option) => option.selected)?.value as string}
-						@change=${this.#onChangeLanguage}>
-						<uui-combobox-list>
-							${this._options.map(
-								(option) =>
-									html`<uui-combobox-list-option .value=${option.value}> ${option.name} </uui-combobox-list-option>`,
-							)}
-						</uui-combobox-list>
-					</uui-combobox>
-				</uui-box>
-				<uui-box headline=${this.localize.term('assignDomain_setDomains')}>
-					<umb-localize key="assignDomain_domainHelpWithVariants">
-						Valid domain names are: "example.com", "www.example.com", "example.com:8080", or
-						"https://www.example.com/".<br />Furthermore also one-level paths in domains are supported, eg.
-						"example.com/en" or "/en".
-					</umb-localize>
-					${this.#renderDomains()} ${this.#renderAddNewDomainButton()}
-				</uui-box>
+				${this.#renderCultureSection()} ${this.#renderDomainSection()}
 				<uui-button
 					slot="actions"
 					id="cancel"
@@ -165,38 +126,68 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 		`;
 	}
 
+	#renderCultureSection() {
+		return html`<uui-box headline=${this.localize.term('assignDomain_setLanguage')}>
+			<uui-label for="select">${this.localize.term('assignDomain_language')}</uui-label>
+			<uui-combobox
+				id="select"
+				label=${this.localize.term('assignDomain_language')}
+				.value=${(this._defaultIsoCode as string) ?? 'inherit'}
+				@change=${this.#onChangeLanguage}>
+				<uui-combobox-list>
+					<uui-combobox-list-option .value=${'inherit'}>
+						${this.localize.term('assignDomain_inherit')}
+					</uui-combobox-list-option>
+					${this.#renderLanguageModelOptions()}
+				</uui-combobox-list>
+			</uui-combobox>
+		</uui-box>`;
+	}
+
+	#renderDomainSection() {
+		return html`<uui-box headline=${this.localize.term('assignDomain_setDomains')}>
+			<umb-localize key="assignDomain_domainHelpWithVariants">
+				Valid domain names are: "example.com", "www.example.com", "example.com:8080", or "https://www.example.com/".<br />Furthermore
+				also one-level paths in domains are supported, eg. "example.com/en" or "/en".
+			</umb-localize>
+			${this.#renderDomains()} ${this.#renderAddNewDomainButton()}
+		</uui-box>`;
+	}
+
 	#renderDomains() {
-		return html` ${repeat(
-			this._domains,
-			(domain) => domain,
-			(domain, index) => {
-				const options = this.#languageModel.map((model) => ({
-					name: model.name,
-					value: model.isoCode,
-					selected: domain.isoCode ? domain.isoCode === model.isoCode : model.isDefault,
-				}));
-				return html`<div class="domain">
+		if (!this._domains?.length) return;
+		return html`<div id="domains">
+			${repeat(
+				this._domains,
+				(domain) => domain.isoCode,
+				(domain, index) => html`
 					<uui-input
 						label=${this.localize.term('assignDomain_domain')}
-						value=${domain.domainName}
-						@change=${(e: UUIInputEvent) => this.#changeDomainName(e, index)}></uui-input>
+						.value=${domain.domainName}
+						@change=${(e: UUIInputEvent) => this.#onChangeDomainHostname(e, index)}></uui-input>
 					<uui-combobox
-						.value=${options.find((option) => option.selected)?.value as string}
+						.value=${domain.isoCode as string}
 						label=${this.localize.term('assignDomain_language')}
-						@change=${(e: UUISelectEvent) => this.#changeIsoCode(e, index)}>
-						<uui-combobox-list>
-							${options.map(
-								(option) =>
-									html`<uui-combobox-list-option .value=${option.value}> ${option.name} </uui-combobox-list-option>`,
-							)}
-						</uui-combobox-list>
+						@change=${(e: UUISelectEvent) => this.#onChangeDomainLanguage(e, index)}>
+						<uui-combobox-list> ${this.#renderLanguageModelOptions()} </uui-combobox-list>
 					</uui-combobox>
-
-					<uui-button look="outline" color="danger" label=${this.localize.term('assignDomain_remove')}>
-						<uui-icon name="icon-trash" @click=${() => this.#remove(index)}></uui-icon>
+					<uui-button
+						look="outline"
+						color="danger"
+						label=${this.localize.term('assignDomain_remove')}
+						@change=${() => this.#onRemoveDomain(index)}>
+						<uui-icon name="icon-trash"></uui-icon>
 					</uui-button>
-				</div> `;
-			},
+				`,
+			)}
+		</div>`;
+	}
+
+	#renderLanguageModelOptions() {
+		return html`${repeat(
+			this.#languageModel,
+			(model) => model.isoCode,
+			(model) => html`<uui-combobox-list-option .value=${model.isoCode}>${model.name}</uui-combobox-list-option>`,
 		)}`;
 	}
 
@@ -205,7 +196,7 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 			<uui-button
 				label=${this.localize.term('assignDomain_addNew')}
 				look="placeholder"
-				@click=${() => this.#addDomain()}></uui-button>
+				@click=${() => this.#onAddDomain()}></uui-button>
 			<uui-button
 				id="dropdown"
 				label=${this.localize.term('buttons_select')}
@@ -215,7 +206,7 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 			</uui-button>
 			<uui-popover-container id="more-options" placement="bottom-end">
 				<umb-popover-layout>
-					<uui-button label=${this.localize.term('assignDomain_addCurrent')} @click=${() => this.#addDomain(true)}>
+					<uui-button label=${this.localize.term('assignDomain_addCurrent')} @click=${() => this.#onAddDomain(true)}>
 						<umb-localize key="assignDomain_addCurrent"> Add current domain </umb-localize>
 					</uui-button>
 				</umb-popover-layout>
@@ -238,19 +229,12 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 				flex-grow: 0;
 			}
 
-			uui-select {
-				display: grid;
-			}
-
-			.domain {
-				display: grid;
+			#domains {
+				margin-top: var(--uui-size-layout-1);
 				margin-bottom: var(--uui-size-2);
+				display: grid;
 				grid-template-columns: 1fr 1fr auto;
-				background-color: var(--uui-interface-surface-alt);
-			}
-
-			uui-combobox {
-				display: block;
+				grid-gap: var(--uui-size-1);
 			}
 		`,
 	];
