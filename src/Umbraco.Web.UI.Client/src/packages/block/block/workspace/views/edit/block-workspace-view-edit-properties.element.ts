@@ -4,6 +4,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import {
 	UmbContentTypePropertyStructureHelper,
 	PropertyContainerTypes,
+	// UmbPropertyTypeBasedPropertyElement,
 	UmbContentTypeModel,
 } from '@umbraco-cms/backoffice/content-type';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -47,20 +48,17 @@ export class UmbBlockWorkspaceViewEditPropertiesElement extends UmbLitElement {
 		return repeat(
 			this._propertyStructure,
 			(property) => property.alias,
-			(property) =>
-				html`<umb-property-type-based-property
-					class="property"
-					.property=${property}></umb-property-type-based-property> `,
+			(property) => html`<umb-property-type-based-property .property=${property}></umb-property-type-based-property> `,
 		);
 	}
 
 	static styles = [
 		UmbTextStyles,
 		css`
-			.property {
+			umb-property-type-based-property {
 				border-bottom: 1px solid var(--uui-color-divider);
 			}
-			.property:last-child {
+			umb-property-type-based-property:last-child {
 				border-bottom: 0;
 			}
 		`,
