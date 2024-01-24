@@ -15,11 +15,11 @@ import { generateAlias } from '@umbraco-cms/backoffice/utils';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 /**
- *  @element media-type-workspace-view-edit-property
+ *  @element umb-media-type-workspace-view-edit-property
  *  @description - Element for displaying a property in an workspace.
  *  @slot editor - Slot for rendering the Property Editor
  */
-@customElement('media-type-workspace-view-edit-property')
+@customElement('umb-media-type-workspace-view-edit-property')
 export class UmbMediaTypeWorkspacePropertyElement extends UmbLitElement {
 	private _property?: PropertyTypeModelBaseModel | undefined;
 	/**
@@ -478,6 +478,6 @@ export class UmbMediaTypeWorkspacePropertyElement extends UmbLitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'media-type-workspace-view-edit-property': UmbMediaTypeWorkspacePropertyElement;
+		'umb-media-type-workspace-view-edit-property': UmbMediaTypeWorkspacePropertyElement;
 	}
 }

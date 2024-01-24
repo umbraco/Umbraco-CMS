@@ -177,7 +177,7 @@ export class UmbMediaTypeWorkspaceViewEditPropertiesElement extends UmbLitElemen
 							(types) => types.containers?.find((containers) => containers.id === property.containerId),
 						);
 
-						return html`<media-type-workspace-view-edit-property
+						return html`<umb-media-type-workspace-view-edit-property
 							data-umb-property-id=${ifDefined(property.id)}
 							owner-media-type-id=${ifDefined(inheritedFromMedia?.unique)}
 							owner-media-type-name=${ifDefined(inheritedFromMedia?.name)}
@@ -190,7 +190,7 @@ export class UmbMediaTypeWorkspaceViewEditPropertiesElement extends UmbLitElemen
 							@property-delete=${() => {
 								this._propertyStructureHelper.removeProperty(property.id!);
 							}}>
-						</media-type-workspace-view-edit-property>`;
+						</umb-media-type-workspace-view-edit-property>`;
 					},
 				)}
 			</div>
