@@ -2,7 +2,10 @@ import type { UmbBlockTypeWithGroupKey, UmbInputBlockTypeElement } from '../../.
 import '../../../block-type/components/input-block-type/index.js';
 import { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { html, customElement, property, state, css, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
-import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import {
+	UmbPropertyEditorConfigCollection,
+	UmbPropertyValueChangeEvent,
+} from '@umbraco-cms/backoffice/property-editor';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_PROPERTY_DATASET_CONTEXT, UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
@@ -80,7 +83,25 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 
 	#deleteItem(e: CustomEvent) {
 		this.value = this._value.filter((block) => block.contentElementTypeKey !== e.detail.contentElementTypeKey);
-		this.dispatchEvent(new CustomEvent('property-value-change'));
+		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+	}
+
+	#deleteGroup(groupKey: string) {
+		this.#datasetContext?.setPropertyValue(
+			'blockGroups',
+			this._blockGroups.filter((group) => group.key !== groupKey),
+		);
+
+		// Should blocks that belonged to the removed group be deleted as well?
+		this.value = this._value.filter((block) => block.groupKey !== groupKey);
+	}
+
+	#changeGroupName(e: UUIInputEvent, groupKey: string) {
+		const groupName = e.target.value as string;
+		this.#datasetContext?.setPropertyValue(
+			'blockGroups',
+			this._blockGroups.map((group) => (group.key === groupKey ? { ...group, name: groupName } : group)),
+		);
 	}
 
 	render() {
@@ -94,24 +115,6 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 						.value="${group.blocks}"
 						@delete=${this.#deleteItem}></umb-input-block-type>`,
 		)}`;
-	}
-
-	#changeGroupName(e: UUIInputEvent, groupKey: string) {
-		const groupName = e.target.value as string;
-		this.#datasetContext?.setPropertyValue(
-			'blockGroups',
-			this._blockGroups.map((group) => (group.key === groupKey ? { ...group, name: groupName } : group)),
-		);
-	}
-
-	#deleteGroup(groupKey: string) {
-		this.#datasetContext?.setPropertyValue(
-			'blockGroups',
-			this._blockGroups.filter((group) => group.key !== groupKey),
-		);
-
-		// Should blocks that belonged to the removed group be deleted as well?
-		this.value = this._value.filter((block) => block.groupKey !== groupKey);
 	}
 
 	#renderGroupInput(groupKey: string, groupName?: string) {
