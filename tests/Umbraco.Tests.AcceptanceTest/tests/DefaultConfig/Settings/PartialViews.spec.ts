@@ -104,13 +104,16 @@ test.describe('Partial Views tests', () => {
     expect(updatedPartialView.content).toBe(updatedPartialViewContent);
   });
 
-  test('can use query builder for a partial view', async ({umbracoApi, umbracoUi}) => {
+  test('can use query builder with Order By statement for a partial view', async ({umbracoApi, umbracoUi}) => {
     //Arrange
+    const propertyAliasValue = 'CreateDate';
+    const expectedCode = 'Umbraco.ContentAtRoot().FirstOrDefault()\r\n' +
+    '    .Children()\r\n' +
+    '    .Where(x => x.IsVisible())\r\n' +
+    '    .OrderBy(x => x.' + propertyAliasValue + ')';
     const expectedTemplateContent = '\r\n' +
       '@{\r\n' +
-      '\tvar selection = Umbraco.ContentAtRoot().FirstOrDefault()\r\n' +
-      '    .Children()\r\n' +
-      '    .Where(x => x.IsVisible());\r\n' +
+      '\tvar selection = ' + expectedCode + ';\r\n' +
       '}\r\n' +
       '<ul>\r\n' +
       '\t@foreach (var item in selection)\r\n' +
@@ -129,7 +132,49 @@ test.describe('Partial Views tests', () => {
 
     // Act
     await umbracoUi.partialView.openPartialViewAtRoot(partialViewFileName);
-    await umbracoUi.partialView.addQueryBuilderWithCreateDateOption();
+    await umbracoUi.partialView.addQueryBuilderWithOrderByStatement(propertyAliasValue);
+    // Verify that the code is shown
+    await umbracoUi.partialView.isQueryBuilderCodeShown(expectedCode);
+    await umbracoUi.partialView.clickSaveButton();
+
+    // Assert
+    const updatedPartialView = await umbracoApi.partialView.getByName(partialViewFileName);
+    expect(updatedPartialView.content).toBe(expectedTemplateContent);
+  });
+
+  test('can use query builder with Where statement for a partial view', async ({umbracoApi, umbracoUi}) => {
+    //Arrange
+    const propertyAliasValue = 'Name';
+    const operatorValue = 'is';
+    const constrainValue = 'Test Content';
+    const expectedCode = 'Umbraco.ContentAtRoot().FirstOrDefault()\r\n' +
+    '    .Children()\r\n' +
+    '    .Where(x => (x.' + propertyAliasValue + ' == "' + constrainValue + '"))\r\n' +
+    '    .Where(x => x.IsVisible())';
+    const expectedTemplateContent = '\r\n' +
+      '@{\r\n' +
+      '\tvar selection = ' + expectedCode + ';\r\n' +
+      '}\r\n' +
+      '<ul>\r\n' +
+      '\t@foreach (var item in selection)\r\n' +
+      '\t{\r\n' +
+      '\t\t<li>\r\n' +
+      '\t\t\t<a href="@item.Url()">@item.Name()</a>\r\n' +
+      '\t\t</li>\r\n' +
+      '\t}\r\n' +
+      '</ul>\r\n' +
+      '\r\n' +
+      '@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage\r\n';
+
+    await umbracoApi.partialView.ensureNameNotExists(partialViewFileName);
+    await umbracoApi.partialView.create(partialViewFileName, "@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage\r\n", "/");
+    expect(await umbracoApi.partialView.doesExist(partialViewFileName)).toBeTruthy();
+
+    // Act
+    await umbracoUi.partialView.openPartialViewAtRoot(partialViewFileName);
+    await umbracoUi.partialView.addQueryBuilderWithWhereStatement(propertyAliasValue, operatorValue, constrainValue);
+    // Verify that the code is shown
+    await umbracoUi.partialView.isQueryBuilderCodeShown(expectedCode);
     await umbracoUi.partialView.clickSaveButton();
 
     // Assert
