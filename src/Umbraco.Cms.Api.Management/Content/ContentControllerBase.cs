@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Controllers;
 using Umbraco.Cms.Api.Management.ViewModels.Content;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
+using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.ContentEditing.Validation;
 using Umbraco.Cms.Core.Models.ContentPublishing;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -75,7 +76,7 @@ public class ContentControllerBase : ManagementApiControllerBase
     protected IActionResult ContentEditingOperationStatusResult<TContentModelBase, TValueModel, TVariantModel>(
         ContentEditingOperationStatus status,
         TContentModelBase requestModel,
-        IEnumerable<PropertyValidationError> validationErrors)
+        ContentValidationResult validationResult)
         where TContentModelBase : ContentModelBase<TValueModel, TVariantModel>
         where TValueModel : ValueModelBase
         where TVariantModel : VariantModelBase
@@ -86,7 +87,7 @@ public class ContentControllerBase : ManagementApiControllerBase
         }
 
         var errors = new SortedDictionary<string, string[]>();
-        foreach (PropertyValidationError validationError in validationErrors)
+        foreach (PropertyValidationError validationError in validationResult.ValidationErrors)
         {
             TValueModel? requestValue = requestModel.Values.FirstOrDefault(value =>
                 value.Alias == validationError.Alias

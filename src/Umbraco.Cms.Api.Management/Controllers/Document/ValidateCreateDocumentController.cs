@@ -6,45 +6,40 @@ using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.ContentEditing;
-using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Document;
 
 [ApiVersion("1.0")]
-public class CreateDocumentController : CreateDocumentControllerBase
+public class ValidateCreateDocumentController : CreateDocumentControllerBase
 {
     private readonly IDocumentEditingPresentationFactory _documentEditingPresentationFactory;
     private readonly IContentEditingService _contentEditingService;
-    private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
-    public CreateDocumentController(
+    public ValidateCreateDocumentController(
         IAuthorizationService authorizationService,
         IDocumentEditingPresentationFactory documentEditingPresentationFactory,
-        IContentEditingService contentEditingService,
-        IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
+        IContentEditingService contentEditingService)
         : base(authorizationService)
     {
         _documentEditingPresentationFactory = documentEditingPresentationFactory;
         _contentEditingService = contentEditingService;
-        _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
-    [HttpPost]
+    [HttpPost("validate")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Create(CreateDocumentRequestModel requestModel)
+    public async Task<IActionResult> Validate(CreateDocumentRequestModel requestModel)
         => await HandleRequest(requestModel.ParentId, async () =>
         {
             ContentCreateModel model = _documentEditingPresentationFactory.MapCreateModel(requestModel);
-            Attempt<ContentCreateResult, ContentEditingOperationStatus> result =
-                await _contentEditingService.CreateAsync(model, CurrentUserKey(_backOfficeSecurityAccessor));
+            Attempt<ContentValidationResult, ContentEditingOperationStatus> result = await _contentEditingService.ValidateCreateAsync(model);
 
             return result.Success
-                ? CreatedAtId<ByKeyDocumentController>(controller => nameof(controller.ByKey), result.Result.Content!.Key)
-                : ContentEditingOperationStatusResult(result.Status);
+                ? Ok()
+                : DocumentEditingOperationStatusResult(result.Status, requestModel, result.Result);
         });
 }

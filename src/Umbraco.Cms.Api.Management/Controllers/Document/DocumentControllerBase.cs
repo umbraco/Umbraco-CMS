@@ -5,7 +5,7 @@ using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Api.Management.ViewModels.Content;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Models.ContentEditing.Validation;
+using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Web.Common.Authorization;
 
@@ -26,7 +26,7 @@ public abstract class DocumentControllerBase : ContentControllerBase
     protected IActionResult DocumentEditingOperationStatusResult<TContentModelBase>(
         ContentEditingOperationStatus status,
         TContentModelBase requestModel,
-        IEnumerable<PropertyValidationError> validationErrors)
+        ContentValidationResult validationResult)
         where TContentModelBase : ContentModelBase<DocumentValueModel, DocumentVariantRequestModel>
-        => ContentEditingOperationStatusResult<TContentModelBase, DocumentValueModel, DocumentVariantRequestModel>(status, requestModel, validationErrors);
+        => ContentEditingOperationStatusResult<TContentModelBase, DocumentValueModel, DocumentVariantRequestModel>(status, requestModel, validationResult);
 }

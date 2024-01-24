@@ -6,45 +6,40 @@ using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.Media;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.ContentEditing;
-using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Media;
 
 [ApiVersion("1.0")]
-public class UpdateMediaController : UpdateMediaControllerBase
+public class ValidateCreateMediaController : CreateMediaControllerBase
 {
     private readonly IMediaEditingService _mediaEditingService;
     private readonly IMediaEditingPresentationFactory _mediaEditingPresentationFactory;
-    private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
-    public UpdateMediaController(
+    public ValidateCreateMediaController(
         IAuthorizationService authorizationService,
         IMediaEditingService mediaEditingService,
-        IMediaEditingPresentationFactory mediaEditingPresentationFactory,
-        IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
-        : base(authorizationService, mediaEditingService)
+        IMediaEditingPresentationFactory mediaEditingPresentationFactory)
+        : base(authorizationService)
     {
         _mediaEditingService = mediaEditingService;
         _mediaEditingPresentationFactory = mediaEditingPresentationFactory;
-        _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
-    [HttpPut("{id:guid}")]
+    [HttpPost("validate")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Update(Guid id, UpdateMediaRequestModel requestModel)
-        => await HandleRequest(id, async media =>
+    public async Task<IActionResult> Validate(CreateMediaRequestModel requestModel)
+        => await HandleRequest(requestModel.ParentId, async () =>
         {
-            MediaUpdateModel model = _mediaEditingPresentationFactory.MapUpdateModel(requestModel);
-            Attempt<MediaUpdateResult, ContentEditingOperationStatus> result =
-                await _mediaEditingService.UpdateAsync(media, model, CurrentUserKey(_backOfficeSecurityAccessor));
+            MediaCreateModel model = _mediaEditingPresentationFactory.MapCreateModel(requestModel);
+            Attempt<ContentValidationResult, ContentEditingOperationStatus> result = await _mediaEditingService.ValidateCreateAsync(model);
 
             return result.Success
                 ? Ok()
-                : ContentEditingOperationStatusResult(result.Status);
+                : MediaEditingOperationStatusResult(result.Status, requestModel, result.Result);
         });
 }

@@ -38,6 +38,12 @@ internal sealed class ContentEditingService
         return await Task.FromResult(content);
     }
 
+    public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateUpdateAsync(IContent content, ContentUpdateModel updateModel)
+        => await ValidatePropertiesAsync(updateModel, content.ContentType.Key);
+
+    public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateCreateAsync(ContentCreateModel createModel)
+        => await ValidatePropertiesAsync(createModel, createModel.ContentTypeKey);
+
     public async Task<Attempt<ContentCreateResult, ContentEditingOperationStatus>> CreateAsync(ContentCreateModel createModel, Guid userKey)
     {
         Attempt<ContentCreateResult, ContentEditingOperationStatus> result = await MapCreate<ContentCreateResult>(createModel);
@@ -49,7 +55,7 @@ internal sealed class ContentEditingService
         // the create mapping might succeed, but this doesn't mean the model is valid at property level.
         // we'll return the actual property validation status if the entire operation succeeds.
         ContentEditingOperationStatus validationStatus = result.Status;
-        IEnumerable<PropertyValidationError> validationErrors = result.Result.ValidationErrors;
+        ContentValidationResult validationResult = result.Result.ValidationResult;
 
         IContent content = result.Result.Content!;
         ContentEditingOperationStatus updateTemplateStatus = await UpdateTemplateAsync(content, createModel.TemplateKey);
@@ -60,7 +66,7 @@ internal sealed class ContentEditingService
 
         ContentEditingOperationStatus saveStatus = await Save(content, userKey);
         return saveStatus == ContentEditingOperationStatus.Success
-            ? Attempt.SucceedWithStatus(validationStatus, new ContentCreateResult { Content = content, ValidationErrors = validationErrors })
+            ? Attempt.SucceedWithStatus(validationStatus, new ContentCreateResult { Content = content, ValidationResult = validationResult })
             : Attempt.FailWithStatus(saveStatus, new ContentCreateResult { Content = content });
     }
 
@@ -75,7 +81,7 @@ internal sealed class ContentEditingService
         // the update mapping might succeed, but this doesn't mean the model is valid at property level.
         // we'll return the actual property validation status if the entire operation succeeds.
         ContentEditingOperationStatus validationStatus = result.Status;
-        IEnumerable<PropertyValidationError> validationErrors = result.Result.ValidationErrors;
+        ContentValidationResult validationResult = result.Result.ValidationResult;
 
         ContentEditingOperationStatus updateTemplateStatus = await UpdateTemplateAsync(content, updateModel.TemplateKey);
         if (updateTemplateStatus != ContentEditingOperationStatus.Success)
@@ -85,7 +91,7 @@ internal sealed class ContentEditingService
 
         ContentEditingOperationStatus saveStatus = await Save(content, userKey);
         return saveStatus == ContentEditingOperationStatus.Success
-            ? Attempt.SucceedWithStatus(validationStatus, new ContentUpdateResult { Content = content, ValidationErrors = validationErrors })
+            ? Attempt.SucceedWithStatus(validationStatus, new ContentUpdateResult { Content = content, ValidationResult = validationResult })
             : Attempt.FailWithStatus(saveStatus, new ContentUpdateResult { Content = content });
     }
 

@@ -1,5 +1,6 @@
 ﻿using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.ContentEditing.Validation;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
@@ -7,6 +8,10 @@ namespace Umbraco.Cms.Core.Services;
 public interface IMediaEditingService
 {
     Task<IMedia?> GetAsync(Guid key);
+
+    Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateCreateAsync(MediaCreateModel createModel);
+
+    Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateUpdateAsync(IMedia media, MediaUpdateModel updateModel);
 
     Task<Attempt<MediaCreateResult, ContentEditingOperationStatus>> CreateAsync(MediaCreateModel createModel, Guid userKey);
 

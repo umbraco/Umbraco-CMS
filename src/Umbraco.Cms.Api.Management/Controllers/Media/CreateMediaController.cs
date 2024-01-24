@@ -47,7 +47,6 @@ public class CreateMediaController : MediaControllerBase
             User,
             MediaPermissionResource.WithKeys(requestModel.ParentId),
             AuthorizationPolicies.MediaPermissionByResource);
-        ;
 
         if (!authorizationResult.Succeeded)
         {
@@ -59,6 +58,6 @@ public class CreateMediaController : MediaControllerBase
 
         return result.Success
             ? CreatedAtId<ByKeyMediaController>(controller => nameof(controller.ByKey), result.Result.Content!.Key)
-            : MediaEditingOperationStatusResult(result.Status, requestModel, result.Result.ValidationErrors);
+            : ContentEditingOperationStatusResult(result.Status);
     }
 }

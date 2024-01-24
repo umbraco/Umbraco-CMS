@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
-using Umbraco.Cms.Core.Models.ContentEditing.Validation;
 using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
@@ -82,7 +81,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
 
         // NOTE: property level validation errors must NOT fail the update - it must be possible to save invalid properties.
         //       instead, the error state and validation errors will be communicated in the return value.
-        Attempt<IList<PropertyValidationError>, ContentEditingOperationStatus> validationResult = await _validationService.ValidatePropertiesAsync(contentCreationModelBase, contentType);
+        Attempt<ContentValidationResult, ContentEditingOperationStatus> validationResult = await ValidatePropertiesAsync(contentCreationModelBase, contentType);
 
         TContent content = New(null, parent?.Id ?? Constants.System.Root, contentType);
         if (contentCreationModelBase.Key.HasValue)
@@ -93,7 +92,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         UpdateNames(contentCreationModelBase, content, contentType);
         await UpdateExistingProperties(contentCreationModelBase, content, contentType);
 
-        return Attempt.SucceedWithStatus(validationResult.Status, new TContentCreateResult { Content = content, ValidationErrors = validationResult.Result });
+        return Attempt.SucceedWithStatus(validationResult.Status, new TContentCreateResult { Content = content, ValidationResult = validationResult.Result });
     }
 
     protected async Task<Attempt<TContentUpdateResult, ContentEditingOperationStatus>> MapUpdate<TContentUpdateResult>(TContent content, ContentEditingModelBase contentEditingModelBase)
@@ -107,13 +106,36 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
 
         // NOTE: property level validation errors must NOT fail the update - it must be possible to save invalid properties.
         //       instead, the error state and validation errors will be communicated in the return value.
-        Attempt<IList<PropertyValidationError>, ContentEditingOperationStatus> validationResult = await _validationService.ValidatePropertiesAsync(contentEditingModelBase, contentType);
+        Attempt<ContentValidationResult, ContentEditingOperationStatus> validationResult = await ValidatePropertiesAsync(contentEditingModelBase, contentType);
 
         UpdateNames(contentEditingModelBase, content, contentType);
         await UpdateExistingProperties(contentEditingModelBase, content, contentType);
         RemoveMissingProperties(contentEditingModelBase, content, contentType);
 
-        return Attempt.SucceedWithStatus(validationResult.Status, new TContentUpdateResult { Content = content, ValidationErrors = validationResult.Result });
+        return Attempt.SucceedWithStatus(validationResult.Status, new TContentUpdateResult { Content = content, ValidationResult = validationResult.Result });
+    }
+
+    protected async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidatePropertiesAsync(
+        ContentEditingModelBase contentEditingModelBase,
+        Guid contentTypeKey)
+    {
+        TContentType? contentType = await ContentTypeService.GetAsync(contentTypeKey);
+        if (contentType is null)
+        {
+            return Attempt.FailWithStatus(ContentEditingOperationStatus.ContentTypeNotFound, new ContentValidationResult());
+        }
+
+        return await ValidatePropertiesAsync(contentEditingModelBase, contentType);
+    }
+
+    private async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidatePropertiesAsync(
+        ContentEditingModelBase contentEditingModelBase,
+        TContentType contentType)
+    {
+        ContentValidationResult result = await _validationService.ValidatePropertiesAsync(contentEditingModelBase, contentType);
+        return result.ValidationErrors.Any() is false
+            ? Attempt.SucceedWithStatus(ContentEditingOperationStatus.Success, result)
+            : Attempt.FailWithStatus(ContentEditingOperationStatus.PropertyValidationError, result);
     }
 
     protected async Task<Attempt<TContent?, ContentEditingOperationStatus>> HandleMoveToRecycleBinAsync(Guid key, Guid userKey)

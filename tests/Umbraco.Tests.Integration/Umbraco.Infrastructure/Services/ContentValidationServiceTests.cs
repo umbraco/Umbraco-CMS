@@ -6,7 +6,6 @@ using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
@@ -22,8 +21,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 public class ContentValidationServiceTests : UmbracoIntegrationTestWithContent
 {
     private IContentValidationService ContentValidationService => GetRequiredService<IContentValidationService>();
-
-    private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
 
     protected override void ConfigureTestServices(IServiceCollection services)
     {
@@ -118,12 +115,11 @@ public class ContentValidationServiceTests : UmbracoIntegrationTestWithContent
             },
             setup.DocumentType);
 
-        Assert.AreEqual(4, validationResult.Result.Count);
-        Assert.IsNotNull(validationResult.Result.SingleOrDefault(r => r.Alias == "blocks" && r.JsonPath == ".contentData[0].blocks.contentData[0].title"));
-        Assert.IsNotNull(validationResult.Result.SingleOrDefault(r => r.Alias == "blocks" && r.JsonPath == ".contentData[0].blocks.settingsData[1].title"));
-        Assert.IsNotNull(validationResult.Result.SingleOrDefault(r => r.Alias == "blocks" && r.JsonPath == ".contentData[1].title"));
-        Assert.IsNotNull(validationResult.Result.SingleOrDefault(r => r.Alias == "blocks" && r.JsonPath == ".settingsData[0].title"));
-        Assert.AreEqual(ContentEditingOperationStatus.PropertyValidationError, validationResult.Status);
+        Assert.AreEqual(4, validationResult.ValidationErrors.Count());
+        Assert.IsNotNull(validationResult.ValidationErrors.SingleOrDefault(r => r.Alias == "blocks" && r.JsonPath == ".contentData[0].blocks.contentData[0].title"));
+        Assert.IsNotNull(validationResult.ValidationErrors.SingleOrDefault(r => r.Alias == "blocks" && r.JsonPath == ".contentData[0].blocks.settingsData[1].title"));
+        Assert.IsNotNull(validationResult.ValidationErrors.SingleOrDefault(r => r.Alias == "blocks" && r.JsonPath == ".contentData[1].title"));
+        Assert.IsNotNull(validationResult.ValidationErrors.SingleOrDefault(r => r.Alias == "blocks" && r.JsonPath == ".settingsData[0].title"));
     }
 
     [TestCase(true)]
@@ -155,14 +151,12 @@ public class ContentValidationServiceTests : UmbracoIntegrationTestWithContent
 
         if (valid)
         {
-            Assert.IsEmpty(validationResult.Result);
-            Assert.AreEqual(ContentEditingOperationStatus.Success, validationResult.Status);
+            Assert.IsEmpty(validationResult.ValidationErrors);
         }
         else
         {
-            Assert.AreEqual(1, validationResult.Result.Count);
-            Assert.IsNotNull(validationResult.Result.SingleOrDefault(r => r.Alias == "author" && r.JsonPath == string.Empty));
-            Assert.AreEqual(ContentEditingOperationStatus.PropertyValidationError, validationResult.Status);
+            Assert.AreEqual(1, validationResult.ValidationErrors.Count());
+            Assert.IsNotNull(validationResult.ValidationErrors.SingleOrDefault(r => r.Alias == "author" && r.JsonPath == string.Empty));
         }
     }
 
@@ -195,14 +189,12 @@ public class ContentValidationServiceTests : UmbracoIntegrationTestWithContent
 
         if (valid)
         {
-            Assert.IsEmpty(validationResult.Result);
-            Assert.AreEqual(ContentEditingOperationStatus.Success, validationResult.Status);
+            Assert.IsEmpty(validationResult.ValidationErrors);
         }
         else
         {
-            Assert.AreEqual(1, validationResult.Result.Count);
-            Assert.IsNotNull(validationResult.Result.SingleOrDefault(r => r.Alias == "title" && r.JsonPath == string.Empty));
-            Assert.AreEqual(ContentEditingOperationStatus.PropertyValidationError, validationResult.Status);
+            Assert.AreEqual(1, validationResult.ValidationErrors.Count());
+            Assert.IsNotNull(validationResult.ValidationErrors.SingleOrDefault(r => r.Alias == "title" && r.JsonPath == string.Empty));
         }
     }
 
@@ -227,9 +219,8 @@ public class ContentValidationServiceTests : UmbracoIntegrationTestWithContent
             },
             contentType);
 
-        Assert.AreEqual(1, validationResult.Result.Count);
-        Assert.IsNotNull(validationResult.Result.SingleOrDefault(r => r.Alias == "title" && r.JsonPath == string.Empty));
-        Assert.AreEqual(ContentEditingOperationStatus.PropertyValidationError, validationResult.Status);
+        Assert.AreEqual(1, validationResult.ValidationErrors.Count());
+        Assert.IsNotNull(validationResult.ValidationErrors.SingleOrDefault(r => r.Alias == "title" && r.JsonPath == string.Empty));
     }
 
     private async Task<(IContentType DocumentType, IContentType ElementType)> SetupBlockListTest()

@@ -5,7 +5,6 @@ using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.ContentEditing.Validation;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.Validation;
-using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
@@ -27,7 +26,7 @@ internal abstract class ContentValidationServiceBase<TContentType>
         _logger = logger;
     }
 
-    protected async Task<Attempt<IList<PropertyValidationError>, ContentEditingOperationStatus>> HandlePropertiesValidationAsync(
+    protected async Task<ContentValidationResult> HandlePropertiesValidationAsync(
         ContentEditingModelBase contentEditingModelBase,
         TContentType contentType)
     {
@@ -46,7 +45,7 @@ internal abstract class ContentValidationServiceBase<TContentType>
 
         if (variantPropertyTypes.Any() is false)
         {
-            return ValidationResult();
+            return new ContentValidationResult { ValidationErrors = validationErrors };
         }
 
         var cultures = (await _languageService.GetAllAsync()).Select(language => language.IsoCode).ToArray();
@@ -64,13 +63,8 @@ internal abstract class ContentValidationServiceBase<TContentType>
             }
         }
 
-        return ValidationResult();
-
-        Attempt<IList<PropertyValidationError>, ContentEditingOperationStatus> ValidationResult()
-            => validationErrors.Any() is false
-                ? Attempt.SucceedWithStatus<IList<PropertyValidationError>, ContentEditingOperationStatus>(ContentEditingOperationStatus.Success, validationErrors)
-                : Attempt.FailWithStatus<IList<PropertyValidationError>, ContentEditingOperationStatus>(ContentEditingOperationStatus.PropertyValidationError, validationErrors);
-    }
+        return new ContentValidationResult { ValidationErrors = validationErrors };
+   }
 
     private IEnumerable<PropertyValidationError> ValidateProperty(ContentEditingModelBase contentEditingModelBase, IPropertyType propertyType, string? culture, string? segment)
     {

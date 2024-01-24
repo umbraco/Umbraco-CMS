@@ -218,9 +218,9 @@ public partial class ContentEditingServiceTests
 
         if (addValidProperties is false)
         {
-            Assert.AreEqual(2, result.Result.ValidationErrors.Count());
-            Assert.IsNotNull(result.Result.ValidationErrors.FirstOrDefault(v => v.Alias == "title" && v.ErrorMessages.Length == 1));
-            Assert.IsNotNull(result.Result.ValidationErrors.FirstOrDefault(v => v.Alias == "text" && v.ErrorMessages.Length == 1));
+            Assert.AreEqual(2, result.Result.ValidationResult.ValidationErrors.Count());
+            Assert.IsNotNull(result.Result.ValidationResult.ValidationErrors.FirstOrDefault(v => v.Alias == "title" && v.ErrorMessages.Length == 1));
+            Assert.IsNotNull(result.Result.ValidationResult.ValidationErrors.FirstOrDefault(v => v.Alias == "text" && v.ErrorMessages.Length == 1));
         }
 
         // NOTE: content update must be successful, even if the mandatory property is missing (publishing however should not!)

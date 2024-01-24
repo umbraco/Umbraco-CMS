@@ -33,6 +33,12 @@ internal sealed class MediaEditingService
         return await Task.FromResult(media);
     }
 
+    public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateUpdateAsync(IMedia media, MediaUpdateModel updateModel)
+        => await ValidatePropertiesAsync(updateModel, media.ContentType.Key);
+
+    public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateCreateAsync(MediaCreateModel createModel)
+        => await ValidatePropertiesAsync(createModel, createModel.ContentTypeKey);
+
     public async Task<Attempt<MediaCreateResult, ContentEditingOperationStatus>> CreateAsync(MediaCreateModel createModel, Guid userKey)
     {
         Attempt<MediaCreateResult, ContentEditingOperationStatus> result = await MapCreate<MediaCreateResult>(createModel);
@@ -44,14 +50,14 @@ internal sealed class MediaEditingService
         // the create mapping might succeed, but this doesn't mean the model is valid at property level.
         // we'll return the actual property validation status if the entire operation succeeds.
         ContentEditingOperationStatus validationStatus = result.Status;
-        IEnumerable<PropertyValidationError> validationErrors = result.Result.ValidationErrors;
+        ContentValidationResult validationResult = result.Result.ValidationResult;
 
         IMedia media = result.Result.Content!;
 
         var currentUserId = await GetUserIdAsync(userKey);
         ContentEditingOperationStatus operationStatus = Save(media, currentUserId);
         return operationStatus == ContentEditingOperationStatus.Success
-            ? Attempt.SucceedWithStatus(validationStatus, new MediaCreateResult { Content = media, ValidationErrors = validationErrors })
+            ? Attempt.SucceedWithStatus(validationStatus, new MediaCreateResult { Content = media, ValidationResult = validationResult })
             : Attempt.FailWithStatus(operationStatus, new MediaCreateResult { Content = media });
     }
 
@@ -66,12 +72,12 @@ internal sealed class MediaEditingService
         // the update mapping might succeed, but this doesn't mean the model is valid at property level.
         // we'll return the actual property validation status if the entire operation succeeds.
         ContentEditingOperationStatus validationStatus = result.Status;
-        IEnumerable<PropertyValidationError> validationErrors = result.Result.ValidationErrors;
+        ContentValidationResult validationResult = result.Result.ValidationResult;
 
         var currentUserId = await GetUserIdAsync(userKey);
         ContentEditingOperationStatus operationStatus = Save(media, currentUserId);
         return operationStatus == ContentEditingOperationStatus.Success
-            ? Attempt.SucceedWithStatus(validationStatus, new MediaUpdateResult { Content = media, ValidationErrors = validationErrors })
+            ? Attempt.SucceedWithStatus(validationStatus, new MediaUpdateResult { Content = media, ValidationResult = validationResult })
             : Attempt.FailWithStatus(operationStatus, new MediaUpdateResult { Content = media });
     }
 

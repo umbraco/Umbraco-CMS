@@ -6,45 +6,40 @@ using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.ContentEditing;
-using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Document;
 
 [ApiVersion("1.0")]
-public class UpdateDocumentController : UpdateDocumentControllerBase
+public class ValidateUpdateDocumentController : UpdateDocumentControllerBase
 {
     private readonly IContentEditingService _contentEditingService;
     private readonly IDocumentEditingPresentationFactory _documentEditingPresentationFactory;
-    private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
-    public UpdateDocumentController(
+    public ValidateUpdateDocumentController(
         IAuthorizationService authorizationService,
         IContentEditingService contentEditingService,
-        IDocumentEditingPresentationFactory documentEditingPresentationFactory,
-        IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
+        IDocumentEditingPresentationFactory documentEditingPresentationFactory)
         : base(authorizationService, contentEditingService)
     {
         _contentEditingService = contentEditingService;
         _documentEditingPresentationFactory = documentEditingPresentationFactory;
-        _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
-    [HttpPut("{id:guid}")]
+    [HttpPut("{id:guid}/validate")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Update(Guid id, UpdateDocumentRequestModel requestModel)
+    public async Task<IActionResult> Validate(Guid id, UpdateDocumentRequestModel requestModel)
         => await HandleRequest(id, async content =>
         {
             ContentUpdateModel model = _documentEditingPresentationFactory.MapUpdateModel(requestModel);
-            Attempt<ContentUpdateResult, ContentEditingOperationStatus> result =
-                await _contentEditingService.UpdateAsync(content, model, CurrentUserKey(_backOfficeSecurityAccessor));
+            Attempt<ContentValidationResult, ContentEditingOperationStatus> result = await _contentEditingService.ValidateUpdateAsync(content, model);
 
             return result.Success
                 ? Ok()
-                : ContentEditingOperationStatusResult(result.Status);
+                : DocumentEditingOperationStatusResult(result.Status, requestModel, result.Result);
         });
 }

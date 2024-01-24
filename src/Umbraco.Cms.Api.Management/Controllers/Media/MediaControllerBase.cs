@@ -6,6 +6,7 @@ using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Api.Management.ViewModels.Content;
 using Umbraco.Cms.Api.Management.ViewModels.Media;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.ContentEditing.Validation;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Web.Common.Authorization;
@@ -26,7 +27,7 @@ public class MediaControllerBase : ContentControllerBase
     protected IActionResult MediaEditingOperationStatusResult<TContentModelBase>(
         ContentEditingOperationStatus status,
         TContentModelBase requestModel,
-        IEnumerable<PropertyValidationError> validationErrors)
+        ContentValidationResult validationResult)
         where TContentModelBase : ContentModelBase<MediaValueModel, MediaVariantRequestModel>
-        => ContentEditingOperationStatusResult<TContentModelBase, MediaValueModel, MediaVariantRequestModel>(status, requestModel, validationErrors);
+        => ContentEditingOperationStatusResult<TContentModelBase, MediaValueModel, MediaVariantRequestModel>(status, requestModel, validationResult);
 }
