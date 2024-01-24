@@ -1,6 +1,6 @@
 import { UmbHealthCheckContext } from '../health-check.context.js';
 import {
-	UMB_HEALTHCHECK_DASHBOARD_CONTEXT_TOKEN,
+	UMB_HEALTHCHECK_DASHBOARD_CONTEXT,
 	UmbHealthCheckDashboardContext,
 } from '../health-check-dashboard.context.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -28,7 +28,7 @@ export class UmbHealthCheckGroupBoxOverviewElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_HEALTHCHECK_DASHBOARD_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_HEALTHCHECK_DASHBOARD_CONTEXT, (instance) => {
 			this._healthCheckContext = instance;
 			if (!this._healthCheckContext || !this.manifest?.meta.label) return;
 			this._api = this._healthCheckContext?.apis.get(this.manifest?.meta.label);

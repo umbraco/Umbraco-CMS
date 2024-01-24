@@ -4,7 +4,7 @@ import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
 import { type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
-export const UMB_USER_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbUserStore>('UmbUserStore');
+export const UMB_USER_STORE_CONTEXT = new UmbContextToken<UmbUserStore>('UmbUserStore');
 
 /**
  * @export
@@ -14,7 +14,7 @@ export const UMB_USER_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbUserStore>('U
  */
 export class UmbUserStore extends UmbStoreBase {
 	constructor(host: UmbControllerHostElement) {
-		super(host, UMB_USER_STORE_CONTEXT_TOKEN.toString(), new UmbArrayState<UmbUserDetailModel>([], (x) => x.id));
+		super(host, UMB_USER_STORE_CONTEXT.toString(), new UmbArrayState<UmbUserDetailModel>([], (x) => x.id));
 	}
 
 	/**

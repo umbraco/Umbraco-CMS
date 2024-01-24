@@ -2,7 +2,7 @@ import {
 	PoolingCOnfig,
 	PoolingInterval,
 	UmbLogViewerWorkspaceContext,
-	UMB_APP_LOG_VIEWER_CONTEXT_TOKEN,
+	UMB_APP_LOG_VIEWER_CONTEXT,
 } from '../../../logviewer.context.js';
 import { css, html, customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -21,7 +21,7 @@ export class UmbLogViewerPollingButtonElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_APP_LOG_VIEWER_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_APP_LOG_VIEWER_CONTEXT, (instance) => {
 			this.#logViewerContext = instance;
 			this.#observePoolingConfig();
 		});

@@ -2,7 +2,7 @@ import { UmbCollectionActionBase } from '@umbraco-cms/backoffice/collection';
 import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import {
 	UMB_CREATE_USER_MODAL,
-	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
+	UMB_MODAL_MANAGER_CONTEXT,
 	UmbModalManagerContext,
 } from '@umbraco-cms/backoffice/modal';
 
@@ -12,7 +12,7 @@ export class UmbCreateUserCollectionAction extends UmbCollectionActionBase {
 	constructor(host: UmbControllerHost) {
 		super(host);
 
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
 			this.#modalManagerContext = instance;
 		});
 	}

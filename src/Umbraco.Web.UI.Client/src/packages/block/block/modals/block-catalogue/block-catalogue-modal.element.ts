@@ -7,7 +7,7 @@ import {
 import { css, html, customElement, state, repeat, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { groupBy } from '@umbraco-cms/backoffice/external/lodash';
 import {
-	UMB_MODAL_CONTEXT_TOKEN,
+	UMB_MODAL_CONTEXT,
 	UmbModalBaseElement,
 	UmbModalRouteRegistrationController,
 } from '@umbraco-cms/backoffice/modal';
@@ -32,7 +32,7 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (modalContext) => {
+		this.consumeContext(UMB_MODAL_CONTEXT, (modalContext) => {
 			new UmbModalRouteRegistrationController(this, UMB_BLOCK_WORKSPACE_MODAL)
 				//.addAdditionalPath('block') // No need for additional path specification in this context as this is for sure the only workspace we want to open here.
 				.onSetup(() => {

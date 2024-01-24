@@ -7,7 +7,7 @@ import { ManifestWorkspace } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UMB_BLOCK_MANAGER_CONTEXT, UmbBlockWorkspaceData } from '@umbraco-cms/backoffice/block';
 import { buildUdi } from '@umbraco-cms/backoffice/utils';
-import { UMB_MODAL_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
+import { UMB_MODAL_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 export class UmbBlockWorkspaceContext<
 	LayoutDataType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel,
@@ -19,7 +19,7 @@ export class UmbBlockWorkspaceContext<
 
 	#blockManager?: typeof UMB_BLOCK_MANAGER_CONTEXT.TYPE;
 	#retrieveBlockManager;
-	#modalContext?: typeof UMB_MODAL_CONTEXT_TOKEN.TYPE;
+	#modalContext?: typeof UMB_MODAL_CONTEXT.TYPE;
 	#retrieveModalContext;
 	#editorConfigPromise?: Promise<unknown>;
 
@@ -49,7 +49,7 @@ export class UmbBlockWorkspaceContext<
 		this.#entityType = workspaceArgs.manifest.meta?.entityType;
 		this.workspaceAlias = workspaceArgs.manifest.alias;
 
-		this.#retrieveModalContext = this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (context) => {
+		this.#retrieveModalContext = this.consumeContext(UMB_MODAL_CONTEXT, (context) => {
 			this.#modalContext = context;
 			context.onSubmit().catch(this.#modalRejected);
 		}).asPromise();

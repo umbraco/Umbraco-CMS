@@ -4,7 +4,7 @@ import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import {
 	UmbModalManagerContext,
-	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
+	UMB_MODAL_MANAGER_CONTEXT,
 	UMB_IMPORT_DICTIONARY_MODAL,
 } from '@umbraco-cms/backoffice/modal';
 import { UMB_DICTIONARY_TREE_STORE_CONTEXT, UmbDictionaryTreeStore } from '@umbraco-cms/backoffice/dictionary';
@@ -18,7 +18,7 @@ export default class UmbImportDictionaryEntityAction extends UmbEntityActionBase
 	constructor(host: UmbControllerHostElement, repositoryAlias: string, unique: string) {
 		super(host, repositoryAlias, unique);
 
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
 			this.#modalContext = instance;
 		});
 		this.consumeContext(UMB_DICTIONARY_TREE_STORE_CONTEXT, (instance) => {

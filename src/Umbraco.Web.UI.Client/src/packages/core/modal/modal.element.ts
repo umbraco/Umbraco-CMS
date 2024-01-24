@@ -1,4 +1,4 @@
-import { UMB_MODAL_CONTEXT_TOKEN, UmbModalContext } from './modal.context.js';
+import { UMB_MODAL_CONTEXT, UmbModalContext } from './modal.context.js';
 import { ManifestModal, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { CSSResultGroup, html, customElement } from '@umbraco-cms/backoffice/external/lit';
@@ -51,7 +51,7 @@ export class UmbModalElement extends UmbLitElement {
 					// Note for this hack (The if-sentence):
 					// We do not currently have a good enough control to ensure that the proxy is last, meaning if another context is provided at this element, it might respond after the proxy event has been dispatched.
 					// To avoid such this hack just prevents proxying the event if its a request for the Modal Context.
-					if (event.contextAlias !== UMB_MODAL_CONTEXT_TOKEN.contextAlias) {
+					if (event.contextAlias !== UMB_MODAL_CONTEXT.contextAlias) {
 						event.stopImmediatePropagation();
 						this.#modalContext.originTarget.dispatchEvent(event.clone());
 					}
@@ -86,7 +86,7 @@ export class UmbModalElement extends UmbLitElement {
 		this.element.appendChild(this.#modalRouterElement);
 		this.#observeModal(this.#modalContext.alias.toString());
 
-		const provider = new UmbContextProvider(this.element, UMB_MODAL_CONTEXT_TOKEN, this.#modalContext);
+		const provider = new UmbContextProvider(this.element, UMB_MODAL_CONTEXT, this.#modalContext);
 		provider.hostConnected();
 	}
 

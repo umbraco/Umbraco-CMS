@@ -19,7 +19,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import {
 	UmbModalManagerContext,
 	UMB_CONTEXT_DEBUGGER_MODAL,
-	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
+	UMB_MODAL_MANAGER_CONTEXT,
 } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-debug')
@@ -40,7 +40,7 @@ export class UmbDebugElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
 			this._modalContext = instance;
 		});
 	}
