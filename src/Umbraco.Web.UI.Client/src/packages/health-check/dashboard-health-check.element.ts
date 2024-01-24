@@ -1,8 +1,5 @@
 import { UmbDashboardHealthCheckGroupElement } from './views/health-check-group.element.js';
-import {
-	UmbHealthCheckDashboardContext,
-	UMB_HEALTHCHECK_DASHBOARD_CONTEXT_TOKEN,
-} from './health-check-dashboard.context.js';
+import { UmbHealthCheckDashboardContext, UMB_HEALTHCHECK_DASHBOARD_CONTEXT } from './health-check-dashboard.context.js';
 import { UmbHealthCheckContext } from './health-check.context.js';
 import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { HealthCheckGroupResponseModel, HealthCheckResource } from '@umbraco-cms/backoffice/backend-api';
@@ -33,7 +30,7 @@ export class UmbDashboardHealthCheckElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		this.provideContext(UMB_HEALTHCHECK_DASHBOARD_CONTEXT_TOKEN, this._healthCheckDashboardContext);
+		this.provideContext(UMB_HEALTHCHECK_DASHBOARD_CONTEXT, this._healthCheckDashboardContext);
 
 		this.observe(umbExtensionsRegistry.extensionsOfType('healthCheck'), (healthCheckManifests) => {
 			this._healthCheckDashboardContext.manifests = healthCheckManifests;

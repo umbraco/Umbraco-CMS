@@ -4,7 +4,7 @@ import { css, html, customElement, property, state, ifDefined, nothing } from '@
 import { PropertyTypeModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import {
 	UMB_CONFIRM_MODAL,
-	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
+	UMB_MODAL_MANAGER_CONTEXT,
 	UMB_PROPERTY_SETTINGS_MODAL,
 	UMB_WORKSPACE_MODAL,
 	UmbConfirmModalData,
@@ -56,7 +56,7 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 	#dataTypeDetailRepository = new UmbDataTypeDetailRepository(this);
 
 	#modalRegistration;
-	private _modalManagerContext?: typeof UMB_MODAL_MANAGER_CONTEXT_TOKEN.TYPE;
+	private _modalManagerContext?: typeof UMB_MODAL_MANAGER_CONTEXT.TYPE;
 
 	@state()
 	protected _modalRoute?: string;
@@ -110,7 +110,7 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 				this._editDocumentTypePath = routeBuilder({});
 			});
 
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (context) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (context) => {
 			this._modalManagerContext = context;
 		});
 	}

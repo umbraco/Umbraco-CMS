@@ -34,6 +34,6 @@ export class UmbHealthCheckDashboardContext {
 	}
 }
 
-export const UMB_HEALTHCHECK_DASHBOARD_CONTEXT_TOKEN = new UmbContextToken<UmbHealthCheckDashboardContext>(
+export const UMB_HEALTHCHECK_DASHBOARD_CONTEXT = new UmbContextToken<UmbHealthCheckDashboardContext>(
 	'UmbHealthCheckDashboardContext',
 );

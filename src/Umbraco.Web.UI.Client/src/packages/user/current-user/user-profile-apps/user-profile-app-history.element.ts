@@ -1,7 +1,7 @@
 import {
 	UmbCurrentUserHistoryItem,
 	UmbCurrentUserHistoryStore,
-	UMB_CURRENT_USER_HISTORY_STORE_CONTEXT_TOKEN,
+	UMB_CURRENT_USER_HISTORY_STORE_CONTEXT,
 } from '../current-user-history.store.js';
 import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -17,7 +17,7 @@ export class UmbUserProfileAppHistoryElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_CURRENT_USER_HISTORY_STORE_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_CURRENT_USER_HISTORY_STORE_CONTEXT, (instance) => {
 			this.#currentUserHistoryStore = instance;
 			this.#observeHistory();
 		});

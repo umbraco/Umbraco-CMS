@@ -2,7 +2,7 @@ import type { UmbWorkspaceContextInterface } from './workspace-context.interface
 import type { UmbVariantableWorkspaceContextInterface } from './workspace-variantable-context.interface.js';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
-export const UMB_VARIANT_WORKSPACE_CONTEXT_TOKEN = new UmbContextToken<
+export const UMB_VARIANT_WORKSPACE_CONTEXT = new UmbContextToken<
 	UmbWorkspaceContextInterface,
 	UmbVariantableWorkspaceContextInterface
 >(

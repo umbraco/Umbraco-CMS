@@ -1,6 +1,6 @@
 import { UmbUserGroupDetailDataSource } from '../types.js';
 import { UmbUserGroupServerDataSource } from './sources/user-group.server.data-source.js';
-import { UMB_USER_GROUP_ITEM_STORE_CONTEXT_TOKEN, UmbUserGroupItemStore } from './user-group-item.store.js';
+import { UMB_USER_GROUP_ITEM_STORE_CONTEXT, UmbUserGroupItemStore } from './user-group-item.store.js';
 import { UmbUserGroupItemServerDataSource } from './sources/user-group-item.server.data-source.js';
 import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { UserGroupItemResponseModel, UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
@@ -10,7 +10,7 @@ import {
 	UmbDataSourceErrorResponse,
 	DataSourceResponse,
 } from '@umbraco-cms/backoffice/repository';
-import { UMB_NOTIFICATION_CONTEXT_TOKEN, UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
+import { UMB_NOTIFICATION_CONTEXT, UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
 import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
@@ -37,16 +37,16 @@ export class UmbUserGroupRepository
 
 		this.#init = Promise.all([
 			/*
-			this.consumeContext(UMB_USER_GROUP_STORE_CONTEXT_TOKEN, (instance) => {
+			this.consumeContext(UMB_USER_GROUP_STORE_CONTEXT, (instance) => {
 				this.#detailStore = instance;
 			}).asPromise(),
 			*/
 
-			this.consumeContext(UMB_USER_GROUP_ITEM_STORE_CONTEXT_TOKEN, (instance) => {
+			this.consumeContext(UMB_USER_GROUP_ITEM_STORE_CONTEXT, (instance) => {
 				this.#itemStore = instance;
 			}).asPromise(),
 
-			this.consumeContext(UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
+			this.consumeContext(UMB_NOTIFICATION_CONTEXT, (instance) => {
 				this.#notificationContext = instance;
 			}).asPromise(),
 		]);

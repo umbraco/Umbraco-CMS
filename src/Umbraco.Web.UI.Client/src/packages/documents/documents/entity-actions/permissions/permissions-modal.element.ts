@@ -5,7 +5,7 @@ import { html, customElement, property, state, ifDefined, nothing } from '@umbra
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import {
 	UMB_ENTITY_USER_PERMISSION_MODAL,
-	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
+	UMB_MODAL_MANAGER_CONTEXT,
 	UMB_USER_GROUP_PICKER_MODAL,
 	UmbEntityUserPermissionSettingsModalData,
 	UmbEntityUserPermissionSettingsModalValue,
@@ -54,7 +54,7 @@ export class UmbPermissionsModalElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
 			this.#modalManagerContext = instance;
 		});
 	}

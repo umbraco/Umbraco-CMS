@@ -1,4 +1,4 @@
-import { UmbLogViewerWorkspaceContext, UMB_APP_LOG_VIEWER_CONTEXT_TOKEN } from '../../../logviewer.context.js';
+import { UmbLogViewerWorkspaceContext, UMB_APP_LOG_VIEWER_CONTEXT } from '../../../logviewer.context.js';
 import { UUICheckboxElement } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, queryAll, state } from '@umbraco-cms/backoffice/external/lit';
 import { debounce } from '@umbraco-cms/backoffice/external/lodash';
@@ -18,7 +18,7 @@ export class UmbLogViewerLogLevelFilterMenuElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_APP_LOG_VIEWER_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_APP_LOG_VIEWER_CONTEXT, (instance) => {
 			this.#logViewerContext = instance;
 			this.#observeLogLevelFilter();
 		});

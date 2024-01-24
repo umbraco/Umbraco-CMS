@@ -1,3 +1,4 @@
+import { UMB_BLOCK_WORKSPACE_MODAL } from '../../workspace/index.js';
 import {
 	UmbBlockCatalogueModalData,
 	UmbBlockCatalogueModalValue,
@@ -5,7 +6,11 @@ import {
 } from '@umbraco-cms/backoffice/block';
 import { css, html, customElement, state, repeat, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { groupBy } from '@umbraco-cms/backoffice/external/lodash';
-import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
+import {
+	UMB_MODAL_CONTEXT,
+	UmbModalBaseElement,
+	UmbModalRouteRegistrationController,
+} from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-block-catalogue-modal')
 export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
@@ -19,26 +24,52 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 	private _blockGroups: Array<{ key: string; name: string }> = [];
 
 	@state()
-	openClipboard?: boolean;
+	_openClipboard?: boolean;
+
+	@state()
+	_workspacePath?: string;
+
+	constructor() {
+		super();
+
+		this.consumeContext(UMB_MODAL_CONTEXT, (modalContext) => {
+			new UmbModalRouteRegistrationController(this, UMB_BLOCK_WORKSPACE_MODAL)
+				//.addAdditionalPath('block') // No need for additional path specification in this context as this is for sure the only workspace we want to open here.
+				.onSetup(() => {
+					return {
+						data: { preset: {}, originData: (modalContext.data as UmbBlockCatalogueModalData).blockOriginData },
+					};
+				})
+				.onSubmit(() => {
+					// When workspace is submitted, we want to close this modal.
+					this.modalContext?.submit();
+				})
+				.observeRouteBuilder((routeBuilder) => {
+					this._workspacePath = routeBuilder({});
+				});
+		});
+	}
 
 	connectedCallback() {
 		super.connectedCallback();
 		if (!this.data) return;
 
-		this.openClipboard = this.data.openClipboard ?? false;
+		this._openClipboard = this.data.openClipboard ?? false;
 		this._blocks = this.data.blocks ?? [];
 		this._blockGroups = this.data.blockGroups ?? [];
 	}
 
+	/*
 	#onClickBlock(contentElementTypeKey: string) {
 		this.modalContext?.updateValue({ key: contentElementTypeKey });
 		this.modalContext?.submit();
 	}
+	*/
 
 	render() {
 		return html`
 			<umb-body-layout headline="${this.localize.term('blockEditor_addBlock')}">
-				${this.#renderViews()} ${this.openClipboard ? this.#renderClipboard() : this.#renderCreateEmpty()}
+				${this.#renderViews()} ${this._openClipboard ? this.#renderClipboard() : this.#renderCreateEmpty()}
 				<div slot="actions">
 					<uui-button label=${this.localize.term('general_close')} @click=${this._rejectModal}></uui-button>
 					<uui-button
@@ -76,7 +107,7 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 									name=${ifDefined(block.label)}
 									background=${ifDefined(block.backgroundColor)}
 									style="color: ${block.iconColor}"
-									@open=${() => this.#onClickBlock(block.contentElementTypeKey)}>
+									href="${this._workspacePath}create/${block.contentElementTypeKey}">
 									<uui-icon .name=${block.icon ?? ''}></uui-icon>
 								</uui-card-block-type>
 							`,
@@ -90,11 +121,11 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 	#renderViews() {
 		return html`
 			<uui-tab-group slot="navigation">
-				<uui-tab label="Create Empty" ?active=${!this.openClipboard} @click=${() => (this.openClipboard = false)}>
+				<uui-tab label="Create Empty" ?active=${!this._openClipboard} @click=${() => (this._openClipboard = false)}>
 					Create Empty
 					<uui-icon slot="icon" name="icon-add"></uui-icon>
 				</uui-tab>
-				<uui-tab label="Clipboard" ?active=${this.openClipboard} @click=${() => (this.openClipboard = true)}>
+				<uui-tab label="Clipboard" ?active=${this._openClipboard} @click=${() => (this._openClipboard = true)}>
 					Clipboard
 					<uui-icon slot="icon" name="icon-paste-in"></uui-icon>
 				</uui-tab>

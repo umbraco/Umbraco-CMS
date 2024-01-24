@@ -546,7 +546,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 						editorSize: 'medium',
 						icon: 'icon-coffee',
 					},
-
 					{
 						label: 'Headline',
 						contentElementTypeKey: 'headline-umbraco-demo-block-id',
@@ -573,6 +572,14 @@ export const data: Array<UmbMockDataTypeModel> = [
 						icon: 'icon-book-alt',
 					},
 				],
+			},
+			{
+				alias: 'useInlineEditingAsDefault',
+				value: true,
+			},
+			{
+				alias: 'useLiveEditing',
+				value: true,
 			},
 		],
 	},

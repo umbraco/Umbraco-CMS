@@ -5,11 +5,7 @@ import {
 	UUIInputElement,
 	UUIInputEvent,
 } from '@umbraco-cms/backoffice/external/uui';
-import {
-	UmbModalManagerContext,
-	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
-	UMB_CONFIRM_MODAL,
-} from '@umbraco-cms/backoffice/modal';
+import { UmbModalManagerContext, UMB_MODAL_MANAGER_CONTEXT, UMB_CONFIRM_MODAL } from '@umbraco-cms/backoffice/modal';
 import { UmbChangeEvent, UmbInputEvent, UmbDeleteEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
@@ -53,7 +49,7 @@ export class UmbMultipleColorPickerItemInputElement extends FormControlMixin(Umb
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
 			this._modalContext = instance;
 		});
 	}
@@ -65,7 +61,7 @@ export class UmbMultipleColorPickerItemInputElement extends FormControlMixin(Umb
 				content: this.localize.term('content_nestedContentDeleteItem'),
 				color: 'danger',
 				confirmLabel: this.localize.term('actions_delete'),
-			}
+			},
 		});
 
 		modalContext?.onSubmit().then(() => {

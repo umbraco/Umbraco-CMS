@@ -1,24 +1,10 @@
 import { UMB_MEDIA_TYPE_ENTITY_TYPE } from '../entity.js';
 import { UMB_MEDIA_TYPE_DETAIL_REPOSITORY_ALIAS } from '../repository/index.js';
-import { UmbCreateMediaTypeEntityAction } from './create/create.action.js';
 import { manifests as createManifests } from './create/manifests.js';
 import { UmbDeleteEntityAction, UmbMoveEntityAction, UmbCopyEntityAction } from '@umbraco-cms/backoffice/entity-action';
 import type { ManifestEntityAction } from '@umbraco-cms/backoffice/extension-registry';
 
 const entityActions: Array<ManifestEntityAction> = [
-	{
-		type: 'entityAction',
-		alias: 'Umb.EntityAction.MediaType.Create',
-		name: 'Create Media Type Entity Action',
-		weight: 500,
-		api: UmbCreateMediaTypeEntityAction,
-		meta: {
-			icon: 'icon-add',
-			label: 'Create',
-			repositoryAlias: UMB_MEDIA_TYPE_DETAIL_REPOSITORY_ALIAS,
-			entityTypes: [UMB_MEDIA_TYPE_ENTITY_TYPE],
-		},
-	},
 	{
 		type: 'entityAction',
 		alias: 'Umb.EntityAction.MediaType.Move',

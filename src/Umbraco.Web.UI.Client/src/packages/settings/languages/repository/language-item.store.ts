@@ -5,7 +5,7 @@ import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbItemStore } from '@umbraco-cms/backoffice/store';
 
-export const UMB_LANGUAGE_ITEM_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbLanguageItemStore>('UmbLanguageItemStore');
+export const UMB_LANGUAGE_ITEM_STORE_CONTEXT = new UmbContextToken<UmbLanguageItemStore>('UmbLanguageItemStore');
 
 /**
  * @export
@@ -17,7 +17,7 @@ export class UmbLanguageItemStore extends UmbStoreBase<LanguageResponseModel> {
 	constructor(host: UmbControllerHostElement) {
 		super(
 			host,
-			UMB_LANGUAGE_ITEM_STORE_CONTEXT_TOKEN.toString(),
+			UMB_LANGUAGE_ITEM_STORE_CONTEXT.toString(),
 			new UmbArrayState<LanguageResponseModel>([], (x) => x.isoCode),
 		);
 	}

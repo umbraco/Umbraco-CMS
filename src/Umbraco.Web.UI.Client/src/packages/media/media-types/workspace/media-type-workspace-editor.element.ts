@@ -4,7 +4,7 @@ import { css, html, customElement, state, ifDefined } from '@umbraco-cms/backoff
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import {
 	UMB_ICON_PICKER_MODAL,
-	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
+	UMB_MODAL_MANAGER_CONTEXT,
 	UmbModalManagerContext,
 } from '@umbraco-cms/backoffice/modal';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
@@ -39,7 +39,7 @@ export class UmbMediaTypeWorkspaceEditorElement extends UmbLitElement {
 			this.#observeMediaType();
 		});
 
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
 			this._modalContext = instance;
 		});
 	}

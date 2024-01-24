@@ -8,6 +8,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbWorkspaceIsNewRedirectController } from '@umbraco-cms/backoffice/workspace';
 import { UmbApi, UmbExtensionsApiInitializer, createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 import { ManifestWorkspace, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { decodeFilePath } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-block-workspace')
 export class UmbBlockWorkspaceElement extends UmbLitElement {
@@ -28,6 +29,11 @@ export class UmbBlockWorkspaceElement extends UmbLitElement {
 		createExtensionApi(manifest, [this, { manifest: manifest }]).then((context) => {
 			if (context) {
 				this.#gotWorkspaceContext(context);
+				// TODO: We need to recreate when ID changed?
+				new UmbExtensionsApiInitializer(this, umbExtensionsRegistry, 'workspaceContext', [
+					this,
+					this.#workspaceContext,
+				]);
 			}
 		});
 	}
@@ -51,17 +57,14 @@ export class UmbBlockWorkspaceElement extends UmbLitElement {
 				},
 			},
 			{
-				path: 'edit/:id',
+				path: 'edit/:udi',
 				component: this.#editorElement,
 				setup: (_component, info) => {
-					const id = info.match.params.id;
-					this.#workspaceContext!.load(id);
+					const udi = decodeFilePath(info.match.params.udi);
+					this.#workspaceContext!.load(udi);
 				},
 			},
 		];
-
-		// TODO: We need to recreate when ID changed?
-		new UmbExtensionsApiInitializer(this, umbExtensionsRegistry, 'workspaceContext', [this, this.#workspaceContext]);
 	}
 
 	render() {

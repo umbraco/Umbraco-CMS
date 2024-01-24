@@ -17,7 +17,7 @@ export class UmbAppLanguageContext extends UmbBaseController implements UmbApi {
 	constructor(host: UmbControllerHost) {
 		super(host);
 
-		this.provideContext(UMB_APP_LANGUAGE_CONTEXT_TOKEN, this);
+		this.provideContext(UMB_APP_LANGUAGE_CONTEXT, this);
 
 		this.#languageRepository = new UmbLanguageRepository(this);
 		this.#observeLanguages();
@@ -58,4 +58,4 @@ export class UmbAppLanguageContext extends UmbBaseController implements UmbApi {
 // Default export to enable this as a globalContext extension js:
 export default UmbAppLanguageContext;
 
-export const UMB_APP_LANGUAGE_CONTEXT_TOKEN = new UmbContextToken<UmbAppLanguageContext>('UmbAppLanguageContext');
+export const UMB_APP_LANGUAGE_CONTEXT = new UmbContextToken<UmbAppLanguageContext>('UmbAppLanguageContext');

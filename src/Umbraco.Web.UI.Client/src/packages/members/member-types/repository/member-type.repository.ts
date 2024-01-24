@@ -4,7 +4,7 @@ import { UmbMemberTypeStore, UMB_MEMBER_TYPE_STORE_CONTEXT } from './member-type
 import { UmbMemberTypeDetailServerDataSource } from './sources/member-type.detail.server.data.js';
 import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
-import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
+import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 
 export class UmbMemberTypeRepository extends UmbBaseController {
 	#init!: Promise<unknown>;
@@ -31,7 +31,7 @@ export class UmbMemberTypeRepository extends UmbBaseController {
 				this.#treeStore = instance;
 			}),
 
-			this.consumeContext(UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
+			this.consumeContext(UMB_NOTIFICATION_CONTEXT, (instance) => {
 				this.#notificationContext = instance;
 			}),
 		]);

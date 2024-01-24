@@ -50,6 +50,9 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 
 	protected _originalPropertyData!: UmbPropertySettingsModalValue;
 
+	/** Indicates if the currently edited property is a new property or an existing */
+	#isNew = false;
+
 	#context = new UmbPropertyTypeWorkspaceContext(this);
 
 	@state()
@@ -69,6 +72,7 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 		}).skipOrigin();
 
 		this._originalPropertyData = this.value;
+		this.#isNew = this.value.alias === '';
 
 		const regEx = this.value.validation?.regEx ?? null;
 		if (regEx) {
@@ -222,7 +226,7 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 		return html`
 			<uui-form>
 				<form @submit="${this.#onSubmit}">
-					<umb-workspace-editor alias=${UMB_PROPERTY_TYPE_WORKSPACE_ALIAS} headline="Property settings">
+					<umb-workspace-editor alias=${UMB_PROPERTY_TYPE_WORKSPACE_ALIAS} headline=${this.localize.term(this.#isNew ? 'contentTypeEditor_addProperty' : 'contentTypeEditor_editProperty')}>
 						<div id="content">
 							<uui-box>
 								<div class="container">
@@ -273,7 +277,7 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 							</uui-box>
 						</div>
 						<div slot="actions">
-							<uui-button label="Submit" look="primary" color="positive" type="submit"></uui-button>
+							<uui-button label="${this.localize.term(this.#isNew ? 'general_add' : 'general_update')}" look="primary" color="positive" type="submit"></uui-button>
 						</div>
 					</umb-workspace-editor>
 				</form>

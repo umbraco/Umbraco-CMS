@@ -2,7 +2,7 @@ import { UmbRepositoryBase } from '../repository-base.js';
 import { UmbDetailDataSource, UmbDetailDataSourceConstructor } from './detail-data-source.interface.js';
 import { UmbDetailRepository } from './detail-repository.interface.js';
 import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UMB_NOTIFICATION_CONTEXT_TOKEN, UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
+import { UMB_NOTIFICATION_CONTEXT, UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbDetailStore } from '@umbraco-cms/backoffice/store';
 import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
@@ -33,7 +33,7 @@ export abstract class UmbDetailRepositoryBase<
 				this.#detailStore = instance;
 			}).asPromise(),
 
-			this.consumeContext(UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
+			this.consumeContext(UMB_NOTIFICATION_CONTEXT, (instance) => {
 				this.#notificationContext = instance;
 			}).asPromise(),
 		]);

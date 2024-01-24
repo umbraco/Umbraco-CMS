@@ -1,6 +1,11 @@
-import { UMB_DOCUMENT_TYPE_ENTITY_TYPE, UMB_DOCUMENT_TYPE_ROOT_ENTITY_TYPE } from '../entity.js';
+import {
+	UMB_DOCUMENT_TYPE_ENTITY_TYPE,
+	UMB_DOCUMENT_TYPE_FOLDER_ENTITY_TYPE,
+	UMB_DOCUMENT_TYPE_ROOT_ENTITY_TYPE,
+} from '../entity.js';
 import { UmbDocumentTypeTreeRepository } from './document-type-tree.repository.js';
 import { UmbDocumentTypeTreeStore } from './document-type.tree.store.js';
+import { manifests as folderManifests } from './folder/manifests.js';
 import type {
 	ManifestRepository,
 	ManifestTree,
@@ -41,8 +46,12 @@ const treeItem: ManifestTreeItem = {
 	alias: 'Umb.TreeItem.DocumentType',
 	name: 'Document Type Tree Item',
 	meta: {
-		entityTypes: [UMB_DOCUMENT_TYPE_ROOT_ENTITY_TYPE, UMB_DOCUMENT_TYPE_ENTITY_TYPE],
+		entityTypes: [
+			UMB_DOCUMENT_TYPE_ROOT_ENTITY_TYPE,
+			UMB_DOCUMENT_TYPE_ENTITY_TYPE,
+			UMB_DOCUMENT_TYPE_FOLDER_ENTITY_TYPE,
+		],
 	},
 };
 
-export const manifests = [treeRepository, treeStore, tree, treeItem];
+export const manifests = [treeRepository, treeStore, tree, treeItem, ...folderManifests];

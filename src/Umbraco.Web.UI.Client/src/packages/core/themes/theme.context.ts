@@ -19,7 +19,7 @@ export class UmbThemeContext extends UmbBaseController {
 	constructor(host: UmbControllerHostElement) {
 		super(host);
 
-		this.provideContext(UMB_THEME_CONTEXT_TOKEN, this);
+		this.provideContext(UMB_THEME_CONTEXT, this);
 
 		const storedTheme = localStorage.getItem(LOCAL_STORAGE_KEY);
 		if (storedTheme) {
@@ -81,7 +81,7 @@ export class UmbThemeContext extends UmbBaseController {
 	}
 }
 
-export const UMB_THEME_CONTEXT_TOKEN = new UmbContextToken<UmbThemeContext>('umbThemeContext');
+export const UMB_THEME_CONTEXT = new UmbContextToken<UmbThemeContext>('umbThemeContext');
 
 // Default export to enable this as a globalContext extension js:
 export default UmbThemeContext;

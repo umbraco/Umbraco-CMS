@@ -1,5 +1,5 @@
 import { UmbUserGroupCollectionFilterModel } from '../../types.js';
-import { UMB_USER_GROUP_STORE_CONTEXT_TOKEN, UmbUserGroupStore } from '../../repository/user-group.store.js';
+import { UMB_USER_GROUP_STORE_CONTEXT, UmbUserGroupStore } from '../../repository/user-group.store.js';
 import { UmbUserGroupCollectionServerDataSource } from './user-group-collection.server.data-source.js';
 import { UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbCollectionDataSource, UmbCollectionRepository } from '@umbraco-cms/backoffice/repository';
@@ -16,7 +16,7 @@ export class UmbUserGroupCollectionRepository extends UmbBaseController implemen
 		super(host);
 		this.#collectionSource = new UmbUserGroupCollectionServerDataSource(this._host);
 
-		this.#init = this.consumeContext(UMB_USER_GROUP_STORE_CONTEXT_TOKEN, (instance) => {
+		this.#init = this.consumeContext(UMB_USER_GROUP_STORE_CONTEXT, (instance) => {
 			this.#detailStore = instance;
 		}).asPromise();
 	}

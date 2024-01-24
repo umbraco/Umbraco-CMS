@@ -18,8 +18,8 @@ export class UmbDocumentItemStore extends UmbEntityItemStore<DocumentItemRespons
 	 * @memberof UmbDocumentItemStore
 	 */
 	constructor(host: UmbControllerHostElement) {
-		super(host, UMB_DOCUMENT_ITEM_STORE_CONTEXT_TOKEN.toString());
+		super(host, UMB_DOCUMENT_ITEM_STORE_CONTEXT.toString());
 	}
 }
 
-export const UMB_DOCUMENT_ITEM_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbDocumentItemStore>('UmbDocumentItemStore');
+export const UMB_DOCUMENT_ITEM_STORE_CONTEXT = new UmbContextToken<UmbDocumentItemStore>('UmbDocumentItemStore');

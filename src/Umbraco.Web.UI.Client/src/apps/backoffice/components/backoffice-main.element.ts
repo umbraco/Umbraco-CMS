@@ -1,6 +1,6 @@
-import { UmbBackofficeContext, UMB_BACKOFFICE_CONTEXT_TOKEN } from '../backoffice.context.js';
+import { UmbBackofficeContext, UMB_BACKOFFICE_CONTEXT } from '../backoffice.context.js';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbSectionContext, UMB_SECTION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/section';
+import { UmbSectionContext, UMB_SECTION_CONTEXT } from '@umbraco-cms/backoffice/section';
 import type { UmbRoute, UmbRouterSlotChangeEvent } from '@umbraco-cms/backoffice/router';
 import type { ManifestSection, UmbSectionElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbExtensionManifestInitializer, createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
@@ -21,7 +21,7 @@ export class UmbBackofficeMainElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_BACKOFFICE_CONTEXT_TOKEN, (_instance) => {
+		this.consumeContext(UMB_BACKOFFICE_CONTEXT, (_instance) => {
 			this._backofficeContext = _instance;
 			this._observeBackoffice();
 		});
@@ -88,7 +88,7 @@ export class UmbBackofficeMainElement extends UmbLitElement {
 	private _provideSectionContext(sectionManifest: ManifestSection) {
 		if (!this._sectionContext) {
 			this._sectionContext = new UmbSectionContext(sectionManifest);
-			this.provideContext(UMB_SECTION_CONTEXT_TOKEN, this._sectionContext);
+			this.provideContext(UMB_SECTION_CONTEXT, this._sectionContext);
 		} else {
 			this._sectionContext.setManifest(sectionManifest);
 		}

@@ -6,7 +6,7 @@ import { css, html, customElement, state, query, queryAll, ifDefined } from '@um
 import {
 	UmbModalBaseElement,
 	UMB_DOCUMENT_PICKER_MODAL,
-	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
+	UMB_MODAL_MANAGER_CONTEXT,
 	UmbModalManagerContext,
 } from '@umbraco-cms/backoffice/modal';
 import {
@@ -65,7 +65,7 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 		this.#templateRepository = new UmbTemplateRepository(this);
 		this.#documentRepository = new UmbDocumentRepository(this);
 
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
 			this.#modalManagerContext = instance;
 		});
 		this.#init();
