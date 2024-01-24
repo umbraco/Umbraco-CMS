@@ -1,8 +1,8 @@
 import { UmbMediaPickerContext } from './input-media.context.js';
-import { css, html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, state, ifDefined, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { MediaItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { MediaItemResponseModel, MediaTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-input-media')
@@ -60,8 +60,8 @@ export class UmbInputMediaElement extends FormControlMixin(UmbLitElement) {
 		this.#pickerContext.setSelection(ids);
 	}
 
-	@property({ type: String })
-	filter?: string;
+	@property({ type: Array })
+	allowedContentTypeIds?: string[] | undefined;
 
 	@property({ type: Boolean })
 	showOpenButton?: boolean;
@@ -103,40 +103,57 @@ export class UmbInputMediaElement extends FormControlMixin(UmbLitElement) {
 		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems));
 	}
 
-	protected _openPicker() {
-		// TODO: Configure the media picker, with `filter` and `ignoreUserStartNodes` [LK]
-		console.log('_openPicker', [this.filter, this.ignoreUserStartNodes]);
-		this.#pickerContext.openPicker({
-			hideTreeRoot: true,
-		});
-	}
-
-	protected _openItem(item: MediaItemResponseModel) {
-		// TODO: Implement the Content editing infinity editor. [LK]
-		console.log('TODO: _openItem', item);
-	}
-
 	protected getFormElement() {
 		return undefined;
 	}
 
+	#pickableFilter: (item: MediaItemResponseModel) => boolean = (item) => {
+		/* TODO: Media item doesn't have the content/media-type ID available to query.
+			 Commenting out until the Management API model is updated. [LK]
+		*/
+		// if (this.allowedContentTypeIds && this.allowedContentTypeIds.length > 0) {
+		// 	return this.allowedContentTypeIds.includes(item.contentTypeId);
+		// }
+		return true;
+	};
+
+	#openPicker() {
+		// TODO: Configure the media picker, with `allowedContentTypeIds` and `ignoreUserStartNodes` [LK]
+		console.log('#openPicker', [this.allowedContentTypeIds, this.ignoreUserStartNodes]);
+		this.#pickerContext.openPicker({
+			hideTreeRoot: true,
+			pickableFilter: this.#pickableFilter,
+		});
+	}
+
+	#openItem(item: MediaItemResponseModel) {
+		// TODO: Implement the Media editing infinity editor. [LK]
+		console.log('TODO: _openItem', item);
+	}
+
 	render() {
-		return html` ${this.#renderItems()} ${this.#renderButton()} `;
+		return html` ${this.#renderItems()} ${this.#renderAddButton()} `;
 	}
 
 	#renderItems() {
 		if (!this._items) return;
 		// TODO: Add sorting. [LK]
-		return html` ${this._items?.map((item) => this.#renderItem(item))} `;
+		return html`
+			${repeat(
+				this._items,
+				(item) => item.id,
+				(item) => this.#renderItem(item),
+			)}
+		`;
 	}
 
-	#renderButton() {
+	#renderAddButton() {
 		if (this._items && this.max && this._items.length >= this.max) return;
 		return html`
 			<uui-button
 				id="add-button"
 				look="placeholder"
-				@click=${this._openPicker}
+				@click=${this.#openPicker}
 				label=${this.localize.term('general_choose')}>
 				<uui-icon name="icon-add"></uui-icon>
 				${this.localize.term('general_choose')}
@@ -152,7 +169,7 @@ export class UmbInputMediaElement extends FormControlMixin(UmbLitElement) {
 				name=${ifDefined(item.name === null ? undefined : item.name)}
 				detail=${ifDefined(item.id)}
 				file-ext="jpg">
-				${this._renderIsTrashed(item)}
+				${this.#renderIsTrashed(item)}
 				<uui-action-bar slot="actions">
 					<uui-button label="Copy media">
 						<uui-icon name="icon-documents"></uui-icon>
@@ -165,7 +182,7 @@ export class UmbInputMediaElement extends FormControlMixin(UmbLitElement) {
 		`;
 	}
 
-	private _renderIsTrashed(item: MediaItemResponseModel) {
+	#renderIsTrashed(item: MediaItemResponseModel) {
 		if (!item.isTrashed) return;
 		return html`<uui-tag size="s" slot="tag" color="danger">Trashed</uui-tag>`;
 	}
