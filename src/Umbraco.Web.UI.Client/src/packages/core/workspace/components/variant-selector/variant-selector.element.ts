@@ -1,6 +1,10 @@
-import { UmbVariantId } from '../../variant/variant-id.class.js';
+import { UmbVariantId } from '../../../variant/variant-id.class.js';
 import { UMB_PROPERTY_DATASET_CONTEXT, isNameablePropertyDatasetContext } from '@umbraco-cms/backoffice/property';
-import { UUIInputElement, UUIInputEvent, UUIPopoverContainerElement } from '@umbraco-cms/backoffice/external/uui';
+import {
+	type UUIInputElement,
+	UUIInputEvent,
+	type UUIPopoverContainerElement,
+} from '@umbraco-cms/backoffice/external/uui';
 import {
 	css,
 	html,
@@ -11,13 +15,9 @@ import {
 	ifDefined,
 	query,
 } from '@umbraco-cms/backoffice/external/lit';
-import {
-	UmbWorkspaceSplitViewContext,
-	UMB_WORKSPACE_SPLIT_VIEW_CONTEXT,
-	ActiveVariant,
-} from '@umbraco-cms/backoffice/workspace';
+import { UMB_WORKSPACE_SPLIT_VIEW_CONTEXT, type ActiveVariant } from '@umbraco-cms/backoffice/workspace';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { DocumentVariantResponseModel, ContentStateModel } from '@umbraco-cms/backoffice/backend-api';
+import { type DocumentVariantResponseModel, ContentStateModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-variant-selector')
 export class UmbVariantSelectorElement extends UmbLitElement {
@@ -36,7 +36,7 @@ export class UmbVariantSelectorElement extends UmbLitElement {
 		return this._activeVariants.map((el) => el.culture ?? '') ?? [];
 	}
 
-	#splitViewContext?: UmbWorkspaceSplitViewContext;
+	#splitViewContext?: typeof UMB_WORKSPACE_SPLIT_VIEW_CONTEXT.TYPE;
 	#variantContext?: typeof UMB_PROPERTY_DATASET_CONTEXT.TYPE;
 
 	@state()

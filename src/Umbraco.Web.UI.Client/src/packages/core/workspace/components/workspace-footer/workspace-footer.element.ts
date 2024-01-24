@@ -1,4 +1,4 @@
-import { UMB_SAVEABLE_WORKSPACE_CONTEXT } from '../saveable-workspace.context-token.js';
+import { UMB_SAVEABLE_WORKSPACE_CONTEXT } from '../../saveable-workspace.context-token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 

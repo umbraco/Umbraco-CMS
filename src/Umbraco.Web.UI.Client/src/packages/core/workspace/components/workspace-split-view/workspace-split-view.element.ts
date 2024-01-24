@@ -2,7 +2,7 @@ import { UmbWorkspaceSplitViewContext } from './workspace-split-view.context.js'
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-
+import '../variant-selector/index.js';
 /**
  *
  * Example. Document Workspace would use a Variant-component(variant component would talk directly to the workspace-context)
@@ -11,7 +11,6 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
  */
 @customElement('umb-workspace-split-view')
 export class UmbWorkspaceSplitViewElement extends UmbLitElement {
-	// TODO: stop prop drilling this alias. Instead use the workspace context.
 	@property()
 	alias!: string;
 
