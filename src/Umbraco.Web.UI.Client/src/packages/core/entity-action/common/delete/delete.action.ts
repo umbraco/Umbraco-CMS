@@ -9,7 +9,7 @@ import {
 import { UmbDetailRepository, UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 
 export class UmbDeleteEntityAction<
-	T extends UmbDetailRepository & UmbItemRepository<any>,
+	T extends UmbDetailRepository<any> & UmbItemRepository<any>,
 > extends UmbEntityActionBase<T> {
 	#modalManager?: UmbModalManagerContext;
 

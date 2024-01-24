@@ -6,6 +6,5 @@
 import type { PackageModelBaseModel } from './PackageModelBaseModel';
 
 export type UpdatePackageRequestModel = (PackageModelBaseModel & {
-    packagePath: string;
+packagePath: string;
 });
-

@@ -9,4 +9,3 @@ export type SortingRequestModel = {
     parentId?: string | null;
     sorting: Array<ItemSortingRequestModel>;
 };
-

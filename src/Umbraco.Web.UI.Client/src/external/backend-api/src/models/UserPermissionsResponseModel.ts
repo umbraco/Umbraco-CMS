@@ -8,4 +8,3 @@ import type { UserPermissionModel } from './UserPermissionModel';
 export type UserPermissionsResponseModel = {
     permissions: Array<UserPermissionModel>;
 };
-

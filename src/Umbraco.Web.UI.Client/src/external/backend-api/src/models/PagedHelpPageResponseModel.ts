@@ -9,4 +9,3 @@ export type PagedHelpPageResponseModel = {
     total: number;
     items: Array<HelpPageResponseModel>;
 };
-

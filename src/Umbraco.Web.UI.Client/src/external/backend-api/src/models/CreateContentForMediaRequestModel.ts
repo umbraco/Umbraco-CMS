@@ -12,4 +12,3 @@ export type CreateContentForMediaRequestModel = {
     id?: string | null;
     parentId?: string | null;
 };
-

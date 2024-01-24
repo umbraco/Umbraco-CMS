@@ -2,11 +2,16 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { AvailableDocumentTypeCompositionResponseModel } from '../models/AvailableDocumentTypeCompositionResponseModel';
+import type { CopyDocumentTypeRequestModel } from '../models/CopyDocumentTypeRequestModel';
 import type { CreateDocumentTypeRequestModel } from '../models/CreateDocumentTypeRequestModel';
 import type { CreateFolderRequestModel } from '../models/CreateFolderRequestModel';
+import type { DocumentTypeCompositionRequestModel } from '../models/DocumentTypeCompositionRequestModel';
+import type { DocumentTypeCompositionResponseModel } from '../models/DocumentTypeCompositionResponseModel';
 import type { DocumentTypeItemResponseModel } from '../models/DocumentTypeItemResponseModel';
 import type { DocumentTypeResponseModel } from '../models/DocumentTypeResponseModel';
 import type { FolderResponseModel } from '../models/FolderResponseModel';
+import type { MoveDocumentTypeRequestModel } from '../models/MoveDocumentTypeRequestModel';
 import type { PagedDocumentTypeTreeItemResponseModel } from '../models/PagedDocumentTypeTreeItemResponseModel';
 import type { UpdateDocumentTypeRequestModel } from '../models/UpdateDocumentTypeRequestModel';
 import type { UpdateFolderResponseModel } from '../models/UpdateFolderResponseModel';
@@ -31,7 +36,7 @@ export class DocumentTypeResource {
             url: '/umbraco/management/api/v1/document-type',
             body: requestBody,
             mediaType: 'application/json',
-            responseHeader: 'Location',
+            responseHeader: 'Umb-Generated-Resource',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
@@ -112,6 +117,104 @@ export class DocumentTypeResource {
     }
 
     /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getDocumentTypeByIdCompositionReferences({
+        id,
+    }: {
+        id: string,
+    }): CancelablePromise<Array<DocumentTypeCompositionResponseModel>> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/umbraco/management/api/v1/document-type/{id}/composition-references',
+            path: {
+                'id': id,
+            },
+            errors: {
+                400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
+                404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns string Created
+     * @throws ApiError
+     */
+    public static postDocumentTypeByIdCopy({
+        id,
+        requestBody,
+    }: {
+        id: string,
+        requestBody?: CopyDocumentTypeRequestModel,
+    }): CancelablePromise<string> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/umbraco/management/api/v1/document-type/{id}/copy',
+            path: {
+                'id': id,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
+            responseHeader: 'Umb-Generated-Resource',
+            errors: {
+                400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
+                404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static putDocumentTypeByIdMove({
+        id,
+        requestBody,
+    }: {
+        id: string,
+        requestBody?: MoveDocumentTypeRequestModel,
+    }): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'PUT',
+            url: '/umbraco/management/api/v1/document-type/{id}/move',
+            path: {
+                'id': id,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                400: `Bad Request`,
+                401: `The resource is protected and requires an authentication token`,
+                404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static postDocumentTypeAvailableCompositions({
+        requestBody,
+    }: {
+        requestBody?: DocumentTypeCompositionRequestModel,
+    }): CancelablePromise<Array<AvailableDocumentTypeCompositionResponseModel>> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/umbraco/management/api/v1/document-type/available-compositions',
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                401: `The resource is protected and requires an authentication token`,
+            },
+        });
+    }
+
+    /**
      * @returns string Created
      * @throws ApiError
      */
@@ -125,7 +228,7 @@ export class DocumentTypeResource {
             url: '/umbraco/management/api/v1/document-type/folder',
             body: requestBody,
             mediaType: 'application/json',
-            responseHeader: 'Location',
+            responseHeader: 'Umb-Generated-Resource',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,

@@ -50,7 +50,11 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 				</uui-box>
 				<div slot="actions">
 					<uui-button label=${this.localize.term('general_close')} @click=${this._rejectModal}></uui-button>
-					<uui-button label=${this.localize.term('general_choose')} look="primary" color="positive" @click=${this._submitModal}></uui-button>
+					<uui-button
+						label=${this.localize.term('general_choose')}
+						look="primary"
+						color="positive"
+						@click=${this._submitModal}></uui-button>
 				</div>
 			</umb-body-layout>
 		`;

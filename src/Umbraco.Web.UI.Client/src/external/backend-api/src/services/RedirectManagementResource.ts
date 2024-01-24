@@ -17,14 +17,14 @@ export class RedirectManagementResource {
      * @throws ApiError
      */
     public static getRedirectManagement({
-        filter,
-        skip,
-        take = 100,
-    }: {
-        filter?: string,
-        skip?: number,
-        take?: number,
-    }): CancelablePromise<PagedRedirectUrlResponseModel> {
+filter,
+skip,
+take = 100,
+}: {
+filter?: string,
+skip?: number,
+take?: number,
+}): CancelablePromise<PagedRedirectUrlResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/redirect-management',
@@ -45,14 +45,14 @@ export class RedirectManagementResource {
      * @throws ApiError
      */
     public static getRedirectManagementById({
-        id,
-        skip,
-        take = 100,
-    }: {
-        id: string,
-        skip?: number,
-        take?: number,
-    }): CancelablePromise<PagedRedirectUrlResponseModel> {
+id,
+skip,
+take = 100,
+}: {
+id: string,
+skip?: number,
+take?: number,
+}): CancelablePromise<PagedRedirectUrlResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/redirect-management/{id}',
@@ -74,10 +74,10 @@ export class RedirectManagementResource {
      * @throws ApiError
      */
     public static deleteRedirectManagementById({
-        id,
-    }: {
-        id: string,
-    }): CancelablePromise<any> {
+id,
+}: {
+id: string,
+}): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/redirect-management/{id}',
@@ -109,10 +109,10 @@ export class RedirectManagementResource {
      * @throws ApiError
      */
     public static postRedirectManagementStatus({
-        status,
-    }: {
-        status?: RedirectStatusModel,
-    }): CancelablePromise<any> {
+status,
+}: {
+status?: RedirectStatusModel,
+}): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/redirect-management/status',

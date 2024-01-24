@@ -35,6 +35,11 @@ export interface IUmbAuthContext {
 	getLatestToken(): Promise<string>;
 
 	/**
+	 * Clears the token storage.
+	 */
+	clearTokenStorage(): Promise<void>;
+
+	/**
 	 * Signs the user out by removing any tokens from the browser.
 	 */
 	signOut(): Promise<void>;

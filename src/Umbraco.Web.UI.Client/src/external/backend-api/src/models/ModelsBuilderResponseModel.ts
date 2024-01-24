@@ -14,4 +14,3 @@ export type ModelsBuilderResponseModel = {
     modelsNamespace?: string | null;
     trackingOutOfDateModels: boolean;
 };
-

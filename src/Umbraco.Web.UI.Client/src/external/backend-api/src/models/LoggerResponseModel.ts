@@ -9,4 +9,3 @@ export type LoggerResponseModel = {
     name: string;
     level: LogLevelModel;
 };
-

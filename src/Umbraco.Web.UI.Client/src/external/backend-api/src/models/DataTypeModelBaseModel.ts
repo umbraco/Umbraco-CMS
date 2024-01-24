@@ -11,4 +11,3 @@ export type DataTypeModelBaseModel = {
     editorUiAlias?: string | null;
     values: Array<DataTypePropertyPresentationModel>;
 };
-

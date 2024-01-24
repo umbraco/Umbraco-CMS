@@ -1,15 +1,37 @@
-import { css, customElement } from '@umbraco-cms/backoffice/external/lit';
+import { UMB_BLOCK_LIST_CONTEXT } from '../../context/block-list.context-token.js';
+import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UUIRefNodeElement } from '@umbraco-cms/backoffice/external/uui';
+import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 /**
  * @element umb-ref-list-block
  */
 @customElement('umb-ref-list-block')
-export class UmbRefListBlockElement extends UUIRefNodeElement {
+export class UmbRefListBlockElement extends UmbLitElement {
 	//
-	connectedCallback(): void {
-		super.connectedCallback();
-		this.setAttribute('border', '');
+	@property({ type: String })
+	name?: string;
+
+	@state()
+	_workspaceEditPath?: string;
+
+	constructor() {
+		super();
+
+		this.consumeContext(UMB_BLOCK_LIST_CONTEXT, (context) => {
+			this.observe(
+				context.workspaceEditPath,
+				(workspaceEditPath) => {
+					this._workspaceEditPath = workspaceEditPath;
+				},
+				'observeWorkspaceEditPath',
+			);
+		});
+	}
+
+	render() {
+		// href=${this._workspaceEditPath ?? '#'}
+		return html`<uui-ref-node border .name=${this.name ?? ''}></uui-ref-node>`;
 	}
 
 	static styles = [

@@ -83,8 +83,7 @@ export class UmbRepositoryItemsManager<ItemType> extends UmbBaseController {
 
 		// TODO: Test if its just some items that is gone now, if so then just filter them out. (maybe use code from #removeItem)
 		// This is where this.#getUnique comes in play. Unless that can come from the repository, but that collides with the idea of having a multi-type repository. If that happens.
-
-		const { asObservable } = await this.repository.requestItems(this.getUniques());
+		const { data, asObservable } = await this.repository.requestItems(this.getUniques());
 
 		if (asObservable) {
 			this.observe(

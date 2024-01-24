@@ -9,4 +9,3 @@ export type PagedRedirectUrlResponseModel = {
     total: number;
     items: Array<RedirectUrlResponseModel>;
 };
-

@@ -6,4 +6,3 @@
 export type CopyDataTypeRequestModel = {
     targetId?: string | null;
 };
-

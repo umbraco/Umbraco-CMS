@@ -1,5 +1,10 @@
-import type { UmbEntityTreeItemModel, UmbEntityTreeRootModel } from '@umbraco-cms/backoffice/tree';
+import { UmbMediaTypeEntityType, UmbMediaTypeFolderEntityType, UmbMediaTypeRootEntityType } from '../entity.js';
+import { UmbUniqueTreeItemModel, UmbUniqueTreeRootModel } from '@umbraco-cms/backoffice/tree';
 
-export interface UmbMediaTypeTreeItemModel extends UmbEntityTreeItemModel {}
-// TODO: TREE STORE TYPE PROBLEM:
-export interface UmbMediaTypeTreeRootModel extends UmbEntityTreeRootModel {}
+export interface UmbMediaTypeTreeItemModel extends UmbUniqueTreeItemModel {
+	entityType: UmbMediaTypeEntityType | UmbMediaTypeFolderEntityType;
+}
+
+export interface UmbMediaTypeTreeRootModel extends UmbUniqueTreeRootModel {
+	entityType: UmbMediaTypeRootEntityType;
+}

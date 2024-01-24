@@ -32,10 +32,12 @@ export class UmbInputMemberElement extends FormControlMixin(UmbLitElement) {
 	 */
 	@property({ type: Number })
 	public get min(): number {
+		// TODO: Uncomment, once `UmbMemberPickerContext` has been implemented. [LK]
 		//return this.#pickerContext.min;
 		return 0;
 	}
 	public set min(value: number) {
+		// TODO: Uncomment, once `UmbMemberPickerContext` has been implemented. [LK]
 		//this.#pickerContext.min = value;
 	}
 
@@ -56,10 +58,12 @@ export class UmbInputMemberElement extends FormControlMixin(UmbLitElement) {
 	 */
 	@property({ type: Number })
 	public get max(): number {
+		// TODO: Uncomment, once `UmbMemberPickerContext` has been implemented. [LK]
 		//return this.#pickerContext.max;
 		return Infinity;
 	}
 	public set max(value: number) {
+		// TODO: Uncomment, once `UmbMemberPickerContext` has been implemented. [LK]
 		//this.#pickerContext.max = value;
 	}
 
@@ -73,13 +77,18 @@ export class UmbInputMemberElement extends FormControlMixin(UmbLitElement) {
 	maxMessage = 'This field exceeds the allowed amount of items';
 
 	public get selectedIds(): Array<string> {
+		// TODO: Uncomment, once `UmbMemberPickerContext` has been implemented. [LK]
 		//return this.#pickerContext.getSelection();
 		return [];
 	}
 	public set selectedIds(ids: Array<string>) {
+		// TODO: Uncomment, once `UmbMemberPickerContext` has been implemented. [LK]
 		//this.#pickerContext.setSelection(ids);
 		this.#sorter.setModel(ids);
 	}
+
+	@property({ type: Array })
+	allowedContentTypeIds?: string[] | undefined;
 
 	@property()
 	public set value(idsString: string) {
@@ -96,6 +105,7 @@ export class UmbInputMemberElement extends FormControlMixin(UmbLitElement) {
 	constructor() {
 		super();
 
+		// TODO: Uncomment, once `UmbMemberPickerContext` has been implemented. [LK]
 		// this.addValidator(
 		// 	'rangeUnderflow',
 		// 	() => this.minMessage,
@@ -113,19 +123,43 @@ export class UmbInputMemberElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	protected _openPicker() {
-		console.log("member.openPicker");
+		console.log('member.openPicker');
 		// this.#pickerContext.openPicker({
 		// 	hideTreeRoot: true,
 		// });
 	}
 
 	protected _requestRemoveItem(item: MemberItemResponseModel) {
-		console.log("member.requestRemoveItem", item);
+		console.log('member.requestRemoveItem', item);
 		//this.#pickerContext.requestRemoveItem(item.id!);
 	}
 
 	protected getFormElement() {
 		return undefined;
+	}
+
+	#pickableFilter: (item: MemberItemResponseModel) => boolean = (item) => {
+		// TODO: Uncomment, once `UmbMemberPickerContext` has been implemented. [LK]
+		console.log('member.pickableFilter', item);
+		// 	if (this.allowedContentTypeIds && this.allowedContentTypeIds.length > 0) {
+		// 		return this.allowedContentTypeIds.includes(item.contentTypeId);
+		// 	}
+		return true;
+	};
+
+	#openPicker() {
+		// TODO: Uncomment, once `UmbMemberPickerContext` has been implemented. [LK]
+		console.log('member.openPicker');
+		// this.#pickerContext.openPicker({
+		// 	hideTreeRoot: true,
+		//	pickableFilter: this.#pickableFilter,
+		// });
+	}
+
+	#requestRemoveItem(item: MemberItemResponseModel) {
+		// TODO: Uncomment, once `UmbMemberPickerContext` has been implemented. [LK]
+		console.log('member.requestRemoveItem', item);
+		//this.#pickerContext.requestRemoveItem(item.id!);
 	}
 
 	render() {
@@ -138,7 +172,7 @@ export class UmbInputMemberElement extends FormControlMixin(UmbLitElement) {
 			${repeat(
 				this._items,
 				(item) => item.id,
-				(item) => this._renderItem(item),
+				(item) => this.#renderItem(item),
 			)}
 		</uui-ref-list>`;
 	}
@@ -148,24 +182,28 @@ export class UmbInputMemberElement extends FormControlMixin(UmbLitElement) {
 		return html`<uui-button
 			id="add-button"
 			look="placeholder"
-			@click=${this._openPicker}
-			label=${this.localize.term('general_add')}></uui-button>`;
+			@click=${this.#openPicker}
+			label=${this.localize.term('general_choose')}></uui-button>`;
 	}
 
-	private _renderItem(item: MemberItemResponseModel) {
+	#renderItem(item: MemberItemResponseModel) {
 		if (!item.id) return;
 		return html`
 			<uui-ref-node name=${ifDefined(item.name)} detail=${ifDefined(item.id)}>
-				<!-- TODO: implement is deleted <uui-tag size="s" slot="tag" color="danger">Deleted</uui-tag> -->
+				${this.#renderIsTrashed(item)}
 				<uui-action-bar slot="actions">
-					<uui-button
-						@click=${() => this._requestRemoveItem(item)}
-						label="Remove member ${item.name}"
+					<uui-button @click=${() => this.#requestRemoveItem(item)} label="Remove member ${item.name}"
 						>Remove</uui-button
 					>
 				</uui-action-bar>
 			</uui-ref-node>
 		`;
+	}
+
+	#renderIsTrashed(item: MemberItemResponseModel) {
+		// TODO: Uncomment, once the Management API model support deleted members. [LK]
+		//if (!item.isTrashed) return;
+		//return html`<uui-tag size="s" slot="tag" color="danger">Trashed</uui-tag>`;
 	}
 
 	static styles = [

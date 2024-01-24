@@ -83,7 +83,10 @@ export class UmbDictionaryWorkspaceContext
 		if (!this.#data.value.id) return;
 
 		if (this.getIsNew()) {
-			await this.repository.create(this.#data.value);
+			const { error } = await this.repository.create(this.#data.value);
+			if (error) {
+				return;
+			}
 			this.setIsNew(false);
 		} else {
 			await this.repository.save(this.#data.value.id, this.#data.value);
