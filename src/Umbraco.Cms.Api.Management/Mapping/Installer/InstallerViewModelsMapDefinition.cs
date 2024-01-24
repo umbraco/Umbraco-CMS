@@ -12,8 +12,8 @@ public class InstallerViewModelsMapDefinition : IMapDefinition
     {
         mapper.Define<InstallRequestModel, InstallData>((source, context) => new InstallData(), Map);
         mapper.Define<UserInstallResponseModel, UserInstallData>((source, context) => new UserInstallData(), Map);
-        mapper.Define<DatabaseInstallResponseModel, DatabaseInstallData>((source, context) => new DatabaseInstallData(), Map);
-        mapper.Define<DatabaseInstallResponseModel, DatabaseModel>((source, context) => new DatabaseModel(), Map);
+        mapper.Define<DatabaseInstallViewModel, DatabaseInstallData>((source, context) => new DatabaseInstallData(), Map);
+        mapper.Define<DatabaseInstallViewModel, DatabaseModel>((source, context) => new DatabaseModel(), Map);
         mapper.Define<DatabaseInstallData, DatabaseModel>((source, context) => new DatabaseModel(), Map);
         mapper.Define<InstallSettingsModel, InstallSettingsResponseModel>((source, context) => new InstallSettingsResponseModel(), Map);
         mapper.Define<UserSettingsModel, UserSettingsViewModel>((source, context) => new UserSettingsViewModel(), Map);
@@ -33,7 +33,7 @@ public class InstallerViewModelsMapDefinition : IMapDefinition
     }
 
     // Umbraco.Code.MapAll
-    private void Map(DatabaseInstallResponseModel source, DatabaseModel target, MapperContext context)
+    private void Map(DatabaseInstallViewModel source, DatabaseModel target, MapperContext context)
     {
         target.ConnectionString = source.ConnectionString;
         target.DatabaseName = source.Name ?? string.Empty;
@@ -64,7 +64,7 @@ public class InstallerViewModelsMapDefinition : IMapDefinition
     }
 
     // Umbraco.Code.MapAll
-    private static void Map(DatabaseInstallResponseModel source, DatabaseInstallData target, MapperContext context)
+    private static void Map(DatabaseInstallViewModel source, DatabaseInstallData target, MapperContext context)
     {
         target.Id = source.Id;
         target.ProviderName = source.ProviderName;

@@ -10,7 +10,7 @@ public class InstallRequestModel
     public UserInstallResponseModel User { get; set; } = null!;
 
     [Required]
-    public DatabaseInstallResponseModel Database { get; set; } = null!;
+    public DatabaseInstallViewModel Database { get; set; } = null!;
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public TelemetryLevel TelemetryLevel { get; set; } = TelemetryLevel.Basic;
