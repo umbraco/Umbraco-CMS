@@ -41,6 +41,7 @@
 				"local-rules/bad-type-import": "error",
 				"local-rules/no-direct-api-import": "warn",
 				"local-rules/prefer-import-aliases": "error",
+				"local-rules/enforce-umb-prefix-on-element-name": "error",
 				"local-rules/enforce-element-suffix-on-element-class-name": "error",
 				"local-rules/umb-class-prefix": "error",
 				"local-rules/prefer-static-styles-last": "warn",
@@ -51,7 +52,8 @@
 						"exceptions": ["@umbraco-cms", "@open-wc/testing", "@storybook", "msw", "."]
 					}
 				],
-				"local-rules/exported-string-constant-naming": ["error",
+				"local-rules/exported-string-constant-naming": [
+					"error",
 					{
 						"excludedFileNames": ["umbraco-package", "input-tiny-mce.defaults"] // TODO: what to do about the tiny mce defaults?
 					}

@@ -2,7 +2,7 @@
 
 const badTypeImportRule = require('./devops/eslint/rules/bad-type-import.cjs');
 const enforceElementSuffixOnElementClassNameRule = require('./devops/eslint/rules/enforce-element-suffix-on-element-class-name.cjs');
-const enforceElementSuffixOnElementNameRule = require('./devops/eslint/rules/enforce-element-suffix-on-element-name.cjs');
+const enforceUmbPrefixOnElementNameRule = require('./devops/eslint/rules/enforce-umb-prefix-on-element-name.cjs');
 const enforceUmbracoExternalImportsRule = require('./devops/eslint/rules/enforce-umbraco-external-imports.cjs');
 const ensureRelativeImportUseJsExtensionRule = require('./devops/eslint/rules/ensure-relative-import-use-js-extension.cjs');
 const exportedStringConstantNaming = require('./devops/eslint/rules/exported-string-constant-naming.cjs');
@@ -14,7 +14,7 @@ const umbClassPrefixRule = require('./devops/eslint/rules/umb-class-prefix.cjs')
 module.exports = {
 	'bad-type-import': badTypeImportRule,
 	'enforce-element-suffix-on-element-class-name': enforceElementSuffixOnElementClassNameRule,
-	'enforce-element-suffix-on-element-name': enforceElementSuffixOnElementNameRule,
+	'enforce-umb-prefix-on-element-name': enforceUmbPrefixOnElementNameRule,
 	'enforce-umbraco-external-imports': enforceUmbracoExternalImportsRule,
 	'ensure-relative-import-use-js-extension': ensureRelativeImportUseJsExtensionRule,
 	'exported-string-constant-naming': exportedStringConstantNaming,
