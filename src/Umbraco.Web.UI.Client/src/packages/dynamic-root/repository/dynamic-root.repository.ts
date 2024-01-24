@@ -1,6 +1,7 @@
 import { UmbDynamicRootServerDataSource } from './dynamic-root.server.data.js';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
+import type { DynamicRootRequestModel } from '@umbraco-cms/backoffice/backend-api';
 
 export class UmbDynamicRootRepository extends UmbBaseController {
 	#dataSource: UmbDynamicRootServerDataSource;
@@ -11,7 +12,9 @@ export class UmbDynamicRootRepository extends UmbBaseController {
 		this.#dataSource = new UmbDynamicRootServerDataSource(host);
 	}
 
-	// TODO: Implement `postDynamicRootQuery` [LK]
+	async postDynamicRootQuery(args: DynamicRootRequestModel) {
+		return this.#dataSource.postDynamicRootQuery(args);
+	}
 
 	async getQuerySteps() {
 		return this.#dataSource.getQuerySteps();
