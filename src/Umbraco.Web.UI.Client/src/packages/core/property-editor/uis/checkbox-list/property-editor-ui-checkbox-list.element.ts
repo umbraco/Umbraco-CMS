@@ -1,4 +1,5 @@
-import { UmbInputCheckboxListElement } from '../../../components/input-checkbox-list/input-checkbox-list.element.js';
+import type { UmbInputCheckboxListElement } from '../../../components/input-checkbox-list/input-checkbox-list.element.js';
+import '../../../components/input-checkbox-list/input-checkbox-list.element.js';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
