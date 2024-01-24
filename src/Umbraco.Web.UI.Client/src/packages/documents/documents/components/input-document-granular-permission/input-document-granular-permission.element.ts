@@ -69,9 +69,9 @@ export class UmbInputDocumentGranularPermissionElement extends FormControlMixin(
 			},
 		});
 
-		modalContext?.onSubmit().then((value) => {
-			//this.#setSelection(selection);
-		});
+		//modalContext?.onSubmit().then((value) => {
+		//this.#setSelection(selection);
+		//});
 	}
 
 	async #removeItem(item: DocumentItemResponseModel) {
