@@ -11,7 +11,7 @@ import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UMB_ACTION_EVENT_CONTEXT, UmbActionEventContext } from '@umbraco-cms/backoffice/action';
 import { UmbEntityActionEvent } from '@umbraco-cms/backoffice/entity-action';
-import { UmbReloadTreeItemRequestEntityActionEvent } from '@umbraco-cms/backoffice/tree';
+import { UmbReloadTreeItemChildrenRequestEntityActionEvent } from '@umbraco-cms/backoffice/tree';
 
 export type UmbTreeItemUniqueFunction<TreeItemType extends UmbTreeItemModelBase> = (
 	x: TreeItemType,
@@ -137,11 +137,11 @@ export class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemModelBase>
 		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (instance) => {
 			this.#actionEventContext = instance;
 			this.#actionEventContext.removeEventListener(
-				UmbReloadTreeItemRequestEntityActionEvent.TYPE,
+				UmbReloadTreeItemChildrenRequestEntityActionEvent.TYPE,
 				this.#onReloadRequest as EventListener,
 			);
 			this.#actionEventContext.addEventListener(
-				UmbReloadTreeItemRequestEntityActionEvent.TYPE,
+				UmbReloadTreeItemChildrenRequestEntityActionEvent.TYPE,
 				this.#onReloadRequest as EventListener,
 			);
 		});

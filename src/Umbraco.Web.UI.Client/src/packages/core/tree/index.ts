@@ -22,7 +22,10 @@ export * from './data-source/index.js';
 // Folder
 export * from './folder/index.js';
 
-// Event
-export * from './event/index.js';
+//
+export {
+	UmbReloadTreeItemChildrenEntityAction,
+	UmbReloadTreeItemChildrenRequestEntityActionEvent,
+} from './reload-tree-item-children/index.js';
 
 export { UmbTreeRepositoryBase } from './tree-repository-base.js';
