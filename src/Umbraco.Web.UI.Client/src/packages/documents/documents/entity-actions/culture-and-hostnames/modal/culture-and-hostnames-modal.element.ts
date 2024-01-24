@@ -1,6 +1,11 @@
 import { html, customElement, state, css, repeat, query } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
+import {
+	UMB_CONFIRM_MODAL,
+	UMB_MODAL_MANAGER_CONTEXT,
+	UmbModalBaseElement,
+	UmbModalManagerContext,
+} from '@umbraco-cms/backoffice/modal';
 import { UUIInputEvent, UUIPopoverContainerElement, UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLanguageRepository } from '@umbraco-cms/backoffice/language';
 import { DomainPresentationModel, LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
@@ -87,7 +92,7 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 		this._domains = this._domains.map((domain, i) => (index === i ? { ...domain, domainName } : domain));
 	}
 
-	#onRemoveDomain(index: number) {
+	async #onRemoveDomain(index: number) {
 		this._domains = this._domains.filter((d, i) => index !== i);
 	}
 
@@ -175,7 +180,7 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 						look="outline"
 						color="danger"
 						label=${this.localize.term('assignDomain_remove')}
-						@change=${() => this.#onRemoveDomain(index)}>
+						@click=${() => this.#onRemoveDomain(index)}>
 						<uui-icon name="icon-trash"></uui-icon>
 					</uui-button>
 				`,
