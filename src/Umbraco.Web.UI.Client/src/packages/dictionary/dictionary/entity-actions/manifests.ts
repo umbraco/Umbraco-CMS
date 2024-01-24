@@ -1,5 +1,5 @@
 import { UMB_DICTIONARY_REPOSITORY_ALIAS } from '../repository/manifests.js';
-import { UMB_DICTIONARY_ENTITY_TYPE, UMB_DICTIONARY_ROOT_ENTITY_TYPE } from '../entities.js';
+import { UMB_DICTIONARY_ENTITY_TYPE, UMB_DICTIONARY_ROOT_ENTITY_TYPE } from '../entity.js';
 import UmbReloadDictionaryEntityAction from './reload.action.js';
 import UmbImportDictionaryEntityAction from './import/import.action.js';
 import UmbExportDictionaryEntityAction from './export/export.action.js';

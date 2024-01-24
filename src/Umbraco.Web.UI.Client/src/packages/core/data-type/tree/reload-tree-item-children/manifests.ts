@@ -12,7 +12,7 @@ export const manifests: Array<ManifestEntityAction> = [
 		type: 'entityAction',
 		alias: 'Umb.EntityAction.DataType.Tree.ReloadTreeItemChildren',
 		name: 'Reload Data Type Tree Item Children Entity Action',
-		weight: 900,
+		weight: 10,
 		api: UmbReloadTreeItemChildrenEntityAction,
 		meta: {
 			icon: 'icon-refresh',
