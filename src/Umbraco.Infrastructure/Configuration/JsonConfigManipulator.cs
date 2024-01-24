@@ -4,11 +4,13 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.Json;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 
-namespace Umbraco.Cms.Core.Configuration;
+namespace Umbraco.Cms.Infrastructure.Configuration;
 
-public class JsonConfigManipulator : IConfigManipulator
+internal class JsonConfigManipulator : IConfigManipulator
 {
     private const string ConnectionStringObjectName = "ConnectionStrings";
     private const string UmbracoConnectionStringPath = $"{ConnectionStringObjectName}:{Constants.System.UmbracoConnectionName}";

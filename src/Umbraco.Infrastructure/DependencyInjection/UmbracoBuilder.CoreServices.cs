@@ -42,6 +42,7 @@ using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Core.Trees;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Core.Webhooks;
+using Umbraco.Cms.Infrastructure.Configuration;
 using Umbraco.Cms.Infrastructure.DeliveryApi;
 using Umbraco.Cms.Infrastructure.DistributedLocking;
 using Umbraco.Cms.Infrastructure.Examine;
