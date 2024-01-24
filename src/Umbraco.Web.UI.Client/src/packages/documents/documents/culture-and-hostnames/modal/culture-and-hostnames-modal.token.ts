@@ -16,6 +16,6 @@ export const UMB_CULTURE_AND_HOSTNAMES_MODAL = new UmbModalToken<
 >('Umb.Modal.CultureAndHostnames', {
 	modal: {
 		type: 'sidebar',
-		size: 'small',
+		size: 'medium',
 	},
 });

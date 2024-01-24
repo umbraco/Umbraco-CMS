@@ -267,30 +267,6 @@ export class UmbDocumentRepository extends UmbBaseController implements UmbApi {
 		alert('sort');
 	}
 
-	async getCultureAndHostnames(id: string) {
-		if (!id) throw new Error('Id is missing');
-		await this.#init;
-
-		const { data, error } = await this.#detailDataSource.getDomains(id);
-		if (!error) {
-			return { data };
-		}
-		return { error };
-	}
-
-	async saveCultureAndHostnames(id: string, data: any) {
-		if (!id) throw new Error('Id is missing');
-		if (!data) throw new Error('Data is missing');
-		await this.#init;
-
-		const { error } = await this.#detailDataSource.updateDomains(id, data);
-		if (!error) {
-			const notification = { data: { message: `Cultures and hostnames saved` } };
-			this.#notificationContext?.peek('positive', notification);
-		}
-		return { error };
-	}
-
 	async setPermissions() {
 		alert('set permissions');
 	}

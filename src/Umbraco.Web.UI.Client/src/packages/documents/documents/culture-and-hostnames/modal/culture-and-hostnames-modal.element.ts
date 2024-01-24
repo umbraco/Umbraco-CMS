@@ -1,18 +1,21 @@
-import { UmbDocumentRepository } from '../../repository/document.repository.js';
 import { html, customElement, state, css, repeat, query } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UUIInputEvent, UUIPopoverContainerElement, UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLanguageRepository } from '@umbraco-cms/backoffice/language';
 import { DomainPresentationModel, LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbCultureAndHostnamesModalData, UmbCultureAndHostnamesModalValue } from '@umbraco-cms/backoffice/document';
+import {
+	UmbCultureAndHostnamesModalData,
+	UmbCultureAndHostnamesModalValue,
+	UmbDocumentCultureAndHostnamesRepository,
+} from '@umbraco-cms/backoffice/document';
 
 @customElement('umb-culture-and-hostnames-modal')
 export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 	UmbCultureAndHostnamesModalData,
 	UmbCultureAndHostnamesModalValue
 > {
-	#documentRepository = new UmbDocumentRepository(this);
+	#documentRepository = new UmbDocumentCultureAndHostnamesRepository(this);
 	#languageRepository = new UmbLanguageRepository(this);
 
 	#unique?: string | null;
@@ -27,15 +30,7 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 	@query('#more-options')
 	popoverContainerElement?: UUIPopoverContainerElement;
 
-	#handleCancel() {
-		this.modalContext?.reject();
-	}
-
-	async #handleSave() {
-		const { error } = await this.#documentRepository.saveCultureAndHostnames(this.#unique!, this.value);
-		if (error) return;
-		this.modalContext?.submit();
-	}
+	// Init
 
 	firstUpdated() {
 		this.#unique = this.data?.unique;
@@ -44,7 +39,7 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 
 	async #getDomains() {
 		if (!this.#unique) return;
-		const { data } = await this.#documentRepository.getCultureAndHostnames(this.#unique);
+		const { data } = await this.#documentRepository.readCultureAndHostnames(this.#unique);
 
 		if (!data) return;
 		this._domains = data.domains.map((domain) => ({ isoCode: domain.isoCode, domainName: domain.domainName }));
@@ -67,6 +62,20 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 		options.unshift({ value: 'inherit', name: 'Inherit', selected: defaultIsoCode ? false : true });
 		this._options = options;
 	}
+
+	// Modal
+
+	async #handleSave() {
+		const { error } = await this.#documentRepository.updateCultureAndHostnames(this.#unique!, this.value);
+		if (error) return;
+		this.modalContext?.submit();
+	}
+
+	#handleCancel() {
+		this.modalContext?.reject();
+	}
+
+	// Events
 
 	#onChangeLanguage(e: UUISelectEvent) {
 		const documentIsoCode = e.target.value as string;
@@ -111,6 +120,8 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 
 		this.value = { ...this.value, domains: this._domains };
 	}
+
+	// Render
 
 	render() {
 		return html`
@@ -164,19 +175,27 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 					value: model.isoCode,
 					selected: domain.isoCode ? domain.isoCode === model.isoCode : model.isDefault,
 				}));
-				return html`<uui-button-group class="domain">
+				return html`<div class="domain">
 					<uui-input
 						label=${this.localize.term('assignDomain_domain')}
 						value=${domain.domainName}
 						@change=${(e: UUIInputEvent) => this.#changeDomainName(e, index)}></uui-input>
-					<uui-select
+					<uui-combobox
+						.value=${options.find((option) => option.selected)?.value as string}
 						label=${this.localize.term('assignDomain_language')}
-						.options=${options}
-						@change=${(e: UUISelectEvent) => this.#changeIsoCode(e, index)}></uui-select>
-					<uui-button look="outline" color="danger" label=${this.localize.term('assignDomain_remove')} compact>
+						@change=${(e: UUISelectEvent) => this.#changeIsoCode(e, index)}>
+						<uui-combobox-list>
+							${options.map(
+								(option) =>
+									html`<uui-combobox-list-option .value=${option.value}> ${option.name} </uui-combobox-list-option>`,
+							)}
+						</uui-combobox-list>
+					</uui-combobox>
+
+					<uui-button look="outline" color="danger" label=${this.localize.term('assignDomain_remove')}>
 						<uui-icon name="icon-trash" @click=${() => this.#remove(index)}></uui-icon>
 					</uui-button>
-				</uui-button-group>`;
+				</div> `;
 			},
 		)}`;
 	}
@@ -191,7 +210,6 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 				id="dropdown"
 				label=${this.localize.term('buttons_select')}
 				look="placeholder"
-				compact
 				popovertarget="more-options">
 				<uui-icon name="icon-navigation-down"></uui-icon>
 			</uui-button>
