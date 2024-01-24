@@ -36,7 +36,7 @@ export class UmbInputMediaElement extends FormControlMixin(UmbLitElement) {
 	public get min(): number {
 		return this.#pickerContext.min;
 	}
-	public set min(value: number) {
+	public set min(value: number | undefined) {
 		this.#pickerContext.min = value;
 	}
 
