@@ -21,7 +21,6 @@ export class UmbDynamicRootQueryStepPickerModalModalElement extends UmbModalBase
 	}
 
 	async #getDynamicRootQuerySteps() {
-
 		const { data } = await this.#dynamicRootRepository.getQuerySteps();
 		console.log('steps', data);
 	}
