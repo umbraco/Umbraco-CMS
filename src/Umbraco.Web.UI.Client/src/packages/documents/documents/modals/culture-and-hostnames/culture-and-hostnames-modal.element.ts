@@ -117,11 +117,18 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 			<umb-body-layout headline=${this.localize.term('actions_assigndomain')}>
 				<uui-box headline=${this.localize.term('assignDomain_setLanguage')}>
 					<uui-label for="select">${this.localize.term('assignDomain_language')}</uui-label>
-					<uui-select
+					<uui-combobox
 						id="select"
 						label=${this.localize.term('assignDomain_language')}
-						@change=${this.#onChangeLanguage}
-						.options=${this._options}></uui-select>
+						.value=${this._options.find((option) => option.selected)?.value as string}
+						@change=${this.#onChangeLanguage}>
+						<uui-combobox-list>
+							${this._options.map(
+								(option) =>
+									html`<uui-combobox-list-option .value=${option.value}> ${option.name} </uui-combobox-list-option>`,
+							)}
+						</uui-combobox-list>
+					</uui-combobox>
 				</uui-box>
 				<uui-box headline=${this.localize.term('assignDomain_setDomains')}>
 					<umb-localize key="assignDomain_domainHelpWithVariants">
@@ -222,6 +229,10 @@ export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<
 				margin-bottom: var(--uui-size-2);
 				grid-template-columns: 1fr 1fr auto;
 				background-color: var(--uui-interface-surface-alt);
+			}
+
+			uui-combobox {
+				display: block;
 			}
 		`,
 	];
