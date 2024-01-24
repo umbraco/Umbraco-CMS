@@ -344,10 +344,6 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 				line-height: 1 !important;
 			}
 
-			/* Solves issue 1019 by lowering un-needed z-index on header.*/
-			.tox.tox-tinymce .tox-editor-header {
-				z-index:0;
-			}
 		`,
 	];
 }
