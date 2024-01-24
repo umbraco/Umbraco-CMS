@@ -219,7 +219,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
                 });
 
                 // Update configuration and wait for change
-                _configManipulator.SaveConnectionString(connectionString, providerName);
+                _configManipulator.SaveConnectionStringAsync(connectionString, providerName).GetAwaiter().GetResult();
                 if (!isChanged.WaitOne(10_000))
                 {
                     throw new InstallException("Didn't retrieve updated connection string within 10 seconds, try manual configuration instead.");
