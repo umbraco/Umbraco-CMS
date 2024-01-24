@@ -11,8 +11,8 @@ import { UmbFolderRepository } from '@umbraco-cms/backoffice/tree';
 export class UmbDeleteFolderEntityAction<T extends UmbFolderRepository> extends UmbEntityActionBase<T> {
 	#modalContext?: UmbModalManagerContext;
 
-	constructor(host: UmbControllerHostElement, repositoryAlias: string, unique: string) {
-		super(host, repositoryAlias, unique);
+	constructor(host: UmbControllerHostElement, repositoryAlias: string, unique: string, entityType: string) {
+		super(host, repositoryAlias, unique, entityType);
 
 		new UmbContextConsumerController(this._host, UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
 			this.#modalContext = instance;

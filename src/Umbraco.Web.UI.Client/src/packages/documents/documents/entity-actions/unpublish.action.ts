@@ -3,8 +3,8 @@ import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbUnpublishDocumentEntityAction extends UmbEntityActionBase<UmbDocumentRepository> {
-	constructor(host: UmbControllerHostElement, repositoryAlias: string, unique: string) {
-		super(host, repositoryAlias, unique);
+	constructor(host: UmbControllerHostElement, repositoryAlias: string, unique: string, entityType: string) {
+		super(host, repositoryAlias, unique, entityType);
 	}
 
 	async execute() {

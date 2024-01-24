@@ -6,8 +6,8 @@ import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api
 export default class UmbReloadDictionaryEntityAction extends UmbEntityActionBase<UmbDictionaryRepository> {
 	static styles = [UmbTextStyles];
 
-	constructor(host: UmbControllerHostElement, repositoryAlias: string, unique: string) {
-		super(host, repositoryAlias, unique);
+	constructor(host: UmbControllerHostElement, repositoryAlias: string, unique: string, entityType: string) {
+		super(host, repositoryAlias, unique, entityType);
 	}
 
 	async execute() {

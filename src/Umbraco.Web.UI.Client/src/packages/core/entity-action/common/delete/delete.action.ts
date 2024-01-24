@@ -13,8 +13,8 @@ export class UmbDeleteEntityAction<
 > extends UmbEntityActionBase<T> {
 	#modalManager?: UmbModalManagerContext;
 
-	constructor(host: UmbControllerHostElement, repositoryAlias: string, unique: string) {
-		super(host, repositoryAlias, unique);
+	constructor(host: UmbControllerHostElement, repositoryAlias: string, unique: string, entityType: string) {
+		super(host, repositoryAlias, unique, entityType);
 
 		new UmbContextConsumerController(this._host, UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
 			this.#modalManager = instance;

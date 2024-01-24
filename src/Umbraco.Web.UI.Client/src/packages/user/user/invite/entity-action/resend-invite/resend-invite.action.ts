@@ -7,8 +7,8 @@ import { type UmbModalManagerContext, UMB_MODAL_MANAGER_CONTEXT_TOKEN } from '@u
 export class UmbResendInviteToUserEntityAction extends UmbEntityActionBase<UmbEnableUserRepository> {
 	#modalManager?: UmbModalManagerContext;
 
-	constructor(host: UmbControllerHostElement, repositoryAlias: string, unique: string) {
-		super(host, repositoryAlias, unique);
+	constructor(host: UmbControllerHostElement, repositoryAlias: string, unique: string, entityType: string) {
+		super(host, repositoryAlias, unique, entityType);
 
 		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
 			this.#modalManager = instance;
