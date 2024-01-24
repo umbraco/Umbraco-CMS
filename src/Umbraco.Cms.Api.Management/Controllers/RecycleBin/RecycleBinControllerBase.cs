@@ -6,12 +6,12 @@ using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Api.Management.Services.Paging;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
-using Umbraco.Cms.Api.Management.ViewModels.Item;
+using Umbraco.Cms.Api.Management.Content;
 using Umbraco.Cms.Api.Management.ViewModels.RecycleBin;
 
 namespace Umbraco.Cms.Api.Management.Controllers.RecycleBin;
 
-public abstract class RecycleBinControllerBase<TItem> : ManagementApiControllerBase
+public abstract class RecycleBinControllerBase<TItem> : ContentControllerBase
     where TItem : RecycleBinItemResponseModelBase, new()
 {
     private readonly IEntityService _entityService;

@@ -50,7 +50,6 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddUnique<IPackagingService, PackagingService>();
         builder.Services.AddUnique<IServerInformationService, ServerInformationService>();
         builder.Services.AddUnique<IServerRegistrationService, ServerRegistrationService>();
-        builder.Services.AddUnique<ITwoFactorLoginService, TwoFactorLoginService>();
         builder.Services.AddTransient(CreateLocalizedTextServiceFileSourcesFactory);
         builder.Services.AddUnique(factory => CreatePackageRepository(factory, "createdPackages.config"));
         builder.Services.AddUnique<ICreatedPackagesRepository, CreatedPackageSchemaRepository>();
