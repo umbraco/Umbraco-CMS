@@ -43,7 +43,7 @@ export class UmbPickerInputContext<ItemType extends { name: string }> extends Um
 	public get min() {
 		return this._min;
 	}
-	public set min(value: number | undefined) {
+	public set min(value) {
 		this._min = value === undefined ? 0 : value;
 	}
 	private _min = 0;
