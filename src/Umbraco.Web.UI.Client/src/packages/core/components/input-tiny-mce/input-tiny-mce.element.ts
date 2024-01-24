@@ -44,7 +44,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	set value(newValue: FormDataEntryValue | FormData) {
-		this._value = newValue;
+		super.value = newValue;
 		const newContent = newValue?.toString() ?? '';
 
 		if(this.#editorRef && this.#editorRef.getContent() != newContent) {
