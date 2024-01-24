@@ -41,6 +41,4 @@ export class UmbSectionSidebarContext {
 	}
 }
 
-export const UMB_SECTION_SIDEBAR_CONTEXT_TOKEN = new UmbContextToken<UmbSectionSidebarContext>(
-	'UmbSectionSidebarContext',
-);
+export const UMB_SECTION_SIDEBAR_CONTEXT = new UmbContextToken<UmbSectionSidebarContext>('UmbSectionSidebarContext');

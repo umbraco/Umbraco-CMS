@@ -129,4 +129,4 @@ export class UmbInstallerContext {
 	}
 }
 
-export const UMB_INSTALLER_CONTEXT_TOKEN = new UmbContextToken<UmbInstallerContext>('UmbInstallerContext');
+export const UMB_INSTALLER_CONTEXT = new UmbContextToken<UmbInstallerContext>('UmbInstallerContext');

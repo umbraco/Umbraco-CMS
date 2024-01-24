@@ -1,7 +1,7 @@
 import { UmbCodeEditorController } from './code-editor.controller.js';
 import type { CodeEditorLanguage, CodeEditorSearchOptions, UmbCodeEditorHost } from './code-editor.model.js';
 import { CodeEditorTheme } from './code-editor.model.js';
-import { UMB_THEME_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/themes';
+import { UMB_THEME_CONTEXT } from '@umbraco-cms/backoffice/themes';
 import { monacoEditorStyles, monacoJumpingCursorHack } from '@umbraco-cms/backoffice/external/monaco-editor';
 import {
 	css,
@@ -98,7 +98,7 @@ export class UmbCodeEditorElement extends UmbLitElement implements UmbCodeEditor
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_THEME_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_THEME_CONTEXT, (instance) => {
 			this.observe(
 				instance.theme,
 				(themeAlias) => {

@@ -4,7 +4,7 @@ import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api
 import {
 	UmbNotificationDefaultData,
 	UmbNotificationContext,
-	UMB_NOTIFICATION_CONTEXT_TOKEN,
+	UMB_NOTIFICATION_CONTEXT,
 } from '@umbraco-cms/backoffice/notification';
 import { UmbObjectState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { UmbEntityDetailStore } from '@umbraco-cms/backoffice/store';
@@ -35,7 +35,7 @@ export class UmbEntityWorkspaceManager<
 		this._host = host;
 		this._entityType = entityType;
 
-		new UmbContextConsumerController(this._host, UMB_NOTIFICATION_CONTEXT_TOKEN, (_instance) => {
+		new UmbContextConsumerController(this._host, UMB_NOTIFICATION_CONTEXT, (_instance) => {
 			this._notificationContext = _instance;
 		});
 

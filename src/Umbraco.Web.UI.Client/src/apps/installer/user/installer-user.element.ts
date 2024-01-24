@@ -1,4 +1,4 @@
-import { UmbInstallerContext, UMB_INSTALLER_CONTEXT_TOKEN } from '../installer.context.js';
+import { UmbInstallerContext, UMB_INSTALLER_CONTEXT } from '../installer.context.js';
 import { css, CSSResultGroup, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
@@ -12,7 +12,7 @@ export class UmbInstallerUserElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_INSTALLER_CONTEXT_TOKEN, (installerContext) => {
+		this.consumeContext(UMB_INSTALLER_CONTEXT, (installerContext) => {
 			this._installerContext = installerContext;
 			this._observeInstallerData();
 		});

@@ -14,7 +14,7 @@ export class UmbDictionaryStore extends UmbStoreBase {
 	constructor(host: UmbControllerHostElement) {
 		super(
 			host,
-			UMB_DICTIONARY_STORE_CONTEXT_TOKEN.toString(),
+			UMB_DICTIONARY_STORE_CONTEXT.toString(),
 			new UmbArrayState<DictionaryItemResponseModel>([], (x) => x.id),
 		);
 	}
@@ -37,4 +37,4 @@ export class UmbDictionaryStore extends UmbStoreBase {
 	}
 }
 
-export const UMB_DICTIONARY_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbDictionaryStore>('UmbDictionaryStore');
+export const UMB_DICTIONARY_STORE_CONTEXT = new UmbContextToken<UmbDictionaryStore>('UmbDictionaryStore');

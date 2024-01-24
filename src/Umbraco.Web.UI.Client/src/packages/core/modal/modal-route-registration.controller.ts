@@ -1,6 +1,6 @@
 import { UmbModalRouteRegistration } from './modal-route-registration.js';
 import { UmbModalToken } from './token/index.js';
-import { UMB_ROUTE_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/router';
+import { UMB_ROUTE_CONTEXT } from '@umbraco-cms/backoffice/router';
 import type { UmbController, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 
@@ -15,7 +15,7 @@ export class UmbModalRouteRegistrationController<D extends object = object, R = 
 	#additionalPath?: string;
 	#uniquePaths: Map<string, string | undefined> = new Map();
 
-	#routeContext?: typeof UMB_ROUTE_CONTEXT_TOKEN.TYPE;
+	#routeContext?: typeof UMB_ROUTE_CONTEXT.TYPE;
 	#modalRegistration?: UmbModalRouteRegistration;
 
 	public get controllerAlias() {
@@ -35,7 +35,7 @@ export class UmbModalRouteRegistrationController<D extends object = object, R = 
 		super(alias, null);
 		this.#host = host;
 
-		this.#init = new UmbContextConsumerController(host, UMB_ROUTE_CONTEXT_TOKEN, (_routeContext) => {
+		this.#init = new UmbContextConsumerController(host, UMB_ROUTE_CONTEXT, (_routeContext) => {
 			this.#routeContext = _routeContext;
 			this.#registerModal();
 		}).asPromise();

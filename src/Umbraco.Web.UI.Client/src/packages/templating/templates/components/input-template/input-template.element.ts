@@ -8,7 +8,7 @@ import {
 	UMB_TEMPLATE_PICKER_MODAL,
 	UMB_TEMPLATE_MODAL,
 	UmbModalManagerContext,
-	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
+	UMB_MODAL_MANAGER_CONTEXT,
 } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { ItemResponseModelBaseModel, TemplateResponseModel } from '@umbraco-cms/backoffice/backend-api';
@@ -81,7 +81,7 @@ export class UmbInputTemplateElement extends FormControlMixin(UmbLitElement) {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
 			this._modalContext = instance;
 		});
 	}

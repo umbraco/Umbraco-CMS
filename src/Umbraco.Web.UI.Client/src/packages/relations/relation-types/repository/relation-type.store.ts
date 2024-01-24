@@ -4,7 +4,7 @@ import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
-export const UMB_RELATION_TYPE_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbRelationTypeStore>('UmbRelationTypeStore');
+export const UMB_RELATION_TYPE_STORE_CONTEXT = new UmbContextToken<UmbRelationTypeStore>('UmbRelationTypeStore');
 
 /**
  * @export
@@ -21,7 +21,7 @@ export class UmbRelationTypeStore extends UmbStoreBase {
 	constructor(host: UmbControllerHostElement) {
 		super(
 			host,
-			UMB_RELATION_TYPE_STORE_CONTEXT_TOKEN.toString(),
+			UMB_RELATION_TYPE_STORE_CONTEXT.toString(),
 			new UmbArrayState<RelationTypeResponseModel>([], (x) => x.id),
 		);
 	}

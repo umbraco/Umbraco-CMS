@@ -1,7 +1,7 @@
 import { UMB_DATA_TYPE_TREE_STORE_CONTEXT, UmbDataTypeTreeStore } from '../../tree/data-type-tree.store.js';
 import { UmbDataTypeDetailRepository } from '../detail/data-type-detail.repository.js';
 import { UmbDataTypeCopyServerDataSource } from './data-type-copy.server.data-source.js';
-import { UMB_NOTIFICATION_CONTEXT_TOKEN, UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
+import { UMB_NOTIFICATION_CONTEXT, UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbCopyDataSource, UmbCopyRepository, UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 
@@ -22,7 +22,7 @@ export class UmbCopyDataTypeRepository extends UmbRepositoryBase implements UmbC
 				this.#treeStore = instance;
 			}).asPromise(),
 
-			this.consumeContext(UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
+			this.consumeContext(UMB_NOTIFICATION_CONTEXT, (instance) => {
 				this.#notificationContext = instance;
 			}).asPromise(),
 		]);

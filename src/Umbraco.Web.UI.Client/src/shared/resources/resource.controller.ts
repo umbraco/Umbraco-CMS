@@ -2,7 +2,7 @@
 import { isApiError, isCancelError, isCancelablePromise } from './apiTypeValidators.function.js';
 import {
 	UmbNotificationContext,
-	UMB_NOTIFICATION_CONTEXT_TOKEN,
+	UMB_NOTIFICATION_CONTEXT,
 	UmbNotificationOptions,
 } from '@umbraco-cms/backoffice/notification';
 import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -20,7 +20,7 @@ export class UmbResourceController extends UmbBaseController {
 
 		this.#promise = promise;
 
-		new UmbContextConsumerController(host, UMB_NOTIFICATION_CONTEXT_TOKEN, (_instance) => {
+		new UmbContextConsumerController(host, UMB_NOTIFICATION_CONTEXT, (_instance) => {
 			this.#notificationContext = _instance;
 		});
 	}

@@ -7,7 +7,7 @@ import { UmbTemplateQueryBuilderServerDataSource } from './sources/template.quer
 import type { UmbItemDataSource, UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
+import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import type {
 	CreateTemplateRequestModel,
 	TemplateItemResponseModel,
@@ -52,7 +52,7 @@ export class UmbTemplateRepository
 				this.#store = instance;
 			}),
 
-			this.consumeContext(UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
+			this.consumeContext(UMB_NOTIFICATION_CONTEXT, (instance) => {
 				this.#notificationContext = instance;
 			}),
 		]);

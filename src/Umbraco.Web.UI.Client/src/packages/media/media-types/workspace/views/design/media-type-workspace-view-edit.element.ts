@@ -13,7 +13,7 @@ import {
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
-import { UMB_CONFIRM_MODAL, UMB_MODAL_MANAGER_CONTEXT_TOKEN, UmbConfirmModalData } from '@umbraco-cms/backoffice/modal';
+import { UMB_CONFIRM_MODAL, UMB_MODAL_MANAGER_CONTEXT, UmbConfirmModalData } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbSorterConfig, UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 
@@ -88,7 +88,7 @@ export class UmbMediaTypeWorkspaceViewEditElement extends UmbLitElement implemen
 
 	private _tabsStructureHelper = new UmbContentTypeContainerStructureHelper<UmbMediaTypeDetailModel>(this);
 
-	private _modalManagerContext?: typeof UMB_MODAL_MANAGER_CONTEXT_TOKEN.TYPE;
+	private _modalManagerContext?: typeof UMB_MODAL_MANAGER_CONTEXT.TYPE;
 
 	constructor() {
 		super();
@@ -116,7 +116,7 @@ export class UmbMediaTypeWorkspaceViewEditElement extends UmbLitElement implemen
 			this._observeRootGroups();
 		});
 
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (context) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (context) => {
 			this._modalManagerContext = context;
 		});
 	}

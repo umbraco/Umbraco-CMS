@@ -9,7 +9,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import {
 	UMB_LINK_PICKER_MODAL,
 	UMB_MEDIA_TREE_PICKER_MODAL,
-	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
+	UMB_MODAL_MANAGER_CONTEXT,
 	UmbModalManagerContext,
 } from '@umbraco-cms/backoffice/modal';
 import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
@@ -47,7 +47,7 @@ export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 	constructor() {
 		super();
 		this.#loadCodeEditor();
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
 			this._modalContext = instance;
 		});
 		this.consumeContext(UMB_APP_CONTEXT, (instance) => {

@@ -4,7 +4,7 @@ import {
 	UmbEmbeddedMediaModalValue,
 	UMB_EMBEDDED_MEDIA_MODAL,
 	UmbModalManagerContext,
-	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
+	UMB_MODAL_MANAGER_CONTEXT,
 } from '@umbraco-cms/backoffice/modal';
 
 export default class UmbTinyMceEmbeddedMediaPlugin extends UmbTinyMcePluginBase {
@@ -13,7 +13,7 @@ export default class UmbTinyMceEmbeddedMediaPlugin extends UmbTinyMcePluginBase 
 	constructor(args: TinyMcePluginArguments) {
 		super(args);
 
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (modalContext) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (modalContext) => {
 			this.#modalContext = modalContext;
 		});
 

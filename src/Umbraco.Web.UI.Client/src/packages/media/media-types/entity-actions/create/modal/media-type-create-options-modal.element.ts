@@ -5,7 +5,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import {
 	type UmbModalManagerContext,
 	type UmbModalContext,
-	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
+	UMB_MODAL_MANAGER_CONTEXT,
 } from '@umbraco-cms/backoffice/modal';
 import { UMB_FOLDER_CREATE_MODAL } from '@umbraco-cms/backoffice/tree';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -22,7 +22,7 @@ export class UmbDataTypeCreateOptionsModalElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
 			this.#modalContext = instance;
 		});
 	}

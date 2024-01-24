@@ -1,10 +1,6 @@
 import { css, html, nothing, customElement, property, query } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin, UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
-import {
-	UmbModalManagerContext,
-	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
-	UMB_CONFIRM_MODAL,
-} from '@umbraco-cms/backoffice/modal';
+import { UmbModalManagerContext, UMB_MODAL_MANAGER_CONTEXT, UMB_CONFIRM_MODAL } from '@umbraco-cms/backoffice/modal';
 import { UmbChangeEvent, UmbInputEvent, UmbDeleteEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
@@ -39,7 +35,7 @@ export class UmbInputMultipleTextStringItemElement extends FormControlMixin(UmbL
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
 			this._modalContext = instance;
 		});
 	}

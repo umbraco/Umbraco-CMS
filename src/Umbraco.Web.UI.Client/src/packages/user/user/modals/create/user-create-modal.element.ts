@@ -4,7 +4,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, query } from '@umbraco-cms/backoffice/external/lit';
 import {
 	UmbModalBaseElement,
-	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
+	UMB_MODAL_MANAGER_CONTEXT,
 	UMB_CREATE_USER_SUCCESS_MODAL,
 	UmbModalManagerContext,
 } from '@umbraco-cms/backoffice/modal';
@@ -20,7 +20,7 @@ export class UmbUserCreateModalElement extends UmbModalBaseElement {
 	connectedCallback(): void {
 		super.connectedCallback();
 
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (_instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (_instance) => {
 			this.#modalManagerContext = _instance;
 		});
 	}

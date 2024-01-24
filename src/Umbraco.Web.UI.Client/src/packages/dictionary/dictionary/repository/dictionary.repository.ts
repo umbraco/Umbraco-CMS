@@ -1,5 +1,5 @@
 import { type UmbDictionaryTreeStore, UMB_DICTIONARY_TREE_STORE_CONTEXT } from '../tree/index.js';
-import { UmbDictionaryStore, UMB_DICTIONARY_STORE_CONTEXT_TOKEN } from './dictionary.store.js';
+import { UmbDictionaryStore, UMB_DICTIONARY_STORE_CONTEXT } from './dictionary.store.js';
 import { UmbDictionaryDetailServerDataSource } from './sources/dictionary-detail.server.data-source.js';
 import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
@@ -7,7 +7,7 @@ import type {
 	CreateDictionaryItemRequestModel,
 	UpdateDictionaryItemRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
-import { type UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
+import { type UmbNotificationContext, UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import { UmbTemporaryFileRepository } from '@umbraco-cms/backoffice/temporary-file';
 
@@ -27,7 +27,7 @@ export class UmbDictionaryRepository extends UmbBaseController implements UmbApi
 		super(host);
 
 		this.#init = Promise.all([
-			this.consumeContext(UMB_DICTIONARY_STORE_CONTEXT_TOKEN, (instance) => {
+			this.consumeContext(UMB_DICTIONARY_STORE_CONTEXT, (instance) => {
 				this.#detailStore = instance;
 			}),
 
@@ -35,7 +35,7 @@ export class UmbDictionaryRepository extends UmbBaseController implements UmbApi
 				this.#treeStore = instance;
 			}),
 
-			this.consumeContext(UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
+			this.consumeContext(UMB_NOTIFICATION_CONTEXT, (instance) => {
 				this.#notificationContext = instance;
 			}),
 		]);

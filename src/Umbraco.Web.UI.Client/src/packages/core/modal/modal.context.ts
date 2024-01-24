@@ -131,4 +131,4 @@ export class UmbModalContext<ModalPreset extends object = object, ModalValue = a
 	}
 }
 
-export const UMB_MODAL_CONTEXT_TOKEN = new UmbContextToken<UmbModalContext>('UmbModalContext');
+export const UMB_MODAL_CONTEXT = new UmbContextToken<UmbModalContext>('UmbModalContext');

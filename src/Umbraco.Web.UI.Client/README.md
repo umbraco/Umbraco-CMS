@@ -44,7 +44,7 @@ Then create a dashboard.js file the same folder.
 
 ```javascript
 import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
-import { UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
+import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 
 const template = document.createElement('template');
 template.innerHTML = `
@@ -75,7 +75,7 @@ export default class MyDashboardElement extends UmbElementMixin(HTMLElement) {
 
 		this.shadowRoot.getElementById('clickMe').addEventListener('click', this.onClick.bind(this));
 
-		this.consumeContext(UMB_NOTIFICATION_CONTEXT_TOKEN, (_instance) => {
+		this.consumeContext(UMB_NOTIFICATION_CONTEXT, (_instance) => {
 			this.#notificationContext = _instance;
 		});
 	}
@@ -109,7 +109,7 @@ Then go to the element located in `src/my-element.ts` and replace it with the fo
 // src/my-element.ts
 import { LitElement, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
-import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
+import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 
 @customElement('my-element')
 export default class MyElement extends UmbElementMixin(LitElement) {
@@ -117,7 +117,7 @@ export default class MyElement extends UmbElementMixin(LitElement) {
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_NOTIFICATION_CONTEXT_TOKEN, (_instance) => {
+		this.consumeContext(UMB_NOTIFICATION_CONTEXT, (_instance) => {
 			this._notificationContext = _instance;
 		});
 	}

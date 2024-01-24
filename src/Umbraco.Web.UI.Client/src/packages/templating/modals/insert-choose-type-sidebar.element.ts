@@ -1,7 +1,7 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import {
-	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
+	UMB_MODAL_MANAGER_CONTEXT,
 	UmbModalManagerContext,
 	UMB_PARTIAL_VIEW_PICKER_MODAL,
 	UmbModalContext,
@@ -37,7 +37,7 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
 			this._modalContext = instance;
 		});
 	}
