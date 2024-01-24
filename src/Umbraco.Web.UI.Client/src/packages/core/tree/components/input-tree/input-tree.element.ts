@@ -35,13 +35,13 @@ export class UmbInputTreeElement extends FormControlMixin(UmbLitElement) {
 	@property({ type: Number })
 	max = 0;
 
-	private _filter: Array<string> = [];
+	private _allowedContentTypeIds: Array<string> = [];
 	@property()
-	public set filter(value: string) {
-		this._filter = value.split(',');
+	public set allowedContentTypeIds(value: string) {
+		this._allowedContentTypeIds = value ? value.split(',') : [];
 	}
-	public get filter(): string {
-		return this._filter.join(',');
+	public get allowedContentTypeIds(): string {
+		return this._allowedContentTypeIds.join(',');
 	}
 
 	@property({ type: Boolean })
@@ -104,7 +104,7 @@ export class UmbInputTreeElement extends FormControlMixin(UmbLitElement) {
 		return html`<umb-input-document
 			.selectedIds=${this.selectedIds}
 			.startNodeId=${this.startNodeId}
-			.filter=${this.filter}
+			.allowedContentTypeIds=${this._allowedContentTypeIds}
 			.min=${this.min}
 			.max=${this.max}
 			?showOpenButton=${this.showOpenButton}
@@ -115,7 +115,7 @@ export class UmbInputTreeElement extends FormControlMixin(UmbLitElement) {
 	#renderMediaPicker() {
 		return html`<umb-input-media
 			.selectedIds=${this.selectedIds}
-			.filter=${this.filter}
+			.allowedContentTypeIds=${this._allowedContentTypeIds}
 			.min=${this.min}
 			.max=${this.max}
 			?showOpenButton=${this.showOpenButton}
@@ -126,7 +126,7 @@ export class UmbInputTreeElement extends FormControlMixin(UmbLitElement) {
 	#renderMemberPicker() {
 		return html`<umb-input-member
 			.selectedIds=${this.selectedIds}
-			.filter=${this.filter}
+			.allowedContentTypeIds=${this._allowedContentTypeIds}
 			.min=${this.min}
 			.max=${this.max}
 			?showOpenButton=${this.showOpenButton}

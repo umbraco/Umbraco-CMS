@@ -6,3 +6,4 @@
 import type { ServerConfigurationBaseModel } from './ServerConfigurationBaseModel';
 
 export type ServerTroubleshootingResponseModel = ServerConfigurationBaseModel;
+

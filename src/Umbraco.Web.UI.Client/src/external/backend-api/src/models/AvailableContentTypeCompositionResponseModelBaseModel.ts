@@ -10,3 +10,4 @@ export type AvailableContentTypeCompositionResponseModelBaseModel = {
     folderPath: Array<string>;
     isCompatible: boolean;
 };
+

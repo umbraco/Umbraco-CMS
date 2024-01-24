@@ -10,3 +10,4 @@ export type DynamicRootQueryRequestModel = {
     origin: DynamicRootQueryOriginRequestModel;
     steps: Array<DynamicRootQueryStepRequestModel>;
 };
+

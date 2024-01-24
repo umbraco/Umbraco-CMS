@@ -8,3 +8,4 @@ export type ContentTypeCompositionRequestModelBaseModel = {
     currentPropertyAliases: Array<string>;
     currentCompositeIds: Array<string>;
 };
+

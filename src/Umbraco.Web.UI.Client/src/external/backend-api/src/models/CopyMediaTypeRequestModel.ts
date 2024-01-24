@@ -6,3 +6,4 @@
 export type CopyMediaTypeRequestModel = {
     targetId?: string | null;
 };
+

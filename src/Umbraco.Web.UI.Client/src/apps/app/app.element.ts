@@ -77,8 +77,8 @@ export class UmbAppElement extends UmbLitElement {
 	async #setup() {
 		if (this.serverUrl === undefined) throw new Error('No serverUrl provided');
 
-		/* All requests to the server requires the base URL to be set. 
-		We make sure it happens before we get the server status. 
+		/* All requests to the server requires the base URL to be set.
+		We make sure it happens before we get the server status.
 		TODO: find the right place to set this
 		*/
 		OpenAPI.BASE = this.serverUrl;
@@ -93,7 +93,7 @@ export class UmbAppElement extends UmbLitElement {
 			// If the runtime level is "install" we should clear any cached tokens
 			// else we should try and set the auth status
 			if (this.#serverConnection.getStatus() === RuntimeLevelModel.INSTALL) {
-				await this.#authContext.signOut();
+				await this.#authContext.clearTokenStorage();
 			} else {
 				await this.#setAuthStatus();
 			}

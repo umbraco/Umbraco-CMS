@@ -104,10 +104,6 @@ export class UmbInputDocumentTypeElement extends FormControlMixin(UmbLitElement)
 			.observeRouteBuilder((routeBuilder) => {
 				this._editDocumentTypePath = routeBuilder({});
 			});
-	}
-
-	connectedCallback() {
-		super.connectedCallback();
 
 		this.addValidator(
 			'rangeUnderflow',

@@ -1,9 +1,10 @@
+import { UmbBlockListContext } from '../../context/block-list.context.js';
 import { html, css, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { type UmbBlockLayoutBaseModel } from '@umbraco-cms/backoffice/block';
 import '../ref-list-block/index.js';
-import { UmbBlockContext } from '@umbraco-cms/backoffice/block';
+import '../inline-list-block/index.js';
 import { UMB_CONFIRM_MODAL, UMB_MODAL_MANAGER_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
 
 /**
@@ -22,7 +23,7 @@ export class UmbPropertyEditorUIBlockListBlockElement extends UmbLitElement impl
 	}
 	private _layout?: UmbBlockLayoutBaseModel | undefined;
 
-	#context = new UmbBlockContext(this);
+	#context = new UmbBlockListContext(this);
 
 	@state()
 	_contentUdi?: string;
@@ -31,13 +32,16 @@ export class UmbPropertyEditorUIBlockListBlockElement extends UmbLitElement impl
 	_label = '';
 
 	@state()
-	_workspacePath?: string;
+	_workspaceEditPath?: string;
+
+	@state()
+	_inlineEditingMode?: boolean;
 
 	constructor() {
 		super();
 
-		this.observe(this.#context.workspacePath, (workspacePath) => {
-			this._workspacePath = workspacePath;
+		this.observe(this.#context.workspaceEditPath, (workspaceEditPath) => {
+			this._workspaceEditPath = workspaceEditPath;
 		});
 		this.observe(this.#context.contentUdi, (contentUdi) => {
 			this._contentUdi = contentUdi;
@@ -45,8 +49,8 @@ export class UmbPropertyEditorUIBlockListBlockElement extends UmbLitElement impl
 		this.observe(this.#context.label, (label) => {
 			this._label = label;
 		});
-		this.observe(this.#context.layout, (layout) => {
-			console.log('layout', layout);
+		this.observe(this.#context.inlineEditingMode, (inlineEditingMode) => {
+			this._inlineEditingMode = inlineEditingMode;
 		});
 	}
 
@@ -66,19 +70,19 @@ export class UmbPropertyEditorUIBlockListBlockElement extends UmbLitElement impl
 	}
 
 	#renderRefBlock() {
-		return html`<umb-ref-list-block .name=${this._label}> </umb-ref-list-block>`;
+		return html`<umb-ref-list-block .name=${this._label}></umb-ref-list-block>`;
 	}
 
-	/*#renderInlineBlock() {
-		return html`<umb-inline-list-block name="block" }}></umb-inline-list-block>`;
-	}*/
+	#renderInlineBlock() {
+		return html`<umb-inline-list-block .name=${this._label}></umb-inline-list-block>`;
+	}
 
 	#renderBlock() {
 		return html`
-			${this.#renderRefBlock()}
+			${this._inlineEditingMode ? this.#renderInlineBlock() : this.#renderRefBlock()}
 			<uui-action-bar>
-				${this._workspacePath
-					? html`<uui-button label="edit" compact href=${this._workspacePath + 'edit/' + this._contentUdi}>
+				${this._workspaceEditPath
+					? html`<uui-button label="edit" compact href=${this._workspaceEditPath}>
 							<uui-icon name="icon-edit"></uui-icon>
 					  </uui-button>`
 					: ''}
@@ -90,7 +94,7 @@ export class UmbPropertyEditorUIBlockListBlockElement extends UmbLitElement impl
 	}
 
 	render() {
-		return this.layout ? this.#renderBlock() : '';
+		return this.layout && this._contentUdi ? this.#renderBlock() : '';
 	}
 
 	static styles = [
@@ -103,6 +107,10 @@ export class UmbPropertyEditorUIBlockListBlockElement extends UmbLitElement impl
 				position: absolute;
 				top: var(--uui-size-2);
 				right: var(--uui-size-2);
+			}
+
+			:host([drag-placeholder]) {
+				opacity: 0.2;
 			}
 		`,
 	];

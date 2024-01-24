@@ -9,3 +9,4 @@ export type DynamicRootContextRequestModel = {
     culture?: string | null;
     segment?: string | null;
 };
+

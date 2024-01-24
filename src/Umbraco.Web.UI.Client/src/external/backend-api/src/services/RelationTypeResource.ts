@@ -28,7 +28,7 @@ requestBody?: CreateRelationTypeRequestModel,
             url: '/umbraco/management/api/v1/relation-type',
             body: requestBody,
             mediaType: 'application/json',
-            responseHeader: 'Location',
+            responseHeader: 'Umb-Generated-Resource',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,

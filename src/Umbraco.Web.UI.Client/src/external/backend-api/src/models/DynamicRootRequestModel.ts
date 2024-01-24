@@ -10,3 +10,4 @@ export type DynamicRootRequestModel = {
     context: DynamicRootContextRequestModel;
     query: DynamicRootQueryRequestModel;
 };
+

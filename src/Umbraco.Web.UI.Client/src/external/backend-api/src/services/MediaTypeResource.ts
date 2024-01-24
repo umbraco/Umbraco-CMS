@@ -27,16 +27,16 @@ export class MediaTypeResource {
      * @throws ApiError
      */
     public static postMediaType({
-requestBody,
-}: {
-requestBody?: CreateMediaTypeRequestModel,
-}): CancelablePromise<string> {
+        requestBody,
+    }: {
+        requestBody?: CreateMediaTypeRequestModel,
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/media-type',
             body: requestBody,
             mediaType: 'application/json',
-            responseHeader: 'Location',
+            responseHeader: 'Umb-Generated-Resource',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
@@ -50,10 +50,10 @@ requestBody?: CreateMediaTypeRequestModel,
      * @throws ApiError
      */
     public static getMediaTypeById({
-id,
-}: {
-id: string,
-}): CancelablePromise<MediaTypeResponseModel> {
+        id,
+    }: {
+        id: string,
+    }): CancelablePromise<MediaTypeResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/media-type/{id}',
@@ -72,10 +72,10 @@ id: string,
      * @throws ApiError
      */
     public static deleteMediaTypeById({
-id,
-}: {
-id: string,
-}): CancelablePromise<any> {
+        id,
+    }: {
+        id: string,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/media-type/{id}',
@@ -94,12 +94,12 @@ id: string,
      * @throws ApiError
      */
     public static putMediaTypeById({
-id,
-requestBody,
-}: {
-id: string,
-requestBody?: UpdateMediaTypeRequestModel,
-}): CancelablePromise<any> {
+        id,
+        requestBody,
+    }: {
+        id: string,
+        requestBody?: UpdateMediaTypeRequestModel,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/media-type/{id}',
@@ -121,10 +121,10 @@ requestBody?: UpdateMediaTypeRequestModel,
      * @throws ApiError
      */
     public static getMediaTypeByIdCompositionReferences({
-id,
-}: {
-id: string,
-}): CancelablePromise<Array<MediaTypeCompositionResponseModel>> {
+        id,
+    }: {
+        id: string,
+    }): CancelablePromise<Array<MediaTypeCompositionResponseModel>> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/media-type/{id}/composition-references',
@@ -144,12 +144,12 @@ id: string,
      * @throws ApiError
      */
     public static postMediaTypeByIdCopy({
-id,
-requestBody,
-}: {
-id: string,
-requestBody?: CopyMediaTypeRequestModel,
-}): CancelablePromise<string> {
+        id,
+        requestBody,
+    }: {
+        id: string,
+        requestBody?: CopyMediaTypeRequestModel,
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/media-type/{id}/copy',
@@ -158,7 +158,7 @@ requestBody?: CopyMediaTypeRequestModel,
             },
             body: requestBody,
             mediaType: 'application/json',
-            responseHeader: 'Location',
+            responseHeader: 'Umb-Generated-Resource',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
@@ -172,12 +172,12 @@ requestBody?: CopyMediaTypeRequestModel,
      * @throws ApiError
      */
     public static putMediaTypeByIdMove({
-id,
-requestBody,
-}: {
-id: string,
-requestBody?: MoveMediaTypeRequestModel,
-}): CancelablePromise<any> {
+        id,
+        requestBody,
+    }: {
+        id: string,
+        requestBody?: MoveMediaTypeRequestModel,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/media-type/{id}/move',
@@ -199,10 +199,10 @@ requestBody?: MoveMediaTypeRequestModel,
      * @throws ApiError
      */
     public static postMediaTypeAvailableCompositions({
-requestBody,
-}: {
-requestBody?: MediaTypeCompositionRequestModel,
-}): CancelablePromise<Array<AvailableMediaTypeCompositionResponseModel>> {
+        requestBody,
+    }: {
+        requestBody?: MediaTypeCompositionRequestModel,
+    }): CancelablePromise<Array<AvailableMediaTypeCompositionResponseModel>> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/media-type/available-compositions',
@@ -219,16 +219,16 @@ requestBody?: MediaTypeCompositionRequestModel,
      * @throws ApiError
      */
     public static postMediaTypeFolder({
-requestBody,
-}: {
-requestBody?: CreateFolderRequestModel,
-}): CancelablePromise<string> {
+        requestBody,
+    }: {
+        requestBody?: CreateFolderRequestModel,
+    }): CancelablePromise<string> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/media-type/folder',
             body: requestBody,
             mediaType: 'application/json',
-            responseHeader: 'Location',
+            responseHeader: 'Umb-Generated-Resource',
             errors: {
                 400: `Bad Request`,
                 401: `The resource is protected and requires an authentication token`,
@@ -242,10 +242,10 @@ requestBody?: CreateFolderRequestModel,
      * @throws ApiError
      */
     public static getMediaTypeFolderById({
-id,
-}: {
-id: string,
-}): CancelablePromise<FolderResponseModel> {
+        id,
+    }: {
+        id: string,
+    }): CancelablePromise<FolderResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/media-type/folder/{id}',
@@ -264,10 +264,10 @@ id: string,
      * @throws ApiError
      */
     public static deleteMediaTypeFolderById({
-id,
-}: {
-id: string,
-}): CancelablePromise<any> {
+        id,
+    }: {
+        id: string,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/umbraco/management/api/v1/media-type/folder/{id}',
@@ -287,12 +287,12 @@ id: string,
      * @throws ApiError
      */
     public static putMediaTypeFolderById({
-id,
-requestBody,
-}: {
-id: string,
-requestBody?: UpdateFolderResponseModel,
-}): CancelablePromise<any> {
+        id,
+        requestBody,
+    }: {
+        id: string,
+        requestBody?: UpdateFolderResponseModel,
+    }): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/umbraco/management/api/v1/media-type/folder/{id}',
@@ -314,10 +314,10 @@ requestBody?: UpdateFolderResponseModel,
      * @throws ApiError
      */
     public static getMediaTypeItem({
-id,
-}: {
-id?: Array<string>,
-}): CancelablePromise<Array<MediaTypeItemResponseModel>> {
+        id,
+    }: {
+        id?: Array<string>,
+    }): CancelablePromise<Array<MediaTypeItemResponseModel>> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/media-type/item',
@@ -335,16 +335,16 @@ id?: Array<string>,
      * @throws ApiError
      */
     public static getTreeMediaTypeChildren({
-parentId,
-skip,
-take = 100,
-foldersOnly = false,
-}: {
-parentId?: string,
-skip?: number,
-take?: number,
-foldersOnly?: boolean,
-}): CancelablePromise<PagedMediaTypeTreeItemResponseModel> {
+        parentId,
+        skip,
+        take = 100,
+        foldersOnly = false,
+    }: {
+        parentId?: string,
+        skip?: number,
+        take?: number,
+        foldersOnly?: boolean,
+    }): CancelablePromise<PagedMediaTypeTreeItemResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/media-type/children',
@@ -365,14 +365,14 @@ foldersOnly?: boolean,
      * @throws ApiError
      */
     public static getTreeMediaTypeRoot({
-skip,
-take = 100,
-foldersOnly = false,
-}: {
-skip?: number,
-take?: number,
-foldersOnly?: boolean,
-}): CancelablePromise<PagedMediaTypeTreeItemResponseModel> {
+        skip,
+        take = 100,
+        foldersOnly = false,
+    }: {
+        skip?: number,
+        take?: number,
+        foldersOnly?: boolean,
+    }): CancelablePromise<PagedMediaTypeTreeItemResponseModel> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/umbraco/management/api/v1/tree/media-type/root',

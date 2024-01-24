@@ -5,8 +5,8 @@ import type {
 	FolderTreeItemResponseModel,
 	FileSystemTreeItemPresentationModel,
 	DocumentResponseModel,
-	TextFileResponseModelBaseModel,
-	FileItemResponseModelBaseModel,
+	FileSystemFileResponseModelBaseModel,
+	FileSystemItemResponseModelBaseModel,
 	MediaTypeResponseModel,
 	MediaTypeTreeItemResponseModel,
 	MediaTreeItemResponseModel,
@@ -24,7 +24,7 @@ export const createEntityTreeItem = (item: any): EntityTreeItemResponseModel => 
 	};
 };
 
-export const createFolderTreeItem = (item: any): FolderTreeItemResponseModel => {
+export const folderTreeItemMapper = (item: any): FolderTreeItemResponseModel => {
 	return {
 		...createEntityTreeItem(item),
 		isFolder: item.isFolder,
@@ -75,26 +75,28 @@ export const createMediaTypeTreeItem = (item: MediaTypeResponseModel): MediaType
 	};
 };
 
-export const createFileSystemTreeItem = (item: any): FileSystemTreeItemPresentationModel => {
+export const createFileSystemTreeItem = (item: any): Omit<FileSystemTreeItemPresentationModel, 'type'> => {
 	return {
-		name: item.name,
-		type: item.type,
-		hasChildren: item.hasChildren ?? false,
 		path: item.path,
+		parent: item.parent ?? null,
+		name: item.name,
+		hasChildren: item.hasChildren ?? false,
 		isFolder: item.isFolder ?? false,
 	};
 };
 
-export const createTextFileItem = (item: any): TextFileResponseModelBaseModel => ({
+export const textFileItemMapper = (item: any): FileSystemFileResponseModelBaseModel => ({
 	path: item.path,
 	name: item.name,
+	parent: item.parent,
 	content: item.content,
 });
 
-export const createFileItemResponseModelBaseModel = (item: any): FileItemResponseModelBaseModel => ({
+export const createFileItemResponseModelBaseModel = (item: any): FileSystemItemResponseModelBaseModel => ({
 	path: item.path,
 	name: item.name,
-	icon: item.icon,
+	parent: item.parent,
+	isFolder: item.isFolder,
 });
 
 export const arrayFilter = (filterBy: Array<string>, value?: Array<string>): boolean => {

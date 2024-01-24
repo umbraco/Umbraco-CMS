@@ -21,7 +21,7 @@ import { UmbMediaHelper } from '@umbraco-cms/backoffice/utils';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
-import { UmbStylesheetRepository } from '@umbraco-cms/backoffice/stylesheet';
+import { UmbStylesheetDetailRepository, UmbStylesheetRuleManager } from '@umbraco-cms/backoffice/stylesheet';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 @customElement('umb-input-tiny-mce')
@@ -35,8 +35,9 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 	#mediaHelper = new UmbMediaHelper();
 	#plugins: Array<new (args: TinyMcePluginArguments) => UmbTinyMcePluginBase> = [];
 	#editorRef?: Editor | null = null;
-	#stylesheetRepository?: UmbStylesheetRepository;
+	#stylesheetRepository: UmbStylesheetDetailRepository;
 	#serverUrl?: string;
+	#umbStylesheetRuleManager = new UmbStylesheetRuleManager();
 
 	protected getFormElement() {
 		return this._editorElement?.querySelector('iframe') ?? undefined;
@@ -65,7 +66,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 			this.#serverUrl = instance.getServerUrl();
 		});
 
-		this.#stylesheetRepository = new UmbStylesheetRepository(this);
+		this.#stylesheetRepository = new UmbStylesheetDetailRepository(this);
 	}
 
 	protected async firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): Promise<void> {
@@ -105,59 +106,66 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 		}
 	}
 
-	async getFormatStyles(stylesheetPath: Array<string>) {
-		const rules: any[] = [];
+	async getFormatStyles(stylesheetPaths: Array<string>) {
+		if (!stylesheetPaths) return [];
+		const formatStyles: any[] = [];
 
-		stylesheetPath.forEach((path) => {
-			this.#stylesheetRepository?.getStylesheetRules(path).then(({ data }) => {
-				data?.rules?.forEach((rule) => {
-					const r: {
-						title?: string;
-						inline?: string;
-						classes?: string;
-						attributes?: Record<string, string>;
-						block?: string;
-					} = {
-						title: rule.name,
-					};
+		const promises = stylesheetPaths.map((path) => this.#stylesheetRepository?.requestByUnique(path));
+		const stylesheetResponses = await Promise.all(promises);
 
-					if (!rule.selector) return;
+		stylesheetResponses.forEach(({ data }) => {
+			if (!data) return;
+			const rulesFromContent = this.#umbStylesheetRuleManager.extractRules(data.content);
 
-					if (rule.selector.startsWith('.')) {
-						r.inline = 'span';
-						r.classes = rule.selector.substring(1);
-					} else if (rule.selector.startsWith('#')) {
-						r.inline = 'span';
-						r.attributes = { id: rule.selector.substring(1) };
-					} else if (rule.selector.includes('.')) {
-						const [block, ...classes] = rule.selector.split('.');
-						r.block = block;
-						r.classes = classes.join(' ').replace(/\./g, ' ');
-					} else if (rule.selector.includes('#')) {
-						const [block, id] = rule.selector.split('#');
-						r.block = block;
-						r.classes = id;
-					} else {
-						r.block = rule.selector;
-					}
+			rulesFromContent.forEach((rule) => {
+				const r: {
+					title?: string;
+					inline?: string;
+					classes?: string;
+					attributes?: Record<string, string>;
+					block?: string;
+				} = {
+					title: rule.name,
+				};
 
-					rules.push(r);
-				});
+				if (!rule.selector) return;
+
+				if (rule.selector.startsWith('.')) {
+					r.inline = 'span';
+					r.classes = rule.selector.substring(1);
+				} else if (rule.selector.startsWith('#')) {
+					r.inline = 'span';
+					r.attributes = { id: rule.selector.substring(1) };
+				} else if (rule.selector.includes('.')) {
+					const [block, ...classes] = rule.selector.split('.');
+					r.block = block;
+					r.classes = classes.join(' ').replace(/\./g, ' ');
+				} else if (rule.selector.includes('#')) {
+					const [block, id] = rule.selector.split('#');
+					r.block = block;
+					r.classes = id;
+				} else {
+					r.block = rule.selector;
+				}
+
+				formatStyles.push(r);
 			});
 		});
 
-		return rules;
+		return formatStyles;
 	}
 
 	async #setTinyConfig() {
 		const dimensions = this.configuration?.getValueByAlias<{ width?: number; height?: number }>('dimensions');
 
+		const stylesheetPaths = this.configuration?.getValueByAlias<string[]>('stylesheets') ?? [];
+		const styleFormats = await this.getFormatStyles(stylesheetPaths);
+
 		// Map the stylesheets with server url
 		const stylesheets =
-			this.configuration
-				?.getValueByAlias<string[]>('stylesheets')
-				?.map((stylesheetPath: string) => `${this.#serverUrl}/css/${stylesheetPath.replace(/\\/g, '/')}`) ?? [];
-		const styleFormats = await this.getFormatStyles(stylesheets);
+			stylesheetPaths?.map(
+				(stylesheetPath: string) => `${this.#serverUrl}/css/${stylesheetPath.replace(/\\/g, '/')}`,
+			) ?? [];
 
 		// create an object by merging the configuration onto the fallback config
 		const configurationOptions: RawEditorOptions = {
@@ -347,6 +355,11 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 			/* FIXME: Remove this workaround when https://github.com/tinymce/tinymce/issues/6431 has been fixed */
 			.tox .tox-collection__item-label {
 				line-height: 1 !important;
+			}
+
+			/* Solves issue 1019 by lowering un-needed z-index on header.*/
+			.tox.tox-tinymce .tox-editor-header {
+				z-index:0;
 			}
 		`,
 	];

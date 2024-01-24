@@ -10,3 +10,4 @@ export type CurrenUserConfigurationResponseModel = {
     usernameIsEmail: boolean;
     passwordConfiguration: PasswordConfigurationResponseModel;
 };
+

@@ -13,10 +13,7 @@ export const UMB_LANGUAGE_ITEM_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbLang
  * @extends {UmbStoreBase}
  * @description -  Store for Languages items
  */
-export class UmbLanguageItemStore
-	extends UmbStoreBase<LanguageResponseModel>
-	implements UmbItemStore<LanguageResponseModel>
-{
+export class UmbLanguageItemStore extends UmbStoreBase<LanguageResponseModel> {
 	constructor(host: UmbControllerHostElement) {
 		super(
 			host,

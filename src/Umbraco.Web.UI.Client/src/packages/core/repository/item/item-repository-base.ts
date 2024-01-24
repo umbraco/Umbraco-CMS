@@ -7,7 +7,7 @@ import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 export class UmbItemRepositoryBase<ItemType = any> extends UmbRepositoryBase implements UmbItemRepository<ItemType> {
 	protected _init: Promise<unknown>;
-	protected _itemStore?: UmbItemStore;
+	protected _itemStore?: UmbItemStore<any>;
 	#itemSource: UmbItemDataSource;
 
 	constructor(
@@ -19,7 +19,7 @@ export class UmbItemRepositoryBase<ItemType = any> extends UmbRepositoryBase imp
 		this.#itemSource = new itemSource(host);
 
 		this._init = this.consumeContext(itemStoreContextAlias, (instance) => {
-			this._itemStore = instance as UmbItemStore;
+			this._itemStore = instance as UmbItemStore<any>;
 		}).asPromise();
 	}
 

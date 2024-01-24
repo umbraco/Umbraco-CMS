@@ -121,8 +121,8 @@ export class UmbExtensionRegistry<
 	}
 
 	registerMany(manifests: Array<ManifestTypes | ManifestKind<ManifestTypes>>): void {
-		const validManifests = manifests.filter(this.checkExtension.bind(this));
-		this._extensions.setValue([...this._extensions.getValue(), ...(validManifests as Array<ManifestTypes>)]);
+		// we have to register extensions individually, so we ensure a manifest is valid before continuing to the next one
+		manifests.forEach((manifest) => this.register(manifest));
 	}
 
 	unregisterMany(aliases: Array<string>): void {
