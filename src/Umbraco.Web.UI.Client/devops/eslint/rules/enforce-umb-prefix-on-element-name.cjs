@@ -24,7 +24,7 @@ module.exports = {
 					const elementName = node.arguments[0].value;
 
 					// check if the element name starts with 'umb-', or 'test-', to be allow tests to have custom elements:
-					const isElementNameValid = elementName.startsWith('umb-') ?? elementName.startsWith('test-');
+					const isElementNameValid = elementName.startsWith('umb-') ? true : elementName.startsWith('test-');
 
 					if (!isElementNameValid) {
 						context.report({
