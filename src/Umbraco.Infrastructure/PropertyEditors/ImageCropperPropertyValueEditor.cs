@@ -166,6 +166,11 @@ internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core v
                 return null; // clear
             }
 
+            if (editorImageCropperValue is not null && temporaryFileKey.HasValue)
+            {
+                // a plausible tempFile value was supplied, but could not be converted to an actual file => clear the src
+                editorImageCropperValue.Src = null;
+            }
             return _jsonSerializer.Serialize(editorImageCropperValue); // unchanged
         }
 
