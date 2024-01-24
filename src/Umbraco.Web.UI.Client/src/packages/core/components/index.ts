@@ -11,7 +11,7 @@ export * from './extension-slot/index.js';
 export * from './footer-layout/index.js';
 export * from './header-app/index.js';
 export * from './history/index.js';
-export * from './input-checkbox-list/index.js';
+export * from '../property-editor/uis/checkbox-list/input-checkbox-list/index.js';
 export * from './input-color/index.js';
 export * from './input-date/index.js';
 export * from './input-dropdown/index.js';
