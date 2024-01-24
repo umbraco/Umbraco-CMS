@@ -37,19 +37,7 @@ public class UpdateDocumentController : UpdateDocumentControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Update(Guid id, UpdateDocumentRequestModel requestModel)
-        => await HandleRequest(id, async content =>
-    {
-        AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
-            User,
-            ContentPermissionResource.WithKeys(
-                ActionUpdate.ActionLetter,
-                id,
-                requestModel.Variants
-                    .Where(v => v.Culture is not null)
-                    .Select(v => v.Culture!)),
-            AuthorizationPolicies.ContentPermissionByResource);
-
-        if (!authorizationResult.Succeeded)
+        => await HandleRequest(id, requestModel, async content =>
         {
             ContentUpdateModel model = _documentEditingPresentationFactory.MapUpdateModel(requestModel);
             Attempt<ContentUpdateResult, ContentEditingOperationStatus> result =

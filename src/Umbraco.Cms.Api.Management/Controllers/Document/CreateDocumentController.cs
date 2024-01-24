@@ -37,19 +37,7 @@ public class CreateDocumentController : CreateDocumentControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Create(CreateDocumentRequestModel requestModel)
-        => await HandleRequest(requestModel.ParentId, async () =>
-    {
-        AuthorizationResult authorizationResult  = await _authorizationService.AuthorizeResourceAsync(
-            User,
-            ContentPermissionResource.WithKeys(
-                ActionNew.ActionLetter,
-                requestModel.ParentId,
-                requestModel.Variants
-                    .Where(v => v.Culture is not null)
-                    .Select(v => v.Culture!)),
-            AuthorizationPolicies.ContentPermissionByResource);
-
-        if (!authorizationResult.Succeeded)
+        => await HandleRequest(requestModel, async () =>
         {
             ContentCreateModel model = _documentEditingPresentationFactory.MapCreateModel(requestModel);
             Attempt<ContentCreateResult, ContentEditingOperationStatus> result =

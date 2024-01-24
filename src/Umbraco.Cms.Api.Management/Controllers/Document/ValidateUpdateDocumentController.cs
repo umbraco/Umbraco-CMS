@@ -33,7 +33,7 @@ public class ValidateUpdateDocumentController : UpdateDocumentControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Validate(Guid id, UpdateDocumentRequestModel requestModel)
-        => await HandleRequest(id, async content =>
+        => await HandleRequest(id, requestModel, async content =>
         {
             ContentUpdateModel model = _documentEditingPresentationFactory.MapUpdateModel(requestModel);
             Attempt<ContentValidationResult, ContentEditingOperationStatus> result = await _contentEditingService.ValidateUpdateAsync(content, model);

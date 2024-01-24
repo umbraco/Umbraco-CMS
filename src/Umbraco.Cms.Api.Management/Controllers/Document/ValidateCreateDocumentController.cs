@@ -33,7 +33,7 @@ public class ValidateCreateDocumentController : CreateDocumentControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Validate(CreateDocumentRequestModel requestModel)
-        => await HandleRequest(requestModel.ParentId, async () =>
+        => await HandleRequest(requestModel, async () =>
         {
             ContentCreateModel model = _documentEditingPresentationFactory.MapCreateModel(requestModel);
             Attempt<ContentValidationResult, ContentEditingOperationStatus> result = await _contentEditingService.ValidateCreateAsync(model);

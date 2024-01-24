@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Security.Authorization.Content;
+using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Extensions;
@@ -14,11 +15,14 @@ public abstract class CreateDocumentControllerBase : DocumentControllerBase
     protected CreateDocumentControllerBase(IAuthorizationService authorizationService)
         => _authorizationService = authorizationService;
 
-    protected async Task<IActionResult> HandleRequest(Guid? parentId, Func<Task<IActionResult>> authorizedHandler)
+    protected async Task<IActionResult> HandleRequest(CreateDocumentRequestModel requestModel, Func<Task<IActionResult>> authorizedHandler)
     {
+        IEnumerable<string> cultures = requestModel.Variants
+            .Where(v => v.Culture is not null)
+            .Select(v => v.Culture!);
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,
-            ContentPermissionResource.WithKeys(ActionNew.ActionLetter, parentId),
+            ContentPermissionResource.WithKeys(ActionNew.ActionLetter, requestModel.ParentId, cultures),
             AuthorizationPolicies.ContentPermissionByResource);
 
         if (!authorizationResult.Succeeded)
