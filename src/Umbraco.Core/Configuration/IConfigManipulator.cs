@@ -2,14 +2,19 @@ namespace Umbraco.Cms.Core.Configuration;
 
 public interface IConfigManipulator
 {
+    [Obsolete("Use RemoveConnectionStringAsync instead, scheduled for removal in V16.")]
     void RemoveConnectionString();
 
+    [Obsolete("Use SaveConnectionStringAsync instead, scheduled for removal in V16.")]
     void SaveConnectionString(string connectionString, string? providerName);
 
+    [Obsolete("Use SaveConfigValueAsync instead, scheduled for removal in V16.")]
     void SaveConfigValue(string itemPath, object value);
 
+    [Obsolete("Use SaveDisableRedirectUrlTrackingAsync instead, scheduled for removal in V16.")]
     void SaveDisableRedirectUrlTracking(bool disable);
 
+    [Obsolete("Use SetGlobalIdAsync instead, scheduled for removal in V16.")]
     void SetGlobalId(string id);
 
     /// <summary>
