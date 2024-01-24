@@ -3,6 +3,7 @@ import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { MemberItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
+import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 import { type UmbSorterConfig, UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 
 const SORTER_CONFIG: UmbSorterConfig<string> = {
@@ -87,6 +88,9 @@ export class UmbInputMemberElement extends FormControlMixin(UmbLitElement) {
 		this.#sorter.setModel(ids);
 	}
 
+	@property({ type: Boolean })
+	showOpenButton?: boolean;
+
 	@property({ type: Array })
 	allowedContentTypeIds?: string[] | undefined;
 
@@ -97,7 +101,10 @@ export class UmbInputMemberElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	@state()
-	private _items: Array<MemberItemResponseModel> = [];
+	private _editMemberPath = '';
+
+	@state()
+	private _items?: Array<MemberItemResponseModel>;
 
 	// TODO: Create the `UmbMemberPickerContext` [LK]
 	//#pickerContext = new UmbMemberPickerContext(this);
@@ -105,6 +112,14 @@ export class UmbInputMemberElement extends FormControlMixin(UmbLitElement) {
 	constructor() {
 		super();
 
+		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
+			.addAdditionalPath('member')
+			.onSetup(() => {
+				return { data: { entityType: 'member', preset: {} } };
+			})
+			.observeRouteBuilder((routeBuilder) => {
+				this._editMemberPath = routeBuilder({});
+			});
 		// TODO: Uncomment, once `UmbMemberPickerContext` has been implemented. [LK]
 		// this.addValidator(
 		// 	'rangeUnderflow',
@@ -192,14 +207,28 @@ export class UmbInputMemberElement extends FormControlMixin(UmbLitElement) {
 			<uui-ref-node name=${ifDefined(item.name)} detail=${ifDefined(item.id)}>
 				${this.#renderIsTrashed(item)}
 				<uui-action-bar slot="actions">
-					<uui-button @click=${() => this.#requestRemoveItem(item)} label="Remove member ${item.name}"
-						>Remove</uui-button
-					>
+					${this.#renderOpenButton(item)}
+					<uui-button
+						@click=${() => this._requestRemoveItem(item)}
+						label="${this.localize.term('general_remove')} ${item.name}">
+						${this.localize.term('general_remove')}
+					</uui-button>
 				</uui-action-bar>
 			</uui-ref-node>
 		`;
 	}
 
+	#renderOpenButton(item: MemberItemResponseModel) {
+		if (!this.showOpenButton) return;
+		return html`
+			<uui-button
+				compact
+				href="${this._editMemberPath}edit/${item.id}"
+				label=${this.localize.term('general_edit') + ` ${item.name}`}>
+				<uui-icon name="icon-edit"></uui-icon>
+			</uui-button>
+		`;
+	}
 	#renderIsTrashed(item: MemberItemResponseModel) {
 		// TODO: Uncomment, once the Management API model support deleted members. [LK]
 		//if (!item.isTrashed) return;

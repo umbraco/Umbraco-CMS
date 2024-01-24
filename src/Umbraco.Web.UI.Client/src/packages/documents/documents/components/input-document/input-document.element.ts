@@ -4,6 +4,7 @@ import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { DocumentItemResponseModel, DocumentTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
+import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 import { type UmbSorterConfig, UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 
 const SORTER_CONFIG: UmbSorterConfig<string> = {
@@ -98,12 +99,24 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	@state()
-	private _items: Array<DocumentItemResponseModel> = [];
+	private _editDocumentPath = '';
+
+	@state()
+	private _items?: Array<DocumentItemResponseModel>;
 
 	#pickerContext = new UmbDocumentPickerContext(this);
 
 	constructor() {
 		super();
+
+		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
+			.addAdditionalPath('document')
+			.onSetup(() => {
+				return { data: { entityType: 'document', preset: {} } };
+			})
+			.observeRouteBuilder((routeBuilder) => {
+				this._editDocumentPath = routeBuilder({});
+			});
 
 		this.addValidator(
 			'rangeUnderflow',
@@ -139,11 +152,6 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 			hideTreeRoot: true,
 			pickableFilter: this.#pickableFilter,
 		});
-	}
-
-	#openItem(item: DocumentItemResponseModel) {
-		// TODO: Implement the Content editing infinity editor. [LK]
-		console.log('TODO: _openItem', item);
 	}
 
 	render() {
@@ -199,9 +207,13 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 
 	#renderOpenButton(item: DocumentItemResponseModel) {
 		if (!this.showOpenButton) return;
-		return html`<uui-button @click=${() => this.#openItem(item)} label="Open document ${item.name}"
-			>${this.localize.term('general_open')}</uui-button
-		>`;
+		return html`
+			<uui-button
+				href="${this._editDocumentPath}edit/${item.id}"
+				label="${this.localize.term('general_open')} ${item.name}">
+				${this.localize.term('general_open')}
+			</uui-button>
+		`;
 	}
 
 	static styles = [
