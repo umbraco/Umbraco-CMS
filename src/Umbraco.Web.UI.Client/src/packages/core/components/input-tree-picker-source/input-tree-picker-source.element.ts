@@ -65,6 +65,15 @@ export class UmbInputTreePickerSourceElement extends FormControlMixin(UmbLitElem
 		{ value: 'member', name: 'Members' },
 	];
 
+	connectedCallback(): void {
+		super.connectedCallback();
+
+		// NOTE: Slight hack to workaround consolidating the old content-picker and dynamic-root. [LK:2024-01-24]
+		if (this.nodeId && !this.dynamicRoot) {
+			this.dynamicRoot = { originAlias: 'ByKey', originKey: this.nodeId, querySteps: [] };
+		}
+	}
+
 	#onContentTypeChange(event: UUISelectEvent) {
 		event.stopPropagation();
 
@@ -83,11 +92,13 @@ export class UmbInputTreePickerSourceElement extends FormControlMixin(UmbLitElem
 
 				// NOTE: Slight hack to workaround consolidating the old content-picker and dynamic-root. [LK:2024-01-24]
 				if (this.dynamicRoot?.originAlias === 'ByKey') {
-					if (!this.dynamicRoot?.querySteps || this.dynamicRoot?.querySteps?.length === 0) {
+					if (!this.dynamicRoot.querySteps || this.dynamicRoot.querySteps?.length === 0) {
 						this.nodeId = this.dynamicRoot.originKey;
 					} else {
 						this.nodeId = undefined;
 					}
+				} else if (this.nodeId) {
+					this.nodeId = undefined;
 				}
 
 				break;

@@ -54,6 +54,7 @@ export class UmbInputDocumentPickerRootElement extends FormControlMixin(UmbLitEl
 				const steps = [...this.data.querySteps];
 				const querySteps = model.map((index) => steps[parseInt(index)]);
 				this.#updateQuerySteps(querySteps);
+				this.dispatchEvent(new UmbChangeEvent());
 			}
 		},
 	});
@@ -72,6 +73,7 @@ export class UmbInputDocumentPickerRootElement extends FormControlMixin(UmbLitEl
 			if (this.data) {
 				const querySteps = [...(this.data.querySteps ?? []), step];
 				this.#updateQuerySteps(querySteps);
+				this.dispatchEvent(new UmbChangeEvent());
 			}
 		});
 	}
@@ -80,7 +82,6 @@ export class UmbInputDocumentPickerRootElement extends FormControlMixin(UmbLitEl
 		if (!this.data) return;
 		this.#sorter.setModel(querySteps?.map((_, index) => index.toString()) ?? []);
 		this.data = { ...this.data, ...{ querySteps } };
-		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	// NOTE: Taken from: https://github.com/umbraco/Umbraco-CMS/blob/release-13.0.0/src/Umbraco.Web.UI.Client/src/views/prevalueeditors/treesource.controller.js#L128-L141 [LK]
@@ -140,6 +141,7 @@ export class UmbInputDocumentPickerRootElement extends FormControlMixin(UmbLitEl
 				const querySteps = [...this.data.querySteps];
 				querySteps.splice(index, 1);
 				this.#updateQuerySteps(querySteps);
+				this.dispatchEvent(new UmbChangeEvent());
 			}
 		}
 	}
