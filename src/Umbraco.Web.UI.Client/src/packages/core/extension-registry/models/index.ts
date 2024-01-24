@@ -32,7 +32,7 @@ import type { ManifestWorkspaceView } from './workspace-view.model.js';
 import type { ManifestWorkspaceViewCollection } from './workspace-view-collection.model.js';
 import type { ManifestUserPermission } from './user-permission.model.js';
 import type { ManifestUserGranularPermission } from './user-granular-permission.model.js';
-import { ManifestCollectionAction } from './collection-action.model.js';
+import type { ManifestCollectionAction } from './collection-action.model.js';
 import type {
 	ManifestBase,
 	ManifestBundle,
@@ -40,41 +40,41 @@ import type {
 	ManifestEntryPoint,
 } from '@umbraco-cms/backoffice/extension-api';
 
-export * from './collection.models.js';
-export * from './collection-action.model.js';
-export * from './collection-view.model.js';
-export * from './dashboard-collection.model.js';
-export * from './dashboard.model.js';
-export * from './entity-action.model.js';
-export * from './entity-bulk-action.model.js';
-export * from './external-login-provider.model.js';
-export * from './global-context.model.js';
-export * from './header-app.model.js';
-export * from './health-check.model.js';
-export * from './localization.model.js';
-export * from './menu-item.model.js';
-export * from './menu.model.js';
-export * from './modal.model.js';
-export * from './package-view.model.js';
-export * from './property-action.model.js';
-export * from './property-editor.model.js';
-export * from './repository.model.js';
-export * from './section-sidebar-app.model.js';
-export * from './section-view.model.js';
-export * from './section.model.js';
-export * from './store.model.js';
-export * from './theme.model.js';
-export * from './tinymce-plugin.model.js';
-export * from './tree-item.model.js';
-export * from './tree.model.js';
-export * from './user-granular-permission.model.js';
-export * from './user-permission.model.js';
-export * from './user-profile-app.model.js';
-export * from './workspace-action.model.js';
-export * from './workspace-context.model.js';
-export * from './workspace-view.model.js';
-export * from './workspace-view-collection.model.js';
-export * from './workspace.model.js';
+export type * from './collection.models.js';
+export type * from './collection-action.model.js';
+export type * from './collection-view.model.js';
+export type * from './dashboard-collection.model.js';
+export type * from './dashboard.model.js';
+export type * from './entity-action.model.js';
+export type * from './entity-bulk-action.model.js';
+export type * from './external-login-provider.model.js';
+export type * from './global-context.model.js';
+export type * from './header-app.model.js';
+export type * from './health-check.model.js';
+export type * from './localization.model.js';
+export type * from './menu-item.model.js';
+export type * from './menu.model.js';
+export type * from './modal.model.js';
+export type * from './package-view.model.js';
+export type * from './property-action.model.js';
+export type * from './property-editor.model.js';
+export type * from './repository.model.js';
+export type * from './section-sidebar-app.model.js';
+export type * from './section-view.model.js';
+export type * from './section.model.js';
+export type * from './store.model.js';
+export type * from './theme.model.js';
+export type * from './tinymce-plugin.model.js';
+export type * from './tree-item.model.js';
+export type * from './tree.model.js';
+export type * from './user-granular-permission.model.js';
+export type * from './user-permission.model.js';
+export type * from './user-profile-app.model.js';
+export type * from './workspace-action.model.js';
+export type * from './workspace-context.model.js';
+export type * from './workspace-view.model.js';
+export type * from './workspace-view-collection.model.js';
+export type * from './workspace.model.js';
 
 export type ManifestTypes =
 	| ManifestBundle<ManifestTypes>
