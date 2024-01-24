@@ -3,7 +3,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
-import '../../../components/input-image-cropper/input-image-cropper.element.js';
+import '../../components/input-image-cropper/input-image-cropper.element.js';
 
 /**
  * @element umb-property-editor-ui-image-cropper

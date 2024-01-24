@@ -1,3 +1,4 @@
-import './input-media/input-media.element.js';
+import './input-media/index.js';
 
-export * from './input-media/input-media.element.js';
+export * from './input-media/index.js';
+export * from './input-image-cropper/index.js';

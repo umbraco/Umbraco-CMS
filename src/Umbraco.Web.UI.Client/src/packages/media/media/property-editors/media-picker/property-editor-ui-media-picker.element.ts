@@ -1,4 +1,4 @@
-import { UmbInputMediaElement } from '../../../../media/media/components/input-media/input-media.element.js';
+import { UmbInputMediaElement } from '../../components/input-media/input-media.element.js';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
