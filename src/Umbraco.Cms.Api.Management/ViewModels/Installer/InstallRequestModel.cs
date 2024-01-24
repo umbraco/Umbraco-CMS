@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Api.Management.ViewModels.Installer;
 public class InstallRequestModel
 {
     [Required]
-    public UserInstallResponseModel User { get; set; } = null!;
+    public UserInstallViewModel User { get; set; } = null!;
 
     [Required]
     public DatabaseInstallViewModel Database { get; set; } = null!;
