@@ -44,6 +44,25 @@ export class UmbRepositoryItemsManager<ItemType> extends UmbBaseController {
 				this.repository = permitted ? repository.api : undefined;
 			},
 		).asPromise();
+
+		this.observe(this.uniques, (uniques) => {
+			if (uniques.length === 0) {
+				this.#items.setValue([]);
+				return;
+			}
+
+			// Check if we already have the items, and then just sort them:
+			const items = this.#items.getValue();
+			if (
+				uniques.length === items.length &&
+				uniques.every((unique) => items.find((item) => this.#getUnique(item) === unique))
+			) {
+				this.#items.setValue(this.#sortByUniques(items));
+			} else {
+				// We need to load new items, so ...
+				this.#requestItems();
+			}
+		});
 	}
 
 	getUniques() {
@@ -52,14 +71,6 @@ export class UmbRepositoryItemsManager<ItemType> extends UmbBaseController {
 
 	setUniques(uniques: string[]) {
 		this.#uniques.setValue(uniques);
-		//TODO: Check if it's safe to call requestItems here.
-		// We don't have to request items if there is no uniques.
-		if (uniques.length === 0) {
-			this.#items.setValue([]);
-			return;
-		}
-
-		this.#requestItems();
 	}
 
 	getItems() {
@@ -75,8 +86,23 @@ export class UmbRepositoryItemsManager<ItemType> extends UmbBaseController {
 		const { data, asObservable } = await this.repository.requestItems(this.getUniques());
 
 		if (asObservable) {
-			this.observe(asObservable(), (data) => this.#items.setValue(data), '_observeRequestedItems');
+			this.observe(
+				asObservable(),
+				(data) => {
+					this.#items.setValue(this.#sortByUniques(data));
+				},
+				'_observeRequestedItems',
+			);
 		}
+	}
+
+	#sortByUniques(data: Array<ItemType>) {
+		const uniques = this.getUniques();
+		return [...data].sort((a, b) => {
+			const aIndex = uniques.indexOf(this.#getUnique(a) ?? '');
+			const bIndex = uniques.indexOf(this.#getUnique(b) ?? '');
+			return aIndex - bIndex;
+		});
 	}
 
 	/*

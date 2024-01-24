@@ -4,9 +4,27 @@ import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { MediaItemResponseModel, MediaTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
+import { type UmbSorterConfig, UmbSorterController } from '@umbraco-cms/backoffice/sorter';
+
+const SORTER_CONFIG: UmbSorterConfig<string> = {
+	compareElementToModel: (element, model) => {
+		return element.getAttribute('detail') === model;
+	},
+	querySelectModelToElement: () => null,
+	identifier: 'Umb.SorterIdentifier.InputMedia',
+	itemSelector: 'uui-card-media',
+	containerSelector: '.container',
+};
 
 @customElement('umb-input-media')
 export class UmbInputMediaElement extends FormControlMixin(UmbLitElement) {
+	#sorter = new UmbSorterController(this, {
+		...SORTER_CONFIG,
+		onChange: ({ model }) => {
+			this.selectedIds = model;
+		},
+	});
+
 	/**
 	 * This is a minimum amount of selected items in this input.
 	 * @type {number}
@@ -58,6 +76,7 @@ export class UmbInputMediaElement extends FormControlMixin(UmbLitElement) {
 	}
 	public set selectedIds(ids: Array<string>) {
 		this.#pickerContext.setSelection(ids);
+		this.#sorter.setModel(ids);
 	}
 
 	@property({ type: Array })
@@ -82,10 +101,9 @@ export class UmbInputMediaElement extends FormControlMixin(UmbLitElement) {
 
 	constructor() {
 		super();
-	}
 
-	connectedCallback() {
-		super.connectedCallback();
+		this.observe(this.#pickerContext.selection, (selection) => (super.value = selection.join(',')));
+		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems));
 
 		this.addValidator(
 			'rangeUnderflow',
@@ -98,9 +116,6 @@ export class UmbInputMediaElement extends FormControlMixin(UmbLitElement) {
 			() => this.maxMessage,
 			() => !!this.max && this.#pickerContext.getSelection().length > this.max,
 		);
-
-		this.observe(this.#pickerContext.selection, (selection) => (super.value = selection.join(',')));
-		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems));
 	}
 
 	protected getFormElement() {
@@ -132,19 +147,16 @@ export class UmbInputMediaElement extends FormControlMixin(UmbLitElement) {
 	}
 
 	render() {
-		return html` ${this.#renderItems()} ${this.#renderAddButton()} `;
+		return html`<div class="container">${this.#renderItems()} ${this.#renderAddButton()}</div>`;
 	}
 
 	#renderItems() {
 		if (!this._items) return;
-		// TODO: Add sorting. [LK]
-		return html`
-			${repeat(
-				this._items,
-				(item) => item.id,
-				(item) => this.#renderItem(item),
-			)}
-		`;
+		return html`${repeat(
+			this._items,
+			(item) => item.id,
+			(item) => this.#renderItem(item),
+		)}`;
 	}
 
 	#renderAddButton() {
@@ -189,7 +201,7 @@ export class UmbInputMediaElement extends FormControlMixin(UmbLitElement) {
 
 	static styles = [
 		css`
-			:host {
+			.container {
 				display: grid;
 				gap: var(--uui-size-space-3);
 				grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
@@ -204,6 +216,10 @@ export class UmbInputMediaElement extends FormControlMixin(UmbLitElement) {
 			uui-icon {
 				display: block;
 				margin: 0 auto;
+			}
+
+			uui-card-media[drag-placeholder] {
+				opacity: 0.2;
 			}
 		`,
 	];
