@@ -230,9 +230,6 @@ public class LogviewerTests
 
 internal class TestLogViewerQueryRepository : ILogViewerQueryRepository
 {
-
-
-
     public TestLogViewerQueryRepository() =>
         Store = new List<ILogViewerQuery>(DatabaseDataCreator._defaultLogQueries.Select(LogViewerQueryModelFactory.BuildEntity));
 
