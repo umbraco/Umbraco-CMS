@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using Umbraco.Cms.Core.Cache;
@@ -146,7 +146,7 @@ public static class DistributedCacheExtensions
         }
 
         IEnumerable<ContentCacheRefresher.JsonPayload> payloads = changes
-            .Select(x => new ContentCacheRefresher.JsonPayload(x.Item.Id, x.Item.Key, x.ChangeTypes));
+            .Select(x => new ContentCacheRefresher.JsonPayload(x.Item.Id, x.Item.Key, x.ChangeTypes, x.Item.Blueprint));
 
         dc.RefreshByPayload(ContentCacheRefresher.UniqueId, payloads);
     }

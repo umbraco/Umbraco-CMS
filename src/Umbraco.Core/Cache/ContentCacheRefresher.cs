@@ -84,8 +84,8 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
                 isolatedCache.ClearOfType<IContent>((k, v) => v.Path?.Contains(pathid) ?? false);
             }
 
-            // if the item is being completely removed, we need to refresh the domains cache if any domain was assigned to the content
-            if (payload.ChangeTypes.HasTypesAny(TreeChangeTypes.Remove))
+            // if the item is not a blueprint and is being completely removed, we need to refresh the domains cache if any domain was assigned to the content
+            if (payload.Blueprint is false && payload.ChangeTypes.HasTypesAny(TreeChangeTypes.Remove))
             {
                 idsRemoved.Add(payload.Id);
             }
@@ -120,7 +120,11 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
         // should rename it, and then, this is only for Deploy, and then, ???
         // if (Suspendable.PageCacheRefresher.CanUpdateDocumentCache)
         //   ...
-        NotifyPublishedSnapshotService(_publishedSnapshotService, AppCaches, payloads);
+        if (payloads.Any(x => x.Blueprint is false))
+        {
+            // Only notify if the payload contains actual (non-blueprint) contents
+            NotifyPublishedSnapshotService(_publishedSnapshotService, AppCaches, payloads);
+        }
 
         base.Refresh(payloads);
     }
@@ -160,10 +164,15 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
     public class JsonPayload
     {
         public JsonPayload(int id, Guid? key, TreeChangeTypes changeTypes)
+            : this(id, key, changeTypes, false)
+        { }
+
+        public JsonPayload(int id, Guid? key, TreeChangeTypes changeTypes, bool blueprint = false)
         {
             Id = id;
             Key = key;
             ChangeTypes = changeTypes;
+            Blueprint = blueprint;
         }
 
         public int Id { get; }
@@ -171,6 +180,8 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
         public Guid? Key { get; }
 
         public TreeChangeTypes ChangeTypes { get; }
+
+        public bool Blueprint { get; }
     }
 
     #endregion
