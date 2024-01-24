@@ -1,7 +1,7 @@
-import { Meta, Story } from '@storybook/web-components';
 import { html } from '@umbraco-cms/backoffice/external/lit';
+import { Meta, Story } from '@storybook/web-components';
 
-import type { UmbDashboardExamineManagementElement } from './dashboard-examine-management.element.js';
+//import type { UmbDashboardExamineManagementElement } from './dashboard-examine-management.element.js';
 import './dashboard-examine-management.element.js';
 
 import type { UmbDashboardExamineOverviewElement } from './views/section-view-examine-overview.js';
