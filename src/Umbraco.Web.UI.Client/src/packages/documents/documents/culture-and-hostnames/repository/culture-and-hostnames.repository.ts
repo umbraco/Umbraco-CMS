@@ -1,7 +1,7 @@
 import { UmbDocumentCultureAndHostnamesServerDataSource } from './culture-and-hostnames.server.data.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
-import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
+import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import { DomainsPresentationModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 
@@ -18,8 +18,8 @@ export class UmbDocumentCultureAndHostnamesRepository extends UmbBaseController 
 		this.#dataSource = new UmbDocumentCultureAndHostnamesServerDataSource(this);
 
 		this.#init = Promise.all([
-			this.consumeContext(UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
-				this.#notificationContext = instance;
+			this.consumeContext(UMB_NOTIFICATION_CONTEXT, (instance) => {
+				this.#notificationContext = instance as UmbNotificationContext;
 			}).asPromise(),
 		]);
 	}
