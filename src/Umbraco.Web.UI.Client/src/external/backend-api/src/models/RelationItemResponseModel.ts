@@ -15,4 +15,3 @@ export type RelationItemResponseModel = {
     relationTypeIsBidirectional: boolean;
     relationTypeIsDependency: boolean;
 };
-

@@ -9,4 +9,3 @@ export type PagedMediaTypeTreeItemResponseModel = {
     total: number;
     items: Array<MediaTypeTreeItemResponseModel>;
 };
-

@@ -11,4 +11,3 @@ export type RedirectUrlResponseModel = {
     contentId: string;
     culture?: string | null;
 };
-

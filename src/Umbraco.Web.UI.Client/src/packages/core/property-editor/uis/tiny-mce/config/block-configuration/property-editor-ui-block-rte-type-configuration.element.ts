@@ -1,4 +1,4 @@
-import { UmbBlockTypeBase, UmbInputBlockTypeElement } from '@umbraco-cms/backoffice/block';
+import { UmbBlockTypeBaseModel, UmbInputBlockTypeElement } from '@umbraco-cms/backoffice/block';
 import { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
@@ -14,7 +14,7 @@ export class UmbPropertyEditorUIBlockRteBlockConfigurationElement
 	implements UmbPropertyEditorUiElement
 {
 	@property({ attribute: false })
-	value: UmbBlockTypeBase[] = [];
+	value: UmbBlockTypeBaseModel[] = [];
 
 	@property({ type: Object, attribute: false })
 	public config?: UmbPropertyEditorConfigCollection;

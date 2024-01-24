@@ -37,7 +37,7 @@ export class UmbSelectionManager extends UmbBaseController {
 	 * @memberof UmbSelectionManager
 	 */
 	public setSelectable(value: boolean) {
-		this.#selectable.next(value);
+		this.#selectable.setValue(value);
 	}
 
 	/**
@@ -58,7 +58,7 @@ export class UmbSelectionManager extends UmbBaseController {
 		if (this.getSelectable() === false) return;
 		if (value === undefined) throw new Error('Value cannot be undefined');
 		const newSelection = this.getMultiple() ? value : value.slice(0, 1);
-		this.#selection.next(newSelection);
+		this.#selection.setValue(newSelection);
 	}
 
 	/**
@@ -76,7 +76,7 @@ export class UmbSelectionManager extends UmbBaseController {
 	 * @memberof UmbSelectionManager
 	 */
 	public setMultiple(value: boolean) {
-		this.#multiple.next(value);
+		this.#multiple.setValue(value);
 
 		/* If multiple is set to false, and the current selection is more than one,
 		then we need to set the selection to the first item. */
@@ -104,7 +104,7 @@ export class UmbSelectionManager extends UmbBaseController {
 		if (this.getSelectable() === false) return;
 		if (this.isSelected(unique)) return;
 		const newSelection = this.getMultiple() ? [...this.getSelection(), unique] : [unique];
-		this.#selection.next(newSelection);
+		this.#selection.setValue(newSelection);
 		this.getHostElement().dispatchEvent(new UmbSelectionChangeEvent());
 	}
 
@@ -116,7 +116,7 @@ export class UmbSelectionManager extends UmbBaseController {
 	public deselect(unique: string | null) {
 		if (this.getSelectable() === false) return;
 		const newSelection = this.getSelection().filter((x) => x !== unique);
-		this.#selection.next(newSelection);
+		this.#selection.setValue(newSelection);
 		this.getHostElement().dispatchEvent(new UmbSelectionChangeEvent());
 	}
 
@@ -136,6 +136,6 @@ export class UmbSelectionManager extends UmbBaseController {
 	 */
 	public clearSelection() {
 		if (this.getSelectable() === false) return;
-		this.#selection.next([]);
+		this.#selection.setValue([]);
 	}
 }

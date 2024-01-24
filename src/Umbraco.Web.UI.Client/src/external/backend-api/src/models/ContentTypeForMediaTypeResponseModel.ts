@@ -23,4 +23,3 @@ export type ContentTypeForMediaTypeResponseModel = {
     compositions: Array<ContentTypeCompositionModel>;
     id: string;
 };
-

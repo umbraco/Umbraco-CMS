@@ -63,7 +63,7 @@ export class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemModelBase>
 
 	public setTreeItem(treeItem: TreeItemType | undefined) {
 		if (!treeItem) {
-			this.#treeItem.next(undefined);
+			this.#treeItem.setValue(undefined);
 			return;
 		}
 
@@ -75,8 +75,8 @@ export class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemModelBase>
 		if (!treeItem.entityType) throw new Error('Could not create tree item context, tree item type is missing');
 		this.entityType = treeItem.entityType;
 
-		this.#hasChildren.next(treeItem.hasChildren || false);
-		this.#treeItem.next(treeItem);
+		this.#hasChildren.setValue(treeItem.hasChildren || false);
+		this.#treeItem.setValue(treeItem);
 
 		// Update observers:
 		this.#observeActions();
@@ -89,9 +89,9 @@ export class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemModelBase>
 		if (this.unique === undefined) throw new Error('Could not request children, unique key is missing');
 
 		// TODO: wait for tree context to be ready
-		this.#isLoading.next(true);
+		this.#isLoading.setValue(true);
 		const response = await this.treeContext!.requestChildrenOf(this.unique);
-		this.#isLoading.next(false);
+		this.#isLoading.setValue(false);
 		return response;
 	}
 
@@ -140,12 +140,12 @@ export class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemModelBase>
 		this.observe(
 			this.treeContext.selection.selectable,
 			(value) => {
-				this.#isSelectableContext.next(value);
+				this.#isSelectableContext.setValue(value);
 
 				// If the tree is selectable, check if this item is selectable
 				if (value === true) {
 					const isSelectable = this.treeContext?.selectableFilter?.(this.getTreeItem()!) ?? true;
-					this.#isSelectable.next(isSelectable);
+					this.#isSelectable.setValue(isSelectable);
 				}
 			},
 			'observeIsSelectable',
@@ -158,7 +158,7 @@ export class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemModelBase>
 		this.observe(
 			this.treeContext.selection.selection.pipe(map((selection) => selection.includes(this.unique!))),
 			(isSelected) => {
-				this.#isSelected.next(isSelected);
+				this.#isSelected.setValue(isSelected);
 			},
 			'observeIsSelected',
 		);
@@ -172,7 +172,7 @@ export class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemModelBase>
 			(pathname) => {
 				if (!pathname || !this.entityType || this.unique === undefined) return;
 				const path = this.constructPath(pathname, this.entityType, this.unique);
-				this.#path.next(path);
+				this.#path.setValue(path);
 			},
 			'observeSectionPath',
 		);
@@ -184,7 +184,7 @@ export class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemModelBase>
 				.extensionsOfType('entityAction')
 				.pipe(map((actions) => actions.filter((action) => action.meta.entityTypes.includes(this.entityType!)))),
 			(actions) => {
-				this.#hasActions.next(actions.length > 0);
+				this.#hasActions.setValue(actions.length > 0);
 			},
 			'observeActions',
 		);
@@ -200,7 +200,7 @@ export class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemModelBase>
 			// we need to skip the first value, because it will also return false until a child is in the store
 			// we therefor rely on the value from the tree item itself
 			if (this.#hasChildrenInitValueFlag === true) {
-				this.#hasChildren.next(hasChildren);
+				this.#hasChildren.setValue(hasChildren);
 			}
 			this.#hasChildrenInitValueFlag = true;
 		});

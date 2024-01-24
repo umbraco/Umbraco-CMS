@@ -1,4 +1,4 @@
-import type { UmbBlockTypeBase, UmbInputBlockTypeElement } from '../../../block-type/index.js';
+import type { UmbBlockTypeBaseModel, UmbInputBlockTypeElement } from '../../../block-type/index.js';
 import '../../../block-type/components/input-block-type/index.js';
 import { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
@@ -15,7 +15,7 @@ export class UmbPropertyEditorUIBlockListBlockConfigurationElement
 	implements UmbPropertyEditorUiElement
 {
 	@property({ attribute: false })
-	value: UmbBlockTypeBase[] = [];
+	value: UmbBlockTypeBaseModel[] = [];
 
 	@property({ type: Object, attribute: false })
 	public config?: UmbPropertyEditorConfigCollection;

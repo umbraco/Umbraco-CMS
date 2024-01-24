@@ -2,12 +2,30 @@ import { UmbDocumentPickerContext } from './input-document.context.js';
 import { css, html, customElement, property, state, ifDefined, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { DocumentItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { DocumentItemResponseModel, DocumentTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
+import { type UmbSorterConfig, UmbSorterController } from '@umbraco-cms/backoffice/sorter';
+
+const SORTER_CONFIG: UmbSorterConfig<string> = {
+	compareElementToModel: (element, model) => {
+		return element.getAttribute('detail') === model;
+	},
+	querySelectModelToElement: () => null,
+	identifier: 'Umb.SorterIdentifier.InputDocument',
+	itemSelector: 'uui-ref-node',
+	containerSelector: 'uui-ref-list',
+};
 
 @customElement('umb-input-document')
 export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
+	#sorter = new UmbSorterController(this, {
+		...SORTER_CONFIG,
+		onChange: ({ model }) => {
+			this.selectedIds = model;
+		},
+	});
+
 	/**
 	 * This is a minimum amount of selected items in this input.
 	 * @type {number}
@@ -59,13 +77,14 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 	}
 	public set selectedIds(ids: Array<string>) {
 		this.#pickerContext.setSelection(ids);
+		this.#sorter.setModel(ids);
 	}
 
 	@property({ type: String })
 	startNodeId?: string;
 
-	@property({ type: String })
-	filter?: string;
+	@property({ type: Array })
+	allowedContentTypeIds?: string[] | undefined;
 
 	@property({ type: Boolean })
 	showOpenButton?: boolean;
@@ -98,10 +117,6 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 			.observeRouteBuilder((routeBuilder) => {
 				this._editDocumentPath = routeBuilder({});
 			});
-	}
-
-	connectedCallback() {
-		super.connectedCallback();
 
 		this.addValidator(
 			'rangeUnderflow',
@@ -119,16 +134,24 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 		this.observe(this.#pickerContext.selectedItems, (selectedItems) => (this._items = selectedItems));
 	}
 
-	protected _openPicker() {
-		// TODO: Configure the content picker, with `startNodeId`, `filter` and `ignoreUserStartNodes` [LK]
-		console.log("_openPicker", [this.startNodeId, this.filter, this.ignoreUserStartNodes]);
-		this.#pickerContext.openPicker({
-			hideTreeRoot: true,
-		});
-	}
-
 	protected getFormElement() {
 		return undefined;
+	}
+
+	#pickableFilter: (item: DocumentTreeItemResponseModel) => boolean = (item) => {
+		if (this.allowedContentTypeIds && this.allowedContentTypeIds.length > 0) {
+			return this.allowedContentTypeIds.includes(item.contentTypeId);
+		}
+		return true;
+	};
+
+	#openPicker() {
+		// TODO: Configure the content picker, with `startNodeId` and `ignoreUserStartNodes` [LK]
+		console.log('_openPicker', [this.startNodeId, this.ignoreUserStartNodes]);
+		this.#pickerContext.openPicker({
+			hideTreeRoot: true,
+			pickableFilter: this.#pickableFilter,
+		});
 	}
 
 	render() {
@@ -137,12 +160,11 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 
 	#renderItems() {
 		if (!this._items) return;
-		// TODO: Add sorting. [LK]
-		return html`<uui-ref-list
-			>${repeat(
+		return html`<uui-ref-list>
+			${repeat(
 				this._items,
 				(item) => item.id,
-				(item) => this._renderItem(item),
+				(item) => this.#renderItem(item),
 			)}
 		</uui-ref-list>`;
 	}
@@ -152,17 +174,17 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 		return html`<uui-button
 			id="add-button"
 			look="placeholder"
-			@click=${this._openPicker}
+			@click=${this.#openPicker}
 			label=${this.localize.term('general_choose')}></uui-button>`;
 	}
 
-	private _renderItem(item: DocumentItemResponseModel) {
+	#renderItem(item: DocumentItemResponseModel) {
 		if (!item.id) return;
 		return html`
 			<uui-ref-node name=${ifDefined(item.name)} detail=${ifDefined(item.id)}>
-				${this._renderIsTrashed(item)}
+				${this.#renderIcon(item)} ${this.#renderIsTrashed(item)}
 				<uui-action-bar slot="actions">
-					${this._renderOpenButton(item)}
+					${this.#renderOpenButton(item)}
 					<uui-button
 						@click=${() => this.#pickerContext.requestRemoveItem(item.id!)}
 						label="Remove document ${item.name}"
@@ -173,12 +195,17 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 		`;
 	}
 
-	private _renderIsTrashed(item: DocumentItemResponseModel) {
+	#renderIcon(item: DocumentItemResponseModel) {
+		if (!item.icon) return;
+		return html`<uui-icon slot="icon" name=${item.icon}></uui-icon>`;
+	}
+
+	#renderIsTrashed(item: DocumentItemResponseModel) {
 		if (!item.isTrashed) return;
 		return html`<uui-tag size="s" slot="tag" color="danger">Trashed</uui-tag>`;
 	}
 
-	private _renderOpenButton(item: DocumentItemResponseModel) {
+	#renderOpenButton(item: DocumentItemResponseModel) {
 		if (!this.showOpenButton) return;
 		return html`
 			<uui-button
@@ -193,6 +220,10 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 		css`
 			#add-button {
 				width: 100%;
+			}
+
+			uui-ref-node[drag-placeholder] {
+				opacity: 0.2;
 			}
 		`,
 	];

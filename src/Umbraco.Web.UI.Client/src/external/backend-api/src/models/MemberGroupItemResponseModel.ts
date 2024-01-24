@@ -6,4 +6,3 @@
 import type { ItemResponseModelBaseModel } from './ItemResponseModelBaseModel';
 
 export type MemberGroupItemResponseModel = ItemResponseModelBaseModel;
-

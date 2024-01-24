@@ -9,6 +9,7 @@ import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observa
 import type { TemplateItemResponseModel, TemplateResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { UmbId } from '@umbraco-cms/backoffice/id';
 
 export class UmbTemplateWorkspaceContext
 	extends UmbEditableWorkspaceContextBase<TemplateResponseModel>
@@ -41,7 +42,7 @@ export class UmbTemplateWorkspaceContext
 	async #loadCodeEditor() {
 		try {
 			await loadCodeEditor();
-			this.#isCodeEditorReady.next(true);
+			this.#isCodeEditorReady.setValue(true);
 		} catch (error) {
 			console.error(error);
 		}
@@ -84,20 +85,20 @@ export class UmbTemplateWorkspaceContext
 		if (data) {
 			this.setIsNew(false);
 			this.setMasterTemplate(data.masterTemplateId ?? null);
-			this.#data.next(data);
+			this.#data.setValue(data);
 		}
 	}
 
 	async setMasterTemplate(id: string | null) {
 		if (id === null) {
-			this.#masterTemplate.next(null);
+			this.#masterTemplate.setValue(null);
 			this.#updateMasterTemplateLayoutBlock();
 			return null;
 		}
 
 		const { data } = await this.repository.requestItems([id]);
 		if (data) {
-			this.#masterTemplate.next(data[0]);
+			this.#masterTemplate.setValue(data[0]);
 			this.#updateMasterTemplateLayoutBlock();
 			return data[0];
 		}
@@ -138,7 +139,10 @@ ${currentContent}`;
 		const isNew = this.getIsNew();
 
 		if (isNew && template) {
+			const key = UmbId.new();
+			this.#data.update({ id: key });
 			await this.repository.create({
+				key: key,
 				name: template.name,
 				content: template.content,
 				alias: template.alias,
@@ -166,7 +170,7 @@ ${currentContent}`;
 		const { data } = await this.repository.createScaffold(parentId);
 		if (!data) return;
 		this.setIsNew(true);
-		this.#data.next({ ...data, id: '', name: '', alias: '' });
+		this.#data.setValue({ ...data, id: '', name: '', alias: '' });
 		if (!parentId) return;
 		await this.setMasterTemplate(parentId);
 	}

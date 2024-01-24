@@ -1,5 +1,5 @@
-import { clamp, calculateExtrapolatedValue } from './mathUtils.js';
 import type { UmbImageCropperCrop, UmbImageCropperFocalPoint } from './index.js';
+import { calculateExtrapolatedValue, clamp } from '@umbraco-cms/backoffice/utils';
 import { LitElement, css, html, nothing, customElement, property, query } from '@umbraco-cms/backoffice/external/lit';
 
 @customElement('umb-image-cropper-preview')

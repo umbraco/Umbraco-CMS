@@ -48,6 +48,6 @@ describe('UmbObserver', () => {
 		});
 
 		expect(count).to.be.equal(1);
-		lateSubject.next(initialData);
+		lateSubject.setValue(initialData);
 	});
 });

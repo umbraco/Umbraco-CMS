@@ -28,7 +28,7 @@ export class UmbThemeContext extends UmbBaseController {
 	}
 
 	public setThemeByAlias(themeAlias: string) {
-		this.#theme.next(themeAlias);
+		this.#theme.setValue(themeAlias);
 
 		this.#themeObserver?.destroy();
 		if (themeAlias) {

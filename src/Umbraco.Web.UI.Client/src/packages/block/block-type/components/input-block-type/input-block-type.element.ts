@@ -1,4 +1,4 @@
-import { UmbBlockTypeBase } from '../../types.js';
+import { UmbBlockTypeBaseModel } from '../../types.js';
 import {
 	UMB_DOCUMENT_TYPE_PICKER_MODAL,
 	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
@@ -11,7 +11,9 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 @customElement('umb-input-block-type')
-export class UmbInputBlockTypeElement<BlockType extends UmbBlockTypeBase = UmbBlockTypeBase> extends UmbLitElement {
+export class UmbInputBlockTypeElement<
+	BlockType extends UmbBlockTypeBaseModel = UmbBlockTypeBaseModel,
+> extends UmbLitElement {
 	//
 	@property({ type: Array, attribute: false })
 	public get value() {
@@ -72,7 +74,7 @@ export class UmbInputBlockTypeElement<BlockType extends UmbBlockTypeBase = UmbBl
 							// Only pick elements:
 							docType.isElement &&
 							// Prevent picking the an already used element type:
-							this._items.find((x) => x.contentElementTypeKey === docType.id) === undefined,
+							this._items.find((x) => x.contentElementTypeKey === docType.unique) === undefined,
 					},
 				});
 

@@ -48,7 +48,7 @@ export class UmbTemporaryFileManager extends UmbBaseController {
 
 		if (!queue.length && this.getIsReady()) return;
 
-		this.#isReady.next(false);
+		this.#isReady.setValue(false);
 
 		queue.forEach(async (item) => {
 			if (item.status !== 'waiting') return;
@@ -64,7 +64,7 @@ export class UmbTemporaryFileManager extends UmbBaseController {
 		});
 
 		if (!queue.find((item) => item.status === 'waiting') && !this.getIsReady()) {
-			this.#isReady.next(true);
+			this.#isReady.setValue(true);
 		}
 	}
 

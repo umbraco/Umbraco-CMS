@@ -6,6 +6,5 @@
 import type { ItemResponseModelBaseModel } from './ItemResponseModelBaseModel';
 
 export type DataTypeItemResponseModel = (ItemResponseModelBaseModel & {
-    editorUiAlias?: string | null;
+editorUiAlias?: string | null;
 });
-

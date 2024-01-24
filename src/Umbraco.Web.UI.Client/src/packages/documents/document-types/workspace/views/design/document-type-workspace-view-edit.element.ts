@@ -1,4 +1,5 @@
 import { UmbDocumentTypeWorkspaceContext } from '../../document-type-workspace.context.js';
+import { UmbDocumentTypeDetailModel } from '../../../types.js';
 import type { UmbDocumentTypeWorkspaceViewEditTabElement } from './document-type-workspace-view-edit-tab.element.js';
 import { css, html, customElement, state, repeat, nothing, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
@@ -85,7 +86,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 
 	private _workspaceContext?: UmbDocumentTypeWorkspaceContext;
 
-	private _tabsStructureHelper = new UmbContentTypeContainerStructureHelper(this);
+	private _tabsStructureHelper = new UmbContentTypeContainerStructureHelper<UmbDocumentTypeDetailModel>(this);
 
 	private _modalManagerContext?: typeof UMB_MODAL_MANAGER_CONTEXT_TOKEN.TYPE;
 
@@ -156,7 +157,7 @@ export class UmbDocumentTypeWorkspaceViewEditElement extends UmbLitElement imple
 					setup: (component) => {
 						(component as UmbDocumentTypeWorkspaceViewEditTabElement).tabName = tabName;
 						(component as UmbDocumentTypeWorkspaceViewEditTabElement).ownerTabId =
-							this._workspaceContext?.structure.isOwnerContainer(tab.id!) ? tab.id : undefined;
+							this._tabsStructureHelper.isOwnerContainer(tab.id!) ? tab.id : undefined;
 					},
 				});
 			});

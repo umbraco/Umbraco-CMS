@@ -1,18 +1,15 @@
 import { UmbDocumentTypeDetailRepository } from '../repository/detail/document-type-detail.repository.js';
+import { UmbDocumentTypeDetailModel } from '../types.js';
 import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
 import {
 	UmbEditableWorkspaceContextBase,
 	UmbSaveableWorkspaceContextInterface,
 } from '@umbraco-cms/backoffice/workspace';
-import type {
-	ContentTypeCompositionModel,
-	ContentTypeSortModel,
-	DocumentTypeResponseModel,
-} from '@umbraco-cms/backoffice/backend-api';
+import type { ContentTypeCompositionModel, ContentTypeSortModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 
-type EntityType = DocumentTypeResponseModel;
+type EntityType = UmbDocumentTypeDetailModel;
 export class UmbDocumentTypeWorkspaceContext
 	extends UmbEditableWorkspaceContextBase<EntityType>
 	implements UmbSaveableWorkspaceContextInterface
@@ -40,7 +37,7 @@ export class UmbDocumentTypeWorkspaceContext
 	readonly defaultTemplateId;
 	readonly cleanup;
 
-	readonly structure = new UmbContentTypePropertyStructureManager(this, this.repository);
+	readonly structure = new UmbContentTypePropertyStructureManager<EntityType>(this, this.repository);
 
 	#isSorting = new UmbBooleanState(undefined);
 	isSorting = this.#isSorting.asObservable();
@@ -72,7 +69,7 @@ export class UmbDocumentTypeWorkspaceContext
 	}
 
 	setIsSorting(isSorting: boolean) {
-		this.#isSorting.next(isSorting);
+		this.#isSorting.setValue(isSorting);
 	}
 
 	getData() {
@@ -80,7 +77,7 @@ export class UmbDocumentTypeWorkspaceContext
 	}
 
 	getEntityId() {
-		return this.getData()?.id;
+		return this.getData()?.unique;
 	}
 
 	getEntityType() {
@@ -129,8 +126,8 @@ export class UmbDocumentTypeWorkspaceContext
 		this.structure.updateOwnerContentType({ defaultTemplateId });
 	}
 
-	async create(parentId: string | null) {
-		const { data } = await this.structure.createScaffold(parentId);
+	async create(parentUnique: string | null) {
+		const { data } = await this.structure.createScaffold(parentUnique);
 		if (!data) return undefined;
 
 		this.setIsNew(true);
@@ -139,8 +136,8 @@ export class UmbDocumentTypeWorkspaceContext
 		return { data } || undefined;
 	}
 
-	async load(entityId: string) {
-		const { data } = await this.structure.loadType(entityId);
+	async load(unique: string) {
+		const { data } = await this.structure.loadType(unique);
 		if (!data) return undefined;
 
 		this.setIsNew(false);

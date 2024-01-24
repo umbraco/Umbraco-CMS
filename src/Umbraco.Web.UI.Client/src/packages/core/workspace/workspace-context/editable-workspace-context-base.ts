@@ -31,7 +31,7 @@ export abstract class UmbEditableWorkspaceContextBase<WorkspaceData>
 	}
 
 	setIsNew(isNew: boolean) {
-		this.#isNew.next(isNew);
+		this.#isNew.setValue(isNew);
 	}
 
 	protected saveComplete(data: WorkspaceData) {

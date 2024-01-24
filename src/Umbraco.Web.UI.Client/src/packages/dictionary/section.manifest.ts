@@ -1,3 +1,4 @@
+import { UMB_DICTIONARY_ROOT_ENTITY_TYPE } from './dictionary/entities.js';
 import type { ManifestDashboard, ManifestSection, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const sectionAlias = 'Umb.Section.Dictionary';
@@ -15,13 +16,14 @@ const section: ManifestSection = {
 
 const menuSectionSidebarApp: ManifestTypes = {
 	type: 'sectionSidebarApp',
-	kind: 'menu',
+	kind: 'menuWithEntityActions',
 	alias: 'Umb.SidebarMenu.Dictionary',
 	name: 'Dictionary Sidebar Menu',
 	weight: 100,
 	meta: {
 		label: 'Dictionary',
 		menu: 'Umb.Menu.Dictionary',
+		entityType: UMB_DICTIONARY_ROOT_ENTITY_TYPE,
 	},
 	conditions: [
 		{

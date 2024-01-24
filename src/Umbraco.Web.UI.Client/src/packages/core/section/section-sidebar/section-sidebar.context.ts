@@ -27,17 +27,17 @@ export class UmbSectionSidebarContext {
 	// TODO: we wont get notified about tree item name changes because we don't have a subscription
 	// we need to figure out how we best can handle this when we only know the entity and unique id
 	openContextMenu(entityType: string, unique: string | null | undefined, headline: string | undefined) {
-		this.#entityType.next(entityType);
-		this.#unique.next(unique);
-		this.#headline.next(headline);
-		this.#contextMenuIsOpen.next(true);
+		this.#entityType.setValue(entityType);
+		this.#unique.setValue(unique);
+		this.#headline.setValue(headline);
+		this.#contextMenuIsOpen.setValue(true);
 	}
 
 	closeContextMenu() {
-		this.#contextMenuIsOpen.next(false);
-		this.#entityType.next(undefined);
-		this.#unique.next(undefined);
-		this.#headline.next(undefined);
+		this.#contextMenuIsOpen.setValue(false);
+		this.#entityType.setValue(undefined);
+		this.#unique.setValue(undefined);
+		this.#headline.setValue(undefined);
 	}
 }
 

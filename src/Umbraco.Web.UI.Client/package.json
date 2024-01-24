@@ -1,7 +1,7 @@
 {
 	"name": "@umbraco-cms/backoffice",
 	"license": "MIT",
-	"version": "14.0.0--preview004",
+	"version": "14.0.0--preview005",
 	"type": "module",
 	"exports": {
 		".": null,
@@ -211,6 +211,10 @@
 		"vite-plugin-static-copy": "^1.0.0",
 		"vite-tsconfig-paths": "^4.2.3",
 		"web-component-analyzer": "^2.0.0"
+	},
+	"overrides": {
+		"lit": "$lit",
+		"lit-html": "2.8.0"
 	},
 	"msw": {
 		"workerDirectory": "public"

@@ -30,10 +30,10 @@ export class TourResource {
      * @throws ApiError
      */
     public static postTour({
-        requestBody,
-    }: {
-        requestBody?: SetTourStatusRequestModel,
-    }): CancelablePromise<any> {
+requestBody,
+}: {
+requestBody?: SetTourStatusRequestModel,
+}): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/umbraco/management/api/v1/tour',

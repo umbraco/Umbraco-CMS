@@ -108,7 +108,7 @@ export class UmbExtensionRegistry<
 					),
 			);
 		nextData.push(kind as ManifestKind<ManifestTypes>);
-		this._kinds.next(nextData);
+		this._kinds.setValue(nextData);
 	}
 
 	register(manifest: ManifestTypes | ManifestKind<ManifestTypes>): void {
@@ -117,12 +117,12 @@ export class UmbExtensionRegistry<
 			return;
 		}
 
-		this._extensions.next([...this._extensions.getValue(), manifest as ManifestTypes]);
+		this._extensions.setValue([...this._extensions.getValue(), manifest as ManifestTypes]);
 	}
 
 	registerMany(manifests: Array<ManifestTypes | ManifestKind<ManifestTypes>>): void {
-		const validManifests = manifests.filter(this.checkExtension.bind(this));
-		this._extensions.next([...this._extensions.getValue(), ...(validManifests as Array<ManifestTypes>)]);
+		// we have to register extensions individually, so we ensure a manifest is valid before continuing to the next one
+		manifests.forEach((manifest) => this.register(manifest));
 	}
 
 	unregisterMany(aliases: Array<string>): void {
@@ -133,8 +133,8 @@ export class UmbExtensionRegistry<
 		const newKindsValues = this._kinds.getValue().filter((kind) => kind.alias !== alias);
 		const newExtensionsValues = this._extensions.getValue().filter((extension) => extension.alias !== alias);
 
-		this._kinds.next(newKindsValues);
-		this._extensions.next(newExtensionsValues);
+		this._kinds.setValue(newKindsValues);
+		this._extensions.setValue(newExtensionsValues);
 	}
 
 	isRegistered(alias: string): boolean {

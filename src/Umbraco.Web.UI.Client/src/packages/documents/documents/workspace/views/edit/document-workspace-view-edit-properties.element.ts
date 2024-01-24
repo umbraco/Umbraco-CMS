@@ -22,7 +22,7 @@ export class UmbDocumentWorkspaceViewEditPropertiesElement extends UmbLitElement
 		this._propertyStructureHelper.setContainerType(value);
 	}
 
-	_propertyStructureHelper = new UmbContentTypePropertyStructureHelper(this);
+	_propertyStructureHelper = new UmbContentTypePropertyStructureHelper<any>(this);
 
 	@state()
 	_propertyStructure: Array<PropertyTypeModelBaseModel> = [];

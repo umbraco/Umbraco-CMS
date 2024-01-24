@@ -67,7 +67,7 @@ export class UmbInputMarkdownElement extends FormControlMixin(UmbLitElement) {
 				folding: false,
 			}); // Prefer to update options before showing the editor, to avoid seeing the changes in the UI.
 
-			this.#isCodeEditorReady.next(true);
+			this.#isCodeEditorReady.setValue(true);
 			this.#loadActions();
 		} catch (error) {
 			console.error(error);

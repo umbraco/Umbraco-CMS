@@ -15,10 +15,15 @@ export class UmbClassState<T extends UmbClassStateData | undefined> extends UmbB
 		super(initialData);
 	}
 
-	next(newData: T): void {
+	/**
+	 * @method setValue
+	 * @param {T} data - The next data for this state to hold.
+	 * @description - Set the data of this state, if data is different than current this will trigger observations to update.
+	 */
+	setValue(data: T): void {
 		const oldValue = this._subject.getValue();
 
-		if (newData && oldValue?.equal(newData)) return;
-		this._subject.next(newData);
+		if (data && oldValue?.equal(data)) return;
+		this._subject.next(data);
 	}
 }

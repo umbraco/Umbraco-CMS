@@ -9,4 +9,3 @@ export type DictionaryItemModelBaseModel = {
     name: string;
     translations: Array<DictionaryItemTranslationModel>;
 };
-
