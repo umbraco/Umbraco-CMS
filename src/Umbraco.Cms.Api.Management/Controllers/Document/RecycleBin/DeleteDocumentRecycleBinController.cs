@@ -42,7 +42,7 @@ public class DeleteDocumentRecycleBinController : DocumentRecycleBinControllerBa
     {
         AuthorizationResult authorizationResult  = await _authorizationService.AuthorizeResourceAsync(
             User,
-            ContentPermissionResource.WithKeys(ActionDelete.ActionLetter, id),
+            ContentPermissionResource.RecycleBin(ActionDelete.ActionLetter),
             AuthorizationPolicies.ContentPermissionByResource);
 
         if (!authorizationResult.Succeeded)
