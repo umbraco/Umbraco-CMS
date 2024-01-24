@@ -71,21 +71,6 @@ const entityActions: Array<ManifestTypes> = [
 			entityTypes: [UMB_DOCUMENT_ROOT_ENTITY_TYPE, UMB_DOCUMENT_ENTITY_TYPE],
 		},
 	},
-	/*
-	{
-		type: 'entityAction',
-		alias: 'Umb.EntityAction.Document.CultureAndHostnames',
-		name: 'Culture And Hostnames Document Entity Action',
-		weight: 400,
-		api: UmbDocumentCultureAndHostnamesEntityAction,
-		meta: {
-			icon: 'icon-home',
-			label: 'Culture And Hostnames (TBD)',
-			repositoryAlias: UMB_DOCUMENT_REPOSITORY_ALIAS,
-			entityTypes: [UMB_DOCUMENT_ENTITY_TYPE],
-		},
-	},
-	*/
 	{
 		type: 'entityAction',
 		alias: 'Umb.EntityAction.Document.PublicAccess',
