@@ -21,6 +21,7 @@ export class UmbScriptCreateOptionsEntityAction extends UmbEntityActionBase<neve
 		this.#modalManagerContext?.open(UMB_SCRIPT_CREATE_OPTIONS_MODAL, {
 			data: {
 				parentUnique: this.unique,
+				entityType: this.entityType,
 			},
 		});
 	}

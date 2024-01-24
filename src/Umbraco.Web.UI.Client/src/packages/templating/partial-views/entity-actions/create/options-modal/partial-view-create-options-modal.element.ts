@@ -38,6 +38,7 @@ export class UmbPartialViewCreateOptionsModalElement extends UmbModalBaseElement
 			// @ts-ignore
 			// TODO: allow null for entity actions. Some actions can be executed on the root item
 			this.data.parentUnique,
+			this.data.entityType,
 		);
 	}
 

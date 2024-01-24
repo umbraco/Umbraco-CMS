@@ -21,6 +21,7 @@ export class UmbPartialViewCreateOptionsEntityAction extends UmbEntityActionBase
 		this.#modalManagerContext?.open(UMB_PARTIAL_VIEW_CREATE_OPTIONS_MODAL, {
 			data: {
 				parentUnique: this.unique,
+				entityType: this.entityType,
 			},
 		});
 	}

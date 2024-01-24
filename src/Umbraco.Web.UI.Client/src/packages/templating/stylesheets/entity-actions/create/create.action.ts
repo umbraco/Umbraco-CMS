@@ -21,6 +21,7 @@ export class UmbStylesheetCreateOptionsEntityAction extends UmbEntityActionBase<
 		this.#modalManagerContext?.open(UMB_STYLESHEET_CREATE_OPTIONS_MODAL, {
 			data: {
 				parentUnique: this.unique,
+				entityType: this.entityType,
 			},
 		});
 	}
