@@ -1,6 +1,6 @@
 import type { UmbMediaDetailModel } from '../../index.js';
 import type { UmbDataSource } from '@umbraco-cms/backoffice/repository';
-import { CreateMediaRequestModel, UpdateMediaRequestModel } from '@umbraco-cms/backoffice/backend-api';
+import type { CreateMediaRequestModel, UpdateMediaRequestModel } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 

@@ -1,5 +1,5 @@
-import { UmbEntityData } from './entity.data.js';
-import { TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbEntityData } from './entity.data.js';
+import type { TreeItemPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 
 export class UmbEntityTreeData<TreeItemType extends TreeItemPresentationModel> {

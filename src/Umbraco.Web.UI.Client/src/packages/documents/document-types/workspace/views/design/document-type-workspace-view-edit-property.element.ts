@@ -1,13 +1,15 @@
 import { UmbDataTypeDetailRepository } from '@umbraco-cms/backoffice/data-type';
-import { UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import type { UUIInputElement} from '@umbraco-cms/backoffice/external/uui';
+import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, property, state, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
-import { PropertyTypeModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { PropertyTypeModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
+import type {
+	UmbConfirmModalData} from '@umbraco-cms/backoffice/modal';
 import {
 	UMB_CONFIRM_MODAL,
 	UMB_MODAL_MANAGER_CONTEXT,
 	UMB_PROPERTY_SETTINGS_MODAL,
 	UMB_WORKSPACE_MODAL,
-	UmbConfirmModalData,
 	UmbModalRouteRegistrationController,
 } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';

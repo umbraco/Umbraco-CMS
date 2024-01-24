@@ -3,9 +3,10 @@ import { UmbMockEntityFolderManager } from '../entity/entity-folder.manager.js';
 import { UmbMockEntityTreeManager } from '../entity/entity-tree.manager.js';
 import { UmbMockEntityItemManager } from '../entity/entity-item.manager.js';
 import { UmbMockEntityDetailManager } from '../entity/entity-detail.manager.js';
-import { UmbMockMediaTypeModel, data } from './media-type.data.js';
+import type { UmbMockMediaTypeModel} from './media-type.data.js';
+import { data } from './media-type.data.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import {
+import type {
 	CreateFolderRequestModel,
 	CreateMediaTypeRequestModel,
 	MediaTypeItemResponseModel,

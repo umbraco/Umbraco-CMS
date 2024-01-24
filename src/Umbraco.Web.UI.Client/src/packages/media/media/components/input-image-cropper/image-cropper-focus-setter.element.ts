@@ -1,8 +1,9 @@
-import { UmbImageCropperFocalPoint } from './index.js';
+import type { UmbImageCropperFocalPoint } from './index.js';
 import { clamp } from '@umbraco-cms/backoffice/utils';
+import type {
+	PropertyValueMap} from '@umbraco-cms/backoffice/external/lit';
 import {
 	LitElement,
-	PropertyValueMap,
 	css,
 	html,
 	nothing,

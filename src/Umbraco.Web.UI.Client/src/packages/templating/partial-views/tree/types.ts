@@ -1,4 +1,4 @@
-import { UmbPartialViewEntityType, UmbPartialViewFolderEntityType, UmbPartialViewRootEntityType } from '../entity.js';
+import type { UmbPartialViewEntityType, UmbPartialViewFolderEntityType, UmbPartialViewRootEntityType } from '../entity.js';
 import type { UmbUniqueTreeItemModel, UmbUniqueTreeRootModel } from '@umbraco-cms/backoffice/tree';
 
 export interface UmbPartialViewTreeItemModel extends UmbUniqueTreeItemModel {

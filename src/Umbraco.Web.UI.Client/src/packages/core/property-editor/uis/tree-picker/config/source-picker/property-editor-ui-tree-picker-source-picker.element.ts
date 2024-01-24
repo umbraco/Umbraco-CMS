@@ -1,7 +1,10 @@
-import { type UmbTreePickerSource, UmbInputTreePickerSourceElement } from '@umbraco-cms/backoffice/components';
+import type { UmbInputTreePickerSourceElement, UmbTreePickerSource } from '@umbraco-cms/backoffice/components';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import { type UmbPropertyEditorConfigCollection, UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
+import {
+	type UmbPropertyEditorConfigCollection,
+	UmbPropertyValueChangeEvent,
+} from '@umbraco-cms/backoffice/property-editor';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
@@ -9,7 +12,10 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
  * @element umb-property-editor-ui-tree-picker-source-picker
  */
 @customElement('umb-property-editor-ui-tree-picker-source-picker')
-export class UmbPropertyEditorUITreePickerSourcePickerElement extends UmbLitElement implements UmbPropertyEditorUiElement {
+export class UmbPropertyEditorUITreePickerSourcePickerElement
+	extends UmbLitElement
+	implements UmbPropertyEditorUiElement
+{
 	@property({ type: Object })
 	value?: UmbTreePickerSource;
 

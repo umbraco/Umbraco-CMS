@@ -3,23 +3,16 @@ import { pastePreProcessHandler } from './input-tiny-mce.handlers.js';
 import { availableLanguages } from './input-tiny-mce.languages.js';
 import { uriAttributeSanitizer } from './input-tiny-mce.sanitizer.js';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
-import { type Editor, type RawEditorOptions } from '@umbraco-cms/backoffice/external/tinymce';
-import { type TinyMcePluginArguments, type UmbTinyMcePluginBase } from '@umbraco-cms/backoffice/components';
+import type { Editor, RawEditorOptions } from '@umbraco-cms/backoffice/external/tinymce';
+import type { TinyMcePluginArguments, UmbTinyMcePluginBase } from '@umbraco-cms/backoffice/components';
 import { loadManifestApi } from '@umbraco-cms/backoffice/extension-api';
 import { type ManifestTinyMcePlugin, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import {
-	PropertyValueMap,
-	css,
-	customElement,
-	html,
-	property,
-	query,
-	state,
-} from '@umbraco-cms/backoffice/external/lit';
+import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, property, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbMediaHelper } from '@umbraco-cms/backoffice/utils';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
 import { UmbStylesheetDetailRepository, UmbStylesheetRuleManager } from '@umbraco-cms/backoffice/stylesheet';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
@@ -32,6 +25,7 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 	@state()
 	private _tinyConfig: RawEditorOptions = {};
 
+	// eslint-disable-next-line @typescript-eslint/consistent-type-imports
 	#renderEditor?: typeof import('@umbraco-cms/backoffice/external/tinymce').renderEditor;
 	#mediaHelper = new UmbMediaHelper();
 	#plugins: Array<new (args: TinyMcePluginArguments) => UmbTinyMcePluginBase> = [];
@@ -232,6 +226,9 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 			this.#editorRef.destroy();
 		}
 
+		if (!this.#renderEditor) {
+			throw new Error('TinyMCE renderEditor is not loaded');
+		}
 		const editors = await this.#renderEditor(this._tinyConfig);
 		this.#editorRef = editors.pop();
 	}

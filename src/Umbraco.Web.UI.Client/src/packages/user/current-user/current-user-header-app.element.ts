@@ -1,7 +1,9 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, CSSResultGroup, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import type { CSSResultGroup} from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import type {
+	UmbModalManagerContext} from '@umbraco-cms/backoffice/modal';
 import {
-	UmbModalManagerContext,
 	UMB_MODAL_MANAGER_CONTEXT,
 	UMB_CURRENT_USER_MODAL,
 } from '@umbraco-cms/backoffice/modal';

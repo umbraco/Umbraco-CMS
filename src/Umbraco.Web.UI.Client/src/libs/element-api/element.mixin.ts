@@ -1,15 +1,16 @@
 import { UmbLocalizeController } from '@umbraco-cms/backoffice/localization-api';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { HTMLElementConstructor } from '@umbraco-cms/backoffice/extension-api';
-import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import {
+import { UmbControllerHostElementMixin , UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type {
 	UmbContextToken,
-	UmbContextCallback,
+	UmbContextCallback} from '@umbraco-cms/backoffice/context-api';
+import {
 	UmbContextConsumerController,
 	UmbContextProviderController,
 } from '@umbraco-cms/backoffice/context-api';
-import { ObserverCallback, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import type { ObserverCallback} from '@umbraco-cms/backoffice/observable-api';
+import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
 export declare class UmbElement extends UmbControllerHostElement {
 	/**

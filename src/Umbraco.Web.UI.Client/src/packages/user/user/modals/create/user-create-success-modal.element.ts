@@ -1,18 +1,20 @@
 import { UmbUserItemRepository } from '../../repository/item/user-item.repository.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UUIInputPasswordElement } from '@umbraco-cms/backoffice/external/uui';
-import {
+import type { UUIInputPasswordElement } from '@umbraco-cms/backoffice/external/uui';
+import type {
 	UmbNotificationDefaultData,
-	UmbNotificationContext,
+	UmbNotificationContext} from '@umbraco-cms/backoffice/notification';
+import {
 	UMB_NOTIFICATION_CONTEXT,
 } from '@umbraco-cms/backoffice/notification';
-import {
+import type {
 	UmbCreateUserSuccessModalData,
-	UmbCreateUserSuccessModalValue,
+	UmbCreateUserSuccessModalValue} from '@umbraco-cms/backoffice/modal';
+import {
 	UmbModalBaseElement,
 } from '@umbraco-cms/backoffice/modal';
-import { UserItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UserItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-user-create-success-modal')
 export class UmbUserCreateSuccessModalElement extends UmbModalBaseElement<

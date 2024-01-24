@@ -1,7 +1,7 @@
-import { UmbStylesheetDetailModel } from '../types.js';
+import type { UmbStylesheetDetailModel } from '../types.js';
 import { UMB_STYLESHEET_DETAIL_STORE_CONTEXT } from '../repository/index.js';
 import { UMB_STYLESHEET_ENTITY_TYPE } from '../entity.js';
-import { UmbStylesheetTreeItemModel } from './types.js';
+import type { UmbStylesheetTreeItemModel } from './types.js';
 import { UmbUniqueTreeStore } from '@umbraco-cms/backoffice/tree';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';

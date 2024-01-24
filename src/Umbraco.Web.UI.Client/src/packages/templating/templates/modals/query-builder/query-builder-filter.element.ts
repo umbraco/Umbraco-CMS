@@ -1,7 +1,8 @@
 import { localizeOperators, localizePropertyType } from './utils.js';
-import { type UUIComboboxListElement } from '@umbraco-cms/backoffice/external/uui';
+import type { UUIComboboxListElement } from '@umbraco-cms/backoffice/external/uui';
+import type {
+	PropertyValueMap} from '@umbraco-cms/backoffice/external/lit';
 import {
-	PropertyValueMap,
 	css,
 	html,
 	customElement,
@@ -10,11 +11,12 @@ import {
 	ifDefined,
 } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import {
+import type {
 	OperatorModel,
 	TemplateQueryExecuteFilterPresentationModel,
-	TemplateQueryPropertyTypeModel,
-	TemplateQuerySettingsResponseModel,
+	TemplateQuerySettingsResponseModel} from '@umbraco-cms/backoffice/backend-api';
+import {
+	TemplateQueryPropertyTypeModel
 } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-query-builder-filter')

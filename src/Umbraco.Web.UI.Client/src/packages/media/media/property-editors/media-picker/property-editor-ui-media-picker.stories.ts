@@ -1,4 +1,4 @@
-import { Meta, Story } from '@storybook/web-components';
+import type { Meta, Story } from '@storybook/web-components';
 import type { UmbPropertyEditorUIMediaPickerElement } from './property-editor-ui-media-picker.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 

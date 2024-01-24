@@ -1,7 +1,10 @@
-import { UMB_USER_STORE_CONTEXT, UmbUserStore } from './user.store.js';
-import { UMB_USER_ITEM_STORE_CONTEXT, UmbUserItemStore } from './item/user-item.store.js';
+import type { UmbUserStore } from './user.store.js';
+import { UMB_USER_STORE_CONTEXT } from './user.store.js';
+import type { UmbUserItemStore } from './item/user-item.store.js';
+import { UMB_USER_ITEM_STORE_CONTEXT } from './item/user-item.store.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UMB_NOTIFICATION_CONTEXT, UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
+import type { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
+import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 
 export class UmbUserRepositoryBase extends UmbRepositoryBase {

@@ -1,4 +1,4 @@
-import { PublishedStateModel } from '@umbraco-cms/backoffice/backend-api';
+import type { PublishedStateModel } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbEntityTreeItemModel, UmbEntityTreeRootModel } from '@umbraco-cms/backoffice/tree';
 
 export interface UmbDocumentTreeItemModel extends UmbEntityTreeItemModel {

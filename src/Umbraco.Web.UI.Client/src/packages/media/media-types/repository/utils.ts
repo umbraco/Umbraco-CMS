@@ -1,4 +1,4 @@
-import { CreateFolderRequestModel } from '@umbraco-cms/backoffice/backend-api';
+import type { CreateFolderRequestModel } from '@umbraco-cms/backoffice/backend-api';
 
 export const createFolderTreeItem = (item: CreateFolderRequestModel) => {
 	if (!item) throw new Error('item is null or undefined');

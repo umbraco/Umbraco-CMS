@@ -3,7 +3,8 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UMB_MODAL_CONTEXT, UmbModalContext } from '@umbraco-cms/backoffice/modal';
+import type { UmbModalContext } from '@umbraco-cms/backoffice/modal';
+import { UMB_MODAL_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 /**
  * @element umb-workspace-footer

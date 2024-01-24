@@ -1,11 +1,12 @@
 import { html, property } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
-import {
+import type {
 	UmbModalManagerContext,
 	UmbModalToken,
 	UmbModalType,
-	UMB_MODAL_MANAGER_CONTEXT,
-	UmbPickerModalValue,
+	UmbPickerModalValue} from '@umbraco-cms/backoffice/modal';
+import {
+	UMB_MODAL_MANAGER_CONTEXT
 } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 

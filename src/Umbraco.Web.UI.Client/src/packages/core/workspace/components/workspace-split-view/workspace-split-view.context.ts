@@ -1,10 +1,10 @@
 import { UMB_VARIANT_WORKSPACE_CONTEXT } from '../../workspace-context/index.js';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import { UmbNumberState } from '@umbraco-cms/backoffice/observable-api';
-import { type UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
+import type { UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 
 export class UmbWorkspaceSplitViewContext extends UmbBaseController {
 	#workspaceContext?: typeof UMB_VARIANT_WORKSPACE_CONTEXT.TYPE;

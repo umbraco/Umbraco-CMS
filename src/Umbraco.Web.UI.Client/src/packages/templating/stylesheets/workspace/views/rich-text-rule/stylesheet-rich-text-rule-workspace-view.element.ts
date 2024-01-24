@@ -1,12 +1,12 @@
-import { UmbStylesheetWorkspaceContext } from '../../stylesheet-workspace.context.js';
-import { UmbStylesheetRule } from '../../../types.js';
-import { UmbStylesheetRuleInputElement } from '../../../components/index.js';
+import type { UmbStylesheetWorkspaceContext } from '../../stylesheet-workspace.context.js';
+import type { UmbStylesheetRule } from '../../../types.js';
+import type { UmbStylesheetRuleInputElement } from '../../../components/index.js';
 import { UmbStylesheetRuleManager } from '../../../utils/index.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 @customElement('umb-stylesheet-rich-text-rule-workspace-view')
 export class UmbStylesheetRichTextRuleWorkspaceViewElement extends UmbLitElement {

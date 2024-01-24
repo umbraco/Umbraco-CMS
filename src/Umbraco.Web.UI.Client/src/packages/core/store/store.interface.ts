@@ -1,5 +1,5 @@
-import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
-import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
+import type { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
+import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 
 export interface UmbStore<T> extends UmbContextBase<T> {
 	append: (item: T) => void;

@@ -3,7 +3,7 @@ import './image-cropper.element.js';
 import './image-cropper-focus-setter.element.js';
 import './image-cropper-preview.element.js';
 import type { UmbImageCropperElement } from './image-cropper.element.js';
-import {
+import type {
 	UmbImageCropperCrop,
 	UmbImageCropperCrops,
 	UmbImageCropperFocalPoint,

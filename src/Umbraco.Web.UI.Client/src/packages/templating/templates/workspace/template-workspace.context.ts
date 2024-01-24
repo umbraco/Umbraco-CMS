@@ -1,8 +1,9 @@
 import { UmbTemplateRepository } from '../repository/index.js';
 import { UmbTemplateTreeRepository } from '../tree/index.js';
 import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
+import type {
+	UmbSaveableWorkspaceContextInterface} from '@umbraco-cms/backoffice/workspace';
 import {
-	UmbSaveableWorkspaceContextInterface,
 	UmbEditableWorkspaceContextBase,
 } from '@umbraco-cms/backoffice/workspace';
 import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';

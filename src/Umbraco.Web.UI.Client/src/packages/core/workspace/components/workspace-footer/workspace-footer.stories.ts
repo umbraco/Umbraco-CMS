@@ -1,7 +1,7 @@
 import '../workspace-editor/workspace-editor.element.js';
 import './workspace-footer.element.js';
 
-import { Meta, Story } from '@storybook/web-components';
+import type { Meta, Story } from '@storybook/web-components';
 import type { UmbWorkspaceFooterLayoutElement } from './workspace-footer.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 

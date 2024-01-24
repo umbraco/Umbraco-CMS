@@ -2,13 +2,14 @@ import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { type UmbItemRepository, UmbRepositoryItemsManager } from '@umbraco-cms/backoffice/repository';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
-import {
-	UMB_CONFIRM_MODAL,
-	UMB_MODAL_MANAGER_CONTEXT,
+import type {
 	UmbModalManagerContext,
 	UmbModalToken,
 	UmbPickerModalData,
-	UmbPickerModalValue,
+	UmbPickerModalValue} from '@umbraco-cms/backoffice/modal';
+import {
+	UMB_CONFIRM_MODAL,
+	UMB_MODAL_MANAGER_CONTEXT
 } from '@umbraco-cms/backoffice/modal';
 
 export class UmbPickerInputContext<ItemType extends { name: string }> extends UmbBaseController {

@@ -4,8 +4,8 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { customElement, state, css, html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbRoute, UmbRouterSlotInitEvent } from '@umbraco-cms/backoffice/router';
-import { VariantModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
-import { ActiveVariant } from '@umbraco-cms/backoffice/workspace';
+import type { VariantModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { ActiveVariant } from '@umbraco-cms/backoffice/workspace';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 @customElement('umb-document-workspace-editor')
 export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {

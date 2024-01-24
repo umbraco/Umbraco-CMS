@@ -1,4 +1,4 @@
-import { UmbWorkspaceAction } from './index.js';
+import type { UmbWorkspaceAction } from './index.js';
 import { UmbActionExecutedEvent } from '@umbraco-cms/backoffice/event';
 import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';

@@ -1,6 +1,6 @@
 import './stylesheet-workspace.element.js';
 
-import { Meta, Story } from '@storybook/web-components';
+import type { Meta, Story } from '@storybook/web-components';
 import type { UmbStylesheetWorkspaceElement } from './stylesheet-workspace.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 

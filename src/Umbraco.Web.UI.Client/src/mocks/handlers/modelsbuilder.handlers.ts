@@ -1,10 +1,11 @@
 const { rest } = window.MockServiceWorker;
 
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
-import {
+import type {
 	ModelsBuilderResponseModel,
+	OutOfDateStatusResponseModel} from '@umbraco-cms/backoffice/backend-api';
+import {
 	ModelsModeModel,
-	OutOfDateStatusResponseModel,
 	OutOfDateTypeModel,
 } from '@umbraco-cms/backoffice/backend-api';
 

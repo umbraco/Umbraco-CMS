@@ -1,9 +1,10 @@
 import { UmbLanguageRepository } from '../repository/language.repository.js';
-import { UMB_APP_LANGUAGE_CONTEXT, UmbAppLanguageContext } from './app-language.context.js';
-import { UUIMenuItemEvent, UUIPopoverContainerElement } from '@umbraco-cms/backoffice/external/uui';
+import type { UmbAppLanguageContext } from './app-language.context.js';
+import { UMB_APP_LANGUAGE_CONTEXT } from './app-language.context.js';
+import type { UUIMenuItemEvent, UUIPopoverContainerElement } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state, repeat, ifDefined, query } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-app-language-select')
 export class UmbAppLanguageSelectElement extends UmbLitElement {

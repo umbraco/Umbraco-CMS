@@ -2,16 +2,18 @@ import { UMB_BLOCK_WORKSPACE_CONTEXT } from '../../block-workspace.context-token
 import type { UmbBlockWorkspaceViewEditTabElement } from './block-workspace-view-edit-tab.element.js';
 import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbContentTypeContainerStructureHelper, UmbContentTypeModel } from '@umbraco-cms/backoffice/content-type';
-import {
-	encodeFolderName,
+import type { UmbContentTypeModel } from '@umbraco-cms/backoffice/content-type';
+import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/content-type';
+import type {
 	UmbRoute,
 	UmbRouterSlotChangeEvent,
-	UmbRouterSlotInitEvent,
+	UmbRouterSlotInitEvent} from '@umbraco-cms/backoffice/router';
+import {
+	encodeFolderName
 } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { PropertyTypeContainerModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
+import type { PropertyTypeContainerModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-block-workspace-view-edit')
 export class UmbBlockWorkspaceViewEditElement extends UmbLitElement implements UmbWorkspaceViewElement {

@@ -1,5 +1,6 @@
 import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import { FormControlMixin, UUIColorPickerChangeEvent } from '@umbraco-cms/backoffice/external/uui';
+import type { UUIColorPickerChangeEvent } from '@umbraco-cms/backoffice/external/uui';
+import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-input-eye-dropper')

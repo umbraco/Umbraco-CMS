@@ -1,11 +1,12 @@
 import type { UmbDocumentWorkspaceContext } from '../workspace/index.js';
-import {
-	UMB_PROPERTY_DATASET_CONTEXT,
+import type {
 	UmbNameablePropertyDatasetContext,
-	UmbPropertyDatasetContext,
+	UmbPropertyDatasetContext} from '@umbraco-cms/backoffice/property';
+import {
+	UMB_PROPERTY_DATASET_CONTEXT
 } from '@umbraco-cms/backoffice/property';
-import { DocumentVariantResponseModel, PropertyTypeModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
-import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { DocumentVariantResponseModel, PropertyTypeModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';

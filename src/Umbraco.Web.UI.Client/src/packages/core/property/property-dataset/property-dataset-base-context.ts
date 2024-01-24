@@ -4,7 +4,7 @@ import {
 	type UmbNameablePropertyDatasetContext,
 	type UmbPropertyDatasetContext,
 } from '@umbraco-cms/backoffice/property';
-import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbArrayState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';

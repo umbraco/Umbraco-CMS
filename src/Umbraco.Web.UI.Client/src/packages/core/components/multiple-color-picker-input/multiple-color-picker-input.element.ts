@@ -1,4 +1,4 @@
-import { UmbMultipleColorPickerItemInputElement } from './multiple-color-picker-item-input.element.js';
+import type { UmbMultipleColorPickerItemInputElement } from './multiple-color-picker-item-input.element.js';
 import type { UmbSwatchDetails } from '@umbraco-cms/backoffice/models';
 import {
 	css,

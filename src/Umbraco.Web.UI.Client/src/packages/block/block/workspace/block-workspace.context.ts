@@ -2,10 +2,11 @@ import type { UmbBlockLayoutBaseModel, UmbBlockDataType } from '../types.js';
 import { UmbBlockElementManager } from './block-element-manager.js';
 import { UmbEditableWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
 import { UmbBooleanState, UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
-import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { ManifestWorkspace } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { ManifestWorkspace } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import { UMB_BLOCK_MANAGER_CONTEXT, UmbBlockWorkspaceData } from '@umbraco-cms/backoffice/block';
+import type { UmbBlockWorkspaceData } from '@umbraco-cms/backoffice/block';
+import { UMB_BLOCK_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/block';
 import { buildUdi } from '@umbraco-cms/backoffice/utils';
 import { UMB_MODAL_CONTEXT } from '@umbraco-cms/backoffice/modal';
 

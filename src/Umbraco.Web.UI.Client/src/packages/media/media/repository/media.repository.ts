@@ -1,13 +1,16 @@
 import { UMB_MEDIA_TREE_STORE_CONTEXT, type UmbMediaTreeStore } from '../tree/index.js';
-import { UMB_MEDIA_STORE_CONTEXT, UmbMediaStore } from './media.store.js';
+import type { UmbMediaStore } from './media.store.js';
+import { UMB_MEDIA_STORE_CONTEXT } from './media.store.js';
 import { UmbMediaDetailServerDataSource } from './sources/media-detail.server.data-source.js';
 import { UmbMediaItemServerDataSource } from './sources/media-item.server.data-source.js';
-import { UMB_MEDIA_ITEM_STORE_CONTEXT, UmbMediaItemStore } from './media-item.store.js';
-import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbMediaItemStore } from './media-item.store.js';
+import { UMB_MEDIA_ITEM_STORE_CONTEXT } from './media-item.store.js';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
-import { CreateMediaRequestModel, UpdateMediaRequestModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
-import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
+import type { CreateMediaRequestModel, UpdateMediaRequestModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbNotificationContext} from '@umbraco-cms/backoffice/notification';
+import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
+import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
 export class UmbMediaRepository extends UmbBaseController implements UmbApi {
 	#init;

@@ -1,7 +1,8 @@
-import { UmbData } from '../data.js';
+import type { UmbData } from '../data.js';
 import { createFileSystemTreeItem } from '../utils.js';
+import type {
+	FileSystemTreeItemPresentationModel} from '@umbraco-cms/backoffice/backend-api';
 import {
-	FileSystemTreeItemPresentationModel,
 	PagedFileSystemTreeItemPresentationModel,
 } from '@umbraco-cms/backoffice/backend-api';
 

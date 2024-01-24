@@ -1,12 +1,13 @@
-import { UmbImageCropperCrop, UmbImageCropperFocalPoint } from './index.js';
+import type { UmbImageCropperCrop, UmbImageCropperFocalPoint } from './index.js';
 import { calculateExtrapolatedValue, clamp, inverseLerp, lerp } from '@umbraco-cms/backoffice/utils';
+import type {
+	PropertyValueMap} from '@umbraco-cms/backoffice/external/lit';
 import {
 	customElement,
 	property,
 	query,
 	state,
 	LitElement,
-	PropertyValueMap,
 	css,
 	html,
 } from '@umbraco-cms/backoffice/external/lit';

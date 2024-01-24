@@ -1,6 +1,7 @@
 import { aTimeout, expect } from '@open-wc/testing';
 import { UmbLocalizationRegistry } from './localization.registry.js';
-import { ManifestLocalization, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestLocalization} from '@umbraco-cms/backoffice/extension-registry';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
 //#region Localizations
 const english: ManifestLocalization = {

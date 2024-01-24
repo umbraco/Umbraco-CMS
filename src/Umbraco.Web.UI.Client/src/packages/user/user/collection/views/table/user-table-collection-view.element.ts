@@ -1,8 +1,8 @@
-import { UmbUserCollectionContext } from '../../user-collection.context.js';
+import type { UmbUserCollectionContext } from '../../user-collection.context.js';
 import type { UmbUserDetailModel } from '../../../types.js';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import {
+import type {
 	UmbTableElement,
 	UmbTableColumn,
 	UmbTableDeselectedEvent,
@@ -17,7 +17,7 @@ import { UmbUserGroupRepository } from '@umbraco-cms/backoffice/user-group';
 
 import './column-layouts/name/user-table-name-column-layout.element.js';
 import './column-layouts/status/user-table-status-column-layout.element.js';
-import { UserGroupItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UserGroupItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-user-table-collection-view')
 export class UmbUserTableCollectionViewElement extends UmbLitElement {

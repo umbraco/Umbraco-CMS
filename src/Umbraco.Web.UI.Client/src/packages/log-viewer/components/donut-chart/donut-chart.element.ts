@@ -1,4 +1,4 @@
-import { UmbDonutSliceElement } from './donut-slice.element.js';
+import type { UmbDonutSliceElement } from './donut-slice.element.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import {
 	css,

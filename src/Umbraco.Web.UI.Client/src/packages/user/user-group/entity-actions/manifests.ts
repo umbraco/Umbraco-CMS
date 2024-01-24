@@ -1,7 +1,7 @@
 import { UMB_USER_GROUP_REPOSITORY_ALIAS } from '../repository/manifests.js';
 import { UMB_USER_GROUP_ENTITY_TYPE } from '../index.js';
 import { UmbDeleteEntityAction } from '@umbraco-cms/backoffice/entity-action';
-import { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const entityActions: Array<ManifestTypes> = [
 	{

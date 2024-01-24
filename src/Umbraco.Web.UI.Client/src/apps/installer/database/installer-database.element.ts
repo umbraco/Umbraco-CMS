@@ -1,8 +1,10 @@
-import { UmbInstallerContext, UMB_INSTALLER_CONTEXT } from '../installer.context.js';
-import { UUIButtonElement } from '@umbraco-cms/backoffice/external/uui';
+import type { UmbInstallerContext} from '../installer.context.js';
+import { UMB_INSTALLER_CONTEXT } from '../installer.context.js';
+import type { UUIButtonElement } from '@umbraco-cms/backoffice/external/uui';
+import type {
+	CSSResultGroup} from '@umbraco-cms/backoffice/external/lit';
 import {
 	css,
-	CSSResultGroup,
 	html,
 	nothing,
 	customElement,
@@ -11,12 +13,13 @@ import {
 	state,
 } from '@umbraco-cms/backoffice/external/lit';
 
-import {
-	ApiError,
+import type {
 	DatabaseInstallResponseModel,
 	DatabaseSettingsPresentationModel,
-	InstallResource,
-	ProblemDetails,
+	ProblemDetails} from '@umbraco-cms/backoffice/backend-api';
+import {
+	ApiError,
+	InstallResource
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';

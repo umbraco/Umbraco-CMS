@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from '@storybook/web-components';
+import type { Meta, StoryObj } from '@storybook/web-components';
 import './input-checkbox-list.element.js';
 import type { UmbInputCheckboxListElement } from './input-checkbox-list.element.js';
 

@@ -1,8 +1,9 @@
 import { html, customElement } from '@umbraco-cms/backoffice/external/lit';
-import {
+import type {
 	UmbNotificationColor,
 	UmbNotificationOptions,
-	UmbNotificationContext,
+	UmbNotificationContext} from '@umbraco-cms/backoffice/notification';
+import {
 	UMB_NOTIFICATION_CONTEXT,
 } from '@umbraco-cms/backoffice/notification';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';

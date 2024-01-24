@@ -1,6 +1,6 @@
 import { UmbStoreBase } from './store-base.js';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
-import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
  * @export

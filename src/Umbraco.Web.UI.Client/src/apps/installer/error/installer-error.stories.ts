@@ -1,4 +1,4 @@
-import { Meta, Story } from '@storybook/web-components';
+import type { Meta, Story } from '@storybook/web-components';
 
 import { installerContextProvider } from '../shared/utils.story-helpers.js';
 import { UmbInstallerContext } from '../installer.context.js';

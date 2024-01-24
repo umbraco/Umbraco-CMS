@@ -1,14 +1,15 @@
 import { UMB_BLOCK_WORKSPACE_CONTEXT } from '../../block-workspace.context-token.js';
 import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import {
-	UmbContentTypePropertyStructureHelper,
+import type {
 	PropertyContainerTypes,
 	// UmbPropertyTypeBasedPropertyElement,
-	UmbContentTypeModel,
+	UmbContentTypeModel} from '@umbraco-cms/backoffice/content-type';
+import {
+	UmbContentTypePropertyStructureHelper
 } from '@umbraco-cms/backoffice/content-type';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { PropertyTypeModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { PropertyTypeModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-block-workspace-view-edit-properties')
 export class UmbBlockWorkspaceViewEditPropertiesElement extends UmbLitElement {

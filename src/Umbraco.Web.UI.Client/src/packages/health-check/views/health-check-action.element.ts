@@ -1,8 +1,9 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
+import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, nothing, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 
-import { HealthCheckActionRequestModel, HealthCheckResource } from '@umbraco-cms/backoffice/backend-api';
+import type { HealthCheckActionRequestModel} from '@umbraco-cms/backoffice/backend-api';
+import { HealthCheckResource } from '@umbraco-cms/backoffice/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 

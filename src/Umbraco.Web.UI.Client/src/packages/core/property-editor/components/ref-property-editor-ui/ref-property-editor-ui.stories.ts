@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from '@storybook/web-components';
+import type { Meta, StoryObj } from '@storybook/web-components';
 import type { UmbRefPropertyEditorUIElement } from './ref-property-editor-ui.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 import { UMB_PROPERTY_EDITOR_SCHEMA_ALIAS_DEFAULT } from '@umbraco-cms/backoffice/property-editor';

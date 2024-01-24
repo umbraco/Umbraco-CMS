@@ -1,6 +1,6 @@
 import { UMB_WORKSPACE_CONTEXT } from './workspace-context/index.js';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
-import {
+import type {
 	ManifestCondition,
 	UmbConditionConfigBase,
 	UmbConditionControllerArguments,
