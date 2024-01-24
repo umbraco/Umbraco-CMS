@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Api.Management.ViewModels.Installer;
 
-public class InstallVResponseModel
+public class InstallRequestModel
 {
     [Required]
     public UserInstallResponseModel User { get; set; } = null!;

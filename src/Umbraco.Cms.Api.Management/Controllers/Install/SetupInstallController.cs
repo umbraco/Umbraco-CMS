@@ -16,27 +16,20 @@ public class SetupInstallController : InstallControllerBase
 {
     private readonly IUmbracoMapper _mapper;
     private readonly IInstallService _installService;
-    private readonly IHostingEnvironment _hostingEnvironment;
-    private readonly GlobalSettings _globalSettings;
 
     public SetupInstallController(
         IUmbracoMapper mapper,
-        IInstallService installService,
-        IOptions<GlobalSettings> globalSettings,
-        IHostingEnvironment hostingEnvironment)
+        IInstallService installService)
     {
         _mapper = mapper;
         _installService = installService;
-        _hostingEnvironment = hostingEnvironment;
-        _globalSettings = globalSettings.Value;
     }
 
     [HttpPost("setup")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status428PreconditionRequired)]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> Setup(InstallVResponseModel installData)
+    public async Task<IActionResult> Setup(InstallRequestModel installData)
     {
         InstallData data = _mapper.Map<InstallData>(installData)!;
         await _installService.Install(data);

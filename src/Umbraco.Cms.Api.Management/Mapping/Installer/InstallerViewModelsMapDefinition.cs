@@ -10,7 +10,7 @@ public class InstallerViewModelsMapDefinition : IMapDefinition
 {
     public void DefineMaps(IUmbracoMapper mapper)
     {
-        mapper.Define<InstallVResponseModel, InstallData>((source, context) => new InstallData(), Map);
+        mapper.Define<InstallRequestModel, InstallData>((source, context) => new InstallData(), Map);
         mapper.Define<UserInstallResponseModel, UserInstallData>((source, context) => new UserInstallData(), Map);
         mapper.Define<DatabaseInstallResponseModel, DatabaseInstallData>((source, context) => new DatabaseInstallData(), Map);
         mapper.Define<DatabaseInstallResponseModel, DatabaseModel>((source, context) => new DatabaseModel(), Map);
@@ -47,7 +47,7 @@ public class InstallerViewModelsMapDefinition : IMapDefinition
     }
 
     // Umbraco.Code.MapAll
-    private static void Map(InstallVResponseModel source, InstallData target, MapperContext context)
+    private static void Map(InstallRequestModel source, InstallData target, MapperContext context)
     {
         target.TelemetryLevel = source.TelemetryLevel;
         target.User = context.Map<UserInstallData>(source.User)!;
