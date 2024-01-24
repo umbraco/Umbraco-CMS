@@ -11,12 +11,12 @@ public class InstallerViewModelsMapDefinition : IMapDefinition
     public void DefineMaps(IUmbracoMapper mapper)
     {
         mapper.Define<InstallRequestModel, InstallData>((source, context) => new InstallData(), Map);
-        mapper.Define<UserInstallViewModel, UserInstallData>((source, context) => new UserInstallData(), Map);
-        mapper.Define<DatabaseInstallViewModel, DatabaseInstallData>((source, context) => new DatabaseInstallData(), Map);
-        mapper.Define<DatabaseInstallViewModel, DatabaseModel>((source, context) => new DatabaseModel(), Map);
+        mapper.Define<UserInstallPresentationModel, UserInstallData>((source, context) => new UserInstallData(), Map);
+        mapper.Define<DatabaseInstallPresentationModel, DatabaseInstallData>((source, context) => new DatabaseInstallData(), Map);
+        mapper.Define<DatabaseInstallPresentationModel, DatabaseModel>((source, context) => new DatabaseModel(), Map);
         mapper.Define<DatabaseInstallData, DatabaseModel>((source, context) => new DatabaseModel(), Map);
         mapper.Define<InstallSettingsModel, InstallSettingsResponseModel>((source, context) => new InstallSettingsResponseModel(), Map);
-        mapper.Define<UserSettingsModel, UserSettingsViewModel>((source, context) => new UserSettingsViewModel(), Map);
+        mapper.Define<UserSettingsModel, UserSettingsPresentationModel>((source, context) => new UserSettingsPresentationModel(), Map);
         mapper.Define<IDatabaseProviderMetadata, DatabaseSettingsModel>((source, context) => new DatabaseSettingsModel(), Map);
         mapper.Define<DatabaseSettingsModel, DatabaseSettingsPresentationModel>((source, context) => new DatabaseSettingsPresentationModel(), Map);
         mapper.Define<ConsentLevelModel, ConsentLevelPresentationModel>((source, context) => new ConsentLevelPresentationModel(), Map);
@@ -33,7 +33,7 @@ public class InstallerViewModelsMapDefinition : IMapDefinition
     }
 
     // Umbraco.Code.MapAll
-    private void Map(DatabaseInstallViewModel source, DatabaseModel target, MapperContext context)
+    private void Map(DatabaseInstallPresentationModel source, DatabaseModel target, MapperContext context)
     {
         target.ConnectionString = source.ConnectionString;
         target.DatabaseName = source.Name ?? string.Empty;
@@ -55,7 +55,7 @@ public class InstallerViewModelsMapDefinition : IMapDefinition
     }
 
     // Umbraco.Code.MapAll
-    private static void Map(UserInstallViewModel source, UserInstallData target, MapperContext context)
+    private static void Map(UserInstallPresentationModel source, UserInstallData target, MapperContext context)
     {
         target.Email = source.Email;
         target.Name = source.Name;
@@ -64,7 +64,7 @@ public class InstallerViewModelsMapDefinition : IMapDefinition
     }
 
     // Umbraco.Code.MapAll
-    private static void Map(DatabaseInstallViewModel source, DatabaseInstallData target, MapperContext context)
+    private static void Map(DatabaseInstallPresentationModel source, DatabaseInstallData target, MapperContext context)
     {
         target.Id = source.Id;
         target.ProviderName = source.ProviderName;
@@ -94,12 +94,12 @@ public class InstallerViewModelsMapDefinition : IMapDefinition
     // Umbraco.Code.MapAll
     private static void Map(InstallSettingsModel source, InstallSettingsResponseModel target, MapperContext context)
     {
-        target.User = context.Map<UserSettingsViewModel>(source.UserSettings)!;
+        target.User = context.Map<UserSettingsPresentationModel>(source.UserSettings)!;
         target.Databases = context.MapEnumerable<DatabaseSettingsModel, DatabaseSettingsPresentationModel>(source.DatabaseSettings);
     }
 
     // Umbraco.Code.MapAll
-    private static void Map(UserSettingsModel source, UserSettingsViewModel target, MapperContext context)
+    private static void Map(UserSettingsModel source, UserSettingsPresentationModel target, MapperContext context)
     {
         target.MinCharLength = source.PasswordSettings.MinCharLength;
         target.MinNonAlphaNumericLength = source.PasswordSettings.MinNonAlphaNumericLength;

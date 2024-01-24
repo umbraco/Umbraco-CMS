@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Umbraco.Cms.Api.Management.ViewModels.Installer;
 
-public class DatabaseInstallViewModel
+public class DatabaseInstallPresentationModel
 {
     [Required]
     public Guid Id { get; set; }

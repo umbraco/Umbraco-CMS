@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Umbraco.Cms.Api.Management.ViewModels.Installer;
 
-public class UserInstallViewModel
+public class UserInstallPresentationModel
 {
     [Required]
     [StringLength(255)]

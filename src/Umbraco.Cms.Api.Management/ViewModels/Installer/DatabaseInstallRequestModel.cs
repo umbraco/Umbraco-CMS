@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Cms.Api.Management.ViewModels.Installer;
 
-public class DatabaseInstallRequestModel : DatabaseInstallViewModel
+public class DatabaseInstallRequestModel : DatabaseInstallPresentationModel
 {
 
 }
