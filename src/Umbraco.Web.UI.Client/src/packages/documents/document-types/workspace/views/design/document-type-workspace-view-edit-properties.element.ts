@@ -180,7 +180,7 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 							(types) => types.containers?.find((containers) => containers.id === property.containerId),
 						);
 
-						return html`<document-type-workspace-view-edit-property
+						return html`<umb-document-type-workspace-view-edit-property
 							data-umb-property-id=${ifDefined(property.id)}
 							owner-document-type-id=${ifDefined(inheritedFromDocument?.unique)}
 							owner-document-type-name=${ifDefined(inheritedFromDocument?.name)}
@@ -193,7 +193,7 @@ export class UmbDocumentTypeWorkspaceViewEditPropertiesElement extends UmbLitEle
 							@property-delete=${() => {
 								this._propertyStructureHelper.removeProperty(property.id!);
 							}}>
-						</document-type-workspace-view-edit-property>`;
+						</umb-document-type-workspace-view-edit-property>`;
 					},
 				)}
 			</div>
