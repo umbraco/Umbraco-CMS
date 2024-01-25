@@ -1,4 +1,4 @@
-import { DomainPresentationModel } from '@umbraco-cms/backoffice/backend-api';
+import type { DomainPresentationModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbCultureAndHostnamesModalData {

@@ -1,19 +1,14 @@
 import { html, customElement, state, css, repeat, query } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import {
-	UMB_CONFIRM_MODAL,
-	UMB_MODAL_MANAGER_CONTEXT,
-	UmbModalBaseElement,
-	UmbModalManagerContext,
-} from '@umbraco-cms/backoffice/modal';
-import { UUIInputEvent, UUIPopoverContainerElement, UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
+import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbLanguageRepository } from '@umbraco-cms/backoffice/language';
-import { DomainPresentationModel, LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { DomainPresentationModel, LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import {
-	UmbCultureAndHostnamesModalData,
-	UmbCultureAndHostnamesModalValue,
 	UmbDocumentCultureAndHostnamesRepository,
+	type UmbCultureAndHostnamesModalData,
+	type UmbCultureAndHostnamesModalValue,
 } from '@umbraco-cms/backoffice/document';
+import type { UUIInputEvent, UUIPopoverContainerElement, UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-culture-and-hostnames-modal')
 export class UmbCultureAndHostnamesModalElement extends UmbModalBaseElement<

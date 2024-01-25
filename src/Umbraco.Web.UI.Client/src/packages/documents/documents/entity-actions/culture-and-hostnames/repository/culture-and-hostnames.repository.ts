@@ -1,9 +1,10 @@
 import { UmbDocumentCultureAndHostnamesServerDataSource } from './culture-and-hostnames.server.data.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
-import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
-import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
-import { DomainsPresentationModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
+import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
+import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
+import type { DomainsPresentationModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 
 export class UmbDocumentCultureAndHostnamesRepository extends UmbBaseController implements UmbApi {
 	#init!: Promise<unknown>;

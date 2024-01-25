@@ -1,7 +1,8 @@
-import { UmbDocumentRepository } from '../../repository/document.repository.js';
+import type { UmbDocumentRepository } from '../../repository/document.repository.js';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UmbModalManagerContext, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UMB_CULTURE_AND_HOSTNAMES_MODAL } from '@umbraco-cms/backoffice/document';
 
 export class UmbDocumentCultureAndHostnamesEntityAction extends UmbEntityActionBase<UmbDocumentRepository> {
