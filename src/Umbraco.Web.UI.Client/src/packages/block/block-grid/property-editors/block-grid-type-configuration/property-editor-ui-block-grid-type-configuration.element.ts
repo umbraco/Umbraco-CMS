@@ -1,23 +1,18 @@
 import type { UmbBlockTypeWithGroupKey, UmbInputBlockTypeElement } from '../../../block-type/index.js';
 import '../../../block-type/components/input-block-type/index.js';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
-import {
-	html,
-	customElement,
-	property,
-	state,
-	repeat,
-	nothing,
-	css,
-	ifDefined,
-} from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, property, state, repeat, nothing, css } from '@umbraco-cms/backoffice/external/lit';
 import {
 	UmbPropertyValueChangeEvent,
 	type UmbPropertyEditorConfigCollection,
 } from '@umbraco-cms/backoffice/property-editor';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import type { UmbBlockGridGroupType, UmbBlockGridGroupTypeConfiguration } from '@umbraco-cms/backoffice/block';
+import {
+	UMB_BLOCK_GRID_TYPE,
+	type UmbBlockGridGroupType,
+	type UmbBlockGridGroupTypeConfiguration,
+} from '@umbraco-cms/backoffice/block';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UMB_PROPERTY_DATASET_CONTEXT, type UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
@@ -66,12 +61,10 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 
 		this.#blockTypeWorkspaceModalRegistration?.destroy();
 
-		const entityType = 'block-grid-type';
-
 		this.#blockTypeWorkspaceModalRegistration = new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
-			.addAdditionalPath(entityType)
+			.addAdditionalPath(UMB_BLOCK_GRID_TYPE)
 			.onSetup(() => {
-				return { data: { entityType: entityType, preset: {} }, modal: { size: 'large' } };
+				return { data: { entityType: UMB_BLOCK_GRID_TYPE, preset: {} }, modal: { size: 'large' } };
 			})
 			.observeRouteBuilder((routeBuilder) => {
 				const newpath = routeBuilder({});
@@ -141,9 +134,8 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 			(group) =>
 				html`${group.key ? this.#renderGroupInput(group.key, group.name) : nothing}
 					<umb-input-block-type
-						entity-type="block-grid-type"
-						.value="${group.blocks}"
-						.workspacePath="${this._workspacePath}"
+						.value=${group.blocks}
+						.workspacePath=${this._workspacePath}
 						@create=${(e: CustomEvent) => this.#onCreate(e, group.key ?? null)}
 						@change=${(e: CustomEvent) => this.#onChange(e, group.key)}></umb-input-block-type>`,
 		)}`;

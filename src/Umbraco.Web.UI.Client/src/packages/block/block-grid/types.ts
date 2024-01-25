@@ -1,5 +1,7 @@
 import type { UmbBlockTypeBaseModel, UmbBlockTypeWithGroupKey } from '../block-type/index.js';
 
+export const UMB_BLOCK_GRID_TYPE = 'block-grid-type';
+
 export interface UmbBlockGridType extends UmbBlockTypeBaseModel {
 	columnSpanOptions: Array<number>;
 	allowAtRoot: boolean;
