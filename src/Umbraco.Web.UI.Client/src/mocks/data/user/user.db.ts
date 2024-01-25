@@ -3,15 +3,16 @@ import { umbUserGroupData } from '../user-group/user-group.db.js';
 import { arrayFilter, stringFilter, queryFilter } from '../utils.js';
 import { data } from './user.data.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import { UmbCurrentUser } from '@umbraco-cms/backoffice/current-user';
-import {
+import type { UmbCurrentUser } from '@umbraco-cms/backoffice/current-user';
+import type {
 	CreateUserRequestModel,
 	CreateUserResponseModel,
 	InviteUserRequestModel,
 	PagedUserResponseModel,
 	UpdateUserGroupsOnUserRequestModel,
 	UserItemResponseModel,
-	UserResponseModel,
+	UserResponseModel} from '@umbraco-cms/backoffice/backend-api';
+import {
 	UserStateModel,
 } from '@umbraco-cms/backoffice/backend-api';
 

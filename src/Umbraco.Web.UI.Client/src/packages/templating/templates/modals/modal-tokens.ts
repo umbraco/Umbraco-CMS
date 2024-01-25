@@ -1,5 +1,5 @@
 import { UMB_MODAL_TEMPLATING_QUERY_BUILDER_SIDEBAR_ALIAS } from './manifests.js';
-import {
+import type {
 	TemplateQueryBuilderModalData,
 	UmbTemplateQueryBuilderModalValue,
 } from './query-builder/query-builder.element.js';

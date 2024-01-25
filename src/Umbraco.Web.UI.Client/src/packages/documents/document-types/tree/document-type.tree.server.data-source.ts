@@ -1,7 +1,8 @@
 import { UMB_DOCUMENT_TYPE_ENTITY_TYPE, UMB_DOCUMENT_TYPE_FOLDER_ENTITY_TYPE } from '../entity.js';
-import { UmbDocumentTypeTreeItemModel } from './types.js';
+import type { UmbDocumentTypeTreeItemModel } from './types.js';
 import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
-import { DocumentTypeResource, DocumentTypeTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { DocumentTypeTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { DocumentTypeResource } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**

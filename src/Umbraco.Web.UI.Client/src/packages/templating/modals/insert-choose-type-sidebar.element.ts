@@ -1,12 +1,13 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
+import type {
+	UmbModalManagerContext,
+	UmbModalContext,
+	UmbDictionaryItemPickerModalValue} from '@umbraco-cms/backoffice/modal';
 import {
 	UMB_MODAL_MANAGER_CONTEXT,
-	UmbModalManagerContext,
 	UMB_PARTIAL_VIEW_PICKER_MODAL,
-	UmbModalContext,
 	UMB_DICTIONARY_ITEM_PICKER_MODAL,
-	UmbDictionaryItemPickerModalValue,
 	UmbModalBaseElement,
 } from '@umbraco-cms/backoffice/modal';
 

@@ -1,9 +1,10 @@
 const { rest } = window.MockServiceWorker;
+import type {
+	ServerStatusResponseModel,
+	ServerInformationResponseModel} from '@umbraco-cms/backoffice/backend-api';
 import {
 	RuntimeLevelModel,
-	RuntimeModeModel,
-	ServerStatusResponseModel,
-	ServerInformationResponseModel,
+	RuntimeModeModel
 } from '@umbraco-cms/backoffice/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 

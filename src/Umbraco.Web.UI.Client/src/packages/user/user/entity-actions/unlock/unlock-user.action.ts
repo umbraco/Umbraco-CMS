@@ -1,7 +1,7 @@
-import { type UmbUnlockUserRepository } from '../../repository/index.js';
+import type { UmbUnlockUserRepository } from '../../repository/index.js';
 import { UmbUserItemRepository } from '../../repository/item/user-item.repository.js';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import {
 	type UmbModalManagerContext,
 	UMB_MODAL_MANAGER_CONTEXT,

@@ -1,6 +1,6 @@
-import { DataTypeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { DataTypeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbEntityItemStore } from '@umbraco-cms/backoffice/store';
 
 /**

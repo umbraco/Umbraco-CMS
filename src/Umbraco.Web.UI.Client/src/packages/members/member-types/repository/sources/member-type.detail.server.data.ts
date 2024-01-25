@@ -1,7 +1,7 @@
 import type { MemberTypeDetails } from '../../types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import { UmbDataSource } from '@umbraco-cms/backoffice/repository';
+import type { UmbDataSource } from '@umbraco-cms/backoffice/repository';
 
 /**
  * @description - A data source for the MemberType detail that fetches data from the server

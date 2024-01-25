@@ -1,9 +1,10 @@
-import {
+import type {
 	TemplateResponseModel,
-	TemplateResource,
 	CreateTemplateRequestModel,
 	UpdateTemplateRequestModel,
-	TemplateScaffoldResponseModel,
+	TemplateScaffoldResponseModel} from '@umbraco-cms/backoffice/backend-api';
+import {
+	TemplateResource
 } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';

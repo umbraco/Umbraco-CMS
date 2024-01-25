@@ -2,13 +2,14 @@ import { UMB_DICTIONARY_TREE_ALIAS } from '../../tree/manifests.js';
 import { UmbDictionaryRepository } from '../../repository/dictionary.repository.js';
 import { css, html, customElement, query, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import {
-	UmbImportDictionaryModalData,
-	UmbImportDictionaryModalValue,
-	UmbModalBaseElement,
-} from '@umbraco-cms/backoffice/modal';
+import type { UmbImportDictionaryModalData, UmbImportDictionaryModalValue } from '@umbraco-cms/backoffice/modal';
+import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import { UmbEntityTreeItemModel, UmbTreeElement, type UmbTreeSelectionConfiguration } from '@umbraco-cms/backoffice/tree';
+import type {
+	UmbEntityTreeItemModel,
+	UmbTreeElement,
+	UmbTreeSelectionConfiguration,
+} from '@umbraco-cms/backoffice/tree';
 
 interface DictionaryItemPreview {
 	name: string;

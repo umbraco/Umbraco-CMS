@@ -1,5 +1,5 @@
-import { DataSourceResponse, UmbPagedData } from '../index.js';
-import { Diff } from '@umbraco-cms/backoffice/utils';
+import type { DataSourceResponse, UmbPagedData } from '../index.js';
+import type { Diff } from '@umbraco-cms/backoffice/utils';
 
 /**
  * This function extends the data set of a paged DataSourceResponse.

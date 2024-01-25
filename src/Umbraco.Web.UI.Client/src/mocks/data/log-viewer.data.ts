@@ -1,6 +1,6 @@
 import { logs } from './logs.data.js';
 import { UmbData } from './data.js';
-import {
+import type {
 	LogMessageResponseModel,
 	LogTemplateResponseModel,
 	SavedLogSearchResponseModel,

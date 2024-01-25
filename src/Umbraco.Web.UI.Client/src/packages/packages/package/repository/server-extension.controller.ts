@@ -1,7 +1,7 @@
 import { UmbPackageRepository } from './package.repository.js';
-import { type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
-import { UmbBackofficeExtensionRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbBackofficeExtensionRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
 export class UmbExtensionInitializer extends UmbBaseController {
 	#extensionRegistry: UmbBackofficeExtensionRegistry;

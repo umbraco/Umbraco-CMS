@@ -1,5 +1,6 @@
-import { UmbRelationTypeTreeItemModel } from './types.js';
-import { EntityTreeItemResponseModel, RelationTypeResource } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbRelationTypeTreeItemModel } from './types.js';
+import type { EntityTreeItemResponseModel} from '@umbraco-cms/backoffice/backend-api';
+import { RelationTypeResource } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
 

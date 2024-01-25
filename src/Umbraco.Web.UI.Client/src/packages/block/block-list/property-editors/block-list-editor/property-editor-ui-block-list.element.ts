@@ -1,23 +1,20 @@
 import { UmbBlockListManagerContext } from '../../manager/block-list-manager.context.js';
 import '../../components/block-list-block/index.js';
-import { type UmbPropertyEditorUIBlockListBlockElement } from '../../components/block-list-block/index.js';
+import type { UmbPropertyEditorUIBlockListBlockElement } from '../../components/block-list-block/index.js';
 import { UMB_BLOCK_LIST_PROPERTY_EDITOR_ALIAS } from './manifests.js';
 import { html, customElement, property, state, repeat, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
-import {
-	UMB_BLOCK_CATALOGUE_MODAL,
-	UmbBlockLayoutBaseModel,
-	UmbBlockTypeBaseModel,
-	UmbBlockWorkspaceData,
-	type UmbBlockValueType,
-} from '@umbraco-cms/backoffice/block';
+import { UMB_BLOCK_CATALOGUE_MODAL } from '@umbraco-cms/backoffice/block';
+import type { UmbBlockLayoutBaseModel, UmbBlockTypeBaseModel, UmbBlockValueType } from '@umbraco-cms/backoffice/block';
 import type { NumberRangeValueType } from '@umbraco-cms/backoffice/models';
-import { UmbModalRouteBuilder, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
+import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/modal';
+import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import { UmbSorterConfig, UmbSorterController } from '@umbraco-cms/backoffice/sorter';
+import type { UmbSorterConfig } from '@umbraco-cms/backoffice/sorter';
+import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 
 export interface UmbBlockListLayoutModel extends UmbBlockLayoutBaseModel {}
 

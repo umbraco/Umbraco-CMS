@@ -1,6 +1,6 @@
-import { UmbTreeItemModelBase } from '../types.js';
+import type { UmbTreeItemModelBase } from '../types.js';
 import type { UmbPagedData, DataSourceResponse } from '@umbraco-cms/backoffice/repository';
-import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export interface UmbTreeDataSourceConstructor<TreeItemType extends UmbTreeItemModelBase> {
 	new (host: UmbControllerHost): UmbTreeDataSource<TreeItemType>;

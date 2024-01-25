@@ -1,12 +1,13 @@
 import { UMB_LANGUAGE_WORKSPACE_CONTEXT } from '../../language-workspace.context.js';
 import type { UmbInputLanguagePickerElement } from '../../../../components/input-language-picker/input-language-picker.element.js';
 import type { UmbInputCultureSelectElement } from '@umbraco-cms/backoffice/culture';
-import { UUIBooleanInputEvent, UUIToggleElement } from '@umbraco-cms/backoffice/external/uui';
+import type { UUIToggleElement } from '@umbraco-cms/backoffice/external/uui';
+import { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, nothing, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
+import type { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 @customElement('umb-language-details-workspace-view')

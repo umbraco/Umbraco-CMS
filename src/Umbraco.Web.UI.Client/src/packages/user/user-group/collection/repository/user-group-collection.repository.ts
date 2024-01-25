@@ -1,9 +1,10 @@
-import { UmbUserGroupCollectionFilterModel } from '../../types.js';
-import { UMB_USER_GROUP_STORE_CONTEXT, UmbUserGroupStore } from '../../repository/user-group.store.js';
+import type { UmbUserGroupCollectionFilterModel } from '../../types.js';
+import type { UmbUserGroupStore } from '../../repository/user-group.store.js';
+import { UMB_USER_GROUP_STORE_CONTEXT } from '../../repository/user-group.store.js';
 import { UmbUserGroupCollectionServerDataSource } from './user-group-collection.server.data-source.js';
-import { UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbCollectionDataSource, UmbCollectionRepository } from '@umbraco-cms/backoffice/repository';
-import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbCollectionDataSource, UmbCollectionRepository } from '@umbraco-cms/backoffice/repository';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 
 export class UmbUserGroupCollectionRepository extends UmbBaseController implements UmbCollectionRepository {

@@ -11,7 +11,7 @@ import type {
 	MediaTypeTreeItemResponseModel,
 	MediaTreeItemResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
-import { UmbMediaDetailModel } from '@umbraco-cms/backoffice/media';
+import type { UmbMediaDetailModel } from '@umbraco-cms/backoffice/media';
 
 export const createEntityTreeItem = (item: any): EntityTreeItemResponseModel => {
 	return {

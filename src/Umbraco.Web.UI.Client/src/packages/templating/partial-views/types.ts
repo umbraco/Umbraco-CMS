@@ -1,4 +1,4 @@
-import { UmbPartialViewEntityType } from './entity.js';
+import type { UmbPartialViewEntityType } from './entity.js';
 
 export interface UmbPartialViewDetailModel {
 	entityType: UmbPartialViewEntityType;

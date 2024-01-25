@@ -1,10 +1,12 @@
 import { UmbUserItemRepository } from '../../user/repository/item/user-item.repository.js';
 import { UMB_CURRENT_USER_CONTEXT } from '../../current-user/current-user.context.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, CSSResultGroup, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import {
+import type { CSSResultGroup} from '@umbraco-cms/backoffice/external/lit';
+import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import type {
 	UmbChangePasswordModalData,
-	UmbChangePasswordModalValue,
+	UmbChangePasswordModalValue} from '@umbraco-cms/backoffice/modal';
+import {
 	UmbModalBaseElement,
 } from '@umbraco-cms/backoffice/modal';
 

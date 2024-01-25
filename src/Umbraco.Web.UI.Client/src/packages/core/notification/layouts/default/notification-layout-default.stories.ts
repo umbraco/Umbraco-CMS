@@ -1,4 +1,4 @@
-import { Meta, Story } from '@storybook/web-components';
+import type { Meta, Story } from '@storybook/web-components';
 import type { UmbNotificationLayoutDefaultElement } from './notification-layout-default.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 

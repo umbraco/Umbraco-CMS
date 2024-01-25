@@ -1,5 +1,5 @@
 import './document-type-workspace-editor.element.js';
-import { Meta, Story } from '@storybook/web-components';
+import type { Meta, Story } from '@storybook/web-components';
 import { data } from '../../../../mocks/data/document-type/document-type.data.js';
 import type { UmbDocumentTypeWorkspaceElement } from './document-type-workspace.element.js';
 import { html, ifDefined } from '@umbraco-cms/backoffice/external/lit';

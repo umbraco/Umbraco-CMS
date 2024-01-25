@@ -13,6 +13,9 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
+import type {
+	LocationLike,
+	StringMap} from '@umbraco-cms/backoffice/external/openid';
 import {
 	BaseTokenRequestHandler,
 	BasicQueryStringUtils,
@@ -26,9 +29,7 @@ import {
 	GRANT_TYPE_REFRESH_TOKEN,
 	RevokeTokenRequest,
 	TokenRequest,
-	TokenResponse,
-	LocationLike,
-	StringMap,
+	TokenResponse
 } from '@umbraco-cms/backoffice/external/openid';
 
 const requestor = new FetchRequestor();

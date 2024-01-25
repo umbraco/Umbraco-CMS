@@ -1,15 +1,16 @@
 import { UmbTemplateRepository } from '../../repository/template.repository.js';
 import { localizePropertyType, localizeSort } from './utils.js';
 import type { UmbQueryBuilderFilterElement } from './query-builder-filter.element.js';
-import { UUIComboboxListElement } from '@umbraco-cms/backoffice/external/uui';
+import type { UUIComboboxListElement } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state, query, queryAll, ifDefined } from '@umbraco-cms/backoffice/external/lit';
+import type {
+	UmbModalManagerContext} from '@umbraco-cms/backoffice/modal';
 import {
 	UmbModalBaseElement,
 	UMB_DOCUMENT_PICKER_MODAL,
-	UMB_MODAL_MANAGER_CONTEXT,
-	UmbModalManagerContext,
+	UMB_MODAL_MANAGER_CONTEXT
 } from '@umbraco-cms/backoffice/modal';
-import {
+import type {
 	TemplateQueryExecuteModel,
 	TemplateQueryResultResponseModel,
 	TemplateQuerySettingsResponseModel,

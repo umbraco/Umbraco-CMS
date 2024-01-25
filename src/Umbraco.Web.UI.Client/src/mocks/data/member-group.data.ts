@@ -1,7 +1,7 @@
 import { UmbEntityData } from './entity.data.js';
 import { createEntityTreeItem } from './utils.js';
-import { EntityTreeItemResponseModel, PagedEntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbMemberGroupDetailModel } from '@umbraco-cms/backoffice/member-group';
+import type { EntityTreeItemResponseModel, PagedEntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbMemberGroupDetailModel } from '@umbraco-cms/backoffice/member-group';
 
 export const data: Array<any> = [
 	{

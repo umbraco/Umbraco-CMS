@@ -1,6 +1,6 @@
-import { UmbLanguageRepository } from '../repository/language.repository.js';
+import type { UmbLanguageRepository } from '../repository/language.repository.js';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbLanguageCreateEntityAction extends UmbEntityActionBase<UmbLanguageRepository> {
 	// TODO: Could EntityActions take the manifest instead, for more flexibility?

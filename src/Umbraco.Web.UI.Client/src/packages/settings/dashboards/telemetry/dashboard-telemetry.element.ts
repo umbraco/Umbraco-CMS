@@ -1,7 +1,8 @@
 import { css, html, customElement, state, unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
-import { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
+import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
+import type {
+	TelemetryResponseModel} from '@umbraco-cms/backoffice/backend-api';
 import {
-	TelemetryResponseModel,
 	TelemetryLevelModel,
 	TelemetryResource,
 	ApiError,

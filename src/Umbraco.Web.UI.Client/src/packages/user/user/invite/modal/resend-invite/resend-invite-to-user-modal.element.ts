@@ -1,5 +1,5 @@
 import { UmbInviteUserRepository } from '../../repository/invite-user.repository.js';
-import {
+import type {
 	UmbResendInviteToUserModalData,
 	UmbResendInviteToUserModalValue,
 } from './resend-invite-to-user-modal.token.js';

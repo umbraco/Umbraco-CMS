@@ -1,8 +1,8 @@
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
-import { DictionaryItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { DictionaryItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 /**
  * @export

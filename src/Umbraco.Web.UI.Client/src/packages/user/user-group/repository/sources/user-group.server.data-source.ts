@@ -1,10 +1,11 @@
-import { UmbUserGroupDetailDataSource } from '../../types.js';
+import type { UmbUserGroupDetailDataSource } from '../../types.js';
 import type { DataSourceResponse } from '@umbraco-cms/backoffice/repository';
-import {
+import type {
 	UserGroupResponseModel,
-	UserGroupResource,
 	UpdateUserGroupRequestModel,
-	CreateUserGroupRequestModel,
+	CreateUserGroupRequestModel} from '@umbraco-cms/backoffice/backend-api';
+import {
+	UserGroupResource
 } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';

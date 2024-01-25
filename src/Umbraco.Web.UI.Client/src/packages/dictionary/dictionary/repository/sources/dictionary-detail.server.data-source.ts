@@ -1,13 +1,14 @@
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import {
+import type {
 	CreateDictionaryItemRequestModel,
 	DictionaryItemResponseModel,
-	DictionaryResource,
 	ImportDictionaryRequestModel,
-	LanguageResource,
-	UpdateDictionaryItemRequestModel,
+	UpdateDictionaryItemRequestModel} from '@umbraco-cms/backoffice/backend-api';
+import {
+	DictionaryResource,
+	LanguageResource
 } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbDataSource } from '@umbraco-cms/backoffice/repository';
 

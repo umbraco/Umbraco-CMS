@@ -1,5 +1,6 @@
-import { UmbBlockWorkspaceData } from '../../index.js';
-import { UmbModalToken, UmbWorkspaceData, UmbWorkspaceValue } from '@umbraco-cms/backoffice/modal';
+import type { UmbBlockWorkspaceData } from '../../index.js';
+import type { UmbWorkspaceData, UmbWorkspaceValue } from '@umbraco-cms/backoffice/modal';
+import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbBlockListWorkspaceData
 	extends UmbBlockWorkspaceData<{

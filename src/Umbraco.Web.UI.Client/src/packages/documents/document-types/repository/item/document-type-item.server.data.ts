@@ -1,5 +1,6 @@
 import type { UmbItemDataSource } from '@umbraco-cms/backoffice/repository';
-import { DocumentTypeItemResponseModel, DocumentTypeResource } from '@umbraco-cms/backoffice/backend-api';
+import type { DocumentTypeItemResponseModel} from '@umbraco-cms/backoffice/backend-api';
+import { DocumentTypeResource } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 

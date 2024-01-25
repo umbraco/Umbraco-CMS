@@ -2,9 +2,10 @@ import { UmbUserGroupCollectionRepository } from '../../collection/repository/in
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { html, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
-import { UMB_USER_GROUP_PICKER_MODAL, UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import { UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UUIMenuItemEvent } from '@umbraco-cms/backoffice/external/uui';
+import type { UMB_USER_GROUP_PICKER_MODAL} from '@umbraco-cms/backoffice/modal';
+import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
+import type { UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UUIMenuItemEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbSelectedEvent, UmbDeselectedEvent } from '@umbraco-cms/backoffice/event';
 @customElement('umb-user-group-picker-modal')
 export class UmbUserGroupPickerModalElement extends UmbModalBaseElement<

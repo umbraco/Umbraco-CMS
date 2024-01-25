@@ -4,7 +4,8 @@ import type { UUIColorSwatchesEvent } from '@umbraco-cms/backoffice/external/uui
 import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
-import { UmbIconPickerModalData, UmbIconPickerModalValue, UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
+import type { UmbIconPickerModalData, UmbIconPickerModalValue} from '@umbraco-cms/backoffice/modal';
+import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 
 // TODO: Make use of UmbPickerLayoutBase
 // TODO: to prevent element extension we need to move the Picker logic into a separate class we can reuse across all pickers
