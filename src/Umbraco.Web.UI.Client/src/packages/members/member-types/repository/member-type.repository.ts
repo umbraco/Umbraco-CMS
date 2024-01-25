@@ -1,10 +1,13 @@
 import type { MemberTypeDetails } from '../types.js';
-import { UmbMemberTypeTreeStore, UMB_MEMBER_TYPE_TREE_STORE_CONTEXT } from '../tree/index.js';
-import { UmbMemberTypeStore, UMB_MEMBER_TYPE_STORE_CONTEXT } from './member-type.store.js';
+import type { UmbMemberTypeTreeStore} from '../tree/index.js';
+import { UMB_MEMBER_TYPE_TREE_STORE_CONTEXT } from '../tree/index.js';
+import type { UmbMemberTypeStore} from './member-type.store.js';
+import { UMB_MEMBER_TYPE_STORE_CONTEXT } from './member-type.store.js';
 import { UmbMemberTypeDetailServerDataSource } from './sources/member-type.detail.server.data.js';
-import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
-import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
+import type { UmbNotificationContext} from '@umbraco-cms/backoffice/notification';
+import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 
 export class UmbMemberTypeRepository extends UmbBaseController {
 	#init!: Promise<unknown>;

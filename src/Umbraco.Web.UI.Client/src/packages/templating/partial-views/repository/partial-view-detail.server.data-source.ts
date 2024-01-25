@@ -1,16 +1,17 @@
+import type { UmbPartialViewDetailModel } from '../types.js';
+import { UMB_PARTIAL_VIEW_ENTITY_TYPE } from '../entity.js';
 import {
 	UmbServerFilePathUniqueSerializer,
 	appendFileExtensionIfNeeded,
 } from '@umbraco-cms/backoffice/server-file-system';
-import { type UmbPartialViewDetailModel } from '../types.js';
-import { UMB_PARTIAL_VIEW_ENTITY_TYPE } from '../entity.js';
-import {
+import type {
 	CreatePartialViewRequestModel,
-	PartialViewResource,
-	UpdatePartialViewRequestModel,
+	UpdatePartialViewRequestModel} from '@umbraco-cms/backoffice/backend-api';
+import {
+	PartialViewResource
 } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
+import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 export class UmbPartialViewDetailServerDataSource implements UmbDetailDataSource<UmbPartialViewDetailModel> {

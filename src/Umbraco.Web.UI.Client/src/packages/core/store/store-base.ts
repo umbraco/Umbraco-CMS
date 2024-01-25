@@ -1,10 +1,10 @@
-import { UmbStore } from './store.interface.js';
+import type { UmbStore } from './store.interface.js';
 import { UmbStoreRemoveEvent } from './events/store-remove.event.js';
 import { UmbStoreUpdateEvent } from './events/store-update.event.js';
 import { UmbStoreAppendEvent } from './events/store-append.event.js';
-import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { type UmbApi } from '@umbraco-cms/backoffice/extension-api';
-import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 
 export class UmbStoreBase<StoreItemType = any> extends UmbContextBase<any> implements UmbStore<StoreItemType>, UmbApi {

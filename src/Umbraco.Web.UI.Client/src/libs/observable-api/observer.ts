@@ -1,4 +1,4 @@
-import { Observable, Subscription } from '@umbraco-cms/backoffice/external/rxjs';
+import type { Observable, Subscription } from '@umbraco-cms/backoffice/external/rxjs';
 
 export type ObserverCallbackStack<T> = {
 	next: (_value: T) => void;

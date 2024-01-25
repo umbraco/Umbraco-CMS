@@ -1,9 +1,9 @@
 import { UMB_PARTIAL_VIEW_ENTITY_TYPE } from '../entity.js';
 import { UMB_PARTIAL_VIEW_DETAIL_STORE_CONTEXT } from '../repository/partial-view-detail.store.js';
-import { UmbPartialViewDetailModel } from '../types.js';
-import { UmbPartialViewTreeItemModel } from './types.js';
+import type { UmbPartialViewDetailModel } from '../types.js';
+import type { UmbPartialViewTreeItemModel } from './types.js';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbUniqueTreeStore } from '@umbraco-cms/backoffice/tree';
 import { UmbStoreConnector } from '@umbraco-cms/backoffice/store';
 

@@ -2,7 +2,7 @@ import { css, html, customElement, property, repeat, state, ifDefined } from '@u
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbDocumentRepository } from '@umbraco-cms/backoffice/document';
-import { DocumentItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { DocumentItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 @customElement('umb-user-document-start-node')
 export class UmbUserDocumentStartNodeElement extends UmbLitElement {

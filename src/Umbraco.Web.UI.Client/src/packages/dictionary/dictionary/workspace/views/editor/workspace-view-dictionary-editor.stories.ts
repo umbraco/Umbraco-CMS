@@ -1,4 +1,4 @@
-import { Meta, Story } from '@storybook/web-components';
+import type { Meta, Story } from '@storybook/web-components';
 import type { UmbWorkspaceViewDictionaryEditorElement } from './workspace-view-dictionary-editor.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 //import { data } from '../../../../../core/mocks/data/dictionary.data.js';

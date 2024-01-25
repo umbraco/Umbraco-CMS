@@ -1,4 +1,4 @@
-import { ManifestElement, ManifestElementAndApi } from '../types/base.types.js';
+import type { ManifestElement, ManifestElementAndApi } from '../types/base.types.js';
 import { loadManifestElement } from './load-manifest-element.function.js';
 
 export async function createExtensionElement<ElementType extends HTMLElement>(

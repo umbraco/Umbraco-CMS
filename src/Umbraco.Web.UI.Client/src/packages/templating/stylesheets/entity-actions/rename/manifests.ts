@@ -1,7 +1,7 @@
 import { UMB_STYLESHEET_ENTITY_TYPE } from '../../entity.js';
 import { UmbRenameStylesheetRepository } from './rename-stylesheet.repository.js';
 import { UmbRenameEntityAction } from '@umbraco-cms/backoffice/entity-action';
-import { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_RENAME_STYLESHEET_REPOSITORY_ALIAS = 'Umb.Repository.Stylesheet.Rename';
 export const UMB_RENAME_STYLESHEET_ENTITY_ACTION_ALIAS = 'Umb.EntityAction.Stylesheet.Rename';

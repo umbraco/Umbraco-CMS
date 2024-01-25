@@ -1,7 +1,7 @@
 import { UMB_SCRIPT_FOLDER_ENTITY_TYPE, UMB_SCRIPT_ROOT_ENTITY_TYPE } from '../../entity.js';
 import { UMB_SCRIPT_DETAIL_REPOSITORY_ALIAS } from '../../repository/manifests.js';
 import { UmbScriptCreateOptionsEntityAction } from './create.action.js';
-import { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 export const manifests: Array<ManifestTypes> = [
 	{

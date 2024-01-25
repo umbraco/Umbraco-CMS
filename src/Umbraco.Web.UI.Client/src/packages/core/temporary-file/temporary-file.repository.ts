@@ -1,5 +1,5 @@
 import { UmbTemporaryFileServerDataSource } from './temporary-file.server.data-source.js';
-import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 
 /**

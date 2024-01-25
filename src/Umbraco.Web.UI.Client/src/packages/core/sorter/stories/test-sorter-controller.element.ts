@@ -1,4 +1,5 @@
-import { UmbSorterConfig, UmbSorterController } from '../sorter.controller.js';
+import type { UmbSorterConfig} from '../sorter.controller.js';
+import { UmbSorterController } from '../sorter.controller.js';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
 

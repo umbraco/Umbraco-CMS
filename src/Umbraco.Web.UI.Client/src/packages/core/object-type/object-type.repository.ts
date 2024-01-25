@@ -1,7 +1,7 @@
 import { ObjectTypesResource } from '@umbraco-cms/backoffice/backend-api';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
-import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 export class UmbObjectTypeRepository extends UmbBaseController implements UmbApi {

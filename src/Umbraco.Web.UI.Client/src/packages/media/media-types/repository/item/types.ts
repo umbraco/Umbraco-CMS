@@ -1,3 +1,3 @@
-import { MediaTypeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { MediaTypeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 export type UmbMediaTypeItemModel = MediaTypeItemResponseModel;

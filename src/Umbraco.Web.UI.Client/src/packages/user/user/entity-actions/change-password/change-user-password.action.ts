@@ -1,6 +1,6 @@
-import { UmbChangeUserPasswordRepository } from '../../repository/change-password/change-user-password.repository.js';
+import type { UmbChangeUserPasswordRepository } from '../../repository/change-password/change-user-password.repository.js';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import {
 	type UmbModalManagerContext,
 	UMB_MODAL_MANAGER_CONTEXT,

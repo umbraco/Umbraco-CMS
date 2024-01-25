@@ -1,12 +1,13 @@
-import {
+import type {
 	PoolingCOnfig,
 	PoolingInterval,
-	UmbLogViewerWorkspaceContext,
+	UmbLogViewerWorkspaceContext} from '../../../logviewer.context.js';
+import {
 	UMB_APP_LOG_VIEWER_CONTEXT,
 } from '../../../logviewer.context.js';
 import { css, html, customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbDropdownElement } from '@umbraco-cms/backoffice/components';
+import type { UmbDropdownElement } from '@umbraco-cms/backoffice/components';
 
 @customElement('umb-log-viewer-polling-button')
 export class UmbLogViewerPollingButtonElement extends UmbLitElement {

@@ -1,4 +1,4 @@
-import { UmbStylesheetWorkspaceContext } from './stylesheet-workspace.context.js';
+import type { UmbStylesheetWorkspaceContext } from './stylesheet-workspace.context.js';
 import type { UUIInputElement, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';

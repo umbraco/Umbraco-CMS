@@ -1,5 +1,6 @@
 import type { UmbItemDataSource } from '@umbraco-cms/backoffice/repository';
-import { MediaResource, MediaItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { MediaItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { MediaResource } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 

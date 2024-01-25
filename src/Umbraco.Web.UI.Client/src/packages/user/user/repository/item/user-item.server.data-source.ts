@@ -1,7 +1,8 @@
 import type { UmbItemDataSource } from '@umbraco-cms/backoffice/repository';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import { UserItemResponseModel, UserResource } from '@umbraco-cms/backoffice/backend-api';
+import type { UserItemResponseModel} from '@umbraco-cms/backoffice/backend-api';
+import { UserResource } from '@umbraco-cms/backoffice/backend-api';
 
 /**
  * A data source for user items that fetches data from the server

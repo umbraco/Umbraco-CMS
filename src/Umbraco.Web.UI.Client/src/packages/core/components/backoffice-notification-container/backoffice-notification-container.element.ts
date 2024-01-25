@@ -1,8 +1,10 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, CSSResultGroup, html, customElement, state, repeat, query } from '@umbraco-cms/backoffice/external/lit';
-import {
+import type { CSSResultGroup} from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, repeat, query } from '@umbraco-cms/backoffice/external/lit';
+import type {
 	UmbNotificationHandler,
-	UmbNotificationContext,
+	UmbNotificationContext} from '@umbraco-cms/backoffice/notification';
+import {
 	UMB_NOTIFICATION_CONTEXT,
 } from '@umbraco-cms/backoffice/notification';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';

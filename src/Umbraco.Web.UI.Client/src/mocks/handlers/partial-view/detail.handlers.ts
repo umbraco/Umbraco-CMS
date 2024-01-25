@@ -1,7 +1,7 @@
 const { rest } = window.MockServiceWorker;
 import { umbPartialViewMockDB } from '../../data/partial-view/partial-view.db.js';
 import { UMB_SLUG } from './slug.js';
-import { CreateStylesheetRequestModel, UpdateStylesheetRequestModel } from '@umbraco-cms/backoffice/backend-api';
+import type { CreateStylesheetRequestModel, UpdateStylesheetRequestModel } from '@umbraco-cms/backoffice/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 export const detailHandlers = [

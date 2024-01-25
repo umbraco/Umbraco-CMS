@@ -1,8 +1,8 @@
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
-import { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 export const UMB_LANGUAGE_STORE_CONTEXT = new UmbContextToken<UmbLanguageStore>('UmbLanguageStore');
 

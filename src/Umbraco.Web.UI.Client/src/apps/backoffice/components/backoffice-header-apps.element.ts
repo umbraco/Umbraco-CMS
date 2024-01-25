@@ -1,4 +1,5 @@
-import { css, CSSResultGroup, html, LitElement, customElement } from '@umbraco-cms/backoffice/external/lit';
+import type { CSSResultGroup} from '@umbraco-cms/backoffice/external/lit';
+import { css, html, LitElement, customElement } from '@umbraco-cms/backoffice/external/lit';
 
 @customElement('umb-backoffice-header-apps')
 export class UmbBackofficeHeaderAppsElement extends LitElement {

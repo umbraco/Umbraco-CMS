@@ -1,5 +1,5 @@
-import { ItemResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { ItemResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 

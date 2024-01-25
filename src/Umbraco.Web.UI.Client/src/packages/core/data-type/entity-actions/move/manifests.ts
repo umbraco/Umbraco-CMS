@@ -1,7 +1,7 @@
 import { UMB_DATA_TYPE_ENTITY_TYPE } from '../../entity.js';
 import { UMB_MOVE_DATA_TYPE_REPOSITORY_ALIAS } from '../../repository/move/manifests.js';
 import { UmbMoveDataTypeEntityAction } from './move.action.js';
-import { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const entityActions: Array<ManifestTypes> = [
 	{

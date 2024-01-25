@@ -1,17 +1,21 @@
-import { UMB_MODAL_CONTEXT, UmbModalContext } from './modal.context.js';
-import { ManifestModal, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbModalContext } from './modal.context.js';
+import { UMB_MODAL_CONTEXT } from './modal.context.js';
+import type { ManifestModal} from '@umbraco-cms/backoffice/extension-registry';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { CSSResultGroup, html, customElement } from '@umbraco-cms/backoffice/external/lit';
+import type { CSSResultGroup} from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { BehaviorSubject } from '@umbraco-cms/backoffice/external/rxjs';
-import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
-import { UUIDialogElement, UUIModalDialogElement, UUIModalSidebarElement } from '@umbraco-cms/backoffice/external/uui';
-import { UmbRouterSlotElement } from '@umbraco-cms/backoffice/router';
+import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import type { UUIDialogElement, UUIModalDialogElement, UUIModalSidebarElement } from '@umbraco-cms/backoffice/external/uui';
+import type { UmbRouterSlotElement } from '@umbraco-cms/backoffice/router';
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
+import type {
+	UmbContextRequestEvent} from '@umbraco-cms/backoffice/context-api';
 import {
 	UMB_CONTENT_REQUEST_EVENT_TYPE,
-	UmbContextProvider,
-	UmbContextRequestEvent,
+	UmbContextProvider
 } from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-modal')

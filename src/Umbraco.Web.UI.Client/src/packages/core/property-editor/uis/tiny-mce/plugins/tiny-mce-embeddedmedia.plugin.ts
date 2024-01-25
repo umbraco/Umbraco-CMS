@@ -1,9 +1,11 @@
-import { TinyMcePluginArguments, UmbTinyMcePluginBase } from '@umbraco-cms/backoffice/components';
-import {
+import type { TinyMcePluginArguments} from '@umbraco-cms/backoffice/components';
+import { UmbTinyMcePluginBase } from '@umbraco-cms/backoffice/components';
+import type {
 	UmbEmbeddedMediaModalData,
 	UmbEmbeddedMediaModalValue,
+	UmbModalManagerContext} from '@umbraco-cms/backoffice/modal';
+import {
 	UMB_EMBEDDED_MEDIA_MODAL,
-	UmbModalManagerContext,
 	UMB_MODAL_MANAGER_CONTEXT,
 } from '@umbraco-cms/backoffice/modal';
 

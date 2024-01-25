@@ -1,6 +1,6 @@
 import { css, html, LitElement, ifDefined, customElement, property, query } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbDropdownElement, UmbTableColumn, UmbTableItem } from '@umbraco-cms/backoffice/components';
-import { UmbActionExecutedEvent } from '@umbraco-cms/backoffice/event';
+import type { UmbActionExecutedEvent } from '@umbraco-cms/backoffice/event';
 
 // TODO: this could be done more generic, but for now we just need it for the document table
 @customElement('umb-document-table-actions-column-layout')

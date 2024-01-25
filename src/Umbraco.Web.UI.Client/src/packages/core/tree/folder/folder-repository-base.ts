@@ -1,12 +1,13 @@
 import { UmbRepositoryBase } from '../../repository/repository-base.js';
-import { type UmbFolderRepository } from './folder-repository.interface.js';
+import type { UmbFolderRepository } from './folder-repository.interface.js';
 import type { UmbFolderDataSource, UmbFolderDataSourceConstructor } from './folder-data-source.interface.js';
-import { UmbCreateFolderModel, UmbFolderModel, UmbUpdateFolderModel } from './types.js';
-import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbTreeItemModelBase, UmbTreeStore } from '@umbraco-cms/backoffice/tree';
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import type { UmbCreateFolderModel, UmbFolderModel, UmbUpdateFolderModel } from './types.js';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbTreeItemModelBase, UmbTreeStore } from '@umbraco-cms/backoffice/tree';
+import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import { UMB_NOTIFICATION_CONTEXT, UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
+import type { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
+import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 
 export type UmbFolderToTreeItemMapper<FolderTreeItemType extends UmbTreeItemModelBase> = (
 	item: UmbFolderModel,

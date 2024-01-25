@@ -1,4 +1,4 @@
-import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
+import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 
 export interface IUmbAuthContext {
 	isAuthorized: Observable<boolean>;

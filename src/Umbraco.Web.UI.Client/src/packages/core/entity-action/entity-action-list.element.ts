@@ -1,5 +1,5 @@
 import { html, customElement, property, state, css } from '@umbraco-cms/backoffice/external/lit';
-import { ManifestEntityAction } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestEntityAction } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-entity-action-list')

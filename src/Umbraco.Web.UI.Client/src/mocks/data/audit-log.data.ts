@@ -1,8 +1,9 @@
 import { data as userData } from './user/user.data.js';
 import { data as documentData } from './document.data.js';
-import {
+import type {
 	AuditLogResponseModel,
-	AuditLogWithUsernameResponseModel,
+	AuditLogWithUsernameResponseModel} from '@umbraco-cms/backoffice/backend-api';
+import {
 	AuditTypeModel,
 } from '@umbraco-cms/backoffice/backend-api';
 

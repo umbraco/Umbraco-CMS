@@ -1,8 +1,8 @@
-import { UmbDocumentTypeDetailModel } from '../types.js';
+import type { UmbDocumentTypeDetailModel } from '../types.js';
 import { UMB_DOCUMENT_TYPE_DETAIL_STORE_CONTEXT } from '../repository/index.js';
-import { UmbDocumentTypeTreeItemModel } from './types.js';
+import type { UmbDocumentTypeTreeItemModel } from './types.js';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbUniqueTreeStore } from '@umbraco-cms/backoffice/tree';
 import { UmbStoreConnector } from '@umbraco-cms/backoffice/store';
 

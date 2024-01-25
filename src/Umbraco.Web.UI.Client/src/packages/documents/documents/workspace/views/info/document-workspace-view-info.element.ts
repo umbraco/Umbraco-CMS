@@ -6,8 +6,8 @@ import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbra
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import './document-workspace-view-info-history.element.js';
 import './document-workspace-view-info-reference.element.js';
-import { UmbDocumentWorkspaceContext } from '@umbraco-cms/backoffice/document';
-import { ContentUrlInfoModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbDocumentWorkspaceContext } from '@umbraco-cms/backoffice/document';
+import type { ContentUrlInfoModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbCurrentUserContext } from '@umbraco-cms/backoffice/current-user';
 
 @customElement('umb-document-workspace-view-info')

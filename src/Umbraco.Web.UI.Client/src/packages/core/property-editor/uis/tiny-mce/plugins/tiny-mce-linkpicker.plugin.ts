@@ -1,9 +1,11 @@
-import { TinyMcePluginArguments, UmbTinyMcePluginBase } from '@umbraco-cms/backoffice/components';
-import {
+import type { TinyMcePluginArguments} from '@umbraco-cms/backoffice/components';
+import { UmbTinyMcePluginBase } from '@umbraco-cms/backoffice/components';
+import type {
 	UmbLinkPickerModalValue,
-	UMB_LINK_PICKER_MODAL,
 	UmbLinkPickerLink,
-	UmbModalManagerContext,
+	UmbModalManagerContext} from '@umbraco-cms/backoffice/modal';
+import {
+	UMB_LINK_PICKER_MODAL,
 	UMB_MODAL_MANAGER_CONTEXT,
 } from '@umbraco-cms/backoffice/modal';
 

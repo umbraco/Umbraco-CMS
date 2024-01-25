@@ -1,4 +1,5 @@
-import { UmbModalToken, UmbWorkspaceData, UmbWorkspaceValue } from '@umbraco-cms/backoffice/modal';
+import type { UmbWorkspaceData, UmbWorkspaceValue } from '@umbraco-cms/backoffice/modal';
+import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbBlockWorkspaceData<OriginDataType = unknown> extends UmbWorkspaceData {
 	originData: OriginDataType;

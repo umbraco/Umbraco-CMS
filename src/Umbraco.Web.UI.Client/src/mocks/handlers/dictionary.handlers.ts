@@ -1,7 +1,7 @@
 const { rest } = window.MockServiceWorker;
 import { umbDictionaryData } from '../data/dictionary.data.js';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
-import {
+import type {
 	ImportDictionaryRequestModel,
 	DictionaryOverviewResponseModel,
 	DictionaryItemResponseModel,

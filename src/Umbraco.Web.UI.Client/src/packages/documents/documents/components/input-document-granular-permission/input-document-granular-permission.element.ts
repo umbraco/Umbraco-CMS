@@ -1,7 +1,9 @@
-import { css, html, customElement, property, state, PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
+import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import type {
+	UmbModalManagerContext} from '@umbraco-cms/backoffice/modal';
 import {
-	UmbModalManagerContext,
 	UMB_MODAL_MANAGER_CONTEXT,
 	UMB_CONFIRM_MODAL,
 	UMB_DOCUMENT_PICKER_MODAL,
@@ -10,7 +12,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { DocumentItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbDocumentRepository } from '@umbraco-cms/backoffice/document';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
+import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-input-document-granular-permission')
@@ -69,9 +71,9 @@ export class UmbInputDocumentGranularPermissionElement extends FormControlMixin(
 			},
 		});
 
-		modalContext?.onSubmit().then((value) => {
-			//this.#setSelection(selection);
-		});
+		//modalContext?.onSubmit().then((value) => {
+		//this.#setSelection(selection);
+		//});
 	}
 
 	async #removeItem(item: DocumentItemResponseModel) {

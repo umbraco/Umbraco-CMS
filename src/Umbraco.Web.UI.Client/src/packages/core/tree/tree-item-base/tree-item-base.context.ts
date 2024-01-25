@@ -1,12 +1,12 @@
-import { UmbTreeItemContext } from '../tree-item-default/tree-item.context.interface.js';
-import { UmbTreeContextBase } from '../tree.context.js';
-import { UmbTreeItemModelBase } from '../types.js';
+import type { UmbTreeItemContext } from '../tree-item-default/tree-item.context.interface.js';
+import type { UmbTreeContextBase } from '../tree.context.js';
+import type { UmbTreeItemModelBase } from '../types.js';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import { UMB_SECTION_CONTEXT, UMB_SECTION_SIDEBAR_CONTEXT } from '@umbraco-cms/backoffice/section';
 import type { UmbSectionContext, UmbSectionSidebarContext } from '@umbraco-cms/backoffice/section';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbBooleanState, UmbDeepState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
-import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
