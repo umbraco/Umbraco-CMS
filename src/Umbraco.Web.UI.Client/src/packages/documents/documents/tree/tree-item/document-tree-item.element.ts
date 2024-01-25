@@ -1,9 +1,9 @@
-import { UmbDocumentTreeItemModel } from '../types.js';
+import type { UmbDocumentTreeItemModel } from '../types.js';
 import { UmbDocumentTreeItemContext } from './document-tree-item.context.js';
 import { css, html, nothing, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbTreeItemElement } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbTreeItemElement } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-document-tree-item')
 export class UmbDocumentTreeItemElement extends UmbLitElement implements UmbTreeItemElement {

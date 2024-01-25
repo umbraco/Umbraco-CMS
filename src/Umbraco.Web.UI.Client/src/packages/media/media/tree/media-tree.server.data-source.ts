@@ -1,6 +1,6 @@
-import { UmbMediaTreeItemModel } from './types.js';
+import type { UmbMediaTreeItemModel } from './types.js';
 import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
-import { MediaResource, MediaTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { MediaResource, type MediaTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
@@ -27,6 +27,7 @@ export class UmbMediaTreeServerDataSource extends UmbTreeServerDataSourceBase<
 	}
 }
 
+// eslint-disable-next-line local-rules/no-direct-api-import
 const getRootItems = () => MediaResource.getTreeMediaRoot({});
 
 const getChildrenOf = (parentUnique: string | null) => {

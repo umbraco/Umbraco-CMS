@@ -3,7 +3,7 @@ import { manifests as collectionRepositoryManifests } from './repository/manifes
 import { manifests as collectionViewManifests } from './views/manifests.js';
 import { manifests as collectionActionManifests } from './action/manifests.js';
 import { UmbUserCollectionContext } from './user-collection.context.js';
-import { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_USER_COLLECTION_ALIAS = 'Umb.Collection.User';
 const collectionManifest: ManifestTypes = {

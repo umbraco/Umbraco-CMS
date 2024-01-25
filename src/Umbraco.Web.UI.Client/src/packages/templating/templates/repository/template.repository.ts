@@ -1,20 +1,24 @@
-import { UmbTemplateTreeStore, UMB_TEMPLATE_TREE_STORE_CONTEXT } from '../tree/index.js';
-import { UmbTemplateStore, UMB_TEMPLATE_STORE_CONTEXT } from './template.store.js';
+import type { UmbTemplateTreeStore} from '../tree/index.js';
+import { UMB_TEMPLATE_TREE_STORE_CONTEXT } from '../tree/index.js';
+import type { UmbTemplateStore} from './template.store.js';
+import { UMB_TEMPLATE_STORE_CONTEXT } from './template.store.js';
 import { UmbTemplateDetailServerDataSource } from './sources/template.detail.server.data.js';
-import { UMB_TEMPLATE_ITEM_STORE_CONTEXT, UmbTemplateItemStore } from './template-item.store.js';
+import type { UmbTemplateItemStore } from './template-item.store.js';
+import { UMB_TEMPLATE_ITEM_STORE_CONTEXT } from './template-item.store.js';
 import { UmbTemplateItemServerDataSource } from './sources/template.item.server.data.js';
 import { UmbTemplateQueryBuilderServerDataSource } from './sources/template.query-builder.server.data.js';
 import type { UmbItemDataSource, UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
-import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbNotificationContext} from '@umbraco-cms/backoffice/notification';
+import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import type {
 	CreateTemplateRequestModel,
 	TemplateItemResponseModel,
 	TemplateQueryExecuteModel,
 	UpdateTemplateRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
-import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
 export class UmbTemplateRepository
 	extends UmbBaseController
@@ -52,7 +56,7 @@ export class UmbTemplateRepository
 				this.#store = instance;
 			}),
 
-			this.consumeContext(UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
+			this.consumeContext(UMB_NOTIFICATION_CONTEXT, (instance) => {
 				this.#notificationContext = instance;
 			}),
 		]);

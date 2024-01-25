@@ -1,14 +1,16 @@
 import { UmbTemplateRepository } from '../repository/index.js';
 import { UmbTemplateTreeRepository } from '../tree/index.js';
 import { loadCodeEditor } from '@umbraco-cms/backoffice/code-editor';
+import type {
+	UmbSaveableWorkspaceContextInterface} from '@umbraco-cms/backoffice/workspace';
 import {
-	UmbSaveableWorkspaceContextInterface,
 	UmbEditableWorkspaceContextBase,
 } from '@umbraco-cms/backoffice/workspace';
 import { UmbBooleanState, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { TemplateItemResponseModel, TemplateResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { UmbId } from '@umbraco-cms/backoffice/id';
 
 export class UmbTemplateWorkspaceContext
 	extends UmbEditableWorkspaceContextBase<TemplateResponseModel>
@@ -138,7 +140,10 @@ ${currentContent}`;
 		const isNew = this.getIsNew();
 
 		if (isNew && template) {
+			const key = UmbId.new();
+			this.#data.update({ id: key });
 			await this.repository.create({
+				key: key,
 				name: template.name,
 				content: template.content,
 				alias: template.alias,

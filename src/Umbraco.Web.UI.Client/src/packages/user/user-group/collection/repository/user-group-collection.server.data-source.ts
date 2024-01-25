@@ -2,7 +2,8 @@ import type { UmbUserGroupCollectionFilterModel } from '../../types.js';
 import type { UmbCollectionDataSource } from '@umbraco-cms/backoffice/repository';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import { UserGroupResponseModel, UserGroupResource } from '@umbraco-cms/backoffice/backend-api';
+import type { UserGroupResponseModel} from '@umbraco-cms/backoffice/backend-api';
+import { UserGroupResource } from '@umbraco-cms/backoffice/backend-api';
 
 /**
  * A data source for the UserGroup that fetches data from the server

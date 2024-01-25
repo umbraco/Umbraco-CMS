@@ -1,16 +1,17 @@
-import {
+import type {
 	InterfaceColor,
 	InterfaceLook,
 	PopoverContainerPlacement,
 	UUIPopoverContainerElement,
 } from '@umbraco-cms/backoffice/external/uui';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import type {
+	PropertyValueMap} from '@umbraco-cms/backoffice/external/lit';
 import {
 	css,
 	html,
 	customElement,
 	property,
-	PropertyValueMap,
 	query,
 	when,
 } from '@umbraco-cms/backoffice/external/lit';

@@ -1,12 +1,15 @@
 import { UmbLanguageServerDataSource } from './sources/language.server.data.js';
-import { UmbLanguageStore, UMB_LANGUAGE_STORE_CONTEXT_TOKEN } from './language.store.js';
+import type { UmbLanguageStore} from './language.store.js';
+import { UMB_LANGUAGE_STORE_CONTEXT } from './language.store.js';
 import { UmbLanguageItemServerDataSource } from './sources/language-item.server.data.js';
-import { UMB_LANGUAGE_ITEM_STORE_CONTEXT_TOKEN, UmbLanguageItemStore } from './language-item.store.js';
-import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbLanguageItemStore } from './language-item.store.js';
+import { UMB_LANGUAGE_ITEM_STORE_CONTEXT } from './language-item.store.js';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
-import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
-import { LanguageItemResponseModel, LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
+import type { UmbNotificationContext} from '@umbraco-cms/backoffice/notification';
+import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
+import type { LanguageItemResponseModel, LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 
 export class UmbLanguageRepository extends UmbBaseController implements UmbItemRepository<LanguageItemResponseModel> {
 	#init: Promise<unknown>;
@@ -25,15 +28,15 @@ export class UmbLanguageRepository extends UmbBaseController implements UmbItemR
 		this.#itemDataSource = new UmbLanguageItemServerDataSource(this);
 
 		this.#init = Promise.all([
-			this.consumeContext(UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
+			this.consumeContext(UMB_NOTIFICATION_CONTEXT, (instance) => {
 				this.#notificationContext = instance;
 			}).asPromise(),
 
-			this.consumeContext(UMB_LANGUAGE_STORE_CONTEXT_TOKEN, (instance) => {
+			this.consumeContext(UMB_LANGUAGE_STORE_CONTEXT, (instance) => {
 				this.#languageStore = instance;
 			}).asPromise(),
 
-			this.consumeContext(UMB_LANGUAGE_ITEM_STORE_CONTEXT_TOKEN, (instance) => {
+			this.consumeContext(UMB_LANGUAGE_ITEM_STORE_CONTEXT, (instance) => {
 				this.#languageItemStore = instance;
 			}).asPromise(),
 		]);

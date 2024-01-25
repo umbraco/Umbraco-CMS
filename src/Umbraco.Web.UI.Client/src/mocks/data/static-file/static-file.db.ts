@@ -1,7 +1,8 @@
 import { UmbFileSystemMockDbBase } from '../file-system/file-system-base.js';
 import { UmbMockFileSystemItemManager } from '../file-system/file-system-item.manager.js';
 import { UmbMockFileSystemTreeManager } from '../file-system/file-system-tree.manager.js';
-import { UmbMockStaticFileModel, data as staticFileData } from './static-file.data.js';
+import type { UmbMockStaticFileModel} from './static-file.data.js';
+import { data as staticFileData } from './static-file.data.js';
 
 class UmbStaticFileMockDB extends UmbFileSystemMockDbBase<UmbMockStaticFileModel> {
 	tree = new UmbMockFileSystemTreeManager<UmbMockStaticFileModel>(this);

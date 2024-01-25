@@ -1,14 +1,16 @@
-import { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { html, customElement, property, repeat, css, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import { UUIBooleanInputEvent, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import type { UUIBooleanInputEvent, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { extractUmbColorVariable } from '@umbraco-cms/backoffice/resources';
+import type {
+	UmbModalManagerContext} from '@umbraco-cms/backoffice/modal';
 import {
 	UMB_ICON_PICKER_MODAL,
-	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
-	UmbModalManagerContext,
+	UMB_MODAL_MANAGER_CONTEXT
 } from '@umbraco-cms/backoffice/modal';
+import type {
+	UmbPropertyEditorConfigCollection} from '@umbraco-cms/backoffice/property-editor';
 import {
-	UmbPropertyEditorConfigCollection,
 	UmbPropertyValueChangeEvent,
 } from '@umbraco-cms/backoffice/property-editor';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -40,7 +42,7 @@ export class UmbPropertyEditorUICollectionViewLayoutConfigurationElement
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
 			this._modalContext = instance;
 		});
 	}

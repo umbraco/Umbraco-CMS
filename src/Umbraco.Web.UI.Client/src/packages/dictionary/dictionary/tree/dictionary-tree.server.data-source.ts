@@ -1,7 +1,8 @@
-import { UmbDictionaryTreeItemModel } from './types.js';
+import type { UmbDictionaryTreeItemModel } from './types.js';
 import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { DictionaryResource, EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { EntityTreeItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import { DictionaryResource } from '@umbraco-cms/backoffice/backend-api';
 
 /**
  * A data source for the Dictionary tree that fetches data from the server

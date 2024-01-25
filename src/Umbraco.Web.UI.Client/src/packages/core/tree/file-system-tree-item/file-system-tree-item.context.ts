@@ -1,6 +1,6 @@
 import { UmbTreeItemContextBase } from '../tree-item-base/tree-item-base.context.js';
-import { UmbFileSystemTreeItemModel } from '../types.js';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbFileSystemTreeItemModel } from '../types.js';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 /**
  * Tree item context for file system tree items. Uses the path as the unique identifier.
  *

@@ -1,6 +1,7 @@
-import { UmbTemplateTreeItemModel } from './types.js';
+import type { UmbTemplateTreeItemModel } from './types.js';
 import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
-import { EntityTreeItemResponseModel, TemplateResource } from '@umbraco-cms/backoffice/backend-api';
+import type { EntityTreeItemResponseModel} from '@umbraco-cms/backoffice/backend-api';
+import { TemplateResource } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**

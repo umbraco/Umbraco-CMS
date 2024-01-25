@@ -1,9 +1,10 @@
 const { rest } = window.MockServiceWorker;
-import {
+import type {
 	DatabaseInstallResponseModel,
 	InstallVResponseModel,
 	InstallSettingsResponseModel,
-	ProblemDetails,
+	ProblemDetails} from '@umbraco-cms/backoffice/backend-api';
+import {
 	TelemetryLevelModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';

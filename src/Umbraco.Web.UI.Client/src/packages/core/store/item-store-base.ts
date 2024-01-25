@@ -1,5 +1,6 @@
-import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbItemStore, UmbStoreBase } from '@umbraco-cms/backoffice/store';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbItemStore} from '@umbraco-cms/backoffice/store';
+import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 
 /**

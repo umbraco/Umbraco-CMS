@@ -181,7 +181,7 @@ class MyElement extends UmbElementMixin(LitElement) {
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_MODAL_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_MODAL_CONTEXT, (instance) => {
 			this.#modalManagerContext = instance;
 			// modalManagerContext is now ready to be used
 		});

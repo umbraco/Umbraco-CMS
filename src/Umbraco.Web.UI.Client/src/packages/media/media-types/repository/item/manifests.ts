@@ -1,6 +1,6 @@
 import { UmbMediaTypeItemRepository } from './media-type-item.repository.js';
 import { UmbMediaTypeItemStore } from './media-type-item.store.js';
-import { ManifestItemStore, ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestItemStore, ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_MEDIA_TYPE_ITEM_REPOSITORY_ALIAS = 'Umb.Repository.MediaType.Item';
 export const UMB_MEDIA_TYPE_ITEM_STORE_ALIAS = 'Umb.Store.MediaType.Item';

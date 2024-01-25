@@ -1,4 +1,4 @@
-import { UmbStylesheetItemModel } from '../../types.js';
+import type { UmbStylesheetItemModel } from '../../types.js';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbItemStoreBase } from '@umbraco-cms/backoffice/store';

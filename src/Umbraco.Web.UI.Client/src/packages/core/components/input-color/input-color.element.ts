@@ -1,5 +1,6 @@
 import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import { FormControlMixin, UUIColorSwatchesEvent } from '@umbraco-cms/backoffice/external/uui';
+import type { UUIColorSwatchesEvent } from '@umbraco-cms/backoffice/external/uui';
+import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UmbSwatchDetails } from '@umbraco-cms/backoffice/models';
 

@@ -4,7 +4,7 @@ import type { ManifestWorkspaceView } from '@umbraco-cms/backoffice/extension-re
 export const workspaceViews: Array<ManifestWorkspaceView> = [
 	{
 		type: 'workspaceView',
-		alias: 'Umb.WorkspaceView.BlockType.List.Settings',
+		alias: 'Umb.WorkspaceView.BlockType.RTE.Settings',
 		name: 'Block List Type Workspace Settings View',
 		js: () => import('./block-rte-type-workspace-view.element.js'),
 		weight: 1000,

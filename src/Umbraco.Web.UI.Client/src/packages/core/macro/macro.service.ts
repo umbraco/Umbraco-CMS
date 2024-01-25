@@ -145,4 +145,4 @@ export class UmbMacroService {
 	}
 }
 
-export const UMB_MACRO_SERVICE_CONTEXT_TOKEN = new UmbContextToken<UmbMacroService>(UmbMacroService.name);
+export const UMB_MACRO_SERVICE_CONTEXT = new UmbContextToken<UmbMacroService>(UmbMacroService.name);

@@ -1,11 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { isApiError, isCancelError, isCancelablePromise } from './apiTypeValidators.function.js';
-import {
-	UmbNotificationContext,
-	UMB_NOTIFICATION_CONTEXT_TOKEN,
-	UmbNotificationOptions,
-} from '@umbraco-cms/backoffice/notification';
-import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { UMB_NOTIFICATION_CONTEXT, type UmbNotificationOptions } from '@umbraco-cms/backoffice/notification';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 import type { DataSourceResponse } from '@umbraco-cms/backoffice/repository';
@@ -13,14 +9,14 @@ import type { DataSourceResponse } from '@umbraco-cms/backoffice/repository';
 export class UmbResourceController extends UmbBaseController {
 	#promise: Promise<any>;
 
-	#notificationContext?: UmbNotificationContext;
+	#notificationContext?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;
 
 	constructor(host: UmbControllerHost, promise: Promise<any>, alias?: string) {
 		super(host, alias);
 
 		this.#promise = promise;
 
-		new UmbContextConsumerController(host, UMB_NOTIFICATION_CONTEXT_TOKEN, (_instance) => {
+		new UmbContextConsumerController(host, UMB_NOTIFICATION_CONTEXT, (_instance) => {
 			this.#notificationContext = _instance;
 		});
 	}

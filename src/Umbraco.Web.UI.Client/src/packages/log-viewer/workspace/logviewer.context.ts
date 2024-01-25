@@ -1,20 +1,22 @@
 import { UmbLogViewerRepository } from '../repository/log-viewer.repository.js';
 import { UmbBasicState, UmbArrayState, UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
-import {
-	DirectionModel,
+import type {
 	LogLevelCountsReponseModel,
-	LogLevelModel,
 	PagedLoggerResponseModel,
 	PagedLogMessageResponseModel,
 	PagedLogTemplateResponseModel,
 	PagedSavedLogSearchResponseModel,
-	SavedLogSearchPresenationBaseModel,
+	SavedLogSearchPresenationBaseModel} from '@umbraco-cms/backoffice/backend-api';
+import {
+	DirectionModel,
+	LogLevelModel
 } from '@umbraco-cms/backoffice/backend-api';
-import { type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { query } from '@umbraco-cms/backoffice/router';
-import { UMB_WORKSPACE_CONTEXT, UmbWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
+import type { UmbWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
+import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 
 export type PoolingInterval = 0 | 2000 | 5000 | 10000 | 20000 | 30000;
 export interface PoolingCOnfig {
@@ -111,7 +113,7 @@ export class UmbLogViewerWorkspaceContext extends UmbBaseController implements U
 		super(host);
 		this.provideContext(UMB_WORKSPACE_CONTEXT, this);
 		// TODO: Revisit usage of workspace for this case... currently no other workspace context provides them self with their own token.
-		this.provideContext(UMB_APP_LOG_VIEWER_CONTEXT_TOKEN, this);
+		this.provideContext(UMB_APP_LOG_VIEWER_CONTEXT, this);
 		this.#repository = new UmbLogViewerRepository(host);
 	}
 
@@ -327,6 +329,6 @@ export class UmbLogViewerWorkspaceContext extends UmbBaseController implements U
 	}
 }
 
-export const UMB_APP_LOG_VIEWER_CONTEXT_TOKEN = new UmbContextToken<UmbLogViewerWorkspaceContext>(
+export const UMB_APP_LOG_VIEWER_CONTEXT = new UmbContextToken<UmbLogViewerWorkspaceContext>(
 	UmbLogViewerWorkspaceContext.name,
 );

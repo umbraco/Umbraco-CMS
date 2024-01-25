@@ -34,7 +34,7 @@ export class UmbNotificationContext extends UmbContextBase<UmbNotificationContex
 	public readonly notifications = this._notifications.asObservable();
 
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_NOTIFICATION_CONTEXT_TOKEN);
+		super(host, UMB_NOTIFICATION_CONTEXT);
 	}
 
 	/**
@@ -94,4 +94,4 @@ export class UmbNotificationContext extends UmbContextBase<UmbNotificationContex
 	}
 }
 
-export const UMB_NOTIFICATION_CONTEXT_TOKEN = new UmbContextToken<UmbNotificationContext>('UmbNotificationContext');
+export const UMB_NOTIFICATION_CONTEXT = new UmbContextToken<UmbNotificationContext>('UmbNotificationContext');

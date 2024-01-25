@@ -1,5 +1,5 @@
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { UmbWorkspaceContextInterface, UmbSaveableWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
+import type { UmbWorkspaceContextInterface, UmbSaveableWorkspaceContextInterface } from '@umbraco-cms/backoffice/workspace';
 
 export const UMB_SAVEABLE_WORKSPACE_CONTEXT = new UmbContextToken<
 	UmbWorkspaceContextInterface,

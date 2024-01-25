@@ -1,16 +1,16 @@
-import type { UmbBlockTypeWithGroupKey, UmbInputBlockTypeElement } from '../../../block-type/index.js';
+import type { UmbBlockTypeWithGroupKey } from '../../../block-type/index.js';
 import '../../../block-type/components/input-block-type/index.js';
-import { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
-import { html, customElement, property, state, css, repeat, nothing } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
+import { html, customElement, property, state, repeat, nothing, css } from '@umbraco-cms/backoffice/external/lit';
 import {
-	UmbPropertyEditorConfigCollection,
 	UmbPropertyValueChangeEvent,
+	type UmbPropertyEditorConfigCollection,
 } from '@umbraco-cms/backoffice/property-editor';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UMB_PROPERTY_DATASET_CONTEXT, UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
-import { UmbBlockGridGroupType, UmbBlockGridGroupTypeConfiguration } from '@umbraco-cms/backoffice/block';
-import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import type { UmbBlockGridGroupType, UmbBlockGridGroupTypeConfiguration } from '@umbraco-cms/backoffice/block';
+import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import { UMB_PROPERTY_DATASET_CONTEXT, type UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
 
 /**
  * @element umb-property-editor-ui-block-grid-type-configuration

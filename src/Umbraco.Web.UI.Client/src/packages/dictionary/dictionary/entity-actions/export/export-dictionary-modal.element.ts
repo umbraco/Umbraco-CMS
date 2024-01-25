@@ -1,8 +1,9 @@
 import { html, customElement, query } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import {
+import type {
 	UmbExportDictionaryModalData,
-	UmbExportDictionaryModalValue,
+	UmbExportDictionaryModalValue} from '@umbraco-cms/backoffice/modal';
+import {
 	UmbModalBaseElement,
 } from '@umbraco-cms/backoffice/modal';
 

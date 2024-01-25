@@ -1,4 +1,4 @@
-import { UmbScriptWorkspaceContext } from './script-workspace.context.js';
+import type { UmbScriptWorkspaceContext } from './script-workspace.context.js';
 import type { UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';

@@ -3,7 +3,7 @@ import { UmbPartialViewWorkspaceEditorElement } from './partial-view-workspace-e
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbRoute, IRoutingInfo, PageComponent } from '@umbraco-cms/backoffice/router';
+import type { UmbRoute, IRoutingInfo, PageComponent } from '@umbraco-cms/backoffice/router';
 import { UmbWorkspaceIsNewRedirectController } from '@umbraco-cms/backoffice/workspace';
 
 import '../../components/insert-menu/templating-insert-menu.element.js';

@@ -2,7 +2,7 @@ import type { DocumentBlueprintDetails } from './types.js';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 /**
  * @export
@@ -14,7 +14,7 @@ export class UmbDocumentBlueprintStore extends UmbStoreBase {
 	constructor(host: UmbControllerHostElement) {
 		super(
 			host,
-			UMB_DOCUMENT_BLUEPRINT_STORE_CONTEXT_TOKEN.toString(),
+			UMB_DOCUMENT_BLUEPRINT_STORE_CONTEXT.toString(),
 			// TODO: use the right type:
 
 			new UmbArrayState<DocumentBlueprintDetails>([], (x) => x.id),
@@ -96,6 +96,6 @@ export class UmbDocumentBlueprintStore extends UmbStoreBase {
 	}
 }
 
-export const UMB_DOCUMENT_BLUEPRINT_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbDocumentBlueprintStore>(
+export const UMB_DOCUMENT_BLUEPRINT_STORE_CONTEXT = new UmbContextToken<UmbDocumentBlueprintStore>(
 	'UmbDocumentBlueprintStore',
 );

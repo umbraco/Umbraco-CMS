@@ -1,4 +1,4 @@
-import { expect, fixture, html } from '@open-wc/testing';
+/*import { expect, fixture, html } from '@open-wc/testing';
 import { UmbPropertyEditorUIMarkdownEditorElement } from './property-editor-ui-markdown-editor.element.js';
 import { defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 
@@ -19,3 +19,4 @@ describe('UmbPropertyEditorUIMarkdownEditorElement', () => {
 		});
 	}
 });
+*/

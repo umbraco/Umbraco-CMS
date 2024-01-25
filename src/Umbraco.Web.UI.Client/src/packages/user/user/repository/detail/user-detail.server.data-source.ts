@@ -1,14 +1,16 @@
-import { UmbUserDetailModel, UmbUserDetailDataSource } from '../../types.js';
+import type { UmbUserDetailModel, UmbUserDetailDataSource } from '../../types.js';
 import { UMB_USER_ENTITY_TYPE } from '../../entity.js';
-import {
+import type {
 	DataSourceResponse,
-	UmbDataSourceErrorResponse,
+	UmbDataSourceErrorResponse} from '@umbraco-cms/backoffice/repository';
+import {
 	extendDataSourceResponseData,
 } from '@umbraco-cms/backoffice/repository';
-import {
+import type {
 	CreateUserRequestModel,
 	UpdateUserRequestModel,
-	UserPresentationBaseModel,
+	UserPresentationBaseModel} from '@umbraco-cms/backoffice/backend-api';
+import {
 	UserResource,
 } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';

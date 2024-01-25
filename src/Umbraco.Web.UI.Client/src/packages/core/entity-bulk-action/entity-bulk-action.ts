@@ -1,4 +1,5 @@
-import { UmbAction, UmbActionBase } from '@umbraco-cms/backoffice/action';
+import type { UmbAction} from '@umbraco-cms/backoffice/action';
+import { UmbActionBase } from '@umbraco-cms/backoffice/action';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 export interface UmbEntityBulkAction<RepositoryType = unknown> extends UmbAction<RepositoryType> {

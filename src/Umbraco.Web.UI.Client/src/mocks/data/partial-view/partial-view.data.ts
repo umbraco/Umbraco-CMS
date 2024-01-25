@@ -1,4 +1,4 @@
-import {
+import type {
 	FileSystemTreeItemPresentationModel,
 	PartialViewItemResponseModel,
 	PartialViewResponseModel,

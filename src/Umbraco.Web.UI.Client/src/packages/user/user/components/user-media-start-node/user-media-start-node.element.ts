@@ -1,7 +1,7 @@
 import { css, html, customElement, property, repeat, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { MediaItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { MediaItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbMediaRepository } from '@umbraco-cms/backoffice/media';
 
 @customElement('umb-user-media-start-node')

@@ -1,10 +1,11 @@
 import { css, html, unsafeHTML, when, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import {
+import type {
 	OEmbedResult,
-	OEmbedStatus,
 	UmbEmbeddedMediaModalData,
-	UmbEmbeddedMediaModalValue,
+	UmbEmbeddedMediaModalValue} from '@umbraco-cms/backoffice/modal';
+import {
+	OEmbedStatus,
 	UmbModalBaseElement,
 } from '@umbraco-cms/backoffice/modal';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';

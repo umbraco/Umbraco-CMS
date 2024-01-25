@@ -1,5 +1,6 @@
 const { rest } = window.MockServiceWorker;
-import { OEmbedResult, OEmbedStatus } from '@umbraco-cms/backoffice/modal';
+import type { OEmbedResult} from '@umbraco-cms/backoffice/modal';
+import { OEmbedStatus } from '@umbraco-cms/backoffice/modal';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 export const handlers = [

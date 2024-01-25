@@ -1,4 +1,4 @@
-import { UmbCreatePartialViewFromSnippetModalData } from './create-from-snippet-modal.token.js';
+import type { UmbCreatePartialViewFromSnippetModalData } from './create-from-snippet-modal.token.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';

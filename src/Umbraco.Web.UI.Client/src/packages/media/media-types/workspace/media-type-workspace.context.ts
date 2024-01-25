@@ -1,12 +1,13 @@
 import { UmbMediaTypeDetailRepository } from '../repository/detail/media-type-detail.repository.js';
 import { UMB_MEDIA_TYPE_ENTITY_TYPE } from '../index.js';
-import { UmbMediaTypeDetailModel } from '../types.js';
+import type { UmbMediaTypeDetailModel } from '../types.js';
+import type {
+	UmbSaveableWorkspaceContextInterface} from '@umbraco-cms/backoffice/workspace';
 import {
-	UmbSaveableWorkspaceContextInterface,
 	UmbEditableWorkspaceContextBase,
 } from '@umbraco-cms/backoffice/workspace';
 import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
-import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 

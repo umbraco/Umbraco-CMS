@@ -7,16 +7,11 @@ import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/
 import {
 	UmbEditableWorkspaceContextBase,
 	UmbWorkspaceSplitViewManager,
-	UmbVariantableWorkspaceContextInterface,
-	UmbPublishableWorkspaceContextInterface,
+	type UmbVariantableWorkspaceContextInterface,
+	type UmbPublishableWorkspaceContextInterface,
 } from '@umbraco-cms/backoffice/workspace';
 import type { CreateDocumentRequestModel, DocumentResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import {
-	appendToFrozenArray,
-	partialUpdateFrozenArray,
-	UmbObjectState,
-	UmbObserverController,
-} from '@umbraco-cms/backoffice/observable-api';
+import { appendToFrozenArray, partialUpdateFrozenArray, UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 type EntityType = DocumentResponseModel;

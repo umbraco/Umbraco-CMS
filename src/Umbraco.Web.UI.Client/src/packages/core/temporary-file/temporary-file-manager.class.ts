@@ -1,6 +1,6 @@
 import { UmbTemporaryFileRepository } from './temporary-file.repository.js';
 import { UmbArrayState, UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 
 export type TemporaryFileStatus = 'complete' | 'waiting' | 'error';
