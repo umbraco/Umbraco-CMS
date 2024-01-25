@@ -25,13 +25,20 @@ export class UmbAuthContext extends UmbBaseController {
 	/**
 	 * Initiates the login flow.
 	 */
-	login(): void {
+	makeAuthorizationRequest() {
 		return this.#authFlow.makeAuthorizationRequest();
 	}
 
 	/**
+	 * Completes the login flow.
+	 */
+	completeAuthorizationRequest() {
+		return this.#authFlow.completeAuthorizationIfPossible();
+	}
+
+	/**
 	 * Checks if the user is authorized. If Authorization is bypassed, the user is always authorized.
-	 * @returns {boolean} True if the user is authorized, otherwise false.
+	 * @returns True if the user is authorized, otherwise false.
 	 */
 	getIsAuthorized() {
 		if (this.#isBypassed) {

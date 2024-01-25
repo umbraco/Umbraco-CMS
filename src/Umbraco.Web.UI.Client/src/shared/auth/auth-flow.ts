@@ -170,9 +170,6 @@ export class UmbAuthFlow {
 				this.#refreshToken = this.#accessTokenResponse.refreshToken;
 			}
 		}
-
-		// If no token was found, or if it was invalid, check if there is a new authorization to be made
-		await this.completeAuthorizationIfPossible();
 	}
 
 	/**
