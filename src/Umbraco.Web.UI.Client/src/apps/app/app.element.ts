@@ -1,8 +1,8 @@
 import type { UmbAppErrorElement } from './app-error.element.js';
 import { UmbAppContext } from './app.context.js';
 import { UmbServerConnection } from './server-connection.js';
-import type { UMB_AUTH_CONTEXT} from '@umbraco-cms/backoffice/auth';
-import { UmbAuthContext } from '@umbraco-cms/backoffice/auth';
+import type { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
+import { UMB_STORAGE_REDIRECT_URL, UmbAuthContext } from '@umbraco-cms/backoffice/auth';
 import { css, html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UUIIconRegistryEssential } from '@umbraco-cms/backoffice/external/uui';
 import { UmbIconRegistry } from '@umbraco-cms/backoffice/icon';
@@ -29,13 +29,12 @@ export class UmbAppElement extends UmbLitElement {
 	 * @attr
 	 */
 	@property({ type: String })
-	// TODO: get from server config
+	// TODO: get from base element or maybe move to UmbAuthContext.#getRedirectUrl since it is only used there
 	backofficePath = '/umbraco';
 
 	/**
 	 * Bypass authentication.
 	 */
-	// TODO: this might not be the right solution
 	@property({ type: Boolean })
 	bypassAuth = false;
 
@@ -140,6 +139,15 @@ export class UmbAppElement extends UmbLitElement {
 	}
 
 	#redirect() {
+		// If there is a ?code parameter in the url, then we are in the middle of the oauth flow
+		// and we need to complete the login (the authorization notifier will redirect after this is done
+		// essentially hitting this method again)
+		const queryParams = new URLSearchParams(window.location.search);
+		if (queryParams.has('code')) {
+			this.#authContext?.completeAuthorizationRequest();
+			return;
+		}
+
 		switch (this.#serverConnection?.getStatus()) {
 			case RuntimeLevelModel.INSTALL:
 				history.replaceState(null, '', 'install');
@@ -156,17 +164,15 @@ export class UmbAppElement extends UmbLitElement {
 			case RuntimeLevelModel.RUN: {
 				const pathname = pathWithoutBasePath({ start: true, end: false });
 
-				// If we are on the installer or upgrade page, redirect to the root
-				// but if not, keep the current path but replace state anyway to initialize the router
-				let currentRoute = location.href;
-				const savedRoute = sessionStorage.getItem('umb:auth:redirect');
-				if (savedRoute) {
-					sessionStorage.removeItem('umb:auth:redirect');
-					currentRoute = savedRoute;
+				// If we are on installer or upgrade page, redirect to the root since we are in the RUN state
+				if (pathname === '/install' || pathname === '/upgrade') {
+					history.replaceState(null, '', '/');
+					break;
 				}
-				const finalPath = pathname === '/install' || pathname === '/upgrade' ? '/' : currentRoute;
 
-				history.replaceState(null, '', finalPath);
+				// Keep the current path but replace state anyway to initialize the router
+				// because the router will not initialize a wildcard route by itself
+				history.replaceState(null, '', location.href);
 				break;
 			}
 
@@ -187,7 +193,7 @@ export class UmbAppElement extends UmbLitElement {
 			}
 
 			// Save location.href so we can redirect to it after login
-			window.sessionStorage.setItem('umb:auth:redirect', location.href);
+			window.sessionStorage.setItem(UMB_STORAGE_REDIRECT_URL, location.href);
 
 			// Make a request to the auth server to start the auth flow
 			this.#authContext.makeAuthorizationRequest();
