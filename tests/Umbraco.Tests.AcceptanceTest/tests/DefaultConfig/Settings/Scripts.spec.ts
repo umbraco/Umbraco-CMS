@@ -11,13 +11,13 @@ test.describe('Script tests', () => {
     await umbracoUi.script.goToSection(ConstantHelper.sections.settings);
   });
 
-  test('can create a empty script', async ({page, umbracoApi, umbracoUi}) => {
+  test('can create a empty script', async ({ umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.script.ensureNameNotExists(scriptName);
 
     // Act
     await umbracoUi.script.clickActionsMenuAtRoot();
-    await umbracoUi.script.clickCreateLabelButton();
+    await umbracoUi.script.clickCreateButton();
     await umbracoUi.script.clickNewJavascriptFileButton();
     // TODO: Remove this timeout when frontend validation is implemented
     await umbracoUi.waitForTimeout(500);
@@ -34,14 +34,14 @@ test.describe('Script tests', () => {
     await umbracoApi.script.ensureNameNotExists(scriptName);
   });
 
-  test('can create a script with content', async ({page, umbracoApi, umbracoUi}) => {
+  test('can create a script with content', async ({ umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.script.ensureNameNotExists(scriptName);
     const scriptContent = 'TestContent';
 
     // Act
     await umbracoUi.script.clickActionsMenuAtRoot();
-    await umbracoUi.script.clickCreateLabelButton();
+    await umbracoUi.script.clickCreateButton();
     await umbracoUi.script.clickNewJavascriptFileButton();
     // TODO: Remove this timeout when frontend validation is implemented
     await umbracoUi.waitForTimeout(500);
@@ -102,7 +102,7 @@ test.describe('Script tests', () => {
   });
 
   // Folder
-  test('can create a folder', async ({page, umbracoApi, umbracoUi}) => {
+  test('can create a folder', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     await umbracoApi.script.ensureNameNotExists(scriptFolderName);
 
@@ -142,7 +142,7 @@ test.describe('Script tests', () => {
     // Act
     await umbracoUi.script.clickRootFolderCaretButton();
     await umbracoUi.script.clickActionsMenuForScript(scriptFolderName);
-    await umbracoUi.script.clickCreateLabelButton();
+    await umbracoUi.script.clickCreateButton();
     await umbracoUi.script.clickNewJavascriptFileButton();
     // TODO: Remove this timeout when frontend validation is implemented
     await umbracoUi.waitForTimeout(500);
@@ -212,7 +212,7 @@ test.describe('Script tests', () => {
     await umbracoApi.script.ensureNameNotExists(scriptFolderName);
   });
 
-  test('can create a script in a folder in a folder', async ({page, umbracoApi, umbracoUi}) => {
+  test('can create a script in a folder in a folder', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const childFolderName = 'ChildFolderName';
     await umbracoApi.script.ensureNameNotExists(scriptFolderName);
@@ -223,7 +223,7 @@ test.describe('Script tests', () => {
     await umbracoUi.script.clickRootFolderCaretButton();
     await umbracoUi.script.clickCaretButtonForName(scriptFolderName);
     await umbracoUi.script.clickActionsMenuForScript(childFolderName);
-    await umbracoUi.script.clickCreateLabelButton();
+    await umbracoUi.script.clickCreateButton();
     await umbracoUi.script.clickNewJavascriptFileButton();
     // TODO: Remove this timeout when frontend validation is implemented
     await umbracoUi.waitForTimeout(500);

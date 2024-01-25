@@ -17,7 +17,7 @@ test.describe('Stylesheets tests', () => {
 
     //Act
     await umbracoUi.stylesheet.clickActionsMenuAtRoot();
-    await umbracoUi.stylesheet.clickCreateLabelButton();
+    await umbracoUi.stylesheet.clickCreateButton();
     await umbracoUi.stylesheet.clickNewStylesheetButton();
     // TODO: Remove this timeout when frontend validation is implemented
     await umbracoUi.waitForTimeout(500);
@@ -42,7 +42,7 @@ test.describe('Stylesheets tests', () => {
 
     //Act
     await umbracoUi.stylesheet.clickActionsMenuAtRoot();
-    await umbracoUi.stylesheet.clickCreateLabelButton();
+    await umbracoUi.stylesheet.clickCreateButton();
     await umbracoUi.stylesheet.clickNewStylesheetButton();
     // TODO: Remove this timeout when frontend validation is implemented
     await umbracoUi.waitForTimeout(500);
@@ -70,7 +70,7 @@ test.describe('Stylesheets tests', () => {
 
     //Act
     await umbracoUi.stylesheet.clickActionsMenuAtRoot();
-    await umbracoUi.stylesheet.clickCreateLabelButton();
+    await umbracoUi.stylesheet.clickCreateButton();
     await umbracoUi.stylesheet.clickNewRichTextEditorStylesheetButton();
     // TODO: Remove this timeout when frontend validation is implemented
     await umbracoUi.waitForTimeout(500);
@@ -219,7 +219,7 @@ test.describe('Stylesheets tests', () => {
     //Act
     await umbracoUi.stylesheet.clickRootFolderCaretButton();
     await umbracoUi.stylesheet.clickActionsMenuForStylesheet(stylesheetFolderName);
-    await umbracoUi.stylesheet.clickCreateLabelButton();
+    await umbracoUi.stylesheet.clickCreateButton();
     await umbracoUi.stylesheet.clickNewStylesheetButton();
     // TODO: Remove this timeout when frontend validation is implemented
     await umbracoUi.waitForTimeout(500);
@@ -255,7 +255,7 @@ test.describe('Stylesheets tests', () => {
     await umbracoUi.stylesheet.clickRootFolderCaretButton();
     await umbracoUi.stylesheet.clickCaretButtonForName(stylesheetFolderName);
     await umbracoUi.stylesheet.clickActionsMenuForStylesheet(childFolderName);
-    await umbracoUi.stylesheet.clickCreateLabelButton();
+    await umbracoUi.stylesheet.clickCreateButton();
     await umbracoUi.stylesheet.clickNewStylesheetButton();
     // TODO: Remove this timeout when frontend validation is implemented
     await umbracoUi.waitForTimeout(500);

@@ -103,30 +103,11 @@ test.describe('Template tests', () => {
     // Arrange
     const templateAlias = AliasHelper.toAlias(templateName);
     await umbracoApi.template.create(templateName, templateAlias, '');
-    const expectedTemplateContent = '\r\n' +
-      '@{\r\n' +
-      '\tvar selection = Umbraco.ContentAtRoot().FirstOrDefault()\r\n' +
-      '    .Children()\r\n' +
-      '    .Where(x => x.IsVisible());\r\n' +
-      '}\r\n' +
-      '<ul>\r\n' +
-      '\t@foreach (var item in selection)\r\n' +
-      '\t{\r\n' +
-      '\t\t<li>\r\n' +
-      '\t\t\t<a href="@item.Url()">@item.Name()</a>\r\n' +
-      '\t\t</li>\r\n' +
-      '\t}\r\n' +
-      '</ul>\r\n' +
-      '\r\n' +
-      '@using Umbraco.Cms.Web.Common.PublishedModels;\r\n' +
-      '@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage\r\n' +
-      '@{\r\n' +
-      '\tLayout = null;\r\n' +
-      '}';
+    const expectedTemplateContent = '\r\n@{\r\n\tvar selection = Umbraco.ContentAtRoot().FirstOrDefault()\r\n    .Children()\r\n    .Where(x =\u003E x.IsVisible())\r\n    .OrderBy(x =\u003E x.CreateDate);\r\n}\r\n\u003Cul\u003E\r\n\t@foreach (var item in selection)\r\n\t{\r\n\t\t\u003Cli\u003E\r\n\t\t\t\u003Ca href=\u0022@item.Url()\u0022\u003E@item.Name()\u003C/a\u003E\r\n\t\t\u003C/li\u003E\r\n\t}\r\n\u003C/ul\u003E\r\n\r\n@using Umbraco.Cms.Web.Common.PublishedModels;\r\n@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage\r\n@{\r\n\tLayout = null;\r\n}';
 
     // Act
     await umbracoUi.template.goToTemplate(templateName);
-    await umbracoUi.template.addQueryBuilderWithCreateDateOption();
+    await umbracoUi.template.addQueryBuilderWithOrderByStatement('CreateDateCreated Date', true);
     await umbracoUi.template.clickSaveButton();
 
     // Assert
@@ -150,7 +131,9 @@ test.describe('Template tests', () => {
 
     // Act
     await umbracoUi.template.goToTemplate(templateName);
+
     await umbracoUi.template.clickSectionsButton();
+    await umbracoUi.waitForTimeout(1000);
     await umbracoUi.template.clickSubmitButton();
     await umbracoUi.template.clickSaveButton();
 
