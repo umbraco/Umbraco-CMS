@@ -27,7 +27,7 @@ test.describe('Partial View tests', () => {
     partialViewPath = await umbracoApi.partialView.create(partialViewName, 'test');
 
     // Act
-    await umbracoApi.partialView.update(partialViewPath, newContent);
+    await umbracoApi.partialView.updateContent(partialViewPath, newContent);
 
     // Assert
     const updatedPartialView = await umbracoApi.partialView.get(partialViewPath);
@@ -40,7 +40,7 @@ test.describe('Partial View tests', () => {
     const wrongPartialViewPath = await umbracoApi.partialView.create(wrongPartialViewName, 'test');
 
     // Act
-    const updatedPartialViewPath = await umbracoApi.partialView.rename(wrongPartialViewPath, partialViewName);
+    const updatedPartialViewPath = await umbracoApi.partialView.updateName(wrongPartialViewPath, partialViewName);
 
     // Assert
     const updatedPartialView = await umbracoApi.partialView.get(updatedPartialViewPath);
