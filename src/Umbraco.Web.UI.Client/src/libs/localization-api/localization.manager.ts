@@ -71,6 +71,11 @@ export class UmbLocalizationManager {
 			this.localizations.set(code, t);
 		}
 
+		// Declare what keys have been changed:
+		const keys = Object.keys(t);
+		for (const key of keys) {
+			this.#changedKeys.add(key);
+		}
 		this.#requestChangedKeysUpdate();
 	}
 	#registerLocalizationBind = this.registerLocalization.bind(this);

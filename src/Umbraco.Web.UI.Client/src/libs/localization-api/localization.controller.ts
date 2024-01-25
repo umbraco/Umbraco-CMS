@@ -107,7 +107,9 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 
 	/** Outputs a translated term. */
 	term<K extends keyof LocalizationSetType>(key: K, ...args: FunctionParams<LocalizationSetType[K]>): string {
-		this.#usedKeys.push(key);
+		if (!this.#usedKeys.includes(key)) {
+			this.#usedKeys.push(key);
+		}
 
 		const { primary, secondary } = this.getLocalizationData(this.lang());
 		let term: any;

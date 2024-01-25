@@ -11,6 +11,22 @@ class UmbLocalizeControllerHostElement extends UmbElementMixin(LitElement) {
 	@property() lang = 'en-us';
 }
 
+@customElement('umb-localization-render-count')
+class UmbLocalizationRenderCountElement extends UmbElementMixin(LitElement) {
+	amountOfUpdates = 0;
+	amountOfRenders = 0;
+
+	requestUpdate() {
+		super.requestUpdate();
+		this.amountOfUpdates++;
+	}
+
+	render() {
+		this.amountOfRenders++;
+		return html`${this.localize.term('logout')}`;
+	}
+}
+
 interface TestLocalization extends UmbLocalizationSetBase {
 	close: string;
 	logout: string;
@@ -40,6 +56,12 @@ const englishOverride: UmbLocalizationSet = {
 	$code: 'en-us',
 	$dir: 'ltr',
 	close: 'Close 2',
+};
+
+const englishOverrideLogout: UmbLocalizationSet = {
+	$code: 'en-us',
+	$dir: 'ltr',
+	logout: 'Log out 2',
 };
 
 const danish: UmbLocalizationSet = {
@@ -130,7 +152,7 @@ describe('UmbLocalizeController', () => {
 			expect(controller.term('logout')).to.equal('Log out'); // Fallback
 		});
 
-		it('should override a term if new translation is registered', () => {
+		it('should override a term if new localization is registered', () => {
 			// Let the registry load the new extension
 			umbLocalizationManager.registerLocalization(englishOverride);
 
@@ -151,6 +173,35 @@ describe('UmbLocalizeController', () => {
 		it('should return a term with no tokens even though they are provided', async () => {
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			expect((controller.term as any)('logout', 'Hello', 'World')).to.equal('Log out');
+		});
+
+		it('only reacts to changes of its own localization-keys', async () => {
+			const element: UmbLocalizationRenderCountElement = await fixture(
+				html`<umb-localization-render-count></umb-localization-render-count>`,
+			);
+			expect(element.amountOfUpdates).to.equal(0);
+			expect(element.amountOfRenders).to.equal(1);
+
+			expect(element.shadowRoot!.textContent).to.equal('Log out');
+			expect(element.amountOfUpdates).to.equal(0);
+
+			// Let the registry load the new extension
+			umbLocalizationManager.registerLocalization(englishOverride);
+
+			await aTimeout(12);
+
+			// This should still be the same (cause it should not be affected as the change did not change our localization key)
+			expect(element.amountOfUpdates).to.equal(0);
+			expect(element.shadowRoot!.textContent).to.equal('Log out');
+
+			// Let the registry load the new extension
+			umbLocalizationManager.registerLocalization(englishOverrideLogout);
+
+			await aTimeout(12);
+
+			// Now we should have gotten one update and the text should be different
+			expect(element.amountOfUpdates).to.equal(1);
+			expect(element.shadowRoot!.textContent).to.equal('Log out 2');
 		});
 	});
 
