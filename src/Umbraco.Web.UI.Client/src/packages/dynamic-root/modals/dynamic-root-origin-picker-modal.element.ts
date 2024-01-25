@@ -1,44 +1,59 @@
 import { UmbDocumentPickerContext } from '../../documents/documents/components/input-document/input-document.context.js';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, customElement, map } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, map, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
-import { type UmbTreePickerDynamicRoot } from '@umbraco-cms/backoffice/components';
-import { type DocumentItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbTreePickerDynamicRoot } from '@umbraco-cms/backoffice/components';
+import { type ManifestDynamicRootOrigin, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-dynamic-root-origin-picker-modal')
 export class UmbDynamicRootOriginPickerModalModalElement extends UmbModalBaseElement {
+	@state()
+	private _origins: Array<ManifestDynamicRootOrigin> = [];
+
+	#documentPickerContext = new UmbDocumentPickerContext(this);
+
 	constructor() {
 		super();
 
 		this.#documentPickerContext.max = 1;
 
-		this.observe(this.#documentPickerContext.selectedItems, (selectedItems) => this.#selectedDocument(selectedItems));
+		this.observe(
+			umbExtensionsRegistry.extensionsOfType('dynamicRootOrigin'),
+			(origins: Array<ManifestDynamicRootOrigin>) => {
+				this._origins = origins;
+			},
+		);
 	}
 
-	#choose(alias: string) {
-		this.#submit({
-			originAlias: alias,
-		});
+	#choose(item: ManifestDynamicRootOrigin) {
+		switch (item.meta.originAlias) {
+			// NOTE: Edge-case. Currently this is the only one that uses a document picker,
+			// but other custom origins may want other configuration options. [LK:2024-01-25]
+			case 'ByKey':
+				this.#openDocumentPicker(item.meta.originAlias);
+				break;
+			default:
+				this.#submit({ originAlias: item.meta.originAlias });
+				break;
+		}
 	}
 
 	#close() {
 		this.modalContext?.reject();
 	}
 
-	#documentPickerContext = new UmbDocumentPickerContext(this);
-
-	#openDocumentPicker() {
-		this.#documentPickerContext.openPicker({
-			hideTreeRoot: true,
-		});
-	}
-
-	#selectedDocument(selectedItems: Array<DocumentItemResponseModel>) {
-		if (selectedItems.length !== 1) return;
-		this.#submit({
-			originAlias: 'ByKey',
-			originKey: selectedItems[0].id,
-		});
+	#openDocumentPicker(originAlias: string) {
+		this.#documentPickerContext
+			.openPicker({
+				hideTreeRoot: true,
+			})
+			.then(() => {
+				const selectedItems = this.#documentPickerContext.getSelection();
+				if (selectedItems.length !== 1) return;
+				this.#submit({
+					originAlias,
+					originKey: selectedItems[0],
+				});
+			});
 	}
 
 	#submit(value: UmbTreePickerDynamicRoot) {
@@ -46,50 +61,17 @@ export class UmbDynamicRootOriginPickerModalModalElement extends UmbModalBaseEle
 		this.modalContext?.submit();
 	}
 
-	#originButtons = [
-		{
-			alias: 'Root',
-			title: this.localize.term('dynamicRoot_originRootTitle'),
-			description: this.localize.term('dynamicRoot_originRootDesc'),
-			action: () => this.#choose('Root'),
-		},
-		{
-			alias: 'Parent',
-			title: this.localize.term('dynamicRoot_originParentTitle'),
-			description: this.localize.term('dynamicRoot_originParentDesc'),
-			action: () => this.#choose('Parent'),
-		},
-		{
-			alias: 'Current',
-			title: this.localize.term('dynamicRoot_originCurrentTitle'),
-			description: this.localize.term('dynamicRoot_originCurrentDesc'),
-			action: () => this.#choose('Current'),
-		},
-		{
-			alias: 'Site',
-			title: this.localize.term('dynamicRoot_originSiteTitle'),
-			description: this.localize.term('dynamicRoot_originSiteDesc'),
-			action: () => this.#choose('Site'),
-		},
-		{
-			alias: 'ByKey',
-			title: this.localize.term('dynamicRoot_originByKeyTitle'),
-			description: this.localize.term('dynamicRoot_originByKeyDesc'),
-			action: () => this.#openDocumentPicker(),
-		},
-	];
-
 	render() {
 		return html`
 			<umb-body-layout headline="${this.localize.term('dynamicRoot_pickDynamicRootOriginTitle')}">
 				<div id="main">
 					<uui-box>
 						${map(
-							this.#originButtons,
-							(btn) => html`
-								<uui-button @click=${btn.action} look="placeholder" label="${btn.title}">
-									<h3>${btn.title}</h3>
-									<p>${btn.description}</p>
+							this._origins,
+							(item) => html`
+								<uui-button @click=${() => this.#choose(item)} look="placeholder" label="${ifDefined(item.meta.label)}">
+									<h3>${item.meta.label}</h3>
+									<p>${item.meta.description}</p>
 								</uui-button>
 							`,
 						)}
@@ -103,7 +85,6 @@ export class UmbDynamicRootOriginPickerModalModalElement extends UmbModalBaseEle
 	}
 
 	static styles = [
-		UmbTextStyles,
 		css`
 			uui-box > uui-button {
 				display: block;

@@ -1,4 +1,4 @@
-import { DynamicRootRequestModel, DynamicRootResource } from '@umbraco-cms/backoffice/backend-api';
+import { type DynamicRootRequestModel, DynamicRootResource } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 

@@ -1,5 +1,5 @@
 import { UmbDynamicRootServerDataSource } from './dynamic-root.server.data.js';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import type { DynamicRootRequestModel } from '@umbraco-cms/backoffice/backend-api';
 
