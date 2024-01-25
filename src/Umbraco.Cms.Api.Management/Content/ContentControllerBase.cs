@@ -87,6 +87,7 @@ public class ContentControllerBase : ManagementApiControllerBase
         }
 
         var errors = new SortedDictionary<string, string[]>();
+        var missingPropertyAliases = new List<string>();
         foreach (PropertyValidationError validationError in validationResult.ValidationErrors)
         {
             TValueModel? requestValue = requestModel.Values.FirstOrDefault(value =>
@@ -95,12 +96,8 @@ public class ContentControllerBase : ManagementApiControllerBase
                 && value.Segment == validationError.Segment);
             if (requestValue is null)
             {
-                // the validation errors collection should be based on the request model property values. if a validation error
-                // does not have a corresponding request model property value, we definitively need to know about this, so we
-                // can correct the initial assumption.
-                // eventually this exception can be replaced by logging, but for the time being we'll fail the request this way,
-                // so the failed assumption is made immediately noticeable.
-                throw new InvalidOperationException($"A validation error was detected for property alias {validationError.Alias}, but a corresponding property value could not be found in the request model.");
+                missingPropertyAliases.Add(validationError.Alias);
+                continue;
             }
 
             var index = requestModel.Values.IndexOf(requestValue);
@@ -112,7 +109,8 @@ public class ContentControllerBase : ManagementApiControllerBase
             => BadRequest(problemDetailsBuilder
                 .WithTitle("Validation failed")
                 .WithDetail("One or more properties did not pass validation")
-                .WithErrors(errors)
+                .WithRequestModelErrors(errors)
+                .WithExtension("missingProperties", missingPropertyAliases.ToArray())
                 .Build()));
     }
 

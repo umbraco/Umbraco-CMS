@@ -37,7 +37,7 @@ public class ProblemDetailsBuilder
         return this;
     }
 
-    public ProblemDetailsBuilder WithErrors(IDictionary<string, string[]> errors)
+    public ProblemDetailsBuilder WithRequestModelErrors(IDictionary<string, string[]> errors)
         => WithExtension(nameof(HttpValidationProblemDetails.Errors).ToFirstLowerInvariant(), errors);
 
     public ProblemDetailsBuilder WithExtension(string key, object value)
