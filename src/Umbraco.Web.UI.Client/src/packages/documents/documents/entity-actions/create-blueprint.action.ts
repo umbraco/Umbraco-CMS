@@ -9,6 +9,6 @@ export class UmbCreateDocumentBlueprintEntityAction extends UmbEntityActionBase<
 
 	async execute() {
 		console.log(`execute for: ${this.unique}`);
-		await this.repository?.createBlueprint();
+		//await this.repository?.createBlueprint();
 	}
 }

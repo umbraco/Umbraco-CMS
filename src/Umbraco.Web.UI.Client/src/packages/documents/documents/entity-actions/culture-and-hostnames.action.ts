@@ -9,6 +9,6 @@ export class UmbDocumentCultureAndHostnamesEntityAction extends UmbEntityActionB
 
 	async execute() {
 		console.log(`execute for: ${this.unique}`);
-		await this.repository?.setCultureAndHostnames();
+		//await this.repository?.setCultureAndHostnames();
 	}
 }

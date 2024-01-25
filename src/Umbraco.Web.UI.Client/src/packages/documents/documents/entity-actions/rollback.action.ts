@@ -9,6 +9,6 @@ export class UmbRollbackDocumentEntityAction extends UmbEntityActionBase<UmbDocu
 
 	async execute() {
 		console.log(`execute for: ${this.unique}`);
-		await this.repository?.rollback();
+		//await this.repository?.rollback();
 	}
 }

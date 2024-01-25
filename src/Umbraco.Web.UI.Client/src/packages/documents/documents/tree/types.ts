@@ -1,25 +1,26 @@
 import type { UmbDocumentEntityType, UmbDocumentRootEntityType } from '../entity.js';
 import type { UmbUniqueTreeItemModel, UmbUniqueTreeRootModel } from '@umbraco-cms/backoffice/tree';
-import type { PublishedStateModel } from '@umbraco-cms/backoffice/backend-api';
+import type { ContentStateModel } from '@umbraco-cms/backoffice/backend-api';
 
 export interface UmbDocumentTreeItemModel extends UmbUniqueTreeItemModel {
 	entityType: UmbDocumentEntityType;
 	noAccess: boolean;
 	isTrashed: boolean;
 	isProtected: boolean;
-	isPublished: boolean;
-	isEdited: boolean;
-	contentTypeId: string;
-	variants: Array<UmbDocumentVariantTreeItemModel>;
-	icon: string;
+	documentType: {
+		id: string;
+		icon: string;
+		hasListView: boolean;
+	};
+	variants: Array<UmbDocumentTreeItemVariantModel>;
 }
 
 export interface UmbDocumentTreeRootModel extends UmbUniqueTreeRootModel {
 	entityType: UmbDocumentRootEntityType;
 }
 
-export interface UmbDocumentVariantTreeItemModel {
+export interface UmbDocumentTreeItemVariantModel {
 	name: string;
 	culture: string | null;
-	state: PublishedStateModel; // TODO: make our own enum for this. We might have states for "unsaved changes" etc.
+	state: ContentStateModel; // TODO: make our own enum for this. We might have states for "unsaved changes" etc.
 }

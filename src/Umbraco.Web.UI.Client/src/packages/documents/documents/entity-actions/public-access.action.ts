@@ -9,6 +9,6 @@ export class UmbDocumentPublicAccessEntityAction extends UmbEntityActionBase<Umb
 
 	async execute() {
 		console.log(`execute for: ${this.unique}`);
-		await this.repository?.setPublicAccess();
+		//await this.repository?.setPublicAccess();
 	}
 }

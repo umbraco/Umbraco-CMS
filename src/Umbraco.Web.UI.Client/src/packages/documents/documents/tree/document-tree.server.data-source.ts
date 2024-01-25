@@ -53,7 +53,13 @@ const mapper = (item: DocumentTreeItemResponseModel): UmbDocumentTreeItemModel =
 		hasChildren: item.hasChildren,
 		isProtected: item.isProtected,
 		documentType: item.documentType,
-		variants: item.variants,
+		variants: item.variants.map((variant) => {
+			return {
+				name: variant.name,
+				culture: variant.culture || null,
+				state: variant.state,
+			};
+		}),
 		isFolder: false,
 	};
 };

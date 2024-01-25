@@ -1,20 +1,16 @@
 import { html, nothing, customElement, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type {
-	UmbCreateDocumentModalData,
-	UmbCreateDocumentModalValue} from '@umbraco-cms/backoffice/modal';
-import {
-	UmbModalBaseElement,
-} from '@umbraco-cms/backoffice/modal';
+import type { UmbCreateDocumentModalData, UmbCreateDocumentModalValue } from '@umbraco-cms/backoffice/modal';
+import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import type { DocumentTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbDocumentRepository } from '@umbraco-cms/backoffice/document';
+import { UmbDocumentDetailRepository } from '@umbraco-cms/backoffice/document';
 
 @customElement('umb-create-document-modal')
 export class UmbCreateDocumentModalElement extends UmbModalBaseElement<
 	UmbCreateDocumentModalData,
 	UmbCreateDocumentModalValue
 > {
-	#documentRepository = new UmbDocumentRepository(this);
+	#documentRepository = new UmbDocumentDetailRepository(this);
 
 	@state()
 	private _allowedDocumentTypes: DocumentTypeResponseModel[] = [];
