@@ -16,7 +16,7 @@ namespace Umbraco.Web.WebApi.Filters
     /// <summary>
     /// Checks if the parameter is IHaveUploadedFiles and then deletes any temporary saved files from file uploads associated with the request
     /// </summary>
-    internal sealed class FileUploadCleanupFilterAttribute : ActionFilterAttribute
+    public sealed class FileUploadCleanupFilterAttribute : ActionFilterAttribute
     {
         private readonly bool _incomingModel;
 

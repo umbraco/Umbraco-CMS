@@ -15,7 +15,7 @@ namespace Umbraco.Web.Editors.Binders
     /// <summary>
     /// The model binder for <see cref="T:Umbraco.Web.Models.ContentEditing.ContentItemSave" />
     /// </summary>
-    internal class ContentItemBinder : IModelBinder
+    public class ContentItemBinder : IModelBinder
     {
         public ContentItemBinder() : this(Current.Services)
         {

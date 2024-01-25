@@ -23,7 +23,7 @@ namespace Umbraco.Web.Editors.Filters
     /// <summary>
     /// Validates the incoming <see cref="ContentItemSave"/> model along with if the user is allowed to perform the operation
     /// </summary>
-    internal sealed class ContentSaveValidationAttribute : ActionFilterAttribute
+    public sealed class ContentSaveValidationAttribute : ActionFilterAttribute
     {
         private readonly ILogger _logger;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;

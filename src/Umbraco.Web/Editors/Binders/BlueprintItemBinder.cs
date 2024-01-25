@@ -5,7 +5,7 @@ using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Editors.Binders
 {
-    internal class BlueprintItemBinder : ContentItemBinder
+    public class BlueprintItemBinder : ContentItemBinder
     {
         public BlueprintItemBinder()
         {
