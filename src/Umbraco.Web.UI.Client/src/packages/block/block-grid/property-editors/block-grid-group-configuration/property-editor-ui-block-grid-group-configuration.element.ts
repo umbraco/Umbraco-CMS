@@ -1,10 +1,10 @@
 import { html, customElement, property, css } from '@umbraco-cms/backoffice/external/lit';
-import { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import { UmbBlockGridGroupType } from '@umbraco-cms/backoffice/block';
+import type { UmbBlockGridGroupType } from '@umbraco-cms/backoffice/block';
 
 @customElement('umb-property-editor-ui-block-grid-group-configuration')
 export class UmbPropertyEditorUIBlockGridGroupConfigurationElement
