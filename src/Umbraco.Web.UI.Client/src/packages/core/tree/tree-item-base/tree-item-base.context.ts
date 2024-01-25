@@ -223,7 +223,8 @@ export class UmbTreeItemContextBase<TreeItemType extends UmbTreeItemModelBase>
 	}
 
 	#onReloadRequest = (event: UmbEntityActionEvent) => {
-		if (this.unique === undefined) return;
+		// Only handle children request here. Root request is handled by the tree context
+		if (!this.unique) return;
 		if (event.getUnique() !== this.unique) return;
 		if (event.getEntityType() !== this.entityType) return;
 		this.requestChildren();
