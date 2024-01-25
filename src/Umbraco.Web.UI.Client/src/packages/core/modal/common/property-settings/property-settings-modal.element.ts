@@ -134,7 +134,7 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 
 	#onDataTypeIdChange(event: UUIInputEvent) {
 		const dataTypeId = event.target.value.toString();
-		this.updateValue({ dataTypeId });
+		this.updateValue({ dataType: { id: dataTypeId } });
 	}
 
 	#onMandatoryChange(event: UUIBooleanInputEvent) {
@@ -259,7 +259,7 @@ export class UmbPropertySettingsModalElement extends UmbModalBaseElement<
 										.value=${this.value.description}></uui-textarea>
 								</div>
 								<umb-data-type-flow-input
-									.value=${this.value.dataTypeId ?? ''}
+									.value=${this.value.dataType.id}
 									@change=${this.#onDataTypeIdChange}></umb-data-type-flow-input>
 								<hr />
 								<div class="container">

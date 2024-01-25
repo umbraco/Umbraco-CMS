@@ -14,7 +14,7 @@ import { DictionaryResource } from '@umbraco-cms/backoffice/backend-api';
  * @implements {UmbTreeDataSource}
  */
 export class UmbDictionaryTreeServerDataSource extends UmbTreeServerDataSourceBase<
-	EntityTreeItemResponseModel,
+	NamedEntityTreeItemResponseModel,
 	UmbDictionaryTreeItemModel
 > {
 	/**

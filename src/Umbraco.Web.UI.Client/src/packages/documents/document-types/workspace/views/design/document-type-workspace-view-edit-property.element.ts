@@ -1,10 +1,9 @@
 import { UmbDataTypeDetailRepository } from '@umbraco-cms/backoffice/data-type';
-import type { UUIInputElement} from '@umbraco-cms/backoffice/external/uui';
+import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, property, state, ifDefined, nothing } from '@umbraco-cms/backoffice/external/lit';
 import type { PropertyTypeModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
-import type {
-	UmbConfirmModalData} from '@umbraco-cms/backoffice/modal';
+import type { UmbConfirmModalData } from '@umbraco-cms/backoffice/modal';
 import {
 	UMB_CONFIRM_MODAL,
 	UMB_MODAL_MANAGER_CONTEXT,
@@ -38,7 +37,7 @@ export class UmbDocumentTypeWorkspacePropertyElement extends UmbLitElement {
 		const oldValue = this._property;
 		this._property = value;
 		this.#modalRegistration.setUniquePathValue('propertyId', value?.id?.toString());
-		this.setDataType(this._property?.dataTypeId);
+		this.setDataType(this._property?.dataType.id);
 		this.requestUpdate('property', oldValue);
 	}
 

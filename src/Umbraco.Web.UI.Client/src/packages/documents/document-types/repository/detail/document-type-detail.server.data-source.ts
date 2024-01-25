@@ -96,8 +96,18 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 			isElement: data.isElement,
 			properties: data.properties,
 			containers: data.containers,
-			allowedDocumentTypes: data.allowedDocumentTypes,
-			compositions: data.compositions,
+			allowedContentTypes: data.allowedDocumentTypes.map((allowedDocumentType) => {
+				return {
+					contentType: { unique: allowedDocumentType.documentType.id },
+					sortOrder: allowedDocumentType.sortOrder,
+				};
+			}),
+			compositions: data.compositions.map((composition) => {
+				return {
+					contentType: { unique: composition.documentType.id },
+					compositionType: composition.compositionType,
+				};
+			}),
 			allowedTemplates: data.allowedTemplates,
 			defaultTemplate: data.defaultTemplate ? { id: data.defaultTemplate.id } : null,
 			cleanup: data.cleanup,
@@ -128,10 +138,19 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 			isElement: model.isElement,
 			properties: model.properties,
 			containers: model.containers,
-			allowedContentTypes: model.allowedContentTypes,
-			compositions: model.compositions,
+			allowedDocumentTypes: model.allowedContentTypes.map((allowedContentType) => {
+				return {
+					documentType: { id: allowedContentType.contentType.unique },
+					sortOrder: allowedContentType.sortOrder,
+				};
+			}),
+			compositions: model.compositions.map((composition) => {
+				return {
+					documentType: { id: composition.contentType.unique },
+					compositionType: composition.compositionType,
+				};
+			}),
 			id: model.unique,
-			containerId: model.parentUnique,
 			allowedTemplates: model.allowedTemplates,
 			defaultTemplate: model.defaultTemplate ? { id: model.defaultTemplate.id } : null,
 			cleanup: model.cleanup,
@@ -172,9 +191,19 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 			isElement: model.isElement,
 			properties: model.properties,
 			containers: model.containers,
-			allowedContentTypes: model.allowedContentTypes,
-			compositions: model.compositions,
-			allowedTemplate: model.allowedTemplates,
+			allowedDocumentTypes: model.allowedContentTypes.map((allowedContentType) => {
+				return {
+					documentType: { id: allowedContentType.contentType.unique },
+					sortOrder: allowedContentType.sortOrder,
+				};
+			}),
+			compositions: model.compositions.map((composition) => {
+				return {
+					documentType: { id: composition.contentType.unique },
+					compositionType: composition.compositionType,
+				};
+			}),
+			allowedTemplates: model.allowedTemplates,
 			defaultTemplate: model.defaultTemplate ? { id: model.defaultTemplate.id } : null,
 			cleanup: model.cleanup,
 		};

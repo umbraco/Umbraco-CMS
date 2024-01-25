@@ -33,7 +33,7 @@ export class UmbDocumentTypeWorkspaceViewStructureElement extends UmbLitElement 
 		this.observe(this.#workspaceContext.allowedContentTypes, (allowedContentTypes) => {
 			const oldValue = this._allowedContentTypeIDs;
 			this._allowedContentTypeIDs = allowedContentTypes
-				?.map((x) => x.id)
+				?.map((x) => x.contentType.unique)
 				.filter((x) => x !== undefined) as Array<string>;
 			this.requestUpdate('_allowedContentTypeIDs', oldValue);
 		});
