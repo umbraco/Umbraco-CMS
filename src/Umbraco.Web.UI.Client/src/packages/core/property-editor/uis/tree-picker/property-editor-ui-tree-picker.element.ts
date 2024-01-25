@@ -1,14 +1,13 @@
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import {
-	type UmbPropertyEditorConfigCollection,
-	UmbPropertyValueChangeEvent,
-} from '@umbraco-cms/backoffice/property-editor';
+import { UmbPropertyValueChangeEvent } from '@umbraco-cms/backoffice/property-editor';
+import { UmbDynamicRootRepository } from '@umbraco-cms/backoffice/dynamic-root';
+import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
+import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbInputTreeElement } from '@umbraco-cms/backoffice/tree';
 import type { UmbTreePickerSource } from '@umbraco-cms/backoffice/components';
-import { UmbDynamicRootRepository } from '@umbraco-cms/backoffice/dynamic-root';
 
 /**
  * @element umb-property-editor-ui-tree-picker
@@ -44,6 +43,8 @@ export class UmbPropertyEditorUITreePickerElement extends UmbLitElement implemen
 
 	#dynamicRootRepository: UmbDynamicRootRepository;
 
+	#workspaceContext?: typeof UMB_WORKSPACE_CONTEXT.TYPE;
+
 	@property({ attribute: false })
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		const startNode: UmbTreePickerSource | undefined = config?.getValueByAlias('startNode');
@@ -65,40 +66,28 @@ export class UmbPropertyEditorUITreePickerElement extends UmbLitElement implemen
 		super();
 
 		this.#dynamicRootRepository = new UmbDynamicRootRepository(this);
+
+		this.consumeContext(UMB_WORKSPACE_CONTEXT, (workspaceContext: typeof UMB_WORKSPACE_CONTEXT.TYPE) => {
+			this.#workspaceContext = workspaceContext;
+		});
 	}
 
 	connectedCallback() {
 		super.connectedCallback();
 
-		// TODO: Implement `startNode.dynamicRoot` [LK]
-		if (this.#dynamicRoot) {
-			console.log('dynamicRoot', this.#dynamicRoot);
+		this.#setStartNodeId();
+	}
 
-			this.#dynamicRootRepository
-				.postDynamicRootQuery({
-					context: {
-						id: 'b327ffa1-749a-4278-aa63-c020dba6b932',
-						parentId: 'b327ffa1-749a-4278-aa63-c020dba6b932',
-						culture: null,
-						segment: null,
-					},
-					query: {
-						origin: {
-							alias: this.#dynamicRoot.originAlias,
-							key: this.#dynamicRoot.originKey,
-						},
-						steps: this.#dynamicRoot.querySteps!.map((step) => {
-							return {
-								alias: step.alias!,
-								documentTypeIds: step.anyOfDocTypeKeys!,
-							};
-						}),
-					},
-				})
-				.then((result) => {
-					// TODO: Implement the result from `postDynamicRootQuery`. [LK]
-					console.log('postDynamicRootQuery', result);
-				});
+	#setStartNodeId() {
+		if (this.startNodeId) return;
+
+		const entityId = this.#workspaceContext?.getEntityId();
+		if (entityId && this.#dynamicRoot) {
+			this.#dynamicRootRepository.postDynamicRootQuery(this.#dynamicRoot, entityId).then((result) => {
+				if (result) {
+					this.startNodeId = result[0];
+				}
+			});
 		}
 	}
 
