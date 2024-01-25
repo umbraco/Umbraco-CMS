@@ -140,7 +140,7 @@ export class UmbInputDocumentElement extends FormControlMixin(UmbLitElement) {
 
 	#pickableFilter: (item: DocumentTreeItemResponseModel) => boolean = (item) => {
 		if (this.allowedContentTypeIds && this.allowedContentTypeIds.length > 0) {
-			return this.allowedContentTypeIds.includes(item.contentTypeId);
+			return this.allowedContentTypeIds.includes(item.documentType.id);
 		}
 		return true;
 	};

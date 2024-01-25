@@ -1,7 +1,7 @@
-import { UmbDocumentRepository } from '../repository/document.repository.js';
 import { UmbDocumentTypeDetailRepository } from '../../document-types/repository/detail/document-type-detail.repository.js';
 import { UmbDocumentPropertyDataContext } from '../property-dataset-context/document-property-dataset-context.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
+import { UmbDocumentDetailRepository } from '../repository/index.js';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbContentTypePropertyStructureManager } from '@umbraco-cms/backoffice/content-type';
 import {
@@ -20,7 +20,7 @@ export class UmbDocumentWorkspaceContext
 	implements UmbVariantableWorkspaceContextInterface, UmbPublishableWorkspaceContextInterface
 {
 	//
-	public readonly repository: UmbDocumentRepository = new UmbDocumentRepository(this);
+	public readonly repository: UmbDocumentDetailRepository = new UmbDocumentDetailRepository(this);
 	/**
 	 * The document is the current state/draft version of the document.
 	 */
@@ -31,11 +31,11 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	readonly unique = this.#currentData.asObservablePart((data) => data?.id);
-	readonly contentTypeId = this.#currentData.asObservablePart((data) => data?.contentTypeId);
+	readonly contentTypeId = this.#currentData.asObservablePart((data) => data?.documentType.id);
 
 	readonly variants = this.#currentData.asObservablePart((data) => data?.variants || []);
 	readonly urls = this.#currentData.asObservablePart((data) => data?.urls || []);
-	readonly templateId = this.#currentData.asObservablePart((data) => data?.templateId || null);
+	readonly templateId = this.#currentData.asObservablePart((data) => data?.template?.id || null);
 
 	readonly structure = new UmbContentTypePropertyStructureManager(this, new UmbDocumentTypeDetailRepository(this));
 	readonly splitView = new UmbWorkspaceSplitViewManager();
@@ -51,8 +51,8 @@ export class UmbDocumentWorkspaceContext
 		*/
 	}
 
-	async load(entityId: string) {
-		this.#getDataPromise = this.repository.requestById(entityId);
+	async load(unique: string) {
+		this.#getDataPromise = this.repository.requestByUnique(unique);
 		const { data } = await this.#getDataPromise;
 		if (!data) return undefined;
 
@@ -62,8 +62,8 @@ export class UmbDocumentWorkspaceContext
 		return data || undefined;
 	}
 
-	async create(documentTypeKey: string, parentId: string | null) {
-		this.#getDataPromise = this.repository.createScaffold(documentTypeKey, { parentId });
+	async create(unique: string, parentUnique: string | null) {
+		this.#getDataPromise = this.repository.createScaffold(unique, { parentUnique });
 		const { data } = await this.#getDataPromise;
 		if (!data) return undefined;
 
@@ -91,7 +91,7 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	getContentTypeId() {
-		return this.getData()?.contentTypeId;
+		return this.getData()?.documentType.id;
 	}
 
 	variantById(variantId: UmbVariantId) {

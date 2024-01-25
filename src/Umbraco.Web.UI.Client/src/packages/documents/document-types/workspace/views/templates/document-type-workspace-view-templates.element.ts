@@ -31,7 +31,7 @@ export class UmbDocumentTypeWorkspaceViewTemplatesElement extends UmbLitElement 
 			this.#workspaceContext.defaultTemplateId,
 			(defaultTemplateId) => {
 				const oldValue = this._defaultTemplateId;
-				this._defaultTemplateId = defaultTemplateId;
+				this._defaultTemplate = defaultTemplateId;
 				this.requestUpdate('_defaultTemplateId', oldValue);
 			},
 			'defaultTemplate',

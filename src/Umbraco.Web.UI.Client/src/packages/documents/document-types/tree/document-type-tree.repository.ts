@@ -21,7 +21,6 @@ export class UmbDocumentTypeTreeRepository
 			name: 'Document Types',
 			icon: 'icon-folder',
 			hasChildren: true,
-			isContainer: false,
 			isFolder: true,
 		};
 

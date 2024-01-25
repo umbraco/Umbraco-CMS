@@ -3,19 +3,18 @@ import { localizePropertyType, localizeSort } from './utils.js';
 import type { UmbQueryBuilderFilterElement } from './query-builder-filter.element.js';
 import type { UUIComboboxListElement } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, state, query, queryAll, ifDefined } from '@umbraco-cms/backoffice/external/lit';
-import type {
-	UmbModalManagerContext} from '@umbraco-cms/backoffice/modal';
+import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import {
 	UmbModalBaseElement,
 	UMB_DOCUMENT_PICKER_MODAL,
-	UMB_MODAL_MANAGER_CONTEXT
+	UMB_MODAL_MANAGER_CONTEXT,
 } from '@umbraco-cms/backoffice/modal';
 import type {
 	TemplateQueryExecuteModel,
 	TemplateQueryResultResponseModel,
 	TemplateQuerySettingsResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
-import { UmbDocumentRepository } from '@umbraco-cms/backoffice/document';
+import { UmbDocumentItemRepository } from '@umbraco-cms/backoffice/document';
 import './query-builder-filter.element.js';
 
 export interface TemplateQueryBuilderModalData {
@@ -57,14 +56,14 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 	@state()
 	private _defaultSortDirection: SortOrder = SortOrder.Ascending;
 
-	#documentRepository: UmbDocumentRepository;
+	#documentItemRepository: UmbDocumentItemRepository;
 	#modalManagerContext?: UmbModalManagerContext;
 	#templateRepository: UmbTemplateRepository;
 
 	constructor() {
 		super();
 		this.#templateRepository = new UmbTemplateRepository(this);
-		this.#documentRepository = new UmbDocumentRepository(this);
+		this.#documentItemRepository = new UmbDocumentItemRepository(this);
 
 		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
 			this.#modalManagerContext = instance;
@@ -127,7 +126,7 @@ export default class UmbChooseInsertTypeModalElement extends UmbModalBaseElement
 	};
 
 	async #getDocumentItem(ids: string[]) {
-		const { data, error } = await this.#documentRepository.requestItems(ids);
+		const { data, error } = await this.#documentItemRepository.requestItems(ids);
 		if (data) {
 			this._selectedRootContentName = data[0].name;
 		}

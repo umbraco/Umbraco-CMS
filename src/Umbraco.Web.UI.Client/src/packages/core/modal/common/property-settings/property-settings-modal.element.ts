@@ -10,8 +10,6 @@ import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffic
 import type { UmbPropertySettingsModalValue, UmbPropertySettingsModalData } from '@umbraco-cms/backoffice/modal';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { generateAlias } from '@umbraco-cms/backoffice/utils';
-import { DocumentTypeResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 // TODO: Could base take a token to get its types?.
 @customElement('umb-property-settings-modal')
 export class UmbPropertySettingsModalElement extends UmbModalBaseElement<

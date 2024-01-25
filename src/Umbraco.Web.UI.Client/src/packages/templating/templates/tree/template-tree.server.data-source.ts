@@ -14,7 +14,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
  * @implements {UmbTreeDataSource}
  */
 export class UmbTemplateTreeServerDataSource extends UmbTreeServerDataSourceBase<
-	EntityTreeItemResponseModel,
+	NamedEntityTreeItemResponseModel,
 	UmbTemplateTreeItemModel
 > {
 	/**

@@ -46,19 +46,14 @@ const getChildrenOf = (parentUnique: string | null) => {
 const mapper = (item: DocumentTreeItemResponseModel): UmbDocumentTreeItemModel => {
 	return {
 		unique: item.id,
-		parentUnique: item.parentId ? item.parentId : null,
-		name: item.name,
+		parentUnique: item.parent ? item.parent.id : null,
 		entityType: UMB_DOCUMENT_ENTITY_TYPE,
 		noAccess: item.noAccess,
 		isTrashed: item.isTrashed,
-		isContainer: item.isContainer,
 		hasChildren: item.hasChildren,
 		isProtected: item.isProtected,
-		isPublished: item.isPublished,
-		isEdited: item.isEdited,
-		contentTypeId: item.contentTypeId,
+		documentType: item.documentType,
 		variants: item.variants,
-		icon: item.icon,
 		isFolder: false,
 	};
 };

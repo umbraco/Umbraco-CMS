@@ -1,16 +1,11 @@
+import { UmbDocumentItemRepository } from '../../repository/index.js';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
-import type {
-	UmbModalManagerContext} from '@umbraco-cms/backoffice/modal';
-import {
-	UMB_MODAL_MANAGER_CONTEXT,
-	UMB_CONFIRM_MODAL,
-	UMB_DOCUMENT_PICKER_MODAL,
-} from '@umbraco-cms/backoffice/modal';
+import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
+import { UMB_MODAL_MANAGER_CONTEXT, UMB_CONFIRM_MODAL, UMB_DOCUMENT_PICKER_MODAL } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { DocumentItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbDocumentRepository } from '@umbraco-cms/backoffice/document';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
@@ -37,7 +32,7 @@ export class UmbInputDocumentGranularPermissionElement extends FormControlMixin(
 	@state()
 	private _items?: Array<DocumentItemResponseModel>;
 
-	#documentRepository = new UmbDocumentRepository(this);
+	#documentItemRepository = new UmbDocumentItemRepository(this);
 	#modalContext?: UmbModalManagerContext;
 	#pickedItemsObserver?: UmbObserverController<Array<DocumentItemResponseModel>>;
 
@@ -58,7 +53,7 @@ export class UmbInputDocumentGranularPermissionElement extends FormControlMixin(
 	async #observePickedDocuments() {
 		this.#pickedItemsObserver?.destroy();
 
-		const { asObservable } = await this.#documentRepository.requestItems(this._selectedIds);
+		const { asObservable } = await this.#documentItemRepository.requestItems(this._selectedIds);
 		this.#pickedItemsObserver = this.observe(asObservable(), (items) => (this._items = items));
 	}
 

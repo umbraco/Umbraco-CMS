@@ -1,5 +1,5 @@
-import { UmbDocumentEntityType } from './entity.js';
-import { ContentStateModel, ContentUrlInfoModel, DocumentValueModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbDocumentEntityType } from './entity.js';
+import type { ContentStateModel, ContentUrlInfoModel, DocumentValueModel } from '@umbraco-cms/backoffice/backend-api';
 
 export interface UmbDocumentDetailModel {
 	contentTypeId: string;
