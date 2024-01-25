@@ -1,11 +1,12 @@
 import { html, customElement, css, nothing, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import {
+import type {
 	UmbEntityUserPermissionSettingsModalData,
-	UmbEntityUserPermissionSettingsModalValue,
+	UmbEntityUserPermissionSettingsModalValue} from '@umbraco-cms/backoffice/modal';
+import {
 	UmbModalBaseElement,
 } from '@umbraco-cms/backoffice/modal';
-import { UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
+import type { UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
 
 @customElement('umb-entity-user-permission-settings-modal')
 export class UmbEntityUserPermissionSettingsModalElement extends UmbModalBaseElement<

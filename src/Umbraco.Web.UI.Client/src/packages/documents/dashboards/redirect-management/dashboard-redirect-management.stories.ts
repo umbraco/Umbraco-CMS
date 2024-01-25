@@ -1,6 +1,6 @@
 import './dashboard-redirect-management.element.js';
 
-import { Meta, Story } from '@storybook/web-components';
+import type { Meta, Story } from '@storybook/web-components';
 import type { UmbDashboardRedirectManagementElement } from './dashboard-redirect-management.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 

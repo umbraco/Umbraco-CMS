@@ -1,5 +1,5 @@
 import { UMB_BLOCK_WORKSPACE_MODAL } from '../../workspace/index.js';
-import {
+import type {
 	UmbBlockCatalogueModalData,
 	UmbBlockCatalogueModalValue,
 	UmbBlockTypeWithGroupKey,

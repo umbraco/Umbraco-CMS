@@ -1,19 +1,21 @@
-import { UmbUserGroupDetailDataSource } from '../types.js';
+import type { UmbUserGroupDetailDataSource } from '../types.js';
 import { UmbUserGroupServerDataSource } from './sources/user-group.server.data-source.js';
-import { UMB_USER_GROUP_ITEM_STORE_CONTEXT, UmbUserGroupItemStore } from './user-group-item.store.js';
+import type { UmbUserGroupItemStore } from './user-group-item.store.js';
+import { UMB_USER_GROUP_ITEM_STORE_CONTEXT } from './user-group-item.store.js';
 import { UmbUserGroupItemServerDataSource } from './sources/user-group-item.server.data-source.js';
-import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
-import { UserGroupItemResponseModel, UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import {
+import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
+import type { UserGroupItemResponseModel, UserGroupResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type {
 	UmbItemDataSource,
 	UmbItemRepository,
 	UmbDataSourceErrorResponse,
 	DataSourceResponse,
 } from '@umbraco-cms/backoffice/repository';
-import { UMB_NOTIFICATION_CONTEXT, UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
-import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
+import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
-import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
 // TODO: implement
 export class UmbUserGroupRepository

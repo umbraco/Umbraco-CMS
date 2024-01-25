@@ -1,4 +1,4 @@
-import { UmbStylesheetEntityType, UmbStylesheetFolderEntityType, UmbStylesheetRootEntityType } from '../entity.js';
+import type { UmbStylesheetEntityType, UmbStylesheetFolderEntityType, UmbStylesheetRootEntityType } from '../entity.js';
 import type { UmbUniqueTreeItemModel, UmbUniqueTreeRootModel } from '@umbraco-cms/backoffice/tree';
 
 export interface UmbStylesheetTreeItemModel extends UmbUniqueTreeItemModel {

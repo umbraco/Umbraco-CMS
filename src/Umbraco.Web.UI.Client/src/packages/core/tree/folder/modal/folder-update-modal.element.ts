@@ -1,6 +1,6 @@
 import { UmbFolderModalElementBase } from './folder-modal-element-base.js';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
-import { UmbFolderUpdateModalData, UmbFolderUpdateModalValue } from '@umbraco-cms/backoffice/tree';
+import type { UmbFolderUpdateModalData, UmbFolderUpdateModalValue } from '@umbraco-cms/backoffice/tree';
 
 @customElement('umb-folder-update-modal')
 export class UmbFolderModalElement extends UmbFolderModalElementBase<

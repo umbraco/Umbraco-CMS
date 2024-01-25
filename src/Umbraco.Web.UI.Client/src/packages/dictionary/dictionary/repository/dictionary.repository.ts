@@ -1,7 +1,8 @@
 import { type UmbDictionaryTreeStore, UMB_DICTIONARY_TREE_STORE_CONTEXT } from '../tree/index.js';
-import { UmbDictionaryStore, UMB_DICTIONARY_STORE_CONTEXT } from './dictionary.store.js';
+import type { UmbDictionaryStore} from './dictionary.store.js';
+import { UMB_DICTIONARY_STORE_CONTEXT } from './dictionary.store.js';
 import { UmbDictionaryDetailServerDataSource } from './sources/dictionary-detail.server.data-source.js';
-import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import type {
 	CreateDictionaryItemRequestModel,

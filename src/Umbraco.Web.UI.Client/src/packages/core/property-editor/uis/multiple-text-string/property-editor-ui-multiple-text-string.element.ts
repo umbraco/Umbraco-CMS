@@ -1,10 +1,10 @@
 import { UmbPropertyValueChangeEvent } from '../../index.js';
-import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
-import { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { MultipleTextStringValue, UmbInputMultipleTextStringElement } from '@umbraco-cms/backoffice/components';
+import type { MultipleTextStringValue, UmbInputMultipleTextStringElement } from '@umbraco-cms/backoffice/components';
 
 /**
  * @element umb-property-editor-ui-multiple-text-string

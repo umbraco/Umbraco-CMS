@@ -157,6 +157,9 @@ export default {
 						if (args[0].indexOf('Lit is in dev mode.') === 0) {
 							return;
 						}
+						if (args[0].indexOf('Multiple versions of Lit loaded.') === 0) {
+							return;
+						}
 						systemWarn(...args);
 					};
 				</script>

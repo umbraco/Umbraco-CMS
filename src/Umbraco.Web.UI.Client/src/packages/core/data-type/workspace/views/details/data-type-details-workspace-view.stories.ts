@@ -1,4 +1,4 @@
-import { Meta, Story } from '@storybook/web-components';
+import type { Meta, Story } from '@storybook/web-components';
 import type { UmbDataTypeDetailsWorkspaceViewEditElement } from './data-type-details-workspace-view.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 

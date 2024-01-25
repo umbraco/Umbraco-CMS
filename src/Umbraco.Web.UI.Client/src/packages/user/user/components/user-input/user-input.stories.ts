@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from '@storybook/web-components';
+import type { Meta, StoryObj } from '@storybook/web-components';
 import './user-input.element.js';
 import type { UmbUserInputElement } from './user-input.element.js';
 

@@ -1,4 +1,4 @@
-import { ManifestBase } from '@umbraco-cms/backoffice/extension-api';
+import type { ManifestBase } from '@umbraco-cms/backoffice/extension-api';
 
 export function componentHasManifestProperty(
 	component: HTMLElement,

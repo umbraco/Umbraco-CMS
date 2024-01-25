@@ -1,6 +1,6 @@
-import { UmbData } from '../data.js';
+import type { UmbData } from '../data.js';
 import { createFileItemResponseModelBaseModel } from '../utils.js';
-import { FileSystemItemResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { FileSystemItemResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 
 export class UmbMockFileSystemItemManager<T extends FileSystemItemResponseModelBaseModel> {
 	#db: UmbData<T>;

@@ -1,4 +1,4 @@
-import { Meta, Story } from '@storybook/web-components';
+import type { Meta, Story } from '@storybook/web-components';
 import type { UmbPropertyEditorUIToggleElement } from './property-editor-ui-toggle.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 

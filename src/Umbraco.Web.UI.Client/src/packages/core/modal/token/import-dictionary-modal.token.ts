@@ -1,5 +1,5 @@
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
-import { UmbEntityTreeItemModel } from '@umbraco-cms/backoffice/tree';
+import type { UmbEntityTreeItemModel } from '@umbraco-cms/backoffice/tree';
 
 export interface UmbImportDictionaryModalData {
 	unique: string | null;

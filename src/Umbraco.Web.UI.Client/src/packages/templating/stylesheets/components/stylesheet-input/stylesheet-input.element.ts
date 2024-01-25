@@ -1,4 +1,4 @@
-import { UmbStylesheetItemModel } from '../../types.js';
+import type { UmbStylesheetItemModel } from '../../types.js';
 import { UmbStylesheetPickerContext } from './stylesheet-input.context.js';
 import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';

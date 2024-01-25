@@ -1,6 +1,7 @@
-import {
+import type {
 	LogViewerDateRange,
-	UmbLogViewerWorkspaceContext,
+	UmbLogViewerWorkspaceContext} from '../workspace/logviewer.context.js';
+import {
 	UMB_APP_LOG_VIEWER_CONTEXT,
 } from '../workspace/logviewer.context.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';

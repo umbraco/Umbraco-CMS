@@ -1,7 +1,7 @@
-import { UmbTreeItemModelBase } from '../types.js';
+import type { UmbTreeItemModelBase } from '../types.js';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { ProblemDetails } from '@umbraco-cms/backoffice/backend-api';
-import { UmbPagedData } from '@umbraco-cms/backoffice/repository';
+import type { UmbPagedData } from '@umbraco-cms/backoffice/repository';
 
 export interface UmbTreeItemContext<TreeItemType extends UmbTreeItemModelBase> {
 	unique?: string | null;

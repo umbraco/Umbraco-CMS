@@ -1,5 +1,5 @@
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import {
+import type {
 	UmbPublishableWorkspaceContextInterface,
 	UmbSaveableWorkspaceContextInterface,
 } from '@umbraco-cms/backoffice/workspace';

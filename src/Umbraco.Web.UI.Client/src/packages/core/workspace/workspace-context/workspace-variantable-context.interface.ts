@@ -1,10 +1,10 @@
 import type { UmbWorkspaceSplitViewManager } from '../workspace-split-view-manager.class.js';
-import { UmbPropertyDatasetContext } from '../../property/property-dataset/property-dataset-context.interface.js';
+import type { UmbPropertyDatasetContext } from '../../property/property-dataset/property-dataset-context.interface.js';
 import type { UmbSaveableWorkspaceContextInterface } from './saveable-workspace-context.interface.js';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { ContentStateModel, VariantResponseModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export interface UmbVariantableWorkspaceContextInterface extends UmbSaveableWorkspaceContextInterface {
 	// Name:

@@ -1,6 +1,9 @@
-import { MacroSyntaxData, UmbMacroService } from '@umbraco-cms/backoffice/macro';
-import { TinyMcePluginArguments, UmbTinyMcePluginBase } from '@umbraco-cms/backoffice/components';
-import { UMB_CONFIRM_MODAL, UMB_MODAL_MANAGER_CONTEXT, UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
+import type { MacroSyntaxData} from '@umbraco-cms/backoffice/macro';
+import { UmbMacroService } from '@umbraco-cms/backoffice/macro';
+import type { TinyMcePluginArguments} from '@umbraco-cms/backoffice/components';
+import { UmbTinyMcePluginBase } from '@umbraco-cms/backoffice/components';
+import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
+import { UMB_CONFIRM_MODAL, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import type { AstNode } from '@umbraco-cms/backoffice/external/tinymce';
 
 interface DialogData {

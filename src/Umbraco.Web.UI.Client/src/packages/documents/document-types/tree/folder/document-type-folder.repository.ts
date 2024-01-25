@@ -1,9 +1,10 @@
 import { UMB_DOCUMENT_TYPE_FOLDER_ENTITY_TYPE } from '../../entity.js';
 import { UMB_DOCUMENT_TYPE_TREE_STORE_CONTEXT } from '../../tree/index.js';
 import { UmbDocumentTypeFolderServerDataSource } from './document-type-folder.server.data-source.js';
-import { UmbDocumentTypeFolderTreeItemModel } from './types.js';
-import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbFolderModel, UmbFolderRepositoryBase } from '@umbraco-cms/backoffice/tree';
+import type { UmbDocumentTypeFolderTreeItemModel } from './types.js';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbFolderModel} from '@umbraco-cms/backoffice/tree';
+import { UmbFolderRepositoryBase } from '@umbraco-cms/backoffice/tree';
 
 export class UmbDocumentTypeFolderRepository extends UmbFolderRepositoryBase<UmbDocumentTypeFolderTreeItemModel> {
 	constructor(host: UmbControllerHost) {

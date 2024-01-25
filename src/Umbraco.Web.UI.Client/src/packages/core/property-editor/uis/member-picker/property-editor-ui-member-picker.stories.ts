@@ -1,4 +1,4 @@
-import { Meta, Story } from '@storybook/web-components';
+import type { Meta, Story } from '@storybook/web-components';
 import type { UmbPropertyEditorUIMemberPickerElement } from './property-editor-ui-member-picker.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 

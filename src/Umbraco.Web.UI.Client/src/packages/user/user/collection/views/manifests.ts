@@ -1,5 +1,5 @@
 import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
-import { ManifestCollectionView } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestCollectionView } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_COLLECTION_VIEW_USER_TABLE = 'Umb.CollectionView.User.Table';
 

@@ -1,8 +1,9 @@
 import type { UmbPropertyAction } from '../../shared/property-action/property-action.interface.js';
 import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
-import {
+import type {
 	UmbNotificationDefaultData,
-	UmbNotificationContext,
+	UmbNotificationContext} from '@umbraco-cms/backoffice/notification';
+import {
 	UMB_NOTIFICATION_CONTEXT,
 } from '@umbraco-cms/backoffice/notification';
 //import { UMB_WORKSPACE_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/workspace';

@@ -1,8 +1,9 @@
-import { UmbMediaTypeDetailRepository } from '../../repository/detail/media-type-detail.repository.js';
+import type { UmbMediaTypeDetailRepository } from '../../repository/detail/media-type-detail.repository.js';
 import { UMB_MEDIA_TYPE_CREATE_OPTIONS_MODAL } from './modal/index.js';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UmbModalManagerContext, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbModalManagerContext} from '@umbraco-cms/backoffice/modal';
+import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 export class UmbCreateMediaTypeEntityAction extends UmbEntityActionBase<UmbMediaTypeDetailRepository> {
 	#modalManagerContext?: UmbModalManagerContext;

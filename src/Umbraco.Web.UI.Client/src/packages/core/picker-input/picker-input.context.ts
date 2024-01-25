@@ -2,13 +2,14 @@ import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { type UmbItemRepository, UmbRepositoryItemsManager } from '@umbraco-cms/backoffice/repository';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
-import {
-	UMB_CONFIRM_MODAL,
-	UMB_MODAL_MANAGER_CONTEXT,
+import type {
 	UmbModalManagerContext,
 	UmbModalToken,
 	UmbPickerModalData,
-	UmbPickerModalValue,
+	UmbPickerModalValue} from '@umbraco-cms/backoffice/modal';
+import {
+	UMB_CONFIRM_MODAL,
+	UMB_MODAL_MANAGER_CONTEXT
 } from '@umbraco-cms/backoffice/modal';
 
 export class UmbPickerInputContext<ItemType extends { name: string }> extends UmbBaseController {
@@ -26,8 +27,27 @@ export class UmbPickerInputContext<ItemType extends { name: string }> extends Um
 	selection;
 	selectedItems;
 
-	max = Infinity;
-	min = 0;
+	/**
+	 * Define a minimum amount of selected items in this input, for this input to be valid.
+	 */
+	public get max() {
+		return this._max;
+	}
+	public set max(value) {
+		this._max = value === undefined ? Infinity : value;
+	}
+	private _max = Infinity;
+
+	/**
+	 * Define a maximum amount of selected items in this input, for this input to be valid.
+	 */
+	public get min() {
+		return this._min;
+	}
+	public set min(value) {
+		this._min = value === undefined ? 0 : value;
+	}
+	private _min = 0;
 
 	/* TODO: find a better way to have a getUniqueMethod. If we want to support trees/items of different types,
 	then it need to be bound to the type and can't be a generic method we pass in. */
@@ -71,7 +91,7 @@ export class UmbPickerInputContext<ItemType extends { name: string }> extends Um
 
 		const modalContext = this.modalManager.open(this.modalAlias, {
 			data: {
-				multiple: this.max === 1 ? false : true,
+				multiple: this._max === 1 ? false : true,
 				...pickerData,
 			},
 			value: {

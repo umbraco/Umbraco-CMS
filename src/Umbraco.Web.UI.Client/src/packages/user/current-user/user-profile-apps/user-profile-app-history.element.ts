@@ -1,6 +1,7 @@
-import {
+import type {
 	UmbCurrentUserHistoryItem,
-	UmbCurrentUserHistoryStore,
+	UmbCurrentUserHistoryStore} from '../current-user-history.store.js';
+import {
 	UMB_CURRENT_USER_HISTORY_STORE_CONTEXT,
 } from '../current-user-history.store.js';
 import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';

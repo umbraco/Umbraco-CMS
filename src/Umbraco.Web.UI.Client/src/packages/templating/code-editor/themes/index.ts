@@ -1,4 +1,4 @@
-import { CodeEditorTheme } from '../code-editor.model.js';
+import type { CodeEditorTheme } from '../code-editor.model.js';
 import { UmbCodeEditorThemeHighContrastLight } from './code-editor.hc-light.theme.js';
 import { UmbCodeEditorThemeHighContrastDark } from './code-editor.hc-dark.theme.js';
 import { UmbCodeEditorThemeLight } from './code-editor.light.theme.js';

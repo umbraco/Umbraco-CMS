@@ -1,12 +1,13 @@
 import { UmbUserDetailRepository } from '../../repository/index.js';
-import { type UmbUserGroupInputElement } from '@umbraco-cms/backoffice/user-group';
+import type { UmbUserGroupInputElement } from '@umbraco-cms/backoffice/user-group';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, query } from '@umbraco-cms/backoffice/external/lit';
+import type {
+	UmbModalManagerContext} from '@umbraco-cms/backoffice/modal';
 import {
 	UmbModalBaseElement,
 	UMB_MODAL_MANAGER_CONTEXT,
-	UMB_CREATE_USER_SUCCESS_MODAL,
-	UmbModalManagerContext,
+	UMB_CREATE_USER_SUCCESS_MODAL
 } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-user-create-modal')

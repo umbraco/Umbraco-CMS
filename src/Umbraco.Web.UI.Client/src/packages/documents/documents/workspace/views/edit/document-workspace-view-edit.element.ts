@@ -3,15 +3,16 @@ import type { UmbDocumentWorkspaceViewEditTabElement } from './document-workspac
 import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbContentTypeContainerStructureHelper } from '@umbraco-cms/backoffice/content-type';
-import {
-	encodeFolderName,
+import type {
 	UmbRoute,
 	UmbRouterSlotChangeEvent,
-	UmbRouterSlotInitEvent,
+	UmbRouterSlotInitEvent} from '@umbraco-cms/backoffice/router';
+import {
+	encodeFolderName
 } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { PropertyTypeContainerModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
+import type { PropertyTypeContainerModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-document-workspace-view-edit')
 export class UmbDocumentWorkspaceViewEditElement extends UmbLitElement implements UmbWorkspaceViewElement {

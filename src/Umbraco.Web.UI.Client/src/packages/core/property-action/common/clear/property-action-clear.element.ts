@@ -1,5 +1,6 @@
 import type { UmbPropertyAction } from '../../shared/property-action/property-action.interface.js';
-import { UmbPropertyContext, UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
+import type { UmbPropertyContext} from '@umbraco-cms/backoffice/property';
+import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 

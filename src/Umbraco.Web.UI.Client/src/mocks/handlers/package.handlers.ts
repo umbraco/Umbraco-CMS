@@ -2,7 +2,7 @@ const { rest } = window.MockServiceWorker;
 import { UmbId } from '@umbraco-cms/backoffice/id';
 
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
-import {
+import type {
 	PackageDefinitionResponseModel,
 	PagedPackageDefinitionResponseModel,
 	PagedPackageMigrationStatusResponseModel,

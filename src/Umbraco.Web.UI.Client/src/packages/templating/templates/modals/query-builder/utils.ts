@@ -1,8 +1,9 @@
-import {
-	OperatorModel,
+import type {
 	TemplateQueryExecuteSortModel,
 	TemplateQueryOperatorModel,
-	TemplateQueryPropertyPresentationModel,
+	TemplateQueryPropertyPresentationModel} from '@umbraco-cms/backoffice/backend-api';
+import {
+	OperatorModel,
 	TemplateQueryPropertyTypeModel,
 	UserOrderModel,
 } from '@umbraco-cms/backoffice/backend-api';

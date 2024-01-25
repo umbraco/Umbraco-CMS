@@ -1,16 +1,16 @@
-import { type UmbTreeItemModelBase } from './types.js';
-import { type UmbTreeRepository } from './tree-repository.interface.js';
-import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
-import { UmbPagedData } from '@umbraco-cms/backoffice/repository';
+import type { UmbTreeItemModelBase } from './types.js';
+import type { UmbTreeRepository } from './tree-repository.interface.js';
+import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
+import type { UmbPagedData } from '@umbraco-cms/backoffice/repository';
 import {
 	type ManifestRepository,
 	type ManifestTree,
 	umbExtensionsRegistry,
 } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
-import { type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
-import { ProblemDetails } from '@umbraco-cms/backoffice/backend-api';
+import type { ProblemDetails } from '@umbraco-cms/backoffice/backend-api';
 import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
 
 // TODO: update interface

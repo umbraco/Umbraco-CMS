@@ -1,4 +1,4 @@
-import { Meta, Story } from '@storybook/web-components';
+import type { Meta, Story } from '@storybook/web-components';
 import type { UmbPropertyEditorUITextBoxElement } from './property-editor-ui-text-box.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 

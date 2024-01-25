@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from '@storybook/web-components';
+import type { Meta, StoryObj } from '@storybook/web-components';
 import './tooltip-menu.element.js';
 import type { UmbTooltipMenuElement, TooltipMenuItem } from './tooltip-menu.element.js';
 

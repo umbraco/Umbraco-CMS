@@ -1,4 +1,4 @@
-import { RelationItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { RelationItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 export const items: Array<RelationItemResponseModel> = [
 	{
