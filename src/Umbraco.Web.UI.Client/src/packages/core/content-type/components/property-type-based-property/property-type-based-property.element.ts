@@ -1,5 +1,5 @@
 import type { UmbPropertyEditorConfig } from '../../../property-editor/index.js';
-import type { UmbDataTypeDetailModel} from '@umbraco-cms/backoffice/data-type';
+import type { UmbDataTypeDetailModel } from '@umbraco-cms/backoffice/data-type';
 import { UmbDataTypeDetailRepository } from '@umbraco-cms/backoffice/data-type';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, ifDefined, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
@@ -16,8 +16,8 @@ export class UmbPropertyTypeBasedPropertyElement extends UmbLitElement {
 	public set property(value: PropertyTypeModelBaseModel | undefined) {
 		const oldProperty = this._property;
 		this._property = value;
-		if (this._property?.dataTypeId !== oldProperty?.dataTypeId) {
-			this._observeDataType(this._property?.dataTypeId);
+		if (this._property?.dataType.id !== oldProperty?.dataType.id) {
+			this._observeDataType(this._property?.dataType.id);
 		}
 	}
 	private _property?: PropertyTypeModelBaseModel;

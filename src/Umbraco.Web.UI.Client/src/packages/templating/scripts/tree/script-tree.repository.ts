@@ -18,7 +18,6 @@ export class UmbScriptTreeRepository extends UmbTreeRepositoryBase<UmbScriptTree
 			name: 'Scripts',
 			icon: 'icon-folder',
 			hasChildren: true,
-			isContainer: false,
 			isFolder: true,
 		};
 

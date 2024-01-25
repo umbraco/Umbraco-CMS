@@ -30,13 +30,6 @@ export const handlers = [
 		return res(ctx.status(200));
 	}),
 
-	rest.post('/umbraco/management/api/v1/media/move', async (req, res, ctx) => {
-		const data = await req.json();
-		if (!data) return;
-		umbMediaData.move(data.ids, data.destination);
-		return res(ctx.status(200));
-	}),
-
 	rest.post<string[]>('/umbraco/management/api/v1/media/trash', async (req, res, ctx) => {
 		const ids = await req.json();
 		const trashed = umbMediaData.trash(ids);

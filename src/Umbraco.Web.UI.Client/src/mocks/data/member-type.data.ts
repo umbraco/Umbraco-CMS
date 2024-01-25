@@ -12,7 +12,6 @@ export const data: Array<MemberTypeDetails> = [
 		entityType: 'member-type',
 		hasChildren: false,
 		id: 'd59be02f-1df9-4228-aa1e-01917d806cda',
-		isContainer: false,
 		parentId: null,
 		alias: 'memberType1',
 		properties: [],

@@ -21,7 +21,6 @@ export class UmbStaticFileTreeRepository
 			name: 'Static Files',
 			icon: 'icon-folder',
 			hasChildren: true,
-			isContainer: false,
 			isFolder: true,
 		};
 

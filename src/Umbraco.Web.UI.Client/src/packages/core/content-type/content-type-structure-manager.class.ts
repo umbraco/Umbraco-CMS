@@ -7,8 +7,7 @@ import type {
 	PropertyTypeModelBaseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost, UmbController } from '@umbraco-cms/backoffice/controller-api';
-import type {
-	MappingFunction} from '@umbraco-cms/backoffice/observable-api';
+import type { MappingFunction } from '@umbraco-cms/backoffice/observable-api';
 import {
 	UmbArrayState,
 	partialUpdateFrozenArray,
@@ -160,7 +159,7 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 
 	private async _loadContentTypeCompositions(contentType: T) {
 		contentType.compositions?.forEach((composition) => {
-			this._ensureType(composition.id);
+			this._ensureType(composition.contentType.unique);
 		});
 	}
 
@@ -191,7 +190,7 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 
 		const container: PropertyTypeContainerModelBaseModel = {
 			id: UmbId.new(),
-			parentId: parentId ?? null,
+			parent: parentId ? { id: parentId } : null,
 			name: '',
 			type: type,
 			sortOrder: sortOrder ?? 0,
@@ -429,7 +428,7 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 		return this.#contentTypes.asObservablePart((docTypes) => {
 			return (
 				docTypes.find((docType) => {
-					return docType.properties?.find((property) => property.containerId === containerId);
+					return docType.properties?.find((property) => property.container?.id === containerId);
 				}) !== undefined
 			);
 		});
@@ -444,7 +443,7 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 			const props: DocumentTypePropertyTypeResponseModel[] = [];
 			docTypes.forEach((docType) => {
 				docType.properties?.forEach((property) => {
-					if (property.containerId === containerId) {
+					if (property.container?.id === containerId) {
 						props.push(property);
 					}
 				});
@@ -455,17 +454,17 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 
 	rootContainers(containerType: PropertyContainerTypes) {
 		return this.#containers.asObservablePart((data) => {
-			return data.filter((x) => x.parentId === null && x.type === containerType);
+			return data.filter((x) => x.parent?.id === null && x.type === containerType);
 		});
 	}
 
 	getRootContainers(containerType: PropertyContainerTypes) {
-		return this.#containers.getValue().filter((x) => x.parentId === null && x.type === containerType);
+		return this.#containers.getValue().filter((x) => x.parent?.id === null && x.type === containerType);
 	}
 
 	hasRootContainers(containerType: PropertyContainerTypes) {
 		return this.#containers.asObservablePart((data) => {
-			return data.filter((x) => x.parentId === null && x.type === containerType).length > 0;
+			return data.filter((x) => x.parent?.id === null && x.type === containerType).length > 0;
 		});
 	}
 
@@ -474,19 +473,16 @@ export class UmbContentTypePropertyStructureManager<T extends UmbContentTypeMode
 	}
 
 	getOwnerContainers(containerType: PropertyContainerTypes, parentId: string | null = null) {
-		return this.getOwnerContentType()?.containers?.filter((x) => x.parentId === parentId && x.type === containerType);
+		return this.getOwnerContentType()?.containers?.filter((x) => x.parent?.id === parentId && x.type === containerType);
 	}
 
 	isOwnerContainer(containerId: string) {
 		return this.getOwnerContentType()?.containers?.filter((x) => x.id === containerId);
 	}
 
-	containersOfParentKey(
-		parentId: PropertyTypeContainerModelBaseModel['parentId'],
-		containerType: PropertyContainerTypes,
-	) {
+	containersOfParentKey(parentId: string, containerType: PropertyContainerTypes) {
 		return this.#containers.asObservablePart((data) => {
-			return data.filter((x) => x.parentId === parentId && x.type === containerType);
+			return data.filter((x) => x.parent?.id === parentId && x.type === containerType);
 		});
 	}
 

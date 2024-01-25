@@ -2,7 +2,6 @@ export interface UmbTreeItemModelBase {
 	entityType: string;
 	name: string;
 	hasChildren: boolean;
-	isContainer: boolean;
 	isFolder: boolean;
 	icon?: string | null;
 }

@@ -4,10 +4,9 @@ import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
 import type {
 	CreateDocumentTypeRequestModel,
-	UpdateDocumentTypeRequestModel} from '@umbraco-cms/backoffice/backend-api';
-import {
-	DocumentTypeResource
+	UpdateDocumentTypeRequestModel,
 } from '@umbraco-cms/backoffice/backend-api';
+import { DocumentTypeResource } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
@@ -52,8 +51,8 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 			containers: [],
 			allowedContentTypes: [],
 			compositions: [],
-			allowedTemplateIds: [],
-			defaultTemplateId: null,
+			allowedTemplates: [],
+			defaultTemplate: null,
 			cleanup: {
 				preventCleanup: false,
 				keepAllVersionsNewerThanDays: null,
@@ -100,7 +99,7 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 			allowedDocumentTypes: data.allowedDocumentTypes,
 			compositions: data.compositions,
 			allowedTemplates: data.allowedTemplates,
-			defaultTemplate: data.defaultTemplate?.id || null,
+			defaultTemplate: data.defaultTemplate ? { id: data.defaultTemplate.id } : null,
 			cleanup: data.cleanup,
 		};
 
@@ -133,8 +132,8 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 			compositions: model.compositions,
 			id: model.unique,
 			containerId: model.parentUnique,
-			allowedTemplateIds: model.allowedTemplateIds,
-			defaultTemplateId: model.defaultTemplateId || null,
+			allowedTemplates: model.allowedTemplates,
+			defaultTemplate: model.defaultTemplate ? { id: model.defaultTemplate.id } : null,
 			cleanup: model.cleanup,
 		};
 
@@ -175,8 +174,8 @@ export class UmbDocumentTypeDetailServerDataSource implements UmbDetailDataSourc
 			containers: model.containers,
 			allowedContentTypes: model.allowedContentTypes,
 			compositions: model.compositions,
-			allowedTemplateIds: model.allowedTemplateIds,
-			defaultTemplateId: model.defaultTemplateId || null,
+			allowedTemplate: model.allowedTemplates,
+			defaultTemplate: model.defaultTemplate ? { id: model.defaultTemplate.id } : null,
 			cleanup: model.cleanup,
 		};
 

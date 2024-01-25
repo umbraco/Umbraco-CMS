@@ -3,7 +3,10 @@ import type {
 	UmbContentTypePropertyStructureManager,
 } from './content-type-structure-manager.class.js';
 import type { UmbContentTypeModel } from './types.js';
-import type { DocumentTypePropertyTypeResponseModel, PropertyTypeModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
+import type {
+	DocumentTypePropertyTypeResponseModel,
+	PropertyTypeModelBaseModel,
+} from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 
@@ -93,7 +96,7 @@ export class UmbContentTypePropertyStructureHelper<T extends UmbContentTypeModel
 			this.#structure.propertyStructuresOf(groupId),
 			(properties) => {
 				// If this need to be able to remove properties, we need to clean out the ones of this group.id before inserting them:
-				const _propertyStructure = this.#propertyStructure.getValue().filter((x) => x.containerId !== groupId);
+				const _propertyStructure = this.#propertyStructure.getValue().filter((x) => x.container?.id !== groupId);
 
 				properties?.forEach((property) => {
 					if (!_propertyStructure.find((x) => x.alias === property.alias)) {

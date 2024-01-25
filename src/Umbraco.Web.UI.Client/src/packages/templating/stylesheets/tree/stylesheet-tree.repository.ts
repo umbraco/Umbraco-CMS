@@ -20,7 +20,6 @@ export class UmbStylesheetTreeRepository extends UmbTreeRepositoryBase<
 			name: 'Stylesheets',
 			icon: 'icon-folder',
 			hasChildren: true,
-			isContainer: false,
 			isFolder: true,
 		};
 
