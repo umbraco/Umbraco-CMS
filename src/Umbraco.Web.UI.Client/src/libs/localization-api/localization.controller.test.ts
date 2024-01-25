@@ -1,6 +1,6 @@
 import { aTimeout, elementUpdated, expect, fixture, html } from '@open-wc/testing';
 import type { UmbLocalizationSet, UmbLocalizationSetBase } from './localization.manager.js';
-import { registerLocalization, localizations } from './localization.manager.js';
+import { umbLocalizationManager } from './localization.manager.js';
 import { UmbLocalizationController } from './localization.controller.js';
 import { LitElement, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
@@ -57,10 +57,10 @@ const danishRegional: UmbLocalizationSet = {
 //#endregion
 
 describe('UmbLocalizeController', () => {
-	let controller: UmbLocalizationController<TestLocalization>;
+	let controller: UmbLocalizationController;
 
 	beforeEach(async () => {
-		registerLocalization(english, danish, danishRegional);
+		umbLocalizationManager.registerManyLocalizations([english, danish, danishRegional]);
 		document.documentElement.lang = english.$code;
 		document.documentElement.dir = english.$dir;
 		await aTimeout(0);
@@ -77,7 +77,7 @@ describe('UmbLocalizeController', () => {
 
 	afterEach(() => {
 		controller.destroy();
-		localizations.clear();
+		umbLocalizationManager.localizations.clear();
 	});
 
 	it('should have a default language', () => {
@@ -132,7 +132,7 @@ describe('UmbLocalizeController', () => {
 
 		it('should override a term if new translation is registered', () => {
 			// Let the registry load the new extension
-			registerLocalization(englishOverride);
+			umbLocalizationManager.registerLocalization(englishOverride);
 
 			expect(controller.term('close')).to.equal('Close 2');
 		});

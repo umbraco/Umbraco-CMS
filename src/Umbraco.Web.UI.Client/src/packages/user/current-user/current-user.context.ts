@@ -25,16 +25,8 @@ export class UmbCurrentUserContext extends UmbBaseController {
 			this.#observeIsAuthorized();
 		});
 
-		umbLocalizationRegistry.isDefaultLoaded.then((isDefaultLoaded) => {
-			if (!isDefaultLoaded) return;
-
-			this.observe(
-				this.languageIsoCode,
-				(currentLanguageIsoCode) => {
-					umbLocalizationRegistry.loadLanguage(currentLanguageIsoCode);
-				},
-				'umbCurrentUserLanguageIsoCode',
-			);
+		this.observe(this.languageIsoCode, (currentLanguageIsoCode) => {
+			umbLocalizationRegistry.loadLanguage(currentLanguageIsoCode);
 		});
 
 		this.provideContext(UMB_CURRENT_USER_CONTEXT, this);

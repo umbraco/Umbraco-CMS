@@ -21,10 +21,6 @@ function addOrUpdateDictionary(
 }
 
 export class UmbLocalizationRegistry {
-	//
-	#isDefaultLoadedPromise?: Promise<boolean>;
-	#isDefaultLoadedResolve?: (value: boolean) => void;
-
 	#currentLanguage = new UmbStringState(document.documentElement.lang ?? 'en-us');
 	readonly currentLanguage = this.#currentLanguage.asObservable();
 
@@ -37,13 +33,6 @@ export class UmbLocalizationRegistry {
 		return umbLocalizationManager.localizations;
 	}
 
-	get isDefaultLoaded() {
-		this.#isDefaultLoadedPromise ??= new Promise<boolean>((resolve) => {
-			this.#isDefaultLoadedResolve = resolve;
-		});
-		return this.#isDefaultLoadedPromise;
-	}
-
 	constructor(extensionRegistry: UmbBackofficeExtensionRegistry) {
 		combineLatest([this.currentLanguage, extensionRegistry.extensionsOfType('localization')]).subscribe(
 			async ([currentLanguage, extensions]) => {
@@ -54,7 +43,7 @@ export class UmbLocalizationRegistry {
 						ext.meta.culture.toLowerCase() === locale.language.toLowerCase(),
 				);
 
-				// Check if there is any difference to the cached aliases
+				// Only get the extensions that are not already loading/loaded:
 				const diff = filteredExt.filter((ext) => !this.#loadedExtAliases.includes(ext.alias));
 				if (diff.length !== 0) {
 					// got new localizations to load:

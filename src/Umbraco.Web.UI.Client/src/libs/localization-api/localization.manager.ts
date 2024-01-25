@@ -20,21 +20,29 @@ export interface UmbLocalizationSetBase {
 	$code: string; // e.g. en, en-GB
 	$dir: 'ltr' | 'rtl';
 }
+
+export type UmbLocalizationSetKey = string | number | symbol;
+
 export interface UmbLocalizationSet extends UmbLocalizationSetBase {
-	[key: string]: UmbLocalizationEntry;
+	[key: UmbLocalizationSetKey]: UmbLocalizationEntry;
 }
 
+export const UMB_DEFAULT_LOCALIZATION_CULTURE = 'en-us';
+
 export class UmbLocalizationManager {
-	connectedControllers = new Set<UmbLocalizationController>();
+	connectedControllers = new Set<UmbLocalizationController<UmbLocalizationSetBase>>();
 	#documentElementObserver: MutationObserver;
 
-	#changedKeys: Set<keyof UmbLocalizationSet> = new Set();
+	#changedKeys: Set<UmbLocalizationSetKey> = new Set();
 	#requestUpdateChangedKeysId?: number = undefined;
 
 	localizations: Map<string, UmbLocalizationSetBase> = new Map();
 	documentDirection = document.documentElement.dir || 'ltr';
 	documentLanguage = document.documentElement.lang || navigator.language;
-	fallback?: UmbLocalizationSetBase;
+
+	get fallback(): UmbLocalizationSet | undefined {
+		return this.localizations.get(UMB_DEFAULT_LOCALIZATION_CULTURE) as UmbLocalizationSet;
+	}
 
 	constructor() {
 		this.#documentElementObserver = new MutationObserver(this.updateAll);
@@ -44,11 +52,11 @@ export class UmbLocalizationManager {
 		});
 	}
 
-	appendConsumer(consumer: UmbLocalizationController) {
+	appendConsumer(consumer: UmbLocalizationController<UmbLocalizationSetBase>) {
 		if (this.connectedControllers.has(consumer)) return;
 		this.connectedControllers.add(consumer);
 	}
-	removeConsumer(consumer: UmbLocalizationController) {
+	removeConsumer(consumer: UmbLocalizationController<UmbLocalizationSetBase>) {
 		this.connectedControllers.delete(consumer);
 	}
 
@@ -63,12 +71,7 @@ export class UmbLocalizationManager {
 			this.localizations.set(code, t);
 		}
 
-		// The first translation we registerer will become the fallback
-		if (!this.fallback) {
-			this.fallback = t;
-		}
-
-		this.requestChangedKeysUpdate();
+		this.#requestChangedKeysUpdate();
 	}
 	#registerLocalizationBind = this.registerLocalization.bind(this);
 
@@ -99,7 +102,7 @@ export class UmbLocalizationManager {
 		this.#changedKeys.clear();
 	};
 
-	updateChangedKeys = () => {
+	#updateChangedKeys = () => {
 		this.#requestUpdateChangedKeysId = undefined;
 
 		this.connectedControllers.forEach((ctrl) => {
@@ -109,9 +112,13 @@ export class UmbLocalizationManager {
 		this.#changedKeys.clear();
 	};
 
-	requestChangedKeysUpdate() {
+	/**
+	 * Request an update of all consumers of the keys defined in #changedKeys.
+	 * This waits one frame, which ensures that multiple changes are collected into one.
+	 */
+	#requestChangedKeysUpdate() {
 		if (this.#requestUpdateChangedKeysId) return;
-		this.#requestUpdateChangedKeysId = requestAnimationFrame(this.updateChangedKeys);
+		this.#requestUpdateChangedKeysId = requestAnimationFrame(this.#updateChangedKeys);
 	}
 }
 
