@@ -1,10 +1,10 @@
 import { UmbLanguageRepository } from '../repository/language.repository.js';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
-import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
+import type { LanguageResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
 export class UmbAppLanguageContext extends UmbBaseController implements UmbApi {
 	#languageRepository: UmbLanguageRepository;

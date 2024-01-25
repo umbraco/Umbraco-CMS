@@ -1,4 +1,4 @@
-import { Meta, Story } from '@storybook/web-components';
+import type { Meta, Story } from '@storybook/web-components';
 import type { UmbPropertyActionClearElement } from './property-action-clear.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 

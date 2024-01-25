@@ -10,12 +10,13 @@ import {
 	repeat,
 	ifDefined,
 } from '@umbraco-cms/backoffice/external/lit';
-import { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
+import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import type {
+	AuditLogWithUsernameResponseModel} from '@umbraco-cms/backoffice/backend-api';
 import {
 	AuditLogBaseModel,
-	AuditLogWithUsernameResponseModel,
 	DirectionModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbCurrentUserContext } from '@umbraco-cms/backoffice/current-user';

@@ -1,7 +1,8 @@
-import { MemoizationFunction } from '../types/memoization-function.type.js';
-import { MappingFunction } from '../types/mapping-function.type.js';
+import type { MemoizationFunction } from '../types/memoization-function.type.js';
+import type { MappingFunction } from '../types/mapping-function.type.js';
 import { defaultMemoization } from './default-memoization.function.js';
-import { distinctUntilChanged, map, Observable, shareReplay } from '@umbraco-cms/backoffice/external/rxjs';
+import type { Observable} from '@umbraco-cms/backoffice/external/rxjs';
+import { distinctUntilChanged, map, shareReplay } from '@umbraco-cms/backoffice/external/rxjs';
 
 /**
  * @export

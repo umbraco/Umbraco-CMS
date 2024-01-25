@@ -3,23 +3,16 @@ import { pastePreProcessHandler } from './input-tiny-mce.handlers.js';
 import { availableLanguages } from './input-tiny-mce.languages.js';
 import { uriAttributeSanitizer } from './input-tiny-mce.sanitizer.js';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
-import { type Editor, type RawEditorOptions, renderEditor } from '@umbraco-cms/backoffice/external/tinymce';
-import { TinyMcePluginArguments, UmbTinyMcePluginBase } from '@umbraco-cms/backoffice/components';
+import type { Editor, RawEditorOptions } from '@umbraco-cms/backoffice/external/tinymce';
+import type { TinyMcePluginArguments, UmbTinyMcePluginBase } from '@umbraco-cms/backoffice/components';
 import { loadManifestApi } from '@umbraco-cms/backoffice/extension-api';
-import { ManifestTinyMcePlugin, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import {
-	PropertyValueMap,
-	css,
-	customElement,
-	html,
-	property,
-	query,
-	state,
-} from '@umbraco-cms/backoffice/external/lit';
+import { type ManifestTinyMcePlugin, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, property, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbMediaHelper } from '@umbraco-cms/backoffice/utils';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
+import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
 import { UMB_APP_CONTEXT } from '@umbraco-cms/backoffice/app';
 import { UmbStylesheetDetailRepository, UmbStylesheetRuleManager } from '@umbraco-cms/backoffice/stylesheet';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
@@ -32,6 +25,8 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 	@state()
 	private _tinyConfig: RawEditorOptions = {};
 
+	// eslint-disable-next-line @typescript-eslint/consistent-type-imports
+	#renderEditor?: typeof import('@umbraco-cms/backoffice/external/tinymce').renderEditor;
 	#mediaHelper = new UmbMediaHelper();
 	#plugins: Array<new (args: TinyMcePluginArguments) => UmbTinyMcePluginBase> = [];
 	#editorRef?: Editor | null = null;
@@ -58,7 +53,12 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 
 	protected async firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): Promise<void> {
 		super.firstUpdated(_changedProperties);
-		await this.#loadPlugins();
+
+		// Here we want to start the loading of everything at first, not one at a time, which is why this code is not using await.
+		const loadEditor = import('@umbraco-cms/backoffice/external/tinymce').then((tinyMce) => {
+			this.#renderEditor = tinyMce.renderEditor;
+		});
+		await Promise.all([loadEditor, ...(await this.#loadPlugins())]);
 		await this.#setTinyConfig();
 	}
 
@@ -81,16 +81,28 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 		const observable = umbExtensionsRegistry?.extensionsOfType('tinyMcePlugin');
 		const manifests = (await firstValueFrom(observable)) as ManifestTinyMcePlugin[];
 
+		const promises = [];
 		for (const manifest of manifests) {
-			const plugin = manifest.js
-				? await loadManifestApi(manifest.js)
-				: manifest.api
-				? await loadManifestApi(manifest.api)
-				: undefined;
-			if (plugin) {
-				this.#plugins.push(plugin);
+			if (manifest.js) {
+				promises.push(
+					loadManifestApi(manifest.js).then((plugin) => {
+						if (plugin) {
+							this.#plugins.push(plugin);
+						}
+					}),
+				);
+			}
+			if (manifest.api) {
+				promises.push(
+					loadManifestApi(manifest.api).then((plugin) => {
+						if (plugin) {
+							this.#plugins.push(plugin);
+						}
+					}),
+				);
 			}
 		}
+		return promises;
 	}
 
 	async getFormatStyles(stylesheetPaths: Array<string>) {
@@ -214,7 +226,10 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 			this.#editorRef.destroy();
 		}
 
-		const editors = await renderEditor(this._tinyConfig);
+		if (!this.#renderEditor) {
+			throw new Error('TinyMCE renderEditor is not loaded');
+		}
+		const editors = await this.#renderEditor(this._tinyConfig);
 		this.#editorRef = editors.pop();
 	}
 
@@ -344,6 +359,10 @@ export class UmbInputTinyMceElement extends FormControlMixin(UmbLitElement) {
 				line-height: 1 !important;
 			}
 
+			/* Solves issue 1019 by lowering un-needed z-index on header.*/
+			.tox.tox-tinymce .tox-editor-header {
+				z-index: 0;
+			}
 		`,
 	];
 }

@@ -1,14 +1,16 @@
 import { UmbId } from '@umbraco-cms/backoffice/id';
-import { UmbContextConsumerController, UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import {
+import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type {
 	UmbNotificationDefaultData,
-	UmbNotificationContext,
+	UmbNotificationContext} from '@umbraco-cms/backoffice/notification';
+import {
 	UMB_NOTIFICATION_CONTEXT,
 } from '@umbraco-cms/backoffice/notification';
 import { UmbObjectState, UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
-import { UmbEntityDetailStore } from '@umbraco-cms/backoffice/store';
-import { UmbEntityTreeItemModel } from '@umbraco-cms/backoffice/tree';
+import type { UmbEntityDetailStore } from '@umbraco-cms/backoffice/store';
+import type { UmbEntityTreeItemModel } from '@umbraco-cms/backoffice/tree';
 
 // Extend entityType base type?, so we are sure to have parentId?
 // TODO: switch to use EntityDetailItem ? if we can have such type?

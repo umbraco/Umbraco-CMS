@@ -1,4 +1,5 @@
-import { UUIBooleanInputElement, UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
+import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
+import { UUIBooleanInputElement } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, property, query } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 

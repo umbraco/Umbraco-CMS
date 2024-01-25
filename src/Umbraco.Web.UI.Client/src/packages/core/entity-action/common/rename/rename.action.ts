@@ -1,8 +1,9 @@
 import { UMB_RENAME_MODAL } from './modal/rename-modal.token.js';
-import { type UmbRenameRepository } from './types.js';
+import type { UmbRenameRepository } from './types.js';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { UmbModalManagerContext, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbModalManagerContext} from '@umbraco-cms/backoffice/modal';
+import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 export class UmbRenameEntityAction extends UmbEntityActionBase<UmbRenameRepository<{ unique: string }>> {
 	#modalManagerContext?: UmbModalManagerContext;

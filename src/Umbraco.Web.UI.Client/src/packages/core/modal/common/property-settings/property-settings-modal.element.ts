@@ -4,11 +4,13 @@ import {
 } from './property-settings-modal.context.js';
 import { UMB_DOCUMENT_TYPE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/document-type';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UUIBooleanInputEvent, UUIInputEvent, UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
-import { PropertyValueMap, css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import {
+import type { UUIBooleanInputEvent, UUIInputEvent, UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
+import type { PropertyValueMap} from '@umbraco-cms/backoffice/external/lit';
+import { css, html, nothing, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import type {
 	UmbPropertySettingsModalValue,
-	UmbPropertySettingsModalData,
+	UmbPropertySettingsModalData} from '@umbraco-cms/backoffice/modal';
+import {
 	UmbModalBaseElement,
 } from '@umbraco-cms/backoffice/modal';
 import { generateAlias } from '@umbraco-cms/backoffice/utils';

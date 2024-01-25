@@ -1,4 +1,5 @@
-import { UmbControllerHostElement, UmbControllerHostElementMixin } from './controller-host-element.mixin.js';
+import type { UmbControllerHostElement} from './controller-host-element.mixin.js';
+import { UmbControllerHostElementMixin } from './controller-host-element.mixin.js';
 
 export class UmbControllerHostProviderElement
 	extends UmbControllerHostElementMixin(HTMLElement)

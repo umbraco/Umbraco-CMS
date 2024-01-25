@@ -1,5 +1,5 @@
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
-import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbArrayState, UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 

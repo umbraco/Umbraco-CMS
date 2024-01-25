@@ -1,16 +1,17 @@
-import { UmbStylesheetDetailModel } from '../types.js';
+import type { UmbStylesheetDetailModel } from '../types.js';
 import { UMB_STYLESHEET_ENTITY_TYPE } from '../entity.js';
 import {
 	UmbServerFilePathUniqueSerializer,
 	appendFileExtensionIfNeeded,
 } from '@umbraco-cms/backoffice/server-file-system';
-import {
+import type {
 	CreateStylesheetRequestModel,
-	StylesheetResource,
-	UpdateStylesheetRequestModel,
+	UpdateStylesheetRequestModel} from '@umbraco-cms/backoffice/backend-api';
+import {
+	StylesheetResource
 } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
+import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 export class UmbStylesheetDetailServerDataSource implements UmbDetailDataSource<UmbStylesheetDetailModel> {

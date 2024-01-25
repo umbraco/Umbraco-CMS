@@ -1,12 +1,14 @@
-import { UmbMediaTypeWorkspaceContext } from '../../media-type-workspace.context.js';
+import type { UmbMediaTypeWorkspaceContext } from '../../media-type-workspace.context.js';
 import './media-type-workspace-view-edit-property.element.js';
-import { UmbMediaTypeDetailModel } from '../../../types.js';
+import type { UmbMediaTypeDetailModel } from '../../../types.js';
 import { css, html, customElement, property, state, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbContentTypePropertyStructureHelper, PropertyContainerTypes } from '@umbraco-cms/backoffice/content-type';
-import { UmbSorterController, UmbSorterConfig } from '@umbraco-cms/backoffice/sorter';
+import type { PropertyContainerTypes } from '@umbraco-cms/backoffice/content-type';
+import { UmbContentTypePropertyStructureHelper } from '@umbraco-cms/backoffice/content-type';
+import type { UmbSorterConfig } from '@umbraco-cms/backoffice/sorter';
+import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { MediaTypePropertyTypeResponseModel, PropertyTypeModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { MediaTypePropertyTypeResponseModel, PropertyTypeModelBaseModel } from '@umbraco-cms/backoffice/backend-api';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 import { UMB_PROPERTY_SETTINGS_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 
@@ -177,7 +179,7 @@ export class UmbMediaTypeWorkspaceViewEditPropertiesElement extends UmbLitElemen
 							(types) => types.containers?.find((containers) => containers.id === property.containerId),
 						);
 
-						return html`<media-type-workspace-view-edit-property
+						return html`<umb-media-type-workspace-view-edit-property
 							data-umb-property-id=${ifDefined(property.id)}
 							owner-media-type-id=${ifDefined(inheritedFromMedia?.unique)}
 							owner-media-type-name=${ifDefined(inheritedFromMedia?.name)}
@@ -190,7 +192,7 @@ export class UmbMediaTypeWorkspaceViewEditPropertiesElement extends UmbLitElemen
 							@property-delete=${() => {
 								this._propertyStructureHelper.removeProperty(property.id!);
 							}}>
-						</media-type-workspace-view-edit-property>`;
+						</umb-media-type-workspace-view-edit-property>`;
 					},
 				)}
 			</div>

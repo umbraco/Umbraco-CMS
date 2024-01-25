@@ -1,6 +1,7 @@
 import { html, customElement, property, state, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbSectionContext, UMB_SECTION_CONTEXT } from '@umbraco-cms/backoffice/section';
+import type { UmbSectionContext} from '@umbraco-cms/backoffice/section';
+import { UMB_SECTION_CONTEXT } from '@umbraco-cms/backoffice/section';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 @customElement('umb-menu-item-layout')

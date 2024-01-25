@@ -1,14 +1,17 @@
-import { UmbDocumentTreeStore, UMB_DOCUMENT_TREE_STORE_CONTEXT } from '../tree/document-tree.store.js';
+import type { UmbDocumentTreeStore} from '../tree/document-tree.store.js';
+import { UMB_DOCUMENT_TREE_STORE_CONTEXT } from '../tree/document-tree.store.js';
 import { UmbDocumentServerDataSource } from './sources/document.server.data.js';
-import { UmbDocumentStore, UMB_DOCUMENT_STORE_CONTEXT } from './document.store.js';
+import type { UmbDocumentStore} from './document.store.js';
+import { UMB_DOCUMENT_STORE_CONTEXT } from './document.store.js';
 import { UMB_DOCUMENT_ITEM_STORE_CONTEXT, type UmbDocumentItemStore } from './document-item.store.js';
 import { UmbDocumentItemServerDataSource } from './sources/document-item.server.data.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
-import { CreateDocumentRequestModel, UpdateDocumentRequestModel } from '@umbraco-cms/backoffice/backend-api';
-import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
-import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
-import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import type { CreateDocumentRequestModel, UpdateDocumentRequestModel } from '@umbraco-cms/backoffice/backend-api';
+import type { UmbNotificationContext} from '@umbraco-cms/backoffice/notification';
+import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
+import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 export class UmbDocumentRepository extends UmbBaseController implements UmbApi {
 	#init!: Promise<unknown>;

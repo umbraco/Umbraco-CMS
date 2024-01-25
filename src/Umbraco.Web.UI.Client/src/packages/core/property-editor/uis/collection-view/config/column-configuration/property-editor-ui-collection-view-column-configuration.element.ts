@@ -1,8 +1,9 @@
-import { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
+import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
 import { html, customElement, property, repeat, css, query, state } from '@umbraco-cms/backoffice/external/lit';
-import { UUIInputEvent, UUISelectElement } from '@umbraco-cms/backoffice/external/uui';
+import type { UUIInputEvent, UUISelectElement } from '@umbraco-cms/backoffice/external/uui';
+import type {
+	UmbPropertyEditorConfigCollection} from '@umbraco-cms/backoffice/property-editor';
 import {
-	UmbPropertyEditorConfigCollection,
 	UmbPropertyValueChangeEvent,
 } from '@umbraco-cms/backoffice/property-editor';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';

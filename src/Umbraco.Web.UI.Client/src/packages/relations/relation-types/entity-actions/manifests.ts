@@ -2,7 +2,7 @@ import { UMB_RELATION_TYPE_REPOSITORY_ALIAS } from '../repository/manifests.js';
 import { UMB_RELATION_TYPE_ENTITY_TYPE, UMB_RELATION_TYPE_ROOT_ENTITY_TYPE } from '../index.js';
 import { UmbCreateRelationTypeEntityAction } from './create.action.js';
 import { UmbDeleteEntityAction } from '@umbraco-cms/backoffice/entity-action';
-import { ManifestEntityAction } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestEntityAction } from '@umbraco-cms/backoffice/extension-registry';
 
 const entityActions: Array<ManifestEntityAction> = [
 	{

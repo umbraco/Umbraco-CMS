@@ -1,8 +1,8 @@
-import { type UmbUserDetailModel } from '../index.js';
+import type { UmbUserDetailModel } from '../index.js';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
-import { type UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 export const UMB_USER_STORE_CONTEXT = new UmbContextToken<UmbUserStore>('UmbUserStore');
 

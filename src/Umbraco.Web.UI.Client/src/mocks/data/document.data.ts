@@ -2,9 +2,8 @@ import { umbDocumentTypeMockDb } from './document-type/document-type.db.js';
 import { umbUserPermissionData } from './user-permission.data.js';
 import { UmbEntityData } from './entity.data.js';
 import { createDocumentTreeItem } from './utils.js';
-import { UmbMockDocumentTypeModel } from './document-type/document-type.data.js';
-import {
-	ContentStateModel,
+import type { UmbMockDocumentTypeModel } from './document-type/document-type.data.js';
+import type {
 	DocumentItemResponseModel,
 	DocumentResponseModel,
 	DocumentTreeItemResponseModel,
@@ -12,7 +11,9 @@ import {
 	PagedDocumentTreeItemResponseModel,
 	PagedDocumentTypeResponseModel,
 	PagedRecycleBinItemResponseModel,
-	PublishDocumentRequestModel,
+	PublishDocumentRequestModel} from '@umbraco-cms/backoffice/backend-api';
+import {
+	ContentStateModel,
 	PublishedStateModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '@umbraco-cms/backoffice/document';

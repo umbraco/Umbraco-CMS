@@ -1,5 +1,5 @@
 import { UmbDocumentPermissionRepository } from './document-permission.repository.js';
-import { ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_DOCUMENT_PERMISSION_REPOSITORY_ALIAS = 'Umb.Repository.Document.Permission';
 

@@ -1,8 +1,10 @@
-import { UmbThemeContext, UMB_THEME_CONTEXT } from '@umbraco-cms/backoffice/themes';
+import type { UmbThemeContext} from '@umbraco-cms/backoffice/themes';
+import { UMB_THEME_CONTEXT } from '@umbraco-cms/backoffice/themes';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
-import { UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
+import type { UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
-import { ManifestTheme, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestTheme} from '@umbraco-cms/backoffice/extension-registry';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-user-profile-app-themes')
 export class UmbUserProfileAppThemesElement extends UmbLitElement {

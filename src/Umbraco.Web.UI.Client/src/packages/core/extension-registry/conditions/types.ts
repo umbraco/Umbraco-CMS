@@ -1,4 +1,4 @@
-import { CollectionAliasConditionConfig } from '../../collection/collection-alias.condition.js';
+import type { CollectionAliasConditionConfig } from '../../collection/collection-alias.condition.js';
 import type { SectionAliasConditionConfig } from './section-alias.condition.js';
 import type { SwitchConditionConfig } from './switch.condition.js';
 import type { UserPermissionConditionConfig } from '@umbraco-cms/backoffice/user-permission';

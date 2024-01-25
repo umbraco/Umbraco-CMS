@@ -1,6 +1,6 @@
 import { UmbInviteUserCollectionAction } from './invite-user.collection-action.js';
 import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
-import { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 export const inviteManifest: ManifestTypes = {
 	type: 'collectionAction',

@@ -1,6 +1,7 @@
-import { UmbMemberTypeTreeItemModel } from './types.js';
+import type { UmbMemberTypeTreeItemModel } from './types.js';
 import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
-import { EntityTreeItemResponseModel, MemberTypeResource } from '@umbraco-cms/backoffice/backend-api';
+import type { EntityTreeItemResponseModel} from '@umbraco-cms/backoffice/backend-api';
+import { MemberTypeResource } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**

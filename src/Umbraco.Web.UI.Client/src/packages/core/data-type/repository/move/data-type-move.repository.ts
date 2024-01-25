@@ -1,8 +1,11 @@
-import { UMB_DATA_TYPE_TREE_STORE_CONTEXT, UmbDataTypeTreeStore } from '../../tree/data-type-tree.store.js';
+import type { UmbDataTypeTreeStore } from '../../tree/data-type-tree.store.js';
+import { UMB_DATA_TYPE_TREE_STORE_CONTEXT } from '../../tree/data-type-tree.store.js';
 import { UmbDataTypeMoveServerDataSource } from './data-type-move.server.data-source.js';
-import { UMB_NOTIFICATION_CONTEXT, UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
+import type { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
+import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbMoveDataSource, UmbMoveRepository, UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
+import type { UmbMoveDataSource, UmbMoveRepository} from '@umbraco-cms/backoffice/repository';
+import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 
 export class UmbMoveDataTypeRepository extends UmbRepositoryBase implements UmbMoveRepository {
 	#init: Promise<unknown>;

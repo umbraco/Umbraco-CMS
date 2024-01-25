@@ -1,8 +1,9 @@
-import { UmbUserRepository } from '../../repository/user.repository.js';
+import type { UmbUserRepository } from '../../repository/user.repository.js';
 import { UmbEntityBulkActionBase } from '@umbraco-cms/backoffice/entity-bulk-action';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
-import { UmbModalManagerContext, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import type { UmbModalManagerContext} from '@umbraco-cms/backoffice/modal';
+import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 export class UmbSetGroupUserEntityBulkAction extends UmbEntityBulkActionBase<UmbUserRepository> {
 	#modalContext?: UmbModalManagerContext;

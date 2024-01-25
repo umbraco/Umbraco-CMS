@@ -1,4 +1,4 @@
-import { UmbBlockTypeBaseModel } from '../../types.js';
+import type { UmbBlockTypeBaseModel } from '../../types.js';
 import {
 	UMB_DOCUMENT_TYPE_PICKER_MODAL,
 	UMB_MODAL_MANAGER_CONTEXT,

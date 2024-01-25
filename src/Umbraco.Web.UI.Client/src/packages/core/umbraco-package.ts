@@ -1,4 +1,4 @@
-import { ManifestTypes } from './extension-registry/index.js';
+import type { ManifestTypes } from './extension-registry/index.js';
 
 export const name = 'Umbraco.Core';
 export const version = '0.0.1';
