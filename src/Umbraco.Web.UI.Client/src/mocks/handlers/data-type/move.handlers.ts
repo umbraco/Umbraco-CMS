@@ -1,7 +1,7 @@
 const { rest } = window.MockServiceWorker;
 import { umbDataTypeMockDb } from '../../data/data-type/data-type.db.js';
 import { UMB_SLUG } from './slug.js';
-import { MoveDataTypeRequestModel } from '@umbraco-cms/backoffice/backend-api';
+import type { MoveDataTypeRequestModel } from '@umbraco-cms/backoffice/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
 
 export const moveHandlers = [

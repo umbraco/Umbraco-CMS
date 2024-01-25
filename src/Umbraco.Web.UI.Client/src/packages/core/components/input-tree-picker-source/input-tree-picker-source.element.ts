@@ -1,6 +1,7 @@
-import { UmbInputDocumentPickerRootElement } from '@umbraco-cms/backoffice/document';
+import type { UmbInputDocumentPickerRootElement } from '@umbraco-cms/backoffice/document';
 import { html, customElement, property, css, state, nothing } from '@umbraco-cms/backoffice/external/lit';
-import { FormControlMixin, UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
+import type { UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
+import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 

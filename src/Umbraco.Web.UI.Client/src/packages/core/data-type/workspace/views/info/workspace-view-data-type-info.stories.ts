@@ -1,6 +1,6 @@
 import './workspace-view-data-type-info.element.js';
 
-import { Meta, Story } from '@storybook/web-components';
+import type { Meta, Story } from '@storybook/web-components';
 import type { UmbWorkspaceViewDataTypeInfoElement } from './workspace-view-data-type-info.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 

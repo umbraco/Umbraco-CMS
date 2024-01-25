@@ -1,16 +1,17 @@
-import { UmbScriptDetailModel } from '../types.js';
+import type { UmbScriptDetailModel } from '../types.js';
 import { UMB_SCRIPT_ENTITY_TYPE } from '../entity.js';
 import {
 	UmbServerFilePathUniqueSerializer,
 	appendFileExtensionIfNeeded,
 } from '@umbraco-cms/backoffice/server-file-system';
-import {
+import type {
 	CreateScriptRequestModel,
-	ScriptResource,
-	UpdateScriptRequestModel,
+	UpdateScriptRequestModel} from '@umbraco-cms/backoffice/backend-api';
+import {
+	ScriptResource
 } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
+import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 
 export class UmbScriptDetailServerDataSource implements UmbDetailDataSource<UmbScriptDetailModel> {

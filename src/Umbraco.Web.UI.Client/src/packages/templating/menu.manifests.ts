@@ -1,4 +1,4 @@
-import { ManifestMenu, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestMenu, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const sectionAlias = 'Umb.Section.Settings';
 

@@ -3,7 +3,7 @@ import { UMB_DOCUMENT_ENTITY_TYPE } from '../entity.js';
 import { UMB_DOCUMENT_COLLECTION_ALIAS } from '../collection/index.js';
 import { UmbDocumentMoveEntityBulkAction } from './move/move.action.js';
 import { UmbDocumentCopyEntityBulkAction } from './copy/copy.action.js';
-import { ManifestEntityBulkAction } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestEntityBulkAction } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
 
 const entityActions: Array<ManifestEntityBulkAction> = [

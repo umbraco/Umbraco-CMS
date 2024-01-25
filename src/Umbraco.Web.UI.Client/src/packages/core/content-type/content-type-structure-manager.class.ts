@@ -1,15 +1,16 @@
-import { UmbContentTypeModel } from './types.js';
-import { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
+import type { UmbContentTypeModel } from './types.js';
+import type { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type {
 	DocumentTypePropertyTypeResponseModel,
 	PropertyTypeContainerModelBaseModel,
 	PropertyTypeModelBaseModel,
 } from '@umbraco-cms/backoffice/backend-api';
-import { type UmbControllerHost, type UmbController } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost, UmbController } from '@umbraco-cms/backoffice/controller-api';
+import type {
+	MappingFunction} from '@umbraco-cms/backoffice/observable-api';
 import {
 	UmbArrayState,
-	MappingFunction,
 	partialUpdateFrozenArray,
 	appendToFrozenArray,
 	filterFrozenArray,

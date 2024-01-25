@@ -1,9 +1,10 @@
 const { rest } = window.MockServiceWorker;
 
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
-import {
+import type {
 	PagedTelemetryResponseModel,
-	TelemetryResponseModel,
+	TelemetryResponseModel} from '@umbraco-cms/backoffice/backend-api';
+import {
 	TelemetryLevelModel,
 } from '@umbraco-cms/backoffice/backend-api';
 

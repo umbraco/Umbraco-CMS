@@ -1,7 +1,7 @@
 import { UmbEntityActionBase } from '../../../../entity-action/entity-action.js';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
-import { type UmbModalManagerContext, UMB_MODAL_MANAGER_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/modal';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import { type UmbModalManagerContext, UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { type UmbFolderRepository, UMB_FOLDER_CREATE_MODAL } from '@umbraco-cms/backoffice/tree';
 
 export class UmbCreateFolderEntityAction<T extends UmbFolderRepository> extends UmbEntityActionBase<T> {
@@ -10,7 +10,7 @@ export class UmbCreateFolderEntityAction<T extends UmbFolderRepository> extends 
 	constructor(host: UmbControllerHostElement, repositoryAlias: string, unique: string, entityType: string) {
 		super(host, repositoryAlias, unique, entityType);
 
-		new UmbContextConsumerController(this._host, UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
+		new UmbContextConsumerController(this._host, UMB_MODAL_MANAGER_CONTEXT, (instance) => {
 			this.#modalContext = instance;
 		});
 	}

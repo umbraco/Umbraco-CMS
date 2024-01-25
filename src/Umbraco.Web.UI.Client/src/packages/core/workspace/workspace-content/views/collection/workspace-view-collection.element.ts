@@ -1,12 +1,12 @@
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
+import type { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { ManifestWorkspaceViewCollection } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
 
 import '../../../../collection/dashboards/dashboard-collection.element.js';
-import { UmbTreeItemModelBase } from '@umbraco-cms/backoffice/tree';
+import type { UmbTreeItemModelBase } from '@umbraco-cms/backoffice/tree';
 
 @customElement('umb-workspace-view-collection')
 export class UmbWorkspaceViewCollectionElement extends UmbLitElement {

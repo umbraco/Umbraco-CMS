@@ -1,8 +1,9 @@
 import { UmbRelationServerDataSource } from './sources/relation.server.data.js';
-import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
-import { UmbNotificationContext, UMB_NOTIFICATION_CONTEXT_TOKEN } from '@umbraco-cms/backoffice/notification';
-import { UmbApi } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbNotificationContext} from '@umbraco-cms/backoffice/notification';
+import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
+import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 
 export class UmbRelationRepository extends UmbBaseController implements UmbApi {
 	#init!: Promise<unknown>;
@@ -17,7 +18,7 @@ export class UmbRelationRepository extends UmbBaseController implements UmbApi {
 		this.#detailDataSource = new UmbRelationServerDataSource(this._host);
 
 		this.#init = Promise.all([
-			this.consumeContext(UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
+			this.consumeContext(UMB_NOTIFICATION_CONTEXT, (instance) => {
 				this.#notificationContext = instance;
 			}).asPromise(),
 		]);

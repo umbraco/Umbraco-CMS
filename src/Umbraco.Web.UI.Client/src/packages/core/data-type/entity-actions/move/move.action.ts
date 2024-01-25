@@ -1,9 +1,10 @@
-import { UmbMoveDataTypeRepository } from '../../repository/move/data-type-move.repository.js';
+import type { UmbMoveDataTypeRepository } from '../../repository/move/data-type-move.repository.js';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type {
+	UmbModalManagerContext} from '@umbraco-cms/backoffice/modal';
 import {
-	UmbModalManagerContext,
-	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
+	UMB_MODAL_MANAGER_CONTEXT,
 	UMB_DATA_TYPE_PICKER_MODAL,
 } from '@umbraco-cms/backoffice/modal';
 
@@ -14,7 +15,7 @@ export class UmbMoveDataTypeEntityAction extends UmbEntityActionBase<UmbMoveData
 	constructor(host: UmbControllerHostElement, repositoryAlias: string, unique: string, entityType: string) {
 		super(host, repositoryAlias, unique, entityType);
 
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
 			this.#modalManagerContext = instance;
 		});
 	}

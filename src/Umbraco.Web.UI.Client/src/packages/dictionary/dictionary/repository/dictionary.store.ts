@@ -1,8 +1,8 @@
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbStoreBase } from '@umbraco-cms/backoffice/store';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
-import { DictionaryItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
+import type { DictionaryItemResponseModel } from '@umbraco-cms/backoffice/backend-api';
 
 /**
  * @export
@@ -14,7 +14,7 @@ export class UmbDictionaryStore extends UmbStoreBase {
 	constructor(host: UmbControllerHostElement) {
 		super(
 			host,
-			UMB_DICTIONARY_STORE_CONTEXT_TOKEN.toString(),
+			UMB_DICTIONARY_STORE_CONTEXT.toString(),
 			new UmbArrayState<DictionaryItemResponseModel>([], (x) => x.id),
 		);
 	}
@@ -37,4 +37,4 @@ export class UmbDictionaryStore extends UmbStoreBase {
 	}
 }
 
-export const UMB_DICTIONARY_STORE_CONTEXT_TOKEN = new UmbContextToken<UmbDictionaryStore>('UmbDictionaryStore');
+export const UMB_DICTIONARY_STORE_CONTEXT = new UmbContextToken<UmbDictionaryStore>('UmbDictionaryStore');

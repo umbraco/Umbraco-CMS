@@ -1,5 +1,6 @@
 import { UMB_BLOCK_LIST_CONTEXT } from '../../index.js';
-import { UMB_BLOCK_WORKSPACE_ALIAS, UMB_BLOCK_WORKSPACE_CONTEXT } from '../../../block/index.js';
+import type { UMB_BLOCK_WORKSPACE_CONTEXT } from '../../../block/index.js';
+import { UMB_BLOCK_WORKSPACE_ALIAS } from '../../../block/index.js';
 import { UmbExtensionsApiInitializer, createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';

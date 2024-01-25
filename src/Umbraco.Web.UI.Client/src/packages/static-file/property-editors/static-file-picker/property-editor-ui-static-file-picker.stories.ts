@@ -1,4 +1,4 @@
-import { Meta, Story } from '@storybook/web-components';
+import type { Meta, Story } from '@storybook/web-components';
 import type { UmbPropertyEditorUIStaticFilePickerElement } from './property-editor-ui-static-file-picker.element.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 

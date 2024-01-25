@@ -1,7 +1,7 @@
-import { UmbBlockTypeBaseModel } from '../../types.js';
+import type { UmbBlockTypeBaseModel } from '../../types.js';
 import {
 	UMB_DOCUMENT_TYPE_PICKER_MODAL,
-	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
+	UMB_MODAL_MANAGER_CONTEXT,
 	UMB_WORKSPACE_MODAL,
 	UmbModalRouteRegistrationController,
 } from '@umbraco-cms/backoffice/modal';
@@ -63,7 +63,7 @@ export class UmbInputBlockTypeElement<
 	}
 
 	create() {
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, async (modalManager) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, async (modalManager) => {
 			if (modalManager) {
 				// TODO: Make as mode for the Picker Modal, so the click to select immediately submits the modal(And in that mode we do not want to see a Submit button).
 				const modalContext = modalManager.open(UMB_DOCUMENT_TYPE_PICKER_MODAL, {

@@ -1,4 +1,4 @@
-import { UmbController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbController, UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 const autoScrollSensitivity = 50;
 const autoScrollSpeed = 16;

@@ -1,9 +1,9 @@
 import { UmbRepositoryBase } from '../repository-base.js';
-import { UmbItemDataSource, UmbItemDataSourceConstructor } from './item-data-source.interface.js';
-import { UmbItemRepository } from './item-repository.interface.js';
-import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbItemStore } from '@umbraco-cms/backoffice/store';
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import type { UmbItemDataSource, UmbItemDataSourceConstructor } from './item-data-source.interface.js';
+import type { UmbItemRepository } from './item-repository.interface.js';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbItemStore } from '@umbraco-cms/backoffice/store';
+import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 
 export class UmbItemRepositoryBase<ItemType = any> extends UmbRepositoryBase implements UmbItemRepository<ItemType> {
 	protected _init: Promise<unknown>;

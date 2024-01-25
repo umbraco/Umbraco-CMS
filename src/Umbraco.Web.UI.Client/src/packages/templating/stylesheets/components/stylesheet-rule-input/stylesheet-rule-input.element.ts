@@ -1,9 +1,10 @@
-import { UmbStylesheetRule } from '../../types.js';
+import type { UmbStylesheetRule } from '../../types.js';
 import { UMB_STYLESHEET_RULE_SETTINGS_MODAL } from './stylesheet-rule-settings-modal.token.js';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { css, html, customElement, repeat, property } from '@umbraco-cms/backoffice/external/lit';
 import { FormControlMixin } from '@umbraco-cms/backoffice/external/uui';
-import { UMB_MODAL_MANAGER_CONTEXT_TOKEN, UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
+import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
+import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 // TODO: add sorting when we have a generic sorting component/functionality for ref lists
@@ -18,7 +19,7 @@ export class UmbStylesheetRuleInputElement extends FormControlMixin(UmbLitElemen
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (modalContext) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (modalContext) => {
 			this.#modalManager = modalContext;
 		});
 	}

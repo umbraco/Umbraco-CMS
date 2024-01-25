@@ -1,4 +1,4 @@
-import { TemplateResult } from '@umbraco-cms/backoffice/external/lit';
+import type { TemplateResult } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbContextDebuggerModalData {

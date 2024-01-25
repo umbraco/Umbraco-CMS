@@ -1,7 +1,7 @@
 import { UMB_DOCUMENT_REPOSITORY_ALIAS } from '../../repository/manifests.js';
 import { UMB_DOCUMENT_ENTITY_TYPE, UMB_DOCUMENT_ROOT_ENTITY_TYPE } from '../../entity.js';
 import { UmbCreateDocumentEntityAction } from './create.action.js';
-import { ManifestEntityAction, ManifestModal } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestEntityAction, ManifestModal } from '@umbraco-cms/backoffice/extension-registry';
 
 const entityActions: Array<ManifestEntityAction> = [
 	{

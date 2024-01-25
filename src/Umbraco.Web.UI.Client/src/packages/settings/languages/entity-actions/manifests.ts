@@ -2,7 +2,7 @@ import { UMB_LANGUAGE_REPOSITORY_ALIAS } from '../repository/manifests.js';
 import { UMB_LANGUAGE_ENTITY_TYPE, UMB_LANGUAGE_ROOT_ENTITY_TYPE } from '../index.js';
 import { UmbLanguageCreateEntityAction } from './language-create-entity-action.js';
 import { UmbDeleteEntityAction } from '@umbraco-cms/backoffice/entity-action';
-import { ManifestEntityAction } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestEntityAction } from '@umbraco-cms/backoffice/extension-registry';
 
 const entityActions: Array<ManifestEntityAction> = [
 	{

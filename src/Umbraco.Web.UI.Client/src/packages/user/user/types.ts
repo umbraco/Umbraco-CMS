@@ -8,7 +8,7 @@ import type {
 	UserStateModel,
 } from '@umbraco-cms/backoffice/backend-api';
 
-import { UmbDataSource, UmbDataSourceErrorResponse } from '@umbraco-cms/backoffice/repository';
+import type { UmbDataSource, UmbDataSourceErrorResponse } from '@umbraco-cms/backoffice/repository';
 
 export type UmbUserDetailModel = UserResponseModel & {
 	entityType: 'user';

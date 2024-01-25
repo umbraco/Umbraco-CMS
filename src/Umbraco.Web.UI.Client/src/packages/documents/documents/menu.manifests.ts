@@ -1,4 +1,4 @@
-import { ManifestMenu } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestMenu } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_CONTENT_MENU_ALIAS = 'Umb.Menu.Content';
 

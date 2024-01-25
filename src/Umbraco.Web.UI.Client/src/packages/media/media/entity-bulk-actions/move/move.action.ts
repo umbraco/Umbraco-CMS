@@ -1,10 +1,11 @@
 import type { UmbMediaRepository } from '../../repository/media.repository.js';
 import { UmbEntityBulkActionBase } from '@umbraco-cms/backoffice/entity-bulk-action';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
+import type {
+	UmbModalManagerContext} from '@umbraco-cms/backoffice/modal';
 import {
-	UmbModalManagerContext,
-	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
+	UMB_MODAL_MANAGER_CONTEXT,
 	UMB_MEDIA_TREE_PICKER_MODAL,
 } from '@umbraco-cms/backoffice/modal';
 
@@ -14,7 +15,7 @@ export class UmbMediaMoveEntityBulkAction extends UmbEntityBulkActionBase<UmbMed
 	constructor(host: UmbControllerHostElement, repositoryAlias: string, selection: Array<string>) {
 		super(host, repositoryAlias, selection);
 
-		new UmbContextConsumerController(host, UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
+		new UmbContextConsumerController(host, UMB_MODAL_MANAGER_CONTEXT, (instance) => {
 			this.#modalContext = instance;
 		});
 	}

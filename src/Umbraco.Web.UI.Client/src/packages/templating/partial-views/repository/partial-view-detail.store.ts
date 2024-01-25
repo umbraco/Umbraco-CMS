@@ -1,6 +1,6 @@
-import { UmbPartialViewDetailModel } from '../types.js';
+import type { UmbPartialViewDetailModel } from '../types.js';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 import { UmbDetailStoreBase } from '@umbraco-cms/backoffice/store';
 
 /**

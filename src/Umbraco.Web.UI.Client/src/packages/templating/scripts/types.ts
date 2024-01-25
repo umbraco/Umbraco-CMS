@@ -1,4 +1,4 @@
-import { UmbScriptEntityType } from './entity.js';
+import type { UmbScriptEntityType } from './entity.js';
 
 export interface UmbScriptDetailModel {
 	entityType: UmbScriptEntityType;

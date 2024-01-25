@@ -1,5 +1,5 @@
-import { type UmbPropertyDatasetContext } from './property-dataset-context.interface.js';
-import { UmbNameablePropertyDatasetContext } from './nameable-property-dataset-context.interface.js';
+import type { UmbPropertyDatasetContext } from './property-dataset-context.interface.js';
+import type { UmbNameablePropertyDatasetContext } from './nameable-property-dataset-context.interface.js';
 import { UMB_PROPERTY_DATASET_CONTEXT } from './property-dataset-context.token.js';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 

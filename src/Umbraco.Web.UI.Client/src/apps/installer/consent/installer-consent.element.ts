@@ -1,9 +1,12 @@
-import { UmbInstallerContext, UMB_INSTALLER_CONTEXT_TOKEN } from '../installer.context.js';
-import { css, CSSResultGroup, html, customElement, state, unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
+import type { UmbInstallerContext} from '../installer.context.js';
+import { UMB_INSTALLER_CONTEXT } from '../installer.context.js';
+import type { CSSResultGroup} from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
 
-import {
+import type {
 	ConsentLevelPresentationModel,
-	TelemetryResponseModel,
+	TelemetryResponseModel} from '@umbraco-cms/backoffice/backend-api';
+import {
 	TelemetryLevelModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
@@ -21,7 +24,7 @@ export class UmbInstallerConsentElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_INSTALLER_CONTEXT_TOKEN, (installerContext) => {
+		this.consumeContext(UMB_INSTALLER_CONTEXT, (installerContext) => {
 			this._installerContext = installerContext;
 			this._observeInstallerSettings();
 			this._observeInstallerData();

@@ -1,11 +1,12 @@
 import { html, property } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
-import {
+import type {
 	UmbModalManagerContext,
 	UmbModalToken,
 	UmbModalType,
-	UMB_MODAL_MANAGER_CONTEXT_TOKEN,
-	UmbPickerModalValue,
+	UmbPickerModalValue} from '@umbraco-cms/backoffice/modal';
+import {
+	UMB_MODAL_MANAGER_CONTEXT
 } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
@@ -29,7 +30,7 @@ export class UmbInputListBaseElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT_TOKEN, (instance) => {
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => {
 			this._modalContext = instance;
 		});
 	}

@@ -1,5 +1,5 @@
 import type { UmbWorkspaceContextInterface } from './workspace-context.interface.js';
-import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
+import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 
 export interface UmbSaveableWorkspaceContextInterface extends UmbWorkspaceContextInterface {
 	isNew: Observable<boolean | undefined>;

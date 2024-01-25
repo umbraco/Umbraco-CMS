@@ -1,4 +1,4 @@
-import { ManifestModal } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestModal } from '@umbraco-cms/backoffice/extension-registry';
 
 export const UMB_RENAME_MODAL_ALIAS = 'Umb.Modal.Rename';
 

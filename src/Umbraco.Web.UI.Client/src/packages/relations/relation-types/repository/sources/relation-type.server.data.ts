@@ -1,9 +1,10 @@
 import type { UmbDataSource } from '@umbraco-cms/backoffice/repository';
-import {
-	RelationTypeResource,
+import type {
 	RelationTypeResponseModel,
 	CreateRelationTypeRequestModel,
-	UpdateRelationTypeRequestModel,
+	UpdateRelationTypeRequestModel} from '@umbraco-cms/backoffice/backend-api';
+import {
+	RelationTypeResource,
 	RelationResource,
 } from '@umbraco-cms/backoffice/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';

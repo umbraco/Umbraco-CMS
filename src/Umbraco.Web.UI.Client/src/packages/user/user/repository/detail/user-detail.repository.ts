@@ -1,10 +1,10 @@
 import { UmbUserRepositoryBase } from '../user-repository-base.js';
-import { UmbUserDetailDataSource } from '../../types.js';
+import type { UmbUserDetailDataSource } from '../../types.js';
 import { UmbUserServerDataSource } from './user-detail.server.data-source.js';
-import { IUmbUserDetailRepository } from './types.js';
+import type { IUmbUserDetailRepository } from './types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbTemporaryFileRepository } from '@umbraco-cms/backoffice/temporary-file';
-import { CreateUserRequestModel, UpdateUserRequestModel } from '@umbraco-cms/backoffice/backend-api';
+import type { CreateUserRequestModel, UpdateUserRequestModel } from '@umbraco-cms/backoffice/backend-api';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 
 export class UmbUserDetailRepository extends UmbUserRepositoryBase implements IUmbUserDetailRepository {

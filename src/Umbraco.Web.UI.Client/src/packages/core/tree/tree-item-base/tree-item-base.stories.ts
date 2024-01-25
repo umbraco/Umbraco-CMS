@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from '@storybook/web-components';
+import type { Meta, StoryObj } from '@storybook/web-components';
 import './tree-item-base.element.js';
 import type { UmbTreeItemBaseElement } from './tree-item-base.element.js';
 

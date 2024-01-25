@@ -1,9 +1,10 @@
-import { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UMB_NOTIFICATION_CONTEXT_TOKEN, UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
+import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
-import { UmbRenameDataSource, UmbRenameDataSourceConstructor } from '@umbraco-cms/backoffice/entity-action';
-import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { UmbDetailStore } from '@umbraco-cms/backoffice/store';
+import type { UmbRenameDataSource, UmbRenameDataSourceConstructor } from '@umbraco-cms/backoffice/entity-action';
+import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
+import type { UmbDetailStore } from '@umbraco-cms/backoffice/store';
 
 export abstract class UmbRenameRepositoryBase<DetailModelType extends { unique: string }> extends UmbRepositoryBase {
 	#detailStore?: UmbDetailStore<DetailModelType>;
@@ -24,7 +25,7 @@ export abstract class UmbRenameRepositoryBase<DetailModelType extends { unique: 
 				this.#detailStore = instance;
 			}).asPromise(),
 
-			this.consumeContext(UMB_NOTIFICATION_CONTEXT_TOKEN, (instance) => {
+			this.consumeContext(UMB_NOTIFICATION_CONTEXT, (instance) => {
 				this.#notificationContext = instance;
 			}).asPromise(),
 		]);

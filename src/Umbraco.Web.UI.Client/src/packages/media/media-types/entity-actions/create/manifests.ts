@@ -5,7 +5,7 @@ import {
 } from '../../index.js';
 import { UMB_MEDIA_TYPE_DETAIL_REPOSITORY_ALIAS } from '../../repository/index.js';
 import { UmbCreateMediaTypeEntityAction } from './create.action.js';
-import { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const entityActions: Array<ManifestTypes> = [
 	{

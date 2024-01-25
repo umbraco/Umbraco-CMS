@@ -1,7 +1,7 @@
-import { UmbCurrentUser } from './types.js';
+import type { UmbCurrentUser } from './types.js';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbBaseController } from '@umbraco-cms/backoffice/class-api';
-import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { UserResource } from '@umbraco-cms/backoffice/backend-api';

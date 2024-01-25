@@ -1,7 +1,8 @@
 import type { UmbItemDataSource } from '@umbraco-cms/backoffice/repository';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecuteAndNotify } from '@umbraco-cms/backoffice/resources';
-import { UserGroupItemResponseModel, UserGroupResource } from '@umbraco-cms/backoffice/backend-api';
+import type { UserGroupItemResponseModel} from '@umbraco-cms/backoffice/backend-api';
+import { UserGroupResource } from '@umbraco-cms/backoffice/backend-api';
 
 /**
  * A data source for user group items that fetches data from the server

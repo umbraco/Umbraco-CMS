@@ -1,6 +1,6 @@
-import { UmbRelationTypeRepository } from '../repository/relation-type.repository.js';
+import type { UmbRelationTypeRepository } from '../repository/relation-type.repository.js';
 import { UmbEntityActionBase } from '@umbraco-cms/backoffice/entity-action';
-import { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHostElement } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbCreateRelationTypeEntityAction extends UmbEntityActionBase<UmbRelationTypeRepository> {
 	// TODO: Could EntityActions take the manifest instead, for more flexibility?

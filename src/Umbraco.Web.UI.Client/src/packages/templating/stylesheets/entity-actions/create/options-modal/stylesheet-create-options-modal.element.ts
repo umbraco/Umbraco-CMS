@@ -1,5 +1,5 @@
 import { UMB_STYLESHEET_FOLDER_REPOSITORY_ALIAS } from '../../../tree/folder/index.js';
-import { UmbStylesheetCreateOptionsModalData } from './index.js';
+import type { UmbStylesheetCreateOptionsModalData } from './index.js';
 import { html, customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';

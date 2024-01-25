@@ -1,9 +1,10 @@
+import type {
+	UmbContextRequestEvent} from '../consume/context-request.event.js';
 import {
-	UmbContextRequestEvent,
 	UMB_CONTENT_REQUEST_EVENT_TYPE,
 	UMB_DEBUG_CONTEXT_EVENT_TYPE,
 } from '../consume/context-request.event.js';
-import { UmbContextToken } from '../token/context-token.js';
+import type { UmbContextToken } from '../token/context-token.js';
 import {
 	UmbContextProvideEventImplementation,
 	//UmbContextUnprovidedEventImplementation,

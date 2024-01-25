@@ -5,7 +5,7 @@ import {
 	UmbExtensionsManifestInitializer,
 } from '@umbraco-cms/backoffice/extension-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
-import { type UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { type ManifestSection, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
 export class UmbBackofficeContext extends UmbContextBase<UmbBackofficeContext> {
@@ -17,7 +17,7 @@ export class UmbBackofficeContext extends UmbContextBase<UmbBackofficeContext> {
 	public readonly allowedSections = this.#allowedSections.asObservable();
 
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_BACKOFFICE_CONTEXT_TOKEN);
+		super(host, UMB_BACKOFFICE_CONTEXT);
 		new UmbExtensionsManifestInitializer(this, umbExtensionsRegistry, 'section', null, (sections) => {
 			this.#allowedSections.setValue([...sections]);
 		});
@@ -28,4 +28,4 @@ export class UmbBackofficeContext extends UmbContextBase<UmbBackofficeContext> {
 	}
 }
 
-export const UMB_BACKOFFICE_CONTEXT_TOKEN = new UmbContextToken<UmbBackofficeContext>('UmbBackofficeContext');
+export const UMB_BACKOFFICE_CONTEXT = new UmbContextToken<UmbBackofficeContext>('UmbBackofficeContext');

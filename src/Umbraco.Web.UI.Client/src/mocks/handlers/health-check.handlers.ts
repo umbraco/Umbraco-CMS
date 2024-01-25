@@ -7,12 +7,13 @@ import {
 	healthGroupsWithoutResult,
 } from '../data/health-check.data.js';
 
-import {
+import type {
 	HealthCheckActionRequestModel,
 	HealthCheckGroupResponseModel,
 	HealthCheckGroupWithResultResponseModel,
 	HealthCheckResultResponseModel,
-	PagedHealthCheckGroupResponseModel,
+	PagedHealthCheckGroupResponseModel} from '@umbraco-cms/backoffice/backend-api';
+import {
 	StatusResultTypeModel,
 } from '@umbraco-cms/backoffice/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';

@@ -1,6 +1,6 @@
 import { expect } from '@open-wc/testing';
-import { ManifestApi } from '../types/index.js';
-import { UmbApi } from '../models/api.interface.js';
+import type { ManifestApi } from '../types/index.js';
+import type { UmbApi } from '../models/api.interface.js';
 import { createExtensionApi } from './create-extension-api.function.js';
 
 class UmbExtensionApiTrueTestClass implements UmbApi {
