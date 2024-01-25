@@ -68,7 +68,7 @@ export class UmbInputTreePickerSourceElement extends FormControlMixin(UmbLitElem
 	connectedCallback(): void {
 		super.connectedCallback();
 
-		// NOTE: Slight hack to workaround consolidating the old content-picker and dynamic-root. [LK:2024-01-24]
+		// HACK: Workaround consolidating the old content-picker and dynamic-root. [LK:2024-01-24]
 		if (this.nodeId && !this.dynamicRoot) {
 			this.dynamicRoot = { originAlias: 'ByKey', originKey: this.nodeId, querySteps: [] };
 		}
@@ -90,7 +90,7 @@ export class UmbInputTreePickerSourceElement extends FormControlMixin(UmbLitElem
 			case 'content':
 				this.dynamicRoot = (event.target as UmbInputDocumentPickerRootElement).data;
 
-				// NOTE: Slight hack to workaround consolidating the old content-picker and dynamic-root. [LK:2024-01-24]
+				// HACK: Workaround consolidating the old content-picker and dynamic-root. [LK:2024-01-24]
 				if (this.dynamicRoot?.originAlias === 'ByKey') {
 					if (!this.dynamicRoot.querySteps || this.dynamicRoot.querySteps?.length === 0) {
 						this.nodeId = this.dynamicRoot.originKey;
