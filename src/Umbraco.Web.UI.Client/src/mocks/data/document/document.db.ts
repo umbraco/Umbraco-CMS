@@ -28,16 +28,9 @@ export class UmbDocumentMockDB extends UmbEntityMockDbBase<UmbMockDocumentModel>
 	}
 
 	// permissions
-	/*
 	getUserPermissionsForDocument(id: string): Array<any> {
-		return umbUserPermissionData
-			.getAll()
-			.items.filter(
-				(permission: any) =>
-					permission.target.entityType === UMB_DOCUMENT_ENTITY_TYPE && permission.target.documentId === id,
-			);
+		return [];
 	}
-  */
 }
 
 const treeItemMapper = (model: UmbMockDocumentModel): Omit<DocumentTreeItemResponseModel, 'type'> => {

@@ -14,7 +14,7 @@ export const data: Array<UmbMockMediaTypeModel> = [
 	{
 		name: 'Media Type 1',
 		id: 'media-type-1-id',
-		parentId: null,
+		parent: null,
 		description: 'Media type 1 description',
 		alias: 'mediaType1',
 		icon: 'icon-bug',
@@ -24,10 +24,9 @@ export const data: Array<UmbMockMediaTypeModel> = [
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
-		allowedContentTypes: [],
+		allowedMediaTypes: [],
 		compositions: [],
 		isFolder: false,
 		hasChildren: false,
-		isContainer: false,
 	},
 ];

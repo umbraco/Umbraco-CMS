@@ -38,7 +38,12 @@ export const createMediaTreeItem = (item: UmbMediaDetailModel): MediaTreeItemRes
 	return {
 		...createContentTreeItem(item),
 		type: 'media',
-		icon: 'media', // TODO: Should get this from media type...
+		mediaType: {
+			// TODO: get this from media type
+			id: '',
+			icon: '',
+			hasListView: false,
+		},
 	};
 };
 

@@ -1,15 +1,19 @@
-import type { UmbMediaDetailModel } from '../../packages/media/media/index.js';
 import { UmbEntityData } from './entity.data.js';
 import { createMediaTreeItem } from './utils.js';
 import type {
 	ContentTreeItemResponseModel,
 	MediaItemResponseModel,
+	MediaResponseModel,
+	MediaTreeItemResponseModel,
 	PagedMediaTreeItemResponseModel,
 } from '@umbraco-cms/backoffice/backend-api';
 
-export const data: Array<UmbMediaDetailModel> = [
+export type UmbMockMediaModelHack = MediaResponseModel & MediaTreeItemResponseModel & MediaItemResponseModel;
+
+export interface UmbMockMediaModel extends Omit<UmbMockMediaModelHack, 'type'> {}
+
+export const data: Array<UmbMockMediaModel> = [
 	{
-		type: 'media',
 		hasChildren: false,
 		id: 'f2f81a40-c989-4b6b-84e2-057cecd3adc1',
 		parent: null,
@@ -20,24 +24,16 @@ export const data: Array<UmbMediaDetailModel> = [
 			icon: 'icon-bug',
 			hasListView: false,
 		},
-		properties: [
-			{
-				alias: 'myMediaHeadline',
-				label: 'Media Headline',
-				description: 'Text string property',
-				dataTypeId: 'dt-textBox',
-			},
-		],
-		data: [
+		values: [
 			{
 				alias: 'myMediaHeadline',
 				value: 'The daily life at Umbraco HQ',
 			},
 		],
 		variants: [],
+		urls: [],
 	},
 	{
-		type: 'media',
 		hasChildren: false,
 		id: '69431027-8867-45bf-a93b-72bbdabfb177',
 		parent: null,
@@ -48,24 +44,16 @@ export const data: Array<UmbMediaDetailModel> = [
 			icon: 'icon-bug',
 			hasListView: false,
 		},
-		properties: [
-			{
-				alias: 'myMediaDescription',
-				label: 'Description',
-				description: 'Textarea property',
-				dataTypeId: 'dt-textArea',
-			},
-		],
-		data: [
+		values: [
 			{
 				alias: 'myMediaDescription',
 				value: 'Every day, a rabbit in a military costume greets me at the front door',
 			},
 		],
 		variants: [],
+		urls: [],
 	},
 	{
-		type: 'media',
 		hasChildren: true,
 		id: '69461027-8867-45bf-a93b-72bbdabfb177',
 		parent: null,
@@ -76,12 +64,11 @@ export const data: Array<UmbMediaDetailModel> = [
 			icon: 'icon-bug',
 			hasListView: false,
 		},
-		properties: [],
-		data: [],
+		values: [],
 		variants: [],
+		urls: [],
 	},
 	{
-		type: 'media',
 		hasChildren: true,
 		id: '69461027-8867-45bf-a93b-5224dabfb177',
 		parent: null,
@@ -92,12 +79,11 @@ export const data: Array<UmbMediaDetailModel> = [
 			icon: 'icon-bug',
 			hasListView: false,
 		},
-		properties: [],
-		data: [],
+		values: [],
 		variants: [],
+		urls: [],
 	},
 	{
-		type: 'media',
 		hasChildren: false,
 		id: '69431027-8867-45s7-a93b-7uibdabfb177',
 		parent: { id: '69461027-8867-45bf-a93b-72bbdabfb177' },
@@ -108,24 +94,16 @@ export const data: Array<UmbMediaDetailModel> = [
 			icon: 'icon-bug',
 			hasListView: false,
 		},
-		properties: [
-			{
-				alias: 'myMediaDescription',
-				label: 'Description',
-				description: 'Textarea property',
-				dataTypeId: 'dt-textArea',
-			},
-		],
-		data: [
+		values: [
 			{
 				alias: 'myMediaDescription',
 				value: 'Every day, a rabbit in a military costume greets me at the front door',
 			},
 		],
 		variants: [],
+		urls: [],
 	},
 	{
-		type: 'media',
 		hasChildren: false,
 		id: '69431027-8867-45s7-a93b-7uibdabf2147',
 		parent: { id: '69461027-8867-45bf-a93b-72bbdabfb177' },
@@ -136,24 +114,16 @@ export const data: Array<UmbMediaDetailModel> = [
 			icon: 'icon-bug',
 			hasListView: false,
 		},
-		properties: [
-			{
-				alias: 'myMediaDescription',
-				label: 'Description',
-				description: 'Textarea property',
-				dataTypeId: 'dt-textArea',
-			},
-		],
-		data: [
+		values: [
 			{
 				alias: 'myMediaDescription',
 				value: 'Every day, a rabbit in a military costume greets me at the front door',
 			},
 		],
 		variants: [],
+		urls: [],
 	},
 	{
-		type: 'media',
 		hasChildren: false,
 		id: '694hdj27-8867-45s7-a93b-7uibdabf2147',
 		parent: { id: '69461027-8867-45bf-a93b-5224dabfb177' },
@@ -164,24 +134,16 @@ export const data: Array<UmbMediaDetailModel> = [
 			icon: 'icon-bug',
 			hasListView: false,
 		},
-		properties: [
-			{
-				alias: 'myMediaDescription',
-				label: 'Description',
-				description: 'Textarea property',
-				dataTypeId: 'dt-textArea',
-			},
-		],
-		data: [
+		values: [
 			{
 				alias: 'myMediaDescription',
 				value: 'Every day, a rabbit in a military costume greets me at the front door',
 			},
 		],
 		variants: [],
+		urls: [],
 	},
 	{
-		type: 'media',
 		hasChildren: false,
 		id: '694hdj27-1237-45s7-a93b-7uibdabfas47',
 		parent: { id: '69461027-8867-45bf-a93b-5224dabfb177' },
@@ -192,25 +154,18 @@ export const data: Array<UmbMediaDetailModel> = [
 			icon: 'icon-bug',
 			hasListView: false,
 		},
-		properties: [
-			{
-				alias: 'myMediaDescription',
-				label: 'Description',
-				description: 'Textarea property',
-				dataTypeId: 'dt-textArea',
-			},
-		],
-		data: [
+		values: [
 			{
 				alias: 'myMediaDescription',
 				value: 'Every day, a rabbit in a military costume greets me at the front door',
 			},
 		],
 		variants: [],
+		urls: [],
 	},
 ];
 
-const createMediaItem = (item: UmbMediaDetailModel): MediaItemResponseModel => {
+const createMediaItem = (item: UmbMockMediaModel): MediaItemResponseModel => {
 	return {
 		id: item.id,
 		mediaType: item.mediaType,
@@ -219,22 +174,18 @@ const createMediaItem = (item: UmbMediaDetailModel): MediaItemResponseModel => {
 	};
 };
 
-// Temp mocked database
-// TODO: all properties are optional in the server schema. I don't think this is correct.
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-class UmbMediaData extends UmbEntityData<UmbMediaDetailModel> {
+class UmbMediaData extends UmbEntityData<UmbMockMediaModel> {
 	constructor() {
 		super(data);
 	}
 
 	getItems(ids: Array<string>): Array<MediaItemResponseModel> {
-		const items = this.data.filter((item) => ids.includes(item.id ?? ''));
+		const items = this.data.filter((item) => ids.includes(item.id));
 		return items.map((item) => createMediaItem(item));
 	}
 
 	getTreeRoot(): PagedMediaTreeItemResponseModel {
-		const items = this.data.filter((item) => item.parent?.id === null);
+		const items = this.data.filter((item) => item.parent === null);
 		const treeItems = items.map((item) => createMediaTreeItem(item));
 		const total = items.length;
 		return { items: treeItems, total };
@@ -250,10 +201,6 @@ class UmbMediaData extends UmbEntityData<UmbMediaDetailModel> {
 	getTreeItem(ids: Array<string>): Array<ContentTreeItemResponseModel> {
 		const items = this.data.filter((item) => ids.includes(item.id));
 		return items.map((item) => createMediaTreeItem(item));
-	}
-
-	move(ids: Array<string>, destinationKey: string) {
-		alert('change to new tree managers');
 	}
 }
 
