@@ -27,6 +27,7 @@ export class UmbMediaTreeServerDataSource extends UmbTreeServerDataSourceBase<
 	}
 }
 
+// eslint-disable-next-line local-rules/no-direct-api-import
 const getRootItems = () => MediaResource.getTreeMediaRoot({});
 
 const getChildrenOf = (parentUnique: string | null) => {
