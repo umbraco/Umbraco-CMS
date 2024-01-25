@@ -25,8 +25,7 @@ export class UmbCurrentUserContext extends UmbBaseController {
 			this.#observeIsAuthorized();
 		});
 
-		// TODO: revisit this. It can probably be simplified
-		this.observe(umbLocalizationRegistry.isDefaultLoaded, (isDefaultLoaded) => {
+		umbLocalizationRegistry.isDefaultLoaded.then((isDefaultLoaded) => {
 			if (!isDefaultLoaded) return;
 
 			this.observe(

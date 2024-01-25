@@ -1,15 +1,8 @@
 import type { ManifestBase, ManifestKind } from '../types/index.js';
 import type { ManifestTypeMap, SpecificManifestTypeOrManifestBase } from '../types/map.types.js';
 import { UmbBasicState } from '@umbraco-cms/backoffice/observable-api';
-import type {
-	Observable} from '@umbraco-cms/backoffice/external/rxjs';
-import {
-	map,
-	distinctUntilChanged,
-	combineLatest,
-	of,
-	switchMap,
-} from '@umbraco-cms/backoffice/external/rxjs';
+import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
+import { map, distinctUntilChanged, combineLatest, of, switchMap } from '@umbraco-cms/backoffice/external/rxjs';
 
 function extensionArrayMemoization<T extends Pick<ManifestBase, 'alias'>>(
 	previousValue: Array<T>,
@@ -213,6 +206,7 @@ export class UmbExtensionRegistry<
 		) as unknown as Observable<Array<ExtensionType>>;
 	}
 
+	// TODO: get rid of the name get
 	getByAlias<T extends ManifestBase = ManifestBase>(alias: string) {
 		return this.extensions.pipe(
 			map((exts) => exts.find((ext) => ext.alias === alias)),
@@ -245,6 +239,7 @@ export class UmbExtensionRegistry<
 		) as Observable<T | undefined>;
 	}
 
+	// TODO: get rid of the name get
 	getByTypeAndAlias<
 		Key extends keyof ManifestTypeMap<ManifestTypes> | string,
 		T extends ManifestBase = SpecificManifestTypeOrManifestBase<ManifestTypes, Key>,
@@ -275,6 +270,7 @@ export class UmbExtensionRegistry<
 		) as Observable<T | undefined>;
 	}
 
+	// TODO: get rid of the name get
 	getByTypeAndAliases<
 		Key extends keyof ManifestTypeMap<ManifestTypes> | string,
 		T extends ManifestBase = SpecificManifestTypeOrManifestBase<ManifestTypes, Key>,
@@ -306,6 +302,49 @@ export class UmbExtensionRegistry<
 		) as Observable<Array<T>>;
 	}
 
+	/**
+	 * Get an observable of an extension by type and a given filter method.
+	 * This will return the all extensions that matches the type and which filter method returns true.
+	 * The filter method will be called for each extension manifest of the given type, and the first argument to it is the extension manifest.
+	 * @param type {string} - The type of the extension to get
+	 * @param filter {(ext: T): void} - The filter method to use to filter the extensions
+	 * @returns {Observable<T | undefined>} - An observable of the extensions that matches the type and filter method
+	 */
+	byTypeAndFilter<
+		Key extends keyof ManifestTypeMap<ManifestTypes> | string,
+		T extends ManifestBase = SpecificManifestTypeOrManifestBase<ManifestTypes, Key>,
+	>(type: Key, filter: (ext: T) => boolean) {
+		return combineLatest([
+			this.extensions.pipe(
+				map((exts) => exts.find((ext) => ext.type === type && filter(ext as unknown as T))),
+				distinctUntilChanged(extensionSingleMemoization),
+			),
+			this._kindsOfType(type),
+		]).pipe(
+			map(([ext, kinds]) => {
+				// TODO: share one merge function between the different methods of this class:
+				// Specific Extension Meta merge (does not merge conditions)
+				if (ext) {
+					const baseManifest = kinds.find((kind) => kind.matchKind === ext.kind)?.manifest;
+					if (baseManifest) {
+						const merged = { __isMatchedWithKind: true, ...baseManifest, ...ext } as any;
+						if ((baseManifest as any).meta) {
+							merged.meta = { ...(baseManifest as any).meta, ...(ext as any).meta };
+						}
+						return merged;
+					}
+				}
+				return ext;
+			}),
+			distinctUntilChanged(extensionAndKindMatchSingleMemoization),
+		) as Observable<T | undefined>;
+	}
+
+	/**
+	 * Get an observable that provides extensions matching the given type.
+	 * @param type {string} - The type of the extensions to get.
+	 * @returns {Observable<T | undefined>} - An observable of the extensions that matches the type.
+	 */
 	extensionsOfType<
 		Key extends keyof ManifestTypeMap<ManifestTypes> | string,
 		T extends ManifestBase = SpecificManifestTypeOrManifestBase<ManifestTypes, Key>,
@@ -331,6 +370,11 @@ export class UmbExtensionRegistry<
 		) as Observable<Array<T>>;
 	}
 
+	/**
+	 * Get an observable that provides extensions matching given types.
+	 * @param type {Array<string>} - The types of the extensions to get.
+	 * @returns {Observable<T | undefined>} - An observable of the extensions that matches the types.
+	 */
 	extensionsOfTypes<ExtensionTypes extends ManifestBase = ManifestBase>(
 		types: string[],
 	): Observable<Array<ExtensionTypes>> {

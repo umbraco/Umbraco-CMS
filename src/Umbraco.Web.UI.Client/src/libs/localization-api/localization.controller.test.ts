@@ -1,7 +1,7 @@
 import { aTimeout, elementUpdated, expect, fixture, html } from '@open-wc/testing';
-import type { DefaultLocalizationSet, LocalizationSet} from './manager.js';
-import { registerLocalization, localizations } from './manager.js';
-import { UmbLocalizeController } from './localize.controller.js';
+import type { UmbLocalizationSet, UmbLocalizationSetBase } from './localization.manager.js';
+import { registerLocalization, localizations } from './localization.manager.js';
+import { UmbLocalizationController } from './localization.controller.js';
 import { LitElement, customElement, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbElementMixin } from '@umbraco-cms/backoffice/element-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -11,7 +11,7 @@ class UmbLocalizeControllerHostElement extends UmbElementMixin(LitElement) {
 	@property() lang = 'en-us';
 }
 
-interface TestLocalization extends LocalizationSet {
+interface TestLocalization extends UmbLocalizationSetBase {
 	close: string;
 	logout: string;
 	withInlineToken: any;
@@ -36,20 +36,20 @@ const english: TestLocalization = {
 	},
 };
 
-const englishOverride: DefaultLocalizationSet = {
+const englishOverride: UmbLocalizationSet = {
 	$code: 'en-us',
 	$dir: 'ltr',
 	close: 'Close 2',
 };
 
-const danish: DefaultLocalizationSet = {
+const danish: UmbLocalizationSet = {
 	$code: 'da',
 	$dir: 'ltr',
 	close: 'Luk',
 	notOnRegional: 'Not on regional',
 };
 
-const danishRegional: DefaultLocalizationSet = {
+const danishRegional: UmbLocalizationSet = {
 	$code: 'da-dk',
 	$dir: 'ltr',
 	close: 'Luk',
@@ -57,7 +57,7 @@ const danishRegional: DefaultLocalizationSet = {
 //#endregion
 
 describe('UmbLocalizeController', () => {
-	let controller: UmbLocalizeController<TestLocalization>;
+	let controller: UmbLocalizationController<TestLocalization>;
 
 	beforeEach(async () => {
 		registerLocalization(english, danish, danishRegional);
@@ -72,7 +72,7 @@ describe('UmbLocalizeController', () => {
 			getControllers: () => [],
 			removeControllerByAlias: () => {},
 		} satisfies UmbControllerHost;
-		controller = new UmbLocalizeController(host);
+		controller = new UmbLocalizationController(host);
 	});
 
 	afterEach(() => {
@@ -226,7 +226,7 @@ describe('UmbLocalizeController', () => {
 		});
 
 		it('should have a localize controller', () => {
-			expect(element.localize).to.be.instanceOf(UmbLocalizeController);
+			expect(element.localize).to.be.instanceOf(UmbLocalizationController);
 		});
 
 		it('should update the term when the language changes', async () => {

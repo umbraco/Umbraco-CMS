@@ -13,6 +13,8 @@ export class UmbSectionSidebarElement extends UmbLitElement {
 	}
 
 	render() {
+		// TODO: just for testing purpose, should be removed in PR.
+		console.log('Render', this);
 		return html`
 			<umb-section-sidebar-context-menu>
 				<uui-scroll-container id="scroll-container">

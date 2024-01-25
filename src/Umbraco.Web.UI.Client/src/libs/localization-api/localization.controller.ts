@@ -11,20 +11,12 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
-import type {
-	DefaultLocalizationSet,
-	FunctionParams,
-	LocalizationSet} from './manager.js';
-import {
-	connectedElements,
-	documentDirection,
-	documentLanguage,
-	fallback,
-	localizations,
-} from './manager.js';
+import type { UmbLocalizationSet, FunctionParams, UmbLocalizationSetBase } from './localization.manager.js';
+import { umbLocalizationManager } from './localization.manager.js';
+import type { LitElement } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbController, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-const LocalizeControllerAlias = Symbol();
+const LocalizationControllerAlias = Symbol();
 /**
  * The UmbLocalizeController enables localization for your element.
  *
@@ -43,12 +35,11 @@ const LocalizeControllerAlias = Symbol();
  * }
  * ```
  */
-export class UmbLocalizeController<LocalizationType extends LocalizationSet = DefaultLocalizationSet>
-	implements UmbController
-{
+export class UmbLocalizationController implements UmbController {
 	#host;
-	#hostEl;
-	controllerAlias = LocalizeControllerAlias;
+	#hostEl?: HTMLElement & Partial<Pick<LitElement, 'requestUpdate'>>;
+	readonly controllerAlias = LocalizationControllerAlias;
+	#usedKeys = new Array<keyof UmbLocalizationSet>();
 
 	constructor(host: UmbControllerHost) {
 		this.#host = host;
@@ -57,15 +48,11 @@ export class UmbLocalizeController<LocalizationType extends LocalizationSet = De
 	}
 
 	hostConnected(): void {
-		if (connectedElements.has(this.#hostEl)) {
-			return;
-		}
-
-		connectedElements.add(this.#hostEl);
+		umbLocalizationManager.appendConsumer(this);
 	}
 
 	hostDisconnected(): void {
-		connectedElements.delete(this.#hostEl);
+		umbLocalizationManager.removeConsumer(this);
 	}
 
 	destroy(): void {
@@ -73,12 +60,24 @@ export class UmbLocalizeController<LocalizationType extends LocalizationSet = De
 		this.#hostEl = undefined as any;
 	}
 
+	documentUpdate() {
+		this.#hostEl?.requestUpdate?.();
+	}
+
+	keysChanged(changedKeys: Set<keyof UmbLocalizationSet>) {
+		const hasOneOfTheseKeys = this.#usedKeys.find((key) => changedKeys.has(key));
+
+		if (hasOneOfTheseKeys) {
+			this.#hostEl?.requestUpdate?.();
+		}
+	}
+
 	/**
 	 * Gets the host element's directionality as determined by the `dir` attribute. The return value is transformed to
 	 * lowercase.
 	 */
 	dir() {
-		return `${this.#hostEl.dir || documentDirection}`.toLowerCase();
+		return `${this.#hostEl?.dir || umbLocalizationManager.documentDirection}`.toLowerCase();
 	}
 
 	/**
@@ -86,21 +85,23 @@ export class UmbLocalizeController<LocalizationType extends LocalizationSet = De
 	 * lowercase.
 	 */
 	lang() {
-		return `${this.#hostEl.lang || documentLanguage}`.toLowerCase();
+		return `${this.#hostEl?.lang || umbLocalizationManager.documentLanguage}`.toLowerCase();
 	}
 
 	private getLocalizationData(lang: string) {
 		const locale = new Intl.Locale(lang);
 		const language = locale?.language.toLowerCase();
 		const region = locale?.region?.toLowerCase() ?? '';
-		const primary = <LocalizationType>localizations.get(`${language}-${region}`);
-		const secondary = <LocalizationType>localizations.get(language);
+		const primary = <UmbLocalizationSet>umbLocalizationManager.localizations.get(`${language}-${region}`);
+		const secondary = <UmbLocalizationSet>umbLocalizationManager.localizations.get(language);
 
 		return { locale, language, region, primary, secondary };
 	}
 
 	/** Outputs a translated term. */
-	term<K extends keyof LocalizationType>(key: K, ...args: FunctionParams<LocalizationType[K]>): string {
+	term<K extends keyof UmbLocalizationSet>(key: K, ...args: FunctionParams<UmbLocalizationSet[K]>): string {
+		this.#usedKeys.push(key);
+
 		const { primary, secondary } = this.getLocalizationData(this.lang());
 		let term: any;
 
@@ -109,8 +110,11 @@ export class UmbLocalizeController<LocalizationType extends LocalizationSet = De
 			term = primary[key];
 		} else if (secondary && secondary[key]) {
 			term = secondary[key];
-		} else if (fallback && fallback[key as keyof LocalizationSet]) {
-			term = fallback[key as keyof LocalizationSet];
+		} else if (
+			umbLocalizationManager.fallback &&
+			umbLocalizationManager.fallback[key as keyof UmbLocalizationSetBase]
+		) {
+			term = umbLocalizationManager.fallback[key as keyof UmbLocalizationSetBase];
 		} else {
 			return String(key);
 		}
