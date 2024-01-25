@@ -2,11 +2,11 @@
 
 public class DocumentConfigurationResponseModel
 {
-    public bool SanitizeTinyMce { get; set; }
+    public required bool SanitizeTinyMce { get; set; }
 
-    public bool DisableDeleteWhenReferenced { get; set; }
+    public required bool DisableDeleteWhenReferenced { get; set; }
 
-    public bool DisableUnpublishWhenReferenced { get; set; }
+    public required bool DisableUnpublishWhenReferenced { get; set; }
 
-    public bool AllowEditInvariantFromNonDefault { get; set; }
+    public required bool AllowEditInvariantFromNonDefault { get; set; }
 }

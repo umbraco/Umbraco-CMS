@@ -4,5 +4,5 @@ namespace Umbraco.Cms.Api.Management.ViewModels.DataType;
 
 public class DatatypeConfigurationResponseModel
 {
-    public DataTypeChangeMode CanBeChanged { get; set; }
+    public required DataTypeChangeMode CanBeChanged { get; set; }
 }

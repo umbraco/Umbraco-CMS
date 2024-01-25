@@ -2,9 +2,9 @@
 
 public class MediaConfigurationResponseModel
 {
-    public bool DisableDeleteWhenReferenced { get; set; }
+    public required bool DisableDeleteWhenReferenced { get; set; }
 
-    public bool DisableUnpublishWhenReferenced { get; set; }
+    public required bool DisableUnpublishWhenReferenced { get; set; }
 
-    public bool SanitizeTinyMce { get; set; }
+    public required bool SanitizeTinyMce { get; set; }
 }

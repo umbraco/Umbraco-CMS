@@ -4,7 +4,7 @@ namespace Umbraco.Cms.Api.Management.ViewModels.DocumentType;
 
 public class DocumentTypeConfigurationResponseModel
 {
-    public DataTypeChangeMode DataTypesCanBeChanged { get; set; }
+    public required DataTypeChangeMode DataTypesCanBeChanged { get; set; }
 
-    public bool DisableTemplates { get; set; }
+    public required bool DisableTemplates { get; set; }
 }
