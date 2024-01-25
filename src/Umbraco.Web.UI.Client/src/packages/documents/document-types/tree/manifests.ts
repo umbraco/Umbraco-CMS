@@ -6,6 +6,7 @@ import {
 import { UmbDocumentTypeTreeRepository } from './document-type-tree.repository.js';
 import { UmbDocumentTypeTreeStore } from './document-type.tree.store.js';
 import { manifests as folderManifests } from './folder/manifests.js';
+import { manifests as reloadManifests } from './reload-tree-item-children/manifests.js';
 import type {
 	ManifestRepository,
 	ManifestTree,
@@ -54,4 +55,4 @@ const treeItem: ManifestTreeItem = {
 	},
 };
 
-export const manifests = [treeRepository, treeStore, tree, treeItem, ...folderManifests];
+export const manifests = [treeRepository, treeStore, tree, treeItem, ...folderManifests, ...reloadManifests];

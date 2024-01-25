@@ -1,4 +1,4 @@
-import { UMB_DICTIONARY_ROOT_ENTITY_TYPE } from '../entities.js';
+import { UMB_DICTIONARY_ROOT_ENTITY_TYPE } from '../entity.js';
 import { UmbDictionaryTreeServerDataSource } from './dictionary-tree.server.data-source.js';
 import type { UmbDictionaryTreeItemModel, UmbDictionaryTreeRootModel } from './types.js';
 import { UMB_DICTIONARY_TREE_STORE_CONTEXT } from './dictionary-tree.store.js';

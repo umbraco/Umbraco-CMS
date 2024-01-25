@@ -1,4 +1,4 @@
-import { UMB_DICTIONARY_ROOT_ENTITY_TYPE } from './dictionary/entities.js';
+import { UMB_DICTIONARY_ROOT_ENTITY_TYPE } from './dictionary/entity.js';
 import type { ManifestDashboard, ManifestSection, ManifestTypes } from '@umbraco-cms/backoffice/extension-registry';
 
 const sectionAlias = 'Umb.Section.Dictionary';

@@ -12,8 +12,8 @@ export class UmbUnlockUserEntityAction extends UmbEntityActionBase<UmbUnlockUser
 	#modalManager?: UmbModalManagerContext;
 	#itemRepository: UmbUserItemRepository;
 
-	constructor(host: UmbControllerHostElement, repositoryAlias: string, unique: string) {
-		super(host, repositoryAlias, unique);
+	constructor(host: UmbControllerHostElement, repositoryAlias: string, unique: string, entityType: string) {
+		super(host, repositoryAlias, unique, entityType);
 
 		this.#itemRepository = new UmbUserItemRepository(this);
 

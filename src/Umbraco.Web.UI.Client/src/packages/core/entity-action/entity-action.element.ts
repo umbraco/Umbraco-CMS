@@ -7,6 +7,20 @@ import { createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 
 @customElement('umb-entity-action')
 export class UmbEntityActionElement extends UmbLitElement {
+	private _entityType?: string | null;
+	@property({ type: String })
+	public get entityType() {
+		return this._entityType;
+	}
+	public set entityType(value: string | undefined | null) {
+		const oldValue = this._entityType;
+		this._entityType = value;
+		if (oldValue !== this._entityType) {
+			this.#createApi();
+			this.requestUpdate('entityType', oldValue);
+		}
+	}
+
 	private _unique?: string | null;
 	@property({ type: String })
 	public get unique() {
@@ -37,10 +51,17 @@ export class UmbEntityActionElement extends UmbLitElement {
 	}
 
 	async #createApi() {
+		// only create the api if we have all the required properties
 		if (!this._manifest) return;
 		if (this._unique === undefined) return;
+		if (!this._entityType) return;
 
-		this.#api = await createExtensionApi(this._manifest, [this, this._manifest.meta.repositoryAlias, this.unique]);
+		this.#api = await createExtensionApi(this._manifest, [
+			this,
+			this._manifest.meta.repositoryAlias,
+			this.unique,
+			this.entityType,
+		]);
 
 		// TODO: Fix so when we use a HREF it does not refresh the page?
 		this._href = await this.#api.getHref?.();
