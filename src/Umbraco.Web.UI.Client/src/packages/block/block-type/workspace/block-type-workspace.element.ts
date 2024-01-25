@@ -6,9 +6,9 @@ import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 
 import { UmbWorkspaceIsNewRedirectController } from '@umbraco-cms/backoffice/workspace';
-import type { UmbApi} from '@umbraco-cms/backoffice/extension-api';
+import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
 import { UmbExtensionsApiInitializer, createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
-import type { ManifestWorkspace} from '@umbraco-cms/backoffice/extension-registry';
+import type { ManifestWorkspace } from '@umbraco-cms/backoffice/extension-registry';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
 @customElement('umb-block-type-workspace')
@@ -39,11 +39,13 @@ export class UmbBlockTypeWorkspaceElement extends UmbLitElement {
 
 		this._routes = [
 			{
-				path: 'create/:elementTypeKey',
+				// Would it make more sense to have groupKey before elementTypeKey?
+				path: 'create/:elementTypeKey/:groupKey',
 				component: this.#editorElement,
 				setup: async (_component, info) => {
 					const elementTypeKey = info.match.params.elementTypeKey;
-					this.#workspaceContext!.create(elementTypeKey);
+					const groupKey = info.match.params.groupKey === 'null' ? null : info.match.params.groupKey;
+					this.#workspaceContext!.create(elementTypeKey, groupKey);
 
 					new UmbWorkspaceIsNewRedirectController(
 						this,

@@ -1,7 +1,16 @@
-import type { UmbBlockTypeWithGroupKey } from '../../../block-type/index.js';
+import type { UmbBlockTypeWithGroupKey, UmbInputBlockTypeElement } from '../../../block-type/index.js';
 import '../../../block-type/components/input-block-type/index.js';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/extension-registry';
-import { html, customElement, property, state, repeat, nothing, css } from '@umbraco-cms/backoffice/external/lit';
+import {
+	html,
+	customElement,
+	property,
+	state,
+	repeat,
+	nothing,
+	css,
+	ifDefined,
+} from '@umbraco-cms/backoffice/external/lit';
 import {
 	UmbPropertyValueChangeEvent,
 	type UmbPropertyEditorConfigCollection,
@@ -11,6 +20,7 @@ import { UmbLitElement } from '@umbraco-cms/internal/lit-element';
 import type { UmbBlockGridGroupType, UmbBlockGridGroupTypeConfiguration } from '@umbraco-cms/backoffice/block';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { UMB_PROPERTY_DATASET_CONTEXT, type UmbPropertyDatasetContext } from '@umbraco-cms/backoffice/property';
+import { UMB_WORKSPACE_MODAL, UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/modal';
 
 /**
  * @element umb-property-editor-ui-block-grid-type-configuration
@@ -21,6 +31,10 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 	implements UmbPropertyEditorUiElement
 {
 	#datasetContext?: UmbPropertyDatasetContext;
+	#blockTypeWorkspaceModalRegistration?: UmbModalRouteRegistrationController<
+		typeof UMB_WORKSPACE_MODAL.DATA,
+		typeof UMB_WORKSPACE_MODAL.VALUE
+	>;
 
 	private _value: Array<UmbBlockTypeWithGroupKey> = [];
 	@property({ attribute: false })
@@ -40,12 +54,29 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 	@state()
 	private _mappedValuesAndGroups: Array<UmbBlockGridGroupTypeConfiguration> = [];
 
+	@state()
+	private _workspacePath?: string;
+
 	constructor() {
 		super();
 		this.consumeContext(UMB_PROPERTY_DATASET_CONTEXT, async (instance) => {
 			this.#datasetContext = instance;
 			this.#observeProperties();
 		});
+
+		this.#blockTypeWorkspaceModalRegistration?.destroy();
+
+		const entityType = 'block-grid-type';
+
+		this.#blockTypeWorkspaceModalRegistration = new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
+			.addAdditionalPath(entityType)
+			.onSetup(() => {
+				return { data: { entityType: entityType, preset: {} }, modal: { size: 'large' } };
+			})
+			.observeRouteBuilder((routeBuilder) => {
+				const newpath = routeBuilder({});
+				this._workspacePath = newpath;
+			});
 	}
 
 	async #observeProperties() {
@@ -71,19 +102,18 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 		this._mappedValuesAndGroups = [{ blocks: valuesWithNoGroup }, ...valuesWithGroup];
 	}
 
-	/*
-	#onChange(e: CustomEvent, group?: UmbBlockGridGroupTypeConfiguration) {
-		const groupValues = (e.target as UmbInputBlockTypeElement).value;
-		const newValues = groupValues.map((value) => ({ ...value, groupKey: group?.key }));
-		const filteredValues = this._value.filter((block) => block.contentElementTypeKey === group?.key);
-		this.value = [...filteredValues, ...newValues];
-		this.dispatchEvent(new CustomEvent('property-value-change'));
-	}
-	*/
-
-	#deleteItem(e: CustomEvent) {
-		this.value = this._value.filter((block) => block.contentElementTypeKey !== e.detail.contentElementTypeKey);
+	#onChange(e: CustomEvent, groupKey?: string) {
+		const updatedValues = (e.target as UmbInputBlockTypeElement).value.map((value) => ({ ...value, groupKey }));
+		const filteredValues = this.value.filter((value) => value.groupKey !== groupKey);
+		this.value = [...filteredValues, ...updatedValues];
 		this.dispatchEvent(new UmbPropertyValueChangeEvent());
+	}
+
+	#onCreate(e: CustomEvent, groupKey: string | null) {
+		const selectedElementType = e.detail.contentElementTypeKey;
+		if (selectedElementType) {
+			this.#blockTypeWorkspaceModalRegistration?.open({}, 'create/' + selectedElementType + '/' + groupKey);
+		}
 	}
 
 	#deleteGroup(groupKey: string) {
@@ -113,7 +143,9 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 					<umb-input-block-type
 						entity-type="block-grid-type"
 						.value="${group.blocks}"
-						@delete=${this.#deleteItem}></umb-input-block-type>`,
+						.workspacePath="${this._workspacePath}"
+						@create=${(e: CustomEvent) => this.#onCreate(e, group.key ?? null)}
+						@change=${(e: CustomEvent) => this.#onChange(e, group.key)}></umb-input-block-type>`,
 		)}`;
 	}
 
@@ -122,7 +154,7 @@ export class UmbPropertyEditorUIBlockGridTypeConfigurationElement
 			auto-width
 			label="Group"
 			.value=${groupName ?? ''}
-			@delete=${(e: UUIInputEvent) => this.#changeGroupName(e, groupKey)}>
+			@change=${(e: UUIInputEvent) => this.#changeGroupName(e, groupKey)}>
 			<uui-button compact slot="append" label="delete" @click=${() => this.#deleteGroup(groupKey)}>
 				<uui-icon name="icon-trash"></uui-icon>
 			</uui-button>
